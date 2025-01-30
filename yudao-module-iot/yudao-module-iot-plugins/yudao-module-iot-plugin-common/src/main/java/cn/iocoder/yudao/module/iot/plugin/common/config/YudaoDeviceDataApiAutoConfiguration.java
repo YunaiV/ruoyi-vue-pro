@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.iot.plugin.common.config;
 
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
-import cn.iocoder.yudao.module.iot.plugin.common.api.DeviceDataApiClient;
+import cn.iocoder.yudao.module.iot.plugin.common.core.downstream.IotDeviceDownstreamHandler;
+import cn.iocoder.yudao.module.iot.plugin.common.core.downstream.IotDeviceDownstreamServer;
+import cn.iocoder.yudao.module.iot.plugin.common.core.upstream.IotDeviceUpstreamClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -10,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 
+// TODO @芋艿：配置类的名字
 /**
  * 设备数据 API 初始化器
  *
@@ -31,8 +34,8 @@ public class YudaoDeviceDataApiAutoConfiguration {
     public RestTemplate restTemplate() {
         // 如果你有更多的自定义需求，比如连接池、超时时间等，可以在这里设置
         return new RestTemplateBuilder()
-                .setConnectTimeout(Duration.ofMillis(5000)) // 设置连接超时时间
-                .setReadTimeout(Duration.ofMillis(5000)) // 设置读取超时时间
+                .connectTimeout(Duration.ofMillis(5000)) // 设置连接超时时间
+                .readTimeout(Duration.ofMillis(5000)) // 设置读取超时时间
                 .build();
     }
 
@@ -44,7 +47,13 @@ public class YudaoDeviceDataApiAutoConfiguration {
      */
     @Bean
     public IotDeviceUpstreamApi deviceDataApi(RestTemplate restTemplate) {
-        return new DeviceDataApiClient(restTemplate, deviceDataUrl);
+        return new IotDeviceUpstreamClient(restTemplate, deviceDataUrl);
+    }
+
+    @Bean(initMethod = "start", destroyMethod = "stop")
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+    public IotDeviceDownstreamServer deviceDownstreamServer(IotDeviceDownstreamHandler deviceDownstreamHandler) {
+        return new IotDeviceDownstreamServer(deviceDownstreamHandler);
     }
 
 }

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.api.device.dto;
+package cn.iocoder.yudao.module.iot.api.device.dto.control.upstream;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
- * IoT 设备状态更新 Request DTO
+ * IoT 设备【状态】更新 Request DTO
  */
 @Data
 public class IotDeviceStateUpdateReqDTO extends IotDeviceUpstreamAbstractReqDTO {

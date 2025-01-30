@@ -1,19 +1,24 @@
-package cn.iocoder.yudao.module.iot.plugin.common.api;
+package cn.iocoder.yudao.module.iot.plugin.common.core.upstream;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
-import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceEventReportReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStateUpdateReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceEventReportReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDevicePropertyReportReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceStateUpdateReqDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestTemplate;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-// TODO @haohao：类注释，写一下，比较好
-// TODO @haohao：类名要改下
+/**
+ * 设备数据 Upstream 上行客户端
+ *
+ * 通过 HTTP 调用远程的 IotDeviceUpstreamApi 接口
+ *
+ * @author haohao
+ */
 @Slf4j
-public class DeviceDataApiClient implements IotDeviceUpstreamApi {
+public class IotDeviceUpstreamClient implements IotDeviceUpstreamApi {
 
     public static final String URL_PREFIX = "/rpc-api/iot/device/upstream";
 
@@ -22,7 +27,7 @@ public class DeviceDataApiClient implements IotDeviceUpstreamApi {
 
     // 可以通过构造器把 RestTemplate 和 baseUrl 注入进来
     // TODO @haohao：可以用 lombok 简化
-    public DeviceDataApiClient(RestTemplate restTemplate, String deviceDataUrl) {
+    public IotDeviceUpstreamClient(RestTemplate restTemplate, String deviceDataUrl) {
         this.restTemplate = restTemplate;
         this.deviceDataUrl = deviceDataUrl;
     }

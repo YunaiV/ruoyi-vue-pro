@@ -18,6 +18,7 @@
     </description>
 
     <dependencies>
+        <!-- TODO 芋艿：依赖整理 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-common</artifactId>
@@ -29,27 +30,26 @@
             <version>${revision}</version>
         </dependency>
 
-        <!-- 其他依赖项 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <!-- PF4J -->
-        <dependency>
-            <groupId>org.pf4j</groupId>
-            <artifactId>pf4j-spring</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+
+        <!-- 其他依赖项 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- Vert.x Web -->
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-web</artifactId>
         </dependency>
     </dependencies>
 

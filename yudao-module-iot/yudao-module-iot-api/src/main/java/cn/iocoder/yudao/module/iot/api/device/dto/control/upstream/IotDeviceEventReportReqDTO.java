@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.api.device.dto;
+package cn.iocoder.yudao.module.iot.api.device.dto.control.upstream;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.Map;
 
 /**
- * IoT 设备【事件】数据上报 Request DTO
+ * IoT 设备【事件】上报 Request DTO
  */
 @Data
 public class IotDeviceEventReportReqDTO extends IotDeviceUpstreamAbstractReqDTO {

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.plugin.http.config;
 
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
-import cn.iocoder.yudao.module.iot.plugin.http.service.HttpVertxHandler;
+import cn.iocoder.yudao.module.iot.plugin.http.framework.upstream.HttpVertxHandler;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -34,7 +34,7 @@ public class HttpVertxPluginConfiguration {
 
     /**
      * 创建路由
-     * 
+     *
      * @param vertx Vertx 实例
      * @param httpVertxHandler HttpVertxHandler 实例
      * @return Router 实例
@@ -68,7 +68,7 @@ public class HttpVertxPluginConfiguration {
     /**
      * 定义一个 VertxService 来管理服务器启动逻辑
      * 无论是独立运行还是插件方式，都可以共用此类
-     * 
+     *
      * @param vertx Vertx 实例
      * @param router Router 实例
      * @return VertxService 实例

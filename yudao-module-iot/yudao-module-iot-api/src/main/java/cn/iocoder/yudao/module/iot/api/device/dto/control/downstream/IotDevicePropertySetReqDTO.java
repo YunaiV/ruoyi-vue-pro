@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.api.device.dto;
+package cn.iocoder.yudao.module.iot.api.device.dto.control.downstream;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
@@ -6,10 +6,12 @@ import lombok.Data;
 import java.util.Map;
 
 /**
- * IoT 设备【属性】数据上报 Request DTO
+ * IoT 设备【属性】设置 Request DTO
+ *
+ * @author 芋道源码
  */
 @Data
-public class IotDevicePropertyReportReqDTO extends IotDeviceUpstreamAbstractReqDTO {
+public class IotDevicePropertySetReqDTO extends IotDeviceDownstreamAbstractReqDTO {
 
     /**
      * 属性参数

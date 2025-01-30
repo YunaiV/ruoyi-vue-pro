@@ -1,11 +1,11 @@
-package cn.iocoder.yudao.module.iot.plugin.http.service;
+package cn.iocoder.yudao.module.iot.plugin.http.framework.upstream;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
-import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStateUpdateReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDevicePropertyReportReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceStateUpdateReqDTO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RequestBody;

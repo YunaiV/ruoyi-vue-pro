@@ -121,12 +121,20 @@
     </build>
 
     <dependencies>
+        <!-- TODO 芋艿：优化下 -->
         <!-- 项目依赖 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-iot-plugin-common</artifactId>
             <version>${revision}</version>
         </dependency>
+
+        <!-- 其他依赖项 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
         <!-- Vert.x Web -->
         <dependency>
             <groupId>io.vertx</groupId>

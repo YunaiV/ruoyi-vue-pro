@@ -5,7 +5,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.yudao.framework.tenant.core.job.TenantJob;
-import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStateUpdateReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceStateUpdateReqDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
