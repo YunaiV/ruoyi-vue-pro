@@ -21,9 +21,9 @@ public abstract class IotDeviceUpstreamAbstractReqDTO {
     private String requestId;
 
     /**
-     * 插件标识
+     * 插件实例的进程编号
      */
-    private String pluginKey;
+    private String processId;
 
     /**
      * 产品标识

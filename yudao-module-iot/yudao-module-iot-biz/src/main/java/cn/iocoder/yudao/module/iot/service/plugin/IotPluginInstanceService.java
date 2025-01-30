@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.plugin;
 
-import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.PluginInfoDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInfoDO;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author 芋道源码
  */
-public interface PluginInstanceService {
+public interface IotPluginInstanceService {
 
     // TODO @芋艿：这个是否应该放到 plugin 主动心跳，而是 server 自己心跳
     /**
@@ -28,7 +28,7 @@ public interface PluginInstanceService {
      *
      * @param pluginInfoDo 插件信息
      */
-    void deletePluginFile(PluginInfoDO pluginInfoDo);
+    void deletePluginFile(IotPluginInfoDO pluginInfoDo);
 
     /**
      * 上传并加载新的插件文件
@@ -44,6 +44,16 @@ public interface PluginInstanceService {
      * @param pluginInfoDo 插件信息
      * @param status       新状态
      */
-    void updatePluginStatus(PluginInfoDO pluginInfoDo, Integer status);
+    void updatePluginStatus(IotPluginInfoDO pluginInfoDo, Integer status);
+
+    // ========== 设备与插件的映射操作 ==========
+
+    /**
+     * 更新设备对应的插件实例的进程编号
+     *
+     * @param deviceKey 设备 Key
+     * @param processId 进程编号
+     */
+    void updateDevicePluginInstanceProcessIdAsync(String deviceKey, String processId);
 
 }

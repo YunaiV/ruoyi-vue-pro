@@ -22,7 +22,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PluginInfoDO extends BaseDO {
+public class IotPluginInfoDO extends BaseDO {
 
     /**
      * 主键 ID

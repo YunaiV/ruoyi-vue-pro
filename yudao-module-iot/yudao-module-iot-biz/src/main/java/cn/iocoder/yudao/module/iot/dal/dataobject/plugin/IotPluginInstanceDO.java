@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+import java.time.LocalDateTime;
 
 /**
  * IoT 插件实例 DO
@@ -20,40 +21,52 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PluginInstanceDO extends BaseDO {
+public class IotPluginInstanceDO extends BaseDO {
 
     /**
-     * 主键ID
+     * 主键
      */
     @TableId
     private Long id;
-    // TODO @芋艿：找一个更好的字段名
     /**
-     * 插件主程序 ID
-     */
-    private String mainId;
-    /**
-     * 插件 ID
+     * 插件编号
      * <p>
-     * 关联 {@link PluginInfoDO#getId()}
+     * 关联 {@link IotPluginInfoDO#getId()}
      */
     private Long pluginId;
+    /**
+     * 插件进程编号
+     *
+     * 一般格式是：hostIp@processId@${uuid}
+     */
+    private String processId;
 
     /**
-     * 插件主程序所在 IP
+     * 插件实例所在 IP
      */
-    private String ip;
-    // TODO @芋艿：这个 port 是否有必要记录
+    private String hostIp;
     /**
-     * 插件主程序端口
+     * 设备下行端口
      */
-    private Integer port;
-    // TODO @芋艿：downstreamPort 增加，目的：用于下行
+    private Integer downstreamPort;
 
-    // TODO @haohao：字段改成 heartbeatTime，LocalDateTime
     /**
-     * 心跳时间，心路时间超过 30 秒需要剔除
+     * 是否在线
      */
-    private Long heartbeatAt;
+    private Boolean online;
+    /**
+     * 在线时间
+     */
+    private LocalDateTime onlineTime;
+    /**
+     * 离线时间
+     */
+    private LocalDateTime offlineTime;
+    /**
+     * 心跳时间
+     *
+     * 目的：心路时间超过一定时间后，会被进行下线处理
+     */
+    private Long heartbeatTime;
 
 }

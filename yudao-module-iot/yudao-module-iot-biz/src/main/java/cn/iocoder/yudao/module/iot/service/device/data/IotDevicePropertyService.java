@@ -61,11 +61,11 @@ public interface IotDevicePropertyService {
     Set<String> getDeviceKeysByReportTime(LocalDateTime maxReportTime);
 
     /**
-     * 更新设备上报时间
+     * 异步更新设备上报时间
      *
      * @param deviceKey  设备标识
      * @param reportTime 上报时间
      */
-    void updateDeviceReportTime(String deviceKey, LocalDateTime reportTime);
+    void updateDeviceReportTimeAsync(String deviceKey, LocalDateTime reportTime);
 
 }

@@ -7,8 +7,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.info.PluginInfoImp
 import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.info.PluginInfoPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.info.PluginInfoRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.info.PluginInfoSaveReqVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.PluginInfoDO;
-import cn.iocoder.yudao.module.iot.service.plugin.PluginInfoService;
+import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInfoDO;
+import cn.iocoder.yudao.module.iot.service.plugin.IotPluginInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +27,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 public class PluginInfoController {
 
     @Resource
-    private PluginInfoService pluginInfoService;
+    private IotPluginInfoService pluginInfoService;
 
     @PostMapping("/create")
     @Operation(summary = "创建插件信息")
@@ -58,7 +58,7 @@ public class PluginInfoController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('iot:plugin-info:query')")
     public CommonResult<PluginInfoRespVO> getPluginInfo(@RequestParam("id") Long id) {
-        PluginInfoDO pluginInfo = pluginInfoService.getPluginInfo(id);
+        IotPluginInfoDO pluginInfo = pluginInfoService.getPluginInfo(id);
         return success(BeanUtils.toBean(pluginInfo, PluginInfoRespVO.class));
     }
 
@@ -66,7 +66,7 @@ public class PluginInfoController {
     @Operation(summary = "获得插件信息分页")
     @PreAuthorize("@ss.hasPermission('iot:plugin-info:query')")
     public CommonResult<PageResult<PluginInfoRespVO>> getPluginInfoPage(@Valid PluginInfoPageReqVO pageReqVO) {
-        PageResult<PluginInfoDO> pageResult = pluginInfoService.getPluginInfoPage(pageReqVO);
+        PageResult<IotPluginInfoDO> pageResult = pluginInfoService.getPluginInfoPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, PluginInfoRespVO.class));
     }
 

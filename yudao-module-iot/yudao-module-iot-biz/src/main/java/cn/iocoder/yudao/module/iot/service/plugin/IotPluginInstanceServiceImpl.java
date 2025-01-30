@@ -3,10 +3,11 @@ package cn.iocoder.yudao.module.iot.service.plugin;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.IdUtil;
-import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.PluginInfoDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.PluginInstanceDO;
-import cn.iocoder.yudao.module.iot.dal.mysql.plugin.PluginInfoMapper;
-import cn.iocoder.yudao.module.iot.dal.mysql.plugin.PluginInstanceMapper;
+import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInfoDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInstanceDO;
+import cn.iocoder.yudao.module.iot.dal.mysql.plugin.IotPluginInfoMapper;
+import cn.iocoder.yudao.module.iot.dal.mysql.plugin.IotPluginInstanceMapper;
+import cn.iocoder.yudao.module.iot.dal.redis.plugin.DevicePluginProcessIdRedisDAO;
 import cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
 import jakarta.annotation.Resource;
@@ -38,16 +39,20 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 @Service
 @Validated
 @Slf4j
-public class PluginInstanceServiceImpl implements PluginInstanceService {
+public class IotPluginInstanceServiceImpl implements IotPluginInstanceService {
 
     // TODO @haohao：mac@uuid
     public static final String MAIN_ID = IdUtil.fastSimpleUUID();
 
+    // TODO @haohao：不直接操作，通过 Service 哈
     @Resource
-    private PluginInfoMapper pluginInfoMapper;
+    private IotPluginInfoMapper pluginInfoMapper;
 
     @Resource
-    private PluginInstanceMapper pluginInstanceMapper;
+    private IotPluginInstanceMapper pluginInstanceMapper;
+
+    @Resource
+    private DevicePluginProcessIdRedisDAO devicePluginProcessIdRedisDAO;
 
     @Resource
     private SpringPluginManager pluginManager;
@@ -73,7 +78,7 @@ public class PluginInstanceServiceImpl implements PluginInstanceService {
     }
 
     @Override
-    public void deletePluginFile(PluginInfoDO pluginInfoDO) {
+    public void deletePluginFile(IotPluginInfoDO pluginInfoDO) {
         File file = new File(pluginsDir, pluginInfoDO.getFileName());
         if (!file.exists()) {
             return;
@@ -115,7 +120,7 @@ public class PluginInstanceServiceImpl implements PluginInstanceService {
     }
 
     @Override
-    public void updatePluginStatus(PluginInfoDO pluginInfoDo, Integer status) {
+    public void updatePluginStatus(IotPluginInfoDO pluginInfoDo, Integer status) {
         String pluginKey = pluginInfoDo.getPluginKey();
         PluginWrapper plugin = pluginManager.getPlugin(pluginKey);
 
@@ -147,9 +152,9 @@ public class PluginInstanceServiceImpl implements PluginInstanceService {
         List<PluginWrapper> plugins = pluginManager.getPlugins();
 
         // 1.2 获取插件信息列表并转换为 Map 以便快速查找
-        List<PluginInfoDO> pluginInfos = pluginInfoMapper.selectList();
-        Map<String, PluginInfoDO> pluginInfoMap = pluginInfos.stream()
-                .collect(Collectors.toMap(PluginInfoDO::getPluginKey, Function.identity()));
+        List<IotPluginInfoDO> pluginInfos = pluginInfoMapper.selectList();
+        Map<String, IotPluginInfoDO> pluginInfoMap = pluginInfos.stream()
+                .collect(Collectors.toMap(IotPluginInfoDO::getPluginKey, Function.identity()));
 
         // 1.3 获取本机 IP 和 MAC 地址,mac@uuid
         String ip = NetUtil.getLocalhostStr();
@@ -161,34 +166,42 @@ public class PluginInstanceServiceImpl implements PluginInstanceService {
             String pluginKey = plugin.getPluginId();
 
             // 2.1 查找插件信息
-            PluginInfoDO pluginInfo = pluginInfoMap.get(pluginKey);
+            IotPluginInfoDO pluginInfo = pluginInfoMap.get(pluginKey);
             if (pluginInfo == null) {
                 log.error("插件信息不存在，pluginKey = {}", pluginKey);
                 continue;
             }
 
             // 2.2 情况一：如果插件实例不存在，则创建
-            PluginInstanceDO pluginInstance = pluginInstanceMapper.selectByMainIdAndPluginId(mainId,
+            IotPluginInstanceDO pluginInstance = pluginInstanceMapper.selectByMainIdAndPluginId(mainId,
                     pluginInfo.getId());
-            if (pluginInstance == null) {
-                // 4.4 如果插件实例不存在，则创建
-                pluginInstance = PluginInstanceDO.builder()
-                        .pluginId(pluginInfo.getId())
-                        .mainId(MAIN_ID + "-" + mac)
-                        .ip(ip)
-                        .port(port)
-                        .heartbeatAt(System.currentTimeMillis())
-                        .build();
-                pluginInstanceMapper.insert(pluginInstance);
-            } else {
-                // 2.2 情况二：如果存在，则更新 heartbeatAt
-                PluginInstanceDO updatePluginInstance = PluginInstanceDO.builder()
-                        .id(pluginInstance.getId())
-                        .heartbeatAt(System.currentTimeMillis())
-                        .build();
-                pluginInstanceMapper.updateById(updatePluginInstance);
-            }
+            // TODO @芋艿：稍后优化；
+//            if (pluginInstance == null) {
+//                // 4.4 如果插件实例不存在，则创建
+//                pluginInstance = PluginInstanceDO.builder()
+//                        .pluginId(pluginInfo.getId())
+//                        .mainId(MAIN_ID + "-" + mac)
+//                        .hostIp(ip)
+//                        .port(port)
+//                        .heartbeatAt(System.currentTimeMillis())
+//                        .build();
+//                pluginInstanceMapper.insert(pluginInstance);
+//            } else {
+//                // 2.2 情况二：如果存在，则更新 heartbeatAt
+//                PluginInstanceDO updatePluginInstance = PluginInstanceDO.builder()
+//                        .id(pluginInstance.getId())
+//                        .heartbeatAt(System.currentTimeMillis())
+//                        .build();
+//                pluginInstanceMapper.updateById(updatePluginInstance);
+//            }
         }
+    }
+
+    // ========== 设备与插件的映射操作 ==========
+
+    @Override
+    public void updateDevicePluginInstanceProcessIdAsync(String deviceKey, String processId) {
+        devicePluginProcessIdRedisDAO.put(deviceKey, processId);
     }
 
 }

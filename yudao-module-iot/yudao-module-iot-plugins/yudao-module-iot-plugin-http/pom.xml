@@ -128,6 +128,12 @@
             <version>${revision}</version>
         </dependency>
 
+        <!-- Web 相关 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
         <!-- 工具类相关 -->
         <dependency>
             <groupId>io.vertx</groupId>

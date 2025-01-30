@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.info.PluginInfoPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.info.PluginInfoSaveReqVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.PluginInfoDO;
-import cn.iocoder.yudao.module.iot.dal.mysql.plugin.PluginInfoMapper;
+import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInfoDO;
+import cn.iocoder.yudao.module.iot.dal.mysql.plugin.IotPluginInfoMapper;
 import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -28,20 +28,20 @@ import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PLUGIN_INFO_N
 @Service
 @Validated
 @Slf4j
-public class PluginInfoServiceImpl implements PluginInfoService {
+public class IotPluginInfoServiceImpl implements IotPluginInfoService {
 
     @Resource
-    private PluginInfoMapper pluginInfoMapper;
+    private IotPluginInfoMapper pluginInfoMapper;
 
     @Resource
-    private PluginInstanceService pluginInstanceService;
+    private IotPluginInstanceService pluginInstanceService;
 
     @Resource
     private SpringPluginManager pluginManager;
 
     @Override
     public Long createPluginInfo(PluginInfoSaveReqVO createReqVO) {
-        PluginInfoDO pluginInfo = BeanUtils.toBean(createReqVO, PluginInfoDO.class);
+        IotPluginInfoDO pluginInfo = BeanUtils.toBean(createReqVO, IotPluginInfoDO.class);
         pluginInfoMapper.insert(pluginInfo);
         return pluginInfo.getId();
     }
@@ -51,14 +51,14 @@ public class PluginInfoServiceImpl implements PluginInfoService {
         // 校验存在
         validatePluginInfoExists(updateReqVO.getId());
         // 更新
-        PluginInfoDO updateObj = BeanUtils.toBean(updateReqVO, PluginInfoDO.class);
+        IotPluginInfoDO updateObj = BeanUtils.toBean(updateReqVO, IotPluginInfoDO.class);
         pluginInfoMapper.updateById(updateObj);
     }
 
     @Override
     public void deletePluginInfo(Long id) {
         // 1.1 校验存在
-        PluginInfoDO pluginInfoDO = validatePluginInfoExists(id);
+        IotPluginInfoDO pluginInfoDO = validatePluginInfoExists(id);
         // 1.2 停止插件
         if (IotPluginStatusEnum.RUNNING.getStatus().equals(pluginInfoDO.getStatus())) {
             throw exception(PLUGIN_INFO_DELETE_FAILED_RUNNING);
@@ -74,8 +74,8 @@ public class PluginInfoServiceImpl implements PluginInfoService {
         pluginInfoMapper.deleteById(id);
     }
 
-    private PluginInfoDO validatePluginInfoExists(Long id) {
-        PluginInfoDO pluginInfo = pluginInfoMapper.selectById(id);
+    private IotPluginInfoDO validatePluginInfoExists(Long id) {
+        IotPluginInfoDO pluginInfo = pluginInfoMapper.selectById(id);
         if (pluginInfo == null) {
             throw exception(PLUGIN_INFO_NOT_EXISTS);
         }
@@ -83,19 +83,19 @@ public class PluginInfoServiceImpl implements PluginInfoService {
     }
 
     @Override
-    public PluginInfoDO getPluginInfo(Long id) {
+    public IotPluginInfoDO getPluginInfo(Long id) {
         return pluginInfoMapper.selectById(id);
     }
 
     @Override
-    public PageResult<PluginInfoDO> getPluginInfoPage(PluginInfoPageReqVO pageReqVO) {
+    public PageResult<IotPluginInfoDO> getPluginInfoPage(PluginInfoPageReqVO pageReqVO) {
         return pluginInfoMapper.selectPage(pageReqVO);
     }
 
     @Override
     public void uploadFile(Long id, MultipartFile file) {
         // 1. 校验插件信息是否存在
-        PluginInfoDO pluginInfoDo = validatePluginInfoExists(id);
+        IotPluginInfoDO pluginInfoDo = validatePluginInfoExists(id);
 
         // 2. 停止并卸载旧的插件
         pluginInstanceService.stopAndUnloadPlugin(pluginInfoDo.getPluginKey());
@@ -114,9 +114,9 @@ public class PluginInfoServiceImpl implements PluginInfoService {
      * @param pluginKeyNew 插件标识符
      * @param file         文件
      */
-    private void updatePluginInfo(PluginInfoDO pluginInfoDo, String pluginKeyNew, MultipartFile file) {
+    private void updatePluginInfo(IotPluginInfoDO pluginInfoDo, String pluginKeyNew, MultipartFile file) {
         // 创建新的插件信息对象并链式设置属性
-        PluginInfoDO updatedPluginInfo = new PluginInfoDO()
+        IotPluginInfoDO updatedPluginInfo = new IotPluginInfoDO()
                 .setId(pluginInfoDo.getId())
                 .setPluginKey(pluginKeyNew)
                 .setStatus(IotPluginStatusEnum.STOPPED.getStatus())
@@ -133,25 +133,25 @@ public class PluginInfoServiceImpl implements PluginInfoService {
     @Override
     public void updatePluginStatus(Long id, Integer status) {
         // 1. 校验插件信息是否存在
-        PluginInfoDO pluginInfoDo = validatePluginInfoExists(id);
+        IotPluginInfoDO pluginInfoDo = validatePluginInfoExists(id);
 
         // 2. 更新插件状态
         pluginInstanceService.updatePluginStatus(pluginInfoDo, status);
 
         // 3. 更新数据库中的插件状态
-        PluginInfoDO updatedPluginInfo = new PluginInfoDO();
+        IotPluginInfoDO updatedPluginInfo = new IotPluginInfoDO();
         updatedPluginInfo.setId(id);
         updatedPluginInfo.setStatus(status);
         pluginInfoMapper.updateById(updatedPluginInfo);
     }
 
     @Override
-    public List<PluginInfoDO> getPluginInfoList() {
+    public List<IotPluginInfoDO> getPluginInfoList() {
         return pluginInfoMapper.selectList();
     }
 
     @Override
-    public List<PluginInfoDO> getPluginInfoListByStatus(Integer status) {
+    public List<IotPluginInfoDO> getPluginInfoListByStatus(Integer status) {
         return pluginInfoMapper.selectListByStatus(status);
     }
 

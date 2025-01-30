@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceStateUpdateReqDTO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
+import cn.iocoder.yudao.module.iot.plugin.common.util.IotPluginCommonUtils;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RequestBody;
 import io.vertx.ext.web.RoutingContext;
@@ -50,19 +51,17 @@ public class IotDevicePropertyReportVertxHandler implements Handler<RoutingConte
         String id = jsonData.getStr("id");
 
         try {
-            // TODO @haohao：pluginKey 需要设置
             // 设备上线
             deviceUpstreamApi.updateDeviceState(((IotDeviceStateUpdateReqDTO)
                     new IotDeviceStateUpdateReqDTO().setRequestId(IdUtil.fastSimpleUUID())
-                            .setPluginKey("http")
-                            .setReportTime(LocalDateTime.now())
+                            .setProcessId(IotPluginCommonUtils.getProcessId()).setReportTime(LocalDateTime.now())
                             .setProductKey(productKey).setDeviceName(deviceName))
                     .setState(IotDeviceStateEnum.ONLINE.getState()));
 
             // 属性上报
             deviceUpstreamApi.reportDeviceProperty(((IotDevicePropertyReportReqDTO)
                     new IotDevicePropertyReportReqDTO().setRequestId(IdUtil.fastSimpleUUID())
-                            .setPluginKey("http").setReportTime(LocalDateTime.now())
+                            .setProcessId(IotPluginCommonUtils.getProcessId()).setReportTime(LocalDateTime.now())
                             .setProductKey(productKey).setDeviceName(deviceName))
                     .setProperties((Map<String, Object>) requestBody.asJsonObject().getMap().get("properties")));
 

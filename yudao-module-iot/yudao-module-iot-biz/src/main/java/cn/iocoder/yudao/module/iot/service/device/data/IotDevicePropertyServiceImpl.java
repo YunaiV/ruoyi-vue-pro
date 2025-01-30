@@ -27,6 +27,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -151,7 +152,7 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
                 LocalDateTimeUtil.toEpochMilli(message.getReportTime()));
 
         // 3.2 保存设备属性【日志】
-        deviceDataRedisDAO.set(message.getDeviceKey(), convertMap(properties.entrySet(), Map.Entry::getKey,
+        deviceDataRedisDAO.putAll(message.getDeviceKey(), convertMap(properties.entrySet(), Map.Entry::getKey,
                 entry -> IotDevicePropertyDO.builder().value(entry.getValue()).updateTime(message.getReportTime()).build()));
     }
 
@@ -190,7 +191,8 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     }
 
     @Override
-    public void updateDeviceReportTime(String deviceKey, LocalDateTime reportTime) {
+    @Async
+    public void updateDeviceReportTimeAsync(String deviceKey, LocalDateTime reportTime) {
         deviceReportTimeRedisDAO.update(deviceKey, reportTime);
     }
 

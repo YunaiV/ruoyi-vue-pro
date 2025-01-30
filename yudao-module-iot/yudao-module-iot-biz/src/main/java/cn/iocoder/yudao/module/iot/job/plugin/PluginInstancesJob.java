@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.job.plugin;
 
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
-import cn.iocoder.yudao.module.iot.service.plugin.PluginInstanceService;
+import cn.iocoder.yudao.module.iot.service.plugin.IotPluginInstanceService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class PluginInstancesJob {
 
     @Resource
-    private PluginInstanceService pluginInstanceService;
+    private IotPluginInstanceService pluginInstanceService;
 
     @Scheduled(initialDelay = 60, fixedRate = 60, timeUnit = TimeUnit.SECONDS)
     public void updatePluginInstances() {

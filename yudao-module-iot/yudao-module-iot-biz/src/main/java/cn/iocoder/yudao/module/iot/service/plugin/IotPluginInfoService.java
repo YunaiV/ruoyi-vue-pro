@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.service.plugin;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.info.PluginInfoPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.info.PluginInfoSaveReqVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.PluginInfoDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInfoDO;
 import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
 import jakarta.validation.Valid;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,10 +15,10 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-public interface PluginInfoService {
+public interface IotPluginInfoService {
 
     /**
-     * 创建IoT 插件信息
+     * 创建插件信息
      *
      * @param createReqVO 创建信息
      * @return 编号
@@ -26,34 +26,34 @@ public interface PluginInfoService {
     Long createPluginInfo(@Valid PluginInfoSaveReqVO createReqVO);
 
     /**
-     * 更新IoT 插件信息
+     * 更新插件信息
      *
      * @param updateReqVO 更新信息
      */
     void updatePluginInfo(@Valid PluginInfoSaveReqVO updateReqVO);
 
     /**
-     * 删除IoT 插件信息
+     * 删除插件信息
      *
      * @param id 编号
      */
     void deletePluginInfo(Long id);
 
     /**
-     * 获得IoT 插件信息
+     * 获得插件信息
      *
      * @param id 编号
-     * @return IoT 插件信息
+     * @return 插件信息
      */
-    PluginInfoDO getPluginInfo(Long id);
+    IotPluginInfoDO getPluginInfo(Long id);
 
     /**
-     * 获得IoT 插件信息分页
+     * 获得插件信息分页
      *
      * @param pageReqVO 分页查询
-     * @return IoT 插件信息分页
+     * @return 插件信息分页
      */
-    PageResult<PluginInfoDO> getPluginInfoPage(PluginInfoPageReqVO pageReqVO);
+    PageResult<IotPluginInfoDO> getPluginInfoPage(PluginInfoPageReqVO pageReqVO);
 
     /**
      * 上传插件的 JAR 包
@@ -76,7 +76,7 @@ public interface PluginInfoService {
      *
      * @return 插件信息列表
      */
-    List<PluginInfoDO> getPluginInfoList();
+    List<IotPluginInfoDO> getPluginInfoList();
 
     /**
      * 根据状态获得插件信息列表
@@ -84,5 +84,5 @@ public interface PluginInfoService {
      * @param status 状态 {@link IotPluginStatusEnum}
      * @return 插件信息列表
      */
-    List<PluginInfoDO> getPluginInfoListByStatus(Integer status);
+    List<IotPluginInfoDO> getPluginInfoListByStatus(Integer status);
 }

@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.iot.framework.plugin.core;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
-import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.PluginInfoDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInfoDO;
 import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
-import cn.iocoder.yudao.module.iot.service.plugin.PluginInfoService;
+import cn.iocoder.yudao.module.iot.service.plugin.IotPluginInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.spring.SpringPluginManager;
 import org.springframework.boot.ApplicationArguments;
@@ -20,7 +20,7 @@ import java.util.List;
 public class PluginStart implements ApplicationRunner {
 
     @Resource
-    private PluginInfoService pluginInfoService;
+    private IotPluginInfoService pluginInfoService;
 
     @Resource
     private SpringPluginManager pluginManager;
@@ -28,7 +28,7 @@ public class PluginStart implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         TenantUtils.executeIgnore(() -> { // 1. 忽略租户上下文执行
-            List<PluginInfoDO> pluginInfoList = pluginInfoService
+            List<IotPluginInfoDO> pluginInfoList = pluginInfoService
                     .getPluginInfoListByStatus(IotPluginStatusEnum.RUNNING.getStatus()); // 2. 获取运行中的插件列表
             if (CollUtil.isEmpty(pluginInfoList)) { // 3. 检查插件列表是否为空
                 log.info("[run] 没有需要启动的插件"); // 4. 日志记录没有插件需要启动
