@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.service.device.message;
+package cn.iocoder.yudao.module.iot.service.device.control;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceEventReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStateUpdateReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceUpstreamAbstractReqDTO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.message.IotDeviceSimulationUpstreamReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceSimulationUpstreamReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageIdentifierEnum;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageTypeEnum;

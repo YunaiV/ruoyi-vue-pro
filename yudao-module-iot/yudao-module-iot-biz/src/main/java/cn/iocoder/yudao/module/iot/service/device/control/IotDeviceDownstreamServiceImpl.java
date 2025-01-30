@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.module.iot.service.device.message;
+package cn.iocoder.yudao.module.iot.service.device.control;
 
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.message.IotDeviceSimulationUpstreamReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceSimulationUpstreamReqVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;

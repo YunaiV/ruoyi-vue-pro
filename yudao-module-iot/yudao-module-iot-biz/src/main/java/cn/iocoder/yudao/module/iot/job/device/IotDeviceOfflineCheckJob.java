@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
-import cn.iocoder.yudao.module.iot.service.device.message.IotDeviceUpstreamService;
+import cn.iocoder.yudao.module.iot.service.device.control.IotDeviceUpstreamService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 

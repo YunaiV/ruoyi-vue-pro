@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceEventReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStateUpdateReqDTO;
-import cn.iocoder.yudao.module.iot.service.device.message.IotDeviceUpstreamService;
+import cn.iocoder.yudao.module.iot.service.device.control.IotDeviceUpstreamService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 
