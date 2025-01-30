@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.iot.plugin.http.config;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
-import cn.iocoder.yudao.module.iot.plugin.http.upstream.IotDeviceUpstreamServer;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginWrapper;
 import org.pf4j.spring.SpringPlugin;
@@ -11,6 +10,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+// TODO @芋艿：完善注释
 /**
  * 负责插件的启动和停止，与 Vert.x 的生命周期管理
  */
@@ -30,8 +30,9 @@ public class IotHttpVertxPlugin extends SpringPlugin {
             Assert.notNull(pluginContext, "pluginContext 不能为空");
 
             // 2. 启动 Vert.x
-            IotDeviceUpstreamServer vertxService = pluginContext.getBean(IotDeviceUpstreamServer.class);
-            vertxService.start();
+            // TODO @haohao：貌似去掉，没有问题额。。。
+//            IotDeviceUpstreamServer vertxService = pluginContext.getBean(IotDeviceUpstreamServer.class);
+//            vertxService.start();
 
             log.info("[HttpVertxPlugin][HttpVertxPlugin 插件启动成功...]");
         } catch (Exception e) {
@@ -44,11 +45,11 @@ public class IotHttpVertxPlugin extends SpringPlugin {
         log.info("[HttpVertxPlugin][HttpVertxPlugin 插件停止开始...]");
         try {
             // 停止服务器
-            ApplicationContext pluginContext = getApplicationContext();
-            if (pluginContext != null) {
-                IotDeviceUpstreamServer vertxService = pluginContext.getBean(IotDeviceUpstreamServer.class);
-                vertxService.stopServer();
-            }
+//            ApplicationContext pluginContext = getApplicationContext();
+//            if (pluginContext != null) {
+//                IotDeviceUpstreamServer vertxService = pluginContext.getBean(IotDeviceUpstreamServer.class);
+//                vertxService.stop();
+//            }
 
             log.info("[HttpVertxPlugin][HttpVertxPlugin 插件停止成功...]");
         } catch (Exception e) {

@@ -16,6 +16,7 @@
 
     <name>${project.artifactId}</name>
     <description>
+        <!-- TODO @芋艿：注释 -->
         物联网 插件模块 - http 插件
     </description>
 
@@ -31,7 +32,7 @@
 
     <build>
         <plugins>
-            <!--  插件模式 zip  -->
+            <!-- 插件模式 zip -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -75,7 +76,7 @@
                 </executions>
             </plugin>
 
-            <!--  插件模式 jar  -->
+            <!-- 插件模式 jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -94,7 +95,7 @@
                 </configuration>
             </plugin>
 
-            <!--  独立模式  -->
+            <!-- 独立模式 -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -121,21 +122,13 @@
     </build>
 
     <dependencies>
-        <!-- TODO 芋艿：优化下 -->
-        <!-- 项目依赖 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-iot-plugin-common</artifactId>
             <version>${revision}</version>
         </dependency>
 
-        <!-- 其他依赖项 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <!-- Vert.x Web -->
+        <!-- 工具类相关 -->
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web</artifactId>

@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.module.iot.framework.plugin;
+package cn.iocoder.yudao.module.iot.framework.plugin.config;
 
-import cn.iocoder.yudao.module.iot.framework.plugin.listener.CustomPluginStateListener;
+import cn.iocoder.yudao.module.iot.framework.plugin.core.CustomPluginStateListener;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.spring.SpringPluginManager;
 import org.springframework.beans.factory.annotation.Value;

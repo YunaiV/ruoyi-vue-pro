@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.framework.plugin;
+package cn.iocoder.yudao.module.iot.framework.plugin.core;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;

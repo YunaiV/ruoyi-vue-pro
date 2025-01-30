@@ -51,7 +51,7 @@ public class IotDeviceUpstreamServer {
     /**
      * 停止所有
      */
-    public void stopServer() {
+    public void stop() {
         log.info("[stop][开始关闭]");
         try {
             // 关闭 HTTP 服务器

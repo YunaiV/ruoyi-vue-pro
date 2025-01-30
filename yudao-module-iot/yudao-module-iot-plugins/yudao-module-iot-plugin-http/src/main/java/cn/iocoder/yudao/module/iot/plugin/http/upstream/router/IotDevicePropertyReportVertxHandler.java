@@ -10,21 +10,22 @@ import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RequestBody;
 import io.vertx.ext.web.RoutingContext;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
+/**
+ * IoT 设备属性上报的 Vert.x Handler
+ */
+@RequiredArgsConstructor
 @Slf4j
 public class IotDevicePropertyReportVertxHandler implements Handler<RoutingContext> {
 
     public static final String PATH = "/sys/:productKey/:deviceName/thing/event/property/post";
 
-    private final IotDeviceUpstreamApi deviceDataApi;
-
-    public IotDevicePropertyReportVertxHandler(IotDeviceUpstreamApi deviceDataApi) {
-        this.deviceDataApi = deviceDataApi;
-    }
+    private final IotDeviceUpstreamApi deviceUpstreamApi;
 
     @Override
     public void handle(RoutingContext ctx) {
@@ -51,7 +52,7 @@ public class IotDevicePropertyReportVertxHandler implements Handler<RoutingConte
         try {
             // TODO @haohao：pluginKey 需要设置
             // 设备上线
-            deviceDataApi.updateDeviceState(((IotDeviceStateUpdateReqDTO)
+            deviceUpstreamApi.updateDeviceState(((IotDeviceStateUpdateReqDTO)
                     new IotDeviceStateUpdateReqDTO().setRequestId(IdUtil.fastSimpleUUID())
                             .setPluginKey("http")
                             .setReportTime(LocalDateTime.now())
@@ -59,7 +60,7 @@ public class IotDevicePropertyReportVertxHandler implements Handler<RoutingConte
                     .setState(IotDeviceStateEnum.ONLINE.getState()));
 
             // 属性上报
-            deviceDataApi.reportDeviceProperty(((IotDevicePropertyReportReqDTO)
+            deviceUpstreamApi.reportDeviceProperty(((IotDevicePropertyReportReqDTO)
                     new IotDevicePropertyReportReqDTO().setRequestId(IdUtil.fastSimpleUUID())
                             .setPluginKey("http").setReportTime(LocalDateTime.now())
                             .setProductKey(productKey).setDeviceName(deviceName))
@@ -81,6 +82,7 @@ public class IotDevicePropertyReportVertxHandler implements Handler<RoutingConte
         }
     }
 
+    // TODO @芋艿：抽一个 IotPluginCommonResult 出来？等 mqtt、websocket 出来后，再考虑优化！
     private JSONObject createResponseJson(int code, JSONObject data, String id,
                                           String message, String method, String version) {
         JSONObject res = new JSONObject();
@@ -92,4 +94,5 @@ public class IotDevicePropertyReportVertxHandler implements Handler<RoutingConte
         res.set("version", version);
         return res;
     }
+
 }

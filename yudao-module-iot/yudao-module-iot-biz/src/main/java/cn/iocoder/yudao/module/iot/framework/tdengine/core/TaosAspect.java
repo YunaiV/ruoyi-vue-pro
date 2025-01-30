@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.framework.aspect;
+package cn.iocoder.yudao.module.iot.framework.tdengine.core;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;

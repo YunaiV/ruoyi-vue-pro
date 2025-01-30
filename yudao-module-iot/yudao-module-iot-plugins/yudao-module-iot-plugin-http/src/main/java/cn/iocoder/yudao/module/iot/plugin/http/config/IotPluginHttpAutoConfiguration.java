@@ -7,7 +7,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 插件与独立运行都可复用的配置类
+ * IoT 插件 HTTP 的专用自动配置类
+ *
+ * @author haohao
  */
 @Configuration
 public class IotPluginHttpAutoConfiguration {
@@ -19,8 +21,8 @@ public class IotPluginHttpAutoConfiguration {
     @Value("${plugin.http.server.port:8092}")
     private Integer port;
 
-    @Bean
-    public IotDeviceUpstreamServer vertxService(IotDeviceUpstreamApi deviceUpstreamApi) {
+    @Bean(initMethod = "start", destroyMethod = "stop")
+    public IotDeviceUpstreamServer deviceUpstreamServer(IotDeviceUpstreamApi deviceUpstreamApi) {
         return new IotDeviceUpstreamServer(port, deviceUpstreamApi);
     }
 

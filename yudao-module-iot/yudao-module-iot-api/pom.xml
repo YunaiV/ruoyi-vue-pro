@@ -30,24 +30,23 @@
             <scope>provided</scope> <!-- 设置为 provided，只有工具类需要使用到 -->
         </dependency>
 
-        <!-- PF4J -->
-        <!-- TODO 芋艿：这个依赖，要不要放在 api 包 -->
+        <!-- 工具类相关 -->
         <dependency>
-            <groupId>org.pf4j</groupId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <scope>provided</scope> <!-- 设置为 provided，只有工具类需要使用到 -->
+        </dependency>
+
+        <dependency>
+            <groupId>org.pf4j</groupId> <!-- PF4J：内置插件机制 -->
             <artifactId>pf4j-spring</artifactId>
+            <!-- TODO @芋艿：可以放到 bom 里配置 -->
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <!-- 工具类相关 -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <scope>provided</scope> <!-- 设置为 provided，只有工具类需要使用到 -->
         </dependency>
 
         <!-- 参数校验 -->

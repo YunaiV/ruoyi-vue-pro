@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.framework.plugin.listener;
+package cn.iocoder.yudao.module.iot.framework.plugin.core;
 
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginStateEvent;

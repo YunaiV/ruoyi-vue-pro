@@ -64,25 +64,19 @@
             <artifactId>yudao-spring-boot-starter-excel</artifactId>
         </dependency>
 
-        <!-- Vert.x 核心依赖 -->
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-core</artifactId>
-        </dependency>
-        <!-- Vert.x Web 模块 -->
+        <!-- 工具类相关 -->
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web</artifactId>
         </dependency>
-        <!-- MQTT -->
+
         <dependency>
-            <groupId>org.eclipse.paho</groupId>
+            <groupId>org.eclipse.paho</groupId> <!-- MQTT -->
             <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
         </dependency>
 
-        <!-- PF4J -->
         <dependency>
-            <groupId>org.pf4j</groupId>
+            <groupId>org.pf4j</groupId>  <!-- PF4J：内置插件机制 -->
             <artifactId>pf4j-spring</artifactId>
             <!-- TODO @芋艿：可以放到 bom 里配置 -->
             <exclusions>
