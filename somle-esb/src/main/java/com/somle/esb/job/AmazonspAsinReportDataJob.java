@@ -28,30 +28,32 @@ public class AmazonspAsinReportDataJob extends AmazonspDataJob {
 
         var dataDate = beforeYesterday;
 
-        amazonService.spClient.getShops().map(shop-> {
-            var options = AmazonSpReportSaveVO.ReportOptions.builder()
-                .asinGranularity("CHILD")
-                .dateGranularity("DAY")
-                .build();
-            var vo = AmazonSpReportSaveVO.builder()
-                .reportType("GET_SALES_AND_TRAFFIC_REPORT")
-                .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
-                .reportOptions(options)
-                .build();
-            return amazonService.spClient.createAndGetReport(shop.getSeller(), vo, "gzip");
-        })
-        .forEach(report -> {
-            OssData data = OssData.builder()
-                .database(DATABASE)
-                .tableName("asin_report")
-                .syncType("inc")
-                .requestTimestamp(System.currentTimeMillis())
-                .folderDate(dataDate)
-                .content(JsonUtils.toJSONObject(report))
-                .headers(null)
-                .build();
-            service.send(data);
-        });
+        for (var client : amazonSpService.clients) {
+            client.getMarketplaceParticipations().stream()
+                .forEach(participation -> {
+                    var options = AmazonSpReportSaveVO.ReportOptions.builder()
+                        .asinGranularity("CHILD")
+                        .dateGranularity("DAY")
+                        .build();
+                    var vo = AmazonSpReportSaveVO.builder()
+                        .reportType("GET_SALES_AND_TRAFFIC_REPORT")
+                        .marketplaceIds(List.of(participation.getMarketplace().getId()))
+                        .reportOptions(options)
+                        .build();
+                    var report = client.createAndGetReport(vo, "gzip");
+
+                    OssData data = OssData.builder()
+                        .database(DATABASE)
+                        .tableName("asin_report")
+                        .syncType("inc")
+                        .requestTimestamp(System.currentTimeMillis())
+                        .folderDate(dataDate)
+                        .content(JsonUtils.toJSONObject(report))
+                        .headers(null)
+                        .build();
+                    service.send(data);
+                });
+        }
         return "data upload success";
     }
 }

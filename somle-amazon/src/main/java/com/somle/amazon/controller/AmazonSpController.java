@@ -20,14 +20,14 @@ public class AmazonSpController {
     @Autowired
     private AmazonService service;
 
-    @GetMapping("orders")
-    public List<AmazonSpOrderRespVO> getOrders(LocalDateTime startTime) {
-        return service.spClient.getShops().flatMap(shop -> {
-            var vo = AmazonSpOrderReqVO.builder()
-                .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
-                .createdAfter(LocalDateTimeUtils.leap(startTime, ZoneId.of("UTC")))
-                .build();
-            return service.spClient.streamOrder(shop.getSeller(), vo);
-        }).toList();
-    }
+//    @GetMapping("orders")
+//    public List<AmazonSpOrderRespVO> getOrders(LocalDateTime startTime) {
+//        return service.spClient.getShops().flatMap(shop -> {
+//            var vo = AmazonSpOrderReqVO.builder()
+//                .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
+//                .createdAfter(LocalDateTimeUtils.leap(startTime, ZoneId.of("UTC")))
+//                .build();
+//            return service.spClient.streamOrder(shop.getSeller(), vo);
+//        }).toList();
+//    }
 }

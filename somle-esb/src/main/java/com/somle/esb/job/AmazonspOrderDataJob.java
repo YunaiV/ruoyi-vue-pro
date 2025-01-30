@@ -22,27 +22,30 @@ public class AmazonspOrderDataJob extends AmazonspDataJob {
     public String execute(String param) throws Exception {
         setDate(param);
 
-        amazonService.spClient.getShops()
-            .forEach(shop -> {
-                var vo = AmazonSpOrderReqVO.builder()
+        for (var client : amazonSpService.clients) {
+            client.getMarketplaceParticipations().stream()
+                .forEach(marketplaceParticipation -> {
+                    var vo = AmazonSpOrderReqVO.builder()
                         .createdAfter(beforeYesterdayFirstSecond)
                         .createdBefore(beforeYesterdayLastSecond)
-                        .marketplaceIds(List.of(shop.getCountry().getMarketplaceId()))
+                        .marketplaceIds(List.of(marketplaceParticipation.getMarketplace().getId()))
                         .build();
-                amazonService.spClient.streamOrder(shop.getSeller(), vo).forEach(page-> {
-                    var data = OssData.builder()
-                        .database(DATABASE)
-                        .tableName("order_create")
-                        .syncType("inc")
-                        .requestTimestamp(System.currentTimeMillis())
-                        .folderDate(beforeYesterday)
-                        .content(page)
-                        .headers(null)
-                        .build();
-                    service.send(data);
-                });
+                    client.streamOrder(vo).forEach(page-> {
+                        var data = OssData.builder()
+                            .database(DATABASE)
+                            .tableName("order_create")
+                            .syncType("inc")
+                            .requestTimestamp(System.currentTimeMillis())
+                            .folderDate(beforeYesterday)
+                            .content(page)
+                            .headers(null)
+                            .build();
+                        service.send(data);
+                    });
 
-            });
+                });
+        }
+
 
         return "data upload success";
     }

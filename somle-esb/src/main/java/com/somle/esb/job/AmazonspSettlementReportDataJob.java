@@ -30,9 +30,9 @@ public class AmazonspSettlementReportDataJob extends AmazonspDataJob {
                 .pageSize(100)
                 .build();
 
-        amazonService.account.getSellers().stream()
-            .flatMap(seller ->
-                amazonService.spClient.getReportStream(seller, vo, null)
+        amazonSpService.clients.stream()
+            .flatMap(client ->
+                client.getReportStream(vo, null)
             )
             .forEach(report -> {
                 OssData data = OssData.builder()

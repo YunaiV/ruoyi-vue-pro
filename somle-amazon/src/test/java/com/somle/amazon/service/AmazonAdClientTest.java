@@ -23,7 +23,7 @@ class AmazonAdClientTest extends BaseSpringTest {
 
     @BeforeEach
     void setUp() {
-        client = new AmazonAdClient(repository.findAll().get(0));
+        client = new AmazonAdClient(repository.findById(4).get());
     }
 
 

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -24,28 +25,28 @@ public class AmazonspFBAReturnReportDataJob extends AmazonspDataJob {
                 .dataEndTime(beforeYesterdayLastSecond.toString())
                 .build();
 
-        amazonService.account.getSellers().stream()
-                .flatMap(seller ->
-                        seller.getShops().stream()
-                                .map(shop -> {
-                                    vo.setMarketplaceIds(Collections.singletonList(shop.getCountry().getMarketplaceId()));
-                                    return amazonService.spClient.createAndGetReport(seller, vo, String.valueOf(false));
-                                })
-                )
-                .forEach(report -> {
+        amazonSpService.clients.stream()
+            .flatMap(client ->
+                client.getMarketplaceParticipations().stream()
+                    .map(marketplaceParticipation -> {
+                        vo.setMarketplaceIds(List.of(marketplaceParticipation.getMarketplace().getId()));
+                        return client.createAndGetReport(vo, String.valueOf(false));
+                    })
+            )
+            .forEach(report -> {
 
-                    OssData data = OssData.builder()
-                            .database(DATABASE)
-                            .tableName("fba_return_report")
-                            .syncType("inc")
-                            .requestTimestamp(System.currentTimeMillis())
-                            .folderDate(beforeYesterday)
-                            .content(report)
-                            .headers(getHeaders(vo))
-                            .build();
+                OssData data = OssData.builder()
+                        .database(DATABASE)
+                        .tableName("fba_return_report")
+                        .syncType("inc")
+                        .requestTimestamp(System.currentTimeMillis())
+                        .folderDate(beforeYesterday)
+                        .content(report)
+                        .headers(getHeaders(vo))
+                        .build();
 
-                    service.send(data);
-                });
+                service.send(data);
+            });
 
         return "data upload success";
     }

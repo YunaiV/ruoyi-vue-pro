@@ -1,15 +1,12 @@
 package com.somle.amazon.model;
 
 
-import lombok.Data;
-
-/**
- * @Description: $
- * @Author: c-tao
- * @Date: 2025/1/25$
- */
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
@@ -17,17 +14,15 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "amazonad_auth")
-public class AmazonAdAuthDO {
+@Table(name = "amazonsp_auth")
+public class AmazonSpAuthDO {
 
     @Id
     private Long id;
 
-    private String accountId;
-
+    private String sellerId;
 
     private String regionCode;
-
 
     private String clientId;
 

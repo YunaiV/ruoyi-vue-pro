@@ -1,16 +1,11 @@
 package com.somle.amazon.service;
 
-import com.somle.amazon.model.AmazonSeller;
-import com.somle.amazon.repository.AmazonAccountRepository;
 import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.framework.test.core.ut.BaseSpringTest;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
-
-import java.time.LocalDate;
 
 
 @Slf4j
@@ -26,19 +21,19 @@ class AmazonServiceTest extends BaseSpringTest {
     static boolean run = true;
 
 
-    @Test
-    void refreshAuth() {
-        amazonService.refreshAuth();
-    }
+//    @Test
+//    void refreshAuth() {
+//        amazonService.refreshAuth();
+//    }
 
-    @Test
-    void generateAccessToken() {
-        var clientId = amazonService.accounts.get(0).getAdClientId();
-        var clientSecret = amazonService.accounts.get(0).getAdClientSecret();
-        var code = "";
-        var response = amazonService.generateAccessToken(clientId, clientSecret, code);
-        log.info(response);
-    }
+//    @Test
+//    void generateAccessToken() {
+//        var clientId = amazonService.accounts.get(0).getAdClientId();
+//        var clientSecret = amazonService.accounts.get(0).getAdClientSecret();
+//        var code = "";
+//        var response = amazonService.generateAccessToken(clientId, clientSecret, code);
+//        log.info(response);
+//    }
 
 
 

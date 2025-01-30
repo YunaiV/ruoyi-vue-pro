@@ -2,6 +2,8 @@ package com.somle.amazon.service;
 
 import com.somle.amazon.repository.AmazonAdAuthRepository;
 import com.somle.amazon.repository.AmazonAdClientRepository;
+import com.somle.amazon.repository.AmazonSpAuthRepository;
+import com.somle.amazon.repository.AmazonSpClientRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -12,22 +14,22 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class AmazonAdService {
+public class AmazonSpService {
     @Resource
     AmazonService amazonService;
 
     @Resource
-    AmazonAdAuthRepository authRepository;
+    AmazonSpAuthRepository authRepository;
 
     @Resource
-    AmazonAdClientRepository clientRepository;
+    AmazonSpClientRepository clientRepository;
 
-    public List<AmazonAdClient> clients;
+    public List<AmazonSpClient> clients;
 
     @PostConstruct
     public void init() {
         clients = authRepository.findAll().stream()
-            .map(AmazonAdClient::new)
+            .map(AmazonSpClient::new)
             .toList();
     }
 

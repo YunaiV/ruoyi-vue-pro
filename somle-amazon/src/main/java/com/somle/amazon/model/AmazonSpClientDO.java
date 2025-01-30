@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="amazonad_client")
-public class AmazonAdClientDO {
+@Table(name="amazonsp_client")
+public class AmazonSpClientDO {
     @Id
     private String id;
     private String secret;

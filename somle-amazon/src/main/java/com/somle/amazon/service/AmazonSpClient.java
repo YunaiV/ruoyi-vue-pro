@@ -2,6 +2,8 @@ package com.somle.amazon.service;
 
 import com.somle.amazon.controller.vo.*;
 import com.somle.amazon.model.*;
+import com.somle.amazon.model.enums.*;
+
 //import com.somle.amazon.repository.AmazonSellerRepository;
 import com.somle.framework.common.util.collection.CollectionUtils;
 import com.somle.framework.common.util.collection.PageUtils;
@@ -14,6 +16,7 @@ import com.somle.framework.common.util.web.RequestX;
 import com.somle.framework.common.util.web.WebUtils;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -28,15 +31,19 @@ import java.util.stream.Stream;
 
 @Slf4j
 @AllArgsConstructor
+@Getter
 @Setter
 public class AmazonSpClient {
 
-    // private List<AmazonShop> shops;
 
-    private AmazonAccount account;
+    private AmazonSpAuthDO auth;
 
-    private Map<String, String> generateHeaders(AmazonSeller seller) {
-        var headers = Map.of("x-amz-access-token", seller.getSpAccessToken());
+    private String getEndPoint() {
+        return AmazonRegion.findByCode(auth.getRegionCode()).getSpUrl();
+    }
+
+    private Map<String, String> generateHeaders(AmazonSpAuthDO auth) {
+        var headers = Map.of("x-amz-access-token", auth.getAccessToken());
         return headers;
     }
 
@@ -53,9 +60,8 @@ public class AmazonSpClient {
 //        return WebUtils.sendRequest(request, JSONObject.class);
 //    }
 
-    @Transactional(readOnly = true)
-    public JSONObject getMarketplaceParticipations(AmazonSeller seller) {
-        String endPoint = seller.getRegion().getSpEndPoint();
+    public List<AmazonSpMarketplaceParticipationVO> getMarketplaceParticipations() {
+        String endPoint = getEndPoint();
         String partialUrl = "/sellers/v1/marketplaceParticipations";
         String fullUrl = endPoint + partialUrl;
 
@@ -64,29 +70,29 @@ public class AmazonSpClient {
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.GET)
             .url(fullUrl)
-            .headers(generateHeaders(seller))
+            .headers(generateHeaders(auth))
             .build();
-        return WebUtils.sendRequest(request, JSONObject.class);
+        var response = WebUtils.sendRequest(request, AmazonSpMarketplaceParticipationRespVO.class);
+        return response.getPayload();
     }
 
 
 
 
-    @Transactional(readOnly = true)
-    public Stream<AmazonShop> getShops() {
-        return account.getSellers().stream().flatMap(seller->seller.getShops().stream());
-    }
+//    @Transactional(readOnly = true)
+//    public Stream<AmazonShop> getShops() {
+//        return account.getSellers().stream().flatMap(seller->seller.getShops().stream());
+//    }
 
-    @Transactional(readOnly = true)
-    public AmazonShop getShop(String countryCode) {
-        return getShops().filter(shop->shop.getCountry().getCode().equals(countryCode)).findFirst().get();
-    }
-
+//    @Transactional(readOnly = true)
+//    public AmazonShop getShop(String countryCode) {
+//        return getShops().filter(shop->shop.getCountry().getCode().equals(countryCode)).findFirst().get();
+//    }
+//
     @SneakyThrows
-    @Transactional(readOnly = true)
-    public String searchListingsItems(AmazonSeller seller, AmazonSpListingReqVO reqVO) {
-        String endPoint = seller.getRegion().getSpEndPoint();
-        String partialUrl = "/listings/2021-08-01/items/" + seller.getId();
+    public String searchListingsItems(AmazonSpListingReqVO reqVO) {
+        String endPoint = getEndPoint();
+        String partialUrl = "/listings/2021-08-01/items/" + auth.getSellerId();
         String fullUrl = endPoint + partialUrl;
 
 
@@ -95,7 +101,7 @@ public class AmazonSpClient {
             .requestMethod(RequestX.Method.GET)
             .url(fullUrl)
             .queryParams(reqVO)
-            .headers(generateHeaders(seller))
+            .headers(generateHeaders(auth))
             .build();
         try(var response = WebUtils.sendRequest(request)){
             var bodyString = response.body().string();
@@ -116,18 +122,17 @@ public class AmazonSpClient {
 
 
     @SneakyThrows
-    @Transactional(readOnly = true)
-    public AmazonSpOrderRespVO getOrder(AmazonSeller seller, AmazonSpOrderReqVO vo) {
+    public AmazonSpOrderRespVO getOrder(AmazonSpOrderReqVO vo) {
         log.info("get orders");
 
-        String endPoint = seller.getRegion().getSpEndPoint();
+        String endPoint = getEndPoint();
         String partialUrl = "/orders/v0/orders";
         String fullUrl = endPoint + partialUrl;
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.GET)
             .url(fullUrl)
             .queryParams(vo)
-            .headers(generateHeaders(seller))
+            .headers(generateHeaders(auth))
             .build();
         try(var response = WebUtils.sendRequest(request)){
             var bodyString = response.body().string();
@@ -138,34 +143,32 @@ public class AmazonSpClient {
     }
 
     @SneakyThrows
-    @Transactional(readOnly = true)
-    public Stream<AmazonSpOrderRespVO> streamOrder(AmazonSeller seller, AmazonSpOrderReqVO vo) {
+    public Stream<AmazonSpOrderRespVO> streamOrder(AmazonSpOrderReqVO vo) {
         return PageUtils.getAllPages(
-            getOrder(seller, vo),
+            getOrder(vo),
             page -> !StrUtils.isEmpty(page.getPayload().getNextToken()),
             page -> {
                 var nextToken = page.getPayload().getNextToken();
                 var reqVO = AmazonSpOrderReqVO.builder()
                     .nextToken(nextToken)
                     .build();
-                return getOrder(seller, reqVO);
+                return getOrder(reqVO);
             }
         );
     }
 
 
-    @Transactional(readOnly = true)
-    public List<AmazonSpReportRespVO> getReports(AmazonSeller seller, AmazonSpReportReqVO vo) {
+    public List<AmazonSpReportRespVO> getReports(AmazonSpReportReqVO vo) {
         log.info("get reports");
 
-        String endPoint = seller.getRegion().getSpEndPoint();
+        String endPoint = getEndPoint();
         String partialUrl = "/reports/2021-06-30/reports";
         String fullUrl = endPoint + partialUrl;
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.GET)
             .url(fullUrl)
             .queryParams(vo)
-            .headers(generateHeaders(seller))
+            .headers(generateHeaders(auth))
             .build();
         try(var response = WebUtils.sendRequest(request)){
             var reportsString = WebUtils.parseResponse(response, JSONObject.class).get("reports");
@@ -174,19 +177,17 @@ public class AmazonSpClient {
         }
     }
 
-    @Transactional(readOnly = true)
-    public Stream<String> getReportStream(AmazonSeller seller, AmazonSpReportReqVO vo, String compression) {
-        return getReports(seller, vo).stream().map(report -> getReport(seller, report.getReportId(), compression));
+    public Stream<String> getReportStream(AmazonSpReportReqVO vo, String compression) {
+        return getReports(vo).stream().map(report -> getReport(report.getReportId(), compression));
     }
 
     @SneakyThrows
-    @Transactional(readOnly = true)
-    public String getReport(AmazonSeller seller, String reportId, String compression) {
+    public String getReport(String reportId, String compression) {
         log.info("get report");
         int RETENTION_DAYS = 720;
         DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        String endPoint = seller.getRegion().getSpEndPoint();
+        String endPoint = getEndPoint();
         String result = null;
 
         // Check report status and get document ID
@@ -197,7 +198,7 @@ public class AmazonSpClient {
             log.info("requesting for document id");
             var request = RequestX.builder()
                 .requestMethod(RequestX.Method.GET)
-                .headers(generateHeaders(seller))
+                .headers(generateHeaders(auth))
                 .url(reportStatusUrl)
                 .build();
             JSONObject responseBody = null;
@@ -239,7 +240,7 @@ public class AmazonSpClient {
             var request = RequestX.builder()
                 .requestMethod(RequestX.Method.GET)
                 .url(documentUrl)
-                .headers(generateHeaders(seller))
+                .headers(generateHeaders(auth))
                 .build();
             try(var response = WebUtils.sendRequest(request)){
                 switch (response.code()) {
@@ -266,11 +267,10 @@ public class AmazonSpClient {
     }
 
     @SneakyThrows
-    @Transactional(readOnly = true)
-    public String createReport(AmazonSeller seller, AmazonSpReportSaveVO vo) {
+    public String createReport(AmazonSpReportSaveVO vo) {
         log.info("get report");
 
-        String endPoint = seller.getRegion().getSpEndPoint();
+        String endPoint = getEndPoint();
         String partialUrl = "/reports/2021-06-30/reports";
         String fullUrl = endPoint + partialUrl;
 
@@ -281,7 +281,7 @@ public class AmazonSpClient {
             var request = RequestX.builder()
                 .requestMethod(RequestX.Method.POST)
                 .url(fullUrl)
-                .headers(generateHeaders(seller))
+                .headers(generateHeaders(auth))
                 .payload(vo)
                 .build();
             try(var response = WebUtils.sendRequest(request)){
@@ -313,10 +313,9 @@ public class AmazonSpClient {
         return reportId;
     }
 
-    @Transactional(readOnly = true)
-    public String createAndGetReport(AmazonSeller seller, AmazonSpReportSaveVO vo, String compression) {
-        String reportId = createReport(seller, vo);
-        var reportString = getReport(seller, reportId, compression);
+    public String createAndGetReport(AmazonSpReportSaveVO vo, String compression) {
+        String reportId = createReport(vo);
+        var reportString = getReport(reportId, compression);
         return reportString;
     }
 }
