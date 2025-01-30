@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceEventReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceStateUpdateReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotPluginInstanceHeartbeatReqDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestTemplate;
 
@@ -49,6 +50,12 @@ public class IotDeviceUpstreamClient implements IotDeviceUpstreamApi {
     public CommonResult<Boolean> reportDeviceProperty(IotDevicePropertyReportReqDTO reportReqDTO) {
         String url = deviceDataUrl + URL_PREFIX + "/report-property";
         return doPost(url, reportReqDTO, "reportDevicePropertyData");
+    }
+
+    @Override
+    public CommonResult<Boolean> heartbeatPluginInstance(IotPluginInstanceHeartbeatReqDTO heartbeatReqDTO) {
+        String url = deviceDataUrl + URL_PREFIX + "/heartbeat-plugin-instance";
+        return doPost(url, heartbeatReqDTO, "heartbeatPluginInstance");
     }
 
     // TODO @haohao：未来可能有 get 类型哈

@@ -67,6 +67,6 @@ public class IotPluginInstanceDO extends BaseDO {
      *
      * 目的：心路时间超过一定时间后，会被进行下线处理
      */
-    private Long heartbeatTime;
+    private LocalDateTime heartbeatTime;
 
 }

@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceEventReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceStateUpdateReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotPluginInstanceHeartbeatReqDTO;
 import cn.iocoder.yudao.module.iot.enums.ApiConstants;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface IotDeviceUpstreamApi {
 
     String PREFIX = ApiConstants.PREFIX + "/device/upstream";
+
+    // ========== 设备相关 ==========
 
     /**
      * 更新设备状态
@@ -43,5 +46,15 @@ public interface IotDeviceUpstreamApi {
      */
     @PostMapping(PREFIX + "/report-event")
     CommonResult<Boolean> reportDeviceEvent(@Valid @RequestBody IotDeviceEventReportReqDTO reportReqDTO);
+
+    // ========== 插件相关 ==========
+
+    /**
+     * 心跳插件实例
+     *
+     * @param heartbeatReqDTO 心跳插件实例 DTO
+     */
+    @PostMapping(PREFIX + "/heartbeat-plugin-instance")
+    CommonResult<Boolean> heartbeatPluginInstance(@Valid @RequestBody IotPluginInstanceHeartbeatReqDTO heartbeatReqDTO);
 
 }

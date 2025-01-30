@@ -3,11 +3,13 @@ package cn.iocoder.yudao.module.iot.plugin.common.config;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.plugin.common.downstream.IotDeviceDownstreamHandler;
 import cn.iocoder.yudao.module.iot.plugin.common.downstream.IotDeviceDownstreamServer;
+import cn.iocoder.yudao.module.iot.plugin.common.heartbeta.IotPluginInstanceHeartbeatJob;
 import cn.iocoder.yudao.module.iot.plugin.common.upstream.IotDeviceUpstreamClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
@@ -18,6 +20,7 @@ import java.time.Duration;
  * @author haohao
  */
 @AutoConfiguration
+@EnableScheduling // 开启定时任务，因为 IotPluginInstanceHeartbeatJob 是一个定时任务
 public class IotPluginCommonAutoConfiguration {
 
     // TODO @haohao：这个要不搞个配置类哈
@@ -53,6 +56,12 @@ public class IotPluginCommonAutoConfiguration {
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public IotDeviceDownstreamServer deviceDownstreamServer(IotDeviceDownstreamHandler deviceDownstreamHandler) {
         return new IotDeviceDownstreamServer(deviceDownstreamHandler);
+    }
+
+    @Bean(initMethod = "init", destroyMethod = "stop")
+    public IotPluginInstanceHeartbeatJob pluginInstanceHeartbeatJob(
+            IotDeviceUpstreamApi deviceDataApi, IotDeviceDownstreamServer deviceDownstreamServer) {
+        return new IotPluginInstanceHeartbeatJob(deviceDataApi, deviceDownstreamServer);
     }
 
 }

@@ -41,6 +41,7 @@ public class IotPluginInfoServiceImpl implements IotPluginInfoService {
 
     @Override
     public Long createPluginInfo(PluginInfoSaveReqVO createReqVO) {
+        // TODO @haohao：pluginKey 唯一值
         IotPluginInfoDO pluginInfo = BeanUtils.toBean(createReqVO, IotPluginInfoDO.class);
         pluginInfoMapper.insert(pluginInfo);
         return pluginInfo.getId();
@@ -153,6 +154,11 @@ public class IotPluginInfoServiceImpl implements IotPluginInfoService {
     @Override
     public List<IotPluginInfoDO> getPluginInfoListByStatus(Integer status) {
         return pluginInfoMapper.selectListByStatus(status);
+    }
+
+    @Override
+    public IotPluginInfoDO getPluginInfoByPluginKey(String pluginKey) {
+        return pluginInfoMapper.selectByPluginKey(pluginKey);
     }
 
 }

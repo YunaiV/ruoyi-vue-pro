@@ -25,4 +25,8 @@ public interface IotPluginInfoMapper extends BaseMapperX<IotPluginInfoDO> {
                 .orderByAsc(IotPluginInfoDO::getId));
     }
 
+    default IotPluginInfoDO selectByPluginKey(String pluginKey) {
+        return selectOne(IotPluginInfoDO::getPluginKey, pluginKey);
+    }
+
 }

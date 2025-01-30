@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.info.PluginInfoSav
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInfoDO;
 import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -85,4 +86,7 @@ public interface IotPluginInfoService {
      * @return 插件信息列表
      */
     List<IotPluginInfoDO> getPluginInfoListByStatus(Integer status);
+
+    IotPluginInfoDO getPluginInfoByPluginKey(@NotEmpty(message = "插件包标识符不能为空") String pluginKey);
+
 }

@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.iot.service.plugin;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.net.NetUtil;
-import cn.hutool.core.util.IdUtil;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotPluginInstanceHeartbeatReqDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInfoDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInstanceDO;
-import cn.iocoder.yudao.module.iot.dal.mysql.plugin.IotPluginInfoMapper;
 import cn.iocoder.yudao.module.iot.dal.mysql.plugin.IotPluginInstanceMapper;
 import cn.iocoder.yudao.module.iot.dal.redis.plugin.DevicePluginProcessIdRedisDAO;
 import cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants;
@@ -16,18 +15,20 @@ import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
 import org.pf4j.spring.SpringPluginManager;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
@@ -41,12 +42,9 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 @Slf4j
 public class IotPluginInstanceServiceImpl implements IotPluginInstanceService {
 
-    // TODO @haohao：mac@uuid
-    public static final String MAIN_ID = IdUtil.fastSimpleUUID();
-
-    // TODO @haohao：不直接操作，通过 Service 哈
     @Resource
-    private IotPluginInfoMapper pluginInfoMapper;
+    @Lazy // 延迟加载，避免循环依赖
+    private IotPluginInfoService pluginInfoService;
 
     @Resource
     private IotPluginInstanceMapper pluginInstanceMapper;
@@ -59,8 +57,60 @@ public class IotPluginInstanceServiceImpl implements IotPluginInstanceService {
 
     @Value("${pf4j.pluginsDir}")
     private String pluginsDir;
-    @Value("${server.port:48080}")
-    private int port;
+
+    @Override
+    public void heartbeatPluginInstance(IotPluginInstanceHeartbeatReqDTO heartbeatReqDTO) {
+        // 情况一：已存在，则进行更新
+        IotPluginInstanceDO instance = pluginInstanceMapper.selectByProcessId(heartbeatReqDTO.getProcessId());
+        if (instance != null) {
+            IotPluginInstanceDO.IotPluginInstanceDOBuilder updateObj = IotPluginInstanceDO.builder().id(instance.getId())
+                    .hostIp(heartbeatReqDTO.getHostIp()).downstreamPort(heartbeatReqDTO.getDownstreamPort())
+                    .online(heartbeatReqDTO.getOnline()).heartbeatTime(LocalDateTime.now());
+            if (Boolean.TRUE.equals(heartbeatReqDTO.getOnline())) {
+                if (Boolean.FALSE.equals(instance.getOnline())) { // 当前处于离线时，才需要更新上线时间
+                    updateObj.onlineTime(LocalDateTime.now());
+                }
+            } else {
+                updateObj.offlineTime(LocalDateTime.now());
+            }
+            pluginInstanceMapper.updateById(updateObj.build());
+            return;
+        }
+
+        // 情况二：不存在，则创建
+        IotPluginInfoDO info = pluginInfoService.getPluginInfoByPluginKey(heartbeatReqDTO.getPluginKey());
+        if (info == null) {
+            log.error("[heartbeatPluginInstance][心跳({}) 对应的插件不存在]", heartbeatReqDTO);
+            return;
+        }
+        IotPluginInstanceDO.IotPluginInstanceDOBuilder insertObj = IotPluginInstanceDO.builder()
+                .pluginId(info.getId()).processId(heartbeatReqDTO.getProcessId())
+                .hostIp(heartbeatReqDTO.getHostIp()).downstreamPort(heartbeatReqDTO.getDownstreamPort())
+                .online(heartbeatReqDTO.getOnline()).heartbeatTime(LocalDateTime.now());
+        if (Boolean.TRUE.equals(heartbeatReqDTO.getOnline())) {
+            insertObj.onlineTime(LocalDateTime.now());
+        } else {
+            insertObj.offlineTime(LocalDateTime.now());
+        }
+        pluginInstanceMapper.insert(insertObj.build());
+    }
+
+    @Override
+    public int offlineTimeoutPluginInstance(LocalDateTime maxHeartbeatTime) {
+        List<IotPluginInstanceDO> list = pluginInstanceMapper.selectListByHeartbeatTimeLt(maxHeartbeatTime);
+        if (CollUtil.isEmpty(list)) {
+            return 0;
+        }
+
+        // 更新插件实例为离线
+        int count = 0;
+        for (IotPluginInstanceDO instance : list) {
+            pluginInstanceMapper.updateById(IotPluginInstanceDO.builder().id(instance.getId())
+                    .online(false).offlineTime(LocalDateTime.now()).build());
+            count++;
+        }
+        return count;
+    }
 
     @Override
     public void stopAndUnloadPlugin(String pluginKey) {
@@ -143,57 +193,6 @@ public class IotPluginInstanceServiceImpl implements IotPluginInstanceService {
                 && plugin.getPluginState() == PluginState.STARTED) {
             pluginManager.stopPlugin(pluginKey);
             log.info("已停止插件: {}", pluginKey);
-        }
-    }
-
-    @Override
-    public void reportPluginInstances() {
-        // 1.1 获取 pf4j 插件列表
-        List<PluginWrapper> plugins = pluginManager.getPlugins();
-
-        // 1.2 获取插件信息列表并转换为 Map 以便快速查找
-        List<IotPluginInfoDO> pluginInfos = pluginInfoMapper.selectList();
-        Map<String, IotPluginInfoDO> pluginInfoMap = pluginInfos.stream()
-                .collect(Collectors.toMap(IotPluginInfoDO::getPluginKey, Function.identity()));
-
-        // 1.3 获取本机 IP 和 MAC 地址,mac@uuid
-        String ip = NetUtil.getLocalhostStr();
-        String mac = NetUtil.getLocalMacAddress();
-        String mainId = mac + "@" + MAIN_ID;
-
-        // 2. 遍历插件列表，并保存为插件实例
-        for (PluginWrapper plugin : plugins) {
-            String pluginKey = plugin.getPluginId();
-
-            // 2.1 查找插件信息
-            IotPluginInfoDO pluginInfo = pluginInfoMap.get(pluginKey);
-            if (pluginInfo == null) {
-                log.error("插件信息不存在，pluginKey = {}", pluginKey);
-                continue;
-            }
-
-            // 2.2 情况一：如果插件实例不存在，则创建
-            IotPluginInstanceDO pluginInstance = pluginInstanceMapper.selectByMainIdAndPluginId(mainId,
-                    pluginInfo.getId());
-            // TODO @芋艿：稍后优化；
-//            if (pluginInstance == null) {
-//                // 4.4 如果插件实例不存在，则创建
-//                pluginInstance = PluginInstanceDO.builder()
-//                        .pluginId(pluginInfo.getId())
-//                        .mainId(MAIN_ID + "-" + mac)
-//                        .hostIp(ip)
-//                        .port(port)
-//                        .heartbeatAt(System.currentTimeMillis())
-//                        .build();
-//                pluginInstanceMapper.insert(pluginInstance);
-//            } else {
-//                // 2.2 情况二：如果存在，则更新 heartbeatAt
-//                PluginInstanceDO updatePluginInstance = PluginInstanceDO.builder()
-//                        .id(pluginInstance.getId())
-//                        .heartbeatAt(System.currentTimeMillis())
-//                        .build();
-//                pluginInstanceMapper.updateById(updatePluginInstance);
-//            }
         }
     }
 

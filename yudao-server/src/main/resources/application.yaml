@@ -284,6 +284,8 @@ yudao:
       - infra_job
       - infra_job_log
       - infra_job_log
+      - iot_plugin_info
+      - iot_plugin_instance
       - infra_data_source_config
       - jimu_dict
       - jimu_dict_item
