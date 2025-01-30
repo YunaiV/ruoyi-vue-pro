@@ -1,8 +1,10 @@
-package cn.iocoder.yudao.module.iot.service.device.upstream;
+package cn.iocoder.yudao.module.iot.service.device.message;
 
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceEventReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStateUpdateReqDTO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.message.IotDeviceSimulationUpstreamReqVO;
+import jakarta.validation.Valid;
 
 /**
  * 设备上行 Service 接口
@@ -12,6 +14,13 @@ import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStateUpdateReqDTO;
  * @author 芋道源码
  */
 public interface IotDeviceUpstreamService {
+
+    /**
+     * 模拟设备上行
+     *
+     * @param simulatorReqVO 设备上行请求 VO
+     */
+    void simulationDeviceUpstream(@Valid IotDeviceSimulationUpstreamReqVO simulatorReqVO);
 
     /**
      * 更新设备状态

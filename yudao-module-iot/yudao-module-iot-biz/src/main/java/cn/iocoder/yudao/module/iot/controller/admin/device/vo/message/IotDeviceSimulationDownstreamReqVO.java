@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.device.vo.device;
+package cn.iocoder.yudao.module.iot.controller.admin.device.vo.message;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageTypeEnum;
@@ -7,9 +7,9 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-@Schema(description = "管理后台 - IoT 模拟设备上报 Request VO") // 属性上报、事件上报、状态变更等
+@Schema(description = "管理后台 - IoT 模拟设备下行 Request VO") // 服务调用、属性设置、属性获取等
 @Data
-public class IotDeviceSimulationReportReqVO {
+public class IotDeviceSimulationDownstreamReqVO {
 
     @Schema(description = "设备编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "177")
     @NotNull(message = "设备编号不能为空")
@@ -25,6 +25,6 @@ public class IotDeviceSimulationReportReqVO {
     private String identifier; // 参见 IotDeviceMessageIdentifierEnum 枚举类
 
     @Schema(description = "请求参数", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Object data; // 例如说：属性上报的 properties、事件上报的 params
+    private Object data; // 例如说：服务调用的 params、属性设置的 properties
 
 }

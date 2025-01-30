@@ -7,8 +7,11 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.message.IotDeviceSimulationUpstreamReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
+import cn.iocoder.yudao.module.iot.service.device.message.IotDeviceDownstreamService;
+import cn.iocoder.yudao.module.iot.service.device.message.IotDeviceUpstreamService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,6 +40,10 @@ public class IotDeviceController {
 
     @Resource
     private IotDeviceService deviceService;
+    @Resource
+    private IotDeviceUpstreamService deviceUpstreamService;
+    @Resource
+    private IotDeviceDownstreamService deviceDownstreamService;
 
     @PostMapping("/create")
     @Operation(summary = "创建设备")
@@ -151,11 +158,21 @@ public class IotDeviceController {
         ExcelUtils.write(response, "设备导入模板.xls", "数据", IotDeviceImportExcelVO.class, list);
     }
 
-    @PostMapping("/simulation-report")
-    @Operation(summary = "模拟设备上报")
-    @PreAuthorize("@ss.hasPermission('iot:device:simulation-report')")
-    public CommonResult<Boolean> simulationReportDevice(@Valid @RequestBody IotDeviceSimulationReportReqVO simulatorReqVO) {
-        deviceService.simulationReportDevice(simulatorReqVO);
+    @PostMapping("/simulation-upstream")
+    @Operation(summary = "模拟设备上行")
+    @PreAuthorize("@ss.hasPermission('iot:device:simulation')")
+    public CommonResult<Boolean> simulationDeviceUpstream(
+            @Valid @RequestBody IotDeviceSimulationUpstreamReqVO upstreamReqVO) {
+        deviceUpstreamService.simulationDeviceUpstream(upstreamReqVO);
+        return success(true);
+    }
+
+    @PostMapping("/simulation-downstream")
+    @Operation(summary = "模拟设备下行")
+    @PreAuthorize("@ss.hasPermission('iot:device:simulation')")
+    public CommonResult<Boolean> simulationDownstreamDevice(
+            @Valid @RequestBody IotDeviceSimulationUpstreamReqVO downstreamReqVO) {
+        deviceDownstreamService.simulationDeviceDownstream(downstreamReqVO);
         return success(true);
     }
 

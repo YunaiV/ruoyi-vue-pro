@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.service.device.upstream;
+package cn.iocoder.yudao.module.iot.service.device.message;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceEventReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceStateUpdateReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.IotDeviceUpstreamAbstractReqDTO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.message.IotDeviceSimulationUpstreamReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageIdentifierEnum;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageTypeEnum;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -44,6 +46,37 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
 
     @Resource
     private IotDeviceProducer deviceProducer;
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void simulationDeviceUpstream(IotDeviceSimulationUpstreamReqVO simulatorReqVO) {
+        // 1. 校验存在
+        IotDeviceDO device = deviceService.validateDeviceExists(simulatorReqVO.getId());
+
+        // 2.1 情况一：属性上报
+        String requestId = IdUtil.fastSimpleUUID();
+        if (Objects.equals(simulatorReqVO.getType(), IotDeviceMessageTypeEnum.PROPERTY.getType())) {
+            reportDeviceProperty(((IotDevicePropertyReportReqDTO)
+                    new IotDevicePropertyReportReqDTO().setRequestId(requestId).setReportTime(LocalDateTime.now())
+                            .setProductKey(device.getProductKey()).setDeviceName(device.getDeviceName()))
+                    .setProperties((Map<String, Object>) simulatorReqVO.getData()));
+            return;
+        }
+        // 2.2 情况二：事件上报
+        if (Objects.equals(simulatorReqVO.getType(), IotDeviceMessageTypeEnum.EVENT.getType())) {
+            // TODO 芋艿：待实现
+            return;
+        }
+        // 2.3 情况三：状态变更
+        if (Objects.equals(simulatorReqVO.getType(), IotDeviceMessageTypeEnum.STATE.getType())) {
+            updateDeviceState(((IotDeviceStateUpdateReqDTO)
+                    new IotDeviceStateUpdateReqDTO().setRequestId(IdUtil.fastSimpleUUID()).setReportTime(LocalDateTime.now())
+                            .setProductKey(device.getProductKey()).setDeviceName(device.getDeviceName()))
+                    .setState((Integer) simulatorReqVO.getData()));
+            return;
+        }
+        throw new IllegalArgumentException("未知的类型：" + simulatorReqVO.getType());
+    }
 
     @Override
     public void updateDeviceState(IotDeviceStateUpdateReqDTO updateReqDTO) {

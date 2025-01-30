@@ -144,11 +144,4 @@ public interface IotDeviceService {
      */
     IotDeviceImportRespVO importDevice(List<IotDeviceImportExcelVO> importDevices, boolean updateSupport);
 
-    /**
-     * 模拟设备上报
-     *
-     * @param reportReqVO 上报信息
-     */
-    void simulationReportDevice(IotDeviceSimulationReportReqVO reportReqVO);
-
 }
