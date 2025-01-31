@@ -31,7 +31,7 @@ public class IotDeviceUpstreamServer {
         Router router = Router.router(vertx);
         router.route().handler(BodyHandler.create()); // 处理 Body
         router.post(IotDevicePropertyReportVertxHandler.PATH)
-                .handler(new IotDevicePropertyReportVertxHandler(deviceUpstreamApi)); // 处理设备属性上报
+                .handler(new IotDevicePropertyReportVertxHandler(deviceUpstreamApi));
         // 创建 HttpServer 实例
         this.server = vertx.createHttpServer().requestHandler(router);
     }
