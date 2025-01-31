@@ -3,16 +3,14 @@ package cn.iocoder.yudao.module.iot.plugin.common.config;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.plugin.common.downstream.IotDeviceDownstreamHandler;
 import cn.iocoder.yudao.module.iot.plugin.common.downstream.IotDeviceDownstreamServer;
-import cn.iocoder.yudao.module.iot.plugin.common.heartbeta.IotPluginInstanceHeartbeatJob;
+import cn.iocoder.yudao.module.iot.plugin.common.heartbeat.IotPluginInstanceHeartbeatJob;
 import cn.iocoder.yudao.module.iot.plugin.common.upstream.IotDeviceUpstreamClient;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
-
-import java.time.Duration;
 
 /**
  * IoT 插件的通用自动配置类
@@ -20,42 +18,28 @@ import java.time.Duration;
  * @author haohao
  */
 @AutoConfiguration
+@EnableConfigurationProperties(IotPluginCommonProperties.class)
 @EnableScheduling // 开启定时任务，因为 IotPluginInstanceHeartbeatJob 是一个定时任务
 public class IotPluginCommonAutoConfiguration {
 
-    // TODO @haohao：这个要不搞个配置类哈
-    @Value("${iot.device-data.url}")
-    private String deviceDataUrl;
-
-    /**
-     * 创建 RestTemplate 实例
-     *
-     * @return RestTemplate 实例
-     */
     @Bean
-    public RestTemplate restTemplate() {
-        // 如果你有更多的自定义需求，比如连接池、超时时间等，可以在这里设置
+    public RestTemplate restTemplate(IotPluginCommonProperties properties) {
         return new RestTemplateBuilder()
-                .connectTimeout(Duration.ofMillis(5000)) // 设置连接超时时间
-                .readTimeout(Duration.ofMillis(5000)) // 设置读取超时时间
+                .connectTimeout(properties.getUpstreamConnectTimeout())
+                .readTimeout(properties.getUpstreamReadTimeout())
                 .build();
     }
 
-    /**
-     * 创建 DeviceDataApi 实例
-     *
-     * @param restTemplate RestTemplate 实例
-     * @return DeviceDataApi 实例
-     */
     @Bean
-    public IotDeviceUpstreamApi deviceDataApi(RestTemplate restTemplate) {
-        return new IotDeviceUpstreamClient(restTemplate, deviceDataUrl);
+    public IotDeviceUpstreamApi deviceUpstreamApi(IotPluginCommonProperties properties,
+                                                  RestTemplate restTemplate) {
+        return new IotDeviceUpstreamClient(properties, restTemplate);
     }
 
     @Bean(initMethod = "start", destroyMethod = "stop")
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    public IotDeviceDownstreamServer deviceDownstreamServer(IotDeviceDownstreamHandler deviceDownstreamHandler) {
-        return new IotDeviceDownstreamServer(deviceDownstreamHandler);
+    public IotDeviceDownstreamServer deviceDownstreamServer(IotPluginCommonProperties properties,
+                                                            IotDeviceDownstreamHandler deviceDownstreamHandler) {
+        return new IotDeviceDownstreamServer(properties, deviceDownstreamHandler);
     }
 
     @Bean(initMethod = "init", destroyMethod = "stop")

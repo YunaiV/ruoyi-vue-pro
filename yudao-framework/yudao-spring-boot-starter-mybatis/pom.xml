@@ -63,10 +63,6 @@
             <artifactId>opengauss-jdbc</artifactId>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>com.taosdata.jdbc</groupId>
-            <artifactId>taos-jdbcdriver</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>com.alibaba</groupId>

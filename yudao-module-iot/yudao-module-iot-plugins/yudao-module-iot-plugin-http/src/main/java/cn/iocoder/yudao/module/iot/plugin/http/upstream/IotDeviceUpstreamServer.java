@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.plugin.http.upstream;
 
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
+import cn.iocoder.yudao.module.iot.plugin.http.config.IotPluginHttpProperties;
 import cn.iocoder.yudao.module.iot.plugin.http.upstream.router.IotDeviceEventReportVertxHandler;
 import cn.iocoder.yudao.module.iot.plugin.http.upstream.router.IotDevicePropertyReportVertxHandler;
 import io.vertx.core.Vertx;
@@ -21,11 +22,11 @@ public class IotDeviceUpstreamServer {
 
     private final Vertx vertx;
     private final HttpServer server;
-    private final Integer port;
+    private final IotPluginHttpProperties properties;
 
-    public IotDeviceUpstreamServer(Integer port,
+    public IotDeviceUpstreamServer(IotPluginHttpProperties properties,
                                    IotDeviceUpstreamApi deviceUpstreamApi) {
-        this.port = port;
+        this.properties = properties;
         // 创建 Vertx 实例
         this.vertx = Vertx.vertx();
         // 创建 Router 实例
@@ -44,7 +45,7 @@ public class IotDeviceUpstreamServer {
      */
     public void start() {
         log.info("[start][开始启动]");
-        server.listen(port)
+        server.listen(properties.getServerPort())
                 .toCompletionStage()
                 .toCompletableFuture()
                 .join();

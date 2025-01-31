@@ -52,6 +52,11 @@
             <artifactId>yudao-spring-boot-starter-redis</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.taosdata.jdbc</groupId>
+            <artifactId>taos-jdbcdriver</artifactId>
+        </dependency>
+
         <!-- Test 测试相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
@@ -64,12 +69,13 @@
             <artifactId>yudao-spring-boot-starter-excel</artifactId>
         </dependency>
 
-        <!-- 工具类相关 -->
+        <!-- TODO @haohao：貌似不需要这个？ -->
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web</artifactId>
         </dependency>
 
+        <!-- TODO @haohao：貌似 biz 模块，不需要 MQTT？ -->
         <dependency>
             <groupId>org.eclipse.paho</groupId> <!-- MQTT -->
             <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
@@ -78,13 +84,6 @@
         <dependency>
             <groupId>org.pf4j</groupId>  <!-- PF4J：内置插件机制 -->
             <artifactId>pf4j-spring</artifactId>
-            <!-- TODO @芋艿：可以放到 bom 里配置 -->
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
     </dependencies>

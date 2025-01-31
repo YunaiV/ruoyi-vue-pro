@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.plugin.common.downstream.IotDeviceDownstreamHandler;
 import cn.iocoder.yudao.module.iot.plugin.http.downstream.IotDeviceDownstreamHandlerImpl;
 import cn.iocoder.yudao.module.iot.plugin.http.upstream.IotDeviceUpstreamServer;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,18 +14,13 @@ import org.springframework.context.annotation.Configuration;
  * @author haohao
  */
 @Configuration
+@EnableConfigurationProperties(IotPluginHttpProperties.class)
 public class IotPluginHttpAutoConfiguration {
 
-    // TODO @haohao：这个要不要搞个配置类，更容易维护；
-    /**
-     * 可在 application.yml 中配置，默认端口 8092
-     */
-    @Value("${plugin.http.server.port:8092}")
-    private Integer port;
-
     @Bean(initMethod = "start", destroyMethod = "stop")
-    public IotDeviceUpstreamServer deviceUpstreamServer(IotDeviceUpstreamApi deviceUpstreamApi) {
-        return new IotDeviceUpstreamServer(port, deviceUpstreamApi);
+    public IotDeviceUpstreamServer deviceUpstreamServer(IotDeviceUpstreamApi deviceUpstreamApi,
+                                                        IotPluginHttpProperties properties) {
+        return new IotDeviceUpstreamServer(properties, deviceUpstreamApi);
     }
 
     @Bean

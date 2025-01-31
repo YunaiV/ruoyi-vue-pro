@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceEven
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceStateUpdateReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotPluginInstanceHeartbeatReqDTO;
+import cn.iocoder.yudao.module.iot.plugin.common.config.IotPluginCommonProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestTemplate;
@@ -25,32 +26,31 @@ public class IotDeviceUpstreamClient implements IotDeviceUpstreamApi {
 
     public static final String URL_PREFIX = "/rpc-api/iot/device/upstream";
 
-    private final RestTemplate restTemplate;
+    private final IotPluginCommonProperties properties;
 
-    // TODO @芋艿：改个名字
-    private final String deviceDataUrl;
+    private final RestTemplate restTemplate;
 
     @Override
     public CommonResult<Boolean> updateDeviceState(IotDeviceStateUpdateReqDTO updateReqDTO) {
-        String url = deviceDataUrl + URL_PREFIX + "/update-state";
+        String url = properties.getUpstreamUrl() + URL_PREFIX + "/update-state";
         return doPost(url, updateReqDTO);
     }
 
     @Override
     public CommonResult<Boolean> reportDeviceEvent(IotDeviceEventReportReqDTO reportReqDTO) {
-        String url = deviceDataUrl + URL_PREFIX + "/report-event";
+        String url = properties.getUpstreamUrl() + URL_PREFIX + "/report-event";
         return doPost(url, reportReqDTO);
     }
 
     @Override
     public CommonResult<Boolean> reportDeviceProperty(IotDevicePropertyReportReqDTO reportReqDTO) {
-        String url = deviceDataUrl + URL_PREFIX + "/report-property";
+        String url = properties.getUpstreamUrl() + URL_PREFIX + "/report-property";
         return doPost(url, reportReqDTO);
     }
 
     @Override
     public CommonResult<Boolean> heartbeatPluginInstance(IotPluginInstanceHeartbeatReqDTO heartbeatReqDTO) {
-        String url = deviceDataUrl + URL_PREFIX + "/heartbeat-plugin-instance";
+        String url = properties.getUpstreamUrl() + URL_PREFIX + "/heartbeat-plugin-instance";
         return doPost(url, heartbeatReqDTO);
     }
 

@@ -2,11 +2,11 @@ spring:
   application:
     name: yudao-module-iot-plugin-http
 
-iot:
-  device-data:
-    url: http://127.0.0.1:48080
-
-plugin:
-  http:
-    server:
-      port: 8092
+yudao:
+  iot:
+    plugin:
+      common:
+        upstream-url: http://127.0.0.1:48080
+        downstream-port: 8093
+      http:
+        server-port: 8092

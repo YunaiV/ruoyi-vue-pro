@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.plugin.common.downstream;
 
+import cn.iocoder.yudao.module.iot.plugin.common.config.IotPluginCommonProperties;
 import cn.iocoder.yudao.module.iot.plugin.common.downstream.router.IotDevicePropertyGetVertxHandler;
 import cn.iocoder.yudao.module.iot.plugin.common.downstream.router.IotDevicePropertySetVertxHandler;
 import cn.iocoder.yudao.module.iot.plugin.common.downstream.router.IotDeviceServiceInvokeVertxHandler;
@@ -19,8 +20,11 @@ public class IotDeviceDownstreamServer {
 
     private final Vertx vertx;
     private final HttpServer server;
+    private final IotPluginCommonProperties properties;
 
-    public IotDeviceDownstreamServer(IotDeviceDownstreamHandler deviceDownstreamHandler) {
+    public IotDeviceDownstreamServer(IotPluginCommonProperties properties,
+                                     IotDeviceDownstreamHandler deviceDownstreamHandler) {
+        this.properties = properties;
         // 创建 Vertx 实例
         this.vertx = Vertx.vertx();
         // 创建 Router 实例
@@ -41,7 +45,7 @@ public class IotDeviceDownstreamServer {
      */
     public void start() {
         log.info("[start][开始启动]");
-        server.listen(0) // 通过 0 自动选择端口
+        server.listen(properties.getDownstreamPort())
               .toCompletionStage()
               .toCompletableFuture()
               .join();
