@@ -35,7 +35,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_DOWNSTREAM_FAILED;
 
 /**
- * 设备下行 Service 实现类
+ * IoT 设备下行 Service 实现类
  *
  * @author 芋道源码
  */

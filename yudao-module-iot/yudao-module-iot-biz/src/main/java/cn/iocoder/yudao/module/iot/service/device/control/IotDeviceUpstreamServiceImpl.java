@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * 设备上行 Service 实现类
+ * IoT 设备上行 Service 实现类
  *
  * @author 芋道源码
  */
@@ -123,11 +123,11 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
     @Override
     public void reportDeviceProperty(IotDevicePropertyReportReqDTO reportReqDTO) {
         // 1.1 获得设备
-        log.info("[reportDevicePropertyData][上报设备属性: {}]", reportReqDTO);
+        log.info("[reportDeviceProperty][上报设备属性: {}]", reportReqDTO);
         IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(
                 reportReqDTO.getProductKey(), reportReqDTO.getDeviceName());
         if (device == null) {
-            log.error("[reportDevicePropertyData][设备({}/{})不存在]",
+            log.error("[reportDeviceProperty][设备({}/{})不存在]",
                     reportReqDTO.getProductKey(), reportReqDTO.getDeviceName());
             return;
         }
@@ -145,11 +145,11 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
     @Override
     public void reportDeviceEvent(IotDeviceEventReportReqDTO reportReqDTO) {
         // 1.1 获得设备
-        log.info("[reportDeviceEventData][上报设备事件: {}]", reportReqDTO);
+        log.info("[reportDeviceEvent][上报设备事件: {}]", reportReqDTO);
         IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(
                 reportReqDTO.getProductKey(), reportReqDTO.getDeviceName());
         if (device == null) {
-            log.error("[reportDeviceEventData][设备({}/{})不存在]",
+            log.error("[reportDeviceEvent][设备({}/{})不存在]",
                     reportReqDTO.getProductKey(), reportReqDTO.getDeviceName());
             return;
         }

@@ -4,7 +4,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDevicePropertyReportReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceEventReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceStateUpdateReqDTO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.plugin.common.util.IotPluginCommonUtils;
@@ -21,15 +21,13 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
 
 /**
- * IoT 设备属性上报的 Vert.x Handler
- *
- * @author haohao
+ * IoT 设备设备上报的 Vert.x Handler
  */
 @RequiredArgsConstructor
 @Slf4j
-public class IotDevicePropertyReportVertxHandler implements Handler<RoutingContext> {
+public class IotDeviceEventReportVertxHandler implements Handler<RoutingContext> {
 
-    public static final String PATH = "/sys/:productKey/:deviceName/thing/event/property/post";
+    public static final String PATH = "/sys/:productKey/:deviceName/thing/event/:identifier/post";
 
     private final IotDeviceUpstreamApi deviceUpstreamApi;
 
@@ -37,27 +35,24 @@ public class IotDevicePropertyReportVertxHandler implements Handler<RoutingConte
     @SuppressWarnings("unchecked")
     public void handle(RoutingContext routingContext) {
         // 1. 解析参数
-        IotDevicePropertyReportReqDTO reportReqDTO;
+        IotDeviceEventReportReqDTO reportReqDTO;
         try {
             String productKey = routingContext.pathParam("productKey");
             String deviceName = routingContext.pathParam("deviceName");
+            String identifier = routingContext.pathParam("identifier");
             JsonObject body = routingContext.body().asJsonObject();
             String id = ObjUtil.defaultIfBlank(body.getString("id"), IdUtil.fastSimpleUUID());
-            Map<String, Object> properties = (Map<String, Object>) body.getMap().get("properties");
-            reportReqDTO = ((IotDevicePropertyReportReqDTO)
-                    new IotDevicePropertyReportReqDTO().setRequestId(id)
+            Map<String, Object> params = (Map<String, Object>) body.getMap().get("params");
+            reportReqDTO = ((IotDeviceEventReportReqDTO)
+                    new IotDeviceEventReportReqDTO().setRequestId(id)
                             .setProcessId(IotPluginCommonUtils.getProcessId()).setReportTime(LocalDateTime.now())
                             .setProductKey(productKey).setDeviceName(deviceName))
-                    .setProperties(properties);
+                    .setIdentifier(identifier).setParams(params);
         } catch (Exception e) {
             log.error("[handle][路径参数({}) 解析参数失败]", routingContext.pathParams(), e);
             IotPluginCommonUtils.writeJson(routingContext, CommonResult.error(BAD_REQUEST));
             return;
         }
-
-        // TODO @芋艿：secret 校验。目前的想法：
-        //      方案一：请求的时候，带上 secret 参数，然后进行校验，减少请求的频次。不过可能要看下 mqtt 能不能复用！
-        //      方案二：本地有设备信息的缓存，异步刷新。这样可能 mqtt 的校验，和 http 校验都容易适配。
 
         try {
             // 2. 设备上线
@@ -68,11 +63,11 @@ public class IotDevicePropertyReportVertxHandler implements Handler<RoutingConte
                     .setState(IotDeviceStateEnum.ONLINE.getState()));
 
             // 3.1 属性上报
-            CommonResult<Boolean> result = deviceUpstreamApi.reportDeviceProperty(reportReqDTO);
+            CommonResult<Boolean> result = deviceUpstreamApi.reportDeviceEvent(reportReqDTO);
             // 3.2 返回结果
             IotPluginCommonUtils.writeJson(routingContext, result);
         } catch (Exception e) {
-            log.error("[handle][请求参数({}) 属性上报异常]", reportReqDTO, e);
+            log.error("[handle][请求参数({}) 时间上报异常]", reportReqDTO, e);
             IotPluginCommonUtils.writeJson(routingContext, CommonResult.error(INTERNAL_SERVER_ERROR));
         }
     }

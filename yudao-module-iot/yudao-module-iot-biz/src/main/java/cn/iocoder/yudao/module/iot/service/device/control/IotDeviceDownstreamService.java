@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceS
 import jakarta.validation.Valid;
 
 /**
- * 设备下行 Service 接口
+ * IoT 设备下行 Service 接口
  *
  * 目的：服务端 -> 插件 -> 设备
  *

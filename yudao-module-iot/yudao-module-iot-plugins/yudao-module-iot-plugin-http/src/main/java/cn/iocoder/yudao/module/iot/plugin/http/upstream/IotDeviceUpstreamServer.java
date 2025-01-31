@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.plugin.http.upstream;
 
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
+import cn.iocoder.yudao.module.iot.plugin.http.upstream.router.IotDeviceEventReportVertxHandler;
 import cn.iocoder.yudao.module.iot.plugin.http.upstream.router.IotDevicePropertyReportVertxHandler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
@@ -32,6 +33,8 @@ public class IotDeviceUpstreamServer {
         router.route().handler(BodyHandler.create()); // 处理 Body
         router.post(IotDevicePropertyReportVertxHandler.PATH)
                 .handler(new IotDevicePropertyReportVertxHandler(deviceUpstreamApi));
+        router.post(IotDeviceEventReportVertxHandler.PATH)
+                .handler(new IotDeviceEventReportVertxHandler(deviceUpstreamApi));
         // 创建 HttpServer 实例
         this.server = vertx.createHttpServer().requestHandler(router);
     }
