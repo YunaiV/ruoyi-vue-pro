@@ -5,10 +5,8 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDeviceDownstreamAbstractReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDevicePropertyGetReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDevicePropertySetReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDeviceServiceInvokeReqDTO;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.*;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceDownstreamReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInstanceDO;
@@ -68,21 +66,27 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
             return;
         }
         // 属性相关
-        if (Objects.equals(downstreamReqVO.getType(), IotDeviceMessageTypeEnum.PROPERTY.getType()))
+        if (Objects.equals(downstreamReqVO.getType(), IotDeviceMessageTypeEnum.PROPERTY.getType())) {
             // 属性设置
             if (Objects.equals(downstreamReqVO.getIdentifier(),
                     IotDeviceMessageIdentifierEnum.PROPERTY_SET.getIdentifier())) {
                 setDeviceProperty(downstreamReqVO, device, parentDevice);
                 return;
             }
-        // 属性设置
-        if (Objects.equals(downstreamReqVO.getIdentifier(),
-                IotDeviceMessageIdentifierEnum.PROPERTY_GET.getIdentifier())) {
-            getDeviceProperty(downstreamReqVO, device, parentDevice);
+            // 属性设置
+            if (Objects.equals(downstreamReqVO.getIdentifier(),
+                    IotDeviceMessageIdentifierEnum.PROPERTY_GET.getIdentifier())) {
+                getDeviceProperty(downstreamReqVO, device, parentDevice);
+                return;
+            }
+        }
+        // 配置下发
+        if (Objects.equals(downstreamReqVO.getType(), IotDeviceMessageTypeEnum.CONFIG.getType())
+            && Objects.equals(downstreamReqVO.getIdentifier(), IotDeviceMessageIdentifierEnum.CONFIG_SET.getIdentifier())) {
+            setDeviceConfig(downstreamReqVO, device, parentDevice);
             return;
         }
         // TODO 芋艿：ota 升级
-        // TODO 芋艿：配置下发
     }
 
     /**
@@ -193,6 +197,41 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
         // 4. 如果不成功，抛出异常，提示用户
         if (result.isError()) {
             log.error("[getDeviceProperty][设备({})属性获取失败，请求参数：({})，响应结果：({})]",
+                    device.getDeviceKey(), reqDTO, result);
+            throw exception(DEVICE_DOWNSTREAM_FAILED, result.getMsg());
+        }
+    }
+
+    /**
+     * 设置设备配置
+     *
+     * @param downstreamReqVO 下行请求
+     * @param device          设备
+     * @param parentDevice    父设备
+     */
+    @SuppressWarnings({"unchecked", "unused"})
+    private void setDeviceConfig(IotDeviceDownstreamReqVO downstreamReqVO,
+                                 IotDeviceDO device, IotDeviceDO parentDevice) {
+        // 1. 参数转换，无需校验
+        Map<String, Object> config = JsonUtils.parseObject(device.getConfig(), Map.class);
+
+        // 2. 发送请求
+        String url = String.format( "sys/%s/%s/thing/service/config/set",
+                getProductKey(device, parentDevice), getDeviceName(device, parentDevice));
+        IotDeviceConfigSetReqDTO reqDTO = new IotDeviceConfigSetReqDTO()
+                .setConfig(config);
+        CommonResult<Boolean> result = requestPlugin(url, reqDTO, device);
+
+        // 3. 发送设备消息
+        IotDeviceMessage message = new IotDeviceMessage().setRequestId(reqDTO.getRequestId())
+                .setType(IotDeviceMessageTypeEnum.CONFIG.getType())
+                .setIdentifier(IotDeviceMessageIdentifierEnum.CONFIG_SET.getIdentifier())
+                .setData(reqDTO.getConfig());
+        sendDeviceMessage(message, device, result.getCode());
+
+        // 4. 如果不成功，抛出异常，提示用户
+        if (result.isError()) {
+            log.error("[setDeviceConfig][设备({})配置下发失败，请求参数：({})，响应结果：({})]",
                     device.getDeviceKey(), reqDTO, result);
             throw exception(DEVICE_DOWNSTREAM_FAILED, result.getMsg());
         }

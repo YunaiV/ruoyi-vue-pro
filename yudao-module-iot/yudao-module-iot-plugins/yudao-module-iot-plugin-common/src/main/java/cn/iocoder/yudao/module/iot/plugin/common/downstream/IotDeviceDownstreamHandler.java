@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.plugin.common.downstream;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDeviceConfigSetReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDevicePropertyGetReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDevicePropertySetReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDeviceServiceInvokeReqDTO;
@@ -37,5 +38,13 @@ public interface IotDeviceDownstreamHandler {
      * @return 是否成功
      */
     CommonResult<Boolean> setDeviceProperty(IotDevicePropertySetReqDTO setReqDTO);
+
+    /**
+     * 设置设备配置
+     *
+     * @param setReqDTO 设置设备配置的请求
+     * @return 是否成功
+     */
+    CommonResult<Boolean> setDeviceConfig(IotDeviceConfigSetReqDTO setReqDTO);
 
 }

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.plugin.http.downstream;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDeviceConfigSetReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDevicePropertyGetReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDevicePropertySetReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDeviceServiceInvokeReqDTO;
@@ -30,6 +31,11 @@ public class IotDeviceDownstreamHandlerImpl implements IotDeviceDownstreamHandle
 
     @Override
     public CommonResult<Boolean> setDeviceProperty(IotDevicePropertySetReqDTO setReqDTO) {
+        return CommonResult.error(NOT_IMPLEMENTED.getCode(), "HTTP 不支持设置设备属性");
+    }
+
+    @Override
+    public CommonResult<Boolean> setDeviceConfig(IotDeviceConfigSetReqDTO setReqDTO) {
         return CommonResult.error(NOT_IMPLEMENTED.getCode(), "HTTP 不支持设置设备属性");
     }
 

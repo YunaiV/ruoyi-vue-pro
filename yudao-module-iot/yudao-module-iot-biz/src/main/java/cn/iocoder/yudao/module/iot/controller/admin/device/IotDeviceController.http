@@ -1,5 +1,5 @@
-### 请求 /iot/device/simulation-downstream 接口（服务调用） => 成功
-POST {{baseUrl}}/iot/device/simulation-downstream
+### 请求 /iot/device/downstream 接口（服务调用） => 成功
+POST {{baseUrl}}/iot/device/downstream
 Content-Type: application/json
 tenant-id: {{adminTenentId}}
 Authorization: Bearer {{token}}
@@ -13,8 +13,8 @@ Authorization: Bearer {{token}}
   }
 }
 
-### 请求 /iot/device/simulation-downstream 接口（属性设置） => 成功
-POST {{baseUrl}}/iot/device/simulation-downstream
+### 请求 /iot/device/downstream 接口（属性设置） => 成功
+POST {{baseUrl}}/iot/device/downstream
 Content-Type: application/json
 tenant-id: {{adminTenentId}}
 Authorization: Bearer {{token}}
@@ -28,8 +28,8 @@ Authorization: Bearer {{token}}
   }
 }
 
-### 请求 /iot/device/simulation-downstream 接口（属性获取） => 成功
-POST {{baseUrl}}/iot/device/simulation-downstream
+### 请求 /iot/device/downstream 接口（属性获取） => 成功
+POST {{baseUrl}}/iot/device/downstream
 Content-Type: application/json
 tenant-id: {{adminTenentId}}
 Authorization: Bearer {{token}}
@@ -39,4 +39,16 @@ Authorization: Bearer {{token}}
   "type": "property",
   "identifier": "get",
   "data": ["xx", "yy"]
+}
+
+### 请求 /iot/device/downstream 接口（配置设置） => 成功
+POST {{baseUrl}}/iot/device/downstream
+Content-Type: application/json
+tenant-id: {{adminTenentId}}
+Authorization: Bearer {{token}}
+
+{
+  "id": 25,
+  "type": "config",
+  "identifier": "set"
 }

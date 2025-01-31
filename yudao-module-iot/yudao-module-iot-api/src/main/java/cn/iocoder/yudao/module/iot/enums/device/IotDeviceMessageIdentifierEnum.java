@@ -10,15 +10,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum IotDeviceMessageIdentifierEnum {
 
-    PROPERTY_GET("get"), // 下行
+    PROPERTY_GET("get"), // 下行 TODO 芋艿：【讨论】貌似这个“上行”更合理？device 主动拉取配置。和 IotDevicePropertyGetReqDTO 一样的配置
     PROPERTY_SET("set"), // 下行
     PROPERTY_REPORT("report"), // 上行
 
     STATE_ONLINE("online"), // 上行
     STATE_OFFLINE("offline"), // 上行
 
-    SERVICE_REPLY_SUFFIX("_reply"); // TODO 上行 or 下行
+    CONFIG_GET("get"), // 上行 TODO 芋艿：【讨论】暂时没有上行的场景
+    CONFIG_SET("set"), // 下行
 
+    SERVICE_REPLY_SUFFIX("_reply"); // 芋艿：TODO 芋艿：【讨论】上行 or 下行
 
     /**
      * 标志符
