@@ -7,9 +7,9 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-@Schema(description = "管理后台 - IoT 模拟设备下行 Request VO") // 服务调用、属性设置、属性获取等
+@Schema(description = "管理后台 - IoT 设备上行 Request VO") // 属性上报、事件上报、状态变更等
 @Data
-public class IotDeviceSimulationDownstreamReqVO {
+public class IotDeviceUpstreamReqVO {
 
     @Schema(description = "设备编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "177")
     @NotNull(message = "设备编号不能为空")
@@ -25,6 +25,6 @@ public class IotDeviceSimulationDownstreamReqVO {
     private String identifier; // 参见 IotDeviceMessageIdentifierEnum 枚举类
 
     @Schema(description = "请求参数", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Object data; // 例如说：服务调用的 params、属性设置的 properties
+    private Object data; // 例如说：属性上报的 properties、事件上报的 params
 
 }

@@ -160,4 +160,11 @@ public class IotDeviceDO extends BaseDO {
      */
     private String address;
 
+    /**
+     * 设备配置
+     *
+     * JSON 格式，可下发给 device 进行自定义配置
+     */
+    private String config;
+
 }

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.service.device.control;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceEventReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceStateUpdateReqDTO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceSimulationUpstreamReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceUpstreamReqVO;
 import jakarta.validation.Valid;
 
 /**
@@ -16,11 +16,11 @@ import jakarta.validation.Valid;
 public interface IotDeviceUpstreamService {
 
     /**
-     * 模拟设备上行
+     * 设备上行，可用于设备模拟
      *
      * @param simulatorReqVO 设备上行请求 VO
      */
-    void simulationDeviceUpstream(@Valid IotDeviceSimulationUpstreamReqVO simulatorReqVO);
+    void upstreamDevice(@Valid IotDeviceUpstreamReqVO simulatorReqVO);
 
     /**
      * 更新设备状态

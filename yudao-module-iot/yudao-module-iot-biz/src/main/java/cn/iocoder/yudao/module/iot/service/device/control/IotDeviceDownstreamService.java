@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.device.control;
 
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceSimulationDownstreamReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceDownstreamReqVO;
 import jakarta.validation.Valid;
 
 /**
@@ -13,10 +13,10 @@ import jakarta.validation.Valid;
 public interface IotDeviceDownstreamService {
 
     /**
-     * 模拟设备下行
+     * 设备下行，可用于设备模拟
      *
      * @param downstreamReqVO 设备下行请求 VO
      */
-    void simulationDeviceDownstream(@Valid IotDeviceSimulationDownstreamReqVO downstreamReqVO);
+    void downstreamDevice(@Valid IotDeviceDownstreamReqVO downstreamReqVO);
 
 }

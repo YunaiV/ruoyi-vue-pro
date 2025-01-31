@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceEven
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDevicePropertyReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceStateUpdateReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceUpstreamAbstractReqDTO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceSimulationUpstreamReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceUpstreamReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageIdentifierEnum;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageTypeEnum;
@@ -52,7 +52,7 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void simulationDeviceUpstream(IotDeviceSimulationUpstreamReqVO simulatorReqVO) {
+    public void upstreamDevice(IotDeviceUpstreamReqVO simulatorReqVO) {
         // 1. 校验存在
         IotDeviceDO device = deviceService.validateDeviceExists(simulatorReqVO.getId());
 

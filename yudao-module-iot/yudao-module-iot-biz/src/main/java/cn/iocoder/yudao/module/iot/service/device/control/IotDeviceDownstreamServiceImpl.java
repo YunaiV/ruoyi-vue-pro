@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDeviceDo
 import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDevicePropertyGetReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDevicePropertySetReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDeviceServiceInvokeReqDTO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceSimulationDownstreamReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceDownstreamReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInstanceDO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageIdentifierEnum;
@@ -56,7 +56,7 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
     private IotDeviceProducer deviceProducer;
 
     @Override
-    public void simulationDeviceDownstream(IotDeviceSimulationDownstreamReqVO downstreamReqVO) {
+    public void downstreamDevice(IotDeviceDownstreamReqVO downstreamReqVO) {
         // 校验设备是否存在
         IotDeviceDO device = deviceService.validateDeviceExists(downstreamReqVO.getId());
         // TODO 芋艿：父设备的处理
@@ -93,7 +93,7 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
      * @param parentDevice    父设备
      */
     @SuppressWarnings("unchecked")
-    private void invokeDeviceService(IotDeviceSimulationDownstreamReqVO downstreamReqVO,
+    private void invokeDeviceService(IotDeviceDownstreamReqVO downstreamReqVO,
                                      IotDeviceDO device, IotDeviceDO parentDevice) {
         // 1. 参数校验
         if (!(downstreamReqVO.getData() instanceof Map<?, ?>)) {
@@ -130,7 +130,7 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
      * @param parentDevice    父设备
      */
     @SuppressWarnings("unchecked")
-    private void setDeviceProperty(IotDeviceSimulationDownstreamReqVO downstreamReqVO,
+    private void setDeviceProperty(IotDeviceDownstreamReqVO downstreamReqVO,
                                    IotDeviceDO device, IotDeviceDO parentDevice) {
         // 1. 参数校验
         if (!(downstreamReqVO.getData() instanceof Map<?, ?>)) {
@@ -168,7 +168,7 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
      * @param parentDevice    父设备
      */
     @SuppressWarnings("unchecked")
-    private void getDeviceProperty(IotDeviceSimulationDownstreamReqVO downstreamReqVO,
+    private void getDeviceProperty(IotDeviceDownstreamReqVO downstreamReqVO,
                                    IotDeviceDO device, IotDeviceDO parentDevice) {
         // 1. 参数校验
         if (!(downstreamReqVO.getData() instanceof List<?>)) {
