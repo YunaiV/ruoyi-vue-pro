@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.service.plugin;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotPluginInstanceHeartbeatReqDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInfoDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInstanceDO;
@@ -201,6 +202,15 @@ public class IotPluginInstanceServiceImpl implements IotPluginInstanceService {
     @Override
     public void updateDevicePluginInstanceProcessIdAsync(String deviceKey, String processId) {
         devicePluginProcessIdRedisDAO.put(deviceKey, processId);
+    }
+
+    @Override
+    public IotPluginInstanceDO getPluginInstanceByDeviceKey(String deviceKey) {
+        String processId = devicePluginProcessIdRedisDAO.get(deviceKey);
+        if (StrUtil.isEmpty(processId)) {
+            return null;
+        }
+        return pluginInstanceMapper.selectByProcessId(processId);
     }
 
 }

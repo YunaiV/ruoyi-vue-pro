@@ -30,6 +30,7 @@ public interface ErrorCodeConstants {
     ErrorCode DEVICE_GATEWAY_NOT_EXISTS = new ErrorCode(1_050_003_004, "网关设备不存在");
     ErrorCode DEVICE_NOT_GATEWAY = new ErrorCode(1_050_003_005, "设备不是网关设备");
     ErrorCode DEVICE_IMPORT_LIST_IS_EMPTY = new ErrorCode(1_050_003_006, "导入设备数据不能为空！");
+    ErrorCode DEVICE_DOWNSTREAM_FAILED = new ErrorCode(1_050_003_007, "执行失败，原因：{}");
 
     // ========== 产品分类 1-050-004-000 ==========
     ErrorCode PRODUCT_CATEGORY_NOT_EXISTS = new ErrorCode(1_050_004_000, "产品分类不存在");
@@ -46,6 +47,6 @@ public interface ErrorCodeConstants {
     ErrorCode PLUGIN_STATUS_INVALID = new ErrorCode(1_050_006_004, "插件状态无效");
 
     // ========== 插件实例 1-050-007-000 ==========
-    ErrorCode PLUGIN_INSTANCE_NOT_EXISTS = new ErrorCode(1_050_007_000, "插件实例不存在");
+
 
 }

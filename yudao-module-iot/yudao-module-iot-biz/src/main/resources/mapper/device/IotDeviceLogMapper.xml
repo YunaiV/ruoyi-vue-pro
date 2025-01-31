@@ -13,6 +13,7 @@
                 type NCHAR(50),
                 identifier NCHAR(255),
                 content NCHAR(1024),
+                code INT,
                 report_time TIMESTAMP
             ) TAGS (
                 device_key NCHAR(50)
@@ -24,7 +25,7 @@
     </select>
 
     <insert id="insert">
-        INSERT INTO device_log_${deviceKey} (ts, id, product_key, device_name, type, identifier, content, report_time)
+        INSERT INTO device_log_${deviceKey} (ts, id, product_key, device_name, type, identifier, content, code, report_time)
         USING device_log
         TAGS ('${deviceKey}')
         VALUES (
@@ -35,6 +36,7 @@
             #{type},
             #{identifier},
             #{content},
+            #{code},
             #{reportTime}
         )
     </insert>

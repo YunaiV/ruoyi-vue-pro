@@ -1,0 +1,14 @@
+### 请求 /iot/device/simulation-downstream 接口 => 成功
+POST {{baseUrl}}/iot/device/simulation-downstream
+Content-Type: application/json
+tenant-id: {{adminTenentId}}
+Authorization: Bearer {{token}}
+
+{
+  "id": 25,
+  "type": "service",
+  "identifier": "temperature",
+  "data": {
+    "xx": "yy"
+  }
+}

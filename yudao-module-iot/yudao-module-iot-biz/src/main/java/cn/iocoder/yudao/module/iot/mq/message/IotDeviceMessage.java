@@ -55,12 +55,16 @@ public class IotDeviceMessage {
      * 例如说：属性上报的 properties、事件上报的 params
      */
     private Object data;
+    /**
+     * 响应码
+     *
+     * 目前只有 server 下行消息给 device 设备时，才会有响应码
+     */
+    private Integer code;
 
     /**
      * 上报时间
      */
     private LocalDateTime reportTime;
-
-    // TODO @芋艿 code;
 
 }

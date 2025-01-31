@@ -14,10 +14,28 @@ import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDeviceSe
  */
 public interface IotDeviceDownstreamHandler {
 
+    /**
+     * 调用设备服务
+     *
+     * @param invokeReqDTO 调用设备服务的请求
+     * @return 是否成功
+     */
     CommonResult<Boolean> invokeDeviceService(IotDeviceServiceInvokeReqDTO invokeReqDTO);
 
+    /**
+     * 获取设备属性
+     *
+     * @param getReqDTO 获取设备属性的请求
+     * @return 是否成功
+     */
     CommonResult<Boolean> getDeviceProperty(IotDevicePropertyGetReqDTO getReqDTO);
 
+    /**
+     * 设置设备属性
+     *
+     * @param setReqDTO 设置设备属性的请求
+     * @return 是否成功
+     */
     CommonResult<Boolean> setDeviceProperty(IotDevicePropertySetReqDTO setReqDTO);
 
 }

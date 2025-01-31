@@ -5,7 +5,8 @@ import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDevicePr
 import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDevicePropertySetReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDeviceServiceInvokeReqDTO;
 import cn.iocoder.yudao.module.iot.plugin.common.downstream.IotDeviceDownstreamHandler;
-import org.springframework.stereotype.Component;
+
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.NOT_IMPLEMENTED;
 
 /**
  * HTTP 插件的 {@link IotDeviceDownstreamHandler} 实现类
@@ -15,28 +16,21 @@ import org.springframework.stereotype.Component;
  *
  * @author 芋道源码
  */
-@Component // TODO @芋艿：后续统一处理
 public class IotDeviceDownstreamHandlerImpl implements IotDeviceDownstreamHandler {
 
     @Override
     public CommonResult<Boolean> invokeDeviceService(IotDeviceServiceInvokeReqDTO invokeReqDTO) {
-        // TODO @芋艿：待实现
-        System.out.println();
-        return null;
+        return CommonResult.error(NOT_IMPLEMENTED.getCode(), "HTTP 不支持调用设备服务");
     }
 
     @Override
     public CommonResult<Boolean> getDeviceProperty(IotDevicePropertyGetReqDTO getReqDTO) {
-        // TODO @芋艿：待实现
-        System.out.println();
-        return null;
+        return CommonResult.error(NOT_IMPLEMENTED.getCode(), "HTTP 不支持获取设备属性");
     }
 
     @Override
     public CommonResult<Boolean> setDeviceProperty(IotDevicePropertySetReqDTO setReqDTO) {
-        // TODO @芋艿：待实现
-        System.out.println();
-        return null;
+        return CommonResult.error(NOT_IMPLEMENTED.getCode(), "HTTP 不支持设置设备属性");
     }
 
 }

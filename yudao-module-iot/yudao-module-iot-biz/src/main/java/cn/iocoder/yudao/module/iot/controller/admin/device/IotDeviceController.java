@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceSimulationDownstreamReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceSimulationUpstreamReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
@@ -171,7 +172,7 @@ public class IotDeviceController {
     @Operation(summary = "模拟设备下行")
     @PreAuthorize("@ss.hasPermission('iot:device:simulation')")
     public CommonResult<Boolean> simulationDownstreamDevice(
-            @Valid @RequestBody IotDeviceSimulationUpstreamReqVO downstreamReqVO) {
+            @Valid @RequestBody IotDeviceSimulationDownstreamReqVO downstreamReqVO) {
         deviceDownstreamService.simulationDeviceDownstream(downstreamReqVO);
         return success(true);
     }

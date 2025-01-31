@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.service.plugin;
 
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotPluginInstanceHeartbeatReqDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInfoDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInstanceDO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -66,5 +67,13 @@ public interface IotPluginInstanceService {
      * @param processId 进程编号
      */
     void updateDevicePluginInstanceProcessIdAsync(String deviceKey, String processId);
+
+    /**
+     * 获得设备对应的插件实例
+     *
+     * @param deviceKey 设备 Key
+     * @return 插件实例
+     */
+    IotPluginInstanceDO getPluginInstanceByDeviceKey(String deviceKey);
 
 }

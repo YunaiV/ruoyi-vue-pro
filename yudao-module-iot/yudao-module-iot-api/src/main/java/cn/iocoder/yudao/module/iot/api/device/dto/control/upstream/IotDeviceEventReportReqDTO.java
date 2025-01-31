@@ -19,7 +19,6 @@ public class IotDeviceEventReportReqDTO extends IotDeviceUpstreamAbstractReqDTO 
     /**
      * 事件参数
      */
-    @NotEmpty(message = "事件参数不能为空")
     private Map<String, Object> params;
 
 }

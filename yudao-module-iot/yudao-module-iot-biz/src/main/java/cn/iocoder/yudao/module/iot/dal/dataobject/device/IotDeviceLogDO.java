@@ -75,6 +75,12 @@ public class IotDeviceLogDO {
      * 存储具体的消息数据内容，通常是 JSON 格式
      */
     private String content;
+    /**
+     * 响应码
+     *
+     * 目前只有 server 下行消息给 device 设备时，才会有响应码
+     */
+    private Integer code;
 
     /**
      * 上报时间戳
