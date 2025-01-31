@@ -67,7 +67,10 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
         }
         // 2.2 情况二：事件上报
         if (Objects.equals(simulatorReqVO.getType(), IotDeviceMessageTypeEnum.EVENT.getType())) {
-            // TODO 芋艿：待实现
+            reportDeviceEvent(((IotDeviceEventReportReqDTO)
+                    new IotDeviceEventReportReqDTO().setRequestId(requestId).setReportTime(LocalDateTime.now())
+                            .setProductKey(device.getProductKey()).setDeviceName(device.getDeviceName()))
+                    .setIdentifier(simulatorReqVO.getIdentifier()).setParams((Map<String, Object>) simulatorReqVO.getData()));
             return;
         }
         // 2.3 情况三：状态变更
@@ -120,7 +123,7 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
     @Override
     public void reportDeviceProperty(IotDevicePropertyReportReqDTO reportReqDTO) {
         // 1.1 获得设备
-        log.info("[reportDevicePropertyData][上报设备属性数据: {}]", reportReqDTO);
+        log.info("[reportDevicePropertyData][上报设备属性: {}]", reportReqDTO);
         IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(
                 reportReqDTO.getProductKey(), reportReqDTO.getDeviceName());
         if (device == null) {
@@ -141,9 +144,24 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
 
     @Override
     public void reportDeviceEvent(IotDeviceEventReportReqDTO reportReqDTO) {
-        log.info("[reportDeviceEventData][上报设备事件数据: {}]", reportReqDTO);
+        // 1.1 获得设备
+        log.info("[reportDeviceEventData][上报设备事件: {}]", reportReqDTO);
+        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(
+                reportReqDTO.getProductKey(), reportReqDTO.getDeviceName());
+        if (device == null) {
+            log.error("[reportDeviceEventData][设备({}/{})不存在]",
+                    reportReqDTO.getProductKey(), reportReqDTO.getDeviceName());
+            return;
+        }
+        // 1.2 记录设备的最后时间
+        updateDeviceLastTime(device, reportReqDTO);
 
-        // TODO 芋艿：待实现
+        // 2. 发送设备消息
+        IotDeviceMessage message = BeanUtils.toBean(reportReqDTO, IotDeviceMessage.class)
+                .setType(IotDeviceMessageTypeEnum.EVENT.getType())
+                .setIdentifier(reportReqDTO.getIdentifier())
+                .setData(reportReqDTO.getParams());
+        sendDeviceMessage(message, device);
     }
 
     private void updateDeviceLastTime(IotDeviceDO device, IotDeviceUpstreamAbstractReqDTO reqDTO) {
