@@ -6,6 +6,8 @@ import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDeviceDownstreamAbstractReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDevicePropertyGetReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDevicePropertySetReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDeviceServiceInvokeReqDTO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceSimulationDownstreamReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
@@ -24,6 +26,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -91,11 +94,12 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
      */
     @SuppressWarnings("unchecked")
     private void invokeDeviceService(IotDeviceSimulationDownstreamReqVO downstreamReqVO,
-            IotDeviceDO device, IotDeviceDO parentDevice) {
+                                     IotDeviceDO device, IotDeviceDO parentDevice) {
         // 1. 参数校验
         if (!(downstreamReqVO.getData() instanceof Map<?, ?>)) {
             throw new ServiceException(BAD_REQUEST.getCode(), "data 不是 Map 类型");
         }
+        // TODO @super：【可优化】过滤掉不合法的服务
 
         // 2. 发送请求
         String url = String.format( "sys/%s/%s/thing/service/%s",
@@ -125,16 +129,73 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
      * @param device          设备
      * @param parentDevice    父设备
      */
+    @SuppressWarnings("unchecked")
     private void setDeviceProperty(IotDeviceSimulationDownstreamReqVO downstreamReqVO,
-            IotDeviceDO device, IotDeviceDO parentDevice) {
-        // TODO 1. 请求
+                                   IotDeviceDO device, IotDeviceDO parentDevice) {
+        // 1. 参数校验
+        if (!(downstreamReqVO.getData() instanceof Map<?, ?>)) {
+            throw new ServiceException(BAD_REQUEST.getCode(), "data 不是 Map 类型");
+        }
+        // TODO @super：【可优化】过滤掉不合法的属性
 
-        // TODO 2. 发送消息
+        // 2. 发送请求
+        String url = String.format( "sys/%s/%s/thing/service/property/set",
+                getProductKey(device, parentDevice), getDeviceName(device, parentDevice));
+        IotDevicePropertySetReqDTO reqDTO = new IotDevicePropertySetReqDTO()
+                .setProperties((Map<String, Object>) downstreamReqVO.getData());
+        CommonResult<Boolean> result = requestPlugin(url, reqDTO, device);
+
+        // 3. 发送设备消息
+        IotDeviceMessage message = new IotDeviceMessage().setRequestId(reqDTO.getRequestId())
+                .setType(IotDeviceMessageTypeEnum.PROPERTY.getType())
+                .setIdentifier(IotDeviceMessageIdentifierEnum.PROPERTY_SET.getIdentifier())
+                .setData(reqDTO.getProperties());
+        sendDeviceMessage(message, device, result.getCode());
+
+        // 4. 如果不成功，抛出异常，提示用户
+        if (result.isError()) {
+            log.error("[setDeviceProperty][设备({})属性设置失败，请求参数：({})，响应结果：({})]",
+                    device.getDeviceKey(), reqDTO, result);
+            throw exception(DEVICE_DOWNSTREAM_FAILED, result.getMsg());
+        }
     }
 
+    /**
+     * 获取设备属性
+     *
+     * @param downstreamReqVO 下行请求
+     * @param device          设备
+     * @param parentDevice    父设备
+     */
+    @SuppressWarnings("unchecked")
     private void getDeviceProperty(IotDeviceSimulationDownstreamReqVO downstreamReqVO,
-            IotDeviceDO device, IotDeviceDO parentDevice) {
-        // TODO 芋艿：这里需要获取设备属性
+                                   IotDeviceDO device, IotDeviceDO parentDevice) {
+        // 1. 参数校验
+        if (!(downstreamReqVO.getData() instanceof List<?>)) {
+            throw new ServiceException(BAD_REQUEST.getCode(), "data 不是 List 类型");
+        }
+        // TODO @super：【可优化】过滤掉不合法的属性
+
+        // 2. 发送请求
+        String url = String.format( "sys/%s/%s/thing/service/property/get",
+                getProductKey(device, parentDevice), getDeviceName(device, parentDevice));
+        IotDevicePropertyGetReqDTO reqDTO = new IotDevicePropertyGetReqDTO()
+                .setIdentifiers((List<String>) downstreamReqVO.getData());
+        CommonResult<Boolean> result = requestPlugin(url, reqDTO, device);
+
+        // 3. 发送设备消息
+        IotDeviceMessage message = new IotDeviceMessage().setRequestId(reqDTO.getRequestId())
+                .setType(IotDeviceMessageTypeEnum.PROPERTY.getType())
+                .setIdentifier(IotDeviceMessageIdentifierEnum.PROPERTY_SET.getIdentifier())
+                .setData(reqDTO.getIdentifiers());
+        sendDeviceMessage(message, device, result.getCode());
+
+        // 4. 如果不成功，抛出异常，提示用户
+        if (result.isError()) {
+            log.error("[getDeviceProperty][设备({})属性获取失败，请求参数：({})，响应结果：({})]",
+                    device.getDeviceKey(), reqDTO, result);
+            throw exception(DEVICE_DOWNSTREAM_FAILED, result.getMsg());
+        }
     }
 
     /**
