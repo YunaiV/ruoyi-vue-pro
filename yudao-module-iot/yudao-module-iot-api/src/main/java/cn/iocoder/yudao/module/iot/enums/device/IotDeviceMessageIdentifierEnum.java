@@ -20,6 +20,7 @@ public enum IotDeviceMessageIdentifierEnum {
     CONFIG_GET("get"), // 上行 TODO 芋艿：【讨论】暂时没有上行的场景
     CONFIG_SET("set"), // 下行
 
+    SERVICE_INVOKE("${identifier}"), // 下行
     SERVICE_REPLY_SUFFIX("_reply"); // 芋艿：TODO 芋艿：【讨论】上行 or 下行
 
     /**
