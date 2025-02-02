@@ -220,7 +220,7 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
     @SuppressWarnings({"unchecked", "DataFlowIssue"})
     private boolean isTriggerConditionParameterMatched(IotDeviceMessage message, IotRuleSceneDO.TriggerConditionParameter parameter,
                                                        IotRuleSceneDO ruleScene, IotRuleSceneDO.Trigger trigger) {
-        // 计算是否匹配
+        // 1.1 校验操作符是否合法
         IotRuleSceneTriggerConditionParameterOperatorEnum operator =
                 IotRuleSceneTriggerConditionParameterOperatorEnum.operatorOf(parameter.getOperator());
         if (operator == null) {
@@ -228,41 +228,36 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
                     ruleScene.getId(), trigger, parameter.getOperator());
             return false;
         }
-        // TODO @芋艿：目前只支持方便转换成 string 的类型，如果是 struct、list 这种，需要考虑下
+        // 1.2 校验消息是否包含对应的值
         String messageValue = MapUtil.getStr((Map<String, Object>) message.getData(), parameter.getIdentifier());
         if (messageValue == null) {
             return false;
         }
+
+        // 2.1 构建 Spring 表达式的变量
         Map<String, Object> springExpressionVariables = new HashMap<>();
         try {
             springExpressionVariables.put(IotRuleSceneTriggerConditionParameterOperatorEnum.SPRING_EXPRESSION_SOURCE, messageValue);
             springExpressionVariables.put(IotRuleSceneTriggerConditionParameterOperatorEnum.SPRING_EXPRESSION_VALUE, parameter.getValue());
-            if (ObjectUtils.equalsAny(operator, IotRuleSceneTriggerConditionParameterOperatorEnum.IN,
-                    IotRuleSceneTriggerConditionParameterOperatorEnum.NOT_IN)) {
-                springExpressionVariables.put(IotRuleSceneTriggerConditionParameterOperatorEnum.SPRING_EXPRESSION_VALUE_List,
-                        StrUtil.split(parameter.getValue(), CharPool.COMMA));
-            } else if (ObjectUtils.equalsAny(operator, IotRuleSceneTriggerConditionParameterOperatorEnum.BETWEEN,
-                    IotRuleSceneTriggerConditionParameterOperatorEnum.NOT_BETWEEN)) {
-                List<String> parameterValues = StrUtil.splitTrim(parameter.getValue(), CharPool.COMMA);
-                if (NumberUtil.isNumber(messageValue) && NumberUtils.isAllNumber(parameterValues)) {  // 特殊：解决数字的比较
-                    springExpressionVariables.put(IotRuleSceneTriggerConditionParameterOperatorEnum.SPRING_EXPRESSION_SOURCE,
-                            NumberUtil.parseDouble(messageValue));
-                    springExpressionVariables.put(IotRuleSceneTriggerConditionParameterOperatorEnum.SPRING_EXPRESSION_VALUE_List,
-                            convertList(parameterValues, NumberUtil::parseDouble));
-                } else {
-                    springExpressionVariables.put(IotRuleSceneTriggerConditionParameterOperatorEnum.SPRING_EXPRESSION_VALUE_List, parameterValues);
-                }
-            } else if (ObjectUtils.equalsAny(operator, IotRuleSceneTriggerConditionParameterOperatorEnum.GREATER_THAN,
+            List<String> parameterValues = StrUtil.splitTrim(parameter.getValue(), CharPool.COMMA);
+            springExpressionVariables.put(IotRuleSceneTriggerConditionParameterOperatorEnum.SPRING_EXPRESSION_VALUE_List, parameterValues);
+            // 特殊：解决数字的比较。因为 Spring 是基于它的 compareTo 方法，对数字的比较存在问题！
+            if (ObjectUtils.equalsAny(operator, IotRuleSceneTriggerConditionParameterOperatorEnum.BETWEEN,
+                    IotRuleSceneTriggerConditionParameterOperatorEnum.NOT_BETWEEN,
+                    IotRuleSceneTriggerConditionParameterOperatorEnum.GREATER_THAN,
                     IotRuleSceneTriggerConditionParameterOperatorEnum.GREATER_THAN_OR_EQUALS,
                     IotRuleSceneTriggerConditionParameterOperatorEnum.LESS_THAN,
-                    IotRuleSceneTriggerConditionParameterOperatorEnum.LESS_THAN_OR_EQUALS)) {
-                if (NumberUtil.isNumber(messageValue) && NumberUtil.isNumber(parameter.getValue())) {  // 特殊：解决数字的比较
-                    springExpressionVariables.put(IotRuleSceneTriggerConditionParameterOperatorEnum.SPRING_EXPRESSION_SOURCE,
-                            NumberUtil.parseDouble(messageValue));
-                    springExpressionVariables.put(IotRuleSceneTriggerConditionParameterOperatorEnum.SPRING_EXPRESSION_VALUE,
-                            NumberUtil.parseDouble(parameter.getValue()));
-                }
+                    IotRuleSceneTriggerConditionParameterOperatorEnum.LESS_THAN_OR_EQUALS)
+                    && NumberUtil.isNumber(messageValue)
+                    && NumberUtils.isAllNumber(parameterValues)) {
+                springExpressionVariables.put(IotRuleSceneTriggerConditionParameterOperatorEnum.SPRING_EXPRESSION_SOURCE,
+                        NumberUtil.parseDouble(messageValue));
+                springExpressionVariables.put(IotRuleSceneTriggerConditionParameterOperatorEnum.SPRING_EXPRESSION_VALUE,
+                        NumberUtil.parseDouble(parameter.getValue()));
+                springExpressionVariables.put(IotRuleSceneTriggerConditionParameterOperatorEnum.SPRING_EXPRESSION_VALUE_List,
+                        convertList(parameterValues, NumberUtil::parseDouble));
             }
+            // 2.2 计算 Spring 表达式
             return (Boolean) SpringExpressionUtils.parseExpression(operator.getSpringExpression(), springExpressionVariables);
         } catch (Exception e) {
             log.error("[isTriggerConditionParameterMatched][消息({}) 规则场景编号({}) 的触发器({}) 的匹配表达式({}/{}) 计算异常]",
