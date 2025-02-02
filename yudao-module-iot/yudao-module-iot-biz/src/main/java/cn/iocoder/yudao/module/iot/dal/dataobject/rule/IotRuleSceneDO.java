@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageIdentifierEnum;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerConditionParameterOperatorEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * IoT 场景联动 DO
+ * IoT 规则场景（场景联动） DO
  *
  * @author 芋道源码
  */
@@ -72,7 +73,7 @@ public class IotRuleSceneDO extends BaseDO {
         /**
          * 触发类型
          *
-         * TODO @芋艿：device、job
+         * 枚举 {@link cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerTypeEnum}
          */
         private Integer type;
 
@@ -147,12 +148,15 @@ public class IotRuleSceneDO extends BaseDO {
         /**
          * 操作符
          *
-         * TODO 芋艿：枚举
+         * 枚举 {@link IotRuleSceneTriggerConditionParameterOperatorEnum}
          */
         private String operator;
 
         /**
-         * 值
+         * 比较值
+         *
+         * 如果有多个值，则使用 "," 分隔，类似 "1,2,3"。
+         * 例如说，{@link IotRuleSceneTriggerConditionParameterOperatorEnum#IN}、{@link IotRuleSceneTriggerConditionParameterOperatorEnum#BETWEEN}
          */
         private String value;
 
