@@ -43,7 +43,11 @@ public class IotRuleSceneDataBridgeAction implements IotRuleSceneAction {
 
     @Override
     public void execute(IotDeviceMessage message, IotRuleSceneDO.ActionConfig config) {
-        // 1. 获得数据桥梁
+        // 1.1 如果消息为空，直接返回
+        if (message == null) {
+            return;
+        }
+        // 1.2 获得数据桥梁
         Assert.notNull(config.getDataBridgeId(), "数据桥梁编号不能为空");
         IotDataBridgeDO dataBridge = dataBridgeService.getIotDataBridge(config.getDataBridgeId());
         if (dataBridge == null || dataBridge.getConfig() == null) {

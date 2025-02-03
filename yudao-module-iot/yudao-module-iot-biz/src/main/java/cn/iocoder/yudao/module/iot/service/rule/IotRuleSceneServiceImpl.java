@@ -23,6 +23,11 @@ import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.service.rule.action.IotRuleSceneAction;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.TriggerKey;
+import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -328,6 +333,30 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
                 });
             });
         });
+    }
+
+    // TODO @芋艿：测试思路代码，记得删除！！！
+    // 1. Job 类：IotRuleSceneJob
+    // 2. 参数：id
+    // 3. jobHandlerName：IotRuleSceneJob + id
+
+    // 新增：addJob
+    // 修改：不存在 addJob、存在 updateJob
+    // 有 + 禁用：1）存在、停止；2）不存在：不处理；TODO 测试：直接暂停，是否可以？？？（结论：可以）
+    // 有 + 开启：1）存在，更新；2）不存在，新增；
+    // 无 + 禁用、开启：1）存在，删除；TODO 测试：直接删除？？？（结论：可以）
+
+    public static void main2(String[] args) throws SchedulerException {
+//        System.out.println(QuartzJobBean.class);
+        Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+        scheduler.start();
+
+        String jobHandlerName = "123";
+        // 暂停 Trigger 对象
+        scheduler.pauseTrigger(new TriggerKey(jobHandlerName));
+        // 取消并删除 Job 调度
+        scheduler.unscheduleJob(new TriggerKey(jobHandlerName));
+        scheduler.deleteJob(new JobKey(jobHandlerName));
     }
 
 }

@@ -60,8 +60,6 @@ public class IotRuleSceneDO extends TenantBaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<TriggerConfig> triggers;
 
-    // TODO @芋艿：需要调研下 https://help.aliyun.com/zh/iot/user-guide/scene-orchestration-1?spm=a2c4g.11186623.help-menu-30520.d_2_4_5_0.45413908fxCSVa
-
     /**
      * 执行器数组
      */
@@ -97,7 +95,7 @@ public class IotRuleSceneDO extends TenantBaseDO {
         /**
          * 触发条件数组
          *
-         * 当 {@link #type} 为 {@link IotRuleSceneTriggerTypeEnum#DEVICE} 时，必填
+         * 必填：当 {@link #type} 为 {@link IotRuleSceneTriggerTypeEnum#DEVICE} 时
          * 条件与条件之间，是“或”的关系
          */
         private List<TriggerCondition> conditions;
@@ -105,7 +103,7 @@ public class IotRuleSceneDO extends TenantBaseDO {
         /**
          * CRON 表达式
          *
-         * 当 {@link #type} 为 {@link IotRuleSceneTriggerTypeEnum#TIMER} 时，必填
+         * 必填：当 {@link #type} 为 {@link IotRuleSceneTriggerTypeEnum#TIMER} 时
          */
         private String cronExpression;
 
@@ -185,15 +183,15 @@ public class IotRuleSceneDO extends TenantBaseDO {
         /**
          * 设备控制
          *
-         * 当 {@link #type} 为 {@link IotRuleSceneActionTypeEnum#DEVICE_CONTROL} 时，必填
+         * 必填：当 {@link #type} 为 {@link IotRuleSceneActionTypeEnum#DEVICE_CONTROL} 时
          */
         private ActionDeviceControl deviceControl;
 
         /**
          * 数据桥接编号
          *
-         * 当 {@link #type} 为 {@link IotRuleSceneActionTypeEnum#DATA_BRIDGE} 时，必填
-         * TODO 芋艿：关联
+         * 必填：当 {@link #type} 为 {@link IotRuleSceneActionTypeEnum#DATA_BRIDGE} 时
+         * 关联：{@link IotDataBridgeDO#getId()}
          */
         private Long dataBridgeId;
 
