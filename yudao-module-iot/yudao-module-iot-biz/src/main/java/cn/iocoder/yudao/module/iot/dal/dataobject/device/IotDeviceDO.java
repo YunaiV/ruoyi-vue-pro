@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.dal.dataobject.device;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongSetTypeHandler;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -27,7 +28,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IotDeviceDO extends BaseDO {
+public class IotDeviceDO extends TenantBaseDO {
 
     /**
      * 设备 ID，主键，自增

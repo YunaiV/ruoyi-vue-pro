@@ -98,26 +98,27 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
                     updateReqDTO.getProductKey(), updateReqDTO.getDeviceName());
             return;
         }
-        // 1.2 记录设备的最后时间
-        updateDeviceLastTime(device, updateReqDTO);
-        // 1.3 当前状态一致，不处理
-        if (Objects.equals(device.getState(), updateReqDTO.getState())) {
-            return;
-        }
+        TenantUtils.execute(device.getTenantId(), () -> {
+            // 1.2 记录设备的最后时间
+            updateDeviceLastTime(device, updateReqDTO);
+            // 1.3 当前状态一致，不处理
+            if (Objects.equals(device.getState(), updateReqDTO.getState())) {
+                return;
+            }
 
-        // 2. 更新设备状态
-        TenantUtils.executeIgnore(() ->
-                deviceService.updateDeviceState(device.getId(), updateReqDTO.getState()));
+            // 2. 更新设备状态
+            deviceService.updateDeviceState(device.getId(), updateReqDTO.getState());
 
-        // 3. TODO 芋艿：子设备的关联
+            // 3. TODO 芋艿：子设备的关联
 
-        // 4. 发送设备消息
-        IotDeviceMessage message = BeanUtils.toBean(updateReqDTO, IotDeviceMessage.class)
-                .setType(IotDeviceMessageTypeEnum.STATE.getType())
-                .setIdentifier(ObjUtil.equals(updateReqDTO.getState(), IotDeviceStateEnum.ONLINE.getState())
-                        ? IotDeviceMessageIdentifierEnum.STATE_ONLINE.getIdentifier()
-                        : IotDeviceMessageIdentifierEnum.STATE_OFFLINE.getIdentifier());
-        sendDeviceMessage(message, device);
+            // 4. 发送设备消息
+            IotDeviceMessage message = BeanUtils.toBean(updateReqDTO, IotDeviceMessage.class)
+                    .setType(IotDeviceMessageTypeEnum.STATE.getType())
+                    .setIdentifier(ObjUtil.equals(updateReqDTO.getState(), IotDeviceStateEnum.ONLINE.getState())
+                            ? IotDeviceMessageIdentifierEnum.STATE_ONLINE.getIdentifier()
+                            : IotDeviceMessageIdentifierEnum.STATE_OFFLINE.getIdentifier());
+            sendDeviceMessage(message, device);
+        });
     }
 
     @Override
@@ -174,7 +175,8 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
 
     private void sendDeviceMessage(IotDeviceMessage message, IotDeviceDO device) {
         // 1. 完善消息
-        message.setDeviceKey(device.getDeviceKey());
+        message.setDeviceKey(device.getDeviceKey())
+                .setTenantId(device.getTenantId());
         if (StrUtil.isEmpty(message.getRequestId())) {
             message.setRequestId(IdUtil.fastSimpleUUID());
         }

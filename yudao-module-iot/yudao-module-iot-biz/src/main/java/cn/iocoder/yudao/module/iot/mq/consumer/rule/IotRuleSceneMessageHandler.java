@@ -24,7 +24,7 @@ public class IotRuleSceneMessageHandler {
     @Async
     public void onMessage(IotDeviceMessage message) {
         log.info("[onMessage][消息内容({})]", message);
-        ruleSceneService.executeRuleScene(message);
+        ruleSceneService.executeRuleSceneByDevice(message);
     }
 
 }

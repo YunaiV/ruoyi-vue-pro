@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.rule;
 
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
+import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 
 import java.util.List;
@@ -22,10 +23,12 @@ public interface IotRuleSceneService {
     List<IotRuleSceneDO> getRuleSceneListByProductKeyAndDeviceNameFromCache(String productKey, String deviceName);
 
     /**
-     * 执行规则场景
+     * 基于 {@link IotRuleSceneTriggerTypeEnum#DEVICE} 场景，执行规则场景
      *
      * @param message 消息
      */
-    void executeRuleScene(IotDeviceMessage message);
+    void executeRuleSceneByDevice(IotDeviceMessage message);
+
+    // TODO @芋艿：基于 timer 场景，执行规则场景
 
 }

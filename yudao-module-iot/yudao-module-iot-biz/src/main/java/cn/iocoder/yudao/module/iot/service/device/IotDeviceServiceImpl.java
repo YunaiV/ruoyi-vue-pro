@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
+import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
@@ -261,13 +262,9 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     @Override
-    public IotDeviceDO getDeviceByProductKeyAndDeviceNameFromCache(String productKey, String deviceName) {
-        // 保证在 @CacheEvict 之前，忽略租户
-        return TenantUtils.executeIgnore(() -> getSelf().getDeviceByProductKeyAndDeviceNameFromCache0(productKey, deviceName));
-    }
-
     @Cacheable(value = RedisKeyConstants.DEVICE, key = "#productKey + '_' + #deviceName", unless = "#result == null")
-    public IotDeviceDO getDeviceByProductKeyAndDeviceNameFromCache0(String productKey, String deviceName) {
+    @TenantIgnore // 忽略租户信息，跨租户 productKey + deviceName 是唯一的
+    public IotDeviceDO getDeviceByProductKeyAndDeviceNameFromCache(String productKey, String deviceName) {
         return deviceMapper.selectByProductKeyAndDeviceName(productKey, deviceName);
     }
 
@@ -389,8 +386,8 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     private void deleteDeviceCache(IotDeviceDO device) {
-        // 保证在 @CacheEvict 之前，忽略租户
-        TenantUtils.executeIgnore(() -> getSelf().deleteDeviceCache0(device));
+        // 保证 Spring AOP 触发
+        getSelf().deleteDeviceCache0(device);
     }
 
     private void deleteDeviceCache(List<IotDeviceDO> devices) {

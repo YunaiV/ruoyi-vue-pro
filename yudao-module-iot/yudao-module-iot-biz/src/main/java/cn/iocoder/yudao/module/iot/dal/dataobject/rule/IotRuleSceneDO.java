@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.rule;
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageIdentifierEnum;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerConditionParameterOperatorEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -30,7 +32,7 @@ import java.util.Map;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IotRuleSceneDO extends BaseDO {
+public class IotRuleSceneDO extends TenantBaseDO {
 
     /**
      * 场景编号
@@ -56,24 +58,26 @@ public class IotRuleSceneDO extends BaseDO {
      * 触发器数组
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<Trigger> triggers;
+    private List<TriggerConfig> triggers;
+
+    // TODO @芋艿：需要调研下 https://help.aliyun.com/zh/iot/user-guide/scene-orchestration-1?spm=a2c4g.11186623.help-menu-30520.d_2_4_5_0.45413908fxCSVa
 
     /**
      * 执行器数组
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<Actuator> actuators;
+    private List<ActionConfig> actions;
 
     /**
-     * 触发器
+     * 触发器配置
      */
     @Data
-    public static class Trigger {
+    public static class TriggerConfig {
 
         /**
          * 触发类型
          *
-         * 枚举 {@link cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerTypeEnum}
+         * 枚举 {@link IotRuleSceneTriggerTypeEnum}
          */
         private Integer type;
 
@@ -93,14 +97,15 @@ public class IotRuleSceneDO extends BaseDO {
         /**
          * 触发条件数组
          *
-         * TODO @芋艿：注释说明
+         * 当 {@link #type} 为 {@link IotRuleSceneTriggerTypeEnum#DEVICE} 时，必填
+         * 条件与条件之间，是“或”的关系
          */
         private List<TriggerCondition> conditions;
 
         /**
          * CRON 表达式
          *
-         * TODO @芋艿：注释说明
+         * 当 {@link #type} 为 {@link IotRuleSceneTriggerTypeEnum#TIMER} 时，必填
          */
         private String cronExpression;
 
@@ -127,6 +132,8 @@ public class IotRuleSceneDO extends BaseDO {
 
         /**
          * 参数数组
+         *
+         * 参数与参数之间，是“或”的关系
          */
         private List<TriggerConditionParameter> parameters;
 
@@ -163,17 +170,40 @@ public class IotRuleSceneDO extends BaseDO {
     }
 
     /**
-     * 执行器
+     * 执行器配置
      */
     @Data
-    public static class Actuator {
+    public static class ActionConfig {
 
         /**
          * 执行类型
          *
-         * TODO @芋艿：control、alert、webhook（待定）
+         * 枚举 {@link IotRuleSceneActionTypeEnum}
          */
         private Integer type;
+
+        /**
+         * 设备控制
+         *
+         * 当 {@link #type} 为 {@link IotRuleSceneActionTypeEnum#DEVICE_CONTROL} 时，必填
+         */
+        private ActionDeviceControl deviceControl;
+
+        /**
+         * 数据桥接编号
+         *
+         * 当 {@link #type} 为 {@link IotRuleSceneActionTypeEnum#DATA_BRIDGE} 时，必填
+         * TODO 芋艿：关联
+         */
+        private Long dataBridgeId;
+
+    }
+
+    /**
+     * 执行设备控制
+     */
+    @Data
+    public static class ActionDeviceControl {
 
         /**
          * 产品标识
@@ -189,34 +219,11 @@ public class IotRuleSceneDO extends BaseDO {
         private List<String> deviceNames;
 
         /**
-         * 控制数组
-         *
-         * TODO 芋艿：类型的情况下
-         */
-        private List<ActuatorControl> controls;
-
-        /**
-         * 数据桥接编号
-         *
-         * TODO 芋艿：暂定！
-         * TODO 芋艿：关联
-         */
-        private Long bridgeId;
-
-    }
-
-    /**
-     * 执行器控制
-     */
-    @Data
-    public static class ActuatorControl {
-
-        /**
          * 消息类型
          *
          * 枚举 {@link IotDeviceMessageTypeEnum#PROPERTY}、{@link IotDeviceMessageTypeEnum#SERVICE}
          */
-        private Integer type;
+        private String type;
         /**
          * 消息标识符
          *

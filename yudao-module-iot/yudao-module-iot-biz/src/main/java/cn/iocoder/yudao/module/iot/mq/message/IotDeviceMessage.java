@@ -67,4 +67,9 @@ public class IotDeviceMessage {
      */
     private LocalDateTime reportTime;
 
+    /**
+     * 租户编号
+     */
+    private Long tenantId;
+
 }

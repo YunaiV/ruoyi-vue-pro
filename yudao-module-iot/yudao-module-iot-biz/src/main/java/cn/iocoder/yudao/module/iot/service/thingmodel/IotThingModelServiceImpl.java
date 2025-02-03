@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
+import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelEvent;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelParam;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelService;
@@ -135,13 +135,9 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     }
 
     @Override
-    public List<IotThingModelDO> getThingModelListByProductKeyFromCache(String productKey) {
-        // 保证在 @CacheEvict 之前，忽略租户
-        return TenantUtils.executeIgnore(() -> getSelf().getThingModelListByProductKeyFromCache0(productKey));
-    }
-
     @Cacheable(value = RedisKeyConstants.THING_MODEL_LIST, key = "#productKey")
-    public List<IotThingModelDO> getThingModelListByProductKeyFromCache0(String productKey) {
+    @TenantIgnore // 忽略租户信息，跨租户 productKey 是唯一的
+    public List<IotThingModelDO> getThingModelListByProductKeyFromCache(String productKey) {
         return thingModelMapper.selectListByProductKey(productKey);
     }
 
@@ -354,8 +350,8 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     }
 
     private void deleteThingModelListCache(String productKey) {
-        // 保证在 @CacheEvict 之前，忽略租户
-        TenantUtils.executeIgnore(() -> getSelf().deleteThingModelListCache0(productKey));
+        // 保证 Spring AOP 触发
+        getSelf().deleteThingModelListCache0(productKey);
     }
 
     @CacheEvict(value = RedisKeyConstants.THING_MODEL_LIST, key = "#productKey")

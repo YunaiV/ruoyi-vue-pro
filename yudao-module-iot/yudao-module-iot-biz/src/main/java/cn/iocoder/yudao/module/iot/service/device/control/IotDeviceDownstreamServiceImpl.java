@@ -54,7 +54,7 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
     private IotDeviceProducer deviceProducer;
 
     @Override
-    public void downstreamDevice(IotDeviceDownstreamReqVO downstreamReqVO) {
+    public IotDeviceMessage downstreamDevice(IotDeviceDownstreamReqVO downstreamReqVO) {
         // 校验设备是否存在
         IotDeviceDO device = deviceService.validateDeviceExists(downstreamReqVO.getId());
         // TODO 芋艿：父设备的处理
@@ -62,31 +62,28 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
 
         // 服务调用
         if (Objects.equals(downstreamReqVO.getType(), IotDeviceMessageTypeEnum.SERVICE.getType())) {
-            invokeDeviceService(downstreamReqVO, device, parentDevice);
-            return;
+            return invokeDeviceService(downstreamReqVO, device, parentDevice);
         }
         // 属性相关
         if (Objects.equals(downstreamReqVO.getType(), IotDeviceMessageTypeEnum.PROPERTY.getType())) {
             // 属性设置
             if (Objects.equals(downstreamReqVO.getIdentifier(),
                     IotDeviceMessageIdentifierEnum.PROPERTY_SET.getIdentifier())) {
-                setDeviceProperty(downstreamReqVO, device, parentDevice);
-                return;
+                return setDeviceProperty(downstreamReqVO, device, parentDevice);
             }
             // 属性设置
             if (Objects.equals(downstreamReqVO.getIdentifier(),
                     IotDeviceMessageIdentifierEnum.PROPERTY_GET.getIdentifier())) {
-                getDeviceProperty(downstreamReqVO, device, parentDevice);
-                return;
+                return getDeviceProperty(downstreamReqVO, device, parentDevice);
             }
         }
         // 配置下发
         if (Objects.equals(downstreamReqVO.getType(), IotDeviceMessageTypeEnum.CONFIG.getType())
             && Objects.equals(downstreamReqVO.getIdentifier(), IotDeviceMessageIdentifierEnum.CONFIG_SET.getIdentifier())) {
-            setDeviceConfig(downstreamReqVO, device, parentDevice);
-            return;
+            return setDeviceConfig(downstreamReqVO, device, parentDevice);
         }
         // TODO 芋艿：ota 升级
+        return null;
     }
 
     /**
@@ -95,9 +92,10 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
      * @param downstreamReqVO 下行请求
      * @param device          设备
      * @param parentDevice    父设备
+     * @return 下发消息
      */
     @SuppressWarnings("unchecked")
-    private void invokeDeviceService(IotDeviceDownstreamReqVO downstreamReqVO,
+    private IotDeviceMessage invokeDeviceService(IotDeviceDownstreamReqVO downstreamReqVO,
                                      IotDeviceDO device, IotDeviceDO parentDevice) {
         // 1. 参数校验
         if (!(downstreamReqVO.getData() instanceof Map<?, ?>)) {
@@ -124,6 +122,7 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
                     device.getDeviceKey(), reqDTO, result);
             throw exception(DEVICE_DOWNSTREAM_FAILED, result.getMsg());
         }
+        return message;
     }
 
     /**
@@ -132,10 +131,11 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
      * @param downstreamReqVO 下行请求
      * @param device          设备
      * @param parentDevice    父设备
+     * @return 下发消息
      */
     @SuppressWarnings("unchecked")
-    private void setDeviceProperty(IotDeviceDownstreamReqVO downstreamReqVO,
-                                   IotDeviceDO device, IotDeviceDO parentDevice) {
+    private IotDeviceMessage setDeviceProperty(IotDeviceDownstreamReqVO downstreamReqVO,
+                                               IotDeviceDO device, IotDeviceDO parentDevice) {
         // 1. 参数校验
         if (!(downstreamReqVO.getData() instanceof Map<?, ?>)) {
             throw new ServiceException(BAD_REQUEST.getCode(), "data 不是 Map 类型");
@@ -162,6 +162,7 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
                     device.getDeviceKey(), reqDTO, result);
             throw exception(DEVICE_DOWNSTREAM_FAILED, result.getMsg());
         }
+        return message;
     }
 
     /**
@@ -170,10 +171,11 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
      * @param downstreamReqVO 下行请求
      * @param device          设备
      * @param parentDevice    父设备
+     * @return 下发消息
      */
     @SuppressWarnings("unchecked")
-    private void getDeviceProperty(IotDeviceDownstreamReqVO downstreamReqVO,
-                                   IotDeviceDO device, IotDeviceDO parentDevice) {
+    private IotDeviceMessage getDeviceProperty(IotDeviceDownstreamReqVO downstreamReqVO,
+                                               IotDeviceDO device, IotDeviceDO parentDevice) {
         // 1. 参数校验
         if (!(downstreamReqVO.getData() instanceof List<?>)) {
             throw new ServiceException(BAD_REQUEST.getCode(), "data 不是 List 类型");
@@ -200,6 +202,7 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
                     device.getDeviceKey(), reqDTO, result);
             throw exception(DEVICE_DOWNSTREAM_FAILED, result.getMsg());
         }
+        return message;
     }
 
     /**
@@ -208,10 +211,11 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
      * @param downstreamReqVO 下行请求
      * @param device          设备
      * @param parentDevice    父设备
+     * @return 下发消息
      */
     @SuppressWarnings({"unchecked", "unused"})
-    private void setDeviceConfig(IotDeviceDownstreamReqVO downstreamReqVO,
-                                 IotDeviceDO device, IotDeviceDO parentDevice) {
+    private IotDeviceMessage setDeviceConfig(IotDeviceDownstreamReqVO downstreamReqVO,
+                                             IotDeviceDO device, IotDeviceDO parentDevice) {
         // 1. 参数转换，无需校验
         Map<String, Object> config = JsonUtils.parseObject(device.getConfig(), Map.class);
 
@@ -235,6 +239,7 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
                     device.getDeviceKey(), reqDTO, result);
             throw exception(DEVICE_DOWNSTREAM_FAILED, result.getMsg());
         }
+        return message;
     }
 
     /**
@@ -275,7 +280,8 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
     private void sendDeviceMessage(IotDeviceMessage message, IotDeviceDO device, Integer code) {
         // 1. 完善消息
         message.setProductKey(device.getProductKey()).setDeviceName(device.getDeviceName())
-                .setDeviceKey(device.getDeviceKey());
+                .setDeviceKey(device.getDeviceKey())
+                .setTenantId(device.getTenantId());
         Assert.notNull(message.getRequestId(), "requestId 不能为空");
         if (message.getReportTime() == null) {
             message.setReportTime(LocalDateTime.now());
