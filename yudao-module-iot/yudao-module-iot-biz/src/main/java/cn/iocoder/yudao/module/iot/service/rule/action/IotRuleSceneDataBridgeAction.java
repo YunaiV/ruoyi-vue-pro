@@ -11,7 +11,6 @@ import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.service.rule.IotDataBridgeService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -29,6 +28,9 @@ import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_
  *
  * @author 芋道源码
  */
+// TODO @芋艿：【优化】因为 bridge 会比较多，所以可以考虑在 rule 下，新建一个 bridge 的 package，然后定义一个 bridgehandler，它有：
+//    1. input 方法、output 方法
+//    2. build 方法，用于有状态的连接，例如说 mq、tcp、websocket
 @Component
 @Slf4j
 public class IotRuleSceneDataBridgeAction implements IotRuleSceneAction {
@@ -38,8 +40,6 @@ public class IotRuleSceneDataBridgeAction implements IotRuleSceneAction {
 
     @Resource
     private IotDataBridgeService dataBridgeService;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void execute(IotDeviceMessage message, IotRuleSceneDO.ActionConfig config) {
@@ -62,6 +62,7 @@ public class IotRuleSceneDataBridgeAction implements IotRuleSceneAction {
             return;
         }
 
+        // TODO @芋艿：因为下面的，都是有状态的，所以通过 guava 缓存连接，然后通过 RemovalNotification 实现关闭。例如说，一次新建有效期是 10 分钟；
         // TODO @芋艿：mq-redis
         // TODO @芋艿：mq-数据库
         // TODO @芋艿：kafka
