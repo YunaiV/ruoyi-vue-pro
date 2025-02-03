@@ -139,6 +139,7 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
             ruleScene01.getTriggers().add(trigger01);
             // 动作
             ruleScene01.setActions(CollUtil.newArrayList());
+            // 设备控制
             IotRuleSceneDO.ActionConfig action01 = new IotRuleSceneDO.ActionConfig();
             action01.setType(IotRuleSceneActionTypeEnum.DEVICE_CONTROL.getType());
             IotRuleSceneDO.ActionDeviceControl actionDeviceControl01 = new IotRuleSceneDO.ActionDeviceControl();
@@ -151,7 +152,12 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
                     .put("color", "red")
                     .build());
             action01.setDeviceControl(actionDeviceControl01);
-            ruleScene01.getActions().add(action01);
+//            ruleScene01.getActions().add(action01); // TODO 芋艿：先不测试了
+            // 数据桥接（http）
+            IotRuleSceneDO.ActionConfig action02 = new IotRuleSceneDO.ActionConfig();
+            action02.setType(IotRuleSceneActionTypeEnum.DATA_BRIDGE.getType());
+            action02.setDataBridgeId(1L);
+            ruleScene01.getActions().add(action02);
             return ListUtil.toList(ruleScene01);
         }
 

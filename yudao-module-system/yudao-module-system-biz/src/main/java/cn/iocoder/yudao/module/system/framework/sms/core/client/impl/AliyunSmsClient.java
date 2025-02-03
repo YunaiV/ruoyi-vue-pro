@@ -184,7 +184,7 @@ public class AliyunSmsClient extends AbstractSmsClient {
     @SneakyThrows
     private static String percentCode(String str) {
         Assert.notNull(str, "str 不能为空");
-        return URLEncoder.encode(str, StandardCharsets.UTF_8.name())
+        return HttpUtils.encodeUtf8(str)
                 .replace("+", "%20") // 加号 "+" 被替换为 "%20"
                 .replace("*", "%2A") // 星号 "*" 被替换为 "%2A"
                 .replace("%7E", "~"); // 波浪号 "%7E" 被替换为 "~"
