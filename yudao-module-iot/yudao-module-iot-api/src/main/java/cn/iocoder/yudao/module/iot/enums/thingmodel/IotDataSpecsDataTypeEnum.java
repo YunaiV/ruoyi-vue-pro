@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.enums.thingmodel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+// TODO @puhui999：加个 ArrayValuable
 /**
  * IoT 数据定义的数据类型枚举类
  *

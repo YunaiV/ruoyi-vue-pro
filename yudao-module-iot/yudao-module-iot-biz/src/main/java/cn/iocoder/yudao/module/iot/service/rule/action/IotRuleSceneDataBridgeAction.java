@@ -60,7 +60,6 @@ public class IotRuleSceneDataBridgeAction implements IotRuleSceneAction {
         }
 
         // 2.1 执行 HTTP 请求
-        // TODO @芋艿：groovy 或者 javascript 实现数据的转换；可以考虑基于 hutool 的 ScriptUtil 做
         if (IotDataBridgTypeEnum.HTTP.getType().equals(dataBridge.getType())) {
             executeHttp(message, (IotDataBridgeDO.HttpConfig) dataBridge.getConfig());
             return;

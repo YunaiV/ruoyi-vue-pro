@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
  */
 public interface IotRuleSceneAction {
 
+    // TODO @芋艿：groovy 或者 javascript 实现数据的转换；可以考虑基于 hutool 的 ScriptUtil 做
     /**
      * 执行场景
      *
