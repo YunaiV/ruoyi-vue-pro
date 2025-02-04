@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelL
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelSaveReqVO;
-import cn.iocoder.yudao.module.iot.convert.thingmodel.IotThingModelConvert;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -62,7 +61,7 @@ public class IotThingModelController {
     @PreAuthorize("@ss.hasPermission('iot:thing-model:query')")
     public CommonResult<IotThingModelRespVO> getThingModel(@RequestParam("id") Long id) {
         IotThingModelDO thingModel = thingModelService.getThingModel(id);
-        return success(IotThingModelConvert.INSTANCE.convert(thingModel));
+        return success(BeanUtils.toBean(thingModel, IotThingModelRespVO.class));
     }
 
     @GetMapping("/list-by-product-id")
@@ -71,7 +70,7 @@ public class IotThingModelController {
     @PreAuthorize("@ss.hasPermission('iot:thing-model:query')")
     public CommonResult<List<IotThingModelRespVO>> getThingModelListByProductId(@RequestParam("productId") Long productId) {
         List<IotThingModelDO> list = thingModelService.getThingModelListByProductId(productId);
-        return success(IotThingModelConvert.INSTANCE.convertList(list));
+        return success(BeanUtils.toBean(list, IotThingModelRespVO.class));
     }
 
     // TODO @puhui @super：getThingModelListByProductId 和 getThingModelListByProductId 可以融合么？
@@ -80,7 +79,7 @@ public class IotThingModelController {
     @PreAuthorize("@ss.hasPermission('iot:thing-model:query')")
     public CommonResult<List<IotThingModelRespVO>> getThingModelListByProductId(@Valid IotThingModelListReqVO reqVO) {
         List<IotThingModelDO> list = thingModelService.getThingModelList(reqVO);
-        return success(IotThingModelConvert.INSTANCE.convertList(list));
+        return success(BeanUtils.toBean(list, IotThingModelRespVO.class));
     }
 
     @GetMapping("/page")

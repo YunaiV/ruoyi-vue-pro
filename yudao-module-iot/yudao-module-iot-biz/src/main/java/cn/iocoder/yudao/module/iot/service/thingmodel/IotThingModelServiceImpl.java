@@ -58,9 +58,7 @@ public class IotThingModelServiceImpl implements IotThingModelService {
         validateIdentifierUnique(createReqVO.getProductId(), createReqVO.getIdentifier());
         // 1.2 功能名称在同一产品下是否唯一
         validateNameUnique(createReqVO.getProductId(), createReqVO.getName());
-        // 1.3 系统保留字段，不能用于标识符定义
-        validateNotDefaultEventAndService(createReqVO.getIdentifier());
-        // 1.4 校验产品状态，发布状态下，不允许新增功能
+        // 1.3 校验产品状态，发布状态下，不允许新增功能
         validateProductStatus(createReqVO.getProductId());
 
         // 2. 插入数据库
@@ -71,7 +69,6 @@ public class IotThingModelServiceImpl implements IotThingModelService {
         if (Objects.equals(createReqVO.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
             createDefaultEventsAndServices(createReqVO.getProductId(), createReqVO.getProductKey());
         }
-        // TODO @puhui999: 服务和事件的情况 method 怎么设置？在前端设置还是后端设置？
 
         // 4. 删除缓存
         deleteThingModelListCache(createReqVO.getProductKey());
@@ -177,14 +174,6 @@ public class IotThingModelServiceImpl implements IotThingModelService {
         }
     }
 
-    // TODO @芋艿：在 review 下
-    private void validateNotDefaultEventAndService(String identifier) {
-        // 系统保留字段，不能用于标识符定义
-        if (StrUtil.equalsAny(identifier, "set", "get", "post", "property", "event", "time", "value")) {
-            throw exception(THING_MODEL_IDENTIFIER_INVALID);
-        }
-    }
-
     private void validateNameUnique(Long productId, String name) {
         IotThingModelDO thingModel = thingModelMapper.selectByProductIdAndName(productId, name);
         if (thingModel != null) {
@@ -193,6 +182,12 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     }
 
     private void validateIdentifierUnique(Long productId, String identifier) {
+        // 系统保留字段，不能用于标识符定义
+        if (StrUtil.equalsAny(identifier, "set", "get", "post", "property", "event", "time", "value")) {
+            throw exception(THING_MODEL_IDENTIFIER_INVALID);
+        }
+
+        // 校验唯一
         IotThingModelDO thingModel = thingModelMapper.selectByProductIdAndIdentifier(productId, identifier);
         if (thingModel != null) {
             throw exception(THING_MODEL_IDENTIFIER_EXISTS);
@@ -215,17 +210,17 @@ public class IotThingModelServiceImpl implements IotThingModelService {
         // 2.1 生成属性上报事件
         ThingModelEvent propertyPostEvent = generatePropertyPostEvent(properties);
         if (propertyPostEvent != null) {
-            newThingModels.add(buildEventThingModelDO(productId, productKey, propertyPostEvent, "属性上报事件"));
+            newThingModels.add(buildEventThingModel(productId, productKey, propertyPostEvent, "属性上报事件"));
         }
         // 2.2 生成属性设置服务
         ThingModelService propertySetService = generatePropertySetService(properties);
         if (propertySetService != null) {
-            newThingModels.add(buildServiceThingModelDO(productId, productKey, propertySetService, "属性设置服务"));
+            newThingModels.add(buildServiceThingModel(productId, productKey, propertySetService, "属性设置服务"));
         }
         // 2.3 生成属性获取服务
         ThingModelService propertyGetService = generatePropertyGetService(properties);
         if (propertyGetService != null) {
-            newThingModels.add(buildServiceThingModelDO(productId, productKey, propertyGetService, "属性获取服务"));
+            newThingModels.add(buildServiceThingModel(productId, productKey, propertyGetService, "属性获取服务"));
         }
 
         // 3.1 获取数据库中的默认的旧事件和服务列表
@@ -269,8 +264,8 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     /**
      * 构建事件功能对象
      */
-    private IotThingModelDO buildEventThingModelDO(Long productId, String productKey,
-                                                   ThingModelEvent event, String description) {
+    private IotThingModelDO buildEventThingModel(Long productId, String productKey,
+                                                 ThingModelEvent event, String description) {
         return new IotThingModelDO().setProductId(productId).setProductKey(productKey)
                 .setIdentifier(event.getIdentifier()).setName(event.getName()).setDescription(description)
                 .setType(IotThingModelTypeEnum.EVENT.getType()).setEvent(event);
@@ -279,13 +274,14 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     /**
      * 构建服务功能对象
      */
-    private IotThingModelDO buildServiceThingModelDO(Long productId, String productKey,
-                                                     ThingModelService service, String description) {
+    private IotThingModelDO buildServiceThingModel(Long productId, String productKey,
+                                                   ThingModelService service, String description) {
         return new IotThingModelDO().setProductId(productId).setProductKey(productKey)
                 .setIdentifier(service.getIdentifier()).setName(service.getName()).setDescription(description)
                 .setType(IotThingModelTypeEnum.SERVICE.getType()).setService(service);
     }
 
+    // TODO @haohao：是不是不用生成这个？目前属性上报，是个批量接口
     /**
      * 生成属性上报事件
      */
@@ -301,6 +297,7 @@ public class IotThingModelServiceImpl implements IotThingModelService {
                 .setOutputParams(buildInputOutputParam(thingModels, IotThingModelParamDirectionEnum.OUTPUT));
     }
 
+    // TODO @haohao：是不是不用生成这个？目前属性上报，是个批量接口
     /**
      * 生成属性设置服务
      */
