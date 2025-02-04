@@ -78,6 +78,7 @@ public class PluginInfoController {
         return success(true);
     }
 
+    // TODO @haohao：要不独立一个 VO，不用 PluginInfoSaveReqVO
     @PutMapping("/update-status")
     @Operation(summary = "修改插件状态")
     @PreAuthorize("@ss.hasPermission('iot:plugin-info:update')")

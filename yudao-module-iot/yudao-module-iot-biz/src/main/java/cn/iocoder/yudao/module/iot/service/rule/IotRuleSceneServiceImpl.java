@@ -404,7 +404,7 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
         // 无 + 禁用、开启：1）存在，删除；TODO 测试：直接删除？？？（结论：可以）deleteJob
 
         //
-        if (true) {
+        if (false) {
             Long id = 1L;
             Map<String, Object> jobDataMap = IotRuleSceneJob.buildJobDataMap(id);
             schedulerManager.addOrUpdateJob(IotRuleSceneJob.class,
@@ -417,7 +417,8 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
             schedulerManager.pauseJob(IotRuleSceneJob.buildJobName(id));
         }
         if (true) {
-
+            Long id = 1L;
+            schedulerManager.deleteJob(IotRuleSceneJob.buildJobName(id));
         }
     }
 

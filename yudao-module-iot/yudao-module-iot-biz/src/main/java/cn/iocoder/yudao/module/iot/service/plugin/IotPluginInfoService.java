@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * IoT 插件信息 Service 接口
  *
- * @author 芋道源码
+ * @author haohao
  */
 public interface IotPluginInfoService {
 

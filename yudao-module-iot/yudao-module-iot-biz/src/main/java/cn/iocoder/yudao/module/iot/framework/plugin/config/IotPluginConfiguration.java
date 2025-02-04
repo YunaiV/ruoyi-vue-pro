@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.iot.framework.plugin.config;
 
-import cn.iocoder.yudao.module.iot.framework.plugin.core.CustomPluginStateListener;
+import cn.iocoder.yudao.module.iot.framework.plugin.core.IotPluginStartRunner;
+import cn.iocoder.yudao.module.iot.framework.plugin.core.IotPluginStateListener;
+import cn.iocoder.yudao.module.iot.service.plugin.IotPluginInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.spring.SpringPluginManager;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,16 +11,24 @@ import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Paths;
 
-// TODO @芋艿：需要 review 下
-@Slf4j
+/**
+ * IoT 插件配置类
+ *
+ * @author haohao
+ */
 @Configuration
-public class UnifiedConfiguration {
-
-    @Value("${pf4j.pluginsDir:pluginsDir}")
-    private String pluginsDir;
+@Slf4j
+public class IotPluginConfiguration {
 
     @Bean
-    public SpringPluginManager pluginManager() {
+    public IotPluginStartRunner pluginStartRunner(SpringPluginManager pluginManager,
+                                                  IotPluginInfoService pluginInfoService) {
+        return new IotPluginStartRunner(pluginManager, pluginInfoService);
+    }
+
+    // TODO @芋艿：需要 review 下
+    @Bean
+    public SpringPluginManager pluginManager(@Value("${pf4j.pluginsDir:pluginsDir}") String pluginsDir) {
         log.info("[init][实例化 SpringPluginManager]");
         SpringPluginManager springPluginManager = new SpringPluginManager(Paths.get(pluginsDir)) {
 //        SpringPluginManager springPluginManager = new SpringPluginManager() {
@@ -30,7 +40,7 @@ public class UnifiedConfiguration {
             }
 
         };
-        springPluginManager.addPluginStateListener(new CustomPluginStateListener());
+        springPluginManager.addPluginStateListener(new IotPluginStateListener());
         return springPluginManager;
     }
 

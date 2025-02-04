@@ -13,7 +13,7 @@ public class PluginInfoSaveReqVO {
 
     // TODO @haohao：一些枚举字段，需要加枚举校验。例如说，deployType、status、type 等
 
-    @Schema(description = "主键ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11546")
+    @Schema(description = "主键编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "11546")
     private Long id;
 
     @Schema(description = "插件包标识符", requiredMode = Schema.RequiredMode.REQUIRED, example = "24627")

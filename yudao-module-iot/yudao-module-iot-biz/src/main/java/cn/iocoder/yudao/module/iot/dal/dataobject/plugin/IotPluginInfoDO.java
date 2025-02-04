@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+// TODO @haohao：建议 IotPluginInfoDO 改成 IotPluginConfigDO，插件配置。项目里，暂时没有用 info 作为配置的哈。
 /**
  * IoT 插件信息 DO
  *
@@ -38,7 +39,7 @@ public class IotPluginInfoDO extends BaseDO {
      */
     private String name;
     /**
-     * 描述
+     * 插件描述
      */
     private String description;
     /**
@@ -68,12 +69,14 @@ public class IotPluginInfoDO extends BaseDO {
      */
     // TODO @芋艿：枚举字段
     private String protocol;
+    // TODO @haohao：这个字段，是不是直接用 CommonStatus，开启、禁用；然后插件实例那，online 是否在线
     /**
      * 状态
      * <p>
      * 枚举 {@link IotPluginStatusEnum}
      */
     private Integer status;
+
     // TODO @芋艿：configSchema、config 示例字段
     /**
      * 插件配置项描述信息
@@ -83,6 +86,7 @@ public class IotPluginInfoDO extends BaseDO {
      * 插件配置信息
      */
     private String config;
+
     // TODO @芋艿：script 后续的使用
     /**
      * 插件脚本
