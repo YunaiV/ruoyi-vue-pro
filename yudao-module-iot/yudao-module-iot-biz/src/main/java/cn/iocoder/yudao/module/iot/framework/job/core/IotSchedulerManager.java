@@ -80,18 +80,18 @@ public class IotSchedulerManager {
      * 添加或更新 Job 到 Quartz 中
      *
      * @param jobClass 任务处理器的类
-     * @param jobHandlerName 任务处理器的名字
+     * @param jobName 任务名
      * @param cronExpression CRON 表达式
      * @param jobDataMap 任务数据
      * @throws SchedulerException 添加异常
      */
-    public void addOrUpdateJob(Class <? extends Job> jobClass, String jobHandlerName,
+    public void addOrUpdateJob(Class <? extends Job> jobClass, String jobName,
                                String cronExpression, Map<String, Object> jobDataMap)
             throws SchedulerException {
-        if (scheduler.checkExists(new JobKey(jobHandlerName))) {
-            this.updateJob(jobHandlerName, cronExpression);
+        if (scheduler.checkExists(new JobKey(jobName))) {
+            this.updateJob(jobName, cronExpression);
         } else {
-            this.addJob(jobClass, jobHandlerName, cronExpression, jobDataMap);
+            this.addJob(jobClass, jobName, cronExpression, jobDataMap);
         }
     }
 
@@ -99,20 +99,20 @@ public class IotSchedulerManager {
      * 添加 Job 到 Quartz 中
      *
      * @param jobClass 任务处理器的类
-     * @param jobHandlerName 任务处理器的名字
+     * @param jobName 任务名
      * @param cronExpression CRON 表达式
      * @param jobDataMap 任务数据
      * @throws SchedulerException 添加异常
      */
-    public void addJob(Class <? extends Job> jobClass, String jobHandlerName,
+    public void addJob(Class <? extends Job> jobClass, String jobName,
                        String cronExpression, Map<String, Object> jobDataMap)
             throws SchedulerException {
         // 创建 JobDetail 对象
         JobDetail jobDetail = JobBuilder.newJob(jobClass)
                 .usingJobData(new JobDataMap(jobDataMap))
-                .withIdentity(jobHandlerName).build();
+                .withIdentity(jobName).build();
         // 创建 Trigger 对象
-        Trigger trigger = this.buildTrigger(jobHandlerName, cronExpression);
+        Trigger trigger = this.buildTrigger(jobName, cronExpression);
         // 新增 Job 调度
         scheduler.scheduleJob(jobDetail, trigger);
     }
@@ -120,70 +120,70 @@ public class IotSchedulerManager {
     /**
      * 更新 Job 到 Quartz
      *
-     * @param jobHandlerName 任务处理器的名字
+     * @param jobName 任务名
      * @param cronExpression CRON 表达式
      * @throws SchedulerException 更新异常
      */
-    public void updateJob(String jobHandlerName, String cronExpression)
+    public void updateJob(String jobName, String cronExpression)
             throws SchedulerException {
         // 创建新 Trigger 对象
-        Trigger newTrigger = this.buildTrigger(jobHandlerName, cronExpression);
+        Trigger newTrigger = this.buildTrigger(jobName, cronExpression);
         // 修改调度
-        scheduler.rescheduleJob(new TriggerKey(jobHandlerName), newTrigger);
+        scheduler.rescheduleJob(new TriggerKey(jobName), newTrigger);
     }
 
     /**
      * 删除 Quartz 中的 Job
      *
-     * @param jobHandlerName 任务处理器的名字
+     * @param jobName 任务名
      * @throws SchedulerException 删除异常
      */
-    public void deleteJob(String jobHandlerName) throws SchedulerException {
+    public void deleteJob(String jobName) throws SchedulerException {
         // 暂停 Trigger 对象
-        scheduler.pauseTrigger(new TriggerKey(jobHandlerName));
+        scheduler.pauseTrigger(new TriggerKey(jobName));
         // 取消并删除 Job 调度
-        scheduler.unscheduleJob(new TriggerKey(jobHandlerName));
-        scheduler.deleteJob(new JobKey(jobHandlerName));
+        scheduler.unscheduleJob(new TriggerKey(jobName));
+        scheduler.deleteJob(new JobKey(jobName));
     }
 
     /**
      * 暂停 Quartz 中的 Job
      *
-     * @param jobHandlerName 任务处理器的名字
+     * @param jobName 任务名
      * @throws SchedulerException 暂停异常
      */
-    public void pauseJob(String jobHandlerName) throws SchedulerException {
-        scheduler.pauseJob(new JobKey(jobHandlerName));
+    public void pauseJob(String jobName) throws SchedulerException {
+        scheduler.pauseJob(new JobKey(jobName));
     }
 
     /**
      * 启动 Quartz 中的 Job
      *
-     * @param jobHandlerName 任务处理器的名字
+     * @param jobName 任务名
      * @throws SchedulerException 启动异常
      */
-    public void resumeJob(String jobHandlerName) throws SchedulerException {
-        scheduler.resumeJob(new JobKey(jobHandlerName));
-        scheduler.resumeTrigger(new TriggerKey(jobHandlerName));
+    public void resumeJob(String jobName) throws SchedulerException {
+        scheduler.resumeJob(new JobKey(jobName));
+        scheduler.resumeTrigger(new TriggerKey(jobName));
     }
 
     /**
      * 立即触发一次 Quartz 中的 Job
      *
-     * @param jobHandlerName 任务处理器的名字
+     * @param jobName 任务名
      * @throws SchedulerException 触发异常
      */
-    public void triggerJob(String jobHandlerName)
+    public void triggerJob(String jobName)
             throws SchedulerException {
         // 触发任务
         JobDataMap data = new JobDataMap();
-        data.put(JobDataKeyEnum.JOB_HANDLER_NAME.name(), jobHandlerName);
-        scheduler.triggerJob(new JobKey(jobHandlerName), data);
+        data.put(JobDataKeyEnum.JOB_HANDLER_NAME.name(), jobName);
+        scheduler.triggerJob(new JobKey(jobName), data);
     }
 
-    private Trigger buildTrigger(String jobHandlerName, String cronExpression) {
+    private Trigger buildTrigger(String jobName, String cronExpression) {
         return TriggerBuilder.newTrigger()
-                .withIdentity(jobHandlerName)
+                .withIdentity(jobName)
                 .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression))
                 .build();
     }

@@ -7,6 +7,7 @@ import cn.hutool.core.text.CharPool;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringExpressionUtils;
@@ -19,9 +20,12 @@ import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerConditionParameterOperatorEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerTypeEnum;
+import cn.iocoder.yudao.module.iot.framework.job.core.IotSchedulerManager;
+import cn.iocoder.yudao.module.iot.job.rule.IotRuleSceneJob;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.service.rule.action.IotRuleSceneAction;
 import jakarta.annotation.Resource;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
@@ -53,6 +57,9 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
 
     @Resource
     private List<IotRuleSceneAction> ruleSceneActions;
+
+    @Resource(name = "iotSchedulerManager")
+    private IotSchedulerManager schedulerManager;
 
     // TODO 芋艿，缓存待实现
     @Override
@@ -186,7 +193,7 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
     public void executeRuleSceneByDevice(IotDeviceMessage message) {
         TenantUtils.execute(message.getTenantId(), () -> {
             // 1. 获得设备匹配的规则场景
-            List<IotRuleSceneDO> ruleScenes = getMatchedRuleSceneList(message);
+            List<IotRuleSceneDO> ruleScenes = getMatchedRuleSceneListByMessage(message);
             if (CollUtil.isEmpty(ruleScenes)) {
                 return;
             }
@@ -196,13 +203,60 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
         });
     }
 
+    @Override
+    public void executeRuleSceneByTimer(Long id) {
+        // 1.1 获得规则场景
+//        IotRuleSceneDO scene = TenantUtils.executeIgnore(() -> ruleSceneMapper.selectById(id));
+        // TODO @芋艿：这里，临时测试，后续删除。
+        IotRuleSceneDO scene = new IotRuleSceneDO().setStatus(CommonStatusEnum.ENABLE.getStatus());
+        if (true) {
+            scene.setTenantId(1L);
+            IotRuleSceneDO.TriggerConfig triggerConfig = new IotRuleSceneDO.TriggerConfig();
+            triggerConfig.setType(IotRuleSceneTriggerTypeEnum.TIMER.getType());
+            scene.setTriggers(ListUtil.toList(triggerConfig));
+            // 动作
+            IotRuleSceneDO.ActionConfig action01 = new IotRuleSceneDO.ActionConfig();
+            action01.setType(IotRuleSceneActionTypeEnum.DEVICE_CONTROL.getType());
+            IotRuleSceneDO.ActionDeviceControl actionDeviceControl01 = new IotRuleSceneDO.ActionDeviceControl();
+            actionDeviceControl01.setProductKey("4aymZgOTOOCrDKRT");
+            actionDeviceControl01.setDeviceNames(ListUtil.of("small"));
+            actionDeviceControl01.setType(IotDeviceMessageTypeEnum.PROPERTY.getType());
+            actionDeviceControl01.setIdentifier(IotDeviceMessageIdentifierEnum.PROPERTY_SET.getIdentifier());
+            actionDeviceControl01.setData(MapUtil.<String, Object>builder()
+                    .put("power", 1)
+                    .put("color", "red")
+                    .build());
+            action01.setDeviceControl(actionDeviceControl01);
+            scene.setActions(ListUtil.toList(action01));
+        }
+        if (scene == null) {
+            log.error("[executeRuleSceneByTimer][规则场景({}) 不存在]", id);
+            return;
+        }
+        if (CommonStatusEnum.isDisable(scene.getStatus())) {
+            log.info("[executeRuleSceneByTimer][规则场景({}) 已被禁用]", id);
+            return;
+        }
+        // 1.2 判断是否有定时触发器，避免脏数据
+        IotRuleSceneDO.TriggerConfig config = CollUtil.findOne(scene.getTriggers(),
+                trigger -> ObjUtil.equals(trigger.getType(), IotRuleSceneTriggerTypeEnum.TIMER.getType()));
+        if (config == null) {
+            log.error("[executeRuleSceneByTimer][规则场景({}) 不存在定时触发器]", scene);
+            return;
+        }
+
+        // 2. 执行规则场景
+        TenantUtils.execute(scene.getTenantId(),
+                () -> executeRuleSceneAction(null, ListUtil.toList(scene)));
+    }
+
     /**
-     * 获得匹配的规则场景列表
+     * 基于消息，获得匹配的规则场景列表
      *
      * @param message 设备消息
      * @return 规则场景列表
      */
-    private List<IotRuleSceneDO> getMatchedRuleSceneList(IotDeviceMessage message) {
+    private List<IotRuleSceneDO> getMatchedRuleSceneListByMessage(IotDeviceMessage message) {
         // 1. 匹配设备
         // TODO @芋艿：可能需要 getSelf(); 缓存
         List<IotRuleSceneDO> ruleScenes = getRuleSceneListByProductKeyAndDeviceNameFromCache(
@@ -335,16 +389,37 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
         });
     }
 
-    // TODO @芋艿：测试思路代码，记得删除！！！
-    // 1. Job 类：IotRuleSceneJob
-    // 2. 参数：id
-    // 3. jobHandlerName：IotRuleSceneJob + id
+    @Override
+    @SneakyThrows
+    public void test() {
+        // TODO @芋艿：测试思路代码，记得删除！！！
+        // 1. Job 类：IotRuleSceneJob DONE
+        // 2. 参数：id DONE
+        // 3. jobHandlerName：IotRuleSceneJob + id DONE
 
-    // 新增：addJob
-    // 修改：不存在 addJob、存在 updateJob
-    // 有 + 禁用：1）存在、停止；2）不存在：不处理；TODO 测试：直接暂停，是否可以？？？（结论：可以）
-    // 有 + 开启：1）存在，更新；2）不存在，新增；
-    // 无 + 禁用、开启：1）存在，删除；TODO 测试：直接删除？？？（结论：可以）
+        // 新增：addJob
+        // 修改：不存在 addJob、存在 updateJob
+        // 有 + 禁用：1）存在、停止；2）不存在：不处理；TODO 测试：直接暂停，是否可以？？？（结论：可以）pauseJob
+        // 有 + 开启：1）存在，更新；2）不存在，新增；结论：使用 save(addOrUpdateJob)
+        // 无 + 禁用、开启：1）存在，删除；TODO 测试：直接删除？？？（结论：可以）deleteJob
+
+        //
+        if (true) {
+            Long id = 1L;
+            Map<String, Object> jobDataMap = IotRuleSceneJob.buildJobDataMap(id);
+            schedulerManager.addOrUpdateJob(IotRuleSceneJob.class,
+                    IotRuleSceneJob.buildJobName(id),
+                    "0/10 * * * * ?",
+                        jobDataMap);
+        }
+        if (false) {
+            Long id = 1L;
+            schedulerManager.pauseJob(IotRuleSceneJob.buildJobName(id));
+        }
+        if (true) {
+
+        }
+    }
 
     public static void main2(String[] args) throws SchedulerException {
 //        System.out.println(QuartzJobBean.class);

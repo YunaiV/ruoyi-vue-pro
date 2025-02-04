@@ -29,6 +29,16 @@ public interface IotRuleSceneService {
      */
     void executeRuleSceneByDevice(IotDeviceMessage message);
 
-    // TODO @芋艿：基于 timer 场景，执行规则场景
+    /**
+     * 基于 {@link IotRuleSceneTriggerTypeEnum#TIMER} 场景，执行规则场景
+     *
+     * @param id 场景编号
+     */
+    void executeRuleSceneByTimer(Long id);
+
+    /**
+     * TODO 芋艿：测试方法，需要删除
+     */
+    void test();
 
 }
