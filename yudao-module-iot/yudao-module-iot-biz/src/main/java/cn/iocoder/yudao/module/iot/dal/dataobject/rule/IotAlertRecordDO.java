@@ -63,6 +63,7 @@ public class IotAlertRecordDO extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private IotDeviceMessage deviceMessage;
 
+    // TODO @芋艿：换成枚举，枚举对应 ApiErrorLogProcessStatusEnum
     /**
      * 处理状态
      *

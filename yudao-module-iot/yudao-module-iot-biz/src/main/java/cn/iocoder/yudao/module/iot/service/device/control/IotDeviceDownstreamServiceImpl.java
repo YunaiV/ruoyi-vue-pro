@@ -57,6 +57,7 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
     public IotDeviceMessage downstreamDevice(IotDeviceDownstreamReqVO downstreamReqVO) {
         // 校验设备是否存在
         IotDeviceDO device = deviceService.validateDeviceExists(downstreamReqVO.getId());
+        // TODO @芋艿：离线设备，不允许推送
         // TODO 芋艿：父设备的处理
         IotDeviceDO parentDevice = null;
 
