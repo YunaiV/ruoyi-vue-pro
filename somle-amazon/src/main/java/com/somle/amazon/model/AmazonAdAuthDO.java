@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 public class AmazonAdAuthDO {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String accountId;
