@@ -24,7 +24,7 @@
 <!--        <module>yudao-module-crm</module>-->
 <!--        <module>yudao-module-erp</module>-->
 <!--        <module>yudao-module-ai</module>-->
-<!--        <module>yudao-module-iot</module>-->
+        <module>yudao-module-iot</module>
     </modules>
 
     <name>${project.artifactId}</name>

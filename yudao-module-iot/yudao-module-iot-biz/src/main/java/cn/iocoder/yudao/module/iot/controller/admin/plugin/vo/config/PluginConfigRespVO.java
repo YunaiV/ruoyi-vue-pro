@@ -1,13 +1,13 @@
-package cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.info;
+package cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.config;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "管理后台 - IoT 插件信息 Response VO")
+@Schema(description = "管理后台 - IoT 插件配置 Response VO")
 @Data
-public class PluginInfoRespVO {
+public class PluginConfigRespVO {
 
     @Schema(description = "主键 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11546")
     private Long id;

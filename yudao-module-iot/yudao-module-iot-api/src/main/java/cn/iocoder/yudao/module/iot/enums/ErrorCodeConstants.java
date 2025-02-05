@@ -39,12 +39,13 @@ public interface ErrorCodeConstants {
     ErrorCode DEVICE_GROUP_NOT_EXISTS = new ErrorCode(1_050_005_000, "设备分组不存在");
     ErrorCode DEVICE_GROUP_DELETE_FAIL_DEVICE_EXISTS = new ErrorCode(1_050_005_001, "设备分组下存在设备，不允许删除");
 
-    // ========== 插件信息 1-050-006-000 ==========
-    ErrorCode PLUGIN_INFO_NOT_EXISTS = new ErrorCode(1_050_006_000, "插件信息不存在");
+    // ========== 插件配置 1-050-006-000 ==========
+    ErrorCode PLUGIN_CONFIG_NOT_EXISTS = new ErrorCode(1_050_006_000, "插件配置不存在");
     ErrorCode PLUGIN_INSTALL_FAILED = new ErrorCode(1_050_006_001, "插件安装失败");
     ErrorCode PLUGIN_INSTALL_FAILED_FILE_NAME_NOT_MATCH = new ErrorCode(1_050_006_002, "插件安装失败，文件名与原插件id不匹配");
-    ErrorCode PLUGIN_INFO_DELETE_FAILED_RUNNING = new ErrorCode(1_050_006_003, "请先停止插件");
+    ErrorCode PLUGIN_CONFIG_DELETE_FAILED_RUNNING = new ErrorCode(1_050_006_003, "请先停止插件");
     ErrorCode PLUGIN_STATUS_INVALID = new ErrorCode(1_050_006_004, "插件状态无效");
+    ErrorCode PLUGIN_CONFIG_KEY_DUPLICATE = new ErrorCode(1_050_006_005, "插件标识已存在");
 
     // ========== 插件实例 1-050-007-000 ==========
 

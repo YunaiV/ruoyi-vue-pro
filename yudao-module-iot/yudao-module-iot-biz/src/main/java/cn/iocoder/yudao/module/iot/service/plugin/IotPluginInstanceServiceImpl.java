@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotPluginInstanceHeartbeatReqDTO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInfoDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginConfigDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInstanceDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.plugin.IotPluginInstanceMapper;
 import cn.iocoder.yudao.module.iot.dal.redis.plugin.DevicePluginProcessIdRedisDAO;
@@ -45,7 +45,7 @@ public class IotPluginInstanceServiceImpl implements IotPluginInstanceService {
 
     @Resource
     @Lazy // 延迟加载，避免循环依赖
-    private IotPluginInfoService pluginInfoService;
+    private IotPluginConfigService pluginConfigService;
 
     @Resource
     private IotPluginInstanceMapper pluginInstanceMapper;
@@ -79,7 +79,7 @@ public class IotPluginInstanceServiceImpl implements IotPluginInstanceService {
         }
 
         // 情况二：不存在，则创建
-        IotPluginInfoDO info = pluginInfoService.getPluginInfoByPluginKey(heartbeatReqDTO.getPluginKey());
+        IotPluginConfigDO info = pluginConfigService.getPluginConfigByPluginKey(heartbeatReqDTO.getPluginKey());
         if (info == null) {
             log.error("[heartbeatPluginInstance][心跳({}) 对应的插件不存在]", heartbeatReqDTO);
             return;
@@ -129,18 +129,18 @@ public class IotPluginInstanceServiceImpl implements IotPluginInstanceService {
     }
 
     @Override
-    public void deletePluginFile(IotPluginInfoDO pluginInfoDO) {
-        File file = new File(pluginsDir, pluginInfoDO.getFileName());
+    public void deletePluginFile(IotPluginConfigDO pluginConfigDO) {
+        File file = new File(pluginsDir, pluginConfigDO.getFileName());
         if (!file.exists()) {
             return;
         }
         try {
             TimeUnit.SECONDS.sleep(1); // 等待 1 秒，避免插件未卸载完毕
             if (!file.delete()) {
-                log.error("[deletePluginInfo][删除插件文件({}) 失败]", pluginInfoDO.getFileName());
+                log.error("[deletePluginFile][删除插件文件({}) 失败]", pluginConfigDO.getFileName());
             }
         } catch (InterruptedException e) {
-            log.error("[deletePluginInfo][删除插件文件({}) 失败]", pluginInfoDO.getFileName(), e);
+            log.error("[deletePluginFile][删除插件文件({}) 失败]", pluginConfigDO.getFileName(), e);
         }
     }
 
@@ -171,13 +171,13 @@ public class IotPluginInstanceServiceImpl implements IotPluginInstanceService {
     }
 
     @Override
-    public void updatePluginStatus(IotPluginInfoDO pluginInfoDo, Integer status) {
-        String pluginKey = pluginInfoDo.getPluginKey();
+    public void updatePluginStatus(IotPluginConfigDO pluginConfigDO, Integer status) {
+        String pluginKey = pluginConfigDO.getPluginKey();
         PluginWrapper plugin = pluginManager.getPlugin(pluginKey);
 
         if (plugin == null) {
             // 插件不存在且状态为停止，抛出异常
-            if (IotPluginStatusEnum.STOPPED.getStatus().equals(pluginInfoDo.getStatus())) {
+            if (IotPluginStatusEnum.STOPPED.getStatus().equals(pluginConfigDO.getStatus())) {
                 throw exception(ErrorCodeConstants.PLUGIN_STATUS_INVALID);
             }
             return;

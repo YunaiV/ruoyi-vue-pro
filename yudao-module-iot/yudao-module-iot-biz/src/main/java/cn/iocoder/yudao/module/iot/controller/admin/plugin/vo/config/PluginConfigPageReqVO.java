@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.info;
+package cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.config;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
@@ -6,9 +6,9 @@ import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-@Schema(description = "管理后台 - IoT 插件信息分页 Request VO")
+@Schema(description = "管理后台 - IoT 插件配置分页 Request VO")
 @Data
-public class PluginInfoPageReqVO extends PageParam {
+public class PluginConfigPageReqVO extends PageParam {
 
     @Schema(description = "插件名称", example = "http")
     private String name;

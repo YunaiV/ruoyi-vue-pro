@@ -31,7 +31,7 @@ public class IotPluginInstanceDO extends BaseDO {
     /**
      * 插件编号
      * <p>
-     * 关联 {@link IotPluginInfoDO#getId()}
+     * 关联 {@link IotPluginConfigDO#getId()}
      */
     private Long pluginId;
     /**
