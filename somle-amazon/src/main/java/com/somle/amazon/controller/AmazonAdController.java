@@ -1,5 +1,6 @@
 package com.somle.amazon.controller;
 
+import com.somle.amazon.model.enums.AmazonRegion;
 import com.somle.amazon.service.AmazonAdService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +22,9 @@ public class AmazonAdController {
         return service.getAuthUrl();
     }
 
-    @GetMapping("authUrlRedirect")
-    String authUrlRedirect(@RequestParam String code, @RequestParam String scope) {
-        service.createAuth(code);
+    @PostMapping("auth")
+    String create(@RequestParam String code, @RequestParam AmazonRegion region) {
+        service.createAuth(code, region);
         return "success";
     }
 }

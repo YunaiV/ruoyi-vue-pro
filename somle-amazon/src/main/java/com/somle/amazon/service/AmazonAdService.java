@@ -1,6 +1,7 @@
 package com.somle.amazon.service;
 
 import com.somle.amazon.model.AmazonAdAuthDO;
+import com.somle.amazon.model.enums.AmazonRegion;
 import com.somle.amazon.repository.AmazonAdAuthRepository;
 import com.somle.amazon.repository.AmazonAdClientRepository;
 import com.somle.framework.common.util.web.WebUtils;
@@ -42,12 +43,12 @@ public class AmazonAdService {
                 "client_id",clientDO.getId(),
                 "scope","advertising::campaign_management",
                 "response_type","code",
-                "redirect_uri","https://prod.esb.somle.com:55002/authUrlRedirect"
+                "redirect_uri","https://amazon.com"
             )
         );
     }
 
-    public Long createAuth(String code) {
+    public Long createAuth(String code, AmazonRegion region) {
         var clientDO = clientRepository.findAll().get(0);
         var authDO = new AmazonAdAuthDO();
         var response = amazonService.generateAccessToken(
@@ -57,6 +58,7 @@ public class AmazonAdService {
         );
         authDO.setClientId(clientDO.getId());
         authDO.setRefreshToken(response.getRefreshToken());
+        authDO.setRegionCode(region.getCode());
         authRepository.save(authDO);
         clients.add(new AmazonAdClient(authDO));
         refreshAuth();
