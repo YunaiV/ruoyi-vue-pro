@@ -1,5 +1,6 @@
 package com.somle.amazon.service;
 
+import com.somle.amazon.controller.vo.AmazonAdAccountRespVO;
 import com.somle.amazon.controller.vo.AmazonAdProfileRespVO;
 import com.somle.amazon.model.AmazonAdAuthDO;
 import com.somle.amazon.model.enums.AmazonRegion;
@@ -67,7 +68,7 @@ public class AmazonAdClient {
 
 
 
-    public JSONObject listAccounts() {
+    public AmazonAdAccountRespVO listAccounts() {
         JSONObject payload = JsonUtils.newObject();
 
         String partialUrl = "/adsAccounts/list";
@@ -80,11 +81,7 @@ public class AmazonAdClient {
             .headers(generateHeaders())
             .payload(payload)
             .build();
-        try(var response = WebUtils.sendRequest(request)){
-            var responseBody = WebUtils.parseResponse(response, JSONObject.class);
-            log.info(responseBody.toString());
-            return responseBody;
-        }
+        return WebUtils.sendRequest(request, AmazonAdAccountRespVO.class);
     }
 
     public List<AmazonAdProfileRespVO> listProfiles() {

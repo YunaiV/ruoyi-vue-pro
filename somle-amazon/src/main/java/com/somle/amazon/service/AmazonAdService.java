@@ -8,9 +8,11 @@ import com.somle.framework.common.util.web.WebUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Example;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,9 +34,11 @@ public class AmazonAdService {
 
     @PostConstruct
     public void init() {
-        clients = authRepository.findAll().stream()
-            .map(AmazonAdClient::new)
-            .toList();
+        clients = new ArrayList<>(
+            authRepository.findAll().stream()
+                .map(AmazonAdClient::new)
+                .toList()
+        );
     }
 
     public String getAuthUrl() {
@@ -62,28 +66,42 @@ public class AmazonAdService {
         authDO.setClientId(clientDO.getId());
         authDO.setRefreshToken(response.getRefreshToken());
         authDO.setRegionCode(region.getCode());
+        var client = new AmazonAdClient(authDO);
+        var accountId = client.listAccounts().getAdsAccounts().get(0).getAdsAccountId();
+        authDO.setAccountId(accountId);
+        validate(authDO);
         authRepository.save(authDO);
-        clients.add(new AmazonAdClient(authDO));
-        refreshAuth();
+        clients.add(client);
+        refreshAuth(client);
         return authDO.getId();
+    }
+
+    private void validate(AmazonAdAuthDO authDO) {
+        var probe = new AmazonAdAuthDO();
+        probe.setClientId(authDO.getClientId());
+        probe.setAccountId(authDO.getAccountId());
+        if (authRepository.findOne(Example.of(probe)).isPresent()) {
+            throw new RuntimeException("Duplicate Authorization");
+        }
     }
 
 
 
     @Scheduled(cron = "0 0,30 * * * *")
-    public void refreshAuth() {
-        clients.stream()
-            .forEach(client -> {
-                var auth = client.getAuth();
-                var newAccessToken = amazonService.refreshAccessToken(
-                    auth.getClientId(),
-                    clientRepository.findById(auth.getClientId()).get().getSecret(),
-                    auth.getRefreshToken()
-                );
-                auth.setAccessToken(newAccessToken);
-                client.setAuth(auth);
-                authRepository.save(auth);
-            });
+    public void refreshAuths() {
+        clients.forEach(this::refreshAuth);
+    }
+
+    public void refreshAuth(AmazonAdClient client) {
+        var auth = client.getAuth();
+        var newAccessToken = amazonService.refreshAccessToken(
+            auth.getClientId(),
+            clientRepository.findById(auth.getClientId()).get().getSecret(),
+            auth.getRefreshToken()
+        );
+        auth.setAccessToken(newAccessToken);
+        client.setAuth(auth);
+        authRepository.save(auth);
     }
 
 }
