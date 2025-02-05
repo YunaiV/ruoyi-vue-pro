@@ -81,6 +81,7 @@ public class AmazonAdService {
         var probe = new AmazonAdAuthDO();
         probe.setClientId(authDO.getClientId());
         probe.setAccountId(authDO.getAccountId());
+        probe.setRegionCode(authDO.getRegionCode());
         if (authRepository.findOne(Example.of(probe)).isPresent()) {
             throw new RuntimeException("Duplicate Authorization");
         }
