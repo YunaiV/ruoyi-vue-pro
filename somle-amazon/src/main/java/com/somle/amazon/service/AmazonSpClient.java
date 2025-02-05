@@ -21,8 +21,6 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -291,7 +289,7 @@ public class AmazonSpClient {
                         reportId = report.getReportId();
                         break;
                     case 403:
-                        var error = WebUtils.parseResponse(response, AmazonErrorListVO.class);
+                        var error = WebUtils.parseResponse(response, AmazonSpErrorListVO.class);
                         switch (error.getErrors().get(0).getCode()) {
                             case "Unauthorized":
                                 log.error(error.toString());

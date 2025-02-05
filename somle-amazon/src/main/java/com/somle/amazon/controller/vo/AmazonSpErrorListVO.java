@@ -4,11 +4,11 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class AmazonErrorListVO {
-    private List<AmazonErrorDetail> errors;
+public class AmazonSpErrorListVO {
+    private List<ErrorDetail> errors;
 
     @Data
-    public class AmazonErrorDetail {
+    public class ErrorDetail {
         private String code;
         private String message;
         private String details;

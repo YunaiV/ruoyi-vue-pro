@@ -28,6 +28,8 @@ public class AmazonAdService {
 
     public List<AmazonAdClient> clients;
 
+    public final String REDIRECT_URI = "https://somle.com";
+
     @PostConstruct
     public void init() {
         clients = authRepository.findAll().stream()
@@ -43,7 +45,7 @@ public class AmazonAdService {
                 "client_id",clientDO.getId(),
                 "scope","advertising::campaign_management",
                 "response_type","code",
-                "redirect_uri","https://somle.com"
+                "redirect_uri",REDIRECT_URI
             )
         );
     }
@@ -54,7 +56,8 @@ public class AmazonAdService {
         var response = amazonService.generateAccessToken(
             clientDO.getId(),
             clientDO.getSecret(),
-            code
+            code,
+            REDIRECT_URI
         );
         authDO.setClientId(clientDO.getId());
         authDO.setRefreshToken(response.getRefreshToken());

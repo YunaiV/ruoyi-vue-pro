@@ -26,15 +26,6 @@ class AmazonServiceTest extends BaseSpringTest {
 //        amazonService.refreshAuth();
 //    }
 
-//    @Test
-//    void generateAccessToken() {
-//        var clientId = amazonService.accounts.get(0).getAdClientId();
-//        var clientSecret = amazonService.accounts.get(0).getAdClientSecret();
-//        var code = "";
-//        var response = amazonService.generateAccessToken(clientId, clientSecret, code);
-//        log.info(response);
-//    }
-
 
 
     @Test

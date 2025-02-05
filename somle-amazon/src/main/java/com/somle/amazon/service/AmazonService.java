@@ -2,11 +2,14 @@ package com.somle.amazon.service;
 
 import com.somle.amazon.controller.vo.AmazonAuthReqVO;
 import com.somle.amazon.controller.vo.AmazonAuthRespVO;
+import com.somle.framework.common.util.json.JSONObject;
+import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.web.RequestX;
 import com.somle.framework.common.util.web.WebUtils;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Response;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -51,13 +54,13 @@ public class AmazonService {
 //            });
 //    }
 
-    public AmazonAuthRespVO generateAccessToken(String clientId, String clientSecret, String code) {
+    public AmazonAuthRespVO generateAccessToken(String clientId, String clientSecret, String code, String redirectUri) {
         AmazonAuthReqVO reqVO = AmazonAuthReqVO.builder()
             .grantType("authorization_code")
             .code(code)
             .clientId(clientId)
             .clientSecret(clientSecret)
-            .redirectUri("https://www.amazon.com/")
+            .redirectUri(redirectUri)
             .build();
         return authorize(reqVO);
     }
@@ -78,7 +81,11 @@ public class AmazonService {
                 .url(authUrl)
                 .payload(reqVO)
                 .build();
-            var response = WebUtils.sendRequest(request, AmazonAuthRespVO.class);
+            var body = WebUtils.sendRequest(request, JSONObject.class);
+            var response = JsonUtils.parseObject(body, AmazonAuthRespVO.class);
+            if (response.getAccessToken() == null) {
+                throw new RuntimeException("Invalid response from auth server:" + body.toString());
+            }
             return response;
     }
 

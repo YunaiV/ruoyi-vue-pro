@@ -17,10 +17,25 @@ class AmazonAdServiceTest extends BaseSpringTest {
     @Resource
     AmazonAdService service;
 
+    @Resource
+    AmazonService amazonService;
+
 
     @Test
     void refreshAuth() {
         service.refreshAuth();
+    }
+
+    @Test
+    void generateAccessToken() {
+        var clientDO = service.clientRepository.findAll().get(0);
+        var response = amazonService.generateAccessToken(
+            clientDO.getId(),
+            clientDO.getSecret(),
+            "ANWfdLbCJdnfYyzVsKXa",
+            service.REDIRECT_URI
+        );
+        log.info(response.toString());
     }
 
 
