@@ -104,6 +104,11 @@ public class AmazonAdClient {
         }
     }
 
+    public List<AmazonAdProfileRespVO> listSellerProfiles() {
+        return listProfiles().stream().filter(profile -> profile.getAccountInfo().getType() == "seller").collect(Collectors.toList());
+    }
+
+
 //    public JSONObject getProfile() {
 //
 //    }
@@ -129,7 +134,7 @@ public class AmazonAdClient {
     }
 
     public Stream<JSONArray> createAndGetAllAdReport(LocalDate dataDate) {
-        var reportIdMap = listProfiles().stream().collect(Collectors.toMap(
+        var reportIdMap = listSellerProfiles().stream().collect(Collectors.toMap(
             profile->profile,
             profile->createAdReport(profile.getProfileId(), dataDate)
         ));
