@@ -21,10 +21,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -99,13 +96,12 @@ public class AmazonAdClient {
             .build();
         try(var response = WebUtils.sendRequest(request)){
             var responseBody = WebUtils.parseResponse(response, new TypeReference<List<AmazonAdProfileRespVO>>() {});
-            log.info(responseBody.toString());
             return responseBody;
         }
     }
 
     public List<AmazonAdProfileRespVO> listSellerProfiles() {
-        return listProfiles().stream().filter(profile -> profile.getAccountInfo().getType() == "seller").collect(Collectors.toList());
+        return listProfiles().stream().filter(profile -> "seller".equals(profile.getAccountInfo().getType())).collect(Collectors.toList());
     }
 
 
