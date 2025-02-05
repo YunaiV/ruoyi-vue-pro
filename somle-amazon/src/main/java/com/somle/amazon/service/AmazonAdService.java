@@ -67,6 +67,7 @@ public class AmazonAdService {
         authDO.setRefreshToken(response.getRefreshToken());
         authDO.setRegionCode(region.getCode());
         var client = new AmazonAdClient(authDO);
+        refreshAuth(client);
         var accountId = client.listAccounts().getAdsAccounts().get(0).getAdsAccountId();
         authDO.setAccountId(accountId);
         validate(authDO);
