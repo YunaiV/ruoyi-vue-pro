@@ -51,7 +51,7 @@ public class AmazonService {
 //            });
 //    }
 
-    public String generateAccessToken(String clientId, String clientSecret, String code) {
+    public AmazonAuthRespVO generateAccessToken(String clientId, String clientSecret, String code) {
         AmazonAuthReqVO reqVO = AmazonAuthReqVO.builder()
             .grantType("authorization_code")
             .code(code)
@@ -69,22 +69,17 @@ public class AmazonService {
             .clientSecret(clientSecret)
             .refreshToken(refreshToken)
             .build();
-        return authorize(reqVO);
+        return authorize(reqVO).getAccessToken();
     }
 
-    private String authorize(AmazonAuthReqVO reqVO) {
-        try {
+    private AmazonAuthRespVO authorize(AmazonAuthReqVO reqVO) {
             var request = RequestX.builder()
                 .requestMethod(RequestX.Method.POST)
                 .url(authUrl)
                 .payload(reqVO)
                 .build();
             var response = WebUtils.sendRequest(request, AmazonAuthRespVO.class);
-            var accessToken = response.getAccessToken();
-            return accessToken;
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get access token", e);
-        }
+            return response;
     }
 
 

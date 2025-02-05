@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.somle.amazon.controller.vo.AmazonSpOrderReqVO;
 import com.somle.amazon.controller.vo.AmazonSpOrderRespVO;
+import com.somle.amazon.service.AmazonSpService;
 import com.somle.framework.common.util.date.LocalDateTimeUtils;
 import com.somle.framework.common.util.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +16,15 @@ import com.somle.amazon.service.AmazonService;
 
 
 @RestController
-@RequestMapping("/api/amazon/sp")
+@RequestMapping("/api/amazonsp")
 public class AmazonSpController {
     @Autowired
-    private AmazonService service;
+    private AmazonSpService service;
+
+    @PostMapping("refreshAuth")
+    void refreshAuth() {
+        service.refreshAuth();
+    }
 
 //    @GetMapping("orders")
 //    public List<AmazonSpOrderRespVO> getOrders(LocalDateTime startTime) {
