@@ -22,8 +22,8 @@ class AmazonAdServiceTest extends BaseSpringTest {
 
 
     @Test
-    void refreshAuth() {
-        service.refreshAuth();
+    void refreshAuths() {
+        service.refreshAuths();
     }
 
     @Test

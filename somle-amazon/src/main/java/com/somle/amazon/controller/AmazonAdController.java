@@ -12,9 +12,9 @@ public class AmazonAdController {
     @Autowired
     private AmazonAdService service;
 
-    @PostMapping("refreshAuth")
-    void refreshAuth() {
-        service.refreshAuth();
+    @PostMapping("refreshAuths")
+    void refreshAuths() {
+        service.refreshAuths();
     }
 
     @GetMapping("authUrl")
