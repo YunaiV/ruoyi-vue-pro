@@ -1,7 +1,7 @@
 ### 请求 /iot/think-model-function/create 接口 => 成功
 POST {{baseUrl}}/iot/think-model-function/create
 Content-Type: application/json
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
 Authorization: Bearer {{token}}
 
 {
@@ -32,7 +32,7 @@ Authorization: Bearer {{token}}
 ### 请求 /iot/think-model-function/create 接口 => 成功
 POST {{baseUrl}}/iot/think-model-function/create
 Content-Type: application/json
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
 Authorization: Bearer {{token}}
 
 {
@@ -66,7 +66,7 @@ Authorization: Bearer {{token}}
 ### 请求 /iot/think-model-function/update 接口 => 成功
 PUT {{baseUrl}}/iot/think-model-function/update
 Content-Type: application/json
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
 Authorization: Bearer {{token}}
 
 {
@@ -97,16 +97,16 @@ Authorization: Bearer {{token}}
 
 ### 请求 /iot/think-model-function/delete 接口 => 成功
 DELETE {{baseUrl}}/iot/think-model-function/delete?id=7
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
 Authorization: Bearer {{token}}
 
 ### 请求 /iot/think-model-function/get 接口 => 成功
 GET {{baseUrl}}/iot/think-model-function/get?id=10
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
 Authorization: Bearer {{token}}
 
 
 ### 请求 /iot/think-model-function/list-by-product-id 接口 => 成功
 GET {{baseUrl}}/iot/think-model-function/list-by-product-id?productId=1001
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
 Authorization: Bearer {{token}}

@@ -2,7 +2,7 @@
 POST {{appApi}}/promotion/bargain-record/create
 Authorization: Bearer {{appToken}}
 Content-Type: application/json
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 
 {
   "activityId": 1

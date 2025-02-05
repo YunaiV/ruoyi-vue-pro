@@ -2,7 +2,7 @@
 POST {{baseUrl}}/system/mail-template/send-mail
 Authorization: Bearer {{token}}
 Content-Type: application/json
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
 
 {
   "templateCode": "test_01",

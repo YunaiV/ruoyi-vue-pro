@@ -1,7 +1,7 @@
 ### 请求 /login 接口 => 成功
 POST {{appApi}}/member/auth/login
 Content-Type: application/json
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 
 {
   "mobile": "15601691388",
@@ -11,7 +11,7 @@ tenant-id: {{appTenentId}}
 ### 请求 /send-sms-code 接口 => 成功
 POST {{appApi}}/member/auth/send-sms-code
 Content-Type: application/json
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 
 {
   "mobile": "15601691388",
@@ -21,7 +21,7 @@ tenant-id: {{appTenentId}}
 ### 请求 /sms-login 接口 => 成功
 POST {{appApi}}/member/auth/sms-login
 Content-Type: application/json
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 terminal: 30
 
 {
@@ -32,7 +32,7 @@ terminal: 30
 ### 请求 /social-login 接口 => 成功
 POST {{appApi}}/member/auth/social-login
 Content-Type: application/json
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 
 {
   "type": 34,
@@ -43,7 +43,7 @@ tenant-id: {{appTenentId}}
 ### 请求 /weixin-mini-app-login 接口 => 成功
 POST {{appApi}}/member/auth/weixin-mini-app-login
 Content-Type: application/json
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 
 {
   "phoneCode": "618e6412e0c728f5b8fc7164497463d0158a923c9e7fd86af8bba393b9decbc5",
@@ -54,14 +54,14 @@ tenant-id: {{appTenentId}}
 POST {{appApi}}/member/auth/logout
 Content-Type: application/json
 Authorization: Bearer c1b76bdaf2c146c581caa4d7fd81ee66
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 
 ### 请求 /auth/refresh-token 接口 => 成功
 POST {{appApi}}/member/auth/refresh-token?refreshToken=bc43d929094849a28b3a69f6e6940d70
 Content-Type: application/json
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 
 ### 请求 /auth/create-weixin-jsapi-signature 接口 => 成功
 POST {{appApi}}/member/auth/create-weixin-jsapi-signature?url=http://www.iocoder.cn
 Authorization: Bearer {{appToken}}
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}

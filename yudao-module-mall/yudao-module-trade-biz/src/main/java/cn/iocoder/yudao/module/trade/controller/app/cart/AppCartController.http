@@ -1,6 +1,6 @@
 ### 请求 /trade/cart/add 接口 => 成功
 POST {{appApi}}/trade/cart/add
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 Authorization: Bearer {{appToken}}
 Content-Type: application/json
 
@@ -12,7 +12,7 @@ Content-Type: application/json
 
 ### 请求 /trade/cart/update 接口 => 成功
 PUT {{appApi}}/trade/cart/update
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 Authorization: Bearer {{appToken}}
 Content-Type: application/json
 
@@ -23,20 +23,20 @@ Content-Type: application/json
 
 ### 请求 /trade/cart/delete 接口 => 成功
 DELETE {{appApi}}/trade/cart/delete?ids=1
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 Authorization: Bearer {{appToken}}
 
 ### 请求 /trade/cart/get-count 接口 => 成功
 GET {{appApi}}/trade/cart/get-count
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 Authorization: Bearer {{appToken}}
 
 ### 请求 /trade/cart/get-count-map 接口 => 成功
 GET {{appApi}}/trade/cart/get-count-map
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 Authorization: Bearer {{appToken}}
 
 ### 请求 /trade/cart/list 接口 => 成功
 GET {{appApi}}/trade/cart/list
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 Authorization: Bearer {{appToken}}

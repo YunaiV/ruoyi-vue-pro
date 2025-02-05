@@ -2,7 +2,7 @@
 POST {{baseUrl}}/system/oauth2-client/create
 Content-Type: application/json
 Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
 
 {
   "id": "1",

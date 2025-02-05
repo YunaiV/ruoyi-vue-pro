@@ -2,7 +2,7 @@
 POST {{appApi}}/pay/order/submit
 Content-Type: application/json
 Authorization: Bearer {{appToken}}
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 
 {
   "id": 174,
@@ -13,7 +13,7 @@ tenant-id: {{appTenentId}}
 POST {{appApi}}/pay/order/submit
 Content-Type: application/json
 Authorization: Bearer {{appToken}}
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 
 {
   "id": 202,
@@ -27,7 +27,7 @@ tenant-id: {{appTenentId}}
 POST {{appApi}}/pay/order/submit
 Content-Type: application/json
 Authorization: Bearer {{appToken}}
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 
 {
   "id": 202,
@@ -41,7 +41,7 @@ tenant-id: {{appTenentId}}
 POST {{appApi}}/pay/order/submit
 Content-Type: application/json
 Authorization: Bearer {{appToken}}
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 
 {
   "id": 202,
@@ -55,7 +55,7 @@ tenant-id: {{appTenentId}}
 POST {{appApi}}/pay/order/submit
 Content-Type: application/json
 Authorization: Bearer {{appToken}}
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 
 {
   "id": 202,

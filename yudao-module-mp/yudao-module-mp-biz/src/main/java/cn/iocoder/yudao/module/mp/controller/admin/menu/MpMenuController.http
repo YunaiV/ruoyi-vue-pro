@@ -2,7 +2,7 @@
 POST {{baseUrl}}/mp/menu/save
 Content-Type: application/json
 Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
 
 {
   "accountId": "1",
@@ -37,7 +37,7 @@ tenant-id: {{adminTenentId}}
 POST {{baseUrl}}/mp/menu/save
 Content-Type: application/json
 Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
 
 {
   "accountId": "1",
@@ -47,4 +47,4 @@ tenant-id: {{adminTenentId}}
 ### 请求 /mp/menu/list 接口 => 成功
 GET {{baseUrl}}/mp/menu/list?accountId=1
 Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
