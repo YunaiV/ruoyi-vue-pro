@@ -52,11 +52,6 @@
             <artifactId>yudao-spring-boot-starter-redis</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.taosdata.jdbc</groupId>
-            <artifactId>taos-jdbcdriver</artifactId>
-        </dependency>
-
         <!-- Test 测试相关 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>

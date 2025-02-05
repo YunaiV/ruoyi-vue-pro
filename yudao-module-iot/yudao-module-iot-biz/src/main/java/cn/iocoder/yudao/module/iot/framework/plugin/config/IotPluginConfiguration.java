@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.framework.plugin.config;
 
 import cn.iocoder.yudao.module.iot.framework.plugin.core.IotPluginStartRunner;
 import cn.iocoder.yudao.module.iot.framework.plugin.core.IotPluginStateListener;
-import cn.iocoder.yudao.module.iot.service.plugin.IotPluginInfoService;
+import cn.iocoder.yudao.module.iot.service.plugin.IotPluginConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.spring.SpringPluginManager;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,8 +22,8 @@ public class IotPluginConfiguration {
 
     @Bean
     public IotPluginStartRunner pluginStartRunner(SpringPluginManager pluginManager,
-                                                  IotPluginInfoService pluginInfoService) {
-        return new IotPluginStartRunner(pluginManager, pluginInfoService);
+                                                  IotPluginConfigService pluginConfigService) {
+        return new IotPluginStartRunner(pluginManager, pluginConfigService);
     }
 
     // TODO @芋艿：需要 review 下
@@ -31,7 +31,6 @@ public class IotPluginConfiguration {
     public SpringPluginManager pluginManager(@Value("${pf4j.pluginsDir:pluginsDir}") String pluginsDir) {
         log.info("[init][实例化 SpringPluginManager]");
         SpringPluginManager springPluginManager = new SpringPluginManager(Paths.get(pluginsDir)) {
-//        SpringPluginManager springPluginManager = new SpringPluginManager() {
 
             @Override
             public void startPlugins() {

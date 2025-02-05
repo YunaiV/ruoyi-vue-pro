@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.plugin;
 
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotPluginInstanceHeartbeatReqDTO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInfoDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginConfigDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInstanceDO;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,9 +38,9 @@ public interface IotPluginInstanceService {
     /**
      * 删除插件文件
      *
-     * @param pluginInfoDo 插件信息
+     * @param pluginConfigDO 插件配置
      */
-    void deletePluginFile(IotPluginInfoDO pluginInfoDo);
+    void deletePluginFile(IotPluginConfigDO pluginConfigDO);
 
     /**
      * 上传并加载新的插件文件
@@ -53,10 +53,10 @@ public interface IotPluginInstanceService {
     /**
      * 更新插件状态
      *
-     * @param pluginInfoDo 插件信息
+     * @param pluginConfigDO 插件配置
      * @param status       新状态
      */
-    void updatePluginStatus(IotPluginInfoDO pluginInfoDo, Integer status);
+    void updatePluginStatus(IotPluginConfigDO pluginConfigDO, Integer status);
 
     // ========== 设备与插件的映射操作 ==========
 

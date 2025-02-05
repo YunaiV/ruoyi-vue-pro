@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.info;
+package cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.config;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Schema(description = "管理后台 - IoT 插件上传 Request VO")
 @Data
-public class PluginInfoImportReqVO {
+public class PluginConfigImportReqVO {
 
     @Schema(description = "主键 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11546")
     private Long id;
