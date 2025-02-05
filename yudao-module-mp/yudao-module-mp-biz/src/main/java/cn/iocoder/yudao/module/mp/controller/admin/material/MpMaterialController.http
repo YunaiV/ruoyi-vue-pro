@@ -2,4 +2,4 @@
 GET {{baseUrl}}/mp/material/page?permanent=true&pageNo=1&pageSize=10
 Content-Type: application/json
 Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
