@@ -42,7 +42,7 @@ public class AmazonAdService {
                 "client_id",clientDO.getId(),
                 "scope","advertising::campaign_management",
                 "response_type","code",
-                "redirect_uri","https://www.amazon.com/"
+                "redirect_uri","https://prod.esb.somle.com:55002/authUrlRedirect"
             )
         );
     }
