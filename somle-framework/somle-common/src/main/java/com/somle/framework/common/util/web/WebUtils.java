@@ -1,6 +1,5 @@
 package com.somle.framework.common.util.web;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.somle.framework.common.util.json.JSONObject;
@@ -15,7 +14,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -171,17 +169,28 @@ public class WebUtils {
     }
 
 
-
-    @SneakyThrows
+    /**
+     * 获取 HTTP 响应的 Body 内容并返回为字符串
+     *
+     * @param response OkHttp 的 Response 对象
+     * @return 响应 Body 的字符串
+     * @throws IllegalStateException 如果 response 或 response body 为空
+     * @throws RuntimeException 如果读取 response body 发生 IOException
+     */
     public static String getBodyString(Response response) {
-        if (response.body() == null) {
-            throw new RuntimeException("body is null");
+        if (response == null || response.body() == null) {
+            throw new IllegalStateException("Response or body is null");
         }
-        String responseString = response.body()
-            .string();
-        log.debug("response: " + responseString);
-        return responseString;
+        try (ResponseBody responseBody = response.body()) {
+            String responseString = responseBody.string();
+            log.debug("Response: {}", responseString);
+            return responseString;
+        } catch (IOException e) {
+            log.error("Failed to read response body", e);
+            throw new RuntimeException("Error reading response body", e);
+        }
     }
+
 
     public static <T> T parseResponse(Response response, Class<T> responseClass) {
         String bodyString = "";
