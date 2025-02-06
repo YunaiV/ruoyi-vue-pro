@@ -4,65 +4,68 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.AbstractFileClient;
-import com.amazonaws.HttpMethod;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.S3Object;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Configuration;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
-import java.io.ByteArrayInputStream;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
+import java.net.URI;
+import java.time.Duration;
 
 /**
  * 基于 S3 协议的文件客户端，实现 MinIO、阿里云、腾讯云、七牛云、华为云等云服务
- * <p>
- * S3 协议的客户端，采用亚马逊提供的 software.amazon.awssdk.s3 库
  *
  * @author 芋道源码
  */
 public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
 
-    private AmazonS3Client client;
+    private S3Client client;
 
     public S3FileClient(Long id, S3FileClientConfig config) {
         super(id, config);
     }
 
-    @Override
-    protected void doInit() {
-        // 补全 domain
-        if (StrUtil.isEmpty(config.getDomain())) {
-            config.setDomain(buildDomain());
-        }
-        // 初始化客户端
-        client = (AmazonS3Client)AmazonS3ClientBuilder.standard()
-                .withCredentials(buildCredentials())
-                .withEndpointConfiguration(buildEndpointConfiguration())
+    /**
+     * 动态创建 S3Presigner
+     *
+     * @param endpoint  节点地址
+     * @param accessKey 访问 Key
+     * @param secretKey 访问 Secret
+     * @return S3Presigner
+     */
+    private static S3Presigner createPresigner(String endpoint, String accessKey, String secretKey) {
+        return S3Presigner.builder()
+                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
+                .endpointOverride(URI.create(endpoint))
                 .build();
     }
 
     /**
-     * 基于 config 秘钥，构建 S3 客户端的认证信息
+     * 生成动态的预签名上传 URL
      *
-     * @return S3 客户端的认证信息
+     * @param bucket    存储 Bucket
+     * @param path      相对路径
+     * @param duration  过期时间
+     * @param endpoint  节点地址
+     * @param accessKey 访问 Key
+     * @param secretKey 访问 Secret
+     * @return 生成的上传 URL
      */
-    private AWSStaticCredentialsProvider buildCredentials() {
-        return new AWSStaticCredentialsProvider(
-                new BasicAWSCredentials(config.getAccessKey(), config.getAccessSecret()));
-    }
-
-    /**
-     * 构建 S3 客户端的 Endpoint 配置，包括 region、endpoint
-     *
-     * @return  S3 客户端的 EndpointConfiguration 配置
-     */
-    private AwsClientBuilder.EndpointConfiguration buildEndpointConfiguration() {
-        return new AwsClientBuilder.EndpointConfiguration(config.getEndpoint(),
-                null); // 无需设置 region
+    public static String getPresignedUrl(String bucket, String path, Duration duration,
+                                         String endpoint, String accessKey, String secretKey) {
+        try (S3Presigner presigner = createPresigner(endpoint, accessKey, secretKey)) {
+            return presigner.presignPutObject(PutObjectPresignRequest.builder()
+                    .signatureDuration(duration)
+                    .putObjectRequest(b -> b.bucket(bucket).key(path))
+                    .build()).url().toString();
+        }
     }
 
     /**
@@ -80,39 +83,90 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
     }
 
     @Override
-    public String upload(byte[] content, String path, String type) throws Exception {
-        // 元数据，主要用于设置文件类型
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentType(type);
-        objectMetadata.setContentLength(content.length); // 如果不设置，会有 “ No content length specified for stream data” 警告日志
-        // 执行上传
-        client.putObject(config.getBucket(),
-                path, // 相对路径
-                new ByteArrayInputStream(content), // 文件内容
-                objectMetadata);
+    protected void doInit() {
+        // 补全 domain
+        if (StrUtil.isEmpty(config.getDomain())) {
+            config.setDomain(buildDomain());
+        }
+        // 初始化 S3 客户端
+        client = S3Client.builder()
+                .credentialsProvider(buildCredentials())
+                .region(Region.of(config.getEndpoint())) // 这里随便填，SDK 需要
+                .endpointOverride(URI.create(buildEndpoint()))
+                .serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(true).build()) //  Path-style 访问
+                .build();
+    }
 
+    /**
+     * 基于 config 秘钥，构建 S3 客户端的认证信息
+     *
+     * @return S3 客户端的认证信息
+     */
+    private StaticCredentialsProvider buildCredentials() {
+        return StaticCredentialsProvider.create(
+                AwsBasicCredentials.create(config.getAccessKey(), config.getAccessSecret()));
+    }
+
+    /**
+     * 节点地址补全协议头
+     *
+     * @return 节点地址
+     */
+    private String buildEndpoint() {
+        // 如果已经是 http 或者 https，则不进行拼接
+        if (HttpUtil.isHttp(config.getEndpoint()) || HttpUtil.isHttps(config.getEndpoint())) {
+            return config.getEndpoint();
+        }
+        return StrUtil.format("https://{}", config.getEndpoint());
+    }
+
+    @Override
+    public String upload(byte[] content, String path, String type) {
+        // 构造 PutObjectRequest
+        PutObjectRequest putRequest = PutObjectRequest.builder()
+                .bucket(config.getBucket())
+                .key(path)
+                .contentType(type)
+                .contentLength((long) content.length)
+                .build();
+
+        // 上传文件
+        client.putObject(putRequest, RequestBody.fromBytes(content));
         // 拼接返回路径
         return config.getDomain() + "/" + path;
     }
 
     @Override
-    public void delete(String path) throws Exception {
-        client.deleteObject(config.getBucket(), path);
+    public void delete(String path) {
+        DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+                .bucket(config.getBucket())
+                .key(path)
+                .build();
+        client.deleteObject(deleteRequest);
     }
 
     @Override
-    public byte[] getContent(String path) throws Exception {
-        S3Object tempS3Object = client.getObject(config.getBucket(), path);
-        return IoUtil.readBytes(tempS3Object.getObjectContent());
+    public byte[] getContent(String path) {
+        GetObjectRequest getRequest = GetObjectRequest.builder()
+                .bucket(config.getBucket())
+                .key(path)
+                .build();
+
+        return IoUtil.readBytes(client.getObject(getRequest));
     }
 
     @Override
-    public FilePresignedUrlRespDTO getPresignedObjectUrl(String path) throws Exception {
-        // 设定过期时间为 10 分钟。取值范围：1 秒 ~ 7 天
-        Date expiration = new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(10));
-        // 生成上传 URL
-        String uploadUrl = String.valueOf(client.generatePresignedUrl(config.getBucket(), path, expiration , HttpMethod.PUT));
-        return new FilePresignedUrlRespDTO(uploadUrl, config.getDomain() + "/" + path);
+    public FilePresignedUrlRespDTO getPresignedObjectUrl(String path) {
+        String presignedUrl = getPresignedUrl(
+                config.getBucket(),
+                path,
+                Duration.ofMinutes(10),
+                config.getEndpoint(),
+                config.getAccessKey(),
+                config.getAccessSecret()
+        );
+
+        return new FilePresignedUrlRespDTO(presignedUrl, config.getDomain() + "/" + path);
     }
 
 }
