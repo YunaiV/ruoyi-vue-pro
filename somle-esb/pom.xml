@@ -83,11 +83,6 @@
         </dependency>
         <dependency>
             <groupId>com.somle</groupId>
-            <artifactId>somle-erp</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.somle</groupId>
             <artifactId>somle-matomo</artifactId>
             <version>${revision}</version>
         </dependency>

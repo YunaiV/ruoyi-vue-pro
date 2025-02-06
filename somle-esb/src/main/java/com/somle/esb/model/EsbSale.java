@@ -1,4 +1,4 @@
-package com.somle.erp.model;
+package com.somle.esb.model;
 
 import jakarta.persistence.Id;
 
@@ -6,11 +6,11 @@ import lombok.Data;
 
 
 @Data
-public class ErpSale {
+public class EsbSale {
     @Id
     private String id;
     private String platformSku;
     private String platformCode;
-    private ErpCustomer customer;
-    private ErpAddress address;
+    private EsbCustomer customer;
+    private EsbAddress address;
 }

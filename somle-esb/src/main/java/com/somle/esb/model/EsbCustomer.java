@@ -1,4 +1,4 @@
-package com.somle.erp.model;
+package com.somle.esb.model;
 
 import jakarta.persistence.Id;
 
@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class ErpCustomer {
+public class EsbCustomer {
     @Id
     private String id;
     private String name;

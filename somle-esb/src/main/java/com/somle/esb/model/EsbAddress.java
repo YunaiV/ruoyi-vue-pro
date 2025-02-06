@@ -1,4 +1,4 @@
-package com.somle.erp.model;
+package com.somle.esb.model;
 
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ErpAddress {
+public class EsbAddress {
     private String line1;
     private String line2;
     private String line3;
