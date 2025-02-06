@@ -77,9 +77,9 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         //审核状态
         purchaseRequest.setStatus(ErpAuditStatus.PROCESS.getStatus());
         //关闭状态
-        purchaseRequest.setOffStatus(ErpAuditStatus.OPENED.getStatus());
+//        purchaseRequest.setOffStatus(ErpAuditStatus.OPENED.getStatus());
         //订购状态
-        purchaseRequest.setOrderStatus(ErpAuditStatus.OT_ORDERED.getStatus());
+//        purchaseRequest.setOrderStatus(ErpAuditStatus.OT_ORDERED.getStatus());
 
         //2. 插入主表的申请单数据
         ThrowUtil.ifThrow(erpPurchaseRequestMapper.insert(purchaseRequest) <= 0, PURCHASE_REQUEST_ADD_FAIL_APPROVE);
@@ -121,9 +121,9 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         //1.1 判断已审核
         ThrowUtil.ifThrow(erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.APPROVE.getStatus()), PURCHASE_REQUEST_UPDATE_FAIL_APPROVE, erpPurchaseRequestDO.getNo());
         //1.2 判断已关闭
-        ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(ErpAuditStatus.CLOSED.getStatus()), PURCHASE_REQUEST_CLOSED, erpPurchaseRequestDO.getNo());
+//        ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(ErpAuditStatus.CLOSED.getStatus()), PURCHASE_REQUEST_CLOSED, erpPurchaseRequestDO.getNo());
         //1.3 判断已手动关闭
-        ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(ErpAuditStatus.MANUAL_CLOSED.getStatus()), PURCHASE_REQUEST_MANUAL_CLOSED, erpPurchaseRequestDO.getNo());
+//        ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(ErpAuditStatus.MANUAL_CLOSED.getStatus()), PURCHASE_REQUEST_MANUAL_CLOSED, erpPurchaseRequestDO.getNo());
         //1.4 校验子单requestId是否关联主单的id
         List<ErpPurchaseRequestItemsDO> requestItemsDOS = erpPurchaseRequestItemsMapper.findItemsGroupedByRequestId(List.of(updateReqVO.getId())).get(updateReqVO.getId());
         for (@Valid ErpPurchaseRequestItemsSaveReqVO itemsSaveReqVO : updateReqVO.getItems()) {
@@ -258,7 +258,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
      */
     private void handleEnableStatus(Long requestId, List<Long> itemIds, ErpPurchaseRequestDO erpPurchaseRequestDO) {
         // 1. 校验：如果采购申请单已经是开启状态，抛出异常
-        ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(ErpAuditStatus.OPENED.getStatus()), PURCHASE_REQUEST_OPENED, erpPurchaseRequestDO.getNo());
+//        ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(ErpAuditStatus.OPENED.getStatus()), PURCHASE_REQUEST_OPENED, erpPurchaseRequestDO.getNo());
 
         // 如果子项ID列表不为空，执行以下操作
         if (itemIds != null && !itemIds.isEmpty()) {
@@ -287,7 +287,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         ThrowUtil.ifThrow(erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.PROCESS.getStatus()), PURCHASE_REQUEST_CLOSE_FAIL, erpPurchaseRequestDO.getNo());
 
         // 2. 校验：如果采购申请单已经是关闭状态，抛出异常
-        ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(ErpAuditStatus.CLOSED.getStatus()), PURCHASE_REQUEST_CLOSED, erpPurchaseRequestDO.getNo());
+//        ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(ErpAuditStatus.CLOSED.getStatus()), PURCHASE_REQUEST_CLOSED, erpPurchaseRequestDO.getNo());
 
         // 如果子项ID列表不为空，执行以下操作
         if (itemIds != null && !itemIds.isEmpty()) {
@@ -344,7 +344,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
      */
     private void updatePurchaseRequestStatus(Long requestId, ErpAuditStatus status) {
         // 更新采购申请单的状态
-        erpPurchaseRequestMapper.updateById(new ErpPurchaseRequestDO().setId(requestId).setOffStatus(status.getStatus()));
+//        erpPurchaseRequestMapper.updateById(new ErpPurchaseRequestDO().setId(requestId).setOffStatus(status.getStatus()));
     }
 
     @Override

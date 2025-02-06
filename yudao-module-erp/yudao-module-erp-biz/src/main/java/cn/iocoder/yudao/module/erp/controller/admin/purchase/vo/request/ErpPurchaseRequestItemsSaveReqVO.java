@@ -11,34 +11,34 @@ import java.math.BigDecimal;
 public class ErpPurchaseRequestItemsSaveReqVO {
 
     @Schema(description = "id", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Null(groups = validation.OnCreate.class, message = "创建时，id必须为空")
-    @NotNull(groups = validation.OnUpdate.class, message = "更新时，id不能为空")
+    @Null(groups = validation.OnCreate.class, message = "创建时，子项id必须为空")
+    @NotNull(groups = validation.OnUpdate.class, message = "更新时，子项id不能为空")
     private Long id;
 
     @Schema(description = "商品id", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "商品id不能为空")
     private Long productId;
 
+    @Schema(description = "仓库编号", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Long warehouseId;
 
     @Schema(description = "申请数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     @NotNull(message = "申请数量不能为空")
     @Positive(message = "申请数量必须为正数")
     private Integer count;
 
-    @Schema(description = "仓库编号", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Long warehouseId;
-
     @Schema(description = "批准数量", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "8")
     @PositiveOrZero(message = "批准数量不能为负数")
+    @Null(groups = validation.OnCreate.class, message = "创建时，批准数量必须为空")
     private Integer approveCount;
 
     @Schema(description = "含税单价", requiredMode = Schema.RequiredMode.REQUIRED, example = "50.5")
     @Positive(message = "含税单价必须为正数")
     private BigDecimal actTaxPrice;
 
-    @Schema(description = "价税合计", requiredMode = Schema.RequiredMode.REQUIRED, example = "505.5")
-    @DecimalMin(value = "0.0", message = "价税合计必须大于0")
-    private BigDecimal allAmount;
+//    @Schema(description = "价税合计", requiredMode = Schema.RequiredMode.REQUIRED, example = "505.5")
+//    @DecimalMin(value = "0.0", message = "价税合计必须大于0")
+//    private BigDecimal allAmount;
 
     @Schema(description = "参考单价", requiredMode = Schema.RequiredMode.REQUIRED, example = "50.5")
     @DecimalMin(value = "0.0", message = "参考单价必须大于0")

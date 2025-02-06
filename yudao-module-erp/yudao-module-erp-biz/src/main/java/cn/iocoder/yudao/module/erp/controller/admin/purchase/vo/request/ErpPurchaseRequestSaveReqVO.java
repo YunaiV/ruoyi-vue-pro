@@ -16,8 +16,8 @@ import java.util.List;
 @Data
 public class ErpPurchaseRequestSaveReqVO {
     @Schema(description = "id")
-    @Null(groups = validation.OnCreate.class, message = "创建时，id必须为空")
-    @NotNull(groups = validation.OnUpdate.class, message = "更新时，id不能为空")
+    @Null(groups = validation.OnCreate.class, message = "创建时，申请单id必须为空")
+    @NotNull(groups = validation.OnUpdate.class, message = "更新时，申请单id不能为空")
     private Long id;
 
     @Schema(description = "申请人", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -36,6 +36,7 @@ public class ErpPurchaseRequestSaveReqVO {
     private String no;
 
     @Schema(description = "单据标签")
+    @NotNull(message = "单据标签不能为空")
     private String tag;
 
     @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1724")
