@@ -345,6 +345,11 @@ public class BpmSimpleModelNodeVO {
         @Valid
         private HttpRequestTriggerSetting httpRequestSetting;
 
+        /**
+         * 更新流程表单触发器设置
+         */
+        private UpdateNormalFormTriggerSetting updateNormalFormSetting;
+
         @Schema(description = "http 请求触发器设置", example = "{}")
         @Data
         public static class HttpRequestTriggerSetting {
@@ -365,14 +370,32 @@ public class BpmSimpleModelNodeVO {
             // TODO @json：可能未来看情况，搞个 HttpResponseParam；得看看有没别的业务需要，抽象统一
             /**
              * 请求返回处理设置，用于修改流程表单值
-             *
+             * <p>
              * key：表示要修改的流程表单字段名(name)
              * value：接口返回的字段名
              */
             @Schema(description = "请求返回处理设置", example = "[]")
             private List<KeyValue<String, String>> response;
-
         }
 
+        @Schema(description = "更新流程表单触发器设置", example = "{}")
+        @Data
+        public static class UpdateNormalFormTriggerSetting {
+
+            @Schema(description = "条件类型", example = "1")
+            @InEnum(BpmSimpleModeConditionTypeEnum.class)
+            @NotNull(message = "条件类型不能为空")
+            private Integer conditionType;
+
+            @Schema(description = "条件表达式", example = "${day>3}")
+            private String conditionExpression;
+
+            @Schema(description = "条件组", example = "{}")
+            private ConditionGroups conditionGroups;
+
+            @Schema(description = "更新的表单字段", example = "userName")
+            @NotEmpty(message = "更新的表单字段不能为空")
+            private Map<String, Object> updateFormFields;
+        }
     }
 }
