@@ -47,11 +47,18 @@ public class IotOtaUpgradeTaskDO extends BaseDO {
     private Long firmwareId;
 
     /**
-     * 任务类型
+     * 任务状态
      *
-     * TODO @芋艿：1-全部、2-指定设备
+     * 关联 {@link cn.iocoder.yudao.module.iot.enums.ota.IotOtaUpgradeTaskStatusEnum}
      */
-    private Integer type;
+    private Integer status;
+
+    /**
+     * 升级范围
+     *
+     * 关联 {@link cn.iocoder.yudao.module.iot.enums.ota.IotOtaUpgradeTaskScopeEnum}
+     */
+    private Integer scope;
     /**
      * 选中的设备名字数组
      *

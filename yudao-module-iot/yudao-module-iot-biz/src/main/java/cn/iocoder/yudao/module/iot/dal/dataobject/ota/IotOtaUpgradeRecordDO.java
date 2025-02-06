@@ -40,17 +40,6 @@ public class IotOtaUpgradeRecordDO extends BaseDO {
     private Long taskId;
 
     /**
-     * 升级状态
-     *
-     * TODO
-     */
-    private Integer status;
-    /**
-     * 升级进度，百分比
-     */
-    private Integer progress;
-
-    /**
      * 产品标识
      *
      * 关联 {@link cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO#getId()}
@@ -70,6 +59,23 @@ public class IotOtaUpgradeRecordDO extends BaseDO {
     private String deviceId;
 
     /**
+     * 升级状态
+     *
+     * 关联 {@link cn.iocoder.yudao.module.iot.enums.ota.IotOtaUpgradeRecordStatusEnum}
+     */
+    private Integer status;
+    /**
+     * 升级进度，百分比
+     */
+    private Integer progress;
+    /**
+     * 升级进度描述
+     *
+     * 注意，只记录设备最后一次的升级进度描述
+     * 如果想看历史记录，可以查看 {@link cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO} 设备日志
+     */
+    private String description;
+    /**
      * 升级开始时间
      */
     private LocalDateTime startTime;
@@ -77,7 +83,5 @@ public class IotOtaUpgradeRecordDO extends BaseDO {
      * 升级结束时间
      */
     private LocalDateTime endTime;
-
-
 
 }
