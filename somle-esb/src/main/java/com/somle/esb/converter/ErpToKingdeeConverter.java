@@ -3,7 +3,7 @@ package com.somle.esb.converter;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.enums.DictTypeConstants;
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
+import cn.iocoder.yudao.module.erp.api.logistic.customrule.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.erp.api.supplier.dto.ErpSupplierDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -45,10 +45,10 @@ public class ErpToKingdeeConverter {
      * @param customRuleDTOs ERP产品列表
      * @return 转换后的Kingdee产品列表
      */
-    public List<KingdeeProduct> customRuleDTOToProduct(List<ErpCustomRuleDTO> customRuleDTOs) {
-        log.info("Converting ERP products to full Kingdee products");
+    public List<KingdeeProduct> convert(List<ErpCustomRuleDTO> customRuleDTOs) {
+        log.debug("Converting ERP products to full Kingdee products");
         return customRuleDTOs.stream()
-            .map(this::customRuleToProduct)
+            .map(this::convert)
             .collect(Collectors.toList());
     }
 
@@ -58,10 +58,10 @@ public class ErpToKingdeeConverter {
      * @param productDTOs ERP产品列表
      * @return 转换后的简化版Kingdee产品列表
      */
-    public List<KingdeeProduct> productDTOToProduct(List<ErpProductDTO> productDTOs) {
-        log.info("Converting ERP products to simple Kingdee products");
+    public List<KingdeeProduct> toKingdeeProducts(List<ErpProductDTO> productDTOs) {
+        log.debug("Converting ERP products to simple Kingdee products");
         return productDTOs.stream()
-            .map(this::productToProduct)
+            .map(this::toKingdeeProduct)
             .collect(Collectors.toList());
     }
 
@@ -71,17 +71,17 @@ public class ErpToKingdeeConverter {
      * @param customRuleDTO ERP产品对象
      * @return 转换后的Kingdee产品对象
      */
-    private KingdeeProduct customRuleToProduct(ErpCustomRuleDTO customRuleDTO) {
+    private KingdeeProduct convert(ErpCustomRuleDTO customRuleDTO) {
+        ErpProductDTO productDTO = customRuleDTO.getProductDTO();
         KingdeeProduct kingdeeProduct = new KingdeeProduct();
         //普通
         kingdeeProduct.setCheckType("1");
         // 获取国家编码
         Integer countryCode = customRuleDTO.getCountryCode();
         // 获取产品名称
-        String productName = customRuleDTO.getProductName();
+        String productName = productDTO.getName();
         // 获取产品条码
-        String barCode = customRuleDTO.getBarCode();
-
+        String barCode = productDTO.getBarCode();
         // 如果国家编码不为空，且产品条码不为空，设置SKU
         if (ObjectUtil.isNotEmpty(countryCode)) {
             DictDataRespDTO dictData = dictDataApi.getDictData(DictTypeConstants.COUNTRY_CODE, String.valueOf(countryCode));
@@ -96,8 +96,7 @@ public class ErpToKingdeeConverter {
             kingdeeProduct.setNumber(barCode);
             kingdeeProduct.setName(productName);
         }
-
-        kingdeeProduct.setBarcode(customRuleDTO.getBarCode());
+        kingdeeProduct.setBarcode(productDTO.getBarCode());
         // 报关品名
         kingdeeProduct.setProducingPace(customRuleDTO.getDeclaredType());
         kingdeeProduct.setDeclaredTypeEn(customRuleDTO.getDeclaredTypeEn());
@@ -105,10 +104,12 @@ public class ErpToKingdeeConverter {
         kingdeeProduct.setHelpCode(customRuleDTO.getHscode());
         kingdeeProduct.setCostMethod("2");
         //给金蝶-包装属性
-        kingdeeProduct.setGrossWeight(String.valueOf(customRuleDTO.getPackageWeight()));
-        Float pdNetLength = mmToCmAsFloat(customRuleDTO.getPackageLength());
-        Float pdNetWidth = mmToCmAsFloat(customRuleDTO.getPackageWidth());
-        Float pdNetHeight = mmToCmAsFloat(customRuleDTO.getPackageHeight());
+        kingdeeProduct.setGrossWeight(String.valueOf(productDTO.getPackageWeight()));
+        //给金蝶-净重
+        kingdeeProduct.setNetWeight(String.valueOf(productDTO.getWeight()));
+        Float pdNetLength = mmToCmAsFloat(productDTO.getPackageLength());
+        Float pdNetWidth = mmToCmAsFloat(productDTO.getPackageWidth());
+        Float pdNetHeight = mmToCmAsFloat(productDTO.getPackageHeight());
         kingdeeProduct.setLength(String.valueOf(pdNetLength));
         kingdeeProduct.setWide(String.valueOf(pdNetWidth));
         kingdeeProduct.setHigh(String.valueOf(pdNetHeight));
@@ -118,10 +119,10 @@ public class ErpToKingdeeConverter {
         }
         //部门id，映射到金蝶自定义字段中
         //在金蝶中辅助资料对应的就是erp中的部门，非树形结构，在辅助资料中，由一个辅助分类是部门/报关品名（部门公司）
-        kingdeeProduct.setSaleDepartmentId(customRuleDTO.getProductDeptId());
+        kingdeeProduct.setSaleDepartmentId(productDTO.getDeptId());
         kingdeeProduct.setDeclaredTypeZh(customRuleDTO.getDeclaredType());
         //将报关规则的id存到这里面去
-        kingdeeProduct.setMaxInventoryQty(customRuleDTO.getId());
+        kingdeeProduct.setMaxInventoryQty(String.valueOf(customRuleDTO.getId()));
         return kingdeeProduct;
     }
 
@@ -129,20 +130,30 @@ public class ErpToKingdeeConverter {
     /**
      * 将单个ERP产品转换为Kingdee产品。
      *
-     * @param product ERP产品对象
+     * @param productDTO ERP产品对象
      * @return 转换后的Kingdee产品对象
      */
-    private KingdeeProduct productToProduct(ErpProductDTO product) {
+    private KingdeeProduct toKingdeeProduct(ErpProductDTO productDTO) {
         KingdeeProduct kingdeeProduct = new KingdeeProduct();
         //普通
         kingdeeProduct.setCheckType("1");
-        kingdeeProduct.setNumber(product.getBarCode());
-        kingdeeProduct.setName(product.getName());
-        kingdeeProduct.setBarcode(product.getBarCode());
+        kingdeeProduct.setNumber(productDTO.getBarCode());
+        kingdeeProduct.setName(productDTO.getName());
+        kingdeeProduct.setBarcode(productDTO.getBarCode());
         kingdeeProduct.setCostMethod("2");
+
+        kingdeeProduct.setGrossWeight(String.valueOf(productDTO.getPackageWeight()));
+        //给金蝶-净重
+        kingdeeProduct.setNetWeight(String.valueOf(productDTO.getWeight()));
+        Float pdNetLength = mmToCmAsFloat(productDTO.getPackageLength());
+        Float pdNetWidth = mmToCmAsFloat(productDTO.getPackageWidth());
+        Float pdNetHeight = mmToCmAsFloat(productDTO.getPackageHeight());
+        kingdeeProduct.setLength(String.valueOf(pdNetLength));
+        kingdeeProduct.setWide(String.valueOf(pdNetWidth));
+        kingdeeProduct.setHigh(String.valueOf(pdNetHeight));
         //部门id，映射到金蝶自定义字段中
         //在金蝶中辅助资料对应的就是erp中的部门，非树形结构，在辅助资料中，由一个辅助分类是部门/报关品名（部门公司）
-        kingdeeProduct.setSaleDepartmentId(product.getDeptId());
+        kingdeeProduct.setSaleDepartmentId(productDTO.getDeptId());
         return kingdeeProduct;
     }
 

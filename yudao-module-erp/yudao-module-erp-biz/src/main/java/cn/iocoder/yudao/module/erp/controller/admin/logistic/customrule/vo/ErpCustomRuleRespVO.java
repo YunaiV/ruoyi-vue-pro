@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 @ExcelIgnoreUnannotated
 public class ErpCustomRuleRespVO implements VO {
 
-    @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("产品编号")
+    @Schema(description = "海关规则id", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("海关规则id")
     private Long id;
 
     @Schema(description = "国家编码", requiredMode = Schema.RequiredMode.REQUIRED)
