@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.plugin;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginDeployTypeEnum;
-import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
 import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -23,7 +22,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IotPluginConfigDO extends BaseDO {
+public class IotPluginConfigDO extends TenantBaseDO {
 
     /**
      * 主键 ID

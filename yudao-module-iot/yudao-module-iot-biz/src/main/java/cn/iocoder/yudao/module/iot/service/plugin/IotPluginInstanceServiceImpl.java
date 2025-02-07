@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.service.plugin;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotPluginInstanceHeartbeatReqDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginConfigDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInstanceDO;
@@ -62,7 +63,8 @@ public class IotPluginInstanceServiceImpl implements IotPluginInstanceService {
     @Override
     public void heartbeatPluginInstance(IotPluginInstanceHeartbeatReqDTO heartbeatReqDTO) {
         // 情况一：已存在，则进行更新
-        IotPluginInstanceDO instance = pluginInstanceMapper.selectByProcessId(heartbeatReqDTO.getProcessId());
+        IotPluginInstanceDO instance = TenantUtils.executeIgnore(
+                () -> pluginInstanceMapper.selectByProcessId(heartbeatReqDTO.getProcessId()));
         if (instance != null) {
             IotPluginInstanceDO.IotPluginInstanceDOBuilder updateObj = IotPluginInstanceDO.builder().id(instance.getId())
                     .hostIp(heartbeatReqDTO.getHostIp()).downstreamPort(heartbeatReqDTO.getDownstreamPort())
@@ -74,12 +76,14 @@ public class IotPluginInstanceServiceImpl implements IotPluginInstanceService {
             } else {
                 updateObj.offlineTime(LocalDateTime.now());
             }
-            pluginInstanceMapper.updateById(updateObj.build());
+            TenantUtils.execute(instance.getTenantId(),
+                    () -> pluginInstanceMapper.updateById(updateObj.build()));
             return;
         }
 
         // 情况二：不存在，则创建
-        IotPluginConfigDO info = pluginConfigService.getPluginConfigByPluginKey(heartbeatReqDTO.getPluginKey());
+        IotPluginConfigDO info = TenantUtils.executeIgnore(
+                () -> pluginConfigService.getPluginConfigByPluginKey(heartbeatReqDTO.getPluginKey()));
         if (info == null) {
             log.error("[heartbeatPluginInstance][心跳({}) 对应的插件不存在]", heartbeatReqDTO);
             return;
@@ -93,7 +97,8 @@ public class IotPluginInstanceServiceImpl implements IotPluginInstanceService {
         } else {
             insertObj.offlineTime(LocalDateTime.now());
         }
-        pluginInstanceMapper.insert(insertObj.build());
+        TenantUtils.execute(info.getTenantId(),
+                () -> pluginInstanceMapper.insert(insertObj.build()));
     }
 
     @Override

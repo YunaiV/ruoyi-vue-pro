@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.job.plugin;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
+import cn.iocoder.yudao.framework.tenant.core.job.TenantJob;
 import cn.iocoder.yudao.module.iot.service.plugin.IotPluginInstanceService;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +29,7 @@ public class IotPluginInstancesJob implements JobHandler {
     private IotPluginInstanceService pluginInstanceService;
 
     @Override
+    @TenantJob
     public String execute(String param) {
         int count = pluginInstanceService.offlineTimeoutPluginInstance(
                 LocalDateTime.now().minus(OFFLINE_TIMEOUT));
