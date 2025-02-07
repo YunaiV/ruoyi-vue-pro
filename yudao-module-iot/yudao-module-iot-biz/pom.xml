@@ -81,6 +81,27 @@
             <artifactId>pf4j-spring</artifactId>
         </dependency>
 
+        <!-- TODO @芋艿：bom 管理 -->
+        <dependency>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>4.0.25</version>
+            <type>pom</type>
+        </dependency>
+
+        <!-- TODO @芋艿：bom 管理 -->
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js</artifactId>
+            <version>24.1.2</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js-scriptengine</artifactId>
+            <version>24.1.2</version>
+        </dependency>
+
     </dependencies>
 
 </project>
