@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.device;
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongSetTypeHandler;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -116,9 +116,11 @@ public class IotDeviceDO extends TenantBaseDO {
      */
     private String ip;
     /**
-     * 设备的固件版本
+     * 固件编号
+     *
+     * 关联 {@link IotOtaFirmwareDO#getId()}
      */
-    private String firmwareVersion;
+    private String firmwareId;
 
     /**
      * 设备密钥，用于设备认证，需安全存储

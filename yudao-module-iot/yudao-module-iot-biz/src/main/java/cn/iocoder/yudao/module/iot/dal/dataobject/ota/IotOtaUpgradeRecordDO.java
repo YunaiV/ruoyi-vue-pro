@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.ota;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -57,6 +58,12 @@ public class IotOtaUpgradeRecordDO extends BaseDO {
      * 关联 {@link cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO#getId()}
      */
     private String deviceId;
+    /**
+     * 来源的固件编号
+     *
+     * 关联 {@link IotDeviceDO#getFirmwareId()}
+     */
+    private Long fromFirmwareId;
 
     /**
      * 升级状态
