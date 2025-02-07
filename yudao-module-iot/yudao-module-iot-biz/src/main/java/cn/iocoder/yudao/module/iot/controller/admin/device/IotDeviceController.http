@@ -52,3 +52,24 @@ Authorization: Bearer {{token}}
   "type": "config",
   "identifier": "set"
 }
+
+### 请求 /iot/device/downstream 接口（OTA 升级） => 成功
+POST {{baseUrl}}/iot/device/downstream
+Content-Type: application/json
+tenant-id: {{adminTenentId}}
+Authorization: Bearer {{token}}
+
+{
+  "id": 25,
+  "type": "ota",
+  "identifier": "upgrade",
+  "data": {
+    "firmwareId": 1,
+    "version": "1.0.0",
+    "signMethod": "MD5",
+    "fileSign": "d41d8cd98f00b204e9800998ecf8427e",
+    "fileSize": 1024,
+    "fileUrl": "http://example.com/firmware.bin",
+    "information": "{\"desc\":\"升级到最新版本\"}"
+  }
+}

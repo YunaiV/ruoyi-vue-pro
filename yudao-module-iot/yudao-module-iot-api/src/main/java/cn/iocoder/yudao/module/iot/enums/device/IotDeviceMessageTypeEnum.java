@@ -17,7 +17,8 @@ public enum IotDeviceMessageTypeEnum implements ArrayValuable<String> {
     PROPERTY("property"), // 设备属性
     EVENT("event"), // 设备事件
     SERVICE("service"), // 设备服务
-    CONFIG("config"); // 设备配置
+    CONFIG("config"), // 设备配置
+    OTA("ota"),; // 设备 OTA
 
     public static final String[] ARRAYS = Arrays.stream(values()).map(IotDeviceMessageTypeEnum::getType).toArray(String[]::new);
 

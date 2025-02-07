@@ -21,7 +21,12 @@ public enum IotDeviceMessageIdentifierEnum {
     CONFIG_SET("set"), // 下行
 
     SERVICE_INVOKE("${identifier}"), // 下行
-    SERVICE_REPLY_SUFFIX("_reply"); // 芋艿：TODO 芋艿：【讨论】上行 or 下行
+    SERVICE_REPLY_SUFFIX("_reply"), // 芋艿：TODO 芋艿：【讨论】上行 or 下行
+
+    OTA_UPGRADE("upgrade"), // 下行
+    OTA_PULL("pull"), // 上行
+    OTA_PROGRESS("progress"), // 上行
+    OTA_REPORT("report"),; // 上行
 
     /**
      * 标志符

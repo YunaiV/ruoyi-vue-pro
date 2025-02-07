@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.iot.plugin.common.downstream;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDeviceConfigSetReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDevicePropertyGetReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDevicePropertySetReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDeviceServiceInvokeReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.*;
 
 /**
  * IoT 设备下行处理器
@@ -46,5 +43,13 @@ public interface IotDeviceDownstreamHandler {
      * @return 是否成功
      */
     CommonResult<Boolean> setDeviceConfig(IotDeviceConfigSetReqDTO setReqDTO);
+
+    /**
+     * 升级设备 OTA
+     *
+     * @param upgradeReqDTO 升级设备 OTA 的请求
+     * @return 是否成功
+     */
+    CommonResult<Boolean> upgradeDeviceOta(IotDeviceOtaUpgradeReqDTO upgradeReqDTO);
 
 }

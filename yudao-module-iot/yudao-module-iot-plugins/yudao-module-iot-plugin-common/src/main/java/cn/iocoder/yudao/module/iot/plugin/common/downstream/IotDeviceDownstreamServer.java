@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.iot.plugin.common.downstream;
 
 import cn.iocoder.yudao.module.iot.plugin.common.config.IotPluginCommonProperties;
-import cn.iocoder.yudao.module.iot.plugin.common.downstream.router.IotDeviceConfigSetVertxHandler;
-import cn.iocoder.yudao.module.iot.plugin.common.downstream.router.IotDevicePropertyGetVertxHandler;
-import cn.iocoder.yudao.module.iot.plugin.common.downstream.router.IotDevicePropertySetVertxHandler;
-import cn.iocoder.yudao.module.iot.plugin.common.downstream.router.IotDeviceServiceInvokeVertxHandler;
+import cn.iocoder.yudao.module.iot.plugin.common.downstream.router.*;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
@@ -39,6 +36,8 @@ public class IotDeviceDownstreamServer {
                 .handler(new IotDevicePropertyGetVertxHandler(deviceDownstreamHandler));
         router.post(IotDeviceConfigSetVertxHandler.PATH)
                 .handler(new IotDeviceConfigSetVertxHandler(deviceDownstreamHandler));
+        router.post(IotDeviceOtaUpgradeVertxHandler.PATH)
+                .handler(new IotDeviceOtaUpgradeVertxHandler(deviceDownstreamHandler));
         // 创建 HttpServer 实例
         this.server = vertx.createHttpServer().requestHandler(router);
     }
