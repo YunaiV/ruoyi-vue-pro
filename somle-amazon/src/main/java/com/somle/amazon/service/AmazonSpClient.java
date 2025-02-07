@@ -20,7 +20,14 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
+import org.springframework.retry.policy.ExceptionClassifierRetryPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
+import org.springframework.web.client.HttpClientErrorException;
 
+import java.net.SocketTimeoutException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -266,7 +273,6 @@ public class AmazonSpClient {
 
     @SneakyThrows
     public String createReport(AmazonSpReportSaveVO vo) {
-        log.info("get report");
 
         String endPoint = getEndPoint();
         String partialUrl = "/reports/2021-06-30/reports";
@@ -282,30 +288,30 @@ public class AmazonSpClient {
                 .headers(generateHeaders(auth))
                 .payload(vo)
                 .build();
-            try(var response = WebUtils.sendRequest(request)){
-                switch (response.code()) {
-                    case 202:
-                        var report = WebUtils.parseResponse(response, AmazonSpReportRespVO.class);
-                        reportId = report.getReportId();
-                        break;
-                    case 403:
-                        var error = WebUtils.parseResponse(response, AmazonSpErrorListVO.class);
-                        switch (error.getErrors().get(0).getCode()) {
-                            case "Unauthorized":
-                                log.error(error.toString());
-                                throw new RuntimeException("Error unauthorized");
-                            default:
-                                break;
-                        }
-                        throw new RuntimeException("Error creating report: " + error);
-                    case 429:
-                        log.info("Received 429 Too Many Requests. Retrying...");
-                        CoreUtils.sleep(3000);
-                        continue;
-                    default:
-                        throw new RuntimeException("Unknown response code: " + response.code() + "Detail: " + response.body().string());
+            reportId = CoreUtils.retry(ctx -> {
+                try(var response = WebUtils.sendRequest(request)){
+                    switch (response.code()) {
+                        case 202:
+                            var report = WebUtils.parseResponse(response, AmazonSpReportRespVO.class);
+                            return report.getReportId();
+                        case 403:
+                            var error = WebUtils.parseResponse(response, AmazonSpErrorListVO.class);
+                            switch (error.getErrors().get(0).getCode()) {
+                                case "Unauthorized":
+                                    log.error(error.toString());
+                                    throw new RuntimeException("Error unauthorized");
+                                default:
+                                    break;
+                            }
+                            throw new RuntimeException("Error creating report: " + error);
+                        case 429:
+                            throw new HttpClientErrorException(HttpStatus.TOO_MANY_REQUESTS, response.body().string());
+                        default:
+                            throw new RuntimeException("Unknown response code: " + response.code() + "Detail: " + response.body().string());
+                    }
                 }
-            }
+            });
+
         }
         log.info("Got report ID: {}", reportId);
         return reportId;

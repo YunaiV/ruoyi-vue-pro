@@ -31,7 +31,7 @@ class AmazonSpClientTest extends BaseSpringTest {
 
     @BeforeEach
     void setUp() {
-        client = spService.clients.get(0);
+        client = spService.clients.get(2);
     }
 
 //    @Test
@@ -130,9 +130,27 @@ class AmazonSpClientTest extends BaseSpringTest {
     }
 
     @Test
+    void getStorageReport() {
+//        var options = AmazonSpReportSaveVO.ReportOptions.builder()
+//            .asinGranularity("CHILD")
+//            .dateGranularity("DAY")
+//            .build();
+        var vo = AmazonSpReportSaveVO.builder()
+            .reportType("GET_FBA_STORAGE_FEE_CHARGES_DATA")
+            .marketplaceIds(List.of(AmazonCountry.findByCode("CA").getMarketplaceId()))
+            .dataStartTime(LocalDateTime.of(2024,12,1,0,0).toString())
+            .dataEndTime(LocalDateTime.of(2025,1,2,0,0).toString())
+//            .marketplaceIds(List.of(AmazonCountry.findByCode("DE").getMarketplaceId()))
+//            .reportOptions(options)
+            .build();
+        var reportString = client.createAndGetReport(vo, "gzip");
+        log.info(reportString);
+    }
+
+    @Test
     void getReports() {
         var vo = AmazonSpReportReqVO.builder()
-                .reportTypes(List.of("GET_FLAT_FILE_RETURNS_DATA_BY_RETURN_DATE"))
+                .reportTypes(List.of("GET_FBA_STORAGE_FEE_CHARGES_DATA"))
                 .processingStatuses(List.of(ProcessingStatuses.DONE))
                 .pageSize(100)
                 .build();
@@ -144,13 +162,13 @@ class AmazonSpClientTest extends BaseSpringTest {
 
     @Test
     void getReport() {
-        var vo = AmazonSpReportReqVO.builder()
-                .reportTypes(List.of("GET_FLAT_FILE_RETURNS_DATA_BY_RETURN_DATE"))
-                .processingStatuses(List.of(ProcessingStatuses.DONE))
-                .pageSize(100)
-                .build();
-        var report = client.getReports(vo).get(0);
-        log.info(client.getReport(report.getReportId(),null));
+//        var vo = AmazonSpReportReqVO.builder()
+//                .reportTypes(List.of("GET_FLAT_FILE_RETURNS_DATA_BY_RETURN_DATE"))
+//                .processingStatuses(List.of(ProcessingStatuses.DONE))
+//                .pageSize(100)
+//                .build();
+//        var report = client.getReports(vo).get(0);
+        log.info(client.getReport("970685020124",null));
     }
 
 

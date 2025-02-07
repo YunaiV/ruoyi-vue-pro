@@ -28,20 +28,6 @@ public class AmazonadDataJob extends DataJob{
     public String execute(String param) throws Exception {
         setDate(param);
 
-        amazonAdService.clients.stream()
-            .flatMap(client -> client.createAndGetAllAdReport(beforeYesterday))
-            .forEach(page -> {
-                OssData data = OssData.builder()
-                    .database(DATABASE)
-                    .tableName("ad_report")
-                    .syncType("inc")
-                    .requestTimestamp(System.currentTimeMillis())
-                    .folderDate(beforeYesterday)
-                    .content(page)
-                    .headers(null)
-                    .build();
-                service.send(data);
-            });
-        return "data upload success";
+        throw new Exception("template data job do not execute");
     }
 }

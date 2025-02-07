@@ -2,6 +2,7 @@ package com.somle.amazon.service;
 
 import com.somle.amazon.controller.vo.AmazonAdAccountRespVO;
 import com.somle.amazon.controller.vo.AmazonAdProfileRespVO;
+import com.somle.amazon.controller.vo.AmazonAdReportReqVO;
 import com.somle.amazon.model.AmazonAdAuthDO;
 import com.somle.amazon.model.enums.AmazonRegion;
 import com.somle.framework.common.util.general.CoreUtils;
@@ -129,10 +130,10 @@ public class AmazonAdClient {
         }
     }
 
-    public Stream<JSONArray> createAndGetAllAdReport(LocalDate dataDate) {
+    public Stream<JSONArray> batchCreateAndGetReport(AmazonAdReportReqVO payload) {
         var reportIdMap = listSellerProfiles().stream().collect(Collectors.toMap(
             profile->profile,
-            profile->createAdReport(profile.getProfileId(), dataDate)
+            profile->createReport(profile.getProfileId(), payload)
         ));
         // usually take more than 5 mins
         CoreUtils.sleep(300000);
@@ -140,48 +141,9 @@ public class AmazonAdClient {
             .map(entry->getReport(entry.getKey().getProfileId(), entry.getValue()));
     }
 
-    public JSONArray createAndGetReport(Long profileId, JSONObject payload, LocalDate dataDate) {
-        var reportId = createReport(profileId, payload, dataDate);
+    public JSONArray createAndGetReport(Long profileId, AmazonAdReportReqVO payload, LocalDate dataDate) {
+        var reportId = createReport(profileId, payload);
         return getReport(profileId, reportId);
-    }
-
-
-
-    // return report id
-    public String createAdReport(Long profileId, LocalDate dataDate) {
-        List<String> baseMetric = new ArrayList<>(Arrays.asList(
-            "addToCart", "addToCartClicks", "addToCartRate", "adGroupId", "adGroupName", "adId",
-            "brandedSearches", "brandedSearchesClicks", "campaignBudgetAmount", "campaignBudgetCurrencyCode",
-            "campaignBudgetType", "campaignId", "campaignName", "campaignStatus", "clicks", "cost", "costType",
-            "date", "detailPageViews", "detailPageViewsClicks", "eCPAddToCart", "impressions",
-            "newToBrandDetailPageViewRate", "newToBrandDetailPageViews", "newToBrandDetailPageViewsClicks",
-            "newToBrandECPDetailPageView", "newToBrandPurchases", "newToBrandPurchasesClicks",
-            "newToBrandPurchasesPercentage", "newToBrandPurchasesRate", "newToBrandSales", "newToBrandSalesClicks",
-            "newToBrandSalesPercentage", "newToBrandUnitsSold", "newToBrandUnitsSoldClicks",
-            "newToBrandUnitsSoldPercentage", "purchases", "purchasesClicks", "purchasesPromoted", "sales",
-            "salesClicks", "salesPromoted", "unitsSold", "unitsSoldClicks", "video5SecondViewRate", "video5SecondViews",
-            "videoCompleteViews", "videoFirstQuartileViews", "videoMidpointViews", "videoThirdQuartileViews",
-            "videoUnmutes", "viewabilityRate", "viewableImpressions"
-        ));
-
-        baseMetric.remove("startDate");
-        baseMetric.remove("endDate");
-
-        JSONObject params = JsonUtils.newObject();
-//        params.put("startDate", null);
-//        params.put("endDate", null);
-
-        JSONObject configuration = JsonUtils.newObject();
-        configuration.put("adProduct", "SPONSORED_BRANDS");
-        configuration.put("groupBy", new ArrayList<>(Arrays.asList("ads")));
-        configuration.put("columns", baseMetric);
-        configuration.put("reportTypeId", "sbAds");
-        configuration.put("timeUnit", "DAILY");
-        configuration.put("format", "GZIP_JSON");
-
-        params.put("configuration", configuration);
-
-        return createReport(profileId, params, dataDate);
     }
 
 
@@ -189,11 +151,8 @@ public class AmazonAdClient {
 
     // return report id
     @SneakyThrows
-    public String createReport(Long profileId, JSONObject payload, LocalDate dataDate) {
-        JSONObject updateDict = JsonUtils.newObject();
-        updateDict.put("startDate", dataDate.toString());
-        updateDict.put("endDate", dataDate.toString());
-        payload.putAll(updateDict);
+    public String createReport(Long profileId, AmazonAdReportReqVO payload) {
+
 
         String partialUrl = "/reporting/reports";
         String endpoint = getEndPoint();
