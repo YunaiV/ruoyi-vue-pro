@@ -628,8 +628,6 @@ public class SimpleModelUtils {
             String conditionExpression = buildConditionExpression(node.getConditionSetting());
             return buildBpmnSequenceFlow(sourceId, targetId, node.getId(), node.getName(), conditionExpression);
         }
-
-
     }
 
     /**
@@ -726,8 +724,8 @@ public class SimpleModelUtils {
                 if (node.getTriggerSetting().getHttpRequestSetting() != null) {
                     addExtensionElementJson(serviceTask, TRIGGER_PARAM, node.getTriggerSetting().getHttpRequestSetting());
                 }
-                if (node.getTriggerSetting().getUpdateNormalFormSetting() != null) {
-                    addExtensionElementJson(serviceTask, TRIGGER_PARAM, node.getTriggerSetting().getUpdateNormalFormSetting());
+                if (node.getTriggerSetting().getNormalFormSetting() != null) {
+                    addExtensionElementJson(serviceTask, TRIGGER_PARAM, node.getTriggerSetting().getNormalFormSetting());
                 }
             }
             return serviceTask;

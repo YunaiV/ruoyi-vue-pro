@@ -346,9 +346,9 @@ public class BpmSimpleModelNodeVO {
         private HttpRequestTriggerSetting httpRequestSetting;
 
         /**
-         * 更新流程表单触发器设置
+         * 流程表单触发器设置
          */
-        private UpdateNormalFormTriggerSetting updateNormalFormSetting;
+        private NormalFormTriggerSetting normalFormSetting;
 
         @Schema(description = "http 请求触发器设置", example = "{}")
         @Data
@@ -378,23 +378,11 @@ public class BpmSimpleModelNodeVO {
             private List<KeyValue<String, String>> response;
         }
 
-        @Schema(description = "更新流程表单触发器设置", example = "{}")
+        @Schema(description = "流程表单触发器设置", example = "{}")
         @Data
-        public static class UpdateNormalFormTriggerSetting {
+        public static class NormalFormTriggerSetting {
 
-            @Schema(description = "条件类型", example = "1")
-            @InEnum(BpmSimpleModeConditionTypeEnum.class)
-            @NotNull(message = "条件类型不能为空")
-            private Integer conditionType;
-
-            @Schema(description = "条件表达式", example = "${day>3}")
-            private String conditionExpression;
-
-            @Schema(description = "条件组", example = "{}")
-            private ConditionGroups conditionGroups;
-
-            @Schema(description = "更新的表单字段", example = "userName")
-            @NotEmpty(message = "更新的表单字段不能为空")
+            @Schema(description = "修改的表单字段", example = "userName")
             private Map<String, Object> updateFormFields;
         }
     }
