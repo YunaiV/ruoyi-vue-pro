@@ -30,7 +30,6 @@ public class IotPluginStartRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         List<IotPluginConfigDO> pluginConfigList = TenantUtils.executeIgnore(
-                // 查询运行中且部署类型为 JAR 的插件
                 () -> pluginConfigService.getPluginConfigListByStatusAndDeployType(
                         IotPluginStatusEnum.RUNNING.getStatus(), IotPluginDeployTypeEnum.JAR.getDeployType()));
         if (CollUtil.isEmpty(pluginConfigList)) {
