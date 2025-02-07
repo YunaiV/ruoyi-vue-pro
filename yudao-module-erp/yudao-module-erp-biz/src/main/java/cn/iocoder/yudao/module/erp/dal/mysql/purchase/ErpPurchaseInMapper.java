@@ -42,7 +42,7 @@ public interface ErpPurchaseInMapper extends BaseMapperX<ErpPurchaseInDO> {
             query.apply("t.payment_price = t.total_price");
         }
         if (Boolean.TRUE.equals(reqVO.getPaymentEnable())) {
-            query.eq(ErpPurchaseInDO::getStatus, ErpAuditStatus.APPROVE.getStatus())
+            query.eq(ErpPurchaseInDO::getStatus, ErpAuditStatus.APPROVE.getCode())
                     .apply("t.payment_price < t.total_price");
         }
         if (reqVO.getWarehouseId() != null || reqVO.getProductId() != null) {

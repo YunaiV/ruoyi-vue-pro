@@ -42,7 +42,7 @@ public interface ErpSaleOutMapper extends BaseMapperX<ErpSaleOutDO> {
             query.apply("t.receipt_price = t.total_price");
         }
         if (Boolean.TRUE.equals(reqVO.getReceiptEnable())) {
-            query.eq(ErpSaleOutDO::getStatus, ErpAuditStatus.APPROVE.getStatus())
+            query.eq(ErpSaleOutDO::getStatus, ErpAuditStatus.APPROVE.getCode())
                     .apply("t.receipt_price < t.total_price");
         }
         if (reqVO.getWarehouseId() != null || reqVO.getProductId() != null) {

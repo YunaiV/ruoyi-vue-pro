@@ -23,7 +23,7 @@ public class ErpPurchaseRequestItemsSaveReqVO {
     private Long warehouseId;
 
     @Schema(description = "申请数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
-    @NotNull(message = "申请数量不能为空")
+//    @NotNull(message = "申请数量不能为空")
     @Positive(message = "申请数量必须为正数")
     private Integer count;
 
@@ -36,19 +36,20 @@ public class ErpPurchaseRequestItemsSaveReqVO {
     @Positive(message = "含税单价必须为正数")
     private BigDecimal actTaxPrice;
 
-//    @Schema(description = "价税合计", requiredMode = Schema.RequiredMode.REQUIRED, example = "505.5")
-//    @DecimalMin(value = "0.0", message = "价税合计必须大于0")
-//    private BigDecimal allAmount;
+    @Schema(description = "价税合计", requiredMode = Schema.RequiredMode.REQUIRED, example = "505.5")
+    @DecimalMin(value = "0.0", message = "价税合计必须大于0")
+    private BigDecimal allAmount;
 
     @Schema(description = "参考单价", requiredMode = Schema.RequiredMode.REQUIRED, example = "50.5")
     @DecimalMin(value = "0.0", message = "参考单价必须大于0")
     private BigDecimal referenceUnitPrice;
 
+    //是否计算得到？待确认
     @Schema(description = "税额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED, example = "5.5")
     @DecimalMin(value = "0.0", message = "税额必须大于0")
     private BigDecimal taxPrice;
 
-    @Schema(description = "税率，百分比", requiredMode = Schema.RequiredMode.REQUIRED, example = "0.13")
+    @Schema(description = "增值税税率，百分比", requiredMode = Schema.RequiredMode.REQUIRED, example = "0.13")
     @DecimalMin(value = "0.0", message = "税率不能为负")
     @DecimalMax(value = "1.0", message = "税率不能超过100%")
     private BigDecimal taxPercent;

@@ -89,7 +89,7 @@ public class ErpFinanceReceiptServiceImpl implements ErpFinanceReceiptService {
 
         // 2.1 插入收款单
         ErpFinanceReceiptDO receipt = BeanUtils.toBean(createReqVO, ErpFinanceReceiptDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()));
+                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getCode()));
         calculateTotalPrice(receipt, receiptItems);
         financeReceiptMapper.insert(receipt);
         // 2.2 插入收款单项
@@ -106,7 +106,7 @@ public class ErpFinanceReceiptServiceImpl implements ErpFinanceReceiptService {
     public void updateFinanceReceipt(ErpFinanceReceiptSaveReqVO updateReqVO) {
         // 1.1 校验存在
         ErpFinanceReceiptDO receipt = validateFinanceReceiptExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVE.getStatus().equals(receipt.getStatus())) {
+        if (ErpAuditStatus.APPROVE.getCode().equals(receipt.getStatus())) {
             throw exception(FINANCE_RECEIPT_UPDATE_FAIL_APPROVE, receipt.getNo());
         }
         // 1.2 校验客户
@@ -139,7 +139,7 @@ public class ErpFinanceReceiptServiceImpl implements ErpFinanceReceiptService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateFinanceReceiptStatus(Long id, Integer status) {
-        boolean approve = ErpAuditStatus.APPROVE.getStatus().equals(status);
+        boolean approve = ErpAuditStatus.APPROVE.getCode().equals(status);
         // 1.1 校验存在
         ErpFinanceReceiptDO receipt = validateFinanceReceiptExists(id);
         // 1.2 校验状态
@@ -218,7 +218,7 @@ public class ErpFinanceReceiptServiceImpl implements ErpFinanceReceiptService {
             return;
         }
         receipts.forEach(receipt -> {
-            if (ErpAuditStatus.APPROVE.getStatus().equals(receipt.getStatus())) {
+            if (ErpAuditStatus.APPROVE.getCode().equals(receipt.getStatus())) {
                 throw exception(FINANCE_RECEIPT_DELETE_FAIL_APPROVE, receipt.getNo());
             }
         });

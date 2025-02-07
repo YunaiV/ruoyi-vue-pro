@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestItemRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestSaveReqVO;
@@ -75,15 +76,6 @@ public class ErpPurchaseRequestController {
         return success(true);
     }
 
-    @PutMapping("/update-status")
-    @Operation(summary = "更新采购申请单的状态")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-request:update-status')")
-    public CommonResult<Boolean> updatePurchaseOrderStatus(@RequestParam("id") Long id,
-                                                           @RequestParam("status") Integer status) {
-        erpPurchaseRequestService.updatePurchaseRequestStatus(id, status);
-        return success(true);
-    }
-
     @DeleteMapping("/delete")
     @Operation(summary = "删除ERP采购申请单")
     @Parameter(name = "id", description = "编号数组", required = true)
@@ -92,27 +84,24 @@ public class ErpPurchaseRequestController {
         erpPurchaseRequestService.deletePurchaseRequest(ids);
         return success(true);
     }
-    @PutMapping("/review")
+
+    @PutMapping("/auditStatus")
     @Operation(summary = "审核/反审核采购订单")
     @Parameter(name = "requestId", description = "申请单编号", required = true)
     @Parameter(name = "reviewed", description = "审核状态", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:review')")
-    public CommonResult<Boolean> reviewPurchaseRequest(@RequestParam("requestId") Long requestId,
-                                                       @RequestParam("reviewed") Boolean reviewed) {
-        //TODO 审核订单-审核、反审核
-//        purchaseOrderService.updatePurchaseOrderStatus(id, status);
-        erpPurchaseRequestService.reviewPurchaseOrder(requestId, reviewed);
+    public CommonResult<Boolean> reviewPurchaseRequest(@RequestParam("requestId") Long requestId,@RequestParam("reviewed") Boolean reviewed) {
+        erpPurchaseRequestService.reviewPurchaseOrder(requestId,null, reviewed);
         return success(true);
     }
+
     @PutMapping("/status")
     @Operation(summary = "关闭/启用申请单")
     @Parameter(name = "id", description = "申请单id", required = true)
     @Parameter(name = "enable", description = "开启、关闭", required = true)
     @Parameter(name = "itemIds", description = "申请单商品ids", required = false)
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:enable')")
-    public CommonResult<Boolean> switchPurchaseOrderStatus(@RequestParam("requestId") Long requestId,
-                                                           @RequestParam("itemId") List<Long> itemIds,
-                                                           @RequestParam("enable") Boolean enable) {
+    public CommonResult<Boolean> switchPurchaseOrderStatus(@RequestParam("requestId") Long requestId, @RequestParam("itemId") List<Long> itemIds, @RequestParam("enable") Boolean enable) {
         erpPurchaseRequestService.switchPurchaseOrderStatus(requestId, itemIds, enable);
         return success(true);
     }
@@ -139,7 +128,7 @@ public class ErpPurchaseRequestController {
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
             convertSet(purchaseRequestItemsList, ErpPurchaseRequestItemsDO::getProductId));
         return success(BeanUtils.toBean(purchaseRequest, ErpPurchaseRequestRespVO.class, purchaseOrderVO ->
-            purchaseOrderVO.setItems(BeanUtils.toBean(purchaseRequestItemsList, ErpPurchaseRequestRespVO.Item.class, item -> {
+            purchaseOrderVO.setItems(BeanUtils.toBean(purchaseRequestItemsList, ErpPurchaseRequestItemRespVO.class, item -> {
                 MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
                     .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()));
             }))));
@@ -216,7 +205,7 @@ public class ErpPurchaseRequestController {
             MapUtils.findAndThen(deptMap, safeParseLong(purchaseRequest.getApplicationDept()), dept -> purchaseRequest.setApplicationDept(dept.getName()));
 
             purchaseRequest.setItems(
-                BeanUtils.toBean(purchaseRequestItemMap.get(purchaseRequest.getId()), ErpPurchaseRequestRespVO.Item.class,
+                BeanUtils.toBean(purchaseRequestItemMap.get(purchaseRequest.getId()), ErpPurchaseRequestItemRespVO.class,
                     item -> {
                         MapUtils.findAndThen(productMap, item.getProductId(), product -> item
                             .setProductName(product.getName())
@@ -232,9 +221,9 @@ public class ErpPurchaseRequestController {
             );
             //2.2 申请单-产品项
             //产品名称汇总拼接
-            purchaseRequest.setProductNames(CollUtil.join(purchaseRequest.getItems(), "，", ErpPurchaseRequestRespVO.Item::getProductName));
+            purchaseRequest.setProductNames(CollUtil.join(purchaseRequest.getItems(), "，", ErpPurchaseRequestItemRespVO::getProductName));
             //订单产品总数
-            purchaseRequest.setTotalCount(CollUtil.isEmpty(purchaseRequest.getItems()) ? 0 : purchaseRequest.getItems().stream().mapToInt(ErpPurchaseRequestRespVO.Item::getCount).sum());
+            purchaseRequest.setTotalCount(CollUtil.isEmpty(purchaseRequest.getItems()) ? 0 : purchaseRequest.getItems().stream().mapToInt(ErpPurchaseRequestItemRespVO::getCount).sum());
             //创建者、更新者、审核人、申请人填充
             MapUtils.findAndThen(userMap, safeParseLong(purchaseRequest.getApplicant()), user -> purchaseRequest.setApplicant(user.getNickname()));
             MapUtils.findAndThen(userMap, safeParseLong(purchaseRequest.getAuditor()), user -> purchaseRequest.setAuditor(user.getNickname()));

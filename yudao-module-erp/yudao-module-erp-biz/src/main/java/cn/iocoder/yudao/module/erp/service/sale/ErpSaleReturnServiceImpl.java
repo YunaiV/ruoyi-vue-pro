@@ -89,7 +89,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
 
         // 2.1 插入退货
         ErpSaleReturnDO saleReturn = BeanUtils.toBean(createReqVO, ErpSaleReturnDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()))
+                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getCode()))
                 .setOrderNo(saleOrder.getNo()).setCustomerId(saleOrder.getCustomerId());
         calculateTotalPrice(saleReturn, saleReturnItems);
         saleReturnMapper.insert(saleReturn);
@@ -107,7 +107,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
     public void updateSaleReturn(ErpSaleReturnSaveReqVO updateReqVO) {
         // 1.1 校验存在
         ErpSaleReturnDO saleReturn = validateSaleReturnExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVE.getStatus().equals(saleReturn.getStatus())) {
+        if (ErpAuditStatus.APPROVE.getCode().equals(saleReturn.getStatus())) {
             throw exception(SALE_RETURN_UPDATE_FAIL_APPROVE, saleReturn.getNo());
         }
         // 1.2 校验销售订单已审核
@@ -163,7 +163,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateSaleReturnStatus(Long id, Integer status) {
-        boolean approve = ErpAuditStatus.APPROVE.getStatus().equals(status);
+        boolean approve = ErpAuditStatus.APPROVE.getCode().equals(status);
         // 1.1 校验存在
         ErpSaleReturnDO saleReturn = validateSaleReturnExists(id);
         // 1.2 校验状态
@@ -252,7 +252,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
             return;
         }
         saleReturns.forEach(saleReturn -> {
-            if (ErpAuditStatus.APPROVE.getStatus().equals(saleReturn.getStatus())) {
+            if (ErpAuditStatus.APPROVE.getCode().equals(saleReturn.getStatus())) {
                 throw exception(SALE_RETURN_DELETE_FAIL_APPROVE, saleReturn.getNo());
             }
         });
@@ -286,7 +286,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
     @Override
     public ErpSaleReturnDO validateSaleReturn(Long id) {
         ErpSaleReturnDO saleReturn = validateSaleReturnExists(id);
-        if (ObjectUtil.notEqual(saleReturn.getStatus(), ErpAuditStatus.APPROVE.getStatus())) {
+        if (ObjectUtil.notEqual(saleReturn.getStatus(), ErpAuditStatus.APPROVE.getCode())) {
             throw exception(SALE_RETURN_NOT_APPROVE);
         }
         return saleReturn;

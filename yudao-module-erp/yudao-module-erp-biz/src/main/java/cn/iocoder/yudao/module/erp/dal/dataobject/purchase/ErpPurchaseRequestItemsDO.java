@@ -56,6 +56,10 @@ public class ErpPurchaseRequestItemsDO extends BaseDO {
      */
     private Integer offStatus;
     /**
+     * 采购状态
+     */
+    private Integer orderStatus;
+    /**
      * 价税合计
      */
     private BigDecimal allAmount;

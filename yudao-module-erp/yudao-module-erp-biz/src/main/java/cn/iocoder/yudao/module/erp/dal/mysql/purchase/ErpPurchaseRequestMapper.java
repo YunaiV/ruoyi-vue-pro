@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestPageReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -34,11 +33,5 @@ public interface ErpPurchaseRequestMapper extends BaseMapperX<ErpPurchaseRequest
     default ErpPurchaseRequestDO selectByNo(String no) {
         return selectOne(ErpPurchaseRequestDO::getNo, no);
     }
-
-    default int updateByIdAndStatus(Long id, Integer status, ErpPurchaseRequestDO updateObj) {
-        return update(updateObj, new LambdaUpdateWrapper<ErpPurchaseRequestDO>()
-            .eq(ErpPurchaseRequestDO::getId, id).eq(ErpPurchaseRequestDO::getStatus, status));
-    }
-
 
 }

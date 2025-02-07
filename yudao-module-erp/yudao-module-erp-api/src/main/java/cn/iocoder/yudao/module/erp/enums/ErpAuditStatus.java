@@ -27,37 +27,22 @@ public enum ErpAuditStatus implements IntArrayValuable {
     PROCESSING(12, "审核中"),
     APPROVE(20, "已审核"),
     REJECTED(14, "审核不通过"),
-    REVERSED(5, "反审核"),
-
-    // 3. 订单状态
-    OT_ORDERED(41, "未订购"),
-    ORDERED(42, "已订购"),
-    PARTIALLY_ORDERED(43, "部分订购"),
-    ORDER_FAILED(44, "订购失败"),
-
-    // 4. 其他处理状态
-    ON_HOLD(45, "待处理"),
-
-    // 5. 关闭状态
-    CLOSED(2, "已关闭"),
-    MANUAL_CLOSED(91, "手动关闭"),
-    OPENED(1, "已开启"),
-    ;
+    REVERSED(5, "反审核");
 
     private static final Map<Integer, ErpAuditStatus> STATUS_MAP = new HashMap<>();
 
     static {
         for (ErpAuditStatus status : values()) {
-            STATUS_MAP.put(status.status, status);
+            STATUS_MAP.put(status.code, status);
         }
     }
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ErpAuditStatus::getStatus).toArray();
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ErpAuditStatus::getCode).toArray();
 
     /**
      * 状态
      */
-    private final Integer status;
+    private final Integer code;
     /**
      * 状态名
      */
@@ -71,11 +56,19 @@ public enum ErpAuditStatus implements IntArrayValuable {
     /**
      * 根据状态码获取状态枚举的描述。
      *
-     * @param status 状态码
+     * @param code 状态码
      * @return 状态描述，如果没有找到则返回null
      */
-    public static String getDescriptionByStatus(Integer status) {
-        ErpAuditStatus statusEnum = STATUS_MAP.get(status);
+    public static String getDescriptionByCode(Integer code) {
+        ErpAuditStatus statusEnum = STATUS_MAP.get(code);
         return statusEnum != null ? statusEnum.getName() : null;
+    }
+    public static ErpAuditStatus fromCode(int code) {
+        for (ErpAuditStatus status : ErpAuditStatus.values()) {
+            if (status.getCode() == code) {
+                return status;
+            }
+        }
+        throw new IllegalArgumentException("无效的订购状态码: " + code);
     }
 }

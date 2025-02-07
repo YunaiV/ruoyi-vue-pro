@@ -83,7 +83,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
 
         // 2.1 插入订单
         ErpSaleOrderDO saleOrder = BeanUtils.toBean(createReqVO, ErpSaleOrderDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()));
+                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getCode()));
         calculateTotalPrice(saleOrder, saleOrderItems);
         saleOrderMapper.insert(saleOrder);
         // 2.2 插入订单项
@@ -97,7 +97,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
     public void updateSaleOrder(ErpSaleOrderSaveReqVO updateReqVO) {
         // 1.1 校验存在
         ErpSaleOrderDO saleOrder = validateSaleOrderExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVE.getStatus().equals(saleOrder.getStatus())) {
+        if (ErpAuditStatus.APPROVE.getCode().equals(saleOrder.getStatus())) {
             throw exception(SALE_ORDER_UPDATE_FAIL_APPROVE, saleOrder.getNo());
         }
         // 1.2 校验客户
@@ -137,7 +137,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateSaleOrderStatus(Long id, Integer status) {
-        boolean approve = ErpAuditStatus.APPROVE.getStatus().equals(status);
+        boolean approve = ErpAuditStatus.APPROVE.getCode().equals(status);
         // 1.1 校验存在
         ErpSaleOrderDO saleOrder = validateSaleOrderExists(id);
         // 1.2 校验状态
@@ -247,7 +247,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
             return;
         }
         saleOrders.forEach(saleOrder -> {
-            if (ErpAuditStatus.APPROVE.getStatus().equals(saleOrder.getStatus())) {
+            if (ErpAuditStatus.APPROVE.getCode().equals(saleOrder.getStatus())) {
                 throw exception(SALE_ORDER_DELETE_FAIL_APPROVE, saleOrder.getNo());
             }
         });
@@ -277,7 +277,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
     @Override
     public ErpSaleOrderDO validateSaleOrder(Long id) {
         ErpSaleOrderDO saleOrder = validateSaleOrderExists(id);
-        if (ObjectUtil.notEqual(saleOrder.getStatus(), ErpAuditStatus.APPROVE.getStatus())) {
+        if (ObjectUtil.notEqual(saleOrder.getStatus(), ErpAuditStatus.APPROVE.getCode())) {
             throw exception(SALE_ORDER_NOT_APPROVE);
         }
         return saleOrder;

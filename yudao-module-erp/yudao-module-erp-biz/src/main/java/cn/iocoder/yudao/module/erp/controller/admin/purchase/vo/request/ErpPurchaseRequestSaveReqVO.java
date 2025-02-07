@@ -21,22 +21,21 @@ public class ErpPurchaseRequestSaveReqVO {
     private Long id;
 
     @Schema(description = "申请人", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "申请人不能为空")
+//    @NotNull(message = "申请人不能为空")
     private Long applicant;
 
     @Schema(description = "申请部门")
-    @NotNull(message = "申请部门不能为空")
+//    @NotNull(message = "申请部门不能为空")
     private Long applicationDept;
 
     @Schema(description = "单据日期", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "单据日期不能为空")
+//    @NotNull(message = "单据日期不能为空")
     private LocalDateTime requestTime;
 
     @Schema(description = "单据编号", example = "CGDD-20250108-000027")
     private String no;
 
     @Schema(description = "单据标签")
-    @NotNull(message = "单据标签不能为空")
     private String tag;
 
     @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1724")

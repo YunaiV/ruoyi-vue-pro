@@ -203,6 +203,12 @@ public interface ErrorCodeConstants {
     ErrorCode PURCHASE_REQUEST_PROCESS_FAIL = new ErrorCode(1_030_101_008, "反审核失败，只有已审核的采购申请单才能反审核");
     ErrorCode PURCHASE_REQUEST_APPROVE_FAIL = new ErrorCode(1_030_101_009, "审核失败，只有未审核的采购申请单才能审核");
     ErrorCode PURCHASE_REQUEST_CLOSE_FAIL  = new ErrorCode(1_030_101_010, "未审核的采购申请单({})不能进行关闭");
+    ErrorCode PURCHASE_REQUEST_UPDATE_FAIL_AUDIT_STATUS  = new ErrorCode(1_030_101_011, "非法审核状态变更({})->({})");
+    ErrorCode PURCHASE_REQUEST_UPDATE_FAIL_ORDER_STATUS  = new ErrorCode(1_030_101_012, "非法采购状态变更({})->({})");
+    ErrorCode PURCHASE_REQUEST_UPDATE_FAIL_OFF_STATUS  = new ErrorCode(1_030_101_013, "非法开关状态变更({})->({})");
+    ErrorCode PURCHASE_REQUEST_UPDATE_FAIL  = new ErrorCode(1_030_101_014, "订单编号({})更新状态失败，请联系管理员");
+    ErrorCode PURCHASE_REQUEST_ITEM_CLOSED  = new ErrorCode(1_030_101_015, "id({})已关闭,采购项无法修改");
+    ErrorCode PURCHASE_REQUEST_ITEM_MANUAL_CLOSED  = new ErrorCode(1_030_101_016, "id({})已手动关闭,采购项无法修改");
 
     // ========== ERP 海关规则 1-030-604-000 ==========
     ErrorCode CUSTOM_RULE_NOT_EXISTS = new ErrorCode(1_030_604_000, "ERP 海关规则不存在");

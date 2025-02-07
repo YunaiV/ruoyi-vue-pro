@@ -70,7 +70,16 @@ public interface ErpPurchaseRequestService {
      * @param id     采购申请单id
      * @param status 状态
      */
-    void updatePurchaseRequestStatus(Long id, Integer status);
+    void updatePurchaseRequestStatus(Long id, Integer auditStatus, Integer orderStatus, Integer offStatus);
+
+    /**
+     * 更新采购申请单子项状态(审核状态+关闭状态)
+     *
+     * @param itemIds     子表id
+     * @param orderStatus 采购状态
+     * @param offStatus   关闭状态
+     */
+    void updatePurchaseRequestItemList(List<Long> itemIds, Integer orderStatus, Integer offStatus);
 
     /**
      * 获得采购订单项 List
@@ -79,19 +88,22 @@ public interface ErpPurchaseRequestService {
      * @return 采购订单项 List
      */
     List<ErpPurchaseRequestItemsDO> getPurchaseRequestItemListByOrderIds(Collection<Long> requestIds);
+
     /**
      * 审核/反审核采购订单
      *
      * @param requestId 采购订单id
-     * @param reviewed 审核状态
+     * @param itemIds   采购订单子项id集合
+     * @param reviewed  审核状态
      */
-    void reviewPurchaseOrder(Long requestId, Boolean reviewed);
+    void reviewPurchaseOrder(Long requestId, List<Long> itemIds, Boolean reviewed);
+
     /**
      * 启用/关闭申请单子项，自动更新父订单状态
      *
      * @param requestId 采购订单id
-     * @param itemIds 采购订单子项id集合
-     * @param enable 开启/关闭
+     * @param itemIds   采购订单子项id集合
+     * @param enable    开启/关闭
      */
     void switchPurchaseOrderStatus(Long requestId, List<Long> itemIds, Boolean enable);
 
@@ -105,16 +117,19 @@ public interface ErpPurchaseRequestService {
 
     /**
      * 校验采购订单的子项目是否合法
+     *
      * @param items 采购订单子项目集合
      *              1、校验产品有效性 2、校验仓库有效性
      * @Return 采购订单子项目
      */
-     List<ErpPurchaseRequestItemsDO> validatePurchaseRequestItems(List<ErpPurchaseRequestItemsSaveReqVO> items);
+    List<ErpPurchaseRequestItemsDO> validatePurchaseRequestItems(List<ErpPurchaseRequestItemsSaveReqVO> items);
+
     /**
      * 校验采购订单的子项表id否关联主表
+     *
      * @param masterId 主表id-申请单
-     * @param itemIds itemIds 子表id集合-申请项
+     * @param itemIds  itemIds 子表id集合-申请项
      * @Return void
      */
-    void validatePurchaseRequestItemsMasterId(Long masterId,List<Long> itemIds);
+    void validatePurchaseRequestItemsMasterId(Long masterId, List<Long> itemIds);
 }

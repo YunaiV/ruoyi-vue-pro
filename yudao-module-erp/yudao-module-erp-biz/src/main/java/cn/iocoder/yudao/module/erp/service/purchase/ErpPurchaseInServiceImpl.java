@@ -85,11 +85,11 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
 
         // 2.1 插入入库
         ErpPurchaseInDO purchaseIn = BeanUtils.toBean(createReqVO, ErpPurchaseInDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()))
+                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getCode()))
                 .setOrderNo(purchaseOrder.getNo()).setSupplierId(purchaseOrder.getSupplierId());
         calculateTotalPrice(purchaseIn, purchaseInItems);
         // 2.1.1 设置入库单默认的审核状态-未审核。
-        purchaseIn.setAuditorStatus(ErpAuditStatus.PROCESS.getStatus());
+        purchaseIn.setAuditorStatus(ErpAuditStatus.PROCESS.getCode());
         purchaseInMapper.insert(purchaseIn);
         // 2.2 插入入库项
         purchaseInItems.forEach(o -> o.setInId(purchaseIn.getId()));
@@ -105,7 +105,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     public void updatePurchaseIn(ErpPurchaseInSaveReqVO updateReqVO) {
         // 1.1 校验存在
         ErpPurchaseInDO purchaseIn = validatePurchaseInExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVE.getStatus().equals(purchaseIn.getStatus())) {
+        if (ErpAuditStatus.APPROVE.getCode().equals(purchaseIn.getStatus())) {
             throw exception(PURCHASE_IN_UPDATE_FAIL_APPROVE, purchaseIn.getNo());
         }
         // 1.2 校验采购订单已审核
@@ -157,7 +157,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePurchaseInStatus(Long id, Integer status) {
-        boolean approve = ErpAuditStatus.APPROVE.getStatus().equals(status);
+        boolean approve = ErpAuditStatus.APPROVE.getCode().equals(status);
         // 1.1 校验存在
         ErpPurchaseInDO purchaseIn = validatePurchaseInExists(id);
         // 1.2 校验状态
@@ -246,7 +246,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
             return;
         }
         purchaseIns.forEach(purchaseIn -> {
-            if (ErpAuditStatus.APPROVE.getStatus().equals(purchaseIn.getStatus())) {
+            if (ErpAuditStatus.APPROVE.getCode().equals(purchaseIn.getStatus())) {
                 throw exception(PURCHASE_IN_DELETE_FAIL_APPROVE, purchaseIn.getNo());
             }
         });
@@ -280,7 +280,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     @Override
     public ErpPurchaseInDO validatePurchaseIn(Long id) {
         ErpPurchaseInDO purchaseIn = validatePurchaseInExists(id);
-        if (ObjectUtil.notEqual(purchaseIn.getStatus(), ErpAuditStatus.APPROVE.getStatus())) {
+        if (ObjectUtil.notEqual(purchaseIn.getStatus(), ErpAuditStatus.APPROVE.getCode())) {
             throw exception(PURCHASE_IN_NOT_APPROVE);
         }
         return purchaseIn;

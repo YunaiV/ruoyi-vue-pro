@@ -69,7 +69,7 @@ public class ErpStockCheckServiceImpl implements ErpStockCheckService {
 
         // 2.1 插入盘点单
         ErpStockCheckDO stockCheck = BeanUtils.toBean(createReqVO, ErpStockCheckDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus())
+                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getCode())
                 .setTotalCount(getSumValue(stockCheckItems, ErpStockCheckItemDO::getCount, BigDecimal::add))
                 .setTotalPrice(getSumValue(stockCheckItems, ErpStockCheckItemDO::getTotalPrice, BigDecimal::add, BigDecimal.ZERO)));
         stockCheckMapper.insert(stockCheck);
@@ -84,7 +84,7 @@ public class ErpStockCheckServiceImpl implements ErpStockCheckService {
     public void updateStockCheck(ErpStockCheckSaveReqVO updateReqVO) {
         // 1.1 校验存在
         ErpStockCheckDO stockCheck = validateStockCheckExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVE.getStatus().equals(stockCheck.getStatus())) {
+        if (ErpAuditStatus.APPROVE.getCode().equals(stockCheck.getStatus())) {
             throw exception(STOCK_CHECK_UPDATE_FAIL_APPROVE, stockCheck.getNo());
         }
         // 1.2 校验盘点项的有效性
@@ -102,7 +102,7 @@ public class ErpStockCheckServiceImpl implements ErpStockCheckService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateStockCheckStatus(Long id, Integer status) {
-        boolean approve = ErpAuditStatus.APPROVE.getStatus().equals(status);
+        boolean approve = ErpAuditStatus.APPROVE.getCode().equals(status);
         // 1.1 校验存在
         ErpStockCheckDO stockCheck = validateStockCheckExists(id);
         // 1.2 校验状态
@@ -181,7 +181,7 @@ public class ErpStockCheckServiceImpl implements ErpStockCheckService {
             return;
         }
         stockChecks.forEach(stockCheck -> {
-            if (ErpAuditStatus.APPROVE.getStatus().equals(stockCheck.getStatus())) {
+            if (ErpAuditStatus.APPROVE.getCode().equals(stockCheck.getStatus())) {
                 throw exception(STOCK_CHECK_DELETE_FAIL_APPROVE, stockCheck.getNo());
             }
         });

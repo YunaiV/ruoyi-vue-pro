@@ -70,7 +70,7 @@ public class ErpStockMoveServiceImpl implements ErpStockMoveService {
 
         // 2.1 插入出库单
         ErpStockMoveDO stockMove = BeanUtils.toBean(createReqVO, ErpStockMoveDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus())
+                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getCode())
                 .setTotalCount(getSumValue(stockMoveItems, ErpStockMoveItemDO::getCount, BigDecimal::add))
                 .setTotalPrice(getSumValue(stockMoveItems, ErpStockMoveItemDO::getTotalPrice, BigDecimal::add, BigDecimal.ZERO)));
         stockMoveMapper.insert(stockMove);
@@ -85,7 +85,7 @@ public class ErpStockMoveServiceImpl implements ErpStockMoveService {
     public void updateStockMove(ErpStockMoveSaveReqVO updateReqVO) {
         // 1.1 校验存在
         ErpStockMoveDO stockMove = validateStockMoveExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVE.getStatus().equals(stockMove.getStatus())) {
+        if (ErpAuditStatus.APPROVE.getCode().equals(stockMove.getStatus())) {
             throw exception(STOCK_MOVE_UPDATE_FAIL_APPROVE, stockMove.getNo());
         }
         // 1.2 校验出库项的有效性
@@ -103,7 +103,7 @@ public class ErpStockMoveServiceImpl implements ErpStockMoveService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateStockMoveStatus(Long id, Integer status) {
-        boolean approve = ErpAuditStatus.APPROVE.getStatus().equals(status);
+        boolean approve = ErpAuditStatus.APPROVE.getCode().equals(status);
         // 1.1 校验存在
         ErpStockMoveDO stockMove = validateStockMoveExists(id);
         // 1.2 校验状态
@@ -178,7 +178,7 @@ public class ErpStockMoveServiceImpl implements ErpStockMoveService {
             return;
         }
         stockMoves.forEach(stockMove -> {
-            if (ErpAuditStatus.APPROVE.getStatus().equals(stockMove.getStatus())) {
+            if (ErpAuditStatus.APPROVE.getCode().equals(stockMove.getStatus())) {
                 throw exception(STOCK_MOVE_DELETE_FAIL_APPROVE, stockMove.getNo());
             }
         });

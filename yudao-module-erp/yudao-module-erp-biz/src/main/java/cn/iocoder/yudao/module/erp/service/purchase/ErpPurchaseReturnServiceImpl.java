@@ -81,7 +81,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
 
         // 2.1 插入退货
         ErpPurchaseReturnDO purchaseReturn = BeanUtils.toBean(createReqVO, ErpPurchaseReturnDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()))
+                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getCode()))
                 .setOrderNo(purchaseOrder.getNo()).setSupplierId(purchaseOrder.getSupplierId());
         calculateTotalPrice(purchaseReturn, purchaseReturnItems);
         purchaseReturnMapper.insert(purchaseReturn);
@@ -99,7 +99,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
     public void updatePurchaseReturn(ErpPurchaseReturnSaveReqVO updateReqVO) {
         // 1.1 校验存在
         ErpPurchaseReturnDO purchaseReturn = validatePurchaseReturnExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVE.getStatus().equals(purchaseReturn.getStatus())) {
+        if (ErpAuditStatus.APPROVE.getCode().equals(purchaseReturn.getStatus())) {
             throw exception(PURCHASE_RETURN_UPDATE_FAIL_APPROVE, purchaseReturn.getNo());
         }
         // 1.2 校验采购订单已审核
@@ -151,7 +151,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePurchaseReturnStatus(Long id, Integer status) {
-        boolean approve = ErpAuditStatus.APPROVE.getStatus().equals(status);
+        boolean approve = ErpAuditStatus.APPROVE.getCode().equals(status);
         // 1.1 校验存在
         ErpPurchaseReturnDO purchaseReturn = validatePurchaseReturnExists(id);
         // 1.2 校验状态
@@ -240,7 +240,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
             return;
         }
         purchaseReturns.forEach(purchaseReturn -> {
-            if (ErpAuditStatus.APPROVE.getStatus().equals(purchaseReturn.getStatus())) {
+            if (ErpAuditStatus.APPROVE.getCode().equals(purchaseReturn.getStatus())) {
                 throw exception(PURCHASE_RETURN_DELETE_FAIL_APPROVE, purchaseReturn.getNo());
             }
         });
@@ -274,7 +274,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
     @Override
     public ErpPurchaseReturnDO validatePurchaseReturn(Long id) {
         ErpPurchaseReturnDO purchaseReturn = getPurchaseReturn(id);
-        if (ObjectUtil.notEqual(purchaseReturn.getStatus(), ErpAuditStatus.APPROVE.getStatus())) {
+        if (ObjectUtil.notEqual(purchaseReturn.getStatus(), ErpAuditStatus.APPROVE.getCode())) {
             throw exception(PURCHASE_RETURN_NOT_APPROVE);
         }
         return purchaseReturn;

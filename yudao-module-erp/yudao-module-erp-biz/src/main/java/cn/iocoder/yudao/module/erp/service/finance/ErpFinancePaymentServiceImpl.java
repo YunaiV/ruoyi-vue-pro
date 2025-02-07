@@ -89,7 +89,7 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
 
         // 2.1 插入付款单
         ErpFinancePaymentDO payment = BeanUtils.toBean(createReqVO, ErpFinancePaymentDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()));
+                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getCode()));
         calculateTotalPrice(payment, paymentItems);
         financePaymentMapper.insert(payment);
         // 2.2 插入付款单项
@@ -106,7 +106,7 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
     public void updateFinancePayment(ErpFinancePaymentSaveReqVO updateReqVO) {
         // 1.1 校验存在
         ErpFinancePaymentDO payment = validateFinancePaymentExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVE.getStatus().equals(payment.getStatus())) {
+        if (ErpAuditStatus.APPROVE.getCode().equals(payment.getStatus())) {
             throw exception(FINANCE_PAYMENT_UPDATE_FAIL_APPROVE, payment.getNo());
         }
         // 1.2 校验供应商
@@ -139,7 +139,7 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateFinancePaymentStatus(Long id, Integer status) {
-        boolean approve = ErpAuditStatus.APPROVE.getStatus().equals(status);
+        boolean approve = ErpAuditStatus.APPROVE.getCode().equals(status);
         // 1.1 校验存在
         ErpFinancePaymentDO payment = validateFinancePaymentExists(id);
         // 1.2 校验状态
@@ -218,7 +218,7 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
             return;
         }
         payments.forEach(payment -> {
-            if (ErpAuditStatus.APPROVE.getStatus().equals(payment.getStatus())) {
+            if (ErpAuditStatus.APPROVE.getCode().equals(payment.getStatus())) {
                 throw exception(FINANCE_PAYMENT_DELETE_FAIL_APPROVE, payment.getNo());
             }
         });

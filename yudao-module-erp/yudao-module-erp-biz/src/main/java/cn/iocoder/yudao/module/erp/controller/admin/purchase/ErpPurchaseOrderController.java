@@ -184,7 +184,7 @@ public class ErpPurchaseOrderController {
                     MapUtils.findAndThen(warehouseMap, item.getWarehouseId(), erpWarehouseDO -> item.setWarehouseName(erpWarehouseDO.getName()));
                 }));
             purchaseOrder.setProductNames(CollUtil.join(purchaseOrder.getItems(), "，", ErpPurchaseOrderBaseRespVO.Item::getProductName));//设置订单下的产品信息
-            purchaseOrder.setStatusDesc(ErpAuditStatus.getDescriptionByStatus(purchaseOrder.getStatus()));//设置采购状态
+            purchaseOrder.setStatusDesc(ErpAuditStatus.getDescriptionByCode(purchaseOrder.getStatus()));//设置采购状态
             MapUtils.findAndThen(supplierMap, purchaseOrder.getSupplierId(), supplier -> purchaseOrder.setSupplierName(supplier.getName()));
             //设置创建人的部门name
             MapUtils.findAndThen(deptMap, adminUserApi.getUser(Long.parseLong(purchaseOrder.getCreator())).getDeptId(), deptRespDTO -> purchaseOrder.setDepartmentName(deptRespDTO.getName()));
