@@ -55,7 +55,7 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     @Transactional(rollbackFor = Exception.class)
     public Long createThingModel(IotThingModelSaveReqVO createReqVO) {
         // 1.1 校验功能标识符在同一产品下是否唯一
-        validateIdentifierUnique(createReqVO.getProductId(), createReqVO.getIdentifier());
+        validateIdentifierUnique(null, createReqVO.getProductId(), createReqVO.getIdentifier());
         // 1.2 功能名称在同一产品下是否唯一
         validateNameUnique(createReqVO.getProductId(), createReqVO.getName());
         // 1.3 校验产品状态，发布状态下，不允许新增功能
@@ -81,7 +81,7 @@ public class IotThingModelServiceImpl implements IotThingModelService {
         // 1.1 校验功能是否存在
         validateProductThingModelMapperExists(updateReqVO.getId());
         // 1.2 校验功能标识符是否唯一
-        validateIdentifierUniqueForUpdate(updateReqVO.getId(), updateReqVO.getProductId(), updateReqVO.getIdentifier());
+        validateIdentifierUnique(updateReqVO.getId(), updateReqVO.getProductId(), updateReqVO.getIdentifier());
         // 1.3 校验产品状态，发布状态下，不允许操作功能
         validateProductStatus(updateReqVO.getProductId());
 
@@ -159,8 +159,23 @@ public class IotThingModelServiceImpl implements IotThingModelService {
         }
     }
 
-    // TODO @puhui999：这个方法，和 validateIdentifierUnique 可以融合下
-    private void validateIdentifierUniqueForUpdate(Long id, Long productId, String identifier) {
+    private void validateIdentifierUnique(Long id, Long productId, String identifier) {
+        // 1.0 情况一：创建时校验
+        if (id == null) {
+            // 1.1 系统保留字段，不能用于标识符定义
+            if (StrUtil.equalsAny(identifier, "set", "get", "post", "property", "event", "time", "value")) {
+                throw exception(THING_MODEL_IDENTIFIER_INVALID);
+            }
+
+            // 1.2 校验唯一
+            IotThingModelDO thingModel = thingModelMapper.selectByProductIdAndIdentifier(productId, identifier);
+            if (thingModel != null) {
+                throw exception(THING_MODEL_IDENTIFIER_EXISTS);
+            }
+            return;
+        }
+
+        // 2.0 情况二：更新时校验
         IotThingModelDO thingModel = thingModelMapper.selectByProductIdAndIdentifier(productId, identifier);
         if (thingModel != null && ObjectUtil.notEqual(thingModel.getId(), id)) {
             throw exception(THING_MODEL_IDENTIFIER_EXISTS);
@@ -181,23 +196,10 @@ public class IotThingModelServiceImpl implements IotThingModelService {
         }
     }
 
-    private void validateIdentifierUnique(Long productId, String identifier) {
-        // 系统保留字段，不能用于标识符定义
-        if (StrUtil.equalsAny(identifier, "set", "get", "post", "property", "event", "time", "value")) {
-            throw exception(THING_MODEL_IDENTIFIER_INVALID);
-        }
-
-        // 校验唯一
-        IotThingModelDO thingModel = thingModelMapper.selectByProductIdAndIdentifier(productId, identifier);
-        if (thingModel != null) {
-            throw exception(THING_MODEL_IDENTIFIER_EXISTS);
-        }
-    }
-
     /**
      * 创建默认的事件和服务
      *
-     * @param productId 产品编号
+     * @param productId  产品编号
      * @param productKey 产品标识
      */
     public void createDefaultEventsAndServices(Long productId, String productKey) {
@@ -282,6 +284,7 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     }
 
     // TODO @haohao：是不是不用生成这个？目前属性上报，是个批量接口
+
     /**
      * 生成属性上报事件
      */
@@ -298,6 +301,7 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     }
 
     // TODO @haohao：是不是不用生成这个？目前属性上报，是个批量接口
+
     /**
      * 生成属性设置服务
      */
@@ -352,7 +356,8 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     }
 
     @CacheEvict(value = RedisKeyConstants.THING_MODEL_LIST, key = "#productKey")
-    public void deleteThingModelListCache0(String productKey) {}
+    public void deleteThingModelListCache0(String productKey) {
+    }
 
     private IotThingModelServiceImpl getSelf() {
         return SpringUtil.getBean(getClass());
