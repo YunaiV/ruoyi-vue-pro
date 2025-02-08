@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.dal.redis;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -48,7 +49,10 @@ public class BpmProcessIdRedisDAO {
         String noPrefix = processIdRule.getPrefix() + infix + processIdRule.getPostfix();
         String key = RedisKeyConstants.BPM_PROCESS_ID + noPrefix;
         Long no = stringRedisTemplate.opsForValue().increment(key);
-        stringRedisTemplate.expire(key, Duration.ofDays(1L));
+        if (StrUtil.isEmpty(infix)) {
+            // 特殊：没有前缀，则不能过期，不能每次都是从 0 开始
+            stringRedisTemplate.expire(key, Duration.ofDays(1L));
+        }
         return noPrefix + String.format("%0" + processIdRule.getLength() + "d", no);
     }
 

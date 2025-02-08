@@ -199,4 +199,12 @@ public class JsonUtils {
         return JSONUtil.isTypeJSON(text);
     }
 
+    /**
+     * 判断字符串是否为 JSON 类型的字符串
+     * @param str 字符串
+     */
+    public static boolean isJsonObject(String str) {
+        return JSONUtil.isTypeJSONObject(str);
+    }
+
 }
