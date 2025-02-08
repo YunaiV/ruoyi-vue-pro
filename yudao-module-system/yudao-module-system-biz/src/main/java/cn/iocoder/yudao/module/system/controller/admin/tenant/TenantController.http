@@ -5,7 +5,7 @@ GET {{baseUrl}}/system/tenant/get-id-by-name?name=芋道源码
 POST {{baseUrl}}/system/tenant/create
 Content-Type: application/json
 Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
 
 {
   "name": "芋道",
