@@ -10,7 +10,6 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-// TODO @puhui999：部分字段，可以用 cursor 加上 example
 @Schema(description = "管理后台 - IoT 产品物模型 Response VO")
 @Data
 @ExcelIgnoreUnannotated
@@ -20,23 +19,23 @@ public class IotThingModelRespVO {
     @ExcelProperty("产品ID")
     private Long id;
 
-    @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long productId;
 
-    @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "temperature_sensor")
     @ExcelProperty("产品标识")
     private String productKey;
 
-    @Schema(description = "功能标识", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "功能标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "temperature")
     private String identifier;
 
-    @Schema(description = "功能名称", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "功能名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "温度")
     private String name;
 
-    @Schema(description = "功能描述", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "功能描述", requiredMode = Schema.RequiredMode.REQUIRED, example = "测量当前环境温度")
     private String description;
 
-    @Schema(description = "功能类型", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "功能类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer type;
 
     @Schema(description = "属性", requiredMode = Schema.RequiredMode.REQUIRED)
