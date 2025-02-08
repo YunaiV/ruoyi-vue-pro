@@ -9,6 +9,7 @@ import com.somle.esb.service.EsbService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -19,7 +20,7 @@ public class AmazonadSpAdvertisedProductReportDataJob extends AmazonadDataJob{
     public String execute(String param) throws Exception {
         setDate(param);
 
-        var baseMetric = List.of(
+        var baseMetric = new ArrayList<>(List.of(
             "date", "startDate", "endDate", "campaignName", "campaignId", "adGroupName", "adGroupId", "adId",
             "addToList", "qualifiedBorrows", "royaltyQualifiedBorrows", "portfolioId", "impressions", "clicks",
             "costPerClick", "clickThroughRate", "cost", "spend", "campaignBudgetCurrencyCode",
@@ -32,7 +33,7 @@ public class AmazonadSpAdvertisedProductReportDataJob extends AmazonadDataJob{
             "unitsSoldSameSku14d", "unitsSoldSameSku30d", "unitsSoldOtherSku7d",
             "kindleEditionNormalizedPagesRead14d", "kindleEditionNormalizedPagesRoyalties14d",
             "acosClicks7d", "acosClicks14d", "roasClicks7d", "roasClicks14d"
-        );
+        ));
 
         baseMetric.remove("startDate");
         baseMetric.remove("endDate");

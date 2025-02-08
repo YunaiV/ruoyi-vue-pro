@@ -7,6 +7,7 @@ import com.somle.amazon.controller.vo.AmazonSpReportReqVO.ProcessingStatuses;
 
 import com.somle.esb.model.OssData;
 import com.somle.framework.common.util.collection.MapUtils;
+import com.somle.framework.common.util.csv.TsvUtils;
 import com.somle.framework.common.util.json.JsonUtils;
 import org.springframework.stereotype.Component;
 
@@ -41,7 +42,7 @@ public class AmazonspSettlementReportDataJob extends AmazonspDataJob {
                     .syncType("inc")
                     .requestTimestamp(System.currentTimeMillis())
                     .folderDate(beforeYesterday)
-                    .content(report)
+                    .content(TsvUtils.toMapList(report))
                     .headers(null)
                     .build();
                 service.send(data);

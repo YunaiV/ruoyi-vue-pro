@@ -224,7 +224,7 @@ public class AmazonSpClient {
             log.info(status);
             switch (status) {
                 case "CANCELLED":
-                    throw new RuntimeException("No data returned, get report fail.");
+                    throw new RuntimeException("Report cancelled, possibly no data in given criteria.");
                 case "IN_QUEUE":
                     break;
                 case "IN_PROGRESS":

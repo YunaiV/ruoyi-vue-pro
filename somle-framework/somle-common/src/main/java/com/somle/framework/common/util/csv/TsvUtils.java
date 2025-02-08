@@ -8,9 +8,9 @@ import java.util.function.Function;
  * @author: c-tao
  * @date: 2024/12/19 9:12
  */
-public class CsvUtils {
+public class TsvUtils {
 
-    private static final CsvReaderX reader = new CsvReaderX(',');
+    private static final CsvReaderX reader = new CsvReaderX('\t');
 
     public static <T> List<T> toBean(String csvString, Class<T> clazz) {
         return reader.toBean(csvString, clazz);

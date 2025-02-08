@@ -5,6 +5,7 @@ import com.somle.amazon.controller.vo.AmazonAdReportReqVO;
 import com.somle.esb.model.OssData;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -15,7 +16,7 @@ public class AmazonadSdAdvertisedProductReportDataJob extends AmazonadDataJob{
     public String execute(String param) throws Exception {
         setDate(param);
 
-        var baseMetric = List.of(
+        var baseMetric = new ArrayList<>(List.of(
             "addToCart", "addToCartRate", "addToCartViews", "addToCartClicks", "adGroupId", "adGroupName",
             "adId", "addToList", "addToListFromClicks", "qualifiedBorrows", "royaltyQualifiedBorrows",
             "addToListFromViews", "qualifiedBorrowsFromClicks", "qualifiedBorrowsFromViews",
@@ -32,7 +33,7 @@ public class AmazonadSdAdvertisedProductReportDataJob extends AmazonadDataJob{
             "startDate", "unitsSold", "unitsSoldClicks", "videoCompleteViews", "videoFirstQuartileViews",
             "videoMidpointViews", "videoThirdQuartileViews", "videoUnmutes", "viewabilityRate",
             "viewClickThroughRate"
-        );
+        ));
 
         baseMetric.remove("startDate");
         baseMetric.remove("endDate");

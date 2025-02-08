@@ -3,6 +3,7 @@ package com.somle.esb.job;
 
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
 import com.somle.esb.model.OssData;
+import com.somle.framework.common.util.csv.TsvUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public class AmazonspStorageFeeReportDataJob extends AmazonspDataJob {
                     .syncType("inc")
                     .requestTimestamp(System.currentTimeMillis())
                     .folderDate(beforeYesterday)
-                    .content(report)
+                    .content(TsvUtils.toMapList(report))
                     .headers(null)
                     .build();
                 service.send(data);

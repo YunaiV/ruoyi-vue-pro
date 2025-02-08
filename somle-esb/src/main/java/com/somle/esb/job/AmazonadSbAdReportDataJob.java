@@ -19,7 +19,7 @@ public class AmazonadSbAdReportDataJob extends AmazonadDataJob{
     public String execute(String param) throws Exception {
         setDate(param);
 
-        var baseMetric = List.of(
+        var baseMetric = new ArrayList<>(List.of(
             "addToCart", "addToCartClicks", "addToCartRate", "adGroupId", "adGroupName", "adId",
             "brandedSearches", "brandedSearchesClicks", "campaignBudgetAmount", "campaignBudgetCurrencyCode",
             "campaignBudgetType", "campaignId", "campaignName", "campaignStatus", "clicks", "cost", "costType",
@@ -32,7 +32,7 @@ public class AmazonadSbAdReportDataJob extends AmazonadDataJob{
             "salesClicks", "salesPromoted", "unitsSold", "unitsSoldClicks", "video5SecondViewRate", "video5SecondViews",
             "videoCompleteViews", "videoFirstQuartileViews", "videoMidpointViews", "videoThirdQuartileViews",
             "videoUnmutes", "viewabilityRate", "viewableImpressions"
-        );
+        ));
 
         baseMetric.remove("startDate");
         baseMetric.remove("endDate");
