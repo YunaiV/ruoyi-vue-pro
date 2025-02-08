@@ -30,12 +30,12 @@ public interface IotDeviceService {
      *
      * @param productKey 产品标识
      * @param deviceName 设备名称
-     * @param gatewayId 网关设备 ID
+     * @param gatewayId  网关设备 ID
      * @return 设备
      */
     IotDeviceDO createDevice(@NotEmpty(message = "产品标识不能为空") String productKey,
-                             @NotEmpty(message = "设备名称不能为空") String deviceName,
-                             Long gatewayId);
+            @NotEmpty(message = "设备名称不能为空") String deviceName,
+            Long gatewayId);
 
     /**
      * 更新设备
@@ -58,7 +58,7 @@ public interface IotDeviceService {
     /**
      * 更新设备状态
      *
-     * @param id   编号
+     * @param id    编号
      * @param state 状态
      */
     void updateDeviceState(Long id, Integer state);

@@ -7,6 +7,8 @@ import lombok.Data;
 
 /**
  * IoT 设备【状态】更新 Request DTO
+ *
+ * @author 芋道源码
  */
 @Data
 public class IotDeviceStateUpdateReqDTO extends IotDeviceUpstreamAbstractReqDTO {

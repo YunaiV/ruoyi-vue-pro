@@ -220,6 +220,7 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
         if (CollUtil.isNotEmpty(registerReqDTO.getParams())) {
             registerReqDTO.getParams().forEach(subDevice -> registerDevice0(
                     subDevice.getProductKey(), subDevice.getDeviceName(), device.getId(), registerReqDTO));
+            // TODO @芋艿：后续要处理，每个设备是否成功
         }
 
         // 3. 发送设备消息
@@ -227,6 +228,52 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
                 .setType(IotDeviceMessageTypeEnum.REGISTER.getType())
                 .setIdentifier(IotDeviceMessageIdentifierEnum.REGISTER_REGISTER_SUB.getIdentifier())
                 .setData(registerReqDTO.getParams());
+        sendDeviceMessage(message, device);
+    }
+
+    @Override
+    public void addDeviceTopology(IotDeviceTopologyAddReqDTO addReqDTO) {
+        // 1.1 获得设备
+        log.info("[addDeviceTopology][添加设备拓扑: {}]", addReqDTO);
+        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(
+                addReqDTO.getProductKey(), addReqDTO.getDeviceName());
+        if (device == null) {
+            log.error("[addDeviceTopology][设备({}/{}) 不存在]",
+                    addReqDTO.getProductKey(), addReqDTO.getDeviceName());
+            return;
+        }
+        if (!IotProductDeviceTypeEnum.isGateway(device.getDeviceType())) {
+            log.error("[addDeviceTopology][设备({}/{}) 不是网关设备({})，无法进行拓扑添加]",
+                    addReqDTO.getProductKey(), addReqDTO.getDeviceName(), device);
+            return;
+        }
+        // 1.2 记录设备的最后时间
+        updateDeviceLastTime(device, addReqDTO);
+
+        // 2. 处理拓扑
+        if (CollUtil.isNotEmpty(addReqDTO.getParams())) {
+            TenantUtils.execute(device.getTenantId(), () -> {
+                addReqDTO.getParams().forEach(subDevice -> {
+                    IotDeviceDO subDeviceDO = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(
+                            subDevice.getProductKey(), subDevice.getDeviceName());
+                    // TODO @芋艿：后续要处理，每个设备是否成功
+                    if (subDeviceDO == null) {
+                        log.error("[addDeviceTopology][子设备({}/{}) 不存在]",
+                                subDevice.getProductKey(), subDevice.getDeviceName());
+                        return;
+                    }
+                    deviceService.updateDeviceGateway(subDeviceDO.getId(), device.getId());
+                    log.info("[addDeviceTopology][子设备({}/{}) 添加到网关设备({}) 成功]",
+                            subDevice.getProductKey(), subDevice.getDeviceName(), device);
+                });
+            });
+        }
+
+        // 3. 发送设备消息
+        IotDeviceMessage message = BeanUtils.toBean(addReqDTO, IotDeviceMessage.class)
+                .setType(IotDeviceMessageTypeEnum.TOPOLOGY.getType())
+                .setIdentifier(IotDeviceMessageIdentifierEnum.TOPOLOGY_ADD.getIdentifier())
+                .setData(addReqDTO.getParams());
         sendDeviceMessage(message, device);
     }
 

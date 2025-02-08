@@ -62,6 +62,15 @@ public interface IotDeviceUpstreamApi {
     @PostMapping(PREFIX + "/register-sub")
     CommonResult<Boolean> registerSubDevice(@Valid @RequestBody IotDeviceRegisterSubReqDTO registerReqDTO);
 
+    // TODO @芋艿：这个需要 plugins 接入下
+    /**
+     * 注册设备拓扑
+     *
+     * @param addReqDTO 注册设备拓扑 DTO
+     */
+    @PostMapping(PREFIX + "/add-topology")
+    CommonResult<Boolean> addDeviceTopology(@Valid @RequestBody IotDeviceTopologyAddReqDTO addReqDTO);
+
     // ========== 插件相关 ==========
 
     /**

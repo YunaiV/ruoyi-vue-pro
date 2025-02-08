@@ -81,8 +81,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     public IotDeviceDO createDevice(String productKey, String deviceName, Long gatewayId) {
         String deviceKey = generateDeviceKey();
         // 1.1 校验产品是否存在
-        IotProductDO product = TenantUtils.executeIgnore(() ->
-                productService.getProductByProductKey(productKey));
+        IotProductDO product = TenantUtils.executeIgnore(() -> productService.getProductByProductKey(productKey));
         if (product == null) {
             throw exception(PRODUCT_NOT_EXISTS);
         }
@@ -100,7 +99,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     private void validateCreateDeviceParam(String productKey, String deviceName, String deviceKey,
-                                           Long gatewayId, IotProductDO product) {
+            Long gatewayId, IotProductDO product) {
         TenantUtils.executeIgnore(() -> {
             // 校验设备名称在同一产品下是否唯一
             if (deviceMapper.selectByProductKeyAndDeviceName(productKey, deviceName) != null) {
@@ -120,7 +119,8 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     private void initDevice(IotDeviceDO device, IotProductDO product) {
-        device.setProductId(product.getId()).setProductKey(product.getProductKey()).setDeviceType(product.getDeviceType());
+        device.setProductId(product.getId()).setProductKey(product.getProductKey())
+                .setDeviceType(product.getDeviceType());
         // 生成并设置必要的字段
         // TODO @芋艿：各种 mqtt 是不是可以简化！
         device.setDeviceSecret(generateDeviceSecret())
@@ -269,7 +269,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         // 2. 更新状态和时间
         IotDeviceDO updateObj = new IotDeviceDO().setId(id).setState(state);
         if (device.getOnlineTime() == null
-            && Objects.equals(state, IotDeviceStateEnum.ONLINE.getState())) {
+                && Objects.equals(state, IotDeviceStateEnum.ONLINE.getState())) {
             updateObj.setActiveTime(LocalDateTime.now());
         }
         if (Objects.equals(state, IotDeviceStateEnum.ONLINE.getState())) {
@@ -363,7 +363,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
                 // 2.1.1 校验字段是否符合要求
                 try {
                     ValidationUtils.validate(importDevice);
-                } catch (ConstraintViolationException ex){
+                } catch (ConstraintViolationException ex) {
                     respVO.getFailureDeviceNames().put(importDevice.getDeviceName(), ex.getMessage());
                     return;
                 }
@@ -427,7 +427,8 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     @CacheEvict(value = RedisKeyConstants.DEVICE, key = "#device.productKey + '_' + #device.deviceName")
-    public void deleteDeviceCache0(IotDeviceDO device) {}
+    public void deleteDeviceCache0(IotDeviceDO device) {
+    }
 
     private IotDeviceServiceImpl getSelf() {
         return SpringUtil.getBean(getClass());

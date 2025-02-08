@@ -9,8 +9,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+// TODO @芋艿：参考阿里云的物模型，优化 IoT 上下行消息的设计，尽量保持一致（渐进式，不要一口气）！
 /**
- * 设备消息
+ * IoT 设备消息
  */
 @Data
 @NoArgsConstructor

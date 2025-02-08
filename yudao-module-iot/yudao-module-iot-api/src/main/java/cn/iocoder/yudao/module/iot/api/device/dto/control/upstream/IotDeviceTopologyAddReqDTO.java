@@ -6,19 +6,17 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * IoT 设备【注册】子设备 Request DTO
- *
- * @author 芋道源码
+ * IoT 设备【拓扑】添加 Request DTO
  */
 @Data
-public class IotDeviceRegisterSubReqDTO extends IotDeviceUpstreamAbstractReqDTO {
+public class IotDeviceTopologyAddReqDTO extends IotDeviceUpstreamAbstractReqDTO {
 
     // TODO @芋艿：看看要不要优化命名
     /**
      * 子设备数组
      */
     @NotEmpty(message = "子设备不能为空")
-    private List<Device> params;
+    private List<IotDeviceRegisterSubReqDTO.Device> params;
 
     /**
      * 设备信息
@@ -37,6 +35,8 @@ public class IotDeviceRegisterSubReqDTO extends IotDeviceUpstreamAbstractReqDTO 
          */
         @NotEmpty(message = "设备名称不能为空")
         private String deviceName;
+
+        // TODO @芋艿：阿里云还有 sign 签名
 
     }
 

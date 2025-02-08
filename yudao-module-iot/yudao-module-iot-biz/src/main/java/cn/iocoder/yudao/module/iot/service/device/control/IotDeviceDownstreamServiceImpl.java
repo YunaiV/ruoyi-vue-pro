@@ -88,6 +88,7 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
         if (Objects.equals(downstreamReqVO.getType(), IotDeviceMessageTypeEnum.OTA.getType())) {
             return otaUpgrade(downstreamReqVO, device, parentDevice);
         }
+        // TODO @芋艿：取消设备的网关的时，要不要下发 REGISTER_UNREGISTER_SUB ？
         throw new IllegalArgumentException("不支持的下行消息类型：" + downstreamReqVO);
     }
 

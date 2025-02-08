@@ -55,6 +55,12 @@ public class IoTDeviceUpstreamApiImpl implements IotDeviceUpstreamApi {
         return success(true);
     }
 
+    @Override
+    public CommonResult<Boolean> addDeviceTopology(IotDeviceTopologyAddReqDTO addReqDTO) {
+        deviceUpstreamService.addDeviceTopology(addReqDTO);
+        return success(true);
+    }
+
     // ========== 插件相关 ==========
 
     @Override

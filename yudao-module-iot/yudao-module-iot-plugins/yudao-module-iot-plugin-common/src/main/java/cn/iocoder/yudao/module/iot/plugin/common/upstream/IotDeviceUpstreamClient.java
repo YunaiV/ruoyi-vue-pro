@@ -2,10 +2,7 @@ package cn.iocoder.yudao.module.iot.plugin.common.upstream;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceEventReportReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDevicePropertyReportReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceStateUpdateReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotPluginInstanceHeartbeatReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.*;
 import cn.iocoder.yudao.module.iot.plugin.common.config.IotPluginCommonProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +37,24 @@ public class IotDeviceUpstreamClient implements IotDeviceUpstreamApi {
     public CommonResult<Boolean> reportDeviceEvent(IotDeviceEventReportReqDTO reportReqDTO) {
         String url = properties.getUpstreamUrl() + URL_PREFIX + "/report-event";
         return doPost(url, reportReqDTO);
+    }
+
+    // TODO @芋艿：待实现
+    @Override
+    public CommonResult<Boolean> registerDevice(IotDeviceRegisterReqDTO registerReqDTO) {
+        return null;
+    }
+
+    // TODO @芋艿：待实现
+    @Override
+    public CommonResult<Boolean> registerSubDevice(IotDeviceRegisterSubReqDTO registerReqDTO) {
+        return null;
+    }
+
+    // TODO @芋艿：待实现
+    @Override
+    public CommonResult<Boolean> addDeviceTopology(IotDeviceTopologyAddReqDTO addReqDTO) {
+        return null;
     }
 
     @Override

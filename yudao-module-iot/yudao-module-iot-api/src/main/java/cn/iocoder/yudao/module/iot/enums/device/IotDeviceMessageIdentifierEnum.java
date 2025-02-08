@@ -30,7 +30,10 @@ public enum IotDeviceMessageIdentifierEnum {
 
     REGISTER_REGISTER("register"), // 上行
     REGISTER_REGISTER_SUB("register_sub"), // 上行
-    REGISTER_UNREGISTER_SUB("unregister_sub"),; // 下行
+    REGISTER_UNREGISTER_SUB("unregister_sub"), // 下行
+
+    TOPOLOGY_ADD("topology_add"), // 下行;
+    ;
 
     /**
      * 标志符

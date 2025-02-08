@@ -55,4 +55,11 @@ public interface IotDeviceUpstreamService {
      */
     void registerSubDevice(IotDeviceRegisterSubReqDTO registerReqDTO);
 
+    /**
+     * 添加设备拓扑
+     *
+     * @param addReqDTO 添加设备拓扑 DTO
+     */
+    void addDeviceTopology(IotDeviceTopologyAddReqDTO addReqDTO);
+
 }
