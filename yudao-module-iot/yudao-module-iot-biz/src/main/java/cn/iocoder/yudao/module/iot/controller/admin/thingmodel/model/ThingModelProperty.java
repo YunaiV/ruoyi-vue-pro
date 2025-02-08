@@ -24,7 +24,7 @@ public class ThingModelProperty {
      * 属性标识符
      */
     @NotEmpty(message = "属性标识符不能为空")
-    @Pattern(regexp = "^[a-zA-Z][a-zA-Z0-9_]{0,31}$", message = "属性标识符只能由字母、数字和下划线组成，必须以字母开头，长度不超过32个字符")
+    @Pattern(regexp = "^[a-zA-Z][a-zA-Z0-9_]{0,31}$", message = "属性标识符只能由字母、数字和下划线组成，必须以字母开头，长度不超过 32 个字符")
     private String identifier;
     /**
      * 属性名称

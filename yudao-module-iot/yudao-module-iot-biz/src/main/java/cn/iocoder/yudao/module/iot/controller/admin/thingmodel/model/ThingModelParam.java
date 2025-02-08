@@ -22,7 +22,7 @@ public class ThingModelParam {
      * 参数标识符
      */
     @NotEmpty(message = "参数标识符不能为空")
-    @Pattern(regexp = "^[a-zA-Z][a-zA-Z0-9_]{0,31}$", message = "参数标识符只能由字母、数字和下划线组成，必须以字母开头，长度不超过32个字符")
+    @Pattern(regexp = "^[a-zA-Z][a-zA-Z0-9_]{0,31}$", message = "参数标识符只能由字母、数字和下划线组成，必须以字母开头，长度不超过 32 个字符")
     private String identifier;
     /**
      * 参数名称

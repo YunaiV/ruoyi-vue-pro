@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @ExcelIgnoreUnannotated
 public class IotThingModelRespVO {
 
-    @Schema(description = "产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "21816")
+    @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "21816")
     @ExcelProperty("产品ID")
     private Long id;
 
