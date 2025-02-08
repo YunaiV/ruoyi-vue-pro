@@ -32,7 +32,14 @@ public class BpmProcessInstancePageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
+    @Schema(description = "结束时间")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime[] endTime;
+
     @Schema(description = "发起用户编号", example = "1024")
     private Long startUserId; // 注意，只有在【流程实例】菜单，才使用该参数
+
+    @Schema(description = "动态表单字段查询 JSON Str", example = "{}")
+    private String formFieldsParams; // SpringMVC 在 get 请求下，无法方便的定义 Map 类型的参数，所以通过 String 接收后，逻辑里面转换
 
 }

@@ -3,7 +3,7 @@ POST {{baseUrl}}/system/social-client/send-subscribe-message
 Authorization: Bearer {{token}}
 Content-Type: application/json
 #Authorization: Bearer test100
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
 
 {
   "userId": 247,

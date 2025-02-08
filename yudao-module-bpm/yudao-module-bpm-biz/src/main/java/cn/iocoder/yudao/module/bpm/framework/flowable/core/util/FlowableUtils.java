@@ -26,6 +26,9 @@ import org.flowable.task.api.TaskInfo;
 
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 /**
  * Flowable 相关的工具方法
@@ -193,7 +196,6 @@ public class FlowableUtils {
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES);
     }
 
-    // TODO @lesan：如果值是 null 的情况，可能要调研下飞书、钉钉，是不是不返回哈！
     /**
      * 获得流程实例的摘要
      *
@@ -206,53 +208,40 @@ public class FlowableUtils {
      */
     public static List<KeyValue<String, String>> getSummary(BpmProcessDefinitionInfoDO processDefinitionInfo,
                                                             Map<String, Object> processVariables) {
-        // TODO @lesan：建议 if return，减少 { 层级
-        if (ObjectUtil.isNotNull(processDefinitionInfo)
-                && BpmModelFormTypeEnum.NORMAL.getType().equals(processDefinitionInfo.getFormType())) {
-            List<KeyValue<String, String>> summaryList = new ArrayList<>();
-            // TODO @lesan：可以使用 CollUtils.convertMap 简化工作量哈。
-            Map<String, BpmFormFieldVO> formFieldsMap = new HashMap<>();
-            processDefinitionInfo.getFormFields().forEach(formFieldStr -> {
-                BpmFormFieldVO formField = JsonUtils.parseObject(formFieldStr, BpmFormFieldVO.class);
-                if (formField != null) {
-                    formFieldsMap.put(formField.getField(), formField);
-                }
-            });
-
-            // TODO @lesan：这里也可以 if return，还是为了减少括号哈。这样，就可以写注释，情况一：；情况二：
-            if (ObjectUtil.isNotNull(processDefinitionInfo.getSummarySetting())
-                    && Boolean.TRUE.equals(processDefinitionInfo.getSummarySetting().getEnable())) {
-                // TODO @lesan：这里，也可以通过 CollUtils.convertList 简化哈。
-                for (String item : processDefinitionInfo.getSummarySetting().getSummary()) {
-                    BpmFormFieldVO formField = formFieldsMap.get(item);
-                    if (formField != null) {
-                        summaryList.add(new KeyValue<>(formField.getTitle(),
-                                processVariables.getOrDefault(item, "").toString()));
-                    }
-                }
-            } else {
-                // 默认展示前三个
-                /* TODO @lesan：stream 简化
-                 * summaryList.addAll(formFieldsMap.entrySet().stream()
-                 *         .limit(3)
-                 *         .map(entry -> new KeyValue<>(entry.getValue().getTitle(),
-                 *                 processVariables.getOrDefault(entry.getValue().getField(), "").toString()))
-                 *         .collect(Collectors.toList()));
-                 */
-                int j = 0;
-                for (Map.Entry<String, BpmFormFieldVO> entry : formFieldsMap.entrySet()) {
-                    BpmFormFieldVO formField = entry.getValue();
-                    if (j > 2) {
-                        break;
-                    }
-                    summaryList.add(new KeyValue<>(formField.getTitle(),
-                            processVariables.getOrDefault(formField.getField(), "").toString()));
-                    j++;
-                }
-            }
-            return summaryList;
+        // 只有流程表单才会显示摘要！
+        if (ObjectUtil.isNull(processDefinitionInfo)
+                || !BpmModelFormTypeEnum.NORMAL.getType().equals(processDefinitionInfo.getFormType())) {
+            return null;
         }
-        return null;
+
+        // 解析表单配置
+        Map<String, BpmFormFieldVO> formFieldsMap = new HashMap<>();
+        processDefinitionInfo.getFormFields().forEach(formFieldStr -> {
+            BpmFormFieldVO formField = JsonUtils.parseObject(formFieldStr, BpmFormFieldVO.class);
+            if (formField != null) {
+                formFieldsMap.put(formField.getField(), formField);
+            }
+        });
+
+        // 情况一：当自定义了摘要
+        if (ObjectUtil.isNotNull(processDefinitionInfo.getSummarySetting())
+                && Boolean.TRUE.equals(processDefinitionInfo.getSummarySetting().getEnable())) {
+            return convertList(processDefinitionInfo.getSummarySetting().getSummary(), item -> {
+                BpmFormFieldVO formField = formFieldsMap.get(item);
+                if (formField != null) {
+                    return new KeyValue<String, String>(formField.getTitle(),
+                            processVariables.getOrDefault(item, "").toString());
+                }
+                return null;
+            });
+        }
+
+        // 情况二：默认摘要展示前三个表单字段
+        return formFieldsMap.entrySet().stream()
+                .limit(3)
+                .map(entry -> new KeyValue<>(entry.getValue().getTitle(),
+                        processVariables.getOrDefault(entry.getValue().getField(), "").toString()))
+                .collect(Collectors.toList());
     }
 
     // ========== Task 相关的工具方法 ==========
@@ -317,9 +306,9 @@ public class FlowableUtils {
 
     private static Object getExpressionValue(VariableContainer variableContainer, String expressionString,
                                              ProcessEngineConfigurationImpl processEngineConfiguration) {
-        assert processEngineConfiguration!= null;
+        assert processEngineConfiguration != null;
         ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
-        assert expressionManager!= null;
+        assert expressionManager != null;
         Expression expression = expressionManager.createExpression(expressionString);
         return expression.getValue(variableContainer);
     }

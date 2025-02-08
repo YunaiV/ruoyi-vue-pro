@@ -2,13 +2,13 @@
 GET {{baseUrl}}/mp/message/page?accountId=1&pageNo=1&pageSize=10
 Content-Type: application/json
 Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
 
 ### 请求 /mp/message/send 接口 => 成功（文本）
 POST {{baseUrl}}/mp/message/send
 Content-Type: application/json
 Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
 
 {
   "userId": 3,
@@ -20,7 +20,7 @@ tenant-id: {{adminTenentId}}
 POST {{baseUrl}}/mp/message/send
 Content-Type: application/json
 Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
 
 {
   "userId": 3,
