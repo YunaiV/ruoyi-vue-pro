@@ -5,6 +5,7 @@ import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO.ProcessingStatuses;
 import com.somle.esb.model.OssData;
 import com.somle.framework.common.util.csv.CsvUtils;
+import com.somle.framework.common.util.csv.TsvUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -25,19 +26,18 @@ public class AmazonspFBMReturnReportDataJob extends AmazonspDataJob {
                 .pageSize(100)
                 .build();
 
-        amazonService.account.getSellers().stream()
-            .flatMap(seller ->
-                amazonService.spClient.getReportStream(seller, vo, null)
+        amazonSpService.clients.stream()
+            .flatMap(client ->
+                client.getReportStream(vo, null)
             )
             .forEach(report -> {
-                var csvData = CsvUtils.toMapList(report);
                 OssData data = OssData.builder()
                     .database(DATABASE)
                     .tableName("fbm_return_report")
                     .syncType("inc")
                     .requestTimestamp(System.currentTimeMillis())
                     .folderDate(beforeYesterday)
-                    .content(csvData)
+                    .content(TsvUtils.toMapList(report))
                     .headers(null)
                     .build();
                 service.send(data);

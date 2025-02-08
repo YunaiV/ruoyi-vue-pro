@@ -4,6 +4,7 @@ package com.somle.esb.job;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import com.somle.amazon.service.AmazonService;
+import com.somle.amazon.service.AmazonSpService;
 import com.somle.esb.model.Domain;
 import com.somle.esb.model.OssData;
 import com.somle.esb.service.EsbService;
@@ -18,7 +19,7 @@ public class AmazonspDataJob extends DataJob{
     EsbService service;
 
     @Autowired
-    AmazonService amazonService;
+    AmazonSpService amazonSpService;
 
     final String DATABASE = Domain.AMAZONSP.toString();
 

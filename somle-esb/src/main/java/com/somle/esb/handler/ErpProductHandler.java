@@ -24,7 +24,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-@Profile("!dev & !test") // 仅在非 dev 和非 test 环境加载
+@Profile("!dev & !test")
 @RequiredArgsConstructor
 public class ErpProductHandler {
 
@@ -34,9 +34,9 @@ public class ErpProductHandler {
     private final ErpToKingdeeConverter erpToKingdeeConverter;
 
     @ServiceActivator(inputChannel = "erpProductChannel")
-    public void syncProductsToEccang(@Payload List<ErpProductDTO> products) {
+    public void syncProductsToEccang(@Payload List<ErpProductDTO> erpProductDTOS) {
         log.info("syncProductsToEccang");
-        List<EccangProduct> eccangProducts = erpToEccangConverter.productDTOToProduct(products);
+        List<EccangProduct> eccangProducts = erpToEccangConverter.convertByErpProducts(erpProductDTOS);
         for (EccangProduct eccangProduct : eccangProducts) {
             eccangProduct.setActionType("ADD");
             EccangProduct eccangServiceProduct = eccangService.getProduct(eccangProduct.getProductSku());
@@ -56,7 +56,7 @@ public class ErpProductHandler {
     @ServiceActivator(inputChannel = "erpProductChannel")
     public void syncProductsToKingdee(@Payload List<ErpProductDTO> products) {
         log.info("syncProductsToKingdee");
-        List<KingdeeProduct> kingdee = erpToKingdeeConverter.productDTOToProduct(products);
+        List<KingdeeProduct> kingdee = erpToKingdeeConverter.toKingdeeProducts(products);
         for (KingdeeProduct kingdeeProduct : kingdee) {
             kingdeeService.addProduct(kingdeeProduct);
         }

@@ -4,7 +4,10 @@ import cn.hutool.core.collection.CollUtil;
 import com.somle.eccang.model.*;
 import com.somle.eccang.model.EccangResponse.EccangPage;
 import com.somle.eccang.model.exception.EccangResponseException;
+import com.somle.eccang.model.req.EccangInventoryBatchReqVO;
+import com.somle.eccang.model.req.EccangRmaReturnReqVO;
 import com.somle.eccang.repository.EccangTokenRepository;
+import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.framework.common.util.general.Limiter;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
@@ -102,25 +105,11 @@ public class EccangService {
     // core network io
     @SneakyThrows
     private EccangResponse getResponse(Object payload, String endpoint) {
-        var retryPolicy = new ExceptionClassifierRetryPolicy();
-        retryPolicy.setPolicyMap(Map.of(
-            HttpClientErrorException.class, new SimpleRetryPolicy(10),
-            SocketTimeoutException.class, new SimpleRetryPolicy(10)
-        ));
-
-        var exponentialBackOffPolicy = new ExponentialBackOffPolicy();
-        exponentialBackOffPolicy.setInitialInterval(2000);
-        exponentialBackOffPolicy.setMultiplier(2);
-        exponentialBackOffPolicy.setMaxInterval(180000);
-
-        var retryTemplate = new RetryTemplate();
-        retryTemplate.setRetryPolicy(retryPolicy);
-        retryTemplate.setBackOffPolicy(exponentialBackOffPolicy);
 
         String url = "http://openapi-web.eccang.com/openApi/api/unity";
 
 
-        EccangResponse responseFinal = retryTemplate.execute(ctx -> {
+        EccangResponse responseFinal = CoreUtils.retry(ctx -> {
             var requestBody = requestBody(payload, endpoint);
             var request = RequestX.builder()
                 .requestMethod(RequestX.Method.POST)
@@ -130,7 +119,7 @@ public class EccangService {
             // 获取当前重试次数
             int retryCount = ctx.getRetryCount();
             // 记录每次重试的日志
-            log.debug("正在请求url= {},第 {} 次重试。endpoint = {}",request.getUrl(), retryCount + 1, endpoint);
+            log.debug("正在请求url= {},第 {} 次重试。endpoint = {}", request.getUrl(), retryCount + 1, endpoint);
             try (var response = WebUtils.sendRequest(request)) {
                 switch (response.code()) {
                     case 200:
@@ -193,7 +182,7 @@ public class EccangService {
             getPage(payload, endpoint), Objects::nonNull,
             bizContent -> {
                 if (bizContent.hasNext()) {
-                    log.debug("have next,当前进度：{}/{}", (bizContent.getPage() - 1) * pageSize + bizContent.getData().size(), bizContent.getTotal());
+                    log.debug("have next,endpoint:{}当前进度：{}/{}", endpoint, (bizContent.getPage() - 1) * pageSize + bizContent.getData().size(), bizContent.getTotal());
                     payload.put("page", bizContent.getPage() + 1);
                     return getPage(payload, endpoint);
                 } else {
@@ -352,6 +341,9 @@ public class EccangService {
         return getAllPage(JsonUtils.toJSONObject(eccangInventoryBatchLogVO), "getInventoryBatchLog");
     }
 
+    public Stream<EccangPage> getInventoryBatch(EccangInventoryBatchReqVO eccangInventoryBatchVO) {
+        return getAllPage(JsonUtils.toJSONObject(eccangInventoryBatchVO), "getInventoryBatch");
+    }
 
     public EccangPage addDepartment(EccangCategory department) {
         try {
@@ -448,6 +440,10 @@ public class EccangService {
         return getAllPage(JsonUtils.toJSONObject(eccangRmaRefundVO), "getRmaRefundList");
     }
 
+    //退件列表
+    public Stream<EccangPage> getRmaReturnList(EccangRmaReturnReqVO eccangRmaReturnReqVO){
+        return getAllPage(JsonUtils.toJSONObject(eccangRmaReturnReqVO), "getRmaReturnList");
+    }
 
     public String parseCountryCode(String code) {
         switch (code) {

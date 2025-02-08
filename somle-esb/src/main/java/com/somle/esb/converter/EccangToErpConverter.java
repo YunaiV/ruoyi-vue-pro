@@ -1,15 +1,13 @@
 package com.somle.esb.converter;
 
 import com.somle.eccang.model.EccangOrder;
-import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.service.EccangService;
-import com.somle.erp.model.*;
+import com.somle.esb.model.EsbAddress;
+import com.somle.esb.model.EsbCustomer;
+import com.somle.esb.model.EsbSale;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -18,9 +16,9 @@ public class EccangToErpConverter {
     @Autowired
     EccangService eccangService;
 
-    public ErpAddress toEsb(EccangOrder.EccangAddress address) {
+    public EsbAddress toEsb(EccangOrder.EccangAddress address) {
         log.debug(address.toString());
-        ErpAddress erpAddress = ErpAddress.builder()
+        EsbAddress erpAddress = EsbAddress.builder()
             .line1(address.getLine1())
             .line2(address.getLine2())
             .line3(address.getLine3())
@@ -47,9 +45,9 @@ public class EccangToErpConverter {
 
     }
 
-    public ErpSale toEsb(EccangOrder order) {
-        ErpSale erpSale = new ErpSale();
-        ErpCustomer erpCustomer = ErpCustomer.builder()
+    public EsbSale toEsb(EccangOrder order) {
+        EsbSale erpSale = new EsbSale();
+        EsbCustomer erpCustomer = EsbCustomer.builder()
             .name(order.getBuyerName())
             .build();
         erpSale.setPlatformSku(order.getOrderDetail().getPlatformSku());

@@ -4,13 +4,10 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo.ErpCustomRulePageReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.logistic.customrule.ErpCustomRuleDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierProductDO;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
-import jakarta.validation.constraints.NotNull;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -22,25 +19,6 @@ import java.util.List;
  */
 @Mapper
 public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
-    default MPJLambdaWrapper<ErpCustomRuleDO> getWrapper() {
-        return new MPJLambdaWrapperX<ErpCustomRuleDO>()
-            .selectAll(ErpCustomRuleDO.class)
-            .leftJoin(ErpProductDO.class, ErpProductDO::getId, ErpCustomRuleDO::getProductId)
-            .selectAs(ErpProductDO::getName, ErpCustomRuleDTO::getProductName)
-            .selectAs(ErpProductDO::getPrimaryImageUrl, ErpCustomRuleDTO::getProductImageUrl)
-            .selectAs(ErpProductDO::getWeight, ErpCustomRuleDTO::getProductWeight)
-            .selectAs(ErpProductDO::getLength, ErpCustomRuleDTO::getProductLength)
-            .selectAs(ErpProductDO::getWidth, ErpCustomRuleDTO::getProductWidth)
-            .selectAs(ErpProductDO::getHeight, ErpCustomRuleDTO::getProductHeight)
-            .selectAs(ErpProductDO::getPackageHeight, ErpCustomRuleDTO::getPackageHeight)
-            .selectAs(ErpProductDO::getPackageLength, ErpCustomRuleDTO::getPackageLength)
-            .selectAs(ErpProductDO::getPackageWeight, ErpCustomRuleDTO::getPackageWeight)
-            .selectAs(ErpProductDO::getPackageWidth, ErpCustomRuleDTO::getPackageWidth)
-            .selectAs(ErpProductDO::getMaterial, ErpCustomRuleDTO::getProductMaterial)
-            .selectAs(ErpProductDO::getCreator, ErpCustomRuleDTO::getProductCreatorId)
-            .selectAs(ErpProductDO::getBarCode, ErpCustomRuleDTO::getBarCode)
-            .selectAs(ErpProductDO::getDeptId, ErpCustomRuleDTO::getProductDeptId);
-    }
     /**
      * 分页查询ERP海关规则数据
      *
@@ -68,41 +46,6 @@ public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
         return selectJoinPage(reqVO, ErpCustomRuleDO.class, query);
     }
 
-
-    /**
-     * @return java.util.List<cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO>
-     * @Author Wqh
-     * @Description 根据海关规则id获取产品的全量信息（海关规则，产品供应商）
-     * @Date 10:40 2024/11/5
-     * @Param [id]
-     **/
-    default List<ErpCustomRuleDTO> selectProductAllInfoListByCustomRuleId(@NotNull(message = "海关规则id不能为空") Long id) {
-        return selectJoinList(ErpCustomRuleDTO.class, getWrapper().eq(ErpCustomRuleDO::getId, id));
-    }
-
-    /**
-     * @return java.util.List<cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO>
-     * @Author Wqh
-     * @Description 根据产品id获取产品的全量信息（海关规则，产品供应商）
-     * @Date 10:40 2024/11/5
-     * @Param [id]
-     **/
-    default List<ErpCustomRuleDTO> selectProductAllInfoListById(@NotNull(message = "产品id不能为空") Long id) {
-        return selectJoinList(ErpCustomRuleDTO.class, getWrapper().eq(ErpProductDO::getId, id));
-    }
-
-    /**
-     * @return java.util.List<cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO>
-     * @Author Wqh
-     * @Description 根据供应商产品id获取产品的全量信息（海关规则，产品供应商）
-     * @Date 10:40 2024/11/5
-     * @Param [id]
-     **/
-    default List<ErpCustomRuleDTO> selectProductAllInfoListBySupplierId(@NotNull(message = "供应商产品id不能为空") Long id) {
-        return selectJoinList(ErpCustomRuleDTO.class, getWrapper().eq(ErpSupplierProductDO::getId, id));
-    }
-
-
     /**
      * 根据 城市code 和 产品id 查询一个
      *
@@ -114,5 +57,10 @@ public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
         return selectOne(new LambdaQueryWrapperX<ErpCustomRuleDO>()
             .eq(ErpCustomRuleDO::getCountryCode, countryCode)
             .eq(ErpCustomRuleDO::getProductId, productId));
+    }
+
+    default List<ErpCustomRuleDO> selectByProductId(List<Long> productIds) {
+        return selectList(new LambdaQueryWrapperX<ErpCustomRuleDO>()
+            .in(ErpCustomRuleDO::getProductId, productIds));
     }
 }

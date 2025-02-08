@@ -1,7 +1,10 @@
 package com.somle.amazon.service;
 
-import com.somle.amazon.model.AmazonAccount;
-import com.somle.amazon.model.AmazonShop;
+import com.somle.amazon.controller.vo.AmazonAdAccountRespVO;
+import com.somle.amazon.controller.vo.AmazonAdProfileRespVO;
+import com.somle.amazon.controller.vo.AmazonAdReportReqVO;
+import com.somle.amazon.model.AmazonAdAuthDO;
+import com.somle.amazon.model.enums.AmazonRegion;
 import com.somle.framework.common.util.general.CoreUtils;
 import com.somle.framework.common.util.json.JSONArray;
 import com.somle.framework.common.util.json.JSONObject;
@@ -9,118 +12,150 @@ import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.web.RequestX;
 import com.somle.framework.common.util.web.WebUtils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+
+
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
 @Slf4j
 @AllArgsConstructor
+@Getter
 @Setter
 public class AmazonAdClient {
 
-    public AmazonAccount account;
+//    public AmazonAccount account;
 
+    private AmazonAdAuthDO auth;
 
-    public Stream<AmazonShop> getShops() {
-        return account.getSellers().stream().flatMap(seller->seller.getShops().stream());
+    private String getEndPoint() {
+        return AmazonRegion.findByCode(auth.getRegionCode()).getAdUrl();
     }
 
-    public AmazonShop getShop(String countryCode) {
-        return getShops().filter(shop->shop.getCountry().getCode().equals(countryCode)).findFirst().get();
+
+
+    private Map<String, String> generateHeaders() {
+        Map<String, String> headers = Map.of(
+            "Amazon-Advertising-API-ClientId", auth.getClientId(),
+            "Authorization", auth.getAccessToken()
+        );
+        return headers;
     }
 
-    private Map<String, String> generateHeaders(AmazonShop shop) {
+
+    private Map<String, String> generateHeaders(Long profileId) {
         String contentType = "application/vnd.createasyncreportrequest.v3+json";
         Map<String, String> headers = Map.of(
-            "Amazon-Advertising-API-Scope", shop.getProfileId(),
-            "Amazon-Advertising-API-ClientId", shop.getSeller().getAccount().getAdClientId(),
-            "Authorization", shop.getSeller().getAdAccessToken(),
+            "Amazon-Advertising-API-Scope", profileId.toString(),
+            "Amazon-Advertising-API-ClientId", auth.getClientId(),
+            "Authorization", auth.getAccessToken(),
             "Content-Type", contentType,
             "Accept", contentType
         );
         return headers;
     }
 
-    public Stream<JSONArray> getAllAdReport(LocalDate dataDate) {
-        var reportIdMap = getShops().collect(Collectors.toMap(
-                shop->shop,
-                shop->createAdReport(shop, dataDate)
+
+
+    public AmazonAdAccountRespVO listAccounts() {
+        JSONObject payload = JsonUtils.newObject();
+
+        String partialUrl = "/adsAccounts/list";
+        String endpoint = getEndPoint();
+        String fullUrl = endpoint + partialUrl;
+
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.POST)
+            .url(fullUrl)
+            .headers(generateHeaders())
+            .payload(payload)
+            .build();
+        return WebUtils.sendRequest(request, AmazonAdAccountRespVO.class);
+    }
+
+    public List<AmazonAdProfileRespVO> listProfiles() {
+        JSONObject payload = JsonUtils.newObject();
+
+        String partialUrl = "/v2/profiles";
+        String endpoint = getEndPoint();
+        String fullUrl = endpoint + partialUrl;
+
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.GET)
+            .url(fullUrl)
+            .headers(generateHeaders())
+            .payload(payload)
+            .build();
+        try(var response = WebUtils.sendRequest(request)){
+            var responseBody = WebUtils.parseResponse(response, new TypeReference<List<AmazonAdProfileRespVO>>() {});
+            return responseBody;
+        }
+    }
+
+    public List<AmazonAdProfileRespVO> listSellerProfiles() {
+        return listProfiles().stream().filter(profile -> "seller".equals(profile.getAccountInfo().getType())).collect(Collectors.toList());
+    }
+
+
+//    public JSONObject getProfile() {
+//
+//    }
+
+    public JSONObject listPortfolios(Long profileId) {
+        JSONObject payload = JsonUtils.newObject();
+
+        String partialUrl = "/v2/profiles";
+        String endpoint = getEndPoint();
+        String fullUrl = endpoint + partialUrl;
+
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.POST)
+            .url(fullUrl)
+            .headers(generateHeaders(profileId))
+            .payload(payload)
+            .build();
+        try(var response = WebUtils.sendRequest(request)){
+            var responseBody = WebUtils.parseResponse(response, JSONObject.class);
+            log.info(responseBody.toString());
+            return responseBody;
+        }
+    }
+
+    public Stream<JSONArray> batchCreateAndGetReport(AmazonAdReportReqVO payload) {
+        var reportIdMap = listSellerProfiles().stream().collect(Collectors.toMap(
+            profile->profile,
+            profile->createReport(profile.getProfileId(), payload)
         ));
         // usually take more than 5 mins
         CoreUtils.sleep(300000);
-        return reportIdMap.entrySet().stream().map(entry->getReport(entry.getKey(), entry.getValue()));
+        return reportIdMap.entrySet().stream()
+            .map(entry->getReport(entry.getKey().getProfileId(), entry.getValue()));
+    }
+
+    public JSONArray createAndGetReport(Long profileId, AmazonAdReportReqVO payload, LocalDate dataDate) {
+        var reportId = createReport(profileId, payload);
+        return getReport(profileId, reportId);
     }
 
 
 
 
-
-
-    public String createAdReport(AmazonShop shop, LocalDate dataDate) {
-        List<String> baseMetric = new ArrayList<>(Arrays.asList(
-            "addToCart", "addToCartClicks", "addToCartRate", "adGroupId", "adGroupName", "adId",
-            "brandedSearches", "brandedSearchesClicks", "campaignBudgetAmount", "campaignBudgetCurrencyCode",
-            "campaignBudgetType", "campaignId", "campaignName", "campaignStatus", "clicks", "cost", "costType",
-            "date", "detailPageViews", "detailPageViewsClicks", "eCPAddToCart", "impressions",
-            "newToBrandDetailPageViewRate", "newToBrandDetailPageViews", "newToBrandDetailPageViewsClicks",
-            "newToBrandECPDetailPageView", "newToBrandPurchases", "newToBrandPurchasesClicks",
-            "newToBrandPurchasesPercentage", "newToBrandPurchasesRate", "newToBrandSales", "newToBrandSalesClicks",
-            "newToBrandSalesPercentage", "newToBrandUnitsSold", "newToBrandUnitsSoldClicks",
-            "newToBrandUnitsSoldPercentage", "purchases", "purchasesClicks", "purchasesPromoted", "sales",
-            "salesClicks", "salesPromoted", "unitsSold", "unitsSoldClicks", "video5SecondViewRate", "video5SecondViews",
-            "videoCompleteViews", "videoFirstQuartileViews", "videoMidpointViews", "videoThirdQuartileViews",
-            "videoUnmutes", "viewabilityRate", "viewableImpressions"
-        ));
-
-        baseMetric.remove("startDate");
-        baseMetric.remove("endDate");
-
-        JSONObject params = JsonUtils.newObject();
-//        params.put("startDate", null);
-//        params.put("endDate", null);
-
-        JSONObject configuration = JsonUtils.newObject();
-        configuration.put("adProduct", "SPONSORED_BRANDS");
-        configuration.put("groupBy", new ArrayList<>(Arrays.asList("ads")));
-        configuration.put("columns", baseMetric);
-        configuration.put("reportTypeId", "sbAds");
-        configuration.put("timeUnit", "DAILY");
-        configuration.put("format", "GZIP_JSON");
-
-        params.put("configuration", configuration);
-
-        return createReport(shop, params, dataDate);
-    }
-
-
-    @Transactional(readOnly = true)
-    public JSONArray getReport(AmazonShop shop, JSONObject payload, LocalDate dataDate) {
-        var reportId = createReport(shop, payload, dataDate);
-        return getReport(shop, reportId);
-    }
-
+    // return report id
     @SneakyThrows
-    @Transactional(readOnly = true)
-    public String createReport(AmazonShop shop, JSONObject payload, LocalDate dataDate) {
-        JSONObject updateDict = JsonUtils.newObject();
-        updateDict.put("startDate", dataDate.toString());
-        updateDict.put("endDate", dataDate.toString());
-        payload.putAll(updateDict);
+    public String createReport(Long profileId, AmazonAdReportReqVO payload) {
+
 
         String partialUrl = "/reporting/reports";
-        String endpoint = shop.getSeller().getRegion().getAdEndPoint();
+        String endpoint = getEndPoint();
         String fullUrl = endpoint + partialUrl;
 
 
@@ -131,7 +166,7 @@ public class AmazonAdClient {
             var request = RequestX.builder()
                 .requestMethod(RequestX.Method.POST)
                 .url(fullUrl)
-                .headers(generateHeaders(shop))
+                .headers(generateHeaders(profileId))
                 .payload(payload)
                 .build();
             try(var response = WebUtils.sendRequest(request)){
@@ -151,15 +186,14 @@ public class AmazonAdClient {
                 reportId = responseBody.getString("reportId");
             }
         }
-        log.info("Got report ID for shop: " + shop.getCountry().getCode());
+        log.info("Got report ID for profileId: " + profileId);
         return reportId;
     }
 
-    @Transactional(readOnly = true)
-    public JSONArray getReport(AmazonShop shop, String reportId) {
+    public JSONArray getReport(Long profileId, String reportId) {
 
         String partialUrl = "/reporting/reports";
-        String endpoint = shop.getSeller().getRegion().getAdEndPoint();
+        String endpoint = getEndPoint();
         String fullUrl = endpoint + partialUrl;
 
 
@@ -171,11 +205,10 @@ public class AmazonAdClient {
             CoreUtils.sleep(5000);
             String reportStatusUrl = endpoint + "/reporting/reports/" + reportId;
             log.info("Checking report status...");
-            var tokenExpireTime = shop.getSeller().getAdExpireTime();
             var request = RequestX.builder()
                 .requestMethod(RequestX.Method.GET)
                 .url(reportStatusUrl)
-                .headers(generateHeaders(shop))
+                .headers(generateHeaders(profileId))
                 .build();
             JSONObject responseBody = null;
             try(var response = WebUtils.sendRequest(request);){
@@ -183,7 +216,7 @@ public class AmazonAdClient {
                     case 200:
                         break;
                     case 401:
-                        throw new RuntimeException("Failed for shop " + shop.getCountry() + " Unauthorized error, token expired at " +  tokenExpireTime);
+                        throw new RuntimeException("Failed for profileId " + profileId + " Unauthorized error, token expired");
                     case 429:
                         log.info("Received 429 Too Many Requests. Retrying...");
                         CoreUtils.sleep(10000);

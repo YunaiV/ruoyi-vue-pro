@@ -121,6 +121,31 @@ public class ErpProductServiceDelegator implements ErpProductService {
         ErpProductService service = getDefaultService();
         return service.getProductVOList(ids);
     }
+    @Override
+    public List<ErpProductDO> listProducts(Collection<Long> ids) {
+        ErpProductService service = getDefaultService();
+        return service.listProducts(ids);
+    }
+    /**
+     * 获得产品 DO Map
+     *
+     * @param ids 编号数组
+     * @return 产品 DO Map
+     */
+    @Override
+    public Map<Long, ErpProductDO> getProductMap(Collection<Long> ids) {
+        return ErpProductService.super.getProductMap(ids);
+    }
+    /**
+     * 获得产品 VO Map
+     *
+     * @param ids 编号数组
+     * @return 产品 VO Map
+     */
+    @Override
+    public Map<Long, ErpProductRespVO> getProductVOMap(Collection<Long> ids) {
+        return ErpProductService.super.getProductVOMap(ids);
+    }
 
     @Override
     public PageResult<ErpProductRespVO> getProductVOPage(ErpProductPageReqVO pageReqVO) {

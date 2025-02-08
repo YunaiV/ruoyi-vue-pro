@@ -75,6 +75,24 @@ public interface ErpProductService {
     List<ErpProductRespVO> getProductVOList(Collection<Long> ids);
 
     /**
+     * 获得产品 DO 列表
+     *
+     * @param ids 编号组
+     * @return 产品 DO 列表
+     */
+    List<ErpProductDO> listProducts(Collection<Long> ids);
+
+    /**
+     * 获得产品 DO Map
+     *
+     * @param ids 编号数组
+     * @return 产品 DO Map
+     */
+    default Map<Long, ErpProductDO> getProductMap(Collection<Long> ids) {
+        return convertMap(listProducts(ids), ErpProductDO::getId);
+    }
+
+    /**
      * 获得产品 VO Map
      *
      * @param ids 编号数组

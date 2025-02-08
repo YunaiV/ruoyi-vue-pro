@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.erp.api.product.dto;
 
+import lombok.Builder;
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 /**
  * @date: 2025/1/3 8:31
@@ -8,7 +11,12 @@ import lombok.Data;
  * @description:
  */
 @Data
+@Builder
 public class ErpProductDTO {
+    /**
+     * 产品id
+     */
+    private Long id;
     /**
      * 产品名称
      */
@@ -28,7 +36,7 @@ public class ErpProductDTO {
     /**
      * 基础重量（kg）
      */
-    private Integer weight;
+    private BigDecimal weight;
     /**
      * 基础宽度（mm）
      */
@@ -41,6 +49,22 @@ public class ErpProductDTO {
      * 基础高度（mm）
      */
     private Integer height;
+    /**
+     * 包装高度（mm）
+     */
+    private Integer packageHeight;
+    /**
+     * 包装长度（mm）
+     */
+    private Integer packageLength;
+    /**
+     * 包装重量(kg)
+     */
+    private BigDecimal packageWeight;
+    /**
+     * 包装宽度（mm）
+     */
+    private Integer packageWidth;
     /**
      * 主图url
      */

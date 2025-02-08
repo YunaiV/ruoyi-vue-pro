@@ -135,12 +135,8 @@ public class OttoClient {
 
     // 解析响应
     private OttoCommonResp<Object> parseResponse(Response response) throws IOException {
-        if (response.body() == null) {
-            throw new RuntimeException("Response 为空");
-        }
-        String jsonResponse = response.body().string();
         //new TypeReference<OttoCommonResp<Object>>()
-        OttoCommonResp<Object> commonResp = WebUtils.parseResponse(jsonResponse, new TypeReference<>() {
+        OttoCommonResp<Object> commonResp = WebUtils.parseResponse(response, new TypeReference<>() {
         });
         handleLinksRecursively(commonResp);
         return commonResp;

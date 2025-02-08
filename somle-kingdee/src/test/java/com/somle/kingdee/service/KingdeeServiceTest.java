@@ -1,12 +1,5 @@
 package com.somle.kingdee.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.TreeMap;
-
 import com.somle.framework.common.util.date.LocalDateTimeUtils;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.test.core.ut.BaseSpringTest;
@@ -17,16 +10,58 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.Rollback;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.TreeMap;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 @Import(KingdeeService.class)
 public class KingdeeServiceTest extends BaseSpringTest {
     @Resource
     KingdeeService service;
-
+    // 定义所有的字段名称及对应表
+    String[][] fields = {
+        {"商品", "bd_material"},
+        {"仓库", "bd_store"},
+        {"类别", "bd_materialgroup"},
+        {"仓库分类", "bd_storegroup"},
+        {"品牌分类", "bd_brandgroup"},
+        {"仓位", "bd_space"},
+        {"品牌", "bd_brand"},
+        {"辅助属性", "bd_auxdetail"},
+        {"商品标签", "bd_label"},
+        {"辅助资料", "bd_auxinfo"},
+        {"品标签分类", "bd_labelgroup"},
+        {"辅助资料分类", "bd_auxinfotype"},
+        {"库存", "inv_inventory_entity"},
+        {"物流公司", "bd_logisticscompany"},
+        {"部门", "bd_department"},
+        {"外部基础资料", "iac_virtualbase"},
+        {"职员", "bd_employee"},
+        {"科目", "bd_account"},
+        {"币别", "bd_currency"},
+        {"零售门店", "lsbd_store"},
+        {"客户", "bd_customer"},
+        {"会员级别", "lsbd_mblevel"},
+        {"客户分类", "bd_customergroup"},
+        {"会员信息", "lsbd_mb"},
+        {"供应商", "bd_supplier"},
+        {"门店商品上下架", "lsbd_onoffshelf"},
+        {"供应商分类", "bd_suppliergroup"},
+        {"零售单据", "store_bill"},
+        {"账户", "bd_bank"},
+        {"门店零售价", "lsst_retail_price"},
+        {"结算方式", "bd_settlementtype"},
+        {"收入类别", "bd_paccttype"},
+        {"计量单位", "bd_measureunits_new"}
+    };
 
 //    @BeforeEach
 //    void setUp() {
@@ -130,9 +165,14 @@ public class KingdeeServiceTest extends BaseSpringTest {
     }
 
     @Test
+    @Rollback(false)
     public void testGetCustomField() {
         var client = service.getClientList().get(0);
-        log.info(client.getCustomField("bd_material").toString());
+        client.refreshAuth();
+        for (String[] field : fields) {
+            log.info(client.getCustomField(field[1]).toString());
+        }
+//        log.info(client.getCustomField("").toString());
     }
 
     @Test
