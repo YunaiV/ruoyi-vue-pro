@@ -91,7 +91,7 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
     public PageResult<TradeOrderDO> getOrderPage(TradeOrderPageReqVO reqVO) {
         // 根据用户查询条件构建用户编号列表
         Set<Long> userIds = buildQueryConditionUserIds(reqVO);
-        if (userIds == null) { // 没查询到用户，说明肯定也没他的订单
+        if (userIds == null || userIds.isEmpty()) { // 没查询到用户，说明肯定也没他的订单
             return PageResult.empty();
         }
         // 分页查询
