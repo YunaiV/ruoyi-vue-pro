@@ -2,7 +2,7 @@
 POST {{appApi}}/promotion/bargain-help/create
 Authorization: Bearer test248
 Content-Type: application/json
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 
 {
   "recordId": 26
