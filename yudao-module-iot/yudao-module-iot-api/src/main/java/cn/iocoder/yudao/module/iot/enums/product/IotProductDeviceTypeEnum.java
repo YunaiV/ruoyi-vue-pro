@@ -46,4 +46,14 @@ public enum IotProductDeviceTypeEnum implements ArrayValuable<Integer> {
         return GATEWAY.getType().equals(type);
     }
 
+    /**
+     * 判断是否是网关子设备
+     *
+     * @param type 类型
+     * @return 是否是网关子设备
+     */
+    public static boolean isGatewaySub(Integer type) {
+        return GATEWAY_SUB.getType().equals(type);
+    }
+
 }

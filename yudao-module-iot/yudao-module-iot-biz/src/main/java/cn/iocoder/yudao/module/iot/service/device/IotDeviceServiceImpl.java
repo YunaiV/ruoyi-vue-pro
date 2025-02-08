@@ -64,22 +64,10 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         if (product == null) {
             throw exception(PRODUCT_NOT_EXISTS);
         }
-        // 1.2 校验设备标识是否唯一
-        TenantUtils.executeIgnore(() -> {
-            if (deviceMapper.selectByDeviceKey(createReqVO.getDeviceKey()) != null) {
-                throw exception(PRODUCT_KEY_EXISTS);
-            }
-        });
-        // 1.3 校验设备名称在同一产品下是否唯一
-        if (deviceMapper.selectByProductKeyAndDeviceName(product.getProductKey(), createReqVO.getDeviceName()) != null) {
-            throw exception(DEVICE_NAME_EXISTS);
-        }
-        // 1.4 校验父设备是否为合法网关
-        if (IotProductDeviceTypeEnum.isGateway(product.getDeviceType())
-                && createReqVO.getGatewayId() != null) {
-            validateGatewayDeviceExists(createReqVO.getGatewayId());
-        }
-        // 1.5 校验分组存在
+        // 1.2 统一校验
+        validateCreateDeviceParam(product.getProductKey(), createReqVO.getDeviceName(), createReqVO.getDeviceKey(),
+                createReqVO.getGatewayId(), product);
+        // 1.3 校验分组存在
         deviceGroupService.validateDeviceGroupExists(createReqVO.getGroupIds());
 
         // 2. 插入到数据库
@@ -90,32 +78,45 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     @Override
-    public IotDeviceDO createDevice(String productKey, String deviceName) {
+    public IotDeviceDO createDevice(String productKey, String deviceName, Long gatewayId) {
+        String deviceKey = generateDeviceKey();
         // 1.1 校验产品是否存在
         IotProductDO product = TenantUtils.executeIgnore(() ->
                 productService.getProductByProductKey(productKey));
         if (product == null) {
             throw exception(PRODUCT_NOT_EXISTS);
         }
-        // 1.2 校验设备标识是否唯一
-        String deviceKey = generateDeviceKey();
-        TenantUtils.executeIgnore(() -> {
-            if (deviceMapper.selectByDeviceKey(deviceKey) != null) {
-                throw exception(PRODUCT_KEY_EXISTS);
-            }
-        });
         return TenantUtils.execute(product.getTenantId(), () -> {
-            // 1.3 校验设备名称在同一产品下是否唯一
-            if (deviceMapper.selectByProductKeyAndDeviceName(product.getProductKey(), deviceName) != null) {
-                throw exception(DEVICE_NAME_EXISTS);
-            }
+            // 1.2 校验设备名称在同一产品下是否唯一
+            validateCreateDeviceParam(productKey, deviceName, deviceKey, gatewayId, product);
 
             // 2. 插入到数据库
-            IotDeviceDO device = new IotDeviceDO().setDeviceName(deviceName).setDeviceKey(deviceKey);
+            IotDeviceDO device = new IotDeviceDO().setDeviceName(deviceName).setDeviceKey(deviceKey)
+                    .setGatewayId(gatewayId);
             initDevice(device, product);
             deviceMapper.insert(device);
             return device;
         });
+    }
+
+    private void validateCreateDeviceParam(String productKey, String deviceName, String deviceKey,
+                                           Long gatewayId, IotProductDO product) {
+        TenantUtils.executeIgnore(() -> {
+            // 校验设备名称在同一产品下是否唯一
+            if (deviceMapper.selectByProductKeyAndDeviceName(productKey, deviceName) != null) {
+                throw exception(DEVICE_NAME_EXISTS);
+            }
+            // 校验设备标识是否唯一
+            if (deviceMapper.selectByDeviceKey(deviceKey) != null) {
+                throw exception(DEVICE_KEY_EXISTS);
+            }
+        });
+
+        // 校验父设备是否为合法网关
+        if (IotProductDeviceTypeEnum.isGatewaySub(product.getDeviceType())
+                && gatewayId != null) {
+            validateGatewayDeviceExists(gatewayId);
+        }
     }
 
     private void initDevice(IotDeviceDO device, IotProductDO product) {
@@ -136,7 +137,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         // 1.1 校验存在
         IotDeviceDO device = validateDeviceExists(updateReqVO.getId());
         // 1.2 校验父设备是否为合法网关
-        if (IotProductDeviceTypeEnum.isGateway(device.getDeviceType())
+        if (IotProductDeviceTypeEnum.isGatewaySub(device.getDeviceType())
                 && updateReqVO.getGatewayId() != null) {
             validateGatewayDeviceExists(updateReqVO.getGatewayId());
         }

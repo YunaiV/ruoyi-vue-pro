@@ -49,6 +49,12 @@ public class IoTDeviceUpstreamApiImpl implements IotDeviceUpstreamApi {
         return success(true);
     }
 
+    @Override
+    public CommonResult<Boolean> registerSubDevice(IotDeviceRegisterSubReqDTO registerReqDTO) {
+        deviceUpstreamService.registerSubDevice(registerReqDTO);
+        return success(true);
+    }
+
     // ========== 插件相关 ==========
 
     @Override

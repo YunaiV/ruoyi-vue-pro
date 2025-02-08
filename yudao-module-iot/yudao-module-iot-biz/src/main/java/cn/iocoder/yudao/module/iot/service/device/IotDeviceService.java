@@ -30,10 +30,12 @@ public interface IotDeviceService {
      *
      * @param productKey 产品标识
      * @param deviceName 设备名称
+     * @param gatewayId 网关设备 ID
      * @return 设备
      */
     IotDeviceDO createDevice(@NotEmpty(message = "产品标识不能为空") String productKey,
-                             @NotEmpty(message = "设备名称不能为空") String deviceName);
+                             @NotEmpty(message = "设备名称不能为空") String deviceName,
+                             Long gatewayId);
 
     /**
      * 更新设备
@@ -41,6 +43,17 @@ public interface IotDeviceService {
      * @param updateReqVO 更新信息
      */
     void updateDevice(@Valid IotDeviceSaveReqVO updateReqVO);
+
+    // TODO @芋艿：先这么实现。未来看情况，要不要自己实现
+    /**
+     * 更新设备的所属网关
+     *
+     * @param id        编号
+     * @param gatewayId 网关设备 ID
+     */
+    default void updateDeviceGateway(Long id, Long gatewayId) {
+        updateDevice(new IotDeviceSaveReqVO().setId(id).setGatewayId(gatewayId));
+    }
 
     /**
      * 更新设备状态
