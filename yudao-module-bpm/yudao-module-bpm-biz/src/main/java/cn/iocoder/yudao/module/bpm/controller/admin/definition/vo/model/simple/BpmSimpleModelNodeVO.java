@@ -345,6 +345,8 @@ public class BpmSimpleModelNodeVO {
         @Valid
         private HttpRequestTriggerSetting httpRequestSetting;
 
+        // TODO @jason：这个要不直接叫 formSetting，更好理解一点哈
+        // TODO @jason：如果搞成 List<NormalFormTriggerSetting>，是不是可以做条件组了？微信讨论哈
         /**
          * 流程表单触发器设置
          */
@@ -376,6 +378,7 @@ public class BpmSimpleModelNodeVO {
              */
             @Schema(description = "请求返回处理设置", example = "[]")
             private List<KeyValue<String, String>> response;
+
         }
 
         @Schema(description = "流程表单触发器设置", example = "{}")
@@ -384,6 +387,8 @@ public class BpmSimpleModelNodeVO {
 
             @Schema(description = "修改的表单字段", example = "userName")
             private Map<String, Object> updateFormFields;
+
         }
+
     }
 }

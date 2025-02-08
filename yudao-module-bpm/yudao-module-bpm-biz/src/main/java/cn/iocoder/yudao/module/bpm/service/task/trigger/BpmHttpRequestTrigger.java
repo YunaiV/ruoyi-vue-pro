@@ -81,13 +81,14 @@ public class BpmHttpRequestTrigger implements BpmTrigger {
         }
 
         // 4.1 判断是否需要解析返回值
-        if (StrUtil.isEmpty(responseEntity.getBody()) || !responseEntity.getStatusCode().is2xxSuccessful()
+        if (StrUtil.isEmpty(responseEntity.getBody())
+                || !responseEntity.getStatusCode().is2xxSuccessful()
                 || CollUtil.isEmpty(setting.getResponse())) {
             return;
         }
         // 4.2 解析返回值, 返回值必须符合 CommonResult 规范。
-        CommonResult<Map<String, Object>> respResult = JsonUtils.parseObjectQuietly(responseEntity.getBody(),
-                new TypeReference<>() {});
+        CommonResult<Map<String, Object>> respResult = JsonUtils.parseObjectQuietly(
+                responseEntity.getBody(), new TypeReference<>() {});
         if (respResult == null || !respResult.isSuccess()){
             return;
         }

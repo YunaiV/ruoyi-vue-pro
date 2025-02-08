@@ -206,4 +206,5 @@ public class JsonUtils {
     public static boolean isJsonObject(String str) {
         return JSONUtil.isTypeJSONObject(str);
     }
+
 }

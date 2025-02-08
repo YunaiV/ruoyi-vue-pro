@@ -9,6 +9,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+// TODO @jason：改成 BpmFormUpdateTrigger
 /**
  * BPM 更新流程表单触发器
  *
@@ -39,4 +40,5 @@ public class BpmUpdateNormalFormTrigger implements BpmTrigger {
             processInstanceService.updateProcessInstanceVariables(processInstanceId, setting.getUpdateFormFields());
         }
     }
+
 }
