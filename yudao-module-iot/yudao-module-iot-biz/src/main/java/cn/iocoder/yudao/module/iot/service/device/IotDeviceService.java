@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -17,12 +18,22 @@ import java.util.List;
 public interface IotDeviceService {
 
     /**
-     * 创建设备
+     * 【管理员】创建设备
      *
      * @param createReqVO 创建信息
      * @return 编号
      */
     Long createDevice(@Valid IotDeviceSaveReqVO createReqVO);
+
+    /**
+     * 【设备注册】创建设备
+     *
+     * @param productKey 产品标识
+     * @param deviceName 设备名称
+     * @return 设备
+     */
+    IotDeviceDO createDevice(@NotEmpty(message = "产品标识不能为空") String productKey,
+                             @NotEmpty(message = "设备名称不能为空") String deviceName);
 
     /**
      * 更新设备

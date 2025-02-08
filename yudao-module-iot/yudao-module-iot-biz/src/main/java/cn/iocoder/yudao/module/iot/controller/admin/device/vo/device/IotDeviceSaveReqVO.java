@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device.vo.device;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -18,6 +19,7 @@ public class IotDeviceSaveReqVO {
     private String deviceKey;
 
     @Schema(description = "设备名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "王五")
+    @NotEmpty(message = "设备名称不能为空")
     private String deviceName;
 
     @Schema(description = "备注名称", example = "张三")

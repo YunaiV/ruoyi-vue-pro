@@ -71,7 +71,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
             }
         });
         // 1.3 校验设备名称在同一产品下是否唯一
-        if (deviceMapper.selectByProductKeyAndDeviceName(product.getProductKey(), createReqVO.getDeviceKey()) != null) {
+        if (deviceMapper.selectByProductKeyAndDeviceName(product.getProductKey(), createReqVO.getDeviceName()) != null) {
             throw exception(DEVICE_NAME_EXISTS);
         }
         // 1.4 校验父设备是否为合法网关
@@ -82,21 +82,52 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         // 1.5 校验分组存在
         deviceGroupService.validateDeviceGroupExists(createReqVO.getGroupIds());
 
-        // 2.1 转换 VO 为 DO
-        // TODO @芋艿：各种 mqtt 是不是可以简化！
-        IotDeviceDO device = BeanUtils.toBean(createReqVO, IotDeviceDO.class, o -> {
-            o.setProductKey(product.getProductKey()).setDeviceType(product.getDeviceType());
-            // 生成并设置必要的字段
-            o.setDeviceSecret(generateDeviceSecret())
-                    .setMqttClientId(generateMqttClientId())
-                    .setMqttUsername(generateMqttUsername(o.getDeviceName(), o.getProductKey()))
-                    .setMqttPassword(generateMqttPassword());
-            // 设置设备状态为未激活
-            o.setState(IotDeviceStateEnum.INACTIVE.getState());
-        });
-        // 2.2 插入到数据库
+        // 2. 插入到数据库
+        IotDeviceDO device = BeanUtils.toBean(createReqVO, IotDeviceDO.class);
+        initDevice(device, product);
         deviceMapper.insert(device);
         return device.getId();
+    }
+
+    @Override
+    public IotDeviceDO createDevice(String productKey, String deviceName) {
+        // 1.1 校验产品是否存在
+        IotProductDO product = TenantUtils.executeIgnore(() ->
+                productService.getProductByProductKey(productKey));
+        if (product == null) {
+            throw exception(PRODUCT_NOT_EXISTS);
+        }
+        // 1.2 校验设备标识是否唯一
+        String deviceKey = generateDeviceKey();
+        TenantUtils.executeIgnore(() -> {
+            if (deviceMapper.selectByDeviceKey(deviceKey) != null) {
+                throw exception(PRODUCT_KEY_EXISTS);
+            }
+        });
+        return TenantUtils.execute(product.getTenantId(), () -> {
+            // 1.3 校验设备名称在同一产品下是否唯一
+            if (deviceMapper.selectByProductKeyAndDeviceName(product.getProductKey(), deviceName) != null) {
+                throw exception(DEVICE_NAME_EXISTS);
+            }
+
+            // 2. 插入到数据库
+            IotDeviceDO device = new IotDeviceDO().setDeviceName(deviceName).setDeviceKey(deviceKey);
+            initDevice(device, product);
+            deviceMapper.insert(device);
+            return device;
+        });
+    }
+
+    private void initDevice(IotDeviceDO device, IotProductDO product) {
+        device.setProductId(product.getId()).setProductKey(product.getProductKey()).setDeviceType(product.getDeviceType());
+        // 生成并设置必要的字段
+        // TODO @芋艿：各种 mqtt 是不是可以简化！
+        device.setDeviceSecret(generateDeviceSecret())
+                .setMqttClientId(generateMqttClientId())
+                .setMqttUsername(generateMqttUsername(device.getDeviceName(), device.getProductKey()))
+                .setMqttPassword(generateMqttPassword());
+        // 设置设备状态为未激活
+        device.setState(IotDeviceStateEnum.INACTIVE.getState());
     }
 
     @Override

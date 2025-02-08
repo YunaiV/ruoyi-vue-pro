@@ -26,7 +26,11 @@ public enum IotDeviceMessageIdentifierEnum {
     OTA_UPGRADE("upgrade"), // 下行
     OTA_PULL("pull"), // 上行
     OTA_PROGRESS("progress"), // 上行
-    OTA_REPORT("report"),; // 上行
+    OTA_REPORT("report"), // 上行
+
+    REGISTER_REGISTER("register"), // 上行
+    REGISTER_SUB_REGISTER("sub_register"), // 上行
+    REGISTER_SUB_UNREGISTER("sub_unregister"),; // 下行
 
     /**
      * 标志符

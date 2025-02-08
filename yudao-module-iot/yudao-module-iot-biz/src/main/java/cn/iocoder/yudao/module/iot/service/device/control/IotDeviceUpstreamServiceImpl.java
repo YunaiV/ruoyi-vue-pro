@@ -7,10 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceEventReportReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDevicePropertyReportReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceStateUpdateReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceUpstreamAbstractReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.*;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceUpstreamReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageIdentifierEnum;
@@ -163,6 +160,29 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
                 .setIdentifier(reportReqDTO.getIdentifier())
                 .setData(reportReqDTO.getParams());
         sendDeviceMessage(message, device);
+    }
+
+    @Override
+    public void registerDevice(IotDeviceRegisterReqDTO registerReqDTO) {
+        // 1.1 注册设备
+        log.info("[registerDevice][注册设备: {}]", registerReqDTO);
+        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(
+                registerReqDTO.getProductKey(), registerReqDTO.getDeviceName());
+        boolean register = device == null;
+        if (device == null) {
+            device = deviceService.createDevice(registerReqDTO.getProductKey(), registerReqDTO.getDeviceName());
+            log.info("[registerDevice][请求({}) 成功注册设备({})]", registerReqDTO, device);
+        }
+        // 1.2 记录设备的最后时间
+        updateDeviceLastTime(device, registerReqDTO);
+
+        // 2. 发送设备消息
+        if (register) {
+            IotDeviceMessage message = BeanUtils.toBean(registerReqDTO, IotDeviceMessage.class)
+                    .setType(IotDeviceMessageTypeEnum.REGISTER.getType())
+                    .setIdentifier(IotDeviceMessageIdentifierEnum.REGISTER_REGISTER.getIdentifier());
+            sendDeviceMessage(message, device);
+        }
     }
 
     private void updateDeviceLastTime(IotDeviceDO device, IotDeviceUpstreamAbstractReqDTO reqDTO) {

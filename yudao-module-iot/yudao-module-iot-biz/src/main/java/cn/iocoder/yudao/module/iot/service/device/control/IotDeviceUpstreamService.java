@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.service.device.control;
 
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceEventReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDevicePropertyReportReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceStateUpdateReqDTO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceUpstreamReqVO;
 import jakarta.validation.Valid;
@@ -42,5 +43,12 @@ public interface IotDeviceUpstreamService {
      * @param reportReqDTO 设备事件
      */
     void reportDeviceEvent(IotDeviceEventReportReqDTO reportReqDTO);
+
+    /**
+     * 注册设备
+     *
+     * @param registerReqDTO 注册设备 DTO
+     */
+    void registerDevice(IotDeviceRegisterReqDTO registerReqDTO);
 
 }

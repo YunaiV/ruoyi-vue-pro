@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.product;
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -19,7 +19,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IotProductDO extends BaseDO {
+public class IotProductDO extends TenantBaseDO {
 
     /**
      * 产品 ID

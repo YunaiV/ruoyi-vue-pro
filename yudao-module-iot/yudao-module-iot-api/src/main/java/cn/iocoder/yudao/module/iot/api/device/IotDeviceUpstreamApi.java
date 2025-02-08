@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.module.iot.api.device;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceEventReportReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDevicePropertyReportReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceStateUpdateReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotPluginInstanceHeartbeatReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.*;
 import cn.iocoder.yudao.module.iot.enums.ApiConstants;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,6 +43,15 @@ public interface IotDeviceUpstreamApi {
      */
     @PostMapping(PREFIX + "/report-event")
     CommonResult<Boolean> reportDeviceEvent(@Valid @RequestBody IotDeviceEventReportReqDTO reportReqDTO);
+
+    // TODO @芋艿：这个需要 plugins 接入下
+    /**
+     * 注册设备
+     *
+     * @param registerReqDTO 注册设备 DTO
+     */
+    @PostMapping(PREFIX + "/register")
+    CommonResult<Boolean> registerDevice(@Valid @RequestBody IotDeviceRegisterReqDTO registerReqDTO);
 
     // ========== 插件相关 ==========
 

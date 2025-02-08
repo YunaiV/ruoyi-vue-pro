@@ -106,6 +106,11 @@ public class IotProductServiceImpl implements IotProductService {
     }
 
     @Override
+    public IotProductDO getProductByProductKey(String productKey) {
+        return productMapper.selectByProductKey(productKey);
+    }
+
+    @Override
     public PageResult<IotProductDO> getProductPage(IotProductPageReqVO pageReqVO) {
         return productMapper.selectPage(pageReqVO);
     }

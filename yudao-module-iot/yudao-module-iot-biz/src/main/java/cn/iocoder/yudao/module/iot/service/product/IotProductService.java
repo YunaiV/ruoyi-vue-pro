@@ -46,6 +46,14 @@ public interface IotProductService {
     IotProductDO getProduct(Long id);
 
     /**
+     * 根据产品 key 获得产品
+     *
+     * @param productKey 产品 key
+     * @return 产品
+     */
+    IotProductDO getProductByProductKey(String productKey);
+
+    /**
      * 校验产品存在
      *
      * @param id 编号
