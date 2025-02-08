@@ -132,7 +132,7 @@ public class ErpToEccangConverter {
         // 设置其他产品属性
         Optional.ofNullable(customRuleDTO.getTaxRate()).ifPresent(taxRate -> eccangProduct.setTaxRate(taxRate.floatValue()));
         eccangProduct.setPdOverseaTypeCn(customRuleDTO.getDeclaredType());
-        eccangProduct.setProductImgUrlList(Collections.singletonList(productDTO.getPrimaryImageUrl()));
+//        eccangProduct.setProductImgUrlList(Collections.singletonList(productDTO.getPrimaryImageUrl()));
 //        eccangProduct.setHsCode(customRuleDTO.getHscode());//暂停向eccang同步该属性
         eccangProduct.setDefaultSupplierCode("默认供应商");
         // 设置物流属性
@@ -229,7 +229,7 @@ public class ErpToEccangConverter {
         // 设置产品尺寸和重量
         eccangProduct.setProductMaterial(product.getMaterial());
         eccangProduct.setPdNetWeight(product.getWeight().floatValue());
-        eccangProduct.setProductImgUrlList(Collections.singletonList(product.getPrimaryImageUrl()));
+        //eccangProduct.setProductImgUrlList(Collections.singletonList(product.getPrimaryImageUrl()));产品图片属于敏感数据，不同步
         eccangProduct.setDefaultSupplierCode("默认供应商");
         //产品基础属性
         eccangProduct.setPdNetLength(mmToCmAsFloat(Float.valueOf(product.getLength())));
