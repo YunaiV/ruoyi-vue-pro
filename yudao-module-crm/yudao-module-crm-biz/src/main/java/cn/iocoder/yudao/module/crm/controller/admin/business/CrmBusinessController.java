@@ -127,8 +127,8 @@ public class CrmBusinessController {
     }
 
     @GetMapping("/simple-all-list")
-    @Operation(summary = "获得联系人的精简列表")
-    @PreAuthorize("@ss.hasPermission('crm:contact:query')")
+    @Operation(summary = "获得商机的精简列表")
+    @PreAuthorize("@ss.hasPermission('crm:business:query')")
     public CommonResult<List<CrmBusinessRespVO>> getSimpleContactList() {
         CrmBusinessPageReqVO reqVO = new CrmBusinessPageReqVO();
         reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
