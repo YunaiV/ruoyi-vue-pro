@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple;
 
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
@@ -157,6 +158,7 @@ public class BpmSimpleModelNodeVO {
         @Schema(description = "值", example = "xxx")
         @NotEmpty(message = "值不能为空")
         private String value;
+
     }
 
     @Schema(description = "审批节点拒绝处理策略")
@@ -343,6 +345,13 @@ public class BpmSimpleModelNodeVO {
         @Valid
         private HttpRequestTriggerSetting httpRequestSetting;
 
+        // TODO @jason：这个要不直接叫 formSetting，更好理解一点哈
+        // TODO @jason：如果搞成 List<NormalFormTriggerSetting>，是不是可以做条件组了？微信讨论哈
+        /**
+         * 流程表单触发器设置
+         */
+        private NormalFormTriggerSetting normalFormSetting;
+
         @Schema(description = "http 请求触发器设置", example = "{}")
         @Data
         public static class HttpRequestTriggerSetting {
@@ -359,6 +368,26 @@ public class BpmSimpleModelNodeVO {
             @Schema(description = "请求头参数设置", example = "[]")
             @Valid
             private List<HttpRequestParam> body;
+
+            // TODO @json：可能未来看情况，搞个 HttpResponseParam；得看看有没别的业务需要，抽象统一
+            /**
+             * 请求返回处理设置，用于修改流程表单值
+             * <p>
+             * key：表示要修改的流程表单字段名(name)
+             * value：接口返回的字段名
+             */
+            @Schema(description = "请求返回处理设置", example = "[]")
+            private List<KeyValue<String, String>> response;
+
+        }
+
+        @Schema(description = "流程表单触发器设置", example = "{}")
+        @Data
+        public static class NormalFormTriggerSetting {
+
+            @Schema(description = "修改的表单字段", example = "userName")
+            private Map<String, Object> updateFormFields;
+
         }
 
     }

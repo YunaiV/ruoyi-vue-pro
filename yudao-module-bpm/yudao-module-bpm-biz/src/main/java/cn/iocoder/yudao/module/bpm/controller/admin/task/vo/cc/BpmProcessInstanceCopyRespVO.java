@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.cc;
 
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "管理后台 - 流程实例抄送的分页 Item Response VO")
 @Data
@@ -39,5 +41,8 @@ public class BpmProcessInstanceCopyRespVO {
 
     @Schema(description = "抄送时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
+
+    @Schema(description = "流程摘要", example = "[]")
+    private List<KeyValue<String, String>> summary;
 
 }

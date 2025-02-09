@@ -64,6 +64,13 @@ public class BpmnModelUtils {
         addExtensionElement(element, name, String.valueOf(value));
     }
 
+    public static void addExtensionElementJson(FlowElement element, String name, Object value) {
+        if (value == null) {
+            return;
+        }
+        addExtensionElement(element, name, JsonUtils.toJsonString(value));
+    }
+
     public static void addExtensionElement(FlowElement element, String name, Map<String, String> attributes) {
         if (attributes == null) {
             return;

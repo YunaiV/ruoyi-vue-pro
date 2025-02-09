@@ -77,7 +77,8 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
                 .setUserId(userId).setReason(reason).setStartUserId(Long.valueOf(processInstance.getStartUserId()))
                 .setProcessInstanceId(processInstanceId).setProcessInstanceName(processInstance.getName())
                 .setCategory(processDefinition.getCategory()).setTaskId(taskId)
-                .setActivityId(activityId).setActivityName(activityName));
+                .setActivityId(activityId).setActivityName(activityName)
+                .setProcessDefinitionId(processInstance.getProcessDefinitionId()));
         processInstanceCopyMapper.insertBatch(copyList);
     }
 

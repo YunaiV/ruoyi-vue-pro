@@ -5,7 +5,6 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.ConditionGroups;
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
@@ -626,54 +625,50 @@ public class SimpleModelUtils {
 
         public static SequenceFlow buildSequenceFlow(String sourceId, String targetId,
                                                      BpmSimpleModelNodeVO node) {
-            String conditionExpression = buildConditionExpression(node);
+            String conditionExpression = buildConditionExpression(node.getConditionSetting());
             return buildBpmnSequenceFlow(sourceId, targetId, node.getId(), node.getName(), conditionExpression);
         }
+    }
 
-        /**
-         * 构造条件表达式
-         *
-         * @param node 条件节点
-         */
-        public static String buildConditionExpression(BpmSimpleModelNodeVO node) {
-            return buildConditionExpression(node.getConditionSetting().getConditionType(), node.getConditionSetting().getConditionExpression(),
-                    node.getConditionSetting().getConditionGroups());
+    /**
+     * 构造条件表达式
+     */
+    public static String buildConditionExpression(BpmSimpleModelNodeVO.ConditionSetting conditionSetting) {
+        return buildConditionExpression(conditionSetting.getConditionType(), conditionSetting.getConditionExpression(),
+                conditionSetting.getConditionGroups());
+    }
+
+    public static String buildConditionExpression(BpmSimpleModelNodeVO.RouterSetting routerSetting) {
+        return buildConditionExpression(routerSetting.getConditionType(), routerSetting.getConditionExpression(),
+                routerSetting.getConditionGroups());
+    }
+
+    public static String buildConditionExpression(Integer conditionType, String conditionExpression, ConditionGroups conditionGroups) {
+        BpmSimpleModeConditionTypeEnum conditionTypeEnum = BpmSimpleModeConditionTypeEnum.valueOf(conditionType);
+        if (conditionTypeEnum == BpmSimpleModeConditionTypeEnum.EXPRESSION) {
+            return conditionExpression;
         }
-
-        public static String buildConditionExpression(BpmSimpleModelNodeVO.RouterSetting router) {
-            return buildConditionExpression(router.getConditionType(), router.getConditionExpression(),
-                    router.getConditionGroups());
-        }
-
-        public static String buildConditionExpression(Integer conditionType, String conditionExpression,
-                                                      ConditionGroups conditionGroups) {
-            BpmSimpleModeConditionTypeEnum conditionTypeEnum = BpmSimpleModeConditionTypeEnum.valueOf(conditionType);
-            if (conditionTypeEnum == BpmSimpleModeConditionTypeEnum.EXPRESSION) {
-                return conditionExpression;
+        if (conditionTypeEnum == BpmSimpleModeConditionTypeEnum.RULE) {
+            if (conditionGroups == null || CollUtil.isEmpty(conditionGroups.getConditions())) {
+                return null;
             }
-            if (conditionTypeEnum == BpmSimpleModeConditionTypeEnum.RULE) {
-                if (conditionGroups == null || CollUtil.isEmpty(conditionGroups.getConditions())) {
-                    return null;
+            List<String> strConditionGroups = CollectionUtils.convertList(conditionGroups.getConditions(), item -> {
+                if (CollUtil.isEmpty(item.getRules())) {
+                    return "";
                 }
-                List<String> strConditionGroups = CollectionUtils.convertList(conditionGroups.getConditions(), item -> {
-                    if (CollUtil.isEmpty(item.getRules())) {
-                        return "";
-                    }
-                    // 构造规则表达式
-                    List<String> list = CollectionUtils.convertList(item.getRules(), (rule) -> {
-                        String rightSide = NumberUtil.isNumber(rule.getRightSide()) ? rule.getRightSide()
-                                : "\"" + rule.getRightSide() + "\""; // 如果非数值类型加引号
-                        return String.format(" %s %s var:convertByType(%s,%s)", rule.getLeftSide(), rule.getOpCode(), rule.getLeftSide(), rightSide);
-                    });
-                    // 构造条件组的表达式
-                    Boolean and = item.getAnd();
-                    return "(" + CollUtil.join(list, and ? " && " : " || ") + ")";
+                // 构造规则表达式
+                List<String> list = CollectionUtils.convertList(item.getRules(), (rule) -> {
+                    String rightSide = NumberUtil.isNumber(rule.getRightSide()) ? rule.getRightSide()
+                            : "\"" + rule.getRightSide() + "\""; // 如果非数值类型加引号
+                    return String.format(" %s %s var:convertByType(%s,%s)", rule.getLeftSide(), rule.getOpCode(), rule.getLeftSide(), rightSide);
                 });
-                return String.format("${%s}", CollUtil.join(strConditionGroups, conditionGroups.getAnd() ? " && " : " || "));
-            }
-            return null;
+                // 构造条件组的表达式
+                Boolean and = item.getAnd();
+                return "(" + CollUtil.join(list, and ? " && " : " || ") + ")";
+            });
+            return String.format("${%s}", CollUtil.join(strConditionGroups, conditionGroups.getAnd() ? " && " : " || "));
         }
-
+        return null;
     }
 
     public static class DelayTimerNodeConvert implements NodeConvert {
@@ -727,9 +722,10 @@ public class SimpleModelUtils {
             if (node.getTriggerSetting() != null) {
                 addExtensionElement(serviceTask, TRIGGER_TYPE, node.getTriggerSetting().getType());
                 if (node.getTriggerSetting().getHttpRequestSetting() != null) {
-                    // TODO @jason：加个 addExtensionElementJson 方法，方便设置 JSON 类型的属性
-                    addExtensionElement(serviceTask, TRIGGER_PARAM,
-                            JsonUtils.toJsonString(node.getTriggerSetting().getHttpRequestSetting()));
+                    addExtensionElementJson(serviceTask, TRIGGER_PARAM, node.getTriggerSetting().getHttpRequestSetting());
+                }
+                if (node.getTriggerSetting().getNormalFormSetting() != null) {
+                    addExtensionElementJson(serviceTask, TRIGGER_PARAM, node.getTriggerSetting().getNormalFormSetting());
                 }
             }
             return serviceTask;
@@ -760,7 +756,7 @@ public class SimpleModelUtils {
         }
 
         public static SequenceFlow buildSequenceFlow(String nodeId, BpmSimpleModelNodeVO.RouterSetting router) {
-            String conditionExpression = ConditionNodeConvert.buildConditionExpression(router);
+            String conditionExpression = SimpleModelUtils.buildConditionExpression(router);
             return buildBpmnSequenceFlow(nodeId, router.getNodeId(), null, null, conditionExpression);
         }
 
@@ -804,7 +800,7 @@ public class SimpleModelUtils {
             // 查找满足条件的 BpmSimpleModelNodeVO 节点
             BpmSimpleModelNodeVO matchConditionNode = CollUtil.findOne(currentNode.getConditionNodes(),
                     conditionNode -> !BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow())
-                            && evalConditionExpress(variables, conditionNode));
+                            && evalConditionExpress(variables, conditionNode.getConditionSetting()));
             if (matchConditionNode == null) {
                 matchConditionNode = CollUtil.findOne(currentNode.getConditionNodes(),
                         conditionNode -> BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow()));
@@ -819,7 +815,7 @@ public class SimpleModelUtils {
             // 查找满足条件的 BpmSimpleModelNodeVO 节点
             Collection<BpmSimpleModelNodeVO> matchConditionNodes = CollUtil.filterNew(currentNode.getConditionNodes(),
                     conditionNode -> !BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow())
-                            && evalConditionExpress(variables, conditionNode));
+                            && evalConditionExpress(variables, conditionNode.getConditionSetting()));
             if (CollUtil.isEmpty(matchConditionNodes)) {
                 matchConditionNodes = CollUtil.filterNew(currentNode.getConditionNodes(),
                         conditionNode -> BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow()));
@@ -841,16 +837,17 @@ public class SimpleModelUtils {
         simulateNextNode(currentNode.getChildNode(), variables, resultNodes);
     }
 
-    public static boolean evalConditionExpress(Map<String, Object> variables, BpmSimpleModelNodeVO conditionNode) {
-        return BpmnModelUtils.evalConditionExpress(variables, ConditionNodeConvert.buildConditionExpression(conditionNode));
+    public static boolean evalConditionExpress(Map<String, Object> variables, BpmSimpleModelNodeVO.ConditionSetting conditionSetting) {
+        return BpmnModelUtils.evalConditionExpress(variables, buildConditionExpression(conditionSetting));
     }
 
     // TODO @芋艿：【高】要不要优化下，抽个 HttpUtils
+
     /**
      * 添加 HTTP 请求参数。请求头或者请求体
      *
-     * @param params HTTP 请求参数
-     * @param paramSettings HTTP 请求参数设置
+     * @param params           HTTP 请求参数
+     * @param paramSettings    HTTP 请求参数设置
      * @param processVariables 流程变量
      */
     public static void addHttpRequestParam(MultiValueMap<String, String> params,

@@ -86,6 +86,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         if (StrUtil.isNotEmpty(name)) {
             modelQuery.modelNameLike("%" + name + "%");
         }
+        modelQuery.modelTenantId(FlowableUtils.getTenantId());
         return modelQuery.list();
     }
 
@@ -288,8 +289,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 2.3 清理所有 Task
         List<Task> tasks = taskService.createTaskQuery()
                 .processDefinitionKey(model.getKey()).list();
-        // TODO @lesan：貌似传递一个 reason 会好点！
-        tasks.forEach(task -> taskService.deleteTask(task.getId()));
+        tasks.forEach(task -> taskService.deleteTask(task.getId(),BpmReasonEnum.CANCEL_BY_PROCESS_CLEAN.getReason()));
     }
 
     @Override

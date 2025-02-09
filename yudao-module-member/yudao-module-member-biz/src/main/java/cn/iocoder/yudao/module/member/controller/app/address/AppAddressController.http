@@ -1,7 +1,7 @@
 ### 请求 /create 接口 => 成功
 POST {{appApi}}//member/address/create
 Content-Type: application/json
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 Authorization: Bearer {{appToken}}
 
 {
@@ -16,7 +16,7 @@ Authorization: Bearer {{appToken}}
 ### 请求 /update 接口 => 成功
 PUT {{appApi}}//member/address/update
 Content-Type: application/json
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 Authorization: Bearer {{appToken}}
 
 {
@@ -32,23 +32,23 @@ Authorization: Bearer {{appToken}}
 ### 请求 /delete 接口 => 成功
 DELETE {{appApi}}//member/address/delete?id=2
 Content-Type: application/json
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 Authorization: Bearer {{appToken}}
 
 ### 请求 /get 接口 => 成功
 GET {{appApi}}//member/address/get?id=1
 Content-Type: application/json
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 Authorization: Bearer {{appToken}}
 
 ### 请求 /get-default 接口 => 成功
 GET {{appApi}}//member/address/get-default
 Content-Type: application/json
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 Authorization: Bearer {{appToken}}
 
 ### 请求 /list 接口 => 成功
 GET {{appApi}}//member/address/list
 Content-Type: application/json
-tenant-id: {{appTenentId}}
+tenant-id: {{appTenantId}}
 Authorization: Bearer {{appToken}}
