@@ -5,9 +5,10 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.TriggerSetting.NormalFormTriggerSetting;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTriggerTypeEnum;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 // TODO @jason：改成 BpmFormUpdateTrigger
 /**
