@@ -39,7 +39,7 @@ public class AmazonadSdAdvertisedProductReportDataJob extends AmazonadDataJob{
         baseMetric.remove("endDate");
 
         var configuration = AmazonAdReportReqVO.Configuration.builder()
-            .adProduct("SPONSORED_DISPLAYS")
+            .adProduct("SPONSORED_DISPLAY")
             .groupBy(List.of("advertiser"))
             .columns(baseMetric)
             .reportTypeId("sdAdvertisedProduct")
