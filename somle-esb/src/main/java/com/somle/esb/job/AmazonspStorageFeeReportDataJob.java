@@ -2,6 +2,7 @@ package com.somle.esb.job;
 
 
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
+import com.somle.amazon.controller.vo.AmazonSpReportSaveVO;
 import com.somle.esb.model.OssData;
 import com.somle.framework.common.util.csv.TsvUtils;
 import org.springframework.stereotype.Component;
@@ -16,16 +17,15 @@ public class AmazonspStorageFeeReportDataJob extends AmazonspDataJob {
     public String execute(String param) throws Exception {
         setDate(param);
 
-        var vo = AmazonSpReportReqVO.builder()
-                .reportTypes(List.of("GET_FBA_STORAGE_FEE_CHARGES_DATA"))
-//                .processingStatuses(List.of(ProcessingStatuses.DONE))
-                .createdSince(beforeYesterdayFirstSecond)
-                .createdUntil(beforeYesterdayLastSecond)
+        var vo = AmazonSpReportSaveVO.builder()
+                .reportType("GET_FBA_STORAGE_FEE_CHARGES_DATA")
+                .dataStartTime(beforeYesterdayFirstSecond.toString())
+                .dataEndTime(beforeYesterdayLastSecond.toString())
                 .build();
 
         amazonSpService.clients.stream()
-            .flatMap(client ->
-                client.getReportStream(vo, null)
+            .map(client ->
+                client.createAndGetReportOrNull(vo, "gzip")
             )
             .forEach(report -> {
                 OssData data = OssData.builder()
@@ -34,7 +34,7 @@ public class AmazonspStorageFeeReportDataJob extends AmazonspDataJob {
                     .syncType("inc")
                     .requestTimestamp(System.currentTimeMillis())
                     .folderDate(beforeYesterday)
-                    .content(TsvUtils.toMapList(report))
+                    .content(report != null ? TsvUtils.toMapList(report) : "")
                     .headers(null)
                     .build();
                 service.send(data);

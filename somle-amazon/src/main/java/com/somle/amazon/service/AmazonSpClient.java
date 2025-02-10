@@ -21,13 +21,8 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.retry.backoff.ExponentialBackOffPolicy;
-import org.springframework.retry.policy.ExceptionClassifierRetryPolicy;
-import org.springframework.retry.policy.SimpleRetryPolicy;
-import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.client.HttpClientErrorException;
 
-import java.net.SocketTimeoutException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -163,7 +158,7 @@ public class AmazonSpClient {
     }
 
 
-    public List<AmazonSpReportRespVO> getReports(AmazonSpReportReqVO vo) {
+    public List<AmazonSpReportRespVO> listReports(AmazonSpReportReqVO vo) {
         log.info("get reports");
 
         String endPoint = getEndPoint();
@@ -183,7 +178,16 @@ public class AmazonSpClient {
     }
 
     public Stream<String> getReportStream(AmazonSpReportReqVO vo, String compression) {
-        return getReports(vo).stream().map(report -> getReport(report.getReportId(), compression));
+        return listReports(vo).stream().map(report -> getReport(report.getReportId(), compression));
+    }
+
+    public String getReportOrNull(String reportId, String compression) {
+        String report = null;
+        try {
+            report = getReport(reportId, compression);
+        } catch (AmazonException.ReportCancelledException e) {
+        }
+        return report;
     }
 
     @SneakyThrows
@@ -224,7 +228,7 @@ public class AmazonSpClient {
             log.info(status);
             switch (status) {
                 case "CANCELLED":
-                    throw new RuntimeException("Report cancelled, possibly no data in given criteria.");
+                    throw new AmazonException.ReportCancelledException(reportId);
                 case "IN_QUEUE":
                     break;
                 case "IN_PROGRESS":
@@ -320,6 +324,12 @@ public class AmazonSpClient {
     public String createAndGetReport(AmazonSpReportSaveVO vo, String compression) {
         String reportId = createReport(vo);
         var reportString = getReport(reportId, compression);
+        return reportString;
+    }
+
+    public String createAndGetReportOrNull(AmazonSpReportSaveVO vo, String compression) {
+        String reportId = createReport(vo);
+        var reportString = getReportOrNull(reportId, compression);
         return reportString;
     }
 }

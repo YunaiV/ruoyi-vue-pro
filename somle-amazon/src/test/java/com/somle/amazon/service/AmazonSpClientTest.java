@@ -148,13 +148,13 @@ class AmazonSpClientTest extends BaseSpringTest {
     }
 
     @Test
-    void getReports() {
+    void listReports() {
         var vo = AmazonSpReportReqVO.builder()
                 .reportTypes(List.of("GET_FBA_STORAGE_FEE_CHARGES_DATA"))
                 .processingStatuses(List.of(ProcessingStatuses.DONE))
                 .pageSize(100)
                 .build();
-        var reports = client.getReports(vo);
+        var reports = client.listReports(vo);
         for (var report : reports) {
             log.info(report.toString());
         }
