@@ -11,7 +11,7 @@ import lombok.Data;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class KingdeeProduct {
+public class KingdeeProductSaveReqVO {
 
 
     //自定义字段为引用辅助资料、引用基础资料时，提交单据保存接口，自定义字段名需要增加【_id】后缀，自定义字段值为：对应辅助资料或基础资料的id

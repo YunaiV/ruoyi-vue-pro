@@ -4,8 +4,8 @@ import cn.hutool.core.util.ObjUtil;
 import com.somle.framework.common.util.json.JSONObject;
 import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.framework.common.util.web.RequestX;
-import com.somle.kingdee.model.*;
 import com.somle.framework.common.util.web.WebUtils;
+import com.somle.kingdee.model.*;
 import com.somle.kingdee.model.supplier.KingdeeSupplier;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,10 @@ import org.springframework.beans.BeanUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 import static com.somle.kingdee.util.SignatureUtils.*;
@@ -128,48 +131,51 @@ public class KingdeeClient {
         return response;
     }
 
-    public KingdeeResponse addProduct(KingdeeProduct product) {
-        KingdeeProduct kingdeeProductCopy = new KingdeeProduct();
-        BeanUtils.copyProperties(product, kingdeeProductCopy);
+    public KingdeeResponse addProduct(KingdeeProductSaveReqVO product) {
+        KingdeeProductSaveReqVO saveReqVO = new KingdeeProductSaveReqVO();
+        BeanUtils.copyProperties(product, saveReqVO);
         try {
-            String id = getMaterial(kingdeeProductCopy.getNumber()).getData(JSONObject.class).getString("id");
-            kingdeeProductCopy.setId(id);
+            String id = getMaterial(saveReqVO.getNumber()).getData(JSONObject.class).getString("id");
+            saveReqVO.setId(id);
         } catch (Exception e) {
-            log.debug("id not found for " + kingdeeProductCopy.getNumber() + "adding new");
+            log.debug("id not found for " + saveReqVO.getNumber() + "adding new");
         }
 
-        kingdeeProductCopy.setVolumeUnitId(getMeasureUnitByNumber("立方厘米").getId());
-        kingdeeProductCopy.setWeightUnitId(getMeasureUnitByNumber("kg").getId());
-        kingdeeProductCopy.setBaseUnitId(getMeasureUnitByNumber("套").getId());
-        kingdeeProductCopy.setCustomField(
+        saveReqVO.setVolumeUnitId(getMeasureUnitByNumber("立方厘米").getId());
+        saveReqVO.setWeightUnitId(getMeasureUnitByNumber("kg").getId());
+        saveReqVO.setBaseUnitId(getMeasureUnitByNumber("套").getId());
+        saveReqVO.setCustomField(
             getCustomFieldByDisplayName("bd_material", "部门"),
-            getAuxInfoByNumber(kingdeeProductCopy.getSaleDepartmentId().toString()).getId()
+            getAuxInfoByNumber(saveReqVO.getSaleDepartmentId().toString()).getId()
         );
-        setCustomFieldSafely(kingdeeProductCopy, "报关品名", kingdeeProductCopy.getDeclaredTypeZh());
-        setCustomFieldSafely(kingdeeProductCopy, "报关品名(英文)", kingdeeProductCopy.getDeclaredTypeEn());
+        setCustomFieldSafely(saveReqVO, "报关品名", saveReqVO.getDeclaredTypeZh());
+        setCustomFieldSafely(saveReqVO, "报关品名(英文)", saveReqVO.getDeclaredTypeEn());
+        saveReqVO.setIgnoreWarn(true);//保存覆盖已存在产品
         log.debug("adding product");
         String endUrl = "/jdy/v2/bd/material";
         TreeMap<String, String> params = new TreeMap<>();
-        KingdeeResponse response = postResponse(endUrl, params, kingdeeProductCopy);
+        KingdeeResponse response = postResponse(endUrl, params, saveReqVO);
         return response;
     }
 
     /**
      * 根绝字段名称获取id，如果有该字段、则设置value，没有就日志记录
-     * @param kingdeeProductCopy 对象
-     * @param displayName 属性名称
-     * @param fieldValue 属性值
+     *
+     * @param reqVO 对象
+     * @param displayName        属性名称
+     * @param fieldValue         属性值
      */
-    private void setCustomFieldSafely(KingdeeProduct kingdeeProductCopy, String displayName, String fieldValue) {
+    private void setCustomFieldSafely(KingdeeProductSaveReqVO reqVO, String displayName, String fieldValue) {
         try {
             KingdeeCustomField customField = getCustomFieldByDisplayName("bd_material", displayName);
             if (customField != null) {
-                kingdeeProductCopy.setCustomField(customField, fieldValue);
+                reqVO.setCustomField(customField, fieldValue);
             }
         } catch (Exception e) {
             log.debug("custom field " + displayName + " skipped for " + token.getAccountName(), e);
         }
     }
+
     public KingdeeResponse addSupplier(KingdeeSupplier kingdeeSupplier) {
         KingdeeSupplier supplierCopy = new KingdeeSupplier();
         BeanUtils.copyProperties(kingdeeSupplier, supplierCopy);

@@ -8,7 +8,7 @@ import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.service.EccangService;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
-import com.somle.kingdee.model.KingdeeProduct;
+import com.somle.kingdee.model.KingdeeProductSaveReqVO;
 import com.somle.kingdee.service.KingdeeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,11 +68,11 @@ public class ErpCustomRuleHandler {
     @ServiceActivator(inputChannel = "erpCustomRuleChannel")
     public void syncCustomRulesToKingdee(@Payload List<ErpCustomRuleDTO> customRules) {
         log.debug("syncCustomRuleToKingdee");
-        List<KingdeeProduct> kingdee = erpToKingdeeConverter.convert(processRules(customRules));
-        for (KingdeeProduct kingdeeProduct : kingdee) {
-            kingdeeService.addProduct(kingdeeProduct);
+        List<KingdeeProductSaveReqVO> kingdee = erpToKingdeeConverter.convert(processRules(customRules));
+        for (KingdeeProductSaveReqVO reqVO : kingdee) {
+            kingdeeService.addProduct(reqVO);
         }
-        log.info("syncCustomRuleToKingdee end,skus={{}}}", kingdee.stream().map(KingdeeProduct::getNumber).toList());
+        log.info("syncCustomRuleToKingdee end,skus={{}}}", kingdee.stream().map(KingdeeProductSaveReqVO::getNumber).toList());
     }
 
 
