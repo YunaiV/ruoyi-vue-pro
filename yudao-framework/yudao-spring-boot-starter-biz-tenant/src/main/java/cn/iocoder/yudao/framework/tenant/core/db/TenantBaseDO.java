@@ -17,5 +17,8 @@ public abstract class TenantBaseDO extends BaseDO {
      * 多租户编号
      */
     private Long tenantId;
-
+//    /**
+//     * 乐观锁
+//     */
+//    private Integer revision;
 }

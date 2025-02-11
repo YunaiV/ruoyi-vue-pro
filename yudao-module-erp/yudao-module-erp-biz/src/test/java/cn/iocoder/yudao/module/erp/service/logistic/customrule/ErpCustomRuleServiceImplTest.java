@@ -1,32 +1,24 @@
 package cn.iocoder.yudao.module.erp.service.logistic.customrule;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
-import jakarta.annotation.Resource;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-
-import cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo.*;
+import cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo.ErpCustomRulePageReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo.ErpCustomRuleSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.logistic.customrule.ErpCustomRuleDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
 import jakarta.annotation.Resource;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import java.util.*;
-import java.time.LocalDateTime;
 
-import static cn.hutool.core.util.RandomUtil.*;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.CUSTOM_RULE_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
  * {@link ErpCustomRuleServiceImpl} 的单元测试类
@@ -92,8 +84,8 @@ public class ErpCustomRuleServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         customRuleService.deleteCustomRule(id);
-       // 校验数据不存在了
-       assertNull(customRuleMapper.selectById(id));
+        // 校验数据不存在了
+        assertNull(customRuleMapper.selectById(id));
     }
 
     @Test
@@ -108,63 +100,63 @@ public class ErpCustomRuleServiceImplTest extends BaseDbUnitTest {
     @Test
     @Disabled  // TODO 请修改 null 为需要的值，然后删除 @Disabled 注解
     public void testGetCustomRulePage() {
-       // mock 数据
-       ErpCustomRuleDO dbCustomRule = randomPojo(ErpCustomRuleDO.class, o -> { // 等会查询到
-           o.setCountryCode(null);
-           o.setType(null);
-           o.setSupplierProductId(null);
-           o.setDeclaredTypeEn(null);
-           o.setDeclaredType(null);
-           o.setDeclaredValue(null);
-           o.setDeclaredValueCurrencyCode(null);
-           o.setTaxRate(null);
-           o.setHscode(null);
-           o.setLogisticAttribute(null);
-           o.setCreateTime(null);
-       });
-       customRuleMapper.insert(dbCustomRule);
-       // 测试 countryCode 不匹配
-       customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setCountryCode(null)));
-       // 测试 type 不匹配
-       customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setType(null)));
-       // 测试 supplierProductId 不匹配
-       customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setSupplierProductId(null)));
-       // 测试 declaredTypeEn 不匹配
-       customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setDeclaredTypeEn(null)));
-       // 测试 declaredType 不匹配
-       customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setDeclaredType(null)));
-       // 测试 declaredValue 不匹配
-       customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setDeclaredValue(null)));
-       // 测试 declaredValueCurrencyCode 不匹配
-       customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setDeclaredValueCurrencyCode(null)));
-       // 测试 taxRate 不匹配
-       customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setTaxRate(null)));
-       // 测试 hscode 不匹配
-       customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setHscode(null)));
-       // 测试 logisticAttribute 不匹配
-       customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setLogisticAttribute(null)));
-       // 测试 createTime 不匹配
-       customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setCreateTime(null)));
-       // 准备参数
-       ErpCustomRulePageReqVO reqVO = new ErpCustomRulePageReqVO();
-       reqVO.setCountryCode(null);
-       reqVO.setType(null);
-       reqVO.setSupplierProductId(null);
-       reqVO.setDeclaredTypeEn(null);
-       reqVO.setDeclaredType(null);
-       reqVO.setDeclaredValue(null);
-       reqVO.setDeclaredValueCurrencyCode(null);
-       reqVO.setTaxRate(null);
-       reqVO.setHscode(null);
-       reqVO.setLogisticAttribute(null);
-       reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
+        // mock 数据
+        ErpCustomRuleDO dbCustomRule = randomPojo(ErpCustomRuleDO.class, o -> { // 等会查询到
+            o.setCountryCode(null);
+//           o.setType(null);
+//           o.setSupplierProductId(null);
+            o.setDeclaredTypeEn(null);
+            o.setDeclaredType(null);
+            o.setDeclaredValue(null);
+            o.setDeclaredValueCurrencyCode(null);
+            o.setTaxRate(null);
+            o.setHscode(null);
+            o.setLogisticAttribute(null);
+            o.setCreateTime(null);
+        });
+        customRuleMapper.insert(dbCustomRule);
+        // 测试 countryCode 不匹配
+        customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setCountryCode(null)));
+        // 测试 type 不匹配
+//       customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setType(null)));
+        // 测试 supplierProductId 不匹配
+//       customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setSupplierProductId(null)));
+        // 测试 declaredTypeEn 不匹配
+        customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setDeclaredTypeEn(null)));
+        // 测试 declaredType 不匹配
+        customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setDeclaredType(null)));
+        // 测试 declaredValue 不匹配
+        customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setDeclaredValue(null)));
+        // 测试 declaredValueCurrencyCode 不匹配
+        customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setDeclaredValueCurrencyCode(null)));
+        // 测试 taxRate 不匹配
+        customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setTaxRate(null)));
+        // 测试 hscode 不匹配
+        customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setHscode(null)));
+        // 测试 logisticAttribute 不匹配
+        customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setLogisticAttribute(null)));
+        // 测试 createTime 不匹配
+        customRuleMapper.insert(cloneIgnoreId(dbCustomRule, o -> o.setCreateTime(null)));
+        // 准备参数
+        ErpCustomRulePageReqVO reqVO = new ErpCustomRulePageReqVO();
+        reqVO.setCountryCode(null);
+//       reqVO.setType(null);
+//       reqVO.setSupplierProductId(null);
+        reqVO.setDeclaredTypeEn(null);
+        reqVO.setDeclaredType(null);
+        reqVO.setDeclaredValue(null);
+        reqVO.setDeclaredValueCurrencyCode(null);
+        reqVO.setTaxRate(null);
+        reqVO.setHscode(null);
+        reqVO.setLogisticAttribute(null);
+        reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
-       // 调用
-       PageResult<ErpCustomRuleDO> pageResult = customRuleService.getCustomRulePage(reqVO);
-       // 断言
-       assertEquals(1, pageResult.getTotal());
-       assertEquals(1, pageResult.getList().size());
-       assertPojoEquals(dbCustomRule, pageResult.getList().get(0));
+        // 调用
+        PageResult<ErpCustomRuleDO> pageResult = customRuleService.getCustomRulePage(reqVO);
+        // 断言
+        assertEquals(1, pageResult.getTotal());
+        assertEquals(1, pageResult.getList().size());
+        assertPojoEquals(dbCustomRule, pageResult.getList().get(0));
     }
 
 }
