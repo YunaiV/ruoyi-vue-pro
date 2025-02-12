@@ -163,7 +163,7 @@ public class EccangService {
             case "saas.api.error.code.0061": //达到限流时-继续重试
                 throw new HttpClientErrorException(HttpStatus.TOO_MANY_REQUESTS, "(同一客户每秒请求接口次数不能超过10次)请求受限，继续重试");
             case "common.error.code.9999":
-                throw new RuntimeException("Eccang return invalid response: " + response.getBizContent(EccangResponse.EccangError.class));
+                throw new RuntimeException("Eccang return invalid response: " + response);
             default:
                 throw new RuntimeException("Unknown eccang-specific response code: " + response.getCode() + " " + "message: " + response.getMessage());
         }

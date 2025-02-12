@@ -1,5 +1,6 @@
 package com.somle.eccang;
 
+import com.somle.eccang.config.EccangIntegrationConfig;
 import com.somle.eccang.model.*;
 import com.somle.eccang.repository.EccangTokenRepository;
 import com.somle.eccang.service.EccangService;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,6 +23,7 @@ import java.util.List;
 @Slf4j
 @Import({
     EccangService.class,
+    EccangIntegrationConfig.class,
 })
 public class EccangTest extends BaseSpringTest {
     @Resource
@@ -30,11 +33,7 @@ public class EccangTest extends BaseSpringTest {
     EccangTokenRepository tokenRepo;
 
 
-    @MockBean(name = "dataChannel")
-    MessageChannel dataChannel;
 
-    @MockBean(name = "saleChannel")
-    MessageChannel saleChannel;
 
     @BeforeEach
     void init() {
@@ -106,6 +105,19 @@ public class EccangTest extends BaseSpringTest {
             2023
         );
         log.info(String.valueOf(result.toList().size()));
+    }
+
+    @Test
+    public void getOrder2() {
+        var reqVO = EccangOrderVO.builder()
+            .condition(
+                EccangOrderVO.Condition.builder()
+                    .platformCreateDateStart(LocalDateTime.of(2025, 1, 1,0,0))
+                    .platformCreateDateEnd(LocalDateTime.of(2025, 1, 2,0,0))
+                    .build()
+            )
+            .build();
+        log.info(service.getOrderUnarchivePages(reqVO).toList().toString());
     }
 
     @Test
