@@ -122,6 +122,7 @@ public class IotDeviceDO extends TenantBaseDO {
      */
     private String firmwareId;
 
+    // TODO @芋艿：【待定 003】：要不要增加 username？目前 tl 有，阿里云之类的没有
     /**
      * 设备密钥，用于设备认证，需安全存储
      */
@@ -144,6 +145,7 @@ public class IotDeviceDO extends TenantBaseDO {
     // TODO @haohao：是不是要枚举哈
     private String authType;
 
+    // TODO @芋艿：【待定 002】：1）设备维护的时候，设置位置？类似 tl？；2）设备上传的时候，设置位置，类似 it？
     /**
      * 设备位置的纬度
      */
