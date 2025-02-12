@@ -190,6 +190,7 @@ public class AmazonAdClient {
         return reportId;
     }
 
+    @SneakyThrows
     public JSONArray getReport(Long profileId, String reportId) {
 
         String partialUrl = "/reporting/reports";
@@ -222,7 +223,7 @@ public class AmazonAdClient {
                         CoreUtils.sleep(10000);
                         continue;
                     default:
-                        throw new RuntimeException("Http error code: " + response + response.body());
+                        throw new RuntimeException("Http wrong code response: " + response + "\nbody: " + response.body().string());
                 }
                  responseBody = WebUtils.parseResponse(response, JSONObject.class);
             }
