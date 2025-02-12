@@ -479,7 +479,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 1. 开始节点/审批节点
         if (ObjectUtils.equalsAny(node.getType(),
                 BpmSimpleModelNodeTypeEnum.START_USER_NODE.getType(),
-                BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType())) {
+                BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType(),
+                BpmSimpleModelNodeTypeEnum.TRANSACTOR_NODE.getType())) {
             List<Long> candidateUserIds = getTaskCandidateUserList(bpmnModel, node.getId(),
                     startUserId, processDefinitionInfo.getProcessDefinitionId(), processVariables);
             activityNode.setCandidateUserIds(candidateUserIds);

@@ -40,7 +40,7 @@ public class SimpleModelUtils {
 
     static {
         List<NodeConvert> converts = asList(new StartNodeConvert(), new EndNodeConvert(),
-                new StartUserNodeConvert(), new ApproveNodeConvert(), new CopyNodeConvert(),
+                new StartUserNodeConvert(), new ApproveNodeConvert(), new CopyNodeConvert(), new TransactorNodeConvert(),
                 new DelayTimerNodeConvert(), new TriggerNodeConvert(),
                 new ConditionBranchNodeConvert(), new ParallelBranchNodeConvert(), new InclusiveBranchNodeConvert(), new RouteBranchNodeConvert());
         converts.forEach(convert -> NODE_CONVERTS.put(convert.getType(), convert));
@@ -514,6 +514,13 @@ public class SimpleModelUtils {
 
     }
 
+    private static class TransactorNodeConvert extends ApproveNodeConvert {
+        @Override
+        public BpmSimpleModelNodeTypeEnum getType() {
+            return BpmSimpleModelNodeTypeEnum.TRANSACTOR_NODE;
+        }
+    }
+
     private static class CopyNodeConvert implements NodeConvert {
 
         @Override
@@ -785,10 +792,11 @@ public class SimpleModelUtils {
         BpmSimpleModelNodeTypeEnum nodeType = BpmSimpleModelNodeTypeEnum.valueOf(currentNode.getType());
         Assert.notNull(nodeType, "模型节点类型不支持");
 
-        // 情况：START_NODE/START_USER_NODE/APPROVE_NODE/COPY_NODE/END_NODE
+        // 情况：START_NODE/START_USER_NODE/APPROVE_NODE/COPY_NODE/END_NODE/TRANSACTOR_NODE
         if (nodeType == BpmSimpleModelNodeTypeEnum.START_NODE
                 || nodeType == BpmSimpleModelNodeTypeEnum.START_USER_NODE
                 || nodeType == BpmSimpleModelNodeTypeEnum.APPROVE_NODE
+                || nodeType == BpmSimpleModelNodeTypeEnum.TRANSACTOR_NODE
                 || nodeType == BpmSimpleModelNodeTypeEnum.COPY_NODE
                 || nodeType == BpmSimpleModelNodeTypeEnum.END_NODE) {
             // 添加元素
