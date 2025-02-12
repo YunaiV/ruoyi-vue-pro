@@ -7,7 +7,7 @@
 //import com.somle.eccang.service.EccangService;
 //import com.somle.esb.converter.ErpToEccangConverter;
 //import com.somle.esb.converter.ErpToKingdeeConverter;
-//import com.somle.kingdee.model.KingdeeProduct;
+//import com.somle.kingdee.model.KingdeeProductSaveReqVO;
 //import com.somle.kingdee.model.supplier.KingdeeSupplier;
 //import com.somle.kingdee.service.KingdeeService;
 //import lombok.extern.slf4j.Slf4j;

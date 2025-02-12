@@ -2,7 +2,7 @@ package com.somle.kingdee.service;
 
 
 import com.somle.kingdee.model.KingdeeAuxInfoDetail;
-import com.somle.kingdee.model.KingdeeProduct;
+import com.somle.kingdee.model.KingdeeProductSaveReqVO;
 import com.somle.kingdee.model.KingdeeToken;
 import com.somle.kingdee.model.supplier.KingdeeSupplier;
 import com.somle.kingdee.repository.KingdeeTokenRepository;
@@ -70,7 +70,7 @@ public class KingdeeService {
     }
 
 
-    public void addProduct(KingdeeProduct product) {
+    public void addProduct(KingdeeProductSaveReqVO product) {
         clientList.parallelStream().forEach(n-> n.addProduct(product));
     }
 
