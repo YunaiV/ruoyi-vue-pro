@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.module.erp.controller.admin.product.vo.product;
 
-import lombok.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
@@ -26,6 +29,15 @@ public class ErpProductPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
+    @Schema(description = "修改时间(\"yyyy-MM-dd HH:mm:ss\")")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime[] updateTime;
+
+    @Schema(description = "更新人")
+    private String updater;
+    @Schema(description = "创建人")
+    private String creator;
+
     @Schema(description = "部门id")
     private Long deptId;
 
@@ -35,7 +47,7 @@ public class ErpProductPageReqVO extends PageParam {
     @Schema(description = "单位编号")
     private Long unitId;
 
-    @Schema(description = "品牌",example = "you")
+    @Schema(description = "品牌")
     private String brand;
 
     @Schema(description = "材料（中文）")
@@ -73,6 +85,18 @@ public class ErpProductPageReqVO extends PageParam {
 
     @Schema(description = "基础高度（mm）")
     private Integer height;
+
+    @Schema(description = "包装长度（整数，没有小数点，单位mm，必须为正数）")
+    private Integer packageLength;
+
+    @Schema(description = "包装宽度（整数，没有小数点，单位mm，必须为正数）")
+    private Integer packageWidth;
+
+    @Schema(description = "包装高度（整数，没有小数点，单位mm，必须为正数）")
+    private Integer packageHeight;
+
+    @Schema(description = "包装重量（保留至小数点后两位，单位kg，必须为非负数）")
+    private BigDecimal packageWeight;
 
     @Schema(description = "PO产品经理id")
     private Long productOwnerId;

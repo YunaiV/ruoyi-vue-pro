@@ -92,6 +92,8 @@ public class ErpProductController {
         return success(convertList(list, product -> new ErpProductRespVO().setId(product.getId())
             .setName(product.getName()).setBarCode(product.getBarCode())
             .setCategoryId(product.getCategoryId()).setCategoryName(product.getCategoryName())
+            .setBrand(product.getBrand())
+            .setSeries(product.getSeries())
             .setUnitId(product.getUnitId()).setUnitName(product.getUnitName())));
     }
 
