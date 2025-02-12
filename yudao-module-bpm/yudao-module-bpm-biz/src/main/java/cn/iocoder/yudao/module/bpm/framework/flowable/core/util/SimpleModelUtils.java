@@ -40,7 +40,7 @@ public class SimpleModelUtils {
 
     static {
         List<NodeConvert> converts = asList(new StartNodeConvert(), new EndNodeConvert(),
-                new StartUserNodeConvert(), new ApproveNodeConvert(), new CopyNodeConvert(),
+                new StartUserNodeConvert(), new ApproveNodeConvert(), new CopyNodeConvert(), new TransactorNodeConvert(),
                 new DelayTimerNodeConvert(), new TriggerNodeConvert(),
                 new ConditionBranchNodeConvert(), new ParallelBranchNodeConvert(), new InclusiveBranchNodeConvert(), new RouteBranchNodeConvert());
         converts.forEach(convert -> NODE_CONVERTS.put(convert.getType(), convert));
@@ -512,6 +512,13 @@ public class SimpleModelUtils {
             userTask.setLoopCharacteristics(multiInstanceCharacteristics);
         }
 
+    }
+
+    private static class TransactorNodeConvert extends ApproveNodeConvert {
+        @Override
+        public BpmSimpleModelNodeTypeEnum getType() {
+            return BpmSimpleModelNodeTypeEnum.TRANSACTOR_NODE;
+        }
     }
 
     private static class CopyNodeConvert implements NodeConvert {
