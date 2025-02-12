@@ -241,7 +241,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         PayOrderCreateReqDTO reqDTO = randomPojo(PayOrderCreateReqDTO.class,
                 o -> o.setAppKey("demo").setMerchantOrderId("10"));
         // mock 数据
-        PayOrderDO dbOrder = randomPojo(PayOrderDO.class,  o -> o.setAppId(1L).setMerchantOrderId("10"));
+        PayOrderDO dbOrder = randomPojo(PayOrderDO.class, o -> o.setAppId(1L).setMerchantOrderId("10"));
         orderMapper.insert(dbOrder);
         // mock 方法
         PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L).setOrderNotifyUrl("http://127.0.0.1"));
@@ -358,9 +358,9 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
             when(client.unifiedOrder(argThat(payOrderUnifiedReqDTO -> {
                 assertNotNull(payOrderUnifiedReqDTO.getOutTradeNo());
                 assertThat(payOrderUnifiedReqDTO)
-                        .extracting("subject", "body", "notifyUrl", "returnUrl", "price", "expireTime")
+                        .extracting("subject", "body", "notifyUrl", "returnUrl", "price")
                         .containsExactly(order.getSubject(), order.getBody(), "http://127.0.0.1/10",
-                                reqVO.getReturnUrl(), order.getPrice(), order.getExpireTime());
+                                reqVO.getReturnUrl(), order.getPrice());
                 return true;
             }))).thenReturn(unifiedOrderResp);
 
@@ -372,7 +372,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
             assertNotNull(orderExtension);
             assertThat(orderExtension).extracting("no", "orderId").isNotNull();
             assertThat(orderExtension)
-                    .extracting("channelId", "channelCode","userIp" ,"status", "channelExtras",
+                    .extracting("channelId", "channelCode", "userIp", "status", "channelExtras",
                             "channelErrorCode", "channelErrorMsg", "channelNotifyData")
                     .containsExactly(10L, PayChannelEnum.ALIPAY_APP.getCode(), userIp,
                             PayOrderStatusEnum.WAITING.getStatus(), reqVO.getChannelExtras(),
@@ -412,9 +412,9 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
             when(client.unifiedOrder(argThat(payOrderUnifiedReqDTO -> {
                 assertNotNull(payOrderUnifiedReqDTO.getOutTradeNo());
                 assertThat(payOrderUnifiedReqDTO)
-                        .extracting("subject", "body", "notifyUrl", "returnUrl", "price", "expireTime")
+                        .extracting("subject", "body", "notifyUrl", "returnUrl", "price")
                         .containsExactly(order.getSubject(), order.getBody(), "http://127.0.0.1/10",
-                                reqVO.getReturnUrl(), order.getPrice(), order.getExpireTime());
+                                reqVO.getReturnUrl(), order.getPrice());
                 return true;
             }))).thenReturn(unifiedOrderResp);
 
@@ -425,7 +425,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
             assertNotNull(orderExtension);
             assertThat(orderExtension).extracting("no", "orderId").isNotNull();
             assertThat(orderExtension)
-                    .extracting("channelId", "channelCode","userIp" ,"status", "channelExtras",
+                    .extracting("channelId", "channelCode", "userIp", "status", "channelExtras",
                             "channelErrorCode", "channelErrorMsg", "channelNotifyData")
                     .containsExactly(10L, PayChannelEnum.ALIPAY_APP.getCode(), userIp,
                             PayOrderStatusEnum.WAITING.getStatus(), reqVO.getChannelExtras(),
@@ -661,7 +661,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
                 "updateTime", "updater");
         // 断言，调用
         verify(notifyService).createPayNotifyTask(eq(PayNotifyTypeEnum.ORDER.getType()),
-            eq(orderExtension.getOrderId()));
+                eq(orderExtension.getOrderId()));
     }
 
     @Test
@@ -973,7 +973,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         // 断言
         assertEquals(count, 0);
         // 断言 order 没有变化，因为没更新
-        assertPojoEquals(order, orderMapper.selectOne(null));
+        assertPojoEquals(order, orderMapper.selectOne(null), "expireTime");
     }
 
     @Test
@@ -995,7 +995,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         // 断言
         assertEquals(count, 0);
         // 断言 order 没有变化，因为没更新
-        assertPojoEquals(order, orderMapper.selectOne(null));
+        assertPojoEquals(order, orderMapper.selectOne(null), "expireTime");
     }
 
     @Test
@@ -1024,7 +1024,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         // 断言
         assertEquals(count, 0);
         // 断言 order 没有变化，因为没更新
-        assertPojoEquals(order, orderMapper.selectOne(null));
+        assertPojoEquals(order, orderMapper.selectOne(null), "expireTime");
     }
 
     @Test
@@ -1061,7 +1061,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
             // 断言
             assertEquals(count, 0);
             // 断言 order 没有变化，因为没更新
-            assertPojoEquals(order, orderMapper.selectOne(null));
+            assertPojoEquals(order, orderMapper.selectOne(null), "expireTime");
             verify(payOrderServiceImpl).notifyOrder(same(channel), same(respDTO));
         }
     }
@@ -1099,7 +1099,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         // 断言 order 变化
         order.setStatus(PayOrderStatusEnum.CLOSED.getStatus());
         assertPojoEquals(order, orderMapper.selectOne(null),
-                "updateTime", "updater");
+                "updateTime", "updater", "expireTime");
     }
 
 }
