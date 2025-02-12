@@ -515,10 +515,12 @@ public class SimpleModelUtils {
     }
 
     private static class TransactorNodeConvert extends ApproveNodeConvert {
+
         @Override
         public BpmSimpleModelNodeTypeEnum getType() {
             return BpmSimpleModelNodeTypeEnum.TRANSACTOR_NODE;
         }
+
     }
 
     private static class CopyNodeConvert implements NodeConvert {
