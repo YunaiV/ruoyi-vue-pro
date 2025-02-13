@@ -20,15 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.retry.backoff.ExponentialBackOffPolicy;
-import org.springframework.retry.policy.ExceptionClassifierRetryPolicy;
-import org.springframework.retry.policy.SimpleRetryPolicy;
-import org.springframework.retry.support.RetryTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
-import java.net.SocketTimeoutException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
@@ -156,8 +151,7 @@ public class EccangService {
                 }
             case "429":
                 throw new HttpClientErrorException(HttpStatus.TOO_MANY_REQUESTS, "Too many requests, please try again later.");
-            case "500", "saas.api.error.code.0082":
-                throw new RuntimeException("Eccang error, full response: " + response);
+//            case "500", "saas.api.error.code.0082":
             case "saas.api.error.code.0049":
                 throw new RuntimeException("签名过期：时间戳必须在一分钟以内，超出1分钟则过期失效，且只能用一次。 时间戳重新生成后，需要重新生成签名");
             case "saas.api.error.code.0061": //达到限流时-继续重试
@@ -165,7 +159,7 @@ public class EccangService {
             case "common.error.code.9999":
                 throw new RuntimeException("Eccang return invalid response: " + response);
             default:
-                throw new RuntimeException("Unknown eccang-specific response code: " + response.getCode() + " " + "message: " + response.getMessage());
+                throw new RuntimeException("Unknown eccang-specific full response:" + response);
         }
     }
 
