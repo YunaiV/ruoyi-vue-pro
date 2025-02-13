@@ -27,9 +27,7 @@ import java.util.List;
 @Data
 public class BpmModelMetaInfoVO {
 
-    @Schema(description = "流程图标", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/yudao.jpg")
-    @NotEmpty(message = "流程图标不能为空")
-    @URL(message = "流程图标格式不正确")
+    @Schema(description = "流程图标", example = "https://www.iocoder.cn/yudao.jpg")
     private String icon;
 
     @Schema(description = "流程描述", example = "我是描述")
