@@ -219,7 +219,7 @@ public class WebUtils {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         InputStream inputStream = connection.getInputStream();
-        if ("gzip".equalsIgnoreCase(compression)) {
+        if ("GZIP".equalsIgnoreCase(compression)) {
             inputStream = new GZIPInputStream(inputStream);
         }
         return inputStream;

@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -119,6 +120,30 @@ public class AmazonSpClient {
         }
     }
 
+    @SneakyThrows
+    public void validateResponse(Response response) {
+        switch (response.code()) {
+            case 200:
+                break;
+            case 202:
+                break;
+            case 403:
+                var error = WebUtils.parseResponse(response, AmazonSpErrorListVO.class);
+                switch (error.getErrors().get(0).getCode()) {
+                    case "Unauthorized":
+                        log.error(error.toString());
+                        throw new RuntimeException("Error unauthorized");
+                    default:
+                        break;
+                }
+                throw new RuntimeException("Error creating report: " + error);
+            case 429:
+                throw new HttpClientErrorException(HttpStatus.TOO_MANY_REQUESTS, response.body().string());
+            default:
+                throw new RuntimeException("Unknown response code: " + response.code() + "Detail: " + response.body().string());
+        }
+    }
+
 
 
     @SneakyThrows
@@ -177,102 +202,80 @@ public class AmazonSpClient {
         }
     }
 
-    public Stream<String> getReportStream(AmazonSpReportReqVO vo, String compression) {
-        return listReports(vo).stream().map(report -> getReport(report.getReportId(), compression));
+    public Stream<String> getReportStream(AmazonSpReportReqVO vo) {
+        return listReports(vo).stream().map(report -> waitAndGetReportDocument(report.getReportId()));
     }
 
-    public String getReportOrNull(String reportId, String compression) {
+    public String getReportOrNull(String reportId) {
         String report = null;
         try {
-            report = getReport(reportId, compression);
+            report = waitAndGetReportDocument(reportId);
         } catch (AmazonException.ReportCancelledException e) {
         }
         return report;
     }
 
     @SneakyThrows
-    public String getReport(String reportId, String compression) {
+    public AmazonSpReportRespVO getReport(String reportId) {
         log.info("get report");
         int RETENTION_DAYS = 720;
         DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         String endPoint = getEndPoint();
-        String result = null;
 
         // Check report status and get document ID
-        String status = null;
         String reportStatusUrl = endPoint + "/reports/2021-06-30/reports/" + reportId;
-        String docId = null;
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.GET)
+            .headers(generateHeaders(auth))
+            .url(reportStatusUrl)
+            .build();
+        try(var response = WebUtils.sendRequest(request)){
+            validateResponse(response);
+            return WebUtils.parseResponse(response, AmazonSpReportRespVO.class);
+        }
+    }
+
+    @SneakyThrows
+    public AmazonSpReportDocumentRespVO getReportDocument(String docId) {
+        // Use document ID to get download URL
+        String documentUrl = getEndPoint() + "/reports/2021-06-30/documents/" + docId;
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.GET)
+            .url(documentUrl)
+            .headers(generateHeaders(auth))
+            .build();
+        try(var response = WebUtils.sendRequest(request)){
+            validateResponse(response);
+            return JsonUtils.parseObject(response.body().string(), AmazonSpReportDocumentRespVO.class);
+        }
+    }
+
+    @SneakyThrows
+    public String waitAndGetReportDocument(String reportId) {
+        // Check report status and get document ID
+        String status = null;
+        AmazonSpReportRespVO respVO = null;
         while (!"DONE".equals(status)) {
-            log.info("requesting for document id");
-            var request = RequestX.builder()
-                .requestMethod(RequestX.Method.GET)
-                .headers(generateHeaders(auth))
-                .url(reportStatusUrl)
-                .build();
-            JSONObject responseBody = null;
-            try(var response = WebUtils.sendRequest(request)){
-                switch (response.code()) {
-                    case 200:
-                        break;
-                    case 429:
-                        log.info("Received 429 Too Many Requests. Retrying...");
-                        CoreUtils.sleep(3000);
-                        continue;
-                    default:
-                        throw new RuntimeException("Http error code: " + response + response.body());
-                }
-                 responseBody = WebUtils.parseResponse(response, JSONObject.class);
-            }
-            status = responseBody.getString("processingStatus");
-            log.info(status);
+            respVO = getReport(reportId);
+            status = respVO.getProcessingStatus();
             switch (status) {
                 case "CANCELLED":
                     throw new AmazonException.ReportCancelledException(reportId);
                 case "IN_QUEUE":
-                    break;
+                    continue;
                 case "IN_PROGRESS":
-                    break;
+                    continue;
                 case "DONE":
-                    docId = responseBody.getString("reportDocumentId");
                     break;
                 default:
                     throw new RuntimeException("Unknown status code: " + status);
             }
-
         }
 
-        // Use document ID to get download URL
-        String docUrl = null;
-        String documentUrl = endPoint + "/reports/2021-06-30/documents/" + docId;
-        while (docUrl == null) {
-            var request = RequestX.builder()
-                .requestMethod(RequestX.Method.GET)
-                .url(documentUrl)
-                .headers(generateHeaders(auth))
-                .build();
-            try(var response = WebUtils.sendRequest(request)){
-                switch (response.code()) {
-                    case 200:
-                        JSONObject responseBody = JsonUtils.parseObject(response.body().string(), JSONObject.class);
-                        docUrl = responseBody.getString("url");
-                    case 429:
-                        log.info("Received 429 Too Many Requests. Retrying...");
-                        CoreUtils.sleep(3000);
-                        continue;
-                    default:
-                        throw new RuntimeException("Unknown reponse code: " + response + response.body());
-                }
-            }
-        }
-
-        log.info("Document URL: {}", docUrl);
-
+        var docRespVO = getReportDocument(respVO.getReportDocumentId());
         // Use util to process the document URL
-        result = WebUtils.urlToString(docUrl, compression);
-
-
-        return result;
+        return WebUtils.urlToString(docRespVO.getUrl(), docRespVO.getCompressionAlgorithm().toString());
     }
 
     @SneakyThrows
@@ -293,26 +296,15 @@ public class AmazonSpClient {
                 .payload(vo)
                 .build();
             reportId = CoreUtils.retry(ctx -> {
+                // 获取当前重试次数
+                int retryCount = ctx.getRetryCount();
+                // 记录每次重试的日志
+                log.debug("遇到错误: {}", ctx.getLastThrowable().getStackTrace().toString());
+                log.debug("正在请求url= {},第 {} 次重试。", request.getUrl(), retryCount + 1);
                 try(var response = WebUtils.sendRequest(request)){
-                    switch (response.code()) {
-                        case 202:
-                            var report = WebUtils.parseResponse(response, AmazonSpReportRespVO.class);
-                            return report.getReportId();
-                        case 403:
-                            var error = WebUtils.parseResponse(response, AmazonSpErrorListVO.class);
-                            switch (error.getErrors().get(0).getCode()) {
-                                case "Unauthorized":
-                                    log.error(error.toString());
-                                    throw new RuntimeException("Error unauthorized");
-                                default:
-                                    break;
-                            }
-                            throw new RuntimeException("Error creating report: " + error);
-                        case 429:
-                            throw new HttpClientErrorException(HttpStatus.TOO_MANY_REQUESTS, response.body().string());
-                        default:
-                            throw new RuntimeException("Unknown response code: " + response.code() + "Detail: " + response.body().string());
-                    }
+                    validateResponse(response);
+                    var report = WebUtils.parseResponse(response, AmazonSpReportRespVO.class);
+                    return report.getReportId();
                 }
             });
 
@@ -321,15 +313,15 @@ public class AmazonSpClient {
         return reportId;
     }
 
-    public String createAndGetReport(AmazonSpReportSaveVO vo, String compression) {
+    public String createAndGetReport(AmazonSpReportSaveVO vo) {
         String reportId = createReport(vo);
-        var reportString = getReport(reportId, compression);
+        var reportString = waitAndGetReportDocument(reportId);
         return reportString;
     }
 
-    public String createAndGetReportOrNull(AmazonSpReportSaveVO vo, String compression) {
+    public String createAndGetReportOrNull(AmazonSpReportSaveVO vo) {
         String reportId = createReport(vo);
-        var reportString = getReportOrNull(reportId, compression);
+        var reportString = getReportOrNull(reportId);
         return reportString;
     }
 }

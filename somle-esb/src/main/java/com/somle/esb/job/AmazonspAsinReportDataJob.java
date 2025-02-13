@@ -40,7 +40,7 @@ public class AmazonspAsinReportDataJob extends AmazonspDataJob {
                         .marketplaceIds(List.of(participation.getMarketplace().getId()))
                         .reportOptions(options)
                         .build();
-                    var report = client.createAndGetReport(vo, "gzip");
+                    var report = client.createAndGetReport(vo);
 
                     OssData data = OssData.builder()
                         .database(DATABASE)

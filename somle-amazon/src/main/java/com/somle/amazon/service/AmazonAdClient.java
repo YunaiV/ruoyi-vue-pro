@@ -20,6 +20,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Response;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -66,6 +69,34 @@ public class AmazonAdClient {
 
 
 
+    private JSONObject sendRequest(Long profileId, RequestX request) {
+        return CoreUtils.retry(ctx -> {
+            try(var response = WebUtils.sendRequest(request);){
+                validateResponse(profileId, response);
+                return WebUtils.parseResponse(response, JSONObject.class);
+            }
+        });
+    }
+
+    @SneakyThrows
+    private void validateResponse(Long profileId, Response response) {
+        switch (response.code()) {
+            case 200:
+                break;
+            case 401:
+                var additionalMessage = profileId == null ? "" : profileId.toString();
+                throw new RuntimeException("Unauthorized error, token expired" + additionalMessage);
+            case 425:
+                throw new RuntimeException("The Request is a duplicate");
+            case 429:
+                throw new HttpClientErrorException(HttpStatus.TOO_MANY_REQUESTS, "Received 429 Too Many Requests. Retrying...");
+            default:
+                throw new RuntimeException("Http wrong code response: " + response + "\nbody: " + response.body().string());
+        }
+    }
+
+
+
     public AmazonAdAccountRespVO listAccounts() {
         JSONObject payload = JsonUtils.newObject();
 
@@ -105,11 +136,6 @@ public class AmazonAdClient {
         return listProfiles().stream().filter(profile -> "seller".equals(profile.getAccountInfo().getType())).collect(Collectors.toList());
     }
 
-
-//    public JSONObject getProfile() {
-//
-//    }
-
     public JSONObject listPortfolios(Long profileId) {
         JSONObject payload = JsonUtils.newObject();
 
@@ -123,11 +149,7 @@ public class AmazonAdClient {
             .headers(generateHeaders(profileId))
             .payload(payload)
             .build();
-        try(var response = WebUtils.sendRequest(request)){
-            var responseBody = WebUtils.parseResponse(response, JSONObject.class);
-            log.info(responseBody.toString());
-            return responseBody;
-        }
+        return sendRequest(profileId, request);
     }
 
     public Stream<JSONArray> batchCreateAndGetReport(AmazonAdReportReqVO payload) {
@@ -169,22 +191,8 @@ public class AmazonAdClient {
                 .headers(generateHeaders(profileId))
                 .payload(payload)
                 .build();
-            try(var response = WebUtils.sendRequest(request)){
-                switch (response.code()) {
-                    case 200:
-                        break;
-                    case 425:
-                        throw new RuntimeException("The Request is a duplicate");
-                    case 429:
-                        log.info("Received 429 Too Many Requests. Retrying...");
-                        CoreUtils.sleep(3000);
-                        continue;
-                    default:
-                        throw new RuntimeException("Unknown response code in creating report: " + response.body().string());
-                }
-                var responseBody = WebUtils.parseResponse(response, JSONObject.class);
-                reportId = responseBody.getString("reportId");
-            }
+            var response = sendRequest(profileId, request);
+            reportId = response.getString("reportId");
         }
         log.info("Got report ID for profileId: " + profileId);
         return reportId;
@@ -211,22 +219,8 @@ public class AmazonAdClient {
                 .url(reportStatusUrl)
                 .headers(generateHeaders(profileId))
                 .build();
-            JSONObject responseBody = null;
-            try(var response = WebUtils.sendRequest(request);){
-                switch (response.code()) {
-                    case 200:
-                        break;
-                    case 401:
-                        throw new RuntimeException("Failed for profileId " + profileId + " Unauthorized error, token expired");
-                    case 429:
-                        log.info("Received 429 Too Many Requests. Retrying...");
-                        CoreUtils.sleep(10000);
-                        continue;
-                    default:
-                        throw new RuntimeException("Http wrong code response: " + response + "\nbody: " + response.body().string());
-                }
-                 responseBody = WebUtils.parseResponse(response, JSONObject.class);
-            }
+            JSONObject responseBody = sendRequest(profileId, request);
+
             log.debug(responseBody.toString());
             status = responseBody.getString("status");
             log.info(status);
@@ -247,7 +241,7 @@ public class AmazonAdClient {
         }
         log.info("Got doc url {}", docUrl);
 
-        var contentString = WebUtils.urlToString(docUrl, "gzip");
+        var contentString = WebUtils.urlToString(docUrl, "GZIP");
 
         return JsonUtils.parseObject(contentString, JSONArray.class);
     }

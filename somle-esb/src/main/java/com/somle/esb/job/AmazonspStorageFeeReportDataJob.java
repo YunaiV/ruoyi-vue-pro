@@ -27,7 +27,7 @@ public class AmazonspStorageFeeReportDataJob extends AmazonspDataJob {
                         .dataStartTime(beforeYesterdayFirstSecond.toString())
                         .dataEndTime(beforeYesterdayLastSecond.toString())
                         .build();
-                    var report = client.createAndGetReportOrNull(vo, "gzip");
+                    var report = client.createAndGetReportOrNull(vo);
                     OssData data = OssData.builder()
                         .database(DATABASE)
                         .tableName("storage_fee_report")
