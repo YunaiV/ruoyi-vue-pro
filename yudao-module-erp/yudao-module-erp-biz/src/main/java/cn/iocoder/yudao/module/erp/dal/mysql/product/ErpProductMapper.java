@@ -10,8 +10,6 @@ import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * ERP 产品 Mapper
@@ -25,8 +23,6 @@ public interface ErpProductMapper extends BaseMapperX<ErpProductDO> {
         MPJLambdaWrapper<ErpProductDO> orderByDesc = new MPJLambdaWrapperX<ErpProductDO>()
             .betweenIfPresent(ErpProductDO::getCreateTime, reqVO.getCreateTime()) // 添加创建时间查询
             .betweenIfPresent(ErpProductDO::getUpdateTime, reqVO.getUpdateTime())  // 添加修改时间查询
-//            .leftJoin(AdminUserDO.class, "creatorUser", AdminUserDO::getId, ErpProductDO::getCreator)
-//            .leftJoin(AdminUserDO.class, "updaterUser", AdminUserDO::getId, ErpProductDO::getUpdater)
             .likeIfExists(ErpProductDO::getName, reqVO.getName())
             .eqIfExists(ErpProductDO::getCategoryId, reqVO.getCategoryId())
             .likeIfExists(ErpProductDO::getBarCode, reqVO.getBarCode())
@@ -44,10 +40,8 @@ public interface ErpProductMapper extends BaseMapperX<ErpProductDO> {
             .likeIfExists(ErpProductDO::getWeight, reqVO.getWeight())  // 重量查询
             // 创建人 模糊
             .eqIfExists(ErpProductDO::getCreator, reqVO.getCreator())
-//            .likeIfExists("creatorUser", AdminUserDO::getNickname, reqVO.getCreator())
             // 更新人 模糊
             .eqIfExists(ErpProductDO::getUpdater, reqVO.getUpdater())
-//            .likeIfExists("updaterUser", AdminUserDO::getNickname, reqVO.getUpdater())
             .orderByDesc(ErpProductDO::getId);
         return selectPage(reqVO, orderByDesc);
     }
