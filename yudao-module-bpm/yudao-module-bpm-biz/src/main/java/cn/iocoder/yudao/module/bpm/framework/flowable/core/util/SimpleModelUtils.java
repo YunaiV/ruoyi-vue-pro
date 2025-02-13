@@ -445,6 +445,8 @@ public class SimpleModelUtils {
             addSignEnable(node.getSignEnable(), userTask);
             // 审批意见
             addReasonRequire(node.getReasonRequire(), userTask);
+            // 节点类型
+            addNodeType(node.getType(), userTask);
             return userTask;
         }
 

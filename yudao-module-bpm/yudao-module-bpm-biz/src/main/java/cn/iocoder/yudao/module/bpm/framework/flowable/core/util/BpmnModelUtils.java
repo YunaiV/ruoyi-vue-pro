@@ -410,6 +410,26 @@ public class BpmnModelUtils {
         return parseExtensionElement(flowElement, TRIGGER_PARAM);
     }
 
+    /**
+     * 给节点添加节点类型
+     *
+     * @param nodeType 节点类型
+     * @param flowElement 节点
+     */
+    public static void addNodeType(Integer nodeType, FlowElement flowElement) {
+        addExtensionElement(flowElement, BpmnModelConstants.NODE_TYPE, nodeType);
+    }
+
+    /**
+     * 解析节点类型
+     *
+     * @param flowElement 节点
+     * @return 节点类型
+     */
+    public static Integer parseNodeType(FlowElement flowElement) {
+        return NumberUtils.parseInt(parseExtensionElement(flowElement, BpmnModelConstants.NODE_TYPE));
+    }
+
     // ========== BPM 简单查找相关的方法 ==========
 
     /**
