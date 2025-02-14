@@ -1,7 +1,5 @@
 package com.somle.amazon.service;
 
-import com.somle.amazon.repository.AmazonAdAuthRepository;
-import com.somle.amazon.repository.AmazonAdClientRepository;
 import com.somle.amazon.repository.AmazonSpAuthRepository;
 import com.somle.amazon.repository.AmazonSpClientRepository;
 import jakarta.annotation.PostConstruct;
@@ -35,19 +33,20 @@ public class AmazonSpService {
 
 
     @Scheduled(cron = "0 0,30 * * * *")
-    public void refreshAuth() {
-        clients.stream()
-            .forEach(client -> {
-                var auth = client.getAuth();
-                var newAccessToken = amazonService.refreshAccessToken(
-                    auth.getClientId(),
-                    clientRepository.findById(auth.getClientId()).get().getSecret(),
-                    auth.getRefreshToken()
-                );
-                auth.setAccessToken(newAccessToken);
-                client.setAuth(auth);
-                authRepository.save(auth);
-            });
+    public void refreshAuths() {
+        clients.forEach(this::refreshAuth);
+    }
+
+    private void refreshAuth(AmazonSpClient client) {
+        var auth = client.getAuth();
+        var newAccessToken = amazonService.refreshAccessToken(
+            auth.getClientId(),
+            clientRepository.findById(auth.getClientId()).get().getSecret(),
+            auth.getRefreshToken()
+        );
+        auth.setAccessToken(newAccessToken);
+        client.setAuth(auth);
+        authRepository.save(auth);
     }
 
 }

@@ -94,7 +94,7 @@ public class AmazonAdService {
         clients.forEach(this::refreshAuth);
     }
 
-    public void refreshAuth(AmazonAdClient client) {
+    private void refreshAuth(AmazonAdClient client) {
         var auth = client.getAuth();
         var newAccessToken = amazonService.refreshAccessToken(
             auth.getClientId(),

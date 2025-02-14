@@ -27,6 +27,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 
@@ -203,13 +204,13 @@ public class AmazonSpClient {
     }
 
     public Stream<String> getReportStream(AmazonSpReportReqVO vo) {
-        return listReports(vo).stream().map(report -> waitAndGetReportDocument(report.getReportId()));
+        return listReports(vo).stream().map(report -> waitAndGetReportDocumentString(report.getReportId()));
     }
 
     public String getReportOrNull(String reportId) {
         String report = null;
         try {
-            report = waitAndGetReportDocument(reportId);
+            report = waitAndGetReportDocumentString(reportId);
         } catch (AmazonException.ReportCancelledException e) {
         }
         return report;
@@ -252,7 +253,7 @@ public class AmazonSpClient {
     }
 
     @SneakyThrows
-    public String waitAndGetReportDocument(String reportId) {
+    public String waitAndGetReportDocumentString(String reportId) {
         // Check report status and get document ID
         String status = null;
         AmazonSpReportRespVO respVO = null;
@@ -275,7 +276,7 @@ public class AmazonSpClient {
 
         var docRespVO = getReportDocument(respVO.getReportDocumentId());
         // Use util to process the document URL
-        return WebUtils.urlToString(docRespVO.getUrl(), docRespVO.getCompressionAlgorithm().toString());
+        return WebUtils.urlToString(docRespVO.getUrl(), Objects.toString(docRespVO.getCompressionAlgorithm(),null));
     }
 
     @SneakyThrows
@@ -315,7 +316,7 @@ public class AmazonSpClient {
 
     public String createAndGetReport(AmazonSpReportSaveVO vo) {
         String reportId = createReport(vo);
-        var reportString = waitAndGetReportDocument(reportId);
+        var reportString = waitAndGetReportDocumentString(reportId);
         return reportString;
     }
 
