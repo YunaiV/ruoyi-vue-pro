@@ -15,7 +15,7 @@ public class ErpCustomCategoryItemSaveReqVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "5710")
     @Null(groups = Validation.OnCreate.class, message = "创建时，子项id必须为空")
-    @NotNull(groups = Validation.OnUpdate.class, message = "更新时，子项id不能为空")
+//    @NotNull(groups = Validation.OnUpdate.class, message = "更新时，子项id不能为空")
     private Long id;
 
 //    @Schema(description = "分类表id", requiredMode = Schema.RequiredMode.REQUIRED, example = "25022")

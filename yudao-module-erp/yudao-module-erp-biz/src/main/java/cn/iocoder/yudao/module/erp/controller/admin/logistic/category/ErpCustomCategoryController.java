@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.module.erp.controller.admin.logistic.category.item.vo.ErpCustomCategoryItemRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.logistic.category.item.vo.ErpCustomCategoryItemSimpleRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.logistic.category.vo.ErpCustomCategoryPageReqVO;
@@ -58,6 +59,7 @@ public class ErpCustomCategoryController {
     @PostMapping("/create")
     @Operation(summary = "创建海关分类")
     @PreAuthorize("@ss.hasPermission('erp:custom-category:create')")
+    @Idempotent
     public CommonResult<Long> createCustomRuleCategory(@Validated(Validation.OnCreate.class) @RequestBody ErpCustomCategorySaveReqVO createReqVO) {
         return success(customRuleCategoryService.createCustomRuleCategory(createReqVO));
     }

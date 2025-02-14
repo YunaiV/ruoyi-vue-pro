@@ -116,6 +116,11 @@ public class ErpCustomCategoryServiceImpl implements ErpCustomCategoryService {
         customRuleCategoryItemMapper.insertBatch(list);
     }
 
+    /**
+     * 更新海关分类子表
+     * @param categoryId 海关分类id
+     * @param list 海关分类子表
+     */
     private void updateCustomRuleCategoryItemList(Long categoryId, List<ErpCustomCategoryItemDO> list) {
         deleteCustomRuleCategoryItemByCategoryId(categoryId);
         list.forEach(o -> o.setId(null).setUpdater(null).setUpdateTime(null)); // 解决更新情况下：1）id 冲突；2）updateTime 不更新
