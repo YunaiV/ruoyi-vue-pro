@@ -326,7 +326,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             ActivityNode activityNode = new ActivityNode().setId(task.getTaskDefinitionKey()).setName(task.getName())
                     .setNodeType(START_USER_NODE_ID.equals(task.getTaskDefinitionKey())
                             ? BpmSimpleModelNodeTypeEnum.START_USER_NODE.getType()
-                            : parseNodeType(flowNode))
+                            : ObjectUtil.isNull(parseNodeType(flowNode)) ?
+                            BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType() : parseNodeType(flowNode))
                     .setStatus(FlowableUtils.getTaskStatus(task))
                     .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(flowNode))
                     .setStartTime(DateUtils.of(task.getCreateTime())).setEndTime(DateUtils.of(task.getEndTime()))
@@ -403,7 +404,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             HistoricActivityInstance firstActivity = CollUtil.getFirst(taskActivities); // 取第一个任务，会签/或签的任务，开始时间相同
             ActivityNode activityNode = new ActivityNode().setId(firstActivity.getActivityId())
                     .setName(firstActivity.getActivityName())
-                    .setNodeType(parseNodeType(flowNode))
+                    .setNodeType(ObjectUtil.isNull(parseNodeType(flowNode)) ?
+                            BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType() : parseNodeType(flowNode))
                     .setStatus(BpmTaskStatusEnum.RUNNING.getStatus())
                     .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(flowNode))
                     .setStartTime(DateUtils.of(CollUtil.getFirst(taskActivities).getStartTime()))
