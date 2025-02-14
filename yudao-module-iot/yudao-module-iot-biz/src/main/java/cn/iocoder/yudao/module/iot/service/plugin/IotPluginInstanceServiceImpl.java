@@ -191,13 +191,23 @@ public class IotPluginInstanceServiceImpl implements IotPluginInstanceService {
         // 启动插件
         if (status.equals(IotPluginStatusEnum.RUNNING.getStatus())
                 && plugin.getPluginState() != PluginState.STARTED) {
-            pluginManager.startPlugin(pluginKey);
+            try {
+                pluginManager.startPlugin(pluginKey);
+            } catch (Exception e) {
+                log.error("[updatePluginStatus][启动插件({}) 失败]", pluginKey, e);
+                throw exception(ErrorCodeConstants.PLUGIN_START_FAILED, e);
+            }
             log.info("已启动插件: {}", pluginKey);
         }
         // 停止插件
         else if (status.equals(IotPluginStatusEnum.STOPPED.getStatus())
                 && plugin.getPluginState() == PluginState.STARTED) {
-            pluginManager.stopPlugin(pluginKey);
+            try {
+                pluginManager.stopPlugin(pluginKey);
+            } catch (Exception e) {
+                log.error("[updatePluginStatus][停止插件({}) 失败]", pluginKey, e);
+                throw exception(ErrorCodeConstants.PLUGIN_STOP_FAILED, e);
+            }
             log.info("已停止插件: {}", pluginKey);
         }
     }

@@ -65,16 +65,16 @@
         </dependency>
 
         <!-- TODO @haohao：貌似不需要这个？ -->
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-web</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.vertx</groupId>-->
+<!--            <artifactId>vertx-web</artifactId>-->
+<!--        </dependency>-->
 
         <!-- TODO @haohao：貌似 biz 模块，不需要 MQTT？ -->
-        <dependency>
-            <groupId>org.eclipse.paho</groupId> <!-- MQTT -->
-            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.eclipse.paho</groupId> &lt;!&ndash; MQTT &ndash;&gt;-->
+<!--            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.pf4j</groupId>  <!-- PF4J：内置插件机制 -->

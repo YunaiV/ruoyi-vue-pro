@@ -46,6 +46,8 @@ public interface ErrorCodeConstants {
     ErrorCode PLUGIN_CONFIG_DELETE_FAILED_RUNNING = new ErrorCode(1_050_006_003, "请先停止插件");
     ErrorCode PLUGIN_STATUS_INVALID = new ErrorCode(1_050_006_004, "插件状态无效");
     ErrorCode PLUGIN_CONFIG_KEY_DUPLICATE = new ErrorCode(1_050_006_005, "插件标识已存在");
+    ErrorCode PLUGIN_START_FAILED = new ErrorCode(1_050_006_006, "插件启动失败");
+    ErrorCode PLUGIN_STOP_FAILED = new ErrorCode(1_050_006_007, "插件停止失败");
 
     // ========== 插件实例 1-050-007-000 ==========
 

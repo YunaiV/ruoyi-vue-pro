@@ -59,22 +59,13 @@ public class IotHttpVertxPlugin extends SpringPlugin {
 
     @Override
     protected ApplicationContext createApplicationContext() {
-        // TODO @haohao：这个加 deviceDataApi 的目的是啥呀？
-        AnnotationConfigApplicationContext pluginContext = new AnnotationConfigApplicationContext() {
-
-            @Override
-            protected void prepareRefresh() {
-                // 在刷新容器前注册主程序中的 Bean
-                ConfigurableListableBeanFactory beanFactory = this.getBeanFactory();
-                IotDeviceUpstreamApi deviceDataApi = SpringUtil.getBean(IotDeviceUpstreamApi.class);
-                beanFactory.registerSingleton("deviceDataApi", deviceDataApi);
-                super.prepareRefresh();
-            }
-
-        };
-
+        // 创建插件自己的 ApplicationContext
+        AnnotationConfigApplicationContext pluginContext = new AnnotationConfigApplicationContext();
+        // 设置父容器为主应用的 ApplicationContext （确保主应用中提供的类可用）
+        pluginContext.setParent(SpringUtil.getApplicationContext());
+        // 继续使用插件自己的 ClassLoader 以加载插件内部的类
         pluginContext.setClassLoader(getWrapper().getPluginClassLoader());
-        // TODO @芋艿：枚举
+        // 扫描当前插件的自动配置包
         pluginContext.scan("cn.iocoder.yudao.module.iot.plugin.http.config");
         pluginContext.refresh();
         return pluginContext;

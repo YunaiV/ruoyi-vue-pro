@@ -94,6 +94,34 @@
                     </archive>
                 </configuration>
             </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-shade-plugin</artifactId>-->
+<!--                <version>3.6.0</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>shade</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <minimizeJar>true</minimizeJar>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <configuration>-->
+<!--                    <archive>-->
+<!--                        <manifestEntries>-->
+<!--                            <Plugin-Id>${plugin.id}</Plugin-Id>-->
+<!--                            <Plugin-Class>${plugin.class}</Plugin-Class>-->
+<!--                            <Plugin-Version>${plugin.version}</Plugin-Version>-->
+<!--                            <Plugin-Provider>${plugin.provider}</Plugin-Provider>-->
+<!--                            <Plugin-Description>${plugin.description}</Plugin-Description>-->
+<!--                            <Plugin-Dependencies>${plugin.dependencies}</Plugin-Dependencies>-->
+<!--                        </manifestEntries>-->
+<!--                    </archive>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
 
             <!-- 独立模式 -->
             <plugin>
@@ -112,12 +140,6 @@
                 </executions>
             </plugin>
 
-            <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
