@@ -31,7 +31,7 @@ public class KingdeeController {
 
     @PostConstruct
     public void init() {
-        this.kingdeeClient = kingdeeService.getClientList().get(0);
+        this.kingdeeClient = kingdeeService.getClients().get(0);
         log.info(kingdeeClient.getToken().getAccountName());
     }
 

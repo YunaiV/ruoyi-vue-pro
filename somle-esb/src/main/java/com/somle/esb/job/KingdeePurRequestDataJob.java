@@ -24,7 +24,7 @@ public class KingdeePurRequestDataJob extends KingdeeDataJob {
             .build();
 
         // 获取所有 Kingdee 客户端列表
-        for (KingdeeClient client : kingdeeService.getClientList()) {
+        for (KingdeeClient client : kingdeeService.getClients()) {
             // 获取当前客户端的采购请求列表
             List<KingdeePurRequest> purRequests = client.getPurRequest(vo);
             // 获取当前时间戳，用于记录请求时间

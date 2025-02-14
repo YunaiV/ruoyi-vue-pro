@@ -135,7 +135,7 @@ public class KingdeeServiceTest extends BaseSpringTest {
 
     @Test
     public void testGetAuxInfoType() {
-        var client = service.getClientList().get(0);
+        var client = service.getClients().get(0);
         var vo = new KingdeePurRequestReqVO();
         log.info(client.getAuxInfoTypeByNumber("BM").toString());
     }
@@ -143,7 +143,7 @@ public class KingdeeServiceTest extends BaseSpringTest {
 
     @Test
     public void testGetPurRequest() {
-        var client = service.getClientList().get(0);
+        var client = service.getClients().get(0);
         var vo = KingdeePurRequestReqVO.builder()
             .createStartTime(LocalDateTimeUtils.toTimestamp(LocalDateTime.now().minusDays(1)))
             .createEndTime(LocalDateTimeUtils.toTimestamp(LocalDateTime.now()))
@@ -155,7 +155,7 @@ public class KingdeeServiceTest extends BaseSpringTest {
     public void testGetPurOrder() {
         var start = LocalDateTime.of(2024, 10, 1, 0, 0, 0).atZone(ZoneId.systemDefault()).toInstant();
         var end = LocalDateTime.of(2024, 11, 1, 0, 0, 0).atZone(ZoneId.systemDefault()).toInstant();
-        var client = service.getClientList().get(0);
+        var client = service.getClients().get(0);
         var vo = KingdeePurOrderReqVO.builder()
             .createStartTime(Timestamp.from(start))
             .createEndTime(Timestamp.from(end))
@@ -167,7 +167,7 @@ public class KingdeeServiceTest extends BaseSpringTest {
     @Test
     @Rollback(false)
     public void testGetCustomField() {
-        var client = service.getClientList().get(0);
+        var client = service.getClients().get(0);
         client.refreshAuth();
         for (String[] field : fields) {
             log.info(client.getCustomField(field[1]).toString());
@@ -177,7 +177,7 @@ public class KingdeeServiceTest extends BaseSpringTest {
 
     @Test
     public void testGetCustomFieldByDisplayName() {
-        var client = service.getClientList().get(0);
+        var client = service.getClients().get(0);
         log.info(client.getCustomFieldByDisplayName("bd_material", "部门").toString());
     }
 }
