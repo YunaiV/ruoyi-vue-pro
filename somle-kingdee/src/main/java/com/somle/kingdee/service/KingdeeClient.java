@@ -36,18 +36,18 @@ public class KingdeeClient {
         this.token = token;
     }
 
-    public KingdeeToken refreshAuth() {
+    protected KingdeeToken refreshAuth() {
         return fillAuth(pushAuth(token));
     }
 
-    public KingdeeToken fillAuth(KingdeeToken token) {
+    private KingdeeToken fillAuth(KingdeeToken token) {
         token.setAppSignature(getAppSignature(token));
         token.setAppToken(getAppToken(token));
         log.info("tokens filled successfully");
         return token;
     }
 
-    public String getAppToken(KingdeeToken token) {
+    private String getAppToken(KingdeeToken token) {
         log.info("preparing app token");
         String appKey = token.getAppKey();
         String appSignature = token.getAppSignature();
@@ -69,7 +69,7 @@ public class KingdeeClient {
         return response.getData(JSONObject.class).getString("app-token");
     }
 
-    public KingdeeToken pushAuth(KingdeeToken token) {
+    private KingdeeToken pushAuth(KingdeeToken token) {
         String outerInstanceId = token.getOuterInstanceId();
         String reqMtd = "POST";
         String ctime = String.valueOf(System.currentTimeMillis());

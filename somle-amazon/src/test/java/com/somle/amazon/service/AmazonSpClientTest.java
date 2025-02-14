@@ -41,11 +41,6 @@ class AmazonSpClientTest extends BaseSpringTest {
 //        log.info(report.toString());
 //    }
 
-    @Test
-    void refreshToken() {
-        spService.refreshAuth();
-    }
-
 //    @Test
 //    void getAccount() {
 //        var shop = amazonService.shopRepository.findByCountryCode("US");
@@ -168,7 +163,15 @@ class AmazonSpClientTest extends BaseSpringTest {
 //                .pageSize(100)
 //                .build();
 //        var report = client.getReports(vo).get(0);
-        log.info(client.waitAndGetReportDocument("970685020124"));
+        log.info(client.waitAndGetReportDocumentString("970685020124"));
+    }
+
+    @Test
+    void getReportDocument() {
+        var respVO = client.getReport("970685020124");
+        log.info(respVO.toString());
+        var listing = client.getReportDocument(respVO.getReportDocumentId());
+        log.info(listing.toString());
     }
 
 

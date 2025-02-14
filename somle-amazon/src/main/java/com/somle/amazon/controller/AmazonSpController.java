@@ -1,18 +1,8 @@
 package com.somle.amazon.controller;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.List;
-
-import com.somle.amazon.controller.vo.AmazonSpOrderReqVO;
-import com.somle.amazon.controller.vo.AmazonSpOrderRespVO;
 import com.somle.amazon.service.AmazonSpService;
-import com.somle.framework.common.util.date.LocalDateTimeUtils;
-import com.somle.framework.common.util.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import com.somle.amazon.service.AmazonService;
 
 
 @RestController
@@ -23,7 +13,7 @@ public class AmazonSpController {
 
     @PostMapping("refreshAuth")
     void refreshAuth() {
-        service.refreshAuth();
+        service.refreshAuths();
     }
 
 //    @GetMapping("orders")

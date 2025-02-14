@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +46,7 @@ public class ErpCustomRuleController {
     @PostMapping("/create")
     @Operation(summary = "创建ERP 海关规则")
     @PreAuthorize("@ss.hasPermission('erp:custom-rule:create')")
+    @Idempotent
     public CommonResult<Long> createCustomRule(@Valid @RequestBody ErpCustomRuleSaveReqVO createReqVO) {
         return success(customRuleService.createCustomRule(createReqVO));
     }

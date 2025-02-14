@@ -36,7 +36,6 @@ import java.util.stream.Stream;
 @Setter
 public class AmazonAdClient {
 
-//    public AmazonAccount account;
 
     private AmazonAdAuthDO auth;
 

@@ -6,12 +6,12 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductSimpleRespVO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductServiceDelegator;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,12 +40,11 @@ public class ErpProductController {
 
     @Resource
     private ErpProductServiceDelegator productService;
-    @Resource
-    private AdminUserApi adminUserApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建产品")
     @PreAuthorize("@ss.hasPermission('erp:product:create')")
+    @Idempotent
     public CommonResult<Long> createProduct(@Valid @RequestBody ErpProductSaveReqVO createReqVO) {
         return success(productService.createProduct(createReqVO));
     }
