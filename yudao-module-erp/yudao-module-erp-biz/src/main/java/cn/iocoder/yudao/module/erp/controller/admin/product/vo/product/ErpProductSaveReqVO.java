@@ -44,6 +44,9 @@ public class ErpProductSaveReqVO {
     @NotEmpty(message = "材料（中文）不能为空")
     private String material;
 
+    @Schema(description = "产品材质-关联海关分类")
+    private Long customCategoryId;
+
     @Schema(description = "产品状态（1启用，0禁用）", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "产品状态（1启用，0禁用）不能为空")
     private Boolean status;

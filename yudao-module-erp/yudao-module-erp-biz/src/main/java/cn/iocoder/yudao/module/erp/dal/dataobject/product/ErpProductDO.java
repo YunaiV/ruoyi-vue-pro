@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.product;
 
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
-
-import com.baomidou.mybatisplus.annotation.*;
 
 import java.math.BigDecimal;
 
@@ -51,6 +52,10 @@ public class ErpProductDO extends TenantBaseDO {
      * 材料（中文）
      */
     private String material;
+    /**
+     * 产品材质-关联海关分类
+     */
+    private Long customCategoryId;
     /**
      * 产品状态（1启用，0禁用）
      */

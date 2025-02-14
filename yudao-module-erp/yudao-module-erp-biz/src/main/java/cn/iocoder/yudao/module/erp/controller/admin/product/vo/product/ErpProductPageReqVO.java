@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.erp.controller.admin.product.vo.product;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

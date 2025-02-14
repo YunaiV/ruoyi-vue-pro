@@ -59,6 +59,9 @@ public class ErpProductRespVO extends BaseDO {
     @ExcelProperty("材料（中文）")
     private String material;
 
+    @Schema(description = "产品材质-关联海关分类")
+    private Long customCategoryId;
+
     @Schema(description = "产品状态（1启用，0禁用）", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @ExcelProperty("产品状态（1启用，0禁用）")
     private Boolean status;

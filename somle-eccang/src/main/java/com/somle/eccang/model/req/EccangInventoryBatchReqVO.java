@@ -38,19 +38,19 @@ public class EccangInventoryBatchReqVO {
     private Integer warehouseId;
 
     // 上架时间-开始时间 (格式：YYYY-MM-DD)
-    @JsonFormat(pattern = "yyyy-MM-DD")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date fifoTimeFrom;
 
     // 上架时间-截止时间 (格式：YYYY-MM-DD)
-    @JsonFormat(pattern = "yyyy-MM-DD")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date fifoTimeTo;
 
     // 更新时间-开始时间 (格式：YYYY-MM-DD)
-    @JsonFormat(pattern = "yyyy-MM-DD")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date ibUpdateTimeFrom;
 
     // 更新时间-截止时间 (格式：YYYY-MM-DD)
-    @JsonFormat(pattern = "yyyy-MM-DD")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date ibUpdateTimeTo;
 
     // 当前页

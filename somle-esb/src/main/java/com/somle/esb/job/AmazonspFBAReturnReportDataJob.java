@@ -32,7 +32,7 @@ public class AmazonspFBAReturnReportDataJob extends AmazonspDataJob {
                 client.getMarketplaceParticipations().stream()
                     .map(marketplaceParticipation -> {
                         vo.setMarketplaceIds(List.of(marketplaceParticipation.getMarketplace().getId()));
-                        return client.createAndGetReport(vo, String.valueOf(false));
+                        return client.createAndGetReport(vo);
                     })
             )
             .forEach(report -> {
