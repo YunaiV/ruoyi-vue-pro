@@ -20,6 +20,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
 
+// TODO @芋艿：【待定 005】要不要简化成，解析后，统一处理？只有一个 Handler！！！
 /**
  * IoT 设备属性上报的 Vert.x Handler
  *
