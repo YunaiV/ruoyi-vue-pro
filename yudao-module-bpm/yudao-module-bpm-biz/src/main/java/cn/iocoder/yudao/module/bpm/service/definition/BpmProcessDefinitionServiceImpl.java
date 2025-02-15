@@ -155,17 +155,21 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
     }
 
     @Override
-    public void updateProcessDefinitionState(String id, Integer state) {
+    public void updateProcessDefinitionState(String id, Integer state,boolean isSuspended) {
         // 激活
         if (Objects.equals(SuspensionState.ACTIVE.getStateCode(), state)) {
-            repositoryService.activateProcessDefinitionById(id, false, null);
+            if (isSuspended) {
+                repositoryService.activateProcessDefinitionById(id, false, null);
+            }
             return;
         }
         // 挂起
         if (Objects.equals(SuspensionState.SUSPENDED.getStateCode(), state)) {
             // suspendProcessInstances = false，进行中的任务，不进行挂起。
             // 原因：只要新的流程不允许发起即可，老流程继续可以执行。
-            repositoryService.suspendProcessDefinitionById(id, false, null);
+            if (!isSuspended) {
+                repositoryService.suspendProcessDefinitionById(id, false, null);
+            }
             return;
         }
         log.error("[updateProcessDefinitionState][流程定义({}) 修改未知状态({})]", id, state);

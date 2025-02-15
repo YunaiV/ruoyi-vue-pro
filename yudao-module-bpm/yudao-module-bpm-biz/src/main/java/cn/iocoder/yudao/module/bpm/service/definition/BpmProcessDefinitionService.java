@@ -60,8 +60,9 @@ public interface BpmProcessDefinitionService {
      *
      * @param id 流程定义的编号
      * @param state 状态
+     * @param isSuspended 是否处于激活或挂起状态
      */
-    void updateProcessDefinitionState(String id, Integer state);
+    void updateProcessDefinitionState(String id, Integer state, boolean isSuspended);
 
     /**
      * 更新模型编号
