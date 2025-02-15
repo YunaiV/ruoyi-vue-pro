@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.*;
 import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
@@ -35,8 +36,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 认证")
@@ -45,6 +48,9 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 @Validated
 @Slf4j
 public class AuthController {
+
+
+    static final String SYSTEM_USER_REGISTER_KEY = "system.user.register";
 
     @Resource
     private AdminAuthService authService;
@@ -58,7 +64,8 @@ public class AuthController {
     private PermissionService permissionService;
     @Resource
     private SocialClientService socialClientService;
-
+    @Resource
+    private ConfigApi configApi;
     @Resource
     private SecurityProperties securityProperties;
 
@@ -119,6 +126,12 @@ public class AuthController {
     @PermitAll
     @Operation(summary = "注册用户")
     public CommonResult<AuthLoginRespVO> register(@RequestBody @Valid AuthRegisterReqVO registerReqVO) {
+        // 1. 判断是否开启注册功能(true: 开启注册, false: 关闭注册)
+        String isOpenRegister = configApi.getConfigValueByKey(SYSTEM_USER_REGISTER_KEY);
+        if (Boolean.FALSE.toString().equals(isOpenRegister)) {
+            throw exception(AUTH_REGISTER_USER_DISABLED);
+        }
+
         return success(authService.register(registerReqVO));
     }
 
