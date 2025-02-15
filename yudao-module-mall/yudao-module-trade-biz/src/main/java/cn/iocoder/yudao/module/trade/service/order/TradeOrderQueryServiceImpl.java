@@ -91,9 +91,10 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
     public PageResult<TradeOrderDO> getOrderPage(TradeOrderPageReqVO reqVO) {
         // 根据用户查询条件构建用户编号列表
         Set<Long> userIds = buildQueryConditionUserIds(reqVO);
-        if (CollUtil.isEmpty(userIds)) { // 没查询到用户，说明肯定也没他的订单
+        if (userIds == null) { // 没查询到用户，说明肯定也没他的订单
             return PageResult.empty();
         }
+
         // 分页查询
         return tradeOrderMapper.selectPage(reqVO, userIds);
     }
@@ -122,11 +123,11 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
     public TradeOrderSummaryRespVO getOrderSummary(TradeOrderPageReqVO reqVO) {
         // 根据用户查询条件构建用户编号列表
         Set<Long> userIds = buildQueryConditionUserIds(reqVO);
-        if (CollUtil.isEmpty(userIds)) { // 没查询到用户，说明肯定也没他的订单
+        if (userIds == null) { // 没查询到用户，说明肯定也没他的订单
             return new TradeOrderSummaryRespVO();
         }
         // 查询每个售后状态对应的数量、金额
-        List<Map<String, Object>> list = tradeOrderMapper.selectOrderSummaryGroupByRefundStatus(reqVO, null);
+        List<Map<String, Object>> list = tradeOrderMapper.selectOrderSummaryGroupByRefundStatus(reqVO, userIds);
 
         TradeOrderSummaryRespVO vo = new TradeOrderSummaryRespVO().setAfterSaleCount(0L).setAfterSalePrice(0L);
         for (Map<String, Object> map : list) {
