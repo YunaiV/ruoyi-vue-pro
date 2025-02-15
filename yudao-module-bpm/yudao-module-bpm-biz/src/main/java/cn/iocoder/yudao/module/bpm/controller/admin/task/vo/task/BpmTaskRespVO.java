@@ -85,6 +85,9 @@ public class BpmTaskRespVO {
     @Schema(description = "是否填写审批意见", example = "false")
     private Boolean reasonRequire;
 
+    @Schema(description = "节点类型", example = "10") // 只有Simple设计器的场景下才会使用此字段
+    private Integer nodeType;
+
     @Data
     @Schema(description = "流程实例")
     public static class ProcessInstance {

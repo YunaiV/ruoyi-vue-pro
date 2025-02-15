@@ -129,4 +129,9 @@ public interface BpmnModelConstants {
      */
     String REASON_REQUIRE = "reasonRequire";
 
+    /**
+     * 节点类型
+     */
+    String NODE_TYPE = "nodeType";
+
 }
