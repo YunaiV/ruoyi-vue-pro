@@ -171,9 +171,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         return BpmTaskConvert.INSTANCE.buildTodoTask(todoTask, childrenTasks, buttonsSetting, taskForm)
-                .setSignEnable(signEnable)
-                .setReasonRequire(reasonRequire)
-                .setNodeType(nodeType);
+                .setNodeType(nodeType).setSignEnable(signEnable).setReasonRequire(reasonRequire);
     }
 
     @Override

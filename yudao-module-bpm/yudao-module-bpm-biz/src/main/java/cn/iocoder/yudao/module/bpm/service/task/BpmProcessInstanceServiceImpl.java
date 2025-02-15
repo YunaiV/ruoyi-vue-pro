@@ -5,6 +5,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -326,8 +327,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             ActivityNode activityNode = new ActivityNode().setId(task.getTaskDefinitionKey()).setName(task.getName())
                     .setNodeType(START_USER_NODE_ID.equals(task.getTaskDefinitionKey())
                             ? BpmSimpleModelNodeTypeEnum.START_USER_NODE.getType()
-                            : ObjectUtil.isNull(parseNodeType(flowNode)) ?
-                            BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType() : parseNodeType(flowNode))
+                            : ObjUtil.defaultIfNull(parseNodeType(flowNode), // 目的：解决“办理节点”的识别
+                                BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType()))
                     .setStatus(FlowableUtils.getTaskStatus(task))
                     .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(flowNode))
                     .setStartTime(DateUtils.of(task.getCreateTime())).setEndTime(DateUtils.of(task.getEndTime()))
@@ -404,8 +405,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             HistoricActivityInstance firstActivity = CollUtil.getFirst(taskActivities); // 取第一个任务，会签/或签的任务，开始时间相同
             ActivityNode activityNode = new ActivityNode().setId(firstActivity.getActivityId())
                     .setName(firstActivity.getActivityName())
-                    .setNodeType(ObjectUtil.isNull(parseNodeType(flowNode)) ?
-                            BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType() : parseNodeType(flowNode))
+                    .setNodeType(ObjUtil.defaultIfNull(parseNodeType(flowNode), // 目的：解决“办理节点”的识别
+                            BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType()))
                     .setStatus(BpmTaskStatusEnum.RUNNING.getStatus())
                     .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(flowNode))
                     .setStartTime(DateUtils.of(CollUtil.getFirst(taskActivities).getStartTime()))
