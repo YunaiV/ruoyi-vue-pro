@@ -304,7 +304,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         }
 
         // 2. 更新状态
-        processDefinitionService.updateProcessDefinitionState(definition.getId(), state,definition.isSuspended());
+        processDefinitionService.updateProcessDefinitionState(definition.getId(), state);
     }
 
     @Override
@@ -403,7 +403,7 @@ public class BpmModelServiceImpl implements BpmModelService {
             return;
         }
         processDefinitionService.updateProcessDefinitionState(oldDefinition.getId(),
-                SuspensionState.SUSPENDED.getStateCode(),oldDefinition.isSuspended());
+                SuspensionState.SUSPENDED.getStateCode());
     }
 
     private Model getModelByKey(String key) {
