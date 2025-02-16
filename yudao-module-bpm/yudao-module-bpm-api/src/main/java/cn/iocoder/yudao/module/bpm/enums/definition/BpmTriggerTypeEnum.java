@@ -17,7 +17,7 @@ import java.util.Arrays;
 public enum BpmTriggerTypeEnum implements ArrayValuable<Integer> {
 
     HTTP_REQUEST(1, "发起 HTTP 请求"),
-    UPDATE_NORMAL_FORM(2, "更新流程表单"); // TODO @jason：FORM_UPDATE
+    FORM_UPDATE(2, "更新流程表单");
 
     /**
      * 触发器执行动作类型
@@ -39,5 +39,4 @@ public enum BpmTriggerTypeEnum implements ArrayValuable<Integer> {
     public static BpmTriggerTypeEnum typeOf(Integer type) {
         return ArrayUtil.firstMatch(item -> item.getType().equals(type), values());
     }
-
 }

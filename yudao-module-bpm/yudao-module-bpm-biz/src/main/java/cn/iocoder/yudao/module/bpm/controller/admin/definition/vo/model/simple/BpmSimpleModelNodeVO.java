@@ -345,12 +345,10 @@ public class BpmSimpleModelNodeVO {
         @Valid
         private HttpRequestTriggerSetting httpRequestSetting;
 
-        // TODO @jason：这个要不直接叫 formSetting，更好理解一点哈
-        // TODO @jason：如果搞成 List<NormalFormTriggerSetting>，是不是可以做条件组了？微信讨论哈
         /**
          * 流程表单触发器设置
          */
-        private NormalFormTriggerSetting normalFormSetting;
+        private List<FormTriggerSetting> formSettings;
 
         @Schema(description = "http 请求触发器设置", example = "{}")
         @Data
@@ -383,12 +381,20 @@ public class BpmSimpleModelNodeVO {
 
         @Schema(description = "流程表单触发器设置", example = "{}")
         @Data
-        public static class NormalFormTriggerSetting {
+        public static class FormTriggerSetting {
+
+            @Schema(description = "条件类型", example = "1")
+            @InEnum(BpmSimpleModeConditionTypeEnum.class)
+            private Integer conditionType;
+
+            @Schema(description = "条件表达式", example = "${day>3}")
+            private String conditionExpression;
+
+            @Schema(description = "条件组", example = "{}")
+            private ConditionGroups conditionGroups;
 
             @Schema(description = "修改的表单字段", example = "userName")
             private Map<String, Object> updateFormFields;
-
         }
-
     }
 }

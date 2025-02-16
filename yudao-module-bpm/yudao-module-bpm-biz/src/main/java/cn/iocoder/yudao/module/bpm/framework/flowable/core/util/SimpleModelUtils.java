@@ -724,8 +724,8 @@ public class SimpleModelUtils {
                 if (node.getTriggerSetting().getHttpRequestSetting() != null) {
                     addExtensionElementJson(serviceTask, TRIGGER_PARAM, node.getTriggerSetting().getHttpRequestSetting());
                 }
-                if (node.getTriggerSetting().getNormalFormSetting() != null) {
-                    addExtensionElementJson(serviceTask, TRIGGER_PARAM, node.getTriggerSetting().getNormalFormSetting());
+                if (node.getTriggerSetting().getFormSettings() != null) {
+                    addExtensionElementJson(serviceTask, TRIGGER_PARAM, node.getTriggerSetting().getFormSettings());
                 }
             }
             return serviceTask;
