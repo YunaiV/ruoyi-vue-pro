@@ -5,6 +5,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -67,6 +68,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailRespVO.ActivityNode;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.START_USER_NODE_ID;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseNodeType;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.*;
@@ -325,7 +327,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             ActivityNode activityNode = new ActivityNode().setId(task.getTaskDefinitionKey()).setName(task.getName())
                     .setNodeType(START_USER_NODE_ID.equals(task.getTaskDefinitionKey())
                             ? BpmSimpleModelNodeTypeEnum.START_USER_NODE.getType()
-                            : BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType())
+                            : ObjUtil.defaultIfNull(parseNodeType(flowNode), // 目的：解决“办理节点”的识别
+                                BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType()))
                     .setStatus(FlowableUtils.getTaskStatus(task))
                     .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(flowNode))
                     .setStartTime(DateUtils.of(task.getCreateTime())).setEndTime(DateUtils.of(task.getEndTime()))
@@ -402,7 +405,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             HistoricActivityInstance firstActivity = CollUtil.getFirst(taskActivities); // 取第一个任务，会签/或签的任务，开始时间相同
             ActivityNode activityNode = new ActivityNode().setId(firstActivity.getActivityId())
                     .setName(firstActivity.getActivityName())
-                    .setNodeType(BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType())
+                    .setNodeType(ObjUtil.defaultIfNull(parseNodeType(flowNode), // 目的：解决“办理节点”的识别
+                            BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType()))
                     .setStatus(BpmTaskStatusEnum.RUNNING.getStatus())
                     .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(flowNode))
                     .setStartTime(DateUtils.of(CollUtil.getFirst(taskActivities).getStartTime()))
@@ -479,7 +483,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 1. 开始节点/审批节点
         if (ObjectUtils.equalsAny(node.getType(),
                 BpmSimpleModelNodeTypeEnum.START_USER_NODE.getType(),
-                BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType())) {
+                BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType(),
+                BpmSimpleModelNodeTypeEnum.TRANSACTOR_NODE.getType())) {
             List<Long> candidateUserIds = getTaskCandidateUserList(bpmnModel, node.getId(),
                     startUserId, processDefinitionInfo.getProcessDefinitionId(), processVariables);
             activityNode.setCandidateUserIds(candidateUserIds);

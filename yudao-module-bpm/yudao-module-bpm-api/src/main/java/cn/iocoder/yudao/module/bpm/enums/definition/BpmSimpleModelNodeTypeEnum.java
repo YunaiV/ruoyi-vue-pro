@@ -25,6 +25,7 @@ public enum BpmSimpleModelNodeTypeEnum implements ArrayValuable<Integer> {
     START_USER_NODE(10, "发起人", "userTask"), // 发起人节点。前端的开始节点，Id 固定
     APPROVE_NODE(11, "审批人", "userTask"),
     COPY_NODE(12, "抄送人", "serviceTask"),
+    TRANSACTOR_NODE(13, "办理人", "userTask"),
 
     DELAY_TIMER_NODE(14, "延迟器", "receiveTask"),
     TRIGGER_NODE(15, "触发器", "serviceTask"),

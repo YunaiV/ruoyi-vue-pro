@@ -61,6 +61,7 @@ import java.util.stream.Stream;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.START_USER_NODE_ID;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.*;
 
@@ -162,6 +163,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 bpmnModel, todoTask.getTaskDefinitionKey());
         Boolean signEnable = parseSignEnable(bpmnModel, todoTask.getTaskDefinitionKey());
         Boolean reasonRequire = parseReasonRequire(bpmnModel, todoTask.getTaskDefinitionKey());
+        Integer nodeType = parseNodeType(BpmnModelUtils.getFlowElementById(bpmnModel, todoTask.getTaskDefinitionKey()));
 
         // 4. 任务表单
         BpmFormDO taskForm = null;
@@ -170,8 +172,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         return BpmTaskConvert.INSTANCE.buildTodoTask(todoTask, childrenTasks, buttonsSetting, taskForm)
-                .setSignEnable(signEnable)
-                .setReasonRequire(reasonRequire);
+                .setNodeType(nodeType).setSignEnable(signEnable).setReasonRequire(reasonRequire);
     }
 
     @Override
@@ -194,6 +195,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             return PageResult.empty();
         }
         List<HistoricTaskInstance> tasks = taskQuery.listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
+
+        // 特殊：强制移除自动完成的“发起人”节点
+        // 补充说明：由于 taskQuery 无法方面的过滤，所以暂时通过内存过滤
+        tasks.removeIf(task -> task.getTaskDefinitionKey().equals(START_USER_NODE_ID));
         return new PageResult<>(tasks, count);
     }
 

@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model;
 
-import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmAutoApproveTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
@@ -27,8 +26,7 @@ import java.util.List;
 @Data
 public class BpmModelMetaInfoVO {
 
-    @Schema(description = "流程图标", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/yudao.jpg")
-    @NotEmpty(message = "流程图标不能为空")
+    @Schema(description = "流程图标", example = "https://www.iocoder.cn/yudao.jpg")
     @URL(message = "流程图标格式不正确")
     private String icon;
 
