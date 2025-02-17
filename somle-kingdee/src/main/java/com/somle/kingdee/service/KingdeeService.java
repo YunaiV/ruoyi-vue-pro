@@ -47,9 +47,8 @@ public class KingdeeService {
     @Scheduled(cron = "0 0 * * * *")
     public boolean refreshAuths() {
         return clients.parallelStream()
-            .map(n->n.refreshAuth())
-            .map(n->saveToken(n))
-            .allMatch(n->n==true);
+            .map(KingdeeClient::refreshAuth)
+            .allMatch(this::saveToken);
     }
 
     public boolean saveToken(KingdeeToken token) {
