@@ -210,9 +210,9 @@ public class BpmnModelUtils {
     /**
      * 给节点添加用户任务的审批人为空时，处理类型枚举
      *
+     * @see BpmUserTaskAssignEmptyHandlerTypeEnum
      * @param emptyHandler 空处理
      * @param userTask 任务节点
-     * @see BpmUserTaskAssignEmptyHandlerTypeEnum
      */
     public static void addAssignEmptyHandlerType(BpmSimpleModelNodeVO.AssignEmptyHandler emptyHandler, UserTask userTask) {
         if (emptyHandler == null) {
@@ -256,7 +256,7 @@ public class BpmnModelUtils {
      * 给节点添加表单字段权限元素
      *
      * @param fieldsPermissions 表单字段权限
-     * @param flowElement       节点
+     * @param flowElement 节点
      */
     public static void addFormFieldsPermission(List<Map<String, String>> fieldsPermissions, FlowElement flowElement) {
         if (CollUtil.isNotEmpty(fieldsPermissions)) {
@@ -762,9 +762,9 @@ public class BpmnModelUtils {
 
         // 情况：StartEvent/EndEvent/UserTask/ServiceTask
         if (currentElement instanceof StartEvent
-                || currentElement instanceof EndEvent
-                || currentElement instanceof UserTask
-                || currentElement instanceof ServiceTask) {
+            || currentElement instanceof EndEvent
+            || currentElement instanceof UserTask
+            || currentElement instanceof ServiceTask) {
             // 添加元素
             FlowNode flowNode = (FlowNode) currentElement;
             resultElements.add(flowNode);
