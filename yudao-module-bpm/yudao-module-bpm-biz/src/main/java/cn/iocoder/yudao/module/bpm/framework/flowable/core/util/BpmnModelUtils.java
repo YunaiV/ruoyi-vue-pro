@@ -780,7 +780,8 @@ public class BpmnModelUtils {
             Gateway gateway = (Gateway) currentElement;
             SequenceFlow matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
                     flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
-                            && evalConditionExpress(variables, flow.getConditionExpression()));
+                            //流程第一次发起时，variables条件值一定为空，发生异常会导致后续分支节点无法预测，
+                            || (null != variables && evalConditionExpress(variables, flow.getConditionExpression())));
             if (matchSequenceFlow == null) {
                 matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
                         flow -> ObjUtil.equal(gateway.getDefaultFlow(), flow.getId()));
