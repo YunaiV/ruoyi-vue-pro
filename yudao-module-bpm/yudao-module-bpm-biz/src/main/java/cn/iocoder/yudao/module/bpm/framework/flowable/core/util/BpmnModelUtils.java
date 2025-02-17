@@ -32,7 +32,7 @@ import static org.flowable.bpmn.constants.BpmnXMLConstants.FLOWABLE_EXTENSIONS_P
 
 /**
  * BPMN Model 操作工具类。目前分成三部分：
- *
+ * <p>
  * 1. BPMN 修改 + 解析元素相关的方法
  * 2. BPMN 简单查找相关的方法
  * 3. BPMN 复杂遍历相关的方法
@@ -105,8 +105,8 @@ public class BpmnModelUtils {
      * 给节点添加候选人元素
      *
      * @param candidateStrategy 候选人策略
-     * @param candidateParam 候选人参数，允许空
-     * @param flowElement 节点
+     * @param candidateParam    候选人参数，允许空
+     * @param flowElement       节点
      */
     public static void addCandidateElements(Integer candidateStrategy, String candidateParam, FlowElement flowElement) {
         addExtensionElement(flowElement, BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY,
@@ -150,9 +150,9 @@ public class BpmnModelUtils {
     /**
      * 解析审批类型
      *
-     * @see BpmUserTaskApproveTypeEnum
      * @param userTask 任务节点
      * @return 审批类型
+     * @see BpmUserTaskApproveTypeEnum
      */
     public static Integer parseApproveType(FlowElement userTask) {
         return NumberUtils.parseInt(parseExtensionElement(userTask, BpmnModelConstants.USER_TASK_APPROVE_TYPE));
@@ -162,7 +162,7 @@ public class BpmnModelUtils {
      * 添加任务拒绝处理元素
      *
      * @param rejectHandler 任务拒绝处理
-     * @param userTask 任务节点
+     * @param userTask      任务节点
      */
     public static void addTaskRejectElements(BpmSimpleModelNodeVO.RejectHandler rejectHandler, UserTask userTask) {
         if (rejectHandler == null) {
@@ -196,9 +196,9 @@ public class BpmnModelUtils {
     /**
      * 给节点添加用户任务的审批人与发起人相同时，处理类型枚举
      *
-     * @see BpmUserTaskAssignStartUserHandlerTypeEnum
      * @param assignStartUserHandlerType 发起人处理类型
-     * @param userTask 任务节点
+     * @param userTask                   任务节点
+     * @see BpmUserTaskAssignStartUserHandlerTypeEnum
      */
     public static void addAssignStartUserHandlerType(Integer assignStartUserHandlerType, UserTask userTask) {
         if (assignStartUserHandlerType == null) {
@@ -210,9 +210,9 @@ public class BpmnModelUtils {
     /**
      * 给节点添加用户任务的审批人为空时，处理类型枚举
      *
-     * @see BpmUserTaskAssignEmptyHandlerTypeEnum
      * @param emptyHandler 空处理
-     * @param userTask 任务节点
+     * @param userTask     任务节点
+     * @see BpmUserTaskAssignEmptyHandlerTypeEnum
      */
     public static void addAssignEmptyHandlerType(BpmSimpleModelNodeVO.AssignEmptyHandler emptyHandler, UserTask userTask) {
         if (emptyHandler == null) {
@@ -256,7 +256,7 @@ public class BpmnModelUtils {
      * 给节点添加表单字段权限元素
      *
      * @param fieldsPermissions 表单字段权限
-     * @param flowElement 节点
+     * @param flowElement       节点
      */
     public static void addFormFieldsPermission(List<Map<String, String>> fieldsPermissions, FlowElement flowElement) {
         if (CollUtil.isNotEmpty(fieldsPermissions)) {
@@ -267,7 +267,7 @@ public class BpmnModelUtils {
     /**
      * 解析表单字段权限
      *
-     * @param bpmnModel bpmnModel 对象
+     * @param bpmnModel     bpmnModel 对象
      * @param flowElementId 元素 ID
      * @return 表单字段权限
      */
@@ -313,7 +313,7 @@ public class BpmnModelUtils {
     /**
      * 解析操作按钮设置
      *
-     * @param bpmnModel bpmnModel 对象
+     * @param bpmnModel     bpmnModel 对象
      * @param flowElementId 元素 ID
      * @return 操作按钮设置
      */
@@ -762,9 +762,9 @@ public class BpmnModelUtils {
 
         // 情况：StartEvent/EndEvent/UserTask/ServiceTask
         if (currentElement instanceof StartEvent
-            || currentElement instanceof EndEvent
-            || currentElement instanceof UserTask
-            || currentElement instanceof ServiceTask) {
+                || currentElement instanceof EndEvent
+                || currentElement instanceof UserTask
+                || currentElement instanceof ServiceTask) {
             // 添加元素
             FlowNode flowNode = (FlowNode) currentElement;
             resultElements.add(flowNode);
@@ -778,10 +778,16 @@ public class BpmnModelUtils {
         if (currentElement instanceof ExclusiveGateway) {
             // 查找满足条件的 SequenceFlow 路径
             Gateway gateway = (Gateway) currentElement;
-            SequenceFlow matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
-                    flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
-                            //流程第一次发起时，variables条件值一定为空，发生异常会导致后续分支节点无法预测，
-                            || (null != variables && evalConditionExpress(variables, flow.getConditionExpression())));
+            SequenceFlow matchSequenceFlow;
+            //流程首次发起时，variables值一定为空，会导致条件表达式解析错误导致预测节点缺失
+            if (null == variables) {
+                matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
+                        flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId()));
+            } else {
+                matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
+                        flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
+                                && (evalConditionExpress(variables, flow.getConditionExpression())));
+            }
             if (matchSequenceFlow == null) {
                 matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
                         flow -> ObjUtil.equal(gateway.getDefaultFlow(), flow.getId()));
@@ -831,7 +837,7 @@ public class BpmnModelUtils {
      * 计算条件表达式是否为 true 满足条件
      *
      * @param variables 流程实例
-     * @param express 条件表达式
+     * @param express   条件表达式
      * @return 是否满足条件
      */
     public static boolean evalConditionExpress(Map<String, Object> variables, String express) {
