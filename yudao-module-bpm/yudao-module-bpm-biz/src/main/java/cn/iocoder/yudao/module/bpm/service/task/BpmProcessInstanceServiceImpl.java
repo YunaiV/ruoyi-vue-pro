@@ -608,7 +608,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 .getProcessDefinition(createReqVO.getProcessDefinitionId());
         // 发起流程
         return createProcessInstance0(userId, definition, createReqVO.getVariables(), null,
-                createReqVO.getStartUserSelectAssignees());
+                createReqVO.getStartUserSelectAssignees(), createReqVO.getNodeIds());
     }
 
     @Override
@@ -620,13 +620,13 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             // 发起流程
             return createProcessInstance0(userId, definition, createReqDTO.getVariables(),
                     createReqDTO.getBusinessKey(),
-                    createReqDTO.getStartUserSelectAssignees());
+                    createReqDTO.getStartUserSelectAssignees(),createReqDTO.getNodeIds());
         });
     }
 
     private String createProcessInstance0(Long userId, ProcessDefinition definition,
             Map<String, Object> variables, String businessKey,
-            Map<String, List<Long>> startUserSelectAssignees) {
+            Map<String, List<Long>> startUserSelectAssignees, List<String> nodeIds) {
         // 1.1 校验流程定义
         if (definition == null) {
             throw exception(PROCESS_DEFINITION_NOT_EXISTS);
@@ -644,7 +644,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             throw exception(PROCESS_INSTANCE_START_USER_CAN_START);
         }
         // 1.3 校验发起人自选审批人
-        validateStartUserSelectAssignees(definition, startUserSelectAssignees);
+        validateStartUserSelectAssignees(definition, startUserSelectAssignees, nodeIds);
 
         // 2. 创建流程实例
         if (variables == null) {
@@ -690,16 +690,17 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     }
 
     private void validateStartUserSelectAssignees(ProcessDefinition definition,
-            Map<String, List<Long>> startUserSelectAssignees) {
+            Map<String, List<Long>> startUserSelectAssignees, List<String> nodeIds) {
         // 1. 获得发起人自选审批人的 UserTask/ServiceTask 列表
         BpmnModel bpmnModel = processDefinitionService.getProcessDefinitionBpmnModel(definition.getId());
         List<Task> tasks = BpmTaskCandidateStartUserSelectStrategy.getStartUserSelectTaskList(bpmnModel);
         if (CollUtil.isEmpty(tasks)) {
             return;
         }
+        // 2.流程发起时要先获取当前流程的预测走向节点，发起是
 
         // 2. 校验发起人自选审批人的审批人和抄送人是否都配置了
-        tasks.forEach(task -> {
+        tasks.stream().filter(task -> nodeIds == null || nodeIds.contains(task.getId())).forEach(task -> {
             List<Long> assignees = startUserSelectAssignees != null ? startUserSelectAssignees.get(task.getId()) : null;
             if (CollUtil.isEmpty(assignees)) {
                 throw exception(PROCESS_INSTANCE_START_USER_SELECT_ASSIGNEES_NOT_CONFIG, task.getName());
