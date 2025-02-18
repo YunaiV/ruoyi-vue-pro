@@ -2,7 +2,7 @@ oss:
   bucketName: somle-bigdata-dev
 kingdee:
   outerInstanceIds:
-    - 94464631434776576
+    - 369949131390717952 #金蝶沙盒
 
 debug: false
 
@@ -63,7 +63,6 @@ spring:
       password: uniplore # 密码，建议生产环境开启
 
 --- #################### 定时任务相关配置 ####################
-
 # Quartz 配置项，对应 QuartzProperties 配置)
 spring:
   quartz:
@@ -93,6 +92,8 @@ spring:
 #    jdbc: # 使用 JDBC 的 JobStore 的时候，JDBC 的配置
 ##      initialize-schema: ALWAYS # 是否自动使用 SQL 初始化 Quartz 表结构。
 #      initialize-schema: NEVER # 是否自动使用 SQL 初始化 Quartz 表结构。这里设置成 never ，我们手动创建表结构。
+  jpa:
+    open-in-view: false
 
 --- #################### 消息队列相关 ####################
 
