@@ -36,13 +36,17 @@ public class KingdeeClient {
         this.token = token;
     }
 
+    /**
+     * 根据OuterInstanceId覆盖内存的KingdeeToken
+     * @return KingdeeToken
+     */
     protected KingdeeToken refreshAuth() {
-        return fillAuth(pushAuth(token));
+        return fillAuth(pushAuth(token.getOuterInstanceId()));
     }
 
-    private KingdeeToken fillAuth(KingdeeToken token) {
-        token.setAppSignature(getAppSignature(token));
-        token.setAppToken(getAppToken(token));
+    private KingdeeToken fillAuth(KingdeeToken newToken) {
+        token.setAppSignature(getAppSignature(newToken));
+        token.setAppToken(getAppToken(newToken));
         log.info("tokens filled successfully");
         return token;
     }
@@ -69,8 +73,7 @@ public class KingdeeClient {
         return response.getData(JSONObject.class).getString("app-token");
     }
 
-    private KingdeeToken pushAuth(KingdeeToken token) {
-        String outerInstanceId = token.getOuterInstanceId();
+    private KingdeeToken pushAuth(String outerInstanceId) {
         String reqMtd = "POST";
         String ctime = String.valueOf(System.currentTimeMillis());
         String endUrl = "/jdyconnector/app_management/push_app_authorize";
