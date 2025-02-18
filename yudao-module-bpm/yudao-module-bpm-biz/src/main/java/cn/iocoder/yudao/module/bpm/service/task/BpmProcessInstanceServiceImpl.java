@@ -7,6 +7,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -165,6 +166,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         HistoricProcessInstance historicProcessInstance = null; // 流程实例
         Integer processInstanceStatus = BpmProcessInstanceStatusEnum.NOT_START.getStatus(); // 流程状态
         Map<String, Object> processVariables = reqVO.getProcessVariables(); // 流程变量
+        if (reqVO.getProcessVariablesStr() != null){
+            processVariables = JSONUtil.parseObj(reqVO.getProcessVariablesStr());
+        }
         // 1.2 如果是流程已发起的场景，则使用流程实例的数据
         if (reqVO.getProcessInstanceId() != null) {
             historicProcessInstance = getHistoricProcessInstance(reqVO.getProcessInstanceId());
