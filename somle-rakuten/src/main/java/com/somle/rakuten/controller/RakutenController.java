@@ -1,6 +1,6 @@
 package com.somle.rakuten.controller;
 
-import com.somle.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import com.somle.rakuten.model.vo.RakutenOrderReqVO;
 import com.somle.rakuten.model.vo.RakutenOrderSearchReqVO;
 import com.somle.rakuten.service.RakutenService;

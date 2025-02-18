@@ -7,12 +7,12 @@ import com.somle.eccang.model.exception.EccangResponseException;
 import com.somle.eccang.model.req.EccangInventoryBatchReqVO;
 import com.somle.eccang.model.req.EccangRmaReturnReqVO;
 import com.somle.eccang.repository.EccangTokenRepository;
-import com.somle.framework.common.util.general.CoreUtils;
-import com.somle.framework.common.util.general.Limiter;
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.framework.common.util.web.RequestX;
-import com.somle.framework.common.util.web.WebUtils;
+import cn.iocoder.yudao.framework.common.util.general.CoreUtils;
+import cn.iocoder.yudao.framework.common.util.general.Limiter;
+import cn.iocoder.yudao.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.web.RequestX;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -191,7 +191,7 @@ public class EccangService {
 
     // public Stream<BizContent> listPage (String endpoint) {
 
-    //     var payload = JsonUtils.newObject();
+    //     var payload = JsonUtilsSomle.newObject();
     //     return getAllBiz(payload, endpoint);
     // }
 
@@ -314,7 +314,7 @@ public class EccangService {
             .build();
         // String response = post("getWmsProductList", product, String.class).get(0);
         // log.debug(response);
-        // return JsonUtils.parseObject(response, EccangProduct.class);
+        // return JsonUtilsSomle.parseObject(response, EccangProduct.class);
         List<EccangProduct> getWmsProductList = post("getWmsProductList", product, EccangProduct.class);
         if (CollUtil.isNotEmpty(getWmsProductList)) {
             return getWmsProductList.get(0);

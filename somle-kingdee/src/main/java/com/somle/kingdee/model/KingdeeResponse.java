@@ -2,7 +2,7 @@ package com.somle.kingdee.model;
 
 import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.somle.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;

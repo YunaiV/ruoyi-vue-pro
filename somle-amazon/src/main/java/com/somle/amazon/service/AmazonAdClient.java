@@ -5,12 +5,12 @@ import com.somle.amazon.controller.vo.AmazonAdProfileRespVO;
 import com.somle.amazon.controller.vo.AmazonAdReportReqVO;
 import com.somle.amazon.model.AmazonAdAuthDO;
 import com.somle.amazon.model.enums.AmazonRegion;
-import com.somle.framework.common.util.general.CoreUtils;
-import com.somle.framework.common.util.json.JSONArray;
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.framework.common.util.web.RequestX;
-import com.somle.framework.common.util.web.WebUtils;
+import cn.iocoder.yudao.framework.common.util.general.CoreUtils;
+import cn.iocoder.yudao.framework.common.util.json.JSONArray;
+import cn.iocoder.yudao.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.web.RequestX;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 

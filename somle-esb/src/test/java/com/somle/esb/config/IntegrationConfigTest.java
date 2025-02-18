@@ -1,6 +1,6 @@
 package com.somle.esb.config;
 
-import com.somle.framework.test.core.ut.BaseSpringIntegrationTest;
+import cn.iocoder.yudao.framework.test.core.ut.BaseSpringIntegrationTest;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;

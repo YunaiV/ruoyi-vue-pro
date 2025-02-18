@@ -24,7 +24,7 @@ import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.esb.service.AliyunService;
 import com.somle.esb.service.EsbMappingService;
 import com.somle.esb.service.EsbService;
-import com.somle.framework.test.core.ut.BaseSpringTest;
+import cn.iocoder.yudao.framework.test.core.ut.BaseSpringTest;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
 import com.somle.shopify.service.ShopifyService;

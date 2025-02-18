@@ -27,7 +27,7 @@
 
 
 
-        <module>somle-framework</module>
+<!--        <module>somle-framework</module>-->
         <module>somle-esb</module>
         <module>somle-amazon</module>
         <module>somle-eccang</module>

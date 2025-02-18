@@ -1,19 +1,20 @@
 package com.somle.amazon.service;
 
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.PageUtils;
+import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import com.somle.amazon.controller.vo.*;
 import com.somle.amazon.model.*;
 import com.somle.amazon.model.enums.*;
 
 //import com.somle.amazon.repository.AmazonSellerRepository;
-import com.somle.framework.common.util.collection.CollectionUtils;
-import com.somle.framework.common.util.collection.PageUtils;
-import com.somle.framework.common.util.general.CoreUtils;
 
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.framework.common.util.string.StrUtils;
-import com.somle.framework.common.util.web.RequestX;
-import com.somle.framework.common.util.web.WebUtils;
+import cn.iocoder.yudao.framework.common.util.general.CoreUtils;
+
+import cn.iocoder.yudao.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.web.RequestX;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -107,7 +108,7 @@ public class AmazonSpClient {
             .build();
         try(var response = WebUtils.sendRequest(request)){
             var bodyString = response.body().string();
-//            var result = JsonUtils.parseObject(bodyString, AmazonSpOrderRespVO.class);
+//            var result = JsonUtilsSomle.parseObject(bodyString, AmazonSpOrderRespVO.class);
 //            validateResponse(result);
             return bodyString;
         }

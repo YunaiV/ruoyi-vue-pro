@@ -122,7 +122,7 @@ public class ErpCustomCategoryServiceImplTest extends BaseDbUnitTest {
         reqVO.setMaterial(null);
         reqVO.setDeclaredType(null);
         reqVO.setDeclaredTypeEn(null);
-        reqVO.setCombinedValue(null);
+        // reqVO.setCombinedValue(null);
 
         // 调用
         PageResult<ErpCustomCategoryDO> pageResult = customRuleCategoryService.getCustomRuleCategoryPage(reqVO);

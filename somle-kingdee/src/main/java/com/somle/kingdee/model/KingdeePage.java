@@ -1,14 +1,11 @@
 package com.somle.kingdee.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.somle.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import lombok.Data;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -22,7 +19,7 @@ public class KingdeePage {
     private Integer totalPage;
 
 //    public <T> List<T> getRows(Class<T> objectClass) {
-//        return JsonUtils.parseArray(rows.toString(), objectClass);
+//        return JsonUtilsSomle.parseArray(rows.toString(), objectClass);
 //    }
 
     public <T> List<T> getRowsList(Class<T> objectClass) {

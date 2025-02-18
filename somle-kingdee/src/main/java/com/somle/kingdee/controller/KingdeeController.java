@@ -1,7 +1,7 @@
 package com.somle.kingdee.controller;
 
 
-import com.somle.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import com.somle.kingdee.model.KingdeeToken;
 import com.somle.kingdee.model.vo.KingdeeTokenVO;
 import com.somle.kingdee.service.KingdeeClient;

@@ -9,14 +9,16 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * JSON 工具类
@@ -33,6 +35,14 @@ public class JsonUtils {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL); // 忽略 null 值
         objectMapper.registerModules(new JavaTimeModule()); // 解决 LocalDateTime 的序列化
+    }
+
+    public static JsonNodeFactory getNodeFactory() {
+        return objectMapper.getNodeFactory();
+    }
+
+    public static JSONObject newObject() {
+        return new JSONObject();
     }
 
     /**
@@ -177,6 +187,16 @@ public class JsonUtils {
         }
     }
 
+    @SneakyThrows
+    public static <T> List<T> parseArray(JsonNode node, Class<T> clazz) {
+        if (clazz == JSONArray.class) {
+            return parseArray(node.toString(), clazz);
+        } else {
+            return  objectMapper.readerForListOf(clazz).readValue(node);
+        }
+
+    }
+
     public static JsonNode parseTree(String text) {
         try {
             return objectMapper.readTree(text);
@@ -198,5 +218,62 @@ public class JsonUtils {
     public static boolean isJson(String text) {
         return JSONUtil.isTypeJSON(text);
     }
+
+    public static MultiValuedMap<String, String> toMultiStringMap(JSONObject json) {
+        MultiValuedMap<String, String> multiMap = new ArrayListValuedHashMap<>();
+
+        json.fields().forEachRemaining(entry -> {
+            String key = entry.getKey();
+            JsonNode value = entry.getValue();
+
+            if (value.isArray()) {
+                value.forEach(arrayElement -> multiMap.put(key, arrayElement.asText()));
+            } else {
+                multiMap.put(key, value.asText());
+            }
+        });
+
+        return multiMap;
+    }
+
+    public static MultiValuedMap<String, String> toMultiStringMap(Object pojo) {
+        return toMultiStringMap(toJSONObject(pojo));
+    }
+
+    public static JSONObject toJSONObject(Object object) {
+        return new JSONObject(objectMapper.valueToTree(object));
+    }
+
+    @SneakyThrows
+    public static <T> T parseObject(JsonNode node, Class<T> clazz) {
+        if (clazz == JSONObject.class) {
+            return parseObject(node.toString(), clazz);
+        } else {
+            return objectMapper.treeToValue(node, clazz);
+        }
+    }
+
+    @SneakyThrows
+    public static Map<String, String> toStringMap(JSONObject json) {
+        Map<String, String> map = new HashMap<>();
+
+        Iterator<Map.Entry<String, JsonNode>> fields = json.fields();
+        while (fields.hasNext()) {
+            Map.Entry<String, JsonNode> field = fields.next();
+            map.put(field.getKey(), field.getValue().asText());
+        }
+        return map;
+    }
+
+    public static Map<String, String> toStringMap(Object pojo) {
+        return toStringMap(toJSONObject(pojo));
+    }
+
+    @SneakyThrows
+    public static JsonNode parseJson(String text) {
+        return objectMapper.readTree(text);
+    }
+
+
 
 }

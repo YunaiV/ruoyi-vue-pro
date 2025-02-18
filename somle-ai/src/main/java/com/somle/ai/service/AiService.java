@@ -3,8 +3,8 @@ package com.somle.ai.service;
 import com.somle.ai.model.AiName;
 import com.somle.ai.model.AiReqVO;
 import com.somle.ai.model.AiResponse;
-import com.somle.framework.common.util.web.RequestX;
-import com.somle.framework.common.util.web.WebUtils;
+import cn.iocoder.yudao.framework.common.util.web.RequestX;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 
 import lombok.extern.slf4j.Slf4j;
 

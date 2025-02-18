@@ -1,7 +1,7 @@
 package com.somle.wayfair.service;
 
 
-import com.somle.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import com.somle.wayfair.service.WayfairService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
