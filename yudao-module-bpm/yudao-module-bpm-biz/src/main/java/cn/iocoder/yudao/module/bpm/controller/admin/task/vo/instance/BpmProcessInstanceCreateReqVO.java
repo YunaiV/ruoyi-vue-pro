@@ -21,7 +21,4 @@ public class BpmProcessInstanceCreateReqVO {
     @Schema(description = "发起人自选审批人 Map", example = "{taskKey1: [1, 2]}")
     private Map<String, List<Long>> startUserSelectAssignees;
 
-    @Schema(description = "活动节点列表", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<String> nodeIds;
-
 }

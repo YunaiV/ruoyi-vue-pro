@@ -41,9 +41,4 @@ public class BpmProcessInstanceCreateReqDTO {
      */
     private Map<String, List<Long>> startUserSelectAssignees;
 
-    /**
-     * 活动节点列表 createProcessInstance弃用时可移除
-     */
-    private List<String> nodeIds;
-
 }
