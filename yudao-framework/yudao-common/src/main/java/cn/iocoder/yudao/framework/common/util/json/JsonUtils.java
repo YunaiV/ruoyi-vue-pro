@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -71,12 +72,19 @@ public class JsonUtils {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
     }
 
+
     public static <T> T parseObject(String text, Class<T> clazz) {
         if (StrUtil.isEmpty(text)) {
             return null;
         }
         try {
-            return objectMapper.readValue(text, clazz);
+//            if(JSONObject.class.equals(clazz)) {
+//                ObjectNode result=objectMapper.readValue(text,ObjectNode.class);
+//                JSONObject t=new JSONObject(result);
+//                return (T)t;
+//            } else {
+                return objectMapper.readValue(text, clazz);
+//            }
         } catch (IOException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
