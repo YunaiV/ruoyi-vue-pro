@@ -25,16 +25,16 @@ public class EccangSaleHandler {
     private final EccangToErpConverter eccangToErpConverter;
     private final AiService aiService;
 
-    @ServiceActivator(inputChannel = "eccangSaleOutputChannel")
-    public void handleSale(Message<EccangOrder> message) {
-        var eccangOrder = message.getPayload();
-        var erpSale = eccangToErpConverter.toEsb(eccangOrder);
-
-        AiName name = AiName.builder()
-            .name(erpSale.getCustomer().getName())
-            .build();
-        aiService.addName(name);
-        aiService.addAddress(erpSale.getAddress());
-
-    }
+//    @ServiceActivator(inputChannel = "eccangSaleOutputChannel")
+//    public void handleSale(Message<EccangOrder> message) {
+//        var eccangOrder = message.getPayload();
+//        var erpSale = eccangToErpConverter.toEsb(eccangOrder);
+//
+//        AiName name = AiName.builder()
+//            .name(erpSale.getCustomer().getName())
+//            .build();
+//        aiService.addName(name);
+//        aiService.addAddress(erpSale.getAddress());
+//
+//    }
 }
