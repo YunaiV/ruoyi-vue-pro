@@ -99,7 +99,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     private void validateCreateDeviceParam(String productKey, String deviceName, String deviceKey,
-            Long gatewayId, IotProductDO product) {
+                                           Long gatewayId, IotProductDO product) {
         TenantUtils.executeIgnore(() -> {
             // 校验设备名称在同一产品下是否唯一
             if (deviceMapper.selectByProductKeyAndDeviceName(productKey, deviceName) != null) {
@@ -259,6 +259,16 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     @Override
     public List<IotDeviceDO> getDeviceListByState(Integer state) {
         return deviceMapper.selectListByState(state);
+    }
+
+    @Override
+    public List<IotDeviceDO> getDeviceListByProductId(Long productId) {
+        return deviceMapper.selectListByProductId(productId);
+    }
+
+    @Override
+    public List<IotDeviceDO> getDeviceListByIdList(List<Long> deviceIdList) {
+        return deviceMapper.selectByIds(deviceIdList);
     }
 
     @Override
