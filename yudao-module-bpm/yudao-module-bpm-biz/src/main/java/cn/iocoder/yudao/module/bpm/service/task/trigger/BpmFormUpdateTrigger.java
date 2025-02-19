@@ -49,12 +49,14 @@ public class BpmFormUpdateTrigger implements BpmTrigger {
             if (CollUtil.isEmpty(setting.getUpdateFormFields())) {
                 continue;
             }
+            // 配置了条件，判断条件是否满足
             boolean isFormUpdateNeeded = true;
-            if (setting.getConditionType() != null) {  // 配置了条件，判断条件是否满足
-                String conditionExpression = SimpleModelUtils.buildConditionExpression(setting.getConditionType(), setting.getConditionExpression(),
-                        setting.getConditionGroups());
+            if (setting.getConditionType() != null) {
+                String conditionExpression = SimpleModelUtils.buildConditionExpression(
+                        setting.getConditionType(), setting.getConditionExpression(), setting.getConditionGroups());
                 isFormUpdateNeeded = BpmnModelUtils.evalConditionExpress(processVariables, conditionExpression);
             }
+            // 更新流程表单
             if (isFormUpdateNeeded) {
                 processInstanceService.updateProcessInstanceVariables(processInstanceId, setting.getUpdateFormFields());
             }
