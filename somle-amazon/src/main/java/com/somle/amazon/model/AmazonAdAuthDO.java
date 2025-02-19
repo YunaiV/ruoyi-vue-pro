@@ -27,9 +27,6 @@ public class AmazonAdAuthDO {
     private String accountId;
 
 
-    private String regionCode;
-
-
     private String clientId;
 
     @Column(columnDefinition="TEXT")
