@@ -850,11 +850,11 @@ public class BpmnModelUtils {
      * 计算条件表达式是否为 true 满足条件
      *
      * @param variables 流程实例
-     * @param express 条件表达式
+     * @param expression 条件表达式
      * @return 是否满足条件
      */
-    public static boolean evalConditionExpress(Map<String, Object> variables, String express) {
-        if (express == null) {
+    public static boolean evalConditionExpress(Map<String, Object> variables, String expression) {
+        if (expression == null) {
             return Boolean.FALSE;
         }
         // 如果 variables 为空，则创建一个的原因？可能 expression 的计算，不依赖于 variables
@@ -864,10 +864,11 @@ public class BpmnModelUtils {
 
         // 执行计算
         try {
-            Object result = FlowableUtils.getExpressionValue(variables, express);
+            Object result = FlowableUtils.getExpressionValue(variables, expression);
             return Boolean.TRUE.equals(result);
         } catch (FlowableException ex) {
-            log.error("[evalConditionExpress][条件表达式({}) 变量({}) 解析报错]", express, variables, ex);
+            // 为什么使用 info 日志？原因是，expression 如果从 variables 取不到值，会报错。实际这种情况下，可以忽略
+            log.info("[evalConditionExpress][条件表达式({}) 变量({}) 解析报错]", expression, variables, ex);
             return Boolean.FALSE;
         }
     }
