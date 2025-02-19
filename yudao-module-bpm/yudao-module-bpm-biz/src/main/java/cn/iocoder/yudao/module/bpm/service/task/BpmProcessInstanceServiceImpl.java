@@ -499,6 +499,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 3. 抄送节点
         if (CollUtil.isEmpty(runActivityIds) && // 流程发起时：需要展示抄送节点，用于选择抄送人
                 BpmSimpleModelNodeTypeEnum.COPY_NODE.getType().equals(node.getType())) {
+            List<Long> candidateUserIds = getTaskCandidateUserList(bpmnModel, node.getId(),
+                    startUserId, processDefinitionInfo.getProcessDefinitionId(), processVariables);
+            activityNode.setCandidateUserIds(candidateUserIds);
             return activityNode;
         }
         return null;
