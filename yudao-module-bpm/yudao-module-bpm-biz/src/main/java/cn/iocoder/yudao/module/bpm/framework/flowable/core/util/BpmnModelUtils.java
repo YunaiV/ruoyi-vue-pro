@@ -808,6 +808,7 @@ public class BpmnModelUtils {
             // 查找满足条件的 SequenceFlow 路径
             Gateway gateway = (Gateway) currentElement;
             Collection<SequenceFlow> matchSequenceFlows;
+            // 流程首次发起时，variables值一定为空，会导致条件表达式解析错误导致预测节点缺失
             if (null == variables){
                 matchSequenceFlows = CollUtil.filterNew(gateway.getOutgoingFlows(),
                         flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId()));

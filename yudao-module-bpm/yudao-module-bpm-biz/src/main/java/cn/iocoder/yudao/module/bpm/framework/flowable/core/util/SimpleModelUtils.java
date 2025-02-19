@@ -809,6 +809,7 @@ public class SimpleModelUtils {
         if (nodeType == BpmSimpleModelNodeTypeEnum.CONDITION_BRANCH_NODE) {
             // 查找满足条件的 BpmSimpleModelNodeVO 节点
             BpmSimpleModelNodeVO matchConditionNode;
+            // 流程首次发起时，variables值一定为空，会导致条件表达式解析错误导致预测节点缺失
             if(null == variables) {
                 matchConditionNode = CollUtil.findOne(currentNode.getConditionNodes(),
                         conditionNode -> !BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow()));
@@ -830,6 +831,7 @@ public class SimpleModelUtils {
         if (nodeType == BpmSimpleModelNodeTypeEnum.INCLUSIVE_BRANCH_NODE) {
             // 查找满足条件的 BpmSimpleModelNodeVO 节点
             Collection<BpmSimpleModelNodeVO> matchConditionNodes;
+            // 流程首次发起时，variables值一定为空，会导致条件表达式解析错误导致预测节点缺失
             if (null == variables) {
                 matchConditionNodes = CollUtil.filterNew(currentNode.getConditionNodes(),
                         conditionNode -> !BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow()));
