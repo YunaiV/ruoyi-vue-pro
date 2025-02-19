@@ -11,7 +11,6 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.erp.api.logistic.customrule.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.ErpSupplierProductPageReqVO;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierProductService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
@@ -25,12 +24,10 @@ import com.somle.eccang.service.EccangService;
 import com.somle.esb.enums.TenantId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -239,9 +236,10 @@ public class ErpToEccangConverter {
         eccangProduct.setPdDeclareCurrencyCode(
             ObjectUtils.defaultIfNull(eccangProduct.getPdDeclareCurrencyCode(), "USD") // 默认申报币种USD
         );
-        eccangProduct.setProductDeclaredValue(0f);// 申报价值
-        eccangProduct.setPdOverseaTypeEn("无"); //申报品名英文
-
+        eccangProduct.setProductDeclaredValue(
+            ObjectUtils.defaultIfNull(eccangProduct.getProductDeclaredValue(), 0.001F));// 申报价值
+        eccangProduct.setPdOverseaTypeEn(
+            ObjectUtils.defaultIfNull(eccangProduct.getPdOverseaTypeEn(), "无")); //申报品名英文
         return eccangProduct;
     }
 
