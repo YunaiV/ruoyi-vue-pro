@@ -16,15 +16,14 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 
-
 /**
-* @Description: $
-* @Author: c-tao
-* @Date: 2025/1/13$
-*/
+ * @Description: $
+ * @Author: c-tao
+ * @Date: 2025/1/13$
+ */
 @Slf4j
 @Component
-@Profile("!dev & !test") // 仅在非 dev 和非 test 环境加载
+@Profile("prod")
 @RequiredArgsConstructor
 public class DingtalkDepartmentHandler {
 

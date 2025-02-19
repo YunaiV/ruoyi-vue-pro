@@ -29,7 +29,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 @Slf4j
 @Component
-@Profile("!dev & !test")
+@Profile("prod")
 @RequiredArgsConstructor
 public class ErpCustomRuleHandler {
 
