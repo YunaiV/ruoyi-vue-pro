@@ -36,7 +36,6 @@
         <dependency>
             <groupId>org.apache.rocketmq</groupId>
             <artifactId>rocketmq-spring-boot-starter</artifactId>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 
