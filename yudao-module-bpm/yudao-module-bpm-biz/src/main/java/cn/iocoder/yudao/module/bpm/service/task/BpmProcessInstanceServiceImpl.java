@@ -696,8 +696,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     }
 
     private void validateStartUserSelectAssignees(Long userId, ProcessDefinition definition,
-            Map<String, List<Long>> startUserSelectAssignees, Map<String,Object> variables) {
-        // 1.获取预测的节点信息
+                                                  Map<String, List<Long>> startUserSelectAssignees,
+                                                  Map<String,Object> variables) {
+        // 1. 获取预测的节点信息
         BpmApprovalDetailRespVO detailRespVO = getApprovalDetail(userId, new BpmApprovalDetailReqVO()
                 .setProcessDefinitionId(definition.getId())
                 .setProcessVariables(variables));
@@ -705,9 +706,11 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         if (CollUtil.isEmpty(activityNodes)){
             return;
         }
-        // 2.移除掉不是发起人自选审批人节点
-        activityNodes.removeIf(task -> !Objects.equals(BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy(), task.getCandidateStrategy()));
-        // 3.流程发起时要先获取当前流程的预测走向节点，发起时只校验预测的节点发起人自选审批人的审批人和抄送人是否都配置了
+
+        // 2.1 移除掉不是发起人自选审批人节点
+        activityNodes.removeIf(task ->
+                ObjectUtil.notEqual(BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy(), task.getCandidateStrategy()));
+        // 2.2 流程发起时要先获取当前流程的预测走向节点，发起时只校验预测的节点发起人自选审批人的审批人和抄送人是否都配置了
         activityNodes.forEach(task -> {
             List<Long> assignees = startUserSelectAssignees != null ? startUserSelectAssignees.get(task.getId()) : null;
             if (CollUtil.isEmpty(assignees)) {

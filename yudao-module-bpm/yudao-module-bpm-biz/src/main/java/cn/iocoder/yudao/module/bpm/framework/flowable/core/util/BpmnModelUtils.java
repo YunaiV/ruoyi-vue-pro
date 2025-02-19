@@ -799,8 +799,8 @@ public class BpmnModelUtils {
             // 查找满足条件的 SequenceFlow 路径
             Gateway gateway = (Gateway) currentElement;
             SequenceFlow matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
-                        flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
-                                && (evalConditionExpress(variables, flow.getConditionExpression())));
+                    flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
+                            && (evalConditionExpress(variables, flow.getConditionExpression())));
             if (matchSequenceFlow == null) {
                 matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
                         flow -> ObjUtil.equal(gateway.getDefaultFlow(), flow.getId()));
@@ -857,9 +857,12 @@ public class BpmnModelUtils {
         if (express == null) {
             return Boolean.FALSE;
         }
+        // 如果 variables 为空，则创建一个的原因？可能 expression 的计算，不依赖于 variables
         if (variables == null) {
-            return Boolean.FALSE;
+            variables = new HashMap<>();
         }
+
+        // 执行计算
         try {
             Object result = FlowableUtils.getExpressionValue(variables, express);
             return Boolean.TRUE.equals(result);
