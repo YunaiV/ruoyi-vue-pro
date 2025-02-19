@@ -808,16 +808,9 @@ public class SimpleModelUtils {
         // 情况：CONDITION_BRANCH_NODE 排它，只有一个满足条件的。如果没有，就走默认的
         if (nodeType == BpmSimpleModelNodeTypeEnum.CONDITION_BRANCH_NODE) {
             // 查找满足条件的 BpmSimpleModelNodeVO 节点
-            BpmSimpleModelNodeVO matchConditionNode;
-            // 流程首次发起时，variables值一定为空，会导致条件表达式解析错误导致预测节点缺失
-            if(null == variables) {
-                matchConditionNode = CollUtil.findOne(currentNode.getConditionNodes(),
-                        conditionNode -> !BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow()));
-            }else {
-                matchConditionNode = CollUtil.findOne(currentNode.getConditionNodes(),
+            BpmSimpleModelNodeVO matchConditionNode = CollUtil.findOne(currentNode.getConditionNodes(),
                         conditionNode -> !BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow())
                                 && evalConditionExpress(variables, conditionNode.getConditionSetting()));
-            }
             if (matchConditionNode == null) {
                 matchConditionNode = CollUtil.findOne(currentNode.getConditionNodes(),
                         conditionNode -> BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow()));
@@ -830,16 +823,9 @@ public class SimpleModelUtils {
         // 情况：INCLUSIVE_BRANCH_NODE 包容，多个满足条件的。如果没有，就走默认的
         if (nodeType == BpmSimpleModelNodeTypeEnum.INCLUSIVE_BRANCH_NODE) {
             // 查找满足条件的 BpmSimpleModelNodeVO 节点
-            Collection<BpmSimpleModelNodeVO> matchConditionNodes;
-            // 流程首次发起时，variables值一定为空，会导致条件表达式解析错误导致预测节点缺失
-            if (null == variables) {
-                matchConditionNodes = CollUtil.filterNew(currentNode.getConditionNodes(),
-                        conditionNode -> !BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow()));
-            }else {
-                matchConditionNodes = CollUtil.filterNew(currentNode.getConditionNodes(),
+            Collection<BpmSimpleModelNodeVO> matchConditionNodes = CollUtil.filterNew(currentNode.getConditionNodes(),
                         conditionNode -> !BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow())
                                 && evalConditionExpress(variables, conditionNode.getConditionSetting()));
-            }
             if (CollUtil.isEmpty(matchConditionNodes)) {
                 matchConditionNodes = CollUtil.filterNew(currentNode.getConditionNodes(),
                         conditionNode -> BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow()));
