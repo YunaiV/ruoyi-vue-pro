@@ -699,7 +699,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             return;
         }
         // 2.移除掉不是发起人自选审批人节点
-        activityNodes.removeIf(task -> Objects.equals(BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy(), task. getCandidateStrategy()));
+        activityNodes.removeIf(task -> !Objects.equals(BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy(), task.getCandidateStrategy()));
         // 3.流程发起时要先获取当前流程的预测走向节点，发起时只校验预测的节点发起人自选审批人的审批人和抄送人是否都配置了
         activityNodes.forEach(task -> {
             List<Long> assignees = startUserSelectAssignees != null ? startUserSelectAssignees.get(task.getId()) : null;
