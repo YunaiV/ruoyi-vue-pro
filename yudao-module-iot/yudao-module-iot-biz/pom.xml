@@ -75,6 +75,11 @@
 <!--            <groupId>org.eclipse.paho</groupId> &lt;!&ndash; MQTT &ndash;&gt;-->
 <!--            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>-->
 <!--        </dependency>-->
+        <!-- 工具类相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-mq</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.pf4j</groupId>  <!-- PF4J：内置插件机制 -->
