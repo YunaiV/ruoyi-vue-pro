@@ -7,7 +7,6 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -29,7 +28,6 @@ import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.dept.BpmTaskCandidateStartUserSelectStrategy;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
@@ -167,9 +165,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         HistoricProcessInstance historicProcessInstance = null; // 流程实例
         Integer processInstanceStatus = BpmProcessInstanceStatusEnum.NOT_START.getStatus(); // 流程状态
         Map<String, Object> processVariables = reqVO.getProcessVariables(); // 流程变量
-        if (reqVO.getProcessVariablesStr() != null){
-            processVariables = JSONUtil.parseObj(reqVO.getProcessVariablesStr());
-        }
         // 1.2 如果是流程已发起的场景，则使用流程实例的数据
         if (reqVO.getProcessInstanceId() != null) {
             historicProcessInstance = getHistoricProcessInstance(reqVO.getProcessInstanceId());
@@ -213,8 +208,11 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // TODO @jason：有一个极端情况，如果一个用户有 2 个 task A 和 B，A 已经通过，B 需要审核。这个时，通过 A 进来，todo 拿到
         // B，会不会表单权限不一致哈。
         BpmTaskRespVO todoTask = taskService.getFirstTodoTask(loginUserId, reqVO.getProcessInstanceId());
-
-        // 3.2 预测未运行节点的审批信息
+        // 3.2 流程首次发起时，variables值一定为空，会导致条件表达式解析错误导致预测节点缺失
+        if (null == processVariables) {
+            processVariables = new HashMap<>();
+        }
+        // 3.3 预测未运行节点的审批信息
         List<ActivityNode> simulateActivityNodes = getSimulateApproveNodeList(startUserId, bpmnModel,
                 processDefinitionInfo,
                 processVariables, activities);
@@ -697,17 +695,16 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     private void validateStartUserSelectAssignees(Long userId, ProcessDefinition definition,
             Map<String, List<Long>> startUserSelectAssignees, Map<String,Object> variables) {
         // 1.获取预测的节点信息
-        BpmApprovalDetailReqVO detailReqVO = new BpmApprovalDetailReqVO();
-        detailReqVO.setProcessVariables(variables);
-        detailReqVO.setProcessDefinitionId(definition.getId());
-        BpmApprovalDetailRespVO respVO = getApprovalDetail(userId, detailReqVO);
-        List<ActivityNode> activityNodes = respVO.getActivityNodes();
+        BpmApprovalDetailRespVO detailRespVO = getApprovalDetail(userId, new BpmApprovalDetailReqVO()
+                .setProcessDefinitionId(definition.getId())
+                .setProcessVariables(variables));
+        List<ActivityNode> activityNodes = detailRespVO.getActivityNodes();
         if (CollUtil.isEmpty(activityNodes)){
             return;
         }
-        //移除掉不是发起人自选审批人节点
-        activityNodes.removeIf(task -> null == task.getCandidateStrategy() || !task.getCandidateStrategy().equals(BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy()));
-        // 2. 流程发起时要先获取当前流程的预测走向节点，发起时只校验预测的节点发起人自选审批人的审批人和抄送人是否都配置了
+        // 2.移除掉不是发起人自选审批人节点
+        activityNodes.removeIf(task -> Objects.equals(BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy(), task. getCandidateStrategy()));
+        // 3.流程发起时要先获取当前流程的预测走向节点，发起时只校验预测的节点发起人自选审批人的审批人和抄送人是否都配置了
         activityNodes.forEach(task -> {
             List<Long> assignees = startUserSelectAssignees != null ? startUserSelectAssignees.get(task.getId()) : null;
             if (CollUtil.isEmpty(assignees)) {
