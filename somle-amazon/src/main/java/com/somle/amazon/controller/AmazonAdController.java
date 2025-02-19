@@ -23,8 +23,8 @@ public class AmazonAdController {
     }
 
     @PostMapping("auth")
-    String createAuth(@RequestParam String code, @RequestParam AmazonRegion region) {
-        service.createAuth(code, region);
+    String createAuth(@RequestParam String code) {
+        service.createAuth(code);
         return "success";
     }
 }
