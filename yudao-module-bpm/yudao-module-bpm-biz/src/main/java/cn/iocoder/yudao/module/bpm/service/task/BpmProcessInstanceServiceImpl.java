@@ -29,7 +29,7 @@ import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.dept.BpmTaskCandidateStartUserSelectStrategy;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.event.BpmProcessInstanceEventPublisher;
@@ -210,7 +210,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // TODO @jason：有一个极端情况，如果一个用户有 2 个 task A 和 B，A 已经通过，B 需要审核。这个时，通过 A 进来，todo 拿到
         // B，会不会表单权限不一致哈。
         BpmTaskRespVO todoTask = taskService.getFirstTodoTask(loginUserId, reqVO.getProcessInstanceId());
-
         // 3.2 预测未运行节点的审批信息
         List<ActivityNode> simulateActivityNodes = getSimulateApproveNodeList(startUserId, bpmnModel,
                 processDefinitionInfo,
@@ -651,7 +650,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             throw exception(PROCESS_INSTANCE_START_USER_CAN_START);
         }
         // 1.3 校验发起人自选审批人
-        validateStartUserSelectAssignees(definition, startUserSelectAssignees);
+        validateStartUserSelectAssignees(userId, definition, startUserSelectAssignees, variables);
 
         // 2. 创建流程实例
         if (variables == null) {
@@ -696,17 +695,20 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         return instance.getId();
     }
 
-    private void validateStartUserSelectAssignees(ProcessDefinition definition,
-            Map<String, List<Long>> startUserSelectAssignees) {
-        // 1. 获得发起人自选审批人的 UserTask/ServiceTask 列表
-        BpmnModel bpmnModel = processDefinitionService.getProcessDefinitionBpmnModel(definition.getId());
-        List<Task> tasks = BpmTaskCandidateStartUserSelectStrategy.getStartUserSelectTaskList(bpmnModel);
-        if (CollUtil.isEmpty(tasks)) {
+    private void validateStartUserSelectAssignees(Long userId, ProcessDefinition definition,
+            Map<String, List<Long>> startUserSelectAssignees, Map<String,Object> variables) {
+        // 1.获取预测的节点信息
+        BpmApprovalDetailRespVO detailRespVO = getApprovalDetail(userId, new BpmApprovalDetailReqVO()
+                .setProcessDefinitionId(definition.getId())
+                .setProcessVariables(variables));
+        List<ActivityNode> activityNodes = detailRespVO.getActivityNodes();
+        if (CollUtil.isEmpty(activityNodes)){
             return;
         }
-
-        // 2. 校验发起人自选审批人的审批人和抄送人是否都配置了
-        tasks.forEach(task -> {
+        // 2.移除掉不是发起人自选审批人节点
+        activityNodes.removeIf(task -> !Objects.equals(BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy(), task.getCandidateStrategy()));
+        // 3.流程发起时要先获取当前流程的预测走向节点，发起时只校验预测的节点发起人自选审批人的审批人和抄送人是否都配置了
+        activityNodes.forEach(task -> {
             List<Long> assignees = startUserSelectAssignees != null ? startUserSelectAssignees.get(task.getId()) : null;
             if (CollUtil.isEmpty(assignees)) {
                 throw exception(PROCESS_INSTANCE_START_USER_SELECT_ASSIGNEES_NOT_CONFIG, task.getName());

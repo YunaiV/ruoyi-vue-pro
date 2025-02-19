@@ -799,8 +799,8 @@ public class BpmnModelUtils {
             // 查找满足条件的 SequenceFlow 路径
             Gateway gateway = (Gateway) currentElement;
             SequenceFlow matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
-                    flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
-                            && evalConditionExpress(variables, flow.getConditionExpression()));
+                        flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
+                                && (evalConditionExpress(variables, flow.getConditionExpression())));
             if (matchSequenceFlow == null) {
                 matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
                         flow -> ObjUtil.equal(gateway.getDefaultFlow(), flow.getId()));
@@ -821,8 +821,8 @@ public class BpmnModelUtils {
             // 查找满足条件的 SequenceFlow 路径
             Gateway gateway = (Gateway) currentElement;
             Collection<SequenceFlow> matchSequenceFlows = CollUtil.filterNew(gateway.getOutgoingFlows(),
-                    flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
-                            && evalConditionExpress(variables, flow.getConditionExpression()));
+                        flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
+                                && evalConditionExpress(variables, flow.getConditionExpression()));
             if (CollUtil.isEmpty(matchSequenceFlows)) {
                 matchSequenceFlows = CollUtil.filterNew(gateway.getOutgoingFlows(),
                         flow -> ObjUtil.equal(gateway.getDefaultFlow(), flow.getId()));
@@ -855,6 +855,9 @@ public class BpmnModelUtils {
      */
     public static boolean evalConditionExpress(Map<String, Object> variables, String express) {
         if (express == null) {
+            return Boolean.FALSE;
+        }
+        if (variables == null) {
             return Boolean.FALSE;
         }
         try {

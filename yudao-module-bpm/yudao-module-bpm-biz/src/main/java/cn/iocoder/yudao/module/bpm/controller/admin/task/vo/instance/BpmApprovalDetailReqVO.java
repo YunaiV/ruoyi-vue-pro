@@ -18,6 +18,9 @@ public class BpmApprovalDetailReqVO {
     @Schema(description = "流程变量")
     private Map<String, Object> processVariables; // 使用场景：同 processDefinitionId，用于流程预测
 
+    @Schema(description = "流程变量")
+    private String processVariablesStr; // 解决 GET 无法传递对象的问题，最终转换成 processVariables 变量
+
     @Schema(description = "流程实例的编号", example = "1024")
     private String processInstanceId;  // 使用场景：流程已发起时候传流程实例 ID
 
