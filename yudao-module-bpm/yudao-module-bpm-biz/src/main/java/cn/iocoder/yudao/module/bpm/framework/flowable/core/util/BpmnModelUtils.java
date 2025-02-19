@@ -778,9 +778,16 @@ public class BpmnModelUtils {
         if (currentElement instanceof ExclusiveGateway) {
             // 查找满足条件的 SequenceFlow 路径
             Gateway gateway = (Gateway) currentElement;
-            SequenceFlow matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
-                    flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
-                            && (evalConditionExpress(variables, flow.getConditionExpression())));
+            SequenceFlow matchSequenceFlow;
+            // 流程首次发起时，variables值一定为空，会导致条件表达式解析错误导致预测节点缺失
+            if (null == variables) {
+                matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
+                        flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId()));
+            } else {
+                matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
+                        flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
+                                && (evalConditionExpress(variables, flow.getConditionExpression())));
+            }
             if (matchSequenceFlow == null) {
                 matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
                         flow -> ObjUtil.equal(gateway.getDefaultFlow(), flow.getId()));
@@ -800,9 +807,15 @@ public class BpmnModelUtils {
         if (currentElement instanceof InclusiveGateway) {
             // 查找满足条件的 SequenceFlow 路径
             Gateway gateway = (Gateway) currentElement;
-            Collection<SequenceFlow> matchSequenceFlows = CollUtil.filterNew(gateway.getOutgoingFlows(),
-                    flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
-                            && evalConditionExpress(variables, flow.getConditionExpression()));
+            Collection<SequenceFlow> matchSequenceFlows;
+            if (null == variables){
+                matchSequenceFlows = CollUtil.filterNew(gateway.getOutgoingFlows(),
+                        flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId()));
+            }else {
+                matchSequenceFlows = CollUtil.filterNew(gateway.getOutgoingFlows(),
+                        flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
+                                && evalConditionExpress(variables, flow.getConditionExpression()));
+            }
             if (CollUtil.isEmpty(matchSequenceFlows)) {
                 matchSequenceFlows = CollUtil.filterNew(gateway.getOutgoingFlows(),
                         flow -> ObjUtil.equal(gateway.getDefaultFlow(), flow.getId()));
