@@ -44,8 +44,8 @@ public class IotPluginCommonAutoConfiguration {
 
     @Bean(initMethod = "init", destroyMethod = "stop")
     public IotPluginInstanceHeartbeatJob pluginInstanceHeartbeatJob(
-            IotDeviceUpstreamApi deviceDataApi, IotDeviceDownstreamServer deviceDownstreamServer) {
-        return new IotPluginInstanceHeartbeatJob(deviceDataApi, deviceDownstreamServer);
+            IotDeviceUpstreamApi deviceDataApi, IotDeviceDownstreamServer deviceDownstreamServer, IotPluginCommonProperties commonProperties) {
+        return new IotPluginInstanceHeartbeatJob(deviceDataApi, deviceDownstreamServer, commonProperties);
     }
 
 }

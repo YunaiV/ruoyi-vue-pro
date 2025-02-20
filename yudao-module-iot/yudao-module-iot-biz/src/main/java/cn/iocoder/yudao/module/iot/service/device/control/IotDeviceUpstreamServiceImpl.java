@@ -20,6 +20,8 @@ import cn.iocoder.yudao.module.iot.mq.producer.device.IotDeviceProducer;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
 import cn.iocoder.yudao.module.iot.service.plugin.IotPluginInstanceService;
+import cn.iocoder.yudao.module.iot.util.MqttSignUtils;
+import cn.iocoder.yudao.module.iot.util.MqttSignUtils.MqttSignResult;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -58,25 +60,26 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
         // 2.1 情况一：属性上报
         String requestId = IdUtil.fastSimpleUUID();
         if (Objects.equals(simulatorReqVO.getType(), IotDeviceMessageTypeEnum.PROPERTY.getType())) {
-            reportDeviceProperty(((IotDevicePropertyReportReqDTO)
-                    new IotDevicePropertyReportReqDTO().setRequestId(requestId).setReportTime(LocalDateTime.now())
-                            .setProductKey(device.getProductKey()).setDeviceName(device.getDeviceName()))
+            reportDeviceProperty(((IotDevicePropertyReportReqDTO) new IotDevicePropertyReportReqDTO()
+                    .setRequestId(requestId).setReportTime(LocalDateTime.now())
+                    .setProductKey(device.getProductKey()).setDeviceName(device.getDeviceName()))
                     .setProperties((Map<String, Object>) simulatorReqVO.getData()));
             return;
         }
         // 2.2 情况二：事件上报
         if (Objects.equals(simulatorReqVO.getType(), IotDeviceMessageTypeEnum.EVENT.getType())) {
-            reportDeviceEvent(((IotDeviceEventReportReqDTO)
-                    new IotDeviceEventReportReqDTO().setRequestId(requestId).setReportTime(LocalDateTime.now())
-                            .setProductKey(device.getProductKey()).setDeviceName(device.getDeviceName()))
-                    .setIdentifier(simulatorReqVO.getIdentifier()).setParams((Map<String, Object>) simulatorReqVO.getData()));
+            reportDeviceEvent(((IotDeviceEventReportReqDTO) new IotDeviceEventReportReqDTO().setRequestId(requestId)
+                    .setReportTime(LocalDateTime.now())
+                    .setProductKey(device.getProductKey()).setDeviceName(device.getDeviceName()))
+                    .setIdentifier(simulatorReqVO.getIdentifier())
+                    .setParams((Map<String, Object>) simulatorReqVO.getData()));
             return;
         }
         // 2.3 情况三：状态变更
         if (Objects.equals(simulatorReqVO.getType(), IotDeviceMessageTypeEnum.STATE.getType())) {
-            updateDeviceState(((IotDeviceStateUpdateReqDTO)
-                    new IotDeviceStateUpdateReqDTO().setRequestId(IdUtil.fastSimpleUUID()).setReportTime(LocalDateTime.now())
-                            .setProductKey(device.getProductKey()).setDeviceName(device.getDeviceName()))
+            updateDeviceState(((IotDeviceStateUpdateReqDTO) new IotDeviceStateUpdateReqDTO()
+                    .setRequestId(IdUtil.fastSimpleUUID()).setReportTime(LocalDateTime.now())
+                    .setProductKey(device.getProductKey()).setDeviceName(device.getDeviceName()))
                     .setState((Integer) simulatorReqVO.getData()));
             return;
         }
@@ -275,6 +278,37 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
                 .setIdentifier(IotDeviceMessageIdentifierEnum.TOPOLOGY_ADD.getIdentifier())
                 .setData(addReqDTO.getParams());
         sendDeviceMessage(message, device);
+    }
+
+    @Override
+    public Boolean authenticateEmqxConnection(IotDeviceEmqxAuthReqDTO authReqDTO) {
+        log.info("[authenticateEmqxConnection][认证 Emqx 连接: {}]", authReqDTO);
+        // 1. 校验设备是否存在
+        // username 格式：${DeviceName}&${ProductKey}
+        String[] usernameParts = authReqDTO.getUsername().split("&");
+        if (usernameParts.length != 2) {
+            log.error("[authenticateEmqxConnection][认证失败，username 格式不正确]");
+            return Boolean.FALSE;
+        }
+        String deviceName = usernameParts[0];
+        String productKey = usernameParts[1];
+        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(
+                productKey, deviceName);
+        if (device == null) {
+            log.error("[authenticateEmqxConnection][设备({}/{}) 不存在]",
+                    productKey, deviceName);
+            return Boolean.FALSE;
+        }
+        // 2. 校验密码
+        String deviceSecret = device.getDeviceSecret();
+        String clientId = authReqDTO.getClientId();
+        MqttSignResult sign = MqttSignUtils.calculate(productKey, deviceName, deviceSecret, clientId);
+        if (!StrUtil.equals(sign.getPassword(), authReqDTO.getPassword())) {
+            log.error("[authenticateEmqxConnection][认证失败，密码不正确]");
+            return Boolean.FALSE;
+        }
+        log.info("[authenticateEmqxConnection][认证成功]");
+        return Boolean.TRUE;
     }
 
     private void updateDeviceLastTime(IotDeviceDO device, IotDeviceUpstreamAbstractReqDTO reqDTO) {

@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: yudao-module-iot-plugin-emqx
+
+yudao:
+  iot:
+    plugin:
+      common:
+        upstream-url: http://127.0.0.1:48080
+        downstream-port: 8100
+        plugin-key: yudao-module-iot-plugin-emqx
+      emqx:
+        host: 127.0.0.1
+        port: 1883
+        ssl: false
+        topics: "/sys/#"
+        auth-port: 8101

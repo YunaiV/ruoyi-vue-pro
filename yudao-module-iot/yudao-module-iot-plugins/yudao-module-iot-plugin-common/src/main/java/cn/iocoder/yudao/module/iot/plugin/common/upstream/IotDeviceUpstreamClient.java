@@ -58,6 +58,12 @@ public class IotDeviceUpstreamClient implements IotDeviceUpstreamApi {
     }
 
     @Override
+    public CommonResult<Boolean> authenticateEmqxConnection(IotDeviceEmqxAuthReqDTO authReqDTO) {
+        String url = properties.getUpstreamUrl() + URL_PREFIX + "/authenticate-emqx-connection";
+        return doPost(url, authReqDTO);
+    }
+
+    @Override
     public CommonResult<Boolean> reportDeviceProperty(IotDevicePropertyReportReqDTO reportReqDTO) {
         String url = properties.getUpstreamUrl() + URL_PREFIX + "/report-property";
         return doPost(url, reportReqDTO);

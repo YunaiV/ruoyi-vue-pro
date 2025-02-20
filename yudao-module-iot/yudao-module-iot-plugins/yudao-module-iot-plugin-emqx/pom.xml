@@ -12,6 +12,7 @@
     <packaging>jar</packaging>
 
     <artifactId>yudao-module-iot-plugin-emqx</artifactId>
+    <version>1.0.0</version>
 
     <name>${project.artifactId}</name>
     <description>
@@ -21,36 +22,16 @@
     <properties>
         <!-- 插件相关 -->
         <plugin.id>emqx-plugin</plugin.id>
-        <plugin.class>cn.iocoder.yudao.module.iot.plugin.EmqxPlugin</plugin.class>
-        <plugin.version>0.0.1</plugin.version>
-        <plugin.provider>ahh</plugin.provider>
-        <plugin.description>emqx-plugin-0.0.1</plugin.description>
+        <plugin.class>cn.iocoder.yudao.module.iot.plugin.emqx.config.IotEmqxPlugin</plugin.class>
+        <plugin.version>${project.version}</plugin.version>
+        <plugin.provider>yudao</plugin.provider>
+        <plugin.description>${project.artifactId}-${project.version}</plugin.description>
         <plugin.dependencies/>
     </properties>
 
     <build>
         <plugins>
-            <!-- DOESN'T WORK WITH MAVEN 3 (I defined the plugin metadata in properties section)
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>properties-maven-plugin</artifactId>
-                <version>1.0-alpha-2</version>
-                <executions>
-                  <execution>
-                    <phase>initialize</phase>
-                    <goals>
-                      <goal>read-project-properties</goal>
-                    </goals>
-                    <configuration>
-                      <files>
-                        <file>plugin.properties</file>
-                      </files>
-                    </configuration>
-                  </execution>
-                </executions>
-            </plugin>
-            -->
-
+            <!-- 插件模式 zip -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -94,6 +75,7 @@
                 </executions>
             </plugin>
 
+            <!-- 插件模式 jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -111,54 +93,72 @@
                     </archive>
                 </configuration>
             </plugin>
+            <!--            <plugin>-->
+            <!--                <groupId>org.apache.maven.plugins</groupId>-->
+            <!--                <artifactId>maven-shade-plugin</artifactId>-->
+            <!--                <version>3.6.0</version>-->
+            <!--                <executions>-->
+            <!--                    <execution>-->
+            <!--                        <phase>package</phase>-->
+            <!--                        <goals>-->
+            <!--                            <goal>shade</goal>-->
+            <!--                        </goals>-->
+            <!--                        <configuration>-->
+            <!--                            <minimizeJar>true</minimizeJar>-->
+            <!--                        </configuration>-->
+            <!--                    </execution>-->
+            <!--                </executions>-->
+            <!--                <configuration>-->
+            <!--                    <archive>-->
+            <!--                        <manifestEntries>-->
+            <!--                            <Plugin-Id>${plugin.id}</Plugin-Id>-->
+            <!--                            <Plugin-Class>${plugin.class}</Plugin-Class>-->
+            <!--                            <Plugin-Version>${plugin.version}</Plugin-Version>-->
+            <!--                            <Plugin-Provider>${plugin.provider}</Plugin-Provider>-->
+            <!--                            <Plugin-Description>${plugin.description}</Plugin-Description>-->
+            <!--                            <Plugin-Dependencies>${plugin.dependencies}</Plugin-Dependencies>-->
+            <!--                        </manifestEntries>-->
+            <!--                    </archive>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
 
+            <!-- 独立模式 -->
             <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>-standalone</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
+
         </plugins>
     </build>
 
     <dependencies>
-        <!-- 其他依赖项 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-iot-plugin-common</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <!-- Web 相关 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <!-- PF4J Spring 集成 -->
-        <dependency>
-            <groupId>org.pf4j</groupId>
-            <artifactId>pf4j-spring</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <!-- 项目依赖 -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-iot-api</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- Vert.x 核心依赖 -->
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-core</artifactId>
-        </dependency>
-        <!-- Vert.x Web 模块 -->
+
+        <!-- 工具类相关 -->
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web</artifactId>
-        </dependency>
-        <!-- MQTT -->
-        <dependency>
-            <groupId>org.eclipse.paho</groupId>
-            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -20,6 +20,8 @@ import cn.iocoder.yudao.module.iot.dal.redis.RedisKeyConstants;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
+import cn.iocoder.yudao.module.iot.util.MqttSignUtils;
+import cn.iocoder.yudao.module.iot.util.MqttSignUtils.MqttSignResult;
 import jakarta.annotation.Resource;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -123,10 +125,8 @@ public class IotDeviceServiceImpl implements IotDeviceService {
                 .setDeviceType(product.getDeviceType());
         // 生成并设置必要的字段
         // TODO @芋艿：各种 mqtt 是不是可以简化！
-        device.setDeviceSecret(generateDeviceSecret())
-                .setMqttClientId(generateMqttClientId())
-                .setMqttUsername(generateMqttUsername(device.getDeviceName(), device.getProductKey()))
-                .setMqttPassword(generateMqttPassword());
+        // clientId、username、password 根据规则实时生成
+        device.setDeviceSecret(generateDeviceSecret());
         // 设置设备状态为未激活
         device.setState(IotDeviceStateEnum.INACTIVE.getState());
     }
@@ -318,35 +318,6 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         return IdUtil.fastSimpleUUID();
     }
 
-    /**
-     * 生成 MQTT Client ID
-     *
-     * @return 生成的 MQTT Client ID
-     */
-    private String generateMqttClientId() {
-        return IdUtil.fastSimpleUUID();
-    }
-
-    /**
-     * 生成 MQTT Username
-     *
-     * @param deviceName 设备名称
-     * @param productKey 产品 Key
-     * @return 生成的 MQTT Username
-     */
-    private String generateMqttUsername(String deviceName, String productKey) {
-        return deviceName + "&" + productKey;
-    }
-
-    /**
-     * 生成 MQTT Password
-     *
-     * @return 生成的 MQTT Password
-     */
-    private String generateMqttPassword() {
-        return RandomUtil.randomString(32);
-    }
-
     @Override
     @Transactional(rollbackFor = Exception.class) // 添加事务，异常则回滚所有导入
     public IotDeviceImportRespVO importDevice(List<IotDeviceImportExcelVO> importDevices, boolean updateSupport) {
@@ -415,6 +386,17 @@ public class IotDeviceServiceImpl implements IotDeviceService {
             }
         });
         return respVO;
+    }
+
+    @Override
+    public IotDeviceMqttConnectionParamsRespVO getMqttConnectionParams(Long deviceId) {
+        IotDeviceDO device = validateDeviceExists(deviceId);
+        MqttSignResult mqttSignResult = MqttSignUtils.calculate(device.getProductKey(), device.getDeviceName(),
+                device.getDeviceSecret());
+        return new IotDeviceMqttConnectionParamsRespVO()
+                .setMqttClientId(mqttSignResult.getClientId())
+                .setMqttUsername(mqttSignResult.getUsername())
+                .setMqttPassword(mqttSignResult.getPassword());
     }
 
     private void deleteDeviceCache(IotDeviceDO device) {

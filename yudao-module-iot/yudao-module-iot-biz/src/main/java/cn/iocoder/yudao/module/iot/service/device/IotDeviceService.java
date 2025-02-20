@@ -168,4 +168,12 @@ public interface IotDeviceService {
      */
     IotDeviceImportRespVO importDevice(List<IotDeviceImportExcelVO> importDevices, boolean updateSupport);
 
+    /**
+     * 获取 MQTT 连接参数
+     *
+     * @param deviceId 设备 ID
+     * @return MQTT 连接参数
+     */
+    IotDeviceMqttConnectionParamsRespVO getMqttConnectionParams(Long deviceId);
+
 }

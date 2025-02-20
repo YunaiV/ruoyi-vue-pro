@@ -4,6 +4,7 @@ import cn.hutool.system.SystemUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotPluginInstanceHeartbeatReqDTO;
+import cn.iocoder.yudao.module.iot.plugin.common.config.IotPluginCommonProperties;
 import cn.iocoder.yudao.module.iot.plugin.common.downstream.IotDeviceDownstreamServer;
 import cn.iocoder.yudao.module.iot.plugin.common.util.IotPluginCommonUtils;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class IotPluginInstanceHeartbeatJob {
 
     private final IotDeviceUpstreamApi deviceUpstreamApi;
     private final IotDeviceDownstreamServer deviceDownstreamServer;
+    private final IotPluginCommonProperties commonProperties;
 
     public void init() {
         CommonResult<Boolean> result = deviceUpstreamApi.heartbeatPluginInstance(buildPluginInstanceHeartbeatReqDTO(true));
@@ -41,9 +43,8 @@ public class IotPluginInstanceHeartbeatJob {
     }
 
     private IotPluginInstanceHeartbeatReqDTO buildPluginInstanceHeartbeatReqDTO(Boolean online) {
-        // TODO @haohao：pluginKey 的获取？？？
         return new IotPluginInstanceHeartbeatReqDTO()
-                .setPluginKey("yudao-module-iot-plugin-http").setProcessId(IotPluginCommonUtils.getProcessId())
+                .setPluginKey(commonProperties.getPluginKey()).setProcessId(IotPluginCommonUtils.getProcessId())
                 .setHostIp(SystemUtil.getHostInfo().getAddress()).setDownstreamPort(deviceDownstreamServer.getPort())
                 .setOnline(online);
     }

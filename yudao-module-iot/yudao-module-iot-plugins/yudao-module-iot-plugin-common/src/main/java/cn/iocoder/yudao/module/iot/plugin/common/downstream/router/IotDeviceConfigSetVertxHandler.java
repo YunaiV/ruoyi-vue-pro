@@ -16,7 +16,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
 
 /**
- * IOT 设备配置设置 Vertx Handler
+ * IoT 设备配置设置 Vertx Handler
  *
  * 芋道源码
  */
