@@ -122,7 +122,7 @@ public class WebUtils {
 
         String bodyString = JsonUtils.toJsonString(payload);
         RequestBody body = RequestBody.create(bodyString, MediaType.parse("application/json; charset=utf-8"));
-        log.debug("body: " + bodyString);
+        log.info("body: " + bodyString);
 
 
         Request request;
