@@ -47,7 +47,7 @@ public interface CouponTemplateMapper extends BaseMapperX<CouponTemplateDO> {
     }
 
     default List<CouponTemplateDO> selectListByTakeType(Integer takeType) {
-        return selectList(CouponTemplateDO::getTakeType, takeType);
+        return selectList(CouponTemplateDO::getTakeType, takeType, CouponTemplateDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
     }
 
     default List<CouponTemplateDO> selectList(List<Integer> canTakeTypes, Integer productScope, Long productScopeValue, Integer count) {
