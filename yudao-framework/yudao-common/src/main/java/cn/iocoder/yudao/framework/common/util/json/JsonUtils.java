@@ -66,8 +66,11 @@ public class JsonUtils {
         if ( objectMapper.isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)) {
             throw new RuntimeException("objectMapper feature should not be enabled");
         }
+        var result = objectMapper.writeValueAsString(object);
+
         log.info("toJsonString test passed");
-        return objectMapper.writeValueAsString(object);
+        log.info(result);
+        return result;
     }
 
     // convert json to string
