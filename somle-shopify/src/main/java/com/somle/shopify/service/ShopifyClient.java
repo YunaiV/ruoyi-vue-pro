@@ -1,10 +1,10 @@
 package com.somle.shopify.service;
 
 
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.framework.common.util.web.RequestX;
-import com.somle.framework.common.util.web.WebUtils;
+import cn.iocoder.yudao.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.web.RequestX;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import com.somle.shopify.model.ShopifyToken;
 import lombok.Setter;
 import lombok.SneakyThrows;

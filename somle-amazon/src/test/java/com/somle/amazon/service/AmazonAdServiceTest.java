@@ -1,7 +1,7 @@
 package com.somle.amazon.service;
 
-import com.somle.framework.common.util.general.CoreUtils;
-import com.somle.framework.test.core.ut.BaseSpringTest;
+import cn.iocoder.yudao.framework.common.util.general.CoreUtils;
+import cn.iocoder.yudao.framework.test.core.ut.BaseSpringTest;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;

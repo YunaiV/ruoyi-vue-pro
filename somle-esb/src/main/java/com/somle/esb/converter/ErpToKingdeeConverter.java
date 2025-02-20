@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static cn.iocoder.yudao.framework.common.util.number.LengthUtils.mmToCmAsFloat;
 import static com.somle.esb.util.ConstantConvertUtils.getCountrySuffix;
-import static com.somle.framework.common.util.number.LengthUtils.mmToCmAsFloat;
 
 @Slf4j
 @Service

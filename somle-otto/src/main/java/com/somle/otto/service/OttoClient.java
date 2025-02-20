@@ -1,8 +1,8 @@
 package com.somle.otto.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.somle.framework.common.util.web.RequestX;
-import com.somle.framework.common.util.web.WebUtils;
+import cn.iocoder.yudao.framework.common.util.web.RequestX;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import com.somle.otto.model.pojo.OttoAccount;
 import com.somle.otto.model.req.OttoReceiptReq;
 import com.somle.otto.model.resp.OttoCommonResp;

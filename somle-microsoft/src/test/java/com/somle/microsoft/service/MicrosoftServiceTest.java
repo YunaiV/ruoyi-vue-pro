@@ -1,7 +1,7 @@
 package com.somle.microsoft.service;
 
-import com.somle.framework.test.core.ut.BaseDbUnitTest;
-import com.somle.framework.test.core.ut.BaseSpringTest;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.BaseSpringTest;
 import com.somle.microsoft.model.PowerbiAccount;
 import com.somle.microsoft.model.PowerbiReportReqVO;
 import jakarta.annotation.Resource;

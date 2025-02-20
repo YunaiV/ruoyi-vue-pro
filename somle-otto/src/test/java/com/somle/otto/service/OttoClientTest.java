@@ -1,6 +1,6 @@
 package com.somle.otto.service;
 
-import com.somle.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import com.somle.otto.model.resp.OttoCommonResp;
 import com.somle.otto.repository.OttoAccountDao;
 import com.somle.otto.repository.OttoAuthTokenDao;

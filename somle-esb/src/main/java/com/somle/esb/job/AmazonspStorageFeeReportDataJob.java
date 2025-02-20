@@ -1,11 +1,9 @@
 package com.somle.esb.job;
 
 
-import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
+import cn.iocoder.yudao.framework.common.util.csv.TsvUtils;
 import com.somle.amazon.controller.vo.AmazonSpReportSaveVO;
-import com.somle.amazon.model.enums.AmazonCountry;
 import com.somle.esb.model.OssData;
-import com.somle.framework.common.util.csv.TsvUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

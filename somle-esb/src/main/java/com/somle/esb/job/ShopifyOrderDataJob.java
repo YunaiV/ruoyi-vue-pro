@@ -1,13 +1,8 @@
 package com.somle.esb.job;
 
 
-import com.somle.amazon.controller.vo.AmazonSpOrderReqVO;
 import com.somle.esb.model.OssData;
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public class ShopifyOrderDataJob extends ShopifyDataJob {

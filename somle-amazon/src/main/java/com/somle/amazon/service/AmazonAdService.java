@@ -4,7 +4,7 @@ import com.somle.amazon.model.AmazonAdAuthDO;
 import com.somle.amazon.model.enums.AmazonRegion;
 import com.somle.amazon.repository.AmazonAdAuthRepository;
 import com.somle.amazon.repository.AmazonAdClientRepository;
-import com.somle.framework.common.util.web.WebUtils;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

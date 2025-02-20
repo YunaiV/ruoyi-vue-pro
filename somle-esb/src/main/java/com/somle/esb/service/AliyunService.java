@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.zip.GZIPOutputStream;
 
-import com.somle.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import com.somle.esb.model.AliyunToken;
 import com.somle.esb.repository.AliyunTokenRepository;
 import jakarta.annotation.PostConstruct;

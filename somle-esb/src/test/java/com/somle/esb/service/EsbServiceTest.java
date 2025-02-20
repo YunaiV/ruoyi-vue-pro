@@ -16,7 +16,7 @@ import cn.iocoder.yudao.module.system.service.dept.DeptServiceImpl;
 
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import com.github.yulichang.autoconfigure.MybatisPlusJoinAutoConfiguration;
-import com.somle.framework.test.core.ut.BaseSpringTest;
+import cn.iocoder.yudao.framework.test.core.ut.BaseSpringTest;
 import com.somle.shopify.service.ShopifyService;
 import lombok.extern.slf4j.Slf4j;
 import com.somle.ai.service.AiService;

@@ -2,14 +2,13 @@ package com.somle.amazon.service;
 
 import com.somle.amazon.controller.vo.AmazonAuthReqVO;
 import com.somle.amazon.controller.vo.AmazonAuthRespVO;
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.framework.common.util.web.RequestX;
-import com.somle.framework.common.util.web.WebUtils;
+import cn.iocoder.yudao.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.web.RequestX;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Response;
 import org.springframework.stereotype.Service;
 
 @Slf4j

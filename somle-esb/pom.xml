@@ -60,8 +60,8 @@
         </dependency>
 
         <dependency>
-            <groupId>com.somle</groupId>
-            <artifactId>somle-spring-boot-starter-test</artifactId>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
 

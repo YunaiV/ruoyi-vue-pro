@@ -1,6 +1,6 @@
 package com.somle.otto.service;
 
-import com.somle.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import com.somle.otto.model.pojo.OttoAuthToken;
 import com.somle.otto.model.resp.OttoAccessTokenResp;
 import com.somle.otto.repository.OttoAccountDao;
