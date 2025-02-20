@@ -62,6 +62,11 @@ public class JsonUtils {
     // convert pojo to string
     @SneakyThrows
     public static String toJsonString(Object object) {
+        log.info("toJsonString test begin");
+        if ( objectMapper.isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)) {
+            throw new RuntimeException("objectMapper feature should not be enabled");
+        }
+        log.info("toJsonString test passed");
         return objectMapper.writeValueAsString(object);
     }
 
@@ -69,6 +74,8 @@ public class JsonUtils {
     @SneakyThrows
     public static String toJsonString(JSONObject jsonObject) {
         return jsonObject.toString();
+
+//        return objectMapper.writeValueAsString(jsonObject);
     }
 
     //convert pojo to json
