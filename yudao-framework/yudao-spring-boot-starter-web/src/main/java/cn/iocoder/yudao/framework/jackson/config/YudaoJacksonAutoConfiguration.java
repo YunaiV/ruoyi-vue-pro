@@ -36,10 +36,10 @@ public class YudaoJacksonAutoConfiguration {
                 .addSerializer(LocalDate.class, LocalDateSerializer.INSTANCE)
                 .addDeserializer(LocalDate.class, LocalDateDeserializer.INSTANCE)
                 .addSerializer(LocalTime.class, LocalTimeSerializer.INSTANCE)
-                .addDeserializer(LocalTime.class, LocalTimeDeserializer.INSTANCE)
+                .addDeserializer(LocalTime.class, LocalTimeDeserializer.INSTANCE);
                 // 新增 LocalDateTime 序列化、反序列化规则，使用 Long 时间戳
-                .addSerializer(LocalDateTime.class, TimestampLocalDateTimeSerializer.INSTANCE)
-                .addDeserializer(LocalDateTime.class, TimestampLocalDateTimeDeserializer.INSTANCE);
+//                .addSerializer(LocalDateTime.class, TimestampLocalDateTimeSerializer.INSTANCE)
+//                .addDeserializer(LocalDateTime.class, TimestampLocalDateTimeDeserializer.INSTANCE);
         // 1.2 注册到 objectMapper
         objectMappers.forEach(objectMapper -> objectMapper.registerModule(simpleModule));
 
