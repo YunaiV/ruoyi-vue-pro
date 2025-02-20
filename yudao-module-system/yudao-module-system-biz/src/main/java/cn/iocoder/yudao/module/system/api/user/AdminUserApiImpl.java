@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.system.api.user;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserReqDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
@@ -34,12 +36,11 @@ public class AdminUserApiImpl implements AdminUserApi {
         AdminUserDO user = userService.getUser(id);
         return BeanUtils.toBean(user, AdminUserRespDTO.class);
     }
-
     @Override
     public List<AdminUserRespDTO> getUserListBySubordinate(Long id) {
         // 1.1 获取用户负责的部门
-        List<DeptDO> depts = deptService.getDeptListByLeaderUserId(id);
-        if (CollUtil.isEmpty(depts)) {
+        AdminUserDO user = userService.getUser(id);
+        if (user == null) {
             return Collections.emptyList();
         }
         ArrayList<Long> deptIds = new ArrayList<>();
@@ -53,8 +54,7 @@ public class AdminUserApiImpl implements AdminUserApi {
         }
         deptIds.add(dept.getId());
         // 1.2 获取所有子部门
-        Set<Long> deptIds = convertSet(depts, DeptDO::getId);
-        List<DeptDO> childDeptList = deptService.getChildDeptList(deptIds);
+        List<DeptDO> childDeptList = deptService.getChildDeptList(dept.getId());
         if (CollUtil.isNotEmpty(childDeptList)) {
             deptIds.addAll(convertSet(childDeptList, DeptDO::getId));
         }

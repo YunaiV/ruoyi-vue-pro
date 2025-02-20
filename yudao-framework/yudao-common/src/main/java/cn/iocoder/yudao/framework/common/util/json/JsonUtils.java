@@ -276,6 +276,11 @@ public class JsonUtils {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
     }
 
+    @SneakyThrows
+    public static byte[] toJsonByte(Object object) {
+        return objectMapper.writeValueAsBytes(object);
+    }
+
 //    /**
 //     * 将字符串解析成指定类型的对象
 //     * 使用 {@link #parseObject(String, Class)} 时，在@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS) 的场景下，
