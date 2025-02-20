@@ -49,7 +49,7 @@ public class AmazonadSbAdReportDataJob extends AmazonadDataJob{
             .configuration(configuration)
             .build();
 
-        amazonAdService.clients.stream()
+        amazonAdService.createAllClients().stream()
             .flatMap(client -> client.batchCreateAndGetReport(payload))
             .forEach(page -> {
                 OssData data = OssData.builder()

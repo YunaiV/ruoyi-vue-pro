@@ -20,13 +20,13 @@ import java.util.Objects;
 
 
 /**
-* @Description: $
-* @Author: c-tao
-* @Date: 2025/1/13$
-*/
+ * @Description: $
+ * @Author: c-tao
+ * @Date: 2025/1/13$
+ */
 @Slf4j
 @Component
-@Profile("!dev & !test") // 仅在非 dev 和非 test 环境加载
+@Profile("prod")
 @RequiredArgsConstructor
 public class DepartmentHandler {
 
@@ -39,7 +39,7 @@ public class DepartmentHandler {
     public void handle(@Payload DeptRespDTO department) {
         Long deptId = department.getId();
         //同步到易仓
-        if (!Objects.equals(deptId, TenantId.DEFAULT.getId())){
+        if (!Objects.equals(deptId, TenantId.DEFAULT.getId())) {
             EccangCategory eccang = erpToEccangConverter.toEccang(String.valueOf(deptId));
             EccangResponse.EccangPage response = eccangService.addDepartment(eccang);
             log.info(response.toString());

@@ -39,8 +39,10 @@ public class AmazonAdClient {
 
     private AmazonAdAuthDO auth;
 
+    private AmazonRegion region;
+
     private String getEndPoint() {
-        return AmazonRegion.findByCode(auth.getRegionCode()).getAdUrl();
+        return this.region.getAdUrl();
     }
 
 
