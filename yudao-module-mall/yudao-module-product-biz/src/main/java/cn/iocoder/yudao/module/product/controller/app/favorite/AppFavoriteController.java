@@ -3,8 +3,6 @@ package cn.iocoder.yudao.module.product.controller.app.favorite;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
-import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteBatchReqVO;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoritePageReqVO;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteReqVO;
 import cn.iocoder.yudao.module.product.controller.app.favorite.vo.AppFavoriteRespVO;
@@ -15,10 +13,10 @@ import cn.iocoder.yudao.module.product.service.favorite.ProductFavoriteService;
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.*;
-
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -37,14 +35,12 @@ public class AppFavoriteController {
 
     @PostMapping(value = "/create")
     @Operation(summary = "添加商品收藏")
-    @PreAuthenticated
     public CommonResult<Long> createFavorite(@RequestBody @Valid AppFavoriteReqVO reqVO) {
         return success(productFavoriteService.createFavorite(getLoginUserId(), reqVO.getSpuId()));
     }
 
     @DeleteMapping(value = "/delete")
     @Operation(summary = "取消单个商品收藏")
-    @PreAuthenticated
     public CommonResult<Boolean> deleteFavorite(@RequestBody @Valid AppFavoriteReqVO reqVO) {
         productFavoriteService.deleteFavorite(getLoginUserId(), reqVO.getSpuId());
         return success(Boolean.TRUE);
@@ -52,7 +48,6 @@ public class AppFavoriteController {
 
     @GetMapping(value = "/page")
     @Operation(summary = "获得商品收藏分页")
-    @PreAuthenticated
     public CommonResult<PageResult<AppFavoriteRespVO>> getFavoritePage(AppFavoritePageReqVO reqVO) {
         PageResult<ProductFavoriteDO> favoritePage = productFavoriteService.getFavoritePage(getLoginUserId(), reqVO);
         if (CollUtil.isEmpty(favoritePage.getList())) {
@@ -72,7 +67,6 @@ public class AppFavoriteController {
 
     @GetMapping(value = "/exits")
     @Operation(summary = "检查是否收藏过商品")
-    @PreAuthenticated
     public CommonResult<Boolean> isFavoriteExists(AppFavoriteReqVO reqVO) {
         ProductFavoriteDO favorite = productFavoriteService.getFavorite(getLoginUserId(), reqVO.getSpuId());
         return success(favorite != null);
@@ -80,7 +74,6 @@ public class AppFavoriteController {
 
     @GetMapping(value = "/get-count")
     @Operation(summary = "获得商品收藏数量")
-    @PreAuthenticated
     public CommonResult<Long> getFavoriteCount() {
         return success(productFavoriteService.getFavoriteCount(getLoginUserId()));
     }

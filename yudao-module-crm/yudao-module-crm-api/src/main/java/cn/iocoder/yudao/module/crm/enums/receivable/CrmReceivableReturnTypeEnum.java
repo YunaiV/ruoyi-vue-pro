@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.crm.enums.receivable;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum CrmReceivableReturnTypeEnum implements IntArrayValuable {
+public enum CrmReceivableReturnTypeEnum implements ArrayValuable<Integer> {
 
     CHECK(1, "支票"),
     CASH(2, "现金"),
@@ -24,7 +24,7 @@ public enum CrmReceivableReturnTypeEnum implements IntArrayValuable {
     WECHAT_PAY(7, "微信支付"),
     OTHER(8, "其它");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmReceivableReturnTypeEnum::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(CrmReceivableReturnTypeEnum::getType).toArray(Integer[]::new);
 
     /**
      * 类型
@@ -36,7 +36,7 @@ public enum CrmReceivableReturnTypeEnum implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

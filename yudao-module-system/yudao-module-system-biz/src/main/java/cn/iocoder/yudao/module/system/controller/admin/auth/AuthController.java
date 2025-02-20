@@ -7,7 +7,14 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
-import cn.iocoder.yudao.module.system.controller.admin.auth.vo.*;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthLoginReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthLoginRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthPermissionInfoRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthRegisterReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthResetPasswordReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthSmsLoginReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthSmsSendReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthSocialLoginReqVO;
 import cn.iocoder.yudao.module.system.convert.auth.AuthConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
@@ -23,14 +30,19 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -115,6 +127,13 @@ public class AuthController {
         return success(AuthConvert.INSTANCE.convert(user, roles, menuList));
     }
 
+    @PostMapping("/register")
+    @PermitAll
+    @Operation(summary = "注册用户")
+    public CommonResult<AuthLoginRespVO> register(@RequestBody @Valid AuthRegisterReqVO registerReqVO) {
+        return success(authService.register(registerReqVO));
+    }
+
     // ========== 短信登录相关 ==========
 
     @PostMapping("/sms-login")
@@ -129,6 +148,14 @@ public class AuthController {
     @Operation(summary = "发送手机验证码")
     public CommonResult<Boolean> sendLoginSmsCode(@RequestBody @Valid AuthSmsSendReqVO reqVO) {
         authService.sendSmsCode(reqVO);
+        return success(true);
+    }
+
+    @PostMapping("/reset-password")
+    @PermitAll
+    @Operation(summary = "重置密码")
+    public CommonResult<Boolean> resetPassword(@RequestBody @Valid AuthResetPasswordReqVO reqVO) {
+        authService.resetPassword(reqVO);
         return success(true);
     }
 

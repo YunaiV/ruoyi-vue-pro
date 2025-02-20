@@ -13,7 +13,7 @@ public interface CodegenColumnMapper extends BaseMapperX<CodegenColumnDO> {
     default List<CodegenColumnDO> selectListByTableId(Long tableId) {
         return selectList(new LambdaQueryWrapperX<CodegenColumnDO>()
                 .eq(CodegenColumnDO::getTableId, tableId)
-                .orderByAsc(CodegenColumnDO::getId));
+                .orderByAsc(CodegenColumnDO::getOrdinalPosition));
     }
 
     default void deleteListByTableId(Long tableId) {

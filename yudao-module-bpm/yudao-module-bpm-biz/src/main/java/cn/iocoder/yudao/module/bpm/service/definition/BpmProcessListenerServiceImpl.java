@@ -7,8 +7,8 @@ import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.listener.BpmPr
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.listener.BpmProcessListenerSaveReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessListenerDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmProcessListenerMapper;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmProcessListenerType;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmProcessListenerValueType;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmProcessListenerTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmProcessListenerValueTypeEnum;
 import jakarta.annotation.Resource;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.delegate.TaskListener;
@@ -52,14 +52,14 @@ public class BpmProcessListenerServiceImpl implements BpmProcessListenerService 
 
     private void validateCreateProcessListenerValue(BpmProcessListenerSaveReqVO createReqVO) {
         // class 类型
-        if (createReqVO.getValueType().equals(BpmProcessListenerValueType.CLASS.getType())) {
+        if (createReqVO.getValueType().equals(BpmProcessListenerValueTypeEnum.CLASS.getType())) {
             try {
                 Class<?> clazz = Class.forName(createReqVO.getValue());
-                if (createReqVO.getType().equals(BpmProcessListenerType.EXECUTION.getType())
+                if (createReqVO.getType().equals(BpmProcessListenerTypeEnum.EXECUTION.getType())
                     && !JavaDelegate.class.isAssignableFrom(clazz)) {
                     throw exception(PROCESS_LISTENER_CLASS_IMPLEMENTS_ERROR, createReqVO.getValue(),
                             JavaDelegate.class.getName());
-                } else if (createReqVO.getType().equals(BpmProcessListenerType.TASK.getType())
+                } else if (createReqVO.getType().equals(BpmProcessListenerTypeEnum.TASK.getType())
                     && !TaskListener.class.isAssignableFrom(clazz)) {
                     throw exception(PROCESS_LISTENER_CLASS_IMPLEMENTS_ERROR, createReqVO.getValue(),
                             TaskListener.class.getName());

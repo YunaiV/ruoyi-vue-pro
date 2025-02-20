@@ -46,8 +46,7 @@ public interface AfterSaleConvert {
             @Mapping(source = "afterSale.refundPrice", target = "price"),
             @Mapping(source = "orderProperties.payAppKey", target = "appKey")
     })
-    PayRefundCreateReqDTO convert(String userIp, AfterSaleDO afterSale,
-                                  TradeOrderProperties orderProperties);
+    PayRefundCreateReqDTO convert(String userIp, AfterSaleDO afterSale, TradeOrderProperties orderProperties);
 
     MemberUserRespVO convert(MemberUserRespDTO bean);
 

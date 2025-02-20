@@ -81,7 +81,25 @@ public interface DeptService {
      * @param id 部门编号
      * @return 子部门列表
      */
-    List<DeptDO> getChildDeptList(Long id);
+    default List<DeptDO> getChildDeptList(Long id) {
+        return getChildDeptList(Collections.singleton(id));
+    }
+
+    /**
+     * 获得指定部门的所有子部门
+     *
+     * @param ids 部门编号数组
+     * @return 子部门列表
+     */
+    List<DeptDO> getChildDeptList(Collection<Long> ids);
+
+    /**
+     * 获得指定领导者的部门列表
+     *
+     * @param id 领导者编号
+     * @return 部门列表
+     */
+    List<DeptDO> getDeptListByLeaderUserId(Long id);
 
     /**
      * 获得所有子部门，从缓存中

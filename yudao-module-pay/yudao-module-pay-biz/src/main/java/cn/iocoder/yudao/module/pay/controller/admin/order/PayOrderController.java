@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.*;
@@ -11,12 +12,14 @@ import cn.iocoder.yudao.module.pay.convert.order.PayOrderConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
+import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
@@ -51,10 +54,21 @@ public class PayOrderController {
 
     @GetMapping("/get")
     @Operation(summary = "获得支付订单")
-    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @Parameters({
+            @Parameter(name = "id", description = "编号", required = true, example = "1024"),
+            @Parameter(name = "sync", description = "是否同步", example = "true")
+    })
     @PreAuthorize("@ss.hasPermission('pay:order:query')")
-    public CommonResult<PayOrderRespVO> getOrder(@RequestParam("id") Long id) {
-        return success(PayOrderConvert.INSTANCE.convert(orderService.getOrder(id)));
+    public CommonResult<PayOrderRespVO> getOrder(@RequestParam("id") Long id,
+                                                 @RequestParam(value = "sync", required = false) Boolean sync) {
+        PayOrderDO order = orderService.getOrder(id);
+        // sync 仅在等待支付
+        if (Boolean.TRUE.equals(sync) && PayOrderStatusEnum.isWaiting(order.getStatus())) {
+            orderService.syncOrderQuietly(order.getId());
+            // 重新查询，因为同步后，可能会有变化
+            order = orderService.getOrder(id);
+        }
+        return success(BeanUtils.toBean(order, PayOrderRespVO.class));
     }
 
     @GetMapping("/get-detail")

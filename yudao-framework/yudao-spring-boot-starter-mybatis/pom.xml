@@ -74,6 +74,10 @@
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-jsqlparser</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
             <artifactId>dynamic-datasource-spring-boot3-starter</artifactId> <!-- 多数据源 -->
             <exclusions>
                 <exclusion>

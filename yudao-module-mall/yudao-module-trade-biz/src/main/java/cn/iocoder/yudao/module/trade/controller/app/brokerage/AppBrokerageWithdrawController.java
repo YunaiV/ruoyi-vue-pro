@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.trade.controller.app.brokerage;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.security.core.annotations.PreAuthenticated;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBrokerageWithdrawCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBrokerageWithdrawPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBrokerageWithdrawRespVO;
@@ -11,12 +10,11 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageWithdrawD
 import cn.iocoder.yudao.module.trade.service.brokerage.BrokerageWithdrawService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
@@ -33,7 +31,6 @@ public class AppBrokerageWithdrawController {
 
     @GetMapping("/page")
     @Operation(summary = "获得分销提现分页")
-    @PreAuthenticated
     public CommonResult<PageResult<AppBrokerageWithdrawRespVO>> getBrokerageWithdrawPage(AppBrokerageWithdrawPageReqVO pageReqVO) {
         PageResult<BrokerageWithdrawDO> pageResult = brokerageWithdrawService.getBrokerageWithdrawPage(
                 BrokerageWithdrawConvert.INSTANCE.convert(pageReqVO, getLoginUserId()));
@@ -42,7 +39,6 @@ public class AppBrokerageWithdrawController {
 
     @PostMapping("/create")
     @Operation(summary = "创建分销提现")
-    @PreAuthenticated
     public CommonResult<Long> createBrokerageWithdraw(@RequestBody @Valid AppBrokerageWithdrawCreateReqVO createReqVO) {
         return success(brokerageWithdrawService.createBrokerageWithdraw(getLoginUserId(), createReqVO));
     }

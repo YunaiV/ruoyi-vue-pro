@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.promotion.service.bargain;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
@@ -15,17 +13,17 @@ import cn.iocoder.yudao.module.promotion.controller.admin.bargain.vo.activity.Ba
 import cn.iocoder.yudao.module.promotion.convert.bargain.BargainActivityConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.bargain.BargainActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.bargain.BargainActivityMapper;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.anyMatch;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.product.enums.ErrorCodeConstants.SKU_NOT_EXISTS;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 
@@ -194,15 +192,8 @@ public class BargainActivityServiceImpl implements BargainActivityService {
     }
 
     @Override
-    public List<BargainActivityDO> getBargainActivityBySpuIdsAndStatusAndDateTimeLt(Collection<Long> spuIds, Integer status, LocalDateTime dateTime) {
-        // 1. 查询出指定 spuId 的 spu 参加的活动最接近现在的一条记录。多个的话，一个 spuId 对应一个最近的活动编号
-        List<Map<String, Object>> spuIdAndActivityIdMaps = bargainActivityMapper.selectSpuIdAndActivityIdMapsBySpuIdsAndStatus(spuIds, status);
-        if (CollUtil.isEmpty(spuIdAndActivityIdMaps)) {
-            return Collections.emptyList();
-        }
-        // 2. 查询活动详情
-        return bargainActivityMapper.selectListByIdsAndDateTimeLt(
-                convertSet(spuIdAndActivityIdMaps, map -> MapUtil.getLong(map, "activityId")), dateTime);
+    public BargainActivityDO getMatchBargainActivityBySpuId(Long spuId) {
+        return bargainActivityMapper.selectBySpuIdAndStatusAndNow(spuId, CommonStatusEnum.ENABLE.getStatus());
     }
 
 }

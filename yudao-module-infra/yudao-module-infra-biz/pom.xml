@@ -116,8 +116,8 @@
             <artifactId>jsch</artifactId> <!-- 文件客户端：解决 sftp 连接 -->
         </dependency>
         <dependency>
-            <groupId>io.minio</groupId>
-            <artifactId>minio</artifactId> <!-- 文件客户端：解决阿里云、腾讯云、minio 等 S3 连接 -->
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId><!-- 文件客户端：解决阿里云、腾讯云、minio 等 S3 连接 -->
         </dependency>
 
         <dependency>
