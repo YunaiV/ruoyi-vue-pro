@@ -67,9 +67,8 @@ public class JsonUtils {
             throw new RuntimeException("objectMapper feature should not be enabled");
         }
         var result = objectMapper.writeValueAsString(object);
-
-        log.info("toJsonString test passed");
         log.info(result);
+        log.info("toJsonString test passed");
         return result;
     }
 
