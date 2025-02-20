@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.crm.controller.admin.product.vo.product;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductCategoryDO;
-import cn.iocoder.yudao.module.crm.enums.DictTypeConstants;
+import cn.iocoder.yudao.module.crm.enums.CrmDictTypeConstants;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.fhs.core.trans.anno.Trans;
@@ -34,7 +34,7 @@ public class CrmProductRespVO implements VO {
 
     @Schema(description = "单位", example = "2")
     @ExcelProperty(value = "单位", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.CRM_PRODUCT_UNIT)
+    @DictFormat(CrmDictTypeConstants.CRM_PRODUCT_UNIT)
     private Integer unit;
 
     @Schema(description = "价格, 单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "8911")
@@ -43,7 +43,7 @@ public class CrmProductRespVO implements VO {
 
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "上架")
     @ExcelProperty(value = "单位", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.CRM_PRODUCT_STATUS)
+    @DictFormat(CrmDictTypeConstants.CRM_PRODUCT_STATUS)
     private Integer status;
 
     @Schema(description = "产品分类编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
@@ -59,7 +59,7 @@ public class CrmProductRespVO implements VO {
 
     @Schema(description = "负责人的用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "31926")
     @Trans(type = TransType.SIMPLE, targetClassName = "cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO",
-            fields = "nickname", ref = "ownerUserName")
+        fields = "nickname", ref = "ownerUserName")
     private Long ownerUserId;
     @Schema(description = "负责人的用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
     @ExcelProperty("负责人")
@@ -67,7 +67,7 @@ public class CrmProductRespVO implements VO {
 
     @Schema(description = "创建人编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @Trans(type = TransType.SIMPLE, targetClassName = "cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO",
-            fields = "nickname", ref = "creatorName")
+        fields = "nickname", ref = "creatorName")
     private String creator;
     @Schema(description = "创建人名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
     @ExcelProperty("创建人")

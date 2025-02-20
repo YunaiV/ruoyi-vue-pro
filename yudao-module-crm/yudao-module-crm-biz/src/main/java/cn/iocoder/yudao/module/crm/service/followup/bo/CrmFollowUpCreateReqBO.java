@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.crm.service.followup.bo;
 
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
-import cn.iocoder.yudao.module.crm.enums.DictTypeConstants;
+import cn.iocoder.yudao.module.crm.enums.CrmDictTypeConstants;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -21,14 +21,14 @@ public class CrmFollowUpCreateReqBO {
 
     /**
      * 数据类型
-     *
+     * <p>
      * 枚举 {@link CrmBizTypeEnum}
      */
     @NotNull(message = "数据类型不能为空")
     private Integer bizType;
     /**
      * 数据编号
-     *
+     * <p>
      * 关联 {@link CrmBizTypeEnum} 对应模块 DO 的 id 字段
      */
     @NotNull(message = "数据编号不能为空")
@@ -36,8 +36,8 @@ public class CrmFollowUpCreateReqBO {
 
     /**
      * 跟进类型
-     *
-     * 关联 {@link DictTypeConstants#CRM_FOLLOW_UP_TYPE} 字典
+     * <p>
+     * 关联 {@link CrmDictTypeConstants#CRM_FOLLOW_UP_TYPE} 字典
      */
     @NotNull(message = "跟进类型不能为空")
     private Integer type;
@@ -63,14 +63,14 @@ public class CrmFollowUpCreateReqBO {
 
     /**
      * 关联的商机编号数组
-     *
+     * <p>
      * 关联 {@link CrmBusinessDO#getId()}
      */
     private List<Long> businessIds;
 
     /**
      * 关联的联系人编号数组
-     *
+     * <p>
      * 关联 {@link CrmContactDO#getId()}
      */
     private List<Long> contactIds;

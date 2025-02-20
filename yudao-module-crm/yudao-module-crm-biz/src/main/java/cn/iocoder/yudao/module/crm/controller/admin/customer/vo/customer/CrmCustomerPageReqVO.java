@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+
 @Schema(description = "管理后台 - CRM 客户分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -49,10 +50,17 @@ public class CrmCustomerPageReqVO extends PageParam {
     @Schema(description = "是否为公海数据", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
     private Boolean pool; // null 则表示为不是公海数据
 
-    @Schema(description = "联系状态", example = "1")
+    @Schema(description = "联系状态")
     private Integer contactStatus; // backlog 查询条件
 
-    @Schema(description = "跟进状态", example = "true")
+    @Schema(description = "跟进状态")
     private Boolean followUpStatus;
+
+    //公司介绍
+    @Schema(description = "公司介绍", example = "北京")
+    private String companyIntroduction;
+    //官网
+    @Schema(description = "官网", example = "www.baidu.com")
+    private String companyWebsite;
 
 }
