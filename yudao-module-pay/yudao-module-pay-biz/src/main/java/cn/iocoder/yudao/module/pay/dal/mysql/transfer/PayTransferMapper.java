@@ -23,10 +23,6 @@ public interface PayTransferMapper extends BaseMapperX<PayTransferDO> {
                     PayTransferDO::getMerchantTransferId, merchantTransferId);
     }
 
-    default PayTransferDO selectByNo(String no){
-        return selectOne(PayTransferDO::getNo, no);
-    }
-
     default PageResult<PayTransferDO> selectPage(PayTransferPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<PayTransferDO>()
                 .eqIfPresent(PayTransferDO::getNo, reqVO.getNo())
@@ -41,9 +37,15 @@ public interface PayTransferMapper extends BaseMapperX<PayTransferDO> {
                 .orderByDesc(PayTransferDO::getId));
     }
 
-    default List<PayTransferDO> selectListByStatus(Integer status){
+    default List<PayTransferDO> selectListByStatus(Integer status) {
         return selectList(PayTransferDO::getStatus, status);
     }
+
+    default PayTransferDO selectByAppIdAndNo(Long appId, String no) {
+        return selectOne(PayTransferDO::getAppId, appId,
+                PayTransferDO::getNo, no);
+    }
+
 }
 
 

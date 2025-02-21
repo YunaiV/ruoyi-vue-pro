@@ -220,6 +220,22 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     }
 
     @Override
+    public final PayTransferRespDTO parseTransferNotify(Map<String, String> params, String body) {
+        try {
+            return doParseTransferNotify(params, body);
+        } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
+            throw ex;
+        } catch (Throwable ex) {
+            log.error("[doParseTransferNotify][客户端({}) params({}) body({}) 解析失败]",
+                    getId(), params, body, ex);
+            throw buildPayException(ex);
+        }
+    }
+
+    protected abstract PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body)
+            throws Throwable;
+
+    @Override
     public final PayTransferRespDTO getTransfer(String outTradeNo, PayTransferTypeEnum type) {
         try {
             return doGetTransfer(outTradeNo, type);

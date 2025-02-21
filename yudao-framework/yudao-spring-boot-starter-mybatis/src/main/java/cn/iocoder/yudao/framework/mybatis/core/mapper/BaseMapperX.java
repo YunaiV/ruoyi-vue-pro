@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.SortablePageParam;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
-import cn.iocoder.yudao.framework.mybatis.core.enums.SqlConstants;
+import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
@@ -22,7 +22,6 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 在 MyBatis Plus 的 BaseMapper 的基础上拓展，提供更多的能力
@@ -135,11 +134,6 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         return selectList(new LambdaQueryWrapper<T>().in(field, values));
     }
 
-    @Deprecated
-    default List<T> selectList(SFunction<T, ?> leField, SFunction<T, ?> geField, Object value) {
-        return selectList(new LambdaQueryWrapper<T>().le(leField, value).ge(geField, value));
-    }
-
     default List<T> selectList(SFunction<T, ?> field1, Object value1, SFunction<T, ?> field2, Object value2) {
         return selectList(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2));
     }
@@ -151,7 +145,8 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
      */
     default Boolean insertBatch(Collection<T> entities) {
         // 特殊：SQL Server 批量插入后，获取 id 会报错，因此通过循环处理
-        if (Objects.equals(SqlConstants.DB_TYPE, DbType.SQL_SERVER)) {
+        DbType dbType = JdbcUtils.getDbType();
+        if (JdbcUtils.isSQLServer(dbType)) {
             entities.forEach(this::insert);
             return CollUtil.isNotEmpty(entities);
         }
@@ -166,7 +161,8 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
      */
     default Boolean insertBatch(Collection<T> entities, int size) {
         // 特殊：SQL Server 批量插入后，获取 id 会报错，因此通过循环处理
-        if (Objects.equals(SqlConstants.DB_TYPE, DbType.SQL_SERVER)) {
+        DbType dbType = JdbcUtils.getDbType();
+        if (JdbcUtils.isSQLServer(dbType)) {
             entities.forEach(this::insert);
             return CollUtil.isNotEmpty(entities);
         }
@@ -183,10 +179,6 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
 
     default Boolean updateBatch(Collection<T> entities, int size) {
         return Db.updateBatchById(entities, size);
-    }
-
-    default Boolean insertOrUpdateBatch(Collection<T> collection) {
-        return Db.saveOrUpdateBatch(collection);
     }
 
     default int delete(String field, String value) {

@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,7 @@ public class AppDeliverExpressController {
 
     @GetMapping("/list")
     @Operation(summary = "获得快递公司列表")
+    @PermitAll
     public CommonResult<List<AppDeliveryExpressRespVO>> getDeliveryExpressList() {
         List<DeliveryExpressDO> list = deliveryExpressService.getDeliveryExpressListByStatus(CommonStatusEnum.ENABLE.getStatus());
         list.sort(Comparator.comparing(DeliveryExpressDO::getSort));

@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -74,6 +75,7 @@ public class AppSeckillActivityController {
 
     @GetMapping("/get-now")
     @Operation(summary = "获得当前秒杀活动", description = "获取当前正在进行的活动，提供给首页使用")
+    @PermitAll
     public CommonResult<AppSeckillActivityNowRespVO> getNowSeckillActivity() {
         return success(nowSeckillActivityCache.getUnchecked("")); // 缓存
     }
@@ -96,6 +98,7 @@ public class AppSeckillActivityController {
 
     @GetMapping("/page")
     @Operation(summary = "获得秒杀活动分页")
+    @PermitAll
     public CommonResult<PageResult<AppSeckillActivityRespVO>> getSeckillActivityPage(AppSeckillActivityPageReqVO pageReqVO) {
         // 1. 查询满足当前阶段的活动
         PageResult<SeckillActivityDO> pageResult = activityService.getSeckillActivityAppPageByConfigId(pageReqVO);
@@ -113,6 +116,7 @@ public class AppSeckillActivityController {
     @GetMapping("/get-detail")
     @Operation(summary = "获得秒杀活动明细")
     @Parameter(name = "id", description = "活动编号", required = true, example = "1024")
+    @PermitAll
     public CommonResult<AppSeckillActivityDetailRespVO> getSeckillActivity(@RequestParam("id") Long id) {
         // 1. 获取活动
         SeckillActivityDO activity = activityService.getSeckillActivity(id);
@@ -151,8 +155,9 @@ public class AppSeckillActivityController {
     }
 
     @GetMapping("/list-by-ids")
-    @Operation(summary = "获得拼团活动列表，基于活动编号数组")
+    @Operation(summary = "获得秒杀活动列表，基于活动编号数组")
     @Parameter(name = "ids", description = "活动编号数组", required = true, example = "[1024, 1025]")
+    @PermitAll
     public CommonResult<List<AppSeckillActivityRespVO>> getCombinationActivityListByIds(@RequestParam("ids") List<Long> ids) {
         // 1. 获得开启的活动列表
         List<SeckillActivityDO> activityList = activityService.getSeckillActivityListByIds(ids);

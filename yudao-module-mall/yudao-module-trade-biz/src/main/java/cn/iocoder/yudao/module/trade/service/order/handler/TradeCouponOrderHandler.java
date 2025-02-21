@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderItemDO;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,7 @@ import java.util.List;
  * @author 芋道源码
  */
 @Component
+@Slf4j
 public class TradeCouponOrderHandler implements TradeOrderHandler {
 
     @Resource
@@ -46,11 +48,15 @@ public class TradeCouponOrderHandler implements TradeOrderHandler {
             return;
         }
         // 赠送优惠券
-        List<Long> couponIds = couponApi.takeCouponsByAdmin(order.getGiveCouponTemplateCounts(), order.getUserId());
-        if (CollUtil.isEmpty(couponIds)) {
-            return;
+        try {
+            List<Long> couponIds = couponApi.takeCouponsByAdmin(order.getGiveCouponTemplateCounts(), order.getUserId());
+            if (CollUtil.isEmpty(couponIds)) {
+                return;
+            }
+            orderUpdateService.updateOrderGiveCouponIds(order.getUserId(), order.getId(), couponIds);
+        } catch (Exception e) {
+            log.error("[afterPayOrder][order({}) 赠送优惠券({})失败，需要手工补偿]", order.getId(), order.getGiveCouponTemplateCounts(), e);
         }
-        orderUpdateService.updateOrderGiveCouponIds(order.getUserId(), order.getId(), couponIds);
     }
 
     @Override

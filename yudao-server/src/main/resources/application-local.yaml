@@ -171,6 +171,7 @@ logging:
     cn.iocoder.yudao.module.statistics.dal.mysql: debug
     cn.iocoder.yudao.module.crm.dal.mysql: debug
     cn.iocoder.yudao.module.erp.dal.mysql: debug
+    cn.iocoder.yudao.module.iot.dal.mysql: debug
     cn.iocoder.yudao.module.ai.dal.mysql: debug
     org.springframework.context.support.PostProcessorRegistrationDelegate: ERROR # TODO 芋艿：先禁用，Spring Boot 3.X 存在部分错误的 WARN 提示
 #    org.springframework: DEBUG
@@ -216,6 +217,7 @@ yudao:
   pay:
     order-notify-url: http://yunai.natapp1.cc/admin-api/pay/notify/order # 支付渠道的【支付】回调地址
     refund-notify-url: http://yunai.natapp1.cc/admin-api/pay/notify/refund # 支付渠道的【退款】回调地址
+    transfer-notify-url: http://yunai.natapp1.cc/admin-api/pay/notify/transfer # 支付渠道的【转账】回调地址
   access-log: # 访问日志的配置项
     enable: false
   demo: false # 关闭演示模式
@@ -252,3 +254,20 @@ justauth:
     prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::
     timeout: 24h # 超时时长，目前只对 Redis 缓存生效，默认 3 分钟
 
+--- #################### iot相关配置 TODO 芋艿：再瞅瞅 ####################
+iot:
+  emq:
+    # 账号
+    username: anhaohao
+    # 密码
+    password: ahh@123456
+    # 主机地址
+    hostUrl: tcp://chaojiniu.top:1883
+    # 客户端Id，不能相同，采用随机数 ${random.value}
+    client-id: ${random.int}
+    # 默认主题
+    default-topic: test
+    # 保持连接
+    keepalive: 60
+    # 清除会话(设置为false,断开连接，重连后使用原来的会话 保留订阅的主题，能接收离线期间的消息)
+    clearSession: true
