@@ -8,7 +8,7 @@ import com.somle.amazon.model.enums.AmazonRegion;
 import cn.iocoder.yudao.framework.common.util.general.CoreUtils;
 import cn.iocoder.yudao.framework.common.util.json.JSONArray;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import cn.iocoder.yudao.framework.common.util.web.RequestX;
 import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 
@@ -99,7 +99,7 @@ public class AmazonAdClient {
 
 
     public AmazonAdAccountRespVO listAccounts() {
-        JSONObject payload = JsonUtils.newObject();
+        JSONObject payload = JsonUtilsX.newObject();
 
         String partialUrl = "/adsAccounts/list";
         String endpoint = getEndPoint();
@@ -115,7 +115,7 @@ public class AmazonAdClient {
     }
 
     public List<AmazonAdProfileRespVO> listProfiles() {
-        JSONObject payload = JsonUtils.newObject();
+        JSONObject payload = JsonUtilsX.newObject();
 
         String partialUrl = "/v2/profiles";
         String endpoint = getEndPoint();
@@ -138,7 +138,7 @@ public class AmazonAdClient {
     }
 
     public JSONObject listPortfolios(Long profileId) {
-        JSONObject payload = JsonUtils.newObject();
+        JSONObject payload = JsonUtilsX.newObject();
 
         String partialUrl = "/v2/profiles";
         String endpoint = getEndPoint();
@@ -244,7 +244,7 @@ public class AmazonAdClient {
 
         var contentString = WebUtils.urlToString(docUrl, "GZIP");
 
-        return JsonUtils.parseObject(contentString, JSONArray.class);
+        return JsonUtilsX.parseObject(contentString, JSONArray.class);
     }
 
 

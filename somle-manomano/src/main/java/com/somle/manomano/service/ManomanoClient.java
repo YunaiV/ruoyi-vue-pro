@@ -2,7 +2,7 @@ package com.somle.manomano.service;
 
 
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import com.somle.manomano.model.ManomanoShop;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ public class ManomanoClient {
                 .build();
         Response response = client.newCall(request).execute();
         var bodyString = response.body().string();
-        var result = JsonUtils.parseObject(bodyString, JSONObject.class);
+        var result = JsonUtilsX.parseObject(bodyString, JSONObject.class);
         return result;
     }
 

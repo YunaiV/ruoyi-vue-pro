@@ -120,24 +120,24 @@
             </dependency>
 
 
-            <dependency>
-                <groupId>com.somle</groupId>
-                <artifactId>somle-framework</artifactId>
-                <version>${revision}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.somle</groupId>-->
+<!--                <artifactId>somle-framework</artifactId>-->
+<!--                <version>${revision}</version>-->
+<!--            </dependency>-->
 
-            <dependency>
-                <groupId>com.somle</groupId>
-                <artifactId>somle-common</artifactId>
-                <version>${revision}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.somle</groupId>-->
+<!--                <artifactId>somle-common</artifactId>-->
+<!--                <version>${revision}</version>-->
+<!--            </dependency>-->
 
-            <dependency>
-                <groupId>com.somle</groupId>
-                <artifactId>somle-spring-boot-starter-test</artifactId>
-                <version>${revision}</version>
-                <scope>test</scope>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.somle</groupId>-->
+<!--                <artifactId>somle-spring-boot-starter-test</artifactId>-->
+<!--                <version>${revision}</version>-->
+<!--                <scope>test</scope>-->
+<!--            </dependency>-->
 
 
 

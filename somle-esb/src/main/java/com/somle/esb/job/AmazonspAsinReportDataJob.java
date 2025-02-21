@@ -4,7 +4,7 @@ package com.somle.esb.job;
 
 import com.somle.amazon.controller.vo.AmazonSpReportSaveVO;
 import com.somle.esb.model.OssData;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -38,7 +38,7 @@ public class AmazonspAsinReportDataJob extends AmazonspDataJob {
                         .syncType("inc")
                         .requestTimestamp(System.currentTimeMillis())
                         .folderDate(dataDate)
-                        .content(JsonUtils.toJSONObject(report))
+                        .content(JsonUtilsX.toJSONObject(report))
                         .headers(null)
                         .build();
                     service.send(data);

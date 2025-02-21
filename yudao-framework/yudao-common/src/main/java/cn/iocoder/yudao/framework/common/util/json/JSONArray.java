@@ -18,12 +18,12 @@ public class JSONArray extends ArrayNode {
 //    }
 
     public JSONArray() {
-        super(JsonUtils.getNodeFactory());
+        super(JsonUtilsX.getNodeFactory());
     }
 
 
     public JSONArray(ArrayNode other) {
-        super(JsonUtils.getNodeFactory());
+        super(JsonUtilsX.getNodeFactory());
         this.addAll(other);
     }
 

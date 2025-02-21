@@ -13,7 +13,7 @@ import com.dingtalk.api.request.OapiV2UserGetRequest;
 import com.dingtalk.api.response.OapiUserListidResponse;
 import com.dingtalk.api.response.OapiV2UserGetResponse;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import cn.iocoder.yudao.framework.common.util.web.RequestX;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.annotation.PostConstruct;
@@ -70,7 +70,7 @@ public class DingTalkService {
 
     public DingTalkToken refreshAuth() {
         String url = HOST + "/v1.0/oauth2/accessToken";
-        var payload = JsonUtils.newObject();
+        var payload = JsonUtilsX.newObject();
         DingTalkToken token = tokenRepository.findAll().get(0);
         payload.put("appKey", token.getAppKey());
         payload.put("appSecret", token.getAppSecret());
@@ -127,7 +127,7 @@ public class DingTalkService {
         );
         Map<String, String> headers = Map.of(
         );
-        var payload = JsonUtils.newObject();
+        var payload = JsonUtilsX.newObject();
         payload.put("dept_id", deptId);
         try {
             var request = RequestX.builder()
@@ -199,7 +199,7 @@ public class DingTalkService {
         );
         Map<String, String> headers = Map.of(
         );
-        var payload = JsonUtils.newObject();
+        var payload = JsonUtilsX.newObject();
         payload.put("dept_id", deptId);
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.POST)

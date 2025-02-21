@@ -2,7 +2,7 @@ package com.somle.bestbuy.service;
 
 import com.somle.bestbuy.repository.BestbuyTokenRepository;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import cn.iocoder.yudao.framework.common.util.web.RequestX;
 import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import jakarta.annotation.PostConstruct;
@@ -61,7 +61,7 @@ public class BestbuyService {
             if (response.isSuccessful()) {
                 ResponseBody body = response.body();
                 if (body != null) {
-                    return JsonUtils.parseObject(body.string(), JSONObject.class);
+                    return JsonUtilsX.parseObject(body.string(), JSONObject.class);
                 } else {
                     throw new RuntimeException("响应体为空");
                 }
@@ -88,7 +88,7 @@ public class BestbuyService {
             .headers(getHeaders())
             .build();
         if (httpMethod.equals(HttpMethod.POST)) {
-            request.setPayload(JsonUtils.parseObject(requestBody, JSONObject.class));
+            request.setPayload(JsonUtilsX.parseObject(requestBody, JSONObject.class));
         }
         return WebUtils.sendRequest(request);
     }

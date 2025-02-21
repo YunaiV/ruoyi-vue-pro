@@ -4,7 +4,7 @@ import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.framework.common.util.lang.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import cn.iocoder.yudao.framework.common.util.web.RequestX;
 import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import com.somle.rakuten.enums.RakutenOrderStatusEnum;
@@ -49,7 +49,7 @@ public class RakutenClient {
     @SneakyThrows
     public JSONObject getOrder(RakutenOrderReqVO vo) {
         String endpoint = "/es/2.0/order/getOrder/";
-        return sendRequestAndParse(endpoint, JsonUtils.toJsonString(vo));
+        return sendRequestAndParse(endpoint, JsonUtilsX.toJsonString(vo));
     }
 
     @SneakyThrows
@@ -77,7 +77,7 @@ public class RakutenClient {
             .requestMethod(RequestX.Method.POST)
             .url(BASE_URL + endpoint)
             .headers(getHeaders())
-            .payload(JsonUtils.parseObject(requestBody, JSONObject.class))
+            .payload(JsonUtilsX.parseObject(requestBody, JSONObject.class))
             .build();
         return WebUtils.sendRequest(request);
     }
@@ -104,7 +104,7 @@ public class RakutenClient {
         String startDatetimeStr = vo.getStartDatetime() != null ? ZonedDateTimeConverter.convertToString(vo.getStartDatetime()) : null;
         String endDatetimeStr = vo.getEndDatetime() != null ? ZonedDateTimeConverter.convertToString(vo.getEndDatetime()) : null;
         // 创建一个临时对象来存储转换后的数据
-        JSONObject jsonObject = JsonUtils.toJSONObject(vo);
+        JSONObject jsonObject = JsonUtilsX.toJSONObject(vo);
         // 手动设置日期字段为字符串格式
         jsonObject.put("startDatetime", startDatetimeStr);
         jsonObject.put("endDatetime", endDatetimeStr);
@@ -118,7 +118,7 @@ public class RakutenClient {
                 log.error("Response body is null for endpoint: {}", endpoint);
                 throw new RuntimeException("Response body is null");
             }
-            return JsonUtils.parseObject(response.body().string(), JSONObject.class);
+            return JsonUtilsX.parseObject(response.body().string(), JSONObject.class);
         } catch (Exception e) {
             log.error("Error occurred while sending request to endpoint: {}", endpoint, e);
             throw new RuntimeException("Error occurred while sending request", e);
