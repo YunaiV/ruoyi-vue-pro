@@ -22,6 +22,8 @@ import org.springframework.util.MultiValueMap;
 import java.util.*;
 
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.*;
 import static cn.iocoder.yudao.module.bpm.service.task.listener.BpmUserTaskListener.DELEGATE_EXPRESSION;
 import static java.util.Arrays.asList;
@@ -42,7 +44,8 @@ public class SimpleModelUtils {
         List<NodeConvert> converts = asList(new StartNodeConvert(), new EndNodeConvert(),
                 new StartUserNodeConvert(), new ApproveNodeConvert(), new CopyNodeConvert(), new TransactorNodeConvert(),
                 new DelayTimerNodeConvert(), new TriggerNodeConvert(),
-                new ConditionBranchNodeConvert(), new ParallelBranchNodeConvert(), new InclusiveBranchNodeConvert(), new RouteBranchNodeConvert());
+                new ConditionBranchNodeConvert(), new ParallelBranchNodeConvert(), new InclusiveBranchNodeConvert(), new RouteBranchNodeConvert(),
+                new ChildProcessConvert(), new AsyncChildProcessConvert());
         converts.forEach(convert -> NODE_CONVERTS.put(convert.getType(), convert));
     }
 
@@ -772,6 +775,66 @@ public class SimpleModelUtils {
         }
 
     }
+
+    private static class ChildProcessConvert implements NodeConvert {
+
+        @Override
+        public CallActivity convert(BpmSimpleModelNodeVO node) {
+            BpmSimpleModelNodeVO.ChildProcessSetting childProcessSetting = node.getChildProcessSetting();
+            List<IOParameter> inVariable = childProcessSetting.getInVariable() == null ?
+                    new ArrayList<>() : new ArrayList<>(childProcessSetting.getInVariable());
+            CallActivity callActivity = new CallActivity();
+            callActivity.setId(node.getId());
+            callActivity.setName(node.getName());
+            callActivity.setCalledElementType("key");
+            // 1. 是否异步
+            callActivity.setAsynchronous(node.getChildProcessSetting().getAsync());
+            // 2. 调用的子流程
+            callActivity.setCalledElement(childProcessSetting.getCalledElement());
+            callActivity.setProcessInstanceName(childProcessSetting.getCalledElementName());
+            // 3. 是否自动跳过子流程发起节点
+            if (Boolean.TRUE.equals(childProcessSetting.getSkipStartUserNode())) {
+                IOParameter ioParameter = new IOParameter();
+                ioParameter.setSourceExpression("true");
+                ioParameter.setTarget(PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE);
+                inVariable.add(ioParameter);
+            } else {
+                IOParameter ioParameter = new IOParameter();
+                ioParameter.setSourceExpression("false");
+                ioParameter.setTarget(PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE);
+                inVariable.add(ioParameter);
+            }
+            // 4. 主→子变量传递
+            // 默认需要传递的一些变量
+            // 4.1 流程状态
+            IOParameter ioParameter = new IOParameter();
+            ioParameter.setSource(PROCESS_INSTANCE_VARIABLE_STATUS);
+            ioParameter.setTarget(PROCESS_INSTANCE_VARIABLE_STATUS);
+            inVariable.add(ioParameter);
+            callActivity.setInParameters(inVariable);
+            // 5. 子→主变量传递
+            if (childProcessSetting.getOutVariable() != null && !childProcessSetting.getOutVariable().isEmpty()) {
+                callActivity.setOutParameters(childProcessSetting.getOutVariable());
+            }
+            return callActivity;
+        }
+
+        @Override
+        public BpmSimpleModelNodeTypeEnum getType() {
+            return BpmSimpleModelNodeTypeEnum.CHILD_PROCESS;
+        }
+
+    }
+
+    private static class AsyncChildProcessConvert extends ChildProcessConvert {
+
+        @Override
+        public BpmSimpleModelNodeTypeEnum getType() {
+            return BpmSimpleModelNodeTypeEnum.ASYNC_CHILD_PROCESS;
+        }
+
+    }
+
 
     private static String buildGatewayJoinId(String id) {
         return id + "_join";

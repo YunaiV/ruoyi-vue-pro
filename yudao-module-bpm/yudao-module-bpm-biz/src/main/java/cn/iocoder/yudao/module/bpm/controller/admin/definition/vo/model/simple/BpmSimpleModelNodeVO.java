@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.flowable.bpmn.model.IOParameter;
 import org.hibernate.validator.constraints.URL;
 
 import java.util.List;
@@ -121,6 +122,8 @@ public class BpmSimpleModelNodeVO {
      * 触发器节点设置
      */
     private TriggerSetting triggerSetting;
+
+    private ChildProcessSetting childProcessSetting;
 
     @Schema(description = "任务监听器")
     @Valid
@@ -396,5 +399,34 @@ public class BpmSimpleModelNodeVO {
             @Schema(description = "修改的表单字段", example = "userName")
             private Map<String, Object> updateFormFields;
         }
+    }
+
+    @Schema(description = "子流程节点配置")
+    @Data
+    @Valid
+    public static class ChildProcessSetting {
+
+        @Schema(description = "被调用流程", example = "xxx")
+        @NotEmpty(message = "被调用流程不能为空")
+        private String calledElement;
+
+        @Schema(description = "被调用流程名称", example = "xxx")
+        @NotEmpty(message = "被调用流程名称不能为空")
+        private String calledElementName;
+
+        @Schema(description = "是否异步", example = "false")
+        @NotNull(message = "是否异步不能为空")
+        private Boolean async;
+
+        @Schema(description = "输入参数(主->子)", example = "[]")
+        private List<IOParameter> inVariable;
+
+        @Schema(description = "输出参数(子->主)", example = "[]")
+        private List<IOParameter> outVariable;
+
+        @Schema(description = "是否自动跳过子流程发起节点", example = "false")
+        @NotNull(message = "是否自动跳过子流程发起节点不能为空")
+        private Boolean skipStartUserNode;
+
     }
 }
