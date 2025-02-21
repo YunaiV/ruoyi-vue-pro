@@ -2,7 +2,7 @@ package com.somle.kingdee.service;
 
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import cn.iocoder.yudao.framework.common.util.web.RequestX;
 import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import com.somle.kingdee.model.*;
@@ -401,11 +401,11 @@ public class KingdeeClient {
     }
 
     public KingdeeResponse getResponse(String endUrl, Object params) {
-        return fetchResponse("GET", endUrl, new TreeMap<>(JsonUtils.toStringMap(params)), null);
+        return fetchResponse("GET", endUrl, new TreeMap<>(JsonUtilsX.toStringMap(params)), null);
     }
 
     public KingdeeResponse postResponse(String endUrl, Object params, Object payload) {
-        return fetchResponse("POST", endUrl, new TreeMap<>(JsonUtils.toStringMap(params)), payload);
+        return fetchResponse("POST", endUrl, new TreeMap<>(JsonUtilsX.toStringMap(params)), payload);
     }
 
 }

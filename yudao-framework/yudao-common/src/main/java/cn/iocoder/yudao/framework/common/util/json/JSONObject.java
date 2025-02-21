@@ -25,11 +25,11 @@ public class JSONObject extends ObjectNode{
 //    }
 
     public JSONObject() {
-        super(JsonUtils.getNodeFactory());
+        super(JsonUtilsX.getNodeFactory());
     }
 
     public JSONObject(ObjectNode other) {
-        super(JsonUtils.getNodeFactory());
+        super(JsonUtilsX.getNodeFactory());
         this.setAll(other);
     }
 

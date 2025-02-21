@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ public class WebUtils {
     }
 
     public static String urlWithParams(String url, JSONObject json) {
-        MultiValuedMap<String, String> queryParams = JsonUtils.toMultiStringMap(json);
+        MultiValuedMap<String, String> queryParams = JsonUtilsX.toMultiStringMap(json);
         return urlWithParams(url, queryParams);
     }
 
@@ -48,7 +48,7 @@ public class WebUtils {
      * use pojo's json format to make queryparams
      */
     public static String urlWithParams(String url, Object pojo) {
-        var json = JsonUtils.toJSONObject(pojo);
+        var json = JsonUtilsX.toJSONObject(pojo);
         return urlWithParams(url, json);
     }
 
@@ -62,7 +62,7 @@ public class WebUtils {
     }
 
     public static Headers toHeaders(JSONObject json) {
-        MultiValuedMap<String, String> headerMap = JsonUtils.toMultiStringMap(json);
+        MultiValuedMap<String, String> headerMap = JsonUtilsX.toMultiStringMap(json);
         return toHeaders(headerMap);
     }
 
@@ -71,7 +71,7 @@ public class WebUtils {
      * use pojo's json format to make headers
      */
     public static Headers toHeaders(Object pojo) {
-        var json = JsonUtils.toJSONObject(pojo);
+        var json = JsonUtilsX.toJSONObject(pojo);
         return toHeaders(json);
     }
 
@@ -120,7 +120,7 @@ public class WebUtils {
             log.debug("headers: " + headers.toString());
         }
 
-        String bodyString = JsonUtils.toJsonString(payload);
+        String bodyString = JsonUtilsX.toJsonString(payload);
         RequestBody body = RequestBody.create(bodyString, MediaType.parse("application/json; charset=utf-8"));
         log.info("body: " + bodyString);
 
@@ -198,7 +198,7 @@ public class WebUtils {
         String bodyString = "";
         try {
             bodyString = getBodyString(response);
-            return JsonUtils.parseObject(bodyString, responseClass);
+            return JsonUtilsX.parseObject(bodyString, responseClass);
         } catch (Exception e) {
             throw new RuntimeException("parse error in response with body: \n" + bodyString + "\ncause: " + e);
         }

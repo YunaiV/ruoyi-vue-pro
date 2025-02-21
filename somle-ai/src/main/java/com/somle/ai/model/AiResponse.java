@@ -5,7 +5,7 @@ import java.util.stream.Stream;
 
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -25,6 +25,6 @@ public class AiResponse {
     private List<ObjectNode> results;
 
     public <T> Stream<T> getResults(Class<T> objectClass) {
-        return results.stream().map(n-> JsonUtils.parseObject(n, objectClass));
+        return results.stream().map(n-> JsonUtilsX.parseObject(n, objectClass));
     }
 }
