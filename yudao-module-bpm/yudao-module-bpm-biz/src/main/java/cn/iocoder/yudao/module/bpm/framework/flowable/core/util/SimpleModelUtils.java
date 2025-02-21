@@ -816,6 +816,8 @@ public class SimpleModelUtils {
             if (childProcessSetting.getOutVariable() != null && !childProcessSetting.getOutVariable().isEmpty()) {
                 callActivity.setOutParameters(childProcessSetting.getOutVariable());
             }
+            // 添加节点类型
+            addNodeType(node.getType(), callActivity);
             return callActivity;
         }
 
@@ -865,6 +867,8 @@ public class SimpleModelUtils {
                 || nodeType == BpmSimpleModelNodeTypeEnum.APPROVE_NODE
                 || nodeType == BpmSimpleModelNodeTypeEnum.TRANSACTOR_NODE
                 || nodeType == BpmSimpleModelNodeTypeEnum.COPY_NODE
+                || nodeType == BpmSimpleModelNodeTypeEnum.CHILD_PROCESS
+                || nodeType == BpmSimpleModelNodeTypeEnum.ASYNC_CHILD_PROCESS
                 || nodeType == BpmSimpleModelNodeTypeEnum.END_NODE) {
             // 添加元素
             resultNodes.add(currentNode);
