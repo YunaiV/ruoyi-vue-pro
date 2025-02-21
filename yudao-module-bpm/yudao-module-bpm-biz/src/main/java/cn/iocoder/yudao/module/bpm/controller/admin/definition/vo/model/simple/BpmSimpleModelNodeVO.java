@@ -428,5 +428,27 @@ public class BpmSimpleModelNodeVO {
         @NotNull(message = "是否自动跳过子流程发起节点不能为空")
         private Boolean skipStartUserNode;
 
+        @Schema(description = "子流程发起人配置", example = "{}")
+        private StartUserSetting startUserSetting;
+
+        @Schema(description = "子流程发起人配置")
+        @Data
+        @Valid
+        public static class StartUserSetting {
+
+            @Schema(description = "子流程发起人类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+            @NotNull(message = "子流程发起人类型")
+            @InEnum(BpmChildProcessStartUserTypeEnum.class)
+            private Integer type;
+
+            @Schema(description = "表单", example = "xxx")
+            private String formField;
+
+            @Schema(description = "当子流程发起人为空时类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+            @InEnum(BpmChildProcessStartUserEmptyTypeEnum.class)
+            private Integer emptyHandleType;
+
+        }
+
     }
 }

@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.ConditionGroups;
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
@@ -16,6 +17,7 @@ import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
+import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.TaskListener;
 import org.springframework.util.MultiValueMap;
 
@@ -816,6 +818,18 @@ public class SimpleModelUtils {
             if (childProcessSetting.getOutVariable() != null && !childProcessSetting.getOutVariable().isEmpty()) {
                 callActivity.setOutParameters(childProcessSetting.getOutVariable());
             }
+            // 6. 子流程发起人配置
+            List<FlowableListener> executionListeners = new ArrayList<>();
+            FlowableListener flowableListener = new FlowableListener();
+            flowableListener.setEvent(ExecutionListener.EVENTNAME_START);
+            flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+            flowableListener.setImplementation("${bpmCallActivityListener}");
+            FieldExtension fieldExtension = new FieldExtension();
+            fieldExtension.setFieldName("listenerConfig");
+            fieldExtension.setStringValue(JsonUtils.toJsonString(childProcessSetting.getStartUserSetting()));
+            flowableListener.getFieldExtensions().add(fieldExtension);
+            executionListeners.add(flowableListener);
+            callActivity.setExecutionListeners(executionListeners);
             // 添加节点类型
             addNodeType(node.getType(), callActivity);
             return callActivity;
