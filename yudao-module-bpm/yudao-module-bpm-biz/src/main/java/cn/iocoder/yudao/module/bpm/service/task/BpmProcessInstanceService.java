@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -148,15 +149,6 @@ public interface BpmProcessInstanceService {
      */
     void updateProcessInstanceReject(ProcessInstance processInstance, String reason);
 
-    // ========== Event 事件相关方法 ==========
-
-    /**
-     * 处理 ProcessInstance 完成事件，例如说：审批通过、不通过、取消
-     *
-     * @param instance 流程任务
-     */
-    void processProcessInstanceCompleted(ProcessInstance instance);
-
     /**
      * 更新 ProcessInstance 的变量
      *
@@ -165,4 +157,20 @@ public interface BpmProcessInstanceService {
      */
     void updateProcessInstanceVariables(String id, Map<String, Object> variables);
 
+    /**
+     * 删除 ProcessInstance 的变量
+     *
+     * @param processInstanceId  流程编号
+     * @param variableNames 流程变量名
+     */
+    void removeProcessInstanceVariables(String processInstanceId, Collection<String> variableNames);
+
+    // ========== Event 事件相关方法 ==========
+
+    /**
+     * 处理 ProcessInstance 完成事件，例如说：审批通过、不通过、取消
+     *
+     * @param instance 流程任务
+     */
+    void processProcessInstanceCompleted(ProcessInstance instance);
 }

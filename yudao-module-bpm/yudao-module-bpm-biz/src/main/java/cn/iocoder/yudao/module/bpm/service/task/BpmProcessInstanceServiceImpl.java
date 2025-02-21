@@ -776,6 +776,16 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 BpmReasonEnum.REJECT_TASK.format(reason));
     }
 
+    @Override
+    public void updateProcessInstanceVariables(String id, Map<String, Object> variables) {
+        runtimeService.setVariables(id, variables);
+    }
+
+    @Override
+    public void removeProcessInstanceVariables(String processInstanceId, Collection<String> variableNames) {
+        runtimeService.removeVariables(processInstanceId, variableNames);
+    }
+
     // ========== Event 事件相关方法 ==========
 
     @Override
@@ -809,10 +819,4 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                     BpmProcessInstanceConvert.INSTANCE.buildProcessInstanceStatusEvent(this, instance, status));
         });
     }
-
-    @Override
-    public void updateProcessInstanceVariables(String id, Map<String, Object> variables) {
-        runtimeService.setVariables(id, variables);
-    }
-
 }

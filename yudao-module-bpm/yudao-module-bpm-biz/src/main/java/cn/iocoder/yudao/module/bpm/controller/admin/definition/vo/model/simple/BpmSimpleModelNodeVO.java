@@ -14,6 +14,7 @@ import org.hibernate.validator.constraints.URL;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Schema(description = "管理后台 - 仿钉钉流程设计模型节点 VO")
 @Data
@@ -393,8 +394,11 @@ public class BpmSimpleModelNodeVO {
             @Schema(description = "条件组", example = "{}")
             private ConditionGroups conditionGroups;
 
-            @Schema(description = "修改的表单字段", example = "userName")
+            @Schema(description = "修改的表单字段", example = "{}")
             private Map<String, Object> updateFormFields;
+
+            @Schema(description = "删除表单字段", example = "[]")
+            private Set<String> deleteFields;
         }
     }
 }
