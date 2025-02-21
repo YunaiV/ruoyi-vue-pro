@@ -17,13 +17,19 @@ public class AppProductBrowseHistoryRespVO {
 
     // ========== 商品相关字段 ==========
 
-    @Schema(description = "商品 SPU 名称", example = "赵六")
+    @Schema(description = "商品 SPU 名称", requiredMode = REQUIRED, example = "赵六")
     private String spuName;
 
-    @Schema(description = "商品封面图", example = "https://domain/pic.png")
+    @Schema(description = "商品封面图", requiredMode = REQUIRED, example = "https://www.iocoder.cn/pic.png")
     private String picUrl;
 
-    @Schema(description = "商品单价", example = "100")
+    @Schema(description = "商品单价", requiredMode = REQUIRED, example = "50")
     private Integer price;
+
+    @Schema(description = "商品销量", requiredMode = REQUIRED, example = "60")
+    private Integer salesCount;
+
+    @Schema(description = "库存", requiredMode = REQUIRED, example = "80")
+    private Integer stock;
 
 }

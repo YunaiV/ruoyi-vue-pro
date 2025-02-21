@@ -217,7 +217,7 @@ public interface CombinationActivityConvert {
         List<CombinationRecordDO> createRecords = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
             // 基础信息和团长保持一致
-            CombinationRecordDO newRecord = convert5(headRecord);
+            CombinationRecordDO newRecord = convert5(headRecord).setHeadId(headRecord.getId());
             // 虚拟信息
             newRecord.setCount(0) // 会单独更新下，在后续的 Service 逻辑里
                     .setUserId(0L).setNickname("").setAvatar("").setOrderId(0L);

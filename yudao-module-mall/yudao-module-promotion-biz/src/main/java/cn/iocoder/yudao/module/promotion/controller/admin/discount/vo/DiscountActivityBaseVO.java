@@ -63,11 +63,11 @@ public class DiscountActivityBaseVO {
         @Min(value = 0, message = "优惠金额需要大于等于 0")
         private Integer discountPrice;
 
-        @AssertTrue(message = "折扣百分比需要大于等于 1，小于等于 99")
+        @AssertTrue(message = "折扣百分比需要大于等于 0.01%，小于等于 99.99%")
         @JsonIgnore
         public boolean isDiscountPercentValid() {
             return ObjectUtil.notEqual(discountType, PromotionDiscountTypeEnum.PERCENT.getType())
-                    || (discountPercent != null && discountPercent >= 1 && discountPercent<= 99);
+                    || (discountPercent != null && discountPercent >= 1 && discountPercent <= 9999);
         }
 
         @AssertTrue(message = "优惠金额不能为空")

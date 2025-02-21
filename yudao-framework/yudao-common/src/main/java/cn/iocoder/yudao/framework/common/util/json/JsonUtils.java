@@ -199,4 +199,12 @@ public class JsonUtils {
         return JSONUtil.isTypeJSON(text);
     }
 
+    @SneakyThrows
+    public static byte[] toJsonByte(Object object) {
+        return objectMapper.writeValueAsBytes(object);
+    }
+
+
+
+
 }

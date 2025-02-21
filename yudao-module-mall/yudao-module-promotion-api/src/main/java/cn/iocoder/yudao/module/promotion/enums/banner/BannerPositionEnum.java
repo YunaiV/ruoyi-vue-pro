@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.promotion.enums.banner;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @Getter
-public enum BannerPositionEnum implements IntArrayValuable {
+public enum BannerPositionEnum implements ArrayValuable<Integer> {
 
     HOME_POSITION(1, "首页"),
     SECKILL_POSITION(2, "秒杀活动页"),
@@ -21,7 +21,7 @@ public enum BannerPositionEnum implements IntArrayValuable {
     DISCOUNT_POSITION(4, "限时折扣页"),
     REWARD_POSITION(5, "满减送页");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BannerPositionEnum::getPosition).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(BannerPositionEnum::getPosition).toArray(Integer[]::new);
 
     /**
      * 值
@@ -33,7 +33,7 @@ public enum BannerPositionEnum implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

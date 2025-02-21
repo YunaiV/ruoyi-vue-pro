@@ -152,7 +152,7 @@ public class CouponServiceImpl implements CouponService {
                     findAndThen(userCouponIdsMap, userId, couponIds::addAll);
                 }
             } catch (Exception e) {
-                log.error("[takeCouponsByAdmin][coupon({}) 优惠券发放失败]", entry, e);
+                log.error("[takeCouponsByAdmin][coupon({}) 优惠券发放失败 userId({})]", entry, userId, e);
             }
         }
         return couponIds;
@@ -178,6 +178,9 @@ public class CouponServiceImpl implements CouponService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void invalidateCoupon(Long couponId, Long userId) {
+        if (couponId == null || couponId <= 0) {
+            return;
+        }
         // 1.1 校验优惠券
         CouponDO coupon = couponMapper.selectByIdAndUserId(couponId, userId);
         if (coupon == null) {
@@ -269,7 +272,8 @@ public class CouponServiceImpl implements CouponService {
             throw exception(COUPON_TEMPLATE_NOT_EXISTS);
         }
         // 校验剩余数量
-        if (couponTemplate.getTakeCount() + userIds.size() > couponTemplate.getTotalCount()) {
+        if (ObjUtil.notEqual(couponTemplate.getTakeLimitCount(), CouponTemplateDO.TIME_LIMIT_COUNT_MAX) // 非不限制
+                && couponTemplate.getTakeCount() + userIds.size() > couponTemplate.getTotalCount()) {
             throw exception(COUPON_TEMPLATE_NOT_ENOUGH);
         }
         // 校验"固定日期"的有效期类型是否过期
@@ -279,7 +283,7 @@ public class CouponServiceImpl implements CouponService {
             }
         }
         // 校验领取方式
-        if (ObjectUtil.notEqual(couponTemplate.getTakeType(), takeType.getValue())) {
+        if (ObjectUtil.notEqual(couponTemplate.getTakeType(), takeType.getType())) {
             throw exception(COUPON_TEMPLATE_CANNOT_TAKE);
         }
     }
