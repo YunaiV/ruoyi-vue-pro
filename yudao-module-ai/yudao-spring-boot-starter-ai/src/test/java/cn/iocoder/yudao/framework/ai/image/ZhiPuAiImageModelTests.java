@@ -22,7 +22,7 @@ public class ZhiPuAiImageModelTests {
     public void testCall() {
         // 准备参数
         ZhiPuAiImageOptions imageOptions = ZhiPuAiImageOptions.builder()
-                .withModel(ZhiPuAiImageApi.ImageModel.CogView_3.getValue())
+                .model(ZhiPuAiImageApi.ImageModel.CogView_3.getValue())
                 .build();
         ImagePrompt prompt = new ImagePrompt("万里长城", imageOptions);
 

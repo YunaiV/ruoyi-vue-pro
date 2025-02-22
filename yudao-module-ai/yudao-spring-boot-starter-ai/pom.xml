@@ -14,8 +14,8 @@
     <name>${project.artifactId}</name>
     <description>AI 大模型拓展，接入国内外大模型</description>
     <properties>
-        <spring-ai.groupId>group.springframework.ai</spring-ai.groupId>
-        <spring-ai.version>1.1.0</spring-ai.version>
+        <spring-ai.groupId>org.springframework.ai</spring-ai.groupId>
+        <spring-ai.version>1.0.0-M6</spring-ai.version>
     </properties>
 
     <dependencies>
@@ -89,6 +89,11 @@
             <groupId>${spring-ai.groupId}</groupId>
             <artifactId>spring-ai-qianfan-spring-boot-starter</artifactId>
             <version>${spring-ai.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloud.ai</groupId>
+            <artifactId>spring-ai-alibaba-starter</artifactId>
+            <version>1.0.0-M5.1</version>
         </dependency>
 
         <!-- 阿里云 通义千问 -->

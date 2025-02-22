@@ -13,60 +13,45 @@ import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
-import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
-import com.alibaba.cloud.ai.tongyi.TongYiAutoConfiguration;
-import com.alibaba.cloud.ai.tongyi.TongYiConnectionProperties;
-import com.alibaba.cloud.ai.tongyi.chat.TongYiChatModel;
-import com.alibaba.cloud.ai.tongyi.chat.TongYiChatProperties;
-import com.alibaba.cloud.ai.tongyi.image.TongYiImagesModel;
-import com.alibaba.cloud.ai.tongyi.image.TongYiImagesProperties;
-import com.alibaba.dashscope.aigc.generation.Generation;
-import com.alibaba.dashscope.aigc.imagesynthesis.ImageSynthesis;
-import com.alibaba.dashscope.embeddings.TextEmbedding;
-import com.azure.ai.openai.OpenAIClient;
+import com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeAutoConfiguration;
+import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
+import com.alibaba.cloud.ai.dashscope.api.DashScopeImageApi;
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
+import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingModel;
+import com.alibaba.cloud.ai.dashscope.image.DashScopeImageModel;
+import com.azure.ai.openai.OpenAIClientBuilder;
 import org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiAutoConfiguration;
 import org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiChatProperties;
 import org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiConnectionProperties;
 import org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration;
 import org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration;
 import org.springframework.ai.autoconfigure.qianfan.QianFanAutoConfiguration;
-import org.springframework.ai.autoconfigure.qianfan.QianFanChatProperties;
-import org.springframework.ai.autoconfigure.qianfan.QianFanConnectionProperties;
-import org.springframework.ai.autoconfigure.qianfan.QianFanImageProperties;
 import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiAutoConfiguration;
-import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiChatProperties;
 import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiConnectionProperties;
-import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiImageProperties;
 import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
-import org.springframework.ai.model.function.FunctionCallbackContext;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiImageModel;
-import org.springframework.ai.openai.api.ApiUtils;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.openai.api.OpenAiImageApi;
+import org.springframework.ai.openai.api.common.OpenAiApiConstants;
 import org.springframework.ai.qianfan.QianFanChatModel;
 import org.springframework.ai.qianfan.QianFanImageModel;
 import org.springframework.ai.qianfan.api.QianFanApi;
 import org.springframework.ai.qianfan.api.QianFanImageApi;
 import org.springframework.ai.stabilityai.StabilityAiImageModel;
 import org.springframework.ai.stabilityai.api.StabilityAiApi;
-import org.springframework.ai.vectorstore.RedisVectorStore;
+import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 import org.springframework.ai.zhipuai.ZhiPuAiImageModel;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
 import org.springframework.ai.zhipuai.api.ZhiPuAiImageApi;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
-import org.springframework.retry.support.RetryTemplate;
-import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
-import redis.clients.jedis.JedisPooled;
-import redis.clients.jedis.search.Schema;
 
 import java.util.List;
 
@@ -110,7 +95,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
         //noinspection EnhancedSwitchMigration
         switch (platform) {
             case TONG_YI:
-                return SpringUtil.getBean(TongYiChatModel.class);
+                return SpringUtil.getBean(DashScopeChatModel.class);
             case YI_YAN:
                 return SpringUtil.getBean(QianFanChatModel.class);
             case DEEP_SEEK:
@@ -135,7 +120,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
         //noinspection EnhancedSwitchMigration
         switch (platform) {
             case TONG_YI:
-                return SpringUtil.getBean(TongYiImagesModel.class);
+                return SpringUtil.getBean(DashScopeImageModel.class);
             case YI_YAN:
                 return SpringUtil.getBean(QianFanImageModel.class);
             case ZHI_PU:
@@ -202,17 +187,20 @@ public class AiModelFactoryImpl implements AiModelFactory {
         String cacheKey = buildClientCacheKey(VectorStore.class, platform, apiKey, url);
         return Singleton.get(cacheKey, (Func0<VectorStore>) () -> {
             String prefix = StrUtil.format("{}#{}:", platform.getPlatform(), apiKey);
-            var config = RedisVectorStore.RedisVectorStoreConfig.builder()
-                    .withIndexName(cacheKey)
-                    .withPrefix(prefix)
-                    .withMetadataFields(new RedisVectorStore.MetadataField("knowledgeId", Schema.FieldType.NUMERIC))
-                    .build();
-            RedisProperties redisProperties = SpringUtils.getBean(RedisProperties.class);
-            RedisVectorStore redisVectorStore = new RedisVectorStore(config, embeddingModel,
-                    new JedisPooled(redisProperties.getHost(), redisProperties.getPort()),
-                    true);
-            redisVectorStore.afterPropertiesSet();
-            return redisVectorStore;
+            // TODO @芋艿：先临时使用 store
+            return SimpleVectorStore.builder(embeddingModel).build();
+            // TODO @芋艿：@xin：后续看看，是不是切到阿里云之类的
+//            var config = RedisVectorStore.RedisVectorStoreConfig.builder()
+//                    .withIndexName(cacheKey)
+//                    .withPrefix(prefix)
+//                    .withMetadataFields(new RedisVectorStore.MetadataField("knowledgeId", Schema.FieldType.NUMERIC))
+//                    .build();
+//            RedisProperties redisProperties = SpringUtils.getBean(RedisProperties.class);
+//            RedisVectorStore redisVectorStore = new RedisVectorStore(config, embeddingModel,
+//                    new JedisPooled(redisProperties.getHost(), redisProperties.getPort()),
+//                    true);
+//            redisVectorStore.afterPropertiesSet();
+//            return redisVectorStore;
         });
     }
 
@@ -226,29 +214,23 @@ public class AiModelFactoryImpl implements AiModelFactory {
     // ========== 各种创建 spring-ai 客户端的方法 ==========
 
     /**
-     * 可参考 {@link TongYiAutoConfiguration#tongYiChatClient(Generation, TongYiChatProperties, TongYiConnectionProperties)}
+     * 可参考 {@link DashScopeAutoConfiguration} 的 dashscopeChatModel 方法
      */
-    private static TongYiChatModel buildTongYiChatModel(String key) {
-        com.alibaba.dashscope.aigc.generation.Generation generation = SpringUtil.getBean(Generation.class);
-        TongYiChatProperties chatOptions = SpringUtil.getBean(TongYiChatProperties.class);
-        // TODO @芋艿：貌似 apiKey 是全局唯一的？？？得测试下
-        // TODO @芋艿：貌似阿里云不是增量返回的
-        // 该 issue 进行跟进中 https://github.com/alibaba/spring-cloud-alibaba/issues/3790
-        TongYiConnectionProperties connectionProperties = new TongYiConnectionProperties();
-        connectionProperties.setApiKey(key);
-        return new TongYiAutoConfiguration().tongYiChatClient(generation, chatOptions, connectionProperties);
-    }
-
-    private static TongYiImagesModel buildTongYiImagesModel(String key) {
-        ImageSynthesis imageSynthesis = SpringUtil.getBean(ImageSynthesis.class);
-        TongYiImagesProperties imagesOptions = SpringUtil.getBean(TongYiImagesProperties.class);
-        TongYiConnectionProperties connectionProperties = new TongYiConnectionProperties();
-        connectionProperties.setApiKey(key);
-        return new TongYiAutoConfiguration().tongYiImagesClient(imageSynthesis, imagesOptions, connectionProperties);
+    private static DashScopeChatModel buildTongYiChatModel(String key) {
+        DashScopeApi dashScopeApi = new DashScopeApi(key);
+        return new DashScopeChatModel(dashScopeApi);
     }
 
     /**
-     * 可参考 {@link QianFanAutoConfiguration#qianFanChatModel(QianFanConnectionProperties, QianFanChatProperties, RestClient.Builder, RetryTemplate, ResponseErrorHandler)}
+     * 可参考 {@link DashScopeAutoConfiguration} 的 dashScopeImageModel 方法
+     */
+    private static DashScopeImageModel buildTongYiImagesModel(String key) {
+        DashScopeImageApi dashScopeImageApi = new DashScopeImageApi(key);
+        return new DashScopeImageModel(dashScopeImageApi);
+    }
+
+    /**
+     * 可参考 {@link QianFanAutoConfiguration} 的 qianFanChatModel 方法
      */
     private static QianFanChatModel buildYiYanChatModel(String key) {
         List<String> keys = StrUtil.split(key, '|');
@@ -260,7 +242,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     /**
-     * 可参考 {@link QianFanAutoConfiguration#qianFanImageModel(QianFanConnectionProperties, QianFanImageProperties, RestClient.Builder, RetryTemplate, ResponseErrorHandler)}
+     * 可参考 {@link QianFanAutoConfiguration} 的 qianFanImageModel 方法
      */
     private QianFanImageModel buildQianFanImageModel(String key) {
         List<String> keys = StrUtil.split(key, '|');
@@ -275,11 +257,13 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link YudaoAiAutoConfiguration#deepSeekChatModel(YudaoAiProperties)}
      */
     private static DeepSeekChatModel buildDeepSeekChatModel(String apiKey) {
-        return new DeepSeekChatModel(apiKey);
+        YudaoAiProperties.DeepSeekProperties properties = new YudaoAiProperties.DeepSeekProperties()
+                .setApiKey(apiKey);
+        return new YudaoAiAutoConfiguration().buildDeepSeekChatModel(properties);
     }
 
     /**
-     * 可参考 {@link ZhiPuAiAutoConfiguration#zhiPuAiChatModel(ZhiPuAiConnectionProperties, ZhiPuAiChatProperties, RestClient.Builder, List, FunctionCallbackContext, RetryTemplate, ResponseErrorHandler)}
+     * 可参考 {@link ZhiPuAiAutoConfiguration} 的 zhiPuAiChatModel 方法
      */
     private ZhiPuAiChatModel buildZhiPuChatModel(String apiKey, String url) {
         url = StrUtil.blankToDefault(url, ZhiPuAiConnectionProperties.DEFAULT_BASE_URL);
@@ -288,7 +272,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     /**
-     * 可参考 {@link ZhiPuAiAutoConfiguration#zhiPuAiImageModel(ZhiPuAiConnectionProperties, ZhiPuAiImageProperties, RestClient.Builder, RetryTemplate, ResponseErrorHandler)}
+     * 可参考 {@link ZhiPuAiAutoConfiguration} 的 zhiPuAiImageModel 方法
      */
     private ZhiPuAiImageModel buildZhiPuAiImageModel(String apiKey, String url) {
         url = StrUtil.blankToDefault(url, ZhiPuAiConnectionProperties.DEFAULT_BASE_URL);
@@ -301,21 +285,22 @@ public class AiModelFactoryImpl implements AiModelFactory {
      */
     private static XingHuoChatModel buildXingHuoChatModel(String key) {
         List<String> keys = StrUtil.split(key, '|');
-        Assert.equals(keys.size(), 3, "XingHuoChatClient 的密钥需要 (appid|appKey|secretKey) 格式");
-        String appKey = keys.get(1);
-        String secretKey = keys.get(2);
-        return new XingHuoChatModel(appKey, secretKey);
+        Assert.equals(keys.size(), 2, "XingHuoChatClient 的密钥需要 (appKey|secretKey) 格式");
+        YudaoAiProperties.XingHuoProperties properties = new YudaoAiProperties.XingHuoProperties()
+                .setAppKey(keys.get(0)).setSecretKey(keys.get(1));
+        return new YudaoAiAutoConfiguration().buildXingHuoChatClient(properties);
     }
 
     /**
-     * 可参考 {@link OpenAiAutoConfiguration}
+     * 可参考 {@link OpenAiAutoConfiguration} 的 openAiChatModel 方法
      */
     private static OpenAiChatModel buildOpenAiChatModel(String openAiToken, String url) {
-        url = StrUtil.blankToDefault(url, ApiUtils.DEFAULT_BASE_URL);
-        OpenAiApi openAiApi = new OpenAiApi(url, openAiToken);
-        return new OpenAiChatModel(openAiApi);
+        url = StrUtil.blankToDefault(url, OpenAiApiConstants.DEFAULT_BASE_URL);
+        OpenAiApi openAiApi = OpenAiApi.builder().baseUrl(url).apiKey(openAiToken).build();
+        return OpenAiChatModel.builder().openAiApi(openAiApi).build();
     }
 
+    // TODO @芋艿：手头暂时没密钥，使用建议再测试下
     /**
      * 可参考 {@link AzureOpenAiAutoConfiguration}
      */
@@ -325,27 +310,28 @@ public class AiModelFactoryImpl implements AiModelFactory {
         AzureOpenAiConnectionProperties connectionProperties = new AzureOpenAiConnectionProperties();
         connectionProperties.setApiKey(apiKey);
         connectionProperties.setEndpoint(url);
-        OpenAIClient openAIClient = azureOpenAiAutoConfiguration.openAIClient(connectionProperties);
+        OpenAIClientBuilder openAIClient = azureOpenAiAutoConfiguration.openAIClientBuilder(connectionProperties, null);
         // 获取 AzureOpenAiChatProperties 对象
         AzureOpenAiChatProperties chatProperties = SpringUtil.getBean(AzureOpenAiChatProperties.class);
-        return azureOpenAiAutoConfiguration.azureOpenAiChatModel(openAIClient, chatProperties, null, null);
+        return azureOpenAiAutoConfiguration.azureOpenAiChatModel(openAIClient, chatProperties,
+                null, null, null);
     }
 
     /**
-     * 可参考 {@link OpenAiAutoConfiguration}
+     * 可参考 {@link OpenAiAutoConfiguration} 的 openAiImageModel 方法
      */
     private OpenAiImageModel buildOpenAiImageModel(String openAiToken, String url) {
-        url = StrUtil.blankToDefault(url, ApiUtils.DEFAULT_BASE_URL);
-        OpenAiImageApi openAiApi = new OpenAiImageApi(url, openAiToken, RestClient.builder());
+        url = StrUtil.blankToDefault(url, OpenAiApiConstants.DEFAULT_BASE_URL);
+        OpenAiImageApi openAiApi = OpenAiImageApi.builder().baseUrl(url).apiKey(openAiToken).build();
         return new OpenAiImageModel(openAiApi);
     }
 
     /**
-     * 可参考 {@link OllamaAutoConfiguration}
+     * 可参考 {@link OllamaAutoConfiguration} 的 ollamaApi 方法
      */
     private static OllamaChatModel buildOllamaChatModel(String url) {
         OllamaApi ollamaApi = new OllamaApi(url);
-        return new OllamaChatModel(ollamaApi);
+        return OllamaChatModel.builder().ollamaApi(ollamaApi).build();
     }
 
     private StabilityAiImageModel buildStabilityAiImageModel(String apiKey, String url) {
@@ -356,13 +342,13 @@ public class AiModelFactoryImpl implements AiModelFactory {
 
     // ========== 各种创建 EmbeddingModel 的方法 ==========
 
+    // TODO @芋艿：需要测试下
     /**
-     * 可参考 {@link TongYiAutoConfiguration#tongYiTextEmbeddingClient(TextEmbedding, TongYiConnectionProperties)}
+     * 可参考 {@link DashScopeAutoConfiguration} 的 dashscopeEmbeddingModel 方法
      */
     private EmbeddingModel buildTongYiEmbeddingModel(String apiKey) {
-        TongYiConnectionProperties connectionProperties = new TongYiConnectionProperties();
-        connectionProperties.setApiKey(apiKey);
-        return new TongYiAutoConfiguration().tongYiTextEmbeddingClient(SpringUtil.getBean(TextEmbedding.class), connectionProperties);
+        DashScopeApi dashScopeApi = new DashScopeApi(apiKey);
+        return new DashScopeEmbeddingModel(dashScopeApi);
     }
 
 }

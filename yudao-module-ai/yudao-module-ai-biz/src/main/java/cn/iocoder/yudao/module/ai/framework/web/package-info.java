@@ -1,4 +1,4 @@
 /**
- * crm 模块的 web 拓展封装
+ * ai 模块的 web 拓展封装
  */
-package cn.iocoder.yudao.module.crm.framework.web;
+package cn.iocoder.yudao.module.ai.framework.web;

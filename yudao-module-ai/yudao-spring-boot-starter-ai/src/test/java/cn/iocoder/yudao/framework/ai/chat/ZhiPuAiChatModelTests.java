@@ -24,7 +24,7 @@ public class ZhiPuAiChatModelTests {
 
     private final ZhiPuAiApi zhiPuAiApi = new ZhiPuAiApi("32f84543e54eee31f8d56b2bd6020573.3vh9idLJZ2ZhxDEs");
     private final ZhiPuAiChatModel chatModel = new ZhiPuAiChatModel(zhiPuAiApi,
-            ZhiPuAiChatOptions.builder().withModel(ZhiPuAiApi.ChatModel.GLM_4.getModelName()).build());
+            ZhiPuAiChatOptions.builder().model(ZhiPuAiApi.ChatModel.GLM_4.getName()).build());
 
     @Test
     @Disabled

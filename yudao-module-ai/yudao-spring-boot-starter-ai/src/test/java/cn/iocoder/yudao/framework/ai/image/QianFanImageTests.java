@@ -25,9 +25,9 @@ public class QianFanImageTests {
         // 准备参数
         // 只支持 1024x1024、768x768、768x1024、1024x768、576x1024、1024x576
         QianFanImageOptions imageOptions = QianFanImageOptions.builder()
-                .withModel(QianFanImageApi.ImageModel.Stable_Diffusion_XL.getValue())
-                .withWidth(1024).withHeight(1024)
-                .withN(1)
+                .model(QianFanImageApi.ImageModel.Stable_Diffusion_XL.getValue())
+                .width(1024).height(1024)
+                .N(1)
                 .build();
         ImagePrompt prompt = new ImagePrompt("good", imageOptions);
 

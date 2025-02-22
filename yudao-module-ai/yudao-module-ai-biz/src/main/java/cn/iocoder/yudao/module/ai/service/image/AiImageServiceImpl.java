@@ -20,7 +20,6 @@ import cn.iocoder.yudao.module.ai.dal.mysql.image.AiImageMapper;
 import cn.iocoder.yudao.module.ai.enums.image.AiImageStatusEnum;
 import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
-import com.alibaba.cloud.ai.tongyi.image.TongYiImagesOptions;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.image.ImageModel;
@@ -144,7 +143,7 @@ public class AiImageServiceImpl implements AiImageService {
                     .withClipGuidancePreset(String.valueOf(draw.getOptions().get("clipGuidancePreset")))
                     .build();
         } else if (ObjUtil.equal(draw.getPlatform(), AiPlatformEnum.TONG_YI.getPlatform())) {
-            return TongYiImagesOptions.builder()
+            return DashScopeImageOptions.builder()
                     .withModel(draw.getModel()).withN(1)
                     .withHeight(draw.getHeight()).withWidth(draw.getWidth())
                     .build();

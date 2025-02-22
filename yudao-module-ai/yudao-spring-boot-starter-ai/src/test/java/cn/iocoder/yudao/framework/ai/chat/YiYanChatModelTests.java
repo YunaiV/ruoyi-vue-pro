@@ -25,7 +25,7 @@ public class YiYanChatModelTests {
             "qS8k8dYr2nXunagK4SSU8Xjj",
             "pHGbx51ql2f0hOyabQvSZezahVC3hh3e");
     private final QianFanChatModel chatModel = new QianFanChatModel(qianFanApi,
-            QianFanChatOptions.builder().withModel(QianFanApi.ChatModel.ERNIE_Tiny_8K.getValue()).build()
+            QianFanChatOptions.builder().model(QianFanApi.ChatModel.ERNIE_Tiny_8K.getValue()).build()
     );
 
     @Test

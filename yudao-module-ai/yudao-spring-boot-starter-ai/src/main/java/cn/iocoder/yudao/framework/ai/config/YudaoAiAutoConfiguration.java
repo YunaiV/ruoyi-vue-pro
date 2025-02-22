@@ -1,15 +1,16 @@
 package cn.iocoder.yudao.framework.ai.config;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactory;
 import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactoryImpl;
 import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
-import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatOptions;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
-import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatOptions;
-import com.alibaba.cloud.ai.tongyi.TongYiAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.tokenizer.JTokkitTokenCountEstimator;
 import org.springframework.ai.tokenizer.TokenCountEstimator;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
@@ -17,7 +18,6 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
 
 /**
@@ -28,7 +28,6 @@ import org.springframework.context.annotation.Lazy;
 @AutoConfiguration
 @EnableConfigurationProperties(YudaoAiProperties.class)
 @Slf4j
-@Import(TongYiAutoConfiguration.class)
 public class YudaoAiAutoConfiguration {
 
     @Bean
@@ -43,26 +42,52 @@ public class YudaoAiAutoConfiguration {
     @ConditionalOnProperty(value = "yudao.ai.deepseek.enable", havingValue = "true")
     public DeepSeekChatModel deepSeekChatModel(YudaoAiProperties yudaoAiProperties) {
         YudaoAiProperties.DeepSeekProperties properties = yudaoAiProperties.getDeepSeek();
-        DeepSeekChatOptions options = DeepSeekChatOptions.builder()
-                .model(properties.getModel())
-                .temperature(properties.getTemperature())
-                .maxTokens(properties.getMaxTokens())
-                .topP(properties.getTopP())
+        return buildDeepSeekChatModel(properties);
+    }
+
+    public DeepSeekChatModel buildDeepSeekChatModel(YudaoAiProperties.DeepSeekProperties properties) {
+        if (StrUtil.isEmpty(properties.getModel())) {
+            properties.setModel(DeepSeekChatModel.MODEL_DEFAULT);
+        }
+        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
+                .openAiApi(OpenAiApi.builder()
+                        .baseUrl(DeepSeekChatModel.BASE_URL)
+                        .apiKey(properties.getApiKey())
+                        .build())
+                .defaultOptions(OpenAiChatOptions.builder()
+                        .model(properties.getModel())
+                        .temperature(properties.getTemperature())
+                        .maxTokens(properties.getMaxTokens())
+                        .topP(properties.getTopP())
+                        .build())
                 .build();
-        return new DeepSeekChatModel(properties.getApiKey(), options);
+        return new DeepSeekChatModel(openAiChatModel);
     }
 
     @Bean
     @ConditionalOnProperty(value = "yudao.ai.xinghuo.enable", havingValue = "true")
     public XingHuoChatModel xingHuoChatClient(YudaoAiProperties yudaoAiProperties) {
         YudaoAiProperties.XingHuoProperties properties = yudaoAiProperties.getXinghuo();
-        XingHuoChatOptions options = XingHuoChatOptions.builder()
-                .model(properties.getModel())
-                .temperature(properties.getTemperature())
-                .maxTokens(properties.getMaxTokens())
-                .topK(properties.getTopK())
+        return buildXingHuoChatClient(properties);
+    }
+
+    public XingHuoChatModel buildXingHuoChatClient(YudaoAiProperties.XingHuoProperties properties) {
+        if (StrUtil.isEmpty(properties.getModel())) {
+            properties.setModel(XingHuoChatModel.MODEL_DEFAULT);
+        }
+        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
+                .openAiApi(OpenAiApi.builder()
+                        .baseUrl(XingHuoChatModel.BASE_URL)
+                        .apiKey(properties.getAppKey() + ":" + properties.getSecretKey())
+                        .build())
+                .defaultOptions(OpenAiChatOptions.builder()
+                        .model(properties.getModel())
+                        .temperature(properties.getTemperature())
+                        .maxTokens(properties.getMaxTokens())
+                        .topP(properties.getTopP())
+                        .build())
                 .build();
-        return new XingHuoChatModel(properties.getAppKey(), properties.getSecretKey(), options);
+        return new XingHuoChatModel(openAiChatModel);
     }
 
     @Bean

@@ -26,7 +26,7 @@ public class OpenAIChatModelTests {
             "https://api.holdai.top",
             "sk-dZEPiVaNcT3FHhef51996bAa0bC74806BeAb620dA5Da10Bf");
     private final OpenAiChatModel chatModel = new OpenAiChatModel(openAiApi,
-            OpenAiChatOptions.builder().withModel(OpenAiApi.ChatModel.GPT_4_O).build());
+            OpenAiChatOptions.builder().model(OpenAiApi.ChatModel.GPT_4_O).build());
 
     @Test
     @Disabled

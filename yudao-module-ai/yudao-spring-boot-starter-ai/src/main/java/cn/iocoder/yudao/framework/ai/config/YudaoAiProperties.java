@@ -42,9 +42,9 @@ public class YudaoAiProperties {
         private String secretKey;
 
         private String model;
-        private Float temperature;
+        private Double temperature;
         private Integer maxTokens;
-        private Integer topK;
+        private Double topP;
 
     }
 
@@ -55,9 +55,9 @@ public class YudaoAiProperties {
         private String apiKey;
 
         private String model;
-        private Float temperature;
+        private Double temperature;
         private Integer maxTokens;
-        private Float topP;
+        private Double topP;
 
     }
 
