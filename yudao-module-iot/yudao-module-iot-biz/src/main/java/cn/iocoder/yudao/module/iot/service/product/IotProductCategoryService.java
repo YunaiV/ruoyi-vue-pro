@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.product.vo.category.IotProdu
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductCategoryDO;
 import jakarta.validation.Valid;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -82,5 +83,21 @@ public interface IotProductCategoryService {
      * @return 产品分类列表
      */
     List<IotProductCategoryDO> getProductCategoryListByStatus(Integer status);
+
+    /**
+     * 获得产品分类数量
+     *
+     * @param createTime 创建时间，如果为空，则统计所有分类数量
+     * @return 产品分类数量
+     */
+    Long getProductCategoryCount(LocalDateTime createTime);
+
+
+    /**
+     * 获得各产品分类下属的设备总数
+     *
+     * @return 产品分类名称和各产品分类下属的设备总数
+     */
+    Map<String,Integer> getDeviceCountsOfProductCategoryMap();
 
 }

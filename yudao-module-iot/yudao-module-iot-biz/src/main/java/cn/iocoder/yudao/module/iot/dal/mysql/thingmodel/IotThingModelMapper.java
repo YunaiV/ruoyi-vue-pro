@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelP
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -70,6 +71,17 @@ public interface IotThingModelMapper extends BaseMapperX<IotThingModelDO> {
     default IotThingModelDO selectByProductIdAndName(Long productId, String name) {
         return selectOne(IotThingModelDO::getProductId, productId,
                 IotThingModelDO::getName, name);
+    }
+
+    /**
+     * 统计物模型数量
+     *
+     * @param createTime 创建时间，如果为空，则统计所有物模型数量
+     * @return 物模型数量
+     */
+    default Long selectCountByCreateTime(LocalDateTime createTime) {
+        return selectCount(new LambdaQueryWrapperX<IotThingModelDO>()
+                .geIfPresent(IotThingModelDO::getCreateTime, createTime));
     }
 
 }

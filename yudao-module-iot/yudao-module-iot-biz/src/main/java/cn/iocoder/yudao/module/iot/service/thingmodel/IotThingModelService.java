@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelS
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import jakarta.validation.Valid;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -79,5 +80,13 @@ public interface IotThingModelService {
      * @return 产品物模型列表
      */
     List<IotThingModelDO> getThingModelList(IotThingModelListReqVO reqVO);
+
+    /**
+     * 获得物模型数量
+     *
+     * @param createTime 创建时间，如果为空，则统计所有物模型数量
+     * @return 物模型数量
+     */
+    Long getThingModelCount(LocalDateTime createTime);
 
 }

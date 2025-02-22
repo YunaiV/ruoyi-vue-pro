@@ -5,14 +5,20 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.category.IotProductCategoryPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.category.IotProductCategorySaveReqVO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductCategoryDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.product.IotProductCategoryMapper;
+import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PRODUCT_CATEGORY_NOT_EXISTS;
@@ -29,7 +35,12 @@ public class IotProductCategoryServiceImpl implements IotProductCategoryService 
     @Resource
     private IotProductCategoryMapper productCategoryMapper;
 
-    @Override
+    @Resource
+    private IotProductService productService;
+
+    @Resource
+    private IotDeviceService deviceService;
+
     public Long createProductCategory(IotProductCategorySaveReqVO createReqVO) {
         // 插入
         IotProductCategoryDO productCategory = BeanUtils.toBean(createReqVO, IotProductCategoryDO.class);
@@ -82,6 +93,52 @@ public class IotProductCategoryServiceImpl implements IotProductCategoryService 
     @Override
     public List<IotProductCategoryDO> getProductCategoryListByStatus(Integer status) {
         return productCategoryMapper.selectListByStatus(status);
+    }
+
+    @Override
+    public Long getProductCategoryCount(LocalDateTime createTime) {
+        return productCategoryMapper.selectCountByCreateTime(createTime);
+    }
+
+    @Override
+    public Map<String, Integer> getDeviceCountsOfProductCategoryMap() {
+        // 1. 获取所有数据
+        List<IotProductCategoryDO> categoryList = productCategoryMapper.selectList();
+        List<IotProductDO> productList = productService.getProductList();
+        List<IotDeviceDO> deviceList = deviceService.getDeviceList();
+
+        // 2. 统计每个分类下的设备数量
+        Map<String, Integer> categoryDeviceCountMap = new HashMap<>();
+        
+        // 2.1 初始化所有分类的计数为0
+        for (IotProductCategoryDO category : categoryList) {
+            categoryDeviceCountMap.put(category.getName(), 0);
+        }
+        
+        // 2.2 构建产品ID到分类的映射
+        Map<Long, IotProductCategoryDO> productCategoryMap = new HashMap<>();
+        for (IotProductDO product : productList) {
+            Long categoryId = product.getCategoryId();
+            IotProductCategoryDO category = categoryList.stream()
+                    .filter(c -> c.getId().equals(categoryId))
+                    .findFirst()
+                    .orElse(null);
+            if (category != null) {
+                productCategoryMap.put(product.getId(), category);
+            }
+        }
+        
+        // 2.3 统计每个分类下的设备数量
+        for (IotDeviceDO device : deviceList) {
+            Long productId = device.getProductId();
+            IotProductCategoryDO category = productCategoryMap.get(productId);
+            if (category != null) {
+                String categoryName = category.getName();
+                categoryDeviceCountMap.merge(categoryName, 1, Integer::sum);
+            }
+        }
+        
+        return categoryDeviceCountMap;
     }
 
 }

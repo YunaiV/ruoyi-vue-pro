@@ -434,4 +434,19 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         return SpringUtil.getBean(getClass());
     }
 
+    @Override
+    public Long getDeviceCount(LocalDateTime createTime) {
+        return deviceMapper.selectCountByCreateTime(createTime);
+    }
+
+    @Override
+    public Long getDeviceCountByState(Integer state) {
+        return deviceMapper.selectCountByState(state);
+    }
+
+    @Override
+    public List<IotDeviceDO> getDeviceList() {
+        return deviceMapper.selectList();
+    }
+
 }

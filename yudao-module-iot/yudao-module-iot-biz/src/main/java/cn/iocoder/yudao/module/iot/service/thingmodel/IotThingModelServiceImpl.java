@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -361,6 +362,11 @@ public class IotThingModelServiceImpl implements IotThingModelService {
 
     private IotThingModelServiceImpl getSelf() {
         return SpringUtil.getBean(getClass());
+    }
+
+    @Override
+    public Long getThingModelCount(LocalDateTime createTime) {
+        return thingModelMapper.selectCountByCreateTime(createTime);
     }
 
 }
