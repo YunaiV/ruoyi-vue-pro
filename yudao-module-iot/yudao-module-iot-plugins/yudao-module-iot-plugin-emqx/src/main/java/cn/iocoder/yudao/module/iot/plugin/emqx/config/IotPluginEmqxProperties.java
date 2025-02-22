@@ -17,22 +17,29 @@ public class IotPluginEmqxProperties {
     /**
      * 服务主机
      */
-    private String host;
-
+    private String mqttHost;
     /**
      * 服务端口
      */
-    private int port;
+    private int mqttPort;
+    /**
+     * 服务用户名
+     */
+    private String mqttUsername;
 
+    /**
+     * 服务密码
+     */
+    private String mqttPassword;
     /**
      * 是否启用 SSL
      */
-    private boolean ssl;
+    private boolean mqttSsl;
 
     /**
      * 订阅的主题
      */
-    private String topics;
+    private String mqttTopics;
 
     /**
      * 认证端口

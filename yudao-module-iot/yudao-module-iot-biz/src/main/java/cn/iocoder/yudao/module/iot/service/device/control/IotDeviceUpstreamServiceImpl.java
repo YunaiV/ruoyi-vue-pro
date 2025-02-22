@@ -174,7 +174,7 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
     }
 
     private void registerDevice0(String productKey, String deviceName, Long gatewayId,
-                                 IotDeviceUpstreamAbstractReqDTO registerReqDTO) {
+            IotDeviceUpstreamAbstractReqDTO registerReqDTO) {
         // 1.1 注册设备
         IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(productKey, deviceName);
         boolean registerNew = device == null;
@@ -280,16 +280,15 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
         sendDeviceMessage(message, device);
     }
 
-    // TODO @haohao：建议返回 boolean；
     @Override
-    public Boolean authenticateEmqxConnection(IotDeviceEmqxAuthReqDTO authReqDTO) {
+    public boolean authenticateEmqxConnection(IotDeviceEmqxAuthReqDTO authReqDTO) {
         log.info("[authenticateEmqxConnection][认证 Emqx 连接: {}]", authReqDTO);
         // 1. 校验设备是否存在
         // username 格式：${DeviceName}&${ProductKey}
         String[] usernameParts = authReqDTO.getUsername().split("&");
         if (usernameParts.length != 2) {
             log.error("[authenticateEmqxConnection][认证失败，username 格式不正确]");
-            return Boolean.FALSE;
+            return false;
         }
         String deviceName = usernameParts[0];
         String productKey = usernameParts[1];
@@ -298,19 +297,18 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
         if (device == null) {
             log.error("[authenticateEmqxConnection][设备({}/{}) 不存在]",
                     productKey, deviceName);
-            return Boolean.FALSE;
+            return false;
         }
         // 2. 校验密码
         String deviceSecret = device.getDeviceSecret();
         String clientId = authReqDTO.getClientId();
         MqttSignResult sign = MqttSignUtils.calculate(productKey, deviceName, deviceSecret, clientId);
-        // TODO @haohao：notEquals，尽量不走取反逻辑哈
-        if (!StrUtil.equals(sign.getPassword(), authReqDTO.getPassword())) {
-            log.error("[authenticateEmqxConnection][认证失败，密码不正确]");
-            return Boolean.FALSE;
+        if (StrUtil.equals(sign.getPassword(), authReqDTO.getPassword())) {
+            log.info("[authenticateEmqxConnection][认证成功]");
+            return true;
         }
-        log.info("[authenticateEmqxConnection][认证成功]");
-        return Boolean.TRUE;
+        log.error("[authenticateEmqxConnection][认证失败，密码不正确]");
+        return false;
     }
 
     private void updateDeviceLastTime(IotDeviceDO device, IotDeviceUpstreamAbstractReqDTO reqDTO) {

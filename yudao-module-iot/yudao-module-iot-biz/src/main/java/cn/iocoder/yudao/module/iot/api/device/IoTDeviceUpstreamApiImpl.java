@@ -62,7 +62,7 @@ public class IoTDeviceUpstreamApiImpl implements IotDeviceUpstreamApi {
 
     @Override
     public CommonResult<Boolean> authenticateEmqxConnection(IotDeviceEmqxAuthReqDTO authReqDTO) {
-        Boolean result = deviceUpstreamService.authenticateEmqxConnection(authReqDTO);
+        boolean result = deviceUpstreamService.authenticateEmqxConnection(authReqDTO);
         return success(result);
     }
 

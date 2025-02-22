@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.iot.util;
 
+import cn.hutool.crypto.digest.HMac;
+import cn.hutool.crypto.digest.HmacAlgorithm;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -12,10 +13,6 @@ import java.nio.charset.StandardCharsets;
  * 提供静态方法来计算 MQTT 连接参数
  */
 public class MqttSignUtils {
-
-    private static final String SIGN_METHOD = "hmacsha256";
-
-    // TODO @haohao：calculate 方法，可以融合么？
 
     /**
      * 计算 MQTT 连接参数
@@ -26,14 +23,7 @@ public class MqttSignUtils {
      * @return 包含 clientId, username, password 的结果对象
      */
     public static MqttSignResult calculate(String productKey, String deviceName, String deviceSecret) {
-        String clientId = productKey + "." + deviceName;
-        String username = deviceName + "&" + productKey;
-        // 生成 password
-        // TODO @haohao：signContent 和 signContentBuilder 风格保持统一的实现哈
-        String signContent = String.format("clientId%sdeviceName%sdeviceSecret%sproductKey%s",
-                clientId, deviceName, deviceSecret, productKey);
-        String password = sign(signContent, deviceSecret);
-        return new MqttSignResult(clientId, username, password);
+        return calculate(productKey, deviceName, deviceSecret, productKey + "." + deviceName);
     }
 
     /**
@@ -47,56 +37,31 @@ public class MqttSignUtils {
      */
     public static MqttSignResult calculate(String productKey, String deviceName, String deviceSecret, String clientId) {
         String username = deviceName + "&" + productKey;
-        String signContentBuilder = "clientId" + clientId +
-                "deviceName" + deviceName +
-                "deviceSecret" + deviceSecret +
-                "productKey" + productKey;
+        // 构建签名内容
+        StringBuilder signContentBuilder = new StringBuilder()
+                .append("clientId").append(clientId)
+                .append("deviceName").append(deviceName)
+                .append("deviceSecret").append(deviceSecret)
+                .append("productKey").append(productKey);
 
-        String password = sign(signContentBuilder, deviceSecret);
+        // 使用 HMac 计算签名
+        byte[] key = deviceSecret.getBytes(StandardCharsets.UTF_8);
+        String signContent = signContentBuilder.toString();
+        HMac mac = new HMac(HmacAlgorithm.HmacSHA256, key);
+        String password = mac.digestHex(signContent);
 
         return new MqttSignResult(clientId, username, password);
-    }
-
-    // TODO @haohao：hutool 貌似有工具类可以用哈。
-    private static String sign(String content, String key) {
-        try {
-            Mac mac = Mac.getInstance(SIGN_METHOD);
-            mac.init(new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), SIGN_METHOD));
-            byte[] signData = mac.doFinal(content.getBytes(StandardCharsets.UTF_8));
-            return bytesToHex(signData);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to sign content with HmacSHA256", e);
-        }
-    }
-
-    private static String bytesToHex(byte[] bytes) {
-        StringBuilder hexString = new StringBuilder(bytes.length * 2);
-        for (byte b : bytes) {
-            String hex = Integer.toHexString(0xFF & b);
-            if (hex.length() == 1) {
-                hexString.append('0');
-            }
-            hexString.append(hex);
-        }
-        return hexString.toString();
     }
 
     /**
      * MQTT 签名结果类
      */
     @Getter
-    // TODO @haohao：可以用 lombok 哈
+    @AllArgsConstructor
     public static class MqttSignResult {
-
         private final String clientId;
         private final String username;
         private final String password;
-
-        public MqttSignResult(String clientId, String username, String password) {
-            this.clientId = clientId;
-            this.username = username;
-            this.password = password;
-        }
-
     }
+
 }

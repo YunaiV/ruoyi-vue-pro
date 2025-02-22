@@ -79,18 +79,6 @@ public class IotDeviceRespVO {
     @ExcelProperty("设备密钥")
     private String deviceSecret;
 
-    @Schema(description = "MQTT 客户端 ID", example = "24602")
-    @ExcelProperty("MQTT 客户端 ID")
-    private String mqttClientId;
-
-    @Schema(description = "MQTT 用户名", example = "芋艿")
-    @ExcelProperty("MQTT 用户名")
-    private String mqttUsername;
-
-    @Schema(description = "MQTT 密码")
-    @ExcelProperty("MQTT 密码")
-    private String mqttPassword;
-
     @Schema(description = "认证类型（如一机一密、动态注册）", example = "2")
     @ExcelProperty("认证类型（如一机一密、动态注册）")
     private String authType;

@@ -67,6 +67,6 @@ public interface IotDeviceUpstreamService {
      *
      * @param authReqDTO Emqx 连接认证 DTO
      */
-    Boolean authenticateEmqxConnection(IotDeviceEmqxAuthReqDTO authReqDTO);
+    boolean authenticateEmqxConnection(IotDeviceEmqxAuthReqDTO authReqDTO);
 
 }

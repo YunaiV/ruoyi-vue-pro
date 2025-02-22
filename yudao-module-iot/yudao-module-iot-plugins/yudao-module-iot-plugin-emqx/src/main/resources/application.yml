@@ -10,8 +10,10 @@ yudao:
         downstream-port: 8100
         plugin-key: yudao-module-iot-plugin-emqx
       emqx:
-        host: 127.0.0.1
-        port: 1883
-        ssl: false
-        topics: "/sys/#"
+        mqtt-host: 127.0.0.1
+        mqtt-port: 1883
+        mqtt-ssl: false
+        mqtt-username: yudao
+        mqtt-password: yudao
+        mqtt-topics: "/+/#"
         auth-port: 8101
