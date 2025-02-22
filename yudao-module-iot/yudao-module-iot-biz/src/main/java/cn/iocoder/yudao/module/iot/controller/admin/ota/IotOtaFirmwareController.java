@@ -21,7 +21,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Validated
 @RestController
-@Tag(name = "管理后台 - IoT OTA固件")
+@Tag(name = "管理后台 - IoT OTA 固件")
 @RequestMapping("/iot/ota-firmware")
 public class IotOtaFirmwareController {
 
@@ -29,14 +29,14 @@ public class IotOtaFirmwareController {
     private IotOtaFirmwareService otaFirmwareService;
 
     @PostMapping("/create")
-    @Operation(summary = "创建OTA固件")
+    @Operation(summary = "创建 OTA 固件")
     @PreAuthorize("@ss.hasPermission('iot:ota-firmware:create')")
     public CommonResult<Long> createOtaFirmware(@Valid @RequestBody IotOtaFirmwareCreateReqVO createReqVO) {
         return success(otaFirmwareService.createOtaFirmware(createReqVO));
     }
 
     @PutMapping("/update")
-    @Operation(summary = "更新OTA固件")
+    @Operation(summary = "更新 OTA 固件")
     @PreAuthorize("@ss.hasPermission('iot:ota-firmware:update')")
     public CommonResult<Boolean> updateOtaFirmware(@Valid @RequestBody IotOtaFirmwareUpdateReqVO updateReqVO) {
         otaFirmwareService.updateOtaFirmware(updateReqVO);
@@ -44,7 +44,7 @@ public class IotOtaFirmwareController {
     }
 
     @GetMapping("/get")
-    @Operation(summary = "获得OTA固件")
+    @Operation(summary = "获得 OTA 固件")
     @PreAuthorize("@ss.hasPermission('iot:ota-firmware:query')")
     public CommonResult<IotOtaFirmwareRespVO> getOtaFirmware(@RequestParam("id") Long id) {
         IotOtaFirmwareDO otaFirmware = otaFirmwareService.getOtaFirmware(id);
@@ -52,7 +52,7 @@ public class IotOtaFirmwareController {
     }
 
     @GetMapping("/page")
-    @Operation(summary = "获得OTA固件分页")
+    @Operation(summary = "获得 OTA 固件分页")
     @PreAuthorize("@ss.hasPermission('iot:ota-firmware:query')")
     public CommonResult<PageResult<IotOtaFirmwareRespVO>> getOtaFirmwarePage(@Valid IotOtaFirmwarePageReqVO pageReqVO) {
         PageResult<IotOtaFirmwareDO> pageResult = otaFirmwareService.getOtaFirmwarePage(pageReqVO);

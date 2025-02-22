@@ -22,20 +22,12 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Validated
 @RestController
-@Tag(name = "管理后台 - OTA升级记录")
+@Tag(name = "管理后台 - OTA 升级记录")
 @RequestMapping("/iot/ota-upgrade-record")
 public class IotOtaUpgradeRecordController {
 
     @Resource
     private IotOtaUpgradeRecordService upgradeRecordService;
-
-    @GetMapping("/get-count")
-    @Operation(summary = "获得升级记录 分页 tab count")
-    @PreAuthorize("@ss.hasPermission('iot:ota-upgrade-record:query')")
-    public CommonResult<Map<Integer, Long>> getOtaUpgradeRecordCount(
-            @Valid IotOtaUpgradeRecordPageReqVO pageReqVO) {
-        return success(upgradeRecordService.getOtaUpgradeRecordCount(pageReqVO));
-    }
 
     @GetMapping("/get-statistics")
     @Operation(summary = "固件升级设备统计")
@@ -44,6 +36,14 @@ public class IotOtaUpgradeRecordController {
     public CommonResult<Map<Integer, Long>> getOtaUpgradeRecordStatistics(
             @RequestParam(value = "firmwareId") Long firmwareId) {
         return success(upgradeRecordService.getOtaUpgradeRecordStatistics(firmwareId));
+    }
+
+    @GetMapping("/get-count")
+    @Operation(summary = "获得升级记录分页 tab 数量")
+    @PreAuthorize("@ss.hasPermission('iot:ota-upgrade-record:query')")
+    public CommonResult<Map<Integer, Long>> getOtaUpgradeRecordCount(
+            @Valid IotOtaUpgradeRecordPageReqVO pageReqVO) {
+        return success(upgradeRecordService.getOtaUpgradeRecordCount(pageReqVO));
     }
 
     @GetMapping("/page")
@@ -64,6 +64,7 @@ public class IotOtaUpgradeRecordController {
         return success(BeanUtils.toBean(upgradeRecord, IotOtaUpgradeRecordRespVO.class));
     }
 
+    // TODO @li：使用 Putmapping
     @PostMapping("/retry")
     @Operation(summary = "重试升级记录")
     @PreAuthorize("@ss.hasPermission('iot:ota-upgrade-record:retry')")

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.service.ota.bo.upgrade.record;
+package cn.iocoder.yudao.module.iot.service.ota.bo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.iot.enums.ota.IotOtaUpgradeRecordStatusEnum;
@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+// TODO @li：这个类，貌似没用？
 @Data
 public class IotOtaUpgradeRecordUpdateReqBO {
 

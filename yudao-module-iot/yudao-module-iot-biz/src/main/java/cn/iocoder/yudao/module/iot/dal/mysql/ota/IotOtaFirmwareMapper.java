@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
+// TODO @li：这里的注释，可以去掉哈，多了点点
 /**
  * IotOtaFirmwareMapper 接口用于操作 IotOtaFirmwareDO 实体类对应的数据库表。
  * 该接口继承自 BaseMapperX，提供了基本的 CRUD 操作，并扩展了特定查询方法。
@@ -24,9 +25,8 @@ public interface IotOtaFirmwareMapper extends BaseMapperX<IotOtaFirmwareDO> {
      * @return 返回符合条件的固件信息列表。
      */
     default List<IotOtaFirmwareDO> selectByProductIdAndVersion(String productId, String version) {
-        return selectList(new LambdaQueryWrapperX<IotOtaFirmwareDO>()
-                .eq(IotOtaFirmwareDO::getProductId, productId)
-                .eq(IotOtaFirmwareDO::getVersion, version));
+        return selectList(IotOtaFirmwareDO::getProductId, productId,
+                IotOtaFirmwareDO::getVersion, version);
     }
 
     /**
@@ -36,11 +36,10 @@ public interface IotOtaFirmwareMapper extends BaseMapperX<IotOtaFirmwareDO> {
      * @return 返回分页查询结果，包含符合条件的固件信息列表。
      */
     default PageResult<IotOtaFirmwareDO> selectPage(IotOtaFirmwarePageReqVO pageReqVO) {
-        return selectPage(pageReqVO,
-                new LambdaQueryWrapperX<IotOtaFirmwareDO>()
-                        .likeIfPresent(IotOtaFirmwareDO::getName, pageReqVO.getName())
-                        .eqIfPresent(IotOtaFirmwareDO::getProductId, pageReqVO.getProductId())
-                        .orderByDesc(IotOtaFirmwareDO::getCreateTime));
+        return selectPage(pageReqVO, new LambdaQueryWrapperX<IotOtaFirmwareDO>()
+                .likeIfPresent(IotOtaFirmwareDO::getName, pageReqVO.getName())
+                .eqIfPresent(IotOtaFirmwareDO::getProductId, pageReqVO.getProductId())
+                .orderByDesc(IotOtaFirmwareDO::getCreateTime));
     }
 
 }

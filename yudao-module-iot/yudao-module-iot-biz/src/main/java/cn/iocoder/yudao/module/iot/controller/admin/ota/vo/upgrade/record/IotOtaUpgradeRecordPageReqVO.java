@@ -11,6 +11,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 @Schema(description = "管理后台 - OTA升级记录分页 Request VO")
 public class IotOtaUpgradeRecordPageReqVO extends PageParam {
 
+    // TODO @li：使用 IotOtaUpgradeRecordStatusEnum 枚举哈
     /**
      * 待处理状态
      */

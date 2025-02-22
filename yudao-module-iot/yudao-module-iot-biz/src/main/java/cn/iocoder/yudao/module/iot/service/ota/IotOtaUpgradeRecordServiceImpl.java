@@ -7,8 +7,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.record.IotOta
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaUpgradeRecordDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.ota.IotOtaUpgradeRecordMapper;
 import cn.iocoder.yudao.module.iot.enums.ota.IotOtaUpgradeRecordStatusEnum;
-import cn.iocoder.yudao.module.iot.service.ota.bo.upgrade.record.IotOtaUpgradeRecordCreateReqBO;
-import cn.iocoder.yudao.module.iot.service.ota.bo.upgrade.record.IotOtaUpgradeRecordUpdateReqBO;
+import cn.iocoder.yudao.module.iot.service.ota.bo.IotOtaUpgradeRecordCreateReqBO;
+import cn.iocoder.yudao.module.iot.service.ota.bo.IotOtaUpgradeRecordUpdateReqBO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,21 +30,22 @@ public class IotOtaUpgradeRecordServiceImpl implements IotOtaUpgradeRecordServic
     private IotOtaUpgradeRecordMapper upgradeRecordMapper;
 
     @Override
-    public void createUpgradeRecordBatch(List<IotOtaUpgradeRecordCreateReqBO> saveList) {
+    public void createUpgradeRecordBatch(List<IotOtaUpgradeRecordCreateReqBO> createList) {
         // 1. 批量校验参数信息
-        saveList.forEach(saveBO -> validateUpgradeRecordDuplicate(saveBO.getFirmwareId(), saveBO.getTaskId(), saveBO.getDeviceId()));
-        // 2.将数据转化成数据库存储的格式
-        List<IotOtaUpgradeRecordDO> upgradeRecords = BeanUtils.toBean(saveList, IotOtaUpgradeRecordDO.class);
-        // 3.将数据批量存储到数据库里
+        createList.forEach(saveBO -> validateUpgradeRecordDuplicate(saveBO.getFirmwareId(), saveBO.getTaskId(), saveBO.getDeviceId()));
+
+        // 2. 将数据批量存储到数据库里
+        List<IotOtaUpgradeRecordDO> upgradeRecords = BeanUtils.toBean(createList, IotOtaUpgradeRecordDO.class);
         upgradeRecordMapper.insertBatch(upgradeRecords);
     }
 
     @Override
     @Transactional
     public void updateUpgradeRecord(IotOtaUpgradeRecordUpdateReqBO updateReqBO) {
-        // 1.校验升级记录信息是否存在
+        // 1. 校验升级记录信息是否存在
         validateUpgradeRecordExists(updateReqBO.getId());
-        // 2.将数据转化成数据库存储的格式
+
+        // 2. 将数据转化成数据库存储的格式
         IotOtaUpgradeRecordDO updateRecord = BeanUtils.toBean(updateReqBO, IotOtaUpgradeRecordDO.class);
         upgradeRecordMapper.updateById(updateRecord);
         // TODO @芋艿: 更新升级记录触发的其他Action
@@ -61,6 +62,7 @@ public class IotOtaUpgradeRecordServiceImpl implements IotOtaUpgradeRecordServic
     @Transactional
     public Map<Integer, Long> getOtaUpgradeRecordCount(IotOtaUpgradeRecordPageReqVO pageReqVO) {
         // 分别查询不同状态的OTA升级记录数量
+        // TODO @li: 通过 groupby 统计下；
         Long pending = upgradeRecordMapper.getOtaUpgradeRecordCount(pageReqVO.getTaskId(), pageReqVO.getDeviceName(), IotOtaUpgradeRecordStatusEnum.PENDING.getStatus());
         Long pushed = upgradeRecordMapper.getOtaUpgradeRecordCount(pageReqVO.getTaskId(), pageReqVO.getDeviceName(), IotOtaUpgradeRecordStatusEnum.PUSHED.getStatus());
         Long upgrading = upgradeRecordMapper.getOtaUpgradeRecordCount(pageReqVO.getTaskId(), pageReqVO.getDeviceName(), IotOtaUpgradeRecordStatusEnum.UPGRADING.getStatus());
@@ -68,6 +70,7 @@ public class IotOtaUpgradeRecordServiceImpl implements IotOtaUpgradeRecordServic
         Long failure = upgradeRecordMapper.getOtaUpgradeRecordCount(pageReqVO.getTaskId(), pageReqVO.getDeviceName(), IotOtaUpgradeRecordStatusEnum.FAILURE.getStatus());
         Long canceled = upgradeRecordMapper.getOtaUpgradeRecordCount(pageReqVO.getTaskId(), pageReqVO.getDeviceName(), IotOtaUpgradeRecordStatusEnum.CANCELED.getStatus());
         // 将各状态的数量封装到Map中返回
+        // TODO @li：使用 MapUtil，因为 Map.of 是 jdk9 才有，后续不好同步到 master 的 jdk8；
         return Map.of(IotOtaUpgradeRecordPageReqVO.PENDING, pending,
                 IotOtaUpgradeRecordPageReqVO.PUSHED, pushed,
                 IotOtaUpgradeRecordPageReqVO.UPGRADING, upgrading,
@@ -87,6 +90,7 @@ public class IotOtaUpgradeRecordServiceImpl implements IotOtaUpgradeRecordServic
     @Transactional
     public Map<Integer, Long> getOtaUpgradeRecordStatistics(Long firmwareId) {
         // 查询并统计不同状态的OTA升级记录数量
+        // TODO @li: 通过 groupby 统计下；
         Long pending = upgradeRecordMapper.getOtaUpgradeRecordStatistics(firmwareId, IotOtaUpgradeRecordStatusEnum.PENDING.getStatus());
         Long pushed = upgradeRecordMapper.getOtaUpgradeRecordStatistics(firmwareId, IotOtaUpgradeRecordStatusEnum.PUSHED.getStatus());
         Long upgrading = upgradeRecordMapper.getOtaUpgradeRecordStatistics(firmwareId, IotOtaUpgradeRecordStatusEnum.UPGRADING.getStatus());
@@ -108,6 +112,7 @@ public class IotOtaUpgradeRecordServiceImpl implements IotOtaUpgradeRecordServic
         IotOtaUpgradeRecordDO upgradeRecord = validateUpgradeRecordExists(id);
         // 1.2.校验升级记录是否可以重新升级
         validateUpgradeRecordCanRetry(upgradeRecord);
+
         // 2.将一些数据重置，这样定时任务轮询就可以重启任务
         upgradeRecordMapper.updateById(new IotOtaUpgradeRecordDO()
                 .setId(upgradeRecord.getId()).setProgress(0)

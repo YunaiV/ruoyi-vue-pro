@@ -7,10 +7,13 @@ import lombok.Data;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
-@Data
+// TODO @li：中英文之间，有个空格。中文写作习惯哈。
 @Schema(description = "管理后台 - OTA固件创建 Request VO")
+@Data
 public class IotOtaFirmwareCreateReqVO extends IotOtaFirmwareCommonReqVO {
 
+    // TODO @li：因为有了注解，注释可以不写哈
+    // TODO @li：swagger 注解，写在 validator 注解之前，保持项目统一哈。
     /**
      * 版本号
      */
@@ -27,6 +30,7 @@ public class IotOtaFirmwareCreateReqVO extends IotOtaFirmwareCommonReqVO {
     @Schema(description = "产品编号", requiredMode = REQUIRED, example = "1024")
     private String productId;
 
+    // TODO @li：productId 即可，而 productKey 通过 productId 查询
     /**
      * 产品标识
      * <p>
@@ -43,6 +47,8 @@ public class IotOtaFirmwareCreateReqVO extends IotOtaFirmwareCommonReqVO {
      */
     @Schema(description = "签名方式", example = "MD5")
     private String signMethod;
+
+    // TODO @li：fileSign、fileSize 通过后端下载文件，计算出来。对前端屏蔽这个细节。
 
     /**
      * 固件文件签名

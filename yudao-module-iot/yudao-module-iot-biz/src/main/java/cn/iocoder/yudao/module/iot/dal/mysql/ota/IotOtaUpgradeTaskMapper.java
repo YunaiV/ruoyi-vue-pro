@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
+// TODO @li：这里的注释，可以去掉哈，多了点点
 /**
  * IotOtaUpgradeTaskMapper 接口用于操作 IotOtaUpgradeTaskDO 数据库表。
  * 该接口继承自 BaseMapperX，提供了基本的数据库操作方法。
@@ -46,13 +47,11 @@ public interface IotOtaUpgradeTaskMapper extends BaseMapperX<IotOtaUpgradeTaskDO
      * <p>
      * 该函数通过传入的任务状态，查询数据库中符合条件的升级任务列表。
      *
-     * @param state 任务状态，用于筛选升级任务的状态值
+     * @param status 任务状态，用于筛选升级任务的状态值
      * @return 返回符合条件的升级任务列表，列表中的每个元素为 IotOtaUpgradeTaskDO 对象
      */
-    default List<IotOtaUpgradeTaskDO> selectUpgradeTaskByState(Integer state) {
-        // 使用 LambdaQueryWrapperX 构建查询条件，筛选出状态等于指定值的升级任务
-        return selectList(new LambdaQueryWrapperX<IotOtaUpgradeTaskDO>()
-                .eq(IotOtaUpgradeTaskDO::getStatus, state));
+    default List<IotOtaUpgradeTaskDO> selectUpgradeTaskByState(Integer status) {
+        return selectList(IotOtaUpgradeTaskDO::getStatus, status);
     }
 
 

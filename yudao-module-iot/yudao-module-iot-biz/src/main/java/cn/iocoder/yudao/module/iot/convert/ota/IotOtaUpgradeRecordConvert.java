@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaUpgradeTaskDO;
 import cn.iocoder.yudao.module.iot.enums.ota.IotOtaUpgradeRecordStatusEnum;
-import cn.iocoder.yudao.module.iot.service.ota.bo.upgrade.record.IotOtaUpgradeRecordCreateReqBO;
+import cn.iocoder.yudao.module.iot.service.ota.bo.IotOtaUpgradeRecordCreateReqBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -16,6 +16,7 @@ public interface IotOtaUpgradeRecordConvert {
 
     IotOtaUpgradeRecordConvert INSTANCE = Mappers.getMapper(IotOtaUpgradeRecordConvert.class);
 
+    // TODO @li：一般情况下，这种 convert 直接写 service 就好啦。不用特别写一个哈
     default List<IotOtaUpgradeRecordCreateReqBO> convertBOList(IotOtaUpgradeTaskDO upgradeTask, IotOtaFirmwareDO firmware, List<IotDeviceDO> deviceList) {
         return deviceList.stream().map(device -> {
             IotOtaUpgradeRecordCreateReqBO createReqBO = new IotOtaUpgradeRecordCreateReqBO();

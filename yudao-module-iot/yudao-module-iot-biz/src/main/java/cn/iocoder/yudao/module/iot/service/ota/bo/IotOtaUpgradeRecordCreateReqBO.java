@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.service.ota.bo.upgrade.record;
+package cn.iocoder.yudao.module.iot.service.ota.bo;
 
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;

@@ -29,18 +29,22 @@ public class IotOtaFirmwareServiceImpl implements IotOtaFirmwareService {
 
     @Override
     public Long createOtaFirmware(IotOtaFirmwareCreateReqVO saveReqVO) {
-        // 1.校验固件产品id+版本号不能重复
+        // 1. 校验固件产品 + 版本号不能重复
+        // TODO @li：需要考虑设备也存在
         validateProductAndVersionDuplicate(saveReqVO.getProductId(), saveReqVO.getVersion());
+
         // 2.转化数据格式，准备存储到数据库中
-        IotOtaFirmwareDO otaFirmware = BeanUtils.toBean(saveReqVO, IotOtaFirmwareDO.class);
-        otaFirmwareMapper.insert(otaFirmware);
-        return otaFirmware.getId();
+        IotOtaFirmwareDO firmware = BeanUtils.toBean(saveReqVO, IotOtaFirmwareDO.class);
+        otaFirmwareMapper.insert(firmware);
+        return firmware.getId();
     }
 
     @Override
     public void updateOtaFirmware(IotOtaFirmwareUpdateReqVO updateReqVO) {
+        // TODO @li：如果序号只有一个，直接写 1. 更好哈
         // 1.1. 校验存在
         validateFirmwareExists(updateReqVO.getId());
+
         // 2. 更新数据
         IotOtaFirmwareDO updateObj = BeanUtils.toBean(updateReqVO, IotOtaFirmwareDO.class);
         otaFirmwareMapper.updateById(updateObj);
@@ -58,11 +62,11 @@ public class IotOtaFirmwareServiceImpl implements IotOtaFirmwareService {
 
     @Override
     public IotOtaFirmwareDO validateFirmwareExists(Long id) {
-        IotOtaFirmwareDO otaFirmware = otaFirmwareMapper.selectById(id);
-        if (otaFirmware == null) {
+        IotOtaFirmwareDO firmware = otaFirmwareMapper.selectById(id);
+        if (firmware == null) {
             throw exception(OTA_FIRMWARE_NOT_EXISTS);
         }
-        return otaFirmware;
+        return firmware;
     }
 
     /**
@@ -80,6 +84,7 @@ public class IotOtaFirmwareServiceImpl implements IotOtaFirmwareService {
         // 查询数据库中是否存在具有相同产品ID和版本号的固件信息
         List<IotOtaFirmwareDO> list = otaFirmwareMapper.selectByProductIdAndVersion(productId, version);
         // 如果查询结果非空且不为null，则抛出异常，提示固件信息已存在
+        // TODO @li：使用 isNotEmpty 这种 方法，简化
         if (Objects.nonNull(list) && !list.isEmpty()) {
             throw exception(OTA_FIRMWARE_PRODUCT_VERSION_DUPLICATE);
         }

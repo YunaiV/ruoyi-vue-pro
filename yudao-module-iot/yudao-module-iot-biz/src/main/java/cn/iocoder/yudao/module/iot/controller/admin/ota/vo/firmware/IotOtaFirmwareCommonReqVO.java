@@ -6,6 +6,7 @@ import lombok.Data;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
+// TODO @li：因为 create 和 update 可以公用的字段比较少，建议不用 IotOtaFirmwareCommonReqVO
 @Data
 @Schema(description = "管理后台 - OTA固件信息 Request VO")
 public class IotOtaFirmwareCommonReqVO {

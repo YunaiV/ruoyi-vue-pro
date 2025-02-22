@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.iot.dal.mysql.ota.IotOtaUpgradeTaskMapper;
 import cn.iocoder.yudao.module.iot.enums.ota.IotOtaUpgradeTaskScopeEnum;
 import cn.iocoder.yudao.module.iot.enums.ota.IotOtaUpgradeTaskStatusEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
-import cn.iocoder.yudao.module.iot.service.ota.bo.upgrade.record.IotOtaUpgradeRecordCreateReqBO;
+import cn.iocoder.yudao.module.iot.service.ota.bo.IotOtaUpgradeRecordCreateReqBO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -34,31 +34,37 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
 
     @Resource
     private IotOtaUpgradeTaskMapper upgradeTaskMapper;
-    @Lazy
+
     @Resource
+    @Lazy
     private IotDeviceService deviceService;
-    @Lazy
     @Resource
+    @Lazy
     private IotOtaFirmwareService firmwareService;
-    @Lazy
     @Resource
+    @Lazy
     private IotOtaUpgradeRecordService upgradeRecordService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createUpgradeTask(IotOtaUpgradeTaskSaveReqVO createReqVO) {
-        // 1.1.校验同一固件的升级任务名称不重复
+        // 1.1 校验同一固件的升级任务名称不重复
         validateFirmwareTaskDuplicate(createReqVO.getFirmwareId(), createReqVO.getName());
-        // 1.2.校验固件信息是否存在
+        // 1.2 校验固件信息是否存在
         IotOtaFirmwareDO firmware = firmwareService.validateFirmwareExists(createReqVO.getFirmwareId());
-        // 1.3.校验升级范围=2(指定设备时),deviceIds deviceNames不为空并且长度相等
+        // 1.3 校验升级范围=2(指定设备时),deviceIds deviceNames不为空并且长度相等
+        // TODO @li：deviceNames 应该后端查询
         validateScopeAndDevice(createReqVO.getScope(), createReqVO.getDeviceIds(), createReqVO.getDeviceNames());
-        // 2.初始化OTA升级任务信息
+        // TODO @li：如果全部范围，但是没设备可以升级，需要报错
+
+        // 2. 保存 OTA 升级任务信息到数据库
         IotOtaUpgradeTaskDO upgradeTask = initUpgradeTask(createReqVO, firmware.getProductId());
-        // 3.保存OTA升级任务信息到数据库
         upgradeTaskMapper.insert(upgradeTask);
-        // 4.生成设备升级记录信息并存储，等待定时任务轮询
-        List<IotOtaUpgradeRecordCreateReqBO> upgradeRecordList = initUpgradeRecordList(upgradeTask, firmware, createReqVO.getDeviceIds());
+
+        // 3. 生成设备升级记录信息并存储，等待定时任务轮询
+        List<IotOtaUpgradeRecordCreateReqBO> upgradeRecordList = initUpgradeRecordList(
+                upgradeTask, firmware, createReqVO.getDeviceIds());
+        // TODO @li：只需要传递 deviceIds、firewareId、剩余的 upgradeRecordService 里面自己处理；这样，后续 record 加字段，都不需要透传太多；解耦
         upgradeRecordService.createUpgradeRecordBatch(upgradeRecordList);
         // TODO @芋艿: 创建任务触发的其他Action
         return upgradeTask.getId();
@@ -67,15 +73,17 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void cancelUpgradeTask(Long id) {
-        // 1.1.校验升级任务是否存在
+        // 1.1 校验升级任务是否存在
         IotOtaUpgradeTaskDO upgradeTask = validateUpgradeTaskExists(id);
-        // 1.2.校验升级任务是否可以取消
+        // 1.2 校验升级任务是否可以取消
+        // TODO @li：这种一次性的，可以不考虑拆分方法
         validateUpgradeTaskCanCancel(upgradeTask);
-        // 2.更新OTA升级任务状态为已取消
+
+        // 2. 更新 OTA 升级任务状态为已取消
         upgradeTaskMapper.updateById(IotOtaUpgradeTaskDO.builder()
                 .id(id).status(IotOtaUpgradeTaskStatusEnum.CANCELED.getStatus())
                 .build());
-        // 3.更新OTA升级记录状态为已取消
+        // 3. 更新 OTA 升级记录状态为已取消
         upgradeRecordService.cancelUpgradeRecordByTaskId(id);
         // TODO @芋艿: 取消任务触发的其他Action
     }
@@ -176,6 +184,7 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
         }
     }
 
+    // TODO @li：一次性，不复用的，可以直接写在对应的逻辑里；
     /**
      * 初始化升级任务
      * <p>
@@ -189,6 +198,7 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
     private IotOtaUpgradeTaskDO initUpgradeTask(IotOtaUpgradeTaskSaveReqVO createReqVO, String productId) {
         // 配置各项参数
         IotOtaUpgradeTaskDO upgradeTask = IotOtaUpgradeTaskDO.builder()
+                // TODO @li：不用每个占一行。最好相同类型的，放在一行里；
                 .name(createReqVO.getName())
                 .description(createReqVO.getDescription())
                 .firmwareId(createReqVO.getFirmwareId())
@@ -219,7 +229,10 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
      * @param deviceIds   设备ID列表，仅在升级任务范围为选择设备时使用
      * @return 升级记录请求对象列表，包含每个设备的升级记录信息
      */
-    private List<IotOtaUpgradeRecordCreateReqBO> initUpgradeRecordList(IotOtaUpgradeTaskDO upgradeTask, IotOtaFirmwareDO firmware, List<Long> deviceIds) {
+    private List<IotOtaUpgradeRecordCreateReqBO> initUpgradeRecordList(
+            IotOtaUpgradeTaskDO upgradeTask, IotOtaFirmwareDO firmware, List<Long> deviceIds) {
+        // TODO @li：需要考虑，如果创建多个任务，相互之间不能重复；
+        // 1）指定设备的时候，进行校验；2）如果是全部，则过滤其它已经发起的；；；；；另外，需要排除掉 cancel 的哈。因为 cancal 之后，还可以发起
         // 根据升级任务的范围确定设备列表
         List<IotDeviceDO> deviceList;
         if (Objects.equals(upgradeTask.getScope(), IotOtaUpgradeTaskScopeEnum.SELECT.getScope())) {

@@ -12,8 +12,9 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+// TODO @li：这里的注释，可以去掉哈，多了点点
 /**
- * OTA升级记录 Mapper 接口
+ * OTA 升级记录 Mapper 接口
  */
 @Mapper
 public interface IotOtaUpgradeRecordMapper extends BaseMapperX<IotOtaUpgradeRecordDO> {
@@ -78,6 +79,7 @@ public interface IotOtaUpgradeRecordMapper extends BaseMapperX<IotOtaUpgradeReco
      */
     default void cancelUpgradeRecordByTaskId(Long taskId) {
         // 使用LambdaUpdateWrapper构建更新条件，将状态为“待处理”的记录更新为“已取消”
+        // TODO @li：哪些可以更新，通过 service 传递。mapper 尽量不要有逻辑
         update(new LambdaUpdateWrapper<IotOtaUpgradeRecordDO>()
                 .set(IotOtaUpgradeRecordDO::getStatus, IotOtaUpgradeRecordStatusEnum.CANCELED.getStatus())
                 .eq(IotOtaUpgradeRecordDO::getTaskId, taskId)

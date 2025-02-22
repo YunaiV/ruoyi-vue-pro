@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+// TODO @li：也不用通过 job 去统计。可以通过 record update status 后，主动去更新 task 的状态。
 @Slf4j
 @Component
 public class IotOtaUpgradeTaskJob implements JobHandler {
