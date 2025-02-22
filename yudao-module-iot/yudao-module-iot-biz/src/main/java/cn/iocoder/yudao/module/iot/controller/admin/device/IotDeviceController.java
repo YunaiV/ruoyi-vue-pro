@@ -177,6 +177,7 @@ public class IotDeviceController {
         return success(true);
     }
 
+    // TODO @haohao：是不是默认详情接口，不返回 secret，然后这个接口，用于统一返回。然后接口名可以更通用一点。
     @GetMapping("/mqtt-connection-params")
     @Operation(summary = "获取 MQTT 连接参数")
     @PreAuthorize("@ss.hasPermission('iot:device:mqtt-connection-params')")

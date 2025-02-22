@@ -280,6 +280,7 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
         sendDeviceMessage(message, device);
     }
 
+    // TODO @haohao：建议返回 boolean；
     @Override
     public Boolean authenticateEmqxConnection(IotDeviceEmqxAuthReqDTO authReqDTO) {
         log.info("[authenticateEmqxConnection][认证 Emqx 连接: {}]", authReqDTO);
@@ -303,6 +304,7 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
         String deviceSecret = device.getDeviceSecret();
         String clientId = authReqDTO.getClientId();
         MqttSignResult sign = MqttSignUtils.calculate(productKey, deviceName, deviceSecret, clientId);
+        // TODO @haohao：notEquals，尽量不走取反逻辑哈
         if (!StrUtil.equals(sign.getPassword(), authReqDTO.getPassword())) {
             log.error("[authenticateEmqxConnection][认证失败，密码不正确]");
             return Boolean.FALSE;

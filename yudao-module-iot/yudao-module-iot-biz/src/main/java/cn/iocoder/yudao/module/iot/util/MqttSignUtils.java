@@ -8,11 +8,14 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * MQTT 签名工具类
- * 提供静态方法来计算 MQTT 连接参数。
+ *
+ * 提供静态方法来计算 MQTT 连接参数
  */
 public class MqttSignUtils {
 
     private static final String SIGN_METHOD = "hmacsha256";
+
+    // TODO @haohao：calculate 方法，可以融合么？
 
     /**
      * 计算 MQTT 连接参数
@@ -25,11 +28,11 @@ public class MqttSignUtils {
     public static MqttSignResult calculate(String productKey, String deviceName, String deviceSecret) {
         String clientId = productKey + "." + deviceName;
         String username = deviceName + "&" + productKey;
+        // 生成 password
+        // TODO @haohao：signContent 和 signContentBuilder 风格保持统一的实现哈
         String signContent = String.format("clientId%sdeviceName%sdeviceSecret%sproductKey%s",
                 clientId, deviceName, deviceSecret, productKey);
-
         String password = sign(signContent, deviceSecret);
-
         return new MqttSignResult(clientId, username, password);
     }
 
@@ -54,6 +57,7 @@ public class MqttSignUtils {
         return new MqttSignResult(clientId, username, password);
     }
 
+    // TODO @haohao：hutool 貌似有工具类可以用哈。
     private static String sign(String content, String key) {
         try {
             Mac mac = Mac.getInstance(SIGN_METHOD);
@@ -81,7 +85,9 @@ public class MqttSignUtils {
      * MQTT 签名结果类
      */
     @Getter
+    // TODO @haohao：可以用 lombok 哈
     public static class MqttSignResult {
+
         private final String clientId;
         private final String username;
         private final String password;

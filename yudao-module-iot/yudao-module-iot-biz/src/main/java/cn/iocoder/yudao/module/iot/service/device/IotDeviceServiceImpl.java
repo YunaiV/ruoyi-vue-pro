@@ -123,9 +123,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     private void initDevice(IotDeviceDO device, IotProductDO product) {
         device.setProductId(product.getId()).setProductKey(product.getProductKey())
                 .setDeviceType(product.getDeviceType());
-        // 生成并设置必要的字段
-        // TODO @芋艿：各种 mqtt 是不是可以简化！
-        // clientId、username、password 根据规则实时生成
+        // 生成密钥
         device.setDeviceSecret(generateDeviceSecret());
         // 设置设备状态为未激活
         device.setState(IotDeviceStateEnum.INACTIVE.getState());
