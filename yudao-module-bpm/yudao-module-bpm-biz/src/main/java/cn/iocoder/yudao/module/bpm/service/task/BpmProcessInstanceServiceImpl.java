@@ -320,6 +320,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 遍历 tasks 列表，只处理已结束的 UserTask
         // 为什么不通过 activities 呢？因为，加签场景下，它只存在于 tasks，没有 activities，导致如果遍历 activities
         // 的话，它无法成为一个节点
+        // TODO @芋艿：子流程只有activity，这里获取不到已结束的子流程
         List<HistoricTaskInstance> endTasks = filterList(tasks, task -> task.getEndTime() != null);
         List<ActivityNode> approvalNodes = convertList(endTasks, task -> {
             FlowElement flowNode = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
@@ -390,7 +391,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             List<HistoricTaskInstance> tasks) {
         // 构建运行中的任务，基于 activityId 分组
         List<HistoricActivityInstance> runActivities = filterList(activities, activity -> activity.getEndTime() == null
-                && (StrUtil.equalsAny(activity.getActivityType(), ELEMENT_TASK_USER)));
+                && (StrUtil.equalsAny(activity.getActivityType(), ELEMENT_TASK_USER, ELEMENT_CALL_ACTIVITY)));
         Map<String, List<HistoricActivityInstance>> runningTaskMap = convertMultiMap(runActivities,
                 HistoricActivityInstance::getActivityId);
 
@@ -404,7 +405,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             HistoricActivityInstance firstActivity = CollUtil.getFirst(taskActivities); // 取第一个任务，会签/或签的任务，开始时间相同
             ActivityNode activityNode = new ActivityNode().setId(firstActivity.getActivityId())
                     .setName(firstActivity.getActivityName())
-                    .setNodeType(ObjUtil.defaultIfNull(parseNodeType(flowNode), // 目的：解决“办理节点”的识别
+                    .setNodeType(ObjUtil.defaultIfNull(parseNodeType(flowNode), // 目的：解决“办理节点”和"子流程"的识别
                             BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType()))
                     .setStatus(BpmTaskStatusEnum.RUNNING.getStatus())
                     .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(flowNode))
@@ -413,6 +414,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             // 处理每个任务的 tasks 属性
             for (HistoricActivityInstance activity : taskActivities) {
                 HistoricTaskInstance task = taskMap.get(activity.getTaskId());
+                if (task == null) {
+                    continue;
+                }
                 activityNode.getTasks().add(BpmProcessInstanceConvert.INSTANCE.buildApprovalTaskInfo(task));
                 // 加签子任务，需要过滤掉已经完成的加签子任务
                 List<HistoricTaskInstance> childrenTasks = filterList(
@@ -501,6 +505,12 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             List<Long> candidateUserIds = getTaskCandidateUserList(bpmnModel, node.getId(),
                     startUserId, processDefinitionInfo.getProcessDefinitionId(), processVariables);
             activityNode.setCandidateUserIds(candidateUserIds);
+            return activityNode;
+        }
+
+        // 4. 子流程节点
+        if (BpmSimpleModelNodeTypeEnum.CHILD_PROCESS.getType().equals(node.getType()) ||
+                BpmSimpleModelNodeTypeEnum.ASYNC_CHILD_PROCESS.getType().equals(node.getType())) {
             return activityNode;
         }
         return null;
