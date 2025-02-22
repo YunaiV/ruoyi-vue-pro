@@ -121,6 +121,10 @@ public class CouponServiceImpl implements CouponService {
     @Transactional(rollbackFor = Exception.class)
     public Map<Long, List<Long>> takeCoupon(Long templateId, Set<Long> userIds, CouponTakeTypeEnum takeType) {
         CouponTemplateDO template = couponTemplateService.getCouponTemplate(templateId);
+        return takeCoupon(template, userIds, takeType);
+    }
+
+    private Map<Long, List<Long>> takeCoupon(CouponTemplateDO template, Set<Long> userIds, CouponTakeTypeEnum takeType) {
         // 1. 过滤掉达到领取限制的用户
         removeTakeLimitUser(userIds, template);
         // 2. 校验优惠劵是否可以领取
@@ -131,7 +135,7 @@ public class CouponServiceImpl implements CouponService {
         couponMapper.insertBatch(couponList);
 
         // 4. 增加优惠劵模板的领取数量
-        couponTemplateService.updateCouponTemplateTakeCount(templateId, userIds.size());
+        couponTemplateService.updateCouponTemplateTakeCount(template.getId(), userIds.size());
 
         return convertMultiMap(couponList, CouponDO::getUserId, CouponDO::getId);
     }
@@ -208,7 +212,7 @@ public class CouponServiceImpl implements CouponService {
     public void takeCouponByRegister(Long userId) {
         List<CouponTemplateDO> templates = couponTemplateService.getCouponTemplateListByTakeType(CouponTakeTypeEnum.REGISTER);
         for (CouponTemplateDO template : templates) {
-            takeCoupon(template.getId(), CollUtil.newHashSet(userId), CouponTakeTypeEnum.REGISTER);
+            takeCoupon(template, CollUtil.newHashSet(userId), CouponTakeTypeEnum.REGISTER);
         }
     }
 
