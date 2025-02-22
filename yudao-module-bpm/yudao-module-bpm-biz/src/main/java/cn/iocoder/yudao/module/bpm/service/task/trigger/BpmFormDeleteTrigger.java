@@ -43,10 +43,10 @@ public class BpmFormDeleteTrigger implements BpmTrigger {
             return;
         }
 
-        // 2.获取流程变量
+        // 2. 获取流程变量
         Map<String, Object> processVariables = processInstanceService.getProcessInstance(processInstanceId).getProcessVariables();
 
-        // 3.获取需要删除的表单字段
+        // 3.1 获取需要删除的表单字段
         Set<String> deleteFields = new HashSet<>();
         settings.forEach(setting -> {
             if (CollUtil.isEmpty(setting.getDeleteFields())) {
@@ -64,7 +64,7 @@ public class BpmFormDeleteTrigger implements BpmTrigger {
             }
         });
 
-        // 4. 删除流程变量
+        // 3.2 删除流程变量
         if (CollUtil.isNotEmpty(deleteFields)) {
             processInstanceService.removeProcessInstanceVariables(processInstanceId, deleteFields);
         }

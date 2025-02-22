@@ -790,8 +790,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     }
 
     @Override
-    public void removeProcessInstanceVariables(String processInstanceId, Collection<String> variableNames) {
-        runtimeService.removeVariables(processInstanceId, variableNames);
+    public void removeProcessInstanceVariables(String id, Collection<String> variableNames) {
+        runtimeService.removeVariables(id, variableNames);
     }
 
     // ========== Event 事件相关方法 ==========

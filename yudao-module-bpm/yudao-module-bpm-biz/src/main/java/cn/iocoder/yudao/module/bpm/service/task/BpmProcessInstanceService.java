@@ -160,10 +160,10 @@ public interface BpmProcessInstanceService {
     /**
      * 删除 ProcessInstance 的变量
      *
-     * @param processInstanceId  流程编号
+     * @param id  流程编号
      * @param variableNames 流程变量名
      */
-    void removeProcessInstanceVariables(String processInstanceId, Collection<String> variableNames);
+    void removeProcessInstanceVariables(String id, Collection<String> variableNames);
 
     // ========== Event 事件相关方法 ==========
 
