@@ -1214,7 +1214,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     }
                 }
 
-                // 发起人节点
+                // 获取发起人节点
                 BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(processInstance.getProcessDefinitionId());
                 if (bpmnModel == null) {
                     log.error("[processTaskAssigned][taskId({}) 没有找到流程模型]", task.getId());
@@ -1227,16 +1227,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                         String.format(PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, task.getTaskDefinitionKey()), Boolean.class);
                 Boolean skipStartUserNodeFlag = Convert.toBool(runtimeService.getVariable(processInstance.getProcessInstanceId(),
                         PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE, String.class));
-                if (userTaskElement.getId().equals(START_USER_NODE_ID) &&
-                        (skipStartUserNodeFlag == null || Boolean.TRUE.equals(skipStartUserNodeFlag)) &&
-                        !Boolean.TRUE.equals(returnTaskFlag)) {
+                if (userTaskElement.getId().equals(START_USER_NODE_ID)
+                        && (skipStartUserNodeFlag == null // 目的：一般是“主流程”，发起人节点，自动通过审核
+                            || Boolean.TRUE.equals(skipStartUserNodeFlag)) // 目的：一般是“子流程”，发起人节点，按配置自动通过审核
+                        && !Boolean.TRUE.equals(returnTaskFlag)) { // TODO @lesan：ObjUtil.notEqual(returnTaskFlag, Boolean.TRUE) 改成这个有问题么？尽量不用 ! 取反
                     getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                             .setReason(BpmReasonEnum.ASSIGN_START_USER_APPROVE_WHEN_SKIP_START_USER_NODE.getReason()));
                     return;
                 }
                 // 当不为发起人节点时，审批人与提交人为同一人时，根据 BpmUserTaskAssignStartUserHandlerTypeEnum 策略进行处理
-                if (!userTaskElement.getId().equals(START_USER_NODE_ID) &&
-                        StrUtil.equals(task.getAssignee(), processInstance.getStartUserId())) {
+                if (ObjectUtil.notEqual(userTaskElement.getId(), START_USER_NODE_ID)
+                        && StrUtil.equals(task.getAssignee(), processInstance.getStartUserId())) {
                     if (ObjUtil.notEqual(returnTaskFlag, Boolean.TRUE)) {
                         Integer assignStartUserHandlerType = BpmnModelUtils.parseAssignStartUserHandlerType(userTaskElement);
 

@@ -11,8 +11,11 @@ import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.B
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmCopyTaskDelegate;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmTriggerTaskDelegate;
+import cn.iocoder.yudao.module.bpm.service.task.listener.BpmCallActivityListener;
+import cn.iocoder.yudao.module.bpm.service.task.listener.BpmUserTaskListener;
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.Process;
@@ -24,10 +27,7 @@ import org.springframework.util.MultiValueMap;
 import java.util.*;
 
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
-import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE;
-import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.*;
-import static cn.iocoder.yudao.module.bpm.service.task.listener.BpmUserTaskListener.DELEGATE_EXPRESSION;
 import static java.util.Arrays.asList;
 
 /**
@@ -462,7 +462,7 @@ public class SimpleModelUtils {
                 FlowableListener flowableListener = new FlowableListener();
                 flowableListener.setEvent(TaskListener.EVENTNAME_CREATE);
                 flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
-                flowableListener.setImplementation(DELEGATE_EXPRESSION);
+                flowableListener.setImplementation(BpmUserTaskListener.DELEGATE_EXPRESSION);
                 addListenerConfig(flowableListener, node.getTaskCreateListener());
                 flowableListeners.add(flowableListener);
             }
@@ -471,7 +471,7 @@ public class SimpleModelUtils {
                 FlowableListener flowableListener = new FlowableListener();
                 flowableListener.setEvent(TaskListener.EVENTNAME_ASSIGNMENT);
                 flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
-                flowableListener.setImplementation(DELEGATE_EXPRESSION);
+                flowableListener.setImplementation(BpmUserTaskListener.DELEGATE_EXPRESSION);
                 addListenerConfig(flowableListener, node.getTaskAssignListener());
                 flowableListeners.add(flowableListener);
             }
@@ -480,7 +480,7 @@ public class SimpleModelUtils {
                 FlowableListener flowableListener = new FlowableListener();
                 flowableListener.setEvent(TaskListener.EVENTNAME_COMPLETE);
                 flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
-                flowableListener.setImplementation(DELEGATE_EXPRESSION);
+                flowableListener.setImplementation(BpmUserTaskListener.DELEGATE_EXPRESSION);
                 addListenerConfig(flowableListener, node.getTaskCompleteListener());
                 flowableListeners.add(flowableListener);
             }
@@ -788,48 +788,56 @@ public class SimpleModelUtils {
             CallActivity callActivity = new CallActivity();
             callActivity.setId(node.getId());
             callActivity.setName(node.getName());
-            callActivity.setCalledElementType("key");
+            callActivity.setCalledElementType("key"); // TODO @lesan：这里为啥是 key 哈？
             // 1. 是否异步
             callActivity.setAsynchronous(node.getChildProcessSetting().getAsync());
+
             // 2. 调用的子流程
             callActivity.setCalledElement(childProcessSetting.getCalledElement());
             callActivity.setProcessInstanceName(childProcessSetting.getCalledElementName());
+
             // 3. 是否自动跳过子流程发起节点
+            // TODO @lesan：貌似只有 SourceExpression 的区别，直接通过 valueOf childProcessSetting.getSkipStartUserNode()？？？
             if (Boolean.TRUE.equals(childProcessSetting.getSkipStartUserNode())) {
                 IOParameter ioParameter = new IOParameter();
                 ioParameter.setSourceExpression("true");
-                ioParameter.setTarget(PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE);
+                ioParameter.setTarget(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE);
                 inVariable.add(ioParameter);
             } else {
                 IOParameter ioParameter = new IOParameter();
                 ioParameter.setSourceExpression("false");
-                ioParameter.setTarget(PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE);
+                ioParameter.setTarget(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE);
                 inVariable.add(ioParameter);
             }
+
             // 4. 主→子变量传递
-            // 默认需要传递的一些变量
-            // 4.1 流程状态
+            // 4.1 【默认需要传递的一些变量】流程状态
+            // TODO @lesan：4.1 这个要不，单独一个序号，类似 3. 这个。然后下面，就是把 主→子变量传递、子→主变量传递；这样逻辑连贯点哈
             IOParameter ioParameter = new IOParameter();
-            ioParameter.setSource(PROCESS_INSTANCE_VARIABLE_STATUS);
-            ioParameter.setTarget(PROCESS_INSTANCE_VARIABLE_STATUS);
+            ioParameter.setSource(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS);
+            ioParameter.setTarget(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS);
             inVariable.add(ioParameter);
             callActivity.setInParameters(inVariable);
+
             // 5. 子→主变量传递
+            // TODO @lesan：通过 isNotEmpty 这种哈
             if (childProcessSetting.getOutVariable() != null && !childProcessSetting.getOutVariable().isEmpty()) {
                 callActivity.setOutParameters(childProcessSetting.getOutVariable());
             }
+
             // 6. 子流程发起人配置
             List<FlowableListener> executionListeners = new ArrayList<>();
             FlowableListener flowableListener = new FlowableListener();
             flowableListener.setEvent(ExecutionListener.EVENTNAME_START);
             flowableListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
-            flowableListener.setImplementation("${bpmCallActivityListener}");
+            flowableListener.setImplementation(BpmCallActivityListener.DELEGATE_EXPRESSION);
             FieldExtension fieldExtension = new FieldExtension();
             fieldExtension.setFieldName("listenerConfig");
             fieldExtension.setStringValue(JsonUtils.toJsonString(childProcessSetting.getStartUserSetting()));
             flowableListener.getFieldExtensions().add(fieldExtension);
             executionListeners.add(flowableListener);
             callActivity.setExecutionListeners(executionListeners);
+
             // 添加节点类型
             addNodeType(node.getType(), callActivity);
             return callActivity;

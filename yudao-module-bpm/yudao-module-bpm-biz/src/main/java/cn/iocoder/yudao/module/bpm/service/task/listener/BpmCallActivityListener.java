@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.bpm.service.task.listener;
 
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -22,7 +21,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * BPM 子流程监听器
+ * BPM 子流程监听器：设置流程的发起人
  *
  * @author Lesan
  */
@@ -42,46 +41,50 @@ public class BpmCallActivityListener implements ExecutionListener {
     public void notify(DelegateExecution execution) {
         String expressionText = listenerConfig.getExpressionText();
         Assert.notNull(expressionText, "监听器扩展字段({})不能为空", expressionText);
-        BpmSimpleModelNodeVO.ChildProcessSetting.StartUserSetting startUserSetting = JsonUtils.parseObject(expressionText, BpmSimpleModelNodeVO.ChildProcessSetting.StartUserSetting.class);
-        // 1. 当发起人来源为表单时
-        if (startUserSetting != null &&
-                startUserSetting.getType().equals(BpmChildProcessStartUserTypeEnum.FROM_FORM.getType())) {
+        BpmSimpleModelNodeVO.ChildProcessSetting.StartUserSetting startUserSetting = JsonUtils.parseObject(
+                expressionText, BpmSimpleModelNodeVO.ChildProcessSetting.StartUserSetting.class);
+
+        // 1. 当发起人来源为主流程发起人时，并兜底 startUserSetting 为空时
+        if (startUserSetting == null
+                || startUserSetting.getType().equals(BpmChildProcessStartUserTypeEnum.MAIN_PROCESS_START_USER.getType())) {
             ExecutionEntity parent = (ExecutionEntity) execution.getParent();
-            String formField = parent.getVariable(startUserSetting.getFormField(), String.class);
-            // 1.1 当表单值为空时
-            if (StrUtil.isEmpty(formField)) {
-                // 1.1.1 来自主流程发起人
-                if (startUserSetting.getEmptyHandleType().equals(BpmChildProcessStartUserEmptyTypeEnum.MAIN_PROCESS_START_USER.getType())){
+            FlowableUtils.setAuthenticatedUserId(Long.parseLong(parent.getStartUserId()));
+            return;
+        }
+
+        // 2. 当发起人来源为表单时
+        if (startUserSetting.getType().equals(BpmChildProcessStartUserTypeEnum.FROM_FORM.getType())) {
+            ExecutionEntity parent = (ExecutionEntity) execution.getParent();
+            String formFieldValue = parent.getVariable(startUserSetting.getFormField(), String.class);
+            // 2.1 当表单值为空时
+            if (StrUtil.isEmpty(formFieldValue)) {
+                // 2.1.1 来自主流程发起人
+                if (startUserSetting.getEmptyHandleType().equals(BpmChildProcessStartUserEmptyTypeEnum.MAIN_PROCESS_START_USER.getType())) {
                     FlowableUtils.setAuthenticatedUserId(Long.parseLong(parent.getStartUserId()));
                     return;
                 }
-                // 1.1.2 来自子流程管理员
-                if (startUserSetting.getEmptyHandleType().equals(BpmChildProcessStartUserEmptyTypeEnum.CHILD_PROCESS_ADMIN.getType())){
+                // 2.1.2 来自子流程管理员
+                if (startUserSetting.getEmptyHandleType().equals(BpmChildProcessStartUserEmptyTypeEnum.CHILD_PROCESS_ADMIN.getType())) {
                     BpmProcessDefinitionInfoDO processDefinition = processDefinitionService.getProcessDefinitionInfo(execution.getProcessDefinitionId());
                     List<Long> managerUserIds = processDefinition.getManagerUserIds();
-                    FlowableUtils.setAuthenticatedUserId(Convert.toLong(managerUserIds.get(0)));
+                    FlowableUtils.setAuthenticatedUserId(managerUserIds.get(0));
                     return;
                 }
-                // 1.1.3 来自主流程管理员
-                if (startUserSetting.getEmptyHandleType().equals(BpmChildProcessStartUserEmptyTypeEnum.MAIN_PROCESS_ADMIN.getType())){
+                // 2.1.3 来自主流程管理员
+                if (startUserSetting.getEmptyHandleType().equals(BpmChildProcessStartUserEmptyTypeEnum.MAIN_PROCESS_ADMIN.getType())) {
                     BpmProcessDefinitionInfoDO processDefinition = processDefinitionService.getProcessDefinitionInfo(parent.getProcessDefinitionId());
                     List<Long> managerUserIds = processDefinition.getManagerUserIds();
-                    FlowableUtils.setAuthenticatedUserId(Convert.toLong(managerUserIds.get(0)));
+                    FlowableUtils.setAuthenticatedUserId(managerUserIds.get(0));
                     return;
                 }
             }
-            // 1.2 使用表单值，并兜底字符串转Long失败时使用主流程发起人
+            // 2.2 使用表单值，并兜底字符串转 Long 失败时使用主流程发起人
             try {
-                FlowableUtils.setAuthenticatedUserId(Long.parseLong(formField));
+                FlowableUtils.setAuthenticatedUserId(Long.parseLong(formFieldValue));
             } catch (Exception e) {
+                // todo @lesan：打个日志，方便排查
                 FlowableUtils.setAuthenticatedUserId(Long.parseLong(parent.getStartUserId()));
             }
-        }
-        // 2. 当发起人来源为主流程发起人时，并兜底startUserSetting为空时
-        if (startUserSetting == null ||
-                startUserSetting.getType().equals(BpmChildProcessStartUserTypeEnum.MAIN_PROCESS_START_USER.getType())) {
-            ExecutionEntity parent = (ExecutionEntity) execution.getParent();
-            FlowableUtils.setAuthenticatedUserId(Long.parseLong(parent.getStartUserId()));
         }
     }
 

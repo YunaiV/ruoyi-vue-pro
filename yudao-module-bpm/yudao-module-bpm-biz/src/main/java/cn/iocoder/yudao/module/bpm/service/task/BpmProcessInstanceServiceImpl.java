@@ -320,7 +320,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 遍历 tasks 列表，只处理已结束的 UserTask
         // 为什么不通过 activities 呢？因为，加签场景下，它只存在于 tasks，没有 activities，导致如果遍历 activities
         // 的话，它无法成为一个节点
-        // TODO @芋艿：子流程只有activity，这里获取不到已结束的子流程
+        // TODO @芋艿：子流程只有activity，这里获取不到已结束的子流程；TODO @lesan：这个会有啥影响？微信聊？
         List<HistoricTaskInstance> endTasks = filterList(tasks, task -> task.getEndTime() != null);
         List<ActivityNode> approvalNodes = convertList(endTasks, task -> {
             FlowElement flowNode = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
@@ -389,7 +389,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             Map<String, Object> processVariables,
             List<HistoricActivityInstance> activities,
             List<HistoricTaskInstance> tasks) {
-        // 构建运行中的任务，基于 activityId 分组
+        // 构建运行中的任务、子流程，基于 activityId 分组
         List<HistoricActivityInstance> runActivities = filterList(activities, activity -> activity.getEndTime() == null
                 && (StrUtil.equalsAny(activity.getActivityType(), ELEMENT_TASK_USER, ELEMENT_CALL_ACTIVITY)));
         Map<String, List<HistoricActivityInstance>> runningTaskMap = convertMultiMap(runActivities,
@@ -414,6 +414,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             // 处理每个任务的 tasks 属性
             for (HistoricActivityInstance activity : taskActivities) {
                 HistoricTaskInstance task = taskMap.get(activity.getTaskId());
+                // TODO @lesan：这里为啥 continue 哈？
                 if (task == null) {
                     continue;
                 }
