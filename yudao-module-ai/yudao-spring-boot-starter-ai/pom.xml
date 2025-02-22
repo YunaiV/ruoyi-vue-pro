@@ -67,6 +67,12 @@
                     <artifactId>spring-cloud-function-core</artifactId>
                     <groupId>org.springframework.cloud</groupId>
                 </exclusion>
+                <!-- swagger-annotations 2.2.20会导致Schema解析方法错误 -->
+                <!-- https://github.com/spring-projects/spring-ai/pull/2024/commits/7315b8a09f1e7f3a86d480e0d81bffa45b3238ff -->
+                <exclusion>
+                    <groupId>io.swagger.core.v3</groupId>
+                    <artifactId>swagger-annotations</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
