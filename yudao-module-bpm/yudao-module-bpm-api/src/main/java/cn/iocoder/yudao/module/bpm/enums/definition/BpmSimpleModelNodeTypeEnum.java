@@ -30,6 +30,9 @@ public enum BpmSimpleModelNodeTypeEnum implements ArrayValuable<Integer> {
     DELAY_TIMER_NODE(14, "延迟器", "receiveTask"),
     TRIGGER_NODE(15, "触发器", "serviceTask"),
 
+    CHILD_PROCESS(20, "子流程", "callActivity"), // TODO @lesan：CHILD_PROCESS、ASYNC_CHILD_PROCESS 可以合并为一个么？
+    ASYNC_CHILD_PROCESS(21, "异步子流程", "callActivity"),
+
     // 50 ~ 条件分支
     CONDITION_NODE(50, "条件", "sequenceFlow"), // 用于构建流转条件的表达式
     CONDITION_BRANCH_NODE(51, "条件分支", "exclusiveGateway"),

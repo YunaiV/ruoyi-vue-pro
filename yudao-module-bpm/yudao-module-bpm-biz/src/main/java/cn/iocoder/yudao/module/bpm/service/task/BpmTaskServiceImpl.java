@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.service.task;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.*;
 import cn.hutool.extra.spring.SpringUtil;
@@ -63,6 +64,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.START_USER_NODE_ID;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.*;
 
 /**
@@ -1212,19 +1214,31 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     }
                 }
 
-                // 审批人与提交人为同一人时，根据 BpmUserTaskAssignStartUserHandlerTypeEnum 策略进行处理
-                if (StrUtil.equals(task.getAssignee(), processInstance.getStartUserId())) {
-                    // 判断是否为退回或者驳回：如果是退回或者驳回不走这个策略
-                    // TODO 芋艿：【优化】未来有没更好的判断方式？！另外，还要考虑清理机制。就是说，下次处理了之后，就移除这个标识
-                    Boolean returnTaskFlag = runtimeService.getVariable(processInstance.getProcessInstanceId(),
-                            String.format(PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, task.getTaskDefinitionKey()), Boolean.class);
+                // 获取发起人节点
+                BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(processInstance.getProcessDefinitionId());
+                if (bpmnModel == null) {
+                    log.error("[processTaskAssigned][taskId({}) 没有找到流程模型]", task.getId());
+                    return;
+                }
+                FlowElement userTaskElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
+                // 判断是否为退回或者驳回：如果是退回或者驳回不走这个策略
+                // TODO 芋艿：【优化】未来有没更好的判断方式？！另外，还要考虑清理机制。就是说，下次处理了之后，就移除这个标识
+                Boolean returnTaskFlag = runtimeService.getVariable(processInstance.getProcessInstanceId(),
+                        String.format(PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, task.getTaskDefinitionKey()), Boolean.class);
+                Boolean skipStartUserNodeFlag = Convert.toBool(runtimeService.getVariable(processInstance.getProcessInstanceId(),
+                        PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE, String.class));
+                if (userTaskElement.getId().equals(START_USER_NODE_ID)
+                        && (skipStartUserNodeFlag == null // 目的：一般是“主流程”，发起人节点，自动通过审核
+                            || Boolean.TRUE.equals(skipStartUserNodeFlag)) // 目的：一般是“子流程”，发起人节点，按配置自动通过审核
+                        && !Boolean.TRUE.equals(returnTaskFlag)) { // TODO @lesan：ObjUtil.notEqual(returnTaskFlag, Boolean.TRUE) 改成这个有问题么？尽量不用 ! 取反
+                    getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
+                            .setReason(BpmReasonEnum.ASSIGN_START_USER_APPROVE_WHEN_SKIP_START_USER_NODE.getReason()));
+                    return;
+                }
+                // 当不为发起人节点时，审批人与提交人为同一人时，根据 BpmUserTaskAssignStartUserHandlerTypeEnum 策略进行处理
+                if (ObjectUtil.notEqual(userTaskElement.getId(), START_USER_NODE_ID)
+                        && StrUtil.equals(task.getAssignee(), processInstance.getStartUserId())) {
                     if (ObjUtil.notEqual(returnTaskFlag, Boolean.TRUE)) {
-                        BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(processInstance.getProcessDefinitionId());
-                        if (bpmnModel == null) {
-                            log.error("[processTaskAssigned][taskId({}) 没有找到流程模型]", task.getId());
-                            return;
-                        }
-                        FlowElement userTaskElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
                         Integer assignStartUserHandlerType = BpmnModelUtils.parseAssignStartUserHandlerType(userTaskElement);
 
                         // 情况一：自动跳过

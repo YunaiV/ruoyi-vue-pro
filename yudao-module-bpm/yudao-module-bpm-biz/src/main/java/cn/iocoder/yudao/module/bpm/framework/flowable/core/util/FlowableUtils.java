@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -24,7 +25,10 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.TaskInfo;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -240,7 +244,8 @@ public class FlowableUtils {
         return formFieldsMap.entrySet().stream()
                 .limit(3)
                 .map(entry -> new KeyValue<>(entry.getValue().getTitle(),
-                        processVariables.getOrDefault(entry.getValue().getField(), "").toString()))
+                        // TODO @lesan： MapUtil.getStr 可以更简单？
+                        StrUtil.toStringOrEmpty(processVariables.getOrDefault(entry.getValue().getField(), ""))))
                 .collect(Collectors.toList());
     }
 

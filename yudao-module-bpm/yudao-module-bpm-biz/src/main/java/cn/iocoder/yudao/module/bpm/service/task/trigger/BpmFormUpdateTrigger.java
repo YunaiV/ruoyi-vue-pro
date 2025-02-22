@@ -41,10 +41,10 @@ public class BpmFormUpdateTrigger implements BpmTrigger {
             return;
         }
 
-        // 2.获取流程变量
+        // 2. 获取流程变量
         Map<String, Object> processVariables = processInstanceService.getProcessInstance(processInstanceId).getProcessVariables();
 
-        // 3.更新流程变量
+        // 3. 更新流程变量
         for (FormTriggerSetting setting : settings) {
             if (CollUtil.isEmpty(setting.getUpdateFormFields())) {
                 continue;

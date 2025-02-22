@@ -52,6 +52,13 @@ public class BpmnVariableConstants {
     public static final String PROCESS_INSTANCE_SKIP_EXPRESSION_ENABLED = "_FLOWABLE_SKIP_EXPRESSION_ENABLED";
 
     /**
+     * 流程实例的变量 - 用于判断流程是否需要跳过发起人节点
+     *
+     * @see ProcessInstance#getProcessVariables()
+     */
+    public static final String PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE = "PROCESS_SKIP_START_USER_NODE";
+
+    /**
      * 流程实例的变量 - 流程开始时间
      *
      * 【非存储变量】用于部分需要 format 的场景，例如说：流程实例的自定义标题
