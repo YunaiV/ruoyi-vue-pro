@@ -277,11 +277,11 @@ public interface BpmTaskService {
     void processTaskTimeout(String processInstanceId, String taskDefineKey, Integer handlerType);
 
     /**
-     * 处理 延迟器 超时事件
+     * 触发 ReceiveTask, 让流程继续执行
      *
      * @param processInstanceId 流程示例编号
      * @param taskDefineKey     任务 Key
      */
-    void processDelayTimerTimeout(String processInstanceId, String taskDefineKey);
+    void triggerReceiveTask(String processInstanceId, String taskDefineKey);
 
 }

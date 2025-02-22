@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -122,6 +123,13 @@ public class BpmSimpleModelNodeVO {
      * 触发器节点设置
      */
     private TriggerSetting triggerSetting;
+
+    /**
+     * 附加节点 Id, 该节点不从前端传入。 由程序生成. 由于当个节点无法完成功能。 需要附加节点来完成。
+     */
+    @JsonIgnore
+    private String attachNodeId; // 目前用于异步触发器节点。需要 UserTask 和 ReceiveTask（附加节点) 来完成
+
 
     @Schema(description = "任务监听器")
     @Valid
@@ -378,6 +386,10 @@ public class BpmSimpleModelNodeVO {
             @Schema(description = "请求返回处理设置", example = "[]")
             private List<KeyValue<String, String>> response;
 
+            /**
+             * 异步 Http 请求，需要指定回调 Id，用于回调执行. 由后端指定
+             */
+            private String callbackId;
         }
 
         @Schema(description = "流程表单触发器设置", example = "{}")

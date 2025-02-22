@@ -1309,7 +1309,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public void processDelayTimerTimeout(String processInstanceId, String taskDefineKey) {
+    public void triggerReceiveTask(String processInstanceId, String taskDefineKey) {
         Execution execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstanceId)
                 .activityId(taskDefineKey)

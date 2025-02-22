@@ -20,4 +20,12 @@ public interface BpmProcessInstanceApi {
      */
     String createProcessInstance(Long userId, @Valid BpmProcessInstanceCreateReqDTO reqDTO);
 
+
+    /**
+     * 异步 HTTP 请求触发器回调, 为了唤醒流程继续执行
+     *
+     * @param processInstanceId 流程实例编号
+     * @param callbackId 回调编号, 对应 ReceiveTask Id
+     */
+    void asyncHttpTriggerCallback(String processInstanceId, String callbackId);
 }
