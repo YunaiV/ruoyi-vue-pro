@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.service.rule.execute;
+package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgTypeEnum;
@@ -30,12 +30,13 @@ public class IotRocketMQDataBridgeExecute implements IotDataBridgeExecute {
     /**
      * 针对 {@link IotDataBridgeDO.RocketMQConfig} 的 DefaultMQProducer 缓存
      */
+    // TODO @puhui999：因为 kafka 之类也存在这个情况，是不是得搞个抽象类。提供一个 initProducer，和 closeProducer 方法
     private final LoadingCache<IotDataBridgeDO.RocketMQConfig, DefaultMQProducer> PRODUCER_CACHE = CacheBuilder.newBuilder()
-            // 只阻塞当前数据加载线程，其他线程返回旧值
-            .refreshAfterWrite(Duration.ofMinutes(10))
+            .refreshAfterWrite(Duration.ofMinutes(10)) // TODO puhui999：应该是 read 30 分钟哈
             // 增加移除监听器，自动关闭 producer
             .removalListener(notification -> {
                 DefaultMQProducer producer = (DefaultMQProducer) notification.getValue();
+                // TODO puhui999：if return，更简短哈
                 if (producer != null) {
                     try {
                         producer.shutdown();
@@ -45,8 +46,10 @@ public class IotRocketMQDataBridgeExecute implements IotDataBridgeExecute {
                     }
                 }
             })
+            // TODO @puhui999：就同步哈，不用异步处理。
             // 通过 asyncReloading 实现全异步加载，包括 refreshAfterWrite 被阻塞的加载线程
             .build(CacheLoader.asyncReloading(new CacheLoader<IotDataBridgeDO.RocketMQConfig, DefaultMQProducer>() {
+
                 @Override
                 public DefaultMQProducer load(IotDataBridgeDO.RocketMQConfig config) throws Exception {
                     DefaultMQProducer producer = new DefaultMQProducer(config.getGroup());
@@ -55,6 +58,7 @@ public class IotRocketMQDataBridgeExecute implements IotDataBridgeExecute {
                     log.info("[PRODUCER_CACHE][配置({}) 对应的 producer 已创建并启动]", config);
                     return producer;
                 }
+
             }, Executors.newCachedThreadPool()));
 
     @Override
@@ -120,7 +124,7 @@ public class IotRocketMQDataBridgeExecute implements IotDataBridgeExecute {
         log.info("[main][第一次执行，应该会创建新的 producer]");
         action.executeRocketMQ(message, config);
 
-        log.info("[main][第二次执行，应该会复用缓存的 producer]"); 
+        log.info("[main][第二次执行，应该会复用缓存的 producer]");
         action.executeRocketMQ(message, config);
     }
 

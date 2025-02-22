@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.service.rule.IotDataBridgeService;
-import cn.iocoder.yudao.module.iot.service.rule.execute.IotDataBridgeExecute;
+import cn.iocoder.yudao.module.iot.service.rule.action.databridge.IotDataBridgeExecute;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -19,9 +19,6 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-// TODO @芋艿：【优化】因为 bridge 会比较多，所以可以考虑在 rule 下，新建一个 bridge 的 package，然后定义一个 bridgehandler，它有：
-//    1. input 方法、output 方法
-//    2. build 方法，用于有状态的连接，例如说 mq、tcp、websocket
 @Component
 @Slf4j
 public class IotRuleSceneDataBridgeAction implements IotRuleSceneAction {
@@ -49,7 +46,7 @@ public class IotRuleSceneDataBridgeAction implements IotRuleSceneAction {
             return;
         }
 
-        // 2.1 执行数据桥接操作
+        // 2. 执行数据桥接操作
         dataBridgeExecutes.forEach(execute -> execute.execute(message, dataBridge));
     }
 

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.service.rule.execute;
+package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
