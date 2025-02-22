@@ -1,0 +1,1 @@
+package cn.iocoder.yudao.module.iot.service.ota.bo.upgrade;

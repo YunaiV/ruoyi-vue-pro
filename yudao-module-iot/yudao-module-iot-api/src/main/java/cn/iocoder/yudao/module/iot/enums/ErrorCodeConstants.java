@@ -51,5 +51,17 @@ public interface ErrorCodeConstants {
 
     // ========== 插件实例 1-050-007-000 ==========
 
+    // ========== 固件相关 1-050-008-000 ==========
+    ErrorCode OTA_FIRMWARE_NOT_EXISTS = new ErrorCode(1_050_008_000, "固件信息不存在");
+    ErrorCode OTA_FIRMWARE_PRODUCT_VERSION_DUPLICATE = new ErrorCode(1_050_008_001, "产品版本号重复");
+
+    ErrorCode OTA_UPGRADE_TASK_NOT_EXISTS = new ErrorCode(1_050_008_002, "升级任务不存在");
+    ErrorCode OTA_UPGRADE_TASK_NAME_DUPLICATE = new ErrorCode(1_050_008_003, "升级任务名称重复");
+    ErrorCode OTA_UPGRADE_TASK_PARAMS_INVALID = new ErrorCode(1_050_008_004, "升级任务参数无效");
+    ErrorCode OTA_UPGRADE_TASK_CANNOT_CANCEL = new ErrorCode(1_050_008_005, "升级任务不能取消");
+
+    ErrorCode OTA_UPGRADE_RECORD_NOT_EXISTS = new ErrorCode(1_050_008_006, "升级记录不存在");
+    ErrorCode OTA_UPGRADE_RECORD_DUPLICATE = new ErrorCode(1_050_008_007, "升级记录重复");
+    ErrorCode OTA_UPGRADE_RECORD_CANNOT_RETRY = new ErrorCode(1_050_008_008, "升级记录不能重试");
 
 }

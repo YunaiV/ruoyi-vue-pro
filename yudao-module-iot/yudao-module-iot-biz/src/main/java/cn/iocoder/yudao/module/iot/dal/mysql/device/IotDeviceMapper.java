@@ -60,6 +60,10 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
         return selectList(IotDeviceDO::getState, state);
     }
 
+    default List<IotDeviceDO> selectListByProductId(Long productId) {
+        return selectList(IotDeviceDO::getProductId, productId);
+    }
+
     default Long selectCountByGroupId(Long groupId) {
         return selectCount(new LambdaQueryWrapperX<IotDeviceDO>()
                 .apply("FIND_IN_SET(" + groupId + ",group_ids) > 0")

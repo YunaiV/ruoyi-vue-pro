@@ -34,8 +34,8 @@ public interface IotDeviceService {
      * @return 设备
      */
     IotDeviceDO createDevice(@NotEmpty(message = "产品标识不能为空") String productKey,
-            @NotEmpty(message = "设备名称不能为空") String deviceName,
-            Long gatewayId);
+                             @NotEmpty(message = "设备名称不能为空") String deviceName,
+                             Long gatewayId);
 
     /**
      * 更新设备
@@ -45,6 +45,7 @@ public interface IotDeviceService {
     void updateDevice(@Valid IotDeviceSaveReqVO updateReqVO);
 
     // TODO @芋艿：先这么实现。未来看情况，要不要自己实现
+
     /**
      * 更新设备的所属网关
      *
@@ -133,6 +134,22 @@ public interface IotDeviceService {
     List<IotDeviceDO> getDeviceListByState(Integer state);
 
     /**
+     * 根据产品ID获取设备列表
+     *
+     * @param productId 产品ID，用于查询特定产品的设备列表
+     * @return 返回与指定产品ID关联的设备列表，列表中的每个元素为IotDeviceDO对象
+     */
+    List<IotDeviceDO> getDeviceListByProductId(Long productId);
+
+    /**
+     * 根据设备ID列表获取设备信息列表
+     *
+     * @param deviceIdList 设备ID列表，包含需要查询的设备ID
+     * @return 返回与设备ID列表对应的设备信息列表，列表中的每个元素为IotDeviceDO对象
+     */
+    List<IotDeviceDO> getDeviceListByIdList(List<Long> deviceIdList);
+
+    /**
      * 基于产品编号，获得设备数量
      *
      * @param productId 产品编号
@@ -150,7 +167,7 @@ public interface IotDeviceService {
 
     /**
      * 【缓存】根据产品 key 和设备名称，获得设备信息
-     *
+     * <p>
      * 注意：该方法会忽略租户信息，所以调用时，需要确认会不会有跨租户访问的风险！！！
      *
      * @param productKey 产品 key
