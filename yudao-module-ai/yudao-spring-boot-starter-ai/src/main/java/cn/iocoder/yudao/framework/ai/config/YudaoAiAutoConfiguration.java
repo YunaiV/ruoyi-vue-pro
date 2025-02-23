@@ -35,7 +35,6 @@ public class YudaoAiAutoConfiguration {
         return new AiModelFactoryImpl();
     }
 
-
     // ========== 各种 AI Client 创建 ==========
 
     @Bean
