@@ -15,8 +15,8 @@ import java.util.List;
 public class MidjourneyApiTests {
 
     private final MidjourneyApi midjourneyApi = new MidjourneyApi(
-            "https://api.holdai.top/mj",
-            "sk-dZEPiVaNcT3FHhef51996bAa0bC74806BeAb620dA5Da10Bf",
+            "https://api.holdai.top/mj", // 链接
+            "sk-aN6nWn3fILjrgLFT0fC4Aa60B72e4253826c77B29dC94f17", // 密钥
             null);
 
     @Test

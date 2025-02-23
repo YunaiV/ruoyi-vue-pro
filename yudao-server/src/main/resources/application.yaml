@@ -186,9 +186,8 @@ yudao:
       model: deepseek-chat
     xinghuo: # 讯飞星火
       enable: true
-      appId: 13c8cca6
-      appKey: cb6415c19d6162cda07b47316fcb0416
-      secretKey: Y2JiYTIxZjA3MDMxMjNjZjQzYzVmNzdh
+      appKey: 75b161ed2aef4719b275d6e7f2a4d4cd
+      secretKey: YWYxYWI2MTA4ODI2NGZlYTQyNjAzZTcz
       model: generalv3.5
     midjourney:
       enable: true

@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -19,7 +18,6 @@ import reactor.core.publisher.Mono;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -52,18 +50,13 @@ public class MidjourneyApi {
     public MidjourneyApi(String baseUrl, String apiKey, String notifyUrl) {
         this.webClient = WebClient.builder()
                 .baseUrl(baseUrl)
-                .defaultHeaders(getJsonContentHeaders(apiKey))
+                .defaultHeaders(httpHeaders -> {
+                    httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+                    httpHeaders.setBearerAuth(apiKey);
+                })
                 .build();
         this.notifyUrl = notifyUrl;
     }
-
-    // TODO @芋艿：这里，看看怎么调整下？？？https://github.com/spring-projects/spring-ai/issues/741
-    public static Consumer<HttpHeaders> getJsonContentHeaders(String apiKey) {
-        return (headers) -> {
-            headers.setBearerAuth(apiKey);
-            headers.setContentType(MediaType.APPLICATION_JSON);
-        };
-    };
 
     /**
      * imagine - 根据提示词提交绘画任务
