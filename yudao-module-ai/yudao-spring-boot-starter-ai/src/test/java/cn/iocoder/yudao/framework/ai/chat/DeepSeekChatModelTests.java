@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class DeepSeekChatModelTests {
 
-    private static final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
+    private final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
             .openAiApi(OpenAiApi.builder()
                     .baseUrl(DeepSeekChatModel.BASE_URL)
                     .apiKey("sk-e52047409b144d97b791a6a46a2d") // apiKey

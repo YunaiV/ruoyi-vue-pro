@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class XingHuoChatModelTests {
 
-    private static final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
+    private final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
         .openAiApi(OpenAiApi.builder()
                 .baseUrl(XingHuoChatModel.BASE_URL)
                 .apiKey("75b161ed2aef4719b275d6e7f2a4d4cd:YWYxYWI2MTA4ODI2NGZlYTQyNjAzZTcz") // appKey:secretKey

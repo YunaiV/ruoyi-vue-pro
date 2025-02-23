@@ -26,6 +26,12 @@ public class YudaoAiProperties {
     private DouBaoProperties doubao;
 
     /**
+     * 腾讯混元
+     */
+    @SuppressWarnings("SpellCheckingInspection")
+    private HunYuanProperties hunyuan;
+
+    /**
      * 讯飞星火
      */
     @SuppressWarnings("SpellCheckingInspection")
@@ -41,21 +47,6 @@ public class YudaoAiProperties {
      */
     @SuppressWarnings("SpellCheckingInspection")
     private SunoProperties suno;
-
-    @Data
-    public static class XingHuoProperties {
-
-        private String enable;
-        private String appId;
-        private String appKey;
-        private String secretKey;
-
-        private String model;
-        private Double temperature;
-        private Integer maxTokens;
-        private Double topP;
-
-    }
 
     @Data
     public static class DeepSeekProperties {
@@ -75,6 +66,35 @@ public class YudaoAiProperties {
 
         private String enable;
         private String apiKey;
+
+        private String model;
+        private Double temperature;
+        private Integer maxTokens;
+        private Double topP;
+
+    }
+
+    @Data
+    public static class HunYuanProperties {
+
+        private String enable;
+        private String baseUrl;
+        private String apiKey;
+
+        private String model;
+        private Double temperature;
+        private Integer maxTokens;
+        private Double topP;
+
+    }
+
+    @Data
+    public static class XingHuoProperties {
+
+        private String enable;
+        private String appId;
+        private String appKey;
+        private String secretKey;
 
         private String model;
         private Double temperature;

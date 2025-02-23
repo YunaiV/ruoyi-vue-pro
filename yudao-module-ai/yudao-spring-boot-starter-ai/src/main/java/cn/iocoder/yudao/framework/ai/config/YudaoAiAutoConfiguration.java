@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactory;
 import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactoryImpl;
 import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.doubao.DouBaoChatModel;
+import cn.iocoder.yudao.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
@@ -65,32 +66,6 @@ public class YudaoAiAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(value = "yudao.ai.xinghuo.enable", havingValue = "true")
-    public XingHuoChatModel xingHuoChatClient(YudaoAiProperties yudaoAiProperties) {
-        YudaoAiProperties.XingHuoProperties properties = yudaoAiProperties.getXinghuo();
-        return buildXingHuoChatClient(properties);
-    }
-
-    public XingHuoChatModel buildXingHuoChatClient(YudaoAiProperties.XingHuoProperties properties) {
-        if (StrUtil.isEmpty(properties.getModel())) {
-            properties.setModel(XingHuoChatModel.MODEL_DEFAULT);
-        }
-        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .openAiApi(OpenAiApi.builder()
-                        .baseUrl(XingHuoChatModel.BASE_URL)
-                        .apiKey(properties.getAppKey() + ":" + properties.getSecretKey())
-                        .build())
-                .defaultOptions(OpenAiChatOptions.builder()
-                        .model(properties.getModel())
-                        .temperature(properties.getTemperature())
-                        .maxTokens(properties.getMaxTokens())
-                        .topP(properties.getTopP())
-                        .build())
-                .build();
-        return new XingHuoChatModel(openAiChatModel);
-    }
-
-    @Bean
     @ConditionalOnProperty(value = "yudao.ai.doubao.enable", havingValue = "true")
     public DouBaoChatModel douBaoChatClient(YudaoAiProperties yudaoAiProperties) {
         YudaoAiProperties.DouBaoProperties properties = yudaoAiProperties.getDoubao();
@@ -114,6 +89,64 @@ public class YudaoAiAutoConfiguration {
                         .build())
                 .build();
         return new DouBaoChatModel(openAiChatModel);
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.hunyuan.enable", havingValue = "true")
+    public HunYuanChatModel hunYuanChatClient(YudaoAiProperties yudaoAiProperties) {
+        YudaoAiProperties.HunYuanProperties properties = yudaoAiProperties.getHunyuan();
+        return buildHunYuanChatClient(properties);
+    }
+
+    public HunYuanChatModel buildHunYuanChatClient(YudaoAiProperties.HunYuanProperties properties) {
+        if (StrUtil.isEmpty(properties.getModel())) {
+            properties.setModel(HunYuanChatModel.MODEL_DEFAULT);
+        }
+        // 特殊：由于混元大模型不提供 deepseek，而是通过知识引擎，所以需要区分下 URL
+        if (StrUtil.isEmpty(properties.getBaseUrl())) {
+            properties.setBaseUrl(StrUtil.startWithIgnoreCase(properties.getModel(), "deepseek") ?
+                    HunYuanChatModel.DEEP_SEEK_BASE_URL : HunYuanChatModel.BASE_URL);
+        }
+        // 创建 OpenAiChatModel、HunYuanChatModel 对象
+        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
+                .openAiApi(OpenAiApi.builder()
+                      .baseUrl(properties.getBaseUrl())
+                      .apiKey(properties.getApiKey())
+                      .build())
+                .defaultOptions(OpenAiChatOptions.builder()
+                        .model(properties.getModel())
+                        .temperature(properties.getTemperature())
+                        .maxTokens(properties.getMaxTokens())
+                        .topP(properties.getTopP())
+                        .build())
+                .build();
+        return new HunYuanChatModel(openAiChatModel);
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.xinghuo.enable", havingValue = "true")
+    public XingHuoChatModel xingHuoChatClient(YudaoAiProperties yudaoAiProperties) {
+        YudaoAiProperties.XingHuoProperties properties = yudaoAiProperties.getXinghuo();
+        return buildXingHuoChatClient(properties);
+    }
+
+    public XingHuoChatModel buildXingHuoChatClient(YudaoAiProperties.XingHuoProperties properties) {
+        if (StrUtil.isEmpty(properties.getModel())) {
+            properties.setModel(XingHuoChatModel.MODEL_DEFAULT);
+        }
+        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
+                .openAiApi(OpenAiApi.builder()
+                        .baseUrl(XingHuoChatModel.BASE_URL)
+                        .apiKey(properties.getAppKey() + ":" + properties.getSecretKey())
+                        .build())
+                .defaultOptions(OpenAiChatOptions.builder()
+                        .model(properties.getModel())
+                        .temperature(properties.getTemperature())
+                        .maxTokens(properties.getMaxTokens())
+                        .topP(properties.getTopP())
+                        .build())
+                .build();
+        return new XingHuoChatModel(openAiChatModel);
     }
 
     @Bean

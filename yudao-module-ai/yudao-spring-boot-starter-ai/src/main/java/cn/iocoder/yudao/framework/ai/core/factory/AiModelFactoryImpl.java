@@ -11,6 +11,7 @@ import cn.iocoder.yudao.framework.ai.config.YudaoAiProperties;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.doubao.DouBaoChatModel;
+import cn.iocoder.yudao.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
@@ -77,6 +78,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildDeepSeekChatModel(apiKey);
                 case DOU_BAO:
                     return buildDouBaoChatModel(apiKey);
+                case HUN_YUAN:
+                    return buildHunYuanChatModel(apiKey, url);
                 case ZHI_PU:
                     return buildZhiPuChatModel(apiKey, url);
                 case XING_HUO:
@@ -105,6 +108,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(DeepSeekChatModel.class);
             case DOU_BAO:
                 return SpringUtil.getBean(DouBaoChatModel.class);
+            case HUN_YUAN:
+                return SpringUtil.getBean(HunYuanChatModel.class);
             case ZHI_PU:
                 return SpringUtil.getBean(ZhiPuAiChatModel.class);
             case XING_HUO:
@@ -272,8 +277,17 @@ public class AiModelFactoryImpl implements AiModelFactory {
      */
     private ChatModel buildDouBaoChatModel(String apiKey) {
         YudaoAiProperties.DouBaoProperties properties = new YudaoAiProperties.DouBaoProperties()
-               .setApiKey(apiKey);
+                .setApiKey(apiKey);
         return new YudaoAiAutoConfiguration().buildDouBaoChatClient(properties);
+    }
+
+    /**
+     * 可参考 {@link YudaoAiAutoConfiguration#hunYuanChatClient(YudaoAiProperties)}
+     */
+    private ChatModel buildHunYuanChatModel(String apiKey, String url) {
+        YudaoAiProperties.HunYuanProperties properties = new YudaoAiProperties.HunYuanProperties()
+                .setBaseUrl(url).setApiKey(apiKey);
+        return new YudaoAiAutoConfiguration().buildHunYuanChatClient(properties);
     }
 
     /**

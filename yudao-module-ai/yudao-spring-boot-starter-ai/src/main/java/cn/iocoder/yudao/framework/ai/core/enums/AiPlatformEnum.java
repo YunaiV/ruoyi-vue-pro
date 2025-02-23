@@ -20,6 +20,7 @@ public enum AiPlatformEnum {
     ZHI_PU("ZhiPu", "智谱"), // 智谱 AI
     XING_HUO("XingHuo", "星火"), // 讯飞
     DOU_BAO("DouBao", "豆包"), // 字节
+    HUN_YUAN("HunYuan", "混元"), // 腾讯
 
     // ========== 国外平台 ==========
 

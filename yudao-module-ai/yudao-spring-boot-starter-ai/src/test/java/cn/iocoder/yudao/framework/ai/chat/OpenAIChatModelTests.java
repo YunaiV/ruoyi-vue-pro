@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class OpenAIChatModelTests {
 
-    private static final OpenAiChatModel chatModel = OpenAiChatModel.builder()
+    private final OpenAiChatModel chatModel = OpenAiChatModel.builder()
             .openAiApi(OpenAiApi.builder()
                     .baseUrl("https://api.holdai.top")
                     .apiKey("sk-aN6nWn3fILjrgLFT0fC4Aa60B72e4253826c77B29dC94f17") // apiKey
