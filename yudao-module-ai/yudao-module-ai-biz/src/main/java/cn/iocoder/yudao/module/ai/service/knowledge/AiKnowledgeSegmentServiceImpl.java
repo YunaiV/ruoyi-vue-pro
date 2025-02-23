@@ -106,10 +106,12 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         VectorStore vectorStore = apiKeyService.getOrCreateVectorStore(model.getKeyId());
 
         // 3.1 向量检索
-        List<Document> documentList = vectorStore.similaritySearch(SearchRequest.query(reqVO.getContent())
-                .withTopK(knowledge.getTopK())
-                .withSimilarityThreshold(knowledge.getSimilarityThreshold())
-                .withFilterExpression(new FilterExpressionBuilder().eq(AiKnowledgeSegmentDO.FIELD_KNOWLEDGE_ID, reqVO.getKnowledgeId()).build()));
+        List<Document> documentList = vectorStore.similaritySearch(SearchRequest.builder()
+                .query(reqVO.getContent())
+                .topK(knowledge.getTopK())
+                .similarityThreshold(knowledge.getSimilarityThreshold())
+                .filterExpression(new FilterExpressionBuilder().eq(AiKnowledgeSegmentDO.FIELD_KNOWLEDGE_ID, reqVO.getKnowledgeId()).build())
+                .build());
         if (CollUtil.isEmpty(documentList)) {
             return ListUtil.empty();
         }

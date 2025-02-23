@@ -163,7 +163,7 @@ spring:
     zhipuai: # 智谱 AI
       api-key: 32f84543e54eee31f8d56b2bd6020573.3vh9idLJZ2ZhxDEs
     openai: # OpenAI 官方
-      api-key: sk-yzKea6d8e8212c3bdd99f9f44ced1cae37c097e5aa3BTS7z
+      api-key: sk-aN6nWn3fILjrgLFT0fC4Aa60B72e4253826c77B29dC94f17
       base-url: https://api.gptsapi.net
     azure: # OpenAI 微软
       openai:
@@ -175,11 +175,8 @@ spring:
         model: llama3
     stabilityai:
       api-key: sk-e53UqbboF8QJCscYvzJscJxJXoFcFg4iJjl1oqgE7baJETmx
-  cloud:
-    ai:
-      tongyi: # 通义千问
-        tongyi:
-          api-key: sk-Zsd81gZYg7
+    dashscope: # 通义千问
+      api-key: sk-71800982914041848008480000000000
 
 yudao:
   ai:

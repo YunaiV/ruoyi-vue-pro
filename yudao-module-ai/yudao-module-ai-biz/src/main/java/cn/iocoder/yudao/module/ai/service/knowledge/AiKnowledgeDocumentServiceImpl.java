@@ -60,7 +60,7 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
         List<Document> documents = loader.get();
         Document document = CollUtil.getFirst(documents);
         // 1.2 文档记录入库
-        String content = document.getContent();
+        String content = document.getText();
         AiKnowledgeDocumentDO documentDO = BeanUtils.toBean(createReqVO, AiKnowledgeDocumentDO.class)
                 .setTokens(tokenCountEstimator.estimate(content)).setWordCount(content.length())
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()).setSliceStatus(AiKnowledgeDocumentStatusEnum.SUCCESS.getStatus());
@@ -77,9 +77,9 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
         List<Document> segments = tokenTextSplitter.apply(documents);
         // 2.2 分段内容入库
         List<AiKnowledgeSegmentDO> segmentDOList = CollectionUtils.convertList(segments,
-                segment -> new AiKnowledgeSegmentDO().setContent(segment.getContent()).setDocumentId(documentId)
+                segment -> new AiKnowledgeSegmentDO().setContent(segment.getText()).setDocumentId(documentId)
                         .setKnowledgeId(createReqVO.getKnowledgeId()).setVectorId(segment.getId())
-                        .setTokens(tokenCountEstimator.estimate(segment.getContent())).setWordCount(segment.getContent().length())
+                        .setTokens(tokenCountEstimator.estimate(segment.getText())).setWordCount(segment.getText().length())
                         .setStatus(CommonStatusEnum.ENABLE.getStatus()));
         segmentMapper.insertBatch(segmentDOList);
 
