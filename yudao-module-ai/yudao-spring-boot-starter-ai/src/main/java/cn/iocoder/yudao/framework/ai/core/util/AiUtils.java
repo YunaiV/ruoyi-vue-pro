@@ -30,6 +30,7 @@ public class AiUtils {
                 return ZhiPuAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
             case OPENAI:
             case DEEP_SEEK: // 复用 OpenAI 客户端
+            case DOU_BAO: // 复用 OpenAI 客户端
             case XING_HUO: // 复用 OpenAI 客户端
                 return OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
             case AZURE_OPENAI:

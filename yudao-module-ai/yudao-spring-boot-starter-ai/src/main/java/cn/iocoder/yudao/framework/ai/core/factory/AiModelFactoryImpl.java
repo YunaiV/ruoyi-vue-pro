@@ -10,6 +10,7 @@ import cn.iocoder.yudao.framework.ai.config.YudaoAiAutoConfiguration;
 import cn.iocoder.yudao.framework.ai.config.YudaoAiProperties;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
+import cn.iocoder.yudao.framework.ai.core.model.doubao.DouBaoChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
@@ -74,6 +75,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildYiYanChatModel(apiKey);
                 case DEEP_SEEK:
                     return buildDeepSeekChatModel(apiKey);
+                case DOU_BAO:
+                    return buildDouBaoChatModel(apiKey);
                 case ZHI_PU:
                     return buildZhiPuChatModel(apiKey, url);
                 case XING_HUO:
@@ -100,6 +103,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(QianFanChatModel.class);
             case DEEP_SEEK:
                 return SpringUtil.getBean(DeepSeekChatModel.class);
+            case DOU_BAO:
+                return SpringUtil.getBean(DouBaoChatModel.class);
             case ZHI_PU:
                 return SpringUtil.getBean(ZhiPuAiChatModel.class);
             case XING_HUO:
@@ -260,6 +265,15 @@ public class AiModelFactoryImpl implements AiModelFactory {
         YudaoAiProperties.DeepSeekProperties properties = new YudaoAiProperties.DeepSeekProperties()
                 .setApiKey(apiKey);
         return new YudaoAiAutoConfiguration().buildDeepSeekChatModel(properties);
+    }
+
+    /**
+     * 可参考 {@link YudaoAiAutoConfiguration#douBaoChatClient(YudaoAiProperties)}
+     */
+    private ChatModel buildDouBaoChatModel(String apiKey) {
+        YudaoAiProperties.DouBaoProperties properties = new YudaoAiProperties.DouBaoProperties()
+               .setApiKey(apiKey);
+        return new YudaoAiAutoConfiguration().buildDouBaoChatClient(properties);
     }
 
     /**

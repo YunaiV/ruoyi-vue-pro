@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactory;
 import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactoryImpl;
 import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
+import cn.iocoder.yudao.framework.ai.core.model.doubao.DouBaoChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
@@ -40,7 +41,7 @@ public class YudaoAiAutoConfiguration {
     @Bean
     @ConditionalOnProperty(value = "yudao.ai.deepseek.enable", havingValue = "true")
     public DeepSeekChatModel deepSeekChatModel(YudaoAiProperties yudaoAiProperties) {
-        YudaoAiProperties.DeepSeekProperties properties = yudaoAiProperties.getDeepSeek();
+        YudaoAiProperties.DeepSeekProperties properties = yudaoAiProperties.getDeepseek();
         return buildDeepSeekChatModel(properties);
     }
 
@@ -87,6 +88,32 @@ public class YudaoAiAutoConfiguration {
                         .build())
                 .build();
         return new XingHuoChatModel(openAiChatModel);
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.doubao.enable", havingValue = "true")
+    public DouBaoChatModel douBaoChatClient(YudaoAiProperties yudaoAiProperties) {
+        YudaoAiProperties.DouBaoProperties properties = yudaoAiProperties.getDoubao();
+        return buildDouBaoChatClient(properties);
+    }
+
+    public DouBaoChatModel buildDouBaoChatClient(YudaoAiProperties.DouBaoProperties properties) {
+        if (StrUtil.isEmpty(properties.getModel())) {
+            properties.setModel(DouBaoChatModel.MODEL_DEFAULT);
+        }
+        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
+                .openAiApi(OpenAiApi.builder()
+                        .baseUrl(DouBaoChatModel.BASE_URL)
+                        .apiKey(properties.getApiKey())
+                        .build())
+                .defaultOptions(OpenAiChatOptions.builder()
+                        .model(properties.getModel())
+                        .temperature(properties.getTemperature())
+                        .maxTokens(properties.getMaxTokens())
+                        .topP(properties.getTopP())
+                        .build())
+                .build();
+        return new DouBaoChatModel(openAiChatModel);
     }
 
     @Bean

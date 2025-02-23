@@ -19,6 +19,7 @@ public enum AiPlatformEnum {
     DEEP_SEEK("DeepSeek", "DeepSeek"), // DeepSeek
     ZHI_PU("ZhiPu", "智谱"), // 智谱 AI
     XING_HUO("XingHuo", "星火"), // 讯飞
+    DOU_BAO("DouBao", "豆包"), // 字节
 
     // ========== 国外平台 ==========
 

@@ -16,11 +16,19 @@ public class YudaoAiProperties {
     /**
      * DeepSeek
      */
-    private DeepSeekProperties deepSeek;
+    @SuppressWarnings("SpellCheckingInspection")
+    private DeepSeekProperties deepseek;
+
+    /**
+     * 字节豆包
+     */
+    @SuppressWarnings("SpellCheckingInspection")
+    private DouBaoProperties doubao;
 
     /**
      * 讯飞星火
      */
+    @SuppressWarnings("SpellCheckingInspection")
     private XingHuoProperties xinghuo;
 
     /**
@@ -31,6 +39,7 @@ public class YudaoAiProperties {
     /**
      * Suno 音乐
      */
+    @SuppressWarnings("SpellCheckingInspection")
     private SunoProperties suno;
 
     @Data
@@ -50,6 +59,19 @@ public class YudaoAiProperties {
 
     @Data
     public static class DeepSeekProperties {
+
+        private String enable;
+        private String apiKey;
+
+        private String model;
+        private Double temperature;
+        private Integer maxTokens;
+        private Double topP;
+
+    }
+
+    @Data
+    public static class DouBaoProperties {
 
         private String enable;
         private String apiKey;
