@@ -117,7 +117,8 @@ public class BpmSimpleModelNodeVO {
     @Schema(description = "路由分支组", example = "[]")
     private List<RouterSetting> routerGroups;
 
-    @Schema(description = "路由分支默认分支 ID", example = "Flow_xxx", hidden = true) // 由后端生成，所以 hidden = true
+    @Schema(description = "路由分支默认分支 ID", example = "Flow_xxx", hidden = true) // 由后端生成（不从前端传递），所以 hidden = true
+    @JsonIgnore
     private String routerDefaultFlowId; // 仅用于路由分支节点 BpmSimpleModelNodeType.ROUTER_BRANCH_NODE
 
     /**
@@ -125,12 +126,9 @@ public class BpmSimpleModelNodeVO {
      */
     private TriggerSetting triggerSetting;
 
-    /**
-     * 附加节点 Id, 该节点不从前端传入。 由程序生成. 由于当个节点无法完成功能。 需要附加节点来完成。
-     */
+    @Schema(description = "附加节点 Id", example = "UserTask_xxx", hidden = true) // 由后端生成（不从前端传递），所以 hidden = true
     @JsonIgnore
-    private String attachNodeId; // 目前用于异步触发器节点。需要 UserTask 和 ReceiveTask（附加节点) 来完成
-
+    private String attachNodeId; // 目前用于触发器节点（异步）。需要 UserTask 和 ReceiveTask（附加节点) 来完成
 
     /**
      * 子流程设置
@@ -382,7 +380,6 @@ public class BpmSimpleModelNodeVO {
             @Valid
             private List<HttpRequestParam> body;
 
-            // TODO @json：可能未来看情况，搞个 HttpResponseParam；得看看有没别的业务需要，抽象统一
             /**
              * 请求返回处理设置，用于修改流程表单值
              * <p>
@@ -392,10 +389,13 @@ public class BpmSimpleModelNodeVO {
             @Schema(description = "请求返回处理设置", example = "[]")
             private List<KeyValue<String, String>> response;
 
+            // TODO @jason：改成 callbackTaskDefineKey
             /**
-             * 异步 Http 请求，需要指定回调 Id，用于回调执行. 由后端指定
+             * 异步 Http 请求，需要指定回调 ID，用于回调执行
              */
+            @Schema(description = "回调 ID", example = "xxx", hidden = true)
             private String callbackId;
+
         }
 
         @Schema(description = "流程表单触发器设置", example = "{}")

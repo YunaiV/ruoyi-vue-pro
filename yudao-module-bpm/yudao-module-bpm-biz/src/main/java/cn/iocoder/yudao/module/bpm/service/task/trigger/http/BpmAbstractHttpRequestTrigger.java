@@ -1,7 +1,8 @@
-package cn.iocoder.yudao.module.bpm.service.task.trigger;
+package cn.iocoder.yudao.module.bpm.service.task.trigger.http;
 
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.SimpleModelUtils;
+import cn.iocoder.yudao.module.bpm.service.task.trigger.BpmTrigger;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -39,8 +40,7 @@ public abstract class BpmAbstractHttpRequestTrigger implements BpmTrigger {
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
         ResponseEntity<String> responseEntity;
         try {
-            responseEntity = restTemplate.exchange(url, HttpMethod.POST,
-                    requestEntity, String.class);
+            responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
             log.info("[sendHttpRequest][HTTP 触发器，请求头：{}，请求体：{}，响应结果：{}]", headers, body, responseEntity);
         } catch (RestClientException e) {
             log.error("[sendHttpRequest][HTTP 触发器，请求头：{}，请求体：{}，请求出错：{}]", headers, body, e.getMessage());
@@ -66,4 +66,5 @@ public abstract class BpmAbstractHttpRequestTrigger implements BpmTrigger {
         body.add("processInstanceId", processInstance.getId());
         return body;
     }
+
 }

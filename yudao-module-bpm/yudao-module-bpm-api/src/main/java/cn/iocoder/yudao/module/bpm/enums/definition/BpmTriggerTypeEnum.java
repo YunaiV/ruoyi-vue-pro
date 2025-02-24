@@ -19,7 +19,7 @@ public enum BpmTriggerTypeEnum implements ArrayValuable<Integer> {
     HTTP_REQUEST(1, "发起 HTTP 请求"),
     FORM_UPDATE(2, "更新流程表单数据"),
     FORM_DELETE(3, "删除流程表单数据"),
-    ASYNC_HTTP_REQUEST(4, "发起异步 HTTP 请求");
+    ASYNC_HTTP_REQUEST(4, "发起异步 HTTP 请求"); // TODO @jason：HTTP_REQUEST_ASYNC
 
     /**
      * 触发器执行动作类型

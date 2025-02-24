@@ -180,6 +180,7 @@ public class BpmProcessInstanceController {
         return success(processInstanceService.getProcessInstanceBpmnModelView(id));
     }
 
+    // TODO @jason：要不去掉这个接口，单体通过 asyncHttpTriggerCallback？
     @PostMapping("/http-trigger/callback")
     @Operation(summary = "异步 HTTP 请求触发器回调")
     @PermitAll // 允许外部调用，不需要登录。 TODO @芋艿 需要加一下验证签名吗？

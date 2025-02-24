@@ -1329,7 +1329,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 .activityId(taskDefineKey)
                 .singleResult();
         if (execution == null) {
-            log.error("[processDelayTimerTimeout][processInstanceId({}) activityId({}) 没有找到执行活动]",
+            log.error("[triggerReceiveTask][processInstanceId({}) activityId({}) 没有找到执行活动]",
                     processInstanceId, taskDefineKey);
             return;
         }

@@ -276,8 +276,9 @@ public interface BpmTaskService {
      */
     void processTaskTimeout(String processInstanceId, String taskDefineKey, Integer handlerType);
 
+    // TODO @jason：改成 triggerTask。然后，“触发 ReceiveTask，让流程继续执行”，改成一些调用场景
     /**
-     * 触发 ReceiveTask, 让流程继续执行
+     * 触发 ReceiveTask，让流程继续执行
      *
      * @param processInstanceId 流程示例编号
      * @param taskDefineKey     任务 Key

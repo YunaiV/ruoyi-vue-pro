@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.service.task.trigger;
+package cn.iocoder.yudao.module.bpm.service.task.trigger.http;
 
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
@@ -42,7 +42,8 @@ public class BpmAsyncHttpRequestTrigger extends BpmAbstractHttpRequestTrigger {
         MultiValueMap<String, String> headers = buildHttpHeaders(processInstance, setting.getHeader());
         // 2.2 设置请求体
         MultiValueMap<String, String> body = buildHttpBody(processInstance, setting.getBody());
-        body.add("callbackId", setting.getCallbackId()); // 异步请求 callbackId 需要传给被调用方. 用于回调执行
+        // TODO @芋艿：【异步】在看看
+        body.add("callbackId", setting.getCallbackId()); // 异步请求 callbackId 需要传给被调用方，用于回调执行
 
         // 3. 发起请求
         sendHttpRequest(setting.getUrl(), headers, body);

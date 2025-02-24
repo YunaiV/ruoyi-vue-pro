@@ -171,11 +171,12 @@ public class SimpleModelUtils {
         // 情况二：没有“子节点”，则直接跟 targetNodeId 建立连线。例如说，结束节点、条件分支（分支节点的孩子节点或聚合节点）的最后一个节点
         String finalTargetNodeId = isChildNodeValid ? childNode.getId() : targetNodeId;
 
+        // 如果没有附加节点：则直接建立连线
         if (StrUtil.isEmpty(node.getAttachNodeId())) {
             SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), finalTargetNodeId);
             process.addFlowElement(sequenceFlow);
         } else {
-            // 如果有附加节点. 需要先建立和附加节点的连线。再建立附加节点和目标节点的连线
+            // 如果有附加节点：需要先建立和附加节点的连线，再建立附加节点和目标节点的连线。例如说，触发器节点（异步）
             List<SequenceFlow> sequenceFlows = buildAttachNodeSequenceFlow(node.getId(), node.getAttachNodeId(), finalTargetNodeId);
             sequenceFlows.forEach(process::addFlowElement);
         }
@@ -189,9 +190,9 @@ public class SimpleModelUtils {
     /**
      * 构建有附加节点的连线
      *
-     * @param nodeId 当前节点 Id
-     * @param attachNodeId 附属节点 Id
-     * @param targetNodeId 目标节点 Id
+     * @param nodeId 当前节点 ID
+     * @param attachNodeId 附属节点 ID
+     * @param targetNodeId 目标节点 ID
      */
     private static List<SequenceFlow> buildAttachNodeSequenceFlow(String nodeId, String attachNodeId, String targetNodeId) {
         SequenceFlow sequenceFlow = buildBpmnSequenceFlow(nodeId, attachNodeId, null, null, null);
@@ -748,8 +749,10 @@ public class SimpleModelUtils {
 
     public static class TriggerNodeConvert implements NodeConvert {
 
+        // TODO @芋艿：【异步】在看看
         @Override
         public List<? extends FlowElement> convertList(BpmSimpleModelNodeVO node) {
+            Assert.notNull(node.getTriggerSetting(), "触发器节点设置不能为空");
             List<FlowElement> flowElements = new ArrayList<>(2);
             // 触发器使用 ServiceTask 来实现
             ServiceTask serviceTask = new ServiceTask();
@@ -757,23 +760,23 @@ public class SimpleModelUtils {
             serviceTask.setName(node.getName());
             serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
             serviceTask.setImplementation("${" + BpmTriggerTaskDelegate.BEAN_NAME + "}");
-            Assert.notNull(node.getTriggerSetting(), "触发器节点设置不能为空");
-
             addExtensionElement(serviceTask, TRIGGER_TYPE, node.getTriggerSetting().getType());
             flowElements.add(serviceTask);
+
             // 异步 HTTP 请求。需要附加一个 ReceiveTask、发起请求后、等待回调执行
+            // TODO @jason：这里能挪到最后处理么？这样，代码的整体性更好；
             if (ASYNC_HTTP_REQUEST.getType().equals(node.getTriggerSetting().getType())) {
+                Assert.notNull(node.getTriggerSetting().getHttpRequestSetting(), "触发器 HTTP 请求设置不能为空");
                 String attachNodeId = "Activity_" + IdUtil.fastUUID();
                 ReceiveTask receiveTask = new ReceiveTask();
                 receiveTask.setId(attachNodeId);
                 receiveTask.setName("异步 HTTP 请求");
                 node.setAttachNodeId(attachNodeId);
-                // 设置 receiveId
-                Assert.notNull(node.getTriggerSetting().getHttpRequestSetting(), "触发器 http 请求设置不能为空");
-                node.getTriggerSetting().getHttpRequestSetting().setCallbackId(attachNodeId);
+                node.getTriggerSetting().getHttpRequestSetting().setCallbackId(attachNodeId); // 设置 receiveId
                 flowElements.add(receiveTask);
             }
 
+            // TODO @jason：是不是挪到 flowElements.add(serviceTask); 之前哈，因为它在处理 serviceTask
             if (node.getTriggerSetting().getHttpRequestSetting() != null) {
                 addExtensionElementJson(serviceTask, TRIGGER_PARAM, node.getTriggerSetting().getHttpRequestSetting());
             }

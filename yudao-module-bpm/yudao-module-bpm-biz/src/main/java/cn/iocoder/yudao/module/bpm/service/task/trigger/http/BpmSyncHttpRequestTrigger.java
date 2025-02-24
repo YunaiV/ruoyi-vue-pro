@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.service.task.trigger;
+package cn.iocoder.yudao.module.bpm.service.task.trigger.http;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
