@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -177,6 +178,14 @@ public class BpmProcessInstanceController {
     @Parameter(name = "id", description = "流程实例的编号", required = true)
     public CommonResult<BpmProcessInstanceBpmnModelViewRespVO> getProcessInstanceBpmnModelView(@RequestParam(value = "id") String id) {
         return success(processInstanceService.getProcessInstanceBpmnModelView(id));
+    }
+
+    @PostMapping("/http-trigger/callback")
+    @Operation(summary = "异步 HTTP 请求触发器回调")
+    @PermitAll // 允许外部调用，不需要登录。 TODO @芋艿 需要加一下验证签名吗？
+    public CommonResult<Boolean> httpTriggerCallback(@Valid @RequestBody BpmHttpTriggerCallbackReqVO reqVO) {
+        taskService.triggerReceiveTask(reqVO.getId(), reqVO.getCallbackId());
+        return success(true);
     }
 
 }
