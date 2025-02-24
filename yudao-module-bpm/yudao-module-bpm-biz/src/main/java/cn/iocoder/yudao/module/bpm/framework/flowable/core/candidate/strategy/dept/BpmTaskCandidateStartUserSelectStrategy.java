@@ -56,7 +56,7 @@ public class BpmTaskCandidateStartUserSelectStrategy extends AbstractBpmTaskCand
         // 获得审批人，如果不存在，则直接返回空，避免类型转换异常
         List<Long> assignees = startUserSelectAssignees.get(execution.getCurrentActivityId());
         if (CollUtil.isEmpty(assignees)){
-            return null;
+            return Sets.newLinkedHashSet();
         }
         return new LinkedHashSet<>(assignees);
     }
@@ -74,7 +74,7 @@ public class BpmTaskCandidateStartUserSelectStrategy extends AbstractBpmTaskCand
         // 获得审批人，如果不存在，则直接返回空，避免类型转换异常
         List<Long> assignees = startUserSelectAssignees.get(activityId);
         if (CollUtil.isEmpty(assignees)){
-            return null;
+            return Sets.newLinkedHashSet();
         }
         return new LinkedHashSet<>(assignees);
     }
