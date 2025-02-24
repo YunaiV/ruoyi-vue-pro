@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,7 +31,6 @@ public class AiMindMapController {
 
     @PostMapping(value = "/generate-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "导图生成（流式）", description = "流式返回，响应较快")
-    @PermitAll  // 解决 SSE 最终响应的时候，会被 Access Denied 拦截的问题
     public Flux<CommonResult<String>> generateMindMap(@RequestBody @Valid AiMindMapGenerateReqVO generateReqVO) {
         return mindMapService.generateMindMap(generateReqVO, getLoginUserId());
     }

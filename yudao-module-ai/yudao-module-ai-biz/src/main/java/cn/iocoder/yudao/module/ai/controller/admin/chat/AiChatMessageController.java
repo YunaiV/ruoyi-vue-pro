@@ -20,7 +20,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -57,7 +56,6 @@ public class AiChatMessageController {
 
     @Operation(summary = "发送消息（流式）", description = "流式返回，响应较快")
     @PostMapping(value = "/send-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    @PermitAll // 解决 SSE 最终响应的时候，会被 Access Denied 拦截的问题
     public Flux<CommonResult<AiChatMessageSendRespVO>> sendChatMessageStream(@Valid @RequestBody AiChatMessageSendReqVO sendReqVO) {
         return chatMessageService.sendChatMessageStream(sendReqVO, getLoginUserId());
     }
