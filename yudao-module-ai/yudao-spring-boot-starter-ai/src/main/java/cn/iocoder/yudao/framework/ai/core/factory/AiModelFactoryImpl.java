@@ -13,6 +13,7 @@ import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.doubao.DouBaoChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeAutoConfiguration;
@@ -80,6 +81,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildDouBaoChatModel(apiKey);
                 case HUN_YUAN:
                     return buildHunYuanChatModel(apiKey, url);
+                case SILICON_FLOW:
+                    return buildSiliconFlowChatModel(apiKey);
                 case ZHI_PU:
                     return buildZhiPuChatModel(apiKey, url);
                 case XING_HUO:
@@ -110,6 +113,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(DouBaoChatModel.class);
             case HUN_YUAN:
                 return SpringUtil.getBean(HunYuanChatModel.class);
+            case SILICON_FLOW:
+                return SpringUtil.getBean(SiliconFlowChatModel.class);
             case ZHI_PU:
                 return SpringUtil.getBean(ZhiPuAiChatModel.class);
             case XING_HUO:
@@ -288,6 +293,15 @@ public class AiModelFactoryImpl implements AiModelFactory {
         YudaoAiProperties.HunYuanProperties properties = new YudaoAiProperties.HunYuanProperties()
                 .setBaseUrl(url).setApiKey(apiKey);
         return new YudaoAiAutoConfiguration().buildHunYuanChatClient(properties);
+    }
+
+    /**
+     * 可参考 {@link YudaoAiAutoConfiguration#siliconFlowChatClient(YudaoAiProperties)}
+     */
+    private ChatModel buildSiliconFlowChatModel(String apiKey) {
+        YudaoAiProperties.SiliconFlowProperties properties = new YudaoAiProperties.SiliconFlowProperties()
+               .setApiKey(apiKey);
+        return new YudaoAiAutoConfiguration().buildSiliconFlowChatClient(properties);
     }
 
     /**

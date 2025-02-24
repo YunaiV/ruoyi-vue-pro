@@ -33,6 +33,7 @@ public class AiUtils {
             case DOU_BAO: // 复用 OpenAI 客户端
             case HUN_YUAN: // 复用 OpenAI 客户端
             case XING_HUO: // 复用 OpenAI 客户端
+            case SILICON_FLOW: // 复用 OpenAI 客户端
                 return OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
             case AZURE_OPENAI:
                 // TODO 芋艿：貌似没 model 字段？？？！

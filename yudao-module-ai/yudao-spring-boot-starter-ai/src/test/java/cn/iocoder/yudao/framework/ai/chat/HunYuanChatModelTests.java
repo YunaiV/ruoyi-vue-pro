@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
-import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link DeepSeekChatModel} 集成测试
+ * {@link HunYuanChatModel} 集成测试
  *
  * @author 芋道源码
  */

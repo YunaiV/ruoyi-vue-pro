@@ -21,6 +21,7 @@ public enum AiPlatformEnum {
     XING_HUO("XingHuo", "星火"), // 讯飞
     DOU_BAO("DouBao", "豆包"), // 字节
     HUN_YUAN("HunYuan", "混元"), // 腾讯
+    SILICON_FLOW("SiliconFlow", "硅基流动"), // 硅基流动
 
     // ========== 国外平台 ==========
 

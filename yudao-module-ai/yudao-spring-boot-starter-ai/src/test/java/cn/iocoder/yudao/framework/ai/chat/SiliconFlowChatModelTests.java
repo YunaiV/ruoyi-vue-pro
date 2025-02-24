@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
-import cn.iocoder.yudao.framework.ai.core.model.doubao.DouBaoChatModel;
+import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
@@ -17,25 +17,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link DouBaoChatModel} 集成测试
+ * {@link SiliconFlowChatModel} 集成测试
  *
  * @author 芋道源码
  */
-public class DouBaoChatModelTests {
+public class SiliconFlowChatModelTests {
 
     private final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
             .openAiApi(OpenAiApi.builder()
-                    .baseUrl(DouBaoChatModel.BASE_URL)
-                    .apiKey("5c1b5747-26d2-4ebd-a4e0-dd0e8d8b4272") // apiKey
+                    .baseUrl(SiliconFlowChatModel.BASE_URL)
+                    .apiKey("sk-epsakfenqnyzoxhmbucsxlhkdqlcbnimslqoivkshalvdozz") // apiKey
                     .build())
             .defaultOptions(OpenAiChatOptions.builder()
-                    .model("doubao-1-5-lite-32k-250115") // 模型（doubao）
-//                    .model("deepseek-r1-250120") // 模型（deepseek）
+                    .model(SiliconFlowChatModel.MODEL_DEFAULT) // 模型
+//                    .model("deepseek-ai/DeepSeek-R1") // 模型（deepseek-ai/DeepSeek-R1）可用赠费
+//                    .model("Pro/deepseek-ai/DeepSeek-R1") // 模型（Pro/deepseek-ai/DeepSeek-R1）需要付费
                     .temperature(0.7)
                     .build())
             .build();
 
-    private final DouBaoChatModel chatModel = new DouBaoChatModel(openAiChatModel);
+    private final SiliconFlowChatModel chatModel = new SiliconFlowChatModel(openAiChatModel);
 
     @Test
     @Disabled
@@ -51,7 +52,6 @@ public class DouBaoChatModelTests {
         System.out.println(response);
     }
 
-    // TODO @芋艿：因为使用的是 v1 api，导致 deepseek-r1-250120 不返回 think 过程，后续需要优化
     @Test
     @Disabled
     public void testStream() {

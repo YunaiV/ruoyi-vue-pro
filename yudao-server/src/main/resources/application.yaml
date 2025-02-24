@@ -192,6 +192,10 @@ yudao:
       enable: true
       api-key: sk-abc
       model: hunyuan-turbo
+    siliconflow: # 硅基流动
+      enable: true
+      api-key: sk-epsakfenqnyzoxhmbucsxlhkdqlcbnimslqoivkshalvdozz
+      model: deepseek-ai/DeepSeek-R1-Distill-Qwen-7B
     xinghuo: # 讯飞星火
       enable: true
       appKey: 75b161ed2aef4719b275d6e7f2a4d4cd

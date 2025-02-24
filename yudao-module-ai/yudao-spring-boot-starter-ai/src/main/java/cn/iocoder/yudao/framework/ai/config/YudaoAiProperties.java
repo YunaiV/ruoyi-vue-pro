@@ -32,6 +32,12 @@ public class YudaoAiProperties {
     private HunYuanProperties hunyuan;
 
     /**
+     * 硅基流动
+     */
+    @SuppressWarnings("SpellCheckingInspection")
+    private SiliconFlowProperties siliconflow;
+
+    /**
      * 讯飞星火
      */
     @SuppressWarnings("SpellCheckingInspection")
@@ -79,6 +85,19 @@ public class YudaoAiProperties {
 
         private String enable;
         private String baseUrl;
+        private String apiKey;
+
+        private String model;
+        private Double temperature;
+        private Integer maxTokens;
+        private Double topP;
+
+    }
+
+    @Data
+    public static class SiliconFlowProperties {
+
+        private String enable;
         private String apiKey;
 
         private String model;
