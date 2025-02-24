@@ -284,4 +284,12 @@ public interface BpmTaskService {
      */
     void triggerReceiveTask(String processInstanceId, String taskDefineKey);
 
+    /**
+     * 处理 子流程 审批超时事件
+     *
+     * @param processInstanceId 流程示例编号
+     * @param taskDefineKey     任务 Key
+     */
+    void processChildProcessTimeout(String processInstanceId, String taskDefineKey);
+
 }

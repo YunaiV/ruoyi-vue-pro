@@ -817,7 +817,8 @@ public class SimpleModelUtils {
     private static class ChildProcessConvert implements NodeConvert {
 
         @Override
-        public CallActivity convert(BpmSimpleModelNodeVO node) {
+        public List<FlowElement> convertList(BpmSimpleModelNodeVO node) {
+            List<FlowElement> flowElements = new ArrayList<>(2);
             BpmSimpleModelNodeVO.ChildProcessSetting childProcessSetting = node.getChildProcessSetting();
             List<IOParameter> inVariables = childProcessSetting.getInVariables() == null ?
                     new ArrayList<>() : new ArrayList<>(childProcessSetting.getInVariables());
@@ -866,9 +867,27 @@ public class SimpleModelUtils {
             executionListeners.add(flowableListener);
             callActivity.setExecutionListeners(executionListeners);
 
+            // 7. 超时设置
+            if (childProcessSetting.getTimeoutSetting() != null) {
+                BoundaryEvent boundaryEvent = new BoundaryEvent();
+                boundaryEvent.setId("Event-" + IdUtil.fastUUID());
+                boundaryEvent.setCancelActivity(false);
+                boundaryEvent.setAttachedToRef(callActivity);
+                TimerEventDefinition eventDefinition = new TimerEventDefinition();
+                if (childProcessSetting.getTimeoutSetting().getType().equals(BpmDelayTimerTypeEnum.FIXED_DATE_TIME.getType())) {
+                    eventDefinition.setTimeDuration(childProcessSetting.getTimeoutSetting().getTimeExpression());
+                } else if (childProcessSetting.getTimeoutSetting().getType().equals(BpmDelayTimerTypeEnum.FIXED_TIME_DURATION.getType())) {
+                    eventDefinition.setTimeDate(childProcessSetting.getTimeoutSetting().getTimeExpression());
+                }
+                boundaryEvent.addEventDefinition(eventDefinition);
+                addExtensionElement(boundaryEvent, BOUNDARY_EVENT_TYPE, BpmBoundaryEventTypeEnum.CHILD_PROCESS_TIMEOUT.getType());
+                flowElements.add(boundaryEvent);
+            }
+
             // 添加节点类型
             addNodeType(node.getType(), callActivity);
-            return callActivity;
+            flowElements.add(callActivity);
+            return flowElements;
         }
 
         @Override

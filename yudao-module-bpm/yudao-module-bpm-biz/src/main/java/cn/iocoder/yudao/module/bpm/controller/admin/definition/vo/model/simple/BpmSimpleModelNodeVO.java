@@ -451,6 +451,9 @@ public class BpmSimpleModelNodeVO {
         @NotNull(message = "子流程发起人配置不能为空")
         private StartUserSetting startUserSetting;
 
+        @Schema(description = "超时设置", requiredMode = Schema.RequiredMode.REQUIRED, example = "{}")
+        private TimeoutSetting timeoutSetting;
+
         @Schema(description = "子流程发起人配置")
         @Data
         @Valid
@@ -468,6 +471,24 @@ public class BpmSimpleModelNodeVO {
             @NotNull(message = "当子流程发起人为空时类型不能为空")
             @InEnum(BpmChildProcessStartUserEmptyTypeEnum.class)
             private Integer emptyType;
+
+        }
+
+        @Schema(description = "超时设置")
+        @Data
+        @Valid
+        public static class TimeoutSetting {
+
+            @Schema(description = "是否开启超时设置", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
+            @NotNull(message = "是否开启超时设置不能为空")
+            private Boolean enable;
+
+            @Schema(description = "时间类型", example = "1")
+            @InEnum(BpmDelayTimerTypeEnum.class)
+            private Integer type;
+
+            @Schema(description = "时间表达式", example = "PT1H,2025-01-01T00:00:00")
+            private String timeExpression;
 
         }
 

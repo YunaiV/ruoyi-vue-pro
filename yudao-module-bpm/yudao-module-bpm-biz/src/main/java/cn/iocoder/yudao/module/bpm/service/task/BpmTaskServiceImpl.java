@@ -41,6 +41,7 @@ import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.DelegationState;
@@ -1337,6 +1338,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 若存在直接触发接收任务，执行后续节点
         FlowableUtils.execute(execution.getTenantId(),
                 () -> runtimeService.trigger(execution.getId()));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void processChildProcessTimeout(String processInstanceId, String taskDefineKey) {
+        List<ActivityInstance> activityInstances = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .activityId(taskDefineKey).list();
+        activityInstances.forEach(activityInstance -> FlowableUtils.execute(activityInstance.getTenantId(), () -> {
+            moveTaskToEnd(activityInstance.getCalledProcessInstanceId(), BpmReasonEnum.TIMEOUT_APPROVE.getReason());
+        }));
     }
 
     /**
