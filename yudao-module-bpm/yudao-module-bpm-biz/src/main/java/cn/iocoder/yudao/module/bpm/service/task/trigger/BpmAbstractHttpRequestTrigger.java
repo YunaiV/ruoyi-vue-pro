@@ -16,7 +16,9 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_TENANT_ID;
+import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.PROCESS_INSTANCE_HTTP_TRIGGER_CALL_ERROR;
 
 /**
  * BPM 发送 HTTP 请求触发器抽象类
@@ -35,13 +37,14 @@ public abstract class BpmAbstractHttpRequestTrigger implements BpmTrigger {
         // TODO @芋艿：要不要抽象一个 Http 请求的工具类，方便复用呢？
         // 3. 发起请求
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
-        ResponseEntity<String> responseEntity = null;
+        ResponseEntity<String> responseEntity;
         try {
             responseEntity = restTemplate.exchange(url, HttpMethod.POST,
                     requestEntity, String.class);
             log.info("[sendHttpRequest][HTTP 触发器，请求头：{}，请求体：{}，响应结果：{}]", headers, body, responseEntity);
         } catch (RestClientException e) {
             log.error("[sendHttpRequest][HTTP 触发器，请求头：{}，请求体：{}，请求出错：{}]", headers, body, e.getMessage());
+            throw exception(PROCESS_INSTANCE_HTTP_TRIGGER_CALL_ERROR);
         }
         return responseEntity;
     }
