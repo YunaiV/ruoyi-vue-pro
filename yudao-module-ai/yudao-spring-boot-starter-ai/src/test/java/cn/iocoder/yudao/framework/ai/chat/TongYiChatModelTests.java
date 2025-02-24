@@ -24,7 +24,11 @@ public class TongYiChatModelTests {
 
     private final DashScopeChatModel chatModel = new DashScopeChatModel(
             new DashScopeApi("sk-7d903764249848cfa912733146da12d1"),
-            DashScopeChatOptions.builder().withModel("qwen1.5-72b-chat").build());
+            DashScopeChatOptions.builder()
+                    .withModel("qwen1.5-72b-chat") // 模型
+//                    .withModel("deepseek-r1") // 模型（deepseek-r1）
+//                    .withModel("deepseek-v3") // 模型（deepseek-v3）
+                    .build());
 
     @Test
     @Disabled
