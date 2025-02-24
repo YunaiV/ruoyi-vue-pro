@@ -59,19 +59,19 @@ public class BpmCallActivityListener implements ExecutionListener {
             // 2.1 当表单值为空时
             if (StrUtil.isEmpty(formFieldValue)) {
                 // 2.1.1 来自主流程发起人
-                if (startUserSetting.getEmptyHandleType().equals(BpmChildProcessStartUserEmptyTypeEnum.MAIN_PROCESS_START_USER.getType())) {
+                if (startUserSetting.getEmptyType().equals(BpmChildProcessStartUserEmptyTypeEnum.MAIN_PROCESS_START_USER.getType())) {
                     FlowableUtils.setAuthenticatedUserId(Long.parseLong(parent.getStartUserId()));
                     return;
                 }
                 // 2.1.2 来自子流程管理员
-                if (startUserSetting.getEmptyHandleType().equals(BpmChildProcessStartUserEmptyTypeEnum.CHILD_PROCESS_ADMIN.getType())) {
+                if (startUserSetting.getEmptyType().equals(BpmChildProcessStartUserEmptyTypeEnum.CHILD_PROCESS_ADMIN.getType())) {
                     BpmProcessDefinitionInfoDO processDefinition = processDefinitionService.getProcessDefinitionInfo(execution.getProcessDefinitionId());
                     List<Long> managerUserIds = processDefinition.getManagerUserIds();
                     FlowableUtils.setAuthenticatedUserId(managerUserIds.get(0));
                     return;
                 }
                 // 2.1.3 来自主流程管理员
-                if (startUserSetting.getEmptyHandleType().equals(BpmChildProcessStartUserEmptyTypeEnum.MAIN_PROCESS_ADMIN.getType())) {
+                if (startUserSetting.getEmptyType().equals(BpmChildProcessStartUserEmptyTypeEnum.MAIN_PROCESS_ADMIN.getType())) {
                     BpmProcessDefinitionInfoDO processDefinition = processDefinitionService.getProcessDefinitionInfo(parent.getProcessDefinitionId());
                     List<Long> managerUserIds = processDefinition.getManagerUserIds();
                     FlowableUtils.setAuthenticatedUserId(managerUserIds.get(0));
@@ -82,7 +82,8 @@ public class BpmCallActivityListener implements ExecutionListener {
             try {
                 FlowableUtils.setAuthenticatedUserId(Long.parseLong(formFieldValue));
             } catch (Exception e) {
-                // todo @lesan：打个日志，方便排查
+                log.error("[error][监听器：{}，子流程监听器设置流程的发起人字符串转 Long 失败，字符串：{}]",
+                        DELEGATE_EXPRESSION, formFieldValue);
                 FlowableUtils.setAuthenticatedUserId(Long.parseLong(parent.getStartUserId()));
             }
         }

@@ -320,7 +320,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 遍历 tasks 列表，只处理已结束的 UserTask
         // 为什么不通过 activities 呢？因为，加签场景下，它只存在于 tasks，没有 activities，导致如果遍历 activities
         // 的话，它无法成为一个节点
-        // TODO @芋艿：子流程只有activity，这里获取不到已结束的子流程；TODO @lesan：这个会有啥影响？微信聊？
+        // TODO @芋艿：子流程只有activity，这里获取不到已结束的子流程；TODO @lesan：这个会导致timeline不会展示已结束的子流程
         List<HistoricTaskInstance> endTasks = filterList(tasks, task -> task.getEndTime() != null);
         List<ActivityNode> approvalNodes = convertList(endTasks, task -> {
             FlowElement flowNode = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
@@ -414,7 +414,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             // 处理每个任务的 tasks 属性
             for (HistoricActivityInstance activity : taskActivities) {
                 HistoricTaskInstance task = taskMap.get(activity.getTaskId());
-                // TODO @lesan：这里为啥 continue 哈？
+                // TODO @lesan：这里为啥 continue 哈？ @芋艿：子流程的 activity 中 task 是null 下面的方法会报错
                 if (task == null) {
                     continue;
                 }
@@ -510,8 +510,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         }
 
         // 4. 子流程节点
-        if (BpmSimpleModelNodeTypeEnum.CHILD_PROCESS.getType().equals(node.getType()) ||
-                BpmSimpleModelNodeTypeEnum.ASYNC_CHILD_PROCESS.getType().equals(node.getType())) {
+        if (BpmSimpleModelNodeTypeEnum.CHILD_PROCESS.getType().equals(node.getType())) {
             return activityNode;
         }
         return null;

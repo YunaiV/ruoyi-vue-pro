@@ -1230,7 +1230,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 if (userTaskElement.getId().equals(START_USER_NODE_ID)
                         && (skipStartUserNodeFlag == null // 目的：一般是“主流程”，发起人节点，自动通过审核
                             || Boolean.TRUE.equals(skipStartUserNodeFlag)) // 目的：一般是“子流程”，发起人节点，按配置自动通过审核
-                        && !Boolean.TRUE.equals(returnTaskFlag)) { // TODO @lesan：ObjUtil.notEqual(returnTaskFlag, Boolean.TRUE) 改成这个有问题么？尽量不用 ! 取反
+                        && ObjUtil.notEqual(returnTaskFlag, Boolean.TRUE)) {
                     getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                             .setReason(BpmReasonEnum.ASSIGN_START_USER_APPROVE_WHEN_SKIP_START_USER_NODE.getReason()));
                     return;
