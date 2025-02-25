@@ -53,7 +53,7 @@ public class BpmTaskCandidateStartUserSelectStrategy extends AbstractBpmTaskCand
         Map<String, List<Long>> startUserSelectAssignees = FlowableUtils.getStartUserSelectAssignees(processInstance);
         Assert.notNull(startUserSelectAssignees, "流程实例({}) 的发起人自选审批人不能为空",
                 execution.getProcessInstanceId());
-        // 获得审批人，如果不存在，则直接返回空，避免类型转换异常
+        // 获得审批人，如果不存在，则直接返回空，fix: 用于节点预测时，如果该节点不存在发起人自选审批人，类型转换异常
         List<Long> assignees = startUserSelectAssignees.get(execution.getCurrentActivityId());
         if (CollUtil.isEmpty(assignees)){
             return Sets.newLinkedHashSet();
@@ -71,7 +71,7 @@ public class BpmTaskCandidateStartUserSelectStrategy extends AbstractBpmTaskCand
         if (startUserSelectAssignees == null) {
             return Sets.newLinkedHashSet();
         }
-        // 获得审批人，如果不存在，则直接返回空，避免类型转换异常
+        // 获得审批人，如果不存在，则直接返回空，fix: 用于节点预测时，如果该节点不存在发起人自选审批人，类型转换异常
         List<Long> assignees = startUserSelectAssignees.get(activityId);
         if (CollUtil.isEmpty(assignees)){
             return Sets.newLinkedHashSet();
