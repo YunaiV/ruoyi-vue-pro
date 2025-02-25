@@ -276,6 +276,13 @@ public interface BpmTaskService {
      */
     void processTaskTimeout(String processInstanceId, String taskDefineKey, Integer handlerType);
 
+    /**
+     * 处理 ChildProcess 子流程的审批超时事件
+     *
+     * @param processInstanceId 流程示例编号
+     * @param taskDefineKey     任务 Key
+     */
+    void processChildProcessTimeout(String processInstanceId, String taskDefineKey);
 
     /**
      * 触发流程任务 (ReceiveTask) 的执行

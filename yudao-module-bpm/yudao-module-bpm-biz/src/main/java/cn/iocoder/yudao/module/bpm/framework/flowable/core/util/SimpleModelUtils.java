@@ -48,7 +48,7 @@ public class SimpleModelUtils {
                 new StartUserNodeConvert(), new ApproveNodeConvert(), new CopyNodeConvert(), new TransactorNodeConvert(),
                 new DelayTimerNodeConvert(), new TriggerNodeConvert(),
                 new ConditionBranchNodeConvert(), new ParallelBranchNodeConvert(), new InclusiveBranchNodeConvert(), new RouteBranchNodeConvert(),
-                new ChildProcessConvert(), new AsyncChildProcessConvert());
+                new ChildProcessConvert());
         converts.forEach(convert -> NODE_CONVERTS.put(convert.getType(), convert));
     }
 
@@ -416,6 +416,7 @@ public class SimpleModelUtils {
         private BoundaryEvent buildUserTaskTimeoutBoundaryEvent(UserTask userTask,
                                                                 BpmSimpleModelNodeVO.TimeoutHandler timeoutHandler) {
             // 1.1 定时器边界事件
+            // TODO @lesan：一些 BoundaryEvent timeout 的，可以做一些基础的设置么？
             BoundaryEvent boundaryEvent = new BoundaryEvent();
             boundaryEvent.setId("Event-" + IdUtil.fastUUID());
             boundaryEvent.setCancelActivity(false); // 设置关联的任务为不会被中断
@@ -723,6 +724,7 @@ public class SimpleModelUtils {
             // 2. 添加接收任务的 Timer Boundary Event
             if (node.getDelaySetting() != null) {
                 // 2.1 定时器边界事件
+                // TODO @lesan：一些 BoundaryEvent timeout 的，可以做一些基础的设置么？
                 BoundaryEvent boundaryEvent = new BoundaryEvent();
                 boundaryEvent.setId("Event-" + IdUtil.fastUUID());
                 boundaryEvent.setCancelActivity(false);
@@ -816,48 +818,41 @@ public class SimpleModelUtils {
     private static class ChildProcessConvert implements NodeConvert {
 
         @Override
-        public CallActivity convert(BpmSimpleModelNodeVO node) {
+        public List<FlowElement> convertList(BpmSimpleModelNodeVO node) {
+            List<FlowElement> flowElements = new ArrayList<>(2);
             BpmSimpleModelNodeVO.ChildProcessSetting childProcessSetting = node.getChildProcessSetting();
-            List<IOParameter> inVariable = childProcessSetting.getInVariable() == null ?
-                    new ArrayList<>() : new ArrayList<>(childProcessSetting.getInVariable());
+            List<IOParameter> inVariables = childProcessSetting.getInVariables() == null ?
+                    new ArrayList<>() : new ArrayList<>(childProcessSetting.getInVariables());
             CallActivity callActivity = new CallActivity();
             callActivity.setId(node.getId());
             callActivity.setName(node.getName());
-            callActivity.setCalledElementType("key"); // TODO @lesan：这里为啥是 key 哈？
+            callActivity.setCalledElementType("key");
             // 1. 是否异步
-            callActivity.setAsynchronous(node.getChildProcessSetting().getAsync());
-
-            // 2. 调用的子流程
-            callActivity.setCalledElement(childProcessSetting.getCalledElement());
-            callActivity.setProcessInstanceName(childProcessSetting.getCalledElementName());
-
-            // 3. 是否自动跳过子流程发起节点
-            // TODO @lesan：貌似只有 SourceExpression 的区别，直接通过 valueOf childProcessSetting.getSkipStartUserNode()？？？
-            if (Boolean.TRUE.equals(childProcessSetting.getSkipStartUserNode())) {
-                IOParameter ioParameter = new IOParameter();
-                ioParameter.setSourceExpression("true");
-                ioParameter.setTarget(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE);
-                inVariable.add(ioParameter);
-            } else {
-                IOParameter ioParameter = new IOParameter();
-                ioParameter.setSourceExpression("false");
-                ioParameter.setTarget(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE);
-                inVariable.add(ioParameter);
+            if (node.getChildProcessSetting().getAsync()) {
+                // TODO @lesan: 这里目前测试没有跳过执行call activity 后面的节点
+                callActivity.setAsynchronous(true);
             }
 
-            // 4. 主→子变量传递
-            // 4.1 【默认需要传递的一些变量】流程状态
-            // TODO @lesan：4.1 这个要不，单独一个序号，类似 3. 这个。然后下面，就是把 主→子变量传递、子→主变量传递；这样逻辑连贯点哈
+            // 2. 调用的子流程
+            callActivity.setCalledElement(childProcessSetting.getCalledProcessDefinitionKey());
+            callActivity.setProcessInstanceName(childProcessSetting.getCalledProcessDefinitionName());
+
+            // 3. 是否自动跳过子流程发起节点
             IOParameter ioParameter = new IOParameter();
+            ioParameter.setSourceExpression(childProcessSetting.getSkipStartUserNode().toString());
+            ioParameter.setTarget(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE);
+            inVariables.add(ioParameter);
+
+            // 4. 【默认需要传递的一些变量】流程状态
+            ioParameter = new IOParameter();
             ioParameter.setSource(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS);
             ioParameter.setTarget(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS);
-            inVariable.add(ioParameter);
-            callActivity.setInParameters(inVariable);
+            inVariables.add(ioParameter);
 
-            // 5. 子→主变量传递
-            // TODO @lesan：通过 isNotEmpty 这种哈
-            if (childProcessSetting.getOutVariable() != null && !childProcessSetting.getOutVariable().isEmpty()) {
-                callActivity.setOutParameters(childProcessSetting.getOutVariable());
+            // 5. 主→子变量传递、子->主变量传递
+            callActivity.setInParameters(inVariables);
+            if (ArrayUtil.isNotEmpty(childProcessSetting.getOutVariables()) && ObjUtil.notEqual(childProcessSetting.getAsync(), Boolean.TRUE)) {
+                callActivity.setOutParameters(childProcessSetting.getOutVariables());
             }
 
             // 6. 子流程发起人配置
@@ -873,9 +868,28 @@ public class SimpleModelUtils {
             executionListeners.add(flowableListener);
             callActivity.setExecutionListeners(executionListeners);
 
+            // 7. 超时设置
+            if (childProcessSetting.getTimeoutSetting() != null) {
+                // TODO @lesan：一些 BoundaryEvent timeout 的，可以做一些基础的设置么？
+                BoundaryEvent boundaryEvent = new BoundaryEvent();
+                boundaryEvent.setId("Event-" + IdUtil.fastUUID());
+                boundaryEvent.setCancelActivity(false);
+                boundaryEvent.setAttachedToRef(callActivity);
+                TimerEventDefinition eventDefinition = new TimerEventDefinition();
+                if (childProcessSetting.getTimeoutSetting().getType().equals(BpmDelayTimerTypeEnum.FIXED_DATE_TIME.getType())) {
+                    eventDefinition.setTimeDuration(childProcessSetting.getTimeoutSetting().getTimeExpression());
+                } else if (childProcessSetting.getTimeoutSetting().getType().equals(BpmDelayTimerTypeEnum.FIXED_TIME_DURATION.getType())) {
+                    eventDefinition.setTimeDate(childProcessSetting.getTimeoutSetting().getTimeExpression());
+                }
+                boundaryEvent.addEventDefinition(eventDefinition);
+                addExtensionElement(boundaryEvent, BOUNDARY_EVENT_TYPE, BpmBoundaryEventTypeEnum.CHILD_PROCESS_TIMEOUT.getType());
+                flowElements.add(boundaryEvent);
+            }
+
             // 添加节点类型
             addNodeType(node.getType(), callActivity);
-            return callActivity;
+            flowElements.add(callActivity);
+            return flowElements;
         }
 
         @Override
@@ -884,16 +898,6 @@ public class SimpleModelUtils {
         }
 
     }
-
-    private static class AsyncChildProcessConvert extends ChildProcessConvert {
-
-        @Override
-        public BpmSimpleModelNodeTypeEnum getType() {
-            return BpmSimpleModelNodeTypeEnum.ASYNC_CHILD_PROCESS;
-        }
-
-    }
-
 
     private static String buildGatewayJoinId(String id) {
         return id + "_join";
@@ -925,7 +929,6 @@ public class SimpleModelUtils {
                 || nodeType == BpmSimpleModelNodeTypeEnum.TRANSACTOR_NODE
                 || nodeType == BpmSimpleModelNodeTypeEnum.COPY_NODE
                 || nodeType == BpmSimpleModelNodeTypeEnum.CHILD_PROCESS
-                || nodeType == BpmSimpleModelNodeTypeEnum.ASYNC_CHILD_PROCESS
                 || nodeType == BpmSimpleModelNodeTypeEnum.END_NODE) {
             // 添加元素
             resultNodes.add(currentNode);

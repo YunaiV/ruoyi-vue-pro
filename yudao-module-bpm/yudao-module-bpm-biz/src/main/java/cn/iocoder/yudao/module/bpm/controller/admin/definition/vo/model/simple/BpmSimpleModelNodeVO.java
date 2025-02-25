@@ -423,34 +423,34 @@ public class BpmSimpleModelNodeVO {
     @Valid
     public static class ChildProcessSetting {
 
-        // TODO @lesan：calledElement => calledProcessDefinitionKey ? 这样更容易理解？不过如果一个流程多次发起，key 变了，好像会有问题？
         @Schema(description = "被调用流程", requiredMode = Schema.RequiredMode.REQUIRED, example = "xxx")
         @NotEmpty(message = "被调用流程不能为空")
-        private String calledElement;
+        private String calledProcessDefinitionKey;
 
         @Schema(description = "被调用流程名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "xxx")
         @NotEmpty(message = "被调用流程名称不能为空")
-        private String calledElementName;
+        private String calledProcessDefinitionName;
 
         @Schema(description = "是否异步", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
         @NotNull(message = "是否异步不能为空")
         private Boolean async;
 
-        // TODO @lesan：inVariables
-        @Schema(description = "输入参数(主->子)", requiredMode = Schema.RequiredMode.REQUIRED, example = "[]")
-        private List<IOParameter> inVariable;
+        @Schema(description = "输入参数(主->子)", example = "[]")
+        private List<IOParameter> inVariables;
 
-        // TODO @lesan：outVariables
         @Schema(description = "输出参数(子->主)", example = "[]")
-        private List<IOParameter> outVariable;
+        private List<IOParameter> outVariables;
 
-        @Schema(description = "是否自动跳过子流程发起节点", example = "false")
+        @Schema(description = "是否自动跳过子流程发起节点", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
         @NotNull(message = "是否自动跳过子流程发起节点不能为空")
         private Boolean skipStartUserNode;
 
         @Schema(description = "子流程发起人配置", requiredMode = Schema.RequiredMode.REQUIRED, example = "{}")
-        // TODO @lesan：这个应该也必须填写？
+        @NotNull(message = "子流程发起人配置不能为空")
         private StartUserSetting startUserSetting;
+
+        @Schema(description = "超时设置", requiredMode = Schema.RequiredMode.REQUIRED, example = "{}")
+        private TimeoutSetting timeoutSetting;
 
         @Schema(description = "子流程发起人配置")
         @Data
@@ -465,11 +465,28 @@ public class BpmSimpleModelNodeVO {
             @Schema(description = "表单", example = "xxx")
             private String formField;
 
-            // TODO @lesan：emptyHandleType => emptyType，和 type 对上？
             @Schema(description = "当子流程发起人为空时类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
             @NotNull(message = "当子流程发起人为空时类型不能为空")
             @InEnum(BpmChildProcessStartUserEmptyTypeEnum.class)
-            private Integer emptyHandleType;
+            private Integer emptyType;
+
+        }
+
+        @Schema(description = "超时设置")
+        @Data
+        @Valid
+        public static class TimeoutSetting {
+
+            @Schema(description = "是否开启超时设置", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
+            @NotNull(message = "是否开启超时设置不能为空")
+            private Boolean enable;
+
+            @Schema(description = "时间类型", example = "1")
+            @InEnum(BpmDelayTimerTypeEnum.class)
+            private Integer type;
+
+            @Schema(description = "时间表达式", example = "PT1H,2025-01-01T00:00:00")
+            private String timeExpression;
 
         }
 
