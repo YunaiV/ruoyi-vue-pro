@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * ERP 海关规则 Mapper
  *
- * @author 索迈管理员
+ * @author 王岽宇
  */
 @Mapper
 public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {

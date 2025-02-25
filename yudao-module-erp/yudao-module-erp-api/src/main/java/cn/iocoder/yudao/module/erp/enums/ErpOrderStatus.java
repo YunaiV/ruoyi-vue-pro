@@ -25,18 +25,9 @@ public enum ErpOrderStatus {
     }
 
     // 存储状态码和描述的字段
-    private final int code;
+    private final Integer code;
     private final String description;
 
-    // 获取状态码
-    public int getCode() {
-        return code;
-    }
-
-    // 获取状态描述
-    public String getDescription() {
-        return description;
-    }
 
     // 根据状态码获取状态枚举
     public static ErpOrderStatus fromCode(int code) {

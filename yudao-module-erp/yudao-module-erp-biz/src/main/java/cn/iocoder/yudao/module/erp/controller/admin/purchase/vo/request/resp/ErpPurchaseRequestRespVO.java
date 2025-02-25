@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request;
+package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.resp;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
@@ -30,10 +30,12 @@ public class ErpPurchaseRequestRespVO extends BaseVO {
     @Schema(description = "申请人")
     @ExcelProperty("申请人")
     private String applicant;
+    private Long applicantId;
 
     @Schema(description = "申请部门")
     @ExcelProperty("申请部门")
     private String applicationDept;
+    private Long applicationDeptId;
 
     @Schema(description = "单据日期")
     @ExcelProperty("单据日期")
@@ -42,6 +44,7 @@ public class ErpPurchaseRequestRespVO extends BaseVO {
     @Schema(description = "审核者")
     @ExcelProperty("审核者")
     private String auditor;
+    private Long auditorId;
 
     @Schema(description = "审核时间")
     @ExcelProperty("审核时间")
@@ -66,17 +69,6 @@ public class ErpPurchaseRequestRespVO extends BaseVO {
     @ContentStyle(shrinkToFit = BooleanEnum.TRUE)
     private LocalDateTime createTime;
 
-    @Schema(description = "最后更新时间")
-    @ExcelProperty("最后更新时间")
-    private LocalDateTime updateTime;
-
-    @Schema(description = "制单人", example = "admin")
-    @ExcelProperty("制单人")
-    private String creator;
-
-    @Schema(description = "更新者", example = "admin")
-    @ExcelProperty("更新者")
-    private String updater;
     // ========== 申请单计算 ==========
     // ========== 状态 ==========
     @Schema(description = "审核状态（待审核，审核通过，审核未通过）")
@@ -92,4 +84,17 @@ public class ErpPurchaseRequestRespVO extends BaseVO {
     @ExcelProperty("订购状态")
     private Integer orderStatus;
 
+    //收获地址
+    @Schema(description = "收获地址")
+    @ExcelProperty("收获地址")
+    private String delivery;
+
+    //supplierId
+    @Schema(description = "供应商id")
+    @ExcelProperty("供应商id")
+    private Long supplierId;
+    //supplierName
+    @Schema(description = "供应商名称")
+    @ExcelProperty("供应商名称")
+    private String supplierName;
 }

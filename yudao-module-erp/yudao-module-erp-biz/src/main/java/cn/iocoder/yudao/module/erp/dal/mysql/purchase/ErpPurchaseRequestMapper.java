@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.erp.dal.mysql.purchase;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestPageReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestPageReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -18,13 +18,15 @@ public interface ErpPurchaseRequestMapper extends BaseMapperX<ErpPurchaseRequest
     default PageResult<ErpPurchaseRequestDO> selectPage(ErpPurchaseRequestPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ErpPurchaseRequestDO>()
             .eqIfPresent(ErpPurchaseRequestDO::getNo, reqVO.getNo())
-            .eqIfPresent(ErpPurchaseRequestDO::getApplicant, reqVO.getApplicant())
-            .eqIfPresent(ErpPurchaseRequestDO::getApplicationDept, reqVO.getApplicationDept())
+            .eqIfPresent(ErpPurchaseRequestDO::getApplicantId, reqVO.getApplicantId())
+            .eqIfPresent(ErpPurchaseRequestDO::getApplicationDeptId, reqVO.getApplicationDeptId())
+            //supplierId 供应商编号
+            .eqIfPresent(ErpPurchaseRequestDO::getSupplierId, reqVO.getSupplierId())
             .betweenIfPresent(ErpPurchaseRequestDO::getRequestTime, reqVO.getRequestTime())
             .eqIfPresent(ErpPurchaseRequestDO::getStatus, reqVO.getStatus())
 //            .eqIfPresent(ErpPurchaseRequestDO::getOffStatus, reqVO.getOffStatus())
 //                .eqIfPresent(ErpPurchaseRequestDO::getOrderStatus, reqVO.getOrderStatus())
-            .eqIfPresent(ErpPurchaseRequestDO::getAuditor, reqVO.getAuditor())
+            .eqIfPresent(ErpPurchaseRequestDO::getAuditorId, reqVO.getAuditorId()) //审核者
             .betweenIfPresent(ErpPurchaseRequestDO::getAuditTime, reqVO.getAuditTime())
             .betweenIfPresent(ErpPurchaseRequestDO::getCreateTime, reqVO.getCreateTime())
             .orderByDesc(ErpPurchaseRequestDO::getId));

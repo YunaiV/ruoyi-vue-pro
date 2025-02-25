@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.purchase;
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErpPurchaseRequestItemsDO extends BaseDO {
+public class ErpPurchaseRequestItemsDO extends TenantBaseDO {
     /**
      * id
      */

@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestItemsSaveReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestPageReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestAuditStatusReq;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestItemsSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestPageReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import jakarta.validation.Valid;
@@ -66,9 +67,11 @@ public interface ErpPurchaseRequestService {
 
     /**
      * 更新采购申请单状态
-     *
-     * @param id     采购申请单id
-     * @param status 状态
+     * 该方法用于更新指定采购申请单的状态信息，包括审核状态、订单状态和下架状态。
+     * @param id 采购申请单的唯一标识符
+     * @param auditStatus 审核状态，用于表示采购申请单的审核情况
+     * @param orderStatus 订单状态，用于表示采购申请单的订单处理情况
+     * @param offStatus 下架状态，用于表示采购申请单是否被下架
      */
     void updatePurchaseRequestStatus(Long id, Integer auditStatus, Integer orderStatus, Integer offStatus);
 
@@ -79,7 +82,7 @@ public interface ErpPurchaseRequestService {
      * @param orderStatus 采购状态
      * @param offStatus   关闭状态
      */
-    void updatePurchaseRequestItemList(List<Long> itemIds, Integer orderStatus, Integer offStatus);
+    void updateItemStatus(List<Long> itemIds, Integer orderStatus, Integer offStatus);
 
     /**
      * 获得采购订单项 List
@@ -92,11 +95,9 @@ public interface ErpPurchaseRequestService {
     /**
      * 审核/反审核采购订单
      *
-     * @param requestId 采购订单id
-     * @param itemIds   采购订单子项id集合
-     * @param reviewed  审核状态
+     * @param req 审核采购订单的请求对象，包含了采购订单的ID和审核状态等信息。
      */
-    void reviewPurchaseOrder(Long requestId, List<Long> itemIds, Boolean reviewed);
+    void reviewPurchaseOrder(ErpPurchaseRequestAuditStatusReq req);
 
     /**
      * 启用/关闭申请单子项，自动更新父订单状态

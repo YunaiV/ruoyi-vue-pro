@@ -19,6 +19,8 @@ import java.util.List;
 public interface ErpCustomCategoryItemMapper extends BaseMapperX<ErpCustomCategoryItemDO> {
 
     default PageResult<ErpCustomCategoryItemDO> selectPage(ErpCustomCategoryItemPageReqVO reqVO) {
+
+
         return selectPage(reqVO, new LambdaQueryWrapperX<ErpCustomCategoryItemDO>()
 //            .eqIfPresent(ErpCustomCategoryItemDO::getCategoryId, reqVO.getCategoryId())
             .eqIfPresent(ErpCustomCategoryItemDO::getCountryCode, reqVO.getCountryCode())
@@ -26,6 +28,7 @@ public interface ErpCustomCategoryItemMapper extends BaseMapperX<ErpCustomCatego
             .eqIfPresent(ErpCustomCategoryItemDO::getTaxRate, reqVO.getTaxRate())
             .betweenIfPresent(ErpCustomCategoryItemDO::getCreateTime, reqVO.getCreateTime())
             .orderByDesc(ErpCustomCategoryItemDO::getId));
+
     }
 
     default List<ErpCustomCategoryItemDO> selectListByCategoryId(Integer categoryId) {

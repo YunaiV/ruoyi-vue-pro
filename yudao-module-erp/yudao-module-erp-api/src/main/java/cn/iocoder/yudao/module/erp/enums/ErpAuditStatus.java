@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.erp.enums;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -16,7 +16,7 @@ import java.util.Map;
  */
 @RequiredArgsConstructor
 @Getter
-public enum ErpAuditStatus implements IntArrayValuable {
+public enum ErpAuditStatus implements ArrayValuable<Integer> {
 
     // 1. 草稿阶段
     DRAFT(0, "草稿"),
@@ -48,11 +48,6 @@ public enum ErpAuditStatus implements IntArrayValuable {
      */
     private final String name;
 
-    @Override
-    public int[] array() {
-        return ARRAYS;
-    }
-
     /**
      * 根据状态码获取状态枚举的描述。
      *
@@ -70,5 +65,18 @@ public enum ErpAuditStatus implements IntArrayValuable {
             }
         }
         throw new IllegalArgumentException("无效的订购状态码: " + code);
+    }
+
+    /**
+     * @return 数组
+     */
+    @Override
+    public Integer[] array() {
+        int[] arrays = ARRAYS;
+        Integer[] result = new Integer[arrays.length];
+        for (int i = 0; i < arrays.length; i++) {
+            result[i] = arrays[i];
+        }
+        return result;
     }
 }

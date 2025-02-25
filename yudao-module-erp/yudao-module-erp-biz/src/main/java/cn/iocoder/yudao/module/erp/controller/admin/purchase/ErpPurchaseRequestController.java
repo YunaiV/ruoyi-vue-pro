@@ -9,16 +9,19 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestItemRespVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestPageReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestRespVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestAuditStatusReq;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestPageReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.resp.ErpPurchaseRequestItemRespVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.resp.ErpPurchaseRequestRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.tools.validation;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseRequestService;
+import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpWarehouseService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -52,7 +55,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 @RestController
 @RequestMapping("/erp/purchase-request")
 @Validated
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ErpPurchaseRequestController {
 
     private final ErpPurchaseRequestService erpPurchaseRequestService;
@@ -60,6 +63,7 @@ public class ErpPurchaseRequestController {
     private final ErpProductService productService;
     private final AdminUserApi adminUserApi;
     private final DeptApi deptApi;
+    private final ErpSupplierService erpSupplierService;
 
     @PostMapping("/create")
     @Operation(summary = "创建ERP采购申请单")
@@ -90,12 +94,22 @@ public class ErpPurchaseRequestController {
     @Parameter(name = "requestId", description = "申请单编号", required = true)
     @Parameter(name = "reviewed", description = "审核状态", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:review')")
-    public CommonResult<Boolean> reviewPurchaseRequest(@RequestParam("requestId") Long requestId,@RequestParam("reviewed") Boolean reviewed) {
-        erpPurchaseRequestService.reviewPurchaseOrder(requestId,null, reviewed);
+    public CommonResult<Boolean> reviewPurchaseRequest(@RequestBody ErpPurchaseRequestAuditStatusReq req) {
+        erpPurchaseRequestService.reviewPurchaseOrder(req);
         return success(true);
     }
 
-    @PutMapping("/status")
+    //procurement采购接口
+    @GetMapping("/procurement")
+    @Operation(summary = "采购接口")
+    @Parameter(name = "requestId", description = "申请单编号", required = true)
+    @PreAuthorize("@ss.hasPermission('erp:purchase-order:procurement')")
+    public CommonResult<Boolean> procurement(@RequestParam("requestId") Long requestId) {
+        //TODO 采购
+        return null;
+    }
+
+    @PutMapping("/enableStatus")
     @Operation(summary = "关闭/启用申请单")
     @Parameter(name = "id", description = "申请单id", required = true)
     @Parameter(name = "enable", description = "开启、关闭", required = true)
@@ -105,8 +119,9 @@ public class ErpPurchaseRequestController {
         erpPurchaseRequestService.switchPurchaseOrderStatus(requestId, itemIds, enable);
         return success(true);
     }
+
     @PutMapping("/merge")
-    @Operation(summary = "合并采购订单")
+    @Operation(summary = "合并采购")
     @Parameter(name = "ids", description = "编号数组", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:merge')")
     public CommonResult<Long> mergePurchaseOrder(@RequestParam("ids") List<Long> ids) {
@@ -124,14 +139,8 @@ public class ErpPurchaseRequestController {
         if (purchaseRequest == null) {
             return success(null);
         }
-        List<ErpPurchaseRequestItemsDO> purchaseRequestItemsList = erpPurchaseRequestService.getPurchaseRequestItemListByOrderId(id);
-        Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
-            convertSet(purchaseRequestItemsList, ErpPurchaseRequestItemsDO::getProductId));
-        return success(BeanUtils.toBean(purchaseRequest, ErpPurchaseRequestRespVO.class, purchaseOrderVO ->
-            purchaseOrderVO.setItems(BeanUtils.toBean(purchaseRequestItemsList, ErpPurchaseRequestItemRespVO.class, item -> {
-                MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
-                    .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()));
-            }))));
+        List<ErpPurchaseRequestRespVO> vos = bindList(Collections.singletonList(purchaseRequest));
+        return success(vos.get(0));
     }
 
     @GetMapping("/page")
@@ -139,7 +148,7 @@ public class ErpPurchaseRequestController {
     @PreAuthorize("@ss.hasPermission('erp:purchase-request:query')")
     public CommonResult<PageResult<ErpPurchaseRequestRespVO>> getPurchaseRequestPage(@Valid ErpPurchaseRequestPageReqVO pageReqVO) {
         PageResult<ErpPurchaseRequestDO> pageResult = erpPurchaseRequestService.getPurchaseRequestPage(pageReqVO);
-        return success(buildPurchaseRequestVOPageResult(pageResult));
+        return success(new PageResult<>(bindList(pageResult.getList()), pageResult.getTotal()));
     }
 
 
@@ -150,28 +159,28 @@ public class ErpPurchaseRequestController {
     public void exportPurchaseRequestExcel(@Valid ErpPurchaseRequestPageReqVO pageReqVO,
                                            HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<ErpPurchaseRequestRespVO> list = buildPurchaseRequestVOPageResult(erpPurchaseRequestService.getPurchaseRequestPage(pageReqVO)).getList();
+        List<ErpPurchaseRequestRespVO> list = bindList(erpPurchaseRequestService.getPurchaseRequestPage(pageReqVO).getList());
         // 导出 Excel
         ExcelUtils.write(response, "ERP采购申请单.xls", "数据", ErpPurchaseRequestRespVO.class, list);
     }
 
-    private PageResult<ErpPurchaseRequestRespVO> buildPurchaseRequestVOPageResult(PageResult<ErpPurchaseRequestDO> pageResult) {
-        if (CollUtil.isEmpty(pageResult.getList())) {
-            return PageResult.empty(pageResult.getTotal());
+    private List<ErpPurchaseRequestRespVO> bindList(List<ErpPurchaseRequestDO> oldList) {
+        if (CollUtil.isEmpty(oldList)) {
+            return Collections.emptyList();
         }
         // 1.1 申请单-产品项
         List<ErpPurchaseRequestItemsDO> purchaseRequestItemList = erpPurchaseRequestService.getPurchaseRequestItemListByOrderIds(
-            convertSet(pageResult.getList(), ErpPurchaseRequestDO::getId));
+            convertSet(oldList, ErpPurchaseRequestDO::getId));
         Map<Long, List<ErpPurchaseRequestItemsDO>> purchaseRequestItemMap = convertMultiMap(purchaseRequestItemList, ErpPurchaseRequestItemsDO::getRequestId);
         // 1.2 产品信息
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
             convertSet(purchaseRequestItemList, ErpPurchaseRequestItemsDO::getProductId));
         //1.3 获取用户信息
         Set<Long> userIds = Stream.concat(
-                pageResult.getList().stream()
+                oldList.stream()
                     .flatMap(purchaseRequest -> Stream.of(
-                        purchaseRequest.getApplicant(),//申请人
-                        purchaseRequest.getAuditor(),//审核者
+                        purchaseRequest.getApplicantId(),//申请人
+                        purchaseRequest.getAuditorId(),//审核者
                         safeParseLong(purchaseRequest.getCreator()),
                         safeParseLong(purchaseRequest.getUpdater())
                     )),
@@ -192,18 +201,22 @@ public class ErpPurchaseRequestController {
         );
         //1.4 部门信息
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
-            convertSet(pageResult.getList(), ErpPurchaseRequestDO::getApplicationDept)
+            convertSet(oldList, ErpPurchaseRequestDO::getApplicationDeptId)
         );
-
+        //1.5 供应商信息
+        Map<Long, ErpSupplierDO> supplierMap = erpSupplierService.getSupplierMap(
+            convertSet(oldList, ErpPurchaseRequestDO::getSupplierId)
+        );
         //2 开始拼接
-        return BeanUtils.toBean(pageResult, ErpPurchaseRequestRespVO.class, purchaseRequest -> {
+        return BeanUtils.toBean(oldList, ErpPurchaseRequestRespVO.class, purchaseRequest -> {
             //2.1 申请单填充
             //设置人员信息
-            MapUtils.findAndThen(userMap, safeParseLong(purchaseRequest.getApplicant()), user -> purchaseRequest.setApplicant(user.getNickname()));//申请人
-            MapUtils.findAndThen(userMap, safeParseLong(purchaseRequest.getAuditor()), user -> purchaseRequest.setAuditor(user.getNickname()));//审核者
+            MapUtils.findAndThen(userMap, purchaseRequest.getApplicantId(), user -> purchaseRequest.setApplicant(user.getNickname()));//申请人
+            MapUtils.findAndThen(userMap, purchaseRequest.getAuditorId(), user -> purchaseRequest.setAuditor(user.getNickname()));//审核者
             //设置部门信息
-            MapUtils.findAndThen(deptMap, safeParseLong(purchaseRequest.getApplicationDept()), dept -> purchaseRequest.setApplicationDept(dept.getName()));
-
+            MapUtils.findAndThen(deptMap, purchaseRequest.getApplicationDeptId(), dept -> purchaseRequest.setApplicationDept(dept.getName()));
+            //供应商信息
+            MapUtils.findAndThen(supplierMap, purchaseRequest.getSupplierId(), supplier -> purchaseRequest.setSupplierName(supplier.getName()));
             purchaseRequest.setItems(
                 BeanUtils.toBean(purchaseRequestItemMap.get(purchaseRequest.getId()), ErpPurchaseRequestItemRespVO.class,
                     item -> {
@@ -225,8 +238,8 @@ public class ErpPurchaseRequestController {
             //订单产品总数
             purchaseRequest.setTotalCount(CollUtil.isEmpty(purchaseRequest.getItems()) ? 0 : purchaseRequest.getItems().stream().mapToInt(ErpPurchaseRequestItemRespVO::getCount).sum());
             //创建者、更新者、审核人、申请人填充
-            MapUtils.findAndThen(userMap, safeParseLong(purchaseRequest.getApplicant()), user -> purchaseRequest.setApplicant(user.getNickname()));
-            MapUtils.findAndThen(userMap, safeParseLong(purchaseRequest.getAuditor()), user -> purchaseRequest.setAuditor(user.getNickname()));
+            MapUtils.findAndThen(userMap, purchaseRequest.getApplicantId(), user -> purchaseRequest.setApplicant(user.getNickname()));
+            MapUtils.findAndThen(userMap, purchaseRequest.getAuditorId(), user -> purchaseRequest.setAuditor(user.getNickname()));
             MapUtils.findAndThen(userMap, safeParseLong(purchaseRequest.getCreator()), user -> purchaseRequest.setCreator(user.getNickname()));
             MapUtils.findAndThen(userMap, safeParseLong(purchaseRequest.getUpdater()), user -> purchaseRequest.setUpdater(user.getNickname()));
         });

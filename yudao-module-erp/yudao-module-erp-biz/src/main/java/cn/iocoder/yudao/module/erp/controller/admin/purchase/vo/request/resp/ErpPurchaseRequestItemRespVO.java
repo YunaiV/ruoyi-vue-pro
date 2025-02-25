@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request;
+package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.resp;
 
 import cn.iocoder.yudao.framework.mybatis.core.vo.BaseVO;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -38,8 +38,11 @@ public class ErpPurchaseRequestItemRespVO extends BaseVO {
     @ExcelProperty("产品单位名称")
     private String productUnitName;
 
+    @Schema(description = "产品单位ID")
+    @ExcelProperty("产品单位ID")
+    private String productUnitId;
+
     @Schema(description = "仓库id")
-    @ExcelProperty("仓库id")
     private Long warehouseId;
 
     @Schema(description = "仓库名称")
@@ -55,7 +58,7 @@ public class ErpPurchaseRequestItemRespVO extends BaseVO {
 
     @Schema(description = "已入库数量")
     @ExcelProperty("已入库数量")
-    private String inQty;
+    private Integer inQty;
 
     @Schema(description = "参考单价")
     @ExcelProperty("参考单价")
@@ -80,25 +83,37 @@ public class ErpPurchaseRequestItemRespVO extends BaseVO {
     @Schema(description = "批准数量")
     @ExcelProperty("批准数量")
     private Integer approveCount;
+
     // ========== 其他状态信息 ==========
     @Schema(description = "关闭状态（已关闭，已开启）")
     @ExcelProperty("关闭状态")
     private String offStatus;
 
-    //未订购数量
     @Schema(description = "未订购数量", example = "100")
     @ExcelProperty("未订购数量")
     private Integer unOrderCount;
-    //已订购数量
+
     @Schema(description = "已订购数量", example = "100")
     @ExcelProperty("已订购数量")
     private Integer orderCount;
-    //已入库数量
+
     @Schema(description = "已入库数量", example = "100")
     @ExcelProperty("已入库数量")
     private Integer inCount;
-    //行采购状态
+
     @Schema(description = "行采购状态")
     @ExcelProperty("行采购状态")
     private String orderStatus;
+
+    @Schema(description = "供应商id")
+    @ExcelProperty("供应商id")
+    private Long supplierId;
+
+    @Schema(description = "供应商名称")
+    @ExcelProperty("供应商名称")
+    private String supplierName;
+
+    @Schema(description = "收货地址")
+    @ExcelProperty("收货地址")
+    private String delivery;
 }
