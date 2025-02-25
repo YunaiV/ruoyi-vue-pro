@@ -324,18 +324,18 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
 
         // 判断是否是审核操作
         if (Boolean.TRUE.equals(req.getReviewed())) {
-            //排除已审核
-            ThrowUtil.ifThrow(ErpAuditStatus.PROCESS.getCode().equals(requestDO.getStatus()), PURCHASE_REQUEST_APPROVE_FAIL);
+            //已审核->异常
+            ThrowUtil.ifThrow(ErpAuditStatus.APPROVE.getCode().equals(requestDO.getStatus()), PURCHASE_REQUEST_APPROVE_FAIL);
             // 审核操作
             approvePurchaseOrder(req, itemsDOList);
         } else {
-            //非审核->异常
+            //非已审核->异常
             ThrowUtil.ifThrow(!ErpAuditStatus.APPROVE.getCode().equals(requestDO.getStatus()), PURCHASE_REQUEST_PROCESS_FAIL);
             //非关闭->异常
-            ThrowUtil.ifThrow(!ErpOffStatus.CLOSED.getCode().equals(requestDO.getOffStatus()), PURCHASE_REQUEST_PROCESS_FAIL_CLOSE);
+            ThrowUtil.ifThrow(ErpOffStatus.CLOSED.getCode().equals(requestDO.getOffStatus()), PURCHASE_REQUEST_PROCESS_FAIL_CLOSE);
             //已订购+部分订购->异常
             ThrowUtil.ifThrow(ErpOrderStatus.PARTIALLY_ORDERED.getCode().equals(requestDO.getOrderStatus()) ||
-                !ErpOrderStatus.ORDERED.getCode().equals(requestDO.getOrderStatus()
+                ErpOrderStatus.ORDERED.getCode().equals(requestDO.getOrderStatus()
                 ), PURCHASE_REQUEST_PROCESS_FAIL_ORDERED);
             // 反审核操作
             reverseApprovePurchaseOrder(itemsDOList, req);
