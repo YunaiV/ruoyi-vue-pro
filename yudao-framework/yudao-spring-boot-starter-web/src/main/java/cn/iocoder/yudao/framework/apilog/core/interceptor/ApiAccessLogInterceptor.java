@@ -42,7 +42,7 @@ public class ApiAccessLogInterceptor implements HandlerInterceptor {
         }
 
         // 打印 request 日志
-        if (!SpringUtils.isProd()) {
+        if (!SpringUtils.getEnv().isProdEnv()) {
             Map<String, String> queryString = ServletUtils.getParamMap(request);
             String requestBody = ServletUtils.isJsonRequest(request) ? ServletUtils.getBody(request) : null;
             if (CollUtil.isEmpty(queryString) && StrUtil.isEmpty(requestBody)) {
@@ -64,7 +64,7 @@ public class ApiAccessLogInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
         // 打印 response 日志
-        if (!SpringUtils.isProd()) {
+        if (!SpringUtils.getEnv().isProdEnv()) {
             StopWatch stopWatch = (StopWatch) request.getAttribute(ATTRIBUTE_STOP_WATCH);
             stopWatch.stop();
             log.info("[afterCompletion][完成请求 URL({}) 耗时({} ms)]",

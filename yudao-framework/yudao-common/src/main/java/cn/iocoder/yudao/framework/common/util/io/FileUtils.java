@@ -6,16 +6,23 @@ import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
+import cn.hutool.system.OsInfo;
+import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
+import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
 
 /**
  * 文件工具类
  *
  * @author 芋道源码
  */
+@Slf4j
 public class FileUtils {
 
     /**
@@ -81,4 +88,117 @@ public class FileUtils {
         return sha256Hex + '.' + FileTypeUtil.getType(new ByteArrayInputStream(content));
     }
 
+    /**
+     * 获得  file 相对于 baseDir 的路径
+     * @param baseDir  基础路径
+     * @param file 完整路径
+     * @return 相对路径
+     * */
+    public static String getRelativePath(File baseDir,File file)
+    {
+        String base=baseDir.getAbsolutePath();
+        String full=file.getAbsolutePath();
+        if(!full.startsWith(base)) {
+            throw new IllegalArgumentException(full + " is not sub of "+base);
+        }
+        return full.substring(base.length());
+    }
+
+    /**
+     * 获得相对于指定基础路径的文件
+     */
+    public static File resolveByPath(String basicDirPath, String... part) {
+        part = ArrayUtils.unshift(part, basicDirPath);
+        return  new File(StrUtils.joinPath(part));
+    }
+
+    /**
+     * 获得相对于指定基础路径的文件
+     */
+    public static File resolveByPath(File basicDir, String... part) {
+        return resolveByPath(basicDir.getAbsolutePath(), part);
+    }
+
+    /**
+     * 获得相对于指定类所在目录的文件
+     *
+     * @param cls 类
+     * @return 类所在的路径
+     */
+    public static File resolveByClass(Class cls, String... part) {
+        File dir = resolveByClass(cls);
+        return resolveByPath(dir.getParentFile(), part);
+    }
+
+    /**
+     * 获得类所在的路径
+     *
+     * @param cls 类
+     * @return 类所在的路径
+     */
+    public static File resolveByClass(Class cls) {
+
+        String strURL = "";
+        try {
+            String strClassName = cls.getName();
+            String strPackageName = "";
+            if (cls.getPackage() != null) {
+                strPackageName = cls.getPackage().getName();
+            }
+
+            String strClassFileName = "";
+            if (!"".equals(strPackageName)) {
+                strClassFileName = strClassName.substring(strPackageName.length() + 1, strClassName.length());
+            } else {
+                strClassFileName = strClassName;
+            }
+            try {
+                URL url = cls.getResource(strClassFileName + ".class");
+                if(url!=null) {
+                    strURL = url.toString();
+                } else {
+                    return null;
+                }
+            } catch (Exception e){
+                log.error("path resolve error",e);
+                return null;
+            }
+
+            OsInfo os= new OsInfo();
+
+            String _strURL=StrUtils.removeFirst(strURL, "file:/");
+            if(!os.isWindows()) {
+                _strURL="/"+_strURL;
+            }
+            File f=new File(_strURL);
+            if(f.exists() && f.isFile()) {
+                return f;
+            }
+
+
+
+            try {
+                strURL = java.net.URLDecoder.decode(strURL, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                log.error("path resolve error", e);
+            }
+
+            return new File(strURL);
+        } catch (Exception e) {
+            log.error("path resolve error", e);
+            return null;
+        }
+
+    }
+
+    public static String changeExtName(String rel, String newExtName) {
+        int i=rel.lastIndexOf(".");
+        newExtName=StrUtils.removeFirst(newExtName, ".");
+        if(i!=-1) {
+            rel=rel.substring(0,i);
+            return rel+"."+newExtName;
+        } else {
+            return rel+"."+newExtName;
+        }
+    }
 }

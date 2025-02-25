@@ -61,4 +61,18 @@ public class NumberUtils {
         return NumberUtil.mul(values);
     }
 
+    public static Long parseLong(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Long) {
+            return (Long) value;
+        }
+        try {
+            return Long.parseLong(value.toString());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
 }
