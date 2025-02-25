@@ -519,10 +519,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 其中，variables 是存储动态表单到 local 任务级别。过滤一下，避免 ProcessInstance 系统级的变量被占用
         if (CollUtil.isNotEmpty(reqVO.getVariables())) {
             Map<String, Object> variables = FlowableUtils.filterTaskFormVariable(reqVO.getVariables());
-            // 修改表单的值需要存储到 ProcessInstance 变量
+            // 下个节点审批人如果不存在，则由前端传递
             if (CollUtil.isNotEmpty(reqVO.getStartUserSelectAssignees())) {
-                variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES,
-                        reqVO.getStartUserSelectAssignees());
+                // 获取实例中的全部节点数据，避免后续节点的审批人被覆盖
+                Map<String, List<Long>> startUserSelectAssignees = FlowableUtils.getStartUserSelectAssignees(instance.getProcessVariables());
+                startUserSelectAssignees.putAll(reqVO.getStartUserSelectAssignees());
+                variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES, startUserSelectAssignees);
             }
             runtimeService.setVariables(task.getProcessInstanceId(), variables);
             taskService.complete(task.getId(), variables, true);
