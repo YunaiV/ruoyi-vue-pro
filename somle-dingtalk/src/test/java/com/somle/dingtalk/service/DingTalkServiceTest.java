@@ -1,7 +1,7 @@
 package com.somle.dingtalk.service;
 
+import cn.iocoder.yudao.framework.test.core.ut.BaseSpringTest;
 import com.somle.dingtalk.repository.DingTalkTokenRepository;
-import com.somle.framework.test.core.ut.BaseSpringTest;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;

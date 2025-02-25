@@ -1,10 +1,10 @@
 package com.somle.kingdee.service;
 
 import cn.hutool.core.util.ObjUtil;
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.framework.common.util.web.RequestX;
-import com.somle.framework.common.util.web.WebUtils;
+import cn.iocoder.yudao.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
+import cn.iocoder.yudao.framework.common.util.web.RequestX;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import com.somle.kingdee.model.*;
 import com.somle.kingdee.model.supplier.KingdeeSupplier;
 import lombok.Data;
@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static com.somle.kingdee.util.SignatureUtils.*;
@@ -38,6 +40,7 @@ public class KingdeeClient {
 
     /**
      * 根据OuterInstanceId覆盖内存的KingdeeToken
+     *
      * @return KingdeeToken
      */
     protected KingdeeToken refreshAuth() {
@@ -45,7 +48,10 @@ public class KingdeeClient {
     }
 
     private KingdeeToken fillAuth(KingdeeToken newToken) {
-        token.setAppSignature(getAppSignature(newToken));
+        String signature = getAppSignature(newToken);
+        token.setAppSignature(signature);
+        newToken.setAppSignature(signature);//响应返回值没有签名->需要计算
+
         token.setAppToken(getAppToken(newToken));
         log.info("tokens filled successfully");
         return token;
@@ -119,11 +125,29 @@ public class KingdeeClient {
         return response;
     }
 
-    public KingdeeUnit getMeasureUnitByNumber(String number) {
-        String endUrl = "/jdy/v2/bd/measure_unit_detail";
-        TreeMap<String, String> params = new TreeMap<>();
-        params.put("number", number);
-        return getResponse(endUrl, params).getData(KingdeeUnit.class);
+    /**
+     * 安全设置单位id，如果它存在。
+     * @param unitName 单位名称
+     * @param setter 回调函数
+     */
+    private void setUnitId(String unitName, Consumer<KingdeeUnit> setter) {
+        getMeasureUnitByNumber(unitName, (kingdeeUnit, e) -> {
+            if (e == null) {
+                setter.accept(kingdeeUnit);
+            }
+        });
+    }
+    public void getMeasureUnitByNumber(String number, BiConsumer<KingdeeUnit, Exception> callback) {
+        try {
+            String endUrl = "/jdy/v2/bd/measure_unit_detail";
+            TreeMap<String, String> params = new TreeMap<>();
+            params.put("number", number);
+            KingdeeUnit kingdeeUnit = getResponse(endUrl, params).getData(KingdeeUnit.class);
+            callback.accept(kingdeeUnit, null);
+        } catch (Exception e) {
+            log.debug("getMeasureUnitByNumber error,当前产品的单位也许不存在。", e);
+            callback.accept(null, e);
+        }
     }
 
     public KingdeeResponse getMaterial(String number) {
@@ -135,38 +159,43 @@ public class KingdeeClient {
     }
 
     public KingdeeResponse addProduct(KingdeeProductSaveReqVO product) {
-        KingdeeProductSaveReqVO saveReqVO = new KingdeeProductSaveReqVO();
-        BeanUtils.copyProperties(product, saveReqVO);
+        KingdeeProductSaveReqVO reqVO = new KingdeeProductSaveReqVO();
+        BeanUtils.copyProperties(product, reqVO);
         try {
-            String id = getMaterial(saveReqVO.getNumber()).getData(JSONObject.class).getString("id");
-            saveReqVO.setId(id);
+            String id = getMaterial(reqVO.getNumber()).getData(JSONObject.class).getString("id");
+            reqVO.setId(id);
         } catch (Exception e) {
-            log.debug("id not found for " + saveReqVO.getNumber() + "adding new");
+            log.debug("id not found for ({}) adding new", reqVO.getNumber());
         }
-
-        saveReqVO.setVolumeUnitId(getMeasureUnitByNumber("立方厘米").getId());
-        saveReqVO.setWeightUnitId(getMeasureUnitByNumber("kg").getId());
-        saveReqVO.setBaseUnitId(getMeasureUnitByNumber("套").getId());
-        saveReqVO.setCustomField(
-            getCustomFieldByDisplayName("bd_material", "部门"),
-            getAuxInfoByNumber(saveReqVO.getSaleDepartmentId().toString()).getId()
-        );
-        setCustomFieldSafely(saveReqVO, "报关品名", saveReqVO.getDeclaredTypeZh());
-        setCustomFieldSafely(saveReqVO, "报关品名(英文)", saveReqVO.getDeclaredTypeEn());
-        saveReqVO.setIgnoreWarn(true);//保存覆盖已存在产品
+        setUnitId("立方厘米", kingdeeUnit -> reqVO.setVolumeUnitId(kingdeeUnit.getId()));
+        setUnitId("kg", kingdeeUnit -> reqVO.setWeightUnitId(kingdeeUnit.getId()));
+        setUnitId("套", kingdeeUnit -> reqVO.setBaseUnitId(kingdeeUnit.getId()));
+        try {
+            Optional.ofNullable(getAuxInfoByNumber(reqVO.getSaleDepartmentId().toString()))
+                .ifPresent(kingdeeUnit ->
+                    setCustomFieldSafely(reqVO, "部门", kingdeeUnit.getId())
+                );
+        } catch (Exception e) {
+            log.debug("getAuxInfoByNumber error for sale department ID: {}", reqVO.getSaleDepartmentId(), e);
+        }
+        setCustomFieldSafely(reqVO, "部门", reqVO.getDeclaredTypeZh());
+        setCustomFieldSafely(reqVO, "报关品名", reqVO.getDeclaredTypeZh());
+        setCustomFieldSafely(reqVO, "报关品名(英文)", reqVO.getDeclaredTypeEn());
+        reqVO.setIgnoreWarn(true);//保存覆盖已存在产品
         log.debug("adding product");
         String endUrl = "/jdy/v2/bd/material";
         TreeMap<String, String> params = new TreeMap<>();
-        KingdeeResponse response = postResponse(endUrl, params, saveReqVO);
-        return response;
+        return postResponse(endUrl, params, reqVO);
     }
+
+
 
     /**
      * 根绝字段名称获取id，如果有该字段、则设置value，没有就日志记录
      *
-     * @param reqVO 对象
-     * @param displayName        属性名称
-     * @param fieldValue         属性值
+     * @param reqVO       对象
+     * @param displayName 属性名称
+     * @param fieldValue  属性值
      */
     private void setCustomFieldSafely(KingdeeProductSaveReqVO reqVO, String displayName, String fieldValue) {
         try {
@@ -372,11 +401,11 @@ public class KingdeeClient {
     }
 
     public KingdeeResponse getResponse(String endUrl, Object params) {
-        return fetchResponse("GET", endUrl, new TreeMap<>(JsonUtils.toStringMap(params)), null);
+        return fetchResponse("GET", endUrl, new TreeMap<>(JsonUtilsX.toStringMap(params)), null);
     }
 
     public KingdeeResponse postResponse(String endUrl, Object params, Object payload) {
-        return fetchResponse("POST", endUrl, new TreeMap<>(JsonUtils.toStringMap(params)), payload);
+        return fetchResponse("POST", endUrl, new TreeMap<>(JsonUtilsX.toStringMap(params)), payload);
     }
 
 }

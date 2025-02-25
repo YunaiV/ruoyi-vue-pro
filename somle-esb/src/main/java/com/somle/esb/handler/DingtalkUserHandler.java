@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-@Profile("!dev & !test") // 仅在非 dev 和非 test 环境加载
+@Profile("prod")
 @RequiredArgsConstructor
 public class DingtalkUserHandler {
 

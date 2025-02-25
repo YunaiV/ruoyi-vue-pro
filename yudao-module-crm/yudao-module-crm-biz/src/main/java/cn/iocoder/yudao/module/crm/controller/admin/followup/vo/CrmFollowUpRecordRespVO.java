@@ -10,7 +10,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_FOLLOW_UP_TYPE;
+import static cn.iocoder.yudao.module.crm.enums.CrmDictTypeConstants.CRM_FOLLOW_UP_TYPE;
 
 @Schema(description = "管理后台 - 跟进记录 Response VO")
 @Data

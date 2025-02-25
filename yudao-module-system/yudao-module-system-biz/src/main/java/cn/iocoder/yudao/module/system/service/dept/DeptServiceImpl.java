@@ -200,10 +200,10 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
-    public List<DeptDO> getChildDeptList(Long id) {
+    public List<DeptDO> getChildDeptList(Collection<Long> ids) {
         List<DeptDO> children = new LinkedList<>();
         // 遍历每一层
-        Collection<Long> parentIds = Collections.singleton(id);
+        Collection<Long> parentIds = ids;
         // 使用 Short.MAX_VALUE 避免 bug 场景下，存在死循环
         for (int i = 0; i < Short.MAX_VALUE; i++) {
             // 查询当前层，所有的子部门
@@ -217,6 +217,11 @@ public class DeptServiceImpl implements DeptService {
             parentIds = convertSet(depts, DeptDO::getId);
         }
         return children;
+    }
+
+    @Override
+    public List<DeptDO> getDeptListByLeaderUserId(Long id) {
+        return deptMapper.selectListByLeaderUserId(id);
     }
 
     @Override

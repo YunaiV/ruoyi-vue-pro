@@ -1,10 +1,10 @@
 package com.somle.eccang.model;
 
+import cn.iocoder.yudao.framework.common.deserializer.CustomListDeserializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.somle.framework.common.deserializer.CustomListDeserializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

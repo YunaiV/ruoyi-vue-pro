@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractRespVO;
-import cn.iocoder.yudao.module.crm.enums.DictTypeConstants;
+import cn.iocoder.yudao.module.crm.enums.CrmDictTypeConstants;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,7 +31,7 @@ public class CrmReceivableRespVO {
 
     @Schema(description = "回款方式", example = "2")
     @ExcelProperty(value = "回款方式", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.CRM_RECEIVABLE_RETURN_TYPE)
+    @DictFormat(CrmDictTypeConstants.CRM_RECEIVABLE_RETURN_TYPE)
     private Integer returnType;
 
     @Schema(description = "回款金额", requiredMode = Schema.RequiredMode.REQUIRED, example = "9000")
@@ -69,7 +69,7 @@ public class CrmReceivableRespVO {
 
     @Schema(description = "审批状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @ExcelProperty(value = "审批状态", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.CRM_AUDIT_STATUS)
+    @DictFormat(CrmDictTypeConstants.CRM_AUDIT_STATUS)
     private Integer auditStatus;
 
     @Schema(description = "工作流编号", example = "备注")

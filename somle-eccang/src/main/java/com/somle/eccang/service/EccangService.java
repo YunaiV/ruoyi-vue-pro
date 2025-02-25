@@ -7,12 +7,12 @@ import com.somle.eccang.model.exception.EccangResponseException;
 import com.somle.eccang.model.req.EccangInventoryBatchReqVO;
 import com.somle.eccang.model.req.EccangRmaReturnReqVO;
 import com.somle.eccang.repository.EccangTokenRepository;
-import com.somle.framework.common.util.general.CoreUtils;
-import com.somle.framework.common.util.general.Limiter;
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.framework.common.util.web.RequestX;
-import com.somle.framework.common.util.web.WebUtils;
+import cn.iocoder.yudao.framework.common.util.general.CoreUtils;
+import cn.iocoder.yudao.framework.common.util.general.Limiter;
+import cn.iocoder.yudao.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
+import cn.iocoder.yudao.framework.common.util.web.RequestX;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -81,10 +81,10 @@ public class EccangService {
     protected JSONObject requestBody(Object reqParams, String ecMethod) {
         long timestamp = System.currentTimeMillis();
 
-        var postData = JsonUtils.newObject();
+        var postData = JsonUtilsX.newObject();
         postData.put("app_key", token.getUserName());
 //        postData.put("biz_content", JSON.toJSONString(reqParams.isEmpty() ? Map.of("page_size", pageSize) : reqParams));
-        postData.put("biz_content", JsonUtils.toJsonString(reqParams));
+        postData.put("biz_content", JsonUtilsX.toJsonString(reqParams));
         postData.put("charset", "UTF-8");
         postData.put("interface_method", ecMethod);
         postData.put("nonce_str", "113456");
@@ -119,7 +119,7 @@ public class EccangService {
                 switch (response.code()) {
                     case 200:
                         var responseBody = response.body().string();
-                        var responseOriginal = JsonUtils.parseObject(responseBody, EccangResponse.class);
+                        var responseOriginal = JsonUtilsX.parseObject(responseBody, EccangResponse.class);
                         validateResponse(responseOriginal);
                         return responseOriginal;
                     case 429:
@@ -191,19 +191,19 @@ public class EccangService {
 
     // public Stream<BizContent> listPage (String endpoint) {
 
-    //     var payload = JsonUtils.newObject();
+    //     var payload = JsonUtilsSomle.newObject();
     //     return getAllBiz(payload, endpoint);
     // }
 
     public EccangPage list(String endpoint) {
 
-        var payload = JsonUtils.newObject();
+        var payload = JsonUtilsX.newObject();
         return getPage(payload, endpoint);
     }
 
     public <T> Stream<T> list(String endpoint, Class<T> objectClass) {
 
-        var payload = JsonUtils.newObject();
+        var payload = JsonUtilsX.newObject();
         // log.debug(payload.toString());
         // getAllBiz(payload, endpoint);
         // return Stream.of();
@@ -240,7 +240,7 @@ public class EccangService {
 
     public List<EccangWarehouse> getWarehouseList() {
 
-        JSONObject params = JsonUtils.newObject();
+        JSONObject params = JsonUtilsX.newObject();
         return getPage(params, "getWarehouseList").getData(EccangWarehouse.class);
     }
 
@@ -304,7 +304,7 @@ public class EccangService {
     public Stream<EccangPage> getOrderUnarchivePages(EccangOrderVO orderParams) {
         orderParams.setGetAddress(1);
         orderParams.setGetDetail(1);
-        return getAllPage(JsonUtils.toJSONObject(orderParams), "getOrderList");
+        return getAllPage(JsonUtilsX.toJSONObject(orderParams), "getOrderList");
     }
 
     public EccangProduct getProduct(String sku) {
@@ -314,7 +314,7 @@ public class EccangService {
             .build();
         // String response = post("getWmsProductList", product, String.class).get(0);
         // log.debug(response);
-        // return JsonUtils.parseObject(response, EccangProduct.class);
+        // return JsonUtilsSomle.parseObject(response, EccangProduct.class);
         List<EccangProduct> getWmsProductList = post("getWmsProductList", product, EccangProduct.class);
         if (CollUtil.isNotEmpty(getWmsProductList)) {
             return getWmsProductList.get(0);
@@ -323,7 +323,7 @@ public class EccangService {
     }
 
     public Stream<EccangPage> getInventory() {
-        var payload = JsonUtils.newObject();
+        var payload = JsonUtilsX.newObject();
         return getAllPage(payload, "getProductInventory");
     }
 
@@ -332,11 +332,11 @@ public class EccangService {
         List<EccangWarehouse> warehouseList = getWarehouseList();
         var codeList = warehouseList.stream().map(EccangWarehouse::getWarehouseCode).toList();
         eccangInventoryBatchLogVO.setWarehouseCode(codeList);
-        return getAllPage(JsonUtils.toJSONObject(eccangInventoryBatchLogVO), "getInventoryBatchLog");
+        return getAllPage(JsonUtilsX.toJSONObject(eccangInventoryBatchLogVO), "getInventoryBatchLog");
     }
 
     public Stream<EccangPage> getInventoryBatch(EccangInventoryBatchReqVO eccangInventoryBatchVO) {
-        return getAllPage(JsonUtils.toJSONObject(eccangInventoryBatchVO), "getInventoryBatch");
+        return getAllPage(JsonUtilsX.toJSONObject(eccangInventoryBatchVO), "getInventoryBatch");
     }
 
     public EccangPage addDepartment(EccangCategory department) {
@@ -431,12 +431,12 @@ public class EccangService {
      * @Param []
      **/
     public Stream<EccangPage> getRmaRefundList(EccangRmaRefundVO eccangRmaRefundVO) {
-        return getAllPage(JsonUtils.toJSONObject(eccangRmaRefundVO), "getRmaRefundList");
+        return getAllPage(JsonUtilsX.toJSONObject(eccangRmaRefundVO), "getRmaRefundList");
     }
 
     //退件列表
     public Stream<EccangPage> getRmaReturnList(EccangRmaReturnReqVO eccangRmaReturnReqVO){
-        return getAllPage(JsonUtils.toJSONObject(eccangRmaReturnReqVO), "getRmaReturnList");
+        return getAllPage(JsonUtilsX.toJSONObject(eccangRmaReturnReqVO), "getRmaReturnList");
     }
 
     public String parseCountryCode(String code) {

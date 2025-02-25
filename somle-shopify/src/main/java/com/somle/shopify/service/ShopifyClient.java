@@ -1,10 +1,10 @@
 package com.somle.shopify.service;
 
 
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.framework.common.util.web.RequestX;
-import com.somle.framework.common.util.web.WebUtils;
+import cn.iocoder.yudao.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
+import cn.iocoder.yudao.framework.common.util.web.RequestX;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import com.somle.shopify.model.ShopifyToken;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -49,7 +49,7 @@ public class ShopifyClient {
             .headers(getHeaders())
             .build();
         var bodyString = sendRequest(request).body().string();
-        var result = JsonUtils.parseObject(bodyString, JSONObject.class);
+        var result = JsonUtilsX.parseObject(bodyString, JSONObject.class);
         return result;
     }
 
@@ -62,7 +62,7 @@ public class ShopifyClient {
             .headers(getHeaders())
             .build();
         var bodyString = sendRequest(request).body().string();
-        var result = JsonUtils.parseObject(bodyString, JSONObject.class);
+        var result = JsonUtilsX.parseObject(bodyString, JSONObject.class);
         return result;
     }
 
@@ -75,7 +75,7 @@ public class ShopifyClient {
             .headers(getHeaders())
             .build();
         var bodyString = sendRequest(request).body().string();
-        var result = JsonUtils.parseObject(bodyString, JSONObject.class);
+        var result = JsonUtilsX.parseObject(bodyString, JSONObject.class);
         return result;
     }
 
@@ -90,7 +90,7 @@ public class ShopifyClient {
             .headers(getHeaders())
             .build();
         var bodyString = sendRequest(request).body().string();
-        var result = JsonUtils.parseObject(bodyString, JSONObject.class);
+        var result = JsonUtilsX.parseObject(bodyString, JSONObject.class);
         return result;
     }
 

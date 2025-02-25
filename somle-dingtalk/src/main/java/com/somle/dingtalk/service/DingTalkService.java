@@ -12,9 +12,10 @@ import com.dingtalk.api.request.OapiUserListidRequest;
 import com.dingtalk.api.request.OapiV2UserGetRequest;
 import com.dingtalk.api.response.OapiUserListidResponse;
 import com.dingtalk.api.response.OapiV2UserGetResponse;
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.framework.common.util.web.RequestX;
+import cn.iocoder.yudao.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
+import cn.iocoder.yudao.framework.common.util.web.RequestX;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.annotation.PostConstruct;
 
 import lombok.SneakyThrows;
@@ -31,7 +32,7 @@ import com.somle.dingtalk.model.DingTalkDepartment;
 import com.somle.dingtalk.model.DingTalkResponse;
 import com.somle.dingtalk.model.DingTalkToken;
 import com.somle.dingtalk.repository.DingTalkTokenRepository;
-import com.somle.framework.common.util.web.WebUtils;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -63,13 +64,13 @@ public class DingTalkService {
     //     String response = restTemplate.getForObject(url, String.class);
     //     log.debug(response.toString());
 
-    //     JSONObject jsonObject = JsonUtils.parseObject(response);
+    //     JSONObject jsonObject = JsonUtilsSomle.parseObject(response);
     //     return jsonObject.getString("access_token");
     // }
 
     public DingTalkToken refreshAuth() {
         String url = HOST + "/v1.0/oauth2/accessToken";
-        var payload = JsonUtils.newObject();
+        var payload = JsonUtilsX.newObject();
         DingTalkToken token = tokenRepository.findAll().get(0);
         payload.put("appKey", token.getAppKey());
         payload.put("appSecret", token.getAppSecret());
@@ -78,7 +79,9 @@ public class DingTalkService {
             .url(url)
             .payload(payload)
             .build();
-        String accessToken = WebUtils.sendRequest(request, JSONObject.class).getString("accessToken");
+        ObjectNode result= WebUtils.sendRequest(request, ObjectNode.class);
+        JSONObject jsonObject=new JSONObject(result);
+        String accessToken =jsonObject.getString("accessToken");
         token.setAccessToken(accessToken);
         return token;
     }
@@ -124,7 +127,7 @@ public class DingTalkService {
         );
         Map<String, String> headers = Map.of(
         );
-        var payload = JsonUtils.newObject();
+        var payload = JsonUtilsX.newObject();
         payload.put("dept_id", deptId);
         try {
             var request = RequestX.builder()
@@ -196,7 +199,7 @@ public class DingTalkService {
         );
         Map<String, String> headers = Map.of(
         );
-        var payload = JsonUtils.newObject();
+        var payload = JsonUtilsX.newObject();
         payload.put("dept_id", deptId);
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.POST)

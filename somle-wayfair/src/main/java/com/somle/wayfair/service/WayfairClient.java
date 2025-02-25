@@ -1,8 +1,8 @@
 package com.somle.wayfair.service;
 
 
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.web.WebUtils;
+import cn.iocoder.yudao.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import com.somle.wayfair.model.WayfairToken;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

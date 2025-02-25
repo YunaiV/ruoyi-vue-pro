@@ -1,11 +1,8 @@
 package cn.iocoder.yudao.module.product.controller.admin.history.vo;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
-import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-
-import java.time.LocalDateTime;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
@@ -30,5 +27,11 @@ public class ProductBrowseHistoryRespVO {
 
     @Schema(description = "商品单价", example = "100")
     private Integer price;
+
+    @Schema(description = "商品销量", example = "100")
+    private Integer salesCount;
+
+    @Schema(description = "库存", example = "100")
+    private Integer stock;
 
 }

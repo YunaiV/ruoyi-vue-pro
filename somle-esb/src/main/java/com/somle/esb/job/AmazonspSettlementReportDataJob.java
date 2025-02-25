@@ -1,14 +1,11 @@
 package com.somle.esb.job;
 
 
-import cn.hutool.json.JSONUtil;
+import cn.iocoder.yudao.framework.common.util.csv.TsvUtils;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO.ProcessingStatuses;
 
 import com.somle.esb.model.OssData;
-import com.somle.framework.common.util.collection.MapUtils;
-import com.somle.framework.common.util.csv.TsvUtils;
-import com.somle.framework.common.util.json.JsonUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

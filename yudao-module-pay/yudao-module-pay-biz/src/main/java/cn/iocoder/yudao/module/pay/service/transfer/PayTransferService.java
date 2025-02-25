@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.pay.service.transfer;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferPageReqVO;
@@ -54,4 +55,13 @@ public interface PayTransferService {
      * @return 同步到状态的转账数量，包括转账成功、转账失败、转账中的
      */
     int syncTransfer();
+
+    /**
+     * 渠道的转账通知
+     *
+     * @param channelId  渠道编号
+     * @param notify     通知
+     */
+    void notifyTransfer(Long channelId, PayTransferRespDTO notify);
+
 }

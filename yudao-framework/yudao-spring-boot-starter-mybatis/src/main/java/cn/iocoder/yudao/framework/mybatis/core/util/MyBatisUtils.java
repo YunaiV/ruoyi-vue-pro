@@ -36,8 +36,9 @@ public class MyBatisUtils {
         Page<T> page = new Page<>(pageParam.getPageNo(), pageParam.getPageSize());
         // 排序字段
         if (!CollectionUtil.isEmpty(sortingFields)) {
-            page.addOrder(sortingFields.stream().map(sortingField -> SortingField.ORDER_ASC.equals(sortingField.getOrder()) ?
-                            OrderItem.asc(sortingField.getField()) : OrderItem.desc(sortingField.getField()))
+            page.addOrder(sortingFields.stream().map(sortingField -> SortingField.ORDER_ASC.equals(sortingField.getOrder())
+                            ? OrderItem.asc(StrUtil.toUnderlineCase(sortingField.getField()))
+                            : OrderItem.desc(StrUtil.toUnderlineCase(sortingField.getField())))
                     .collect(Collectors.toList()));
         }
         return page;
@@ -96,7 +97,6 @@ public class MyBatisUtils {
      * @return sql
      */
     public static String findInSet(String column, Object value) {
-        // 这里不用SqlConstants.DB_TYPE，因为它是使用 primary 数据源的 url 推断出来的类型
         DbType dbType = JdbcUtils.getDbType();
         return DbTypeEnum.getFindInSetTemplate(dbType)
                 .replace("#{column}", column)

@@ -4,6 +4,9 @@ import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 商品 SPU API 接口
@@ -20,6 +23,16 @@ public interface ProductSpuApi {
      * @return SPU 数组
      */
     List<ProductSpuRespDTO> getSpuList(Collection<Long> ids);
+
+    /**
+     * 批量查询 SPU MAP
+     *
+     * @param ids SPU 编号列表
+     * @return SPU MAP
+     */
+    default Map<Long, ProductSpuRespDTO> getSpusMap(Collection<Long> ids) {
+        return convertMap(getSpuList(ids), ProductSpuRespDTO::getId);
+    }
 
     /**
      * 批量查询 SPU 数组，并且校验是否 SPU 是否有效。

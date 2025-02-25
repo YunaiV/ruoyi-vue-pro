@@ -4,7 +4,7 @@ import com.somle.amazon.model.AmazonAdAuthDO;
 import com.somle.amazon.model.enums.AmazonRegion;
 import com.somle.amazon.repository.AmazonAdAuthRepository;
 import com.somle.amazon.repository.AmazonAdClientRepository;
-import com.somle.framework.common.util.web.WebUtils;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -25,20 +26,38 @@ public class AmazonAdService {
     @Resource
     AmazonAdAuthRepository authRepository;
 
+    List<AmazonAdAuthDO> auths;
+
     @Resource
     AmazonAdClientRepository clientRepository;
 
-    public List<AmazonAdClient> clients;
 
     public final String REDIRECT_URI = "https://somle.com";
 
     @PostConstruct
     public void init() {
-        clients = new ArrayList<>(
-            authRepository.findAll().stream()
-                .map(AmazonAdClient::new)
-                .toList()
-        );
+//        clients = new ArrayList<>();
+//        for (var auth : authRepository.findAll()) {
+//            clients.addAll(createClients(auth));
+//        }
+        auths = new ArrayList<>();
+        for (var auth : authRepository.findAll()) {
+            auths.add(auth);
+        }
+
+    }
+
+    public List<AmazonAdClient> createAllClients() {
+        return auths.stream()
+            .flatMap(auth -> createClients(auth).stream())
+            .toList();
+    }
+
+
+    private List<AmazonAdClient> createClients(AmazonAdAuthDO authDO) {
+        return Stream.of(AmazonRegion.values())
+            .map(region -> new AmazonAdClient(authDO, region))
+            .toList();
     }
 
     public String getAuthUrl() {
@@ -54,7 +73,7 @@ public class AmazonAdService {
         );
     }
 
-    public Long createAuth(String code, AmazonRegion region) {
+    public Long createAuth(String code) {
         var clientDO = clientRepository.findAll().get(0);
         var authDO = new AmazonAdAuthDO();
         var response = amazonService.generateAccessToken(
@@ -65,15 +84,13 @@ public class AmazonAdService {
         );
         authDO.setClientId(clientDO.getId());
         authDO.setRefreshToken(response.getRefreshToken());
-        authDO.setRegionCode(region.getCode());
-        var client = new AmazonAdClient(authDO);
-        refreshAuth(client);
+        // 临时的client
+        var client = new AmazonAdClient(authDO, AmazonRegion.NA);
+        refreshAccessTokenAndSave(authDO);
         var accountId = client.listAccounts().getAdsAccounts().get(0).getAdsAccountId();
         authDO.setAccountId(accountId);
         validate(authDO);
-        authRepository.save(authDO);
-        clients.add(client);
-        refreshAuth(client);
+        refreshAccessTokenAndSave(authDO);
         return authDO.getId();
     }
 
@@ -81,7 +98,6 @@ public class AmazonAdService {
         var probe = new AmazonAdAuthDO();
         probe.setClientId(authDO.getClientId());
         probe.setAccountId(authDO.getAccountId());
-        probe.setRegionCode(authDO.getRegionCode());
         if (authRepository.findOne(Example.of(probe)).isPresent()) {
             throw new RuntimeException("Duplicate Authorization");
         }
@@ -91,18 +107,16 @@ public class AmazonAdService {
 
     @Scheduled(cron = "0 0,30 * * * *")
     public void refreshAuths() {
-        clients.forEach(this::refreshAuth);
+        auths.forEach(this::refreshAccessTokenAndSave);
     }
 
-    private void refreshAuth(AmazonAdClient client) {
-        var auth = client.getAuth();
+    private void refreshAccessTokenAndSave(AmazonAdAuthDO auth) {
         var newAccessToken = amazonService.refreshAccessToken(
             auth.getClientId(),
             clientRepository.findById(auth.getClientId()).get().getSecret(),
             auth.getRefreshToken()
         );
         auth.setAccessToken(newAccessToken);
-        client.setAuth(auth);
         authRepository.save(auth);
     }
 

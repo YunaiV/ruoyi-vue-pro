@@ -2,14 +2,13 @@ package com.somle.amazon.service;
 
 import com.somle.amazon.controller.vo.AmazonAuthReqVO;
 import com.somle.amazon.controller.vo.AmazonAuthRespVO;
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.framework.common.util.web.RequestX;
-import com.somle.framework.common.util.web.WebUtils;
+import cn.iocoder.yudao.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
+import cn.iocoder.yudao.framework.common.util.web.RequestX;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Response;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -82,7 +81,7 @@ public class AmazonService {
                 .payload(reqVO)
                 .build();
             var body = WebUtils.sendRequest(request, JSONObject.class);
-            var response = JsonUtils.parseObject(body, AmazonAuthRespVO.class);
+            var response = JsonUtilsX.parseObject(body, AmazonAuthRespVO.class);
             if (response.getAccessToken() == null) {
                 throw new RuntimeException("Invalid response from auth server:" + body.toString());
             }

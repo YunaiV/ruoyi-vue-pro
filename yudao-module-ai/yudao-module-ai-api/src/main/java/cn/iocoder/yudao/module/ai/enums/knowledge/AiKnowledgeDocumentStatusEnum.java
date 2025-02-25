@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.ai.enums.knowledge;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @Getter
-public enum AiKnowledgeDocumentStatusEnum implements IntArrayValuable {
+public enum AiKnowledgeDocumentStatusEnum implements ArrayValuable<Integer> {
 
     IN_PROGRESS(10, "索引中"),
     SUCCESS(20, "可用"),
@@ -29,10 +29,10 @@ public enum AiKnowledgeDocumentStatusEnum implements IntArrayValuable {
      */
     private final String name;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(AiKnowledgeDocumentStatusEnum::getStatus).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(AiKnowledgeDocumentStatusEnum::getStatus).toArray(Integer[]::new);
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

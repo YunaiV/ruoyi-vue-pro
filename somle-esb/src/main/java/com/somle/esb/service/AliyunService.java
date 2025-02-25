@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.zip.GZIPOutputStream;
 
-import com.somle.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import com.somle.esb.model.AliyunToken;
 import com.somle.esb.repository.AliyunTokenRepository;
 import jakarta.annotation.PostConstruct;
@@ -51,7 +51,7 @@ public class AliyunService {
     public void storeOss(Message<OssData> message) throws IOException {
 
         OssData data = message.getPayload();
-        String jsonString = JsonUtils.toJsonString(data);
+        String jsonString = JsonUtilsX.toJsonString(data);
         byte[] compressedContent = compressString(jsonString);
 
         String database = data.getDatabase();

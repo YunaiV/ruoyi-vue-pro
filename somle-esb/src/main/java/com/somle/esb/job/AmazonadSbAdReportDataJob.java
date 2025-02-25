@@ -3,12 +3,9 @@ package com.somle.esb.job;
 
 import com.somle.amazon.controller.vo.AmazonAdReportReqVO;
 import com.somle.esb.model.OssData;
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -52,7 +49,7 @@ public class AmazonadSbAdReportDataJob extends AmazonadDataJob{
             .configuration(configuration)
             .build();
 
-        amazonAdService.clients.stream()
+        amazonAdService.createAllClients().stream()
             .flatMap(client -> client.batchCreateAndGetReport(payload))
             .forEach(page -> {
                 OssData data = OssData.builder()

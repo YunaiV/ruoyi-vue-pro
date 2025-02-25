@@ -79,6 +79,8 @@ public interface PayClient {
      */
     PayRefundRespDTO getRefund(String outTradeNo, String outRefundNo);
 
+    // ============ 转账相关 ==========
+
     /**
      * 调用渠道，进行转账
      *
@@ -95,4 +97,14 @@ public interface PayClient {
      * @return 转账信息
      */
     PayTransferRespDTO getTransfer(String outTradeNo, PayTransferTypeEnum type);
+
+    /**
+     * 解析 transfer 回调数据
+     *
+     * @param params HTTP 回调接口 content type 为 application/x-www-form-urlencoded 的所有参数
+     * @param body HTTP 回调接口的 request body
+     * @return 转账信息
+     */
+    PayTransferRespDTO parseTransferNotify(Map<String, String> params, String body);
+
 }

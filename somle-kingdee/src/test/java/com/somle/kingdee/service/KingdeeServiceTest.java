@@ -1,8 +1,8 @@
 package com.somle.kingdee.service;
 
-import com.somle.framework.common.util.date.LocalDateTimeUtils;
-import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.framework.test.core.ut.BaseSpringTest;
+import cn.iocoder.yudao.framework.common.util.lang.date.LocalDateTimeUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
+import cn.iocoder.yudao.framework.test.core.ut.BaseSpringTest;
 import com.somle.kingdee.model.KingdeePurOrderReqVO;
 import com.somle.kingdee.model.KingdeePurRequestReqVO;
 import com.somle.kingdee.util.SignatureUtils;
@@ -148,7 +148,7 @@ public class KingdeeServiceTest extends BaseSpringTest {
             .createStartTime(LocalDateTimeUtils.toTimestamp(LocalDateTime.now().minusDays(1)))
             .createEndTime(LocalDateTimeUtils.toTimestamp(LocalDateTime.now()))
             .build();
-        log.info(JsonUtils.toJsonString(client.getPurRequest(vo)));
+        log.info(JsonUtilsX.toJsonString(client.getPurRequest(vo)));
     }
 
     @Test
@@ -160,7 +160,7 @@ public class KingdeeServiceTest extends BaseSpringTest {
             .createStartTime(Timestamp.from(start))
             .createEndTime(Timestamp.from(end))
             .build();
-        log.info(JsonUtils.toJSONObject(vo).toString());
+        log.info(JsonUtilsX.toJSONObject(vo).toString());
         log.info(client.getPurOrder(vo).get(0).toString());
     }
 

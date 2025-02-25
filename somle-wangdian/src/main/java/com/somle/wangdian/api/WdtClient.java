@@ -8,8 +8,8 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Map;
 
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import com.somle.wangdian.utils.WebUtils;
 import lombok.SneakyThrows;
 
@@ -135,9 +135,9 @@ public class WdtClient {
 	@SneakyThrows
 	public JSONObject execute(String relativeUrl, Object reqVO) {
 
-		var responseString = execute(relativeUrl, JsonUtils.toStringMap(reqVO));
+		var responseString = execute(relativeUrl, JsonUtilsX.toStringMap(reqVO));
 
-		return JsonUtils.parseObject(responseString, JSONObject.class);
+		return JsonUtilsX.parseObject(responseString, JSONObject.class);
 
 	}
 }

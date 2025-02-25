@@ -21,6 +21,9 @@ public class AiChatConversationUpdateMyReqVO {
     @Schema(description = "模型编号", example = "1")
     private Long modelId;
 
+    @Schema(description = "知识库编号", example = "1")
+    private Long knowledgeId;
+
     @Schema(description = "角色设定", example = "一个快乐的程序员")
     private String systemMessage;
 

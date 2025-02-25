@@ -24,7 +24,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-@Profile("!dev & !test")
+@Profile("prod")
 @RequiredArgsConstructor
 public class ErpProductHandler {
 

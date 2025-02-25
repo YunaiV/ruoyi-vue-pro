@@ -1,5 +1,6 @@
 package com.somle.esb.handler;
 
+import cn.iocoder.yudao.framework.common.enums.enums.DictTypeConstants;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.logistic.customrule.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierProductService;
@@ -28,7 +29,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 @Slf4j
 @Component
-@Profile("!dev & !test")
+@Profile("prod")
 @RequiredArgsConstructor
 public class ErpCustomRuleHandler {
 
@@ -86,7 +87,7 @@ public class ErpCustomRuleHandler {
         CopyOnWriteArrayList<ErpCustomRuleDTO> processedRules = new CopyOnWriteArrayList<>(customRules);
         customRules.stream()
             .filter(customRule -> customRule.getCountryCode() != null)
-            .forEach(customRule -> Optional.ofNullable(dictDataApi.parseDictData("country_code", "CN"))
+            .forEach(customRule -> Optional.ofNullable(dictDataApi.parseDictData(DictTypeConstants.COUNTRY_CODE, "CN"))
                 .flatMap(dictDataRespDTO -> Optional.ofNullable(dictDataRespDTO.getValue()))
                 .ifPresent(value -> {
                     Integer countryCode = Integer.valueOf(value);

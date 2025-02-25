@@ -1,7 +1,7 @@
 package com.somle.wangdian.service;
 
-import com.somle.framework.test.core.ut.BaseDbUnitTest;
-import com.somle.framework.test.core.ut.BaseSpringTest;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.BaseSpringTest;
 import com.somle.wangdian.model.WangdianTradeReqVO;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
