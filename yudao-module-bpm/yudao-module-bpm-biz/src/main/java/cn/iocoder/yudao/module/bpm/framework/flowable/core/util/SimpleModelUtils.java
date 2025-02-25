@@ -26,7 +26,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.util.*;
 
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmTriggerTypeEnum.ASYNC_HTTP_REQUEST;
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmTriggerTypeEnum.HTTP_REQUEST_ASYNC;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.*;
 import static java.util.Arrays.asList;
@@ -754,6 +754,17 @@ public class SimpleModelUtils {
         public List<? extends FlowElement> convertList(BpmSimpleModelNodeVO node) {
             Assert.notNull(node.getTriggerSetting(), "触发器节点设置不能为空");
             List<FlowElement> flowElements = new ArrayList<>(2);
+            // 异步 HTTP 请求。需要附加一个 ReceiveTask、发起请求后、等待回调执行
+            if (HTTP_REQUEST_ASYNC.getType().equals(node.getTriggerSetting().getType())) {
+                Assert.notNull(node.getTriggerSetting().getHttpRequestSetting(), "触发器 HTTP 请求设置不能为空");
+                String attachNodeId = "Activity_" + IdUtil.fastUUID();
+                ReceiveTask receiveTask = new ReceiveTask();
+                receiveTask.setId(attachNodeId);
+                receiveTask.setName("异步 HTTP 请求");
+                node.setAttachNodeId(attachNodeId);
+                node.getTriggerSetting().getHttpRequestSetting().setCallbackTaskDefineKey(attachNodeId); // 设置 callbackTaskDefineKey
+                flowElements.add(receiveTask);
+            }
             // 触发器使用 ServiceTask 来实现
             ServiceTask serviceTask = new ServiceTask();
             serviceTask.setId(node.getId());
@@ -761,28 +772,13 @@ public class SimpleModelUtils {
             serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
             serviceTask.setImplementation("${" + BpmTriggerTaskDelegate.BEAN_NAME + "}");
             addExtensionElement(serviceTask, TRIGGER_TYPE, node.getTriggerSetting().getType());
-            flowElements.add(serviceTask);
-
-            // 异步 HTTP 请求。需要附加一个 ReceiveTask、发起请求后、等待回调执行
-            // TODO @jason：这里能挪到最后处理么？这样，代码的整体性更好；
-            if (ASYNC_HTTP_REQUEST.getType().equals(node.getTriggerSetting().getType())) {
-                Assert.notNull(node.getTriggerSetting().getHttpRequestSetting(), "触发器 HTTP 请求设置不能为空");
-                String attachNodeId = "Activity_" + IdUtil.fastUUID();
-                ReceiveTask receiveTask = new ReceiveTask();
-                receiveTask.setId(attachNodeId);
-                receiveTask.setName("异步 HTTP 请求");
-                node.setAttachNodeId(attachNodeId);
-                node.getTriggerSetting().getHttpRequestSetting().setCallbackId(attachNodeId); // 设置 receiveId
-                flowElements.add(receiveTask);
-            }
-
-            // TODO @jason：是不是挪到 flowElements.add(serviceTask); 之前哈，因为它在处理 serviceTask
             if (node.getTriggerSetting().getHttpRequestSetting() != null) {
                 addExtensionElementJson(serviceTask, TRIGGER_PARAM, node.getTriggerSetting().getHttpRequestSetting());
             }
             if (node.getTriggerSetting().getFormSettings() != null) {
                 addExtensionElementJson(serviceTask, TRIGGER_PARAM, node.getTriggerSetting().getFormSettings());
             }
+            flowElements.add(serviceTask);
             return flowElements;
         }
 

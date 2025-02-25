@@ -389,13 +389,11 @@ public class BpmSimpleModelNodeVO {
             @Schema(description = "请求返回处理设置", example = "[]")
             private List<KeyValue<String, String>> response;
 
-            // TODO @jason：改成 callbackTaskDefineKey
             /**
-             * 异步 Http 请求，需要指定回调 ID，用于回调执行
+             * 异步 Http 请求，需要指定回调任务 Key，用于回调执行
              */
-            @Schema(description = "回调 ID", example = "xxx", hidden = true)
-            private String callbackId;
-
+            @Schema(description = "回调任务 Key", example = "xxx", hidden = true)
+            private String callbackTaskDefineKey;
         }
 
         @Schema(description = "流程表单触发器设置", example = "{}")

@@ -24,7 +24,7 @@ public class BpmAsyncHttpRequestTrigger extends BpmAbstractHttpRequestTrigger {
 
     @Override
     public BpmTriggerTypeEnum getType() {
-        return BpmTriggerTypeEnum.ASYNC_HTTP_REQUEST;
+        return BpmTriggerTypeEnum.HTTP_REQUEST_ASYNC;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class BpmAsyncHttpRequestTrigger extends BpmAbstractHttpRequestTrigger {
         // 2.2 设置请求体
         MultiValueMap<String, String> body = buildHttpBody(processInstance, setting.getBody());
         // TODO @芋艿：【异步】在看看
-        body.add("callbackId", setting.getCallbackId()); // 异步请求 callbackId 需要传给被调用方，用于回调执行
+        body.add("callbackId", setting.getCallbackTaskDefineKey()); // 异步请求 callbackId 需要传给被调用方，用于回调执行
 
         // 3. 发起请求
         sendHttpRequest(setting.getUrl(), headers, body);

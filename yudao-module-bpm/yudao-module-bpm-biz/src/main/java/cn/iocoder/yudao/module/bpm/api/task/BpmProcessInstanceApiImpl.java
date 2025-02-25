@@ -2,12 +2,10 @@ package cn.iocoder.yudao.module.bpm.api.task;
 
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
-import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
-import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
-
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Flowable 流程实例 Api 实现类
@@ -22,17 +20,8 @@ public class BpmProcessInstanceApiImpl implements BpmProcessInstanceApi {
     @Resource
     private BpmProcessInstanceService processInstanceService;
 
-    @Resource
-    private BpmTaskService bpmTaskService;
-
     @Override
     public String createProcessInstance(Long userId, @Valid BpmProcessInstanceCreateReqDTO reqDTO) {
         return processInstanceService.createProcessInstance(userId, reqDTO);
     }
-
-    @Override
-    public void asyncHttpTriggerCallback(String processInstanceId, String callbackId) {
-        bpmTaskService.triggerReceiveTask(processInstanceId, callbackId);
-    }
-
 }

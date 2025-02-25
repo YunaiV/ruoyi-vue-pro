@@ -19,13 +19,6 @@ public interface BpmProcessInstanceApi {
      */
     String createProcessInstance(Long userId, @Valid BpmProcessInstanceCreateReqDTO reqDTO);
 
-    // TODO @jason：新增 BpmProcessTaskApi 接口，这个要不改成 triggerTask，保持通用性（和 flowable 保持一致）
-    /**
-     * 异步 HTTP 请求触发器回调, 为了唤醒流程继续执行
-     *
-     * @param processInstanceId 流程实例编号
-     * @param callbackId 回调编号, 对应 ReceiveTask Id TODO @jason：改成 taskDefineKey
-     */
-    void asyncHttpTriggerCallback(String processInstanceId, String callbackId);
+
 
 }

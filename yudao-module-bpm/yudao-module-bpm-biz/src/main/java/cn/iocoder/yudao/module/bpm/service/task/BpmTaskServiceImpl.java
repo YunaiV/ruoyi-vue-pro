@@ -1323,7 +1323,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public void triggerReceiveTask(String processInstanceId, String taskDefineKey) {
+    public void triggerTask(String processInstanceId, String taskDefineKey) {
         Execution execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstanceId)
                 .activityId(taskDefineKey)
