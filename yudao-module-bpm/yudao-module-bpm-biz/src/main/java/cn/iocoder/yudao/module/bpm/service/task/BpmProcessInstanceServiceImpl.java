@@ -414,7 +414,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             // 处理每个任务的 tasks 属性
             for (HistoricActivityInstance activity : taskActivities) {
                 HistoricTaskInstance task = taskMap.get(activity.getTaskId());
-                // TODO @lesan：这里为啥 continue 哈？ @芋艿：子流程的 activity 中 task 是null 下面的方法会报错
+                // TODO @lesan：这里为啥 continue 哈？ @芋艿：子流程的 activity 中 task 是null 下面的方法会报错；TODO @lesan：写个注释？？？
                 if (task == null) {
                     continue;
                 }

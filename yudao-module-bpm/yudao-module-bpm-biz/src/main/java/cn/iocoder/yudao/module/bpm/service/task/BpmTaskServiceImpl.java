@@ -1324,6 +1324,16 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void processChildProcessTimeout(String processInstanceId, String taskDefineKey) {
+        List<ActivityInstance> activityInstances = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .activityId(taskDefineKey).list();
+        activityInstances.forEach(activityInstance -> FlowableUtils.execute(activityInstance.getTenantId(),
+                () -> moveTaskToEnd(activityInstance.getCalledProcessInstanceId(), BpmReasonEnum.TIMEOUT_APPROVE.getReason())));
+    }
+
+    @Override
     public void triggerReceiveTask(String processInstanceId, String taskDefineKey) {
         Execution execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstanceId)
@@ -1338,17 +1348,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 若存在直接触发接收任务，执行后续节点
         FlowableUtils.execute(execution.getTenantId(),
                 () -> runtimeService.trigger(execution.getId()));
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void processChildProcessTimeout(String processInstanceId, String taskDefineKey) {
-        List<ActivityInstance> activityInstances = runtimeService.createActivityInstanceQuery()
-                .processInstanceId(processInstanceId)
-                .activityId(taskDefineKey).list();
-        activityInstances.forEach(activityInstance -> FlowableUtils.execute(activityInstance.getTenantId(), () -> {
-            moveTaskToEnd(activityInstance.getCalledProcessInstanceId(), BpmReasonEnum.TIMEOUT_APPROVE.getReason());
-        }));
     }
 
     /**

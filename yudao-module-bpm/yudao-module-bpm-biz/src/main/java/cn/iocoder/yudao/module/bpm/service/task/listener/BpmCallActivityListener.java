@@ -82,7 +82,7 @@ public class BpmCallActivityListener implements ExecutionListener {
             try {
                 FlowableUtils.setAuthenticatedUserId(Long.parseLong(formFieldValue));
             } catch (Exception e) {
-                log.error("[error][监听器：{}，子流程监听器设置流程的发起人字符串转 Long 失败，字符串：{}]",
+                log.error("[notify][监听器：{}，子流程监听器设置流程的发起人字符串转 Long 失败，字符串：{}]",
                         DELEGATE_EXPRESSION, formFieldValue);
                 FlowableUtils.setAuthenticatedUserId(Long.parseLong(parent.getStartUserId()));
             }

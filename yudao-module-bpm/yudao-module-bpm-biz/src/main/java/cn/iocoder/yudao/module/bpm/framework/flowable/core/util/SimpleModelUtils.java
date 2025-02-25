@@ -416,6 +416,7 @@ public class SimpleModelUtils {
         private BoundaryEvent buildUserTaskTimeoutBoundaryEvent(UserTask userTask,
                                                                 BpmSimpleModelNodeVO.TimeoutHandler timeoutHandler) {
             // 1.1 定时器边界事件
+            // TODO @lesan：一些 BoundaryEvent timeout 的，可以做一些基础的设置么？
             BoundaryEvent boundaryEvent = new BoundaryEvent();
             boundaryEvent.setId("Event-" + IdUtil.fastUUID());
             boundaryEvent.setCancelActivity(false); // 设置关联的任务为不会被中断
@@ -723,6 +724,7 @@ public class SimpleModelUtils {
             // 2. 添加接收任务的 Timer Boundary Event
             if (node.getDelaySetting() != null) {
                 // 2.1 定时器边界事件
+                // TODO @lesan：一些 BoundaryEvent timeout 的，可以做一些基础的设置么？
                 BoundaryEvent boundaryEvent = new BoundaryEvent();
                 boundaryEvent.setId("Event-" + IdUtil.fastUUID());
                 boundaryEvent.setCancelActivity(false);
@@ -872,6 +874,7 @@ public class SimpleModelUtils {
 
             // 7. 超时设置
             if (childProcessSetting.getTimeoutSetting() != null) {
+                // TODO @lesan：一些 BoundaryEvent timeout 的，可以做一些基础的设置么？
                 BoundaryEvent boundaryEvent = new BoundaryEvent();
                 boundaryEvent.setId("Event-" + IdUtil.fastUUID());
                 boundaryEvent.setCancelActivity(false);

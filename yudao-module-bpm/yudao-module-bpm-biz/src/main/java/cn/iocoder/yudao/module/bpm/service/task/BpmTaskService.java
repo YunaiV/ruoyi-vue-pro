@@ -276,6 +276,14 @@ public interface BpmTaskService {
      */
     void processTaskTimeout(String processInstanceId, String taskDefineKey, Integer handlerType);
 
+    /**
+     * 处理 ChildProcess 子流程的审批超时事件
+     *
+     * @param processInstanceId 流程示例编号
+     * @param taskDefineKey     任务 Key
+     */
+    void processChildProcessTimeout(String processInstanceId, String taskDefineKey);
+
     // TODO @jason：改成 triggerTask。然后，“触发 ReceiveTask，让流程继续执行”，改成一些调用场景
     /**
      * 触发 ReceiveTask，让流程继续执行
@@ -284,13 +292,5 @@ public interface BpmTaskService {
      * @param taskDefineKey     任务 Key
      */
     void triggerReceiveTask(String processInstanceId, String taskDefineKey);
-
-    /**
-     * 处理 子流程 审批超时事件
-     *
-     * @param processInstanceId 流程示例编号
-     * @param taskDefineKey     任务 Key
-     */
-    void processChildProcessTimeout(String processInstanceId, String taskDefineKey);
 
 }
