@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -244,8 +244,7 @@ public class FlowableUtils {
         return formFieldsMap.entrySet().stream()
                 .limit(3)
                 .map(entry -> new KeyValue<>(entry.getValue().getTitle(),
-                        // TODO @lesan： MapUtil.getStr 可以更简单？
-                        StrUtil.toStringOrEmpty(processVariables.getOrDefault(entry.getValue().getField(), ""))))
+                        MapUtil.getStr(processVariables, entry.getValue().getField(), "")))
                 .collect(Collectors.toList());
     }
 

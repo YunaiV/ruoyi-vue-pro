@@ -41,6 +41,7 @@ import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.DelegationState;
@@ -1230,7 +1231,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 if (userTaskElement.getId().equals(START_USER_NODE_ID)
                         && (skipStartUserNodeFlag == null // 目的：一般是“主流程”，发起人节点，自动通过审核
                             || Boolean.TRUE.equals(skipStartUserNodeFlag)) // 目的：一般是“子流程”，发起人节点，按配置自动通过审核
-                        && !Boolean.TRUE.equals(returnTaskFlag)) { // TODO @lesan：ObjUtil.notEqual(returnTaskFlag, Boolean.TRUE) 改成这个有问题么？尽量不用 ! 取反
+                        && ObjUtil.notEqual(returnTaskFlag, Boolean.TRUE)) {
                     getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                             .setReason(BpmReasonEnum.ASSIGN_START_USER_APPROVE_WHEN_SKIP_START_USER_NODE.getReason()));
                     return;
@@ -1337,6 +1338,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 若存在直接触发接收任务，执行后续节点
         FlowableUtils.execute(execution.getTenantId(),
                 () -> runtimeService.trigger(execution.getId()));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void processChildProcessTimeout(String processInstanceId, String taskDefineKey) {
+        List<ActivityInstance> activityInstances = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .activityId(taskDefineKey).list();
+        activityInstances.forEach(activityInstance -> FlowableUtils.execute(activityInstance.getTenantId(), () -> {
+            moveTaskToEnd(activityInstance.getCalledProcessInstanceId(), BpmReasonEnum.TIMEOUT_APPROVE.getReason());
+        }));
     }
 
     /**
