@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.common.util.spring;
+package cn.iocoder.yudao.framework.common.util.cache;
 
 
 import java.math.BigDecimal;

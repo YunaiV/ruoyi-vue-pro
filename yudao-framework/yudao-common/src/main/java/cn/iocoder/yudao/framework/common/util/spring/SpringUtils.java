@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationContext;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -22,8 +23,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SpringUtils extends SpringUtil  {
 
-    public static final String APPLICATION_YAML_NAME = "application.yaml";
-    public static final String SPRING_PROFILES_ACTIVE = "spring.profiles.active";
+//    public static final String APPLICATION_YAML_NAME = "application.yaml";
+//    public static final String SPRING_PROFILES_ACTIVE = "spring.profiles.active";
+
+    public static final String PROFILE_PROD = "prod";
 
     /**
      * 根据精确类型获取 Bean（忽略子类）。
@@ -51,55 +54,65 @@ public class SpringUtils extends SpringUtil  {
     }
 
     /**
-     * 获得当前环境类型
-     **/
-    public static EnvEnum getEnv() {
-        bootInitialize();
-        EnvEnum current = EnvEnum.current();
-        if(current==null || current==EnvEnum.UNKNOWN) {
-            String activeProfile = getActiveProfile();
-            current=EnvEnum.parse(activeProfile);
-            EnvEnum.current(current);
-            return current;
-        } else {
-            return EnvEnum.current();
-        }
+     * 是否为生产环境
+     *
+     * @return 是否生产环境
+     */
+    public static boolean isProd() {
+        String activeProfile = getActiveProfile();
+        return Objects.equals(PROFILE_PROD, activeProfile);
     }
 
+//    /**
+//     * 获得当前环境类型
+//     **/
+//    public static EnvEnum getEnv() {
+//        bootInitialize();
+//        EnvEnum current = EnvEnum.current();
+//        if(current==null || current==EnvEnum.UNKNOWN) {
+//            String activeProfile = getActiveProfile();
+//            current=EnvEnum.parse(activeProfile);
+//            EnvEnum.current(current);
+//            return current;
+//        } else {
+//            return EnvEnum.current();
+//        }
+//    }
 
-    private static YMLProperties APPLICATION_YML = null;
-    private static void initBootstrapYML() {
 
-        if(APPLICATION_YML!=null) return;
-        try {
-            String content = null;
-            File ymlFile=new File(APPLICATION_YAML_NAME);
-            if(ymlFile.exists()) {
-                log.info("read config from file "+ymlFile.getAbsolutePath());
-                content = FileUtil.readString(ymlFile,"UTF-8");
-            } else {
-                InputStream inputStream = SpringUtils.class.getClassLoader().getResourceAsStream(APPLICATION_YAML_NAME);
-                content = StreamUtil.input2string(inputStream, "UTF-8");
-                inputStream.close();
-                log.info("read config from resource /bootstrap.yml");
-            }
-            APPLICATION_YML = new YMLProperties();
-            APPLICATION_YML.load(content);
-            String activeProfile=APPLICATION_YML.getProperty(SPRING_PROFILES_ACTIVE).stringValue();
-            EnvEnum current = EnvEnum.parse(activeProfile);
-            EnvEnum.current(current);
-
-        } catch (Exception e) {
-            log.error("配置信息初始化失败",e);
-        }
-    }
+//    private static YMLProperties APPLICATION_YML = null;
+//    private static void initBootstrapYML() {
+//
+//        if(APPLICATION_YML!=null) return;
+//        try {
+//            String content = null;
+//            File ymlFile=new File(APPLICATION_YAML_NAME);
+//            if(ymlFile.exists()) {
+//                log.info("read config from file "+ymlFile.getAbsolutePath());
+//                content = FileUtil.readString(ymlFile,"UTF-8");
+//            } else {
+//                InputStream inputStream = SpringUtils.class.getClassLoader().getResourceAsStream(APPLICATION_YAML_NAME);
+//                content = StreamUtil.input2string(inputStream, "UTF-8");
+//                inputStream.close();
+//                log.info("read config from resource /bootstrap.yml");
+//            }
+//            APPLICATION_YML = new YMLProperties();
+//            APPLICATION_YML.load(content);
+//            String activeProfile=APPLICATION_YML.getProperty(SPRING_PROFILES_ACTIVE).stringValue();
+//            EnvEnum current = EnvEnum.parse(activeProfile);
+//            EnvEnum.current(current);
+//
+//        } catch (Exception e) {
+//            log.error("配置信息初始化失败",e);
+//        }
+//    }
 
 
 //    private static Class STARTUP_CLASS = null;
 //    private static Boolean IS_IN_IDE = null ;
-    /**
-     * 是否从IDE启动
-     * */
+//    /**
+//     * 是否从IDE启动
+//     * */
 //    public static Boolean isBootInIDE() {
 //        if(IS_IN_IDE!=null) return IS_IN_IDE;
 //        Throwable ta=new Throwable();
@@ -118,19 +131,19 @@ public class SpringUtils extends SpringUtil  {
 //        return IS_IN_IDE;
 //    }
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) {
-       super.setApplicationContext(applicationContext);
-    }
-
-    /**
-     * 启动前初始化相关常量
-     **/
-    public static void bootInitialize() {
-        initBootstrapYML();
-        System.out.println("Env="+EnvEnum.current().name()+" "+EnvEnum.current().text());
-        // System.out.println("Env="+EnvEnum.current().name()+" "+EnvEnum.current().text()+" ; BOOT_IN_IDE="+isBootInIDE());
-
-    }
+//    @Override
+//    public void setApplicationContext(ApplicationContext applicationContext) {
+//       super.setApplicationContext(applicationContext);
+//    }
+//
+//    /**
+//     * 启动前初始化相关常量
+//     **/
+//    public static void bootInitialize() {
+//        initBootstrapYML();
+//        System.out.println("Env="+EnvEnum.current().name()+" "+EnvEnum.current().text());
+//        // System.out.println("Env="+EnvEnum.current().name()+" "+EnvEnum.current().text()+" ; BOOT_IN_IDE="+isBootInIDE());
+//
+//    }
 
 }
