@@ -14,6 +14,9 @@ public class IotDeviceDownstreamHandlerImpl implements IotDeviceDownstreamHandle
 
     @Override
     public CommonResult<Boolean> invokeDeviceService(IotDeviceServiceInvokeReqDTO invokeReqDTO) {
+        // 设备服务调用
+        // 请求Topic：/sys/${productKey}/${deviceName}/thing/service/${tsl.service.identifier}
+        // 响应Topic：/sys/${productKey}/${deviceName}/thing/service/${tsl.service.identifier}_reply
         return CommonResult.success(true);
     }
 
@@ -24,6 +27,9 @@ public class IotDeviceDownstreamHandlerImpl implements IotDeviceDownstreamHandle
 
     @Override
     public CommonResult<Boolean> setDeviceProperty(IotDevicePropertySetReqDTO setReqDTO) {
+        // 设置设备属性 标准 JSON
+        // 请求Topic：/sys/${productKey}/${deviceName}/thing/service/property/set
+        // 响应Topic：/sys/${productKey}/${deviceName}/thing/service/property/set_reply
         return CommonResult.success(true);
     }
 
