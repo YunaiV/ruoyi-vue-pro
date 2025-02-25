@@ -14,6 +14,6 @@ yudao:
         mqtt-port: 1883
         mqtt-ssl: false
         mqtt-username: yudao
-        mqtt-password: yudao
+        mqtt-password: 123456
         mqtt-topics: "/+/#"
         auth-port: 8101
