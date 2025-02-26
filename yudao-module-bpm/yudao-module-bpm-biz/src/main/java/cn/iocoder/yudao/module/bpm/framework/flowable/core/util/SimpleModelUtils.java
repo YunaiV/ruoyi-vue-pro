@@ -10,7 +10,6 @@ import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.B
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.ConditionGroups;
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmCopyTaskDelegate;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmTriggerTaskDelegate;
@@ -84,7 +83,7 @@ public class SimpleModelUtils {
         traverseNodeToBuildFlowNode(startNode, process);
 
         // 3. 构建并添加节点之间的连线 Sequence Flow
-        EndEvent endEvent = BpmnModelUtils.getEndEvent(bpmnModel);
+        EndEvent endEvent = getEndEvent(bpmnModel);
         traverseNodeToBuildSequenceFlow(process, startNode, endEvent.getId());
 
         // 4. 自动布局
@@ -364,7 +363,7 @@ public class SimpleModelUtils {
             userTask.setName(node.getName());
 
             // 人工审批
-            addExtensionElement(userTask, BpmnModelConstants.USER_TASK_APPROVE_TYPE, BpmUserTaskApproveTypeEnum.USER.getType());
+            addExtensionElement(userTask, USER_TASK_APPROVE_TYPE, BpmUserTaskApproveTypeEnum.USER.getType());
             // 候选人策略为发起人自己
             addCandidateElements(BpmTaskCandidateStrategyEnum.START_USER.getStrategy(), null, userTask);
             // 添加表单字段权限属性元素
@@ -415,25 +414,17 @@ public class SimpleModelUtils {
          */
         private BoundaryEvent buildUserTaskTimeoutBoundaryEvent(UserTask userTask,
                                                                 BpmSimpleModelNodeVO.TimeoutHandler timeoutHandler) {
-            // 1.1 定时器边界事件
-            // TODO @lesan：一些 BoundaryEvent timeout 的，可以做一些基础的设置么？
-            BoundaryEvent boundaryEvent = new BoundaryEvent();
-            boundaryEvent.setId("Event-" + IdUtil.fastUUID());
-            boundaryEvent.setCancelActivity(false); // 设置关联的任务为不会被中断
-            boundaryEvent.setAttachedToRef(userTask);
-            // 1.2 定义超时时间、最大提醒次数
-            TimerEventDefinition eventDefinition = new TimerEventDefinition();
-            eventDefinition.setTimeDuration(timeoutHandler.getTimeDuration());
+            // 1. 创建 Timeout Boundary Event
+            String timeCycle = null;
             if (Objects.equals(BpmUserTaskTimeoutHandlerTypeEnum.REMINDER.getType(), timeoutHandler.getType()) &&
                     timeoutHandler.getMaxRemindCount() != null && timeoutHandler.getMaxRemindCount() > 1) {
-                eventDefinition.setTimeCycle(String.format("R%d/%s",
-                        timeoutHandler.getMaxRemindCount(), timeoutHandler.getTimeDuration()));
+                timeCycle = String.format("R%d/%s",
+                        timeoutHandler.getMaxRemindCount(), timeoutHandler.getTimeDuration());
             }
-            boundaryEvent.addEventDefinition(eventDefinition);
+            BoundaryEvent boundaryEvent = buildTimeoutBoundaryEvent(userTask, BpmBoundaryEventTypeEnum.USER_TASK_TIMEOUT.getType(),
+                    timeoutHandler.getTimeDuration(), timeCycle, null);
 
-            // 2.1 添加定时器边界事件类型
-            addExtensionElement(boundaryEvent, BOUNDARY_EVENT_TYPE, BpmBoundaryEventTypeEnum.USER_TASK_TIMEOUT.getType());
-            // 2.2 添加超时执行动作元素
+            // 2 添加超时执行动作元素
             addExtensionElement(boundaryEvent, USER_TASK_TIMEOUT_HANDLER_TYPE, timeoutHandler.getType());
             return boundaryEvent;
         }
@@ -516,7 +507,7 @@ public class SimpleModelUtils {
             BpmUserTaskApproveMethodEnum approveMethodEnum = BpmUserTaskApproveMethodEnum.valueOf(approveMethod);
             Assert.notNull(approveMethodEnum, "审批方式({})不能为空", approveMethodEnum);
             // 添加审批方式的扩展属性
-            addExtensionElement(userTask, BpmnModelConstants.USER_TASK_APPROVE_METHOD, approveMethod);
+            addExtensionElement(userTask, USER_TASK_APPROVE_METHOD, approveMethod);
             if (approveMethodEnum == BpmUserTaskApproveMethodEnum.RANDOM) {
                 // 随机审批，不需要设置多实例属性
                 return;
@@ -723,21 +714,14 @@ public class SimpleModelUtils {
 
             // 2. 添加接收任务的 Timer Boundary Event
             if (node.getDelaySetting() != null) {
-                // 2.1 定时器边界事件
-                // TODO @lesan：一些 BoundaryEvent timeout 的，可以做一些基础的设置么？
-                BoundaryEvent boundaryEvent = new BoundaryEvent();
-                boundaryEvent.setId("Event-" + IdUtil.fastUUID());
-                boundaryEvent.setCancelActivity(false);
-                boundaryEvent.setAttachedToRef(receiveTask);
-                // 2.2 定义超时时间
-                TimerEventDefinition eventDefinition = new TimerEventDefinition();
+                BoundaryEvent boundaryEvent = null;
                 if (node.getDelaySetting().getDelayType().equals(BpmDelayTimerTypeEnum.FIXED_DATE_TIME.getType())) {
-                    eventDefinition.setTimeDuration(node.getDelaySetting().getDelayTime());
+                    boundaryEvent = buildTimeoutBoundaryEvent(receiveTask, BpmBoundaryEventTypeEnum.DELAY_TIMER_TIMEOUT.getType(),
+                            node.getDelaySetting().getDelayTime(), null, null);
                 } else if (node.getDelaySetting().getDelayType().equals(BpmDelayTimerTypeEnum.FIXED_TIME_DURATION.getType())) {
-                    eventDefinition.setTimeDate(node.getDelaySetting().getDelayTime());
+                    boundaryEvent = buildTimeoutBoundaryEvent(receiveTask, BpmBoundaryEventTypeEnum.DELAY_TIMER_TIMEOUT.getType(),
+                            null, null, node.getDelaySetting().getDelayTime());
                 }
-                boundaryEvent.addEventDefinition(eventDefinition);
-                addExtensionElement(boundaryEvent, BOUNDARY_EVENT_TYPE, BpmBoundaryEventTypeEnum.DELAY_TIMER_TIMEOUT.getType());
                 flowElements.add(boundaryEvent);
             }
             return flowElements;
@@ -870,19 +854,14 @@ public class SimpleModelUtils {
 
             // 7. 超时设置
             if (childProcessSetting.getTimeoutSetting() != null) {
-                // TODO @lesan：一些 BoundaryEvent timeout 的，可以做一些基础的设置么？
-                BoundaryEvent boundaryEvent = new BoundaryEvent();
-                boundaryEvent.setId("Event-" + IdUtil.fastUUID());
-                boundaryEvent.setCancelActivity(false);
-                boundaryEvent.setAttachedToRef(callActivity);
-                TimerEventDefinition eventDefinition = new TimerEventDefinition();
-                if (childProcessSetting.getTimeoutSetting().getType().equals(BpmDelayTimerTypeEnum.FIXED_DATE_TIME.getType())) {
-                    eventDefinition.setTimeDuration(childProcessSetting.getTimeoutSetting().getTimeExpression());
-                } else if (childProcessSetting.getTimeoutSetting().getType().equals(BpmDelayTimerTypeEnum.FIXED_TIME_DURATION.getType())) {
-                    eventDefinition.setTimeDate(childProcessSetting.getTimeoutSetting().getTimeExpression());
+                BoundaryEvent boundaryEvent = null;
+                if (node.getDelaySetting().getDelayType().equals(BpmDelayTimerTypeEnum.FIXED_DATE_TIME.getType())) {
+                    boundaryEvent = buildTimeoutBoundaryEvent(callActivity, BpmBoundaryEventTypeEnum.DELAY_TIMER_TIMEOUT.getType(),
+                            node.getDelaySetting().getDelayTime(), null, null);
+                } else if (node.getDelaySetting().getDelayType().equals(BpmDelayTimerTypeEnum.FIXED_TIME_DURATION.getType())) {
+                    boundaryEvent = buildTimeoutBoundaryEvent(callActivity, BpmBoundaryEventTypeEnum.CHILD_PROCESS_TIMEOUT.getType(),
+                            null, null, node.getDelaySetting().getDelayTime());
                 }
-                boundaryEvent.addEventDefinition(eventDefinition);
-                addExtensionElement(boundaryEvent, BOUNDARY_EVENT_TYPE, BpmBoundaryEventTypeEnum.CHILD_PROCESS_TIMEOUT.getType());
                 flowElements.add(boundaryEvent);
             }
 
@@ -901,6 +880,33 @@ public class SimpleModelUtils {
 
     private static String buildGatewayJoinId(String id) {
         return id + "_join";
+    }
+
+    private static BoundaryEvent buildTimeoutBoundaryEvent(Activity attachedToRef, Integer type,
+                                                           String timeDuration,
+                                                           String timeCycle,
+                                                           String timeDate) {
+        // 1.1 定时器边界事件
+        BoundaryEvent boundaryEvent = new BoundaryEvent();
+        boundaryEvent.setId("Event-" + IdUtil.fastUUID());
+        boundaryEvent.setCancelActivity(false); // 设置关联的任务为不会被中断
+        boundaryEvent.setAttachedToRef(attachedToRef);
+        // 1.2 定义超时时间表达式
+        TimerEventDefinition eventDefinition = new TimerEventDefinition();
+        if (ObjUtil.isNotNull(timeDuration)) {
+            eventDefinition.setTimeDuration(timeDuration);
+        }
+        if (ObjUtil.isNotNull(timeDuration)) {
+            eventDefinition.setTimeCycle(timeCycle);
+        }
+        if (ObjUtil.isNotNull(timeDate)) {
+            eventDefinition.setTimeDate(timeDate);
+        }
+        boundaryEvent.addEventDefinition(eventDefinition);
+
+        // 2.1 添加定时器边界事件类型
+        addExtensionElement(boundaryEvent, BOUNDARY_EVENT_TYPE, type);
+        return boundaryEvent;
     }
 
     // ========== SIMPLE 流程预测相关的方法 ==========
