@@ -41,27 +41,40 @@ public class IotOtaUpgradeTaskDO extends BaseDO {
 
     /**
      * 固件编号
-     *
+     * <p>
      * 关联 {@link IotOtaFirmwareDO#getId()}
      */
     private Long firmwareId;
 
     /**
      * 任务状态
-     *
+     * <p>
      * 关联 {@link cn.iocoder.yudao.module.iot.enums.ota.IotOtaUpgradeTaskStatusEnum}
      */
     private Integer status;
 
     /**
      * 升级范围
-     *
+     * <p>
      * 关联 {@link cn.iocoder.yudao.module.iot.enums.ota.IotOtaUpgradeTaskScopeEnum}
      */
     private Integer scope;
     /**
+     * 设备数量
+     */
+    private Long deviceCount;
+    /**
+     * 选中的设备编号数组
+     * <p>
+     * 关联 {@link IotDeviceDO#getId()}
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<Long> deviceIds;
+
+    // TODO @li：这个通过查询，不用冗余
+    /**
      * 选中的设备名字数组
-     *
+     * <p>
      * 关联 {@link IotDeviceDO#getDeviceName()}
      */
     @TableField(typeHandler = JacksonTypeHandler.class)

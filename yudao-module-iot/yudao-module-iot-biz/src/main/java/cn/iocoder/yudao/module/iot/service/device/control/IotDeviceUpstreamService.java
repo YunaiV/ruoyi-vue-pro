@@ -62,4 +62,11 @@ public interface IotDeviceUpstreamService {
      */
     void addDeviceTopology(IotDeviceTopologyAddReqDTO addReqDTO);
 
+    /**
+     * Emqx 连接认证
+     *
+     * @param authReqDTO Emqx 连接认证 DTO
+     */
+    boolean authenticateEmqxConnection(IotDeviceEmqxAuthReqDTO authReqDTO);
+
 }

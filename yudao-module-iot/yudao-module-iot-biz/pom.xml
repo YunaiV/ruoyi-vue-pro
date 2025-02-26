@@ -75,10 +75,11 @@
 <!--            <groupId>org.eclipse.paho</groupId> &lt;!&ndash; MQTT &ndash;&gt;-->
 <!--            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>-->
 <!--        </dependency>-->
-        <!-- 工具类相关 -->
+        <!-- 消息队列相关 -->
         <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-mq</artifactId>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>

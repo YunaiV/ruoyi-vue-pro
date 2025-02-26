@@ -41,4 +41,12 @@ public class IotPluginCommonUtils {
                 .end(JsonUtils.toJsonString(result));
     }
 
+    @SuppressWarnings("deprecation")
+    public static void writeJson(RoutingContext routingContext, String result) {
+        routingContext.response()
+                .setStatusCode(200)
+                .putHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .end(result);
+    }
+
 }

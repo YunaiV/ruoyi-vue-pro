@@ -71,6 +71,15 @@ public interface IotDeviceUpstreamApi {
     @PostMapping(PREFIX + "/add-topology")
     CommonResult<Boolean> addDeviceTopology(@Valid @RequestBody IotDeviceTopologyAddReqDTO addReqDTO);
 
+    // TODO @芋艿：考虑 http 认证
+    /**
+     * 认证 Emqx 连接
+     *
+     * @param authReqDTO 认证 Emqx 连接 DTO
+     */
+    @PostMapping(PREFIX + "/authenticate-emqx-connection")
+    CommonResult<Boolean> authenticateEmqxConnection(@Valid @RequestBody IotDeviceEmqxAuthReqDTO authReqDTO);
+
     // ========== 插件相关 ==========
 
     /**

@@ -21,7 +21,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
 
 /**
- * IoT 设备设备上报的 Vert.x Handler
+ * IoT 设备事件上报的 Vert.x Handler
  */
 @RequiredArgsConstructor
 @Slf4j

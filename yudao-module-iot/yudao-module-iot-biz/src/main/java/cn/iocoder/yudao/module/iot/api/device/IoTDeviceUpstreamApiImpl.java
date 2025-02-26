@@ -4,15 +4,14 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.*;
 import cn.iocoder.yudao.module.iot.service.device.control.IotDeviceUpstreamService;
 import cn.iocoder.yudao.module.iot.service.plugin.IotPluginInstanceService;
+import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
-
-import jakarta.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 /**
- *  * 设备数据 Upstream 上行 API 实现类
+ * * 设备数据 Upstream 上行 API 实现类
  */
 @RestController
 @Validated
@@ -59,6 +58,12 @@ public class IoTDeviceUpstreamApiImpl implements IotDeviceUpstreamApi {
     public CommonResult<Boolean> addDeviceTopology(IotDeviceTopologyAddReqDTO addReqDTO) {
         deviceUpstreamService.addDeviceTopology(addReqDTO);
         return success(true);
+    }
+
+    @Override
+    public CommonResult<Boolean> authenticateEmqxConnection(IotDeviceEmqxAuthReqDTO authReqDTO) {
+        boolean result = deviceUpstreamService.authenticateEmqxConnection(authReqDTO);
+        return success(result);
     }
 
     // ========== 插件相关 ==========

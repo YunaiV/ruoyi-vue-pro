@@ -35,8 +35,8 @@ public interface IotDeviceService {
      * @return 设备
      */
     IotDeviceDO createDevice(@NotEmpty(message = "产品标识不能为空") String productKey,
-            @NotEmpty(message = "设备名称不能为空") String deviceName,
-            Long gatewayId);
+                             @NotEmpty(message = "设备名称不能为空") String deviceName,
+                             Long gatewayId);
 
     /**
      * 更新设备
@@ -46,6 +46,7 @@ public interface IotDeviceService {
     void updateDevice(@Valid IotDeviceSaveReqVO updateReqVO);
 
     // TODO @芋艿：先这么实现。未来看情况，要不要自己实现
+
     /**
      * 更新设备的所属网关
      *
@@ -110,7 +111,7 @@ public interface IotDeviceService {
     IotDeviceDO getDeviceByDeviceKey(String deviceKey);
 
     /**
-     * 获得设备分页
+     * ��得设备分页
      *
      * @param pageReqVO 分页查询
      * @return IoT 设备分页
@@ -151,7 +152,7 @@ public interface IotDeviceService {
 
     /**
      * 【缓存】根据产品 key 和设备名称，获得设备信息
-     *
+     * <p>
      * 注意：该方法会忽略租户信息，所以调用时，需要确认会不会有跨租户访问的风险！！！
      *
      * @param productKey 产品 key
@@ -191,5 +192,13 @@ public interface IotDeviceService {
      * @return 设备列表
      */
     List<IotDeviceDO> getDeviceList();
+
+    /**
+     * 获取 MQTT 连接参数
+     *
+     * @param deviceId 设备 ID
+     * @return MQTT 连接参数
+     */
+    IotDeviceMqttConnectionParamsRespVO getMqttConnectionParams(Long deviceId);
 
 }

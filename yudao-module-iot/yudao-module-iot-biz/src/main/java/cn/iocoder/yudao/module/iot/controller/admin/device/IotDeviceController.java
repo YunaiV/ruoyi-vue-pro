@@ -7,8 +7,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceDownstreamReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceUpstreamReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.control.IotDeviceDownstreamService;
@@ -175,6 +175,14 @@ public class IotDeviceController {
     public CommonResult<Boolean> downstreamDevice(@Valid @RequestBody IotDeviceDownstreamReqVO downstreamReqVO) {
         deviceDownstreamService.downstreamDevice(downstreamReqVO);
         return success(true);
+    }
+
+    // TODO @haohao：是不是默认详情接口，不返回 secret，然后这个接口，用于统一返回。然后接口名可以更通用一点。
+    @GetMapping("/mqtt-connection-params")
+    @Operation(summary = "获取 MQTT 连接参数")
+    @PreAuthorize("@ss.hasPermission('iot:device:mqtt-connection-params')")
+    public CommonResult<IotDeviceMqttConnectionParamsRespVO> getMqttConnectionParams(@RequestParam("deviceId") Long deviceId) {
+        return success(deviceService.getMqttConnectionParams(deviceId));
     }
 
 }

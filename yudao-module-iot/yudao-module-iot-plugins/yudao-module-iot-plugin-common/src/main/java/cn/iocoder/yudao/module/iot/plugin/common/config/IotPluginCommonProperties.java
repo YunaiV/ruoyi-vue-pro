@@ -7,6 +7,11 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.Duration;
 
+/**
+ * IoT 插件的通用配置类
+ *
+ * @author haohao
+ */
 @ConfigurationProperties(prefix = "yudao.iot.plugin.common")
 @Validated
 @Data
@@ -44,5 +49,11 @@ public class IotPluginCommonProperties {
      * 下行端口
      */
     private Integer downstreamPort = DOWNSTREAM_PORT_RANDOM;
+
+    /**
+     * 插件包标识符
+     */
+    @NotEmpty(message = "插件包标识符不能为空")
+    private String pluginKey;
 
 }
