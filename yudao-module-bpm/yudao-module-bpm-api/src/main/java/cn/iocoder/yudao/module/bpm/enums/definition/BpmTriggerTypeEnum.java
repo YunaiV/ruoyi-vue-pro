@@ -17,9 +17,10 @@ import java.util.Arrays;
 public enum BpmTriggerTypeEnum implements ArrayValuable<Integer> {
 
     HTTP_REQUEST(1, "发起 HTTP 请求"),
-    FORM_UPDATE(2, "更新流程表单数据"),
-    FORM_DELETE(3, "删除流程表单数据"),
-    HTTP_REQUEST_ASYNC(4, "发起异步 HTTP 请求"); // TODO @jason：发起 HTTP 回调
+    HTTP_CALLBACK(2, "发起 HTTP 回调"),
+    FORM_UPDATE(10, "更新流程表单数据"),
+    FORM_DELETE(11, "删除流程表单数据"),
+    ;
 
     /**
      * 触发器执行动作类型

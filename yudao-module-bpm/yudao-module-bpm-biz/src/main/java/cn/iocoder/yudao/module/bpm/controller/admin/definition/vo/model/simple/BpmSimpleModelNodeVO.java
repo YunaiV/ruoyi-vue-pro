@@ -128,7 +128,7 @@ public class BpmSimpleModelNodeVO {
 
     @Schema(description = "附加节点 Id", example = "UserTask_xxx", hidden = true) // 由后端生成（不从前端传递），所以 hidden = true
     @JsonIgnore
-    private String attachNodeId; // 目前用于触发器节点（异步）。需要 UserTask 和 ReceiveTask（附加节点) 来完成
+    private String attachNodeId; // 目前用于触发器节点（HTTP 回调）。需要 UserTask 和 ReceiveTask（附加节点) 来完成
 
     /**
      * 子流程设置
@@ -390,7 +390,7 @@ public class BpmSimpleModelNodeVO {
             private List<KeyValue<String, String>> response;
 
             /**
-             * 异步 Http 请求，需要指定回调任务 Key，用于回调执行
+             * Http 回调请求，需要指定回调任务 Key，用于回调执行
              */
             @Schema(description = "回调任务 Key", example = "xxx", hidden = true)
             private String callbackTaskDefineKey;

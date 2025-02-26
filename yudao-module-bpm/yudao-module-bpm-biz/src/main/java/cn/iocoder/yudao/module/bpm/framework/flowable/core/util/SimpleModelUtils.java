@@ -25,7 +25,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.util.*;
 
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmTriggerTypeEnum.HTTP_REQUEST_ASYNC;
+import static cn.iocoder.yudao.module.bpm.enums.definition.BpmTriggerTypeEnum.HTTP_CALLBACK;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.*;
 import static java.util.Arrays.asList;
@@ -175,7 +175,7 @@ public class SimpleModelUtils {
             SequenceFlow sequenceFlow = buildBpmnSequenceFlow(node.getId(), finalTargetNodeId);
             process.addFlowElement(sequenceFlow);
         } else {
-            // 如果有附加节点：需要先建立和附加节点的连线，再建立附加节点和目标节点的连线。例如说，触发器节点（异步）
+            // 如果有附加节点：需要先建立和附加节点的连线，再建立附加节点和目标节点的连线。例如说，触发器节点（HTTP 回调）
             List<SequenceFlow> sequenceFlows = buildAttachNodeSequenceFlow(node.getId(), node.getAttachNodeId(), finalTargetNodeId);
             sequenceFlows.forEach(process::addFlowElement);
         }
@@ -735,17 +735,17 @@ public class SimpleModelUtils {
 
     public static class TriggerNodeConvert implements NodeConvert {
 
-        // TODO @芋艿：【异步】在看看
+        // TODO @芋艿：【回调】在看看
         @Override
         public List<? extends FlowElement> convertList(BpmSimpleModelNodeVO node) {
             Assert.notNull(node.getTriggerSetting(), "触发器节点设置不能为空");
             List<FlowElement> flowElements = new ArrayList<>(2);
-            // 异步 HTTP 请求。需要附加一个 ReceiveTask、发起请求后、等待回调执行
-            if (HTTP_REQUEST_ASYNC.getType().equals(node.getTriggerSetting().getType())) {
-                Assert.notNull(node.getTriggerSetting().getHttpRequestSetting(), "触发器 HTTP 请求设置不能为空");
+            // HTTP 回调请求。需要附加一个 ReceiveTask、发起请求后、等待回调执行
+            if (HTTP_CALLBACK.getType().equals(node.getTriggerSetting().getType())) {
+                Assert.notNull(node.getTriggerSetting().getHttpRequestSetting(), "触发器 HTTP 回调请求设置不能为空");
                 ReceiveTask receiveTask = new ReceiveTask();
                 receiveTask.setId("Activity_" + IdUtil.fastUUID());
-                receiveTask.setName("异步 HTTP 请求");
+                receiveTask.setName("HTTP 回调");
                 node.setAttachNodeId(receiveTask.getId());
                 flowElements.add(receiveTask);
                 // 重要：设置 callbackTaskDefineKey，用于 HTTP 回调

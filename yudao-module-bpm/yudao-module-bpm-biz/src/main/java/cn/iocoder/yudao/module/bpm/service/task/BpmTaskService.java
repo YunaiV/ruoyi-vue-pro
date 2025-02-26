@@ -287,11 +287,12 @@ public interface BpmTaskService {
     /**
      * 触发流程任务 (ReceiveTask) 的执行
      * <p>
-     * 1. Simple 模型异步 HTTP 请求触发器节点的回调，触发流程继续执行
+     * 1. Simple 模型 HTTP 回调请求触发器节点的回调，触发流程继续执行
      * 2. Simple 模型延迟器节点，到时触发流程继续执行
      *
      * @param processInstanceId 流程示例编号
      * @param taskDefineKey     任务 Key
      */
     void triggerTask(String processInstanceId, String taskDefineKey);
+
 }
