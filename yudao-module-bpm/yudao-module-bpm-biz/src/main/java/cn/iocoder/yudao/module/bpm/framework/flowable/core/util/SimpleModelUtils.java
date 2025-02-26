@@ -853,16 +853,33 @@ public class SimpleModelUtils {
             callActivity.setExecutionListeners(executionListeners);
 
             // 7. 超时设置
-            if (childProcessSetting.getTimeoutSetting() != null) {
+            if (childProcessSetting.getTimeoutSetting() != null && Boolean.TRUE.equals(childProcessSetting.getTimeoutSetting().getEnable())) {
                 BoundaryEvent boundaryEvent = null;
-                if (node.getDelaySetting().getDelayType().equals(BpmDelayTimerTypeEnum.FIXED_DATE_TIME.getType())) {
+                if (childProcessSetting.getTimeoutSetting().getType().equals(BpmDelayTimerTypeEnum.FIXED_DATE_TIME.getType())) {
                     boundaryEvent = buildTimeoutBoundaryEvent(callActivity, BpmBoundaryEventTypeEnum.DELAY_TIMER_TIMEOUT.getType(),
-                            node.getDelaySetting().getDelayTime(), null, null);
-                } else if (node.getDelaySetting().getDelayType().equals(BpmDelayTimerTypeEnum.FIXED_TIME_DURATION.getType())) {
+                            childProcessSetting.getTimeoutSetting().getTimeExpression(), null, null);
+                } else if (childProcessSetting.getTimeoutSetting().getType().equals(BpmDelayTimerTypeEnum.FIXED_TIME_DURATION.getType())) {
                     boundaryEvent = buildTimeoutBoundaryEvent(callActivity, BpmBoundaryEventTypeEnum.CHILD_PROCESS_TIMEOUT.getType(),
-                            null, null, node.getDelaySetting().getDelayTime());
+                            null, null, childProcessSetting.getTimeoutSetting().getTimeExpression());
                 }
                 flowElements.add(boundaryEvent);
+            }
+
+            // 8. 多实例
+            if (childProcessSetting.getMultiInstanceSetting() != null && Boolean.TRUE.equals(childProcessSetting.getMultiInstanceSetting().getEnable())) {
+                MultiInstanceLoopCharacteristics multiInstanceCharacteristics = new MultiInstanceLoopCharacteristics();
+                multiInstanceCharacteristics.setSequential(childProcessSetting.getMultiInstanceSetting().getSequential());
+                if (childProcessSetting.getMultiInstanceSetting().getSourceType().equals(BpmChildProcessMultiInstanceSourceTypeEnum.FIXED_QUANTITY.getType())) {
+                    multiInstanceCharacteristics.setLoopCardinality(childProcessSetting.getMultiInstanceSetting().getSource());
+                }
+                if (childProcessSetting.getMultiInstanceSetting().getSourceType().equals(BpmChildProcessMultiInstanceSourceTypeEnum.DIGITAL_FORM.getType()) ||
+                        childProcessSetting.getMultiInstanceSetting().getSourceType().equals(BpmChildProcessMultiInstanceSourceTypeEnum.MULTI_FORM.getType())) {
+                    multiInstanceCharacteristics.setInputDataItem(childProcessSetting.getMultiInstanceSetting().getSource());
+                }
+                multiInstanceCharacteristics.setCompletionCondition(String.format("${ nrOfCompletedInstances/nrOfInstances >= %s}",
+                        String.format("%.2f", childProcessSetting.getMultiInstanceSetting().getCompleteRatio() / 100D)));
+                callActivity.setLoopCharacteristics(multiInstanceCharacteristics);
+                addExtensionElement(callActivity, CHILD_PROCESS_MULTI_INSTANCE_SOURCE_TYPE, childProcessSetting.getMultiInstanceSetting().getSourceType());
             }
 
             // 添加节点类型

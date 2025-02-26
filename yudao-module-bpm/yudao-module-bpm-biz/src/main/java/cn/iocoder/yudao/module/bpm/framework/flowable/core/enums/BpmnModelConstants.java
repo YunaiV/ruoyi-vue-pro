@@ -69,6 +69,11 @@ public interface BpmnModelConstants {
     String USER_TASK_APPROVE_METHOD = "approveMethod";
 
     /**
+     * BPMN Child Process 的扩展属性，用于标记多实例来源类型
+     */
+    String CHILD_PROCESS_MULTI_INSTANCE_SOURCE_TYPE = "childProcessMultiInstanceSourceType";
+
+    /**
      * BPMN ExtensionElement 流程表单字段权限元素, 用于标记字段权限
      */
     String FORM_FIELD_PERMISSION_ELEMENT = "fieldsPermission";
