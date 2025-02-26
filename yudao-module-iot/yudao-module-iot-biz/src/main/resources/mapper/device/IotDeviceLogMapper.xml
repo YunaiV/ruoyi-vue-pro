@@ -55,4 +55,68 @@
         ORDER BY ts DESC
     </select>
 
+    <select id="selectCountByCreateTime" resultType="Long">
+        SELECT COUNT(*)
+        FROM device_log
+        <where>
+            <if test="createTime != null">
+                AND ts >= #{createTime}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectDeviceLogUpCountByHour" resultType="cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsRespVO$TimeData">
+        SELECT 
+            TIMETRUNCATE(ts, 1h) as time,
+            COUNT(*) as data 
+        FROM 
+        <choose>
+            <when test="deviceKey != null and deviceKey != ''">
+                device_log_${deviceKey}
+            </when>
+            <otherwise>
+                device_log
+            </otherwise>
+        </choose>
+        <where>
+            <if test="startTime != null">
+                AND ts >= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND ts &lt;= #{endTime}
+            </if>
+            AND (
+                 identifier IN ('online', 'offline', 'pull', 'progress', 'report', 'register', 'register_sub')
+            )
+        </where>
+        GROUP BY TIMETRUNCATE(ts, 1h)
+        ORDER BY time ASC
+    </select>
+
+    <select id="selectDeviceLogDownCountByHour" resultType="cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsRespVO$TimeData">
+        SELECT 
+            TIMETRUNCATE(ts, 1h) as time,
+            COUNT(*) as data 
+        FROM 
+        <choose>
+            <when test="deviceKey != null and deviceKey != ''">
+                device_log_${deviceKey}
+            </when>
+            <otherwise>
+                device_log
+            </otherwise>
+        </choose>
+        <where>
+            <if test="startTime != null">
+                AND ts >= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND ts &lt;= #{endTime}
+            </if>
+            AND identifier IN ('set', 'get', 'upgrade', 'unregister_sub', 'topology_add')
+        </where>
+        GROUP BY TIMETRUNCATE(ts, 1h)
+        ORDER BY time ASC
+    </select>
+
 </mapper>

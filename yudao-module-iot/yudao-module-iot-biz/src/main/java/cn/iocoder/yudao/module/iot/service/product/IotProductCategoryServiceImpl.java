@@ -5,11 +5,13 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.category.IotProductCategoryPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.category.IotProductCategorySaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductCategoryDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.product.IotProductCategoryMapper;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
+import cn.iocoder.yudao.module.iot.service.product.IotProductCategoryService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -19,6 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PRODUCT_CATEGORY_NOT_EXISTS;
@@ -101,7 +104,7 @@ public class IotProductCategoryServiceImpl implements IotProductCategoryService 
     }
 
     @Override
-    public Map<String, Integer> getDeviceCountsOfProductCategoryMap() {
+    public List<IotStatisticsRespVO.DataItem> getDeviceCountsOfProductCategory() {
         // 1. 获取所有数据
         List<IotProductCategoryDO> categoryList = productCategoryMapper.selectList();
         List<IotProductDO> productList = productService.getProductList();
@@ -137,8 +140,16 @@ public class IotProductCategoryServiceImpl implements IotProductCategoryService 
                 categoryDeviceCountMap.merge(categoryName, 1, Integer::sum);
             }
         }
-        
-        return categoryDeviceCountMap;
+
+        // 3. 转换为 DataItem 列表
+        return categoryDeviceCountMap.entrySet().stream()
+                .map(entry -> {
+                    IotStatisticsRespVO.DataItem dataItem = new IotStatisticsRespVO.DataItem();
+                    dataItem.setName(entry.getKey());
+                    dataItem.setValue(entry.getValue());
+                    return dataItem;
+                })
+                .collect(Collectors.toList());
     }
 
 }

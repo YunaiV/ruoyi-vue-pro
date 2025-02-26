@@ -135,6 +135,22 @@ public interface IotDeviceService {
     List<IotDeviceDO> getDeviceListByState(Integer state);
 
     /**
+     * 根据产品ID获取设备列表
+     *
+     * @param productId 产品ID，用于查询特定产品的设备列表
+     * @return 返回与指定产品ID关联的设备列表，列表中的每个元素为IotDeviceDO对象
+     */
+    List<IotDeviceDO> getDeviceListByProductId(Long productId);
+
+    /**
+     * 根据设备ID列表获取设备信息列表
+     *
+     * @param deviceIdList 设备ID列表，包含需要查询的设备ID
+     * @return 返回与设备ID列表对应的设备信息列表，列表中的每个元素为IotDeviceDO对象
+     */
+    List<IotDeviceDO> getDeviceListByIdList(List<Long> deviceIdList);
+
+    /**
      * 基于产品编号，获得设备数量
      *
      * @param productId 产品编号

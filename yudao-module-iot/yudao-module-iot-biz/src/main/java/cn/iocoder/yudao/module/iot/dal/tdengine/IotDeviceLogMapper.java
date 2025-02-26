@@ -1,12 +1,16 @@
 package cn.iocoder.yudao.module.iot.dal.tdengine;
 
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceLogPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.annotation.TDengineDS;
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 设备日志 {@link IotDeviceLogDO} Mapper 接口
@@ -45,5 +49,37 @@ public interface IotDeviceLogMapper {
      */
     IPage<IotDeviceLogDO> selectPage(IPage<IotDeviceLogDO> page,
                                      @Param("reqVO") IotDeviceLogPageReqVO reqVO);
+
+    /**
+     * 统计设备日志数量
+     *
+     * @param createTime 创建时间，如果为空，则统计所有日志数量
+     * @return 日志数量
+     */
+    Long selectCountByCreateTime(@Param("createTime") Long createTime);
+
+    /**
+     * 获得每个小时设备上行消息数量统计
+     *
+     * @param deviceKey 设备标识
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return 每小时消息数量统计
+     */
+    List<IotStatisticsRespVO.TimeData> selectDeviceLogUpCountByHour(@Param("deviceKey") String deviceKey,
+                                                                    @Param("startTime") Long startTime,
+                                                                    @Param("endTime") Long endTime);
+
+    /**
+     * 获得每个小时设备下行消息数量统计
+     *
+     * @param deviceKey 设备标识
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return 每小时消息数量统计
+     */
+    List<IotStatisticsRespVO.TimeData> selectDeviceLogDownCountByHour(@Param("deviceKey") String deviceKey,
+                                                                      @Param("startTime") Long startTime,
+                                                                      @Param("endTime") Long endTime);
 
 }
