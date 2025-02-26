@@ -520,11 +520,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (CollUtil.isNotEmpty(reqVO.getVariables())) {
             Map<String, Object> variables = FlowableUtils.filterTaskFormVariable(reqVO.getVariables());
             // 下个节点审批人如果不存在，则由前端传递
-            if (CollUtil.isNotEmpty(reqVO.getStartUserSelectAssignees())) {
+            if (CollUtil.isNotEmpty(reqVO.getNextAssignees())) {
                 // 获取实例中的全部节点数据，避免后续节点的审批人被覆盖
-                Map<String, List<Long>> startUserSelectAssignees = FlowableUtils.getStartUserSelectAssignees(instance.getProcessVariables());
-                startUserSelectAssignees.putAll(reqVO.getStartUserSelectAssignees());
-                variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES, startUserSelectAssignees);
+                Map<String, List<Long>> hisProcessVariables = FlowableUtils.getStartUserSelectAssignees(instance.getProcessVariables());
+                hisProcessVariables.putAll(reqVO.getNextAssignees());
+                variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES, hisProcessVariables);
             }
             runtimeService.setVariables(task.getProcessInstanceId(), variables);
             taskService.complete(task.getId(), variables, true);

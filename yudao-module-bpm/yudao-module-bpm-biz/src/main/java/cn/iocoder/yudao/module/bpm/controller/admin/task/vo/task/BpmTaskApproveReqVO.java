@@ -24,7 +24,7 @@ public class BpmTaskApproveReqVO {
     @Schema(description = "变量实例（动态表单）", requiredMode = Schema.RequiredMode.REQUIRED)
     private Map<String, Object> variables;
 
-    @Schema(description = "发起人自选审批人 Map", example = "{taskKey1: [1, 2]}")
-    private Map<String, List<Long>> startUserSelectAssignees;
+    @Schema(description = "下一个节点审批人", example = "{nodeId:[1, 2]}")
+    private Map<String, List<Long>> nextAssignees;
 
 }
