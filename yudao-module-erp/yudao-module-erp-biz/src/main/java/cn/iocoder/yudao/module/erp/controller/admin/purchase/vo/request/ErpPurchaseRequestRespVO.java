@@ -1,14 +1,15 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
-import cn.iocoder.yudao.module.erp.enums.DictTypeConstants;
+import cn.iocoder.yudao.module.erp.enums.ErpDictTypeConstants;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.List;
-
-import com.alibaba.excel.annotation.*;
 
 @Schema(description = "管理后台 - ERP采购申请单 Response VO")
 @Data
@@ -40,7 +41,7 @@ public class ErpPurchaseRequestRespVO {
 
     @Schema(description = "审核状态(0:待审核，1:审核通过，2:审核未通过)", example = "2")
     @ExcelProperty("审核状态(0:待审核，1:审核通过，2:审核未通过)")
-    @DictFormat(DictTypeConstants.PURCHASE_REQUEST_APPLICATION_STATUS)
+    @DictFormat(ErpDictTypeConstants.PURCHASE_REQUEST_APPLICATION_STATUS)
     private Integer status;
 
     @Schema(description = "关闭状态（0已关闭，1已开启）", example = "1")

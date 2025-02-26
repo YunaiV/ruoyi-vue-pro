@@ -3,8 +3,10 @@ package cn.iocoder.yudao.module.erp.dal.mysql.logistic.category.item;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.erp.controller.admin.logistic.category.item.vo.ErpCustomCategoryItemPageReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.logistic.category.item.ErpCustomCategoryItemDO;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
@@ -17,18 +19,22 @@ import java.util.List;
  */
 @Mapper
 public interface ErpCustomCategoryItemMapper extends BaseMapperX<ErpCustomCategoryItemDO> {
-
-    default PageResult<ErpCustomCategoryItemDO> selectPage(ErpCustomCategoryItemPageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<ErpCustomCategoryItemDO>()
-//            .eqIfPresent(ErpCustomCategoryItemDO::getCategoryId, reqVO.getCategoryId())
+    //buildQueryWrapper
+    default MPJLambdaWrapper<ErpCustomCategoryItemDO> buildQueryWrapper(ErpCustomCategoryItemPageReqVO reqVO) {
+        return new MPJLambdaWrapperX<ErpCustomCategoryItemDO>()
+            .selectAll(ErpCustomCategoryItemDO.class)
             .eqIfPresent(ErpCustomCategoryItemDO::getCountryCode, reqVO.getCountryCode())
-            .eqIfPresent(ErpCustomCategoryItemDO::getHsCode, reqVO.getHsCode())
             .eqIfPresent(ErpCustomCategoryItemDO::getTaxRate, reqVO.getTaxRate())
             .betweenIfPresent(ErpCustomCategoryItemDO::getCreateTime, reqVO.getCreateTime())
-            .orderByDesc(ErpCustomCategoryItemDO::getId));
+            .orderByDesc(ErpCustomCategoryItemDO::getId)
+            ;
     }
 
-    default List<ErpCustomCategoryItemDO> selectListByCategoryId(Integer categoryId) {
+    default PageResult<ErpCustomCategoryItemDO> selectPage(ErpCustomCategoryItemPageReqVO reqVO) {
+        return selectPage(reqVO, buildQueryWrapper(reqVO));
+    }
+
+    default List<ErpCustomCategoryItemDO> selectListByCategoryId(Long categoryId) {
         return selectList(new LambdaQueryWrapperX<ErpCustomCategoryItemDO>()
             .eq(ErpCustomCategoryItemDO::getCustomCategoryId, categoryId));
     }

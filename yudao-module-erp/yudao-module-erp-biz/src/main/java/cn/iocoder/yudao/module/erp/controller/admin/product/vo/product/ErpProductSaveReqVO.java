@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.erp.controller.admin.product.vo.product;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.json.GuidePriceJson;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import lombok.*;
 import jakarta.validation.constraints.*;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.List;

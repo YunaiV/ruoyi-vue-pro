@@ -40,7 +40,7 @@ public class ErpCustomCategoryItemDO extends TenantBaseDO {
     /**
      * HS编码
      */
-    private String hsCode;
+    private String hscode;
     /**
      * 税率
      */

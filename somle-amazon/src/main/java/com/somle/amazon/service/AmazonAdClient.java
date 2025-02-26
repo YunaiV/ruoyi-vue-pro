@@ -1,20 +1,17 @@
 package com.somle.amazon.service;
 
-import com.somle.amazon.controller.vo.AmazonAdAccountRespVO;
-import com.somle.amazon.controller.vo.AmazonAdProfileRespVO;
-import com.somle.amazon.controller.vo.AmazonAdReportReqVO;
-import com.somle.amazon.model.AmazonAdAuthDO;
-import com.somle.amazon.model.enums.AmazonRegion;
 import cn.iocoder.yudao.framework.common.util.general.CoreUtils;
 import cn.iocoder.yudao.framework.common.util.json.JSONArray;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import cn.iocoder.yudao.framework.common.util.web.RequestX;
 import cn.iocoder.yudao.framework.common.util.web.WebUtils;
-
 import com.fasterxml.jackson.core.type.TypeReference;
-
-
+import com.somle.amazon.controller.vo.AmazonAdAccountRespVO;
+import com.somle.amazon.controller.vo.AmazonAdProfileRespVO;
+import com.somle.amazon.controller.vo.AmazonAdReportReqVO;
+import com.somle.amazon.model.AmazonAdAuthDO;
+import com.somle.amazon.model.enums.AmazonRegion;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,7 +22,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 

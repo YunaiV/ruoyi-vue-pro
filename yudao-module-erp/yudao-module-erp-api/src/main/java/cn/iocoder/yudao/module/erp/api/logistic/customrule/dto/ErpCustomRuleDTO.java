@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 
+/**
+ * 海关规则+产品+海关分类(主子表)
+ */
 @Data
 public class ErpCustomRuleDTO {
     /**

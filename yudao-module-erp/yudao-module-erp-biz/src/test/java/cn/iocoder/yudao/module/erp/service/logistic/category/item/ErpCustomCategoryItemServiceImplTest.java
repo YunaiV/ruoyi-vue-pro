@@ -104,7 +104,6 @@ public class ErpCustomCategoryItemServiceImplTest extends BaseDbUnitTest {
         ErpCustomCategoryItemDO dbCustomRuleCategoryItem = randomPojo(ErpCustomCategoryItemDO.class, o -> { // 等会查询到
             o.setCustomCategoryId(null);
             o.setCountryCode(null);
-            o.setHsCode(null);
             o.setTaxRate(null);
             o.setCreateTime(null);
         });
@@ -114,7 +113,6 @@ public class ErpCustomCategoryItemServiceImplTest extends BaseDbUnitTest {
         // 测试 countryCode 不匹配
         customRuleCategoryItemMapper.insert(cloneIgnoreId(dbCustomRuleCategoryItem, o -> o.setCountryCode(null)));
         // 测试 hsCode 不匹配
-        customRuleCategoryItemMapper.insert(cloneIgnoreId(dbCustomRuleCategoryItem, o -> o.setHsCode(null)));
         // 测试 taxRate 不匹配
         customRuleCategoryItemMapper.insert(cloneIgnoreId(dbCustomRuleCategoryItem, o -> o.setTaxRate(null)));
         // 测试 createTime 不匹配
@@ -123,7 +121,7 @@ public class ErpCustomCategoryItemServiceImplTest extends BaseDbUnitTest {
         ErpCustomCategoryItemPageReqVO reqVO = new ErpCustomCategoryItemPageReqVO();
 //        reqVO.setCategoryId(null);
         reqVO.setCountryCode(null);
-        reqVO.setHsCode(null);
+//        reqVO.setHsCode(null);
         reqVO.setTaxRate(null);
         reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 

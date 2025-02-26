@@ -5,17 +5,9 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.logistic.category.item.ErpCust
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import lombok.Data;
 
-import java.util.List;
-
-/**
- * 海关分类主+子+产品(不带海关规则的产品)
- */
+//1子表 : 1主表 : 1产品
 @Data
-public class ErpCustomCategoryBO extends ErpCustomCategoryDO {
-
-    // 海关分类子项
-    private List<ErpCustomCategoryItemDO> items;
-
-    //产品
-    private ErpProductDO productDO;
+public class ErpCustomCategoryItemBO extends ErpCustomCategoryItemDO {
+    private ErpProductDO erpProductDO;
+    private ErpCustomCategoryDO erpCustomCategoryDO;
 }

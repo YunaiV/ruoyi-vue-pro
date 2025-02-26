@@ -10,12 +10,12 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.erp.api.logistic.customrule.ErpCustomRuleApi;
+import cn.iocoder.yudao.module.erp.api.logistic.customrule.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.json.GuidePriceJson;
-import cn.iocoder.yudao.module.erp.convert.product.ErpProductConvert;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductCategoryDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductUnitDO;
@@ -123,12 +123,7 @@ public class ErpProductServiceImpl implements ErpProductService {
             product.setPatentCountryCodes(JSONUtil.toJsonStr(createReqVO.getPatentCountryCodeList()));
         }
         ThrowUtil.ifSqlThrow(productMapper.insert(product), DB_INSERT_ERROR);
-        //获取创建人id
-        Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
-        ErpProductDTO erpProductDTO = BeanUtils.toBean(product, ErpProductDTO.class);
-        erpProductDTO.setCreator(String.valueOf(loginUserId));
-        //同步数据
-        erpProductChannel.send(MessageBuilder.withPayload(List.of(erpProductDTO)).build());
+        this.syncProduct(product, false);
         // 返回
         return product.getId();
     }
@@ -181,20 +176,38 @@ public class ErpProductServiceImpl implements ErpProductService {
             updateObj.setPatentCountryCodes("");
         }
         ThrowUtil.ifSqlThrow(productMapper.updateById(updateObj), DB_UPDATE_ERROR);
-        //更新产品时->覆盖n个海关规则
-        //找到产品id对应的所有海关规则DTO(含海关信息)
-        Optional.ofNullable(erpCustomRuleApi.getErpCustomRuleDTOByProductId(productId)).ifPresent(
-            dtos -> {
-                erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos).build());
-            }
-        );
+        this.syncProduct(updateObj, true);
+    }
 
-        //获取创建人id
-        Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
-        ErpProductDTO erpProductDTO = BeanUtils.toBean(updateObj, ErpProductDTO.class);
-        erpProductDTO.setCreator(String.valueOf(loginUserId));
-        //同步数据
-        erpProductChannel.send(MessageBuilder.withPayload(List.of(erpProductDTO)).build());
+    private void syncProduct(ErpProductDO productDO, Boolean isUpdate) {
+        if (isUpdate) {
+            //更新产品时->覆盖n个海关规则
+            //找到产品id对应的所有海关规则DTO(含海关信息+海关分类)，如果没有海关分类信息(产品逻辑必须有)，那么就不更新海关规则
+            List<ErpCustomRuleDTO> dtos = new ArrayList<>();
+            // 从产品ID获取海关规则 + 从分类ID获取海关规则
+            Optional.ofNullable(erpCustomRuleApi.listDTOsByProductId(productDO.getId()))
+                .ifPresent(dtos::addAll); // 如果不为空，添加到dtos列表中
+            Optional.ofNullable(productDO.getCustomCategoryId())
+                .map(erpCustomRuleApi::getErpCustomRule) // 获取分类ID对应的海关规则DTO
+                .ifPresent(dtos::add); // 如果存在DTO，添加到dtos列表中
+            // 如果dtos中有数据，则发送消息
+            if (!dtos.isEmpty()) {
+                erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos.stream().distinct().toList()).build());
+            }
+            //获取创建人id
+            Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
+            ErpProductDTO erpProductDTO = BeanUtils.toBean(productDO, ErpProductDTO.class);
+            erpProductDTO.setCreator(String.valueOf(loginUserId));
+            //同步数据
+            erpProductChannel.send(MessageBuilder.withPayload(List.of(erpProductDTO)).build());
+        } else {
+            //获取创建人id
+            Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
+            ErpProductDTO erpProductDTO = BeanUtils.toBean(productDO, ErpProductDTO.class);
+            erpProductDTO.setCreator(String.valueOf(loginUserId));
+            //同步数据
+            erpProductChannel.send(MessageBuilder.withPayload(List.of(erpProductDTO)).build());
+        }
     }
 
     @Override

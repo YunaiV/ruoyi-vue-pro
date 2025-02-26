@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProduc
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Collection;
 import java.util.List;
@@ -80,7 +81,7 @@ public interface ErpProductService {
      * @param ids 编号组
      * @return 产品 DO 列表
      */
-    List<ErpProductDO> listProducts(Collection<Long> ids);
+    List<ErpProductDO> listProducts(@NotNull Collection<Long> ids);
 
     /**
      * 获得产品 DO Map

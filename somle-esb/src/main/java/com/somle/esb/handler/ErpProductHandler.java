@@ -1,6 +1,5 @@
 package com.somle.esb.handler;
 
-import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.service.EccangService;
@@ -35,22 +34,12 @@ public class ErpProductHandler {
 
     @ServiceActivator(inputChannel = "erpProductChannel")
     public void syncProductsToEccang(@Payload List<ErpProductDTO> erpProductDTOS) {
-        log.info("syncProductsToEccang");
         List<EccangProduct> eccangProducts = erpToEccangConverter.convertByErpProducts(erpProductDTOS);
         for (EccangProduct eccangProduct : eccangProducts) {
-            eccangProduct.setActionType("ADD");
-            EccangProduct eccangServiceProduct = eccangService.getProduct(eccangProduct.getProductSku());
-            //根据sku从eccang中获取产品，如果产品不为空，则表示已存在，操作则变为修改
-            if (ObjUtil.isNotEmpty(eccangServiceProduct)) {
-                eccangProduct.setActionType("EDIT");
-                //如果是修改就要上传默认采购单价
-                //TODO 后续有变更，请修改
-                eccangProduct.setProductPurchaseValue(0.001F);
-            }
             log.debug(eccangProduct.toString());
             eccangService.addBatchProduct(List.of(eccangProduct));
         }
-        log.info("syncProductsToEccang end");
+        log.info("syncProductsToEccang end,sku = ({})", eccangProducts.stream().map(EccangProduct::getProductSku).toList());
     }
 
     @ServiceActivator(inputChannel = "erpProductChannel")

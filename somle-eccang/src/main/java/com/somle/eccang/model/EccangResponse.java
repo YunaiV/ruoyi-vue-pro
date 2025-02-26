@@ -1,9 +1,9 @@
 package com.somle.eccang.model;
 
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import lombok.*;
 
 import java.util.List;

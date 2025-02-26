@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Field;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -90,9 +91,8 @@ public class ErpToEccangConverter {
             ? getCountrySuffix(dictDataApi.getDictData(DictTypeConstants.COUNTRY_CODE, String.valueOf(countryCode)).getLabel())
             : "";
         String barCode = productDTO.getBarCode();
-        String productName = productDTO.getName();
         String suffix = countrySuffix.isEmpty() ? "" : "-" + countrySuffix;
-        eccangProduct.setProductTitle(productName + suffix);
+        eccangProduct.setProductTitle(productDTO.getName() + suffix);
         eccangProduct.setProductTitleEn(CharSequenceUtil.isNotBlank(barCode) ? barCode + suffix : barCode);
         eccangProduct.setProductSku(CharSequenceUtil.isNotBlank(barCode) ? barCode + suffix : barCode);
         //申报币种
@@ -105,113 +105,41 @@ public class ErpToEccangConverter {
         eccangProduct.setProductDeclaredValue(customRuleDTO.getDeclaredValue().floatValue());
         eccangProduct.setPdOverseaTypeEn(customRuleDTO.getDeclaredTypeEn());
 
-        //产品尺寸和重量
-        eccangProduct.setProductMaterial(productDTO.getMaterial());
-        eccangProduct.setProductWeight(productDTO.getPackageWeight().floatValue());
-        eccangProduct.setPdNetWeight(productDTO.getWeight().floatValue());
-        //包装长-宽-高
-        eccangProduct.setProductWidth(mmToCmAsFloat(productDTO.getPackageWidth()));
-        eccangProduct.setProductLength(mmToCmAsFloat(productDTO.getPackageLength()));
-        eccangProduct.setProductHeight(mmToCmAsFloat(productDTO.getPackageHeight()));
-        //长-宽-高
-        eccangProduct.setPdNetLength(mmToCmAsFloat(productDTO.getLength()));
-        eccangProduct.setPdNetWidth(mmToCmAsFloat(productDTO.getWidth()));
-        eccangProduct.setPdNetHeight(mmToCmAsFloat(productDTO.getHeight()));
+        this.setProductSizeAndWeight(eccangProduct, productDTO, (product, dto) -> {
+        });
         //其他产品属性
         Optional.ofNullable(customRuleDTO.getTaxRate()).ifPresent(taxRate -> eccangProduct.setTaxRate(taxRate.floatValue()));
         eccangProduct.setPdOverseaTypeCn(customRuleDTO.getDeclaredType());
-//        eccangProduct.setProductImgUrlList(Collections.singletonList(productDTO.getPrimaryImageUrl()));
-//        eccangProduct.setHsCode(customRuleDTO.getHscode());//暂停向eccang同步该属性
+//        eccangProduct.setProductImgUrlList(Collections.singletonList(productDTO.getPrimaryImageUrl()));//不同步imgUrlList
+//        eccangProduct.setHsCode(customRuleDTO.getHscode());//不同步hsCode
         // 物流属性
         Integer logisticAttribute = customRuleDTO.getLogisticAttribute();
-        if (ObjUtil.isNotEmpty(logisticAttribute)) {
-            eccangProduct.setLogisticAttribute(String.valueOf(logisticAttribute));
-        }
-        // 产品创建人部门名称
-        MapUtils.findAndThen(userMap, Long.parseLong(productDTO.getCreator()),
-            user -> eccangProduct.setUserOrganizationId(eccangService.getOrganizationByNameEn(String.valueOf(productDTO.getDeptId())).getId()));//TODO-需要检查erp中产品资料库中的部门信息不为空
-        // 品类
-        TreeSet<DeptLevelRespDTO> deptTreeLevel = deptApi.getDeptTreeLevel(productDTO.getDeptId());
-        if (CollectionUtil.isEmpty(deptTreeLevel) || deptTreeLevel.size() > 3) {
-            throw new RuntimeException("品类部门信息异常，请联系管理员，检查erp中产品资料库中的部门信息");
-        }
-        deptTreeLevel.pollFirst();
-        int index = 1;
-        for (DeptLevelRespDTO deptLevelRespDTO : deptTreeLevel) {
-            Field categoryNameField = ReflectUtil.getField(EccangProduct.class, "procutCategoryName" + index);
-            ReflectUtil.setFieldValue(eccangProduct, categoryNameField, deptLevelRespDTO.getDeptName());
-            Field categoryNameEnField = ReflectUtil.getField(EccangProduct.class, "procutCategoryNameEn" + index);
-            ReflectUtil.setFieldValue(eccangProduct, categoryNameEnField, deptLevelRespDTO.getDeptName());
-            index += 1;
-        }
+        eccangProduct.setLogisticAttribute(Optional.ofNullable(logisticAttribute)
+            .map(String::valueOf)
+            .orElse(null));
+
+        this.setProductCategoriesAndOrganizationId(eccangProduct, productDTO, userMap);
         //产品id
 //        eccangProduct.setDesc(String.valueOf(customRuleDTO.getProductId()));//Desc->productId
-        EccangProduct eccangServiceProduct = eccangService.getProduct(eccangProduct.getProductSku());
-        //根据sku从eccang中获取产品，如果产品不为空，则表示已存在，操作则变为修改
-        if (ObjUtil.isNotEmpty(eccangServiceProduct)) {
-            eccangProduct.setActionType("EDIT");
-            //如果是修改就要上传默认采购单价
-            //TODO 后续有变更，请修改
-            eccangProduct.setProductPurchaseValue(0.001F);
-        }
         return eccangProduct;
     }
 
     /**
      * 将单个ERP产品转换为Eccang产品。
      *
-     * @param product ERP产品对象
-     * @param userMap 用户信息映射
+     * @param productDTO ERP产品对象
+     * @param userMap    用户信息映射
      * @return 转换后的Eccang产品对象
      */
-    private EccangProduct convertByErpProductDTO(ErpProductDTO product, Map<Long, AdminUserRespDTO> userMap) {
+    private EccangProduct convertByErpProductDTO(ErpProductDTO productDTO, Map<Long, AdminUserRespDTO> userMap) {
         EccangProduct eccangProduct = setDefaultValue(new EccangProduct());
-        EccangProduct eccangServiceProduct = eccangService.getProduct(eccangProduct.getProductSku());
-        //根据sku从eccang中获取产品，如果产品不为空，则表示已存在，操作则变为修改
-        if (ObjUtil.isNotEmpty(eccangServiceProduct)) {
-            eccangProduct.setActionType("EDIT");
-            //如果是修改就要上传默认采购单价
-            //TODO 后续有变更，请修改
-            eccangProduct.setProductPurchaseValue(0F);
-        }
         //SKU和标题
-        eccangProduct.setProductTitle(product.getName());
-        eccangProduct.setProductTitleEn(product.getBarCode());
-        eccangProduct.setProductSku(product.getBarCode());
-        //产品尺寸和重量
-        eccangProduct.setProductMaterial(product.getMaterial());
-        eccangProduct.setPdNetWeight(product.getWeight().floatValue());
-        //eccangProduct.setProductImgUrlList(Collections.singletonList(product.getPrimaryImageUrl()));产品图片属于敏感数据，不同步
-        //产品基础属性
-        eccangProduct.setPdNetLength(mmToCmAsFloat(Float.valueOf(product.getLength())));
-        eccangProduct.setPdNetWidth(mmToCmAsFloat(Float.valueOf(product.getWidth())));
-        eccangProduct.setPdNetHeight(mmToCmAsFloat(Float.valueOf(product.getHeight())));
-        //产品包装属性
-        eccangProduct.setProductLength(mmToCmAsFloat(product.getPackageLength()));  // mm -> cm
-        eccangProduct.setProductWidth(mmToCmAsFloat(product.getPackageWidth()));    // mm -> cm
-        eccangProduct.setProductHeight(mmToCmAsFloat(product.getPackageHeight()));  // mm -> cm
-        eccangProduct.setProductWeight(
-            product.getPackageWeight() != null
-                ? product.getPackageWeight().setScale(3, RoundingMode.HALF_UP).floatValue() // 保留三位小数
-                : null // 如果为 null，返回 null
-        );
-        //产品创建人部门名称
-        MapUtils.findAndThen(userMap, Long.parseLong(product.getCreator()),
-            user -> eccangProduct.setUserOrganizationId(eccangService.getOrganizationByNameEn(String.valueOf(product.getDeptId())).getId()));
-        //品类
-        TreeSet<DeptLevelRespDTO> deptTreeLevel = deptApi.getDeptTreeLevel(product.getDeptId());
-        if (CollectionUtil.isEmpty(deptTreeLevel) || deptTreeLevel.size() > 3) {
-            throw new RuntimeException("品类部门信息异常，请联系管理员，检查erp中产品资料库中的部门信息");
-        }
-        deptTreeLevel.pollFirst();
-        int index = 1;
-        for (DeptLevelRespDTO deptLevelRespDTO : deptTreeLevel) {
-            Field categoryNameField = ReflectUtil.getField(EccangProduct.class, "procutCategoryName" + index);
-            ReflectUtil.setFieldValue(eccangProduct, categoryNameField, deptLevelRespDTO.getDeptName());
-            Field categoryNameEnField = ReflectUtil.getField(EccangProduct.class, "procutCategoryNameEn" + index);
-            ReflectUtil.setFieldValue(eccangProduct, categoryNameEnField, deptLevelRespDTO.getDeptName());
-            index += 1;
-        }
+        eccangProduct.setProductTitle(productDTO.getName());
+        eccangProduct.setProductTitleEn(productDTO.getBarCode());
+        eccangProduct.setProductSku(productDTO.getBarCode());
+        this.setProductSizeAndWeight(eccangProduct, productDTO, (product, dto) -> {
+        });
+        this.setProductCategoriesAndOrganizationId(eccangProduct, productDTO, userMap);
         return eccangProduct;
     }
 
@@ -225,13 +153,13 @@ public class ErpToEccangConverter {
             ObjectUtils.defaultIfNull(eccangProduct.getSaleStatus(), 2) // 销售状态
         );
         eccangProduct.setActionType(
-            ObjectUtils.defaultIfNull(eccangProduct.getActionType(), "ADD") //操作类型
+            ObjectUtils.defaultIfNull(eccangProduct.getActionType(), "ADD") //默认操作类型
         );
         eccangProduct.setCurrencyCode(
             ObjectUtils.defaultIfNull(eccangProduct.getCurrencyCode(), "RMB") // 默认币种代码RMB
         );
         eccangProduct.setProductPrice(
-            ObjectUtils.defaultIfNull(eccangProduct.getProductPrice(), 0f) // 默认价格为 0.0
+            ObjectUtils.defaultIfNull(eccangProduct.getProductPrice(), 0F) // 默认价格为 0.0
         );
         eccangProduct.setPdDeclareCurrencyCode(
             ObjectUtils.defaultIfNull(eccangProduct.getPdDeclareCurrencyCode(), "USD") // 默认申报币种USD
@@ -240,6 +168,13 @@ public class ErpToEccangConverter {
             ObjectUtils.defaultIfNull(eccangProduct.getProductDeclaredValue(), 0.001F));// 申报价值
         eccangProduct.setPdOverseaTypeEn(
             ObjectUtils.defaultIfNull(eccangProduct.getPdOverseaTypeEn(), "无")); //申报品名英文
+        //根据sku从eccang中获取产品，如果产品不为空，则表示已存在，操作则变为修改
+        if (ObjUtil.isNotEmpty(eccangService.getProduct(eccangProduct.getProductSku()))) {
+            eccangProduct.setActionType("EDIT");
+            //如果是修改就要上传默认采购单价
+            //TODO 后续有变更，请修改
+            eccangProduct.setProductPurchaseValue(0.001F);
+        }
         return eccangProduct;
     }
 
@@ -299,5 +234,58 @@ public class ErpToEccangConverter {
             deptTreeLevel.pollLast();
         }
         return deptTreeLevel.last();
+    }
+
+
+    /**
+     * 设置ERP产品的分类信息和组织id
+     * 通过部门ID获取部门层级，并设置到Eccang产品的分类字段。
+     *
+     * @param eccangProduct Eccang产品对象
+     * @param productDTO    ERP产品DTO
+     */
+    private void setProductCategoriesAndOrganizationId(EccangProduct eccangProduct, ErpProductDTO productDTO, Map<Long, AdminUserRespDTO> userMap) {
+        // 产品创建人部门名称
+        MapUtils.findAndThen(userMap, Long.parseLong(productDTO.getCreator()),
+            user -> eccangProduct.setUserOrganizationId(eccangService.getOrganizationByNameEn(String.valueOf(productDTO.getDeptId())).getId()));//TODO-需要检查erp中产品资料库中的部门信息不为空
+        // 品类
+        TreeSet<DeptLevelRespDTO> deptTreeLevel = deptApi.getDeptTreeLevel(productDTO.getDeptId());
+        if (CollectionUtil.isEmpty(deptTreeLevel) || deptTreeLevel.size() > 3) {
+            throw new RuntimeException("品类部门信息转换异常，请联系管理员，检查erp中产品资料库中的部门信息");
+        }
+        deptTreeLevel.pollFirst();
+        int index = 1;
+        for (DeptLevelRespDTO deptLevelRespDTO : deptTreeLevel) {
+            Field categoryNameField = ReflectUtil.getField(EccangProduct.class, "procutCategoryName" + index);
+            ReflectUtil.setFieldValue(eccangProduct, categoryNameField, deptLevelRespDTO.getDeptName());
+            Field categoryNameEnField = ReflectUtil.getField(EccangProduct.class, "procutCategoryNameEn" + index);
+            ReflectUtil.setFieldValue(eccangProduct, categoryNameEnField, deptLevelRespDTO.getDeptName());
+            index += 1;
+        }
+    }
+
+    // 设置产品尺寸和重量
+    private void setProductSizeAndWeight(EccangProduct eccangProduct, ErpProductDTO productDTO, BiConsumer<EccangProduct, ErpProductDTO> consumer) {
+        // 设置产品的材料
+        eccangProduct.setProductMaterial(productDTO.getMaterial());
+
+        // 设置产品的净重（单位：kg），从ERP产品DTO中获取重量，并转换为浮动数值
+        eccangProduct.setPdNetWeight(productDTO.getWeight().floatValue());
+
+        // 设置产品的净尺寸（单位：cm），从ERP产品DTO中获取长度、宽度和高度，并将其从毫米转换为厘米
+        eccangProduct.setPdNetLength(mmToCmAsFloat(productDTO.getLength()));  // 净长
+        eccangProduct.setPdNetWidth(mmToCmAsFloat(productDTO.getWidth()));    // 净宽
+        eccangProduct.setPdNetHeight(mmToCmAsFloat(productDTO.getHeight()));  // 净高
+
+        // 设置产品的包装尺寸（单位：cm），同样从ERP产品DTO中获取包装长度、宽度和高度，并进行单位转换
+        eccangProduct.setProductLength(mmToCmAsFloat(productDTO.getPackageLength()));  // 包装长
+        eccangProduct.setProductWidth(mmToCmAsFloat(productDTO.getPackageWidth()));    // 包装宽
+        eccangProduct.setProductHeight(mmToCmAsFloat(productDTO.getPackageHeight()));  // 包装高
+        eccangProduct.setProductWeight(
+            Optional.ofNullable(productDTO.getPackageWeight())
+                .map(weight -> weight.setScale(3, RoundingMode.HALF_UP).floatValue())//保留三位小数
+                .orElse(null)
+        );
+        consumer.accept(eccangProduct, productDTO);//自定义尺寸和重量
     }
 }

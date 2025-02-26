@@ -1,10 +1,10 @@
 package com.somle.eccang.service;
 
-import com.somle.eccang.model.EccangToken;
-import com.somle.eccang.repository.EccangTokenRepository;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
+import com.somle.eccang.model.EccangToken;
+import com.somle.eccang.repository.EccangTokenRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
