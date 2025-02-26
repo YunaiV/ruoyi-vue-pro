@@ -33,7 +33,7 @@ public class ErpProductSaveReqVO {
 
     @Schema(description = "SKU（编码）", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "SKU（编码）不能为空")
-    @Pattern(regexp = "^[a-zA-Z0-9-]+$", message = "SKU（编码）只能包含字母、数字、中划线")
+    @Pattern(regexp = "^[A-Z0-9-]+$", message = "SKU（编码）只能包含大写字母、数字、中划线")
     private String barCode;
 
     @Schema(description = "单位编号", requiredMode = Schema.RequiredMode.REQUIRED)
