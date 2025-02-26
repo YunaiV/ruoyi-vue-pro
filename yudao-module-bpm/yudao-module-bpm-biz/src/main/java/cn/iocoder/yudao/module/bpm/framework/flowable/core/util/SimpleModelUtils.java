@@ -743,14 +743,15 @@ public class SimpleModelUtils {
             // 异步 HTTP 请求。需要附加一个 ReceiveTask、发起请求后、等待回调执行
             if (HTTP_REQUEST_ASYNC.getType().equals(node.getTriggerSetting().getType())) {
                 Assert.notNull(node.getTriggerSetting().getHttpRequestSetting(), "触发器 HTTP 请求设置不能为空");
-                String attachNodeId = "Activity_" + IdUtil.fastUUID();
                 ReceiveTask receiveTask = new ReceiveTask();
-                receiveTask.setId(attachNodeId);
+                receiveTask.setId("Activity_" + IdUtil.fastUUID());
                 receiveTask.setName("异步 HTTP 请求");
-                node.setAttachNodeId(attachNodeId);
-                node.getTriggerSetting().getHttpRequestSetting().setCallbackTaskDefineKey(attachNodeId); // 设置 callbackTaskDefineKey
+                node.setAttachNodeId(receiveTask.getId());
                 flowElements.add(receiveTask);
+                // 重要：设置 callbackTaskDefineKey，用于 HTTP 回调
+                node.getTriggerSetting().getHttpRequestSetting().setCallbackTaskDefineKey(receiveTask.getId());
             }
+            
             // 触发器使用 ServiceTask 来实现
             ServiceTask serviceTask = new ServiceTask();
             serviceTask.setId(node.getId());

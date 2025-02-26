@@ -10,6 +10,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 
+// TODO @jason：BpmHttpCallbackTrigger
 /**
  * BPM 发送异步 HTTP 请求触发器
  *

@@ -21,4 +21,5 @@ public class BpmProcessTaskApiImpl implements BpmProcessTaskApi {
     public void triggerTask(String processInstanceId, String taskDefineKey) {
         bpmTaskService.triggerTask(processInstanceId, taskDefineKey);
     }
+
 }

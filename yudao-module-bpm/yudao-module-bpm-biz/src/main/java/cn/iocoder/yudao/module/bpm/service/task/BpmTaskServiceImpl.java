@@ -1340,8 +1340,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 .activityId(taskDefineKey)
                 .singleResult();
         if (execution == null) {
-            log.error("[triggerReceiveTask][processInstanceId({}) activityId({}) 没有找到执行活动]",
-                    processInstanceId, taskDefineKey);
+            log.error("[triggerTask][processInstanceId({}) activityId({}) 没有找到执行活动]", processInstanceId, taskDefineKey);
             return;
         }
 

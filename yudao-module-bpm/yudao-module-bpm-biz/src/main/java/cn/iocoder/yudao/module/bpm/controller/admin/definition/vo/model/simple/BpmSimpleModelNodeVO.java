@@ -394,6 +394,7 @@ public class BpmSimpleModelNodeVO {
              */
             @Schema(description = "回调任务 Key", example = "xxx", hidden = true)
             private String callbackTaskDefineKey;
+            
         }
 
         @Schema(description = "流程表单触发器设置", example = "{}")

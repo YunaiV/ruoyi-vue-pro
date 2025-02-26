@@ -9,7 +9,6 @@ import jakarta.validation.constraints.NotEmpty;
  */
 public interface BpmProcessTaskApi {
 
-
     /**
      * 触发流程任务的执行
      *
@@ -18,4 +17,5 @@ public interface BpmProcessTaskApi {
      */
     void triggerTask(@NotEmpty(message = "流程实例的编号不能为空") String processInstanceId,
                      @NotEmpty(message = "任务 Key 不能为空") String taskDefineKey);
+
 }
