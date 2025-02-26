@@ -561,7 +561,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             // 2.1、获取节点中的审批人策略为【发起人自选】且状态为【未执行】的节点
             List<BpmApprovalDetailRespVO.ActivityNode> notStartActivityNodes = activityNodes.stream().filter(node ->
                     BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy().equals(node.getCandidateStrategy())
-                    && BpmTaskStatusEnum.NOT_START.getStatus().equals(node.getStatus())).toList();
+                    && BpmTaskStatusEnum.NOT_START.getStatus().equals(node.getStatus())
+                    && CollUtil.isEmpty(node.getCandidateUsers())).toList();
             // 3、校验传递的参数中是否存在不是下一个节点的信息
             for (Map.Entry<String, List<Long>> nextActivityNode : nextActivityNodes.entrySet()) {
                 if (notStartActivityNodes.stream().noneMatch(taskNode -> taskNode.getId().equals(nextActivityNode.getKey()))) {
