@@ -414,7 +414,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             // 处理每个任务的 tasks 属性
             for (HistoricActivityInstance activity : taskActivities) {
                 HistoricTaskInstance task = taskMap.get(activity.getTaskId());
-                // ChildProcess 子流程节点仅存在于 activity 中，并且没有自身的 task ，需要跳过执行
+                // 特殊情况：子流程节点 ChildProcess 仅存在于 activity 中，并且没有自身的 task，需要跳过执行
+                // TODO @芋艿：后续看看怎么优化！
                 if (task == null) {
                     continue;
                 }

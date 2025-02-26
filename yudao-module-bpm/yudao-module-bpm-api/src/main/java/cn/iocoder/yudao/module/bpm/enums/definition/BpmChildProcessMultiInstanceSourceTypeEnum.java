@@ -33,4 +33,5 @@ public enum BpmChildProcessMultiInstanceSourceTypeEnum implements ArrayValuable<
     public Integer[] array() {
         return ARRAYS;
     }
+
 }

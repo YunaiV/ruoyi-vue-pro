@@ -41,6 +41,7 @@ public class BpmSequentialMultiInstanceBehavior extends SequentialMultiInstanceB
      */
     @Override
     protected int resolveNrOfInstances(DelegateExecution execution) {
+        // 情况一：UserTask 节点
         if (execution.getCurrentFlowElement() instanceof UserTask) {
             // 第一步，设置 collectionVariable 和 CollectionVariable
             // 从  execution.getVariable() 读取所有任务处理人的 key
@@ -66,6 +67,7 @@ public class BpmSequentialMultiInstanceBehavior extends SequentialMultiInstanceB
             return assigneeUserIds.size();
         }
 
+        // 情况二：CallActivity 节点
         if (execution.getCurrentFlowElement() instanceof CallActivity) {
             FlowElement flowElement = execution.getCurrentFlowElement();
             Integer sourceType = BpmnModelUtils.parseMultiInstanceSourceType(flowElement);

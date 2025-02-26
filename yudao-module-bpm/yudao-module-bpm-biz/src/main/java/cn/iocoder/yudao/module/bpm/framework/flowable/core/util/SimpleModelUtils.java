@@ -721,6 +721,8 @@ public class SimpleModelUtils {
                 } else if (node.getDelaySetting().getDelayType().equals(BpmDelayTimerTypeEnum.FIXED_TIME_DURATION.getType())) {
                     boundaryEvent = buildTimeoutBoundaryEvent(receiveTask, BpmBoundaryEventTypeEnum.DELAY_TIMER_TIMEOUT.getType(),
                             null, null, node.getDelaySetting().getDelayTime());
+                } else {
+                    throw new UnsupportedOperationException("不支持的延迟类型：" + node.getDelaySetting());
                 }
                 flowElements.add(boundaryEvent);
             }
@@ -751,7 +753,7 @@ public class SimpleModelUtils {
                 // 重要：设置 callbackTaskDefineKey，用于 HTTP 回调
                 node.getTriggerSetting().getHttpRequestSetting().setCallbackTaskDefineKey(receiveTask.getId());
             }
-            
+
             // 触发器使用 ServiceTask 来实现
             ServiceTask serviceTask = new ServiceTask();
             serviceTask.setId(node.getId());
@@ -877,6 +879,7 @@ public class SimpleModelUtils {
                         childProcessSetting.getMultiInstanceSetting().getSourceType().equals(BpmChildProcessMultiInstanceSourceTypeEnum.MULTI_FORM.getType())) {
                     multiInstanceCharacteristics.setInputDataItem(childProcessSetting.getMultiInstanceSetting().getSource());
                 }
+//              TODO @lesan：String.format(approveMethodEnum.getCompletionCondition(), String.format("%.2f", approveRatio / 100D)));
                 multiInstanceCharacteristics.setCompletionCondition(String.format("${ nrOfCompletedInstances/nrOfInstances >= %s}",
                         String.format("%.2f", childProcessSetting.getMultiInstanceSetting().getCompleteRatio() / 100D)));
                 callActivity.setLoopCharacteristics(multiInstanceCharacteristics);
@@ -901,9 +904,7 @@ public class SimpleModelUtils {
     }
 
     private static BoundaryEvent buildTimeoutBoundaryEvent(Activity attachedToRef, Integer type,
-                                                           String timeDuration,
-                                                           String timeCycle,
-                                                           String timeDate) {
+                                                           String timeDuration, String timeCycle, String timeDate) {
         // 1.1 定时器边界事件
         BoundaryEvent boundaryEvent = new BoundaryEvent();
         boundaryEvent.setId("Event-" + IdUtil.fastUUID());
@@ -922,7 +923,7 @@ public class SimpleModelUtils {
         }
         boundaryEvent.addEventDefinition(eventDefinition);
 
-        // 2.1 添加定时器边界事件类型
+        // 2. 添加定时器边界事件类型
         addExtensionElement(boundaryEvent, BOUNDARY_EVENT_TYPE, type);
         return boundaryEvent;
     }
