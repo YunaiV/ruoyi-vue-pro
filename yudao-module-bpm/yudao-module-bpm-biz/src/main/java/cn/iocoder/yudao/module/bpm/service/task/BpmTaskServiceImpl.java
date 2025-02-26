@@ -525,7 +525,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (CollUtil.isNotEmpty(reqVO.getVariables())) {
             Map<String, Object> variables = FlowableUtils.filterTaskFormVariable(reqVO.getVariables());
             // 校验传递的参数中是否存在不是下一个执行的节点
-             checkNextActivityNodes(userId, reqVO.getVariables(), task.getProcessInstanceId(), reqVO.getNextAssignees());
+            validateNextAssignees(userId, reqVO.getVariables(), task.getProcessInstanceId(), reqVO.getNextAssignees());
             // 下个节点审批人如果不存在，则由前端传递
             if (CollUtil.isNotEmpty(reqVO.getNextAssignees())) {
                 // 获取实例中的全部节点数据，避免后续节点的审批人被覆盖
@@ -550,7 +550,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      * @param processInstanceId 流程实例id
      * @param nextActivityNodes 下一个执行节点信息 {节点id : [审批人id,审批人id]}
      */
-    private void checkNextActivityNodes(Long loginUserId, Map<String, Object> variables,String processInstanceId,
+    private void validateNextAssignees(Long loginUserId, Map<String, Object> variables,String processInstanceId,
                                                 Map<String, List<Long>> nextActivityNodes){
         // 1、查询流程【预测】的全部信息
         BpmApprovalDetailRespVO approvalDetail = processInstanceService.getApprovalDetail(loginUserId,
@@ -562,7 +562,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             List<BpmApprovalDetailRespVO.ActivityNode> notStartActivityNodes = activityNodes.stream().filter(node ->
                     BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy().equals(node.getCandidateStrategy())
                     && BpmTaskStatusEnum.NOT_START.getStatus().equals(node.getStatus())).toList();
-            // 3、校验传递的参数中是否存在不是下一节点的信息
+            // 3、校验传递的参数中是否存在不是下一个节点的信息
             for (Map.Entry<String, List<Long>> nextActivityNode : nextActivityNodes.entrySet()) {
                 if (notStartActivityNodes.stream().noneMatch(taskNode -> taskNode.getId().equals(nextActivityNode.getKey()))) {
                     log.error("[checkNextActivityNodes][ ({}) 不是下一个执行的流程节点！]", nextActivityNode.getKey());
