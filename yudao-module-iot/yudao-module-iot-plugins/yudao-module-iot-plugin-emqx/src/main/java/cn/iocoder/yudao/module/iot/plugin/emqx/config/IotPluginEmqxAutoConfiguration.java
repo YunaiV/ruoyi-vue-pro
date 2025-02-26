@@ -1,9 +1,14 @@
 package cn.iocoder.yudao.module.iot.plugin.emqx.config;
 
+import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.plugin.common.downstream.IotDeviceDownstreamHandler;
 import cn.iocoder.yudao.module.iot.plugin.emqx.downstream.IotDeviceDownstreamHandlerImpl;
 import cn.iocoder.yudao.module.iot.plugin.emqx.upstream.IotDeviceUpstreamServer;
+import io.vertx.core.Vertx;
+import io.vertx.mqtt.MqttClient;
+import io.vertx.mqtt.MqttClientOptions;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,19 +18,37 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author haohao
  */
+@Slf4j
 @Configuration
 @EnableConfigurationProperties(IotPluginEmqxProperties.class)
 public class IotPluginEmqxAutoConfiguration {
 
-    @Bean(initMethod = "start", destroyMethod = "stop")
-    public IotDeviceUpstreamServer deviceUpstreamServer(IotDeviceUpstreamApi deviceUpstreamApi,
-                                                        IotPluginEmqxProperties emqxProperties) {
-        return new IotDeviceUpstreamServer(emqxProperties, deviceUpstreamApi);
+    @Bean
+    public Vertx vertx() {
+        return Vertx.vertx();
     }
 
     @Bean
-    public IotDeviceDownstreamHandler deviceDownstreamHandler() {
-        return new IotDeviceDownstreamHandlerImpl();
+    public MqttClient mqttClient(Vertx vertx, IotPluginEmqxProperties emqxProperties) {
+        MqttClientOptions options = new MqttClientOptions()
+                .setClientId("yudao-iot-downstream-" + IdUtil.fastSimpleUUID())
+                .setUsername(emqxProperties.getMqttUsername())
+                .setPassword(emqxProperties.getMqttPassword())
+                .setSsl(emqxProperties.isMqttSsl());
+        return MqttClient.create(vertx, options);
+    }
+
+    @Bean(initMethod = "start", destroyMethod = "stop")
+    public IotDeviceUpstreamServer deviceUpstreamServer(IotDeviceUpstreamApi deviceUpstreamApi,
+                                                        IotPluginEmqxProperties emqxProperties,
+                                                        Vertx vertx,
+                                                        MqttClient mqttClient) {
+        return new IotDeviceUpstreamServer(emqxProperties, deviceUpstreamApi, vertx, mqttClient);
+    }
+
+    @Bean
+    public IotDeviceDownstreamHandler deviceDownstreamHandler(MqttClient mqttClient) {
+        return new IotDeviceDownstreamHandlerImpl(mqttClient);
     }
 
 }

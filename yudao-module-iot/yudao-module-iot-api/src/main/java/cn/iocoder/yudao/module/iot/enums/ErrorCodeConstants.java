@@ -67,4 +67,7 @@ public interface ErrorCodeConstants {
     ErrorCode OTA_UPGRADE_RECORD_DUPLICATE = new ErrorCode(1_050_008_007, "升级记录重复");
     ErrorCode OTA_UPGRADE_RECORD_CANNOT_RETRY = new ErrorCode(1_050_008_008, "升级记录不能重试");
 
+    // ========== MQTT 通信相关 1-050-009-000 ==========
+    ErrorCode MQTT_TOPIC_ILLEGAL = new ErrorCode(1_050_009_000, "topic illegal");
+
 }
