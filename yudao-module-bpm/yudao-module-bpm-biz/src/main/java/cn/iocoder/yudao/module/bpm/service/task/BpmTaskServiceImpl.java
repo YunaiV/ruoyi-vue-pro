@@ -10,15 +10,19 @@ import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
+import cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskSignTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
@@ -56,6 +60,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -519,6 +524,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 其中，variables 是存储动态表单到 local 任务级别。过滤一下，避免 ProcessInstance 系统级的变量被占用
         if (CollUtil.isNotEmpty(reqVO.getVariables())) {
             Map<String, Object> variables = FlowableUtils.filterTaskFormVariable(reqVO.getVariables());
+            // 校验传递的参数中是否存在不是下一个执行的节点
+             checkNextActivityNodes(userId, reqVO.getVariables(), task.getProcessInstanceId(), reqVO.getNextAssignees());
             // 下个节点审批人如果不存在，则由前端传递
             if (CollUtil.isNotEmpty(reqVO.getNextAssignees())) {
                 // 获取实例中的全部节点数据，避免后续节点的审批人被覆盖
@@ -534,6 +541,35 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 【加签专属】处理加签任务
         handleParentTaskIfSign(task.getParentTaskId());
+    }
+
+    /**
+     * 校验传递的参数中是否存在不是下一个执行的节点
+     *
+     * @param loginUserId 流程发起人
+     * @param processInstanceId 流程实例id
+     * @param nextActivityNodes 下一个执行节点信息 {节点id : [审批人id,审批人id]}
+     */
+    private void checkNextActivityNodes(Long loginUserId, Map<String, Object> variables,String processInstanceId,
+                                                Map<String, List<Long>> nextActivityNodes){
+        // 1、查询流程【预测】的全部信息
+        BpmApprovalDetailRespVO approvalDetail = processInstanceService.getApprovalDetail(loginUserId,
+                new BpmApprovalDetailReqVO().setProcessVariables(variables).setProcessInstanceId(processInstanceId));
+        // 2、获取预测节点的信息
+        List<BpmApprovalDetailRespVO.ActivityNode> activityNodes = approvalDetail.getActivityNodes();
+        if (CollUtil.isNotEmpty(activityNodes)) {
+            // 2.1、获取节点中的审批人策略为【发起人自选】且状态为【未执行】的节点
+            List<BpmApprovalDetailRespVO.ActivityNode> notStartActivityNodes = activityNodes.stream().filter(node ->
+                    BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy().equals(node.getCandidateStrategy())
+                    && BpmTaskStatusEnum.NOT_START.getStatus().equals(node.getStatus())).toList();
+            // 3、校验传递的参数中是否存在不是下一节点的信息
+            for (Map.Entry<String, List<Long>> nextActivityNode : nextActivityNodes.entrySet()) {
+                if (notStartActivityNodes.stream().noneMatch(taskNode -> taskNode.getId().equals(nextActivityNode.getKey()))) {
+                    log.error("[checkNextActivityNodes][ ({}) 不是下一个执行的流程节点！]", nextActivityNode.getKey());
+                    throw exception(TASK_START_USER_SELECT_NODE_NOT_EXISTS, nextActivityNode.getKey());
+                }
+            }
+        }
     }
 
     /**
