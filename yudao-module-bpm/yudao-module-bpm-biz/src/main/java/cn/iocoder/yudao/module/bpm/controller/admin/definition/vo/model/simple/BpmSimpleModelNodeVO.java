@@ -452,6 +452,9 @@ public class BpmSimpleModelNodeVO {
         @Schema(description = "超时设置", requiredMode = Schema.RequiredMode.REQUIRED, example = "{}")
         private TimeoutSetting timeoutSetting;
 
+        @Schema(description = "多实例设置", requiredMode = Schema.RequiredMode.REQUIRED, example = "{}")
+        private MultiInstanceSetting multiInstanceSetting;
+
         @Schema(description = "子流程发起人配置")
         @Data
         @Valid
@@ -487,6 +490,34 @@ public class BpmSimpleModelNodeVO {
 
             @Schema(description = "时间表达式", example = "PT1H,2025-01-01T00:00:00")
             private String timeExpression;
+
+        }
+
+        @Schema(description = "多实例设置")
+        @Data
+        @Valid
+        public static class MultiInstanceSetting {
+
+            @Schema(description = "是否开启多实例", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
+            @NotNull(message = "是否开启多实例不能为空")
+            private Boolean enable;
+
+            @Schema(description = "是否串行", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
+            @NotNull(message = "是否串行不能为空")
+            private Boolean sequential;
+
+            @Schema(description = "完成比例", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
+            @NotNull(message = "完成比例不能为空")
+            private Integer completeRatio;
+
+            @Schema(description = "多实例来源类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+            @NotNull(message = "多实例来源类型不能为空")
+            @InEnum(BpmChildProcessMultiInstanceSourceTypeEnum.class)
+            private Integer sourceType;
+
+            @Schema(description = "多实例来源", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+            @NotNull(message = "多实例来源不能为空")
+            private String source;
 
         }
 

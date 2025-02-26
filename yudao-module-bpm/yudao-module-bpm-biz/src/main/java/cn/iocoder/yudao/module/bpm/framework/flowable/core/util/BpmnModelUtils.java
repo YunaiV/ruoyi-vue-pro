@@ -159,6 +159,17 @@ public class BpmnModelUtils {
     }
 
     /**
+     * 解析子流程多实例来源类型
+     *
+     * @see BpmChildProcessMultiInstanceSourceTypeEnum
+     * @param element 任务节点
+     * @return 多实例来源类型
+     */
+    public static Integer parseMultiInstanceSourceType(FlowElement element) {
+        return NumberUtils.parseInt(parseExtensionElement(element, BpmnModelConstants.CHILD_PROCESS_MULTI_INSTANCE_SOURCE_TYPE));
+    }
+
+    /**
      * 添加任务拒绝处理元素
      *
      * @param rejectHandler 任务拒绝处理
