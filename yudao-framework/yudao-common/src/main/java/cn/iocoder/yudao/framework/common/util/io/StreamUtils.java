@@ -9,7 +9,7 @@ import java.io.*;
  * 
  * @author LeeFangJie
  */
-public class StreamUtil {
+public class StreamUtils {
 
 	/**
 	 * inputStream转outputStream
@@ -18,7 +18,7 @@ public class StreamUtil {
 	 * @return 输出流
 	 * @throws Exception  抛出异常
 	 */
-	public static OutputStream input2output(InputStream in,OutputStream out) throws Exception {
+	public static OutputStream inputToOutput(InputStream in,OutputStream out) throws Exception {
 		if(out==null) out = new ByteArrayOutputStream();
 		IOUtils.copy(in, out);
 		return out;
@@ -30,8 +30,8 @@ public class StreamUtil {
 	 * @return 输出流
 	 * @throws Exception  抛出异常
 	 */
-	public static OutputStream input2output(InputStream in) throws Exception {
-		return input2output(in,null);
+	public static OutputStream inputToOutput(InputStream in) throws Exception {
+		return inputToOutput(in,null);
 	}
  
 	/**
@@ -41,7 +41,7 @@ public class StreamUtil {
 	 * @return 字符串
 	 * @throws Exception  抛出异常
 	 * */
-	public static String input2string(InputStream in, String encoding) throws Exception {
+	public static String inputToString(InputStream in, String encoding) throws Exception {
 		StringWriter writer = new StringWriter();
 		IOUtils.copy(in, writer, encoding);
 		String content=writer.toString();
@@ -55,7 +55,7 @@ public class StreamUtil {
 	 * @return 字符串
 	 * @throws Exception  抛出异常
 	 * */
-	public static String input2string(InputStream in) throws Exception {
+	public static String inputToString(InputStream in) throws Exception {
 		StringWriter writer = new StringWriter();
 		IOUtils.copy(in, writer, "UTF-8");
 		return writer.toString();
@@ -67,7 +67,7 @@ public class StreamUtil {
 	 * @return 输出流
 	 * @throws Exception  抛出异常
 	 */
-	public static ByteArrayInputStream string2input(String in) throws Exception {
+	public static ByteArrayInputStream stringToInput(String in) throws Exception {
 		ByteArrayInputStream input = new ByteArrayInputStream(in.getBytes());
 		return input;
 	}
@@ -78,8 +78,8 @@ public class StreamUtil {
 	 * @return 输出流
 	 * @throws Exception  抛出异常
 	 */
-	public static ByteArrayOutputStream string2output(String in) throws Exception {
-		return (ByteArrayOutputStream)input2output(string2input(in),new ByteArrayOutputStream());
+	public static ByteArrayOutputStream stringToOutput(String in) throws Exception {
+		return (ByteArrayOutputStream)inputToOutput(stringToInput(in),new ByteArrayOutputStream());
 	}
 	
 	/**
@@ -88,10 +88,10 @@ public class StreamUtil {
 	 * @return 输出 byte 数组
 	 * @throws Exception  抛出异常
 	 */
-	public static final byte[] input2bytes(InputStream in) throws Exception {
-		ByteArrayOutputStream swapStream=(ByteArrayOutputStream)input2output(in,new ByteArrayOutputStream());
-		byte[] in2b = swapStream.toByteArray();
-		return in2b;
+	public static final byte[] inputToBytes(InputStream in) throws Exception {
+		ByteArrayOutputStream swapStream=(ByteArrayOutputStream)inputToOutput(in,new ByteArrayOutputStream());
+		byte[] inToByte = swapStream.toByteArray();
+		return inToByte;
 	}
  
 
@@ -102,7 +102,7 @@ public class StreamUtil {
 	 * @return 输出流
 	 * @throws Exception  抛出异常
 	 */
-	public static ByteArrayInputStream bytes2input(byte[] bytes) throws Exception {
+	public static ByteArrayInputStream bytesToInput(byte[] bytes) throws Exception {
 		return new ByteArrayInputStream(bytes);
 	}
 	
