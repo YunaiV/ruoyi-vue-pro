@@ -12,6 +12,7 @@ import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.erp.api.logistic.customrule.ErpCustomRuleApi;
 import cn.iocoder.yudao.module.erp.api.logistic.customrule.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductRespDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductSaveReqVO;
@@ -26,6 +27,7 @@ import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
@@ -39,8 +41,7 @@ import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
 
@@ -286,9 +287,16 @@ public class ErpProductServiceImpl implements ErpProductService {
     }
 
     @Override
+    @Cacheable(cacheNames = "erpProductService_getProductVOListByStatus", key = "#status", unless = "#result == null")
     public List<ErpProductRespVO> getProductVOListByStatus(Boolean status) {
         List<ErpProductDO> list = productMapper.selectListByStatus(status);
         return buildProductVOList(list);
+    }
+    @Override
+    @Cacheable(cacheNames = "erpProductService_getProductDTOListByStatus", key = "#status", unless = "#result == null")
+    public List<ErpProductRespDTO> getProductDTOListByStatus(Boolean status) {
+        List<ErpProductDO> erpProductDOs = productMapper.selectListByStatus(status);
+        return buildProductDTOList(erpProductDOs);
     }
 
     @Override
@@ -363,6 +371,19 @@ public class ErpProductServiceImpl implements ErpProductService {
                 .filter(productDo -> productDo.getId().equals(product.getId()) && StrUtil.isNotBlank(productDo.getSecondaryImageUrls()))
                 .findFirst().ifPresent(productDo ->
                     product.setSecondaryImageUrlList(JSONUtil.toList(productDo.getSecondaryImageUrls(), String.class)));
+        });
+    }
+
+    private List<ErpProductRespDTO> buildProductDTOList(List<ErpProductDO> erpProductDOs) {
+        if (CollUtil.isEmpty(erpProductDOs)) {
+            return Collections.emptyList();
+        }
+        Map<Long, ErpProductUnitDO> unitMap = productUnitService.getProductUnitMap(
+                convertSet(erpProductDOs, ErpProductDO::getUnitId));
+
+        return BeanUtils.toBean(erpProductDOs, ErpProductRespDTO.class, erpProductRespDTO -> {
+            MapUtils.findAndThen(unitMap, erpProductRespDTO.getUnitId(),
+                    unit -> erpProductRespDTO.setUnitName(unit.getName()));
         });
     }
 

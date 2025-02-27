@@ -115,6 +115,14 @@ public interface LogRecordConstants {
     String CRM_CONTRACT_TRANSFER_SUCCESS = "将合同【{{#contract.name}}】的负责人从【{getAdminUserById{#contract.ownerUserId}}】变更为了【{getAdminUserById{#reqVO.newOwnerUserId}}】";
     String CRM_CONTRACT_SUBMIT_SUB_TYPE = "提交合同审批";
     String CRM_CONTRACT_SUBMIT_SUCCESS = "提交合同【{{#contractName}}】审批成功";
+
+    String CRM_CONTRACT_APPROVE_SUB_TYPE = "提交合同审批";
+
+    String CRM_CONTRACT_CANCEL_APPROVE_SUB_TYPE = "取消合同审批";
+
+    String CRM_CONTRACT_CANCEL_SUCCESS = "取消合同【{{#contractName}}】审批成功";
+
+    String CRM_CONTRACT_APPROVE_SUCCESS = "合同【{{#contractName}}】审批成功";
     String CRM_CONTRACT_FOLLOW_UP_SUB_TYPE = "合同跟进";
     String CRM_CONTRACT_FOLLOW_UP_SUCCESS = "合同跟进【{{#contractName}}】";
 
@@ -149,6 +157,14 @@ public interface LogRecordConstants {
     String CRM_RECEIVABLE_DELETE_SUCCESS = "删除了合同【{getContractById{#receivable.contractId}}】的{{#period != null ? '【第'+ #period +'期】' : '编号为【'+ #receivable.no +'】的'}}回款";
     String CRM_RECEIVABLE_SUBMIT_SUB_TYPE = "提交回款审批";
     String CRM_RECEIVABLE_SUBMIT_SUCCESS = "提交编号为【{{#receivableNo}}】的回款审批成功";
+
+    String CRM_RECEIVABLE_APPROVE_SUB_TYPE = "审批回款";
+
+    String CRM_RECEIVABLE_APPROVE_SUCCESS = "审批编号为【{{#receivableNo}}】的回款成功";
+
+    String CRM_RECEIVABLE_CANCEL_APPROVE_SUB_TYPE = "取消回款审批";
+
+    String CRM_RECEIVABLE_CANCEL_APPROVE_SUCCESS = "取消【{{#receivableNo}}】的回款审批成功";
 
     // ======================= CRM_RECEIVABLE_PLAN 回款计划 =======================
 

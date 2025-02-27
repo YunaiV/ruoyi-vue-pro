@@ -72,6 +72,23 @@ public interface CrmContractService {
      */
     void submitContract(Long id, Long userId);
 
+
+    /**
+     * 审批通过合同审批流程
+     *
+     * @param id     合同编号
+     * @param userId 用户编号
+     */
+    void approveContract(Long id, Long userId);
+
+    /**
+     * 退回合同审批
+     *
+     * @param id     合同编号
+     * @param userId 用户编号
+     */
+    void cancelApproveContract(Long id, Long userId);
+
     /**
      * 更新合同流程审批结果
      *

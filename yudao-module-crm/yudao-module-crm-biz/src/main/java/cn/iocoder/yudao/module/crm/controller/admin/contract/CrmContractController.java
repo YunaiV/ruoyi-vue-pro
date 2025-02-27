@@ -19,13 +19,15 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
-import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
 import cn.iocoder.yudao.module.crm.service.receivable.CrmReceivableService;
+import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.erp.api.product.ErpProductUnitApi;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductUnitDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -68,11 +70,15 @@ public class CrmContractController {
     private CrmContactService contactService;
     @Resource
     private CrmBusinessService businessService;
-    @Resource
-    private CrmProductService productService;
+
     @Resource
     private CrmReceivableService receivableService;
 
+    @Resource
+    private ErpProductApi erpProductApi;
+
+    @Resource
+    private ErpProductUnitApi erpProductUnitApi;
     @Resource
     private AdminUserApi adminUserApi;
     @Resource
@@ -118,12 +124,16 @@ public class CrmContractController {
         CrmContractRespVO contractVO = buildContractDetailList(singletonList(contract)).get(0);
         // 拼接产品项
         List<CrmContractProductDO> businessProducts = contractService.getContractProductListByContractId(contractVO.getId());
-        Map<Long, CrmProductDO> productMap = productService.getProductMap(
-                convertSet(businessProducts, CrmContractProductDO::getProductId));
+
+        Map<Long, ErpProductDTO> erpProductMap = erpProductApi.getProductMap(convertSet(businessProducts, CrmContractProductDO::getProductId));
+
+        List<ErpProductDTO> erpProductDOList = erpProductMap.values().stream().toList();
+        Map<Long, ErpProductUnitDTO> unitMap = erpProductUnitApi.getProductUnitMap(
+                convertSet(erpProductDOList, ErpProductDTO::getUnitId));
         contractVO.setProducts(BeanUtils.toBean(businessProducts, CrmContractRespVO.Product.class, businessProductVO ->
-                MapUtils.findAndThen(productMap, businessProductVO.getProductId(),
+                MapUtils.findAndThen(erpProductMap, businessProductVO.getProductId(),
                         product -> businessProductVO.setProductName(product.getName())
-                                .setProductNo(product.getNo()).setProductUnit(product.getUnit()))));
+                                .setBarCode(product.getBarCode()).setProductUnitName(unitMap.get(product.getUnitId()).getName()))));
         return contractVO;
     }
 
@@ -176,6 +186,23 @@ public class CrmContractController {
     @PreAuthorize("@ss.hasPermission('crm:contract:update')")
     public CommonResult<Boolean> submitContract(@RequestParam("id") Long id) {
         contractService.submitContract(id, getLoginUserId());
+        return success(true);
+    }
+
+    @PutMapping("/approve")
+    @Operation(summary = "审批合同")
+    @PreAuthorize("@ss.hasPermission('crm:contract:approve')")
+    public CommonResult<Boolean> approveContract(@RequestParam("id") Long id) {
+        contractService.approveContract(id, getLoginUserId());
+        return success(true);
+    }
+
+
+    @PutMapping("/cancelApprove")
+    @Operation(summary = "退回审批")
+    @PreAuthorize("@ss.hasPermission('crm:contract:approve')")
+    public CommonResult<Boolean> cancelApproveContract(@RequestParam("id") Long id) {
+        contractService.cancelApproveContract(id, getLoginUserId());
         return success(true);
     }
 
