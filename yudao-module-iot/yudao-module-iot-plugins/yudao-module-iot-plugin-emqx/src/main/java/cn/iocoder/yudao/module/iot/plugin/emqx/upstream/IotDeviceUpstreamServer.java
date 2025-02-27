@@ -26,17 +26,33 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class IotDeviceUpstreamServer {
 
-    private static final int RECONNECT_DELAY_MS = 5000; // 重连延迟时间(毫秒)
-    private static final int CONNECTION_TIMEOUT_MS = 10000; // 连接超时时间(毫秒)
-    private static final String TOPIC_SEPARATOR = ","; // 主题分隔符
-    private static final MqttQoS DEFAULT_QOS = MqttQoS.AT_LEAST_ONCE; // 默认QoS级别
+    /**
+     * 重连延迟时间(毫秒)
+     */
+    private static final int RECONNECT_DELAY_MS = 5000;
+    /**
+     * 连接超时时间(毫秒)
+     */
+    private static final int CONNECTION_TIMEOUT_MS = 10000;
+    /**
+     * 主题分隔符
+     */
+    private static final String TOPIC_SEPARATOR = ",";
+    /**
+     * 默认 QoS 级别
+     */
+    private static final MqttQoS DEFAULT_QOS = MqttQoS.AT_LEAST_ONCE;
 
     private final Vertx vertx;
     private final HttpServer server;
     private final MqttClient client;
     private final IotPluginEmqxProperties emqxProperties;
     private final IotDeviceMqttMessageHandler mqttMessageHandler;
-    private volatile boolean isRunning = false; // 服务运行状态标志
+
+    /**
+     * 服务运行状态标志
+     */
+    private volatile boolean isRunning = false;
 
     public IotDeviceUpstreamServer(IotPluginEmqxProperties emqxProperties,
                                    IotDeviceUpstreamApi deviceUpstreamApi,
@@ -50,6 +66,7 @@ public class IotDeviceUpstreamServer {
         Router router = Router.router(vertx);
         router.route().handler(BodyHandler.create()); // 处理 Body
         router.post(IotDeviceAuthVertxHandler.PATH)
+                // TODO @haohao：疑问，mqtt 的认证，需要通过 http 呀？
                 .handler(new IotDeviceAuthVertxHandler(deviceUpstreamApi));
         // 创建 HttpServer 实例
         this.server = vertx.createHttpServer().requestHandler(router);

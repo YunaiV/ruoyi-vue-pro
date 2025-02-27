@@ -59,9 +59,11 @@ public class MqttSignUtils {
     @Getter
     @AllArgsConstructor
     public static class MqttSignResult {
+
         private final String clientId;
         private final String username;
         private final String password;
+
     }
 
 }

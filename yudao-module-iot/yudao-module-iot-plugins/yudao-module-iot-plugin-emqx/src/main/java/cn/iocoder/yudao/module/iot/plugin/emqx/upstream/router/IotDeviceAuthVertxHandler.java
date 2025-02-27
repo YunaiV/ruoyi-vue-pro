@@ -27,7 +27,7 @@ public class IotDeviceAuthVertxHandler implements Handler<RoutingContext> {
     @Override
     @SuppressWarnings("unchecked")
     public void handle(RoutingContext routingContext) {
-
+        // TODO @haohao：try catch 兜底异常
         JsonObject json = routingContext.body().asJsonObject();
         String clientId = json.getString("clientid");
         String username = json.getString("username");
@@ -40,9 +40,11 @@ public class IotDeviceAuthVertxHandler implements Handler<RoutingContext> {
             denyAccess(routingContext);
             return;
         }
+        // TODO @haohao：貌似可以考虑封装一个 writeJson ，里面有个参数是 data，然后里面去 JsonUtils.toJsonString(data)
         IotPluginCommonUtils.writeJson(routingContext, "{\"result\": \"allow\"}");
     }
 
+    // TODO @haohao：下面两个简单方法，貌似可以考虑不抽小方法哈。
     private void denyAccess(RoutingContext routingContext) {
         IotPluginCommonUtils.writeJson(routingContext, "{\"result\": \"deny\"}");
     }

@@ -26,12 +26,14 @@ import java.util.Arrays;
 @Slf4j
 public class IotDeviceMqttMessageHandler {
 
+    // TODO @haohao：讨论，感觉 mqtt 和 http，可以做个相对统一的格式哈。
     // 设备上报属性 标准 JSON
-    // 请求Topic：/sys/${productKey}/${deviceName}/thing/event/property/post
-    // 响应Topic：/sys/${productKey}/${deviceName}/thing/event/property/post_reply
+    // 请求 Topic：/sys/${productKey}/${deviceName}/thing/event/property/post
+    // 响应 Topic：/sys/${productKey}/${deviceName}/thing/event/property/post_reply
+
     // 设备上报事件 标准 JSON
-    // 请求Topic：/sys/${productKey}/${deviceName}/thing/event/${tsl.event.identifier}/post
-    // 响应Topic：/sys/${productKey}/${deviceName}/thing/event/${tsl.event.identifier}/post_reply
+    // 请求 Topic：/sys/${productKey}/${deviceName}/thing/event/${tsl.event.identifier}/post
+    // 响应 Topic：/sys/${productKey}/${deviceName}/thing/event/${tsl.event.identifier}/post_reply
 
     private static final String SYS_TOPIC_PREFIX = "/sys/";
     private static final String PROPERTY_POST_TOPIC = "/thing/event/property/post";
