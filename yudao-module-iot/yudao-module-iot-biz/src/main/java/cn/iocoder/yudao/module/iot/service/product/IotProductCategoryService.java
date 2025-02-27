@@ -3,9 +3,11 @@ package cn.iocoder.yudao.module.iot.service.product;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.category.IotProductCategoryPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.category.IotProductCategorySaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductCategoryDO;
 import jakarta.validation.Valid;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -82,5 +84,20 @@ public interface IotProductCategoryService {
      * @return 产品分类列表
      */
     List<IotProductCategoryDO> getProductCategoryListByStatus(Integer status);
+
+    /**
+     * 获得产品分类数量
+     *
+     * @param createTime 创建时间，如果为空，则统计所有分类数量
+     * @return 产品分类数量
+     */
+    Long getProductCategoryCount(LocalDateTime createTime);
+
+    /**
+     * 获得各个品类下设备数量统计
+     *
+     * @return 品类设备统计列表
+     */
+    List<IotStatisticsRespVO.DataItem> getDeviceCountsOfProductCategory();
 
 }

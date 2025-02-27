@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -184,6 +185,29 @@ public interface IotDeviceService {
      * @return 导入结果
      */
     IotDeviceImportRespVO importDevice(List<IotDeviceImportExcelVO> importDevices, boolean updateSupport);
+
+    /**
+     * 获得设备数量
+     *
+     * @param createTime 创建时间，如果为空，则统计所有设备数量
+     * @return 设备数量
+     */
+    Long getDeviceCount(LocalDateTime createTime);
+
+    /**
+     * 获得设备数量，基于状态
+     *
+     * @param state 状态
+     * @return 设备数量
+     */
+    Long getDeviceCountByState(Integer state);
+
+    /**
+     * 获得所有设备列表
+     *
+     * @return 设备列表
+     */
+    List<IotDeviceDO> getDeviceList();
 
     /**
      * 获取 MQTT 连接参数
