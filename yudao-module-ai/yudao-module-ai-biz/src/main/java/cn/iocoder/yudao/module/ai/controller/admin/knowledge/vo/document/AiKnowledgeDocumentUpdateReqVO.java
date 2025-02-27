@@ -11,16 +11,15 @@ import lombok.Data;
 @Data
 public class AiKnowledgeDocumentUpdateReqVO {
 
-
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "15583")
     @NotNull(message = "编号不能为空")
     private Long id;
 
+    @Schema(description = "名称", example = "Java 开发手册")
+    private String name;
+
     @Schema(description = "是否启用", example = "1")
     @InEnum(CommonStatusEnum.class)
     private Integer status;
-
-    @Schema(description = "名称", example = "Java 开发手册")
-    private String name;
 
 }

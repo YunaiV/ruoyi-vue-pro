@@ -10,12 +10,14 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.apikey.AiApiKeyPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.apikey.AiApiKeySaveReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.model.AiApiKeyMapper;
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -35,6 +37,11 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
 
     @Resource
     private AiApiKeyMapper apiKeyMapper;
+
+    // TODO @芋艿：后续要不要改？
+    @Resource
+    @Lazy // 延迟加载，解决渲染依赖
+    private AiChatModelService chatModelService;
 
     @Resource
     private AiModelFactory modelFactory;
@@ -136,18 +143,18 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
     }
 
     @Override
-    public EmbeddingModel getEmbeddingModel(Long id) {
-        AiApiKeyDO apiKey = validateApiKey(id);
+    public VectorStore getOrCreateVectorStoreByModelId(Long modelId) {
+        // 获取模型 + 密钥
+        AiChatModelDO chatModel = chatModelService.validateChatModel(modelId);
+        AiApiKeyDO apiKey = validateApiKey(chatModel.getKeyId());
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
-        return modelFactory.getOrCreateEmbeddingModel(platform, apiKey.getApiKey(), apiKey.getUrl());
-    }
 
-    @Override
-    public VectorStore getOrCreateVectorStore(Long id) {
-        AiApiKeyDO apiKey = validateApiKey(id);
-        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
+        // 创建或获取 EmbeddingModel 对象
+        EmbeddingModel embeddingModel = modelFactory.getOrCreateEmbeddingModel(platform, apiKey.getApiKey(),
+                apiKey.getUrl(), chatModel.getModel());
+
         // 创建或获取 VectorStore 对象
-        return modelFactory.getOrCreateVectorStore(getEmbeddingModel(id), platform, apiKey.getApiKey(), apiKey.getUrl());
+        return modelFactory.getOrCreateVectorStore(embeddingModel);
     }
 
 }

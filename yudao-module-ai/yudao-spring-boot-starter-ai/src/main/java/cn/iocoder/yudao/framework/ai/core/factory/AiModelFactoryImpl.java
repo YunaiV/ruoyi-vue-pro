@@ -21,6 +21,7 @@ import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeImageApi;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingModel;
+import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingOptions;
 import com.alibaba.cloud.ai.dashscope.image.DashScopeImageModel;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiAutoConfiguration;
@@ -33,10 +34,13 @@ import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiAutoConfiguration;
 import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiConnectionProperties;
 import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.ollama.OllamaChatModel;
+import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.ollama.api.OllamaApi;
+import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.api.OpenAiApi;
@@ -184,13 +188,15 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     @Override
-    public EmbeddingModel getOrCreateEmbeddingModel(AiPlatformEnum platform, String apiKey, String url) {
-        String cacheKey = buildClientCacheKey(EmbeddingModel.class, platform, apiKey, url);
+    public EmbeddingModel getOrCreateEmbeddingModel(AiPlatformEnum platform, String apiKey, String url, String model) {
+        String cacheKey = buildClientCacheKey(EmbeddingModel.class, platform, apiKey, url, model);
         return Singleton.get(cacheKey, (Func0<EmbeddingModel>) () -> {
-            // TODO @xin 先测试一个
             switch (platform) {
                 case TONG_YI:
-                    return buildTongYiEmbeddingModel(apiKey);
+                    return buildTongYiEmbeddingModel(apiKey, model);
+                case OLLAMA:
+                    return buildOllamaEmbeddingModel(url, model);
+                // TODO @芋艿：各个平台的向量化能力；
                 default:
                     throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
             }
@@ -198,13 +204,14 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     @Override
-    public VectorStore getOrCreateVectorStore(EmbeddingModel embeddingModel, AiPlatformEnum platform, String apiKey, String url) {
-        String cacheKey = buildClientCacheKey(VectorStore.class, platform, apiKey, url);
+    public VectorStore getOrCreateVectorStore(EmbeddingModel embeddingModel) {
+//        String cacheKey = buildClientCacheKey(VectorStore.class, platform, apiKey, url);
+        String cacheKey = buildClientCacheKey(VectorStore.class, embeddingModel);
         return Singleton.get(cacheKey, (Func0<VectorStore>) () -> {
-            String prefix = StrUtil.format("{}#{}:", platform.getPlatform(), apiKey);
             // TODO @芋艿：先临时使用 store
             return SimpleVectorStore.builder(embeddingModel).build();
             // TODO @芋艿：@xin：后续看看，是不是切到阿里云之类的
+//            String prefix = StrUtil.format("{}#{}:", platform.getPlatform(), apiKey);
 //            var config = RedisVectorStore.RedisVectorStoreConfig.builder()
 //                    .withIndexName(cacheKey)
 //                    .withPrefix(prefix)
@@ -388,9 +395,16 @@ public class AiModelFactoryImpl implements AiModelFactory {
     /**
      * 可参考 {@link DashScopeAutoConfiguration} 的 dashscopeEmbeddingModel 方法
      */
-    private EmbeddingModel buildTongYiEmbeddingModel(String apiKey) {
+    private DashScopeEmbeddingModel buildTongYiEmbeddingModel(String apiKey, String model) {
         DashScopeApi dashScopeApi = new DashScopeApi(apiKey);
-        return new DashScopeEmbeddingModel(dashScopeApi);
+        DashScopeEmbeddingOptions dashScopeEmbeddingOptions = DashScopeEmbeddingOptions.builder().withModel(model).build();
+        return new DashScopeEmbeddingModel(dashScopeApi, MetadataMode.EMBED, dashScopeEmbeddingOptions);
+    }
+
+    private OllamaEmbeddingModel buildOllamaEmbeddingModel(String url, String model) {
+        OllamaApi ollamaApi = new OllamaApi(url);
+        OllamaOptions ollamaOptions = OllamaOptions.builder().model(model).build();
+        return OllamaEmbeddingModel.builder().ollamaApi(ollamaApi).defaultOptions(ollamaOptions).build();
     }
 
 }

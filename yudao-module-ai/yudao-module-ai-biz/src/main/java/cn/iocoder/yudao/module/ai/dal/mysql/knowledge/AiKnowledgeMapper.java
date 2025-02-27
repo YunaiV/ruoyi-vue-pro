@@ -16,11 +16,9 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface AiKnowledgeMapper extends BaseMapperX<AiKnowledgeDO> {
 
-    default PageResult<AiKnowledgeDO> selectPage(Long userId, AiKnowledgePageReqVO pageReqVO) {
+    default PageResult<AiKnowledgeDO> selectPage(AiKnowledgePageReqVO pageReqVO) {
         return selectPage(pageReqVO, new LambdaQueryWrapperX<AiKnowledgeDO>()
                 .eq(AiKnowledgeDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
-                .likeIfPresent(AiKnowledgeDO::getName, pageReqVO.getName())
-                .and(e -> e.apply("FIND_IN_SET(" + userId + ",visibility_permissions)").or(m -> m.apply("FIND_IN_SET(-1,visibility_permissions)")))
-                .orderByDesc(AiKnowledgeDO::getId));
+                .likeIfPresent(AiKnowledgeDO::getName, pageReqVO.getName()));
     }
 }

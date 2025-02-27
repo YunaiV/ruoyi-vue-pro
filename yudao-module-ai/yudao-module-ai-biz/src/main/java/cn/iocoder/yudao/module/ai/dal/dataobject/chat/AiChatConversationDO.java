@@ -80,6 +80,8 @@ public class AiChatConversationDO extends BaseDO {
     private Long modelId;
     /**
      * 模型标志
+     *
+     * 冗余 {@link AiChatModelDO#getModel()} 字段
      */
     private String model;
 

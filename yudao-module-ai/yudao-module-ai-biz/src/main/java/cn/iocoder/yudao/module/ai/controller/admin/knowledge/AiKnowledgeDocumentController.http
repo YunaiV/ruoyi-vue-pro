@@ -1,0 +1,12 @@
+### 创建知识文档
+POST {{baseUrl}}/ai/knowledge/document/create
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}
+
+{
+  "knowledgeId": 1,
+  "name": "测试文档",
+  "url": "https://static.iocoder.cn/README.md",
+  "segmentMaxTokens": 800
+}

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
+// TODO @芋艿，需要改造，增加 type
 /**
  * AI 聊天模型 DO
  *

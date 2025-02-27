@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.ai.controller.admin.model.vo.apikey.AiApiKeySaveR
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import jakarta.validation.Valid;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.vectorstore.VectorStore;
 
@@ -114,19 +113,11 @@ public interface AiApiKeyService {
     SunoApi getSunoApi();
 
     /**
-     * 获得 EmbeddingModel 对象
-     *
-     * @param id 编号
-     * @return EmbeddingModel 对象
-     */
-    EmbeddingModel getEmbeddingModel(Long id);
-
-    /**
      * 获得 VectorStore 对象
      *
-     * @param id 编号
+     * @param modelId 编号
      * @return VectorStore 对象
      */
-    VectorStore getOrCreateVectorStore(Long id);
+    VectorStore getOrCreateVectorStoreByModelId(Long modelId);
 
 }

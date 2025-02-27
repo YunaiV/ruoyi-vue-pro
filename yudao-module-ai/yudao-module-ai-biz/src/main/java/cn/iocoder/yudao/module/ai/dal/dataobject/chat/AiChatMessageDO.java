@@ -82,6 +82,8 @@ public class AiChatMessageDO extends BaseDO {
 
     /**
      * 模型标志
+     *
+     * 冗余 {@link AiChatModelDO#getModel()}
      */
     private String model;
     /**

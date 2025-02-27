@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.ai.service.knowledge;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -10,23 +11,28 @@ import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowle
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentUpdateStatusReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeSegmentMapper;
 import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
-import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.tokenizer.TokenCountEstimator;
+import org.springframework.ai.transformer.splitter.TextSplitter;
+import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.KNOWLEDGE_SEGMENT_NOT_EXISTS;
 
 /**
@@ -38,15 +44,23 @@ import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.KNOWLEDGE_SEGM
 @Slf4j
 public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService {
 
+    public static final String VECTOR_STORE_METADATA_KNOWLEDGE_ID = "knowledgeId";
+    public static final String VECTOR_STORE_METADATA_DOCUMENT_ID = "documentId";
+    public static final String VECTOR_STORE_METADATA_SEGMENT_ID = "segmentId";
+
     @Resource
     private AiKnowledgeSegmentMapper segmentMapper;
 
     @Resource
     private AiKnowledgeService knowledgeService;
     @Resource
-    private AiChatModelService chatModelService;
+    @Lazy // 延迟加载，避免循环依赖
+    private AiKnowledgeDocumentService knowledgeDocumentService;
     @Resource
     private AiApiKeyService apiKeyService;
+
+    @Resource
+    private TokenCountEstimator tokenCountEstimator;
 
     @Override
     public PageResult<AiKnowledgeSegmentDO> getKnowledgeSegmentPage(AiKnowledgeSegmentPageReqVO pageReqVO) {
@@ -54,69 +68,114 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
     }
 
     @Override
+    public void createKnowledgeSegmentBySplitContent(Long documentId, String content) {
+        // 1. 校验
+        AiKnowledgeDocumentDO documentDO = knowledgeDocumentService.validateKnowledgeDocumentExists(documentId);
+        AiKnowledgeDO knowledgeDO = knowledgeService.validateKnowledgeExists(documentDO.getKnowledgeId());
+        VectorStore vectorStore = getVectorStoreById(knowledgeDO);
+
+        // 2. 文档切片
+        Document document = new Document(content);
+        TextSplitter textSplitter = buildTokenTextSplitter(documentDO.getSegmentMaxTokens());
+        List<Document> documentSegments = textSplitter.apply(Collections.singletonList(document));
+
+        // 3.1 存储切片
+        List<AiKnowledgeSegmentDO> segmentDOs = convertList(documentSegments, segment -> {
+            if (StrUtil.isEmpty(segment.getText())) {
+                return null;
+            }
+            return new AiKnowledgeSegmentDO().setKnowledgeId(documentDO.getKnowledgeId()).setDocumentId(documentId)
+                    .setContent(segment.getText()).setContentLength(segment.getText().length())
+                    .setVectorId(AiKnowledgeSegmentDO.VECTOR_ID_EMPTY).setTokens(tokenCountEstimator.estimate(segment.getText()))
+                    .setStatus(CommonStatusEnum.ENABLE.getStatus());
+        });
+        segmentMapper.insertBatch(segmentDOs);
+        // 3.2 切片向量化
+        for (int i = 0; i < documentSegments.size(); i++) {
+            Document segment = documentSegments.get(i);
+            AiKnowledgeSegmentDO segmentDO = segmentDOs.get(i);
+            writeVectorStore(vectorStore, segmentDO, segment);
+        }
+    }
+
+    @Override
     public void updateKnowledgeSegment(AiKnowledgeSegmentUpdateReqVO reqVO) {
         // 1. 校验
-        AiKnowledgeSegmentDO oldKnowledgeSegment = validateKnowledgeSegmentExists(reqVO.getId());
+        AiKnowledgeSegmentDO segment = validateKnowledgeSegmentExists(reqVO.getId());
 
-        // 2.1 获取知识库向量实例
-        VectorStore vectorStore = knowledgeService.getVectorStoreById(oldKnowledgeSegment.getKnowledgeId());
-        // 2.2 删除原向量
-        vectorStore.delete(List.of(oldKnowledgeSegment.getVectorId()));
-        // 2.3 重新向量化
-        Document document = new Document(reqVO.getContent());
-        document.getMetadata().put(AiKnowledgeSegmentDO.FIELD_KNOWLEDGE_ID, oldKnowledgeSegment.getKnowledgeId());
-        vectorStore.add(List.of(document));
+        // 2. 删除向量
+        VectorStore vectorStore = getVectorStoreById(segment.getKnowledgeId());
+        deleteVectorStore(vectorStore, segment);
 
-        // 3. 更新段落内容
-        AiKnowledgeSegmentDO knowledgeSegment = BeanUtils.toBean(reqVO, AiKnowledgeSegmentDO.class);
-        knowledgeSegment.setVectorId(document.getId());
-        segmentMapper.updateById(knowledgeSegment);
+        // 3.1 更新切片
+        AiKnowledgeSegmentDO segmentDO = BeanUtils.toBean(reqVO, AiKnowledgeSegmentDO.class);
+        segmentMapper.updateById(segmentDO);
+        // 3.2 重新向量化
+        writeVectorStore(vectorStore, segmentDO, new Document(segmentDO.getContent()));
     }
 
     @Override
     public void updateKnowledgeSegmentStatus(AiKnowledgeSegmentUpdateStatusReqVO reqVO) {
-        // 0 校验
-        AiKnowledgeSegmentDO oldKnowledgeSegment = validateKnowledgeSegmentExists(reqVO.getId());
-        // 1 获取知识库向量实例
-        VectorStore vectorStore = knowledgeService.getVectorStoreById(oldKnowledgeSegment.getKnowledgeId());
-        AiKnowledgeSegmentDO knowledgeSegment = BeanUtils.toBean(reqVO, AiKnowledgeSegmentDO.class);
+        // 1. 校验
+        AiKnowledgeSegmentDO segment = validateKnowledgeSegmentExists(reqVO.getId());
 
+        // 2. 获取知识库向量实例
+        VectorStore vectorStore = getVectorStoreById(segment.getKnowledgeId());
+
+        // 3. 更新状态
+        segmentMapper.updateById(new AiKnowledgeSegmentDO().setId(reqVO.getId()).setStatus(reqVO.getStatus()));
+
+        // 4. 更新向量
         if (Objects.equals(reqVO.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
-            // 2.1 启用重新向量化
-            Document document = new Document(oldKnowledgeSegment.getContent());
-            document.getMetadata().put(AiKnowledgeSegmentDO.FIELD_KNOWLEDGE_ID, oldKnowledgeSegment.getKnowledgeId());
-            vectorStore.add(List.of(document));
-            knowledgeSegment.setVectorId(document.getId());
+            writeVectorStore(vectorStore, segment, new Document(segment.getContent()));
         } else {
-            // 2.2 禁用删除向量
-            vectorStore.delete(List.of(oldKnowledgeSegment.getVectorId()));
-            knowledgeSegment.setVectorId("");
+            deleteVectorStore(vectorStore, segment);
         }
-        // 3 更新段落状态
-        segmentMapper.updateById(knowledgeSegment);
+    }
+
+    private void writeVectorStore(VectorStore vectorStore, AiKnowledgeSegmentDO segmentDO, Document segment) {
+        // 1. 向量存储
+        segment.getMetadata().put(VECTOR_STORE_METADATA_KNOWLEDGE_ID, segmentDO.getKnowledgeId());
+        segment.getMetadata().put(VECTOR_STORE_METADATA_DOCUMENT_ID, segmentDO.getDocumentId());
+        segment.getMetadata().put(VECTOR_STORE_METADATA_SEGMENT_ID, segmentDO.getId());
+        vectorStore.add(List.of(segment));
+
+        // 2. 更新向量 ID
+        segmentMapper.updateById(new AiKnowledgeSegmentDO().setId(segmentDO.getId()).setVectorId(segment.getId()));
+    }
+
+    private void deleteVectorStore(VectorStore vectorStore, AiKnowledgeSegmentDO segmentDO) {
+        // 1. 更新向量 ID
+        if (StrUtil.isEmpty(segmentDO.getVectorId())) {
+            return;
+        }
+        segmentMapper.updateById(new AiKnowledgeSegmentDO().setId(segmentDO.getId())
+                .setVectorId(AiKnowledgeSegmentDO.VECTOR_ID_EMPTY));
+
+        // 2. 删除向量
+        vectorStore.delete(List.of(segmentDO.getVectorId()));
     }
 
     @Override
     public List<AiKnowledgeSegmentDO> similaritySearch(AiKnowledgeSegmentSearchReqVO reqVO) {
         // 1. 校验
         AiKnowledgeDO knowledge = knowledgeService.validateKnowledgeExists(reqVO.getKnowledgeId());
-        AiChatModelDO model = chatModelService.validateChatModel(knowledge.getModelId());
 
         // 2. 获取向量存储实例
-        VectorStore vectorStore = apiKeyService.getOrCreateVectorStore(model.getKeyId());
+        VectorStore vectorStore = apiKeyService.getOrCreateVectorStoreByModelId(knowledge.getEmbeddingModelId());
 
         // 3.1 向量检索
-        List<Document> documentList = vectorStore.similaritySearch(SearchRequest.builder()
+        List<Document> documents = vectorStore.similaritySearch(SearchRequest.builder()
                 .query(reqVO.getContent())
-                .topK(knowledge.getTopK())
-                .similarityThreshold(knowledge.getSimilarityThreshold())
-                .filterExpression(new FilterExpressionBuilder().eq(AiKnowledgeSegmentDO.FIELD_KNOWLEDGE_ID, reqVO.getKnowledgeId()).build())
+                .topK(knowledge.getTopK()).similarityThreshold(knowledge.getSimilarityThreshold())
+                .filterExpression(new FilterExpressionBuilder()
+                        .eq(VECTOR_STORE_METADATA_KNOWLEDGE_ID, reqVO.getKnowledgeId()).build())
                 .build());
-        if (CollUtil.isEmpty(documentList)) {
+        if (CollUtil.isEmpty(documents)) {
             return ListUtil.empty();
         }
         // 3.2 段落召回
-        return segmentMapper.selectListByVectorIds(CollUtil.getFieldValues(documentList, "id", String.class));
+        return segmentMapper.selectListByVectorIds(convertList(documents, Document::getId));
     }
 
     /**
@@ -131,6 +190,24 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
             throw exception(KNOWLEDGE_SEGMENT_NOT_EXISTS);
         }
         return knowledgeSegment;
+    }
+
+    private VectorStore getVectorStoreById(AiKnowledgeDO knowledge) {
+        return apiKeyService.getOrCreateVectorStoreByModelId(knowledge.getEmbeddingModelId());
+    }
+
+    private VectorStore getVectorStoreById(Long knowledgeId) {
+        return getVectorStoreById(knowledgeService.validateKnowledgeExists(knowledgeId));
+    }
+
+    private static TextSplitter buildTokenTextSplitter(Integer segmentMaxTokens) {
+        return TokenTextSplitter.builder()
+                .withChunkSize(segmentMaxTokens)
+                .withMinChunkSizeChars(Integer.MAX_VALUE) // 忽略字符的截断
+                .withMinChunkLengthToEmbed(1) // 允许的最小有效分段长度
+                .withMaxNumChunks(Integer.MAX_VALUE)
+                .withKeepSeparator(true) // 保留分隔符
+                .build();
     }
 
 }

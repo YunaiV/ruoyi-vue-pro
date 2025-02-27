@@ -21,7 +21,6 @@ public interface AiKnowledgeDocumentService {
      */
     Long createKnowledgeDocument(AiKnowledgeDocumentCreateReqVO createReqVO);
 
-
     /**
      * 获取文档分页
      *
@@ -36,4 +35,13 @@ public interface AiKnowledgeDocumentService {
      * @param reqVO 更新信息
      */
     void updateKnowledgeDocument(AiKnowledgeDocumentUpdateReqVO reqVO);
+
+    /**
+     * 校验文档是否存在
+     *
+     * @param id 文档编号
+     * @return 文档信息
+     */
+    AiKnowledgeDocumentDO validateKnowledgeDocumentExists(Long id);
+
 }

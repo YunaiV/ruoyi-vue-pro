@@ -27,18 +27,19 @@ public class AiKnowledgeDocumentController {
     @Resource
     private AiKnowledgeDocumentService documentService;
 
-    @PostMapping("/create")
-    @Operation(summary = "新建文档")
-    public CommonResult<Long> createKnowledgeDocument(@Valid AiKnowledgeDocumentCreateReqVO reqVO) {
-        Long knowledgeDocumentId = documentService.createKnowledgeDocument(reqVO);
-        return success(knowledgeDocumentId);
-    }
-
     @GetMapping("/page")
     @Operation(summary = "获取文档分页")
-    public CommonResult<PageResult<AiKnowledgeDocumentRespVO>> getKnowledgeDocumentPage(@Valid AiKnowledgeDocumentPageReqVO pageReqVO) {
+    public CommonResult<PageResult<AiKnowledgeDocumentRespVO>> getKnowledgeDocumentPage(
+            @Valid AiKnowledgeDocumentPageReqVO pageReqVO) {
         PageResult<AiKnowledgeDocumentDO> pageResult = documentService.getKnowledgeDocumentPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, AiKnowledgeDocumentRespVO.class));
+    }
+
+    @PostMapping("/create")
+    @Operation(summary = "新建文档")
+    public CommonResult<Long> createKnowledgeDocument(@RequestBody @Valid AiKnowledgeDocumentCreateReqVO reqVO) {
+        Long knowledgeDocumentId = documentService.createKnowledgeDocument(reqVO);
+        return success(knowledgeDocumentId);
     }
 
     @PutMapping("/update")

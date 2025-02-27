@@ -1,26 +1,22 @@
 package cn.iocoder.yudao.module.ai.service.knowledge;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeDocumentMapper;
-import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeSegmentMapper;
-import cn.iocoder.yudao.module.ai.enums.knowledge.AiKnowledgeDocumentStatusEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.tokenizer.TokenCountEstimator;
-import org.springframework.ai.transformer.splitter.TokenTextSplitter;
-import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.KNOWLEDGE_DOCUMENT_NOT_EXISTS;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
 
 /**
  * AI 知识库文档 Service 实现类
@@ -40,58 +36,46 @@ import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.KNOWLEDGE_DOCU
 public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentService {
 
     @Resource
-    private AiKnowledgeDocumentMapper documentMapper;
-    @Resource
-    private AiKnowledgeSegmentMapper segmentMapper;
+    private AiKnowledgeDocumentMapper knowledgeDocumentMapper;
 
     @Resource
     private TokenCountEstimator tokenCountEstimator;
+
     @Resource
+    private AiKnowledgeSegmentService knowledgeSegmentService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
     private AiKnowledgeService knowledgeService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createKnowledgeDocument(AiKnowledgeDocumentCreateReqVO createReqVO) {
-        // 0. 校验并获取向量存储实例
-        VectorStore vectorStore = knowledgeService.getVectorStoreById(createReqVO.getKnowledgeId());
+        // 1. 校验参数
+        knowledgeService.validateKnowledgeExists(createReqVO.getKnowledgeId());
 
-        // 1.1 下载文档
+        // 2. 下载文档
         TikaDocumentReader loader = new TikaDocumentReader(downloadFile(createReqVO.getUrl()));
         List<Document> documents = loader.get();
         Document document = CollUtil.getFirst(documents);
-        // 1.2 文档记录入库
-        String content = document.getText();
-        AiKnowledgeDocumentDO documentDO = BeanUtils.toBean(createReqVO, AiKnowledgeDocumentDO.class)
-                .setTokens(tokenCountEstimator.estimate(content)).setWordCount(content.length())
-                .setStatus(CommonStatusEnum.ENABLE.getStatus()).setSliceStatus(AiKnowledgeDocumentStatusEnum.SUCCESS.getStatus());
-        documentMapper.insert(documentDO);
-        Long documentId = documentDO.getId();
-        if (CollUtil.isEmpty(documents)) {
-            return documentId;
+        if (document == null || StrUtil.isEmpty(document.getText())) {
+            throw exception(KNOWLEDGE_DOCUMENT_FILE_READ_FAIL);
         }
 
-        // 2 构造文本分段器
-        TokenTextSplitter tokenTextSplitter = new TokenTextSplitter(createReqVO.getDefaultSegmentTokens(), createReqVO.getMinSegmentWordCount(), createReqVO.getMinChunkLengthToEmbed(),
-                createReqVO.getMaxNumSegments(), createReqVO.getKeepSeparator());
-        // 2.1 文档分段
-        List<Document> segments = tokenTextSplitter.apply(documents);
-        // 2.2 分段内容入库
-        List<AiKnowledgeSegmentDO> segmentDOList = CollectionUtils.convertList(segments,
-                segment -> new AiKnowledgeSegmentDO().setContent(segment.getText()).setDocumentId(documentId)
-                        .setKnowledgeId(createReqVO.getKnowledgeId()).setVectorId(segment.getId())
-                        .setTokens(tokenCountEstimator.estimate(segment.getText())).setWordCount(segment.getText().length())
-                        .setStatus(CommonStatusEnum.ENABLE.getStatus()));
-        segmentMapper.insertBatch(segmentDOList);
+        // 3. 文档记录入库
+        String content = document.getText();
+        AiKnowledgeDocumentDO documentDO = BeanUtils.toBean(createReqVO, AiKnowledgeDocumentDO.class)
+                .setContent(content).setContentLength(content.length()).setTokens(tokenCountEstimator.estimate(content))
+                .setStatus(CommonStatusEnum.ENABLE.getStatus());
+        knowledgeDocumentMapper.insert(documentDO);
 
-        // 3. 向量化并存储
-        segments.forEach(segment -> segment.getMetadata().put(AiKnowledgeSegmentDO.FIELD_KNOWLEDGE_ID, createReqVO.getKnowledgeId()));
-        vectorStore.add(segments);
-        return documentId;
+        // 4. 文档切片入库
+        knowledgeSegmentService.createKnowledgeSegmentBySplitContent(documentDO.getId(), document.getText());
+        return documentDO.getId();
     }
 
     @Override
     public PageResult<AiKnowledgeDocumentDO> getKnowledgeDocumentPage(AiKnowledgeDocumentPageReqVO pageReqVO) {
-        return documentMapper.selectPage(pageReqVO);
+        return knowledgeDocumentMapper.selectPage(pageReqVO);
     }
 
     @Override
@@ -100,17 +84,13 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
         validateKnowledgeDocumentExists(reqVO.getId());
         // 2. 更新文档
         AiKnowledgeDocumentDO document = BeanUtils.toBean(reqVO, AiKnowledgeDocumentDO.class);
-        documentMapper.updateById(document);
+        knowledgeDocumentMapper.updateById(document);
+        // TODO @芋艿：这里要处理状态的变更
     }
 
-    /**
-     * 校验文档是否存在
-     *
-     * @param id 文档编号
-     * @return 文档信息
-     */
-    private AiKnowledgeDocumentDO validateKnowledgeDocumentExists(Long id) {
-        AiKnowledgeDocumentDO knowledgeDocument = documentMapper.selectById(id);
+    @Override
+    public AiKnowledgeDocumentDO validateKnowledgeDocumentExists(Long id) {
+        AiKnowledgeDocumentDO knowledgeDocument = knowledgeDocumentMapper.selectById(id);
         if (knowledgeDocument == null) {
             throw exception(KNOWLEDGE_DOCUMENT_NOT_EXISTS);
         }
@@ -120,6 +100,9 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
     private org.springframework.core.io.Resource downloadFile(String url) {
         try {
             byte[] bytes = HttpUtil.downloadBytes(url);
+            if (bytes.length == 0) {
+                throw exception(KNOWLEDGE_DOCUMENT_FILE_EMPTY);
+            }
             return new ByteArrayResource(bytes);
         } catch (Exception e) {
             log.error("[downloadFile][url({}) 下载失败]", url, e);

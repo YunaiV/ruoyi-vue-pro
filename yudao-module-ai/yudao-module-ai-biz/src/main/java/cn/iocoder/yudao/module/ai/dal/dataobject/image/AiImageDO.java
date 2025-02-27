@@ -52,6 +52,7 @@ public class AiImageDO extends BaseDO {
      * 枚举 {@link cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum}
      */
     private String platform;
+    // TODO @芋艿：modelId？
     /**
      * 模型
      *
