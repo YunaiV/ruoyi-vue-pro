@@ -778,6 +778,8 @@ public class BpmnModelUtils {
         if (currentElement instanceof ExclusiveGateway) {
             // 查找满足条件的 SequenceFlow 路径
             Gateway gateway = (Gateway) currentElement;
+            // TODO @小北：当一个网关节点下存在多个满足的并行节点时，只查询一个节点流程流转会存在问题，需要优化，
+            // TODO 具体见issue：https://github.com/YunaiV/ruoyi-vue-pro/issues/761
             SequenceFlow matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
                         flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
                                 && (evalConditionExpress(variables, flow.getConditionExpression())));
