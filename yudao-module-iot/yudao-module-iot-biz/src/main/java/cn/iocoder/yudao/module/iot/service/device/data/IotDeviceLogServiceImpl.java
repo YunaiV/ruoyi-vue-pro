@@ -73,11 +73,13 @@ public class IotDeviceLogServiceImpl implements IotDeviceLogService {
     public Long getDeviceLogCount(LocalDateTime createTime) {
         Long time = null;
         if (createTime != null) {
+            // todo @super：1）LocalDateTimeUtil.toEpochMilli(createTime);2）直接表达式，更简洁 time != null ? createTime.toInstant(ZoneOffset.UTC).toEpochMilli() : null;
             time = createTime.toInstant(ZoneOffset.UTC).toEpochMilli();
         }
         return deviceLogMapper.selectCountByCreateTime(time);
     }
 
+    // TODO @super：加一个参数，Boolean upstream：true 上行，false 下行，null 不过滤
     @Override
     public List<IotStatisticsRespVO.TimeData> getDeviceLogUpCountByHour(String deviceKey, Long startTime, Long endTime) {
         try {

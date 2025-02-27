@@ -192,7 +192,7 @@ public interface IotDeviceService {
      * @param createTime 创建时间，如果为空，则统计所有设备数量
      * @return 设备数量
      */
-    Long getDeviceCount(LocalDateTime createTime);
+    Long getDeviceCount(@Nullable LocalDateTime createTime);
 
     /**
      * 获得设备数量，基于状态

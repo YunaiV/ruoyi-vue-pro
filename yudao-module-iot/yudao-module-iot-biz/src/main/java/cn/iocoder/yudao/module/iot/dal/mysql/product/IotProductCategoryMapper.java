@@ -6,8 +6,8 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.category.IotProductCategoryPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductCategoryDO;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
+import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,13 +30,7 @@ public interface IotProductCategoryMapper extends BaseMapperX<IotProductCategory
         return selectList(IotProductCategoryDO::getStatus, status);
     }
 
-    /**
-     * 统计产品分类数量
-     *
-     * @param createTime 创建时间，如果为空，则统计所有分类数量
-     * @return 产品分类数量
-     */
-    default Long selectCountByCreateTime(LocalDateTime createTime) {
+    default Long selectCountByCreateTime(@Nullable LocalDateTime createTime) {
         return selectCount(new LambdaQueryWrapperX<IotProductCategoryDO>()
                 .geIfPresent(IotProductCategoryDO::getCreateTime, createTime));
     }

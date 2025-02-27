@@ -9,7 +9,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -58,6 +57,8 @@ public interface IotDeviceLogMapper {
      */
     Long selectCountByCreateTime(@Param("createTime") Long createTime);
 
+    // TODO @super：1）上行、下行，不写在 mapper 里，而是通过参数传递，这样，selectDeviceLogUpCountByHour、selectDeviceLogDownCountByHour 可以合并；
+    //  TODO @super：2）不能只基于 identifier 来计算，而是要 type + identifier 成对
     /**
      * 获得每个小时设备上行消息数量统计
      *

@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsR
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductCategoryDO;
 import jakarta.validation.Valid;
 
+import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -91,8 +92,9 @@ public interface IotProductCategoryService {
      * @param createTime 创建时间，如果为空，则统计所有分类数量
      * @return 产品分类数量
      */
-    Long getProductCategoryCount(LocalDateTime createTime);
+    Long getProductCategoryCount(@Nullable LocalDateTime createTime);
 
+    // TODO @super：1）Map<ProductCategory, Count> 虽然有点怪哈，然后 Controller 按需转换成 Map<String, Integer> ；2）名字 getProductCategoryDeviceCountMap 方法
     /**
      * 获得各个品类下设备数量统计
      *

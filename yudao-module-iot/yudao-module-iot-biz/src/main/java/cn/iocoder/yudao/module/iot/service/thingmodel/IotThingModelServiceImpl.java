@@ -364,6 +364,7 @@ public class IotThingModelServiceImpl implements IotThingModelService {
         return SpringUtil.getBean(getClass());
     }
 
+    // TODO @super：用不到，删除下；
     @Override
     public Long getThingModelCount(LocalDateTime createTime) {
         return thingModelMapper.selectCountByCreateTime(createTime);

@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 
-
 @Tag(name = "管理后台 - IoT 数据统计")
 @RestController
 @RequestMapping("/iot/statistics")
@@ -27,48 +26,47 @@ import java.time.LocalDateTime;
 public class IotStatisticsController {
 
     @Resource
-    private IotDeviceService iotDeviceService;
-
+    private IotDeviceService deviceService;
     @Resource
-    private IotProductCategoryService iotProductCategoryService;
-
+    private IotProductCategoryService productCategoryService;
     @Resource
-    private IotProductService iotProductService;
-
+    private IotProductService productService;
     @Resource
-    private IotDeviceLogService iotDeviceLogService;
+    private IotDeviceLogService deviceLogService;
 
-
+    // TODO @super：description 非必要，可以不写哈
     @GetMapping("/main")
-    @Operation(summary = "获取IOT首页的数据统计", description = "用于IOT首页的数据统计")
+    @Operation(summary = "获取首页的数据统计", description = "用于IOT首页的数据统计")
     public CommonResult<IotStatisticsRespVO> getIotMainStats(@Valid IotStatisticsReqVO reqVO){
+        // TODO @super：新增 get-summary 接口，返回：总数、今日新增、数量、状态
         IotStatisticsRespVO iotStatisticsRespVO = new IotStatisticsRespVO();
         // 获取总数
-        iotStatisticsRespVO.setCategoryTotal(iotProductCategoryService.getProductCategoryCount(null));
-        iotStatisticsRespVO.setProductTotal(iotProductService.getProductCount(null));
-        iotStatisticsRespVO.setDeviceTotal(iotDeviceService.getDeviceCount(null));
-        iotStatisticsRespVO.setReportTotal(iotDeviceLogService.getDeviceLogCount(null));
+        iotStatisticsRespVO.setCategoryTotal(productCategoryService.getProductCategoryCount(null));
+        iotStatisticsRespVO.setProductTotal(productService.getProductCount(null));
+        iotStatisticsRespVO.setDeviceTotal(deviceService.getDeviceCount(null));
+        iotStatisticsRespVO.setReportTotal(deviceLogService.getDeviceLogCount(null));
 
         // 获取今日新增数量
         LocalDateTime todayStart = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
-        iotStatisticsRespVO.setCategoryTodayTotal(iotProductCategoryService.getProductCategoryCount(todayStart));
-        iotStatisticsRespVO.setProductTodayTotal(iotProductService.getProductCount(todayStart));
-        iotStatisticsRespVO.setDeviceTodayTotal(iotDeviceService.getDeviceCount(todayStart));
-        iotStatisticsRespVO.setReportTodayTotal(iotDeviceLogService.getDeviceLogCount(todayStart));
+        iotStatisticsRespVO.setCategoryTodayTotal(productCategoryService.getProductCategoryCount(todayStart));
+        iotStatisticsRespVO.setProductTodayTotal(productService.getProductCount(todayStart));
+        iotStatisticsRespVO.setDeviceTodayTotal(deviceService.getDeviceCount(todayStart));
+        iotStatisticsRespVO.setReportTodayTotal(deviceLogService.getDeviceLogCount(todayStart));
 
         // 获取各个品类下设备数量统计
         iotStatisticsRespVO.setDeviceStatsOfCategory(
-            iotProductCategoryService.getDeviceCountsOfProductCategory()
+            productCategoryService.getDeviceCountsOfProductCategory()
         );
 
         // 获取设备状态数量统计
-        iotStatisticsRespVO.setOnlineTotal(iotDeviceService.getDeviceCountByState(IotDeviceStateEnum.ONLINE.getState()));
-        iotStatisticsRespVO.setOfflineTotal(iotDeviceService.getDeviceCountByState(IotDeviceStateEnum.OFFLINE.getState()));
-        iotStatisticsRespVO.setNeverOnlineTotal(iotDeviceService.getDeviceCountByState(IotDeviceStateEnum.INACTIVE.getState()));
+        iotStatisticsRespVO.setOnlineTotal(deviceService.getDeviceCountByState(IotDeviceStateEnum.ONLINE.getState()));
+        iotStatisticsRespVO.setOfflineTotal(deviceService.getDeviceCountByState(IotDeviceStateEnum.OFFLINE.getState()));
+        iotStatisticsRespVO.setNeverOnlineTotal(deviceService.getDeviceCountByState(IotDeviceStateEnum.INACTIVE.getState()));
 
+        // TODO @super：新增 get-log-summary 接口，返回
         // 根据传入时间范围获取设备上下行消息数量统计
-        iotStatisticsRespVO.setDeviceUpMessageStats(iotDeviceLogService.getDeviceLogUpCountByHour(null, reqVO.getStartTime(), reqVO.getEndTime()));
-        iotStatisticsRespVO.setDeviceDownMessageStats(iotDeviceLogService.getDeviceLogDownCountByHour(null, reqVO.getStartTime(), reqVO.getEndTime()));
+        iotStatisticsRespVO.setDeviceUpMessageStats(deviceLogService.getDeviceLogUpCountByHour(null, reqVO.getStartTime(), reqVO.getEndTime()));
+        iotStatisticsRespVO.setDeviceDownMessageStats(deviceLogService.getDeviceLogDownCountByHour(null, reqVO.getStartTime(), reqVO.getEndTime()));
 
         return CommonResult.success(iotStatisticsRespVO);
     }

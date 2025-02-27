@@ -11,7 +11,6 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductCategoryDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.product.IotProductCategoryMapper;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
-import cn.iocoder.yudao.module.iot.service.product.IotProductCategoryService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -108,16 +107,18 @@ public class IotProductCategoryServiceImpl implements IotProductCategoryService 
         // 1. 获取所有数据
         List<IotProductCategoryDO> categoryList = productCategoryMapper.selectList();
         List<IotProductDO> productList = productService.getProductList();
+        // TODO @super：不要 list 查询，返回内存，而是查询一个 Map<productId, count>
         List<IotDeviceDO> deviceList = deviceService.getDeviceList();
 
         // 2. 统计每个分类下的设备数量
         Map<String, Integer> categoryDeviceCountMap = new HashMap<>();
-        
+
         // 2.1 初始化所有分类的计数为0
         for (IotProductCategoryDO category : categoryList) {
             categoryDeviceCountMap.put(category.getName(), 0);
+            // TODO @super：直接这里面计算，不用多个循环。产品本身也不多，不用构建 Map，直接 filter 就好了
         }
-        
+
         // 2.2 构建产品ID到分类的映射
         Map<Long, IotProductCategoryDO> productCategoryMap = new HashMap<>();
         for (IotProductDO product : productList) {
@@ -130,7 +131,7 @@ public class IotProductCategoryServiceImpl implements IotProductCategoryService 
                 productCategoryMap.put(product.getId(), category);
             }
         }
-        
+
         // 2.3 统计每个分类下的设备数量
         for (IotDeviceDO device : deviceList) {
             Long productId = device.getProductId();

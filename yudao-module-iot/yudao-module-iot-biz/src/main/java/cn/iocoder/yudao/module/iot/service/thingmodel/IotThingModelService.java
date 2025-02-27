@@ -81,6 +81,7 @@ public interface IotThingModelService {
      */
     List<IotThingModelDO> getThingModelList(IotThingModelListReqVO reqVO);
 
+    // TODO @super：用不到，删除下哈。
     /**
      * 获得物模型数量
      *

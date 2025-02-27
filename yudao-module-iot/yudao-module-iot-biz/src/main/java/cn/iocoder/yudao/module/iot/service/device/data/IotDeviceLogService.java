@@ -5,8 +5,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceLogP
 import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
-import org.apache.ibatis.annotations.Param;
 
+import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -45,7 +45,7 @@ public interface IotDeviceLogService {
      * @param createTime 创建时间，如果为空，则统计所有日志数量
      * @return 日志数量
      */
-    Long getDeviceLogCount(LocalDateTime createTime);
+    Long getDeviceLogCount(@Nullable LocalDateTime createTime);
 
     /**
      * 获得每个小时设备上行消息数量统计
@@ -55,7 +55,9 @@ public interface IotDeviceLogService {
      * @param endTime 结束时间，如果为空，则不限制结束时间
      * @return 每小时消息数量统计列表
      */
-    List<IotStatisticsRespVO.TimeData> getDeviceLogUpCountByHour(String deviceKey, Long startTime, Long endTime);
+    List<IotStatisticsRespVO.TimeData> getDeviceLogUpCountByHour(@Nullable String deviceKey,
+                                                                 @Nullable Long startTime,
+                                                                 @Nullable Long endTime);
 
     /**
      * 获得每个小时设备下行消息数量统计
@@ -65,6 +67,8 @@ public interface IotDeviceLogService {
      * @param endTime 结束时间，如果为空，则不限制结束时间
      * @return 每小时消息数量统计列表
      */
-    List<IotStatisticsRespVO.TimeData> getDeviceLogDownCountByHour( String deviceKey, Long startTime, Long endTime);
+    List<IotStatisticsRespVO.TimeData> getDeviceLogDownCountByHour(@Nullable String deviceKey,
+                                                                   @Nullable Long startTime,
+                                                                   @Nullable Long endTime);
 
 }
