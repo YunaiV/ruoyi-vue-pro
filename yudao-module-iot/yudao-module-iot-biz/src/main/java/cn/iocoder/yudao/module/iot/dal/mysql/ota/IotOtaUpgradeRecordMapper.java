@@ -11,10 +11,10 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-// TODO @li：这里的注释，可以去掉哈，多了点点
-
 /**
- * OTA 升级记录 Mapper 接口
+ * OTA 升级记录 Mapper
+ *
+ * @author Shelly
  */
 @Mapper
 public interface IotOtaUpgradeRecordMapper extends BaseMapperX<IotOtaUpgradeRecordDO> {

@@ -9,10 +9,10 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
-// TODO @li：这里的注释，可以去掉哈，多了点点
 /**
- * IotOtaFirmwareMapper 接口用于操作 IotOtaFirmwareDO 实体类对应的数据库表。
- * 该接口继承自 BaseMapperX，提供了基本的 CRUD 操作，并扩展了特定查询方法。
+ * OTA固件 Mapper
+ *
+ * @author Shelly
  */
 @Mapper
 public interface IotOtaFirmwareMapper extends BaseMapperX<IotOtaFirmwareDO> {
