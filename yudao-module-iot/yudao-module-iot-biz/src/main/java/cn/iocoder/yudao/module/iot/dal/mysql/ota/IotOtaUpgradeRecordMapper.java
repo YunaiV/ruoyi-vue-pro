@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.record.IotOtaUpgradeRecordPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaUpgradeRecordDO;
-import cn.iocoder.yudao.module.iot.enums.ota.IotOtaUpgradeRecordStatusEnum;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -82,18 +81,20 @@ public interface IotOtaUpgradeRecordMapper extends BaseMapperX<IotOtaUpgradeReco
     }
 
     /**
-     * 根据任务ID取消升级记录。
-     * 该方法通过任务ID查找状态为“待处理”的升级记录，并将其状态更新为“已取消”。
+     * 根据任务ID和状态更新升级记录的状态
+     * <p>
+     * 该函数用于将符合指定任务ID和状态的升级记录的状态更新为新的状态。
      *
-     * @param taskId 任务ID，用于查找对应的升级记录。
+     * @param setStatus   要设置的新状态值，类型为Integer
+     * @param taskId      要更新的升级记录对应的任务ID，类型为Long
+     * @param whereStatus 用于筛选升级记录的当前状态值，类型为Integer
      */
-    default void cancelUpgradeRecordByTaskId(Long taskId) {
-        // 使用LambdaUpdateWrapper构建更新条件，将状态为“待处理”的记录更新为“已取消”
-        // TODO @li：哪些可以更新，通过 service 传递。mapper 尽量不要有逻辑
+    default void updateUpgradeRecordStatusByTaskIdAndStatus(Integer setStatus, Long taskId, Integer whereStatus) {
+        // 使用LambdaUpdateWrapper构建更新条件，将指定状态的记录更新为指定状态
         update(new LambdaUpdateWrapper<IotOtaUpgradeRecordDO>()
-                .set(IotOtaUpgradeRecordDO::getStatus, IotOtaUpgradeRecordStatusEnum.CANCELED.getStatus())
+                .set(IotOtaUpgradeRecordDO::getStatus, setStatus)
                 .eq(IotOtaUpgradeRecordDO::getTaskId, taskId)
-                .eq(IotOtaUpgradeRecordDO::getStatus, IotOtaUpgradeRecordStatusEnum.PENDING.getStatus())
+                .eq(IotOtaUpgradeRecordDO::getStatus, whereStatus)
         );
     }
 

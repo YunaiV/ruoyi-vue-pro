@@ -134,7 +134,9 @@ public class IotOtaUpgradeRecordServiceImpl implements IotOtaUpgradeRecordServic
     @Override
     public void cancelUpgradeRecordByTaskId(Long taskId) {
         // 暂定只有待推送的升级记录可以取消
-        upgradeRecordMapper.cancelUpgradeRecordByTaskId(taskId);
+        upgradeRecordMapper.updateUpgradeRecordStatusByTaskIdAndStatus(
+                IotOtaUpgradeRecordStatusEnum.CANCELED.getStatus(), taskId,
+                IotOtaUpgradeRecordStatusEnum.PENDING.getStatus());
     }
 
     @Override
