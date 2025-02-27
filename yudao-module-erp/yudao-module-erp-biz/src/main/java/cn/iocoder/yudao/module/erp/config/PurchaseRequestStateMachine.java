@@ -51,7 +51,11 @@ public class PurchaseRequestStateMachine {
     public static boolean canTransitionOrder(ErpOrderStatus currentState, ErpOrderStatus nextState) {
         return ORDER_STATUS_TRANSITIONS.getOrDefault(currentState, Collections.emptySet()).contains(nextState);
     }
+    //付款状态
 
+    //入库状态
+
+    //执行状态
 
     // 根据 Integer 值获取对应的枚举
     public static ErpAuditStatus fromValue(int value) {
