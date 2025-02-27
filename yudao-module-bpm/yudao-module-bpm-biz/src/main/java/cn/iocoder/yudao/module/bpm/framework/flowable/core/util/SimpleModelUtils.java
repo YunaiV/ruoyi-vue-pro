@@ -25,7 +25,6 @@ import org.springframework.util.MultiValueMap;
 
 import java.util.*;
 
-import static cn.iocoder.yudao.module.bpm.enums.definition.BpmTriggerTypeEnum.HTTP_CALLBACK;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.*;
 import static java.util.Arrays.asList;
@@ -737,13 +736,12 @@ public class SimpleModelUtils {
 
     public static class TriggerNodeConvert implements NodeConvert {
 
-        // TODO @芋艿：【回调】在看看
         @Override
         public List<? extends FlowElement> convertList(BpmSimpleModelNodeVO node) {
             Assert.notNull(node.getTriggerSetting(), "触发器节点设置不能为空");
             List<FlowElement> flowElements = new ArrayList<>(2);
             // HTTP 回调请求。需要附加一个 ReceiveTask、发起请求后、等待回调执行
-            if (HTTP_CALLBACK.getType().equals(node.getTriggerSetting().getType())) {
+            if (BpmTriggerTypeEnum.HTTP_CALLBACK.getType().equals(node.getTriggerSetting().getType())) {
                 Assert.notNull(node.getTriggerSetting().getHttpRequestSetting(), "触发器 HTTP 回调请求设置不能为空");
                 ReceiveTask receiveTask = new ReceiveTask();
                 receiveTask.setId("Activity_" + IdUtil.fastUUID());
