@@ -48,7 +48,11 @@ public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
             .likeIfExists(ErpCustomCategoryDO::getDeclaredType, reqVO.getDeclaredType())  // 申报品名
             .likeIfExists(ErpCustomCategoryDO::getDeclaredTypeEn, reqVO.getDeclaredTypeEn())  // 申报品名en
             .selectAsClass(ErpCustomCategoryDO.class, ErpCustomRuleBO.class)
-            .leftJoin(ErpCustomCategoryItemDO.class, ErpCustomCategoryItemDO::getCustomCategoryId, ErpCustomCategoryDO::getId)
+//            .leftJoin(ErpCustomCategoryItemDO.class, ErpCustomCategoryItemDO::getCustomCategoryId, ErpCustomCategoryDO::getId )
+            .leftJoin(ErpCustomCategoryItemDO.class, on->
+                on.eq(ErpCustomCategoryItemDO::getCustomCategoryId, ErpCustomCategoryDO::getId)
+                    .eq(ErpCustomCategoryItemDO::getCountryCode, ErpCustomRuleDO::getCountryCode)
+            )
 //            .eq(ErpCustomRuleDO::getCountryCode,ErpCustomCategoryItemDO::getCountryCode)
             .selectAsClass(ErpCustomCategoryItemDO.class, ErpCustomRuleBO.class)
             .eqIfExists(ErpCustomCategoryItemDO::getCountryCode, reqVO.getCountryCode())  // countryCode
