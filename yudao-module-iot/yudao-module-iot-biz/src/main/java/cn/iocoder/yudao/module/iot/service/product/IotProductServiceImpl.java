@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -135,6 +136,16 @@ public class IotProductServiceImpl implements IotProductService {
     @Override
     public List<IotProductDO> getProductList() {
         return productMapper.selectList();
+    }
+
+    @Override
+    public Long getProductCount(LocalDateTime createTime) {
+        return productMapper.selectCountByCreateTime(createTime);
+    }
+
+    @Override
+    public List<IotProductDO> getProductListByCategoryId(Long categoryId) {
+        return productMapper.selectListByCategoryId(categoryId);
     }
 
 }

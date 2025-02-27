@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -67,6 +68,28 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
     default Long selectCountByGroupId(Long groupId) {
         return selectCount(new LambdaQueryWrapperX<IotDeviceDO>()
                 .apply("FIND_IN_SET(" + groupId + ",group_ids) > 0"));
+    }
+
+    /**
+     * 统计设备数量
+     *
+     * @param createTime 创建时间，如果为空，则统计所有设备数量
+     * @return 设备数量
+     */
+    default Long selectCountByCreateTime(LocalDateTime createTime) {
+        return selectCount(new LambdaQueryWrapperX<IotDeviceDO>()
+                .geIfPresent(IotDeviceDO::getCreateTime, createTime));
+    }
+
+    /**
+     * 统计指定状态的设备数量
+     *
+     * @param state 状态
+     * @return 设备数量
+     */
+    default Long selectCountByState(Integer state) {
+        return selectCount(new LambdaQueryWrapperX<IotDeviceDO>()
+                .eqIfPresent(IotDeviceDO::getState, state));
     }
 
 }

@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceLogPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.IotDeviceLogMapper;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
@@ -15,6 +16,11 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * IoT 设备日志数据 Service 实现类
@@ -58,6 +64,39 @@ public class IotDeviceLogServiceImpl implements IotDeviceLogService {
         } catch (Exception exception) {
             if (exception.getMessage().contains("Table does not exist")) {
                 return PageResult.empty();
+            }
+            throw exception;
+        }
+    }
+
+    @Override
+    public Long getDeviceLogCount(LocalDateTime createTime) {
+        Long time = null;
+        if (createTime != null) {
+            time = createTime.toInstant(ZoneOffset.UTC).toEpochMilli();
+        }
+        return deviceLogMapper.selectCountByCreateTime(time);
+    }
+
+    @Override
+    public List<IotStatisticsRespVO.TimeData> getDeviceLogUpCountByHour(String deviceKey, Long startTime, Long endTime) {
+        try {
+            return deviceLogMapper.selectDeviceLogUpCountByHour(deviceKey, startTime, endTime);
+        } catch (Exception exception) {
+            if (exception.getMessage().contains("Table does not exist")) {
+                return new ArrayList<>();
+            }
+            throw exception;
+        }
+    }
+
+    @Override
+    public List<IotStatisticsRespVO.TimeData> getDeviceLogDownCountByHour(String deviceKey, Long startTime, Long endTime) {
+        try {
+            return deviceLogMapper.selectDeviceLogDownCountByHour(deviceKey, startTime, endTime);
+        } catch (Exception exception) {
+            if (exception.getMessage().contains("Table does not exist")) {
+                return new ArrayList<>();
             }
             throw exception;
         }
