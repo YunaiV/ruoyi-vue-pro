@@ -13,6 +13,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 // TODO @li：这里的注释，可以去掉哈，多了点点
+
 /**
  * OTA 升级记录 Mapper 接口
  */
@@ -43,9 +44,14 @@ public interface IotOtaUpgradeRecordMapper extends BaseMapperX<IotOtaUpgradeReco
      * @param status     状态，用于筛选特定状态的升级记录
      * @return 返回符合条件的OTA升级记录的数量
      */
-    Long getOtaUpgradeRecordCount(@Param("taskId") Long taskId,
-                                  @Param("deviceName") String deviceName,
-                                  @Param("status") Integer status);
+    default Long getOtaUpgradeRecordCount(@Param("taskId") Long taskId,
+                                          @Param("deviceName") String deviceName,
+                                          @Param("status") Integer status) {
+        return selectCount(new LambdaQueryWrapperX<IotOtaUpgradeRecordDO>()
+                .eqIfPresent(IotOtaUpgradeRecordDO::getTaskId, taskId)
+                .likeIfPresent(IotOtaUpgradeRecordDO::getDeviceId, deviceName)
+                .eqIfPresent(IotOtaUpgradeRecordDO::getStatus, status));
+    }
 
     /**
      * 获取OTA升级记录的统计信息
@@ -54,8 +60,12 @@ public interface IotOtaUpgradeRecordMapper extends BaseMapperX<IotOtaUpgradeReco
      * @param status     状态，用于筛选特定状态的升级记录
      * @return 返回符合条件的OTA升级记录的统计信息
      */
-    Long getOtaUpgradeRecordStatistics(@Param("firmwareId") Long firmwareId,
-                                       @Param("status") Integer status);
+    default Long getOtaUpgradeRecordStatistics(@Param("firmwareId") Long firmwareId,
+                                               @Param("status") Integer status) {
+        return selectCount(new LambdaQueryWrapperX<IotOtaUpgradeRecordDO>()
+                .eqIfPresent(IotOtaUpgradeRecordDO::getFirmwareId, firmwareId)
+                .eqIfPresent(IotOtaUpgradeRecordDO::getStatus, status));
+    }
 
 
     /**
