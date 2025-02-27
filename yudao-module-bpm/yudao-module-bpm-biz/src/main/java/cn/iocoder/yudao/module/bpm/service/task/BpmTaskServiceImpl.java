@@ -525,6 +525,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (CollUtil.isNotEmpty(reqVO.getVariables())) {
             Map<String, Object> variables = FlowableUtils.filterTaskFormVariable(reqVO.getVariables());
             // 校验传递的参数中是否存在不是下一个执行的节点
+            // 当前执行的流程节点，需根据该节点寻找下一个节点
+            String taskDefinitionKey = task.getTaskDefinitionKey();
+            List<FlowNode> nextFlowNodes = getNextFlowNodes(taskDefinitionKey, bpmnModel, variables);
+            System.out.println(nextFlowNodes);
             validateNextAssignees(userId, reqVO.getVariables(), task.getProcessInstanceId(), reqVO.getNextAssignees());
             // 下个节点审批人如果不存在，则由前端传递
             if (CollUtil.isNotEmpty(reqVO.getNextAssignees())) {
@@ -544,6 +548,41 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     /**
+     *
+     * @param taskDefinitionKey 当前节点id
+     * @param bpmnModel bpmnModel
+     */
+    private List<FlowNode> getNextFlowNodes(String taskDefinitionKey, BpmnModel bpmnModel,  Map<String, Object> variables){
+        FlowNode flowElement = (FlowNode) bpmnModel.getFlowElement(taskDefinitionKey);
+        // 存储下一个执行的节点
+        List<FlowNode> nextFlowNodes = new ArrayList<>();
+        resolveNextNodes(flowElement, bpmnModel, variables, nextFlowNodes);
+        return nextFlowNodes;
+    }
+
+    private void resolveNextNodes(FlowNode currentNode, BpmnModel bpmnModel, Map<String, Object> variables, List<FlowNode> nextFlowNodes) {
+        List<SequenceFlow> outgoingFlows = currentNode.getOutgoingFlows();
+        for (SequenceFlow sequenceFlow : outgoingFlows) {
+            // 如果是排他网关，需要根据条件表达式判断
+            if (currentNode instanceof ExclusiveGateway) {
+                String conditionExpression = sequenceFlow.getConditionExpression();
+                if (conditionExpression != null && !BpmnModelUtils.evalConditionExpress(variables,conditionExpression)) {
+                    continue;
+                }
+            }
+            FlowElement targetElement = bpmnModel.getFlowElement(sequenceFlow.getTargetRef());
+            if (targetElement instanceof FlowNode targetNode) {
+                if (targetNode instanceof Gateway) {
+                    // 如果目标节点还是网关，递归处理
+                    resolveNextNodes(targetNode, bpmnModel, variables, nextFlowNodes);
+                } else {
+                    nextFlowNodes.add(targetNode);
+                }
+            }
+        }
+    }
+
+    /**
      * 校验传递的参数中是否存在不是下一个执行的节点
      *
      * @param loginUserId 流程发起人
@@ -559,6 +598,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         List<BpmApprovalDetailRespVO.ActivityNode> activityNodes = approvalDetail.getActivityNodes();
         if (CollUtil.isNotEmpty(activityNodes)) {
             // 2.1、获取节点中的审批人策略为【发起人自选】且状态为【未执行】的节点
+            // TODO 获取下一个执行节点
             List<BpmApprovalDetailRespVO.ActivityNode> notStartActivityNodes = activityNodes.stream().filter(node ->
                     BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy().equals(node.getCandidateStrategy())
                     && BpmTaskStatusEnum.NOT_START.getStatus().equals(node.getStatus())
