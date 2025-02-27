@@ -529,7 +529,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             String taskDefinitionKey = task.getTaskDefinitionKey();
             List<FlowNode> nextFlowNodes = getNextFlowNodes(taskDefinitionKey, bpmnModel, variables);
             System.out.println(nextFlowNodes);
-            validateNextAssignees(userId, reqVO.getVariables(), task.getProcessInstanceId(), reqVO.getNextAssignees());
+//            validateNextAssignees(userId, reqVO.getVariables(), task.getProcessInstanceId(), reqVO.getNextAssignees());
             // 下个节点审批人如果不存在，则由前端传递
             if (CollUtil.isNotEmpty(reqVO.getNextAssignees())) {
                 // 获取实例中的全部节点数据，避免后续节点的审批人被覆盖
@@ -548,39 +548,65 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     /**
-     *
-     * @param taskDefinitionKey 当前节点id
-     * @param bpmnModel bpmnModel
+     * 根据当前节点 ID 获取下一个执行的 FlowNode 列表
+     * @param taskDefinitionKey 当前节点 ID
+     * @param bpmnModel BPMN 模型
+     * @param variables 流程变量，用于条件判断
+     * @return 下一个执行的 FlowNode 列表
      */
-    private List<FlowNode> getNextFlowNodes(String taskDefinitionKey, BpmnModel bpmnModel,  Map<String, Object> variables){
-        FlowNode flowElement = (FlowNode) bpmnModel.getFlowElement(taskDefinitionKey);
-        // 存储下一个执行的节点
+    public List<FlowNode> getNextFlowNodes(String taskDefinitionKey, BpmnModel bpmnModel, Map<String, Object> variables) {
+        if (taskDefinitionKey == null || bpmnModel == null) {
+            throw new IllegalArgumentException("taskDefinitionKey and bpmnModel cannot be null");
+        }
+        FlowNode currentNode = (FlowNode) bpmnModel.getFlowElement(taskDefinitionKey);
+        if (currentNode == null) {
+            throw new IllegalArgumentException("FlowElement with given taskDefinitionKey not found in BpmnModel");
+        }
         List<FlowNode> nextFlowNodes = new ArrayList<>();
-        resolveNextNodes(flowElement, bpmnModel, variables, nextFlowNodes);
+        resolveNextNodes(currentNode, bpmnModel, variables, nextFlowNodes);
         return nextFlowNodes;
     }
 
+    /**
+     * 递归解析下一个执行节点
+     * @param currentNode 当前节点
+     * @param bpmnModel BPMN 模型
+     * @param variables 流程变量，用于条件判断
+     * @param nextFlowNodes 存储下一个执行节点的列表
+     */
     private void resolveNextNodes(FlowNode currentNode, BpmnModel bpmnModel, Map<String, Object> variables, List<FlowNode> nextFlowNodes) {
         List<SequenceFlow> outgoingFlows = currentNode.getOutgoingFlows();
         for (SequenceFlow sequenceFlow : outgoingFlows) {
-            // 如果是排他网关，需要根据条件表达式判断
-            if (currentNode instanceof ExclusiveGateway) {
-                String conditionExpression = sequenceFlow.getConditionExpression();
-                if (conditionExpression != null && !BpmnModelUtils.evalConditionExpress(variables,conditionExpression)) {
-                    continue;
-                }
+            if (!shouldFollowSequenceFlow(currentNode, sequenceFlow, variables)) {
+                continue;
             }
             FlowElement targetElement = bpmnModel.getFlowElement(sequenceFlow.getTargetRef());
             if (targetElement instanceof FlowNode targetNode) {
                 if (targetNode instanceof Gateway) {
-                    // 如果目标节点还是网关，递归处理
+                    // 如果目标节点是网关，递归处理
                     resolveNextNodes(targetNode, bpmnModel, variables, nextFlowNodes);
-                } else {
+                }else {
                     nextFlowNodes.add(targetNode);
                 }
             }
         }
     }
+
+    /**
+     * 判断是否应该遵循当前序列流
+     * @param currentNode 当前节点
+     * @param sequenceFlow 序列流
+     * @param variables 流程变量，用于条件判断
+     * @return 是否应该遵循该序列流
+     */
+    private boolean shouldFollowSequenceFlow(FlowNode currentNode, SequenceFlow sequenceFlow, Map<String, Object> variables) {
+        if (currentNode instanceof ExclusiveGateway) {
+            String conditionExpression = sequenceFlow.getConditionExpression();
+            return conditionExpression == null || BpmnModelUtils.evalConditionExpress(variables, conditionExpression);
+        }
+        return true;
+    }
+
 
     /**
      * 校验传递的参数中是否存在不是下一个执行的节点
