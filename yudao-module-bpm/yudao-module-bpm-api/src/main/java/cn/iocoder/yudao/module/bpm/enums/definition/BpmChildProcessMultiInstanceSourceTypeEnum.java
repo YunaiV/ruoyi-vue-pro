@@ -17,8 +17,8 @@ import java.util.Arrays;
 public enum BpmChildProcessMultiInstanceSourceTypeEnum implements ArrayValuable<Integer> {
 
     FIXED_QUANTITY(1, "固定数量"),
-    DIGITAL_FORM(2, "数字表单"),
-    MULTI_FORM(3, "多项表单");
+    NUMBER_FORM(2, "数字表单"),
+    MULTIPLE_FORM(3, "多选表单");
 
     private final Integer type;
     private final String name;

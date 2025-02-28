@@ -509,7 +509,7 @@ public class BpmSimpleModelNodeVO {
 
             @Schema(description = "完成比例", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
             @NotNull(message = "完成比例不能为空")
-            private Integer completeRatio; // TODO @lesan：approveRatio 要不这个，和上面保持一致？
+            private Integer approveRatio;
 
             @Schema(description = "多实例来源类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
             @NotNull(message = "多实例来源类型不能为空")
