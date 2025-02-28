@@ -71,8 +71,8 @@ import redis.clients.jedis.search.Schema;
 
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatOptions.MODEL_DEFAULT;
-import static cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatOptions.MODEL_REASONER_ALL;
+import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatOptions;
+
 
 /**
  * AI Model 模型工厂的实现类
@@ -92,7 +92,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 case YI_YAN:
                     return buildYiYanChatModel(apiKey);
                 case DEEP_SEEK:
-                    // return buildDeepSeekChatModel(apiKey);
+//                     return buildDeepSeekChatModel(apiKey);
                     // 替换 DEEP_SEEK 对接方式，支持三方的Reasoner模式
                     return buildDeepSeekReasonerChatModel(apiKey,url);
                 case ZHI_PU:
@@ -288,7 +288,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link YudaoAiAutoConfiguration#deepSeekChatModel(YudaoAiProperties)}
      */
     private static DeepSeekChatModel buildDeepSeekReasonerChatModel(String apiKey,String url) {
-        return new DeepSeekChatModel(apiKey,DeepSeekChatOptions.builder().model(MODEL_REASONER_ALL).temperature(0.7F).build(),url);
+        return new DeepSeekChatModel(apiKey,DeepSeekChatOptions.builder().model(DeepSeekChatOptions.MODEL_REASONER).temperature(0.7F).build(),url);
     }
 
     /**
