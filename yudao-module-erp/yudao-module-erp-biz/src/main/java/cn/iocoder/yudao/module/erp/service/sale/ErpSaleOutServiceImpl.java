@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.out.ErpSaleOutPageRe
 import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.out.ErpSaleOutSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOrderDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOrderItemDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOutDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOutItemDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleOutItemMapper;
@@ -32,6 +33,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -88,6 +90,9 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
             throw exception(SALE_OUT_NO_EXISTS);
         }
 
+        // 1.6 校验是否超出订单订购量出库
+        validateSaleOutItemsCountForCreate(createReqVO, saleOutItems);
+
         // 2.1 插入出库
         ErpSaleOutDO saleOut = BeanUtils.toBean(createReqVO, ErpSaleOutDO.class, in -> in
                 .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()))
@@ -98,9 +103,19 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
         saleOutItems.forEach(o -> o.setOutId(saleOut.getId()));
         saleOutItemMapper.insertBatch(saleOutItems);
 
-        // 3. 更新销售订单的出库数量
-        updateSaleOrderOutCount(createReqVO.getOrderId());
+        // 3. 这里不更新销售单出库数量，审核完成后再更新
+//        updateSaleOrderOutCount(createReqVO.getOrderId());
         return saleOut.getId();
+    }
+
+    /**
+     *  1.6 校验当前的已有的出库量和本次的出库量是否小于订单上的产品数量
+     * @param createReqVO
+     * @param saleOutItems
+     */
+    private void validateSaleOutItemsCountForCreate(ErpSaleOutSaveReqVO createReqVO, List<ErpSaleOutItemDO> saleOutItems) {
+        Map<Long, BigDecimal> alreadyOutMap = saleOutItemMapper.selectListByOrderItemIds(convertList(saleOutItems, ErpSaleOutItemDO::getOrderItemId));
+        validateSaleOutItemsCount(createReqVO, saleOutItems, alreadyOutMap);
     }
 
     @Override
@@ -122,6 +137,9 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
         // 1.5 校验订单项的有效性
         List<ErpSaleOutItemDO> saleOutItems = validateSaleOutItems(updateReqVO.getItems());
 
+        // 1.6 校验是否超出订单订购量出库
+        validateSaleOutItemsCountForUpdate(updateReqVO, saleOutItems);
+
         // 2.1 更新出库
         ErpSaleOutDO updateObj = BeanUtils.toBean(updateReqVO, ErpSaleOutDO.class)
                 .setOrderNo(saleOrder.getNo()).setCustomerId(saleOrder.getCustomerId());
@@ -135,6 +153,42 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
         // 3.2 注意：如果销售订单编号变更了，需要更新“老”销售订单的出库数量
         if (ObjectUtil.notEqual(saleOut.getOrderId(), updateObj.getOrderId())) {
             updateSaleOrderOutCount(saleOut.getOrderId());
+        }
+
+    }
+
+    /**
+     * 更新时验证是否超出订单订购量出库
+     * @param updateReqVO
+     * @param saleOutItems
+     */
+    private void validateSaleOutItemsCountForUpdate(ErpSaleOutSaveReqVO updateReqVO, List<ErpSaleOutItemDO> saleOutItems) {
+        Map<Long, BigDecimal> alreadyOutMap = saleOutItemMapper.selectListByOrderItemIdsNotIds(
+                convertList(saleOutItems, ErpSaleOutItemDO::getOrderItemId),convertList(saleOutItems, ErpSaleOutItemDO::getId));
+        validateSaleOutItemsCount(updateReqVO, saleOutItems, alreadyOutMap);
+    }
+
+    private void validateSaleOutItemsCount(ErpSaleOutSaveReqVO updateReqVO, List<ErpSaleOutItemDO> saleOutItems, Map<Long, BigDecimal> alreadyOutMap) {
+        List<ErpSaleOrderItemDO> saleOrderItemList = saleOrderService.getSaleOrderItemListByOrderId(updateReqVO.getOrderId());
+        // 订单上的订购产品数量
+        Map<Long, BigDecimal> saleOrderItemMap = saleOrderItemList.stream().collect(Collectors.toMap(ErpSaleOrderItemDO::getId, ErpSaleOrderItemDO::getCount, (v1, v2) -> v1));
+        // 订单上的已出货数量
+//        Map<Long, BigDecimal> alreadyOutMapReal = saleOrderItemList.stream().collect(Collectors.toMap(ErpSaleOrderItemDO::getId, ErpSaleOrderItemDO::getOutCount, (v1, v2) -> v1));
+
+        for (ErpSaleOutItemDO saleOutItem : saleOutItems) {
+            // 本次数量
+            BigDecimal total = BigDecimal.ZERO;
+            total = total.add(saleOutItem.getCount());
+
+            // 历史数量
+            BigDecimal alreadyCount = alreadyOutMap.get(saleOutItem.getOrderItemId());
+            if (null !=alreadyCount){
+                total = total.add(alreadyCount);
+            }
+            BigDecimal bigDecimal = saleOrderItemMap.get(saleOutItem.getOrderItemId());
+            if (total.compareTo(bigDecimal) > 0) {
+                throw exception(SALE_OUT_ITEM_COUNT_EXCEED, saleOrderItemMap.get(saleOutItem.getOrderItemId()));
+            }
         }
     }
 
@@ -193,6 +247,10 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
                     saleOutItem.getProductId(), saleOutItem.getWarehouseId(), count,
                     bizType, saleOutItem.getOutId(), saleOutItem.getId(), saleOut.getNo()));
         });
+
+        // 4, 更新销售订单的出库数量
+        updateSaleOrderOutCount(saleOut.getOrderId());
+
     }
 
     @Override
@@ -265,8 +323,6 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
             // 2.2 删除订单项
             saleOutItemMapper.deleteByOutId(saleOut.getId());
 
-            // 2.3 更新销售订单的出库数量
-            updateSaleOrderOutCount(saleOut.getOrderId());
         });
 
     }

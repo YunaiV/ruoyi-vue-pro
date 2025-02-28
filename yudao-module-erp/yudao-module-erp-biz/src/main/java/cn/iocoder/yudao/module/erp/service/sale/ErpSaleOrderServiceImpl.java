@@ -233,6 +233,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
                         productService.getProduct(item.getProductId()).getName(), item.getOutCount());
             }
             saleOrderItemMapper.updateById(new ErpSaleOrderItemDO().setId(item.getId()).setReturnCount(returnCount));
+            //todo 销售订单上的item 的出库量也要重新计算
         });
         // 2. 更新销售订单
         BigDecimal totalReturnCount = getSumValue(returnCountMap.values(), value -> value, BigDecimal::add, BigDecimal.ZERO);

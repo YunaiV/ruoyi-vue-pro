@@ -53,4 +53,32 @@ public interface ErpSaleOutItemMapper extends BaseMapperX<ErpSaleOutItemDO> {
         return convertMap(result, obj -> (Long) obj.get("order_item_id"), obj -> (BigDecimal) obj.get("sumCount"));
     }
 
+    /**
+     * 基于销售订单项编号，查询每个销售订单项的出库数量之和
+     * @param orderItemIds 销售订单项编号数组
+     * @return  key 单项编号，value 出库数量之和
+     */
+    default Map<Long, BigDecimal> selectListByOrderItemIds(Collection<Long> orderItemIds){
+        if (CollUtil.isEmpty(orderItemIds)) {
+            return Collections.emptyMap();
+        }
+        List<Map<String, Object>> result = selectMaps(new QueryWrapper<ErpSaleOutItemDO>()
+                .select("order_item_id, SUM(count) AS sumCount")
+                .groupBy("order_item_id")
+                .in("order_item_id", orderItemIds));
+        return convertMap(result, obj -> (Long) obj.get("order_item_id"), obj -> (BigDecimal) obj.get("sumCount"));
+    }
+
+    default Map<Long, BigDecimal> selectListByOrderItemIdsNotIds(List<Long> orderItemIds, List<Long> ids){
+        if (CollUtil.isEmpty(orderItemIds)) {
+            return Collections.emptyMap();
+        }
+        List<Map<String, Object>> result = selectMaps(new QueryWrapper<ErpSaleOutItemDO>()
+                .select("order_item_id, SUM(count) AS sumCount")
+                .groupBy("order_item_id")
+                .in("order_item_id", orderItemIds)
+                .notIn("id", ids));
+        return convertMap(result, obj -> (Long) obj.get("order_item_id"), obj -> (BigDecimal) obj.get("sumCount"));
+    }
+
 }

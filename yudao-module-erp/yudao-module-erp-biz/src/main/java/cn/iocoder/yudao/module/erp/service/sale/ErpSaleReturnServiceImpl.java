@@ -98,8 +98,8 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
         saleReturnItems.forEach(o -> o.setReturnId(saleReturn.getId()));
         saleReturnItemMapper.insertBatch(saleReturnItems);
 
-        // 3. 更新销售订单的退货数量
-        updateSaleOrderReturnCount(createReqVO.getOrderId());
+        // 3. 更新销售订单的退货数量，在审核时更新
+//        updateSaleOrderReturnCount(createReqVO.getOrderId());
         return saleReturn.getId();
     }
 
@@ -130,12 +130,12 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
         // 2.2 更新退货项
         updateSaleReturnItemList(updateReqVO.getId(), saleReturnItems);
 
-        // 3.1 更新销售订单的出库数量
-        updateSaleOrderReturnCount(updateObj.getOrderId());
-        // 3.2 注意：如果销售订单编号变更了，需要更新“老”销售订单的出库数量
-        if (ObjectUtil.notEqual(saleReturn.getOrderId(), updateObj.getOrderId())) {
-            updateSaleOrderReturnCount(saleReturn.getOrderId());
-        }
+//        // 3.1 更新销售订单的出库数量
+//        updateSaleOrderReturnCount(updateObj.getOrderId());
+//        // 3.2 注意：如果销售订单编号变更了，需要更新“老”销售订单的出库数量
+//        if (ObjectUtil.notEqual(saleReturn.getOrderId(), updateObj.getOrderId())) {
+//            updateSaleOrderReturnCount(saleReturn.getOrderId());
+//        }
     }
 
     private void calculateTotalPrice(ErpSaleReturnDO saleReturn, List<ErpSaleReturnItemDO> saleReturnItems) {
@@ -193,6 +193,9 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
                     saleReturnItem.getProductId(), saleReturnItem.getWarehouseId(), count,
                     bizType, saleReturnItem.getReturnId(), saleReturnItem.getId(), saleReturn.getNo()));
         });
+
+        // 4. 变更订单上的出库量和订货量
+        updateSaleOrderReturnCount(saleReturn.getOrderId());
     }
 
     @Override
