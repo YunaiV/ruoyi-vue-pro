@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateListReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeDocumentService;
@@ -15,6 +16,8 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -38,8 +41,16 @@ public class AiKnowledgeDocumentController {
     @PostMapping("/create")
     @Operation(summary = "新建文档")
     public CommonResult<Long> createKnowledgeDocument(@RequestBody @Valid AiKnowledgeDocumentCreateReqVO reqVO) {
-        Long knowledgeDocumentId = documentService.createKnowledgeDocument(reqVO);
-        return success(knowledgeDocumentId);
+        Long id = documentService.createKnowledgeDocument(reqVO);
+        return success(id);
+    }
+
+    @PostMapping("/create-list")
+    @Operation(summary = "批量新建文档")
+    public CommonResult<List<Long>> createKnowledgeDocumentList(
+            @RequestBody @Valid AiKnowledgeDocumentCreateListReqVO reqVO) {
+        List<Long> ids = documentService.createKnowledgeDocumentList(reqVO);
+        return success(ids);
     }
 
     @PutMapping("/update")

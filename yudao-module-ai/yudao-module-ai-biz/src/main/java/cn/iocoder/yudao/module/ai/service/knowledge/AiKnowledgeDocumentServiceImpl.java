@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateListReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeDocumentMapper;
@@ -21,9 +22,11 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
 
 /**
@@ -54,23 +57,43 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
         knowledgeService.validateKnowledgeExists(createReqVO.getKnowledgeId());
 
         // 2. 下载文档
-        TikaDocumentReader loader = new TikaDocumentReader(downloadFile(createReqVO.getUrl()));
-        List<Document> documents = loader.get();
-        Document document = CollUtil.getFirst(documents);
-        if (document == null || StrUtil.isEmpty(document.getText())) {
-            throw exception(KNOWLEDGE_DOCUMENT_FILE_READ_FAIL);
-        }
+        String content = readUrl(createReqVO.getUrl());
 
         // 3. 文档记录入库
-        String content = document.getText();
         AiKnowledgeDocumentDO documentDO = BeanUtils.toBean(createReqVO, AiKnowledgeDocumentDO.class)
                 .setContent(content).setContentLength(content.length()).setTokens(tokenCountEstimator.estimate(content))
                 .setStatus(CommonStatusEnum.ENABLE.getStatus());
         knowledgeDocumentMapper.insert(documentDO);
 
-        // 4. 文档切片入库
-        knowledgeSegmentService.createKnowledgeSegmentBySplitContent(documentDO.getId(), document.getText());
+        // 4. 文档切片入库（同步）
+        knowledgeSegmentService.createKnowledgeSegmentBySplitContent(documentDO.getId(), content);
         return documentDO.getId();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public List<Long> createKnowledgeDocumentList(AiKnowledgeDocumentCreateListReqVO createListReqVO) {
+        // 1. 校验参数
+        knowledgeService.validateKnowledgeExists(createListReqVO.getKnowledgeId());
+
+        // 2. 下载文档
+        List<String> contents = convertList(createListReqVO.getList(), document -> readUrl(document.getUrl()));
+
+        // 3. 文档记录入库
+        List<AiKnowledgeDocumentDO> documentDOs = new ArrayList<>(createListReqVO.getList().size());
+        for (int i = 0; i < createListReqVO.getList().size(); i++) {
+            AiKnowledgeDocumentCreateListReqVO.Document documentVO = createListReqVO.getList().get(i);
+            String content = contents.get(i);
+            documentDOs.add(BeanUtils.toBean(documentVO, AiKnowledgeDocumentDO.class).setKnowledgeId(createListReqVO.getKnowledgeId())
+                    .setContent(content).setContentLength(content.length()).setTokens(tokenCountEstimator.estimate(content))
+                    .setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        }
+        knowledgeDocumentMapper.insertBatch(documentDOs);
+
+        // 4. 批量创建文档切片（异步）
+        documentDOs.forEach(documentDO ->
+                knowledgeSegmentService.createKnowledgeSegmentBySplitContentAsync(documentDO.getId(), documentDO.getContent()));
+        return convertList(documentDOs, AiKnowledgeDocumentDO::getId);
     }
 
     @Override
@@ -97,17 +120,28 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
         return knowledgeDocument;
     }
 
-    private org.springframework.core.io.Resource downloadFile(String url) {
+    private static String readUrl(String url) {
+        // 下载文件
+        ByteArrayResource resource = null;
         try {
             byte[] bytes = HttpUtil.downloadBytes(url);
             if (bytes.length == 0) {
                 throw exception(KNOWLEDGE_DOCUMENT_FILE_EMPTY);
             }
-            return new ByteArrayResource(bytes);
+            resource = new ByteArrayResource(bytes);
         } catch (Exception e) {
-            log.error("[downloadFile][url({}) 下载失败]", url, e);
-            throw new RuntimeException(e);
+            log.error("[readUrl][url({}) 读取失败]", url, e);
+            throw exception(KNOWLEDGE_DOCUMENT_FILE_DOWNLOAD_FAIL);
         }
+
+        // 读取文件
+        TikaDocumentReader loader = new TikaDocumentReader(resource);
+        List<Document> documents = loader.get();
+        Document document = CollUtil.getFirst(documents);
+        if (document == null || StrUtil.isEmpty(document.getText())) {
+            throw exception(KNOWLEDGE_DOCUMENT_FILE_READ_FAIL);
+        }
+        return document.getText();
     }
 
 }

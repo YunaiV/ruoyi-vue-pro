@@ -56,6 +56,7 @@ public interface ErrorCodeConstants {
 
     ErrorCode KNOWLEDGE_DOCUMENT_NOT_EXISTS = new ErrorCode(1_022_008_101, "文档不存在!");
     ErrorCode KNOWLEDGE_DOCUMENT_FILE_EMPTY = new ErrorCode(1_022_008_102, "文档内容为空!");
+    ErrorCode KNOWLEDGE_DOCUMENT_FILE_DOWNLOAD_FAIL = new ErrorCode(1_022_008_102, "文件下载失败!");
     ErrorCode KNOWLEDGE_DOCUMENT_FILE_READ_FAIL = new ErrorCode(1_022_008_102, "文档加载失败!");
 
     ErrorCode KNOWLEDGE_SEGMENT_NOT_EXISTS = new ErrorCode(1_022_008_202, "段落不存在!");

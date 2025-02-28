@@ -4,7 +4,10 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateListReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
+
+import java.util.List;
 
 /**
  * AI 知识库-文档 Service 接口
@@ -20,6 +23,14 @@ public interface AiKnowledgeDocumentService {
      * @return 文档编号
      */
     Long createKnowledgeDocument(AiKnowledgeDocumentCreateReqVO createReqVO);
+
+    /**
+     * 批量创建文档
+     *
+     * @param createListReqVO 批量创建 Request VO
+     * @return 文档编号列表
+     */
+    List<Long> createKnowledgeDocumentList(AiKnowledgeDocumentCreateListReqVO createListReqVO);
 
     /**
      * 获取文档分页

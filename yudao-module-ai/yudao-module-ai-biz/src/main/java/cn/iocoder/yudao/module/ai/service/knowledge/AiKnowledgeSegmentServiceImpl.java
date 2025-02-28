@@ -110,8 +110,10 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         // 3.1 更新切片
         AiKnowledgeSegmentDO segmentDO = BeanUtils.toBean(reqVO, AiKnowledgeSegmentDO.class);
         segmentMapper.updateById(segmentDO);
-        // 3.2 重新向量化
-        writeVectorStore(vectorStore, segmentDO, new Document(segmentDO.getContent()));
+        // 3.2 重新向量化，必须开启状态
+        if (CommonStatusEnum.isEnable(segmentDO.getStatus())) {
+            writeVectorStore(vectorStore, segmentDO, new Document(segmentDO.getContent()));
+        }
     }
 
     @Override

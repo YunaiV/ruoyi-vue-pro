@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowle
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentUpdateStatusReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
+import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 
@@ -31,6 +32,17 @@ public interface AiKnowledgeSegmentService {
      * @param content 文档内容
      */
     void createKnowledgeSegmentBySplitContent(Long documentId, String content);
+
+    /**
+     * 【异步】基于 content 内容，切片创建多个段落
+     *
+     * @param documentId 知识库文档编号
+     * @param content 文档内容
+     */
+    @Async
+    default void createKnowledgeSegmentBySplitContentAsync(Long documentId, String content) {
+        createKnowledgeSegmentBySplitContent(documentId, content);
+    }
 
     /**
      * 更新段落的内容
