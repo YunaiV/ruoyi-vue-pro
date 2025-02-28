@@ -23,6 +23,7 @@ import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskSignTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
@@ -522,14 +523,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 BpmCommentTypeEnum.APPROVE.formatComment(reqVO.getReason()));
         // 2.3 调用 BPM complete 去完成任务
         // 其中，variables 是存储动态表单到 local 任务级别。过滤一下，避免 ProcessInstance 系统级的变量被占用
-        if (CollUtil.isNotEmpty(reqVO.getVariables())) {
+//        if (CollUtil.isNotEmpty(reqVO.getVariables())) {
             Map<String, Object> variables = FlowableUtils.filterTaskFormVariable(reqVO.getVariables());
             // 校验传递的参数中是否存在不是下一个执行的节点
-            // 当前执行的流程节点，需根据该节点寻找下一个节点
-            String taskDefinitionKey = task.getTaskDefinitionKey();
-            List<FlowNode> nextFlowNodes = getNextFlowNodes(taskDefinitionKey, bpmnModel, variables);
-            System.out.println(nextFlowNodes);
-//            validateNextAssignees(userId, reqVO.getVariables(), task.getProcessInstanceId(), reqVO.getNextAssignees());
+            validateNextAssignees(task.getTaskDefinitionKey(), reqVO.getVariables(), bpmnModel, reqVO.getNextAssignees(), instance);
             // 下个节点审批人如果不存在，则由前端传递
             if (CollUtil.isNotEmpty(reqVO.getNextAssignees())) {
                 // 获取实例中的全部节点数据，避免后续节点的审批人被覆盖
@@ -539,104 +536,58 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             }
             runtimeService.setVariables(task.getProcessInstanceId(), variables);
             taskService.complete(task.getId(), variables, true);
-        } else {
-            taskService.complete(task.getId());
-        }
+//        } else {
+//            taskService.complete(task.getId());
+//        }
 
         // 【加签专属】处理加签任务
         handleParentTaskIfSign(task.getParentTaskId());
-    }
-
-    /**
-     * 根据当前节点 ID 获取下一个执行的 FlowNode 列表
-     * @param taskDefinitionKey 当前节点 ID
-     * @param bpmnModel BPMN 模型
-     * @param variables 流程变量，用于条件判断
-     * @return 下一个执行的 FlowNode 列表
-     */
-    public List<FlowNode> getNextFlowNodes(String taskDefinitionKey, BpmnModel bpmnModel, Map<String, Object> variables) {
-        if (taskDefinitionKey == null || bpmnModel == null) {
-            throw new IllegalArgumentException("taskDefinitionKey and bpmnModel cannot be null");
-        }
-        FlowNode currentNode = (FlowNode) bpmnModel.getFlowElement(taskDefinitionKey);
-        if (currentNode == null) {
-            throw new IllegalArgumentException("FlowElement with given taskDefinitionKey not found in BpmnModel");
-        }
-        List<FlowNode> nextFlowNodes = new ArrayList<>();
-        resolveNextNodes(currentNode, bpmnModel, variables, nextFlowNodes);
-        return nextFlowNodes;
-    }
-
-    /**
-     * 递归解析下一个执行节点
-     * @param currentNode 当前节点
-     * @param bpmnModel BPMN 模型
-     * @param variables 流程变量，用于条件判断
-     * @param nextFlowNodes 存储下一个执行节点的列表
-     */
-    private void resolveNextNodes(FlowNode currentNode, BpmnModel bpmnModel, Map<String, Object> variables, List<FlowNode> nextFlowNodes) {
-        List<SequenceFlow> outgoingFlows = currentNode.getOutgoingFlows();
-        for (SequenceFlow sequenceFlow : outgoingFlows) {
-            if (!shouldFollowSequenceFlow(currentNode, sequenceFlow, variables)) {
-                continue;
-            }
-            FlowElement targetElement = bpmnModel.getFlowElement(sequenceFlow.getTargetRef());
-            if (targetElement instanceof FlowNode targetNode) {
-                if (targetNode instanceof Gateway) {
-                    // 如果目标节点是网关，递归处理
-                    resolveNextNodes(targetNode, bpmnModel, variables, nextFlowNodes);
-                }else {
-                    nextFlowNodes.add(targetNode);
-                }
-            }
-        }
-    }
-
-    /**
-     * 判断是否应该遵循当前序列流
-     * @param currentNode 当前节点
-     * @param sequenceFlow 序列流
-     * @param variables 流程变量，用于条件判断
-     * @return 是否应该遵循该序列流
-     */
-    private boolean shouldFollowSequenceFlow(FlowNode currentNode, SequenceFlow sequenceFlow, Map<String, Object> variables) {
-        if (currentNode instanceof ExclusiveGateway) {
-            String conditionExpression = sequenceFlow.getConditionExpression();
-            return conditionExpression == null || BpmnModelUtils.evalConditionExpress(variables, conditionExpression);
-        }
-        return true;
     }
 
 
     /**
      * 校验传递的参数中是否存在不是下一个执行的节点
      *
-     * @param loginUserId 流程发起人
-     * @param processInstanceId 流程实例id
-     * @param nextActivityNodes 下一个执行节点信息 {节点id : [审批人id,审批人id]}
+     * @param taskDefinitionKey 当前任务节点id
+     * @param variables 流程变量
+     * @param bpmnModel 流程模型
+     * @param nextActivityNodes 下一个节点审批人集合（参数）
      */
-    private void validateNextAssignees(Long loginUserId, Map<String, Object> variables,String processInstanceId,
-                                                Map<String, List<Long>> nextActivityNodes){
-        // 1、查询流程【预测】的全部信息
-        BpmApprovalDetailRespVO approvalDetail = processInstanceService.getApprovalDetail(loginUserId,
-                new BpmApprovalDetailReqVO().setProcessVariables(variables).setProcessInstanceId(processInstanceId));
-        // 2、获取预测节点的信息
-        List<BpmApprovalDetailRespVO.ActivityNode> activityNodes = approvalDetail.getActivityNodes();
-        if (CollUtil.isNotEmpty(activityNodes)) {
-            // 2.1、获取节点中的审批人策略为【发起人自选】且状态为【未执行】的节点
-            // TODO 获取下一个执行节点
-            List<BpmApprovalDetailRespVO.ActivityNode> notStartActivityNodes = activityNodes.stream().filter(node ->
-                    BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy().equals(node.getCandidateStrategy())
-                    && BpmTaskStatusEnum.NOT_START.getStatus().equals(node.getStatus())
-                    && CollUtil.isEmpty(node.getCandidateUsers())).toList();
-            // 3、校验传递的参数中是否存在不是下一个节点的信息
-            for (Map.Entry<String, List<Long>> nextActivityNode : nextActivityNodes.entrySet()) {
-                if (notStartActivityNodes.stream().noneMatch(taskNode -> taskNode.getId().equals(nextActivityNode.getKey()))) {
-                    log.error("[checkNextActivityNodes][ ({}) 不是下一个执行的流程节点！]", nextActivityNode.getKey());
-                    throw exception(TASK_START_USER_SELECT_NODE_NOT_EXISTS, nextActivityNode.getKey());
+    private void validateNextAssignees(String taskDefinitionKey, Map<String, Object> variables, BpmnModel bpmnModel,
+                                                Map<String, List<Long>> nextActivityNodes,ProcessInstance processInstance){
+
+        // 1、获取当前任务节点的信息
+        FlowElement flowElement = bpmnModel.getFlowElement(taskDefinitionKey);
+        // 2、获取下一个应该执行的节点集合
+        List<FlowNode> nextFlowNodes = getNextFlowNodes(flowElement, bpmnModel, variables);
+        // 3、比较前端传递的节点和预测的下一个节点是否匹配，匹配则将该节点设置上审批人
+        for (FlowNode nextFlowNode : nextFlowNodes) {
+            // 获取下一个执行节点的属性 是否为 发起人自选
+            Map<String, List<ExtensionElement>> extensionElements = nextFlowNode.getExtensionElements();
+            List<ExtensionElement> elements = extensionElements.get(BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY);
+            if (CollUtil.isEmpty(elements)){
+                continue;
+            }
+            // 获取节点中的审批人策略
+            Integer candidateStrategy = Integer.valueOf(elements.get(0).getElementText());
+            // 获取流程实例中的发起人自选审批人
+            Map<String, List<Long>> startUserSelectAssignees = FlowableUtils.getStartUserSelectAssignees(processInstance.getProcessVariables());
+            List<Long> startUserSelectAssignee = startUserSelectAssignees.get(nextFlowNode.getId());
+            if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy()) && CollUtil.isEmpty(startUserSelectAssignee)) {
+                // 先判断节点是否存在
+                if (!nextActivityNodes.containsKey(nextFlowNode.getId())){
+                    throw exception(TASK_TARGET_NODE_NOT_EXISTS, nextFlowNode.getName());
+                }
+                // 如果节点存在，则判断节点中的审批人策略是否为 发起人自选
+                List<Long> nextAssignees = nextActivityNodes.get(nextFlowNode.getId());
+                // 3.1、如果前端传递的节点为空，则抛出异常
+                if (CollUtil.isEmpty(nextAssignees)) {
+                    throw exception(PROCESS_INSTANCE_START_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
                 }
             }
+
         }
+
     }
 
     /**
