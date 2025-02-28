@@ -1,14 +1,16 @@
 package cn.iocoder.yudao.module.erp.enums;
 
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 @RequiredArgsConstructor
 @Getter
-public enum ErpOffStatus {
+public enum ErpOffStatus implements ArrayValuable<Integer> {
 
     OPEN(1, "开启"),
     CLOSED(2, "已关闭"),
@@ -25,8 +27,8 @@ public enum ErpOffStatus {
 
     // 存储状态码和描述的字段
     private final Integer code;
-    private final String description;
-
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ErpOffStatus::getCode).toArray();
+    private final String desc;
 
     // 根据状态码获取状态枚举
     public static ErpOffStatus fromCode(int code) {
@@ -40,6 +42,19 @@ public enum ErpOffStatus {
     // 根据状态码获取对应的描述
     public static String getDescriptionByCode(Integer code) {
         ErpOffStatus status = STATUS_MAP.get(code);
-        return status != null ? status.getDescription() : null;
+        return status != null ? status.getDesc() : null;
+    }
+
+    /**
+     * @return 数组
+     */
+    @Override
+    public Integer[] array() {
+        int[] arrays = ARRAYS;
+        Integer[] result = new Integer[arrays.length];
+        for (int i = 0; i < arrays.length; i++) {
+            result[i] = arrays[i];
+        }
+        return result;
     }
 }

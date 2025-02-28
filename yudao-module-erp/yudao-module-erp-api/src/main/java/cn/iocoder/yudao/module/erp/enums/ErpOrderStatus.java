@@ -1,14 +1,16 @@
 package cn.iocoder.yudao.module.erp.enums;
 
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 @RequiredArgsConstructor
 @Getter
-public enum ErpOrderStatus {
+public enum ErpOrderStatus implements ArrayValuable<Integer> {
 
     ORDERED(1, "已完整订购"),
     PARTIALLY_ORDERED(2, "部分订购"),
@@ -26,7 +28,8 @@ public enum ErpOrderStatus {
 
     // 存储状态码和描述的字段
     private final Integer code;
-    private final String description;
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ErpOrderStatus::getCode).toArray();
+    private final String desc;
 
 
     // 根据状态码获取状态枚举
@@ -41,6 +44,19 @@ public enum ErpOrderStatus {
     // 根据状态码获取对应的描述
     public static String getDescriptionByCode(Integer code) {
         ErpOrderStatus status = STATUS_MAP.get(code);
-        return status != null ? status.getDescription() : null;
+        return status != null ? status.getDesc() : null;
+    }
+
+    /**
+     * @return 数组
+     */
+    @Override
+    public Integer[] array() {
+        int[] arrays = ARRAYS;
+        Integer[] result = new Integer[arrays.length];
+        for (int i = 0; i < arrays.length; i++) {
+            result[i] = arrays[i];
+        }
+        return result;
     }
 }

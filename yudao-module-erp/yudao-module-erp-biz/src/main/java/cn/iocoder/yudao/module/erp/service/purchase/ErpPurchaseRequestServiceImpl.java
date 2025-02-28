@@ -16,12 +16,14 @@ import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestItemsMap
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
+import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.ErpOffStatus;
 import cn.iocoder.yudao.module.erp.enums.ErpOrderStatus;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpWarehouseService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import com.alibaba.cola.statemachine.StateMachine;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import lombok.RequiredArgsConstructor;
@@ -62,6 +64,8 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     @Lazy
     @Autowired
     private ErpPurchaseRequestServiceImpl erpPurchaseRequestService;
+    @Autowired
+    StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestDO> erpPurchaseStatusMachine;
 
 
     @Override
@@ -87,10 +91,10 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         ErpPurchaseRequestDO purchaseRequest = BeanUtils.toBean(createReqVO, ErpPurchaseRequestDO.class);
         purchaseRequest.setNo(no);
         //初始状态设置，审核状态、关闭状态、订购状态
-        purchaseRequest.setStatus(ErpAuditStatus.PROCESS.getCode())
-            .setOffStatus(ErpOffStatus.OPEN.getCode())
-            .setOrderStatus(ErpOrderStatus.OT_ORDERED.getCode());
-
+//        purchaseRequest.setStatus(ErpAuditStatus.PROCESS.getCode())
+//            .setOffStatus(ErpOffStatus.OPEN.getCode())
+//            .setOrderStatus(ErpOrderStatus.OT_ORDERED.getCode());
+        erpPurchaseStatusMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.INIT, purchaseRequest);//初始化事件
         //2. 插入主表的申请单数据
         ThrowUtil.ifThrow(erpPurchaseRequestMapper.insert(purchaseRequest) <= 0, PURCHASE_REQUEST_ADD_FAIL_APPROVE);
         Long id = purchaseRequest.getId();

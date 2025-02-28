@@ -24,7 +24,6 @@ public interface ErpCustomCategoryItemMapper extends BaseMapperX<ErpCustomCatego
         return new MPJLambdaWrapperX<ErpCustomCategoryItemDO>()
             .selectAll(ErpCustomCategoryItemDO.class)
             .eqIfPresent(ErpCustomCategoryItemDO::getCountryCode, reqVO.getCountryCode())
-            .eqIfPresent(ErpCustomCategoryItemDO::getHsCode, reqVO.getHsCode())
             .eqIfPresent(ErpCustomCategoryItemDO::getTaxRate, reqVO.getTaxRate())
             .betweenIfPresent(ErpCustomCategoryItemDO::getCreateTime, reqVO.getCreateTime())
             .orderByDesc(ErpCustomCategoryItemDO::getId)

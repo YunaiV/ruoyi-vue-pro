@@ -27,7 +27,10 @@ public enum ErpAuditStatus implements ArrayValuable<Integer> {
     PROCESSING(12, "审核中"),
     APPROVE(20, "已审核"),
     REJECTED(14, "审核不通过"),
-    REVERSED(5, "反审核");
+    REVERSED(5, "撤销审核"),
+    ;
+
+
 
     private static final Map<Integer, ErpAuditStatus> STATUS_MAP = new HashMap<>();
 
@@ -46,7 +49,7 @@ public enum ErpAuditStatus implements ArrayValuable<Integer> {
     /**
      * 状态名
      */
-    private final String name;
+    private final String desc;
 
     /**
      * 根据状态码获取状态枚举的描述。
@@ -56,7 +59,7 @@ public enum ErpAuditStatus implements ArrayValuable<Integer> {
      */
     public static String getDescriptionByCode(Integer code) {
         ErpAuditStatus statusEnum = STATUS_MAP.get(code);
-        return statusEnum != null ? statusEnum.getName() : null;
+        return statusEnum != null ? statusEnum.getDesc() : null;
     }
     public static ErpAuditStatus fromCode(int code) {
         for (ErpAuditStatus status : ErpAuditStatus.values()) {

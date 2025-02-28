@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.resp;
 
-import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.framework.mybatis.core.vo.BaseVO;
-import cn.iocoder.yudao.module.erp.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ContentStyle;
@@ -73,7 +71,7 @@ public class ErpPurchaseRequestRespVO extends BaseVO {
     // ========== 状态 ==========
     @Schema(description = "审核状态（待审核，审核通过，审核未通过）")
     @ExcelProperty(value = "审核状态", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.AUDIT_STATUS)
+//    @DictFormat(DictTypeConstants.AUDIT_STATUS)
     private Integer status;
 
     @Schema(description = "关闭状态（已关闭，已开启）")
