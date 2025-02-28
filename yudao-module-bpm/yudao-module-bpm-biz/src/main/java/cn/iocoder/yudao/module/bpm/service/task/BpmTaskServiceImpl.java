@@ -523,9 +523,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 BpmCommentTypeEnum.APPROVE.formatComment(reqVO.getReason()));
         // 2.3 调用 BPM complete 去完成任务
         // 其中，variables 是存储动态表单到 local 任务级别。过滤一下，避免 ProcessInstance 系统级的变量被占用
-//        if (CollUtil.isNotEmpty(reqVO.getVariables())) {
+        if (CollUtil.isNotEmpty(reqVO.getVariables())) {
             Map<String, Object> variables = FlowableUtils.filterTaskFormVariable(reqVO.getVariables());
-            // 校验传递的参数中是否存在不是下一个执行的节点
+            // 校验传递的参数中是否为下一个将要执行的任务节点
             validateNextAssignees(task.getTaskDefinitionKey(), reqVO.getVariables(), bpmnModel, reqVO.getNextAssignees(), instance);
             // 下个节点审批人如果不存在，则由前端传递
             if (CollUtil.isNotEmpty(reqVO.getNextAssignees())) {
@@ -536,9 +536,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             }
             runtimeService.setVariables(task.getProcessInstanceId(), variables);
             taskService.complete(task.getId(), variables, true);
-//        } else {
-//            taskService.complete(task.getId());
-//        }
+        } else {
+            taskService.complete(task.getId());
+        }
 
         // 【加签专属】处理加签任务
         handleParentTaskIfSign(task.getParentTaskId());
@@ -546,7 +546,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
 
     /**
-     * 校验传递的参数中是否存在不是下一个执行的节点
+     * 校验传递的参数中是否为下一个将要执行的任务节点
      *
      * @param taskDefinitionKey 当前任务节点id
      * @param variables 流程变量
@@ -555,39 +555,37 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      */
     private void validateNextAssignees(String taskDefinitionKey, Map<String, Object> variables, BpmnModel bpmnModel,
                                                 Map<String, List<Long>> nextActivityNodes,ProcessInstance processInstance){
-
         // 1、获取当前任务节点的信息
         FlowElement flowElement = bpmnModel.getFlowElement(taskDefinitionKey);
-        // 2、获取下一个应该执行的节点集合
+        // 2、获取下一个将要执行的节点集合
         List<FlowNode> nextFlowNodes = getNextFlowNodes(flowElement, bpmnModel, variables);
-        // 3、比较前端传递的节点和预测的下一个节点是否匹配，匹配则将该节点设置上审批人
+        // 3、循环下一个将要执行的节点集合
         for (FlowNode nextFlowNode : nextFlowNodes) {
-            // 获取下一个执行节点的属性 是否为 发起人自选
+            // 3.1、获取下一个将要执行节点的属性（是否为自选审批人等）
             Map<String, List<ExtensionElement>> extensionElements = nextFlowNode.getExtensionElements();
             List<ExtensionElement> elements = extensionElements.get(BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY);
             if (CollUtil.isEmpty(elements)){
                 continue;
             }
-            // 获取节点中的审批人策略
+            // 3.2、获取节点中的审批人策略
             Integer candidateStrategy = Integer.valueOf(elements.get(0).getElementText());
-            // 获取流程实例中的发起人自选审批人
+            // 3.3、获取流程实例中的发起人自选审批人
             Map<String, List<Long>> startUserSelectAssignees = FlowableUtils.getStartUserSelectAssignees(processInstance.getProcessVariables());
             List<Long> startUserSelectAssignee = startUserSelectAssignees.get(nextFlowNode.getId());
+            // 3.4、如果节点中的审批人策略为 发起人自选，并且该节点的审批人为空
             if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy()) && CollUtil.isEmpty(startUserSelectAssignee)) {
-                // 先判断节点是否存在
+                // 先判断前端传递的参数节点节点是否为将要执行的节点
                 if (!nextActivityNodes.containsKey(nextFlowNode.getId())){
                     throw exception(TASK_TARGET_NODE_NOT_EXISTS, nextFlowNode.getName());
                 }
-                // 如果节点存在，则判断节点中的审批人策略是否为 发起人自选
+                // 如果节点存在，则获取节点中的审批人
                 List<Long> nextAssignees = nextActivityNodes.get(nextFlowNode.getId());
-                // 3.1、如果前端传递的节点为空，则抛出异常
+                // 如果前端传递的节点为空，则抛出异常
                 if (CollUtil.isEmpty(nextAssignees)) {
                     throw exception(PROCESS_INSTANCE_START_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
                 }
             }
-
         }
-
     }
 
     /**

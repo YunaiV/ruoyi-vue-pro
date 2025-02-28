@@ -880,7 +880,7 @@ public class BpmnModelUtils {
      * @param nextFlowNodes 下一个执行的流程节点集合
      */
     private static void handleExclusiveGateway(Gateway gateway, BpmnModel bpmnModel, Map<String, Object> variables, List<FlowNode> nextFlowNodes) {
-       // TODO @小北： 这里findOne和simulateNextFlowElements中有重复代码，需要优化，@芋道：是否重构？？
+       // TODO @小北： 这里和simulateNextFlowElements中有重复代码，是否重构？？每个网关节点拆分出方法应该比较合理化，@芋道
         SequenceFlow matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
                 flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
                         && (evalConditionExpress(variables, flow.getConditionExpression())));
