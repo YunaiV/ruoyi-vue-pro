@@ -204,4 +204,45 @@ public class IotDataBridgeDO extends BaseDO {
 
     }
 
+    /**
+     * RabbitMQ 配置
+     */
+    @Data
+    public static class RabbitMQConfig implements Config {
+
+        /**
+         * RabbitMQ 服务器地址
+         */
+        private String host;
+        /**
+         * 端口
+         */
+        private Integer port;
+        /**
+         * 虚拟主机
+         */
+        private String virtualHost;
+        /**
+         * 用户名
+         */
+        private String username;
+        /**
+         * 密码
+         */
+        private String password;
+
+        /**
+         * 交换机名称
+         */
+        private String exchange;
+        /**
+         * 路由键
+         */
+        private String routingKey;
+        /**
+         * 队列名称
+         */
+        private String queue;
+    }
+
 }

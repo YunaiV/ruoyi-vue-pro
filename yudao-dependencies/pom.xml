@@ -36,6 +36,7 @@
         <!-- 消息队列 -->
         <rocketmq-spring.version>2.3.2</rocketmq-spring.version>
         <kafka-spring.version>3.3.3</kafka-spring.version>
+        <rabbitmq-spring.version>3.4.3</rabbitmq-spring.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.7</lock4j.version>
         <!-- 监控相关 -->
@@ -296,6 +297,12 @@
                 <artifactId>spring-kafka</artifactId>
                 <version>${kafka-spring.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-amqp</artifactId>
+                <version>${rabbitmq-spring.version}</version>
+            </dependency>
+
             <!-- 服务保障相关 -->
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
