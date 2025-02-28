@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateListReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentCreateListReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeDocumentService;
@@ -21,6 +21,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
+// TODO @芋艿：增加权限标识
 @Tag(name = "管理后台 - AI 知识库文档")
 @RestController
 @RequestMapping("/ai/knowledge/document")
@@ -36,6 +37,13 @@ public class AiKnowledgeDocumentController {
             @Valid AiKnowledgeDocumentPageReqVO pageReqVO) {
         PageResult<AiKnowledgeDocumentDO> pageResult = documentService.getKnowledgeDocumentPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, AiKnowledgeDocumentRespVO.class));
+    }
+
+    @GetMapping("/get")
+    @Operation(summary = "获取文档详情")
+    public CommonResult<AiKnowledgeDocumentRespVO> getKnowledgeDocument(@RequestParam("id") Long id) {
+        AiKnowledgeDocumentDO document = documentService.getKnowledgeDocument(id);
+        return success(BeanUtils.toBean(document, AiKnowledgeDocumentRespVO.class));
     }
 
     @PostMapping("/create")

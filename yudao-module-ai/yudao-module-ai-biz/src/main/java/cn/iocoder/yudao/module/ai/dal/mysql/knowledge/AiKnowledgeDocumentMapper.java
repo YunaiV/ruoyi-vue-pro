@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * AI 知识库-文档 Mapper
+ * AI 知识库文档 Mapper
  *
  * @author xiaoxin
  */
@@ -17,6 +17,7 @@ public interface AiKnowledgeDocumentMapper extends BaseMapperX<AiKnowledgeDocume
 
     default PageResult<AiKnowledgeDocumentDO> selectPage(AiKnowledgeDocumentPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<AiKnowledgeDocumentDO>()
+                .eqIfPresent(AiKnowledgeDocumentDO::getKnowledgeId, reqVO.getKnowledgeId())
                 .likeIfPresent(AiKnowledgeDocumentDO::getName, reqVO.getName())
                 .orderByDesc(AiKnowledgeDocumentDO::getId));
     }

@@ -28,6 +28,14 @@ public interface AiKnowledgeService {
     void updateKnowledge(AiKnowledgeSaveReqVO updateReqVO);
 
     /**
+     * 获得知识库
+     *
+     * @param id 编号
+     * @return 知识库
+     */
+    AiKnowledgeDO getKnowledge(Long id);
+
+    /**
      * 校验知识库是否存在
      *
      * @param id 记录编号

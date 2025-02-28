@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.ai.dal.mysql.knowledge;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -9,7 +8,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * AI 知识库基础信息 Mapper
+ * AI 知识库 Mapper
  *
  * @author xiaoxin
  */
@@ -18,7 +17,10 @@ public interface AiKnowledgeMapper extends BaseMapperX<AiKnowledgeDO> {
 
     default PageResult<AiKnowledgeDO> selectPage(AiKnowledgePageReqVO pageReqVO) {
         return selectPage(pageReqVO, new LambdaQueryWrapperX<AiKnowledgeDO>()
-                .eq(AiKnowledgeDO::getStatus, CommonStatusEnum.ENABLE.getStatus())
-                .likeIfPresent(AiKnowledgeDO::getName, pageReqVO.getName()));
+                .likeIfPresent(AiKnowledgeDO::getName, pageReqVO.getName())
+                .eqIfPresent(AiKnowledgeDO::getStatus, pageReqVO.getStatus())
+                .betweenIfPresent(AiKnowledgeDO::getCreateTime, pageReqVO.getCreateTime())
+                .orderByDesc(AiKnowledgeDO::getId));
     }
+
 }

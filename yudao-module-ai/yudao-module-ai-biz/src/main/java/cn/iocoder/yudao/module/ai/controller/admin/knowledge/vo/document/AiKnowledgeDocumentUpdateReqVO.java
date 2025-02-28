@@ -6,8 +6,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-
-@Schema(description = "管理后台 - AI 更新 知识库-文档 Request VO")
+// TODO @芋艿：稍后优化
+@Schema(description = "管理后台 - AI 知识库文档更新 Request VO")
 @Data
 public class AiKnowledgeDocumentUpdateReqVO {
 

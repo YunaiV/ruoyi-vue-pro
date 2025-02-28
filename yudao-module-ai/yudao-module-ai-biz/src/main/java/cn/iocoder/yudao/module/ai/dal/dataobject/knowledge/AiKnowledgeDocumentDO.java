@@ -29,7 +29,7 @@ public class AiKnowledgeDocumentDO extends BaseDO {
      */
     private Long knowledgeId;
     /**
-     * 文件名称
+     * 文档名称
      */
     private String name;
     /**
@@ -50,9 +50,14 @@ public class AiKnowledgeDocumentDO extends BaseDO {
      */
     private Integer tokens;
     /**
-     * 每个文本块的目标 token 数
+     * 分片最大 Token 数
      */
     private Integer segmentMaxTokens;
+
+    /**
+     * 召回次数
+     */
+    private Integer retrievalCount;
 
     /**
      * 状态

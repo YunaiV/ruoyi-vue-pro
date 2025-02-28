@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnow
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
 import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
+// TODO @芋艿：增加权限标识
 @Tag(name = "管理后台 - AI 知识库")
 @RestController
 @RequestMapping("/ai/knowledge")
@@ -29,9 +31,17 @@ public class AiKnowledgeController {
     @GetMapping("/page")
     @Operation(summary = "获取知识库分页")
     public CommonResult<PageResult<AiKnowledgeRespVO>> getKnowledgePage(@Valid AiKnowledgePageReqVO pageReqVO) {
-        
+
         PageResult<AiKnowledgeDO> pageResult = knowledgeService.getKnowledgePage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, AiKnowledgeRespVO.class));
+    }
+
+    @GetMapping("/get")
+    @Operation(summary = "获得知识库")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    public CommonResult<AiKnowledgeRespVO> getKnowledge(@RequestParam("id") Long id) {
+        AiKnowledgeDO knowledge = knowledgeService.getKnowledge(id);
+        return success(BeanUtils.toBean(knowledge, AiKnowledgeRespVO.class));
     }
 
     @PostMapping("/create")

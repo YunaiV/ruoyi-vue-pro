@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.ai.service.knowledge;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgePageReqVO;
@@ -8,11 +7,9 @@ import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnow
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeMapper;
-import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -40,7 +37,7 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
 
         // 2. 插入知识库
         AiKnowledgeDO knowledge = BeanUtils.toBean(createReqVO, AiKnowledgeDO.class)
-                .setEmbeddingModel(model.getModel()).setStatus(CommonStatusEnum.ENABLE.getStatus());
+                .setEmbeddingModel(model.getModel());
         knowledgeMapper.insert(knowledge);
         return knowledge.getId();
     }
@@ -56,6 +53,13 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
         AiKnowledgeDO updateObj = BeanUtils.toBean(updateReqVO, AiKnowledgeDO.class)
                 .setEmbeddingModel(model.getModel());
         knowledgeMapper.updateById(updateObj);
+
+        // TODO @芋艿：如果模型变化，需要 reindex 所有的文档
+    }
+
+    @Override
+    public AiKnowledgeDO getKnowledge(Long id) {
+        return knowledgeMapper.selectById(id);
     }
 
     @Override

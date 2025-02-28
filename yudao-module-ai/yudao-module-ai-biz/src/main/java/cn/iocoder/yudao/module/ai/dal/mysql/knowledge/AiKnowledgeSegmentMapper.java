@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 /**
- * AI 知识库-分片 Mapper
+ * AI 知识库分片 Mapper
  *
  * @author xiaoxin
  */

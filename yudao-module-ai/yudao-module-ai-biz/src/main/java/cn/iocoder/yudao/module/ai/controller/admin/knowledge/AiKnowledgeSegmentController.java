@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
+// TODO @芋艿：增加权限标识
 @Tag(name = "管理后台 - AI 知识库段落")
 @RestController
 @RequestMapping("/ai/knowledge/segment")

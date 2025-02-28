@@ -58,6 +58,11 @@ public class AiKnowledgeSegmentDO extends BaseDO {
     private Integer tokens;
 
     /**
+     * 召回次数
+     */
+    private Integer retrievalCount;
+
+    /**
      * 状态
      * <p>
      * 枚举 {@link CommonStatusEnum}

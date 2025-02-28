@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateListReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentCreateListReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeDocumentMapper;
@@ -84,21 +84,28 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
         for (int i = 0; i < createListReqVO.getList().size(); i++) {
             AiKnowledgeDocumentCreateListReqVO.Document documentVO = createListReqVO.getList().get(i);
             String content = contents.get(i);
-            documentDOs.add(BeanUtils.toBean(documentVO, AiKnowledgeDocumentDO.class).setKnowledgeId(createListReqVO.getKnowledgeId())
-                    .setContent(content).setContentLength(content.length()).setTokens(tokenCountEstimator.estimate(content))
+            documentDOs.add(BeanUtils.toBean(documentVO, AiKnowledgeDocumentDO.class)
+                    .setKnowledgeId(createListReqVO.getKnowledgeId())
+                    .setContent(content).setContentLength(content.length())
+                    .setTokens(tokenCountEstimator.estimate(content))
                     .setStatus(CommonStatusEnum.ENABLE.getStatus()));
         }
         knowledgeDocumentMapper.insertBatch(documentDOs);
 
         // 4. 批量创建文档切片（异步）
-        documentDOs.forEach(documentDO ->
-                knowledgeSegmentService.createKnowledgeSegmentBySplitContentAsync(documentDO.getId(), documentDO.getContent()));
+        documentDOs.forEach(documentDO -> knowledgeSegmentService
+                .createKnowledgeSegmentBySplitContentAsync(documentDO.getId(), documentDO.getContent()));
         return convertList(documentDOs, AiKnowledgeDocumentDO::getId);
     }
 
     @Override
     public PageResult<AiKnowledgeDocumentDO> getKnowledgeDocumentPage(AiKnowledgeDocumentPageReqVO pageReqVO) {
         return knowledgeDocumentMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public AiKnowledgeDocumentDO getKnowledgeDocument(Long id) {
+        return knowledgeDocumentMapper.selectById(id);
     }
 
     @Override

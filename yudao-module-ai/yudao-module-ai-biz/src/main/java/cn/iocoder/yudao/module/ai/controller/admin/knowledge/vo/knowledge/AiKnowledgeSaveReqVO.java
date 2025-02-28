@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -31,6 +33,9 @@ public class AiKnowledgeSaveReqVO {
     @NotNull(message = "相似性阈值不能为空")
     private Double similarityThreshold;
 
-    // TODO @芋艿：status
+    @Schema(description = "是否启用",  requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "是否启用不能为空")
+    @InEnum(CommonStatusEnum.class)
+    private Integer status;
 
 }
