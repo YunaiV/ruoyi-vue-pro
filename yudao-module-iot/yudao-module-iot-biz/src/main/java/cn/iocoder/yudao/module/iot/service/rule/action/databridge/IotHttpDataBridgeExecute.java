@@ -32,7 +32,7 @@ public class IotHttpDataBridgeExecute implements IotDataBridgeExecute {
 
     @Override
     public void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
-        // 1.1 校验数据桥接的类型 == HTTP
+        // 1.1 校验数据桥梁的类型 == HTTP
         if (!IotDataBridgTypeEnum.HTTP.getType().equals(dataBridge.getType())) {
             return;
         }

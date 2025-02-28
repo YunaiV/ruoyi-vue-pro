@@ -170,4 +170,38 @@ public class IotDataBridgeDO extends BaseDO {
 
     }
 
+    /**
+     * Kafka 配置
+     */
+    @Data
+    public static class KafkaMQConfig implements Config {
+
+        /**
+         * Kafka 服务器地址
+         */
+        private String bootstrapServers;
+        /**
+         * 用户名
+         */
+        private String username;
+        /**
+         * 密码
+         */
+        private String password;
+        /**
+         * 是否启用 SSL
+         */
+        private Boolean ssl;
+
+        /**
+         * 生产者组 ID
+         */
+        private String groupId;
+        /**
+         * 主题
+         */
+        private String topic;
+
+    }
+
 }

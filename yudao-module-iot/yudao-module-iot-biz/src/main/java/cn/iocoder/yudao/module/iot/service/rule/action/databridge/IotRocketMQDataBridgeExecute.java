@@ -24,7 +24,7 @@ public class IotRocketMQDataBridgeExecute extends AbstractCacheableDataBridgeExe
 
     @Override
     public void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
-        // 1.1 校验数据桥接的类型 == ROCKETMQ
+        // 1.1 校验数据桥梁的类型 == ROCKETMQ
         if (!IotDataBridgTypeEnum.ROCKETMQ.getType().equals(dataBridge.getType())) {
             return;
         }

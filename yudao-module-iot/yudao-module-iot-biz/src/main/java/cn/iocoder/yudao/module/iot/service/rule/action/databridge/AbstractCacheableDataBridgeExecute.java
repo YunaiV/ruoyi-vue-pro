@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.Duration;
 
 /**
- * 带缓存功能的数据桥接执行器抽象类
+ * 带缓存功能的数据桥梁执行器抽象类
  *
  * @author HUIHUI
  */

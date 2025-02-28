@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 public interface IotDataBridgeExecute {
 
     /**
-     * 执行数据桥接操作
+     * 执行数据桥梁操作
      *
      * @param message    设备消息
      * @param dataBridge 数据桥梁
