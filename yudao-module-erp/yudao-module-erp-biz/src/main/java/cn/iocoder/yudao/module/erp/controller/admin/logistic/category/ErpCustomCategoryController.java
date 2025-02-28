@@ -145,7 +145,7 @@ public class ErpCustomCategoryController {
     @GetMapping({"/simple-list"})
     @Operation(summary = "获得海关分类组合值精简列表", description = "材料+报关品名")
     public CommonResult<List<ErpCustomCategoryItemSimpleRespVO>> getCustomRuleCategoryItemList() {
-        List<ErpCustomCategoryDO> list = customRuleCategoryService.getCustomRuleCategoryPage(null).getList();
+        List<ErpCustomCategoryDO> list = customRuleCategoryService.getCustomRuleCategoryList(null);
         List<ErpCustomCategoryRespVO> respVOS = BindingResult(list);
         return success(respVOS.stream().map(vo -> new ErpCustomCategoryItemSimpleRespVO()
             .setCustomCategoryId(vo.getId())

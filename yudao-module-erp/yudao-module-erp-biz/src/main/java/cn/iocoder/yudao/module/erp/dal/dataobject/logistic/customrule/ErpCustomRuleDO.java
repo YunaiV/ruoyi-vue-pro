@@ -1,12 +1,10 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.logistic.customrule;
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
-
-import java.math.BigDecimal;
 
 /**
  * ERP 海关规则 DO
@@ -21,7 +19,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErpCustomRuleDO extends BaseDO {
+public class ErpCustomRuleDO extends TenantBaseDO {
 
     /**
      * 海关规则id
@@ -32,19 +30,10 @@ public class ErpCustomRuleDO extends BaseDO {
      * 国家编码
      */
     private Integer countryCode;
-
     /**
      * 产品id
      */
     private Long productId;
-    /**
-     * 申报品名（英文）
-     */
-    private String declaredTypeEn;
-    /**
-     * 申报品名
-     */
-    private String declaredType;
     /**
      * 申报金额
      */
@@ -53,14 +42,6 @@ public class ErpCustomRuleDO extends BaseDO {
      * 申报金额币种
      */
     private Integer declaredValueCurrencyCode;
-    /**
-     * 税率
-     */
-    private BigDecimal taxRate;
-    /**
-     * hs编码
-     */
-    private String hscode;
     /**
      * 物流属性
      */

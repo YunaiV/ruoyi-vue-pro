@@ -1,24 +1,21 @@
 package cn.iocoder.yudao.module.erp.service.logistic.category.bo;
 
-public class ErpCustomCategoryBO {
-    /**
-     * 编号
-     */
-    private Long id;
-    /**
-     * 材质-字典
-     */
-    private Integer material;
-    /**
-     * 报关品名
-     */
-    private String declaredType;
-    /**
-     * 英文品名
-     */
-    private String declaredTypeEn;
-    /**
-     * 材质对应string+报关品名(动态计算)
-     */
-    private String combinedValue;
+import cn.iocoder.yudao.module.erp.dal.dataobject.logistic.category.ErpCustomCategoryDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.logistic.category.item.ErpCustomCategoryItemDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
+import lombok.Data;
+
+import java.util.List;
+
+/**
+ * 海关分类主+子+产品(不带海关规则的产品)
+ */
+@Data
+public class ErpCustomCategoryBO extends ErpCustomCategoryDO {
+
+    // 海关分类子项
+    private List<ErpCustomCategoryItemDO> items;
+
+    //产品
+    private ErpProductDO productDO;
 }

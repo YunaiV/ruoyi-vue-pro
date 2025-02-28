@@ -27,7 +27,7 @@ import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
-import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
+import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
@@ -77,11 +77,11 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     private CrmPermissionService permissionService;
     @Resource
     private CrmContactBusinessService contactBusinessService;
-    @Resource
-    private CrmProductService productService;
 
     @Resource
     private AdminUserApi adminUserApi;
+    @Resource
+    private ErpProductApi erpProductApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -205,7 +205,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     private List<CrmBusinessProductDO> validateBusinessProducts(List<CrmBusinessSaveReqVO.BusinessProduct> list) {
         // 1. 校验产品存在
-        productService.validProductList(convertSet(list, CrmBusinessSaveReqVO.BusinessProduct::getProductId));
+        erpProductApi.validProductList(convertSet(list, CrmBusinessSaveReqVO.BusinessProduct::getProductId));
         // 2. 转化为 CrmBusinessProductDO 列表
         return convertList(list, o -> BeanUtils.toBean(o, CrmBusinessProductDO.class,
                 item -> item.setTotalPrice(MoneyUtils.priceMultiply(item.getBusinessPrice(), item.getCount()))));

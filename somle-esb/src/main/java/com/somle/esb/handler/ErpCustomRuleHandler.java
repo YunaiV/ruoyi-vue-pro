@@ -49,13 +49,8 @@ public class ErpCustomRuleHandler {
      **/
     @ServiceActivator(inputChannel = "erpCustomRuleChannel")
     public void syncCustomRulesToEccang(@Payload List<ErpCustomRuleDTO> customRules) {
-        List<ErpCustomRuleDTO> dtos = processRules(customRules);
-        List<EccangProduct> eccangProducts = erpToEccangConverter.convertByErpCustomDTOs(dtos);
-        log.debug("syncCustomRuleToEccang start ,sku={{}}", eccangProducts.stream().map(EccangProduct::getProductSku).toList());
-
-        eccangProducts.forEach(eccangProduct -> {
-            eccangService.addBatchProduct(List.of(eccangProduct));
-        });
+        List<EccangProduct> eccangProducts = erpToEccangConverter.convertByErpCustomDTOs(processRules(customRules));
+        eccangProducts.forEach(eccangProduct -> eccangService.addBatchProduct(List.of(eccangProduct)));
         log.info("syncCustomRuleToEccang end ,sku={{}}", eccangProducts.stream().map(EccangProduct::getProductSku).toList());
     }
 
@@ -68,11 +63,8 @@ public class ErpCustomRuleHandler {
      **/
     @ServiceActivator(inputChannel = "erpCustomRuleChannel")
     public void syncCustomRulesToKingdee(@Payload List<ErpCustomRuleDTO> customRules) {
-        log.debug("syncCustomRuleToKingdee");
         List<KingdeeProductSaveReqVO> kingdee = erpToKingdeeConverter.convert(processRules(customRules));
-        for (KingdeeProductSaveReqVO reqVO : kingdee) {
-            kingdeeService.addProduct(reqVO);
-        }
+        kingdee.forEach(kingdeeService::addProduct);
         log.info("syncCustomRuleToKingdee end,skus={{}}}", kingdee.stream().map(KingdeeProductSaveReqVO::getNumber).toList());
     }
 

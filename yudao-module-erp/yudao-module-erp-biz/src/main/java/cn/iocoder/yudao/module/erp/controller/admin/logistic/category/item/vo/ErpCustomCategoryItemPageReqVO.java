@@ -25,7 +25,7 @@ public class ErpCustomCategoryItemPageReqVO extends PageParam {
     private Integer countryCode;
 
     @Schema(description = "HS编码")
-    private String hsCode;
+    private String hscode;
 
     @Schema(description = "税率")
     private BigDecimal taxRate;

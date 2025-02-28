@@ -2,13 +2,13 @@ package cn.iocoder.yudao.module.erp.controller.admin.product.vo.product;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.json.GuidePriceJson;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.List;
-
-import com.alibaba.excel.annotation.*;
 
 @Schema(description = "管理后台 - ERP 产品 Response VO")
 @Data

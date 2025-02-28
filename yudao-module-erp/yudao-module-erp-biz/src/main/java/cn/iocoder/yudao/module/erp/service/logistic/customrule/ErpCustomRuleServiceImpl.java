@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.erp.service.logistic.customrule;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.enums.DictTypeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -7,9 +9,14 @@ import cn.iocoder.yudao.module.erp.api.logistic.customrule.ErpCustomRuleApi;
 import cn.iocoder.yudao.module.erp.api.logistic.customrule.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo.ErpCustomRulePageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.logistic.customrule.vo.ErpCustomRuleSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.logistic.customrule.ErpCustomRuleDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
-import jakarta.annotation.Resource;
+import cn.iocoder.yudao.module.erp.enums.ErpDictTypeConstants;
+import cn.iocoder.yudao.module.erp.service.logistic.customrule.bo.ErpCustomRuleBO;
+import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
+import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessageChannel;
@@ -18,13 +25,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_INSERT_ERROR;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_BATCH_INSERT_ERROR;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_UPDATE_ERROR;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.CUSTOM_RULE_NOT_EXISTS;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.NO_REPEAT_OF_COUNTRY_CODE_AND_PRODUCT_CODE;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 
 /**
  * ERP 海关规则 Service 实现类
@@ -35,45 +45,57 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.NO_REPEAT_OF_
 @Service
 @Validated
 public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
-    @Resource
-    private MessageChannel erpCustomRuleChannel;
-    @Resource
+    @Autowired
     ErpCustomRuleMapper customRuleMapper;
     @Autowired
+    MessageChannel erpCustomRuleChannel;
+    @Autowired
     ErpCustomRuleApi erpCustomRuleApi;
+    @Autowired
+    DictDataApi dictDataApi;
+    @Autowired
+    ErpProductService erpProductService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createCustomRule(ErpCustomRuleSaveReqVO createReqVO) {
+        baseValidator(createReqVO);
         //判断国别+产品编码是否重复
-        validateExist(null, createReqVO.getCountryCode(), createReqVO.getProductId());
-        //插入
-        ErpCustomRuleDO customRule = BeanUtils.toBean(createReqVO, ErpCustomRuleDO.class);
-        //填充barCode(产品sku),根据产品id
-        ThrowUtil.ifSqlThrow(customRuleMapper.insert(customRule
-        ), DB_INSERT_ERROR);
-        Long id = customRule.getId();
+        createReqVO.getCountryCode().forEach(countryCode -> validateExist(null, countryCode, createReqVO.getProductId()));
+        List<ErpCustomRuleDO> doList = createReqVO.getCountryCode().stream().map(countryCode -> copyPropertiesIgnoreType(createReqVO, countryCode)).toList();
+        ThrowUtil.ifThrow(erpProductService.getProduct(createReqVO.getProductId()).getCustomCategoryId() == null, CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS_BY_PRODUCT_ID);
+        //批量添加
+        ThrowUtil.ifThrow(!customRuleMapper.insertBatch(doList, doList.size()), DB_BATCH_INSERT_ERROR);
         //同步数据
-        ErpCustomRuleDTO customRuleDTO = erpCustomRuleApi.getErpCustomRuleDTOById(id);
-        erpCustomRuleChannel.send(MessageBuilder.withPayload(List.of(customRuleDTO)).build());
+        List<Long> ids = doList.stream().map(ErpCustomRuleDO::getId).toList();
+        this.syncErpCustomRule(ids);
         // 返回
-        return id;
+        return (long) ids.size();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateCustomRule(ErpCustomRuleSaveReqVO updateReqVO) {
+        baseValidator(updateReqVO);
         Long id = updateReqVO.getId();
         //判断国别+产品编码是否重复
-        validateExist(id, updateReqVO.getCountryCode(), updateReqVO.getProductId());
+        //获得updateReqVO国别的第一个
+        Integer countryCode = updateReqVO.getCountryCode().stream().findFirst().orElseThrow(() -> exception(DB_UPDATE_ERROR));
+        validateExist(id, countryCode, updateReqVO.getProductId());
         // 校验存在
         validateCustomRuleExists(id);
+        ThrowUtil.ifThrow(erpProductService.getProduct(updateReqVO.getProductId()).getCustomCategoryId() == null, CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS_BY_PRODUCT_ID);
         // 更新
-        ErpCustomRuleDO updateObj = BeanUtils.toBean(updateReqVO, ErpCustomRuleDO.class);
+        ErpCustomRuleDO updateObj = copyPropertiesIgnoreType(updateReqVO, countryCode);
         ThrowUtil.ifSqlThrow(customRuleMapper.updateById(updateObj), DB_UPDATE_ERROR);
         //同步数据
-        ErpCustomRuleDTO customRuleDTO = erpCustomRuleApi.getErpCustomRuleDTOById(id);
-        erpCustomRuleChannel.send(MessageBuilder.withPayload(List.of(customRuleDTO)).build());
+        this.syncErpCustomRule(Collections.singletonList(id));
+    }
+
+    //同步海关规则方法
+    private void syncErpCustomRule(List<Long> ruleIds) {
+        List<ErpCustomRuleDTO> dtos = erpCustomRuleApi.listCustomRules(ruleIds);
+        erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos).build());
     }
 
     @Override
@@ -97,22 +119,79 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
 
     @Override
     public PageResult<ErpCustomRuleDO> getCustomRulePage(ErpCustomRulePageReqVO pageReqVO) {
+        if (pageReqVO == null) {
+            pageReqVO = new ErpCustomRulePageReqVO();
+        }
         return customRuleMapper.selectPage(pageReqVO);
     }
 
+    @Override
+    public ErpCustomRuleBO getCustomRuleBOById(@NotNull Long id) {
+        //检查规则下的产品是否存在海关分类
+//        ThrowUtil.ifThrow(customRuleMapper.selectById(id) == null,CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS_BY_PRODUCT_ID);
+        ErpCustomRuleDO ruleDO = customRuleMapper.selectById(id);
+        if (ruleDO == null) return null;
+        ErpProductRespVO product = erpProductService.getProduct(ruleDO.getProductId());
+        if (product.getCustomCategoryId() == null) {
+            //不存在海关规则->原始table
+            return BeanUtils.toBean(ruleDO, ErpCustomRuleBO.class);
+        } else {
+            //存在->关联查询bo
+            return customRuleMapper.getCustomRuleBOById(id);
+        }
+
+    }
+
+    @Override
+    public List<ErpCustomRuleBO> getCustomRuleBOList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return customRuleMapper.selectCustomRuleBOByIds(ids);
+    }
+
+    @Override
+    public PageResult<ErpCustomRuleBO> getCustomRuleBOPage(ErpCustomRulePageReqVO pageReqVO) {
+        if (pageReqVO == null) {
+            pageReqVO = new ErpCustomRulePageReqVO();
+        }
+        return customRuleMapper.selectBOPage(pageReqVO);
+    }
+
     private void validateExist(Long id, Integer countryCode, Long productId) {
-        //TODO 城市code+产品id是否存在,校验-wdy
+        //校验产品是否存在
+        erpProductService.validProductList(Collections.singleton(productId));
         ErpCustomRuleDO erpCustomRuleDO = customRuleMapper.getCustomRuleByCountryCodeAndProductId(countryCode, productId);
         if (erpCustomRuleDO == null) {
             return;
         }
         // 如果 id 为空，说明不用比较是否为相同 id 的字典类型
-        if (id == null) {
-            throw exception(NO_REPEAT_OF_COUNTRY_CODE_AND_PRODUCT_CODE);
-        }
-        if (!erpCustomRuleDO.getId().equals(id)) {
-            throw exception(NO_REPEAT_OF_COUNTRY_CODE_AND_PRODUCT_CODE);
-        }
+        String barCode = erpProductService.getProduct(productId).getBarCode();
+        String countryDesc = dictDataApi.getDictDataLabel(DictTypeConstants.COUNTRY_CODE, countryCode);
+        ThrowUtil.ifThrow(id == null, NO_REPEAT_OF_COUNTRY_CODE_AND_PRODUCT_CODE, barCode + countryDesc);
+        ThrowUtil.ifThrow(!erpCustomRuleDO.getId().equals(id), NO_REPEAT_OF_COUNTRY_CODE_AND_PRODUCT_CODE, barCode + countryDesc);
     }
 
+    private void baseValidator(ErpCustomRuleSaveReqVO vo) {
+        //国家
+        Optional.ofNullable(vo.getCountryCode())
+            .ifPresent(countryCodes -> dictDataApi.validateDictDataList(DictTypeConstants.COUNTRY_CODE,
+                countryCodes.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.toSet())));
+        //货币
+        Optional.ofNullable(vo.getDeclaredValueCurrencyCode()).ifPresent(i -> dictDataApi.validateDictDataList(DictTypeConstants.CURRENCY_CODE, Collections.singleton(String.valueOf(i))));
+        //物流属性
+        Optional.ofNullable(vo.getLogisticAttribute()).ifPresent(i -> dictDataApi.validateDictDataList(ErpDictTypeConstants.ERP_LOGISTIC_ATTRIBUTE, Collections.singleton(String.valueOf(i))));
+
+    }
+
+    /**
+     * 自定义转换VO->DO。比较特殊。
+     */
+    protected ErpCustomRuleDO copyPropertiesIgnoreType(ErpCustomRuleSaveReqVO source, Integer countryCode) {
+        //手动映射
+        source.setCountryCode(null);
+        return BeanUtils.toBean(source, ErpCustomRuleDO.class).setCountryCode(countryCode);
+    }
 }

@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.erp.controller.admin.product.vo.product;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.json.GuidePriceJson;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import lombok.*;
 import jakarta.validation.constraints.*;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -33,7 +33,7 @@ public class ErpProductSaveReqVO {
 
     @Schema(description = "SKU（编码）", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "SKU（编码）不能为空")
-    @Pattern(regexp = "^[a-zA-Z0-9-]+$", message = "SKU（编码）只能包含字母、数字、中划线")
+    @Pattern(regexp = "^[A-Z0-9-]+$", message = "SKU（编码）只能包含大写字母、数字、中划线")
     private String barCode;
 
     @Schema(description = "单位编号", requiredMode = Schema.RequiredMode.REQUIRED)

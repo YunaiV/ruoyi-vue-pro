@@ -5,15 +5,13 @@ package cn.iocoder.yudao.framework.common.util.collection;
  * @Author: c-tao
  * @Date: $
  */
-import lombok.AllArgsConstructor;
 
+import java.util.Spliterator;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import java.util.Spliterator;
-import java.util.function.Consumer;
 
 public class PageUtils {
 

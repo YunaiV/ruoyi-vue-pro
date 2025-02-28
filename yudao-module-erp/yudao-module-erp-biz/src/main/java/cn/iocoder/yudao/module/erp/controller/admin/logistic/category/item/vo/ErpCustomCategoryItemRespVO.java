@@ -27,7 +27,7 @@ public class ErpCustomCategoryItemRespVO {
 
     @Schema(description = "HS编码", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("HS编码")
-    private String hsCode;
+    private String hscode;
 
     @Schema(description = "税率", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("税率")

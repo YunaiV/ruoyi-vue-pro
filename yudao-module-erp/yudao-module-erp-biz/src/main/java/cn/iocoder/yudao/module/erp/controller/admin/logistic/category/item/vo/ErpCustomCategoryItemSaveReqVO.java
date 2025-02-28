@@ -28,7 +28,7 @@ public class ErpCustomCategoryItemSaveReqVO {
 
     @Schema(description = "HS编码", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "HS编码不能为空")
-    private String hsCode;
+    private String hscode;
 
     @Schema(description = "税率", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "税率不能为空")

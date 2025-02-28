@@ -54,6 +54,13 @@ public interface ErpCustomCategoryService {
      */
     PageResult<ErpCustomCategoryDO> getCustomRuleCategoryPage(ErpCustomCategoryPageReqVO pageReqVO);
 
+    /**
+     * 获得海关分类的list
+     *
+     * @param pageReqVO 分页查询
+     * @return 海关分类list
+     */
+    List<ErpCustomCategoryDO> getCustomRuleCategoryList(ErpCustomCategoryPageReqVO pageReqVO);
     // ==================== 子表（海关分类子表） ====================
 
     /**

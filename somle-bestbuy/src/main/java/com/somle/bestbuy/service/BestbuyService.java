@@ -1,10 +1,10 @@
 package com.somle.bestbuy.service;
 
-import com.somle.bestbuy.repository.BestbuyTokenRepository;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import cn.iocoder.yudao.framework.common.util.web.RequestX;
 import cn.iocoder.yudao.framework.common.util.web.WebUtils;
+import com.somle.bestbuy.repository.BestbuyTokenRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

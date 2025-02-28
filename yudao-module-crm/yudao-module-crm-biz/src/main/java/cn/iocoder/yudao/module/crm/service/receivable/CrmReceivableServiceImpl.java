@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.bpm.api.task.BpmProcessInstanceApi;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivablePageReqVO;
@@ -240,22 +241,55 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
     @LogRecord(type = CRM_RECEIVABLE_TYPE, subType = CRM_RECEIVABLE_SUBMIT_SUB_TYPE, bizNo = "{{#id}}",
             success = CRM_RECEIVABLE_SUBMIT_SUCCESS)
     public void submitReceivable(Long id, Long userId) {
-        // 1. 校验回款是否在审批
-        CrmReceivableDO receivable = validateReceivableExists(id);
-        if (ObjUtil.notEqual(receivable.getAuditStatus(), CrmAuditStatusEnum.DRAFT.getStatus())) {
+        //1. 校验回款是否处于未提交或审核不通过状态
+        boolean isReceivableDraftOrReject = receivableMapper.selectCount(new LambdaQueryWrapperX<CrmReceivableDO>()
+                .eq(CrmReceivableDO::getId, id)
+                .in(CrmReceivableDO::getAuditStatus, Arrays.asList(CrmAuditStatusEnum.DRAFT.getStatus(), CrmAuditStatusEnum.REJECT.getStatus()))) > 0;
+        if (!isReceivableDraftOrReject) {
             throw exception(RECEIVABLE_SUBMIT_FAIL_NOT_DRAFT);
         }
+        //2.修改回款状态为审批中
+        receivableMapper.updateById(new CrmReceivableDO().setId(id).setAuditStatus(CrmAuditStatusEnum.PROCESS.getStatus()));
+    }
 
-        // 2. 创建回款审批流程实例
-        String processInstanceId = bpmProcessInstanceApi.createProcessInstance(userId, new BpmProcessInstanceCreateReqDTO()
-                .setProcessDefinitionKey(BPM_PROCESS_DEFINITION_KEY).setBusinessKey(String.valueOf(id)));
 
-        // 3. 更新回款工作流编号
-        receivableMapper.updateById(new CrmReceivableDO().setId(id).setProcessInstanceId(processInstanceId)
-                .setAuditStatus(CrmAuditStatusEnum.PROCESS.getStatus()));
 
-        // 4. 记录日志
-        LogRecordContext.putVariable("receivableNo", receivable.getNo());
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_RECEIVABLE_TYPE, subType = CRM_RECEIVABLE_APPROVE_SUB_TYPE, bizNo = "{{#id}}",
+            success = CRM_RECEIVABLE_APPROVE_SUCCESS)
+    public void approveReceivable(Long id, Long userId) {
+
+        //1. 校验回款是否处于审批中状态
+        boolean isReceivableProcess = receivableMapper.selectCount(new LambdaQueryWrapperX<CrmReceivableDO>()
+                .eq(CrmReceivableDO::getId, id)
+                .eq(CrmReceivableDO::getAuditStatus, CrmAuditStatusEnum.PROCESS.getStatus())) > 0;
+
+        if (!isReceivableProcess) {
+            throw exception(RECEIVABLE_APPROVE_FAIL_CONTRACT_NOT_PROCESS);
+        }
+
+        //2.修改回款状态为审核通过
+        receivableMapper.updateById(new CrmReceivableDO().setId(id).setAuditStatus(CrmAuditStatusEnum.APPROVE.getStatus()));
+    }
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_RECEIVABLE_TYPE, subType = CRM_RECEIVABLE_CANCEL_APPROVE_SUB_TYPE, bizNo = "{{#id}}",
+            success = CRM_RECEIVABLE_CANCEL_APPROVE_SUCCESS)
+    public void cancelApproveReceivable(Long id, Long userId) {
+
+        //1.校验回款是否处于审批通过或审批中状态
+        boolean isReceivableApprove = receivableMapper.selectCount(new LambdaQueryWrapperX<CrmReceivableDO>()
+                .eq(CrmReceivableDO::getId, id)
+                .in(CrmReceivableDO::getAuditStatus, Arrays.asList(CrmAuditStatusEnum.APPROVE.getStatus(), CrmAuditStatusEnum.PROCESS.getStatus()))) > 0;
+        if (!isReceivableApprove) {
+            throw exception(RECEIVABLE_CANCELL_APPROVE);
+        }
+
+        //2.修改合同状态为审核不通过状态
+        receivableMapper.updateById(new CrmReceivableDO().setId(id).setAuditStatus(CrmAuditStatusEnum.REJECT.getStatus()));
     }
 
     private CrmReceivableDO validateReceivableExists(Long id) {
