@@ -877,8 +877,8 @@ public class SimpleModelUtils {
                         childProcessSetting.getMultiInstanceSetting().getSourceType().equals(BpmChildProcessMultiInstanceSourceTypeEnum.MULTIPLE_FORM.getType())) {
                     multiInstanceCharacteristics.setInputDataItem(childProcessSetting.getMultiInstanceSetting().getSource());
                 }
-                multiInstanceCharacteristics.setCompletionCondition(String.format("${ nrOfCompletedInstances/nrOfInstances >= %s}",
-                        String.format(BpmUserTaskApproveMethodEnum.RATIO.getCompletionCondition(), String.format("%.2f", childProcessSetting.getMultiInstanceSetting().getApproveRatio() / 100D))));
+                multiInstanceCharacteristics.setCompletionCondition(String.format(BpmUserTaskApproveMethodEnum.RATIO.getCompletionCondition(),
+                        String.format("%.2f", childProcessSetting.getMultiInstanceSetting().getApproveRatio() / 100D)));
                 callActivity.setLoopCharacteristics(multiInstanceCharacteristics);
                 addExtensionElement(callActivity, CHILD_PROCESS_MULTI_INSTANCE_SOURCE_TYPE, childProcessSetting.getMultiInstanceSetting().getSourceType());
             }
