@@ -127,9 +127,10 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
         return knowledgeDocument;
     }
 
-    private static String readUrl(String url) {
+    @Override
+    public String readUrl(String url) {
         // 下载文件
-        ByteArrayResource resource = null;
+        ByteArrayResource resource;
         try {
             byte[] bytes = HttpUtil.downloadBytes(url);
             if (bytes.length == 0) {

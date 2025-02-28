@@ -10,11 +10,15 @@ import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowle
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
 import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeSegmentService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -30,7 +34,8 @@ public class AiKnowledgeSegmentController {
 
     @GetMapping("/page")
     @Operation(summary = "获取段落分页")
-    public CommonResult<PageResult<AiKnowledgeSegmentRespVO>> getKnowledgeSegmentPage(@Valid AiKnowledgeSegmentPageReqVO pageReqVO) {
+    public CommonResult<PageResult<AiKnowledgeSegmentRespVO>> getKnowledgeSegmentPage(
+            @Valid AiKnowledgeSegmentPageReqVO pageReqVO) {
         PageResult<AiKnowledgeSegmentDO> pageResult = segmentService.getKnowledgeSegmentPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, AiKnowledgeSegmentRespVO.class));
     }
@@ -44,9 +49,23 @@ public class AiKnowledgeSegmentController {
 
     @PutMapping("/update-status")
     @Operation(summary = "启禁用段落内容")
-    public CommonResult<Boolean> updateKnowledgeSegmentStatus(@Valid @RequestBody AiKnowledgeSegmentUpdateStatusReqVO reqVO) {
+    public CommonResult<Boolean> updateKnowledgeSegmentStatus(
+            @Valid @RequestBody AiKnowledgeSegmentUpdateStatusReqVO reqVO) {
         segmentService.updateKnowledgeSegmentStatus(reqVO);
         return success(true);
+    }
+
+    @GetMapping("/split")
+    @Operation(summary = "切片内容")
+    @Parameters({
+            @Parameter(name = "url", description = "文档 URL", required = true),
+            @Parameter(name = "segmentMaxTokens", description = "分段的最大 Token 数", required = true)
+    })
+    public CommonResult<List<AiKnowledgeSegmentRespVO>> splitContent(
+            @RequestParam("url") String url,
+            @RequestParam(value = "segmentMaxTokens") Integer segmentMaxTokens) {
+        List<AiKnowledgeSegmentDO> segments = segmentService.splitContent(url, segmentMaxTokens);
+        return success(BeanUtils.toBean(segments, AiKnowledgeSegmentRespVO.class));
     }
 
 }

@@ -1,0 +1,5 @@
+### 切片内容
+GET {{baseUrl}}/ai/knowledge/segment/split?url=https://static.iocoder.cn/README_yudao.md&segmentMaxTokens=800
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}

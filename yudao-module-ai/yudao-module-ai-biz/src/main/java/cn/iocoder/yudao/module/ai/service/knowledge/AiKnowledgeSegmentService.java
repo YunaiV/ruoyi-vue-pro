@@ -29,7 +29,7 @@ public interface AiKnowledgeSegmentService {
      * 基于 content 内容，切片创建多个段落
      *
      * @param documentId 知识库文档编号
-     * @param content 文档内容
+     * @param content    文档内容
      */
     void createKnowledgeSegmentBySplitContent(Long documentId, String content);
 
@@ -37,7 +37,7 @@ public interface AiKnowledgeSegmentService {
      * 【异步】基于 content 内容，切片创建多个段落
      *
      * @param documentId 知识库文档编号
-     * @param content 文档内容
+     * @param content    文档内容
      */
     @Async
     default void createKnowledgeSegmentBySplitContentAsync(Long documentId, String content) {
@@ -65,5 +65,14 @@ public interface AiKnowledgeSegmentService {
      * @return 召回的段落
      */
     List<AiKnowledgeSegmentDO> similaritySearch(AiKnowledgeSegmentSearchReqVO reqVO);
+
+    /**
+     * 根据 URL 内容，切片创建多个段落
+     *
+     * @param url              URL 地址
+     * @param segmentMaxTokens 段落最大 Token 数
+     * @return 切片后的段落列表
+     */
+    List<AiKnowledgeSegmentDO> splitContent(String url, Integer segmentMaxTokens);
 
 }

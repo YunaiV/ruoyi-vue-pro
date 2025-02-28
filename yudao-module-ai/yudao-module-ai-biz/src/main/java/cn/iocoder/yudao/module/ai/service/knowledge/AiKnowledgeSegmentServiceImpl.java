@@ -75,9 +75,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         VectorStore vectorStore = getVectorStoreById(knowledgeDO);
 
         // 2. 文档切片
-        Document document = new Document(content);
-        TextSplitter textSplitter = buildTokenTextSplitter(documentDO.getSegmentMaxTokens());
-        List<Document> documentSegments = textSplitter.apply(Collections.singletonList(document));
+        List<Document> documentSegments = splitContentByToken(content, documentDO.getSegmentMaxTokens());
 
         // 3.1 存储切片
         List<AiKnowledgeSegmentDO> segmentDOs = convertList(documentSegments, segment -> {
@@ -86,7 +84,8 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
             }
             return new AiKnowledgeSegmentDO().setKnowledgeId(documentDO.getKnowledgeId()).setDocumentId(documentId)
                     .setContent(segment.getText()).setContentLength(segment.getText().length())
-                    .setVectorId(AiKnowledgeSegmentDO.VECTOR_ID_EMPTY).setTokens(tokenCountEstimator.estimate(segment.getText()))
+                    .setVectorId(AiKnowledgeSegmentDO.VECTOR_ID_EMPTY)
+                    .setTokens(tokenCountEstimator.estimate(segment.getText()))
                     .setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
         segmentMapper.insertBatch(segmentDOs);
@@ -180,6 +179,26 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         return segmentMapper.selectListByVectorIds(convertList(documents, Document::getId));
     }
 
+    @Override
+    public List<AiKnowledgeSegmentDO> splitContent(String url, Integer segmentMaxTokens) {
+        // 1. 读取 URL 内容
+        String content = knowledgeDocumentService.readUrl(url);
+
+        // 2. 文档切片
+        List<Document> documentSegments = splitContentByToken(content, segmentMaxTokens);
+
+        // 3. 转换为段落对象
+        return convertList(documentSegments, segment -> {
+            if (StrUtil.isEmpty(segment.getText())) {
+                return null;
+            }
+            return new AiKnowledgeSegmentDO()
+                    .setContent(segment.getText())
+                    .setContentLength(segment.getText().length())
+                    .setTokens(tokenCountEstimator.estimate(segment.getText()));
+        });
+    }
+
     /**
      * 校验段落是否存在
      *
@@ -200,6 +219,11 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
 
     private VectorStore getVectorStoreById(Long knowledgeId) {
         return getVectorStoreById(knowledgeService.validateKnowledgeExists(knowledgeId));
+    }
+
+    private static List<Document> splitContentByToken(String content, Integer segmentMaxTokens) {
+        TextSplitter textSplitter = buildTokenTextSplitter(segmentMaxTokens);
+        return textSplitter.apply(Collections.singletonList(new Document(content)));
     }
 
     private static TextSplitter buildTokenTextSplitter(Integer segmentMaxTokens) {
