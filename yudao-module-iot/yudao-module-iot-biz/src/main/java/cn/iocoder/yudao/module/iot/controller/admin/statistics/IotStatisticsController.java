@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.iot.controller.admin.statistics;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsDeviceMessageSummaryRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsSummaryRespVO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.data.IotDeviceLogService;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Tag(name = "管理后台 - IoT 数据统计")
 @RestController
@@ -35,38 +37,41 @@ public class IotStatisticsController {
     private IotDeviceLogService deviceLogService;
 
     // TODO @super：description 非必要，可以不写哈
-    @GetMapping("/main")
-    @Operation(summary = "获取首页的数据统计", description = "用于IOT首页的数据统计")
-    public CommonResult<IotStatisticsRespVO> getIotMainStats(@Valid IotStatisticsReqVO reqVO){
-        // TODO @super：新增 get-summary 接口，返回：总数、今日新增、数量、状态
-        IotStatisticsRespVO iotStatisticsRespVO = new IotStatisticsRespVO();
+    @GetMapping("/get-summary")
+    @Operation(summary = "获取IOT数据统计")
+    public CommonResult<IotStatisticsSummaryRespVO> getIotStatisticsSummary(){
+        IotStatisticsSummaryRespVO respVO = new IotStatisticsSummaryRespVO();
         // 获取总数
-        iotStatisticsRespVO.setCategoryTotal(productCategoryService.getProductCategoryCount(null));
-        iotStatisticsRespVO.setProductTotal(productService.getProductCount(null));
-        iotStatisticsRespVO.setDeviceTotal(deviceService.getDeviceCount(null));
-        iotStatisticsRespVO.setReportTotal(deviceLogService.getDeviceLogCount(null));
+        respVO.setProductCategoryCount(productCategoryService.getProductCategoryCount(null));
+        respVO.setProductCount(productService.getProductCount(null));
+        respVO.setDeviceCount(deviceService.getDeviceCount(null));
+        respVO.setDeviceMessageCount(deviceLogService.getDeviceLogCount(null));
 
         // 获取今日新增数量
         LocalDateTime todayStart = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
-        iotStatisticsRespVO.setCategoryTodayTotal(productCategoryService.getProductCategoryCount(todayStart));
-        iotStatisticsRespVO.setProductTodayTotal(productService.getProductCount(todayStart));
-        iotStatisticsRespVO.setDeviceTodayTotal(deviceService.getDeviceCount(todayStart));
-        iotStatisticsRespVO.setReportTodayTotal(deviceLogService.getDeviceLogCount(todayStart));
+        respVO.setProductCategoryTodayCount(productCategoryService.getProductCategoryCount(todayStart));
+        respVO.setProductTodayCount(productService.getProductCount(todayStart));
+        respVO.setDeviceTodayCount(deviceService.getDeviceCount(todayStart));
+        respVO.setDeviceMessageTodayCount(deviceLogService.getDeviceLogCount(todayStart));
 
         // 获取各个品类下设备数量统计
-        iotStatisticsRespVO.setDeviceStatsOfCategory(
-            productCategoryService.getDeviceCountsOfProductCategory()
-        );
+        respVO.setProductCategoryDeviceCounts(productCategoryService.getProductCategoryDeviceCountMap());
 
         // 获取设备状态数量统计
-        iotStatisticsRespVO.setOnlineTotal(deviceService.getDeviceCountByState(IotDeviceStateEnum.ONLINE.getState()));
-        iotStatisticsRespVO.setOfflineTotal(deviceService.getDeviceCountByState(IotDeviceStateEnum.OFFLINE.getState()));
-        iotStatisticsRespVO.setNeverOnlineTotal(deviceService.getDeviceCountByState(IotDeviceStateEnum.INACTIVE.getState()));
+        Map<Integer, Long> deviceCountMap = deviceService.getDeviceCountMapByState();
+        respVO.setDeviceOnlineCount(deviceCountMap.getOrDefault(IotDeviceStateEnum.ONLINE.getState(), 0L));
+        respVO.setDeviceOfflineCount(deviceCountMap.getOrDefault(IotDeviceStateEnum.OFFLINE.getState(), 0L));
+        respVO.setDeviceInactiveCount(deviceCountMap.getOrDefault(IotDeviceStateEnum.INACTIVE.getState(), 0L));
 
-        // TODO @super：新增 get-log-summary 接口，返回
+        return CommonResult.success(respVO);
+    }
+    @GetMapping("/get-log-summary")
+    @Operation(summary = "获取IOT上下行消息数据统计")
+    public CommonResult<IotStatisticsDeviceMessageSummaryRespVO> getIotStatisticsDeviceMessageSummary(@Valid IotStatisticsReqVO reqVO){
         // 根据传入时间范围获取设备上下行消息数量统计
-        iotStatisticsRespVO.setDeviceUpMessageStats(deviceLogService.getDeviceLogUpCountByHour(null, reqVO.getStartTime(), reqVO.getEndTime()));
-        iotStatisticsRespVO.setDeviceDownMessageStats(deviceLogService.getDeviceLogDownCountByHour(null, reqVO.getStartTime(), reqVO.getEndTime()));
+        IotStatisticsDeviceMessageSummaryRespVO iotStatisticsRespVO = new IotStatisticsDeviceMessageSummaryRespVO();
+        iotStatisticsRespVO.setUpstreamCounts(deviceLogService.getDeviceLogUpCountByHour(null, reqVO.getStartTime(), reqVO.getEndTime()));
+        iotStatisticsRespVO.setDownstreamCounts(deviceLogService.getDeviceLogDownCountByHour(null, reqVO.getStartTime(), reqVO.getEndTime()));
 
         return CommonResult.success(iotStatisticsRespVO);
     }

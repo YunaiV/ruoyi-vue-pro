@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.module.iot.service.device.data;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceLogPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsDeviceMessageSummaryRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.IotDeviceLogMapper;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
@@ -17,10 +18,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * IoT 设备日志数据 Service 实现类
@@ -71,37 +73,39 @@ public class IotDeviceLogServiceImpl implements IotDeviceLogService {
 
     @Override
     public Long getDeviceLogCount(LocalDateTime createTime) {
-        Long time = null;
-        if (createTime != null) {
             // todo @super：1）LocalDateTimeUtil.toEpochMilli(createTime);2）直接表达式，更简洁 time != null ? createTime.toInstant(ZoneOffset.UTC).toEpochMilli() : null;
-            time = createTime.toInstant(ZoneOffset.UTC).toEpochMilli();
-        }
-        return deviceLogMapper.selectCountByCreateTime(time);
+        return deviceLogMapper.selectCountByCreateTime(createTime != null ? LocalDateTimeUtil.toEpochMilli(createTime) : null);
     }
 
     // TODO @super：加一个参数，Boolean upstream：true 上行，false 下行，null 不过滤
     @Override
-    public List<IotStatisticsRespVO.TimeData> getDeviceLogUpCountByHour(String deviceKey, Long startTime, Long endTime) {
-        try {
-            return deviceLogMapper.selectDeviceLogUpCountByHour(deviceKey, startTime, endTime);
-        } catch (Exception exception) {
-            if (exception.getMessage().contains("Table does not exist")) {
-                return new ArrayList<>();
-            }
-            throw exception;
-        }
+    public List<Map<Long, Integer>> getDeviceLogUpCountByHour(String deviceKey, Long startTime, Long endTime) {
+        List<Map<String, Object>> list = deviceLogMapper.selectDeviceLogUpCountByHour(deviceKey, startTime, endTime);
+        return list.stream()
+                .map(map -> {
+                    // 从Timestamp获取时间戳
+                    Timestamp timestamp = (Timestamp) map.get("time");
+                    Long timeMillis = timestamp.getTime();
+                    // 消息数量转换
+                    Integer count = ((Number) map.get("data")).intValue();
+                    return Map.of(timeMillis, count);
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<IotStatisticsRespVO.TimeData> getDeviceLogDownCountByHour(String deviceKey, Long startTime, Long endTime) {
-        try {
-            return deviceLogMapper.selectDeviceLogDownCountByHour(deviceKey, startTime, endTime);
-        } catch (Exception exception) {
-            if (exception.getMessage().contains("Table does not exist")) {
-                return new ArrayList<>();
-            }
-            throw exception;
-        }
+    public List<Map<Long, Integer>> getDeviceLogDownCountByHour(String deviceKey, Long startTime, Long endTime) {
+        List<Map<String, Object>> list = deviceLogMapper.selectDeviceLogDownCountByHour(deviceKey, startTime, endTime);
+        return list.stream()
+                .map(map -> {
+                    // 从Timestamp获取时间戳
+                    Timestamp timestamp = (Timestamp) map.get("time");
+                    Long timeMillis = timestamp.getTime();
+                    // 消息数量转换
+                    Integer count = ((Number) map.get("data")).intValue();
+                    return Map.of(timeMillis, count);
+                })
+                .collect(Collectors.toList());
     }
 
 }

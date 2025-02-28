@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.iot.service.product;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.category.IotProductCategoryPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.category.IotProductCategorySaveReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductCategoryDO;
 import jakarta.validation.Valid;
 
@@ -100,6 +99,6 @@ public interface IotProductCategoryService {
      *
      * @return 品类设备统计列表
      */
-    List<IotStatisticsRespVO.DataItem> getDeviceCountsOfProductCategory();
+    Map<String, Integer> getProductCategoryDeviceCountMap();
 
 }

@@ -5,8 +5,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.category.IotProductCategoryPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.category.IotProductCategorySaveReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsRespVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductCategoryDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.product.IotProductCategoryMapper;
@@ -16,11 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PRODUCT_CATEGORY_NOT_EXISTS;
@@ -103,54 +97,30 @@ public class IotProductCategoryServiceImpl implements IotProductCategoryService 
     }
 
     @Override
-    public List<IotStatisticsRespVO.DataItem> getDeviceCountsOfProductCategory() {
+    public Map<String, Integer> getProductCategoryDeviceCountMap() {
         // 1. 获取所有数据
         List<IotProductCategoryDO> categoryList = productCategoryMapper.selectList();
         List<IotProductDO> productList = productService.getProductList();
         // TODO @super：不要 list 查询，返回内存，而是查询一个 Map<productId, count>
-        List<IotDeviceDO> deviceList = deviceService.getDeviceList();
+        Map<Long, Integer> deviceCountMapByProductId = deviceService.getDeviceCountMapByProductId();
 
         // 2. 统计每个分类下的设备数量
         Map<String, Integer> categoryDeviceCountMap = new HashMap<>();
-
+        
         // 2.1 初始化所有分类的计数为0
         for (IotProductCategoryDO category : categoryList) {
             categoryDeviceCountMap.put(category.getName(), 0);
-            // TODO @super：直接这里面计算，不用多个循环。产品本身也不多，不用构建 Map，直接 filter 就好了
-        }
-
-        // 2.2 构建产品ID到分类的映射
-        Map<Long, IotProductCategoryDO> productCategoryMap = new HashMap<>();
-        for (IotProductDO product : productList) {
-            Long categoryId = product.getCategoryId();
-            IotProductCategoryDO category = categoryList.stream()
-                    .filter(c -> c.getId().equals(categoryId))
-                    .findFirst()
-                    .orElse(null);
-            if (category != null) {
-                productCategoryMap.put(product.getId(), category);
+            
+            // 2.2 找到该分类下的所有产品,累加设备数量
+            for (IotProductDO product : productList) {
+                if (Objects.equals(product.getCategoryId(), category.getId())) {
+                    Integer deviceCount = deviceCountMapByProductId.getOrDefault(product.getId(), 0);
+                    categoryDeviceCountMap.merge(category.getName(), deviceCount, Integer::sum);
+                }
             }
         }
 
-        // 2.3 统计每个分类下的设备数量
-        for (IotDeviceDO device : deviceList) {
-            Long productId = device.getProductId();
-            IotProductCategoryDO category = productCategoryMap.get(productId);
-            if (category != null) {
-                String categoryName = category.getName();
-                categoryDeviceCountMap.merge(categoryName, 1, Integer::sum);
-            }
-        }
-
-        // 3. 转换为 DataItem 列表
-        return categoryDeviceCountMap.entrySet().stream()
-                .map(entry -> {
-                    IotStatisticsRespVO.DataItem dataItem = new IotStatisticsRespVO.DataItem();
-                    dataItem.setName(entry.getKey());
-                    dataItem.setValue(entry.getValue());
-                    return dataItem;
-                })
-                .collect(Collectors.toList());
+        return categoryDeviceCountMap;
     }
 
 }

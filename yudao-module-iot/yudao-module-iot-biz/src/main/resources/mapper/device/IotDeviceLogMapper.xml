@@ -65,7 +65,7 @@
         </where>
     </select>
 
-    <select id="selectDeviceLogUpCountByHour" resultType="cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsRespVO$TimeData">
+    <select id="selectDeviceLogUpCountByHour" resultType="java.util.Map">
         SELECT 
             TIMETRUNCATE(ts, 1h) as time,
             COUNT(*) as data 
@@ -93,7 +93,7 @@
         ORDER BY time ASC
     </select>
 
-    <select id="selectDeviceLogDownCountByHour" resultType="cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsRespVO$TimeData">
+    <select id="selectDeviceLogDownCountByHour" resultType="java.util.Map">
         SELECT 
             TIMETRUNCATE(ts, 1h) as time,
             COUNT(*) as data 
