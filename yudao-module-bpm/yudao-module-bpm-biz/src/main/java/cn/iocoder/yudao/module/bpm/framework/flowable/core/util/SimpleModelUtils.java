@@ -873,13 +873,12 @@ public class SimpleModelUtils {
                 if (childProcessSetting.getMultiInstanceSetting().getSourceType().equals(BpmChildProcessMultiInstanceSourceTypeEnum.FIXED_QUANTITY.getType())) {
                     multiInstanceCharacteristics.setLoopCardinality(childProcessSetting.getMultiInstanceSetting().getSource());
                 }
-                if (childProcessSetting.getMultiInstanceSetting().getSourceType().equals(BpmChildProcessMultiInstanceSourceTypeEnum.DIGITAL_FORM.getType()) ||
-                        childProcessSetting.getMultiInstanceSetting().getSourceType().equals(BpmChildProcessMultiInstanceSourceTypeEnum.MULTI_FORM.getType())) {
+                if (childProcessSetting.getMultiInstanceSetting().getSourceType().equals(BpmChildProcessMultiInstanceSourceTypeEnum.NUMBER_FORM.getType()) ||
+                        childProcessSetting.getMultiInstanceSetting().getSourceType().equals(BpmChildProcessMultiInstanceSourceTypeEnum.MULTIPLE_FORM.getType())) {
                     multiInstanceCharacteristics.setInputDataItem(childProcessSetting.getMultiInstanceSetting().getSource());
                 }
-//              TODO @lesan：String.format(approveMethodEnum.getCompletionCondition(), String.format("%.2f", approveRatio / 100D)));
-                multiInstanceCharacteristics.setCompletionCondition(String.format("${ nrOfCompletedInstances/nrOfInstances >= %s}",
-                        String.format("%.2f", childProcessSetting.getMultiInstanceSetting().getCompleteRatio() / 100D)));
+                multiInstanceCharacteristics.setCompletionCondition(String.format(BpmUserTaskApproveMethodEnum.RATIO.getCompletionCondition(),
+                        String.format("%.2f", childProcessSetting.getMultiInstanceSetting().getApproveRatio() / 100D)));
                 callActivity.setLoopCharacteristics(multiInstanceCharacteristics);
                 addExtensionElement(callActivity, CHILD_PROCESS_MULTI_INSTANCE_SOURCE_TYPE, childProcessSetting.getMultiInstanceSetting().getSourceType());
             }
