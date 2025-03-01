@@ -7,12 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 
-// TODO @芋艿：因为下面的，都是有状态的，所以通过 guava 缓存连接，然后通过 RemovalNotification 实现关闭。例如说，一次新建有效期是 10 分钟；
-// TODO @芋艿：mq-redis
-// TODO @芋艿：mq-数据库
-// TODO @芋艿：kafka
-// TODO @芋艿：rocketmq
-// TODO @芋艿：rabbitmq
+// TODO @芋艿：数据库
 // TODO @芋艿：mqtt
 // TODO @芋艿：tcp
 // TODO @芋艿：websocket
@@ -25,6 +20,7 @@ import java.time.Duration;
 @Slf4j
 public abstract class AbstractCacheableDataBridgeExecute implements IotDataBridgeExecute {
 
+    // TODO @huihui：AbstractCacheableDataBridgeExecute<Producer> 这样，下面的 Object, Object 就有了类型；另外 IotDataBridgeDO.Config 可以替代一个 Object 哇，
     /**
      * Producer 缓存
      */
@@ -43,12 +39,14 @@ public abstract class AbstractCacheableDataBridgeExecute implements IotDataBridg
                 }
             })
             .build(new CacheLoader<Object, Object>() {
+
                 @Override
                 public Object load(Object config) throws Exception {
                     Object producer = initProducer(config);
                     log.info("[PRODUCER_CACHE][配置({}) 对应的 producer 已创建并启动]", config);
                     return producer;
                 }
+
             });
 
     /**
@@ -77,4 +75,4 @@ public abstract class AbstractCacheableDataBridgeExecute implements IotDataBridg
      */
     protected abstract void closeProducer(Object producer);
 
-} 
+}

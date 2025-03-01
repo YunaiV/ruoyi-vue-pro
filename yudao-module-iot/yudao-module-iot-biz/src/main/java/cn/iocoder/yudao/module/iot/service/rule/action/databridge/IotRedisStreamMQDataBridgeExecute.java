@@ -42,6 +42,7 @@ public class IotRedisStreamMQDataBridgeExecute extends AbstractCacheableDataBrid
     }
 
     @SuppressWarnings("unchecked")
+    // TODO @huihui：try catch 交给父类来做，子类不处理异常
     private void executeRedisStream(IotDeviceMessage message, IotDataBridgeDO.RedisStreamMQConfig config) {
         try {
             // 1. 获取 RedisTemplate
@@ -71,6 +72,7 @@ public class IotRedisStreamMQDataBridgeExecute extends AbstractCacheableDataBrid
             serverConfig.setPassword(redisConfig.getPassword());
         }
 
+        // TODO @huihui：看看能不能简化一些。按道理说，不用这么多的哈。
         // 2.1 创建 RedissonClient
         RedissonClient redisson = Redisson.create(redissonConfig);
         // 2.2 创建并配置 RedisTemplate
@@ -89,6 +91,7 @@ public class IotRedisStreamMQDataBridgeExecute extends AbstractCacheableDataBrid
 
     @Override
     protected void closeProducer(Object producer) {
+        // TODO @huihui：try catch 交给父类来做。子类不处理异常
         if (producer instanceof RedisTemplate) {
             RedisConnectionFactory factory = ((RedisTemplate<?, ?>) producer).getConnectionFactory();
             try {
@@ -101,7 +104,7 @@ public class IotRedisStreamMQDataBridgeExecute extends AbstractCacheableDataBrid
         }
     }
 
-
+    // TODO @huihui：看看能不能简化一些。按道理说，不用这么多的哈。
     public static RedisSerializer<?> buildRedisSerializer() {
         RedisSerializer<Object> json = RedisSerializer.json();
         // 解决 LocalDateTime 的序列化

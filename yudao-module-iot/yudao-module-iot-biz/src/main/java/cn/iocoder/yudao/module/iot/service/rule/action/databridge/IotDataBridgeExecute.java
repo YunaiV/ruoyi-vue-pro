@@ -11,6 +11,8 @@ import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
  */
 public interface IotDataBridgeExecute {
 
+    // TODO @huihui：要不搞个 getType？然后 execute0 由子类实现。这样，子类的 executeRedisStream ，其实就是 execute0 了。
+
     /**
      * 执行数据桥梁操作
      *

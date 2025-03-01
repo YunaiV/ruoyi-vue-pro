@@ -51,6 +51,7 @@ public class IotRabbitMQDataBridgeExecute extends AbstractCacheableDataBridgeExe
     }
 
     @Override
+    @SuppressWarnings("resource")
     protected Object initProducer(Object config) throws Exception {
         IotDataBridgeDO.RabbitMQConfig rabbitConfig = (IotDataBridgeDO.RabbitMQConfig) config;
 
