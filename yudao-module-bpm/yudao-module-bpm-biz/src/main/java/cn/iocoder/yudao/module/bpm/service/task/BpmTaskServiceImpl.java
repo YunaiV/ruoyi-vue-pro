@@ -122,6 +122,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (StrUtil.isNotEmpty(pageVO.getCategory())) {
             taskQuery.taskCategory(pageVO.getCategory());
         }
+        if (StrUtil.isNotEmpty(pageVO.getProcessDefinitionKey())) {
+            taskQuery.processDefinitionKey(pageVO.getProcessDefinitionKey());
+        }
         if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
             taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[0]));
             taskQuery.taskCreatedBefore(DateUtils.of(pageVO.getCreateTime()[1]));
