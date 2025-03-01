@@ -40,6 +40,7 @@ public interface ErrorCodeConstants {
     ErrorCode PROCESS_INSTANCE_START_USER_CAN_START = new ErrorCode(1_009_004_005, "发起流程失败，你没有权限发起该流程");
     ErrorCode PROCESS_INSTANCE_CANCEL_FAIL_NOT_ALLOW = new ErrorCode(1_009_004_005, "流程取消失败，该流程不允许取消");
     ErrorCode PROCESS_INSTANCE_HTTP_TRIGGER_CALL_ERROR = new ErrorCode(1_009_004_006, "流程 Http 触发器请求调用失败");
+    ErrorCode PROCESS_INSTANCE_APPROVE_USER_SELECT_ASSIGNEES_NOT_CONFIG = new ErrorCode(1_009_004_007, "任务({})的下一个节点审批人未配置");
 
     // ========== 流程任务 1-009-005-000 ==========
     ErrorCode TASK_OPERATE_FAIL_ASSIGN_NOT_SELF = new ErrorCode(1_009_005_001, "操作失败，原因：该任务的审批人不是你");

@@ -530,9 +530,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (CollUtil.isNotEmpty(reqVO.getVariables())) {
             Map<String, Object> variables = FlowableUtils.filterTaskFormVariable(reqVO.getVariables());
             // 校验传递的参数中是否为下一个将要执行的任务节点
-            validateNextAssignees(task.getTaskDefinitionKey(), reqVO.getVariables(), bpmnModel, reqVO.getNextAssignees(), instance);
+            validateAndSetNextAssignees(task.getTaskDefinitionKey(), reqVO.getVariables(), bpmnModel, reqVO.getNextAssignees(), instance);
             // 如果有下一个审批人，则设置到流程变量中
-            // TODO @小北：validateNextAssignees 升级成 validateAndSetNextAssignees，然后里面吧下面这一小段逻辑，抽进去如何？
             if (CollUtil.isNotEmpty(reqVO.getNextAssignees())) {
                 // 获取实例中的全部节点数据，避免后续节点的审批人被覆盖
                 // TODO @小北：这里有个需要讨论的点，微信哈；
@@ -567,38 +566,28 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      * @param nextAssignees 下一个节点审批人集合（参数）
      * @param processInstance 流程实例
      */
-    private void validateNextAssignees(String taskDefinitionKey, Map<String, Object> variables, BpmnModel bpmnModel,
+    private void validateAndSetNextAssignees(String taskDefinitionKey, Map<String, Object> variables, BpmnModel bpmnModel,
                                        Map<String, List<Long>> nextAssignees, ProcessInstance processInstance) {
         // 1. 获取当前任务节点的信息
         FlowElement flowElement = bpmnModel.getFlowElement(taskDefinitionKey);
         // 2. 获取下一个将要执行的节点集合
         List<FlowNode> nextFlowNodes = getNextFlowNodes(flowElement, bpmnModel, variables);
-
         // 3. 循环下一个将要执行的节点集合
         for (FlowNode nextFlowNode : nextFlowNodes) {
-            // 3.1 获取下一个将要执行节点的属性（是否为自选审批人等）
-            // TODO @小北：public static Integer parseCandidateStrategy(FlowElement userTask) 使用这个工具方法哈。
-            Map<String, List<ExtensionElement>> extensionElements = nextFlowNode.getExtensionElements();
-            List<ExtensionElement> elements = extensionElements.get(BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY);
-            if (CollUtil.isEmpty(elements)) {
-                continue;
-            }
-            // 3.2 获取节点中的审批人策略
-            Integer candidateStrategy = Integer.valueOf(elements.get(0).getElementText());
-            // 3.3 获取流程实例中的发起人自选审批人
+            // 3.1 获取下一个将要执行节点中的审批人策略
+            Integer candidateStrategy = parseCandidateStrategy(nextFlowNode);
+            // 3.2 获取流程实例中的发起人自选审批人
             Map<String, List<Long>> startUserSelectAssignees = FlowableUtils.getStartUserSelectAssignees(processInstance.getProcessVariables());
             List<Long> startUserSelectAssignee = startUserSelectAssignees.get(nextFlowNode.getId());
-            // 3.4 如果节点中的审批人策略为 发起人自选，并且该节点的审批人为空
+            // 3.3 如果节点中的审批人策略为 发起人自选，并且该节点的审批人为空
             if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy()) && CollUtil.isEmpty(startUserSelectAssignee)) {
-                // 先判断前端传递的参数节点节点是否为将要执行的节点
-                // TODO @小北：!nextAssignees.containsKey(nextFlowNode.getId())、和 CollUtil.isEmpty(nextAssignees.get(nextFlowNode.getId()))) 是不是等价的？
+                // 判断节点是否为执行节点
                 if (!nextAssignees.containsKey(nextFlowNode.getId())) {
                     throw exception(TASK_TARGET_NODE_NOT_EXISTS, nextFlowNode.getName());
                 }
-                // 如果前端传递的节点为空，则抛出异常
-                // TODO @小北：换一个错误码哈。
+                // 判断节点的审批人是否配置
                 if (CollUtil.isEmpty(nextAssignees.get(nextFlowNode.getId()))) {
-                    throw exception(PROCESS_INSTANCE_START_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
+                    throw exception(PROCESS_INSTANCE_APPROVE_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
                 }
             }
             // TODO @小北：加一个“审批人选择”的校验；
