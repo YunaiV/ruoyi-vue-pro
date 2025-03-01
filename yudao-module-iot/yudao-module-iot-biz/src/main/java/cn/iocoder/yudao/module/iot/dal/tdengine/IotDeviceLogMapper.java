@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.dal.tdengine;
 
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceLogPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.annotation.TDengineDS;
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
@@ -10,6 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 设备日志 {@link IotDeviceLogDO} Mapper 接口
@@ -60,27 +60,17 @@ public interface IotDeviceLogMapper {
     // TODO @super：1）上行、下行，不写在 mapper 里，而是通过参数传递，这样，selectDeviceLogUpCountByHour、selectDeviceLogDownCountByHour 可以合并；
     //  TODO @super：2）不能只基于 identifier 来计算，而是要 type + identifier 成对
     /**
-     * 获得每个小时设备上行消息数量统计
-     *
-     * @param deviceKey 设备标识
-     * @param startTime 开始时间
-     * @param endTime 结束时间
-     * @return 每小时消息数量统计
+     * 查询每个小时设备上行消息数量
      */
-    List<IotStatisticsRespVO.TimeData> selectDeviceLogUpCountByHour(@Param("deviceKey") String deviceKey,
-                                                                    @Param("startTime") Long startTime,
-                                                                    @Param("endTime") Long endTime);
+    List<Map<String, Object>> selectDeviceLogUpCountByHour(@Param("deviceKey") String deviceKey,
+                                                          @Param("startTime") Long startTime,
+                                                          @Param("endTime") Long endTime);
 
     /**
-     * 获得每个小时设备下行消息数量统计
-     *
-     * @param deviceKey 设备标识
-     * @param startTime 开始时间
-     * @param endTime 结束时间
-     * @return 每小时消息数量统计
+     * 查询每个小时设备下行消息数量
      */
-    List<IotStatisticsRespVO.TimeData> selectDeviceLogDownCountByHour(@Param("deviceKey") String deviceKey,
-                                                                      @Param("startTime") Long startTime,
-                                                                      @Param("endTime") Long endTime);
+    List<Map<String, Object>> selectDeviceLogDownCountByHour(@Param("deviceKey") String deviceKey,
+                                                            @Param("startTime") Long startTime,
+                                                            @Param("endTime") Long endTime);
 
 }

@@ -37,10 +37,5 @@ public interface IotProductMapper extends BaseMapperX<IotProductDO> {
                 .geIfPresent(IotProductDO::getCreateTime, createTime));
     }
 
-    default List<IotProductDO> selectListByCategoryId(Long categoryId) {
-        return selectList(new LambdaQueryWrapperX<IotProductDO>()
-                .eq(IotProductDO::getCategoryId, categoryId)
-                .orderByDesc(IotProductDO::getId));
-    }
 
 }

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.service.device;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 
@@ -10,6 +11,7 @@ import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * IoT 设备 Service 接口
@@ -111,7 +113,7 @@ public interface IotDeviceService {
     IotDeviceDO getDeviceByDeviceKey(String deviceKey);
 
     /**
-     * ��得设备分页
+     * 获得设备分页
      *
      * @param pageReqVO 分页查询
      * @return IoT 设备分页
@@ -194,13 +196,6 @@ public interface IotDeviceService {
      */
     Long getDeviceCount(@Nullable LocalDateTime createTime);
 
-    /**
-     * 获得设备数量，基于状态
-     *
-     * @param state 状态
-     * @return 设备数量
-     */
-    Long getDeviceCountByState(Integer state);
 
     /**
      * 获得所有设备列表
@@ -216,5 +211,20 @@ public interface IotDeviceService {
      * @return MQTT 连接参数
      */
     IotDeviceMqttConnectionParamsRespVO getMqttConnectionParams(Long deviceId);
+
+    /**
+     * 获得各个产品下的设备数量 Map
+     *
+     * @return key: 产品编号, value: 设备数量
+     */
+    Map<Long, Integer> getDeviceCountMapByProductId();
+
+    /**
+     * 获得各个状态下的设备数量 Map
+     *
+     * @return key: 设备状态枚举 {@link IotDeviceStateEnum}
+     *         value: 设备数量
+     */
+    Map<Integer, Long> getDeviceCountMapByState();
 
 }

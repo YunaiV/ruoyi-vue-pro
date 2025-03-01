@@ -102,13 +102,5 @@ public interface IotProductService {
      */
     Long getProductCount(@Nullable LocalDateTime createTime);
 
-    // TODO @super：用不到的，删除下哈
-    /**
-     * 获得产品列表，基于分类编号
-     *
-     * @param categoryId 分类编号
-     * @return 产品列表
-     */
-    List<IotProductDO> getProductListByCategoryId(Long categoryId);
 
 }

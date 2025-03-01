@@ -8,10 +8,13 @@ import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDevicePa
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * IoT 设备 Mapper
@@ -80,5 +83,19 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
         return selectCount(new LambdaQueryWrapperX<IotDeviceDO>()
                 .eqIfPresent(IotDeviceDO::getState, state));
     }
+
+    /**
+     * 查询指定产品下各状态的设备数量
+     *
+     * @return 设备数量统计列表
+     */
+    List<Map<String, Object>> selectDeviceCountMapByProductId();
+
+    /**
+     * 查询各个状态下的设备数量
+     *
+     * @return 设备数量统计列表
+     */
+    List<Map<String, Object>> selectDeviceCountGroupByState();
 
 }

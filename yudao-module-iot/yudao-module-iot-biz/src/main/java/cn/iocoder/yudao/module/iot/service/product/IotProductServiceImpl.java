@@ -143,9 +143,5 @@ public class IotProductServiceImpl implements IotProductService {
         return productMapper.selectCountByCreateTime(createTime);
     }
 
-    @Override
-    public List<IotProductDO> getProductListByCategoryId(Long categoryId) {
-        return productMapper.selectListByCategoryId(categoryId);
-    }
 
 }

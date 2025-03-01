@@ -35,6 +35,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -430,14 +431,30 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     // TODO @super：是不是 groupby 查询，更高效；不过 controller，还是要考虑 null 的情况；不过可以直接枚举 foreach 处理下
-    @Override
-    public Long getDeviceCountByState(Integer state) {
-        return deviceMapper.selectCountByState(state);
-    }
 
     @Override
     public List<IotDeviceDO> getDeviceList() {
         return deviceMapper.selectList();
+    }
+
+    @Override
+    public Map<Long, Integer> getDeviceCountMapByProductId() {
+        // 查询结果转换成Map
+        List<Map<String, Object>> list = deviceMapper.selectDeviceCountMapByProductId();
+        return list.stream().collect(Collectors.toMap(
+            map -> Long.valueOf(map.get("key").toString()),
+            map -> Integer.valueOf(map.get("value").toString())
+        ));
+    }
+
+    @Override
+    public Map<Integer, Long> getDeviceCountMapByState() {
+        // 查询结果转换成Map
+        List<Map<String, Object>> list = deviceMapper.selectDeviceCountGroupByState();
+        return list.stream().collect(Collectors.toMap(
+            map -> Integer.valueOf(map.get("key").toString()),
+            map -> Long.valueOf(map.get("value").toString())
+        ));
     }
 
 }
