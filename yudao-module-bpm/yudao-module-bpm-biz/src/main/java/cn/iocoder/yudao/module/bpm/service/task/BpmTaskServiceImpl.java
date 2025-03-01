@@ -581,11 +581,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             List<Long> startUserSelectAssignee = startUserSelectAssignees.get(nextFlowNode.getId());
             // 3.3 如果节点中的审批人策略为 发起人自选，并且该节点的审批人为空
             if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy()) && CollUtil.isEmpty(startUserSelectAssignee)) {
-                // 判断节点是否为执行节点
+                // 判断节点是否为执行节点，仅校验节点
                 if (!nextAssignees.containsKey(nextFlowNode.getId())) {
                     throw exception(TASK_TARGET_NODE_NOT_EXISTS, nextFlowNode.getName());
                 }
-                // 判断节点的审批人是否配置
+                // 判断节点的审批人是否配置，节点存在，但未配置审批人
                 if (CollUtil.isEmpty(nextAssignees.get(nextFlowNode.getId()))) {
                     throw exception(PROCESS_INSTANCE_APPROVE_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
                 }
