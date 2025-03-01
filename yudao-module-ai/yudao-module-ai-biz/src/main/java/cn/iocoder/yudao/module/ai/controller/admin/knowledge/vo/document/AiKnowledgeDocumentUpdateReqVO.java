@@ -1,12 +1,9 @@
 package cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document;
 
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-// TODO @芋艿：稍后优化
 @Schema(description = "管理后台 - AI 知识库文档更新 Request VO")
 @Data
 public class AiKnowledgeDocumentUpdateReqVO {
@@ -18,8 +15,7 @@ public class AiKnowledgeDocumentUpdateReqVO {
     @Schema(description = "名称", example = "Java 开发手册")
     private String name;
 
-    @Schema(description = "是否启用", example = "1")
-    @InEnum(CommonStatusEnum.class)
-    private Integer status;
+    @Schema(description = "分片最大 Token 数", example = "1000")
+    private Integer segmentMaxTokens;
 
 }

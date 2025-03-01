@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import org.hibernate.validator.constraints.URL;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,7 +63,7 @@ public class AiKnowledgeSegmentController {
             @Parameter(name = "segmentMaxTokens", description = "分段的最大 Token 数", required = true)
     })
     public CommonResult<List<AiKnowledgeSegmentRespVO>> splitContent(
-            @RequestParam("url") String url,
+            @RequestParam("url") @URL String url,
             @RequestParam(value = "segmentMaxTokens") Integer segmentMaxTokens) {
         List<AiKnowledgeSegmentDO> segments = segmentService.splitContent(url, segmentMaxTokens);
         return success(BeanUtils.toBean(segments, AiKnowledgeSegmentRespVO.class));

@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowl
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentCreateListReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateStatusReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeDocumentService;
@@ -47,14 +48,14 @@ public class AiKnowledgeDocumentController {
     }
 
     @PostMapping("/create")
-    @Operation(summary = "新建文档")
+    @Operation(summary = "新建文档（单个）")
     public CommonResult<Long> createKnowledgeDocument(@RequestBody @Valid AiKnowledgeDocumentCreateReqVO reqVO) {
         Long id = documentService.createKnowledgeDocument(reqVO);
         return success(id);
     }
 
     @PostMapping("/create-list")
-    @Operation(summary = "批量新建文档")
+    @Operation(summary = "新建文档（多个）")
     public CommonResult<List<Long>> createKnowledgeDocumentList(
             @RequestBody @Valid AiKnowledgeDocumentCreateListReqVO reqVO) {
         List<Long> ids = documentService.createKnowledgeDocumentList(reqVO);
@@ -65,6 +66,14 @@ public class AiKnowledgeDocumentController {
     @Operation(summary = "更新文档")
     public CommonResult<Boolean> updateKnowledgeDocument(@Valid @RequestBody AiKnowledgeDocumentUpdateReqVO reqVO) {
         documentService.updateKnowledgeDocument(reqVO);
+        return success(true);
+    }
+
+    @PutMapping("/update-status")
+    @Operation(summary = "更新文档状态")
+    public CommonResult<Boolean> updateKnowledgeDocumentStatus(
+            @Valid @RequestBody AiKnowledgeDocumentUpdateStatusReqVO reqVO) {
+        documentService.updateKnowledgeDocumentStatus(reqVO);
         return success(true);
     }
 

@@ -59,6 +59,13 @@ public interface AiKnowledgeSegmentService {
     void updateKnowledgeSegmentStatus(AiKnowledgeSegmentUpdateStatusReqVO reqVO);
 
     /**
+     * 根据文档编号删除段落
+     *
+     * @param documentId 文档编号
+     */
+    void deleteKnowledgeSegmentByDocumentId(Long documentId);
+
+    /**
      * 召回段落
      *
      * @param reqVO 召回请求信息

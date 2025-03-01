@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.ai.service.knowledge;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateStatusReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentCreateListReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
@@ -10,14 +11,14 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO
 import java.util.List;
 
 /**
- * AI 知识库-文档 Service 接口
+ * AI 知识库文档 Service 接口
  *
  * @author xiaoxin
  */
 public interface AiKnowledgeDocumentService {
 
     /**
-     * 创建文档
+     * 创建文档（单个）
      *
      * @param createReqVO 文档创建 Request VO
      * @return 文档编号
@@ -25,7 +26,7 @@ public interface AiKnowledgeDocumentService {
     Long createKnowledgeDocument(AiKnowledgeDocumentCreateReqVO createReqVO);
 
     /**
-     * 批量创建文档
+     * 创建文档（多个）
      *
      * @param createListReqVO 批量创建 Request VO
      * @return 文档编号列表
@@ -54,6 +55,13 @@ public interface AiKnowledgeDocumentService {
      * @param reqVO 更新信息
      */
     void updateKnowledgeDocument(AiKnowledgeDocumentUpdateReqVO reqVO);
+
+    /**
+     * 更新文档状态
+     *
+     * @param reqVO 更新状态信息
+     */
+    void updateKnowledgeDocumentStatus(AiKnowledgeDocumentUpdateStatusReqVO reqVO);
 
     /**
      * 校验文档是否存在

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.service.knowledge;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -8,6 +9,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateStatusReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentCreateListReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
@@ -88,6 +90,7 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
                     .setKnowledgeId(createListReqVO.getKnowledgeId())
                     .setContent(content).setContentLength(content.length())
                     .setTokens(tokenCountEstimator.estimate(content))
+                    .setSegmentMaxTokens(createListReqVO.getSegmentMaxTokens())
                     .setStatus(CommonStatusEnum.ENABLE.getStatus()));
         }
         knowledgeDocumentMapper.insertBatch(documentDOs);
@@ -111,11 +114,38 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
     @Override
     public void updateKnowledgeDocument(AiKnowledgeDocumentUpdateReqVO reqVO) {
         // 1. 校验文档是否存在
-        validateKnowledgeDocumentExists(reqVO.getId());
+        AiKnowledgeDocumentDO oldDocument = validateKnowledgeDocumentExists(reqVO.getId());
+
         // 2. 更新文档
         AiKnowledgeDocumentDO document = BeanUtils.toBean(reqVO, AiKnowledgeDocumentDO.class);
         knowledgeDocumentMapper.updateById(document);
-        // TODO @芋艿：这里要处理状态的变更
+
+        // 3. 如果处于开启状态，并且最大 tokens 发生变化，则 segment 需要重新索引
+        if (CommonStatusEnum.isEnable(oldDocument.getStatus())
+                && reqVO.getSegmentMaxTokens() != null
+                && ObjUtil.notEqual(reqVO.getSegmentMaxTokens(), oldDocument.getSegmentMaxTokens())) {
+            // 删除旧的文档切片
+            knowledgeSegmentService.deleteKnowledgeSegmentByDocumentId(reqVO.getId());
+            // 重新创建文档切片
+            knowledgeSegmentService.createKnowledgeSegmentBySplitContentAsync(reqVO.getId(), oldDocument.getContent());
+        }
+    }
+
+    @Override
+    public void updateKnowledgeDocumentStatus(AiKnowledgeDocumentUpdateStatusReqVO reqVO) {
+        // 1. 校验存在
+        AiKnowledgeDocumentDO document = validateKnowledgeDocumentExists(reqVO.getId());
+
+        // 2. 更新状态
+        knowledgeDocumentMapper.updateById(new AiKnowledgeDocumentDO()
+                .setId(reqVO.getId()).setStatus(reqVO.getStatus()));
+
+        // 3. 处理文档切片
+        if (CommonStatusEnum.isEnable(reqVO.getStatus())) {
+            knowledgeSegmentService.createKnowledgeSegmentBySplitContentAsync(reqVO.getId(), document.getContent());
+        } else {
+            knowledgeSegmentService.deleteKnowledgeSegmentByDocumentId(reqVO.getId());
+        }
     }
 
     @Override
