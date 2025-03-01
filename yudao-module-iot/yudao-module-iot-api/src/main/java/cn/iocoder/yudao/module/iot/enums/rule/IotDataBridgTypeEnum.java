@@ -22,7 +22,7 @@ public enum IotDataBridgTypeEnum implements ArrayValuable<Integer> {
     MQTT(10),
 
     DATABASE(20),
-    REDIS(21),
+    REDIS_STREAM(21),
 
     ROCKETMQ(30),
     RABBITMQ(31),
