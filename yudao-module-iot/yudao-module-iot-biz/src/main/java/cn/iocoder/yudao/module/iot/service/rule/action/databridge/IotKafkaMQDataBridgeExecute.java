@@ -35,6 +35,7 @@ public class IotKafkaMQDataBridgeExecute extends AbstractCacheableDataBridgeExec
         executeKafka(message, (IotDataBridgeDO.KafkaMQConfig) dataBridge.getConfig());
     }
 
+    @SuppressWarnings("unchecked")
     private void executeKafka(IotDeviceMessage message, IotDataBridgeDO.KafkaMQConfig config) {
         try {
             // 1. 获取或创建 KafkaTemplate

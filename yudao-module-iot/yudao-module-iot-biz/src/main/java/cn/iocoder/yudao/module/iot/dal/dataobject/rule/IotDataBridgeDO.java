@@ -194,10 +194,6 @@ public class IotDataBridgeDO extends BaseDO {
         private Boolean ssl;
 
         /**
-         * 生产者组 ID
-         */
-        private String groupId;
-        /**
          * 主题
          */
         private String topic;
@@ -243,6 +239,35 @@ public class IotDataBridgeDO extends BaseDO {
          * 队列名称
          */
         private String queue;
+    }
+
+    /**
+     * Redis Stream MQ 配置
+     */
+    @Data
+    public static class RedisStreamMQConfig implements Config {
+
+        /**
+         * Redis 服务器地址
+         */
+        private String host;
+        /**
+         * 端口
+         */
+        private Integer port;
+        /**
+         * 密码
+         */
+        private String password;
+        /**
+         * 数据库索引
+         */
+        private Integer database;
+
+        /**
+         * 主题
+         */
+        private String topic;
     }
 
 }

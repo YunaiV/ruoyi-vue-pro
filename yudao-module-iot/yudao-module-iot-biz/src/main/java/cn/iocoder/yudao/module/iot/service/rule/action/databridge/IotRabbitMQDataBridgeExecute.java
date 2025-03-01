@@ -87,7 +87,7 @@ public class IotRabbitMQDataBridgeExecute extends AbstractCacheableDataBridgeExe
         }
     }
 
-    // TODO @芋道源码：测试代码，后续清理
+    // TODO @芋艿：测试代码，后续清理
     public static void main(String[] args) {
         // 1. 创建一个共享的实例
         IotRabbitMQDataBridgeExecute action = new IotRabbitMQDataBridgeExecute();
