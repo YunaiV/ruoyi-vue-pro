@@ -30,6 +30,12 @@ public class BpmnVariableConstants {
      */
     public static final String PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES = "PROCESS_START_USER_SELECT_ASSIGNEES";
     /**
+     * 流程实例的变量 - 审批人选择的审批人 Map
+     *
+     * @see ProcessInstance#getProcessVariables()
+     */
+    public static final String PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES = "PROCESS_APPROVE_USER_SELECT_ASSIGNEES";
+    /**
      * 流程实例的变量 - 发起用户 ID
      *
      * @see ProcessInstance#getProcessVariables()
