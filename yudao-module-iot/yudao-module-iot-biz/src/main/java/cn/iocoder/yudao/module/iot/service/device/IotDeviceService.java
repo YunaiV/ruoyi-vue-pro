@@ -196,14 +196,6 @@ public interface IotDeviceService {
      */
     Long getDeviceCount(@Nullable LocalDateTime createTime);
 
-
-    /**
-     * 获得所有设备列表
-     *
-     * @return 设备列表
-     */
-    List<IotDeviceDO> getDeviceList();
-
     /**
      * 获取 MQTT 连接参数
      *

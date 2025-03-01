@@ -106,11 +106,9 @@ public class IotProductCategoryServiceImpl implements IotProductCategoryService 
 
         // 2. 统计每个分类下的设备数量
         Map<String, Integer> categoryDeviceCountMap = new HashMap<>();
-        
-        // 2.1 初始化所有分类的计数为0
         for (IotProductCategoryDO category : categoryList) {
             categoryDeviceCountMap.put(category.getName(), 0);
-            
+            // TODO @super：CollectionUtils.getSumValue()，看看能不能简化下
             // 2.2 找到该分类下的所有产品,累加设备数量
             for (IotProductDO product : productList) {
                 if (Objects.equals(product.getCategoryId(), category.getId())) {
@@ -119,7 +117,6 @@ public class IotProductCategoryServiceImpl implements IotProductCategoryService 
                 }
             }
         }
-
         return categoryDeviceCountMap;
     }
 

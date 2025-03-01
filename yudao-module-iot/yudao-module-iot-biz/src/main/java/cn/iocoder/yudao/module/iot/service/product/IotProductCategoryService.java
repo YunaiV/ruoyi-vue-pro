@@ -93,9 +93,8 @@ public interface IotProductCategoryService {
      */
     Long getProductCategoryCount(@Nullable LocalDateTime createTime);
 
-    // TODO @super：1）Map<ProductCategory, Count> 虽然有点怪哈，然后 Controller 按需转换成 Map<String, Integer> ；2）名字 getProductCategoryDeviceCountMap 方法
     /**
-     * 获得各个品类下设备数量统计
+     * 获得各个品类下设备数量统计，其中 key 是产品分类名
      *
      * @return 品类设备统计列表
      */

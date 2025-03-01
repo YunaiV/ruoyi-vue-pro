@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.iot.service.device.data;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceLogPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsDeviceMessageSummaryRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 
@@ -57,8 +56,8 @@ public interface IotDeviceLogService {
      * @return key: 时间戳, value: 消息数量
      */
     List<Map<Long, Integer>> getDeviceLogUpCountByHour(@Nullable String deviceKey,
-                                                                                     @Nullable Long startTime,
-                                                                                     @Nullable Long endTime);
+                                                       @Nullable Long startTime,
+                                                       @Nullable Long endTime);
 
     /**
      * 获得每个小时设备下行消息数量统计
@@ -69,7 +68,7 @@ public interface IotDeviceLogService {
      * @return key: 时间戳, value: 消息数量
      */
     List<Map<Long, Integer>> getDeviceLogDownCountByHour(@Nullable String deviceKey,
-                                                  @Nullable Long startTime,
-                                                  @Nullable Long endTime);
+                                                         @Nullable Long startTime,
+                                                         @Nullable Long endTime);
 
 }

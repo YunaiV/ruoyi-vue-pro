@@ -63,14 +63,14 @@ public interface IotDeviceLogMapper {
      * 查询每个小时设备上行消息数量
      */
     List<Map<String, Object>> selectDeviceLogUpCountByHour(@Param("deviceKey") String deviceKey,
-                                                          @Param("startTime") Long startTime,
-                                                          @Param("endTime") Long endTime);
+                                                           @Param("startTime") Long startTime,
+                                                           @Param("endTime") Long endTime);
 
     /**
      * 查询每个小时设备下行消息数量
      */
     List<Map<String, Object>> selectDeviceLogDownCountByHour(@Param("deviceKey") String deviceKey,
-                                                            @Param("startTime") Long startTime,
-                                                            @Param("endTime") Long endTime);
+                                                             @Param("startTime") Long startTime,
+                                                             @Param("endTime") Long endTime);
 
 }

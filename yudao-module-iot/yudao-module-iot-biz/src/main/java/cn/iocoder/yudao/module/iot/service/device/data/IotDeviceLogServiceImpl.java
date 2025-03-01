@@ -7,7 +7,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceLogPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsDeviceMessageSummaryRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.IotDeviceLogMapper;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
@@ -73,13 +72,13 @@ public class IotDeviceLogServiceImpl implements IotDeviceLogService {
 
     @Override
     public Long getDeviceLogCount(LocalDateTime createTime) {
-            // todo @super：1）LocalDateTimeUtil.toEpochMilli(createTime);2）直接表达式，更简洁 time != null ? createTime.toInstant(ZoneOffset.UTC).toEpochMilli() : null;
         return deviceLogMapper.selectCountByCreateTime(createTime != null ? LocalDateTimeUtil.toEpochMilli(createTime) : null);
     }
 
     // TODO @super：加一个参数，Boolean upstream：true 上行，false 下行，null 不过滤
     @Override
     public List<Map<Long, Integer>> getDeviceLogUpCountByHour(String deviceKey, Long startTime, Long endTime) {
+        // TODO @super：不能只基于数据库统计。因为有一些小时，可能出现没数据的情况，导致前端展示的图是不全的。可以参考 CrmStatisticsCustomerService 来实现
         List<Map<String, Object>> list = deviceLogMapper.selectDeviceLogUpCountByHour(deviceKey, startTime, endTime);
         return list.stream()
                 .map(map -> {
@@ -93,6 +92,7 @@ public class IotDeviceLogServiceImpl implements IotDeviceLogService {
                 .collect(Collectors.toList());
     }
 
+    // TODO @super：getDeviceLogDownCountByHour 融合到 getDeviceLogUpCountByHour
     @Override
     public List<Map<Long, Integer>> getDeviceLogDownCountByHour(String deviceKey, Long startTime, Long endTime) {
         List<Map<String, Object>> list = deviceLogMapper.selectDeviceLogDownCountByHour(deviceKey, startTime, endTime);

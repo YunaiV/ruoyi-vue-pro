@@ -4,12 +4,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-@Schema(description = "管理后台 - Iot统计 Request VO")
+@Schema(description = "管理后台 - IoT 统计 Request VO")
 @Data
 public class IotStatisticsReqVO {
 
-    // TODO @supper：times 直接传递哈；
-    // TODO 2super：private 不要丢了
+    // TODO @super：前端传递的时候，还是通过 startTime 和 endTime 传递。后端转成 Long
 
     @Schema(description = "查询起始时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "1658486600000")
     @NotNull(message = "查询起始时间不能为空")

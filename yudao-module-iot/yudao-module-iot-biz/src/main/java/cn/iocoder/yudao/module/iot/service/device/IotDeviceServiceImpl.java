@@ -430,13 +430,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         return deviceMapper.selectCountByCreateTime(createTime);
     }
 
-    // TODO @super：是不是 groupby 查询，更高效；不过 controller，还是要考虑 null 的情况；不过可以直接枚举 foreach 处理下
-
-    @Override
-    public List<IotDeviceDO> getDeviceList() {
-        return deviceMapper.selectList();
-    }
-
+    // TODO @super：简化
     @Override
     public Map<Long, Integer> getDeviceCountMapByProductId() {
         // 查询结果转换成Map
