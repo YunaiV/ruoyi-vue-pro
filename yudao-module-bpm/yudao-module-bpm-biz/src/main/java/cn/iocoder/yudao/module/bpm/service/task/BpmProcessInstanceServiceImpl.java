@@ -175,9 +175,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             }
             startUserId = Long.valueOf(historicProcessInstance.getStartUserId());
             processInstanceStatus = FlowableUtils.getProcessInstanceStatus(historicProcessInstance);
-            // 如果流程变量不为空，则用前端传递的新变量值覆盖历史的流程变量
+            // 合并 DB 和前端传递的流量变量，以前端的为主
             Map<String, Object> historicVariables = historicProcessInstance.getProcessVariables();
-            if (null != processVariables) {
+            if (CollUtil.isNotEmpty(processVariables)) {
                 historicVariables.putAll(processVariables);
             }
             processVariables = historicVariables;

@@ -11,13 +11,10 @@ import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
-import cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
@@ -63,7 +60,6 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -535,9 +531,15 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             Map<String, Object> variables = FlowableUtils.filterTaskFormVariable(reqVO.getVariables());
             // 校验传递的参数中是否为下一个将要执行的任务节点
             validateNextAssignees(task.getTaskDefinitionKey(), reqVO.getVariables(), bpmnModel, reqVO.getNextAssignees(), instance);
-            // 下个节点审批人如果不存在，则由前端传递
+            // 如果有下一个审批人，则设置到流程变量中
+            // TODO @小北：validateNextAssignees 升级成 validateAndSetNextAssignees，然后里面吧下面这一小段逻辑，抽进去如何？
             if (CollUtil.isNotEmpty(reqVO.getNextAssignees())) {
                 // 获取实例中的全部节点数据，避免后续节点的审批人被覆盖
+                // TODO @小北：这里有个需要讨论的点，微信哈；
+                // TODO 因为 PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES 定位是发起人，那么审批人选择的，放在 PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES。目前想到两个方案：
+                // TODO 方案一：增加一个 PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES，然后设置到这里面。然后，BpmTaskCandidateStartUserSelectStrategy 也从这里读
+                // TODO 方案二：也是增加一个 PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES，根据节点审批人类型，放到 PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES、PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES
+                // TODO 方案三：融合成 PROCESS_INSTANCE_VARIABLE_USER_SELECT_ASSIGNEES，不再区分是发起人选择、还是审批人选择。
                 Map<String, List<Long>> hisProcessVariables = FlowableUtils.getStartUserSelectAssignees(instance.getProcessVariables());
                 hisProcessVariables.putAll(reqVO.getNextAssignees());
                 variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES, hisProcessVariables);
@@ -554,45 +556,52 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
 
     /**
-     * 校验传递的参数中是否为下一个将要执行的任务节点
+     * 校验选择的下一个节点的审批人，是否合法
      *
-     * @param taskDefinitionKey 当前任务节点id
+     * 1. 是否有漏选：没有选择审批人
+     * 2. 是否有多选：非下一个节点
+     *
+     * @param taskDefinitionKey 当前任务节点标识
      * @param variables 流程变量
      * @param bpmnModel 流程模型
-     * @param nextActivityNodes 下一个节点审批人集合（参数）
+     * @param nextAssignees 下一个节点审批人集合（参数）
+     * @param processInstance 流程实例
      */
     private void validateNextAssignees(String taskDefinitionKey, Map<String, Object> variables, BpmnModel bpmnModel,
-                                                Map<String, List<Long>> nextActivityNodes,ProcessInstance processInstance){
-        // 1、获取当前任务节点的信息
+                                       Map<String, List<Long>> nextAssignees, ProcessInstance processInstance) {
+        // 1. 获取当前任务节点的信息
         FlowElement flowElement = bpmnModel.getFlowElement(taskDefinitionKey);
-        // 2、获取下一个将要执行的节点集合
+        // 2. 获取下一个将要执行的节点集合
         List<FlowNode> nextFlowNodes = getNextFlowNodes(flowElement, bpmnModel, variables);
-        // 3、循环下一个将要执行的节点集合
+
+        // 3. 循环下一个将要执行的节点集合
         for (FlowNode nextFlowNode : nextFlowNodes) {
-            // 3.1、获取下一个将要执行节点的属性（是否为自选审批人等）
+            // 3.1 获取下一个将要执行节点的属性（是否为自选审批人等）
+            // TODO @小北：public static Integer parseCandidateStrategy(FlowElement userTask) 使用这个工具方法哈。
             Map<String, List<ExtensionElement>> extensionElements = nextFlowNode.getExtensionElements();
             List<ExtensionElement> elements = extensionElements.get(BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY);
-            if (CollUtil.isEmpty(elements)){
+            if (CollUtil.isEmpty(elements)) {
                 continue;
             }
-            // 3.2、获取节点中的审批人策略
+            // 3.2 获取节点中的审批人策略
             Integer candidateStrategy = Integer.valueOf(elements.get(0).getElementText());
-            // 3.3、获取流程实例中的发起人自选审批人
+            // 3.3 获取流程实例中的发起人自选审批人
             Map<String, List<Long>> startUserSelectAssignees = FlowableUtils.getStartUserSelectAssignees(processInstance.getProcessVariables());
             List<Long> startUserSelectAssignee = startUserSelectAssignees.get(nextFlowNode.getId());
-            // 3.4、如果节点中的审批人策略为 发起人自选，并且该节点的审批人为空
+            // 3.4 如果节点中的审批人策略为 发起人自选，并且该节点的审批人为空
             if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy()) && CollUtil.isEmpty(startUserSelectAssignee)) {
                 // 先判断前端传递的参数节点节点是否为将要执行的节点
-                if (!nextActivityNodes.containsKey(nextFlowNode.getId())){
+                // TODO @小北：!nextAssignees.containsKey(nextFlowNode.getId())、和 CollUtil.isEmpty(nextAssignees.get(nextFlowNode.getId()))) 是不是等价的？
+                if (!nextAssignees.containsKey(nextFlowNode.getId())) {
                     throw exception(TASK_TARGET_NODE_NOT_EXISTS, nextFlowNode.getName());
                 }
-                // 如果节点存在，则获取节点中的审批人
-                List<Long> nextAssignees = nextActivityNodes.get(nextFlowNode.getId());
                 // 如果前端传递的节点为空，则抛出异常
-                if (CollUtil.isEmpty(nextAssignees)) {
+                // TODO @小北：换一个错误码哈。
+                if (CollUtil.isEmpty(nextAssignees.get(nextFlowNode.getId()))) {
                     throw exception(PROCESS_INSTANCE_START_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
                 }
             }
+            // TODO @小北：加一个“审批人选择”的校验；
         }
     }
 

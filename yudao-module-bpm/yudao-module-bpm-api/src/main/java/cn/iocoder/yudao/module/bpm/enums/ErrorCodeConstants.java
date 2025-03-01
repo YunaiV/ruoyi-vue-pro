@@ -58,7 +58,6 @@ public interface ErrorCodeConstants {
     ErrorCode TASK_CREATE_FAIL_NO_CANDIDATE_USER = new ErrorCode(1_009_006_003, "操作失败，原因：找不到任务的审批人！");
     ErrorCode TASK_SIGNATURE_NOT_EXISTS = new ErrorCode(1_009_005_015, "签名不能为空！");
     ErrorCode TASK_REASON_REQUIRE = new ErrorCode(1_009_005_016, "审批意见不能为空！");
-    ErrorCode TASK_START_USER_SELECT_NODE_NOT_EXISTS = new ErrorCode(1_009_004_007, "({})不是下一个执行的流程节点！");
 
     // ========== 动态表单模块 1-009-010-000 ==========
     ErrorCode FORM_NOT_EXISTS = new ErrorCode(1_009_010_000, "动态表单不存在");
