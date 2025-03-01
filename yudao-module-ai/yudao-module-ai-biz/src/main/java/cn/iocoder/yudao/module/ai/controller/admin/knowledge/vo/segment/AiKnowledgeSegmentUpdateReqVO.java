@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 
-@Schema(description = "管理后台 - AI 更新 知识库-段落 request VO")
+@Schema(description = "管理后台 - AI 更新 知识库段落 request VO")
 @Data
 public class AiKnowledgeSegmentUpdateReqVO {
 

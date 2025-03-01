@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowle
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentSearchReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentUpdateStatusReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentProcessRespVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
 import org.springframework.scheduling.annotation.Async;
 
@@ -81,5 +82,13 @@ public interface AiKnowledgeSegmentService {
      * @return 切片后的段落列表
      */
     List<AiKnowledgeSegmentDO> splitContent(String url, Integer segmentMaxTokens);
+
+    /**
+     * 获取文档处理进度（多个）
+     *
+     * @param documentIds 文档编号列表
+     * @return 文档处理列表
+     */
+    List<AiKnowledgeSegmentProcessRespVO> getKnowledgeSegmentProcessList(List<Long> documentIds);
 
 }

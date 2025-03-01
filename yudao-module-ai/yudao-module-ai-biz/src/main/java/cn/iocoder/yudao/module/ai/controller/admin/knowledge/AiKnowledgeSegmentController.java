@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowle
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentUpdateStatusReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentProcessRespVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
 import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeSegmentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -67,6 +68,15 @@ public class AiKnowledgeSegmentController {
             @RequestParam(value = "segmentMaxTokens") Integer segmentMaxTokens) {
         List<AiKnowledgeSegmentDO> segments = segmentService.splitContent(url, segmentMaxTokens);
         return success(BeanUtils.toBean(segments, AiKnowledgeSegmentRespVO.class));
+    }
+
+    @GetMapping("/get-process-list")
+    @Operation(summary = "获取文档处理列表")
+    @Parameter(name = "documentIds", description = "文档编号列表", required = true, example = "1,2,3")
+    public CommonResult<List<AiKnowledgeSegmentProcessRespVO>> getKnowledgeSegmentProcessList(
+            @RequestParam("documentIds") List<Long> documentIds) {
+        List<AiKnowledgeSegmentProcessRespVO> list = segmentService.getKnowledgeSegmentProcessList(documentIds);
+        return success(list);
     }
 
 }

@@ -3,3 +3,10 @@ GET {{baseUrl}}/ai/knowledge/segment/split?url=https://static.iocoder.cn/README_
 Content-Type: application/json
 Authorization: Bearer {{token}}
 tenant-id: {{adminTenantId}}
+
+### 获取文档处理列表
+GET {{baseUrl}}/ai/knowledge/segment/get-process-list?documentIds=1,2,3
+Content-Type: application/json
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}
+

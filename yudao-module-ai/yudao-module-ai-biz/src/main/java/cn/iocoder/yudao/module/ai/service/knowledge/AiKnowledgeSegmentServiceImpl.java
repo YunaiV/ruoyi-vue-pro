@@ -6,10 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentPageReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentSearchReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentUpdateReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentUpdateStatusReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.*;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
@@ -250,6 +247,14 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
                 .withMaxNumChunks(Integer.MAX_VALUE)
                 .withKeepSeparator(true) // 保留分隔符
                 .build();
+    }
+
+    @Override
+    public List<AiKnowledgeSegmentProcessRespVO> getKnowledgeSegmentProcessList(List<Long> documentIds) {
+        if (CollUtil.isEmpty(documentIds)) {
+            return Collections.emptyList();
+        }
+        return segmentMapper.selectProcessList(documentIds);
     }
 
 }

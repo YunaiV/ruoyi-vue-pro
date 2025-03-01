@@ -67,8 +67,8 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
                 .setStatus(CommonStatusEnum.ENABLE.getStatus());
         knowledgeDocumentMapper.insert(documentDO);
 
-        // 4. 文档切片入库（同步）
-        knowledgeSegmentService.createKnowledgeSegmentBySplitContent(documentDO.getId(), content);
+        // 4. 文档切片入库（异步）
+        knowledgeSegmentService.createKnowledgeSegmentBySplitContentAsync(documentDO.getId(), content);
         return documentDO.getId();
     }
 
