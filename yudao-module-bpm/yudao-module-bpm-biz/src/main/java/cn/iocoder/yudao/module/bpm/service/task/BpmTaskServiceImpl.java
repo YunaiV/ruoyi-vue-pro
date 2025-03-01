@@ -11,15 +11,20 @@ import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
+import cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskSignTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
@@ -58,6 +63,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -527,7 +533,15 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 其中，variables 是存储动态表单到 local 任务级别。过滤一下，避免 ProcessInstance 系统级的变量被占用
         if (CollUtil.isNotEmpty(reqVO.getVariables())) {
             Map<String, Object> variables = FlowableUtils.filterTaskFormVariable(reqVO.getVariables());
-            // 修改表单的值需要存储到 ProcessInstance 变量
+            // 校验传递的参数中是否为下一个将要执行的任务节点
+            validateNextAssignees(task.getTaskDefinitionKey(), reqVO.getVariables(), bpmnModel, reqVO.getNextAssignees(), instance);
+            // 下个节点审批人如果不存在，则由前端传递
+            if (CollUtil.isNotEmpty(reqVO.getNextAssignees())) {
+                // 获取实例中的全部节点数据，避免后续节点的审批人被覆盖
+                Map<String, List<Long>> hisProcessVariables = FlowableUtils.getStartUserSelectAssignees(instance.getProcessVariables());
+                hisProcessVariables.putAll(reqVO.getNextAssignees());
+                variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES, hisProcessVariables);
+            }
             runtimeService.setVariables(task.getProcessInstanceId(), variables);
             taskService.complete(task.getId(), variables, true);
         } else {
@@ -536,6 +550,50 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 【加签专属】处理加签任务
         handleParentTaskIfSign(task.getParentTaskId());
+    }
+
+
+    /**
+     * 校验传递的参数中是否为下一个将要执行的任务节点
+     *
+     * @param taskDefinitionKey 当前任务节点id
+     * @param variables 流程变量
+     * @param bpmnModel 流程模型
+     * @param nextActivityNodes 下一个节点审批人集合（参数）
+     */
+    private void validateNextAssignees(String taskDefinitionKey, Map<String, Object> variables, BpmnModel bpmnModel,
+                                                Map<String, List<Long>> nextActivityNodes,ProcessInstance processInstance){
+        // 1、获取当前任务节点的信息
+        FlowElement flowElement = bpmnModel.getFlowElement(taskDefinitionKey);
+        // 2、获取下一个将要执行的节点集合
+        List<FlowNode> nextFlowNodes = getNextFlowNodes(flowElement, bpmnModel, variables);
+        // 3、循环下一个将要执行的节点集合
+        for (FlowNode nextFlowNode : nextFlowNodes) {
+            // 3.1、获取下一个将要执行节点的属性（是否为自选审批人等）
+            Map<String, List<ExtensionElement>> extensionElements = nextFlowNode.getExtensionElements();
+            List<ExtensionElement> elements = extensionElements.get(BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY);
+            if (CollUtil.isEmpty(elements)){
+                continue;
+            }
+            // 3.2、获取节点中的审批人策略
+            Integer candidateStrategy = Integer.valueOf(elements.get(0).getElementText());
+            // 3.3、获取流程实例中的发起人自选审批人
+            Map<String, List<Long>> startUserSelectAssignees = FlowableUtils.getStartUserSelectAssignees(processInstance.getProcessVariables());
+            List<Long> startUserSelectAssignee = startUserSelectAssignees.get(nextFlowNode.getId());
+            // 3.4、如果节点中的审批人策略为 发起人自选，并且该节点的审批人为空
+            if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy()) && CollUtil.isEmpty(startUserSelectAssignee)) {
+                // 先判断前端传递的参数节点节点是否为将要执行的节点
+                if (!nextActivityNodes.containsKey(nextFlowNode.getId())){
+                    throw exception(TASK_TARGET_NODE_NOT_EXISTS, nextFlowNode.getName());
+                }
+                // 如果节点存在，则获取节点中的审批人
+                List<Long> nextAssignees = nextActivityNodes.get(nextFlowNode.getId());
+                // 如果前端传递的节点为空，则抛出异常
+                if (CollUtil.isEmpty(nextAssignees)) {
+                    throw exception(PROCESS_INSTANCE_START_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
+                }
+            }
+        }
     }
 
     /**
