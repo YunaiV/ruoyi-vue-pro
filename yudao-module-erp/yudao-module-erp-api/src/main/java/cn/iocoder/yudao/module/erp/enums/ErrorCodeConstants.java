@@ -189,29 +189,31 @@ public interface ErrorCodeConstants {
 
 
     // ========== ERP 采购申请单 1-030-603-000 ==========
-    ErrorCode PURCHASE_REQUEST_NOT_EXISTS = new ErrorCode(1_030_603_000, "采购申请单不存在");
-    ErrorCode PURCHASE_REQUEST_ITEM_NOT_EXISTS = new ErrorCode(1_030_603_000, "采购申请项({})不存在");
-    ErrorCode PURCHASE_REQUEST_OPENED = new ErrorCode(1_030_603_011, "采购申请单({})已开启");
-    ErrorCode PURCHASE_REQUEST_CLOSED = new ErrorCode(1_030_603_012, "采购申请单({})已关闭");
-    ErrorCode PURCHASE_REQUEST_MANUAL_CLOSED = new ErrorCode(1_030_603_013, "采购申请单({})已手动关闭");
-    ErrorCode PURCHASE_REQUEST_UPDATE_FAIL_APPROVE = new ErrorCode(1_030_603_001, "采购申请单({})已审核，无法修改");
-    ErrorCode PURCHASE_REQUEST_DELETE_FAIL_APPROVE = new ErrorCode(1_030_603_002, "采购申请单({})未审核，无法删除");
-    ErrorCode PURCHASE_REQUEST_ADD_FAIL_APPROVE = new ErrorCode(1_030_603_003, "采购申请单添加失败");
-    ErrorCode PURCHASE_REQUEST_UPDATE_FAIL_REQUEST_ID = new ErrorCode(1_030_603_004, "申请单子表id为({})不属于该采购申请单");
-    ErrorCode PURCHASE_REQUEST_ADD_FAIL_PRODUCT = new ErrorCode(1_030_603_005, "采购申请单的产品添加失败");
-    ErrorCode PURCHASE_REQUEST_NO_OUT_OF_BOUNDS = new ErrorCode(1_030_101_006, "采购申请单号编码大于999999,生成失败");
-    ErrorCode PURCHASE_REQUEST_NO_EXISTS = new ErrorCode(1_030_101_007, "生成采购申请单号失败，请重新提交");
-    ErrorCode PURCHASE_REQUEST_PROCESS_FAIL = new ErrorCode(1_030_101_008, "反审核失败，只有已审核的采购申请单才能反审核");
-    ErrorCode PURCHASE_REQUEST_PROCESS_FAIL_CLOSE = new ErrorCode(1_030_101_008, "反审核失败，已关闭的采购申请单不能反审核");
-    ErrorCode PURCHASE_REQUEST_PROCESS_FAIL_ORDERED = new ErrorCode(1_030_101_008, "反审核失败，已订购的采购申请单不能反审核");
-    ErrorCode PURCHASE_REQUEST_APPROVE_FAIL = new ErrorCode(1_030_101_009, "审核失败，只有未审核的采购申请单才能审核");
-    ErrorCode PURCHASE_REQUEST_CLOSE_FAIL  = new ErrorCode(1_030_101_010, "未审核的采购申请单({})不能进行关闭");
-    ErrorCode PURCHASE_REQUEST_UPDATE_FAIL_AUDIT_STATUS  = new ErrorCode(1_030_101_011, "非法审核状态变更({})->({})");
-    ErrorCode PURCHASE_REQUEST_UPDATE_FAIL_ORDER_STATUS  = new ErrorCode(1_030_101_012, "非法采购状态变更({})->({})");
-    ErrorCode PURCHASE_REQUEST_UPDATE_FAIL_OFF_STATUS  = new ErrorCode(1_030_101_013, "非法开关状态变更({})->({})");
-    ErrorCode PURCHASE_REQUEST_UPDATE_FAIL  = new ErrorCode(1_030_101_014, "订单编号({})更新状态失败，请联系管理员");
-    ErrorCode PURCHASE_REQUEST_ITEM_CLOSED  = new ErrorCode(1_030_101_015, "id({})已关闭,采购项无法修改");
-    ErrorCode PURCHASE_REQUEST_ITEM_MANUAL_CLOSED  = new ErrorCode(1_030_101_016, "id({})已手动关闭,采购项无法修改");
+    ErrorCode PURCHASE_REQUEST_NOT_EXISTS = new ErrorCode(1_030_603_100, "采购申请单不存在");
+    ErrorCode PURCHASE_REQUEST_ITEM_NOT_EXISTS = new ErrorCode(1_030_603_101, "采购申请项({})不存在");
+    ErrorCode PURCHASE_REQUEST_OPENED = new ErrorCode(1_030_603_110, "采购申请单({})已开启");
+    ErrorCode PURCHASE_REQUEST_CLOSED = new ErrorCode(1_030_603_111, "采购申请单({})已关闭");
+    ErrorCode PURCHASE_REQUEST_MANUAL_CLOSED = new ErrorCode(1_030_603_112, "采购申请单({})已手动关闭");
+    ErrorCode PURCHASE_REQUEST_UPDATE_FAIL_APPROVE = new ErrorCode(1_030_603_120, "采购申请单({})已审核，无法修改");
+    ErrorCode PURCHASE_REQUEST_DELETE_FAIL_APPROVE = new ErrorCode(1_030_603_121, "采购申请单({})未审核，无法删除");
+    ErrorCode PURCHASE_REQUEST_ADD_FAIL_APPROVE = new ErrorCode(1_030_603_122, "采购申请单添加失败");
+    ErrorCode PURCHASE_REQUEST_UPDATE_FAIL_REQUEST_ID = new ErrorCode(1_030_603_123, "申请单子表id为({})不属于该采购申请单");
+    ErrorCode PURCHASE_REQUEST_ADD_FAIL_PRODUCT = new ErrorCode(1_030_603_124, "采购申请单的产品添加失败");
+    ErrorCode PURCHASE_REQUEST_NO_OUT_OF_BOUNDS = new ErrorCode(1_030_603_130, "采购申请单号编码大于999999,生成失败");
+    ErrorCode PURCHASE_REQUEST_NO_EXISTS = new ErrorCode(1_030_603_131, "生成采购申请单号失败，请重新提交");
+    ErrorCode PURCHASE_REQUEST_PROCESS_FAIL = new ErrorCode(1_030_603_132, "反审核失败，只有已审核的采购申请单才能反审核");
+    ErrorCode PURCHASE_REQUEST_PROCESS_FAIL_CLOSE = new ErrorCode(1_030_603_133, "反审核失败，已关闭的采购申请单不能反审核");
+    ErrorCode PURCHASE_REQUEST_PROCESS_FAIL_ORDERED = new ErrorCode(1_030_603_134, "反审核失败，已订购的采购申请单不能反审核");
+    ErrorCode PURCHASE_REQUEST_APPROVE_FAIL = new ErrorCode(1_030_603_135, "审核失败，只有未审核的采购申请单才能审核");
+    ErrorCode PURCHASE_REQUEST_CLOSE_FAIL = new ErrorCode(1_030_603_136, "未审核的采购申请单({})不能进行关闭");
+    ErrorCode PURCHASE_REQUEST_UPDATE_FAIL_AUDIT_STATUS = new ErrorCode(1_030_603_137, "非法审核状态变更({})->({})");
+    ErrorCode PURCHASE_REQUEST_UPDATE_FAIL_ORDER_STATUS = new ErrorCode(1_030_603_138, "非法采购状态变更({})->({})");
+    ErrorCode PURCHASE_REQUEST_UPDATE_FAIL_OFF_STATUS = new ErrorCode(1_030_603_139, "非法开关状态变更({})->({})");
+    ErrorCode PURCHASE_REQUEST_UPDATE_FAIL = new ErrorCode(1_030_603_140, "订单编号({})更新状态失败，请联系管理员");
+    ErrorCode PURCHASE_REQUEST_ITEM_CLOSED = new ErrorCode(1_030_603_141, "id({})已关闭,采购项无法修改");
+    ErrorCode PURCHASE_REQUEST_ITEM_MANUAL_CLOSED = new ErrorCode(1_030_603_142, "id({})已手动关闭,采购项无法修改");
+//采购子项不存在
+    ErrorCode PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_ID = new ErrorCode(1_030_603_143, "采购请求ID=({})没有子项");
 
     // ========== ERP 海关规则 1-030-604-000 ==========
     ErrorCode CUSTOM_RULE_NOT_EXISTS = new ErrorCode(1_030_604_000, "ERP 海关规则不存在");

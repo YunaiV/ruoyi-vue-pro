@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderPageReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
-import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -46,12 +46,12 @@ public interface ErpPurchaseOrderMapper extends BaseMapperX<ErpPurchaseOrderDO> 
         }
         // 可采购入库
         if (Boolean.TRUE.equals(reqVO.getInEnable())) {
-            query.eq(ErpPurchaseOrderDO::getStatus, ErpAuditStatus.APPROVE.getCode())
+            query.eq(ErpPurchaseOrderDO::getStatus, ErpAuditStatus.APPROVED.getCode())
                     .apply("t.total_in_count < t.total_count");
         }
         // 可采购退货
         if (Boolean.TRUE.equals(reqVO.getReturnEnable())) {
-            query.eq(ErpPurchaseOrderDO::getStatus, ErpAuditStatus.APPROVE.getCode())
+            query.eq(ErpPurchaseOrderDO::getStatus, ErpAuditStatus.APPROVED.getCode())
                     .apply("t.total_return_count < t.total_in_count");
         }
         if (reqVO.getProductId() != null) {

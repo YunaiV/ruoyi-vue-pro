@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.erp.config;
 
-import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
-import cn.iocoder.yudao.module.erp.enums.ErpOffStatus;
-import cn.iocoder.yudao.module.erp.enums.ErpOrderStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpOffStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpOrderStatus;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,9 +22,9 @@ public class PurchaseRequestStateMachine {
         // 审核状态转移
 //        STATUS_TRANSITIONS.put(ErpAuditStatus.DRAFT, Set.of(ErpAuditStatus.SUBMITTED));
 //        STATUS_TRANSITIONS.put(ErpAuditStatus.SUBMITTED, Set.of(ErpAuditStatus.PROCESS));
-        STATUS_TRANSITIONS.put(ErpAuditStatus.PROCESS, Set.of(ErpAuditStatus.PROCESSING,ErpAuditStatus.APPROVE, ErpAuditStatus.REJECTED));
-        STATUS_TRANSITIONS.put(ErpAuditStatus.REVERSED, Set.of(ErpAuditStatus.PROCESSING,ErpAuditStatus.APPROVE, ErpAuditStatus.REJECTED));
-        STATUS_TRANSITIONS.put(ErpAuditStatus.APPROVE, Set.of(ErpAuditStatus.REVERSED));
+        STATUS_TRANSITIONS.put(ErpAuditStatus.PENDING_REVIEW, Set.of(ErpAuditStatus.UNDER_REVIEW,ErpAuditStatus.APPROVED, ErpAuditStatus.REJECTED));
+        STATUS_TRANSITIONS.put(ErpAuditStatus.REVOKED, Set.of(ErpAuditStatus.UNDER_REVIEW,ErpAuditStatus.APPROVED, ErpAuditStatus.REJECTED));
+        STATUS_TRANSITIONS.put(ErpAuditStatus.APPROVED, Set.of(ErpAuditStatus.REVOKED));
 
         // 关闭状态转移
         OFF_STATUS_TRANSITIONS.put(ErpOffStatus.OPEN, Set.of(ErpOffStatus.CLOSED, ErpOffStatus.MANUAL_CLOSED));

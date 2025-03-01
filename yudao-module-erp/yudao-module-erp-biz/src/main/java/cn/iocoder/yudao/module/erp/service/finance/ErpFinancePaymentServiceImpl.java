@@ -16,8 +16,8 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseReturnDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.finance.ErpFinancePaymentItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.finance.ErpFinancePaymentMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
-import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.common.ErpBizTypeEnum;
+import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseInService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseReturnService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
@@ -89,7 +89,7 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
 
         // 2.1 插入付款单
         ErpFinancePaymentDO payment = BeanUtils.toBean(createReqVO, ErpFinancePaymentDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getCode()));
+                .setNo(no).setStatus(ErpAuditStatus.PENDING_REVIEW.getCode()));
         calculateTotalPrice(payment, paymentItems);
         financePaymentMapper.insert(payment);
         // 2.2 插入付款单项
@@ -106,7 +106,7 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
     public void updateFinancePayment(ErpFinancePaymentSaveReqVO updateReqVO) {
         // 1.1 校验存在
         ErpFinancePaymentDO payment = validateFinancePaymentExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVE.getCode().equals(payment.getStatus())) {
+        if (ErpAuditStatus.APPROVED.getCode().equals(payment.getStatus())) {
             throw exception(FINANCE_PAYMENT_UPDATE_FAIL_APPROVE, payment.getNo());
         }
         // 1.2 校验供应商
@@ -139,7 +139,7 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateFinancePaymentStatus(Long id, Integer status) {
-        boolean approve = ErpAuditStatus.APPROVE.getCode().equals(status);
+        boolean approve = ErpAuditStatus.APPROVED.getCode().equals(status);
         // 1.1 校验存在
         ErpFinancePaymentDO payment = validateFinancePaymentExists(id);
         // 1.2 校验状态
@@ -218,7 +218,7 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
             return;
         }
         payments.forEach(payment -> {
-            if (ErpAuditStatus.APPROVE.getCode().equals(payment.getStatus())) {
+            if (ErpAuditStatus.APPROVED.getCode().equals(payment.getStatus())) {
                 throw exception(FINANCE_PAYMENT_DELETE_FAIL_APPROVE, payment.getNo());
             }
         });

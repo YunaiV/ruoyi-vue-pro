@@ -15,7 +15,7 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseReturnItem
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseReturnItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseReturnMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
-import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.stock.ErpStockRecordBizTypeEnum;
 import cn.iocoder.yudao.module.erp.service.finance.ErpAccountService;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
@@ -81,7 +81,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
 
         // 2.1 插入退货
         ErpPurchaseReturnDO purchaseReturn = BeanUtils.toBean(createReqVO, ErpPurchaseReturnDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getCode()))
+                .setNo(no).setStatus(ErpAuditStatus.PENDING_REVIEW.getCode()))
                 .setOrderNo(purchaseOrder.getNo()).setSupplierId(purchaseOrder.getSupplierId());
         calculateTotalPrice(purchaseReturn, purchaseReturnItems);
         purchaseReturnMapper.insert(purchaseReturn);
@@ -99,7 +99,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
     public void updatePurchaseReturn(ErpPurchaseReturnSaveReqVO updateReqVO) {
         // 1.1 校验存在
         ErpPurchaseReturnDO purchaseReturn = validatePurchaseReturnExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVE.getCode().equals(purchaseReturn.getStatus())) {
+        if (ErpAuditStatus.APPROVED.getCode().equals(purchaseReturn.getStatus())) {
             throw exception(PURCHASE_RETURN_UPDATE_FAIL_APPROVE, purchaseReturn.getNo());
         }
         // 1.2 校验采购订单已审核
@@ -151,7 +151,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePurchaseReturnStatus(Long id, Integer status) {
-        boolean approve = ErpAuditStatus.APPROVE.getCode().equals(status);
+        boolean approve = ErpAuditStatus.APPROVED.getCode().equals(status);
         // 1.1 校验存在
         ErpPurchaseReturnDO purchaseReturn = validatePurchaseReturnExists(id);
         // 1.2 校验状态
@@ -240,7 +240,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
             return;
         }
         purchaseReturns.forEach(purchaseReturn -> {
-            if (ErpAuditStatus.APPROVE.getCode().equals(purchaseReturn.getStatus())) {
+            if (ErpAuditStatus.APPROVED.getCode().equals(purchaseReturn.getStatus())) {
                 throw exception(PURCHASE_RETURN_DELETE_FAIL_APPROVE, purchaseReturn.getNo());
             }
         });
@@ -274,7 +274,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
     @Override
     public ErpPurchaseReturnDO validatePurchaseReturn(Long id) {
         ErpPurchaseReturnDO purchaseReturn = getPurchaseReturn(id);
-        if (ObjectUtil.notEqual(purchaseReturn.getStatus(), ErpAuditStatus.APPROVE.getCode())) {
+        if (ObjectUtil.notEqual(purchaseReturn.getStatus(), ErpAuditStatus.APPROVED.getCode())) {
             throw exception(PURCHASE_RETURN_NOT_APPROVE);
         }
         return purchaseReturn;

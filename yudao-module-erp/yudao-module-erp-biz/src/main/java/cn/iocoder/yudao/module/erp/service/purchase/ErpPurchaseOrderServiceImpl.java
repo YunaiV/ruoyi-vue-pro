@@ -15,7 +15,7 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemD
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseOrderItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseOrderMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
-import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.service.finance.ErpAccountService;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import jakarta.annotation.Resource;
@@ -75,7 +75,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         String no = noRedisDAO.generate(ErpNoRedisDAO.PURCHASE_ORDER_NO_PREFIX, PURCHASE_ORDER_NO_OUT_OF_BOUNDS);
         ThrowUtil.ifThrow(purchaseOrderMapper.selectByNo(no) != null, PURCHASE_ORDER_NO_EXISTS);
         // 2.1 插入订单
-        ErpPurchaseOrderDO purchaseOrder = BeanUtils.toBean(createReqVO, ErpPurchaseOrderDO.class, in -> in.setNo(no).setStatus(ErpAuditStatus.PROCESS.getCode()));//设置审核状态,默认未审核
+        ErpPurchaseOrderDO purchaseOrder = BeanUtils.toBean(createReqVO, ErpPurchaseOrderDO.class, in -> in.setNo(no).setStatus(ErpAuditStatus.PENDING_REVIEW.getCode()));//设置审核状态,默认未审核
         calculateTotalPrice(purchaseOrder, purchaseOrderItems);
         // 2.1.1 插入单据日期+结算日期
         purchaseOrder.setDocumentDate(LocalDateTime.now());
@@ -93,7 +93,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     public void updatePurchaseOrder(ErpPurchaseOrderSaveReqVO updateReqVO) {
         // 1.1 校验存在,校验不处于已审批+TODO 已关闭+手动关闭
         ErpPurchaseOrderDO purchaseOrder = validatePurchaseOrderExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVE.getCode().equals(purchaseOrder.getStatus())) {
+        if (ErpAuditStatus.APPROVED.getCode().equals(purchaseOrder.getStatus())) {
             throw exception(PURCHASE_ORDER_UPDATE_FAIL_APPROVE, purchaseOrder.getNo());
         }
         // 1.2 校验供应商
@@ -129,7 +129,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePurchaseOrderStatus(Long id, Integer status) {
-        boolean approve = ErpAuditStatus.APPROVE.getCode().equals(status);
+        boolean approve = ErpAuditStatus.APPROVED.getCode().equals(status);
         // 1.1 校验存在
         ErpPurchaseOrderDO purchaseOrder = validatePurchaseOrderExists(id);
         // 1.2 校验状态
@@ -234,7 +234,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
             return;
         }
         purchaseOrders.forEach(purchaseOrder -> {
-            if (ErpAuditStatus.APPROVE.getCode().equals(purchaseOrder.getStatus())) {
+            if (ErpAuditStatus.APPROVED.getCode().equals(purchaseOrder.getStatus())) {
                 throw exception(PURCHASE_ORDER_DELETE_FAIL_APPROVE, purchaseOrder.getNo());
             }
         });
@@ -264,7 +264,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     @Override
     public ErpPurchaseOrderDO validatePurchaseOrder(Long id) {
         ErpPurchaseOrderDO purchaseOrder = validatePurchaseOrderExists(id);
-        if (ObjectUtil.notEqual(purchaseOrder.getStatus(), ErpAuditStatus.APPROVE.getCode())) {
+        if (ObjectUtil.notEqual(purchaseOrder.getStatus(), ErpAuditStatus.APPROVED.getCode())) {
             throw exception(PURCHASE_ORDER_NOT_APPROVE);
         }
         return purchaseOrder;

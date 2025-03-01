@@ -15,7 +15,7 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOutItemDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleOutItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleOutMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
-import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.stock.ErpStockRecordBizTypeEnum;
 import cn.iocoder.yudao.module.erp.service.finance.ErpAccountService;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
@@ -89,7 +89,7 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
 
         // 2.1 插入出库
         ErpSaleOutDO saleOut = BeanUtils.toBean(createReqVO, ErpSaleOutDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getCode()))
+                .setNo(no).setStatus(ErpAuditStatus.PENDING_REVIEW.getCode()))
                 .setOrderNo(saleOrder.getNo()).setCustomerId(saleOrder.getCustomerId());
         calculateTotalPrice(saleOut, saleOutItems);
         saleOutMapper.insert(saleOut);
@@ -107,7 +107,7 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
     public void updateSaleOut(ErpSaleOutSaveReqVO updateReqVO) {
         // 1.1 校验存在
         ErpSaleOutDO saleOut = validateSaleOutExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVE.getCode().equals(saleOut.getStatus())) {
+        if (ErpAuditStatus.APPROVED.getCode().equals(saleOut.getStatus())) {
             throw exception(SALE_OUT_UPDATE_FAIL_APPROVE, saleOut.getNo());
         }
         // 1.2 校验销售订单已审核
@@ -163,7 +163,7 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateSaleOutStatus(Long id, Integer status) {
-        boolean approve = ErpAuditStatus.APPROVE.getCode().equals(status);
+        boolean approve = ErpAuditStatus.APPROVED.getCode().equals(status);
         // 1.1 校验存在
         ErpSaleOutDO saleOut = validateSaleOutExists(id);
         // 1.2 校验状态
@@ -252,7 +252,7 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
             return;
         }
         saleOuts.forEach(saleOut -> {
-            if (ErpAuditStatus.APPROVE.getCode().equals(saleOut.getStatus())) {
+            if (ErpAuditStatus.APPROVED.getCode().equals(saleOut.getStatus())) {
                 throw exception(SALE_OUT_DELETE_FAIL_APPROVE, saleOut.getNo());
             }
         });
@@ -286,7 +286,7 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
     @Override
     public ErpSaleOutDO validateSaleOut(Long id) {
         ErpSaleOutDO saleOut = validateSaleOutExists(id);
-        if (ObjectUtil.notEqual(saleOut.getStatus(), ErpAuditStatus.APPROVE.getCode())) {
+        if (ObjectUtil.notEqual(saleOut.getStatus(), ErpAuditStatus.APPROVED.getCode())) {
             throw exception(SALE_OUT_NOT_APPROVE);
         }
         return saleOut;

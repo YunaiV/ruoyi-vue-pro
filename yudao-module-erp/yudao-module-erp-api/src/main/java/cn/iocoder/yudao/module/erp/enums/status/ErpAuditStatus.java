@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.enums;
+package cn.iocoder.yudao.module.erp.enums.status;
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
@@ -19,15 +19,15 @@ import java.util.Map;
 public enum ErpAuditStatus implements ArrayValuable<Integer> {
 
     // 1. 草稿阶段
-    DRAFT(0, "草稿"),
+    DRAFT(1, "草稿"),
 
     // 2. 审核流程
-    SUBMITTED(11, "已提交"),
-    PROCESS(10, "未审核"),
-    PROCESSING(12, "审核中"),
-    APPROVE(20, "已审核"),
-    REJECTED(14, "审核不通过"),
-    REVERSED(5, "撤销审核"),
+    SUBMITTED(2, "已提交"),
+    PENDING_REVIEW(3, "未审核"),
+    UNDER_REVIEW(4, "审核中"),
+    APPROVED(5, "已审核"),
+    REJECTED(6, "审核不通过"),
+    REVOKED(7, "审核撤销"),
     ;
 
 

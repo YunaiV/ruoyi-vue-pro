@@ -15,10 +15,10 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestIte
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestItemsMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
-import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
-import cn.iocoder.yudao.module.erp.enums.ErpOffStatus;
-import cn.iocoder.yudao.module.erp.enums.ErpOrderStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpOffStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpOrderStatus;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpWarehouseService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -26,6 +26,7 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +65,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     @Lazy
     @Autowired
     private ErpPurchaseRequestServiceImpl erpPurchaseRequestService;
-    @Autowired
+    @Resource
     StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestDO> erpPurchaseStatusMachine;
 
 
@@ -90,10 +91,8 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         //初始化
         ErpPurchaseRequestDO purchaseRequest = BeanUtils.toBean(createReqVO, ErpPurchaseRequestDO.class);
         purchaseRequest.setNo(no);
-        //初始状态设置，审核状态、关闭状态、订购状态
-//        purchaseRequest.setStatus(ErpAuditStatus.PROCESS.getCode())
-//            .setOffStatus(ErpOffStatus.OPEN.getCode())
-//            .setOrderStatus(ErpOrderStatus.OT_ORDERED.getCode());
+
+        //初始化事件
         erpPurchaseStatusMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.INIT, purchaseRequest);//初始化事件
         //2. 插入主表的申请单数据
         ThrowUtil.ifThrow(erpPurchaseRequestMapper.insert(purchaseRequest) <= 0, PURCHASE_REQUEST_ADD_FAIL_APPROVE);
@@ -101,7 +100,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         itemsDOList.forEach(i -> i.setRequestId(id));
         //设置子表初始状态
         itemsDOList.forEach(i -> i.setOffStatus(ErpOffStatus.OPEN.getCode())
-            .setOrderStatus(ErpAuditStatus.PROCESS.getCode()));
+            .setOrderStatus(ErpAuditStatus.PENDING_REVIEW.getCode()));
         //3. 批量插入子表数据
         ThrowUtil.ifThrow(!erpPurchaseRequestItemsMapper.insertBatch(itemsDOList), PURCHASE_REQUEST_ADD_FAIL_PRODUCT);
         // 返回单据id
@@ -162,7 +161,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     //判断当前状态是否可以更新
     private void updateStatusCheck(ErpPurchaseRequestDO requestDO, List<Long> itemIds) {
         //1.1 判断已审核
-        ThrowUtil.ifThrow(requestDO.getStatus().equals(ErpAuditStatus.APPROVE.getCode()), PURCHASE_REQUEST_UPDATE_FAIL_APPROVE, requestDO.getNo());
+        ThrowUtil.ifThrow(requestDO.getStatus().equals(ErpAuditStatus.APPROVED.getCode()), PURCHASE_REQUEST_UPDATE_FAIL_APPROVE, requestDO.getNo());
         //1.2 判断已关闭
         ThrowUtil.ifThrow(requestDO.getOffStatus().equals(ErpOffStatus.CLOSED.getCode()), PURCHASE_REQUEST_CLOSED, requestDO.getNo());
         //1.3 判断已手动关闭
@@ -329,12 +328,12 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         // 判断是否是审核操作
         if (Boolean.TRUE.equals(req.getReviewed())) {
             //已审核->异常
-            ThrowUtil.ifThrow(ErpAuditStatus.APPROVE.getCode().equals(requestDO.getStatus()), PURCHASE_REQUEST_APPROVE_FAIL);
+            ThrowUtil.ifThrow(ErpAuditStatus.APPROVED.getCode().equals(requestDO.getStatus()), PURCHASE_REQUEST_APPROVE_FAIL);
             // 审核操作
             approvePurchaseOrder(req, itemsDOList);
         } else {
             //非已审核->异常
-            ThrowUtil.ifThrow(!ErpAuditStatus.APPROVE.getCode().equals(requestDO.getStatus()), PURCHASE_REQUEST_PROCESS_FAIL);
+            ThrowUtil.ifThrow(!ErpAuditStatus.APPROVED.getCode().equals(requestDO.getStatus()), PURCHASE_REQUEST_PROCESS_FAIL);
             //非关闭->异常
             ThrowUtil.ifThrow(ErpOffStatus.CLOSED.getCode().equals(requestDO.getOffStatus()), PURCHASE_REQUEST_PROCESS_FAIL_CLOSE);
             //已订购+部分订购->异常
@@ -351,7 +350,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
      */
     private void approvePurchaseOrder(ErpPurchaseRequestAuditStatusReq req, List<ErpPurchaseRequestItemsDO> itemsDOList) {
         // 更新采购申请单状态为审核通过
-        erpPurchaseRequestService.updatePurchaseRequestStatus(req.getRequestId(), ErpAuditStatus.APPROVE.getCode(), null, null);
+        erpPurchaseRequestService.updatePurchaseRequestStatus(req.getRequestId(), ErpAuditStatus.APPROVED.getCode(), null, null);
 
         // 创建一个 Map 来根据 itemId 快速查找对应的审核项
         Map<Long, ErpPurchaseRequestAuditStatusReq.requestItems> itemMap = req.getItems().stream()
@@ -371,7 +370,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
      */
     private void reverseApprovePurchaseOrder(List<ErpPurchaseRequestItemsDO> itemsDOList, ErpPurchaseRequestAuditStatusReq req) {
         // 更新采购申请单状态为反审核
-        erpPurchaseRequestService.updatePurchaseRequestStatus(req.getRequestId(), ErpAuditStatus.REVERSED.getCode(), null, null);
+        erpPurchaseRequestService.updatePurchaseRequestStatus(req.getRequestId(), ErpAuditStatus.REVOKED.getCode(), null, null);
 
         // 设置所有申请单的批准数量为 null
         itemsDOList.forEach(itemDO -> itemDO.setApproveCount(null));
@@ -404,7 +403,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         } else {
             // 处理关闭状态
             //未审核->异常
-            ThrowUtil.ifThrow(!ErpAuditStatus.APPROVE.getCode().equals(erpPurchaseRequestMapper.selectById(requestId).getStatus()), PURCHASE_REQUEST_CLOSE_FAIL);
+            ThrowUtil.ifThrow(!ErpAuditStatus.APPROVED.getCode().equals(erpPurchaseRequestMapper.selectById(requestId).getStatus()), PURCHASE_REQUEST_CLOSE_FAIL);
             //处理子表状态
             erpPurchaseRequestService.updateItemStatus(itemIds, null, ErpOffStatus.MANUAL_CLOSED.getCode());
             //子表都关->主表也关
@@ -427,7 +426,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         }
         // 1.1 非已审核->异常
         purchaseRequestDOs.forEach(erpPurchaseRequestDO -> {
-            ThrowUtil.ifThrow(!erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.APPROVE.getCode()), PURCHASE_REQUEST_DELETE_FAIL_APPROVE, erpPurchaseRequestDO.getNo());
+            ThrowUtil.ifThrow(!erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.APPROVED.getCode()), PURCHASE_REQUEST_DELETE_FAIL_APPROVE, erpPurchaseRequestDO.getNo());
         });
 
         // 2. 遍历删除，并记录操作日志

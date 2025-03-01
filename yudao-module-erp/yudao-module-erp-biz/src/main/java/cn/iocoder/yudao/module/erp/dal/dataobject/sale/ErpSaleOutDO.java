@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.erp.dal.dataobject.sale;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpAccountDO;
+import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -37,7 +38,7 @@ public class ErpSaleOutDO extends BaseDO {
     /**
      * 出库状态
      *
-     * 枚举 {@link cn.iocoder.yudao.module.erp.enums.ErpAuditStatus}
+     * 枚举 {@link ErpAuditStatus}
      */
     private Integer status;
     /**

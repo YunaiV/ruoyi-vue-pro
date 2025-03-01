@@ -16,8 +16,8 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleReturnDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.finance.ErpFinanceReceiptItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.finance.ErpFinanceReceiptMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
-import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.common.ErpBizTypeEnum;
+import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.service.sale.ErpCustomerService;
 import cn.iocoder.yudao.module.erp.service.sale.ErpSaleOutService;
 import cn.iocoder.yudao.module.erp.service.sale.ErpSaleReturnService;
@@ -89,7 +89,7 @@ public class ErpFinanceReceiptServiceImpl implements ErpFinanceReceiptService {
 
         // 2.1 插入收款单
         ErpFinanceReceiptDO receipt = BeanUtils.toBean(createReqVO, ErpFinanceReceiptDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getCode()));
+                .setNo(no).setStatus(ErpAuditStatus.PENDING_REVIEW.getCode()));
         calculateTotalPrice(receipt, receiptItems);
         financeReceiptMapper.insert(receipt);
         // 2.2 插入收款单项
@@ -106,7 +106,7 @@ public class ErpFinanceReceiptServiceImpl implements ErpFinanceReceiptService {
     public void updateFinanceReceipt(ErpFinanceReceiptSaveReqVO updateReqVO) {
         // 1.1 校验存在
         ErpFinanceReceiptDO receipt = validateFinanceReceiptExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVE.getCode().equals(receipt.getStatus())) {
+        if (ErpAuditStatus.APPROVED.getCode().equals(receipt.getStatus())) {
             throw exception(FINANCE_RECEIPT_UPDATE_FAIL_APPROVE, receipt.getNo());
         }
         // 1.2 校验客户
@@ -139,7 +139,7 @@ public class ErpFinanceReceiptServiceImpl implements ErpFinanceReceiptService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateFinanceReceiptStatus(Long id, Integer status) {
-        boolean approve = ErpAuditStatus.APPROVE.getCode().equals(status);
+        boolean approve = ErpAuditStatus.APPROVED.getCode().equals(status);
         // 1.1 校验存在
         ErpFinanceReceiptDO receipt = validateFinanceReceiptExists(id);
         // 1.2 校验状态
@@ -218,7 +218,7 @@ public class ErpFinanceReceiptServiceImpl implements ErpFinanceReceiptService {
             return;
         }
         receipts.forEach(receipt -> {
-            if (ErpAuditStatus.APPROVE.getCode().equals(receipt.getStatus())) {
+            if (ErpAuditStatus.APPROVED.getCode().equals(receipt.getStatus())) {
                 throw exception(FINANCE_RECEIPT_DELETE_FAIL_APPROVE, receipt.getNo());
             }
         });

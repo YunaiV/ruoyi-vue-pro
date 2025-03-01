@@ -15,7 +15,7 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleReturnItemDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleReturnItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleReturnMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
-import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.stock.ErpStockRecordBizTypeEnum;
 import cn.iocoder.yudao.module.erp.service.finance.ErpAccountService;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
@@ -89,7 +89,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
 
         // 2.1 插入退货
         ErpSaleReturnDO saleReturn = BeanUtils.toBean(createReqVO, ErpSaleReturnDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getCode()))
+                .setNo(no).setStatus(ErpAuditStatus.PENDING_REVIEW.getCode()))
                 .setOrderNo(saleOrder.getNo()).setCustomerId(saleOrder.getCustomerId());
         calculateTotalPrice(saleReturn, saleReturnItems);
         saleReturnMapper.insert(saleReturn);
@@ -107,7 +107,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
     public void updateSaleReturn(ErpSaleReturnSaveReqVO updateReqVO) {
         // 1.1 校验存在
         ErpSaleReturnDO saleReturn = validateSaleReturnExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVE.getCode().equals(saleReturn.getStatus())) {
+        if (ErpAuditStatus.APPROVED.getCode().equals(saleReturn.getStatus())) {
             throw exception(SALE_RETURN_UPDATE_FAIL_APPROVE, saleReturn.getNo());
         }
         // 1.2 校验销售订单已审核
@@ -163,7 +163,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateSaleReturnStatus(Long id, Integer status) {
-        boolean approve = ErpAuditStatus.APPROVE.getCode().equals(status);
+        boolean approve = ErpAuditStatus.APPROVED.getCode().equals(status);
         // 1.1 校验存在
         ErpSaleReturnDO saleReturn = validateSaleReturnExists(id);
         // 1.2 校验状态
@@ -252,7 +252,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
             return;
         }
         saleReturns.forEach(saleReturn -> {
-            if (ErpAuditStatus.APPROVE.getCode().equals(saleReturn.getStatus())) {
+            if (ErpAuditStatus.APPROVED.getCode().equals(saleReturn.getStatus())) {
                 throw exception(SALE_RETURN_DELETE_FAIL_APPROVE, saleReturn.getNo());
             }
         });
@@ -286,7 +286,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
     @Override
     public ErpSaleReturnDO validateSaleReturn(Long id) {
         ErpSaleReturnDO saleReturn = validateSaleReturnExists(id);
-        if (ObjectUtil.notEqual(saleReturn.getStatus(), ErpAuditStatus.APPROVE.getCode())) {
+        if (ObjectUtil.notEqual(saleReturn.getStatus(), ErpAuditStatus.APPROVED.getCode())) {
             throw exception(SALE_RETURN_NOT_APPROVE);
         }
         return saleReturn;

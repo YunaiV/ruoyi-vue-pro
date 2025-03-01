@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.purchase;
 
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpOffStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpOrderStatus;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -46,15 +49,15 @@ public class ErpPurchaseRequestDO extends TenantBaseDO {
     /**
      * 审核状态
      */
-    private Integer status;
+    private Integer status = ErpAuditStatus.DRAFT.getCode(); // 默认草稿;
     /**
      * 关闭状态
      */
-    private Integer offStatus;
+    private Integer offStatus = ErpOffStatus.OPEN.getCode(); //默认开启
     /**
      * 订购状态
      */
-    private Integer orderStatus;
+    private Integer orderStatus = ErpOrderStatus.OT_ORDERED.getCode(); //默认未订购
     /**
      * 审核者id
      */

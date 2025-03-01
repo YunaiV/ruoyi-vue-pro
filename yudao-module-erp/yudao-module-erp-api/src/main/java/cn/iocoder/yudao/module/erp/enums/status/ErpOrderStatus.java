@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.enums;
+package cn.iocoder.yudao.module.erp.enums.status;
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
