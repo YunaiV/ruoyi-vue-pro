@@ -65,6 +65,7 @@ public class AiChatConversationDO extends BaseDO {
      */
     private Long roleId;
 
+    // TODO @芋艿：可优化，绑定多个知识库。前提，spring ai 支持 RerankModel 的封装
     /**
      * 知识库编号
      * <p>

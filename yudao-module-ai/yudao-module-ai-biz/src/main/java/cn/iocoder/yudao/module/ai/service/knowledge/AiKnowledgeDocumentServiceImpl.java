@@ -7,10 +7,10 @@ import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentCreateListReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateStatusReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentCreateListReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeDocumentMapper;
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -149,6 +150,14 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
     }
 
     @Override
+    public void updateKnowledgeDocumentRetrievalCountIncr(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        knowledgeDocumentMapper.updateRetrievalCountIncr(ids);
+    }
+
+    @Override
     public AiKnowledgeDocumentDO validateKnowledgeDocumentExists(Long id) {
         AiKnowledgeDocumentDO knowledgeDocument = knowledgeDocumentMapper.selectById(id);
         if (knowledgeDocument == null) {
@@ -180,6 +189,14 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
             throw exception(KNOWLEDGE_DOCUMENT_FILE_READ_FAIL);
         }
         return document.getText();
+    }
+
+    @Override
+    public List<AiKnowledgeDocumentDO> getKnowledgeDocumentList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return new ArrayList<>();
+        }
+        return knowledgeDocumentMapper.selectByIds(ids);
     }
 
 }

@@ -7,11 +7,12 @@ import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentProcessRespVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * AI 知识库分片 Mapper
@@ -50,6 +51,12 @@ public interface AiKnowledgeSegmentMapper extends BaseMapperX<AiKnowledgeSegment
                 .in(AiKnowledgeSegmentDO::getDocumentId, documentIds)
                 .groupBy(AiKnowledgeSegmentDO::getDocumentId);
         return selectJoinList(AiKnowledgeSegmentProcessRespVO.class, wrapper);
+    }
+
+    default void updateRetrievalCountIncrByIds(List<Long> ids) {
+        update( new LambdaUpdateWrapper<AiKnowledgeSegmentDO>()
+                .setSql(" retrieval_count = retrieval_count + 1")
+                .in(AiKnowledgeSegmentDO::getId, ids));
     }
 
 }

@@ -99,9 +99,10 @@ public interface AiModelFactory {
      * <p>
      * 如果不存在，则进行创建
      *
+     * @param type           向量存储类型
      * @param embeddingModel 向量模型
      * @return VectorStore 对象
      */
-    VectorStore getOrCreateVectorStore(EmbeddingModel embeddingModel);
+    VectorStore getOrCreateVectorStore(Class<? extends VectorStore> type, EmbeddingModel embeddingModel);
 
 }

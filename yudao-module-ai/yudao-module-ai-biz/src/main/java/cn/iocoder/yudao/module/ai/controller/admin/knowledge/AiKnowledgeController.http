@@ -9,7 +9,8 @@ tenant-id: {{adminTenantId}}
   "description": "测试描述",
   "embeddingModelId": 30,
   "topK": 3,
-  "similarityThreshold": 0.5
+  "similarityThreshold": 0.5,
+  "status": 0
 }
 
 ### 更新知识库
@@ -24,7 +25,8 @@ tenant-id: {{adminTenantId}}
   "description": "测试描述",
   "embeddingModelId": 30,
   "topK": 5,
-  "similarityThreshold": 0.6
+  "similarityThreshold": 0.6,
+  "status": 0
 }
 
 ### 获取知识库分页

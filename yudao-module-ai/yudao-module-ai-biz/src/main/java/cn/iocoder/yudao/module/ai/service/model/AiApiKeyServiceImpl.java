@@ -16,6 +16,7 @@ import jakarta.annotation.Resource;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
+import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -154,7 +155,7 @@ public class AiApiKeyServiceImpl implements AiApiKeyService {
                 apiKey.getUrl(), chatModel.getModel());
 
         // 创建或获取 VectorStore 对象
-        return modelFactory.getOrCreateVectorStore(embeddingModel);
+        return modelFactory.getOrCreateVectorStore(SimpleVectorStore.class, embeddingModel);
     }
 
 }

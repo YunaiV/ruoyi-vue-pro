@@ -2,11 +2,12 @@ package cn.iocoder.yudao.module.ai.service.knowledge;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentPageReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentSearchReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentProcessRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentUpdateStatusReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentProcessRespVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
+import cn.iocoder.yudao.module.ai.service.knowledge.bo.AiKnowledgeSegmentSearchReqBO;
+import cn.iocoder.yudao.module.ai.service.knowledge.bo.AiKnowledgeSegmentSearchRespBO;
 import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
@@ -67,12 +68,12 @@ public interface AiKnowledgeSegmentService {
     void deleteKnowledgeSegmentByDocumentId(Long documentId);
 
     /**
-     * 召回段落
+     * 搜索知识库段落，并返回结果
      *
-     * @param reqVO 召回请求信息
-     * @return 召回的段落
+     * @param reqBO 搜索请求信息
+     * @return 搜索结果段落列表
      */
-    List<AiKnowledgeSegmentDO> similaritySearch(AiKnowledgeSegmentSearchReqVO reqVO);
+    List<AiKnowledgeSegmentSearchRespBO> searchKnowledgeSegment(AiKnowledgeSegmentSearchReqBO reqBO);
 
     /**
      * 根据 URL 内容，切片创建多个段落

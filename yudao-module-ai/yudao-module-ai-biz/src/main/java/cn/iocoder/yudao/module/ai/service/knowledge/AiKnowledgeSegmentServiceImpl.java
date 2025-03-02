@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.ai.service.knowledge;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -12,6 +13,8 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeSegmentMapper;
 import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
+import cn.iocoder.yudao.module.ai.service.knowledge.bo.AiKnowledgeSegmentSearchReqBO;
+import cn.iocoder.yudao.module.ai.service.knowledge.bo.AiKnowledgeSegmentSearchRespBO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
@@ -171,25 +174,45 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
     }
 
     @Override
-    public List<AiKnowledgeSegmentDO> similaritySearch(AiKnowledgeSegmentSearchReqVO reqVO) {
+    public List<AiKnowledgeSegmentSearchRespBO> searchKnowledgeSegment(AiKnowledgeSegmentSearchReqBO reqBO) {
         // 1. 校验
-        AiKnowledgeDO knowledge = knowledgeService.validateKnowledgeExists(reqVO.getKnowledgeId());
+        AiKnowledgeDO knowledge = knowledgeService.validateKnowledgeExists(reqBO.getKnowledgeId());
 
-        // 2. 获取向量存储实例
+        // 2.1 向量检索
         VectorStore vectorStore = apiKeyService.getOrCreateVectorStoreByModelId(knowledge.getEmbeddingModelId());
-
-        // 3.1 向量检索
         List<Document> documents = vectorStore.similaritySearch(SearchRequest.builder()
-                .query(reqVO.getContent())
-                .topK(knowledge.getTopK()).similarityThreshold(knowledge.getSimilarityThreshold())
+                .query(reqBO.getContent())
+                .topK(ObjUtil.defaultIfNull(reqBO.getTopK(), knowledge.getTopK()))
+                .similarityThreshold(ObjUtil.defaultIfNull(reqBO.getSimilarityThreshold(), knowledge.getSimilarityThreshold()))
                 .filterExpression(new FilterExpressionBuilder()
-                        .eq(VECTOR_STORE_METADATA_KNOWLEDGE_ID, reqVO.getKnowledgeId()).build())
+                        .eq(VECTOR_STORE_METADATA_KNOWLEDGE_ID, reqBO.getKnowledgeId()).build())
                 .build());
         if (CollUtil.isEmpty(documents)) {
             return ListUtil.empty();
         }
-        // 3.2 段落召回
-        return segmentMapper.selectListByVectorIds(convertList(documents, Document::getId));
+        // 2.2 段落召回
+        List<AiKnowledgeSegmentDO> segments = segmentMapper
+                .selectListByVectorIds(convertList(documents, Document::getId));
+        if (CollUtil.isEmpty(segments)) {
+            return ListUtil.empty();
+        }
+
+        // 3. 增加召回次数
+        segmentMapper.updateRetrievalCountIncrByIds(convertList(segments, AiKnowledgeSegmentDO::getId));
+
+        // 4. 构建结果
+        List<AiKnowledgeSegmentSearchRespBO> result = convertList(segments, segment -> {
+            Document document = CollUtil.findOne(documents,  // 找到对应的文档
+                    doc -> Objects.equals(doc.getId(), segment.getVectorId()));
+            if (document == null) {
+                return null;
+            }
+            return BeanUtils.toBean(segment, AiKnowledgeSegmentSearchRespBO.class)
+                    .setScore(document.getScore());
+        });
+        result.sort((o1, o2)
+                -> Double.compare(o2.getScore(), o1.getScore())); // 按照分数降序排序
+        return result;
     }
 
     @Override

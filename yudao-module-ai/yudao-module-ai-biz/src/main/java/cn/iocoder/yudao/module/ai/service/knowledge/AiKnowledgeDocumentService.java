@@ -1,14 +1,18 @@
 package cn.iocoder.yudao.module.ai.service.knowledge;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentCreateListReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateStatusReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentCreateListReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * AI 知识库文档 Service 接口
@@ -64,6 +68,13 @@ public interface AiKnowledgeDocumentService {
     void updateKnowledgeDocumentStatus(AiKnowledgeDocumentUpdateStatusReqVO reqVO);
 
     /**
+     * 更新文档检索次数（增加 +1）
+     *
+     * @param ids 文档编号列表
+     */
+    void updateKnowledgeDocumentRetrievalCountIncr(Collection<Long> ids);
+
+    /**
      * 校验文档是否存在
      *
      * @param id 文档编号
@@ -78,5 +89,23 @@ public interface AiKnowledgeDocumentService {
      * @return 内容
      */
     String readUrl(String url);
+
+    /**
+     * 获取文档列表
+     *
+     * @param ids 文档编号列表
+     * @return 文档列表
+     */
+    List<AiKnowledgeDocumentDO> getKnowledgeDocumentList(Collection<Long> ids);
+
+    /**
+     * 获取文档 Map
+     *
+     * @param ids 文档编号列表
+     * @return 文档 Map
+     */
+    default Map<Long, AiKnowledgeDocumentDO> getKnowledgeDocumentMap(Collection<Long> ids) {
+        return convertMap(getKnowledgeDocumentList(ids), AiKnowledgeDocumentDO::getId);
+    }
 
 }
