@@ -12,9 +12,9 @@ import java.util.Map;
 @Getter
 public enum ErpOffStatus implements ArrayValuable<Integer> {
 
-    OPEN(1, "开启"),
-    CLOSED(2, "已关闭"),
-    MANUAL_CLOSED(3, "手动关闭");
+    OPEN(0, "开启"),
+    CLOSED(1, "已关闭"),
+    MANUAL_CLOSED(2, "手动关闭");
 
     private static final Map<Integer, ErpOffStatus> STATUS_MAP = new HashMap<>();
 

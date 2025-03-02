@@ -5,10 +5,10 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestMapper;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Slf4j
@@ -18,6 +18,7 @@ public class ActionAuditImpl extends BaseActionImpl {
     private ErpPurchaseRequestMapper mapper;
 
     @Override
+    @Transactional
     public void execute(ErpAuditStatus from, ErpAuditStatus to, ErpEventEnum event, ErpPurchaseRequestDO context) {
         ErpPurchaseRequestDO purchaseRequestDO = mapper.selectById(context.getId());
         purchaseRequestDO.setStatus(to.getCode());

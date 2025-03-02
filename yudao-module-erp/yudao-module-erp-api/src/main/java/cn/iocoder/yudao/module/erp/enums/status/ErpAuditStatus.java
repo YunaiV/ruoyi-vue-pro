@@ -19,7 +19,7 @@ import java.util.Map;
 public enum ErpAuditStatus implements ArrayValuable<Integer> {
 
     // 1. 草稿阶段
-    DRAFT(1, "草稿"),
+    DRAFT(0, "草稿"),
 
     // 2. 审核流程
     SUBMITTED(2, "已提交"),
@@ -29,7 +29,6 @@ public enum ErpAuditStatus implements ArrayValuable<Integer> {
     REJECTED(6, "审核不通过"),
     REVOKED(7, "审核撤销"),
     ;
-
 
 
     private static final Map<Integer, ErpAuditStatus> STATUS_MAP = new HashMap<>();
@@ -61,6 +60,7 @@ public enum ErpAuditStatus implements ArrayValuable<Integer> {
         ErpAuditStatus statusEnum = STATUS_MAP.get(code);
         return statusEnum != null ? statusEnum.getDesc() : null;
     }
+
     public static ErpAuditStatus fromCode(int code) {
         for (ErpAuditStatus status : ErpAuditStatus.values()) {
             if (status.getCode() == code) {

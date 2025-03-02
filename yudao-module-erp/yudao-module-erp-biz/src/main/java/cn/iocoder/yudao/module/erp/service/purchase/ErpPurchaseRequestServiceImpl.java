@@ -92,7 +92,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         ErpPurchaseRequestDO purchaseRequest = BeanUtils.toBean(createReqVO, ErpPurchaseRequestDO.class);
         purchaseRequest.setNo(no);
 
-        //初始化事件
+        //初始-审核状态
         erpPurchaseStatusMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.INIT, purchaseRequest);//初始化事件
         //2. 插入主表的申请单数据
         ThrowUtil.ifThrow(erpPurchaseRequestMapper.insert(purchaseRequest) <= 0, PURCHASE_REQUEST_ADD_FAIL_APPROVE);
@@ -317,7 +317,6 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     /**
      * 审核/反审核采购订单
      * 该方法用于根据传入的请求参数对采购订单进行审核或反审核操作。
-     *
      */
     @Override
     public void reviewPurchaseOrder(ErpPurchaseRequestAuditStatusReq req) {
@@ -327,6 +326,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
 
         // 判断是否是审核操作
         if (Boolean.TRUE.equals(req.getReviewed())) {
+
             //已审核->异常
             ThrowUtil.ifThrow(ErpAuditStatus.APPROVED.getCode().equals(requestDO.getStatus()), PURCHASE_REQUEST_APPROVE_FAIL);
             // 审核操作
@@ -399,7 +399,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
                 // 主表状态开启
                 log.debug("主表状态开启");
                 erpPurchaseRequestService.updatePurchaseRequestStatus(requestId, null, null, ErpOffStatus.OPEN.getCode());
-                }
+            }
         } else {
             // 处理关闭状态
             //未审核->异常

@@ -12,10 +12,11 @@ import java.util.Map;
 @Getter
 public enum ErpOrderStatus implements ArrayValuable<Integer> {
 
+    OT_ORDERED(0, "未订购"),
     ORDERED(1, "已完整订购"),
     PARTIALLY_ORDERED(2, "部分订购"),
     ORDER_FAILED(3, "订购失败"),
-    OT_ORDERED(4, "未订购");
+    ;
 
     private static final Map<Integer, ErpOrderStatus> STATUS_MAP = new HashMap<>();
 

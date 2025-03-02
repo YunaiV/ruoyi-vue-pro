@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -16,6 +17,7 @@ public class ActionPaymentImpl extends BaseActionImpl {
     private ErpPurchaseRequestMapper mapper;
 
     @Override
+    @Transactional
     public void execute(ErpAuditStatus from, ErpAuditStatus to, ErpEventEnum event, ErpPurchaseRequestDO context) {
         ErpPurchaseRequestDO aDo = mapper.selectById(context.getId());
         aDo.setOrderStatus(to.getCode());
