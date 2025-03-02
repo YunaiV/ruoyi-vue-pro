@@ -201,6 +201,31 @@ public class FlowableUtils {
     }
 
     /**
+     * 获得流程实例的审批用户选择的下一个节点的审批人 Map
+     *
+     * @param processInstance 流程实例
+     * @return 审批用户选择的下一个节点的审批人Map
+     */
+    public static Map<String, List<Long>> getApproveUserSelectAssignees(ProcessInstance processInstance) {
+        return processInstance != null ? getApproveUserSelectAssignees(processInstance.getProcessVariables()) : null;
+    }
+
+    /**
+     * 获得流程实例的审批用户选择的下一个节点的审批人 Map
+     *
+     * @param processVariables 流程变量
+     * @return 审批用户选择的下一个节点的审批人Map Map
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String, List<Long>> getApproveUserSelectAssignees(Map<String, Object> processVariables) {
+        if (processVariables == null) {
+            return null;
+        }
+        return (Map<String, List<Long>>) processVariables.get(
+                BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES);
+    }
+
+    /**
      * 获得流程实例的摘要
      *
      * 仅有 {@link BpmModelFormTypeEnum#getType()} 表单，才有摘要。
