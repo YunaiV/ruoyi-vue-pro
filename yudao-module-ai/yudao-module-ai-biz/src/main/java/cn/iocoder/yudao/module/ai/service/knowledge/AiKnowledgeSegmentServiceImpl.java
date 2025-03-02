@@ -34,6 +34,7 @@ import java.util.Objects;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.KNOWLEDGE_SEGMENT_NOT_EXISTS;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.KNOWLEDGE_SEGMENT_CONTENT_TOO_LONG;
 
 /**
  * AI 知识库分片 Service 实现类
@@ -98,20 +99,20 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
     }
 
     @Override
-    public void updateKnowledgeSegment(AiKnowledgeSegmentUpdateReqVO reqVO) {
+    public void updateKnowledgeSegment(AiKnowledgeSegmentSaveReqVO reqVO) {
         // 1. 校验
-        AiKnowledgeSegmentDO segment = validateKnowledgeSegmentExists(reqVO.getId());
+        AiKnowledgeSegmentDO oldSegment = validateKnowledgeSegmentExists(reqVO.getId());
 
         // 2. 删除向量
-        VectorStore vectorStore = getVectorStoreById(segment.getKnowledgeId());
-        deleteVectorStore(vectorStore, segment);
+        VectorStore vectorStore = getVectorStoreById(oldSegment.getKnowledgeId());
+        deleteVectorStore(vectorStore, oldSegment);
 
         // 3.1 更新切片
-        AiKnowledgeSegmentDO segmentDO = BeanUtils.toBean(reqVO, AiKnowledgeSegmentDO.class);
-        segmentMapper.updateById(segmentDO);
+        AiKnowledgeSegmentDO newSegment = BeanUtils.toBean(reqVO, AiKnowledgeSegmentDO.class);
+        segmentMapper.updateById(newSegment);
         // 3.2 重新向量化，必须开启状态
-        if (CommonStatusEnum.isEnable(segmentDO.getStatus())) {
-            writeVectorStore(vectorStore, segmentDO, new Document(segmentDO.getContent()));
+        if (CommonStatusEnum.isEnable(oldSegment.getStatus())) {
+            writeVectorStore(vectorStore, newSegment, new Document(newSegment.getContent()));
         }
     }
 
@@ -143,7 +144,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         segmentMapper.updateById(new AiKnowledgeSegmentDO().setId(reqVO.getId()).setStatus(reqVO.getStatus()));
 
         // 4. 更新向量
-        if (Objects.equals(reqVO.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+        if (CommonStatusEnum.isEnable(reqVO.getStatus())) {
             writeVectorStore(vectorStore, segment, new Document(segment.getContent()));
         } else {
             deleteVectorStore(vectorStore, segment);
@@ -183,7 +184,8 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         List<Document> documents = vectorStore.similaritySearch(SearchRequest.builder()
                 .query(reqBO.getContent())
                 .topK(ObjUtil.defaultIfNull(reqBO.getTopK(), knowledge.getTopK()))
-                .similarityThreshold(ObjUtil.defaultIfNull(reqBO.getSimilarityThreshold(), knowledge.getSimilarityThreshold()))
+                .similarityThreshold(
+                        ObjUtil.defaultIfNull(reqBO.getSimilarityThreshold(), knowledge.getSimilarityThreshold()))
                 .filterExpression(new FilterExpressionBuilder()
                         .eq(VECTOR_STORE_METADATA_KNOWLEDGE_ID, reqBO.getKnowledgeId()).build())
                 .build());
@@ -202,7 +204,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
 
         // 4. 构建结果
         List<AiKnowledgeSegmentSearchRespBO> result = convertList(segments, segment -> {
-            Document document = CollUtil.findOne(documents,  // 找到对应的文档
+            Document document = CollUtil.findOne(documents, // 找到对应的文档
                     doc -> Objects.equals(doc.getId(), segment.getVectorId()));
             if (document == null) {
                 return null;
@@ -210,8 +212,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
             return BeanUtils.toBean(segment, AiKnowledgeSegmentSearchRespBO.class)
                     .setScore(document.getScore());
         });
-        result.sort((o1, o2)
-                -> Double.compare(o2.getScore(), o1.getScore())); // 按照分数降序排序
+        result.sort((o1, o2) -> Double.compare(o2.getScore(), o1.getScore())); // 按照分数降序排序
         return result;
     }
 
@@ -278,6 +279,37 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
             return Collections.emptyList();
         }
         return segmentMapper.selectProcessList(documentIds);
+    }
+
+    @Override
+    public Long createKnowledgeSegment(AiKnowledgeSegmentSaveReqVO createReqVO) {
+        // 1.1 校验文档是否存在
+        AiKnowledgeDocumentDO document = knowledgeDocumentService
+                .validateKnowledgeDocumentExists(createReqVO.getDocumentId());
+        // 1.2 获取知识库信息
+        AiKnowledgeDO knowledge = knowledgeService.validateKnowledgeExists(document.getKnowledgeId());
+        // 1.3 校验 token 熟练
+        Integer tokens = tokenCountEstimator.estimate(createReqVO.getContent());
+        if (tokens > document.getSegmentMaxTokens()) {
+            throw exception(KNOWLEDGE_SEGMENT_CONTENT_TOO_LONG, tokens, document.getSegmentMaxTokens());
+        }
+
+        // 2. 保存段落
+        AiKnowledgeSegmentDO segment = BeanUtils.toBean(createReqVO, AiKnowledgeSegmentDO.class)
+                .setKnowledgeId(knowledge.getId()).setDocumentId(document.getId())
+                .setContentLength(createReqVO.getContent().length()).setTokens(tokens)
+                .setVectorId(AiKnowledgeSegmentDO.VECTOR_ID_EMPTY)
+                .setRetrievalCount(0).setStatus(CommonStatusEnum.ENABLE.getStatus());
+        segmentMapper.insert(segment);
+
+        // 3. 向量化
+        writeVectorStore(getVectorStoreById(knowledge), segment, new Document(segment.getContent()));
+        return segment.getId();
+    }
+
+    @Override
+    public AiKnowledgeSegmentDO getKnowledgeSegment(Long id) {
+        return validateKnowledgeSegmentExists(id);
     }
 
 }

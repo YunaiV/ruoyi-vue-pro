@@ -60,5 +60,6 @@ public interface ErrorCodeConstants {
     ErrorCode KNOWLEDGE_DOCUMENT_FILE_READ_FAIL = new ErrorCode(1_022_008_102, "文档加载失败!");
 
     ErrorCode KNOWLEDGE_SEGMENT_NOT_EXISTS = new ErrorCode(1_022_008_202, "段落不存在!");
+    ErrorCode KNOWLEDGE_SEGMENT_CONTENT_TOO_LONG = new ErrorCode(1_022_008_203, "内容 Token 数为 {}，超过最大限制 {}");
 
 }

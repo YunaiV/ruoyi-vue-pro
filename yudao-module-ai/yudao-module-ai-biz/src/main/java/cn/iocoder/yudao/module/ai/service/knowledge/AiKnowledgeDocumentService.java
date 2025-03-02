@@ -75,6 +75,13 @@ public interface AiKnowledgeDocumentService {
     void updateKnowledgeDocumentRetrievalCountIncr(Collection<Long> ids);
 
     /**
+     * 删除文档
+     *
+     * @param id 文档编号
+     */
+    void deleteKnowledgeDocument(Long id);
+
+    /**
      * 校验文档是否存在
      *
      * @param id 文档编号

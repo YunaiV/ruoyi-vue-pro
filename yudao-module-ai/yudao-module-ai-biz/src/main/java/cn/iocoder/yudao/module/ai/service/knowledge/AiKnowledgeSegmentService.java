@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.ai.service.knowledge;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentProcessRespVO;
-import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentUpdateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentSaveReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentUpdateStatusReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
 import cn.iocoder.yudao.module.ai.service.knowledge.bo.AiKnowledgeSegmentSearchReqBO;
@@ -18,6 +18,14 @@ import java.util.List;
  * @author xiaoxin
  */
 public interface AiKnowledgeSegmentService {
+
+    /**
+     * 获取知识库段落详情
+     *
+     * @param id 段落编号
+     * @return 段落详情
+     */
+    AiKnowledgeSegmentDO getKnowledgeSegment(Long id);
 
     /**
      * 获取段落分页
@@ -47,11 +55,19 @@ public interface AiKnowledgeSegmentService {
     }
 
     /**
+     * 创建知识库段落
+     *
+     * @param createReqVO 创建信息
+     * @return 段落编号
+     */
+    Long createKnowledgeSegment(AiKnowledgeSegmentSaveReqVO createReqVO);
+
+    /**
      * 更新段落的内容
      *
      * @param reqVO 更新内容
      */
-    void updateKnowledgeSegment(AiKnowledgeSegmentUpdateReqVO reqVO);
+    void updateKnowledgeSegment(AiKnowledgeSegmentSaveReqVO reqVO);
 
     /**
      * 更新段落的状态

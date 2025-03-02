@@ -25,8 +25,8 @@ public interface AiKnowledgeSegmentMapper extends BaseMapperX<AiKnowledgeSegment
     default PageResult<AiKnowledgeSegmentDO> selectPage(AiKnowledgeSegmentPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<AiKnowledgeSegmentDO>()
                 .eq(AiKnowledgeSegmentDO::getDocumentId, reqVO.getDocumentId())
+                .likeIfPresent(AiKnowledgeSegmentDO::getContent, reqVO.getContent())
                 .eqIfPresent(AiKnowledgeSegmentDO::getStatus, reqVO.getStatus())
-                .likeIfPresent(AiKnowledgeSegmentDO::getContent, reqVO.getKeyword())
                 .orderByDesc(AiKnowledgeSegmentDO::getId));
     }
 

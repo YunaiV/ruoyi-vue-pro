@@ -150,6 +150,19 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteKnowledgeDocument(Long id) {
+        // 1. 校验存在
+        validateKnowledgeDocumentExists(id);
+
+        // 2. 删除
+        knowledgeDocumentMapper.deleteById(id);
+
+        // 3. 删除对应的段落
+        knowledgeSegmentService.deleteKnowledgeSegmentByDocumentId(id);
+    }
+
+    @Override
     public void updateKnowledgeDocumentRetrievalCountIncr(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return;
