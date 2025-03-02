@@ -67,6 +67,7 @@ public class IotDeviceUpstreamServer {
         router.route().handler(BodyHandler.create()); // 处理 Body
         router.post(IotDeviceAuthVertxHandler.PATH)
                 // TODO @haohao：疑问，mqtt 的认证，需要通过 http 呀？
+                // 回复：MQTT 认证不必须通过 HTTP 进行，但 HTTP 认证是 EMQX 等 MQTT 服务器支持的一种灵活的认证方式
                 .handler(new IotDeviceAuthVertxHandler(deviceUpstreamApi));
         // 创建 HttpServer 实例
         this.server = vertx.createHttpServer().requestHandler(router);
@@ -165,15 +166,14 @@ public class IotDeviceUpstreamServer {
      * @return 订阅结果的Future
      */
     private Future<Void> subscribeToTopics() {
-        String topicsStr = emqxProperties.getMqttTopics();
-        if (topicsStr == null || topicsStr.trim().isEmpty()) {
+        String[] topics = emqxProperties.getMqttTopics();
+        if (topics == null || topics.length == 0) {
             log.warn("[subscribeToTopics] 未配置MQTT主题，跳过订阅");
             return Future.succeededFuture();
         }
 
         log.info("[subscribeToTopics] 开始订阅设备上行消息主题");
 
-        String[] topics = topicsStr.split(TOPIC_SEPARATOR);
         Future<Void> compositeFuture = Future.succeededFuture();
 
         for (String topic : topics) {

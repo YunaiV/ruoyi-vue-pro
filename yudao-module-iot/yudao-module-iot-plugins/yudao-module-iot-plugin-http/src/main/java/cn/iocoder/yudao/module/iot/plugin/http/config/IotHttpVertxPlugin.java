@@ -2,11 +2,9 @@ package cn.iocoder.yudao.module.iot.plugin.http.config;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.extra.spring.SpringUtil;
-import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginWrapper;
 import org.pf4j.spring.SpringPlugin;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -29,11 +27,6 @@ public class IotHttpVertxPlugin extends SpringPlugin {
             ApplicationContext pluginContext = getApplicationContext();
             Assert.notNull(pluginContext, "pluginContext 不能为空");
 
-            // 2. 启动 Vert.x
-            // TODO @haohao：貌似去掉，没有问题额。。。
-//            IotDeviceUpstreamServer vertxService = pluginContext.getBean(IotDeviceUpstreamServer.class);
-//            vertxService.start();
-
             log.info("[HttpVertxPlugin][HttpVertxPlugin 插件启动成功...]");
         } catch (Exception e) {
             log.error("[HttpVertxPlugin][HttpVertxPlugin 插件开启动异常...]", e);
@@ -44,13 +37,6 @@ public class IotHttpVertxPlugin extends SpringPlugin {
     public void stop() {
         log.info("[HttpVertxPlugin][HttpVertxPlugin 插件停止开始...]");
         try {
-            // 停止服务器
-//            ApplicationContext pluginContext = getApplicationContext();
-//            if (pluginContext != null) {
-//                IotDeviceUpstreamServer vertxService = pluginContext.getBean(IotDeviceUpstreamServer.class);
-//                vertxService.stop();
-//            }
-
             log.info("[HttpVertxPlugin][HttpVertxPlugin 插件停止成功...]");
         } catch (Exception e) {
             log.error("[HttpVertxPlugin][HttpVertxPlugin 插件停止异常...]", e);

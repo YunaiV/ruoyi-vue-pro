@@ -49,4 +49,18 @@ public class IotPluginCommonUtils {
                 .end(result);
     }
 
+    /**
+     * 将对象转换为JSON字符串后写入响应
+     *
+     * @param routingContext 路由上下文
+     * @param data           要转换为JSON的数据对象
+     */
+    @SuppressWarnings("deprecation")
+    public static void writeJson(RoutingContext routingContext, Object data) {
+        routingContext.response()
+                .setStatusCode(200)
+                .putHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .end(JsonUtils.toJsonString(data));
+    }
+
 }

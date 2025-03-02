@@ -36,11 +36,10 @@ public class IotPluginEmqxProperties {
      */
     private boolean mqttSsl;
 
-    // TODO @haohao：这个是不是改成数组？
     /**
-     * 订阅的主题
+     * 订阅的主题列表
      */
-    private String mqttTopics;
+    private String[] mqttTopics;
 
     /**
      * 认证端口
