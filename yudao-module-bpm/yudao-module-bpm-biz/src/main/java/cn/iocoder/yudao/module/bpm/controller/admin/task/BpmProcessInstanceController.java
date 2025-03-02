@@ -178,4 +178,15 @@ public class BpmProcessInstanceController {
     public CommonResult<BpmProcessInstanceBpmnModelViewRespVO> getProcessInstanceBpmnModelView(@RequestParam(value = "id") String id) {
         return success(processInstanceService.getProcessInstanceBpmnModelView(id));
     }
+
+    @GetMapping("/get-next-flow-nodes")
+    @Operation(summary = "获取下一个执行的流程节点")
+    @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
+    @SuppressWarnings("unchecked")
+    public CommonResult<List<BpmApprovalDetailRespVO.ActivityNode>> getNextFlowNodes(@Valid BpmApprovalDetailReqVO reqVO) {
+        if (StrUtil.isNotEmpty(reqVO.getProcessVariablesStr())) {
+            reqVO.setProcessVariables(JsonUtils.parseObject(reqVO.getProcessVariablesStr(), Map.class));
+        }
+        return success(processInstanceService.getNextFlowNodes(getLoginUserId(), reqVO));
+    }
 }

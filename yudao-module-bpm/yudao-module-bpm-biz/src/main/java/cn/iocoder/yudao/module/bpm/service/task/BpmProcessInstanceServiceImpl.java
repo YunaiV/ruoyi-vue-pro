@@ -11,6 +11,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
@@ -55,6 +56,7 @@ import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -223,6 +225,49 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 4. 拼接最终数据
         return buildApprovalDetail(reqVO, bpmnModel, processDefinition, processDefinitionInfo, historicProcessInstance,
                 processInstanceStatus, endActivityNodes, runActivityNodes, simulateActivityNodes, todoTask);
+    }
+
+    @Override
+    public List<ActivityNode> getNextFlowNodes(Long loginUserId, BpmApprovalDetailReqVO reqVO) {
+        // 1 校验任务存在
+        Task task = taskService.getTask(reqVO.getTaskId());
+        if (task == null) {
+            throw exception(TASK_NOT_EXISTS);
+        }
+        // 2 校验任务是否由当前用户审批
+        if (StrUtil.isNotBlank(task.getAssignee())
+                && ObjectUtil.notEqual(loginUserId, NumberUtils.parseLong(task.getAssignee()))) {
+            throw exception(TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
+        }
+        // 3 校验流程实例存在
+        ProcessInstance instance = getProcessInstance(task.getProcessInstanceId());
+        if (instance == null) {
+            throw exception(PROCESS_INSTANCE_NOT_EXISTS);
+        }
+        // 4 获取 BpmnModel
+        BpmnModel bpmnModel = processDefinitionService.getProcessDefinitionBpmnModel(task.getProcessDefinitionId());
+        if (bpmnModel == null) {
+            return null;
+        }
+        // 5. 获取当前任务节点的信息
+        FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
+        List<FlowNode> nextFlowNodes = BpmnModelUtils.getNextFlowNodes(flowElement, bpmnModel, reqVO.getProcessVariables());
+        return convertList(nextFlowNodes, nodes -> {
+            FlowElement flowNode = BpmnModelUtils.getFlowElementById(bpmnModel, nodes.getId());
+            ActivityNode activityNode = new ActivityNode().setId(nodes.getId()).setName(nodes.getName())
+                    .setNodeType(START_USER_NODE_ID.equals(nodes.getId())
+                            ? BpmSimpleModelNodeTypeEnum.START_USER_NODE.getType()
+                            : ObjUtil.defaultIfNull(parseNodeType(flowNode), // 目的：解决“办理节点”的识别
+                            BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType()))
+                    .setStatus(FlowableUtils.getTaskStatus(task))
+                    .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(flowNode));
+
+            // 如果是取消状态，则跳过
+            if (BpmTaskStatusEnum.isCancelStatus(activityNode.getStatus())) {
+                return null;
+            }
+            return activityNode;
+        });
     }
 
     @Override
