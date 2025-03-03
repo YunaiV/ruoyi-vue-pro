@@ -61,7 +61,7 @@ public class ActionItemOffImpl implements Action<ErpOffStatus, ErpEventEnum, Erp
 
         ErpPurchaseRequestDO requestDO = requestMapper.selectById(itemsDO.getRequestId());
         if (requestDO == null) {
-            log.error("采购请求不存在，ID: {}", itemsDO.getRequestId());
+            log.error("采购申请单不存在，ID: {}", itemsDO.getRequestId());
             throw ServiceExceptionUtil.exception(ErrorCodeConstants.PURCHASE_REQUEST_NOT_EXISTS, itemsDO.getRequestId());
         }
 

@@ -37,7 +37,7 @@ public interface ErpPurchaseRequestService {
     /**
      * 删除ERP采购申请单
      *
-     * @param ids 编号数组
+     * @param ids 主表ids
      */
     void deletePurchaseRequest(List<Long> ids);
 
@@ -65,24 +65,24 @@ public interface ErpPurchaseRequestService {
      */
     List<ErpPurchaseRequestItemsDO> getPurchaseRequestItemListByOrderId(Long requestId);
 
-    /**
-     * 更新采购申请单状态
-     * 该方法用于更新指定采购申请单的状态信息，包括审核状态、订单状态和下架状态。
-     * @param id 采购申请单的唯一标识符
-     * @param auditStatus 审核状态，用于表示采购申请单的审核情况
-     * @param orderStatus 订单状态，用于表示采购申请单的订单处理情况
-     * @param offStatus 下架状态，用于表示采购申请单是否被下架
-     */
-    void updatePurchaseRequestStatus(Long id, Integer auditStatus, Integer orderStatus, Integer offStatus);
+//    /**
+//     * 更新采购申请单状态
+//     * 该方法用于更新指定采购申请单的状态信息，包括审核状态、订单状态和下架状态。
+//     * @param id 采购申请单的唯一标识符
+//     * @param auditStatus 审核状态，用于表示采购申请单的审核情况
+//     * @param orderStatus 订单状态，用于表示采购申请单的订单处理情况
+//     * @param offStatus 下架状态，用于表示采购申请单是否被下架
+//     */
+//    void updatePurchaseRequestStatus(Long id, Integer auditStatus, Integer orderStatus, Integer offStatus);
 
-    /**
-     * 更新采购申请单子项状态(审核状态+关闭状态)
-     *
-     * @param itemIds     子表id
-     * @param orderStatus 采购状态
-     * @param offStatus   关闭状态
-     */
-    void updateItemStatus(List<Long> itemIds, Integer orderStatus, Integer offStatus);
+//    /**
+//     * 更新采购申请单子项状态(审核状态+关闭状态)
+//     *
+//     * @param itemIds     子表id
+//     * @param orderStatus 采购状态
+//     * @param offStatus   关闭状态
+//     */
+//    void updateItemStatus(List<Long> itemIds, Integer orderStatus, Integer offStatus);
 
     /**
      * 获得采购订单项 List

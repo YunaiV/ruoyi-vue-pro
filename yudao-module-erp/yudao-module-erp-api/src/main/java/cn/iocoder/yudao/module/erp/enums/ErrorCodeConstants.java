@@ -210,7 +210,7 @@ public interface ErrorCodeConstants {
     ErrorCode PURCHASE_REQUEST_UPDATE_FAIL_ORDER_STATUS = new ErrorCode(1_030_603_138, "非法采购状态变更({})->({})");
     ErrorCode PURCHASE_REQUEST_UPDATE_FAIL_OFF_STATUS = new ErrorCode(1_030_603_139, "非法开关状态变更({})->({})");
     ErrorCode PURCHASE_REQUEST_UPDATE_FAIL = new ErrorCode(1_030_603_140, "订单编号({})更新状态失败，请联系管理员");
-    ErrorCode PURCHASE_REQUEST_ITEM_CLOSED = new ErrorCode(1_030_603_141, "id({})已关闭,采购项无法修改");
+    ErrorCode PURCHASE_REQUEST_ITEM_CLOSED = new ErrorCode(1_030_603_141, "订单项编号({})已关闭,采购项无法修改");
     ErrorCode PURCHASE_REQUEST_ITEM_MANUAL_CLOSED = new ErrorCode(1_030_603_142, "id({})已手动关闭,采购项无法修改");
 //采购子项不存在
     ErrorCode PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_ID = new ErrorCode(1_030_603_143, "采购请求ID=({})没有子项");
