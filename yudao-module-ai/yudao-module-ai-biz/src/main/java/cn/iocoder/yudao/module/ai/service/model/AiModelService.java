@@ -109,9 +109,10 @@ public interface AiModelService {
     /**
      * 获得 MidjourneyApi 对象
      *
+     * @param id 编号
      * @return MidjourneyApi 对象
      */
-    MidjourneyApi getMidjourneyApi();
+    MidjourneyApi getMidjourneyApi(Long id);
 
     /**
      * 获得 SunoApi 对象

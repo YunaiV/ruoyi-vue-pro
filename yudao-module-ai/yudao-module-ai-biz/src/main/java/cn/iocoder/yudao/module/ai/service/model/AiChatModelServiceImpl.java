@@ -137,9 +137,9 @@ public class AiChatModelServiceImpl implements AiModelService {
     }
 
     @Override
-    public MidjourneyApi getMidjourneyApi() {
-        AiApiKeyDO apiKey = apiKeyService.getRequiredDefaultApiKey(
-                AiPlatformEnum.MIDJOURNEY.getPlatform(), CommonStatusEnum.ENABLE.getStatus());
+    public MidjourneyApi getMidjourneyApi(Long id) {
+        AiModelDO model = validateModel(id);
+        AiApiKeyDO apiKey = apiKeyService.validateApiKey(model.getKeyId());
         return modelFactory.getOrCreateMidjourneyApi(apiKey.getApiKey(), apiKey.getUrl());
     }
 
