@@ -595,8 +595,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (CollUtil.isNotEmpty(allNextAssignees)) {
             // 获取实例中的全部节点数据，避免后续节点的审批人被覆盖
             hisProcessVariables.putAll(allNextAssignees);
+            // 设置流程变量,审批人自选
             newVariables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES, hisProcessVariables);
-            runtimeService.setVariables(processInstance.getProcessInstanceId(), variables);
+            // 设置流程变量,发起人自选，后续的节点或者回退后再或者驳回重新发起的场景可能存在发起人自选或者审批人自选，所以中两个变量值要保持一致，否则会查询不到审批人
+            newVariables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES, hisProcessVariables);
+            runtimeService.setVariables(processInstance.getProcessInstanceId(), newVariables);
         }
         return newVariables;
     }

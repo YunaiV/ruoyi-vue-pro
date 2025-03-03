@@ -856,6 +856,10 @@ public class BpmnModelUtils {
             if (targetElement == null) {
                 continue;
             }
+            // 如果是结束节点，直接返回
+            if (targetElement instanceof EndEvent) {
+                break;
+            }
             // 情况一：处理不同类型的网关
             if (targetElement instanceof Gateway) {
                 Gateway gateway = (Gateway) targetElement;
