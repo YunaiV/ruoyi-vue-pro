@@ -169,7 +169,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         Long startUserId = loginUserId; // 流程发起人
         HistoricProcessInstance historicProcessInstance = null; // 流程实例
         Integer processInstanceStatus = BpmProcessInstanceStatusEnum.NOT_START.getStatus(); // 流程状态
-        Map<String, Object> processVariables = reqVO.getProcessVariables(); // 流程变量
+        Map<String, Object> processVariables = new HashMap<>(); // 流程变量
         // 1.2 如果是流程已发起的场景，则使用流程实例的数据
         if (reqVO.getProcessInstanceId() != null) {
             historicProcessInstance = getHistoricProcessInstance(reqVO.getProcessInstanceId());
@@ -180,10 +180,12 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             processInstanceStatus = FlowableUtils.getProcessInstanceStatus(historicProcessInstance);
             // 合并 DB 和前端传递的流量变量，以前端的为主
             Map<String, Object> historicVariables = historicProcessInstance.getProcessVariables();
-            if (CollUtil.isNotEmpty(processVariables)) {
-                historicVariables.putAll(processVariables);
+            if (CollUtil.isNotEmpty(historicVariables)) {
+                processVariables.putAll(historicVariables);
             }
-            processVariables = historicVariables;
+        }
+        if (CollUtil.isNotEmpty(reqVO.getProcessVariables())) {
+            processVariables.putAll(reqVO.getProcessVariables());
         }
         // 1.3 读取其它相关数据
         ProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(

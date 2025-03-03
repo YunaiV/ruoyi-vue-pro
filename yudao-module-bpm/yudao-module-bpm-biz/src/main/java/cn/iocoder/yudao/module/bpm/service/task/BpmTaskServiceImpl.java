@@ -531,6 +531,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             // 校验传递的参数中是否为下一个将要执行的任务节点
             Map<String, Object> variables = validateAndSetNextAssignees(task.getTaskDefinitionKey(), reqVO.getVariables(),
                     bpmnModel, reqVO.getNextAssignees(), instance);
+            runtimeService.setVariables(task.getProcessInstanceId(), variables);
             taskService.complete(task.getId(), variables, true);
         } else {
             taskService.complete(task.getId());
@@ -555,6 +556,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      */
     private Map<String, Object> validateAndSetNextAssignees(String taskDefinitionKey, Map<String, Object> variables, BpmnModel bpmnModel,
                                        Map<String, List<Long>> nextAssignees, ProcessInstance processInstance) {
+        // 下一个节点参数为空，不做处理，表示流程正常流转，无需选择下一个节点的审判人
+        if (CollUtil.isEmpty(nextAssignees)){
+            return variables;
+        }
         // 1. 获取当前任务节点的信息
         FlowElement flowElement = bpmnModel.getFlowElement(taskDefinitionKey);
         // 2. 获取下一个将要执行的节点集合
@@ -587,7 +592,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 // 4.3.3 校验通过的全部节点和审批人
                 allNextAssignees.put(nextFlowNode.getId(), nextAssignees.get(nextFlowNode.getId()));
             }
-            // TODO @小北：加一个“审批人选择”的校验；
         }
         // variables 是存储动态表单到 local 任务级别。过滤一下，避免 ProcessInstance 系统级的变量被占用
         Map<String, Object> newVariables = FlowableUtils.filterTaskFormVariable(variables);
@@ -599,7 +603,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             newVariables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES, hisProcessVariables);
             // 设置流程变量,发起人自选，后续的节点或者回退后再或者驳回重新发起的场景可能存在发起人自选或者审批人自选，所以中两个变量值要保持一致，否则会查询不到审批人
             newVariables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES, hisProcessVariables);
-            runtimeService.setVariables(processInstance.getProcessInstanceId(), newVariables);
         }
         return newVariables;
     }
