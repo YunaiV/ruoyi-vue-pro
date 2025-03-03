@@ -25,7 +25,7 @@ public interface IotDataBridgeExecute<Config> {
      * @param dataBridge 数据桥梁
      */
     @SuppressWarnings({"unchecked"})
-    default void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
+    default void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) throws Exception {
         // 1.1 校验数据桥梁类型
         if (!getType().equals(dataBridge.getType())) {
             return;
@@ -41,6 +41,6 @@ public interface IotDataBridgeExecute<Config> {
      * @param message 设备消息
      * @param config  桥梁配置
      */
-    void execute0(IotDeviceMessage message, Config config);
+    void execute0(IotDeviceMessage message, Config config) throws Exception;
 
 }

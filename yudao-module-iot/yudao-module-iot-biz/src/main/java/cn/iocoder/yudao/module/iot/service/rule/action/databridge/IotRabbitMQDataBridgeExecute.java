@@ -29,23 +29,19 @@ public class IotRabbitMQDataBridgeExecute extends
     }
 
     @Override
-    public void execute0(IotDeviceMessage message, IotDataBridgeDO.RabbitMQConfig config) {
-        try {
-            // 1. 获取或创建 Channel
-            Channel channel = getProducer(config);
+    public void execute0(IotDeviceMessage message, IotDataBridgeDO.RabbitMQConfig config) throws Exception {
+        // 1. 获取或创建 Channel
+        Channel channel = getProducer(config);
 
-            // 2.1 声明交换机、队列和绑定关系
-            channel.exchangeDeclare(config.getExchange(), "direct", true);
-            channel.queueDeclare(config.getQueue(), true, false, false, null);
-            channel.queueBind(config.getQueue(), config.getExchange(), config.getRoutingKey());
+        // 2.1 声明交换机、队列和绑定关系
+        channel.exchangeDeclare(config.getExchange(), "direct", true);
+        channel.queueDeclare(config.getQueue(), true, false, false, null);
+        channel.queueBind(config.getQueue(), config.getExchange(), config.getRoutingKey());
 
-            // 2.2 发送消息
-            channel.basicPublish(config.getExchange(), config.getRoutingKey(), null,
-                    message.toString().getBytes(StandardCharsets.UTF_8));
-            log.info("[executeRabbitMQ][message({}) config({}) 发送成功]", message, config);
-        } catch (Exception e) {
-            log.error("[executeRabbitMQ][message({}) config({}) 发送异常]", message, config, e);
-        }
+        // 2.2 发送消息
+        channel.basicPublish(config.getExchange(), config.getRoutingKey(), null,
+                message.toString().getBytes(StandardCharsets.UTF_8));
+        log.info("[executeRabbitMQ][message({}) config({}) 发送成功]", message, config);
     }
 
     @Override
@@ -107,11 +103,12 @@ public class IotRabbitMQDataBridgeExecute extends
                 .build();
 
         // 4. 执行两次测试，验证缓存
-        log.info("[main][第一次执行，应该会创建新的 channel]");
-        action.execute0(message, config);
+        // 4. 执行两次测试，验证缓存
+        log.info("[main][第一次执行，应该会创建新的 producer]");
+        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
 
-        log.info("[main][第二次执行，应该会复用缓存的 channel]");
-        action.execute0(message, config);
+        log.info("[main][第二次执行，应该会复用缓存的 producer]");
+        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
     }
 
 }

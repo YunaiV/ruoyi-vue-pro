@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Kafka 的 {@link IotDataBridgeExecute} 实现类
@@ -35,20 +34,14 @@ public class IotKafkaMQDataBridgeExecute extends
     }
 
     @Override
-    public void execute0(IotDeviceMessage message, IotDataBridgeDO.KafkaMQConfig config) {
-        try {
-            // 1. 获取或创建 KafkaTemplate
-            KafkaTemplate<String, String> kafkaTemplate = getProducer(config);
+    public void execute0(IotDeviceMessage message, IotDataBridgeDO.KafkaMQConfig config) throws Exception {
+        // 1. 获取或创建 KafkaTemplate
+        KafkaTemplate<String, String> kafkaTemplate = getProducer(config);
 
-            // 2. 发送消息并等待结果
-            kafkaTemplate.send(config.getTopic(), message.toString())
-                    .get(SEND_TIMEOUT.getSeconds(), TimeUnit.SECONDS); // 添加超时等待
-            log.info("[executeKafka][message({}) 发送成功]", message);
-        } catch (TimeoutException e) {
-            log.error("[executeKafka][message({}) config({}) 发送超时]", message, config, e);
-        } catch (Exception e) {
-            log.error("[executeKafka][message({}) config({}) 发送异常]", message, config, e);
-        }
+        // 2. 发送消息并等待结果
+        kafkaTemplate.send(config.getTopic(), message.toString())
+                .get(SEND_TIMEOUT.getSeconds(), TimeUnit.SECONDS); // 添加超时等待
+        log.info("[execute0][message({}) 发送成功]", message);
     }
 
     @Override
@@ -109,10 +102,10 @@ public class IotKafkaMQDataBridgeExecute extends
 
         // 4. 执行两次测试，验证缓存
         log.info("[main][第一次执行，应该会创建新的 producer]");
-        action.execute0(message, config);
+        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
 
         log.info("[main][第二次执行，应该会复用缓存的 producer]");
-        action.execute0(message, config);
+        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
     }
 
 }

@@ -26,10 +26,10 @@ public class IotRuleSceneDataBridgeAction implements IotRuleSceneAction {
     @Resource
     private IotDataBridgeService dataBridgeService;
     @Resource
-    private List<IotDataBridgeExecute> dataBridgeExecutes;
+    private List<IotDataBridgeExecute<?>> dataBridgeExecutes;
 
     @Override
-    public void execute(IotDeviceMessage message, IotRuleSceneDO.ActionConfig config) {
+    public void execute(IotDeviceMessage message, IotRuleSceneDO.ActionConfig config) throws Exception {
         // 1.1 如果消息为空，直接返回
         if (message == null) {
             return;
@@ -47,7 +47,9 @@ public class IotRuleSceneDataBridgeAction implements IotRuleSceneAction {
         }
 
         // 2. 执行数据桥接操作
-        dataBridgeExecutes.forEach(execute -> execute.execute(message, dataBridge));
+        for (IotDataBridgeExecute<?> execute : dataBridgeExecutes) {
+            execute.execute(message, dataBridge);
+        }
     }
 
     @Override

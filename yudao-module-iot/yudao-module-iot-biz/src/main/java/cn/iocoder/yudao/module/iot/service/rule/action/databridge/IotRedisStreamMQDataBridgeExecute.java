@@ -38,19 +38,15 @@ public class IotRedisStreamMQDataBridgeExecute extends
     }
 
     @Override
-    public void execute0(IotDeviceMessage message, IotDataBridgeDO.RedisStreamMQConfig config) {
-        try {
-            // 1. 获取 RedisTemplate
-            RedisTemplate<String, Object> redisTemplate = getProducer(config);
+    public void execute0(IotDeviceMessage message, IotDataBridgeDO.RedisStreamMQConfig config) throws Exception {
+        // 1. 获取 RedisTemplate
+        RedisTemplate<String, Object> redisTemplate = getProducer(config);
 
-            // 2. 创建并发送 Stream 记录
-            ObjectRecord<String, IotDeviceMessage> record = StreamRecords.newRecord()
-                    .ofObject(message).withStreamKey(config.getTopic());
-            String recordId = String.valueOf(redisTemplate.opsForStream().add(record));
-            log.info("[executeRedisStream][消息发送成功] messageId: {}, config: {}", recordId, config);
-        } catch (Exception e) {
-            log.error("[executeRedisStream][消息发送失败] message: {}, config: {}", message, config, e);
-        }
+        // 2. 创建并发送 Stream 记录
+        ObjectRecord<String, IotDeviceMessage> record = StreamRecords.newRecord()
+                .ofObject(message).withStreamKey(config.getTopic());
+        String recordId = String.valueOf(redisTemplate.opsForStream().add(record));
+        log.info("[executeRedisStream][消息发送成功] messageId: {}, config: {}", recordId, config);
     }
 
     @Override
@@ -126,11 +122,11 @@ public class IotRedisStreamMQDataBridgeExecute extends
                 .build();
 
         // 4. 执行两次测试，验证缓存
-        log.info("[main][第一次执行，应该会创建新的 RedisTemplate]");
-        action.execute0(message, config);
+        log.info("[main][第一次执行，应该会创建新的 producer]");
+        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
 
-        log.info("[main][第二次执行，应该会复用缓存的 RedisTemplate]");
-        action.execute0(message, config);
+        log.info("[main][第二次执行，应该会复用缓存的 producer]");
+        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
     }
 
 }

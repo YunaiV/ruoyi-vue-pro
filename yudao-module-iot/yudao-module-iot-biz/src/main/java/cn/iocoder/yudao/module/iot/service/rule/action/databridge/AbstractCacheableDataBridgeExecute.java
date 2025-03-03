@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
+import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -92,5 +94,21 @@ public abstract class AbstractCacheableDataBridgeExecute<Config, Producer> imple
      * @param producer 生产者对象
      */
     protected abstract void closeProducer(Producer producer) throws Exception;
+
+    @Override
+    @SuppressWarnings({"unchecked"})
+    public void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
+        // 1.1 校验数据桥梁类型
+        if (!getType().equals(dataBridge.getType())) {
+            return;
+        }
+
+        // 1.2 执行对应的数据桥梁发送消息
+        try {
+            execute0(message, (Config) dataBridge.getConfig());
+        } catch (Exception e) {
+            log.error("[execute][桥梁配置 config({}) 对应的 message({}) 发送异常]", dataBridge.getConfig(), message, e);
+        }
+    }
 
 }

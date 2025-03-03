@@ -29,27 +29,23 @@ public class IotRocketMQDataBridgeExecute extends
     }
 
     @Override
-    public void execute0(IotDeviceMessage message, IotDataBridgeDO.RocketMQConfig config) {
-        try {
-            // 1. 获取或创建 Producer
-            DefaultMQProducer producer = getProducer(config);
+    public void execute0(IotDeviceMessage message, IotDataBridgeDO.RocketMQConfig config) throws Exception {
+        // 1. 获取或创建 Producer
+        DefaultMQProducer producer = getProducer(config);
 
-            // 2.1 创建消息对象，指定Topic、Tag和消息体
-            Message msg = new Message(
-                    config.getTopic(),
-                    config.getTags(),
-                    message.toString().getBytes(RemotingHelper.DEFAULT_CHARSET)
-            );
-            // 2.2 发送同步消息并处理结果
-            SendResult sendResult = producer.send(msg);
-            // 2.3 处理发送结果
-            if (SendStatus.SEND_OK.equals(sendResult.getSendStatus())) {
-                log.info("[executeRocketMQ][message({}) config({}) 发送成功，结果({})]", message, config, sendResult);
-            } else {
-                log.error("[executeRocketMQ][message({}) config({}) 发送失败，结果({})]", message, config, sendResult);
-            }
-        } catch (Exception e) {
-            log.error("[executeRocketMQ][message({}) config({}) 发送异常]", message, config, e);
+        // 2.1 创建消息对象，指定Topic、Tag和消息体
+        Message msg = new Message(
+                config.getTopic(),
+                config.getTags(),
+                message.toString().getBytes(RemotingHelper.DEFAULT_CHARSET)
+        );
+        // 2.2 发送同步消息并处理结果
+        SendResult sendResult = producer.send(msg);
+        // 2.3 处理发送结果
+        if (SendStatus.SEND_OK.equals(sendResult.getSendStatus())) {
+            log.info("[executeRocketMQ][message({}) config({}) 发送成功，结果({})]", message, config, sendResult);
+        } else {
+            log.error("[executeRocketMQ][message({}) config({}) 发送失败，结果({})]", message, config, sendResult);
         }
     }
 
@@ -93,10 +89,10 @@ public class IotRocketMQDataBridgeExecute extends
 
         // 4. 执行两次测试，验证缓存
         log.info("[main][第一次执行，应该会创建新的 producer]");
-        action.execute0(message, config);
+        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
 
         log.info("[main][第二次执行，应该会复用缓存的 producer]");
-        action.execute0(message, config);
+        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
     }
 
 }
