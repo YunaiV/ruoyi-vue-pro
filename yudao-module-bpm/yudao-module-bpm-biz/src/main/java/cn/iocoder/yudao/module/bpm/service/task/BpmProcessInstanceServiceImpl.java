@@ -15,6 +15,7 @@ import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
+import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
@@ -249,24 +250,43 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         if (bpmnModel == null) {
             return null;
         }
-        // 5. 获取当前任务节点的信息
+        HistoricProcessInstance historicProcessInstance = getHistoricProcessInstance(task.getProcessInstanceId());
+        if (historicProcessInstance == null) {
+            throw exception(ErrorCodeConstants.PROCESS_INSTANCE_NOT_EXISTS);
+        }
+        Map<String, Object> processVariables = new HashMap<>();
+        // 获取历史中流程变量
+        Map<String, Object> historicVariables = historicProcessInstance.getProcessVariables();
+        if (CollUtil.isNotEmpty(historicVariables)) {
+            processVariables.putAll(historicVariables);
+        }
+        // 合并前端传递的流程变量，以前端为准
+        if (CollUtil.isNotEmpty(reqVO.getProcessVariables())){
+            processVariables.putAll(reqVO.getProcessVariables());
+        }
+        // 获取流程定义信息
+        BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService
+                .getProcessDefinitionInfo(task.getProcessDefinitionId());
+        // 获取当前任务节点的信息
         FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
-        List<FlowNode> nextFlowNodes = BpmnModelUtils.getNextFlowNodes(flowElement, bpmnModel, reqVO.getProcessVariables());
-        return convertList(nextFlowNodes, nodes -> {
-            FlowElement flowNode = BpmnModelUtils.getFlowElementById(bpmnModel, nodes.getId());
-            ActivityNode activityNode = new ActivityNode().setId(nodes.getId()).setName(nodes.getName())
-                    .setNodeType(START_USER_NODE_ID.equals(nodes.getId())
-                            ? BpmSimpleModelNodeTypeEnum.START_USER_NODE.getType()
-                            : ObjUtil.defaultIfNull(parseNodeType(flowNode), // 目的：解决“办理节点”的识别
-                            BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType()))
-                    .setStatus(FlowableUtils.getTaskStatus(task))
-                    .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(flowNode));
-
-            // 如果是取消状态，则跳过
-            if (BpmTaskStatusEnum.isCancelStatus(activityNode.getStatus())) {
-                return null;
+        // 获取下一个将要执行的节点集合
+        List<FlowNode> nextFlowNodes = BpmnModelUtils.getNextFlowNodes(flowElement, bpmnModel, processVariables);
+        return convertList(nextFlowNodes, node -> {
+            List<Long> candidateUserIds = getTaskCandidateUserList(bpmnModel, node.getId(),
+                    loginUserId, processDefinitionInfo.getProcessDefinitionId(), processVariables);
+            //存在一个节点多人审批的情况
+            List<UserSimpleBaseVO> candidateUsers = new ArrayList<>();
+            for (Long candidateUserId : candidateUserIds) {
+                Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(candidateUserIds);
+                Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
+                candidateUsers.add(BpmProcessInstanceConvert.INSTANCE.buildUser(candidateUserId, userMap, deptMap));
             }
-            return activityNode;
+            return new ActivityNode().setNodeType(BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType())
+                    .setId(node.getId())
+                    .setName(node.getName())
+                    .setStatus(BpmTaskStatusEnum.RUNNING.getStatus())
+                    .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(node))
+                    .setCandidateUsers(candidateUsers);
         });
     }
 
@@ -725,7 +745,11 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                                                                                              // true，不影响没配置
                                                                                              // skipExpression 的节点
         if (CollUtil.isNotEmpty(startUserSelectAssignees)) {
+            // 设置流程变量，发起人自选审批人
             variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES,
+                    startUserSelectAssignees);
+            // 设置流程变量，审批人自选审批人
+            variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES,
                     startUserSelectAssignees);
         }
 
@@ -768,9 +792,10 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             return;
         }
 
-        // 2.1 移除掉不是发起人自选审批人节点
+        // 2.1 移除掉不是发起人或者审批人自选审批人节点
         activityNodes.removeIf(task ->
-                ObjectUtil.notEqual(BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy(), task.getCandidateStrategy()));
+                ObjectUtil.notEqual(BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy(), task.getCandidateStrategy())
+        && ObjectUtil.notEqual(BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy(), task.getCandidateStrategy()));
         // 2.2 流程发起时要先获取当前流程的预测走向节点，发起时只校验预测的节点发起人自选审批人的审批人和抄送人是否都配置了
         activityNodes.forEach(task -> {
             List<Long> assignees = startUserSelectAssignees != null ? startUserSelectAssignees.get(task.getId()) : null;
