@@ -1,12 +1,12 @@
-package cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatModel;
+package cn.iocoder.yudao.module.ai.controller.admin.model.vo.model;
 
 import lombok.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 
-@Schema(description = "管理后台 - API 聊天模型分页 Request VO")
+@Schema(description = "管理后台 - API 模型分页 Request VO")
 @Data
-public class AiChatModelPageReqVO extends PageParam {
+public class AiModelPageReqVO extends PageParam {
 
     @Schema(description = "模型名字", example = "张三")
     private String name;

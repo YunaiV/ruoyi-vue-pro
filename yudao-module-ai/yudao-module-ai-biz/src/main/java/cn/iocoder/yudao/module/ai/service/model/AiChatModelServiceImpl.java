@@ -1,114 +1,168 @@
 package cn.iocoder.yudao.module.ai.service.model;
 
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactory;
+import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatModel.AiChatModelPageReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatModel.AiChatModelSaveReqVO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
-import cn.iocoder.yudao.module.ai.dal.mysql.model.AiChatModelMapper;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiModelPageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiModelSaveReqVO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
+import cn.iocoder.yudao.module.ai.dal.mysql.model.AiChatMapper;
 import jakarta.annotation.Resource;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.image.ImageModel;
+import org.springframework.ai.vectorstore.SimpleVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
 
 /**
- * AI 聊天模型 Service 实现类
+ * AI 模型 Service 实现类
  *
  * @author fansili
  */
 @Service
 @Validated
-public class AiChatModelServiceImpl implements AiChatModelService {
+public class AiChatModelServiceImpl implements AiModelService {
 
     @Resource
     private AiApiKeyService apiKeyService;
 
     @Resource
-    private AiChatModelMapper chatModelMapper;
+    private AiChatMapper modelMapper;
+
+    @Resource
+    private AiModelFactory modelFactory;
 
     @Override
-    public Long createChatModel(AiChatModelSaveReqVO createReqVO) {
+    public Long createModel(AiModelSaveReqVO createReqVO) {
         // 1. 校验
         AiPlatformEnum.validatePlatform(createReqVO.getPlatform());
         apiKeyService.validateApiKey(createReqVO.getKeyId());
 
         // 2. 插入
-        AiChatModelDO chatModel = BeanUtils.toBean(createReqVO, AiChatModelDO.class);
-        chatModelMapper.insert(chatModel);
-        return chatModel.getId();
+        AiModelDO model = BeanUtils.toBean(createReqVO, AiModelDO.class);
+        modelMapper.insert(model);
+        return model.getId();
     }
 
     @Override
-    public void updateChatModel(AiChatModelSaveReqVO updateReqVO) {
+    public void updateModel(AiModelSaveReqVO updateReqVO) {
         // 1. 校验
-        validateChatModelExists(updateReqVO.getId());
+        validateModelExists(updateReqVO.getId());
         AiPlatformEnum.validatePlatform(updateReqVO.getPlatform());
         apiKeyService.validateApiKey(updateReqVO.getKeyId());
 
         // 2. 更新
-        AiChatModelDO updateObj = BeanUtils.toBean(updateReqVO, AiChatModelDO.class);
-        chatModelMapper.updateById(updateObj);
+        AiModelDO updateObj = BeanUtils.toBean(updateReqVO, AiModelDO.class);
+        modelMapper.updateById(updateObj);
     }
 
     @Override
-    public void deleteChatModel(Long id) {
+    public void deleteModel(Long id) {
         // 校验存在
-        validateChatModelExists(id);
+        validateModelExists(id);
         // 删除
-        chatModelMapper.deleteById(id);
+        modelMapper.deleteById(id);
     }
 
-    private AiChatModelDO validateChatModelExists(Long id) {
-        AiChatModelDO model = chatModelMapper.selectById(id);
-        if (chatModelMapper.selectById(id) == null) {
-            throw exception(CHAT_MODEL_NOT_EXISTS);
+    private AiModelDO validateModelExists(Long id) {
+        AiModelDO model = modelMapper.selectById(id);
+        if (modelMapper.selectById(id) == null) {
+            throw exception(MODEL_NOT_EXISTS);
         }
         return model;
     }
 
     @Override
-    public AiChatModelDO getChatModel(Long id) {
-        return chatModelMapper.selectById(id);
+    public AiModelDO getModel(Long id) {
+        return modelMapper.selectById(id);
     }
 
     @Override
-    public AiChatModelDO getRequiredDefaultChatModel() {
-        AiChatModelDO model = chatModelMapper.selectFirstByStatus(CommonStatusEnum.ENABLE.getStatus());
+    public AiModelDO getRequiredDefaultModel(Integer type) {
+        AiModelDO model = modelMapper.selectFirstByStatus(type, CommonStatusEnum.ENABLE.getStatus());
         if (model == null) {
-            throw exception(CHAT_MODEL_DEFAULT_NOT_EXISTS);
+            throw exception(MODEL_DEFAULT_NOT_EXISTS);
         }
         return model;
     }
 
     @Override
-    public PageResult<AiChatModelDO> getChatModelPage(AiChatModelPageReqVO pageReqVO) {
-        return chatModelMapper.selectPage(pageReqVO);
+    public PageResult<AiModelDO> getModelPage(AiModelPageReqVO pageReqVO) {
+        return modelMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public AiChatModelDO validateChatModel(Long id) {
-        AiChatModelDO model = validateChatModelExists(id);
+    public AiModelDO validateModel(Long id) {
+        AiModelDO model = validateModelExists(id);
         if (CommonStatusEnum.isDisable(model.getStatus())) {
-            throw exception(CHAT_MODEL_DISABLE);
+            throw exception(MODEL_DISABLE);
         }
         return model;
     }
 
     @Override
-    public List<AiChatModelDO> getChatModelListByStatus(Integer status) {
-        return chatModelMapper.selectList(status);
+    public List<AiModelDO> getModelListByStatusAndType(Integer status, Integer type,
+                                                       String platform) {
+        return modelMapper.selectListByStatusAndType(status, type, platform);
+    }
+
+    // ========== 与 Spring AI 集成 ==========
+
+    @Override
+    public ChatModel getChatModel(Long id) {
+        AiModelDO model = validateModel(id);
+        AiApiKeyDO apiKey = apiKeyService.validateApiKey(model.getKeyId());
+        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
+        return modelFactory.getOrCreateChatModel(platform, apiKey.getApiKey(), apiKey.getUrl());
     }
 
     @Override
-    public List<AiChatModelDO> getChatModelList(Collection<Long> ids) {
-        return chatModelMapper.selectBatchIds(ids);
+    public ImageModel getImageModel(Long id) {
+        AiModelDO model = validateModel(id);
+        AiApiKeyDO apiKey = apiKeyService.validateApiKey(model.getKeyId());
+        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
+        return modelFactory.getOrCreateImageModel(platform, apiKey.getApiKey(), apiKey.getUrl());
+    }
+
+    @Override
+    public MidjourneyApi getMidjourneyApi() {
+        AiApiKeyDO apiKey = apiKeyService.getRequiredDefaultApiKey(
+                AiPlatformEnum.MIDJOURNEY.getPlatform(), CommonStatusEnum.ENABLE.getStatus());
+        return modelFactory.getOrCreateMidjourneyApi(apiKey.getApiKey(), apiKey.getUrl());
+    }
+
+    @Override
+    public SunoApi getSunoApi() {
+        AiApiKeyDO apiKey = apiKeyService.getRequiredDefaultApiKey(
+                AiPlatformEnum.SUNO.getPlatform(), CommonStatusEnum.ENABLE.getStatus());
+        return modelFactory.getOrCreateSunoApi(apiKey.getApiKey(), apiKey.getUrl());
+    }
+
+    @Override
+    public VectorStore getOrCreateVectorStore(Long id) {
+        // 获取模型 + 密钥
+        AiModelDO model = validateModel(id);
+        AiApiKeyDO apiKey = apiKeyService.validateApiKey(model.getKeyId());
+        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
+
+        // 创建或获取 EmbeddingModel 对象
+        EmbeddingModel embeddingModel = modelFactory.getOrCreateEmbeddingModel(
+                platform, apiKey.getApiKey(), apiKey.getUrl(), model.getModel());
+
+        // 创建或获取 VectorStore 对象
+        return modelFactory.getOrCreateVectorStore(SimpleVectorStore.class, embeddingModel);
     }
 
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.model;
 
+import cn.iocoder.yudao.framework.ai.core.enums.AiModelTypeEnum;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
@@ -8,23 +9,22 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-// TODO @芋艿，需要改造，增加 type
 /**
- * AI 聊天模型 DO
+ * AI 模型 DO
  *
- * 默认聊天模型：{@link #status} 为开启，并且 {@link #sort} 排序第一
+ * 默认模型：{@link #status} 为开启，并且 {@link #sort} 排序第一
  *
  * @author fansili
  * @since 2024/4/24 19:39
  */
-@TableName("ai_chat_model")
-@KeySequence("ai_chat_model_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("ai_model")
+@KeySequence("ai_model_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AiChatModelDO extends BaseDO {
+public class AiModelDO extends BaseDO {
 
     /**
      * 编号
@@ -51,6 +51,12 @@ public class AiChatModelDO extends BaseDO {
      * 枚举 {@link AiPlatformEnum}
      */
     private String platform;
+    /**
+     * 类型
+     *
+     * 枚举 {@link AiModelTypeEnum}
+     */
+    private Integer type;
 
     /**
      * 排序值

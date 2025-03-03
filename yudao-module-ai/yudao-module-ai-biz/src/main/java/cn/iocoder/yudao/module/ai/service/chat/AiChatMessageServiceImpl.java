@@ -15,13 +15,12 @@ import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessage
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.chat.AiChatMessageMapper;
 import cn.iocoder.yudao.module.ai.enums.AiChatRoleEnum;
 import cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeSegmentService;
-import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
-import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
+import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.Message;
@@ -63,9 +62,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     @Resource
     private AiChatConversationService chatConversationService;
     @Resource
-    private AiChatModelService chatModalService;
-    @Resource
-    private AiApiKeyService apiKeyService;
+    private AiModelService modalService;
     @Resource
     private AiKnowledgeSegmentService knowledgeSegmentService;
 
@@ -78,8 +75,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         }
         List<AiChatMessageDO> historyMessages = chatMessageMapper.selectListByConversationId(conversation.getId());
         // 1.2 校验模型
-        AiChatModelDO model = chatModalService.validateChatModel(conversation.getModelId());
-        ChatModel chatModel = apiKeyService.getChatModel(model.getKeyId());
+        AiModelDO model = modalService.validateModel(conversation.getModelId());
+        ChatModel chatModel = modalService.getChatModel(model.getKeyId());
 
         // 2. 插入 user 发送消息
         AiChatMessageDO userMessage = createChatMessage(conversation.getId(), null, model,
@@ -112,8 +109,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         }
         List<AiChatMessageDO> historyMessages = chatMessageMapper.selectListByConversationId(conversation.getId());
         // 1.2 校验模型
-        AiChatModelDO model = chatModalService.validateChatModel(conversation.getModelId());
-        StreamingChatModel chatModel = apiKeyService.getChatModel(model.getKeyId());
+        AiModelDO model = modalService.validateModel(conversation.getModelId());
+        StreamingChatModel chatModel = modalService.getChatModel(model.getKeyId());
 
         // 2. 插入 user 发送消息
         AiChatMessageDO userMessage = createChatMessage(conversation.getId(), null, model,
@@ -161,8 +158,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         return null;
     }
 
-    private Prompt buildPrompt(AiChatConversationDO conversation, List<AiChatMessageDO> messages,List<AiKnowledgeSegmentDO> segmentList,
-                               AiChatModelDO model, AiChatMessageSendReqVO sendReqVO) {
+    private Prompt buildPrompt(AiChatConversationDO conversation, List<AiChatMessageDO> messages, List<AiKnowledgeSegmentDO> segmentList,
+                               AiModelDO model, AiChatMessageSendReqVO sendReqVO) {
         // 1. 构建 Prompt Message 列表
         List<Message> chatMessages = new ArrayList<>();
 
@@ -232,7 +229,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     }
 
     private AiChatMessageDO createChatMessage(Long conversationId, Long replyId,
-                                              AiChatModelDO model, Long userId, Long roleId,
+                                              AiModelDO model, Long userId, Long roleId,
                                               MessageType messageType, String content, Boolean useContext) {
         AiChatMessageDO message = new AiChatMessageDO().setConversationId(conversationId).setReplyId(replyId)
                 .setModel(model.getModel()).setModelId(model.getId()).setUserId(userId).setRoleId(roleId)

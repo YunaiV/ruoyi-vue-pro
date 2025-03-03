@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.ai.dal.dataobject.knowledge;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -35,13 +35,13 @@ public class AiKnowledgeDO extends BaseDO {
     /**
      * 向量模型编号
      *
-     * 关联 {@link AiChatModelDO#getId()}
+     * 关联 {@link AiModelDO#getId()}
      */
     private Long embeddingModelId;
     /**
      * 模型标识
      *
-     * 冗余 {@link AiChatModelDO#getModel()}
+     * 冗余 {@link AiModelDO#getModel()}
      */
     private String embeddingModel;
 

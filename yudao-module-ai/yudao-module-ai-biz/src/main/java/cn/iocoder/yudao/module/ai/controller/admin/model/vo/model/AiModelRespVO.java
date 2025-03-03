@@ -1,13 +1,13 @@
-package cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatModel;
+package cn.iocoder.yudao.module.ai.controller.admin.model.vo.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "管理后台 - AI 聊天模型 Response VO")
+@Schema(description = "管理后台 - AI 模型 Response VO")
 @Data
-public class AiChatModelRespVO {
+public class AiModelRespVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2630")
     private Long id;
@@ -23,6 +23,9 @@ public class AiChatModelRespVO {
 
     @Schema(description = "模型平台", example = "OpenAI")
     private String platform;
+
+    @Schema(description = "模型类型", example = "1")
+    private Integer type;
 
     @Schema(description = "排序", example = "1")
     private Integer sort;

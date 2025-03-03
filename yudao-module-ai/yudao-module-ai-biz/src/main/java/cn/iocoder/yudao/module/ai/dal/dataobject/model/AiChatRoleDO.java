@@ -58,7 +58,7 @@ public class AiChatRoleDO extends BaseDO {
     /**
      * 模型编号
      *
-     * 关联 {@link AiChatModelDO#getId()} 字段
+     * 关联 {@link AiModelDO#getId()} 字段
      */
     private Long modelId;
 

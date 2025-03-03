@@ -456,25 +456,4 @@ public class AiModelFactoryImpl implements AiModelFactory {
         return vectorStore;
     }
 
-    /**
-     * 创建向量存储文件
-     *
-     * @param embeddingModel 嵌入模型
-     * @return 向量存储文件
-     */
-    private File createVectorStoreFile(EmbeddingModel embeddingModel) {
-        // 获取简单类名
-        String simpleClassName = embeddingModel.getClass().getSimpleName();
-        // 获取用户主目录
-        String userHome = FileUtil.getUserHomePath();
-        // 创建vector_store目录
-        File vectorStoreDir = new File(userHome, "vector_store");
-        if (!vectorStoreDir.exists()) {
-            vectorStoreDir.mkdirs();
-        }
-
-        // 创建文件
-        return new File(vectorStoreDir, "simple_" + simpleClassName + ".json");
-    }
-
 }

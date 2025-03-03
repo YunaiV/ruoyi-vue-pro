@@ -7,14 +7,17 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.*;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentPageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentProcessRespVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentSaveReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment.AiKnowledgeSegmentUpdateStatusReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeSegmentMapper;
-import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.ai.service.knowledge.bo.AiKnowledgeSegmentSearchReqBO;
 import cn.iocoder.yudao.module.ai.service.knowledge.bo.AiKnowledgeSegmentSearchRespBO;
+import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
@@ -33,8 +36,8 @@ import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.KNOWLEDGE_SEGMENT_NOT_EXISTS;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.KNOWLEDGE_SEGMENT_CONTENT_TOO_LONG;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.KNOWLEDGE_SEGMENT_NOT_EXISTS;
 
 /**
  * AI 知识库分片 Service 实现类
@@ -58,7 +61,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
     @Lazy // 延迟加载，避免循环依赖
     private AiKnowledgeDocumentService knowledgeDocumentService;
     @Resource
-    private AiApiKeyService apiKeyService;
+    private AiModelService modelService;
 
     @Resource
     private TokenCountEstimator tokenCountEstimator;
@@ -180,7 +183,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         AiKnowledgeDO knowledge = knowledgeService.validateKnowledgeExists(reqBO.getKnowledgeId());
 
         // 2.1 向量检索
-        VectorStore vectorStore = apiKeyService.getOrCreateVectorStoreByModelId(knowledge.getEmbeddingModelId());
+        VectorStore vectorStore = getVectorStoreById(knowledge);
         List<Document> documents = vectorStore.similaritySearch(SearchRequest.builder()
                 .query(reqBO.getContent())
                 .topK(ObjUtil.defaultIfNull(reqBO.getTopK(), knowledge.getTopK()))
@@ -251,11 +254,12 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
     }
 
     private VectorStore getVectorStoreById(AiKnowledgeDO knowledge) {
-        return apiKeyService.getOrCreateVectorStoreByModelId(knowledge.getEmbeddingModelId());
+        return modelService.getOrCreateVectorStore(knowledge.getEmbeddingModelId());
     }
 
     private VectorStore getVectorStoreById(Long knowledgeId) {
-        return getVectorStoreById(knowledgeService.validateKnowledgeExists(knowledgeId));
+        AiKnowledgeDO knowledge = knowledgeService.validateKnowledgeExists(knowledgeId);
+        return getVectorStoreById(knowledge);
     }
 
     private static List<Document> splitContentByToken(String content, Integer segmentMaxTokens) {

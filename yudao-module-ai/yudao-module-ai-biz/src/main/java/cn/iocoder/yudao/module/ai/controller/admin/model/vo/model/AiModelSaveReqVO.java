@@ -1,14 +1,17 @@
-package cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatModel;
+package cn.iocoder.yudao.module.ai.controller.admin.model.vo.model;
 
+import cn.iocoder.yudao.framework.ai.core.enums.AiModelTypeEnum;
+import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
-@Schema(description = "管理后台 - API 聊天模型新增/修改 Request VO")
+@Schema(description = "管理后台 - API 模型新增/修改 Request VO")
 @Data
-public class AiChatModelSaveReqVO {
+public class AiModelSaveReqVO {
 
     @Schema(description = "编号", example = "2630")
     private Long id;
@@ -27,7 +30,13 @@ public class AiChatModelSaveReqVO {
 
     @Schema(description = "模型平台", requiredMode = Schema.RequiredMode.REQUIRED, example = "OpenAI")
     @NotEmpty(message = "模型平台不能为空")
+    @InEnum(AiPlatformEnum.class)
     private String platform;
+
+    @Schema(description = "模型类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "模型类型不能为空")
+    @InEnum(AiModelTypeEnum.class)
+    private Integer type;
 
     @Schema(description = "排序", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "排序不能为空")

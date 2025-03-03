@@ -5,9 +5,9 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgePageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeSaveReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeMapper;
-import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
+import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,12 +28,12 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
     private AiKnowledgeMapper knowledgeMapper;
 
     @Resource
-    private AiChatModelService chatModelService;
+    private AiModelService chatModelService;
 
     @Override
     public Long createKnowledge(AiKnowledgeSaveReqVO createReqVO) {
         // 1. 校验模型配置
-        AiChatModelDO model = chatModelService.validateChatModel(createReqVO.getEmbeddingModelId());
+        AiModelDO model = chatModelService.validateModel(createReqVO.getEmbeddingModelId());
 
         // 2. 插入知识库
         AiKnowledgeDO knowledge = BeanUtils.toBean(createReqVO, AiKnowledgeDO.class)
@@ -47,7 +47,7 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
         // 1.1 校验知识库存在
         validateKnowledgeExists(updateReqVO.getId());
         // 1.2 校验模型配置
-        AiChatModelDO model = chatModelService.validateChatModel(updateReqVO.getEmbeddingModelId());
+        AiModelDO model = chatModelService.validateModel(updateReqVO.getEmbeddingModelId());
 
         // 2. 更新知识库
         AiKnowledgeDO updateObj = BeanUtils.toBean(updateReqVO, AiKnowledgeDO.class)
