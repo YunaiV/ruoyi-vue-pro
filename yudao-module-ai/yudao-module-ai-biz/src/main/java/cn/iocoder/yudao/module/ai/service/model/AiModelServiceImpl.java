@@ -33,7 +33,7 @@ import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
  */
 @Service
 @Validated
-public class AiChatModelServiceImpl implements AiModelService {
+public class AiModelServiceImpl implements AiModelService {
 
     @Resource
     private AiApiKeyService apiKeyService;

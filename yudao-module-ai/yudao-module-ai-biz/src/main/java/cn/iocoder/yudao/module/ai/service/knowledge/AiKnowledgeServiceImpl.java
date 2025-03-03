@@ -28,12 +28,12 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
     private AiKnowledgeMapper knowledgeMapper;
 
     @Resource
-    private AiModelService chatModelService;
+    private AiModelService modelService;
 
     @Override
     public Long createKnowledge(AiKnowledgeSaveReqVO createReqVO) {
         // 1. 校验模型配置
-        AiModelDO model = chatModelService.validateModel(createReqVO.getEmbeddingModelId());
+        AiModelDO model = modelService.validateModel(createReqVO.getEmbeddingModelId());
 
         // 2. 插入知识库
         AiKnowledgeDO knowledge = BeanUtils.toBean(createReqVO, AiKnowledgeDO.class)
@@ -47,7 +47,7 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
         // 1.1 校验知识库存在
         validateKnowledgeExists(updateReqVO.getId());
         // 1.2 校验模型配置
-        AiModelDO model = chatModelService.validateModel(updateReqVO.getEmbeddingModelId());
+        AiModelDO model = modelService.validateModel(updateReqVO.getEmbeddingModelId());
 
         // 2. 更新知识库
         AiKnowledgeDO updateObj = BeanUtils.toBean(updateReqVO, AiKnowledgeDO.class)

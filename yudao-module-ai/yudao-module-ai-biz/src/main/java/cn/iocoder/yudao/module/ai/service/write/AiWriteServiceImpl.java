@@ -54,7 +54,7 @@ import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.WRITE_NOT_EXIS
 public class AiWriteServiceImpl implements AiWriteService {
 
     @Resource
-    private AiModelService chatModalService;
+    private AiModelService modalService;
     @Resource
     private AiChatRoleService chatRoleService;
 
@@ -76,7 +76,7 @@ public class AiWriteServiceImpl implements AiWriteService {
                 ? writeRole.getSystemMessage() : AiChatRoleEnum.AI_WRITE_ROLE.getSystemMessage();
         // 1.3 校验平台
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
-        StreamingChatModel chatModel = chatModalService.getChatModel(model.getKeyId());
+        StreamingChatModel chatModel = modalService.getChatModel(model.getKeyId());
 
         // 2. 插入写作信息
         AiWriteDO writeDO = BeanUtils.toBean(generateReqVO, AiWriteDO.class, write -> write.setUserId(userId)
@@ -110,10 +110,10 @@ public class AiWriteServiceImpl implements AiWriteService {
     private AiModelDO getModel(AiChatRoleDO writeRole) {
         AiModelDO model = null;
         if (Objects.nonNull(writeRole) && Objects.nonNull(writeRole.getModelId())) {
-            model = chatModalService.getModel(writeRole.getModelId());
+            model = modalService.getModel(writeRole.getModelId());
         }
         if (model == null) {
-            model = chatModalService.getRequiredDefaultModel(AiModelTypeEnum.CHAT.getType());
+            model = modalService.getRequiredDefaultModel(AiModelTypeEnum.CHAT.getType());
         }
         Assert.notNull(model, "[AI] 获取不到模型");
         return model;

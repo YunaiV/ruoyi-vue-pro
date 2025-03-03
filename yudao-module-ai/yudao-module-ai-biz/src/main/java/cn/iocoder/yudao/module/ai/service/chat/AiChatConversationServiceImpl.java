@@ -45,7 +45,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
     private AiChatConversationMapper chatConversationMapper;
 
     @Resource
-    private AiModelService chatModalService;
+    private AiModelService modalService;
     @Resource
     private AiChatRoleService chatRoleService;
     @Resource
@@ -56,8 +56,8 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
         // 1.1 获得 AiChatRoleDO 聊天角色
         AiChatRoleDO role = createReqVO.getRoleId() != null ? chatRoleService.validateChatRole(createReqVO.getRoleId()) : null;
         // 1.2 获得 AiModelDO 聊天模型
-        AiModelDO model = role != null && role.getModelId() != null ? chatModalService.validateModel(role.getModelId())
-                : chatModalService.getRequiredDefaultModel(AiModelTypeEnum.CHAT.getType());
+        AiModelDO model = role != null && role.getModelId() != null ? modalService.validateModel(role.getModelId())
+                : modalService.getRequiredDefaultModel(AiModelTypeEnum.CHAT.getType());
         Assert.notNull(model, "必须找到默认模型");
         validateChatModel(model);
 
@@ -89,7 +89,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
         // 1.2 校验模型是否存在（修改模型的情况）
         AiModelDO model = null;
         if (updateReqVO.getModelId() != null) {
-            model = chatModalService.validateModel(updateReqVO.getModelId());
+            model = modalService.validateModel(updateReqVO.getModelId());
         }
 
         // 1.3 校验知识库是否存在
@@ -144,6 +144,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
         if (ObjectUtil.isAllNotEmpty(model.getTemperature(), model.getMaxTokens(), model.getMaxContexts())) {
             return;
         }
+        Assert.equals(model.getType(), AiModelTypeEnum.CHAT.getType(), "模型类型不正确：" + model);
         throw exception(CHAT_CONVERSATION_MODEL_ERROR);
     }
 
