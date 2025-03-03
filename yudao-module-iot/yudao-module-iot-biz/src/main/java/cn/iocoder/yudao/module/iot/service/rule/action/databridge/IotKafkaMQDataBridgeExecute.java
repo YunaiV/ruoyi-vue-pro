@@ -24,7 +24,8 @@ import java.util.concurrent.TimeoutException;
  */
 @Component
 @Slf4j
-public class IotKafkaMQDataBridgeExecute extends AbstractCacheableDataBridgeExecute {
+public class IotKafkaMQDataBridgeExecute extends
+        AbstractCacheableDataBridgeExecute<IotDataBridgeDO.KafkaMQConfig, KafkaTemplate<String, String>> {
 
     private static final Duration SEND_TIMEOUT = Duration.ofMillis(10);
 
@@ -38,11 +39,10 @@ public class IotKafkaMQDataBridgeExecute extends AbstractCacheableDataBridgeExec
         executeKafka(message, (IotDataBridgeDO.KafkaMQConfig) dataBridge.getConfig());
     }
 
-    @SuppressWarnings("unchecked")
     private void executeKafka(IotDeviceMessage message, IotDataBridgeDO.KafkaMQConfig config) {
         try {
             // 1. 获取或创建 KafkaTemplate
-            KafkaTemplate<String, String> kafkaTemplate = (KafkaTemplate<String, String>) getProducer(config);
+            KafkaTemplate<String, String> kafkaTemplate = getProducer(config);
 
             // 2. 发送消息并等待结果
             kafkaTemplate.send(config.getTopic(), message.toString())
@@ -56,24 +56,22 @@ public class IotKafkaMQDataBridgeExecute extends AbstractCacheableDataBridgeExec
     }
 
     @Override
-    protected Object initProducer(Object config) {
-        IotDataBridgeDO.KafkaMQConfig kafkaConfig = (IotDataBridgeDO.KafkaMQConfig) config;
-        
+    protected KafkaTemplate<String, String> initProducer(IotDataBridgeDO.KafkaMQConfig config) {
         // 1.1 构建生产者配置
         Map<String, Object> props = new HashMap<>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfig.getBootstrapServers());
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         // 1.2 如果配置了认证信息
-        if (kafkaConfig.getUsername() != null && kafkaConfig.getPassword() != null) {
+        if (config.getUsername() != null && config.getPassword() != null) {
             props.put("security.protocol", "SASL_PLAINTEXT");
             props.put("sasl.mechanism", "PLAIN");
             props.put("sasl.jaas.config",
                     "org.apache.kafka.common.security.plain.PlainLoginModule required username=\""
-                            + kafkaConfig.getUsername() + "\" password=\"" + kafkaConfig.getPassword() + "\";");
+                            + config.getUsername() + "\" password=\"" + config.getPassword() + "\";");
         }
         // 1.3 如果启用 SSL
-        if (Boolean.TRUE.equals(kafkaConfig.getSsl())) {
+        if (Boolean.TRUE.equals(config.getSsl())) {
             props.put("security.protocol", "SSL");
         }
 
@@ -83,10 +81,8 @@ public class IotKafkaMQDataBridgeExecute extends AbstractCacheableDataBridgeExec
     }
 
     @Override
-    protected void closeProducer(Object producer) {
-        if (producer instanceof KafkaTemplate) {
-            ((KafkaTemplate<?, ?>) producer).destroy();
-        }
+    protected void closeProducer(KafkaTemplate<String, String> producer) {
+        producer.destroy();
     }
 
     // TODO @芋艿：测试代码，后续清理

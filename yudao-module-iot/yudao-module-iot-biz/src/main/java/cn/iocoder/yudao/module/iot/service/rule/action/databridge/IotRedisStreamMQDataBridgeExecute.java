@@ -29,7 +29,8 @@ import java.time.LocalDateTime;
  */
 @Component
 @Slf4j
-public class IotRedisStreamMQDataBridgeExecute extends AbstractCacheableDataBridgeExecute {
+public class IotRedisStreamMQDataBridgeExecute extends
+        AbstractCacheableDataBridgeExecute<IotDataBridgeDO.RedisStreamMQConfig, RedisTemplate<String, Object>> {
 
     @Override
     public void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
@@ -46,7 +47,7 @@ public class IotRedisStreamMQDataBridgeExecute extends AbstractCacheableDataBrid
     private void executeRedisStream(IotDeviceMessage message, IotDataBridgeDO.RedisStreamMQConfig config) {
         try {
             // 1. 获取 RedisTemplate
-            RedisTemplate<String, Object> redisTemplate = (RedisTemplate<String, Object>) getProducer(config);
+            RedisTemplate<String, Object> redisTemplate = getProducer(config);
 
             // 2. 创建并发送 Stream 记录
             ObjectRecord<String, IotDeviceMessage> record = StreamRecords.newRecord()
@@ -59,17 +60,15 @@ public class IotRedisStreamMQDataBridgeExecute extends AbstractCacheableDataBrid
     }
 
     @Override
-    protected Object initProducer(Object config) {
-        IotDataBridgeDO.RedisStreamMQConfig redisConfig = (IotDataBridgeDO.RedisStreamMQConfig) config;
-
+    protected RedisTemplate<String, Object> initProducer(IotDataBridgeDO.RedisStreamMQConfig config) {
         // 1.1 创建 Redisson 配置
         Config redissonConfig = new Config();
         SingleServerConfig serverConfig = redissonConfig.useSingleServer()
-                .setAddress("redis://" + redisConfig.getHost() + ":" + redisConfig.getPort())
-                .setDatabase(redisConfig.getDatabase());
+                .setAddress("redis://" + config.getHost() + ":" + config.getPort())
+                .setDatabase(config.getDatabase());
         // 1.2 设置密码（如果有）
-        if (StrUtil.isNotBlank(redisConfig.getPassword())) {
-            serverConfig.setPassword(redisConfig.getPassword());
+        if (StrUtil.isNotBlank(config.getPassword())) {
+            serverConfig.setPassword(config.getPassword());
         }
 
         // TODO @huihui：看看能不能简化一些。按道理说，不用这么多的哈。
@@ -90,17 +89,10 @@ public class IotRedisStreamMQDataBridgeExecute extends AbstractCacheableDataBrid
     }
 
     @Override
-    protected void closeProducer(Object producer) {
-        // TODO @huihui：try catch 交给父类来做。子类不处理异常
-        if (producer instanceof RedisTemplate) {
-            RedisConnectionFactory factory = ((RedisTemplate<?, ?>) producer).getConnectionFactory();
-            try {
-                if (factory != null) {
-                    ((RedissonConnectionFactory) factory).destroy();
-                }
-            } catch (Exception e) {
-                log.error("[closeProducer][关闭 redisson 连接异常]", e);
-            }
+    protected void closeProducer(RedisTemplate<String, Object> producer) throws Exception {
+        RedisConnectionFactory factory = producer.getConnectionFactory();
+        if (factory != null) {
+            ((RedissonConnectionFactory) factory).destroy();
         }
     }
 

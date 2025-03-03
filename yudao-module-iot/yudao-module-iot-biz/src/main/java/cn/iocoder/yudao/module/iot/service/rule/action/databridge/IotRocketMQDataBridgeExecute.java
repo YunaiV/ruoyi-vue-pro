@@ -20,7 +20,8 @@ import java.time.LocalDateTime;
  */
 @Component
 @Slf4j
-public class IotRocketMQDataBridgeExecute extends AbstractCacheableDataBridgeExecute {
+public class IotRocketMQDataBridgeExecute extends
+        AbstractCacheableDataBridgeExecute<IotDataBridgeDO.RocketMQConfig, DefaultMQProducer> {
 
     @Override
     public void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
@@ -35,7 +36,7 @@ public class IotRocketMQDataBridgeExecute extends AbstractCacheableDataBridgeExe
     private void executeRocketMQ(IotDeviceMessage message, IotDataBridgeDO.RocketMQConfig config) {
         try {
             // 1. 获取或创建 Producer
-            DefaultMQProducer producer = (DefaultMQProducer) getProducer(config);
+            DefaultMQProducer producer = getProducer(config);
 
             // 2.1 创建消息对象，指定Topic、Tag和消息体
             Message msg = new Message(
@@ -57,19 +58,16 @@ public class IotRocketMQDataBridgeExecute extends AbstractCacheableDataBridgeExe
     }
 
     @Override
-    protected Object initProducer(Object config) throws Exception {
-        IotDataBridgeDO.RocketMQConfig rocketMQConfig = (IotDataBridgeDO.RocketMQConfig) config;
-        DefaultMQProducer producer = new DefaultMQProducer(rocketMQConfig.getGroup());
-        producer.setNamesrvAddr(rocketMQConfig.getNameServer());
+    protected DefaultMQProducer initProducer(IotDataBridgeDO.RocketMQConfig config) throws Exception {
+        DefaultMQProducer producer = new DefaultMQProducer(config.getGroup());
+        producer.setNamesrvAddr(config.getNameServer());
         producer.start();
         return producer;
     }
 
     @Override
-    protected void closeProducer(Object producer) {
-        if (producer instanceof DefaultMQProducer) {
-            ((DefaultMQProducer) producer).shutdown();
-        }
+    protected void closeProducer(DefaultMQProducer producer) {
+        producer.shutdown();
     }
 
     // TODO @芋艿：测试代码，后续清理

@@ -19,7 +19,8 @@ import java.time.LocalDateTime;
  */
 @Component
 @Slf4j
-public class IotRabbitMQDataBridgeExecute extends AbstractCacheableDataBridgeExecute {
+public class IotRabbitMQDataBridgeExecute extends
+        AbstractCacheableDataBridgeExecute<IotDataBridgeDO.RabbitMQConfig, Channel> {
 
     @Override
     public void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
@@ -34,7 +35,7 @@ public class IotRabbitMQDataBridgeExecute extends AbstractCacheableDataBridgeExe
     private void executeRabbitMQ(IotDeviceMessage message, IotDataBridgeDO.RabbitMQConfig config) {
         try {
             // 1. 获取或创建 Channel
-            Channel channel = (Channel) getProducer(config);
+            Channel channel = getProducer(config);
 
             // 2.1 声明交换机、队列和绑定关系
             channel.exchangeDeclare(config.getExchange(), "direct", true);
@@ -52,16 +53,14 @@ public class IotRabbitMQDataBridgeExecute extends AbstractCacheableDataBridgeExe
 
     @Override
     @SuppressWarnings("resource")
-    protected Object initProducer(Object config) throws Exception {
-        IotDataBridgeDO.RabbitMQConfig rabbitConfig = (IotDataBridgeDO.RabbitMQConfig) config;
-
+    protected Channel initProducer(IotDataBridgeDO.RabbitMQConfig config) throws Exception {
         // 1. 创建连接工厂
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(rabbitConfig.getHost());
-        factory.setPort(rabbitConfig.getPort());
-        factory.setVirtualHost(rabbitConfig.getVirtualHost());
-        factory.setUsername(rabbitConfig.getUsername());
-        factory.setPassword(rabbitConfig.getPassword());
+        factory.setHost(config.getHost());
+        factory.setPort(config.getPort());
+        factory.setVirtualHost(config.getVirtualHost());
+        factory.setUsername(config.getUsername());
+        factory.setPassword(config.getPassword());
 
         // 2. 创建连接
         Connection connection = factory.newConnection();
@@ -71,20 +70,13 @@ public class IotRabbitMQDataBridgeExecute extends AbstractCacheableDataBridgeExe
     }
 
     @Override
-    protected void closeProducer(Object producer) {
-        if (producer instanceof Channel) {
-            try {
-                Channel channel = (Channel) producer;
-                if (channel.isOpen()) {
-                    channel.close();
-                }
-                Connection connection = channel.getConnection();
-                if (connection.isOpen()) {
-                    connection.close();
-                }
-            } catch (Exception e) {
-                log.error("[closeProducer][关闭 RabbitMQ 连接异常]", e);
-            }
+    protected void closeProducer(Channel channel) throws Exception {
+        if (channel.isOpen()) {
+            channel.close();
+        }
+        Connection connection = channel.getConnection();
+        if (connection.isOpen()) {
+            connection.close();
         }
     }
 
@@ -124,4 +116,5 @@ public class IotRabbitMQDataBridgeExecute extends AbstractCacheableDataBridgeExe
         log.info("[main][第二次执行，应该会复用缓存的 channel]");
         action.executeRabbitMQ(message, config);
     }
+
 }
