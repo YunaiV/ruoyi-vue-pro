@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 public class IotKafkaMQDataBridgeExecute extends
         AbstractCacheableDataBridgeExecute<IotDataBridgeDO.KafkaMQConfig, KafkaTemplate<String, String>> {
 
-    private static final Duration SEND_TIMEOUT = Duration.ofMillis(10);
+    private static final Duration SEND_TIMEOUT = Duration.ofMillis(10000); // 10 秒超时时间
 
     @Override
     public Integer getType() {
