@@ -33,18 +33,12 @@ public class IotRedisStreamMQDataBridgeExecute extends
         AbstractCacheableDataBridgeExecute<IotDataBridgeDO.RedisStreamMQConfig, RedisTemplate<String, Object>> {
 
     @Override
-    public void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
-        // 1.1 校验数据桥梁类型
-        if (!IotDataBridgTypeEnum.REDIS_STREAM.getType().equals(dataBridge.getType())) {
-            return;
-        }
-        // 1.2 执行消息发送
-        executeRedisStream(message, (IotDataBridgeDO.RedisStreamMQConfig) dataBridge.getConfig());
+    public Integer getType() {
+        return IotDataBridgTypeEnum.REDIS_STREAM.getType();
     }
 
-    @SuppressWarnings("unchecked")
-    // TODO @huihui：try catch 交给父类来做，子类不处理异常
-    private void executeRedisStream(IotDeviceMessage message, IotDataBridgeDO.RedisStreamMQConfig config) {
+    @Override
+    public void execute0(IotDeviceMessage message, IotDataBridgeDO.RedisStreamMQConfig config) {
         try {
             // 1. 获取 RedisTemplate
             RedisTemplate<String, Object> redisTemplate = getProducer(config);
@@ -133,10 +127,10 @@ public class IotRedisStreamMQDataBridgeExecute extends
 
         // 4. 执行两次测试，验证缓存
         log.info("[main][第一次执行，应该会创建新的 RedisTemplate]");
-        action.executeRedisStream(message, config);
+        action.execute0(message, config);
 
         log.info("[main][第二次执行，应该会复用缓存的 RedisTemplate]");
-        action.executeRedisStream(message, config);
+        action.execute0(message, config);
     }
 
 }

@@ -22,17 +22,14 @@ import java.time.LocalDateTime;
 public class IotRabbitMQDataBridgeExecute extends
         AbstractCacheableDataBridgeExecute<IotDataBridgeDO.RabbitMQConfig, Channel> {
 
+
     @Override
-    public void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
-        // 1.1 校验数据桥梁的类型 == RABBITMQ
-        if (!IotDataBridgTypeEnum.RABBITMQ.getType().equals(dataBridge.getType())) {
-            return;
-        }
-        // 1.2 执行 RabbitMQ 发送消息
-        executeRabbitMQ(message, (IotDataBridgeDO.RabbitMQConfig) dataBridge.getConfig());
+    public Integer getType() {
+        return IotDataBridgTypeEnum.RABBITMQ.getType();
     }
 
-    private void executeRabbitMQ(IotDeviceMessage message, IotDataBridgeDO.RabbitMQConfig config) {
+    @Override
+    public void execute0(IotDeviceMessage message, IotDataBridgeDO.RabbitMQConfig config) {
         try {
             // 1. 获取或创建 Channel
             Channel channel = getProducer(config);
@@ -111,10 +108,10 @@ public class IotRabbitMQDataBridgeExecute extends
 
         // 4. 执行两次测试，验证缓存
         log.info("[main][第一次执行，应该会创建新的 channel]");
-        action.executeRabbitMQ(message, config);
+        action.execute0(message, config);
 
         log.info("[main][第二次执行，应该会复用缓存的 channel]");
-        action.executeRabbitMQ(message, config);
+        action.execute0(message, config);
     }
 
 }

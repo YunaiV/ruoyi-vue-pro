@@ -24,16 +24,12 @@ public class IotRocketMQDataBridgeExecute extends
         AbstractCacheableDataBridgeExecute<IotDataBridgeDO.RocketMQConfig, DefaultMQProducer> {
 
     @Override
-    public void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
-        // 1.1 校验数据桥梁的类型 == ROCKETMQ
-        if (!IotDataBridgTypeEnum.ROCKETMQ.getType().equals(dataBridge.getType())) {
-            return;
-        }
-        // 1.2 执行 RocketMQ 发送消息
-        executeRocketMQ(message, (IotDataBridgeDO.RocketMQConfig) dataBridge.getConfig());
+    public Integer getType() {
+        return IotDataBridgTypeEnum.ROCKETMQ.getType();
     }
 
-    private void executeRocketMQ(IotDeviceMessage message, IotDataBridgeDO.RocketMQConfig config) {
+    @Override
+    public void execute0(IotDeviceMessage message, IotDataBridgeDO.RocketMQConfig config) {
         try {
             // 1. 获取或创建 Producer
             DefaultMQProducer producer = getProducer(config);
@@ -97,10 +93,10 @@ public class IotRocketMQDataBridgeExecute extends
 
         // 4. 执行两次测试，验证缓存
         log.info("[main][第一次执行，应该会创建新的 producer]");
-        action.executeRocketMQ(message, config);
+        action.execute0(message, config);
 
         log.info("[main][第二次执行，应该会复用缓存的 producer]");
-        action.executeRocketMQ(message, config);
+        action.execute0(message, config);
     }
 
 }

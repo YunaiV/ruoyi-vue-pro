@@ -9,9 +9,14 @@ import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
  *
  * @author HUIHUI
  */
-public interface IotDataBridgeExecute {
+public interface IotDataBridgeExecute<Config> {
 
-    // TODO @huihui：要不搞个 getType？然后 execute0 由子类实现。这样，子类的 executeRedisStream ，其实就是 execute0 了。
+    /**
+     * 获取数据桥梁类型
+     *
+     * @return 数据桥梁类型
+     */
+    Integer getType();
 
     /**
      * 执行数据桥梁操作
@@ -19,6 +24,23 @@ public interface IotDataBridgeExecute {
      * @param message    设备消息
      * @param dataBridge 数据桥梁
      */
-    void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge);
+    @SuppressWarnings({"unchecked"})
+    default void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
+        // 1.1 校验数据桥梁类型
+        if (!getType().equals(dataBridge.getType())) {
+            return;
+        }
+
+        // 1.2 执行对应的数据桥梁发送消息
+        execute0(message, (Config) dataBridge.getConfig());
+    }
+
+    /**
+     * 【真正】执行数据桥梁操作
+     *
+     * @param message 设备消息
+     * @param config  桥梁配置
+     */
+    void execute0(IotDeviceMessage message, Config config);
 
 }

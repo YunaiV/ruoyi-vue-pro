@@ -30,16 +30,12 @@ public class IotKafkaMQDataBridgeExecute extends
     private static final Duration SEND_TIMEOUT = Duration.ofMillis(10);
 
     @Override
-    public void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
-        // 1. 校验数据桥梁的类型 == KAFKA
-        if (!IotDataBridgTypeEnum.KAFKA.getType().equals(dataBridge.getType())) {
-            return;
-        }
-        // 2. 执行 Kafka 发送消息
-        executeKafka(message, (IotDataBridgeDO.KafkaMQConfig) dataBridge.getConfig());
+    public Integer getType() {
+        return IotDataBridgTypeEnum.KAFKA.getType();
     }
 
-    private void executeKafka(IotDeviceMessage message, IotDataBridgeDO.KafkaMQConfig config) {
+    @Override
+    public void execute0(IotDeviceMessage message, IotDataBridgeDO.KafkaMQConfig config) {
         try {
             // 1. 获取或创建 KafkaTemplate
             KafkaTemplate<String, String> kafkaTemplate = getProducer(config);
@@ -113,10 +109,10 @@ public class IotKafkaMQDataBridgeExecute extends
 
         // 4. 执行两次测试，验证缓存
         log.info("[main][第一次执行，应该会创建新的 producer]");
-        action.executeKafka(message, config);
+        action.execute0(message, config);
 
         log.info("[main][第二次执行，应该会复用缓存的 producer]");
-        action.executeKafka(message, config);
+        action.execute0(message, config);
     }
 
 }

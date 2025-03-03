@@ -25,23 +25,19 @@ import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_
  */
 @Component
 @Slf4j
-public class IotHttpDataBridgeExecute implements IotDataBridgeExecute {
+public class IotHttpDataBridgeExecute implements IotDataBridgeExecute<IotDataBridgeDO.HttpConfig> {
 
     @Resource
     private RestTemplate restTemplate;
 
     @Override
-    public void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
-        // 1.1 校验数据桥梁的类型 == HTTP
-        if (!IotDataBridgTypeEnum.HTTP.getType().equals(dataBridge.getType())) {
-            return;
-        }
-        // 1.2 执行 HTTP 请求
-        executeHttp(message, (IotDataBridgeDO.HttpConfig) dataBridge.getConfig());
+    public Integer getType() {
+        return IotDataBridgTypeEnum.HTTP.getType();
     }
 
+    @Override
     @SuppressWarnings({"unchecked", "deprecation"})
-    private void executeHttp(IotDeviceMessage message, IotDataBridgeDO.HttpConfig config) {
+    public void execute0(IotDeviceMessage message, IotDataBridgeDO.HttpConfig config) {
         String url = null;
         HttpMethod method = HttpMethod.valueOf(config.getMethod().toUpperCase());
         HttpEntity<String> requestEntity = null;

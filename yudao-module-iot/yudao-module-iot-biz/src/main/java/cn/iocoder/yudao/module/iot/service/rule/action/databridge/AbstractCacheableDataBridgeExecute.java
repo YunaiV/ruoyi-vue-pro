@@ -33,7 +33,7 @@ import java.time.Duration;
  * @author HUIHUI
  */
 @Slf4j
-public abstract class AbstractCacheableDataBridgeExecute<Config, Producer> implements IotDataBridgeExecute {
+public abstract class AbstractCacheableDataBridgeExecute<Config, Producer> implements IotDataBridgeExecute<Config> {
 
     /**
      * Producer 缓存
