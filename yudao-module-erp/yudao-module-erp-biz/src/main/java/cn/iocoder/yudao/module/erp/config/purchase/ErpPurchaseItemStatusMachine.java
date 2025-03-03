@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.erp.config.purchase;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import cn.iocoder.yudao.module.erp.config.purchase.impl.BaseFailCallbackImpl;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.ErpStateMachines;
@@ -23,6 +24,8 @@ public class ErpPurchaseItemStatusMachine {
     private Action<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> actionItemOffImpl;
     @Resource
     private Action<ErpStorageStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> actionItemStorageImpl;
+    @Resource
+    private BaseFailCallbackImpl baseFailCallbackImpl;
 
     @Bean(ErpStateMachines.PURCHASE_REQUEST_ITEM_OFF_STATE_MACHINE_NAME)
     public StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> getPurchaseRequestStateMachine() {
@@ -34,7 +37,7 @@ public class ErpPurchaseItemStatusMachine {
             .perform(actionItemOffImpl);
         // 开启
         builder.externalTransitions()
-            .fromAmong(ErpOffStatus.CLOSED, ErpOffStatus.MANUAL_CLOSED)
+            .fromAmong(ErpOffStatus.MANUAL_CLOSED)
             .to(ErpOffStatus.OPEN)
             .on(ErpEventEnum.ACTIVATE)
             .perform(actionItemOffImpl);
@@ -51,12 +54,7 @@ public class ErpPurchaseItemStatusMachine {
             .on(ErpEventEnum.AUTO_CLOSE)
             .perform(actionItemOffImpl);
         //错误回调函数
-        builder.setFailCallback((f, e, o) -> {
-            String msg = StrUtil.format("状态机执行失败,订单：{}，事件：{}，起始状态({})", JSONUtil.toJsonStr(o), e.getDesc(), f.getDesc());
-            log.warn(msg);
-            throw new RuntimeException(msg);
-        });
-
+        builder.setFailCallback(baseFailCallbackImpl);
         return builder.build(ErpStateMachines.PURCHASE_REQUEST_ITEM_OFF_STATE_MACHINE_NAME);
     }
 
@@ -77,13 +75,13 @@ public class ErpPurchaseItemStatusMachine {
         builder.externalTransition()
             .from(ErpStorageStatus.NONE_IN_STORAGE)
             .to(ErpStorageStatus.PARTIALLY_IN_STORAGE)
-            .on(ErpEventEnum.ADD_TO_STORAGE)
+            .on(ErpEventEnum.ADD_STOCK)
             .perform(actionItemStorageImpl);
         //减少库存
         builder.externalTransition()
             .from(ErpStorageStatus.PARTIALLY_IN_STORAGE)
             .to(ErpStorageStatus.NONE_IN_STORAGE)
-            .on(ErpEventEnum.REMOVE_FROM_STORAGE)
+            .on(ErpEventEnum.REDUCE_STOCK)
             .perform(actionItemStorageImpl);
         // 库存调整：从任何存储状态到调整状态，触发STOCK_ADJUSTMENT事件
 //        builder.externalTransition()

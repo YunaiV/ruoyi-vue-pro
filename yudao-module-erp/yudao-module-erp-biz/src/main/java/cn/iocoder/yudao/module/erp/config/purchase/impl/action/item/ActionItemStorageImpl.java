@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.config.purchase.impl.action;
+package cn.iocoder.yudao.module.erp.config.purchase.impl.action.item;
 
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
@@ -23,11 +23,11 @@ public class ActionItemStorageImpl implements Action<ErpStorageStatus, ErpEventE
 
     @Override
     @Transactional
-    public void execute(ErpStorageStatus f, ErpStorageStatus t, ErpEventEnum erpEventEnum, ErpPurchaseRequestItemsDO requestItemsDO) {
-        ErpPurchaseRequestItemsDO itemsDO = mapper.selectById(requestItemsDO.getId());
+    public void execute(ErpStorageStatus f, ErpStorageStatus t, ErpEventEnum erpEventEnum, ErpPurchaseRequestItemsDO context) {
+        ErpPurchaseRequestItemsDO itemsDO = mapper.selectById(context.getId());
         itemsDO.setOrderStatus(f.getCode());
         mapper.updateById(itemsDO);
         //日志记录状态变化 log.info
-        log.info("采购订单{}状态变化：{}->{}", JSONUtil.toJsonStr(requestItemsDO), f, t);
+        log.info("item入库状态机触发({})事件：将对象{},由状态 {}->{}", erpEventEnum.getDesc(), JSONUtil.toJsonStr(context), f.getDesc(), t.getDesc());
     }
 }

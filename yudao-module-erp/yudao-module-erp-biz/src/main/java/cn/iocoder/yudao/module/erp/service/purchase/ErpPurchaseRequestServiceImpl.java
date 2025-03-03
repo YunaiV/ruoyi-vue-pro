@@ -19,6 +19,7 @@ import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.status.ErpOffStatus;
 import cn.iocoder.yudao.module.erp.enums.status.ErpOrderStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpStorageStatus;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpWarehouseService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -43,6 +44,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.module.erp.enums.ErpStateMachines.*;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 
 /**
@@ -65,9 +67,17 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     @Lazy
     @Autowired
     private ErpPurchaseRequestServiceImpl erpPurchaseRequestService;
-    @Resource
-    StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestDO> erpPurchaseStatusMachine;
+    @Resource(name = PURCHASE_REQUEST_STATE_MACHINE_NAME)
+    StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestDO> auditMachine;
+    @Resource(name = PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME)
+    StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestDO> offMachine;
+    @Resource(name = PURCHASE_ORDER_STATE_MACHINE_NAME)
+    StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestDO> orderMachine;
 
+    @Resource(name = PURCHASE_ORDER_ITEM_STATE_MACHINE_NAME)
+    StateMachine<ErpStorageStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> orderItemMachine;
+    @Resource(name = PURCHASE_REQUEST_ITEM_OFF_STATE_MACHINE_NAME)
+    StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> offItemMachine;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -91,19 +101,22 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         //初始化
         ErpPurchaseRequestDO purchaseRequest = BeanUtils.toBean(createReqVO, ErpPurchaseRequestDO.class);
         purchaseRequest.setNo(no);
-
-        //初始-审核状态
-        erpPurchaseStatusMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.INIT, purchaseRequest);//初始化事件
         //2. 插入主表的申请单数据
         ThrowUtil.ifThrow(erpPurchaseRequestMapper.insert(purchaseRequest) <= 0, PURCHASE_REQUEST_ADD_FAIL_APPROVE);
         Long id = purchaseRequest.getId();
         itemsDOList.forEach(i -> i.setRequestId(id));
-        //设置子表初始状态
-        itemsDOList.forEach(i -> i.setOffStatus(ErpOffStatus.OPEN.getCode())
-            .setOrderStatus(ErpAuditStatus.PENDING_REVIEW.getCode()));
         //3. 批量插入子表数据
         ThrowUtil.ifThrow(!erpPurchaseRequestItemsMapper.insertBatch(itemsDOList), PURCHASE_REQUEST_ADD_FAIL_PRODUCT);
-        // 返回单据id
+        //4.初始化-审核状态-开关-订购
+        auditMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.INIT, purchaseRequest);
+        offMachine.fireEvent(ErpOffStatus.OPEN, ErpEventEnum.OFF_INIT, purchaseRequest);
+        orderMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_INIT, purchaseRequest);
+        //子表初始化
+        itemsDOList.forEach(i -> {
+                orderItemMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, ErpEventEnum.ORDER_INIT, i);
+                offItemMachine.fireEvent(ErpOffStatus.OPEN, ErpEventEnum.OFF_INIT, i);
+            }
+        );
         return id;
     }
 
@@ -389,17 +402,10 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     public void switchPurchaseOrderStatus(Long requestId, List<Long> itemIds, Boolean enable) {
         // 根据 enable 参数判断是开启还是关闭状态
         if (Boolean.TRUE.equals(enable)) {
-            // 处理启用状态
-            //更新子表
-            erpPurchaseRequestService.updateItemStatus(itemIds, null, ErpOffStatus.OPEN.getCode());
-            //一个子表开->主表开
-            if (erpPurchaseRequestMapper.selectCount(new LambdaQueryWrapper<ErpPurchaseRequestDO>()
-                .eq(ErpPurchaseRequestDO::getId, requestId)
-                .eq(ErpPurchaseRequestDO::getOffStatus, ErpOffStatus.OPEN.getCode())) == 0) {//主表不处于开启状态
-                // 主表状态开启
-                log.debug("主表状态开启");
-                erpPurchaseRequestService.updatePurchaseRequestStatus(requestId, null, null, ErpOffStatus.OPEN.getCode());
-            }
+            itemIds.forEach(i->{
+                ErpPurchaseRequestItemsDO itemsDO = erpPurchaseRequestItemsMapper.selectById(i);
+                offItemMachine.fireEvent(ErpOffStatus.fromCode(itemsDO.getOffStatus()), ErpEventEnum.ACTIVATE, itemsDO);
+            });
         } else {
             // 处理关闭状态
             //未审核->异常

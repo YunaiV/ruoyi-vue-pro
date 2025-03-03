@@ -2,12 +2,14 @@ package cn.iocoder.yudao.module.erp.config.purchase;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import cn.iocoder.yudao.module.erp.config.purchase.impl.BaseFailCallbackImpl;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
-import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestMapper;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.ErpStateMachines;
 import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.status.ErpOffStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpOrderStatus;
 import com.alibaba.cola.statemachine.Action;
 import com.alibaba.cola.statemachine.Condition;
 import com.alibaba.cola.statemachine.StateMachine;
@@ -29,7 +31,9 @@ public class ErpPurchaseStatusMachine {
     @Resource
     private Action<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestDO> actionOffImpl;
     @Resource
-    private ErpPurchaseRequestMapper mapper;
+    private Action<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestDO> actionOrderImpl;
+    @Resource
+    private BaseFailCallbackImpl baseFailCallbackImpl;
 
     @Bean(ErpStateMachines.PURCHASE_REQUEST_STATE_MACHINE_NAME)
     public StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestDO> getPurchaseRequestStateMachine() {
@@ -73,13 +77,7 @@ public class ErpPurchaseStatusMachine {
             .on(ErpEventEnum.WITHDRAW_REVIEW)
             .when(baseConditionImpl)
             .perform(actionAuditImpl);
-
-        //错误回调函数
-        builder.setFailCallback((f, e, o) -> {
-            String msg = StrUtil.format("状态机执行失败,订单：{}，事件：{}，起始状态({})", JSONUtil.toJsonStr(o), e.getDesc(), f.getDesc());
-            log.warn(msg);
-            throw new RuntimeException(msg);
-        });
+        builder.setFailCallback(baseFailCallbackImpl);
         return builder.build(ErpStateMachines.PURCHASE_REQUEST_STATE_MACHINE_NAME);
     }
 
@@ -113,12 +111,38 @@ public class ErpPurchaseStatusMachine {
             .on(ErpEventEnum.AUTO_CLOSE)
             .when(baseConditionImpl)
             .perform(actionOffImpl);
-        //错误回调函数
-        builder.setFailCallback((f, e, o) -> {
-            String msg = StrUtil.format("状态机执行失败,订单：{}，事件：{}，form状态({})", JSONUtil.toJsonStr(o), e.getDesc(), f.getDesc());
-            log.warn(msg);
-            throw new RuntimeException(msg);
-        });
+        builder.setFailCallback(baseFailCallbackImpl);
         return builder.build(ErpStateMachines.PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME);
+    }
+
+    //订购
+    @Bean(ErpStateMachines.PURCHASE_ORDER_STATE_MACHINE_NAME)
+    public StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestDO> getPurchaseOrderStateMachine() {
+        StateMachineBuilder<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestDO> builder = StateMachineBuilderFactory.create();
+        //初始化事件
+        builder.internalTransition()
+            .within(ErpOrderStatus.OT_ORDERED)
+            .on(ErpEventEnum.ORDER_INIT)
+            .perform(actionOrderImpl);
+        //订购商品
+        builder.externalTransitions()
+            .fromAmong(ErpOrderStatus.OT_ORDERED, ErpOrderStatus.ORDER_FAILED)
+            .to(ErpOrderStatus.PARTIALLY_ORDERED)
+            .on(ErpEventEnum.ORDER_GOODS)
+            .perform(actionOrderImpl);
+        //订购完成
+        builder.externalTransitions()
+            .fromAmong(ErpOrderStatus.PARTIALLY_ORDERED, ErpOrderStatus.ORDER_FAILED, ErpOrderStatus.OT_ORDERED)
+            .to(ErpOrderStatus.ORDERED)
+            .on(ErpEventEnum.ORDER_COMPLETE)
+            .perform(actionOrderImpl);
+        //放弃订购
+        builder.externalTransitions()
+            .fromAmong(ErpOrderStatus.PARTIALLY_ORDERED, ErpOrderStatus.OT_ORDERED)
+            .to(ErpOrderStatus.ORDER_FAILED)
+            .on(ErpEventEnum.ORDER_CANCEL)
+            .perform(actionOrderImpl);
+        builder.setFailCallback(baseFailCallbackImpl);
+        return builder.build(ErpStateMachines.PURCHASE_ORDER_STATE_MACHINE_NAME);
     }
 }
