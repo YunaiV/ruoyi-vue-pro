@@ -44,11 +44,14 @@ public interface ErpSaleOutItemMapper extends BaseMapperX<ErpSaleOutItemDO> {
         if (CollUtil.isEmpty(outIds)) {
             return Collections.emptyMap();
         }
+
+
         // SQL sum 查询
         List<Map<String, Object>> result = selectMaps(new QueryWrapper<ErpSaleOutItemDO>()
                 .select("order_item_id, SUM(count) AS sumCount")
                 .groupBy("order_item_id")
-                .in("out_id", outIds));
+                .in("out_id", outIds))
+                ;
         // 获得数量
         return convertMap(result, obj -> (Long) obj.get("order_item_id"), obj -> (BigDecimal) obj.get("sumCount"));
     }

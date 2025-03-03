@@ -64,7 +64,7 @@ public interface ErpSaleOutMapper extends BaseMapperX<ErpSaleOutDO> {
     }
 
     default List<ErpSaleOutDO> selectListByOrderId(Long orderId) {
-        return selectList(ErpSaleOutDO::getOrderId, orderId);
+        return selectList(ErpSaleOutDO::getOrderId, orderId,ErpSaleOutDO::getStatus, ErpAuditStatus.APPROVE.getStatus());
     }
 
 }

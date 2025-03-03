@@ -130,12 +130,6 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
         // 2.2 更新退货项
         updateSaleReturnItemList(updateReqVO.getId(), saleReturnItems);
 
-//        // 3.1 更新销售订单的出库数量
-//        updateSaleOrderReturnCount(updateObj.getOrderId());
-//        // 3.2 注意：如果销售订单编号变更了，需要更新“老”销售订单的出库数量
-//        if (ObjectUtil.notEqual(saleReturn.getOrderId(), updateObj.getOrderId())) {
-//            updateSaleOrderReturnCount(saleReturn.getOrderId());
-//        }
     }
 
     private void calculateTotalPrice(ErpSaleReturnDO saleReturn, List<ErpSaleReturnItemDO> saleReturnItems) {
@@ -149,16 +143,6 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
         }
         saleReturn.setDiscountPrice(MoneyUtils.priceMultiplyPercent(saleReturn.getTotalPrice(), saleReturn.getDiscountPercent()));
         saleReturn.setTotalPrice(saleReturn.getTotalPrice().subtract(saleReturn.getDiscountPrice().add(saleReturn.getOtherPrice())));
-    }
-
-    private void updateSaleOrderReturnCount(Long orderId) {
-        // 1.1 查询销售订单对应的销售出库单列表
-        List<ErpSaleReturnDO> saleReturns = saleReturnMapper.selectListByOrderId(orderId);
-        // 1.2 查询对应的销售订单项的退货数量
-        Map<Long, BigDecimal> returnCountMap = saleReturnItemMapper.selectOrderItemCountSumMapByReturnIds(
-                convertList(saleReturns, ErpSaleReturnDO::getId));
-        // 2. 更新销售订单的出库数量
-        saleOrderService.updateSaleOrderReturnCount(orderId, returnCountMap);
     }
 
     @Override
@@ -195,7 +179,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
         });
 
         // 4. 变更订单上的出库量和订货量
-        updateSaleOrderReturnCount(saleReturn.getOrderId());
+        saleOrderService.updateSaleOrderOutCountReturnCount(saleReturn.getOrderId());
     }
 
     @Override
@@ -268,8 +252,8 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
             // 2.2 删除订单项
             saleReturnItemMapper.deleteByReturnId(saleReturn.getId());
 
-            // 2.3 更新销售订单的出库数量
-            updateSaleOrderReturnCount(saleReturn.getOrderId());
+//            // 2.3 更新销售订单的出库数量
+//            updateSaleOrderReturnCount(saleReturn.getOrderId());
         });
 
     }

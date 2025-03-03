@@ -149,10 +149,10 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
         updateSaleOutItemList(updateReqVO.getId(), saleOutItems);
 
         // 3.1 更新销售订单的出库数量
-        updateSaleOrderOutCount(updateObj.getOrderId());
+        saleOrderService.updateSaleOrderOutCountReturnCount(updateObj.getOrderId());
         // 3.2 注意：如果销售订单编号变更了，需要更新“老”销售订单的出库数量
         if (ObjectUtil.notEqual(saleOut.getOrderId(), updateObj.getOrderId())) {
-            updateSaleOrderOutCount(saleOut.getOrderId());
+            saleOrderService.updateSaleOrderOutCountReturnCount(saleOut.getOrderId());
         }
 
     }
@@ -205,16 +205,6 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
         saleOut.setTotalPrice(saleOut.getTotalPrice().subtract(saleOut.getDiscountPrice().add(saleOut.getOtherPrice())));
     }
 
-    private void updateSaleOrderOutCount(Long orderId) {
-        // 1.1 查询销售订单对应的销售出库单列表
-        List<ErpSaleOutDO> saleOuts = saleOutMapper.selectListByOrderId(orderId);
-        // 1.2 查询对应的销售订单项的出库数量
-        Map<Long, BigDecimal> returnCountMap = saleOutItemMapper.selectOrderItemCountSumMapByOutIds(
-                convertList(saleOuts, ErpSaleOutDO::getId));
-        // 2. 更新销售订单的出库数量
-        saleOrderService.updateSaleOrderOutCount(orderId, returnCountMap);
-    }
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateSaleOutStatus(Long id, Integer status) {
@@ -249,7 +239,7 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
         });
 
         // 4, 更新销售订单的出库数量
-        updateSaleOrderOutCount(saleOut.getOrderId());
+        saleOrderService.updateSaleOrderOutCountReturnCount(saleOut.getOrderId());
 
     }
 

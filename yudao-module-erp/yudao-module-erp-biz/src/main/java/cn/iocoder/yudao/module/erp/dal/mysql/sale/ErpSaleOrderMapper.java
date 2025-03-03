@@ -54,7 +54,8 @@ public interface ErpSaleOrderMapper extends BaseMapperX<ErpSaleOrderDO> {
         // 可销售退货
         if (Boolean.TRUE.equals(reqVO.getReturnEnable())) {
             query.eq(ErpSaleOrderDO::getStatus, ErpAuditStatus.APPROVE.getStatus())
-                    .apply("t.return_count < t.out_count");
+                    .apply("t.out_count < t.total_count");
+//                    .apply("t.return_count < t.out_count");
         }
         if (reqVO.getProductId() != null) {
             query.leftJoin(ErpSaleOrderItemDO.class, ErpSaleOrderItemDO::getOrderId, ErpSaleOrderDO::getId)

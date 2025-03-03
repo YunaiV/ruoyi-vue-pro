@@ -108,7 +108,7 @@ public class ErpSaleOrderDO extends BaseDO {
 
     // ========== 销售出库 ==========
     /**
-     * 销售出库数量
+     * 销售出库数量 , 这个真是的仓库发出出库数量，除去了退货的
      */
     private BigDecimal outCount;
 

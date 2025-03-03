@@ -10,8 +10,9 @@ import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.order.ErpSaleOrderSa
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOrderItemDO;
-import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleOrderItemMapper;
-import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleOrderMapper;
+import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOutDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleReturnDO;
+import cn.iocoder.yudao.module.erp.dal.mysql.sale.*;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.service.finance.ErpAccountService;
@@ -60,6 +61,16 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
 
     @Resource
     private AdminUserApi adminUserApi;
+
+    @Resource
+    private ErpSaleOutMapper saleOutMapper;
+    @Resource
+    private ErpSaleOutItemMapper saleOutItemMapper;
+
+    @Resource
+    private ErpSaleReturnMapper saleReturnMapper;
+    @Resource
+    private ErpSaleReturnItemMapper saleReturnItemMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -199,47 +210,89 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
         }
     }
 
-    @Override
-    public void updateSaleOrderOutCount(Long id, Map<Long, BigDecimal> outCountMap) {
-        List<ErpSaleOrderItemDO> orderItems = saleOrderItemMapper.selectListByOrderId(id);
-        // 1. 更新每个销售订单项
-        orderItems.forEach(item -> {
-            BigDecimal outCount = outCountMap.getOrDefault(item.getId(), BigDecimal.ZERO);
-            if (item.getOutCount().equals(outCount)) {
-                return;
-            }
-            if (outCount.compareTo(item.getCount()) > 0) {
-                throw exception(SALE_ORDER_ITEM_OUT_FAIL_PRODUCT_EXCEED,
-                        productService.getProduct(item.getProductId()).getName(), item.getCount());
-            }
-            saleOrderItemMapper.updateById(new ErpSaleOrderItemDO().setId(item.getId()).setOutCount(outCount));
-        });
-        // 2. 更新销售订单
-        BigDecimal totalOutCount = getSumValue(outCountMap.values(), value -> value, BigDecimal::add, BigDecimal.ZERO);
-        saleOrderMapper.updateById(new ErpSaleOrderDO().setId(id).setOutCount(totalOutCount));
-    }
+//    @Deprecated
+//    @Override
+//    public void updateSaleOrderOutCount(Long id, Map<Long, BigDecimal> outCountMap) {
+//        List<ErpSaleOrderItemDO> orderItems = saleOrderItemMapper.selectListByOrderId(id);
+//        // 1. 更新每个销售订单项
+//        orderItems.forEach(item -> {
+//            BigDecimal outCount = outCountMap.getOrDefault(item.getId(), BigDecimal.ZERO);
+//            if (item.getOutCount().equals(outCount)) {
+//                return;
+//            }
+//            if (outCount.compareTo(item.getCount()) > 0) {
+//                throw exception(SALE_ORDER_ITEM_OUT_FAIL_PRODUCT_EXCEED,
+//                        productService.getProduct(item.getProductId()).getName(), item.getCount());
+//            }
+//            saleOrderItemMapper.updateById(new ErpSaleOrderItemDO().setId(item.getId()).setOutCount(outCount));
+//        });
+//        // 2. 更新销售订单
+//        BigDecimal totalOutCount = getSumValue(outCountMap.values(), value -> value, BigDecimal::add, BigDecimal.ZERO);
+//        saleOrderMapper.updateById(new ErpSaleOrderDO().setId(id).setOutCount(totalOutCount));
+//    }
 
+//    @Deprecated
+//    @Override
+//    public void updateSaleOrderReturnCount(Long orderId, Map<Long, BigDecimal> returnCountMap) {
+//        List<ErpSaleOrderItemDO> orderItems = saleOrderItemMapper.selectListByOrderId(orderId);
+//        // 1. 更新每个销售订单项
+//        orderItems.forEach(item -> {
+//            BigDecimal returnCount = returnCountMap.getOrDefault(item.getId(), BigDecimal.ZERO);
+//            if (item.getReturnCount().equals(returnCount)) {
+//                return;
+//            }
+//            if (returnCount.compareTo(item.getOutCount()) > 0) {
+//                throw exception(SALE_ORDER_ITEM_RETURN_FAIL_OUT_EXCEED,
+//                        productService.getProduct(item.getProductId()).getName(), item.getOutCount());
+//            }
+//            saleOrderItemMapper.updateById(new ErpSaleOrderItemDO().setId(item.getId()).setReturnCount(returnCount));
+//            //todo 销售订单上的item 的出库量也要重新计算
+//        });
+//        // 2. 更新销售订单
+//        BigDecimal totalReturnCount = getSumValue(returnCountMap.values(), value -> value, BigDecimal::add, BigDecimal.ZERO);
+//        saleOrderMapper.updateById(new ErpSaleOrderDO().setId(orderId).setReturnCount(totalReturnCount));
+//    }
+
+
+    /**
+     * 这里还需要考虑，退货
+     * @param orderId
+     */
     @Override
-    public void updateSaleOrderReturnCount(Long orderId, Map<Long, BigDecimal> returnCountMap) {
+    @Transactional(rollbackFor = Exception.class)
+    public void updateSaleOrderOutCountReturnCount(Long orderId) {
+        // 1.1 查询销售订单对应的销售出库单列表
+        List<ErpSaleOutDO> saleOuts = saleOutMapper.selectListByOrderId(orderId);
+        // 1.2 查询对应的销售订单项的出库数量
+        Map<Long, BigDecimal> outCountMap = saleOutItemMapper.selectOrderItemCountSumMapByOutIds(
+                convertList(saleOuts, ErpSaleOutDO::getId));
+
+        // 1.1 查询销售订单对应的销售退货单列表
+        List<ErpSaleReturnDO> saleReturns = saleReturnMapper.selectListByOrderId(orderId);
+        // 1.2 查询对应的销售订单项的退货数量
+        Map<Long, BigDecimal> returnCountMap = saleReturnItemMapper.selectOrderItemCountSumMapByReturnIds(
+                convertList(saleReturns, ErpSaleReturnDO::getId));
+
+        // 2. 更新销售订单的出库数量，和退货数量
         List<ErpSaleOrderItemDO> orderItems = saleOrderItemMapper.selectListByOrderId(orderId);
-        // 1. 更新每个销售订单项
         orderItems.forEach(item -> {
             BigDecimal returnCount = returnCountMap.getOrDefault(item.getId(), BigDecimal.ZERO);
             if (item.getReturnCount().equals(returnCount)) {
                 return;
             }
-            if (returnCount.compareTo(item.getOutCount()) > 0) {
+            BigDecimal outCount = outCountMap.getOrDefault(item.getId(), BigDecimal.ZERO);
+            if (returnCount.compareTo(outCount) > 0) {
                 throw exception(SALE_ORDER_ITEM_RETURN_FAIL_OUT_EXCEED,
                         productService.getProduct(item.getProductId()).getName(), item.getOutCount());
             }
-            saleOrderItemMapper.updateById(new ErpSaleOrderItemDO().setId(item.getId()).setReturnCount(returnCount));
-            //todo 销售订单上的item 的出库量也要重新计算
-        });
-        // 2. 更新销售订单
-        BigDecimal totalReturnCount = getSumValue(returnCountMap.values(), value -> value, BigDecimal::add, BigDecimal.ZERO);
-        saleOrderMapper.updateById(new ErpSaleOrderDO().setId(orderId).setReturnCount(totalReturnCount));
-    }
 
+            saleOrderItemMapper.updateById(new ErpSaleOrderItemDO().setId(item.getId()).setReturnCount(returnCount).setOutCount(outCount.subtract(returnCount)));
+        });
+        // 3. 更新销售订单
+        BigDecimal totalReturnCount = getSumValue(returnCountMap.values(), value -> value, BigDecimal::add, BigDecimal.ZERO);
+        BigDecimal totalOutCount = getSumValue(outCountMap.values(), value -> value, BigDecimal::add, BigDecimal.ZERO);
+        saleOrderMapper.updateById(new ErpSaleOrderDO().setId(orderId).setOutCount(totalOutCount.subtract(totalReturnCount)).setReturnCount(totalReturnCount));
+    }
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteSaleOrder(List<Long> ids) {
