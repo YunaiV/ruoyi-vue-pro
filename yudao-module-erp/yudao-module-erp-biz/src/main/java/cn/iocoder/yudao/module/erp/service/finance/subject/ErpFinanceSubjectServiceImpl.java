@@ -1,0 +1,70 @@
+package cn.iocoder.yudao.module.erp.service.finance.subject;
+
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.erp.controller.admin.finance.subject.vo.ErpFinanceSubjectPageReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.finance.subject.vo.ErpFinanceSubjectSaveReqVO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.finance.subject.ErpFinanceSubjectDO;
+import cn.iocoder.yudao.module.erp.dal.mysql.finance.subject.ErpFinanceSubjectMapper;
+import jakarta.annotation.Resource;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.FINANCE_SUBJECT_NOT_EXISTS;
+
+/**
+ * Erp财务主体 Service 实现类
+ *
+ * @author 王岽宇
+ */
+@Service
+@Validated
+public class ErpFinanceSubjectServiceImpl implements ErpFinanceSubjectService {
+
+    @Resource
+    private ErpFinanceSubjectMapper financeSubjectMapper;
+
+    @Override
+    public Long createFinanceSubject(ErpFinanceSubjectSaveReqVO createReqVO) {
+        // 插入
+        ErpFinanceSubjectDO financeSubject = BeanUtils.toBean(createReqVO, ErpFinanceSubjectDO.class);
+        financeSubjectMapper.insert(financeSubject);
+        // 返回
+        return financeSubject.getId();
+    }
+
+    @Override
+    public void updateFinanceSubject(ErpFinanceSubjectSaveReqVO updateReqVO) {
+        // 校验存在
+        validateFinanceSubjectExists(updateReqVO.getId());
+        // 更新
+        ErpFinanceSubjectDO updateObj = BeanUtils.toBean(updateReqVO, ErpFinanceSubjectDO.class);
+        financeSubjectMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void deleteFinanceSubject(Long id) {
+        // 校验存在
+        validateFinanceSubjectExists(id);
+        // 删除
+        financeSubjectMapper.deleteById(id);
+    }
+
+    private void validateFinanceSubjectExists(Long id) {
+        if (financeSubjectMapper.selectById(id) == null) {
+            throw exception(FINANCE_SUBJECT_NOT_EXISTS);
+        }
+    }
+
+    @Override
+    public ErpFinanceSubjectDO getFinanceSubject(Long id) {
+        return financeSubjectMapper.selectById(id);
+    }
+
+    @Override
+    public PageResult<ErpFinanceSubjectDO> getFinanceSubjectPage(ErpFinanceSubjectPageReqVO pageReqVO) {
+        return financeSubjectMapper.selectPage(pageReqVO);
+    }
+
+}

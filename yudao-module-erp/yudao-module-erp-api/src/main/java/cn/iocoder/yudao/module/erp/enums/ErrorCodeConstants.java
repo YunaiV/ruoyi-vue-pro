@@ -225,5 +225,6 @@ public interface ErrorCodeConstants {
     // ========== 海关分类子表 1-030-606-000 ==========
     ErrorCode CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS = new ErrorCode(1_030_606_001, "海关分类子表不存在");
     ErrorCode CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS_BY_PRODUCT_ID = new ErrorCode(1_030_606_002, "所选产品中不存在海关分类数据");
-
+    // ========== Erp财务主体 1-030-607-000 ==========
+    ErrorCode FINANCE_SUBJECT_NOT_EXISTS = new ErrorCode(1_030_607_001, "Erp财务主体不存在");
 }

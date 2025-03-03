@@ -1,0 +1,41 @@
+package cn.iocoder.yudao.module.erp.dal.mysql.finance.subject;
+
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.erp.controller.admin.finance.subject.vo.ErpFinanceSubjectPageReqVO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.finance.subject.ErpFinanceSubjectDO;
+import org.apache.ibatis.annotations.Mapper;
+
+/**
+ * Erp财务主体 Mapper
+ *
+ * @author 王岽宇
+ */
+@Mapper
+public interface ErpFinanceSubjectMapper extends BaseMapperX<ErpFinanceSubjectDO> {
+
+    default PageResult<ErpFinanceSubjectDO> selectPage(ErpFinanceSubjectPageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<ErpFinanceSubjectDO>()
+            .eqIfPresent(ErpFinanceSubjectDO::getCreator, reqVO.getCreator())
+            .betweenIfPresent(ErpFinanceSubjectDO::getCreateTime, reqVO.getCreateTime())
+            .eqIfPresent(ErpFinanceSubjectDO::getUpdater, reqVO.getUpdater())
+            .betweenIfPresent(ErpFinanceSubjectDO::getUpdateTime, reqVO.getUpdateTime())
+            .likeIfPresent(ErpFinanceSubjectDO::getName, reqVO.getName())
+            .likeIfPresent(ErpFinanceSubjectDO::getContact, reqVO.getContact())
+            .likeIfPresent(ErpFinanceSubjectDO::getMobile, reqVO.getMobile())
+            .likeIfPresent(ErpFinanceSubjectDO::getTelephone, reqVO.getTelephone())
+            .likeIfPresent(ErpFinanceSubjectDO::getEmail, reqVO.getEmail())
+            .likeIfPresent(ErpFinanceSubjectDO::getFax, reqVO.getFax())
+            .likeIfPresent(ErpFinanceSubjectDO::getDeliveryAddress, reqVO.getDeliveryAddress())
+            .likeIfPresent(ErpFinanceSubjectDO::getCompanyAddress, reqVO.getCompanyAddress())
+            .likeIfPresent(ErpFinanceSubjectDO::getRemark, reqVO.getRemark())
+            .eqIfPresent(ErpFinanceSubjectDO::getStatus, reqVO.getStatus())
+            .likeIfPresent(ErpFinanceSubjectDO::getTaxNo, reqVO.getTaxNo())
+            .likeIfPresent(ErpFinanceSubjectDO::getBankName, reqVO.getBankName())
+            .likeIfPresent(ErpFinanceSubjectDO::getBankAccount, reqVO.getBankAccount())
+            .likeIfPresent(ErpFinanceSubjectDO::getBankAddress, reqVO.getBankAddress())
+            .orderByDesc(ErpFinanceSubjectDO::getId));
+    }
+
+}
