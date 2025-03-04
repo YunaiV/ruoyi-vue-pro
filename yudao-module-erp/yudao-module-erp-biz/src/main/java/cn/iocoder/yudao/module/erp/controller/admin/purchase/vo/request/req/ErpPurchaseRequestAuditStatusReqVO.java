@@ -8,6 +8,7 @@ import lombok.Data;
 import java.util.List;
 
 //审核状态请求类
+@Schema(description = "管理后台 - ERP采购申请单审核状态 Request VO")
 @Data
 @Builder
 public class ErpPurchaseRequestAuditStatusReqVO {

@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_UPDATE_ERROR;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PURCHASE_REQUEST_PROCESS_FAIL_CLOSE;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PURCHASE_REQUEST_PROCESS_FAIL_ORDERED;
 
@@ -57,6 +58,7 @@ public class ActionAuditImpl implements Action<ErpAuditStatus, ErpEventEnum, Erp
             //设置审核时间
             requestDO.setAuditTime(LocalDateTime.now());
             requestDO.setReviewComment(req.getReviewComment());
+            requestDO.setAuditorId(getLoginUserId());
         }
         //审核不通过(设置未通过意见)
         if (ErpAuditStatus.REVOKED.getCode().equals(to.getCode())) {

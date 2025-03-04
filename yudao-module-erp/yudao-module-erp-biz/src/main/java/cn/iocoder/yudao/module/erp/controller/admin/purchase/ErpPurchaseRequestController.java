@@ -8,11 +8,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestAuditStatusReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestEnableStatusReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestPageReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.*;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.resp.ErpPurchaseRequestItemRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.resp.ErpPurchaseRequestRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.tools.validation;
@@ -20,6 +18,7 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
+import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestItemsMapper;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseRequestService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
@@ -66,10 +65,12 @@ public class ErpPurchaseRequestController {
     private final AdminUserApi adminUserApi;
     private final DeptApi deptApi;
     private final ErpSupplierService erpSupplierService;
+    private final ErpPurchaseRequestItemsMapper erpPurchaseRequestItemsMapper;
 
     @PostMapping("/create")
     @Operation(summary = "创建ERP采购申请单")
     @PreAuthorize("@ss.hasPermission('erp:purchase-request:create')")
+    @Idempotent
     public CommonResult<Long> createPurchaseRequest(@Validated(validation.OnCreate.class) @RequestBody ErpPurchaseRequestSaveReqVO createReqVO) {
         return success(erpPurchaseRequestService.createPurchaseRequest(createReqVO));
     }
@@ -106,45 +107,42 @@ public class ErpPurchaseRequestController {
     @Parameter(name = "requestId", description = "申请单编号", required = true)
     @Parameter(name = "reviewed", description = "审核状态", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:review')")
-    public CommonResult<Boolean> reviewPurchaseRequest(@RequestBody ErpPurchaseRequestAuditStatusReqVO req) {
+    public CommonResult<Boolean> reviewPurchaseRequest(@Validated @RequestBody ErpPurchaseRequestAuditStatusReqVO req) {
         erpPurchaseRequestService.reviewPurchaseOrder(req);
         return success(true);
     }
 
-    //procurement采购接口
-    @PostMapping("/procurement")
-    @Operation(summary = "采购")
-    @Parameter(name = "requestId", description = "申请单编号", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:purchase-order:procurement')")
-    public CommonResult<Boolean> procurement(@RequestParam("requestId") Long requestId) {
-        //TODO 采购
-        //申请单->采购单DO
-        ErpPurchaseRequestDO aDo = erpPurchaseRequestService.getPurchaseRequest(requestId);
-        //调用采购单service,创建采购单
-        return null;
-    }
+//    //procurement采购接口
+//    @PostMapping("/procurement")
+//    @Operation(summary = "采购")
+//    @Parameter(name = "requestId", description = "申请单编号", required = true)
+//    @PreAuthorize("@ss.hasPermission('erp:purchase-order:procurement')")
+//    public CommonResult<Boolean> procurement(@RequestParam("requestId") Long requestId) {
+//        //申请单->采购单DO
+//        ErpPurchaseRequestDO aDo = erpPurchaseRequestService.getPurchaseRequest(requestId);
+//        //调用采购单service,创建采购单
+//        return null;
+//    }
 
     @PostMapping("/merge")
     @Operation(summary = "合并采购")
-    @Parameter(name = "itemIds", description = "申请单申请项ids", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:merge')")
-    public CommonResult<Long> mergePurchaseOrder(@NotNull @RequestParam("itemIds") List<Long> itemIds) {
-        //TODO 合并采购订单
-//        return success(purchaseOrderService.mergePurchaseOrder(ids));
+    public CommonResult<Long> mergePurchaseOrder(@Validated @RequestBody ErpPurchaseRequestOrderReqVO reqVO) {
+        erpPurchaseRequestService.merge(reqVO);
         return null;
     }
 
     @PutMapping("/enableStatus")
     @Operation(summary = "关闭/启用")
     @PreAuthorize("@ss.hasPermission('erp:purchasereq-order:enable')")
-    public CommonResult<Boolean> switchPurchaseOrderStatus(@RequestBody @NotNull ErpPurchaseRequestEnableStatusReqVO reqVO) {
+    public CommonResult<Boolean> switchPurchaseOrderStatus(@Validated @RequestBody ErpPurchaseRequestEnableStatusReqVO reqVO) {
         erpPurchaseRequestService.switchPurchaseOrderStatus(reqVO.getRequestId(), reqVO.getItemIds(), reqVO.getEnable());
         return success(true);
     }
 
     @GetMapping("/get")
     @Operation(summary = "获得ERP采购申请单")
-    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-request:query')")
     public CommonResult<ErpPurchaseRequestRespVO> getPurchaseRequest(@RequestParam("id") Long id) {
         ErpPurchaseRequestDO purchaseRequest = erpPurchaseRequestService.getPurchaseRequest(id);

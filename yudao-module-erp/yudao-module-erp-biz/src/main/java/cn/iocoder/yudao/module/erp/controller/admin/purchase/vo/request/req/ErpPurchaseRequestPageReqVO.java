@@ -43,6 +43,7 @@ public class ErpPurchaseRequestPageReqVO extends PageParam {
     @Schema(description = "审核者id")
     private Long auditorId;
 
+
     @Schema(description = "审核时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] auditTime;

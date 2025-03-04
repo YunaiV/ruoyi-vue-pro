@@ -38,7 +38,7 @@ public class ActionOffImpl  implements Action<ErpOffStatus, ErpEventEnum, ErpPur
         validate(from, to, event, context);
         ErpPurchaseRequestDO aDo = mapper.selectById(context.getId());
         aDo.setOffStatus(to.getCode());
-        mapper.updateById(aDo);
+        ThrowUtil.ifSqlThrow(mapper.updateById(aDo), DB_UPDATE_ERROR);
         //ErpPurchaseRequestDO主表开启事件，则主表的子表都开启
         //联动更新子表关闭状态
         if (event == ErpEventEnum.MANUAL_CLOSE || event == ErpEventEnum.AUTO_CLOSE) {

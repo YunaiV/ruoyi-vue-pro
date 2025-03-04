@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
@@ -48,6 +49,7 @@ public class ErpPurchaseOrderSaveReqVO {
     private String remark;
 
     @Schema(description = "订单清单列表")
+    @NotNull(message = "订单项不能为空")
     private List<Item> items;
     // ========== 部门和主体信息 ==========
 
@@ -67,10 +69,6 @@ public class ErpPurchaseOrderSaveReqVO {
         @NotNull(message = "产品编号不能为空")
         private Long productId;
 
-        @Schema(description = "产品单位", requiredMode = Schema.RequiredMode.REQUIRED)
-        @NotNull(message = "产品单位不能为空")
-        private Long productUnitId;
-
         @Schema(description = "产品单价")
         @DecimalMin(value = "0.00", message = "产品单价不能小于0")
         private BigDecimal productPrice;
@@ -82,10 +80,16 @@ public class ErpPurchaseOrderSaveReqVO {
         @DecimalMin(value = "0.00", message = "含税单价不能小于0")
         private BigDecimal actTaxPrice;
 
-        @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED)
-        @NotNull(message = "产品数量不能为空")
-        @DecimalMin(value = "1", message = "产品数量必须大于0")
-        private BigDecimal count;
+        @Schema(description = "下单数量", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "下单数量不能为空")
+        @Min(value = 0, message = "产品数量必须大于0")
+        private Integer count;
+        //产品申请数量
+        @Schema(description = "申请数量")
+        private Integer applyCount;
+
+        @Schema(description = "批准数量")
+        private Integer approveCount;
 
         @Schema(description = "增值税税率，百分比")
         private BigDecimal taxPercent;
@@ -93,10 +97,9 @@ public class ErpPurchaseOrderSaveReqVO {
         @Schema(description = "备注")
         private String remark;
 
-        @Schema(description = "供应商产品编号")
-        @Pattern(regexp = "\\d+$", message = "供应商产品编号格式不正确")
-        @NotNull(message = "供应商产品编号不能为空")
-        private String supplierProductId;
+        @Schema(description = "供应商产品id")
+        @NotNull(message = "供应商产品id不能为空")
+        private Long supplierProductId;
 
         // ========== 采购入库 ==========
         /**
@@ -109,7 +112,7 @@ public class ErpPurchaseOrderSaveReqVO {
         private BigDecimal discountPercent;
         // ========== 仓库相关 ==========
         @Schema(description = "仓库编号")
-        private String warehouseId; // 仓库编号
+        private Long warehouseId; // 仓库编号
 
         @Schema(description = "交货日期")
         private LocalDateTime deliveryTime;

@@ -1,14 +1,24 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Schema(description = "管理后台 - ERP采购申请单采购 Request VO")
 @Data
 public class ErpPurchaseRequestOrderReqVO {
+
+    @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "供应商编号不能为空")
+    private Long supplierId;
+
+    @Schema(description = "期望采购时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "采购时间不能为空")
+    private LocalDateTime orderTime;
     // 项目列表
     @NotNull(message = "项目列表不能为空")
     @Schema(description = "项目列表", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -21,8 +31,18 @@ public class ErpPurchaseRequestOrderReqVO {
         @Schema(description = "申请单项ID", requiredMode = Schema.RequiredMode.REQUIRED)
         private Long id;
 
-        @NotNull(message = "下单数量不能为空")
+        @Schema(description = "供应商产品id")
+        @NotNull(message = "供应商产品id不能为空")
+        private Long supplierProductId;
+//        @NotNull(message = "下单数量不能为空")
+//        @Schema(description = "下单数量", requiredMode = Schema.RequiredMode.REQUIRED)
+//        private Integer orderCount;
+
         @Schema(description = "下单数量", requiredMode = Schema.RequiredMode.REQUIRED)
-        private Integer orderCount;
+        @NotNull(message = "下单数量不能为空")
+        @Min(value = 0, message = "下单数量必须大于0")
+        private Integer count;
+
+
     }
 }
