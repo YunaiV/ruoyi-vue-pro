@@ -32,6 +32,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -84,13 +85,23 @@ public class ErpPurchaseRequestController {
     @Operation(summary = "删除ERP采购申请单")
     @Parameter(name = "id", description = "编号数组", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-request:delete')")
-    public CommonResult<Boolean> deletePurchaseRequest(@RequestParam("ids") List<Long> ids) {
+    public CommonResult<Boolean> deletePurchaseRequest(@NotNull @RequestParam("ids") List<Long> ids) {
         erpPurchaseRequestService.deletePurchaseRequest(ids);
         return success(true);
     }
 
+    //提交审核 submitAudit
+    @PutMapping("/submitAudit")
+    @Operation(summary = "提交审核")
+    @Parameter(name = "id", description = "申请单编号数组", required = true)
+    @PreAuthorize("@ss.hasPermission('erp:purchase-request:submitAudit')")
+    public CommonResult<Boolean> submitAudit(@NotNull @RequestParam("id") Collection<Long> ids) {
+        erpPurchaseRequestService.submitAudit(ids);
+        return success(true);
+    }
+
     @PutMapping("/auditStatus")
-    @Operation(summary = "审核/反审核采购订单")
+    @Operation(summary = "审核同意/审核撤销")
     @Parameter(name = "requestId", description = "申请单编号", required = true)
     @Parameter(name = "reviewed", description = "审核状态", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:review')")
@@ -101,7 +112,7 @@ public class ErpPurchaseRequestController {
 
     //procurement采购接口
     @GetMapping("/procurement")
-    @Operation(summary = "采购接口")
+    @Operation(summary = "采购")
     @Parameter(name = "requestId", description = "申请单编号", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:procurement')")
     public CommonResult<Boolean> procurement(@RequestParam("requestId") Long requestId) {
@@ -120,7 +131,7 @@ public class ErpPurchaseRequestController {
     }
 
     @PutMapping("/enableStatus")
-    @Operation(summary = "关闭/启用申请单")
+    @Operation(summary = "关闭/启用")
     @Parameter(name = "id", description = "申请单id", required = true)
     @Parameter(name = "enable", description = "开启、关闭", required = true)
     @Parameter(name = "itemIds", description = "申请单商品ids", required = false)

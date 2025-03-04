@@ -99,12 +99,12 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         //3. 批量插入子表数据
         ThrowUtil.ifThrow(!erpPurchaseRequestItemsMapper.insertBatch(itemsDOList), PURCHASE_REQUEST_ADD_FAIL_PRODUCT);
         //4.初始化-审核状态-开关-订购
-        auditMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.INIT, ErpPurchaseRequestAuditStatusReqVO.builder().requestId(id).build());
+        auditMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.AUDIT_INIT, ErpPurchaseRequestAuditStatusReqVO.builder().requestId(id).build());
         offMachine.fireEvent(ErpOffStatus.OPEN, ErpEventEnum.OFF_INIT, purchaseRequest);
         orderMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_INIT, purchaseRequest);
         //子表初始化
         itemsDOList.forEach(i -> {
-            storageMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, ErpEventEnum.INIT_STORAGE, i);
+            storageMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, ErpEventEnum.STORAGE_INIT, i);
                 offItemMachine.fireEvent(ErpOffStatus.OPEN, ErpEventEnum.OFF_INIT, i);
             }
         );
@@ -193,7 +193,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
             erpPurchaseRequestItemsMapper.insertBatch(diffList.get(0));
             for (ErpPurchaseRequestItemsDO itemsDO : diffList.get(0)) {
                 //初始化状态
-                storageMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, ErpEventEnum.INIT_STORAGE, itemsDO);
+                storageMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, ErpEventEnum.STORAGE_INIT, itemsDO);
                 offItemMachine.fireEvent(ErpOffStatus.OPEN, ErpEventEnum.OFF_INIT, itemsDO);
             }
         }
@@ -235,6 +235,16 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         }
     }
 
+    @Override
+    public void submitAudit(Collection<Long> ids) {
+        if (!CollUtil.isEmpty(ids)) {
+            List<ErpPurchaseRequestDO> dos = erpPurchaseRequestMapper.selectByIds(ids);
+            for (ErpPurchaseRequestDO aDo : dos) {
+                auditMachine.fireEvent(ErpAuditStatus.fromCode(aDo.getStatus()), ErpEventEnum.SUBMIT_FOR_REVIEW, ErpPurchaseRequestAuditStatusReqVO.builder().requestId(aDo.getId()).build());
+            }
+        }
+    }
+
     /**
      * 关闭/启用采购申请单子项状态
      *
@@ -262,7 +272,6 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
             }
         }
     }
-
 
 
     @Override

@@ -27,11 +27,9 @@ public class ErpPurchaseRequestAuditStatusReqVO {
     private Boolean reviewed;
 
     //审核意见
-//    @NotNull(message = "审核意见不能为空")
     @Schema(description = "审核意见")
     private String reviewComment;
 
-    // 内部静态类，用于表示项目
     @Data
     public static class requestItems {
         // 项目ID

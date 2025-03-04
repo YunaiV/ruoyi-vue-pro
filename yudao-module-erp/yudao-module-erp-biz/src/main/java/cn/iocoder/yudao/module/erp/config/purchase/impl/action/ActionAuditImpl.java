@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -52,12 +53,17 @@ public class ActionAuditImpl implements Action<ErpAuditStatus, ErpEventEnum, Erp
                     itemDO.setApproveCount(itemDO.getCount());//默认申请数量
                 }
             });
-            //制空审核意见
-//            requestDO.setReviewComment(null);
+            //设置审核时间
+            requestDO.setAuditTime(LocalDateTime.now());
         }
         //审核不通过(设置未通过意见)
         if (ErpAuditStatus.REVOKED.getCode().equals(to.getCode())) {
             requestDO.setReviewComment(req.getReviewComment());
+        }
+        //反审核
+        if (ErpAuditStatus.DRAFT.getCode().equals(to.getCode())) {
+            //设置审核时间
+//            requestDO.setAuditTime(null);
         }
         //持久化变更状态
         requestDO.setStatus(to.getCode());

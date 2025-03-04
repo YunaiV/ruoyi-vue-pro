@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum ErpEventEnum {
     // 审核事件
-    INIT("审核初始化"),
+    AUDIT_INIT("审核初始化"),
     SUBMIT_FOR_REVIEW("提交审核"),
     AGREE("审核通过"),
     REJECT("审核不通过"),
@@ -34,7 +34,7 @@ public enum ErpEventEnum {
     PURCHASE_CANCELLED("采购取消"),
 
     // 入库事件
-    INIT_STORAGE("入库初始化"),
+    STORAGE_INIT("入库初始化"),
     STOCK_ADJUSTMENT("库存调整"),
     ADD_STOCK("添加库存"),
     REDUCE_STOCK("减少库存"),

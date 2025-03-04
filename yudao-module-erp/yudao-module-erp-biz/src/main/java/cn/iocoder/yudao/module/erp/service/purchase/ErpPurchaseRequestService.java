@@ -100,6 +100,13 @@ public interface ErpPurchaseRequestService {
     void reviewPurchaseOrder(ErpPurchaseRequestAuditStatusReqVO req);
 
     /**
+     * 提交审核
+     *
+     * @param ids 采购订单id
+     */
+    void submitAudit(Collection<Long> ids);
+
+    /**
      * 启用/关闭申请单子项，自动更新父订单状态
      *
      * @param requestId 采购订单id

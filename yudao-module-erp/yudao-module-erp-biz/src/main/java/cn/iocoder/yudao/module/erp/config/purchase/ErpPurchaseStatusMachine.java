@@ -40,7 +40,7 @@ public class ErpPurchaseStatusMachine {
         // 初始化状态
         builder.internalTransition()
             .within(ErpAuditStatus.DRAFT)
-            .on(ErpEventEnum.INIT)
+            .on(ErpEventEnum.AUDIT_INIT)
             .perform(actionAuditImpl);
 
         // 提交审核

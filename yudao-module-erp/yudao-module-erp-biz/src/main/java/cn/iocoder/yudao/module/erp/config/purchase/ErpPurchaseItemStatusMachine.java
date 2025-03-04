@@ -69,7 +69,7 @@ public class ErpPurchaseItemStatusMachine {
         // 初始化状态
         builder.internalTransition()
             .within(ErpStorageStatus.NONE_IN_STORAGE)
-            .on(ErpEventEnum.INIT_STORAGE)
+            .on(ErpEventEnum.STORAGE_INIT)
             .perform(actionItemStorageImpl);
         //添加库存
         builder.externalTransition()
@@ -89,11 +89,7 @@ public class ErpPurchaseItemStatusMachine {
 //            .to(ErpStorageStatus.STOCK_ADJUSTMENT)
 //            .on(ErpEventEnum.STOCK_ADJUSTMENT)
 //            .perform(actionItemStorageImpl);
-        builder.setFailCallback((f, e, o) -> {
-            String msg = StrUtil.format("状态机执行失败,订单：{}，事件：{}，起始状态({})", JSONUtil.toJsonStr(o), e.getDesc(), f.getDesc());
-            log.warn(msg);
-            throw new RuntimeException(msg);
-        });
+        builder.setFailCallback(baseFailCallbackImpl);
         return builder.build(ErpStateMachines.PURCHASE_ORDER_ITEM_STATE_MACHINE_NAME);
     }
 }

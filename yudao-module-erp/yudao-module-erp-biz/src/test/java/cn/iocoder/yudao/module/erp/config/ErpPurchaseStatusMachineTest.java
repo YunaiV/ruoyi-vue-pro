@@ -55,7 +55,7 @@ class ErpPurchaseStatusMachineTest extends BaseDbUnitTest {
 //        mapper.update(requestDO, new LambdaQueryWrapperX<ErpPurchaseRequestDO>().eq(ErpPurchaseRequestDO::getId, requestDO.getId()));
         //
 
-        auditMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.INIT, requestDO);//初始化
+        auditMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.AUDIT_INIT, requestDO);//初始化
         auditMachine.fireEvent(ErpAuditStatus.fromCode(mapper.selectById(32603L).getStatus()), ErpEventEnum.SUBMIT_FOR_REVIEW, requestDO);//提交审核
         auditMachine.fireEvent(ErpAuditStatus.fromCode(mapper.selectById(32603L).getStatus()), ErpEventEnum.AGREE, requestDO);//审核同意
         auditMachine.fireEvent(ErpAuditStatus.fromCode(mapper.selectById(32603L).getStatus()), ErpEventEnum.WITHDRAW_REVIEW, requestDO);//反审核

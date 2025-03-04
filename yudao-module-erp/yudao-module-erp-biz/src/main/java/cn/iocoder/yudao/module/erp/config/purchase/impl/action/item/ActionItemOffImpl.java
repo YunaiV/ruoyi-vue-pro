@@ -67,10 +67,16 @@ public class ActionItemOffImpl implements Action<ErpOffStatus, ErpEventEnum, Erp
 
         if (allClosed) {
             log.info("所有子项已关闭，更新主表状态: ID={}", requestDO.getId());
-//            machine.fireEvent(ErpOffStatus.fromCode(requestDO.getOffStatus()), ErpEventEnum.AUTO_CLOSE, requestDO);
+            //主表不是关闭状态
+            if (!requestDO.getOffStatus().equals(ErpOffStatus.CLOSED.getCode())) {
+                machine.fireEvent(ErpOffStatus.fromCode(requestDO.getOffStatus()), ErpEventEnum.AUTO_CLOSE, requestDO);
+            }
         } else if (hasOpen) {
             log.info("存在已开启的子项，更新主表状态: ID={}", requestDO.getId());
-//            machine.fireEvent(ErpOffStatus.fromCode(requestDO.getOffStatus()), ErpEventEnum.ACTIVATE, requestDO);
+            //主表不是开启状态
+            if (!requestDO.getOffStatus().equals(ErpOffStatus.OPEN.getCode())) {
+                machine.fireEvent(ErpOffStatus.fromCode(requestDO.getOffStatus()), ErpEventEnum.ACTIVATE, requestDO);
+            }
         }
         log.info("item开关状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
     }
