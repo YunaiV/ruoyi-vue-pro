@@ -14,8 +14,7 @@ import java.util.Collections;
 
 /**
  * IoT Emqx 连接认证的 Vert.x Handler
- * <a href=
- * "https://docs.emqx.com/zh/emqx/latest/access-control/authn/http.html">...</a>
+ * <a href="https://docs.emqx.com/zh/emqx/latest/access-control/authn/http.html">MQTT HTTP</a>
  *
  * @author haohao
  */
@@ -31,28 +30,29 @@ public class IotDeviceAuthVertxHandler implements Handler<RoutingContext> {
     @SuppressWarnings("unchecked")
     public void handle(RoutingContext routingContext) {
         try {
+            // 构建认证请求 DTO
             JsonObject json = routingContext.body().asJsonObject();
             String clientId = json.getString("clientid");
             String username = json.getString("username");
             String password = json.getString("password");
-
-            // 构建认证请求DTO
             IotDeviceEmqxAuthReqDTO authReqDTO = new IotDeviceEmqxAuthReqDTO()
                     .setClientId(clientId)
                     .setUsername(username)
                     .setPassword(password);
 
-            // 调用认证API
+            // 调用认证 API
             CommonResult<Boolean> authResult = deviceUpstreamApi.authenticateEmqxConnection(authReqDTO);
             if (authResult.getCode() != 0 || !authResult.getData()) {
                 IotPluginCommonUtils.writeJson(routingContext, Collections.singletonMap("result", "deny"));
                 return;
             }
 
+            // 响应结果
             IotPluginCommonUtils.writeJson(routingContext, Collections.singletonMap("result", "allow"));
         } catch (Exception e) {
-            log.error("[handle][EMQX认证异常]", e);
+            log.error("[handle][EMQX 认证异常]", e);
             IotPluginCommonUtils.writeJson(routingContext, Collections.singletonMap("result", "deny"));
         }
     }
+
 }

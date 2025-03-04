@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.plugin.emqx.upstream;
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.plugin.emqx.config.IotPluginEmqxProperties;
 import cn.iocoder.yudao.module.iot.plugin.emqx.upstream.router.IotDeviceAuthVertxHandler;
@@ -167,33 +168,28 @@ public class IotDeviceUpstreamServer {
      */
     private Future<Void> subscribeToTopics() {
         String[] topics = emqxProperties.getMqttTopics();
-        if (topics == null || topics.length == 0) {
+        if (ArrayUtil.isEmpty(topics)) {
             log.warn("[subscribeToTopics] 未配置MQTT主题，跳过订阅");
             return Future.succeededFuture();
         }
-
         log.info("[subscribeToTopics] 开始订阅设备上行消息主题");
 
         Future<Void> compositeFuture = Future.succeededFuture();
-
         for (String topic : topics) {
             String trimmedTopic = topic.trim();
             if (trimmedTopic.isEmpty()) {
                 continue;
             }
-
             compositeFuture = compositeFuture.compose(v -> client.subscribe(trimmedTopic, DEFAULT_QOS.value())
                     .<Void>map(ack -> {
                         log.info("[subscribeToTopics] 成功订阅主题: {}", trimmedTopic);
                         return null;
                     })
                     .recover(err -> {
-                        log.error("[subscribeToTopics] 订阅主题失败: {}, 原因: {}",
-                                trimmedTopic, err.getMessage());
+                        log.error("[subscribeToTopics] 订阅主题失败: {}, 原因: {}", trimmedTopic, err.getMessage());
                         return Future.<Void>succeededFuture(); // 继续订阅其他主题
                     }));
         }
-
         return compositeFuture;
     }
 
@@ -205,7 +201,6 @@ public class IotDeviceUpstreamServer {
             log.warn("[stop] 服务未运行，无需停止");
             return;
         }
-
         log.info("[stop] 开始关闭服务");
         isRunning = false;
 
@@ -213,11 +208,9 @@ public class IotDeviceUpstreamServer {
             CompletableFuture<Void> serverFuture = server != null
                     ? server.close().toCompletionStage().toCompletableFuture()
                     : CompletableFuture.completedFuture(null);
-
             CompletableFuture<Void> clientFuture = client != null
                     ? client.disconnect().toCompletionStage().toCompletableFuture()
                     : CompletableFuture.completedFuture(null);
-
             CompletableFuture<Void> vertxFuture = vertx != null
                     ? vertx.close().toCompletionStage().toCompletableFuture()
                     : CompletableFuture.completedFuture(null);

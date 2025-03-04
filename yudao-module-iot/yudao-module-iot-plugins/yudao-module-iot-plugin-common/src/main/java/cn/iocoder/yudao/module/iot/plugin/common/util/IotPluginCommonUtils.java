@@ -50,10 +50,10 @@ public class IotPluginCommonUtils {
     }
 
     /**
-     * 将对象转换为JSON字符串后写入响应
+     * 将对象转换为 JSON 字符串后写入响应
      *
      * @param routingContext 路由上下文
-     * @param data           要转换为JSON的数据对象
+     * @param data           数据对象
      */
     @SuppressWarnings("deprecation")
     public static void writeJson(RoutingContext routingContext, Object data) {
