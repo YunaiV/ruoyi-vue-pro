@@ -231,7 +231,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     }
 
     @Override
-    public List<ActivityNode> getNextFlowNodes(Long loginUserId, BpmApprovalDetailReqVO reqVO) {
+    public List<ActivityNode> getNextApprovalNodes(Long loginUserId, BpmApprovalDetailReqVO reqVO) {
         // 1.1 校验任务存在
         Task task = taskService.getTask(reqVO.getTaskId());
         if (task == null) {
@@ -755,9 +755,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             // 设置流程变量，发起人自选审批人
             variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES,
                     startUserSelectAssignees);
-            // 设置流程变量，审批人自选审批人
-            variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES,
-                    startUserSelectAssignees);
+//            // 设置流程变量，审批人自选审批人
+//            variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES,
+//                    startUserSelectAssignees);
         }
 
         // 3. 创建流程
@@ -801,8 +801,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
         // 2.1 移除掉不是发起人或者审批人自选审批人节点
         activityNodes.removeIf(task ->
-                ObjectUtil.notEqual(BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy(), task.getCandidateStrategy())
-                        && ObjectUtil.notEqual(BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy(), task.getCandidateStrategy()));
+                ObjectUtil.notEqual(BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy(), task.getCandidateStrategy()));
         // 2.2 流程发起时要先获取当前流程的预测走向节点，发起时只校验预测的节点发起人自选审批人的审批人和抄送人是否都配置了
         activityNodes.forEach(task -> {
             List<Long> assignees = startUserSelectAssignees != null ? startUserSelectAssignees.get(task.getId()) : null;

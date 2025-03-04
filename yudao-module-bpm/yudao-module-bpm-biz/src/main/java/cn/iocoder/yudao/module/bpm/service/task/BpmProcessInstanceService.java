@@ -104,7 +104,7 @@ public interface BpmProcessInstanceService {
      * @param reqVO 请求信息
      * @return 下一个执行节点信息
      */
-    List<BpmApprovalDetailRespVO.ActivityNode> getNextFlowNodes(Long loginUserId, @Valid BpmApprovalDetailReqVO reqVO);
+    List<BpmApprovalDetailRespVO.ActivityNode> getNextApprovalNodes(Long loginUserId, @Valid BpmApprovalDetailReqVO reqVO);
 
     /**
      * 获取流程实例的 BPMN 模型视图
