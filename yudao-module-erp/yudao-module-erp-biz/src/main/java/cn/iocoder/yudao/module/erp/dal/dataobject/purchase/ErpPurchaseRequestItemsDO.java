@@ -77,4 +77,10 @@ public class ErpPurchaseRequestItemsDO extends TenantBaseDO {
      * 税率，百分比
      */
     private BigDecimal taxPercent;
+    /**
+     * 采购单ID
+     *
+     * @link {ErpPurchaseOrderDO}
+     */
+    private Long purchaseOrderId;
 }

@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.erp.config.purchase;
 
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.module.erp.config.purchase.impl.BaseFailCallbackImpl;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;

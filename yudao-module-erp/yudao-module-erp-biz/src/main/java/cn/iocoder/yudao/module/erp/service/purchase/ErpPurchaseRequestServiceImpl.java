@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -14,6 +15,7 @@ import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestItemsMap
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
+import cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.status.ErpOffStatus;
 import cn.iocoder.yudao.module.erp.enums.status.ErpOrderStatus;
@@ -223,17 +225,32 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
      */
     @Override
     public void reviewPurchaseOrder(ErpPurchaseRequestAuditStatusReqVO req) {
-        // 查询所有相关的 items
+        // 查询采购申请单信息
         ErpPurchaseRequestDO requestDO = erpPurchaseRequestMapper.selectById(req.getRequestId());
+
+        if (requestDO == null) {
+            log.error("采购申请单不存在，ID: {}", req.getRequestId());
+            throw ServiceExceptionUtil.exception(ErrorCodeConstants.PURCHASE_REQUEST_NOT_EXISTS, req.getRequestId());
+        }
+        // 获取当前申请单状态
+        ErpAuditStatus currentStatus = ErpAuditStatus.fromCode(requestDO.getStatus());
         // 判断是否是审核操作
         if (Boolean.TRUE.equals(req.getReviewed())) {
             // 审核操作
-            auditMachine.fireEvent(ErpAuditStatus.fromCode(requestDO.getStatus()), ErpEventEnum.AGREE, ErpPurchaseRequestAuditStatusReqVO.builder().requestId(requestDO.getId()).build());
+            if (req.getPass()) {
+                log.debug("采购申请单通过审核，ID: {}", req.getRequestId());
+                auditMachine.fireEvent(currentStatus, ErpEventEnum.AGREE, req);
+            } else {
+                log.debug("采购申请单拒绝审核，ID: {}", req.getRequestId());
+                auditMachine.fireEvent(currentStatus, ErpEventEnum.REJECT, req);
+            }
         } else {
             // 反审核操作
-            auditMachine.fireEvent(ErpAuditStatus.fromCode(requestDO.getStatus()), ErpEventEnum.WITHDRAW_REVIEW, ErpPurchaseRequestAuditStatusReqVO.builder().requestId(requestDO.getId()).build());
+            log.debug("采购申请单撤回审核，ID: {}", req.getRequestId());
+            auditMachine.fireEvent(currentStatus, ErpEventEnum.WITHDRAW_REVIEW, req);
         }
     }
+
 
     @Override
     public void submitAudit(Collection<Long> ids) {

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.erp.config.purchase.impl.action;
 
 
 import cn.hutool.json.JSONUtil;
+import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
@@ -20,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_UPDATE_ERROR;
 
 @Slf4j
 @Component
@@ -41,7 +44,7 @@ public class ActionOffImpl  implements Action<ErpOffStatus, ErpEventEnum, ErpPur
         if (event == ErpEventEnum.MANUAL_CLOSE || event == ErpEventEnum.AUTO_CLOSE) {
             List<ErpPurchaseRequestItemsDO> itemsDOS = itemsMapper.selectListByRequestId(context.getId());
             itemsDOS.forEach(item -> item.setOffStatus(to.getCode()));
-            itemsMapper.updateBatch(itemsDOS);
+            ThrowUtil.ifThrow(!itemsMapper.updateBatch(itemsDOS), GlobalErrorCodeConstants.DB_BATCH_UPDATE_ERROR);
         }
         //ErpPurchaseRequestDO主表关闭事件，则子表的状态都关闭
         log.info("开关状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());

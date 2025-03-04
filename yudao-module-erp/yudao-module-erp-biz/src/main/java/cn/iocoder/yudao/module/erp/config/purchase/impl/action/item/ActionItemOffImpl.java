@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.erp.config.purchase.impl.action.item;
 
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestItemsMapper;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_UPDATE_ERROR;
 
 @Slf4j
 @Component
@@ -45,7 +48,7 @@ public class ActionItemOffImpl implements Action<ErpOffStatus, ErpEventEnum, Erp
         }
         // 更新 Item 状态
         itemsDO.setOffStatus(to.getCode());
-        mapper.updateById(itemsDO);
+        ThrowUtil.ifSqlThrow(mapper.updateById(itemsDO), DB_UPDATE_ERROR);
         log.info("更新采购项状态：ID={}，状态={} -> {}", itemsDO.getId(), from, to);
 
         // 查询同一个采购请求的所有子项

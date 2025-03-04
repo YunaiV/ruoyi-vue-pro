@@ -21,10 +21,14 @@ public class ErpPurchaseRequestAuditStatusReqVO {
     @Schema(description = "项目列表", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<requestItems> items;
 
-    // 审核状态
+    // 审核/反审核
     @NotNull(message = "审核状态不能为空")
-    @Schema(description = "审核状态", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "审核/反审核", requiredMode = Schema.RequiredMode.REQUIRED)
     private Boolean reviewed;
+    //通过与否
+    @NotNull(message = "通过与否不能为空")
+    @Schema(description = "通过/不通过", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Boolean pass;
 
     //审核意见
     @Schema(description = "审核意见")

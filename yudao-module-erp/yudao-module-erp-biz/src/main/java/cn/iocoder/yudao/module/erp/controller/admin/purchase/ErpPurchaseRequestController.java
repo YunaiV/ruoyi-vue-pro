@@ -102,7 +102,7 @@ public class ErpPurchaseRequestController {
     }
 
     @PostMapping("/auditStatus")
-    @Operation(summary = "审核同意/审核撤销")
+    @Operation(summary = "审核/反审核")
     @Parameter(name = "requestId", description = "申请单编号", required = true)
     @Parameter(name = "reviewed", description = "审核状态", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:review')")
@@ -162,7 +162,6 @@ public class ErpPurchaseRequestController {
         PageResult<ErpPurchaseRequestDO> pageResult = erpPurchaseRequestService.getPurchaseRequestPage(pageReqVO);
         return success(new PageResult<>(bindList(pageResult.getList()), pageResult.getTotal()));
     }
-
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出ERP采购申请单 Excel")
