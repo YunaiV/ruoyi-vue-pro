@@ -95,4 +95,16 @@ public class ErpPurchaseRequestRespVO extends BaseVO {
     @Schema(description = "供应商名称")
     @ExcelProperty("供应商名称")
     private String supplierName;
+    /**
+     * 审核意见
+     */
+    @Schema(description = "审核意见")
+    @ExcelProperty("审核意见")
+    private String reviewComment;
+//    /**
+//     * 采购单ID
+//     *
+//     * @link {ErpPurchaseOrderDO}
+//     */
+//    private Long purchaseOrderId;
 }

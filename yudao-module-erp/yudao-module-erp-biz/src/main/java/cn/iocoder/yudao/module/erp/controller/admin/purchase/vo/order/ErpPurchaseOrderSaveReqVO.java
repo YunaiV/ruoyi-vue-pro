@@ -14,37 +14,37 @@ import java.util.List;
 @Data
 public class ErpPurchaseOrderSaveReqVO {
 
-    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17386")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long id;
 
-    @Schema(description = "单据日期", example = "2024-10-12")
+    @Schema(description = "单据日期")
     private LocalDateTime noTime;
 
-    @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1724")
+    @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "供应商编号不能为空")
     private Long supplierId;
 
-    @Schema(description = "结算账户编号", example = "31189")
+    @Schema(description = "结算账户编号")
     private Long accountId;
 
-    @Schema(description = "结算日期", example = "2025-1-1")
+    @Schema(description = "结算日期")
     private LocalDateTime settlementDate;
 
     @Schema(description = "采购时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "采购时间不能为空")
     private LocalDateTime orderTime;
 
-//    @Schema(description = "优惠率，百分比", requiredMode = Schema.RequiredMode.REQUIRED, example = "99.88")
+//    @Schema(description = "优惠率，百分比", requiredMode = Schema.RequiredMode.REQUIRED)
 //    private BigDecimal discountPercent;
 
-    @Schema(description = "定金金额，单位：元", example = "7127")
+    @Schema(description = "定金金额，单位：元")
     @DecimalMin(value = "0.00", message = "定金金额不能小于0")
     private BigDecimal depositPrice;
 
-    @Schema(description = "附件地址", example = "https://www.iocoder.cn")
+    @Schema(description = "附件地址")
     private String fileUrl;
 
-    @Schema(description = "备注", example = "你猜")
+    @Schema(description = "备注")
     private String remark;
 
     @Schema(description = "订单清单列表")
@@ -71,29 +71,29 @@ public class ErpPurchaseOrderSaveReqVO {
         @NotNull(message = "产品单位不能为空")
         private Long productUnitId;
 
-        @Schema(description = "产品单价", example = "100.00")
+        @Schema(description = "产品单价")
         @DecimalMin(value = "0.00", message = "产品单价不能小于0")
         private BigDecimal productPrice;
 
         @Schema(description = "币别id(财务管理-币别维护)")
         private Long currencyId;
 
-        @Schema(description = "含税单价", example = "100.00")
+        @Schema(description = "含税单价")
         @DecimalMin(value = "0.00", message = "含税单价不能小于0")
         private BigDecimal actTaxPrice;
 
-        @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
+        @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "产品数量不能为空")
         @DecimalMin(value = "1", message = "产品数量必须大于0")
         private BigDecimal count;
 
-        @Schema(description = "增值税税率，百分比", example = "0.013")
+        @Schema(description = "增值税税率，百分比")
         private BigDecimal taxPercent;
 
-        @Schema(description = "备注", example = "随便")
+        @Schema(description = "备注")
         private String remark;
 
-        @Schema(description = "供应商产品编号", example = "1007")
+        @Schema(description = "供应商产品编号")
         @Pattern(regexp = "\\d+$", message = "供应商产品编号格式不正确")
         @NotNull(message = "供应商产品编号不能为空")
         private String supplierProductId;
@@ -105,13 +105,13 @@ public class ErpPurchaseOrderSaveReqVO {
         @DecimalMin(value = "0.00", message = "采购入库数量不能小于0")
         private BigDecimal inCount;
 
-        @Schema(description = "优惠率，百分比", requiredMode = Schema.RequiredMode.REQUIRED, example = "99.88")
+        @Schema(description = "优惠率，百分比", requiredMode = Schema.RequiredMode.REQUIRED)
         private BigDecimal discountPercent;
         // ========== 仓库相关 ==========
-        @Schema(description = "仓库编号", example = "3")
+        @Schema(description = "仓库编号")
         private String warehouseId; // 仓库编号
 
-        @Schema(description = "交货日期", example = "2025-1-1")
+        @Schema(description = "交货日期")
         private LocalDateTime deliveryTime;
         // ========== 其他 ==========
         @Schema(description = "x码")

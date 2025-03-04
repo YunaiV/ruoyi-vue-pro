@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestAuditStatusReq;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestAuditStatusReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.resp.ErpPurchaseRequestItemRespVO;
@@ -94,7 +94,7 @@ public class ErpPurchaseRequestController {
     @Parameter(name = "requestId", description = "申请单编号", required = true)
     @Parameter(name = "reviewed", description = "审核状态", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:review')")
-    public CommonResult<Boolean> reviewPurchaseRequest(@RequestBody ErpPurchaseRequestAuditStatusReq req) {
+    public CommonResult<Boolean> reviewPurchaseRequest(@RequestBody ErpPurchaseRequestAuditStatusReqVO req) {
         erpPurchaseRequestService.reviewPurchaseOrder(req);
         return success(true);
     }
@@ -109,6 +109,16 @@ public class ErpPurchaseRequestController {
         return null;
     }
 
+    @PutMapping("/merge")
+    @Operation(summary = "合并采购")
+    @Parameter(name = "ids", description = "编号数组", required = true)
+    @PreAuthorize("@ss.hasPermission('erp:purchase-order:merge')")
+    public CommonResult<Long> mergePurchaseOrder(@RequestParam("ids") List<Long> ids) {
+        //TODO 合并采购订单
+//        return success(purchaseOrderService.mergePurchaseOrder(ids));
+        return null;
+    }
+
     @PutMapping("/enableStatus")
     @Operation(summary = "关闭/启用申请单")
     @Parameter(name = "id", description = "申请单id", required = true)
@@ -118,16 +128,6 @@ public class ErpPurchaseRequestController {
     public CommonResult<Boolean> switchPurchaseOrderStatus(@RequestParam("requestId") Long requestId, @RequestParam("itemId") List<Long> itemIds, @RequestParam("enable") Boolean enable) {
         erpPurchaseRequestService.switchPurchaseOrderStatus(requestId, itemIds, enable);
         return success(true);
-    }
-
-    @PutMapping("/merge")
-    @Operation(summary = "合并采购")
-    @Parameter(name = "ids", description = "编号数组", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:purchase-order:merge')")
-    public CommonResult<Long> mergePurchaseOrder(@RequestParam("ids") List<Long> ids) {
-        //TODO 合并采购订单
-//        return success(purchaseOrderService.mergePurchaseOrder(ids));
-        return null;
     }
 
     @GetMapping("/get")
@@ -246,7 +246,7 @@ public class ErpPurchaseRequestController {
     }
 
     /**
-     * 尝试转换id为 Long
+     * 安全转换id为 Long
      *
      * @param value String类型的id
      * @return id

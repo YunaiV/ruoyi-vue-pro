@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.erp.config.purchase;
 
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.module.erp.config.purchase.impl.BaseFailCallbackImpl;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestAuditStatusReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.ErpStateMachines;
@@ -27,7 +25,7 @@ public class ErpPurchaseStatusMachine {
     private Condition<ErpPurchaseRequestDO> baseConditionImpl;
 
     @Resource
-    private Action<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestDO> actionAuditImpl;
+    private Action<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestAuditStatusReqVO> actionAuditImpl;
     @Resource
     private Action<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestDO> actionOffImpl;
     @Resource
@@ -36,14 +34,13 @@ public class ErpPurchaseStatusMachine {
     private BaseFailCallbackImpl baseFailCallbackImpl;
 
     @Bean(ErpStateMachines.PURCHASE_REQUEST_STATE_MACHINE_NAME)
-    public StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestDO> getPurchaseRequestStateMachine() {
-        StateMachineBuilder<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestDO> builder = StateMachineBuilderFactory.create();
+    public StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestAuditStatusReqVO> getPurchaseRequestStateMachine() {
+        StateMachineBuilder<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestAuditStatusReqVO> builder = StateMachineBuilderFactory.create();
 
         // 初始化状态
         builder.internalTransition()
             .within(ErpAuditStatus.DRAFT)
             .on(ErpEventEnum.INIT)
-            .when(baseConditionImpl)
             .perform(actionAuditImpl);
 
         // 提交审核
@@ -51,7 +48,6 @@ public class ErpPurchaseStatusMachine {
             .fromAmong(ErpAuditStatus.DRAFT, ErpAuditStatus.REVOKED, ErpAuditStatus.REJECTED)
             .to(ErpAuditStatus.PENDING_REVIEW)
             .on(ErpEventEnum.SUBMIT_FOR_REVIEW)
-            .when(baseConditionImpl)
             .perform(actionAuditImpl);
 
         // 审核通过
@@ -59,7 +55,6 @@ public class ErpPurchaseStatusMachine {
             .from(ErpAuditStatus.PENDING_REVIEW)
             .to(ErpAuditStatus.APPROVED)
             .on(ErpEventEnum.AGREE)
-            .when(baseConditionImpl)
             .perform(actionAuditImpl);
 
         // 审核不通过
@@ -67,7 +62,6 @@ public class ErpPurchaseStatusMachine {
             .from(ErpAuditStatus.PENDING_REVIEW)
             .to(ErpAuditStatus.REJECTED)
             .on(ErpEventEnum.REJECT)
-            .when(baseConditionImpl)
             .perform(actionAuditImpl);
 
         // 反审核
@@ -75,7 +69,6 @@ public class ErpPurchaseStatusMachine {
             .from(ErpAuditStatus.APPROVED)
             .to(ErpAuditStatus.REVOKED)
             .on(ErpEventEnum.WITHDRAW_REVIEW)
-            .when(baseConditionImpl)
             .perform(actionAuditImpl);
         builder.setFailCallback(baseFailCallbackImpl);
         return builder.build(ErpStateMachines.PURCHASE_REQUEST_STATE_MACHINE_NAME);

@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestAuditStatusReq;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestAuditStatusReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestItemsSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestSaveReqVO;
@@ -27,7 +27,6 @@ import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -58,11 +57,9 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     private final ErpNoRedisDAO noRedisDAO;
     private final DeptApi deptApi;
     private final AdminUserApi adminUserApi;
-    @Lazy
-    @Autowired
-    private ErpPurchaseRequestServiceImpl erpPurchaseRequestService;
+
     @Resource(name = PURCHASE_REQUEST_STATE_MACHINE_NAME)
-    StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestDO> auditMachine;
+    StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestAuditStatusReqVO> auditMachine;
     @Resource(name = PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME)
     StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestDO> offMachine;
     @Resource(name = PURCHASE_ORDER_STATE_MACHINE_NAME)
@@ -102,7 +99,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         //3. 批量插入子表数据
         ThrowUtil.ifThrow(!erpPurchaseRequestItemsMapper.insertBatch(itemsDOList), PURCHASE_REQUEST_ADD_FAIL_PRODUCT);
         //4.初始化-审核状态-开关-订购
-        auditMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.INIT, purchaseRequest);
+        auditMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.INIT, ErpPurchaseRequestAuditStatusReqVO.builder().requestId(id).build());
         offMachine.fireEvent(ErpOffStatus.OPEN, ErpEventEnum.OFF_INIT, purchaseRequest);
         orderMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_INIT, purchaseRequest);
         //子表初始化
@@ -225,38 +222,18 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
      * 该方法用于根据传入的请求参数对采购订单进行审核或反审核操作。
      */
     @Override
-    public void reviewPurchaseOrder(ErpPurchaseRequestAuditStatusReq req) {
+    public void reviewPurchaseOrder(ErpPurchaseRequestAuditStatusReqVO req) {
         // 查询所有相关的 items
         ErpPurchaseRequestDO requestDO = erpPurchaseRequestMapper.selectById(req.getRequestId());
         // 判断是否是审核操作
         if (Boolean.TRUE.equals(req.getReviewed())) {
             // 审核操作
-            auditMachine.fireEvent( ErpAuditStatus.fromCode(requestDO.getStatus()),ErpEventEnum.AGREE,requestDO);
+            auditMachine.fireEvent(ErpAuditStatus.fromCode(requestDO.getStatus()), ErpEventEnum.AGREE, ErpPurchaseRequestAuditStatusReqVO.builder().requestId(requestDO.getId()).build());
         } else {
             // 反审核操作
-            auditMachine.fireEvent( ErpAuditStatus.fromCode(requestDO.getStatus()),ErpEventEnum.WITHDRAW_REVIEW,requestDO);
+            auditMachine.fireEvent(ErpAuditStatus.fromCode(requestDO.getStatus()), ErpEventEnum.WITHDRAW_REVIEW, ErpPurchaseRequestAuditStatusReqVO.builder().requestId(requestDO.getId()).build());
         }
     }
-
-//    /**
-//     * 审核采购订单并更新批准数量
-//     */
-//    private void approvePurchaseOrder(ErpPurchaseRequestAuditStatusReq req, List<ErpPurchaseRequestItemsDO> itemsDOList) {
-//        // 更新采购申请单状态为审核通过
-//        erpPurchaseRequestService.updatePurchaseRequestStatus(req.getRequestId(), ErpAuditStatus.APPROVED.getCode(), null, null);
-//
-//        // 创建一个 Map 来根据 itemId 快速查找对应的审核项
-//        Map<Long, ErpPurchaseRequestAuditStatusReq.requestItems> itemMap = req.getItems().stream()
-//            .collect(Collectors.toMap(ErpPurchaseRequestAuditStatusReq.requestItems::getId, item -> item));
-//
-//        // 设置批准数量
-//        itemsDOList.forEach(itemDO -> {
-//            ErpPurchaseRequestAuditStatusReq.requestItems item = itemMap.get(itemDO.getId());
-//            if (item != null) {
-//                itemDO.setApproveCount(item.getApproveCount());
-//            }
-//        });
-//    }
 
     /**
      * 关闭/启用采购申请单子项状态

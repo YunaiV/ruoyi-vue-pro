@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestAuditStatusReq;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestAuditStatusReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestItemsSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestSaveReqVO;
@@ -97,7 +97,7 @@ public interface ErpPurchaseRequestService {
      *
      * @param req 审核采购订单的请求对象，包含了采购订单的ID和审核状态等信息。
      */
-    void reviewPurchaseOrder(ErpPurchaseRequestAuditStatusReq req);
+    void reviewPurchaseOrder(ErpPurchaseRequestAuditStatusReqVO req);
 
     /**
      * 启用/关闭申请单子项，自动更新父订单状态

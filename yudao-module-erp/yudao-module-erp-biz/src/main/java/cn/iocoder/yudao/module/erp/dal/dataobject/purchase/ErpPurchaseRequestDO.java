@@ -80,4 +80,14 @@ public class ErpPurchaseRequestDO extends TenantBaseDO {
      */
     private String delivery;
 
+    /**
+     * 审核意见
+     */
+    private String reviewComment;
+    /**
+     * 采购单ID
+     *
+     * @link {ErpPurchaseOrderDO}
+     */
+    private Long purchaseOrderId;
 }
