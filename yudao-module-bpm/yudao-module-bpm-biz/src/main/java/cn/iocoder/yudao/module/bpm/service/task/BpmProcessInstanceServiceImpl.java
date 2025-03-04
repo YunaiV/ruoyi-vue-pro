@@ -282,9 +282,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                     loginUserId, historicProcessInstance.getProcessDefinitionId(), processVariables);
             // 3.2 获取节点的审批人信息
             Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(candidateUserIds);
-            if (CollUtil.isEmpty(userMap)) {
-                return null;
-            }
             // 3.3 获取节点的审批人部门信息
             Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
             // 3.4 存在一个节点多人审批的情况，组装审批人信息
