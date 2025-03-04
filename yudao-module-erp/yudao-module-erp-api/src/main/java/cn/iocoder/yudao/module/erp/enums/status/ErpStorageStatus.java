@@ -11,9 +11,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Getter
 public enum ErpStorageStatus implements ArrayValuable<Integer> {
-    NONE_IN_STORAGE(0, "未入库"),
-    PARTIALLY_IN_STORAGE(1, "部分入库"),
-    ALL_IN_STORAGE(2, "已入库"),
+    NONE_IN_STORAGE(1, "未入库"),
+    PARTIALLY_IN_STORAGE(2, "部分入库"),
+    ALL_IN_STORAGE(3, "已入库"),
     ;
 
 

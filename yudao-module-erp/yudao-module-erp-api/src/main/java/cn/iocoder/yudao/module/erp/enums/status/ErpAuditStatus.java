@@ -19,7 +19,7 @@ import java.util.Map;
 public enum ErpAuditStatus implements ArrayValuable<Integer> {
 
     // 1. 草稿阶段
-    DRAFT(0, "草稿"),
+    DRAFT(1, "草稿"),
 
     // 2. 审核流程
     SUBMITTED(2, "已提交"),

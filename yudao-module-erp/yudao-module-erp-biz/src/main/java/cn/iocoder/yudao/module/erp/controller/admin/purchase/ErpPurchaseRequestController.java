@@ -111,9 +111,9 @@ public class ErpPurchaseRequestController {
 
     @PutMapping("/merge")
     @Operation(summary = "合并采购")
-    @Parameter(name = "ids", description = "编号数组", required = true)
+    @Parameter(name = "itemIds", description = "申请单申请项ids", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:merge')")
-    public CommonResult<Long> mergePurchaseOrder(@RequestParam("ids") List<Long> ids) {
+    public CommonResult<Long> mergePurchaseOrder(@RequestParam("itemIds") List<Long> itemIds) {
         //TODO 合并采购订单
 //        return success(purchaseOrderService.mergePurchaseOrder(ids));
         return null;

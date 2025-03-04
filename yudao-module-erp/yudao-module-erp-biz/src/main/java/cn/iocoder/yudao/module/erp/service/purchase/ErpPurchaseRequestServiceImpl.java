@@ -66,7 +66,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestDO> orderMachine;
 
     @Resource(name = PURCHASE_ORDER_ITEM_STATE_MACHINE_NAME)
-    StateMachine<ErpStorageStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> orderItemMachine;
+    StateMachine<ErpStorageStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> storageMachine;
     @Resource(name = PURCHASE_REQUEST_ITEM_OFF_STATE_MACHINE_NAME)
     StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> offItemMachine;
 
@@ -104,7 +104,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         orderMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_INIT, purchaseRequest);
         //子表初始化
         itemsDOList.forEach(i -> {
-                orderItemMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, ErpEventEnum.ORDER_INIT, i);
+            storageMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, ErpEventEnum.INIT_STORAGE, i);
                 offItemMachine.fireEvent(ErpOffStatus.OPEN, ErpEventEnum.OFF_INIT, i);
             }
         );
@@ -193,7 +193,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
             erpPurchaseRequestItemsMapper.insertBatch(diffList.get(0));
             for (ErpPurchaseRequestItemsDO itemsDO : diffList.get(0)) {
                 //初始化状态
-                orderItemMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, ErpEventEnum.INIT_STORAGE, itemsDO);
+                storageMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, ErpEventEnum.INIT_STORAGE, itemsDO);
                 offItemMachine.fireEvent(ErpOffStatus.OPEN, ErpEventEnum.OFF_INIT, itemsDO);
             }
         }
@@ -245,19 +245,24 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void switchPurchaseOrderStatus(Long requestId, List<Long> itemIds, Boolean enable) {
-        // 根据 enable 参数判断是开启还是关闭状态
-        List<ErpPurchaseRequestItemsDO> itemsDOList = erpPurchaseRequestItemsMapper.selectBatchIds(itemIds);
-        if (Boolean.TRUE.equals(enable)) {
-            itemsDOList.forEach(itemsDO ->
-                offItemMachine.fireEvent(ErpOffStatus.fromCode(itemsDO.getOffStatus()),
-                ErpEventEnum.ACTIVATE, itemsDO));
-        } else {
-            // 处理关闭状态
-            itemsDOList.forEach(itemsDO ->
-                offItemMachine.fireEvent(ErpOffStatus.fromCode(itemsDO.getOffStatus()),
-                ErpEventEnum.MANUAL_CLOSE, itemsDO));
+        ErpEventEnum event = Boolean.TRUE.equals(enable) ? ErpEventEnum.ACTIVATE : ErpEventEnum.MANUAL_CLOSE;
+        if (requestId != null) {
+            // 处理采购订单状态
+            ErpPurchaseRequestDO aDo = erpPurchaseRequestMapper.selectById(requestId);
+            if (aDo != null) {
+                offMachine.fireEvent(ErpOffStatus.fromCode(aDo.getOffStatus()), event, aDo);
+            }
+        } else if (itemIds != null && !itemIds.isEmpty()) {
+            // 批量处理采购订单子项状态
+            List<ErpPurchaseRequestItemsDO> itemsDOList = erpPurchaseRequestItemsMapper.selectBatchIds(itemIds);
+            if (itemsDOList != null && !itemsDOList.isEmpty()) {
+                itemsDOList.forEach(itemsDO ->
+                    offItemMachine.fireEvent(ErpOffStatus.fromCode(itemsDO.getOffStatus()), event, itemsDO)
+                );
+            }
         }
     }
+
 
 
     @Override

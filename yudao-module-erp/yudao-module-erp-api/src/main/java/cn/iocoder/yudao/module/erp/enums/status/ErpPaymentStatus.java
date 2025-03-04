@@ -11,9 +11,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Getter
 public enum ErpPaymentStatus implements ArrayValuable<Integer> {
-    NONE_PAYED(0, "未付款"),
-    PARTIALLY_PAYED(1, "部分付款"),
-    ALL_PAYED(2, "已付款"),
+    NONE_PAYED(1, "未付款"),
+    PARTIALLY_PAYED(2, "部分付款"),
+    ALL_PAYED(3, "已付款"),
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ErpPaymentStatus::getCode).toArray();
