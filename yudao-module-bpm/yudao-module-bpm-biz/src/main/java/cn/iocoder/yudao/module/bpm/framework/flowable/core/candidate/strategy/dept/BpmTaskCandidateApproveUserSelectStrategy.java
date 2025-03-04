@@ -50,6 +50,9 @@ public class BpmTaskCandidateApproveUserSelectStrategy extends AbstractBpmTaskCa
         Map<String, List<Long>> approveUserSelectAssignees = FlowableUtils.getApproveUserSelectAssignees(processInstance);
         Assert.notNull(approveUserSelectAssignees, "流程实例({}) 的下一个执行节点审批人不能为空",
                 execution.getProcessInstanceId());
+        if (approveUserSelectAssignees == null) {
+            return Sets.newLinkedHashSet();
+        }
         // 获得审批人
         List<Long> assignees = approveUserSelectAssignees.get(execution.getCurrentActivityId());
         return CollUtil.isNotEmpty(assignees) ? new LinkedHashSet<>(assignees) : Sets.newLinkedHashSet();
@@ -62,6 +65,8 @@ public class BpmTaskCandidateApproveUserSelectStrategy extends AbstractBpmTaskCa
             return Sets.newLinkedHashSet();
         }
         Map<String, List<Long>> approveUserSelectAssignees = FlowableUtils.getApproveUserSelectAssignees(processVariables);
+        Assert.notNull(approveUserSelectAssignees, "流程实例节点({}) 的下一个执行节点审批人不能为空",
+                activityId);
         if (approveUserSelectAssignees == null) {
             return Sets.newLinkedHashSet();
         }
