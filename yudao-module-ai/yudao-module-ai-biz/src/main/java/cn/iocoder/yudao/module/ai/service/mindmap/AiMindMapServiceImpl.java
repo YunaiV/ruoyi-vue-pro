@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.ai.service.mindmap;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiModelTypeEnum;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
@@ -38,7 +38,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.error;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.MIND_MAP_NOT_EXISTS;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
 
 /**
  * AI 思维导图 Service 实现类
@@ -129,7 +129,13 @@ public class AiMindMapServiceImpl implements AiMindMapService {
         if (model == null) {
             model = modalService.getRequiredDefaultModel(AiModelTypeEnum.CHAT.getType());
         }
-        Assert.notNull(model, "[AI] 获取不到模型");
+        // 校验模型存在、且合法
+        if (model == null) {
+            throw exception(MODEL_NOT_EXISTS);
+        }
+        if (ObjUtil.notEqual(model.getType(), AiModelTypeEnum.CHAT.getType())) {
+            throw exception(MODEL_USE_TYPE_ERROR);
+        }
         return model;
     }
 
