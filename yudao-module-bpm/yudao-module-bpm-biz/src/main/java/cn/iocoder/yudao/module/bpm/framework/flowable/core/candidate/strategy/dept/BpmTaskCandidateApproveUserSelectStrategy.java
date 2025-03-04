@@ -65,9 +65,8 @@ public class BpmTaskCandidateApproveUserSelectStrategy extends AbstractBpmTaskCa
         if (processVariables == null) {
             return Sets.newLinkedHashSet();
         }
+        // 流程预测时会使用，允许审批人为空，如果为空前端会弹出提示选择下一个节点审批人，避免流程无法进行，审批时会真正校验节点是否配置审批人
         Map<String, List<Long>> approveUserSelectAssignees = FlowableUtils.getApproveUserSelectAssignees(processVariables);
-        Assert.notNull(approveUserSelectAssignees, "流程实例节点({}) 的下一个执行节点审批人不能为空",
-                activityId);
         if (approveUserSelectAssignees == null) {
             return Sets.newLinkedHashSet();
         }
