@@ -78,7 +78,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         ErpPurchaseOrderDO purchaseOrder = BeanUtils.toBean(createReqVO, ErpPurchaseOrderDO.class, in -> in.setNo(no).setStatus(ErpAuditStatus.PENDING_REVIEW.getCode()));//设置审核状态,默认未审核
         calculateTotalPrice(purchaseOrder, purchaseOrderItems);
         // 2.1.1 插入单据日期+结算日期
-        purchaseOrder.setDocumentDate(LocalDateTime.now());
+        purchaseOrder.setNoTime(LocalDateTime.now());
         purchaseOrder.setSettlementDate(createReqVO.getSettlementDate() == null ? LocalDateTime.now() : createReqVO.getSettlementDate());
 
         purchaseOrderMapper.insert(purchaseOrder);

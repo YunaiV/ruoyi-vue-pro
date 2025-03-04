@@ -98,16 +98,16 @@ public class ErpPurchaseOrderDO extends BaseDO {
      */
     private String remark;
     // ========== 时间相关字段 ==========
-    /**
-     * 单据日期，默认为当前日期，也可以自行选择
-     */
-    private LocalDateTime documentDate;
+//    /**
+//     * 单据日期，默认为当前日期，也可以自行选择
+//     */
+//    private LocalDateTime documentDate;
     /**
      * 结算日期，默认为当前日期
      */
     private LocalDateTime settlementDate;
     /**
-     * 审核人，审核时自动填充
+     * 审核人id，审核时自动填充
      */
     private Long auditorId;
     /**

@@ -10,6 +10,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestAuditStatusReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestEnableStatusReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.resp.ErpPurchaseRequestItemRespVO;
@@ -93,14 +94,14 @@ public class ErpPurchaseRequestController {
     //提交审核 submitAudit
     @PutMapping("/submitAudit")
     @Operation(summary = "提交审核")
-    @Parameter(name = "id", description = "申请单编号数组", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:purchase-request:submitAudit')")
-    public CommonResult<Boolean> submitAudit(@NotNull @RequestParam("id") Collection<Long> ids) {
+    @Parameter(name = "ids", description = "申请单编号数组", required = true)
+    @PreAuthorize("@ss.hasPermission('erp:purchase-request:update')")
+    public CommonResult<Boolean> submitAudit(@NotNull @RequestBody Collection<Long> ids) {
         erpPurchaseRequestService.submitAudit(ids);
         return success(true);
     }
 
-    @PutMapping("/auditStatus")
+    @PostMapping("/auditStatus")
     @Operation(summary = "审核同意/审核撤销")
     @Parameter(name = "requestId", description = "申请单编号", required = true)
     @Parameter(name = "reviewed", description = "审核状态", required = true)
@@ -111,20 +112,23 @@ public class ErpPurchaseRequestController {
     }
 
     //procurement采购接口
-    @GetMapping("/procurement")
+    @PostMapping("/procurement")
     @Operation(summary = "采购")
     @Parameter(name = "requestId", description = "申请单编号", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:procurement')")
     public CommonResult<Boolean> procurement(@RequestParam("requestId") Long requestId) {
         //TODO 采购
+        //申请单->采购单DO
+        ErpPurchaseRequestDO aDo = erpPurchaseRequestService.getPurchaseRequest(requestId);
+        //调用采购单service,创建采购单
         return null;
     }
 
-    @PutMapping("/merge")
+    @PostMapping("/merge")
     @Operation(summary = "合并采购")
     @Parameter(name = "itemIds", description = "申请单申请项ids", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:merge')")
-    public CommonResult<Long> mergePurchaseOrder(@RequestParam("itemIds") List<Long> itemIds) {
+    public CommonResult<Long> mergePurchaseOrder(@NotNull @RequestParam("itemIds") List<Long> itemIds) {
         //TODO 合并采购订单
 //        return success(purchaseOrderService.mergePurchaseOrder(ids));
         return null;
@@ -132,12 +136,9 @@ public class ErpPurchaseRequestController {
 
     @PutMapping("/enableStatus")
     @Operation(summary = "关闭/启用")
-    @Parameter(name = "id", description = "申请单id", required = true)
-    @Parameter(name = "enable", description = "开启、关闭", required = true)
-    @Parameter(name = "itemIds", description = "申请单商品ids", required = false)
-    @PreAuthorize("@ss.hasPermission('erp:purchase-order:enable')")
-    public CommonResult<Boolean> switchPurchaseOrderStatus(@RequestParam("requestId") Long requestId, @RequestParam("itemId") List<Long> itemIds, @RequestParam("enable") Boolean enable) {
-        erpPurchaseRequestService.switchPurchaseOrderStatus(requestId, itemIds, enable);
+    @PreAuthorize("@ss.hasPermission('erp:purchasereq-order:enable')")
+    public CommonResult<Boolean> switchPurchaseOrderStatus(@RequestBody @NotNull ErpPurchaseRequestEnableStatusReqVO reqVO) {
+        erpPurchaseRequestService.switchPurchaseOrderStatus(reqVO.getRequestId(), reqVO.getItemIds(), reqVO.getEnable());
         return success(true);
     }
 
