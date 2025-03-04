@@ -133,32 +133,19 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public BpmTaskRespVO getFirstTodoTask(Long userId, String processInstanceId) {
-        if (processInstanceId == null) {
-            return null;
+    public BpmTaskRespVO getTodoTask(Long userId, String id, String processInstanceId) {
+        // 1.1 获取指定的用户待办任务
+        Task todoTask = getMyTodoTask(userId, id);
+        if (todoTask == null) {
+            // 1.2 获取不到，则获取该流程实例下，第一个用户的待办任务
+            todoTask = getFirstMyTodoTask(userId, processInstanceId);
         }
-        // 1. 查询所有任务
-        List<Task> tasks = taskService.createTaskQuery()
-                .active()
-                .processInstanceId(processInstanceId)
-                .includeTaskLocalVariables()
-                .includeProcessVariables()
-                .orderByTaskCreateTime().asc() // 按创建时间升序
-                .list();
-        if (CollUtil.isEmpty(tasks)) {
-            return null;
-        }
-
-        // 2.1 查询我的首个任务
-        Task todoTask = CollUtil.findOne(tasks, task -> {
-            return isAssignUserTask(userId, task) // 当前用户为审批人
-                    || isAddSignUserTask(userId, task); // 当前用户为加签人（为了减签）
-        });
         if (todoTask == null) {
             return null;
         }
-        // 2.2 查询该任务的子任务
-        List<Task> childrenTasks = getAllChildrenTaskListByParentTaskId(todoTask.getId(), tasks);
+
+        // 2.查询该任务的子任务
+        List<Task> childrenTasks = getAllChildrenTaskListByParentTaskId(todoTask.getId(), CollUtil.newArrayList(todoTask));
 
         // 3. 转换返回
         BpmnModel bpmnModel = bpmProcessDefinitionService.getProcessDefinitionBpmnModel(todoTask.getProcessDefinitionId());
@@ -176,6 +163,40 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         return BpmTaskConvert.INSTANCE.buildTodoTask(todoTask, childrenTasks, buttonsSetting, taskForm)
                 .setNodeType(nodeType).setSignEnable(signEnable).setReasonRequire(reasonRequire);
+    }
+
+    private Task getMyTodoTask(Long userId, String id) {
+        if (StrUtil.isEmpty(id)) {
+            return null;
+        }
+        Task task = getTask(id);
+        if (task == null) {
+            return null;
+        }
+        if (!isAssignUserTask(userId, task) && !isAddSignUserTask(userId, task)) {
+            return null;
+        }
+        return task;
+    }
+
+    private Task getFirstMyTodoTask(Long userId, String processInstanceId) {
+        if (processInstanceId == null) {
+            return null;
+        }
+        // 1. 查询所有任务
+        List<Task> tasks = taskService.createTaskQuery()
+                .active()
+                .processInstanceId(processInstanceId)
+                .includeTaskLocalVariables()
+                .includeProcessVariables()
+                .orderByTaskCreateTime().asc() // 按创建时间升序
+                .list();
+
+        // 2. 查询我的首个任务
+        return CollUtil.findOne(tasks, task -> {
+            return isAssignUserTask(userId, task) // 当前用户为审批人
+                    || isAddSignUserTask(userId, task); // 当前用户为加签人（为了减签）
+        });
     }
 
     @Override
@@ -1230,7 +1251,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                         PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE, String.class));
                 if (userTaskElement.getId().equals(START_USER_NODE_ID)
                         && (skipStartUserNodeFlag == null // 目的：一般是“主流程”，发起人节点，自动通过审核
-                            || Boolean.TRUE.equals(skipStartUserNodeFlag)) // 目的：一般是“子流程”，发起人节点，按配置自动通过审核
+                        || Boolean.TRUE.equals(skipStartUserNodeFlag)) // 目的：一般是“子流程”，发起人节点，按配置自动通过审核
                         && ObjUtil.notEqual(returnTaskFlag, Boolean.TRUE)) {
                     getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                             .setReason(BpmReasonEnum.ASSIGN_START_USER_APPROVE_WHEN_SKIP_START_USER_NODE.getReason()));

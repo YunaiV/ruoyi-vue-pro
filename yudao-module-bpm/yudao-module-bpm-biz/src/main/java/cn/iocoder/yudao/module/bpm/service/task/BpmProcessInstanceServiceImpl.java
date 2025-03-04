@@ -207,9 +207,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         }
 
         // 3.1 计算当前登录用户的待办任务
-        // TODO @jason：有一个极端情况，如果一个用户有 2 个 task A 和 B，A 已经通过，B 需要审核。这个时，通过 A 进来，todo 拿到
-        // B，会不会表单权限不一致哈。
-        BpmTaskRespVO todoTask = taskService.getFirstTodoTask(loginUserId, reqVO.getProcessInstanceId());
+        BpmTaskRespVO todoTask = taskService.getTodoTask(loginUserId, reqVO.getTaskId(), reqVO.getProcessInstanceId());
         // 3.2 预测未运行节点的审批信息
         List<ActivityNode> simulateActivityNodes = getSimulateApproveNodeList(startUserId, bpmnModel,
                 processDefinitionInfo,
