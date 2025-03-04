@@ -809,6 +809,7 @@ public class BpmnModelUtils {
         if (currentElement instanceof ExclusiveGateway) {
             // 查找满足条件的 SequenceFlow 路径
             Gateway gateway = (Gateway) currentElement;
+            // TODO @小北：当一个网关节点下存在多个满足的并行节点时，只查询一个节点流程流转会存在问题。需要优化，具体见issue：https://github.com/YunaiV/ruoyi-vue-pro/issues/761
             SequenceFlow matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
                     flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
                             && (evalConditionExpress(variables, flow.getConditionExpression())));
@@ -855,6 +856,130 @@ public class BpmnModelUtils {
                     nextElement -> simulateNextFlowElements(nextElement.getTargetFlowElement(), variables, resultElements, visitElements));
             return;
         }
+    }
+
+    /**
+     * 根据当前节点，获取下一个节点
+     *
+     * @param currentElement 当前节点
+     * @param bpmnModel  BPMN模型
+     * @param variables 流程变量
+     */
+    @SuppressWarnings("PatternVariableCanBeUsed")
+    public static List<FlowNode> getNextFlowNodes(FlowElement currentElement, BpmnModel bpmnModel,
+                                                  Map<String, Object> variables){
+        List<FlowNode> nextFlowNodes = new ArrayList<>(); // 下一个执行的流程节点集合
+        FlowNode currentNode = (FlowNode) currentElement;  // 当前执行节点的基本属性
+        List<SequenceFlow> outgoingFlows = currentNode.getOutgoingFlows();  // 当前节点的关联节点
+        if (CollUtil.isEmpty(outgoingFlows)) {
+            log.warn("[getNextFlowNodes][当前节点({}) 的 outgoingFlows 为空]", currentNode.getId());
+            return nextFlowNodes;
+        }
+
+        // 遍历每个出口流
+        for (SequenceFlow outgoingFlow : outgoingFlows) {
+            // 获取目标节点的基本属性
+            FlowElement targetElement = bpmnModel.getFlowElement(outgoingFlow.getTargetRef());
+            if (targetElement == null) {
+                continue;
+            }
+            // 情况一：处理不同类型的网关
+            if (targetElement instanceof Gateway) {
+                Gateway gateway = (Gateway) targetElement;
+                if (gateway instanceof ExclusiveGateway) {
+                    handleExclusiveGateway(gateway, bpmnModel, variables, nextFlowNodes);
+                } else if (gateway instanceof InclusiveGateway) {
+                    handleInclusiveGateway(gateway, bpmnModel, variables, nextFlowNodes);
+                } else if (gateway instanceof ParallelGateway) {
+                    handleParallelGateway(gateway, bpmnModel, variables, nextFlowNodes);
+                }
+            } else {
+                // 情况二：如果不是网关，直接添加到下一个节点列表
+                nextFlowNodes.add((FlowNode) targetElement);
+            }
+        }
+        return nextFlowNodes;
+    }
+
+    /**
+     * 处理排它网关
+     *
+     * @param gateway 排他网关
+     * @param bpmnModel BPMN模型
+     * @param variables 流程变量
+     * @param nextFlowNodes 下一个执行的流程节点集合
+     */
+    private static void handleExclusiveGateway(Gateway gateway, BpmnModel bpmnModel,
+                                               Map<String, Object> variables, List<FlowNode> nextFlowNodes) {
+       // TODO @小北： 这里和 simulateNextFlowElements 中有重复代码，是否重构？？每个网关节点拆分出方法应该比较合理化，@芋艿
+        // TODO @小北：ok，把 simulateNextFlowElements 里面处理网关的，复用这个方法，可以么？
+        SequenceFlow matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
+                flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
+                        && (evalConditionExpress(variables, flow.getConditionExpression())));
+        if (matchSequenceFlow == null) {
+            matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
+                    flow -> ObjUtil.equal(gateway.getDefaultFlow(), flow.getId()));
+            // 特殊：没有默认的情况下，并且只有 1 个条件，则认为它是默认的
+            if (matchSequenceFlow == null && gateway.getOutgoingFlows().size() == 1) {
+                matchSequenceFlow = gateway.getOutgoingFlows().get(0);
+            }
+        }
+        // 遍历满足条件的 SequenceFlow 路径
+        if (matchSequenceFlow != null) {
+            FlowElement targetElement = bpmnModel.getFlowElement(matchSequenceFlow.getTargetRef());
+            if (targetElement instanceof FlowNode) {
+                nextFlowNodes.add((FlowNode) targetElement);
+            }
+        }
+    }
+
+    /**
+     * 处理包容网关
+     *
+     * @param gateway 排他网关
+     * @param bpmnModel BPMN模型
+     * @param variables 流程变量
+     * @param nextFlowNodes 下一个执行的流程节点集合
+     */
+    private static void handleInclusiveGateway(Gateway gateway, BpmnModel bpmnModel,
+                                               Map<String, Object> variables, List<FlowNode> nextFlowNodes) {
+        Collection<SequenceFlow> matchSequenceFlows = CollUtil.filterNew(gateway.getOutgoingFlows(),
+                flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
+                        && evalConditionExpress(variables, flow.getConditionExpression()));
+        if (CollUtil.isEmpty(matchSequenceFlows)) {
+            matchSequenceFlows = CollUtil.filterNew(gateway.getOutgoingFlows(),
+                    flow -> ObjUtil.equal(gateway.getDefaultFlow(), flow.getId()));
+            // 特殊：没有默认的情况下，并且只有 1 个条件，则认为它是默认的
+            if (CollUtil.isEmpty(matchSequenceFlows) && gateway.getOutgoingFlows().size() == 1) {
+                matchSequenceFlows = gateway.getOutgoingFlows();
+            }
+        }
+        // 遍历满足条件的 SequenceFlow 路径，获取目标节点
+        matchSequenceFlows.forEach(flow -> {
+            FlowElement targetElement = bpmnModel.getFlowElement(flow.getTargetRef());
+            if (targetElement instanceof FlowNode) {
+                nextFlowNodes.add((FlowNode) targetElement);
+            }
+        });
+    }
+
+    /**
+     * 处理并行网关
+     *
+     * @param gateway 排他网关
+     * @param bpmnModel BPMN模型
+     * @param variables 流程变量
+     * @param nextFlowNodes 下一个执行的流程节点集合
+     */
+    private static void handleParallelGateway(Gateway gateway, BpmnModel bpmnModel,
+                                              Map<String, Object> variables, List<FlowNode> nextFlowNodes) {
+        // 并行网关，遍历所有出口路径，获取目标节点
+        gateway.getOutgoingFlows().forEach(flow -> {
+            FlowElement targetElement = bpmnModel.getFlowElement(flow.getTargetRef());
+            if (targetElement instanceof FlowNode) {
+                nextFlowNodes.add((FlowNode) targetElement);
+            }
+        });
     }
 
     /**

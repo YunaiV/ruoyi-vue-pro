@@ -71,10 +71,10 @@ public class BpmSequentialMultiInstanceBehavior extends SequentialMultiInstanceB
         if (execution.getCurrentFlowElement() instanceof CallActivity) {
             FlowElement flowElement = execution.getCurrentFlowElement();
             Integer sourceType = BpmnModelUtils.parseMultiInstanceSourceType(flowElement);
-            if (sourceType.equals(BpmChildProcessMultiInstanceSourceTypeEnum.DIGITAL_FORM.getType())) {
+            if (sourceType.equals(BpmChildProcessMultiInstanceSourceTypeEnum.NUMBER_FORM.getType())) {
                 return execution.getVariable(super.collectionExpression.getExpressionText(), Integer.class);
             }
-            if (sourceType.equals(BpmChildProcessMultiInstanceSourceTypeEnum.MULTI_FORM.getType())) {
+            if (sourceType.equals(BpmChildProcessMultiInstanceSourceTypeEnum.MULTIPLE_FORM.getType())) {
                 return execution.getVariable(super.collectionExpression.getExpressionText(), List.class).size();
             }
         }

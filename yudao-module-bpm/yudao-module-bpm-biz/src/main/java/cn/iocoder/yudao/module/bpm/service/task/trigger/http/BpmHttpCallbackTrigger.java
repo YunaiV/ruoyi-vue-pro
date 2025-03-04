@@ -42,8 +42,8 @@ public class BpmHttpCallbackTrigger extends BpmAbstractHttpRequestTrigger {
         MultiValueMap<String, String> headers = buildHttpHeaders(processInstance, setting.getHeader());
         // 2.2 设置请求体
         MultiValueMap<String, String> body = buildHttpBody(processInstance, setting.getBody());
-        // TODO @芋艿：【回调】在看看
-        body.add("callbackId", setting.getCallbackTaskDefineKey()); // 回调请求 callbackId 需要传给被调用方，用于回调执行
+        // 重要：回调请求 taskDefineKey 需要传给被调用方，用于回调执行
+        body.add("taskDefineKey", setting.getCallbackTaskDefineKey());
 
         // 3. 发起请求
         sendHttpRequest(setting.getUrl(), headers, body);

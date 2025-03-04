@@ -32,10 +32,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 流程实例") // 流程实例，通过流程定义创建的一次“申请”
@@ -78,8 +78,14 @@ public class BpmProcessInstanceController {
                 convertSet(processDefinitionMap.values(), ProcessDefinition::getCategory));
         Map<String, BpmProcessDefinitionInfoDO> processDefinitionInfoMap = processDefinitionService.getProcessDefinitionInfoMap(
                 convertSet(pageResult.getList(), HistoricProcessInstance::getProcessDefinitionId));
+        Set<Long> userIds = convertSet(pageResult.getList(), processInstance -> NumberUtils.parseLong(processInstance.getStartUserId()));
+        userIds.addAll(convertSetByFlatMap(taskMap.values(),
+                tasks -> tasks.stream().map(Task::getAssignee).filter(StrUtil::isNotBlank).map(Long::parseLong)));
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
+                convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
         return success(BpmProcessInstanceConvert.INSTANCE.buildProcessInstancePage(pageResult,
-                processDefinitionMap, categoryMap, taskMap, null, null, processDefinitionInfoMap));
+                processDefinitionMap, categoryMap, taskMap, userMap, deptMap, processDefinitionInfoMap));
     }
 
     @GetMapping("/manager-page")

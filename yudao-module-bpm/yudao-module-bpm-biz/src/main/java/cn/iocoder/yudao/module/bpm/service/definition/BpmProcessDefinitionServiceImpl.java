@@ -143,9 +143,8 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
 
         // 插入拓展表
         BpmProcessDefinitionInfoDO definitionDO = BeanUtils.toBean(modelMetaInfo, BpmProcessDefinitionInfoDO.class)
-                .setModelId(model.getId()).setProcessDefinitionId(definition.getId())
+                .setModelId(model.getId()).setCategory(model.getCategory()).setProcessDefinitionId(definition.getId())
                 .setModelType(modelMetaInfo.getType()).setSimpleModel(simpleJson);
-
         if (form != null) {
             definitionDO.setFormFields(form.getFields()).setFormConf(form.getConf());
         }
