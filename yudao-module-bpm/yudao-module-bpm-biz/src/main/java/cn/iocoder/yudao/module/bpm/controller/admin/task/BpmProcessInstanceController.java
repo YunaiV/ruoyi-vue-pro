@@ -178,10 +178,22 @@ public class BpmProcessInstanceController {
         return success(processInstanceService.getApprovalDetail(getLoginUserId(), reqVO));
     }
 
+    @GetMapping("/get-next-approval-nodes")
+    @Operation(summary = "获取下一个执行的流程节点")
+    @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
+    @SuppressWarnings("unchecked")
+    public CommonResult<List<BpmApprovalDetailRespVO.ActivityNode>> getNextApprovalNodes(@Valid BpmApprovalDetailReqVO reqVO) {
+        if (StrUtil.isNotEmpty(reqVO.getProcessVariablesStr())) {
+            reqVO.setProcessVariables(JsonUtils.parseObject(reqVO.getProcessVariablesStr(), Map.class));
+        }
+        return success(processInstanceService.getNextApprovalNodes(getLoginUserId(), reqVO));
+    }
+
     @GetMapping("/get-bpmn-model-view")
     @Operation(summary = "获取流程实例的 BPMN 模型视图", description = "在【流程详细】界面中，进行调用")
     @Parameter(name = "id", description = "流程实例的编号", required = true)
     public CommonResult<BpmProcessInstanceBpmnModelViewRespVO> getProcessInstanceBpmnModelView(@RequestParam(value = "id") String id) {
         return success(processInstanceService.getProcessInstanceBpmnModelView(id));
     }
+
 }

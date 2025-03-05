@@ -97,6 +97,15 @@ public interface BpmProcessInstanceService {
     BpmApprovalDetailRespVO getApprovalDetail(Long loginUserId, @Valid BpmApprovalDetailReqVO reqVO);
 
     /**
+     * 获取下一个执行节点信息。
+     *
+     * @param loginUserId 登录人的用户编号
+     * @param reqVO 请求信息
+     * @return 下一个执行节点信息
+     */
+    List<BpmApprovalDetailRespVO.ActivityNode> getNextApprovalNodes(Long loginUserId, @Valid BpmApprovalDetailReqVO reqVO);
+
+    /**
      * 获取流程实例的 BPMN 模型视图
      *
      * @param id 流程实例的编号
@@ -172,4 +181,5 @@ public interface BpmProcessInstanceService {
      * @param instance 流程任务
      */
     void processProcessInstanceCompleted(ProcessInstance instance);
+
 }

@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.SimpleModelUtils;
@@ -23,9 +24,7 @@ import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceCopyService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.StartEvent;
-import org.flowable.bpmn.model.UserTask;
+import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
@@ -48,6 +47,7 @@ import java.util.Objects;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseCandidateStrategy;
 
 /**
  * 流程模型实现：主要进行 Flowable {@link Model} 的维护
@@ -243,7 +243,18 @@ public class BpmModelServiceImpl implements BpmModelService {
         if (startEvent == null) {
             throw exception(MODEL_DEPLOY_FAIL_BPMN_START_EVENT_NOT_EXISTS);
         }
-        // 2. 校验 UserTask 的 name 都配置了
+        // 2. 校验第一个用户任务的规则类型是否为 审批人自选，如果是则抛出异常，第一个用户任务的规则类型不允许是审批人自选，因为会出现无审批人的情况
+        List<SequenceFlow> outgoingFlows = startEvent.getOutgoingFlows();
+        if (CollUtil.isNotEmpty(outgoingFlows)){
+            // 2.1 获取第一个用户任务节点
+            FlowElement targetFlowElement = outgoingFlows.get(0).getTargetFlowElement();
+            // 2.2 获取审批人策略
+            Integer candidateStrategy = parseCandidateStrategy(targetFlowElement);
+            if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy())){
+                throw exception(MODEL_DEPLOY_FAIL_BPMN_USER_TASK_RULE_TYPE_NOT_APPROVE_USER_SELECT, targetFlowElement.getName());
+            }
+        }
+        // 3. 校验 UserTask 的 name 都配置了
         List<UserTask> userTasks = BpmnModelUtils.getBpmnModelElements(bpmnModel, UserTask.class);
         userTasks.forEach(userTask -> {
             if (StrUtil.isEmpty(userTask.getName())) {
