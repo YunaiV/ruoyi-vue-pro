@@ -224,7 +224,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         List<ActivityNode> simulateActivityNodes = getSimulateApproveNodeList(startUserId, bpmnModel,
                 processDefinitionInfo,
                 processVariables, activities);
-        // 3.3 如果时发起动作,activityId为开始节点，不校验审批人自选节点
+        // 3.3 如果是发起动作,activityId为开始节点，不校验审批人自选节点
         if (ObjUtil.isNotNull(reqVO.getActivityId()) && ObjUtil.equals(reqVO.getActivityId(),BpmnModelConstants.START_USER_NODE_ID)){
             simulateActivityNodes.removeIf(node -> BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy().equals(node.getCandidateStrategy()));
         }
@@ -360,15 +360,15 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
      * 主要是，拼接审批人的用户信息、部门信息
      */
     private BpmApprovalDetailRespVO buildApprovalDetail(BpmApprovalDetailReqVO reqVO,
-                                                        BpmnModel bpmnModel,
-                                                        ProcessDefinition processDefinition,
-                                                        BpmProcessDefinitionInfoDO processDefinitionInfo,
-                                                        HistoricProcessInstance processInstance,
-                                                        Integer processInstanceStatus,
-                                                        List<ActivityNode> endApprovalNodeInfos,
-                                                        List<ActivityNode> runningApprovalNodeInfos,
-                                                        List<ActivityNode> simulateApprovalNodeInfos,
-                                                        BpmTaskRespVO todoTask) {
+            BpmnModel bpmnModel,
+            ProcessDefinition processDefinition,
+            BpmProcessDefinitionInfoDO processDefinitionInfo,
+            HistoricProcessInstance processInstance,
+            Integer processInstanceStatus,
+            List<ActivityNode> endApprovalNodeInfos,
+            List<ActivityNode> runningApprovalNodeInfos,
+            List<ActivityNode> simulateApprovalNodeInfos,
+            BpmTaskRespVO todoTask) {
         // 1. 获取所有需要读取用户信息的 userIds
         List<ActivityNode> approveNodes = newArrayList(
                 asList(endApprovalNodeInfos, runningApprovalNodeInfos, simulateApprovalNodeInfos));
@@ -390,9 +390,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
      * 获得【已结束】的活动节点们
      */
     private List<ActivityNode> getEndActivityNodeList(Long startUserId, BpmnModel bpmnModel,
-                                                      BpmProcessDefinitionInfoDO processDefinitionInfo,
-                                                      HistoricProcessInstance historicProcessInstance, Integer processInstanceStatus,
-                                                      List<HistoricActivityInstance> activities, List<HistoricTaskInstance> tasks) {
+              BpmProcessDefinitionInfoDO processDefinitionInfo,
+              HistoricProcessInstance historicProcessInstance, Integer processInstanceStatus,
+              List<HistoricActivityInstance> activities, List<HistoricTaskInstance> tasks) {
         // 遍历 tasks 列表，只处理已结束的 UserTask
         // 为什么不通过 activities 呢？因为，加签场景下，它只存在于 tasks，没有 activities，导致如果遍历 activities
         // 的话，它无法成为一个节点
@@ -460,11 +460,11 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
      * 获得【进行中】的活动节点们
      */
     private List<ActivityNode> getRunApproveNodeList(Long startUserId,
-                                                     BpmnModel bpmnModel,
-                                                     ProcessDefinition processDefinition,
-                                                     Map<String, Object> processVariables,
-                                                     List<HistoricActivityInstance> activities,
-                                                     List<HistoricTaskInstance> tasks) {
+            BpmnModel bpmnModel,
+            ProcessDefinition processDefinition,
+            Map<String, Object> processVariables,
+            List<HistoricActivityInstance> activities,
+            List<HistoricTaskInstance> tasks) {
         // 构建运行中的任务、子流程，基于 activityId 分组
         List<HistoricActivityInstance> runActivities = filterList(activities, activity -> activity.getEndTime() == null
                 && (StrUtil.equalsAny(activity.getActivityType(), ELEMENT_TASK_USER, ELEMENT_CALL_ACTIVITY)));
@@ -525,9 +525,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
      * 获得【预测（未来）】的活动节点们
      */
     private List<ActivityNode> getSimulateApproveNodeList(Long startUserId, BpmnModel bpmnModel,
-                                                          BpmProcessDefinitionInfoDO processDefinitionInfo,
-                                                          Map<String, Object> processVariables,
-                                                          List<HistoricActivityInstance> activities) {
+            BpmProcessDefinitionInfoDO processDefinitionInfo,
+            Map<String, Object> processVariables,
+            List<HistoricActivityInstance> activities) {
         // TODO @芋艿：【可优化】在驳回场景下，未来的预测准确性不高。原因是，驳回后，HistoricActivityInstance
         // 包括了历史的操作，不是只有 startEvent 到当前节点的记录
         Set<String> runActivityIds = convertSet(activities, HistoricActivityInstance::getActivityId);
@@ -549,8 +549,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     }
 
     private ActivityNode buildNotRunApproveNodeForSimple(Long startUserId, BpmnModel bpmnModel,
-                                                         BpmProcessDefinitionInfoDO processDefinitionInfo, Map<String, Object> processVariables,
-                                                         BpmSimpleModelNodeVO node, Set<String> runActivityIds) {
+            BpmProcessDefinitionInfoDO processDefinitionInfo, Map<String, Object> processVariables,
+            BpmSimpleModelNodeVO node, Set<String> runActivityIds) {
         // TODO @芋艿：【可优化】在驳回场景下，未来的预测准确性不高。原因是，驳回后，HistoricActivityInstance
         // 包括了历史的操作，不是只有 startEvent 到当前节点的记录
         if (runActivityIds.contains(node.getId())) {
@@ -594,8 +594,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     }
 
     private ActivityNode buildNotRunApproveNodeForBpmn(Long startUserId, BpmnModel bpmnModel,
-                                                       BpmProcessDefinitionInfoDO processDefinitionInfo, Map<String, Object> processVariables,
-                                                       FlowElement node, Set<String> runActivityIds) {
+            BpmProcessDefinitionInfoDO processDefinitionInfo, Map<String, Object> processVariables,
+            FlowElement node, Set<String> runActivityIds) {
         if (runActivityIds.contains(node.getId())) {
             return null;
         }
