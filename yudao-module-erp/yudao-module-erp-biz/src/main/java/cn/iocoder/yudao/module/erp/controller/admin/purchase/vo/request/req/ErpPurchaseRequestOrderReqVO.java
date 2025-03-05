@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -35,10 +34,10 @@ public class ErpPurchaseRequestOrderReqVO {
         @NotNull(message = "供应商产品id不能为空")
         private Long supplierProductId;
 
-        @Schema(description = "下单数量", requiredMode = Schema.RequiredMode.REQUIRED)
+        //下单数量
         @NotNull(message = "下单数量不能为空")
-        @Min(value = 0, message = "下单数量必须大于0")
-        private Integer count;
+        @Schema(description = "下单数量", requiredMode = Schema.RequiredMode.REQUIRED)
+        private Integer orderQuantity;
 
     }
 }

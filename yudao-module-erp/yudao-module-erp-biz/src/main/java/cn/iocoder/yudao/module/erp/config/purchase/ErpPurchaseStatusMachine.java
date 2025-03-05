@@ -117,11 +117,26 @@ public class ErpPurchaseStatusMachine {
             .within(ErpOrderStatus.OT_ORDERED)
             .on(ErpEventEnum.ORDER_INIT)
             .perform(actionOrderImpl);
-        //订购商品
+        //订购数量增减
         builder.externalTransitions()
             .fromAmong(ErpOrderStatus.OT_ORDERED, ErpOrderStatus.ORDER_FAILED)
             .to(ErpOrderStatus.PARTIALLY_ORDERED)
-            .on(ErpEventEnum.ORDER_GOODS)
+            .on(ErpEventEnum.ORDER_GOODS_ADD)
+            .perform(actionOrderImpl);
+        builder.externalTransitions()
+            .fromAmong(ErpOrderStatus.OT_ORDERED, ErpOrderStatus.ORDER_FAILED, ErpOrderStatus.PARTIALLY_ORDERED)
+            .to(ErpOrderStatus.ORDERED)
+            .on(ErpEventEnum.ORDER_GOODS_ADD)
+            .perform(actionOrderImpl);
+        builder.externalTransitions()
+            .fromAmong(ErpOrderStatus.ORDERED)
+            .to(ErpOrderStatus.PARTIALLY_ORDERED)
+            .on(ErpEventEnum.ORDER_GOODS_REDUCE)
+            .perform(actionOrderImpl);
+        builder.externalTransitions()
+            .fromAmong(ErpOrderStatus.PARTIALLY_ORDERED)
+            .to(ErpOrderStatus.OT_ORDERED)
+            .on(ErpEventEnum.ORDER_GOODS_REDUCE)
             .perform(actionOrderImpl);
         //订购完成
         builder.externalTransitions()

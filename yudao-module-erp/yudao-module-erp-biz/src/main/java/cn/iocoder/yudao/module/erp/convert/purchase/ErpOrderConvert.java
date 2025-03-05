@@ -31,7 +31,7 @@ public interface ErpOrderConvert {
         item.setTaxPercent(itemDO.getTaxPercent());
 
         //下单数量
-        item.setCount(requestItemsMap.get(itemDO.getId()).getCount());
+        item.setCount(requestItemsMap.get(itemDO.getId()).getOrderQuantity());
         //供应商产品id
         item.setSupplierProductId(requestItemsMap.get(itemDO.getId()).getSupplierProductId());
         return item;
