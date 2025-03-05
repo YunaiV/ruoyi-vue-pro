@@ -286,9 +286,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
             // 3.4 存在一个节点多人审批的情况，组装审批人信息
             List<UserSimpleBaseVO> candidateUsers = new ArrayList<>();
-            userMap.forEach((key, value) -> {
-                candidateUsers.add(BpmProcessInstanceConvert.INSTANCE.buildUser(key, userMap, deptMap));
-            });
+            userMap.forEach((key, value) -> candidateUsers.add(BpmProcessInstanceConvert.INSTANCE.buildUser(key, userMap, deptMap)));
             return new ActivityNode().setNodeType(BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType())
                     .setId(node.getId())
                     .setName(node.getName())
