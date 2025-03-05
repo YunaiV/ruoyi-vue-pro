@@ -19,13 +19,12 @@ public class BaseFailCallbackImpl<S, E, C> implements FailCallback<S, E, C> {
 
     public void onFail(S sourceState, E event, C context) {
         //如果sourceState 的类是erpAuditStatus
-        String description = convertEventToDescription(event);
-        description = description == null ? ErpEventEnum.valueOf(event.toString()).getDesc() : description;
-        String msg = StrUtil.format("无法在当前状态({})下触发事件({})，上下文：{}", sourceState, description, JSONUtil.toJsonStr(context));
+        String description = convertEventToDescription(sourceState);
+        String msg = StrUtil.format("无法在当前状态({})下触发事件({})，上下文：{}", description,  ErpEventEnum.valueOf(event.toString()).getDesc(), JSONUtil.toJsonStr(context));
         log.warn(msg);
 //        throw new IllegalArgumentException(msg);
 //        throw new ServiceException(msg);
-        ThrowUtil.ifThrow(true, PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_STATUS, sourceState, description);
+        ThrowUtil.ifThrow(true, PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_STATUS, description, ErpEventEnum.valueOf(event.toString()).getDesc());
 //        throw new TransitionFailException("Cannot fire event [" + event + "] on current state [" + sourceState + "] with context [" + context + "]");
     }
 

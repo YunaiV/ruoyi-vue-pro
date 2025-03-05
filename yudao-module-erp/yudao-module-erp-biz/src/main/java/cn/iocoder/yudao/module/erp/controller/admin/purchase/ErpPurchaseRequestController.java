@@ -136,7 +136,7 @@ public class ErpPurchaseRequestController {
     @Operation(summary = "关闭/启用")
     @PreAuthorize("@ss.hasPermission('erp:purchasereq-order:enable')")
     public CommonResult<Boolean> switchPurchaseOrderStatus(@Validated @RequestBody ErpPurchaseRequestEnableStatusReqVO reqVO) {
-        erpPurchaseRequestService.switchPurchaseOrderStatus(reqVO.getRequestId(), reqVO.getItemIds(), reqVO.getEnable());
+        erpPurchaseRequestService.switchPurchaseOrderStatus(null, reqVO.getItemIds(), reqVO.getEnable());
         return success(true);
     }
 

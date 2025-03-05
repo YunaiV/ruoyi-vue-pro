@@ -11,11 +11,6 @@ import java.util.List;
 @Data
 @Builder
 public class ErpPurchaseRequestEnableStatusReqVO {
-    //@RequestParam("requestId") Long requestId, @RequestParam("itemId") List<Long> itemIds, @RequestParam("enable") Boolean enable
-    //申请单id
-    @Schema(description = "申请单id", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "申请单id不能为空")
-    private Long requestId;
 
     @Schema(description = "申请单商品ids")
     @NotNull(message = "申请单商品ids不能为空")
