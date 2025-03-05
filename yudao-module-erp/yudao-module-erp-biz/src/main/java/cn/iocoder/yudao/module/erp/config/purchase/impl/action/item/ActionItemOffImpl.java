@@ -59,7 +59,7 @@ public class ActionItemOffImpl implements Action<ErpOffStatus, ErpEventEnum, Erp
         }
 
         // **如果所有子项都关闭了，则传递事件给主表**
-        boolean allClosed = itemList.stream().allMatch(item -> item.getOffStatus().equals(ErpOffStatus.CLOSED.getCode()));
+        boolean allClosed = itemList.stream().noneMatch(item -> item.getOffStatus().equals(ErpOffStatus.OPEN.getCode()));
         boolean hasOpen = itemList.stream().anyMatch(item -> item.getOffStatus().equals(ErpOffStatus.OPEN.getCode()));
 
         ErpPurchaseRequestDO requestDO = requestMapper.selectById(itemsDO.getRequestId());
@@ -72,13 +72,13 @@ public class ActionItemOffImpl implements Action<ErpOffStatus, ErpEventEnum, Erp
             log.info("所有子项已关闭，更新主表状态: ID={}", requestDO.getId());
             //主表不是关闭状态
             if (!requestDO.getOffStatus().equals(ErpOffStatus.CLOSED.getCode())) {
-                machine.fireEvent(ErpOffStatus.fromCode(requestDO.getOffStatus()), ErpEventEnum.AUTO_CLOSE, requestDO);
+                machine.fireEvent(ErpOffStatus.fromCode(requestDO.getOffStatus()), event, requestDO);
             }
         } else if (hasOpen) {
             log.info("存在已开启的子项，更新主表状态: ID={}", requestDO.getId());
             //主表不是开启状态
             if (!requestDO.getOffStatus().equals(ErpOffStatus.OPEN.getCode())) {
-                machine.fireEvent(ErpOffStatus.fromCode(requestDO.getOffStatus()), ErpEventEnum.ACTIVATE, requestDO);
+                machine.fireEvent(ErpOffStatus.fromCode(requestDO.getOffStatus()), event, requestDO);
             }
         }
         log.info("item开关状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());

@@ -82,4 +82,13 @@ public class ErpPurchaseRequestItemsDO extends TenantBaseDO {
      *{@link ErpPurchaseOrderDO#getId()} ()}
      */
     private Long purchaseOrderId;
+    /**
+     * 产品已订购数量
+     */
+    private Integer orderedQuantity;
+    /**
+     * ERP 采购订单项ID
+     * {@link ErpPurchaseOrderItemDO#getId()} ()}
+     */
+    private Long purchaseOrderItemId;
 }
