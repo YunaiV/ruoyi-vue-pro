@@ -246,7 +246,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         // 2. 校验第一个用户任务的规则类型是否为 审批人自选，如果是则抛出异常，第一个用户任务的规则类型不允许是审批人自选，因为会出现无审批人的情况
         List<SequenceFlow> outgoingFlows = startEvent.getOutgoingFlows();
         if (CollUtil.isNotEmpty(outgoingFlows)){
-            // 2.1 获取第一个用户节点
+            // 2.1 获取第一个用户任务节点
             FlowElement targetFlowElement = outgoingFlows.get(0).getTargetFlowElement();
             // 2.2 获取审批人策略
             Integer candidateStrategy = parseCandidateStrategy(targetFlowElement);
