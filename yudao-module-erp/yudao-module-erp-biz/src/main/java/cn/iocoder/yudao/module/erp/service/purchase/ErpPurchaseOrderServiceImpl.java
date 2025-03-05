@@ -63,6 +63,8 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createPurchaseOrder(ErpPurchaseOrderSaveReqVO createReqVO) {
+        //TODO 编号重复性校验
+
         // 1.1 校验订单项的有效性
         List<ErpPurchaseOrderItemDO> purchaseOrderItems = validatePurchaseOrderItems(createReqVO.getItems());
         // 1.2 校验供应商

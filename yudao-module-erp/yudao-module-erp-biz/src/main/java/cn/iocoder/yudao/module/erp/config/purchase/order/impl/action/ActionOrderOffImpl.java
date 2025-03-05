@@ -1,12 +1,10 @@
-package cn.iocoder.yudao.module.erp.config.purchase.impl.action;
+package cn.iocoder.yudao.module.erp.config.purchase.order.impl.action;
 
 
 import cn.hutool.json.JSONUtil;
-import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
-import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestItemsMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestMapper;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants;
@@ -15,47 +13,36 @@ import cn.iocoder.yudao.module.erp.enums.status.ErpOffStatus;
 import com.alibaba.cola.statemachine.Action;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_UPDATE_ERROR;
 
 @Slf4j
 @Component
-public class ActionOffImpl  implements Action<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestDO> {
+public class ActionOrderOffImpl implements Action<ErpOffStatus, ErpEventEnum, ErpPurchaseOrderDO> {
     @Resource
     ErpPurchaseRequestMapper mapper;
-    @Autowired
-    ErpPurchaseRequestItemsMapper itemsMapper;
 
     @Override
     @Transactional
-    public void execute(ErpOffStatus from, ErpOffStatus to, ErpEventEnum event, ErpPurchaseRequestDO context) {
+    public void execute(ErpOffStatus from, ErpOffStatus to, ErpEventEnum event, ErpPurchaseOrderDO context) {
         validate(from, to, event, context);
+        //子项存在开启主表就开启，子项都关闭|手动关闭主表才关闭
         ErpPurchaseRequestDO aDo = mapper.selectById(context.getId());
         aDo.setOffStatus(to.getCode());
         ThrowUtil.ifSqlThrow(mapper.updateById(aDo), DB_UPDATE_ERROR);
-        //ErpPurchaseRequestDO主表开启事件，则主表的子表都开启
-        //联动更新子表关闭状态
-        if (event == ErpEventEnum.MANUAL_CLOSE || event == ErpEventEnum.AUTO_CLOSE) {
-            List<ErpPurchaseRequestItemsDO> itemsDOS = itemsMapper.selectListByRequestId(context.getId());
-            itemsDOS.forEach(item -> item.setOffStatus(to.getCode()));
-            ThrowUtil.ifThrow(!itemsMapper.updateBatch(itemsDOS), GlobalErrorCodeConstants.DB_BATCH_UPDATE_ERROR);
-        }
-        //ErpPurchaseRequestDO主表关闭事件，则子表的状态都关闭
         log.info("开关状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
     }
 
     //校验方法
-    public static void validate(ErpOffStatus from, ErpOffStatus to, ErpEventEnum event, ErpPurchaseRequestDO context) {
+    public static void validate(ErpOffStatus from, ErpOffStatus to, ErpEventEnum event, ErpPurchaseOrderDO context) {
         //手动关闭+自动关闭事件
         if (event == ErpEventEnum.MANUAL_CLOSE || event == ErpEventEnum.AUTO_CLOSE) {
             //未审核->异常
-            ThrowUtil.ifThrow(Objects.equals(context.getStatus(), ErpAuditStatus.PENDING_REVIEW.getCode()), ErrorCodeConstants.PURCHASE_REQUEST_CLOSE_FAIL, context.getId());
+            ThrowUtil.ifThrow(Objects.equals(context.getStatus(), ErpAuditStatus.PENDING_REVIEW.getCode()), ErrorCodeConstants.PURCHASE_ORDER_CLOSE_FAIL, context.getNo());
         }
     }
 }

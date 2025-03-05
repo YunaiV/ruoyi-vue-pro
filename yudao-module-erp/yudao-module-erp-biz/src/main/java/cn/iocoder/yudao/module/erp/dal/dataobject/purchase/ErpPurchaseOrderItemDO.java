@@ -129,4 +129,12 @@ public class ErpPurchaseOrderItemDO extends BaseDO {
      * 交货日期
      */
     private LocalDateTime deliveryTime;
+    /**
+     * 关闭状态
+     */
+    private Integer offStatus;
+    //执行状态 Integer
+
+    //入库状态
+    //付款状态
 }

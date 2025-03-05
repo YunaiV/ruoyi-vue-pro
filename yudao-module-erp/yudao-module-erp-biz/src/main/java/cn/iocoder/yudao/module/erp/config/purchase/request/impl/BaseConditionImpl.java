@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.config.purchase.impl;
+package cn.iocoder.yudao.module.erp.config.purchase.request.impl;
 
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import com.alibaba.cola.statemachine.Condition;

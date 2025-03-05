@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.erp.config;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.erp.config.purchase.ErpPurchaseStatusMachine;
-import cn.iocoder.yudao.module.erp.config.purchase.impl.BaseConditionImpl;
-import cn.iocoder.yudao.module.erp.config.purchase.impl.action.ActionAuditImpl;
-import cn.iocoder.yudao.module.erp.config.purchase.impl.action.ActionOffImpl;
+import cn.iocoder.yudao.module.erp.config.purchase.request.ErpPurchaseRequestStatusMachine;
+import cn.iocoder.yudao.module.erp.config.purchase.request.impl.BaseConditionImpl;
+import cn.iocoder.yudao.module.erp.config.purchase.request.impl.action.ActionAuditImpl;
+import cn.iocoder.yudao.module.erp.config.purchase.request.impl.action.ActionOffImpl;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestMapper;
@@ -24,9 +24,9 @@ import org.springframework.test.context.ContextConfiguration;
 
 @Slf4j
 @ComponentScan(value = "cn.iocoder.yudao.module.erp")
-@ContextConfiguration(classes = {ErpPurchaseStatusMachine.class})
+@ContextConfiguration(classes = {ErpPurchaseRequestStatusMachine.class})
 @Import({BaseConditionImpl.class, ActionAuditImpl.class, ActionOffImpl.class})
-class ErpPurchaseStatusMachineTest extends BaseDbUnitTest {
+class ErpPurchaseRequestStatusMachineTest extends BaseDbUnitTest {
 
     @Resource
     ErpPurchaseRequestMapper mapper;

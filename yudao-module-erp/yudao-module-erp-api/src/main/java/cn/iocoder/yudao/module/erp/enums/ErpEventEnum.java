@@ -20,10 +20,9 @@ public enum ErpEventEnum {
 
     // 订购事件
     ORDER_INIT("订购初始化"),
-    ORDER_GOODS_ADD("订购商品数量增加"),
-    ORDER_GOODS_REDUCE("订购商品数量减少"),
-    ORDER_CANCEL("放弃订购"),
-    ORDER_COMPLETE("订购完成"),
+    PART_PURCHASE("部分采购"),
+    FULL_PURCHASE("完全采购"),
+    ORDER_CANCEL("放弃采购"),
 
 
     // 采购事件

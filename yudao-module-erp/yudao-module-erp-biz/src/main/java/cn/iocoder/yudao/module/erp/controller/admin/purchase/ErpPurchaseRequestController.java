@@ -112,18 +112,6 @@ public class ErpPurchaseRequestController {
         return success(true);
     }
 
-//    //procurement采购接口
-//    @PostMapping("/procurement")
-//    @Operation(summary = "采购")
-//    @Parameter(name = "requestId", description = "申请单编号", required = true)
-//    @PreAuthorize("@ss.hasPermission('erp:purchase-order:procurement')")
-//    public CommonResult<Boolean> procurement(@RequestParam("requestId") Long requestId) {
-//        //申请单->采购单DO
-//        ErpPurchaseRequestDO aDo = erpPurchaseRequestService.getPurchaseRequest(requestId);
-//        //调用采购单service,创建采购单
-//        return null;
-//    }
-
     @PostMapping("/merge")
     @Operation(summary = "合并采购")
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:merge')")
@@ -238,6 +226,10 @@ public class ErpPurchaseRequestController {
                         //产品创建者、更新者填充
                         MapUtils.findAndThen(userMap, safeParseLong(item.getCreator()), user -> item.setCreator(user.getNickname()));
                         MapUtils.findAndThen(userMap, safeParseLong(item.getUpdater()), user -> item.setUpdater(user.getNickname()));
+                        //未订购数量 , 存在批准数量
+                        if (item.getApproveCount() != null) {
+                            item.setUnOrderCount(item.getApproveCount() - (item.getInCount() == null ? 0 : item.getInCount()));
+                        }
                     }
                 )
             );
@@ -251,6 +243,7 @@ public class ErpPurchaseRequestController {
             MapUtils.findAndThen(userMap, purchaseRequest.getAuditorId(), user -> purchaseRequest.setAuditor(user.getNickname()));
             MapUtils.findAndThen(userMap, safeParseLong(purchaseRequest.getCreator()), user -> purchaseRequest.setCreator(user.getNickname()));
             MapUtils.findAndThen(userMap, safeParseLong(purchaseRequest.getUpdater()), user -> purchaseRequest.setUpdater(user.getNickname()));
+            //未订购数量
         });
     }
 

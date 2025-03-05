@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 public class ErpPurchaseRequestItemRespVO extends BaseVO {
@@ -116,4 +117,7 @@ public class ErpPurchaseRequestItemRespVO extends BaseVO {
     @Schema(description = "收货地址")
     @ExcelProperty("收货地址")
     private String delivery;
+    //期望到货日期
+    @Schema(description = "期望到货日期")
+    private LocalDateTime expectArrivalDate;
 }

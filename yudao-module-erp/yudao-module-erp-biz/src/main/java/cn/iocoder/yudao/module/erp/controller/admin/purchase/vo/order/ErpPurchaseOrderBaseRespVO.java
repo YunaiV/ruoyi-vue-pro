@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.base.ErpPurchaseBaseRespVO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.write.style.ContentStyle;
+import com.alibaba.excel.enums.BooleanEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -55,16 +57,31 @@ public class ErpPurchaseOrderBaseRespVO extends ErpPurchaseBaseRespVO {
     @Schema(description = "交货日期", example = "2025-1-1")
     private LocalDateTime deliveryDate;
 
+    // ========== 审核信息 ==========
+
+    @Schema(description = "审核者id")
+    @ExcelProperty("审核者id")
+    private String auditor;
+    private Long auditorId;
+
+    @Schema(description = "审核人名称")
+    @ExcelProperty("审核人名称")
+    private String auditorName;
+
+    @Schema(description = "审核时间")
+    @ExcelProperty("审核时间")
+    @ContentStyle(shrinkToFit = BooleanEnum.TRUE)
+    private LocalDateTime auditTime;
     @Data
     public static class Item {
 
         @Schema(description = "订单项编号", example = "11756")
         private Long id;
 
-        @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
+        @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
         private Long productId;
 
-        @Schema(description = "产品单位单位", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
+        @Schema(description = "产品单位单位", requiredMode = Schema.RequiredMode.REQUIRED)
         private Long productUnitId;
 
         @Schema(description = "产品单价", example = "100.00")
@@ -86,7 +103,7 @@ public class ErpPurchaseOrderBaseRespVO extends ErpPurchaseBaseRespVO {
         @Schema(description = "价税合计")
         private BigDecimal allAmount;
 
-        @Schema(description = "备注", example = "随便")
+        @Schema(description = "备注")
         private String remark;
 
         @Schema(description = "供应商付款条款")
@@ -138,6 +155,22 @@ public class ErpPurchaseOrderBaseRespVO extends ErpPurchaseBaseRespVO {
 
         @Schema(description = "型号规格型号")
         private String model;
+        // ========== 带出 ==========
+        //采购申请No
+        @Schema(description = "采购申请No")
+        private String purchaseApplyNo;
+        //部门名称
+        @Schema(description = "部门名称", example = "IT 部")
+        private String deptName;
+        //申请人
+        @Schema(description = "申请人", example = "张三")
+        private String applyUserName;
+        //申请日期
+        @Schema(description = "申请日期")
+        private LocalDateTime applyTime;
+        //制单人
+        @Schema(description = "制单人", example = "李四")
+        private String createUserName;
     }
 
 }

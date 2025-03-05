@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * ERP采购申请单子 DO
@@ -91,4 +92,8 @@ public class ErpPurchaseRequestItemsDO extends TenantBaseDO {
      * {@link ErpPurchaseOrderItemDO#getId()} ()}
      */
     private Long purchaseOrderItemId;
+    /**
+     * 期望到货日期
+     */
+    private LocalDateTime expectArrivalDate;
 }

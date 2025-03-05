@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -58,6 +57,10 @@ public class ErpPurchaseOrderSaveReqVO {
 
     @Schema(description = "采购主体编号")
     private Long purchaseEntityId;
+
+    //收获地址
+    @Schema(description = "收获地址")
+    private String address;
 
     @Data
     public static class Item {

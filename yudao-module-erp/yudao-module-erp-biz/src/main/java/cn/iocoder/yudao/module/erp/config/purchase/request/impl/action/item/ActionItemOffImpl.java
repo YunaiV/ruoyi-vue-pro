@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.config.purchase.impl.action.item;
+package cn.iocoder.yudao.module.erp.config.purchase.request.impl.action.item;
 
 
 import cn.hutool.json.JSONUtil;

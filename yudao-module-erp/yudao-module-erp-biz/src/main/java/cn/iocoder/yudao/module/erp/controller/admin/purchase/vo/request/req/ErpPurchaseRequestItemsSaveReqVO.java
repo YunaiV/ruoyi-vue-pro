@@ -6,6 +6,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - ERP采购申请单子新增/修改 Request VO")
 @Data
@@ -20,7 +21,7 @@ public class ErpPurchaseRequestItemsSaveReqVO {
     @NotNull(message = "商品id不能为空")
     private Long productId;
 
-    @Schema(description = "仓库id", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "仓库id")
     private Long warehouseId;
 
     @Schema(description = "申请数量", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -33,25 +34,28 @@ public class ErpPurchaseRequestItemsSaveReqVO {
     @Null(groups = validation.OnCreate.class, message = "创建时，批准数量必须为空")
     private Integer approveCount;
 
-    @Schema(description = "含税单价", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "含税单价")
     @Positive(message = "含税单价必须为正数")
     private BigDecimal actTaxPrice;
 
-    @Schema(description = "价税合计", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "价税合计")
     @DecimalMin(value = "0.0", message = "价税合计必须大于0")
     private BigDecimal allAmount;
 
-    @Schema(description = "参考单价", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "参考单价")
     @DecimalMin(value = "0.0", message = "参考单价必须大于0")
     private BigDecimal referenceUnitPrice;
 
     //是否计算得到？待确认
-    @Schema(description = "税额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "税额，单位：元")
     @DecimalMin(value = "0.0", message = "税额必须大于0")
     private BigDecimal taxPrice;
 
-    @Schema(description = "增值税税率，百分比", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "增值税税率，百分比")
     @DecimalMin(value = "0.0", message = "税率不能为负")
     @DecimalMax(value = "1.0", message = "税率不能超过100%")
     private BigDecimal taxPercent;
+    //期望到货日期
+    @Schema(description = "期望到货日期")
+    private LocalDateTime expectArrivalDate;
 }

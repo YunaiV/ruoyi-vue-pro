@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.config.purchase.impl.action;
+package cn.iocoder.yudao.module.erp.config.purchase.request.impl.action;
 
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
@@ -31,10 +31,10 @@ public class ActionOrderImpl implements Action<ErpOrderStatus, ErpEventEnum, Erp
     @Override
     @Transactional
     public void execute(ErpOrderStatus from, ErpOrderStatus to, ErpEventEnum event, ErpPurchaseRequestDO context) {
-        if (event == ErpEventEnum.ORDER_GOODS_ADD || event == ErpEventEnum.ORDER_GOODS_REDUCE) {
-            updatePurchaseOrderStatus(context);
-            return;
-        }
+//        if (event == ErpEventEnum.ORDER_GOODS_ADD || event == ErpEventEnum.ORDER_GOODS_REDUCE) {
+//            updatePurchaseOrderStatus(context);
+//            return;
+//        }
 
         // 其他事件：直接更新采购申请的状态
         ErpPurchaseRequestDO requestDO = purchaseRequestMapper.selectById(context.getId());

@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.module.erp.config.purchase;
+package cn.iocoder.yudao.module.erp.config.purchase.request;
 
-import cn.iocoder.yudao.module.erp.config.purchase.impl.BaseFailCallbackImpl;
+import cn.iocoder.yudao.module.erp.config.purchase.request.impl.BaseFailCallbackImpl;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestAuditStatusReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
@@ -20,7 +20,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Slf4j
 @Configuration
-public class ErpPurchaseStatusMachine {
+@SuppressWarnings({"rawtypes", "unchecked"})
+public class ErpPurchaseRequestStatusMachine {
     @Resource
     private Condition<ErpPurchaseRequestDO> baseConditionImpl;
 
@@ -74,7 +75,6 @@ public class ErpPurchaseStatusMachine {
         return builder.build(ErpStateMachines.PURCHASE_REQUEST_STATE_MACHINE_NAME);
     }
 
-
     @Bean(ErpStateMachines.PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME)
     public StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestDO> getPurchaseRequestOffStateMachine() {
         StateMachineBuilder<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestDO> builder = StateMachineBuilderFactory.create();
@@ -108,7 +108,6 @@ public class ErpPurchaseStatusMachine {
         return builder.build(ErpStateMachines.PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME);
     }
 
-    //订购
     @Bean(ErpStateMachines.PURCHASE_ORDER_STATE_MACHINE_NAME)
     public StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestDO> getPurchaseOrderStateMachine() {
         StateMachineBuilder<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestDO> builder = StateMachineBuilderFactory.create();
@@ -117,32 +116,21 @@ public class ErpPurchaseStatusMachine {
             .within(ErpOrderStatus.OT_ORDERED)
             .on(ErpEventEnum.ORDER_INIT)
             .perform(actionOrderImpl);
-        //订购数量增减
+        //部分采购
         builder.externalTransitions()
-            .fromAmong(ErpOrderStatus.OT_ORDERED, ErpOrderStatus.ORDER_FAILED)
+            .fromAmong(ErpOrderStatus.OT_ORDERED)
             .to(ErpOrderStatus.PARTIALLY_ORDERED)
-            .on(ErpEventEnum.ORDER_GOODS_ADD)
+            .on(ErpEventEnum.PART_PURCHASE)
             .perform(actionOrderImpl);
-        builder.externalTransitions()
-            .fromAmong(ErpOrderStatus.OT_ORDERED, ErpOrderStatus.ORDER_FAILED, ErpOrderStatus.PARTIALLY_ORDERED)
-            .to(ErpOrderStatus.ORDERED)
-            .on(ErpEventEnum.ORDER_GOODS_ADD)
+        builder.internalTransition()
+            .within(ErpOrderStatus.PARTIALLY_ORDERED)
+            .on(ErpEventEnum.PART_PURCHASE)
             .perform(actionOrderImpl);
-        builder.externalTransitions()
-            .fromAmong(ErpOrderStatus.ORDERED)
-            .to(ErpOrderStatus.PARTIALLY_ORDERED)
-            .on(ErpEventEnum.ORDER_GOODS_REDUCE)
-            .perform(actionOrderImpl);
+        //完全采购
         builder.externalTransitions()
             .fromAmong(ErpOrderStatus.PARTIALLY_ORDERED)
-            .to(ErpOrderStatus.OT_ORDERED)
-            .on(ErpEventEnum.ORDER_GOODS_REDUCE)
-            .perform(actionOrderImpl);
-        //订购完成
-        builder.externalTransitions()
-            .fromAmong(ErpOrderStatus.PARTIALLY_ORDERED, ErpOrderStatus.ORDER_FAILED, ErpOrderStatus.OT_ORDERED)
             .to(ErpOrderStatus.ORDERED)
-            .on(ErpEventEnum.ORDER_COMPLETE)
+            .on(ErpEventEnum.FULL_PURCHASE)
             .perform(actionOrderImpl);
         //放弃订购
         builder.externalTransitions()

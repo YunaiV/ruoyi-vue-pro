@@ -1,6 +1,6 @@
-package cn.iocoder.yudao.module.erp.config.purchase;
+package cn.iocoder.yudao.module.erp.config.purchase.request;
 
-import cn.iocoder.yudao.module.erp.config.purchase.impl.BaseFailCallbackImpl;
+import cn.iocoder.yudao.module.erp.config.purchase.request.impl.BaseFailCallbackImpl;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.ErpStateMachines;
@@ -17,7 +17,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Slf4j
 @Configuration
-public class ErpPurchaseItemStatusMachine {
+@SuppressWarnings({"rawtypes", "unchecked"})
+public class ErpPurchaseRequestItemStatusMachine {
     @Resource
     private Action<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> actionItemOffImpl;
     @Resource

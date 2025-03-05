@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.config.purchase.impl.action.item;
+package cn.iocoder.yudao.module.erp.config.purchase.request.impl.action.item;
 
 import cn.iocoder.yudao.module.erp.api.purchase.ErpOrderCountDTO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
@@ -14,9 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Objects;
 
 import static cn.iocoder.yudao.module.erp.enums.ErpStateMachines.PURCHASE_ORDER_STATE_MACHINE_NAME;
 
@@ -39,24 +36,7 @@ public class ActionItemOrderImpl implements Action<ErpOrderStatus, ErpEventEnum,
         //更新采购申请项的采购状态(暂无)
         Long purchaseOrderItemId = context.getPurchaseOrderItemId();
         ErpPurchaseRequestItemsDO itemsDO = mapper.selectById(purchaseOrderItemId);
-        if (event == ErpEventEnum.ORDER_GOODS_ADD) {
-            //默认订购数量
-            Integer orderedQuantity = itemsDO.getOrderedQuantity();
-            orderedQuantity = orderedQuantity == null ? 0 : orderedQuantity;
-            itemsDO.setOrderedQuantity(orderedQuantity + context.getOrderCount());
-            ErpPurchaseRequestDO aDo = requestMapper.selectById(itemsDO.getRequestId());
-            stateMachine.fireEvent(ErpOrderStatus.fromCode(aDo.getOrderStatus()), event, aDo);
-        }
-        if (event == ErpEventEnum.ORDER_GOODS_REDUCE) {
-            //默认订购数量
-            Integer orderedQuantity = itemsDO.getOrderedQuantity();
-            orderedQuantity = orderedQuantity == null ? 0 : orderedQuantity;
-            itemsDO.setOrderedQuantity(orderedQuantity - context.getOrderCount());
-            ErpPurchaseRequestDO aDo = requestMapper.selectById(itemsDO.getRequestId());
-            stateMachine.fireEvent(ErpOrderStatus.fromCode(aDo.getOrderStatus()), event, aDo);
-        }
         mapper.updateById(itemsDO);
-
     }
 
 

@@ -212,21 +212,31 @@ public interface ErrorCodeConstants {
     ErrorCode PURCHASE_REQUEST_UPDATE_FAIL = new ErrorCode(1_030_603_140, "订单编号({})更新状态失败，请联系管理员");
     ErrorCode PURCHASE_REQUEST_ITEM_CLOSED = new ErrorCode(1_030_603_141, "订单项编号({})已关闭,采购项无法修改");
     ErrorCode PURCHASE_REQUEST_ITEM_MANUAL_CLOSED = new ErrorCode(1_030_603_142, "id({})已手动关闭,采购项无法修改");
-//采购子项不存在
+    //采购子项不存在
     ErrorCode PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_ID = new ErrorCode(1_030_603_143, "采购请求ID=({})没有子项");
     //当前状态不能触发事件
     ErrorCode PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_STATUS = new ErrorCode(1_030_603_144, "无法在当前状态({})下触发事件({})");
+    //采购订单
+    // ========== ERP 采购订单 1-030-604-300 ==========
+    ErrorCode PURCHASE_ORDER_CLOSE_FAIL = new ErrorCode(1_030_604_000, "未审核的采购订单({})不能进行关闭");
+    // ========== ERP 采购入库单 1-030-605-300 ==========
+    // ========== ERP 采购退货单 1-030-606-300 ==========
+    // ========== ERP 采购支付单 1-030-607-300 ==========
 
-    // ========== ERP 海关规则 1-030-604-000 ==========
-    ErrorCode CUSTOM_RULE_NOT_EXISTS = new ErrorCode(1_030_604_000, "ERP 海关规则不存在");
-    ErrorCode CUSTOM_RULE_PART_NULL = new ErrorCode(1_030_604_001, "集合中存在部分集合产品名称或供应商产品编码为空");
-    ErrorCode NO_REPEAT_OF_COUNTRY_CODE_AND_SUPPLIER_PRODUCT_CODE = new ErrorCode(1_030_604_002, "海关规则中，国家代码+供应商产品编码不能重复");
-    ErrorCode NO_REPEAT_OF_COUNTRY_CODE_AND_PRODUCT_CODE = new ErrorCode(1_030_604_003, "海关规则中，产品编码+国家代码({})不能重复");
-    // ========== 海关分类 1-030-605-000 ==========
-    ErrorCode CUSTOM_RULE_CATEGORY_NOT_EXISTS = new ErrorCode(1_030_605_001, "海关分类不存在");
-    // ========== 海关分类子表 1-030-606-000 ==========
-    ErrorCode CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS = new ErrorCode(1_030_606_001, "海关分类子表不存在");
-    ErrorCode CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS_BY_PRODUCT_ID = new ErrorCode(1_030_606_002, "所选产品中不存在海关分类数据");
-    // ========== Erp财务主体 1-030-607-000 ==========
-    ErrorCode FINANCE_SUBJECT_NOT_EXISTS = new ErrorCode(1_030_607_001, "Erp财务主体不存在");
+    // ========== ERP 海关规则 1-030-608-000 ==========
+    ErrorCode CUSTOM_RULE_NOT_EXISTS = new ErrorCode(1_030_608_000, "ERP 海关规则不存在");
+    ErrorCode CUSTOM_RULE_PART_NULL = new ErrorCode(1_030_608_001, "集合中存在部分集合产品名称或供应商产品编码为空");
+    ErrorCode NO_REPEAT_OF_COUNTRY_CODE_AND_SUPPLIER_PRODUCT_CODE = new ErrorCode(1_030_608_002, "海关规则中，国家代码+供应商产品编码不能重复");
+    ErrorCode NO_REPEAT_OF_COUNTRY_CODE_AND_PRODUCT_CODE = new ErrorCode(1_030_608_003, "海关规则中，产品编码+国家代码({})不能重复");
+
+    // ========== 海关分类 1-030-609-000 ==========
+    ErrorCode CUSTOM_RULE_CATEGORY_NOT_EXISTS = new ErrorCode(1_030_609_000, "海关分类不存在");
+
+    // ========== 海关分类子表 1-030-610-000 ==========
+    ErrorCode CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS = new ErrorCode(1_030_610_000, "海关分类子表不存在");
+    ErrorCode CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS_BY_PRODUCT_ID = new ErrorCode(1_030_610_001, "所选产品中不存在海关分类数据");
+
+    // ========== Erp财务主体 1-030-611-000 ==========
+    ErrorCode FINANCE_SUBJECT_NOT_EXISTS = new ErrorCode(1_030_611_000, "Erp财务主体不存在");
+
 }
