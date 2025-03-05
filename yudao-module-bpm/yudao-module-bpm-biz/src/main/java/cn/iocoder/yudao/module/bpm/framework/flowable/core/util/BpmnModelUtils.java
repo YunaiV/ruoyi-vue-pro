@@ -808,16 +808,16 @@ public class BpmnModelUtils {
         // 情况：ExclusiveGateway 排它，只有一个满足条件的。如果没有，就走默认的
         if (currentElement instanceof ExclusiveGateway) {
             // 查找满足条件的 SequenceFlow 路径
-            SequenceFlow matchSequenceFlow = findMatchSequenceFlow((Gateway) currentElement, variables);
+            SequenceFlow matchSequenceFlow = findMatchSequenceFlowByExclusiveGateway((Gateway) currentElement, variables);
             // 遍历满足条件的 SequenceFlow 路径
             if (matchSequenceFlow != null) {
                 simulateNextFlowElements(matchSequenceFlow.getTargetFlowElement(), variables, resultElements, visitElements);
             }
         }
         // 情况：InclusiveGateway 包容，多个满足条件的。如果没有，就走默认的
-       else if (currentElement instanceof InclusiveGateway) {
+        else if (currentElement instanceof InclusiveGateway) {
             // 查找满足条件的 SequenceFlow 路径
-            Collection<SequenceFlow> matchSequenceFlows = findMatchSequenceFlows((Gateway) currentElement, variables);
+            Collection<SequenceFlow> matchSequenceFlows = findMatchSequenceFlowsByInclusiveGateway((Gateway) currentElement, variables);
             // 遍历满足条件的 SequenceFlow 路径
             matchSequenceFlows.forEach(
                     flow -> simulateNextFlowElements(flow.getTargetFlowElement(), variables, resultElements, visitElements));
@@ -889,7 +889,7 @@ public class BpmnModelUtils {
     private static void handleExclusiveGateway(Gateway gateway, BpmnModel bpmnModel,
                                                Map<String, Object> variables, List<FlowNode> nextFlowNodes) {
         // 查找满足条件的 SequenceFlow 路径
-        SequenceFlow matchSequenceFlow = findMatchSequenceFlow(gateway, variables);
+        SequenceFlow matchSequenceFlow = findMatchSequenceFlowByExclusiveGateway(gateway, variables);
         // 遍历满足条件的 SequenceFlow 路径
         if (matchSequenceFlow != null) {
             FlowElement targetElement = bpmnModel.getFlowElement(matchSequenceFlow.getTargetRef());
@@ -906,7 +906,7 @@ public class BpmnModelUtils {
      * @param variables 流程变量
      * @return 符合条件的路径
      */
-    private static SequenceFlow findMatchSequenceFlow(Gateway gateway, Map<String, Object> variables){
+    private static SequenceFlow findMatchSequenceFlowByExclusiveGateway(Gateway gateway, Map<String, Object> variables) {
         SequenceFlow matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
                 flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
                         && (evalConditionExpress(variables, flow.getConditionExpression())));
@@ -932,7 +932,7 @@ public class BpmnModelUtils {
     private static void handleInclusiveGateway(Gateway gateway, BpmnModel bpmnModel,
                                                Map<String, Object> variables, List<FlowNode> nextFlowNodes) {
         // 查找满足条件的 SequenceFlow 路径集合
-        Collection<SequenceFlow> matchSequenceFlows = findMatchSequenceFlows(gateway, variables);
+        Collection<SequenceFlow> matchSequenceFlows = findMatchSequenceFlowsByInclusiveGateway(gateway, variables);
         // 遍历满足条件的 SequenceFlow 路径，获取目标节点
         matchSequenceFlows.forEach(flow -> {
             FlowElement targetElement = bpmnModel.getFlowElement(flow.getTargetRef());
@@ -949,7 +949,7 @@ public class BpmnModelUtils {
      * @param variables 流程变量
      * @return 符合条件的路径
      */
-    private static Collection<SequenceFlow> findMatchSequenceFlows(Gateway gateway, Map<String, Object> variables) {
+    private static Collection<SequenceFlow> findMatchSequenceFlowsByInclusiveGateway(Gateway gateway, Map<String, Object> variables) {
         // 查找满足条件的 SequenceFlow 路径
         Collection<SequenceFlow> matchSequenceFlows = CollUtil.filterNew(gateway.getOutgoingFlows(),
                 flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())

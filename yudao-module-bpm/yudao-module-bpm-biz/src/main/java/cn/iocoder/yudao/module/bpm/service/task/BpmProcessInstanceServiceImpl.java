@@ -11,7 +11,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
@@ -179,9 +178,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             startUserId = Long.valueOf(historicProcessInstance.getStartUserId());
             processInstanceStatus = FlowableUtils.getProcessInstanceStatus(historicProcessInstance);
             // 合并 DB 和前端传递的流量变量，以前端的为主
-            Map<String, Object> historicVariables = historicProcessInstance.getProcessVariables();
-            if (CollUtil.isNotEmpty(historicVariables)) {
-                processVariables.putAll(historicVariables);
+            if (CollUtil.isNotEmpty(historicProcessInstance.getProcessVariables())) {
+                processVariables.putAll(historicProcessInstance.getProcessVariables());
             }
         }
         if (CollUtil.isNotEmpty(reqVO.getProcessVariables())) {
@@ -222,9 +220,11 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         List<ActivityNode> simulateActivityNodes = getSimulateApproveNodeList(startUserId, bpmnModel,
                 processDefinitionInfo,
                 processVariables, activities);
-        // 3.3 如果是发起动作,activityId为开始节点，不校验审批人自选节点
-        if (ObjUtil.isNotNull(reqVO.getActivityId()) && ObjUtil.equals(reqVO.getActivityId(),BpmnModelConstants.START_USER_NODE_ID)){
-            simulateActivityNodes.removeIf(node -> BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy().equals(node.getCandidateStrategy()));
+        // 3.3 如果是发起动作，activityId 为开始节点，不校验审批人自选节点
+        // TODO @小北：ObjUtil.equals(reqVO.getActivityId(), BpmnModelConstants.START_USER_NODE_ID) 够啦，不用判空
+        if (ObjUtil.isNotNull(reqVO.getActivityId()) && ObjUtil.equals(reqVO.getActivityId(), BpmnModelConstants.START_USER_NODE_ID)) {
+            simulateActivityNodes.removeIf(node ->
+                    BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy().equals(node.getCandidateStrategy()));
         }
 
         // 4. 拼接最终数据
@@ -234,46 +234,37 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
     @Override
     public List<ActivityNode> getNextApprovalNodes(Long loginUserId, BpmApprovalDetailReqVO reqVO) {
-        // 1.1 校验任务存在
-        Task task = taskService.getTask(reqVO.getTaskId());
-        if (task == null) {
-            throw exception(TASK_NOT_EXISTS);
-        }
-        // 1.2 校验任务是否由当前用户审批
-        if (StrUtil.isNotBlank(task.getAssignee())
-                && ObjectUtil.notEqual(loginUserId, NumberUtils.parseLong(task.getAssignee()))) {
-            throw exception(TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
-        }
-        // 1.3 校验流程实例存在
+        // 1.1 校验任务存在，且是当前用户的
+        Task task = taskService.validateTask(loginUserId, reqVO.getTaskId());
+        // 1.2 校验流程实例存在
         ProcessInstance instance = getProcessInstance(task.getProcessInstanceId());
         if (instance == null) {
             throw exception(PROCESS_INSTANCE_NOT_EXISTS);
         }
-        // 1.4 校验BpmnModel
-        BpmnModel bpmnModel = processDefinitionService.getProcessDefinitionBpmnModel(task.getProcessDefinitionId());
-        if (bpmnModel == null) {
-            return null;
-        }
-        //1.5 流程实例是否存在
         HistoricProcessInstance historicProcessInstance = getHistoricProcessInstance(task.getProcessInstanceId());
         if (historicProcessInstance == null) {
             throw exception(ErrorCodeConstants.PROCESS_INSTANCE_NOT_EXISTS);
         }
+        // 1.3 校验BpmnModel
+        BpmnModel bpmnModel = processDefinitionService.getProcessDefinitionBpmnModel(task.getProcessDefinitionId());
+        if (bpmnModel == null) {
+            return null;
+        }
 
-        // 2 设置流程变量
+        // 2. 设置流程变量
         Map<String, Object> processVariables = new HashMap<>();
         // 2.1 获取历史中流程变量
-        Map<String, Object> historicVariables = historicProcessInstance.getProcessVariables();
-        if (CollUtil.isNotEmpty(historicVariables)) {
-            processVariables.putAll(historicVariables);
+        if (CollUtil.isNotEmpty(historicProcessInstance.getProcessVariables())) {
+            processVariables.putAll(historicProcessInstance.getProcessVariables());
         }
         // 2.2 合并前端传递的流程变量，以前端为准
         if (CollUtil.isNotEmpty(reqVO.getProcessVariables())) {
             processVariables.putAll(reqVO.getProcessVariables());
         }
+
         // 3 获取当前任务节点的信息
-        FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
         // 3.1 获取下一个将要执行的节点集合
+        FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
         List<FlowNode> nextFlowNodes = BpmnModelUtils.getNextFlowNodes(flowElement, bpmnModel, processVariables);
         return convertList(nextFlowNodes, node -> {
             List<Long> candidateUserIds = getTaskCandidateUserList(bpmnModel, node.getId(),
@@ -290,6 +281,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                     .setName(node.getName())
                     .setStatus(BpmTaskStatusEnum.RUNNING.getStatus())
                     .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(node))
+                    // TODO @小北：先把 candidateUserIds 设置完，然后最后拼接 candidateUsers 信息。这样，如果有多个节点，就不用重复查询啦；类似 buildApprovalDetail 思路；
+                    // TODO 先拼接处 List ActivityNode
+                    // TODO 接着，再起一段，处理 adminUserApi.getUserMap(candidateUserIds)、deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId))
                     .setCandidateUsers(candidateUsers);
         });
     }
@@ -745,16 +739,11 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_ID, userId); // 设置流程变量，发起人 ID
         variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS, // 流程实例状态：审批中
                 BpmProcessInstanceStatusEnum.RUNNING.getStatus());
-        variables.put(BpmnVariableConstants.PROCESS_INSTANCE_SKIP_EXPRESSION_ENABLED, true); // 跳过表达式需要添加此变量为
-        // true，不影响没配置
-        // skipExpression 的节点
+        variables.put(BpmnVariableConstants.PROCESS_INSTANCE_SKIP_EXPRESSION_ENABLED, true); // 跳过表达式需要添加此变量为 true，不影响没配置 skipExpression 的节点
         if (CollUtil.isNotEmpty(startUserSelectAssignees)) {
             // 设置流程变量，发起人自选审批人
             variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES,
                     startUserSelectAssignees);
-//            // 设置流程变量，审批人自选审批人
-//            variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES,
-//                    startUserSelectAssignees);
         }
 
         // 3. 创建流程
@@ -796,7 +785,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             return;
         }
 
-        // 2.1 移除掉不是发起人或者审批人自选审批人节点
+        // 2.1 移除掉不是发起人自选审批人节点
         activityNodes.removeIf(task ->
                 ObjectUtil.notEqual(BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy(), task.getCandidateStrategy()));
         // 2.2 流程发起时要先获取当前流程的预测走向节点，发起时只校验预测的节点发起人自选审批人的审批人和抄送人是否都配置了

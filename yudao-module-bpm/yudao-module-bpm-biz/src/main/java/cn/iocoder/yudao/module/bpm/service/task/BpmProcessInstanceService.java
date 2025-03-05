@@ -97,7 +97,7 @@ public interface BpmProcessInstanceService {
     BpmApprovalDetailRespVO getApprovalDetail(Long loginUserId, @Valid BpmApprovalDetailReqVO reqVO);
 
     /**
-     * 获取下一个执行节点信息。
+     * 获取下一个执行节点信息
      *
      * @param loginUserId 登录人的用户编号
      * @param reqVO 请求信息

@@ -21,7 +21,6 @@ import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskSignTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
@@ -277,13 +276,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return query.list();
     }
 
-    /**
-     * 校验任务是否存在，并且是否是分配给自己的任务
-     *
-     * @param userId 用户 id
-     * @param taskId task id
-     */
-    private Task validateTask(Long userId, String taskId) {
+    @Override
+    public Task validateTask(Long userId, String taskId) {
         Task task = validateTaskExist(taskId);
         // 为什么判断 assignee 非空的情况下？
         // 例如说：在审批人为空时，我们会有“自动审批通过”的策略，此时 userId 为 null，允许通过
@@ -552,12 +546,14 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 2.3 调用 BPM complete 去完成任务
         // 其中，variables 是存储动态表单到 local 任务级别。过滤一下，避免 ProcessInstance 系统级的变量被占用
         if (CollUtil.isNotEmpty(reqVO.getVariables())) {
-            // 校验传递的参数中是否为下一个将要执行的任务节点
+            // 校验并处理 APPROVE_USER_SELECT 当前审批人，选择下一节点审批人的逻辑
             Map<String, Object> variables = validateAndSetNextAssignees(task.getTaskDefinitionKey(), reqVO.getVariables(),
                     bpmnModel, reqVO.getNextAssignees(), instance);
+            // 完成任务
             runtimeService.setVariables(task.getProcessInstanceId(), variables);
             taskService.complete(task.getId(), variables, true);
         } else {
+            // 完成任务
             taskService.complete(task.getId());
         }
 
@@ -579,54 +575,52 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      * @param processInstance 流程实例
      */
     private Map<String, Object> validateAndSetNextAssignees(String taskDefinitionKey, Map<String, Object> variables, BpmnModel bpmnModel,
-                                       Map<String, List<Long>> nextAssignees, ProcessInstance processInstance) {
+                                                            Map<String, List<Long>> nextAssignees, ProcessInstance processInstance) {
         // 下一个节点参数为空，不做处理，表示流程正常流转，无需选择下一个节点的审判人
-        if (CollUtil.isEmpty(nextAssignees)){
+        // TODO @小北：会出现漏选，其实需要的情况哇？
+        if (CollUtil.isEmpty(nextAssignees)) {
             return variables;
         }
-        // 1. 获取当前任务节点的信息
+        // 1. 获取下一个将要执行的节点集合
         FlowElement flowElement = bpmnModel.getFlowElement(taskDefinitionKey);
-        // 2. 获取下一个将要执行的节点集合
         List<FlowNode> nextFlowNodes = getNextFlowNodes(flowElement, bpmnModel, variables);
+
+        // 2. 循环下一个将要执行的节点集合
         Map<String, List<Long>> processVariables = new HashMap<>();
-        // 3. 循环下一个将要执行的节点集合
         for (FlowNode nextFlowNode : nextFlowNodes) {
-            // 3.1 获取下一个将要执行节点中的审批人策略
-            Integer candidateStrategy = parseCandidateStrategy(nextFlowNode);
-            // 3.2 判断节点是否为执行节点，仅校验节点
             if (!nextAssignees.containsKey(nextFlowNode.getId())) {
                 throw exception(TASK_TARGET_NODE_NOT_EXISTS, nextFlowNode.getName());
             }
-            // 3.3 获取节点中的审批人
             List<Long> assignees = nextAssignees.get(nextFlowNode.getId());
-            // 3.4 流程变量
-            // 3.5 如果节点中的审批人策略为 发起人自选
+            // 2.1 情况一：如果节点中的审批人策略为 发起人自选
+            Integer candidateStrategy = parseCandidateStrategy(nextFlowNode);
             if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy())) {
                 processVariables = FlowableUtils.getStartUserSelectAssignees(processInstance.getProcessVariables());
-                if(processVariables == null){
+                if (processVariables == null) {
                     processVariables = new HashMap<>();
                 }
                 List<Long> startUserSelectAssignee = processVariables.get(nextFlowNode.getId());
-                // 如果当前节点已经存在审批人，则不允许覆盖
+                // 特殊：如果当前节点已经存在审批人，则不允许覆盖
                 if (CollUtil.isNotEmpty(startUserSelectAssignee)) {
                     continue;
                 }
                 // 如果节点存在，但未配置审批人
-                if (CollUtil.isEmpty(assignees)){
+                if (CollUtil.isEmpty(assignees)) {
                     throw exception(PROCESS_INSTANCE_START_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
                 }
                 // 校验通过的全部节点和审批人
                 processVariables.put(nextFlowNode.getId(), assignees);
                 variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES, processVariables);
             }
-            // 3.6 如果节点中的审批人策略为 审批人，在审批时选择下一个节点的审批人，并且该节点的审批人为空
-            if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy())){
+            // 2.2 情况二：如果节点中的审批人策略为 审批人，在审批时选择下一个节点的审批人，并且该节点的审批人为空
+            if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy())) {
                 // 如果节点存在，但未配置审批人
                 if (CollUtil.isEmpty(assignees)) {
                     throw exception(PROCESS_INSTANCE_APPROVE_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
                 }
                 // 校验通过的全部节点和审批人
                 processVariables.put(nextFlowNode.getId(), assignees);
+                // TODO @小北：是不是要类似情况一的做法，通过 PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES 拿一下？因为如果 task1 是审批人自选，task2 是审批人自选，看着会覆盖？
                 variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES, processVariables);
             }
         }
@@ -1094,6 +1088,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @SuppressWarnings("DataFlowIssue")
     public void deleteSignTask(Long userId, BpmTaskSignDeleteReqVO reqVO) {
         // 1.1 校验 task 可以被减签
         Task task = validateTaskCanSignDelete(reqVO.getId());

@@ -27,12 +27,14 @@ public class BpmnVariableConstants {
      * 流程实例的变量 - 发起用户选择的审批人 Map
      *
      * @see ProcessInstance#getProcessVariables()
+     * @see BpmTaskCandidateStrategyEnum#START_USER_SELECT
      */
     public static final String PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES = "PROCESS_START_USER_SELECT_ASSIGNEES";
     /**
      * 流程实例的变量 - 审批人选择的审批人 Map
      *
      * @see ProcessInstance#getProcessVariables()
+     * @see BpmTaskCandidateStrategyEnum#APPROVE_USER_SELECT
      */
     public static final String PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES = "PROCESS_APPROVE_USER_SELECT_ASSIGNEES";
     /**

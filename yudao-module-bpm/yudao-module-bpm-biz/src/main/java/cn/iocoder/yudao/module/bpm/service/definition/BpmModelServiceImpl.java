@@ -243,15 +243,15 @@ public class BpmModelServiceImpl implements BpmModelService {
         if (startEvent == null) {
             throw exception(MODEL_DEPLOY_FAIL_BPMN_START_EVENT_NOT_EXISTS);
         }
-        // 2. 校验第一个用户任务的规则类型是否为 审批人自选，如果是则抛出异常，第一个用户任务的规则类型不允许是审批人自选，因为会出现无审批人的情况
+        // 2. 校验第一个用户任务的规则类型是否为“审批人自选”，如果是则抛出异常。原因是，流程发起后，直接进入第一个用户任务，会出现无审批人的情况
         List<SequenceFlow> outgoingFlows = startEvent.getOutgoingFlows();
-        if (CollUtil.isNotEmpty(outgoingFlows)){
-            // 2.1 获取第一个用户任务节点
+        // TODO @小北：可能极端情况下，startEvent 后面接了个 serviceTask，接着才是 userTask。。。
+        // TODO @小北：simple 因为第一个任务是发起人，可能要找第二个任务？？？
+        if (CollUtil.isNotEmpty(outgoingFlows)) {
             FlowElement targetFlowElement = outgoingFlows.get(0).getTargetFlowElement();
-            // 2.2 获取审批人策略
             Integer candidateStrategy = parseCandidateStrategy(targetFlowElement);
-            if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy())){
-                throw exception(MODEL_DEPLOY_FAIL_BPMN_USER_TASK_RULE_TYPE_NOT_APPROVE_USER_SELECT, targetFlowElement.getName());
+            if (Objects.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy())) {
+                throw exception(MODEL_DEPLOY_FAIL_FIRST_USER_TASK_CANDIDATE_STRATEGY_ERROR, targetFlowElement.getName());
             }
         }
         // 3. 校验 UserTask 的 name 都配置了
