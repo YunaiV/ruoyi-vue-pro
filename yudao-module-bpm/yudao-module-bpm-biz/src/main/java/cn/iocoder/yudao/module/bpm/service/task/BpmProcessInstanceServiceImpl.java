@@ -149,7 +149,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     }
 
     private Map<String, String> getFormFieldsPermission(BpmnModel bpmnModel,
-                                                        String activityId, String taskId) {
+            String activityId, String taskId) {
         // 1. 获取流程活动编号。流程活动 Id 为空事，从流程任务中获取流程活动 Id
         if (StrUtil.isEmpty(activityId) && StrUtil.isNotEmpty(taskId)) {
             activityId = Optional.ofNullable(taskService.getHistoricTask(taskId))
