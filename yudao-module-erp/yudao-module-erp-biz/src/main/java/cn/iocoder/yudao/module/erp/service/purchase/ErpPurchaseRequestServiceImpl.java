@@ -149,7 +149,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void merge(ErpPurchaseRequestOrderReqVO reqVO) {
+    public Long merge(ErpPurchaseRequestOrderReqVO reqVO) {
         List<Long> itemIds = reqVO.getItems().stream().map(ErpPurchaseRequestOrderReqVO.requestItems::getId).toList();
         List<ErpPurchaseRequestItemsDO> itemsDOS = erpPurchaseRequestItemsMapper.selectByIds(itemIds);
         //Map<Long,ErpPurchaseRequestOrderReqVO.requestItems>
@@ -163,6 +163,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         //申请项关联订单
         itemsDOS.forEach(i -> i.setPurchaseOrderId(orderId));
         ThrowUtil.ifThrow(!erpPurchaseRequestItemsMapper.updateBatch(itemsDOS), GlobalErrorCodeConstants.DB_BATCH_UPDATE_ERROR);
+        return orderId;
     }
 
     @Override

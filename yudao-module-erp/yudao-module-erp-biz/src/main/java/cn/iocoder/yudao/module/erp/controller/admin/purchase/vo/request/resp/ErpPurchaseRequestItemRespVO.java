@@ -87,7 +87,7 @@ public class ErpPurchaseRequestItemRespVO extends BaseVO {
     // ========== 其他状态信息 ==========
     @Schema(description = "关闭状态（已关闭，已开启）")
     @ExcelProperty("关闭状态")
-    private String offStatus;
+    private Integer offStatus;
 
     @Schema(description = "未订购数量", example = "100")
     @ExcelProperty("未订购数量")
@@ -103,7 +103,7 @@ public class ErpPurchaseRequestItemRespVO extends BaseVO {
 
     @Schema(description = "行采购状态")
     @ExcelProperty("行采购状态")
-    private String orderStatus;
+    private Integer orderStatus;
 
     @Schema(description = "供应商id")
     @ExcelProperty("供应商id")

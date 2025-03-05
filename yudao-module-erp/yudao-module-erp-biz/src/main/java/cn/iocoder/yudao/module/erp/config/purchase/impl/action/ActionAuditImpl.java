@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_BATCH_UPDATE_ERROR;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_UPDATE_ERROR;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PURCHASE_REQUEST_PROCESS_FAIL_CLOSE;
@@ -49,15 +50,11 @@ public class ActionAuditImpl implements Action<ErpAuditStatus, ErpEventEnum, Erp
             // 设置批准数量
             itemsDOS.forEach(itemDO -> {
                 ErpPurchaseRequestAuditStatusReqVO.requestItems item = itemMap.get(itemDO.getId());
-                if (item != null) {
-                    itemDO.setApproveCount(item.getApproveCount());
-                } else {
-                    itemDO.setApproveCount(itemDO.getCount());//默认申请数量
-                }
+                itemDO.setApproveCount(item.getApproveCount() == null ? itemDO.getCount() : item.getApproveCount());//默认(批准数量 = 申请数量)
             });
-            //设置审核时间
-            requestDO.setAuditTime(LocalDateTime.now());
+            //设置审核意见
             requestDO.setReviewComment(req.getReviewComment());
+            requestDO.setAuditTime(LocalDateTime.now());
             requestDO.setAuditorId(getLoginUserId());
         }
         //审核不通过(设置未通过意见)
@@ -67,10 +64,12 @@ public class ActionAuditImpl implements Action<ErpAuditStatus, ErpEventEnum, Erp
         //反审核
         if (ErpAuditStatus.DRAFT.getCode().equals(to.getCode())) {
             //设置审核时间
-            requestDO.setAuditTime(null);
+            requestDO.setAuditTime(LocalDateTime.now());
+            requestDO.setAuditorId(getLoginUserId());
         }
         //持久化变更状态
         requestDO.setStatus(to.getCode());
+        ThrowUtil.ifThrow(!itemsMapper.updateBatch(itemsDOS), DB_BATCH_UPDATE_ERROR);
         ThrowUtil.ifSqlThrow(mapper.updateById(requestDO), DB_UPDATE_ERROR);
         log.info("审核状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(requestDO), from.getDesc(), to.getDesc());
     }

@@ -128,8 +128,8 @@ public class ErpPurchaseRequestController {
     @Operation(summary = "合并采购")
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:merge')")
     public CommonResult<Long> mergePurchaseOrder(@Validated @RequestBody ErpPurchaseRequestOrderReqVO reqVO) {
-        erpPurchaseRequestService.merge(reqVO);
-        return null;
+        Long orderId = erpPurchaseRequestService.merge(reqVO);
+        return success(orderId);
     }
 
     @PutMapping("/enableStatus")

@@ -42,7 +42,7 @@ public class ErpPurchaseInSaveReqVO {
     @Schema(description = "入库审核状态")
     private Integer auditorStatus;
 
-    @Schema(description = "结算日期", example = "2025-1-1")
+    @Schema(description = "结算日期")
     private LocalDateTime settlementDate;
 
     @Schema(description = "结算账户编号", example = "31189")
