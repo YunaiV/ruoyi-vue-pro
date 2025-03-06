@@ -2,11 +2,13 @@ package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderAuditReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
@@ -63,8 +65,8 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createPurchaseOrder(ErpPurchaseOrderSaveReqVO createReqVO) {
-        //TODO 编号重复性校验
-
+        // 校验编号
+        validatePurchaseOrderExists(createReqVO.getNo());
         // 1.1 校验订单项的有效性
         List<ErpPurchaseOrderItemDO> purchaseOrderItems = validatePurchaseOrderItems(createReqVO.getItems());
         // 1.2 校验供应商
@@ -77,13 +79,13 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         String no = noRedisDAO.generate(ErpNoRedisDAO.PURCHASE_ORDER_NO_PREFIX, PURCHASE_ORDER_NO_OUT_OF_BOUNDS);
         ThrowUtil.ifThrow(purchaseOrderMapper.selectByNo(no) != null, PURCHASE_ORDER_NO_EXISTS);
         // 2.1 插入订单
-        ErpPurchaseOrderDO purchaseOrder = BeanUtils.toBean(createReqVO, ErpPurchaseOrderDO.class, in -> in.setNo(no).setStatus(ErpAuditStatus.PENDING_REVIEW.getCode()));//设置审核状态,默认未审核
+        ErpPurchaseOrderDO purchaseOrder = BeanUtils.toBean(createReqVO, ErpPurchaseOrderDO.class, in -> in.setNo(no));
         calculateTotalPrice(purchaseOrder, purchaseOrderItems);
         // 2.1.1 插入单据日期+结算日期
         purchaseOrder.setNoTime(LocalDateTime.now());
         purchaseOrder.setSettlementDate(createReqVO.getSettlementDate() == null ? LocalDateTime.now() : createReqVO.getSettlementDate());
 
-        purchaseOrderMapper.insert(purchaseOrder);
+        ThrowUtil.ifSqlThrow(purchaseOrderMapper.insert(purchaseOrder), GlobalErrorCodeConstants.DB_INSERT_ERROR);
         // 2.2 插入订单项
         purchaseOrderItems.forEach(o -> o.setOrderId(purchaseOrder.getId()));
         purchaseOrderItemMapper.insertBatch(purchaseOrderItems);
@@ -93,6 +95,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePurchaseOrder(ErpPurchaseOrderSaveReqVO updateReqVO) {
+        validatePurchaseOrderExists(updateReqVO.getNo());
         // 1.1 校验存在,校验不处于已审批+TODO 已关闭+手动关闭
         ErpPurchaseOrderDO purchaseOrder = validatePurchaseOrderExists(updateReqVO.getId());
         if (ErpAuditStatus.APPROVED.getCode().equals(purchaseOrder.getStatus())) {
@@ -115,6 +118,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         updatePurchaseOrderItemList(updateReqVO.getId(), purchaseOrderItems);
     }
 
+    //计算采购订单的总价、税费、折扣价格
     private void calculateTotalPrice(ErpPurchaseOrderDO purchaseOrder, List<ErpPurchaseOrderItemDO> purchaseOrderItems) {
         purchaseOrder.setTotalCount(getSumValue(purchaseOrderItems, ErpPurchaseOrderItemDO::getCount, BigDecimal::add));
         purchaseOrder.setTotalProductPrice(getSumValue(purchaseOrderItems, ErpPurchaseOrderItemDO::getTotalPrice, BigDecimal::add, BigDecimal.ZERO));
@@ -126,6 +130,14 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         }
         purchaseOrder.setDiscountPrice(MoneyUtils.priceMultiplyPercent(purchaseOrder.getTotalPrice(), purchaseOrder.getDiscountPercent()));
         purchaseOrder.setTotalPrice(purchaseOrder.getTotalPrice().subtract(purchaseOrder.getDiscountPrice()));
+    }
+
+    //检查订单No的编号唯一
+    private void validatePurchaseOrderExists(String No) {
+        ErpPurchaseOrderDO purchaseOrder = purchaseOrderMapper.selectByNo(No);
+        if (purchaseOrder != null) {
+            throw exception(PURCHASE_ORDER_CODE_DUPLICATE, No);
+        }
     }
 
     @Override
@@ -292,4 +304,18 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         return purchaseOrderItemMapper.selectListByOrderIds(orderIds);
     }
 
+    @Override
+    public void submitAudit(Collection<Long> itemIds) {
+        //TODO 提交审核
+    }
+
+    @Override
+    public void reviewPurchaseOrder(ErpPurchaseOrderAuditReqVO req) {
+        //TODO 审核/反审核
+    }
+
+    @Override
+    public void switchPurchaseOrderStatus(Collection<Long> itemIds, Boolean open) {
+        //TODO 开/关
+    }
 }

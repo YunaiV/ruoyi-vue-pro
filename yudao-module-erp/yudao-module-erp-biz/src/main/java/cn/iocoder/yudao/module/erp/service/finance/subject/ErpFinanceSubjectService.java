@@ -3,8 +3,11 @@ package cn.iocoder.yudao.module.erp.service.finance.subject;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.erp.controller.admin.finance.subject.vo.ErpFinanceSubjectPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.finance.subject.vo.ErpFinanceSubjectSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.finance.subject.vo.ErpFinanceSubjectSimpleRespVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.finance.subject.ErpFinanceSubjectDO;
 import jakarta.validation.Valid;
+
+import java.util.List;
 
 /**
  * Erp财务主体 Service 接口
@@ -51,4 +54,5 @@ public interface ErpFinanceSubjectService {
      */
     PageResult<ErpFinanceSubjectDO> getFinanceSubjectPage(ErpFinanceSubjectPageReqVO pageReqVO);
 
+    List<ErpFinanceSubjectSimpleRespVO> ListFinanceSubjectSimple();
 }

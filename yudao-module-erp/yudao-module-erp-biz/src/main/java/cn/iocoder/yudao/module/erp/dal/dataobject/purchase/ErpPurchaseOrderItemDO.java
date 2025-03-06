@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.purchase;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -25,7 +26,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErpPurchaseOrderItemDO extends BaseDO {
+public class ErpPurchaseOrderItemDO extends TenantBaseDO {
     /**
      * 编号
      */
@@ -62,7 +63,7 @@ public class ErpPurchaseOrderItemDO extends BaseDO {
      */
     private Long productUnitId;
     /**
-     * 备注
+     * 商品行备注
      */
     private String remark;
     // ========== 合计 ==========
@@ -71,7 +72,7 @@ public class ErpPurchaseOrderItemDO extends BaseDO {
      */
     private BigDecimal productPrice;
     /**
-     * 数量
+     * 下单数量
      */
     private BigDecimal count;
     /**
@@ -124,7 +125,6 @@ public class ErpPurchaseOrderItemDO extends BaseDO {
      */
     private BigDecimal returnCount;
     // ========== 其他 ==========
-    private String xCode;
     /**
      * 交货日期
      */
@@ -150,4 +150,6 @@ public class ErpPurchaseOrderItemDO extends BaseDO {
      * {@link ErpPurchaseRequestItemsDO#getId()}
      */
     private Long purchaseApplyItemId;
+    private String xCode;//x码
+    private String containerRate;//箱率
 }

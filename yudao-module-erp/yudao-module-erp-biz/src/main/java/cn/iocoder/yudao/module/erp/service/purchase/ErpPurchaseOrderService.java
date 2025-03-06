@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderAuditReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -107,4 +109,14 @@ public interface ErpPurchaseOrderService {
      */
     List<ErpPurchaseOrderItemDO> getPurchaseOrderItemListByOrderIds(Collection<Long> orderIds);
 
+    /**
+     * 审核采购订单
+     *
+     * @param itemIds 采购订单项
+     */
+    void submitAudit(@NotNull Collection<Long> itemIds);
+
+    void reviewPurchaseOrder(ErpPurchaseOrderAuditReqVO req);
+
+    void switchPurchaseOrderStatus(Collection<Long> itemIds, Boolean open);
 }

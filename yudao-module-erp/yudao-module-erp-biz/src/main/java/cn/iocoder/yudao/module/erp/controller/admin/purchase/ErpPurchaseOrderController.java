@@ -9,14 +9,15 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderAuditReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderBaseRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.tools.validation;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
-import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseOrderService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
@@ -32,15 +33,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -75,14 +76,14 @@ public class ErpPurchaseOrderController {
     @PostMapping("/create")
     @Operation(summary = "创建采购订单")
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:create')")
-    public CommonResult<Long> createPurchaseOrder(@Valid @RequestBody ErpPurchaseOrderSaveReqVO createReqVO) {
+    public CommonResult<Long> createPurchaseOrder(@Validated(validation.OnCreate.class) @RequestBody ErpPurchaseOrderSaveReqVO createReqVO) {
         return success(purchaseOrderService.createPurchaseOrder(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新采购订单")
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:update')")
-    public CommonResult<Boolean> updatePurchaseOrder(@Valid @RequestBody ErpPurchaseOrderSaveReqVO updateReqVO) {
+    public CommonResult<Boolean> updatePurchaseOrder(@Validated(validation.OnUpdate.class)@RequestBody ErpPurchaseOrderSaveReqVO updateReqVO) {
         purchaseOrderService.updatePurchaseOrder(updateReqVO);
         return success(true);
     }
@@ -140,25 +141,78 @@ public class ErpPurchaseOrderController {
         ExcelUtils.write(response, "采购订单.xls", "数据", ErpPurchaseOrderBaseRespVO.class, voList);
     }
 
+    @PutMapping("/submitAudit")
+    @Operation(summary = "提交审核")
+    @Parameter(name = "itemIds", description = "订单下的订单项Id集合", required = true)
+    @PreAuthorize("@ss.hasPermission('erp:purchase-order:submitAudit')")
+    public CommonResult<Boolean> submitAudit(@NotNull @RequestBody Collection<Long> itemIds) {
+        purchaseOrderService.submitAudit(itemIds);
+        return success(true);
+    }
+
+    @PostMapping("/auditStatus")
+    @Operation(summary = "审核/反审核")
+    @Parameter(name = "requestId", description = "申请单编号", required = true)
+    @Parameter(name = "reviewed", description = "审核状态", required = true)
+    @PreAuthorize("@ss.hasPermission('erp:purchase-order:review')")
+    public CommonResult<Boolean> reviewPurchaseRequest(@Validated @RequestBody ErpPurchaseOrderAuditReqVO req) {
+        purchaseOrderService.reviewPurchaseOrder(req);
+        return success(true);
+    }
+
+//    @PostMapping("/merge")
+//    @Operation(summary = "合并入库")
+//    @PreAuthorize("@ss.hasPermission('erp:purchase-order:merge')")
+//    public CommonResult<Long> mergePurchaseOrder(@Validated @RequestBody ErpPurchaseRequestOrderReqVO reqVO) {
+//        Long orderId = purchaseOrderService.merge(reqVO);
+//        return success(orderId);
+//    }
+//
+    @PutMapping("/enableStatus")
+    @Operation(summary = "关闭/启用")
+    @PreAuthorize("@ss.hasPermission('erp:purchasereq-order:enable')")
+    public CommonResult<Boolean> switchPurchaseOrderStatus(@Validated(validation.OnSwitch.class) @RequestBody ErpPurchaseOrderAuditReqVO reqVO) {
+        //获得reqVO的item的ids
+        List<Long> itemIds = reqVO.getItems().stream().map(ErpPurchaseOrderAuditReqVO.requestItems::getId).collect(Collectors.toSet()).stream().toList();
+        purchaseOrderService.switchPurchaseOrderStatus(itemIds, reqVO.getOpen());
+        return success(true);
+    }
+
+
     private List<ErpPurchaseOrderBaseRespVO> bindList(List<ErpPurchaseOrderDO> list) {
 
         // 1.1 订单项
         List<ErpPurchaseOrderItemDO> purchaseOrderItemList = purchaseOrderService.getPurchaseOrderItemListByOrderIds(
             convertSet(list, ErpPurchaseOrderDO::getId));
         Map<Long, List<ErpPurchaseOrderItemDO>> purchaseOrderItemMap = convertMultiMap(purchaseOrderItemList, ErpPurchaseOrderItemDO::getOrderId);
-        // 1.2 产品信息
+        // 1.2 产品
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
             convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getProductId));
-        // 1.3 供应商信息
+        // 1.3 供应商
         Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(
             convertSet(list, ErpPurchaseOrderDO::getSupplierId));
-        // 1.4 管理员信息
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-            convertSet(list, purchaseOrder -> Long.parseLong(purchaseOrder.getCreator())));
-        // 1.5 部门信息
+        // 1.4 人员
+        Set<Long> userIds = Stream.concat(
+                list.stream()
+                    .flatMap(orderDO -> Stream.of(
+                        orderDO.getAuditorId(),//审核者
+                        safeParseLong(orderDO.getCreator()),
+                        safeParseLong(orderDO.getUpdater())
+                    )),
+                purchaseOrderItemList.stream()
+                    .flatMap(orderItemDO -> Stream.of(
+                        safeParseLong(orderItemDO.getCreator()),
+                        safeParseLong(orderItemDO.getUpdater())
+                    ))
+            )
+            .distinct()
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
+        // 1.5 部门
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
             convertSet(list, ErpPurchaseOrderDO::getDepartmentId));
-        // 1.6 获取仓库信息
+        // 1.6 仓库
         Map<Long, ErpWarehouseDO> warehouseMap = erpWarehouseService.getWarehouseMap(
             convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getWarehouseId));
 
@@ -167,25 +221,39 @@ public class ErpPurchaseOrderController {
         return BeanUtils.toBean(list, ErpPurchaseOrderBaseRespVO.class, purchaseOrder -> {
             purchaseOrder.setItems(BeanUtils.toBean(purchaseOrderItemMap.get(purchaseOrder.getId()), ErpPurchaseOrderBaseRespVO.Item.class,
                 item -> {
-                    //设置产品信息
+                    //设置产品
                     MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
                         .setProductBarCode(product.getBarCode())
                         .setProductUnitName(product.getUnitName()));
-                    // 设置仓库信息
+                    // 设置仓库
                     MapUtils.findAndThen(warehouseMap, item.getWarehouseId(), erpWarehouseDO -> item.setWarehouseName(erpWarehouseDO.getName()));
                 }));
-            purchaseOrder.setProductNames(CollUtil.join(purchaseOrder.getItems(), "，", ErpPurchaseOrderBaseRespVO.Item::getProductName));//设置订单下的产品信息
-            purchaseOrder.setStatusDesc(ErpAuditStatus.getDescriptionByCode(purchaseOrder.getStatus()));//设置采购状态
-            MapUtils.findAndThen(supplierMap, purchaseOrder.getSupplierId(), supplier -> purchaseOrder.setSupplierName(supplier.getName()));
+            purchaseOrder.setProductNames(CollUtil.join(purchaseOrder.getItems(), "，", ErpPurchaseOrderBaseRespVO.Item::getProductName));//设置订单下的产品
+//            MapUtils.findAndThen(supplierMap, purchaseOrder.getSupplierId(), supplier -> purchaseOrder.setSupplierName(supplier.getName()));
             //设置创建人的部门name
-            MapUtils.findAndThen(deptMap, adminUserApi.getUser(Long.parseLong(purchaseOrder.getCreator())).getDeptId(), deptRespDTO -> purchaseOrder.setDepartmentName(deptRespDTO.getName()));
+//            MapUtils.findAndThen(deptMap, adminUserApi.getUser(Long.parseLong(purchaseOrder.getCreator())).getDeptId(), deptRespDTO -> purchaseOrder.setDepartmentName(deptRespDTO.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(purchaseOrder.getCreator()), user -> purchaseOrder.setCreator(user.getNickname()));
             //设置审核人的name
             Optional.ofNullable(purchaseOrder.getAuditor()).ifPresent(auditor->
                 MapUtils.findAndThen(userMap,Long.parseLong(auditor),user->purchaseOrder.setAuditorName(user.getNickname()))
             );
+            //创建者、更新者、审核人、申请人填充
             //设置币别name
 
         });
+    }
+
+    /**
+     * 安全转换id为 Long
+     *
+     * @param value String类型的id
+     * @return id
+     */
+    private Long safeParseLong(String value) {
+        try {
+            return Optional.ofNullable(value).map(Long::parseLong).orElse(null);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 }

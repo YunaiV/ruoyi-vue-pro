@@ -10,7 +10,7 @@ import java.util.List;
 @Schema(description = "管理后台 - ERP采购申请单子开/关 Request VO")
 @Data
 @Builder
-public class ErpPurchaseRequestEnableStatusReqVO {
+public class ErpPurchaseRequestEnableReqVO {
 
     @Schema(description = "申请单商品ids")
     @NotNull(message = "申请单商品ids不能为空")

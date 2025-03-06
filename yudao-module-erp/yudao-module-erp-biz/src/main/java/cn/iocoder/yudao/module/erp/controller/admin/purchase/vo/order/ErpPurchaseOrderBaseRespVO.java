@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order;
 
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.base.ErpPurchaseBaseRespVO;
+import cn.iocoder.yudao.framework.mybatis.core.vo.BaseVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.resp.ErpPurchaseRequestItemRespVO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ContentStyle;
 import com.alibaba.excel.enums.BooleanEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -16,161 +17,151 @@ import java.util.List;
 @Schema(description = "管理后台 - ERP 采购订单 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class ErpPurchaseOrderBaseRespVO extends ErpPurchaseBaseRespVO {
+public class ErpPurchaseOrderBaseRespVO extends BaseVO {
 
-    @Schema(description = "采购单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "XS001")
+    @Schema(description = "id")
+    private Long id;
+    @Schema(description = "采购单编号")
     @ExcelProperty("采购单编号")
     private String no;
-
-    @Schema(description = "单据日期", example = "2024-10-12")
+    @Schema(description = "单据日期")
     private LocalDateTime noTime;
-
-    @Schema(description = "采购状态编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @ExcelProperty("采购状态编号")
-    private Integer status;
-
-    @Schema(description = "采购状态描述", example = "审核中")
+    @Schema(description = "采购状态描述")
     @ExcelProperty("采购状态")
     private String statusDesc;
-
-    @Schema(description = "采购时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "采购时间")
     @ExcelProperty("采购时间")
     private LocalDateTime orderTime;
-
-    @Schema(description = "订单项列表", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "订单项列表")
     private List<Item> items;
-
-    @Schema(description = "产品信息", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "产品信息")
     @ExcelProperty("产品信息")
     private String productNames;
-
     // ========== 采购入库 ==========
-
-    @Schema(description = "订单采购入库数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
+    @Schema(description = "订单采购入库数量")
     private BigDecimal totalInCount;
-
     // ========== 采购退货（出库）） ==========
-
-    @Schema(description = "订单采购退货数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
+    @Schema(description = "订单采购退货数量")
     private BigDecimal totalReturnCount;
-
-    @Schema(description = "交货日期", example = "2025-1-1")
+    @Schema(description = "交货日期")
     private LocalDateTime deliveryDate;
-
     // ========== 审核信息 ==========
-
     @Schema(description = "审核者id")
     @ExcelProperty("审核者id")
     private String auditor;
     private Long auditorId;
-
     @Schema(description = "审核人名称")
     @ExcelProperty("审核人名称")
     private String auditorName;
-
     @Schema(description = "审核时间")
     @ExcelProperty("审核时间")
     @ContentStyle(shrinkToFit = BooleanEnum.TRUE)
     private LocalDateTime auditTime;
+    @Schema(description = "审核状态")
+    private Integer auditStatus;
+    @Schema(description = "开关状态")
+    private Integer offStatus;
+    @Schema(description = "支付状态")
+    private Integer orderStatus;
+    @Schema(description = "执行状态")
+    private Integer executeStatus;
+    //入库状态
+    @Schema(description = "入库状态")
+    private Integer inStatus;
+    //付款状态
+    @Schema(description = "付款状态")
+    private Integer payStatus;
+    @Schema(description = "备注")
+    private String remark;
     @Data
-    public static class Item {
-
-        @Schema(description = "订单项编号", example = "11756")
+    public static class Item extends BaseVO {
+        @Schema(description = "订单项编号")
         private Long id;
-
-        @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "产品编号")
         private Long productId;
-
-        @Schema(description = "产品单位单位", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "产品单位单位")
         private Long productUnitId;
-
-        @Schema(description = "产品单价", example = "100.00")
-        private BigDecimal productPrice;
-
         @Schema(description = "币别名称")
         private Long currencyName;
-
-        @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
-        @NotNull(message = "产品数量不能为空")
+        @Schema(description = "产品下单数量")
         private BigDecimal count;
-
-        @Schema(description = "税率，百分比", example = "99.88")
+        @Schema(description = "产品单价")
+        private BigDecimal productPrice;
+        @Schema(description = "税率，百分比")
         private BigDecimal taxPercent;
-
-        @Schema(description = "税额，单位：元", example = "100.00")
+        @Schema(description = "税额，单位：元")
         private BigDecimal taxPrice;
-
         @Schema(description = "价税合计")
         private BigDecimal allAmount;
-
-        @Schema(description = "备注")
+        @Schema(description = "商品行备注")
         private String remark;
-
         @Schema(description = "供应商付款条款")
         private String supplierRule;
-
         // ========== 采购入库 ==========
-
-        @Schema(description = "采购入库数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
+        @Schema(description = "采购入库数量")
         private BigDecimal inCount;
-
         // ========== 采购退货（入库）） ==========
-
-        @Schema(description = "采购退货数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
+        @Schema(description = "采购退货数量")
         private BigDecimal returnCount;
-
         // ========== 关联字段 ==========
-
-        @Schema(description = "产品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "巧克力")
+        @Schema(description = "产品名称")
         private String productName;
-        @Schema(description = "产品单位名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "盒")
+        @Schema(description = "产品单位名称")
         private String productUnitName;
-        @Schema(description = "产品条码", requiredMode = Schema.RequiredMode.REQUIRED, example = "A9985")
+        @Schema(description = "产品条码")
         private String productBarCode;
-
         // ========== 产品库存相关 ==========
         @Schema(description = "产品存放仓库编号")
         private Long warehouseId; // 该字段仅仅在“详情”和“编辑”时使用
         @Schema(description = "产品存放仓库名称")
         private String warehouseName; // 该字段仅仅在“详情”和“编辑”时使用
-
         @Schema(description = "报关品名-产品(产品的品牌)")
         private String customsDeclaration;
-
         @Schema(description = "源单行号")
         private int srcSeq;
-
-//        private String srcBillTypeId;// 源单类型ID
+        //        private String srcBillTypeId;// 源单类型ID
         @Schema(description = "源单类型")
         private String srcBillTypeName;
-
         @Schema(description = "源单单号")
         private int srcNo;
-
         @Schema(description = "x码")
         private String xCode;
-
         @Schema(description = "箱率")
         private String containerRate;//箱率
-
         @Schema(description = "型号规格型号")
         private String model;
         // ========== 带出 ==========
-        //采购申请No
-        @Schema(description = "采购申请No")
-        private String purchaseApplyNo;
-        //部门名称
-        @Schema(description = "部门名称", example = "IT 部")
-        private String deptName;
-        //申请人
-        @Schema(description = "申请人", example = "张三")
-        private String applyUserName;
-        //申请日期
-        @Schema(description = "申请日期")
-        private LocalDateTime applyTime;
-        //制单人
-        @Schema(description = "制单人", example = "李四")
-        private String createUserName;
+        @Schema(description = "可用库存")
+        private BigDecimal availableStock;
+        @Schema(description = "已入库数量")
+        private BigDecimal inCounted;
+        /**
+         * 关闭状态
+         */
+        @Schema(description = "关闭状态")
+        private Integer offStatus;
+        /**
+         * 执行状态
+         */
+        @Schema(description = "执行状态")
+        private Integer executeStatus;
+        /**
+         * 入库状态
+         */
+        @Schema(description = "入库状态")
+        private Integer inStatus;
+        /**
+         * 付款状态
+         */
+        @Schema(description = "付款状态")
+        private Integer payStatus;
+        /**
+         * 采购申请项ID
+         * {@link ErpPurchaseRequestItemsDO#getId()}
+         */
+        @Schema(description = "采购申请项ID")
+        private Long purchaseApplyItemId;
+        @Schema(description = "申请项")
+        private ErpPurchaseRequestItemRespVO purchaseRequestItem;
     }
-
 }

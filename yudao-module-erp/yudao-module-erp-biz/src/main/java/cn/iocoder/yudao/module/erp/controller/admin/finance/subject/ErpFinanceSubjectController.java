@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.finance.subject.vo.ErpFinanceSubjectPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.finance.subject.vo.ErpFinanceSubjectRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.finance.subject.vo.ErpFinanceSubjectSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.finance.subject.vo.ErpFinanceSubjectSimpleRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.tool.Validation;
 import cn.iocoder.yudao.module.erp.dal.dataobject.finance.subject.ErpFinanceSubjectDO;
 import cn.iocoder.yudao.module.erp.service.finance.subject.ErpFinanceSubjectService;
@@ -19,6 +20,9 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -69,6 +73,13 @@ public class ErpFinanceSubjectController {
     public CommonResult<ErpFinanceSubjectRespVO> getFinanceSubject(@NotNull @RequestParam("id") Long id) {
         ErpFinanceSubjectDO financeSubject = financeSubjectService.getFinanceSubject(id);
         return success(BeanUtils.toBean(financeSubject, ErpFinanceSubjectRespVO.class));
+    }
+
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得Erp财务主体精简列表", description = "只包含被开启的财务主体，主要用于前端的下拉选项")
+    public CommonResult<List<ErpFinanceSubjectSimpleRespVO>> getWarehouseSimpleList() {
+        List<ErpFinanceSubjectSimpleRespVO> respVOS = financeSubjectService.ListFinanceSubjectSimple();
+        return success(respVOS);
     }
 
     @GetMapping("/page")

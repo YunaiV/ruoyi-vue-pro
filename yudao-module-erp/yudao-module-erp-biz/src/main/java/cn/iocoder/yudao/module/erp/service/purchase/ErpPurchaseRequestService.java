@@ -94,7 +94,7 @@ public interface ErpPurchaseRequestService {
      *
      * @param req 审核采购订单的请求对象，包含了采购订单的ID和审核状态等信息。
      */
-    void reviewPurchaseOrder(ErpPurchaseRequestAuditStatusReqVO req);
+    void reviewPurchaseOrder(ErpPurchaseRequestAuditReqVO req);
 
     /**
      * 提交审核

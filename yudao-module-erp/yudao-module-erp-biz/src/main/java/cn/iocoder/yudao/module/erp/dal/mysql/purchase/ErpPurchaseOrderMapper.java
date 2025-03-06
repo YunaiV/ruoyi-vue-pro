@@ -71,5 +71,4 @@ public interface ErpPurchaseOrderMapper extends BaseMapperX<ErpPurchaseOrderDO> 
     default ErpPurchaseOrderDO selectByNo(String no) {
         return selectOne(ErpPurchaseOrderDO::getNo, no);
     }
-
 }

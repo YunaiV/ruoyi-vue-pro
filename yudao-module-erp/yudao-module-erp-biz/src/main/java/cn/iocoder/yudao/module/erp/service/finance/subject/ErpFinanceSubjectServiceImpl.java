@@ -4,11 +4,18 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.finance.subject.vo.ErpFinanceSubjectPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.finance.subject.vo.ErpFinanceSubjectSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.finance.subject.vo.ErpFinanceSubjectSimpleRespVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.finance.subject.ErpFinanceSubjectDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.finance.subject.ErpFinanceSubjectMapper;
 import jakarta.annotation.Resource;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.FINANCE_SUBJECT_NOT_EXISTS;
@@ -35,6 +42,8 @@ public class ErpFinanceSubjectServiceImpl implements ErpFinanceSubjectService {
     }
 
     @Override
+    @CachePut(value = "erp:finance-subject", key = "#updateReqVO.id")
+    @Transactional(rollbackFor = Exception.class)
     public void updateFinanceSubject(ErpFinanceSubjectSaveReqVO updateReqVO) {
         // 校验存在
         validateFinanceSubjectExists(updateReqVO.getId());
@@ -44,6 +53,7 @@ public class ErpFinanceSubjectServiceImpl implements ErpFinanceSubjectService {
     }
 
     @Override
+    @CacheEvict(value = "erp:finance-subject", allEntries = true)
     public void deleteFinanceSubject(Long id) {
         // 校验存在
         validateFinanceSubjectExists(id);
@@ -58,13 +68,21 @@ public class ErpFinanceSubjectServiceImpl implements ErpFinanceSubjectService {
     }
 
     @Override
+    @Cacheable(value = "erp:finance-subject", key = "#id")
     public ErpFinanceSubjectDO getFinanceSubject(Long id) {
         return financeSubjectMapper.selectById(id);
     }
 
     @Override
+    @Cacheable(value = "erp:finance-subject", key = "#pageReqVO.pageNo + '-' + #pageReqVO.pageSize", unless = "#result == null")
     public PageResult<ErpFinanceSubjectDO> getFinanceSubjectPage(ErpFinanceSubjectPageReqVO pageReqVO) {
         return financeSubjectMapper.selectPage(pageReqVO);
     }
 
+    @Override
+    @Cacheable(value = "erp:finance-subject", key = "'simple-list'", unless = "#result == null")
+    public List<ErpFinanceSubjectSimpleRespVO> ListFinanceSubjectSimple() {
+        List<ErpFinanceSubjectDO> subjectDOS = financeSubjectMapper.selectListSimple();
+        return BeanUtils.toBean(subjectDOS, ErpFinanceSubjectSimpleRespVO.class);
+    }
 }

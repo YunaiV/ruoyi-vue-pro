@@ -11,7 +11,7 @@ import java.util.List;
 @Schema(description = "管理后台 - ERP采购申请单审核状态 Request VO")
 @Data
 @Builder
-public class ErpPurchaseRequestAuditStatusReqVO {
+public class ErpPurchaseRequestAuditReqVO {
     // 请求ID
     @NotNull(message = "申请单ID不能为空")
     @Schema(description = "申请单ID", requiredMode = Schema.RequiredMode.REQUIRED)

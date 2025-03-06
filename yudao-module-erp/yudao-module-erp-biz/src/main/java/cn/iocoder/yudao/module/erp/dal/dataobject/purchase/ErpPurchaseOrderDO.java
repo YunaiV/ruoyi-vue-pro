@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.purchase;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpAccountDO;
 import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -24,7 +25,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErpPurchaseOrderDO extends BaseDO {
+public class ErpPurchaseOrderDO extends TenantBaseDO {
     // ========== 基本信息 ==========
     @TableId
     private Long id;
@@ -127,6 +128,15 @@ public class ErpPurchaseOrderDO extends BaseDO {
      * 采购主体id
      */
     private Long purchaseEntityId;
+
+    /**
+     * 收货地址
+     */
+    private String address;
+    /**
+     * 付款条款
+     */
+    private String paymentTerms;
     // ========== 采购入库 ==========
     /**
      * 采购入库数量
@@ -147,9 +157,6 @@ public class ErpPurchaseOrderDO extends BaseDO {
      */
     private String completionJson;
 
-    private String xCode;//x码
-
-    private String containerRate;//箱率
     /**
      * 关闭状态
      */

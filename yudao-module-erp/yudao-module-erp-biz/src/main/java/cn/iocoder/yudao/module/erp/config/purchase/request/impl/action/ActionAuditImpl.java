@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.erp.config.purchase.request.impl.action;
 
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestAuditStatusReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestAuditReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestItemsMapper;
@@ -31,7 +31,7 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PURCHASE_REQU
 
 @Slf4j
 @Component
-public class ActionAuditImpl implements Action<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestAuditStatusReqVO> {
+public class ActionAuditImpl implements Action<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestAuditReqVO> {
     @Autowired
     private ErpPurchaseRequestMapper mapper;
     @Autowired
@@ -39,17 +39,17 @@ public class ActionAuditImpl implements Action<ErpAuditStatus, ErpEventEnum, Erp
 
     @Override
     @Transactional
-    public void execute(ErpAuditStatus from, ErpAuditStatus to, ErpEventEnum event, ErpPurchaseRequestAuditStatusReqVO req) {
+    public void execute(ErpAuditStatus from, ErpAuditStatus to, ErpEventEnum event, ErpPurchaseRequestAuditReqVO req) {
         ErpPurchaseRequestDO requestDO = mapper.selectById(req.getRequestId());
         List<ErpPurchaseRequestItemsDO> itemsDOS = itemsMapper.selectListByRequestId(req.getRequestId());
         validate(from, to, event, requestDO);
         //审核通过(批准数量)
         if (ErpAuditStatus.APPROVED.getCode().equals(to.getCode())) {
-            Map<Long, ErpPurchaseRequestAuditStatusReqVO.requestItems> itemMap = req.getItems().stream()
-                .collect(Collectors.toMap(ErpPurchaseRequestAuditStatusReqVO.requestItems::getId, item -> item));
+            Map<Long, ErpPurchaseRequestAuditReqVO.requestItems> itemMap = req.getItems().stream()
+                .collect(Collectors.toMap(ErpPurchaseRequestAuditReqVO.requestItems::getId, item -> item));
             // 设置批准数量
             itemsDOS.forEach(itemDO -> {
-                ErpPurchaseRequestAuditStatusReqVO.requestItems item = itemMap.get(itemDO.getId());
+                ErpPurchaseRequestAuditReqVO.requestItems item = itemMap.get(itemDO.getId());
                 itemDO.setApproveCount(item.getApproveCount() == null ? itemDO.getCount() : item.getApproveCount());//默认(批准数量 = 申请数量)
             });
             //设置审核意见

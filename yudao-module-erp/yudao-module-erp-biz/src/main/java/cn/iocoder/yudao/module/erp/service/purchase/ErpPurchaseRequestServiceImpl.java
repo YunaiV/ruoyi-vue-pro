@@ -65,7 +65,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     private final AdminUserApi adminUserApi;
 
     @Resource(name = PURCHASE_REQUEST_STATE_MACHINE_NAME)
-    StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestAuditStatusReqVO> auditMachine;
+    StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestAuditReqVO> auditMachine;
     @Resource(name = PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME)
     StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestDO> offMachine;
     @Resource(name = PURCHASE_ORDER_STATE_MACHINE_NAME)
@@ -105,7 +105,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         //3. 批量插入子表数据
         ThrowUtil.ifThrow(!erpPurchaseRequestItemsMapper.insertBatch(itemsDOList), PURCHASE_REQUEST_ADD_FAIL_PRODUCT);
         //4.初始化-审核状态-开关-订购
-        auditMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.AUDIT_INIT, ErpPurchaseRequestAuditStatusReqVO.builder().requestId(id).build());
+        auditMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.AUDIT_INIT, ErpPurchaseRequestAuditReqVO.builder().requestId(id).build());
         offMachine.fireEvent(ErpOffStatus.OPEN, ErpEventEnum.OFF_INIT, purchaseRequest);
         orderMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_INIT, purchaseRequest);
         //子表初始化
@@ -247,7 +247,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
      * 该方法用于根据传入的请求参数对采购订单进行审核或反审核操作。
      */
     @Override
-    public void reviewPurchaseOrder(ErpPurchaseRequestAuditStatusReqVO req) {
+    public void reviewPurchaseOrder(ErpPurchaseRequestAuditReqVO req) {
         // 查询采购申请单信息
         ErpPurchaseRequestDO requestDO = erpPurchaseRequestMapper.selectById(req.getRequestId());
 
@@ -280,7 +280,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         if (!CollUtil.isEmpty(ids)) {
             List<ErpPurchaseRequestDO> dos = erpPurchaseRequestMapper.selectByIds(ids);
             for (ErpPurchaseRequestDO aDo : dos) {
-                auditMachine.fireEvent(ErpAuditStatus.fromCode(aDo.getStatus()), ErpEventEnum.SUBMIT_FOR_REVIEW, ErpPurchaseRequestAuditStatusReqVO.builder().requestId(aDo.getId()).build());
+                auditMachine.fireEvent(ErpAuditStatus.fromCode(aDo.getStatus()), ErpEventEnum.SUBMIT_FOR_REVIEW, ErpPurchaseRequestAuditReqVO.builder().requestId(aDo.getId()).build());
             }
         }
     }

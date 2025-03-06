@@ -106,15 +106,15 @@ public class ErpPurchaseRequestController {
     @Operation(summary = "审核/反审核")
     @Parameter(name = "requestId", description = "申请单编号", required = true)
     @Parameter(name = "reviewed", description = "审核状态", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:purchase-order:review')")
-    public CommonResult<Boolean> reviewPurchaseRequest(@Validated @RequestBody ErpPurchaseRequestAuditStatusReqVO req) {
+    @PreAuthorize("@ss.hasPermission('erp:purchase-request:review')")
+    public CommonResult<Boolean> reviewPurchaseRequest(@Validated @RequestBody ErpPurchaseRequestAuditReqVO req) {
         erpPurchaseRequestService.reviewPurchaseOrder(req);
         return success(true);
     }
 
     @PostMapping("/merge")
     @Operation(summary = "合并采购")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-order:merge')")
+    @PreAuthorize("@ss.hasPermission('erp:purchase-request:merge')")
     public CommonResult<Long> mergePurchaseOrder(@Validated @RequestBody ErpPurchaseRequestOrderReqVO reqVO) {
         Long orderId = erpPurchaseRequestService.merge(reqVO);
         return success(orderId);
@@ -122,8 +122,8 @@ public class ErpPurchaseRequestController {
 
     @PutMapping("/enableStatus")
     @Operation(summary = "关闭/启用")
-    @PreAuthorize("@ss.hasPermission('erp:purchasereq-order:enable')")
-    public CommonResult<Boolean> switchPurchaseOrderStatus(@Validated @RequestBody ErpPurchaseRequestEnableStatusReqVO reqVO) {
+    @PreAuthorize("@ss.hasPermission('erp:purchase-request:enable')")
+    public CommonResult<Boolean> switchPurchaseOrderStatus(@Validated @RequestBody ErpPurchaseRequestEnableReqVO reqVO) {
         erpPurchaseRequestService.switchPurchaseOrderStatus(null, reqVO.getItemIds(), reqVO.getEnable());
         return success(true);
     }

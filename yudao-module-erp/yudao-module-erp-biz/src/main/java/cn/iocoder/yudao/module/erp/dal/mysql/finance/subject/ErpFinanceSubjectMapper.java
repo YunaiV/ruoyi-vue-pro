@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.erp.controller.admin.finance.subject.vo.ErpFinanc
 import cn.iocoder.yudao.module.erp.dal.dataobject.finance.subject.ErpFinanceSubjectDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * Erp财务主体 Mapper
  *
@@ -38,4 +40,10 @@ public interface ErpFinanceSubjectMapper extends BaseMapperX<ErpFinanceSubjectDO
             .orderByDesc(ErpFinanceSubjectDO::getId));
     }
 
+    //精简列表
+    default List<ErpFinanceSubjectDO> selectListSimple() {
+        return selectList(new LambdaQueryWrapperX<ErpFinanceSubjectDO>()
+            .select(ErpFinanceSubjectDO::getId, ErpFinanceSubjectDO::getName)
+            .orderByDesc(ErpFinanceSubjectDO::getId));
+    }
 }

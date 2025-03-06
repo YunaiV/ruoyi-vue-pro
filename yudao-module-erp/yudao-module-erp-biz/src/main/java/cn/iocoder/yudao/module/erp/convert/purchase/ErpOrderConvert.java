@@ -24,16 +24,15 @@ public interface ErpOrderConvert {
         // 设置仓库ID
         item.setWarehouseId(itemDO.getWarehouseId());
         // 设置审批数量
-        item.setApproveCount(itemDO.getApproveCount());
+//        item.setApproveCount(itemDO.getApproveCount());
         // 设置实际含税单价
         item.setActTaxPrice(itemDO.getActTaxPrice());
         // 设置税率
         item.setTaxPercent(itemDO.getTaxPercent());
 
         //下单数量
-        item.setCount(requestItemsMap.get(itemDO.getId()).getOrderQuantity());
-        //供应商产品id
-        item.setSupplierProductId(requestItemsMap.get(itemDO.getId()).getSupplierProductId());
+//        item.setCount(requestItemsMap.get(itemDO.getId()).getOrderQuantity());
+
         return item;
     }
 
