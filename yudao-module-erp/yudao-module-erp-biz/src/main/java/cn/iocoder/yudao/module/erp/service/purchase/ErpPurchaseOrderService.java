@@ -110,12 +110,16 @@ public interface ErpPurchaseOrderService {
     List<ErpPurchaseOrderItemDO> getPurchaseOrderItemListByOrderIds(Collection<Long> orderIds);
 
     /**
-     * 审核采购订单
+     * 提交审核采购订单
      *
      * @param itemIds 采购订单项
      */
     void submitAudit(@NotNull Collection<Long> itemIds);
 
+    /**
+     * 审核/反审核采购订单
+     * @param req 审核请求体
+     */
     void reviewPurchaseOrder(ErpPurchaseOrderAuditReqVO req);
 
     void switchPurchaseOrderStatus(Collection<Long> itemIds, Boolean open);

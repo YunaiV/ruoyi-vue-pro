@@ -35,6 +35,16 @@ public class ErpPurchaseOrderSaveReqVO {
     @Schema(description = "结算账户编号")
     private Long accountId;
 
+    //收获地址
+    @Schema(description = "收获地址")
+    private String address;
+    //付款条款
+    @Schema(description = "付款条款")
+    private String paymentTerms;
+
+    @Schema(description = "采购主体编号")
+    private Long purchaseEntityId;
+
     @Schema(description = "结算日期")
     private LocalDateTime settlementDate;
 
@@ -55,19 +65,6 @@ public class ErpPurchaseOrderSaveReqVO {
     @NotNull(message = "订单项不能为空")
     @Size(min = 1, message = "商品信息至少一个")
     private List<@Valid Item> items;
-    // ========== 部门和主体信息 ==========
-
-    @Schema(description = "采购主体编号")
-    private Long purchaseEntityId;
-
-    //收获地址
-    @Schema(description = "收获地址")
-    private String address;
-
-    //付款条款
-    @Schema(description = "付款条款")
-    private String paymentTerms;
-
     @Data
     public static class Item {
 

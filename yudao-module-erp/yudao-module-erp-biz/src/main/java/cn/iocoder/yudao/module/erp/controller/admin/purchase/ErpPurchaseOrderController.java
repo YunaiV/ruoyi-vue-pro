@@ -88,14 +88,14 @@ public class ErpPurchaseOrderController {
         return success(true);
     }
 
-    @PutMapping("/update-status")
-    @Operation(summary = "更新采购订单的状态")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-order:update-status')")
-    public CommonResult<Boolean> updatePurchaseOrderStatus(@RequestParam("id") Long id,
-                                                           @RequestParam("status") Integer status) {
-        purchaseOrderService.updatePurchaseOrderStatus(id, status);
-        return success(true);
-    }
+//    @PutMapping("/update-status")
+//    @Operation(summary = "更新采购订单的状态")
+//    @PreAuthorize("@ss.hasPermission('erp:purchase-order:update-status')")
+//    public CommonResult<Boolean> updatePurchaseOrderStatus(@RequestParam("id") Long id,
+//                                                           @RequestParam("status") Integer status) {
+//        purchaseOrderService.updatePurchaseOrderStatus(id, status);
+//        return success(true);
+//    }
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除采购订单")
