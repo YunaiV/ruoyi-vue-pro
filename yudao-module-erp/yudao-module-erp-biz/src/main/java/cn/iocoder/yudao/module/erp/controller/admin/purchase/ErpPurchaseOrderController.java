@@ -37,7 +37,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -115,16 +115,8 @@ public class ErpPurchaseOrderController {
         if (purchaseOrder == null) {
             return success(null);
         }
-        List<ErpPurchaseOrderItemDO> purchaseOrderItemList = purchaseOrderService.getPurchaseOrderItemListByOrderId(id);
-        Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
-            convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getProductId));
-        return success(BeanUtils.toBean(purchaseOrder, ErpPurchaseOrderBaseRespVO.class, purchaseOrderVO ->
-            purchaseOrderVO.setItems(BeanUtils.toBean(purchaseOrderItemList, ErpPurchaseOrderBaseRespVO.Item.class, item -> {
-                BigDecimal purchaseCount = stockService.getStockCount(item.getProductId());
-                item.setCount(purchaseCount != null ? purchaseCount : BigDecimal.ZERO);
-                MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
-                    .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()));
-            }))));
+        List<ErpPurchaseOrderBaseRespVO> vos = bindList(Collections.singletonList(purchaseOrder));
+        return success(vos.get(0));
     }
 
     @GetMapping("/page")
@@ -132,7 +124,8 @@ public class ErpPurchaseOrderController {
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:query')")
     public CommonResult<PageResult<ErpPurchaseOrderBaseRespVO>> getPurchaseOrderPage(@Valid ErpPurchaseOrderPageReqVO pageReqVO) {
         PageResult<ErpPurchaseOrderDO> pageResult = purchaseOrderService.getPurchaseOrderPage(pageReqVO);
-        return success(buildPurchaseOrderVOPageResult(pageResult));
+        List<ErpPurchaseOrderBaseRespVO> voList = bindList(pageResult.getList());
+        return success(new PageResult<>(voList, pageResult.getTotal()));
     }
 
     @GetMapping("/export-excel")
@@ -142,38 +135,36 @@ public class ErpPurchaseOrderController {
     public void exportPurchaseOrderExcel(@Valid ErpPurchaseOrderPageReqVO pageReqVO,
                                          HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<ErpPurchaseOrderBaseRespVO> list = buildPurchaseOrderVOPageResult(purchaseOrderService.getPurchaseOrderPage(pageReqVO)).getList();
+        List<ErpPurchaseOrderBaseRespVO> voList = bindList(purchaseOrderService.getPurchaseOrderPage(pageReqVO).getList());
         // 导出 Excel
-        ExcelUtils.write(response, "采购订单.xls", "数据", ErpPurchaseOrderBaseRespVO.class, list);
+        ExcelUtils.write(response, "采购订单.xls", "数据", ErpPurchaseOrderBaseRespVO.class, voList);
     }
 
-    private PageResult<ErpPurchaseOrderBaseRespVO> buildPurchaseOrderVOPageResult(PageResult<ErpPurchaseOrderDO> pageResult) {
-        if (CollUtil.isEmpty(pageResult.getList())) {
-            return PageResult.empty(pageResult.getTotal());
-        }
+    private List<ErpPurchaseOrderBaseRespVO> bindList(List<ErpPurchaseOrderDO> list) {
+
         // 1.1 订单项
         List<ErpPurchaseOrderItemDO> purchaseOrderItemList = purchaseOrderService.getPurchaseOrderItemListByOrderIds(
-            convertSet(pageResult.getList(), ErpPurchaseOrderDO::getId));
+            convertSet(list, ErpPurchaseOrderDO::getId));
         Map<Long, List<ErpPurchaseOrderItemDO>> purchaseOrderItemMap = convertMultiMap(purchaseOrderItemList, ErpPurchaseOrderItemDO::getOrderId);
         // 1.2 产品信息
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
             convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getProductId));
         // 1.3 供应商信息
         Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(
-            convertSet(pageResult.getList(), ErpPurchaseOrderDO::getSupplierId));
+            convertSet(list, ErpPurchaseOrderDO::getSupplierId));
         // 1.4 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-            convertSet(pageResult.getList(), purchaseOrder -> Long.parseLong(purchaseOrder.getCreator())));
+            convertSet(list, purchaseOrder -> Long.parseLong(purchaseOrder.getCreator())));
         // 1.5 部门信息
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
-            convertSet(pageResult.getList(), ErpPurchaseOrderDO::getDepartmentId));
+            convertSet(list, ErpPurchaseOrderDO::getDepartmentId));
         // 1.6 获取仓库信息
         Map<Long, ErpWarehouseDO> warehouseMap = erpWarehouseService.getWarehouseMap(
             convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getWarehouseId));
 
 
         // 2. 开始拼接
-        return BeanUtils.toBean(pageResult, ErpPurchaseOrderBaseRespVO.class, purchaseOrder -> {
+        return BeanUtils.toBean(list, ErpPurchaseOrderBaseRespVO.class, purchaseOrder -> {
             purchaseOrder.setItems(BeanUtils.toBean(purchaseOrderItemMap.get(purchaseOrder.getId()), ErpPurchaseOrderBaseRespVO.Item.class,
                 item -> {
                     //设置产品信息
@@ -197,5 +188,4 @@ public class ErpPurchaseOrderController {
 
         });
     }
-
 }

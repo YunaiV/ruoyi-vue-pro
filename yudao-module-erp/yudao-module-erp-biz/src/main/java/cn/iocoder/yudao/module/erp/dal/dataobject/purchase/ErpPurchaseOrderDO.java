@@ -161,7 +161,7 @@ public class ErpPurchaseOrderDO extends BaseDO {
     //执行状态 Integer
     private Integer executeStatus;
     //入库状态
-    private Integer ioStatus;
+    private Integer inStatus;
     //付款状态
     private Integer payStatus;
     //审核状态

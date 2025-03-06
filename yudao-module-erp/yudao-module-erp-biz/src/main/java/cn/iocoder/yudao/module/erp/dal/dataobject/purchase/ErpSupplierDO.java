@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.purchase;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -58,7 +60,7 @@ public class ErpSupplierDO extends BaseDO {
     private String remark;
     /**
      * 开启状态
-     *
+     * <p>
      * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum}
      */
     private Integer status;
@@ -86,5 +88,20 @@ public class ErpSupplierDO extends BaseDO {
      * 开户地址
      */
     private String bankAddress;
+
+    /**
+     * 付款条款
+     */
+    private String paymentTerms;
+
+    /**
+     * 送达地址
+     */
+    private String deliveryAddress;
+
+    /**
+     * 公司地址
+     */
+    private String companyAddress;
 
 }

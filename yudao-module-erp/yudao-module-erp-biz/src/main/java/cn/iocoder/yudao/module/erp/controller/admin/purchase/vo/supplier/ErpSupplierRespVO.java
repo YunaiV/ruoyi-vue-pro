@@ -81,4 +81,15 @@ public class ErpSupplierRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "付款条款")
+    @ExcelProperty("付款条款")
+    private String paymentTerms;
+
+    @Schema(description = "送达地址")
+    @ExcelProperty("送达地址")
+    private String deliveryAddress;
+
+    @Schema(description = "公司地址")
+    @ExcelProperty("公司地址")
+    private String companyAddress;
 }

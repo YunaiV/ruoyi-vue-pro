@@ -133,14 +133,14 @@ public class ErpPurchaseOrderItemDO extends BaseDO {
      * 关闭状态
      */
     private Integer offStatus;
-    /**
-     * 采购状态
-     */
-    private Integer orderStatus;
+//    /**
+//     * 采购状态
+//     */
+//    private Integer orderStatus;
     //执行状态 Integer
     private Integer executeStatus;
     //入库状态
-    private Integer ioStatus;
+    private Integer inStatus;
     //付款状态
     private Integer payStatus;
 }

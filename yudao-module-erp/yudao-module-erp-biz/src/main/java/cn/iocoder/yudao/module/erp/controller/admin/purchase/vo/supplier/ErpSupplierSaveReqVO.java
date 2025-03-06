@@ -4,8 +4,10 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import cn.iocoder.yudao.framework.common.validation.Telephone;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -68,4 +70,15 @@ public class ErpSupplierSaveReqVO {
     @Schema(description = "开户地址", example = "兴业银行浦东支行")
     private String bankAddress;
 
+    @Schema(description = "付款条款")
+    @NotBlank(message = "付款条款不能为空")
+    private String paymentTerms;
+
+    @Schema(description = "送达地址")
+    @NotBlank(message = "送达地址不能为空")
+    private String deliveryAddress;
+
+    @Schema(description = "公司地址")
+    @NotBlank(message = "公司地址不能为空")
+    private String companyAddress;
 }
