@@ -151,6 +151,12 @@ spring:
       redis:
         index: default-index
         prefix: "default:"
+      qdrant:
+        collection-name: knowledge_segment
+        host: 127.0.0.1
+        port: 6334
+        use-tls: false
+        api-key:
     qianfan: # 文心一言
       api-key: x0cuLZ7XsaTCU08vuJWO87Lg
       secret-key: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK

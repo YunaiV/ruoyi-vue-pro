@@ -11,6 +11,7 @@ import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowChatModel
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.autoconfigure.vectorstore.qdrant.QdrantVectorStoreProperties;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
@@ -29,7 +30,9 @@ import org.springframework.context.annotation.Lazy;
  * @author fansili
  */
 @AutoConfiguration
-@EnableConfigurationProperties(YudaoAiProperties.class)
+@EnableConfigurationProperties({YudaoAiProperties.class,
+        QdrantVectorStoreProperties.class // 解析 Qdrant 配置
+})
 @Slf4j
 public class YudaoAiAutoConfiguration {
 

@@ -115,6 +115,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         segmentMapper.updateById(newSegment);
         // 3.2 重新向量化，必须开启状态
         if (CommonStatusEnum.isEnable(oldSegment.getStatus())) {
+            newSegment.setKnowledgeId(oldSegment.getKnowledgeId()).setDocumentId(oldSegment.getDocumentId());
             writeVectorStore(vectorStore, newSegment, new Document(newSegment.getContent()));
         }
     }
@@ -156,9 +157,10 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
 
     private void writeVectorStore(VectorStore vectorStore, AiKnowledgeSegmentDO segmentDO, Document segment) {
         // 1. 向量存储
-        segment.getMetadata().put(VECTOR_STORE_METADATA_KNOWLEDGE_ID, segmentDO.getKnowledgeId());
-        segment.getMetadata().put(VECTOR_STORE_METADATA_DOCUMENT_ID, segmentDO.getDocumentId());
-        segment.getMetadata().put(VECTOR_STORE_METADATA_SEGMENT_ID, segmentDO.getId());
+        // 为什么要 toString 呢？因为部分 VectorStore 实现，不支持 Long 类型，例如说 QdrantVectorStore
+        segment.getMetadata().put(VECTOR_STORE_METADATA_KNOWLEDGE_ID, segmentDO.getKnowledgeId().toString());
+        segment.getMetadata().put(VECTOR_STORE_METADATA_DOCUMENT_ID, segmentDO.getDocumentId().toString());
+        segment.getMetadata().put(VECTOR_STORE_METADATA_SEGMENT_ID, segmentDO.getId().toString());
         vectorStore.add(List.of(segment));
 
         // 2. 更新向量 ID
@@ -190,7 +192,8 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
                 .similarityThreshold(
                         ObjUtil.defaultIfNull(reqBO.getSimilarityThreshold(), knowledge.getSimilarityThreshold()))
                 .filterExpression(new FilterExpressionBuilder()
-                        .eq(VECTOR_STORE_METADATA_KNOWLEDGE_ID, reqBO.getKnowledgeId()).build())
+                        .eq(VECTOR_STORE_METADATA_KNOWLEDGE_ID, reqBO.getKnowledgeId().toString())
+                        .build())
                 .build());
         if (CollUtil.isEmpty(documents)) {
             return ListUtil.empty();

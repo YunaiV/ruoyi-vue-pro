@@ -54,7 +54,6 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
     private AiKnowledgeService knowledgeService;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public Long createKnowledgeDocument(AiKnowledgeDocumentCreateReqVO createReqVO) {
         // 1. 校验参数
         knowledgeService.validateKnowledgeExists(createReqVO.getKnowledgeId());
@@ -74,7 +73,6 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public List<Long> createKnowledgeDocumentList(AiKnowledgeDocumentCreateListReqVO createListReqVO) {
         // 1. 校验参数
         knowledgeService.validateKnowledgeExists(createListReqVO.getKnowledgeId());

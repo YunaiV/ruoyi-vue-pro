@@ -16,8 +16,8 @@ import jakarta.annotation.Resource;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
-import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.qdrant.QdrantVectorStore;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -162,7 +162,8 @@ public class AiModelServiceImpl implements AiModelService {
                 platform, apiKey.getApiKey(), apiKey.getUrl(), model.getModel());
 
         // 创建或获取 VectorStore 对象
-        return modelFactory.getOrCreateVectorStore(SimpleVectorStore.class, embeddingModel);
+//        return modelFactory.getOrCreateVectorStore(SimpleVectorStore.class, embeddingModel);
+        return modelFactory.getOrCreateVectorStore(QdrantVectorStore.class, embeddingModel);
     }
 
 }
