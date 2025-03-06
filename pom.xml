@@ -65,6 +65,7 @@
         <lombok.version>1.18.36</lombok.version>
         <spring.boot.version>3.4.1</spring.boot.version>
         <mapstruct.version>1.6.3</mapstruct.version>
+        <dom4j.version>2.1.3</dom4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
