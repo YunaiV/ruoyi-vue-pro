@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import cn.iocoder.yudao.framework.common.util.web.RequestX;
 import cn.iocoder.yudao.framework.common.util.web.WebUtils;
+import com.somle.cdiscount.model.CdiscountToken;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
@@ -18,10 +19,14 @@ public class CdiscountClient {
     private final String TOKEN_URL = "https://auth.octopia-io.net/auth/realms/maas/protocol/openid-connect/token";
 
    //此参数拼接方式必须配合header中"Content-Type", "application/x-www-form-urlencoded"方式使用
-    private final String TOKEN_REQUEST_BODY = "client_id=gumaomao&client_secret=D6zTxDeCXErst2Kvr7D4AYrJI0ZMiIdP&grant_type=client_credentials";
+    private final String TOKEN_REQUEST_BODY;
 
    //卖家ID
     public static final String SELLER_ID = "79730";
+
+    public CdiscountClient(CdiscountToken token) {
+        this.TOKEN_REQUEST_BODY = "client_id=" + token.getClientId() + "&client_secret=" + token.getClientSecret() + "&grant_type=client_credentials";
+    }
 
     public Map<String, String> getHeaders() throws IOException {
         return Map.of(
