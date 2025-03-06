@@ -339,6 +339,12 @@ public class KingdeeClient {
         return response.getData(KingdeePage.class).getRowsList(KingdeePurOrder.class).stream().toList();
     }
 
+    public List<Object> getPurInbound(KingdeePurInboundReqVO vo) {
+        log.debug("fetching purchase inbound");
+        String endUrl = "/jdy/v2/scm/pur_inbound";
+        KingdeeResponse response = getResponse(endUrl, vo);
+        return response.getData(KingdeePage.class).getRowsList(Object.class).stream().toList();
+    }
     public KingdeePurOrderDetail getPurOrderDetail(String purOrderNumber) {
         String endUrl = "/jdy/v2/scm/pur_order_detail";
         TreeMap<String, String> params = new TreeMap<>();
