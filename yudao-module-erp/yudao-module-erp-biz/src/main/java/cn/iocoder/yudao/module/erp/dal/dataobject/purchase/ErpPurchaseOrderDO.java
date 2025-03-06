@@ -107,11 +107,11 @@ public class ErpPurchaseOrderDO extends BaseDO {
      */
     private LocalDateTime settlementDate;
     /**
-     * 审核人id，审核时自动填充
+     * 审核人id
      */
     private Long auditorId;
     /**
-     * 审核时间，审核时自动填充
+     * 审核时间
      */
     private LocalDateTime auditTime;
     // ========== 部门和主体信息 ==========
@@ -156,9 +156,14 @@ public class ErpPurchaseOrderDO extends BaseDO {
     private Integer offStatus;
     /**
      * 采购状态
+     * {@link ErpAuditStatus}
      */
     private Integer orderStatus;
     //执行状态 Integer
+    /**
+     * 执行状态
+     * {@link }
+     */
     private Integer executeStatus;
     //入库状态
     private Integer inStatus;

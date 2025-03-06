@@ -133,14 +133,21 @@ public class ErpPurchaseOrderItemDO extends BaseDO {
      * 关闭状态
      */
     private Integer offStatus;
-//    /**
-//     * 采购状态
-//     */
-//    private Integer orderStatus;
-    //执行状态 Integer
+    /**
+     * 执行状态
+     */
     private Integer executeStatus;
-    //入库状态
+    /**
+     * 入库状态
+     */
     private Integer inStatus;
-    //付款状态
+    /**
+     * 付款状态
+     */
     private Integer payStatus;
+    /**
+     * 采购申请项ID
+     * {@link ErpPurchaseRequestItemsDO#getId()}
+     */
+    private Long purchaseApplyItemId;
 }
