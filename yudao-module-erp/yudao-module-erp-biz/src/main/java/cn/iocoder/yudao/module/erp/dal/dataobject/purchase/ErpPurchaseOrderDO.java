@@ -150,4 +150,20 @@ public class ErpPurchaseOrderDO extends BaseDO {
     private String xCode;//x码
 
     private String containerRate;//箱率
+    /**
+     * 关闭状态
+     */
+    private Integer offStatus;
+    /**
+     * 采购状态
+     */
+    private Integer orderStatus;
+    //执行状态 Integer
+    private Integer executeStatus;
+    //入库状态
+    private Integer ioStatus;
+    //付款状态
+    private Integer payStatus;
+    //审核状态
+    private Integer auditStatus;
 }
