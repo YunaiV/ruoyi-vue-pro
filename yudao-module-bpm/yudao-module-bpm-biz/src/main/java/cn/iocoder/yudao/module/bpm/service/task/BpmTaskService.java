@@ -35,16 +35,16 @@ public interface BpmTaskService {
     PageResult<Task> getTaskTodoPage(Long userId, BpmTaskPageReqVO pageReqVO);
 
     /**
-     * 获得用户（待办）的任务。
-     * 1、根据 id 查询待办任务
-     * 2、如果任务不存在，获取指定流程下，首个需要处理任务
+     * 获得用户（待办）的任务：
+     * 1. 根据 taskId 查询待办任务
+     * 2. 如果任务不存在（或者已审核），获取指定流程下，首个需要处理任务
      *
      * @param userId 用户编号
-     * @param id    任务编号
+     * @param taskId 任务编号
      * @param processInstanceId 流程实例编号
      * @return 待办任务
      */
-    BpmTaskRespVO getTodoTask(Long userId, String id, String processInstanceId);
+    BpmTaskRespVO getTodoTask(Long userId, String taskId, String processInstanceId);
 
     /**
      * 获得已办的流程任务分页

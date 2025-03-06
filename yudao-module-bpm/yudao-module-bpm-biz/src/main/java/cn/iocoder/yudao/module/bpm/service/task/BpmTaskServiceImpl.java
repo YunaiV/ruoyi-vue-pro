@@ -137,18 +137,18 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
-    public BpmTaskRespVO getTodoTask(Long userId, String id, String processInstanceId) {
+    public BpmTaskRespVO getTodoTask(Long userId, String taskId, String processInstanceId) {
         // 1.1 获取指定的用户待办任务
-        Task todoTask = getMyTodoTask(userId, id);
+        Task todoTask = getMyTodoTask(userId, taskId);
+        // 1.2 获取不到，则获取该流程实例下，第一个用户的待办任务
         if (todoTask == null) {
-            // 1.2 获取不到，则获取该流程实例下，第一个用户的待办任务
-            todoTask = getFirstMyTodoTask(userId, processInstanceId);
+            todoTask = getMyFirstTodoTask(userId, processInstanceId);
         }
         if (todoTask == null) {
             return null;
         }
 
-        // 2.查询该任务的子任务
+        // 2. 查询该任务的子任务
         List<Task> childrenTasks = getAllChildrenTaskListByParentTaskId(todoTask.getId(), CollUtil.newArrayList(todoTask));
 
         // 3. 转换返回
@@ -169,11 +169,18 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 .setNodeType(nodeType).setSignEnable(signEnable).setReasonRequire(reasonRequire);
     }
 
-    private Task getMyTodoTask(Long userId, String id) {
-        if (StrUtil.isEmpty(id)) {
+    /**
+     * 获得用户指定 taskId 任务编号的“待办”（未审批、且可审核）的任务
+     *
+     * @param userId 用户编号
+     * @param taskId 任务编号
+     * @return 任务
+     */
+    private Task getMyTodoTask(Long userId, String taskId) {
+        if (StrUtil.isEmpty(taskId)) {
             return null;
         }
-        Task task = getTask(id);
+        Task task = getTask(taskId);
         if (task == null) {
             return null;
         }
@@ -183,7 +190,14 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         return task;
     }
 
-    private Task getFirstMyTodoTask(Long userId, String processInstanceId) {
+    /**
+     * 获得用户指定 processInstanceId 流程编号下的首个“待办”（未审批、且可审核）的任务
+     *
+     * @param userId 用户编号
+     * @param processInstanceId 流程编号
+     * @return 任务
+     */
+    private Task getMyFirstTodoTask(Long userId, String processInstanceId) {
         if (processInstanceId == null) {
             return null;
         }
