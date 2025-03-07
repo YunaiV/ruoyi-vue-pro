@@ -25,8 +25,7 @@ public class EccangSpecialOrdersDataJob extends EccangDataJob {
             .spoAddTimeTo(beforeYesterdayLastSecond)
             .page(1)
             .pageSize(100)
-            .build()).forEach(
-            page -> {
+            .build()).forEach(page -> {
                 OssData data = OssData.builder()
                     .database(DATABASE)
                     .tableName("special_orders")
