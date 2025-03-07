@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.plugin.emqx.config.IotPluginEmqxProperties;
 import cn.iocoder.yudao.module.iot.plugin.emqx.upstream.router.IotDeviceAuthVertxHandler;
 import cn.iocoder.yudao.module.iot.plugin.emqx.upstream.router.IotDeviceMqttMessageHandler;
+import cn.iocoder.yudao.module.iot.plugin.emqx.upstream.router.IotDeviceWebhookVertxHandler;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
@@ -70,6 +71,9 @@ public class IotDeviceUpstreamServer {
                 // TODO @haohao：疑问，mqtt 的认证，需要通过 http 呀？
                 // 回复：MQTT 认证不必须通过 HTTP 进行，但 HTTP 认证是 EMQX 等 MQTT 服务器支持的一种灵活的认证方式
                 .handler(new IotDeviceAuthVertxHandler(deviceUpstreamApi));
+        // 添加 Webhook 处理器，用于处理设备连接和断开连接事件
+        router.post(IotDeviceWebhookVertxHandler.PATH)
+                .handler(new IotDeviceWebhookVertxHandler(deviceUpstreamApi));
         // 创建 HttpServer 实例
         this.server = vertx.createHttpServer().requestHandler(router);
         this.mqttMessageHandler = new IotDeviceMqttMessageHandler(deviceUpstreamApi, client);
