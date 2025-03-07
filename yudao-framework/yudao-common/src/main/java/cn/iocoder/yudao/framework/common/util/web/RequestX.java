@@ -1,13 +1,11 @@
 package cn.iocoder.yudao.framework.common.util.web;
 
-import jakarta.servlet.http.HttpServletRequest;
+import cn.hutool.http.ContentType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
-import okhttp3.Request;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,6 +21,8 @@ public class RequestX {
 //    private List<String> paths;
     private Object queryParams;
     private Map<String, String> headers;
+    @Builder.Default
+    private ContentType contentType=ContentType.JSON;
     private Object payload;
 
     @Getter

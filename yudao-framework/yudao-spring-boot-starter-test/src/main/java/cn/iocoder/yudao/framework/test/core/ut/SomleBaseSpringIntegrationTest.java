@@ -3,7 +3,6 @@ package cn.iocoder.yudao.framework.test.core.ut;
 
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
@@ -12,16 +11,15 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.integration.config.EnableIntegration;
-import org.springframework.integration.config.EnableIntegrationManagement;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 
-@SpringBootTest(classes = BaseSpringIntegrationTest.Application.class)
+@SpringBootTest(classes = SomleBaseSpringIntegrationTest.Application.class)
 @ActiveProfiles("unit-test")
 @EnableJpaRepositories(basePackages = { "${somle.base-package}.repository" })
 @EntityScan("${somle.base-package}.model")
-public class BaseSpringIntegrationTest {
+public class SomleBaseSpringIntegrationTest {
 
 //    @BeforeAll
 //    public static void init() {

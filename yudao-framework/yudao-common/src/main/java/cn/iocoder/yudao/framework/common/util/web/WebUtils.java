@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.framework.common.util.web;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import cn.hutool.http.ContentType;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import cn.iocoder.yudao.framework.common.util.string.StrUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
@@ -17,7 +17,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.zip.GZIPInputStream;
@@ -120,8 +123,18 @@ public class WebUtils {
             log.debug("headers: " + headers.toString());
         }
 
-        String bodyString = JsonUtilsX.toJsonString(payload);
-        RequestBody body = RequestBody.create(bodyString, MediaType.parse("application/json; charset=utf-8"));
+        String bodyString = null;
+        if(requestX.getContentType()==null) {
+            requestX.setContentType(ContentType.JSON);
+        }
+        if(requestX.getContentType()== ContentType.JSON) {
+            bodyString=JsonUtilsX.toJsonString(payload);
+        } else if (requestX.getContentType()==ContentType.FORM_URLENCODED) {
+            bodyString=buildUrlPatternBody(payload);
+        } else {
+            throw new IllegalArgumentException("不支持的 ContentType "+ requestX.getContentType().name());
+        }
+        RequestBody body = RequestBody.create(bodyString, MediaType.parse(requestX.getContentType().getValue()+"; charset=utf-8"));
         log.info("body: " + bodyString);
 
 
@@ -138,6 +151,49 @@ public class WebUtils {
 
         return request;
 
+    }
+
+    public static String buildUrlPatternBody(Object param) {
+        JSONObject json = JsonUtilsX.toJSONObject(param);
+        return buildUrlPatternBody(json);
+    }
+
+    public static String buildUrlPatternBody(JSONObject params)  {
+        Map<String, String> json = new HashMap<>();
+        params.fieldNames().forEachRemaining(key -> {
+            json.put(key, params.getString(key));
+        });
+        return buildUrlPatternBody(json);
+    }
+
+    public static String buildUrlPatternBody(Map<String, String> params)  {
+        if (params == null || params.isEmpty()) {
+            return null;
+        }
+
+        StringBuilder query = new StringBuilder();
+        Set<Map.Entry<String, String>> entries = params.entrySet();
+        boolean hasParam = false;
+
+        for (Map.Entry<String, String> entry : entries) {
+            String name = entry.getKey();
+            String value = entry.getValue();
+            // 忽略参数名或参数值为空的参数
+            if (!StrUtils.isBlank(name) && !StrUtils.isBlank(value)) {
+                if (hasParam) {
+                    query.append("&");
+                } else {
+                    hasParam = true;
+                }
+                try {
+                    query.append(name).append("=").append(URLEncoder.encode(value, "UTF-8"));
+                } catch (Exception e){
+                    log.error("urlWithParams error", e);
+                }
+            }
+        }
+
+        return query.toString();
     }
 
     @SneakyThrows
