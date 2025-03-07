@@ -127,7 +127,10 @@ public class WebUtils {
         }
 
         String bodyString = null;
-        if(requestX.getContentType()==null || requestX.getContentType()== ContentType.JSON) {
+        if(requestX.getContentType()==null) {
+            requestX.setContentType(ContentType.JSON);
+        }
+        if(requestX.getContentType()== ContentType.JSON) {
             bodyString=JsonUtilsX.toJsonString(payload);
         } else if (requestX.getContentType()==ContentType.FORM_URLENCODED) {
             bodyString=buildUrlPatternBody(payload);
