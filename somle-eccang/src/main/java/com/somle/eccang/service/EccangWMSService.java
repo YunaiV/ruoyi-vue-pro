@@ -33,14 +33,15 @@ public class EccangWMSService {
 
     private OkHttpClient client;
 
-    private  String appToken;
+    private String appToken;
 
-    private  String appKey;
+    private String appKey;
 
     private final String url = "http://somle.yunwms.com/default/svc/web-service";
 
     @Autowired
     private EccangWMSTokenRepository eccangWMSTokenRepository;
+
     @PostConstruct
     public void init() {
         client = new OkHttpClient();
@@ -53,12 +54,12 @@ public class EccangWMSService {
     public Stream<EccangResponse.EccangPage> streamSpecialOrders(EccangSpecialOrdersReqVo eccangSpecialOrdersReqVo) {
         String endpoint = "getSpecialOrdersList";
         return PageUtils.getAllPages(
-                getPage(JsonUtilsX.toJSONObject(eccangSpecialOrdersReqVo), endpoint),
-                page -> page.hasNext(),
-                page -> {
-                        eccangSpecialOrdersReqVo.setPage(page.getPage() + 1);
-                        return getPage(JsonUtilsX.toJSONObject(eccangSpecialOrdersReqVo), endpoint);
-                }
+            getPage(JsonUtilsX.toJSONObject(eccangSpecialOrdersReqVo), endpoint),
+            page -> page.hasNext(),
+            page -> {
+                eccangSpecialOrdersReqVo.setPage(page.getPage() + 1);
+                return getPage(JsonUtilsX.toJSONObject(eccangSpecialOrdersReqVo), endpoint);
+            }
         );
     }
 
@@ -67,7 +68,6 @@ public class EccangWMSService {
         EccangResponse.EccangPage page = response.getEccangPage();
         return page;
     }
-
 
 
     @SneakyThrows
@@ -79,10 +79,10 @@ public class EccangWMSService {
 
             // 创建请求
             Request request = new Request.Builder()
-                    .url(url) // 替换为实际的服务URL
-                    .post(body)
-                    .addHeader("Content-Type", "text/xml; charset=utf-8")
-                    .build();
+                .url(url) // 替换为实际的服务URL
+                .post(body)
+                .addHeader("Content-Type", "text/xml; charset=utf-8")
+                .build();
 
             int retryCount = ctx.getRetryCount();
             // 记录每次重试的日志
@@ -91,7 +91,7 @@ public class EccangWMSService {
                 switch (response.code()) {
                     case 200:
                         var responseBody = response.body().string();
-                        String jsonObject= parseObjectByXmlUtil(responseBody).toString();
+                        String jsonObject = parseObjectByXmlUtil(responseBody).toString();
                         var responseOriginal = JsonUtilsX.parseObject(jsonObject, EccangWMSResponse.class);
                         return responseOriginal;
                     case 429:
@@ -107,17 +107,17 @@ public class EccangWMSService {
     protected String requestBody(JSONObject reqParams, String ecMethod) {
 
         String requestBody =
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                        "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ns1=\"http://www.example.org/Ec/\">\n" +
-                        "    <SOAP-ENV:Body>\n" +
-                        "        <ns1:callService>\n" +
-                        "            <paramsJson>"+ reqParams.toString() +"</paramsJson>\n" +
-                        "            <appToken>" + appToken + "</appToken>\n" +
-                        "            <appKey>" + appKey +"</appKey>\n" +
-                        "            <service>" + ecMethod + "</service>\n" +
-                        "        </ns1:callService>\n" +
-                        "    </SOAP-ENV:Body>\n" +
-                        "</SOAP-ENV:Envelope>";
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ns1=\"http://www.example.org/Ec/\">\n" +
+                "    <SOAP-ENV:Body>\n" +
+                "        <ns1:callService>\n" +
+                "            <paramsJson>" + reqParams.toString() + "</paramsJson>\n" +
+                "            <appToken>" + appToken + "</appToken>\n" +
+                "            <appKey>" + appKey + "</appKey>\n" +
+                "            <service>" + ecMethod + "</service>\n" +
+                "        </ns1:callService>\n" +
+                "    </SOAP-ENV:Body>\n" +
+                "</SOAP-ENV:Envelope>";
         return requestBody;
     }
 
