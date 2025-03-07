@@ -1,7 +1,7 @@
 package com.somle.esb.job;
 
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
-import cn.iocoder.yudao.framework.test.core.ut.BaseSpringIntegrationTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseSpringIntegrationTest;
 import cn.iocoder.yudao.module.erp.api.logistic.customrule.ErpCustomRuleApi;
 import cn.iocoder.yudao.module.erp.api.logistic.customrule.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
-public class SyncErpProductJobTest extends BaseSpringIntegrationTest {
+public class SyncErpProductJobTestSomle extends SomleBaseSpringIntegrationTest {
     @Resource
     ErpCustomRuleApi erpCustomRuleApi;
     @Resource
