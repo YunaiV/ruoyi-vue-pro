@@ -2,6 +2,7 @@ package com.somle.manomano.service;
 
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Import({ManomanoService.class})
-class ManomanoServiceTest extends BaseDbUnitTest {
+class ManomanoServiceTest extends SomleBaseDbUnitTest {
     @Resource
     ManomanoService service;
 
