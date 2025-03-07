@@ -110,7 +110,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         orderMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_INIT, purchaseRequest);
         //子表初始化
         itemsDOList.forEach(i -> {
-            orderItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.STORAGE_INIT, i);
+            orderItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.START_PURCHASE, i);
                 offItemMachine.fireEvent(ErpOffStatus.OPEN, ErpEventEnum.OFF_INIT, i);
             }
         );
@@ -238,7 +238,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
             erpPurchaseRequestItemsMapper.insertBatch(diffList.get(0));
             for (ErpPurchaseRequestItemsDO itemsDO : diffList.get(0)) {
                 //初始化状态
-                orderItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.STORAGE_INIT, itemsDO);
+                orderItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.START_PURCHASE, itemsDO);
                 offItemMachine.fireEvent(ErpOffStatus.OPEN, ErpEventEnum.OFF_INIT, itemsDO);
             }
         }

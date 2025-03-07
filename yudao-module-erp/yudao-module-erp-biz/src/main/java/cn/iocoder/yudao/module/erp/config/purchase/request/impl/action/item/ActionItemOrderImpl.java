@@ -5,14 +5,18 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestIte
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestItemsMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestMapper;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
+import cn.iocoder.yudao.module.erp.enums.ErpStateMachines;
 import cn.iocoder.yudao.module.erp.enums.status.ErpOrderStatus;
 import com.alibaba.cola.statemachine.Action;
 import com.alibaba.cola.statemachine.StateMachine;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.module.erp.enums.ErpStateMachines.PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME;
 
@@ -24,9 +28,12 @@ public class ActionItemOrderImpl implements Action<ErpOrderStatus, ErpEventEnum,
     private ErpPurchaseRequestItemsMapper itemsMapper;
     @Autowired
     ErpPurchaseRequestMapper requestMapper;
-    @Autowired
-    @Qualifier(PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME)
+    @Resource(name = PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME)
     StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestDO> stateMachine;
+    @Resource(name = ErpStateMachines.PURCHASE_REQUEST_ITEM_STATE_MACHINE_NAME)
+    StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> itemsDOStateMachine;
+    @Resource(name = ErpStateMachines.PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME)
+    StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestDO> requestStateMachine;
 
     @Override
     @Transactional
@@ -35,10 +42,30 @@ public class ActionItemOrderImpl implements Action<ErpOrderStatus, ErpEventEnum,
         //更新采购申请项的采购状态(暂无)
         Long purchaseOrderItemId = context.getPurchaseOrderItemId();
         ErpPurchaseRequestItemsDO itemsDO = itemsMapper.selectById(purchaseOrderItemId);
-        //新增订单下单数量
-        int i = (itemsDO.getOrderedQuantity() == null ? 0 : itemsDO.getOrderedQuantity()) + context.getOrderedQuantity();
+        //下单数量变更
+        int i = (itemsDO.getOrderedQuantity() == null ? 0 : itemsDO.getOrderedQuantity());
         itemsDO.setOrderedQuantity(i);
+        //已订购数量 == 申请数量，传递事件
+        if (Objects.equals(itemsDO.getCount(), itemsDO.getOrderedQuantity())) {
+            //子订单已完全采购
+            itemsDOStateMachine.fireEvent(ErpOrderStatus.fromCode(itemsDO.getOffStatus()), ErpEventEnum.PURCHASE_ADJUSTMENT, itemsDO);
+            //检验申请单下的所有子表是否符合传递事件的需求
+            checkRequest(event, itemsDO);
+        }
+        itemsDO.setOrderStatus(to.getCode());
         itemsMapper.updateById(itemsDO);
+    }
+
+    //检验申请单下的所有子表是否符合传递事件的需求
+    private void checkRequest(ErpEventEnum event, ErpPurchaseRequestItemsDO itemsDO) {
+        //子采购完成
+        List<ErpPurchaseRequestItemsDO> itemList = itemsMapper.selectListByRequestId(itemsDO.getRequestId());
+        boolean allClosed = itemList.stream().noneMatch(item -> item.getOrderStatus().equals(ErpOrderStatus.ORDERED.getCode()));
+        ErpPurchaseRequestDO requestDO = requestMapper.selectById(itemsDO.getRequestId());
+        if (allClosed) {
+            requestStateMachine.fireEvent(ErpOrderStatus.fromCode(requestDO.getOrderStatus()), ErpEventEnum.PURCHASE_COMPLETE, requestDO);
+        }
+
     }
 
 

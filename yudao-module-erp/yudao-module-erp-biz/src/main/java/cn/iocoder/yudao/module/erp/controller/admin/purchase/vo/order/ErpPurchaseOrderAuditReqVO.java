@@ -42,9 +42,9 @@ public class ErpPurchaseOrderAuditReqVO {
         @NotNull(message = "采购项ID不能为空")
         @Schema(description = "采购项ID", requiredMode = Schema.RequiredMode.REQUIRED)
         private Long id;
-        //批准数量
-        @NotNull(groups = validation.OnAudit.class,message = "批准数量不能为空")
-        @Schema(description = "批准数量", requiredMode = Schema.RequiredMode.REQUIRED)
-        private Integer approveCount;
+//        //批准数量
+//        @NotNull(groups = validation.OnAudit.class,message = "批准数量不能为空")
+//        @Schema(description = "批准数量", requiredMode = Schema.RequiredMode.REQUIRED)
+//        private Integer approveCount;
     }
 }

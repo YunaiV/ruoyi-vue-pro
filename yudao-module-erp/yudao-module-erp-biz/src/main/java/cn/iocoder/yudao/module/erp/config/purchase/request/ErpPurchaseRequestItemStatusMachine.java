@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.erp.config.purchase.request;
 
-import cn.iocoder.yudao.module.erp.api.purchase.ErpOrderCountDTO;
 import cn.iocoder.yudao.module.erp.config.purchase.request.impl.BaseFailCallbackImpl;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
@@ -94,8 +93,9 @@ public class ErpPurchaseRequestItemStatusMachine {
             .perform(actionItemOrderImpl);
 
         //采购完成
-        builder.internalTransition()
-            .within(ErpOrderStatus.ORDERED)
+        builder.externalTransitions()
+            .fromAmong(ErpOrderStatus.OT_ORDERED, ErpOrderStatus.PARTIALLY_ORDERED)
+            .to(ErpOrderStatus.ORDERED)
             .on(ErpEventEnum.PURCHASE_COMPLETE)
             .perform(actionItemOrderImpl);
 

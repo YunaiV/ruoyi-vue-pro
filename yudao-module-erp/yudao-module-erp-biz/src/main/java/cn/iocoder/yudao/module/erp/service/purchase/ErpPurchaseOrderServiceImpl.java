@@ -71,7 +71,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     @Resource(name = ErpStateMachines.PURCHASE_ORDER_AUDIT_STATE_MACHINE_NAME)
     StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseOrderDO> auditMachine;
     @Resource(name = ErpStateMachines.PURCHASE_REQUEST_ITEM_STATE_MACHINE_NAME)
-    StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> orderItemMachine;
+    StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> requestOrderItemMachine;
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createPurchaseOrder(ErpPurchaseOrderSaveReqVO createReqVO) {
@@ -110,9 +110,10 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         for (ErpPurchaseOrderItemDO orderItemDO : purchaseOrderItems) {
             Optional.ofNullable(orderItemDO.getPurchaseApplyItemId()).ifPresent(itemId -> {
                 ErpPurchaseRequestItemsDO itemsDO = requestItemsMapper.selectById(itemId);
-                //采购调整,设置下单数量进入DO，申请单去增减
-                itemsDO.setOrderedQuantity(orderItemDO.getCount().toBigInteger().intValue());
-                orderItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_ADJUSTMENT, itemsDO);
+                //采购调整,设置下单数量进入DO，申请单去增加
+                int oldCount = itemsDO.getOrderedQuantity() == null ? 0 : itemsDO.getOrderedQuantity();
+                itemsDO.setOrderedQuantity(oldCount + orderItemDO.getCount().toBigInteger().intValue());
+                requestOrderItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_ADJUSTMENT, itemsDO);
             });
         }
         return purchaseOrder.getId();
@@ -217,13 +218,43 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         // 第二步，批量添加、修改、删除
         if (CollUtil.isNotEmpty(diffList.get(0))) {
             diffList.get(0).forEach(o -> o.setOrderId(id));
+            for (ErpPurchaseOrderItemDO orderItemDO : diffList.get(0)) {
+                //新增如果有申请单项则发事件
+                Optional.ofNullable(orderItemDO.getPurchaseApplyItemId()).ifPresent(purchaseApplyItemId -> {
+                    ErpPurchaseRequestItemsDO requestItemsDO = requestItemsMapper.selectById(purchaseApplyItemId);
+                    int oldCount = requestItemsDO.getOrderedQuantity();
+                    requestItemsDO.setOrderedQuantity(oldCount + orderItemDO.getCount().toBigInteger().intValue());
+                    requestOrderItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, requestItemsDO);
+                });
+            }
             purchaseOrderItemMapper.insertBatch(diffList.get(0));
         }
         if (CollUtil.isNotEmpty(diffList.get(1))) {
+            for (ErpPurchaseOrderItemDO orderItemDO : diffList.get(1)) {
+                Optional.ofNullable(orderItemDO.getPurchaseApplyItemId()).ifPresent(purchaseApplyItemId -> {
+                    ErpPurchaseRequestItemsDO requestItemsDO = requestItemsMapper.selectById(purchaseApplyItemId);
+                    ErpPurchaseOrderItemDO oldOrderItem = purchaseOrderItemMapper.selectById(orderItemDO.getId());
+                    int newCount = requestItemsDO.getOrderedQuantity();
+                    int oldCount = oldOrderItem.getCount().intValue();
+                    requestItemsDO.setOrderedQuantity(newCount - oldCount);
+                    requestOrderItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, requestItemsDO);
+                });
+            }
+            //跟旧数据对比，申请数量差异，则发采购事件调整
             purchaseOrderItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
             purchaseOrderItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpPurchaseOrderItemDO::getId));
+            //减少申请项的采购数量
+            for (ErpPurchaseOrderItemDO orderItemDO : diffList.get(0)) {
+                //新增如果有申请单项则发事件
+                Optional.ofNullable(orderItemDO.getPurchaseApplyItemId()).ifPresent(purchaseApplyItemId -> {
+                    ErpPurchaseRequestItemsDO requestItemsDO = requestItemsMapper.selectById(purchaseApplyItemId);
+                    int oldCount = requestItemsDO.getOrderedQuantity();
+                    requestItemsDO.setOrderedQuantity(oldCount - orderItemDO.getCount().toBigInteger().intValue());
+                    requestOrderItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, requestItemsDO);
+                });
+            }
         }
     }
 
