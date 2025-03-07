@@ -1,6 +1,8 @@
 package com.somle.eccang.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.PageUtil;
+import cn.iocoder.yudao.framework.common.util.collection.PageUtils;
 import cn.iocoder.yudao.framework.common.util.general.CoreUtils;
 import cn.iocoder.yudao.framework.common.util.general.Limiter;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
@@ -172,20 +174,15 @@ public class EccangService {
     private Stream<EccangPage> getAllPage(JSONObject payload, String endpoint) {
         payload.put("page", 1);
         payload.put("page_size", pageSize);
-        return Stream.iterate(
-            getPage(payload, endpoint), Objects::nonNull,
+        return PageUtils.getAllPages(
+            getPage(payload, endpoint),
+            Objects::nonNull,
             bizContent -> {
-                if (bizContent.hasNext()) {
-                    log.debug("have next,endpoint:{}当前进度：{}/{}", endpoint, (bizContent.getPage() - 1) * pageSize + bizContent.getData().size(), bizContent.getTotal());
-                    payload.put("page", bizContent.getPage() + 1);
-                    return getPage(payload, endpoint);
-                } else {
-                    log.debug("no next page");
-                    return null;
-                }
+                log.debug("have next,endpoint:{}当前进度：{}/{}", endpoint, (bizContent.getPage() - 1) * pageSize + bizContent.getData().size(), bizContent.getTotal());
+                payload.put("page", bizContent.getPage() + 1);
+                return getPage(payload, endpoint);
             }
         );
-        // );
     }
 
 
