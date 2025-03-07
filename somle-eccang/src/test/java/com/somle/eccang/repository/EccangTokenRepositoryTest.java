@@ -1,12 +1,13 @@
 package com.somle.eccang.repository;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
-class EccangTokenRepositoryTest extends BaseDbUnitTest {
+class EccangTokenRepositoryTest extends SomleBaseDbUnitTest {
 
     @Resource
     EccangTokenRepository eccangTokenRepository;
