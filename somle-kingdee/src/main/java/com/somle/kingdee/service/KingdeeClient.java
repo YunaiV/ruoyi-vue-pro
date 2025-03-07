@@ -339,11 +339,18 @@ public class KingdeeClient {
         return response.getData(KingdeePage.class).getRowsList(KingdeePurOrder.class).stream().toList();
     }
 
-    public List<Object> getPurInbound(KingdeePurInboundReqVO vo) {
+    /**
+     * 获取采购单入库列表
+     * @param vo 请求参数
+     * @return List<KingdeePurInbound> 金蝶采购单入库列表
+     * 2025.03.07 gumaomao
+     *
+     * */
+    public List<KingdeePurInbound> getPurInbound(KingdeePurInboundReqVO vo) {
         log.debug("fetching purchase inbound");
         String endUrl = "/jdy/v2/scm/pur_inbound";
         KingdeeResponse response = getResponse(endUrl, vo);
-        return response.getData(KingdeePage.class).getRowsList(Object.class).stream().toList();
+        return response.getData(KingdeePage.class).getRowsList(KingdeePurInbound.class).stream().toList();
     }
     public KingdeePurOrderDetail getPurOrderDetail(String purOrderNumber) {
         String endUrl = "/jdy/v2/scm/pur_order_detail";

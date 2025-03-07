@@ -1,6 +1,7 @@
 package com.somle.esb.job;
 
 import com.somle.esb.model.OssData;
+import com.somle.kingdee.model.KingdeePurInbound;
 import com.somle.kingdee.model.KingdeePurInboundReqVO;
 import com.somle.kingdee.service.KingdeeClient;
 import org.springframework.stereotype.Component;
@@ -22,7 +23,7 @@ public class KingdeePurInboundJob extends KingdeeDataJob{
         // 获取所有 Kingdee 客户端列表
         for (KingdeeClient client : kingdeeService.getClients()) {
             // 获取当前客户端的采购入库单列表
-            List<Object> purInbounds = client.getPurInbound(vo);
+            List<KingdeePurInbound> purInbounds = client.getPurInbound(vo);
             // 获取当前时间戳，用于记录请求时间
             long currentTimeMillis = System.currentTimeMillis();
             // 发送采购请求数据到 OSS
