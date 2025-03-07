@@ -57,7 +57,7 @@ public class ErpPurchaseRequestItemsDO extends TenantBaseDO {
      */
     private Integer offStatus;
     /**
-     * 采购状态
+     * 订购状态
      */
     private Integer orderStatus;
     /**

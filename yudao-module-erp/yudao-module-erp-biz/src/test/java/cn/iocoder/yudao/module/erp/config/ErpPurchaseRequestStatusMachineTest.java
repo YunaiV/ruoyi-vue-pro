@@ -30,12 +30,12 @@ class ErpPurchaseRequestStatusMachineTest extends BaseDbUnitTest {
 
     @Resource
     ErpPurchaseRequestMapper mapper;
-    @Resource(name = ErpStateMachines.PURCHASE_REQUEST_STATE_MACHINE_NAME)
+    @Resource(name = ErpStateMachines.PURCHASE_REQUEST_AUDIT_STATE_MACHINE_NAME)
     StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestDO> auditMachine;
     @Resource(name = ErpStateMachines.PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME)
     StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestDO> offMachine;
 
-    @Resource(name = ErpStateMachines.PURCHASE_ORDER_STATE_MACHINE_NAME)
+    @Resource(name = ErpStateMachines.PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME)
     StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestDO> orderMachine;
 
     @BeforeAll

@@ -13,5 +13,5 @@ public class ErpOrderCountDTO {
     //订购数量
     private Integer orderCount;
     //布尔 增加、减少
-    private Boolean orderCountIsAdd;
+//    private Boolean orderCountIsAdd;
 }

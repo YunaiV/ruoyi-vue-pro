@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 public class ErpPurchaseOrderSaveReqVO {
 
-    @Schema(description = "编号")
+    @Schema(description = "id")
     @Null(groups = validation.OnCreate.class, message = "创建时，订单id必须为空")
     @NotNull(groups = validation.OnUpdate.class, message = "更新时，订单id不能为空")
     private Long id;
@@ -65,6 +65,7 @@ public class ErpPurchaseOrderSaveReqVO {
     @NotNull(message = "订单项不能为空")
     @Size(min = 1, message = "商品信息至少一个")
     private List<@Valid Item> items;
+
     @Data
     public static class Item {
 
@@ -129,8 +130,11 @@ public class ErpPurchaseOrderSaveReqVO {
         @Schema(description = "箱率")
         private String containerRate;
 
-        @Schema(description = "采购申请单，申请项编号")
+        @Schema(description = "采购申请单的申请项id")
         private Long erpPurchaseRequestItemId;
+
+        @Schema(description = "采购申请单No")
+        private String erpPurchaseRequestItemNo;
     }
 
 }

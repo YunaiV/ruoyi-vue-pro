@@ -72,7 +72,6 @@ public class ErpFinanceSubjectServiceImpl implements ErpFinanceSubjectService {
     }
 
     @Override
-    @Cacheable(value = "erp:finance-subject-list", key = "#pageReqVO.pageNo + '-' + #pageReqVO.pageSize", unless = "#result == null")
     public PageResult<ErpFinanceSubjectDO> getFinanceSubjectPage(ErpFinanceSubjectPageReqVO pageReqVO) {
         return financeSubjectMapper.selectPage(pageReqVO);
     }

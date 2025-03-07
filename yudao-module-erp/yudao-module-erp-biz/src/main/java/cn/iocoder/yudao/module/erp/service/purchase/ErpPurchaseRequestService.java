@@ -118,7 +118,7 @@ public interface ErpPurchaseRequestService {
      * @param id id
      * @return 采购订单
      */
-    ErpPurchaseRequestDO validatePurchaseRequestExists(Long id);
+    ErpPurchaseRequestDO validateIdExists(Long id);
 
     /**
      * 校验采购订单的子项目是否合法

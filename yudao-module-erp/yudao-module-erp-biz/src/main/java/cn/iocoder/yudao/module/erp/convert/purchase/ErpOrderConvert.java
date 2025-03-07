@@ -30,9 +30,9 @@ public interface ErpOrderConvert {
         // 设置税率
         item.setTaxPercent(itemDO.getTaxPercent());
 
-        //下单数量
-//        item.setCount(requestItemsMap.get(itemDO.getId()).getOrderQuantity());
-
+        //采购申请单下单数量->采购订单的申请数量
+        item.setApplyCount(requestItemsMap.get(itemDO.getId()).getOrderQuantity());
+        item.setErpPurchaseRequestItemId(itemDO.getId());
         return item;
     }
 

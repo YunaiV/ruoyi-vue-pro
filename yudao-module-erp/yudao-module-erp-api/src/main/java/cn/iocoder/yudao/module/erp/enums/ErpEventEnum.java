@@ -20,24 +20,23 @@ public enum ErpEventEnum {
 
     // 订购事件
     ORDER_INIT("订购初始化"),
-    PART_PURCHASE("部分采购"),
-    FULL_PURCHASE("完全采购"),
+    ORDER_ADJUSTMENT("订购数量调整"),
     ORDER_CANCEL("放弃采购"),
 
 
     // 采购事件
-    START_PURCHASE("开始采购"),
+    START_PURCHASE("采购初始化"),
+    PURCHASE_ADJUSTMENT("采购单修改"),
     PURCHASE_COMPLETE("采购完成"),
     ACCEPTANCE_PASS("验收通过"),
     ACCEPTANCE_FAIL("验收不通过"),
     PURCHASE_FAILED("采购失败"),
-    PURCHASE_CANCELLED("采购取消"),
+    PURCHASE_CANCELLED("取消采购订单"),
 
     // 入库事件
     STORAGE_INIT("入库初始化"),
     STOCK_ADJUSTMENT("库存调整"),
-    ADD_STOCK("添加库存"),
-    REDUCE_STOCK("减少库存"),
+    STORAGE_COMPLETE("入库完成"),
 
 
     ;

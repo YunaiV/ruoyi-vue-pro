@@ -14,12 +14,19 @@ import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchas
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseOrderItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseOrderMapper;
+import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestItemsMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
+import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
+import cn.iocoder.yudao.module.erp.enums.ErpStateMachines;
 import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpOffStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpOrderStatus;
 import cn.iocoder.yudao.module.erp.service.finance.ErpAccountService;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
+import com.alibaba.cola.statemachine.StateMachine;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,10 +34,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -51,17 +55,23 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     private ErpPurchaseOrderMapper purchaseOrderMapper;
     @Resource
     private ErpPurchaseOrderItemMapper purchaseOrderItemMapper;
-
     @Resource
     private ErpNoRedisDAO noRedisDAO;
-
     @Resource
     private ErpProductService productService;
     @Resource
     private ErpSupplierService supplierService;
     @Resource
     private ErpAccountService accountService;
+    @Resource
+    private ErpPurchaseRequestItemsMapper requestItemsMapper;
 
+    @Resource(name = ErpStateMachines.PURCHASE_ORDER_OFF_STATE_MACHINE_NAME)
+    StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseOrderDO> offMachine;
+    @Resource(name = ErpStateMachines.PURCHASE_ORDER_AUDIT_STATE_MACHINE_NAME)
+    StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseOrderDO> auditMachine;
+    @Resource(name = ErpStateMachines.PURCHASE_REQUEST_ITEM_STATE_MACHINE_NAME)
+    StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> orderItemMachine;
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createPurchaseOrder(ErpPurchaseOrderSaveReqVO createReqVO) {
@@ -89,6 +99,22 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         // 2.2 插入订单项
         purchaseOrderItems.forEach(o -> o.setOrderId(purchaseOrder.getId()));
         purchaseOrderItemMapper.insertBatch(purchaseOrderItems);
+        //3.0 设置初始化状态
+        //主表
+        offMachine.fireEvent(ErpOffStatus.OPEN, ErpEventEnum.OFF_INIT, purchaseOrder);
+        auditMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.AUDIT_INIT, purchaseOrder);
+//        orderMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_INIT, purchaseRequest);
+        //子表
+
+        //扣减采购申请项的库存
+        for (ErpPurchaseOrderItemDO orderItemDO : purchaseOrderItems) {
+            Optional.ofNullable(orderItemDO.getPurchaseApplyItemId()).ifPresent(itemId -> {
+                ErpPurchaseRequestItemsDO itemsDO = requestItemsMapper.selectById(itemId);
+                //采购调整,设置下单数量进入DO，申请单去增减
+                itemsDO.setOrderedQuantity(orderItemDO.getCount().toBigInteger().intValue());
+                orderItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_ADJUSTMENT, itemsDO);
+            });
+        }
         return purchaseOrder.getId();
     }
 

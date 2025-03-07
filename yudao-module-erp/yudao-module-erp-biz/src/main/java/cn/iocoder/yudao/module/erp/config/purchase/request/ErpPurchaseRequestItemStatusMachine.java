@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.erp.config.purchase.request;
 
+import cn.iocoder.yudao.module.erp.api.purchase.ErpOrderCountDTO;
 import cn.iocoder.yudao.module.erp.config.purchase.request.impl.BaseFailCallbackImpl;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.ErpStateMachines;
 import cn.iocoder.yudao.module.erp.enums.status.ErpOffStatus;
-import cn.iocoder.yudao.module.erp.enums.status.ErpStorageStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpOrderStatus;
 import com.alibaba.cola.statemachine.Action;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
@@ -22,7 +23,7 @@ public class ErpPurchaseRequestItemStatusMachine {
     @Resource
     private Action<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> actionItemOffImpl;
     @Resource
-    private Action<ErpStorageStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> actionItemStorageImpl;
+    private Action<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> actionItemOrderImpl;
     @Resource
     private BaseFailCallbackImpl baseFailCallbackImpl;
 
@@ -57,38 +58,50 @@ public class ErpPurchaseRequestItemStatusMachine {
         return builder.build(ErpStateMachines.PURCHASE_REQUEST_ITEM_OFF_STATE_MACHINE_NAME);
     }
 
-    //    子项入库状态
-    @Bean(ErpStateMachines.PURCHASE_ORDER_ITEM_STATE_MACHINE_NAME)
-    public StateMachine<ErpStorageStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> getPurchaseOrderStateMachine() {
-        StateMachineBuilder<ErpStorageStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> builder = StateMachineBuilderFactory.create();
-//        INIT_STORAGE("入库初始化"),
-//            ADD_TO_STORAGE("添加至库存"),
-//            REMOVE_FROM_STORAGE("从库存移除"),
-//            STOCK_ADJUSTMENT("库存调整");
-        // 初始化状态
+    //    子项采购状态
+    @Bean(ErpStateMachines.PURCHASE_REQUEST_ITEM_STATE_MACHINE_NAME)
+    public StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> getPurchaseOrderStateMachine() {
+        StateMachineBuilder<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> builder = StateMachineBuilderFactory.create();
+        //初始化
         builder.internalTransition()
-            .within(ErpStorageStatus.NONE_IN_STORAGE)
-            .on(ErpEventEnum.STORAGE_INIT)
-            .perform(actionItemStorageImpl);
-        //添加库存
+            .within(ErpOrderStatus.OT_ORDERED)
+            .on(ErpEventEnum.START_PURCHASE)
+            .perform(actionItemOrderImpl);
+        //采购数量调整(未+局部 <-> 局部+整体)
         builder.externalTransition()
-            .from(ErpStorageStatus.NONE_IN_STORAGE)
-            .to(ErpStorageStatus.PARTIALLY_IN_STORAGE)
-            .on(ErpEventEnum.ADD_STOCK)
-            .perform(actionItemStorageImpl);
-        //减少库存
+            .from(ErpOrderStatus.OT_ORDERED)
+            .to(ErpOrderStatus.PARTIALLY_ORDERED)
+            .on(ErpEventEnum.PURCHASE_ADJUSTMENT)
+            .perform(actionItemOrderImpl);
         builder.externalTransition()
-            .from(ErpStorageStatus.PARTIALLY_IN_STORAGE)
-            .to(ErpStorageStatus.NONE_IN_STORAGE)
-            .on(ErpEventEnum.REDUCE_STOCK)
-            .perform(actionItemStorageImpl);
-        // 库存调整：从任何存储状态到调整状态，触发STOCK_ADJUSTMENT事件
-//        builder.externalTransition()
-//            .from(ErpStorageStatus.PARTIALLY_IN_STORAGE)
-//            .to(ErpStorageStatus.STOCK_ADJUSTMENT)
-//            .on(ErpEventEnum.STOCK_ADJUSTMENT)
-//            .perform(actionItemStorageImpl);
+            .from(ErpOrderStatus.OT_ORDERED)
+            .to(ErpOrderStatus.ORDERED)
+            .on(ErpEventEnum.PURCHASE_ADJUSTMENT)
+            .perform(actionItemOrderImpl);
+        builder.internalTransition()
+            .within(ErpOrderStatus.PARTIALLY_ORDERED)
+            .on(ErpEventEnum.PURCHASE_ADJUSTMENT)
+            .perform(actionItemOrderImpl);
+        builder.externalTransitions()
+            .fromAmong(ErpOrderStatus.ORDERED, ErpOrderStatus.PARTIALLY_ORDERED)
+            .to(ErpOrderStatus.OT_ORDERED)
+            .on(ErpEventEnum.PURCHASE_ADJUSTMENT)
+            .perform(actionItemOrderImpl);
+        builder.externalTransitions()
+            .fromAmong(ErpOrderStatus.ORDERED)
+            .to(ErpOrderStatus.PARTIALLY_ORDERED)
+            .on(ErpEventEnum.PURCHASE_ADJUSTMENT)
+            .perform(actionItemOrderImpl);
+
+        //采购完成
+        builder.internalTransition()
+            .within(ErpOrderStatus.ORDERED)
+            .on(ErpEventEnum.PURCHASE_COMPLETE)
+            .perform(actionItemOrderImpl);
+
         builder.setFailCallback(baseFailCallbackImpl);
-        return builder.build(ErpStateMachines.PURCHASE_ORDER_ITEM_STATE_MACHINE_NAME);
+        return builder.build(ErpStateMachines.PURCHASE_REQUEST_ITEM_STATE_MACHINE_NAME);
     }
+
+
 }

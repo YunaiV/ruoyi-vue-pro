@@ -34,7 +34,7 @@ public class ErpPurchaseRequestStatusMachine {
     @Resource
     private BaseFailCallbackImpl baseFailCallbackImpl;
 
-    @Bean(ErpStateMachines.PURCHASE_REQUEST_STATE_MACHINE_NAME)
+    @Bean(ErpStateMachines.PURCHASE_REQUEST_AUDIT_STATE_MACHINE_NAME)
     public StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestAuditReqVO> getPurchaseRequestStateMachine() {
         StateMachineBuilder<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestAuditReqVO> builder = StateMachineBuilderFactory.create();
 
@@ -72,7 +72,7 @@ public class ErpPurchaseRequestStatusMachine {
             .on(ErpEventEnum.WITHDRAW_REVIEW)
             .perform(actionAuditImpl);
         builder.setFailCallback(baseFailCallbackImpl);
-        return builder.build(ErpStateMachines.PURCHASE_REQUEST_STATE_MACHINE_NAME);
+        return builder.build(ErpStateMachines.PURCHASE_REQUEST_AUDIT_STATE_MACHINE_NAME);
     }
 
     @Bean(ErpStateMachines.PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME)
@@ -108,7 +108,7 @@ public class ErpPurchaseRequestStatusMachine {
         return builder.build(ErpStateMachines.PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME);
     }
 
-    @Bean(ErpStateMachines.PURCHASE_ORDER_STATE_MACHINE_NAME)
+    @Bean(ErpStateMachines.PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME)
     public StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestDO> getPurchaseOrderStateMachine() {
         StateMachineBuilder<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestDO> builder = StateMachineBuilderFactory.create();
         //初始化事件
@@ -116,21 +116,23 @@ public class ErpPurchaseRequestStatusMachine {
             .within(ErpOrderStatus.OT_ORDERED)
             .on(ErpEventEnum.ORDER_INIT)
             .perform(actionOrderImpl);
-        //部分采购
+        // ->未订购
         builder.externalTransitions()
-            .fromAmong(ErpOrderStatus.OT_ORDERED)
+            .fromAmong(ErpOrderStatus.ORDERED, ErpOrderStatus.PARTIALLY_ORDERED)
+            .to(ErpOrderStatus.OT_ORDERED)
+            .on(ErpEventEnum.ORDER_ADJUSTMENT)
+            .perform(actionOrderImpl);
+        //->部分订购
+        builder.externalTransitions()
+            .fromAmong(ErpOrderStatus.OT_ORDERED, ErpOrderStatus.ORDERED)
             .to(ErpOrderStatus.PARTIALLY_ORDERED)
-            .on(ErpEventEnum.PART_PURCHASE)
+            .on(ErpEventEnum.ORDER_ADJUSTMENT)
             .perform(actionOrderImpl);
-        builder.internalTransition()
-            .within(ErpOrderStatus.PARTIALLY_ORDERED)
-            .on(ErpEventEnum.PART_PURCHASE)
-            .perform(actionOrderImpl);
-        //完全采购
+        //->全部订购
         builder.externalTransitions()
-            .fromAmong(ErpOrderStatus.PARTIALLY_ORDERED)
+            .fromAmong(ErpOrderStatus.OT_ORDERED, ErpOrderStatus.PARTIALLY_ORDERED)
             .to(ErpOrderStatus.ORDERED)
-            .on(ErpEventEnum.FULL_PURCHASE)
+            .on(ErpEventEnum.ORDER_ADJUSTMENT)
             .perform(actionOrderImpl);
         //放弃订购
         builder.externalTransitions()
@@ -139,6 +141,6 @@ public class ErpPurchaseRequestStatusMachine {
             .on(ErpEventEnum.ORDER_CANCEL)
             .perform(actionOrderImpl);
         builder.setFailCallback(baseFailCallbackImpl);
-        return builder.build(ErpStateMachines.PURCHASE_ORDER_STATE_MACHINE_NAME);
+        return builder.build(ErpStateMachines.PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME);
     }
 }

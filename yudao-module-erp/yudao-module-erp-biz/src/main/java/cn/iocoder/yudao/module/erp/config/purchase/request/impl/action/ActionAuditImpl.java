@@ -40,11 +40,11 @@ public class ActionAuditImpl implements Action<ErpAuditStatus, ErpEventEnum, Erp
     @Override
     @Transactional
     public void execute(ErpAuditStatus from, ErpAuditStatus to, ErpEventEnum event, ErpPurchaseRequestAuditReqVO req) {
-        ErpPurchaseRequestDO requestDO = mapper.selectById(req.getRequestId());
+        ErpPurchaseRequestDO data = mapper.selectById(req.getRequestId());
         List<ErpPurchaseRequestItemsDO> itemsDOS = itemsMapper.selectListByRequestId(req.getRequestId());
-        validate(from, to, event, requestDO);
+        validate(from, to, event, data);
         //审核通过(批准数量)
-        if (ErpAuditStatus.APPROVED.getCode().equals(to.getCode())) {
+        if (event == ErpEventEnum.AGREE) {
             Map<Long, ErpPurchaseRequestAuditReqVO.requestItems> itemMap = req.getItems().stream()
                 .collect(Collectors.toMap(ErpPurchaseRequestAuditReqVO.requestItems::getId, item -> item));
             // 设置批准数量
@@ -53,25 +53,27 @@ public class ActionAuditImpl implements Action<ErpAuditStatus, ErpEventEnum, Erp
                 itemDO.setApproveCount(item.getApproveCount() == null ? itemDO.getCount() : item.getApproveCount());//默认(批准数量 = 申请数量)
             });
             //设置审核意见
-            requestDO.setReviewComment(req.getReviewComment());
-            requestDO.setAuditTime(LocalDateTime.now());
-            requestDO.setAuditorId(getLoginUserId());
+            data.setReviewComment(req.getReviewComment());
+            data.setAuditTime(LocalDateTime.now());
+            data.setAuditorId(getLoginUserId());
         }
         //审核不通过(设置未通过意见)
-        if (ErpAuditStatus.REVOKED.getCode().equals(to.getCode())) {
-            requestDO.setReviewComment(req.getReviewComment());
+        if (event == ErpEventEnum.REJECT) {
+            data.setReviewComment(req.getReviewComment());
+            data.setAuditTime(LocalDateTime.now());
+            data.setAuditorId(getLoginUserId());
         }
         //反审核
-        if (ErpAuditStatus.DRAFT.getCode().equals(to.getCode())) {
+        if (event == ErpEventEnum.WITHDRAW_REVIEW) {
             //设置审核时间
-            requestDO.setAuditTime(LocalDateTime.now());
-            requestDO.setAuditorId(getLoginUserId());
+            data.setAuditTime(LocalDateTime.now());
+            data.setAuditorId(getLoginUserId());
         }
         //持久化变更状态
-        requestDO.setStatus(to.getCode());
+        data.setStatus(to.getCode());
         ThrowUtil.ifThrow(!itemsMapper.updateBatch(itemsDOS), DB_BATCH_UPDATE_ERROR);
-        ThrowUtil.ifSqlThrow(mapper.updateById(requestDO), DB_UPDATE_ERROR);
-        log.info("审核状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(requestDO), from.getDesc(), to.getDesc());
+        ThrowUtil.ifSqlThrow(mapper.updateById(data), DB_UPDATE_ERROR);
+        log.info("审核状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(data), from.getDesc(), to.getDesc());
     }
 
     //校验方法
@@ -84,7 +86,6 @@ public class ActionAuditImpl implements Action<ErpAuditStatus, ErpEventEnum, Erp
             ThrowUtil.ifThrow(ErpOrderStatus.PARTIALLY_ORDERED.getCode().equals(aDo.getOrderStatus()) ||
                 ErpOrderStatus.ORDERED.getCode().equals(aDo.getOrderStatus()
                 ), PURCHASE_REQUEST_PROCESS_FAIL_ORDERED);
-            //设置子表批准数量null
         }
     }
 }

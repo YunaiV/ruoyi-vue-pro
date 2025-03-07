@@ -81,6 +81,7 @@ public class ErpSupplierController {
 
     @GetMapping("/simple-list")
     @Operation(summary = "获得供应商精简列表", description = "只包含被开启的供应商，主要用于前端的下拉选项")
+    @PreAuthorize("@ss.hasPermission('erp:supplier:query')")
     public CommonResult<List<ErpSupplierRespVO>> getSupplierSimpleList() {
         List<ErpSupplierDO> list = supplierService.getSupplierListByStatus(CommonStatusEnum.ENABLE.getStatus());
         return success(convertList(list, supplier -> new ErpSupplierRespVO().setId(supplier.getId()).setName(supplier.getName())));

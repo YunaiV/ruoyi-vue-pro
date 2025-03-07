@@ -26,9 +26,6 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
     private String no;
     @Schema(description = "单据日期")
     private LocalDateTime noTime;
-    @Schema(description = "采购状态描述")
-    @ExcelProperty("采购状态")
-    private String statusDesc;
     @Schema(description = "采购时间")
     @ExcelProperty("采购时间")
     private LocalDateTime orderTime;
@@ -37,6 +34,11 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
     @Schema(description = "产品信息")
     @ExcelProperty("产品信息")
     private String productNames;
+    @Schema(description = "供应商编号")
+    private Long supplierId;
+    
+    @Schema(description = "供应商名称")
+    private Long supplierName;
     // ========== 采购入库 ==========
     @Schema(description = "订单采购入库数量")
     private BigDecimal totalInCount;
@@ -61,18 +63,15 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
     private Integer auditStatus;
     @Schema(description = "开关状态")
     private Integer offStatus;
-    @Schema(description = "支付状态")
-    private Integer orderStatus;
     @Schema(description = "执行状态")
     private Integer executeStatus;
-    //入库状态
     @Schema(description = "入库状态")
     private Integer inStatus;
-    //付款状态
     @Schema(description = "付款状态")
     private Integer payStatus;
     @Schema(description = "备注")
     private String remark;
+
     @Data
     public static class Item extends BaseVO {
         @Schema(description = "订单项编号")

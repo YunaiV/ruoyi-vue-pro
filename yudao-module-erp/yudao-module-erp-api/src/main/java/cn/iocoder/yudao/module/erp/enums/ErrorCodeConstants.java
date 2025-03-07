@@ -32,6 +32,7 @@ public interface ErrorCodeConstants {
     ErrorCode PURCHASE_ORDER_PROCESS_FAIL_EXISTS_RETURN = new ErrorCode(1_030_101_010, "反审核失败，已存在对应的采购退货单");
     ErrorCode PURCHASE_ORDER_NO_OUT_OF_BOUNDS = new ErrorCode(1_030_101_011, "采购订单号编码大于999999,生成失败");
     ErrorCode PURCHASE_ORDER_CODE_DUPLICATE = new ErrorCode(1_030_101_012, "采购订单编号({})已存在");
+    ErrorCode PURCHASE_ORDER_CLOSE_FAIL = new ErrorCode(1_030_101_014, "未审核的采购订单({})不能进行关闭");
 
     // ========== ERP 采购入库（1-030-102-000） ==========
     ErrorCode PURCHASE_IN_NOT_EXISTS = new ErrorCode(1_030_102_000, "采购入库单不存在");
@@ -219,7 +220,7 @@ public interface ErrorCodeConstants {
     ErrorCode PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_STATUS = new ErrorCode(1_030_603_144, "无法在当前状态({})下触发事件({})");
     //采购订单
     // ========== ERP 采购订单 1-030-604-300 ==========
-    ErrorCode PURCHASE_ORDER_CLOSE_FAIL = new ErrorCode(1_030_604_000, "未审核的采购订单({})不能进行关闭");
+
     // ========== ERP 采购入库单 1-030-605-300 ==========
     // ========== ERP 采购退货单 1-030-606-300 ==========
     // ========== ERP 采购支付单 1-030-607-300 ==========

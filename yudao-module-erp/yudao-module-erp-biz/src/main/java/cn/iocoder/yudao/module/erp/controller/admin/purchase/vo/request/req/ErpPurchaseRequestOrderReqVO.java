@@ -30,9 +30,9 @@ public class ErpPurchaseRequestOrderReqVO {
         @Schema(description = "申请单项ID", requiredMode = Schema.RequiredMode.REQUIRED)
         private Long id;
 
-        @Schema(description = "供应商产品id")
-        @NotNull(message = "供应商产品id不能为空")
-        private Long supplierProductId;
+//        @Schema(description = "供应商产品id")
+//        @NotNull(message = "供应商产品id不能为空")
+//        private Long supplierProductId;
 
         //下单数量
         @NotNull(message = "下单数量不能为空")
