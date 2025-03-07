@@ -221,8 +221,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 processDefinitionInfo,
                 processVariables, activities);
         // 3.3 如果是发起动作，activityId 为开始节点，不校验审批人自选节点
-        // TODO @小北：ObjUtil.equals(reqVO.getActivityId(), BpmnModelConstants.START_USER_NODE_ID) 够啦，不用判空
-        if (ObjUtil.isNotNull(reqVO.getActivityId()) && ObjUtil.equals(reqVO.getActivityId(), BpmnModelConstants.START_USER_NODE_ID)) {
+        if (ObjUtil.equals(reqVO.getActivityId(), BpmnModelConstants.START_USER_NODE_ID)) {
             simulateActivityNodes.removeIf(node ->
                     BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy().equals(node.getCandidateStrategy()));
         }
