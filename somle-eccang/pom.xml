@@ -36,14 +36,6 @@
             <artifactId>spring-boot-starter-integration</artifactId>
         </dependency>
 
-        <!-- 添加dom4j依赖解析xml结果 -->
-        <dependency>
-            <groupId>org.dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>${dom4j.version}</version>
-        </dependency>
-
-
     </dependencies>
 
 </project>

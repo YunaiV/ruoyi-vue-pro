@@ -1,6 +1,7 @@
 package com.somle.eccang.model.req;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
@@ -16,6 +17,7 @@ import java.util.List;
 public class EccangSpecialOrdersReqVo {
 
     // 必填字段
+    @JsonProperty("pageSize")
     private int pageSize; // 每页数据长度，最大值100
     private int page;     // 当前页
 

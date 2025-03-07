@@ -5,7 +5,7 @@ import com.somle.eccang.model.req.EccangSpecialOrdersReqVo;
 import com.somle.esb.model.OssData;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.atomic.AtomicInteger;
+
 
 
 /**
@@ -16,22 +16,19 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @description: 易仓WMS获取退件列表
  */
 @Component
-public class EccangGetSpecialOrdersDataJob extends EccangDataJob{
+public class EccangSpecialOrdersDataJob extends EccangDataJob{
 
     @Override
     public String execute(String param) throws Exception {
         setDate(param);
 
-        AtomicInteger totalPages = new AtomicInteger();  // 追踪处理的总页数
-        AtomicInteger totalCount = new AtomicInteger();  // 追踪处理的总数
-        eccangWMSService.getSpecialOrdersList(EccangSpecialOrdersReqVo.builder()
+        eccangWMSService.streamSpecialOrders(EccangSpecialOrdersReqVo.builder()
                 .spoAddTimeFrom(beforeYesterdayFirstSecond)
                 .spoAddTimeTo(beforeYesterdayLastSecond)
+                .page(1)
+                .pageSize(100)
                 .build()).forEach(
                 page -> {
-                    totalPages.getAndIncrement();  // 增加页面计数
-                    totalCount.getAndUpdate(v -> page.getTotal());  // 增加总记录数
-
                     OssData data = OssData.builder()
                             .database(DATABASE)
                             .tableName("special_orders")
@@ -44,7 +41,7 @@ public class EccangGetSpecialOrdersDataJob extends EccangDataJob{
                     service.send(data);
                 }
         );
-        // 返回包含总页数和总记录数的结果
-        return String.format("Data upload success, total pages processed: %d, total records processed: %d", totalPages.get(), totalCount.get());
+
+        return "data upload success";
     }
 }

@@ -1,15 +1,9 @@
 package com.somle.eccang.model;
 
-
-import cn.iocoder.yudao.framework.common.util.json.JSONObject;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -28,10 +22,9 @@ public class EccangWMSResponse {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Pagination {
-        private int page;
-        private int pageSize = 20;
+        private Integer page;
+        private Integer pageSize;
     }
 
 
@@ -39,8 +32,8 @@ public class EccangWMSResponse {
         EccangResponse.EccangPage eccangPage = new EccangResponse.EccangPage();
         eccangPage.setTotal(Integer.valueOf(this.total));
         eccangPage.setTotalCount(Integer.valueOf(this.total));
-        eccangPage.setPageSize(Integer.valueOf(this.pagination.pageSize));
-        eccangPage.setPage(Integer.valueOf(this.pagination.page));
+        eccangPage.setPageSize(this.pagination.pageSize);
+        eccangPage.setPage(this.pagination.page);
         eccangPage.setData(data);
         return eccangPage;
     }

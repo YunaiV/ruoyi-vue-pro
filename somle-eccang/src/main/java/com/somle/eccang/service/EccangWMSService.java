@@ -1,5 +1,7 @@
 package com.somle.eccang.service;
 
+import cn.hutool.core.util.XmlUtil;
+import cn.iocoder.yudao.framework.common.util.collection.PageUtils;
 import cn.iocoder.yudao.framework.common.util.general.CoreUtils;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
@@ -15,16 +17,13 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-import java.io.ByteArrayInputStream;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 
@@ -34,7 +33,6 @@ public class EccangWMSService {
 
     private OkHttpClient client;
 
-    private int pageSize = 20;
     private  String appToken;
 
     private  String appKey;
@@ -52,27 +50,16 @@ public class EccangWMSService {
     }
 
 
-    public Stream<EccangResponse.EccangPage> getSpecialOrdersList(EccangSpecialOrdersReqVo eccangSpecialOrdersReqVo) {
-        return getAllPage(JsonUtilsX.toJSONObject(eccangSpecialOrdersReqVo), "getSpecialOrdersList");
-    }
-
-    private Stream<EccangResponse.EccangPage> getAllPage(JSONObject payload, String endpoint) {
-        payload.put("page", 1);
-        payload.put("page_size", pageSize);
-        return Stream.iterate(
-                getPage(payload, endpoint), Objects::nonNull,
-                bizContent -> {
-                    if (bizContent.hasNext()) {
-                        log.debug("have next,endpoint:{}当前进度：{}/{}", endpoint, (bizContent.getPage() - 1) * pageSize + bizContent.getData().size(), bizContent.getTotal());
-                        payload.put("page", bizContent.getPage() + 1);
-                        return getPage(payload, endpoint);
-                    } else {
-                        log.debug("no next page");
-                        return null;
-                    }
+    public Stream<EccangResponse.EccangPage> streamSpecialOrders(EccangSpecialOrdersReqVo eccangSpecialOrdersReqVo) {
+        String endpoint = "getSpecialOrdersList";
+        return PageUtils.getAllPages(
+                getPage(JsonUtilsX.toJSONObject(eccangSpecialOrdersReqVo), endpoint),
+                page -> page.hasNext(),
+                page -> {
+                        eccangSpecialOrdersReqVo.setPage(page.getPage() + 1);
+                        return getPage(JsonUtilsX.toJSONObject(eccangSpecialOrdersReqVo), endpoint);
                 }
         );
-        // );
     }
 
     private EccangResponse.EccangPage getPage(JSONObject payload, String endpoint) {
@@ -104,7 +91,7 @@ public class EccangWMSService {
                 switch (response.code()) {
                     case 200:
                         var responseBody = response.body().string();
-                        String jsonObject= parseObjectByDom4j(responseBody).toString();
+                        String jsonObject= parseObjectByXmlUtil(responseBody).toString();
                         var responseOriginal = JsonUtilsX.parseObject(jsonObject, EccangWMSResponse.class);
                         return responseOriginal;
                     case 429:
@@ -135,15 +122,12 @@ public class EccangWMSService {
     }
 
     @SneakyThrows
-    protected JSONObject parseObjectByDom4j(String responseBody) {
-        // 创建一个Dom4J框架提供的解析器对象
-        SAXReader saxReader = new SAXReader();
-        //2.使用saxReader对象把需要解析的XML文件读成一个Document对象。
-        Document document = saxReader.read(new ByteArrayInputStream(responseBody.getBytes()));
-        // 3、获得根元素对象
-        Element root = document.getRootElement();
-        // 获取<reponse>标签中的内容，即返回结果
-        String responseText = root.elements().get(0).elements().get(0).elements().get(0).getText();
+    protected JSONObject parseObjectByXmlUtil(String responseBody) {
+        Document document = XmlUtil.parseXml(responseBody);
+        //1.获取根节点
+        Element root = document.getDocumentElement();
+        //2.逐级获取<response>标签中的响应内容
+        String responseText = root.getChildNodes().item(0).getChildNodes().item(0).getChildNodes().item(0).getTextContent();
         JSONObject result = JsonUtilsX.parseObject(responseText, JSONObject.class);
         return result;
     }
