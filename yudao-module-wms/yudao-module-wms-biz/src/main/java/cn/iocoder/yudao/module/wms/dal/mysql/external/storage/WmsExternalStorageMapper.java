@@ -27,4 +27,6 @@ public interface WmsExternalStorageMapper extends BaseMapperX<WmsExternalStorage
                 .orderByDesc(WmsExternalStorageDO::getId));
     }
 
+    
+
 }

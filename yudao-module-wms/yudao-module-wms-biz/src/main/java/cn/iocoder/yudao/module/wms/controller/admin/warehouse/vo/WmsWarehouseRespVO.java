@@ -1,0 +1,83 @@
+package cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+import java.util.*;
+import org.springframework.format.annotation.DateTimeFormat;
+import java.time.LocalDateTime;
+import com.alibaba.excel.annotation.*;
+
+@Schema(description = "管理后台 - 仓库 Response VO")
+@Data
+@ExcelIgnoreUnannotated
+public class WmsWarehouseRespVO {
+
+    @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "30946")
+    @ExcelProperty("主键")
+    private Long id;
+
+    @Schema(description = "属性/模式 : 0-自营;1-三方;2-平台；", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("属性/模式 : 0-自营;1-三方;2-平台；")
+    private Integer mode;
+
+    @Schema(description = "代码", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("代码")
+    private String code;
+
+    @Schema(description = "名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "李四")
+    @ExcelProperty("名称")
+    private String name;
+
+    @Schema(description = "外部存储ID", example = "22814")
+    @ExcelProperty("外部存储ID")
+    private Long externalStorageId;
+
+    @Schema(description = "外部存储代码")
+    @ExcelProperty("外部存储代码")
+    private String externalStorageCode;
+
+    @Schema(description = "公司名称", example = "张三")
+    @ExcelProperty("公司名称")
+    private String companyName;
+
+    @Schema(description = "国家")
+    @ExcelProperty("国家")
+    private String country;
+
+    @Schema(description = "省/州")
+    @ExcelProperty("省/州")
+    private String province;
+
+    @Schema(description = "市")
+    @ExcelProperty("市")
+    private String city;
+
+    @Schema(description = "详细地址1")
+    @ExcelProperty("详细地址1")
+    private String addressLine1;
+
+    @Schema(description = "详细地址2")
+    @ExcelProperty("详细地址2")
+    private String addressLine2;
+
+    @Schema(description = "邮编")
+    @ExcelProperty("邮编")
+    private String postcode;
+
+    @Schema(description = "联系人")
+    @ExcelProperty("联系人")
+    private String contactPerson;
+
+    @Schema(description = "联系的话")
+    @ExcelProperty("联系的话")
+    private String contactPhone;
+
+    @Schema(description = "库存同步：0-关闭；1-开启；")
+    @ExcelProperty("库存同步：0-关闭；1-开启；")
+    private Integer isSync;
+
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("创建时间")
+    private LocalDateTime createTime;
+
+}

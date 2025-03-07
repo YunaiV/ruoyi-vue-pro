@@ -57,7 +57,7 @@ public class WmsExternalStorageServiceImpl implements WmsExternalStorageService 
 
     private void validateExternalStorageExists(Long id) {
         if (externalStorageMapper.selectById(id) == null) {
-            throw exception(EXTERNAL_STORAGE_NOT_EXISTS);
+            // throw exception(EXTERNAL_STORAGE_NOT_EXISTS);
         }
     }
 
