@@ -1,9 +1,11 @@
 package com.somle.cdiscount.service;
+import cn.hutool.http.ContentType;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import cn.iocoder.yudao.framework.common.util.web.RequestX;
 import cn.iocoder.yudao.framework.common.util.web.WebUtils;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.somle.cdiscount.model.CdiscountToken;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -19,13 +21,14 @@ public class CdiscountClient {
     private final String TOKEN_URL = "https://auth.octopia-io.net/auth/realms/maas/protocol/openid-connect/token";
 
    //此参数拼接方式必须配合header中"Content-Type", "application/x-www-form-urlencoded"方式使用
-    private final String TOKEN_REQUEST_BODY;
 
    //卖家ID
     public static final String SELLER_ID = "79730";
 
+    private CdiscountToken token;
+
     public CdiscountClient(CdiscountToken token) {
-        this.TOKEN_REQUEST_BODY = "client_id=" + token.getClientId() + "&client_secret=" + token.getClientSecret() + "&grant_type=client_credentials";
+        this.token = token;
     }
 
     public Map<String, String> getHeaders() throws IOException {
@@ -57,12 +60,21 @@ public class CdiscountClient {
     }
 
 
+    @SneakyThrows
     public String getAccessToken(){
-        String body = HttpUtils.post(TOKEN_URL, Map.of(
-                        "Content-Type", "application/x-www-form-urlencoded"
-                ), TOKEN_REQUEST_BODY
-        );
-        JSONObject jsonObject = JsonUtilsX.parseObject(body, JSONObject.class);
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.POST)
+            .url(TOKEN_URL)
+            .payload(token)
+            .queryParams(
+                Map.of(
+                    "Content-Type", "application/x-www-form-urlencoded"
+                )
+            )
+            .contentType(ContentType.FORM_URLENCODED)
+            .build();
+        var bodyString = WebUtils.sendRequest(request).body().string();
+        JSONObject jsonObject = JsonUtilsX.parseObject(bodyString, JSONObject.class);
         return jsonObject.getString("access_token");
     }
 }

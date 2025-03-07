@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.common.util.web;
 
+import cn.hutool.http.ContentType;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +24,7 @@ public class RequestX {
 //    private List<String> paths;
     private Object queryParams;
     private Map<String, String> headers;
+    private ContentType contentType=ContentType.JSON;
     private Object payload;
 
     @Getter
