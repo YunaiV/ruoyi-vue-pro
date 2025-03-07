@@ -21,6 +21,7 @@ public class RequestX {
 //    private List<String> paths;
     private Object queryParams;
     private Map<String, String> headers;
+    @Builder.Default
     private ContentType contentType=ContentType.JSON;
     private Object payload;
 
