@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class KingdeePurInboundJob extends KingdeeDataJob{
+public class KingdeePurInboundDataJob extends KingdeeDataJob{
 
 
     @Override
