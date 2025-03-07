@@ -17,7 +17,7 @@ public class CdiscountClient {
 
     //Cdiscount平台API请求路径
     private final String URL = "https://api.octopia-io.net/seller/v2";
-   //Cdiscount平台获取token的请求路径
+    //Cdiscount平台获取token的请求路径
     private final String TOKEN_URL = "https://auth.octopia-io.net/auth/realms/maas/protocol/openid-connect/token";
 
     private CdiscountToken token;
@@ -39,16 +39,16 @@ public class CdiscountClient {
         //Cdiscount平台订单查询接口路径
         var endpoint = "/orders";
         var request = RequestX.builder()
-                .requestMethod(RequestX.Method.GET)
-                .url(URL+endpoint)
-                .queryParams(
-                        Map.of(
-                                "salesChannelId", "CDISFR",
-                                "shippingCountry", "Fr"
-                        )
+            .requestMethod(RequestX.Method.GET)
+            .url(URL + endpoint)
+            .queryParams(
+                Map.of(
+                    "salesChannelId", "CDISFR",
+                    "shippingCountry", "Fr"
                 )
-                .headers(getHeaders())
-                .build();
+            )
+            .headers(getHeaders())
+            .build();
         var bodyString = WebUtils.sendRequest(request).body().string();
         var result = JsonUtilsX.parseObject(bodyString, JSONObject.class);
         return result;
@@ -56,7 +56,7 @@ public class CdiscountClient {
 
 
     @SneakyThrows
-    public String getAccessToken(){
+    public String getAccessToken() {
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.POST)
             .url(TOKEN_URL)
