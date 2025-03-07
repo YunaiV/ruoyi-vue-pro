@@ -1,12 +1,12 @@
 package com.somle.esb.job;
 
 
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import com.somle.esb.model.Domain;
 import com.somle.esb.model.OssData;
 import com.somle.esb.service.EsbService;
-import cn.iocoder.yudao.framework.common.util.collection.PageUtils;
 import com.somle.matomo.model.MatomoMethodVO;
 import com.somle.matomo.model.MatomoVisitReqVO;
 import com.somle.matomo.service.MatomoService;
@@ -48,7 +48,7 @@ public class MatomoDataJob extends DataJob {
                 .filterOffset(0)
                 .build();
 
-            var results = PageUtils.getAllPages(
+            var results = StreamX.getAllPages(
                 matomoService.getResponse(methodVO, reqVO),
                 response -> !response.isEmpty(),
                 response -> {
