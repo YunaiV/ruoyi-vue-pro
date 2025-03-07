@@ -1,6 +1,6 @@
 package com.somle.esb.config;
 
-import cn.iocoder.yudao.framework.test.core.ut.BaseSpringIntegrationTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseSpringIntegrationTest;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import org.springframework.messaging.MessageChannel;
     IntegrationConfig.class,
     TestHandler.class,
 })
-class IntegrationConfigTest extends BaseSpringIntegrationTest {
+class IntegrationConfigTestSomle extends SomleBaseSpringIntegrationTest {
 
     @Resource
     MessageChannel testChannel;

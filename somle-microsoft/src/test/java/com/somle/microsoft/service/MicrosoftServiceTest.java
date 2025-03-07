@@ -2,6 +2,7 @@ package com.somle.microsoft.service;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.test.core.ut.BaseSpringTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
 import com.somle.microsoft.model.PowerbiAccount;
 import com.somle.microsoft.model.PowerbiReportReqVO;
 import jakarta.annotation.Resource;
@@ -17,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @Import(MicrosoftService.class)
-class MicrosoftServiceTest extends BaseDbUnitTest {
+class MicrosoftServiceTest extends SomleBaseDbUnitTest {
 
     @Resource
     MicrosoftService service;

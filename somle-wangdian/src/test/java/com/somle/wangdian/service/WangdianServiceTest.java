@@ -2,6 +2,7 @@ package com.somle.wangdian.service;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.test.core.ut.BaseSpringTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
 import com.somle.wangdian.model.WangdianTradeReqVO;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
@@ -16,7 +17,7 @@ import java.util.Map;
 
 @Slf4j
 @Import(WangdianService.class)
-class WangdianServiceTest extends BaseDbUnitTest {
+class WangdianServiceTest extends SomleBaseDbUnitTest {
 
     @Resource
     WangdianService service;

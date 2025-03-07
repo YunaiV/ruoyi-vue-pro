@@ -1,6 +1,7 @@
 package com.somle.otto;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
 import com.somle.otto.model.pojo.OttoAccount;
 import com.somle.otto.repository.OttoAccountDao;
 import com.somle.otto.repository.OttoAuthTokenDao;
@@ -12,7 +13,7 @@ import org.springframework.context.annotation.Import;
 
 @Slf4j
 @Import({OttoService.class, OttoAccountDao.class, OttoAuthTokenDao.class})
-public class DemoTest  extends BaseDbUnitTest {
+public class DemoTest  extends SomleBaseDbUnitTest {
     @Resource
     OttoAccountDao ottoAccountDao;
     @Resource
