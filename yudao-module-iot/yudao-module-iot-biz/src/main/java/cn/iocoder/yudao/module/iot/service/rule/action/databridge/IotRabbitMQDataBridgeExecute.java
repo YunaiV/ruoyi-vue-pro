@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
  *
  * @author HUIHUI
  */
-@ConditionalOnClass(Channel.class)
+@ConditionalOnClass(name = "com.rabbitmq.client.Channel")
 @Component
 @Slf4j
 public class IotRabbitMQDataBridgeExecute extends

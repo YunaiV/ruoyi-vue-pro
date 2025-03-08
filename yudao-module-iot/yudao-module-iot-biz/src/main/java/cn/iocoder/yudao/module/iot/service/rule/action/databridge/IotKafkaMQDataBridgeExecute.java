@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author HUIHUI
  */
-@ConditionalOnClass(KafkaTemplate.class)
+@ConditionalOnClass(name = "org.springframework.kafka.core.KafkaTemplate")
 @Component
 @Slf4j
 public class IotKafkaMQDataBridgeExecute extends

@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
  *
  * @author HUIHUI
  */
-@ConditionalOnClass(DefaultMQProducer.class)
+@ConditionalOnClass(name = "org.apache.rocketmq.client.producer.DefaultMQProducer")
 @Component
 @Slf4j
 public class IotRocketMQDataBridgeExecute extends
