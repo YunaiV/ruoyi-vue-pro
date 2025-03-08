@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author HUIHUI
  */
+@ConditionalOnClass(KafkaTemplate.class)
 @Component
 @Slf4j
 public class IotKafkaMQDataBridgeExecute extends
