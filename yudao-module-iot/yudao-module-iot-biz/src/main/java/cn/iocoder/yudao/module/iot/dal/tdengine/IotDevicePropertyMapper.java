@@ -34,7 +34,7 @@ public interface IotDevicePropertyMapper {
                                             List<TDengineTableField> newFields) {
         // TODO @芋艿：需要处理 device_key，重新发布的时候
         oldFields.removeIf(field -> StrUtil.equalsAny(field.getField(),
-                TDengineTableField.FIELD_TS, "report_time"));
+                TDengineTableField.FIELD_TS, "report_time", "device_key"));
         List<TDengineTableField> addFields = newFields.stream().filter( // 新增的字段
                         newField -> oldFields.stream().noneMatch(oldField -> oldField.getField().equals(newField.getField())))
                 .collect(Collectors.toList());
