@@ -36,18 +36,35 @@ public class ActionOrderImpl implements Action<ErpOrderStatus, ErpEventEnum, Erp
 //            return;
 //        }
 
-        // 其他事件：直接更新采购申请的状态
         ErpPurchaseRequestDO requestDO = purchaseRequestMapper.selectById(context.getId());
         if (requestDO == null) {
             log.error("采购申请单不存在，ID: {}", context.getId());
             return;
         }
+        //子数量调整
+        if (event == ErpEventEnum.ORDER_ADJUSTMENT) {
+            List<ErpPurchaseRequestItemsDO> requestItemsDOS = purchaseRequestItemsMapper.selectListByRequestId(requestDO.getId());
+            //全部采购
+            if (requestItemsDOS.stream().allMatch(item -> item.getOrderStatus().equals(ErpOrderStatus.ORDERED.getCode()))) {
+                requestDO.setOrderStatus(ErpOrderStatus.ORDERED.getCode());
+            }
+            //部分采购
+            if (requestItemsDOS.stream().anyMatch(item -> item.getOrderStatus().equals(ErpOrderStatus.PARTIALLY_ORDERED.getCode()))) {
+                requestDO.setOrderStatus(ErpOrderStatus.PARTIALLY_ORDERED.getCode());
+            }
+            //未采购,状态都是未采购
+            if (requestItemsDOS.stream().allMatch(item -> item.getOrderStatus().equals(ErpOrderStatus.OT_ORDERED.getCode()))) {
+                requestDO.setOrderStatus(ErpOrderStatus.OT_ORDERED.getCode());
+            }
+        } else {
+            //其他事件,初始化+放弃
+            requestDO.setOrderStatus(to.getCode());
+        }
+        // 其他事件：直接更新采购申请的状态
 
-        requestDO.setOrderStatus(to.getCode());
         ThrowUtil.ifSqlThrow(purchaseRequestMapper.updateById(requestDO), GlobalErrorCodeConstants.DB_UPDATE_ERROR);
-
         log.debug("采购状态机触发({})事件：将对象{},由状态 {}->{}",
-            event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
+            event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), ErpOrderStatus.fromCode(requestDO.getOrderStatus()).getDesc());
     }
 
     /**

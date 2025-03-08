@@ -39,7 +39,7 @@ public class ErpPurchaseRequestItemsDO extends TenantBaseDO {
     /**
      * 申请数量
      */
-    private Integer count;
+    private Integer count; //联动申请项采购数量+采购状态
     /**
      * 仓库编号
      */

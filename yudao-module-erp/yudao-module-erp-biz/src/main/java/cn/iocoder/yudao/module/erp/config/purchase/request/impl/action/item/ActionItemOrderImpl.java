@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.erp.config.purchase.request.impl.action.item;
 
+import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestItemsMapper;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 
 import static cn.iocoder.yudao.module.erp.enums.ErpStateMachines.PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME;
 
@@ -40,20 +40,36 @@ public class ActionItemOrderImpl implements Action<ErpOrderStatus, ErpEventEnum,
     public void execute(ErpOrderStatus from, ErpOrderStatus to, ErpEventEnum event, ErpPurchaseRequestItemsDO context) {
         //更新采购申请项的下单数量
         //更新采购申请项的采购状态(暂无)
-        Long purchaseOrderItemId = context.getPurchaseOrderItemId();
-        ErpPurchaseRequestItemsDO itemsDO = itemsMapper.selectById(purchaseOrderItemId);
-        //下单数量变更
-        int i = (itemsDO.getOrderedQuantity() == null ? 0 : itemsDO.getOrderedQuantity());
-        itemsDO.setOrderedQuantity(i);
-        //已订购数量 == 申请数量，传递事件
-        if (Objects.equals(itemsDO.getCount(), itemsDO.getOrderedQuantity())) {
-            //子订单已完全采购
-            itemsDOStateMachine.fireEvent(ErpOrderStatus.fromCode(itemsDO.getOffStatus()), ErpEventEnum.PURCHASE_ADJUSTMENT, itemsDO);
-            //检验申请单下的所有子表是否符合传递事件的需求
-            checkRequest(event, itemsDO);
+        ErpPurchaseRequestItemsDO itemsDO = itemsMapper.selectById(context.getId());
+        if (event == ErpEventEnum.ORDER_ADJUSTMENT) {
+            //采购数量变更->采购状态
+            int oldCount = (itemsDO.getOrderedQuantity() == null ? 0 : itemsDO.getOrderedQuantity());
+            int newCount = oldCount + context.getCount();//最终订购数量
+            itemsDO.setOrderedQuantity(newCount);
+            //根据订购数量来判断是否完整订购,批准数量,状态
+            if (newCount == 0) {
+                itemsDO.setOrderStatus(ErpOrderStatus.OT_ORDERED.getCode());// 状态设为未订购
+//                //一个未订购->订单未订购?部分订购
+//                List<ErpPurchaseRequestItemsDO> requestItemsDOS = itemsMapper.selectListByRequestId(itemsDO.getRequestId());
+//                boolean hasOpen = requestItemsDOS.stream().anyMatch(item -> item.getOrderStatus().equals(ErpOrderStatus.PARTIALLY_ORDERED.getCode()));
+//                if (hasOpen) {//部分订购
+//                    ErpPurchaseRequestDO requestDO = requestMapper.selectById(itemsDO.getRequestId());
+//                    requestMapper.updateById(requestDO.setOrderStatus(ErpOrderStatus.PARTIALLY_ORDERED.getCode()));
+//                }
+            } else if (newCount == itemsDO.getApproveCount()) {
+                itemsDO.setOrderStatus(ErpOrderStatus.ORDERED.getCode());// 状态设为全部订购
+            } else if (newCount < itemsDO.getApproveCount()) {
+                itemsDO.setOrderStatus(ErpOrderStatus.PARTIALLY_ORDERED.getCode());// 状态设为部分订购
+            }
+        } else {
+            //初始化+失败，事件
+            itemsDO.setOrderStatus(to.getCode());
         }
-        itemsDO.setOrderStatus(to.getCode());
         itemsMapper.updateById(itemsDO);
+        //传递事件
+        ErpPurchaseRequestDO requestDO = requestMapper.selectById(itemsDO.getRequestId());
+        requestStateMachine.fireEvent(ErpOrderStatus.fromCode(requestDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, requestDO);
+        log.info("item订购状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), ErpOrderStatus.fromCode(itemsDO.getOrderStatus()).getDesc());
     }
 
     //检验申请单下的所有子表是否符合传递事件的需求
@@ -67,6 +83,5 @@ public class ActionItemOrderImpl implements Action<ErpOrderStatus, ErpEventEnum,
         }
 
     }
-
 
 }

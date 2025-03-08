@@ -106,13 +106,13 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
 //        orderMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_INIT, purchaseRequest);
         //子表
 
-        //扣减采购申请项的库存
+        //联动采购申请项的库存
         for (ErpPurchaseOrderItemDO orderItemDO : purchaseOrderItems) {
             Optional.ofNullable(orderItemDO.getPurchaseApplyItemId()).ifPresent(itemId -> {
                 ErpPurchaseRequestItemsDO itemsDO = requestItemsMapper.selectById(itemId);
                 //采购调整,设置下单数量进入DO，申请单去增加
-                int oldCount = itemsDO.getOrderedQuantity() == null ? 0 : itemsDO.getOrderedQuantity();
-                itemsDO.setOrderedQuantity(oldCount + orderItemDO.getCount().toBigInteger().intValue());
+//                int oldCount = itemsDO.getOrderedQuantity() == null ? 0 : itemsDO.getOrderedQuantity();
+                itemsDO.setOrderedQuantity(orderItemDO.getCount().toBigInteger().negate().intValue());
                 requestOrderItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_ADJUSTMENT, itemsDO);
             });
         }
@@ -167,30 +167,30 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         }
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updatePurchaseOrderStatus(Long id, Integer status) {
-        boolean approve = ErpAuditStatus.APPROVED.getCode().equals(status);
-        // 1.1 校验存在
-        ErpPurchaseOrderDO purchaseOrder = validatePurchaseOrderExists(id);
-        // 1.2 校验状态
-        if (purchaseOrder.getStatus().equals(status)) {
-            throw exception(approve ? PURCHASE_ORDER_APPROVE_FAIL : PURCHASE_ORDER_PROCESS_FAIL);
-        }
-        // 1.3 存在采购入单，无法反审核
-        if (!approve && purchaseOrder.getTotalInCount().compareTo(BigDecimal.ZERO) > 0) {
-            throw exception(PURCHASE_ORDER_PROCESS_FAIL_EXISTS_IN);
-        }
-        // 1.4 存在采购退货单，无法反审核
-        if (!approve && purchaseOrder.getTotalReturnCount().compareTo(BigDecimal.ZERO) > 0) {
-            throw exception(PURCHASE_ORDER_PROCESS_FAIL_EXISTS_RETURN);
-        }
-        // 2. 更新状态
-        int updateCount = purchaseOrderMapper.updateByIdAndStatus(id, purchaseOrder.getStatus(), new ErpPurchaseOrderDO().setStatus(status).setAuditorId(SecurityFrameworkUtils.getLoginUserId()).setAuditTime(LocalDateTime.now()));//2.1 设置审核人的id+时间
-        if (updateCount == 0) {
-            throw exception(approve ? PURCHASE_ORDER_APPROVE_FAIL : PURCHASE_ORDER_PROCESS_FAIL);
-        }
-    }
+//    @Override
+//    @Transactional(rollbackFor = Exception.class)
+//    public void updatePurchaseOrderStatus(Long id, Integer status) {
+//        boolean approve = ErpAuditStatus.APPROVED.getCode().equals(status);
+//        // 1.1 校验存在
+//        ErpPurchaseOrderDO purchaseOrder = validatePurchaseOrderExists(id);
+//        // 1.2 校验状态
+//        if (purchaseOrder.getStatus().equals(status)) {
+//            throw exception(approve ? PURCHASE_ORDER_APPROVE_FAIL : PURCHASE_ORDER_PROCESS_FAIL);
+//        }
+//        // 1.3 存在采购入单，无法反审核
+//        if (!approve && purchaseOrder.getTotalInCount().compareTo(BigDecimal.ZERO) > 0) {
+//            throw exception(PURCHASE_ORDER_PROCESS_FAIL_EXISTS_IN);
+//        }
+//        // 1.4 存在采购退货单，无法反审核
+//        if (!approve && purchaseOrder.getTotalReturnCount().compareTo(BigDecimal.ZERO) > 0) {
+//            throw exception(PURCHASE_ORDER_PROCESS_FAIL_EXISTS_RETURN);
+//        }
+//        // 2. 更新状态
+//        int updateCount = purchaseOrderMapper.updateByIdAndStatus(id, purchaseOrder.getStatus(), new ErpPurchaseOrderDO().setStatus(status).setAuditorId(SecurityFrameworkUtils.getLoginUserId()).setAuditTime(LocalDateTime.now()));//2.1 设置审核人的id+时间
+//        if (updateCount == 0) {
+//            throw exception(approve ? PURCHASE_ORDER_APPROVE_FAIL : PURCHASE_ORDER_PROCESS_FAIL);
+//        }
+//    }
 
     private List<ErpPurchaseOrderItemDO> validatePurchaseOrderItems(List<ErpPurchaseOrderSaveReqVO.Item> list) {
         // 1. 校验产品存在
@@ -222,8 +222,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
                 //新增如果有申请单项则发事件
                 Optional.ofNullable(orderItemDO.getPurchaseApplyItemId()).ifPresent(purchaseApplyItemId -> {
                     ErpPurchaseRequestItemsDO requestItemsDO = requestItemsMapper.selectById(purchaseApplyItemId);
-                    int oldCount = requestItemsDO.getOrderedQuantity();
-                    requestItemsDO.setOrderedQuantity(oldCount + orderItemDO.getCount().toBigInteger().intValue());
+                    requestItemsDO.setOrderedQuantity(orderItemDO.getCount().toBigInteger().negate().intValue());
                     requestOrderItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, requestItemsDO);
                 });
             }
@@ -234,7 +233,8 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
                 Optional.ofNullable(orderItemDO.getPurchaseApplyItemId()).ifPresent(purchaseApplyItemId -> {
                     ErpPurchaseRequestItemsDO requestItemsDO = requestItemsMapper.selectById(purchaseApplyItemId);
                     ErpPurchaseOrderItemDO oldOrderItem = purchaseOrderItemMapper.selectById(orderItemDO.getId());
-                    int newCount = requestItemsDO.getOrderedQuantity();
+//                    int newCount = requestItemsDO.getOrderedQuantity();
+                    int newCount = orderItemDO.getCount().intValue();
                     int oldCount = oldOrderItem.getCount().intValue();
                     requestItemsDO.setOrderedQuantity(newCount - oldCount);
                     requestOrderItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, requestItemsDO);
@@ -244,17 +244,16 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
             purchaseOrderItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            purchaseOrderItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpPurchaseOrderItemDO::getId));
             //减少申请项的采购数量
             for (ErpPurchaseOrderItemDO orderItemDO : diffList.get(0)) {
-                //新增如果有申请单项则发事件
+                //联动申请项
                 Optional.ofNullable(orderItemDO.getPurchaseApplyItemId()).ifPresent(purchaseApplyItemId -> {
                     ErpPurchaseRequestItemsDO requestItemsDO = requestItemsMapper.selectById(purchaseApplyItemId);
-                    int oldCount = requestItemsDO.getOrderedQuantity();
-                    requestItemsDO.setOrderedQuantity(oldCount - orderItemDO.getCount().toBigInteger().intValue());
+                    requestItemsDO.setOrderedQuantity(orderItemDO.getCount().toBigInteger().intValue());
                     requestOrderItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, requestItemsDO);
                 });
             }
+            purchaseOrderItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpPurchaseOrderItemDO::getId));
         }
     }
 
@@ -312,6 +311,15 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
 
         // 2. 遍历删除，并记录操作日志
         purchaseOrders.forEach(purchaseOrder -> {
+            //联动申请项
+            for (ErpPurchaseOrderItemDO orderItemDO : purchaseOrderItemMapper.selectListByOrderId(purchaseOrder.getId())) {
+                Optional.ofNullable(orderItemDO.getPurchaseApplyItemId()).ifPresent(id -> {
+                    ErpPurchaseRequestItemsDO requestItemsDO = requestItemsMapper.selectById(id);
+                    requestItemsDO.setOrderedQuantity(orderItemDO.getCount().intValue());
+                    //
+                    requestOrderItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, requestItemsDO);
+                });
+            }
             // 2.1 删除订单
             purchaseOrderMapper.deleteById(purchaseOrder.getId());
             // 2.2 删除订单项

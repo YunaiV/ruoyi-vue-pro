@@ -36,13 +36,13 @@ public interface ErpPurchaseOrderService {
      */
     void updatePurchaseOrder(@Valid ErpPurchaseOrderSaveReqVO updateReqVO);
 
-    /**
-     * 更新采购订单的状态
-     *
-     * @param id 编号
-     * @param status 状态
-     */
-    void updatePurchaseOrderStatus(Long id, Integer status);
+//    /**
+//     * 更新采购订单的状态
+//     *
+//     * @param id 编号
+//     * @param status 状态
+//     */
+//    void updatePurchaseOrderStatus(Long id, Integer status);
 
     /**
      * 更新采购订单的入库数量

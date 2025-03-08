@@ -61,42 +61,41 @@ public class ErpPurchaseRequestItemStatusMachine {
     @Bean(ErpStateMachines.PURCHASE_REQUEST_ITEM_STATE_MACHINE_NAME)
     public StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> getPurchaseOrderStateMachine() {
         StateMachineBuilder<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> builder = StateMachineBuilderFactory.create();
-        //初始化
+        //初始化事件
         builder.internalTransition()
             .within(ErpOrderStatus.OT_ORDERED)
-            .on(ErpEventEnum.START_PURCHASE)
+            .on(ErpEventEnum.ORDER_INIT)
             .perform(actionItemOrderImpl);
-        //采购数量调整(未+局部 <-> 局部+整体)
-        builder.externalTransition()
-            .from(ErpOrderStatus.OT_ORDERED)
-            .to(ErpOrderStatus.PARTIALLY_ORDERED)
-            .on(ErpEventEnum.PURCHASE_ADJUSTMENT)
-            .perform(actionItemOrderImpl);
-        builder.externalTransition()
-            .from(ErpOrderStatus.OT_ORDERED)
-            .to(ErpOrderStatus.ORDERED)
-            .on(ErpEventEnum.PURCHASE_ADJUSTMENT)
-            .perform(actionItemOrderImpl);
-        builder.internalTransition()
-            .within(ErpOrderStatus.PARTIALLY_ORDERED)
-            .on(ErpEventEnum.PURCHASE_ADJUSTMENT)
-            .perform(actionItemOrderImpl);
+        // 订购数量调整
         builder.externalTransitions()
-            .fromAmong(ErpOrderStatus.ORDERED, ErpOrderStatus.PARTIALLY_ORDERED)
-            .to(ErpOrderStatus.OT_ORDERED)
-            .on(ErpEventEnum.PURCHASE_ADJUSTMENT)
+            .fromAmong(ErpOrderStatus.OT_ORDERED)
+            .to(ErpOrderStatus.PARTIALLY_ORDERED)
+            .on(ErpEventEnum.ORDER_ADJUSTMENT)
             .perform(actionItemOrderImpl);
+
+        builder.externalTransitions()
+            .fromAmong(ErpOrderStatus.PARTIALLY_ORDERED)
+            .to(ErpOrderStatus.ORDERED)
+            .on(ErpEventEnum.ORDER_ADJUSTMENT)
+            .perform(actionItemOrderImpl);
+
         builder.externalTransitions()
             .fromAmong(ErpOrderStatus.ORDERED)
             .to(ErpOrderStatus.PARTIALLY_ORDERED)
-            .on(ErpEventEnum.PURCHASE_ADJUSTMENT)
+            .on(ErpEventEnum.ORDER_ADJUSTMENT)
             .perform(actionItemOrderImpl);
 
-        //采购完成
         builder.externalTransitions()
-            .fromAmong(ErpOrderStatus.OT_ORDERED, ErpOrderStatus.PARTIALLY_ORDERED)
-            .to(ErpOrderStatus.ORDERED)
-            .on(ErpEventEnum.PURCHASE_COMPLETE)
+            .fromAmong(ErpOrderStatus.PARTIALLY_ORDERED)
+            .to(ErpOrderStatus.OT_ORDERED)
+            .on(ErpEventEnum.ORDER_ADJUSTMENT)
+            .perform(actionItemOrderImpl);
+
+        //放弃订购
+        builder.externalTransitions()
+            .fromAmong(ErpOrderStatus.PARTIALLY_ORDERED, ErpOrderStatus.OT_ORDERED)
+            .to(ErpOrderStatus.ORDER_FAILED)
+            .on(ErpEventEnum.ORDER_CANCEL)
             .perform(actionItemOrderImpl);
 
         builder.setFailCallback(baseFailCallbackImpl);

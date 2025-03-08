@@ -116,24 +116,31 @@ public class ErpPurchaseRequestStatusMachine {
             .within(ErpOrderStatus.OT_ORDERED)
             .on(ErpEventEnum.ORDER_INIT)
             .perform(actionOrderImpl);
-        // ->未订购
+        // 订购数量调整
         builder.externalTransitions()
-            .fromAmong(ErpOrderStatus.ORDERED, ErpOrderStatus.PARTIALLY_ORDERED)
-            .to(ErpOrderStatus.OT_ORDERED)
-            .on(ErpEventEnum.ORDER_ADJUSTMENT)
-            .perform(actionOrderImpl);
-        //->部分订购
-        builder.externalTransitions()
-            .fromAmong(ErpOrderStatus.OT_ORDERED, ErpOrderStatus.ORDERED)
+            .fromAmong(ErpOrderStatus.OT_ORDERED)
             .to(ErpOrderStatus.PARTIALLY_ORDERED)
             .on(ErpEventEnum.ORDER_ADJUSTMENT)
             .perform(actionOrderImpl);
-        //->全部订购
+
         builder.externalTransitions()
-            .fromAmong(ErpOrderStatus.OT_ORDERED, ErpOrderStatus.PARTIALLY_ORDERED)
+            .fromAmong(ErpOrderStatus.PARTIALLY_ORDERED)
             .to(ErpOrderStatus.ORDERED)
             .on(ErpEventEnum.ORDER_ADJUSTMENT)
             .perform(actionOrderImpl);
+
+        builder.externalTransitions()
+            .fromAmong(ErpOrderStatus.ORDERED)
+            .to(ErpOrderStatus.PARTIALLY_ORDERED)
+            .on(ErpEventEnum.ORDER_ADJUSTMENT)
+            .perform(actionOrderImpl);
+
+        builder.externalTransitions()
+            .fromAmong(ErpOrderStatus.PARTIALLY_ORDERED)
+            .to(ErpOrderStatus.OT_ORDERED)
+            .on(ErpEventEnum.ORDER_ADJUSTMENT)
+            .perform(actionOrderImpl);
+
         //放弃订购
         builder.externalTransitions()
             .fromAmong(ErpOrderStatus.PARTIALLY_ORDERED, ErpOrderStatus.OT_ORDERED)
