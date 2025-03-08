@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -48,9 +49,14 @@ import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.KNOWLEDGE_SEGM
 @Slf4j
 public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService {
 
-    public static final String VECTOR_STORE_METADATA_KNOWLEDGE_ID = "knowledgeId";
-    public static final String VECTOR_STORE_METADATA_DOCUMENT_ID = "documentId";
-    public static final String VECTOR_STORE_METADATA_SEGMENT_ID = "segmentId";
+    private static final String VECTOR_STORE_METADATA_KNOWLEDGE_ID = "knowledgeId";
+    private static final String VECTOR_STORE_METADATA_DOCUMENT_ID = "documentId";
+    private static final String VECTOR_STORE_METADATA_SEGMENT_ID = "segmentId";
+
+    private static final Map<String, Class<?>> VECTOR_STORE_METADATA_TYPES = Map.of(
+            VECTOR_STORE_METADATA_KNOWLEDGE_ID, String.class,
+            VECTOR_STORE_METADATA_DOCUMENT_ID, String.class,
+            VECTOR_STORE_METADATA_SEGMENT_ID, String.class);
 
     @Resource
     private AiKnowledgeSegmentMapper segmentMapper;
@@ -257,7 +263,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
     }
 
     private VectorStore getVectorStoreById(AiKnowledgeDO knowledge) {
-        return modelService.getOrCreateVectorStore(knowledge.getEmbeddingModelId());
+        return modelService.getOrCreateVectorStore(knowledge.getEmbeddingModelId(), VECTOR_STORE_METADATA_TYPES);
     }
 
     private VectorStore getVectorStoreById(Long knowledgeId) {

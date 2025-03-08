@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
@@ -151,7 +152,7 @@ public class AiModelServiceImpl implements AiModelService {
     }
 
     @Override
-    public VectorStore getOrCreateVectorStore(Long id) {
+    public VectorStore getOrCreateVectorStore(Long id, Map<String, Class<?>> metadataFields) {
         // 获取模型 + 密钥
         AiModelDO model = validateModel(id);
         AiApiKeyDO apiKey = apiKeyService.validateApiKey(model.getKeyId());
@@ -162,8 +163,9 @@ public class AiModelServiceImpl implements AiModelService {
                 platform, apiKey.getApiKey(), apiKey.getUrl(), model.getModel());
 
         // 创建或获取 VectorStore 对象
-//        return modelFactory.getOrCreateVectorStore(SimpleVectorStore.class, embeddingModel);
-        return modelFactory.getOrCreateVectorStore(QdrantVectorStore.class, embeddingModel);
+//        return modelFactory.getOrCreateVectorStore(SimpleVectorStore.class, embeddingModel, metadataFields);
+        return modelFactory.getOrCreateVectorStore(QdrantVectorStore.class, embeddingModel, metadataFields);
+//        return modelFactory.getOrCreateVectorStore(RedisVectorStore.class, embeddingModel, metadataFields);
     }
 
 }

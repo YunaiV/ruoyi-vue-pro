@@ -149,10 +149,12 @@ spring:
   ai:
     vectorstore: # 向量存储
       redis:
-        index: default-index
-        prefix: "default:"
+        initialize-schema: true
+        index: knowledge_index # Redis 中向量索引的名称：用于存储和检索向量数据的索引标识符，所有相关的向量搜索操作都会基于这个索引进行
+        prefix: "knowledge_segment:" # Redis 中存储向量数据的键名前缀：这个前缀会添加到每个存储在 Redis 中的向量数据键名前，每个 document 都是一个 hash 结构
       qdrant:
-        collection-name: knowledge_segment
+        initialize-schema: true
+        collection-name: knowledge_segment # Qdrant 中向量集合的名称：用于存储向量数据的集合标识符，所有相关的向量操作都会在这个集合中进行
         host: 127.0.0.1
         port: 6334
         use-tls: false

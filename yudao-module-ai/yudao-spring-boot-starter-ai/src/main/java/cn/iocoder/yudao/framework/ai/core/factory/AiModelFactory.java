@@ -8,6 +8,8 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.vectorstore.VectorStore;
 
+import java.util.Map;
+
 /**
  * AI Model 模型工厂的接口类
  *
@@ -96,13 +98,16 @@ public interface AiModelFactory {
 
     /**
      * 基于指定配置，获得 VectorStore 对象
-     * <p>
+     *
      * 如果不存在，则进行创建
      *
      * @param type           向量存储类型
      * @param embeddingModel 向量模型
+     * @param metadataFields 元数据字段
      * @return VectorStore 对象
      */
-    VectorStore getOrCreateVectorStore(Class<? extends VectorStore> type, EmbeddingModel embeddingModel);
+    VectorStore getOrCreateVectorStore(Class<? extends VectorStore> type,
+                                       EmbeddingModel embeddingModel,
+                                       Map<String, Class<?>> metadataFields);
 
 }

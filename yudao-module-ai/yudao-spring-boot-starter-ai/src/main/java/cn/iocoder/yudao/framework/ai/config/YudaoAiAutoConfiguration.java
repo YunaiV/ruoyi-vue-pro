@@ -12,12 +12,12 @@ import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.autoconfigure.vectorstore.qdrant.QdrantVectorStoreProperties;
+import org.springframework.ai.autoconfigure.vectorstore.redis.RedisVectorStoreProperties;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.tokenizer.JTokkitTokenCountEstimator;
 import org.springframework.ai.tokenizer.TokenCountEstimator;
-import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -31,7 +31,8 @@ import org.springframework.context.annotation.Lazy;
  */
 @AutoConfiguration
 @EnableConfigurationProperties({YudaoAiProperties.class,
-        QdrantVectorStoreProperties.class // 解析 Qdrant 配置
+        QdrantVectorStoreProperties.class, // 解析 Qdrant 配置
+        RedisVectorStoreProperties.class, // 解析 Redis 配置
 })
 @Slf4j
 public class YudaoAiAutoConfiguration {
@@ -199,32 +200,6 @@ public class YudaoAiAutoConfiguration {
 //    public TransformersEmbeddingModel transformersEmbeddingClient() {
 //        return new TransformersEmbeddingModel(MetadataMode.EMBED);
 //    }
-
-    /**
-     * TODO @xin 默认版本先不弄，目前都先取对应的 EmbeddingModel
-     */
-//    @Bean
-//    @Lazy // TODO 芋艿：临时注释，避免无法启动
-//    public RedisVectorStore vectorStore(TransformersEmbeddingModel embeddingModel, RedisVectorStoreProperties properties,
-//                                        RedisProperties redisProperties) {
-//        var config = RedisVectorStore.RedisVectorStoreConfig.builder()
-//                .withIndexName(properties.getIndex())
-//                .withPrefix(properties.getPrefix())
-//                .withMetadataFields(new RedisVectorStore.MetadataField("knowledgeId", Schema.FieldType.NUMERIC))
-//                .build();
-//
-//        RedisVectorStore redisVectorStore = new RedisVectorStore(config, embeddingModel,
-//                new JedisPooled(redisProperties.getHost(), redisProperties.getPort()),
-//                properties.isInitializeSchema());
-//        redisVectorStore.afterPropertiesSet();
-//        return redisVectorStore;
-//    }
-    @Bean
-    @Lazy // TODO 芋艿：临时注释，避免无法启动
-    public TokenTextSplitter tokenTextSplitter() {
-        //TODO  @xin 配置提取
-        return new TokenTextSplitter(500, 100, 5, 10000, true);
-    }
 
     @Bean
     @Lazy // TODO 芋艿：临时注释，避免无法启动

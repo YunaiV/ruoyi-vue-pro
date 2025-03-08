@@ -13,6 +13,7 @@ import org.springframework.ai.vectorstore.VectorStore;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * AI 模型 Service 接口
@@ -125,8 +126,9 @@ public interface AiModelService {
      * 获得 VectorStore 对象
      *
      * @param id 编号
+     * @param metadataFields 元数据的定义
      * @return VectorStore 对象
      */
-    VectorStore getOrCreateVectorStore(Long id);
+    VectorStore getOrCreateVectorStore(Long id, Map<String, Class<?>> metadataFields);
 
 }

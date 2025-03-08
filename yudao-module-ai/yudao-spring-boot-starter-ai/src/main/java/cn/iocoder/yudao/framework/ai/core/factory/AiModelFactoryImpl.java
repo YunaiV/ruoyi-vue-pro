@@ -19,6 +19,7 @@ import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeAutoConfiguration;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeImageApi;
@@ -39,12 +40,13 @@ import org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration;
 import org.springframework.ai.autoconfigure.qianfan.QianFanAutoConfiguration;
 import org.springframework.ai.autoconfigure.vectorstore.qdrant.QdrantVectorStoreAutoConfiguration;
 import org.springframework.ai.autoconfigure.vectorstore.qdrant.QdrantVectorStoreProperties;
+import org.springframework.ai.autoconfigure.vectorstore.redis.RedisVectorStoreAutoConfiguration;
+import org.springframework.ai.autoconfigure.vectorstore.redis.RedisVectorStoreProperties;
 import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiAutoConfiguration;
 import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiConnectionProperties;
 import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.document.MetadataMode;
-import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.ollama.OllamaChatModel;
@@ -67,19 +69,25 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.observation.DefaultVectorStoreObservationConvention;
 import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
 import org.springframework.ai.vectorstore.qdrant.QdrantVectorStore;
+import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 import org.springframework.ai.zhipuai.ZhiPuAiImageModel;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
 import org.springframework.ai.zhipuai.api.ZhiPuAiImageApi;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.web.client.RestClient;
+import redis.clients.jedis.JedisPooled;
 
 import java.io.File;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 /**
  * AI Model 模型工厂的实现类
@@ -225,7 +233,9 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     @Override
-    public VectorStore getOrCreateVectorStore(Class<? extends VectorStore> type, EmbeddingModel embeddingModel) {
+    public VectorStore getOrCreateVectorStore(Class<? extends VectorStore> type,
+            EmbeddingModel embeddingModel,
+            Map<String, Class<?>> metadataFields) {
         String cacheKey = buildClientCacheKey(VectorStore.class, embeddingModel, type);
         return Singleton.get(cacheKey, (Func0<VectorStore>) () -> {
             if (type == SimpleVectorStore.class) {
@@ -234,23 +244,10 @@ public class AiModelFactoryImpl implements AiModelFactory {
             if (type == QdrantVectorStore.class) {
                 return buildQdrantVectorStore(embeddingModel);
             }
+            if (type == RedisVectorStore.class) {
+                return buildRedisVectorStore(embeddingModel, metadataFields);
+            }
             throw new IllegalArgumentException(StrUtil.format("未知类型({})", type));
-            // TODO @芋艿：先临时使用 store
-            // TODO @芋艿：@xin：后续看看，是不是切到阿里云之类的
-            // String prefix = StrUtil.format("{}#{}:", platform.getPlatform(), apiKey);
-            // var config = RedisVectorStore.RedisVectorStoreConfig.builder()
-            // .withIndexName(cacheKey)
-            // .withPrefix(prefix)
-            // .withMetadataFields(new RedisVectorStore.MetadataField("knowledgeId",
-            // Schema.FieldType.NUMERIC))
-            // .build();
-            // RedisProperties redisProperties = SpringUtils.getBean(RedisProperties.class);
-            // RedisVectorStore redisVectorStore = new RedisVectorStore(config,
-            // embeddingModel,
-            // new JedisPooled(redisProperties.getHost(), redisProperties.getPort()),
-            // true);
-            // redisVectorStore.afterPropertiesSet();
-            // return redisVectorStore;
         });
     }
 
@@ -469,21 +466,65 @@ public class AiModelFactoryImpl implements AiModelFactory {
         return vectorStore;
     }
 
+    /**
+     * 参考 {@link QdrantVectorStoreAutoConfiguration} 的 vectorStore 方法
+     */
+    @SneakyThrows
     private QdrantVectorStore buildQdrantVectorStore(EmbeddingModel embeddingModel) {
         QdrantVectorStoreAutoConfiguration configuration = new QdrantVectorStoreAutoConfiguration();
-        QdrantVectorStoreProperties vectorStoreProperties = SpringUtil.getBean(QdrantVectorStoreProperties.class);
+        QdrantVectorStoreProperties properties = SpringUtil.getBean(QdrantVectorStoreProperties.class);
         // 参考 QdrantVectorStoreAutoConfiguration 实现，创建 QdrantClient 对象
         QdrantGrpcClient.Builder grpcClientBuilder = QdrantGrpcClient.newBuilder(
-                vectorStoreProperties.getHost(), vectorStoreProperties.getPort(), vectorStoreProperties.isUseTls());
-        if (StrUtil.isNotEmpty(vectorStoreProperties.getApiKey())) {
-            grpcClientBuilder.withApiKey(vectorStoreProperties.getApiKey());
+                properties.getHost(), properties.getPort(), properties.isUseTls());
+        if (StrUtil.isNotEmpty(properties.getApiKey())) {
+            grpcClientBuilder.withApiKey(properties.getApiKey());
         }
         QdrantClient qdrantClient = new QdrantClient(grpcClientBuilder.build());
-        // 参考 QdrantVectorStoreAutoConfiguration 实现，实现 batchingStrategy
-        BatchingStrategy batchingStrategy = ReflectUtil.invoke(configuration, "batchingStrategy");
-
         // 创建 QdrantVectorStore 对象
-        ObjectProvider<ObservationRegistry> observationRegistry = new ObjectProvider<>() {
+        QdrantVectorStore vectorStore = configuration.vectorStore(embeddingModel, properties, qdrantClient,
+                getObservationRegistry(), getCustomObservationConvention(),
+                ReflectUtil.invoke(configuration, "batchingStrategy"));
+        // 初始化索引
+        vectorStore.afterPropertiesSet();
+        return vectorStore;
+    }
+
+    /**
+     * 参考 {@link RedisVectorStoreAutoConfiguration} 的 vectorStore 方法
+     */
+    private RedisVectorStore buildRedisVectorStore(EmbeddingModel embeddingModel,
+                                                   Map<String, Class<?>> metadataFields) {
+        // 创建 JedisPooled 对象
+        RedisProperties redisProperties = SpringUtils.getBean(RedisProperties.class);
+        JedisPooled jedisPooled = new JedisPooled(redisProperties.getHost(), redisProperties.getPort());
+        // 创建 RedisVectorStoreProperties 对象
+        RedisVectorStoreAutoConfiguration configuration = new RedisVectorStoreAutoConfiguration();
+        RedisVectorStoreProperties properties = SpringUtil.getBean(RedisVectorStoreProperties.class);
+        RedisVectorStore redisVectorStore = RedisVectorStore.builder(jedisPooled, embeddingModel)
+                .indexName(properties.getIndex()).prefix(properties.getPrefix())
+                .initializeSchema(properties.isInitializeSchema())
+                .metadataFields(convertList(metadataFields.entrySet(), entry -> {
+                    String fieldName = entry.getKey();
+                    Class<?> fieldType = entry.getValue();
+                    if (Number.class.isAssignableFrom(fieldType)) {
+                        return RedisVectorStore.MetadataField.numeric(fieldName);
+                    }
+                    if (Boolean.class.isAssignableFrom(fieldType)) {
+                        return RedisVectorStore.MetadataField.tag(fieldName);
+                    }
+                    return RedisVectorStore.MetadataField.text(fieldName);
+                }))
+                .observationRegistry(getObservationRegistry().getObject())
+                .customObservationConvention(getCustomObservationConvention().getObject())
+                .batchingStrategy(ReflectUtil.invoke(configuration, "batchingStrategy"))
+                .build();
+        // 初始化索引
+        redisVectorStore.afterPropertiesSet();
+        return redisVectorStore;
+    }
+
+    private static ObjectProvider<ObservationRegistry> getObservationRegistry() {
+        return new ObjectProvider<>() {
 
             @Override
             public ObservationRegistry getObject() throws BeansException {
@@ -491,16 +532,15 @@ public class AiModelFactoryImpl implements AiModelFactory {
             }
 
         };
-        ObjectProvider <VectorStoreObservationConvention> customObservationConvention = new ObjectProvider<>() {
+    }
 
+    private static ObjectProvider<VectorStoreObservationConvention> getCustomObservationConvention() {
+        return new ObjectProvider<>() {
             @Override
             public VectorStoreObservationConvention getObject() throws BeansException {
                 return new DefaultVectorStoreObservationConvention();
             }
-
         };
-        return configuration.vectorStore(embeddingModel, vectorStoreProperties, qdrantClient,
-                observationRegistry, customObservationConvention, batchingStrategy);
     }
 
 }
