@@ -26,6 +26,7 @@ public class ActionOrderOffImpl implements Action<ErpOffStatus, ErpEventEnum, Er
     @Resource
     ErpPurchaseRequestMapper mapper;
 
+
     @Override
     @Transactional
     public void execute(ErpOffStatus from, ErpOffStatus to, ErpEventEnum event, ErpPurchaseOrderDO context) {
@@ -36,6 +37,7 @@ public class ActionOrderOffImpl implements Action<ErpOffStatus, ErpEventEnum, Er
         ThrowUtil.ifSqlThrow(mapper.updateById(aDo), DB_UPDATE_ERROR);
         log.info("开关状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
     }
+
 
     //校验方法
     public static void validate(ErpOffStatus from, ErpOffStatus to, ErpEventEnum event, ErpPurchaseOrderDO context) {

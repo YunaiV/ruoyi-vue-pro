@@ -92,12 +92,12 @@ public class ErpSupplierController {
     @PreAuthorize("@ss.hasPermission('erp:supplier:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportSupplierExcel(@Valid ErpSupplierPageReqVO pageReqVO,
-              HttpServletResponse response) throws IOException {
+                                    HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpSupplierDO> list = supplierService.getSupplierPage(pageReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "供应商.xls", "数据", ErpSupplierRespVO.class,
-                        BeanUtils.toBean(list, ErpSupplierRespVO.class));
+            BeanUtils.toBean(list, ErpSupplierRespVO.class));
     }
 
 }

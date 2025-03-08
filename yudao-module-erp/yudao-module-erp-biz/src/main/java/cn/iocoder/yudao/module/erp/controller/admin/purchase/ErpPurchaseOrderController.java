@@ -33,7 +33,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -83,7 +82,7 @@ public class ErpPurchaseOrderController {
     @PutMapping("/update")
     @Operation(summary = "更新采购订单")
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:update')")
-    public CommonResult<Boolean> updatePurchaseOrder(@Validated(validation.OnUpdate.class)@RequestBody ErpPurchaseOrderSaveReqVO updateReqVO) {
+    public CommonResult<Boolean> updatePurchaseOrder(@Validated(validation.OnUpdate.class) @RequestBody ErpPurchaseOrderSaveReqVO updateReqVO) {
         purchaseOrderService.updatePurchaseOrder(updateReqVO);
         return success(true);
     }
@@ -141,12 +140,12 @@ public class ErpPurchaseOrderController {
         ExcelUtils.write(response, "采购订单.xls", "数据", ErpPurchaseOrderBaseRespVO.class, voList);
     }
 
-    @PutMapping("/submitAudit")
+    @PostMapping("/submitAudit")
     @Operation(summary = "提交审核")
     @Parameter(name = "itemIds", description = "订单下的订单项Id集合", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:submitAudit')")
-    public CommonResult<Boolean> submitAudit(@NotNull @RequestBody Collection<Long> itemIds) {
-        purchaseOrderService.submitAudit(itemIds);
+    public CommonResult<Boolean> submitAudit(@Validated @RequestBody ErpPurchaseOrderAuditReqVO reqVO) {
+        purchaseOrderService.submitAudit(reqVO.getOrderIds());
         return success(true);
     }
 
@@ -155,12 +154,12 @@ public class ErpPurchaseOrderController {
     @Parameter(name = "requestId", description = "申请单编号", required = true)
     @Parameter(name = "reviewed", description = "审核状态", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:review')")
-    public CommonResult<Boolean> reviewPurchaseRequest(@Validated @RequestBody ErpPurchaseOrderAuditReqVO req) {
+    public CommonResult<Boolean> reviewPurchaseRequest(@Validated(validation.OnAudit.class) @RequestBody ErpPurchaseOrderAuditReqVO req) {
         purchaseOrderService.reviewPurchaseOrder(req);
         return success(true);
     }
 
-//    @PostMapping("/merge")
+    //    @PostMapping("/merge")
 //    @Operation(summary = "合并入库")
 //    @PreAuthorize("@ss.hasPermission('erp:purchase-order:merge')")
 //    public CommonResult<Long> mergePurchaseOrder(@Validated @RequestBody ErpPurchaseRequestOrderReqVO reqVO) {
@@ -234,8 +233,8 @@ public class ErpPurchaseOrderController {
 //            MapUtils.findAndThen(deptMap, adminUserApi.getUser(Long.parseLong(purchaseOrder.getCreator())).getDeptId(), deptRespDTO -> purchaseOrder.setDepartmentName(deptRespDTO.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(purchaseOrder.getCreator()), user -> purchaseOrder.setCreator(user.getNickname()));
             //设置审核人的name
-            Optional.ofNullable(purchaseOrder.getAuditor()).ifPresent(auditor->
-                MapUtils.findAndThen(userMap,Long.parseLong(auditor),user->purchaseOrder.setAuditorName(user.getNickname()))
+            Optional.ofNullable(purchaseOrder.getAuditor()).ifPresent(auditor ->
+                MapUtils.findAndThen(userMap, Long.parseLong(auditor), user -> purchaseOrder.setAuditorName(user.getNickname()))
             );
             //创建者、更新者、审核人、申请人填充
             //设置币别name

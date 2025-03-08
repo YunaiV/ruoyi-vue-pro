@@ -18,6 +18,7 @@ public enum ErpOrderStatus implements ArrayValuable<Integer> {
     ORDER_FAILED(4, "订购失败"),
     ;
 
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ErpOrderStatus::getCode).toArray();
     private static final Map<Integer, ErpOrderStatus> STATUS_MAP = new HashMap<>();
 
     static {
@@ -29,7 +30,6 @@ public enum ErpOrderStatus implements ArrayValuable<Integer> {
 
     // 存储状态码和描述的字段
     private final Integer code;
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ErpOrderStatus::getCode).toArray();
     private final String desc;
 
 

@@ -36,7 +36,7 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
     private String productNames;
     @Schema(description = "供应商编号")
     private Long supplierId;
-    
+
     @Schema(description = "供应商名称")
     private Long supplierName;
     // ========== 采购入库 ==========

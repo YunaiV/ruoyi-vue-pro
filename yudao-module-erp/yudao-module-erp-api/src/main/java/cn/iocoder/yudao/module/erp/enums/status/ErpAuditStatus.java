@@ -31,6 +31,7 @@ public enum ErpAuditStatus implements ArrayValuable<Integer> {
     ;
 
 
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ErpAuditStatus::getCode).toArray();
     private static final Map<Integer, ErpAuditStatus> STATUS_MAP = new HashMap<>();
 
     static {
@@ -38,8 +39,6 @@ public enum ErpAuditStatus implements ArrayValuable<Integer> {
             STATUS_MAP.put(status.code, status);
         }
     }
-
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ErpAuditStatus::getCode).toArray();
 
     /**
      * 状态

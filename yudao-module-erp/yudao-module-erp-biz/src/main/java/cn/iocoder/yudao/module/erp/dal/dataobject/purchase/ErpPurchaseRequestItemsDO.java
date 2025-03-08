@@ -80,7 +80,7 @@ public class ErpPurchaseRequestItemsDO extends TenantBaseDO {
     private BigDecimal taxPercent;
     /**
      * ERP 采购订单ID
-     *{@link ErpPurchaseOrderDO#getId()} ()}
+     * {@link ErpPurchaseOrderDO#getId()} ()}
      */
     private Long purchaseOrderId;
     /**

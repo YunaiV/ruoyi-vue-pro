@@ -7,7 +7,6 @@ import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderAuditReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderSaveReqVO;
@@ -51,6 +50,13 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 @Validated
 public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
 
+    @Resource(name = ErpStateMachines.PURCHASE_ORDER_OFF_STATE_MACHINE_NAME)
+    StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseOrderDO> offMachine;
+    @Resource(name = ErpStateMachines.PURCHASE_ORDER_AUDIT_STATE_MACHINE_NAME)
+    StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseOrderDO> auditMachine;
+    @Resource(name = ErpStateMachines.PURCHASE_REQUEST_ITEM_STATE_MACHINE_NAME)
+    StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> requestItemMachine;
+
     @Resource
     private ErpPurchaseOrderMapper purchaseOrderMapper;
     @Resource
@@ -66,12 +72,6 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     @Resource
     private ErpPurchaseRequestItemsMapper requestItemsMapper;
 
-    @Resource(name = ErpStateMachines.PURCHASE_ORDER_OFF_STATE_MACHINE_NAME)
-    StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseOrderDO> offMachine;
-    @Resource(name = ErpStateMachines.PURCHASE_ORDER_AUDIT_STATE_MACHINE_NAME)
-    StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseOrderDO> auditMachine;
-    @Resource(name = ErpStateMachines.PURCHASE_REQUEST_ITEM_STATE_MACHINE_NAME)
-    StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> requestOrderItemMachine;
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createPurchaseOrder(ErpPurchaseOrderSaveReqVO createReqVO) {
@@ -101,10 +101,19 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         purchaseOrderItemMapper.insertBatch(purchaseOrderItems);
         //3.0 设置初始化状态
         //主表
+        //开关
         offMachine.fireEvent(ErpOffStatus.OPEN, ErpEventEnum.OFF_INIT, purchaseOrder);
+        //审核
         auditMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.AUDIT_INIT, purchaseOrder);
+        //入库
+        //执行
+        //付款
 //        orderMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_INIT, purchaseRequest);
         //子表
+        //开关
+        //付款
+        //入库
+        //执行
 
         //联动采购申请项的库存
         for (ErpPurchaseOrderItemDO orderItemDO : purchaseOrderItems) {
@@ -113,7 +122,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
                 //采购调整,设置下单数量进入DO，申请单去增加
 //                int oldCount = itemsDO.getOrderedQuantity() == null ? 0 : itemsDO.getOrderedQuantity();
                 itemsDO.setOrderedQuantity(orderItemDO.getCount().toBigInteger().negate().intValue());
-                requestOrderItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_ADJUSTMENT, itemsDO);
+                requestItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_ADJUSTMENT, itemsDO);
             });
         }
         return purchaseOrder.getId();
@@ -223,7 +232,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
                 Optional.ofNullable(orderItemDO.getPurchaseApplyItemId()).ifPresent(purchaseApplyItemId -> {
                     ErpPurchaseRequestItemsDO requestItemsDO = requestItemsMapper.selectById(purchaseApplyItemId);
                     requestItemsDO.setOrderedQuantity(orderItemDO.getCount().toBigInteger().negate().intValue());
-                    requestOrderItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, requestItemsDO);
+                    requestItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, requestItemsDO);
                 });
             }
             purchaseOrderItemMapper.insertBatch(diffList.get(0));
@@ -237,7 +246,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
                     int newCount = orderItemDO.getCount().intValue();
                     int oldCount = oldOrderItem.getCount().intValue();
                     requestItemsDO.setOrderedQuantity(newCount - oldCount);
-                    requestOrderItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, requestItemsDO);
+                    requestItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, requestItemsDO);
                 });
             }
             //跟旧数据对比，申请数量差异，则发采购事件调整
@@ -250,7 +259,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
                 Optional.ofNullable(orderItemDO.getPurchaseApplyItemId()).ifPresent(purchaseApplyItemId -> {
                     ErpPurchaseRequestItemsDO requestItemsDO = requestItemsMapper.selectById(purchaseApplyItemId);
                     requestItemsDO.setOrderedQuantity(orderItemDO.getCount().toBigInteger().intValue());
-                    requestOrderItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, requestItemsDO);
+                    requestItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, requestItemsDO);
                 });
             }
             purchaseOrderItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpPurchaseOrderItemDO::getId));
@@ -317,7 +326,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
                     ErpPurchaseRequestItemsDO requestItemsDO = requestItemsMapper.selectById(id);
                     requestItemsDO.setOrderedQuantity(orderItemDO.getCount().intValue());
                     //
-                    requestOrderItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, requestItemsDO);
+                    requestItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, requestItemsDO);
                 });
             }
             // 2.1 删除订单
@@ -382,5 +391,15 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     @Override
     public void switchPurchaseOrderStatus(Collection<Long> itemIds, Boolean open) {
         //TODO 开/关
+        ErpEventEnum event = Boolean.TRUE.equals(open) ? ErpEventEnum.ACTIVATE : ErpEventEnum.MANUAL_CLOSE;
+        if (itemIds != null && !itemIds.isEmpty()) {
+            // 批量处理采购订单子项状态
+            List<ErpPurchaseOrderItemDO> orderItemDOS = purchaseOrderItemMapper.selectBatchIds(itemIds);
+            if (orderItemDOS != null && !orderItemDOS.isEmpty()) {
+//                orderItemDOS.forEach(orderItemDO ->
+//                    offItemMachine.fireEvent(ErpOffStatus.fromCode(orderItemDO.getOffStatus()), event, orderItemDO)
+//                );
+            }
+        }
     }
 }

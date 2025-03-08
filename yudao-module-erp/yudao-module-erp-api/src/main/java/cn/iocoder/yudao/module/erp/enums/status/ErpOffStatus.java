@@ -16,6 +16,7 @@ public enum ErpOffStatus implements ArrayValuable<Integer> {
     CLOSED(2, "已关闭"),
     MANUAL_CLOSED(3, "手动关闭");
 
+    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ErpOffStatus::getCode).toArray();
     private static final Map<Integer, ErpOffStatus> STATUS_MAP = new HashMap<>();
 
     static {
@@ -27,7 +28,6 @@ public enum ErpOffStatus implements ArrayValuable<Integer> {
 
     // 存储状态码和描述的字段
     private final Integer code;
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ErpOffStatus::getCode).toArray();
     private final String desc;
 
     // 根据状态码获取状态枚举

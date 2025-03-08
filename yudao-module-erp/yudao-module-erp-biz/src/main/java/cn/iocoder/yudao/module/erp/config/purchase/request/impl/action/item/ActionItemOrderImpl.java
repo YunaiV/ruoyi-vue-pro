@@ -25,8 +25,6 @@ import static cn.iocoder.yudao.module.erp.enums.ErpStateMachines.PURCHASE_REQUES
 @Slf4j
 public class ActionItemOrderImpl implements Action<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> {
     @Autowired
-    private ErpPurchaseRequestItemsMapper itemsMapper;
-    @Autowired
     ErpPurchaseRequestMapper requestMapper;
     @Resource(name = PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME)
     StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestDO> stateMachine;
@@ -34,6 +32,8 @@ public class ActionItemOrderImpl implements Action<ErpOrderStatus, ErpEventEnum,
     StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> itemsDOStateMachine;
     @Resource(name = ErpStateMachines.PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME)
     StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestDO> requestStateMachine;
+    @Autowired
+    private ErpPurchaseRequestItemsMapper itemsMapper;
 
     @Override
     @Transactional

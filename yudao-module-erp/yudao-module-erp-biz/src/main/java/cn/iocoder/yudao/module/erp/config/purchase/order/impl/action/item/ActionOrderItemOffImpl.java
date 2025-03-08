@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.erp.config.purchase.order.impl.action.item;
 
-import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
@@ -24,14 +23,12 @@ import java.util.List;
 @Component
 public class ActionOrderItemOffImpl implements Action<ErpOffStatus, ErpEventEnum, ErpPurchaseOrderItemDO> {
 
+    @Resource(name = ErpStateMachines.PURCHASE_ORDER_OFF_STATE_MACHINE_NAME)
+    StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseOrderDO> orderOffStateMachine;
     @Autowired
     private ErpPurchaseOrderItemMapper itemMapper;
-
     @Autowired
     private ErpPurchaseOrderMapper orderMapper;
-
-//    @Resource(name = ErpStateMachines.PURCHASE_ORDER_OFF_STATE_MACHINE_NAME)
-    StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseOrderDO> orderStateMachine;
 
     @Override
     @Transactional
@@ -84,12 +81,12 @@ public class ActionOrderItemOffImpl implements Action<ErpOffStatus, ErpEventEnum
         if (allClosed) {
             //主表是开启状态
             if (aDo.getOffStatus().equals(ErpOffStatus.OPEN.getCode())) {
-                orderStateMachine.fireEvent(ErpOffStatus.fromCode(aDo.getOffStatus()), event, aDo);
+                orderOffStateMachine.fireEvent(ErpOffStatus.fromCode(aDo.getOffStatus()), event, aDo);
             }
         } else if (hasOpen) {
             //主表不是开启状态
             if (!aDo.getOffStatus().equals(ErpOffStatus.OPEN.getCode())) {
-                orderStateMachine.fireEvent(ErpOffStatus.fromCode(aDo.getOffStatus()), event, aDo);
+                orderOffStateMachine.fireEvent(ErpOffStatus.fromCode(aDo.getOffStatus()), event, aDo);
             }
         }
     }

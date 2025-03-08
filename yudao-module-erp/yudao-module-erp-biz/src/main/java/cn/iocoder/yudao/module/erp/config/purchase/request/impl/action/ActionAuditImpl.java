@@ -33,9 +33,9 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PURCHASE_REQU
 @Component
 public class ActionAuditImpl implements Action<ErpAuditStatus, ErpEventEnum, ErpPurchaseRequestAuditReqVO> {
     @Autowired
-    private ErpPurchaseRequestMapper mapper;
-    @Autowired
     ErpPurchaseRequestItemsMapper itemsMapper;
+    @Autowired
+    private ErpPurchaseRequestMapper mapper;
 
     @Override
     @Transactional

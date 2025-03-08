@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.erp.convert.purchase;
 
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderSaveReqVO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

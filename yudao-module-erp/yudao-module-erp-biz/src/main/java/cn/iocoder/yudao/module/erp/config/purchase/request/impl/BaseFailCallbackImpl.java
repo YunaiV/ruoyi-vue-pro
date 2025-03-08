@@ -20,7 +20,7 @@ public class BaseFailCallbackImpl<S, E, C> implements FailCallback<S, E, C> {
     public void onFail(S sourceState, E event, C context) {
         //如果sourceState 的类是erpAuditStatus
         String description = convertEventToDescription(sourceState);
-        String msg = StrUtil.format("无法在当前状态({})下触发事件({})，上下文：{}", description,  ErpEventEnum.valueOf(event.toString()).getDesc(), JSONUtil.toJsonStr(context));
+        String msg = StrUtil.format("无法在当前状态({})下触发事件({})，上下文：{}", description, ErpEventEnum.valueOf(event.toString()).getDesc(), JSONUtil.toJsonStr(context));
         log.warn(msg);
 //        throw new IllegalArgumentException(msg);
 //        throw new ServiceException(msg);

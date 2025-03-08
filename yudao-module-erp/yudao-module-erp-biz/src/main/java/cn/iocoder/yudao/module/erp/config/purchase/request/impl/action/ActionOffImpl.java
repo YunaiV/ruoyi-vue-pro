@@ -26,11 +26,20 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 
 @Slf4j
 @Component
-public class ActionOffImpl  implements Action<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestDO> {
+public class ActionOffImpl implements Action<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestDO> {
     @Resource
     ErpPurchaseRequestMapper mapper;
     @Autowired
     ErpPurchaseRequestItemsMapper itemsMapper;
+
+    //校验方法
+    public static void validate(ErpOffStatus from, ErpOffStatus to, ErpEventEnum event, ErpPurchaseRequestDO context) {
+        //手动关闭+自动关闭事件
+        if (event == ErpEventEnum.MANUAL_CLOSE || event == ErpEventEnum.AUTO_CLOSE) {
+            //未审核->异常
+            ThrowUtil.ifThrow(Objects.equals(context.getStatus(), ErpAuditStatus.PENDING_REVIEW.getCode()), ErrorCodeConstants.PURCHASE_REQUEST_CLOSE_FAIL, context.getNo());
+        }
+    }
 
     @Override
     @Transactional
@@ -48,14 +57,5 @@ public class ActionOffImpl  implements Action<ErpOffStatus, ErpEventEnum, ErpPur
         }
         //ErpPurchaseRequestDO主表关闭事件，则子表的状态都关闭
         log.info("开关状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
-    }
-
-    //校验方法
-    public static void validate(ErpOffStatus from, ErpOffStatus to, ErpEventEnum event, ErpPurchaseRequestDO context) {
-        //手动关闭+自动关闭事件
-        if (event == ErpEventEnum.MANUAL_CLOSE || event == ErpEventEnum.AUTO_CLOSE) {
-            //未审核->异常
-            ThrowUtil.ifThrow(Objects.equals(context.getStatus(), ErpAuditStatus.PENDING_REVIEW.getCode()), ErrorCodeConstants.PURCHASE_REQUEST_CLOSE_FAIL, context.getNo());
-        }
     }
 }
