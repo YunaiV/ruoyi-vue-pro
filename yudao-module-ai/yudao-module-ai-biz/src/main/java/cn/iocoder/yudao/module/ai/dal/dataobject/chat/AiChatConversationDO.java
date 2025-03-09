@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.chat;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -64,14 +63,6 @@ public class AiChatConversationDO extends BaseDO {
      * 关联 {@link AiChatRoleDO#getId()}
      */
     private Long roleId;
-
-    // TODO @芋艿：可优化，绑定多个知识库。前提，spring ai 支持 RerankModel 的封装
-    /**
-     * 知识库编号
-     * <p>
-     * 关联 {@link AiKnowledgeDO#getId()}
-     */
-    private Long knowledgeId;
 
     /**
      * 模型编号
