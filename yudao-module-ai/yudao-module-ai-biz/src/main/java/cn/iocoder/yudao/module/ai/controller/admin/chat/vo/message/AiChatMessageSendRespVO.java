@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "管理后台 - AI 聊天消息发送 Response VO")
 @Data
@@ -27,6 +28,12 @@ public class AiChatMessageSendRespVO {
 
         @Schema(description = "聊天内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "你好，你好啊")
         private String content;
+
+        @Schema(description = "知识库段落编号数组", example = "[1,2,3]")
+        private List<Long> segmentIds;
+
+        @Schema(description = "知识库段落数组")
+        private List<AiChatMessageRespVO.KnowledgeSegment> segments;
 
         @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
         private LocalDateTime createTime;
