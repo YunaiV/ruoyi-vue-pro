@@ -17,7 +17,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.ai.vectorstore.qdrant.QdrantVectorStore;
+import org.springframework.ai.vectorstore.milvus.MilvusVectorStore;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -114,8 +114,7 @@ public class AiModelServiceImpl implements AiModelService {
     }
 
     @Override
-    public List<AiModelDO> getModelListByStatusAndType(Integer status, Integer type,
-                                                       String platform) {
+    public List<AiModelDO> getModelListByStatusAndType(Integer status, Integer type, String platform) {
         return modelMapper.selectListByStatusAndType(status, type, platform);
     }
 
@@ -163,9 +162,10 @@ public class AiModelServiceImpl implements AiModelService {
                 platform, apiKey.getApiKey(), apiKey.getUrl(), model.getModel());
 
         // 创建或获取 VectorStore 对象
-//        return modelFactory.getOrCreateVectorStore(SimpleVectorStore.class, embeddingModel, metadataFields);
-        return modelFactory.getOrCreateVectorStore(QdrantVectorStore.class, embeddingModel, metadataFields);
-//        return modelFactory.getOrCreateVectorStore(RedisVectorStore.class, embeddingModel, metadataFields);
+        // return modelFactory.getOrCreateVectorStore(SimpleVectorStore.class, embeddingModel, metadataFields);
+        // return modelFactory.getOrCreateVectorStore(QdrantVectorStore.class, embeddingModel, metadataFields);
+        // return modelFactory.getOrCreateVectorStore(RedisVectorStore.class, embeddingModel, metadataFields);
+        return modelFactory.getOrCreateVectorStore(MilvusVectorStore.class, embeddingModel, metadataFields);
     }
 
 }

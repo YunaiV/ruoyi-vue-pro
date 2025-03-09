@@ -11,8 +11,12 @@ import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowChatModel
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusServiceClientProperties;
+import org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusVectorStoreProperties;
 import org.springframework.ai.autoconfigure.vectorstore.qdrant.QdrantVectorStoreProperties;
 import org.springframework.ai.autoconfigure.vectorstore.redis.RedisVectorStoreProperties;
+import org.springframework.ai.embedding.BatchingStrategy;
+import org.springframework.ai.embedding.TokenCountBatchingStrategy;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
@@ -22,7 +26,6 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Lazy;
 
 /**
  * 芋道 AI 自动配置
@@ -33,6 +36,7 @@ import org.springframework.context.annotation.Lazy;
 @EnableConfigurationProperties({YudaoAiProperties.class,
         QdrantVectorStoreProperties.class, // 解析 Qdrant 配置
         RedisVectorStoreProperties.class, // 解析 Redis 配置
+        MilvusVectorStoreProperties.class, MilvusServiceClientProperties.class // 解析 Milvus 配置
 })
 @Slf4j
 public class YudaoAiAutoConfiguration {
@@ -193,18 +197,16 @@ public class YudaoAiAutoConfiguration {
         return new SunoApi(yudaoAiProperties.getSuno().getBaseUrl());
     }
 
-    // ========== rag 相关 ==========
-    // TODO @xin 免费版本
-//    @Bean
-//    @Lazy // TODO 芋艿：临时注释，避免无法启动」
-//    public TransformersEmbeddingModel transformersEmbeddingClient() {
-//        return new TransformersEmbeddingModel(MetadataMode.EMBED);
-//    }
+    // ========== RAG 相关 ==========
 
     @Bean
-    @Lazy // TODO 芋艿：临时注释，避免无法启动
     public TokenCountEstimator tokenCountEstimator() {
         return new JTokkitTokenCountEstimator();
+    }
+
+    @Bean
+    public BatchingStrategy batchingStrategy() {
+        return new TokenCountBatchingStrategy();
     }
 
 }

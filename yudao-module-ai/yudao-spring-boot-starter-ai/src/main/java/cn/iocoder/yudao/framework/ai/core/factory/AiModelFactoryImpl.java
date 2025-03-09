@@ -5,7 +5,6 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.lang.func.Func0;
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -29,6 +28,7 @@ import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingOptions;
 import com.alibaba.cloud.ai.dashscope.image.DashScopeImageModel;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import io.micrometer.observation.ObservationRegistry;
+import io.milvus.client.MilvusServiceClient;
 import io.qdrant.client.QdrantClient;
 import io.qdrant.client.QdrantGrpcClient;
 import lombok.SneakyThrows;
@@ -38,6 +38,10 @@ import org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiConnectionPr
 import org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration;
 import org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration;
 import org.springframework.ai.autoconfigure.qianfan.QianFanAutoConfiguration;
+import org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusServiceClientConnectionDetails;
+import org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusServiceClientProperties;
+import org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusVectorStoreAutoConfiguration;
+import org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusVectorStoreProperties;
 import org.springframework.ai.autoconfigure.vectorstore.qdrant.QdrantVectorStoreAutoConfiguration;
 import org.springframework.ai.autoconfigure.vectorstore.qdrant.QdrantVectorStoreProperties;
 import org.springframework.ai.autoconfigure.vectorstore.redis.RedisVectorStoreAutoConfiguration;
@@ -47,6 +51,7 @@ import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiConnectionProperties;
 import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.document.MetadataMode;
+import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.ollama.OllamaChatModel;
@@ -66,6 +71,7 @@ import org.springframework.ai.stabilityai.StabilityAiImageModel;
 import org.springframework.ai.stabilityai.api.StabilityAiApi;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.milvus.MilvusVectorStore;
 import org.springframework.ai.vectorstore.observation.DefaultVectorStoreObservationConvention;
 import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
 import org.springframework.ai.vectorstore.qdrant.QdrantVectorStore;
@@ -246,6 +252,9 @@ public class AiModelFactoryImpl implements AiModelFactory {
             }
             if (type == RedisVectorStore.class) {
                 return buildRedisVectorStore(embeddingModel, metadataFields);
+            }
+            if (type == MilvusVectorStore.class) {
+                return buildMilvusVectorStore(embeddingModel);
             }
             throw new IllegalArgumentException(StrUtil.format("未知类型({})", type));
         });
@@ -482,8 +491,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
         QdrantClient qdrantClient = new QdrantClient(grpcClientBuilder.build());
         // 创建 QdrantVectorStore 对象
         QdrantVectorStore vectorStore = configuration.vectorStore(embeddingModel, properties, qdrantClient,
-                getObservationRegistry(), getCustomObservationConvention(),
-                ReflectUtil.invoke(configuration, "batchingStrategy"));
+                getObservationRegistry(), getCustomObservationConvention(), getBatchingStrategy());
         // 初始化索引
         vectorStore.afterPropertiesSet();
         return vectorStore;
@@ -516,11 +524,46 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 }))
                 .observationRegistry(getObservationRegistry().getObject())
                 .customObservationConvention(getCustomObservationConvention().getObject())
-                .batchingStrategy(ReflectUtil.invoke(configuration, "batchingStrategy"))
+                .batchingStrategy(getBatchingStrategy())
                 .build();
         // 初始化索引
         redisVectorStore.afterPropertiesSet();
         return redisVectorStore;
+    }
+
+    /**
+     * 参考 {@link MilvusVectorStoreAutoConfiguration} 的 vectorStore 方法
+     */
+    @SneakyThrows
+    private MilvusVectorStore buildMilvusVectorStore(EmbeddingModel embeddingModel) {
+        MilvusVectorStoreAutoConfiguration configuration = new MilvusVectorStoreAutoConfiguration();
+        // 获取配置属性
+        MilvusVectorStoreProperties serverProperties = SpringUtil.getBean(MilvusVectorStoreProperties.class);
+        MilvusServiceClientProperties clientProperties = SpringUtil.getBean(MilvusServiceClientProperties.class);
+
+        // 创建 MilvusServiceClient 对象
+        MilvusServiceClient milvusClient = configuration.milvusClient(serverProperties, clientProperties,
+                new MilvusServiceClientConnectionDetails() {
+
+                    @Override
+                    public String getHost() {
+                        return clientProperties.getHost();
+                    }
+
+                    @Override
+                    public int getPort() {
+                        return clientProperties.getPort();
+                    }
+
+                }
+        );
+        // 创建 MilvusVectorStore 对象
+        MilvusVectorStore vectorStore = configuration.vectorStore(milvusClient, embeddingModel, serverProperties,
+                getBatchingStrategy(), getObservationRegistry(), getCustomObservationConvention());
+
+        // 初始化索引
+        vectorStore.afterPropertiesSet();
+        return vectorStore;
     }
 
     private static ObjectProvider<ObservationRegistry> getObservationRegistry() {
@@ -541,6 +584,10 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return new DefaultVectorStoreObservationConvention();
             }
         };
+    }
+
+    private static BatchingStrategy getBatchingStrategy() {
+        return SpringUtil.getBean(BatchingStrategy.class);
     }
 
 }

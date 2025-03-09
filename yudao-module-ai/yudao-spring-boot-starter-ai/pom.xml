@@ -70,7 +70,6 @@
             <groupId>${spring-ai.groupId}</groupId>
             <artifactId>spring-ai-qdrant-store</artifactId>
             <version>${spring-ai.version}</version>
-<!--            <optional>true</optional>-->
         </dependency>
 
         <dependency>
