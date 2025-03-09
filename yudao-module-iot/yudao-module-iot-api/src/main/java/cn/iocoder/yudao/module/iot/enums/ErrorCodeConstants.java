@@ -70,4 +70,7 @@ public interface ErrorCodeConstants {
     // ========== MQTT 通信相关 1-050-009-000 ==========
     ErrorCode MQTT_TOPIC_ILLEGAL = new ErrorCode(1_050_009_000, "topic illegal");
 
+    // ========== IoT 数据桥梁 1-050-010-000 ==========
+    ErrorCode DATA_BRIDGE_NOT_EXISTS = new ErrorCode(1_050_010_000, "IoT 数据桥梁不存在");
+
 }

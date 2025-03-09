@@ -1,45 +1,70 @@
 package cn.iocoder.yudao.module.iot.service.rule;
 
-import cn.hutool.core.map.MapUtil;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.IotDataBridgePageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.IotDataBridgeSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.rule.IotDataBridgeMapper;
-import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgTypeEnum;
 import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.Objects;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DATA_BRIDGE_NOT_EXISTS;
 
 /**
- * IoT 数据桥梁的 Service 实现类
+ * IoT 数据桥梁 Service 实现类
  *
- * @author 芋道源码
+ * @author HUIHUI
  */
 @Service
 @Validated
-@Slf4j
 public class IotDataBridgeServiceImpl implements IotDataBridgeService {
 
     @Resource
     private IotDataBridgeMapper dataBridgeMapper;
 
-    // TODO @芋艿：临时测试
     @Override
-    public IotDataBridgeDO getIotDataBridge(Long id) {
-        if (Objects.equals(id, 1L)) {
-            IotDataBridgeDO.HttpConfig config = new IotDataBridgeDO.HttpConfig()
-                    .setUrl("http://127.0.0.1:48080/test")
-//                    .setMethod("POST")
-                    .setMethod("GET")
-                    .setQuery(MapUtil.of("aaa", "bbb"))
-                    .setHeaders(MapUtil.of("ccc", "ddd"))
-                    .setBody(JsonUtils.toJsonString(MapUtil.of("eee", "fff")));
-            return IotDataBridgeDO.builder().id(1L).name("芋道").description("芋道源码").status(0).direction(1)
-                    .type(IotDataBridgTypeEnum.HTTP.getType()).config(config).build();
+    public Long createDataBridge(IotDataBridgeSaveReqVO createReqVO) {
+        // 插入
+        IotDataBridgeDO dataBridge = BeanUtils.toBean(createReqVO, IotDataBridgeDO.class);
+        dataBridgeMapper.insert(dataBridge);
+        // 返回
+        return dataBridge.getId();
+    }
+
+    @Override
+    public void updateDataBridge(IotDataBridgeSaveReqVO updateReqVO) {
+        // 校验存在
+        validateDataBridgeExists(updateReqVO.getId());
+        // 更新
+        IotDataBridgeDO updateObj = BeanUtils.toBean(updateReqVO, IotDataBridgeDO.class);
+        dataBridgeMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void deleteDataBridge(Long id) {
+        // 校验存在
+        validateDataBridgeExists(id);
+        // 删除
+        dataBridgeMapper.deleteById(id);
+    }
+
+    private void validateDataBridgeExists(Long id) {
+        if (dataBridgeMapper.selectById(id) == null) {
+            throw exception(DATA_BRIDGE_NOT_EXISTS);
         }
+    }
+
+    @Override
+    public IotDataBridgeDO getDataBridge(Long id) {
         return dataBridgeMapper.selectById(id);
+    }
+
+    @Override
+    public PageResult<IotDataBridgeDO> getDataBridgePage(IotDataBridgePageReqVO pageReqVO) {
+        return dataBridgeMapper.selectPage(pageReqVO);
     }
 
 }

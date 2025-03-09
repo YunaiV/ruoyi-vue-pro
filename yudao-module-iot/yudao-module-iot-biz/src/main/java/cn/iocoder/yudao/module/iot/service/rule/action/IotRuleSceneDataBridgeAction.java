@@ -36,7 +36,7 @@ public class IotRuleSceneDataBridgeAction implements IotRuleSceneAction {
         }
         // 1.2 获得数据桥梁
         Assert.notNull(config.getDataBridgeId(), "数据桥梁编号不能为空");
-        IotDataBridgeDO dataBridge = dataBridgeService.getIotDataBridge(config.getDataBridgeId());
+        IotDataBridgeDO dataBridge = dataBridgeService.getDataBridge(config.getDataBridgeId());
         if (dataBridge == null || dataBridge.getConfig() == null) {
             log.error("[execute][message({}) config({}) 对应的数据桥梁不存在]", message, config);
             return;
