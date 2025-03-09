@@ -20,7 +20,7 @@ import java.util.List;
  * @since 2024/4/14 17:35
  * @since 2024/4/14 17:35
  */
-@TableName("ai_chat_message")
+@TableName(value = "ai_chat_message", autoResultMap = true)
 @KeySequence("ai_chat_conversation_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -72,14 +72,6 @@ public class AiChatMessageDO extends BaseDO {
     private Long roleId;
 
     /**
-     * 知识库段落编号数组
-     *
-     * 关联 {@link AiKnowledgeSegmentDO#getId()} 字段
-     */
-    @TableField(typeHandler = LongListTypeHandler.class)
-    private List<Long> segmentIds;
-
-    /**
      * 模型标志
      *
      * 冗余 {@link AiModelDO#getModel()}
@@ -101,5 +93,13 @@ public class AiChatMessageDO extends BaseDO {
      * 是否携带上下文
      */
     private Boolean useContext;
+
+    /**
+     * 知识库段落编号数组
+     *
+     * 关联 {@link AiKnowledgeSegmentDO#getId()} 字段
+     */
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> segmentIds;
 
 }

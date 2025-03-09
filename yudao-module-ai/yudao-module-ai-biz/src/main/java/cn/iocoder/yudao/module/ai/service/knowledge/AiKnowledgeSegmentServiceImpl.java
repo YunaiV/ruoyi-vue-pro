@@ -30,10 +30,7 @@ import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -322,7 +319,15 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
 
     @Override
     public AiKnowledgeSegmentDO getKnowledgeSegment(Long id) {
-        return validateKnowledgeSegmentExists(id);
+        return segmentMapper.selectById(id);
+    }
+
+    @Override
+    public List<AiKnowledgeSegmentDO> getKnowledgeSegmentList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return segmentMapper.selectBatchIds(ids);
     }
 
 }

@@ -10,7 +10,11 @@ import cn.iocoder.yudao.module.ai.service.knowledge.bo.AiKnowledgeSegmentSearchR
 import cn.iocoder.yudao.module.ai.service.knowledge.bo.AiKnowledgeSegmentSearchRespBO;
 import org.springframework.scheduling.annotation.Async;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * AI 知识库段落 Service 接口
@@ -26,6 +30,24 @@ public interface AiKnowledgeSegmentService {
      * @return 段落详情
      */
     AiKnowledgeSegmentDO getKnowledgeSegment(Long id);
+
+    /**
+     * 获取知识库段落列表
+     *
+     * @param ids 段落编号列表
+     * @return 段落列表
+     */
+    List<AiKnowledgeSegmentDO> getKnowledgeSegmentList(Collection<Long> ids);
+
+    /**
+     * 获取知识库段落 Map
+     *
+     * @param ids 段落编号列表
+     * @return 段落 Map
+     */
+    default Map<Long, AiKnowledgeSegmentDO> getKnowledgeSegmentMap(Collection<Long> ids) {
+        return convertMap(getKnowledgeSegmentList(ids), AiKnowledgeSegmentDO::getId);
+    }
 
     /**
      * 获取段落分页

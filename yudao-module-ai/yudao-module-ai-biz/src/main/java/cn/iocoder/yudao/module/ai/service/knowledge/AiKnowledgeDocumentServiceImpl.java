@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -205,9 +206,9 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
     @Override
     public List<AiKnowledgeDocumentDO> getKnowledgeDocumentList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
-        return knowledgeDocumentMapper.selectByIds(ids);
+        return knowledgeDocumentMapper.selectBatchIds(ids);
     }
 
 }

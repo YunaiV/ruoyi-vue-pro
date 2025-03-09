@@ -212,7 +212,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         // 1.4 知识库，通过 UserMessage 实现
         if (CollUtil.isNotEmpty(knowledgeSegments)) {
             String reference = knowledgeSegments.stream()
-                    .map(segment -> "<Reference>\n" + segment.getContent() + "</Reference>")
+                    .map(segment -> "<Reference>" + segment.getContent() + "</Reference>")
                     .collect(Collectors.joining("\n\n"));
             chatMessages.add(new UserMessage(String.format(KNOWLEDGE_USER_MESSAGE_TEMPLATE, reference)));
         }

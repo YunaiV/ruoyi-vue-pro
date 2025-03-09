@@ -23,7 +23,6 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
-// TODO @芋艿：增加权限标识
 @Tag(name = "管理后台 - AI 知识库")
 @RestController
 @RequestMapping("/ai/knowledge")
