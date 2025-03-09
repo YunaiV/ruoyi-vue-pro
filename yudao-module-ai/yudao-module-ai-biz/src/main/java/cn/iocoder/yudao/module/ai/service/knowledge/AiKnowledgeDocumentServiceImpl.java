@@ -7,7 +7,6 @@ import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentCreateListReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateReqVO;
@@ -209,11 +208,6 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
             return new ArrayList<>();
         }
         return knowledgeDocumentMapper.selectByIds(ids);
-    }
-
-    @Override
-    public List<AiKnowledgeDocumentDO> getKnowledgeDocumentListByStatus(Integer status) {
-        return knowledgeDocumentMapper.selectListByStatus(status);
     }
 
 }

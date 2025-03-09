@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnow
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * AI 知识库 Mapper
  *
@@ -21,6 +23,10 @@ public interface AiKnowledgeMapper extends BaseMapperX<AiKnowledgeDO> {
                 .eqIfPresent(AiKnowledgeDO::getStatus, pageReqVO.getStatus())
                 .betweenIfPresent(AiKnowledgeDO::getCreateTime, pageReqVO.getCreateTime())
                 .orderByDesc(AiKnowledgeDO::getId));
+    }
+
+    default List<AiKnowledgeDO> selectListByStatus(Integer status) {
+        return selectList(AiKnowledgeDO::getStatus, status);
     }
 
 }

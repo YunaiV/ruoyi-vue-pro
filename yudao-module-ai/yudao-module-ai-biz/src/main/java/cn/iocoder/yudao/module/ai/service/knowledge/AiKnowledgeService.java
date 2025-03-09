@@ -5,6 +5,8 @@ import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnow
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeSaveReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
 
+import java.util.List;
+
 /**
  * AI 知识库-基础信息 Service 接口
  *
@@ -49,5 +51,13 @@ public interface AiKnowledgeService {
      * @return 知识库分页
      */
     PageResult<AiKnowledgeDO> getKnowledgePage(AiKnowledgePageReqVO pageReqVO);
+
+    /**
+     * 获得指定状态的知识库列表
+     *
+     * @param status 状态
+     * @return 知识库列表
+     */
+    List<AiKnowledgeDO> getKnowledgeSimpleListByStatus(Integer status);
 
 }

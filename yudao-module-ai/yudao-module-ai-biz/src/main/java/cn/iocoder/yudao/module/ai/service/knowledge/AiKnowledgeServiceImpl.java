@@ -12,6 +12,8 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.KNOWLEDGE_NOT_EXISTS;
 
@@ -74,6 +76,11 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
     @Override
     public PageResult<AiKnowledgeDO> getKnowledgePage(AiKnowledgePageReqVO pageReqVO) {
         return knowledgeMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<AiKnowledgeDO> getKnowledgeSimpleListByStatus(Integer status) {
+        return knowledgeMapper.selectListByStatus(status);
     }
 
 }

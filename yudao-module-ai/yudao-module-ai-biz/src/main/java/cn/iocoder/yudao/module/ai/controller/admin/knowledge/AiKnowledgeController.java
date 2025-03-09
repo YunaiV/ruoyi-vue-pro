@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.controller.admin.knowledge;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -17,7 +18,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 // TODO @芋艿：增加权限标识
 @Tag(name = "管理后台 - AI 知识库")
@@ -60,6 +64,14 @@ public class AiKnowledgeController {
     public CommonResult<Boolean> updateKnowledge(@RequestBody @Valid AiKnowledgeSaveReqVO updateReqVO) {
         knowledgeService.updateKnowledge(updateReqVO);
         return success(true);
+    }
+
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得知识库的精简列表")
+    public CommonResult<List<AiKnowledgeRespVO>> getKnowledgeSimpleList() {
+        List<AiKnowledgeDO> list = knowledgeService.getKnowledgeSimpleListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        return success(convertList(list, knowledge -> new AiKnowledgeRespVO()
+                .setId(knowledge.getId()).setName(knowledge.getName())));
     }
 
 }

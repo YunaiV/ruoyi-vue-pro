@@ -115,12 +115,4 @@ public interface AiKnowledgeDocumentService {
         return convertMap(getKnowledgeDocumentList(ids), AiKnowledgeDocumentDO::getId);
     }
 
-    /**
-     * 获取指定状态的文档列表
-     *
-     * @param status 状态
-     * @return 文档列表
-     */
-    List<AiKnowledgeDocumentDO> getKnowledgeDocumentListByStatus(Integer status);
-
 }

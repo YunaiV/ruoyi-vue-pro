@@ -46,8 +46,8 @@ public class AiChatRoleRespVO implements VO {
     @Schema(description = "角色设定", requiredMode = Schema.RequiredMode.REQUIRED)
     private String systemMessage;
 
-    @Schema(description = "知识库文档编号列表", example = "1,2,3")
-    private List<Long> documentIds;
+    @Schema(description = "引用的知识库编号列表", example = "1,2,3")
+    private List<Long> knowledgeIds;
 
     @Schema(description = "是否公开", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Boolean publicStatus;

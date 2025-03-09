@@ -31,7 +31,7 @@ public class AiChatRoleSaveMyReqVO {
     @NotEmpty(message = "角色设定不能为空")
     private String systemMessage;
 
-    @Schema(description = "知识库文档编号列表", example = "1,2,3")
-    private List<Long> documentIds;
+    @Schema(description = "引用的知识库编号列表", example = "1,2,3")
+    private List<Long> knowledgeIds;
 
 }

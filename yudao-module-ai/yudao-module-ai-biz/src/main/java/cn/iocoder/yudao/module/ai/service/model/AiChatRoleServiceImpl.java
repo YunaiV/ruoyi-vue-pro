@@ -5,14 +5,13 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRolePageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRoleSaveMyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRoleSaveReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.model.AiChatRoleMapper;
-import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeDocumentService;
+import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,8 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.CHAT_ROLE_DISABLE;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.CHAT_ROLE_NOT_EXISTS;
 
 /**
  * AI 聊天角色 Service 实现类
@@ -38,12 +38,12 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     private AiChatRoleMapper chatRoleMapper;
 
     @Resource
-    private AiKnowledgeDocumentService knowledgeDocumentService;
+    private AiKnowledgeService knowledgeService;
 
     @Override
     public Long createChatRole(AiChatRoleSaveReqVO createReqVO) {
         // 校验文档
-        validateDocuments(createReqVO.getDocumentIds());
+        validateDocuments(createReqVO.getKnowledgeIds());
 
         // 保存角色
         AiChatRoleDO chatRole = BeanUtils.toBean(createReqVO, AiChatRoleDO.class);
@@ -54,7 +54,7 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     @Override
     public Long createChatRoleMy(AiChatRoleSaveMyReqVO createReqVO, Long userId) {
         // 校验文档
-        validateDocuments(createReqVO.getDocumentIds());
+        validateDocuments(createReqVO.getKnowledgeIds());
 
         // 保存角色
         AiChatRoleDO chatRole = BeanUtils.toBean(createReqVO, AiChatRoleDO.class).setUserId(userId)
@@ -68,7 +68,7 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
         // 校验存在
         validateChatRoleExists(updateReqVO.getId());
         // 校验文档
-        validateDocuments(updateReqVO.getDocumentIds());
+        validateDocuments(updateReqVO.getKnowledgeIds());
 
         // 更新角色
         AiChatRoleDO updateObj = BeanUtils.toBean(updateReqVO, AiChatRoleDO.class);
@@ -83,7 +83,7 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
             throw exception(CHAT_ROLE_NOT_EXISTS);
         }
         // 校验文档
-        validateDocuments(updateReqVO.getDocumentIds());
+        validateDocuments(updateReqVO.getKnowledgeIds());
 
         // 更新
         AiChatRoleDO updateObj = BeanUtils.toBean(updateReqVO, AiChatRoleDO.class);
@@ -91,16 +91,16 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     }
 
     /**
-     * 校验文档是否存在
+     * 校验知识库是否存在
      *
-     * @param documentIds 文档编号列表
+     * @param knowledgeIds 知识库编号列表
      */
-    private void validateDocuments(List<Long> documentIds) {
-        if (CollUtil.isEmpty(documentIds)) {
+    private void validateDocuments(List<Long> knowledgeIds) {
+        if (CollUtil.isEmpty(knowledgeIds)) {
             return;
         }
         // 校验文档是否存在
-        documentIds.forEach(knowledgeDocumentService::validateKnowledgeDocumentExists);
+        knowledgeIds.forEach(knowledgeService::validateKnowledgeExists);
     }
 
     @Override
