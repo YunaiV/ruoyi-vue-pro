@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeRocketMQConfig;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
-import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
@@ -23,15 +24,15 @@ import java.time.LocalDateTime;
 @Component
 @Slf4j
 public class IotRocketMQDataBridgeExecute extends
-        AbstractCacheableDataBridgeExecute<IotDataBridgeDO.RocketMQConfig, DefaultMQProducer> {
+        AbstractCacheableDataBridgeExecute<IotDataBridgeRocketMQConfig, DefaultMQProducer> {
 
     @Override
     public Integer getType() {
-        return IotDataBridgTypeEnum.ROCKETMQ.getType();
+        return IotDataBridgeTypeEnum.ROCKETMQ.getType();
     }
 
     @Override
-    public void execute0(IotDeviceMessage message, IotDataBridgeDO.RocketMQConfig config) throws Exception {
+    public void execute0(IotDeviceMessage message, IotDataBridgeRocketMQConfig config) throws Exception {
         // 1. 获取或创建 Producer
         DefaultMQProducer producer = getProducer(config);
 
@@ -52,7 +53,7 @@ public class IotRocketMQDataBridgeExecute extends
     }
 
     @Override
-    protected DefaultMQProducer initProducer(IotDataBridgeDO.RocketMQConfig config) throws Exception {
+    protected DefaultMQProducer initProducer(IotDataBridgeRocketMQConfig config) throws Exception {
         DefaultMQProducer producer = new DefaultMQProducer(config.getGroup());
         producer.setNamesrvAddr(config.getNameServer());
         producer.start();
@@ -70,7 +71,7 @@ public class IotRocketMQDataBridgeExecute extends
         IotRocketMQDataBridgeExecute action = new IotRocketMQDataBridgeExecute();
 
         // 2. 创建共享的配置
-        IotDataBridgeDO.RocketMQConfig config = new IotDataBridgeDO.RocketMQConfig();
+        IotDataBridgeRocketMQConfig config = new IotDataBridgeRocketMQConfig();
         config.setNameServer("127.0.0.1:9876");
         config.setGroup("test-group");
         config.setTopic("test-topic");

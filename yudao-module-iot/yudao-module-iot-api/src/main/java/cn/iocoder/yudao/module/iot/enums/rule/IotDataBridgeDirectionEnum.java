@@ -13,14 +13,14 @@ import java.util.Arrays;
  */
 @RequiredArgsConstructor
 @Getter
-public enum IotDataBridgDirectionEnum implements ArrayValuable<Integer> {
+public enum IotDataBridgeDirectionEnum implements ArrayValuable<Integer> {
 
     INPUT(1), // 输入
     OUTPUT(2); // 输出
 
     private final Integer type;
 
-    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotDataBridgDirectionEnum::getType).toArray(Integer[]::new);
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotDataBridgeDirectionEnum::getType).toArray(Integer[]::new);
 
     @Override
     public Integer[] array() {

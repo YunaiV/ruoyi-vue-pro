@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeRabbitMQConfig;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
-import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -22,16 +23,16 @@ import java.time.LocalDateTime;
 @Component
 @Slf4j
 public class IotRabbitMQDataBridgeExecute extends
-        AbstractCacheableDataBridgeExecute<IotDataBridgeDO.RabbitMQConfig, Channel> {
+        AbstractCacheableDataBridgeExecute<IotDataBridgeRabbitMQConfig, Channel> {
 
 
     @Override
     public Integer getType() {
-        return IotDataBridgTypeEnum.RABBITMQ.getType();
+        return IotDataBridgeTypeEnum.RABBITMQ.getType();
     }
 
     @Override
-    public void execute0(IotDeviceMessage message, IotDataBridgeDO.RabbitMQConfig config) throws Exception {
+    public void execute0(IotDeviceMessage message, IotDataBridgeRabbitMQConfig config) throws Exception {
         // 1. 获取或创建 Channel
         Channel channel = getProducer(config);
 
@@ -48,7 +49,7 @@ public class IotRabbitMQDataBridgeExecute extends
 
     @Override
     @SuppressWarnings("resource")
-    protected Channel initProducer(IotDataBridgeDO.RabbitMQConfig config) throws Exception {
+    protected Channel initProducer(IotDataBridgeRabbitMQConfig config) throws Exception {
         // 1. 创建连接工厂
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(config.getHost());
@@ -81,7 +82,7 @@ public class IotRabbitMQDataBridgeExecute extends
         IotRabbitMQDataBridgeExecute action = new IotRabbitMQDataBridgeExecute();
 
         // 2. 创建共享的配置
-        IotDataBridgeDO.RabbitMQConfig config = new IotDataBridgeDO.RabbitMQConfig();
+        IotDataBridgeRabbitMQConfig config = new IotDataBridgeRabbitMQConfig();
         config.setHost("localhost");
         config.setPort(5672);
         config.setVirtualHost("/");

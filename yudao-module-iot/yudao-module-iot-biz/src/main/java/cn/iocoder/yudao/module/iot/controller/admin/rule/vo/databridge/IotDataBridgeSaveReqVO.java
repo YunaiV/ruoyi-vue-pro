@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge;
 
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeConfig;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -32,6 +33,7 @@ public class IotDataBridgeSaveReqVO {
     private Integer type;
 
     @Schema(description = "桥梁配置")
-    private String config;
+    @NotNull(message = "桥梁配置不能为空")
+    private IotDataBridgeConfig config;
 
 }

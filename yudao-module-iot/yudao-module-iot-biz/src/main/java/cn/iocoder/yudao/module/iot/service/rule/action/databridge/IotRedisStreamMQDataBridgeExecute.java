@@ -2,8 +2,9 @@ package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeRedisStreamMQConfig;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
-import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -30,15 +31,15 @@ import java.time.LocalDateTime;
 @Component
 @Slf4j
 public class IotRedisStreamMQDataBridgeExecute extends
-        AbstractCacheableDataBridgeExecute<IotDataBridgeDO.RedisStreamMQConfig, RedisTemplate<String, Object>> {
+        AbstractCacheableDataBridgeExecute<IotDataBridgeRedisStreamMQConfig, RedisTemplate<String, Object>> {
 
     @Override
     public Integer getType() {
-        return IotDataBridgTypeEnum.REDIS_STREAM.getType();
+        return IotDataBridgeTypeEnum.REDIS_STREAM.getType();
     }
 
     @Override
-    public void execute0(IotDeviceMessage message, IotDataBridgeDO.RedisStreamMQConfig config) throws Exception {
+    public void execute0(IotDeviceMessage message, IotDataBridgeRedisStreamMQConfig config) throws Exception {
         // 1. 获取 RedisTemplate
         RedisTemplate<String, Object> redisTemplate = getProducer(config);
 
@@ -50,7 +51,7 @@ public class IotRedisStreamMQDataBridgeExecute extends
     }
 
     @Override
-    protected RedisTemplate<String, Object> initProducer(IotDataBridgeDO.RedisStreamMQConfig config) {
+    protected RedisTemplate<String, Object> initProducer(IotDataBridgeRedisStreamMQConfig config) {
         // 1.1 创建 Redisson 配置
         Config redissonConfig = new Config();
         SingleServerConfig serverConfig = redissonConfig.useSingleServer()
@@ -101,7 +102,7 @@ public class IotRedisStreamMQDataBridgeExecute extends
         IotRedisStreamMQDataBridgeExecute action = new IotRedisStreamMQDataBridgeExecute();
 
         // 2. 创建共享的配置
-        IotDataBridgeDO.RedisStreamMQConfig config = new IotDataBridgeDO.RedisStreamMQConfig();
+        IotDataBridgeRedisStreamMQConfig config = new IotDataBridgeRedisStreamMQConfig();
         config.setHost("127.0.0.1");
         config.setPort(6379);
         config.setDatabase(0);

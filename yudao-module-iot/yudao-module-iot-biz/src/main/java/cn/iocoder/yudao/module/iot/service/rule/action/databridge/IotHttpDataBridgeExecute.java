@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
-import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgTypeEnum;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeHttpConfig;
+import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -25,19 +25,19 @@ import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_
  */
 @Component
 @Slf4j
-public class IotHttpDataBridgeExecute implements IotDataBridgeExecute<IotDataBridgeDO.HttpConfig> {
+public class IotHttpDataBridgeExecute implements IotDataBridgeExecute<IotDataBridgeHttpConfig> {
 
     @Resource
     private RestTemplate restTemplate;
 
     @Override
     public Integer getType() {
-        return IotDataBridgTypeEnum.HTTP.getType();
+        return IotDataBridgeTypeEnum.HTTP.getType();
     }
 
     @Override
     @SuppressWarnings({"unchecked", "deprecation"})
-    public void execute0(IotDeviceMessage message, IotDataBridgeDO.HttpConfig config) {
+    public void execute0(IotDeviceMessage message, IotDataBridgeHttpConfig config) {
         String url = null;
         HttpMethod method = HttpMethod.valueOf(config.getMethod().toUpperCase());
         HttpEntity<String> requestEntity = null;

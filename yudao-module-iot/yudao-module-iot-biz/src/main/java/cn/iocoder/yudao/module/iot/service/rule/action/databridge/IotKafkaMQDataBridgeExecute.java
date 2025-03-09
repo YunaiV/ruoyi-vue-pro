@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeKafkaMQConfig;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
-import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -26,17 +27,17 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Slf4j
 public class IotKafkaMQDataBridgeExecute extends
-        AbstractCacheableDataBridgeExecute<IotDataBridgeDO.KafkaMQConfig, KafkaTemplate<String, String>> {
+        AbstractCacheableDataBridgeExecute<IotDataBridgeKafkaMQConfig, KafkaTemplate<String, String>> {
 
     private static final Duration SEND_TIMEOUT = Duration.ofMillis(10000); // 10 秒超时时间
 
     @Override
     public Integer getType() {
-        return IotDataBridgTypeEnum.KAFKA.getType();
+        return IotDataBridgeTypeEnum.KAFKA.getType();
     }
 
     @Override
-    public void execute0(IotDeviceMessage message, IotDataBridgeDO.KafkaMQConfig config) throws Exception {
+    public void execute0(IotDeviceMessage message, IotDataBridgeKafkaMQConfig config) throws Exception {
         // 1. 获取或创建 KafkaTemplate
         KafkaTemplate<String, String> kafkaTemplate = getProducer(config);
 
@@ -47,7 +48,7 @@ public class IotKafkaMQDataBridgeExecute extends
     }
 
     @Override
-    protected KafkaTemplate<String, String> initProducer(IotDataBridgeDO.KafkaMQConfig config) {
+    protected KafkaTemplate<String, String> initProducer(IotDataBridgeKafkaMQConfig config) {
         // 1.1 构建生产者配置
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());
@@ -82,7 +83,7 @@ public class IotKafkaMQDataBridgeExecute extends
         IotKafkaMQDataBridgeExecute action = new IotKafkaMQDataBridgeExecute();
 
         // 2. 创建共享的配置
-        IotDataBridgeDO.KafkaMQConfig config = new IotDataBridgeDO.KafkaMQConfig();
+        IotDataBridgeKafkaMQConfig config = new IotDataBridgeKafkaMQConfig();
         config.setBootstrapServers("127.0.0.1:9092");
         config.setTopic("test-topic");
         config.setSsl(false);
