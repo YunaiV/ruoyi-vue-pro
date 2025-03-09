@@ -2,10 +2,15 @@ package cn.iocoder.yudao.module.ai.dal.dataobject.model;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
+import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+
+import java.util.List;
 
 /**
  * AI 聊天角色 DO
@@ -61,6 +66,14 @@ public class AiChatRoleDO extends BaseDO {
      * 关联 {@link AiModelDO#getId()} 字段
      */
     private Long modelId;
+
+    /**
+     * 知识库文档编号列表
+     *
+     * 关联 {@link AiKnowledgeDocumentDO#getId()} 字段
+     */
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> documentIds;
 
     /**
      * 是否公开

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.controller.admin.knowledge;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -10,8 +11,10 @@ import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowl
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateStatusReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
+import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeDocumentMapper;
 import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeDocumentService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 @Tag(name = "管理后台 - AI 知识库文档")
 @RestController
@@ -89,6 +93,15 @@ public class AiKnowledgeDocumentController {
     public CommonResult<Boolean> deleteKnowledgeDocument(@RequestParam("id") Long id) {
         documentService.deleteKnowledgeDocument(id);
         return success(true);
+    }
+
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得知识库文档的精简列表")
+    public CommonResult<List<AiKnowledgeDocumentRespVO>> getKnowledgeDocumentSimpleList() {
+        List<AiKnowledgeDocumentDO> list = documentService
+                .getKnowledgeDocumentListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        return success(convertList(list, document -> new AiKnowledgeDocumentRespVO()
+                .setId(document.getId()).setName(document.getName())));
     }
 
 }

@@ -5,12 +5,14 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRolePageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRoleSaveMyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRoleSaveReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.model.AiChatRoleMapper;
+import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeDocumentService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,8 +37,15 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     @Resource
     private AiChatRoleMapper chatRoleMapper;
 
+    @Resource
+    private AiKnowledgeDocumentService knowledgeDocumentService;
+
     @Override
     public Long createChatRole(AiChatRoleSaveReqVO createReqVO) {
+        // 校验文档
+        validateDocuments(createReqVO.getDocumentIds());
+
+        // 保存角色
         AiChatRoleDO chatRole = BeanUtils.toBean(createReqVO, AiChatRoleDO.class);
         chatRoleMapper.insert(chatRole);
         return chatRole.getId();
@@ -44,6 +53,10 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
 
     @Override
     public Long createChatRoleMy(AiChatRoleSaveMyReqVO createReqVO, Long userId) {
+        // 校验文档
+        validateDocuments(createReqVO.getDocumentIds());
+
+        // 保存角色
         AiChatRoleDO chatRole = BeanUtils.toBean(createReqVO, AiChatRoleDO.class).setUserId(userId)
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()).setPublicStatus(false);
         chatRoleMapper.insert(chatRole);
@@ -54,7 +67,10 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     public void updateChatRole(AiChatRoleSaveReqVO updateReqVO) {
         // 校验存在
         validateChatRoleExists(updateReqVO.getId());
-        // 更新
+        // 校验文档
+        validateDocuments(updateReqVO.getDocumentIds());
+
+        // 更新角色
         AiChatRoleDO updateObj = BeanUtils.toBean(updateReqVO, AiChatRoleDO.class);
         chatRoleMapper.updateById(updateObj);
     }
@@ -66,10 +82,25 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
         if (ObjectUtil.notEqual(chatRole.getUserId(), userId)) {
             throw exception(CHAT_ROLE_NOT_EXISTS);
         }
+        // 校验文档
+        validateDocuments(updateReqVO.getDocumentIds());
 
         // 更新
         AiChatRoleDO updateObj = BeanUtils.toBean(updateReqVO, AiChatRoleDO.class);
         chatRoleMapper.updateById(updateObj);
+    }
+
+    /**
+     * 校验文档是否存在
+     *
+     * @param documentIds 文档编号列表
+     */
+    private void validateDocuments(List<Long> documentIds) {
+        if (CollUtil.isEmpty(documentIds)) {
+            return;
+        }
+        // 校验文档是否存在
+        documentIds.forEach(knowledgeDocumentService::validateKnowledgeDocumentExists);
     }
 
     @Override
@@ -134,7 +165,8 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     @Override
     public List<String> getChatRoleCategoryList() {
         List<AiChatRoleDO> list = chatRoleMapper.selectListGroupByCategory(CommonStatusEnum.ENABLE.getStatus());
-        return convertList(list, AiChatRoleDO::getCategory, role -> role != null && StrUtil.isNotBlank(role.getCategory()));
+        return convertList(list, AiChatRoleDO::getCategory,
+                role -> role != null && StrUtil.isNotBlank(role.getCategory()));
     }
 
     @Override
@@ -143,4 +175,3 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     }
 
 }
-

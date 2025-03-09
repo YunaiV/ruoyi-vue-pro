@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * AI 知识库文档 Mapper
@@ -26,9 +27,13 @@ public interface AiKnowledgeDocumentMapper extends BaseMapperX<AiKnowledgeDocume
     }
 
     default void updateRetrievalCountIncr(Collection<Long> ids) {
-        update( new LambdaUpdateWrapper<AiKnowledgeDocumentDO>()
+        update(new LambdaUpdateWrapper<AiKnowledgeDocumentDO>()
                 .setSql(" retrieval_count = retrieval_count + 1")
                 .in(AiKnowledgeDocumentDO::getId, ids));
+    }
+
+    default List<AiKnowledgeDocumentDO> selectListByStatus(Integer status) {
+        return selectList(AiKnowledgeDocumentDO::getStatus, status);
     }
 
 }

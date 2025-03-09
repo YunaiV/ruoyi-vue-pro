@@ -75,7 +75,7 @@ public class AiChatRoleController {
     @GetMapping("/category-list")
     @Operation(summary = "获得聊天角色的分类列表")
     public CommonResult<List<String>> getChatRoleCategoryList() {
-         return success(chatRoleService.getChatRoleCategoryList());
+        return success(chatRoleService.getChatRoleCategoryList());
     }
 
     // ========== 角色管理 ==========
