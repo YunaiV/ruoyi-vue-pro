@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.config.purchase.request.impl;
+package cn.iocoder.yudao.module.erp.config;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
 
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_STATUS;
 
+//状态机基本异常回调
 @Component
 @Slf4j
 public class BaseFailCallbackImpl<S, E, C> implements FailCallback<S, E, C> {

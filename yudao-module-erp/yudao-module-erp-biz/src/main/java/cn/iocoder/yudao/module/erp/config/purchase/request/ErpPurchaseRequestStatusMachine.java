@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.erp.config.purchase.request;
 
-import cn.iocoder.yudao.module.erp.config.purchase.request.impl.BaseFailCallbackImpl;
+import cn.iocoder.yudao.module.erp.config.BaseFailCallbackImpl;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestAuditReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
