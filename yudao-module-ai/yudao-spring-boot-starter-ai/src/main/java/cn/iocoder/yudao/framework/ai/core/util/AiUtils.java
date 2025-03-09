@@ -19,7 +19,7 @@ import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
 public class AiUtils {
 
     public static ChatOptions buildChatOptions(AiPlatformEnum platform, String model, Double temperature, Integer maxTokens) {
-        //noinspection EnhancedSwitchMigration
+        // noinspection EnhancedSwitchMigration
         switch (platform) {
             case TONG_YI:
                 // TODO @芋艿：tongyi 暂时没 maxTokens 选项
