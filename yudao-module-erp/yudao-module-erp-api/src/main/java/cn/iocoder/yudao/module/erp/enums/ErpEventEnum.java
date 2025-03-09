@@ -33,11 +33,6 @@ public enum ErpEventEnum {
     PURCHASE_FAILED("采购失败"),
     PURCHASE_CANCELLED("取消采购订单"),
 
-    // 入库事件
-    STORAGE_INIT("入库初始化"),
-    STOCK_ADJUSTMENT("库存调整"),
-    STORAGE_COMPLETE("入库完成"),
-
     // 执行事件
     /**
      * 执行初始化：
@@ -102,11 +97,70 @@ public enum ErpEventEnum {
      */
     EXECUTION_FAILED("执行失败"),
 
+    //付款事件
+    PAYMENT_INIT("付款初始化"),
+    PARTIAL_PAYMENT("部分付款"),
+    COMPLETE_PAYMENT("完成付款"),
+    CANCEL_PAYMENT("取消付款"),
+    PAYMENT_EXCEPTION("付款异常"),
+    PAYMENT_ADJUSTMENT("付款调整"),
 
-    PAYMENT_INIT("支付初始化"),
-    PARTIAL_PAYMENT("部分支付"), 
-    COMPLETE_PAYMENT("完成支付"),
-    PAYMENT_FAILED("支付失败")
+
+    //入库事件
+    /**
+     * 入库初始化：
+     * 1. 触发时机：采购订单创建时
+     * 2. 前置状态：NONE_IN_STORAGE（未入库）
+     * 3. 后置状态：NONE_IN_STORAGE（未入库）
+     * 4. 业务行为：初始化入库状态
+     */
+    STORAGE_INIT("入库初始化"),
+
+
+    /**
+     * 部分入库：
+     * 1. 触发时机：采购商品部分到货入库
+     * 2. 前置状态：NONE_IN_STORAGE（未入库）
+     * 3. 后置状态：PARTIALLY_IN_STORAGE（部分入库）
+     * 4. 业务行为：记录部分商品入库
+     */
+    PARTIAL_STORAGE("部分入库"),
+
+    /**
+     * 完成入库：
+     * 1. 触发时机：采购商品全部到货入库
+     * 2. 前置状态：NONE_IN_STORAGE（未入库）或 PARTIALLY_IN_STORAGE（部分入库）
+     * 3. 后置状态：ALL_IN_STORAGE（已入库）
+     * 4. 业务行为：完成所有商品入库
+     */
+    COMPLETE_STORAGE("完成入库"),
+
+    /**
+     * 入库取消：
+     * 1. 触发时机：入库单需要取消
+     * 2. 前置状态：NONE_IN_STORAGE（未入库）或 PARTIALLY_IN_STORAGE（部分入库）
+     * 3. 后置状态：NONE_IN_STORAGE（未入库）
+     * 4. 业务行为：取消入库操作
+     */
+    CANCEL_STORAGE("取消入库"),
+
+    /**
+     * 入库异常：
+     * 1. 触发时机：入库过程发生异常
+     * 2. 前置状态：任意状态
+     * 3. 后置状态：保持原状态
+     * 4. 业务行为：记录异常信息
+     */
+    STORAGE_EXCEPTION("入库异常"),
+
+    /**
+     * 库存调整：
+     * 1. 触发时机：人工调整库存
+     * 2. 前置状态：任意状态
+     * 3. 后置状态：根据调整后数量判断
+     * 4. 业务行为：手动修改库存数量
+     */
+    STOCK_ADJUSTMENT("库存调整")
     ;
     private final String desc;
 

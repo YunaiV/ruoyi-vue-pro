@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.erp.config.purchase.order;
 
+import cn.iocoder.yudao.module.erp.config.purchase.order.impl.action.ActionOrderExecuteImpl;
 import cn.iocoder.yudao.module.erp.config.purchase.request.impl.BaseFailCallbackImpl;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.ErpStateMachines;
-import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
-import cn.iocoder.yudao.module.erp.enums.status.ErpOffStatus;
-import cn.iocoder.yudao.module.erp.enums.status.ErpStorageStatus;
+import cn.iocoder.yudao.module.erp.enums.status.*;
 import com.alibaba.cola.statemachine.Action;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
@@ -103,6 +102,11 @@ public class ErpPurchaseOrderStatusMachine {
         return builder.build(ErpStateMachines.PURCHASE_ORDER_AUDIT_STATE_MACHINE_NAME);
     }
 
+    @Resource
+    private ActionOrderExecuteImpl actionOrderExecuteImpl;
+    @Resource
+    private Action<ErpPaymentStatus, ErpEventEnum, ErpPurchaseOrderDO> actionOrderPaymentImpl;
+
     //    入库状态机
     @Bean(ErpStateMachines.PURCHASE_ORDER_STORAGE_STATE_MACHINE_NAME)
     public StateMachine<ErpStorageStatus, ErpEventEnum, ErpPurchaseOrderDO> getPurchaseStorageStateMachine() {
@@ -132,7 +136,7 @@ public class ErpPurchaseOrderStatusMachine {
         //结束事件
         builder.internalTransition()
             .within(ErpStorageStatus.ALL_IN_STORAGE)
-            .on(ErpEventEnum.STORAGE_COMPLETE)
+            .on(ErpEventEnum.COMPLETE_STORAGE)
             .perform(actionOrderInImpl);
 
 
@@ -140,9 +144,113 @@ public class ErpPurchaseOrderStatusMachine {
         return builder.build(ErpStateMachines.PURCHASE_ORDER_STORAGE_STATE_MACHINE_NAME);
     }
 
-//    //执行状态机
-//    @Bean(ErpStateMachines.PURCHASE_ORDER_EXECUTION_STATE_MACHINE_NAME)
-//    public StateMachine<ErpExecStatus, ErpEventEnum, ErpPurchaseOrderExecReqVO> getPurchaseExecStateMachine() {
-//
-//    }
+    // 采购订单执行状态机
+    @Bean(ErpStateMachines.PURCHASE_ORDER_EXECUTION_STATE_MACHINE_NAME)
+    public StateMachine<ErpExecutionStatus, ErpEventEnum, ErpPurchaseOrderDO> getPurchaseOrderExecutionStateMachine() {
+        StateMachineBuilder<ErpExecutionStatus, ErpEventEnum, ErpPurchaseOrderDO> builder = StateMachineBuilderFactory.create();
+
+        // 初始化待执行状态
+        builder.internalTransition()
+            .within(ErpExecutionStatus.PENDING)
+            .on(ErpEventEnum.EXECUTION_INIT)
+            .perform(actionOrderExecuteImpl);
+
+        // 开始执行
+        builder.externalTransition()
+            .from(ErpExecutionStatus.PENDING)
+            .to(ErpExecutionStatus.IN_PROGRESS)
+            .on(ErpEventEnum.START_EXECUTION)
+            .perform(actionOrderExecuteImpl);
+
+        // 执行完成
+        builder.externalTransition()
+            .from(ErpExecutionStatus.IN_PROGRESS)
+            .to(ErpExecutionStatus.COMPLETED)
+            .on(ErpEventEnum.COMPLETE_EXECUTION)
+            .perform(actionOrderExecuteImpl);
+
+        // 暂停执行
+        builder.externalTransition()
+            .from(ErpExecutionStatus.IN_PROGRESS)
+            .to(ErpExecutionStatus.PAUSED)
+            .on(ErpEventEnum.PAUSE_EXECUTION)
+            .perform(actionOrderExecuteImpl);
+
+        // 恢复执行
+        builder.externalTransition()
+            .from(ErpExecutionStatus.PAUSED)
+            .to(ErpExecutionStatus.IN_PROGRESS)
+            .on(ErpEventEnum.RESUME_EXECUTION)
+            .perform(actionOrderExecuteImpl);
+
+        // 取消执行
+        builder.externalTransitions()
+            .fromAmong(ErpExecutionStatus.PENDING, ErpExecutionStatus.IN_PROGRESS, ErpExecutionStatus.PAUSED)
+            .to(ErpExecutionStatus.CANCELLED)
+            .on(ErpEventEnum.CANCEL_EXECUTION)
+            .perform(actionOrderExecuteImpl);
+
+        // 执行失败
+        builder.externalTransition()
+            .from(ErpExecutionStatus.IN_PROGRESS)
+            .to(ErpExecutionStatus.FAILED)
+            .on(ErpEventEnum.EXECUTION_FAILED)
+            .perform(actionOrderExecuteImpl);
+
+        // 设置错误回调
+        builder.setFailCallback(baseFailCallbackImpl);
+
+        return builder.build(ErpStateMachines.PURCHASE_ORDER_EXECUTION_STATE_MACHINE_NAME);
+    }
+
+    @Bean(ErpStateMachines.PURCHASE_ORDER_PAYMENT_STATE_MACHINE_NAME)
+    public StateMachine<ErpPaymentStatus, ErpEventEnum, ErpPurchaseOrderDO> getPurchaseOrderPaymentStateMachine() {
+        StateMachineBuilder<ErpPaymentStatus, ErpEventEnum, ErpPurchaseOrderDO> builder = StateMachineBuilderFactory.create();
+
+        // 初始化状态
+        builder.internalTransition()
+            .within(ErpPaymentStatus.NONE_PAYMENT)
+            .on(ErpEventEnum.PAYMENT_INIT)
+            .perform(actionOrderPaymentImpl);
+
+        // 部分付款
+        builder.externalTransition()
+            .from(ErpPaymentStatus.NONE_PAYMENT)
+            .to(ErpPaymentStatus.PARTIALLY_PAYMENT)
+            .on(ErpEventEnum.PARTIAL_PAYMENT)
+            .perform(actionOrderPaymentImpl);
+
+        // 完成付款
+        builder.externalTransitions()
+            .fromAmong(ErpPaymentStatus.NONE_PAYMENT, ErpPaymentStatus.PARTIALLY_PAYMENT)
+            .to(ErpPaymentStatus.ALL_PAYMENT)
+            .on(ErpEventEnum.COMPLETE_PAYMENT)
+            .perform(actionOrderPaymentImpl);
+
+        // 付款异常
+        builder.externalTransitions()
+            .fromAmong(ErpPaymentStatus.NONE_PAYMENT, ErpPaymentStatus.PARTIALLY_PAYMENT)
+            .to(ErpPaymentStatus.PAYMENT_EXCEPTION)
+            .on(ErpEventEnum.PAYMENT_EXCEPTION)
+            .perform(actionOrderPaymentImpl);
+
+        // 付款调整
+        builder.externalTransitions()
+            .fromAmong(ErpPaymentStatus.PARTIALLY_PAYMENT, ErpPaymentStatus.ALL_PAYMENT, ErpPaymentStatus.PAYMENT_EXCEPTION)
+            .to(ErpPaymentStatus.PARTIALLY_PAYMENT)
+            .on(ErpEventEnum.PAYMENT_ADJUSTMENT)
+            .perform(actionOrderPaymentImpl);
+
+        // 取消付款
+        builder.externalTransitions()
+            .fromAmong(ErpPaymentStatus.PARTIALLY_PAYMENT, ErpPaymentStatus.ALL_PAYMENT)
+            .to(ErpPaymentStatus.NONE_PAYMENT)
+            .on(ErpEventEnum.CANCEL_PAYMENT)
+            .perform(actionOrderPaymentImpl);
+
+        // 设置错误回调
+        builder.setFailCallback(baseFailCallbackImpl);
+
+        return builder.build(ErpStateMachines.PURCHASE_ORDER_PAYMENT_STATE_MACHINE_NAME);
+    }
 }

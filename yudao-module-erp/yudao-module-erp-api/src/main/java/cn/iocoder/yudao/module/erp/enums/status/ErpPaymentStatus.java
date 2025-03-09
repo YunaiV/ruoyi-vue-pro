@@ -11,10 +11,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Getter
 public enum ErpPaymentStatus implements ArrayValuable<Integer> {
-    PAYMENT_INIT(1, "未付款"),
-    PARTIAL_PAYMENT(2, "部分付款"),
-    COMPLETE_PAYMENT(3, "已付款"),
-    PAYMENT_FAILED(4, "付款失败"),
+    NONE_PAYMENT(1, "未付款"),
+    PARTIALLY_PAYMENT(2, "部分付款"),
+    ALL_PAYMENT(3, "已付款"),
+    PAYMENT_EXCEPTION(4, "付款异常"),
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(ErpPaymentStatus::getCode).toArray();
@@ -51,6 +51,11 @@ public enum ErpPaymentStatus implements ArrayValuable<Integer> {
      */
     @Override
     public Integer[] array() {
-        return Arrays.stream(ARRAYS).boxed().toArray(Integer[]::new);
+        int[] arrays = ARRAYS;
+        Integer[] result = new Integer[arrays.length];
+        for (int i = 0; i < arrays.length; i++) {
+            result[i] = arrays[i];
+        }
+        return result;
     }
 }
