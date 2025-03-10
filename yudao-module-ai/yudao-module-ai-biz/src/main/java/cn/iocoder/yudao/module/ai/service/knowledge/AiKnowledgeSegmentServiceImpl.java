@@ -158,6 +158,30 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         }
     }
 
+    @Override
+    public void reindexKnowledgeSegmentByKnowledgeId(Long knowledgeId) {
+        // 1.1 校验知识库存在
+        AiKnowledgeDO knowledge = knowledgeService.validateKnowledgeExists(knowledgeId);
+        // 1.2 获取知识库向量实例
+        VectorStore vectorStore = getVectorStoreById(knowledge);
+
+        // 2.1 查询知识库下的所有启用状态的段落
+        List<AiKnowledgeSegmentDO> segments = segmentMapper.selectListByKnowledgeIdAndStatus(
+                knowledgeId, CommonStatusEnum.ENABLE.getStatus());
+        if (CollUtil.isEmpty(segments)) {
+            return;
+        }
+        // 2.2 遍历所有段落，重新索引
+        for (AiKnowledgeSegmentDO segment : segments) {
+            // 删除旧的向量
+            deleteVectorStore(vectorStore, segment);
+            // 重新创建向量
+            writeVectorStore(vectorStore, segment, new Document(segment.getContent()));
+        }
+        log.info("[reindexKnowledgeSegmentByKnowledgeId][知识库({}) 重新索引完成，共处理 {} 个段落]",
+                knowledgeId, segments.size());
+    }
+
     private void writeVectorStore(VectorStore vectorStore, AiKnowledgeSegmentDO segmentDO, Document segment) {
         // 1. 向量存储
         // 为什么要 toString 呢？因为部分 VectorStore 实现，不支持 Long 类型，例如说 QdrantVectorStore

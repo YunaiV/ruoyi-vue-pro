@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.ai.service.knowledge;
 
+import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgePageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeSaveReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeMapper;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
@@ -31,6 +34,8 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
 
     @Resource
     private AiModelService modelService;
+    @Resource
+    private AiKnowledgeSegmentService knowledgeSegmentService;
 
     @Override
     public Long createKnowledge(AiKnowledgeSaveReqVO createReqVO) {
@@ -47,7 +52,7 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
     @Override
     public void updateKnowledge(AiKnowledgeSaveReqVO updateReqVO) {
         // 1.1 校验知识库存在
-        validateKnowledgeExists(updateReqVO.getId());
+        AiKnowledgeDO oldKnowledge = validateKnowledgeExists(updateReqVO.getId());
         // 1.2 校验模型配置
         AiModelDO model = modelService.validateModel(updateReqVO.getEmbeddingModelId());
 
@@ -56,7 +61,10 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
                 .setEmbeddingModel(model.getModel());
         knowledgeMapper.updateById(updateObj);
 
-        // TODO @芋艿：如果模型变化，需要 reindex 所有的文档
+        // 3. 如果模型变化，需要 reindex 所有的文档
+        if (ObjUtil.notEqual(oldKnowledge.getEmbeddingModelId(), updateReqVO.getEmbeddingModelId())) {
+            knowledgeSegmentService.reindexByKnowledgeIdAsync(updateReqVO.getId());
+        }
     }
 
     @Override

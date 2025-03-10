@@ -99,6 +99,23 @@ public interface AiKnowledgeSegmentService {
     void updateKnowledgeSegmentStatus(AiKnowledgeSegmentUpdateStatusReqVO reqVO);
 
     /**
+     * 重新索引知识库下的所有文档段落
+     *
+     * @param knowledgeId 知识库编号
+     */
+    void reindexKnowledgeSegmentByKnowledgeId(Long knowledgeId);
+
+    /**
+     * 【异步】重新索引知识库下的所有文档段落
+     *
+     * @param knowledgeId 知识库编号
+     */
+    @Async
+    default void reindexByKnowledgeIdAsync(Long knowledgeId) {
+        reindexKnowledgeSegmentByKnowledgeId(knowledgeId);
+    }
+
+    /**
      * 根据文档编号删除段落
      *
      * @param documentId 文档编号

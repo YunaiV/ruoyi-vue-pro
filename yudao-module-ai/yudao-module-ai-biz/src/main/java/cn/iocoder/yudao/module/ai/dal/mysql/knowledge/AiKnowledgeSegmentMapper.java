@@ -42,6 +42,11 @@ public interface AiKnowledgeSegmentMapper extends BaseMapperX<AiKnowledgeSegment
                 .orderByDesc(AiKnowledgeSegmentDO::getId));
     }
 
+    default List<AiKnowledgeSegmentDO> selectListByKnowledgeIdAndStatus(Long knowledgeId, Integer status) {
+        return selectList(AiKnowledgeSegmentDO::getKnowledgeId, knowledgeId,
+                AiKnowledgeSegmentDO::getStatus, status);
+    }
+
     default List<AiKnowledgeSegmentProcessRespVO> selectProcessList(Collection<Long> documentIds) {
         MPJLambdaWrapper<AiKnowledgeSegmentDO> wrapper = new MPJLambdaWrapperX<AiKnowledgeSegmentDO>()
                 .selectAs(AiKnowledgeSegmentDO::getDocumentId, AiKnowledgeSegmentProcessRespVO::getDocumentId)
@@ -54,7 +59,7 @@ public interface AiKnowledgeSegmentMapper extends BaseMapperX<AiKnowledgeSegment
     }
 
     default void updateRetrievalCountIncrByIds(List<Long> ids) {
-        update( new LambdaUpdateWrapper<AiKnowledgeSegmentDO>()
+        update(new LambdaUpdateWrapper<AiKnowledgeSegmentDO>()
                 .setSql(" retrieval_count = retrieval_count + 1")
                 .in(AiKnowledgeSegmentDO::getId, ids));
     }
