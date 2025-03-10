@@ -1,4 +1,5 @@
 package com.somle.cdiscount.service;
+
 import com.somle.cdiscount.repository.CdiscountTokenRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;

@@ -1,4 +1,5 @@
 package com.somle.cdiscount.service;
+
 import cn.hutool.http.ContentType;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
@@ -8,6 +9,7 @@ import com.somle.cdiscount.model.CdiscountToken;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -72,6 +74,7 @@ public class CdiscountClient {
         JSONObject jsonObject = JsonUtilsX.parseObject(bodyString, JSONObject.class);
         return jsonObject.getString("access_token");
     }
+
     protected void refreshToken() {
         String accessToken = getAccessToken();
         token.setAccessToken(accessToken);
