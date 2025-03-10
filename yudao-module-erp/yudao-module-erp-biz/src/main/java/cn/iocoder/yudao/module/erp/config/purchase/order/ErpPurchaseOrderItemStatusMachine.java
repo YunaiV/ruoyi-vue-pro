@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.erp.config.purchase.order;
 
 import cn.iocoder.yudao.module.erp.config.BaseFailCallbackImpl;
-import cn.iocoder.yudao.module.erp.config.purchase.order.impl.action.item.ActionOrderItemInImpl;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.ErpStateMachines;
@@ -15,7 +14,6 @@ import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,6 +26,12 @@ public class ErpPurchaseOrderItemStatusMachine {
 
     @Resource
     private BaseFailCallbackImpl baseFailCallbackImpl;
+    @Resource
+    private Action<ErpExecutionStatus, ErpEventEnum, ErpPurchaseOrderItemDO> actionOrderExecuteImpl;
+    @Resource
+    private Action<ErpStorageStatus, ErpEventEnum, ErpPurchaseOrderItemDO> actionOrderItemInImpl;
+    @Resource
+    private Action<ErpPaymentStatus, ErpEventEnum, ErpPurchaseOrderItemDO> actionOrderPayImpl;
 
     //采购订单子项状态机
     @Bean(ErpStateMachines.PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME)
@@ -61,13 +65,7 @@ public class ErpPurchaseOrderItemStatusMachine {
         return builder.build(ErpStateMachines.PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME);
     }
 
-    @Resource
-    private Action<ErpExecutionStatus, ErpEventEnum, ErpPurchaseOrderItemDO> actionOrderItemExecuteImpl;
-    @Resource
-    private ActionOrderItemInImpl actionOrderItemInImpl;
-    //采购订单子项状态机-付款
-    @Resource
-    private Action<ErpPaymentStatus, ErpEventEnum, ErpPurchaseOrderItemDO> actionOrderItemPaymentImpl;
+
 
     // 采购订单子项执行状态机
     @Bean(ErpStateMachines.PURCHASE_ORDER_ITEM_EXECUTION_STATE_MACHINE_NAME)
@@ -78,49 +76,49 @@ public class ErpPurchaseOrderItemStatusMachine {
         builder.internalTransition()
             .within(ErpExecutionStatus.PENDING)
             .on(ErpEventEnum.EXECUTION_INIT)
-            .perform(actionOrderItemExecuteImpl);
+            .perform(actionOrderExecuteImpl);
 
         // 开始执行
         builder.externalTransition()
             .from(ErpExecutionStatus.PENDING)
             .to(ErpExecutionStatus.IN_PROGRESS)
             .on(ErpEventEnum.START_EXECUTION)
-            .perform(actionOrderItemExecuteImpl);
+            .perform(actionOrderExecuteImpl);
 
         // 执行完成
         builder.externalTransition()
             .from(ErpExecutionStatus.IN_PROGRESS)
             .to(ErpExecutionStatus.COMPLETED)
             .on(ErpEventEnum.COMPLETE_EXECUTION)
-            .perform(actionOrderItemExecuteImpl);
+            .perform(actionOrderExecuteImpl);
 
         // 暂停执行
         builder.externalTransition()
             .from(ErpExecutionStatus.IN_PROGRESS)
             .to(ErpExecutionStatus.PAUSED)
             .on(ErpEventEnum.PAUSE_EXECUTION)
-            .perform(actionOrderItemExecuteImpl);
+            .perform(actionOrderExecuteImpl);
 
         // 恢复执行
         builder.externalTransition()
             .from(ErpExecutionStatus.PAUSED)
             .to(ErpExecutionStatus.IN_PROGRESS)
             .on(ErpEventEnum.RESUME_EXECUTION)
-            .perform(actionOrderItemExecuteImpl);
+            .perform(actionOrderExecuteImpl);
 
         // 取消执行
         builder.externalTransitions()
             .fromAmong(ErpExecutionStatus.PENDING, ErpExecutionStatus.IN_PROGRESS, ErpExecutionStatus.PAUSED)
             .to(ErpExecutionStatus.CANCELLED)
             .on(ErpEventEnum.CANCEL_EXECUTION)
-            .perform(actionOrderItemExecuteImpl);
+            .perform(actionOrderExecuteImpl);
 
         // 执行失败
         builder.externalTransition()
             .from(ErpExecutionStatus.IN_PROGRESS)
             .to(ErpExecutionStatus.FAILED)
             .on(ErpEventEnum.EXECUTION_FAILED)
-            .perform(actionOrderItemExecuteImpl);
+            .perform(actionOrderExecuteImpl);
 
         // 设置错误回调
         builder.setFailCallback(baseFailCallbackImpl);
@@ -188,42 +186,42 @@ public class ErpPurchaseOrderItemStatusMachine {
         builder.internalTransition()
             .within(ErpPaymentStatus.NONE_PAYMENT)
             .on(ErpEventEnum.PAYMENT_INIT)
-            .perform(actionOrderItemPaymentImpl);
+            .perform(actionOrderPayImpl);
 
         // 部分付款
         builder.externalTransition()
             .from(ErpPaymentStatus.NONE_PAYMENT)
             .to(ErpPaymentStatus.PARTIALLY_PAYMENT)
             .on(ErpEventEnum.PARTIAL_PAYMENT)
-            .perform(actionOrderItemPaymentImpl);
+            .perform(actionOrderPayImpl);
 
         // 完成付款
         builder.externalTransitions()
             .fromAmong(ErpPaymentStatus.NONE_PAYMENT, ErpPaymentStatus.PARTIALLY_PAYMENT)
             .to(ErpPaymentStatus.ALL_PAYMENT)
             .on(ErpEventEnum.COMPLETE_PAYMENT)
-            .perform(actionOrderItemPaymentImpl);
+            .perform(actionOrderPayImpl);
 
         // 取消付款
         builder.externalTransitions()
             .fromAmong(ErpPaymentStatus.NONE_PAYMENT, ErpPaymentStatus.PARTIALLY_PAYMENT)
             .to(ErpPaymentStatus.NONE_PAYMENT)
             .on(ErpEventEnum.CANCEL_PAYMENT)
-            .perform(actionOrderItemPaymentImpl);
+            .perform(actionOrderPayImpl);
 
         // 付款异常
         builder.externalTransitions()
             .fromAmong(ErpPaymentStatus.NONE_PAYMENT, ErpPaymentStatus.PARTIALLY_PAYMENT, ErpPaymentStatus.ALL_PAYMENT)
             .to(ErpPaymentStatus.NONE_PAYMENT)
             .on(ErpEventEnum.PAYMENT_EXCEPTION)
-            .perform(actionOrderItemPaymentImpl);
+            .perform(actionOrderPayImpl);
 
         // 付款调整
         builder.externalTransitions()
             .fromAmong(ErpPaymentStatus.NONE_PAYMENT, ErpPaymentStatus.PARTIALLY_PAYMENT, ErpPaymentStatus.ALL_PAYMENT)
             .to(ErpPaymentStatus.NONE_PAYMENT)
             .on(ErpEventEnum.PAYMENT_ADJUSTMENT)
-            .perform(actionOrderItemPaymentImpl);
+            .perform(actionOrderPayImpl);
 
         // 设置错误回调
         builder.setFailCallback(baseFailCallbackImpl);

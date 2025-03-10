@@ -103,7 +103,7 @@ public class ErpPurchaseOrderStatusMachine {
     }
 
     @Resource
-    private ActionOrderExecuteImpl actionOrderExecuteImpl;
+    private Action<ErpExecutionStatus, ErpEventEnum, ErpPurchaseOrderDO> actionOrderExecuteImpl;
     @Resource
     private Action<ErpPaymentStatus, ErpEventEnum, ErpPurchaseOrderDO> actionOrderPaymentImpl;
 
