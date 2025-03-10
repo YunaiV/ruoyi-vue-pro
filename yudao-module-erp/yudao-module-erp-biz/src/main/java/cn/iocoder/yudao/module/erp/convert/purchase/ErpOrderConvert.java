@@ -32,6 +32,7 @@ public interface ErpOrderConvert {
 
         //采购申请单下单数量->采购订单的申请数量
         item.setApplyCount(requestItemsMap.get(itemDO.getId()).getOrderQuantity());
+        //产品项
         item.setErpPurchaseRequestItemId(itemDO.getId());
         return item;
     }

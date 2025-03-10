@@ -175,11 +175,9 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         saveReqVO.setItems(itemList);
 
         Long orderId = erpPurchaseOrderService.createPurchaseOrder(saveReqVO);
-
-        itemsDOS.forEach(item -> item.setPurchaseOrderId(orderId));
-
-        boolean updateSuccess = erpPurchaseRequestItemsMapper.updateBatch(itemsDOS);
-        ThrowUtil.ifThrow(!updateSuccess, GlobalErrorCodeConstants.DB_BATCH_UPDATE_ERROR);
+        //给与回显的订单id关联
+//        itemsDOS.forEach(item -> item.setPurchaseOrderId(orderId));
+//        ThrowUtil.ifThrow(!erpPurchaseRequestItemsMapper.updateBatch(itemsDOS), GlobalErrorCodeConstants.DB_BATCH_UPDATE_ERROR);
 
         return orderId;
     }

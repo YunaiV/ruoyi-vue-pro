@@ -56,6 +56,12 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseOrderDO> auditMachine;
     @Resource(name = ErpStateMachines.PURCHASE_REQUEST_ITEM_STATE_MACHINE_NAME)
     StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> requestItemMachine;
+    //子项开关状态机
+    @Resource(name = ErpStateMachines.PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME)
+    StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseOrderItemDO> requestItemOffMachine;
+//    @Resource(name = ErpStateMachines.PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME)
+//    StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseOrderItemDO> requestItemStorageMachine;
+
 
     @Resource
     private ErpPurchaseOrderMapper purchaseOrderMapper;
@@ -110,10 +116,14 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         //付款
 //        orderMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_INIT, purchaseRequest);
         //子表
-        //开关
-        //付款
-        //入库
-        //执行
+        for (ErpPurchaseOrderItemDO purchaseOrderItem : purchaseOrderItems) {
+            //开关
+            requestItemOffMachine.fireEvent(ErpOffStatus.OPEN, ErpEventEnum.OFF_INIT, purchaseOrderItem);
+            //付款
+            //入库
+            //执行
+        }
+
 
         //联动采购申请项的库存
         for (ErpPurchaseOrderItemDO orderItemDO : purchaseOrderItems) {
