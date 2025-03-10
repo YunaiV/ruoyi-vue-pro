@@ -163,9 +163,9 @@ public class AiModelServiceImpl implements AiModelService {
 
         // 创建或获取 VectorStore 对象
          return modelFactory.getOrCreateVectorStore(SimpleVectorStore.class, embeddingModel, metadataFields);
-        // return modelFactory.getOrCreateVectorStore(QdrantVectorStore.class, embeddingModel, metadataFields);
-        // return modelFactory.getOrCreateVectorStore(RedisVectorStore.class, embeddingModel, metadataFields);
-//        return modelFactory.getOrCreateVectorStore(MilvusVectorStore.class, embeddingModel, metadataFields);
+//         return modelFactory.getOrCreateVectorStore(QdrantVectorStore.class, embeddingModel, metadataFields);
+//         return modelFactory.getOrCreateVectorStore(RedisVectorStore.class, embeddingModel, metadataFields);
+//         return modelFactory.getOrCreateVectorStore(MilvusVectorStore.class, embeddingModel, metadataFields);
     }
 
 }

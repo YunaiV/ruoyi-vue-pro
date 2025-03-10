@@ -36,7 +36,6 @@ public class AiKnowledgeController {
     @Operation(summary = "获取知识库分页")
     @PreAuthorize("@ss.hasPermission('ai:knowledge:query')")
     public CommonResult<PageResult<AiKnowledgeRespVO>> getKnowledgePage(@Valid AiKnowledgePageReqVO pageReqVO) {
-
         PageResult<AiKnowledgeDO> pageResult = knowledgeService.getKnowledgePage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, AiKnowledgeRespVO.class));
     }

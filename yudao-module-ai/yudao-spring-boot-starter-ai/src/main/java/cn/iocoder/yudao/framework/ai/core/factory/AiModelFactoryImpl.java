@@ -77,6 +77,7 @@ import org.springframework.ai.vectorstore.observation.VectorStoreObservationConv
 import org.springframework.ai.vectorstore.qdrant.QdrantVectorStore;
 import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
+import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingModel;
 import org.springframework.ai.zhipuai.ZhiPuAiImageModel;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
 import org.springframework.ai.zhipuai.api.ZhiPuAiImageApi;
@@ -231,7 +232,9 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildTongYiEmbeddingModel(apiKey, model);
                 case OLLAMA:
                     return buildOllamaEmbeddingModel(url, model);
-                // TODO @芋艿：各个平台的向量化能力；
+                // TODO @芋艿：yiyan
+                case ZHI_PU:
+                    return buildZhiPuEmbeddingModel(apiKey, url, model);
                 default:
                     throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
             }
@@ -240,8 +243,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
 
     @Override
     public VectorStore getOrCreateVectorStore(Class<? extends VectorStore> type,
-            EmbeddingModel embeddingModel,
-            Map<String, Class<?>> metadataFields) {
+                                              EmbeddingModel embeddingModel,
+                                              Map<String, Class<?>> metadataFields) {
         String cacheKey = buildClientCacheKey(VectorStore.class, embeddingModel, type);
         return Singleton.get(cacheKey, (Func0<VectorStore>) () -> {
             if (type == SimpleVectorStore.class) {
@@ -425,15 +428,22 @@ public class AiModelFactoryImpl implements AiModelFactory {
 
     // ========== 各种创建 EmbeddingModel 的方法 ==========
 
-    // TODO @芋艿：需要测试下
     /**
      * 可参考 {@link DashScopeAutoConfiguration} 的 dashscopeEmbeddingModel 方法
      */
     private DashScopeEmbeddingModel buildTongYiEmbeddingModel(String apiKey, String model) {
         DashScopeApi dashScopeApi = new DashScopeApi(apiKey);
-        DashScopeEmbeddingOptions dashScopeEmbeddingOptions = DashScopeEmbeddingOptions.builder().withModel(model)
-                .build();
+        DashScopeEmbeddingOptions dashScopeEmbeddingOptions = DashScopeEmbeddingOptions.builder().withModel(model).build();
         return new DashScopeEmbeddingModel(dashScopeApi, MetadataMode.EMBED, dashScopeEmbeddingOptions);
+    }
+
+    /**
+     * 可参考 {@link ZhiPuAiAutoConfiguration} 的 zhiPuAiEmbeddingModel 方法
+     */
+    private ZhiPuAiEmbeddingModel buildZhiPuEmbeddingModel(String apiKey, String url, String model) {
+        url = StrUtil.blankToDefault(url, ZhiPuAiConnectionProperties.DEFAULT_BASE_URL);
+        ZhiPuAiApi zhiPuAiApi = new ZhiPuAiApi(url, apiKey);
+        return new ZhiPuAiEmbeddingModel(zhiPuAiApi);
     }
 
     private OllamaEmbeddingModel buildOllamaEmbeddingModel(String url, String model) {
