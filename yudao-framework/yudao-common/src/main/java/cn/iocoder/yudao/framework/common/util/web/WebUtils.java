@@ -30,10 +30,14 @@ import java.util.zip.GZIPInputStream;
 
 @Slf4j
 public class WebUtils {
+
+    public static final String WWW_EVAL_COM = "http://www.eval.com";
+
     private static final OkHttpClient client = new OkHttpClient().newBuilder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .build();
+
 
 
     public static String urlWithParams(String url, MultiValuedMap<String, String> queryParams) {
@@ -170,33 +174,9 @@ public class WebUtils {
     }
 
     public static String buildUrlPatternBody(Map<String, String> params)  {
-        if (params == null || params.isEmpty()) {
-            return null;
-        }
-
-        StringBuilder query = new StringBuilder();
-        Set<Map.Entry<String, String>> entries = params.entrySet();
-        boolean hasParam = false;
-
-        for (Map.Entry<String, String> entry : entries) {
-            String name = entry.getKey();
-            String value = entry.getValue();
-            // 忽略参数名或参数值为空的参数
-            if (!StrUtils.isBlank(name) && !StrUtils.isBlank(value)) {
-                if (hasParam) {
-                    query.append("&");
-                } else {
-                    hasParam = true;
-                }
-                try {
-                    query.append(name).append("=").append(URLEncoder.encode(value, "UTF-8"));
-                } catch (Exception e){
-                    log.error("urlWithParams error", e);
-                }
-            }
-        }
-
-        return query.toString();
+        String body=urlWithParams(WWW_EVAL_COM, params);
+        body=body.substring(WWW_EVAL_COM.length()+2);
+        return body;
     }
 
     @SneakyThrows
