@@ -126,7 +126,7 @@ public class ErpPurchaseOrderItemStatusMachine {
         return builder.build(ErpStateMachines.PURCHASE_ORDER_ITEM_EXECUTION_STATE_MACHINE_NAME);
     }
 
-    @Bean
+    @Bean(ErpStateMachines.PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME)
     public StateMachine<ErpStorageStatus, ErpEventEnum, ErpPurchaseOrderItemDO> buildPurchaseOrderItemStorageStateMachine() {
         StateMachineBuilder<ErpStorageStatus, ErpEventEnum, ErpPurchaseOrderItemDO> builder = StateMachineBuilderFactory.create();
 

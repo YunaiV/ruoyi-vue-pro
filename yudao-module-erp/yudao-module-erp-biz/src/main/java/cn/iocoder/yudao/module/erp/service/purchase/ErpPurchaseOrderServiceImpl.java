@@ -23,6 +23,7 @@ import cn.iocoder.yudao.module.erp.enums.ErpStateMachines;
 import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.status.ErpOffStatus;
 import cn.iocoder.yudao.module.erp.enums.status.ErpOrderStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpStorageStatus;
 import cn.iocoder.yudao.module.erp.service.finance.ErpAccountService;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import com.alibaba.cola.statemachine.StateMachine;
@@ -37,6 +38,7 @@ import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.module.erp.enums.ErpStateMachines.*;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 
 // TODO 芋艿：记录操作日志
@@ -50,17 +52,17 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 @Validated
 public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
 
-    @Resource(name = ErpStateMachines.PURCHASE_ORDER_OFF_STATE_MACHINE_NAME)
+    @Resource(name = PURCHASE_ORDER_OFF_STATE_MACHINE_NAME)
     StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseOrderDO> offMachine;
-    @Resource(name = ErpStateMachines.PURCHASE_ORDER_AUDIT_STATE_MACHINE_NAME)
+    @Resource(name = PURCHASE_ORDER_AUDIT_STATE_MACHINE_NAME)
     StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseOrderDO> auditMachine;
-    @Resource(name = ErpStateMachines.PURCHASE_REQUEST_ITEM_STATE_MACHINE_NAME)
+    @Resource(name = PURCHASE_REQUEST_ITEM_STATE_MACHINE_NAME)
     StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> requestItemMachine;
     //子项开关状态机
-    @Resource(name = ErpStateMachines.PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME)
+    @Resource(name = PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME)
     StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseOrderItemDO> requestItemOffMachine;
-//    @Resource(name = ErpStateMachines.PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME)
-//    StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseOrderItemDO> requestItemStorageMachine;
+    @Resource(name = PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME)
+    StateMachine<ErpStorageStatus, ErpEventEnum, ErpPurchaseOrderItemDO> requestItemStorageMachine;
 
 
     @Resource
