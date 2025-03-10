@@ -24,7 +24,7 @@ public class WangdianTradeDataJob extends WangdianDataJob{
                 .pageNo(0)
                 .build();
 
-            StreamX.getAllPages(
+            StreamX.iterate(
                 wangdianService.client.execute("trade_query.php", reqVO),
                 response -> !response.getInteger("total_count").equals(0),
                 respoonse ->{

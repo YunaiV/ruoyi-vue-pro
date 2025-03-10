@@ -785,7 +785,7 @@ public class StreamX<T> {
      * @param getNextPage  A method to produce the next page given the current page.
      * @return A Stream of all pages of results.
      */
-    public static <T> Stream<T> getAllPages(T firstPage,Predicate<T> haveNextPage,Function<T, T> getNextPage) {
+    public static <T> Stream<T> iterate(T firstPage, Predicate<T> haveNextPage, Function<T, T> getNextPage) {
         return StreamSupport.stream(new PaginationSpliterator<>(firstPage, haveNextPage, getNextPage), false);
     }
 

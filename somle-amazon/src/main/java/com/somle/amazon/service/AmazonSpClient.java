@@ -167,7 +167,7 @@ public class AmazonSpClient {
 
     @SneakyThrows
     public Stream<AmazonSpOrderRespVO> streamOrder(AmazonSpOrderReqVO vo) {
-        return StreamX.getAllPages(
+        return StreamX.iterate(
             getOrder(vo),
             page -> !StrUtils.isEmpty(page.getPayload().getNextToken()),
             page -> {

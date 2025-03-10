@@ -31,7 +31,7 @@ class MatomoServiceTest extends BaseMockitoUnitTest {
             .filterOffset(0)
             .build();
 
-        var results = StreamX.getAllPages(
+        var results = StreamX.iterate(
             service.getResponse(methodVO, reqVO),
             response -> !response.isEmpty(),
             response -> {
