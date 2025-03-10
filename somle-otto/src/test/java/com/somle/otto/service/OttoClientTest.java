@@ -1,6 +1,7 @@
 package com.somle.otto.service;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
 import com.somle.otto.model.resp.OttoCommonResp;
 import com.somle.otto.repository.OttoAccountDao;
 import com.somle.otto.repository.OttoAuthTokenDao;
@@ -14,7 +15,7 @@ import org.springframework.test.annotation.Rollback;
 
 @Slf4j
 @Import({OttoService.class, OttoAccountDao.class, OttoAuthTokenDao.class})
-class OttoClientTest extends BaseDbUnitTest {
+class OttoClientTest extends SomleBaseDbUnitTest {
 
     @Resource
     OttoAccountDao ottoAccountDao;

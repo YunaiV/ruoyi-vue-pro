@@ -2,6 +2,7 @@ package com.somle.walmart.service;
 
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
 import com.somle.walmart.model.WalmartOrderReqVO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Import({WalmartService.class})
-class WalmartServiceTest extends BaseDbUnitTest {
+class WalmartServiceTest extends SomleBaseDbUnitTest {
     @Resource
     WalmartService service;
 

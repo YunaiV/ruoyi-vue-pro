@@ -7,6 +7,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
 import com.somle.rakuten.model.pojo.RakutenTokenEntityDO;
 import com.somle.rakuten.model.vo.RakutenOrderReqVO;
 import com.somle.rakuten.model.vo.RakutenOrderSearchReqVO;
@@ -25,7 +26,7 @@ import java.util.List;
 
 @Slf4j
 @Import({RakutenService.class})
-class RakutenServiceTest extends BaseDbUnitTest {
+class RakutenServiceTest extends SomleBaseDbUnitTest {
 
     @Resource
     RakutenService service;
