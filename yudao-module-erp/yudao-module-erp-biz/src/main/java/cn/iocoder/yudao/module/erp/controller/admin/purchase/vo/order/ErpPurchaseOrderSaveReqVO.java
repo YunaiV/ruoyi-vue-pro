@@ -16,7 +16,7 @@ public class ErpPurchaseOrderSaveReqVO {
 
     @Schema(description = "id")
     @Null(groups = validation.OnCreate.class, message = "创建时，订单id必须为空")
-    @NotNull(groups = validation.OnUpdate.class, message = "更新时，订单id不能为空")
+//    @NotNull(groups = validation.OnUpdate.class, message = "更新时，订单id不能为空")
     private Long id;
 
     @Schema(description = "单据编号")
@@ -48,8 +48,8 @@ public class ErpPurchaseOrderSaveReqVO {
     @Schema(description = "结算日期")
     private LocalDateTime settlementDate;
 
-//    @Schema(description = "优惠率，百分比", requiredMode = Schema.RequiredMode.REQUIRED)
-//    private BigDecimal discountPercent;
+    @Schema(description = "优惠率，百分比")
+    private BigDecimal discountPercent;
 
     @Schema(description = "定金金额，单位：元")
     @DecimalMin(value = "0.00", message = "定金金额不能小于0")
@@ -95,15 +95,15 @@ public class ErpPurchaseOrderSaveReqVO {
         @DecimalMin(value = "0.00", message = "含税单价不能小于0")
         private BigDecimal actTaxPrice;
 
-        @Schema(description = "申请数量", requiredMode = Schema.RequiredMode.REQUIRED)
-        @NotNull(message = "下单数量不能为空")
-        @Min(value = 0, message = "产品数量必须大于0")
-        private Integer applyCount;
+//        @Schema(description = "申请数量", requiredMode = Schema.RequiredMode.REQUIRED)
+//        @NotNull(message = "applyCount下单数量不能为空")
+//        @Min(value = 0, message = "产品数量必须大于0")
+//        private Integer applyCount;
 
-//        @Schema(description = "下单数量")
-//        @NotNull(message = "下单数量不能为空")
-//        @Min(value = 0, message = "产品数量必须大于0") 审核人填写
-//        private Integer count;
+        @Schema(description = "下单数量")//审核人填写
+        @NotNull(message = "count下单数量不能为空")
+        @Min(value = 0, message = "产品数量必须大于0")
+        private Integer count;
 
         @Schema(description = "商品行备注")
         private String remark;
@@ -131,7 +131,7 @@ public class ErpPurchaseOrderSaveReqVO {
         private String containerRate;
 
         @Schema(description = "采购申请单的申请项id")
-        private Long erpPurchaseRequestItemId;
+        private Long purchaseApplyItemId;
 
         @Schema(description = "采购申请单No")
         private String erpPurchaseRequestItemNo;

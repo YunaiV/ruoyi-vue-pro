@@ -120,4 +120,8 @@ public class ErpPurchaseRequestItemRespVO extends BaseVO {
     //期望到货日期
     @Schema(description = "期望到货日期")
     private LocalDateTime expectArrivalDate;
+    /**
+     * 产品已订购数量
+     */
+    private Integer orderedQuantity;
 }

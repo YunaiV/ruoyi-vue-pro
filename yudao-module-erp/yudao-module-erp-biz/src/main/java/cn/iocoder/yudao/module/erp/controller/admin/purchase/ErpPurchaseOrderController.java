@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
@@ -70,7 +69,6 @@ public class ErpPurchaseOrderController {
     @Resource
     private DeptApi deptApi;
 //    warehouse
-
 
     @PostMapping("/create")
     @Operation(summary = "创建采购订单")
@@ -217,28 +215,22 @@ public class ErpPurchaseOrderController {
 
 
         // 2. 开始拼接
-        return BeanUtils.toBean(list, ErpPurchaseOrderBaseRespVO.class, purchaseOrder -> {
-            purchaseOrder.setItems(BeanUtils.toBean(purchaseOrderItemMap.get(purchaseOrder.getId()), ErpPurchaseOrderBaseRespVO.Item.class,
+        return BeanUtils.toBean(list, ErpPurchaseOrderBaseRespVO.class, respVO -> {
+            respVO.setItems(BeanUtils.toBean(purchaseOrderItemMap.get(respVO.getId()), ErpPurchaseOrderBaseRespVO.Item.class,
                 item -> {
                     //设置产品
-                    MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
-                        .setProductBarCode(product.getBarCode())
-                        .setProductUnitName(product.getUnitName()));
+                    MapUtils.findAndThen(productMap, item.getProductId(), item::setProduct);
                     // 设置仓库
                     MapUtils.findAndThen(warehouseMap, item.getWarehouseId(), erpWarehouseDO -> item.setWarehouseName(erpWarehouseDO.getName()));
                 }));
-            purchaseOrder.setProductNames(CollUtil.join(purchaseOrder.getItems(), "，", ErpPurchaseOrderBaseRespVO.Item::getProductName));//设置订单下的产品
-//            MapUtils.findAndThen(supplierMap, purchaseOrder.getSupplierId(), supplier -> purchaseOrder.setSupplierName(supplier.getName()));
+            MapUtils.findAndThen(supplierMap, respVO.getSupplierId(), supplier -> respVO.setSupplierName(supplier.getName()));
             //设置创建人的部门name
-//            MapUtils.findAndThen(deptMap, adminUserApi.getUser(Long.parseLong(purchaseOrder.getCreator())).getDeptId(), deptRespDTO -> purchaseOrder.setDepartmentName(deptRespDTO.getName()));
-            MapUtils.findAndThen(userMap, Long.parseLong(purchaseOrder.getCreator()), user -> purchaseOrder.setCreator(user.getNickname()));
+//            MapUtils.findAndThen(deptMap, adminUserApi.getUser(Long.parseLong(respVO.getCreator())).getDeptId(), deptRespDTO -> respVO.setDepartmentName(deptRespDTO.getName()));
+            MapUtils.findAndThen(userMap, Long.parseLong(respVO.getCreator()), user -> respVO.setCreator(user.getNickname()));
             //设置审核人的name
-            Optional.ofNullable(purchaseOrder.getAuditor()).ifPresent(auditor ->
-                MapUtils.findAndThen(userMap, Long.parseLong(auditor), user -> purchaseOrder.setAuditorName(user.getNickname()))
+            Optional.ofNullable(respVO.getAuditor()).ifPresent(auditor ->
+                MapUtils.findAndThen(userMap, Long.parseLong(auditor), user -> respVO.setAuditorName(user.getNickname()))
             );
-            //创建者、更新者、审核人、申请人填充
-            //设置币别name
-
         });
     }
 

@@ -5,6 +5,7 @@ import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
+import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseOrderMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestMapper;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants;
@@ -24,7 +25,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 @Component
 public class ActionOrderOffImpl implements Action<ErpOffStatus, ErpEventEnum, ErpPurchaseOrderDO> {
     @Resource
-    ErpPurchaseRequestMapper mapper;
+    ErpPurchaseOrderMapper mapper;
 
 
     @Override
@@ -32,7 +33,7 @@ public class ActionOrderOffImpl implements Action<ErpOffStatus, ErpEventEnum, Er
     public void execute(ErpOffStatus from, ErpOffStatus to, ErpEventEnum event, ErpPurchaseOrderDO context) {
         validate(from, to, event, context);
         //子项存在开启主表就开启，子项都关闭|手动关闭主表才关闭
-        ErpPurchaseRequestDO aDo = mapper.selectById(context.getId());
+        ErpPurchaseOrderDO aDo = mapper.selectById(context.getId());
         aDo.setOffStatus(to.getCode());
         ThrowUtil.ifSqlThrow(mapper.updateById(aDo), DB_UPDATE_ERROR);
         log.info("开关状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());

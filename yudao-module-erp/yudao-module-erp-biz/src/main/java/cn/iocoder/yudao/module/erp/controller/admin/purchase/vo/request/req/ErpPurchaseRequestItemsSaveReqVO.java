@@ -52,8 +52,8 @@ public class ErpPurchaseRequestItemsSaveReqVO {
     private BigDecimal taxPrice;
 
     @Schema(description = "增值税税率，百分比")
-    @DecimalMin(value = "0.0", message = "税率不能为负")
-    @DecimalMax(value = "1.0", message = "税率不能超过100%")
+//    @DecimalMin(value = "0.0", message = "税率不能为负")
+//    @DecimalMax(value = "1.0", message = "税率不能超过100%")
     private BigDecimal taxPercent;
     //期望到货日期
     @Schema(description = "期望到货日期")

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order;
 
 import cn.iocoder.yudao.framework.mybatis.core.vo.BaseVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.resp.ErpPurchaseRequestItemRespVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
@@ -8,6 +9,7 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ContentStyle;
 import com.alibaba.excel.enums.BooleanEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.DecimalMin;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -31,14 +33,15 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
     private LocalDateTime orderTime;
     @Schema(description = "订单项列表")
     private List<Item> items;
-    @Schema(description = "产品信息")
-    @ExcelProperty("产品信息")
-    private String productNames;
+
+//    @ExcelProperty("产品名称汇总")
+//    private String productNames;
+
     @Schema(description = "供应商编号")
     private Long supplierId;
 
     @Schema(description = "供应商名称")
-    private Long supplierName;
+    private String supplierName;
     // ========== 采购入库 ==========
     @Schema(description = "订单采购入库数量")
     private BigDecimal totalInCount;
@@ -71,15 +74,39 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
     private Integer payStatus;
     @Schema(description = "备注")
     private String remark;
+    @Schema(description = "结算账户编号")
+    private Long accountId;
+    //收获地址
+    @Schema(description = "收获地址")
+    private String address;
+    //付款条款
+    @Schema(description = "付款条款")
+    private String paymentTerms;
 
+    @Schema(description = "采购主体编号")
+    private Long purchaseEntityId;
+
+    @Schema(description = "结算日期")
+    private LocalDateTime settlementDate;
+
+    @Schema(description = "优惠率，百分比")
+    private BigDecimal discountPercent;
+    @Schema(description = "定金金额，单位：元")
+    @DecimalMin(value = "0.00", message = "定金金额不能小于0")
+    private BigDecimal depositPrice;
+
+    @Schema(description = "附件地址")
+    private String fileUrl;
     @Data
     public static class Item extends BaseVO {
         @Schema(description = "订单项编号")
         private Long id;
         @Schema(description = "产品编号")
         private Long productId;
-        @Schema(description = "产品单位单位")
-        private Long productUnitId;
+
+        @Schema(description = "erp产品")
+        private ErpProductRespVO product;
+
         @Schema(description = "币别名称")
         private Long currencyName;
         @Schema(description = "产品下单数量")
@@ -103,12 +130,12 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
         @Schema(description = "采购退货数量")
         private BigDecimal returnCount;
         // ========== 关联字段 ==========
-        @Schema(description = "产品名称")
-        private String productName;
-        @Schema(description = "产品单位名称")
-        private String productUnitName;
-        @Schema(description = "产品条码")
-        private String productBarCode;
+//        @Schema(description = "产品名称")
+//        private String productName;
+//        @Schema(description = "产品单位名称")
+//        private String productUnitName;
+//        @Schema(description = "产品条码")
+//        private String productBarCode;
         // ========== 产品库存相关 ==========
         @Schema(description = "产品存放仓库编号")
         private Long warehouseId; // 该字段仅仅在“详情”和“编辑”时使用
@@ -160,7 +187,12 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
          */
         @Schema(description = "采购申请项ID")
         private Long purchaseApplyItemId;
+        @Schema(description = "采购申请单No")
+        private String erpPurchaseRequestItemNo;
         @Schema(description = "申请项")
         private ErpPurchaseRequestItemRespVO purchaseRequestItem;
+
+        @Schema(description = "币别id(财务管理-币别维护)")
+        private Long currencyId;
     }
 }

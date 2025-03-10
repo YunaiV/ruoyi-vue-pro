@@ -49,6 +49,7 @@ public class ActionItemOrderImpl implements Action<ErpOrderStatus, ErpEventEnum,
             //根据订购数量来判断是否完整订购,批准数量,状态
             if (newCount == 0) {
                 itemsDO.setOrderStatus(ErpOrderStatus.OT_ORDERED.getCode());// 状态设为未订购
+                //开启采购申请单?已审核状态转变？
 //                //一个未订购->订单未订购?部分订购
 //                List<ErpPurchaseRequestItemsDO> requestItemsDOS = itemsMapper.selectListByRequestId(itemsDO.getRequestId());
 //                boolean hasOpen = requestItemsDOS.stream().anyMatch(item -> item.getOrderStatus().equals(ErpOrderStatus.PARTIALLY_ORDERED.getCode()));

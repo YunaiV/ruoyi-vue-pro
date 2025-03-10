@@ -59,7 +59,7 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
             return;
         }
         orderDO.setId(context.getOrderId());
-        storageStateMachine.fireEvent(ErpStorageStatus.fromCode(orderDO.getStatus()), erpEventEnum, orderDO);
+        storageStateMachine.fireEvent(ErpStorageStatus.fromCode(orderDO.getInStatus()), erpEventEnum, orderDO);
 
         // 3. 记录日志
         log.info("子项入库状态机触发({})事件：对象ID={}，状态 {} -> {}, 入库数量={}",

@@ -30,8 +30,7 @@ public class ErpPurchaseOrderItemStatusMachine {
     private Action<ErpExecutionStatus, ErpEventEnum, ErpPurchaseOrderItemDO> actionOrderExecuteImpl;
     @Resource
     private Action<ErpStorageStatus, ErpEventEnum, ErpPurchaseOrderItemDO> actionOrderItemInImpl;
-    @Resource
-    private Action<ErpPaymentStatus, ErpEventEnum, ErpPurchaseOrderItemDO> actionOrderPayImpl;
+
 
     //采购订单子项状态机
     @Bean(ErpStateMachines.PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME)
@@ -178,6 +177,9 @@ public class ErpPurchaseOrderItemStatusMachine {
         return builder.build(ErpStateMachines.PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME);
     }
 
+    @Resource
+    private Action<ErpPaymentStatus, ErpEventEnum, ErpPurchaseOrderItemDO> actionOrderItemPayImpl;
+
     @Bean(ErpStateMachines.PURCHASE_ORDER_ITEM_PAYMENT_STATE_MACHINE_NAME)
     public StateMachine<ErpPaymentStatus, ErpEventEnum, ErpPurchaseOrderItemDO> getPurchaseOrderItemPaymentStateMachine() {
         StateMachineBuilder<ErpPaymentStatus, ErpEventEnum, ErpPurchaseOrderItemDO> builder = StateMachineBuilderFactory.create();
@@ -186,42 +188,42 @@ public class ErpPurchaseOrderItemStatusMachine {
         builder.internalTransition()
             .within(ErpPaymentStatus.NONE_PAYMENT)
             .on(ErpEventEnum.PAYMENT_INIT)
-            .perform(actionOrderPayImpl);
+            .perform(actionOrderItemPayImpl);
 
         // 部分付款
         builder.externalTransition()
             .from(ErpPaymentStatus.NONE_PAYMENT)
             .to(ErpPaymentStatus.PARTIALLY_PAYMENT)
             .on(ErpEventEnum.PARTIAL_PAYMENT)
-            .perform(actionOrderPayImpl);
+            .perform(actionOrderItemPayImpl);
 
         // 完成付款
         builder.externalTransitions()
             .fromAmong(ErpPaymentStatus.NONE_PAYMENT, ErpPaymentStatus.PARTIALLY_PAYMENT)
             .to(ErpPaymentStatus.ALL_PAYMENT)
             .on(ErpEventEnum.COMPLETE_PAYMENT)
-            .perform(actionOrderPayImpl);
+            .perform(actionOrderItemPayImpl);
 
         // 取消付款
         builder.externalTransitions()
             .fromAmong(ErpPaymentStatus.NONE_PAYMENT, ErpPaymentStatus.PARTIALLY_PAYMENT)
             .to(ErpPaymentStatus.NONE_PAYMENT)
             .on(ErpEventEnum.CANCEL_PAYMENT)
-            .perform(actionOrderPayImpl);
+            .perform(actionOrderItemPayImpl);
 
         // 付款异常
         builder.externalTransitions()
             .fromAmong(ErpPaymentStatus.NONE_PAYMENT, ErpPaymentStatus.PARTIALLY_PAYMENT, ErpPaymentStatus.ALL_PAYMENT)
             .to(ErpPaymentStatus.NONE_PAYMENT)
             .on(ErpEventEnum.PAYMENT_EXCEPTION)
-            .perform(actionOrderPayImpl);
+            .perform(actionOrderItemPayImpl);
 
         // 付款调整
         builder.externalTransitions()
             .fromAmong(ErpPaymentStatus.NONE_PAYMENT, ErpPaymentStatus.PARTIALLY_PAYMENT, ErpPaymentStatus.ALL_PAYMENT)
             .to(ErpPaymentStatus.NONE_PAYMENT)
             .on(ErpEventEnum.PAYMENT_ADJUSTMENT)
-            .perform(actionOrderPayImpl);
+            .perform(actionOrderItemPayImpl);
 
         // 设置错误回调
         builder.setFailCallback(baseFailCallbackImpl);

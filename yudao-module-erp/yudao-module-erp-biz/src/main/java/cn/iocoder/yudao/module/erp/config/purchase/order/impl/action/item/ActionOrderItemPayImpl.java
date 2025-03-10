@@ -52,6 +52,6 @@ public class ActionOrderItemPayImpl implements Action<ErpPaymentStatus, ErpEvent
             log.error("未找到对应的采购订单,订单ID={}", context.getOrderId());
             return;
         }
-        paymentStateMachine.fireEvent(ErpPaymentStatus.fromCode(orderDO.getPayStatus()), erpEventEnum, orderDO);
+//        paymentStateMachine.fireEvent(ErpPaymentStatus.fromCode(orderDO.getPayStatus()), erpEventEnum, orderDO);
     }
 }

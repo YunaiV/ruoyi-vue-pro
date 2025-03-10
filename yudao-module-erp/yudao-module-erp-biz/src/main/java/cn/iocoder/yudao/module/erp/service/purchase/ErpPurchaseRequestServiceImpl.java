@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -108,7 +107,8 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         offMachine.fireEvent(ErpOffStatus.OPEN, ErpEventEnum.OFF_INIT, purchaseRequest);
         orderMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_INIT, purchaseRequest);
         //子表初始化
-        itemsDOList.forEach(i -> {
+        List<ErpPurchaseRequestItemsDO> itemsDOS = erpPurchaseRequestItemsMapper.selectListByRequestId(purchaseRequest.getId());
+        itemsDOS.forEach(i -> {
                 orderItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.START_PURCHASE, i);
                 offItemMachine.fireEvent(ErpOffStatus.OPEN, ErpEventEnum.OFF_INIT, i);
             }
@@ -155,19 +155,33 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
 
         List<ErpPurchaseRequestItemsDO> itemsDOS = erpPurchaseRequestItemsMapper.selectListByIds(itemIds);
         ThrowUtil.ifThrow(itemsDOS.isEmpty(), PURCHASE_REQUEST_ITEM_NOT_EXISTS, itemIds);
+        //申请单已审核+未关闭才可以合并
+        validMerge(itemsDOS);
 
         Map<Long, ErpPurchaseRequestOrderReqVO.requestItems> itemsMap =
             reqVO.getItems().stream()
                 .collect(Collectors.toMap(ErpPurchaseRequestOrderReqVO.requestItems::getId, Function.identity()));
+
+        // 收集 map, itemId -> requestItemDO
+        Map<Long, ErpPurchaseRequestItemsDO> requestItemDOMap =
+            itemsDOS.stream()
+                .collect(Collectors.toMap(ErpPurchaseRequestItemsDO::getId, Function.identity()));
         //  **转换采购订单 `Item`**
         List<ErpPurchaseOrderSaveReqVO.Item> itemList =
-            ErpOrderConvert.INSTANCE.convertToErpPurchaseOrderSaveReqVOItemList(itemsDOS, itemsMap);
+            ErpOrderConvert.INSTANCE.convertToErpPurchaseOrderSaveReqVOItemList(itemsDOS, itemsMap, requestItemDOMap);
         //requestId -> requestDO
         Map<Long, String> requestIdToNoMap = erpPurchaseRequestMapper.selectByIds(
             itemsDOS.stream().map(ErpPurchaseRequestItemsDO::getRequestId).collect(Collectors.toSet())
         ).stream().collect(Collectors.toMap(ErpPurchaseRequestDO::getId, ErpPurchaseRequestDO::getNo));
-
-        itemList.forEach(item -> item.setErpPurchaseRequestItemNo(requestIdToNoMap.get(item.getErpPurchaseRequestItemId())));
+        //申请单的no编号
+        itemList.forEach(item -> {
+            Long itemId = item.getPurchaseApplyItemId();
+            //获得itemdo
+            ErpPurchaseRequestItemsDO itemDO = requestItemDOMap.get(itemId);
+            //获得requestDO
+            ErpPurchaseRequestDO requestDO = erpPurchaseRequestMapper.selectById(itemDO.getRequestId());
+            item.setErpPurchaseRequestItemNo(requestDO.getNo());
+        });
 
         ErpPurchaseOrderSaveReqVO saveReqVO = BeanUtils.toBean(reqVO, ErpPurchaseOrderSaveReqVO.class);
         saveReqVO.setId(null);
@@ -178,8 +192,21 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         //给与回显的订单id关联
 //        itemsDOS.forEach(item -> item.setPurchaseOrderId(orderId));
 //        ThrowUtil.ifThrow(!erpPurchaseRequestItemsMapper.updateBatch(itemsDOS), GlobalErrorCodeConstants.DB_BATCH_UPDATE_ERROR);
-
+        //自动关闭事件
+        itemsDOS.forEach(itemsDO -> offItemMachine.fireEvent(ErpOffStatus.fromCode(itemsDO.getOffStatus()), ErpEventEnum.AUTO_CLOSE, itemsDO));
         return orderId;
+    }
+
+    private void validMerge(List<ErpPurchaseRequestItemsDO> itemsDOS) {
+        //1. 校验申请单需已审核
+        List<ErpPurchaseRequestDO> requestDOS = erpPurchaseRequestMapper.selectBatchIds(convertList(itemsDOS, ErpPurchaseRequestItemsDO::getRequestId));
+        for (ErpPurchaseRequestDO requestDO : requestDOS) {
+            ThrowUtil.ifThrow(!requestDO.getStatus().equals(ErpAuditStatus.APPROVED.getCode()), PURCHASE_REQUEST_MERGE_FAIL, requestDO.getNo());
+        }
+        //2. 校验申请项需处于开启状态
+        for (ErpPurchaseRequestItemsDO itemsDO : itemsDOS) {
+            ThrowUtil.ifThrow(!itemsDO.getOffStatus().equals(ErpOffStatus.OPEN.getCode()), PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_OPEN, itemsDO.getId());
+        }
     }
 
 

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.erp.config.purchase.order;
 
 import cn.iocoder.yudao.module.erp.config.BaseFailCallbackImpl;
 import cn.iocoder.yudao.module.erp.config.purchase.order.impl.action.ActionOrderExecuteImpl;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderAuditReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.ErpStateMachines;
@@ -23,7 +24,7 @@ public class ErpPurchaseOrderStatusMachine {
     @Resource
     private Action<ErpOffStatus, ErpEventEnum, ErpPurchaseOrderDO> actionOrderOffImpl;
     @Resource
-    private Action<ErpAuditStatus, ErpEventEnum, ErpPurchaseOrderDO> actionOrderAuditImpl;
+    private Action<ErpAuditStatus, ErpEventEnum, ErpPurchaseOrderAuditReqVO> actionOrderAuditImpl;
     @Resource
     private Action<ErpStorageStatus, ErpEventEnum, ErpPurchaseOrderDO> actionOrderInImpl;
     @Resource
@@ -62,8 +63,8 @@ public class ErpPurchaseOrderStatusMachine {
     }
 
     @Bean(ErpStateMachines.PURCHASE_ORDER_AUDIT_STATE_MACHINE_NAME)
-    public StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseOrderDO> getPurchaseRequestStateMachine() {
-        StateMachineBuilder<ErpAuditStatus, ErpEventEnum, ErpPurchaseOrderDO> builder = StateMachineBuilderFactory.create();
+    public StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseOrderAuditReqVO> getPurchaseRequestStateMachine() {
+        StateMachineBuilder<ErpAuditStatus, ErpEventEnum, ErpPurchaseOrderAuditReqVO> builder = StateMachineBuilderFactory.create();
 
         // 初始化状态
         builder.internalTransition()
