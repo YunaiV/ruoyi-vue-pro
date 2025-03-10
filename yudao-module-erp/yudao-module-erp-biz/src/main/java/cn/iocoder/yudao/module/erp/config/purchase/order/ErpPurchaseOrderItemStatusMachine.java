@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.erp.config.purchase.order;
 
-import cn.iocoder.yudao.module.erp.config.purchase.order.impl.action.item.ActionOrderItemInImpl;
 import cn.iocoder.yudao.module.erp.config.BaseFailCallbackImpl;
+import cn.iocoder.yudao.module.erp.config.purchase.order.impl.action.item.ActionOrderItemInImpl;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.ErpStateMachines;
@@ -15,6 +15,7 @@ import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
