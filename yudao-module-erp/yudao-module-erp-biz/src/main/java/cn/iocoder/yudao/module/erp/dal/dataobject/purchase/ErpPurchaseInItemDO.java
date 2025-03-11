@@ -35,12 +35,7 @@ public class ErpPurchaseInItemDO extends BaseDO {
      * 关联 {@link ErpPurchaseInDO#getId()}
      */
     private Long inId;
-    /**
-     * 采购订单项编号
-     * 关联 {@link ErpPurchaseOrderItemDO#getId()}
-     * 目的：方便更新关联的采购订单项的入库数量
-     */
-    private Long orderItemId;
+
     /**
      * 仓库编号
      * 关联 {@link ErpWarehouseDO#getId()}
@@ -52,11 +47,10 @@ public class ErpPurchaseInItemDO extends BaseDO {
      */
     private Long productId;
     /**
-     * 产品单位单位
+     * 产品单位
      * 冗余 {@link ErpProductDO#getUnitId()}
      */
     private Long productUnitId;
-
     /**
      * 产品单位单价，单位：元
      */
@@ -79,10 +73,36 @@ public class ErpPurchaseInItemDO extends BaseDO {
      * taxPrice = totalPrice * taxPercent
      */
     private BigDecimal taxPrice;
-
     /**
      * 备注
      */
     private String remark;
-
+    /**
+     * 箱率
+     * 关联 {@link ErpPurchaseOrderItemDO#getContainerRate()}
+     */
+    private String containerRate;//箱率
+    /**
+     * 采购订单项编号
+     * 关联 {@link ErpPurchaseOrderItemDO#getId()}
+     * 目的：方便更新关联的采购订单项的入库数量
+     */
+    private Long orderItemId;
+    /**
+     * 采购订单编号-展示用(源单单号,采购单)
+     * 关联 {@link ErpPurchaseOrderDO#getNo()}
+     */
+    private String orderNo;
+    /**
+     * 币别id(财务管理-币别维护)
+     */
+    private Long currencyId;
+    /**
+     * 付款状态
+     */
+    private Integer payStatus;
+    /**
+     * 含税单价
+     */
+    private BigDecimal actTaxPrice;
 }

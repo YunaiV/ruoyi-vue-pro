@@ -24,7 +24,7 @@ public interface ErpPurchaseOrderMapper extends BaseMapperX<ErpPurchaseOrderDO> 
             .likeIfPresent(ErpPurchaseOrderDO::getNo, reqVO.getNo())
             .eqIfPresent(ErpPurchaseOrderDO::getSupplierId, reqVO.getSupplierId())
             .betweenIfPresent(ErpPurchaseOrderDO::getOrderTime, reqVO.getOrderTime())
-            .eqIfPresent(ErpPurchaseOrderDO::getStatus, reqVO.getStatus())
+            .eqIfPresent(ErpPurchaseOrderDO::getAuditStatus, reqVO.getStatus())
             .likeIfPresent(ErpPurchaseOrderDO::getRemark, reqVO.getRemark())
             .eqIfPresent(ErpPurchaseOrderDO::getCreator, reqVO.getCreator())
             .orderByDesc(ErpPurchaseOrderDO::getId);
@@ -46,12 +46,12 @@ public interface ErpPurchaseOrderMapper extends BaseMapperX<ErpPurchaseOrderDO> 
         }
         // 可采购入库
         if (Boolean.TRUE.equals(reqVO.getInEnable())) {
-            query.eq(ErpPurchaseOrderDO::getStatus, ErpAuditStatus.APPROVED.getCode())
+            query.eq(ErpPurchaseOrderDO::getAuditStatus, ErpAuditStatus.APPROVED.getCode())
                 .apply("t.total_in_count < t.total_count");
         }
         // 可采购退货
         if (Boolean.TRUE.equals(reqVO.getReturnEnable())) {
-            query.eq(ErpPurchaseOrderDO::getStatus, ErpAuditStatus.APPROVED.getCode())
+            query.eq(ErpPurchaseOrderDO::getAuditStatus, ErpAuditStatus.APPROVED.getCode())
                 .apply("t.total_return_count < t.total_in_count");
         }
         if (reqVO.getProductId() != null) {
@@ -65,7 +65,7 @@ public interface ErpPurchaseOrderMapper extends BaseMapperX<ErpPurchaseOrderDO> 
 
     default int updateByIdAndStatus(Long id, Integer status, ErpPurchaseOrderDO updateObj) {
         return update(updateObj, new LambdaUpdateWrapper<ErpPurchaseOrderDO>()
-            .eq(ErpPurchaseOrderDO::getId, id).eq(ErpPurchaseOrderDO::getStatus, status));
+            .eq(ErpPurchaseOrderDO::getId, id).eq(ErpPurchaseOrderDO::getAuditStatus, status));
     }
 
     default ErpPurchaseOrderDO selectByNo(String no) {

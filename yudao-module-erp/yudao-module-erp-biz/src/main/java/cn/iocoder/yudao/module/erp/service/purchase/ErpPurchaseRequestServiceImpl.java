@@ -9,8 +9,10 @@ import cn.iocoder.yudao.module.erp.api.purchase.ErpOrderCountDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.*;
 import cn.iocoder.yudao.module.erp.convert.purchase.ErpOrderConvert;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
+import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseOrderItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestItemsMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
@@ -33,10 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -56,6 +55,7 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService {
     private final ErpPurchaseRequestMapper erpPurchaseRequestMapper;
     private final ErpPurchaseRequestItemsMapper erpPurchaseRequestItemsMapper;
+    private final ErpPurchaseOrderItemMapper erpPurchaseOrderItemMapper;
     private final ErpWarehouseService erpWarehouseService;
     private final ErpProductService productService;
     private final ErpPurchaseOrderService erpPurchaseOrderService;
@@ -376,17 +376,33 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         purchaseRequestDOs.forEach(erpPurchaseRequestDO -> {
             ThrowUtil.ifThrow(!erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.APPROVED.getCode()), PURCHASE_REQUEST_DELETE_FAIL_APPROVE, erpPurchaseRequestDO.getNo());
         });
+        //1.2 校验存在关联的采购订单
+        ThrowUtil.ifThrow(!validHasApplyItemId(purchaseRequestDOs), PURCHASE_REQUEST_DELETE_FAIL);
+
+        //2.0 手动关闭所有行状态
         for (ErpPurchaseRequestDO requestDO : purchaseRequestDOs) {
             List<ErpPurchaseRequestItemsDO> itemsDOS = erpPurchaseRequestItemsMapper.selectListByRequestId(requestDO.getId());
             itemsDOS.forEach(itemsDO -> offItemMachine.fireEvent(ErpOffStatus.fromCode(itemsDO.getOffStatus()), ErpEventEnum.MANUAL_CLOSE, itemsDO));
         }
-        // 2. 遍历删除，并记录操作日志
+        //2.1 遍历删除，并记录操作日志
         purchaseRequestDOs.forEach(erpPurchaseRequest -> {
             //获取主表id
             Long id = erpPurchaseRequest.getId();
             erpPurchaseRequestMapper.deleteById(id);
             erpPurchaseRequestItemsMapper.deleteByRequestId(id);
         });
+    }
+
+    //校验是否存在关联的采购订单
+    private Boolean validHasApplyItemId(List<ErpPurchaseRequestDO> purchaseRequestDOs) {
+        //收集purchaseRequestDOs的id
+        List<Long> ids = purchaseRequestDOs.stream().map(ErpPurchaseRequestDO::getId).collect(Collectors.toList());
+        List<ErpPurchaseRequestItemsDO> requestItemsDOS = erpPurchaseRequestItemsMapper.selectListByRequestIds(ids);
+        //收集item的id,去重
+        Set<Long> itemIds = requestItemsDOS.stream().map(ErpPurchaseRequestItemsDO::getId).collect(Collectors.toSet());
+        List<ErpPurchaseOrderItemDO> dos = erpPurchaseOrderItemMapper.selectListByPurchaseApplyItemIds(itemIds);
+        //如果dos非空，返回true
+        return CollUtil.isEmpty(dos);
     }
 
     @Override

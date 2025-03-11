@@ -66,6 +66,17 @@ public class ErpPurchaseOrderSaveReqVO {
     @Size(min = 1, message = "商品信息至少一个")
     private List<@Valid Item> items;
 
+    /**
+     * 验货单，JSON 格式
+     */
+    @Schema(description = "验货单json")
+    private String inspectionJson;
+    /**
+     * 完工单，JSON 格式
+     */
+    @Schema(description = "完工单json")
+    private String completionJson;
+
     @Data
     public static class Item {
 

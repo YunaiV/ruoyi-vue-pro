@@ -204,7 +204,6 @@ public class ErpPurchaseOrderController {
         Map<Long, ErpWarehouseDO> warehouseMap = erpWarehouseService.getWarehouseMap(
             convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getWarehouseId));
 
-
         // 2. 开始拼接
         return BeanUtils.toBean(list, ErpPurchaseOrderBaseRespVO.class, respVO -> {
             respVO.setItems(BeanUtils.toBean(purchaseOrderItemMap.get(respVO.getId()), ErpPurchaseOrderBaseRespVO.Item.class,
@@ -216,7 +215,7 @@ public class ErpPurchaseOrderController {
                 }));
             MapUtils.findAndThen(supplierMap, respVO.getSupplierId(), supplier -> respVO.setSupplierName(supplier.getName()));
             //设置创建人的部门name
-//            MapUtils.findAndThen(deptMap, adminUserApi.getUser(Long.parseLong(respVO.getCreator())).getDeptId(), deptRespDTO -> respVO.setDepartmentName(deptRespDTO.getName()));
+            MapUtils.findAndThen(deptMap, adminUserApi.getUser(Long.parseLong(respVO.getCreator())).getDeptId(), deptRespDTO -> respVO.setDepartmentName(deptRespDTO.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(respVO.getCreator()), user -> respVO.setCreator(user.getNickname()));
             //设置审核人的name
             Optional.ofNullable(respVO.getAuditor()).ifPresent(auditor ->

@@ -27,6 +27,7 @@ import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
@@ -41,7 +42,8 @@ import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
 
@@ -89,6 +91,7 @@ public class ErpProductServiceImpl implements ErpProductService {
     }
 
     @Override
+    @CacheEvict(cacheNames = {"erp:ProductService:getProductVOListByStatus", "erp:ProductService:getProductDTOListByStatus"})
     public Long createProduct(ErpProductSaveReqVO createReqVO) {
         //TODO 暂时编号不是系统自动生成，后续添加生成规则，流水号的递增由编号来判断，编号相同流水号便自增
         //校验是否存在相同的产品编码
@@ -132,6 +135,7 @@ public class ErpProductServiceImpl implements ErpProductService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(cacheNames = {"erp:ProductService:getProductVOListByStatus", "erp:ProductService:getProductDTOListByStatus"})
     public void updateProduct(ErpProductSaveReqVO updateReqVO) {
         Long productId = updateReqVO.getId();
         // 校验存在
@@ -212,6 +216,7 @@ public class ErpProductServiceImpl implements ErpProductService {
     }
 
     @Override
+    @CacheEvict(cacheNames = {"erp:ProductService:getProductVOListByStatus", "erp:ProductService:getProductDTOListByStatus"})
     public void deleteProduct(Long id) {
         // 校验存在
         validateProductExists(id);
@@ -287,13 +292,13 @@ public class ErpProductServiceImpl implements ErpProductService {
     }
 
     @Override
-    @Cacheable(cacheNames = "erpProductService_getProductVOListByStatus", key = "#status", unless = "#result == null")
+    @Cacheable(cacheNames = "erp:ProductService:getProductVOListByStatus", key = "#status", unless = "#result == null")
     public List<ErpProductRespVO> getProductVOListByStatus(Boolean status) {
         List<ErpProductDO> list = productMapper.selectListByStatus(status);
         return buildProductVOList(list);
     }
     @Override
-    @Cacheable(cacheNames = "erpProductService_getProductDTOListByStatus", key = "#status", unless = "#result == null")
+    @Cacheable(cacheNames = "erp:ProductService:getProductDTOListByStatus", key = "#status", unless = "#result == null")
     public List<ErpProductRespDTO> getProductDTOListByStatus(Boolean status) {
         List<ErpProductDO> erpProductDOs = productMapper.selectListByStatus(status);
         return buildProductDTOList(erpProductDOs);

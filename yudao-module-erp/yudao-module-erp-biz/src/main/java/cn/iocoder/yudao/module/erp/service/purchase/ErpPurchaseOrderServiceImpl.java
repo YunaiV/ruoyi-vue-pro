@@ -176,7 +176,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
 //        validatePurchaseOrderExists(updateReqVO.getNo());
         // 1.1 校验存在,校验不处于已审批+TODO 已关闭+手动关闭
         ErpPurchaseOrderDO purchaseOrder = validatePurchaseOrderExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVED.getCode().equals(purchaseOrder.getStatus())) {
+        if (ErpAuditStatus.APPROVED.getCode().equals(purchaseOrder.getAuditStatus())) {
             throw exception(PURCHASE_ORDER_UPDATE_FAIL_APPROVE, purchaseOrder.getNo());
         }
         // 1.2 校验供应商
@@ -196,7 +196,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         updatePurchaseOrderItemList(updateReqVO.getId(), purchaseOrderItems);
     }
 
-    //计算采购订单的总价、税费、折扣价格
+    //计算采购订单的总价、税费、折扣价格,|计算总数量|计算总商品价格|计算总税费|计算折扣价格
     private void calculateTotalPrice(ErpPurchaseOrderDO purchaseOrder, List<ErpPurchaseOrderItemDO> purchaseOrderItems) {
         purchaseOrder.setTotalCount(getSumValue(purchaseOrderItems, ErpPurchaseOrderItemDO::getCount, BigDecimal::add));
         purchaseOrder.setTotalProductPrice(getSumValue(purchaseOrderItems, ErpPurchaseOrderItemDO::getTotalPrice, BigDecimal::add, BigDecimal.ZERO));
@@ -358,7 +358,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
             return;
         }
         purchaseOrders.forEach(purchaseOrder -> {
-            if (ErpAuditStatus.APPROVED.getCode().equals(purchaseOrder.getStatus())) {
+            if (ErpAuditStatus.APPROVED.getCode().equals(purchaseOrder.getAuditStatus())) {
                 throw exception(PURCHASE_ORDER_DELETE_FAIL_APPROVE, purchaseOrder.getNo());
             }
         });
@@ -401,8 +401,8 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     @Override
     public ErpPurchaseOrderDO validatePurchaseOrder(Long id) {
         ErpPurchaseOrderDO purchaseOrder = validatePurchaseOrderExists(id);
-        if (ObjectUtil.notEqual(purchaseOrder.getStatus(), ErpAuditStatus.APPROVED.getCode())) {
-            throw exception(PURCHASE_ORDER_NOT_APPROVE);
+        if (ObjectUtil.notEqual(purchaseOrder.getAuditStatus(), ErpAuditStatus.APPROVED.getCode())) {
+            throw exception(PURCHASE_ORDER_NOT_APPROVE, purchaseOrder.getNo());
         }
         return purchaseOrder;
     }

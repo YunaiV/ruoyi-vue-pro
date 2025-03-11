@@ -85,7 +85,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
 
         // 2.1 插入入库
         ErpPurchaseInDO purchaseIn = BeanUtils.toBean(createReqVO, ErpPurchaseInDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PENDING_REVIEW.getCode()))
+                .setNo(no).setAuditorStatus(ErpAuditStatus.PENDING_REVIEW.getCode()))
                 .setOrderNo(purchaseOrder.getNo()).setSupplierId(purchaseOrder.getSupplierId());
         calculateTotalPrice(purchaseIn, purchaseInItems);
         // 2.1.1 设置入库单默认的审核状态-未审核。
@@ -105,7 +105,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     public void updatePurchaseIn(ErpPurchaseInSaveReqVO updateReqVO) {
         // 1.1 校验存在
         ErpPurchaseInDO purchaseIn = validatePurchaseInExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVED.getCode().equals(purchaseIn.getStatus())) {
+        if (ErpAuditStatus.APPROVED.getCode().equals(purchaseIn.getAuditorStatus())) {
             throw exception(PURCHASE_IN_UPDATE_FAIL_APPROVE, purchaseIn.getNo());
         }
         // 1.2 校验采购订单已审核
@@ -161,21 +161,19 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         // 1.1 校验存在
         ErpPurchaseInDO purchaseIn = validatePurchaseInExists(id);
         // 1.2 校验状态
-        if (purchaseIn.getStatus().equals(status)) {
+        if (purchaseIn.getAuditorStatus().equals(status)) {
             throw exception(approve ? PURCHASE_IN_APPROVE_FAIL : PURCHASE_IN_PROCESS_FAIL);
         }
         // 1.3 校验已付款
         if (!approve && purchaseIn.getPaymentPrice().compareTo(BigDecimal.ZERO) > 0) {
             throw exception(PURCHASE_IN_PROCESS_FAIL_EXISTS_PAYMENT);
         }
-
         // 2. 更新状态
-        int updateCount = purchaseInMapper.updateByIdAndStatus(id, purchaseIn.getStatus(),
-                new ErpPurchaseInDO().setStatus(status));
+        int updateCount = purchaseInMapper.updateByIdAndStatus(id, purchaseIn.getAuditorStatus(),
+            new ErpPurchaseInDO().setAuditorStatus(status));
         if (updateCount == 0) {
             throw exception(approve ? PURCHASE_IN_APPROVE_FAIL : PURCHASE_IN_PROCESS_FAIL);
         }
-
         // 3. 变更库存
         List<ErpPurchaseInItemDO> purchaseInItems = purchaseInItemMapper.selectListByInId(id);
         Integer bizType = approve ? ErpStockRecordBizTypeEnum.PURCHASE_IN.getType()
@@ -246,7 +244,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
             return;
         }
         purchaseIns.forEach(purchaseIn -> {
-            if (ErpAuditStatus.APPROVED.getCode().equals(purchaseIn.getStatus())) {
+            if (ErpAuditStatus.APPROVED.getCode().equals(purchaseIn.getAuditorStatus())) {
                 throw exception(PURCHASE_IN_DELETE_FAIL_APPROVE, purchaseIn.getNo());
             }
         });
@@ -280,7 +278,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     @Override
     public ErpPurchaseInDO validatePurchaseIn(Long id) {
         ErpPurchaseInDO purchaseIn = validatePurchaseInExists(id);
-        if (ObjectUtil.notEqual(purchaseIn.getStatus(), ErpAuditStatus.APPROVED.getCode())) {
+        if (ObjectUtil.notEqual(purchaseIn.getAuditorStatus(), ErpAuditStatus.APPROVED.getCode())) {
             throw exception(PURCHASE_IN_NOT_APPROVE);
         }
         return purchaseIn;

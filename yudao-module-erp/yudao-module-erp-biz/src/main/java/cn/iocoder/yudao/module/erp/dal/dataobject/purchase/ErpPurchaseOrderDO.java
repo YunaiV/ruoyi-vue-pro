@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  * <p>
  * 包含整个采购订单的基本信息，例如订单编号、总金额、供应商信息等。
  */
-@TableName(value = "erp_purchase_order")
+@TableName(value = "erp_purchase_order", autoResultMap = true)
 @KeySequence("erp_purchase_order_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -37,10 +37,10 @@ public class ErpPurchaseOrderDO extends TenantBaseDO {
      */
     private LocalDateTime noTime;
     /**
-     * 采购状态
+     * 审核状态
      * 枚举 {@link ErpAuditStatus}
      */
-    private Integer status;
+    private Integer auditStatus;
     /**
      * 供应商编号
      * 关联 {@link ErpSupplierDO#getId()}
@@ -176,5 +176,22 @@ public class ErpPurchaseOrderDO extends TenantBaseDO {
     //付款状态
     private Integer payStatus;
     //审核状态
-    private Integer auditStatus;
+//    private Integer auditStatus;
+    //审核意见
+    private String reviewComment;
+
+    /**
+     * 验货单
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Property {
+
+        //日期
+        private LocalDateTime inspectionDate;
+
+        //通过数量
+        private Integer inspectionPassCount;
+    }
 }

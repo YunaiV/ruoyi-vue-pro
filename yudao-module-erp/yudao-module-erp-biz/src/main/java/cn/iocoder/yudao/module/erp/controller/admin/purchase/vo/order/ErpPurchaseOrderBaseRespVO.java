@@ -62,6 +62,10 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
     @ExcelProperty("审核时间")
     @ContentStyle(shrinkToFit = BooleanEnum.TRUE)
     private LocalDateTime auditTime;
+
+    @Schema(description = "审核意见")
+    private String reviewComment;
+
     @Schema(description = "审核状态")
     private Integer auditStatus;
     @Schema(description = "开关状态")
@@ -91,12 +95,62 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
 
     @Schema(description = "优惠率，百分比")
     private BigDecimal discountPercent;
+    /**
+     * 优惠金额，单位：元
+     * <p>
+     * discountPrice = (totalProductPrice + totalTaxPrice) * discountPercent
+     */
+    @Schema(description = "优惠金额，单位：元")
+    private BigDecimal discountPrice;
     @Schema(description = "定金金额，单位：元")
     @DecimalMin(value = "0.00", message = "定金金额不能小于0")
     private BigDecimal depositPrice;
+    // ========== 合计 ==========
+    /**
+     * 合计数量-项目数量
+     */
+    @Schema(description = "合计数量-项目数量")
+    private BigDecimal totalCount;
+    /**
+     * 最终合计价格，单位：元
+     * <p>
+     * totalPrice = totalProductPrice + totalTaxPrice - discountPrice
+     */
+    @Schema(description = "最终合计价格，单位：元")
+    private BigDecimal totalPrice;
+    /**
+     * 合计产品价格，单位：元
+     */
+    @Schema(description = "合计产品价格，单位：元")
+    private BigDecimal totalProductPrice;
+    /**
+     * 合计税额，单位：元
+     */
+    @Schema(description = "合计税额，单位：元")
+    private BigDecimal totalTaxPrice;
 
     @Schema(description = "附件地址")
     private String fileUrl;
+    /**
+     * 部门，由系统中进行选择
+     * <p></>
+     * 部门id
+     */
+    @Schema(description = "部门，由系统中进行选择")
+    private Long departmentId;
+
+    @Schema(description = "部门名称")
+    private String departmentName;
+    /**
+     * 验货单，JSON 格式
+     */
+    @Schema(description = "验货单json")
+    private String inspectionJson;
+    /**
+     * 完工单，JSON 格式
+     */
+    @Schema(description = "完工单json")
+    private String completionJson;
     @Data
     public static class Item extends BaseVO {
         @Schema(description = "订单项编号")
@@ -126,16 +180,9 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
         // ========== 采购入库 ==========
         @Schema(description = "采购入库数量")
         private BigDecimal inCount;
-        // ========== 采购退货（入库）） ==========
+        // ========== 采购退货（出库）） ==========
         @Schema(description = "采购退货数量")
         private BigDecimal returnCount;
-        // ========== 关联字段 ==========
-//        @Schema(description = "产品名称")
-//        private String productName;
-//        @Schema(description = "产品单位名称")
-//        private String productUnitName;
-//        @Schema(description = "产品条码")
-//        private String productBarCode;
         // ========== 产品库存相关 ==========
         @Schema(description = "产品存放仓库编号")
         private Long warehouseId; // 该字段仅仅在“详情”和“编辑”时使用

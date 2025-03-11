@@ -4,9 +4,7 @@ package cn.iocoder.yudao.module.erp.config.purchase.order.impl.action;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseOrderMapper;
-import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestMapper;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
@@ -45,7 +43,7 @@ public class ActionOrderOffImpl implements Action<ErpOffStatus, ErpEventEnum, Er
         //手动关闭+自动关闭事件
         if (event == ErpEventEnum.MANUAL_CLOSE || event == ErpEventEnum.AUTO_CLOSE) {
             //未审核->异常
-            ThrowUtil.ifThrow(Objects.equals(context.getStatus(), ErpAuditStatus.PENDING_REVIEW.getCode()), ErrorCodeConstants.PURCHASE_ORDER_CLOSE_FAIL, context.getNo());
+            ThrowUtil.ifThrow(Objects.equals(context.getAuditStatus(), ErpAuditStatus.PENDING_REVIEW.getCode()), ErrorCodeConstants.PURCHASE_ORDER_CLOSE_FAIL, context.getNo());
         }
     }
 }

@@ -25,21 +25,20 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErpPurchaseInDO extends BaseDO {
-
     /**
-     * 编号
+     * id
      */
     @TableId
     private Long id;
     /**
-     * 采购入库单号
+     * 采购入库单据编号
      */
     private String no;
     /**
-     * 入库状态
+     * 审核状态
      * 枚举 {@link ErpAuditStatus}
      */
-    private Integer status;
+    private Integer auditorStatus;
     /**
      * 供应商编号
      * 关联 {@link ErpSupplierDO#getId()}
@@ -63,6 +62,10 @@ public class ErpPurchaseInDO extends BaseDO {
      * 审核人ID
      */
     private String auditorId;
+    /**
+     * 审核时间
+     */
+    private LocalDateTime auditTime;
     /**
      * 汇率
      */
@@ -102,7 +105,6 @@ public class ErpPurchaseInDO extends BaseDO {
      * 目的：和 {@link cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinancePaymentDO} 结合，记录已支付金额
      */
     private BigDecimal paymentPrice;
-
     /**
      * 合计产品价格，单位：元
      */
@@ -124,7 +126,6 @@ public class ErpPurchaseInDO extends BaseDO {
      * 其它金额，单位：元
      */
     private BigDecimal otherPrice;
-
     /**
      * 附件地址
      */
@@ -133,14 +134,12 @@ public class ErpPurchaseInDO extends BaseDO {
      * 备注
      */
     private String remark;
-
     /**
      * 对账状态(false:未对账 ，true:已对账)
      */
     private Boolean reconciliationStatus;
-
     /**
-     * 入库审核状态
+     * 审核意见
      */
-    private Integer auditorStatus;
+    private String reviewComment;
 }

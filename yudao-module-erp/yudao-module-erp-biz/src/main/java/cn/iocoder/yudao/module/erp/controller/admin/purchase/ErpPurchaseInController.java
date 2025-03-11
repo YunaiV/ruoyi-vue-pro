@@ -12,10 +12,11 @@ import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProduc
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInBaseRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderAuditReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.tools.validation;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInItemDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseInService;
@@ -35,8 +36,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -79,14 +80,14 @@ public class ErpPurchaseInController {
         return success(true);
     }
 
-    @PutMapping("/update-status")
-    @Operation(summary = "更新采购入库的状态")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-in:update-status')")
-    public CommonResult<Boolean> updatePurchaseInStatus(@RequestParam("id") Long id,
-                                                        @RequestParam("status") Integer status) {
-        purchaseInService.updatePurchaseInStatus(id, status);
-        return success(true);
-    }
+//    @PutMapping("/update-status")
+//    @Operation(summary = "更新采购入库的状态")
+//    @PreAuthorize("@ss.hasPermission('erp:purchase-in:update-status')")
+//    public CommonResult<Boolean> updatePurchaseInStatus(@RequestParam("id") Long id,
+//                                                        @RequestParam("status") Integer status) {
+//        purchaseInService.updatePurchaseInStatus(id, status);
+//        return success(true);
+//    }
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除采购入库")
@@ -106,16 +107,8 @@ public class ErpPurchaseInController {
         if (purchaseIn == null) {
             return success(null);
         }
-        List<ErpPurchaseInItemDO> purchaseInItemList = purchaseInService.getPurchaseInItemListByInId(id);
-        Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
-            convertSet(purchaseInItemList, ErpPurchaseInItemDO::getProductId));
-        return success(BeanUtils.toBean(purchaseIn, ErpPurchaseInBaseRespVO.class, purchaseInVO ->
-            purchaseInVO.setItems(BeanUtils.toBean(purchaseInItemList, ErpPurchaseInBaseRespVO.Item.class, item -> {
-                ErpStockDO stock = stockService.getStock(item.getProductId(), item.getWarehouseId());
-                item.setStockCount(stock != null ? stock.getCount() : BigDecimal.ZERO);
-                MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
-                    .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()));
-            }))));
+        ErpPurchaseInBaseRespVO respVO = bindList(Collections.singletonList(purchaseIn)).get(0);
+        return success(respVO);
     }
 
     @GetMapping("/page")
@@ -123,7 +116,8 @@ public class ErpPurchaseInController {
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:query')")
     public CommonResult<PageResult<ErpPurchaseInBaseRespVO>> getPurchaseInPage(@Valid ErpPurchaseInPageReqVO pageReqVO) {
         PageResult<ErpPurchaseInDO> pageResult = purchaseInService.getPurchaseInPage(pageReqVO);
-        return success(buildPurchaseInVOPageResult(pageResult));
+        List<ErpPurchaseInBaseRespVO> respVOS = bindList(pageResult.getList());
+        return success(new PageResult<>(respVOS, pageResult.getTotal()));
     }
 
     @GetMapping("/export-excel")
@@ -133,53 +127,64 @@ public class ErpPurchaseInController {
     public void exportPurchaseInExcel(@Valid ErpPurchaseInPageReqVO pageReqVO,
                                       HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<ErpPurchaseInBaseRespVO> list = buildPurchaseInVOPageResult(purchaseInService.getPurchaseInPage(pageReqVO)).getList();
+        PageResult<ErpPurchaseInDO> page = purchaseInService.getPurchaseInPage(pageReqVO);
         // 导出 Excel
-        ExcelUtils.write(response, "采购入库.xls", "数据", ErpPurchaseInBaseRespVO.class, list);
+        ExcelUtils.write(response, "采购入库.xls", "数据", ErpPurchaseInBaseRespVO.class, bindList(page.getList()));
     }
 
-    private PageResult<ErpPurchaseInBaseRespVO> buildPurchaseInVOPageResult(PageResult<ErpPurchaseInDO> pageResult) {
-        if (CollUtil.isEmpty(pageResult.getList())) {
-            return PageResult.empty(pageResult.getTotal());
+    @PostMapping("/submitAudit")
+    @Operation(summary = "提交审核")
+    @Parameter(name = "itemIds", description = "订单下的订单项Id集合", required = true)
+    @PreAuthorize("@ss.hasPermission('erp:purchase-in:submitAudit')")
+    public CommonResult<Boolean> submitAudit(@Validated @RequestBody ErpPurchaseOrderAuditReqVO reqVO) {
+//        purchaseInService.submitAudit(reqVO.getOrderIds());
+        return success(true);
+    }
+
+    @PostMapping("/auditStatus")
+    @Operation(summary = "审核/反审核")
+    @Parameter(name = "requestId", description = "申请单编号", required = true)
+    @Parameter(name = "reviewed", description = "审核状态", required = true)
+    @PreAuthorize("@ss.hasPermission('erp:purchase-in:review')")
+    public CommonResult<Boolean> reviewPurchaseRequest(@Validated(validation.OnAudit.class) @RequestBody ErpPurchaseOrderAuditReqVO req) {
+//        purchaseInService.reviewPurchaseOrder(req);
+        return success(true);
+    }
+
+    private List<ErpPurchaseInBaseRespVO> bindList(List<ErpPurchaseInDO> list) {
+        if (CollUtil.isEmpty(list)) {
+            return Collections.emptyList();
         }
         // 1.1 入库项
         List<ErpPurchaseInItemDO> purchaseInItemList = purchaseInService.getPurchaseInItemListByInIds(
-            convertSet(pageResult.getList(), ErpPurchaseInDO::getId));
+            convertSet(list, ErpPurchaseInDO::getId));
         Map<Long, List<ErpPurchaseInItemDO>> purchaseInItemMap = convertMultiMap(purchaseInItemList, ErpPurchaseInItemDO::getInId);
         // 1.2 产品信息
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
             convertSet(purchaseInItemList, ErpPurchaseInItemDO::getProductId));
         // 1.3 供应商信息
         Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(
-            convertSet(pageResult.getList(), ErpPurchaseInDO::getSupplierId));
+            convertSet(list, ErpPurchaseInDO::getSupplierId));
         // 1.4 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-            convertSet(pageResult.getList(), purchaseIn -> Long.parseLong(purchaseIn.getCreator())));
+            convertSet(list, purchaseIn -> Long.parseLong(purchaseIn.getCreator())));
         // 1.6 获取仓库信息
         Map<Long, ErpWarehouseDO> warehouseMap = erpWarehouseService.getWarehouseMap(
             convertSet(purchaseInItemList, ErpPurchaseInItemDO::getWarehouseId));
         // 2. 开始拼接
-        return BeanUtils.toBean(pageResult, ErpPurchaseInBaseRespVO.class, purchaseIn -> {
+        return BeanUtils.toBean(list, ErpPurchaseInBaseRespVO.class, purchaseIn -> {
             purchaseIn.setItems(BeanUtils.toBean(purchaseInItemMap.get(purchaseIn.getId()), ErpPurchaseInBaseRespVO.Item.class,
                 item -> {
                     //设置产品信息-带出相关字段
-                    MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
-                        .setProductBarCode(product.getBarCode())
-                        .setProductUnitName(product.getUnitName())//设置产品重量+体积+规格型号
-                        .setTotalVolume(product.getLength() * product.getHeight() * product.getWidth() * Double.parseDouble(String.valueOf(item.getCount())))//总体积
-                        .setTotalWeight(product.getWeight().setScale(2, RoundingMode.HALF_UP).longValue() * Double.parseDouble(String.valueOf(item.getCount())))//总重量
-                        .setModel(product.getModel())
-                        .setCustomsDeclaration(product.getBrand())//产品品牌
+                    MapUtils.findAndThen(productMap, item.getProductId(), product -> item
+                        .setProduct(product)
+                        .setTotalVolume(product.getLength() * product.getHeight() * product.getWidth() * Double.parseDouble(String.valueOf(item.getCount())))//总体积=数量*产品体积
+                        .setTotalWeight(product.getWeight().setScale(2, RoundingMode.HALF_UP).longValue() * Double.parseDouble(String.valueOf(item.getCount())))//总重量=数量*产品重量
                     );
                     // 设置仓库信息
                     MapUtils.findAndThen(warehouseMap, item.getWarehouseId(), erpWarehouseDO -> item.setWarehouseName(erpWarehouseDO.getName()));
                 }));
 //            purchaseIn.setProductNames(CollUtil.join(purchaseIn.getItems(), "，", ErpPurchaseInBaseRespVO.Item::getProductName));
-            //TODO 添加入库审核状态描述
-//            String statusDescription = ErpAuditStatus.getDescriptionByStatus(purchaseIn.getAuditorStatus());
-//            if (statusDescription != null) {
-//                purchaseIn.setAuditorStatusDesc(statusDescription);
-//            }
             //产品-带出相关字段
 
             MapUtils.findAndThen(supplierMap, purchaseIn.getSupplierId(), supplier -> purchaseIn.setSupplierName(supplier.getName()));

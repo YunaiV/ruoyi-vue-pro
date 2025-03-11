@@ -27,7 +27,7 @@ public interface ErpPurchaseInMapper extends BaseMapperX<ErpPurchaseInDO> {
                 .likeIfPresent(ErpPurchaseInDO::getNo, reqVO.getNo())
 //                .eqIfPresent(ErpPurchaseInDO::getSupplierId, reqVO.getSupplierId())
                 .betweenIfPresent(ErpPurchaseInDO::getInTime, reqVO.getInTime())
-                .eqIfPresent(ErpPurchaseInDO::getStatus, reqVO.getStatus())
+            .eqIfPresent(ErpPurchaseInDO::getAuditorStatus, reqVO.getStatus())
                 .likeIfPresent(ErpPurchaseInDO::getRemark, reqVO.getRemark())
                 .eqIfPresent(ErpPurchaseInDO::getCreator, reqVO.getCreator())
                 .eqIfPresent(ErpPurchaseInDO::getAccountId, reqVO.getAccountId())
@@ -42,7 +42,7 @@ public interface ErpPurchaseInMapper extends BaseMapperX<ErpPurchaseInDO> {
             query.apply("t.payment_price = t.total_price");
         }
         if (Boolean.TRUE.equals(reqVO.getPaymentEnable())) {
-            query.eq(ErpPurchaseInDO::getStatus, ErpAuditStatus.APPROVED.getCode())
+            query.eq(ErpPurchaseInDO::getAuditorStatus, ErpAuditStatus.APPROVED.getCode())
                     .apply("t.payment_price < t.total_price");
         }
         if (reqVO.getWarehouseId() != null || reqVO.getProductId() != null) {
@@ -56,7 +56,7 @@ public interface ErpPurchaseInMapper extends BaseMapperX<ErpPurchaseInDO> {
 
     default int updateByIdAndStatus(Long id, Integer status, ErpPurchaseInDO updateObj) {
         return update(updateObj, new LambdaUpdateWrapper<ErpPurchaseInDO>()
-                .eq(ErpPurchaseInDO::getId, id).eq(ErpPurchaseInDO::getStatus, status));
+            .eq(ErpPurchaseInDO::getId, id).eq(ErpPurchaseInDO::getAuditorStatus, status));
     }
 
     default ErpPurchaseInDO selectByNo(String no) {

@@ -36,7 +36,9 @@ public class ActionItemOrderImpl implements Action<ErpOrderStatus, ErpEventEnum,
         //更新采购申请项的下单数量
         //更新采购申请项的采购状态(暂无)
         ErpPurchaseRequestItemsDO itemsDO = null;
-        Optional.ofNullable(context.getPurchaseOrderItemId()).ifPresent(id -> itemsMapper.selectById(id));
+        if (Optional.ofNullable(context.getPurchaseOrderItemId()).isPresent()) {
+            itemsDO = itemsMapper.selectById(context.getPurchaseOrderItemId());
+        }
         if (event == ErpEventEnum.ORDER_ADJUSTMENT) {
             //采购数量变更->采购状态
             int oldCount = (itemsDO.getOrderedQuantity() == null ? 0 : itemsDO.getOrderedQuantity());

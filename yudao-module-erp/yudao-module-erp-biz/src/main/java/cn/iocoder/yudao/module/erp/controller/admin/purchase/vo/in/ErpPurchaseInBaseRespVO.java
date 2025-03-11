@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in;
 
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.base.ErpPurchaseBaseRespVO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -15,11 +16,22 @@ import java.util.List;
 @Data
 @ExcelIgnoreUnannotated
 public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
-
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17386")
+    private Long id;
 
     @Schema(description = "入库单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "XS001")
     @ExcelProperty("入库单编号")
     private String no;
+
+    @Schema(description = "单据日期", example = "2024-10-12")
+    private LocalDateTime noTime;
+
+    @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "12")
+    @NotNull(message = "供应商编号不能为空")
+    private Long supplierId;
+
+    @Schema(description = "币别ID,财务管理-币别维护")
+    private Long currencyId;
 
     @Schema(description = "入库状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @ExcelProperty("入库状态")
@@ -40,6 +52,24 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
     @Schema(description = "对账状态(false:未对账 ，true:已对账)", example = "false")
     private Boolean reconciliationStatus;
 
+    @Schema(description = "审核人ID")
+    private String auditorId;
+
+    @Schema(description = "审核时间")
+    private LocalDateTime auditTime;
+
+    @Schema(description = "结算账户编号")
+    private Long accountId;
+
+    @Schema(description = "优惠率，百分比", requiredMode = Schema.RequiredMode.REQUIRED, example = "99.88")
+    private BigDecimal discountPercent;
+
+    @Schema(description = "其它金额，单位：元", example = "100")
+    private BigDecimal otherPrice;
+
+    @Schema(description = "附件地址", example = "https://www.abc.cn")
+    private String fileUrl;
+
     @Data
     public static class Item {
 
@@ -58,7 +88,10 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
         @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
         private Long productId;
 
-        @Schema(description = "产品单位单位", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+        @Schema(description = "产品信息")
+        private ErpProductRespVO product;
+
+        @Schema(description = "产品单位", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Long productUnitId;
 
         @Schema(description = "产品单价", example = "100.00")
@@ -75,7 +108,7 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
         private BigDecimal taxPrice;
 
         @Schema(description = "含税单价", example = "120.00")
-        private double actTaxPrice;
+        private BigDecimal actTaxPrice;
 
         @Schema(description = "备注", example = "随便")
         private String remark;
@@ -87,13 +120,6 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
         private LocalDateTime settlementDate;
 
         // ========== 关联字段 ==========
-
-        @Schema(description = "产品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "巧克力")
-        private String productName;
-        @Schema(description = "产品条码", requiredMode = Schema.RequiredMode.REQUIRED, example = "A9985")
-        private String productBarCode;
-        @Schema(description = "产品单位名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "盒")
-        private String productUnitName;
 
         @Schema(description = "库存数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
         private BigDecimal stockCount; // 该字段仅仅在“详情”和“编辑”时使用
@@ -112,12 +138,6 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
         @Schema(description = "商品总重量,单位：kg 千克", example = "1.2")
         private Double totalWeight;
 
-        @Schema(description = "型号规格型号")
-        private String model;
-
-        @Schema(description = "报关品名-产品(产品的品牌)")
-        private String customsDeclaration;
-
         @Schema(description = "源单行号")
         private int srcSeq;
         // 源单类型ID
@@ -129,8 +149,13 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
         @Schema(description = "源单单号")
         private int srcNo;
 
-        @Schema(description = "价税合计")
-        private BigDecimal allAmount;
-    }
+        @Schema(description = "总价，单位：元,totalPrice = productPrice * count")
+        private BigDecimal totalPrice;
 
+        @Schema(description = "币别id(财务管理-币别维护)")
+        private Long currencyId;
+
+        @Schema(description = "付款状态")
+        private Integer payStatus;
+    }
 }

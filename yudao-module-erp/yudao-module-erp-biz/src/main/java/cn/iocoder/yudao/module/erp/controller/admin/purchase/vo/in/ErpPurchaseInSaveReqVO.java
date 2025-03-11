@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in;
 
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
@@ -16,9 +17,15 @@ public class ErpPurchaseInSaveReqVO {
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17386")
     private Long id;
 
-    @Schema(description = "采购订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "CGRK-20241012-00197")
+    @Schema(description = "采购订单id", requiredMode = Schema.RequiredMode.REQUIRED, example = "CGRK-20241012-00197")
     @NotNull(message = "采购订单编号不能为空")
     private Long orderId;
+    /**
+     * 采购订单号
+     * 冗余 {@link ErpPurchaseOrderDO#getNo()}
+     */
+    @Schema(description = "采购订单号", example = "CGDD-20241012-00197")
+    private String orderNo;
 
     @Schema(description = "单据日期", example = "2024-10-12")
     private LocalDateTime noTime;
@@ -30,8 +37,8 @@ public class ErpPurchaseInSaveReqVO {
     @Schema(description = "币别ID,财务管理-币别维护")
     private Long currencyId;
 
-//    @Schema(description = "汇率,财务管理-币别维护",example = "5.8")
-//    private BigDecimal exchangeRate;
+    @Schema(description = "汇率,财务管理-币别维护", example = "5.8")
+    private BigDecimal exchangeRate;
 
     @Schema(description = "审核人ID")
     private String auditorId;
@@ -45,7 +52,7 @@ public class ErpPurchaseInSaveReqVO {
     @Schema(description = "结算日期")
     private LocalDateTime settlementDate;
 
-    @Schema(description = "结算账户编号", example = "31189")
+    @Schema(description = "结算账户编号")
     private Long accountId;
 
     @Schema(description = "入库时间", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -58,7 +65,7 @@ public class ErpPurchaseInSaveReqVO {
     @Schema(description = "其它金额，单位：元", example = "100")
     private BigDecimal otherPrice;
 
-    @Schema(description = "附件地址", example = "https://www.iocoder.cn")
+    @Schema(description = "附件地址", example = "https://www.abc.cn")
     private String fileUrl;
 
     @Schema(description = "备注", example = "备注123")
@@ -76,22 +83,21 @@ public class ErpPurchaseInSaveReqVO {
         @NotNull(message = "产品编号不能为空")
         private Long productId;
 
-        @Schema(description = "产品名称")
-        private String ItemName;
+        @Schema(description = "产品名称(快照)")
+        private String productName;
 
         @Schema(description = "入库项编号", example = "11756")
         private Long id;
 
-        @Schema(description = "采购订单项编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "11756")
-        @NotNull(message = "采购订单项编号不能为空")
+        @Schema(description = "采购订单项id", requiredMode = Schema.RequiredMode.REQUIRED, example = "11756")
+        @NotNull(message = "采购订单项id不能为空")
         private Long orderItemId;
 
         @Schema(description = "仓库编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
         @NotNull(message = "仓库编号不能为空")
         private Long warehouseId;
 
-
-        @Schema(description = "产品单位单位", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
+        @Schema(description = "产品单位(产品带出来)", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
         @NotNull(message = "产品单位单位不能为空")
         private Long productUnitId;
 
@@ -112,7 +118,7 @@ public class ErpPurchaseInSaveReqVO {
         @Schema(description = "备注", example = "商品行备注")
         private String remark;
 
-        @Schema(description = "报关品名-产品")
+        @Schema(description = "报关品名(快照)")
         private String customsDeclaration;
 
         @Schema(description = "源单行号")
@@ -122,9 +128,10 @@ public class ErpPurchaseInSaveReqVO {
         private int srcNo;
 
         @Schema(description = "箱率")
-        private String containerRate;//箱率
+        private String containerRate;
 
+        @Schema(description = "币别id(财务管理-币别维护)")
+        private Long currencyId;
 
     }
-
 }
