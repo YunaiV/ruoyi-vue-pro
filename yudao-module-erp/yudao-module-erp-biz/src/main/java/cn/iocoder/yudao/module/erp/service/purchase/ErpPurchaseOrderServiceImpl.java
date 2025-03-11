@@ -27,6 +27,8 @@ import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import com.alibaba.cola.statemachine.StateMachine;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -96,6 +98,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(cacheNames = "erp:purchaseOrder:getPurchaseOrderPage")
     public Long createPurchaseOrder(ErpPurchaseOrderSaveReqVO createReqVO) {
         // 校验编号
 //        validatePurchaseOrderExists(createReqVO.getNo());
@@ -172,6 +175,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(cacheNames = "erp:purchaseOrder:getPurchaseOrderPage")
     public void updatePurchaseOrder(ErpPurchaseOrderSaveReqVO updateReqVO) {
 //        validatePurchaseOrderExists(updateReqVO.getNo());
         // 1.1 校验存在,校验不处于已审批+TODO 已关闭+手动关闭
@@ -284,10 +288,14 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
                 Optional.ofNullable(orderItemDO.getPurchaseApplyItemId()).ifPresent(purchaseApplyItemId -> {
                     ErpPurchaseRequestItemsDO requestItemsDO = requestItemsMapper.selectById(purchaseApplyItemId);
                     //验证:采购的产品数量<=申请项的剩余订购数量(批准数量-已订购数量)
-                    ThrowUtil.ifThrow((requestItemsDO.getApproveCount() - requestItemsDO.getOrderedQuantity()) < orderItemDO.getCount().intValue(), PURCHASE_ORDER_ITEM_PURCHASE_FAIL_EXCEED);
+
                     ErpPurchaseOrderItemDO oldOrderItem = purchaseOrderItemMapper.selectById(orderItemDO.getId());
                     int newCount = orderItemDO.getCount().intValue();
                     int oldCount = oldOrderItem.getCount().intValue();
+                    if (newCount != oldCount) {
+                        //数量有改变
+                        ThrowUtil.ifThrow((requestItemsDO.getApproveCount() - requestItemsDO.getOrderedQuantity()) < orderItemDO.getCount().intValue(), PURCHASE_ORDER_ITEM_PURCHASE_FAIL_EXCEED);
+                    }
                     ErpOrderCountDTO dto = ErpOrderCountDTO.builder().purchaseOrderItemId(requestItemsDO.getId())
                         .quantity(newCount - oldCount).build();
                     orderItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, dto);
@@ -312,8 +320,9 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     }
 
     @Override
-    public void updatePurchaseOrderInCount(Long id, Map<Long, BigDecimal> inCountMap) {
-        List<ErpPurchaseOrderItemDO> orderItems = purchaseOrderItemMapper.selectListByOrderId(id);
+    @CacheEvict(cacheNames = "erp:purchaseOrder:getPurchaseOrderPage")
+    public void updatePurchaseOrderInCount(Long itemId, Map<Long, BigDecimal> inCountMap) {
+        List<ErpPurchaseOrderItemDO> orderItems = purchaseOrderItemMapper.selectListByOrderId(itemId);
         // 1. 更新每个采购订单项
         orderItems.forEach(item -> {
             BigDecimal inCount = inCountMap.getOrDefault(item.getId(), BigDecimal.ZERO);
@@ -327,10 +336,11 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         });
         // 2. 更新采购订单
         BigDecimal totalInCount = getSumValue(inCountMap.values(), value -> value, BigDecimal::add, BigDecimal.ZERO);
-        purchaseOrderMapper.updateById(new ErpPurchaseOrderDO().setId(id).setTotalInCount(totalInCount));
+        purchaseOrderMapper.updateById(new ErpPurchaseOrderDO().setId(itemId).setTotalInCount(totalInCount));
     }
 
     @Override
+    @CacheEvict(cacheNames = "erp:purchaseOrder:getPurchaseOrderPage")
     public void updatePurchaseOrderReturnCount(Long orderId, Map<Long, BigDecimal> returnCountMap) {
         List<ErpPurchaseOrderItemDO> orderItems = purchaseOrderItemMapper.selectListByOrderId(orderId);
         // 1. 更新每个采购订单项
@@ -351,6 +361,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(cacheNames = "erp:purchaseOrder:getPurchaseOrderPage")
     public void deletePurchaseOrder(List<Long> ids) {
         // 1. 校验不处于已审批
         List<ErpPurchaseOrderDO> purchaseOrders = purchaseOrderMapper.selectBatchIds(ids);
@@ -394,6 +405,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     }
 
     @Override
+    @Cacheable(cacheNames = "erp:purchaseOrder:getPurchaseOrderPage", key = "#id")
     public ErpPurchaseOrderDO getPurchaseOrder(Long id) {
         return purchaseOrderMapper.selectById(id);
     }
@@ -408,6 +420,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     }
 
     @Override
+    @Cacheable(cacheNames = "erp:purchaseOrder:getPurchaseOrderPage", key = "#pageReqVO")
     public PageResult<ErpPurchaseOrderDO> getPurchaseOrderPage(ErpPurchaseOrderPageReqVO pageReqVO) {
         return purchaseOrderMapper.selectPage(pageReqVO);
     }

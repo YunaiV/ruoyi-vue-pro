@@ -47,10 +47,10 @@ public interface ErpPurchaseOrderService {
     /**
      * 更新采购订单的入库数量
      *
-     * @param id         编号
+     * @param itemId         编号
      * @param inCountMap 入库数量 Map：key 采购订单项编号；value 入库数量
      */
-    void updatePurchaseOrderInCount(Long id, Map<Long, BigDecimal> inCountMap);
+    void updatePurchaseOrderInCount(Long itemId, Map<Long, BigDecimal> inCountMap);
 
     /**
      * 更新采购订单的退货数量
