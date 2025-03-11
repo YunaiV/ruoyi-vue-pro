@@ -159,51 +159,56 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long merge(ErpPurchaseRequestOrderReqVO reqVO) {
+        // 获取所有 itemIds
         List<Long> itemIds = reqVO.getItems().stream()
             .map(ErpPurchaseRequestOrderReqVO.requestItems::getId)
-            .toList();
+            .collect(Collectors.toList());
 
+        // 查询 itemDOS 并校验
         List<ErpPurchaseRequestItemsDO> itemsDOS = erpPurchaseRequestItemsMapper.selectListByIds(itemIds);
         ThrowUtil.ifThrow(itemsDOS.isEmpty(), PURCHASE_REQUEST_ITEM_NOT_EXISTS, itemIds);
+
         //申请单已审核+未关闭才可以合并
         validMerge(itemsDOS);
+        // 创建 itemsMap 和 requestItemDOMap
+        Map<Long, ErpPurchaseRequestOrderReqVO.requestItems> itemsMap = reqVO.getItems().stream()
+            .collect(Collectors.toMap(ErpPurchaseRequestOrderReqVO.requestItems::getId, Function.identity()));
+        Map<Long, ErpPurchaseRequestItemsDO> requestItemDOMap = itemsDOS.stream()
+            .collect(Collectors.toMap(ErpPurchaseRequestItemsDO::getId, Function.identity()));
 
-        Map<Long, ErpPurchaseRequestOrderReqVO.requestItems> itemsMap =
-            reqVO.getItems().stream()
-                .collect(Collectors.toMap(ErpPurchaseRequestOrderReqVO.requestItems::getId, Function.identity()));
+        // 转换采购订单 `Item`
+        List<ErpPurchaseOrderSaveReqVO.Item> itemList = ErpOrderConvert.INSTANCE.convertToErpPurchaseOrderSaveReqVOItemList(itemsDOS, itemsMap, requestItemDOMap);
+        // 获取申请单编号映射
+        Set<Long> requestIds = itemsDOS.stream()
+            .map(ErpPurchaseRequestItemsDO::getRequestId)
+            .collect(Collectors.toSet());
+        Map<Long, ErpPurchaseRequestDO> rDOMap = erpPurchaseRequestMapper.selectByIds(requestIds).stream()
+            .collect(Collectors.toMap(ErpPurchaseRequestDO::getId, Function.identity()));
 
-        // 收集 map, itemId -> requestItemDO
-        Map<Long, ErpPurchaseRequestItemsDO> requestItemDOMap =
-            itemsDOS.stream()
-                .collect(Collectors.toMap(ErpPurchaseRequestItemsDO::getId, Function.identity()));
-        //  **转换采购订单 `Item`**
-        List<ErpPurchaseOrderSaveReqVO.Item> itemList =
-            ErpOrderConvert.INSTANCE.convertToErpPurchaseOrderSaveReqVOItemList(itemsDOS, itemsMap, requestItemDOMap);
-        //requestId -> requestDO
-        Map<Long, String> requestIdToNoMap = erpPurchaseRequestMapper.selectByIds(
-            itemsDOS.stream().map(ErpPurchaseRequestItemsDO::getRequestId).collect(Collectors.toSet())
-        ).stream().collect(Collectors.toMap(ErpPurchaseRequestDO::getId, ErpPurchaseRequestDO::getNo));
-        //申请单的no编号
+        //后置渲染，申请单的no编号
         itemList.forEach(item -> {
             Long itemId = item.getPurchaseApplyItemId();
-            //获得itemdo
             ErpPurchaseRequestItemsDO itemDO = requestItemDOMap.get(itemId);
             //获得requestDO
-            ErpPurchaseRequestDO requestDO = erpPurchaseRequestMapper.selectById(itemDO.getRequestId());
-            item.setErpPurchaseRequestItemNo(requestDO.getNo());
+            ErpPurchaseRequestDO aDo = rDOMap.get(itemDO.getRequestId());
+            item.setErpPurchaseRequestItemNo(aDo.getNo());
+            item.setApplicantId(aDo.getApplicantId());//申请人
+            item.setApplicationDeptId(aDo.getApplicationDeptId());//申请部门
         });
 
+        // 构建并创建采购订单
         ErpPurchaseOrderSaveReqVO saveReqVO = BeanUtils.toBean(reqVO, ErpPurchaseOrderSaveReqVO.class);
         saveReqVO.setId(null);
         saveReqVO.setNoTime(LocalDateTime.now());
         saveReqVO.setItems(itemList);
-
+        //创建订单
         Long orderId = erpPurchaseOrderService.createPurchaseOrder(saveReqVO);
-        //给与回显的订单id关联
+        // 更新回显的订单id关联
         itemList.forEach(item -> {
             item.setPurchaseApplyItemId(orderId);
-            item.setErpPurchaseRequestItemNo(requestIdToNoMap.get(orderId));
+            item.setErpPurchaseRequestItemNo(rDOMap.get(orderId).getNo());
         });
+        // 更新订单
         erpPurchaseOrderService.updatePurchaseOrder(saveReqVO);
         return orderId;
     }

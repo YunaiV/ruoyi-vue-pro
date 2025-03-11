@@ -36,6 +36,7 @@ public class ErpPurchaseOrderDO extends TenantBaseDO {
      * 单据日期
      */
     private LocalDateTime noTime;
+
     /**
      * 审核状态
      * 枚举 {@link ErpAuditStatus}
@@ -116,14 +117,8 @@ public class ErpPurchaseOrderDO extends TenantBaseDO {
     private LocalDateTime auditTime;
     // ========== 部门和主体信息 ==========
     /**
-     * 部门，由系统中进行选择
-     * <p></>
-     * 部门id
-     */
-    private Long departmentId;
-    /**
      * 采购主体，进行采购的公司主体，关联财务模块-主体管理
-     * <p></>
+     * <p>
      * 采购主体id
      */
     private Long purchaseEntityId;
@@ -178,23 +173,21 @@ public class ErpPurchaseOrderDO extends TenantBaseDO {
 //    private Integer auditStatus;
     //审核意见
     private String reviewComment;
-    /**
-     * 部门id
-     */
-    private Long deptId;
+    //总验货通过数量
+    private Integer totalInspectionPassCount;
 
-    /**
-     * 验货单
-     */
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Property {
-
-        //日期
-        private LocalDateTime inspectionDate;
-
-        //通过数量
-        private Integer inspectionPassCount;
-    }
+//    /**
+//     * 验货单
+//     */
+//    @Data
+//    @NoArgsConstructor
+//    @AllArgsConstructor
+//    public static class Property {
+//
+//        //日期
+//        private LocalDateTime inspectionDate;
+//
+//        //通过数量
+//        private Integer inspectionPassCount;
+//    }
 }

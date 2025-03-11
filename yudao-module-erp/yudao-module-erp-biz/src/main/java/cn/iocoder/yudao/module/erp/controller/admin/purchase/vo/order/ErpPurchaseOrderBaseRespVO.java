@@ -102,6 +102,7 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
      */
     @Schema(description = "优惠金额，单位：元")
     private BigDecimal discountPrice;
+
     @Schema(description = "定金金额，单位：元")
     @DecimalMin(value = "0.00", message = "定金金额不能小于0")
     private BigDecimal depositPrice;
@@ -131,16 +132,8 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
 
     @Schema(description = "附件地址")
     private String fileUrl;
-    /**
-     * 部门，由系统中进行选择
-     * <p></>
-     * 部门id
-     */
-    @Schema(description = "部门，由系统中进行选择")
-    private Long departmentId;
 
-    @Schema(description = "部门名称")
-    private String departmentName;
+
     /**
      * 验货单，JSON 格式
      */
@@ -250,5 +243,16 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
 
         @Schema(description = "交货日期")
         private LocalDateTime deliveryTime;
+
+        @Schema(description = "申请人id")
+        private Long applicantId;
+        @Schema(description = "申请人名称")
+        private String applicantName;
+
+        @Schema(description = "部门，由系统中进行选择")
+        private Long applicationDeptId;
+
+        @Schema(description = "部门名称")
+        private String departmentName;
     }
 }

@@ -83,6 +83,9 @@ public class ErpPurchaseInSaveReqVO {
         @NotNull(message = "产品编号不能为空")
         private Long productId;
 
+        @Schema(description = "型号规格(产品带出)")
+        private String model;
+
         @Schema(description = "产品名称(快照)")
         private String productName;
 
@@ -108,6 +111,9 @@ public class ErpPurchaseInSaveReqVO {
         @NotNull(message = "产品数量不能为空")
         private BigDecimal count;
 
+        @Schema(description = "价税合计")
+        private BigDecimal allAmount;
+
         @Schema(description = "增值税税率，百分比", example = "99.88")
         private BigDecimal taxPercent;
 
@@ -117,9 +123,6 @@ public class ErpPurchaseInSaveReqVO {
 
         @Schema(description = "备注", example = "商品行备注")
         private String remark;
-
-        @Schema(description = "报关品名(快照)")
-        private String customsDeclaration;
 
         @Schema(description = "源单行号")
         private int srcSeq;

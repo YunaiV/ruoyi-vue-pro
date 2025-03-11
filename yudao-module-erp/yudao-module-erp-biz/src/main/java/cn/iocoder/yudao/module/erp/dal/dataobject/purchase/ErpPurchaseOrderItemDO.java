@@ -157,7 +157,6 @@ public class ErpPurchaseOrderItemDO extends TenantBaseDO {
      * {@link ErpPurchaseRequestItemsDO#getId()}
      */
     private Long purchaseApplyItemId;
-
     /**
      * 采购申请单No
      */
@@ -169,5 +168,14 @@ public class ErpPurchaseOrderItemDO extends TenantBaseDO {
      * 币别id(财务管理-币别维护)
      */
     private Long currencyId;
-
+    /**
+     * 申请人id
+     */
+    private Long applicantId;
+    /**
+     * 申请部门id
+     * <p>
+     * 部门id
+     */
+    private Long applicationDeptId;
 }

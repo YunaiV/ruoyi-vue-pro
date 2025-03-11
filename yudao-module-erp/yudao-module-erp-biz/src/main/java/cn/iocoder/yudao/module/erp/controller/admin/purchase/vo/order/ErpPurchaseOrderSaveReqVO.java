@@ -72,15 +72,14 @@ public class ErpPurchaseOrderSaveReqVO {
      */
     @Schema(description = "验货单json")
     private String inspectionJson;
+    //总验货通过数量
+    @Schema(description = "总验货通过数量")
+    private Integer totalInspectionPassCount;
     /**
      * 完工单，JSON 格式
      */
     @Schema(description = "完工单json")
     private String completionJson;
-
-
-    @Schema(description = "部门 id")
-    private Long deptId;
 
     @Data
     public static class Item {
@@ -99,6 +98,7 @@ public class ErpPurchaseOrderSaveReqVO {
 
         @Schema(description = "产品单价")
         @DecimalMin(value = "0.00", message = "产品单价不能小于0")
+        @NotNull(message = "产品单价不能为空")
         private BigDecimal productPrice;
         /**
          * 产品单位
@@ -163,6 +163,12 @@ public class ErpPurchaseOrderSaveReqVO {
 
         @Schema(description = "采购申请单No")
         private String erpPurchaseRequestItemNo;
+
+        @Schema(description = "部门id")
+        private Long applicationDeptId;
+
+        @Schema(description = "申请人id")
+        private Long applicantId;
     }
 
 }

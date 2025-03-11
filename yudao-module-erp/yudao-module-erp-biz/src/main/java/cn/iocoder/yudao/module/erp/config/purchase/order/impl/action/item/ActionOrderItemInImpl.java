@@ -11,6 +11,7 @@ import com.alibaba.cola.statemachine.StateMachine;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
@@ -29,6 +30,7 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
     private StateMachine storageStateMachine;
     //入库单->订单项->订单->申请项->申请单
     @Override
+    @Transactional( rollbackFor = Exception.class)
     public void execute(ErpStorageStatus from, ErpStorageStatus to, ErpEventEnum erpEventEnum, ErpPurchaseOrderItemDO context) {
         //入库数量+入库状态
         // 1. 校验参数

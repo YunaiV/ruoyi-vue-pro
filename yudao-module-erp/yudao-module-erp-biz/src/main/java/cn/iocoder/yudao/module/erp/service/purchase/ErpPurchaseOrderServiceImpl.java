@@ -11,7 +11,6 @@ import cn.iocoder.yudao.module.erp.api.purchase.ErpOrderCountDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderAuditReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderSaveReqVO;
-import cn.iocoder.yudao.module.erp.convert.purchase.ErpOrderConvert;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
@@ -27,8 +26,6 @@ import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import com.alibaba.cola.statemachine.StateMachine;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -36,6 +33,8 @@ import org.springframework.validation.annotation.Validated;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -98,7 +97,6 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(cacheNames = "erp:purchaseOrder:getPurchaseOrderPage")
     public Long createPurchaseOrder(ErpPurchaseOrderSaveReqVO createReqVO) {
         // 校验编号
 //        validatePurchaseOrderExists(createReqVO.getNo());
@@ -175,7 +173,6 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(cacheNames = "erp:purchaseOrder:getPurchaseOrderPage")
     public void updatePurchaseOrder(ErpPurchaseOrderSaveReqVO updateReqVO) {
 //        validatePurchaseOrderExists(updateReqVO.getNo());
         // 1.1 校验存在,校验不处于已审批+TODO 已关闭+手动关闭
@@ -253,7 +250,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         Map<Long, ErpProductDO> productMap = convertMap(productList, ErpProductDO::getId);
         // 2. 转化为 ErpPurchaseOrderItemDO 列表
         return convertList(list, o -> BeanUtils.toBean(o, ErpPurchaseOrderItemDO.class, item -> {
-            item = ErpOrderConvert.INSTANCE.convertToErpPurchaseOrderItemDO(o);//convert转换一下
+//            item = ErpOrderConvert.INSTANCE.convertToErpPurchaseOrderItemDO(o);//convert转换一下
             item.setTotalPrice(MoneyUtils.priceMultiply(item.getProductPrice(), item.getCount()));
             if (item.getTotalPrice() == null) {
                 return;
@@ -277,42 +274,72 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         // 第二步，批量添加、修改、删除
         if (CollUtil.isNotEmpty(diffList.get(0))) {
             diffList.get(0).forEach(o -> o.setOrderId(id));
-            for (ErpPurchaseOrderItemDO orderItemDO : diffList.get(0)) {
-                //行状态初始化
-                initSlaveStatus(Collections.singletonList(orderItemDO));
-            }
+            //行状态初始化
+            initSlaveStatus(diffList.get(0));
             purchaseOrderItemMapper.insertBatch(diffList.get(0));
         }
         if (CollUtil.isNotEmpty(diffList.get(1))) {
-            for (ErpPurchaseOrderItemDO orderItemDO : diffList.get(1)) {
-                Optional.ofNullable(orderItemDO.getPurchaseApplyItemId()).ifPresent(purchaseApplyItemId -> {
-                    ErpPurchaseRequestItemsDO requestItemsDO = requestItemsMapper.selectById(purchaseApplyItemId);
-                    //验证:采购的产品数量<=申请项的剩余订购数量(批准数量-已订购数量)
+            // 批量查询所有需要的采购订单项（purchase order items）
+            Set<Long> orderItemIds = diffList.get(1).stream()
+                .map(ErpPurchaseOrderItemDO::getId)
+                .collect(Collectors.toSet());
+            Map<Long, ErpPurchaseOrderItemDO> orderItemMap = purchaseOrderItemMapper.selectBatchIds(orderItemIds).stream()
+                .collect(Collectors.toMap(ErpPurchaseOrderItemDO::getId, Function.identity()));
 
-                    ErpPurchaseOrderItemDO oldOrderItem = purchaseOrderItemMapper.selectById(orderItemDO.getId());
+            // 批量查询所有需要的采购申请项（purchase request items）
+            Set<Long> purchaseApplyItemIds = diffList.get(1).stream()
+                .map(ErpPurchaseOrderItemDO::getPurchaseApplyItemId)
+                .filter(Objects::nonNull)  // 过滤掉为空的purchaseApplyItemId
+                .collect(Collectors.toSet());
+
+            Map<Long, ErpPurchaseRequestItemsDO> requestItemsMap = requestItemsMapper.selectBatchIds(purchaseApplyItemIds).stream()
+                .collect(Collectors.toMap(ErpPurchaseRequestItemsDO::getId, Function.identity()));
+            // 遍历并处理订单项
+            for (ErpPurchaseOrderItemDO orderItemDO : diffList.get(1)) {
+                ErpPurchaseOrderItemDO oldOrderItem = orderItemMap.get(orderItemDO.getId());  // 从map中获取旧的order item
+                Optional.ofNullable(orderItemDO.getPurchaseApplyItemId()).ifPresent(purchaseApplyItemId -> {
+                    ErpPurchaseRequestItemsDO requestItemsDO = requestItemsMap.get(purchaseApplyItemId);  // 从map中获取request item
+                    // 验证:采购的产品数量 <= 申请项的剩余订购数量(批准数量 - 已订购数量)
                     int newCount = orderItemDO.getCount().intValue();
                     int oldCount = oldOrderItem.getCount().intValue();
                     if (newCount != oldCount) {
-                        //数量有改变
-                        ThrowUtil.ifThrow((requestItemsDO.getApproveCount() - requestItemsDO.getOrderedQuantity()) < orderItemDO.getCount().intValue(), PURCHASE_ORDER_ITEM_PURCHASE_FAIL_EXCEED);
+                        // 数量有改变
+                        ThrowUtil.ifThrow((requestItemsDO.getApproveCount() - requestItemsDO.getOrderedQuantity()) < orderItemDO.getCount().intValue(),
+                            PURCHASE_ORDER_ITEM_PURCHASE_FAIL_EXCEED);
                     }
-                    ErpOrderCountDTO dto = ErpOrderCountDTO.builder().purchaseOrderItemId(requestItemsDO.getId())
-                        .quantity(newCount - oldCount).build();
+                    ErpOrderCountDTO dto = ErpOrderCountDTO.builder()
+                        .purchaseOrderItemId(requestItemsDO.getId())
+                        .quantity(newCount - oldCount)
+                        .build();
                     orderItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, dto);
                 });
             }
+
             //跟旧数据对比，申请数量差异，则发采购事件调整
             purchaseOrderItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
             //减少申请项的采购数量
+            // 批量查询所有需要的采购申请项（purchase request items）
+            Set<Long> purchaseApplyItemIds = diffList.get(0).stream()
+                .map(ErpPurchaseOrderItemDO::getPurchaseApplyItemId)
+                .filter(Objects::nonNull)  // 过滤掉为空的purchaseApplyItemId
+                .collect(Collectors.toSet());
+
+            Map<Long, ErpPurchaseRequestItemsDO> requestItemsMap = requestItemsMapper.selectBatchIds(purchaseApplyItemIds).stream()
+                .collect(Collectors.toMap(ErpPurchaseRequestItemsDO::getId, Function.identity()));
+
+            // 遍历并处理订单项
             for (ErpPurchaseOrderItemDO orderItemDO : diffList.get(0)) {
-                //联动申请项
                 Optional.ofNullable(orderItemDO.getPurchaseApplyItemId()).ifPresent(purchaseApplyItemId -> {
-                    ErpPurchaseRequestItemsDO requestItemsDO = requestItemsMapper.selectById(purchaseApplyItemId);
-                    ErpOrderCountDTO dto = ErpOrderCountDTO.builder().purchaseOrderItemId(requestItemsDO.getId())
-                        .quantity(orderItemDO.getCount().negate().intValue()).build();
-                    orderItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, dto);
+                    ErpPurchaseRequestItemsDO requestItemsDO = requestItemsMap.get(purchaseApplyItemId);  // 从map中获取request item
+                    if (requestItemsDO != null) {
+                        ErpOrderCountDTO dto = ErpOrderCountDTO.builder()
+                            .purchaseOrderItemId(requestItemsDO.getId())
+                            .quantity(orderItemDO.getCount().negate().intValue())  // 负值数量
+                            .build();
+                        orderItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, dto);
+                    }
                 });
             }
             purchaseOrderItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpPurchaseOrderItemDO::getId));
@@ -320,7 +347,6 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     }
 
     @Override
-    @CacheEvict(cacheNames = "erp:purchaseOrder:getPurchaseOrderPage")
     public void updatePurchaseOrderInCount(Long itemId, Map<Long, BigDecimal> inCountMap) {
         List<ErpPurchaseOrderItemDO> orderItems = purchaseOrderItemMapper.selectListByOrderId(itemId);
         // 1. 更新每个采购订单项
@@ -340,7 +366,6 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     }
 
     @Override
-    @CacheEvict(cacheNames = "erp:purchaseOrder:getPurchaseOrderPage")
     public void updatePurchaseOrderReturnCount(Long orderId, Map<Long, BigDecimal> returnCountMap) {
         List<ErpPurchaseOrderItemDO> orderItems = purchaseOrderItemMapper.selectListByOrderId(orderId);
         // 1. 更新每个采购订单项
@@ -361,7 +386,6 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(cacheNames = "erp:purchaseOrder:getPurchaseOrderPage")
     public void deletePurchaseOrder(List<Long> ids) {
         // 1. 校验不处于已审批
         List<ErpPurchaseOrderDO> purchaseOrders = purchaseOrderMapper.selectBatchIds(ids);
@@ -405,7 +429,6 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     }
 
     @Override
-    @Cacheable(cacheNames = "erp:purchaseOrder:getPurchaseOrderPage", key = "#id")
     public ErpPurchaseOrderDO getPurchaseOrder(Long id) {
         return purchaseOrderMapper.selectById(id);
     }
@@ -420,7 +443,6 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     }
 
     @Override
-    @Cacheable(cacheNames = "erp:purchaseOrder:getPurchaseOrderPage", key = "#pageReqVO")
     public PageResult<ErpPurchaseOrderDO> getPurchaseOrderPage(ErpPurchaseOrderPageReqVO pageReqVO) {
         return purchaseOrderMapper.selectPage(pageReqVO);
     }
@@ -442,13 +464,16 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
 
     @Override
     public void submitAudit(Collection<Long> orderIds) {
-        //TODO 提交审核
-        //1. 校验订单项
+        // 提前校验传入的订单ID是否存在
+        if (CollUtil.isEmpty(orderIds)) {
+            throw exception(PURCHASE_ORDER_NOT_EXISTS);
+        }
+        // 1. 批量查询订单信息
         List<ErpPurchaseOrderDO> orderDOS = purchaseOrderMapper.selectBatchIds(orderIds);
         if (CollUtil.isEmpty(orderDOS)) {
             throw exception(PURCHASE_ORDER_NOT_EXISTS);
         }
-        //2. 提交审核
+        // 2. 触发事件
         orderDOS.forEach(orderDO -> {
             auditMachine.fireEvent(ErpAuditStatus.fromCode(orderDO.getAuditStatus()), ErpEventEnum.SUBMIT_FOR_REVIEW, ErpPurchaseOrderAuditReqVO.builder().orderIds(Collections.singletonList(orderDO.getId())).build());
         });

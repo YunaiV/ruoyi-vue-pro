@@ -27,7 +27,7 @@ public class ActionOrderOffImpl implements Action<ErpOffStatus, ErpEventEnum, Er
 
 
     @Override
-    @Transactional
+    @Transactional( rollbackFor = Exception.class)
     public void execute(ErpOffStatus from, ErpOffStatus to, ErpEventEnum event, ErpPurchaseOrderDO context) {
         validate(from, to, event, context);
         //子项存在开启主表就开启，子项都关闭|手动关闭主表才关闭

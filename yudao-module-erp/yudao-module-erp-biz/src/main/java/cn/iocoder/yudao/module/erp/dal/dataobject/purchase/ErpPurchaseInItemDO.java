@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -105,4 +106,12 @@ public class ErpPurchaseInItemDO extends BaseDO {
      * 含税单价
      */
     private BigDecimal actTaxPrice;
+    /**
+     * 价税合计
+     */
+    private BigDecimal allAmount;
+    /**
+     * 型号规格(产品带出)
+     */
+    private String model;
 }

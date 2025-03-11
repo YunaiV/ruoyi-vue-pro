@@ -21,7 +21,7 @@ public class ActionOrderExecuteImpl implements Action<ErpExecutionStatus, ErpEve
     @Transactional(rollbackFor = Exception.class)
     public void execute(ErpExecutionStatus from, ErpExecutionStatus to, ErpEventEnum event, ErpPurchaseOrderDO context) {
         ErpPurchaseOrderDO orderDO = mapper.selectById(context.getId());
-        orderDO.setOrderStatus(to.getCode());
+        orderDO.setExecuteStatus(to.getCode());
         mapper.updateById(orderDO);
         //log
         log.info("执行状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());

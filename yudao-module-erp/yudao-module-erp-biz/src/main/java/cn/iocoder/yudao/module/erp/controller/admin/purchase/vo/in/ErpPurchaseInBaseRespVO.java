@@ -88,6 +88,9 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
         @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
         private Long productId;
 
+        @Schema(description = "型号规格(产品带出)")
+        private String model;
+
         @Schema(description = "产品信息")
         private ErpProductRespVO product;
 
@@ -109,6 +112,9 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
 
         @Schema(description = "含税单价", example = "120.00")
         private BigDecimal actTaxPrice;
+
+        @Schema(description = "价税合计")
+        private BigDecimal allAmount;
 
         @Schema(description = "备注", example = "随便")
         private String remark;
@@ -138,16 +144,16 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
         @Schema(description = "商品总重量,单位：kg 千克", example = "1.2")
         private Double totalWeight;
 
-        @Schema(description = "源单行号")
-        private int srcSeq;
+//        @Schema(description = "源单行号")
+//        private int srcSeq;
         // 源单类型ID
 //        private String srcBillTypeId;
 
-        @Schema(description = "源单类型")
-        private String srcBillTypeName;
+//        @Schema(description = "源单类型")
+//        private String srcBillTypeName;
 
-        @Schema(description = "源单单号")
-        private int srcNo;
+//        @Schema(description = "源单单号")
+//        private int srcNo;
 
         @Schema(description = "总价，单位：元,totalPrice = productPrice * count")
         private BigDecimal totalPrice;

@@ -26,7 +26,7 @@ public class ActionOrderAuditImpl implements Action<ErpAuditStatus, ErpEventEnum
     ErpPurchaseOrderMapper mapper;
 
     @Override
-    @Transactional
+    @Transactional( rollbackFor = Exception.class)
     public void execute(ErpAuditStatus from, ErpAuditStatus to, ErpEventEnum event, ErpPurchaseOrderAuditReqVO reqVO) {
 
         List<Long> orderIds = reqVO.getOrderIds();

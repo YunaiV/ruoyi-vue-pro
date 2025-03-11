@@ -31,7 +31,7 @@ public class ActionOrderItemOffImpl implements Action<ErpOffStatus, ErpEventEnum
     private ErpPurchaseOrderMapper orderMapper;
 
     @Override
-    @Transactional
+    @Transactional( rollbackFor = Exception.class)
     public void execute(ErpOffStatus from, ErpOffStatus to, ErpEventEnum event, ErpPurchaseOrderItemDO context) {
         // 查询采购订单子项
         ErpPurchaseOrderItemDO itemDO = itemMapper.selectById(context.getId());

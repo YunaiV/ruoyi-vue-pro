@@ -8,10 +8,10 @@ import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.status.ErpPaymentStatus;
 import com.alibaba.cola.statemachine.Action;
 import com.alibaba.cola.statemachine.StateMachine;
-
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import static cn.iocoder.yudao.module.erp.enums.ErpStateMachines.PURCHASE_ORDER_PAYMENT_STATE_MACHINE_NAME;
 
@@ -27,6 +27,7 @@ public class ActionOrderItemPayImpl implements Action<ErpPaymentStatus, ErpEvent
 
 
     @Override
+    @Transactional( rollbackFor = Exception.class)
     public void execute(ErpPaymentStatus f, ErpPaymentStatus t, ErpEventEnum erpEventEnum,
                         ErpPurchaseOrderItemDO context) {
         // 支付状态机执行

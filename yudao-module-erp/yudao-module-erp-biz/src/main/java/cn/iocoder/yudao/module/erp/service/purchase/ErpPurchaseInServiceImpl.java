@@ -154,7 +154,6 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         purchaseOrderService.updatePurchaseOrderInCount(orderId, returnCountMap);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePurchaseInStatus(Long id, Integer status) {
         boolean approve = ErpAuditStatus.APPROVED.getCode().equals(status);

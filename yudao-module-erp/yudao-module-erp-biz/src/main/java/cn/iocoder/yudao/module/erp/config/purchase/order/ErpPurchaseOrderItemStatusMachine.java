@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.config.purchase.order;
 
 import cn.iocoder.yudao.module.erp.config.BaseFailCallbackImpl;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.ErpStateMachines;
@@ -21,17 +22,17 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class ErpPurchaseOrderItemStatusMachine {
-    @Resource
-    private Action<ErpOffStatus, ErpEventEnum, ErpPurchaseOrderItemDO> actionOrderItemOffImpl;
+
 
     @Resource
     private BaseFailCallbackImpl baseFailCallbackImpl;
-    @Resource
-    private Action<ErpExecutionStatus, ErpEventEnum, ErpPurchaseOrderItemDO> actionOrderExecuteImpl;
-    @Resource
-    private Action<ErpStorageStatus, ErpEventEnum, ErpPurchaseOrderItemDO> actionOrderItemInImpl;
+
+    
 
 
+
+    @Resource
+    private Action<ErpOffStatus, ErpEventEnum, ErpPurchaseOrderItemDO> actionOrderItemOffImpl;
     //采购订单子项状态机
     @Bean(ErpStateMachines.PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME)
     public StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseOrderItemDO> getPurchaseOrderItemStateMachine() {
@@ -65,7 +66,8 @@ public class ErpPurchaseOrderItemStatusMachine {
     }
 
 
-
+    @Resource
+    private Action<ErpExecutionStatus, ErpEventEnum, ErpPurchaseOrderItemDO> actionOrderItemExecuteImpl;
     // 采购订单子项执行状态机
     @Bean(ErpStateMachines.PURCHASE_ORDER_ITEM_EXECUTION_STATE_MACHINE_NAME)
     public StateMachine<ErpExecutionStatus, ErpEventEnum, ErpPurchaseOrderItemDO> getPurchaseOrderItemExecutionStateMachine() {
@@ -75,49 +77,49 @@ public class ErpPurchaseOrderItemStatusMachine {
         builder.internalTransition()
             .within(ErpExecutionStatus.PENDING)
             .on(ErpEventEnum.EXECUTION_INIT)
-            .perform(actionOrderExecuteImpl);
+            .perform(actionOrderItemExecuteImpl);
 
         // 开始执行
         builder.externalTransition()
             .from(ErpExecutionStatus.PENDING)
             .to(ErpExecutionStatus.IN_PROGRESS)
             .on(ErpEventEnum.START_EXECUTION)
-            .perform(actionOrderExecuteImpl);
+            .perform(actionOrderItemExecuteImpl);
 
         // 执行完成
         builder.externalTransition()
             .from(ErpExecutionStatus.IN_PROGRESS)
             .to(ErpExecutionStatus.COMPLETED)
             .on(ErpEventEnum.COMPLETE_EXECUTION)
-            .perform(actionOrderExecuteImpl);
+            .perform(actionOrderItemExecuteImpl);
 
         // 暂停执行
         builder.externalTransition()
             .from(ErpExecutionStatus.IN_PROGRESS)
             .to(ErpExecutionStatus.PAUSED)
             .on(ErpEventEnum.PAUSE_EXECUTION)
-            .perform(actionOrderExecuteImpl);
+            .perform(actionOrderItemExecuteImpl);
 
         // 恢复执行
         builder.externalTransition()
             .from(ErpExecutionStatus.PAUSED)
             .to(ErpExecutionStatus.IN_PROGRESS)
             .on(ErpEventEnum.RESUME_EXECUTION)
-            .perform(actionOrderExecuteImpl);
+            .perform(actionOrderItemExecuteImpl);
 
         // 取消执行
         builder.externalTransitions()
             .fromAmong(ErpExecutionStatus.PENDING, ErpExecutionStatus.IN_PROGRESS, ErpExecutionStatus.PAUSED)
             .to(ErpExecutionStatus.CANCELLED)
             .on(ErpEventEnum.CANCEL_EXECUTION)
-            .perform(actionOrderExecuteImpl);
+            .perform(actionOrderItemExecuteImpl);
 
         // 执行失败
         builder.externalTransition()
             .from(ErpExecutionStatus.IN_PROGRESS)
             .to(ErpExecutionStatus.FAILED)
             .on(ErpEventEnum.EXECUTION_FAILED)
-            .perform(actionOrderExecuteImpl);
+            .perform(actionOrderItemExecuteImpl);
 
         // 设置错误回调
         builder.setFailCallback(baseFailCallbackImpl);
@@ -125,6 +127,8 @@ public class ErpPurchaseOrderItemStatusMachine {
         return builder.build(ErpStateMachines.PURCHASE_ORDER_ITEM_EXECUTION_STATE_MACHINE_NAME);
     }
 
+    @Resource
+    private Action<ErpStorageStatus, ErpEventEnum, ErpPurchaseOrderItemDO> actionOrderItemInImpl;
     @Bean(ErpStateMachines.PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME)
     public StateMachine<ErpStorageStatus, ErpEventEnum, ErpPurchaseOrderItemDO> buildPurchaseOrderItemStorageStateMachine() {
         StateMachineBuilder<ErpStorageStatus, ErpEventEnum, ErpPurchaseOrderItemDO> builder = StateMachineBuilderFactory.create();

@@ -190,7 +190,8 @@ public class ErpPurchaseOrderController {
                 purchaseOrderItemList.stream()
                     .flatMap(orderItemDO -> Stream.of(
                         safeParseLong(orderItemDO.getCreator()),
-                        safeParseLong(orderItemDO.getUpdater())
+                        safeParseLong(orderItemDO.getUpdater()),
+                        orderItemDO.getApplicantId()
                     ))
             )
             .distinct()
@@ -199,7 +200,7 @@ public class ErpPurchaseOrderController {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         // 1.5 部门
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
-            convertSet(list, ErpPurchaseOrderDO::getDepartmentId));
+            convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getApplicationDeptId));
         // 1.6 仓库
         Map<Long, ErpWarehouseDO> warehouseMap = erpWarehouseService.getWarehouseMap(
             convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getWarehouseId));
@@ -212,12 +213,18 @@ public class ErpPurchaseOrderController {
                     MapUtils.findAndThen(productMap, item.getProductId(), item::setProduct);
                     // 设置仓库
                     MapUtils.findAndThen(warehouseMap, item.getWarehouseId(), erpWarehouseDO -> item.setWarehouseName(erpWarehouseDO.getName()));
+                    //人员
+                    MapUtils.findAndThen(userMap, Long.parseLong(item.getCreator()), user -> item.setCreator(user.getNickname()));
+                    MapUtils.findAndThen(userMap, Long.parseLong(item.getUpdater()), user -> item.setUpdater(user.getNickname()));
+                    //申请人name
+                    MapUtils.findAndThen(userMap, item.getApplicantId(), user -> item.setApplicantName(user.getNickname()));
+                    //部门name
+                    MapUtils.findAndThen(deptMap, item.getApplicationDeptId(), dept -> item.setDepartmentName(dept.getName()));
                 }));
             MapUtils.findAndThen(supplierMap, respVO.getSupplierId(), supplier -> respVO.setSupplierName(supplier.getName()));
-            //设置创建人的部门name
-            MapUtils.findAndThen(deptMap, adminUserApi.getUser(Long.parseLong(respVO.getCreator())).getDeptId(), deptRespDTO -> respVO.setDepartmentName(deptRespDTO.getName()));
+            //人员
             MapUtils.findAndThen(userMap, Long.parseLong(respVO.getCreator()), user -> respVO.setCreator(user.getNickname()));
-            //设置审核人的name
+            MapUtils.findAndThen(userMap, Long.parseLong(respVO.getUpdater()), user -> respVO.setUpdater(user.getNickname()));
             Optional.ofNullable(respVO.getAuditor()).ifPresent(auditor ->
                 MapUtils.findAndThen(userMap, Long.parseLong(auditor), user -> respVO.setAuditorName(user.getNickname()))
             );

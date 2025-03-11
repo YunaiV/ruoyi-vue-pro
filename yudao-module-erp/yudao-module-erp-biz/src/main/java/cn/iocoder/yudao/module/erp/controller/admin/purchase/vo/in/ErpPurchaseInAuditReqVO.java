@@ -33,11 +33,6 @@ public class ErpPurchaseInAuditReqVO {
     @Schema(description = "审核意见")
     private String reviewComment;
 
-    //开关
-    @Schema(description = "启用/关闭")
-    @NotNull(groups = validation.OnSwitch.class, message = "开关不能为空")
-    private Boolean enable;
-
     @Data
     public static class item {
         // 入库单ID

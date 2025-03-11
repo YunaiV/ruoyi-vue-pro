@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static cn.iocoder.yudao.module.erp.enums.ErpEventEnum.STOCK_ADJUSTMENT;
+
 @Slf4j
 @Component
 public class ActionOrderInImpl implements Action<ErpStorageStatus, ErpEventEnum, ErpPurchaseOrderDO> {
@@ -32,36 +34,39 @@ public class ActionOrderInImpl implements Action<ErpStorageStatus, ErpEventEnum,
             return;
         }
 
-        // 获取订单项的入库状态
-        List<ErpPurchaseOrderItemDO> items = itemMapper.selectListByOrderId(context.getId());
-        if (CollUtil.isEmpty(items)) {
-            return;
-        }
+        if (event == STOCK_ADJUSTMENT) {//动态调整入库数量->动态调整状态
+            // 获取订单项的入库状态
+            List<ErpPurchaseOrderItemDO> items = itemMapper.selectListByOrderId(context.getId());
+            if (CollUtil.isEmpty(items)) {
+                return;
+            }
 
-        // 判断订单项的入库状态
-        boolean hasNotInStorage = false;
-        boolean hasPartialInStorage = false;
-        boolean allInStorage = true;
+            // 判断订单项的入库状态
+            boolean hasNotInStorage = false;
+            boolean hasPartialInStorage = false;
+            boolean allInStorage = true;
 
-        for (ErpPurchaseOrderItemDO item : items) {
-            Integer inStatus = item.getInStatus();
-            if (inStatus == null || inStatus.equals(ErpStorageStatus.NONE_IN_STORAGE.getCode())) {
-                hasNotInStorage = true;
-                allInStorage = false;
-            } else if (inStatus.equals(ErpStorageStatus.PARTIALLY_IN_STORAGE.getCode())) {
-                hasPartialInStorage = true;
-                allInStorage = false;
+            for (ErpPurchaseOrderItemDO item : items) {
+                Integer inStatus = item.getInStatus();
+                if (inStatus == null || inStatus.equals(ErpStorageStatus.NONE_IN_STORAGE.getCode())) {
+                    hasNotInStorage = true;
+                    allInStorage = false;
+                } else if (inStatus.equals(ErpStorageStatus.PARTIALLY_IN_STORAGE.getCode())) {
+                    hasPartialInStorage = true;
+                    allInStorage = false;
+                }
+            }
+
+            // 设置订单入库状态
+            if (allInStorage) {
+                to = ErpStorageStatus.ALL_IN_STORAGE;
+            } else if (hasPartialInStorage || (hasNotInStorage && hasPartialInStorage)) {
+                to = ErpStorageStatus.PARTIALLY_IN_STORAGE;
+            } else {
+                to = ErpStorageStatus.NONE_IN_STORAGE;
             }
         }
 
-        // 设置订单入库状态
-        if (allInStorage) {
-            to = ErpStorageStatus.ALL_IN_STORAGE;
-        } else if (hasPartialInStorage || (hasNotInStorage && hasPartialInStorage)) {
-            to = ErpStorageStatus.PARTIALLY_IN_STORAGE;
-        } else {
-            to = ErpStorageStatus.NONE_IN_STORAGE;
-        }
         ErpPurchaseOrderDO orderDO = mapper.selectById(context.getId());
         orderDO.setInStatus(to.getCode());
         mapper.updateById(orderDO);
