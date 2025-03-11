@@ -40,10 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
@@ -210,11 +207,11 @@ public class BpmModelServiceImpl implements BpmModelService {
     public void deployModel(Long userId, String id) {
         // 1.1 校验流程模型存在
         Model model = validateModelManager(id, userId);
+        BpmModelMetaInfoVO metaInfo = BpmModelConvert.INSTANCE.parseMetaInfo(model);
         // 1.2 校验流程图
         byte[] bpmnBytes = getModelBpmnXML(model.getId());
-        validateBpmnXml(bpmnBytes);
+        validateBpmnXml(bpmnBytes, metaInfo.getType());
         // 1.3 校验表单已配
-        BpmModelMetaInfoVO metaInfo = BpmModelConvert.INSTANCE.parseMetaInfo(model);
         BpmFormDO form = validateFormConfig(metaInfo);
         // 1.4 校验任务分配规则已配置
         taskCandidateInvoker.validateBpmnConfig(bpmnBytes);
@@ -234,7 +231,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         repositoryService.saveModel(model);
     }
 
-    private void validateBpmnXml(byte[] bpmnBytes) {
+    private void validateBpmnXml(byte[] bpmnBytes, int type) {
         BpmnModel bpmnModel = BpmnModelUtils.getBpmnModel(bpmnBytes);
         if (bpmnModel == null) {
             throw exception(MODEL_NOT_EXISTS);
@@ -252,10 +249,14 @@ public class BpmModelServiceImpl implements BpmModelService {
             }
         });
         // 3. 校验第一个用户任务节点的规则类型是否为“审批人自选”
-        UserTask userTask = userTasks.get(0);
-        Integer candidateStrategy = parseCandidateStrategy(userTask);
+        Map<Integer, UserTask> userTaskMap = new HashMap<>();
+        // BPMN 设计器，校验第一个用户任务节点
+        userTaskMap.put(BpmModelTypeEnum.BPMN.getType(), userTasks.get(0));
+        // SIMPLE 设计器，第一个节点固定为发起人所以校验第二个用户任务节点
+        userTaskMap.put(BpmModelTypeEnum.SIMPLE.getType(), userTasks.get(1));
+        Integer candidateStrategy = parseCandidateStrategy(userTaskMap.get(type));
         if (Objects.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy())) {
-            throw exception(MODEL_DEPLOY_FAIL_FIRST_USER_TASK_CANDIDATE_STRATEGY_ERROR, userTask.getName());
+            throw exception(MODEL_DEPLOY_FAIL_FIRST_USER_TASK_CANDIDATE_STRATEGY_ERROR, userTaskMap.get(type).getName());
         }
     }
 
