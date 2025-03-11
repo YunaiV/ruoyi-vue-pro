@@ -22,8 +22,7 @@ public class AiUtils {
         // noinspection EnhancedSwitchMigration
         switch (platform) {
             case TONG_YI:
-                // TODO @芋艿：tongyi 暂时没 maxTokens 选项
-                return DashScopeChatOptions.builder().withModel(model).withTemperature(temperature).build();
+                return DashScopeChatOptions.builder().withModel(model).withTemperature(temperature).withMaxToken(maxTokens).build();
             case YI_YAN:
                 return QianFanChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
             case ZHI_PU:

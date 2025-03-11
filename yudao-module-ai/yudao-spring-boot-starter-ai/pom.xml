@@ -49,7 +49,7 @@
             <!-- 通义千问 -->
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-starter</artifactId>
-            <version>1.0.0-M5.1</version>
+            <version>${spring-ai.version}.1</version>
         </dependency>
         <dependency>
             <!-- 文心一言 -->

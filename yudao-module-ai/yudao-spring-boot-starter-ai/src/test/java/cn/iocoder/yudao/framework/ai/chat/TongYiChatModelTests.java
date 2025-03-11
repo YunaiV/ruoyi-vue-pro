@@ -28,6 +28,7 @@ public class TongYiChatModelTests {
                     .withModel("qwen1.5-72b-chat") // 模型
 //                    .withModel("deepseek-r1") // 模型（deepseek-r1）
 //                    .withModel("deepseek-v3") // 模型（deepseek-v3）
+//                    .withModel("deepseek-r1-distill-qwen-1.5b") // 模型（deepseek-r1-distill-qwen-1.5b）
                     .build());
 
     @Test

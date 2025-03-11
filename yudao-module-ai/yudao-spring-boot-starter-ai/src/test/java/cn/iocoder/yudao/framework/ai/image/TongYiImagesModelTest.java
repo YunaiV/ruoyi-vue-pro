@@ -3,7 +3,6 @@ package cn.iocoder.yudao.framework.ai.image;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeImageApi;
 import com.alibaba.cloud.ai.dashscope.image.DashScopeImageModel;
 import com.alibaba.cloud.ai.dashscope.image.DashScopeImageOptions;
-import com.alibaba.dashscope.aigc.imagesynthesis.ImageSynthesis;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.image.ImageOptions;
@@ -25,7 +24,7 @@ public class TongYiImagesModelTest {
     public void imageCallTest() {
         // 准备参数
         ImageOptions options = DashScopeImageOptions.builder()
-                .withModel(ImageSynthesis.Models.WANX_V1)
+                .withModel("wanx-v1")
                 .withHeight(256).withWidth(256)
                 .build();
         ImagePrompt prompt = new ImagePrompt("中国长城!", options);
