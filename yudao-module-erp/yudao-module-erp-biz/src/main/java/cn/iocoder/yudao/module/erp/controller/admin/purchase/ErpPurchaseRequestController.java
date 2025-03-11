@@ -224,9 +224,9 @@ public class ErpPurchaseRequestController {
                         //产品创建者、更新者填充
                         MapUtils.findAndThen(userMap, safeParseLong(item.getCreator()), user -> item.setCreator(user.getNickname()));
                         MapUtils.findAndThen(userMap, safeParseLong(item.getUpdater()), user -> item.setUpdater(user.getNickname()));
-                        //未订购数量 , 存在批准数量
-                        if (item.getApproveCount() != null) {
-                            item.setUnOrderCount(item.getApproveCount() - (item.getInCount() == null ? 0 : item.getInCount()));
+                        //未订购数量==批准-已订购
+                        if (item.getOrderCount() != null && item.getApproveCount() != null) {
+                            item.setUnOrderCount(item.getApproveCount() - item.getOrderCount());
                         }
                     }
                 )

@@ -169,7 +169,6 @@ public class ErpPurchaseOrderController {
 
 
     private List<ErpPurchaseOrderBaseRespVO> bindList(List<ErpPurchaseOrderDO> list) {
-
         // 1.1 订单项
         List<ErpPurchaseOrderItemDO> purchaseOrderItemList = purchaseOrderService.getPurchaseOrderItemListByOrderIds(
             convertSet(list, ErpPurchaseOrderDO::getId));
