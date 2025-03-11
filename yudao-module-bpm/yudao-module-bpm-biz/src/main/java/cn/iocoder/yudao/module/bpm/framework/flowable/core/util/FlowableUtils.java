@@ -194,7 +194,7 @@ public class FlowableUtils {
     @SuppressWarnings("unchecked")
     public static Map<String, List<Long>> getStartUserSelectAssignees(Map<String, Object> processVariables) {
         if (processVariables == null) {
-            return null;
+            return new HashMap<>();
         }
         return (Map<String, List<Long>>) processVariables.get(
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES);
@@ -214,12 +214,12 @@ public class FlowableUtils {
      * 获得流程实例的审批用户选择的下一个节点的审批人 Map
      *
      * @param processVariables 流程变量
-     * @return 审批用户选择的下一个节点的审批人Map Map
+     * @return 审批用户选择的下一个节点的审批人Map
      */
     @SuppressWarnings("unchecked")
     public static Map<String, List<Long>> getApproveUserSelectAssignees(Map<String, Object> processVariables) {
         if (processVariables == null) {
-            return null;
+            return new HashMap<>();
         }
         return (Map<String, List<Long>>) processVariables.get(
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES);
