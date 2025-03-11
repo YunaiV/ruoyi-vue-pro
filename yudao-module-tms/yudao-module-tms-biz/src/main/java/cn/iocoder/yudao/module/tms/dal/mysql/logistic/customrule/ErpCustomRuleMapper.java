@@ -39,6 +39,9 @@ public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
             .leftJoin(ErpProductDO.class, ErpProductDO::getId, ErpCustomRuleDO::getProductId)  // 左连接产品表
             .likeIfExists(ErpProductDO::getBarCode, reqVO.getBarCode()) // 产品SKU编码
             ;
+        //原始：规则->产品->分类<-分类子表(国别=规则国别)
+        //TODO 规则-{限定产品ids筛选通过api拿} 得到DO
+        //TODO 规则{限定产品ids筛选通过api拿}->分类子表(国别=规则国别)->分类。  得到BO
     }
 
     //海关分类
