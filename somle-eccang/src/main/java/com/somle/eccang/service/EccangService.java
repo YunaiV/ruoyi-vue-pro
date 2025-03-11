@@ -116,7 +116,10 @@ public class EccangService {
             // 获取当前重试次数
             int retryCount = ctx.getRetryCount();
             // 记录每次重试的日志
-            log.debug("正在请求url= {},第 {} 次重试。endpoint = {}", request.getUrl(), retryCount + 1, endpoint);
+            if (ctx.getRetryCount() != 0) {
+                log.debug("正在请求url= {},第 {} 次重试。endpoint = {}", request.getUrl(), retryCount, endpoint);
+                log.debug("重试原因：{}", ctx.getLastThrowable().toString());
+            }
             try (var response = WebUtils.sendRequest(request)) {
                 switch (response.code()) {
                     case 200:
@@ -174,13 +177,17 @@ public class EccangService {
     private Stream<EccangPage> getAllPage(JSONObject payload, String endpoint) {
         payload.put("page", 1);
         payload.put("page_size", pageSize);
-        return PageUtils.getAllPages(
-            getPage(payload, endpoint),
-            Objects::nonNull,
+        return Stream.iterate(
+            getPage(payload, endpoint), Objects::nonNull,
             bizContent -> {
-                log.debug("have next,endpoint:{}当前进度：{}/{}", endpoint, (bizContent.getPage() - 1) * pageSize + bizContent.getData().size(), bizContent.getTotal());
-                payload.put("page", bizContent.getPage() + 1);
-                return getPage(payload, endpoint);
+                if (bizContent.hasNext()) {
+                    log.debug("have next,endpoint:{}当前进度：{}/{}", endpoint, (bizContent.getPage() - 1) * pageSize + bizContent.getData().size(), bizContent.getTotal());
+                    payload.put("page", bizContent.getPage() + 1);
+                    return getPage(payload, endpoint);
+                } else {
+                    log.debug("no next page");
+                    return null;
+                }
             }
         );
     }
