@@ -112,9 +112,9 @@ public interface ErpPurchaseOrderService {
     /**
      * 提交审核采购订单
      *
-     * @param itemIds 采购订单项
+     * @param orderIds 订单ids
      */
-    void submitAudit(@NotNull Collection<Long> itemIds);
+    void submitAudit(@NotNull Collection<Long> orderIds);
 
     /**
      * 审核/反审核采购订单

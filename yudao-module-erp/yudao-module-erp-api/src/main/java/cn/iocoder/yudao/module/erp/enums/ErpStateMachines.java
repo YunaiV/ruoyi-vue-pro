@@ -12,7 +12,7 @@ public interface ErpStateMachines {
     //采购申请子项开关状态机
     String PURCHASE_REQUEST_ITEM_OFF_STATE_MACHINE_NAME = "purchaseRequestItemOffStateMachine";
     //采购子项采购状态机
-    String PURCHASE_REQUEST_ITEM_STATE_MACHINE_NAME = "purchaseRequestItemStateMachine";
+    String PURCHASE_REQUEST_ITEM_ORDER_STATE_MACHINE_NAME = "purchaseRequestItemStateMachine";
 
     // ========== ERP 采购订单 ==========
     //订单开关状态机

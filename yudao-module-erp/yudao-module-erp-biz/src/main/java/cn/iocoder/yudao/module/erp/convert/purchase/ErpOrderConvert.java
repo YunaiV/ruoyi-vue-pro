@@ -26,15 +26,14 @@ public interface ErpOrderConvert {
         item.setWarehouseId(itemDO.getWarehouseId());
         // 设置审批数量
 //        item.setApproveCount(itemDO.getApproveCount());
-        // 设置实际含税单价
-        item.setActTaxPrice(itemDO.getActTaxPrice());
         // 设置税率
         item.setTaxPercent(itemDO.getTaxPercent());
-        item.setActTaxPrice(itemDO.getActTaxPrice());
         //采购订单的申请数量
         //产品项
         item.setPurchaseApplyItemId(itemDO.getId());
+        //含税单价
         item.setProductPrice(itemDOMap.get(itemDO.getId()).getActTaxPrice());
+        //税率
         item.setTaxPercent(itemDOMap.get(itemDO.getId()).getTaxPercent());
         // 设置下单数量(采购)
         item.setCount(requestItemsMap.get(itemDO.getId()).getOrderQuantity());

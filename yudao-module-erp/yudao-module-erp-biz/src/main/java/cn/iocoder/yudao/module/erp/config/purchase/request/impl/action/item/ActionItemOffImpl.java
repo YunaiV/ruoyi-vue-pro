@@ -49,7 +49,7 @@ public class ActionItemOffImpl implements Action<ErpOffStatus, ErpEventEnum, Erp
         // 更新 Item 状态
         itemsDO.setOffStatus(to.getCode());
         ThrowUtil.ifSqlThrow(mapper.updateById(itemsDO), DB_UPDATE_ERROR);
-        log.info("更新采购项状态：ID={}，状态={} -> {}", itemsDO.getId(), from, to);
+//        log.info("更新采购项状态：ID={}，状态={} -> {}", itemsDO.getId(), from, to);
 
         // 查询同一个采购请求的所有子项
         List<ErpPurchaseRequestItemsDO> itemList = mapper.selectListByRequestId(itemsDO.getRequestId());

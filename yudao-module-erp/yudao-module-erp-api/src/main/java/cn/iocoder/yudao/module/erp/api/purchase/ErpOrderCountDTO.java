@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.erp.api.purchase;
 
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -7,11 +8,11 @@ import lombok.Data;
  * 增加减少库存数量、xx数量
  */
 @Data
+@Builder
 public class ErpOrderCountDTO {
     //申请单订单项ID
     private Long purchaseOrderItemId;
     //订购数量
-    private Integer orderCount;
-    //布尔 增加、减少
-//    private Boolean orderCountIsAdd;
+    private Integer quantity;
+
 }

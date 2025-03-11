@@ -151,7 +151,7 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
         @Schema(description = "源单单号")
         private int srcNo;
         @Schema(description = "x码")
-        private String xCode;
+        private String xcode;
         @Schema(description = "箱率")
         private String containerRate;//箱率
         @Schema(description = "型号规格型号")
@@ -194,5 +194,8 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
 
         @Schema(description = "币别id(财务管理-币别维护)")
         private Long currencyId;
+
+        @Schema(description = "交货日期")
+        private LocalDateTime deliveryTime;
     }
 }

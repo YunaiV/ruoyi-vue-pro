@@ -18,7 +18,6 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
-import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestItemsMapper;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseRequestService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
@@ -65,7 +64,6 @@ public class ErpPurchaseRequestController {
     private final AdminUserApi adminUserApi;
     private final DeptApi deptApi;
     private final ErpSupplierService erpSupplierService;
-    private final ErpPurchaseRequestItemsMapper erpPurchaseRequestItemsMapper;
 
     @PostMapping("/create")
     @Operation(summary = "创建ERP采购申请单")

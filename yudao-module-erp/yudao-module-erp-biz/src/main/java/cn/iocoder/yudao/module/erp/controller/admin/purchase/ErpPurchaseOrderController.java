@@ -157,21 +157,13 @@ public class ErpPurchaseOrderController {
         return success(true);
     }
 
-    //    @PostMapping("/merge")
-//    @Operation(summary = "合并入库")
-//    @PreAuthorize("@ss.hasPermission('erp:purchase-order:merge')")
-//    public CommonResult<Long> mergePurchaseOrder(@Validated @RequestBody ErpPurchaseRequestOrderReqVO reqVO) {
-//        Long orderId = purchaseOrderService.merge(reqVO);
-//        return success(orderId);
-//    }
-//
     @PutMapping("/enableStatus")
     @Operation(summary = "关闭/启用")
     @PreAuthorize("@ss.hasPermission('erp:purchasereq-order:enable')")
     public CommonResult<Boolean> switchPurchaseOrderStatus(@Validated(validation.OnSwitch.class) @RequestBody ErpPurchaseOrderAuditReqVO reqVO) {
         //获得reqVO的item的ids
         List<Long> itemIds = reqVO.getItems().stream().map(ErpPurchaseOrderAuditReqVO.requestItems::getId).collect(Collectors.toSet()).stream().toList();
-        purchaseOrderService.switchPurchaseOrderStatus(itemIds, reqVO.getOpen());
+        purchaseOrderService.switchPurchaseOrderStatus(itemIds, reqVO.getEnable());
         return success(true);
     }
 

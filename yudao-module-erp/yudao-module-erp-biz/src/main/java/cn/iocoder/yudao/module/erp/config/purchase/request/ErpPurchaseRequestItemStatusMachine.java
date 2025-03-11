@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.erp.config.purchase.request;
 
+import cn.iocoder.yudao.module.erp.api.purchase.ErpOrderCountDTO;
 import cn.iocoder.yudao.module.erp.config.BaseFailCallbackImpl;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
@@ -22,7 +23,7 @@ public class ErpPurchaseRequestItemStatusMachine {
     @Resource
     private Action<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> actionItemOffImpl;
     @Resource
-    private Action<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> actionItemOrderImpl;
+    private Action<ErpOrderStatus, ErpEventEnum, ErpOrderCountDTO> actionItemOrderImpl;
     @Resource
     private BaseFailCallbackImpl baseFailCallbackImpl;
 
@@ -58,9 +59,9 @@ public class ErpPurchaseRequestItemStatusMachine {
     }
 
     //    子项采购状态
-    @Bean(ErpStateMachines.PURCHASE_REQUEST_ITEM_STATE_MACHINE_NAME)
-    public StateMachine<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> getPurchaseOrderStateMachine() {
-        StateMachineBuilder<ErpOrderStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> builder = StateMachineBuilderFactory.create();
+    @Bean(ErpStateMachines.PURCHASE_REQUEST_ITEM_ORDER_STATE_MACHINE_NAME)
+    public StateMachine<ErpOrderStatus, ErpEventEnum, ErpOrderCountDTO> getPurchaseOrderStateMachine() {
+        StateMachineBuilder<ErpOrderStatus, ErpEventEnum, ErpOrderCountDTO> builder = StateMachineBuilderFactory.create();
         //初始化事件
         builder.internalTransition()
             .within(ErpOrderStatus.OT_ORDERED)
@@ -99,7 +100,7 @@ public class ErpPurchaseRequestItemStatusMachine {
             .perform(actionItemOrderImpl);
 
         builder.setFailCallback(baseFailCallbackImpl);
-        return builder.build(ErpStateMachines.PURCHASE_REQUEST_ITEM_STATE_MACHINE_NAME);
+        return builder.build(ErpStateMachines.PURCHASE_REQUEST_ITEM_ORDER_STATE_MACHINE_NAME);
     }
 
 

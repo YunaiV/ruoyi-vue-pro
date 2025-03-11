@@ -39,7 +39,7 @@ public class ErpPurchaseOrderAuditReqVO {
     //开关
     @Schema(description = "启用/关闭")
     @NotNull(groups = validation.OnSwitch.class, message = "开关不能为空")
-    private Boolean open;
+    private Boolean enable;
 
     @Data
     public static class requestItems {

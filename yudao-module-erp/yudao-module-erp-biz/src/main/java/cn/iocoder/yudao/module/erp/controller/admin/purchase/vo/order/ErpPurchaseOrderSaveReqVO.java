@@ -71,7 +71,7 @@ public class ErpPurchaseOrderSaveReqVO {
 
         @Schema(description = "订单项编号")
         @Null(groups = validation.OnCreate.class, message = "创建时，订单项id必须为空")
-        @NotNull(groups = validation.OnUpdate.class, message = "更新时，订单项id不能为空")
+//        @NotNull(groups = validation.OnUpdate.class, message = "更新时，订单项id不能为空")
         private Long id;
 
         @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -125,7 +125,7 @@ public class ErpPurchaseOrderSaveReqVO {
         private LocalDateTime deliveryTime;
         // ========== 其他 ==========
         @Schema(description = "x码")
-        private String xCode;
+        private String xcode;
 
         @Schema(description = "箱率")
         private String containerRate;

@@ -35,8 +35,10 @@ public class ActionOrderAuditImpl implements Action<ErpAuditStatus, ErpEventEnum
             ErpPurchaseOrderDO orderDO = mapper.selectById(id);
             orderDO.setAuditStatus(to.getCode());
             //审核人+时间+意见
-            orderDO.setAuditTime(LocalDateTime.now());
-            orderDO.setAuditorId(getLoginUserId());
+            if (event == ErpEventEnum.AGREE || event == ErpEventEnum.REJECT) {
+                orderDO.setAuditTime(LocalDateTime.now());
+                orderDO.setAuditorId(getLoginUserId());
+            }
 //            orderDO.setReviewComment(reqVO.getReviewComment()); DB添加字段
             ThrowUtil.ifSqlThrow(mapper.updateById(orderDO), DB_UPDATE_ERROR);
             log.info("审核状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(reqVO), from.getDesc(), to.getDesc());

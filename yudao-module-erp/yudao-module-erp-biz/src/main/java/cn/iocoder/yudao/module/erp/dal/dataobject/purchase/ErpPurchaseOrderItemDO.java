@@ -149,6 +149,17 @@ public class ErpPurchaseOrderItemDO extends TenantBaseDO {
      * {@link ErpPurchaseRequestItemsDO#getId()}
      */
     private Long purchaseApplyItemId;
-    private String xCode;//x码
+
+    /**
+     * 采购申请单No
+     */
+    private String erpPurchaseRequestItemNo;
+
+    private String xcode;//x码
     private String containerRate;//箱率
+    /**
+     * 币别id(财务管理-币别维护)
+     */
+    private Long currencyId;
+
 }

@@ -24,14 +24,14 @@ public enum ErpEventEnum {
     ORDER_CANCEL("放弃采购"),
 
 
-    // 采购事件
-    START_PURCHASE("采购初始化"),
-    PURCHASE_ADJUSTMENT("采购单修改"),
-    PURCHASE_COMPLETE("采购完成"),
-    ACCEPTANCE_PASS("验收通过"),
-    ACCEPTANCE_FAIL("验收不通过"),
-    PURCHASE_FAILED("采购失败"),
-    PURCHASE_CANCELLED("取消采购订单"),
+//    // 采购事件
+//    START_PURCHASE("采购初始化"),
+//    PURCHASE_ADJUSTMENT("采购单修改"),
+//    PURCHASE_COMPLETE("采购完成"),
+//    ACCEPTANCE_PASS("验收通过"),
+//    ACCEPTANCE_FAIL("验收不通过"),
+//    PURCHASE_FAILED("采购失败"),
+//    PURCHASE_CANCELLED("取消采购订单"),
 
     // 执行事件
     /**
