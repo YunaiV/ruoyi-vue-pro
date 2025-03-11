@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @Builder
-@TableName("erp_product")
+@TableName("erp_product") //连表查询海关规则ErpCustomRuleMapper.java中需要对应上erp的产品表
 public class ErpProductDTO {
     /**
      * 产品编号
