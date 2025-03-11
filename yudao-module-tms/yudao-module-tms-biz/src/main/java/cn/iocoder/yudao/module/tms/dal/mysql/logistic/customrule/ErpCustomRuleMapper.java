@@ -4,11 +4,11 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.customrule.vo.ErpCustomRulePageReqVO;
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.ErpCustomCategoryDO;
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.item.ErpCustomCategoryItemDO;
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.customrule.ErpCustomRuleDO;
-import cn.iocoder.yudao.module.tms.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.tms.service.logistic.customrule.bo.ErpCustomRuleBO;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import jakarta.validation.constraints.NotNull;
@@ -36,15 +36,15 @@ public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
             .betweenIfPresent(ErpCustomRuleDO::getCreateTime, reqVO.getCreateTime())  // 创建时间范围
             .betweenIfPresent(ErpCustomRuleDO::getUpdateTime, reqVO.getUpdateTime())  // 更新时间范围
             .orderByAsc(ErpCustomRuleDO::getId)  // 按id降序排序
-            .leftJoin(ErpProductDO.class, ErpProductDO::getId, ErpCustomRuleDO::getProductId)  // 左连接产品表
-            .likeIfExists(ErpProductDO::getBarCode, reqVO.getBarCode()) // 产品SKU编码
+            .leftJoin(ErpProductDTO.class, ErpProductDTO::getId, ErpCustomRuleDO::getProductId)  // 左连接产品表
+            .likeIfExists(ErpProductDTO::getBarCode, reqVO.getBarCode()) // 产品SKU编码
             ;
     }
 
     //海关分类
     private MPJLambdaWrapper<ErpCustomRuleDO> getBOWrapper(@NotNull ErpCustomRulePageReqVO reqVO) {
         return bindQueryWrapper(reqVO)
-            .leftJoin(ErpCustomCategoryDO.class, ErpCustomCategoryDO::getId, ErpProductDO::getCustomCategoryId)
+            .leftJoin(ErpCustomCategoryDO.class, ErpCustomCategoryDO::getId, ErpProductDTO::getCustomCategoryId)
             .likeIfExists(ErpCustomCategoryDO::getDeclaredType, reqVO.getDeclaredType())  // 申报品名
             .likeIfExists(ErpCustomCategoryDO::getDeclaredTypeEn, reqVO.getDeclaredTypeEn())  // 申报品名en
             .selectAsClass(ErpCustomCategoryDO.class, ErpCustomRuleBO.class)
