@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.ErpSupplierProdu
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.ErpSupplierProductSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierProductDO;
+import cn.iocoder.yudao.module.erp.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpSupplierProductMapper;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import jakarta.annotation.Resource;
@@ -42,7 +43,7 @@ public class ErpSupplierProductServiceImpl implements ErpSupplierProductService 
     private final ErpSupplierProductMapper supplierProductMapper;
     private final ErpProductService productService;
     private final ErpSupplierService supplierService;
-//    private final ErpCustomRuleMapper customRuleMapper;
+    private final ErpCustomRuleMapper customRuleMapper;
 
     @Override
     public Long createSupplierProduct(ErpSupplierProductSaveReqVO createReqVO) {

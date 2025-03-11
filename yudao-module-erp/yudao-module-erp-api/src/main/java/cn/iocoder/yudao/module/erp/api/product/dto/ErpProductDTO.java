@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.erp.api.product.dto;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,7 +13,6 @@ import java.time.LocalDateTime;
  */
 @Data
 @Builder
-@TableName("erp_product")
 public class ErpProductDTO {
     /**
      * 产品编号

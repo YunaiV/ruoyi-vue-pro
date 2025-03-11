@@ -28,12 +28,6 @@
             <artifactId>spring-boot-starter-validation</artifactId>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-annotation</artifactId>
-            <version>3.5.9</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 
 </project>
