@@ -74,10 +74,6 @@ public interface BpmProcessDefinitionConvert {
         if (deployment != null) {
             respVO.setDeploymentTime(LocalDateTimeUtil.of(deployment.getDeploymentTime()));
         }
-        // 图标为null时，处理成空字符串，否则copyTo的to.setIcon( from.getIcon() );会报错
-        if (respVO.getIcon() == null) {
-            respVO.setIcon("");
-        }
         // BpmProcessDefinitionInfoDO
         if (processDefinitionInfo != null) {
             copyTo(processDefinitionInfo, respVO);
