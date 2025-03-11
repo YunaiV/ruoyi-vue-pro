@@ -20,7 +20,10 @@ public class BpmProcessDefinitionRespVO extends BpmModelMetaInfoVO {
     @Schema(description = "流程名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
     private String name;
 
-    @Schema(description = "流程标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "easy-build")
+    @Schema(description = "表单名字", example = "请假表单")
+    private String formName;
+
+    @Schema(description = "流程标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "youdao")
     private String key;
 
     @Schema(description = "流程分类", example = "1")
@@ -30,6 +33,9 @@ public class BpmProcessDefinitionRespVO extends BpmModelMetaInfoVO {
 
     @Schema(description = "流程模型的类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private Integer modelType; // 参见 BpmModelTypeEnum 枚举类
+
+    @Schema(description = "流程模型的编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "ABC")
+    private String modelId;
 
     @Schema(description = "中断状态-参见 SuspensionState 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer suspensionState; // 参见 SuspensionState 枚举

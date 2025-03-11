@@ -44,8 +44,7 @@ public class BpmModelMetaInfoVO {
     private Integer formType;
     @Schema(description = "表单编号", example = "1024")
     private Long formId; // formType 为 NORMAL 使用，必须非空
-    @Schema(description = "表单名字", example = "请假表单")
-    private String formName;
+
     @Schema(description = "表单的配置-JSON 字符串。在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空", requiredMode = Schema.RequiredMode.REQUIRED)
     private String formConf;
     @Schema(description = "表单项的数组-JSON 字符串的数组。在表单类型为 {@link BpmModelFormTypeEnum#CUSTOM} 时，必须非空", requiredMode = Schema.RequiredMode.REQUIRED)
