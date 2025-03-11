@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order;
 
 import cn.iocoder.yudao.module.erp.controller.admin.tools.validation;
+import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -77,6 +78,10 @@ public class ErpPurchaseOrderSaveReqVO {
     @Schema(description = "完工单json")
     private String completionJson;
 
+
+    @Schema(description = "部门 id")
+    private Long deptId;
+
     @Data
     public static class Item {
 
@@ -88,10 +93,19 @@ public class ErpPurchaseOrderSaveReqVO {
         @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "产品编号不能为空")
         private Long productId;
+        //产品名称
+        @Schema(description = "产品名称")
+        private String productName;
 
         @Schema(description = "产品单价")
         @DecimalMin(value = "0.00", message = "产品单价不能小于0")
         private BigDecimal productPrice;
+        /**
+         * 产品单位
+         * <p>
+         * 冗余 {@link ErpProductDO#getUnitId()}
+         */
+        private Long productUnitId;
 
         @Schema(description = "增值税税率，百分比")
         private BigDecimal taxPercent;
@@ -106,10 +120,13 @@ public class ErpPurchaseOrderSaveReqVO {
         @DecimalMin(value = "0.00", message = "含税单价不能小于0")
         private BigDecimal actTaxPrice;
 
-//        @Schema(description = "申请数量", requiredMode = Schema.RequiredMode.REQUIRED)
-//        @NotNull(message = "applyCount下单数量不能为空")
-//        @Min(value = 0, message = "产品数量必须大于0")
-//        private Integer applyCount;
+        @Schema(description = "价税合计")
+        @DecimalMin(value = "0.0", message = "价税合计必须大于0")
+        private BigDecimal allAmount;
+
+        //应付款余额
+        @Schema(description = "应付款余额(查询+修改)")
+        private BigDecimal payableBalance;
 
         @Schema(description = "下单数量")//审核人填写
         @NotNull(message = "count下单数量不能为空")
@@ -120,11 +137,11 @@ public class ErpPurchaseOrderSaveReqVO {
         private String remark;
 
         // ========== 采购入库 ==========
-        /**
-         * 采购入库数量
-         */
-        @DecimalMin(value = "0.00", message = "采购入库数量不能小于0")
-        private BigDecimal inCount;
+//        /**
+//         * 采购入库数量
+//         */
+//        @DecimalMin(value = "0.00", message = "采购入库数量不能小于0")
+//        private BigDecimal inCount;
 
         @Schema(description = "优惠率，百分比", requiredMode = Schema.RequiredMode.REQUIRED)
         private BigDecimal discountPercent;

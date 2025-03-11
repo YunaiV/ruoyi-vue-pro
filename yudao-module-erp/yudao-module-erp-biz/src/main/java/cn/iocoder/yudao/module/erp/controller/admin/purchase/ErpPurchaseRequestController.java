@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
@@ -224,10 +225,9 @@ public class ErpPurchaseRequestController {
                         //产品创建者、更新者填充
                         MapUtils.findAndThen(userMap, safeParseLong(item.getCreator()), user -> item.setCreator(user.getNickname()));
                         MapUtils.findAndThen(userMap, safeParseLong(item.getUpdater()), user -> item.setUpdater(user.getNickname()));
-                        //未订购数量==批准-已订购
-                        if (item.getOrderCount() != null && item.getApproveCount() != null) {
-                            item.setUnOrderCount(item.getApproveCount() - item.getOrderCount());
-                        }
+                        item.setOrderCount(ObjectUtils.defaultIfNull(item.getOrderCount(), 0));//已订购数量
+                        item.setInCount(ObjectUtils.defaultIfNull(item.getInCount(), 0));//入库
+                        item.setUnOrderCount(ObjectUtils.defaultIfNull(item.getApproveCount() - item.getOrderCount(), 0));//未订购
                     }
                 )
             );

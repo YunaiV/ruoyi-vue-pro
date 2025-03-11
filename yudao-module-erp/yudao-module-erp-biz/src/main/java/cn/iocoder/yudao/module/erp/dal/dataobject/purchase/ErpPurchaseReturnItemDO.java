@@ -92,4 +92,5 @@ public class ErpPurchaseReturnItemDO extends BaseDO {
      */
     private String remark;
 
+    //actTaxPrice 含税单价
 }

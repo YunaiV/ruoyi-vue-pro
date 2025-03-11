@@ -71,6 +71,10 @@ public class ErpPurchaseOrderItemDO extends TenantBaseDO {
      */
     private BigDecimal productPrice;
     /**
+     * 产品名称
+     */
+    private String productName;
+    /**
      * 下单数量
      */
     private BigDecimal count;
@@ -88,6 +92,10 @@ public class ErpPurchaseOrderItemDO extends TenantBaseDO {
      * taxPrice = totalPrice * taxPercent
      */
     private BigDecimal taxPrice;
+    /**
+     * 含税单价
+     */
+    private BigDecimal actTaxPrice;
     // ========== 采购金额和数量 ==========
     /**
      * 合计产品价格，单位：元

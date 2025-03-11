@@ -123,5 +123,11 @@ public interface ErpPurchaseOrderService {
      */
     void reviewPurchaseOrder(ErpPurchaseOrderAuditReqVO req);
 
+    /**
+     * 开关
+     *
+     * @param itemIds 采购订单项编号数组
+     * @param open    是否开启/关闭
+     */
     void switchPurchaseOrderStatus(Collection<Long> itemIds, Boolean open);
 }

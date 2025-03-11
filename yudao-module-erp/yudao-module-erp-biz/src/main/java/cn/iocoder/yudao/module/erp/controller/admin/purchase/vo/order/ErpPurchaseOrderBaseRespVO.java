@@ -167,6 +167,9 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
         private BigDecimal count;
         @Schema(description = "产品单价")
         private BigDecimal productPrice;
+        @Schema(description = "含税单价", example = "120.00")
+        private BigDecimal actTaxPrice;
+
         @Schema(description = "税率，百分比")
         private BigDecimal taxPercent;
         @Schema(description = "税额，单位：元")
@@ -178,6 +181,9 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
         @Schema(description = "供应商付款条款")
         private String supplierRule;
         // ========== 采购入库 ==========
+        //待入库数量
+        @Schema(description = "待入库数量")
+        private BigDecimal waitInCount;
         @Schema(description = "采购入库数量")
         private BigDecimal inCount;
         // ========== 采购退货（出库）） ==========
@@ -190,12 +196,12 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
         private String warehouseName; // 该字段仅仅在“详情”和“编辑”时使用
         @Schema(description = "报关品名-产品(产品的品牌)")
         private String customsDeclaration;
-        @Schema(description = "源单行号")
-        private int srcSeq;
-        //        private String srcBillTypeId;// 源单类型ID
-        @Schema(description = "源单类型")
-        private String srcBillTypeName;
-        @Schema(description = "源单单号")
+        //        @Schema(description = "源单行号")
+//        private int srcSeq;
+//        //        private String srcBillTypeId;// 源单类型ID
+//        @Schema(description = "源单类型")
+//        private String srcBillTypeName;
+        @Schema(description = "源单单号(采购单No)")
         private int srcNo;
         @Schema(description = "x码")
         private String xcode;

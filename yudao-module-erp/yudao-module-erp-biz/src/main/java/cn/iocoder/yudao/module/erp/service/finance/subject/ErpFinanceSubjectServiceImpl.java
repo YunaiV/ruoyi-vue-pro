@@ -41,7 +41,7 @@ public class ErpFinanceSubjectServiceImpl implements ErpFinanceSubjectService {
     }
 
     @Override
-    @CacheEvict(value = "erp:finance-subject-list", allEntries = true)
+    @CacheEvict(value = "erp:ErpFinanceSubjectService:ListFinanceSubjectSimple", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void updateFinanceSubject(ErpFinanceSubjectSaveReqVO updateReqVO) {
         // 校验存在
@@ -52,7 +52,7 @@ public class ErpFinanceSubjectServiceImpl implements ErpFinanceSubjectService {
     }
 
     @Override
-    @CacheEvict(value = {"erp:finance-subject-list"}, allEntries = true)
+    @CacheEvict(value = {"erp:ErpFinanceSubjectService:ListFinanceSubjectSimple"}, allEntries = true)
     public void deleteFinanceSubject(Long id) {
         // 校验存在
         validateFinanceSubjectExists(id);
@@ -77,7 +77,7 @@ public class ErpFinanceSubjectServiceImpl implements ErpFinanceSubjectService {
     }
 
     @Override
-    @Cacheable(value = "erp:finance-subject-list", key = "'simple-list'", unless = "#result == null")
+    @Cacheable(value = "erp:ErpFinanceSubjectService:ListFinanceSubjectSimple", key = "'simple-list'", unless = "#result == null")
     public List<ErpFinanceSubjectSimpleRespVO> ListFinanceSubjectSimple() {
         List<ErpFinanceSubjectDO> subjectDOS = financeSubjectMapper.selectListSimple();
         return BeanUtils.toBean(subjectDOS, ErpFinanceSubjectSimpleRespVO.class);

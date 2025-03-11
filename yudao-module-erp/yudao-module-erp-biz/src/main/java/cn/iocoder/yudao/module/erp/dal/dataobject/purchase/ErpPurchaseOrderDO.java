@@ -165,7 +165,6 @@ public class ErpPurchaseOrderDO extends TenantBaseDO {
      * {@link ErpAuditStatus}
      */
     private Integer orderStatus;
-    //执行状态 Integer
     /**
      * 执行状态
      * {@link }
@@ -179,6 +178,10 @@ public class ErpPurchaseOrderDO extends TenantBaseDO {
 //    private Integer auditStatus;
     //审核意见
     private String reviewComment;
+    /**
+     * 部门id
+     */
+    private Long deptId;
 
     /**
      * 验货单

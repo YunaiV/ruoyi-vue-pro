@@ -113,7 +113,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
 
     private void initSlaveStatus(List<ErpPurchaseRequestItemsDO> itemsDOS) {
         itemsDOS.forEach(i -> {
-            orderItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_INIT, ErpOrderCountDTO.builder().build());
+            orderItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_INIT, ErpOrderCountDTO.builder().purchaseOrderItemId(i.getId()).build());
                 offItemMachine.fireEvent(ErpOffStatus.OPEN, ErpEventEnum.OFF_INIT, i);
             }
         );
