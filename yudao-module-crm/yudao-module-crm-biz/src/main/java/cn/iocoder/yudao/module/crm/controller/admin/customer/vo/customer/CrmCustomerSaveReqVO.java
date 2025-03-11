@@ -47,12 +47,10 @@ public class CrmCustomerSaveReqVO {
 
     @Schema(description = "手机", example = "18000000000")
     @DiffLogField(name = "手机")
-    @Mobile
     private String mobile;
 
     @Schema(description = "电话", example = "18000000000")
     @DiffLogField(name = "电话")
-    @Telephone
     private String telephone;
 
     @Schema(description = "QQ", example = "123456789")

@@ -2,6 +2,7 @@ package com.somle.esb.job;
 
 
 import com.somle.eccang.service.EccangService;
+import com.somle.eccang.service.EccangWMSService;
 import com.somle.esb.model.Domain;
 import com.somle.esb.service.EsbService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ public class EccangDataJob extends DataJob{
 
     @Autowired
     EccangService eccangService;
+
+    @Autowired
+    EccangWMSService eccangWMSService;
 
     final String DATABASE = Domain.ECCANG.toString();
 
