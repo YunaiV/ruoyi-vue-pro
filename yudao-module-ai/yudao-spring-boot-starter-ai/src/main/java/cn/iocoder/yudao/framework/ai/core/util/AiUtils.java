@@ -6,6 +6,8 @@ import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import org.springframework.ai.azure.openai.AzureOpenAiChatOptions;
 import org.springframework.ai.chat.messages.*;
 import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.minimax.MiniMaxChatOptions;
+import org.springframework.ai.moonshot.MoonshotChatOptions;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.qianfan.QianFanChatOptions;
@@ -27,6 +29,10 @@ public class AiUtils {
                 return QianFanChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
             case ZHI_PU:
                 return ZhiPuAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
+            case MINI_MAX:
+                return MiniMaxChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
+            case MOONSHOT:
+                return MoonshotChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
             case OPENAI:
             case DEEP_SEEK: // 复用 OpenAI 客户端
             case DOU_BAO: // 复用 OpenAI 客户端

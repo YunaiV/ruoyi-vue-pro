@@ -36,6 +36,8 @@ import org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiAutoConfigur
 import org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiChatProperties;
 import org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiConnectionProperties;
 import org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiEmbeddingProperties;
+import org.springframework.ai.autoconfigure.minimax.MiniMaxAutoConfiguration;
+import org.springframework.ai.autoconfigure.moonshot.MoonshotAutoConfiguration;
 import org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration;
 import org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration;
 import org.springframework.ai.autoconfigure.qianfan.QianFanAutoConfiguration;
@@ -48,7 +50,6 @@ import org.springframework.ai.autoconfigure.vectorstore.qdrant.QdrantVectorStore
 import org.springframework.ai.autoconfigure.vectorstore.redis.RedisVectorStoreAutoConfiguration;
 import org.springframework.ai.autoconfigure.vectorstore.redis.RedisVectorStoreProperties;
 import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiAutoConfiguration;
-import org.springframework.ai.autoconfigure.zhipuai.ZhiPuAiConnectionProperties;
 import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
 import org.springframework.ai.azure.openai.AzureOpenAiEmbeddingModel;
 import org.springframework.ai.chat.model.ChatModel;
@@ -56,6 +57,12 @@ import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
+import org.springframework.ai.minimax.MiniMaxChatModel;
+import org.springframework.ai.minimax.MiniMaxEmbeddingModel;
+import org.springframework.ai.minimax.MiniMaxEmbeddingOptions;
+import org.springframework.ai.minimax.api.MiniMaxApi;
+import org.springframework.ai.moonshot.MoonshotChatModel;
+import org.springframework.ai.moonshot.api.MoonshotApi;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.ollama.api.OllamaApi;
@@ -130,6 +137,10 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildSiliconFlowChatModel(apiKey);
                 case ZHI_PU:
                     return buildZhiPuChatModel(apiKey, url);
+                case MINI_MAX:
+                    return buildMiniMaxChatModel(apiKey, url);
+                case MOONSHOT:
+                    return buildMoonshotChatModel(apiKey, url);
                 case XING_HUO:
                     return buildXingHuoChatModel(apiKey);
                 case OPENAI:
@@ -162,6 +173,10 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(SiliconFlowChatModel.class);
             case ZHI_PU:
                 return SpringUtil.getBean(ZhiPuAiChatModel.class);
+            case MINI_MAX:
+                return SpringUtil.getBean(MiniMaxChatModel.class);
+            case MOONSHOT:
+                return SpringUtil.getBean(MoonshotChatModel.class);
             case XING_HUO:
                 return SpringUtil.getBean(XingHuoChatModel.class);
             case OPENAI:
@@ -242,6 +257,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildYiYanEmbeddingModel(apiKey, model);
                 case ZHI_PU:
                     return buildZhiPuEmbeddingModel(apiKey, url, model);
+                case MINI_MAX:
+                    return buildMiniMaxEmbeddingModel(apiKey, url, model);
                 case OPENAI:
                     return buildOpenAiEmbeddingModel(apiKey, url, model);
                 case AZURE_OPENAI:
@@ -365,8 +382,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link ZhiPuAiAutoConfiguration} 的 zhiPuAiChatModel 方法
      */
     private ZhiPuAiChatModel buildZhiPuChatModel(String apiKey, String url) {
-        url = StrUtil.blankToDefault(url, ZhiPuAiConnectionProperties.DEFAULT_BASE_URL);
-        ZhiPuAiApi zhiPuAiApi = new ZhiPuAiApi(url, apiKey);
+        ZhiPuAiApi zhiPuAiApi = StrUtil.isEmpty(url) ? new ZhiPuAiApi(apiKey)
+                : new ZhiPuAiApi(url, apiKey);
         return new ZhiPuAiChatModel(zhiPuAiApi);
     }
 
@@ -374,9 +391,27 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link ZhiPuAiAutoConfiguration} 的 zhiPuAiImageModel 方法
      */
     private ZhiPuAiImageModel buildZhiPuAiImageModel(String apiKey, String url) {
-        url = StrUtil.blankToDefault(url, ZhiPuAiConnectionProperties.DEFAULT_BASE_URL);
-        ZhiPuAiImageApi zhiPuAiApi = new ZhiPuAiImageApi(url, apiKey, RestClient.builder());
+        ZhiPuAiImageApi zhiPuAiApi = StrUtil.isEmpty(url) ? new ZhiPuAiImageApi(apiKey)
+                : new ZhiPuAiImageApi(url, apiKey, RestClient.builder());
         return new ZhiPuAiImageModel(zhiPuAiApi);
+    }
+
+    /**
+     * 可参考 {@link MiniMaxAutoConfiguration} 的 miniMaxChatModel 方法
+     */
+    private MiniMaxChatModel buildMiniMaxChatModel(String apiKey, String url) {
+        MiniMaxApi miniMaxApi = StrUtil.isEmpty(url) ? new MiniMaxApi(apiKey)
+                : new MiniMaxApi(url, apiKey);
+        return new MiniMaxChatModel(miniMaxApi);
+    }
+
+    /**
+     * 可参考 {@link MoonshotAutoConfiguration} 的 moonshotChatModel 方法
+     */
+    private MoonshotChatModel buildMoonshotChatModel(String apiKey, String url) {
+        MoonshotApi moonshotApi = StrUtil.isEmpty(url)? new MoonshotApi(apiKey)
+                : new MoonshotApi(url, apiKey);
+        return new MoonshotChatModel(moonshotApi);
     }
 
     /**
@@ -454,10 +489,20 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link ZhiPuAiAutoConfiguration} 的 zhiPuAiEmbeddingModel 方法
      */
     private ZhiPuAiEmbeddingModel buildZhiPuEmbeddingModel(String apiKey, String url, String model) {
-        url = StrUtil.blankToDefault(url, ZhiPuAiConnectionProperties.DEFAULT_BASE_URL);
-        ZhiPuAiApi zhiPuAiApi = new ZhiPuAiApi(url, apiKey);
+        ZhiPuAiApi zhiPuAiApi = StrUtil.isEmpty(url) ? new ZhiPuAiApi(apiKey)
+                : new ZhiPuAiApi(url, apiKey);
         ZhiPuAiEmbeddingOptions zhiPuAiEmbeddingOptions = ZhiPuAiEmbeddingOptions.builder().model(model).build();
         return new ZhiPuAiEmbeddingModel(zhiPuAiApi, MetadataMode.EMBED, zhiPuAiEmbeddingOptions);
+    }
+
+    /**
+     * 可参考 {@link MiniMaxAutoConfiguration} 的 miniMaxEmbeddingModel 方法
+     */
+    private EmbeddingModel buildMiniMaxEmbeddingModel(String apiKey, String url, String model) {
+        MiniMaxApi miniMaxApi = StrUtil.isEmpty(url)? new MiniMaxApi(apiKey)
+                : new MiniMaxApi(url, apiKey);
+        MiniMaxEmbeddingOptions miniMaxEmbeddingOptions = MiniMaxEmbeddingOptions.builder().model(model).build();
+        return new MiniMaxEmbeddingModel(miniMaxApi, MetadataMode.EMBED, miniMaxEmbeddingOptions);
     }
 
     /**
