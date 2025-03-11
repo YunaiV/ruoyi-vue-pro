@@ -600,7 +600,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     throw exception(PROCESS_INSTANCE_START_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
                 }
                 processVariables = FlowableUtils.getStartUserSelectAssignees(processInstance.getProcessVariables());
-                if (CollUtil.isNotEmpty(processVariables)) {
+                if (processVariables == null){
+                    processVariables = new HashMap<>();
+                }else {
                     List<Long> startUserSelectAssignee = processVariables.get(nextFlowNode.getId());
                     // 特殊：如果当前节点已经存在审批人，则不允许覆盖
                     if (CollUtil.isNotEmpty(startUserSelectAssignee)) {
@@ -619,7 +621,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     throw exception(PROCESS_INSTANCE_APPROVE_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
                 }
                 processVariables = FlowableUtils.getApproveUserSelectAssignees(processInstance.getProcessVariables());
-                if (CollUtil.isNotEmpty(processVariables)) {
+                if (processVariables == null){
+                    processVariables = new HashMap<>();
+                }else  {
                     List<Long> approveUserSelectAssignee = processVariables.get(nextFlowNode.getId());
                     // 特殊：如果当前节点已经存在审批人，则不允许覆盖
                     if (CollUtil.isNotEmpty(approveUserSelectAssignee)) {
