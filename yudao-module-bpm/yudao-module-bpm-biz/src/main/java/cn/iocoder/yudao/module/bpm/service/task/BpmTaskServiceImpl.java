@@ -610,7 +610,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     }
                 }
                 // 校验通过的全部节点和审批人
-                processVariables.put(nextFlowNode.getId(), nextAssignees.get(nextFlowNode.getId()));
+                processVariables.put(nextFlowNode.getId(), assignees);
                 variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES, processVariables);
             }
             // 2.2 情况二：如果节点中的审批人策略为 审批人，在审批时选择下一个节点的审批人，并且该节点的审批人为空
@@ -631,7 +631,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     }
                 }
                 // 校验通过的全部节点和审批人
-                processVariables.put(nextFlowNode.getId(), nextAssignees.get(nextFlowNode.getId()));
+                processVariables.put(nextFlowNode.getId(), assignees);
                 variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES, processVariables);
             }
         }
