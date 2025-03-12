@@ -5,9 +5,6 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.ErpCustomCategoryPageReqVO;
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.ErpCustomCategoryDO;
-import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.item.ErpCustomCategoryItemDO;
-import cn.iocoder.yudao.module.tms.dal.dataobject.product.ErpProductDO;
-import cn.iocoder.yudao.module.tms.service.logistic.category.bo.ErpCustomCategoryBO;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import jakarta.validation.constraints.NotNull;
 import org.apache.ibatis.annotations.Mapper;
@@ -41,16 +38,16 @@ public interface ErpCustomCategoryMapper extends BaseMapperX<ErpCustomCategoryDO
         return selectJoinList(ErpCustomCategoryDO.class, buildQueryWrapper(reqVO));
     }
 
-    //获得BO List
-    default List<ErpCustomCategoryBO> getErpCustomCategoryBOListByCategoryId(@NotNull Long categoryId) {
-        MPJLambdaWrapper<ErpCustomCategoryDO> wrapper = buildQueryWrapper(new ErpCustomCategoryPageReqVO())
-            .selectAll(ErpCustomCategoryDO.class)
-            .leftJoin(ErpCustomCategoryItemDO.class, ErpCustomCategoryItemDO::getCustomCategoryId, ErpCustomCategoryDO::getId)
-            .selectCollection(ErpCustomCategoryItemDO.class, ErpCustomCategoryBO::getItems)
-            .leftJoin(ErpProductDO.class, ErpProductDO::getCustomCategoryId, ErpCustomCategoryDO::getId)
-            .selectAssociation(ErpProductDO.class, ErpCustomCategoryBO::getProductDO)
-            .eq(ErpCustomCategoryDO::getId, categoryId)
-            ;
-        return selectJoinList(ErpCustomCategoryBO.class, wrapper);
-    }
+//    //获得BO List
+//    default List<ErpCustomCategoryBO> getErpCustomCategoryBOListByCategoryId(@NotNull Long categoryId) {
+//        MPJLambdaWrapper<ErpCustomCategoryDO> wrapper = buildQueryWrapper(new ErpCustomCategoryPageReqVO())
+//            .selectAll(ErpCustomCategoryDO.class)
+//            .leftJoin(ErpCustomCategoryItemDO.class, ErpCustomCategoryItemDO::getCustomCategoryId, ErpCustomCategoryDO::getId)
+//            .selectCollection(ErpCustomCategoryItemDO.class, ErpCustomCategoryBO::getItems)
+//            .leftJoin(ErpProductDO.class, ErpProductDO::getCustomCategoryId, ErpCustomCategoryDO::getId)
+//            .selectAssociation(ErpProductDO.class, ErpCustomCategoryBO::getProductDO)
+//            .eq(ErpCustomCategoryDO::getId, categoryId)
+//            ;
+//        return selectJoinList(ErpCustomCategoryBO.class, wrapper);
+//    }
 }

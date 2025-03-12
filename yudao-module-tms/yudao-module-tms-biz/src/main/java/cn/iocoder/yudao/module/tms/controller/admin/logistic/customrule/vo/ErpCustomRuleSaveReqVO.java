@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.tms.controller.admin.logistic.customrule.vo;
 
-import cn.iocoder.yudao.module.tms.controller.admin.tool.Validation;
+import cn.iocoder.yudao.module.system.api.utils.Validation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Data;

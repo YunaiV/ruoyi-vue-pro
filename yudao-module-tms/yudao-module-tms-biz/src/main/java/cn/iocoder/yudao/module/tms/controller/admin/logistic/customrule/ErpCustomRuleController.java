@@ -9,15 +9,15 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
+import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.system.api.utils.Validation;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.customrule.vo.ErpCustomRulePageReqVO;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.customrule.vo.ErpCustomRuleRespVO;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.customrule.vo.ErpCustomRuleSaveReqVO;
-import cn.iocoder.yudao.module.tms.controller.admin.product.vo.product.ErpProductRespVO;
-import cn.iocoder.yudao.module.tms.controller.admin.tool.Validation;
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.customrule.ErpCustomRuleDO;
 import cn.iocoder.yudao.module.tms.service.logistic.customrule.ErpCustomRuleService;
 import cn.iocoder.yudao.module.tms.service.logistic.customrule.bo.ErpCustomRuleBO;
-import cn.iocoder.yudao.module.tms.service.product.ErpProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,7 +47,7 @@ public class ErpCustomRuleController {
     @Resource
     private ErpCustomRuleService customRuleService;
     @Resource
-    private ErpProductService tmsProductService;
+    private ErpProductApi erpProductApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建ERP 海关规则")
@@ -118,10 +118,10 @@ public class ErpCustomRuleController {
         if (CollUtil.isEmpty(list)) {
             return Collections.emptyList();
         }
-        Map<Long, ErpProductRespVO> productVOMap = tmsProductService.getProductVOMap(convertSet(list, ErpCustomRuleDO::getProductId));
+        Map<Long, ErpProductDTO> map = erpProductApi.getProductMap(convertSet(list, ErpCustomRuleDO::getProductId));
         //2开始拼接
         return BeanUtils.toBean(list, ErpCustomRuleRespVO.class, vo -> {
-            MapUtils.findAndThen(productVOMap, vo.getProductId(), vo::setProduct);//设置产品vo
+            MapUtils.findAndThen(map, vo.getProductId(), vo::setProduct);//设置产品vo
         });
     }
 

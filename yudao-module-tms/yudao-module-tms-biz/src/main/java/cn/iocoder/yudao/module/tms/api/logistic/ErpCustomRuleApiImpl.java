@@ -1,14 +1,13 @@
 package cn.iocoder.yudao.module.tms.api.logistic;
 
+import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.tms.api.logistic.customrule.ErpCustomRuleApi;
 import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.tms.convert.logistic.ErpCustomRuleConvert;
-import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.tms.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
-import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductMapper;
 import cn.iocoder.yudao.module.tms.service.logistic.customrule.ErpCustomRuleService;
 import cn.iocoder.yudao.module.tms.service.logistic.customrule.bo.ErpCustomRuleBO;
-import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,12 +20,14 @@ import static cn.iocoder.yudao.module.tms.enums.ErrorCodeConstants.CUSTOM_RULE_N
 
 @Service
 public class ErpCustomRuleApiImpl implements ErpCustomRuleApi {
-    @Autowired
-    ErpProductMapper tmsProductMapper;
+    //    @Autowired
+//    ErpProductMapper tmsProductMapper;
     @Autowired
     ErpCustomRuleMapper customRuleMapper;
+    //    @Autowired
+//    ErpProductService tmsProductService;
     @Autowired
-    ErpProductService tmsProductService;
+    ErpProductApi erpProductApi;
     @Autowired
     ErpCustomRuleService tmsCustomRuleService;
 
@@ -43,8 +44,8 @@ public class ErpCustomRuleApiImpl implements ErpCustomRuleApi {
             .distinct()  // 保证产品 ID 唯一
             .collect(Collectors.toList());
 
-        Map<Long, ErpProductDO> productMap = tmsProductService.getProductMap(productIds);
-        return ErpCustomRuleConvert.INSTANCE.convert(boList, productMap);
+        Map<Long, ErpProductDTO> map = erpProductApi.getProductMap(productIds);
+        return ErpCustomRuleConvert.INSTANCE.convert(boList, map);
     }
 
 
@@ -56,8 +57,8 @@ public class ErpCustomRuleApiImpl implements ErpCustomRuleApi {
             throw exception(CUSTOM_RULE_NOT_EXISTS, id);
         }
         //2.0 获得产品
-        ErpProductDO tmsProductDO = tmsProductMapper.selectById(ruleBO.getProductId());
-        return ErpCustomRuleConvert.INSTANCE.convert(ruleBO, tmsProductDO);
+        ErpProductDTO productDto = erpProductApi.getProductDto(ruleBO.getProductId());
+        return ErpCustomRuleConvert.INSTANCE.convert(ruleBO, productDto);
     }
 
 
@@ -68,7 +69,7 @@ public class ErpCustomRuleApiImpl implements ErpCustomRuleApi {
         if (ruleBOS.isEmpty()) {
             return null;
         }
-        Map<Long, ErpProductDO> productMap = tmsProductService.getProductMap(List.of(productId));
-        return ErpCustomRuleConvert.INSTANCE.convert(ruleBOS, productMap);
+        Map<Long, ErpProductDTO> map = erpProductApi.getProductMap(List.of(productId));
+        return ErpCustomRuleConvert.INSTANCE.convert(ruleBOS, map);
     }
 }

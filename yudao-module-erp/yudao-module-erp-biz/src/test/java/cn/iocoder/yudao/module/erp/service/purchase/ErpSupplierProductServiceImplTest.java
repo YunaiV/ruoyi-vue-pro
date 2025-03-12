@@ -1,33 +1,25 @@
 package cn.iocoder.yudao.module.erp.service.purchase;
 
-import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
-import jakarta.annotation.Resource;
-
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.*;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.ErpSupplierProductPageReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.ErpSupplierProductSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierProductDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpSupplierProductMapper;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-
+import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import jakarta.annotation.Resource;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import java.util.*;
-import java.time.LocalDateTime;
 
-import static cn.hutool.core.util.RandomUtil.*;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.*;
-import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.*;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.SUPPLIER_PRODUCT_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
  * {@link ErpSupplierProductServiceImpl} 的单元测试类

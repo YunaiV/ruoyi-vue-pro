@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.tms.service.logistic.category;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.ErpCustomCategoryPageReqVO;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.ErpCustomCategorySaveReqVO;
 import cn.iocoder.yudao.module.tms.convert.logistic.category.ErpCustomCategoryConvert;
@@ -20,11 +22,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.diffList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.tms.enums.ErrorCodeConstants.CUSTOM_RULE_CATEGORY_NOT_EXISTS;
 
 /**
@@ -48,7 +51,7 @@ public class ErpCustomCategoryServiceImpl implements ErpCustomCategoryService {
     @Transactional(rollbackFor = Exception.class)
     public Long createCustomRuleCategory(ErpCustomCategorySaveReqVO createReqVO) {
         //材质-字典校验
-        dictDataApi.validateDictDataList("tms_product_material", List.of(String.valueOf(createReqVO.getMaterial())));
+        dictDataApi.validateDictDataList("erp_product_material", List.of(String.valueOf(createReqVO.getMaterial())));
         // 插入
         ErpCustomCategoryDO customRuleCategory = ErpCustomCategoryConvert.INSTANCE.convert(createReqVO);
         customRuleCategoryMapper.insert(customRuleCategory);
@@ -68,7 +71,7 @@ public class ErpCustomCategoryServiceImpl implements ErpCustomCategoryService {
         Long categoryId = updateReqVO.getId();
         validateCustomRuleCategoryExists(categoryId);
         //材质-字典校验
-        dictDataApi.validateDictDataList("tms_product_material", List.of(String.valueOf(updateReqVO.getMaterial())));
+        dictDataApi.validateDictDataList("erp_product_material", List.of(String.valueOf(updateReqVO.getMaterial())));
         // 更新
         ErpCustomCategoryDO updateObj = BeanUtils.toBean(updateReqVO, ErpCustomCategoryDO.class);
         customRuleCategoryMapper.updateById(updateObj);
@@ -93,13 +96,31 @@ public class ErpCustomCategoryServiceImpl implements ErpCustomCategoryService {
 
     private void validateCustomRuleCategoryExists(Long id) {
         if (customRuleCategoryMapper.selectById(id) == null) {
-            throw exception(CUSTOM_RULE_CATEGORY_NOT_EXISTS);
+            throw exception(ErrorCodeConstants.CUSTOM_RULE_CATEGORY_NOT_EXISTS);
         }
     }
 
     @Override
     public ErpCustomCategoryDO getCustomRuleCategory(Long id) {
         return customRuleCategoryMapper.selectById(id);
+    }
+
+    //get list方法
+    public List<ErpCustomCategoryDO> listCustomRuleCategory(Collection<Long> ids) {
+        return customRuleCategoryMapper.selectByIds(ids);
+    }
+
+    @Override
+    public void validCustomRuleCategory(List<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        List<ErpCustomCategoryDO> list = customRuleCategoryMapper.selectBatchIds(ids);
+        Map<Long, ErpCustomCategoryDO> map = convertMap(list, ErpCustomCategoryDO::getId);
+        for (Long id : ids) {
+            ErpCustomCategoryDO aDo = map.get(id);
+            ThrowUtil.ifEmptyThrow(aDo, ErrorCodeConstants.CUSTOM_RULE_CATEGORY_NOT_EXISTS);
+        }
     }
 
     @Override
@@ -173,7 +194,7 @@ public class ErpCustomCategoryServiceImpl implements ErpCustomCategoryService {
 //        List<ErpCustomRuleBO> ruleBOS = customRuleMapper.selectBOListEqCountryCodeByCategoryId(new ErpCustomRulePageReqVO(), categoryId);
 //        //获得变更的海关规则ids
 //        List<Long> ids = ruleBOS.stream().map(ErpCustomRuleBO::getId).toList();
-//        tmsCustomRuleService.syncErpCustomRule(ids);
+//        erpCustomRuleService.syncErpCustomRule(ids);
 //    }
 //
 //    //同步海关规则方法 categoryItemId
@@ -181,6 +202,6 @@ public class ErpCustomCategoryServiceImpl implements ErpCustomCategoryService {
 //        List<ErpCustomRuleBO> ruleBOS = customRuleMapper.selectBOListEqCountryCodeByItemId(new ErpCustomRulePageReqVO(), categoryItemId);
 //        //获得变更的海关规则ids
 //        List<Long> ids = ruleBOS.stream().map(ErpCustomRuleBO::getId).toList();
-//        tmsCustomRuleService.syncErpCustomRule(ids);
+//        erpCustomRuleService.syncErpCustomRule(ids);
 //    }
 }

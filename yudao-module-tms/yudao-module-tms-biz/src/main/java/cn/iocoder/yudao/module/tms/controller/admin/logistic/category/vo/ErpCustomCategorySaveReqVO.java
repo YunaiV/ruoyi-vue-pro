@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo;
 
+import cn.iocoder.yudao.module.system.api.utils.Validation;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.item.vo.ErpCustomCategoryItemSaveReqVO;
-import cn.iocoder.yudao.module.tms.controller.admin.tool.Validation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
