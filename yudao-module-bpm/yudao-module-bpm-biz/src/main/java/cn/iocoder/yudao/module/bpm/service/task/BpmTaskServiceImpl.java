@@ -557,22 +557,27 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 2.2 添加评论
         taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.APPROVE.getType(),
                 BpmCommentTypeEnum.APPROVE.formatComment(reqVO.getReason()));
-        // 2.3 调用 BPM complete 去完成任务
+
         // 如果流程变量前端传空，需要从历史实例中获取，原因：前端表单如果在当前节点无可编辑的字段时variables一定会为空
         // 场景一：A节点发起，B节点表单无可编辑字段，审批通过时，C节点需要流程变量获取下一个执行节点，但因为B节点无可编辑的字段，variables为空，流程可能出现问题
         // 场景二：A节点发起，B节点只有某一个字段可编辑（比如day），但C节点需要多个节点（比如workday，在发起时填写，因为B节点只有day的编辑权限，在审批后。variables会缺少work的值）
         // 历史中的变量值
-        Map<String, Object> variables = new HashMap<>(instance.getProcessVariables());
-        // 如果变量值不为空，则覆盖历史变量
+        // 3.1 设置流程变量
+        Map<String, Object> processVariables = new HashMap<>();
+        // 3.2 获取历史中流程变量
+        if (CollUtil.isNotEmpty(instance.getProcessVariables())) {
+            processVariables.putAll(instance.getProcessVariables());
+        }
+        // 3.3 合并前端传递的流程变量，以前端为准
         if (CollUtil.isNotEmpty(reqVO.getVariables())) {
-            variables.putAll(reqVO.getVariables());
+            processVariables.putAll(reqVO.getVariables());
         }
         // 校验并处理 APPROVE_USER_SELECT 当前审批人，选择下一节点审批人的逻辑
-        Map<String, Object> resVariables = validateAndSetNextAssignees(task.getTaskDefinitionKey(), variables,
+        Map<String, Object> variables = validateAndSetNextAssignees(task.getTaskDefinitionKey(), processVariables,
                 bpmnModel, reqVO.getNextAssignees(), instance);
-        // 完成任务
-        runtimeService.setVariables(task.getProcessInstanceId(), resVariables);
-        taskService.complete(task.getId(), resVariables, true);
+        // 3.4 调用 BPM complete 去完成任务
+        runtimeService.setVariables(task.getProcessInstanceId(), variables);
+        taskService.complete(task.getId(), variables, true);
 
         // 【加签专属】处理加签任务
         handleParentTaskIfSign(task.getParentTaskId());
