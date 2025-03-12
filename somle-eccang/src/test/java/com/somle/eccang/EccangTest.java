@@ -78,7 +78,7 @@ public class EccangTest extends BaseSpringTest {
         vo.setDateFrom(datetime1);
         vo.setDateTo(datetime2);
         var result = service.getInventoryBatchLog(vo);
-        System.err.println(result.toList().size());
+        log.error(String.valueOf(result.toList().size()));
     }
 
 

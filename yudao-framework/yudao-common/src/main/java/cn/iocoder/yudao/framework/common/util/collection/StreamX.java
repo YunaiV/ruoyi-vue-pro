@@ -4,10 +4,7 @@ package cn.iocoder.yudao.framework.common.util.collection;
 
 
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -777,16 +774,16 @@ public class StreamX<T> {
     }
 
     /**
-     * Fetches all pages of results starting from the first page as a Stream.
+     * Same as Stream::iterate but will include the first element where hasNext evaluate to false
      *
-     * @param <T>          The type representing a page of results.
-     * @param firstPage    The first page of results.
-     * @param haveNextPage   A method to decide if the current page is the last page.
-     * @param getNextPage  A method to produce the next page given the current page.
-     * @return A Stream of all pages of results.
+     * @param <T>          The type of the element.
+     * @param seed    the initial element
+     * @param hasNext   a predicate to apply to elements to determine when the last element is reached
+     * @param next  a function to be applied to the previous element to produce a new element
+     * @return a new sequential Stream
      */
-    public static <T> Stream<T> iterate(T firstPage, Predicate<T> haveNextPage, Function<T, T> getNextPage) {
-        return StreamSupport.stream(new PaginationSpliterator<>(firstPage, haveNextPage, getNextPage), false);
+    public static <T> Stream<T> iterate(T seed, Predicate<? super T> hasNext, UnaryOperator<T> next) {
+        return StreamSupport.stream(new PaginationSpliterator<>(seed, hasNext, next), false);
     }
 
 }
@@ -796,11 +793,11 @@ public class StreamX<T> {
 
 class PaginationSpliterator<T> implements Spliterator<T> {
     private T currentPage;
-    private final Predicate<T> haveNextPage;
-    private final Function<T, T> getNextPage;
+    private final Predicate<? super T> haveNextPage;
+    private final UnaryOperator<T> getNextPage;
     private boolean finished = false;
 
-    public PaginationSpliterator(T firstPage, Predicate<T> haveNextPage, Function<T, T> getNextPage) {
+    public PaginationSpliterator(T firstPage, Predicate<? super T> haveNextPage, UnaryOperator<T> getNextPage) {
         this.currentPage = firstPage;
         this.haveNextPage = haveNextPage;
         this.getNextPage = getNextPage;
