@@ -5,7 +5,7 @@
 //import cn.iocoder.yudao.module.tms.dal.dataobject.product.ErpProductDO;
 //import lombok.Data;
 //
-////1子表 : 1主表 : 1产品
+/// /1子表 : 1主表 : 1产品
 //@Data
 //public class ErpCustomCategoryItemBO extends ErpCustomCategoryItemDO {
 //    private ErpProductDO tmsProductDO;

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.ErpCustomCategoryPageReqVO;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.ErpCustomCategorySaveReqVO;
 import cn.iocoder.yudao.module.tms.convert.logistic.category.ErpCustomCategoryConvert;
@@ -14,7 +15,6 @@ import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.item.ErpCust
 import cn.iocoder.yudao.module.tms.dal.mysql.logistic.category.ErpCustomCategoryMapper;
 import cn.iocoder.yudao.module.tms.dal.mysql.logistic.category.item.ErpCustomCategoryItemMapper;
 import cn.iocoder.yudao.module.tms.service.logistic.category.item.ErpCustomCategoryItemService;
-import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,6 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.module.tms.enums.ErrorCodeConstants.CUSTOM_RULE_CATEGORY_NOT_EXISTS;
 
 /**
  * 海关分类 Service 实现类
