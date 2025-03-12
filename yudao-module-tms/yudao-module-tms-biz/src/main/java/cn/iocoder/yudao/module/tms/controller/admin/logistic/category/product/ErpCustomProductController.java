@@ -37,7 +37,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - 海关产品分类表")
 @RestController
-@RequestMapping("/erp/custom-product")
+@RequestMapping("/tms/custom-product")
 @Validated
 public class ErpCustomProductController {
     @Resource
