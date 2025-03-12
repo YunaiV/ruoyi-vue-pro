@@ -558,18 +558,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.APPROVE.getType(),
                 BpmCommentTypeEnum.APPROVE.formatComment(reqVO.getReason()));
         // 2.3 调用 BPM complete 去完成任务
-        // 其中，variables 是存储动态表单到 local 任务级别。过滤一下，避免 ProcessInstance 系统级的变量被占用
-        if (CollUtil.isNotEmpty(reqVO.getVariables())) {
-            // 校验并处理 APPROVE_USER_SELECT 当前审批人，选择下一节点审批人的逻辑
-            Map<String, Object> variables = validateAndSetNextAssignees(task.getTaskDefinitionKey(), reqVO.getVariables(),
-                    bpmnModel, reqVO.getNextAssignees(), instance);
-            // 完成任务
-            runtimeService.setVariables(task.getProcessInstanceId(), variables);
-            taskService.complete(task.getId(), variables, true);
-        } else {
-            // 完成任务
-            taskService.complete(task.getId());
-        }
+        // 校验并处理 APPROVE_USER_SELECT 当前审批人，选择下一节点审批人的逻辑
+        Map<String, Object> variables = validateAndSetNextAssignees(task.getTaskDefinitionKey(), reqVO.getVariables(),
+                bpmnModel, reqVO.getNextAssignees(), instance);
+        // 完成任务
+        runtimeService.setVariables(task.getProcessInstanceId(), variables);
+        taskService.complete(task.getId(), variables, true);
 
         // 【加签专属】处理加签任务
         handleParentTaskIfSign(task.getParentTaskId());
@@ -590,37 +584,30 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      */
     private Map<String, Object> validateAndSetNextAssignees(String taskDefinitionKey, Map<String, Object> variables, BpmnModel bpmnModel,
                                                             Map<String, List<Long>> nextAssignees, ProcessInstance processInstance) {
-        // 下一个节点参数为空，不做处理，表示流程正常流转，无需选择下一个节点的审判人
-        // TODO @小北：会出现漏选，其实需要的情况哇？
-        if (CollUtil.isEmpty(nextAssignees)) {
-            return variables;
-        }
         // 1. 获取下一个将要执行的节点集合
         FlowElement flowElement = bpmnModel.getFlowElement(taskDefinitionKey);
         List<FlowNode> nextFlowNodes = getNextFlowNodes(flowElement, bpmnModel, variables);
-
         // 2. 循环下一个将要执行的节点集合
-        Map<String, List<Long>> processVariables = new HashMap<>();
+        Map<String, List<Long>> processVariables;
         for (FlowNode nextFlowNode : nextFlowNodes) {
-            if (!nextAssignees.containsKey(nextFlowNode.getId())) {
-                throw exception(TASK_TARGET_NODE_NOT_EXISTS, nextFlowNode.getName());
-            }
-            List<Long> assignees = nextAssignees.get(nextFlowNode.getId());
-            // 2.1 情况一：如果节点中的审批人策略为 发起人自选
+            // 获取任务节点中的审批人策略
             Integer candidateStrategy = parseCandidateStrategy(nextFlowNode);
+            // 2.1 情况一：如果节点中的审批人策略为 发起人自选
             if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy())) {
-                processVariables = FlowableUtils.getStartUserSelectAssignees(processInstance.getProcessVariables());
-                if (processVariables == null) {
-                    processVariables = new HashMap<>();
-                }
-                List<Long> startUserSelectAssignee = processVariables.get(nextFlowNode.getId());
-                // 特殊：如果当前节点已经存在审批人，则不允许覆盖
-                if (CollUtil.isNotEmpty(startUserSelectAssignee)) {
-                    continue;
-                }
                 // 如果节点存在，但未配置审批人
+                List<Long> assignees = nextAssignees != null ? nextAssignees.get(nextFlowNode.getId()) : null;
                 if (CollUtil.isEmpty(assignees)) {
                     throw exception(PROCESS_INSTANCE_START_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
+                }
+                processVariables = FlowableUtils.getStartUserSelectAssignees(processInstance.getProcessVariables());
+                if (processVariables == null){
+                    processVariables = new HashMap<>();
+                }else {
+                    List<Long> startUserSelectAssignee = processVariables.get(nextFlowNode.getId());
+                    // 特殊：如果当前节点已经存在审批人，则不允许覆盖
+                    if (CollUtil.isNotEmpty(startUserSelectAssignee)) {
+                        continue;
+                    }
                 }
                 // 校验通过的全部节点和审批人
                 processVariables.put(nextFlowNode.getId(), assignees);
@@ -629,12 +616,22 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             // 2.2 情况二：如果节点中的审批人策略为 审批人，在审批时选择下一个节点的审批人，并且该节点的审批人为空
             if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy())) {
                 // 如果节点存在，但未配置审批人
+                List<Long> assignees = nextAssignees != null ? nextAssignees.get(nextFlowNode.getId()) : null;
                 if (CollUtil.isEmpty(assignees)) {
                     throw exception(PROCESS_INSTANCE_APPROVE_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
                 }
+                processVariables = FlowableUtils.getApproveUserSelectAssignees(processInstance.getProcessVariables());
+                if (processVariables == null){
+                    processVariables = new HashMap<>();
+                }else  {
+                    List<Long> approveUserSelectAssignee = processVariables.get(nextFlowNode.getId());
+                    // 特殊：如果当前节点已经存在审批人，则不允许覆盖
+                    if (CollUtil.isNotEmpty(approveUserSelectAssignee)) {
+                        continue;
+                    }
+                }
                 // 校验通过的全部节点和审批人
                 processVariables.put(nextFlowNode.getId(), assignees);
-                // TODO @小北：是不是要类似情况一的做法，通过 PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES 拿一下？因为如果 task1 是审批人自选，task2 是审批人自选，看着会覆盖？
                 variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES, processVariables);
             }
         }

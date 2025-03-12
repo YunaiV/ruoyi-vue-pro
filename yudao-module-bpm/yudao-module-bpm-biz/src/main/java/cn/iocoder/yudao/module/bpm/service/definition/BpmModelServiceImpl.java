@@ -40,9 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
@@ -209,11 +207,11 @@ public class BpmModelServiceImpl implements BpmModelService {
     public void deployModel(Long userId, String id) {
         // 1.1 校验流程模型存在
         Model model = validateModelManager(id, userId);
+        BpmModelMetaInfoVO metaInfo = BpmModelConvert.INSTANCE.parseMetaInfo(model);
         // 1.2 校验流程图
         byte[] bpmnBytes = getModelBpmnXML(model.getId());
-        validateBpmnXml(bpmnBytes);
+        validateBpmnXml(bpmnBytes, metaInfo.getType());
         // 1.3 校验表单已配
-        BpmModelMetaInfoVO metaInfo = BpmModelConvert.INSTANCE.parseMetaInfo(model);
         BpmFormDO form = validateFormConfig(metaInfo);
         // 1.4 校验任务分配规则已配置
         taskCandidateInvoker.validateBpmnConfig(bpmnBytes);
@@ -233,7 +231,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         repositoryService.saveModel(model);
     }
 
-    private void validateBpmnXml(byte[] bpmnBytes) {
+    private void validateBpmnXml(byte[] bpmnBytes, int type) {
         BpmnModel bpmnModel = BpmnModelUtils.getBpmnModel(bpmnBytes);
         if (bpmnModel == null) {
             throw exception(MODEL_NOT_EXISTS);
@@ -243,24 +241,23 @@ public class BpmModelServiceImpl implements BpmModelService {
         if (startEvent == null) {
             throw exception(MODEL_DEPLOY_FAIL_BPMN_START_EVENT_NOT_EXISTS);
         }
-        // 2. 校验第一个用户任务的规则类型是否为“审批人自选”，如果是则抛出异常。原因是，流程发起后，直接进入第一个用户任务，会出现无审批人的情况
-        List<SequenceFlow> outgoingFlows = startEvent.getOutgoingFlows();
-        // TODO @小北：可能极端情况下，startEvent 后面接了个 serviceTask，接着才是 userTask。。。
-        // TODO @小北：simple 因为第一个任务是发起人，可能要找第二个任务？？？
-        if (CollUtil.isNotEmpty(outgoingFlows)) {
-            FlowElement targetFlowElement = outgoingFlows.get(0).getTargetFlowElement();
-            Integer candidateStrategy = parseCandidateStrategy(targetFlowElement);
-            if (Objects.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy())) {
-                throw exception(MODEL_DEPLOY_FAIL_FIRST_USER_TASK_CANDIDATE_STRATEGY_ERROR, targetFlowElement.getName());
-            }
-        }
-        // 3. 校验 UserTask 的 name 都配置了
+        // 2. 校验 UserTask 的 name 都配置了
         List<UserTask> userTasks = BpmnModelUtils.getBpmnModelElements(bpmnModel, UserTask.class);
         userTasks.forEach(userTask -> {
             if (StrUtil.isEmpty(userTask.getName())) {
                 throw exception(MODEL_DEPLOY_FAIL_BPMN_USER_TASK_NAME_NOT_EXISTS, userTask.getId());
             }
         });
+        // 3. 校验第一个用户任务节点的规则类型是否为“审批人自选”
+        Map<Integer, UserTask> userTaskMap = new HashMap<>();
+        // BPMN 设计器，校验第一个用户任务节点
+        userTaskMap.put(BpmModelTypeEnum.BPMN.getType(), userTasks.get(0));
+        // SIMPLE 设计器，第一个节点固定为发起人所以校验第二个用户任务节点
+        userTaskMap.put(BpmModelTypeEnum.SIMPLE.getType(), userTasks.get(1));
+        Integer candidateStrategy = parseCandidateStrategy(userTaskMap.get(type));
+        if (Objects.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy())) {
+            throw exception(MODEL_DEPLOY_FAIL_FIRST_USER_TASK_CANDIDATE_STRATEGY_ERROR, userTaskMap.get(type).getName());
+        }
     }
 
     @Override

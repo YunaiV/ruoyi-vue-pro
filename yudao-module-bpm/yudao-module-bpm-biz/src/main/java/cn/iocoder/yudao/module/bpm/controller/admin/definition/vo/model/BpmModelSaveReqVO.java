@@ -21,6 +21,9 @@ public class BpmModelSaveReqVO extends BpmModelMetaInfoVO {
     @NotEmpty(message = "流程名称不能为空")
     private String name;
 
+    @Schema(description = "表单名字", example = "请假表单")
+    private String formName;
+
     @Schema(description = "流程分类", example = "1")
     private String category;
 
