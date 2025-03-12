@@ -114,7 +114,10 @@ public class EccangService {
             // 获取当前重试次数
             int retryCount = ctx.getRetryCount();
             // 记录每次重试的日志
-            log.debug("正在请求url= {},第 {} 次重试。endpoint = {}", request.getUrl(), retryCount + 1, endpoint);
+            if (ctx.getRetryCount() != 0) {
+                log.debug("正在请求url= {},第 {} 次重试。endpoint = {}", request.getUrl(), retryCount, endpoint);
+                log.debug("重试原因：{}", ctx.getLastThrowable().toString());
+            }
             try (var response = WebUtils.sendRequest(request)) {
                 switch (response.code()) {
                     case 200:
@@ -185,7 +188,6 @@ public class EccangService {
                 }
             }
         );
-        // );
     }
 
 

@@ -1,9 +1,9 @@
 package com.somle.esb.job;
 
 
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import com.somle.esb.model.OssData;
-import cn.iocoder.yudao.framework.common.util.collection.PageUtils;
 import com.somle.wangdian.model.WangdianTradeReqVO;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +24,7 @@ public class WangdianTradeDataJob extends WangdianDataJob{
                 .pageNo(0)
                 .build();
 
-            PageUtils.getAllPages(
+            StreamX.iterate(
                 wangdianService.client.execute("trade_query.php", reqVO),
                 response -> !response.getInteger("total_count").equals(0),
                 respoonse ->{

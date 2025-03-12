@@ -1,14 +1,11 @@
 package cn.iocoder.yudao.framework.common.util.web;
 
-import cn.hutool.core.net.URLEncodeUtil;
 import cn.hutool.http.ContentType;
-import cn.iocoder.yudao.framework.common.util.string.StrUtils;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import cn.iocoder.yudao.framework.common.util.string.StrUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
@@ -37,7 +34,6 @@ public class WebUtils {
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .build();
-
 
 
     public static String urlWithParams(String url, MultiValuedMap<String, String> queryParams) {

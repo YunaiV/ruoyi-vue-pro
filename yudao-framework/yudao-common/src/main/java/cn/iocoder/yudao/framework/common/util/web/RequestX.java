@@ -1,14 +1,11 @@
 package cn.iocoder.yudao.framework.common.util.web;
 
 import cn.hutool.http.ContentType;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
-import okhttp3.Request;
 
-import java.util.List;
 import java.util.Map;
 
 /**
