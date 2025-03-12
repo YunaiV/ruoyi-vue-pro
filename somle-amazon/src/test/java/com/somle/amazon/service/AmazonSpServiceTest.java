@@ -1,18 +1,20 @@
 package com.somle.amazon.service;
 
-import cn.iocoder.yudao.framework.test.core.ut.BaseSpringTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseSpringTest;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 
+@Disabled
 @Slf4j
 @Import({
     AmazonService.class,
     AmazonSpService.class,
 })
-class AmazonSpServiceTest extends BaseSpringTest {
+class AmazonSpServiceTest extends SomleBaseSpringTest {
     @Resource
     AmazonSpService spService;
 

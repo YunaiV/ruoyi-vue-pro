@@ -193,7 +193,8 @@ public class DictTypeServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testValidateDictDataExists_notExists() {
-        assertServiceException(() -> dictTypeService.validateDictTypeExists(randomLongId()), DICT_TYPE_NOT_EXISTS);
+        var someId = randomLongId();
+        assertServiceException(() -> dictTypeService.validateDictTypeExists(someId), DICT_TYPE_NOT_EXISTS, someId);
     }
 
     @Test

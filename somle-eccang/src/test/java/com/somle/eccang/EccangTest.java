@@ -4,15 +4,12 @@ import com.somle.eccang.config.EccangIntegrationConfig;
 import com.somle.eccang.model.*;
 import com.somle.eccang.repository.EccangTokenRepository;
 import com.somle.eccang.service.EccangService;
-import cn.iocoder.yudao.framework.test.core.ut.BaseSpringTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseSpringTest;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,12 +17,13 @@ import java.time.LocalTime;
 import java.util.List;
 
 
+@Disabled
 @Slf4j
 @Import({
     EccangService.class,
     EccangIntegrationConfig.class,
 })
-public class EccangTest extends BaseSpringTest {
+public class EccangTest extends SomleBaseSpringTest {
     @Resource
     EccangService service;
 

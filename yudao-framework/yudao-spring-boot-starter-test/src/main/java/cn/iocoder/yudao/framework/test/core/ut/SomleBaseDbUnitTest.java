@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.test.core.ut;
 
 
+import org.junit.jupiter.api.Disabled;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;

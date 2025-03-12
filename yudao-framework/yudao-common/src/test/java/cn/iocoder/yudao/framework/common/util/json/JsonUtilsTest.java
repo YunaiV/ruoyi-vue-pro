@@ -19,7 +19,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class JsonUtilsTest {
+class JsonUtilsXTest {
 
 
     @Data
@@ -143,17 +143,17 @@ class JsonUtilsTest {
 
     @Test
     public void toJsonString_String_ReturnsJson() throws Exception {
-        assertEquals("\"John\"", JsonUtils.toJsonString("John"));
+        assertEquals("\"John\"", JsonUtilsX.toJsonString("John"));
     }
 
     @Test
     public void toJsonString_NormalObject_ReturnsJson() throws Exception {
-        assertEquals("{\"name\":\"John\"}", JsonUtils.toJsonString(new Person("John")));
+        assertEquals("{\"name\":\"John\"}", JsonUtilsX.toJsonString(new Person("John")));
     }
 
     @Test
     public void toJsonString_LocalDateTime_ReturnsJson() throws Exception {
-        assertEquals("{\"datetime\":\"2025-02-17T14:38:00\"}", JsonUtils.toJsonString(new Today(LocalDateTime.of(2025, 2, 17, 14, 38))));
+        assertEquals("{\"datetime\":\"2025-02-17T14:38:00\"}", JsonUtilsX.toJsonString(new Today(LocalDateTime.of(2025, 2, 17, 14, 38))));
     }
 
     @Test
@@ -164,7 +164,7 @@ class JsonUtilsTest {
                 .platformShipDateStart(datetime1)
                 .build())
             .build();
-        assertEquals("{\"condition\":{\"platform_ship_date_start\":\"2025-02-17 14:38:00\"}}", JsonUtils.toJsonString(reqVO));
+        assertEquals("{\"condition\":{\"platform_ship_date_start\":\"2025-02-17 14:38:00\"}}", JsonUtilsX.toJsonString(reqVO));
     }
 
 
@@ -172,47 +172,47 @@ class JsonUtilsTest {
 //    @Test
 //    public void toJsonString_NullObject_ThrowsException() {
 //        assertThrows(NullPointerException.class, () -> {
-//            JsonUtils.toJsonString(null);
+//            JsonUtilsX.toJsonString(null);
 //        });
 //    }
 
     @Test
     public void parseObject_ValidJson_ReturnsObject() throws Exception {
         String json = "{\"name\":\"John\"}";
-        Person result = JsonUtils.parseObject(json, Person.class);
+        Person result = JsonUtilsX.parseObject(json, Person.class);
         assertEquals("John", result.getName());
     }
 
     @Test
     public void parseObject_ValidJson_ReturnsObjectNode() throws Exception {
         String json = "{\"name\":\"John\"}";
-        ObjectNode result = JsonUtils.parseObject(json, ObjectNode.class);
+        ObjectNode result = JsonUtilsX.parseObject(json, ObjectNode.class);
         assertEquals("John", result.get("name").asText());
     }
 
     @Test
     public void parseObject_ValidJson_ReturnsJSONObject() throws Exception {
         String json = "{\"name\":\"John\"}";
-        JSONObject result = JsonUtils.parseObject(json, JSONObject.class);
+        JSONObject result = JsonUtilsX.parseObject(json, JSONObject.class);
         assertEquals("John", result.getString("name"));
     }
 
     @Test
     public void parseObject_EmptyJson_ReturnsNull() {
-        assertNull(JsonUtils.parseObject("", Person.class));
+        assertNull(JsonUtilsX.parseObject("", Person.class));
     }
 
     @Test
     public void parseObject_InvalidJson_ThrowsException() {
         assertThrows(Exception.class, () -> {
-            JsonUtils.parseObject("{\"name\":}", Person.class);
+            JsonUtilsX.parseObject("{\"name\":}", Person.class);
         });
     }
 
     @Test
     public void parseArray_ValidJsonArray_ReturnsList() throws Exception {
         String jsonArray = "[{\"name\":\"John\"}, {\"name\":\"Jane\"}]";
-        List<Person> result = JsonUtils.parseArray(jsonArray, Person.class);
+        List<Person> result = JsonUtilsX.parseArray(jsonArray, Person.class);
         assertEquals(2, result.size());
         assertEquals("John", result.get(0).getName());
     }
@@ -221,27 +221,27 @@ class JsonUtilsTest {
     @Test
     public void parseArray_ValidJsonArray_ReturnsJSON() throws Exception {
         String jsonArray = "[{\"name\":\"John\"}, {\"name\":\"Jane\"}]";
-        List<Person> result = JsonUtils.parseArray(jsonArray, Person.class);
+        List<Person> result = JsonUtilsX.parseArray(jsonArray, Person.class);
         assertEquals(2, result.size());
         assertEquals("John", result.get(0).getName());
     }
 
     @Test
     public void parseArray_EmptyJsonArray_ReturnsEmptyList() {
-        assertTrue(JsonUtils.parseArray("", Person.class).isEmpty());
+        assertTrue(JsonUtilsX.parseArray("", Person.class).isEmpty());
     }
 
     @Test
     public void parseArray_InvalidJsonArray_ThrowsException() {
         assertThrows(Exception.class, () -> {
-            JsonUtils.parseArray("[{\"name\":}]", Person.class);
+            JsonUtilsX.parseArray("[{\"name\":}]", Person.class);
         });
     }
 
     @Test
     public void parseArray_ValidStringArray_ReturnsList() throws Exception {
         String jsonArray = "{\"name\":[\"John\", \"Jane\"]}";
-        Map<String, List<String>> result = JsonUtils.parseObject(jsonArray, Map.class);
+        Map<String, List<String>> result = JsonUtilsX.parseObject(jsonArray, Map.class);
         assertEquals(1, result.size());
         assertEquals("John", result.get("name").get(0));
     }
@@ -254,18 +254,18 @@ class JsonUtilsTest {
         var instant = dateTime.atZone(ZoneId.systemDefault()).toInstant();
 
         var birthday = new Birthday(dateTime,  Timestamp.from(instant));
-        assertEquals("{\"dateTime\":\"20241231\",\"timeStamp\":1735660740000}", JsonUtils.toJsonString(birthday));
+        assertEquals("{\"dateTime\":\"20241231\",\"timeStamp\":1735660740000}", JsonUtilsX.toJsonString(birthday));
     }
 
 //    @Test
 //    public void parseObject2_ValidJson_ReturnsObject() {
 //        String json = "{\"name\":\"John\"}";
-//        Person result = JsonUtils.parseObject2(json, Person.class);
+//        Person result = JsonUtilsX.parseObject2(json, Person.class);
 //        assertEquals("John", result.getName());
 //    }
 //
 //    @Test
 //    public void parseObject2_EmptyJson_ReturnsNull() {
-//        assertNull(JsonUtils.parseObject2("", Person.class));
+//        assertNull(JsonUtilsX.parseObject2("", Person.class));
 //    }
 }

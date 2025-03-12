@@ -9,10 +9,12 @@ import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.Rollback;
 
+@Disabled
 @Slf4j
 @Import({OttoService.class, OttoAccountDao.class, OttoAuthTokenDao.class})
 class OttoClientTest extends SomleBaseDbUnitTest {

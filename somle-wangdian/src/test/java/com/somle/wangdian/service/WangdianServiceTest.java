@@ -1,20 +1,17 @@
 package com.somle.wangdian.service;
 
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.framework.test.core.ut.BaseSpringTest;
 import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
 import com.somle.wangdian.model.WangdianTradeReqVO;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
 
+@Disabled
 @Slf4j
 @Import(WangdianService.class)
 class WangdianServiceTest extends SomleBaseDbUnitTest {

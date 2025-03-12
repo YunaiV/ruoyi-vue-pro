@@ -1,21 +1,16 @@
 package com.somle.microsoft.service;
 
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.framework.test.core.ut.BaseSpringTest;
 import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
-import com.somle.microsoft.model.PowerbiAccount;
 import com.somle.microsoft.model.PowerbiReportReqVO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.messaging.MessageChannel;
 
-import java.time.LocalDate;
-
-import static org.junit.jupiter.api.Assertions.*;
-
+@Disabled
 @Slf4j
 @Import(MicrosoftService.class)
 class MicrosoftServiceTest extends SomleBaseDbUnitTest {

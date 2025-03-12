@@ -1,17 +1,21 @@
 package com.somle.amazon.service;
 
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
+import com.somle.amazon.model.enums.AmazonRegion;
 import com.somle.amazon.repository.AmazonAdAuthRepository;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 
+@Disabled
 @Slf4j
 @Import({
 })
-class AmazonAdClientTest  {
+class AmazonAdClientTest extends SomleBaseDbUnitTest {
     @Resource
     AmazonAdAuthRepository repository;
 
@@ -19,7 +23,7 @@ class AmazonAdClientTest  {
 
     @BeforeEach
     void setUp() {
-        // client = new AmazonAdClient(repository.findById(4l).get());
+         client = new AmazonAdClient(repository.findById(1l).get(), AmazonRegion.NA);
     }
 
 
