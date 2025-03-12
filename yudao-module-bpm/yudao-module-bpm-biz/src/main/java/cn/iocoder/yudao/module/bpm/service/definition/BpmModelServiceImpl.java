@@ -231,7 +231,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         repositoryService.saveModel(model);
     }
 
-    private void validateBpmnXml(byte[] bpmnBytes, int type) {
+    private void validateBpmnXml(byte[] bpmnBytes, Integer type) {
         BpmnModel bpmnModel = BpmnModelUtils.getBpmnModel(bpmnBytes);
         if (bpmnModel == null) {
             throw exception(MODEL_NOT_EXISTS);
@@ -248,6 +248,7 @@ public class BpmModelServiceImpl implements BpmModelService {
                 throw exception(MODEL_DEPLOY_FAIL_BPMN_USER_TASK_NAME_NOT_EXISTS, userTask.getId());
             }
         });
+        // TODO @小北：是不是可以 UserTask firUserTask = CollUtil.get(userTasks, BpmModelTypeEnum.BPMN.getType().equals(type) ? 0 : 1)；然后，最好判空。。。极端情况下，没 usertask ，哈哈哈哈。
         // 3. 校验第一个用户任务节点的规则类型是否为“审批人自选”
         Map<Integer, UserTask> userTaskMap = new HashMap<>();
         // BPMN 设计器，校验第一个用户任务节点

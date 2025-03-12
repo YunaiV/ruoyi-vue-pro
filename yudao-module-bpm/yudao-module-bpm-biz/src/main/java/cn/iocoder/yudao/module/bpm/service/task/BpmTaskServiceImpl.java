@@ -557,12 +557,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 2.2 添加评论
         taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.APPROVE.getType(),
                 BpmCommentTypeEnum.APPROVE.formatComment(reqVO.getReason()));
-        // 2.3 调用 BPM complete 去完成任务
-        // 校验并处理 APPROVE_USER_SELECT 当前审批人，选择下一节点审批人的逻辑
+        // 2.3 校验并处理 APPROVE_USER_SELECT 当前审批人，选择下一节点审批人的逻辑
         Map<String, Object> variables = validateAndSetNextAssignees(task.getTaskDefinitionKey(), reqVO.getVariables(),
                 bpmnModel, reqVO.getNextAssignees(), instance);
-        // 完成任务
         runtimeService.setVariables(task.getProcessInstanceId(), variables);
+        // 2.4 调用 BPM complete 去完成任务
         taskService.complete(task.getId(), variables, true);
 
         // 【加签专属】处理加签任务
@@ -587,10 +586,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 1. 获取下一个将要执行的节点集合
         FlowElement flowElement = bpmnModel.getFlowElement(taskDefinitionKey);
         List<FlowNode> nextFlowNodes = getNextFlowNodes(flowElement, bpmnModel, variables);
-        // 2. 循环下一个将要执行的节点集合
+
+        // 2. 校验选择的下一个节点的审批人，是否合法
         Map<String, List<Long>> processVariables;
         for (FlowNode nextFlowNode : nextFlowNodes) {
-            // 获取任务节点中的审批人策略
             Integer candidateStrategy = parseCandidateStrategy(nextFlowNode);
             // 2.1 情况一：如果节点中的审批人策略为 发起人自选
             if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy())) {
@@ -600,16 +599,16 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     throw exception(PROCESS_INSTANCE_START_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
                 }
                 processVariables = FlowableUtils.getStartUserSelectAssignees(processInstance.getProcessVariables());
-                if (processVariables == null){
-                    processVariables = new HashMap<>();
-                }else {
-                    List<Long> startUserSelectAssignee = processVariables.get(nextFlowNode.getId());
-                    // 特殊：如果当前节点已经存在审批人，则不允许覆盖
-                    if (CollUtil.isNotEmpty(startUserSelectAssignee)) {
-                        continue;
-                    }
+                // 特殊：如果当前节点已经存在审批人，则不允许覆盖
+                // TODO @小北：【不用改】通过 if return，让逻辑更简洁一点；虽然会多判断一次 processVariables，但是 if else 层级更少。
+                if (processVariables != null
+                        && CollUtil.isNotEmpty(processVariables.get(nextFlowNode.getId()))) {
+                    continue;
                 }
-                // 校验通过的全部节点和审批人
+                // 设置 PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES
+                if (processVariables == null) {
+                    processVariables = new HashMap<>();
+                }
                 processVariables.put(nextFlowNode.getId(), assignees);
                 variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES, processVariables);
             }
@@ -621,16 +620,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     throw exception(PROCESS_INSTANCE_APPROVE_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
                 }
                 processVariables = FlowableUtils.getApproveUserSelectAssignees(processInstance.getProcessVariables());
-                if (processVariables == null){
+                if (processVariables == null) {
                     processVariables = new HashMap<>();
-                }else  {
+                } else  {
                     List<Long> approveUserSelectAssignee = processVariables.get(nextFlowNode.getId());
                     // 特殊：如果当前节点已经存在审批人，则不允许覆盖
+                    // TODO @小北：这种，应该可以覆盖呢。
                     if (CollUtil.isNotEmpty(approveUserSelectAssignee)) {
                         continue;
                     }
                 }
-                // 校验通过的全部节点和审批人
+                // 设置 PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES
                 processVariables.put(nextFlowNode.getId(), assignees);
                 variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES, processVariables);
             }
