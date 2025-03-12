@@ -4,16 +4,13 @@ import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
 import cn.iocoder.yudao.module.wms.controller.admin.external.storage.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.external.storage.WmsExternalStorageDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-
 import cn.iocoder.yudao.module.wms.dal.mysql.external.storage.WmsExternalStorageMapper;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 
@@ -31,6 +28,12 @@ public class WmsExternalStorageServiceImpl implements WmsExternalStorageService 
 
     @Override
     public Long createExternalStorage(WmsExternalStorageSaveReqVO createReqVO) {
+        if (externalStorageMapper.getByName(createReqVO.getName()) != null) {
+            throw exception(EXTERNAL_STORAGE_NAME_DUPLICATE);
+        }
+        if (externalStorageMapper.getByCode(createReqVO.getCode()) != null) {
+            throw exception(EXTERNAL_STORAGE_CODE_DUPLICATE);
+        }
         // 插入
         WmsExternalStorageDO externalStorage = BeanUtils.toBean(createReqVO, WmsExternalStorageDO.class);
         externalStorageMapper.insert(externalStorage);
@@ -41,10 +44,16 @@ public class WmsExternalStorageServiceImpl implements WmsExternalStorageService 
     @Override
     public void updateExternalStorage(WmsExternalStorageSaveReqVO updateReqVO) {
         // 校验存在
-        validateExternalStorageExists(updateReqVO.getId());
-        // 更新
-        WmsExternalStorageDO updateObj = BeanUtils.toBean(updateReqVO, WmsExternalStorageDO.class);
-        externalStorageMapper.updateById(updateObj);
+        WmsExternalStorageDO exists = validateExternalStorageExists(updateReqVO.getId());
+        if (!Objects.equals(updateReqVO.getId(), exists.getId()) && Objects.equals(updateReqVO.getName(), exists.getName())) {
+            throw exception(EXTERNAL_STORAGE_NAME_DUPLICATE);
+        }
+        if (!Objects.equals(updateReqVO.getId(), exists.getId()) && Objects.equals(updateReqVO.getCode(), exists.getCode())) {
+            throw exception(EXTERNAL_STORAGE_CODE_DUPLICATE);
+        }
+        // 插入
+        WmsExternalStorageDO externalStorage = BeanUtils.toBean(updateReqVO, WmsExternalStorageDO.class);
+        externalStorageMapper.updateById(externalStorage);
     }
 
     @Override
@@ -55,10 +64,12 @@ public class WmsExternalStorageServiceImpl implements WmsExternalStorageService 
         externalStorageMapper.deleteById(id);
     }
 
-    private void validateExternalStorageExists(Long id) {
-        if (externalStorageMapper.selectById(id) == null) {
-            // throw exception(EXTERNAL_STORAGE_NOT_EXISTS);
+    private WmsExternalStorageDO validateExternalStorageExists(Long id) {
+        WmsExternalStorageDO externalStorage = externalStorageMapper.selectById(id);
+        if (externalStorage == null) {
+            throw exception(EXTERNAL_STORAGE_NOT_EXISTS);
         }
+        return externalStorage;
     }
 
     @Override
@@ -70,5 +81,4 @@ public class WmsExternalStorageServiceImpl implements WmsExternalStorageService 
     public PageResult<WmsExternalStorageDO> getExternalStoragePage(WmsExternalStoragePageReqVO pageReqVO) {
         return externalStorageMapper.selectPage(pageReqVO);
     }
-
 }

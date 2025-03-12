@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
-
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 @Schema(description = "管理后台 - 外部存储库分页 Request VO")
@@ -21,14 +20,13 @@ public class WmsExternalStoragePageReqVO extends PageParam {
     @Schema(description = "名称", example = "芋艿")
     private String name;
 
-    @Schema(description = "外部仓类型:1-三方,2-平台；", example = "1")
+    @Schema(description = "外部仓类型 ; ExternalStorageType : 1-三方仓 , 2-平台仓", example = "1")
     private Integer type;
 
-    @Schema(description = "JSON格式的对接需要的参数")
+    @Schema(description = "对接参数，JSON格式的对接需要的参数")
     private String apiParameters;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
-
 }

@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.external.storage;
 
 import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -19,14 +18,25 @@ public interface WmsExternalStorageMapper extends BaseMapperX<WmsExternalStorage
 
     default PageResult<WmsExternalStorageDO> selectPage(WmsExternalStoragePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<WmsExternalStorageDO>()
-                .eqIfPresent(WmsExternalStorageDO::getCode, reqVO.getCode())
-                .likeIfPresent(WmsExternalStorageDO::getName, reqVO.getName())
-                .eqIfPresent(WmsExternalStorageDO::getType, reqVO.getType())
-                .eqIfPresent(WmsExternalStorageDO::getApiParameters, reqVO.getApiParameters())
-                .betweenIfPresent(WmsExternalStorageDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(WmsExternalStorageDO::getId));
+				.eqIfPresent(WmsExternalStorageDO::getCode, reqVO.getCode())
+				.likeIfPresent(WmsExternalStorageDO::getName, reqVO.getName())
+				.eqIfPresent(WmsExternalStorageDO::getType, reqVO.getType())
+				.eqIfPresent(WmsExternalStorageDO::getApiParameters, reqVO.getApiParameters())
+				.betweenIfPresent(WmsExternalStorageDO::getCreateTime, reqVO.getCreateTime())
+				.orderByDesc(WmsExternalStorageDO::getId));
     }
 
-    
+    /**
+     * 按 name 查询唯一的 WmsExternalStorageDO
+     */
+    default WmsExternalStorageDO getByName(String name) {
+        return selectOne(WmsExternalStorageDO::getName, name);
+    }
 
-}
+    /**
+     * 按 code 查询唯一的 WmsExternalStorageDO
+     */
+    default WmsExternalStorageDO getByCode(String code) {
+        return selectOne(WmsExternalStorageDO::getCode, code);
+    }
+}

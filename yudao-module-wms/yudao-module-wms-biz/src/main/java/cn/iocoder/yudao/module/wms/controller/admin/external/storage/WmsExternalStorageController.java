@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms.controller.admin.external.storage;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.web.bind.annotation.*;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -7,33 +8,34 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
-
 import jakarta.validation.constraints.*;
 import jakarta.validation.*;
 import jakarta.servlet.http.*;
 import java.util.*;
 import java.io.IOException;
-
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.*;
-
 import cn.iocoder.yudao.module.wms.controller.admin.external.storage.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.external.storage.WmsExternalStorageDO;
 import cn.iocoder.yudao.module.wms.service.external.storage.WmsExternalStorageService;
 
-@Tag(name = "管理后台 - 外部存储库")
+@Tag(name = "外部存储库")
 @RestController
 @RequestMapping("/wms/external-storage")
 @Validated
 public class WmsExternalStorageController {
+
+    @PostConstruct
+    void init() {
+        // 原子操作，初始化字典数据
+        System.out.println();
+    }
 
     @Resource
     private WmsExternalStorageService externalStorageService;
@@ -83,13 +85,10 @@ public class WmsExternalStorageController {
     @Operation(summary = "导出外部存储库 Excel")
     @PreAuthorize("@ss.hasPermission('wms:external-storage:export')")
     @ApiAccessLog(operateType = EXPORT)
-    public void exportExternalStorageExcel(@Valid WmsExternalStoragePageReqVO pageReqVO,
-              HttpServletResponse response) throws IOException {
+    public void exportExternalStorageExcel(@Valid WmsExternalStoragePageReqVO pageReqVO, HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<WmsExternalStorageDO> list = externalStorageService.getExternalStoragePage(pageReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "外部存储库.xls", "数据", WmsExternalStorageRespVO.class,
-                        BeanUtils.toBean(list, WmsExternalStorageRespVO.class));
+        ExcelUtils.write(response, "外部存储库.xls", "数据", WmsExternalStorageRespVO.class, BeanUtils.toBean(list, WmsExternalStorageRespVO.class));
     }
-
 }

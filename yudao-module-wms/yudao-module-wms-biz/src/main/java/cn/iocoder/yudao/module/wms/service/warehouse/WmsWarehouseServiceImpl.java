@@ -33,6 +33,7 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
     public Long createWarehouse(WmsWarehouseSaveReqVO createReqVO) {
         // 插入
         WmsWarehouseDO warehouse = BeanUtils.toBean(createReqVO, WmsWarehouseDO.class);
+
         warehouseMapper.insert(warehouse);
         // 返回
         return warehouse.getId();
