@@ -1,7 +1,7 @@
 package com.somle.eccang.service;
 
 import cn.hutool.core.util.XmlUtil;
-import cn.iocoder.yudao.framework.common.util.collection.PageUtils;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.general.CoreUtils;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
@@ -53,7 +53,7 @@ public class EccangWMSService {
 
     public Stream<EccangResponse.EccangPage> streamSpecialOrders(EccangSpecialOrdersReqVo eccangSpecialOrdersReqVo) {
         String endpoint = "getSpecialOrdersList";
-        return PageUtils.getAllPages(
+        return StreamX.iterate(
             getPage(JsonUtilsX.toJSONObject(eccangSpecialOrdersReqVo), endpoint),
             page -> page.hasNext(),
             page -> {
