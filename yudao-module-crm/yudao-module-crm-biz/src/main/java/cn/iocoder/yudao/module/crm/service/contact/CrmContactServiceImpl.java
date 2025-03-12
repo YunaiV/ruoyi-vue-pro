@@ -146,7 +146,7 @@ public class CrmContactServiceImpl implements CrmContactService {
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_CONTACT_TYPE, subType = CRM_CONTACT_DELETE_SUB_TYPE, bizNo = "{{#id}}",
             success = CRM_CONTACT_DELETE_SUCCESS)
-    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
     public void deleteContact(Long id) {
         // 1.1 校验存在
         CrmContactDO contact = validateContactExists(id);
@@ -158,10 +158,11 @@ public class CrmContactServiceImpl implements CrmContactService {
         // 2. 删除联系人
         contactMapper.deleteById(id);
 
-        // 4.1 删除数据权限
-        permissionService.deletePermission(CrmBizTypeEnum.CRM_CONTACT.getType(), id);
-        // 4.2 删除商机关联
+        // 3.1 应该先删除商机关联
         contactBusinessService.deleteContactBusinessByContactId(id);
+
+        // 3.2 再删除数据权限
+        permissionService.deletePermission(CrmBizTypeEnum.CRM_CONTACT.getType(), id);
 
         // 记录操作日志上下文
         LogRecordContext.putVariable("contactName", contact.getName());
