@@ -40,6 +40,7 @@ public interface ErpStateMachines {
     String PURCHASE_ORDER_ITEM_PURCHASE_STATE_MACHINE_NAME = "purchaseOrderItemPurchaseStateMachine";
 
     // ========== ERP 入库单 ==========
+
     // ========== ERP 出库单 ==========
     // ========== ERP 付款单 ==========
 }

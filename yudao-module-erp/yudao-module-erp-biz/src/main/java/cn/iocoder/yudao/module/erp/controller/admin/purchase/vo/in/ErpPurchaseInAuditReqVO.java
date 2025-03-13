@@ -5,10 +5,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
-
+@Data
+@Builder
 public class ErpPurchaseInAuditReqVO {
     @NotNull(groups = {validation.OnSubmitAudit.class, validation.OnAudit.class}, message = "入库单ID不能为空")
     @Size(min = 1, groups = validation.OnAudit.class, message = "入库单ID审核时候只能传一个")

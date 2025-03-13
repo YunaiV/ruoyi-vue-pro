@@ -21,7 +21,6 @@ import cn.iocoder.yudao.module.erp.service.finance.ErpAccountService;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpStockRecordService;
 import cn.iocoder.yudao.module.erp.service.stock.bo.ErpStockRecordCreateReqBO;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -67,8 +66,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     @Resource
     private ErpStockRecordService stockRecordService;
 
-    @Resource
-    private AdminUserApi adminUserApi;
+//    @Resource(name = PURCHASE_REQUEST_ITEM_OFF_STATE_MACHINE_NAME)
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -303,4 +301,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         return purchaseInItemMapper.selectListByInIds(inIds);
     }
 
+    @Override
+    public void submitAudit(Collection<Long> inIds) {
+    }
 }

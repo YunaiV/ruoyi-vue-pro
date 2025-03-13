@@ -34,17 +34,17 @@ public interface ErpPurchaseInMapper extends BaseMapperX<ErpPurchaseInDO> {
                 .likeIfPresent(ErpPurchaseInDO::getOrderNo, reqVO.getOrderNo())
                 .orderByDesc(ErpPurchaseInDO::getId);
         // 付款状态。为什么需要 t. 的原因，是因为联表查询时，需要指定表名，不然会报字段不存在的错误
-        if (Objects.equals(reqVO.getPaymentStatus(), ErpPurchaseInPageReqVO.PAYMENT_STATUS_NONE)) {
-            query.eq(ErpPurchaseInDO::getPaymentPrice, 0);
-        } else if (Objects.equals(reqVO.getPaymentStatus(), ErpPurchaseInPageReqVO.PAYMENT_STATUS_PART)) {
-            query.gt(ErpPurchaseInDO::getPaymentPrice, 0).apply("t.payment_price < t.total_price");
-        } else if (Objects.equals(reqVO.getPaymentStatus(), ErpPurchaseInPageReqVO.PAYMENT_STATUS_ALL)) {
-            query.apply("t.payment_price = t.total_price");
-        }
-        if (Boolean.TRUE.equals(reqVO.getPaymentEnable())) {
-            query.eq(ErpPurchaseInDO::getAuditorStatus, ErpAuditStatus.APPROVED.getCode())
-                    .apply("t.payment_price < t.total_price");
-        }
+//        if (Objects.equals(reqVO.getPaymentStatus(), ErpPurchaseInPageReqVO.PAYMENT_STATUS_NONE)) {
+//            query.eq(ErpPurchaseInDO::getPaymentPrice, 0);
+//        } else if (Objects.equals(reqVO.getPaymentStatus(), ErpPurchaseInPageReqVO.PAYMENT_STATUS_PART)) {
+//            query.gt(ErpPurchaseInDO::getPaymentPrice, 0).apply("t.payment_price < t.total_price");
+//        } else if (Objects.equals(reqVO.getPaymentStatus(), ErpPurchaseInPageReqVO.PAYMENT_STATUS_ALL)) {
+//            query.apply("t.payment_price = t.total_price");
+//        }
+//        if (Boolean.TRUE.equals(reqVO.getPaymentEnable())) {
+//            query.eq(ErpPurchaseInDO::getAuditorStatus, ErpAuditStatus.APPROVED.getCode())
+//                    .apply("t.payment_price < t.total_price");
+//        }
         if (reqVO.getWarehouseId() != null || reqVO.getProductId() != null) {
             query.leftJoin(ErpPurchaseInItemDO.class, ErpPurchaseInItemDO::getInId, ErpPurchaseInDO::getId)
                     .eq(reqVO.getWarehouseId() != null, ErpPurchaseInItemDO::getWarehouseId, reqVO.getWarehouseId())

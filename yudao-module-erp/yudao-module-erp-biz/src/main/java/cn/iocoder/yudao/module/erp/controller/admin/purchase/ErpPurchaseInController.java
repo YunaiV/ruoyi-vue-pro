@@ -9,10 +9,10 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInAuditReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInBaseRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInSaveReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderAuditReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.tools.validation;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInItemDO;
@@ -136,8 +136,8 @@ public class ErpPurchaseInController {
     @Operation(summary = "提交审核")
     @Parameter(name = "itemIds", description = "订单下的订单项Id集合", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:submitAudit')")
-    public CommonResult<Boolean> submitAudit(@Validated @RequestBody ErpPurchaseOrderAuditReqVO reqVO) {
-//        purchaseInService.submitAudit(reqVO.getOrderIds());
+    public CommonResult<Boolean> submitAudit(@Validated @RequestBody ErpPurchaseInAuditReqVO reqVO) {
+        purchaseInService.submitAudit(reqVO.getInIds());
         return success(true);
     }
 
@@ -146,7 +146,7 @@ public class ErpPurchaseInController {
     @Parameter(name = "requestId", description = "申请单编号", required = true)
     @Parameter(name = "reviewed", description = "审核状态", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:review')")
-    public CommonResult<Boolean> reviewPurchaseRequest(@Validated(validation.OnAudit.class) @RequestBody ErpPurchaseOrderAuditReqVO req) {
+    public CommonResult<Boolean> reviewPurchaseRequest(@Validated(validation.OnAudit.class) @RequestBody ErpPurchaseInAuditReqVO req) {
 //        purchaseInService.reviewPurchaseOrder(req);
         return success(true);
     }
