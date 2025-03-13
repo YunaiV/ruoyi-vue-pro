@@ -9,12 +9,15 @@ import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.product.vo
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.product.ErpCustomProductDO;
 import cn.iocoder.yudao.module.tms.dal.mysql.logistic.category.product.ErpCustomProductMapper;
 import cn.iocoder.yudao.module.tms.service.logistic.category.ErpCustomCategoryService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.CUSTOM_PRODUCT_NOT_EXISTS;
@@ -83,6 +86,13 @@ public class ErpCustomProductServiceImpl implements ErpCustomProductService {
     @Override
     public PageResult<ErpCustomProductDO> getCustomProductPage(ErpCustomProductPageReqVO pageReqVO) {
         return customProductMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public ErpCustomProductDO getCustomProductByProductId(Long productId) {
+        //根据产品id查询海关产品分类表
+        ErpCustomProductDO customProduct = customProductMapper.selectOne(new LambdaQueryWrapper<ErpCustomProductDO>().eq(ErpCustomProductDO::getProductId, productId));
+        return customProduct;
     }
 
 }

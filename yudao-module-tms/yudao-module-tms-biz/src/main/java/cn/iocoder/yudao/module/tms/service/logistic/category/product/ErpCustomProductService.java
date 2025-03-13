@@ -51,4 +51,6 @@ public interface ErpCustomProductService {
      */
     PageResult<ErpCustomProductDO> getCustomProductPage(ErpCustomProductPageReqVO pageReqVO);
 
+    //根据产品id获取海关产品分类表
+    ErpCustomProductDO getCustomProductByProductId(Long productId);
 }

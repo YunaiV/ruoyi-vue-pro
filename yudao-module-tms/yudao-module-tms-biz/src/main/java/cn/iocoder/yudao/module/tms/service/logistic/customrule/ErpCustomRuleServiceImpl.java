@@ -12,12 +12,16 @@ import cn.iocoder.yudao.module.tms.api.logistic.customrule.ErpCustomRuleApi;
 import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.customrule.vo.ErpCustomRulePageReqVO;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.customrule.vo.ErpCustomRuleSaveReqVO;
+import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.product.ErpCustomProductDO;
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.customrule.ErpCustomRuleDO;
 import cn.iocoder.yudao.module.tms.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
+import cn.iocoder.yudao.module.tms.service.logistic.category.product.ErpCustomProductService;
 import cn.iocoder.yudao.module.tms.service.logistic.customrule.bo.ErpCustomRuleBO;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -44,14 +48,16 @@ import static cn.iocoder.yudao.module.tms.enums.ErrorCodeConstants.*;
 public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
     @Autowired
     ErpCustomRuleMapper customRuleMapper;
-    //    @Autowired
-//    MessageChannel tmsCustomRuleChannel;
+    @Autowired
+    MessageChannel erpCustomRuleChannel;
     @Autowired
     ErpCustomRuleApi tmsCustomRuleApi;
     @Autowired
     DictDataApi dictDataApi;
     @Autowired
     ErpProductApi erpProductApi;
+    @Autowired
+    ErpCustomProductService erpCustomProductService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -60,7 +66,7 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
         //判断国别+产品编码是否重复
         createReqVO.getCountryCode().forEach(countryCode -> validateExist(null, countryCode, createReqVO.getProductId()));
         List<ErpCustomRuleDO> doList = createReqVO.getCountryCode().stream().map(countryCode -> copyPropertiesIgnoreType(createReqVO, countryCode)).toList();
-        ThrowUtil.ifThrow(erpProductApi.getProductDto(createReqVO.getProductId()).getCustomCategoryId() == null, CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS_BY_PRODUCT_ID);
+        validProductHasCustomData(createReqVO);
         //批量添加
         ThrowUtil.ifThrow(!customRuleMapper.insertBatch(doList, doList.size()), DB_BATCH_INSERT_ERROR);
         //同步数据
@@ -81,7 +87,7 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
         validateExist(id, countryCode, updateReqVO.getProductId());
         // 校验存在
         validateCustomRuleExists(id);
-        ThrowUtil.ifThrow(erpProductApi.getProductDto(updateReqVO.getProductId()).getCustomCategoryId() == null, CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS_BY_PRODUCT_ID);
+        validProductHasCustomData(updateReqVO);
         // 更新
         ErpCustomRuleDO updateObj = copyPropertiesIgnoreType(updateReqVO, countryCode);
         ThrowUtil.ifSqlThrow(customRuleMapper.updateById(updateObj), DB_UPDATE_ERROR);
@@ -89,10 +95,22 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
         this.syncErpCustomRule(Collections.singletonList(id));
     }
 
+    //验证产品存在海关分类数据
+    private void validProductHasCustomData(ErpCustomRuleSaveReqVO updateReqVO) {
+//        ThrowUtil.ifThrow(erpProductApi.getProductDto(updateReqVO.getProductId()).getCustomCategoryId() == null, CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS_BY_PRODUCT_ID);
+
+        //根据产品id查询，如果不存在就异常
+        ErpCustomProductDO customProduct = erpCustomProductService.getCustomProductByProductId(updateReqVO.getProductId());
+        if (customProduct == null) {
+            throw exception(CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS_BY_PRODUCT_ID);
+        }
+    }
+
+
     //同步海关规则方法
     private void syncErpCustomRule(List<Long> ruleIds) {
         List<ErpCustomRuleDTO> dtos = tmsCustomRuleApi.listCustomRules(ruleIds);
-//        tmsCustomRuleChannel.send(MessageBuilder.withPayload(dtos).build());
+        erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos).build());
     }
 
     @Override
