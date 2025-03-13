@@ -41,6 +41,10 @@ public class ErpPurchaseRequestItemsDO extends TenantBaseDO {
      */
     private Integer count; //联动申请项采购数量+采购状态
     /**
+     * 入库数量
+     */
+    private BigDecimal inCount;
+    /**
      * 仓库编号
      */
     private Long warehouseId;

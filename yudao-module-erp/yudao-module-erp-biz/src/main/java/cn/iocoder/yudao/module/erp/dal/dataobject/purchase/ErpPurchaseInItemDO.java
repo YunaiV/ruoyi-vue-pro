@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -114,4 +113,8 @@ public class ErpPurchaseInItemDO extends BaseDO {
      * 型号规格(产品带出)
      */
     private String model;
+    /**
+     * 单据来源
+     */
+    private String source;
 }

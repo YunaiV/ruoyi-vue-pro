@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.erp.config.purchase.order;
 import cn.iocoder.yudao.module.erp.config.BaseFailCallbackImpl;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderAuditReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.ErpStateMachines;
 import cn.iocoder.yudao.module.erp.enums.status.*;
@@ -135,10 +134,10 @@ public class ErpPurchaseOrderStatusMachine {
             .on(ErpEventEnum.STOCK_ADJUSTMENT)
             .perform(actionOrderInImpl);
         //结束事件
-        builder.internalTransition()
-            .within(ErpStorageStatus.ALL_IN_STORAGE)
-            .on(ErpEventEnum.COMPLETE_STORAGE)
-            .perform(actionOrderInImpl);
+//        builder.internalTransition()
+//            .within(ErpStorageStatus.ALL_IN_STORAGE)
+//            .on(ErpEventEnum.COMPLETE_STORAGE)
+//            .perform(actionOrderInImpl);
 
 
         builder.setFailCallback(baseFailCallbackImpl);
@@ -214,19 +213,19 @@ public class ErpPurchaseOrderStatusMachine {
             .on(ErpEventEnum.PAYMENT_INIT)
             .perform(actionOrderPaymentImpl);
 
-        // 部分付款
-        builder.externalTransition()
-            .from(ErpPaymentStatus.NONE_PAYMENT)
-            .to(ErpPaymentStatus.PARTIALLY_PAYMENT)
-            .on(ErpEventEnum.PARTIAL_PAYMENT)
-            .perform(actionOrderPaymentImpl);
-
-        // 完成付款
-        builder.externalTransitions()
-            .fromAmong(ErpPaymentStatus.NONE_PAYMENT, ErpPaymentStatus.PARTIALLY_PAYMENT)
-            .to(ErpPaymentStatus.ALL_PAYMENT)
-            .on(ErpEventEnum.COMPLETE_PAYMENT)
-            .perform(actionOrderPaymentImpl);
+//        // 部分付款
+//        builder.externalTransition()
+//            .from(ErpPaymentStatus.NONE_PAYMENT)
+//            .to(ErpPaymentStatus.PARTIALLY_PAYMENT)
+//            .on(ErpEventEnum.PARTIAL_PAYMENT)
+//            .perform(actionOrderPaymentImpl);
+//
+//        // 完成付款
+//        builder.externalTransitions()
+//            .fromAmong(ErpPaymentStatus.NONE_PAYMENT, ErpPaymentStatus.PARTIALLY_PAYMENT)
+//            .to(ErpPaymentStatus.ALL_PAYMENT)
+//            .on(ErpEventEnum.COMPLETE_PAYMENT)
+//            .perform(actionOrderPaymentImpl);
 
         // 付款异常
         builder.externalTransitions()
@@ -244,7 +243,7 @@ public class ErpPurchaseOrderStatusMachine {
 
         // 取消付款
         builder.externalTransitions()
-            .fromAmong(ErpPaymentStatus.PARTIALLY_PAYMENT, ErpPaymentStatus.ALL_PAYMENT)
+            .fromAmong(ErpPaymentStatus.ALL_PAYMENT, ErpPaymentStatus.ALL_PAYMENT)
             .to(ErpPaymentStatus.NONE_PAYMENT)
             .on(ErpEventEnum.CANCEL_PAYMENT)
             .perform(actionOrderPaymentImpl);

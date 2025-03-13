@@ -124,8 +124,8 @@ public class ErpPurchaseInSaveReqVO {
         @Schema(description = "备注", example = "商品行备注")
         private String remark;
 
-        @Schema(description = "源单行号")
-        private int srcSeq;
+        @Schema(description = "单据来源描述")
+        private String source;
 
         @Schema(description = "源单单号")
         private int srcNo;

@@ -69,6 +69,8 @@ public class ErpPurchaseInController {
     @Operation(summary = "创建采购入库")
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:create')")
     public CommonResult<Long> createPurchaseIn(@Valid @RequestBody ErpPurchaseInSaveReqVO createReqVO) {
+        //给vo里面的项的source设置字符串a
+        createReqVO.getItems().forEach(item -> item.setSource("WEB录入"));
         return success(purchaseInService.createPurchaseIn(createReqVO));
     }
 
@@ -147,7 +149,7 @@ public class ErpPurchaseInController {
     @Parameter(name = "reviewed", description = "审核状态", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:review')")
     public CommonResult<Boolean> reviewPurchaseRequest(@Validated(validation.OnAudit.class) @RequestBody ErpPurchaseInAuditReqVO req) {
-//        purchaseInService.reviewPurchaseOrder(req);
+        purchaseInService.reviewPurchaseOrder(req);
         return success(true);
     }
 

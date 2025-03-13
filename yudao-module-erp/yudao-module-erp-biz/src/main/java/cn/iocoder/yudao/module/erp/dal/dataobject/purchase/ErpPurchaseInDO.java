@@ -142,4 +142,8 @@ public class ErpPurchaseInDO extends BaseDO {
      * 审核意见
      */
     private String reviewComment;
+    /**
+     * 付款状态
+     */
+    private Integer payStatus;
 }

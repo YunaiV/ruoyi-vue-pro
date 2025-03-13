@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.erp.config.purchase.order;
 
+import cn.iocoder.yudao.module.erp.api.purchase.ErpInCountDTO;
 import cn.iocoder.yudao.module.erp.config.BaseFailCallbackImpl;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.ErpStateMachines;
@@ -32,7 +32,7 @@ public class ErpPurchaseOrderItemStatusMachine {
 
 
     @Resource
-    private Action<ErpOffStatus, ErpEventEnum, ErpPurchaseOrderItemDO> actionOrderItemOffImpl;
+    private Action actionOrderItemOffImpl;
     //采购订单子项状态机
     @Bean(ErpStateMachines.PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME)
     public StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseOrderItemDO> getPurchaseOrderItemStateMachine() {
@@ -67,7 +67,7 @@ public class ErpPurchaseOrderItemStatusMachine {
 
 
     @Resource
-    private Action<ErpExecutionStatus, ErpEventEnum, ErpPurchaseOrderItemDO> actionOrderItemExecuteImpl;
+    private Action actionOrderItemExecuteImpl;
     // 采购订单子项执行状态机
     @Bean(ErpStateMachines.PURCHASE_ORDER_ITEM_EXECUTION_STATE_MACHINE_NAME)
     public StateMachine<ErpExecutionStatus, ErpEventEnum, ErpPurchaseOrderItemDO> getPurchaseOrderItemExecutionStateMachine() {
@@ -128,10 +128,13 @@ public class ErpPurchaseOrderItemStatusMachine {
     }
 
     @Resource
-    private Action<ErpStorageStatus, ErpEventEnum, ErpPurchaseOrderItemDO> actionOrderItemInImpl;
+    private Action actionOrderItemInImpl;
+    @Resource
+    private Action actionOrderItemPayImpl;
+
     @Bean(ErpStateMachines.PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME)
-    public StateMachine<ErpStorageStatus, ErpEventEnum, ErpPurchaseOrderItemDO> buildPurchaseOrderItemStorageStateMachine() {
-        StateMachineBuilder<ErpStorageStatus, ErpEventEnum, ErpPurchaseOrderItemDO> builder = StateMachineBuilderFactory.create();
+    public StateMachine<ErpStorageStatus, ErpEventEnum, ErpInCountDTO> buildPurchaseOrderItemStorageStateMachine() {
+        StateMachineBuilder<ErpStorageStatus, ErpEventEnum, ErpInCountDTO> builder = StateMachineBuilderFactory.create();
 
         // 初始化入库
         builder.externalTransition()
@@ -141,18 +144,18 @@ public class ErpPurchaseOrderItemStatusMachine {
             .perform(actionOrderItemInImpl);
 
         // 部分入库
-        builder.externalTransition()
-            .from(ErpStorageStatus.NONE_IN_STORAGE)
-            .to(ErpStorageStatus.PARTIALLY_IN_STORAGE)
-            .on(ErpEventEnum.PARTIAL_STORAGE)
-            .perform(actionOrderItemInImpl);
-
-        // 完成入库
-        builder.externalTransitions()
-            .fromAmong(ErpStorageStatus.NONE_IN_STORAGE, ErpStorageStatus.PARTIALLY_IN_STORAGE)
-            .to(ErpStorageStatus.ALL_IN_STORAGE)
-            .on(ErpEventEnum.COMPLETE_STORAGE)
-            .perform(actionOrderItemInImpl);
+//        builder.externalTransition()
+//            .from(ErpStorageStatus.NONE_IN_STORAGE)
+//            .to(ErpStorageStatus.PARTIALLY_IN_STORAGE)
+//            .on(ErpEventEnum.PARTIAL_STORAGE)
+//            .perform(actionOrderItemInImpl);
+//
+//        // 完成入库
+//        builder.externalTransitions()
+//            .fromAmong(ErpStorageStatus.NONE_IN_STORAGE, ErpStorageStatus.PARTIALLY_IN_STORAGE)
+//            .to(ErpStorageStatus.ALL_IN_STORAGE)
+//            .on(ErpEventEnum.COMPLETE_STORAGE)
+//            .perform(actionOrderItemInImpl);
 
         // 取消入库
         builder.externalTransitions()
@@ -161,12 +164,12 @@ public class ErpPurchaseOrderItemStatusMachine {
             .on(ErpEventEnum.CANCEL_STORAGE)
             .perform(actionOrderItemInImpl);
 
-        // 入库异常
-        builder.externalTransitions()
-            .fromAmong(ErpStorageStatus.NONE_IN_STORAGE, ErpStorageStatus.PARTIALLY_IN_STORAGE, ErpStorageStatus.ALL_IN_STORAGE)
-            .to(ErpStorageStatus.NONE_IN_STORAGE)
-            .on(ErpEventEnum.STORAGE_EXCEPTION)
-            .perform(actionOrderItemInImpl);
+//        // 入库异常
+//        builder.externalTransitions()
+//            .fromAmong(ErpStorageStatus.NONE_IN_STORAGE, ErpStorageStatus.PARTIALLY_IN_STORAGE, ErpStorageStatus.ALL_IN_STORAGE)
+//            .to(ErpStorageStatus.NONE_IN_STORAGE)
+//            .on(ErpEventEnum.STORAGE_EXCEPTION)
+//            .perform(actionOrderItemInImpl);
 
         // 库存调整
         builder.externalTransitions()
@@ -181,9 +184,6 @@ public class ErpPurchaseOrderItemStatusMachine {
         return builder.build(ErpStateMachines.PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME);
     }
 
-    @Resource
-    private Action<ErpPaymentStatus, ErpEventEnum, ErpPurchaseOrderItemDO> actionOrderItemPayImpl;
-
     @Bean(ErpStateMachines.PURCHASE_ORDER_ITEM_PAYMENT_STATE_MACHINE_NAME)
     public StateMachine<ErpPaymentStatus, ErpEventEnum, ErpPurchaseOrderItemDO> getPurchaseOrderItemPaymentStateMachine() {
         StateMachineBuilder<ErpPaymentStatus, ErpEventEnum, ErpPurchaseOrderItemDO> builder = StateMachineBuilderFactory.create();
@@ -194,19 +194,19 @@ public class ErpPurchaseOrderItemStatusMachine {
             .on(ErpEventEnum.PAYMENT_INIT)
             .perform(actionOrderItemPayImpl);
 
-        // 部分付款
-        builder.externalTransition()
-            .from(ErpPaymentStatus.NONE_PAYMENT)
-            .to(ErpPaymentStatus.PARTIALLY_PAYMENT)
-            .on(ErpEventEnum.PARTIAL_PAYMENT)
-            .perform(actionOrderItemPayImpl);
-
-        // 完成付款
-        builder.externalTransitions()
-            .fromAmong(ErpPaymentStatus.NONE_PAYMENT, ErpPaymentStatus.PARTIALLY_PAYMENT)
-            .to(ErpPaymentStatus.ALL_PAYMENT)
-            .on(ErpEventEnum.COMPLETE_PAYMENT)
-            .perform(actionOrderItemPayImpl);
+//        // 部分付款
+//        builder.externalTransition()
+//            .from(ErpPaymentStatus.NONE_PAYMENT)
+//            .to(ErpPaymentStatus.PARTIALLY_PAYMENT)
+//            .on(ErpEventEnum.PARTIAL_PAYMENT)
+//            .perform(actionOrderItemPayImpl);
+//
+//        // 完成付款
+//        builder.externalTransitions()
+//            .fromAmong(ErpPaymentStatus.NONE_PAYMENT, ErpPaymentStatus.PARTIALLY_PAYMENT)
+//            .to(ErpPaymentStatus.ALL_PAYMENT)
+//            .on(ErpEventEnum.COMPLETE_PAYMENT)
+//            .perform(actionOrderItemPayImpl);
 
         // 取消付款
         builder.externalTransitions()

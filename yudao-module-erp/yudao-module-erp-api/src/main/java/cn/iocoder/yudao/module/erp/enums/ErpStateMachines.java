@@ -4,43 +4,51 @@ package cn.iocoder.yudao.module.erp.enums;
 public interface ErpStateMachines {
     // ========== ERP 采购申请单 ==========
     //采购申请主表开关状态机
-    String PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME = "purchaseRequestOffStateMachine";
+    String PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME = "purchaseRequestOff";
     //采购申请审核状态机
-    String PURCHASE_REQUEST_AUDIT_STATE_MACHINE_NAME = "purchaseRequestAuditStateMachine";
+    String PURCHASE_REQUEST_AUDIT_STATE_MACHINE_NAME = "purchaseRequestAudit";
     //采购主表采购状态机
-    String PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME = "purchaseRequestOrderStateMachine";
+    String PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME = "purchaseRequestOrder";
     //采购申请子项开关状态机
-    String PURCHASE_REQUEST_ITEM_OFF_STATE_MACHINE_NAME = "purchaseRequestItemOffStateMachine";
+    String PURCHASE_REQUEST_ITEM_OFF_STATE_MACHINE_NAME = "purchaseRequestItemOff";
     //采购子项采购状态机
-    String PURCHASE_REQUEST_ITEM_ORDER_STATE_MACHINE_NAME = "purchaseRequestItemStateMachine";
+    String PURCHASE_REQUEST_ITEM_ORDER_STATE_MACHINE_NAME = "purchaseRequestItem";
 
     // ========== ERP 采购订单 ==========
     //订单开关状态机
-    String PURCHASE_ORDER_OFF_STATE_MACHINE_NAME = "purchaseOrderOffStateMachine";
+    String PURCHASE_ORDER_OFF_STATE_MACHINE_NAME = "purchaseOrderOff";
     //订单审核状态机
-    String PURCHASE_ORDER_AUDIT_STATE_MACHINE_NAME = "purchaseOrderAuditStateMachine";
+    String PURCHASE_ORDER_AUDIT_STATE_MACHINE_NAME = "purchaseOrderAudit";
     //订单执行状态机
-    String PURCHASE_ORDER_EXECUTION_STATE_MACHINE_NAME = "purchaseOrderExecutionStateMachine";
+    String PURCHASE_ORDER_EXECUTION_STATE_MACHINE_NAME = "purchaseOrderExecution";
     //订单入库状态机
-    String PURCHASE_ORDER_STORAGE_STATE_MACHINE_NAME = "purchaseOrderStorageStateMachine";
+    String PURCHASE_ORDER_STORAGE_STATE_MACHINE_NAME = "purchaseOrderStorage";
     //订单付款状态机
-    String PURCHASE_ORDER_PAYMENT_STATE_MACHINE_NAME = "purchaseOrderPaymentStateMachine";
+    String PURCHASE_ORDER_PAYMENT_STATE_MACHINE_NAME = "purchaseOrderPayment";
     //订单采购状态机
-    String PURCHASE_ORDER_PURCHASE_STATE_MACHINE_NAME = "purchaseOrderPurchaseStateMachine";
+    String PURCHASE_ORDER_PURCHASE_STATE_MACHINE_NAME = "purchaseOrderPurchase";
     // ========== ERP 采购订单子项 ==========
     //订单子项开关状态机
-    String PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME = "purchaseOrderItemOffStateMachine";
+    String PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME = "purchaseOrderItemOff";
     //订单子项执行状态机
-    String PURCHASE_ORDER_ITEM_EXECUTION_STATE_MACHINE_NAME = "purchaseOrderItemExecutionStateMachine";
+    String PURCHASE_ORDER_ITEM_EXECUTION_STATE_MACHINE_NAME = "purchaseOrderItemExecution";
     //订单子项入库状态机
-    String PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME = "purchaseOrderItemStorageStateMachine";
+    String PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME = "purchaseOrderItemStorage";
     //订单子项付款状态机
-    String PURCHASE_ORDER_ITEM_PAYMENT_STATE_MACHINE_NAME = "purchaseOrderItemPaymentStateMachine";
+    String PURCHASE_ORDER_ITEM_PAYMENT_STATE_MACHINE_NAME = "purchaseOrderItemPayment";
     //订单子项采购状态机
-    String PURCHASE_ORDER_ITEM_PURCHASE_STATE_MACHINE_NAME = "purchaseOrderItemPurchaseStateMachine";
+    String PURCHASE_ORDER_ITEM_PURCHASE_STATE_MACHINE_NAME = "purchaseOrderItemPurchase";
 
-    // ========== ERP 入库单 ==========
+    // ========== ERP 入库单主项 ==========
+    String PURCHASE_IN_AUDIT_STATE_MACHINE = "purchaseInAudit";
+    String PURCHASE_IN_PAYMENT_STATE_MACHINE = "purchaseInPay";
+    // ========== ERP 入库单子项 ==========
+    String PURCHASE_IN_ITEM_PAYMENT_STATE_MACHINE = "purchaseInItemPay";
+    // ========== ERP 退货单 ==========
+    String PURCHASE_RETURN_AUDIT_STATE_MACHINE_NAME = "purchaseReturnAudit";
+    String PURCHASE_RETURN_REFUND_STATE_MACHINE_NAME = "purchaseReturnRefund";
+    // ========== ERP 退货单子项 ==========
+    String PURCHASE_RETURN_ITEM_REFUND_STATE_MACHINE_NAME = "purchaseReturnItemRefund";
 
-    // ========== ERP 出库单 ==========
-    // ========== ERP 付款单 ==========
+
 }

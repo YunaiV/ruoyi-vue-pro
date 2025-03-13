@@ -1,74 +1,114 @@
 package cn.iocoder.yudao.module.erp.config.purchase.order.impl.action.item;
 
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
+import cn.iocoder.yudao.module.erp.api.purchase.ErpInCountDTO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseOrderItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseOrderMapper;
+import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestItemsMapper;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.status.ErpStorageStatus;
 import com.alibaba.cola.statemachine.Action;
 import com.alibaba.cola.statemachine.StateMachine;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
+import java.math.BigDecimal;
+import java.util.Optional;
 
 import static cn.iocoder.yudao.module.erp.enums.ErpStateMachines.PURCHASE_ORDER_STORAGE_STATE_MACHINE_NAME;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PURCHASE_REQUEST_ITEM_NOT_FOUND;
 
 //订单项入库状态机
 @Component
 @Slf4j
-public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventEnum, ErpPurchaseOrderItemDO> {
+public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventEnum, ErpInCountDTO> {
 
     @Resource
     private ErpPurchaseOrderItemMapper itemMapper;
+    @Autowired
+    ErpPurchaseRequestItemsMapper erpPurchaseRequestItemsMapper;
     @Resource
     private ErpPurchaseOrderMapper mapper;
     @Resource(name = PURCHASE_ORDER_STORAGE_STATE_MACHINE_NAME)
     private StateMachine storageStateMachine;
-    //入库单->订单项->订单->申请项->申请单
+
+    //入库项(->入库主单)->订单项(->订单主单)->申请项(->订单主单)
     @Override
-    @Transactional( rollbackFor = Exception.class)
-    public void execute(ErpStorageStatus from, ErpStorageStatus to, ErpEventEnum erpEventEnum, ErpPurchaseOrderItemDO context) {
-        //入库数量+入库状态
-        // 1. 校验参数
-        if (context == null) {
-            return;
+    @Transactional(rollbackFor = Exception.class)
+    public void execute(ErpStorageStatus from, ErpStorageStatus to, ErpEventEnum event, ErpInCountDTO dto) {
+        // 1. 先查询数据库中的采购项信息
+        ErpPurchaseOrderItemDO oldData = itemMapper.selectById(dto.getOrderItemId());
+        if (oldData == null) {
+            return; // 防止空指针异常
         }
 
-        // 2. 根据事件类型处理
-        if (Objects.requireNonNull(erpEventEnum) == ErpEventEnum.STOCK_ADJUSTMENT) {// 库存调整时,需要重新计算入库状态
-            if (context.getInCount() == null || context.getInCount().compareTo(context.getCount()) == 0) {
-                // 未入库或已全部入库
-                context.setInStatus(ErpStorageStatus.NONE_IN_STORAGE.getCode());
-            } else if (context.getInCount().compareTo(context.getCount()) < 0) {
+
+        // 根据事件类型更新入库状态
+        if (event == null) {
+            return; // 防止空指针异常
+        }
+        //  计算最新入库数量
+        BigDecimal oldInCount = oldData.getInCount() == null ? BigDecimal.ZERO : oldData.getInCount();
+        BigDecimal dtoCount = dto.getCount() == null ? BigDecimal.ZERO : dto.getCount();
+        BigDecimal newInCount = oldInCount.subtract(dtoCount); // 计算新的入库数量
+
+        if (event == ErpEventEnum.STORAGE_INIT) {
+
+        }
+
+        if (event == ErpEventEnum.STOCK_ADJUSTMENT) {
+
+            if (newInCount.compareTo(BigDecimal.ZERO) <= 0) {
+                // 未入库,最新入库数量 <= 0
+                to = (ErpStorageStatus.NONE_IN_STORAGE);
+            } else if (newInCount.compareTo(oldData.getCount()) < 0) {//入库值 小于 申请数量
                 // 部分入库
-                context.setInStatus(ErpStorageStatus.PARTIALLY_IN_STORAGE.getCode());
+                to = (ErpStorageStatus.PARTIALLY_IN_STORAGE);
             } else {
                 // 全部入库
-                context.setInStatus(ErpStorageStatus.ALL_IN_STORAGE.getCode());
+                to = (ErpStorageStatus.ALL_IN_STORAGE);
+                //执行状态完毕
             }
-        } else {// 其他事件直接更新状态
-            context.setInStatus(to.getCode());
+            //传递给采购申请项
         }
-        // 4. 触发订单入库状态变更
+
+        // 更新数据库中的采购项状态
+        itemMapper.updateById(oldData
+            .setInStatus(to.getCode())//状态
+            .setInCount(newInCount)//入库数量
+        );
+        // -触发订单入库状态变更
         // 根据订单项ID查询订单信息
-        ErpPurchaseOrderDO orderDO = mapper.selectById(context.getOrderId());
+        ErpPurchaseOrderDO orderDO = mapper.selectById(oldData.getOrderId());
         if (orderDO == null) {
-            log.error("未找到对应的采购订单,订单ID={}", context.getOrderId());
+            log.error("未找到对应的采购订单,订单ID={}", oldData.getOrderId());
             return;
         }
-        orderDO.setId(context.getOrderId());
-        storageStateMachine.fireEvent(ErpStorageStatus.fromCode(orderDO.getInStatus()), erpEventEnum, orderDO);
+        storageStateMachine.fireEvent(ErpStorageStatus.fromCode(orderDO.getInStatus()), event, orderDO);
+
+        //联动申请项的入库数量
+        Optional.ofNullable(oldData.getPurchaseApplyItemId()).ifPresent(
+            applyItemId -> {
+                ErpPurchaseRequestItemsDO applyItemDO = erpPurchaseRequestItemsMapper.selectById(applyItemId);
+                ThrowUtil.ifThrow(applyItemDO == null, PURCHASE_REQUEST_ITEM_NOT_FOUND, oldData.getId(), applyItemId);
+
+                BigDecimal oldCount = applyItemDO.getInCount();
+                erpPurchaseRequestItemsMapper.updateById(applyItemDO.setInCount(oldCount.subtract(dtoCount)));//联动入库数量
+            }
+        );
 
         // 3. 记录日志
-        log.info("子项入库状态机触发({})事件：对象ID={}，状态 {} -> {}, 入库数量={}",
-            erpEventEnum.getDesc(),
-            context.getId(),
+        log.info("订单子项入库状态机触发({})事件：对象ID={}，状态 {} -> {}, 入库数量={}",
+            event.getDesc(),
+            oldData.getId(),
             from.getDesc(),
             to.getDesc(),
-            context.getInCount());
+            oldData.getInCount());
     }
 }
