@@ -28,6 +28,7 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.module.tms.enums.DictValue.PRODUCT_MATERIAL;
 
 /**
  * 海关分类 Service 实现类
@@ -50,7 +51,7 @@ public class ErpCustomCategoryServiceImpl implements ErpCustomCategoryService {
     @Transactional(rollbackFor = Exception.class)
     public Long createCustomRuleCategory(ErpCustomCategorySaveReqVO createReqVO) {
         //材质-字典校验
-        dictDataApi.validateDictDataList("erp_product_material", List.of(String.valueOf(createReqVO.getMaterial())));
+        dictDataApi.validateDictDataList(PRODUCT_MATERIAL.getName(), List.of(String.valueOf(createReqVO.getMaterial())));
         // 插入
         ErpCustomCategoryDO customRuleCategory = ErpCustomCategoryConvert.INSTANCE.convert(createReqVO);
         customRuleCategoryMapper.insert(customRuleCategory);
@@ -70,7 +71,7 @@ public class ErpCustomCategoryServiceImpl implements ErpCustomCategoryService {
         Long categoryId = updateReqVO.getId();
         validateCustomRuleCategoryExists(categoryId);
         //材质-字典校验
-        dictDataApi.validateDictDataList("erp_product_material", List.of(String.valueOf(updateReqVO.getMaterial())));
+        dictDataApi.validateDictDataList(PRODUCT_MATERIAL.getName(), List.of(String.valueOf(updateReqVO.getMaterial())));
         // 更新
         ErpCustomCategoryDO updateObj = BeanUtils.toBean(updateReqVO, ErpCustomCategoryDO.class);
         customRuleCategoryMapper.updateById(updateObj);

@@ -11,8 +11,8 @@ import lombok.*;
  *
  * @author 索迈管理员
  */
-@TableName("tms_custom_rule")
-@KeySequence("tms_custom_rule_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("erp_custom_rule")
+@KeySequence("erp_custom_rule_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

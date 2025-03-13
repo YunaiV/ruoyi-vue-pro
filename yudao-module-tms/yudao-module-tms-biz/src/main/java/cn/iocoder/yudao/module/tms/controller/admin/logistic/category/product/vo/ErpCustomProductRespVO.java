@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.tms.controller.admin.logistic.category.product.vo;
 
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
-import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.ErpCustomCategoryRespVO;
+import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.ErpCustomCategoryDO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -45,5 +45,5 @@ public class ErpCustomProductRespVO {
     private ErpProductDTO product;
 
     @Schema(description = "海关分类信息")
-    private ErpCustomCategoryRespVO customCategory;
+    private ErpCustomCategoryDO customCategory;
 }

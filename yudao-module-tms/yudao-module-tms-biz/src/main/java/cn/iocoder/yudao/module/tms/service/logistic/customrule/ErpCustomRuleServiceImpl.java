@@ -18,8 +18,6 @@ import cn.iocoder.yudao.module.tms.service.logistic.customrule.bo.ErpCustomRuleB
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -46,8 +44,8 @@ import static cn.iocoder.yudao.module.tms.enums.ErrorCodeConstants.*;
 public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
     @Autowired
     ErpCustomRuleMapper customRuleMapper;
-    @Autowired
-    MessageChannel tmsCustomRuleChannel;
+    //    @Autowired
+//    MessageChannel tmsCustomRuleChannel;
     @Autowired
     ErpCustomRuleApi tmsCustomRuleApi;
     @Autowired
@@ -94,7 +92,7 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
     //同步海关规则方法
     private void syncErpCustomRule(List<Long> ruleIds) {
         List<ErpCustomRuleDTO> dtos = tmsCustomRuleApi.listCustomRules(ruleIds);
-        tmsCustomRuleChannel.send(MessageBuilder.withPayload(dtos).build());
+//        tmsCustomRuleChannel.send(MessageBuilder.withPayload(dtos).build());
     }
 
     @Override

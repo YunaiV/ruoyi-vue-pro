@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.product;
 
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -20,7 +20,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErpCustomProductDO extends BaseDO {
+public class ErpCustomProductDO extends TenantBaseDO {
 
     /**
      * id
@@ -35,9 +35,5 @@ public class ErpCustomProductDO extends BaseDO {
      * 海关分类id
      */
     private Long customCategoryId;
-    /**
-     * 乐观锁
-     */
-    private Integer revision;
 
 }

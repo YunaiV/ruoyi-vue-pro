@@ -14,7 +14,9 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.product.vo.ErpCustomProductPageReqVO;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.product.vo.ErpCustomProductRespVO;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.product.vo.ErpCustomProductSaveReqVO;
+import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.ErpCustomCategoryDO;
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.product.ErpCustomProductDO;
+import cn.iocoder.yudao.module.tms.service.logistic.category.ErpCustomCategoryService;
 import cn.iocoder.yudao.module.tms.service.logistic.category.product.ErpCustomProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -46,6 +48,8 @@ public class ErpCustomProductController {
     private ErpProductApi erpProductApi;
     @Resource
     private AdminUserApi adminUserApi;
+    @Resource
+    ErpCustomCategoryService customCategoryService;
 
     @PostMapping("/create")
     @Operation(summary = "创建海关产品分类表")
@@ -77,6 +81,7 @@ public class ErpCustomProductController {
     @PreAuthorize("@ss.hasPermission('erp:custom-product:query')")
     public CommonResult<ErpCustomProductRespVO> getCustomProduct(@RequestParam("id") Long id) {
         ErpCustomProductDO customProduct = customProductService.getCustomProduct(id);
+
         return success(bingResult(Collections.singletonList(customProduct)).get(0));
     }
 
@@ -125,14 +130,14 @@ public class ErpCustomProductController {
         //map
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         Map<Long, ErpProductDTO> productMap = erpProductApi.getProductMap(productIds);
-//        Map<Long, ErpCustomCategoryDO> categoryMap = customCategoryService.getCustomRuleCategoryMap(categoryIds);
+        Map<Long, ErpCustomCategoryDO> categoryMap = customCategoryService.getCustomRuleCategoryMap(categoryIds);
 
         return BeanUtils.toBean(oldList, ErpCustomProductRespVO.class, vo -> {
             MapUtils.findAndThen(productMap, vo.getProductId(), vo::setProduct);
             //创建者、更新者、审核人、申请人填充
             MapUtils.findAndThen(userMap, safeParseLong(vo.getCreator()), user -> vo.setCreator(user.getNickname()));
             MapUtils.findAndThen(userMap, safeParseLong(vo.getUpdater()), user -> vo.setUpdater(user.getNickname()));
-//            MapUtils.findAndThen(categoryMap, vo.getCustomCategoryId(), vo::setCustomCategory);
+            MapUtils.findAndThen(categoryMap, vo.getCustomCategoryId(), vo::setCustomCategory);
         });
     }
 
