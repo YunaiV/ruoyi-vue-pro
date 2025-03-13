@@ -17,5 +17,7 @@ public interface ErrorCodeConstants {
     ErrorCode EXTERNAL_STORAGE_NOT_EXISTS = new ErrorCode(2_001_000_002, "外部存储库不存在");
 
     // ========== WMS_WAREHOUSE 仓库 2_001_100_000 ==========
-    ErrorCode WAREHOUSE_NOT_EXISTS = new ErrorCode(2_001_100_000, "供应商不存在");
+    ErrorCode WAREHOUSE_NOT_EXISTS = new ErrorCode(2_001_100_000, "仓库不存在");
+    ErrorCode WAREHOUSE_NAME_DUPLICATE = new ErrorCode(2_001_100_001, "名称已存在");
+    ErrorCode WAREHOUSE_CODE_DUPLICATE = new ErrorCode(2_001_100_002, "代码已存在");
 }

@@ -20,14 +20,14 @@ public interface WmsWarehouseService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createWarehouse(@Valid WmsWarehouseSaveReqVO createReqVO);
+    WmsWarehouseDO createWarehouse(@Valid WmsWarehouseSaveReqVO createReqVO);
 
     /**
      * 更新仓库
      *
      * @param updateReqVO 更新信息
      */
-    void updateWarehouse(@Valid WmsWarehouseSaveReqVO updateReqVO);
+    WmsWarehouseDO updateWarehouse(@Valid WmsWarehouseSaveReqVO updateReqVO);
 
     /**
      * 删除仓库
@@ -51,5 +51,4 @@ public interface WmsWarehouseService {
      * @return 仓库分页
      */
     PageResult<WmsWarehouseDO> getWarehousePage(WmsWarehousePageReqVO pageReqVO);
-
 }

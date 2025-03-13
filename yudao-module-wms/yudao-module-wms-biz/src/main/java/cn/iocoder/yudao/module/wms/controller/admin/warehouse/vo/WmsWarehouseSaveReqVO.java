@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.wms.enums.WarehouseMode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
@@ -12,8 +14,9 @@ public class WmsWarehouseSaveReqVO {
     @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "30946")
     private Long id;
 
-    @Schema(description = "属性/模式 : 0-自营;1-三方;2-平台；", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "属性/模式 : 0-自营;1-三方;2-平台；不能为空")
+    @Schema(description = "仓库经营方式 ; WarehouseMode : 0-自营 , 1-三方仓 , 2-平台仓", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "仓库经营方式不能为空")
+    @InEnum(WarehouseMode.class)
     private Integer mode;
 
     @Schema(description = "代码", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -59,5 +62,4 @@ public class WmsWarehouseSaveReqVO {
 
     @Schema(description = "库存同步：0-关闭；1-开启；")
     private Integer isSync;
-
 }

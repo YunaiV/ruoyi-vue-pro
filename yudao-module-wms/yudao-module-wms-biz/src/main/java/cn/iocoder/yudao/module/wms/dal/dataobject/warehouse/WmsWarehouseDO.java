@@ -13,7 +13,8 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
  * @author 李方捷
  */
 @TableName("wms_warehouse")
-@KeySequence("wms_warehouse_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+// 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@KeySequence("wms_warehouse_seq")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -27,65 +28,84 @@ public class WmsWarehouseDO extends BaseDO {
      */
     @TableId
     private Long id;
+
     /**
      * 属性/模式 : 0-自营;1-三方;2-平台；
      */
     private Integer mode;
+
     /**
      * 代码
      */
     private String code;
+
     /**
      * 名称
      */
     private String name;
+
     /**
      * 外部存储ID
      */
     private Long externalStorageId;
+
     /**
      * 外部存储代码
      */
     private String externalStorageCode;
+
     /**
      * 公司名称
      */
     private String companyName;
+
     /**
      * 国家
      */
     private String country;
+
     /**
      * 省/州
      */
     private String province;
+
     /**
      * 市
      */
     private String city;
+
     /**
      * 详细地址1
      */
     private String addressLine1;
+
     /**
      * 详细地址2
      */
     private String addressLine2;
+
     /**
      * 邮编
      */
     private String postcode;
+
     /**
      * 联系人
      */
     private String contactPerson;
+
     /**
      * 联系的话
      */
     private String contactPhone;
+
     /**
      * 库存同步：0-关闭；1-开启；
      */
     private Integer isSync;
 
+    /**
+     * 是否删除
+     */
+    private Boolean deleted;
 }

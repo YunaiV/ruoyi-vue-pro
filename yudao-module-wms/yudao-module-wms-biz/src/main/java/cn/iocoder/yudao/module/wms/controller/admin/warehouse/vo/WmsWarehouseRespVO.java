@@ -6,6 +6,7 @@ import java.util.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import com.alibaba.excel.annotation.*;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 @Schema(description = "管理后台 - 仓库 Response VO")
 @Data
@@ -16,8 +17,8 @@ public class WmsWarehouseRespVO {
     @ExcelProperty("主键")
     private Long id;
 
-    @Schema(description = "属性/模式 : 0-自营;1-三方;2-平台；", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("属性/模式 : 0-自营;1-三方;2-平台；")
+    @Schema(description = "仓库经营方式 ; WarehouseMode : 0-自营 , 1-三方仓 , 2-平台仓", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("仓库经营方式")
     private Integer mode;
 
     @Schema(description = "代码", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -73,11 +74,35 @@ public class WmsWarehouseRespVO {
     private String contactPhone;
 
     @Schema(description = "库存同步：0-关闭；1-开启；")
-    @ExcelProperty("库存同步：0-关闭；1-开启；")
+    @ExcelProperty("库存同步")
     private Integer isSync;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "创建人姓名", example = "张三")
+    @ExcelProperty("创建人姓名")
+    private String creatorName;
+
+    @Schema(description = "更新人姓名", example = "李四")
+    @ExcelProperty("更新人姓名")
+    private String updaterName;
+
+    @Schema(description = "创建者", example = "")
+    @ExcelProperty("创建者")
+    private String creator;
+
+    @Schema(description = "更新者", example = "")
+    @ExcelProperty("更新者")
+    private String updater;
+
+    @Schema(description = "更新时间", example = "")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @ExcelProperty("更新时间")
+    private LocalDateTime updateTime;
+
+    @Schema(description = "租户编号", example = "")
+    @ExcelProperty("租户编号")
+    private Long tenantId;
 }
