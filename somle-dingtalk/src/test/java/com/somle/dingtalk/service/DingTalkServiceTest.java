@@ -40,8 +40,7 @@ class DingTalkServiceTest extends SomleBaseSpringTest {
 
     @Test
     void refreshAuth() {
-        log.info(tokenRepository.findAll().get(0).toString());
-        log.info(service.refreshAuth().toString());
+        service.refreshAuth();
     }
 
     @Test
