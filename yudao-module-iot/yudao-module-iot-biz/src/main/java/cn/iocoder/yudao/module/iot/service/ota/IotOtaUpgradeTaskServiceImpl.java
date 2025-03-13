@@ -191,12 +191,6 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
             upgradeTask.setDeviceCount((long) deviceList.size());
             upgradeTask.setDeviceIds(
                     deviceList.stream().map(IotDeviceDO::getId).collect(Collectors.toList()));
-            upgradeTask.setDeviceNames(
-                    deviceList.stream().map(IotDeviceDO::getDeviceName).collect(Collectors.toList()));
-        } else if (Objects.equals(createReqVO.getScope(), IotOtaUpgradeTaskScopeEnum.SELECT.getScope())) {
-            List<IotDeviceDO> deviceList = deviceService.getDeviceListByIdList(createReqVO.getDeviceIds());
-            upgradeTask.setDeviceNames(
-                    deviceList.stream().map(IotDeviceDO::getDeviceName).collect(Collectors.toList()));
         }
         // 返回初始化后的升级任务对象
         return upgradeTask;
