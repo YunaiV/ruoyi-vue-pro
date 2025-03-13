@@ -907,17 +907,9 @@ public class BpmnModelUtils {
      * @return 符合条件的路径
      */
     private static SequenceFlow findMatchSequenceFlowByExclusiveGateway(Gateway gateway, Map<String, Object> variables) {
-        // TODO 表单无可编辑字段时variables为空，流程走向会出现问题，比如流程审批过程中无需要修改的字段值，
-        // TODO @小北：是不是还是保证，编辑的时候，如果计算下一个节点，还是 variables 是完整体？而不是空的！！！（可以微信讨论下）
-        SequenceFlow matchSequenceFlow;
-        if (CollUtil.isNotEmpty(variables)) {
-             matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
+        SequenceFlow matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
                     flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
                             && (evalConditionExpress(variables, flow.getConditionExpression())));
-        } else {
-            matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
-                    flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId()));
-        }
         if (matchSequenceFlow == null) {
             matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
                     flow -> ObjUtil.equal(gateway.getDefaultFlow(), flow.getId()));
