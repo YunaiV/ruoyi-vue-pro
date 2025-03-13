@@ -194,7 +194,7 @@ public class FlowableUtils {
     @SuppressWarnings("unchecked")
     public static Map<String, List<Long>> getStartUserSelectAssignees(Map<String, Object> processVariables) {
         if (processVariables == null) {
-            return null;
+            return new HashMap<>();
         }
         return (Map<String, List<Long>>) processVariables.get(
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES);
@@ -219,7 +219,7 @@ public class FlowableUtils {
     @SuppressWarnings("unchecked")
     public static Map<String, List<Long>> getApproveUserSelectAssignees(Map<String, Object> processVariables) {
         if (processVariables == null) {
-            return null;
+            return new HashMap<>();
         }
         return (Map<String, List<Long>>) processVariables.get(
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES);
