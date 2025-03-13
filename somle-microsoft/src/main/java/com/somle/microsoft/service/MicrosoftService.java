@@ -45,24 +45,14 @@ public class MicrosoftService {
     public void init() {
         microsoftClient = microsoftClientRepository.findAll().get(0);
         powerbiAccount = powerbiAccountRepository.findAll().get(0);
-        getPasswordToken();
     }
 
-    @Scheduled(cron = "0 */30 * * * *")
+//    @Scheduled(cron = "0 */30 * * * *")
+    @Scheduled(initialDelay = 2000, fixedRate = 1800000)
     @SneakyThrows
     public void getPasswordToken() {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
-//        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-//        var bodyString = WebUtils.urlWithParams("", Map.of(
-//                "grant_type", "password",
-//                "resource", "https://analysis.chinacloudapi.cn/powerbi/api",
-//                "client_id", microsoftClient.getClientId(),
-//                "client_secrete", microsoftClient.getClientSecret(),
-//                "username", powerbiAccount.getUsername(),
-//                "password", powerbiAccount.getPassword()
-//        ));
-//        RequestBody body = RequestBody.create(mediaType, bodyString);
         RequestBody body = new FormBody.Builder()
                 .add("grant_type", "password")
                 .add("resource", "https://analysis.chinacloudapi.cn/powerbi/api")
@@ -78,7 +68,7 @@ public class MicrosoftService {
         Response response = client.newCall(request).execute();
 
         var jsonObject = JsonUtilsX.parseObject(response.body().string(), JSONObject.class);
-        token = jsonObject.getString("access_token");
+        this.token = jsonObject.getString("access_token");
     }
 
     @SneakyThrows
