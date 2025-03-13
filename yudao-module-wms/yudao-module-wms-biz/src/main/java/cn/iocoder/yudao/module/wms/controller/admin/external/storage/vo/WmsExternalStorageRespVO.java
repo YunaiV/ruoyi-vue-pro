@@ -53,4 +53,12 @@ public class WmsExternalStorageRespVO {
     @Schema(description = "更新者", example = "")
     @ExcelProperty("更新者")
     private String updater;
+
+    @Schema(description = "创建人姓名", example = "张三")
+    @ExcelProperty("创建人姓名")
+    private String creatorName;
+
+    @Schema(description = "更新人姓名", example = "李四")
+    @ExcelProperty("更新人姓名")
+    private String updaterName;
 }

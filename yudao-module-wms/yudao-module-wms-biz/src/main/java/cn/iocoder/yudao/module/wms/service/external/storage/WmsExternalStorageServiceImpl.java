@@ -26,8 +26,11 @@ public class WmsExternalStorageServiceImpl implements WmsExternalStorageService 
     @Resource
     private WmsExternalStorageMapper externalStorageMapper;
 
+    /**
+     * @sign : DB2F714982511B63
+     */
     @Override
-    public Long createExternalStorage(WmsExternalStorageSaveReqVO createReqVO) {
+    public WmsExternalStorageDO createExternalStorage(WmsExternalStorageSaveReqVO createReqVO) {
         if (externalStorageMapper.getByName(createReqVO.getName()) != null) {
             throw exception(EXTERNAL_STORAGE_NAME_DUPLICATE);
         }
@@ -38,11 +41,14 @@ public class WmsExternalStorageServiceImpl implements WmsExternalStorageService 
         WmsExternalStorageDO externalStorage = BeanUtils.toBean(createReqVO, WmsExternalStorageDO.class);
         externalStorageMapper.insert(externalStorage);
         // 返回
-        return externalStorage.getId();
+        return externalStorage;
     }
 
+    /**
+     * @sign : 95F5B60A0E67165D
+     */
     @Override
-    public void updateExternalStorage(WmsExternalStorageSaveReqVO updateReqVO) {
+    public WmsExternalStorageDO updateExternalStorage(WmsExternalStorageSaveReqVO updateReqVO) {
         // 校验存在
         WmsExternalStorageDO exists = validateExternalStorageExists(updateReqVO.getId());
         if (!Objects.equals(updateReqVO.getId(), exists.getId()) && Objects.equals(updateReqVO.getName(), exists.getName())) {
@@ -54,6 +60,8 @@ public class WmsExternalStorageServiceImpl implements WmsExternalStorageService 
         // 插入
         WmsExternalStorageDO externalStorage = BeanUtils.toBean(updateReqVO, WmsExternalStorageDO.class);
         externalStorageMapper.updateById(externalStorage);
+        // 返回
+        return externalStorage;
     }
 
     @Override
@@ -64,6 +72,9 @@ public class WmsExternalStorageServiceImpl implements WmsExternalStorageService 
         externalStorageMapper.deleteById(id);
     }
 
+    /**
+     * @sign : 8F00B204E9800998
+     */
     private WmsExternalStorageDO validateExternalStorageExists(Long id) {
         WmsExternalStorageDO externalStorage = externalStorageMapper.selectById(id);
         if (externalStorage == null) {

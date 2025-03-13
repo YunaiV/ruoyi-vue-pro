@@ -20,14 +20,14 @@ public interface WmsExternalStorageService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createExternalStorage(@Valid WmsExternalStorageSaveReqVO createReqVO);
+    WmsExternalStorageDO createExternalStorage(@Valid WmsExternalStorageSaveReqVO createReqVO);
 
     /**
      * 更新外部存储库
      *
      * @param updateReqVO 更新信息
      */
-    void updateExternalStorage(@Valid WmsExternalStorageSaveReqVO updateReqVO);
+    WmsExternalStorageDO updateExternalStorage(@Valid WmsExternalStorageSaveReqVO updateReqVO);
 
     /**
      * 删除外部存储库
@@ -51,5 +51,4 @@ public interface WmsExternalStorageService {
      * @return 外部存储库分页
      */
     PageResult<WmsExternalStorageDO> getExternalStoragePage(WmsExternalStoragePageReqVO pageReqVO);
-
 }
