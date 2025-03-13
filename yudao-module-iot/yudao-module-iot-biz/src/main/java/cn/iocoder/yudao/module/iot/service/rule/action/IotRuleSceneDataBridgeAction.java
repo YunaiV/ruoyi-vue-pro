@@ -26,17 +26,17 @@ public class IotRuleSceneDataBridgeAction implements IotRuleSceneAction {
     @Resource
     private IotDataBridgeService dataBridgeService;
     @Resource
-    private List<IotDataBridgeExecute> dataBridgeExecutes;
+    private List<IotDataBridgeExecute<?>> dataBridgeExecutes;
 
     @Override
-    public void execute(IotDeviceMessage message, IotRuleSceneDO.ActionConfig config) {
+    public void execute(IotDeviceMessage message, IotRuleSceneDO.ActionConfig config) throws Exception {
         // 1.1 如果消息为空，直接返回
         if (message == null) {
             return;
         }
         // 1.2 获得数据桥梁
         Assert.notNull(config.getDataBridgeId(), "数据桥梁编号不能为空");
-        IotDataBridgeDO dataBridge = dataBridgeService.getIotDataBridge(config.getDataBridgeId());
+        IotDataBridgeDO dataBridge = dataBridgeService.getDataBridge(config.getDataBridgeId());
         if (dataBridge == null || dataBridge.getConfig() == null) {
             log.error("[execute][message({}) config({}) 对应的数据桥梁不存在]", message, config);
             return;
@@ -47,7 +47,9 @@ public class IotRuleSceneDataBridgeAction implements IotRuleSceneAction {
         }
 
         // 2. 执行数据桥接操作
-        dataBridgeExecutes.forEach(execute -> execute.execute(message, dataBridge));
+        for (IotDataBridgeExecute<?> execute : dataBridgeExecutes) {
+            execute.execute(message, dataBridge);
+        }
     }
 
     @Override

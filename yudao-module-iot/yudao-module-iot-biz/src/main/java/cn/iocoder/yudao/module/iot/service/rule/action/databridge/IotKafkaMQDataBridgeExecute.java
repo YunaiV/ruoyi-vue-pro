@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeKafkaMQConfig;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
-import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -15,65 +17,53 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Kafka 的 {@link IotDataBridgeExecute} 实现类
  *
  * @author HUIHUI
  */
+@ConditionalOnClass(name = "org.springframework.kafka.core.KafkaTemplate")
 @Component
 @Slf4j
-public class IotKafkaMQDataBridgeExecute extends AbstractCacheableDataBridgeExecute {
+public class IotKafkaMQDataBridgeExecute extends
+        AbstractCacheableDataBridgeExecute<IotDataBridgeKafkaMQConfig, KafkaTemplate<String, String>> {
 
-    private static final Duration SEND_TIMEOUT = Duration.ofMillis(10);
+    private static final Duration SEND_TIMEOUT = Duration.ofMillis(10000); // 10 秒超时时间
 
     @Override
-    public void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
-        // 1. 校验数据桥梁的类型 == KAFKA
-        if (!IotDataBridgTypeEnum.KAFKA.getType().equals(dataBridge.getType())) {
-            return;
-        }
-        // 2. 执行 Kafka 发送消息
-        executeKafka(message, (IotDataBridgeDO.KafkaMQConfig) dataBridge.getConfig());
-    }
-
-    @SuppressWarnings("unchecked")
-    private void executeKafka(IotDeviceMessage message, IotDataBridgeDO.KafkaMQConfig config) {
-        try {
-            // 1. 获取或创建 KafkaTemplate
-            KafkaTemplate<String, String> kafkaTemplate = (KafkaTemplate<String, String>) getProducer(config);
-
-            // 2. 发送消息并等待结果
-            kafkaTemplate.send(config.getTopic(), message.toString())
-                    .get(SEND_TIMEOUT.getSeconds(), TimeUnit.SECONDS); // 添加超时等待
-            log.info("[executeKafka][message({}) 发送成功]", message);
-        } catch (TimeoutException e) {
-            log.error("[executeKafka][message({}) config({}) 发送超时]", message, config, e);
-        } catch (Exception e) {
-            log.error("[executeKafka][message({}) config({}) 发送异常]", message, config, e);
-        }
+    public Integer getType() {
+        return IotDataBridgeTypeEnum.KAFKA.getType();
     }
 
     @Override
-    protected Object initProducer(Object config) {
-        IotDataBridgeDO.KafkaMQConfig kafkaConfig = (IotDataBridgeDO.KafkaMQConfig) config;
-        
+    public void execute0(IotDeviceMessage message, IotDataBridgeKafkaMQConfig config) throws Exception {
+        // 1. 获取或创建 KafkaTemplate
+        KafkaTemplate<String, String> kafkaTemplate = getProducer(config);
+
+        // 2. 发送消息并等待结果
+        kafkaTemplate.send(config.getTopic(), message.toString())
+                .get(SEND_TIMEOUT.getSeconds(), TimeUnit.SECONDS); // 添加超时等待
+        log.info("[execute0][message({}) 发送成功]", message);
+    }
+
+    @Override
+    protected KafkaTemplate<String, String> initProducer(IotDataBridgeKafkaMQConfig config) {
         // 1.1 构建生产者配置
         Map<String, Object> props = new HashMap<>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfig.getBootstrapServers());
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         // 1.2 如果配置了认证信息
-        if (kafkaConfig.getUsername() != null && kafkaConfig.getPassword() != null) {
+        if (config.getUsername() != null && config.getPassword() != null) {
             props.put("security.protocol", "SASL_PLAINTEXT");
             props.put("sasl.mechanism", "PLAIN");
             props.put("sasl.jaas.config",
                     "org.apache.kafka.common.security.plain.PlainLoginModule required username=\""
-                            + kafkaConfig.getUsername() + "\" password=\"" + kafkaConfig.getPassword() + "\";");
+                            + config.getUsername() + "\" password=\"" + config.getPassword() + "\";");
         }
         // 1.3 如果启用 SSL
-        if (Boolean.TRUE.equals(kafkaConfig.getSsl())) {
+        if (Boolean.TRUE.equals(config.getSsl())) {
             props.put("security.protocol", "SSL");
         }
 
@@ -83,10 +73,8 @@ public class IotKafkaMQDataBridgeExecute extends AbstractCacheableDataBridgeExec
     }
 
     @Override
-    protected void closeProducer(Object producer) {
-        if (producer instanceof KafkaTemplate) {
-            ((KafkaTemplate<?, ?>) producer).destroy();
-        }
+    protected void closeProducer(KafkaTemplate<String, String> producer) {
+        producer.destroy();
     }
 
     // TODO @芋艿：测试代码，后续清理
@@ -95,7 +83,7 @@ public class IotKafkaMQDataBridgeExecute extends AbstractCacheableDataBridgeExec
         IotKafkaMQDataBridgeExecute action = new IotKafkaMQDataBridgeExecute();
 
         // 2. 创建共享的配置
-        IotDataBridgeDO.KafkaMQConfig config = new IotDataBridgeDO.KafkaMQConfig();
+        IotDataBridgeKafkaMQConfig config = new IotDataBridgeKafkaMQConfig();
         config.setBootstrapServers("127.0.0.1:9092");
         config.setTopic("test-topic");
         config.setSsl(false);
@@ -117,10 +105,10 @@ public class IotKafkaMQDataBridgeExecute extends AbstractCacheableDataBridgeExec
 
         // 4. 执行两次测试，验证缓存
         log.info("[main][第一次执行，应该会创建新的 producer]");
-        action.executeKafka(message, config);
+        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
 
         log.info("[main][第二次执行，应该会复用缓存的 producer]");
-        action.executeKafka(message, config);
+        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
     }
 
 }

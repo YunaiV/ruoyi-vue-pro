@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
-import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgTypeEnum;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeHttpConfig;
+import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -25,23 +25,19 @@ import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_
  */
 @Component
 @Slf4j
-public class IotHttpDataBridgeExecute implements IotDataBridgeExecute {
+public class IotHttpDataBridgeExecute implements IotDataBridgeExecute<IotDataBridgeHttpConfig> {
 
     @Resource
     private RestTemplate restTemplate;
 
     @Override
-    public void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
-        // 1.1 校验数据桥梁的类型 == HTTP
-        if (!IotDataBridgTypeEnum.HTTP.getType().equals(dataBridge.getType())) {
-            return;
-        }
-        // 1.2 执行 HTTP 请求
-        executeHttp(message, (IotDataBridgeDO.HttpConfig) dataBridge.getConfig());
+    public Integer getType() {
+        return IotDataBridgeTypeEnum.HTTP.getType();
     }
 
+    @Override
     @SuppressWarnings({"unchecked", "deprecation"})
-    private void executeHttp(IotDeviceMessage message, IotDataBridgeDO.HttpConfig config) {
+    public void execute0(IotDeviceMessage message, IotDataBridgeHttpConfig config) {
         String url = null;
         HttpMethod method = HttpMethod.valueOf(config.getMethod().toUpperCase());
         HttpEntity<String> requestEntity = null;

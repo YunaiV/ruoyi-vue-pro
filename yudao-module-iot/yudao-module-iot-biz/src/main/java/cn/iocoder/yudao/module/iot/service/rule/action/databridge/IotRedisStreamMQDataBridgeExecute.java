@@ -2,8 +2,9 @@ package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeRedisStreamMQConfig;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
-import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -29,47 +30,36 @@ import java.time.LocalDateTime;
  */
 @Component
 @Slf4j
-public class IotRedisStreamMQDataBridgeExecute extends AbstractCacheableDataBridgeExecute {
+public class IotRedisStreamMQDataBridgeExecute extends
+        AbstractCacheableDataBridgeExecute<IotDataBridgeRedisStreamMQConfig, RedisTemplate<String, Object>> {
 
     @Override
-    public void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
-        // 1.1 校验数据桥梁类型
-        if (!IotDataBridgTypeEnum.REDIS_STREAM.getType().equals(dataBridge.getType())) {
-            return;
-        }
-        // 1.2 执行消息发送
-        executeRedisStream(message, (IotDataBridgeDO.RedisStreamMQConfig) dataBridge.getConfig());
-    }
-
-    @SuppressWarnings("unchecked")
-    // TODO @huihui：try catch 交给父类来做，子类不处理异常
-    private void executeRedisStream(IotDeviceMessage message, IotDataBridgeDO.RedisStreamMQConfig config) {
-        try {
-            // 1. 获取 RedisTemplate
-            RedisTemplate<String, Object> redisTemplate = (RedisTemplate<String, Object>) getProducer(config);
-
-            // 2. 创建并发送 Stream 记录
-            ObjectRecord<String, IotDeviceMessage> record = StreamRecords.newRecord()
-                    .ofObject(message).withStreamKey(config.getTopic());
-            String recordId = String.valueOf(redisTemplate.opsForStream().add(record));
-            log.info("[executeRedisStream][消息发送成功] messageId: {}, config: {}", recordId, config);
-        } catch (Exception e) {
-            log.error("[executeRedisStream][消息发送失败] message: {}, config: {}", message, config, e);
-        }
+    public Integer getType() {
+        return IotDataBridgeTypeEnum.REDIS_STREAM.getType();
     }
 
     @Override
-    protected Object initProducer(Object config) {
-        IotDataBridgeDO.RedisStreamMQConfig redisConfig = (IotDataBridgeDO.RedisStreamMQConfig) config;
+    public void execute0(IotDeviceMessage message, IotDataBridgeRedisStreamMQConfig config) throws Exception {
+        // 1. 获取 RedisTemplate
+        RedisTemplate<String, Object> redisTemplate = getProducer(config);
 
+        // 2. 创建并发送 Stream 记录
+        ObjectRecord<String, IotDeviceMessage> record = StreamRecords.newRecord()
+                .ofObject(message).withStreamKey(config.getTopic());
+        String recordId = String.valueOf(redisTemplate.opsForStream().add(record));
+        log.info("[executeRedisStream][消息发送成功] messageId: {}, config: {}", recordId, config);
+    }
+
+    @Override
+    protected RedisTemplate<String, Object> initProducer(IotDataBridgeRedisStreamMQConfig config) {
         // 1.1 创建 Redisson 配置
         Config redissonConfig = new Config();
         SingleServerConfig serverConfig = redissonConfig.useSingleServer()
-                .setAddress("redis://" + redisConfig.getHost() + ":" + redisConfig.getPort())
-                .setDatabase(redisConfig.getDatabase());
+                .setAddress("redis://" + config.getHost() + ":" + config.getPort())
+                .setDatabase(config.getDatabase());
         // 1.2 设置密码（如果有）
-        if (StrUtil.isNotBlank(redisConfig.getPassword())) {
-            serverConfig.setPassword(redisConfig.getPassword());
+        if (StrUtil.isNotBlank(config.getPassword())) {
+            serverConfig.setPassword(config.getPassword());
         }
 
         // TODO @huihui：看看能不能简化一些。按道理说，不用这么多的哈。
@@ -90,17 +80,10 @@ public class IotRedisStreamMQDataBridgeExecute extends AbstractCacheableDataBrid
     }
 
     @Override
-    protected void closeProducer(Object producer) {
-        // TODO @huihui：try catch 交给父类来做。子类不处理异常
-        if (producer instanceof RedisTemplate) {
-            RedisConnectionFactory factory = ((RedisTemplate<?, ?>) producer).getConnectionFactory();
-            try {
-                if (factory != null) {
-                    ((RedissonConnectionFactory) factory).destroy();
-                }
-            } catch (Exception e) {
-                log.error("[closeProducer][关闭 redisson 连接异常]", e);
-            }
+    protected void closeProducer(RedisTemplate<String, Object> producer) throws Exception {
+        RedisConnectionFactory factory = producer.getConnectionFactory();
+        if (factory != null) {
+            ((RedissonConnectionFactory) factory).destroy();
         }
     }
 
@@ -119,7 +102,7 @@ public class IotRedisStreamMQDataBridgeExecute extends AbstractCacheableDataBrid
         IotRedisStreamMQDataBridgeExecute action = new IotRedisStreamMQDataBridgeExecute();
 
         // 2. 创建共享的配置
-        IotDataBridgeDO.RedisStreamMQConfig config = new IotDataBridgeDO.RedisStreamMQConfig();
+        IotDataBridgeRedisStreamMQConfig config = new IotDataBridgeRedisStreamMQConfig();
         config.setHost("127.0.0.1");
         config.setPort(6379);
         config.setDatabase(0);
@@ -140,11 +123,11 @@ public class IotRedisStreamMQDataBridgeExecute extends AbstractCacheableDataBrid
                 .build();
 
         // 4. 执行两次测试，验证缓存
-        log.info("[main][第一次执行，应该会创建新的 RedisTemplate]");
-        action.executeRedisStream(message, config);
+        log.info("[main][第一次执行，应该会创建新的 producer]");
+        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
 
-        log.info("[main][第二次执行，应该会复用缓存的 RedisTemplate]");
-        action.executeRedisStream(message, config);
+        log.info("[main][第二次执行，应该会复用缓存的 producer]");
+        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
     }
 
 }

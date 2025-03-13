@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeRocketMQConfig;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
-import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
@@ -9,6 +10,7 @@ import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.client.producer.SendStatus;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.remoting.common.RemotingHelper;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -18,58 +20,49 @@ import java.time.LocalDateTime;
  *
  * @author HUIHUI
  */
+@ConditionalOnClass(name = "org.apache.rocketmq.client.producer.DefaultMQProducer")
 @Component
 @Slf4j
-public class IotRocketMQDataBridgeExecute extends AbstractCacheableDataBridgeExecute {
+public class IotRocketMQDataBridgeExecute extends
+        AbstractCacheableDataBridgeExecute<IotDataBridgeRocketMQConfig, DefaultMQProducer> {
 
     @Override
-    public void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
-        // 1.1 校验数据桥梁的类型 == ROCKETMQ
-        if (!IotDataBridgTypeEnum.ROCKETMQ.getType().equals(dataBridge.getType())) {
-            return;
-        }
-        // 1.2 执行 RocketMQ 发送消息
-        executeRocketMQ(message, (IotDataBridgeDO.RocketMQConfig) dataBridge.getConfig());
+    public Integer getType() {
+        return IotDataBridgeTypeEnum.ROCKETMQ.getType();
     }
 
-    private void executeRocketMQ(IotDeviceMessage message, IotDataBridgeDO.RocketMQConfig config) {
-        try {
-            // 1. 获取或创建 Producer
-            DefaultMQProducer producer = (DefaultMQProducer) getProducer(config);
+    @Override
+    public void execute0(IotDeviceMessage message, IotDataBridgeRocketMQConfig config) throws Exception {
+        // 1. 获取或创建 Producer
+        DefaultMQProducer producer = getProducer(config);
 
-            // 2.1 创建消息对象，指定Topic、Tag和消息体
-            Message msg = new Message(
-                    config.getTopic(),
-                    config.getTags(),
-                    message.toString().getBytes(RemotingHelper.DEFAULT_CHARSET)
-            );
-            // 2.2 发送同步消息并处理结果
-            SendResult sendResult = producer.send(msg);
-            // 2.3 处理发送结果
-            if (SendStatus.SEND_OK.equals(sendResult.getSendStatus())) {
-                log.info("[executeRocketMQ][message({}) config({}) 发送成功，结果({})]", message, config, sendResult);
-            } else {
-                log.error("[executeRocketMQ][message({}) config({}) 发送失败，结果({})]", message, config, sendResult);
-            }
-        } catch (Exception e) {
-            log.error("[executeRocketMQ][message({}) config({}) 发送异常]", message, config, e);
+        // 2.1 创建消息对象，指定Topic、Tag和消息体
+        Message msg = new Message(
+                config.getTopic(),
+                config.getTags(),
+                message.toString().getBytes(RemotingHelper.DEFAULT_CHARSET)
+        );
+        // 2.2 发送同步消息并处理结果
+        SendResult sendResult = producer.send(msg);
+        // 2.3 处理发送结果
+        if (SendStatus.SEND_OK.equals(sendResult.getSendStatus())) {
+            log.info("[executeRocketMQ][message({}) config({}) 发送成功，结果({})]", message, config, sendResult);
+        } else {
+            log.error("[executeRocketMQ][message({}) config({}) 发送失败，结果({})]", message, config, sendResult);
         }
     }
 
     @Override
-    protected Object initProducer(Object config) throws Exception {
-        IotDataBridgeDO.RocketMQConfig rocketMQConfig = (IotDataBridgeDO.RocketMQConfig) config;
-        DefaultMQProducer producer = new DefaultMQProducer(rocketMQConfig.getGroup());
-        producer.setNamesrvAddr(rocketMQConfig.getNameServer());
+    protected DefaultMQProducer initProducer(IotDataBridgeRocketMQConfig config) throws Exception {
+        DefaultMQProducer producer = new DefaultMQProducer(config.getGroup());
+        producer.setNamesrvAddr(config.getNameServer());
         producer.start();
         return producer;
     }
 
     @Override
-    protected void closeProducer(Object producer) {
-        if (producer instanceof DefaultMQProducer) {
-            ((DefaultMQProducer) producer).shutdown();
-        }
+    protected void closeProducer(DefaultMQProducer producer) {
+        producer.shutdown();
     }
 
     // TODO @芋艿：测试代码，后续清理
@@ -78,7 +71,7 @@ public class IotRocketMQDataBridgeExecute extends AbstractCacheableDataBridgeExe
         IotRocketMQDataBridgeExecute action = new IotRocketMQDataBridgeExecute();
 
         // 2. 创建共享的配置
-        IotDataBridgeDO.RocketMQConfig config = new IotDataBridgeDO.RocketMQConfig();
+        IotDataBridgeRocketMQConfig config = new IotDataBridgeRocketMQConfig();
         config.setNameServer("127.0.0.1:9876");
         config.setGroup("test-group");
         config.setTopic("test-topic");
@@ -99,10 +92,10 @@ public class IotRocketMQDataBridgeExecute extends AbstractCacheableDataBridgeExe
 
         // 4. 执行两次测试，验证缓存
         log.info("[main][第一次执行，应该会创建新的 producer]");
-        action.executeRocketMQ(message, config);
+        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
 
         log.info("[main][第二次执行，应该会复用缓存的 producer]");
-        action.executeRocketMQ(message, config);
+        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
     }
 
 }

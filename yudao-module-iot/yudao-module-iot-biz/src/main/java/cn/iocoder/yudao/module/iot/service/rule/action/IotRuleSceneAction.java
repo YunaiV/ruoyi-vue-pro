@@ -22,7 +22,7 @@ public interface IotRuleSceneAction {
      *                2. 非空的情况：设备触发
      * @param config 配置
      */
-    void execute(@Nullable IotDeviceMessage message, IotRuleSceneDO.ActionConfig config);
+    void execute(@Nullable IotDeviceMessage message, IotRuleSceneDO.ActionConfig config) throws Exception;
 
     /**
      * 获得类型
