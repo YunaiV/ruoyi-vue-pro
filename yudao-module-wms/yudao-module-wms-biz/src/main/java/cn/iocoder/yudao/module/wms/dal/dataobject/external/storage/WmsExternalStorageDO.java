@@ -48,4 +48,6 @@ public class WmsExternalStorageDO extends BaseDO {
      * JSON格式的对接需要的参数
      */
     private String apiParameters;
+
+    private Boolean deleted;
 }

@@ -1,16 +1,15 @@
 package cn.iocoder.yudao.module.wms.service.external.storage;
 
-import org.springframework.stereotype.Service;
-import jakarta.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.*;
-import cn.iocoder.yudao.module.wms.controller.admin.external.storage.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.external.storage.WmsExternalStorageDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.wms.controller.admin.external.storage.vo.WmsExternalStoragePageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.external.storage.vo.WmsExternalStorageSaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.external.storage.WmsExternalStorageDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.external.storage.WmsExternalStorageMapper;
+import jakarta.annotation.Resource;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import java.util.Objects;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 
@@ -27,14 +26,14 @@ public class WmsExternalStorageServiceImpl implements WmsExternalStorageService 
     private WmsExternalStorageMapper externalStorageMapper;
 
     /**
-     * @sign : DB2F714982511B63
+     * @sign : 8D1743708CE9B1E6
      */
     @Override
     public WmsExternalStorageDO createExternalStorage(WmsExternalStorageSaveReqVO createReqVO) {
-        if (externalStorageMapper.getByName(createReqVO.getName()) != null) {
+        if (externalStorageMapper.getByName(createReqVO.getName(), true) != null) {
             throw exception(EXTERNAL_STORAGE_NAME_DUPLICATE);
         }
-        if (externalStorageMapper.getByCode(createReqVO.getCode()) != null) {
+        if (externalStorageMapper.getByCode(createReqVO.getCode(), true) != null) {
             throw exception(EXTERNAL_STORAGE_CODE_DUPLICATE);
         }
         // 插入

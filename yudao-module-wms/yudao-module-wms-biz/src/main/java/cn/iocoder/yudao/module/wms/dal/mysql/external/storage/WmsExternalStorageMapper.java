@@ -5,6 +5,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.wms.dal.dataobject.external.storage.WmsExternalStorageDO;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.wms.controller.admin.external.storage.vo.*;
 
@@ -29,14 +31,40 @@ public interface WmsExternalStorageMapper extends BaseMapperX<WmsExternalStorage
     /**
      * 按 name 查询唯一的 WmsExternalStorageDO
      */
+    default WmsExternalStorageDO getByName(String name, boolean deleted) {
+        LambdaQueryWrapperX<WmsExternalStorageDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsExternalStorageDO::getName, name);
+        ;
+        if (deleted) {
+            wrapper.eq(WmsExternalStorageDO::getDeleted, true);
+        }
+        return selectOne(wrapper);
+    }
+
+    /**
+     * 按 code 查询唯一的 WmsExternalStorageDO
+     */
+    default WmsExternalStorageDO getByCode(String code, boolean deleted) {
+        LambdaQueryWrapperX<WmsExternalStorageDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsExternalStorageDO::getCode, code);
+        ;
+        if (deleted) {
+            wrapper.eq(WmsExternalStorageDO::getDeleted, true);
+        }
+        return selectOne(wrapper);
+    }
+
+    /**
+     * 按 name 查询唯一的 WmsExternalStorageDO
+     */
     default WmsExternalStorageDO getByName(String name) {
-        return selectOne(WmsExternalStorageDO::getName, name);
+        return getByName(name, false);
     }
 
     /**
      * 按 code 查询唯一的 WmsExternalStorageDO
      */
     default WmsExternalStorageDO getByCode(String code) {
-        return selectOne(WmsExternalStorageDO::getCode, code);
+        return getByCode(code, false);
     }
 }
