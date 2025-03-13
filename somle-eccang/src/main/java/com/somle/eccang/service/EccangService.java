@@ -1,6 +1,7 @@
 package com.somle.eccang.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.general.CoreUtils;
 import cn.iocoder.yudao.framework.common.util.general.Limiter;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
@@ -11,6 +12,7 @@ import com.somle.eccang.model.*;
 import com.somle.eccang.model.EccangResponse.EccangPage;
 import com.somle.eccang.model.exception.EccangResponseException;
 import com.somle.eccang.model.req.EccangInventoryBatchReqVO;
+import com.somle.eccang.model.req.EccangReceivingReqVo;
 import com.somle.eccang.model.req.EccangRmaReturnReqVO;
 import com.somle.eccang.repository.EccangTokenRepository;
 import jakarta.annotation.PostConstruct;
@@ -439,6 +441,24 @@ public class EccangService {
     //退件列表
     public Stream<EccangPage> getRmaReturnList(EccangRmaReturnReqVO eccangRmaReturnReqVO){
         return getAllPage(JsonUtilsX.toJSONObject(eccangRmaReturnReqVO), "getRmaReturnList");
+    }
+
+    /**
+     * @return java.util.stream.Stream<com.somle.eccang.model.EccangResponse.EccangPage>
+     * @Author gumaomao
+     * @Description 入库单管理——查询入库单信息
+     * @Date  2025/03/13
+     **/
+    public Stream<EccangPage> streamReceiving(EccangReceivingReqVo eccangReceivingReqVo) {
+        String endpoint = "getReceiving";
+        return StreamX.iterate(
+            getPage(JsonUtilsX.toJSONObject(eccangReceivingReqVo), endpoint),
+            page -> page.hasNext(),
+            page -> {
+                eccangReceivingReqVo.setPage(page.getPage() + 1);
+                return getPage(JsonUtilsX.toJSONObject(eccangReceivingReqVo), endpoint);
+            }
+        );
     }
 
     public String parseCountryCode(String code) {
