@@ -38,4 +38,7 @@ public class IotDeviceSaveReqVO {
     @Schema(description = "网关设备 ID", example = "16380")
     private Long gatewayId;
 
+    @Schema(description = "设备配置", example = "{\"abc\": \"efg\"}")
+    private String config;
+
 }

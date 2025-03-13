@@ -83,6 +83,9 @@ public class IotDeviceRespVO {
     @ExcelProperty("认证类型（如一机一密、动态注册）")
     private String authType;
 
+    @Schema(description = "设备配置", example = "{\"abc\": \"efg\"}")
+    private String config;
+
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;

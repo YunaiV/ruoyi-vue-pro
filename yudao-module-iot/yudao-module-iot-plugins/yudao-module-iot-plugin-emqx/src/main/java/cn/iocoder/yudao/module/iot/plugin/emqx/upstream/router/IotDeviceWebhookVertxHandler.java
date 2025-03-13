@@ -17,9 +17,8 @@ import java.util.Collections;
 
 /**
  * IoT Emqx Webhook 事件处理的 Vert.x Handler
- * <a href=
- * "https://docs.emqx.com/zh/emqx/latest/data-integration/webhook.html">EMQX
- * Webhook</a>
+ *
+ * <a href="https://docs.emqx.com/zh/emqx/latest/data-integration/webhook.html">EMQXWebhook</a>
  *
  * @author haohao
  */
@@ -69,12 +68,11 @@ public class IotDeviceWebhookVertxHandler implements Handler<RoutingContext> {
      * @param username 用户名
      */
     private void handleClientConnected(String clientId, String username) {
+        // 解析产品标识和设备名称
         if (StrUtil.isEmpty(username) || "undefined".equals(username)) {
             log.warn("[handleClientConnected][客户端连接事件，但用户名为空] clientId={}", clientId);
             return;
         }
-
-        // 解析产品标识和设备名称
         String[] parts = parseUsername(username);
         if (parts == null) {
             return;
@@ -87,7 +85,6 @@ public class IotDeviceWebhookVertxHandler implements Handler<RoutingContext> {
         updateReqDTO.setState(IotDeviceStateEnum.ONLINE.getState());
         updateReqDTO.setProcessId(IotPluginCommonUtils.getProcessId());
         updateReqDTO.setReportTime(LocalDateTime.now());
-
         CommonResult<Boolean> result = deviceUpstreamApi.updateDeviceState(updateReqDTO);
         if (result.getCode() != 0 || !result.getData()) {
             log.error("[handleClientConnected][更新设备状态为在线失败] clientId={}, username={}, code={}, msg={}",
@@ -104,12 +101,11 @@ public class IotDeviceWebhookVertxHandler implements Handler<RoutingContext> {
      * @param username 用户名
      */
     private void handleClientDisconnected(String clientId, String username) {
+        // 解析产品标识和设备名称
         if (StrUtil.isEmpty(username) || "undefined".equals(username)) {
             log.warn("[handleClientDisconnected][客户端断开连接事件，但用户名为空] clientId={}", clientId);
             return;
         }
-
-        // 解析产品标识和设备名称
         String[] parts = parseUsername(username);
         if (parts == null) {
             return;
@@ -122,7 +118,6 @@ public class IotDeviceWebhookVertxHandler implements Handler<RoutingContext> {
         offlineReqDTO.setState(IotDeviceStateEnum.OFFLINE.getState());
         offlineReqDTO.setProcessId(IotPluginCommonUtils.getProcessId());
         offlineReqDTO.setReportTime(LocalDateTime.now());
-
         CommonResult<Boolean> offlineResult = deviceUpstreamApi.updateDeviceState(offlineReqDTO);
         if (offlineResult.getCode() != 0 || !offlineResult.getData()) {
             log.error("[handleClientDisconnected][更新设备状态为离线失败] clientId={}, username={}, code={}, msg={}",
@@ -136,19 +131,18 @@ public class IotDeviceWebhookVertxHandler implements Handler<RoutingContext> {
      * 解析用户名，格式为 deviceName&productKey
      *
      * @param username 用户名
-     * @return 解析结果，[0]为deviceName，[1]为productKey，解析失败返回null
+     * @return 解析结果，[0] 为 deviceName，[1] 为productKey，解析失败返回 null
      */
     private String[] parseUsername(String username) {
         if (StrUtil.isEmpty(username)) {
             return null;
         }
-
         String[] parts = username.split("&");
         if (parts.length != 2) {
-            log.warn("[parseUsername][用户名格式不正确，无法解析产品标识和设备名称] username={}", username);
+            log.warn("[parseUsername][用户名格式({})不正确，无法解析产品标识和设备名称]", username);
             return null;
         }
-
         return parts;
     }
+
 }

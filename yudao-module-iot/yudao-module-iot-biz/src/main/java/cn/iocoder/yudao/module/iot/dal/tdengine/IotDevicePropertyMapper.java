@@ -32,7 +32,6 @@ public interface IotDevicePropertyMapper {
     default void alterProductPropertySTable(String productKey,
                                             List<TDengineTableField> oldFields,
                                             List<TDengineTableField> newFields) {
-        // TODO @芋艿：需要处理 device_key，重新发布的时候
         oldFields.removeIf(field -> StrUtil.equalsAny(field.getField(),
                 TDengineTableField.FIELD_TS, "report_time", "device_key"));
         List<TDengineTableField> addFields = newFields.stream().filter( // 新增的字段
