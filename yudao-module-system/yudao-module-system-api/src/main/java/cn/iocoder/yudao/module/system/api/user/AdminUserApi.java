@@ -17,7 +17,7 @@ import java.util.function.Function;
  */
 public interface AdminUserApi {
 
-    public static AdminUserApi INSTANCE() {
+    public static AdminUserApi inst() {
         return SpringUtils.getBean(AdminUserApi.class);
     }
     /**
