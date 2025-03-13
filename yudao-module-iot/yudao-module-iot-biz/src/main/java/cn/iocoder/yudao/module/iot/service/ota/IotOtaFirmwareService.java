@@ -7,10 +7,10 @@ import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.firmware.IotOtaFirmwa
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;
 import jakarta.validation.Valid;
 
-// TODO @li：类、方法注释有点冗余，可以参考别的模块哈
 /**
- * OTA固件管理服务接口
- * 提供OTA固件的创建、更新和查询等功能
+ * OTA 固件管理 Service
+ *
+ * @author Shelly Chan
  */
 public interface IotOtaFirmwareService {
 

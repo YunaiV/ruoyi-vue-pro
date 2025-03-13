@@ -44,11 +44,10 @@ public class IotOtaUpgradeTaskController {
         return success(true);
     }
 
-    // TODO @li：get 接口，不是 @RequestBody 哈
     @GetMapping("/page")
     @Operation(summary = "获得升级任务分页")
     @PreAuthorize(value = "@ss.hasPermission('iot:ota-upgrade-task:query')")
-    public CommonResult<PageResult<IotOtaUpgradeTaskRespVO>> getUpgradeTaskPage(@Valid @RequestBody IotOtaUpgradeTaskPageReqVO pageReqVO) {
+    public CommonResult<PageResult<IotOtaUpgradeTaskRespVO>> getUpgradeTaskPage(@Valid IotOtaUpgradeTaskPageReqVO pageReqVO) {
         PageResult<IotOtaUpgradeTaskDO> pageResult = upgradeTaskService.getUpgradeTaskPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, IotOtaUpgradeTaskRespVO.class));
     }

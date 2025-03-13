@@ -8,8 +8,10 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaUpgradeRecordDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * OTA 升级记录 Mapper
@@ -36,36 +38,42 @@ public interface IotOtaUpgradeRecordMapper extends BaseMapperX<IotOtaUpgradeReco
     }
 
     /**
-     * 获取OTA升级记录的数量
+     * 根据任务ID和设备名称查询OTA升级记录的状态统计信息。
+     * 该函数通过SQL查询统计不同状态（0到5）的记录数量，并返回一个包含统计结果的Map列表。
      *
-     * @param taskId     任务ID，用于筛选特定任务的升级记录
-     * @param deviceName 设备名称，用于筛选特定设备的升级记录
-     * @param status     状态，用于筛选特定状态的升级记录
-     * @return 返回符合条件的OTA升级记录的数量
+     * @param taskId     任务ID，用于筛选特定任务的OTA升级记录。
+     * @param deviceName 设备名称，支持模糊查询，用于筛选特定设备的OTA升级记录。
+     * @return 返回一个Map列表，每个Map包含不同状态（0到5）的记录数量。
      */
-    default Long getOtaUpgradeRecordCount(@Param("taskId") Long taskId,
-                                          @Param("deviceName") String deviceName,
-                                          @Param("status") Integer status) {
-        return selectCount(new LambdaQueryWrapperX<IotOtaUpgradeRecordDO>()
-                .eqIfPresent(IotOtaUpgradeRecordDO::getTaskId, taskId)
-                .likeIfPresent(IotOtaUpgradeRecordDO::getDeviceId, deviceName)
-                .eqIfPresent(IotOtaUpgradeRecordDO::getStatus, status));
-    }
+    @Select("select count(case when status = 0 then 1 else 0) as `0` " +
+            "count(case when status = 1 then 1 else 0) as `1` " +
+            "count(case when status = 2 then 1 else 0) as `2` " +
+            "count(case when status = 3 then 1 else 0) as `3` " +
+            "count(case when status = 4 then 1 else 0) as `4` " +
+            "count(case when status = 5 then 1 else 0) as `5` " +
+            "from iot_ota_upgrade_record " +
+            "where task_id = #{taskId} " +
+            "and device_name like concat('%', #{deviceName}, '%') " +
+            "and status = #{status}")
+    List<Map<String, Object>> selectOtaUpgradeRecordCount(@Param("taskId") Long taskId,
+                                                          @Param("deviceName") String deviceName);
 
     /**
-     * 获取OTA升级记录的统计信息
+     * 根据固件ID查询OTA升级记录的状态统计信息。
+     * 该函数通过SQL查询统计不同状态（0到5）的记录数量，并返回一个包含统计结果的Map列表。
      *
-     * @param firmwareId 固件ID，用于筛选特定固件的升级记录
-     * @param status     状态，用于筛选特定状态的升级记录
-     * @return 返回符合条件的OTA升级记录的统计信息
+     * @param firmwareId 固件ID，用于筛选特定固件的OTA升级记录。
+     * @return 返回一个Map列表，每个Map包含不同状态（0到5）的记录数量。
      */
-    default Long getOtaUpgradeRecordStatistics(@Param("firmwareId") Long firmwareId,
-                                               @Param("status") Integer status) {
-        return selectCount(new LambdaQueryWrapperX<IotOtaUpgradeRecordDO>()
-                .eqIfPresent(IotOtaUpgradeRecordDO::getFirmwareId, firmwareId)
-                .eqIfPresent(IotOtaUpgradeRecordDO::getStatus, status));
-    }
-
+    @Select("select count(case when status = 0 then 1 else 0) as `0` " +
+            "count(case when status = 1 then 1 else 0) as `1` " +
+            "count(case when status = 2 then 1 else 0) as `2` " +
+            "count(case when status = 3 then 1 else 0) as `3` " +
+            "count(case when status = 4 then 1 else 0) as `4` " +
+            "count(case when status = 5 then 1 else 0) as `5` " +
+            "from iot_ota_upgrade_record " +
+            "where firmware_id = #{firmwareId}")
+    List<Map<String, Object>> selectOtaUpgradeRecordStatistics(Long firmwareId);
 
     /**
      * 根据分页查询条件获取IOT OTA升级记录的分页结果

@@ -71,13 +71,4 @@ public class IotOtaUpgradeTaskDO extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<Long> deviceIds;
 
-    // TODO @li：这个通过查询，不用冗余
-    /**
-     * 选中的设备名字数组
-     * <p>
-     * 关联 {@link IotDeviceDO#getDeviceName()}
-     */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<String> deviceNames;
-
 }
