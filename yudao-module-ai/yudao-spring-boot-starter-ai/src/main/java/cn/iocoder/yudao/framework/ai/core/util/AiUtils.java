@@ -24,14 +24,18 @@ public class AiUtils {
         // noinspection EnhancedSwitchMigration
         switch (platform) {
             case TONG_YI:
+                // TODO functions
                 return DashScopeChatOptions.builder().withModel(model).withTemperature(temperature).withMaxToken(maxTokens).build();
             case YI_YAN:
                 return QianFanChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
             case ZHI_PU:
+                // TODO functions
                 return ZhiPuAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
             case MINI_MAX:
+                // TODO functions
                 return MiniMaxChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
             case MOONSHOT:
+                // TODO functions
                 return MoonshotChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
             case OPENAI:
             case DEEP_SEEK: // 复用 OpenAI 客户端
@@ -39,12 +43,18 @@ public class AiUtils {
             case HUN_YUAN: // 复用 OpenAI 客户端
             case XING_HUO: // 复用 OpenAI 客户端
             case SILICON_FLOW: // 复用 OpenAI 客户端
-                return OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
+                return OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
+//                        .toolNames() TODO
+                        .toolNames("listDir")
+                        .build();
             case AZURE_OPENAI:
                 // TODO 芋艿：貌似没 model 字段？？？！
+                // TODO 芋艿：.toolNames() TODO
                 return AzureOpenAiChatOptions.builder().deploymentName(model).temperature(temperature).maxTokens(maxTokens).build();
             case OLLAMA:
-                return OllamaOptions.builder().model(model).temperature(temperature).numPredict(maxTokens).build();
+                // TODO 芋艿：.toolNames() TODO
+                return OllamaOptions.builder().model(model).temperature(temperature).numPredict(maxTokens)
+                        .toolNames("listDir").build();
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }

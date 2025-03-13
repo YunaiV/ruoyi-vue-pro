@@ -61,6 +61,7 @@ import org.springframework.ai.minimax.MiniMaxChatModel;
 import org.springframework.ai.minimax.MiniMaxEmbeddingModel;
 import org.springframework.ai.minimax.MiniMaxEmbeddingOptions;
 import org.springframework.ai.minimax.api.MiniMaxApi;
+import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.moonshot.MoonshotChatModel;
 import org.springframework.ai.moonshot.api.MoonshotApi;
 import org.springframework.ai.ollama.OllamaChatModel;
@@ -431,7 +432,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
     private static OpenAiChatModel buildOpenAiChatModel(String openAiToken, String url) {
         url = StrUtil.blankToDefault(url, OpenAiApiConstants.DEFAULT_BASE_URL);
         OpenAiApi openAiApi = OpenAiApi.builder().baseUrl(url).apiKey(openAiToken).build();
-        return OpenAiChatModel.builder().openAiApi(openAiApi).build();
+        return OpenAiChatModel.builder().openAiApi(openAiApi).toolCallingManager(getToolCallingManager()).build();
     }
 
     // TODO @芋艿：手头暂时没密钥，使用建议再测试下
@@ -465,7 +466,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
      */
     private static OllamaChatModel buildOllamaChatModel(String url) {
         OllamaApi ollamaApi = new OllamaApi(url);
-        return OllamaChatModel.builder().ollamaApi(ollamaApi).build();
+        return OllamaChatModel.builder().ollamaApi(ollamaApi).toolCallingManager(getToolCallingManager()).build();
     }
 
     private StabilityAiImageModel buildStabilityAiImageModel(String apiKey, String url) {
@@ -697,6 +698,10 @@ public class AiModelFactoryImpl implements AiModelFactory {
 
     private static BatchingStrategy getBatchingStrategy() {
         return SpringUtil.getBean(BatchingStrategy.class);
+    }
+
+    private static ToolCallingManager getToolCallingManager() {
+        return SpringUtil.getBean(ToolCallingManager.class);
     }
 
 }

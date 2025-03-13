@@ -33,7 +33,7 @@ import org.springframework.context.annotation.Bean;
  * @author fansili
  */
 @AutoConfiguration
-@EnableConfigurationProperties({YudaoAiProperties.class,
+@EnableConfigurationProperties({ YudaoAiProperties.class,
         QdrantVectorStoreProperties.class, // 解析 Qdrant 配置
         RedisVectorStoreProperties.class, // 解析 Redis 配置
         MilvusVectorStoreProperties.class, MilvusServiceClientProperties.class // 解析 Milvus 配置
@@ -139,15 +139,16 @@ public class YudaoAiAutoConfiguration {
         }
         // 特殊：由于混元大模型不提供 deepseek，而是通过知识引擎，所以需要区分下 URL
         if (StrUtil.isEmpty(properties.getBaseUrl())) {
-            properties.setBaseUrl(StrUtil.startWithIgnoreCase(properties.getModel(), "deepseek") ?
-                    HunYuanChatModel.DEEP_SEEK_BASE_URL : HunYuanChatModel.BASE_URL);
+            properties.setBaseUrl(
+                    StrUtil.startWithIgnoreCase(properties.getModel(), "deepseek") ? HunYuanChatModel.DEEP_SEEK_BASE_URL
+                            : HunYuanChatModel.BASE_URL);
         }
         // 创建 OpenAiChatModel、HunYuanChatModel 对象
         OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
                 .openAiApi(OpenAiApi.builder()
-                      .baseUrl(properties.getBaseUrl())
-                      .apiKey(properties.getApiKey())
-                      .build())
+                        .baseUrl(properties.getBaseUrl())
+                        .apiKey(properties.getApiKey())
+                        .build())
                 .defaultOptions(OpenAiChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
