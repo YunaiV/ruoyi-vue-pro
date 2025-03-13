@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge;
 
-import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeConfig;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeAbstractConfig;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -24,6 +24,7 @@ public class IotDataBridgeSaveReqVO {
     @NotNull(message = "桥梁状态不能为空")
     private Integer status;
 
+    // TODO @puhui999：枚举的校验
     @Schema(description = "桥梁方向", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "桥梁方向不能为空")
     private Integer direction;
@@ -34,6 +35,6 @@ public class IotDataBridgeSaveReqVO {
 
     @Schema(description = "桥梁配置")
     @NotNull(message = "桥梁配置不能为空")
-    private IotDataBridgeConfig config;
+    private IotDataBridgeAbstractConfig config;
 
 }

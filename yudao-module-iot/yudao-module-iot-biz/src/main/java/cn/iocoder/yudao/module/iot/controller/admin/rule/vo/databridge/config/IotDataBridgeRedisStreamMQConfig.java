@@ -8,7 +8,7 @@ import lombok.Data;
  * @author HUIHUI
  */
 @Data
-public class IotDataBridgeRedisStreamMQConfig extends IotDataBridgeConfig {
+public class IotDataBridgeRedisStreamMQConfig extends IotDataBridgeAbstractConfig {
 
     /**
      * Redis 服务器地址

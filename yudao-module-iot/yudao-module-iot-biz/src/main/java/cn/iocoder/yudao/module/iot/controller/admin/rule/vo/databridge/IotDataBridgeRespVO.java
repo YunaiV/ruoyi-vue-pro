@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
-import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeConfig;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeAbstractConfig;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -48,7 +48,7 @@ public class IotDataBridgeRespVO {
 
     @Schema(description = "桥梁配置")
     @ExcelProperty("桥梁配置")
-    private IotDataBridgeConfig config;
+    private IotDataBridgeAbstractConfig config;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")

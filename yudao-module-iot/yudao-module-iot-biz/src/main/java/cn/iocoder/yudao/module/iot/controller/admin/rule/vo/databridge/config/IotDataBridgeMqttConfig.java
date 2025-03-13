@@ -8,7 +8,7 @@ import lombok.Data;
  * @author HUIHUI
  */
 @Data
-public class IotDataBridgeMqttConfig extends IotDataBridgeConfig {
+public class IotDataBridgeMqttConfig extends IotDataBridgeAbstractConfig {
 
     /**
      * MQTT 服务器地址

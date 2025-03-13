@@ -20,6 +20,7 @@ public class IotDataBridgePageReqVO extends PageParam {
     @Schema(description = "桥梁名称", example = "赵六")
     private String name;
 
+    // TODO @puhui999：description、direction、type 不过滤哈
     @Schema(description = "桥梁描述", example = "随便")
     private String description;
 
@@ -35,5 +36,6 @@ public class IotDataBridgePageReqVO extends PageParam {
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
+
 
 }

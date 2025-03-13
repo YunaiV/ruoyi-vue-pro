@@ -8,7 +8,7 @@ import lombok.Data;
  * @author HUIHUI
  */
 @Data
-public class IotDataBridgeRocketMQConfig extends IotDataBridgeConfig {
+public class IotDataBridgeRocketMQConfig extends IotDataBridgeAbstractConfig {
 
     /**
      * RocketMQ 名称服务器地址

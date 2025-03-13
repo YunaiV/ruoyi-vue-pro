@@ -8,7 +8,7 @@ import lombok.Data;
  * @author HUIHUI
  */
 @Data
-public class IotDataBridgeRabbitMQConfig extends IotDataBridgeConfig {
+public class IotDataBridgeRabbitMQConfig extends IotDataBridgeAbstractConfig {
 
     /**
      * RabbitMQ 服务器地址

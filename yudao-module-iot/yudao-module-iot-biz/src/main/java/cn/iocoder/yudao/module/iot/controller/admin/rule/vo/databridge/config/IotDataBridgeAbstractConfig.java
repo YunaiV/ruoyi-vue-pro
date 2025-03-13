@@ -22,7 +22,7 @@ import lombok.Data;
         @JsonSubTypes.Type(value = IotDataBridgeRedisStreamMQConfig.class, name = "REDIS_STREAM"),
         @JsonSubTypes.Type(value = IotDataBridgeRocketMQConfig.class, name = "ROCKETMQ"),
 })
-public abstract class IotDataBridgeConfig {
+public abstract class IotDataBridgeAbstractConfig {
 
     /**
      * 配置类型

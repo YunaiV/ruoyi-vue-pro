@@ -66,6 +66,7 @@ public class IotRocketMQDataBridgeExecute extends
     }
 
     // TODO @芋艿：测试代码，后续清理
+    // TODO @puhui999：搞到测试类里。
     public static void main(String[] args) {
         // 1. 创建一个共享的实例
         IotRocketMQDataBridgeExecute action = new IotRocketMQDataBridgeExecute();

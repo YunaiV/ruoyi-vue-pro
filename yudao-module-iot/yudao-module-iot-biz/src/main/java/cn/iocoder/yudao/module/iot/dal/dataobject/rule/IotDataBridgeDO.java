@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.rule;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeConfig;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeAbstractConfig;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeDirectionEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -63,6 +63,6 @@ public class IotDataBridgeDO extends BaseDO {
      * 桥梁配置
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private IotDataBridgeConfig config;
+    private IotDataBridgeAbstractConfig config;
 
 }

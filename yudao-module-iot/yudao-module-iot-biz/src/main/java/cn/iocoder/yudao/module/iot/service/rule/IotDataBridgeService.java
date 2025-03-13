@@ -14,7 +14,7 @@ import jakarta.validation.Valid;
 public interface IotDataBridgeService {
 
     /**
-     * 创建IoT 数据桥梁
+     * 创建数据桥梁
      *
      * @param createReqVO 创建信息
      * @return 编号
@@ -22,32 +22,32 @@ public interface IotDataBridgeService {
     Long createDataBridge(@Valid IotDataBridgeSaveReqVO createReqVO);
 
     /**
-     * 更新IoT 数据桥梁
+     * 更新数据桥梁
      *
      * @param updateReqVO 更新信息
      */
     void updateDataBridge(@Valid IotDataBridgeSaveReqVO updateReqVO);
 
     /**
-     * 删除IoT 数据桥梁
+     * 删除数据桥梁
      *
      * @param id 编号
      */
     void deleteDataBridge(Long id);
 
     /**
-     * 获得IoT 数据桥梁
+     * 获得数据桥梁
      *
      * @param id 编号
-     * @return IoT 数据桥梁
+     * @return 数据桥梁
      */
     IotDataBridgeDO getDataBridge(Long id);
 
     /**
-     * 获得IoT 数据桥梁分页
+     * 获得数据桥梁分页
      *
      * @param pageReqVO 分页查询
-     * @return IoT 数据桥梁分页
+     * @return 数据桥梁分页
      */
     PageResult<IotDataBridgeDO> getDataBridgePage(IotDataBridgePageReqVO pageReqVO);
 

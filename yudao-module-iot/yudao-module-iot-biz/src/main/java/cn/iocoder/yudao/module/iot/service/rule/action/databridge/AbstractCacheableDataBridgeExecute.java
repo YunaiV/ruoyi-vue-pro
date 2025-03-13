@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import com.google.common.cache.CacheBuilder;
@@ -56,6 +57,7 @@ public abstract class AbstractCacheableDataBridgeExecute<Config, Producer> imple
                 }
             })
             .build(new CacheLoader<Config, Producer>() {
+
                 @Override
                 public Producer load(Config config) throws Exception {
                     try {
@@ -67,6 +69,7 @@ public abstract class AbstractCacheableDataBridgeExecute<Config, Producer> imple
                         throw e; // 抛出异常，触发缓存加载失败机制
                     }
                 }
+
             });
 
     /**
@@ -98,12 +101,9 @@ public abstract class AbstractCacheableDataBridgeExecute<Config, Producer> imple
     @Override
     @SuppressWarnings({"unchecked"})
     public void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
-        // 1.1 校验数据桥梁类型
-        if (!getType().equals(dataBridge.getType())) {
+        if (ObjUtil.notEqual(message.getType(), getType())) {
             return;
         }
-
-        // 1.2 执行对应的数据桥梁发送消息
         try {
             execute0(message, (Config) dataBridge.getConfig());
         } catch (Exception e) {

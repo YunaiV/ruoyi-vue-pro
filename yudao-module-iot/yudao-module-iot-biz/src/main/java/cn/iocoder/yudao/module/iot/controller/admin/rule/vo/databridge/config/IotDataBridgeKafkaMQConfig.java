@@ -8,7 +8,7 @@ import lombok.Data;
  * @author HUIHUI
  */
 @Data
-public class IotDataBridgeKafkaMQConfig extends IotDataBridgeConfig {
+public class IotDataBridgeKafkaMQConfig extends IotDataBridgeAbstractConfig {
 
     /**
      * Kafka 服务器地址

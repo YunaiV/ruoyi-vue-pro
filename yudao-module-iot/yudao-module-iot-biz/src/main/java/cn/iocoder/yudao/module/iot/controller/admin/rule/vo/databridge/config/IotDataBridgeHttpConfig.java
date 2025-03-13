@@ -10,7 +10,7 @@ import java.util.Map;
  * @author HUIHUI
  */
 @Data
-public class IotDataBridgeHttpConfig extends IotDataBridgeConfig {
+public class IotDataBridgeHttpConfig extends IotDataBridgeAbstractConfig {
 
     /**
      * 请求 URL

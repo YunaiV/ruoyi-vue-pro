@@ -37,14 +37,14 @@ public class IotDataBridgeController {
     private IotDataBridgeService dataBridgeService;
 
     @PostMapping("/create")
-    @Operation(summary = "创建IoT 数据桥梁")
+    @Operation(summary = "创建数据桥梁")
     @PreAuthorize("@ss.hasPermission('iot:data-bridge:create')")
     public CommonResult<Long> createDataBridge(@Valid @RequestBody IotDataBridgeSaveReqVO createReqVO) {
         return success(dataBridgeService.createDataBridge(createReqVO));
     }
 
     @PutMapping("/update")
-    @Operation(summary = "更新IoT 数据桥梁")
+    @Operation(summary = "更新数据桥梁")
     @PreAuthorize("@ss.hasPermission('iot:data-bridge:update')")
     public CommonResult<Boolean> updateDataBridge(@Valid @RequestBody IotDataBridgeSaveReqVO updateReqVO) {
         dataBridgeService.updateDataBridge(updateReqVO);
@@ -52,7 +52,7 @@ public class IotDataBridgeController {
     }
 
     @DeleteMapping("/delete")
-    @Operation(summary = "删除IoT 数据桥梁")
+    @Operation(summary = "删除数据桥梁")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('iot:data-bridge:delete')")
     public CommonResult<Boolean> deleteDataBridge(@RequestParam("id") Long id) {
@@ -61,7 +61,7 @@ public class IotDataBridgeController {
     }
 
     @GetMapping("/get")
-    @Operation(summary = "获得IoT 数据桥梁")
+    @Operation(summary = "获得数据桥梁")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('iot:data-bridge:query')")
     public CommonResult<IotDataBridgeRespVO> getDataBridge(@RequestParam("id") Long id) {
@@ -70,15 +70,16 @@ public class IotDataBridgeController {
     }
 
     @GetMapping("/page")
-    @Operation(summary = "获得IoT 数据桥梁分页")
+    @Operation(summary = "获得数据桥梁分页")
     @PreAuthorize("@ss.hasPermission('iot:data-bridge:query')")
     public CommonResult<PageResult<IotDataBridgeRespVO>> getDataBridgePage(@Valid IotDataBridgePageReqVO pageReqVO) {
         PageResult<IotDataBridgeDO> pageResult = dataBridgeService.getDataBridgePage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, IotDataBridgeRespVO.class));
     }
 
+    // TODO @puhui999：不用导出哈。相关的 IotDataBridgeRespVO 里的导出也注释掉哈
     @GetMapping("/export-excel")
-    @Operation(summary = "导出IoT 数据桥梁 Excel")
+    @Operation(summary = "导出数据桥梁 Excel")
     @PreAuthorize("@ss.hasPermission('iot:data-bridge:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportDataBridgeExcel(@Valid IotDataBridgePageReqVO pageReqVO,
