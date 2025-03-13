@@ -84,5 +84,8 @@ public class ErpPurchaseRequestDO extends TenantBaseDO {
      * 审核意见
      */
     private String reviewComment;
-
+    /**
+     * 入库状态
+     */
+    private Integer inStatus;
 }

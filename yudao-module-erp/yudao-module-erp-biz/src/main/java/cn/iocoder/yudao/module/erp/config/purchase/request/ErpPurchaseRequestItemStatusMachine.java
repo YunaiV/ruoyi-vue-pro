@@ -1,12 +1,15 @@
 package cn.iocoder.yudao.module.erp.config.purchase.request;
 
+import cn.iocoder.yudao.module.erp.api.purchase.ErpInCountDTO;
 import cn.iocoder.yudao.module.erp.api.purchase.ErpOrderCountDTO;
 import cn.iocoder.yudao.module.erp.config.BaseFailCallbackImpl;
+import cn.iocoder.yudao.module.erp.config.purchase.request.impl.action.item.ActionItemStorageImpl;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.ErpStateMachines;
 import cn.iocoder.yudao.module.erp.enums.status.ErpOffStatus;
 import cn.iocoder.yudao.module.erp.enums.status.ErpOrderStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpStorageStatus;
 import com.alibaba.cola.statemachine.Action;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
@@ -103,5 +106,32 @@ public class ErpPurchaseRequestItemStatusMachine {
         return builder.build(ErpStateMachines.PURCHASE_REQUEST_ITEM_ORDER_STATE_MACHINE_NAME);
     }
 
+    @Resource
+    ActionItemStorageImpl actionItemStorageImpl;
 
+    @Bean(ErpStateMachines.PURCHASE_REQUEST_ITEM_STORAGE_STATE_MACHINE_NAME)
+    public StateMachine<ErpStorageStatus, ErpEventEnum, ErpInCountDTO> buildPurchaseOrderItemStorageStateMachine() {
+        StateMachineBuilder<ErpStorageStatus, ErpEventEnum, ErpInCountDTO> builder = StateMachineBuilderFactory.create();
+        // 初始化入库
+        builder.externalTransition()
+            .from(ErpStorageStatus.NONE_IN_STORAGE)
+            .to(ErpStorageStatus.NONE_IN_STORAGE)
+            .on(ErpEventEnum.STORAGE_INIT)
+            .perform(actionItemStorageImpl);
+        // 取消入库
+        builder.externalTransitions()
+            .fromAmong(ErpStorageStatus.NONE_IN_STORAGE, ErpStorageStatus.PARTIALLY_IN_STORAGE)
+            .to(ErpStorageStatus.NONE_IN_STORAGE)
+            .on(ErpEventEnum.CANCEL_STORAGE)
+            .perform(actionItemStorageImpl);
+        // 库存调整
+        builder.externalTransitions()
+            .fromAmong(ErpStorageStatus.NONE_IN_STORAGE, ErpStorageStatus.PARTIALLY_IN_STORAGE, ErpStorageStatus.ALL_IN_STORAGE)
+            .to(ErpStorageStatus.NONE_IN_STORAGE)
+            .on(ErpEventEnum.STOCK_ADJUSTMENT)
+            .perform(actionItemStorageImpl);
+        // 设置错误回调
+        builder.setFailCallback(baseFailCallbackImpl);
+        return builder.build(ErpStateMachines.PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME);
+    }
 }

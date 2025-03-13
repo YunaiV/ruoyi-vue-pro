@@ -9,10 +9,15 @@ public interface ErpStateMachines {
     String PURCHASE_REQUEST_AUDIT_STATE_MACHINE_NAME = "purchaseRequestAudit";
     //采购主表采购状态机
     String PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME = "purchaseRequestOrder";
+    //采购主表入库状态机
+    String PURCHASE_REQUEST_STORAGE_STATE_MACHINE_NAME = "purchaseRequestStorage";
+    // ========== ERP 采购申请单子表 ==========
     //采购申请子项开关状态机
     String PURCHASE_REQUEST_ITEM_OFF_STATE_MACHINE_NAME = "purchaseRequestItemOff";
     //采购子项采购状态机
     String PURCHASE_REQUEST_ITEM_ORDER_STATE_MACHINE_NAME = "purchaseRequestItem";
+    //采购申请项入库状态机
+    String PURCHASE_REQUEST_ITEM_STORAGE_STATE_MACHINE_NAME = "purchaseRequestItemStorage";
 
     // ========== ERP 采购订单 ==========
     //订单开关状态机

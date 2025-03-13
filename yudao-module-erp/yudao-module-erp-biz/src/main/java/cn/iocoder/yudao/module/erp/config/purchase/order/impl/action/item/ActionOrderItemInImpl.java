@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import static cn.iocoder.yudao.module.erp.enums.ErpStateMachines.PURCHASE_ORDER_STORAGE_STATE_MACHINE_NAME;
+import static cn.iocoder.yudao.module.erp.enums.ErpStateMachines.PURCHASE_REQUEST_ITEM_STORAGE_STATE_MACHINE_NAME;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PURCHASE_REQUEST_ITEM_NOT_FOUND;
 
 //订单项入库状态机
@@ -37,6 +38,9 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
     private ErpPurchaseOrderMapper mapper;
     @Resource(name = PURCHASE_ORDER_STORAGE_STATE_MACHINE_NAME)
     private StateMachine storageStateMachine;
+    @Resource(name = PURCHASE_REQUEST_ITEM_STORAGE_STATE_MACHINE_NAME)
+    private StateMachine purchaseRequestItemStateMachine;
+
 
     //入库项(->入库主单)->订单项(->订单主单)->申请项(->订单主单)
     @Override
@@ -92,14 +96,18 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
         }
         storageStateMachine.fireEvent(ErpStorageStatus.fromCode(orderDO.getInStatus()), event, orderDO);
 
-        //联动申请项的入库数量
+        //2.0 联动申请项的入库数量
         Optional.ofNullable(oldData.getPurchaseApplyItemId()).ifPresent(
             applyItemId -> {
+                //传递给申请项入库状态机
                 ErpPurchaseRequestItemsDO applyItemDO = erpPurchaseRequestItemsMapper.selectById(applyItemId);
                 ThrowUtil.ifThrow(applyItemDO == null, PURCHASE_REQUEST_ITEM_NOT_FOUND, oldData.getId(), applyItemId);
-
                 BigDecimal oldCount = applyItemDO.getInCount();
-                erpPurchaseRequestItemsMapper.updateById(applyItemDO.setInCount(oldCount.subtract(dtoCount)));//联动入库数量
+                BigDecimal changeCount = oldCount.subtract(dtoCount);
+                purchaseRequestItemStateMachine.fireEvent(ErpStorageStatus.fromCode(applyItemDO.getInStatus())
+                    , ErpEventEnum.STOCK_ADJUSTMENT
+                    , ErpInCountDTO.builder().applyItemId(applyItemId).count(changeCount).build()
+                );
             }
         );
 

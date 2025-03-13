@@ -37,7 +37,7 @@ public class ErpPurchaseRequestItemsDO extends TenantBaseDO {
      */
     private Long requestId;
     /**
-     * 申请数量
+     * 申请数量//可以考虑换bigDecimal
      */
     private Integer count; //联动申请项采购数量+采购状态
     /**
@@ -100,4 +100,8 @@ public class ErpPurchaseRequestItemsDO extends TenantBaseDO {
      * 期望到货日期
      */
     private LocalDateTime expectArrivalDate;
+    /**
+     * 入库状态
+     */
+    private Integer inStatus;
 }
