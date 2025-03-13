@@ -36,4 +36,5 @@ public class ErpCustomProductDO extends TenantBaseDO {
      */
     private Long customCategoryId;
 
+    private Boolean deleted;
 }

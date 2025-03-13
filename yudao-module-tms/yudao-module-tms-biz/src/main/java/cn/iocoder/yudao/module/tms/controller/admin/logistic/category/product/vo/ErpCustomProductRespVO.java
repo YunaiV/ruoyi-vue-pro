@@ -44,6 +44,9 @@ public class ErpCustomProductRespVO {
     @Schema(description = "产品信息")
     private ErpProductDTO product;
 
+    @Schema(description = "材质对应string+报关品名")
+    @ExcelProperty("材质对应string+报关品名")
+    private String combinedValue;
     @Schema(description = "海关分类信息")
     private ErpCustomCategoryDO customCategory;
 }

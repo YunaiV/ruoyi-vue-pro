@@ -9,6 +9,8 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
+import cn.iocoder.yudao.module.system.api.dict.dto.DictDataRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.product.vo.ErpCustomProductPageReqVO;
@@ -36,6 +38,7 @@ import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.module.tms.enums.DictValue.PRODUCT_MATERIAL;
 
 @Tag(name = "管理后台 - 海关产品分类表")
 @RestController
@@ -50,6 +53,8 @@ public class ErpCustomProductController {
     private AdminUserApi adminUserApi;
     @Resource
     ErpCustomCategoryService customCategoryService;
+    @Resource
+    DictDataApi dictDataApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建海关产品分类表")
@@ -131,6 +136,8 @@ public class ErpCustomProductController {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         Map<Long, ErpProductDTO> productMap = erpProductApi.getProductMap(productIds);
         Map<Long, ErpCustomCategoryDO> categoryMap = customCategoryService.getCustomRuleCategoryMap(categoryIds);
+        List<DictDataRespDTO> dtoList = dictDataApi.getDictDataList(PRODUCT_MATERIAL.getName());
+        Map<String, String> materialMap = dtoList.stream().collect(Collectors.toMap(DictDataRespDTO::getValue, DictDataRespDTO::getLabel));
 
         return BeanUtils.toBean(oldList, ErpCustomProductRespVO.class, vo -> {
             MapUtils.findAndThen(productMap, vo.getProductId(), vo::setProduct);
@@ -138,6 +145,7 @@ public class ErpCustomProductController {
             MapUtils.findAndThen(userMap, safeParseLong(vo.getCreator()), user -> vo.setCreator(user.getNickname()));
             MapUtils.findAndThen(userMap, safeParseLong(vo.getUpdater()), user -> vo.setUpdater(user.getNickname()));
             MapUtils.findAndThen(categoryMap, vo.getCustomCategoryId(), vo::setCustomCategory);
+            vo.setCombinedValue(materialMap.get(vo.getCustomCategory().getMaterial().toString()) + vo.getCustomCategory().getDeclaredType());//组合值
         });
     }
 

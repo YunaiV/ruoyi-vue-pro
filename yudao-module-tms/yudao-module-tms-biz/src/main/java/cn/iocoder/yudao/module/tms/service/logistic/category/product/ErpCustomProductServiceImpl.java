@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.CUSTOM_PRODUCT_NOT_EXISTS;
@@ -85,6 +83,8 @@ public class ErpCustomProductServiceImpl implements ErpCustomProductService {
 
     @Override
     public PageResult<ErpCustomProductDO> getCustomProductPage(ErpCustomProductPageReqVO pageReqVO) {
+        //打印URL
+
         return customProductMapper.selectPage(pageReqVO);
     }
 
