@@ -64,8 +64,7 @@ public class AiChatMessageController {
 
     @Operation(summary = "发送消息（流式）", description = "流式返回，响应较快")
     @PostMapping(value = "/send-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<CommonResult<AiChatMessageSendRespVO>> sendChatMessageStream(
-            @Valid @RequestBody AiChatMessageSendReqVO sendReqVO) {
+    public Flux<CommonResult<AiChatMessageSendRespVO>> sendChatMessageStream(@Valid @RequestBody AiChatMessageSendReqVO sendReqVO) {
         return chatMessageService.sendChatMessageStream(sendReqVO, getLoginUserId());
     }
 
@@ -123,8 +122,7 @@ public class AiChatMessageController {
     @Operation(summary = "删除指定对话的消息")
     @DeleteMapping("/delete-by-conversation-id")
     @Parameter(name = "conversationId", required = true, description = "对话编号", example = "1024")
-    public CommonResult<Boolean> deleteChatMessageByConversationId(
-            @RequestParam("conversationId") Long conversationId) {
+    public CommonResult<Boolean> deleteChatMessageByConversationId(@RequestParam("conversationId") Long conversationId) {
         chatMessageService.deleteChatMessageByConversationId(conversationId, getLoginUserId());
         return success(true);
     }

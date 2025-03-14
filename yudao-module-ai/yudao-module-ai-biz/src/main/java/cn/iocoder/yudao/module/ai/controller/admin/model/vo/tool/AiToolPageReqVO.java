@@ -15,8 +15,6 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 
 @Schema(description = "管理后台 - AI 工具分页 Request VO")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 public class AiToolPageReqVO extends PageParam {
 
     @Schema(description = "工具名称", example = "王五")
