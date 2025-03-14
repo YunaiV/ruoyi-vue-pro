@@ -52,10 +52,9 @@ public class DingTalkService {
     @Autowired
     DingTalkTokenRepository tokenRepository;
 
-    @Scheduled(cron = "0 0 * * * ?") // Executes at the start of every hour
     @PostConstruct
     private void init() {
-        token = refreshAuth();
+        this.token = tokenRepository.findAll().get(0);
     }
 
 
@@ -68,12 +67,13 @@ public class DingTalkService {
     //     return jsonObject.getString("access_token");
     // }
 
-    public DingTalkToken refreshAuth() {
+//    @Scheduled(cron = "0 0 * * * ?") // Executes at the start of every hour
+    @Scheduled(initialDelay = 2000, fixedRate = 3600000)
+    public void refreshAuth() {
         String url = HOST + "/v1.0/oauth2/accessToken";
         var payload = JsonUtilsX.newObject();
-        DingTalkToken token = tokenRepository.findAll().get(0);
-        payload.put("appKey", token.getAppKey());
-        payload.put("appSecret", token.getAppSecret());
+        payload.put("appKey", this.token.getAppKey());
+        payload.put("appSecret", this.token.getAppSecret());
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.POST)
             .url(url)
@@ -82,8 +82,7 @@ public class DingTalkService {
         ObjectNode result= WebUtils.sendRequest(request, ObjectNode.class);
         JSONObject jsonObject=new JSONObject(result);
         String accessToken =jsonObject.getString("accessToken");
-        token.setAccessToken(accessToken);
-        return token;
+        this.token.setAccessToken(accessToken);
     }
 
     @SneakyThrows

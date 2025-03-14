@@ -85,8 +85,12 @@ public class EccangWMSService {
                 .build();
 
             int retryCount = ctx.getRetryCount();
+            if (retryCount != 0) {
+                // 记录每次重试的日志
+                log.debug("遇到错误: {}", ctx.getLastThrowable().getStackTrace().toString());
+                log.debug("正在请求url= {},第 {} 次重试。endpoint = {}", request.url(), retryCount, endpoint);
+            }
             // 记录每次重试的日志
-            log.debug("正在请求url= {},第 {} 次重试。endpoint = {}", request.url(), retryCount + 1, endpoint);
             try (var response = client.newCall(request).execute()) {
                 switch (response.code()) {
                     case 200:

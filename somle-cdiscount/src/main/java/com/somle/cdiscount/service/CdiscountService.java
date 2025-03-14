@@ -20,7 +20,6 @@ public class CdiscountService {
     @PostConstruct
     public void init() {
         client = new CdiscountClient(tokenRepository.findAll().get(0));
-        refreshAuths();
     }
 
     //每两小时刷新一次token

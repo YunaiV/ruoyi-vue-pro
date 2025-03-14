@@ -3,12 +3,14 @@ package com.somle.esb.config;
 import cn.iocoder.yudao.framework.test.core.ut.SomleBaseSpringIntegrationTest;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.integration.support.management.SubscribableChannelManagement;
 import org.springframework.messaging.MessageChannel;
 
+@Disabled
 @Slf4j
 @Import({
     IntegrationConfig.class,

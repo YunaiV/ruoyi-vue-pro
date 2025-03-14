@@ -1,10 +1,7 @@
 package cn.iocoder.yudao.framework.test.core.ut;
 
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
@@ -13,12 +10,11 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-
-@SpringBootTest(classes = BaseSpringTest.Application.class)
+@SpringBootTest(classes = SomleBaseSpringTest.Application.class)
 @ActiveProfiles("unit-test")
 @EnableJpaRepositories(basePackages = { "${somle.base-package}.repository" })
 @EntityScan("${somle.base-package}.model")
-public class BaseSpringTest {
+public class SomleBaseSpringTest {
 
 //    @BeforeAll
 //    public static void init() {

@@ -19,6 +19,12 @@
             <artifactId>yudao-common</artifactId>
         </dependency>
 
+        <!--被yudao-spring-boot-starter-mybatis以provided依赖-->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-web</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-test</artifactId>

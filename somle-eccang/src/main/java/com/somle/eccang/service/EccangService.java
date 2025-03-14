@@ -177,17 +177,13 @@ public class EccangService {
     private Stream<EccangPage> getAllPage(JSONObject payload, String endpoint) {
         payload.put("page", 1);
         payload.put("page_size", pageSize);
-        return Stream.iterate(
-            getPage(payload, endpoint), Objects::nonNull,
-            bizContent -> {
-                if (bizContent.hasNext()) {
-                    log.debug("have next,endpoint:{}当前进度：{}/{}", endpoint, (bizContent.getPage() - 1) * pageSize + bizContent.getData().size(), bizContent.getTotal());
-                    payload.put("page", bizContent.getPage() + 1);
-                    return getPage(payload, endpoint);
-                } else {
-                    log.debug("no next page");
-                    return null;
-                }
+        return StreamX.iterate(
+            getPage(payload, endpoint),
+            EccangPage::hasNext,
+            eccangPage -> {
+                log.debug("have next,endpoint:{}当前进度：{}/{}", endpoint, (eccangPage.getPage() - 1) * pageSize + eccangPage.getData().size(), eccangPage.getTotal());
+                payload.put("page", eccangPage.getPage() + 1);
+                return getPage(payload, endpoint);
             }
         );
     }
