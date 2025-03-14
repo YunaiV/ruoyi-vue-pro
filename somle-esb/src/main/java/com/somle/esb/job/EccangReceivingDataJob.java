@@ -14,13 +14,14 @@ public class EccangReceivingDataJob extends EccangDataJob {
     @Override
     public String execute(String param) throws Exception {
         setDate(param);
-        eccangService.streamReceiving(EccangReceivingReqVo.builder()
+        var vo = EccangReceivingReqVo.builder()
             .dateFor(beforeYesterdayFirstSecond)
             .dateTo(beforeYesterdayLastSecond)
             .searchDateType("receiving_add_time")
             .page(1)
             .pageSize(100)
-            .build()).forEach(page -> {
+            .build();
+        eccangService.streamReceiving(vo).forEach(page -> {
                 OssData data = OssData.builder()
                     .database(DATABASE)
                     .tableName("receiving")
