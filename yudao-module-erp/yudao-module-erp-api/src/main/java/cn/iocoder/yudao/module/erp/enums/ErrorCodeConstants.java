@@ -47,7 +47,6 @@ public interface ErrorCodeConstants {
     ErrorCode PURCHASE_IN_FAIL_PAYMENT_PRICE_EXCEED = new ErrorCode(1_030_102_007, "付款金额({})超过采购入库单总金额({})");
     ErrorCode PURCHASE_IN_PROCESS_FAIL_EXISTS_PAYMENT = new ErrorCode(1_030_102_008, "反审核失败，已存在对应的付款单");
     ErrorCode PURCHASE_IN_NO_OUT_OF_BOUNDS = new ErrorCode(1_030_101_009, "采购入库单号编码大于999999,生成失败");
-    ErrorCode PURCHASE_IN_PROCESS_FAIL_PAYMENT_STATUS = new ErrorCode(1_030_102_010, "反审核失败，付款状态不是未付款");
 
     // ========== ERP 采购退货（1-030-103-000） ==========
     ErrorCode PURCHASE_RETURN_NOT_EXISTS = new ErrorCode(1_030_103_000, "采购退货单不存在");
@@ -246,5 +245,6 @@ public interface ErrorCodeConstants {
 
     // ========== Erp财务主体 1-030-611-000 ==========
     ErrorCode FINANCE_SUBJECT_NOT_EXISTS = new ErrorCode(1_030_611_000, "Erp财务主体不存在");
-
+    // ========== 海关产品分类表1-030-607-000 ==========
+    ErrorCode CUSTOM_PRODUCT_NOT_EXISTS = new ErrorCode(1_030_607_001, "海关产品分类表不存在");
 }

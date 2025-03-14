@@ -90,8 +90,22 @@ public class ErpProductController {
     @Operation(summary = "获得产品精简列表", description = "只包含被开启的产品，主要用于前端的下拉选项")
     public CommonResult<List<ErpProductSimpleRespVO>> getProductSimpleList() {
         List<ErpProductRespVO> list = productService.getProductVOListByStatus(true);
+//        pageReqVO.setPageSize(100);//返回100个结果
+//        PageResult<ErpProductRespVO> voPage = productService.getProductVOPage(pageReqVO);
+//        List<ErpProductRespVO> list = voPage.getList();
         return success(convertList(list, vo -> BeanUtils.toBean(vo, ErpProductSimpleRespVO.class)));
     }
+
+    //获得产品精简列表(高效)
+    @GetMapping("/simple-list-efficient")
+    @Operation(summary = "获得产品精简列表(高效)返回100个结果")
+    public CommonResult<List<ErpProductSimpleRespVO>> getProductSimpleListEfficient(@Valid ErpProductPageReqVO pageReqVO) {
+        pageReqVO.setPageSize(100);//返回100个结果
+        PageResult<ErpProductRespVO> voPage = productService.getProductVOPage(pageReqVO);
+        List<ErpProductRespVO> list = voPage.getList();
+        return success(convertList(list, vo -> BeanUtils.toBean(vo, ErpProductSimpleRespVO.class)));
+    }
+
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出产品 Excel")
