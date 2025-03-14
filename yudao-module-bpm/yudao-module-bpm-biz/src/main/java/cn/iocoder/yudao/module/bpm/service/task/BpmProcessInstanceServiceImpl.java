@@ -34,6 +34,7 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidat
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.event.BpmProcessInstanceEventPublisher;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmHttpRequestUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.SimpleModelUtils;
@@ -62,6 +63,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -120,6 +122,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     @Resource
     private BpmProcessIdRedisDAO processIdRedisDAO;
 
+    @Resource
+    private RestTemplate restTemplate;
+
     // ========== Query 查询相关方法 ==========
 
     @Override
@@ -148,7 +153,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     }
 
     private Map<String, String> getFormFieldsPermission(BpmnModel bpmnModel,
-            String activityId, String taskId) {
+                                                        String activityId, String taskId) {
         // 1. 获取流程活动编号。流程活动 Id 为空事，从流程任务中获取流程活动 Id
         if (StrUtil.isEmpty(activityId) && StrUtil.isNotEmpty(taskId)) {
             activityId = Optional.ofNullable(taskService.getHistoricTask(taskId))
@@ -351,15 +356,15 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
      * 主要是，拼接审批人的用户信息、部门信息
      */
     private BpmApprovalDetailRespVO buildApprovalDetail(BpmApprovalDetailReqVO reqVO,
-            BpmnModel bpmnModel,
-            ProcessDefinition processDefinition,
-            BpmProcessDefinitionInfoDO processDefinitionInfo,
-            HistoricProcessInstance processInstance,
-            Integer processInstanceStatus,
-            List<ActivityNode> endApprovalNodeInfos,
-            List<ActivityNode> runningApprovalNodeInfos,
-            List<ActivityNode> simulateApprovalNodeInfos,
-            BpmTaskRespVO todoTask) {
+                                                        BpmnModel bpmnModel,
+                                                        ProcessDefinition processDefinition,
+                                                        BpmProcessDefinitionInfoDO processDefinitionInfo,
+                                                        HistoricProcessInstance processInstance,
+                                                        Integer processInstanceStatus,
+                                                        List<ActivityNode> endApprovalNodeInfos,
+                                                        List<ActivityNode> runningApprovalNodeInfos,
+                                                        List<ActivityNode> simulateApprovalNodeInfos,
+                                                        BpmTaskRespVO todoTask) {
         // 1. 获取所有需要读取用户信息的 userIds
         List<ActivityNode> approveNodes = newArrayList(
                 asList(endApprovalNodeInfos, runningApprovalNodeInfos, simulateApprovalNodeInfos));
@@ -381,9 +386,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
      * 获得【已结束】的活动节点们
      */
     private List<ActivityNode> getEndActivityNodeList(Long startUserId, BpmnModel bpmnModel,
-              BpmProcessDefinitionInfoDO processDefinitionInfo,
-              HistoricProcessInstance historicProcessInstance, Integer processInstanceStatus,
-              List<HistoricActivityInstance> activities, List<HistoricTaskInstance> tasks) {
+                                                      BpmProcessDefinitionInfoDO processDefinitionInfo,
+                                                      HistoricProcessInstance historicProcessInstance, Integer processInstanceStatus,
+                                                      List<HistoricActivityInstance> activities, List<HistoricTaskInstance> tasks) {
         // 遍历 tasks 列表，只处理已结束的 UserTask
         // 为什么不通过 activities 呢？因为，加签场景下，它只存在于 tasks，没有 activities，导致如果遍历 activities
         // 的话，它无法成为一个节点
@@ -451,11 +456,11 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
      * 获得【进行中】的活动节点们
      */
     private List<ActivityNode> getRunApproveNodeList(Long startUserId,
-            BpmnModel bpmnModel,
-            ProcessDefinition processDefinition,
-            Map<String, Object> processVariables,
-            List<HistoricActivityInstance> activities,
-            List<HistoricTaskInstance> tasks) {
+                                                     BpmnModel bpmnModel,
+                                                     ProcessDefinition processDefinition,
+                                                     Map<String, Object> processVariables,
+                                                     List<HistoricActivityInstance> activities,
+                                                     List<HistoricTaskInstance> tasks) {
         // 构建运行中的任务、子流程，基于 activityId 分组
         List<HistoricActivityInstance> runActivities = filterList(activities, activity -> activity.getEndTime() == null
                 && (StrUtil.equalsAny(activity.getActivityType(), ELEMENT_TASK_USER, ELEMENT_CALL_ACTIVITY)));
@@ -516,9 +521,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
      * 获得【预测（未来）】的活动节点们
      */
     private List<ActivityNode> getSimulateApproveNodeList(Long startUserId, BpmnModel bpmnModel,
-            BpmProcessDefinitionInfoDO processDefinitionInfo,
-            Map<String, Object> processVariables,
-            List<HistoricActivityInstance> activities) {
+                                                          BpmProcessDefinitionInfoDO processDefinitionInfo,
+                                                          Map<String, Object> processVariables,
+                                                          List<HistoricActivityInstance> activities) {
         // TODO @芋艿：【可优化】在驳回场景下，未来的预测准确性不高。原因是，驳回后，HistoricActivityInstance
         // 包括了历史的操作，不是只有 startEvent 到当前节点的记录
         Set<String> runActivityIds = convertSet(activities, HistoricActivityInstance::getActivityId);
@@ -540,8 +545,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     }
 
     private ActivityNode buildNotRunApproveNodeForSimple(Long startUserId, BpmnModel bpmnModel,
-            BpmProcessDefinitionInfoDO processDefinitionInfo, Map<String, Object> processVariables,
-            BpmSimpleModelNodeVO node, Set<String> runActivityIds) {
+                                                         BpmProcessDefinitionInfoDO processDefinitionInfo, Map<String, Object> processVariables,
+                                                         BpmSimpleModelNodeVO node, Set<String> runActivityIds) {
         // TODO @芋艿：【可优化】在驳回场景下，未来的预测准确性不高。原因是，驳回后，HistoricActivityInstance
         // 包括了历史的操作，不是只有 startEvent 到当前节点的记录
         if (runActivityIds.contains(node.getId())) {
@@ -585,8 +590,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     }
 
     private ActivityNode buildNotRunApproveNodeForBpmn(Long startUserId, BpmnModel bpmnModel,
-            BpmProcessDefinitionInfoDO processDefinitionInfo, Map<String, Object> processVariables,
-            FlowElement node, Set<String> runActivityIds) {
+                                                       BpmProcessDefinitionInfoDO processDefinitionInfo, Map<String, Object> processVariables,
+                                                       FlowElement node, Set<String> runActivityIds) {
         if (runActivityIds.contains(node.getId())) {
             return null;
         }
@@ -902,6 +907,46 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             // 3. 发送流程实例的状态事件
             processInstanceEventPublisher.sendProcessInstanceResultEvent(
                     BpmProcessInstanceConvert.INSTANCE.buildProcessInstanceStatusEvent(this, instance, status));
+
+            // 4. 流程后置通知
+            if (Objects.equals(status, BpmProcessInstanceStatusEnum.APPROVE.getStatus())) {
+                BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService.
+                        getProcessDefinitionInfo(instance.getProcessDefinitionId());
+                if (ObjUtil.isNotNull(processDefinitionInfo) &&
+                        ObjUtil.isNotNull(processDefinitionInfo.getPostProcessNotifySetting())) {
+                    BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getPostProcessNotifySetting();
+
+                    BpmHttpRequestUtils.executeBpmHttpRequest(instance,
+                            setting.getUrl(),
+                            setting.getHeader(),
+                            setting.getBody(),
+                            true, setting.getResponse(),
+                            restTemplate,
+                            this);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void processProcessInstanceCreated(ProcessInstance instance) {
+        // 注意：需要基于 instance 设置租户编号，避免 Flowable 内部异步时，丢失租户编号
+        FlowableUtils.execute(instance.getTenantId(), () -> {
+            // 流程前置通知
+            BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService.
+                    getProcessDefinitionInfo(instance.getProcessDefinitionId());
+            if (ObjUtil.isNotNull(processDefinitionInfo) &&
+                    ObjUtil.isNotNull(processDefinitionInfo.getPreProcessNotifySetting())) {
+                BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getPreProcessNotifySetting();
+
+                BpmHttpRequestUtils.executeBpmHttpRequest(instance,
+                        setting.getUrl(),
+                        setting.getHeader(),
+                        setting.getBody(),
+                        true, setting.getResponse(),
+                        restTemplate,
+                        this);
+            }
         });
     }
 }
