@@ -1,0 +1,57 @@
+package cn.iocoder.yudao.module.wms.dal.mysql.warehouse.location;
+
+import java.util.*;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.location.WmsWarehouseLocationDO;
+import org.apache.ibatis.annotations.Mapper;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.location.vo.*;
+
+/**
+ * 库位 Mapper
+ *
+ * @author 李方捷
+ */
+@Mapper
+public interface WmsWarehouseLocationMapper extends BaseMapperX<WmsWarehouseLocationDO> {
+
+    default PageResult<WmsWarehouseLocationDO> selectPage(WmsWarehouseLocationPageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<WmsWarehouseLocationDO>()
+				.eqIfPresent(WmsWarehouseLocationDO::getCode, reqVO.getCode())
+				.likeIfPresent(WmsWarehouseLocationDO::getName, reqVO.getName())
+				.eqIfPresent(WmsWarehouseLocationDO::getWarehouseId, reqVO.getWarehouseId())
+				.eqIfPresent(WmsWarehouseLocationDO::getAreaId, reqVO.getAreaId())
+				.eqIfPresent(WmsWarehouseLocationDO::getPickingOrder, reqVO.getPickingOrder())
+				.eqIfPresent(WmsWarehouseLocationDO::getStatus, reqVO.getStatus())
+				.betweenIfPresent(WmsWarehouseLocationDO::getCreateTime, reqVO.getCreateTime())
+				.orderByDesc(WmsWarehouseLocationDO::getId));
+    }
+
+    /**
+     * 按 warehouse_id,area_id 查询 WmsWarehouseLocationDO 清单
+     */
+    default List<WmsWarehouseLocationDO> selectByWarehouseIdAndAreaId(Long warehouseId, Long areaId) {
+        return selectList(new LambdaQueryWrapperX<WmsWarehouseLocationDO>().eq(WmsWarehouseLocationDO::getWarehouseId, warehouseId).eq(WmsWarehouseLocationDO::getAreaId, areaId));
+    }
+
+    /**
+     * 按 code 查询唯一的 WmsWarehouseLocationDO
+     */
+    default WmsWarehouseLocationDO getByCode(String code, boolean deleted) {
+        LambdaQueryWrapperX<WmsWarehouseLocationDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsWarehouseLocationDO::getCode, code);
+        ;
+        if (deleted) {
+            wrapper.eq(WmsWarehouseLocationDO::getDeleted, true);
+        }
+        return selectOne(wrapper);
+    }
+
+    /**
+     * 按 code 查询唯一的 WmsWarehouseLocationDO
+     */
+    default WmsWarehouseLocationDO getByCode(String code) {
+        return getByCode(code, false);
+    }
+}

@@ -22,4 +22,14 @@ public interface ErrorCodeConstants {
     ErrorCode WAREHOUSE_NAME_DUPLICATE = new ErrorCode(2_001_100_001, "名称已存在");
     ErrorCode WAREHOUSE_CODE_DUPLICATE = new ErrorCode(2_001_100_002, "代码已存在");
     ErrorCode WAREHOUSE_BE_REFERRED = new ErrorCode(2_001_100_003, "仓库被引用");
+
+    // ========== WMS_WAREHOUSE_AREA 仓库 2_001_200_000 ==========
+    ErrorCode WAREHOUSE_AREA_NOT_EXISTS = new ErrorCode(2_001_200_000, "库区不存在");
+    ErrorCode WAREHOUSE_AREA_CODE_DUPLICATE = new ErrorCode(2_001_200_001, "代码已存在");
+    ErrorCode WAREHOUSE_AREA_BE_REFERRED = new ErrorCode(2_001_200_002, "库区被引用");
+
+    // ========== WMS_WAREHOUSE_LOCATION 仓库 2_001_300_000 ==========
+    ErrorCode WAREHOUSE_LOCATION_NOT_EXISTS = new ErrorCode(2_001_300_000, "库位不存在");
+    ErrorCode WAREHOUSE_LOCATION_CODE_DUPLICATE = new ErrorCode(2_001_300_001, "代码已存在");
+    ErrorCode WAREHOUSE_LOCATION_BE_REFERRED = new ErrorCode(2_001_300_002, "库位被引用");
 }
