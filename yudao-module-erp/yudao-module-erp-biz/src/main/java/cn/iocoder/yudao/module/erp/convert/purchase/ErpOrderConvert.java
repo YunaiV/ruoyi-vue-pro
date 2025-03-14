@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.erp.convert.purchase;
 
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.ErpPurchaseRequestOrderReqVO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -16,34 +15,40 @@ public interface ErpOrderConvert {
     ErpOrderConvert INSTANCE = Mappers.getMapper(ErpOrderConvert.class);
 
 
+    /**
+     * 让采购项关联申请项 采购项:申请项 N:1
+     *
+     * @param itemDO          采购项
+     * @param requestItemsMap ?
+     * @param itemDOMap       采购项Map
+     * @return 采购订单的入参reqVO的item
+     */
     default ErpPurchaseOrderSaveReqVO.Item convertToErpPurchaseOrderSaveReqVOItem(ErpPurchaseRequestItemsDO itemDO, Map<Long, ErpPurchaseRequestOrderReqVO.requestItems> requestItemsMap, Map<Long, ErpPurchaseRequestItemsDO> itemDOMap) {
         ErpPurchaseOrderSaveReqVO.Item item = new ErpPurchaseOrderSaveReqVO.Item();
         // 设置产品ID
         item.setProductId(itemDO.getProductId());
-        // 设置下单数量(采购)
-//        item.setCount(itemDO.getCount());
-        // 设置仓库ID
-        item.setWarehouseId(itemDO.getWarehouseId());
-        // 设置审批数量
-//        item.setApproveCount(itemDO.getApproveCount());
         // 设置税率
         item.setTaxPercent(itemDO.getTaxPercent());
         //采购订单的申请数量
         //产品项
         item.setPurchaseApplyItemId(itemDO.getId());
         //含税单价
-        item.setProductPrice(itemDOMap.get(itemDO.getId()).getActTaxPrice());
+        item.setActTaxPrice(itemDOMap.get(itemDO.getId()).getActTaxPrice());
         //税率
         item.setTaxPercent(itemDOMap.get(itemDO.getId()).getTaxPercent());
-        // 设置下单数量(采购)
-        item.setCount(requestItemsMap.get(itemDO.getId()).getOrderQuantity());
+        // 设置下单数量(采购) == 申请项批准数量
+        item.setCount(itemDO.getApproveCount());
         item.setWarehouseId(itemDOMap.get(itemDO.getId()).getWarehouseId());
+        //价税合计
+        item.setAllAmount(itemDO.getAllAmount());
         // 自动映射其他属性
-//        item.setRemark(itemDOMap.get(itemDO.getId()).getRemark());
-//        item.setUnitId(itemDOMap.get(itemDO.getId()).getUnitId());
         item.setTaxPercent(itemDOMap.get(itemDO.getId()).getTaxPercent());
         item.setTaxPrice(itemDOMap.get(itemDO.getId()).getTaxPrice());
         item.setDeliveryTime(itemDOMap.get(itemDO.getId()).getExpectArrivalDate());
+        //
+        //申请项id
+        item.setPurchaseApplyItemId(itemDO.getId());
+
         return item;
     }
 

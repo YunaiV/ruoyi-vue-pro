@@ -15,8 +15,7 @@ public class ErpPurchaseRequestOrderReqVO {
     @NotNull(message = "供应商编号不能为空")
     private Long supplierId;
 
-    @Schema(description = "期望采购时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "采购时间不能为空")
+    @Schema(description = "期望采购时间")
     private LocalDateTime orderTime;
     // 项目列表
     @NotNull(message = "项目列表不能为空")
@@ -35,7 +34,7 @@ public class ErpPurchaseRequestOrderReqVO {
 //        private Long supplierProductId;
 
         //下单数量
-        @NotNull(message = "下单数量不能为空")
+//        @NotNull(message = "下单数量不能为空")
         @Schema(description = "下单数量", requiredMode = Schema.RequiredMode.REQUIRED)
         private Integer orderQuantity;
 

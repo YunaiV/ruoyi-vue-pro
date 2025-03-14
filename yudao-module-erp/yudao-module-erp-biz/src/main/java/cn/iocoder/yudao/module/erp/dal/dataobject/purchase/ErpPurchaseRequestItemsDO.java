@@ -82,20 +82,20 @@ public class ErpPurchaseRequestItemsDO extends TenantBaseDO {
      * 税率，百分比
      */
     private BigDecimal taxPercent;
-    /**
-     * ERP 采购订单ID
-     * {@link ErpPurchaseOrderDO#getId()} ()}
-     */
-    private Long purchaseOrderId;
+//    /**
+//     * ERP 采购订单ID
+//     * {@link ErpPurchaseOrderDO#getId()} ()}
+//     */
+//    private Long purchaseOrderId;
     /**
      * 产品已订购数量
      */
     private Integer orderedQuantity;
-    /**
-     * ERP 采购订单项ID
-     * {@link ErpPurchaseOrderItemDO#getId()} ()}
-     */
-    private Long purchaseOrderItemId;
+//    /**
+//     * ERP 采购订单项ID
+//     * {@link ErpPurchaseOrderItemDO#getId()} ()}
+//     */
+//    private Long purchaseOrderItemId;
     /**
      * 期望到货日期
      */

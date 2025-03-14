@@ -20,9 +20,9 @@ public class ActionPaymentImpl implements Action<ErpPaymentStatus, ErpEventEnum,
     @Override
     @Transactional
     public void execute(ErpPaymentStatus from, ErpPaymentStatus to, ErpEventEnum event, ErpPurchaseRequestDO context) {
-//        ErpPurchaseRequestDO aDo = mapper.selectById(context.getId());
-//        aDo.setOrderStatus(to.getCode());
-//        mapper.updateById(aDo);
+        ErpPurchaseRequestDO aDo = mapper.selectById(context.getId());
+        aDo.setOrderStatus(to.getCode());
+        mapper.updateById(aDo);
         log.debug("付款状态机执行成功,订单：{}，事件：{}，from状态({})", JSONUtil.toJsonStr(context), event.getDesc(), from.getDesc());
     }
 }
