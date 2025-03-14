@@ -38,7 +38,7 @@ public class ErpPurchaseInDO extends BaseDO {
      * 审核状态
      * 枚举 {@link ErpAuditStatus}
      */
-    private Integer auditorStatus;
+    private Integer auditStatus;
     /**
      * 供应商编号
      * 关联 {@link ErpSupplierDO#getId()}
@@ -61,7 +61,7 @@ public class ErpPurchaseInDO extends BaseDO {
     /**
      * 审核人ID
      */
-    private String auditorId;
+    private Long auditorId;
     /**
      * 审核时间
      */

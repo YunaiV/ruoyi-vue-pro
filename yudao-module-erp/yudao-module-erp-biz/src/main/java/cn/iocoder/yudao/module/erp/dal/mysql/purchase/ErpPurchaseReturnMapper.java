@@ -42,7 +42,7 @@ public interface ErpPurchaseReturnMapper extends BaseMapperX<ErpPurchaseReturnDO
             query.apply("t.refund_price = t.total_price");
         }
         if (Boolean.TRUE.equals(reqVO.getRefundEnable())) {
-            query.eq(ErpPurchaseInDO::getAuditorStatus, ErpAuditStatus.APPROVED.getCode())
+            query.eq(ErpPurchaseInDO::getAuditStatus, ErpAuditStatus.APPROVED.getCode())
                     .apply("t.refund_price < t.total_price");
         }
         if (reqVO.getWarehouseId() != null || reqVO.getProductId() != null) {

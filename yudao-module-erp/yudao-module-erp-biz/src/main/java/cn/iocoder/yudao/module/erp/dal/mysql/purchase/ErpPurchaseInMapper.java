@@ -7,12 +7,10 @@ import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInPageReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInItemDO;
-import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * ERP 采购入库 Mapper
@@ -27,7 +25,7 @@ public interface ErpPurchaseInMapper extends BaseMapperX<ErpPurchaseInDO> {
                 .likeIfPresent(ErpPurchaseInDO::getNo, reqVO.getNo())
 //                .eqIfPresent(ErpPurchaseInDO::getSupplierId, reqVO.getSupplierId())
                 .betweenIfPresent(ErpPurchaseInDO::getInTime, reqVO.getInTime())
-            .eqIfPresent(ErpPurchaseInDO::getAuditorStatus, reqVO.getStatus())
+            .eqIfPresent(ErpPurchaseInDO::getAuditStatus, reqVO.getStatus())
                 .likeIfPresent(ErpPurchaseInDO::getRemark, reqVO.getRemark())
                 .eqIfPresent(ErpPurchaseInDO::getCreator, reqVO.getCreator())
                 .eqIfPresent(ErpPurchaseInDO::getAccountId, reqVO.getAccountId())
@@ -56,7 +54,7 @@ public interface ErpPurchaseInMapper extends BaseMapperX<ErpPurchaseInDO> {
 
     default int updateByIdAndStatus(Long id, Integer status, ErpPurchaseInDO updateObj) {
         return update(updateObj, new LambdaUpdateWrapper<ErpPurchaseInDO>()
-            .eq(ErpPurchaseInDO::getId, id).eq(ErpPurchaseInDO::getAuditorStatus, status));
+            .eq(ErpPurchaseInDO::getId, id).eq(ErpPurchaseInDO::getAuditStatus, status));
     }
 
     default ErpPurchaseInDO selectByNo(String no) {

@@ -30,6 +30,7 @@ import cn.iocoder.yudao.module.erp.service.stock.ErpStockRecordService;
 import cn.iocoder.yudao.module.erp.service.stock.bo.ErpStockRecordCreateReqBO;
 import com.alibaba.cola.statemachine.StateMachine;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +53,7 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
  */
 @Service
 @Validated
+@Slf4j
 public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
 
     @Resource
@@ -75,13 +77,15 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     ErpPurchaseOrderItemMapper orderItemMapper;
 
     @Resource(name = PURCHASE_IN_AUDIT_STATE_MACHINE)
-    private StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseInDO> auditMachine;
+    private StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseInAuditReqVO> auditMachine;
     @Resource(name = PURCHASE_IN_PAYMENT_STATE_MACHINE)
     private StateMachine<ErpPaymentStatus, ErpEventEnum, ErpPurchaseInDO> paymentMachine;
     @Resource(name = PURCHASE_IN_ITEM_PAYMENT_STATE_MACHINE)
     private StateMachine<ErpPaymentStatus, ErpEventEnum, ErpPurchaseInItemDO> itemPaymentMachine;
     @Resource(name = PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME)
     private StateMachine<ErpStorageStatus, ErpEventEnum, ErpInCountDTO> orderItemStorageMachine;
+    @Resource(name = PURCHASE_IN_AUDIT_STATE_MACHINE)
+    private StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseInAuditReqVO> purchaseInAuditStateMachine;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -132,7 +136,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     }
 
     private void initMasterStatus(ErpPurchaseInDO purchaseIn) {
-        auditMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.AUDIT_INIT, purchaseIn);
+        auditMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.AUDIT_INIT, ErpPurchaseInAuditReqVO.builder().inId(purchaseIn.getId()).build());
         paymentMachine.fireEvent(ErpPaymentStatus.NONE_PAYMENT, ErpEventEnum.PAYMENT_INIT, purchaseIn);
     }
 
@@ -141,7 +145,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     public void updatePurchaseIn(ErpPurchaseInSaveReqVO updateReqVO) {
         // 1.1 校验存在
         ErpPurchaseInDO purchaseIn = validatePurchaseInExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVED.getCode().equals(purchaseIn.getAuditorStatus())) {
+        if (ErpAuditStatus.APPROVED.getCode().equals(purchaseIn.getAuditStatus())) {
             throw exception(PURCHASE_IN_UPDATE_FAIL_APPROVE, purchaseIn.getNo());
         }
         // 1.2 校验采购订单已审核
@@ -196,7 +200,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         // 1.1 校验存在
         ErpPurchaseInDO purchaseIn = validatePurchaseInExists(id);
         // 1.2 校验状态
-        if (purchaseIn.getAuditorStatus().equals(status)) {
+        if (purchaseIn.getAuditStatus().equals(status)) {
             throw exception(approve ? PURCHASE_IN_APPROVE_FAIL : PURCHASE_IN_PROCESS_FAIL);
         }
         // 1.3 校验已付款
@@ -204,8 +208,8 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
             throw exception(PURCHASE_IN_PROCESS_FAIL_EXISTS_PAYMENT);
         }
         // 2. 更新状态
-        int updateCount = purchaseInMapper.updateByIdAndStatus(id, purchaseIn.getAuditorStatus(),
-            new ErpPurchaseInDO().setAuditorStatus(status));
+        int updateCount = purchaseInMapper.updateByIdAndStatus(id, purchaseIn.getAuditStatus(),
+            new ErpPurchaseInDO().setAuditStatus(status));
         if (updateCount == 0) {
             throw exception(approve ? PURCHASE_IN_APPROVE_FAIL : PURCHASE_IN_PROCESS_FAIL);
         }
@@ -304,7 +308,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
             return;
         }
         purchaseIns.forEach(purchaseIn -> {
-            if (ErpAuditStatus.APPROVED.getCode().equals(purchaseIn.getAuditorStatus())) {
+            if (ErpAuditStatus.APPROVED.getCode().equals(purchaseIn.getAuditStatus())) {
                 throw exception(PURCHASE_IN_DELETE_FAIL_APPROVE, purchaseIn.getNo());
             }
             //
@@ -350,7 +354,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     @Override
     public ErpPurchaseInDO validatePurchaseIn(Long id) {
         ErpPurchaseInDO purchaseIn = validatePurchaseInExists(id);
-        if (ObjectUtil.notEqual(purchaseIn.getAuditorStatus(), ErpAuditStatus.APPROVED.getCode())) {
+        if (ObjectUtil.notEqual(purchaseIn.getAuditStatus(), ErpAuditStatus.APPROVED.getCode())) {
             throw exception(PURCHASE_IN_NOT_APPROVE);
         }
         return purchaseIn;
@@ -377,11 +381,33 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     }
 
     @Override
-    public void submitAudit(Collection<Long> inIds) {
+    public void submitAudit(Long inId) {
+        ErpPurchaseInDO erpPurchaseInDO = validatePurchaseIn(inId);
+        purchaseInAuditStateMachine.fireEvent(ErpAuditStatus.fromCode(erpPurchaseInDO.getAuditStatus()), ErpEventEnum.SUBMIT_FOR_REVIEW, ErpPurchaseInAuditReqVO.builder().inId(inId).build());//提交审核
     }
 
     @Override
-    public void reviewPurchaseOrder(ErpPurchaseInAuditReqVO req) {
+    public void review(ErpPurchaseInAuditReqVO req) {
+//        purchaseInAuditStateMachine.fireEvent(ErpAuditStatus.fromCode(erpPurchaseInDO.getAuditorStatus()), ErpEventEnum.SUBMIT_FOR_REVIEW, req);//提交审核
+        // 查询采购订单信息
 
+        ErpPurchaseInDO inDO = validatePurchaseIn(req.getInId());
+        // 获取当前订单状态
+        ErpAuditStatus currentStatus = ErpAuditStatus.fromCode(inDO.getAuditStatus());
+        if (Boolean.TRUE.equals(req.getReviewed())) {
+            // 审核操作
+            if (req.getPass()) {
+                log.debug("采购订单通过审核，ID: {}", inDO.getId());
+                auditMachine.fireEvent(currentStatus, ErpEventEnum.AGREE, req);
+            } else {
+                log.debug("采购订单拒绝审核，ID: {}", inDO.getId());
+                auditMachine.fireEvent(currentStatus, ErpEventEnum.REJECT, req);
+            }
+        } else {
+            log.debug("采购订单撤回审核，ID: {}", inDO.getId());
+            auditMachine.fireEvent(currentStatus, ErpEventEnum.WITHDRAW_REVIEW, req);
+        }
     }
+
+
 }

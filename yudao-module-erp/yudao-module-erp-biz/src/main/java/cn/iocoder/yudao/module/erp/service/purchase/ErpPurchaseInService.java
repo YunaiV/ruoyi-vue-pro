@@ -99,12 +99,9 @@ public interface ErpPurchaseInService {
      */
     List<ErpPurchaseInItemDO> getPurchaseInItemListByInIds(Collection<Long> inIds);
 
-    /**
-     * 提交审核
-     *
-     * @param inIds 采购入库编号数组
-     */
-    void submitAudit(Collection<Long> inIds);
 
-    void reviewPurchaseOrder(ErpPurchaseInAuditReqVO req);
+    void submitAudit(Long inId);
+
+    void review(ErpPurchaseInAuditReqVO req);
+
 }

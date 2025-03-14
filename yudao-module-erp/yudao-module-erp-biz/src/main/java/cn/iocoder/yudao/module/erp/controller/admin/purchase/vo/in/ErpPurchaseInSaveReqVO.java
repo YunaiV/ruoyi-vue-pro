@@ -18,14 +18,15 @@ public class ErpPurchaseInSaveReqVO {
     private Long id;
 
     @Schema(description = "采购订单id", requiredMode = Schema.RequiredMode.REQUIRED, example = "CGRK-20241012-00197")
-    @NotNull(message = "采购订单编号不能为空")
+//    @NotNull(message = "采购订单编号不能为空")
     private Long orderId;
+
     /**
      * 采购订单号
      * 冗余 {@link ErpPurchaseOrderDO#getNo()}
      */
-    @Schema(description = "采购订单号", example = "CGDD-20241012-00197")
-    private String orderNo;
+    @Schema(description = "入库单号", example = "CGRK-20241012-00197")
+    private String no;
 
     @Schema(description = "单据日期", example = "2024-10-12")
     private LocalDateTime noTime;
@@ -39,15 +40,6 @@ public class ErpPurchaseInSaveReqVO {
 
     @Schema(description = "汇率,财务管理-币别维护", example = "5.8")
     private BigDecimal exchangeRate;
-
-    @Schema(description = "审核人ID")
-    private String auditorId;
-
-    @Schema(description = "审核时间")
-    private LocalDateTime auditTime;
-
-    @Schema(description = "入库审核状态")
-    private Integer auditorStatus;
 
     @Schema(description = "结算日期")
     private LocalDateTime settlementDate;
@@ -95,6 +87,9 @@ public class ErpPurchaseInSaveReqVO {
         @Schema(description = "采购订单项id", requiredMode = Schema.RequiredMode.REQUIRED, example = "11756")
         @NotNull(message = "采购订单项id不能为空")
         private Long orderItemId;
+
+        @Schema(description = "采购订单编号-展示用(源单单号,采购单)")
+        private String orderNo;
 
         @Schema(description = "仓库编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
         @NotNull(message = "仓库编号不能为空")

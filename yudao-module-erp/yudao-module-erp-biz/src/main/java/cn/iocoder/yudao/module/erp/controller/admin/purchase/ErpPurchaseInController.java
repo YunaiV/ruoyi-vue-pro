@@ -139,7 +139,7 @@ public class ErpPurchaseInController {
     @Parameter(name = "itemIds", description = "订单下的订单项Id集合", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:submitAudit')")
     public CommonResult<Boolean> submitAudit(@Validated @RequestBody ErpPurchaseInAuditReqVO reqVO) {
-        purchaseInService.submitAudit(reqVO.getInIds());
+        purchaseInService.submitAudit(reqVO.getInId());
         return success(true);
     }
 
@@ -149,7 +149,7 @@ public class ErpPurchaseInController {
     @Parameter(name = "reviewed", description = "审核状态", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:review')")
     public CommonResult<Boolean> reviewPurchaseRequest(@Validated(validation.OnAudit.class) @RequestBody ErpPurchaseInAuditReqVO req) {
-        purchaseInService.reviewPurchaseOrder(req);
+        purchaseInService.review(req);
         return success(true);
     }
 

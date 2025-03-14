@@ -156,7 +156,6 @@ public class ErpPurchaseRequestStatusMachine {
 
     @Resource
     ActionStorageImpl actionStorageImpl;
-
     @Bean(ErpStateMachines.PURCHASE_REQUEST_STORAGE_STATE_MACHINE_NAME)
     public StateMachine<ErpStorageStatus, ErpEventEnum, ErpPurchaseRequestDO> buildPurchaseOrderItemStorageStateMachine() {
         StateMachineBuilder<ErpStorageStatus, ErpEventEnum, ErpPurchaseRequestDO> builder = StateMachineBuilderFactory.create();

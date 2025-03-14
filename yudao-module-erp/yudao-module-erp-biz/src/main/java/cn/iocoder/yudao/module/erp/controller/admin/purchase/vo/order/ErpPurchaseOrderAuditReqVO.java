@@ -37,7 +37,7 @@ public class ErpPurchaseOrderAuditReqVO {
     private String reviewComment;
 
     //开关
-    @Schema(description = "启用/关闭")
+    @Schema(description = "启用/关闭状态")
     @NotNull(groups = validation.OnSwitch.class, message = "开关不能为空")
     private Boolean enable;
 

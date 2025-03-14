@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.erp.config.purchase.in;
 import cn.iocoder.yudao.module.erp.config.BaseFailCallbackImpl;
 import cn.iocoder.yudao.module.erp.config.purchase.in.impl.action.ActionInAuditImpl;
 import cn.iocoder.yudao.module.erp.config.purchase.in.impl.action.ActionInPayImpl;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInAuditReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInDO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.ErpStateMachines;
@@ -29,8 +30,8 @@ public class ErpPurchaseInStatusMachine {
     private BaseFailCallbackImpl baseFailCallbackImpl;
 
     @Bean(ErpStateMachines.PURCHASE_IN_AUDIT_STATE_MACHINE)
-    public StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseInDO> getPurchaseRequestStateMachine() {
-        StateMachineBuilder<ErpAuditStatus, ErpEventEnum, ErpPurchaseInDO> builder = StateMachineBuilderFactory.create();
+    public StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseInAuditReqVO> getPurchaseRequestStateMachine() {
+        StateMachineBuilder<ErpAuditStatus, ErpEventEnum, ErpPurchaseInAuditReqVO> builder = StateMachineBuilderFactory.create();
 
         // 初始化状态
         builder.internalTransition()
