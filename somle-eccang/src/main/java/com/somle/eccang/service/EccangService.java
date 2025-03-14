@@ -447,14 +447,7 @@ public class EccangService {
      **/
     public Stream<EccangPage> streamReceiving(EccangReceivingReqVo eccangReceivingReqVo) {
         String endpoint = "getReceiving";
-        return StreamX.iterate(
-            getPage(JsonUtilsX.toJSONObject(eccangReceivingReqVo), endpoint),
-            page -> page.hasNext(),
-            page -> {
-                eccangReceivingReqVo.setPage(page.getPage() + 1);
-                return getPage(JsonUtilsX.toJSONObject(eccangReceivingReqVo), endpoint);
-            }
-        );
+        return getAllPage(JsonUtilsX.toJSONObject(eccangReceivingReqVo), endpoint);
     }
 
     public String parseCountryCode(String code) {
