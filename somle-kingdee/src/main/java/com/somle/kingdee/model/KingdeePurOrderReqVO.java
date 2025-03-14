@@ -5,13 +5,8 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Data;
-
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Data
@@ -110,13 +105,13 @@ public class KingdeePurOrderReqVO {
      * 当前页，默认1 (Current page, default is 1)
      * 非必填 (Optional)
      */
-    private String page;
+    private Integer page;
 
     /**
      * 每页显示条数默认10 (Page size, default is 10)
      * 非必填 (Optional)
      */
-    private String pageSize;
+    private Integer pageSize;
 
     /**
      * 开始日期 (Start bill date, format: "yyyy-MM-dd", leave empty for no filtering)

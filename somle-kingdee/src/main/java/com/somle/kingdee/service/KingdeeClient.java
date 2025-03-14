@@ -1,6 +1,7 @@
 package com.somle.kingdee.service;
 
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import cn.iocoder.yudao.framework.common.util.web.RequestX;
@@ -328,15 +329,27 @@ public class KingdeeClient {
     public List<KingdeePurRequest> getPurRequest(KingdeePurRequestReqVO vo) {
         log.debug("fetching purchase request");
         String endUrl = "/jdy/v2/scm/pur_request";
-        KingdeeResponse response = getResponse(endUrl, vo);
-        return response.getData(KingdeePage.class).getRowsList(KingdeePurRequest.class).stream().toList();
+        return StreamX.iterate(
+            getPage(JsonUtilsX.toJSONObject(vo), endUrl),
+            page -> page.hasNext(),
+            page -> {
+                vo.setPage(page.getPage() + 1);
+                return getPage(JsonUtilsX.toJSONObject(vo), endUrl);
+            }
+        ).flatMap(n -> n.getRowsList(KingdeePurRequest.class).stream()).toList();
     }
 
     public List<KingdeePurOrder> getPurOrder(KingdeePurOrderReqVO vo) {
         log.debug("fetching purchase order");
         String endUrl = "/jdy/v2/scm/pur_order";
-        KingdeeResponse response = getResponse(endUrl, vo);
-        return response.getData(KingdeePage.class).getRowsList(KingdeePurOrder.class).stream().toList();
+        return StreamX.iterate(
+            getPage(JsonUtilsX.toJSONObject(vo), endUrl),
+            page -> page.hasNext(),
+            page -> {
+                vo.setPage(page.getPage() + 1);
+                return getPage(JsonUtilsX.toJSONObject(vo), endUrl);
+            }
+        ).flatMap(n -> n.getRowsList(KingdeePurOrder.class).stream()).toList();
     }
 
     /**
@@ -348,9 +361,15 @@ public class KingdeeClient {
      * */
     public List<KingdeePurInbound> getPurInbound(KingdeePurInboundReqVO vo) {
         log.debug("fetching purchase inbound");
-        String endUrl = "/jdy/v2/scm/pur_inbound";
-        KingdeeResponse response = getResponse(endUrl, vo);
-        return response.getData(KingdeePage.class).getRowsList(KingdeePurInbound.class).stream().toList();
+        String endpoint = "/jdy/v2/scm/pur_inbound";
+        return StreamX.iterate(
+            getPage(JsonUtilsX.toJSONObject(vo), endpoint),
+            page -> page.hasNext(),
+            page -> {
+                vo.setPage(page.getPage() + 1);
+                return getPage(JsonUtilsX.toJSONObject(vo), endpoint);
+            }
+        ).flatMap(n -> n.getRowsList(KingdeePurInbound.class).stream()).toList();
     }
     public KingdeePurOrderDetail getPurOrderDetail(String purOrderNumber) {
         String endUrl = "/jdy/v2/scm/pur_order_detail";
@@ -421,4 +440,8 @@ public class KingdeeClient {
         return fetchResponse("POST", endUrl, new TreeMap<>(JsonUtilsX.toStringMap(params)), payload);
     }
 
+    private KingdeePage getPage(JSONObject payload, String endpoint) {
+        KingdeeResponse response = getResponse(endpoint, payload);
+        return response.getData(KingdeePage.class);
+    }
 }
