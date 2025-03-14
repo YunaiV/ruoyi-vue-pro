@@ -12,6 +12,9 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collection;
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.TOOL_NAME_NOT_EXISTS;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.TOOL_NOT_EXISTS;
@@ -59,7 +62,8 @@ public class AiToolServiceImpl implements AiToolService {
         toolMapper.deleteById(id);
     }
 
-    private void validateToolExists(Long id) {
+    @Override
+    public void validateToolExists(Long id) {
         if (toolMapper.selectById(id) == null) {
             throw exception(TOOL_NOT_EXISTS);
         }
@@ -79,8 +83,18 @@ public class AiToolServiceImpl implements AiToolService {
     }
 
     @Override
+    public List<AiToolDO> getToolList(Collection<Long> ids) {
+        return toolMapper.selectBatchIds(ids);
+    }
+
+    @Override
     public PageResult<AiToolDO> getToolPage(AiToolPageReqVO pageReqVO) {
         return toolMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<AiToolDO> getToolListByStatus(Integer status) {
+        return toolMapper.selectListByStatus(status);
     }
 
 }

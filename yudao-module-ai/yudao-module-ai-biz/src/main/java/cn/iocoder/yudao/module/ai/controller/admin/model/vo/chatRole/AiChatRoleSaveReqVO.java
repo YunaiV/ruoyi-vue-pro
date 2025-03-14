@@ -47,6 +47,9 @@ public class AiChatRoleSaveReqVO {
     @Schema(description = "引用的知识库编号列表", example = "1,2,3")
     private List<Long> knowledgeIds;
 
+    @Schema(description = "引用的工具编号列表", example = "1,2,3")
+    private List<Long> toolIds;
+
     @Schema(description = "是否公开", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "是否公开不能为空")
     private Boolean publicStatus;

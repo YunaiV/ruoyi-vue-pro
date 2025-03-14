@@ -7,7 +7,6 @@ import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.util.AiUtils;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessagePageReqVO;
@@ -19,6 +18,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiToolDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.chat.AiChatMessageMapper;
 import cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeDocumentService;
@@ -27,6 +27,7 @@ import cn.iocoder.yudao.module.ai.service.knowledge.bo.AiKnowledgeSegmentSearchR
 import cn.iocoder.yudao.module.ai.service.knowledge.bo.AiKnowledgeSegmentSearchRespBO;
 import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
+import cn.iocoder.yudao.module.ai.service.model.AiToolService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.Message;
@@ -50,6 +51,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.error;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.CHAT_CONVERSATION_NOT_EXISTS;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.CHAT_MESSAGE_NOT_EXIST;
 
@@ -82,6 +84,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     private AiKnowledgeSegmentService knowledgeSegmentService;
     @Resource
     private AiKnowledgeDocumentService knowledgeDocumentService;
+    @Resource
+    private AiToolService toolService;
 
     @Transactional(rollbackFor = Exception.class)
     public AiChatMessageSendRespVO sendMessage(AiChatMessageSendReqVO sendReqVO, Long userId) {
@@ -118,11 +122,13 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         String newContent = chatResponse.getResult().getOutput().getText();
         chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId()).setContent(newContent));
         // 3.4 响应结果
-        List<AiChatMessageRespVO.KnowledgeSegment> segments = BeanUtils.toBean(knowledgeSegments, AiChatMessageRespVO.KnowledgeSegment.class,
+        List<AiChatMessageRespVO.KnowledgeSegment> segments = BeanUtils.toBean(knowledgeSegments,
+                AiChatMessageRespVO.KnowledgeSegment.class,
                 segment -> {
-            AiKnowledgeDocumentDO document = knowledgeDocumentService.getKnowledgeDocument(segment.getDocumentId());
-            segment.setDocumentName(document != null ? document.getName() : null);
-        });
+                    AiKnowledgeDocumentDO document = knowledgeDocumentService
+                            .getKnowledgeDocument(segment.getDocumentId());
+                    segment.setDocumentName(document != null ? document.getName() : null);
+                });
         return new AiChatMessageSendRespVO()
                 .setSend(BeanUtils.toBean(userMessage, AiChatMessageSendRespVO.Message.class))
                 .setReceive(BeanUtils.toBean(assistantMessage, AiChatMessageSendRespVO.Message.class)
@@ -130,7 +136,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     }
 
     @Override
-    public Flux<CommonResult<AiChatMessageSendRespVO>> sendChatMessageStream(AiChatMessageSendReqVO sendReqVO, Long userId) {
+    public Flux<CommonResult<AiChatMessageSendRespVO>> sendChatMessageStream(AiChatMessageSendReqVO sendReqVO,
+            Long userId) {
         // 1.1 校验对话存在
         AiChatConversationDO conversation = chatConversationService
                 .validateChatConversationExists(sendReqVO.getConversationId());
@@ -143,7 +150,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         StreamingChatModel chatModel = modalService.getChatModel(model.getId());
 
         // 2. 知识库找回
-        List<AiKnowledgeSegmentSearchRespBO> knowledgeSegments = recallKnowledgeSegment(sendReqVO.getContent(), conversation);
+        List<AiKnowledgeSegmentSearchRespBO> knowledgeSegments = recallKnowledgeSegment(sendReqVO.getContent(),
+                conversation);
 
         // 3. 插入 user 发送消息
         AiChatMessageDO userMessage = createChatMessage(conversation.getId(), null, model,
@@ -167,7 +175,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
             if (StrUtil.isEmpty(contentBuffer)) {
                 segments = BeanUtils.toBean(knowledgeSegments, AiChatMessageRespVO.KnowledgeSegment.class,
                         segment -> TenantUtils.executeIgnore(() -> {
-                            AiKnowledgeDocumentDO document = knowledgeDocumentService.getKnowledgeDocument(segment.getDocumentId());
+                            AiKnowledgeDocumentDO document = knowledgeDocumentService
+                                    .getKnowledgeDocument(segment.getDocumentId());
                             segment.setDocumentName(document != null ? document.getName() : null);
                         }));
             }
@@ -192,7 +201,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     }
 
     private List<AiKnowledgeSegmentSearchRespBO> recallKnowledgeSegment(String content,
-                                                                        AiChatConversationDO conversation) {
+            AiChatConversationDO conversation) {
         // 1. 查询聊天角色
         if (conversation == null || conversation.getRoleId() == null) {
             return Collections.emptyList();
@@ -212,8 +221,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     }
 
     private Prompt buildPrompt(AiChatConversationDO conversation, List<AiChatMessageDO> messages,
-                               List<AiKnowledgeSegmentSearchRespBO> knowledgeSegments,
-                               AiModelDO model, AiChatMessageSendReqVO sendReqVO) {
+            List<AiKnowledgeSegmentSearchRespBO> knowledgeSegments,
+            AiModelDO model, AiChatMessageSendReqVO sendReqVO) {
         List<Message> chatMessages = new ArrayList<>();
         // 1.1 System Context 角色设定
         if (StrUtil.isNotBlank(conversation.getSystemMessage())) {
@@ -236,11 +245,18 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
             chatMessages.add(new UserMessage(String.format(KNOWLEDGE_USER_MESSAGE_TEMPLATE, reference)));
         }
 
-        // 2. 构建 ChatOptions 对象
+        // 2.1 查询 tool 工具
+        Set<String> toolNames = null;
+        if (conversation.getRoleId() != null) {
+            AiChatRoleDO chatRole = chatRoleService.getChatRole(conversation.getRoleId());
+            if (chatRole != null && CollUtil.isNotEmpty(chatRole.getToolIds())) {
+                toolNames = convertSet(toolService.getToolList(chatRole.getToolIds()), AiToolDO::getName);
+            }
+        }
+        // 2.2 构建 ChatOptions 对象
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
         ChatOptions chatOptions = AiUtils.buildChatOptions(platform, model.getModel(),
-                conversation.getTemperature(), conversation.getMaxTokens(),
-                SetUtils.asSet("directory_list", "weather_query"));
+                conversation.getTemperature(), conversation.getMaxTokens(), toolNames);
         return new Prompt(chatMessages, chatOptions);
     }
 
@@ -255,8 +271,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
      * @return 消息上下文
      */
     private List<AiChatMessageDO> filterContextMessages(List<AiChatMessageDO> messages,
-                                                        AiChatConversationDO conversation,
-                                                        AiChatMessageSendReqVO sendReqVO) {
+            AiChatConversationDO conversation,
+            AiChatMessageSendReqVO sendReqVO) {
         if (conversation.getMaxContexts() == null || ObjUtil.notEqual(sendReqVO.getUseContext(), Boolean.TRUE)) {
             return Collections.emptyList();
         }
@@ -285,9 +301,9 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     }
 
     private AiChatMessageDO createChatMessage(Long conversationId, Long replyId,
-                                              AiModelDO model, Long userId, Long roleId,
-                                              MessageType messageType, String content, Boolean useContext,
-                                              List<AiKnowledgeSegmentSearchRespBO> knowledgeSegments) {
+            AiModelDO model, Long userId, Long roleId,
+            MessageType messageType, String content, Boolean useContext,
+            List<AiKnowledgeSegmentSearchRespBO> knowledgeSegments) {
         AiChatMessageDO message = new AiChatMessageDO().setConversationId(conversationId).setReplyId(replyId)
                 .setModel(model.getModel()).setModelId(model.getId()).setUserId(userId).setRoleId(roleId)
                 .setType(messageType.getValue()).setContent(content).setUseContext(useContext)

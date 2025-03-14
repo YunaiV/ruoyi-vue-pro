@@ -74,6 +74,13 @@ public class AiChatRoleDO extends BaseDO {
      */
     @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> knowledgeIds;
+    /**
+     * 引用的工具编号列表
+     *
+     * 关联 {@link AiToolDO#getId()} 字段
+     */
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> toolIds;
 
     /**
      * 是否公开

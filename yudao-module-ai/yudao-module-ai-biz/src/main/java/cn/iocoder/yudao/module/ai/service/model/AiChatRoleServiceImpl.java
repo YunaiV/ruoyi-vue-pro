@@ -39,11 +39,15 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
 
     @Resource
     private AiKnowledgeService knowledgeService;
+    @Resource
+    private AiToolService toolService;
 
     @Override
     public Long createChatRole(AiChatRoleSaveReqVO createReqVO) {
         // 校验文档
         validateDocuments(createReqVO.getKnowledgeIds());
+        // 校验工具
+        validateTools(createReqVO.getToolIds());
 
         // 保存角色
         AiChatRoleDO chatRole = BeanUtils.toBean(createReqVO, AiChatRoleDO.class);
@@ -55,6 +59,8 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     public Long createChatRoleMy(AiChatRoleSaveMyReqVO createReqVO, Long userId) {
         // 校验文档
         validateDocuments(createReqVO.getKnowledgeIds());
+        // 校验工具
+        validateTools(createReqVO.getToolIds());
 
         // 保存角色
         AiChatRoleDO chatRole = BeanUtils.toBean(createReqVO, AiChatRoleDO.class).setUserId(userId)
@@ -69,6 +75,8 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
         validateChatRoleExists(updateReqVO.getId());
         // 校验文档
         validateDocuments(updateReqVO.getKnowledgeIds());
+        // 校验工具
+        validateTools(updateReqVO.getToolIds());
 
         // 更新角色
         AiChatRoleDO updateObj = BeanUtils.toBean(updateReqVO, AiChatRoleDO.class);
@@ -84,6 +92,8 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
         }
         // 校验文档
         validateDocuments(updateReqVO.getKnowledgeIds());
+        // 校验工具
+        validateTools(updateReqVO.getToolIds());
 
         // 更新
         AiChatRoleDO updateObj = BeanUtils.toBean(updateReqVO, AiChatRoleDO.class);
@@ -101,6 +111,19 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
         }
         // 校验文档是否存在
         knowledgeIds.forEach(knowledgeService::validateKnowledgeExists);
+    }
+
+    /**
+     * 校验工具是否存在
+     *
+     * @param toolIds 工具编号列表
+     */
+    private void validateTools(List<Long> toolIds) {
+        if (CollUtil.isEmpty(toolIds)) {
+            return;
+        }
+        // 遍历校验每个工具是否存在
+        toolIds.forEach(toolService::validateToolExists);
     }
 
     @Override
