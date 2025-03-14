@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.ai.config;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactory;
 import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactoryImpl;
 import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
@@ -17,6 +18,7 @@ import org.springframework.ai.autoconfigure.vectorstore.qdrant.QdrantVectorStore
 import org.springframework.ai.autoconfigure.vectorstore.redis.RedisVectorStoreProperties;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.TokenCountBatchingStrategy;
+import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
@@ -70,6 +72,7 @@ public class YudaoAiAutoConfiguration {
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
                         .build())
+                .toolCallingManager(getToolCallingManager())
                 .build();
         return new DeepSeekChatModel(openAiChatModel);
     }
@@ -96,6 +99,7 @@ public class YudaoAiAutoConfiguration {
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
                         .build())
+                .toolCallingManager(getToolCallingManager())
                 .build();
         return new DouBaoChatModel(openAiChatModel);
     }
@@ -122,6 +126,7 @@ public class YudaoAiAutoConfiguration {
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
                         .build())
+                .toolCallingManager(getToolCallingManager())
                 .build();
         return new SiliconFlowChatModel(openAiChatModel);
     }
@@ -155,6 +160,7 @@ public class YudaoAiAutoConfiguration {
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
                         .build())
+                .toolCallingManager(getToolCallingManager())
                 .build();
         return new HunYuanChatModel(openAiChatModel);
     }
@@ -181,6 +187,7 @@ public class YudaoAiAutoConfiguration {
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
                         .build())
+                .toolCallingManager(getToolCallingManager())
                 .build();
         return new XingHuoChatModel(openAiChatModel);
     }
@@ -208,6 +215,10 @@ public class YudaoAiAutoConfiguration {
     @Bean
     public BatchingStrategy batchingStrategy() {
         return new TokenCountBatchingStrategy();
+    }
+
+    private static ToolCallingManager getToolCallingManager() {
+        return SpringUtil.getBean(ToolCallingManager.class);
     }
 
 }

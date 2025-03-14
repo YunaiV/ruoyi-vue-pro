@@ -23,6 +23,7 @@ import com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeAutoConfiguration;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeImageApi;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingModel;
 import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingOptions;
 import com.alibaba.cloud.ai.dashscope.image.DashScopeImageModel;
@@ -58,11 +59,14 @@ import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.minimax.MiniMaxChatModel;
+import org.springframework.ai.minimax.MiniMaxChatOptions;
 import org.springframework.ai.minimax.MiniMaxEmbeddingModel;
 import org.springframework.ai.minimax.MiniMaxEmbeddingOptions;
 import org.springframework.ai.minimax.api.MiniMaxApi;
+import org.springframework.ai.model.function.FunctionCallbackResolver;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.moonshot.MoonshotChatModel;
+import org.springframework.ai.moonshot.MoonshotChatOptions;
 import org.springframework.ai.moonshot.api.MoonshotApi;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
@@ -90,10 +94,7 @@ import org.springframework.ai.vectorstore.observation.DefaultVectorStoreObservat
 import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
 import org.springframework.ai.vectorstore.qdrant.QdrantVectorStore;
 import org.springframework.ai.vectorstore.redis.RedisVectorStore;
-import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
-import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingModel;
-import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingOptions;
-import org.springframework.ai.zhipuai.ZhiPuAiImageModel;
+import org.springframework.ai.zhipuai.*;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
 import org.springframework.ai.zhipuai.api.ZhiPuAiImageApi;
 import org.springframework.beans.BeansException;
@@ -110,6 +111,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static org.springframework.ai.retry.RetryUtils.DEFAULT_RETRY_TEMPLATE;
 
 /**
  * AI Model 模型工厂的实现类
@@ -308,7 +310,9 @@ public class AiModelFactoryImpl implements AiModelFactory {
      */
     private static DashScopeChatModel buildTongYiChatModel(String key) {
         DashScopeApi dashScopeApi = new DashScopeApi(key);
-        return new DashScopeChatModel(dashScopeApi);
+        DashScopeChatOptions options = DashScopeChatOptions.builder().withModel(DashScopeApi.DEFAULT_CHAT_MODEL)
+                .withTemperature(0.7).build();
+        return new DashScopeChatModel(dashScopeApi, options, getFunctionCallbackResolver(), DEFAULT_RETRY_TEMPLATE);
     }
 
     /**
@@ -385,7 +389,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
     private ZhiPuAiChatModel buildZhiPuChatModel(String apiKey, String url) {
         ZhiPuAiApi zhiPuAiApi = StrUtil.isEmpty(url) ? new ZhiPuAiApi(apiKey)
                 : new ZhiPuAiApi(url, apiKey);
-        return new ZhiPuAiChatModel(zhiPuAiApi);
+        ZhiPuAiChatOptions options = ZhiPuAiChatOptions.builder().model(ZhiPuAiApi.DEFAULT_CHAT_MODEL).temperature(0.7).build();
+        return new ZhiPuAiChatModel(zhiPuAiApi, options, getFunctionCallbackResolver(), DEFAULT_RETRY_TEMPLATE);
     }
 
     /**
@@ -403,7 +408,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
     private MiniMaxChatModel buildMiniMaxChatModel(String apiKey, String url) {
         MiniMaxApi miniMaxApi = StrUtil.isEmpty(url) ? new MiniMaxApi(apiKey)
                 : new MiniMaxApi(url, apiKey);
-        return new MiniMaxChatModel(miniMaxApi);
+        MiniMaxChatOptions options = MiniMaxChatOptions.builder().model(MiniMaxApi.DEFAULT_CHAT_MODEL).temperature(0.7).build();
+        return new MiniMaxChatModel(miniMaxApi, options, getFunctionCallbackResolver(), DEFAULT_RETRY_TEMPLATE);
     }
 
     /**
@@ -412,7 +418,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
     private MoonshotChatModel buildMoonshotChatModel(String apiKey, String url) {
         MoonshotApi moonshotApi = StrUtil.isEmpty(url)? new MoonshotApi(apiKey)
                 : new MoonshotApi(url, apiKey);
-        return new MoonshotChatModel(moonshotApi);
+        MoonshotChatOptions options = MoonshotChatOptions.builder().model(MoonshotApi.DEFAULT_CHAT_MODEL).build();
+        return new MoonshotChatModel(moonshotApi, options, getFunctionCallbackResolver(), DEFAULT_RETRY_TEMPLATE);
     }
 
     /**
@@ -449,7 +456,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
         // 获取 AzureOpenAiChatProperties 对象
         AzureOpenAiChatProperties chatProperties = SpringUtil.getBean(AzureOpenAiChatProperties.class);
         return azureOpenAiAutoConfiguration.azureOpenAiChatModel(openAIClient, chatProperties,
-                null, null, null);
+                getToolCallingManager(), null, null);
     }
 
     /**
@@ -702,6 +709,10 @@ public class AiModelFactoryImpl implements AiModelFactory {
 
     private static ToolCallingManager getToolCallingManager() {
         return SpringUtil.getBean(ToolCallingManager.class);
+    }
+
+    private static FunctionCallbackResolver getFunctionCallbackResolver() {
+        return SpringUtil.getBean(FunctionCallbackResolver.class);
     }
 
 }

@@ -1,10 +1,11 @@
-package cn.iocoder.yudao.module.ai.service.tool;
+package cn.iocoder.yudao.module.ai.service.tool.function;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.annotation.JsonClassDescription;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,8 +13,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -23,21 +22,22 @@ import static cn.hutool.core.date.DatePattern.NORM_DATETIME_PATTERN;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 /**
- * 目录内容列表工具：列出指定目录的内容
+ * 工具：列出指定目录的文件列表
  *
  * @author 芋道源码
  */
-@Component("listDir")
-public class ListDirToolB implements Function<ListDirToolB.Request, ListDirToolB.Response> {
+@Component("directory_list")
+public class DirectoryListToolFunction implements Function<DirectoryListToolFunction.Request, DirectoryListToolFunction.Response> {
 
     @Data
-    @JsonClassDescription("列出指定目录的内容")
+    @JsonClassDescription("列出指定目录的文件列表")
     public static class Request {
 
         /**
-         * 要列出内容的目录路径
+         * 目录路径
          */
-        @JsonPropertyDescription("要列出内容的目录路径，例如说：/Users/yunai")
+        @JsonProperty(required = true, value = "path")
+        @JsonPropertyDescription("目录路径，例如说：/Users/yunai")
         private String path;
 
     }
@@ -48,7 +48,7 @@ public class ListDirToolB implements Function<ListDirToolB.Request, ListDirToolB
     public static class Response {
 
         /**
-         * 目录内容列表
+         * 文件列表
          */
         private List<File> files;
 
@@ -82,13 +82,12 @@ public class ListDirToolB implements Function<ListDirToolB.Request, ListDirToolB
     @Override
     public Response apply(Request request) {
         // 校验目录存在
-        String path = StrUtil.blankToDefault(request.getPath(), ".");
-        Path dirPath = Paths.get(path);
-        if (!FileUtil.exist(dirPath.toString()) || !FileUtil.isDirectory(dirPath.toString())) {
+        String path = StrUtil.blankToDefault(request.getPath(), "/");
+        if (!FileUtil.exist(path) || !FileUtil.isDirectory(path)) {
             return new Response(Collections.emptyList());
         }
-        // 列出目录内容
-        File[] files = dirPath.toFile().listFiles();
+        // 列出目录
+        File[] files = FileUtil.ls(path);
         if (ArrayUtil.isEmpty(files)) {
             return new Response(Collections.emptyList());
         }

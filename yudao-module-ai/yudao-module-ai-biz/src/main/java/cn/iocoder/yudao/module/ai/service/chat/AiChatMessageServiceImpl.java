@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.util.AiUtils;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessagePageReqVO;
@@ -238,7 +239,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         // 2. 构建 ChatOptions 对象
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
         ChatOptions chatOptions = AiUtils.buildChatOptions(platform, model.getModel(),
-                conversation.getTemperature(), conversation.getMaxTokens());
+                conversation.getTemperature(), conversation.getMaxTokens(),
+                SetUtils.asSet("directory_list", "weather_query"));
         return new Prompt(chatMessages, chatOptions);
     }
 
