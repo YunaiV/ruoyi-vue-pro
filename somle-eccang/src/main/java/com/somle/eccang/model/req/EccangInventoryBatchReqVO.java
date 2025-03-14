@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Data;
+import java.time.LocalDate;
 
-import java.util.Date;
 
 @Data
 @Builder
@@ -39,19 +39,19 @@ public class EccangInventoryBatchReqVO {
 
     // 上架时间-开始时间 (格式：YYYY-MM-DD)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date fifoTimeFrom;
+    private LocalDate fifoTimeFrom;
 
     // 上架时间-截止时间 (格式：YYYY-MM-DD)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date fifoTimeTo;
+    private LocalDate fifoTimeTo;
 
     // 更新时间-开始时间 (格式：YYYY-MM-DD)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date ibUpdateTimeFrom;
+    private LocalDate ibUpdateTimeFrom;
 
     // 更新时间-截止时间 (格式：YYYY-MM-DD)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date ibUpdateTimeTo;
+    private LocalDate ibUpdateTimeTo;
 
     // 当前页
     private Integer page = 1;
