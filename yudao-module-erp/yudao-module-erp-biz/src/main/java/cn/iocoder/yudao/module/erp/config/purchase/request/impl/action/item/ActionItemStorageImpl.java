@@ -47,8 +47,6 @@ public class ActionItemStorageImpl implements Action<ErpStorageStatus, ErpEventE
         ThrowUtil.ifSqlThrow(mapper.updateById(itemsDO), GlobalErrorCodeConstants.DB_BATCH_UPDATE_ERROR);
         //传递事件给主申请单
 
-
-        //日志记录状态变化 log.info
-        log.info("item入库状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), f.getDesc(), t.getDesc());
+        log.debug("item入库状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), f.getDesc(), t.getDesc());
     }
 }

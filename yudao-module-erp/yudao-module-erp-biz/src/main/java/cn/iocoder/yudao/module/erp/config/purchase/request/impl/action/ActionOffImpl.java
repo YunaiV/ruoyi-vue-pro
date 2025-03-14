@@ -56,6 +56,6 @@ public class ActionOffImpl implements Action<ErpOffStatus, ErpEventEnum, ErpPurc
             ThrowUtil.ifThrow(!itemsMapper.updateBatch(itemsDOS), GlobalErrorCodeConstants.DB_BATCH_UPDATE_ERROR);
         }
         //ErpPurchaseRequestDO主表关闭事件，则子表的状态都关闭
-        log.info("开关状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
+        log.debug("开关状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
     }
 }

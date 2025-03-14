@@ -23,6 +23,6 @@ public class ActionPaymentImpl implements Action<ErpPaymentStatus, ErpEventEnum,
 //        ErpPurchaseRequestDO aDo = mapper.selectById(context.getId());
 //        aDo.setOrderStatus(to.getCode());
 //        mapper.updateById(aDo);
-        log.info("付款状态机执行成功,订单：{}，事件：{}，from状态({})", JSONUtil.toJsonStr(context), event.getDesc(), from.getDesc());
+        log.debug("付款状态机执行成功,订单：{}，事件：{}，from状态({})", JSONUtil.toJsonStr(context), event.getDesc(), from.getDesc());
     }
 }

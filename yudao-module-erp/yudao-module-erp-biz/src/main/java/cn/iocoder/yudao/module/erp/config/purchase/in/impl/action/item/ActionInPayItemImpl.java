@@ -43,6 +43,6 @@ public class ActionInPayItemImpl implements Action<ErpPaymentStatus, ErpEventEnu
         // 更新数据库状态
         inItemDO.setPayStatus(to.getCode());
         mapper.updateById(inItemDO);
-        log.info("付款状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
+        log.debug("付款状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
     }
 }

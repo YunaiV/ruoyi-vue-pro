@@ -66,6 +66,6 @@ public class ActionStorageImpl implements Action<ErpStorageStatus, ErpEventEnum,
 
         requestDO.setInStatus(to.getCode());//设置状态
         requestMapper.updateById(requestDO);
-        log.info("入库状态机执行成功,订单：{}，事件：{}，from状态({})", JSONUtil.toJsonStr(context), event.getDesc(), from.getDesc());
+        log.debug("入库状态机执行成功,订单：{}，事件：{}，from状态({})", JSONUtil.toJsonStr(context), event.getDesc(), from.getDesc());
     }
 }

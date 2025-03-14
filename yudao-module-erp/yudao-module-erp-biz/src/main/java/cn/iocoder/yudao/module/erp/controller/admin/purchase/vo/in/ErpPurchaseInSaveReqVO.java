@@ -131,5 +131,10 @@ public class ErpPurchaseInSaveReqVO {
         @Schema(description = "币别id(财务管理-币别维护)")
         private Long currencyId;
 
+        @Schema(description = "申请人id", requiredMode = Schema.RequiredMode.REQUIRED)
+        private Long applicantId;
+
+        @Schema(description = "申请部门id", requiredMode = Schema.RequiredMode.REQUIRED)
+        private Long applicationDeptId;
     }
 }

@@ -24,6 +24,6 @@ public class ActionOrderExecuteImpl implements Action<ErpExecutionStatus, ErpEve
         orderDO.setExecuteStatus(to.getCode());
         mapper.updateById(orderDO);
         //log
-        log.info("执行状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
+        log.debug("执行状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
     }
 }

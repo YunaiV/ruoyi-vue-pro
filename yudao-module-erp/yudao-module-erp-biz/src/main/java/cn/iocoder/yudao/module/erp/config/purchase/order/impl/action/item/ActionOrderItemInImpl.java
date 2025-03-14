@@ -51,8 +51,6 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
         if (oldData == null) {
             return; // 防止空指针异常
         }
-
-
         // 根据事件类型更新入库状态
         if (event == null) {
             return; // 防止空指针异常
@@ -81,7 +79,6 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
             }
             //传递给采购申请项
         }
-
         // 更新数据库中的采购项状态
         itemMapper.updateById(oldData
             .setInStatus(to.getCode())//状态
@@ -112,7 +109,7 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
         );
 
         // 3. 记录日志
-        log.info("订单子项入库状态机触发({})事件：对象ID={}，状态 {} -> {}, 入库数量={}",
+        log.debug("订单子项入库状态机触发({})事件：对象ID={}，状态 {} -> {}, 入库数量={}",
             event.getDesc(),
             oldData.getId(),
             from.getDesc(),

@@ -73,7 +73,7 @@ public class ActionAuditImpl implements Action<ErpAuditStatus, ErpEventEnum, Erp
         data.setStatus(to.getCode());
         ThrowUtil.ifThrow(!itemsMapper.updateBatch(itemsDOS), DB_BATCH_UPDATE_ERROR);
         ThrowUtil.ifSqlThrow(mapper.updateById(data), DB_UPDATE_ERROR);
-        log.info("审核状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(data), from.getDesc(), to.getDesc());
+        log.debug("审核状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(data), from.getDesc(), to.getDesc());
     }
 
     //校验方法

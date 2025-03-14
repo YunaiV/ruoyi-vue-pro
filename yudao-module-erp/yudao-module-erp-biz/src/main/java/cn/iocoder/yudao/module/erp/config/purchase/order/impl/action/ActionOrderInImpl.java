@@ -71,6 +71,6 @@ public class ActionOrderInImpl implements Action<ErpStorageStatus, ErpEventEnum,
         orderDO.setInStatus(to.getCode());
         mapper.updateById(orderDO);
         //log
-        log.info("入库状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
+        log.debug("入库状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
     }
 }

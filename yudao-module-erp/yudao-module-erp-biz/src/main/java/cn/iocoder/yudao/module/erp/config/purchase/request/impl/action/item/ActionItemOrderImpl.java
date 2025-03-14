@@ -71,6 +71,6 @@ public class ActionItemOrderImpl implements Action<ErpOrderStatus, ErpEventEnum,
             requestStateMachine.fireEvent(ErpOrderStatus.fromCode(requestDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, requestDO);
         }
 
-        log.info("item订购状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), ErpOrderStatus.fromCode(itemsDO.getOrderStatus()).getDesc());
+        log.debug("item订购状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), ErpOrderStatus.fromCode(itemsDO.getOrderStatus()).getDesc());
     }
 }

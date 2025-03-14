@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.erp.config.purchase.order.impl.action.item;
 
 import cn.hutool.json.JSONUtil;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseOrderItemMapper;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
@@ -27,7 +26,7 @@ public class ActionOrderItemExecuteImpl implements Action<ErpExecutionStatus, Er
         aDo.setExecuteStatus(to.getCode());
         mapper.updateById(aDo);
         //log
-        log.info("执行状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
+        log.debug("执行状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
 
     }
 }

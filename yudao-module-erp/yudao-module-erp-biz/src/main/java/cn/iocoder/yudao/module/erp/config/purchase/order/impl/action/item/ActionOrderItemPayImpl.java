@@ -40,7 +40,7 @@ public class ActionOrderItemPayImpl implements Action<ErpPaymentStatus, ErpEvent
         context.setPayStatus(t.getCode());
         itemMapper.updateById(context);
         // 3. 记录日志
-        log.info("子项支付状态机触发({})事件：对象ID={}，状态 {} -> {}",
+        log.debug("子项支付状态机触发({})事件：对象ID={}，状态 {} -> {}",
             erpEventEnum.getDesc(),
             context.getId(),
             f.getDesc(),

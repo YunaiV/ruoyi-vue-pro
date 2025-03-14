@@ -16,37 +16,40 @@ import java.util.List;
 @Data
 @ExcelIgnoreUnannotated
 public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
-    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17386")
+    @Schema(description = "编号")
     private Long id;
 
-    @Schema(description = "入库单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "XS001")
+    @Schema(description = "入库单编号", example = "XS001")
     @ExcelProperty("入库单编号")
     private String no;
 
     @Schema(description = "单据日期", example = "2024-10-12")
     private LocalDateTime noTime;
 
-    @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "12")
+    @Schema(description = "供应商编号", example = "12")
     @NotNull(message = "供应商编号不能为空")
     private Long supplierId;
 
     @Schema(description = "币别ID,财务管理-币别维护")
     private Long currencyId;
 
-    @Schema(description = "入库状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @Schema(description = "付款状态")
+    private Integer payStatus;
+
+    @Schema(description = "入库状态", example = "2")
     @ExcelProperty("入库状态")
     private Integer status;
 
-    @Schema(description = "入库时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "入库时间")
     @ExcelProperty("入库时间")
     private LocalDateTime inTime;
 
-    @Schema(description = "采购订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17386")
+    @Schema(description = "采购订单编号")
     private Long orderId;
-    @Schema(description = "采购订单号", requiredMode = Schema.RequiredMode.REQUIRED, example = "XS001")
+    @Schema(description = "采购订单号")
     private String orderNo;
 
-    @Schema(description = "入库项列表", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "入库项列表")
     private List<Item> items;
 
     @Schema(description = "对账状态(false:未对账 ，true:已对账)", example = "false")
@@ -61,7 +64,7 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
     @Schema(description = "结算账户编号")
     private Long accountId;
 
-    @Schema(description = "优惠率，百分比", requiredMode = Schema.RequiredMode.REQUIRED, example = "99.88")
+    @Schema(description = "优惠率，百分比", example = "99.88")
     private BigDecimal discountPercent;
 
     @Schema(description = "其它金额，单位：元", example = "100")
@@ -76,16 +79,16 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
         @Schema(description = "入库项编号", example = "11756")
         private Long id;
 
-        @Schema(description = "采购订单项编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "11756")
+        @Schema(description = "采购订单项编号", example = "11756")
         private Long orderItemId;
 
-        @Schema(description = "仓库编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
+        @Schema(description = "仓库编号", example = "3113")
         private Long warehouseId;
 
         @Schema(description = "产品存放仓库名称")
         private String warehouseName;
 
-        @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
+        @Schema(description = "产品编号", example = "3113")
         private Long productId;
 
         @Schema(description = "型号规格(产品带出)")
@@ -94,13 +97,13 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
         @Schema(description = "产品信息")
         private ErpProductRespVO product;
 
-        @Schema(description = "产品单位", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+        @Schema(description = "产品单位", example = "1")
         private Long productUnitId;
 
         @Schema(description = "产品单价", example = "100.00")
         private BigDecimal productPrice;
 
-        @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
+        @Schema(description = "产品数量", example = "100.00")
         @NotNull(message = "产品数量不能为空")
         private BigDecimal count;
 
@@ -127,7 +130,7 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
 
         // ========== 关联字段 ==========
 
-        @Schema(description = "库存数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
+        @Schema(description = "库存数量", example = "100.00")
         private BigDecimal stockCount; // 该字段仅仅在“详情”和“编辑”时使用
 
         @Schema(description = "箱率")
@@ -163,5 +166,23 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
 
         @Schema(description = "付款状态")
         private Integer payStatus;
+
+        @Schema(description = "申请人id")
+        private Long applicantId;
+        //申请人名称
+        @Schema(description = "申请人名称")
+        private String applicantName;
+
+        @Schema(description = "申请部门id")
+        private Long applicationDeptId;
+        //申请部门名称
+        @Schema(description = "申请部门名称")
+        private String applicationDeptName;
+
+        @Schema(description = "来源单据类型")
+        private String source;
+
+        @Schema(description = "采购订单编号-展示用(源单单号,采购单)")
+        private String orderNo;
     }
 }

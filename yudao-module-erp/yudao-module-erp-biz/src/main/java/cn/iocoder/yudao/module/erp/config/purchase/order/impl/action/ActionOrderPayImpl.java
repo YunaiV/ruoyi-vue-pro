@@ -73,6 +73,6 @@ public class ActionOrderPayImpl implements Action<ErpPaymentStatus, ErpEventEnum
         orderDO.setPayStatus(to.getCode());
         mapper.updateById(orderDO);
         //log
-        log.info("支付状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
+        log.debug("支付状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
     }
 }

@@ -117,4 +117,14 @@ public class ErpPurchaseInItemDO extends BaseDO {
      * 单据来源
      */
     private String source;
+    /**
+     * 申请人id
+     */
+    private Long applicantId;
+    /**
+     * 申请部门id
+     * <p>
+     * 部门id
+     */
+    private Long applicationDeptId;
 }
