@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.service.tool.function;
+package cn.iocoder.yudao.module.ai.service.model.tool;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.io.FileUtil;
