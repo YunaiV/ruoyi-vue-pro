@@ -22,15 +22,16 @@ public interface ErpPurchaseInMapper extends BaseMapperX<ErpPurchaseInDO> {
 
     default PageResult<ErpPurchaseInDO> selectPage(ErpPurchaseInPageReqVO reqVO) {
         MPJLambdaWrapperX<ErpPurchaseInDO> query = new MPJLambdaWrapperX<ErpPurchaseInDO>()
-                .likeIfPresent(ErpPurchaseInDO::getNo, reqVO.getNo())
+            .likeIfPresent(ErpPurchaseInDO::getNo, reqVO.getNo())
 //                .eqIfPresent(ErpPurchaseInDO::getSupplierId, reqVO.getSupplierId())
-                .betweenIfPresent(ErpPurchaseInDO::getInTime, reqVO.getInTime())
+            .betweenIfPresent(ErpPurchaseInDO::getInTime, reqVO.getInTime())
             .eqIfPresent(ErpPurchaseInDO::getAuditStatus, reqVO.getStatus())
-                .likeIfPresent(ErpPurchaseInDO::getRemark, reqVO.getRemark())
-                .eqIfPresent(ErpPurchaseInDO::getCreator, reqVO.getCreator())
-                .eqIfPresent(ErpPurchaseInDO::getAccountId, reqVO.getAccountId())
-                .likeIfPresent(ErpPurchaseInDO::getOrderNo, reqVO.getOrderNo())
-                .orderByDesc(ErpPurchaseInDO::getId);
+            .eqIfPresent(ErpPurchaseInDO::getPayStatus, reqVO.getPayStatus())
+            .likeIfPresent(ErpPurchaseInDO::getRemark, reqVO.getRemark())
+            .eqIfPresent(ErpPurchaseInDO::getCreator, reqVO.getCreator())
+            .eqIfPresent(ErpPurchaseInDO::getAccountId, reqVO.getAccountId())
+            .likeIfPresent(ErpPurchaseInDO::getOrderNo, reqVO.getOrderNo())
+            .orderByDesc(ErpPurchaseInDO::getId);
         // 付款状态。为什么需要 t. 的原因，是因为联表查询时，需要指定表名，不然会报字段不存在的错误
 //        if (Objects.equals(reqVO.getPaymentStatus(), ErpPurchaseInPageReqVO.PAYMENT_STATUS_NONE)) {
 //            query.eq(ErpPurchaseInDO::getPaymentPrice, 0);
@@ -45,9 +46,9 @@ public interface ErpPurchaseInMapper extends BaseMapperX<ErpPurchaseInDO> {
 //        }
         if (reqVO.getWarehouseId() != null || reqVO.getProductId() != null) {
             query.leftJoin(ErpPurchaseInItemDO.class, ErpPurchaseInItemDO::getInId, ErpPurchaseInDO::getId)
-                    .eq(reqVO.getWarehouseId() != null, ErpPurchaseInItemDO::getWarehouseId, reqVO.getWarehouseId())
-                    .eq(reqVO.getProductId() != null, ErpPurchaseInItemDO::getProductId, reqVO.getProductId())
-                    .groupBy(ErpPurchaseInDO::getId); // 避免 1 对多查询，产生相同的 1
+                .eq(reqVO.getWarehouseId() != null, ErpPurchaseInItemDO::getWarehouseId, reqVO.getWarehouseId())
+                .eq(reqVO.getProductId() != null, ErpPurchaseInItemDO::getProductId, reqVO.getProductId())
+                .groupBy(ErpPurchaseInDO::getId); // 避免 1 对多查询，产生相同的 1
         }
         return selectJoinPage(reqVO, ErpPurchaseInDO.class, query);
     }

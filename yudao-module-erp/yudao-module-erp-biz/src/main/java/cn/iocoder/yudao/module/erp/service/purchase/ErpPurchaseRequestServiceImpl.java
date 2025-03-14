@@ -198,16 +198,15 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
             item.setApplicationDeptId(aDo.getApplicationDeptId());//申请部门
         });
 
-        // 构建并创建采购订单
+        //2.0 构造VO入参类
         ErpPurchaseOrderSaveReqVO saveReqVO = BeanUtils.toBean(reqVO, ErpPurchaseOrderSaveReqVO.class, vo -> {
             vo.setId(null);
             vo.setNoTime(LocalDateTime.now());
             vo.setItems(itemList);
             vo.setRemark("申请人期望采购日期:" + DateUtil.format(reqVO.getOrderTime(), DatePattern.CHINESE_DATE_TIME_PATTERN));
         });
-        //创建订单
+        //3.0 持久化
         Long orderId = erpPurchaseOrderService.createPurchaseOrder(saveReqVO);
-
         // 更新订单
         erpPurchaseOrderService.updatePurchaseOrder(saveReqVO);
         return orderId;

@@ -38,6 +38,7 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
     private ErpPurchaseOrderMapper mapper;
     @Resource(name = PURCHASE_ORDER_STORAGE_STATE_MACHINE_NAME)
     private StateMachine storageStateMachine;
+
     @Resource(name = PURCHASE_REQUEST_ITEM_STORAGE_STATE_MACHINE_NAME)
     private StateMachine purchaseRequestItemStateMachine;
 

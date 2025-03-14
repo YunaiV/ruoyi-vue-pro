@@ -519,4 +519,15 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
             }
         }
     }
+
+    @Override
+    public void merge(Collection<Long> itemIds) {
+        // TODO 合并入库
+        List<ErpPurchaseOrderItemDO> orderItemDOS = purchaseOrderItemMapper.selectBatchIds(itemIds);
+        //校验
+        //转换
+
+        //service持久化
+
+    }
 }

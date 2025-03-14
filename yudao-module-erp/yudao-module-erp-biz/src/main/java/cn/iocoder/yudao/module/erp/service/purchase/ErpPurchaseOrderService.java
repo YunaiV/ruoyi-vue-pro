@@ -130,4 +130,11 @@ public interface ErpPurchaseOrderService {
      * @param open    是否开启/关闭
      */
     void switchPurchaseOrderStatus(Collection<Long> itemIds, Boolean open);
+
+    /**
+     * 合并入库
+     *
+     * @param itemIds 采购订单项编号数组
+     */
+    void merge(Collection<Long> itemIds);
 }

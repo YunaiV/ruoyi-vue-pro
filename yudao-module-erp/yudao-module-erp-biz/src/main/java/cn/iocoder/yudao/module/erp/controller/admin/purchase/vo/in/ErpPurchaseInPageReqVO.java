@@ -69,7 +69,7 @@ public class ErpPurchaseInPageReqVO extends PageParam {
     private LocalDateTime settlementDate;
 
     @Schema(description = "付款状态", example = "1")
-    private Integer paymentStatus;
+    private Integer payStatus;
 
     @Schema(description = "是否可付款", example = "true")
     private Boolean paymentEnable; // 对应 paymentStatus = [0, 1]
