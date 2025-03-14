@@ -8,6 +8,9 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.api.OpenAiApi;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
@@ -20,7 +23,18 @@ import java.util.List;
  */
 public class DeepSeekChatModelTests {
 
-    private final DeepSeekChatModel chatModel = new DeepSeekChatModel("sk-e94db327cc7d457d99a8de8810fc6b12");
+    private final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
+            .openAiApi(OpenAiApi.builder()
+                    .baseUrl(DeepSeekChatModel.BASE_URL)
+                    .apiKey("sk-e52047409b144d97b791a6a46a2d") // apiKey
+                    .build())
+            .defaultOptions(OpenAiChatOptions.builder()
+                    .model("deepseek-chat") // 模型
+                    .temperature(0.7)
+                    .build())
+            .build();
+
+    private final DeepSeekChatModel chatModel = new DeepSeekChatModel(openAiChatModel);
 
     @Test
     @Disabled

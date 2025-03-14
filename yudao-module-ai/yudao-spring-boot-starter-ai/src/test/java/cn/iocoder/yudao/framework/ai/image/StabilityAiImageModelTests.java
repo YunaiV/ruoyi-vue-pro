@@ -22,9 +22,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class StabilityAiImageModelTests {
 
-    private final StabilityAiApi imageApi = new StabilityAiApi(
-            "sk-e53UqbboF8QJCscYvzJscJxJXoFcFg4iJjl1oqgE7baJETmx");
-    private final StabilityAiImageModel imageModel = new StabilityAiImageModel(imageApi);
+    private final StabilityAiImageModel imageModel = new StabilityAiImageModel(
+            new StabilityAiApi("sk-e53UqbboF8QJCscYvzJscJxJXoFcFg4iJjl1oqgE7baJETmx") // 密钥
+    );
 
     @Test
     @Disabled
@@ -32,7 +32,7 @@ public class StabilityAiImageModelTests {
         // 准备参数
         ImageOptions options = OpenAiImageOptions.builder()
                 .withModel("stable-diffusion-v1-6")
-                .withHeight(256).withWidth(256)
+                .withHeight(320).withWidth(320)
                 .build();
         ImagePrompt prompt = new ImagePrompt("great wall", options);
 

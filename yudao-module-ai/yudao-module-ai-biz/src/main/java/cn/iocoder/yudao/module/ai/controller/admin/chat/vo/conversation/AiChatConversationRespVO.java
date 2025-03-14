@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation;
 
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import com.fhs.core.trans.anno.Trans;
 import com.fhs.core.trans.constant.TransType;
@@ -31,7 +31,7 @@ public class AiChatConversationRespVO implements VO {
     private Long roleId;
 
     @Schema(description = "模型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @Trans(type = TransType.SIMPLE, target = AiChatModelDO.class, fields = "name", ref = "modelName")
+    @Trans(type = TransType.SIMPLE, target = AiModelDO.class, fields = "name", ref = "modelName")
     private Long modelId;
 
     @Schema(description = "模型标志", requiredMode = Schema.RequiredMode.REQUIRED, example = "ERNIE-Bot-turbo-0922")

@@ -8,9 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.openai.api.ApiUtils;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -50,7 +50,10 @@ public class MidjourneyApi {
     public MidjourneyApi(String baseUrl, String apiKey, String notifyUrl) {
         this.webClient = WebClient.builder()
                 .baseUrl(baseUrl)
-                .defaultHeaders(ApiUtils.getJsonContentHeaders(apiKey))
+                .defaultHeaders(httpHeaders -> {
+                    httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+                    httpHeaders.setBearerAuth(apiKey);
+                })
                 .build();
         this.notifyUrl = notifyUrl;
     }

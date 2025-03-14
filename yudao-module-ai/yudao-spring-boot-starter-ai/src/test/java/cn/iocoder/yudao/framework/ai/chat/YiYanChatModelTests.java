@@ -14,6 +14,7 @@ import reactor.core.publisher.Flux;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO @芋艿：百度千帆 API 提供了 V2 版本，目前 Spring AI 不兼容，可关键 <https://github.com/spring-projects/spring-ai/issues/2179> 进展
 /**
  * {@link QianFanChatModel} 的集成测试
  *
@@ -21,11 +22,11 @@ import java.util.List;
  */
 public class YiYanChatModelTests {
 
-    private final QianFanApi qianFanApi = new QianFanApi(
-            "qS8k8dYr2nXunagK4SSU8Xjj",
-            "pHGbx51ql2f0hOyabQvSZezahVC3hh3e");
-    private final QianFanChatModel chatModel = new QianFanChatModel(qianFanApi,
-            QianFanChatOptions.builder().withModel(QianFanApi.ChatModel.ERNIE_Tiny_8K.getValue()).build()
+    private final QianFanChatModel chatModel = new QianFanChatModel(
+            new QianFanApi("qS8k8dYr2nXunagK4SSU8Xjj", "pHGbx51ql2f0hOyabQvSZezahVC3hh3e"), // 密钥
+            QianFanChatOptions.builder()
+                    .model(QianFanApi.ChatModel.ERNIE_4_0_8K_Preview.getValue())
+                    .build()
     );
 
     @Test

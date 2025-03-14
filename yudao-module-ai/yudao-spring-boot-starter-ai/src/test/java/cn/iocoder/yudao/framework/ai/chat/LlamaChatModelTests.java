@@ -23,10 +23,12 @@ import java.util.List;
  */
 public class LlamaChatModelTests {
 
-    private final OllamaApi ollamaApi = new OllamaApi(
-            "http://127.0.0.1:11434");
-    private final OllamaChatModel chatModel = new OllamaChatModel(ollamaApi,
-            OllamaOptions.create().withModel(OllamaModel.LLAMA3.getModelName()));
+    private final OllamaChatModel chatModel = OllamaChatModel.builder()
+            .ollamaApi(new OllamaApi("http://127.0.0.1:11434")) // Ollama 服务地址
+            .defaultOptions(OllamaOptions.builder()
+                    .model(OllamaModel.LLAMA3.getName()) // 模型
+                    .build())
+            .build();
 
     @Test
     @Disabled

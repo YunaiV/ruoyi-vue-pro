@@ -4,17 +4,18 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.ai.core.enums.AiModelTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationCreateMyReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.conversation.AiChatConversationUpdateMyReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.chat.AiChatConversationMapper;
 import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeService;
-import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
+import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
     private AiChatConversationMapper chatConversationMapper;
 
     @Resource
-    private AiChatModelService chatModalService;
+    private AiModelService modalService;
     @Resource
     private AiChatRoleService chatRoleService;
     @Resource
@@ -54,9 +55,9 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
     public Long createChatConversationMy(AiChatConversationCreateMyReqVO createReqVO, Long userId) {
         // 1.1 获得 AiChatRoleDO 聊天角色
         AiChatRoleDO role = createReqVO.getRoleId() != null ? chatRoleService.validateChatRole(createReqVO.getRoleId()) : null;
-        // 1.2 获得 AiChatModelDO 聊天模型
-        AiChatModelDO model = role != null && role.getModelId() != null ? chatModalService.validateChatModel(role.getModelId())
-                : chatModalService.getRequiredDefaultChatModel();
+        // 1.2 获得 AiModelDO 聊天模型
+        AiModelDO model = role != null && role.getModelId() != null ? modalService.validateModel(role.getModelId())
+                : modalService.getRequiredDefaultModel(AiModelTypeEnum.CHAT.getType());
         Assert.notNull(model, "必须找到默认模型");
         validateChatModel(model);
 
@@ -67,7 +68,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
 
         // 2. 创建 AiChatConversationDO 聊天对话
         AiChatConversationDO conversation = new AiChatConversationDO().setUserId(userId).setPinned(false)
-                .setModelId(model.getId()).setModel(model.getModel()).setKnowledgeId(createReqVO.getKnowledgeId())
+                .setModelId(model.getId()).setModel(model.getModel())
                 .setTemperature(model.getTemperature()).setMaxTokens(model.getMaxTokens()).setMaxContexts(model.getMaxContexts());
         if (role != null) {
             conversation.setTitle(role.getName()).setRoleId(role.getId()).setSystemMessage(role.getSystemMessage());
@@ -86,9 +87,9 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
             throw exception(CHAT_CONVERSATION_NOT_EXISTS);
         }
         // 1.2 校验模型是否存在（修改模型的情况）
-        AiChatModelDO model = null;
+        AiModelDO model = null;
         if (updateReqVO.getModelId() != null) {
-            model = chatModalService.validateChatModel(updateReqVO.getModelId());
+            model = modalService.validateModel(updateReqVO.getModelId());
         }
 
         // 1.3 校验知识库是否存在
@@ -139,10 +140,11 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
         chatConversationMapper.deleteById(id);
     }
 
-    private void validateChatModel(AiChatModelDO model) {
+    private void validateChatModel(AiModelDO model) {
         if (ObjectUtil.isAllNotEmpty(model.getTemperature(), model.getMaxTokens(), model.getMaxContexts())) {
             return;
         }
+        Assert.equals(model.getType(), AiModelTypeEnum.CHAT.getType(), "模型类型不正确：" + model);
         throw exception(CHAT_CONVERSATION_MODEL_ERROR);
     }
 

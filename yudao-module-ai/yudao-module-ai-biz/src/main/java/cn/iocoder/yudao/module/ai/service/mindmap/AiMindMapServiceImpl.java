@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.ai.service.mindmap;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.ai.core.enums.AiModelTypeEnum;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.util.AiUtils;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -12,14 +13,13 @@ import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.mindmap.vo.AiMindMapGenerateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.mindmap.vo.AiMindMapPageReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.mindmap.AiMindMapDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.mindmap.AiMindMapMapper;
 import cn.iocoder.yudao.module.ai.enums.AiChatRoleEnum;
 import cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
-import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
+import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.Message;
@@ -38,7 +38,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.error;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.MIND_MAP_NOT_EXISTS;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
 
 /**
  * AI 思维导图 Service 实现类
@@ -50,9 +50,7 @@ import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.MIND_MAP_NOT_E
 public class AiMindMapServiceImpl implements AiMindMapService {
 
     @Resource
-    private AiApiKeyService apiKeyService;
-    @Resource
-    private AiChatModelService chatModalService;
+    private AiModelService modalService;
     @Resource
     private AiChatRoleService chatRoleService;
 
@@ -65,17 +63,17 @@ public class AiMindMapServiceImpl implements AiMindMapService {
         AiChatRoleDO role = CollUtil.getFirst(
                 chatRoleService.getChatRoleListByName(AiChatRoleEnum.AI_MIND_MAP_ROLE.getName()));
         // 1.1 获取导图执行模型
-        AiChatModelDO model = getModel(role);
+        AiModelDO model = getModel(role);
         // 1.2 获取角色设定消息
         String systemMessage = role != null && StrUtil.isNotBlank(role.getSystemMessage())
                 ? role.getSystemMessage() : AiChatRoleEnum.AI_MIND_MAP_ROLE.getSystemMessage();
         // 1.3 校验平台
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
-        ChatModel chatModel = apiKeyService.getChatModel(model.getKeyId());
+        ChatModel chatModel = modalService.getChatModel(model.getId());
 
         // 2. 插入思维导图信息
-        AiMindMapDO mindMapDO = BeanUtils.toBean(generateReqVO, AiMindMapDO.class,
-                mindMap -> mindMap.setUserId(userId).setModel(model.getModel()).setPlatform(platform.getPlatform()));
+        AiMindMapDO mindMapDO = BeanUtils.toBean(generateReqVO, AiMindMapDO.class, mindMap -> mindMap.setUserId(userId)
+                .setPlatform(platform.getPlatform()).setModelId(model.getId()).setModel(model.getModel()));
         mindMapMapper.insert(mindMapDO);
 
         // 3.1 构建 Prompt，并进行调用
@@ -85,7 +83,7 @@ public class AiMindMapServiceImpl implements AiMindMapService {
         // 3.2 流式返回
         StringBuffer contentBuffer = new StringBuffer();
         return streamResponse.map(chunk -> {
-            String newContent = chunk.getResult() != null ? chunk.getResult().getOutput().getContent() : null;
+            String newContent = chunk.getResult() != null ? chunk.getResult().getOutput().getText() : null;
             newContent = StrUtil.nullToDefault(newContent, ""); // 避免 null 的 情况
             contentBuffer.append(newContent);
             // 响应结果
@@ -103,7 +101,7 @@ public class AiMindMapServiceImpl implements AiMindMapService {
 
     }
 
-    private Prompt buildPrompt(AiMindMapGenerateReqVO generateReqVO, AiChatModelDO model, String systemMessage) {
+    private Prompt buildPrompt(AiMindMapGenerateReqVO generateReqVO, AiModelDO model, String systemMessage) {
         // 1. 构建 message 列表
         List<Message> chatMessages = buildMessages(generateReqVO, systemMessage);
         // 2. 构建 options 对象
@@ -123,15 +121,21 @@ public class AiMindMapServiceImpl implements AiMindMapService {
         return chatMessages;
     }
 
-    private AiChatModelDO getModel(AiChatRoleDO role) {
-        AiChatModelDO model = null;
+    private AiModelDO getModel(AiChatRoleDO role) {
+        AiModelDO model = null;
         if (role != null && role.getModelId() != null) {
-            model = chatModalService.getChatModel(role.getModelId());
+            model = modalService.getModel(role.getModelId());
         }
         if (model == null) {
-            model = chatModalService.getRequiredDefaultChatModel();
+            model = modalService.getRequiredDefaultModel(AiModelTypeEnum.CHAT.getType());
         }
-        Assert.notNull(model, "[AI] 获取不到模型");
+        // 校验模型存在、且合法
+        if (model == null) {
+            throw exception(MODEL_NOT_EXISTS);
+        }
+        if (ObjUtil.notEqual(model.getType(), AiModelTypeEnum.CHAT.getType())) {
+            throw exception(MODEL_USE_TYPE_ERROR);
+        }
         return model;
     }
 

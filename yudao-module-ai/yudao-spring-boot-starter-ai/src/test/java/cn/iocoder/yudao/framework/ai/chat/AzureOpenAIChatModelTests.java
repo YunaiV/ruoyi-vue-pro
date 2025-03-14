@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
-import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.AzureKeyCredential;
 import com.azure.core.util.ClientOptions;
@@ -27,13 +26,13 @@ import static org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiChatP
  */
 public class AzureOpenAIChatModelTests {
 
-    private final OpenAIClient openAiApi = (new OpenAIClientBuilder())
+    // TODO @芋艿：晚点在调整
+    private final OpenAIClientBuilder openAiApi = new OpenAIClientBuilder()
             .endpoint("https://eastusprejade.openai.azure.com")
             .credential(new AzureKeyCredential("xxx"))
-            .clientOptions((new ClientOptions()).setApplicationId("spring-ai"))
-            .buildClient();
+            .clientOptions((new ClientOptions()).setApplicationId("spring-ai"));
     private final AzureOpenAiChatModel chatModel = new AzureOpenAiChatModel(openAiApi,
-            AzureOpenAiChatOptions.builder().withDeploymentName(DEFAULT_DEPLOYMENT_NAME).build());
+            AzureOpenAiChatOptions.builder().deploymentName(DEFAULT_DEPLOYMENT_NAME).build());
 
     @Test
     @Disabled

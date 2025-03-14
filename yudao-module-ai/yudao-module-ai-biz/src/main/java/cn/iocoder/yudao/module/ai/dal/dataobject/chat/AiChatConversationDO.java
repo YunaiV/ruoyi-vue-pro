@@ -1,9 +1,8 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.chat;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -22,7 +21,6 @@ import java.time.LocalDateTime;
 @TableName("ai_chat_conversation")
 @KeySequence("ai_chat_conversation_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
-@EqualsAndHashCode(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -66,20 +64,15 @@ public class AiChatConversationDO extends BaseDO {
     private Long roleId;
 
     /**
-     * 知识库编号
-     * <p>
-     * 关联 {@link AiKnowledgeDO#getId()}
-     */
-    private Long knowledgeId;
-
-    /**
      * 模型编号
      *
-     * 关联 {@link AiChatModelDO#getId()} 字段
+     * 关联 {@link AiModelDO#getId()} 字段
      */
     private Long modelId;
     /**
      * 模型标志
+     *
+     * 冗余 {@link AiModelDO#getModel()} 字段
      */
     private String model;
 

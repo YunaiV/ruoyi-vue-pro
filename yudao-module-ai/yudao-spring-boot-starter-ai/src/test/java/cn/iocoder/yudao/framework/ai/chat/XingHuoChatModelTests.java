@@ -8,6 +8,9 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.api.OpenAiApi;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
@@ -20,9 +23,18 @@ import java.util.List;
  */
 public class XingHuoChatModelTests {
 
-    private final XingHuoChatModel chatModel = new XingHuoChatModel(
-            "cb6415c19d6162cda07b47316fcb0416",
-            "Y2JiYTIxZjA3MDMxMjNjZjQzYzVmNzdh");
+    private final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
+        .openAiApi(OpenAiApi.builder()
+                .baseUrl(XingHuoChatModel.BASE_URL)
+                .apiKey("75b161ed2aef4719b275d6e7f2a4d4cd:YWYxYWI2MTA4ODI2NGZlYTQyNjAzZTcz") // appKey:secretKey
+                .build())
+        .defaultOptions(OpenAiChatOptions.builder()
+                .model("generalv3.5") // 模型
+                .temperature(0.7)
+                .build())
+        .build();
+
+    private final XingHuoChatModel chatModel = new XingHuoChatModel(openAiChatModel);
 
     @Test
     @Disabled

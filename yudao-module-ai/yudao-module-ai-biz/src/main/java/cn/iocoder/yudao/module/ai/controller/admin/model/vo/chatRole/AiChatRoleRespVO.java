@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole;
 
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import com.fhs.core.trans.anno.Trans;
 import com.fhs.core.trans.constant.TransType;
 import com.fhs.core.trans.vo.VO;
@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "管理后台 - AI 聊天角色 Response VO")
 @Data
@@ -20,7 +21,7 @@ public class AiChatRoleRespVO implements VO {
     private Long userId;
 
     @Schema(description = "模型编号", example = "17640")
-    @Trans(type = TransType.SIMPLE, target = AiChatModelDO.class, fields = {"name", "model"}, refs = {"modelName", "model"})
+    @Trans(type = TransType.SIMPLE, target = AiModelDO.class, fields = { "name", "model" }, refs = { "modelName", "model" })
     private Long modelId;
     @Schema(description = "模型名字", example = "张三")
     private String modelName;
@@ -44,6 +45,12 @@ public class AiChatRoleRespVO implements VO {
 
     @Schema(description = "角色设定", requiredMode = Schema.RequiredMode.REQUIRED)
     private String systemMessage;
+
+    @Schema(description = "引用的知识库编号列表", example = "1,2,3")
+    private List<Long> knowledgeIds;
+
+    @Schema(description = "引用的工具编号列表", example = "1,2,3")
+    private List<Long> toolIds;
 
     @Schema(description = "是否公开", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Boolean publicStatus;

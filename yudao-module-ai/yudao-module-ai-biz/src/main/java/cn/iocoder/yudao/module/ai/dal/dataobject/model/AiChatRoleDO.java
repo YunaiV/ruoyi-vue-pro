@@ -2,10 +2,15 @@ package cn.iocoder.yudao.module.ai.dal.dataobject.model;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
+import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+
+import java.util.List;
 
 /**
  * AI 聊天角色 DO
@@ -16,7 +21,6 @@ import lombok.*;
 @TableName(value = "ai_chat_role", autoResultMap = true)
 @KeySequence("ai_chat_role_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
-@EqualsAndHashCode(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -58,9 +62,24 @@ public class AiChatRoleDO extends BaseDO {
     /**
      * 模型编号
      *
-     * 关联 {@link AiChatModelDO#getId()} 字段
+     * 关联 {@link AiModelDO#getId()} 字段
      */
     private Long modelId;
+
+    /**
+     * 引用的知识库编号列表
+     *
+     * 关联 {@link AiKnowledgeDO#getId()} 字段
+     */
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> knowledgeIds;
+    /**
+     * 引用的工具编号列表
+     *
+     * 关联 {@link AiToolDO#getId()} 字段
+     */
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> toolIds;
 
     /**
      * 是否公开

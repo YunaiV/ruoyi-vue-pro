@@ -149,21 +149,28 @@ spring:
   ai:
     vectorstore: # 向量存储
       redis:
-        index: default-index
-        prefix: "default:"
-    embedding:
-      transformer:
-        onnx:
-          model-uri: https://raw.gitcode.com/yudaocode/yudao-demo/raw/master/yudao-static/ai/model.onnx
-        tokenizer:
-          uri: https://raw.gitcode.com/yudaocode/yudao-demo/raw/master/yudao-static/ai/tokenizer.json
+        initialize-schema: true
+        index: knowledge_index # Redis 中向量索引的名称：用于存储和检索向量数据的索引标识符，所有相关的向量搜索操作都会基于这个索引进行
+        prefix: "knowledge_segment:" # Redis 中存储向量数据的键名前缀：这个前缀会添加到每个存储在 Redis 中的向量数据键名前，每个 document 都是一个 hash 结构
+      qdrant:
+        initialize-schema: true
+        collection-name: knowledge_segment # Qdrant 中向量集合的名称：用于存储向量数据的集合标识符，所有相关的向量操作都会在这个集合中进行
+        host: 127.0.0.1
+        port: 6334
+      milvus:
+        initialize-schema: true
+        database-name: default # Milvus 中数据库的名称
+        collection-name: knowledge_segment # Milvus 中集合的名称：用于存储向量数据的集合标识符，所有相关的向量操作都会在这个集合中进行
+        client:
+          host: 127.0.0.1
+          port: 19530
     qianfan: # 文心一言
       api-key: x0cuLZ7XsaTCU08vuJWO87Lg
       secret-key: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
     zhipuai: # 智谱 AI
       api-key: 32f84543e54eee31f8d56b2bd6020573.3vh9idLJZ2ZhxDEs
     openai: # OpenAI 官方
-      api-key: sk-yzKea6d8e8212c3bdd99f9f44ced1cae37c097e5aa3BTS7z
+      api-key: sk-aN6nWn3fILjrgLFT0fC4Aa60B72e4253826c77B29dC94f17
       base-url: https://api.gptsapi.net
     azure: # OpenAI 微软
       openai:
@@ -175,11 +182,12 @@ spring:
         model: llama3
     stabilityai:
       api-key: sk-e53UqbboF8QJCscYvzJscJxJXoFcFg4iJjl1oqgE7baJETmx
-  cloud:
-    ai:
-      tongyi: # 通义千问
-        tongyi:
-          api-key: sk-Zsd81gZYg7
+    dashscope: # 通义千问
+      api-key: sk-71800982914041848008480000000000
+    minimax: # Minimax：https://www.minimaxi.com/
+      api-key: xxxx
+    moonshot: # 月之暗灭（KIMI）
+      api-key: sk-abc
 
 yudao:
   ai:
@@ -187,11 +195,22 @@ yudao:
       enable: true
       api-key: sk-e94db327cc7d457d99a8de8810fc6b12
       model: deepseek-chat
+    doubao: # 字节豆包
+      enable: true
+      api-key: 5c1b5747-26d2-4ebd-a4e0-dd0e8d8b4272
+      model: doubao-1-5-lite-32k-250115
+    hunyuan: # 腾讯混元
+      enable: true
+      api-key: sk-abc
+      model: hunyuan-turbo
+    siliconflow: # 硅基流动
+      enable: true
+      api-key: sk-epsakfenqnyzoxhmbucsxlhkdqlcbnimslqoivkshalvdozz
+      model: deepseek-ai/DeepSeek-R1-Distill-Qwen-7B
     xinghuo: # 讯飞星火
       enable: true
-      appId: 13c8cca6
-      appKey: cb6415c19d6162cda07b47316fcb0416
-      secretKey: Y2JiYTIxZjA3MDMxMjNjZjQzYzVmNzdh
+      appKey: 75b161ed2aef4719b275d6e7f2a4d4cd
+      secretKey: YWYxYWI2MTA4ODI2NGZlYTQyNjAzZTcz
       model: generalv3.5
     midjourney:
       enable: true

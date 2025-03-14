@@ -12,15 +12,18 @@ import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessage
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendRespVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatConversationDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.service.chat.AiChatConversationService;
 import cn.iocoder.yudao.module.ai.service.chat.AiChatMessageService;
+import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeDocumentService;
+import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeSegmentService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -33,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 聊天消息")
@@ -48,6 +51,10 @@ public class AiChatMessageController {
     private AiChatConversationService chatConversationService;
     @Resource
     private AiChatRoleService chatRoleService;
+    @Resource
+    private AiKnowledgeSegmentService knowledgeSegmentService;
+    @Resource
+    private AiKnowledgeDocumentService knowledgeDocumentService;
 
     @Operation(summary = "发送消息（段式）", description = "一次性返回，响应较慢")
     @PostMapping("/send")
@@ -57,7 +64,6 @@ public class AiChatMessageController {
 
     @Operation(summary = "发送消息（流式）", description = "流式返回，响应较快")
     @PostMapping(value = "/send-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    @PermitAll // 解决 SSE 最终响应的时候，会被 Access Denied 拦截的问题
     public Flux<CommonResult<AiChatMessageSendRespVO>> sendChatMessageStream(@Valid @RequestBody AiChatMessageSendReqVO sendReqVO) {
         return chatMessageService.sendChatMessageStream(sendReqVO, getLoginUserId());
     }
@@ -71,8 +77,38 @@ public class AiChatMessageController {
         if (conversation == null || ObjUtil.notEqual(conversation.getUserId(), getLoginUserId())) {
             return success(Collections.emptyList());
         }
+        // 1. 获取消息列表
         List<AiChatMessageDO> messageList = chatMessageService.getChatMessageListByConversationId(conversationId);
-        return success(BeanUtils.toBean(messageList, AiChatMessageRespVO.class));
+        if (CollUtil.isEmpty(messageList)) {
+            return success(Collections.emptyList());
+        }
+
+        // 2. 拼接数据，主要是知识库段落信息
+        Map<Long, AiKnowledgeSegmentDO> segmentMap = knowledgeSegmentService.getKnowledgeSegmentMap(convertListByFlatMap(messageList,
+                message -> CollUtil.isEmpty(message.getSegmentIds()) ? null : message.getSegmentIds().stream()));
+        Map<Long, AiKnowledgeDocumentDO> documentMap = knowledgeDocumentService.getKnowledgeDocumentMap(
+                convertList(segmentMap.values(), AiKnowledgeSegmentDO::getDocumentId));
+        List<AiChatMessageRespVO> messageVOList = BeanUtils.toBean(messageList, AiChatMessageRespVO.class);
+        for (int i = 0; i < messageList.size(); i++) {
+            AiChatMessageDO message = messageList.get(i);
+            if (CollUtil.isEmpty(message.getSegmentIds())) {
+                continue;
+            }
+            // 设置知识库段落信息
+            messageVOList.get(i).setSegments(convertList(message.getSegmentIds(), segmentId -> {
+                AiKnowledgeSegmentDO segment = segmentMap.get(segmentId);
+                if (segment == null) {
+                    return null;
+                }
+                AiKnowledgeDocumentDO document = documentMap.get(segment.getDocumentId());
+                if (document == null) {
+                    return null;
+                }
+                return new AiChatMessageRespVO.KnowledgeSegment().setId(segment.getId()).setContent(segment.getContent())
+                        .setDocumentId(segment.getDocumentId()).setDocumentName(document.getName());
+            }));
+        }
+        return success(messageVOList);
     }
 
     @Operation(summary = "删除消息")
@@ -105,7 +141,8 @@ public class AiChatMessageController {
         Map<Long, AiChatRoleDO> roleMap = chatRoleService.getChatRoleMap(
                 convertSet(pageResult.getList(), AiChatMessageDO::getRoleId));
         return success(BeanUtils.toBean(pageResult, AiChatMessageRespVO.class,
-                respVO -> MapUtils.findAndThen(roleMap, respVO.getRoleId(), role -> respVO.setRoleName(role.getName()))));
+                respVO -> MapUtils.findAndThen(roleMap, respVO.getRoleId(),
+                        role -> respVO.setRoleName(role.getName()))));
     }
 
     @Operation(summary = "管理员删除消息")

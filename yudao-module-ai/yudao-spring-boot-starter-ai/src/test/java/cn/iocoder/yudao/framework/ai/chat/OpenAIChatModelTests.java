@@ -22,11 +22,16 @@ import java.util.List;
  */
 public class OpenAIChatModelTests {
 
-    private final OpenAiApi openAiApi = new OpenAiApi(
-            "https://api.holdai.top",
-            "sk-dZEPiVaNcT3FHhef51996bAa0bC74806BeAb620dA5Da10Bf");
-    private final OpenAiChatModel chatModel = new OpenAiChatModel(openAiApi,
-            OpenAiChatOptions.builder().withModel(OpenAiApi.ChatModel.GPT_4_O).build());
+    private final OpenAiChatModel chatModel = OpenAiChatModel.builder()
+            .openAiApi(OpenAiApi.builder()
+                    .baseUrl("https://api.holdai.top")
+                    .apiKey("sk-aN6nWn3fILjrgLFT0fC4Aa60B72e4253826c77B29dC94f17") // apiKey
+                    .build())
+            .defaultOptions(OpenAiChatOptions.builder()
+                    .model(OpenAiApi.ChatModel.GPT_4_O) // 模型
+                    .temperature(0.7)
+                    .build())
+            .build();
 
     @Test
     @Disabled
