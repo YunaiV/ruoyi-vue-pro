@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.erp.api.purchase.ErpInCountDTO;
 import cn.iocoder.yudao.module.erp.api.purchase.ErpOrderCountDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderAuditReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderPageReqVO;
@@ -63,7 +64,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     @Resource(name = PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME)
     StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseOrderItemDO> orderItemOffMachine;
     @Resource(name = PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME)
-    StateMachine<ErpStorageStatus, ErpEventEnum, ErpPurchaseOrderItemDO> requestItemStorageMachine;
+    StateMachine<ErpStorageStatus, ErpEventEnum, ErpInCountDTO> requestItemStorageMachine;
     @Resource(name = PURCHASE_ORDER_STORAGE_STATE_MACHINE_NAME)
     StateMachine<ErpStorageStatus, ErpEventEnum, ErpPurchaseOrderDO> purchaseOrderStorageMachine;
     //    @Resource(name = PURCHASE_ORDER_ITEM_PURCHASE_STATE_MACHINE_NAME)
@@ -141,7 +142,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
             //付款
             requestItemPaymentMachine.fireEvent(ErpPaymentStatus.NONE_PAYMENT, ErpEventEnum.PAYMENT_INIT, orderItemDO);
             //入库
-            requestItemStorageMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, ErpEventEnum.STORAGE_INIT, orderItemDO);
+            requestItemStorageMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, ErpEventEnum.STORAGE_INIT, ErpInCountDTO.builder().orderItemId(orderItemDO.getId()).count(orderItemDO.getCount()).build());
             //执行
             requestItemExecutionMachine.fireEvent(ErpExecutionStatus.PENDING, ErpEventEnum.EXECUTION_INIT, orderItemDO);
         }

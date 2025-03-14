@@ -132,6 +132,6 @@ public class ErpPurchaseRequestItemStatusMachine {
             .perform(actionItemStorageImpl);
         // 设置错误回调
         builder.setFailCallback(baseFailCallbackImpl);
-        return builder.build(ErpStateMachines.PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME);
+        return builder.build(ErpStateMachines.PURCHASE_REQUEST_ITEM_STORAGE_STATE_MACHINE_NAME);
     }
 }

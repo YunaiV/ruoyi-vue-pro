@@ -115,6 +115,6 @@ public class ErpPurchaseInStatusMachine {
 
 
         builder.setFailCallback(baseFailCallbackImpl);
-        return builder.build(ErpStateMachines.PURCHASE_IN_AUDIT_STATE_MACHINE);
+        return builder.build(ErpStateMachines.PURCHASE_IN_PAYMENT_STATE_MACHINE);
     }
 }

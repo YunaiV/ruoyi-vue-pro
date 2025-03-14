@@ -66,6 +66,6 @@ public class ErpPurchaseInItemStatusMachine {
             .on(ErpEventEnum.CANCEL_PAYMENT)
             .perform(actionInPayItemImpl);
         builder.setFailCallback(baseFailCallbackImpl);
-        return builder.build(ErpStateMachines.PURCHASE_IN_AUDIT_STATE_MACHINE);
+        return builder.build(ErpStateMachines.PURCHASE_IN_ITEM_PAYMENT_STATE_MACHINE);
     }
 }

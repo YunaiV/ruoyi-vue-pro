@@ -241,12 +241,12 @@ public class ErpPurchaseOrderStatusMachine {
             .on(ErpEventEnum.PAYMENT_ADJUSTMENT)
             .perform(actionOrderPaymentImpl);
 
-        // 取消付款
-        builder.externalTransitions()
-            .fromAmong(ErpPaymentStatus.ALL_PAYMENT, ErpPaymentStatus.ALL_PAYMENT)
-            .to(ErpPaymentStatus.NONE_PAYMENT)
-            .on(ErpEventEnum.CANCEL_PAYMENT)
-            .perform(actionOrderPaymentImpl);
+//        // 取消付款
+//        builder.externalTransitions()
+//            .fromAmong(ErpPaymentStatus.ALL_PAYMENT, ErpPaymentStatus.ALL_PAYMENT)
+//            .to(ErpPaymentStatus.NONE_PAYMENT)
+//            .on(ErpEventEnum.CANCEL_PAYMENT)
+//            .perform(actionOrderPaymentImpl);
 
         // 设置错误回调
         builder.setFailCallback(baseFailCallbackImpl);
