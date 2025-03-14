@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 
 /**
- * 外部仓类型
+ * 状态，WMS通用的对象有效状态
  **/
 @RequiredArgsConstructor
 @Getter

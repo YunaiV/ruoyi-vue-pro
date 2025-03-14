@@ -50,4 +50,9 @@ public class WmsExternalStorageDO extends BaseDO {
     private String apiParameters;
 
     private Boolean deleted;
+
+    /**
+     * 状态：0-不可用；1-可用
+     */
+    private Integer status;
 }

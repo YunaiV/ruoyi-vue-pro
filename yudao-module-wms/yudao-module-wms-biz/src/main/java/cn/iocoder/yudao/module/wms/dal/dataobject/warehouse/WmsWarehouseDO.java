@@ -108,4 +108,9 @@ public class WmsWarehouseDO extends BaseDO {
      * 是否删除
      */
     private Boolean deleted;
+
+    /**
+     * 状态：0-不可用；1-可用
+     */
+    private Integer status;
 }

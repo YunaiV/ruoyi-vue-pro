@@ -105,4 +105,8 @@ public class WmsWarehouseRespVO {
     @Schema(description = "租户编号", example = "")
     @ExcelProperty("租户编号")
     private Long tenantId;
+
+    @Schema(description = "状态，WMS通用的对象有效状态 ; ValidStatus : 0-不可用 , 1-可用", example = "")
+    @ExcelProperty("状态")
+    private Integer status;
 }

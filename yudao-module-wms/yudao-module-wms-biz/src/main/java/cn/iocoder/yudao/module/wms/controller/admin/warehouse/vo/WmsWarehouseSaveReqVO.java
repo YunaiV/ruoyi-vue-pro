@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.wms.enums.ValidStatus;
 import cn.iocoder.yudao.module.wms.enums.WarehouseMode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -62,4 +63,8 @@ public class WmsWarehouseSaveReqVO {
 
     @Schema(description = "库存同步：0-关闭；1-开启；")
     private Integer isSync;
+
+    @Schema(description = "状态，WMS通用的对象有效状态 ; ValidStatus : 0-不可用 , 1-可用", example = "")
+    @InEnum(ValidStatus.class)
+    private Integer status;
 }

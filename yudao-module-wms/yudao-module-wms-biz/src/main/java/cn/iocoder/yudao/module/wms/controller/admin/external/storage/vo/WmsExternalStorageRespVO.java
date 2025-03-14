@@ -61,4 +61,8 @@ public class WmsExternalStorageRespVO {
     @Schema(description = "更新人姓名", example = "李四")
     @ExcelProperty("更新人姓名")
     private String updaterName;
+
+    @Schema(description = "状态，WMS通用的对象有效状态 ; ValidStatus : 0-不可用 , 1-可用", example = "")
+    @ExcelProperty("状态")
+    private Integer status;
 }
