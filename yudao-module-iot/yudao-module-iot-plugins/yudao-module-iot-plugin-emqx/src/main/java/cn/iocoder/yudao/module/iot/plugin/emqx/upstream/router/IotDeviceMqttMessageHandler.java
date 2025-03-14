@@ -2,9 +2,11 @@ package cn.iocoder.yudao.module.iot.plugin.emqx.upstream.router;
 
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceEventReportReqDTO;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDevicePropertyReportReqDTO;
+import cn.iocoder.yudao.module.iot.plugin.common.pojo.IotStandardResponse;
 import cn.iocoder.yudao.module.iot.plugin.common.util.IotPluginCommonUtils;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import io.vertx.core.buffer.Buffer;
@@ -14,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * IoT 设备 MQTT 消息处理器
@@ -32,16 +36,16 @@ public class IotDeviceMqttMessageHandler {
     // 响应 Topic：/sys/${productKey}/${deviceName}/thing/event/property/post_reply
 
     // 设备上报事件 标准 JSON
-    // 请求 Topic：/sys/${productKey}/${deviceName}/thing/event/${tsl.event.identifier}/post
-    // 响应 Topic：/sys/${productKey}/${deviceName}/thing/event/${tsl.event.identifier}/post_reply
+    // 请求
+    // Topic：/sys/${productKey}/${deviceName}/thing/event/${tsl.event.identifier}/post
+    // 响应
+    // Topic：/sys/${productKey}/${deviceName}/thing/event/${tsl.event.identifier}/post_reply
 
     private static final String SYS_TOPIC_PREFIX = "/sys/";
     private static final String PROPERTY_POST_TOPIC = "/thing/event/property/post";
     private static final String EVENT_POST_TOPIC_PREFIX = "/thing/event/";
     private static final String EVENT_POST_TOPIC_SUFFIX = "/post";
     private static final String REPLY_SUFFIX = "_reply";
-    private static final int SUCCESS_CODE = 200;
-    private static final String SUCCESS_MESSAGE = "success";
     private static final String PROPERTY_METHOD = "thing.event.property.post";
     private static final String EVENT_METHOD_PREFIX = "thing.event.";
     private static final String EVENT_METHOD_SUFFIX = ".post";
@@ -211,27 +215,25 @@ public class IotDeviceMqttMessageHandler {
      * @param method     响应方法
      * @param customData 自定义数据，可为null
      */
-    private void sendResponse(String topic, JSONObject jsonObject, String method, JSONObject customData) {
+    private void sendResponse(String topic, JSONObject jsonObject, String method, Object customData) {
         String replyTopic = topic + REPLY_SUFFIX;
-        JSONObject data = customData != null ? customData : new JSONObject();
 
-        JSONObject response = new JSONObject()
-                .set("id", jsonObject.getStr("id"))
-                .set("code", SUCCESS_CODE)
-                .set("data", data)
-                .set("message", SUCCESS_MESSAGE)
-                .set("method", method);
+        // 使用IotStandardResponse实体类构建响应
+        IotStandardResponse response = IotStandardResponse.success(
+                jsonObject.getStr("id"),
+                method,
+                customData);
 
         try {
             mqttClient.publish(replyTopic,
-                    Buffer.buffer(response.toString()),
+                    Buffer.buffer(JsonUtils.toJsonString(response)),
                     MqttQoS.AT_LEAST_ONCE,
                     false,
                     false);
             log.info("[sendResponse][发送响应消息成功][topic: {}]", replyTopic);
         } catch (Exception e) {
             log.error("[sendResponse][发送响应消息失败][topic: {}][response: {}]",
-                    replyTopic, response.toString(), e);
+                    replyTopic, response, e);
         }
     }
 
@@ -249,7 +251,29 @@ public class IotDeviceMqttMessageHandler {
         reportReqDTO.setReportTime(LocalDateTime.now());
         reportReqDTO.setProductKey(topicParts[2]);
         reportReqDTO.setDeviceName(topicParts[3]);
-        reportReqDTO.setProperties(jsonObject.getJSONObject("params"));
+
+        // 只使用标准JSON格式处理属性数据
+        JSONObject params = jsonObject.getJSONObject("params");
+        if (params == null) {
+            log.warn("[buildPropertyReportDTO][消息格式不正确，缺少params字段][jsonObject: {}]", jsonObject);
+            params = new JSONObject();
+        }
+
+        // 将标准格式的params转换为平台需要的properties格式
+        Map<String, Object> properties = new HashMap<>();
+        for (Map.Entry<String, Object> entry : params.entrySet()) {
+            String key = entry.getKey();
+            Object valueObj = entry.getValue();
+
+            // 如果是复杂结构（包含value和time）
+            if (valueObj instanceof JSONObject valueJson) {
+                properties.put(key, valueJson.getOrDefault("value", valueObj));
+            } else {
+                properties.put(key, valueObj);
+            }
+        }
+        reportReqDTO.setProperties(properties);
+
         return reportReqDTO;
     }
 
@@ -268,7 +292,15 @@ public class IotDeviceMqttMessageHandler {
         reportReqDTO.setProductKey(topicParts[2]);
         reportReqDTO.setDeviceName(topicParts[3]);
         reportReqDTO.setIdentifier(topicParts[6]);
-        reportReqDTO.setParams(jsonObject.getJSONObject("params"));
+
+        // 只使用标准JSON格式处理事件参数
+        JSONObject params = jsonObject.getJSONObject("params");
+        if (params == null) {
+            log.warn("[buildEventReportDTO][消息格式不正确，缺少params字段][jsonObject: {}]", jsonObject);
+            params = new JSONObject();
+        }
+        reportReqDTO.setParams(params);
+
         return reportReqDTO;
     }
 }

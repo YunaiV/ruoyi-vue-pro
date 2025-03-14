@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.iot.plugin.common.util;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.system.SystemUtil;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.module.iot.plugin.common.pojo.IotStandardResponse;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.ext.web.RoutingContext;
 import org.springframework.http.MediaType;
@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 /**
  * IoT 插件的通用工具类
  *
- * 芋道源码
+ * @author 芋道源码
  */
 public class IotPluginCommonUtils {
 
@@ -33,34 +33,43 @@ public class IotPluginCommonUtils {
                 SystemUtil.getHostInfo().getAddress(), SystemUtil.getCurrentPID(), IdUtil.fastSimpleUUID());
     }
 
-    @SuppressWarnings("deprecation")
-    public static void writeJson(RoutingContext routingContext, CommonResult<?> result) {
-        routingContext.response()
-                .setStatusCode(200)
-                .putHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE)
-                .end(JsonUtils.toJsonString(result));
-    }
-
-    @SuppressWarnings("deprecation")
-    public static void writeJson(RoutingContext routingContext, String result) {
-        routingContext.response()
-                .setStatusCode(200)
-                .putHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE)
-                .end(result);
-    }
-
     /**
-     * 将对象转换为 JSON 字符串后写入响应
+     * 将对象转换为JSON字符串后写入HTTP响应
      *
      * @param routingContext 路由上下文
      * @param data           数据对象
      */
     @SuppressWarnings("deprecation")
-    public static void writeJson(RoutingContext routingContext, Object data) {
+    public static void writeJsonResponse(RoutingContext routingContext, Object data) {
         routingContext.response()
                 .setStatusCode(200)
                 .putHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .end(JsonUtils.toJsonString(data));
     }
 
+    /**
+     * 生成标准JSON格式的响应并写入HTTP响应（基于IotStandardResponse）
+     * <p>
+     * 推荐使用此方法，统一MQTT和HTTP的响应格式。使用方式：
+     *
+     * <pre>
+     * // 成功响应
+     * IotStandardResponse response = IotStandardResponse.success(requestId, method, data);
+     * IotPluginCommonUtils.writeJsonResponse(routingContext, response);
+     *
+     * // 错误响应
+     * IotStandardResponse errorResponse = IotStandardResponse.error(requestId, method, code, message);
+     * IotPluginCommonUtils.writeJsonResponse(routingContext, errorResponse);
+     * </pre>
+     *
+     * @param routingContext 路由上下文
+     * @param response       IotStandardResponse响应对象
+     */
+    @SuppressWarnings("deprecation")
+    public static void writeJsonResponse(RoutingContext routingContext, IotStandardResponse response) {
+        routingContext.response()
+                .setStatusCode(200)
+                .putHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .end(JsonUtils.toJsonString(response));
+    }
 }

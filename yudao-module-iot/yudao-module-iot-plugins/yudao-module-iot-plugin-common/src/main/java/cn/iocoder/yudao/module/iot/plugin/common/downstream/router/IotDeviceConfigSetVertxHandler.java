@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.plugin.common.downstream.router;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDeviceConfigSetReqDTO;
 import cn.iocoder.yudao.module.iot.plugin.common.downstream.IotDeviceDownstreamHandler;
+import cn.iocoder.yudao.module.iot.plugin.common.pojo.IotStandardResponse;
 import cn.iocoder.yudao.module.iot.plugin.common.util.IotPluginCommonUtils;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
@@ -25,6 +26,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 public class IotDeviceConfigSetVertxHandler implements Handler<RoutingContext> {
 
     public static final String PATH = "/sys/:productKey/:deviceName/thing/service/config/set";
+    public static final String METHOD = "thing.service.config.set";
 
     private final IotDeviceDownstreamHandler deviceDownstreamHandler;
 
@@ -44,17 +46,32 @@ public class IotDeviceConfigSetVertxHandler implements Handler<RoutingContext> {
                     .setConfig(config);
         } catch (Exception e) {
             log.error("[handle][路径参数({}) 解析参数失败]", routingContext.pathParams(), e);
-            IotPluginCommonUtils.writeJson(routingContext, CommonResult.error(BAD_REQUEST));
+            // 使用IotStandardResponse实体类返回错误
+            IotStandardResponse errorResponse = IotStandardResponse.error(
+                    null, METHOD, BAD_REQUEST.getCode(), BAD_REQUEST.getMsg());
+            IotPluginCommonUtils.writeJsonResponse(routingContext, errorResponse);
             return;
         }
 
         // 2. 调用处理器
         try {
             CommonResult<Boolean> result = deviceDownstreamHandler.setDeviceConfig(reqDTO);
-            IotPluginCommonUtils.writeJson(routingContext, result);
+
+            // 使用IotStandardResponse实体类返回结果
+            IotStandardResponse response;
+            if (result.isSuccess()) {
+                response = IotStandardResponse.success(reqDTO.getRequestId(), METHOD, result.getData());
+            } else {
+                response = IotStandardResponse.error(
+                        reqDTO.getRequestId(), METHOD, result.getCode(), result.getMsg());
+            }
+            IotPluginCommonUtils.writeJsonResponse(routingContext, response);
         } catch (Exception e) {
             log.error("[handle][请求参数({}) 配置设置异常]", reqDTO, e);
-            IotPluginCommonUtils.writeJson(routingContext, CommonResult.error(INTERNAL_SERVER_ERROR));
+            // 使用IotStandardResponse实体类返回错误
+            IotStandardResponse errorResponse = IotStandardResponse.error(
+                    reqDTO.getRequestId(), METHOD, INTERNAL_SERVER_ERROR.getCode(), INTERNAL_SERVER_ERROR.getMsg());
+            IotPluginCommonUtils.writeJsonResponse(routingContext, errorResponse);
         }
     }
 

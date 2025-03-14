@@ -18,7 +18,11 @@ import java.util.Collections;
 /**
  * IoT Emqx Webhook 事件处理的 Vert.x Handler
  *
- * <a href="https://docs.emqx.com/zh/emqx/latest/data-integration/webhook.html">EMQXWebhook</a>
+ * <a href=
+ * "https://docs.emqx.com/zh/emqx/latest/data-integration/webhook.html">EMQXWebhook</a>
+ *
+ * 注意：该处理器需要返回特定格式：{"result": "success"} 或 {"result": "error"}，
+ * 以符合 EMQX Webhook 插件的要求，因此不使用 IotStandardResponse 实体类。
  *
  * @author haohao
  */
@@ -54,10 +58,12 @@ public class IotDeviceWebhookVertxHandler implements Handler<RoutingContext> {
             }
 
             // 返回成功响应
-            IotPluginCommonUtils.writeJson(routingContext, Collections.singletonMap("result", "success"));
+            // 注意：这里必须返回 {"result": "success"} 格式，以符合 EMQX Webhook 插件的要求
+            IotPluginCommonUtils.writeJsonResponse(routingContext, Collections.singletonMap("result", "success"));
         } catch (Exception e) {
             log.error("[handle][处理 Webhook 事件异常]", e);
-            IotPluginCommonUtils.writeJson(routingContext, Collections.singletonMap("result", "error"));
+            // 注意：这里必须返回 {"result": "error"} 格式，以符合 EMQX Webhook 插件的要求
+            IotPluginCommonUtils.writeJsonResponse(routingContext, Collections.singletonMap("result", "error"));
         }
     }
 
