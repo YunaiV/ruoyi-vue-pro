@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.location.WmsWarehous
 import cn.iocoder.yudao.module.wms.service.external.storage.WmsExternalStorageService;
 import cn.iocoder.yudao.module.wms.service.warehouse.area.WmsWarehouseAreaService;
 import cn.iocoder.yudao.module.wms.service.warehouse.location.WmsWarehouseLocationService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -31,12 +32,15 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 public class WmsWarehouseServiceImpl implements WmsWarehouseService {
 
     @Resource
+    @Lazy
     private WmsWarehouseLocationService warehouseLocationService;
 
     @Resource
+    @Lazy
     private WmsWarehouseAreaService warehouseAreaService;
 
     @Resource
+    @Lazy
     private WmsExternalStorageService externalStorageService;
 
     @Resource

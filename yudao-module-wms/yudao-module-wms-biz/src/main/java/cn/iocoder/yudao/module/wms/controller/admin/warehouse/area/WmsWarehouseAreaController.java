@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.controller.admin.warehouse.area;
 
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -45,6 +46,7 @@ public class WmsWarehouseAreaController {
     public CommonResult<Long> createWarehouseArea(@Valid @RequestBody WmsWarehouseAreaSaveReqVO createReqVO) {
         return success(warehouseAreaService.createWarehouseArea(createReqVO).getId());
     }
+
 
     @PutMapping("/update")
     @Operation(summary = "更新库区")
@@ -117,4 +119,4 @@ public class WmsWarehouseAreaController {
         // 导出 Excel
         ExcelUtils.write(response, "库区.xls", "数据", WmsWarehouseAreaRespVO.class, BeanUtils.toBean(list, WmsWarehouseAreaRespVO.class));
     }
-}
+}
