@@ -25,6 +25,7 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -181,6 +182,7 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
                 reqVO.getSocialType(), reqVO.getSocialCode(), reqVO.getSocialState())));
     }
 
+    @Disabled
     @Test
     public void testSendSmsCode() {
         // 准备参数

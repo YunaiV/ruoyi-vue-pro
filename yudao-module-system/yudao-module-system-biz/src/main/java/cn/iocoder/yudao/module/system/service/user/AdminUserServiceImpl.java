@@ -81,8 +81,6 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Resource
     private ConfigApi configApi;
     private static final ReentrantLock LOCK = new ReentrantLock(true);
-    //工号前缀
-    private static final String EMPLOYEE_ID_PREFIX = "SM%06d";
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -116,8 +114,6 @@ public class AdminUserServiceImpl implements AdminUserService {
         // 3. 记录操作日志上下文
         LogRecordContext.putVariable("user", user);
         Long id = user.getId();
-        //自动生成工号
-        user.setEmployeeId(generateEmployeeId(id));
         //修改
         userMapper.updateById(user);
         return id;
@@ -156,10 +152,6 @@ public class AdminUserServiceImpl implements AdminUserService {
                 updateReqVO.getMobile(), updateReqVO.getEmail(), updateReqVO.getDeptId(), updateReqVO.getPostIds());
         // 2.1 更新用户
         AdminUserDO updateObj = BeanUtils.toBean(updateReqVO, AdminUserDO.class);
-        //判断工号是否为空
-        if (StrUtil.isBlank(oldUser.getEmployeeId())){
-            updateObj.setEmployeeId(generateEmployeeId(oldUser.getId()));
-        }
         userMapper.updateById(updateObj);
         // 2.2 更新岗位
         updateUserPost(updateReqVO, updateObj);
@@ -552,13 +544,4 @@ public class AdminUserServiceImpl implements AdminUserService {
     private String encodePassword(String password) {
         return passwordEncoder.encode(password);
     }
-
-    /**
-     * 自动生成工号
-     * @return java.lang.String
-     **/
-    private String generateEmployeeId(Long id) {
-        return EMPLOYEE_ID_PREFIX.formatted(id);
-    }
-
 }

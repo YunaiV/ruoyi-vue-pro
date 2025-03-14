@@ -27,14 +27,6 @@ public class KingdeeController {
     @Autowired
     private KingdeeService kingdeeService;
 
-    private KingdeeClient kingdeeClient;
-
-    @PostConstruct
-    public void init() {
-        this.kingdeeClient = kingdeeService.getClients().get(0);
-        log.info(kingdeeClient.getToken().getAccountName());
-    }
-
     @Data
     public static class KingdeeRequest {
         private String bizType;

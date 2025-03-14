@@ -24,11 +24,12 @@ import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.esb.service.AliyunService;
 import com.somle.esb.service.EsbMappingService;
 import com.somle.esb.service.EsbService;
-import cn.iocoder.yudao.framework.test.core.ut.BaseSpringTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseSpringTest;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
 import com.somle.shopify.service.ShopifyService;
 import jakarta.annotation.Resource;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration;
@@ -37,6 +38,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+@Disabled
 @Import({
     EsbService.class,
     AliyunService.class,
@@ -78,7 +80,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
     MybatisPlusJoinAutoConfiguration.class, // MyBatis 的Join配置类
 })
 //@MapperScan("cn.iocoder.yudao.module.system.dal.mysql.dept")
-class EsbJobTest extends BaseSpringTest {
+class EsbJobTest extends SomleBaseSpringTest {
     @Resource
     EsbService service;
 

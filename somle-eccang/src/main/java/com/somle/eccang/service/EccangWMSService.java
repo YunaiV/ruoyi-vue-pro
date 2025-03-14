@@ -1,7 +1,7 @@
 package com.somle.eccang.service;
 
 import cn.hutool.core.util.XmlUtil;
-import cn.iocoder.yudao.framework.common.util.collection.PageUtils;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.general.CoreUtils;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
@@ -53,7 +53,7 @@ public class EccangWMSService {
 
     public Stream<EccangResponse.EccangPage> streamSpecialOrders(EccangSpecialOrdersReqVo eccangSpecialOrdersReqVo) {
         String endpoint = "getSpecialOrdersList";
-        return PageUtils.getAllPages(
+        return StreamX.iterate(
             getPage(JsonUtilsX.toJSONObject(eccangSpecialOrdersReqVo), endpoint),
             page -> page.hasNext(),
             page -> {
@@ -85,8 +85,12 @@ public class EccangWMSService {
                 .build();
 
             int retryCount = ctx.getRetryCount();
+            if (retryCount != 0) {
+                // 记录每次重试的日志
+                log.debug("遇到错误: {}", ctx.getLastThrowable().getStackTrace().toString());
+                log.debug("正在请求url= {},第 {} 次重试。endpoint = {}", request.url(), retryCount, endpoint);
+            }
             // 记录每次重试的日志
-            log.debug("正在请求url= {},第 {} 次重试。endpoint = {}", request.url(), retryCount + 1, endpoint);
             try (var response = client.newCall(request).execute()) {
                 switch (response.code()) {
                     case 200:

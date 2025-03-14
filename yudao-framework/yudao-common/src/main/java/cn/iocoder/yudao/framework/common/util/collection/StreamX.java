@@ -4,10 +4,7 @@ package cn.iocoder.yudao.framework.common.util.collection;
 
 
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -776,6 +773,64 @@ public class StreamX<T> {
         return this.assemble(propertyValueMap,keyPropertyGetter,propertySetter);
     }
 
+    /**
+     * Same as Stream::iterate but will include the first element where hasNext evaluate to false
+     *
+     * @param <T>          The type of the element.
+     * @param seed    the initial element
+     * @param hasNext   a predicate to apply to elements to determine when the last element is reached
+     * @param next  a function to be applied to the previous element to produce a new element
+     * @return a new sequential Stream
+     */
+    public static <T> Stream<T> iterate(T seed, Predicate<? super T> hasNext, UnaryOperator<T> next) {
+        return StreamSupport.stream(new PaginationSpliterator<>(seed, hasNext, next), false);
+    }
+
+}
+
+
+
+
+class PaginationSpliterator<T> implements Spliterator<T> {
+    private T currentPage;
+    private final Predicate<? super T> haveNextPage;
+    private final UnaryOperator<T> getNextPage;
+    private boolean finished = false;
+
+    public PaginationSpliterator(T firstPage, Predicate<? super T> haveNextPage, UnaryOperator<T> getNextPage) {
+        this.currentPage = firstPage;
+        this.haveNextPage = haveNextPage;
+        this.getNextPage = getNextPage;
+    }
+
+    @Override
+    public boolean tryAdvance(Consumer<? super T> action) {
+        if (finished) {
+            return false;
+        }
+        action.accept(currentPage);
+        if (!haveNextPage.test(currentPage)) {
+            finished = true;
+        } else {
+            currentPage = getNextPage.apply(currentPage);
+        }
+        return true;
+    }
+
+    @Override
+    public Spliterator<T> trySplit() {
+        return null; // Not supporting parallel streams
+    }
+
+    @Override
+    public long estimateSize() {
+        return Long.MAX_VALUE; // Unknown size
+    }
+
+    @Override
+    public int characteristics() {
+        return ORDERED | NONNULL | IMMUTABLE;
+    }
 }
 
 

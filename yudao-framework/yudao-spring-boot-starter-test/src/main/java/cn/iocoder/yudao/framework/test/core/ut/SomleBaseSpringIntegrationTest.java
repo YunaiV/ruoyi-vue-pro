@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.test.core.ut;
 
 
 import jakarta.annotation.Resource;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
@@ -13,7 +14,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-
 
 @SpringBootTest(classes = SomleBaseSpringIntegrationTest.Application.class)
 @ActiveProfiles("unit-test")

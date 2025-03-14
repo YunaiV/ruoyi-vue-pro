@@ -1,7 +1,7 @@
 package com.somle.amazon.service;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.collection.PageUtils;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.general.CoreUtils;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
@@ -167,7 +167,7 @@ public class AmazonSpClient {
 
     @SneakyThrows
     public Stream<AmazonSpOrderRespVO> streamOrder(AmazonSpOrderReqVO vo) {
-        return PageUtils.getAllPages(
+        return StreamX.iterate(
             getOrder(vo),
             page -> !StrUtils.isEmpty(page.getPayload().getNextToken()),
             page -> {
@@ -296,9 +296,11 @@ public class AmazonSpClient {
             reportId = CoreUtils.retry(ctx -> {
                 // 获取当前重试次数
                 int retryCount = ctx.getRetryCount();
-                // 记录每次重试的日志
-                log.debug("遇到错误: {}", ctx.getLastThrowable().getStackTrace().toString());
-                log.debug("正在请求url= {},第 {} 次重试。", request.getUrl(), retryCount + 1);
+                if (retryCount != 0) {
+                    // 记录每次重试的日志
+                    log.debug("遇到错误: {}", ctx.getLastThrowable().getStackTrace().toString());
+                    log.debug("正在请求url= {},第 {} 次重试。", request.getUrl(), retryCount);
+                }
                 try(var response = WebUtils.sendRequest(request)){
                     validateResponse(response);
                     var report = WebUtils.parseResponse(response, AmazonSpReportRespVO.class);

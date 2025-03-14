@@ -19,7 +19,6 @@ public class EccangSpecialOrdersDataJob extends EccangDataJob {
     @Override
     public String execute(String param) throws Exception {
         setDate(param);
-
         eccangWMSService.streamSpecialOrders(EccangSpecialOrdersReqVo.builder()
             .spoAddTimeFrom(beforeYesterdayFirstSecond)
             .spoAddTimeTo(beforeYesterdayLastSecond)
@@ -31,7 +30,7 @@ public class EccangSpecialOrdersDataJob extends EccangDataJob {
                     .tableName("special_orders")
                     .syncType("inc")
                     .requestTimestamp(System.currentTimeMillis())
-                    .folderDate(today)
+                    .folderDate(beforeYesterday)
                     .content(page)
                     .headers(null)
                     .build();
