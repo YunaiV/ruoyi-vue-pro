@@ -1,14 +1,18 @@
 package cn.iocoder.yudao.module.wms.service.external.storage;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.external.storage.vo.WmsExternalStoragePageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.external.storage.vo.WmsExternalStorageSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.external.storage.WmsExternalStorageDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.external.storage.WmsExternalStorageMapper;
+import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import java.util.List;
 import java.util.Objects;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
@@ -24,6 +28,9 @@ public class WmsExternalStorageServiceImpl implements WmsExternalStorageService 
 
     @Resource
     private WmsExternalStorageMapper externalStorageMapper;
+
+    @Resource
+    private WmsWarehouseService warehouseService;
 
     /**
      * @sign : 8D1743708CE9B1E6
@@ -44,7 +51,7 @@ public class WmsExternalStorageServiceImpl implements WmsExternalStorageService 
     }
 
     /**
-     * @sign : 95F5B60A0E67165D
+     * @sign : 1A82B213779A9B14
      */
     @Override
     public WmsExternalStorageDO updateExternalStorage(WmsExternalStorageSaveReqVO updateReqVO) {
@@ -56,17 +63,25 @@ public class WmsExternalStorageServiceImpl implements WmsExternalStorageService 
         if (!Objects.equals(updateReqVO.getId(), exists.getId()) && Objects.equals(updateReqVO.getCode(), exists.getCode())) {
             throw exception(EXTERNAL_STORAGE_CODE_DUPLICATE);
         }
-        // 插入
+        // 更新
         WmsExternalStorageDO externalStorage = BeanUtils.toBean(updateReqVO, WmsExternalStorageDO.class);
         externalStorageMapper.updateById(externalStorage);
         // 返回
         return externalStorage;
     }
 
+    /**
+     * @sign : 8C5F64D47297133A
+     */
     @Override
     public void deleteExternalStorage(Long id) {
         // 校验存在
         validateExternalStorageExists(id);
+        // 校验是否被仓库表引用
+        List<WmsWarehouseDO> warehouseList = warehouseService.selectByExternalStorageId(id, 1);
+        if (!CollectionUtils.isEmpty(warehouseList)) {
+            throw exception(EXTERNAL_STORAGE_BE_REFERRED);
+        }
         // 删除
         externalStorageMapper.deleteById(id);
     }
@@ -91,4 +106,4 @@ public class WmsExternalStorageServiceImpl implements WmsExternalStorageService 
     public PageResult<WmsExternalStorageDO> getExternalStoragePage(WmsExternalStoragePageReqVO pageReqVO) {
         return externalStorageMapper.selectPage(pageReqVO);
     }
-}
+}

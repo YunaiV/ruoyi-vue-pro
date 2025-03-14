@@ -76,4 +76,16 @@ public interface WmsWarehouseMapper extends BaseMapperX<WmsWarehouseDO> {
     default WmsWarehouseDO getByCode(String code) {
         return getByCode(code, false);
     }
+
+    /**
+     * 按 externalStorageId 查询 WmsWarehouseDO
+     */
+    default List<WmsWarehouseDO> selectByExternalStorageId(Long externalStorageId, int limit) {
+        WmsWarehousePageReqVO reqVO = new WmsWarehousePageReqVO();
+        reqVO.setPageSize(limit);
+        reqVO.setPageNo(1);
+        LambdaQueryWrapperX<WmsWarehouseDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsWarehouseDO::getExternalStorageId, externalStorageId);
+        return selectPage(reqVO, wrapper).getList();
+    }
 }

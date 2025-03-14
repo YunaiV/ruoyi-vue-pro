@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.warehouse;
 
+import cn.iocoder.yudao.module.wms.dal.dataobject.external.storage.WmsExternalStorageDO;
+import cn.iocoder.yudao.module.wms.service.external.storage.WmsExternalStorageService;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -24,10 +26,13 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 public class WmsWarehouseServiceImpl implements WmsWarehouseService {
 
     @Resource
+    private WmsExternalStorageService externalStorageService;
+
+    @Resource
     private WmsWarehouseMapper warehouseMapper;
 
     /**
-     * @sign : 2B1DE640C85EEDD2
+     * @sign : 85697B988214817D
      */
     @Override
     public WmsWarehouseDO createWarehouse(WmsWarehouseSaveReqVO createReqVO) {
@@ -37,6 +42,11 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
         if (warehouseMapper.getByCode(createReqVO.getCode(), true) != null) {
             throw exception(WAREHOUSE_CODE_DUPLICATE);
         }
+        // 按 wms_warehouse.external_storage_id -> wms_external_storage.id 的引用关系，校验存在性
+        WmsExternalStorageDO externalStorage = externalStorageService.getExternalStorage(createReqVO.getExternalStorageId());
+        if (externalStorage == null) {
+            throw exception(EXTERNAL_STORAGE_NOT_EXISTS);
+        }
         // 插入
         WmsWarehouseDO warehouse = BeanUtils.toBean(createReqVO, WmsWarehouseDO.class);
         warehouseMapper.insert(warehouse);
@@ -45,7 +55,7 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
     }
 
     /**
-     * @sign : 5824B44D6C7D7CEB
+     * @sign : 000C450B439067C4
      */
     @Override
     public WmsWarehouseDO updateWarehouse(WmsWarehouseSaveReqVO updateReqVO) {
@@ -57,13 +67,21 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
         if (!Objects.equals(updateReqVO.getId(), exists.getId()) && Objects.equals(updateReqVO.getCode(), exists.getCode())) {
             throw exception(WAREHOUSE_CODE_DUPLICATE);
         }
-        // 插入
+        // 按 wms_warehouse.external_storage_id -> wms_external_storage.id 的引用关系，校验存在性
+        WmsExternalStorageDO externalStorage = externalStorageService.getExternalStorage(updateReqVO.getExternalStorageId());
+        if (externalStorage == null) {
+            throw exception(EXTERNAL_STORAGE_NOT_EXISTS);
+        }
+        // 更新
         WmsWarehouseDO warehouse = BeanUtils.toBean(updateReqVO, WmsWarehouseDO.class);
         warehouseMapper.updateById(warehouse);
         // 返回
         return warehouse;
     }
 
+    /**
+     * @sign : 8161F01314FF7DA4
+     */
     @Override
     public void deleteWarehouse(Long id) {
         // 校验存在
@@ -92,4 +110,11 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
     public PageResult<WmsWarehouseDO> getWarehousePage(WmsWarehousePageReqVO pageReqVO) {
         return warehouseMapper.selectPage(pageReqVO);
     }
-}
+
+    /**
+     * 按 externalStorageId 查询 WmsWarehouseDO
+     */
+    public List<WmsWarehouseDO> selectByExternalStorageId(Long externalStorageId, int limit) {
+        return warehouseMapper.selectByExternalStorageId(externalStorageId, limit);
+    }
+}

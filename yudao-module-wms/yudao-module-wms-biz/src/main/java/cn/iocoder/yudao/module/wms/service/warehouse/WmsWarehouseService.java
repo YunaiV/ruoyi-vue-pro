@@ -51,4 +51,9 @@ public interface WmsWarehouseService {
      * @return 仓库分页
      */
     PageResult<WmsWarehouseDO> getWarehousePage(WmsWarehousePageReqVO pageReqVO);
+
+    /**
+     * 按 externalStorageId 查询 WmsWarehouseDO
+     */
+    List<WmsWarehouseDO> selectByExternalStorageId(Long externalStorageId, int limit);
 }
