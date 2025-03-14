@@ -14,17 +14,14 @@ import java.util.Map;
 @Data
 public class AiImageDrawReqVO {
 
-    @Schema(description = "模型平台", requiredMode = Schema.RequiredMode.REQUIRED, example = "OpenAI")
-    private String platform; // 参见 AiPlatformEnum 枚举
+    @Schema(description = "模型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @NotNull(message = "模型编号不能为空")
+    private Long modelId;
 
     @Schema(description = "提示词", requiredMode = Schema.RequiredMode.REQUIRED, example = "画一个长城")
     @NotEmpty(message = "提示词不能为空")
     @Size(max = 1200, message = "提示词最大 1200")
     private String prompt;
-
-    @Schema(description = "模型", requiredMode = Schema.RequiredMode.REQUIRED, example = "stable-diffusion-v1-6")
-    @NotEmpty(message = "模型不能为空")
-    private String model;
 
     /**
      * 1. dall-e-2 模型：256x256、512x512、1024x1024

@@ -1,12 +1,8 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
-import cn.hutool.core.util.ReflectUtil;
-import com.alibaba.cloud.ai.tongyi.chat.TongYiChatModel;
-import com.alibaba.cloud.ai.tongyi.chat.TongYiChatOptions;
-import com.alibaba.dashscope.aigc.generation.Generation;
-import com.alibaba.dashscope.common.MessageManager;
-import com.alibaba.dashscope.utils.Constants;
-import org.junit.jupiter.api.BeforeEach;
+import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
@@ -20,25 +16,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link TongYiChatModel} 集成测试类
+ * {@link DashScopeChatModel} 集成测试类
  *
  * @author fansili
  */
 public class TongYiChatModelTests {
 
-    private final Generation generation = new Generation();
-    private final TongYiChatModel chatModel = new TongYiChatModel(generation,
-            TongYiChatOptions.builder().withModel("qwen1.5-72b-chat").build());
-
-    static {
-        Constants.apiKey = "sk-Zsd81gZYg7";
-    }
-
-    @BeforeEach
-    public void before() {
-        // 防止 TongYiChatModel 调用空指针
-        ReflectUtil.setFieldValue(chatModel, "msgManager", new MessageManager());
-    }
+    private final DashScopeChatModel chatModel = new DashScopeChatModel(
+            new DashScopeApi("sk-7d903764249848cfa912733146da12d1"),
+            DashScopeChatOptions.builder()
+                    .withModel("qwen1.5-72b-chat") // 模型
+//                    .withModel("deepseek-r1") // 模型（deepseek-r1）
+//                    .withModel("deepseek-v3") // 模型（deepseek-v3）
+//                    .withModel("deepseek-r1-distill-qwen-1.5b") // 模型（deepseek-r1-distill-qwen-1.5b）
+                    .build());
 
     @Test
     @Disabled

@@ -13,9 +13,9 @@ public class AiMidjourneyImagineReqVO {
     @NotEmpty(message = "提示词不能为空!")
     private String prompt;
 
-    @Schema(description = "模型", requiredMode = Schema.RequiredMode.REQUIRED, example = "midjourney")
-    @NotEmpty(message = "模型不能为空")
-    private String model; // 参考 MidjourneyApi.ModelEnum
+    @Schema(description = "模型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "模型编号不能为空")
+    private Long modelId;
 
     @Schema(description = "图片宽度", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "图片宽度不能为空")

@@ -8,6 +8,8 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.vectorstore.VectorStore;
 
+import java.util.Map;
+
 /**
  * AI Model 模型工厂的接口类
  *
@@ -89,21 +91,23 @@ public interface AiModelFactory {
      * @param platform 平台
      * @param apiKey   API KEY
      * @param url      API URL
+     * @param model     模型
      * @return ChatModel 对象
      */
-    EmbeddingModel getOrCreateEmbeddingModel(AiPlatformEnum platform, String apiKey, String url);
+    EmbeddingModel getOrCreateEmbeddingModel(AiPlatformEnum platform, String apiKey, String url, String model);
 
     /**
      * 基于指定配置，获得 VectorStore 对象
-     * <p>
+     *
      * 如果不存在，则进行创建
      *
-     * @param embeddingModel 嵌入模型
-     * @param platform       平台
-     * @param apiKey         API KEY
-     * @param url            API URL
+     * @param type           向量存储类型
+     * @param embeddingModel 向量模型
+     * @param metadataFields 元数据字段
      * @return VectorStore 对象
      */
-    VectorStore getOrCreateVectorStore(EmbeddingModel embeddingModel, AiPlatformEnum platform, String apiKey, String url);
+    VectorStore getOrCreateVectorStore(Class<? extends VectorStore> type,
+                                       EmbeddingModel embeddingModel,
+                                       Map<String, Class<?>> metadataFields);
 
 }

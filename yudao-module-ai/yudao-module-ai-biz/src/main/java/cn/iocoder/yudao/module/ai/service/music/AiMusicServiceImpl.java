@@ -16,7 +16,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.music.AiMusicDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.music.AiMusicMapper;
 import cn.iocoder.yudao.module.ai.enums.music.AiMusicGenerateModeEnum;
 import cn.iocoder.yudao.module.ai.enums.music.AiMusicStatusEnum;
-import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
+import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,7 @@ import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.MUSIC_NOT_EXIS
 public class AiMusicServiceImpl implements AiMusicService {
 
     @Resource
-    private AiApiKeyService apiKeyService;
+    private AiModelService modelService;
 
     @Resource
     private AiMusicMapper musicMapper;
@@ -53,7 +53,7 @@ public class AiMusicServiceImpl implements AiMusicService {
     @Transactional(rollbackFor = Exception.class)
     public List<Long> generateMusic(Long userId, AiSunoGenerateReqVO reqVO) {
         // 1. 调用 Suno 生成音乐
-        SunoApi sunoApi = apiKeyService.getSunoApi();
+        SunoApi sunoApi = modelService.getSunoApi();
         List<SunoApi.MusicData> musicDataList;
         if (Objects.equals(AiMusicGenerateModeEnum.DESCRIPTION.getMode(), reqVO.getGenerateMode())) {
             // 1.1 描述模式
@@ -88,7 +88,7 @@ public class AiMusicServiceImpl implements AiMusicService {
         log.info("[syncMusic][Suno 开始同步, 共 ({}) 个任务]", streamingTask.size());
 
         // GET 请求，为避免参数过长，分批次处理
-        SunoApi sunoApi = apiKeyService.getSunoApi();
+        SunoApi sunoApi = modelService.getSunoApi();
         CollUtil.split(streamingTask, 36).forEach(chunkList -> {
             Map<String, Long> taskIdMap = convertMap(chunkList, AiMusicDO::getTaskId, AiMusicDO::getId);
             List<SunoApi.MusicData> musicTaskList = sunoApi.getMusicList(new ArrayList<>(taskIdMap.keySet()));

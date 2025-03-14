@@ -1,17 +1,10 @@
 package cn.iocoder.yudao.module.ai.service.model;
 
-import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
-import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
-import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.apikey.AiApiKeyPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.apikey.AiApiKeySaveReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import jakarta.validation.Valid;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.image.ImageModel;
-import org.springframework.ai.vectorstore.VectorStore;
 
 import java.util.List;
 
@@ -75,58 +68,13 @@ public interface AiApiKeyService {
      */
     List<AiApiKeyDO> getApiKeyList();
 
-    // ========== 与 spring-ai 集成 ==========
-
     /**
-     * 获得 ChatModel 对象
-     *
-     * @param id 编号
-     * @return ChatModel 对象
-     */
-    ChatModel getChatModel(Long id);
-
-    /**
-     * 获得 ImageModel 对象
-     *
-     * TODO 可优化点：目前默认获取 platform 对应的第一个开启的配置用于绘画；后续可以支持配置选择
+     * 获得默认的 API 密钥
      *
      * @param platform 平台
-     * @return ImageModel 对象
+     * @param status 状态
+     * @return API 密钥
      */
-    ImageModel getImageModel(AiPlatformEnum platform);
-
-    /**
-     * 获得 MidjourneyApi 对象
-     *
-     * TODO 可优化点：目前默认获取 Midjourney 对应的第一个开启的配置用于绘画；后续可以支持配置选择
-     *
-     * @return MidjourneyApi 对象
-     */
-    MidjourneyApi getMidjourneyApi();
-
-    /**
-     * 获得 SunoApi 对象
-     *
-     * TODO 可优化点：目前默认获取 Suno 对应的第一个开启的配置用于音乐；后续可以支持配置选择
-     *
-     * @return SunoApi 对象
-     */
-    SunoApi getSunoApi();
-
-    /**
-     * 获得 EmbeddingModel 对象
-     *
-     * @param id 编号
-     * @return EmbeddingModel 对象
-     */
-    EmbeddingModel getEmbeddingModel(Long id);
-
-    /**
-     * 获得 VectorStore 对象
-     *
-     * @param id 编号
-     * @return VectorStore 对象
-     */
-    VectorStore getOrCreateVectorStore(Long id);
+    AiApiKeyDO getRequiredDefaultApiKey(String platform, Integer status);
 
 }

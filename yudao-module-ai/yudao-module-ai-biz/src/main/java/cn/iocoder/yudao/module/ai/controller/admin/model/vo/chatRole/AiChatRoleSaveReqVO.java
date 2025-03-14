@@ -7,6 +7,8 @@ import lombok.*;
 import jakarta.validation.constraints.*;
 import org.hibernate.validator.constraints.URL;
 
+import java.util.List;
+
 @Schema(description = "管理后台 - AI 聊天角色新增/修改 Request VO")
 @Data
 public class AiChatRoleSaveReqVO {
@@ -41,6 +43,12 @@ public class AiChatRoleSaveReqVO {
     @Schema(description = "角色设定", requiredMode = Schema.RequiredMode.REQUIRED, example = "现在开始你扮演一位程序员，你是一名优秀的程序员，具有很强的逻辑思维能力，总能高效的解决问题")
     @NotEmpty(message = "角色设定不能为空")
     private String systemMessage;
+
+    @Schema(description = "引用的知识库编号列表", example = "1,2,3")
+    private List<Long> knowledgeIds;
+
+    @Schema(description = "引用的工具编号列表", example = "1,2,3")
+    private List<Long> toolIds;
 
     @Schema(description = "是否公开", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "是否公开不能为空")

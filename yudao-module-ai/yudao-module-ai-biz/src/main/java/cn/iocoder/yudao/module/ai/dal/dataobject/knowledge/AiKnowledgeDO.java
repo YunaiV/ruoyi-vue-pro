@@ -2,14 +2,11 @@ package cn.iocoder.yudao.module.ai.dal.dataobject.knowledge;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-
-import java.util.List;
 
 /**
  * AI 知识库 DO
@@ -27,12 +24,6 @@ public class AiKnowledgeDO extends BaseDO {
     @TableId
     private Long id;
     /**
-     * 用户编号
-     * <p>
-     * 关联 AdminUserDO 的 userId 字段
-     */
-    private Long userId;
-    /**
      * 知识库名称
      */
     private String name;
@@ -42,20 +33,17 @@ public class AiKnowledgeDO extends BaseDO {
     private String description;
 
     /**
-     * 可见权限,选择哪些人可见
-     * <p>
-     * -1 所有人可见，其他为各自用户编号
+     * 向量模型编号
+     *
+     * 关联 {@link AiModelDO#getId()}
      */
-    @TableField(typeHandler = LongListTypeHandler.class)
-    private List<Long> visibilityPermissions;
-    /**
-     * 嵌入模型编号
-     */
-    private Long modelId;
+    private Long embeddingModelId;
     /**
      * 模型标识
+     *
+     * 冗余 {@link AiModelDO#getModel()}
      */
-    private String model;
+    private String embeddingModel;
 
     /**
      * topK

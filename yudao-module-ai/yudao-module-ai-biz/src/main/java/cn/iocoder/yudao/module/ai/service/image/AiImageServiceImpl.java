@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.ai.service.image;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
@@ -12,15 +13,19 @@ import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.ai.controller.admin.image.vo.*;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImagePageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImagePublicPageReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyActionReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney.AiMidjourneyImagineReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.image.AiImageMapper;
 import cn.iocoder.yudao.module.ai.enums.image.AiImageStatusEnum;
-import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
+import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
-import com.alibaba.cloud.ai.tongyi.image.TongYiImagesOptions;
+import com.alibaba.cloud.ai.dashscope.image.DashScopeImageOptions;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.image.ImageModel;
@@ -55,13 +60,13 @@ import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
 public class AiImageServiceImpl implements AiImageService {
 
     @Resource
+    private AiModelService modelService;
+
+    @Resource
     private AiImageMapper imageMapper;
 
     @Resource
     private FileApi fileApi;
-
-    @Resource
-    private AiApiKeyService apiKeyService;
 
     @Override
     public PageResult<AiImageDO> getImagePageMy(Long userId, AiImagePageReqVO pageReqVO) {
@@ -88,23 +93,31 @@ public class AiImageServiceImpl implements AiImageService {
 
     @Override
     public Long drawImage(Long userId, AiImageDrawReqVO drawReqVO) {
-        // 1. 保存数据库
-        AiImageDO image = BeanUtils.toBean(drawReqVO, AiImageDO.class).setUserId(userId).setPublicStatus(false)
-                .setStatus(AiImageStatusEnum.IN_PROGRESS.getStatus());
+        // 1. 校验模型
+        AiModelDO model = modelService.validateModel(drawReqVO.getModelId());
+
+        // 2. 保存数据库
+        AiImageDO image = BeanUtils.toBean(drawReqVO, AiImageDO.class).setUserId(userId)
+                .setPlatform(model.getPlatform()).setModelId(model.getId()).setModel(model.getModel())
+                .setPublicStatus(false).setStatus(AiImageStatusEnum.IN_PROGRESS.getStatus());
         imageMapper.insert(image);
-        // 2. 异步绘制，后续前端通过返回的 id 进行轮询结果
-        getSelf().executeDrawImage(image, drawReqVO);
+
+        // 3. 异步绘制，后续前端通过返回的 id 进行轮询结果
+        getSelf().executeDrawImage(image, drawReqVO, model);
         return image.getId();
     }
 
     @Async
-    public void executeDrawImage(AiImageDO image, AiImageDrawReqVO req) {
+    public void executeDrawImage(AiImageDO image, AiImageDrawReqVO reqVO, AiModelDO model) {
         try {
             // 1.1 构建请求
-            ImageOptions request = buildImageOptions(req);
+            ImageOptions request = buildImageOptions(reqVO, model);
             // 1.2 执行请求
-            ImageModel imageModel = apiKeyService.getImageModel(AiPlatformEnum.validatePlatform(req.getPlatform()));
-            ImageResponse response = imageModel.call(new ImagePrompt(req.getPrompt(), request));
+            ImageModel imageModel = modelService.getImageModel(model.getId());
+            ImageResponse response = imageModel.call(new ImagePrompt(reqVO.getPrompt(), request));
+            if (response.getResult() == null) {
+                throw new IllegalArgumentException("生成结果为空");
+            }
 
             // 2. 上传到文件服务
             String b64Json = response.getResult().getOutput().getB64Json();
@@ -116,49 +129,49 @@ public class AiImageServiceImpl implements AiImageService {
             imageMapper.updateById(new AiImageDO().setId(image.getId()).setStatus(AiImageStatusEnum.SUCCESS.getStatus())
                     .setPicUrl(filePath).setFinishTime(LocalDateTime.now()));
         } catch (Exception ex) {
-            log.error("[doDall][image({}) 生成异常]", image, ex);
+            log.error("[executeDrawImage][image({}) 生成异常]", image, ex);
             imageMapper.updateById(new AiImageDO().setId(image.getId())
                     .setStatus(AiImageStatusEnum.FAIL.getStatus())
                     .setErrorMessage(ex.getMessage()).setFinishTime(LocalDateTime.now()));
         }
     }
 
-    private static ImageOptions buildImageOptions(AiImageDrawReqVO draw) {
-        if (ObjUtil.equal(draw.getPlatform(), AiPlatformEnum.OPENAI.getPlatform())) {
+    private static ImageOptions buildImageOptions(AiImageDrawReqVO draw, AiModelDO model) {
+        if (ObjUtil.equal(model.getPlatform(), AiPlatformEnum.OPENAI.getPlatform())) {
             // https://platform.openai.com/docs/api-reference/images/create
-            return OpenAiImageOptions.builder().withModel(draw.getModel())
+            return OpenAiImageOptions.builder().withModel(model.getModel())
                     .withHeight(draw.getHeight()).withWidth(draw.getWidth())
                     .withStyle(MapUtil.getStr(draw.getOptions(), "style")) // 风格
                     .withResponseFormat("b64_json")
                     .build();
-        } else if (ObjUtil.equal(draw.getPlatform(), AiPlatformEnum.STABLE_DIFFUSION.getPlatform())) {
+        } else if (ObjUtil.equal(model.getPlatform(), AiPlatformEnum.STABLE_DIFFUSION.getPlatform())) {
             // https://platform.stability.ai/docs/api-reference#tag/SDXL-and-SD1.6/operation/textToImage
             // https://platform.stability.ai/docs/api-reference#tag/Text-to-Image/operation/textToImage
-            return StabilityAiImageOptions.builder().withModel(draw.getModel())
-                    .withHeight(draw.getHeight()).withWidth(draw.getWidth())
-                    .withSeed(Long.valueOf(draw.getOptions().get("seed")))
-                    .withCfgScale(Float.valueOf(draw.getOptions().get("scale")))
-                    .withSteps(Integer.valueOf(draw.getOptions().get("steps")))
-                    .withSampler(String.valueOf(draw.getOptions().get("sampler")))
-                    .withStylePreset(String.valueOf(draw.getOptions().get("stylePreset")))
-                    .withClipGuidancePreset(String.valueOf(draw.getOptions().get("clipGuidancePreset")))
+            return StabilityAiImageOptions.builder().model(model.getModel())
+                    .height(draw.getHeight()).width(draw.getWidth())
+                    .seed(Long.valueOf(draw.getOptions().get("seed")))
+                    .cfgScale(Float.valueOf(draw.getOptions().get("scale")))
+                    .steps(Integer.valueOf(draw.getOptions().get("steps")))
+                    .sampler(String.valueOf(draw.getOptions().get("sampler")))
+                    .stylePreset(String.valueOf(draw.getOptions().get("stylePreset")))
+                    .clipGuidancePreset(String.valueOf(draw.getOptions().get("clipGuidancePreset")))
                     .build();
-        } else if (ObjUtil.equal(draw.getPlatform(), AiPlatformEnum.TONG_YI.getPlatform())) {
-            return TongYiImagesOptions.builder()
-                    .withModel(draw.getModel()).withN(1)
+        } else if (ObjUtil.equal(model.getPlatform(), AiPlatformEnum.TONG_YI.getPlatform())) {
+            return DashScopeImageOptions.builder()
+                    .withModel(model.getModel()).withN(1)
                     .withHeight(draw.getHeight()).withWidth(draw.getWidth())
                     .build();
-        } else if (ObjUtil.equal(draw.getPlatform(), AiPlatformEnum.YI_YAN.getPlatform())) {
+        } else if (ObjUtil.equal(model.getPlatform(), AiPlatformEnum.YI_YAN.getPlatform())) {
             return QianFanImageOptions.builder()
-                    .withModel(draw.getModel()).withN(1)
-                    .withHeight(draw.getHeight()).withWidth(draw.getWidth())
+                    .model(model.getModel()).N(1)
+                    .height(draw.getHeight()).width(draw.getWidth())
                     .build();
-        } else if (ObjUtil.equal(draw.getPlatform(), AiPlatformEnum.ZHI_PU.getPlatform())) {
+        } else if (ObjUtil.equal(model.getPlatform(), AiPlatformEnum.ZHI_PU.getPlatform())) {
             return ZhiPuAiImageOptions.builder()
-                    .withModel(draw.getModel())
+                    .model(model.getModel())
                     .build();
         }
-        throw new IllegalArgumentException("不支持的 AI 平台：" + draw.getPlatform());
+        throw new IllegalArgumentException("不支持的 AI 平台：" + model.getPlatform());
     }
 
     @Override
@@ -205,52 +218,56 @@ public class AiImageServiceImpl implements AiImageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long midjourneyImagine(Long userId, AiMidjourneyImagineReqVO reqVO) {
-        MidjourneyApi midjourneyApi = apiKeyService.getMidjourneyApi();
-        // 1. 保存数据库
-        AiImageDO image = BeanUtils.toBean(reqVO, AiImageDO.class).setUserId(userId).setPublicStatus(false)
+    public Long midjourneyImagine(Long userId, AiMidjourneyImagineReqVO drawReqVO) {
+        // 1. 校验模型
+        AiModelDO model = modelService.validateModel(drawReqVO.getModelId());
+        Assert.equals(model.getPlatform(), AiPlatformEnum.MIDJOURNEY.getPlatform(), "平台不匹配");
+        MidjourneyApi midjourneyApi = modelService.getMidjourneyApi(model.getId());
+
+        // 2. 保存数据库
+        AiImageDO image = BeanUtils.toBean(drawReqVO, AiImageDO.class).setUserId(userId).setPublicStatus(false)
                 .setStatus(AiImageStatusEnum.IN_PROGRESS.getStatus())
-                .setPlatform(AiPlatformEnum.MIDJOURNEY.getPlatform());
+                .setPlatform(AiPlatformEnum.MIDJOURNEY.getPlatform()).setModelId(model.getId()).setModel(model.getName());
         imageMapper.insert(image);
 
-        // 2. 调用 Midjourney Proxy 提交任务
-        List<String> base64Array = StrUtil.isBlank(reqVO.getReferImageUrl()) ? null :
-                Collections.singletonList("data:image/jpeg;base64,".concat(Base64.encode(HttpUtil.downloadBytes(reqVO.getReferImageUrl()))));
+        // 3. 调用 Midjourney Proxy 提交任务
+        List<String> base64Array = StrUtil.isBlank(drawReqVO.getReferImageUrl()) ? null :
+                Collections.singletonList("data:image/jpeg;base64,".concat(Base64.encode(HttpUtil.downloadBytes(drawReqVO.getReferImageUrl()))));
         MidjourneyApi.ImagineRequest imagineRequest = new MidjourneyApi.ImagineRequest(
-                base64Array, reqVO.getPrompt(),null,
-                MidjourneyApi.ImagineRequest.buildState(reqVO.getWidth(),
-                        reqVO.getHeight(), reqVO.getVersion(), reqVO.getModel()));
+                base64Array, drawReqVO.getPrompt(),null,
+                MidjourneyApi.ImagineRequest.buildState(drawReqVO.getWidth(),
+                        drawReqVO.getHeight(), drawReqVO.getVersion(), model.getModel()));
         MidjourneyApi.SubmitResponse imagineResponse = midjourneyApi.imagine(imagineRequest);
 
-        // 3. 情况一【失败】：抛出业务异常
+        // 4.1 情况一【失败】：抛出业务异常
         if (!MidjourneyApi.SubmitCodeEnum.SUCCESS_CODES.contains(imagineResponse.code())) {
             String description = imagineResponse.description().contains("quota_not_enough") ?
                     "账户余额不足" : imagineResponse.description();
             throw exception(IMAGE_MIDJOURNEY_SUBMIT_FAIL, description);
         }
 
-        // 4. 情况二【成功】：更新 taskId 和参数
+        // 4.2 情况二【成功】：更新 taskId 和参数
         imageMapper.updateById(new AiImageDO().setId(image.getId())
-                .setTaskId(imagineResponse.result()).setOptions(BeanUtil.beanToMap(reqVO)));
+                .setTaskId(imagineResponse.result()).setOptions(BeanUtil.beanToMap(drawReqVO)));
         return image.getId();
     }
 
     @Override
     public Integer midjourneySync() {
-        MidjourneyApi midjourneyApi = apiKeyService.getMidjourneyApi();
         // 1.1 获取 Midjourney 平台，状态在 “进行中” 的 image
-        List<AiImageDO> imageList = imageMapper.selectListByStatusAndPlatform(
+        List<AiImageDO> images = imageMapper.selectListByStatusAndPlatform(
                 AiImageStatusEnum.IN_PROGRESS.getStatus(), AiPlatformEnum.MIDJOURNEY.getPlatform());
-        if (CollUtil.isEmpty(imageList)) {
+        if (CollUtil.isEmpty(images)) {
             return 0;
         }
         // 1.2 调用 Midjourney Proxy 获取任务进展
-        List<MidjourneyApi.Notify> taskList = midjourneyApi.getTaskList(convertSet(imageList, AiImageDO::getTaskId));
+        MidjourneyApi midjourneyApi = modelService.getMidjourneyApi(images.get(0).getModelId());
+        List<MidjourneyApi.Notify> taskList = midjourneyApi.getTaskList(convertSet(images, AiImageDO::getTaskId));
         Map<String, MidjourneyApi.Notify> taskMap = convertMap(taskList, MidjourneyApi.Notify::id);
 
         // 2. 逐个处理，更新进展
         int count = 0;
-        for (AiImageDO image : imageList) {
+        for (AiImageDO image : images) {
             MidjourneyApi.Notify notify = taskMap.get(image.getTaskId());
             if (notify == null) {
                 log.error("[midjourneySync][image({}) 查询不到进展]", image);
@@ -308,12 +325,12 @@ public class AiImageServiceImpl implements AiImageService {
 
     @Override
     public Long midjourneyAction(Long userId, AiMidjourneyActionReqVO reqVO) {
-        MidjourneyApi midjourneyApi = apiKeyService.getMidjourneyApi();
         // 1.1 检查 image
         AiImageDO image = validateImageExists(reqVO.getId());
         if (ObjUtil.notEqual(userId, image.getUserId())) {
             throw exception(IMAGE_NOT_EXISTS);
         }
+        MidjourneyApi midjourneyApi = modelService.getMidjourneyApi(image.getModelId());
         // 1.2 检查 customId
         MidjourneyApi.Button button = CollUtil.findOne(image.getButtons(),
                 buttonX -> buttonX.customId().equals(reqVO.getCustomId()));

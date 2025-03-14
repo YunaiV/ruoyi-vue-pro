@@ -8,7 +8,6 @@ import org.springframework.ai.image.ImageResponse;
 import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.openai.api.OpenAiImageApi;
-import org.springframework.web.client.RestClient;
 
 /**
  * {@link OpenAiImageModel} 集成测试类
@@ -17,11 +16,10 @@ import org.springframework.web.client.RestClient;
  */
 public class OpenAiImageModelTests {
 
-    private final OpenAiImageApi imageApi = new OpenAiImageApi(
-            "https://api.holdai.top",
-            "sk-dZEPiVaNcT3FHhef51996bAa0bC74806BeAb620dA5Da10Bf",
-            RestClient.builder());
-    private final OpenAiImageModel imageModel = new OpenAiImageModel(imageApi);
+    private final OpenAiImageModel imageModel = new OpenAiImageModel(OpenAiImageApi.builder()
+            .baseUrl("https://api.holdai.top") // apiKey
+            .apiKey("sk-aN6nWn3fILjrgLFT0fC4Aa60B72e4253826c77B29dC94f17")
+            .build());
 
     @Test
     @Disabled

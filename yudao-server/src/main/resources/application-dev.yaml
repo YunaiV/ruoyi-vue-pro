@@ -4,6 +4,11 @@ server:
 --- #################### 数据库相关配置 ####################
 
 spring:
+  spring:
+    autoconfigure:
+      exclude:
+        - org.springframework.ai.autoconfigure.vectorstore.qdrant.QdrantVectorStoreAutoConfiguration # 禁用 AI 模块的 Qdrant，手动创建
+        - org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusVectorStoreAutoConfiguration # 禁用 AI 模块的 Milvus，手动创建
   # 数据源配置项
   autoconfigure:
     exclude:

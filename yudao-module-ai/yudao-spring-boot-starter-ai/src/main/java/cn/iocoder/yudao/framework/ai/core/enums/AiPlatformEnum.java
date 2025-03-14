@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.framework.ai.core.enums;
 
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 /**
  * AI 模型平台
@@ -10,7 +13,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum AiPlatformEnum {
+public enum AiPlatformEnum implements ArrayValuable<String> {
 
     // ========== 国内平台 ==========
 
@@ -19,6 +22,11 @@ public enum AiPlatformEnum {
     DEEP_SEEK("DeepSeek", "DeepSeek"), // DeepSeek
     ZHI_PU("ZhiPu", "智谱"), // 智谱 AI
     XING_HUO("XingHuo", "星火"), // 讯飞
+    DOU_BAO("DouBao", "豆包"), // 字节
+    HUN_YUAN("HunYuan", "混元"), // 腾讯
+    SILICON_FLOW("SiliconFlow", "硅基流动"), // 硅基流动
+    MINI_MAX("MiniMax", "MiniMax"), // 稀宇科技
+    MOONSHOT("Moonshot", "月之暗灭"), // KIMI
 
     // ========== 国外平台 ==========
 
@@ -41,6 +49,8 @@ public enum AiPlatformEnum {
      */
     private final String name;
 
+    public static final String[] ARRAYS = Arrays.stream(values()).map(AiPlatformEnum::getPlatform).toArray(String[]::new);
+
     public static AiPlatformEnum validatePlatform(String platform) {
         for (AiPlatformEnum platformEnum : AiPlatformEnum.values()) {
             if (platformEnum.getPlatform().equals(platform)) {
@@ -48,6 +58,11 @@ public enum AiPlatformEnum {
             }
         }
         throw new IllegalArgumentException("非法平台： " + platform);
+    }
+
+    @Override
+    public String[] array() {
+        return ARRAYS;
     }
 
 }
