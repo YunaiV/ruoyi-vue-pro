@@ -10,9 +10,9 @@ import cn.iocoder.yudao.module.erp.controller.admin.finance.subject.vo.ErpFinanc
 import cn.iocoder.yudao.module.erp.controller.admin.finance.subject.vo.ErpFinanceSubjectRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.finance.subject.vo.ErpFinanceSubjectSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.finance.subject.vo.ErpFinanceSubjectSimpleRespVO;
-import cn.iocoder.yudao.module.erp.controller.admin.tool.Validation;
 import cn.iocoder.yudao.module.erp.dal.dataobject.finance.subject.ErpFinanceSubjectDO;
 import cn.iocoder.yudao.module.erp.service.finance.subject.ErpFinanceSubjectService;
+import cn.iocoder.yudao.module.system.api.utils.Validation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

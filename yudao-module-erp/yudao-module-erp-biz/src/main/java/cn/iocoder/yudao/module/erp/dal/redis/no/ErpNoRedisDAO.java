@@ -5,7 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.text.StrPool;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
-import cn.iocoder.yudao.module.erp.dal.redis.RedisKeyConstants;
+import cn.iocoder.yudao.module.erp.dal.redis.ErpRedisKeyConstants;
 import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -95,7 +95,7 @@ public class ErpNoRedisDAO {
     public String generate(String prefix, ErrorCode message) {
         // 递增序号
         String noPrefix = prefix + StrPool.DASHED + DateUtil.format(LocalDateTime.now(), DatePattern.PURE_DATE_PATTERN);
-        String key = RedisKeyConstants.NO + noPrefix;
+        String key = ErpRedisKeyConstants.NO + noPrefix;
         Long no = stringRedisTemplate.opsForValue().increment(key);
         //判断no是否大于6位数
         ThrowUtil.ifGreater(no, 999999L, message);

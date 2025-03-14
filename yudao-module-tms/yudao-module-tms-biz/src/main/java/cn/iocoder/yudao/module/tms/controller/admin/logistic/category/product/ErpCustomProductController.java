@@ -100,6 +100,15 @@ public class ErpCustomProductController {
         return success(new PageResult<>(vos, pageResult.getTotal()));
     }
 
+    //精简列表接口
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得海关产品分类表精简列表")
+    @PreAuthorize("@ss.hasPermission('erp:custom-product:query')")
+    public CommonResult<List<ErpCustomProductRespVO>> getCustomProductSimpleList() {
+        List<ErpCustomProductDO> productDOS = customProductService.listCustomProductList();
+        return success(bingResult(productDOS));
+    }
+
     @GetMapping("/export-excel")
     @Operation(summary = "导出海关产品分类表 Excel")
     @PreAuthorize("@ss.hasPermission('erp:custom-product:export')")

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.erp.controller.admin.finance.subject.vo;
 
-import cn.iocoder.yudao.module.erp.controller.admin.tool.Validation;
+import cn.iocoder.yudao.module.system.api.utils.Validation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

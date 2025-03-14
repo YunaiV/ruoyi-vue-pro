@@ -5,7 +5,7 @@ package cn.iocoder.yudao.module.erp.dal.redis;
  *
  * @author 芋道源码
  */
-public interface RedisKeyConstants {
+public interface ErpRedisKeyConstants {
 
     /**
      * 序号的缓存
@@ -15,4 +15,12 @@ public interface RedisKeyConstants {
      */
     String NO = "erp:seq_no:";
 
+    /**
+     * 单个产品的缓存
+     */
+    String PRODUCT = "erp:product:";
+    /**
+     * 产品的集合+分页的缓存
+     */
+    String PRODUCT_LIST = "erp:product_list:";
 }

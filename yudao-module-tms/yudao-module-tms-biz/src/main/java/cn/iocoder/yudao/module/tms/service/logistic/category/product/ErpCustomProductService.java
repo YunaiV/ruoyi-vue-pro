@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.product.vo
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.product.ErpCustomProductDO;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 /**
  * 海关产品分类表 Service 接口
  *
@@ -26,7 +28,7 @@ public interface ErpCustomProductService {
      *
      * @param updateReqVO 更新信息
      */
-    void updateCustomProduct(@Valid ErpCustomProductSaveReqVO updateReqVO);
+    ErpCustomProductDO updateCustomProduct(@Valid ErpCustomProductSaveReqVO updateReqVO);
 
     /**
      * 删除海关产品分类表
@@ -43,6 +45,7 @@ public interface ErpCustomProductService {
      */
     ErpCustomProductDO getCustomProduct(Long id);
 
+
     /**
      * 获得海关产品分类表分页
      *
@@ -51,6 +54,10 @@ public interface ErpCustomProductService {
      */
     PageResult<ErpCustomProductDO> getCustomProductPage(ErpCustomProductPageReqVO pageReqVO);
 
+    /**
+     * 获取所有海关产品关联
+     */
+    List<ErpCustomProductDO> listCustomProductList();
     //根据产品id获取海关产品分类表
     ErpCustomProductDO getCustomProductByProductId(Long productId);
 }
