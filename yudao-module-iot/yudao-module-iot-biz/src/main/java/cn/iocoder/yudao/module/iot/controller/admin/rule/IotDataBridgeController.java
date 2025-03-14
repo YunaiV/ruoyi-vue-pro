@@ -1,11 +1,8 @@
 package cn.iocoder.yudao.module.iot.controller.admin.rule;
 
-import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.IotDataBridgePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.IotDataBridgeRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.IotDataBridgeSaveReqVO;
@@ -15,16 +12,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.util.List;
-
-import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - IoT 数据桥梁")
@@ -75,20 +67,6 @@ public class IotDataBridgeController {
     public CommonResult<PageResult<IotDataBridgeRespVO>> getDataBridgePage(@Valid IotDataBridgePageReqVO pageReqVO) {
         PageResult<IotDataBridgeDO> pageResult = dataBridgeService.getDataBridgePage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, IotDataBridgeRespVO.class));
-    }
-
-    // TODO @puhui999：不用导出哈。相关的 IotDataBridgeRespVO 里的导出也注释掉哈
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出数据桥梁 Excel")
-    @PreAuthorize("@ss.hasPermission('iot:data-bridge:export')")
-    @ApiAccessLog(operateType = EXPORT)
-    public void exportDataBridgeExcel(@Valid IotDataBridgePageReqVO pageReqVO,
-                                      HttpServletResponse response) throws IOException {
-        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<IotDataBridgeDO> list = dataBridgeService.getDataBridgePage(pageReqVO).getList();
-        // 导出 Excel
-        ExcelUtils.write(response, "IoT 数据桥梁.xls", "数据", IotDataBridgeRespVO.class,
-                BeanUtils.toBean(list, IotDataBridgeRespVO.class));
     }
 
 }
