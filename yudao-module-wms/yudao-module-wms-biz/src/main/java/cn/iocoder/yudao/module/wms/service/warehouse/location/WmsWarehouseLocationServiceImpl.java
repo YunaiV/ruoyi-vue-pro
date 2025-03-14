@@ -1,5 +1,9 @@
 package cn.iocoder.yudao.module.wms.service.warehouse.location;
 
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.area.WmsWarehouseAreaDO;
+import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
+import cn.iocoder.yudao.module.wms.service.warehouse.area.WmsWarehouseAreaService;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -24,15 +28,31 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 public class WmsWarehouseLocationServiceImpl implements WmsWarehouseLocationService {
 
     @Resource
+    private WmsWarehouseAreaService warehouseAreaService;
+
+    @Resource
+    private WmsWarehouseService warehouseService;
+
+    @Resource
     private WmsWarehouseLocationMapper warehouseLocationMapper;
 
     /**
-     * @sign : 60C0FAB32DC32C3F
+     * @sign : 16571B5216063C4A
      */
     @Override
     public WmsWarehouseLocationDO createWarehouseLocation(WmsWarehouseLocationSaveReqVO createReqVO) {
         if (warehouseLocationMapper.getByCode(createReqVO.getCode(), true) != null) {
             throw exception(WAREHOUSE_LOCATION_CODE_DUPLICATE);
+        }
+        // 按 wms_warehouse_location.warehouse_id -> wms_warehouse.id 的引用关系，校验存在性
+        WmsWarehouseDO warehouse = warehouseService.getWarehouse(createReqVO.getWarehouseId());
+        if (warehouse == null) {
+            throw exception(WAREHOUSE_NOT_EXISTS);
+        }
+        // 按 wms_warehouse_location.area_id -> wms_warehouse_area.id 的引用关系，校验存在性
+        WmsWarehouseAreaDO warehouseArea = warehouseAreaService.getWarehouseArea(createReqVO.getAreaId());
+        if (warehouseArea == null) {
+            throw exception(WAREHOUSE_AREA_NOT_EXISTS);
         }
         // 插入
         WmsWarehouseLocationDO warehouseLocation = BeanUtils.toBean(createReqVO, WmsWarehouseLocationDO.class);
@@ -42,7 +62,7 @@ public class WmsWarehouseLocationServiceImpl implements WmsWarehouseLocationServ
     }
 
     /**
-     * @sign : B458D3D556DAAEDC
+     * @sign : 28D5BD3192C1053E
      */
     @Override
     public WmsWarehouseLocationDO updateWarehouseLocation(WmsWarehouseLocationSaveReqVO updateReqVO) {
@@ -50,6 +70,16 @@ public class WmsWarehouseLocationServiceImpl implements WmsWarehouseLocationServ
         WmsWarehouseLocationDO exists = validateWarehouseLocationExists(updateReqVO.getId());
         if (!Objects.equals(updateReqVO.getId(), exists.getId()) && Objects.equals(updateReqVO.getCode(), exists.getCode())) {
             throw exception(WAREHOUSE_LOCATION_CODE_DUPLICATE);
+        }
+        // 按 wms_warehouse_location.warehouse_id -> wms_warehouse.id 的引用关系，校验存在性
+        WmsWarehouseDO warehouse = warehouseService.getWarehouse(updateReqVO.getWarehouseId());
+        if (warehouse == null) {
+            throw exception(WAREHOUSE_NOT_EXISTS);
+        }
+        // 按 wms_warehouse_location.area_id -> wms_warehouse_area.id 的引用关系，校验存在性
+        WmsWarehouseAreaDO warehouseArea = warehouseAreaService.getWarehouseArea(updateReqVO.getAreaId());
+        if (warehouseArea == null) {
+            throw exception(WAREHOUSE_AREA_NOT_EXISTS);
         }
         // 更新
         WmsWarehouseLocationDO warehouseLocation = BeanUtils.toBean(updateReqVO, WmsWarehouseLocationDO.class);
@@ -88,5 +118,19 @@ public class WmsWarehouseLocationServiceImpl implements WmsWarehouseLocationServ
     @Override
     public PageResult<WmsWarehouseLocationDO> getWarehouseLocationPage(WmsWarehouseLocationPageReqVO pageReqVO) {
         return warehouseLocationMapper.selectPage(pageReqVO);
+    }
+
+    /**
+     * 按 warehouseId 查询 WmsWarehouseLocationDO
+     */
+    public List<WmsWarehouseLocationDO> selectByWarehouseId(Long warehouseId, int limit) {
+        return warehouseLocationMapper.selectByWarehouseId(warehouseId, limit);
+    }
+
+    /**
+     * 按 areaId 查询 WmsWarehouseLocationDO
+     */
+    public List<WmsWarehouseLocationDO> selectByAreaId(Long areaId, int limit) {
+        return warehouseLocationMapper.selectByAreaId(areaId, limit);
     }
 }

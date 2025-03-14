@@ -54,4 +54,28 @@ public interface WmsWarehouseLocationMapper extends BaseMapperX<WmsWarehouseLoca
     default WmsWarehouseLocationDO getByCode(String code) {
         return getByCode(code, false);
     }
+
+    /**
+     * 按 warehouseId 查询 WmsWarehouseLocationDO
+     */
+    default List<WmsWarehouseLocationDO> selectByWarehouseId(Long warehouseId, int limit) {
+        WmsWarehouseLocationPageReqVO reqVO = new WmsWarehouseLocationPageReqVO();
+        reqVO.setPageSize(limit);
+        reqVO.setPageNo(1);
+        LambdaQueryWrapperX<WmsWarehouseLocationDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsWarehouseLocationDO::getWarehouseId, warehouseId);
+        return selectPage(reqVO, wrapper).getList();
+    }
+
+    /**
+     * 按 areaId 查询 WmsWarehouseLocationDO
+     */
+    default List<WmsWarehouseLocationDO> selectByAreaId(Long areaId, int limit) {
+        WmsWarehouseLocationPageReqVO reqVO = new WmsWarehouseLocationPageReqVO();
+        reqVO.setPageSize(limit);
+        reqVO.setPageNo(1);
+        LambdaQueryWrapperX<WmsWarehouseLocationDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsWarehouseLocationDO::getAreaId, areaId);
+        return selectPage(reqVO, wrapper).getList();
+    }
 }

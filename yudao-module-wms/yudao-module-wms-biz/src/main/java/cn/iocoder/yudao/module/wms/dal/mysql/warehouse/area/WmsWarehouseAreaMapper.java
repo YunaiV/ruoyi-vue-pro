@@ -55,4 +55,16 @@ public interface WmsWarehouseAreaMapper extends BaseMapperX<WmsWarehouseAreaDO> 
     default List<WmsWarehouseAreaDO> selectByWarehouseId(Long warehouseId) {
         return selectList(new LambdaQueryWrapperX<WmsWarehouseAreaDO>().eq(WmsWarehouseAreaDO::getWarehouseId, warehouseId));
     }
-}
+
+    /**
+     * 按 warehouseId 查询 WmsWarehouseAreaDO
+     */
+    default List<WmsWarehouseAreaDO> selectByWarehouseId(Long warehouseId, int limit) {
+        WmsWarehouseAreaPageReqVO reqVO = new WmsWarehouseAreaPageReqVO();
+        reqVO.setPageSize(limit);
+        reqVO.setPageNo(1);
+        LambdaQueryWrapperX<WmsWarehouseAreaDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsWarehouseAreaDO::getWarehouseId, warehouseId);
+        return selectPage(reqVO, wrapper).getList();
+    }
+}

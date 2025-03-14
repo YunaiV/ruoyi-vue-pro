@@ -51,4 +51,9 @@ public interface WmsWarehouseAreaService {
      * @return 库区分页
      */
     PageResult<WmsWarehouseAreaDO> getWarehouseAreaPage(WmsWarehouseAreaPageReqVO pageReqVO);
+
+    /**
+     * 按 warehouseId 查询 WmsWarehouseAreaDO
+     */
+    List<WmsWarehouseAreaDO> selectByWarehouseId(Long warehouseId, int limit);
 }

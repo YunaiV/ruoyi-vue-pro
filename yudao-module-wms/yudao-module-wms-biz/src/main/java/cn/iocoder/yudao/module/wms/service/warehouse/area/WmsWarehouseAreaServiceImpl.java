@@ -1,5 +1,10 @@
 package cn.iocoder.yudao.module.wms.service.warehouse.area;
 
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.location.WmsWarehouseLocationDO;
+import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
+import cn.iocoder.yudao.module.wms.service.warehouse.location.WmsWarehouseLocationService;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -24,15 +29,26 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 public class WmsWarehouseAreaServiceImpl implements WmsWarehouseAreaService {
 
     @Resource
+    private WmsWarehouseLocationService warehouseLocationService;
+
+    @Resource
+    private WmsWarehouseService warehouseService;
+
+    @Resource
     private WmsWarehouseAreaMapper warehouseAreaMapper;
 
     /**
-     * @sign : E91E47640C63EB3A
+     * @sign : E30D8E71696EA16B
      */
     @Override
     public WmsWarehouseAreaDO createWarehouseArea(WmsWarehouseAreaSaveReqVO createReqVO) {
         if (warehouseAreaMapper.getByCode(createReqVO.getCode(), true) != null) {
             throw exception(WAREHOUSE_AREA_CODE_DUPLICATE);
+        }
+        // 按 wms_warehouse_area.warehouse_id -> wms_warehouse.id 的引用关系，校验存在性
+        WmsWarehouseDO warehouse = warehouseService.getWarehouse(createReqVO.getWarehouseId());
+        if (warehouse == null) {
+            throw exception(WAREHOUSE_NOT_EXISTS);
         }
         // 插入
         WmsWarehouseAreaDO warehouseArea = BeanUtils.toBean(createReqVO, WmsWarehouseAreaDO.class);
@@ -42,7 +58,7 @@ public class WmsWarehouseAreaServiceImpl implements WmsWarehouseAreaService {
     }
 
     /**
-     * @sign : 3CB50D670809557D
+     * @sign : 3FCEC40077F85132
      */
     @Override
     public WmsWarehouseAreaDO updateWarehouseArea(WmsWarehouseAreaSaveReqVO updateReqVO) {
@@ -50,6 +66,11 @@ public class WmsWarehouseAreaServiceImpl implements WmsWarehouseAreaService {
         WmsWarehouseAreaDO exists = validateWarehouseAreaExists(updateReqVO.getId());
         if (!Objects.equals(updateReqVO.getId(), exists.getId()) && Objects.equals(updateReqVO.getCode(), exists.getCode())) {
             throw exception(WAREHOUSE_AREA_CODE_DUPLICATE);
+        }
+        // 按 wms_warehouse_area.warehouse_id -> wms_warehouse.id 的引用关系，校验存在性
+        WmsWarehouseDO warehouse = warehouseService.getWarehouse(updateReqVO.getWarehouseId());
+        if (warehouse == null) {
+            throw exception(WAREHOUSE_NOT_EXISTS);
         }
         // 更新
         WmsWarehouseAreaDO warehouseArea = BeanUtils.toBean(updateReqVO, WmsWarehouseAreaDO.class);
@@ -59,12 +80,17 @@ public class WmsWarehouseAreaServiceImpl implements WmsWarehouseAreaService {
     }
 
     /**
-     * @sign : 84E3D284015CA3CE
+     * @sign : 61ECDB09556E7AA2
      */
     @Override
     public void deleteWarehouseArea(Long id) {
         // 校验存在
         validateWarehouseAreaExists(id);
+        // 校验是否被库位表引用
+        List<WmsWarehouseLocationDO> warehouseLocationList = warehouseLocationService.selectByAreaId(id, 1);
+        if (!CollectionUtils.isEmpty(warehouseLocationList)) {
+            throw exception(WAREHOUSE_AREA_BE_REFERRED);
+        }
         // 删除
         warehouseAreaMapper.deleteById(id);
     }
@@ -89,4 +115,11 @@ public class WmsWarehouseAreaServiceImpl implements WmsWarehouseAreaService {
     public PageResult<WmsWarehouseAreaDO> getWarehouseAreaPage(WmsWarehouseAreaPageReqVO pageReqVO) {
         return warehouseAreaMapper.selectPage(pageReqVO);
     }
-}
+
+    /**
+     * 按 warehouseId 查询 WmsWarehouseAreaDO
+     */
+    public List<WmsWarehouseAreaDO> selectByWarehouseId(Long warehouseId, int limit) {
+        return warehouseAreaMapper.selectByWarehouseId(warehouseId, limit);
+    }
+}

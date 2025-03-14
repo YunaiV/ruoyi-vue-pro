@@ -1,7 +1,12 @@
 package cn.iocoder.yudao.module.wms.service.warehouse;
 
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.wms.dal.dataobject.external.storage.WmsExternalStorageDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.area.WmsWarehouseAreaDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.location.WmsWarehouseLocationDO;
 import cn.iocoder.yudao.module.wms.service.external.storage.WmsExternalStorageService;
+import cn.iocoder.yudao.module.wms.service.warehouse.area.WmsWarehouseAreaService;
+import cn.iocoder.yudao.module.wms.service.warehouse.location.WmsWarehouseLocationService;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -24,6 +29,12 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 @Service
 @Validated
 public class WmsWarehouseServiceImpl implements WmsWarehouseService {
+
+    @Resource
+    private WmsWarehouseLocationService warehouseLocationService;
+
+    @Resource
+    private WmsWarehouseAreaService warehouseAreaService;
 
     @Resource
     private WmsExternalStorageService externalStorageService;
@@ -80,12 +91,22 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
     }
 
     /**
-     * @sign : 8161F01314FF7DA4
+     * @sign : ED025D59E9C934A6
      */
     @Override
     public void deleteWarehouse(Long id) {
         // 校验存在
         validateWarehouseExists(id);
+        // 校验是否被库区表引用
+        List<WmsWarehouseAreaDO> warehouseAreaList = warehouseAreaService.selectByWarehouseId(id, 1);
+        if (!CollectionUtils.isEmpty(warehouseAreaList)) {
+            throw exception(WAREHOUSE_BE_REFERRED);
+        }
+        // 校验是否被库位表引用
+        List<WmsWarehouseLocationDO> warehouseLocationList = warehouseLocationService.selectByWarehouseId(id, 1);
+        if (!CollectionUtils.isEmpty(warehouseLocationList)) {
+            throw exception(WAREHOUSE_BE_REFERRED);
+        }
         // 删除
         warehouseMapper.deleteById(id);
     }
@@ -117,4 +138,4 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
     public List<WmsWarehouseDO> selectByExternalStorageId(Long externalStorageId, int limit) {
         return warehouseMapper.selectByExternalStorageId(externalStorageId, limit);
     }
-}
+}
