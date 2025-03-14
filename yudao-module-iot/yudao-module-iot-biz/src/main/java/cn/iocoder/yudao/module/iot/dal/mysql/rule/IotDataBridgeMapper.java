@@ -18,10 +18,7 @@ public interface IotDataBridgeMapper extends BaseMapperX<IotDataBridgeDO> {
     default PageResult<IotDataBridgeDO> selectPage(IotDataBridgePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<IotDataBridgeDO>()
                 .likeIfPresent(IotDataBridgeDO::getName, reqVO.getName())
-                .likeIfPresent(IotDataBridgeDO::getDescription, reqVO.getDescription())
                 .eqIfPresent(IotDataBridgeDO::getStatus, reqVO.getStatus())
-                .eqIfPresent(IotDataBridgeDO::getDirection, reqVO.getDirection())
-                .eqIfPresent(IotDataBridgeDO::getType, reqVO.getType())
                 .betweenIfPresent(IotDataBridgeDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(IotDataBridgeDO::getId));
     }
