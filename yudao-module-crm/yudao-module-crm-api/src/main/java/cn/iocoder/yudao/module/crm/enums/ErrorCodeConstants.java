@@ -78,6 +78,9 @@ public interface ErrorCodeConstants {
     ErrorCode CUSTOMER_NAME_EXISTS = new ErrorCode(1_020_006_014, "已存在名为【{}】的客户！");
     ErrorCode CUSTOMER_UPDATE_DEAL_STATUS_FAIL = new ErrorCode(1_020_006_015, "更新客户的成交状态失败，原因：已经是该状态，无需更新");
 
+    ErrorCode CUSTOMER_CREATE_NAME_NOT_UNIQUE = new ErrorCode(1_020_006_016, "创建客户失败，原因：客户名称已存在");
+
+    ErrorCode CUSTOMER_UPDATE_NAME_NOT_UNIQUE = new ErrorCode(1_020_006_017, "更新客户失败，原因：客户名称已存在");
     // ========== 权限管理 1_020_007_000 ==========
     ErrorCode CRM_PERMISSION_NOT_EXISTS = new ErrorCode(1_020_007_000, "数据权限不存在");
     ErrorCode CRM_PERMISSION_DENIED = new ErrorCode(1_020_007_001, "{}操作失败，原因：没有权限");
