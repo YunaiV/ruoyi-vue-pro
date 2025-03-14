@@ -9,6 +9,9 @@ import lombok.*;
 import java.util.*;
 import jakarta.validation.constraints.*;
 
+/**
+ * @table-fields : stock_type,code,name,id,priority,partition_type,status,warehouse_id
+ */
 @Schema(description = "管理后台 - 库区新增/修改 Request VO")
 @Data
 public class WmsWarehouseAreaSaveReqVO {

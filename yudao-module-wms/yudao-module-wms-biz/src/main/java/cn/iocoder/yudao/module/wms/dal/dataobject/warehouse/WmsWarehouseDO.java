@@ -9,8 +9,8 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
  * 仓库 DO
- *
  * @author 李方捷
+ * @table-fields : country,code,contact_phone,city,contact_person,postcode,is_sync,mode,external_storage_id,deleted,address_line2,province,address_line1,company_name,name,id,status
  */
 @TableName("wms_warehouse")
 // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

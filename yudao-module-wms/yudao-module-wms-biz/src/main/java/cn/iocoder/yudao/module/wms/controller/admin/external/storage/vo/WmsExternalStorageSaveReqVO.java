@@ -8,6 +8,9 @@ import lombok.*;
 import java.util.*;
 import jakarta.validation.constraints.*;
 
+/**
+ * @table-fields : api_parameters,code,name,id,type,status
+ */
 @Schema(description = "管理后台 - 外部存储库新增/修改 Request VO")
 @Data
 public class WmsExternalStorageSaveReqVO {

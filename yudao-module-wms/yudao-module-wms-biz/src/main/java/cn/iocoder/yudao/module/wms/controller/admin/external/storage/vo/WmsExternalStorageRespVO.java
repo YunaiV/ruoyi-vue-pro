@@ -8,6 +8,9 @@ import java.time.LocalDateTime;
 import com.alibaba.excel.annotation.*;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+/**
+ * @table-fields : api_parameters,tenant_id,creator,update_time,code,create_time,name,id,type,status,updater
+ */
 @Schema(description = "管理后台 - 外部存储库 Response VO")
 @Data
 @ExcelIgnoreUnannotated

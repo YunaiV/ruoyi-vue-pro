@@ -47,7 +47,6 @@ public class WmsWarehouseAreaController {
         return success(warehouseAreaService.createWarehouseArea(createReqVO).getId());
     }
 
-
     @PutMapping("/update")
     @Operation(summary = "更新库区")
     @PreAuthorize("@ss.hasPermission('wms:warehouse-area:update')")
@@ -119,4 +118,4 @@ public class WmsWarehouseAreaController {
         // 导出 Excel
         ExcelUtils.write(response, "库区.xls", "数据", WmsWarehouseAreaRespVO.class, BeanUtils.toBean(list, WmsWarehouseAreaRespVO.class));
     }
-}
+}

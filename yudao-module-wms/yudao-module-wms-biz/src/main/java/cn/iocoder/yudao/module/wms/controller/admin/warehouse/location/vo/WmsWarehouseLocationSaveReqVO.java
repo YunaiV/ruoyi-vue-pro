@@ -7,6 +7,9 @@ import lombok.*;
 import java.util.*;
 import jakarta.validation.constraints.*;
 
+/**
+ * @table-fields : code,picking_order,name,id,area_id,status,warehouse_id
+ */
 @Schema(description = "管理后台 - 库位新增/修改 Request VO")
 @Data
 public class WmsWarehouseLocationSaveReqVO {

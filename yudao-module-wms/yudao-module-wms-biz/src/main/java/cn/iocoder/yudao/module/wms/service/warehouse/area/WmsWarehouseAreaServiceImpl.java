@@ -125,4 +125,4 @@ public class WmsWarehouseAreaServiceImpl implements WmsWarehouseAreaService {
     public List<WmsWarehouseAreaDO> selectByWarehouseId(Long warehouseId, int limit) {
         return warehouseAreaMapper.selectByWarehouseId(warehouseId, limit);
     }
-}
+}
