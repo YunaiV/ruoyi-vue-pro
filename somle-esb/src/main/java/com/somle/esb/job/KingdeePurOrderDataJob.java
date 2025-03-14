@@ -27,40 +27,40 @@ public class KingdeePurOrderDataJob extends KingdeeDataJob {
 
         // 获取所有 Kingdee 客户端列表
         for (KingdeeClient client : kingdeeService.getClients()) {
-            // 获取当前客户端的采购请求列表
-            List<KingdeePurOrder> purOrders = client.getPurOrder(vo);
-            // 获取当前时间戳，用于记录请求时间
-            long currentTimeMillis = System.currentTimeMillis();
-            // 发送采购请求数据到 OSS
-            service.send(
-                OssData.builder()
-                    .database(DATABASE)
-                    .tableName("pur_order")
-                    .syncType("inc")
-                    .requestTimestamp(currentTimeMillis)
-                    .folderDate(yesterday)
-                    .content(purOrders)
-                    .headers(null)
-                    .build()
+            client.streamPurOrder(vo).forEach(
+
+                page -> {
+                    service.send(
+                        OssData.builder()
+                            .database(DATABASE)
+                            .tableName("pur_order")
+                            .syncType("inc")
+                            .requestTimestamp(System.currentTimeMillis())
+                            .folderDate(yesterday)
+                            .content(page)
+                            .headers(null)
+                            .build()
+                    );
+
+
+                    // 遍历每个采购请求，获取并发送详细信息
+                    page.getRowsList(KingdeePurOrder.class).forEach(purOrder -> {
+
+                        service.send(
+                            OssData.builder()
+                                .database(DATABASE)
+                                .tableName("pur_order_detail")
+                                .syncType("inc")
+                                .requestTimestamp(System.currentTimeMillis())
+                                .folderDate(yesterday)
+                                .content(client.getPurOrderDetail(purOrder.getBillNo()))
+                                .headers(null)
+                                .build()
+                        );
+                    });
+                }
             );
-
-            // 遍历每个采购请求，获取并发送详细信息
-            purOrders.forEach(purOrder -> {
-                // 发送采购请求详细信息到 OSS
-                service.send(
-                    OssData.builder()
-                        .database(DATABASE)
-                        .tableName("pur_order_detail")
-                        .syncType("inc")
-                        .requestTimestamp(currentTimeMillis)
-                        .folderDate(yesterday)
-                        .content(client.getPurOrderDetail(purOrder.getBillNo()))
-                        .headers(null)
-                        .build()
-                );
-            });
         }
-
         return "data upload success";
     }
 }

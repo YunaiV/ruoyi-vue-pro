@@ -129,7 +129,7 @@ public class KingdeeClient {
     /**
      * 安全设置单位id，如果它存在。
      * @param unitName 单位名称
-     * @param setter 回调函数
+     * @param setter   回调函数
      */
     private void setUnitId(String unitName, Consumer<KingdeeUnit> setter) {
         getMeasureUnitByNumber(unitName, (kingdeeUnit, e) -> {
@@ -138,6 +138,7 @@ public class KingdeeClient {
             }
         });
     }
+
     public void getMeasureUnitByNumber(String number, BiConsumer<KingdeeUnit, Exception> callback) {
         try {
             String endUrl = "/jdy/v2/bd/measure_unit_detail";
@@ -188,7 +189,6 @@ public class KingdeeClient {
         TreeMap<String, String> params = new TreeMap<>();
         return postResponse(endUrl, params, reqVO);
     }
-
 
 
     /**
@@ -326,51 +326,51 @@ public class KingdeeClient {
             .findFirst().get();
     }
 
-    public List<KingdeePurRequest> getPurRequest(KingdeePurRequestReqVO vo) {
+    public Stream<KingdeePage> streamPurRequest(KingdeePurRequestReqVO vo) {
         log.debug("fetching purchase request");
         String endUrl = "/jdy/v2/scm/pur_request";
         return StreamX.iterate(
             getPage(JsonUtilsX.toJSONObject(vo), endUrl),
             page -> page.hasNext(),
             page -> {
-                vo.setPage(page.getPage() + 1);
+                vo.setPage(String.valueOf(page.getPage() + 1));
                 return getPage(JsonUtilsX.toJSONObject(vo), endUrl);
             }
-        ).flatMap(n -> n.getRowsList(KingdeePurRequest.class).stream()).toList();
+        );
     }
 
-    public List<KingdeePurOrder> getPurOrder(KingdeePurOrderReqVO vo) {
+    public Stream<KingdeePage> streamPurOrder(KingdeePurOrderReqVO vo) {
         log.debug("fetching purchase order");
         String endUrl = "/jdy/v2/scm/pur_order";
         return StreamX.iterate(
             getPage(JsonUtilsX.toJSONObject(vo), endUrl),
             page -> page.hasNext(),
             page -> {
-                vo.setPage(page.getPage() + 1);
+                vo.setPage(String.valueOf(page.getPage() + 1));
                 return getPage(JsonUtilsX.toJSONObject(vo), endUrl);
             }
-        ).flatMap(n -> n.getRowsList(KingdeePurOrder.class).stream()).toList();
+        );
     }
 
     /**
      * 获取采购单入库列表
-     * @param vo 请求参数
-     * @return List<KingdeePurInbound> 金蝶采购单入库列表
-     * 2025.03.07 gumaomao
      *
-     * */
-    public List<KingdeePurInbound> getPurInbound(KingdeePurInboundReqVO vo) {
+     * @param vo 请求参数
+     *           2025.03.07 gumaomao
+     */
+    public Stream<KingdeePage> streamPurInbound(KingdeePurInboundReqVO vo) {
         log.debug("fetching purchase inbound");
         String endpoint = "/jdy/v2/scm/pur_inbound";
         return StreamX.iterate(
             getPage(JsonUtilsX.toJSONObject(vo), endpoint),
             page -> page.hasNext(),
             page -> {
-                vo.setPage(page.getPage() + 1);
+                vo.setPage(String.valueOf(page.getPage() + 1));
                 return getPage(JsonUtilsX.toJSONObject(vo), endpoint);
             }
-        ).flatMap(n -> n.getRowsList(KingdeePurInbound.class).stream()).toList();
+        );
     }
+
     public KingdeePurOrderDetail getPurOrderDetail(String purOrderNumber) {
         String endUrl = "/jdy/v2/scm/pur_order_detail";
         TreeMap<String, String> params = new TreeMap<>();

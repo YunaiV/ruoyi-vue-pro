@@ -105,13 +105,13 @@ public class KingdeePurOrderReqVO {
      * 当前页，默认1 (Current page, default is 1)
      * 非必填 (Optional)
      */
-    private Integer page;
+    private String page;
 
     /**
      * 每页显示条数默认10 (Page size, default is 10)
      * 非必填 (Optional)
      */
-    private Integer pageSize;
+    private String pageSize;
 
     /**
      * 开始日期 (Start bill date, format: "yyyy-MM-dd", leave empty for no filtering)
