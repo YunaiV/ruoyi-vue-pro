@@ -107,6 +107,12 @@
             <version>24.1.2</version>
         </dependency>
 
+        <!-- TDengine 相关依赖 -->
+        <dependency>
+            <groupId>com.taosdata.jdbc</groupId>
+            <artifactId>taos-jdbcdriver</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

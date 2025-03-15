@@ -63,12 +63,11 @@
             <artifactId>opengauss-jdbc</artifactId>
             <optional>true</optional>
         </dependency>
-        <!-- TODO @haohao：这个最好不要全局开启，而是按需开启哈。 -->
         <dependency>
             <groupId>com.taosdata.jdbc</groupId>
             <artifactId>taos-jdbcdriver</artifactId>
+            <optional>true</optional>
         </dependency>
-
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-3-starter</artifactId>
