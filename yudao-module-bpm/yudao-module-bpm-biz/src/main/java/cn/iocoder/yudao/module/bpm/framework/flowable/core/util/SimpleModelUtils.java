@@ -21,7 +21,6 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.TaskListener;
-import org.springframework.util.MultiValueMap;
 
 import java.util.*;
 
@@ -1002,27 +1001,4 @@ public class SimpleModelUtils {
         return BpmnModelUtils.evalConditionExpress(variables, buildConditionExpression(conditionSetting));
     }
 
-    // TODO @芋艿：【高】要不要优化下，抽个 HttpUtils
-
-    /**
-     * 添加 HTTP 请求参数。请求头或者请求体
-     *
-     * @param params           HTTP 请求参数
-     * @param paramSettings    HTTP 请求参数设置
-     * @param processVariables 流程变量
-     */
-    public static void addHttpRequestParam(MultiValueMap<String, String> params,
-                                           List<BpmSimpleModelNodeVO.HttpRequestParam> paramSettings,
-                                           Map<String, Object> processVariables) {
-        if (CollUtil.isEmpty(paramSettings)) {
-            return;
-        }
-        paramSettings.forEach(item -> {
-            if (item.getType().equals(BpmHttpRequestParamTypeEnum.FIXED_VALUE.getType())) {
-                params.add(item.getKey(), item.getValue());
-            } else if (item.getType().equals(BpmHttpRequestParamTypeEnum.FROM_FORM.getType())) {
-                params.add(item.getKey(), processVariables.get(item.getValue()).toString());
-            }
-        });
-    }
 }

@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model;
 
+import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmAutoApproveTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
@@ -80,6 +82,12 @@ public class BpmModelMetaInfoVO {
     @Schema(description = "摘要设置", example = "{}")
     private SummarySetting summarySetting;
 
+    @Schema(description = "流程前置通知设置", example = "{}")
+    private HttpRequestSetting PreProcessNotifySetting;
+
+    @Schema(description = "流程后置通知设置", example = "{}")
+    private HttpRequestSetting PostProcessNotifySetting;
+
     @Schema(description = "流程 ID 规则")
     @Data
     @Valid
@@ -129,6 +137,34 @@ public class BpmModelMetaInfoVO {
 
         @Schema(description = "摘要字段数组", example = "[]")
         private List<String> summary;
+
+    }
+
+    @Schema(description = "http 请求通知设置", example = "{}")
+    @Data
+    public static class HttpRequestSetting {
+
+        @Schema(description = "请求路径", example = "http://127.0.0.1")
+        @NotEmpty(message = "请求 URL 不能为空")
+        @URL(message = "请求 URL 格式不正确")
+        private String url;
+
+        @Schema(description = "请求头参数设置", example = "[]")
+        @Valid
+        private List<BpmSimpleModelNodeVO.HttpRequestParam> header;
+
+        @Schema(description = "请求头参数设置", example = "[]")
+        @Valid
+        private List<BpmSimpleModelNodeVO.HttpRequestParam> body;
+
+        /**
+         * 请求返回处理设置，用于修改流程表单值
+         * <p>
+         * key：表示要修改的流程表单字段名(name)
+         * value：接口返回的字段名
+         */
+        @Schema(description = "请求返回处理设置", example = "[]")
+        private List<KeyValue<String, String>> response;
 
     }
 

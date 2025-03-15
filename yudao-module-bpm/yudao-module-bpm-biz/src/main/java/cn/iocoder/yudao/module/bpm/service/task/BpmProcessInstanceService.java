@@ -182,4 +182,10 @@ public interface BpmProcessInstanceService {
      */
     void processProcessInstanceCompleted(ProcessInstance instance);
 
+    /**
+     * 处理 ProcessInstance 开始事件，例如说：流程前置通知
+     *
+     * @param instance 流程任务
+     */
+    void processProcessInstanceCreated(ProcessInstance instance);
 }
