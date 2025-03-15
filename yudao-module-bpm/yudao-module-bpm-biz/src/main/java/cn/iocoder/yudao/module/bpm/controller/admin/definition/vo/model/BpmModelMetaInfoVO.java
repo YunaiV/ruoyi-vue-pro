@@ -82,13 +82,11 @@ public class BpmModelMetaInfoVO {
     @Schema(description = "摘要设置", example = "{}")
     private SummarySetting summarySetting;
 
-    // TODO @lesan：processBeforeTriggerSetting；要不叫这个？主要考虑，notify 留给后续的站内信、短信、邮件这种 notify 通知哈。
     @Schema(description = "流程前置通知设置", example = "{}")
-    private HttpRequestSetting PreProcessNotifySetting;
+    private HttpRequestSetting processBeforeTriggerSetting;
 
-    // TODO @lesan：processAfterTriggerSetting
     @Schema(description = "流程后置通知设置", example = "{}")
-    private HttpRequestSetting PostProcessNotifySetting;
+    private HttpRequestSetting processAfterTriggerSetting;
 
     @Schema(description = "流程 ID 规则")
     @Data
