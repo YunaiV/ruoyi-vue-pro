@@ -7,10 +7,13 @@ import org.pf4j.spring.SpringPlugin;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-// TODO @芋艿：完善注释
-
 /**
- * 负责插件的启动和停止
+ * EMQX 插件实现类
+ *
+ * 基于 PF4J 插件框架，实现 EMQX 消息中间件的集成
+ * 负责插件的生命周期管理，包括启动、停止和应用上下文的创建
+ *
+ * @author 芋道源码
  */
 @Slf4j
 public class IotEmqxPlugin extends SpringPlugin {

@@ -10,7 +10,6 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -24,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * @author HUIHUI
  */
 @ConditionalOnClass(name = "org.springframework.kafka.core.KafkaTemplate")
-@Component
+//@Component
 @Slf4j
 public class IotKafkaMQDataBridgeExecute extends
         AbstractCacheableDataBridgeExecute<IotDataBridgeKafkaMQConfig, KafkaTemplate<String, String>> {

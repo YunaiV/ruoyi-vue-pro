@@ -31,6 +31,7 @@ import java.util.Map;
 public class IotDeviceMqttMessageHandler {
 
     // TODO @haohao：讨论，感觉 mqtt 和 http，可以做个相对统一的格式哈。
+    // 回复 都使用 Alink 格式，方便后续扩展。
     // 设备上报属性 标准 JSON
     // 请求 Topic：/sys/${productKey}/${deviceName}/thing/event/property/post
     // 响应 Topic：/sys/${productKey}/${deviceName}/thing/event/property/post_reply

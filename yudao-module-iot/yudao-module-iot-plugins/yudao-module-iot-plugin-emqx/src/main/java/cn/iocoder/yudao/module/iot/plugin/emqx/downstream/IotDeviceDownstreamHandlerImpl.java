@@ -27,6 +27,7 @@ public class IotDeviceDownstreamHandlerImpl implements IotDeviceDownstreamHandle
     private static final String SYS_TOPIC_PREFIX = "/sys/";
 
     // TODO @haohao：讨论，感觉 mqtt 和 http，可以做个相对统一的格式哈。
+    // 回复 都使用 Alink 格式，方便后续扩展。
     // 设备服务调用 标准 JSON
     // 请求Topic：/sys/${productKey}/${deviceName}/thing/service/${tsl.service.identifier}
     // 响应Topic：/sys/${productKey}/${deviceName}/thing/service/${tsl.service.identifier}_reply

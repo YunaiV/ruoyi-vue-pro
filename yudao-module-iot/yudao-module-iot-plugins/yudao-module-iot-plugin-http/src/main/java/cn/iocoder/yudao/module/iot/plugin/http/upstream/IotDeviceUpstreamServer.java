@@ -2,8 +2,7 @@ package cn.iocoder.yudao.module.iot.plugin.http.upstream;
 
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.plugin.http.config.IotPluginHttpProperties;
-import cn.iocoder.yudao.module.iot.plugin.http.upstream.router.IotDeviceEventReportVertxHandler;
-import cn.iocoder.yudao.module.iot.plugin.http.upstream.router.IotDevicePropertyReportVertxHandler;
+import cn.iocoder.yudao.module.iot.plugin.http.upstream.router.IotDeviceUpstreamVertxHandler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
@@ -32,10 +31,12 @@ public class IotDeviceUpstreamServer {
         // 创建 Router 实例
         Router router = Router.router(vertx);
         router.route().handler(BodyHandler.create()); // 处理 Body
-        router.post(IotDevicePropertyReportVertxHandler.PATH)
-                .handler(new IotDevicePropertyReportVertxHandler(deviceUpstreamApi));
-        router.post(IotDeviceEventReportVertxHandler.PATH)
-                .handler(new IotDeviceEventReportVertxHandler(deviceUpstreamApi));
+
+        // 使用统一的 Handler 处理所有上行请求
+        IotDeviceUpstreamVertxHandler upstreamHandler = new IotDeviceUpstreamVertxHandler(deviceUpstreamApi);
+        router.post(IotDeviceUpstreamVertxHandler.PROPERTY_PATH).handler(upstreamHandler);
+        router.post(IotDeviceUpstreamVertxHandler.EVENT_PATH).handler(upstreamHandler);
+
         // 创建 HttpServer 实例
         this.server = vertx.createHttpServer().requestHandler(router);
     }
