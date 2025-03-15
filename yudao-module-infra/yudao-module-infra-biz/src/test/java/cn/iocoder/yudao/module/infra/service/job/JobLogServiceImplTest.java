@@ -6,10 +6,10 @@ import cn.iocoder.yudao.module.infra.controller.admin.job.vo.log.JobLogPageReqVO
 import cn.iocoder.yudao.module.infra.dal.dataobject.job.JobLogDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.job.JobLogMapper;
 import cn.iocoder.yudao.module.infra.enums.job.JobLogStatusEnum;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
-import jakarta.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
