@@ -35,13 +35,16 @@ public interface BpmTaskService {
     PageResult<Task> getTaskTodoPage(Long userId, BpmTaskPageReqVO pageReqVO);
 
     /**
-     * 获得用户在指定流程下，首个需要处理（待办）的任务
+     * 获得用户（待办）的任务：
+     * 1. 根据 taskId 查询待办任务
+     * 2. 如果任务不存在（或者已审核），获取指定流程下，首个需要处理任务
      *
      * @param userId 用户编号
+     * @param taskId 任务编号
      * @param processInstanceId 流程实例编号
      * @return 待办任务
      */
-    BpmTaskRespVO getFirstTodoTask(Long userId, String processInstanceId);
+    BpmTaskRespVO getTodoTask(Long userId, String taskId, String processInstanceId);
 
     /**
      * 获得已办的流程任务分页
@@ -88,6 +91,14 @@ public interface BpmTaskService {
      * @return 流程任务列表
      */
     List<HistoricTaskInstance> getTaskListByProcessInstanceId(String processInstanceId, Boolean asc);
+
+    /**
+     * 校验任务是否存在，并且是否是分配给自己的任务
+     *
+     * @param userId 用户 id
+     * @param taskId task id
+     */
+    Task validateTask(Long userId, String taskId);
 
     /**
      * 获取任务
@@ -277,11 +288,22 @@ public interface BpmTaskService {
     void processTaskTimeout(String processInstanceId, String taskDefineKey, Integer handlerType);
 
     /**
-     * 处理 延迟器 超时事件
+     * 处理 ChildProcess 子流程的审批超时事件
      *
      * @param processInstanceId 流程示例编号
      * @param taskDefineKey     任务 Key
      */
-    void processDelayTimerTimeout(String processInstanceId, String taskDefineKey);
+    void processChildProcessTimeout(String processInstanceId, String taskDefineKey);
+
+    /**
+     * 触发流程任务 (ReceiveTask) 的执行
+     * <p>
+     * 1. Simple 模型 HTTP 回调请求触发器节点的回调，触发流程继续执行
+     * 2. Simple 模型延迟器节点，到时触发流程继续执行
+     *
+     * @param processInstanceId 流程示例编号
+     * @param taskDefineKey     任务 Key
+     */
+    void triggerTask(String processInstanceId, String taskDefineKey);
 
 }

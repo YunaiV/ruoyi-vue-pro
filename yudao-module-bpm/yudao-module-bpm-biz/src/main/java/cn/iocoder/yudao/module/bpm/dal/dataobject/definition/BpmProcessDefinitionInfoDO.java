@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.bpm.dal.dataobject.definition;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
-import cn.iocoder.yudao.framework.mybatis.core.type.StringListTypeHandler;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmAutoApproveTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
@@ -60,6 +59,14 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
      */
     private Integer modelType;
 
+    /**
+     * 流程分类的编码
+     *
+     * 关联 {@link BpmCategoryDO#getCode()}
+     *
+     * 为什么要存储？原因是，{@link ProcessDefinition#getCategory()} 无法设置
+     */
+    private String category;
     /**
      * 图标
      */
@@ -149,7 +156,7 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
      *
      * 关联 {@link AdminUserRespDTO#getId()} 字段的数组
      */
-    @TableField(typeHandler = StringListTypeHandler.class) // 为了可以使用 find_in_set 进行过滤
+    @TableField(typeHandler = LongListTypeHandler.class) // 为了可以使用 find_in_set 进行过滤
     private List<Long> managerUserIds;
 
     /**
@@ -175,11 +182,22 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private BpmModelMetaInfoVO.TitleSetting titleSetting;
-
     /**
      * 摘要设置
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private BpmModelMetaInfoVO.SummarySetting summarySetting;
+
+    // TODO @lesan：processBeforeTriggerSetting；要不叫这个？主要考虑，notify 留给后续的站内信、短信、邮件这种 notify 通知哈。
+    /**
+     * 流程前置通知设置
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class, exist = false) // TODO @芋艿：临时注释 exist，因为要合并 master-jdk17
+    private BpmModelMetaInfoVO.HttpRequestSetting PreProcessNotifySetting;
+    /**
+     * 流程后置通知设置
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class, exist = false) // TODO @芋艿：临时注释 exist，因为要合并 master-jdk17
+    private BpmModelMetaInfoVO.HttpRequestSetting PostProcessNotifySetting;
 
 }

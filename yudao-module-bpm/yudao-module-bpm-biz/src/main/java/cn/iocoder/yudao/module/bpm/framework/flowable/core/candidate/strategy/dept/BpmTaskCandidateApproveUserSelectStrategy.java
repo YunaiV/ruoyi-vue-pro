@@ -19,12 +19,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 发起人自选 {@link BpmTaskCandidateUserStrategy} 实现类
+ * 审批人自选 {@link BpmTaskCandidateUserStrategy} 实现类
+ * 审批人在审批时选择下一个节点的审批人
  *
- * @author 芋道源码
+ * @author smallNorthLee
  */
 @Component
-public class BpmTaskCandidateStartUserSelectStrategy extends AbstractBpmTaskCandidateDeptLeaderStrategy {
+public class BpmTaskCandidateApproveUserSelectStrategy extends AbstractBpmTaskCandidateDeptLeaderStrategy {
 
     @Resource
     @Lazy // 延迟加载，避免循环依赖
@@ -32,7 +33,7 @@ public class BpmTaskCandidateStartUserSelectStrategy extends AbstractBpmTaskCand
 
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {
-        return BpmTaskCandidateStrategyEnum.START_USER_SELECT;
+        return BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT;
     }
 
     @Override
@@ -47,11 +48,14 @@ public class BpmTaskCandidateStartUserSelectStrategy extends AbstractBpmTaskCand
     public LinkedHashSet<Long> calculateUsersByTask(DelegateExecution execution, String param) {
         ProcessInstance processInstance = processInstanceService.getProcessInstance(execution.getProcessInstanceId());
         Assert.notNull(processInstance, "流程实例({})不能为空", execution.getProcessInstanceId());
-        Map<String, List<Long>> startUserSelectAssignees = FlowableUtils.getStartUserSelectAssignees(processInstance);
-        Assert.notNull(startUserSelectAssignees, "流程实例({}) 的发起人自选审批人不能为空",
+        Map<String, List<Long>> approveUserSelectAssignees = FlowableUtils.getApproveUserSelectAssignees(processInstance);
+        Assert.notNull(approveUserSelectAssignees, "流程实例({}) 的下一个执行节点审批人不能为空",
                 execution.getProcessInstanceId());
+        if (approveUserSelectAssignees == null) {
+            return Sets.newLinkedHashSet();
+        }
         // 获得审批人
-        List<Long> assignees = startUserSelectAssignees.get(execution.getCurrentActivityId());
+        List<Long> assignees = approveUserSelectAssignees.get(execution.getCurrentActivityId());
         return CollUtil.isNotEmpty(assignees) ? new LinkedHashSet<>(assignees) : Sets.newLinkedHashSet();
     }
 
@@ -61,12 +65,13 @@ public class BpmTaskCandidateStartUserSelectStrategy extends AbstractBpmTaskCand
         if (processVariables == null) {
             return Sets.newLinkedHashSet();
         }
-        Map<String, List<Long>> startUserSelectAssignees = FlowableUtils.getStartUserSelectAssignees(processVariables);
-        if (startUserSelectAssignees == null) {
+        // 流程预测时会使用，允许审批人为空，如果为空前端会弹出提示选择下一个节点审批人，避免流程无法进行，审批时会真正校验节点是否配置审批人
+        Map<String, List<Long>> approveUserSelectAssignees = FlowableUtils.getApproveUserSelectAssignees(processVariables);
+        if (approveUserSelectAssignees == null) {
             return Sets.newLinkedHashSet();
         }
         // 获得审批人
-        List<Long> assignees = startUserSelectAssignees.get(activityId);
+        List<Long> assignees = approveUserSelectAssignees.get(activityId);
         return CollUtil.isNotEmpty(assignees) ? new LinkedHashSet<>(assignees) : Sets.newLinkedHashSet();
     }
 

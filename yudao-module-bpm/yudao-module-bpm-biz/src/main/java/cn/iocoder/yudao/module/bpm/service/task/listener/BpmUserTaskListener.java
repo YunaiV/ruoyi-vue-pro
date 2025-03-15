@@ -1,29 +1,20 @@
 package cn.iocoder.yudao.module.bpm.service.task.listener;
 
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.SimpleModelUtils;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmHttpRequestParamTypeEnum;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmHttpRequestUtils;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import jakarta.annotation.Resource;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.delegate.TaskListener;
-import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.el.FixedValue;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.springframework.context.annotation.Scope;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.Resource;
-import java.util.Map;
-
-import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_TENANT_ID;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseListenerConfig;
 
 // TODO @芋艿：可能会想换个包地址
@@ -51,46 +42,27 @@ public class BpmUserTaskListener implements TaskListener {
     @Override
     public void notify(DelegateTask delegateTask) {
         // 1. 获取所需基础信息
-        HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(delegateTask.getProcessInstanceId());
+        ProcessInstance processInstance = processInstanceService.getProcessInstance(delegateTask.getProcessInstanceId());
         BpmSimpleModelNodeVO.ListenerHandler listenerHandler = parseListenerConfig(listenerConfig);
 
-        // 2. 获取请求头和请求体
-        Map<String, Object> processVariables = processInstance.getProcessVariables();
-        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        SimpleModelUtils.addHttpRequestParam(headers, listenerHandler.getHeader(), processVariables);
-        SimpleModelUtils.addHttpRequestParam(body, listenerHandler.getBody(), processVariables);
-        // 2.1 请求头默认参数
-        if (StrUtil.isNotEmpty(delegateTask.getTenantId())) {
-            headers.add(HEADER_TENANT_ID, delegateTask.getTenantId());
-        }
-        // 2.2 请求体默认参数
+        // 2. 发起请求
         // TODO @芋艿：哪些默认参数，后续再调研下；感觉可以搞个 task 字段，把整个 delegateTask 放进去；
-        body.add("processInstanceId", delegateTask.getProcessInstanceId());
-        body.add("assignee", delegateTask.getAssignee());
-        body.add("taskDefinitionKey", delegateTask.getTaskDefinitionKey());
-        body.add("taskId", delegateTask.getId());
+        listenerHandler.getBody().add(new BpmSimpleModelNodeVO.HttpRequestParam().setKey("processInstanceId")
+                .setType(BpmHttpRequestParamTypeEnum.FIXED_VALUE.getType()).setValue(delegateTask.getProcessInstanceId()));
+        listenerHandler.getBody().add(new BpmSimpleModelNodeVO.HttpRequestParam().setKey("assignee")
+                .setType(BpmHttpRequestParamTypeEnum.FIXED_VALUE.getType()).setValue(delegateTask.getAssignee()));
+        listenerHandler.getBody().add(new BpmSimpleModelNodeVO.HttpRequestParam().setKey("taskDefinitionKey")
+                .setType(BpmHttpRequestParamTypeEnum.FIXED_VALUE.getType()).setValue(delegateTask.getTaskDefinitionKey()));
+        listenerHandler.getBody().add(new BpmSimpleModelNodeVO.HttpRequestParam().setKey("taskId")
+                .setType(BpmHttpRequestParamTypeEnum.FIXED_VALUE.getType()).setValue(delegateTask.getId()));
+        BpmHttpRequestUtils.executeBpmHttpRequest(processInstance,
+                listenerHandler.getPath(),
+                listenerHandler.getHeader(),
+                listenerHandler.getBody(),
+                false, null,
+                restTemplate,
+                processInstanceService);
 
-        // 3. 异步发起请求
-        // TODO @芋艿：确认要同步，还是异步
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
-        try {
-            ResponseEntity<String> responseEntity = restTemplate.exchange(listenerHandler.getPath(), HttpMethod.POST,
-                    requestEntity, String.class);
-            log.info("[notify][监听器：{}，事件类型：{}，请求头：{}，请求体：{}，响应结果：{}]",
-                    DELEGATE_EXPRESSION,
-                    delegateTask.getEventName(),
-                    headers,
-                    body,
-                    responseEntity);
-        } catch (RestClientException e) {
-            log.error("[error][监听器：{}，事件类型：{}，请求头：{}，请求体：{}，请求出错：{}]",
-                    DELEGATE_EXPRESSION,
-                    delegateTask.getEventName(),
-                    headers,
-                    body,
-                    e.getMessage());
-        }
-        // 4. 是否需要后续操作？TODO 芋艿：待定！
+        // 3. 是否需要后续操作？TODO 芋艿：待定！
     }
 }

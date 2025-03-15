@@ -57,7 +57,7 @@ public class BpmModelController {
     @GetMapping("/list")
     @Operation(summary = "获得模型分页")
     @Parameter(name = "name", description = "模型名称", example = "芋艿")
-    public CommonResult<List<BpmModelRespVO>> getModelPage(@RequestParam(value = "name", required = false) String name) {
+    public CommonResult<List<BpmModelRespVO>> getModelList(@RequestParam(value = "name", required = false) String name) {
         List<Model> list = modelService.getModelList(name);
         if (CollUtil.isEmpty(list)) {
             return success(Collections.emptyList());

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionRespVO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -72,6 +73,13 @@ public class BpmProcessInstanceRespVO {
 
         @Schema(description = "任务名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道")
         private String name;
+
+        @Schema(description = "任务分配人编号", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "2048")
+        @JsonIgnore // 不返回，只是方便后续读取，赋值给 assigneeUser
+        private Long assignee;
+
+        @Schema(description = "任务分配人", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "2048")
+        private UserSimpleBaseVO assigneeUser;
 
     }
 

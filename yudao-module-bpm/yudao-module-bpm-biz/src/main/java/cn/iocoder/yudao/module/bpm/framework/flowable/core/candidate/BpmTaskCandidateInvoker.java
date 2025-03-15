@@ -19,6 +19,7 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -129,8 +130,12 @@ public class BpmTaskCandidateInvoker {
 
     public Set<Long> calculateUsersByActivity(BpmnModel bpmnModel, String activityId,
                                               Long startUserId, String processDefinitionId, Map<String, Object> processVariables) {
-        // 审批类型非人工审核时，不进行计算候选人。原因是：后续会自动通过、不通过
+        // 如果是 CallActivity 子流程，不进行计算候选人
         FlowElement flowElement = BpmnModelUtils.getFlowElementById(bpmnModel, activityId);
+        if (flowElement instanceof CallActivity) {
+            return new HashSet<>();
+        }
+        // 审批类型非人工审核时，不进行计算候选人。原因是：后续会自动通过、不通过
         Integer approveType = BpmnModelUtils.parseApproveType(flowElement);
         if (ObjectUtils.equalsAny(approveType,
                 BpmUserTaskApproveTypeEnum.AUTO_APPROVE.getType(),

@@ -3,10 +3,11 @@ package cn.iocoder.yudao.module.bpm.service.task;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
+import jakarta.validation.Valid;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 
-import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,7 +85,6 @@ public interface BpmProcessInstanceService {
     PageResult<HistoricProcessInstance> getProcessInstancePage(Long userId,
                                                                @Valid BpmProcessInstancePageReqVO pageReqVO);
 
-    // TODO @芋艿：重点在 review 下
     /**
      * 获取审批详情。
      * <p>
@@ -95,6 +95,15 @@ public interface BpmProcessInstanceService {
      * @return 流程实例的进度
      */
     BpmApprovalDetailRespVO getApprovalDetail(Long loginUserId, @Valid BpmApprovalDetailReqVO reqVO);
+
+    /**
+     * 获取下一个执行节点信息
+     *
+     * @param loginUserId 登录人的用户编号
+     * @param reqVO 请求信息
+     * @return 下一个执行节点信息
+     */
+    List<BpmApprovalDetailRespVO.ActivityNode> getNextApprovalNodes(Long loginUserId, @Valid BpmApprovalDetailReqVO reqVO);
 
     /**
      * 获取流程实例的 BPMN 模型视图
@@ -148,6 +157,22 @@ public interface BpmProcessInstanceService {
      */
     void updateProcessInstanceReject(ProcessInstance processInstance, String reason);
 
+    /**
+     * 更新 ProcessInstance 的变量
+     *
+     * @param id 流程编号
+     * @param variables 流程变量
+     */
+    void updateProcessInstanceVariables(String id, Map<String, Object> variables);
+
+    /**
+     * 删除 ProcessInstance 的变量
+     *
+     * @param id  流程编号
+     * @param variableNames 流程变量名
+     */
+    void removeProcessInstanceVariables(String id, Collection<String> variableNames);
+
     // ========== Event 事件相关方法 ==========
 
     /**
@@ -158,11 +183,9 @@ public interface BpmProcessInstanceService {
     void processProcessInstanceCompleted(ProcessInstance instance);
 
     /**
-     * 更新 ProcessInstance 的变量
+     * 处理 ProcessInstance 开始事件，例如说：流程前置通知
      *
-     * @param id 流程编号
-     * @param variables 流程变量
+     * @param instance 流程任务
      */
-    void updateProcessInstanceVariables(String id, Map<String, Object> variables);
-
+    void processProcessInstanceCreated(ProcessInstance instance);
 }
