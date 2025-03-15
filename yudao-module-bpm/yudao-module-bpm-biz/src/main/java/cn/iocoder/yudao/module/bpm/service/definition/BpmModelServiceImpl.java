@@ -250,8 +250,7 @@ public class BpmModelServiceImpl implements BpmModelService {
         });
         // 3. 校验第一个用户任务节点的规则类型是否为“审批人自选”，BPMN 设计器，校验第一个用户任务节点，SIMPLE 设计器，第一个节点固定为发起人所以校验第二个用户任务节点
         UserTask firUserTask = CollUtil.get(userTasks, BpmModelTypeEnum.BPMN.getType().equals(type) ? 0 : 1);
-        // 4. 极端情况下无多个用户任务节点，比如发起人-抄送节点
-        if (firUserTask == null){
+        if (firUserTask == null) {
             return;
         }
         Integer candidateStrategy = parseCandidateStrategy(firUserTask);

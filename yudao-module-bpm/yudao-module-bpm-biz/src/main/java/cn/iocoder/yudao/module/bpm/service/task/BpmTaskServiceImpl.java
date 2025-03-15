@@ -557,30 +557,30 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 2.2 添加评论
         taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.APPROVE.getType(),
                 BpmCommentTypeEnum.APPROVE.formatComment(reqVO.getReason()));
-        // 如果流程变量前端传空，需要从历史实例中获取，原因：前端表单如果在当前节点无可编辑的字段时variables一定会为空
-        // 场景一：A节点发起，B节点表单无可编辑字段，审批通过时，C节点需要流程变量获取下一个执行节点，但因为B节点无可编辑的字段，variables为空，流程可能出现问题
-        // 场景二：A节点发起，B节点只有某一个字段可编辑（比如day），但C节点需要多个节点（比如workday，在发起时填写，因为B节点只有day的编辑权限，在审批后。variables会缺少work的值）
-        // 3.1 设置流程变量
+
+        // 3. 设置流程变量。如果流程变量前端传空，需要从历史实例中获取，原因：前端表单如果在当前节点无可编辑的字段时 variables 一定会为空
+        // 场景一：A 节点发起，B 节点表单无可编辑字段，审批通过时，C 节点需要流程变量获取下一个执行节点，但因为 B 节点无可编辑的字段，variables 为空，流程可能出现问题。
+        // 场景二：A 节点发起，B 节点只有某一个字段可编辑（比如 day），但 C 节点需要多个节点。
+        //       （比如 work + day 变量，在发起时填写，因为 B 节点只有 day 的编辑权限，在审批后，variables 会缺少 work 的值）
         Map<String, Object> processVariables = new HashMap<>();
-        // 3.2 获取历史中流程变量
-        if (CollUtil.isNotEmpty(instance.getProcessVariables())) {
+        if (CollUtil.isNotEmpty(instance.getProcessVariables())) { // 获取历史中流程变量
             processVariables.putAll(instance.getProcessVariables());
         }
-        // 3.3 合并前端传递的流程变量，以前端为准
-        if (CollUtil.isNotEmpty(reqVO.getVariables())) {
+        if (CollUtil.isNotEmpty(reqVO.getVariables())) { // 合并前端传递的流程变量，以前端为准
             processVariables.putAll(reqVO.getVariables());
         }
-        // 3.4 校验并处理 APPROVE_USER_SELECT 当前审批人，选择下一节点审批人的逻辑
+
+        // 4. 校验并处理 APPROVE_USER_SELECT 当前审批人，选择下一节点审批人的逻辑
         Map<String, Object> variables = validateAndSetNextAssignees(task.getTaskDefinitionKey(), processVariables,
                 bpmnModel, reqVO.getNextAssignees(), instance);
         runtimeService.setVariables(task.getProcessInstanceId(), variables);
-        // 4 调用 BPM complete 去完成任务
+
+        // 5. 调用 BPM complete 去完成任务
         taskService.complete(task.getId(), variables, true);
 
         // 【加签专属】处理加签任务
         handleParentTaskIfSign(task.getParentTaskId());
     }
-
 
     /**
      * 校验选择的下一个节点的审批人，是否合法

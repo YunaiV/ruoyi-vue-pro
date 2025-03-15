@@ -21,7 +21,6 @@ import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.javax.el.PropertyNotFoundException;
 import org.flowable.common.engine.impl.util.io.BytesStreamSource;
 import org.flowable.engine.impl.el.FixedValue;
 
@@ -1007,11 +1006,6 @@ public class BpmnModelUtils {
             Object result = FlowableUtils.getExpressionValue(variables, expression);
             return Boolean.TRUE.equals(result);
         } catch (FlowableException ex) {
-            // TODO @芋艿 临时方案解决流程变量中不包含条件表达式时报错问题，如果expression 的计算，可能不依赖于 variables，getExpressionValue方法应该需要重构
-            if (ex.getCause() instanceof PropertyNotFoundException){
-                log.error("[evalConditionExpress][条件表达式({}) 变量({}) 解析报错]", expression, variables, ex);
-                return Boolean.FALSE;
-            }
             // 为什么使用 info 日志？原因是，expression 如果从 variables 取不到值，会报错。实际这种情况下，可以忽略
             log.info("[evalConditionExpress][条件表达式({}) 变量({}) 解析报错]", expression, variables, ex);
             return Boolean.FALSE;

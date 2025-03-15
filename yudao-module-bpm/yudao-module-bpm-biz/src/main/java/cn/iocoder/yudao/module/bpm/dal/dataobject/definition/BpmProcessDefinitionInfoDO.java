@@ -191,12 +191,12 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     /**
      * 流程前置通知设置
      */
-    @TableField(typeHandler = JacksonTypeHandler.class, exist = false) // TODO @芋艿：临时注释 exist，因为要合并 master-jdk17
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private BpmModelMetaInfoVO.HttpRequestSetting processBeforeTriggerSetting;
     /**
      * 流程后置通知设置
      */
-    @TableField(typeHandler = JacksonTypeHandler.class, exist = false) // TODO @芋艿：临时注释 exist，因为要合并 master-jdk17
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private BpmModelMetaInfoVO.HttpRequestSetting processAfterTriggerSetting;
 
 }
