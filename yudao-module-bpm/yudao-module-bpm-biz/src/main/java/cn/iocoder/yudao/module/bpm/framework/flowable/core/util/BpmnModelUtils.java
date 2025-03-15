@@ -159,6 +159,17 @@ public class BpmnModelUtils {
     }
 
     /**
+     * 解析子流程多实例来源类型
+     *
+     * @see BpmChildProcessMultiInstanceSourceTypeEnum
+     * @param element 任务节点
+     * @return 多实例来源类型
+     */
+    public static Integer parseMultiInstanceSourceType(FlowElement element) {
+        return NumberUtils.parseInt(parseExtensionElement(element, BpmnModelConstants.CHILD_PROCESS_MULTI_INSTANCE_SOURCE_TYPE));
+    }
+
+    /**
      * 添加任务拒绝处理元素
      *
      * @param rejectHandler 任务拒绝处理
@@ -408,6 +419,26 @@ public class BpmnModelUtils {
 
     public static String parserTriggerParam(FlowElement flowElement) {
         return parseExtensionElement(flowElement, TRIGGER_PARAM);
+    }
+
+    /**
+     * 给节点添加节点类型
+     *
+     * @param nodeType 节点类型
+     * @param flowElement 节点
+     */
+    public static void addNodeType(Integer nodeType, FlowElement flowElement) {
+        addExtensionElement(flowElement, BpmnModelConstants.NODE_TYPE, nodeType);
+    }
+
+    /**
+     * 解析节点类型
+     *
+     * @param flowElement 节点
+     * @return 节点类型
+     */
+    public static Integer parseNodeType(FlowElement flowElement) {
+        return NumberUtils.parseInt(parseExtensionElement(flowElement, BpmnModelConstants.NODE_TYPE));
     }
 
     // ========== BPM 简单查找相关的方法 ==========
@@ -777,71 +808,214 @@ public class BpmnModelUtils {
         // 情况：ExclusiveGateway 排它，只有一个满足条件的。如果没有，就走默认的
         if (currentElement instanceof ExclusiveGateway) {
             // 查找满足条件的 SequenceFlow 路径
-            Gateway gateway = (Gateway) currentElement;
-            SequenceFlow matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
-                    flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
-                            && evalConditionExpress(variables, flow.getConditionExpression()));
-            if (matchSequenceFlow == null) {
-                matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
-                        flow -> ObjUtil.equal(gateway.getDefaultFlow(), flow.getId()));
-                // 特殊：没有默认的情况下，并且只有 1 个条件，则认为它是默认的
-                if (matchSequenceFlow == null && gateway.getOutgoingFlows().size() == 1) {
-                    matchSequenceFlow = gateway.getOutgoingFlows().get(0);
-                }
-            }
+            SequenceFlow matchSequenceFlow = findMatchSequenceFlowByExclusiveGateway((Gateway) currentElement, variables);
             // 遍历满足条件的 SequenceFlow 路径
             if (matchSequenceFlow != null) {
                 simulateNextFlowElements(matchSequenceFlow.getTargetFlowElement(), variables, resultElements, visitElements);
             }
-            return;
         }
-
         // 情况：InclusiveGateway 包容，多个满足条件的。如果没有，就走默认的
-        if (currentElement instanceof InclusiveGateway) {
+        else if (currentElement instanceof InclusiveGateway) {
             // 查找满足条件的 SequenceFlow 路径
-            Gateway gateway = (Gateway) currentElement;
-            Collection<SequenceFlow> matchSequenceFlows = CollUtil.filterNew(gateway.getOutgoingFlows(),
-                    flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
-                            && evalConditionExpress(variables, flow.getConditionExpression()));
-            if (CollUtil.isEmpty(matchSequenceFlows)) {
-                matchSequenceFlows = CollUtil.filterNew(gateway.getOutgoingFlows(),
-                        flow -> ObjUtil.equal(gateway.getDefaultFlow(), flow.getId()));
-                // 特殊：没有默认的情况下，并且只有 1 个条件，则认为它是默认的
-                if (CollUtil.isEmpty(matchSequenceFlows) && gateway.getOutgoingFlows().size() == 1) {
-                    matchSequenceFlows = gateway.getOutgoingFlows();
-                }
-            }
+            Collection<SequenceFlow> matchSequenceFlows = findMatchSequenceFlowsByInclusiveGateway((Gateway) currentElement, variables);
             // 遍历满足条件的 SequenceFlow 路径
             matchSequenceFlows.forEach(
                     flow -> simulateNextFlowElements(flow.getTargetFlowElement(), variables, resultElements, visitElements));
         }
-
         // 情况：ParallelGateway 并行，都满足，都走
-        if (currentElement instanceof ParallelGateway) {
+        else if (currentElement instanceof ParallelGateway) {
             Gateway gateway = (Gateway) currentElement;
             // 遍历子节点
             gateway.getOutgoingFlows().forEach(
                     nextElement -> simulateNextFlowElements(nextElement.getTargetFlowElement(), variables, resultElements, visitElements));
-            return;
         }
+    }
+
+    /**
+     * 根据当前节点，获取下一个节点
+     *
+     * @param currentElement 当前节点
+     * @param bpmnModel  BPMN模型
+     * @param variables 流程变量
+     */
+    @SuppressWarnings("PatternVariableCanBeUsed")
+    public static List<FlowNode> getNextFlowNodes(FlowElement currentElement, BpmnModel bpmnModel,
+                                                  Map<String, Object> variables){
+        List<FlowNode> nextFlowNodes = new ArrayList<>(); // 下一个执行的流程节点集合
+        FlowNode currentNode = (FlowNode) currentElement;  // 当前执行节点的基本属性
+        List<SequenceFlow> outgoingFlows = currentNode.getOutgoingFlows();  // 当前节点的关联节点
+        if (CollUtil.isEmpty(outgoingFlows)) {
+            log.warn("[getNextFlowNodes][当前节点({}) 的 outgoingFlows 为空]", currentNode.getId());
+            return nextFlowNodes;
+        }
+
+        // 遍历每个出口流
+        for (SequenceFlow outgoingFlow : outgoingFlows) {
+            // 获取目标节点的基本属性
+            FlowElement targetElement = bpmnModel.getFlowElement(outgoingFlow.getTargetRef());
+            if (targetElement == null) {
+                continue;
+            }
+            // 如果是结束节点，直接返回
+            if (targetElement instanceof EndEvent) {
+                break;
+            }
+            // 情况一：处理不同类型的网关
+            if (targetElement instanceof Gateway) {
+                Gateway gateway = (Gateway) targetElement;
+                if (gateway instanceof ExclusiveGateway) {
+                    handleExclusiveGateway(gateway, bpmnModel, variables, nextFlowNodes);
+                } else if (gateway instanceof InclusiveGateway) {
+                    handleInclusiveGateway(gateway, bpmnModel, variables, nextFlowNodes);
+                } else if (gateway instanceof ParallelGateway) {
+                    handleParallelGateway(gateway, bpmnModel, variables, nextFlowNodes);
+                }
+            } else {
+                // 情况二：如果不是网关，直接添加到下一个节点列表
+                nextFlowNodes.add((FlowNode) targetElement);
+            }
+        }
+        return nextFlowNodes;
+    }
+
+    /**
+     * 处理排它网关
+     *
+     * @param gateway 排他网关
+     * @param bpmnModel BPMN模型
+     * @param variables 流程变量
+     * @param nextFlowNodes 下一个执行的流程节点集合
+     */
+    private static void handleExclusiveGateway(Gateway gateway, BpmnModel bpmnModel,
+                                               Map<String, Object> variables, List<FlowNode> nextFlowNodes) {
+        // 查找满足条件的 SequenceFlow 路径
+        SequenceFlow matchSequenceFlow = findMatchSequenceFlowByExclusiveGateway(gateway, variables);
+        // 遍历满足条件的 SequenceFlow 路径
+        if (matchSequenceFlow != null) {
+            FlowElement targetElement = bpmnModel.getFlowElement(matchSequenceFlow.getTargetRef());
+            if (targetElement instanceof FlowNode) {
+                nextFlowNodes.add((FlowNode) targetElement);
+            }
+        }
+    }
+
+    /**
+     * 处理排它网关（Exclusive Gateway），选择符合条件的路径
+     *
+     * @param gateway 排他网关
+     * @param variables 流程变量
+     * @return 符合条件的路径
+     */
+    private static SequenceFlow findMatchSequenceFlowByExclusiveGateway(Gateway gateway, Map<String, Object> variables) {
+        // TODO 表单无可编辑字段时variables为空，流程走向会出现问题，比如流程审批过程中无需要修改的字段值，
+        // TODO @小北：是不是还是保证，编辑的时候，如果计算下一个节点，还是 variables 是完整体？而不是空的！！！（可以微信讨论下）
+        SequenceFlow matchSequenceFlow;
+        if (CollUtil.isNotEmpty(variables)) {
+             matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
+                    flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
+                            && (evalConditionExpress(variables, flow.getConditionExpression())));
+        } else {
+            matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
+                    flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId()));
+        }
+        if (matchSequenceFlow == null) {
+            matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
+                    flow -> ObjUtil.equal(gateway.getDefaultFlow(), flow.getId()));
+            // 特殊：没有默认的情况下，并且只有 1 个条件，则认为它是默认的
+            if (matchSequenceFlow == null && gateway.getOutgoingFlows().size() == 1) {
+                matchSequenceFlow = gateway.getOutgoingFlows().get(0);
+            }
+        }
+        return matchSequenceFlow;
+    }
+
+    /**
+     * 处理包容网关
+     *
+     * @param gateway 排他网关
+     * @param bpmnModel BPMN模型
+     * @param variables 流程变量
+     * @param nextFlowNodes 下一个执行的流程节点集合
+     */
+    private static void handleInclusiveGateway(Gateway gateway, BpmnModel bpmnModel,
+                                               Map<String, Object> variables, List<FlowNode> nextFlowNodes) {
+        // 查找满足条件的 SequenceFlow 路径集合
+        Collection<SequenceFlow> matchSequenceFlows = findMatchSequenceFlowsByInclusiveGateway(gateway, variables);
+        // 遍历满足条件的 SequenceFlow 路径，获取目标节点
+        matchSequenceFlows.forEach(flow -> {
+            FlowElement targetElement = bpmnModel.getFlowElement(flow.getTargetRef());
+            if (targetElement instanceof FlowNode) {
+                nextFlowNodes.add((FlowNode) targetElement);
+            }
+        });
+    }
+
+    /**
+     * 处理排它网关（Inclusive Gateway），选择符合条件的路径
+     *
+     * @param gateway 排他网关
+     * @param variables 流程变量
+     * @return 符合条件的路径
+     */
+    private static Collection<SequenceFlow> findMatchSequenceFlowsByInclusiveGateway(Gateway gateway, Map<String, Object> variables) {
+        // 查找满足条件的 SequenceFlow 路径
+        Collection<SequenceFlow> matchSequenceFlows = CollUtil.filterNew(gateway.getOutgoingFlows(),
+                flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
+                        && evalConditionExpress(variables, flow.getConditionExpression()));
+        if (CollUtil.isEmpty(matchSequenceFlows)) {
+            matchSequenceFlows = CollUtil.filterNew(gateway.getOutgoingFlows(),
+                    flow -> ObjUtil.equal(gateway.getDefaultFlow(), flow.getId()));
+            // 特殊：没有默认的情况下，并且只有 1 个条件，则认为它是默认的
+            if (CollUtil.isEmpty(matchSequenceFlows) && gateway.getOutgoingFlows().size() == 1) {
+                matchSequenceFlows = gateway.getOutgoingFlows();
+            }
+        }
+        return matchSequenceFlows;
+    }
+
+
+    /**
+     * 处理并行网关
+     *
+     * @param gateway 排他网关
+     * @param bpmnModel BPMN模型
+     * @param variables 流程变量
+     * @param nextFlowNodes 下一个执行的流程节点集合
+     */
+    private static void handleParallelGateway(Gateway gateway, BpmnModel bpmnModel,
+                                              Map<String, Object> variables, List<FlowNode> nextFlowNodes) {
+        // 并行网关，遍历所有出口路径，获取目标节点
+        gateway.getOutgoingFlows().forEach(flow -> {
+            FlowElement targetElement = bpmnModel.getFlowElement(flow.getTargetRef());
+            if (targetElement instanceof FlowNode) {
+                nextFlowNodes.add((FlowNode) targetElement);
+            }
+        });
     }
 
     /**
      * 计算条件表达式是否为 true 满足条件
      *
      * @param variables 流程实例
-     * @param express 条件表达式
+     * @param expression 条件表达式
      * @return 是否满足条件
      */
-    public static boolean evalConditionExpress(Map<String, Object> variables, String express) {
-        if (express == null) {
+    public static boolean evalConditionExpress(Map<String, Object> variables, String expression) {
+        if (expression == null) {
             return Boolean.FALSE;
         }
+        // 如果 variables 为空，则创建一个的原因？可能 expression 的计算，不依赖于 variables
+        if (variables == null) {
+            variables = new HashMap<>();
+        }
+
+        // 执行计算
         try {
-            Object result = FlowableUtils.getExpressionValue(variables, express);
+            Object result = FlowableUtils.getExpressionValue(variables, expression);
             return Boolean.TRUE.equals(result);
         } catch (FlowableException ex) {
-            log.error("[evalConditionExpress][条件表达式({}) 变量({}) 解析报错]", express, variables, ex);
+            // 为什么使用 info 日志？原因是，expression 如果从 variables 取不到值，会报错。实际这种情况下，可以忽略
+            log.info("[evalConditionExpress][条件表达式({}) 变量({}) 解析报错]", expression, variables, ex);
             return Boolean.FALSE;
         }
     }
