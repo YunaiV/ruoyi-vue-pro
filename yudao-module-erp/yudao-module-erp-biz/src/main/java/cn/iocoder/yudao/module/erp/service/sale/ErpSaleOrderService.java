@@ -42,21 +42,21 @@ public interface ErpSaleOrderService {
      */
     void updateSaleOrderStatus(Long id, Integer status);
 
-    /**
-     * 更新销售订单的出库数量
-     *
-     * @param id 编号
-     * @param outCountMap 出库数量 Map：key 销售订单项编号；value 出库数量
-     */
-    void updateSaleOrderOutCount(Long id, Map<Long, BigDecimal> outCountMap);
-
-    /**
-     * 更新销售订单的退货数量
-     *
-     * @param orderId 编号
-     * @param returnCountMap 退货数量 Map：key 销售订单项编号；value 退货数量
-     */
-    void updateSaleOrderReturnCount(Long orderId, Map<Long, BigDecimal> returnCountMap);
+//    /**
+//     * 更新销售订单的出库数量
+//     *
+//     * @param id 编号
+//     * @param outCountMap 出库数量 Map：key 销售订单项编号；value 出库数量
+//     */
+//    void updateSaleOrderOutCount(Long id, Map<Long, BigDecimal> outCountMap);
+//
+//    /**
+//     * 更新销售订单的退货数量
+//     *
+//     * @param orderId 编号
+//     * @param returnCountMap 退货数量 Map：key 销售订单项编号；value 退货数量
+//     */
+//    void updateSaleOrderReturnCount(Long orderId, Map<Long, BigDecimal> returnCountMap);
 
     /**
      * 删除销售订单
@@ -107,4 +107,5 @@ public interface ErpSaleOrderService {
      */
     List<ErpSaleOrderItemDO> getSaleOrderItemListByOrderIds(Collection<Long> orderIds);
 
+    void updateSaleOrderOutCountReturnCount(Long orderId);
 }

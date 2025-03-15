@@ -65,7 +65,7 @@ public interface ErpSaleReturnMapper extends BaseMapperX<ErpSaleReturnDO> {
     }
 
     default List<ErpSaleReturnDO> selectListByOrderId(Long orderId) {
-        return selectList(ErpSaleReturnDO::getOrderId, orderId);
+        return selectList(ErpSaleReturnDO::getOrderId, orderId,ErpSaleReturnDO::getStatus, ErpAuditStatus.APPROVE.getStatus());
     }
 
 }
