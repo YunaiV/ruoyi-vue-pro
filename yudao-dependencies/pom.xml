@@ -53,7 +53,7 @@
         <mapstruct.version>1.6.3</mapstruct.version>
         <hutool-5.version>5.8.35</hutool-5.version>
         <hutool-6.version>6.0.0-M19</hutool-6.version>
-        <easyexcel.verion>4.0.3</easyexcel.verion>
+        <easyexcel.version>4.0.3</easyexcel.version>
         <velocity.version>2.4.1</velocity.version>
         <fastjson.version>1.2.83</fastjson.version>
         <guava.version>33.4.0-jre</guava.version>
@@ -71,7 +71,7 @@
         <aws-java-sdk-s3.version>1.12.777</aws-java-sdk-s3.version>
         <justauth.version>2.0.5</justauth.version>
         <jimureport.version>1.8.1</jimureport.version>
-        <weixin-java.version>4.6.0</weixin-java.version>
+        <weixin-java.version>4.7.2.B</weixin-java.version>
     </properties>
 
     <dependencyManagement>
@@ -471,7 +471,7 @@
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>easyexcel</artifactId>
-                <version>${easyexcel.verion}</version>
+                <version>${easyexcel.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
