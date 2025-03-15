@@ -935,10 +935,10 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             // 流程前置通知
             BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService.
                     getProcessDefinitionInfo(instance.getProcessDefinitionId());
+            // TODO @lesan：if return 哈。减少括号。
             if (ObjUtil.isNotNull(processDefinitionInfo) &&
                     ObjUtil.isNotNull(processDefinitionInfo.getPreProcessNotifySetting())) {
                 BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getPreProcessNotifySetting();
-
                 BpmHttpRequestUtils.executeBpmHttpRequest(instance,
                         setting.getUrl(),
                         setting.getHeader(),
@@ -949,4 +949,5 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             }
         });
     }
+
 }

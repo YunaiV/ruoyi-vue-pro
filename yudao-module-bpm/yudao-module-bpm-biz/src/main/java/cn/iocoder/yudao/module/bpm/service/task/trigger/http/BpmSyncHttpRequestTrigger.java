@@ -39,6 +39,7 @@ public class BpmSyncHttpRequestTrigger extends BpmAbstractHttpRequestTrigger {
             log.error("[execute][流程({}) HTTP 触发器请求配置为空]", processInstanceId);
             return;
         }
+
         // 2. 发起请求
         ProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
         BpmHttpRequestUtils.executeBpmHttpRequest(processInstance,

@@ -37,51 +37,52 @@ public class BpmHttpRequestUtils {
 
     public static void executeBpmHttpRequest(ProcessInstance processInstance,
                                              String url,
-                                             List<BpmSimpleModelNodeVO.HttpRequestParam> headerParam,
-                                             List<BpmSimpleModelNodeVO.HttpRequestParam> bodyParam,
+                                             List<BpmSimpleModelNodeVO.HttpRequestParam> headerParams,
+                                             List<BpmSimpleModelNodeVO.HttpRequestParam> bodyParams,
                                              Boolean handleResponse,
                                              List<KeyValue<String, String>> response,
+                                             // TODO @lesan：RestTemplate 直接通过 springUtil 获取好咧；
                                              RestTemplate restTemplate,
+                                             // TODO @lesan：processInstanceService 直接通过 springUtil 获取好咧；
                                              BpmProcessInstanceService processInstanceService) {
 
         // 1.1 设置请求头
-        MultiValueMap<String, String> headers = BpmHttpRequestUtils.buildHttpHeaders(processInstance, headerParam);
+        MultiValueMap<String, String> headers = buildHttpHeaders(processInstance, headerParams);
         // 1.2 设置请求体
-        MultiValueMap<String, String> body = BpmHttpRequestUtils.buildHttpBody(processInstance, bodyParam);
+        MultiValueMap<String, String> body = buildHttpBody(processInstance, bodyParams);
 
         // 2. 发起请求
-        ResponseEntity<String> responseEntity = BpmHttpRequestUtils.sendHttpRequest(url, headers, body, restTemplate);
+        ResponseEntity<String> responseEntity = sendHttpRequest(url, headers, body, restTemplate);
 
         // 3. 处理返回
+        // TODO @lesan：可以用 if return，让括号小点
         if (Boolean.TRUE.equals(handleResponse)) {
             // 3.1 判断是否需要解析返回值
-            if (responseEntity == null || StrUtil.isEmpty(responseEntity.getBody())
+            if (responseEntity == null
+                    || StrUtil.isEmpty(responseEntity.getBody())
                     || !responseEntity.getStatusCode().is2xxSuccessful()
                     || CollUtil.isEmpty(response)) {
                 return;
             }
             // 3.2 解析返回值, 返回值必须符合 CommonResult 规范。
-            CommonResult<Map<String, Object>> respResult = JsonUtils.parseObjectQuietly(
-                    responseEntity.getBody(), new TypeReference<>() {
-                    });
+            CommonResult<Map<String, Object>> respResult = JsonUtils.parseObjectQuietly(responseEntity.getBody(),
+                    new TypeReference<>() {});
             if (respResult == null || !respResult.isSuccess()) {
                 return;
             }
             // 3.3 获取需要更新的流程变量
-            Map<String, Object> updateVariables = BpmHttpRequestUtils.getNeedUpdatedVariablesFromResponse(respResult.getData(), response);
+            Map<String, Object> updateVariables = getNeedUpdatedVariablesFromResponse(respResult.getData(), response);
             // 3.4 更新流程变量
             if (CollUtil.isNotEmpty(updateVariables)) {
                 processInstanceService.updateProcessInstanceVariables(processInstance.getId(), updateVariables);
             }
         }
-
     }
 
     public static ResponseEntity<String> sendHttpRequest(String url,
                                                          MultiValueMap<String, String> headers,
                                                          MultiValueMap<String, String> body,
                                                          RestTemplate restTemplate) {
-        // 3. 发起请求
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
         ResponseEntity<String> responseEntity;
         try {
@@ -95,7 +96,7 @@ public class BpmHttpRequestUtils {
     }
 
     public static MultiValueMap<String, String> buildHttpHeaders(ProcessInstance processInstance,
-                                                          List<BpmSimpleModelNodeVO.HttpRequestParam> headerSettings) {
+                                                                 List<BpmSimpleModelNodeVO.HttpRequestParam> headerSettings) {
         Map<String, Object> processVariables = processInstance.getProcessVariables();
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.add(HEADER_TENANT_ID, processInstance.getTenantId());
@@ -104,7 +105,7 @@ public class BpmHttpRequestUtils {
     }
 
     public static MultiValueMap<String, String> buildHttpBody(ProcessInstance processInstance,
-                                                       List<BpmSimpleModelNodeVO.HttpRequestParam> bodySettings) {
+                                                              List<BpmSimpleModelNodeVO.HttpRequestParam> bodySettings) {
         Map<String, Object> processVariables = processInstance.getProcessVariables();
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         addHttpRequestParam(body, bodySettings, processVariables);
@@ -120,7 +121,7 @@ public class BpmHttpRequestUtils {
      * @return 需要更新的流程变量
      */
     public static Map<String, Object> getNeedUpdatedVariablesFromResponse(Map<String, Object> result,
-                                                                   List<KeyValue<String, String>> responseSettings) {
+                                                                          List<KeyValue<String, String>> responseSettings) {
         Map<String, Object> updateVariables = new HashMap<>();
         if (CollUtil.isEmpty(result)) {
             return updateVariables;

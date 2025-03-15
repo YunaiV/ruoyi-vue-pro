@@ -41,13 +41,12 @@ public class BpmHttpCallbackTrigger extends BpmAbstractHttpRequestTrigger {
             log.error("[execute][流程({}) HTTP 回调触发器配置为空]", processInstanceId);
             return;
         }
+
         // 2. 发起请求
         ProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
-        // 重要：回调请求 taskDefineKey 需要传给被调用方，用于回调执行
         setting.getBody().add(new BpmSimpleModelNodeVO.HttpRequestParam()
-                .setKey("taskDefineKey")
-                .setType(BpmHttpRequestParamTypeEnum.FIXED_VALUE.getType())
-                .setValue(setting.getCallbackTaskDefineKey()));
+                .setKey("taskDefineKey") // 重要：回调请求 taskDefineKey 需要传给被调用方，用于回调执行
+                .setType(BpmHttpRequestParamTypeEnum.FIXED_VALUE.getType()).setValue(setting.getCallbackTaskDefineKey()));
         BpmHttpRequestUtils.executeBpmHttpRequest(processInstance,
                 setting.getUrl(),
                 setting.getHeader(),
@@ -56,4 +55,5 @@ public class BpmHttpCallbackTrigger extends BpmAbstractHttpRequestTrigger {
                 restTemplate,
                 processInstanceService);
     }
+
 }
