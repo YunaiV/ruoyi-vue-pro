@@ -149,7 +149,7 @@
 
 ### 工作流程
 
-![BPM 功能列表](/img/common/bpm-feature.png)
+![功能图](/.image/common/bpm-feature.png)
 
 基于 Flowable 构建，可支持信创（国产）数据库，满足中国特色流程操作：
 
