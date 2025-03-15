@@ -9,10 +9,10 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.SimpleModelUtils
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.module.bpm.service.task.trigger.BpmTrigger;
 import com.fasterxml.jackson.core.type.TypeReference;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +38,7 @@ public class BpmFormDeleteTrigger implements BpmTrigger {
     @Override
     public void execute(String processInstanceId, String param) {
         // 1. 解析删除流程表单数据配置
-        List<BpmSimpleModelNodeVO.TriggerSetting.FormTriggerSetting> settings = JsonUtils.parseObject(param, new TypeReference<>() {});
+        List<BpmSimpleModelNodeVO.TriggerSetting.FormTriggerSetting> settings = JsonUtils.parseObject(param, new TypeReference<List<BpmSimpleModelNodeVO.TriggerSetting.FormTriggerSetting>>() {});
         if (CollUtil.isEmpty(settings)) {
             log.error("[execute][流程({}) 删除流程表单数据触发器配置为空]", processInstanceId);
             return;

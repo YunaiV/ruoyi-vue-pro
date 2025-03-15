@@ -66,7 +66,7 @@ public class BpmHttpRequestUtils {
             }
             // 3.2 解析返回值, 返回值必须符合 CommonResult 规范。
             CommonResult<Map<String, Object>> respResult = JsonUtils.parseObjectQuietly(responseEntity.getBody(),
-                    new TypeReference<>() {});
+                    new TypeReference<CommonResult<Map<String, Object>>>() {});
             if (respResult == null || !respResult.isSuccess()) {
                 return;
             }
