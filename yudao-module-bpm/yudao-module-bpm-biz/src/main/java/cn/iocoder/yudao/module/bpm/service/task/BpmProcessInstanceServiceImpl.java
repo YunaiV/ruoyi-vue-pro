@@ -390,9 +390,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                                                       HistoricProcessInstance historicProcessInstance, Integer processInstanceStatus,
                                                       List<HistoricActivityInstance> activities, List<HistoricTaskInstance> tasks) {
         // 遍历 tasks 列表，只处理已结束的 UserTask
-        // 为什么不通过 activities 呢？因为，加签场景下，它只存在于 tasks，没有 activities，导致如果遍历 activities
-        // 的话，它无法成为一个节点
-        // TODO @芋艿：子流程只有activity，这里获取不到已结束的子流程；TODO @lesan：这个会导致timeline不会展示已结束的子流程
+        // 为什么不通过 activities 呢？因为，加签场景下，它只存在于 tasks，没有 activities，导致如果遍历 activities 的话，它无法成为一个节点
+        // TODO @芋艿：子流程只有activity，这里获取不到已结束的子流程；
+        // TODO @lesan：【子流程】基于 activities 查询出 usertask、callactivity，然后拼接？如果是子流程，就是可以点击过去？
         List<HistoricTaskInstance> endTasks = filterList(tasks, task -> task.getEndTime() != null);
         List<ActivityNode> approvalNodes = convertList(endTasks, task -> {
             FlowElement flowNode = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
@@ -468,6 +468,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 HistoricActivityInstance::getActivityId);
 
         // 按照 activityId 分组，构建 ApprovalNodeInfo 节点
+        // TODO @lesan：【子流程】在子流程进行审批的时候，HistoricActivityInstance 里面可以拿到 runActivities.get(0).getCalledProcessInstanceId()。要不要支持跳转？？？
         Map<String, HistoricTaskInstance> taskMap = convertMap(tasks, HistoricTaskInstance::getId);
         return convertList(runningTaskMap.entrySet(), entry -> {
             String activityId = entry.getKey();
