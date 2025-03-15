@@ -21,6 +21,7 @@ import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.javax.el.PropertyNotFoundException;
 import org.flowable.common.engine.impl.util.io.BytesStreamSource;
 import org.flowable.engine.impl.el.FixedValue;
 
@@ -907,17 +908,9 @@ public class BpmnModelUtils {
      * @return 符合条件的路径
      */
     private static SequenceFlow findMatchSequenceFlowByExclusiveGateway(Gateway gateway, Map<String, Object> variables) {
-        // TODO 表单无可编辑字段时variables为空，流程走向会出现问题，比如流程审批过程中无需要修改的字段值，
-        // TODO @小北：是不是还是保证，编辑的时候，如果计算下一个节点，还是 variables 是完整体？而不是空的！！！（可以微信讨论下）
-        SequenceFlow matchSequenceFlow;
-        if (CollUtil.isNotEmpty(variables)) {
-             matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
+        SequenceFlow matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
                     flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId())
                             && (evalConditionExpress(variables, flow.getConditionExpression())));
-        } else {
-            matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
-                    flow -> ObjUtil.notEqual(gateway.getDefaultFlow(), flow.getId()));
-        }
         if (matchSequenceFlow == null) {
             matchSequenceFlow = CollUtil.findOne(gateway.getOutgoingFlows(),
                     flow -> ObjUtil.equal(gateway.getDefaultFlow(), flow.getId()));
@@ -1014,6 +1007,11 @@ public class BpmnModelUtils {
             Object result = FlowableUtils.getExpressionValue(variables, expression);
             return Boolean.TRUE.equals(result);
         } catch (FlowableException ex) {
+            // TODO @芋艿 临时方案解决流程变量中不包含条件表达式时报错问题，如果expression 的计算，可能不依赖于 variables，getExpressionValue方法应该需要重构
+            if (ex.getCause() instanceof PropertyNotFoundException){
+                log.error("[evalConditionExpress][条件表达式({}) 变量({}) 解析报错]", expression, variables, ex);
+                return Boolean.FALSE;
+            }
             // 为什么使用 info 日志？原因是，expression 如果从 variables 取不到值，会报错。实际这种情况下，可以忽略
             log.info("[evalConditionExpress][条件表达式({}) 变量({}) 解析报错]", expression, variables, ex);
             return Boolean.FALSE;
