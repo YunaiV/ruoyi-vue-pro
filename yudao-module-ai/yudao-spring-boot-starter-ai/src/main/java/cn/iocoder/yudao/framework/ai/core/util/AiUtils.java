@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.ai.core.util;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
@@ -13,6 +14,7 @@ import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.qianfan.QianFanChatOptions;
 import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
 
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -28,6 +30,7 @@ public class AiUtils {
 
     public static ChatOptions buildChatOptions(AiPlatformEnum platform, String model, Double temperature, Integer maxTokens,
                                                Set<String> toolNames) {
+        toolNames = ObjUtil.defaultIfNull(toolNames, Collections.emptySet());
         // noinspection EnhancedSwitchMigration
         switch (platform) {
             case TONG_YI:
