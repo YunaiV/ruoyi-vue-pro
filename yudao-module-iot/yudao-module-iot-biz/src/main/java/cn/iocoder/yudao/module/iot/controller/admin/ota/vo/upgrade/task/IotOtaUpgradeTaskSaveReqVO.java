@@ -57,13 +57,4 @@ public class IotOtaUpgradeTaskSaveReqVO {
     @Schema(description = "选中的设备编号数组", requiredMode = REQUIRED, example = "[1,2,3,4]")
     private List<Long> deviceIds;
 
-    // TODO @li：通过 deviceIds 查询 deviceNames，前端不传递哈
-    /**
-     * 选中的设备名字数组
-     * <p>
-     * 关联 {@link IotDeviceDO#getDeviceName()}
-     */
-    @Schema(description = "选中的设备名字数组", requiredMode = REQUIRED, example = "[设备1,设备2,设备3,设备4]")
-    private List<String> deviceNames;
-
 }

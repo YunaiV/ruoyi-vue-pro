@@ -4,21 +4,4 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.iocoder.yudao.module.iot.dal.mysql.ota.IotOtaUpgradeRecordMapper">
 
-    <!-- TODO @li：看看是不是可以通过 mybatis plus 写哈，更好适配多 db -->
-    <select id="getOtaUpgradeRecordCount" resultType="java.lang.Long">
-        select count(*)
-        from iot_ota_upgrade_record
-        where task_id = #{taskId}
-          and device_name like concat('%', #{deviceName}, '%')
-          and status = #{status}
-    </select>
-
-    <!-- TODO @li：看看是不是可以通过 mybatis plus 写哈，更好适配多 db -->
-    <select id="getOtaUpgradeRecordStatistics" resultType="java.lang.Long">
-        select count(*)
-        from iot_ota_upgrade_record
-        where firmware_id = #{firmwareId}
-          and status = #{status}
-    </select>
-
 </mapper>

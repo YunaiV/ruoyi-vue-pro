@@ -8,10 +8,10 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 
-// TODO @li：类、方法注释有点冗余，可以参考别的模块哈
 /**
- * IoT OTA升级任务服务接口
- * 提供OTA升级任务的创建、取消和查询功能
+ * IoT OTA升级任务 Service 接口
+ *
+ * @author Shelly Chan
  */
 public interface IotOtaUpgradeTaskService {
 

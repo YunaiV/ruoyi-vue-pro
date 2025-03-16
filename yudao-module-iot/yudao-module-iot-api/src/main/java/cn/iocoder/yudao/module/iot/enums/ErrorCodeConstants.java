@@ -56,16 +56,15 @@ public interface ErrorCodeConstants {
     ErrorCode OTA_FIRMWARE_NOT_EXISTS = new ErrorCode(1_050_008_000, "固件信息不存在");
     ErrorCode OTA_FIRMWARE_PRODUCT_VERSION_DUPLICATE = new ErrorCode(1_050_008_001, "产品版本号重复");
 
-    // TODO @li：1_050_008_100，这样有点间隔？
-    ErrorCode OTA_UPGRADE_TASK_NOT_EXISTS = new ErrorCode(1_050_008_002, "升级任务不存在");
-    ErrorCode OTA_UPGRADE_TASK_NAME_DUPLICATE = new ErrorCode(1_050_008_003, "升级任务名称重复");
-    ErrorCode OTA_UPGRADE_TASK_PARAMS_INVALID = new ErrorCode(1_050_008_004, "升级任务参数无效");
-    ErrorCode OTA_UPGRADE_TASK_CANNOT_CANCEL = new ErrorCode(1_050_008_005, "升级任务不能取消");
+    ErrorCode OTA_UPGRADE_TASK_NOT_EXISTS = new ErrorCode(1_050_008_100, "升级任务不存在");
+    ErrorCode OTA_UPGRADE_TASK_NAME_DUPLICATE = new ErrorCode(1_050_008_101, "升级任务名称重复");
+    ErrorCode OTA_UPGRADE_TASK_DEVICE_IDS_EMPTY = new ErrorCode(1_050_008_102, "设备编号列表不能为空");
+    ErrorCode OTA_UPGRADE_TASK_DEVICE_LIST_EMPTY = new ErrorCode(1_050_008_103, "设备列表不能为空");
+    ErrorCode OTA_UPGRADE_TASK_CANNOT_CANCEL = new ErrorCode(1_050_008_104, "升级任务不能取消");
 
-    // TODO @li：1_050_008_200
-    ErrorCode OTA_UPGRADE_RECORD_NOT_EXISTS = new ErrorCode(1_050_008_006, "升级记录不存在");
-    ErrorCode OTA_UPGRADE_RECORD_DUPLICATE = new ErrorCode(1_050_008_007, "升级记录重复");
-    ErrorCode OTA_UPGRADE_RECORD_CANNOT_RETRY = new ErrorCode(1_050_008_008, "升级记录不能重试");
+    ErrorCode OTA_UPGRADE_RECORD_NOT_EXISTS = new ErrorCode(1_050_008_200, "升级记录不存在");
+    ErrorCode OTA_UPGRADE_RECORD_DUPLICATE = new ErrorCode(1_050_008_201, "升级记录重复");
+    ErrorCode OTA_UPGRADE_RECORD_CANNOT_RETRY = new ErrorCode(1_050_008_202, "升级记录不能重试");
 
     // ========== MQTT 通信相关 1-050-009-000 ==========
     ErrorCode MQTT_TOPIC_ILLEGAL = new ErrorCode(1_050_009_000, "topic illegal");

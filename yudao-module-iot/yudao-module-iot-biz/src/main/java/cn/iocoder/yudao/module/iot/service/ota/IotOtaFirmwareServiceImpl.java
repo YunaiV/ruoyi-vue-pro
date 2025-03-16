@@ -1,14 +1,19 @@
 package cn.iocoder.yudao.module.iot.service.ota;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.firmware.IotOtaFirmwareCreateReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.firmware.IotOtaFirmwarePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.firmware.IotOtaFirmwareUpdateReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.ota.IotOtaFirmwareMapper;
+import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -26,23 +31,28 @@ public class IotOtaFirmwareServiceImpl implements IotOtaFirmwareService {
 
     @Resource
     private IotOtaFirmwareMapper otaFirmwareMapper;
+    @Lazy
+    @Resource
+    private IotProductService productService;
 
     @Override
     public Long createOtaFirmware(IotOtaFirmwareCreateReqVO saveReqVO) {
         // 1. 校验固件产品 + 版本号不能重复
-        // TODO @li：需要考虑设备也存在
         validateProductAndVersionDuplicate(saveReqVO.getProductId(), saveReqVO.getVersion());
-
-        // 2.转化数据格式，准备存储到数据库中
+        // 2.1.转化数据格式，准备存储到数据库中
         IotOtaFirmwareDO firmware = BeanUtils.toBean(saveReqVO, IotOtaFirmwareDO.class);
+        // 2.2.查询ProductKey
+        IotProductDO product = productService.getProduct(Convert.toLong(firmware.getProductId()));
+        firmware.setProductKey(Objects.requireNonNull(product).getProductKey());
+        // TODO @芋艿: 附件、附件签名等属性的计算
+
         otaFirmwareMapper.insert(firmware);
         return firmware.getId();
     }
 
     @Override
     public void updateOtaFirmware(IotOtaFirmwareUpdateReqVO updateReqVO) {
-        // TODO @li：如果序号只有一个，直接写 1. 更好哈
-        // 1.1. 校验存在
+        // 1. 校验存在
         validateFirmwareExists(updateReqVO.getId());
 
         // 2. 更新数据
@@ -84,8 +94,7 @@ public class IotOtaFirmwareServiceImpl implements IotOtaFirmwareService {
         // 查询数据库中是否存在具有相同产品ID和版本号的固件信息
         List<IotOtaFirmwareDO> list = otaFirmwareMapper.selectByProductIdAndVersion(productId, version);
         // 如果查询结果非空且不为null，则抛出异常，提示固件信息已存在
-        // TODO @li：使用 isNotEmpty 这种 方法，简化
-        if (Objects.nonNull(list) && !list.isEmpty()) {
+        if (CollUtil.isNotEmpty(list)) {
             throw exception(OTA_FIRMWARE_PRODUCT_VERSION_DUPLICATE);
         }
     }

@@ -64,8 +64,7 @@ public class IotOtaUpgradeRecordController {
         return success(BeanUtils.toBean(upgradeRecord, IotOtaUpgradeRecordRespVO.class));
     }
 
-    // TODO @li：使用 Putmapping
-    @PostMapping("/retry")
+    @PutMapping("/retry")
     @Operation(summary = "重试升级记录")
     @PreAuthorize("@ss.hasPermission('iot:ota-upgrade-record:retry')")
     @Parameter(name = "id", description = "升级记录编号", required = true, example = "1024")

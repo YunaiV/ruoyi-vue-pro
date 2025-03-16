@@ -9,10 +9,10 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
-// TODO @li：这里的注释，可以去掉哈，多了点点
 /**
- * IotOtaUpgradeTaskMapper 接口用于操作 IotOtaUpgradeTaskDO 数据库表。
- * 该接口继承自 BaseMapperX，提供了基本的数据库操作方法。
+ * OTA 升级任务Mapper
+ *
+ * @author Shelly
  */
 @Mapper
 public interface IotOtaUpgradeTaskMapper extends BaseMapperX<IotOtaUpgradeTaskDO> {
@@ -53,6 +53,5 @@ public interface IotOtaUpgradeTaskMapper extends BaseMapperX<IotOtaUpgradeTaskDO
     default List<IotOtaUpgradeTaskDO> selectUpgradeTaskByState(Integer status) {
         return selectList(IotOtaUpgradeTaskDO::getStatus, status);
     }
-
 
 }

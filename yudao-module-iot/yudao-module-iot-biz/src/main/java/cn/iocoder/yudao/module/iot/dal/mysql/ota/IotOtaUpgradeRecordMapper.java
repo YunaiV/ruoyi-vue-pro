@@ -5,16 +5,18 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.record.IotOtaUpgradeRecordPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaUpgradeRecordDO;
-import cn.iocoder.yudao.module.iot.enums.ota.IotOtaUpgradeRecordStatusEnum;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
-// TODO @li：这里的注释，可以去掉哈，多了点点
 /**
- * OTA 升级记录 Mapper 接口
+ * OTA 升级记录 Mapper
+ *
+ * @author Shelly
  */
 @Mapper
 public interface IotOtaUpgradeRecordMapper extends BaseMapperX<IotOtaUpgradeRecordDO> {
@@ -36,27 +38,42 @@ public interface IotOtaUpgradeRecordMapper extends BaseMapperX<IotOtaUpgradeReco
     }
 
     /**
-     * 获取OTA升级记录的数量
+     * 根据任务ID和设备名称查询OTA升级记录的状态统计信息。
+     * 该函数通过SQL查询统计不同状态（0到5）的记录数量，并返回一个包含统计结果的Map列表。
      *
-     * @param taskId     任务ID，用于筛选特定任务的升级记录
-     * @param deviceName 设备名称，用于筛选特定设备的升级记录
-     * @param status     状态，用于筛选特定状态的升级记录
-     * @return 返回符合条件的OTA升级记录的数量
+     * @param taskId     任务ID，用于筛选特定任务的OTA升级记录。
+     * @param deviceName 设备名称，支持模糊查询，用于筛选特定设备的OTA升级记录。
+     * @return 返回一个Map列表，每个Map包含不同状态（0到5）的记录数量。
      */
-    Long getOtaUpgradeRecordCount(@Param("taskId") Long taskId,
-                                  @Param("deviceName") String deviceName,
-                                  @Param("status") Integer status);
+    @Select("select count(case when status = 0 then 1 else 0) as `0` " +
+            "count(case when status = 1 then 1 else 0) as `1` " +
+            "count(case when status = 2 then 1 else 0) as `2` " +
+            "count(case when status = 3 then 1 else 0) as `3` " +
+            "count(case when status = 4 then 1 else 0) as `4` " +
+            "count(case when status = 5 then 1 else 0) as `5` " +
+            "from iot_ota_upgrade_record " +
+            "where task_id = #{taskId} " +
+            "and device_name like concat('%', #{deviceName}, '%') " +
+            "and status = #{status}")
+    List<Map<String, Object>> selectOtaUpgradeRecordCount(@Param("taskId") Long taskId,
+                                                          @Param("deviceName") String deviceName);
 
     /**
-     * 获取OTA升级记录的统计信息
+     * 根据固件ID查询OTA升级记录的状态统计信息。
+     * 该函数通过SQL查询统计不同状态（0到5）的记录数量，并返回一个包含统计结果的Map列表。
      *
-     * @param firmwareId 固件ID，用于筛选特定固件的升级记录
-     * @param status     状态，用于筛选特定状态的升级记录
-     * @return 返回符合条件的OTA升级记录的统计信息
+     * @param firmwareId 固件ID，用于筛选特定固件的OTA升级记录。
+     * @return 返回一个Map列表，每个Map包含不同状态（0到5）的记录数量。
      */
-    Long getOtaUpgradeRecordStatistics(@Param("firmwareId") Long firmwareId,
-                                       @Param("status") Integer status);
-
+    @Select("select count(case when status = 0 then 1 else 0) as `0` " +
+            "count(case when status = 1 then 1 else 0) as `1` " +
+            "count(case when status = 2 then 1 else 0) as `2` " +
+            "count(case when status = 3 then 1 else 0) as `3` " +
+            "count(case when status = 4 then 1 else 0) as `4` " +
+            "count(case when status = 5 then 1 else 0) as `5` " +
+            "from iot_ota_upgrade_record " +
+            "where firmware_id = #{firmwareId}")
+    List<Map<String, Object>> selectOtaUpgradeRecordStatistics(Long firmwareId);
 
     /**
      * 根据分页查询条件获取IOT OTA升级记录的分页结果
@@ -72,18 +89,20 @@ public interface IotOtaUpgradeRecordMapper extends BaseMapperX<IotOtaUpgradeReco
     }
 
     /**
-     * 根据任务ID取消升级记录。
-     * 该方法通过任务ID查找状态为“待处理”的升级记录，并将其状态更新为“已取消”。
+     * 根据任务ID和状态更新升级记录的状态
+     * <p>
+     * 该函数用于将符合指定任务ID和状态的升级记录的状态更新为新的状态。
      *
-     * @param taskId 任务ID，用于查找对应的升级记录。
+     * @param setStatus   要设置的新状态值，类型为Integer
+     * @param taskId      要更新的升级记录对应的任务ID，类型为Long
+     * @param whereStatus 用于筛选升级记录的当前状态值，类型为Integer
      */
-    default void cancelUpgradeRecordByTaskId(Long taskId) {
-        // 使用LambdaUpdateWrapper构建更新条件，将状态为“待处理”的记录更新为“已取消”
-        // TODO @li：哪些可以更新，通过 service 传递。mapper 尽量不要有逻辑
+    default void updateUpgradeRecordStatusByTaskIdAndStatus(Integer setStatus, Long taskId, Integer whereStatus) {
+        // 使用LambdaUpdateWrapper构建更新条件，将指定状态的记录更新为指定状态
         update(new LambdaUpdateWrapper<IotOtaUpgradeRecordDO>()
-                .set(IotOtaUpgradeRecordDO::getStatus, IotOtaUpgradeRecordStatusEnum.CANCELED.getStatus())
+                .set(IotOtaUpgradeRecordDO::getStatus, setStatus)
                 .eq(IotOtaUpgradeRecordDO::getTaskId, taskId)
-                .eq(IotOtaUpgradeRecordDO::getStatus, IotOtaUpgradeRecordStatusEnum.PENDING.getStatus())
+                .eq(IotOtaUpgradeRecordDO::getStatus, whereStatus)
         );
     }
 

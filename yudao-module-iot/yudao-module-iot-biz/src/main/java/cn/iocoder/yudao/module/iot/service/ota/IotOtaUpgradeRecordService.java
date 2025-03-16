@@ -3,8 +3,6 @@ package cn.iocoder.yudao.module.iot.service.ota;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.record.IotOtaUpgradeRecordPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaUpgradeRecordDO;
-import cn.iocoder.yudao.module.iot.service.ota.bo.IotOtaUpgradeRecordCreateReqBO;
-import cn.iocoder.yudao.module.iot.service.ota.bo.IotOtaUpgradeRecordUpdateReqBO;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -16,25 +14,15 @@ import java.util.Map;
  */
 public interface IotOtaUpgradeRecordService {
 
-    // TODO @createOtaUpgradeRecordBatch 哈，需要补充方法里，缺少 Ota 关键字的
-
     /**
-     * 批量创建物联网OTA升级记录
-     * <p>
-     * 该函数用于处理一组物联网OTA升级记录的创建请求，并将这些记录批量保存到系统中。
+     * 批量创建OTA升级记录。
+     * 该函数用于为指定的设备列表、固件ID和升级任务ID创建OTA升级记录。
      *
-     * @param createList 包含多个物联网OTA升级记录创建请求的列表，每个请求对象都经过校验（@Valid注解确保）
-     *                 列表中的每个元素都是IotOtaUpgradeRecordCreateReqBO类型的对象，表示一个独立的升级记录创建请求。
+     * @param deviceIds     设备ID列表，表示需要升级的设备集合。
+     * @param firmwareId    固件ID，表示要升级到的固件版本。
+     * @param upgradeTaskId 升级任务ID，表示此次升级任务的唯一标识。
      */
-    void createUpgradeRecordBatch(@Valid List<IotOtaUpgradeRecordCreateReqBO> createList);
-
-    // TODO @li：尽量避免写比较大的通用 update。而是根据场景提供，这样才能收敛
-    /**
-     * 更新现有的 OTA 升级记录
-     *
-     * @param updateReqBO 包含更新升级记录所需信息的请求对象，必须经过验证。
-     */
-    void updateUpgradeRecord(@Valid IotOtaUpgradeRecordUpdateReqBO updateReqBO);
+    void createOtaUpgradeRecordBatch(List<Long> deviceIds, Long firmwareId, Long upgradeTaskId);
 
     /**
      * 获取OTA升级记录的数量统计。
