@@ -122,9 +122,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     @Resource
     private BpmProcessIdRedisDAO processIdRedisDAO;
 
-    @Resource
-    private RestTemplate restTemplate;
-
     // ========== Query 查询相关方法 ==========
 
     @Override
@@ -914,16 +911,14 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService.
                         getProcessDefinitionInfo(instance.getProcessDefinitionId());
                 if (ObjUtil.isNotNull(processDefinitionInfo) &&
-                        ObjUtil.isNotNull(processDefinitionInfo.getPostProcessNotifySetting())) {
-                    BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getPostProcessNotifySetting();
+                        ObjUtil.isNotNull(processDefinitionInfo.getProcessAfterTriggerSetting())) {
+                    BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getProcessAfterTriggerSetting();
 
                     BpmHttpRequestUtils.executeBpmHttpRequest(instance,
                             setting.getUrl(),
                             setting.getHeader(),
                             setting.getBody(),
-                            true, setting.getResponse(),
-                            restTemplate,
-                            this);
+                            true, setting.getResponse());
                 }
             }
         });
@@ -936,18 +931,16 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             // 流程前置通知
             BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService.
                     getProcessDefinitionInfo(instance.getProcessDefinitionId());
-            // TODO @lesan：if return 哈。减少括号。
-            if (ObjUtil.isNotNull(processDefinitionInfo) &&
-                    ObjUtil.isNotNull(processDefinitionInfo.getPreProcessNotifySetting())) {
-                BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getPreProcessNotifySetting();
-                BpmHttpRequestUtils.executeBpmHttpRequest(instance,
-                        setting.getUrl(),
-                        setting.getHeader(),
-                        setting.getBody(),
-                        true, setting.getResponse(),
-                        restTemplate,
-                        this);
+            if (ObjUtil.isNull(processDefinitionInfo) ||
+                    ObjUtil.isNull(processDefinitionInfo.getProcessBeforeTriggerSetting())) {
+                return;
             }
+            BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getProcessBeforeTriggerSetting();
+            BpmHttpRequestUtils.executeBpmHttpRequest(instance,
+                    setting.getUrl(),
+                    setting.getHeader(),
+                    setting.getBody(),
+                    true, setting.getResponse());
         });
     }
 

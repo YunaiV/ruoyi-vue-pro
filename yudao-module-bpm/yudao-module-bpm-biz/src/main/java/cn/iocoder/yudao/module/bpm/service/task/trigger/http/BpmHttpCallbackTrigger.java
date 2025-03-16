@@ -22,9 +22,6 @@ import org.springframework.web.client.RestTemplate;
 public class BpmHttpCallbackTrigger extends BpmAbstractHttpRequestTrigger {
 
     @Resource
-    private RestTemplate restTemplate;
-
-    @Resource
     private BpmProcessInstanceService processInstanceService;
 
     @Override
@@ -51,9 +48,7 @@ public class BpmHttpCallbackTrigger extends BpmAbstractHttpRequestTrigger {
                 setting.getUrl(),
                 setting.getHeader(),
                 setting.getBody(),
-                false, null,
-                restTemplate,
-                processInstanceService);
+                false, null);
     }
 
 }

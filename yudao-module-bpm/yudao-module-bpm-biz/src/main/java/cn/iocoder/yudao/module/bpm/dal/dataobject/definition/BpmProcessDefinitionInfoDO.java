@@ -188,16 +188,15 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private BpmModelMetaInfoVO.SummarySetting summarySetting;
 
-    // TODO @lesan：processBeforeTriggerSetting；要不叫这个？主要考虑，notify 留给后续的站内信、短信、邮件这种 notify 通知哈。
     /**
      * 流程前置通知设置
      */
-    @TableField(typeHandler = JacksonTypeHandler.class, exist = false) // TODO @芋艿：临时注释 exist，因为要合并 master-jdk17
-    private BpmModelMetaInfoVO.HttpRequestSetting PreProcessNotifySetting;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private BpmModelMetaInfoVO.HttpRequestSetting processBeforeTriggerSetting;
     /**
      * 流程后置通知设置
      */
-    @TableField(typeHandler = JacksonTypeHandler.class, exist = false) // TODO @芋艿：临时注释 exist，因为要合并 master-jdk17
-    private BpmModelMetaInfoVO.HttpRequestSetting PostProcessNotifySetting;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private BpmModelMetaInfoVO.HttpRequestSetting processAfterTriggerSetting;
 
 }
