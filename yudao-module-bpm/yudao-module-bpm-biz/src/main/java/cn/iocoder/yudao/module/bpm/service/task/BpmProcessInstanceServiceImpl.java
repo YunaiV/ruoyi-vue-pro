@@ -289,9 +289,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             // 4.2 组装候选用户信息
             List<UserSimpleBaseVO> candidateUsers = new ArrayList<>();
             for (Long userId : candidateUserIds) {
-                AdminUserRespDTO user = userMap.get(userId);
-                if (user != null) {
-                    candidateUsers.add(BpmProcessInstanceConvert.INSTANCE.buildUser(userId, userMap, deptMap));
+                UserSimpleBaseVO user = BpmProcessInstanceConvert.INSTANCE.buildUser(userId, userMap, deptMap);
+                if (user != null){
+                    candidateUsers.add(user);
                 }
             }
 
