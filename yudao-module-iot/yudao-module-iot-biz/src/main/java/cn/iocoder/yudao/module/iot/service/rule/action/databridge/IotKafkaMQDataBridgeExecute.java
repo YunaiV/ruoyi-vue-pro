@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeKafkaMQConfig;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -75,40 +73,6 @@ public class IotKafkaMQDataBridgeExecute extends
     @Override
     protected void closeProducer(KafkaTemplate<String, String> producer) {
         producer.destroy();
-    }
-
-    // TODO @芋艿：测试代码，后续清理
-    public static void main(String[] args) {
-        // 1. 创建一个共享的实例
-        IotKafkaMQDataBridgeExecute action = new IotKafkaMQDataBridgeExecute();
-
-        // 2. 创建共享的配置
-        IotDataBridgeKafkaMQConfig config = new IotDataBridgeKafkaMQConfig();
-        config.setBootstrapServers("127.0.0.1:9092");
-        config.setTopic("test-topic");
-        config.setSsl(false);
-        config.setUsername(null);
-        config.setPassword(null);
-
-        // 3. 创建共享的消息
-        IotDeviceMessage message = IotDeviceMessage.builder()
-                .requestId("TEST-001")
-                .productKey("testProduct")
-                .deviceName("testDevice")
-                .deviceKey("testDeviceKey")
-                .type("property")
-                .identifier("temperature")
-                .data("{\"value\": 60}")
-                .reportTime(LocalDateTime.now())
-                .tenantId(1L)
-                .build();
-
-        // 4. 执行两次测试，验证缓存
-        log.info("[main][第一次执行，应该会创建新的 producer]");
-        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
-
-        log.info("[main][第二次执行，应该会复用缓存的 producer]");
-        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
     }
 
 }

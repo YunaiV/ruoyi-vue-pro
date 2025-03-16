@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.rule;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeAbstractConfig;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeDirectionEnum;
@@ -42,7 +43,7 @@ public class IotDataBridgeDO extends BaseDO {
     /**
      * 桥梁状态
      *
-     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum}
+     * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
     /**

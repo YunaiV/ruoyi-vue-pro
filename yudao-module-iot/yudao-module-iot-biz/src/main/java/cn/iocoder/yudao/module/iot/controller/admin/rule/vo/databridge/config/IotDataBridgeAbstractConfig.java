@@ -15,12 +15,12 @@ import lombok.Data;
 @Data
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", visible = true)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = IotDataBridgeHttpConfig.class, name = "HTTP"),
-        @JsonSubTypes.Type(value = IotDataBridgeKafkaMQConfig.class, name = "KAFKA"),
-        @JsonSubTypes.Type(value = IotDataBridgeMqttConfig.class, name = "MQTT"),
-        @JsonSubTypes.Type(value = IotDataBridgeRabbitMQConfig.class, name = "RABBITMQ"),
-        @JsonSubTypes.Type(value = IotDataBridgeRedisStreamMQConfig.class, name = "REDIS_STREAM"),
-        @JsonSubTypes.Type(value = IotDataBridgeRocketMQConfig.class, name = "ROCKETMQ"),
+        @JsonSubTypes.Type(value = IotDataBridgeHttpConfig.class, name = "1"),
+        @JsonSubTypes.Type(value = IotDataBridgeMqttConfig.class, name = "10"),
+        @JsonSubTypes.Type(value = IotDataBridgeRedisStreamMQConfig.class, name = "21"),
+        @JsonSubTypes.Type(value = IotDataBridgeRocketMQConfig.class, name = "30"),
+        @JsonSubTypes.Type(value = IotDataBridgeRabbitMQConfig.class, name = "31"),
+        @JsonSubTypes.Type(value = IotDataBridgeKafkaMQConfig.class, name = "32"),
 })
 public abstract class IotDataBridgeAbstractConfig {
 

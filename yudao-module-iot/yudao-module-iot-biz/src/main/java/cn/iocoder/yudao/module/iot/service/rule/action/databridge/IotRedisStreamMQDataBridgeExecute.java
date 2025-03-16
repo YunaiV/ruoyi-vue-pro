@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeRedisStreamMQConfig;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,8 +19,6 @@ import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 /**
  * Redis Stream MQ 的 {@link IotDataBridgeExecute} 实现类
@@ -94,40 +91,6 @@ public class IotRedisStreamMQDataBridgeExecute extends
         ObjectMapper objectMapper = (ObjectMapper) ReflectUtil.getFieldValue(json, "mapper");
         objectMapper.registerModules(new JavaTimeModule());
         return json;
-    }
-
-    // TODO @芋艿：测试代码，后续清理
-    public static void main(String[] args) {
-        // 1. 创建一个共享的实例
-        IotRedisStreamMQDataBridgeExecute action = new IotRedisStreamMQDataBridgeExecute();
-
-        // 2. 创建共享的配置
-        IotDataBridgeRedisStreamMQConfig config = new IotDataBridgeRedisStreamMQConfig();
-        config.setHost("127.0.0.1");
-        config.setPort(6379);
-        config.setDatabase(0);
-        config.setPassword("123456");
-        config.setTopic("test-stream");
-
-        // 3. 创建共享的消息
-        IotDeviceMessage message = IotDeviceMessage.builder()
-                .requestId("TEST-001")
-                .productKey("testProduct")
-                .deviceName("testDevice")
-                .deviceKey("testDeviceKey")
-                .type("property")
-                .identifier("temperature")
-                .data("{\"value\": 60}")
-                .reportTime(LocalDateTime.now())
-                .tenantId(1L)
-                .build();
-
-        // 4. 执行两次测试，验证缓存
-        log.info("[main][第一次执行，应该会创建新的 producer]");
-        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
-
-        log.info("[main][第二次执行，应该会复用缓存的 producer]");
-        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
     }
 
 }
