@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.util.List;
 
+// TODO @芋艿：要写清楚，是来自设备网关，还是设备。
 /**
  * IoT 设备【拓扑】添加 Request DTO
  */

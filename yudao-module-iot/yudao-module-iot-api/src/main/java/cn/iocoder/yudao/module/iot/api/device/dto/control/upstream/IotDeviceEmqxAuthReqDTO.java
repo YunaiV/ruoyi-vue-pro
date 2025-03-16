@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 // TODO @芋艿：要不要继承 IotDeviceUpstreamAbstractReqDTO
+// TODO @芋艿：@haohao：后续其它认证的设计
 /**
  * IoT 认证 Emqx 连接 Request DTO
  *

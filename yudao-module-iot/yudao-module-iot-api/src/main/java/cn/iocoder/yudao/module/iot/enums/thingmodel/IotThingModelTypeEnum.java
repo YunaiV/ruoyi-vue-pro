@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * IOT 产品功能（物模型）类型枚举类
+ * IoT 产品功能（物模型）类型枚举类
  *
  * @author ahh
  */
@@ -29,15 +29,6 @@ public enum IotThingModelTypeEnum implements ArrayValuable<Integer> {
      * 描述
      */
     private final String description;
-
-    public static IotThingModelTypeEnum valueOfType(Integer type) {
-        for (IotThingModelTypeEnum value : values()) {
-            if (value.getType().equals(type)) {
-                return value;
-            }
-        }
-        return null;
-    }
 
     @Override
     public Integer[] array() {

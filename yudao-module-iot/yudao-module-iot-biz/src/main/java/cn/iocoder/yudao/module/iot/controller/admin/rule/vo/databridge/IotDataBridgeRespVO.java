@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - IoT 数据桥梁 Response VO")
 @Data
-@ExcelIgnoreUnannotated
 public class IotDataBridgeRespVO {
 
     @Schema(description = "桥梁编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "18564")

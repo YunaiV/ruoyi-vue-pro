@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.plugin.common.pojo;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-// TODO @芋艿：1）后续考虑，要不要叫 Iot 网关之类的 Response；2）包名 pojo
+// TODO @芋艿：1）后续考虑，要不要叫 IoT 网关之类的 Response；2）包名 pojo
 /**
  * IoT 标准协议响应实体类
  * <p>

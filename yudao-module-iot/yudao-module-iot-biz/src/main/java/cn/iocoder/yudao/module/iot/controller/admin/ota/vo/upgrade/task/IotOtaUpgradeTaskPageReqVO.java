@@ -8,7 +8,7 @@ import lombok.Data;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 @Data
-@Schema(description = "管理后台 - OTA升级任务分页 Request VO")
+@Schema(description = "管理后台 - IoT OTA 升级任务分页 Request VO")
 public class IotOtaUpgradeTaskPageReqVO extends PageParam {
 
     /**

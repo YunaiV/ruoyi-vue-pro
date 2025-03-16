@@ -17,8 +17,6 @@ import java.time.LocalDateTime;
 @TableName(value = "iot_ota_upgrade_record", autoResultMap = true)
 @KeySequence("iot_ota_upgrade_record_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

@@ -7,7 +7,7 @@ import lombok.Data;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
-@Schema(description = "管理后台 - OTA 固件创建 Request VO")
+@Schema(description = "管理后台 - IoT OTA 固件创建 Request VO")
 @Data
 public class IotOtaFirmwareCreateReqVO {
 

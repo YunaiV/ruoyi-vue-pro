@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.enums.plugin;
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
@@ -10,6 +11,7 @@ import java.util.Arrays;
  *
  * @author haohao
  */
+@RequiredArgsConstructor
 @Getter
 public enum IotPluginStatusEnum implements ArrayValuable<Integer> {
 
@@ -22,35 +24,14 @@ public enum IotPluginStatusEnum implements ArrayValuable<Integer> {
      * 状态
      */
     private final Integer status;
-
     /**
      * 状态名
      */
     private final String name;
 
-    IotPluginStatusEnum(Integer status, String name) {
-        this.status = status;
-        this.name = name;
-    }
-
-    public static IotPluginStatusEnum fromState(Integer state) {
-        return Arrays.stream(values())
-                .filter(value -> value.getStatus().equals(state))
-                .findFirst()
-                .orElse(null);
-    }
-
     @Override
     public Integer[] array() {
         return ARRAYS;
-    }
-
-    public static boolean isValidState(Integer state) {
-        return fromState(state) != null;
-    }
-
-    public static boolean contains(Integer status) {
-        return Arrays.stream(values()).anyMatch(e -> e.getStatus().equals(status));
     }
 
 }

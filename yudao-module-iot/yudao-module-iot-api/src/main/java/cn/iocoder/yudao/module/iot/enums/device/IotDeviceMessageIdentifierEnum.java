@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.enums.device;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+// TODO @芋艿：需要添加对应的 DTO，以及上下行的链路，网关、网关服务、设备等
 /**
  * IoT 设备消息标识符枚举
  */

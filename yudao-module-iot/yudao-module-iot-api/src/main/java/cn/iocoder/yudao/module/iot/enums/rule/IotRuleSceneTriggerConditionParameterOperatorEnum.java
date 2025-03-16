@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 
 /**
- * Iot 场景触发条件参数的操作符枚举
+ * IoT 场景触发条件参数的操作符枚举
  *
  * @author 芋道源码
  */

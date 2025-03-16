@@ -17,8 +17,6 @@ import lombok.*;
 @TableName("iot_plugin_config")
 @KeySequence("iot_plugin_config_seq")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

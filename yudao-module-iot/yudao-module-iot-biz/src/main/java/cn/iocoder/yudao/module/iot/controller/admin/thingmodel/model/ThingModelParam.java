@@ -11,7 +11,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * IOT 产品物模型中的参数
+ * IoT 产品物模型中的参数
  *
  * @author HUIHUI
  */

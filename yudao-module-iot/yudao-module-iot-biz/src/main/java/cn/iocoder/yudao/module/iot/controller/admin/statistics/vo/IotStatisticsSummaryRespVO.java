@@ -6,9 +6,9 @@ import lombok.Data;
 import java.util.Map;
 
 /**
- * 管理后台 - Iot 统计 Response VO
+ * 管理后台 - IoT 统计 Response VO
  */
-@Schema(description = "管理后台 - Iot 统计 Response VO")
+@Schema(description = "管理后台 - IoT 统计 Response VO")
 @Data
 public class IotStatisticsSummaryRespVO {
 

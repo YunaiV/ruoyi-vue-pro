@@ -6,13 +6,9 @@ import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 @Schema(description = "管理后台 - IoT 产品物模型分页 Request VO")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 public class IotThingModelPageReqVO extends PageParam {
 
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")

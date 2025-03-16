@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInstanceDO;
 
 /**
- * Iot Redis Key 枚举类
+ * IoT Redis Key 枚举类
  *
  * @author 芋道源码
  */

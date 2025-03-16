@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 
 /**
- * Iot 规则场景的触发类型枚举
+ * IoT 规则场景的触发类型枚举
  *
  * 设备触发，定时触发
  */

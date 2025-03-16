@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
- * Iot 设备相关消息的 Producer
+ * IoT 设备相关消息的 Producer
  *
  * @author alwayssuper
  * @since 2024/12/17 16:35

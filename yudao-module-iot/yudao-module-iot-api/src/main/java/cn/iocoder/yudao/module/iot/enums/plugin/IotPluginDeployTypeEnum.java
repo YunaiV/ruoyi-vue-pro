@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.enums.plugin;
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
@@ -10,6 +11,7 @@ import java.util.Arrays;
  *
  * @author haohao
  */
+@RequiredArgsConstructor
 @Getter
 public enum IotPluginDeployTypeEnum implements ArrayValuable<Integer> {
 
@@ -22,23 +24,10 @@ public enum IotPluginDeployTypeEnum implements ArrayValuable<Integer> {
      * 部署方式
      */
     private final Integer deployType;
-
     /**
      * 部署方式名
      */
     private final String name;
-
-    IotPluginDeployTypeEnum(Integer deployType, String name) {
-        this.deployType = deployType;
-        this.name = name;
-    }
-
-    public static IotPluginDeployTypeEnum valueOf(Integer deployType) {
-        return Arrays.stream(values())
-                .filter(value -> value.getDeployType().equals(deployType))
-                .findFirst()
-                .orElse(null);
-    }
 
     @Override
     public Integer[] array() {

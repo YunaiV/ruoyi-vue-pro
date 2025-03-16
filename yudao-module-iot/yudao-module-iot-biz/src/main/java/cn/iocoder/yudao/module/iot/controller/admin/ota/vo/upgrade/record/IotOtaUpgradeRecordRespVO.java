@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 @Data
-@Schema(description = "管理后台 - OTA升级记录 Response VO")
+@Schema(description = "管理后台 - IoT OTA 升级记录 Response VO")
 public class IotOtaUpgradeRecordRespVO {
 
     /**

@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * IOT 产品物模型服务调用方式枚举
+ * IoT 产品物模型服务调用方式枚举
  *
  * @author HUIHUI
  */

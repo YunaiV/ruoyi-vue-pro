@@ -8,11 +8,12 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+// TODO @haohao：后续需要使用下
 @Schema(description = "管理后台 - IoT 插件实例分页 Request VO")
 @Data
 public class PluginInstancePageReqVO extends PageParam {
 
-    @Schema(description = "插件主程序id", example = "23738")
+    @Schema(description = "插件主程序编号", example = "23738")
     private String mainId;
 
     @Schema(description = "插件id", example = "26498")

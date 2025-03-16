@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Validated
+@Tag(name = "管理后台 - IoT OTA 升级任务")
 @RestController
-@Tag(name = "管理后台 - OTA升级任务")
 @RequestMapping("/iot/ota-upgrade-task")
+@Validated
 public class IotOtaUpgradeTaskController {
 
     @Resource

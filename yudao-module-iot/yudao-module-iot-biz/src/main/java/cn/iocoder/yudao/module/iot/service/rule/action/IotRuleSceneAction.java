@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import javax.annotation.Nullable;
 
 /**
- * IOT 规则场景的场景执行器接口
+ * IoT 规则场景的场景执行器接口
  *
  * @author 芋道源码
  */

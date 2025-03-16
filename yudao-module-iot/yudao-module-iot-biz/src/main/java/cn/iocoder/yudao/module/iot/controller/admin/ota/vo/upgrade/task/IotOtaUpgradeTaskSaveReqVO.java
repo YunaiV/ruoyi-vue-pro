@@ -14,7 +14,7 @@ import java.util.List;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 @Data
-@Schema(description = "管理后台 - OTA 升级任务创建/修改 Request VO")
+@Schema(description = "管理后台 - IoT OTA 升级任务创建/修改 Request VO")
 public class IotOtaUpgradeTaskSaveReqVO {
 
     // TODO @li：已经有注解，不用重复注释

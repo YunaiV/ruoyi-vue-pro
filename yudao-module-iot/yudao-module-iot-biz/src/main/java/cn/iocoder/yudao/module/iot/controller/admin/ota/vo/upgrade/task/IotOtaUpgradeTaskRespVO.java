@@ -12,7 +12,7 @@ import java.util.List;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 @Data
-@Schema(description = "管理后台 - OTA升级任务 Response VO")
+@Schema(description = "管理后台 - IoT OTA 升级任务 Response VO")
 public class IotOtaUpgradeTaskRespVO implements VO {
 
     /**

@@ -74,10 +74,10 @@ public interface IotOtaUpgradeRecordMapper extends BaseMapperX<IotOtaUpgradeReco
 
     // TODO @li：这里的注释，可以去掉哈
     /**
-     * 根据分页查询条件获取IOT OTA升级记录的分页结果
+     * 根据分页查询条件获取 OTA升级记录的分页结果
      *
      * @param pageReqVO 分页查询请求参数，包含设备名称、任务ID等查询条件
-     * @return 返回分页查询结果，包含符合条件的IOT OTA升级记录列表
+     * @return 返回分页查询结果，包含符合条件的 OTA升级记录列表
      */
     // TODO @li：selectPage 就 ok 拉。
     default PageResult<IotOtaUpgradeRecordDO> selectUpgradeRecordPage(IotOtaUpgradeRecordPageReqVO pageReqVO) {

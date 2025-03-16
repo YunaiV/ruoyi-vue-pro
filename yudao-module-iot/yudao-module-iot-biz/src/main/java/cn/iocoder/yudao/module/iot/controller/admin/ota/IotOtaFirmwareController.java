@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Validated
-@RestController
 @Tag(name = "管理后台 - IoT OTA 固件")
+@RestController
 @RequestMapping("/iot/ota-firmware")
+@Validated
 public class IotOtaFirmwareController {
 
     @Resource

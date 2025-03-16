@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 
 /**
- * Iot 告警配置的接收方式枚举
+ * IoT 告警配置的接收方式枚举
  *
  * @author 芋道源码
  */

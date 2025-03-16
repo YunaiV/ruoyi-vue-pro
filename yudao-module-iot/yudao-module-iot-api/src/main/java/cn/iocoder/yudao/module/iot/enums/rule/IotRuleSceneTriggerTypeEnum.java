@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 
 /**
- * Iot 场景流转的触发类型枚举
+ * IoT 场景流转的触发类型枚举
  *
  * @author 芋道源码
  */

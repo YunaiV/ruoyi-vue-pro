@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * IOT 产品的设备类型
+ * IoT 产品的设备类型
  *
  * @author ahh
  */

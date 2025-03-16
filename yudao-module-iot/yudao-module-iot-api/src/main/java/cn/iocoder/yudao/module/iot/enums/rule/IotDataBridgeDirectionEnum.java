@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 
 /**
- * Iot 数据桥接的方向枚举
+ * IoT 数据桥接的方向枚举
  *
  * @author 芋道源码
  */

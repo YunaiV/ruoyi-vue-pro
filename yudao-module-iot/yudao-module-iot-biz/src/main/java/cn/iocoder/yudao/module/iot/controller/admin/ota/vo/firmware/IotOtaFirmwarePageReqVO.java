@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@Schema(description = "管理后台 - OTA 固件分页 Request VO")
+@Schema(description = "管理后台 - IoT OTA 固件分页 Request VO")
 public class IotOtaFirmwarePageReqVO extends PageParam {
 
     /**

@@ -20,10 +20,10 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-@Validated
+@Tag(name = "管理后台 - IoT OTA 升级记录")
 @RestController
-@Tag(name = "管理后台 - OTA 升级记录")
 @RequestMapping("/iot/ota-upgrade-record")
+@Validated
 public class IotOtaUpgradeRecordController {
 
     @Resource
@@ -33,8 +33,7 @@ public class IotOtaUpgradeRecordController {
     @Operation(summary = "固件升级设备统计")
     @PreAuthorize("@ss.hasPermission('iot:ota-upgrade-record:query')")
     @Parameter(name = "firmwareId", description = "固件编号", required = true, example = "1024")
-    public CommonResult<Map<Integer, Long>> getOtaUpgradeRecordStatistics(
-            @RequestParam(value = "firmwareId") Long firmwareId) {
+    public CommonResult<Map<Integer, Long>> getOtaUpgradeRecordStatistics(@RequestParam(value = "firmwareId") Long firmwareId) {
         return success(upgradeRecordService.getOtaUpgradeRecordStatistics(firmwareId));
     }
 

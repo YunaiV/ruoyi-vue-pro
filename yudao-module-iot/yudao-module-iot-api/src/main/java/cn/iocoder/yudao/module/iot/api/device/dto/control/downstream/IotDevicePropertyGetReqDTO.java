@@ -6,6 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 // TODO @芋艿：从 server => plugin => device 是否有必要？从阿里云 iot 来看，没有这个功能？！
+// TODO @芋艿：是不是改成 read 更好？在看看阿里云的 topic 设计
 /**
  * IoT 设备【属性】获取 Request DTO
  *

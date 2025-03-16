@@ -8,8 +8,6 @@ import lombok.ToString;
 
 @Schema(description = "管理后台 - IoT 产品分页 Request VO")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 public class IotProductPageReqVO extends PageParam {
 
     @Schema(description = "产品名称", example = "李四")

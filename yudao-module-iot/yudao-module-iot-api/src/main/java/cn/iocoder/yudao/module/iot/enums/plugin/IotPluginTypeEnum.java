@@ -24,7 +24,6 @@ public enum IotPluginTypeEnum implements ArrayValuable<Integer> {
      * 类型
      */
     private final Integer type;
-
     /**
      * 类型名
      */
@@ -33,17 +32,6 @@ public enum IotPluginTypeEnum implements ArrayValuable<Integer> {
     @Override
     public Integer[] array() {
         return ARRAYS;
-    }
-
-    public static IotPluginTypeEnum fromType(Integer type) {
-        return Arrays.stream(values())
-                .filter(value -> value.getType().equals(type))
-                .findFirst()
-                .orElse(null);
-    }
-
-    public static boolean isValidType(Integer type) {
-        return fromType(type) != null;
     }
 
 }
