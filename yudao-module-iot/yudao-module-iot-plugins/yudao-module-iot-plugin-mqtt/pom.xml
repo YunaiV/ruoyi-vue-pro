@@ -14,6 +14,7 @@
     <artifactId>yudao-module-iot-plugin-mqtt</artifactId>
 
     <name>${project.artifactId}</name>
+    <!-- TODO @芋艿：待整理 -->
     <description>
         物联网 插件模块 - mqtt 插件
     </description>

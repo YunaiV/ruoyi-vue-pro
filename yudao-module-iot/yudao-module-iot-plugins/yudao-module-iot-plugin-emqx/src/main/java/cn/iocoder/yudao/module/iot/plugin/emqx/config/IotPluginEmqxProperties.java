@@ -14,6 +14,8 @@ import org.springframework.validation.annotation.Validated;
 @Data
 public class IotPluginEmqxProperties {
 
+    // TODO @haohao：参数校验，加下，啊哈
+
     /**
      * 服务主机
      */
@@ -21,12 +23,11 @@ public class IotPluginEmqxProperties {
     /**
      * 服务端口
      */
-    private int mqttPort;
+    private Integer mqttPort;
     /**
      * 服务用户名
      */
     private String mqttUsername;
-
     /**
      * 服务密码
      */
@@ -34,7 +35,7 @@ public class IotPluginEmqxProperties {
     /**
      * 是否启用 SSL
      */
-    private boolean mqttSsl;
+    private Boolean mqttSsl;
 
     /**
      * 订阅的主题列表
@@ -44,6 +45,6 @@ public class IotPluginEmqxProperties {
     /**
      * 认证端口
      */
-    private int authPort;
+    private Integer authPort;
 
 }

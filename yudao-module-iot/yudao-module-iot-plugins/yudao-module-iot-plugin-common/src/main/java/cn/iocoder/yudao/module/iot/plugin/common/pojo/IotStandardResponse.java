@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.plugin.common.pojo;
 
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 // TODO @芋艿：1）后续考虑，要不要叫 IoT 网关之类的 Response；2）包名 pojo
 /**
@@ -12,7 +11,6 @@ import lombok.experimental.Accessors;
  * @author haohao
  */
 @Data
-@Accessors(chain = true)
 public class IotStandardResponse {
 
     /**
@@ -92,4 +90,5 @@ public class IotStandardResponse {
                 .setMethod(method)
                 .setVersion("1.0");
     }
+
 }

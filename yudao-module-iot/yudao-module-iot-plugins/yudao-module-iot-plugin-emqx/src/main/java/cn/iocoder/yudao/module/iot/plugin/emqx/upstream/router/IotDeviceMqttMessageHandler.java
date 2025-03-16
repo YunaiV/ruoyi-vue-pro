@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * IoT 设备 MQTT 消息处理器
  *
- * 参考："<a href="https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services">设备属性、事件、服务</a>">
+ * 参考：<a href="https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services">设备属性、事件、服务</a>
  */
 @Slf4j
 public class IotDeviceMqttMessageHandler {

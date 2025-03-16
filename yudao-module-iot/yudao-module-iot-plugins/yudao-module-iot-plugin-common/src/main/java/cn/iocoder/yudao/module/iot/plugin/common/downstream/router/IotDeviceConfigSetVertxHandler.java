@@ -25,6 +25,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 @RequiredArgsConstructor
 public class IotDeviceConfigSetVertxHandler implements Handler<RoutingContext> {
 
+    // TODO @haohao：是不是可以把 PATH、Method 所有的，抽到一个枚举类里？因为 topic、path、method 相当于不同的几个表达？
     public static final String PATH = "/sys/:productKey/:deviceName/thing/service/config/set";
     public static final String METHOD = "thing.service.config.set";
 
@@ -57,12 +58,9 @@ public class IotDeviceConfigSetVertxHandler implements Handler<RoutingContext> {
             CommonResult<Boolean> result = deviceDownstreamHandler.setDeviceConfig(reqDTO);
 
             // 3. 响应结果
-            IotStandardResponse response;
-            if (result.isSuccess()) {
-                response = IotStandardResponse.success(reqDTO.getRequestId(), METHOD, result.getData());
-            } else {
-                response = IotStandardResponse.error(reqDTO.getRequestId(), METHOD, result.getCode(), result.getMsg());
-            }
+            IotStandardResponse response = result.isSuccess() ?
+                    IotStandardResponse.success(reqDTO.getRequestId(), METHOD, result.getData())
+                    : IotStandardResponse.error(reqDTO.getRequestId(), METHOD, result.getCode(), result.getMsg());
             IotPluginCommonUtils.writeJsonResponse(routingContext, response);
         } catch (Exception e) {
             log.error("[handle][请求参数({}) 配置设置异常]", reqDTO, e);

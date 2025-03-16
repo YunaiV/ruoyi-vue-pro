@@ -25,6 +25,7 @@ public class IotDeviceDownstreamHandlerImpl implements IotDeviceDownstreamHandle
 
     private static final String SYS_TOPIC_PREFIX = "/sys/";
 
+    // TODO @haohao：是不是可以类似 IotDeviceConfigSetVertxHandler 的建议，抽到统一的枚举类
     // TODO @haohao：讨论，感觉 mqtt 和 http，可以做个相对统一的格式哈。；回复 都使用 Alink 格式，方便后续扩展。
     // 设备服务调用 标准 JSON
     // 请求Topic：/sys/${productKey}/${deviceName}/thing/service/${tsl.service.identifier}
@@ -63,7 +64,6 @@ public class IotDeviceDownstreamHandlerImpl implements IotDeviceDownstreamHandle
             // 构建请求消息
             String requestId = reqDTO.getRequestId() != null ? reqDTO.getRequestId() : generateRequestId();
             JSONObject request = buildServiceRequest(requestId, reqDTO.getIdentifier(), reqDTO.getParams());
-
             // 发送消息
             publishMessage(topic, request);
 
@@ -82,9 +82,8 @@ public class IotDeviceDownstreamHandlerImpl implements IotDeviceDownstreamHandle
 
     @Override
     public CommonResult<Boolean> setDeviceProperty(IotDevicePropertySetReqDTO reqDTO) {
-        log.info("[setProperty][开始设置设备属性][reqDTO: {}]", JSONUtil.toJsonStr(reqDTO));
-
         // 验证参数
+        log.info("[setProperty][开始设置设备属性][reqDTO: {}]", JSONUtil.toJsonStr(reqDTO));
         if (reqDTO.getProductKey() == null || reqDTO.getDeviceName() == null) {
             log.error("[setProperty][参数不完整][reqDTO: {}]", JSONUtil.toJsonStr(reqDTO));
             return CommonResult.error(MQTT_TOPIC_ILLEGAL.getCode(), MQTT_TOPIC_ILLEGAL.getMsg());
@@ -96,7 +95,6 @@ public class IotDeviceDownstreamHandlerImpl implements IotDeviceDownstreamHandle
             // 构建请求消息
             String requestId = reqDTO.getRequestId() != null ? reqDTO.getRequestId() : generateRequestId();
             JSONObject request = buildPropertySetRequest(requestId, reqDTO.getProperties());
-
             // 发送消息
             publishMessage(topic, request);
 
@@ -132,6 +130,7 @@ public class IotDeviceDownstreamHandlerImpl implements IotDeviceDownstreamHandle
         return SYS_TOPIC_PREFIX + productKey + "/" + deviceName + PROPERTY_SET_TOPIC;
     }
 
+    // TODO @haohao：这个，后面搞个对象，会不会好点哈？
     /**
      * 构建服务调用请求
      */
@@ -168,7 +167,7 @@ public class IotDeviceDownstreamHandlerImpl implements IotDeviceDownstreamHandle
     }
 
     /**
-     * 生成请求ID
+     * 生成请求 ID
      */
     private String generateRequestId() {
         return IdUtil.fastSimpleUUID();

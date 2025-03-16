@@ -15,6 +15,7 @@
     <version>1.0.0</version>
 
     <name>${project.artifactId}</name>
+    <!-- TODO @芋艿：待整理 -->
     <description>
         物联网 插件模块 - emqx 插件
     </description>

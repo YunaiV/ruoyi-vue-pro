@@ -15,7 +15,7 @@ import java.util.Collections;
 /**
  * IoT EMQX 连接认证的 Vert.x Handler
  *
- * <a href="https://docs.emqx.com/zh/emqx/latest/access-control/authn/http.html">EMQX HTTP</a>
+ * 参考：<a href="https://docs.emqx.com/zh/emqx/latest/access-control/authn/http.html">EMQX HTTP</a>
  *
  * 注意：该处理器需要返回特定格式：{"result": "allow"} 或 {"result": "deny"}，
  *      以符合 EMQX 认证插件的要求，因此不使用 IotStandardResponse 实体类
@@ -31,7 +31,6 @@ public class IotDeviceAuthVertxHandler implements Handler<RoutingContext> {
     private final IotDeviceUpstreamApi deviceUpstreamApi;
 
     @Override
-    @SuppressWarnings("unchecked")
     public void handle(RoutingContext routingContext) {
         try {
             // 构建认证请求 DTO

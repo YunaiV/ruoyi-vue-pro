@@ -23,10 +23,8 @@ public class IotHttpVertxPlugin extends SpringPlugin {
     public void start() {
         log.info("[HttpVertxPlugin][HttpVertxPlugin 插件启动开始...]");
         try {
-            // 1. 获取插件上下文
             ApplicationContext pluginContext = getApplicationContext();
             Assert.notNull(pluginContext, "pluginContext 不能为空");
-
             log.info("[HttpVertxPlugin][HttpVertxPlugin 插件启动成功...]");
         } catch (Exception e) {
             log.error("[HttpVertxPlugin][HttpVertxPlugin 插件开启动异常...]", e);
@@ -43,6 +41,7 @@ public class IotHttpVertxPlugin extends SpringPlugin {
         }
     }
 
+    // TODO @芋艿：思考下，未来要不要。。。
     @Override
     protected ApplicationContext createApplicationContext() {
         // 创建插件自己的 ApplicationContext
@@ -52,6 +51,7 @@ public class IotHttpVertxPlugin extends SpringPlugin {
         // 继续使用插件自己的 ClassLoader 以加载插件内部的类
         pluginContext.setClassLoader(getWrapper().getPluginClassLoader());
         // 扫描当前插件的自动配置包
+        // TODO @芋艿：后续看看，怎么配置类包
         pluginContext.scan("cn.iocoder.yudao.module.iot.plugin.http.config");
         pluginContext.refresh();
         return pluginContext;

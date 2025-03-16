@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * IoT 插件 Emqx 的专用自动配置类
+ * IoT 插件 EMQX 的专用自动配置类
  *
  * @author haohao
  */
@@ -34,7 +34,7 @@ public class IotPluginEmqxAutoConfiguration {
                 .setClientId("yudao-iot-downstream-" + IdUtil.fastSimpleUUID())
                 .setUsername(emqxProperties.getMqttUsername())
                 .setPassword(emqxProperties.getMqttPassword())
-                .setSsl(emqxProperties.isMqttSsl());
+                .setSsl(emqxProperties.getMqttSsl());
         return MqttClient.create(vertx, options);
     }
 

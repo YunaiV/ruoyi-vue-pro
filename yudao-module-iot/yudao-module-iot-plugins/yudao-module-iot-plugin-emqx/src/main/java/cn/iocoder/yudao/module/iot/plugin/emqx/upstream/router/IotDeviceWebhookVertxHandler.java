@@ -18,7 +18,7 @@ import java.util.Collections;
 /**
  * IoT EMQX Webhook 事件处理的 Vert.x Handler
  *
- * <a href="https://docs.emqx.com/zh/emqx/latest/data-integration/webhook.html">EMQX Webhook</a>
+ * 参考：<a href="https://docs.emqx.com/zh/emqx/latest/data-integration/webhook.html">EMQX Webhook</a>
  *
  * 注意：该处理器需要返回特定格式：{"result": "success"} 或 {"result": "error"}，
  *      以符合 EMQX Webhook 插件的要求，因此不使用 IotStandardResponse 实体类。
@@ -51,8 +51,7 @@ public class IotDeviceWebhookVertxHandler implements Handler<RoutingContext> {
                     handleClientDisconnected(clientId, username);
                     break;
                 default:
-                    log.info("[handle][未处理的 Webhook 事件] event={}, clientId={}, username={}", event, clientId,
-                            username);
+                    log.info("[handle][未处理的 Webhook 事件] event={}, clientId={}, username={}", event, clientId, username);
                     break;
             }
 

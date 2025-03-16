@@ -34,6 +34,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 @Slf4j
 public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
 
+    // TODO @haohao：要不要类似 IotDeviceConfigSetVertxHandler 写的，把这些 PATH、METHOD 之类的抽走
     /**
      * 属性上报路径
      */
@@ -49,6 +50,7 @@ public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
 
     private final IotDeviceUpstreamApi deviceUpstreamApi;
 
+    // TODO @haohao：要不要分成多个 Handler？每个只解决一个问题哈。
     @Override
     public void handle(RoutingContext routingContext) {
         String path = routingContext.request().path();
@@ -102,7 +104,6 @@ public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
             IotPluginCommonUtils.writeJsonResponse(routingContext, response);
         } catch (Exception e) {
             log.error("[handle][处理上行请求异常] path={}", path, e);
-            // 构建错误响应
             String method = path.contains("/property/") ? PROPERTY_METHOD
                     : EVENT_METHOD_PREFIX + (routingContext.pathParams().containsKey("identifier")
                     ? routingContext.pathParam("identifier")
@@ -115,27 +116,28 @@ public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
     /**
      * 更新设备状态
      *
-     * @param productKey 产品Key
+     * @param productKey 产品 Key
      * @param deviceName 设备名称
      */
     private void updateDeviceState(String productKey, String deviceName) {
-        deviceUpstreamApi.updateDeviceState(((IotDeviceStateUpdateReqDTO) new IotDeviceStateUpdateReqDTO().setRequestId(IdUtil.fastSimpleUUID()).setProcessId(IotPluginCommonUtils.getProcessId()).setReportTime(LocalDateTime.now()).setProductKey(productKey).setDeviceName(deviceName)).setState(IotDeviceStateEnum.ONLINE.getState()));
+        deviceUpstreamApi.updateDeviceState(((IotDeviceStateUpdateReqDTO) new IotDeviceStateUpdateReqDTO()
+                .setRequestId(IdUtil.fastSimpleUUID()).setProcessId(IotPluginCommonUtils.getProcessId()).setReportTime(LocalDateTime.now())
+                .setProductKey(productKey).setDeviceName(deviceName)).setState(IotDeviceStateEnum.ONLINE.getState()));
     }
 
     /**
      * 解析属性上报请求
      *
-     * @param productKey 产品Key
+     * @param productKey 产品 Key
      * @param deviceName 设备名称
-     * @param requestId  请求ID
+     * @param requestId  请求 ID
      * @param body       请求体
-     * @return 属性上报请求DTO
+     * @return 属性上报请求 DTO
      */
     @SuppressWarnings("unchecked")
     private IotDevicePropertyReportReqDTO parsePropertyReportRequest(String productKey, String deviceName, String requestId, JsonObject body) {
         // 按照标准 JSON 格式处理属性数据
         Map<String, Object> properties = new HashMap<>();
-        // 优先使用 params 字段，符合标准
         Map<String, Object> params = body.getJsonObject("params") != null ? body.getJsonObject("params").getMap() : null;
         if (params != null) {
             // 将标准格式的 params 转换为平台需要的 properties 格式
@@ -153,24 +155,25 @@ public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
         }
 
         // 构建属性上报请求 DTO
-        return ((IotDevicePropertyReportReqDTO) new IotDevicePropertyReportReqDTO().setRequestId(requestId).setProcessId(IotPluginCommonUtils.getProcessId()).setReportTime(LocalDateTime.now()).setProductKey(productKey).setDeviceName(deviceName)).setProperties(properties);
+        return ((IotDevicePropertyReportReqDTO) new IotDevicePropertyReportReqDTO().setRequestId(requestId)
+                .setProcessId(IotPluginCommonUtils.getProcessId()).setReportTime(LocalDateTime.now())
+                .setProductKey(productKey).setDeviceName(deviceName)).setProperties(properties);
     }
 
     /**
      * 解析事件上报请求
      *
-     * @param productKey 产品Key
+     * @param productKey 产品K ey
      * @param deviceName 设备名称
      * @param identifier 事件标识符
-     * @param requestId  请求ID
+     * @param requestId  请求 ID
      * @param body       请求体
-     * @return 事件上报请求DTO
+     * @return 事件上报请求 DTO
      */
     private IotDeviceEventReportReqDTO parseEventReportRequest(String productKey, String deviceName, String identifier, String requestId, JsonObject body) {
-        // 按照标准JSON格式处理事件参数
+        // 按照标准 JSON 格式处理事件参数
         Map<String, Object> params;
-        // 优先使用params字段，符合标准
-        if (body.getJsonObject("params") != null) {
+        if (body.containsKey("params")) {
             params = body.getJsonObject("params").getMap();
         } else {
             // 兼容旧格式
@@ -178,6 +181,8 @@ public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
         }
 
         // 构建事件上报请求 DTO
-        return ((IotDeviceEventReportReqDTO) new IotDeviceEventReportReqDTO().setRequestId(requestId).setProcessId(IotPluginCommonUtils.getProcessId()).setReportTime(LocalDateTime.now()).setProductKey(productKey).setDeviceName(deviceName)).setIdentifier(identifier).setParams(params);
+        return ((IotDeviceEventReportReqDTO) new IotDeviceEventReportReqDTO().setRequestId(requestId)
+                .setProcessId(IotPluginCommonUtils.getProcessId()).setReportTime(LocalDateTime.now())
+                .setProductKey(productKey).setDeviceName(deviceName)).setIdentifier(identifier).setParams(params);
     }
 }

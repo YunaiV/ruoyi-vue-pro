@@ -72,4 +72,5 @@ public class IotPluginCommonUtils {
                 .putHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .end(JsonUtils.toJsonString(response));
     }
+
 }
