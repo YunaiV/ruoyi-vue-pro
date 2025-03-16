@@ -10,6 +10,7 @@ import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
+import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
@@ -1255,6 +1256,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
+    @DataPermission(enable = false) // 忽略数据权限，避免因为过滤，导致找不到候选人
     public void processTaskAssigned(Task task) {
         // 发送通知。在事务提交时，批量执行操作，所以直接查询会无法查询到 ProcessInstance，所以这里是通过监听事务的提交来实现。
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
