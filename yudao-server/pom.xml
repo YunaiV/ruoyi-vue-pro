@@ -114,19 +114,6 @@
             <artifactId>yudao-module-iot-biz</artifactId>
             <version>${revision}</version>
         </dependency>
-        <!-- IoT 数据桥梁的执行器所需消息队列。如果您只需要使用 rocketmq 那么则注释掉其它消息队列即可 -->
-        <!--        <dependency>-->
-        <!--            <groupId>org.apache.rocketmq</groupId>-->
-        <!--            <artifactId>rocketmq-spring-boot-starter</artifactId>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.kafka</groupId>-->
-        <!--            <artifactId>spring-kafka</artifactId>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.boot</groupId>-->
-        <!--            <artifactId>spring-boot-starter-amqp</artifactId>-->
-        <!--        </dependency>-->
 
         <!-- spring boot 配置所需依赖 -->
         <dependency>

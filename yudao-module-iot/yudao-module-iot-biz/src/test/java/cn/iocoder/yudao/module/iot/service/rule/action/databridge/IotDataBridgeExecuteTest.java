@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +19,7 @@ import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 /**
  * {@link IotDataBridgeExecute} 实现类的测试
@@ -41,20 +41,14 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
     @BeforeEach
     public void setUp() {
         // 创建共享的测试消息
-        message = IotDeviceMessage.builder()
-                .requestId("TEST-001")
-                .productKey("testProduct")
-                .deviceName("testDevice")
-                .deviceKey("testDeviceKey")
-                .type("property")
-                .identifier("temperature")
-                .data("{\"value\": 60}")
-                .reportTime(LocalDateTime.now())
-                .tenantId(1L)
+        message = IotDeviceMessage.builder().requestId("TEST-001").reportTime(LocalDateTime.now()).tenantId(1L)
+                .productKey("testProduct").deviceName("testDevice").deviceKey("testDeviceKey")
+                .type("property").identifier("temperature").data("{\"value\": 60}")
                 .build();
 
         // 配置 RestTemplate mock 返回成功响应
-        Mockito.when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(), any(Class.class)))
+        // TODO @puhui999：这个应该放到 testHttpDataBridge 里
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(), any(Class.class)))
                 .thenReturn(new ResponseEntity<>("Success", HttpStatus.OK));
     }
 
@@ -64,6 +58,7 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
         IotKafkaMQDataBridgeExecute action = new IotKafkaMQDataBridgeExecute();
 
         // 2. 创建配置
+        // TODO @puhui999：可以改成链式哈。
         IotDataBridgeKafkaMQConfig config = new IotDataBridgeKafkaMQConfig();
         config.setBootstrapServers("127.0.0.1:9092");
         config.setTopic("test-topic");
@@ -156,4 +151,4 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
         httpDataBridgeExecute.execute(message, new IotDataBridgeDO().setType(httpDataBridgeExecute.getType()).setConfig(config));
     }
 
-} 
+}
