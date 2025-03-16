@@ -10,6 +10,7 @@ import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
+import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
@@ -557,17 +558,30 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 2.2 添加评论
         taskService.addComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.APPROVE.getType(),
                 BpmCommentTypeEnum.APPROVE.formatComment(reqVO.getReason()));
-        // 2.3 校验并处理 APPROVE_USER_SELECT 当前审批人，选择下一节点审批人的逻辑
-        Map<String, Object> variables = validateAndSetNextAssignees(task.getTaskDefinitionKey(), reqVO.getVariables(),
+
+        // 3. 设置流程变量。如果流程变量前端传空，需要从历史实例中获取，原因：前端表单如果在当前节点无可编辑的字段时 variables 一定会为空
+        // 场景一：A 节点发起，B 节点表单无可编辑字段，审批通过时，C 节点需要流程变量获取下一个执行节点，但因为 B 节点无可编辑的字段，variables 为空，流程可能出现问题。
+        // 场景二：A 节点发起，B 节点只有某一个字段可编辑（比如 day），但 C 节点需要多个节点。
+        //       （比如 work + day 变量，在发起时填写，因为 B 节点只有 day 的编辑权限，在审批后，variables 会缺少 work 的值）
+        Map<String, Object> processVariables = new HashMap<>();
+        if (CollUtil.isNotEmpty(instance.getProcessVariables())) { // 获取历史中流程变量
+            processVariables.putAll(instance.getProcessVariables());
+        }
+        if (CollUtil.isNotEmpty(reqVO.getVariables())) { // 合并前端传递的流程变量，以前端为准
+            processVariables.putAll(reqVO.getVariables());
+        }
+
+        // 4. 校验并处理 APPROVE_USER_SELECT 当前审批人，选择下一节点审批人的逻辑
+        Map<String, Object> variables = validateAndSetNextAssignees(task.getTaskDefinitionKey(), processVariables,
                 bpmnModel, reqVO.getNextAssignees(), instance);
         runtimeService.setVariables(task.getProcessInstanceId(), variables);
-        // 2.4 调用 BPM complete 去完成任务
+
+        // 5. 调用 BPM complete 去完成任务
         taskService.complete(task.getId(), variables, true);
 
         // 【加签专属】处理加签任务
         handleParentTaskIfSign(task.getParentTaskId());
     }
-
 
     /**
      * 校验选择的下一个节点的审批人，是否合法
@@ -600,9 +614,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 }
                 processVariables = FlowableUtils.getStartUserSelectAssignees(processInstance.getProcessVariables());
                 // 特殊：如果当前节点已经存在审批人，则不允许覆盖
-                // TODO @小北：【不用改】通过 if return，让逻辑更简洁一点；虽然会多判断一次 processVariables，但是 if else 层级更少。
-                if (processVariables != null
-                        && CollUtil.isNotEmpty(processVariables.get(nextFlowNode.getId()))) {
+                if (processVariables != null && CollUtil.isNotEmpty(processVariables.get(nextFlowNode.getId()))) {
                     continue;
                 }
                 // 设置 PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES
@@ -622,13 +634,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 processVariables = FlowableUtils.getApproveUserSelectAssignees(processInstance.getProcessVariables());
                 if (processVariables == null) {
                     processVariables = new HashMap<>();
-                } else  {
-                    List<Long> approveUserSelectAssignee = processVariables.get(nextFlowNode.getId());
-                    // 特殊：如果当前节点已经存在审批人，则不允许覆盖
-                    // TODO @小北：这种，应该可以覆盖呢。
-                    if (CollUtil.isNotEmpty(approveUserSelectAssignee)) {
-                        continue;
-                    }
                 }
                 // 设置 PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES
                 processVariables.put(nextFlowNode.getId(), assignees);
@@ -966,7 +971,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(taskList.get(0).getProcessDefinitionId());
         List<String> activityIds = CollUtil.newArrayList(convertSet(taskList, Task::getTaskDefinitionKey));
         EndEvent endEvent = BpmnModelUtils.getEndEvent(bpmnModel);
-        Assert.notNull(endEvent, "结束节点不能未空");
+        Assert.notNull(endEvent, "结束节点不能为空");
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(processInstanceId)
                 .moveActivityIdsToSingleActivityId(activityIds, endEvent.getId())
@@ -1251,6 +1256,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
+    @DataPermission(enable = false) // 忽略数据权限，避免因为过滤，导致找不到候选人
     public void processTaskAssigned(Task task) {
         // 发送通知。在事务提交时，批量执行操作，所以直接查询会无法查询到 ProcessInstance，所以这里是通过监听事务的提交来实现。
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {

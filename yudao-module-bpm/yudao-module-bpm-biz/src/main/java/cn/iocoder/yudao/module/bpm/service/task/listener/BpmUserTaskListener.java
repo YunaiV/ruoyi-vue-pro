@@ -34,9 +34,6 @@ public class BpmUserTaskListener implements TaskListener {
     @Resource
     private BpmProcessInstanceService processInstanceService;
 
-    @Resource
-    private RestTemplate restTemplate;
-
     @Setter
     private FixedValue listenerConfig;
 
@@ -60,9 +57,7 @@ public class BpmUserTaskListener implements TaskListener {
                 listenerHandler.getPath(),
                 listenerHandler.getHeader(),
                 listenerHandler.getBody(),
-                false, null,
-                restTemplate,
-                processInstanceService);
+                false, null);
 
         // 3. 是否需要后续操作？TODO 芋艿：待定！
     }

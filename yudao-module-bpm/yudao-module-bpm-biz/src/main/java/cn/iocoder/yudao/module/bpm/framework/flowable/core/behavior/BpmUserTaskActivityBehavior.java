@@ -10,7 +10,10 @@ import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.TaskHelper;
+import org.flowable.engine.interceptor.CreateUserTaskBeforeContext;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,6 +70,17 @@ public class BpmUserTaskActivityBehavior extends UserTaskActivityBehavior {
         //      如果希望一个任务可以同时被多个人处理，可以考虑使用 BpmParallelMultiInstanceBehavior 实现的会签 or 或签。
         int index = RandomUtil.randomInt(candidateUserIds.size());
         return CollUtil.get(candidateUserIds, index);
+    }
+
+    @Override
+    protected void handleCategory(CreateUserTaskBeforeContext beforeContext, ExpressionManager expressionManager,
+                                  TaskEntity task, DelegateExecution execution) {
+        ProcessDefinitionEntity processDefinitionEntity = CommandContextUtil.getProcessDefinitionEntityManager().findById(execution.getProcessDefinitionId());
+        if (processDefinitionEntity == null) {
+            log.warn("[handleCategory][任务编号({}) 找不到流程定义({})]", task.getId(), execution.getProcessDefinitionId());
+            return;
+        }
+        task.setCategory(processDefinitionEntity.getCategory());
     }
 
 }
