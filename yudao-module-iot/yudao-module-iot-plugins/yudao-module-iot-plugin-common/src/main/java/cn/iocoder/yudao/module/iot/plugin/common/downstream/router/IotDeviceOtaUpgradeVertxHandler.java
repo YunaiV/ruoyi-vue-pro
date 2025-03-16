@@ -51,7 +51,6 @@ public class IotDeviceOtaUpgradeVertxHandler implements Handler<RoutingContext> 
                     .setInformation(information);
         } catch (Exception e) {
             log.error("[handle][路径参数({}) 解析参数失败]", routingContext.pathParams(), e);
-            // 使用IotStandardResponse实体类返回错误
             IotStandardResponse errorResponse = IotStandardResponse.error(
                     null, METHOD, BAD_REQUEST.getCode(), BAD_REQUEST.getMsg());
             IotPluginCommonUtils.writeJsonResponse(routingContext, errorResponse);
@@ -62,18 +61,16 @@ public class IotDeviceOtaUpgradeVertxHandler implements Handler<RoutingContext> 
         try {
             CommonResult<Boolean> result = deviceDownstreamHandler.upgradeDeviceOta(reqDTO);
 
-            // 使用IotStandardResponse实体类返回结果
+            // 3. 响应结果
             IotStandardResponse response;
             if (result.isSuccess()) {
                 response = IotStandardResponse.success(reqDTO.getRequestId(), METHOD, result.getData());
             } else {
-                response = IotStandardResponse.error(
-                        reqDTO.getRequestId(), METHOD, result.getCode(), result.getMsg());
+                response = IotStandardResponse.error(reqDTO.getRequestId(), METHOD, result.getCode(), result.getMsg());
             }
             IotPluginCommonUtils.writeJsonResponse(routingContext, response);
         } catch (Exception e) {
             log.error("[handle][请求参数({}) OTA 升级异常]", reqDTO, e);
-            // 使用IotStandardResponse实体类返回错误
             IotStandardResponse errorResponse = IotStandardResponse.error(
                     reqDTO.getRequestId(), METHOD, INTERNAL_SERVER_ERROR.getCode(), INTERNAL_SERVER_ERROR.getMsg());
             IotPluginCommonUtils.writeJsonResponse(routingContext, errorResponse);

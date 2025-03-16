@@ -16,13 +16,12 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 
 /**
- * IoT Emqx Webhook 事件处理的 Vert.x Handler
+ * IoT EMQX Webhook 事件处理的 Vert.x Handler
  *
- * <a href=
- * "https://docs.emqx.com/zh/emqx/latest/data-integration/webhook.html">EMQXWebhook</a>
+ * <a href="https://docs.emqx.com/zh/emqx/latest/data-integration/webhook.html">EMQX Webhook</a>
  *
  * 注意：该处理器需要返回特定格式：{"result": "success"} 或 {"result": "error"}，
- * 以符合 EMQX Webhook 插件的要求，因此不使用 IotStandardResponse 实体类。
+ *      以符合 EMQX Webhook 插件的要求，因此不使用 IotStandardResponse 实体类。
  *
  * @author haohao
  */
@@ -137,7 +136,7 @@ public class IotDeviceWebhookVertxHandler implements Handler<RoutingContext> {
      * 解析用户名，格式为 deviceName&productKey
      *
      * @param username 用户名
-     * @return 解析结果，[0] 为 deviceName，[1] 为productKey，解析失败返回 null
+     * @return 解析结果，[0] 为 deviceName，[1] 为 productKey，解析失败返回 null
      */
     private String[] parseUsername(String username) {
         if (StrUtil.isEmpty(username)) {

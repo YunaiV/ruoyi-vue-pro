@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.plugin.emqx.upstream.router;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -21,26 +22,20 @@ import java.util.Map;
 
 /**
  * IoT 设备 MQTT 消息处理器
- * <p>
- * 参考：
- * <p>
- * "<a href=
- * "https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services?spm=a2c4g.11186623.0.0.97a72915vRck44#section-g4j-5zg-12b">...</a>">
+ *
+ * 参考："<a href="https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services">设备属性、事件、服务</a>">
  */
 @Slf4j
 public class IotDeviceMqttMessageHandler {
 
-    // TODO @haohao：讨论，感觉 mqtt 和 http，可以做个相对统一的格式哈。
-    // 回复 都使用 Alink 格式，方便后续扩展。
+    // TODO @haohao：讨论，感觉 mqtt 和 http，可以做个相对统一的格式哈；回复 都使用 Alink 格式，方便后续扩展。
     // 设备上报属性 标准 JSON
     // 请求 Topic：/sys/${productKey}/${deviceName}/thing/event/property/post
     // 响应 Topic：/sys/${productKey}/${deviceName}/thing/event/property/post_reply
 
     // 设备上报事件 标准 JSON
-    // 请求
-    // Topic：/sys/${productKey}/${deviceName}/thing/event/${tsl.event.identifier}/post
-    // 响应
-    // Topic：/sys/${productKey}/${deviceName}/thing/event/${tsl.event.identifier}/post_reply
+    // 请求 Topic：/sys/${productKey}/${deviceName}/thing/event/${tsl.event.identifier}/post
+    // 响应 Topic：/sys/${productKey}/${deviceName}/thing/event/${tsl.event.identifier}/post_reply
 
     private static final String SYS_TOPIC_PREFIX = "/sys/";
     private static final String PROPERTY_POST_TOPIC = "/thing/event/property/post";
@@ -70,7 +65,7 @@ public class IotDeviceMqttMessageHandler {
         log.info("[messageHandler][接收到消息][topic: {}][payload: {}]", topic, payload);
 
         try {
-            if (payload == null || payload.isEmpty()) {
+            if (StrUtil.isEmpty(payload)) {
                 log.warn("[messageHandler][消息内容为空][topic: {}]", topic);
                 return;
             }
@@ -214,27 +209,20 @@ public class IotDeviceMqttMessageHandler {
      * @param topic      原始主题
      * @param jsonObject 原始消息JSON对象
      * @param method     响应方法
-     * @param customData 自定义数据，可为null
+     * @param customData 自定义数据，可为 null
      */
     private void sendResponse(String topic, JSONObject jsonObject, String method, Object customData) {
         String replyTopic = topic + REPLY_SUFFIX;
 
-        // 使用IotStandardResponse实体类构建响应
+        // 响应结果
         IotStandardResponse response = IotStandardResponse.success(
-                jsonObject.getStr("id"),
-                method,
-                customData);
-
+                jsonObject.getStr("id"), method, customData);
         try {
-            mqttClient.publish(replyTopic,
-                    Buffer.buffer(JsonUtils.toJsonString(response)),
-                    MqttQoS.AT_LEAST_ONCE,
-                    false,
-                    false);
+            mqttClient.publish(replyTopic, Buffer.buffer(JsonUtils.toJsonString(response)),
+                    MqttQoS.AT_LEAST_ONCE, false, false);
             log.info("[sendResponse][发送响应消息成功][topic: {}]", replyTopic);
         } catch (Exception e) {
-            log.error("[sendResponse][发送响应消息失败][topic: {}][response: {}]",
-                    replyTopic, response, e);
+            log.error("[sendResponse][发送响应消息失败][topic: {}][response: {}]", replyTopic, response, e);
         }
     }
 
@@ -304,4 +292,5 @@ public class IotDeviceMqttMessageHandler {
 
         return reportReqDTO;
     }
+
 }

@@ -17,7 +17,6 @@ import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.MQTT_TOPIC_IL
 
 /**
  * EMQX 插件的 {@link IotDeviceDownstreamHandler} 实现类
- * <p>
  *
  * @author 芋道源码
  */
@@ -26,8 +25,7 @@ public class IotDeviceDownstreamHandlerImpl implements IotDeviceDownstreamHandle
 
     private static final String SYS_TOPIC_PREFIX = "/sys/";
 
-    // TODO @haohao：讨论，感觉 mqtt 和 http，可以做个相对统一的格式哈。
-    // 回复 都使用 Alink 格式，方便后续扩展。
+    // TODO @haohao：讨论，感觉 mqtt 和 http，可以做个相对统一的格式哈。；回复 都使用 Alink 格式，方便后续扩展。
     // 设备服务调用 标准 JSON
     // 请求Topic：/sys/${productKey}/${deviceName}/thing/service/${tsl.service.identifier}
     // 响应Topic：/sys/${productKey}/${deviceName}/thing/service/${tsl.service.identifier}_reply
@@ -62,11 +60,8 @@ public class IotDeviceDownstreamHandlerImpl implements IotDeviceDownstreamHandle
         try {
             // 构建请求主题
             String topic = buildServiceTopic(reqDTO.getProductKey(), reqDTO.getDeviceName(), reqDTO.getIdentifier());
-
-            // 生成请求ID（如果没有提供）
-            String requestId = reqDTO.getRequestId() != null ? reqDTO.getRequestId() : generateRequestId();
-
             // 构建请求消息
+            String requestId = reqDTO.getRequestId() != null ? reqDTO.getRequestId() : generateRequestId();
             JSONObject request = buildServiceRequest(requestId, reqDTO.getIdentifier(), reqDTO.getParams());
 
             // 发送消息
@@ -98,11 +93,8 @@ public class IotDeviceDownstreamHandlerImpl implements IotDeviceDownstreamHandle
         try {
             // 构建请求主题
             String topic = buildPropertySetTopic(reqDTO.getProductKey(), reqDTO.getDeviceName());
-
-            // 生成请求ID（如果没有提供）
-            String requestId = reqDTO.getRequestId() != null ? reqDTO.getRequestId() : generateRequestId();
-
             // 构建请求消息
+            String requestId = reqDTO.getRequestId() != null ? reqDTO.getRequestId() : generateRequestId();
             JSONObject request = buildPropertySetRequest(requestId, reqDTO.getProperties());
 
             // 发送消息
@@ -163,7 +155,7 @@ public class IotDeviceDownstreamHandlerImpl implements IotDeviceDownstreamHandle
     }
 
     /**
-     * 发布MQTT消息
+     * 发布 MQTT 消息
      */
     private void publishMessage(String topic, JSONObject payload) {
         mqttClient.publish(

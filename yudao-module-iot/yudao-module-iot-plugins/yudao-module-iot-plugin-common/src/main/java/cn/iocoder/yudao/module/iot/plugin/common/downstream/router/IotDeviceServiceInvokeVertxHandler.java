@@ -48,7 +48,6 @@ public class IotDeviceServiceInvokeVertxHandler implements Handler<RoutingContex
                     .setIdentifier(identifier).setParams(params);
         } catch (Exception e) {
             log.error("[handle][路径参数({}) 解析参数失败]", routingContext.pathParams(), e);
-            // 使用IotStandardResponse实体类返回错误
             String method = METHOD_PREFIX + routingContext.pathParam("identifier") + METHOD_SUFFIX;
             IotStandardResponse errorResponse = IotStandardResponse.error(
                     null, method, BAD_REQUEST.getCode(), BAD_REQUEST.getMsg());
@@ -60,19 +59,17 @@ public class IotDeviceServiceInvokeVertxHandler implements Handler<RoutingContex
         try {
             CommonResult<Boolean> result = deviceDownstreamHandler.invokeDeviceService(reqDTO);
 
-            // 使用IotStandardResponse实体类返回结果
+            // 3. 响应结果
             String method = METHOD_PREFIX + reqDTO.getIdentifier() + METHOD_SUFFIX;
             IotStandardResponse response;
             if (result.isSuccess()) {
                 response = IotStandardResponse.success(reqDTO.getRequestId(), method, result.getData());
             } else {
-                response = IotStandardResponse.error(
-                        reqDTO.getRequestId(), method, result.getCode(), result.getMsg());
+                response = IotStandardResponse.error(reqDTO.getRequestId(), method, result.getCode(), result.getMsg());
             }
             IotPluginCommonUtils.writeJsonResponse(routingContext, response);
         } catch (Exception e) {
             log.error("[handle][请求参数({}) 服务调用异常]", reqDTO, e);
-            // 使用IotStandardResponse实体类返回错误
             String method = METHOD_PREFIX + reqDTO.getIdentifier() + METHOD_SUFFIX;
             IotStandardResponse errorResponse = IotStandardResponse.error(
                     reqDTO.getRequestId(), method, INTERNAL_SERVER_ERROR.getCode(), INTERNAL_SERVER_ERROR.getMsg());
