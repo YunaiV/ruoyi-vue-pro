@@ -280,11 +280,11 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
         sendDeviceMessage(message, device);
     }
 
+    // TODO @芋艿：后续需要考虑，http 的认证
     @Override
     public boolean authenticateEmqxConnection(IotDeviceEmqxAuthReqDTO authReqDTO) {
         log.info("[authenticateEmqxConnection][认证 Emqx 连接: {}]", authReqDTO);
-        // 1. 校验设备是否存在
-        // username 格式：${DeviceName}&${ProductKey}
+        // 1.1 校验设备是否存在。username 格式：${DeviceName}&${ProductKey}
         String[] usernameParts = authReqDTO.getUsername().split("&");
         if (usernameParts.length != 2) {
             log.error("[authenticateEmqxConnection][认证失败，username 格式不正确]");
@@ -292,17 +292,19 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
         }
         String deviceName = usernameParts[0];
         String productKey = usernameParts[1];
-        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(
-                productKey, deviceName);
+        // 1.2 获得设备
+        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(productKey, deviceName);
         if (device == null) {
-            log.error("[authenticateEmqxConnection][设备({}/{}) 不存在]",
-                    productKey, deviceName);
+            log.error("[authenticateEmqxConnection][设备({}/{}) 不存在]", productKey, deviceName);
             return false;
         }
+        // TODO @haohao：需要记录，记录设备的最后时间
+
         // 2. 校验密码
         String deviceSecret = device.getDeviceSecret();
         String clientId = authReqDTO.getClientId();
         MqttSignResult sign = MqttSignUtils.calculate(productKey, deviceName, deviceSecret, clientId);
+        // TODO 建议，先失败，return false；
         if (StrUtil.equals(sign.getPassword(), authReqDTO.getPassword())) {
             log.info("[authenticateEmqxConnection][认证成功]");
             return true;
