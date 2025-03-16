@@ -334,6 +334,6 @@ yudao:
         customer: E77DF18BE109F454A5CD319E44BF5177
 
 debug: false
-# 插件配置
+# 插件配置 TODO 芋艿：【IOT】需要处理下
 pf4j:
   pluginsDir: /Users/anhaohao/code/gitee/ruoyi-vue-pro/plugins # 插件目录

@@ -45,16 +45,16 @@ spring:
       primary: master
       datasource:
         master:
-          url: jdbc:mysql://chaojiniu.top:23306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
-          #          url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=true&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai # MySQL Connector/J 5.X 连接的示例
+          url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true # MySQL Connector/J 8.X 连接的示例
+          #          url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=true&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true # MySQL Connector/J 5.X 连接的示例
           #          url: jdbc:postgresql://127.0.0.1:5432/ruoyi-vue-pro # PostgreSQL 连接的示例
           #          url: jdbc:oracle:thin:@127.0.0.1:1521:xe # Oracle 连接的示例
           #          url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=ruoyi-vue-pro;SelectMethod=cursor;encrypt=false;rewriteBatchedStatements=true;useUnicode=true;characterEncoding=utf-8 # SQLServer 连接的示例
           #          url: jdbc:dm://127.0.0.1:5236?schema=RUOYI_VUE_PRO # DM 连接的示例
           #          url: jdbc:kingbase8://127.0.0.1:54321/test  # 人大金仓 KingbaseES 连接的示例
           #          url: jdbc:postgresql://127.0.0.1:5432/postgres # OpenGauss 连接的示例
-          username: ruoyi-vue-pro
-          password: ruoyi-@h2ju02hebp
+          username: root
+          password: 123456
           #          username: sa # SQL Server 连接的示例
           #          password: Yudao@2024 # SQL Server 连接的示例
           #          username: SYSDBA # DM 连接的示例
@@ -63,11 +63,11 @@ spring:
           #          password: Yudao@2024 # OpenGauss 连接的示例
         slave: # 模拟从库，可根据自己需要修改
           lazy: true # 开启懒加载，保证启动速度
-          url: jdbc:mysql://chaojiniu.top:23306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
-          username: ruoyi-vue-pro
-          password: ruoyi-@h2ju02hebp
+          url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true&nullCatalogMeansCurrent=true
+          username: root
+          password: 123456
         tdengine: # IOT 数据库
-          #          lazy: true # 开启懒加载，保证启动速度
+          lazy: true # 开启懒加载，保证启动速度
           url: jdbc:TAOS-RS://chaojiniu.top:6041/ruoyi_vue_pro
           driver-class-name: com.taosdata.jdbc.rs.RestfulDriver
           username: root
@@ -76,12 +76,11 @@ spring:
             validation-query: SELECT SERVER_STATUS() # TDengine 数据源的有效性检查 SQL
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
-  data:
-    redis:
-      host: chaojiniu.top # 地址
-      port: 6379 # 端口
-      database: 15 # 数据库索引
-      password: fsknKD7UvQYZsyf2hXXn # 密码，建议生产环境开启
+  redis:
+    host: 127.0.0.1 # 地址
+    port: 6379 # 端口
+    database: 0 # 数据库索引
+#    password: dev # 密码，建议生产环境开启
 
 --- #################### 定时任务相关配置 ####################
 
@@ -186,7 +185,6 @@ logging:
     cn.iocoder.yudao.module.iot.dal.tdengine: DEBUG
     cn.iocoder.yudao.module.ai.dal.mysql: debug
     org.springframework.context.support.PostProcessorRegistrationDelegate: ERROR # TODO 芋艿：先禁用，Spring Boot 3.X 存在部分错误的 WARN 提示
-    com.taosdata: DEBUG # TDengine 的日志级别
 
 debug: false
 
@@ -266,7 +264,7 @@ justauth:
     prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::
     timeout: 24h # 超时时长，目前只对 Redis 缓存生效，默认 3 分钟
 
---- #################### iot相关配置 TODO 芋艿：再瞅瞅 ####################
+--- #################### iot相关配置 TODO 芋艿【IOT】：再瞅瞅 ####################
 pf4j:
 #  pluginsDir: /tmp/
   pluginsDir: ../plugins
