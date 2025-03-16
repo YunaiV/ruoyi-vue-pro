@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.*;
+
 @Tag(name = "管理后台 - IoT 数据统计")
 @RestController
 @RequestMapping("/iot/statistics")
@@ -61,7 +63,7 @@ public class IotStatisticsController {
         respVO.setDeviceOnlineCount(deviceCountMap.getOrDefault(IotDeviceStateEnum.ONLINE.getState(), 0L));
         respVO.setDeviceOfflineCount(deviceCountMap.getOrDefault(IotDeviceStateEnum.OFFLINE.getState(), 0L));
         respVO.setDeviceInactiveCount(deviceCountMap.getOrDefault(IotDeviceStateEnum.INACTIVE.getState(), 0L));
-        return CommonResult.success(respVO);
+        return success(respVO);
     }
 
     // TODO @super：要不干掉 IotStatisticsReqVO 参数，直接使用 @RequestParam 接收，简单一些。
@@ -69,7 +71,7 @@ public class IotStatisticsController {
     @Operation(summary = "获取 IoT 设备上下行消息数据统计")
     public CommonResult<IotStatisticsDeviceMessageSummaryRespVO> getIotStatisticsDeviceMessageSummary(
             @Valid IotStatisticsReqVO reqVO) {
-        return CommonResult.success(new IotStatisticsDeviceMessageSummaryRespVO()
+        return success(new IotStatisticsDeviceMessageSummaryRespVO()
                 .setDownstreamCounts(deviceLogService.getDeviceLogUpCountByHour(null, reqVO.getStartTime(), reqVO.getEndTime()))
                 .setDownstreamCounts((deviceLogService.getDeviceLogDownCountByHour(null, reqVO.getStartTime(), reqVO.getEndTime()))));
     }

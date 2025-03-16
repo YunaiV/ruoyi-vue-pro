@@ -2,8 +2,9 @@ package cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config;
 
 import lombok.Data;
 
+// TODO @puhui999：MQ 可以去掉哈。stream 更精准
 /**
- * Redis Stream MQ 配置
+ * IoT Redis Stream 配置 {@link IotDataBridgeAbstractConfig} 实现类
  *
  * @author HUIHUI
  */

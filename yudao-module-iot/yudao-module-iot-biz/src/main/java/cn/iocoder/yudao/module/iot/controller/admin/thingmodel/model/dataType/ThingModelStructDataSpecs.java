@@ -8,13 +8,13 @@ import lombok.EqualsAndHashCode;
 import java.util.List;
 
 /**
- * 物模型数据类型为 struct 的 DataSpec 定义
+ * IoT 物模型数据类型为 struct 的 DataSpec 定义
  *
  * @author HUIHUI
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@JsonIgnoreProperties({"dataType"}) // 忽略子类中的 dataType 字段，从而避免重复。
+@JsonIgnoreProperties({"dataType"}) // 忽略子类中的 dataType 字段，从而避免重复
 public class ThingModelStructDataSpecs extends ThingModelDataSpecs {
 
     /**

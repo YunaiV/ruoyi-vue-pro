@@ -47,6 +47,7 @@ public interface IotDeviceLogService {
      */
     Long getDeviceLogCount(@Nullable LocalDateTime createTime);
 
+    // TODO @super：deviceKey 是不是用不上哈？
     /**
      * 获得每个小时设备上行消息数量统计
      *

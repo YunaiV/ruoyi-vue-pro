@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Map;
 
 /**
- * HTTP 配置
+ * IoT HTTP 配置 {@link IotDataBridgeAbstractConfig} 实现类
  *
  * @author HUIHUI
  */

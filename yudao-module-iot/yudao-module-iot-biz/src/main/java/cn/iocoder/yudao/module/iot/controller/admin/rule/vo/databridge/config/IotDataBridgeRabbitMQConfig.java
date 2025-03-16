@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config;
 import lombok.Data;
 
 /**
- * RabbitMQ 配置
+ * IoT RabbitMQ 配置 {@link IotDataBridgeAbstractConfig} 实现类
  *
  * @author HUIHUI
  */

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 
 /**
- * 抽象类 ThingModelDataSpecs
+ * IoT ThingModelDataSpecs 抽象类
  *
  * 用于表示物模型数据的通用类型，根据具体的 "dataType" 字段动态映射到对应的子类。
  * 提供多态支持，适用于不同类型的数据结构序列化和反序列化场景。

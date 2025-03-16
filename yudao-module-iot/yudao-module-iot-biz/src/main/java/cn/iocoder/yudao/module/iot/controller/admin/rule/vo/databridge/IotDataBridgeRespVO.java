@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge;
 
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeAbstractConfig;
-import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -20,7 +19,7 @@ public class IotDataBridgeRespVO {
     @Schema(description = "桥梁描述", example = "随便")
     private String description;
 
-    @Schema(description = "桥梁状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @Schema(description = "桥梁状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status;
 
     @Schema(description = "桥梁方向", requiredMode = Schema.RequiredMode.REQUIRED)

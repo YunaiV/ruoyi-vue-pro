@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 
 /**
- * 抽象类 IotDataBridgeConfig
+ * IoT IotDataBridgeConfig 抽象类
  *
  * 用于表示数据桥梁配置数据的通用类型，根据具体的 "type" 字段动态映射到对应的子类
  * 提供多态支持，适用于不同类型的数据结构序列化和反序列化场景。

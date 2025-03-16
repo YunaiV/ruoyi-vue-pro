@@ -11,7 +11,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * 物模型中的属性
+ * IoT 物模型中的属性
  *
  * dataSpecs 和 dataSpecsList 之中必须传入且只能传入一个
  *

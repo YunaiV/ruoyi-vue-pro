@@ -10,7 +10,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * 物模型中的事件
+ * IoT 物模型中的事件
  *
  * @author HUIHUI
  */
