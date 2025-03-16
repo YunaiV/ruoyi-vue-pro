@@ -340,10 +340,11 @@ yudao:
       receive-expire-time: 14d # 收货的过期时间
       comment-expire-time: 7d # 评论的过期时间
     express:
-      client: kd_niao
+      client: KD_NIAO
       kd-niao:
         api-key: cb022f1e-48f1-4c4a-a723-9001ac9676b8
         business-id: 1809751
+        request-type: 1002 # 免费版 1002；付费版 8001
       kd100:
         key: pLXUGAwK5305
         customer: E77DF18BE109F454A5CD319E44BF5177
