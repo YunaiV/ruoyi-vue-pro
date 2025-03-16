@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.firmware.IotOtaFirmwa
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;
 import jakarta.validation.Valid;
 
+// TODO @li：注释写的有点冗余，可以看看别的模块哈。= = AI 生成的注释，有的时候太啰嗦了，需要处理下的哈
 /**
  * OTA 固件管理 Service
  *
@@ -15,7 +16,7 @@ import jakarta.validation.Valid;
 public interface IotOtaFirmwareService {
 
     /**
-     * 创建OTA固件
+     * 创建 OTA 固件
      *
      * @param saveReqVO OTA固件保存请求对象，包含固件的相关信息
      * @return 返回新创建的固件的ID
@@ -23,14 +24,14 @@ public interface IotOtaFirmwareService {
     Long createOtaFirmware(@Valid IotOtaFirmwareCreateReqVO saveReqVO);
 
     /**
-     * 更新OTA固件信息
+     * 更新 OTA 固件信息
      *
      * @param updateReqVO OTA固件保存请求对象，包含需要更新的固件信息
      */
     void updateOtaFirmware(@Valid IotOtaFirmwareUpdateReqVO updateReqVO);
 
     /**
-     * 根据ID获取OTA固件信息
+     * 根据 ID 获取 OTA 固件信息
      *
      * @param id OTA固件的唯一标识符
      * @return 返回OTA固件的详细信息对象
@@ -38,7 +39,7 @@ public interface IotOtaFirmwareService {
     IotOtaFirmwareDO getOtaFirmware(Long id);
 
     /**
-     * 分页查询OTA固件信息
+     * 分页查询 OTA 固件信息
      *
      * @param pageReqVO 包含分页查询条件的请求对象
      * @return 返回分页查询结果，包含固件信息列表和分页信息
@@ -46,7 +47,7 @@ public interface IotOtaFirmwareService {
     PageResult<IotOtaFirmwareDO> getOtaFirmwarePage(@Valid IotOtaFirmwarePageReqVO pageReqVO);
 
     /**
-     * 验证物联网OTA固件是否存在
+     * 验证物联网 OTA 固件是否存在
      *
      * @param id 固件的唯一标识符
      *           该方法用于检查系统中是否存在与给定ID关联的物联网OTA固件信息

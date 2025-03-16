@@ -27,6 +27,7 @@ public class IotOtaFirmwareCreateReqVO {
     private String productId;
 
     @Schema(description = "签名方式", example = "MD5")
+    // TODO @li：是不是必传哈
     private String signMethod;
 
     @Schema(description = "固件文件 URL", requiredMode = REQUIRED, example = "https://www.iocoder.cn/yudao-firmware.zip")

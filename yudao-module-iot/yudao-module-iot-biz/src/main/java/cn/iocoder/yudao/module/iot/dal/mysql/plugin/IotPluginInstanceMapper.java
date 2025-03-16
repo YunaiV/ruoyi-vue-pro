@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.time.LocalDateTime;
 import java.util.List;
 
+// TODO @li：参考 IotOtaUpgradeRecordMapper 的写法
 @Mapper
 public interface IotPluginInstanceMapper extends BaseMapperX<IotPluginInstanceDO> {
 

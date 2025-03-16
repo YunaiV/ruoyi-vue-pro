@@ -8,16 +8,17 @@ import lombok.Data;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 @Data
-@Schema(description = "管理后台 - OTA升级记录分页 Request VO")
+@Schema(description = "管理后台 - OTA 升级记录分页 Request VO")
 public class IotOtaUpgradeRecordPageReqVO extends PageParam {
 
+    // TODO @li：已经有注解，不用重复注释
     /**
      * 升级任务编号字段。
      * <p>
      * 该字段用于标识升级任务的唯一编号，不能为空。
      */
-    @NotNull(message = "升级任务编号不能为空")
     @Schema(description = "升级任务编号", requiredMode = REQUIRED, example = "1024")
+    @NotNull(message = "升级任务编号不能为空")
     private Long taskId;
 
     /**

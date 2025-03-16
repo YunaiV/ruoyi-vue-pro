@@ -7,7 +7,7 @@ import lombok.Data;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
-@Schema(description = "管理后台 - OTA固件更新 Request VO")
+@Schema(description = "管理后台 - OTA 固件更新 Request VO")
 @Data
 public class IotOtaFirmwareUpdateReqVO {
 
@@ -15,6 +15,7 @@ public class IotOtaFirmwareUpdateReqVO {
     @NotNull(message = "固件编号不能为空")
     private Long id;
 
+    // TODO @li：name 是不是可以飞必传哈
     @Schema(description = "固件名称", requiredMode = REQUIRED, example = "智能开关固件")
     @NotEmpty(message = "固件名称不能为空")
     private String name;

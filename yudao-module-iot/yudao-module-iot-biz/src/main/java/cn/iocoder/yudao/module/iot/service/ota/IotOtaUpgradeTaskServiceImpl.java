@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
 
+// TODO @li：完善注释、注解顺序
 @Slf4j
 @Service
 @Validated
@@ -54,9 +55,11 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
         IotOtaFirmwareDO firmware = firmwareService.validateFirmwareExists(createReqVO.getFirmwareId());
         // 1.3 补全设备范围信息，并且校验是否又设备可以升级，如果没有设备可以升级，则报错
         validateScopeAndDevice(createReqVO.getScope(), createReqVO.getDeviceIds(), firmware.getProductId());
+
         // 2. 保存 OTA 升级任务信息到数据库
         IotOtaUpgradeTaskDO upgradeTask = initOtaUpgradeTask(createReqVO, firmware.getProductId());
         upgradeTaskMapper.insert(upgradeTask);
+
         // 3. 生成设备升级记录信息并存储，等待定时任务轮询
         upgradeRecordService.createOtaUpgradeRecordBatch(upgradeTask.getDeviceIds(), firmware.getId(), upgradeTask.getId());
         return upgradeTask.getId();
@@ -68,15 +71,16 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
         // 1.1 校验升级任务是否存在
         IotOtaUpgradeTaskDO upgradeTask = validateUpgradeTaskExists(id);
         // 1.2 校验升级任务是否可以取消
-        // 检查升级任务的状态是否为进行中，只有此状态下的任务才允许取消
+        // TODO @li：ObjUtil notequals
         if (!Objects.equals(upgradeTask.getStatus(), IotOtaUpgradeTaskStatusEnum.IN_PROGRESS.getStatus())) {
-            // 只有进行中的任务才可以取消
             throw exception(OTA_UPGRADE_TASK_CANNOT_CANCEL);
         }
+
         // 2. 更新 OTA 升级任务状态为已取消
         upgradeTaskMapper.updateById(IotOtaUpgradeTaskDO.builder()
                 .id(id).status(IotOtaUpgradeTaskStatusEnum.CANCELED.getStatus())
                 .build());
+
         // 3. 更新 OTA 升级记录状态为已取消
         upgradeRecordService.cancelUpgradeRecordByTaskId(id);
     }
@@ -98,11 +102,10 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
 
     @Override
     public void updateUpgradeTaskStatus(Long id, Integer status) {
-        upgradeTaskMapper.updateById(IotOtaUpgradeTaskDO.builder()
-                .id(id).status(status)
-                .build());
+        upgradeTaskMapper.updateById(IotOtaUpgradeTaskDO.builder().id(id).status(status).build());
     }
 
+    // TODO @li：注释有点冗余
     /**
      * 校验固件升级任务是否重复
      * <p>
@@ -123,6 +126,7 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
         }
     }
 
+    // TODO @li：注释有点冗余
     /**
      * 验证升级任务的范围和设备列表的有效性。
      * <p>
@@ -135,6 +139,7 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
      * @throws cn.iocoder.yudao.framework.common.exception.ServiceException，抛出相应的异常
      */
     private void validateScopeAndDevice(Integer scope, List<Long> deviceIds, String productId) {
+        // TODO @li：if return
         // 验证范围为“选择设备”时，设备列表不能为空
         if (Objects.equals(scope, IotOtaUpgradeTaskScopeEnum.SELECT.getScope())) {
             if (CollUtil.isEmpty(deviceIds)) {
@@ -149,6 +154,7 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
         }
     }
 
+    // TODO @li：注释有点冗余
     /**
      * 验证升级任务是否存在
      * <p>
@@ -167,6 +173,7 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
         return upgradeTask;
     }
 
+    // TODO @li：注释有点冗余
     /**
      * 初始化升级任务
      * <p>
@@ -177,6 +184,7 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
      * @param createReqVO 升级任务保存请求对象，包含创建升级任务所需的信息
      * @return 返回初始化后的升级任务对象
      */
+    // TODO @li：一次性的方法，不用特别抽小方法
     private IotOtaUpgradeTaskDO initOtaUpgradeTask(IotOtaUpgradeTaskSaveReqVO createReqVO, String productId) {
         // 将请求参数转换为升级任务对象
         IotOtaUpgradeTaskDO upgradeTask = BeanUtils.toBean(createReqVO, IotOtaUpgradeTaskDO.class);

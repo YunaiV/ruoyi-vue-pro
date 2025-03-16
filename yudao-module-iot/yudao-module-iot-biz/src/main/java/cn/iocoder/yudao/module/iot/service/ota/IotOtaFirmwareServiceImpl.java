@@ -39,13 +39,14 @@ public class IotOtaFirmwareServiceImpl implements IotOtaFirmwareService {
     public Long createOtaFirmware(IotOtaFirmwareCreateReqVO saveReqVO) {
         // 1. 校验固件产品 + 版本号不能重复
         validateProductAndVersionDuplicate(saveReqVO.getProductId(), saveReqVO.getVersion());
+
         // 2.1.转化数据格式，准备存储到数据库中
         IotOtaFirmwareDO firmware = BeanUtils.toBean(saveReqVO, IotOtaFirmwareDO.class);
         // 2.2.查询ProductKey
+        // TODO @li：productService.getProduct(Convert.toLong(firmware.getProductId())) 放到 1. 后面，先做参考校验。逻辑两段：1）先参数校验；2）构建对象 + 存储
         IotProductDO product = productService.getProduct(Convert.toLong(firmware.getProductId()));
         firmware.setProductKey(Objects.requireNonNull(product).getProductKey());
         // TODO @芋艿: 附件、附件签名等属性的计算
-
         otaFirmwareMapper.insert(firmware);
         return firmware.getId();
     }
@@ -79,6 +80,7 @@ public class IotOtaFirmwareServiceImpl implements IotOtaFirmwareService {
         return firmware;
     }
 
+    // TODO @li：注释有点冗余
     /**
      * 验证产品和版本号是否重复
      * <p>

@@ -46,6 +46,7 @@ public class IotOtaFirmwareDO extends BaseDO {
      *
      * 关联 {@link cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO#getId()}
      */
+    // TODO @li：帮我改成 Long 哈，写错了
     private String productId;
     /**
      * 产品标识

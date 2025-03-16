@@ -9,11 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
-/**
- * OTA固件 Mapper
- *
- * @author Shelly
- */
+// TODO @li：参考 IotOtaUpgradeRecordMapper 的写法
 @Mapper
 public interface IotOtaFirmwareMapper extends BaseMapperX<IotOtaFirmwareDO> {
 

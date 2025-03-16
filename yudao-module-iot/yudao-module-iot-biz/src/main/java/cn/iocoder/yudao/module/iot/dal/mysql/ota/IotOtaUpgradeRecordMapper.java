@@ -13,14 +13,10 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 import java.util.Map;
 
-/**
- * OTA 升级记录 Mapper
- *
- * @author Shelly
- */
 @Mapper
 public interface IotOtaUpgradeRecordMapper extends BaseMapperX<IotOtaUpgradeRecordDO> {
 
+    // TODO @li：selectByFirmwareIdAndTaskIdAndDeviceId；让方法自解释
     /**
      * 根据条件查询单个OTA升级记录
      *
@@ -37,6 +33,7 @@ public interface IotOtaUpgradeRecordMapper extends BaseMapperX<IotOtaUpgradeReco
                 .eqIfPresent(IotOtaUpgradeRecordDO::getDeviceId, deviceId));
     }
 
+    // TODO @li：这个是不是 groupby status 就 ok 拉？
     /**
      * 根据任务ID和设备名称查询OTA升级记录的状态统计信息。
      * 该函数通过SQL查询统计不同状态（0到5）的记录数量，并返回一个包含统计结果的Map列表。
@@ -75,19 +72,23 @@ public interface IotOtaUpgradeRecordMapper extends BaseMapperX<IotOtaUpgradeReco
             "where firmware_id = #{firmwareId}")
     List<Map<String, Object>> selectOtaUpgradeRecordStatistics(Long firmwareId);
 
+    // TODO @li：这里的注释，可以去掉哈
     /**
      * 根据分页查询条件获取IOT OTA升级记录的分页结果
      *
      * @param pageReqVO 分页查询请求参数，包含设备名称、任务ID等查询条件
      * @return 返回分页查询结果，包含符合条件的IOT OTA升级记录列表
      */
+    // TODO @li：selectPage 就 ok 拉。
     default PageResult<IotOtaUpgradeRecordDO> selectUpgradeRecordPage(IotOtaUpgradeRecordPageReqVO pageReqVO) {
+        // TODO @li：这里的注释，可以去掉哈；然后下面的“如果”。。。也没必要注释
         // 使用LambdaQueryWrapperX构建查询条件，并根据请求参数动态添加查询条件
         return selectPage(pageReqVO, new LambdaQueryWrapperX<IotOtaUpgradeRecordDO>()
                 .likeIfPresent(IotOtaUpgradeRecordDO::getDeviceName, pageReqVO.getDeviceName()) // 如果设备名称存在，则添加模糊查询条件
                 .eqIfPresent(IotOtaUpgradeRecordDO::getTaskId, pageReqVO.getTaskId())); // 如果任务ID存在，则添加等值查询条件
     }
 
+    // TODO @li：这里的注释，可以去掉哈
     /**
      * 根据任务ID和状态更新升级记录的状态
      * <p>
@@ -97,6 +98,7 @@ public interface IotOtaUpgradeRecordMapper extends BaseMapperX<IotOtaUpgradeReco
      * @param taskId      要更新的升级记录对应的任务ID，类型为Long
      * @param whereStatus 用于筛选升级记录的当前状态值，类型为Integer
      */
+    // TODO @li：改成 updateByTaskIdAndStatus(taskId, status, IotOtaUpgradeRecordDO) 更通用一些。
     default void updateUpgradeRecordStatusByTaskIdAndStatus(Integer setStatus, Long taskId, Integer whereStatus) {
         // 使用LambdaUpdateWrapper构建更新条件，将指定状态的记录更新为指定状态
         update(new LambdaUpdateWrapper<IotOtaUpgradeRecordDO>()
@@ -106,6 +108,7 @@ public interface IotOtaUpgradeRecordMapper extends BaseMapperX<IotOtaUpgradeReco
         );
     }
 
+    // TODO @li：参考上面的建议，调整下这个方法
     /**
      * 根据状态查询符合条件的升级记录列表
      * <p>
@@ -120,6 +123,7 @@ public interface IotOtaUpgradeRecordMapper extends BaseMapperX<IotOtaUpgradeReco
                 .eq(IotOtaUpgradeRecordDO::getStatus, state));
     }
 
+    // TODO @li：参考上面的建议，调整下这个方法
     /**
      * 更新升级记录状态
      * <p>
@@ -137,6 +141,7 @@ public interface IotOtaUpgradeRecordMapper extends BaseMapperX<IotOtaUpgradeReco
         );
     }
 
+    // TODO @li：参考上面的建议，调整下这个方法
     /**
      * 根据任务ID查询升级记录列表
      * <p>
