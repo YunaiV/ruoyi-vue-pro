@@ -1,6 +1,7 @@
 package com.somle.matomo.service;
 
-import cn.iocoder.yudao.framework.common.util.collection.PageUtils;
+
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import com.somle.matomo.model.MatomoMethodVO;
 import com.somle.matomo.model.MatomoVisitReqVO;
@@ -30,7 +31,7 @@ class MatomoServiceTest extends BaseMockitoUnitTest {
             .filterOffset(0)
             .build();
 
-        var results = PageUtils.getAllPages(
+        var results = StreamX.iterate(
             service.getResponse(methodVO, reqVO),
             response -> !response.isEmpty(),
             response -> {

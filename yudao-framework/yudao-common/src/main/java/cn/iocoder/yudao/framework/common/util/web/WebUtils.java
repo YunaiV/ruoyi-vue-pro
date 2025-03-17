@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.framework.common.util.web;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import cn.hutool.http.ContentType;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import cn.iocoder.yudao.framework.common.util.string.StrUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
@@ -17,13 +17,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.zip.GZIPInputStream;
 
 @Slf4j
 public class WebUtils {
+
+    public static final String WWW_EVAL_COM = "http://www.eval.com";
+
     private static final OkHttpClient client = new OkHttpClient().newBuilder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
@@ -120,8 +126,18 @@ public class WebUtils {
             log.debug("headers: " + headers.toString());
         }
 
-        String bodyString = JsonUtilsX.toJsonString(payload);
-        RequestBody body = RequestBody.create(bodyString, MediaType.parse("application/json; charset=utf-8"));
+        String bodyString = null;
+        if(requestX.getContentType()==null) {
+            requestX.setContentType(ContentType.JSON);
+        }
+        if(requestX.getContentType()== ContentType.JSON) {
+            bodyString=JsonUtilsX.toJsonString(payload);
+        } else if (requestX.getContentType()==ContentType.FORM_URLENCODED) {
+            bodyString=buildUrlPatternBody(payload);
+        } else {
+            throw new IllegalArgumentException("不支持的 ContentType "+ requestX.getContentType().name());
+        }
+        RequestBody body = RequestBody.create(bodyString, MediaType.parse(requestX.getContentType().getValue()+"; charset=utf-8"));
         log.info("body: " + bodyString);
 
 
@@ -138,6 +154,25 @@ public class WebUtils {
 
         return request;
 
+    }
+
+    public static String buildUrlPatternBody(Object param) {
+        JSONObject json = JsonUtilsX.toJSONObject(param);
+        return buildUrlPatternBody(json);
+    }
+
+    public static String buildUrlPatternBody(JSONObject params)  {
+        Map<String, String> json = new HashMap<>();
+        params.fieldNames().forEachRemaining(key -> {
+            json.put(key, params.getString(key));
+        });
+        return buildUrlPatternBody(json);
+    }
+
+    public static String buildUrlPatternBody(Map<String, String> params)  {
+        String body=urlWithParams(WWW_EVAL_COM, params);
+        body=body.substring(WWW_EVAL_COM.length()+2);
+        return body;
     }
 
     @SneakyThrows

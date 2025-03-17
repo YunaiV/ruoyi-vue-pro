@@ -49,9 +49,9 @@ public class EccangController {
         return eccangService.getOrderUnarchive(vo).toList();
     }
 
-    @GetMapping("/getOrder")
+    @PostMapping("/getOrder")
     public List<EccangPage> getOrder(
-        EccangOrderVO order
+        @RequestBody EccangOrderVO order
     ) {
         return eccangService.getOrderUnarchivePages(order).toList();
     }

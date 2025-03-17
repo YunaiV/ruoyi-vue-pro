@@ -46,6 +46,7 @@
         <module>somle-rakuten</module>
         <module>somle-otto</module>
         <module>somle-bestbuy</module>
+        <module>somle-cdiscount</module>
 <!--        <module>yudao-module-iot</module>-->
     </modules>
 

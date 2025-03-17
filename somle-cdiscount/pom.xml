@@ -10,19 +10,12 @@
     </parent>
 
     <groupId>com.somle</groupId>
-    <artifactId>somle-eccang</artifactId>
-
+    <artifactId>somle-cdiscount</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-common</artifactId>
-        </dependency>
-
-        <!--被yudao-spring-boot-starter-mybatis以provided依赖-->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-spring-boot-starter-web</artifactId>
         </dependency>
 
         <dependency>
@@ -31,17 +24,10 @@
             <scope>test</scope>
         </dependency>
 
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-integration</artifactId>
-        </dependency>
-
     </dependencies>
 
 </project>
