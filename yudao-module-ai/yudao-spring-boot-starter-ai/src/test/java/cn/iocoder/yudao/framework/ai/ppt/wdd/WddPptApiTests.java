@@ -9,7 +9,6 @@ import reactor.core.publisher.Flux;
 import java.util.Map;
 import java.util.Objects;
 
-
 /**
  * {@link WddPptApi} 集成测试
  *
@@ -19,11 +18,9 @@ public class WddPptApiTests {
 
     private final WddPptApi wddPptApi = new WddPptApi("https://docmee.cn");
 
+    private final String token = ""; // API Token
 
-    private final String token = "";
-
-
-    @Test //获取token
+    @Test
     @Disabled
     public void testCreateApiToken() {
         // 准备参数
@@ -35,8 +32,10 @@ public class WddPptApiTests {
         System.out.println(token);
     }
 
-
-    @Test // 创建任务
+    /**
+     * 创建任务
+     */
+    @Test
     @Disabled
     public void testCreateTask() {
         WddPptApi.ApiResponse apiResponse = wddPptApi.createTask(token, 1, "dify 介绍", null);
@@ -47,8 +46,9 @@ public class WddPptApiTests {
     @Test // 创建大纲
     @Disabled
     public void testGenerateOutlineRequest() {
-        WddPptApi.CreateOutlineRequest request = new WddPptApi.CreateOutlineRequest("1901539019628613632", "medium", null, null, null, null);
-        //调用
+        WddPptApi.CreateOutlineRequest request = new WddPptApi.CreateOutlineRequest(
+                "1901539019628613632", "medium", null, null, null, null);
+        // 调用
         Flux<Map<String, Object>> flux = wddPptApi.createOutline(token, request);
         StringBuffer contentBuffer = new StringBuffer();
         flux.doOnNext(chunk -> {
@@ -61,14 +61,17 @@ public class WddPptApiTests {
         }).then().block();
         // 打印结果
         System.out.println(contentBuffer);
-
     }
 
-    @Test // 修改大纲
+    /**
+     * 修改大纲
+     */
+    @Test
     @Disabled
     public void testUpdateOutlineRequest() {
-        WddPptApi.UpdateOutlineRequest request = new WddPptApi.UpdateOutlineRequest("1901539019628613632", TEST_OUT_LINE_CONTENT, "精简一点，三个章节即可");
-        //调用
+        WddPptApi.UpdateOutlineRequest request = new WddPptApi.UpdateOutlineRequest(
+                "1901539019628613632", TEST_OUT_LINE_CONTENT, "精简一点，三个章节即可");
+        // 调用
         Flux<Map<String, Object>> flux = wddPptApi.updateOutline(token, request);
         StringBuffer contentBuffer = new StringBuffer();
         flux.doOnNext(chunk -> {
@@ -84,30 +87,35 @@ public class WddPptApiTests {
 
     }
 
-    @Test // 获取 PPT 模版分页
+    /**
+     * 获取 PPT 模版分页
+     */
+    @Test
     @Disabled
     public void testGetPptTemplatePage() {
         // 准备参数
-        WddPptApi.TemplateQueryRequest.Filter filter = new WddPptApi.TemplateQueryRequest.Filter(1, null, null, null);
+        WddPptApi.TemplateQueryRequest.Filter filter = new WddPptApi.TemplateQueryRequest.Filter(
+                1, null, null, null);
         WddPptApi.TemplateQueryRequest request = new WddPptApi.TemplateQueryRequest(1, 10, filter);
-        //调用
+        // 调用
         WddPptApi.PagePptTemplateInfo pptTemplatePage = wddPptApi.getTemplatePage(token, request);
         // 打印结果
         System.out.println(pptTemplatePage);
     }
 
-
-    @Test // 生成 PPT
+    /**
+     * 生成 PPT
+     */
+    @Test
     @Disabled
     public void testGeneratePptx() {
         // 准备参数
         WddPptApi.CreatePptRequest request = new WddPptApi.CreatePptRequest("1901539019628613632", "1805081814809960448", TEST_OUT_LINE_CONTENT);
-        //调用
+        // 调用
         WddPptApi.PptInfo pptInfo = wddPptApi.create(token, request);
         // 打印结果
         System.out.println(pptInfo);
     }
-
 
     private final String TEST_OUT_LINE_CONTENT = """
             # Dify：新一代AI应用开发平台

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.ai.ppt.xunfei;
 
-import cn.iocoder.yudao.framework.ai.core.model.xunfei.api.XunfeiPptApi;
+import cn.hutool.core.io.FileUtil;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XunfeiPptApi;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -8,8 +9,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 /**
  * {@link XunfeiPptApi} 集成测试
@@ -18,13 +17,16 @@ import java.io.IOException;
  */
 public class XunfeiPptApiTests {
 
-    // 讯飞API配置信息，实际使用时请替换为您的应用信息
+    // 讯飞 API 配置信息，实际使用时请替换为您的应用信息
     private static final String APP_ID = "";
     private static final String API_SECRET = "";
 
     private final XunfeiPptApi xunfeiPptApi = new XunfeiPptApi(XunfeiPptApi.BASE_URL, APP_ID, API_SECRET);
 
-    @Test // 获取PPT模板列表
+    /**
+     * 获取 PPT 模板列表
+     */
+    @Test
     @Disabled
     public void testGetTemplatePage() {
         // 调用方法
@@ -48,35 +50,42 @@ public class XunfeiPptApiTests {
         }
     }
 
-    @Test // 创建大纲（通过文本）
+    /**
+     * 创建大纲（通过文本）
+     */
+    @Test
     @Disabled
     public void testCreateOutline() {
         XunfeiPptApi.CreateResponse response = getCreateResponse();
         // 打印结果
         System.out.println("创建大纲响应：" + JsonUtils.toJsonString(response));
 
-        // 保存sid和outline用于后续测试
+        // 保存 sid 和 outline 用于后续测试
         if (response != null && response.data() != null) {
             System.out.println("sid: " + response.data().sid());
             if (response.data().outline() != null) {
-                // 使用OutlineData的toJsonString方法
+                // 使用 OutlineData 的 toJsonString 方法
                 System.out.println("outline: " + response.data().outline().toJsonString());
-                // 将outline对象转换为JSON字符串，用于后续createPptByOutline测试
+                // 将 outline 对象转换为 JSON 字符串，用于后续 createPptByOutline 测试
                 String outlineJson = response.data().outline().toJsonString();
-                System.out.println("可用于createPptByOutline的outline字符串: " + outlineJson);
+                System.out.println("可用于 createPptByOutline 的 outline 字符串: " + outlineJson);
             }
         }
     }
 
-    // 创建大纲（通过文本）
+    /**
+     * 创建大纲（通过文本）
+     * @return 创建大纲响应
+     */
     private XunfeiPptApi.CreateResponse getCreateResponse() {
-        // 准备参数
         String param = "智能体平台 Dify 介绍";
-        // 调用方法
         return xunfeiPptApi.createOutline(param);
     }
 
-    @Test // 通过大纲创建PPT（完整参数）
+    /**
+     * 通过大纲创建 PPT（完整参数）
+     */
+    @Test
     @Disabled
     public void testCreatePptByOutlineWithFullParams() {
         // 创建大纲对象
@@ -84,7 +93,7 @@ public class XunfeiPptApiTests {
         // 调用方法
         XunfeiPptApi.CreateResponse response = xunfeiPptApi.createPptByOutline(createResponse.data().outline(), "精简一些，不要超过6个章节");
         // 打印结果
-        System.out.println("通过大纲创建PPT响应：" + JsonUtils.toJsonString(response));
+        System.out.println("通过大纲创建 PPT 响应：" + JsonUtils.toJsonString(response));
 
         // 保存sid用于后续进度查询
         if (response != null && response.data() != null) {
@@ -95,10 +104,13 @@ public class XunfeiPptApiTests {
         }
     }
 
-    @Test // 检查PPT生成进度
+    /**
+     * 检查 PPT 生成进度
+     */
+    @Test
     @Disabled
     public void testCheckProgress() {
-        // 准备参数 - 使用之前创建PPT时返回的sid
+        // 准备参数 - 使用之前创建 PPT 时返回的 sid
         String sid = "e96dac09f2ec4ee289f029a5fb874ecd"; // 替换为实际的sid
 
         // 调用方法
@@ -111,8 +123,8 @@ public class XunfeiPptApiTests {
             XunfeiPptApi.ProgressResponseData data = response.data();
 
             // 打印PPT生成状态
-            System.out.println("PPT构建状态: " + data.pptStatus());
-            System.out.println("AI配图状态: " + data.aiImageStatus());
+            System.out.println("PPT 构建状态: " + data.pptStatus());
+            System.out.println("AI 配图状态: " + data.aiImageStatus());
             System.out.println("演讲备注状态: " + data.cardNoteStatus());
 
             // 打印进度信息
@@ -126,30 +138,33 @@ public class XunfeiPptApiTests {
 
             // 检查是否完成
             if (data.isAllDone()) {
-                System.out.println("PPT生成已完成!");
-                System.out.println("PPT下载链接: " + data.pptUrl());
+                System.out.println("PPT 生成已完成!");
+                System.out.println("PPT 下载链接: " + data.pptUrl());
             }
             // 检查是否失败
             else if (data.isFailed()) {
-                System.out.println("PPT生成失败!");
+                System.out.println("PPT 生成失败!");
                 System.out.println("错误信息: " + data.errMsg());
             }
             // 正在进行中
             else {
-                System.out.println("PPT生成中，请稍后再查询...");
+                System.out.println("PPT 生成中，请稍后再查询...");
             }
         }
     }
 
-    @Test // 轮询检查PPT生成进度直到完成
+    /**
+     * 轮询检查 PPT 生成进度直到完成
+     */
+    @Test
     @Disabled
     public void testPollCheckProgress() throws InterruptedException {
-        // 准备参数 - 使用之前创建PPT时返回的sid
+        // 准备参数 - 使用之前创建 PP T时返回的 sid
         String sid = "fa36e926f2ed434987fcb4c1f0776ffb"; // 替换为实际的sid
 
         // 最大轮询次数
         int maxPolls = 20;
-        // 轮询间隔（毫秒）- 讯飞API限流为3秒一次
+        // 轮询间隔（毫秒）- 讯飞 API 限流为 3 秒一次
         long pollInterval = 3500;
 
         for (int i = 0; i < maxPolls; i++) {
@@ -163,7 +178,7 @@ public class XunfeiPptApiTests {
                 XunfeiPptApi.ProgressResponseData data = response.data();
 
                 // 打印进度信息
-                System.out.println("PPT构建状态: " + data.pptStatus());
+                System.out.println("PPT 构建状态: " + data.pptStatus());
                 if (data.totalPages() != null && data.donePages() != null) {
                     System.out.println("完成进度: " + data.donePages() + "/" + data.totalPages()
                             + " (" + data.getProgressPercent() + "%)");
@@ -171,19 +186,19 @@ public class XunfeiPptApiTests {
 
                 // 检查是否完成
                 if (data.isAllDone()) {
-                    System.out.println("PPT生成已完成!");
-                    System.out.println("PPT下载链接: " + data.pptUrl());
+                    System.out.println("PPT 生成已完成!");
+                    System.out.println("PPT 下载链接: " + data.pptUrl());
                     break;
                 }
                 // 检查是否失败
                 else if (data.isFailed()) {
-                    System.out.println("PPT生成失败!");
+                    System.out.println("PPT 生成失败!");
                     System.out.println("错误信息: " + data.errMsg());
                     break;
                 }
                 // 正在进行中，继续轮询
                 else {
-                    System.out.println("PPT生成中，等待" + (pollInterval / 1000) + "秒后继续查询...");
+                    System.out.println("PPT 生成中，等待" + (pollInterval / 1000) + "秒后继续查询...");
                     Thread.sleep(pollInterval);
                 }
             } else {
@@ -193,7 +208,10 @@ public class XunfeiPptApiTests {
         }
     }
 
-    @Test // 直接创建PPT（通过文本）
+    /**
+     * 直接创建 PPT（通过文本）
+     */
+    @Test
     @Disabled
     public void testCreatePptByText() {
         // 准备参数
@@ -202,9 +220,9 @@ public class XunfeiPptApiTests {
         // 调用方法
         XunfeiPptApi.CreateResponse response = xunfeiPptApi.create(query);
         // 打印结果
-        System.out.println("直接创建PPT响应：" + JsonUtils.toJsonString(response));
+        System.out.println("直接创建 PPT 响应：" + JsonUtils.toJsonString(response));
 
-        // 保存sid用于后续进度查询
+        // 保存 sid 用于后续进度查询
         if (response != null && response.data() != null) {
             System.out.println("sid: " + response.data().sid());
             if (response.data().coverImgSrc() != null) {
@@ -215,9 +233,12 @@ public class XunfeiPptApiTests {
         }
     }
 
-    @Test // 直接创建PPT（通过文件）
+    /**
+     * 直接创建 PPT（通过文件）
+     */
+    @Test
     @Disabled
-    public void testCreatePptByFile() throws IOException {
+    public void testCreatePptByFile() {
         // 准备参数
         File file = new File("src/test/resources/test.txt"); // 请确保此文件存在
         MultipartFile multipartFile = convertFileToMultipartFile(file);
@@ -227,7 +248,7 @@ public class XunfeiPptApiTests {
         // 打印结果
         System.out.println("通过文件创建PPT响应：" + JsonUtils.toJsonString(response));
 
-        // 保存sid用于后续进度查询
+        // 保存 sid 用于后续进度查询
         if (response != null && response.data() != null) {
             System.out.println("sid: " + response.data().sid());
             if (response.data().coverImgSrc() != null) {
@@ -238,11 +259,14 @@ public class XunfeiPptApiTests {
         }
     }
 
-    @Test // 直接创建PPT（完整参数）
+    /**
+     * 直接创建 PPT（完整参数）
+     */
+    @Test
     @Disabled
-    public void testCreatePptWithFullParams() throws IOException {
+    public void testCreatePptWithFullParams() {
         // 准备参数
-        String query = "合肥天气趋势分析，包括近5年的气温变化、降水量变化、极端天气事件，以及对城市生活的影响";
+        String query = "合肥天气趋势分析，包括近 5 年的气温变化、降水量变化、极端天气事件，以及对城市生活的影响";
 
         // 创建请求对象
         XunfeiPptApi.CreatePptRequest request = XunfeiPptApi.CreatePptRequest.builder()
@@ -258,9 +282,9 @@ public class XunfeiPptApiTests {
         // 调用方法
         XunfeiPptApi.CreateResponse response = xunfeiPptApi.create(request);
         // 打印结果
-        System.out.println("使用完整参数创建PPT响应：" + JsonUtils.toJsonString(response));
+        System.out.println("使用完整参数创建 PPT 响应：" + JsonUtils.toJsonString(response));
 
-        // 保存sid用于后续进度查询
+        // 保存 sid 用于后续进度查询
         if (response != null && response.data() != null) {
             String sid = response.data().sid();
             System.out.println("sid: " + sid);
@@ -275,7 +299,7 @@ public class XunfeiPptApiTests {
             XunfeiPptApi.ProgressResponse progressResponse = xunfeiPptApi.checkProgress(sid);
             if (progressResponse != null && progressResponse.data() != null) {
                 XunfeiPptApi.ProgressResponseData progressData = progressResponse.data();
-                System.out.println("PPT构建状态: " + progressData.pptStatus());
+                System.out.println("PPT 构建状态: " + progressData.pptStatus());
                 if (progressData.totalPages() != null && progressData.donePages() != null) {
                     System.out.println("完成进度: " + progressData.donePages() + "/" + progressData.totalPages()
                             + " (" + progressData.getProgressPercent() + "%)");
@@ -285,16 +309,10 @@ public class XunfeiPptApiTests {
     }
 
     /**
-     * 将File转换为MultipartFile
+     * 将 File 转换为 MultipartFile
      */
-    private MultipartFile convertFileToMultipartFile(File file) throws IOException {
-        FileInputStream input = new FileInputStream(file);
-        return new MockMultipartFile(
-                "file",
-                file.getName(),
-                "text/plain",
-                input.readAllBytes()
-        );
+    private MultipartFile convertFileToMultipartFile(File file) {
+        return new MockMultipartFile("file", file.getName(), "text/plain", FileUtil.readBytes(file));
     }
 
-} 
+}

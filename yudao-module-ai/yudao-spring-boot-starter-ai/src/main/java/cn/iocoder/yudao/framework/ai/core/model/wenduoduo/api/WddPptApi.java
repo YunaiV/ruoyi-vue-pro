@@ -24,11 +24,11 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+// TODO @新：要不改成 WenDuoDuoPptApi
 /**
  * 文多多 API
- * <p>
- * <p>
- * * 对接文多多：<a href="https://docmee.cn/open-platform/api">PPT 生成 API</a>
+ *
+ * @see <a href="https://docmee.cn/open-platform/api">PPT 生成 API</a>
  *
  * @author xiaoxin
  */
@@ -49,13 +49,14 @@ public class WddPptApi {
                 sink.error(new IllegalStateException("[wdd-api] 调用失败！"));
             });
 
+    // TODO @新：是不是不用 baseUrl 哈
     public WddPptApi(String baseUrl) {
         this.webClient = WebClient.builder()
                 .baseUrl(baseUrl)
+                // TODO @新：建议，token 作为 defaultHeader
                 .defaultHeaders((headers) -> headers.setContentType(MediaType.APPLICATION_JSON))
                 .build();
     }
-
 
     /**
      * 创建 token
@@ -81,7 +82,7 @@ public class WddPptApi {
                 .block();
     }
 
-
+    // TODO @xin：是不是给个 API 连接，这样 type、content、files 都不用写注释太细了
     /**
      * 创建任务
      *
@@ -122,7 +123,6 @@ public class WddPptApi {
                 formData.add("file", file.getResource());
             }
         }
-
         return this.webClient.post()
                 .uri("/api/ppt/v2/createTask")
                 .header("token", token)
@@ -162,7 +162,7 @@ public class WddPptApi {
     }
 
     /**
-     * 分页查询PPT模板
+     * 分页查询 PPT 模板
      *
      * @param token   令牌
      * @param request 请求体
@@ -214,7 +214,7 @@ public class WddPptApi {
     }
 
     /**
-     * 生成PPT
+     * 生成 PPT
      *
      * @return PPT信息
      */
@@ -243,9 +243,11 @@ public class WddPptApi {
             String uid,
             Integer limit
     ) {
+
         public CreateTokenRequest(String apiKey) {
             this(apiKey, null, null);
         }
+
     }
 
     /**
@@ -256,8 +258,7 @@ public class WddPptApi {
             Integer code,
             String message,
             Map<String, Object> data
-    ) {
-    }
+    ) { }
 
     /**
      * 创建任务
@@ -267,8 +268,7 @@ public class WddPptApi {
             Integer type,
             String content,
             List<MultipartFile> files
-    ) {
-    }
+    ) { }
 
     /**
      * 生成大纲内容请求
@@ -281,8 +281,7 @@ public class WddPptApi {
             String audience,
             String lang,
             String prompt
-    ) {
-    }
+    ) { }
 
     /**
      * 修改大纲内容请求
@@ -292,21 +291,20 @@ public class WddPptApi {
             String id,
             String markdown,
             String question
-    ) {
-    }
+    ) { }
 
     /**
-     * 生成PPT请求
+     * 生成 PPT 请求
      */
+    // TODO @新：要不按照 PptCreateRequest 这样的风格
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     public record CreatePptRequest(
             String id,
             String templateId,
             String markdown
-    ) {
-    }
+    ) { }
 
-
+    // TODO @新：要不写下类注释
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     public record PptInfo(
             String id,
@@ -325,36 +323,35 @@ public class WddPptApi {
             LocalDateTime createTime,
             String createUser,
             String updateUser
-    ) {
-    }
+    ) { }
 
-
+    // TODO @新：要不写下类注释
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     public record TemplateQueryRequest(
             int page,
             int size,
             Filter filters
     ) {
+
         @JsonInclude(value = JsonInclude.Include.NON_NULL)
         public record Filter(
                 int type,
                 String category,
                 String style,
                 String themeColor
-        ) {
-        }
+        ) { }
+
     }
 
-
+    // TODO @新：要不写下类注释
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     public record PagePptTemplateInfo(
             List<PptTemplateInfo> data,
             String total
-    ) {
-
-    }
+    ) {}
 
 
+    // TODO @新：要不写下类注释
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     public record PptTemplateInfo(
             String id,
@@ -383,7 +380,6 @@ public class WddPptApi {
             LocalDateTime createTime,
             String createUser,
             String updateUser
-    ) {
-    }
+    ) { }
 
 }
