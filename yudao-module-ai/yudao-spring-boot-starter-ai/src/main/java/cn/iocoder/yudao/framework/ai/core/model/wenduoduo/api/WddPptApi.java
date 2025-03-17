@@ -33,7 +33,7 @@ import java.util.function.Predicate;
  * @author xiaoxin
  */
 @Slf4j
-public class WddApi {
+public class WddPptApi {
 
     public static final String BASE_URL = "https://docmee.cn";
 
@@ -49,7 +49,7 @@ public class WddApi {
                 sink.error(new IllegalStateException("[wdd-api] 调用失败！"));
             });
 
-    public WddApi(String baseUrl) {
+    public WddPptApi(String baseUrl) {
         this.webClient = WebClient.builder()
                 .baseUrl(baseUrl)
                 .defaultHeaders((headers) -> headers.setContentType(MediaType.APPLICATION_JSON))
@@ -162,49 +162,13 @@ public class WddApi {
     }
 
     /**
-     * 生成大纲内容
-     *
-     * @return 大纲内容流
-     */
-    public Flux<Map<String, Object>> generateOutlineContent(String token, GenerateOutlineRequest request) {
-        return this.webClient.post()
-                .uri("/api/ppt/v2/generateContent")
-                .header("token", token)
-                .body(Mono.just(request), GenerateOutlineRequest.class)
-                .retrieve()
-                .onStatus(STATUS_PREDICATE, EXCEPTION_FUNCTION.apply(request))
-                .bodyToFlux(new ParameterizedTypeReference<>() {
-                });
-    }
-
-    /**
-     * 修改大纲内容
-     *
-     * @param id       任务ID
-     * @param markdown 大纲内容markdown
-     * @param question 用户修改建议
-     * @return 大纲内容流
-     */
-    public Flux<Map<String, Object>> updateOutlineContent(String token, UpdateOutlineRequest request) {
-        return this.webClient.post()
-                .uri("/api/ppt/v2/updateContent")
-                .header("token", token)
-                .body(Mono.just(request), UpdateOutlineRequest.class)
-                .retrieve()
-                .onStatus(STATUS_PREDICATE, EXCEPTION_FUNCTION.apply(request))
-                .bodyToFlux(new ParameterizedTypeReference<>() {
-                });
-    }
-
-
-    /**
      * 分页查询PPT模板
      *
      * @param token   令牌
      * @param request 请求体
      * @return 模板列表
      */
-    public PagePptTemplateInfo getPptTemplatePage(String token, TemplateQueryRequest request) {
+    public PagePptTemplateInfo getTemplatePage(String token, TemplateQueryRequest request) {
         return this.webClient.post()
                 .uri("/api/ppt/templates")
                 .header("token", token)
@@ -216,17 +180,49 @@ public class WddApi {
                 .block();
     }
 
+    /**
+     * 生成大纲内容
+     *
+     * @return 大纲内容流
+     */
+    public Flux<Map<String, Object>> createOutline(String token, CreateOutlineRequest request) {
+        return this.webClient.post()
+                .uri("/api/ppt/v2/generateContent")
+                .header("token", token)
+                .body(Mono.just(request), CreateOutlineRequest.class)
+                .retrieve()
+                .onStatus(STATUS_PREDICATE, EXCEPTION_FUNCTION.apply(request))
+                .bodyToFlux(new ParameterizedTypeReference<>() {
+                });
+    }
+
+    /**
+     * 修改大纲内容
+     *
+     * @param request 请求体
+     * @return 大纲内容流
+     */
+    public Flux<Map<String, Object>> updateOutline(String token, UpdateOutlineRequest request) {
+        return this.webClient.post()
+                .uri("/api/ppt/v2/updateContent")
+                .header("token", token)
+                .body(Mono.just(request), UpdateOutlineRequest.class)
+                .retrieve()
+                .onStatus(STATUS_PREDICATE, EXCEPTION_FUNCTION.apply(request))
+                .bodyToFlux(new ParameterizedTypeReference<>() {
+                });
+    }
 
     /**
      * 生成PPT
      *
      * @return PPT信息
      */
-    public PptInfo generatePptx(String token, GeneratePptxRequest request) {
+    public PptInfo create(String token, CreatePptRequest request) {
         return this.webClient.post()
                 .uri("/api/ppt/v2/generatePptx")
                 .header("token", token)
-                .body(Mono.just(request), GeneratePptxRequest.class)
+                .body(Mono.just(request), CreatePptRequest.class)
                 .retrieve()
                 .onStatus(STATUS_PREDICATE, EXCEPTION_FUNCTION.apply(request))
                 .bodyToMono(ApiResponse.class)
@@ -278,7 +274,7 @@ public class WddApi {
      * 生成大纲内容请求
      */
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
-    public record GenerateOutlineRequest(
+    public record CreateOutlineRequest(
             String id,
             String length,
             String scene,
@@ -303,7 +299,7 @@ public class WddApi {
      * 生成PPT请求
      */
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
-    public record GeneratePptxRequest(
+    public record CreatePptRequest(
             String id,
             String templateId,
             String markdown

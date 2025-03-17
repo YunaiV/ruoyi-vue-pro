@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.ai.ppt.wdd;
 
-import cn.iocoder.yudao.framework.ai.core.model.wenduoduo.api.WddApi;
+import cn.iocoder.yudao.framework.ai.core.model.wenduoduo.api.WddPptApi;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -11,26 +11,26 @@ import java.util.Objects;
 
 
 /**
- * {@link WddApi} 集成测试
+ * {@link WddPptApi} 集成测试
  *
  * @author xiaoxin
  */
-public class WddApiTests {
+public class WddPptApiTests {
 
-    private final WddApi wddApi = new WddApi("https://docmee.cn");
+    private final WddPptApi wddPptApi = new WddPptApi("https://docmee.cn");
 
 
-    private final String token = "sk_FJo7sKErrrEs5CIZz1";
+    private final String token = "";
 
 
     @Test //获取token
     @Disabled
     public void testCreateApiToken() {
         // 准备参数
-        String apiKey = "ak_RK1rm7TrEv3E3JSWIK";
-        WddApi.CreateTokenRequest request = new WddApi.CreateTokenRequest(apiKey);
+        String apiKey = "";
+        WddPptApi.CreateTokenRequest request = new WddPptApi.CreateTokenRequest(apiKey);
         // 调用方法
-        String token = wddApi.createApiToken(request);
+        String token = wddPptApi.createApiToken(request);
         // 打印结果
         System.out.println(token);
     }
@@ -39,7 +39,7 @@ public class WddApiTests {
     @Test // 创建任务
     @Disabled
     public void testCreateTask() {
-        WddApi.ApiResponse apiResponse = wddApi.createTask(token, 1, "dify 介绍", null);
+        WddPptApi.ApiResponse apiResponse = wddPptApi.createTask(token, 1, "dify 介绍", null);
         System.out.println(apiResponse);
     }
 
@@ -47,9 +47,9 @@ public class WddApiTests {
     @Test // 创建大纲
     @Disabled
     public void testGenerateOutlineRequest() {
-        WddApi.GenerateOutlineRequest request = new WddApi.GenerateOutlineRequest("1901449466163105792", "medium", null, null, null, null);
+        WddPptApi.CreateOutlineRequest request = new WddPptApi.CreateOutlineRequest("1901539019628613632", "medium", null, null, null, null);
         //调用
-        Flux<Map<String, Object>> flux = wddApi.generateOutlineContent(token, request);
+        Flux<Map<String, Object>> flux = wddPptApi.createOutline(token, request);
         StringBuffer contentBuffer = new StringBuffer();
         flux.doOnNext(chunk -> {
             contentBuffer.append(chunk.get("text"));
@@ -66,10 +66,10 @@ public class WddApiTests {
 
     @Test // 修改大纲
     @Disabled
-    public void testUpdateOutlineContentRequest() {
-        WddApi.UpdateOutlineRequest request = new WddApi.UpdateOutlineRequest("1901449466163105792", TEST_OUT_LINE_CONTENT, "精简一点，三个章节即可");
+    public void testUpdateOutlineRequest() {
+        WddPptApi.UpdateOutlineRequest request = new WddPptApi.UpdateOutlineRequest("1901539019628613632", TEST_OUT_LINE_CONTENT, "精简一点，三个章节即可");
         //调用
-        Flux<Map<String, Object>> flux = wddApi.updateOutlineContent(token, request);
+        Flux<Map<String, Object>> flux = wddPptApi.updateOutline(token, request);
         StringBuffer contentBuffer = new StringBuffer();
         flux.doOnNext(chunk -> {
             contentBuffer.append(chunk.get("text"));
@@ -88,10 +88,10 @@ public class WddApiTests {
     @Disabled
     public void testGetPptTemplatePage() {
         // 准备参数
-        WddApi.TemplateQueryRequest.Filter filter = new WddApi.TemplateQueryRequest.Filter(1, null, null, null);
-        WddApi.TemplateQueryRequest request = new WddApi.TemplateQueryRequest(1, 10, filter);
+        WddPptApi.TemplateQueryRequest.Filter filter = new WddPptApi.TemplateQueryRequest.Filter(1, null, null, null);
+        WddPptApi.TemplateQueryRequest request = new WddPptApi.TemplateQueryRequest(1, 10, filter);
         //调用
-        WddApi.PagePptTemplateInfo pptTemplatePage = wddApi.getPptTemplatePage(token, request);
+        WddPptApi.PagePptTemplateInfo pptTemplatePage = wddPptApi.getTemplatePage(token, request);
         // 打印结果
         System.out.println(pptTemplatePage);
     }
@@ -101,9 +101,9 @@ public class WddApiTests {
     @Disabled
     public void testGeneratePptx() {
         // 准备参数
-        WddApi.GeneratePptxRequest request = new WddApi.GeneratePptxRequest("1900913633555255296", "1804885538940116992", TEST_OUT_LINE_CONTENT);
+        WddPptApi.CreatePptRequest request = new WddPptApi.CreatePptRequest("1901539019628613632", "1805081814809960448", TEST_OUT_LINE_CONTENT);
         //调用
-        WddApi.PptInfo pptInfo = wddApi.generatePptx("", request);
+        WddPptApi.PptInfo pptInfo = wddPptApi.create(token, request);
         // 打印结果
         System.out.println(pptInfo);
     }
