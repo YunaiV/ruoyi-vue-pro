@@ -50,8 +50,8 @@ public class AiUtils {
             case HUN_YUAN: // 复用 OpenAI 客户端
             case XING_HUO: // 复用 OpenAI 客户端
             case SILICON_FLOW: // 复用 OpenAI 客户端
-                return OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
-                        .toolNames(toolNames).build();
+                OpenAiChatOptions.Builder builder = OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens);
+                return toolNames == null ? builder.build() : builder.toolNames(toolNames).build();
             case AZURE_OPENAI:
                 // TODO 芋艿：貌似没 model 字段？？？！
                 return AzureOpenAiChatOptions.builder().deploymentName(model).temperature(temperature).maxTokens(maxTokens)
