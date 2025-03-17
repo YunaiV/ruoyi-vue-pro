@@ -86,8 +86,29 @@ public class WddApi {
      * 创建任务
      *
      * @param type    类型
+     *                1.智能生成（主题、要求）
+     *                2.上传文件生成
+     *                3.上传思维导图生成
+     *                4.通过word精准转ppt
+     *                5.通过网页链接生成
+     *                6.粘贴文本内容生成
+     *                7.Markdown大纲生成
      * @param content 内容
+     *                type=1 用户输入主题或要求（不超过1000字符）
+     *                type=2、4 不传
+     *                type=3 幕布等分享链接
+     *                type=5 网页链接地址（http/https）
+     *                type=6 粘贴文本内容（不超过20000字符）
+     *                type=7 大纲内容（markdown）
      * @param files   文件列表
+     *                文件列表（文件数不超过5个，总大小不超过50M）：
+     *                type=1 上传参考文件（非必传，支持多个）
+     *                type=2 上传文件（支持多个）
+     *                type=3 上传思维导图（xmind/mm/md）（仅支持一个）
+     *                type=4 上传word文件（仅支持一个）
+     *                type=5、6、7 不传
+     *                <p>
+     *                支持格式：doc/docx/pdf/ppt/pptx/txt/md/xls/xlsx/csv/html/epub/mobi/xmind/mm
      * @return 任务ID
      */
     public ApiResponse createTask(String token, Integer type, String content, List<MultipartFile> files) {
@@ -127,7 +148,7 @@ public class WddApi {
         return this.webClient.get()
                 .uri(uri)
                 .retrieve()
-                .onStatus(STATUS_PREDICATE, EXCEPTION_FUNCTION.apply(null))
+                .onStatus(STATUS_PREDICATE, EXCEPTION_FUNCTION.apply(lang))
                 .bodyToMono(new ParameterizedTypeReference<ApiResponse>() {
                 })
                 .<Map<String, Object>>handle((response, sink) -> {
@@ -164,15 +185,14 @@ public class WddApi {
      * @param question 用户修改建议
      * @return 大纲内容流
      */
-    public Flux<Map<String, Object>> updateOutlineContent(String token, String id, String markdown, String question) {
-        UpdateOutlineRequest request = new UpdateOutlineRequest(id, markdown, question);
+    public Flux<Map<String, Object>> updateOutlineContent(String token, UpdateOutlineRequest request) {
         return this.webClient.post()
                 .uri("/api/ppt/v2/updateContent")
                 .header("token", token)
                 .body(Mono.just(request), UpdateOutlineRequest.class)
                 .retrieve()
                 .onStatus(STATUS_PREDICATE, EXCEPTION_FUNCTION.apply(request))
-                .bodyToFlux(new ParameterizedTypeReference<Map<String, Object>>() {
+                .bodyToFlux(new ParameterizedTypeReference<>() {
                 });
     }
 
