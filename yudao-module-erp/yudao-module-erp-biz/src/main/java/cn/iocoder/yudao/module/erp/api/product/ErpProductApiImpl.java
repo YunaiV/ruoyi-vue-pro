@@ -12,10 +12,12 @@ import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PRODUCT_NOT_ENABLE;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PRODUCT_NOT_EXISTS;
@@ -26,6 +28,16 @@ public class ErpProductApiImpl implements ErpProductApi {
     private final ErpProductMapper erpProductMapper;
 
     private final ErpProductService erpProductService;
+
+    @Override
+    public ErpProductDTO getProductDto(Long id) {
+        ErpProductDO productDO = erpProductMapper.selectById(id);
+        if (productDO == null) {
+            return null;
+        } else {
+            return ErpProductConvert.INSTANCE.convert(productDO);
+        }
+    }
 
     //获得所有产品DTO，根据ids，如果ids为null返回所有
     public List<ErpProductDTO> listProductDTOs(List<Long> ids) {
