@@ -421,6 +421,14 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         });
     }
 
+    @Override
+    public void validatePurchaseOrderItemExists(Long id) {
+        //校验采购订单项是否存在
+        if (purchaseOrderItemMapper.selectById(id) == null) {
+            throw exception(PURCHASE_ORDER_ITEM_NOT_EXISTS, id);
+        }
+    }
+
     private ErpPurchaseOrderDO validatePurchaseOrderExists(Long id) {
         ErpPurchaseOrderDO purchaseOrder = purchaseOrderMapper.selectById(id);
         if (purchaseOrder == null) {
@@ -436,6 +444,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
 
     @Override
     public ErpPurchaseOrderDO validatePurchaseOrder(Long id) {
+        //只有已审核的才可以
         ErpPurchaseOrderDO purchaseOrder = validatePurchaseOrderExists(id);
         if (ObjectUtil.notEqual(purchaseOrder.getAuditStatus(), ErpAuditStatus.APPROVED.getCode())) {
             throw exception(PURCHASE_ORDER_NOT_APPROVE, purchaseOrder.getNo());

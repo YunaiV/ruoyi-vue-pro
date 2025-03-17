@@ -102,7 +102,8 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         // 2.1 插入入库
         ErpPurchaseInDO purchaseIn = BeanUtils.toBean(createReqVO, ErpPurchaseInDO.class, in -> in
                 .setNo(no))
-                .setOrderNo(purchaseOrder.getNo()).setSupplierId(purchaseOrder.getSupplierId());
+            .setOrderNo(purchaseOrder.getNo())
+            .setSupplierId(purchaseOrder.getSupplierId());
         calculateTotalPrice(purchaseIn, purchaseInItems);
         ThrowUtil.ifSqlThrow(purchaseInMapper.insert(purchaseIn), GlobalErrorCodeConstants.DB_INSERT_ERROR);
         // 2.2 插入入库项
@@ -119,12 +120,14 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
             itemPaymentMachine.fireEvent(ErpPaymentStatus.NONE_PAYMENT, ErpEventEnum.PAYMENT_INIT, purchaseInItem);
             //传递给订单项入库状态机 数量
             Optional.ofNullable(purchaseInItem.getOrderItemId()).ifPresent(orderItemId -> {//存在订单项
+                //校验订单项是否存在
+                purchaseOrderService.validatePurchaseOrderItemExists(orderItemId);
                 ErpPurchaseOrderItemDO orderItemDO = orderItemMapper.selectById(orderItemId);
-                //更新订单项入库数量+状态 入库状态机
+                //更新订单项入库数量+状态 入库状态机,创建入库单->增加入库数量
                 orderItemStorageMachine.fireEvent(ErpStorageStatus.fromCode(orderItemDO.getInStatus()), ErpEventEnum.STOCK_ADJUSTMENT,
                     ErpInCountDTO.builder().orderItemId(orderItemId)
                         //正数
-                        .count(orderItemDO.getCount()).build());
+                        .count(purchaseInItem.getCount()).build());
             });
         }
     }
@@ -151,8 +154,9 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
 
         // 2.1 更新入库
         ErpPurchaseInDO updateObj = BeanUtils.toBean(updateReqVO, ErpPurchaseInDO.class)
-                .setOrderNo(purchaseOrder.getNo()).setSupplierId(purchaseOrder.getSupplierId());
-        calculateTotalPrice(updateObj, purchaseInItems);
+            .setOrderNo(purchaseOrder.getNo())
+            .setSupplierId(purchaseOrder.getSupplierId());
+        calculateTotalPrice(updateObj, purchaseInItems);//合计
         purchaseInMapper.updateById(updateObj);
         // 2.2 更新入库项
         updatePurchaseInItemList(updateReqVO.getId(), purchaseInItems);
@@ -265,7 +269,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
 
                     orderItemStorageMachine.fireEvent(ErpStorageStatus.fromCode(orderItemDO.getInStatus()), ErpEventEnum.STOCK_ADJUSTMENT,
                         ErpInCountDTO.builder().orderItemId(orderItemId)
-                            //取反数量
+                            //删除->订单项减少
                             .count(inItemDO.getCount().negate()).build());
                 });
             }
@@ -326,15 +330,17 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
 
     @Override
     public void submitAudit(Long inId) {
-        ErpPurchaseInDO erpPurchaseInDO = validatePurchaseIn(inId);
-        purchaseInAuditStateMachine.fireEvent(ErpAuditStatus.fromCode(erpPurchaseInDO.getAuditStatus()), ErpEventEnum.SUBMIT_FOR_REVIEW, ErpPurchaseInAuditReqVO.builder().inId(inId).build());//提交审核
+        ErpPurchaseInDO erpPurchaseInDO = validatePurchaseInExists(inId);
+        purchaseInAuditStateMachine.fireEvent(ErpAuditStatus.fromCode(erpPurchaseInDO.getAuditStatus())
+            , ErpEventEnum.SUBMIT_FOR_REVIEW
+            , ErpPurchaseInAuditReqVO.builder().inId(inId).build());//提交审核
     }
 
     @Override
     public void review(ErpPurchaseInAuditReqVO req) {
 //        purchaseInAuditStateMachine.fireEvent(ErpAuditStatus.fromCode(erpPurchaseInDO.getAuditorStatus()), ErpEventEnum.SUBMIT_FOR_REVIEW, req);//提交审核
         // 查询采购订单信息
-        ErpPurchaseInDO inDO = validatePurchaseIn(req.getInId());
+        ErpPurchaseInDO inDO = validatePurchaseInExists(req.getInId());
         // 获取当前订单状态
         ErpAuditStatus currentStatus = ErpAuditStatus.fromCode(inDO.getAuditStatus());
         if (Boolean.TRUE.equals(req.getReviewed())) {

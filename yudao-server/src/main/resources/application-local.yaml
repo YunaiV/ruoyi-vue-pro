@@ -150,6 +150,13 @@ spring:
 logging:
   file:
     name: log/${spring.application.name}.log # 日志文件名，全路径
+  level:
+    cn:
+      iocoder:
+        yudao:
+          module:
+            erp: debug
+    root: info
 
 --- #################### 微信公众号相关配置 ####################
 wx: # 参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-starters/wx-java-mp-spring-boot-starter/README.md 文档

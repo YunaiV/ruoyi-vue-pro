@@ -157,6 +157,7 @@ public class ErpPurchaseOrderController {
         purchaseOrderService.switchPurchaseOrderStatus(itemIds, reqVO.getEnable());
         return success(true);
     }
+    //TODO 合并成入库单
 
 
     private List<ErpPurchaseOrderBaseRespVO> bindList(List<ErpPurchaseOrderDO> list) {

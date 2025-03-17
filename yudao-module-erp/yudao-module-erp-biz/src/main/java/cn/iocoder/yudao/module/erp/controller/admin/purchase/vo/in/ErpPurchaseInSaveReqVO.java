@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in;
 
+import cn.iocoder.yudao.module.erp.controller.admin.tools.validation;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -14,7 +17,7 @@ import java.util.List;
 @Data
 public class ErpPurchaseInSaveReqVO {
 
-    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17386")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long id;
 
     @Schema(description = "采购订单id", requiredMode = Schema.RequiredMode.REQUIRED, example = "CGRK-20241012-00197")
@@ -31,7 +34,7 @@ public class ErpPurchaseInSaveReqVO {
     @Schema(description = "单据日期", example = "2024-10-12")
     private LocalDateTime noTime;
 
-    @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "12")
+    @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "供应商编号不能为空")
     private Long supplierId;
 
@@ -71,6 +74,12 @@ public class ErpPurchaseInSaveReqVO {
 
     @Data
     public static class Item {
+        @Schema(description = "入库项编号", example = "11756")
+        @Null(groups = validation.OnCreate.class, message = "入库id创建时要为null")
+        @Null(groups = validation.OnUpdate.class, message = "入库id更新时不能为null")
+        @Size(min = 1, groups = validation.OnUpdate.class, message = "更新时至少存在一项入库单")
+        private Long id;
+
         @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
         @NotNull(message = "产品编号不能为空")
         private Long productId;
@@ -81,21 +90,18 @@ public class ErpPurchaseInSaveReqVO {
         @Schema(description = "产品名称(快照)")
         private String productName;
 
-        @Schema(description = "入库项编号", example = "11756")
-        private Long id;
-
-        @Schema(description = "采购订单项id", requiredMode = Schema.RequiredMode.REQUIRED, example = "11756")
+        @Schema(description = "采购订单项id", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "采购订单项id不能为空")
         private Long orderItemId;
 
         @Schema(description = "采购订单编号-展示用(源单单号,采购单)")
         private String orderNo;
 
-        @Schema(description = "仓库编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
+        @Schema(description = "仓库编号", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "仓库编号不能为空")
         private Long warehouseId;
 
-        @Schema(description = "产品单位(产品带出来)", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
+        @Schema(description = "产品单位(产品带出来)", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "产品单位单位不能为空")
         private Long productUnitId;
 

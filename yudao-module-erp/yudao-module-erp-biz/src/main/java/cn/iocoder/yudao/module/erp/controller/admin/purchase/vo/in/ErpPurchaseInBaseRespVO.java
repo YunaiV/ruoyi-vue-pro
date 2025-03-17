@@ -19,26 +19,18 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
     @Schema(description = "编号")
     private Long id;
 
-    @Schema(description = "入库单编号", example = "XS001")
+    @Schema(description = "入库单编号")
     @ExcelProperty("入库单编号")
     private String no;
 
-    @Schema(description = "单据日期", example = "2024-10-12")
+    @Schema(description = "单据日期")
     private LocalDateTime noTime;
-
-    @Schema(description = "供应商编号", example = "12")
-    @NotNull(message = "供应商编号不能为空")
-    private Long supplierId;
-
-    @Schema(description = "币别ID,财务管理-币别维护")
-    private Long currencyId;
 
     @Schema(description = "付款状态")
     private Integer payStatus;
 
-    @Schema(description = "入库状态", example = "2")
-    @ExcelProperty("入库状态")
-    private Integer status;
+    @Schema(description = "对账状态(false:未对账 ，true:已对账)")
+    private Boolean reconciliationStatus;
 
     @Schema(description = "入库时间")
     @ExcelProperty("入库时间")
@@ -52,43 +44,22 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
     @Schema(description = "入库项列表")
     private List<Item> items;
 
-    @Schema(description = "对账状态(false:未对账 ，true:已对账)", example = "false")
-    private Boolean reconciliationStatus;
-
-    @Schema(description = "审核人ID")
-    private String auditorId;
-
-    @Schema(description = "审核时间")
-    private LocalDateTime auditTime;
-
-    @Schema(description = "结算账户编号")
-    private Long accountId;
-
-    @Schema(description = "优惠率，百分比", example = "99.88")
-    private BigDecimal discountPercent;
-
-    @Schema(description = "其它金额，单位：元", example = "100")
-    private BigDecimal otherPrice;
-
-    @Schema(description = "附件地址", example = "https://www.abc.cn")
-    private String fileUrl;
-
     @Data
     public static class Item {
 
-        @Schema(description = "入库项编号", example = "11756")
+        @Schema(description = "入库项编号")
         private Long id;
 
-        @Schema(description = "采购订单项编号", example = "11756")
+        @Schema(description = "采购订单项编号")
         private Long orderItemId;
 
-        @Schema(description = "仓库编号", example = "3113")
+        @Schema(description = "仓库编号")
         private Long warehouseId;
 
         @Schema(description = "产品存放仓库名称")
         private String warehouseName;
 
-        @Schema(description = "产品编号", example = "3113")
+        @Schema(description = "产品编号")
         private Long productId;
 
         @Schema(description = "型号规格(产品带出)")
@@ -97,40 +68,40 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
         @Schema(description = "产品信息")
         private ErpProductRespVO product;
 
-        @Schema(description = "产品单位", example = "1")
+        @Schema(description = "产品单位")
         private Long productUnitId;
 
-        @Schema(description = "产品单价", example = "100.00")
+        @Schema(description = "产品单价")
         private BigDecimal productPrice;
 
-        @Schema(description = "产品数量", example = "100.00")
+        @Schema(description = "产品数量")
         @NotNull(message = "产品数量不能为空")
         private BigDecimal count;
 
-        @Schema(description = "税率，百分比", example = "99.88")
+        @Schema(description = "税率，百分比")
         private BigDecimal taxPercent;
 
-        @Schema(description = "税额，单位：元", example = "100.00")
+        @Schema(description = "税额，单位：元")
         private BigDecimal taxPrice;
 
-        @Schema(description = "含税单价", example = "120.00")
+        @Schema(description = "含税单价")
         private BigDecimal actTaxPrice;
 
         @Schema(description = "价税合计")
         private BigDecimal allAmount;
 
-        @Schema(description = "备注", example = "随便")
+        @Schema(description = "备注")
         private String remark;
 
-        @Schema(description = "汇率,财务管理-币别维护", example = "5.8")
+        @Schema(description = "汇率,财务管理-币别维护")
         private BigDecimal exchangeRate;
 
-        @Schema(description = "结算日期", example = "2025-1-1")
+        @Schema(description = "结算日期")
         private LocalDateTime settlementDate;
 
         // ========== 关联字段 ==========
 
-        @Schema(description = "库存数量", example = "100.00")
+        @Schema(description = "库存数量")
         private BigDecimal stockCount; // 该字段仅仅在“详情”和“编辑”时使用
 
         @Schema(description = "箱率")
@@ -139,12 +110,12 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
         /**
          * 商品体积，单位：m^3 平米
          */
-        @Schema(description = "商品总体积,单位：m^3 平米", example = "2.5")
+        @Schema(description = "商品总体积,单位：m^3 平米")
         private Double totalVolume;
         /**
          * 商品重量，单位：kg 千克
          */
-        @Schema(description = "商品总重量,单位：kg 千克", example = "1.2")
+        @Schema(description = "商品总重量,单位：kg 千克")
         private Double totalWeight;
 
 //        @Schema(description = "源单行号")

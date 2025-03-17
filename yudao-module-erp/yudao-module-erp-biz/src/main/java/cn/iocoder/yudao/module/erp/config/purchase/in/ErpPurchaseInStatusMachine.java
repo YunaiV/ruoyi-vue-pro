@@ -22,13 +22,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class ErpPurchaseInStatusMachine {
-    @Resource
-    ActionInAuditImpl actionInAuditImpl;
-    @Resource
-    ActionInPayImpl actionInPayImpl;
+
+
     @Resource
     private BaseFailCallbackImpl baseFailCallbackImpl;
 
+    @Resource
+    ActionInAuditImpl actionInAuditImpl;
     @Bean(ErpStateMachines.PURCHASE_IN_AUDIT_STATE_MACHINE)
     public StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseInAuditReqVO> getPurchaseRequestStateMachine() {
         StateMachineBuilder<ErpAuditStatus, ErpEventEnum, ErpPurchaseInAuditReqVO> builder = StateMachineBuilderFactory.create();
@@ -72,6 +72,8 @@ public class ErpPurchaseInStatusMachine {
         return builder.build(ErpStateMachines.PURCHASE_IN_AUDIT_STATE_MACHINE);
     }
 
+    @Resource
+    ActionInPayImpl actionInPayImpl;
     @Bean(ErpStateMachines.PURCHASE_IN_PAYMENT_STATE_MACHINE)
     public StateMachine<ErpPaymentStatus, ErpEventEnum, ErpPurchaseInDO> getPurchaseRequestPaymentStateMachine() {
         StateMachineBuilder<ErpPaymentStatus, ErpEventEnum, ErpPurchaseInDO> builder = StateMachineBuilderFactory.create();

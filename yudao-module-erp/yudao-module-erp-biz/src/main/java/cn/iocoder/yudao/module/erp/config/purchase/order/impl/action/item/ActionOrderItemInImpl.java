@@ -59,7 +59,7 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
         //  计算最新入库数量
         BigDecimal oldInCount = oldData.getInCount() == null ? BigDecimal.ZERO : oldData.getInCount();
         BigDecimal dtoCount = dto.getCount() == null ? BigDecimal.ZERO : dto.getCount();
-        BigDecimal newInCount = oldInCount.subtract(dtoCount); // 计算新的入库数量
+        BigDecimal newInCount = oldInCount.add(dtoCount); // 计算新的入库数量
 
         if (event == ErpEventEnum.STORAGE_INIT) {
 
@@ -101,7 +101,8 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
                 ErpPurchaseRequestItemsDO applyItemDO = erpPurchaseRequestItemsMapper.selectById(applyItemId);
                 ThrowUtil.ifThrow(applyItemDO == null, PURCHASE_REQUEST_ITEM_NOT_FOUND, oldData.getId(), applyItemId);
                 BigDecimal oldCount = applyItemDO.getInCount();
-                BigDecimal changeCount = oldCount.subtract(dtoCount);
+                BigDecimal result = (oldCount != null && oldCount.compareTo(BigDecimal.ZERO) == 0) ? BigDecimal.ZERO : oldCount;
+                BigDecimal changeCount = result.subtract(dtoCount);
                 purchaseRequestItemStateMachine.fireEvent(ErpStorageStatus.fromCode(applyItemDO.getInStatus())
                     , ErpEventEnum.STOCK_ADJUSTMENT
                     , ErpInCountDTO.builder().applyItemId(applyItemId).count(changeCount).build()
@@ -115,6 +116,6 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
             oldData.getId(),
             from.getDesc(),
             to.getDesc(),
-            oldData.getInCount());
+            dto.getCount());
     }
 }

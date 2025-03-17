@@ -83,6 +83,7 @@ public interface ErpPurchaseOrderService {
      */
     ErpPurchaseOrderDO validatePurchaseOrder(Long id);
 
+
     /**
      * 获得采购订单分页
      *
@@ -93,6 +94,12 @@ public interface ErpPurchaseOrderService {
 
     // ==================== 采购订单项 ====================
 
+    /**
+     * 校验采购订单项是否存在
+     *
+     * @param id 订单项id
+     */
+    void validatePurchaseOrderItemExists(Long id);
     /**
      * 获得采购订单项列表
      *

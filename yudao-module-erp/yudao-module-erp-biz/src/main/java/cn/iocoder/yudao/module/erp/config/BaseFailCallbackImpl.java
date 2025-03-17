@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_STATUS;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PURCHASE_REQUEST_NOT_EXISTS_BY_STATUS;
 
 //状态机基本异常回调
 @Component
@@ -25,7 +25,7 @@ public class BaseFailCallbackImpl<S, E, C> implements FailCallback<S, E, C> {
         log.warn(msg);
 //        throw new IllegalArgumentException(msg);
 //        throw new ServiceException(msg);
-        ThrowUtil.ifThrow(true, PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_STATUS, description, ErpEventEnum.valueOf(event.toString()).getDesc());
+        ThrowUtil.ifThrow(true, PURCHASE_REQUEST_NOT_EXISTS_BY_STATUS, description, ErpEventEnum.valueOf(event.toString()).getDesc());
 //        throw new TransitionFailException("Cannot fire event [" + event + "] on current state [" + sourceState + "] with context [" + context + "]");
     }
 

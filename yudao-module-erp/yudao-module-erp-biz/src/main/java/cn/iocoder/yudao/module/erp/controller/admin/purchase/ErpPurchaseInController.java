@@ -136,7 +136,6 @@ public class ErpPurchaseInController {
 
     @PostMapping("/submitAudit")
     @Operation(summary = "提交审核")
-    @Parameter(name = "itemIds", description = "订单下的订单项Id集合", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:submitAudit')")
     public CommonResult<Boolean> submitAudit(@Validated @RequestBody ErpPurchaseInAuditReqVO reqVO) {
         purchaseInService.submitAudit(reqVO.getInId());
@@ -145,8 +144,6 @@ public class ErpPurchaseInController {
 
     @PostMapping("/auditStatus")
     @Operation(summary = "审核/反审核")
-    @Parameter(name = "requestId", description = "申请单编号", required = true)
-    @Parameter(name = "reviewed", description = "审核状态", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:review')")
     public CommonResult<Boolean> reviewPurchaseRequest(@Validated(validation.OnAudit.class) @RequestBody ErpPurchaseInAuditReqVO req) {
         purchaseInService.review(req);
