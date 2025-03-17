@@ -10,7 +10,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 /**
  * 仓库 DO
  * @author 李方捷
- * @table-fields : country,code,contact_phone,city,contact_person,postcode,is_sync,mode,external_storage_id,deleted,address_line2,province,address_line1,company_name,name,id,status
+ * @table-fields : country,code,contact_phone,city,contact_person,postcode,is_sync,mode,external_storage_id,province,address_line2,address_line1,company_name,name,id,status
  */
 @TableName("wms_warehouse")
 // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -48,11 +48,6 @@ public class WmsWarehouseDO extends BaseDO {
      * 外部存储ID
      */
     private Long externalStorageId;
-
-    /**
-     * 外部存储代码
-     */
-    private String externalStorageCode;
 
     /**
      * 公司名称
@@ -105,12 +100,13 @@ public class WmsWarehouseDO extends BaseDO {
     private Integer isSync;
 
     /**
-     * 是否删除
-     */
-    private Boolean deleted;
-
-    /**
      * 状态：0-不可用；1-可用
      */
     private Integer status;
+    // private Boolean deleted;
+    // 
+    // public WmsWarehouseDO setDeleted(Boolean deleted) {
+    // this.deleted = deleted;
+    // return this;
+    // }
 }

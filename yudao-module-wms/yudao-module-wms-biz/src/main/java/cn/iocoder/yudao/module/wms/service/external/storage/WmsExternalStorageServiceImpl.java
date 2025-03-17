@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.wms.dal.mysql.external.storage.WmsExternalStorage
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import java.util.List;
 import java.util.Objects;
@@ -33,14 +34,14 @@ public class WmsExternalStorageServiceImpl implements WmsExternalStorageService 
     private WmsWarehouseService warehouseService;
 
     /**
-     * @sign : 8D1743708CE9B1E6
+     * @sign : DB2F714982511B63
      */
     @Override
     public WmsExternalStorageDO createExternalStorage(WmsExternalStorageSaveReqVO createReqVO) {
-        if (externalStorageMapper.getByName(createReqVO.getName(), true) != null) {
+        if (externalStorageMapper.getByName(createReqVO.getName()) != null) {
             throw exception(EXTERNAL_STORAGE_NAME_DUPLICATE);
         }
-        if (externalStorageMapper.getByCode(createReqVO.getCode(), true) != null) {
+        if (externalStorageMapper.getByCode(createReqVO.getCode()) != null) {
             throw exception(EXTERNAL_STORAGE_CODE_DUPLICATE);
         }
         // 插入
@@ -71,17 +72,22 @@ public class WmsExternalStorageServiceImpl implements WmsExternalStorageService 
     }
 
     /**
-     * @sign : 8C5F64D47297133A
+     * @sign : 27B44F0FFD1CDC7F
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteExternalStorage(Long id) {
         // 校验存在
-        validateExternalStorageExists(id);
+        WmsExternalStorageDO externalStorage = validateExternalStorageExists(id);
         // 校验是否被仓库表引用
         List<WmsWarehouseDO> warehouseList = warehouseService.selectByExternalStorageId(id, 1);
         if (!CollectionUtils.isEmpty(warehouseList)) {
             throw exception(EXTERNAL_STORAGE_BE_REFERRED);
         }
+        // 唯一索引去重
+        externalStorage.setName(externalStorageMapper.appendLogicDeleteSuffix(externalStorage.getName()));
+        externalStorage.setCode(externalStorageMapper.appendLogicDeleteSuffix(externalStorage.getCode()));
+        externalStorageMapper.updateById(externalStorage);
         // 删除
         externalStorageMapper.deleteById(id);
     }

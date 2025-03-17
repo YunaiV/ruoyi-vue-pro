@@ -40,22 +40,26 @@ public class WmsWarehouseLocationServiceImpl implements WmsWarehouseLocationServ
     private WmsWarehouseLocationMapper warehouseLocationMapper;
 
     /**
-     * @sign : 1F1E8314BF9384E7
+     * @sign : 639EE609C6969D39
      */
     @Override
     public WmsWarehouseLocationDO createWarehouseLocation(WmsWarehouseLocationSaveReqVO createReqVO) {
-        if (warehouseLocationMapper.getByCode(createReqVO.getCode(), true) != null) {
+        if (warehouseLocationMapper.getByCode(createReqVO.getCode()) != null) {
             throw exception(WAREHOUSE_LOCATION_CODE_DUPLICATE);
         }
-        // 按 wms_warehouse_location.area_id -> wms_warehouse_area.id 的引用关系，校验存在性
-        WmsWarehouseAreaDO warehouseArea = warehouseAreaService.getWarehouseArea(createReqVO.getAreaId());
-        if (warehouseArea == null) {
-            throw exception(WAREHOUSE_AREA_NOT_EXISTS);
-        }
         // 按 wms_warehouse_location.warehouse_id -> wms_warehouse.id 的引用关系，校验存在性
-        WmsWarehouseDO warehouse = warehouseService.getWarehouse(createReqVO.getWarehouseId());
-        if (warehouse == null) {
-            throw exception(WAREHOUSE_NOT_EXISTS);
+        if (createReqVO.getWarehouseId() != null) {
+            WmsWarehouseDO warehouse = warehouseService.getWarehouse(createReqVO.getWarehouseId());
+            if (warehouse == null) {
+                throw exception(WAREHOUSE_NOT_EXISTS);
+            }
+        }
+        // 按 wms_warehouse_location.area_id -> wms_warehouse_area.id 的引用关系，校验存在性
+        if (createReqVO.getAreaId() != null) {
+            WmsWarehouseAreaDO warehouseArea = warehouseAreaService.getWarehouseArea(createReqVO.getAreaId());
+            if (warehouseArea == null) {
+                throw exception(WAREHOUSE_AREA_NOT_EXISTS);
+            }
         }
         // 插入
         WmsWarehouseLocationDO warehouseLocation = BeanUtils.toBean(createReqVO, WmsWarehouseLocationDO.class);
@@ -65,7 +69,7 @@ public class WmsWarehouseLocationServiceImpl implements WmsWarehouseLocationServ
     }
 
     /**
-     * @sign : B6C73DA2201D7423
+     * @sign : 6A86580050357BE0
      */
     @Override
     public WmsWarehouseLocationDO updateWarehouseLocation(WmsWarehouseLocationSaveReqVO updateReqVO) {
@@ -74,15 +78,19 @@ public class WmsWarehouseLocationServiceImpl implements WmsWarehouseLocationServ
         if (!Objects.equals(updateReqVO.getId(), exists.getId()) && Objects.equals(updateReqVO.getCode(), exists.getCode())) {
             throw exception(WAREHOUSE_LOCATION_CODE_DUPLICATE);
         }
-        // 按 wms_warehouse_location.area_id -> wms_warehouse_area.id 的引用关系，校验存在性
-        WmsWarehouseAreaDO warehouseArea = warehouseAreaService.getWarehouseArea(updateReqVO.getAreaId());
-        if (warehouseArea == null) {
-            throw exception(WAREHOUSE_AREA_NOT_EXISTS);
-        }
         // 按 wms_warehouse_location.warehouse_id -> wms_warehouse.id 的引用关系，校验存在性
-        WmsWarehouseDO warehouse = warehouseService.getWarehouse(updateReqVO.getWarehouseId());
-        if (warehouse == null) {
-            throw exception(WAREHOUSE_NOT_EXISTS);
+        if (updateReqVO.getWarehouseId() != null) {
+            WmsWarehouseDO warehouse = warehouseService.getWarehouse(updateReqVO.getWarehouseId());
+            if (warehouse == null) {
+                throw exception(WAREHOUSE_NOT_EXISTS);
+            }
+        }
+        // 按 wms_warehouse_location.area_id -> wms_warehouse_area.id 的引用关系，校验存在性
+        if (updateReqVO.getAreaId() != null) {
+            WmsWarehouseAreaDO warehouseArea = warehouseAreaService.getWarehouseArea(updateReqVO.getAreaId());
+            if (warehouseArea == null) {
+                throw exception(WAREHOUSE_AREA_NOT_EXISTS);
+            }
         }
         // 更新
         WmsWarehouseLocationDO warehouseLocation = BeanUtils.toBean(updateReqVO, WmsWarehouseLocationDO.class);
@@ -92,12 +100,16 @@ public class WmsWarehouseLocationServiceImpl implements WmsWarehouseLocationServ
     }
 
     /**
-     * @sign : F21210E01DBAE953
+     * @sign : A028536005D03784
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteWarehouseLocation(Long id) {
         // 校验存在
-        validateWarehouseLocationExists(id);
+        WmsWarehouseLocationDO warehouseLocation = validateWarehouseLocationExists(id);
+        // 唯一索引去重
+        warehouseLocation.setCode(warehouseLocationMapper.appendLogicDeleteSuffix(warehouseLocation.getCode()));
+        warehouseLocationMapper.updateById(warehouseLocation);
         // 删除
         warehouseLocationMapper.deleteById(id);
     }

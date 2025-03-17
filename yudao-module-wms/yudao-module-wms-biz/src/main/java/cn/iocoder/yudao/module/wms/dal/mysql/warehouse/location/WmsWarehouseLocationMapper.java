@@ -29,33 +29,6 @@ public interface WmsWarehouseLocationMapper extends BaseMapperX<WmsWarehouseLoca
     }
 
     /**
-     * 按 warehouse_id,area_id 查询 WmsWarehouseLocationDO 清单
-     */
-    default List<WmsWarehouseLocationDO> selectByWarehouseIdAndAreaId(Long warehouseId, Long areaId) {
-        return selectList(new LambdaQueryWrapperX<WmsWarehouseLocationDO>().eq(WmsWarehouseLocationDO::getWarehouseId, warehouseId).eq(WmsWarehouseLocationDO::getAreaId, areaId));
-    }
-
-    /**
-     * 按 code 查询唯一的 WmsWarehouseLocationDO
-     */
-    default WmsWarehouseLocationDO getByCode(String code, boolean deleted) {
-        LambdaQueryWrapperX<WmsWarehouseLocationDO> wrapper = new LambdaQueryWrapperX<>();
-        wrapper.eq(WmsWarehouseLocationDO::getCode, code);
-        ;
-        if (deleted) {
-            wrapper.eq(WmsWarehouseLocationDO::getDeleted, true);
-        }
-        return selectOne(wrapper);
-    }
-
-    /**
-     * 按 code 查询唯一的 WmsWarehouseLocationDO
-     */
-    default WmsWarehouseLocationDO getByCode(String code) {
-        return getByCode(code, false);
-    }
-
-    /**
      * 按 warehouseId 查询 WmsWarehouseLocationDO
      */
     default List<WmsWarehouseLocationDO> selectByWarehouseId(Long warehouseId, int limit) {
@@ -77,5 +50,21 @@ public interface WmsWarehouseLocationMapper extends BaseMapperX<WmsWarehouseLoca
         LambdaQueryWrapperX<WmsWarehouseLocationDO> wrapper = new LambdaQueryWrapperX<>();
         wrapper.eq(WmsWarehouseLocationDO::getAreaId, areaId);
         return selectPage(reqVO, wrapper).getList();
+    }
+
+    /**
+     * 按 warehouse_id,area_id 查询 WmsWarehouseLocationDO 清单
+     */
+    default List<WmsWarehouseLocationDO> selectByWarehouseIdAndAreaId(Long warehouseId, Long areaId) {
+        return selectList(new LambdaQueryWrapperX<WmsWarehouseLocationDO>().eq(WmsWarehouseLocationDO::getWarehouseId, warehouseId).eq(WmsWarehouseLocationDO::getAreaId, areaId));
+    }
+
+    /**
+     * 按 code 查询唯一的 WmsWarehouseLocationDO
+     */
+    default WmsWarehouseLocationDO getByCode(String code) {
+        LambdaQueryWrapperX<WmsWarehouseLocationDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsWarehouseLocationDO::getCode, code);
+        return selectOne(wrapper);
     }
 }

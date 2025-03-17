@@ -47,20 +47,22 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
     private WmsWarehouseMapper warehouseMapper;
 
     /**
-     * @sign : 85697B988214817D
+     * @sign : 6A1033E3C48B0B9A
      */
     @Override
     public WmsWarehouseDO createWarehouse(WmsWarehouseSaveReqVO createReqVO) {
-        if (warehouseMapper.getByName(createReqVO.getName(), true) != null) {
+        if (warehouseMapper.getByName(createReqVO.getName()) != null) {
             throw exception(WAREHOUSE_NAME_DUPLICATE);
         }
-        if (warehouseMapper.getByCode(createReqVO.getCode(), true) != null) {
+        if (warehouseMapper.getByCode(createReqVO.getCode()) != null) {
             throw exception(WAREHOUSE_CODE_DUPLICATE);
         }
         // 按 wms_warehouse.external_storage_id -> wms_external_storage.id 的引用关系，校验存在性
-        WmsExternalStorageDO externalStorage = externalStorageService.getExternalStorage(createReqVO.getExternalStorageId());
-        if (externalStorage == null) {
-            throw exception(EXTERNAL_STORAGE_NOT_EXISTS);
+        if (createReqVO.getExternalStorageId() != null) {
+            WmsExternalStorageDO externalStorage = externalStorageService.getExternalStorage(createReqVO.getExternalStorageId());
+            if (externalStorage == null) {
+                throw exception(EXTERNAL_STORAGE_NOT_EXISTS);
+            }
         }
         // 插入
         WmsWarehouseDO warehouse = BeanUtils.toBean(createReqVO, WmsWarehouseDO.class);
@@ -70,7 +72,7 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
     }
 
     /**
-     * @sign : 000C450B439067C4
+     * @sign : 38B6A9D0484E56C4
      */
     @Override
     public WmsWarehouseDO updateWarehouse(WmsWarehouseSaveReqVO updateReqVO) {
@@ -83,9 +85,11 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
             throw exception(WAREHOUSE_CODE_DUPLICATE);
         }
         // 按 wms_warehouse.external_storage_id -> wms_external_storage.id 的引用关系，校验存在性
-        WmsExternalStorageDO externalStorage = externalStorageService.getExternalStorage(updateReqVO.getExternalStorageId());
-        if (externalStorage == null) {
-            throw exception(EXTERNAL_STORAGE_NOT_EXISTS);
+        if (updateReqVO.getExternalStorageId() != null) {
+            WmsExternalStorageDO externalStorage = externalStorageService.getExternalStorage(updateReqVO.getExternalStorageId());
+            if (externalStorage == null) {
+                throw exception(EXTERNAL_STORAGE_NOT_EXISTS);
+            }
         }
         // 更新
         WmsWarehouseDO warehouse = BeanUtils.toBean(updateReqVO, WmsWarehouseDO.class);
@@ -95,12 +99,13 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
     }
 
     /**
-     * @sign : ED025D59E9C934A6
+     * @sign : 004DC894F8394A48
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteWarehouse(Long id) {
         // 校验存在
-        validateWarehouseExists(id);
+        WmsWarehouseDO warehouse = validateWarehouseExists(id);
         // 校验是否被库区表引用
         List<WmsWarehouseAreaDO> warehouseAreaList = warehouseAreaService.selectByWarehouseId(id, 1);
         if (!CollectionUtils.isEmpty(warehouseAreaList)) {
@@ -111,6 +116,10 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
         if (!CollectionUtils.isEmpty(warehouseLocationList)) {
             throw exception(WAREHOUSE_BE_REFERRED);
         }
+        // 唯一索引去重
+        warehouse.setName(warehouseMapper.appendLogicDeleteSuffix(warehouse.getName()));
+        warehouse.setCode(warehouseMapper.appendLogicDeleteSuffix(warehouse.getCode()));
+        warehouseMapper.updateById(warehouse);
         // 删除
         warehouseMapper.deleteById(id);
     }

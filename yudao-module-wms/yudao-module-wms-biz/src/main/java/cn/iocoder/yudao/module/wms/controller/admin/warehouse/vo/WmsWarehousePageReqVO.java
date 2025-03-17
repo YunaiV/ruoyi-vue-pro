@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : country,code,contact_phone,create_time,city,contact_person,postcode,is_sync,mode,external_storage_id,address_line2,province,address_line1,company_name,name,status
+ * @table-fields : country,code,contact_phone,create_time,city,contact_person,postcode,is_sync,mode,external_storage_id,province,address_line2,address_line1,company_name,name,status
  */
 @Schema(description = "管理后台 - 仓库分页 Request VO")
 @Data
@@ -28,9 +28,6 @@ public class WmsWarehousePageReqVO extends PageParam {
 
     @Schema(description = "外部存储ID", example = "22814")
     private Long externalStorageId;
-
-    @Schema(description = "外部存储代码")
-    private String externalStorageCode;
 
     @Schema(description = "公司名称", example = "张三")
     private String companyName;

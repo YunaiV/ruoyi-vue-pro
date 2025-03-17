@@ -101,7 +101,7 @@ spring:
 mybatis-plus:
   configuration:
     #开发环境中开启mysql日志
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 # rocketmq 配置项，对应 RocketMQProperties 配置类
 rocketmq:
   name-server: 127.0.0.1:9876 # RocketMQ Namesrv

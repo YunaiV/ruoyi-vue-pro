@@ -30,23 +30,15 @@ public interface WmsWarehouseAreaMapper extends BaseMapperX<WmsWarehouseAreaDO> 
     }
 
     /**
-     * 按 code 查询唯一的 WmsWarehouseAreaDO
+     * 按 warehouseId 查询 WmsWarehouseAreaDO
      */
-    default WmsWarehouseAreaDO getByCode(String code, boolean deleted) {
+    default List<WmsWarehouseAreaDO> selectByWarehouseId(Long warehouseId, int limit) {
+        WmsWarehouseAreaPageReqVO reqVO = new WmsWarehouseAreaPageReqVO();
+        reqVO.setPageSize(limit);
+        reqVO.setPageNo(1);
         LambdaQueryWrapperX<WmsWarehouseAreaDO> wrapper = new LambdaQueryWrapperX<>();
-        wrapper.eq(WmsWarehouseAreaDO::getCode, code);
-        ;
-        if (deleted) {
-            wrapper.eq(WmsWarehouseAreaDO::getDeleted, true);
-        }
-        return selectOne(wrapper);
-    }
-
-    /**
-     * 按 code 查询唯一的 WmsWarehouseAreaDO
-     */
-    default WmsWarehouseAreaDO getByCode(String code) {
-        return getByCode(code, false);
+        wrapper.eq(WmsWarehouseAreaDO::getWarehouseId, warehouseId);
+        return selectPage(reqVO, wrapper).getList();
     }
 
     /**
@@ -57,14 +49,11 @@ public interface WmsWarehouseAreaMapper extends BaseMapperX<WmsWarehouseAreaDO> 
     }
 
     /**
-     * 按 warehouseId 查询 WmsWarehouseAreaDO
+     * 按 code 查询唯一的 WmsWarehouseAreaDO
      */
-    default List<WmsWarehouseAreaDO> selectByWarehouseId(Long warehouseId, int limit) {
-        WmsWarehouseAreaPageReqVO reqVO = new WmsWarehouseAreaPageReqVO();
-        reqVO.setPageSize(limit);
-        reqVO.setPageNo(1);
+    default WmsWarehouseAreaDO getByCode(String code) {
         LambdaQueryWrapperX<WmsWarehouseAreaDO> wrapper = new LambdaQueryWrapperX<>();
-        wrapper.eq(WmsWarehouseAreaDO::getWarehouseId, warehouseId);
-        return selectPage(reqVO, wrapper).getList();
+        wrapper.eq(WmsWarehouseAreaDO::getCode, code);
+        return selectOne(wrapper);
     }
 }

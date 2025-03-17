@@ -9,7 +9,7 @@ import java.util.*;
 import jakarta.validation.constraints.*;
 
 /**
- * @table-fields : country,code,contact_phone,city,contact_person,postcode,is_sync,mode,external_storage_id,address_line2,province,address_line1,company_name,name,id,status
+ * @table-fields : country,code,contact_phone,city,contact_person,postcode,is_sync,mode,external_storage_id,province,address_line2,address_line1,company_name,name,id,status
  */
 @Schema(description = "管理后台 - 仓库新增/修改 Request VO")
 @Data
@@ -33,9 +33,6 @@ public class WmsWarehouseSaveReqVO {
 
     @Schema(description = "外部存储ID", example = "22814")
     private Long externalStorageId;
-
-    @Schema(description = "外部存储代码")
-    private String externalStorageCode;
 
     @Schema(description = "公司名称", example = "张三")
     private String companyName;

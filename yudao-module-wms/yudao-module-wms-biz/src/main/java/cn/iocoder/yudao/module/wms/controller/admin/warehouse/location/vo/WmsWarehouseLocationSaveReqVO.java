@@ -8,7 +8,7 @@ import java.util.*;
 import jakarta.validation.constraints.*;
 
 /**
- * @table-fields : code,picking_order,name,id,area_id,status,warehouse_id
+ * @table-fields : code,picking_order,name,id,area_id,warehouse_id,status
  */
 @Schema(description = "管理后台 - 库位新增/修改 Request VO")
 @Data

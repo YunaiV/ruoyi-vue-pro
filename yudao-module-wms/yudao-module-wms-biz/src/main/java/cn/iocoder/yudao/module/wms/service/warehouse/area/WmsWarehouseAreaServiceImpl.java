@@ -41,17 +41,19 @@ public class WmsWarehouseAreaServiceImpl implements WmsWarehouseAreaService {
     private WmsWarehouseAreaMapper warehouseAreaMapper;
 
     /**
-     * @sign : E30D8E71696EA16B
+     * @sign : F375CBD52181374D
      */
     @Override
     public WmsWarehouseAreaDO createWarehouseArea(WmsWarehouseAreaSaveReqVO createReqVO) {
-        if (warehouseAreaMapper.getByCode(createReqVO.getCode(), true) != null) {
+        if (warehouseAreaMapper.getByCode(createReqVO.getCode()) != null) {
             throw exception(WAREHOUSE_AREA_CODE_DUPLICATE);
         }
         // 按 wms_warehouse_area.warehouse_id -> wms_warehouse.id 的引用关系，校验存在性
-        WmsWarehouseDO warehouse = warehouseService.getWarehouse(createReqVO.getWarehouseId());
-        if (warehouse == null) {
-            throw exception(WAREHOUSE_NOT_EXISTS);
+        if (createReqVO.getWarehouseId() != null) {
+            WmsWarehouseDO warehouse = warehouseService.getWarehouse(createReqVO.getWarehouseId());
+            if (warehouse == null) {
+                throw exception(WAREHOUSE_NOT_EXISTS);
+            }
         }
         // 插入
         WmsWarehouseAreaDO warehouseArea = BeanUtils.toBean(createReqVO, WmsWarehouseAreaDO.class);
@@ -61,7 +63,7 @@ public class WmsWarehouseAreaServiceImpl implements WmsWarehouseAreaService {
     }
 
     /**
-     * @sign : 3FCEC40077F85132
+     * @sign : DBC3FB30102A2E58
      */
     @Override
     public WmsWarehouseAreaDO updateWarehouseArea(WmsWarehouseAreaSaveReqVO updateReqVO) {
@@ -71,9 +73,11 @@ public class WmsWarehouseAreaServiceImpl implements WmsWarehouseAreaService {
             throw exception(WAREHOUSE_AREA_CODE_DUPLICATE);
         }
         // 按 wms_warehouse_area.warehouse_id -> wms_warehouse.id 的引用关系，校验存在性
-        WmsWarehouseDO warehouse = warehouseService.getWarehouse(updateReqVO.getWarehouseId());
-        if (warehouse == null) {
-            throw exception(WAREHOUSE_NOT_EXISTS);
+        if (updateReqVO.getWarehouseId() != null) {
+            WmsWarehouseDO warehouse = warehouseService.getWarehouse(updateReqVO.getWarehouseId());
+            if (warehouse == null) {
+                throw exception(WAREHOUSE_NOT_EXISTS);
+            }
         }
         // 更新
         WmsWarehouseAreaDO warehouseArea = BeanUtils.toBean(updateReqVO, WmsWarehouseAreaDO.class);
@@ -83,17 +87,21 @@ public class WmsWarehouseAreaServiceImpl implements WmsWarehouseAreaService {
     }
 
     /**
-     * @sign : 61ECDB09556E7AA2
+     * @sign : 934AD1EBC4961CFD
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteWarehouseArea(Long id) {
         // 校验存在
-        validateWarehouseAreaExists(id);
+        WmsWarehouseAreaDO warehouseArea = validateWarehouseAreaExists(id);
         // 校验是否被库位表引用
         List<WmsWarehouseLocationDO> warehouseLocationList = warehouseLocationService.selectByAreaId(id, 1);
         if (!CollectionUtils.isEmpty(warehouseLocationList)) {
             throw exception(WAREHOUSE_AREA_BE_REFERRED);
         }
+        // 唯一索引去重
+        warehouseArea.setCode(warehouseAreaMapper.appendLogicDeleteSuffix(warehouseArea.getCode()));
+        warehouseAreaMapper.updateById(warehouseArea);
         // 删除
         warehouseAreaMapper.deleteById(id);
     }

@@ -31,40 +31,18 @@ public interface WmsExternalStorageMapper extends BaseMapperX<WmsExternalStorage
     /**
      * 按 name 查询唯一的 WmsExternalStorageDO
      */
-    default WmsExternalStorageDO getByName(String name, boolean deleted) {
+    default WmsExternalStorageDO getByName(String name) {
         LambdaQueryWrapperX<WmsExternalStorageDO> wrapper = new LambdaQueryWrapperX<>();
         wrapper.eq(WmsExternalStorageDO::getName, name);
-        ;
-        if (deleted) {
-            wrapper.eq(WmsExternalStorageDO::getDeleted, true);
-        }
         return selectOne(wrapper);
-    }
-
-    /**
-     * 按 code 查询唯一的 WmsExternalStorageDO
-     */
-    default WmsExternalStorageDO getByCode(String code, boolean deleted) {
-        LambdaQueryWrapperX<WmsExternalStorageDO> wrapper = new LambdaQueryWrapperX<>();
-        wrapper.eq(WmsExternalStorageDO::getCode, code);
-        ;
-        if (deleted) {
-            wrapper.eq(WmsExternalStorageDO::getDeleted, true);
-        }
-        return selectOne(wrapper);
-    }
-
-    /**
-     * 按 name 查询唯一的 WmsExternalStorageDO
-     */
-    default WmsExternalStorageDO getByName(String name) {
-        return getByName(name, false);
     }
 
     /**
      * 按 code 查询唯一的 WmsExternalStorageDO
      */
     default WmsExternalStorageDO getByCode(String code) {
-        return getByCode(code, false);
+        LambdaQueryWrapperX<WmsExternalStorageDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsExternalStorageDO::getCode, code);
+        return selectOne(wrapper);
     }
 }

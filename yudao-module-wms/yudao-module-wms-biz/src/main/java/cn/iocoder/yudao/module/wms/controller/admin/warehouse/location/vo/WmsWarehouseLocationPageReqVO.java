@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : code,create_time,picking_order,name,area_id,status,warehouse_id
+ * @table-fields : code,create_time,picking_order,name,area_id,warehouse_id,status
  */
 @Schema(description = "管理后台 - 库位分页 Request VO")
 @Data

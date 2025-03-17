@@ -9,7 +9,7 @@ import com.alibaba.excel.annotation.*;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,country,creator,code,contact_phone,create_time,city,contact_person,postcode,is_sync,updater,mode,external_storage_id,update_time,address_line2,province,address_line1,company_name,name,id,status
+ * @table-fields : tenant_id,country,creator,code,contact_phone,create_time,city,contact_person,postcode,is_sync,updater,mode,external_storage_id,update_time,province,address_line2,address_line1,company_name,name,id,status
  */
 @Schema(description = "管理后台 - 仓库 Response VO")
 @Data
@@ -35,10 +35,6 @@ public class WmsWarehouseRespVO {
     @Schema(description = "外部存储ID", example = "22814")
     @ExcelProperty("外部存储ID")
     private Long externalStorageId;
-
-    @Schema(description = "外部存储代码")
-    @ExcelProperty("外部存储代码")
-    private String externalStorageCode;
 
     @Schema(description = "公司名称", example = "张三")
     @ExcelProperty("公司名称")

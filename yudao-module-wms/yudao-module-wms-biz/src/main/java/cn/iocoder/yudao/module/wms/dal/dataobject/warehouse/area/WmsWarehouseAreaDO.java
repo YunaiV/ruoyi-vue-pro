@@ -10,7 +10,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 /**
  * 库区 DO
  * @author 李方捷
- * @table-fields : stock_type,code,deleted,name,id,priority,partition_type,status,warehouse_id
+ * @table-fields : stock_type,code,name,id,priority,partition_type,warehouse_id,status
  */
 @TableName("wms_warehouse_area")
 // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -63,9 +63,4 @@ public class WmsWarehouseAreaDO extends BaseDO {
      * 存货类型：1-拣货；2-存储
      */
     private Integer stockType;
-
-    /**
-     * 是否删除
-     */
-    private Boolean deleted;
 }

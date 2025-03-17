@@ -22,7 +22,6 @@ public interface WmsWarehouseMapper extends BaseMapperX<WmsWarehouseDO> {
 				.eqIfPresent(WmsWarehouseDO::getCode, reqVO.getCode())
 				.likeIfPresent(WmsWarehouseDO::getName, reqVO.getName())
 				.eqIfPresent(WmsWarehouseDO::getExternalStorageId, reqVO.getExternalStorageId())
-				.eqIfPresent(WmsWarehouseDO::getExternalStorageCode, reqVO.getExternalStorageCode())
 				.likeIfPresent(WmsWarehouseDO::getCompanyName, reqVO.getCompanyName())
 				.eqIfPresent(WmsWarehouseDO::getCountry, reqVO.getCountry())
 				.eqIfPresent(WmsWarehouseDO::getProvince, reqVO.getProvince())
@@ -38,46 +37,6 @@ public interface WmsWarehouseMapper extends BaseMapperX<WmsWarehouseDO> {
     }
 
     /**
-     * 按 name 查询唯一的 WmsWarehouseDO
-     */
-    default WmsWarehouseDO getByName(String name, boolean deleted) {
-        LambdaQueryWrapperX<WmsWarehouseDO> wrapper = new LambdaQueryWrapperX<>();
-        wrapper.eq(WmsWarehouseDO::getName, name);
-        ;
-        if (deleted) {
-            wrapper.eq(WmsWarehouseDO::getDeleted, true);
-        }
-        return selectOne(wrapper);
-    }
-
-    /**
-     * 按 name 查询唯一的 WmsWarehouseDO
-     */
-    default WmsWarehouseDO getByName(String name) {
-        return getByName(name, false);
-    }
-
-    /**
-     * 按 code 查询唯一的 WmsWarehouseDO
-     */
-    default WmsWarehouseDO getByCode(String code, boolean deleted) {
-        LambdaQueryWrapperX<WmsWarehouseDO> wrapper = new LambdaQueryWrapperX<>();
-        wrapper.eq(WmsWarehouseDO::getCode, code);
-        ;
-        if (deleted) {
-            wrapper.eq(WmsWarehouseDO::getDeleted, true);
-        }
-        return selectOne(wrapper);
-    }
-
-    /**
-     * 按 code 查询唯一的 WmsWarehouseDO
-     */
-    default WmsWarehouseDO getByCode(String code) {
-        return getByCode(code, false);
-    }
-
-    /**
      * 按 externalStorageId 查询 WmsWarehouseDO
      */
     default List<WmsWarehouseDO> selectByExternalStorageId(Long externalStorageId, int limit) {
@@ -87,5 +46,23 @@ public interface WmsWarehouseMapper extends BaseMapperX<WmsWarehouseDO> {
         LambdaQueryWrapperX<WmsWarehouseDO> wrapper = new LambdaQueryWrapperX<>();
         wrapper.eq(WmsWarehouseDO::getExternalStorageId, externalStorageId);
         return selectPage(reqVO, wrapper).getList();
+    }
+
+    /**
+     * 按 name 查询唯一的 WmsWarehouseDO
+     */
+    default WmsWarehouseDO getByName(String name) {
+        LambdaQueryWrapperX<WmsWarehouseDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsWarehouseDO::getName, name);
+        return selectOne(wrapper);
+    }
+
+    /**
+     * 按 code 查询唯一的 WmsWarehouseDO
+     */
+    default WmsWarehouseDO getByCode(String code) {
+        LambdaQueryWrapperX<WmsWarehouseDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsWarehouseDO::getCode, code);
+        return selectOne(wrapper);
     }
 }
