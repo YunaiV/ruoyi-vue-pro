@@ -150,7 +150,7 @@ public class KingdeeServiceTest extends SomleBaseSpringTest {
             .createStartTime(LocalDateTimeUtils.toTimestamp(LocalDateTime.now().minusDays(1)))
             .createEndTime(LocalDateTimeUtils.toTimestamp(LocalDateTime.now()))
             .build();
-        log.info(JsonUtilsX.toJsonString(client.getPurRequest(vo)));
+        log.info(JsonUtilsX.toJsonString(client.streamPurRequest(vo)));
     }
 
     @Test
@@ -163,7 +163,7 @@ public class KingdeeServiceTest extends SomleBaseSpringTest {
             .createEndTime(Timestamp.from(end))
             .build();
         log.info(JsonUtilsX.toJSONObject(vo).toString());
-        log.info(client.getPurOrder(vo).get(0).toString());
+        log.info(client.streamPurOrder(vo).toString());
     }
 
     @Test
