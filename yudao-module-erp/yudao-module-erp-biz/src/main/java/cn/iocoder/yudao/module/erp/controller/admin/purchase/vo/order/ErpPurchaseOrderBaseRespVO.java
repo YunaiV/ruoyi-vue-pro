@@ -194,8 +194,8 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
 //        //        private String srcBillTypeId;// 源单类型ID
 //        @Schema(description = "源单类型")
 //        private String srcBillTypeName;
-        @Schema(description = "源单单号(采购单No)")
-        private int srcNo;
+//        @Schema(description = "源单单号(采购单No)")
+//        private int srcNo;
         @Schema(description = "x码")
         private String xcode;
         @Schema(description = "箱率")
@@ -205,8 +205,6 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
         // ========== 带出 ==========
         @Schema(description = "可用库存")
         private BigDecimal availableStock;
-        @Schema(description = "已入库数量")
-        private BigDecimal inCounted;
         /**
          * 关闭状态
          */

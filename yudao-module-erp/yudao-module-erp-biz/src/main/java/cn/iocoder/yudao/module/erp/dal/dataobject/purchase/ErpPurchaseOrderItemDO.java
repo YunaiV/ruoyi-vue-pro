@@ -96,6 +96,10 @@ public class ErpPurchaseOrderItemDO extends TenantBaseDO {
      * 含税单价
      */
     private BigDecimal actTaxPrice;
+    /**
+     * 价税合计
+     */
+    private BigDecimal allAmount;
     // ========== 采购金额和数量 ==========
     /**
      * 合计产品价格，单位：元
@@ -164,6 +168,10 @@ public class ErpPurchaseOrderItemDO extends TenantBaseDO {
 
     private String xcode;//x码
     private String containerRate;//箱率
+    /**
+     * 汇率
+     */
+    private BigDecimal exchangeRate;
     /**
      * 币别id(财务管理-币别维护)
      */

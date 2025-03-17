@@ -59,6 +59,13 @@ public class ErpPurchaseInItemStatusMachine {
             .to(ErpPaymentStatus.PAYMENT_EXCEPTION)
             .on(ErpEventEnum.PAYMENT_EXCEPTION)
             .perform(actionInPayItemImpl);
+        //完成付款
+        builder.externalTransition()
+            .from(ErpPaymentStatus.NONE_PAYMENT)
+            .to(ErpPaymentStatus.ALL_PAYMENT)
+            .on(ErpEventEnum.COMPLETE_PAYMENT)
+            .perform(actionInPayItemImpl);
+
         //取消付款
         builder.externalTransition()
             .from(ErpPaymentStatus.ALL_PAYMENT)

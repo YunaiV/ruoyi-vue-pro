@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderAuditReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderMergeReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
@@ -141,7 +142,7 @@ public interface ErpPurchaseOrderService {
     /**
      * 合并入库
      *
-     * @param itemIds 采购订单项编号数组
+     * @param reqVO 请求体
      */
-    void merge(Collection<Long> itemIds);
+    void merge(ErpPurchaseOrderMergeReqVO reqVO);
 }

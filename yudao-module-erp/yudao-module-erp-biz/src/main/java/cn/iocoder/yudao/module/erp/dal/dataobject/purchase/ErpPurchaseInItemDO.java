@@ -93,6 +93,7 @@ public class ErpPurchaseInItemDO extends BaseDO {
      * 关联 {@link ErpPurchaseOrderDO#getNo()}
      */
     private String orderNo;
+
     /**
      * 币别id(财务管理-币别维护)
      */
@@ -127,4 +128,8 @@ public class ErpPurchaseInItemDO extends BaseDO {
      * 部门id
      */
     private Long applicationDeptId;
+    /**
+     * 汇率
+     */
+    private BigDecimal exchangeRate;
 }

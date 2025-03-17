@@ -104,7 +104,7 @@ public class ErpPurchaseBaseRespVO {
     @Schema(description = "币别名称")
     private Long currencyName;
     // ========== 采购订单金额(钱)结束 ==========
-    @Schema(description = "汇率,财务管理-币别维护")
-    private BigDecimal exchangeRate;
+//    @Schema(description = "汇率,财务管理-币别维护")
+//    private BigDecimal exchangeRate;
     // ========== 订单产品合计-结束 ==========
 }

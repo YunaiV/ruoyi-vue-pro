@@ -26,6 +26,9 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
     @Schema(description = "单据日期")
     private LocalDateTime noTime;
 
+    @Schema(description = "收获地址")
+    private String address;
+
     @Schema(description = "付款状态")
     private Integer payStatus;
 
@@ -36,7 +39,7 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
     @ExcelProperty("入库时间")
     private LocalDateTime inTime;
 
-    @Schema(description = "采购订单编号")
+    @Schema(description = "采购订单id")
     private Long orderId;
     @Schema(description = "采购订单号")
     private String orderNo;
@@ -47,19 +50,19 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
     @Data
     public static class Item {
 
-        @Schema(description = "入库项编号")
+        @Schema(description = "入库项id")
         private Long id;
 
-        @Schema(description = "采购订单项编号")
+        @Schema(description = "采购订单项id")
         private Long orderItemId;
 
-        @Schema(description = "仓库编号")
+        @Schema(description = "仓库id")
         private Long warehouseId;
 
         @Schema(description = "产品存放仓库名称")
         private String warehouseName;
 
-        @Schema(description = "产品编号")
+        @Schema(description = "产品id")
         private Long productId;
 
         @Schema(description = "型号规格(产品带出)")
@@ -93,8 +96,8 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
         @Schema(description = "备注")
         private String remark;
 
-        @Schema(description = "汇率,财务管理-币别维护")
-        private BigDecimal exchangeRate;
+//        @Schema(description = "汇率,财务管理-币别维护")
+//        private BigDecimal exchangeRate;
 
         @Schema(description = "结算日期")
         private LocalDateTime settlementDate;
@@ -137,18 +140,18 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
 
         @Schema(description = "付款状态")
         private Integer payStatus;
-
-        @Schema(description = "申请人id")
-        private Long applicantId;
-        //申请人名称
-        @Schema(description = "申请人名称")
-        private String applicantName;
-
-        @Schema(description = "申请部门id")
-        private Long applicationDeptId;
-        //申请部门名称
-        @Schema(description = "申请部门名称")
-        private String applicationDeptName;
+//
+//        @Schema(description = "申请人id")
+//        private Long applicantId;
+//        //申请人名称
+//        @Schema(description = "申请人名称")
+//        private String applicantName;
+//
+//        @Schema(description = "申请部门id")
+//        private Long applicationDeptId;
+//        //申请部门名称
+//        @Schema(description = "申请部门名称")
+//        private String applicationDeptName;
 
         @Schema(description = "来源单据类型")
         private String source;

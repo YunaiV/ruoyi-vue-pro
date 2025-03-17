@@ -10,8 +10,6 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInItemDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
-
 /**
  * ERP 采购入库 Mapper
  *
@@ -30,7 +28,6 @@ public interface ErpPurchaseInMapper extends BaseMapperX<ErpPurchaseInDO> {
             .likeIfPresent(ErpPurchaseInDO::getRemark, reqVO.getRemark())
             .eqIfPresent(ErpPurchaseInDO::getCreator, reqVO.getCreator())
             .eqIfPresent(ErpPurchaseInDO::getAccountId, reqVO.getAccountId())
-            .likeIfPresent(ErpPurchaseInDO::getOrderNo, reqVO.getOrderNo())
             .orderByDesc(ErpPurchaseInDO::getId);
         // 付款状态。为什么需要 t. 的原因，是因为联表查询时，需要指定表名，不然会报字段不存在的错误
 //        if (Objects.equals(reqVO.getPaymentStatus(), ErpPurchaseInPageReqVO.PAYMENT_STATUS_NONE)) {
@@ -62,8 +59,8 @@ public interface ErpPurchaseInMapper extends BaseMapperX<ErpPurchaseInDO> {
         return selectOne(ErpPurchaseInDO::getNo, no);
     }
 
-    default List<ErpPurchaseInDO> selectListByOrderId(Long orderId) {
-        return selectList(ErpPurchaseInDO::getOrderId, orderId);
-    }
+//    default List<ErpPurchaseInDO> selectListByOrderId(Long orderId) {
+//        return selectList(ErpPurchaseInDO::getOrderId, orderId);
+//    }
 
 }

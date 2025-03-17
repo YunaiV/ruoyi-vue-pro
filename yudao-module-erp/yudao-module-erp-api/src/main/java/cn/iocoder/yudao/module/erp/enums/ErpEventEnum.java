@@ -45,7 +45,7 @@ public enum ErpEventEnum {
     //付款事件
     PAYMENT_INIT("付款初始化"),
     // PARTIAL_PAYMENT("部分付款"),
-    // COMPLETE_PAYMENT("完成付款"),
+    COMPLETE_PAYMENT("完成付款"),
     CANCEL_PAYMENT("取消付款"),
     PAYMENT_EXCEPTION("付款异常"),
     PAYMENT_ADJUSTMENT("付款调整"),

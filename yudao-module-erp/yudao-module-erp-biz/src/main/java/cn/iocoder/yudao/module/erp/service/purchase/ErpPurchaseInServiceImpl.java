@@ -10,11 +10,11 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.purchase.ErpInCountDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInAuditReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInPageReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInPayReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInItemDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseInItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseInMapper;
@@ -40,6 +40,8 @@ import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.module.erp.enums.ErpEventEnum.CANCEL_PAYMENT;
+import static cn.iocoder.yudao.module.erp.enums.ErpEventEnum.COMPLETE_PAYMENT;
 import static cn.iocoder.yudao.module.erp.enums.ErpStateMachines.*;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 
@@ -90,7 +92,10 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     @Transactional(rollbackFor = Exception.class)
     public Long createPurchaseIn(ErpPurchaseInSaveReqVO createReqVO) {
         // 1.1 校验采购订单已审核
-        ErpPurchaseOrderDO purchaseOrder = purchaseOrderService.validatePurchaseOrder(createReqVO.getOrderId());
+        for (ErpPurchaseInSaveReqVO.Item item : createReqVO.getItems()) {
+            purchaseOrderService.validatePurchaseOrder(item.getOrderId());
+        }
+//        ErpPurchaseOrderDO purchaseOrder = purchaseOrderService.validatePurchaseOrder(createReqVO.getOrderId());
         // 1.2 校验入库项的有效性
         List<ErpPurchaseInItemDO> purchaseInItems = validatePurchaseInItems(createReqVO.getItems());
         // 1.3 校验结算账户
@@ -101,9 +106,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
 
         // 2.1 插入入库
         ErpPurchaseInDO purchaseIn = BeanUtils.toBean(createReqVO, ErpPurchaseInDO.class, in -> in
-                .setNo(no))
-            .setOrderNo(purchaseOrder.getNo())
-            .setSupplierId(purchaseOrder.getSupplierId());
+            .setNo(no));
         calculateTotalPrice(purchaseIn, purchaseInItems);
         ThrowUtil.ifSqlThrow(purchaseInMapper.insert(purchaseIn), GlobalErrorCodeConstants.DB_INSERT_ERROR);
         // 2.2 插入入库项
@@ -146,16 +149,18 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
             throw exception(PURCHASE_IN_UPDATE_FAIL_APPROVE, purchaseIn.getNo());
         }
         // 1.2 校验采购订单已审核
-        ErpPurchaseOrderDO purchaseOrder = purchaseOrderService.validatePurchaseOrder(updateReqVO.getOrderId());
+        for (ErpPurchaseInSaveReqVO.Item item : updateReqVO.getItems()) {
+            purchaseOrderService.validatePurchaseOrder(item.getOrderId());
+        }
         // 1.3 校验结算账户
         accountService.validateAccount(updateReqVO.getAccountId());
         // 1.4 校验订单项的有效性
         List<ErpPurchaseInItemDO> purchaseInItems = validatePurchaseInItems(updateReqVO.getItems());
 
         // 2.1 更新入库
-        ErpPurchaseInDO updateObj = BeanUtils.toBean(updateReqVO, ErpPurchaseInDO.class)
-            .setOrderNo(purchaseOrder.getNo())
-            .setSupplierId(purchaseOrder.getSupplierId());
+        ErpPurchaseInDO updateObj = BeanUtils.toBean(updateReqVO, ErpPurchaseInDO.class);
+//            .setOrderNo(purchaseOrder.getNo())
+//            .setSupplierId(purchaseOrder.getSupplierId());
         calculateTotalPrice(updateObj, purchaseInItems);//合计
         purchaseInMapper.updateById(updateObj);
         // 2.2 更新入库项
@@ -294,6 +299,14 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         return purchaseIn;
     }
 
+    //验证入库项是否存在
+    private ErpPurchaseInItemDO validatePurchaseInItemExists(Long id) {
+        ErpPurchaseInItemDO purchaseInItem = purchaseInItemMapper.selectById(id);
+        if (purchaseInItem == null)
+            throw exception(PURCHASE_IN_ITEM_NOT_EXISTS, id);
+        return purchaseInItem;
+    }
+
     @Override
     public ErpPurchaseInDO getPurchaseIn(Long id) {
         return purchaseInMapper.selectById(id);
@@ -362,5 +375,21 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         }
     }
 
-
+    @Override
+    public void switchPayStatus(ErpPurchaseInPayReqVO vo) {
+        ErpEventEnum eventEnum = null;
+        if (vo.getPass()) {
+            eventEnum = COMPLETE_PAYMENT;
+        } else {
+            eventEnum = CANCEL_PAYMENT;
+        }
+        ErpEventEnum finalEventEnum = eventEnum;
+        vo.getInItemIds().stream().distinct().forEach(
+            inItemId -> {
+                //校验
+                ErpPurchaseInItemDO inItemDO = validatePurchaseInItemExists(inItemId);
+                itemPaymentMachine.fireEvent(ErpPaymentStatus.fromCode(inItemDO.getPayStatus()), finalEventEnum, inItemDO);
+            }
+        );
+    }
 }

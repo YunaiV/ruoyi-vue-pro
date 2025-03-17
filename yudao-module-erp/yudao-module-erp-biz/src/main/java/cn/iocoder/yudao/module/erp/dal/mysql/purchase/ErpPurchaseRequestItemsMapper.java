@@ -35,7 +35,7 @@ public interface ErpPurchaseRequestItemsMapper extends BaseMapperX<ErpPurchaseRe
      * @param itemIds 子表产品项ids
      * @return 集合
      */
-    default List<ErpPurchaseRequestItemsDO> selectListByIds(List<Long> itemIds) {
+    default List<ErpPurchaseRequestItemsDO> selectListByIds(Collection<Long> itemIds) {
         if (itemIds == null || itemIds.isEmpty()) {
             // 如果 itemIds 为空，直接返回空列表，避免执行全表查询
             return Collections.emptyList();

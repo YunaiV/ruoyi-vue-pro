@@ -8,10 +8,7 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderAuditReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderBaseRespVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderPageReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.*;
 import cn.iocoder.yudao.module.erp.controller.admin.tools.validation;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
@@ -157,8 +154,14 @@ public class ErpPurchaseOrderController {
         purchaseOrderService.switchPurchaseOrderStatus(itemIds, reqVO.getEnable());
         return success(true);
     }
-    //TODO 合并成入库单
 
+    @PostMapping("/merge")
+    @Operation(summary = "合并入库")
+    @PreAuthorize("@ss.hasPermission('erp:purchasereq-order:merge')")
+    public CommonResult<Boolean> mergePurchaseOrder(@Validated @RequestBody ErpPurchaseOrderMergeReqVO reqVO) {
+        purchaseOrderService.merge(reqVO);
+        return success(true);
+    }
 
     private List<ErpPurchaseOrderBaseRespVO> bindList(List<ErpPurchaseOrderDO> list) {
         // 1.1 订单项

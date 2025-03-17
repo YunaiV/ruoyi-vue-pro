@@ -9,10 +9,7 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInAuditReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInBaseRespVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInPageReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.*;
 import cn.iocoder.yudao.module.erp.controller.admin.tools.validation;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInItemDO;
@@ -147,6 +144,16 @@ public class ErpPurchaseInController {
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:review')")
     public CommonResult<Boolean> reviewPurchaseRequest(@Validated(validation.OnAudit.class) @RequestBody ErpPurchaseInAuditReqVO req) {
         purchaseInService.review(req);
+        return success(true);
+    }
+
+    //切换付款状态方法(暂时)
+    @PostMapping("/changePayStatus")
+    @Operation(summary = "切换付款状态")
+    @PreAuthorize("@ss.hasPermission('erp:purchase-in:changePayStatus')")
+    public CommonResult<Boolean> changePayStatus(ErpPurchaseInPayReqVO vo) {
+//        purchaseInService.changePayStatus(reqVO.getInId(), reqVO.getPayStatus());
+        purchaseInService.switchPayStatus(vo);
         return success(true);
     }
 

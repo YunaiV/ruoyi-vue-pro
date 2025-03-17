@@ -28,8 +28,8 @@ public class ErpPurchaseInPageReqVO extends PageParam {
     @Schema(description = "单据日期", example = "2024-10-12")
     private LocalDateTime noTime;
 
-    @Schema(description = "汇率,财务管理-币别维护",example = "5.8")
-    private BigDecimal exchangeRate;
+//    @Schema(description = "汇率,财务管理-币别维护",example = "5.8")
+//    private BigDecimal exchangeRate;
 
     @Schema(description = "应付款余额",example = "12")
     private BigDecimal payableBalance;

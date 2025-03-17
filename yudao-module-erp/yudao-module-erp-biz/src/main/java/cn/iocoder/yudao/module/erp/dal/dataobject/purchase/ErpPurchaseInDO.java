@@ -53,10 +53,10 @@ public class ErpPurchaseInDO extends BaseDO {
      * 单据日期
      */
     private LocalDateTime noTime;
-    /**
-     * 币别
-     */
-    private Long currencyId;
+//    /**
+//     * 币别
+//     */
+//    private Long currencyId;
 
     /**
      * 审核人ID
@@ -66,10 +66,7 @@ public class ErpPurchaseInDO extends BaseDO {
      * 审核时间
      */
     private LocalDateTime auditTime;
-    /**
-     * 汇率
-     */
-    private BigDecimal exchangeRate;
+
 
     /**
      * 结算日期
@@ -81,15 +78,14 @@ public class ErpPurchaseInDO extends BaseDO {
     private LocalDateTime inTime;
 
     /**
-     * 采购订单编号
-     * 关联 {@link ErpPurchaseOrderDO#getId()}
+     * 收获地址
      */
-    private Long orderId;
-    /**
-     * 采购订单号
-     * 冗余 {@link ErpPurchaseOrderDO#getNo()}
-     */
-    private String orderNo;
+    private String address;
+//    /**
+//     * 采购订单编号
+//     * 关联 {@link ErpPurchaseOrderDO#getId()}
+//     */
+//    private Long orderId;
 
     /**
      * 合计数量

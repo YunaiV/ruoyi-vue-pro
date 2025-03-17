@@ -44,5 +44,7 @@ public class ActionInPayItemImpl implements Action<ErpPaymentStatus, ErpEventEnu
         inItemDO.setPayStatus(to.getCode());
         mapper.updateById(inItemDO);
         log.debug("付款状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
+        //传递给主表状态机
+        //TODO 传递给主表状态机
     }
 }
