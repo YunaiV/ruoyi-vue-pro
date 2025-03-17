@@ -63,7 +63,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -268,6 +267,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
         List<FlowNode> nextFlowNodes = BpmnModelUtils.getNextFlowNodes(flowElement, bpmnModel, processVariables);
 
+        // TODO @小北：还是可以优化下哈；“4. 组装节点信息” 只拼接出 candidateUserIds；之后，再第二次循环，查询用户和部门信息，进行拼接
         // 2. 收集所有节点的候选用户 ID
         Set<Long> allCandidateUsers = new HashSet<>();
         for (FlowNode node : nextFlowNodes) {
@@ -290,7 +290,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             List<UserSimpleBaseVO> candidateUsers = new ArrayList<>();
             for (Long userId : candidateUserIds) {
                 UserSimpleBaseVO user = BpmProcessInstanceConvert.INSTANCE.buildUser(userId, userMap, deptMap);
-                if (user != null){
+                if (user != null) {
                     candidateUsers.add(user);
                 }
             }
@@ -932,10 +932,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                     BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getProcessAfterTriggerSetting();
 
                     BpmHttpRequestUtils.executeBpmHttpRequest(instance,
-                            setting.getUrl(),
-                            setting.getHeader(),
-                            setting.getBody(),
-                            true, setting.getResponse());
+                            setting.getUrl(), setting.getHeader(), setting.getBody(), true, setting.getResponse());
                 }
             }
         });
@@ -954,10 +951,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             }
             BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getProcessBeforeTriggerSetting();
             BpmHttpRequestUtils.executeBpmHttpRequest(instance,
-                    setting.getUrl(),
-                    setting.getHeader(),
-                    setting.getBody(),
-                    true, setting.getResponse());
+                    setting.getUrl(), setting.getHeader(), setting.getBody(), true, setting.getResponse());
         });
     }
 

@@ -1176,7 +1176,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
         updateTaskStatus(task.getId(), BpmTaskStatusEnum.RUNNING.getStatus());
 
-        // 2. 处理自动通过的情况，例如说：1）无审批人时，是否自动通过、不通过；2）非【人工审核】时，是否自动通过、不通过
         ProcessInstance processInstance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
         if (processInstance == null) {
             log.error("[processTaskCreated][taskId({}) 没有找到流程实例]", task.getId());
@@ -1188,15 +1187,15 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             log.error("[processTaskCreated][processDefinitionId({}) 没有找到流程定义]", processInstance.getProcessDefinitionId());
             return;
         }
-        // 任务前置通知
+
+        // 2. 任务前置通知
         if (ObjUtil.isNotNull(processDefinitionInfo.getTaskBeforeTriggerSetting())){
             BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getTaskBeforeTriggerSetting();
             BpmHttpRequestUtils.executeBpmHttpRequest(processInstance,
-                    setting.getUrl(),
-                    setting.getHeader(),
-                    setting.getBody(),
-                    true, setting.getResponse());
+                    setting.getUrl(), setting.getHeader(), setting.getBody(), true, setting.getResponse());
         }
+
+        // 3. 处理自动通过的情况，例如说：1）无审批人时，是否自动通过、不通过；2）非【人工审核】时，是否自动通过、不通过
         BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(processInstance.getProcessDefinitionId());
         FlowElement userTaskElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
         Integer approveType = BpmnModelUtils.parseApproveType(userTaskElement);
@@ -1421,14 +1420,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             log.error("[processTaskCompleted][processDefinitionId({}) 没有找到流程定义]", processInstance.getProcessDefinitionId());
             return;
         }
-        // 任务前置通知
+
+        // 任务后置通知
         if (ObjUtil.isNotNull(processDefinitionInfo.getTaskAfterTriggerSetting())){
             BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getTaskAfterTriggerSetting();
             BpmHttpRequestUtils.executeBpmHttpRequest(processInstance,
-                    setting.getUrl(),
-                    setting.getHeader(),
-                    setting.getBody(),
-                    true, setting.getResponse());
+                    setting.getUrl(), setting.getHeader(), setting.getBody(), true, setting.getResponse());
         }
     }
 
