@@ -2,8 +2,9 @@ package cn.iocoder.yudao.module.iot.api.device.dto.control.upstream;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * IoT 设备【状态】更新 Request DTO

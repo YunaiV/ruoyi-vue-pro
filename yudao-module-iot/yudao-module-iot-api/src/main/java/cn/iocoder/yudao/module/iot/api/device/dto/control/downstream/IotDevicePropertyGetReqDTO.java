@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.iot.api.device.dto.control.downstream;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 // TODO @芋艿：从 server => plugin => device 是否有必要？从阿里云 iot 来看，没有这个功能？！

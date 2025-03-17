@@ -2,11 +2,12 @@ package cn.iocoder.yudao.module.iot.mq.consumer.rule;
 
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.service.rule.IotRuleSceneService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * 针对 {@link IotDeviceMessage} 的消费者，处理规则场景

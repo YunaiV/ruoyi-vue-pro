@@ -2,8 +2,9 @@ package cn.iocoder.yudao.module.iot.controller.admin.device.vo.data;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
 
 @Schema(description = "管理后台 - IoT 设备日志分页查询 Request VO")
 @Data

@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.group.IotDeviceGroupPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.group.IotDeviceGroupSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceGroupDO;
-import jakarta.validation.Valid;
 
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public interface IotDeviceGroupService {
      */
     default List<IotDeviceGroupDO> validateDeviceGroupExists(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
-            return List.of();
+            return ListUtil.of();
         }
         return convertList(ids, this::validateDeviceGroupExists);
     }

@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.iot.dal.redis.plugin;
 
 import cn.iocoder.yudao.module.iot.dal.redis.RedisKeyConstants;
-import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
+
+import javax.annotation.Resource;
 
 /**
  * 设备插件的插件进程编号的缓存的 Redis DAO

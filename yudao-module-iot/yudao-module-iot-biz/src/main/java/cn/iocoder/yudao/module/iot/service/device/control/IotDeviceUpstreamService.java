@@ -2,7 +2,8 @@ package cn.iocoder.yudao.module.iot.service.device.control;
 
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.*;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceUpstreamReqVO;
-import jakarta.validation.Valid;
+
+import javax.validation.Valid;
 
 /**
  * IoT 设备上行 Service 接口

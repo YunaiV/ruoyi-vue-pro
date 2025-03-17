@@ -22,11 +22,11 @@ import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
 import cn.iocoder.yudao.module.iot.service.plugin.IotPluginInstanceService;
 import cn.iocoder.yudao.module.iot.util.MqttSignUtils;
 import cn.iocoder.yudao.module.iot.util.MqttSignUtils.MqttSignResult;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;

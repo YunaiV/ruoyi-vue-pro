@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.device.data;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -12,11 +13,11 @@ import cn.iocoder.yudao.module.iot.dal.tdengine.IotDeviceLogMapper;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -87,7 +88,7 @@ public class IotDeviceLogServiceImpl implements IotDeviceLogService {
                     Long timeMillis = timestamp.getTime();
                     // 消息数量转换
                     Integer count = ((Number) map.get("data")).intValue();
-                    return Map.of(timeMillis, count);
+                    return MapUtil.of(timeMillis, count);
                 })
                 .collect(Collectors.toList());
     }
@@ -103,7 +104,7 @@ public class IotDeviceLogServiceImpl implements IotDeviceLogService {
                     Long timeMillis = timestamp.getTime();
                     // 消息数量转换
                     Integer count = ((Number) map.get("data")).intValue();
-                    return Map.of(timeMillis, count);
+                    return MapUtil.of(timeMillis, count);
                 })
                 .collect(Collectors.toList());
     }

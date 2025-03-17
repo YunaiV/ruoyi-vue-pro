@@ -3,10 +3,10 @@ package cn.iocoder.yudao.module.iot.dal.redis.device;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
-import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.Map;
 

@@ -99,18 +99,18 @@
             <type>pom</type>
         </dependency>
 
-        <!-- TODO @芋艿：bom 管理 -->
-        <dependency>
-            <groupId>org.graalvm.js</groupId>
-            <artifactId>js</artifactId>
-            <version>24.1.2</version>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>org.graalvm.js</groupId>
-            <artifactId>js-scriptengine</artifactId>
-            <version>24.1.2</version>
-        </dependency>
+        <!-- TODO @芋艿：bom 管理 TODO @芋艿：不支持 jdk8 -->
+<!--        <dependency>-->
+<!--            <groupId>org.graalvm.js</groupId>-->
+<!--            <artifactId>js</artifactId>-->
+<!--            <version>24.1.2</version>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.graalvm.js</groupId>-->
+<!--            <artifactId>js-scriptengine</artifactId>-->
+<!--            <version>24.1.2</version>-->
+<!--        </dependency>-->
 
         <!-- TODO @芋艿：合理注释 -->
         <!-- IoT 数据桥梁的执行器所需消息队列。如果您只需要使用 rocketmq 那么则注释掉其它消息队列即可 -->

@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.iot.service.ota;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.record.IotOtaUpgradeRecordPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaUpgradeRecordDO;
-import jakarta.validation.Valid;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 

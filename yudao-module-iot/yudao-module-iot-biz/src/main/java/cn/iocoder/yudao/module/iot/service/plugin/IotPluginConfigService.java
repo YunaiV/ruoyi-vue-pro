@@ -6,10 +6,10 @@ import cn.iocoder.yudao.module.iot.controller.admin.plugin.vo.config.PluginConfi
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginConfigDO;
 import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginDeployTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**

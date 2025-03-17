@@ -11,7 +11,6 @@ import cn.iocoder.yudao.module.iot.dal.mysql.plugin.IotPluginInstanceMapper;
 import cn.iocoder.yudao.module.iot.dal.redis.plugin.DevicePluginProcessIdRedisDAO;
 import cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
@@ -22,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;

@@ -11,13 +11,13 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaUpgradeTaskDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.ota.IotOtaUpgradeRecordMapper;
 import cn.iocoder.yudao.module.iot.enums.ota.IotOtaUpgradeRecordStatusEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -66,7 +66,7 @@ public class IotOtaUpgradeRecordServiceImpl implements IotOtaUpgradeRecordServic
             upgradeRecord.setStatus(IotOtaUpgradeRecordStatusEnum.PENDING.getStatus());
             upgradeRecord.setProgress(0);
             return upgradeRecord;
-        }).toList();
+        }).collect(Collectors.toList());
         // 3.保存数据
         upgradeRecordMapper.insertBatch(upgradeRecordList);
         // TODO @芋艿：在这里需要处理推送升级任务的逻辑

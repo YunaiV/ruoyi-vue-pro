@@ -5,8 +5,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceProp
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
-import jakarta.validation.Valid;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;

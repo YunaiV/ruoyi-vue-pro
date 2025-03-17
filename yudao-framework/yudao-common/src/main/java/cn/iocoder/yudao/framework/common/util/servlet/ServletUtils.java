@@ -117,7 +117,7 @@ public class ServletUtils {
     }
 
     public static Map<String, String> getHeaderMap(HttpServletRequest request) {
-        return JakartaServletUtil.getHeaderMap(request);
+        return ServletUtil.getHeaderMap(request);
     }
 
 }

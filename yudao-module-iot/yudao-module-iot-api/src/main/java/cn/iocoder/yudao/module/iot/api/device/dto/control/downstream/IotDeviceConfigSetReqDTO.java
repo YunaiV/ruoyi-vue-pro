@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.iot.api.device.dto.control.downstream;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 /**

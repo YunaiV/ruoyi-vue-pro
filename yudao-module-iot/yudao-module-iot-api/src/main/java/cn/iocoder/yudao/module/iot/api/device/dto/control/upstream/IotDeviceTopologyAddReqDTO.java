@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.iot.api.device.dto.control.upstream;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 // TODO @芋艿：要写清楚，是来自设备网关，还是设备。

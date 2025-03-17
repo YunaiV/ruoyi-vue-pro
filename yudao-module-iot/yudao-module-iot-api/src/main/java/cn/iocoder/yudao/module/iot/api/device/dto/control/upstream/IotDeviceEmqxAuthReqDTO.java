@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.iot.api.device.dto.control.upstream;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
 
 // TODO @芋艿：要不要继承 IotDeviceUpstreamAbstractReqDTO
 // TODO @芋艿：@haohao：后续其它认证的设计
