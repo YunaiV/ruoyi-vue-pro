@@ -267,24 +267,41 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 3.1 获取下一个将要执行的节点集合
         FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
         List<FlowNode> nextFlowNodes = BpmnModelUtils.getNextFlowNodes(flowElement, bpmnModel, processVariables);
-        return convertList(nextFlowNodes, node -> {
+
+        // 2. 收集所有节点的候选用户 ID
+        Set<Long> allCandidateUsers = new HashSet<>();
+        for (FlowNode node : nextFlowNodes) {
             List<Long> candidateUserIds = getTaskCandidateUserList(bpmnModel, node.getId(),
                     loginUserId, historicProcessInstance.getProcessDefinitionId(), processVariables);
-            // 3.2 获取节点的审批人信息
-            Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(candidateUserIds);
-            // 3.3 获取节点的审批人部门信息
-            Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
-            // 3.4 存在一个节点多人审批的情况，组装审批人信息
+            allCandidateUsers.addAll(candidateUserIds);
+        }
+
+        // 3. 批量查询用户和部门信息
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(new ArrayList<>(allCandidateUsers));
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
+
+        // 4. 组装节点信息
+        return convertList(nextFlowNodes, node -> {
+            // 4.1 获取当前节点的候选用户 ID
+            List<Long> candidateUserIds = getTaskCandidateUserList(bpmnModel, node.getId(),
+                    loginUserId, historicProcessInstance.getProcessDefinitionId(), processVariables);
+
+            // 4.2 组装候选用户信息
             List<UserSimpleBaseVO> candidateUsers = new ArrayList<>();
-            userMap.forEach((key, value) -> candidateUsers.add(BpmProcessInstanceConvert.INSTANCE.buildUser(key, userMap, deptMap)));
-            return new ActivityNode().setNodeType(BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType())
+            for (Long userId : candidateUserIds) {
+                UserSimpleBaseVO user = BpmProcessInstanceConvert.INSTANCE.buildUser(userId, userMap, deptMap);
+                if (user != null){
+                    candidateUsers.add(user);
+                }
+            }
+
+            // 4.3 构建节点信息
+            return new ActivityNode()
+                    .setNodeType(BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType())
                     .setId(node.getId())
                     .setName(node.getName())
                     .setStatus(BpmTaskStatusEnum.RUNNING.getStatus())
                     .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(node))
-                    // TODO @小北：先把 candidateUserIds 设置完，然后最后拼接 candidateUsers 信息。这样，如果有多个节点，就不用重复查询啦；类似 buildApprovalDetail 思路；
-                    // TODO 先拼接处 List ActivityNode
-                    // TODO 接着，再起一段，处理 adminUserApi.getUserMap(candidateUserIds)、deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId))
                     .setCandidateUsers(candidateUsers);
         });
     }
