@@ -7,6 +7,9 @@ import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 
+/**
+ * @table-fields : no,actual_arrival_time,creator_comment,source_bill_id,trace_no,type,refer_no,plan_arrival_time,init_age,shipping_method,source_bill_no,source_bill_type,id,status,warehouse_id
+ */
 @Schema(description = "管理后台 - 入库单新增/修改 Request VO")
 @Data
 public class WmsInboundSaveReqVO {
@@ -58,5 +61,4 @@ public class WmsInboundSaveReqVO {
 
     @Schema(description = "初始库龄")
     private Integer initAge;
-
 }

@@ -6,9 +6,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
-
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+/**
+ * @table-fields : no,actual_arrival_time,create_time,creator_comment,source_bill_id,trace_no,type,refer_no,plan_arrival_time,init_age,shipping_method,source_bill_no,source_bill_type,status,warehouse_id
+ */
 @Schema(description = "管理后台 - 入库单分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -62,5 +64,4 @@ public class WmsInboundPageReqVO extends PageParam {
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
-
 }

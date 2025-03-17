@@ -32,4 +32,9 @@ public interface ErrorCodeConstants {
     ErrorCode WAREHOUSE_LOCATION_NOT_EXISTS = new ErrorCode(2_001_300_000, "库位不存在");
     ErrorCode WAREHOUSE_LOCATION_CODE_DUPLICATE = new ErrorCode(2_001_300_001, "代码已存在");
     ErrorCode WAREHOUSE_LOCATION_BE_REFERRED = new ErrorCode(2_001_300_002, "库位被引用");
+
+    // ========== WMS_INBOUND 入库单 2_001_400_000 ==========
+    ErrorCode INBOUND_NOT_EXISTS = new ErrorCode(2_001_400_001, "入库单不存在");
+    ErrorCode INBOUND_NO_DUPLICATE = new ErrorCode(2_001_400_002, "单据号已存在");
+    ErrorCode INBOUND_BE_REFERRED = new ErrorCode(2_001_400_003, "入库单被引用");
 }
