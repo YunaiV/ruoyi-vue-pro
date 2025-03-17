@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.iot.framework.job.core;
 
-import cn.iocoder.yudao.framework.quartz.core.enums.JobDataKeyEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.context.ApplicationContext;
@@ -173,12 +172,8 @@ public class IotSchedulerManager {
      * @param jobName 任务名
      * @throws SchedulerException 触发异常
      */
-    public void triggerJob(String jobName)
-            throws SchedulerException {
-        // 触发任务
-        JobDataMap data = new JobDataMap();
-        data.put(JobDataKeyEnum.JOB_HANDLER_NAME.name(), jobName);
-        scheduler.triggerJob(new JobKey(jobName), data);
+    public void triggerJob(String jobName) throws SchedulerException {
+        scheduler.triggerJob(new JobKey(jobName));
     }
 
     private Trigger buildTrigger(String jobName, String cronExpression) {
