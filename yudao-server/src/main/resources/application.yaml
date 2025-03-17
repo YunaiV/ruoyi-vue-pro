@@ -303,6 +303,8 @@ yudao:
       - infra_job
       - infra_job_log
       - infra_job_log
+      - iot_plugin_info
+      - iot_plugin_instance
       - infra_data_source_config
       - jimu_dict
       - jimu_dict_item
@@ -328,6 +330,8 @@ yudao:
       - mail_account
       - mail_template
       - sms_template
+      - iot:device
+      - iot:thing_model_list
   sms-code: # 短信验证码相关的配置项
     expire-times: 10m
     send-frequency: 1m
@@ -350,3 +354,6 @@ yudao:
         customer: E77DF18BE109F454A5CD319E44BF5177
 
 debug: false
+# 插件配置 TODO 芋艿：【IOT】需要处理下
+pf4j:
+  pluginsDir: /Users/anhaohao/code/gitee/ruoyi-vue-pro/plugins # 插件目录

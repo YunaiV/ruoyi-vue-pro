@@ -35,8 +35,9 @@
         <dm8.jdbc.version>8.1.3.140</dm8.jdbc.version>
         <kingbase.jdbc.version>8.6.0</kingbase.jdbc.version>
         <opengauss.jdbc.version>5.1.0</opengauss.jdbc.version>
+        <taos.version>3.3.3</taos.version>
         <!-- 消息队列 -->
-        <rocketmq-spring.version>2.3.1</rocketmq-spring.version>
+        <rocketmq-spring.version>2.3.2</rocketmq-spring.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.7</lock4j.version>
         <!-- 监控相关 -->
@@ -67,6 +68,8 @@
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
         <netty.version>4.1.116.Final</netty.version>
         <mqtt.version>1.2.5</mqtt.version>
+        <pf4j-spring.version>0.9.0</pf4j-spring.version>
+        <vertx.version>4.5.13</vertx.version>
         <!-- 三方云服务相关 -->
         <commons-io.version>2.17.0</commons-io.version>
         <commons-compress.version>1.27.1</commons-compress.version>
@@ -291,6 +294,12 @@
                 <version>${kingbase.jdbc.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.taosdata.jdbc</groupId>
+                <artifactId>taos-jdbcdriver</artifactId>
+                <version>${taos.version}</version>
+            </dependency>
+
             <!-- Job 定时任务相关 -->
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
@@ -304,7 +313,6 @@
                 <artifactId>yudao-spring-boot-starter-mq</artifactId>
                 <version>${revision}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.apache.rocketmq</groupId>
                 <artifactId>rocketmq-spring-boot-starter</artifactId>
@@ -618,6 +626,36 @@
                         <artifactId>druid</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <!-- PF4J -->
+            <dependency>
+                <groupId>org.pf4j</groupId>
+                <artifactId>pf4j-spring</artifactId>
+                <version>${pf4j-spring.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- Vert.x -->
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-core</artifactId>
+                <version>${vertx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-web</artifactId>
+                <version>${vertx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-mqtt</artifactId>
+                <version>${vertx.version}</version>
             </dependency>
 
             <!-- MQTT -->

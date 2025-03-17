@@ -66,7 +66,9 @@ public class CrmReceivableDO extends BaseDO {
      */
     private LocalDateTime returnTime;
     /**
-     * 回款方式,关联枚举{@link CrmReceivableReturnTypeEnum}
+     * 回款方式
+     *
+     * 枚举 {@link CrmReceivableReturnTypeEnum}
      */
     private Integer returnType;
     /**

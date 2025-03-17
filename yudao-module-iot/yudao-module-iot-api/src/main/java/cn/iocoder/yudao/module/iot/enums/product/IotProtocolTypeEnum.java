@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * IOT 接入网关协议枚举类
+ * IoT 接入网关协议枚举类
  *
  * @author ahh
  */

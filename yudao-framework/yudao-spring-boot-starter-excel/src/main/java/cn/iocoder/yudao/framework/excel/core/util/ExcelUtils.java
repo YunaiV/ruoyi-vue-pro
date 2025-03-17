@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.excel.core.util;
 
+import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.excel.core.handler.SelectSheetWriteHandler;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.converters.longconverter.LongStringConverter;
@@ -8,8 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -40,7 +39,7 @@ public class ExcelUtils {
                 .registerConverter(new LongStringConverter()) // 避免 Long 类型丢失精度
                 .sheet(sheetName).doWrite(data);
         // 设置 header 和 contentType。写在最后的原因是，避免报错时，响应 contentType 已经被修改了
-        response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, StandardCharsets.UTF_8.name()));
+        response.addHeader("Content-Disposition", "attachment;filename=" + HttpUtils.encodeUtf8(filename));
         response.setContentType("application/vnd.ms-excel;charset=UTF-8");
     }
 
