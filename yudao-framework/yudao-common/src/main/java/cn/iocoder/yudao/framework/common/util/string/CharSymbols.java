@@ -127,6 +127,8 @@ public class CharSymbols {
     public static final String LEFT_BRACES = "{";
     public static final String PERCENT = "%";
 
+    public static final String EMPTY_COLLECTION = "∅";
+
     public static String repeat(String c,int len) {
         StringBuilder r=new StringBuilder();
         while (r.length()<len) {

@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.framework.mybatis.core.mapper;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.SortablePageParam;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
+import cn.iocoder.yudao.framework.common.util.string.CharSymbols;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import com.baomidou.mybatisplus.annotation.DbType;
@@ -189,4 +191,10 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         return delete(new LambdaQueryWrapper<T>().eq(field, value));
     }
 
+    /**
+     * 在逻辑删除时，为唯一键值加随机后缀，以避免唯一键值冲突
+     */
+    default String appendLogicDeleteSuffix(String uKeyValue) {
+        return uKeyValue + CharSymbols.VERTICAL_LINE + IdUtil.nanoId(2);
+    }
 }
