@@ -42,12 +42,10 @@ public class CrmContactSaveReqVO {
     private Long ownerUserId;
 
     @Schema(description = "手机号", example = "1387171766")
-    @Mobile
     @DiffLogField(name = "手机号")
     private String mobile;
 
     @Schema(description = "电话", example = "021-0029922")
-    @Telephone
     @DiffLogField(name = "电话")
     private String telephone;
 
