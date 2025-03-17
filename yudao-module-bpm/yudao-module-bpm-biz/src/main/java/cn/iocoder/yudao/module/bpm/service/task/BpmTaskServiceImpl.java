@@ -12,6 +12,7 @@ import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
@@ -23,6 +24,7 @@ import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskSignTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmHttpRequestUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmFormService;
@@ -1180,6 +1182,21 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             log.error("[processTaskCreated][taskId({}) 没有找到流程实例]", task.getId());
             return;
         }
+        BpmProcessDefinitionInfoDO processDefinitionInfo = bpmProcessDefinitionService.
+                getProcessDefinitionInfo(processInstance.getProcessDefinitionId());
+        if (processDefinitionInfo == null) {
+            log.error("[processTaskCreated][processDefinitionId({}) 没有找到流程定义]", processInstance.getProcessDefinitionId());
+            return;
+        }
+        // 任务前置通知
+        if (ObjUtil.isNotNull(processDefinitionInfo.getTaskBeforeTriggerSetting())){
+            BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getTaskBeforeTriggerSetting();
+            BpmHttpRequestUtils.executeBpmHttpRequest(processInstance,
+                    setting.getUrl(),
+                    setting.getHeader(),
+                    setting.getBody(),
+                    true, setting.getResponse());
+        }
         BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(processInstance.getProcessDefinitionId());
         FlowElement userTaskElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
         Integer approveType = BpmnModelUtils.parseApproveType(userTaskElement);
@@ -1389,6 +1406,30 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             }
 
         });
+    }
+
+    @Override
+    public void processTaskCompleted(Task task) {
+        ProcessInstance processInstance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
+        if (processInstance == null) {
+            log.error("[processTaskCompleted][taskId({}) 没有找到流程实例]", task.getId());
+            return;
+        }
+        BpmProcessDefinitionInfoDO processDefinitionInfo = bpmProcessDefinitionService.
+                getProcessDefinitionInfo(processInstance.getProcessDefinitionId());
+        if (processDefinitionInfo == null) {
+            log.error("[processTaskCompleted][processDefinitionId({}) 没有找到流程定义]", processInstance.getProcessDefinitionId());
+            return;
+        }
+        // 任务前置通知
+        if (ObjUtil.isNotNull(processDefinitionInfo.getTaskAfterTriggerSetting())){
+            BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getTaskAfterTriggerSetting();
+            BpmHttpRequestUtils.executeBpmHttpRequest(processInstance,
+                    setting.getUrl(),
+                    setting.getHeader(),
+                    setting.getBody(),
+                    true, setting.getResponse());
+        }
     }
 
     @Override
