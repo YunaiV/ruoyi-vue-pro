@@ -6,8 +6,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.group.IotDeviceGroupPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.group.IotDeviceGroupSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceGroupDO;
+import jakarta.validation.Valid;
 
-import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 
@@ -49,7 +49,7 @@ public interface IotDeviceGroupService {
      */
     default List<IotDeviceGroupDO> validateDeviceGroupExists(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
-            return ListUtil.of();
+            return ListUtil.empty();
         }
         return convertList(ids, this::validateDeviceGroupExists);
     }
