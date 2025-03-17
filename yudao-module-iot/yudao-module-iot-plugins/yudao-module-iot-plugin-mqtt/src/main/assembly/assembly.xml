@@ -1,0 +1,31 @@
+<assembly>
+	<id>plugin</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<dependencySets>
+		<dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <scope>runtime</scope>
+			<outputDirectory>lib</outputDirectory>
+			<includes>
+				<include>*:jar:*</include>
+			</includes>
+		</dependencySet>
+	</dependencySets>
+    <!--
+    <fileSets>
+        <fileSet>
+            <directory>target/classes</directory>
+            <outputDirectory>classes</outputDirectory>
+        </fileSet>
+    </fileSets>
+    -->
+	<fileSets>
+		<fileSet>
+			<directory>target/plugin-classes</directory>
+			<outputDirectory>classes</outputDirectory>
+		</fileSet>
+	</fileSets>
+</assembly>

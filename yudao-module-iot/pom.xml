@@ -10,6 +10,7 @@
     <modules>
         <module>yudao-module-iot-api</module>
         <module>yudao-module-iot-biz</module>
+        <module>yudao-module-iot-plugins</module>
     </modules>
     <modelVersion>4.0.0</modelVersion>
 

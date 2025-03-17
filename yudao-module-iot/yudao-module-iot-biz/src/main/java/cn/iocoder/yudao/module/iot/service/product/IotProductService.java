@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.iot.service.product;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.controller.admin.product.vo.IotProductPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.product.vo.IotProductSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import jakarta.validation.Valid;
 
+import javax.annotation.Nullable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -46,6 +48,30 @@ public interface IotProductService {
     IotProductDO getProduct(Long id);
 
     /**
+     * 根据产品 key 获得产品
+     *
+     * @param productKey 产品 key
+     * @return 产品
+     */
+    IotProductDO getProductByProductKey(String productKey);
+
+    /**
+     * 校验产品存在
+     *
+     * @param id 编号
+     * @return 产品
+     */
+    IotProductDO validateProductExists(Long id);
+
+    /**
+     * 校验产品存在
+     *
+     * @param productKey 产品 key
+     * @return 产品
+     */
+    IotProductDO validateProductExists(String productKey);
+
+    /**
      * 获得产品分页
      *
      * @param pageReqVO 分页查询
@@ -67,5 +93,14 @@ public interface IotProductService {
      * @return 产品列表
      */
     List<IotProductDO> getProductList();
+
+    /**
+     * 获得产品数量
+     *
+     * @param createTime 创建时间，如果为空，则统计所有产品数量
+     * @return 产品数量
+     */
+    Long getProductCount(@Nullable LocalDateTime createTime);
+
 
 }
