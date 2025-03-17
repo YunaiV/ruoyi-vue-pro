@@ -9,13 +9,17 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpSupplierMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.SUPPLIER_NOT_ENABLE;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.SUPPLIER_NOT_EXISTS;
+import static java.util.Collections.*;
 
 /**
  * ERP 供应商 Service 实现类
@@ -78,6 +82,10 @@ public class ErpSupplierServiceImpl implements ErpSupplierService {
 
     @Override
     public List<ErpSupplierDO> getSupplierList(Collection<Long> ids) {
+       //ids是空集合
+        if (CollectionUtils.isEmpty(ids)) {
+            return emptyList();
+        }
         return supplierMapper.selectBatchIds(ids);
     }
 
