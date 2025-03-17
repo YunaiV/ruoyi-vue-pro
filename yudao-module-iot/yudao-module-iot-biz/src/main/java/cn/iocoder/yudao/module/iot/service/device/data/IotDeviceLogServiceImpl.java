@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.device.data;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -87,7 +88,7 @@ public class IotDeviceLogServiceImpl implements IotDeviceLogService {
                     Long timeMillis = timestamp.getTime();
                     // 消息数量转换
                     Integer count = ((Number) map.get("data")).intValue();
-                    return Map.of(timeMillis, count);
+                    return MapUtil.of(timeMillis, count);
                 })
                 .collect(Collectors.toList());
     }
@@ -103,7 +104,7 @@ public class IotDeviceLogServiceImpl implements IotDeviceLogService {
                     Long timeMillis = timestamp.getTime();
                     // 消息数量转换
                     Integer count = ((Number) map.get("data")).intValue();
-                    return Map.of(timeMillis, count);
+                    return MapUtil.of(timeMillis, count);
                 })
                 .collect(Collectors.toList());
     }
