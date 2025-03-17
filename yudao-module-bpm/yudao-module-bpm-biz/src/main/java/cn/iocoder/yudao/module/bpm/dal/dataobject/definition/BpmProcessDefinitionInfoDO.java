@@ -199,4 +199,16 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private BpmModelMetaInfoVO.HttpRequestSetting processAfterTriggerSetting;
 
+    /**
+     * 任务前置通知设置
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private BpmModelMetaInfoVO.HttpRequestSetting taskBeforeTriggerSetting;
+
+    /**
+     * 任务后置通知设置
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private BpmModelMetaInfoVO.HttpRequestSetting taskAfterTriggerSetting;
+
 }
