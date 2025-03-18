@@ -192,9 +192,21 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
     }
 
     /**
-     * 在逻辑删除时，为唯一键值加随机后缀，以避免唯一键值冲突
+     * 在逻辑删除时，处理唯一键的值，以避免唯一键值冲突  flagUKeyAsLogicDelete
      */
-    default String appendLogicDeleteSuffix(String uKeyValue) {
-        return uKeyValue + CharSymbols.VERTICAL_LINE + IdUtil.nanoId(2);
+    default <T> T flagUKeyAsLogicDelete(T uKeyValue) {
+        if(uKeyValue instanceof String) {
+            CharSequence str= (CharSequence) uKeyValue;
+            return (T)(str + CharSymbols.VERTICAL_LINE + IdUtil.nanoId(2));
+        } else if (uKeyValue instanceof Long) {
+            Long n= - (Long)uKeyValue;
+            return (T)n;
+        } else if (uKeyValue instanceof Integer) {
+            Integer n= - (Integer)uKeyValue;
+            return (T)n;
+        } else {
+            return uKeyValue;
+        }
+
     }
 }
