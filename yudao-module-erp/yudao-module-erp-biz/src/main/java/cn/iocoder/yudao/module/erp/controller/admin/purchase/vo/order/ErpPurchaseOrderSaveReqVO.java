@@ -20,13 +20,12 @@ public class ErpPurchaseOrderSaveReqVO {
 //    @NotNull(groups = validation.OnUpdate.class, message = "更新时，订单id不能为空")
     private Long id;
 
-    @Schema(description = "单据编号")
-    @Pattern(regexp = "^[^\\r\\n]*$", message = "单据编号不能包含换行符")
-    @Pattern(regexp = "^\\S.*\\S$", message = "单据编号开头和结尾不能是空格")
-    private String no;
+//    @Schema(description = "单据编号")
+//    @Pattern(regexp = "^[^\\r\\n]*$", message = "单据编号不能包含换行符")
+//    @Pattern(regexp = "^\\S.*\\S$", message = "单据编号开头和结尾不能是空格")
+//    private String no;
 
     @Schema(description = "单据日期", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull
     private LocalDateTime noTime;
 
     @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -35,6 +34,9 @@ public class ErpPurchaseOrderSaveReqVO {
 
     @Schema(description = "结算账户编号")
     private Long accountId;
+
+    @Schema(description = "结算日期")
+    private LocalDateTime settlementDate;
 
     //收获地址
     @Schema(description = "收获地址")
@@ -46,8 +48,6 @@ public class ErpPurchaseOrderSaveReqVO {
     @Schema(description = "采购主体编号")
     private Long purchaseEntityId;
 
-    @Schema(description = "结算日期")
-    private LocalDateTime settlementDate;
 
     @Schema(description = "优惠率，百分比")
     private BigDecimal discountPercent;

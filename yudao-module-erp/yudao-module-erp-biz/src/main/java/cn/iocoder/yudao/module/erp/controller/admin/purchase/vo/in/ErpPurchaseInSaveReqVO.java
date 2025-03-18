@@ -19,7 +19,9 @@ import java.util.List;
 @Builder
 public class ErpPurchaseInSaveReqVO {
 
-    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "id", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Null(groups = validation.OnCreate.class, message = "创建时，id必须为空")
+    @NotNull(groups = validation.OnUpdate.class, message = "更新时，订单id不能为空")
     private Long id;
 
     /**
@@ -29,8 +31,7 @@ public class ErpPurchaseInSaveReqVO {
     @Schema(description = "入库单号")
     private String no;
 
-    @Schema(description = "入库时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "入库时间不能为空")
+    @Schema(description = "入库时间(不填默认当前时间)")
     private LocalDateTime inTime;
 
     @Schema(description = "单据日期")
@@ -49,7 +50,7 @@ public class ErpPurchaseInSaveReqVO {
     @Schema(description = "结算账户编号")
     private Long accountId;
 
-    @Schema(description = "优惠率，百分比", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "优惠率，百分比")
     private BigDecimal discountPercent;
 
     @Schema(description = "其它金额，单位：元")
@@ -110,8 +111,8 @@ public class ErpPurchaseInSaveReqVO {
         @Schema(description = "产品单价")
         private BigDecimal productPrice;
 
-        @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED)
-        @NotNull(message = "产品数量不能为空")
+        @Schema(description = "入库数量", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "入库数量不能为空")
         private BigDecimal count;
 
         @Schema(description = "价税合计")

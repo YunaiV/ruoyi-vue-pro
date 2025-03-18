@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +69,7 @@ public class ErpPurchaseInController {
     public CommonResult<Long> createPurchaseIn(@Valid @RequestBody ErpPurchaseInSaveReqVO createReqVO) {
         //给vo里面的项的source设置字符串a
         createReqVO.getItems().forEach(item -> item.setSource("WEB录入"));
+        createReqVO.setInTime(LocalDateTime.now());
         return success(purchaseInService.createPurchaseIn(createReqVO));
     }
 
@@ -156,6 +158,7 @@ public class ErpPurchaseInController {
         purchaseInService.switchPayStatus(vo);
         return success(true);
     }
+    //TODO 合并出库
 
     private List<ErpPurchaseInBaseRespVO> bindList(List<ErpPurchaseInDO> list) {
         if (CollUtil.isEmpty(list)) {

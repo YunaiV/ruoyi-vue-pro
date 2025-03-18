@@ -16,6 +16,6 @@ public class ErpPurchaseInPayReqVO {
     Collection<Long> inItemIds;
 
     @NotNull(message = "付款与否不能为空")
-    @Schema(description = "通过/不通过")
+    @Schema(description = "付款/撤销付款")
     private Boolean pass;
 }

@@ -101,7 +101,8 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
                 ErpPurchaseRequestItemsDO applyItemDO = erpPurchaseRequestItemsMapper.selectById(applyItemId);
                 ThrowUtil.ifThrow(applyItemDO == null, PURCHASE_REQUEST_ITEM_NOT_FOUND, oldData.getId(), applyItemId);
                 BigDecimal oldCount = applyItemDO.getInCount();
-                BigDecimal result = (oldCount != null && oldCount.compareTo(BigDecimal.ZERO) == 0) ? BigDecimal.ZERO : oldCount;
+//                BigDecimal result = (oldCount != null && oldCount.compareTo(BigDecimal.ZERO) == 0) ? BigDecimal.ZERO : oldCount;
+                BigDecimal result = oldCount == null ? BigDecimal.ZERO : oldCount;
                 BigDecimal changeCount = result.subtract(dtoCount);
                 purchaseRequestItemStateMachine.fireEvent(ErpStorageStatus.fromCode(applyItemDO.getInStatus())
                     , ErpEventEnum.STOCK_ADJUSTMENT
