@@ -38,6 +38,8 @@ public interface ErrorCodeConstants {
     ErrorCode INBOUND_NO_DUPLICATE = new ErrorCode(2_001_400_002, "单据号已存在");
     ErrorCode INBOUND_BE_REFERRED = new ErrorCode(2_001_400_003, "入库单被引用");
     ErrorCode INBOUND_NO_OUT_OF_BOUNDS = new ErrorCode(2_001_400_004, "入库单单据号越界");
+    ErrorCode INBOUND_ITEM_PRODUCT_ID_REPEATED = new ErrorCode(2_001_400_005, "入库单标准产品ID重复");
+    ErrorCode INBOUND_ITEM_PRODUCT_SKU_REPEATED = new ErrorCode(2_001_400_006, "入库单标准产品SKU重复");
 
     // ========== WMS_INBOUND_ITEM 入库单详情表 2_001_500_000 ==========
     ErrorCode INBOUND_ITEM_NOT_EXISTS = new ErrorCode(2_001_500_001, "入库单详情不存在");

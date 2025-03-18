@@ -109,5 +109,5 @@ public class WmsInboundRespVO {
 
     @Schema(description = "详情清单", example = "")
     @ExcelProperty("详情清单")
-    private List<WmsInboundItemRespVO> items;
+    private List<WmsInboundItemRespVO> itemList;
 }

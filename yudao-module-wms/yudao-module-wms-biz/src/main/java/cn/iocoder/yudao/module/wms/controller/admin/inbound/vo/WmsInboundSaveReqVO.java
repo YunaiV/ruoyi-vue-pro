@@ -73,5 +73,5 @@ public class WmsInboundSaveReqVO {
     private Integer initAge;
 
     @Schema(description = "详情清单", example = "")
-    private List<WmsInboundItemSaveReqVO> items;
+    private List<WmsInboundItemSaveReqVO> itemList;
 }

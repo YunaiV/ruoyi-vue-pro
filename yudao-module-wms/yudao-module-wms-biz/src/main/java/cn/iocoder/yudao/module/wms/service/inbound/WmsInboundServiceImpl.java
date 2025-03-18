@@ -17,6 +17,9 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.wms.dal.mysql.inbound.WmsInboundMapper;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
+import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.WmsInboundItemMapper;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 
 /**
  * 入库单 Service 实现类
@@ -28,19 +31,24 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 public class WmsInboundServiceImpl implements WmsInboundService {
 
     @Resource
+    @Lazy
+    private WmsInboundItemMapper inboundItemMapper;
+
+    @Resource
     private WmsNoRedisDAO noRedisDAO;
 
     @Resource
-    @Lazy()
+    @Lazy
     private WmsWarehouseService warehouseService;
 
     @Resource
     private WmsInboundMapper inboundMapper;
 
     /**
-     * @sign : 7A9DE76D2B7A3B30
+     * @sign : FDB230A76243AB66
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public WmsInboundDO createInbound(WmsInboundSaveReqVO createReqVO) {
         // 设置单据号
         String no = noRedisDAO.generate(WmsNoRedisDAO.INBOUND_NO_PREFIX, INBOUND_NOT_EXISTS);
@@ -55,6 +63,27 @@ public class WmsInboundServiceImpl implements WmsInboundService {
                 throw exception(WAREHOUSE_NOT_EXISTS);
             }
         }
+        // 保存入库单详情详情
+        if (createReqVO.getItemList() != null) {
+            List<WmsInboundItemDO> toInsetList = new ArrayList<>();
+            StreamX.from(createReqVO.getItemList()).filter(Objects::nonNull).forEach(item -> {
+                item.setId(null);
+                // 设置归属
+                item.setInboundId(createReqVO.getId());
+                toInsetList.add(BeanUtils.toBean(item, WmsInboundItemDO.class));
+            });
+            // 校验 toInsetList 中是否有重复的 productId
+            boolean isProductIdRepeated = StreamX.isRepeated(toInsetList, WmsInboundItemDO::getProductId);
+            if (isProductIdRepeated) {
+                throw exception(INBOUND_ITEM_PRODUCT_ID_REPEATED);
+            }
+            // 校验 toInsetList 中是否有重复的 productSku
+            boolean isProductSkuRepeated = StreamX.isRepeated(toInsetList, WmsInboundItemDO::getProductSku);
+            if (isProductSkuRepeated) {
+                throw exception(INBOUND_ITEM_PRODUCT_SKU_REPEATED);
+            }
+            inboundItemMapper.insertBatch(toInsetList);
+        }
         // 插入
         WmsInboundDO inbound = BeanUtils.toBean(createReqVO, WmsInboundDO.class);
         inboundMapper.insert(inbound);
@@ -63,12 +92,14 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     }
 
     /**
-     * @sign : 3B2DE699CC208A81
+     * @sign : 4CF404CDA8EE5751
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public WmsInboundDO updateInbound(WmsInboundSaveReqVO updateReqVO) {
         // 校验存在
         WmsInboundDO exists = validateInboundExists(updateReqVO.getId());
+        // 单据号不允许被修改
         updateReqVO.setNo(exists.getNo());
         // 按 wms_inbound.warehouse_id -> wms_warehouse.id 的引用关系，校验存在性
         if (updateReqVO.getWarehouseId() != null) {
@@ -76,6 +107,35 @@ public class WmsInboundServiceImpl implements WmsInboundService {
             if (warehouse == null) {
                 throw exception(WAREHOUSE_NOT_EXISTS);
             }
+        }
+        // 保存入库单详情详情
+        if (updateReqVO.getItemList() != null) {
+            List<WmsInboundItemDO> existsInDB = inboundItemMapper.selectByInboundId(updateReqVO.getId(), Integer.MAX_VALUE);
+            StreamX.CompareResult<WmsInboundItemDO> compareResult = StreamX.compare(existsInDB, BeanUtils.toBean(updateReqVO.getItemList(), WmsInboundItemDO.class), WmsInboundItemDO::getId);
+            List<WmsInboundItemDO> toInsetList = compareResult.getTargetMoreThanBaseList();
+            List<WmsInboundItemDO> toUpdateList = compareResult.getIntersectionList();
+            List<WmsInboundItemDO> toDeleteList = compareResult.getBaseMoreThanTargetList();
+            List<WmsInboundItemDO> finalList = compareResult.getBaseMoreThanTargetList();
+            finalList.addAll(toInsetList);
+            finalList.addAll(toUpdateList);
+            // 校验 toInsetList 中是否有重复的 productId
+            boolean isProductIdRepeated = StreamX.isRepeated(toInsetList, WmsInboundItemDO::getProductId);
+            if (isProductIdRepeated) {
+                throw exception(INBOUND_ITEM_PRODUCT_ID_REPEATED);
+            }
+            // 校验 toInsetList 中是否有重复的 productSku
+            boolean isProductSkuRepeated = StreamX.isRepeated(toInsetList, WmsInboundItemDO::getProductSku);
+            if (isProductSkuRepeated) {
+                throw exception(INBOUND_ITEM_PRODUCT_SKU_REPEATED);
+            }
+            // 设置归属
+            finalList.forEach(item -> {
+                item.setInboundId(updateReqVO.getId());
+            });
+            // 保存详情
+            inboundItemMapper.insertBatch(toInsetList);
+            inboundItemMapper.updateBatch(toUpdateList);
+            inboundItemMapper.deleteBatchIds(toDeleteList);
         }
         // 更新
         WmsInboundDO inbound = BeanUtils.toBean(updateReqVO, WmsInboundDO.class);

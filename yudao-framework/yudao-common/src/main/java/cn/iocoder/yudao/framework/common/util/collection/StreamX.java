@@ -3,6 +3,9 @@ package cn.iocoder.yudao.framework.common.util.collection;
 
 
 
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import lombok.Getter;
+
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
@@ -49,6 +52,9 @@ public class StreamX<T> {
     private Iterable<T> iterable = null;
 
     private Stream<T> stream = null;
+
+
+
 
     private Stream<T> stream() {
 
@@ -786,6 +792,58 @@ public class StreamX<T> {
         return StreamSupport.stream(new PaginationSpliterator<>(seed, hasNext, next), false);
     }
 
+
+    @Getter
+    public static class CompareResult<B> {
+
+        private List<B> intersectionList= new ArrayList<>();
+        private List<B> baseMoreThanTargetList= new ArrayList<>();
+        private List<B> targetMoreThanBaseList= new ArrayList<>();
+
+        void addIntersection(B bean) {
+            this.intersectionList.add(bean);
+        }
+
+        void addBaseMoreThanTarget(B bean) {
+            this.baseMoreThanTargetList.add(bean);
+        }
+
+        void addTargetMoreThanBase(B bean) {
+            this.targetMoreThanBaseList.add(bean);
+        }
+
+
+
+    }
+
+    public static <B,I> CompareResult<B> compare(Collection<B> baseCollection, Collection<B> targetCollection, Function<B,I> key) {
+
+        Map<I,B> baseMap=StreamX.from(baseCollection).toMap(key,t->t);
+        Map<I,B> targetMap=StreamX.from(targetCollection).toMap(key,t->t);
+
+        CompareResult result = new CompareResult();
+
+        StreamX.from(targetCollection).filter(Objects::nonNull).forEach(item -> {
+            if(!baseMap.keySet().contains(key.apply(item))) {
+                result.addTargetMoreThanBase(item);
+            }
+            if(baseMap.keySet().contains(key.apply(item))) {
+                result.addIntersection(item);
+            }
+        });
+        baseCollection.forEach(item -> {
+            if(!targetMap.keySet().contains(key.apply(item))) {
+                result.addBaseMoreThanTarget(item);
+            }
+        });
+        return result;
+    }
+
+    public static <B,V> boolean isRepeated(Collection<B> collection, Function<B,V> value) {
+        Set<V> set=StreamX.from(collection).toSet(value);
+        return set.size()!=collection.size();
+    }
+
 }
 
 
@@ -831,6 +889,7 @@ class PaginationSpliterator<T> implements Spliterator<T> {
     public int characteristics() {
         return ORDERED | NONNULL | IMMUTABLE;
     }
+
 }
 
 

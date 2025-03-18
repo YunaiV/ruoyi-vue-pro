@@ -56,4 +56,11 @@ public interface WmsInboundItemService {
      * 按 inboundId 查询 WmsInboundItemDO
      */
     List<WmsInboundItemDO> selectByInboundId(Long inboundId, int limit);
+
+    /**
+     * 按 inboundId 查询 WmsInboundItemDO
+     */
+    default List<WmsInboundItemDO> selectByInboundId(Long inboundId) {
+        return selectByInboundId(inboundId, Integer.MAX_VALUE);
+    }
 }
