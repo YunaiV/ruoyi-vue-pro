@@ -8,11 +8,15 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringExpressionUtils;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleScenePageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleSceneSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.rule.IotRuleSceneMapper;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageIdentifierEnum;
@@ -39,8 +43,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.RULE_SCENE_NOT_EXISTS;
 
 /**
  * IoT 规则场景 Service 实现类
@@ -60,6 +66,49 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
 
     @Resource(name = "iotSchedulerManager")
     private IotSchedulerManager schedulerManager;
+
+    @Override
+    public Long createRuleScene(IotRuleSceneSaveReqVO createReqVO) {
+        // 插入
+        IotRuleSceneDO ruleScene = BeanUtils.toBean(createReqVO, IotRuleSceneDO.class);
+        ruleSceneMapper.insert(ruleScene);
+        // 返回
+        return ruleScene.getId();
+    }
+
+    @Override
+    public void updateRuleScene(IotRuleSceneSaveReqVO updateReqVO) {
+        // 校验存在
+        validateRuleSceneExists(updateReqVO.getId());
+        // 更新
+        IotRuleSceneDO updateObj = BeanUtils.toBean(updateReqVO, IotRuleSceneDO.class);
+        ruleSceneMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void deleteRuleScene(Long id) {
+        // 校验存在
+        validateRuleSceneExists(id);
+        // 删除
+        ruleSceneMapper.deleteById(id);
+    }
+
+    private void validateRuleSceneExists(Long id) {
+        if (ruleSceneMapper.selectById(id) == null) {
+            throw exception(RULE_SCENE_NOT_EXISTS);
+        }
+    }
+
+    @Override
+    public IotRuleSceneDO getRuleScene(Long id) {
+        return ruleSceneMapper.selectById(id);
+    }
+
+    @Override
+    public PageResult<IotRuleSceneDO> getRuleScenePage(IotRuleScenePageReqVO pageReqVO) {
+        return ruleSceneMapper.selectPage(pageReqVO);
+    }
+
 
     // TODO 芋艿，缓存待实现
     @Override
@@ -331,7 +380,7 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
             springExpressionVariables.put(IotRuleSceneTriggerConditionParameterOperatorEnum.SPRING_EXPRESSION_SOURCE, messageValue);
             springExpressionVariables.put(IotRuleSceneTriggerConditionParameterOperatorEnum.SPRING_EXPRESSION_VALUE, parameter.getValue());
             List<String> parameterValues = StrUtil.splitTrim(parameter.getValue(), CharPool.COMMA);
-            springExpressionVariables.put(IotRuleSceneTriggerConditionParameterOperatorEnum.SPRING_EXPRESSION_VALUE_List, parameterValues);
+            springExpressionVariables.put(IotRuleSceneTriggerConditionParameterOperatorEnum.SPRING_EXPRESSION_VALUE_LIST, parameterValues);
             // 特殊：解决数字的比较。因为 Spring 是基于它的 compareTo 方法，对数字的比较存在问题！
             if (ObjectUtils.equalsAny(operator, IotRuleSceneTriggerConditionParameterOperatorEnum.BETWEEN,
                     IotRuleSceneTriggerConditionParameterOperatorEnum.NOT_BETWEEN,
@@ -345,7 +394,7 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
                         NumberUtil.parseDouble(messageValue));
                 springExpressionVariables.put(IotRuleSceneTriggerConditionParameterOperatorEnum.SPRING_EXPRESSION_VALUE,
                         NumberUtil.parseDouble(parameter.getValue()));
-                springExpressionVariables.put(IotRuleSceneTriggerConditionParameterOperatorEnum.SPRING_EXPRESSION_VALUE_List,
+                springExpressionVariables.put(IotRuleSceneTriggerConditionParameterOperatorEnum.SPRING_EXPRESSION_VALUE_LIST,
                         convertList(parameterValues, NumberUtil::parseDouble));
             }
             // 2.2 计算 Spring 表达式

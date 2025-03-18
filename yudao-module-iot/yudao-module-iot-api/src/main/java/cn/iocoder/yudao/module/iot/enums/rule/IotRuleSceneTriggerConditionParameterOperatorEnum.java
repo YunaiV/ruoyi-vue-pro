@@ -50,7 +50,7 @@ public enum IotRuleSceneTriggerConditionParameterOperatorEnum implements ArrayVa
     /**
      * Spring 表达式 - 目标值数组
      */
-    public static final String SPRING_EXPRESSION_VALUE_List = "values";
+    public static final String SPRING_EXPRESSION_VALUE_LIST = "values";
 
     public static IotRuleSceneTriggerConditionParameterOperatorEnum operatorOf(String operator) {
         return ArrayUtil.firstMatch(item -> item.getOperator().equals(operator), values());
