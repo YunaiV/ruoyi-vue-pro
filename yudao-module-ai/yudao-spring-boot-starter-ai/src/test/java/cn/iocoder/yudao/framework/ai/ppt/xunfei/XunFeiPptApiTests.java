@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.ai.ppt.xunfei;
 
 import cn.hutool.core.io.FileUtil;
-import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XunfeiPptApi;
+import cn.iocoder.yudao.framework.ai.core.model.xinghuo.api.XunFeiPptApi;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -11,17 +11,17 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 
 /**
- * {@link XunfeiPptApi} 集成测试
+ * {@link XunFeiPptApi} 集成测试
  *
  * @author xiaoxin
  */
-public class XunfeiPptApiTests {
+public class XunFeiPptApiTests {
 
     // 讯飞 API 配置信息，实际使用时请替换为您的应用信息
     private static final String APP_ID = "";
     private static final String API_SECRET = "";
 
-    private final XunfeiPptApi xunfeiPptApi = new XunfeiPptApi(XunfeiPptApi.BASE_URL, APP_ID, API_SECRET);
+    private final XunFeiPptApi xunfeiPptApi = new XunFeiPptApi(XunFeiPptApi.BASE_URL, APP_ID, API_SECRET);
 
     /**
      * 获取 PPT 模板列表
@@ -30,7 +30,7 @@ public class XunfeiPptApiTests {
     @Disabled
     public void testGetTemplatePage() {
         // 调用方法
-        XunfeiPptApi.TemplatePageResponse response = xunfeiPptApi.getTemplatePage("商务", 10);
+        XunFeiPptApi.TemplatePageResponse response = xunfeiPptApi.getTemplatePage("商务", 10);
         // 打印结果
         System.out.println("模板列表响应：" + JsonUtils.toJsonString(response));
 
@@ -41,7 +41,7 @@ public class XunfeiPptApiTests {
 
             // 打印第一个模板的信息（如果存在）
             if (!response.data().records().isEmpty()) {
-                XunfeiPptApi.TemplateInfo firstTemplate = response.data().records().get(0);
+                XunFeiPptApi.TemplateInfo firstTemplate = response.data().records().get(0);
                 System.out.println("模板ID：" + firstTemplate.templateIndexId());
                 System.out.println("模板风格：" + firstTemplate.style());
                 System.out.println("模板颜色：" + firstTemplate.color());
@@ -56,7 +56,7 @@ public class XunfeiPptApiTests {
     @Test
     @Disabled
     public void testCreateOutline() {
-        XunfeiPptApi.CreateResponse response = getCreateResponse();
+        XunFeiPptApi.CreateResponse response = getCreateResponse();
         // 打印结果
         System.out.println("创建大纲响应：" + JsonUtils.toJsonString(response));
 
@@ -77,7 +77,7 @@ public class XunfeiPptApiTests {
      * 创建大纲（通过文本）
      * @return 创建大纲响应
      */
-    private XunfeiPptApi.CreateResponse getCreateResponse() {
+    private XunFeiPptApi.CreateResponse getCreateResponse() {
         String param = "智能体平台 Dify 介绍";
         return xunfeiPptApi.createOutline(param);
     }
@@ -89,9 +89,9 @@ public class XunfeiPptApiTests {
     @Disabled
     public void testCreatePptByOutlineWithFullParams() {
         // 创建大纲对象
-        XunfeiPptApi.CreateResponse createResponse = getCreateResponse();
+        XunFeiPptApi.CreateResponse createResponse = getCreateResponse();
         // 调用方法
-        XunfeiPptApi.CreateResponse response = xunfeiPptApi.createPptByOutline(createResponse.data().outline(), "精简一些，不要超过6个章节");
+        XunFeiPptApi.CreateResponse response = xunfeiPptApi.createPptByOutline(createResponse.data().outline(), "精简一些，不要超过6个章节");
         // 打印结果
         System.out.println("通过大纲创建 PPT 响应：" + JsonUtils.toJsonString(response));
 
@@ -114,13 +114,13 @@ public class XunfeiPptApiTests {
         String sid = "e96dac09f2ec4ee289f029a5fb874ecd"; // 替换为实际的sid
 
         // 调用方法
-        XunfeiPptApi.ProgressResponse response = xunfeiPptApi.checkProgress(sid);
+        XunFeiPptApi.ProgressResponse response = xunfeiPptApi.checkProgress(sid);
         // 打印结果
         System.out.println("检查进度响应：" + JsonUtils.toJsonString(response));
 
         // 安全地访问响应数据
         if (response != null && response.data() != null) {
-            XunfeiPptApi.ProgressResponseData data = response.data();
+            XunFeiPptApi.ProgressResponseData data = response.data();
 
             // 打印PPT生成状态
             System.out.println("PPT 构建状态: " + data.pptStatus());
@@ -171,11 +171,11 @@ public class XunfeiPptApiTests {
             System.out.println("第" + (i + 1) + "次查询进度...");
 
             // 调用方法
-            XunfeiPptApi.ProgressResponse response = xunfeiPptApi.checkProgress(sid);
+            XunFeiPptApi.ProgressResponse response = xunfeiPptApi.checkProgress(sid);
 
             // 安全地访问响应数据
             if (response != null && response.data() != null) {
-                XunfeiPptApi.ProgressResponseData data = response.data();
+                XunFeiPptApi.ProgressResponseData data = response.data();
 
                 // 打印进度信息
                 System.out.println("PPT 构建状态: " + data.pptStatus());
@@ -218,7 +218,7 @@ public class XunfeiPptApiTests {
         String query = "合肥天气趋势分析，包括近5年的气温变化、降水量变化、极端天气事件，以及对城市生活的影响";
 
         // 调用方法
-        XunfeiPptApi.CreateResponse response = xunfeiPptApi.create(query);
+        XunFeiPptApi.CreateResponse response = xunfeiPptApi.create(query);
         // 打印结果
         System.out.println("直接创建 PPT 响应：" + JsonUtils.toJsonString(response));
 
@@ -244,7 +244,7 @@ public class XunfeiPptApiTests {
         MultipartFile multipartFile = convertFileToMultipartFile(file);
 
         // 调用方法
-        XunfeiPptApi.CreateResponse response = xunfeiPptApi.create(multipartFile, file.getName());
+        XunFeiPptApi.CreateResponse response = xunfeiPptApi.create(multipartFile, file.getName());
         // 打印结果
         System.out.println("通过文件创建PPT响应：" + JsonUtils.toJsonString(response));
 
@@ -269,7 +269,7 @@ public class XunfeiPptApiTests {
         String query = "合肥天气趋势分析，包括近 5 年的气温变化、降水量变化、极端天气事件，以及对城市生活的影响";
 
         // 创建请求对象
-        XunfeiPptApi.CreatePptRequest request = XunfeiPptApi.CreatePptRequest.builder()
+        XunFeiPptApi.CreatePptRequest request = XunFeiPptApi.CreatePptRequest.builder()
                 .query(query)
                 .language("cn")
                 .isCardNote(true)
@@ -280,7 +280,7 @@ public class XunfeiPptApiTests {
                 .build();
 
         // 调用方法
-        XunfeiPptApi.CreateResponse response = xunfeiPptApi.create(request);
+        XunFeiPptApi.CreateResponse response = xunfeiPptApi.create(request);
         // 打印结果
         System.out.println("使用完整参数创建 PPT 响应：" + JsonUtils.toJsonString(response));
 
@@ -296,9 +296,9 @@ public class XunfeiPptApiTests {
 
             // 立即查询一次进度
             System.out.println("立即查询进度...");
-            XunfeiPptApi.ProgressResponse progressResponse = xunfeiPptApi.checkProgress(sid);
+            XunFeiPptApi.ProgressResponse progressResponse = xunfeiPptApi.checkProgress(sid);
             if (progressResponse != null && progressResponse.data() != null) {
-                XunfeiPptApi.ProgressResponseData progressData = progressResponse.data();
+                XunFeiPptApi.ProgressResponseData progressData = progressResponse.data();
                 System.out.println("PPT 构建状态: " + progressData.pptStatus());
                 if (progressData.totalPages() != null && progressData.donePages() != null) {
                     System.out.println("完成进度: " + progressData.donePages() + "/" + progressData.totalPages()

@@ -24,16 +24,15 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-// TODO @新：要不改成 WenDuoDuoPptApi
+
 /**
  * 文多多 API
  *
- * @see <a href="https://docmee.cn/open-platform/api">PPT 生成 API</a>
- *
  * @author xiaoxin
+ * @see <a href="https://docmee.cn/open-platform/api">PPT 生成 API</a>
  */
 @Slf4j
-public class WddPptApi {
+public class WenDuoDuoPptApi {
 
     public static final String BASE_URL = "https://docmee.cn";
 
@@ -50,7 +49,7 @@ public class WddPptApi {
             });
 
     // TODO @新：是不是不用 baseUrl 哈
-    public WddPptApi(String baseUrl) {
+    public WenDuoDuoPptApi(String baseUrl) {
         this.webClient = WebClient.builder()
                 .baseUrl(baseUrl)
                 // TODO @新：建议，token 作为 defaultHeader
@@ -82,35 +81,14 @@ public class WddPptApi {
                 .block();
     }
 
-    // TODO @xin：是不是给个 API 连接，这样 type、content、files 都不用写注释太细了
     /**
      * 创建任务
      *
      * @param type    类型
-     *                1.智能生成（主题、要求）
-     *                2.上传文件生成
-     *                3.上传思维导图生成
-     *                4.通过word精准转ppt
-     *                5.通过网页链接生成
-     *                6.粘贴文本内容生成
-     *                7.Markdown大纲生成
      * @param content 内容
-     *                type=1 用户输入主题或要求（不超过1000字符）
-     *                type=2、4 不传
-     *                type=3 幕布等分享链接
-     *                type=5 网页链接地址（http/https）
-     *                type=6 粘贴文本内容（不超过20000字符）
-     *                type=7 大纲内容（markdown）
      * @param files   文件列表
-     *                文件列表（文件数不超过5个，总大小不超过50M）：
-     *                type=1 上传参考文件（非必传，支持多个）
-     *                type=2 上传文件（支持多个）
-     *                type=3 上传思维导图（xmind/mm/md）（仅支持一个）
-     *                type=4 上传word文件（仅支持一个）
-     *                type=5、6、7 不传
-     *                <p>
-     *                支持格式：doc/docx/pdf/ppt/pptx/txt/md/xls/xlsx/csv/html/epub/mobi/xmind/mm
      * @return 任务ID
+     * @see <a href="https://docmee.cn/open-platform/api#%E5%88%9B%E5%BB%BA%E4%BB%BB%E5%8A%A1">创建任务</a>
      */
     public ApiResponse createTask(String token, Integer type, String content, List<MultipartFile> files) {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
@@ -258,7 +236,8 @@ public class WddPptApi {
             Integer code,
             String message,
             Map<String, Object> data
-    ) { }
+    ) {
+    }
 
     /**
      * 创建任务
@@ -268,7 +247,8 @@ public class WddPptApi {
             Integer type,
             String content,
             List<MultipartFile> files
-    ) { }
+    ) {
+    }
 
     /**
      * 生成大纲内容请求
@@ -281,7 +261,8 @@ public class WddPptApi {
             String audience,
             String lang,
             String prompt
-    ) { }
+    ) {
+    }
 
     /**
      * 修改大纲内容请求
@@ -291,7 +272,8 @@ public class WddPptApi {
             String id,
             String markdown,
             String question
-    ) { }
+    ) {
+    }
 
     /**
      * 生成 PPT 请求
@@ -302,7 +284,8 @@ public class WddPptApi {
             String id,
             String templateId,
             String markdown
-    ) { }
+    ) {
+    }
 
     // TODO @新：要不写下类注释
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
@@ -323,7 +306,8 @@ public class WddPptApi {
             LocalDateTime createTime,
             String createUser,
             String updateUser
-    ) { }
+    ) {
+    }
 
     // TODO @新：要不写下类注释
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
@@ -339,7 +323,8 @@ public class WddPptApi {
                 String category,
                 String style,
                 String themeColor
-        ) { }
+        ) {
+        }
 
     }
 
@@ -348,7 +333,8 @@ public class WddPptApi {
     public record PagePptTemplateInfo(
             List<PptTemplateInfo> data,
             String total
-    ) {}
+    ) {
+    }
 
 
     // TODO @新：要不写下类注释
@@ -380,6 +366,7 @@ public class WddPptApi {
             LocalDateTime createTime,
             String createUser,
             String updateUser
-    ) { }
+    ) {
+    }
 
 }

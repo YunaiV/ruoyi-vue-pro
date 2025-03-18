@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.ai.core.model.xinghuo.api;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.extern.slf4j.Slf4j;
@@ -28,16 +29,16 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-// TODO @新：要不改成 XunFeiPptApi
+
+
 /**
  * 讯飞智能 PPT 生成 API
  *
- * @see <a href="https://www.xfyun.cn/doc/spark/PPTv2.html">智能 PPT 生成 API</a>
- *
  * @author xiaoxin
+ * @see <a href="https://www.xfyun.cn/doc/spark/PPTv2.html">智能 PPT 生成 API</a>
  */
 @Slf4j
-public class XunfeiPptApi {
+public class XunFeiPptApi {
 
     public static final String BASE_URL = "https://zwapi.xfyun.cn/api/ppt/v2";
 
@@ -54,7 +55,7 @@ public class XunfeiPptApi {
             });
 
     // TODO @新：是不是不用 baseUrl 哈
-    public XunfeiPptApi(String baseUrl, String appId, String apiSecret) {
+    public XunFeiPptApi(String baseUrl, String appId, String apiSecret) {
         // TODO @新：建议，增加 defaultheaders，例如说 appid 之类的；或者每个请求，通过 headers customer 处理。
         this.webClient = WebClient.builder()
                 .baseUrl(baseUrl)
@@ -134,8 +135,7 @@ public class XunfeiPptApi {
         SignatureInfo signInfo = getSignature();
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("style", style);
-        // TODO @新：可以使用 ObjUtil.defaultIfNull
-        requestBody.put("pageSize", pageSize != null ? pageSize : 10);
+        requestBody.put("pageSize", ObjUtil.defaultIfNull(pageSize, 20));
         return this.webClient.post()
                 .uri("/template/list")
                 .header("appId", signInfo.appId)
@@ -288,7 +288,8 @@ public class XunfeiPptApi {
             String appId,
             String timestamp,
             String signature
-    ) { }
+    ) {
+    }
 
     /**
      * 模板列表响应
@@ -300,7 +301,8 @@ public class XunfeiPptApi {
             String desc,
             Integer count,
             TemplatePageData data
-    ) { }
+    ) {
+    }
 
     /**
      * 模板列表数据
@@ -310,7 +312,8 @@ public class XunfeiPptApi {
             String total,
             List<TemplateInfo> records,
             Integer pageNum
-    ) { }
+    ) {
+    }
 
     /**
      * 模板信息
@@ -324,7 +327,8 @@ public class XunfeiPptApi {
             String industry,
             String style,
             String detailImage
-    ) { }
+    ) {
+    }
 
     /**
      * 创建响应
@@ -336,7 +340,8 @@ public class XunfeiPptApi {
             String desc,
             Integer count,
             CreateResponseData data
-    ) { }
+    ) {
+    }
 
     /**
      * 创建响应数据
@@ -348,7 +353,8 @@ public class XunfeiPptApi {
             String title,
             String subTitle,
             OutlineData outline
-    ) { }
+    ) {
+    }
 
     /**
      * 大纲数据结构
@@ -375,7 +381,8 @@ public class XunfeiPptApi {
             @JsonInclude(value = JsonInclude.Include.NON_NULL)
             public record ChapterContent(
                     String chapterTitle
-            ) { }
+            ) {
+            }
 
         }
 
@@ -397,7 +404,8 @@ public class XunfeiPptApi {
             int code,
             String desc,
             ProgressResponseData data
-    ) { }
+    ) {
+    }
 
     /**
      * 进度响应数据
@@ -407,13 +415,12 @@ public class XunfeiPptApi {
             int process,
             String pptId,
             String pptUrl,
-            // TODO @新：字段注释，去掉
-            String pptStatus,         // PPT构建状态：building（构建中），done（已完成），build_failed（生成失败）
-            String aiImageStatus,     // ai配图状态：building（构建中），done（已完成）
-            String cardNoteStatus,    // 演讲备注状态：building（构建中），done（已完成）
-            String errMsg,            // 生成PPT的失败信息
-            Integer totalPages,       // 生成PPT的总页数
-            Integer donePages         // 生成PPT的完成页数
+            String pptStatus,
+            String aiImageStatus,
+            String cardNoteStatus,
+            String errMsg,
+            Integer totalPages,
+            Integer donePages
     ) {
 
         /**
@@ -480,6 +487,7 @@ public class XunfeiPptApi {
         }
 
         // TODO @新：这个可以用 lombok 简化么？
+
         /**
          * 构建器类
          */
