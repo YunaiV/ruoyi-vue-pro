@@ -67,7 +67,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         // 校验存在
         WmsInboundDO inbound = validateInboundExists(id);
         // 唯一索引去重
-        inbound.setNo(inboundMapper.appendLogicDeleteSuffix(inbound.getNo()));
+        inbound.setNo(inboundMapper.flagUKeyAsLogicDelete(inbound.getNo()));
         inboundMapper.updateById(inbound);
         // 删除
         inboundMapper.deleteById(id);
@@ -93,4 +93,4 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     public PageResult<WmsInboundDO> getInboundPage(WmsInboundPageReqVO pageReqVO) {
         return inboundMapper.selectPage(pageReqVO);
     }
-}
+}

@@ -108,7 +108,7 @@ public class WmsWarehouseLocationServiceImpl implements WmsWarehouseLocationServ
         // 校验存在
         WmsWarehouseLocationDO warehouseLocation = validateWarehouseLocationExists(id);
         // 唯一索引去重
-        warehouseLocation.setCode(warehouseLocationMapper.appendLogicDeleteSuffix(warehouseLocation.getCode()));
+        warehouseLocation.setCode(warehouseLocationMapper.flagUKeyAsLogicDelete(warehouseLocation.getCode()));
         warehouseLocationMapper.updateById(warehouseLocation);
         // 删除
         warehouseLocationMapper.deleteById(id);
@@ -148,4 +148,4 @@ public class WmsWarehouseLocationServiceImpl implements WmsWarehouseLocationServ
     public List<WmsWarehouseLocationDO> selectByAreaId(Long areaId, int limit) {
         return warehouseLocationMapper.selectByAreaId(areaId, limit);
     }
-}
+}

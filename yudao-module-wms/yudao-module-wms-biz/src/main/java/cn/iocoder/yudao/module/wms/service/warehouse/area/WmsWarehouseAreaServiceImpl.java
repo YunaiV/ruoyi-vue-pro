@@ -100,7 +100,7 @@ public class WmsWarehouseAreaServiceImpl implements WmsWarehouseAreaService {
             throw exception(WAREHOUSE_AREA_BE_REFERRED);
         }
         // 唯一索引去重
-        warehouseArea.setCode(warehouseAreaMapper.appendLogicDeleteSuffix(warehouseArea.getCode()));
+        warehouseArea.setCode(warehouseAreaMapper.flagUKeyAsLogicDelete(warehouseArea.getCode()));
         warehouseAreaMapper.updateById(warehouseArea);
         // 删除
         warehouseAreaMapper.deleteById(id);
@@ -133,4 +133,4 @@ public class WmsWarehouseAreaServiceImpl implements WmsWarehouseAreaService {
     public List<WmsWarehouseAreaDO> selectByWarehouseId(Long warehouseId, int limit) {
         return warehouseAreaMapper.selectByWarehouseId(warehouseId, limit);
     }
-}
+}

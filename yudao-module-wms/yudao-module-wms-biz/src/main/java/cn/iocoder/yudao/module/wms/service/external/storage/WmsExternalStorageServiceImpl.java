@@ -85,8 +85,8 @@ public class WmsExternalStorageServiceImpl implements WmsExternalStorageService 
             throw exception(EXTERNAL_STORAGE_BE_REFERRED);
         }
         // 唯一索引去重
-        externalStorage.setName(externalStorageMapper.appendLogicDeleteSuffix(externalStorage.getName()));
-        externalStorage.setCode(externalStorageMapper.appendLogicDeleteSuffix(externalStorage.getCode()));
+        externalStorage.setName(externalStorageMapper.flagUKeyAsLogicDelete(externalStorage.getName()));
+        externalStorage.setCode(externalStorageMapper.flagUKeyAsLogicDelete(externalStorage.getCode()));
         externalStorageMapper.updateById(externalStorage);
         // 删除
         externalStorageMapper.deleteById(id);
@@ -112,4 +112,4 @@ public class WmsExternalStorageServiceImpl implements WmsExternalStorageService 
     public PageResult<WmsExternalStorageDO> getExternalStoragePage(WmsExternalStoragePageReqVO pageReqVO) {
         return externalStorageMapper.selectPage(pageReqVO);
     }
-}
+}

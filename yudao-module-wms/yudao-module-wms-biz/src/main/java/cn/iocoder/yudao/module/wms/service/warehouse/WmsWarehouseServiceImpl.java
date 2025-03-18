@@ -117,8 +117,8 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
             throw exception(WAREHOUSE_BE_REFERRED);
         }
         // 唯一索引去重
-        warehouse.setName(warehouseMapper.appendLogicDeleteSuffix(warehouse.getName()));
-        warehouse.setCode(warehouseMapper.appendLogicDeleteSuffix(warehouse.getCode()));
+        warehouse.setName(warehouseMapper.flagUKeyAsLogicDelete(warehouse.getName()));
+        warehouse.setCode(warehouseMapper.flagUKeyAsLogicDelete(warehouse.getCode()));
         warehouseMapper.updateById(warehouse);
         // 删除
         warehouseMapper.deleteById(id);
@@ -151,4 +151,4 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
     public List<WmsWarehouseDO> selectByExternalStorageId(Long externalStorageId, int limit) {
         return warehouseMapper.selectByExternalStorageId(externalStorageId, limit);
     }
-}
+}
