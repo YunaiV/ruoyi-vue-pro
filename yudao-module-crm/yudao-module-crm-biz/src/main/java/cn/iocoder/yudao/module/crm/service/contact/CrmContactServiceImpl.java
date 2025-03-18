@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactBusinessReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contact.vo.CrmContactSaveReqVO;
@@ -250,7 +251,10 @@ public class CrmContactServiceImpl implements CrmContactService {
     @Override
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#id", level = CrmPermissionLevelEnum.READ)
     public CrmContactDO getContact(Long id) {
-        return contactMapper.selectById(id);
+        MPJLambdaWrapperX<CrmContactDO> wrapperX = new MPJLambdaWrapperX<CrmContactDO>()
+            .selectAll(CrmContactDO.class)
+            .eq(CrmContactDO::getId, id);
+        return contactMapper.selectJoinOne(CrmContactDO.class, wrapperX);
     }
 
     @Override

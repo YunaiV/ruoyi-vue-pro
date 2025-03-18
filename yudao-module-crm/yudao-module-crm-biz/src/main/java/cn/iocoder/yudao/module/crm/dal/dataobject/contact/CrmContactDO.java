@@ -3,11 +3,13 @@ package cn.iocoder.yudao.module.crm.dal.dataobject.contact;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
-
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * CRM 联系人 DO
@@ -114,5 +116,13 @@ public class CrmContactDO extends BaseDO {
      * 备注
      */
     private String remark;
+
+    /**
+     * 国家列表
+     * <p>
+     * 对应字典 {@link cn.iocoder.yudao.framework.common.enums.enums.DictTypeConstants#COUNTRY_CODE}
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<Long> countryCodes;
 
 }
