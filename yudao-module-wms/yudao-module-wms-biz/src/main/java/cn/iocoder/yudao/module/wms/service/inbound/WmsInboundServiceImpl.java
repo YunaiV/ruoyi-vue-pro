@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.inbound;
 
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
+import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,9 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 public class WmsInboundServiceImpl implements WmsInboundService {
 
     @Resource
+    private WmsNoRedisDAO noRedisDAO;
+
+    @Resource
     @Lazy()
     private WmsWarehouseService warehouseService;
 
@@ -34,10 +38,13 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     private WmsInboundMapper inboundMapper;
 
     /**
-     * @sign : 3E7AC5154B0479B9
+     * @sign : 7A9DE76D2B7A3B30
      */
     @Override
     public WmsInboundDO createInbound(WmsInboundSaveReqVO createReqVO) {
+        // 设置单据号
+        String no = noRedisDAO.generate(WmsNoRedisDAO.INBOUND_NO_PREFIX, INBOUND_NOT_EXISTS);
+        createReqVO.setNo(no);
         if (inboundMapper.getByNo(createReqVO.getNo()) != null) {
             throw exception(INBOUND_NO_DUPLICATE);
         }
@@ -56,15 +63,13 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     }
 
     /**
-     * @sign : 1D421DA55E803B5B
+     * @sign : 3B2DE699CC208A81
      */
     @Override
     public WmsInboundDO updateInbound(WmsInboundSaveReqVO updateReqVO) {
         // 校验存在
         WmsInboundDO exists = validateInboundExists(updateReqVO.getId());
-        if (!Objects.equals(updateReqVO.getId(), exists.getId()) && Objects.equals(updateReqVO.getNo(), exists.getNo())) {
-            throw exception(INBOUND_NO_DUPLICATE);
-        }
+        updateReqVO.setNo(exists.getNo());
         // 按 wms_inbound.warehouse_id -> wms_warehouse.id 的引用关系，校验存在性
         if (updateReqVO.getWarehouseId() != null) {
             WmsWarehouseDO warehouse = warehouseService.getWarehouse(updateReqVO.getWarehouseId());

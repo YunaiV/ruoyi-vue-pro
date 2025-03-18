@@ -22,7 +22,7 @@ public class WmsInboundRespVO {
     @ExcelProperty("主键")
     private Long id;
 
-    @Schema(description = "单据号", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "单据号")
     @ExcelProperty("单据号")
     private String no;
 

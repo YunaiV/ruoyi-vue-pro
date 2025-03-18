@@ -12,6 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemSaveReqVO;
+import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 
 /**
  * @table-fields : no,actual_arrival_time,creator_comment,source_bill_id,trace_no,type,refer_no,plan_arrival_time,init_age,shipping_method,source_bill_no,source_bill_type,id,status,warehouse_id
@@ -23,8 +24,7 @@ public class WmsInboundSaveReqVO {
     @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "6889")
     private Long id;
 
-    @Schema(description = "单据号", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "单据号不能为空")
+    @Schema(description = "单据号")
     private String no;
 
     @Schema(description = "入库单类型 ; InboundType : 1-手工", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
@@ -37,6 +37,7 @@ public class WmsInboundSaveReqVO {
 
     @Schema(description = "入库单类型 ; InboundStatus : 0-起草中 , 0-待审批 , 0-已驳回 , 0-已通过", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotEmpty(message = "状态不能为空")
+    @InEnum(InboundStatus.class)
     private Integer status;
 
     @Schema(description = "来源单据ID", example = "24655")

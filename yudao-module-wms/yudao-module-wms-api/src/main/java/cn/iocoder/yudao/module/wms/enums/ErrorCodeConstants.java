@@ -37,6 +37,7 @@ public interface ErrorCodeConstants {
     ErrorCode INBOUND_NOT_EXISTS = new ErrorCode(2_001_400_001, "入库单不存在");
     ErrorCode INBOUND_NO_DUPLICATE = new ErrorCode(2_001_400_002, "单据号已存在");
     ErrorCode INBOUND_BE_REFERRED = new ErrorCode(2_001_400_003, "入库单被引用");
+    ErrorCode INBOUND_NO_OUT_OF_BOUNDS = new ErrorCode(2_001_400_004, "入库单单据号越界");
 
     // ========== WMS_INBOUND_ITEM 入库单详情表 2_001_500_000 ==========
     ErrorCode INBOUND_ITEM_NOT_EXISTS = new ErrorCode(2_001_500_001, "入库单详情不存在");
