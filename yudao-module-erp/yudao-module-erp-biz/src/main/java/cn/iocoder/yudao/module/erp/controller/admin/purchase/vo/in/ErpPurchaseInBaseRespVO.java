@@ -44,6 +44,9 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
     @Schema(description = "采购订单号")
     private String orderNo;
 
+    @Schema(description = "审核意见")
+    private String reviewComment;
+
     @Schema(description = "入库项列表")
     private List<Item> items;
 

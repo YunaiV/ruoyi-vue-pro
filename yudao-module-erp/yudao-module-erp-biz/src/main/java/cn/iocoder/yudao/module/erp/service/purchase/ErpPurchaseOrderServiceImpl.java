@@ -101,6 +101,9 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     private ErpPurchaseRequestItemsMapper requestItemsMapper;
     @Autowired
     private ErpPurchaseInServiceImpl erpPurchaseInServiceImpl;
+    @Autowired
+    private ErpPurchaseInService erpPurchaseInService;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -281,9 +284,9 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         // 第二步，批量添加、修改、删除
         if (CollUtil.isNotEmpty(diffList.get(0))) {
             diffList.get(0).forEach(o -> o.setOrderId(id));
+            purchaseOrderItemMapper.insertBatch(diffList.get(0));
             //行状态初始化
             initSlaveStatus(diffList.get(0));
-            purchaseOrderItemMapper.insertBatch(diffList.get(0));
         }
         if (CollUtil.isNotEmpty(diffList.get(1))) {
             // 批量查询所有需要的采购订单项（purchase order items）
@@ -407,11 +410,11 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         // 2. 遍历删除，并记录操作日志
         purchaseOrders.forEach(purchaseOrder -> {
             //联动申请项
-            for (ErpPurchaseOrderItemDO orderItemDO : purchaseOrderItemMapper.selectListByOrderId(purchaseOrder.getId())) {
-                Optional.ofNullable(orderItemDO.getPurchaseApplyItemId()).ifPresent(id -> {
+            for (ErpPurchaseOrderItemDO item : purchaseOrderItemMapper.selectListByOrderId(purchaseOrder.getId())) {
+                Optional.ofNullable(item.getPurchaseApplyItemId()).ifPresent(id -> {
                     ErpPurchaseRequestItemsDO requestItemsDO = requestItemsMapper.selectById(id);
-                    ErpOrderCountDTO dto = ErpOrderCountDTO.builder().purchaseOrderItemId(orderItemDO.getId())
-                        .quantity(orderItemDO.getCount().negate().intValue()).build();//减少申请个数的订购数量
+                    ErpOrderCountDTO dto = ErpOrderCountDTO.builder().purchaseOrderItemId(item.getId())
+                        .quantity(item.getCount().negate().intValue()).build();//减少申请个数的订购数量
                     //订购状态
                     orderItemMachine.fireEvent(ErpOrderStatus.fromCode(requestItemsDO.getOrderStatus()), ErpEventEnum.ORDER_ADJUSTMENT, dto);
                     //开关状态,不是开启
@@ -419,7 +422,13 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
                         requestItemOffMachine.fireEvent(ErpOffStatus.fromCode(requestItemsDO.getOffStatus()), ErpEventEnum.ACTIVATE, requestItemsDO);
                     }
                 });
+                //判断订单项是否存在入库项
+                if (!Objects.equals(item.getInStatus(), ErpStorageStatus.NONE_IN_STORAGE.getCode())) {
+                    //存在入库项，则发抛出异常
+                    throw exception(PURCHASE_ORDER_DELETE_FAIL);
+                }
             }
+
             // 2.1 删除订单
             purchaseOrderMapper.deleteById(purchaseOrder.getId());
             // 2.2 删除订单项
@@ -428,11 +437,13 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     }
 
     @Override
-    public void validatePurchaseOrderItemExists(Long id) {
+    public ErpPurchaseOrderItemDO validatePurchaseOrderItemExists(Long id) {
         //校验采购订单项是否存在
-        if (purchaseOrderItemMapper.selectById(id) == null) {
+        ErpPurchaseOrderItemDO aDo = purchaseOrderItemMapper.selectById(id);
+        if (aDo == null) {
             throw exception(PURCHASE_ORDER_ITEM_NOT_EXISTS, id);
         }
+        return aDo;
     }
 
     private ErpPurchaseOrderDO validatePurchaseOrderExists(Long id) {
@@ -540,10 +551,14 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     public void merge(ErpPurchaseOrderMergeReqVO reqVO) {
         //校验
         for (Long itemId : reqVO.getItemIds()) {
-            validatePurchaseOrderItemExists(itemId);
+            ErpPurchaseOrderItemDO aDo = validatePurchaseOrderItemExists(itemId);
+            ErpPurchaseOrderDO order = getPurchaseOrder(aDo.getOrderId());
+            //非已审核+非开启+非完全入库,异常
+            ThrowUtil.ifThrow(!Objects.equals(order.getAuditStatus(), ErpAuditStatus.APPROVED.getCode()), PURCHASE_ORDER_ITEM_NOT_AUDIT, itemId);
+            ThrowUtil.ifThrow(!Objects.equals(aDo.getOffStatus(), ErpOffStatus.OPEN.getCode()), PURCHASE_ORDER_ITEM_NOT_OPEN, itemId);
+            ThrowUtil.ifThrow(!Objects.equals(aDo.getInStatus(), ErpStorageStatus.ALL_IN_STORAGE.getCode()), PURCHASE_ORDER_IN_ITEM_NOT_OPEN, itemId);
         }
         List<ErpPurchaseOrderItemDO> orderItemDOS = purchaseOrderItemMapper.selectListByItemIds(reqVO.getItemIds());
-
         //转换
         ErpPurchaseInSaveReqVO inSaveReqVO = BeanUtils.toBean(reqVO, ErpPurchaseInSaveReqVO.class, vo -> {
             vo.setNo(null)

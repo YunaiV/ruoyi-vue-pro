@@ -101,7 +101,7 @@ public interface ErpPurchaseInService {
     List<ErpPurchaseInItemDO> getPurchaseInItemListByInIds(Collection<Long> inIds);
 
 
-    void submitAudit(Long inId);
+    void submitAudit(Collection<Long > inIds);
 
     void review(ErpPurchaseInAuditReqVO req);
 

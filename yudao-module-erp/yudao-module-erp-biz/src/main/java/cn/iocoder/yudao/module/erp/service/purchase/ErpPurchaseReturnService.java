@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.returns.ErpPurchaseReturnAuditReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.returns.ErpPurchaseReturnPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.returns.ErpPurchaseReturnSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseReturnDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseReturnItemDO;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -33,13 +35,6 @@ public interface ErpPurchaseReturnService {
      */
     void updatePurchaseReturn(@Valid ErpPurchaseReturnSaveReqVO updateReqVO);
 
-    /**
-     * 更新采购退货的状态
-     *
-     * @param id 编号
-     * @param status 状态
-     */
-    void updatePurchaseReturnStatus(Long id, Integer status);
 
     /**
      * 更新采购退货的退款金额
@@ -99,4 +94,22 @@ public interface ErpPurchaseReturnService {
     List<ErpPurchaseReturnItemDO> getPurchaseReturnItemListByReturnIds(Collection<Long> returnIds);
 
     // ==================== 审核|付款|退货？ ====================
+    /**
+     * 提交审核采购订单
+     *
+     * @param ids 退货单ids
+     */
+    void submitAudit(@NotNull Collection<Long> ids);
+
+    /**
+     * 审核/反审核采购订单
+     *
+     * @param req 审核请求体
+     */
+    void review(ErpPurchaseReturnAuditReqVO req);
+
+    /**
+     * 切换退款状态
+     */
+    void refund(ErpPurchaseReturnAuditReqVO vo);
 }

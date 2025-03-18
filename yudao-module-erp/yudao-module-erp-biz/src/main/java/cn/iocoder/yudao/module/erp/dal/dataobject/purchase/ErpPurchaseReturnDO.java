@@ -36,11 +36,23 @@ public class ErpPurchaseReturnDO extends BaseDO {
      */
     private String no;
     /**
-     * 退货状态
+     * 审批状态
      *
      * 枚举 {@link ErpAuditStatus}
      */
-    private Integer status;
+    private Integer auditStatus;
+    /**
+     * 审核者id
+     */
+    private Long auditorId;
+    /**
+     * 审核时间
+     */
+    private LocalDateTime auditTime;
+    /**
+     * 审核意见
+     */
+    private String reviewComment;
     /**
      * 供应商编号
      *
@@ -58,18 +70,18 @@ public class ErpPurchaseReturnDO extends BaseDO {
      */
     private LocalDateTime returnTime;
 
-    /**
-     * 采购订单编号
-     *
-     * 关联 {@link ErpPurchaseOrderDO#getId()}
-     */
-    private Long orderId;
-    /**
-     * 采购订单号
-     *
-     * 冗余 {@link ErpPurchaseOrderDO#getNo()}
-     */
-    private String orderNo;
+//    /**
+//     * 采购订单编号
+//     *
+//     * 关联 {@link ErpPurchaseOrderDO#getId()}
+//     */
+//    private Long orderId;
+//    /**
+//     * 采购订单号
+//     *
+//     * 冗余 {@link ErpPurchaseOrderDO#getNo()}
+//     */
+//    private String orderNo;
 
     /**
      * 合计数量
@@ -110,7 +122,10 @@ public class ErpPurchaseReturnDO extends BaseDO {
      * 其它金额，单位：元
      */
     private BigDecimal otherPrice;
-
+    /**
+     * 币种编号
+     */
+    private Long currencyId;
     /**
      * 附件地址
      */
@@ -120,4 +135,8 @@ public class ErpPurchaseReturnDO extends BaseDO {
      */
     private String remark;
 
+    /**
+     * 退款状态
+     */
+    private Integer refundStatus;
 }

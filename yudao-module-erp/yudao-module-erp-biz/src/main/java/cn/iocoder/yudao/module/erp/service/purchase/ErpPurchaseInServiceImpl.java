@@ -342,11 +342,13 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     }
 
     @Override
-    public void submitAudit(Long inId) {
-        ErpPurchaseInDO erpPurchaseInDO = validatePurchaseInExists(inId);
-        purchaseInAuditStateMachine.fireEvent(ErpAuditStatus.fromCode(erpPurchaseInDO.getAuditStatus())
-            , ErpEventEnum.SUBMIT_FOR_REVIEW
-            , ErpPurchaseInAuditReqVO.builder().inId(inId).build());//提交审核
+    public void submitAudit(Collection<Long > inIds) {
+        for (Long inId : inIds) {
+            ErpPurchaseInDO erpPurchaseInDO = validatePurchaseInExists(inId);
+            purchaseInAuditStateMachine.fireEvent(ErpAuditStatus.fromCode(erpPurchaseInDO.getAuditStatus())
+                , ErpEventEnum.SUBMIT_FOR_REVIEW
+                , ErpPurchaseInAuditReqVO.builder().inId(inId).build());//提交审核
+        }
     }
 
     @Override

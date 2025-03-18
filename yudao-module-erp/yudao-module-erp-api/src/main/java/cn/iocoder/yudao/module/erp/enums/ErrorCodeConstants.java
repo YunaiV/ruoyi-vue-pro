@@ -36,6 +36,10 @@ public interface ErrorCodeConstants {
     ErrorCode PURCHASE_ORDER_ITEM_PURCHASE_FAIL_EXCEED = new ErrorCode(1_030_101_015, "采购数量不能大于申请项的剩余订购数量");
     ErrorCode PURCHASE_REQUEST_DELETE_FAIL = new ErrorCode(1_030_101_016, "存在关联的采购订单，不能删除采购申请单");
     ErrorCode PURCHASE_ORDER_ITEM_NOT_EXISTS = new ErrorCode(1_030_101_017, "采购订单项({})不存在");
+    ErrorCode PURCHASE_ORDER_ITEM_NOT_OPEN = new ErrorCode(1_030_101_018, "采购订单项({})非开启状态，无法入库");
+    ErrorCode PURCHASE_ORDER_IN_ITEM_NOT_OPEN = new ErrorCode(1_030_101_019, "采购订单项({})已完全入库，无法再次入库");
+    ErrorCode PURCHASE_ORDER_ITEM_NOT_AUDIT = new ErrorCode(1_030_101_020, "采购订单项({})的订单不是已审核状态，无法合并入库");
+    ErrorCode PURCHASE_ORDER_DELETE_FAIL = new ErrorCode(1_030_101_021, "该订单存在关联入库项，无法删除");
 
     // ========== ERP 采购入库（1-030-102-000） ==========
     ErrorCode PURCHASE_IN_NOT_EXISTS = new ErrorCode(1_030_102_000, "采购入库单不存在");

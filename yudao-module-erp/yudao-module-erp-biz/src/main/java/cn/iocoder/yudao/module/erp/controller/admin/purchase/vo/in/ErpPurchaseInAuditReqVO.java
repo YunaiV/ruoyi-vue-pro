@@ -29,5 +29,4 @@ public class ErpPurchaseInAuditReqVO {
     @NotBlank(groups = validation.OnAudit.class, message = "审核意见不能是空字串")
     private String reviewComment;
 
-
 }

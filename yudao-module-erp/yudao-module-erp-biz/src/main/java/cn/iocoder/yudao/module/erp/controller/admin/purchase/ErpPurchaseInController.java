@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.*;
 import cn.iocoder.yudao.module.erp.controller.admin.tools.validation;
@@ -28,6 +29,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +37,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +68,7 @@ public class ErpPurchaseInController {
 
     @PostMapping("/create")
     @Operation(summary = "创建采购入库")
+    @Idempotent
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:create')")
     public CommonResult<Long> createPurchaseIn(@Valid @RequestBody ErpPurchaseInSaveReqVO createReqVO) {
         //给vo里面的项的source设置字符串a
@@ -133,11 +137,11 @@ public class ErpPurchaseInController {
         ExcelUtils.write(response, "采购入库.xls", "数据", ErpPurchaseInBaseRespVO.class, bindList(page.getList()));
     }
 
-    @PostMapping("/submitAudit")
+    @PutMapping("/submitAudit")
     @Operation(summary = "提交审核")
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:submitAudit')")
-    public CommonResult<Boolean> submitAudit(@Validated @RequestBody ErpPurchaseInAuditReqVO reqVO) {
-        purchaseInService.submitAudit(reqVO.getInId());
+    public CommonResult<Boolean> submitAudit(@RequestParam("inIds") @NotNull Collection<Long> inIds) {
+        purchaseInService.submitAudit(inIds.stream().distinct().toList());
         return success(true);
     }
 

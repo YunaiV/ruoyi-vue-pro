@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.returns;
 
+import cn.iocoder.yudao.module.erp.controller.admin.tools.validation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -13,30 +15,27 @@ import java.util.List;
 @Data
 public class ErpPurchaseReturnSaveReqVO {
 
-    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17386")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Null(groups = validation.OnCreate.class, message = "创建时，退货单id必须为空")
     private Long id;
 
-    @Schema(description = "结算账户编号", example = "31189")
+    @Schema(description = "结算账户编号")
     private Long accountId;
 
     @Schema(description = "退货时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "退货时间不能为空")
     private LocalDateTime returnTime;
 
-    @Schema(description = "采购订单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17386")
-    @NotNull(message = "采购订单编号不能为空")
-    private Long orderId;
-
-    @Schema(description = "优惠率，百分比", requiredMode = Schema.RequiredMode.REQUIRED, example = "99.88")
+    @Schema(description = "优惠率，百分比")
     private BigDecimal discountPercent;
 
-    @Schema(description = "其它金额，单位：元", example = "7127")
+    @Schema(description = "其它金额，单位：元")
     private BigDecimal otherPrice;
 
-    @Schema(description = "附件地址", example = "https://www.iocoder.cn")
+    @Schema(description = "附件地址")
     private String fileUrl;
 
-    @Schema(description = "备注", example = "你猜")
+    @Schema(description = "备注")
     private String remark;
 
     @Schema(description = "退货清单列表")
@@ -48,41 +47,43 @@ public class ErpPurchaseReturnSaveReqVO {
     @Data
     public static class Item {
 
-        @Schema(description = "退货项编号", example = "11756")
+        @Schema(description = "退货项编号")
         private Long id;
 
-        @Schema(description = "采购订单项编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "11756")
-        @NotNull(message = "采购订单项编号不能为空")
-        private Long orderItemId;
+        @Schema(description = "入库项id", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "入库项id不能为空")
+        private Long inItemId;
 
-        @Schema(description = "仓库编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
+        @Schema(description = "仓库编号", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "仓库编号不能为空")
         private Long warehouseId;
 
-        @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
+        @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "产品编号不能为空")
         private Long productId;
 
-        @Schema(description = "产品单位单位", requiredMode = Schema.RequiredMode.REQUIRED, example = "3113")
+        @Schema(description = "产品单位单位", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "产品单位单位不能为空")
         private Long productUnitId;
 
-        @Schema(description = "产品单价", example = "100.00")
+        @Schema(description = "产品单价")
         private BigDecimal productPrice;
 
-        @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
+        @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "产品数量不能为空")
         private BigDecimal count;
 
-        @Schema(description = "增值税税率，百分比", example = "99.88")
-        private BigDecimal taxPercent;
-
-        @Schema(description = "备注", example = "随便")
-        private String remark;
-
-        @Schema(description = "含税单价", example = "100.00")
+        @Schema(description = "含税单价")
         @DecimalMin(value = "0.00", message = "含税单价不能小于0")
         private BigDecimal actTaxPrice;
-    }
 
+        @Schema(description = "增值税税率，百分比")
+        private BigDecimal taxPercent;
+
+        @Schema(description = "备注")
+        private String remark;
+
+        @Schema(description = "箱率")
+        private String containerRate;
+    }
 }

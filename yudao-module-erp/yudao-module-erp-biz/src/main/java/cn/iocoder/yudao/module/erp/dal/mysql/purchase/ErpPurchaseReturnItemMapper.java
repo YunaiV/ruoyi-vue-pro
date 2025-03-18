@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.erp.dal.mysql.purchase;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseReturnItemDO;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -51,6 +52,14 @@ public interface ErpPurchaseReturnItemMapper extends BaseMapperX<ErpPurchaseRetu
                 .in("return_id", returnIds));
         // 获得数量
         return convertMap(result, obj -> (Long) obj.get("order_item_id"), obj -> (BigDecimal) obj.get("sumCount"));
+    }
+
+    //通过ids查询,如果ids是空，则返回空集合
+    default List<ErpPurchaseReturnItemDO> selectListByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return selectList(new LambdaQueryWrapper<ErpPurchaseReturnItemDO>().in(ErpPurchaseReturnItemDO::getId, ids));
     }
 
 }

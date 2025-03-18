@@ -100,7 +100,7 @@ public interface ErpPurchaseOrderService {
      *
      * @param id 订单项id
      */
-    void validatePurchaseOrderItemExists(Long id);
+    ErpPurchaseOrderItemDO validatePurchaseOrderItemExists(Long id);
     /**
      * 获得采购订单项列表
      *
@@ -145,4 +145,6 @@ public interface ErpPurchaseOrderService {
      * @param reqVO 请求体
      */
     void merge(ErpPurchaseOrderMergeReqVO reqVO);
+
+
 }

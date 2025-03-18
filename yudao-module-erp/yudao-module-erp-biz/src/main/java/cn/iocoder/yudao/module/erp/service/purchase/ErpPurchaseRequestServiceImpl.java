@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.erp.api.purchase.ErpInCountDTO;
 import cn.iocoder.yudao.module.erp.api.purchase.ErpOrderCountDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.*;
@@ -23,6 +24,7 @@ import cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.status.ErpOffStatus;
 import cn.iocoder.yudao.module.erp.enums.status.ErpOrderStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpStorageStatus;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpWarehouseService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -76,6 +78,10 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     StateMachine<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> offItemMachine;
     @Resource(name = PURCHASE_REQUEST_ITEM_ORDER_STATE_MACHINE_NAME)
     StateMachine<ErpOrderStatus, ErpEventEnum, ErpOrderCountDTO> orderItemMachine;
+    @Resource(name = PURCHASE_REQUEST_STORAGE_STATE_MACHINE_NAME)
+    StateMachine<ErpStorageStatus, ErpEventEnum, ErpPurchaseRequestDO> storageMachine;
+    @Resource(name = PURCHASE_REQUEST_ITEM_STORAGE_STATE_MACHINE_NAME)
+    StateMachine<ErpStorageStatus, ErpEventEnum, ErpInCountDTO> storageItemMachine;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -105,9 +111,8 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         itemsDOList.forEach(i -> i.setRequestId(id));
         //3. 批量插入子表数据
         ThrowUtil.ifThrow(!erpPurchaseRequestItemsMapper.insertBatch(itemsDOList), PURCHASE_REQUEST_ADD_FAIL_PRODUCT);
-        //4.初始化-审核状态-开关-订购
+        //5.初始化状态-主子表
         initMasterStatus(purchaseRequest);
-        //5.子表初始化
         List<ErpPurchaseRequestItemsDO> itemsDOS = erpPurchaseRequestItemsMapper.selectListByRequestId(purchaseRequest.getId());
         initSlaveStatus(itemsDOS);
         return id;
@@ -117,6 +122,8 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         itemsDOS.forEach(i -> {
             orderItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_INIT, ErpOrderCountDTO.builder().purchaseOrderItemId(i.getId()).build());
                 offItemMachine.fireEvent(ErpOffStatus.OPEN, ErpEventEnum.OFF_INIT, i);
+            //入库
+            storageItemMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, ErpEventEnum.STORAGE_INIT, ErpInCountDTO.builder().applyItemId(i.getId()).build());
             }
         );
     }
@@ -126,6 +133,8 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         auditMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.AUDIT_INIT, ErpPurchaseRequestAuditReqVO.builder().requestId(purchaseRequest.getId()).build());
         offMachine.fireEvent(ErpOffStatus.OPEN, ErpEventEnum.OFF_INIT, purchaseRequest);
         orderMachine.fireEvent(ErpOrderStatus.OT_ORDERED, ErpEventEnum.ORDER_INIT, purchaseRequest);
+        //入库
+        storageMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, ErpEventEnum.STORAGE_INIT, purchaseRequest);
     }
 
     /**
@@ -275,7 +284,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         if (CollUtil.isNotEmpty(diffList.get(0))) {
             diffList.get(0).forEach(o -> o.setRequestId(id));
             erpPurchaseRequestItemsMapper.insertBatch(diffList.get(0));
-                //初始化状态
+            //初始化状态
             initSlaveStatus(diffList.get(0));
         }
         if (CollUtil.isNotEmpty(diffList.get(1))) {

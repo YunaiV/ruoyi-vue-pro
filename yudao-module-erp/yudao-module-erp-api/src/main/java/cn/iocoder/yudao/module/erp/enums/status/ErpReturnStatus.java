@@ -33,4 +33,14 @@ public enum ErpReturnStatus implements ArrayValuable<Integer> {
         }
         return result;
     }
+
+
+    // 根据状态码获取状态枚举
+    public static ErpReturnStatus fromCode(int code) {
+        ErpReturnStatus status = STATUS_MAP.get(code);
+        if (status == null) {
+            throw new IllegalArgumentException("无效的订购状态码: " + code);
+        }
+        return status;
+    }
 }

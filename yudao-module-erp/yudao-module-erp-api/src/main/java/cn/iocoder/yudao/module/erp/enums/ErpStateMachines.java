@@ -50,7 +50,9 @@ public interface ErpStateMachines {
     // ========== ERP 入库单子项 ==========
     String PURCHASE_IN_ITEM_PAYMENT_STATE_MACHINE = "purchaseInItemPay";
     // ========== ERP 退货单 ==========
+    //审核
     String PURCHASE_RETURN_AUDIT_STATE_MACHINE_NAME = "purchaseReturnAudit";
+    //退款
     String PURCHASE_RETURN_REFUND_STATE_MACHINE_NAME = "purchaseReturnRefund";
     // ========== ERP 退货单子项 ==========
     String PURCHASE_RETURN_ITEM_REFUND_STATE_MACHINE_NAME = "purchaseReturnItemRefund";

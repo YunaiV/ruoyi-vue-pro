@@ -33,16 +33,15 @@ public class ErpPurchaseReturnItemDO extends BaseDO {
     /**
      * 采购退货编号
      *
-     * 关联 {@link ErpPurchaseReturnDO##getId()}
+     * 关联 {@link ErpPurchaseReturnDO#getId()}
      */
     private Long returnId;
+
     /**
-     * 采购订单项编号
-     *
-     * 关联 {@link ErpPurchaseOrderItemDO#getId()}
-     * 目的：方便更新关联的采购订单项的退货数量
+     * 入库项id
      */
-    private Long orderItemId;
+    private Long inItemId;
+
     /**
      * 仓库编号
      *
@@ -92,5 +91,13 @@ public class ErpPurchaseReturnItemDO extends BaseDO {
      */
     private String remark;
 
-    //actTaxPrice 含税单价
+    /**
+     * 含税单价
+     */
+    private BigDecimal actTaxPrice;
+
+    /**
+     * 箱率
+     */
+    private String containerRate;
 }

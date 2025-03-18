@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.*;
 import cn.iocoder.yudao.module.erp.controller.admin.tools.validation;
@@ -69,6 +70,7 @@ public class ErpPurchaseOrderController {
 
     @PostMapping("/create")
     @Operation(summary = "创建采购订单")
+    @Idempotent
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:create')")
     public CommonResult<Long> createPurchaseOrder(@Validated(validation.OnCreate.class) @RequestBody ErpPurchaseOrderSaveReqVO createReqVO) {
         return success(purchaseOrderService.createPurchaseOrder(createReqVO));

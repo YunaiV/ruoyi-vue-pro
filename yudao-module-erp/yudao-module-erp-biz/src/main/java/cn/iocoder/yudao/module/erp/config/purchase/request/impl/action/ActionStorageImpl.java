@@ -17,8 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static cn.iocoder.yudao.module.erp.enums.ErpEventEnum.STOCK_ADJUSTMENT;
-
 @Slf4j
 @Component
 public class ActionStorageImpl implements Action<ErpStorageStatus, ErpEventEnum, ErpPurchaseRequestDO> {
@@ -33,7 +31,7 @@ public class ActionStorageImpl implements Action<ErpStorageStatus, ErpEventEnum,
     public void execute(ErpStorageStatus from, ErpStorageStatus to, ErpEventEnum event, ErpPurchaseRequestDO context) {
         //如果所有的子项都是已入库，则主单已入库
         ErpPurchaseRequestDO requestDO = requestMapper.selectById(context.getId());
-        if (event == STOCK_ADJUSTMENT) {//付款调整->调整状态,根据子表来设置状态
+//        if (event == STOCK_ADJUSTMENT) {//付款调整->调整状态,根据子表来设置状态
             List<ErpPurchaseRequestItemsDO> items = itemsMapper.selectListByRequestId(context.getId());
             if (CollUtil.isEmpty(items)) {
                 return;
@@ -62,7 +60,7 @@ public class ActionStorageImpl implements Action<ErpStorageStatus, ErpEventEnum,
             } else {
                 to = ErpStorageStatus.NONE_IN_STORAGE;
             }
-        }
+//        }
 
         requestDO.setInStatus(to.getCode());//设置状态
         requestMapper.updateById(requestDO);
