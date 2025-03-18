@@ -1,14 +1,14 @@
 package cn.iocoder.yudao.module.wms.controller.admin.inbound.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
 import cn.iocoder.yudao.module.wms.enums.common.ShippingMethod;
-import cn.iocoder.yudao.module.wms.enums.common.SourceBillType;
+import cn.iocoder.yudao.module.wms.enums.common.BillType;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import java.util.*;
 import jakarta.validation.constraints.*;
-import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemSaveReqVO;
@@ -22,21 +22,22 @@ import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 public class WmsInboundSaveReqVO {
 
     @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "6889")
+    @NotNull(message = "主键不能为空", groups = { ValidationGroup.update.class })
     private Long id;
 
     @Schema(description = "单据号")
     private String no;
 
     @Schema(description = "入库单类型 ; InboundType : 1-手工", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotNull(message = "入库单类型不能为空")
+    @NotNull(message = "入库单类型不能为空", groups = { ValidationGroup.create.class })
     @InEnum(InboundType.class)
     private Integer type;
 
     @Schema(description = "仓库ID", example = "23620")
+    @NotNull(message = "仓库ID不能为空", groups = { ValidationGroup.create.class })
     private Long warehouseId;
 
     @Schema(description = "入库单类型 ; InboundStatus : 0-起草中 , 0-待审批 , 0-已驳回 , 0-已通过", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotEmpty(message = "状态不能为空")
     @InEnum(InboundStatus.class)
     private Integer status;
 
@@ -47,7 +48,7 @@ public class WmsInboundSaveReqVO {
     private String sourceBillNo;
 
     @Schema(description = "来源单据类型 ; SourceBillType : 0-出库单 , 1-入库单", example = "2")
-    @InEnum(SourceBillType.class)
+    @InEnum(BillType.class)
     private Integer sourceBillType;
 
     @Schema(description = "参考号")

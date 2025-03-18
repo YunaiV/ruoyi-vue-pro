@@ -9,7 +9,7 @@ import com.alibaba.excel.annotation.*;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,creator,create_time,plan_quantity,updater,inbound_id,product_sku,source_item_id,left_quantity,update_time,actual_quantity,product_id,id
+ * @table-fields : inbound_id,tenant_id,source_item_id,left_quantity,creator,update_time,actual_quantity,create_time,product_id,plan_quantity,id,updater
  */
 @Schema(description = "管理后台 - 入库单详情 Response VO")
 @Data
@@ -27,10 +27,6 @@ public class WmsInboundItemRespVO {
     @Schema(description = "标准产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "27659")
     @ExcelProperty("标准产品ID")
     private Long productId;
-
-    @Schema(description = "标准产品SKU", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("标准产品SKU")
-    private String productSku;
 
     @Schema(description = "计划入库量", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("计划入库量")
@@ -76,4 +72,8 @@ public class WmsInboundItemRespVO {
     @Schema(description = "更新者", example = "")
     @ExcelProperty("更新者")
     private String updater;
+
+    @Schema(description = "产品", example = "")
+    @ExcelProperty("产品")
+    private ErpProductRespSimpleVO product;
 }

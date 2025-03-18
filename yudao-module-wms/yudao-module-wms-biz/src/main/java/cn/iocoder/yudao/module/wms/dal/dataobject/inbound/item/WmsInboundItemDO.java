@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item;
 
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.ErpProductRespSimpleVO;
 import lombok.*;
 import java.util.*;
 import java.time.LocalDateTime;
@@ -10,7 +11,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 /**
  * 入库单详情 DO
  * @author 李方捷
- * @table-fields : inbound_id,product_sku,source_item_id,left_quantity,actual_quantity,product_id,plan_quantity,id
+ * @table-fields : inbound_id,source_item_id,left_quantity,actual_quantity,product_id,plan_quantity,id
  */
 @TableName("wms_inbound_item")
 // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -40,11 +41,6 @@ public class WmsInboundItemDO extends BaseDO {
     private Long productId;
 
     /**
-     * 标准产品SKU
-     */
-    private String productSku;
-
-    /**
      * 计划入库量
      */
     private Integer planQuantity;
@@ -63,4 +59,9 @@ public class WmsInboundItemDO extends BaseDO {
      * 来源详情ID
      */
     private Long sourceItemId;
+
+    /**
+     * 产品
+     */
+    private ErpProductRespSimpleVO product;
 }

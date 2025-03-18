@@ -27,6 +27,10 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.EXTERNAL_STOR
 import cn.iocoder.yudao.module.wms.controller.admin.external.storage.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.external.storage.WmsExternalStorageDO;
 import cn.iocoder.yudao.module.wms.service.external.storage.WmsExternalStorageService;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.EXTERNAL_STORAGE_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.EXTERNAL_STORAGE_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 @Tag(name = "外部存储库")
 @RestController

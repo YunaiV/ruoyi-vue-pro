@@ -20,7 +20,6 @@ public interface WmsInboundItemMapper extends BaseMapperX<WmsInboundItemDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<WmsInboundItemDO>()
 				.eqIfPresent(WmsInboundItemDO::getInboundId, reqVO.getInboundId())
 				.eqIfPresent(WmsInboundItemDO::getProductId, reqVO.getProductId())
-				.eqIfPresent(WmsInboundItemDO::getProductSku, reqVO.getProductSku())
 				.eqIfPresent(WmsInboundItemDO::getPlanQuantity, reqVO.getPlanQuantity())
 				.eqIfPresent(WmsInboundItemDO::getActualQuantity, reqVO.getActualQuantity())
 				.eqIfPresent(WmsInboundItemDO::getLeftQuantity, reqVO.getLeftQuantity())
@@ -36,16 +35,6 @@ public interface WmsInboundItemMapper extends BaseMapperX<WmsInboundItemDO> {
         LambdaQueryWrapperX<WmsInboundItemDO> wrapper = new LambdaQueryWrapperX<>();
         wrapper.eq(WmsInboundItemDO::getInboundId, inboundId);
         wrapper.eq(WmsInboundItemDO::getProductId, productId);
-        return selectOne(wrapper);
-    }
-
-    /**
-     * 按 inbound_id,product_sku 查询唯一的 WmsInboundItemDO
-     */
-    default WmsInboundItemDO getByInboundIdAndProductSku(Long inboundId, String productSku) {
-        LambdaQueryWrapperX<WmsInboundItemDO> wrapper = new LambdaQueryWrapperX<>();
-        wrapper.eq(WmsInboundItemDO::getInboundId, inboundId);
-        wrapper.eq(WmsInboundItemDO::getProductSku, productSku);
         return selectOne(wrapper);
     }
 

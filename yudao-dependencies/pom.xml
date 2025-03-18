@@ -82,7 +82,7 @@
 <!--        <guava.version>33.3.1-jre</guava.version>-->
         <bucket4j.version>8.10.1</bucket4j.version>
         <commons-collection4.version>4.4</commons-collection4.version>
-
+        <cola.version>5.0.0</cola.version>
     </properties>
 
     <dependencyManagement>
@@ -99,6 +99,12 @@
                 <groupId>com.bucket4j</groupId>
                 <artifactId>bucket4j-core</artifactId>
                 <version>${bucket4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cola</groupId>
+                <artifactId>cola-component-statemachine</artifactId>
+                <version>${cola.version}</version>
             </dependency>
 
 <!--            <dependency>-->

@@ -15,9 +15,9 @@ import java.util.Arrays;
 public enum InboundStatus implements ArrayValuable<Integer>, DictEnum {
 
     DRAFT(0, "起草中"),
-    AUDIT(0, "待审批"),
-    REJECT(0, "已驳回"),
-    PASS(0, "已通过"),
+    AUDIT(1, "待审批"),
+    REJECT(2, "已驳回"),
+    PASS(3, "已通过"),
    ;
 
     public static final Integer[] VALUES = Arrays.stream(values()).map(InboundStatus::getValue).toArray(Integer[]::new);
@@ -58,5 +58,9 @@ public enum InboundStatus implements ArrayValuable<Integer>, DictEnum {
     @Override
     public Integer[] array() {
         return VALUES;
+    }
+
+    public static enum Event {
+        SUBMIT,AGREE, REJECT;
     }
 }

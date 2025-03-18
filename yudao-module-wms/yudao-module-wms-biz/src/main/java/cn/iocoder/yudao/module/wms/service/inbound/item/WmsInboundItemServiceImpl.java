@@ -27,22 +27,19 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 public class WmsInboundItemServiceImpl implements WmsInboundItemService {
 
     @Resource
-    @Lazy()
+    @Lazy
     private WmsInboundService inboundService;
 
     @Resource
     private WmsInboundItemMapper inboundItemMapper;
 
     /**
-     * @sign : 13697A1B2F1A8E5C
+     * @sign : F55768BA65271F63
      */
     @Override
     public WmsInboundItemDO createInboundItem(WmsInboundItemSaveReqVO createReqVO) {
         if (inboundItemMapper.getByInboundIdAndProductId(createReqVO.getInboundId(), createReqVO.getProductId()) != null) {
             throw exception(INBOUND_ITEM_INBOUND_ID_PRODUCT_ID_DUPLICATE);
-        }
-        if (inboundItemMapper.getByInboundIdAndProductSku(createReqVO.getInboundId(), createReqVO.getProductSku()) != null) {
-            throw exception(INBOUND_ITEM_INBOUND_ID_PRODUCT_SKU_DUPLICATE);
         }
         // 按 wms_inbound_item.inbound_id -> wms_inbound.id 的引用关系，校验存在性
         if (createReqVO.getInboundId() != null) {
@@ -59,7 +56,7 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
     }
 
     /**
-     * @sign : EA2D7A7FB4288A5B
+     * @sign : 70F16E5A2203F0AA
      */
     @Override
     public WmsInboundItemDO updateInboundItem(WmsInboundItemSaveReqVO updateReqVO) {
@@ -67,9 +64,6 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
         WmsInboundItemDO exists = validateInboundItemExists(updateReqVO.getId());
         if (!Objects.equals(updateReqVO.getId(), exists.getId()) && Objects.equals(updateReqVO.getInboundId(), exists.getInboundId()) && Objects.equals(updateReqVO.getProductId(), exists.getProductId())) {
             throw exception(INBOUND_ITEM_INBOUND_ID_PRODUCT_ID_DUPLICATE);
-        }
-        if (!Objects.equals(updateReqVO.getId(), exists.getId()) && Objects.equals(updateReqVO.getInboundId(), exists.getInboundId()) && Objects.equals(updateReqVO.getProductSku(), exists.getProductSku())) {
-            throw exception(INBOUND_ITEM_INBOUND_ID_PRODUCT_SKU_DUPLICATE);
         }
         // 按 wms_inbound_item.inbound_id -> wms_inbound.id 的引用关系，校验存在性
         if (updateReqVO.getInboundId() != null) {
@@ -86,7 +80,7 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
     }
 
     /**
-     * @sign : D1E17D3946811E77
+     * @sign : EC9A13353E1B7B88
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -96,7 +90,6 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
         // 唯一索引去重
         inboundItem.setInboundId(inboundItemMapper.flagUKeyAsLogicDelete(inboundItem.getInboundId()));
         inboundItem.setProductId(inboundItemMapper.flagUKeyAsLogicDelete(inboundItem.getProductId()));
-        inboundItem.setProductSku(inboundItemMapper.flagUKeyAsLogicDelete(inboundItem.getProductSku()));
         inboundItemMapper.updateById(inboundItem);
         // 删除
         inboundItemMapper.deleteById(id);

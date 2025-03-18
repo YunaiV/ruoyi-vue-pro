@@ -2,11 +2,13 @@ package cn.iocoder.yudao.module.wms.service.warehouse;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.wms.dal.dataobject.external.storage.WmsExternalStorageDO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.area.WmsWarehouseAreaDO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.location.WmsWarehouseLocationDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.zone.WmsWarehouseZoneDO;
 import cn.iocoder.yudao.module.wms.service.external.storage.WmsExternalStorageService;
-import cn.iocoder.yudao.module.wms.service.warehouse.area.WmsWarehouseAreaService;
-import cn.iocoder.yudao.module.wms.service.warehouse.location.WmsWarehouseLocationService;
+import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
+import cn.iocoder.yudao.module.wms.service.warehouse.bin.WmsWarehouseBinService;
+import cn.iocoder.yudao.module.wms.service.warehouse.zone.WmsWarehouseZoneService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
@@ -33,11 +35,15 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
 
     @Resource
     @Lazy
-    private WmsWarehouseLocationService warehouseLocationService;
+    private WmsInboundService inboundService;
 
     @Resource
     @Lazy
-    private WmsWarehouseAreaService warehouseAreaService;
+    private WmsWarehouseBinService warehouseBinService;
+
+    @Resource
+    @Lazy
+    private WmsWarehouseZoneService warehouseZoneService;
 
     @Resource
     @Lazy
@@ -99,7 +105,7 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
     }
 
     /**
-     * @sign : 004DC894F8394A48
+     * @sign : 0F9BF04D1552020A
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -107,13 +113,18 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
         // 校验存在
         WmsWarehouseDO warehouse = validateWarehouseExists(id);
         // 校验是否被库区表引用
-        List<WmsWarehouseAreaDO> warehouseAreaList = warehouseAreaService.selectByWarehouseId(id, 1);
-        if (!CollectionUtils.isEmpty(warehouseAreaList)) {
+        List<WmsWarehouseZoneDO> warehouseZoneList = warehouseZoneService.selectByWarehouseId(id, 1);
+        if (!CollectionUtils.isEmpty(warehouseZoneList)) {
             throw exception(WAREHOUSE_BE_REFERRED);
         }
         // 校验是否被库位表引用
-        List<WmsWarehouseLocationDO> warehouseLocationList = warehouseLocationService.selectByWarehouseId(id, 1);
-        if (!CollectionUtils.isEmpty(warehouseLocationList)) {
+        List<WmsWarehouseBinDO> warehouseBinList = warehouseBinService.selectByWarehouseId(id, 1);
+        if (!CollectionUtils.isEmpty(warehouseBinList)) {
+            throw exception(WAREHOUSE_BE_REFERRED);
+        }
+        // 校验是否被入库单引用
+        List<WmsInboundDO> inboundList = inboundService.selectByWarehouseId(id, 1);
+        if (!CollectionUtils.isEmpty(inboundList)) {
             throw exception(WAREHOUSE_BE_REFERRED);
         }
         // 唯一索引去重
@@ -151,4 +162,4 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
     public List<WmsWarehouseDO> selectByExternalStorageId(Long externalStorageId, int limit) {
         return warehouseMapper.selectByExternalStorageId(externalStorageId, limit);
     }
-}
+}

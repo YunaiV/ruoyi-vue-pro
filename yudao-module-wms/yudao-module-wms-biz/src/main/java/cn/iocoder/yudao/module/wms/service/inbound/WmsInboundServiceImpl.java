@@ -45,7 +45,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     private WmsInboundMapper inboundMapper;
 
     /**
-     * @sign : FDB230A76243AB66
+     * @sign : 5D2F5734A2A97234
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -63,13 +63,16 @@ public class WmsInboundServiceImpl implements WmsInboundService {
                 throw exception(WAREHOUSE_NOT_EXISTS);
             }
         }
+        // 插入
+        WmsInboundDO inbound = BeanUtils.toBean(createReqVO, WmsInboundDO.class);
+        inboundMapper.insert(inbound);
         // 保存入库单详情详情
         if (createReqVO.getItemList() != null) {
             List<WmsInboundItemDO> toInsetList = new ArrayList<>();
             StreamX.from(createReqVO.getItemList()).filter(Objects::nonNull).forEach(item -> {
                 item.setId(null);
                 // 设置归属
-                item.setInboundId(createReqVO.getId());
+                item.setInboundId(inbound.getId());
                 toInsetList.add(BeanUtils.toBean(item, WmsInboundItemDO.class));
             });
             // 校验 toInsetList 中是否有重复的 productId
@@ -77,22 +80,14 @@ public class WmsInboundServiceImpl implements WmsInboundService {
             if (isProductIdRepeated) {
                 throw exception(INBOUND_ITEM_PRODUCT_ID_REPEATED);
             }
-            // 校验 toInsetList 中是否有重复的 productSku
-            boolean isProductSkuRepeated = StreamX.isRepeated(toInsetList, WmsInboundItemDO::getProductSku);
-            if (isProductSkuRepeated) {
-                throw exception(INBOUND_ITEM_PRODUCT_SKU_REPEATED);
-            }
             inboundItemMapper.insertBatch(toInsetList);
         }
-        // 插入
-        WmsInboundDO inbound = BeanUtils.toBean(createReqVO, WmsInboundDO.class);
-        inboundMapper.insert(inbound);
         // 返回
         return inbound;
     }
 
     /**
-     * @sign : 4CF404CDA8EE5751
+     * @sign : 313B4FDC4F383182
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -122,11 +117,6 @@ public class WmsInboundServiceImpl implements WmsInboundService {
             boolean isProductIdRepeated = StreamX.isRepeated(toInsetList, WmsInboundItemDO::getProductId);
             if (isProductIdRepeated) {
                 throw exception(INBOUND_ITEM_PRODUCT_ID_REPEATED);
-            }
-            // 校验 toInsetList 中是否有重复的 productSku
-            boolean isProductSkuRepeated = StreamX.isRepeated(toInsetList, WmsInboundItemDO::getProductSku);
-            if (isProductSkuRepeated) {
-                throw exception(INBOUND_ITEM_PRODUCT_SKU_REPEATED);
             }
             // 设置归属
             finalList.forEach(item -> {

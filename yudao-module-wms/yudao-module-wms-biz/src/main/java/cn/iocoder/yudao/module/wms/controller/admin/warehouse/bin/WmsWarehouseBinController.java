@@ -1,0 +1,122 @@
+package cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin;
+
+import org.springframework.web.bind.annotation.*;
+import jakarta.annotation.Resource;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.security.access.prepost.PreAuthorize;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.constraints.*;
+import jakarta.validation.*;
+import jakarta.servlet.http.*;
+import java.util.*;
+import java.io.IOException;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
+import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.*;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.*;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
+import cn.iocoder.yudao.module.wms.service.warehouse.bin.WmsWarehouseBinService;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.WAREHOUSE_BIN_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.WAREHOUSE_BIN_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+
+@Tag(name = "库位")
+@RestController
+@RequestMapping("/wms/warehouse-bin")
+@Validated
+public class WmsWarehouseBinController {
+
+    @Resource
+    private WmsWarehouseBinService warehouseBinService;
+
+    /**
+     * @sign : 9D03CAD0A777558E
+     */
+    @PostMapping("/create")
+    @Operation(summary = "创建库位")
+    @PreAuthorize("@ss.hasPermission('wms:warehouse-bin:create')")
+    public CommonResult<Long> createWarehouseBin(@Valid @RequestBody WmsWarehouseBinSaveReqVO createReqVO) {
+        return success(warehouseBinService.createWarehouseBin(createReqVO).getId());
+    }
+
+    @PutMapping("/update")
+    @Operation(summary = "更新库位")
+    @PreAuthorize("@ss.hasPermission('wms:warehouse-bin:update')")
+    public CommonResult<Boolean> updateWarehouseBin(@Valid @RequestBody WmsWarehouseBinSaveReqVO updateReqVO) {
+        warehouseBinService.updateWarehouseBin(updateReqVO);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete")
+    @Operation(summary = "删除库位")
+    @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthorize("@ss.hasPermission('wms:warehouse-bin:delete')")
+    public CommonResult<Boolean> deleteWarehouseBin(@RequestParam("id") Long id) {
+        warehouseBinService.deleteWarehouseBin(id);
+        return success(true);
+    }
+
+    /**
+     * @sign : D16F15F6343AB9B1
+     */
+    @GetMapping("/get")
+    @Operation(summary = "获得库位")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('wms:warehouse-bin:query')")
+    public CommonResult<WmsWarehouseBinRespVO> getWarehouseBin(@RequestParam("id") Long id) {
+        // 查询数据
+        WmsWarehouseBinDO warehouseBin = warehouseBinService.getWarehouseBin(id);
+        if (warehouseBin == null) {
+            throw exception(WAREHOUSE_BIN_NOT_EXISTS);
+        }
+        // 转换
+        WmsWarehouseBinRespVO warehouseBinVO = BeanUtils.toBean(warehouseBin, WmsWarehouseBinRespVO.class);
+        // 人员姓名填充
+        AdminUserApi.inst().prepareFill(List.of(warehouseBinVO))
+			.mapping(WmsWarehouseBinRespVO::getCreator, WmsWarehouseBinRespVO::setCreatorName)
+			.mapping(WmsWarehouseBinRespVO::getCreator, WmsWarehouseBinRespVO::setUpdaterName)
+			.fill();
+        // 返回
+        return success(warehouseBinVO);
+    }
+
+    /**
+     * @sign : AD24BD1BAD790208
+     */
+    @GetMapping("/page")
+    @Operation(summary = "获得库位分页")
+    @PreAuthorize("@ss.hasPermission('wms:warehouse-bin:query')")
+    public CommonResult<PageResult<WmsWarehouseBinRespVO>> getWarehouseBinPage(@Valid WmsWarehouseBinPageReqVO pageReqVO) {
+        // 查询数据
+        PageResult<WmsWarehouseBinDO> doPageResult = warehouseBinService.getWarehouseBinPage(pageReqVO);
+        // 转换
+        PageResult<WmsWarehouseBinRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsWarehouseBinRespVO.class);
+        // 人员姓名填充
+        AdminUserApi.inst().prepareFill(voPageResult.getList())
+			.mapping(WmsWarehouseBinRespVO::getCreator, WmsWarehouseBinRespVO::setCreatorName)
+			.mapping(WmsWarehouseBinRespVO::getCreator, WmsWarehouseBinRespVO::setUpdaterName)
+			.fill();
+        // 返回
+        return success(voPageResult);
+    }
+
+    @GetMapping("/export-excel")
+    @Operation(summary = "导出库位 Excel")
+    @PreAuthorize("@ss.hasPermission('wms:warehouse-bin:export')")
+    @ApiAccessLog(operateType = EXPORT)
+    public void exportWarehouseBinExcel(@Valid WmsWarehouseBinPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
+        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        List<WmsWarehouseBinDO> list = warehouseBinService.getWarehouseBinPage(pageReqVO).getList();
+        // 导出 Excel
+        ExcelUtils.write(response, "库位.xls", "数据", WmsWarehouseBinRespVO.class, BeanUtils.toBean(list, WmsWarehouseBinRespVO.class));
+    }
+}

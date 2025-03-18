@@ -112,4 +112,4 @@ public class WmsExternalStorageServiceImpl implements WmsExternalStorageService 
     public PageResult<WmsExternalStorageDO> getExternalStoragePage(WmsExternalStoragePageReqVO pageReqVO) {
         return externalStorageMapper.selectPage(pageReqVO);
     }
-}
+}
