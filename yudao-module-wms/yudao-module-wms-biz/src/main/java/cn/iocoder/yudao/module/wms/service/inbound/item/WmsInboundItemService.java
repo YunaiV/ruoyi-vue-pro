@@ -20,14 +20,14 @@ public interface WmsInboundItemService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createInboundItem(@Valid WmsInboundItemSaveReqVO createReqVO);
+    WmsInboundItemDO createInboundItem(@Valid WmsInboundItemSaveReqVO createReqVO);
 
     /**
      * 更新入库单详情
      *
      * @param updateReqVO 更新信息
      */
-    void updateInboundItem(@Valid WmsInboundItemSaveReqVO updateReqVO);
+    WmsInboundItemDO updateInboundItem(@Valid WmsInboundItemSaveReqVO updateReqVO);
 
     /**
      * 删除入库单详情
@@ -51,5 +51,4 @@ public interface WmsInboundItemService {
      * @return 入库单详情分页
      */
     PageResult<WmsInboundItemDO> getInboundItemPage(WmsInboundItemPageReqVO pageReqVO);
-
 }

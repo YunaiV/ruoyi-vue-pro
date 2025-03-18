@@ -5,6 +5,9 @@ import lombok.*;
 import java.util.*;
 import jakarta.validation.constraints.*;
 
+/**
+ * @table-fields : inbound_id,product_sku,source_item_id,left_quantity,actual_quantity,product_id,plan_quantity,id
+ */
 @Schema(description = "管理后台 - 入库单详情新增/修改 Request VO")
 @Data
 public class WmsInboundItemSaveReqVO {
@@ -37,5 +40,4 @@ public class WmsInboundItemSaveReqVO {
 
     @Schema(description = "来源详情ID", example = "30830")
     private Long sourceItemId;
-
 }
