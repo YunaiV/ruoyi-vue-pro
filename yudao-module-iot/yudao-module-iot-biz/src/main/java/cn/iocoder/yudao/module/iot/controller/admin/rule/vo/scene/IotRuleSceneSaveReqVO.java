@@ -2,10 +2,14 @@ package cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.config.IotRuleSceneActionConfig;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.config.IotRuleSceneTriggerConfig;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import java.util.List;
 
 @Schema(description = "管理后台 - IoT 规则场景（场景联动）新增/修改 Request VO")
 @Data
@@ -28,10 +32,10 @@ public class IotRuleSceneSaveReqVO {
 
     @Schema(description = "触发器数组", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "触发器数组不能为空")
-    private String triggers;
+    private List<IotRuleSceneTriggerConfig> triggers;
 
     @Schema(description = "执行器数组", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "执行器数组不能为空")
-    private String actions;
+    private List<IotRuleSceneActionConfig> actions;
 
 }

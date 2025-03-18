@@ -2,8 +2,9 @@ package cn.iocoder.yudao.module.iot.service.rule.action;
 
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceDownstreamReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.config.IotRuleSceneActionConfig;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.config.IotRuleSceneActionDeviceControl;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
@@ -27,8 +28,8 @@ public class IotRuleSceneDeviceControlAction implements IotRuleSceneAction {
     private IotDeviceService deviceService;
 
     @Override
-    public void execute(IotDeviceMessage message, IotRuleSceneDO.ActionConfig config) {
-        IotRuleSceneDO.ActionDeviceControl control = config.getDeviceControl();
+    public void execute(IotDeviceMessage message, IotRuleSceneActionConfig config) {
+        IotRuleSceneActionDeviceControl control = config.getDeviceControl();
         Assert.notNull(control, "设备控制配置不能为空");
         // 遍历每个设备，下发消息
         control.getDeviceNames().forEach(deviceName -> {
