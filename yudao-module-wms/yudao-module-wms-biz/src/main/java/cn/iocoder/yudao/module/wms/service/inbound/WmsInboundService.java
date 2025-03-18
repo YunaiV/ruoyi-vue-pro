@@ -51,4 +51,9 @@ public interface WmsInboundService {
      * @return 入库单分页
      */
     PageResult<WmsInboundDO> getInboundPage(WmsInboundPageReqVO pageReqVO);
+
+    /**
+     * 按 warehouseId 查询 WmsInboundDO
+     */
+    List<WmsInboundDO> selectByWarehouseId(Long warehouseId, int limit);
 }

@@ -6,9 +6,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
-
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+/**
+ * @table-fields : inbound_id,product_sku,create_time,changed_quantity,product_id,inbound_item_id,outbound_id,outbound_item_id
+ */
 @Schema(description = "管理后台 - 入库单库存详情扣减分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -39,5 +41,4 @@ public class WmsInboundItemFlowPageReqVO extends PageParam {
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
-
 }

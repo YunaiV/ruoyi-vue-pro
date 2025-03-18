@@ -5,6 +5,9 @@ import lombok.*;
 import java.util.*;
 import jakarta.validation.constraints.*;
 
+/**
+ * @table-fields : inbound_id,product_sku,changed_quantity,product_id,id,inbound_item_id,outbound_id,outbound_item_id
+ */
 @Schema(description = "管理后台 - 入库单库存详情扣减新增/修改 Request VO")
 @Data
 public class WmsInboundItemFlowSaveReqVO {
@@ -37,7 +40,6 @@ public class WmsInboundItemFlowSaveReqVO {
     private Long outboundItemId;
 
     @Schema(description = "变化的数量，出库量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "变化的数量，出库量不能为空")
+    @NotNull(message = "变化的数量不能为空")
     private Integer changedQuantity;
-
 }

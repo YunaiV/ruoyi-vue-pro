@@ -43,4 +43,8 @@ public interface ErrorCodeConstants {
     ErrorCode INBOUND_ITEM_INBOUND_ID_PRODUCT_ID_DUPLICATE = new ErrorCode(2_001_500_002, "入库单ID,标准产品ID已存在");
     ErrorCode INBOUND_ITEM_INBOUND_ID_PRODUCT_SKU_DUPLICATE = new ErrorCode(2_001_500_003, "入库单ID,标准产品SKU已存在");
     ErrorCode INBOUND_ITEM_BE_REFERRED = new ErrorCode(2_001_500_004, "入库单详情被引用");
+
+    // ========== WMS_INBOUND_ITEM_FLOW 入库单库存详情扣减表 2_001_600_000 ==========
+    ErrorCode INBOUND_ITEM_FLOW_NOT_EXISTS = new ErrorCode(2_001_600_001, "入库单库存详情扣减不存在");
+    ErrorCode INBOUND_ITEM_FLOW_BE_REFERRED = new ErrorCode(2_001_600_002, "入库单库存详情扣减被引用");
 }

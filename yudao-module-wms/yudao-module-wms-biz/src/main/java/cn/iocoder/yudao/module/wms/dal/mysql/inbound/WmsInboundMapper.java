@@ -58,4 +58,16 @@ public interface WmsInboundMapper extends BaseMapperX<WmsInboundDO> {
     default List<WmsInboundDO> selectByType(Integer type) {
         return selectList(new LambdaQueryWrapperX<WmsInboundDO>().eq(WmsInboundDO::getType, type));
     }
+
+    /**
+     * 按 warehouseId 查询 WmsInboundDO
+     */
+    default List<WmsInboundDO> selectByWarehouseId(Long warehouseId, int limit) {
+        WmsInboundPageReqVO reqVO = new WmsInboundPageReqVO();
+        reqVO.setPageSize(limit);
+        reqVO.setPageNo(1);
+        LambdaQueryWrapperX<WmsInboundDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsInboundDO::getWarehouseId, warehouseId);
+        return selectPage(reqVO, wrapper).getList();
+    }
 }

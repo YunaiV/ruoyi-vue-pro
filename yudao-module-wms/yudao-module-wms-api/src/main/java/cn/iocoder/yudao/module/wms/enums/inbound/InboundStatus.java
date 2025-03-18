@@ -1,0 +1,62 @@
+package cn.iocoder.yudao.module.wms.enums.inbound;
+
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
+import cn.iocoder.yudao.framework.common.enums.DictEnum;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
+
+/**
+ * 入库单类型
+ **/
+@RequiredArgsConstructor
+@Getter
+public enum InboundStatus implements ArrayValuable<Integer>, DictEnum {
+
+    DRAFT(0, "起草中"),
+    AUDIT(0, "待审批"),
+    REJECT(0, "已驳回"),
+    PASS(0, "已通过"),
+   ;
+
+    public static final Integer[] VALUES = Arrays.stream(values()).map(InboundStatus::getValue).toArray(Integer[]::new);
+
+
+    private final Integer value;
+    private final String label;
+
+    /**
+     * 按 value 匹配枚举，name 优先
+     **/
+    public static InboundStatus parse(Integer value) {
+        for (InboundStatus e : InboundStatus.values()) {
+            if(e.getValue().equals(value)) {
+                return e;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 按 name 或 label 匹配枚举，name 优先
+     **/
+    public static InboundStatus parse(String nameOrLabel) {
+        for (InboundStatus e : InboundStatus.values()) {
+            if(e.name().equalsIgnoreCase(nameOrLabel)) {
+                return e;
+            }
+        }
+        for (InboundStatus e : InboundStatus.values()) {
+            if(e.getLabel().equalsIgnoreCase(nameOrLabel)) {
+                return e;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Integer[] array() {
+        return VALUES;
+    }
+}

@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.module.wms.service.inbound;
 
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
+import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -24,15 +27,26 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 public class WmsInboundServiceImpl implements WmsInboundService {
 
     @Resource
+    @Lazy()
+    private WmsWarehouseService warehouseService;
+
+    @Resource
     private WmsInboundMapper inboundMapper;
 
     /**
-     * @sign : C315769365E4EB63
+     * @sign : 3E7AC5154B0479B9
      */
     @Override
     public WmsInboundDO createInbound(WmsInboundSaveReqVO createReqVO) {
         if (inboundMapper.getByNo(createReqVO.getNo()) != null) {
             throw exception(INBOUND_NO_DUPLICATE);
+        }
+        // 按 wms_inbound.warehouse_id -> wms_warehouse.id 的引用关系，校验存在性
+        if (createReqVO.getWarehouseId() != null) {
+            WmsWarehouseDO warehouse = warehouseService.getWarehouse(createReqVO.getWarehouseId());
+            if (warehouse == null) {
+                throw exception(WAREHOUSE_NOT_EXISTS);
+            }
         }
         // 插入
         WmsInboundDO inbound = BeanUtils.toBean(createReqVO, WmsInboundDO.class);
@@ -42,7 +56,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     }
 
     /**
-     * @sign : 0452BAD3E38B7CC9
+     * @sign : 1D421DA55E803B5B
      */
     @Override
     public WmsInboundDO updateInbound(WmsInboundSaveReqVO updateReqVO) {
@@ -50,6 +64,13 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         WmsInboundDO exists = validateInboundExists(updateReqVO.getId());
         if (!Objects.equals(updateReqVO.getId(), exists.getId()) && Objects.equals(updateReqVO.getNo(), exists.getNo())) {
             throw exception(INBOUND_NO_DUPLICATE);
+        }
+        // 按 wms_inbound.warehouse_id -> wms_warehouse.id 的引用关系，校验存在性
+        if (updateReqVO.getWarehouseId() != null) {
+            WmsWarehouseDO warehouse = warehouseService.getWarehouse(updateReqVO.getWarehouseId());
+            if (warehouse == null) {
+                throw exception(WAREHOUSE_NOT_EXISTS);
+            }
         }
         // 更新
         WmsInboundDO inbound = BeanUtils.toBean(updateReqVO, WmsInboundDO.class);
@@ -93,4 +114,11 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     public PageResult<WmsInboundDO> getInboundPage(WmsInboundPageReqVO pageReqVO) {
         return inboundMapper.selectPage(pageReqVO);
     }
-}
+
+    /**
+     * 按 warehouseId 查询 WmsInboundDO
+     */
+    public List<WmsInboundDO> selectByWarehouseId(Long warehouseId, int limit) {
+        return inboundMapper.selectByWarehouseId(warehouseId, limit);
+    }
+}

@@ -20,14 +20,14 @@ public interface WmsInboundItemFlowService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createInboundItemFlow(@Valid WmsInboundItemFlowSaveReqVO createReqVO);
+    WmsInboundItemFlowDO createInboundItemFlow(@Valid WmsInboundItemFlowSaveReqVO createReqVO);
 
     /**
      * 更新入库单库存详情扣减
      *
      * @param updateReqVO 更新信息
      */
-    void updateInboundItemFlow(@Valid WmsInboundItemFlowSaveReqVO updateReqVO);
+    WmsInboundItemFlowDO updateInboundItemFlow(@Valid WmsInboundItemFlowSaveReqVO updateReqVO);
 
     /**
      * 删除入库单库存详情扣减
@@ -52,4 +52,8 @@ public interface WmsInboundItemFlowService {
      */
     PageResult<WmsInboundItemFlowDO> getInboundItemFlowPage(WmsInboundItemFlowPageReqVO pageReqVO);
 
+    /**
+     * 按 inboundId 查询 WmsInboundItemFlowDO
+     */
+    List<WmsInboundItemFlowDO> selectByInboundId(Long inboundId, int limit);
 }

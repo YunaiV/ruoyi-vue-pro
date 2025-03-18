@@ -1,11 +1,17 @@
 package cn.iocoder.yudao.module.wms.controller.admin.inbound.vo;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.wms.enums.common.ShippingMethod;
+import cn.iocoder.yudao.module.wms.enums.common.SourceBillType;
+import cn.iocoder.yudao.module.wms.enums.inbound.InboundType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
 import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
+import java.util.List;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemSaveReqVO;
 
 /**
  * @table-fields : no,actual_arrival_time,creator_comment,source_bill_id,trace_no,type,refer_no,plan_arrival_time,init_age,shipping_method,source_bill_no,source_bill_type,id,status,warehouse_id
@@ -21,16 +27,17 @@ public class WmsInboundSaveReqVO {
     @NotEmpty(message = "单据号不能为空")
     private String no;
 
-    @Schema(description = "入库单类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "入库单类型 ; InboundType : 1-手工", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "入库单类型不能为空")
+    @InEnum(InboundType.class)
     private Integer type;
 
     @Schema(description = "仓库ID", example = "23620")
     private Long warehouseId;
 
-    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "入库单类型 ; InboundStatus : 0-起草中 , 0-待审批 , 0-已驳回 , 0-已通过", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotEmpty(message = "状态不能为空")
-    private String status;
+    private Integer status;
 
     @Schema(description = "来源单据ID", example = "24655")
     private Long sourceBillId;
@@ -38,7 +45,8 @@ public class WmsInboundSaveReqVO {
     @Schema(description = "来源单据号")
     private String sourceBillNo;
 
-    @Schema(description = "来源单据类型", example = "2")
+    @Schema(description = "来源单据类型 ; SourceBillType : 0-出库单 , 1-入库单", example = "2")
+    @InEnum(SourceBillType.class)
     private Integer sourceBillType;
 
     @Schema(description = "参考号")
@@ -47,7 +55,8 @@ public class WmsInboundSaveReqVO {
     @Schema(description = "跟踪号")
     private String traceNo;
 
-    @Schema(description = "运输方式，1-海运；2-火车；3-空运；4、集卡")
+    @Schema(description = "运输方式 ; ShippingMethod : 0-海运 , 1-铁路 , 2-空运 , 3-集卡")
+    @InEnum(ShippingMethod.class)
     private Integer shippingMethod;
 
     @Schema(description = "预计到货时间")
@@ -61,4 +70,7 @@ public class WmsInboundSaveReqVO {
 
     @Schema(description = "初始库龄")
     private Integer initAge;
+
+    @Schema(description = "详情清单", example = "")
+    private List<WmsInboundItemSaveReqVO> items;
 }

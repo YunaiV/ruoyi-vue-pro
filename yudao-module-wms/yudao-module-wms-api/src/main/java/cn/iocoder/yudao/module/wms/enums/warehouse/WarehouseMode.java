@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.wms.enums;
+package cn.iocoder.yudao.module.wms.enums.warehouse;
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import cn.iocoder.yudao.framework.common.enums.DictEnum;
@@ -8,17 +8,17 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 
 /**
- * 分区类型
+ * 仓库经营方式
  **/
 @RequiredArgsConstructor
 @Getter
-public enum WarehouseAreaPartitionType implements ArrayValuable<Integer>, DictEnum {
+public enum WarehouseMode implements ArrayValuable<Integer>, DictEnum {
 
+    SELF_OWNED(0, "自营"),
+    THIRD_PARTY(1, "三方仓"),
+    PLATFORM(2, "平台仓");
 
-    PICK (1, "标准品"),
-    STORE(2, "不良品");
-
-    public static final Integer[] VALUES = Arrays.stream(values()).map(WarehouseAreaPartitionType::getValue).toArray(Integer[]::new);
+    public static final Integer[] VALUES = Arrays.stream(values()).map(WarehouseMode::getValue).toArray(Integer[]::new);
 
 
     private final Integer value;
@@ -27,8 +27,8 @@ public enum WarehouseAreaPartitionType implements ArrayValuable<Integer>, DictEn
     /**
      * 按 value 匹配枚举，name 优先
      **/
-    public static WarehouseAreaPartitionType parse(Integer value) {
-        for (WarehouseAreaPartitionType e : WarehouseAreaPartitionType.values()) {
+    public static WarehouseMode parse(Integer value) {
+        for (WarehouseMode e : WarehouseMode.values()) {
             if(e.getValue().equals(value)) {
                 return e;
             }
@@ -39,13 +39,13 @@ public enum WarehouseAreaPartitionType implements ArrayValuable<Integer>, DictEn
     /**
      * 按 name 或 label 匹配枚举，name 优先
      **/
-    public static WarehouseAreaPartitionType parse(String nameOrLabel) {
-        for (WarehouseAreaPartitionType e : WarehouseAreaPartitionType.values()) {
+    public static WarehouseMode parse(String nameOrLabel) {
+        for (WarehouseMode e : WarehouseMode.values()) {
             if(e.name().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
         }
-        for (WarehouseAreaPartitionType e : WarehouseAreaPartitionType.values()) {
+        for (WarehouseMode e : WarehouseMode.values()) {
             if(e.getLabel().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }

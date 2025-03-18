@@ -6,8 +6,9 @@ import java.util.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import com.alibaba.excel.annotation.*;
-
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import java.util.List;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 
 /**
  * @table-fields : tenant_id,no,creator,actual_arrival_time,create_time,creator_comment,source_bill_id,trace_no,type,refer_no,updater,update_time,plan_arrival_time,init_age,shipping_method,source_bill_no,source_bill_type,id,status,warehouse_id
@@ -25,7 +26,7 @@ public class WmsInboundRespVO {
     @ExcelProperty("单据号")
     private String no;
 
-    @Schema(description = "入库单类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "入库单类型 ; InboundType : 1-手工", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @ExcelProperty("入库单类型")
     private Integer type;
 
@@ -33,9 +34,9 @@ public class WmsInboundRespVO {
     @ExcelProperty("仓库ID")
     private Long warehouseId;
 
-    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @ExcelProperty("状态")
-    private String status;
+    @Schema(description = "入库单类型 ; InboundStatus : 0-起草中 , 0-待审批 , 0-已驳回 , 0-已通过", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @ExcelProperty("入库单类型")
+    private Integer status;
 
     @Schema(description = "来源单据ID", example = "24655")
     @ExcelProperty("来源单据ID")
@@ -45,7 +46,7 @@ public class WmsInboundRespVO {
     @ExcelProperty("来源单据号")
     private String sourceBillNo;
 
-    @Schema(description = "来源单据类型", example = "2")
+    @Schema(description = "来源单据类型 ; SourceBillType : 0-出库单 , 1-入库单", example = "2")
     @ExcelProperty("来源单据类型")
     private Integer sourceBillType;
 
@@ -57,7 +58,7 @@ public class WmsInboundRespVO {
     @ExcelProperty("跟踪号")
     private String traceNo;
 
-    @Schema(description = "运输方式，1-海运；2-火车；3-空运；4、集卡")
+    @Schema(description = "运输方式 ; ShippingMethod : 0-海运 , 1-铁路 , 2-空运 , 3-集卡")
     @ExcelProperty("运输方式")
     private Integer shippingMethod;
 
@@ -105,4 +106,8 @@ public class WmsInboundRespVO {
     @Schema(description = "更新者", example = "")
     @ExcelProperty("更新者")
     private String updater;
+
+    @Schema(description = "详情清单", example = "")
+    @ExcelProperty("详情清单")
+    private List<WmsInboundItemRespVO> items;
 }

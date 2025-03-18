@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.wms.controller.admin.warehouse.location.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.wms.enums.ValidStatus;
+import cn.iocoder.yudao.module.wms.enums.common.ValidStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import java.util.*;
 import jakarta.validation.constraints.*;
 
 /**

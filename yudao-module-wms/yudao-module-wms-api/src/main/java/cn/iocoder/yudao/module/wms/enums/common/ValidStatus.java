@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.wms.enums;
+package cn.iocoder.yudao.module.wms.enums.common;
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import cn.iocoder.yudao.framework.common.enums.DictEnum;

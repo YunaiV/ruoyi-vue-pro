@@ -1,19 +1,19 @@
 package cn.iocoder.yudao.module.wms.service.inbound.item.flow;
 
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
+import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.flow.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-
 import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.flow.WmsInboundItemFlowMapper;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 
@@ -27,38 +27,73 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 public class WmsInboundItemFlowServiceImpl implements WmsInboundItemFlowService {
 
     @Resource
+    @Lazy()
+    private WmsInboundService inboundService;
+
+    @Resource
     private WmsInboundItemFlowMapper inboundItemFlowMapper;
 
+    /**
+     * @sign : 1F1F95A6107AA047
+     */
     @Override
-    public Long createInboundItemFlow(WmsInboundItemFlowSaveReqVO createReqVO) {
+    public WmsInboundItemFlowDO createInboundItemFlow(WmsInboundItemFlowSaveReqVO createReqVO) {
+        // 按 wms_inbound_item_flow.inbound_id -> wms_inbound.id 的引用关系，校验存在性
+        if (createReqVO.getInboundId() != null) {
+            WmsInboundDO inbound = inboundService.getInbound(createReqVO.getInboundId());
+            if (inbound == null) {
+                throw exception(INBOUND_NOT_EXISTS);
+            }
+        }
         // 插入
         WmsInboundItemFlowDO inboundItemFlow = BeanUtils.toBean(createReqVO, WmsInboundItemFlowDO.class);
         inboundItemFlowMapper.insert(inboundItemFlow);
         // 返回
-        return inboundItemFlow.getId();
+        return inboundItemFlow;
     }
 
+    /**
+     * @sign : 8A5562532D453C4B
+     */
     @Override
-    public void updateInboundItemFlow(WmsInboundItemFlowSaveReqVO updateReqVO) {
+    public WmsInboundItemFlowDO updateInboundItemFlow(WmsInboundItemFlowSaveReqVO updateReqVO) {
         // 校验存在
-        validateInboundItemFlowExists(updateReqVO.getId());
+        WmsInboundItemFlowDO exists = validateInboundItemFlowExists(updateReqVO.getId());
+        // 按 wms_inbound_item_flow.inbound_id -> wms_inbound.id 的引用关系，校验存在性
+        if (updateReqVO.getInboundId() != null) {
+            WmsInboundDO inbound = inboundService.getInbound(updateReqVO.getInboundId());
+            if (inbound == null) {
+                throw exception(INBOUND_NOT_EXISTS);
+            }
+        }
         // 更新
-        WmsInboundItemFlowDO updateObj = BeanUtils.toBean(updateReqVO, WmsInboundItemFlowDO.class);
-        inboundItemFlowMapper.updateById(updateObj);
+        WmsInboundItemFlowDO inboundItemFlow = BeanUtils.toBean(updateReqVO, WmsInboundItemFlowDO.class);
+        inboundItemFlowMapper.updateById(inboundItemFlow);
+        // 返回
+        return inboundItemFlow;
     }
 
+    /**
+     * @sign : CD7AC16303CBA5CC
+     */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteInboundItemFlow(Long id) {
         // 校验存在
-        validateInboundItemFlowExists(id);
+        WmsInboundItemFlowDO inboundItemFlow = validateInboundItemFlowExists(id);
         // 删除
         inboundItemFlowMapper.deleteById(id);
     }
 
-    private void validateInboundItemFlowExists(Long id) {
-        if (inboundItemFlowMapper.selectById(id) == null) {
-            //throw exception(INBOUND_ITEM_FLOW_NOT_EXISTS);
+    /**
+     * @sign : E718B98F68AFE635
+     */
+    private WmsInboundItemFlowDO validateInboundItemFlowExists(Long id) {
+        WmsInboundItemFlowDO inboundItemFlow = inboundItemFlowMapper.selectById(id);
+        if (inboundItemFlow == null) {
+            throw exception(INBOUND_ITEM_FLOW_NOT_EXISTS);
         }
+        return inboundItemFlow;
     }
 
     @Override
@@ -71,4 +106,10 @@ public class WmsInboundItemFlowServiceImpl implements WmsInboundItemFlowService 
         return inboundItemFlowMapper.selectPage(pageReqVO);
     }
 
-}
+    /**
+     * 按 inboundId 查询 WmsInboundItemFlowDO
+     */
+    public List<WmsInboundItemFlowDO> selectByInboundId(Long inboundId, int limit) {
+        return inboundItemFlowMapper.selectByInboundId(inboundId, limit);
+    }
+}

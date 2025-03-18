@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.wms.controller.admin.warehouse.area.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.wms.enums.ValidStatus;
-import cn.iocoder.yudao.module.wms.enums.WarehouseAreaPartitionType;
-import cn.iocoder.yudao.module.wms.enums.WarehouseAreaStockType;
+import cn.iocoder.yudao.module.wms.enums.common.ValidStatus;
+import cn.iocoder.yudao.module.wms.enums.warehouse.WarehouseAreaPartitionType;
+import cn.iocoder.yudao.module.wms.enums.warehouse.WarehouseAreaStockType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import java.util.*;
 import jakarta.validation.constraints.*;
 
 /**

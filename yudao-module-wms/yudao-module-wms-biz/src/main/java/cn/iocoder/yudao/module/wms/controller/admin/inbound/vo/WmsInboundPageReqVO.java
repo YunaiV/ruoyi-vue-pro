@@ -20,14 +20,14 @@ public class WmsInboundPageReqVO extends PageParam {
     @Schema(description = "单据号")
     private String no;
 
-    @Schema(description = "入库单类型", example = "1")
+    @Schema(description = "入库单类型 ; InboundType : 1-手工", example = "1")
     private Integer type;
 
     @Schema(description = "仓库ID", example = "23620")
     private Long warehouseId;
 
-    @Schema(description = "状态", example = "1")
-    private String status;
+    @Schema(description = "入库单类型 ; InboundStatus : 0-起草中 , 0-待审批 , 0-已驳回 , 0-已通过", example = "1")
+    private Integer status;
 
     @Schema(description = "来源单据ID", example = "24655")
     private Long sourceBillId;
@@ -35,7 +35,7 @@ public class WmsInboundPageReqVO extends PageParam {
     @Schema(description = "来源单据号")
     private String sourceBillNo;
 
-    @Schema(description = "来源单据类型", example = "2")
+    @Schema(description = "来源单据类型 ; SourceBillType : 0-出库单 , 1-入库单", example = "2")
     private Integer sourceBillType;
 
     @Schema(description = "参考号")
@@ -44,7 +44,7 @@ public class WmsInboundPageReqVO extends PageParam {
     @Schema(description = "跟踪号")
     private String traceNo;
 
-    @Schema(description = "运输方式，1-海运；2-火车；3-空运；4、集卡")
+    @Schema(description = "运输方式 ; ShippingMethod : 0-海运 , 1-铁路 , 2-空运 , 3-集卡")
     private Integer shippingMethod;
 
     @Schema(description = "预计到货时间")

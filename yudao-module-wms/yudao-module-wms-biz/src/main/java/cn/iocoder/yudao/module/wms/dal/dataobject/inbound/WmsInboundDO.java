@@ -49,7 +49,7 @@ public class WmsInboundDO extends BaseDO {
     /**
      * 状态
      */
-    private String status;
+    private Integer status;
 
     /**
      * 来源单据ID
