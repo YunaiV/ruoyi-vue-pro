@@ -20,14 +20,14 @@ public interface WmsStockOwnershipService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createStockOwnership(@Valid WmsStockOwnershipSaveReqVO createReqVO);
+    WmsStockOwnershipDO createStockOwnership(@Valid WmsStockOwnershipSaveReqVO createReqVO);
 
     /**
      * 更新所有者库存
      *
      * @param updateReqVO 更新信息
      */
-    void updateStockOwnership(@Valid WmsStockOwnershipSaveReqVO updateReqVO);
+    WmsStockOwnershipDO updateStockOwnership(@Valid WmsStockOwnershipSaveReqVO updateReqVO);
 
     /**
      * 删除所有者库存
@@ -51,5 +51,4 @@ public interface WmsStockOwnershipService {
      * @return 所有者库存分页
      */
     PageResult<WmsStockOwnershipDO> getStockOwnershipPage(WmsStockOwnershipPageReqVO pageReqVO);
-
 }

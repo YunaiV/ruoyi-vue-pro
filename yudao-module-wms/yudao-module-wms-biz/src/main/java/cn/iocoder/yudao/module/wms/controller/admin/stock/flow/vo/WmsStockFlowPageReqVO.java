@@ -6,9 +6,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
-
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import java.sql.Timestamp;
 
+/**
+ * @table-fields : reason,defective_quantity,create_time,purchase_transit_quantity,flow_time,return_transit_quantity,stock_id,purchase_plan_quantity,stock_type,available_quantity,outbound_pending_quantity,shelving_pending_quantity,sellable_quantity,delta_quantity,reason_bill_id,reason_item_id,prev_flow_id
+ */
 @Schema(description = "管理后台 - 库存流水分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -62,10 +65,15 @@ public class WmsStockFlowPageReqVO extends PageParam {
 
     @Schema(description = "流水发生的时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime[] flowTime;
+    private Timestamp[] flowTime;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
+    @Schema(description = "待上架数量", example = "")
+    private Integer shelvingPendingQuantity;
+
+    @Schema(description = "待出库量", example = "")
+    private Integer outboundPendingQuantity;
 }

@@ -20,14 +20,14 @@ public interface WmsStockFlowService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createStockFlow(@Valid WmsStockFlowSaveReqVO createReqVO);
+    WmsStockFlowDO createStockFlow(@Valid WmsStockFlowSaveReqVO createReqVO);
 
     /**
      * 更新库存流水
      *
      * @param updateReqVO 更新信息
      */
-    void updateStockFlow(@Valid WmsStockFlowSaveReqVO updateReqVO);
+    WmsStockFlowDO updateStockFlow(@Valid WmsStockFlowSaveReqVO updateReqVO);
 
     /**
      * 删除库存流水
@@ -51,5 +51,4 @@ public interface WmsStockFlowService {
      * @return 库存流水分页
      */
     PageResult<WmsStockFlowDO> getStockFlowPage(WmsStockFlowPageReqVO pageReqVO);
-
 }

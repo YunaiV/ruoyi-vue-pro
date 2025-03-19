@@ -20,14 +20,14 @@ public interface WmsStockBinService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createStockBin(@Valid WmsStockBinSaveReqVO createReqVO);
+    WmsStockBinDO createStockBin(@Valid WmsStockBinSaveReqVO createReqVO);
 
     /**
      * 更新仓位库存
      *
      * @param updateReqVO 更新信息
      */
-    void updateStockBin(@Valid WmsStockBinSaveReqVO updateReqVO);
+    WmsStockBinDO updateStockBin(@Valid WmsStockBinSaveReqVO updateReqVO);
 
     /**
      * 删除仓位库存
@@ -51,5 +51,4 @@ public interface WmsStockBinService {
      * @return 仓位库存分页
      */
     PageResult<WmsStockBinDO> getStockBinPage(WmsStockBinPageReqVO pageReqVO);
-
 }

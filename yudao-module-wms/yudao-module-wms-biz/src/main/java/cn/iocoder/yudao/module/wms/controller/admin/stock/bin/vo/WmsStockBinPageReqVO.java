@@ -6,9 +6,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
-
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+/**
+ * @table-fields : available_quantity,outbound_pending_quantity,create_time,bin_id,product_id,sellable_quantity,warehouse_id
+ */
 @Schema(description = "管理后台 - 仓位库存分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -36,5 +38,4 @@ public class WmsStockBinPageReqVO extends PageParam {
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
-
 }

@@ -5,6 +5,9 @@ import lombok.*;
 import java.util.*;
 import jakarta.validation.constraints.*;
 
+/**
+ * @table-fields : available_quantity,outbound_pending_quantity,company_id,product_id,id,dept_id,warehouse_id
+ */
 @Schema(description = "管理后台 - 所有者库存新增/修改 Request VO")
 @Data
 public class WmsStockOwnershipSaveReqVO {
@@ -38,4 +41,12 @@ public class WmsStockOwnershipSaveReqVO {
     @NotNull(message = "待出库库存不能为空")
     private Integer pendingOutboundQuantity;
 
+    @Schema(description = "库存财务主体公司ID", example = "")
+    private Long companyId;
+
+    @Schema(description = "库存归属部门ID", example = "")
+    private Long deptId;
+
+    @Schema(description = "待出库库存", example = "")
+    private Integer outboundPendingQuantity;
 }

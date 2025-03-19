@@ -6,7 +6,12 @@ import java.util.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import com.alibaba.excel.annotation.*;
+import java.sql.Timestamp;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+/**
+ * @table-fields : tenant_id,reason,defective_quantity,creator,create_time,purchase_transit_quantity,flow_time,return_transit_quantity,stock_id,purchase_plan_quantity,updater,stock_type,available_quantity,outbound_pending_quantity,update_time,shelving_pending_quantity,sellable_quantity,delta_quantity,id,reason_bill_id,reason_item_id,prev_flow_id
+ */
 @Schema(description = "管理后台 - 库存流水 Response VO")
 @Data
 @ExcelIgnoreUnannotated
@@ -21,7 +26,7 @@ public class WmsStockFlowRespVO {
     private Integer stockType;
 
     @Schema(description = "库存ID，分别指向三张库存表的ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "17743")
-    @ExcelProperty("库存ID，分别指向三张库存表的ID")
+    @ExcelProperty("库存ID")
     private Long stockId;
 
     @Schema(description = "流水发生的原因", requiredMode = Schema.RequiredMode.REQUIRED, example = "不香")
@@ -61,11 +66,11 @@ public class WmsStockFlowRespVO {
     private Integer pendingShelvingQuantity;
 
     @Schema(description = "可用量，在库的良品数量")
-    @ExcelProperty("可用量，在库的良品数量")
+    @ExcelProperty("可用量")
     private Integer availableQuantity;
 
     @Schema(description = "可售量，未被单据占用的良品数量")
-    @ExcelProperty("可售量，未被单据占用的良品数量")
+    @ExcelProperty("可售量")
     private Integer sellableQuantity;
 
     @Schema(description = "待出库量")
@@ -78,10 +83,34 @@ public class WmsStockFlowRespVO {
 
     @Schema(description = "流水发生的时间")
     @ExcelProperty("流水发生的时间")
-    private LocalDateTime flowTime;
+    private Timestamp flowTime;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "待上架数量", example = "")
+    @ExcelProperty("待上架数量")
+    private Integer shelvingPendingQuantity;
+
+    @Schema(description = "待出库量", example = "")
+    @ExcelProperty("待出库量")
+    private Integer outboundPendingQuantity;
+
+    @Schema(description = "创建者", example = "")
+    @ExcelProperty("创建者")
+    private String creator;
+
+    @Schema(description = "更新者", example = "")
+    @ExcelProperty("更新者")
+    private String updater;
+
+    @Schema(description = "更新时间", example = "")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @ExcelProperty("更新时间")
+    private LocalDateTime updateTime;
+
+    @Schema(description = "租户编号", example = "")
+    @ExcelProperty("租户编号")
+    private Long tenantId;
 }

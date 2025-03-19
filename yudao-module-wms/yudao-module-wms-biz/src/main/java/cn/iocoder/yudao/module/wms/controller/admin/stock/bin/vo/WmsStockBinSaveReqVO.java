@@ -5,6 +5,9 @@ import lombok.*;
 import java.util.*;
 import jakarta.validation.constraints.*;
 
+/**
+ * @table-fields : available_quantity,outbound_pending_quantity,bin_id,product_id,sellable_quantity,id,warehouse_id
+ */
 @Schema(description = "管理后台 - 仓位库存新增/修改 Request VO")
 @Data
 public class WmsStockBinSaveReqVO {
@@ -25,15 +28,14 @@ public class WmsStockBinSaveReqVO {
     private String productId;
 
     @Schema(description = "可用量，在库的良品数量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "可用量，在库的良品数量不能为空")
+    @NotNull(message = "可用量不能为空")
     private Integer availableQuantity;
 
     @Schema(description = "可售量，未被单据占用的良品数量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "可售量，未被单据占用的良品数量不能为空")
+    @NotNull(message = "可售量不能为空")
     private Integer sellableQuantity;
 
     @Schema(description = "待出库量", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "待出库量不能为空")
     private Integer outboundPendingQuantity;
-
 }

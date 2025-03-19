@@ -6,7 +6,11 @@ import java.util.*;
 import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
+/**
+ * @table-fields : reason,defective_quantity,purchase_transit_quantity,flow_time,return_transit_quantity,stock_id,purchase_plan_quantity,stock_type,available_quantity,outbound_pending_quantity,shelving_pending_quantity,sellable_quantity,delta_quantity,id,reason_bill_id,reason_item_id,prev_flow_id
+ */
 @Schema(description = "管理后台 - 库存流水新增/修改 Request VO")
 @Data
 public class WmsStockFlowSaveReqVO {
@@ -19,7 +23,7 @@ public class WmsStockFlowSaveReqVO {
     private Integer stockType;
 
     @Schema(description = "库存ID，分别指向三张库存表的ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "17743")
-    @NotNull(message = "库存ID，分别指向三张库存表的ID不能为空")
+    @NotNull(message = "库存ID不能为空")
     private Long stockId;
 
     @Schema(description = "流水发生的原因", requiredMode = Schema.RequiredMode.REQUIRED, example = "不香")
@@ -65,6 +69,11 @@ public class WmsStockFlowSaveReqVO {
     private Integer defectiveQuantity;
 
     @Schema(description = "流水发生的时间")
-    private LocalDateTime flowTime;
+    private Timestamp flowTime;
 
+    @Schema(description = "待上架数量", example = "")
+    private Integer shelvingPendingQuantity;
+
+    @Schema(description = "待出库量", example = "")
+    private Integer outboundPendingQuantity;
 }

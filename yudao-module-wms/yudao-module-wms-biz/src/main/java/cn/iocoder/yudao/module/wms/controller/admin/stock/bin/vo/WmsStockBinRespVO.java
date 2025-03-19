@@ -6,7 +6,11 @@ import java.util.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import com.alibaba.excel.annotation.*;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+/**
+ * @table-fields : available_quantity,tenant_id,outbound_pending_quantity,creator,update_time,create_time,bin_id,product_id,sellable_quantity,id,warehouse_id,updater
+ */
 @Schema(description = "管理后台 - 仓位库存 Response VO")
 @Data
 @ExcelIgnoreUnannotated
@@ -29,11 +33,11 @@ public class WmsStockBinRespVO {
     private String productId;
 
     @Schema(description = "可用量，在库的良品数量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("可用量，在库的良品数量")
+    @ExcelProperty("可用量")
     private Integer availableQuantity;
 
     @Schema(description = "可售量，未被单据占用的良品数量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("可售量，未被单据占用的良品数量")
+    @ExcelProperty("可售量")
     private Integer sellableQuantity;
 
     @Schema(description = "待出库量", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -44,4 +48,20 @@ public class WmsStockBinRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "创建者", example = "")
+    @ExcelProperty("创建者")
+    private String creator;
+
+    @Schema(description = "更新者", example = "")
+    @ExcelProperty("更新者")
+    private String updater;
+
+    @Schema(description = "更新时间", example = "")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @ExcelProperty("更新时间")
+    private LocalDateTime updateTime;
+
+    @Schema(description = "租户编号", example = "")
+    @ExcelProperty("租户编号")
+    private Long tenantId;
 }

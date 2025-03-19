@@ -4,16 +4,13 @@ import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.flow.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.flow.WmsStockFlowDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.flow.WmsStockFlowMapper;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 
@@ -29,36 +26,53 @@ public class WmsStockFlowServiceImpl implements WmsStockFlowService {
     @Resource
     private WmsStockFlowMapper stockFlowMapper;
 
+    /**
+     * @sign : 5CDC0A12A8B023F4
+     */
     @Override
-    public Long createStockFlow(WmsStockFlowSaveReqVO createReqVO) {
+    public WmsStockFlowDO createStockFlow(WmsStockFlowSaveReqVO createReqVO) {
         // 插入
         WmsStockFlowDO stockFlow = BeanUtils.toBean(createReqVO, WmsStockFlowDO.class);
         stockFlowMapper.insert(stockFlow);
         // 返回
-        return stockFlow.getId();
+        return stockFlow;
     }
 
+    /**
+     * @sign : 92744785BC7A4404
+     */
     @Override
-    public void updateStockFlow(WmsStockFlowSaveReqVO updateReqVO) {
+    public WmsStockFlowDO updateStockFlow(WmsStockFlowSaveReqVO updateReqVO) {
         // 校验存在
-        validateStockFlowExists(updateReqVO.getId());
+        WmsStockFlowDO exists = validateStockFlowExists(updateReqVO.getId());
         // 更新
-        WmsStockFlowDO updateObj = BeanUtils.toBean(updateReqVO, WmsStockFlowDO.class);
-        stockFlowMapper.updateById(updateObj);
+        WmsStockFlowDO stockFlow = BeanUtils.toBean(updateReqVO, WmsStockFlowDO.class);
+        stockFlowMapper.updateById(stockFlow);
+        // 返回
+        return stockFlow;
     }
 
+    /**
+     * @sign : 2C67EEBE8FF6B925
+     */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteStockFlow(Long id) {
         // 校验存在
-        validateStockFlowExists(id);
+        WmsStockFlowDO stockFlow = validateStockFlowExists(id);
         // 删除
         stockFlowMapper.deleteById(id);
     }
 
-    private void validateStockFlowExists(Long id) {
-        if (stockFlowMapper.selectById(id) == null) {
-            //throw exception(STOCK_FLOW_NOT_EXISTS);
+    /**
+     * @sign : 9FD17EF243CE9F52
+     */
+    private WmsStockFlowDO validateStockFlowExists(Long id) {
+        WmsStockFlowDO stockFlow = stockFlowMapper.selectById(id);
+        if (stockFlow == null) {
+            throw exception(STOCK_FLOW_NOT_EXISTS);
         }
+        return stockFlow;
     }
 
     @Override
@@ -70,5 +84,4 @@ public class WmsStockFlowServiceImpl implements WmsStockFlowService {
     public PageResult<WmsStockFlowDO> getStockFlowPage(WmsStockFlowPageReqVO pageReqVO) {
         return stockFlowMapper.selectPage(pageReqVO);
     }
-
-}
+}

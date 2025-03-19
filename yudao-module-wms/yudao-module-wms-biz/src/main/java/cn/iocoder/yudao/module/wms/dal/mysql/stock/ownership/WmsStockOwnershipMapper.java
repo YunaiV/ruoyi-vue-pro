@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.stock.ownership;
 
 import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -19,15 +18,25 @@ public interface WmsStockOwnershipMapper extends BaseMapperX<WmsStockOwnershipDO
 
     default PageResult<WmsStockOwnershipDO> selectPage(WmsStockOwnershipPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<WmsStockOwnershipDO>()
-                .eqIfPresent(WmsStockOwnershipDO::getWarehouseId, reqVO.getWarehouseId())
-                .eqIfPresent(WmsStockOwnershipDO::getProductId, reqVO.getProductId())
-                .eqIfPresent(WmsStockOwnershipDO::getProductSku, reqVO.getProductSku())
-                .eqIfPresent(WmsStockOwnershipDO::getInventorySubjectId, reqVO.getInventorySubjectId())
-                .eqIfPresent(WmsStockOwnershipDO::getInventoryOwnerId, reqVO.getInventoryOwnerId())
-                .eqIfPresent(WmsStockOwnershipDO::getAvailableQuantity, reqVO.getAvailableQuantity())
-                .eqIfPresent(WmsStockOwnershipDO::getPendingOutboundQuantity, reqVO.getPendingOutboundQuantity())
-                .betweenIfPresent(WmsStockOwnershipDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(WmsStockOwnershipDO::getId));
+				.eqIfPresent(WmsStockOwnershipDO::getWarehouseId, reqVO.getWarehouseId())
+				.eqIfPresent(WmsStockOwnershipDO::getProductId, reqVO.getProductId())
+				.eqIfPresent(WmsStockOwnershipDO::getProductSku, reqVO.getProductSku())
+				.eqIfPresent(WmsStockOwnershipDO::getInventorySubjectId, reqVO.getInventorySubjectId())
+				.eqIfPresent(WmsStockOwnershipDO::getInventoryOwnerId, reqVO.getInventoryOwnerId())
+				.eqIfPresent(WmsStockOwnershipDO::getAvailableQuantity, reqVO.getAvailableQuantity())
+				.eqIfPresent(WmsStockOwnershipDO::getPendingOutboundQuantity, reqVO.getPendingOutboundQuantity())
+				.betweenIfPresent(WmsStockOwnershipDO::getCreateTime, reqVO.getCreateTime())
+				.orderByDesc(WmsStockOwnershipDO::getId));
     }
 
-}
+    /**
+     * 按 warehouse_id,dept_id,product_id 查询唯一的 WmsStockOwnershipDO
+     */
+    default WmsStockOwnershipDO getByUk(Long warehouseId, Long deptId, Long productId) {
+        LambdaQueryWrapperX<WmsStockOwnershipDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsStockOwnershipDO::getWarehouseId, warehouseId);
+        wrapper.eq(WmsStockOwnershipDO::getDeptId, deptId);
+        wrapper.eq(WmsStockOwnershipDO::getProductId, productId);
+        return selectOne(wrapper);
+    }
+}

@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.stock.flow;
 
 import java.util.*;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
@@ -19,24 +18,30 @@ public interface WmsStockFlowMapper extends BaseMapperX<WmsStockFlowDO> {
 
     default PageResult<WmsStockFlowDO> selectPage(WmsStockFlowPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<WmsStockFlowDO>()
-                .eqIfPresent(WmsStockFlowDO::getStockType, reqVO.getStockType())
-                .eqIfPresent(WmsStockFlowDO::getStockId, reqVO.getStockId())
-                .eqIfPresent(WmsStockFlowDO::getReason, reqVO.getReason())
-                .eqIfPresent(WmsStockFlowDO::getReasonBillId, reqVO.getReasonBillId())
-                .eqIfPresent(WmsStockFlowDO::getReasonItemId, reqVO.getReasonItemId())
-                .eqIfPresent(WmsStockFlowDO::getPrevFlowId, reqVO.getPrevFlowId())
-                .eqIfPresent(WmsStockFlowDO::getDeltaQuantity, reqVO.getDeltaQuantity())
-                .eqIfPresent(WmsStockFlowDO::getPurchasePlanQuantity, reqVO.getPurchasePlanQuantity())
-                .eqIfPresent(WmsStockFlowDO::getPurchaseTransitQuantity, reqVO.getPurchaseTransitQuantity())
-                .eqIfPresent(WmsStockFlowDO::getReturnTransitQuantity, reqVO.getReturnTransitQuantity())
-                .eqIfPresent(WmsStockFlowDO::getPendingShelvingQuantity, reqVO.getPendingShelvingQuantity())
-                .eqIfPresent(WmsStockFlowDO::getAvailableQuantity, reqVO.getAvailableQuantity())
-                .eqIfPresent(WmsStockFlowDO::getSellableQuantity, reqVO.getSellableQuantity())
-                .eqIfPresent(WmsStockFlowDO::getPendingOutboundQuantity, reqVO.getPendingOutboundQuantity())
-                .eqIfPresent(WmsStockFlowDO::getDefectiveQuantity, reqVO.getDefectiveQuantity())
-                .betweenIfPresent(WmsStockFlowDO::getFlowTime, reqVO.getFlowTime())
-                .betweenIfPresent(WmsStockFlowDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(WmsStockFlowDO::getId));
+				.eqIfPresent(WmsStockFlowDO::getStockType, reqVO.getStockType())
+				.eqIfPresent(WmsStockFlowDO::getStockId, reqVO.getStockId())
+				.eqIfPresent(WmsStockFlowDO::getReason, reqVO.getReason())
+				.eqIfPresent(WmsStockFlowDO::getReasonBillId, reqVO.getReasonBillId())
+				.eqIfPresent(WmsStockFlowDO::getReasonItemId, reqVO.getReasonItemId())
+				.eqIfPresent(WmsStockFlowDO::getPrevFlowId, reqVO.getPrevFlowId())
+				.eqIfPresent(WmsStockFlowDO::getDeltaQuantity, reqVO.getDeltaQuantity())
+				.eqIfPresent(WmsStockFlowDO::getPurchasePlanQuantity, reqVO.getPurchasePlanQuantity())
+				.eqIfPresent(WmsStockFlowDO::getPurchaseTransitQuantity, reqVO.getPurchaseTransitQuantity())
+				.eqIfPresent(WmsStockFlowDO::getReturnTransitQuantity, reqVO.getReturnTransitQuantity())
+				.eqIfPresent(WmsStockFlowDO::getPendingShelvingQuantity, reqVO.getPendingShelvingQuantity())
+				.eqIfPresent(WmsStockFlowDO::getAvailableQuantity, reqVO.getAvailableQuantity())
+				.eqIfPresent(WmsStockFlowDO::getSellableQuantity, reqVO.getSellableQuantity())
+				.eqIfPresent(WmsStockFlowDO::getPendingOutboundQuantity, reqVO.getPendingOutboundQuantity())
+				.eqIfPresent(WmsStockFlowDO::getDefectiveQuantity, reqVO.getDefectiveQuantity())
+				.betweenIfPresent(WmsStockFlowDO::getFlowTime, reqVO.getFlowTime())
+				.betweenIfPresent(WmsStockFlowDO::getCreateTime, reqVO.getCreateTime())
+				.orderByDesc(WmsStockFlowDO::getId));
     }
 
-}
+    /**
+     * 按 stock_type,stock_id 查询 WmsStockFlowDO 清单
+     */
+    default List<WmsStockFlowDO> selectByStockTypeAndStockId(Integer stockType, Long stockId) {
+        return selectList(new LambdaQueryWrapperX<WmsStockFlowDO>().eq(WmsStockFlowDO::getStockType, stockType).eq(WmsStockFlowDO::getStockId, stockId));
+    }
+}

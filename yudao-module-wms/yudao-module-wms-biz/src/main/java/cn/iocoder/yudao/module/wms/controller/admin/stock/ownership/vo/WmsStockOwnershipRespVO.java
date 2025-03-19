@@ -6,7 +6,11 @@ import java.util.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import com.alibaba.excel.annotation.*;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+/**
+ * @table-fields : available_quantity,tenant_id,outbound_pending_quantity,creator,update_time,company_id,create_time,product_id,id,dept_id,warehouse_id,updater
+ */
 @Schema(description = "管理后台 - 所有者库存 Response VO")
 @Data
 @ExcelIgnoreUnannotated
@@ -48,4 +52,32 @@ public class WmsStockOwnershipRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "库存财务主体公司ID", example = "")
+    @ExcelProperty("库存财务主体公司ID")
+    private Long companyId;
+
+    @Schema(description = "库存归属部门ID", example = "")
+    @ExcelProperty("库存归属部门ID")
+    private Long deptId;
+
+    @Schema(description = "待出库库存", example = "")
+    @ExcelProperty("待出库库存")
+    private Integer outboundPendingQuantity;
+
+    @Schema(description = "创建者", example = "")
+    @ExcelProperty("创建者")
+    private String creator;
+
+    @Schema(description = "更新者", example = "")
+    @ExcelProperty("更新者")
+    private String updater;
+
+    @Schema(description = "更新时间", example = "")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @ExcelProperty("更新时间")
+    private LocalDateTime updateTime;
+
+    @Schema(description = "租户编号", example = "")
+    @ExcelProperty("租户编号")
+    private Long tenantId;
 }
