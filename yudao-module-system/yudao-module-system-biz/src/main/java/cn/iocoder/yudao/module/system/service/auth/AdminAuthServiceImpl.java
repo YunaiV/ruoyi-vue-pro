@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
+import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.*;
@@ -27,12 +28,14 @@ import com.google.common.annotations.VisibleForTesting;
 import com.xingyuv.captcha.model.common.ResponseModel;
 import com.xingyuv.captcha.model.vo.CaptchaVO;
 import com.xingyuv.captcha.service.CaptchaService;
+import jakarta.annotation.Resource;
+import jakarta.validation.Validator;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.Validator;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -69,6 +72,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
      * 验证码的开关，默认为 true
      */
     @Value("${yudao.captcha.enable:true}")
+    @Setter // 为了单测：开启或者关闭验证码
     private Boolean captchaEnable;
 
     @Override
@@ -111,6 +115,14 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public void sendSmsCode(AuthSmsSendReqVO reqVO) {
+        // 如果是重置密码场景，需要校验图形验证码是否正确
+        if (Objects.equals(SmsSceneEnum.ADMIN_MEMBER_RESET_PASSWORD.getScene(), reqVO.getScene())) {
+            ResponseModel response = doValidateCaptcha(reqVO);
+            if (!response.isSuccess()) {
+                throw exception(AUTH_REGISTER_CAPTCHA_CODE_ERROR, response.getRepMsg());
+            }
+        }
+
         // 登录场景，验证是否存在
         if (userService.getUserByMobile(reqVO.getMobile()) == null) {
             throw exception(AUTH_MOBILE_NOT_EXISTS);
@@ -174,21 +186,24 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @VisibleForTesting
     void validateCaptcha(AuthLoginReqVO reqVO) {
-        // 如果验证码关闭，则不进行校验
-        if (!captchaEnable) {
-            return;
-        }
+        ResponseModel response = doValidateCaptcha(reqVO);
         // 校验验证码
-        ValidationUtils.validate(validator, reqVO, AuthLoginReqVO.CodeEnableGroup.class);
-        CaptchaVO captchaVO = new CaptchaVO();
-        captchaVO.setCaptchaVerification(reqVO.getCaptchaVerification());
-        ResponseModel response = captchaService.verification(captchaVO);
-        // 验证不通过
         if (!response.isSuccess()) {
             // 创建登录失败日志（验证码不正确)
             createLoginLog(null, reqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME, LoginResultEnum.CAPTCHA_CODE_ERROR);
             throw exception(AUTH_LOGIN_CAPTCHA_CODE_ERROR, response.getRepMsg());
         }
+    }
+
+    private ResponseModel doValidateCaptcha(CaptchaVerificationReqVO reqVO) {
+        // 如果验证码关闭，则不进行校验
+        if (!captchaEnable) {
+            return ResponseModel.success();
+        }
+        ValidationUtils.validate(validator, reqVO, CaptchaVerificationReqVO.CodeEnableGroup.class);
+        CaptchaVO captchaVO = new CaptchaVO();
+        captchaVO.setCaptchaVerification(reqVO.getCaptchaVerification());
+        return captchaService.verification(captchaVO);
     }
 
     private AuthLoginRespVO createTokenAfterLoginSuccess(Long userId, String username, LoginLogTypeEnum logType) {
@@ -247,4 +262,42 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return UserTypeEnum.ADMIN;
     }
 
+    @Override
+    public AuthLoginRespVO register(AuthRegisterReqVO registerReqVO) {
+        // 1. 校验验证码
+        validateCaptcha(registerReqVO);
+
+        // 2. 校验用户名是否已存在
+        Long userId = userService.registerUser(registerReqVO);
+
+        // 3. 创建 Token 令牌，记录登录日志
+        return createTokenAfterLoginSuccess(userId, registerReqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME);
+    }
+
+    @VisibleForTesting
+    void validateCaptcha(AuthRegisterReqVO reqVO) {
+        ResponseModel response = doValidateCaptcha(reqVO);
+        // 验证不通过
+        if (!response.isSuccess()) {
+            throw exception(AUTH_REGISTER_CAPTCHA_CODE_ERROR, response.getRepMsg());
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void resetPassword(AuthResetPasswordReqVO reqVO) {
+        AdminUserDO userByMobile = userService.getUserByMobile(reqVO.getMobile());
+        if (userByMobile == null) {
+            throw exception(USER_MOBILE_NOT_EXISTS);
+        }
+
+        smsCodeApi.useSmsCode(new SmsCodeUseReqDTO()
+                .setCode(reqVO.getCode())
+                .setMobile(reqVO.getMobile())
+                .setScene(SmsSceneEnum.ADMIN_MEMBER_RESET_PASSWORD.getScene())
+                .setUsedIp(getClientIP())
+        );
+
+        userService.updateUserPassword(userByMobile.getId(), reqVO.getPassword());
+    }
 }

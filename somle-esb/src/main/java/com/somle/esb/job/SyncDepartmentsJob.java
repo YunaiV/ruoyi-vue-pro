@@ -1,9 +1,14 @@
 package com.somle.esb.job;
 
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
-import com.somle.esb.service.EsbService;
+import com.somle.dingtalk.config.DingtalkIntegrationConfig;
+import com.somle.dingtalk.service.DingTalkService;
+import com.somle.esb.enums.TenantId;
+import com.somle.esb.handler.DingtalkDepartmentHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.integration.support.MessageBuilder;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,20 +21,18 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class SyncDepartmentsJob extends DataJob{
-    //默认租户id
-    public static final Long TENANT_ID_DEFAULT = 50001L;
     @Autowired
-    EsbService service;
+    DingTalkService dingTalkService;
+
+    @Autowired
+    MessageChannel dingtalkDepartmentOutputChannel;
 
 
     @Override
-    public String execute(String param) throws Exception {
-        try {
-            TenantContextHolder.setTenantId(TENANT_ID_DEFAULT);
-            service.syncDepartments();
-            return "sync success";
-        } finally {
-            TenantContextHolder.clear();
-        }
+    public String execute(String param){
+        dingTalkService.getDepartmentStream().forEach(department -> {
+            dingtalkDepartmentOutputChannel.send(MessageBuilder.withPayload(department).build());
+        });
+        return "sync success";
     }
 }

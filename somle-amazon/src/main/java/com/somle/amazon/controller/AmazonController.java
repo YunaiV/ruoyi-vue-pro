@@ -11,8 +11,8 @@ public class AmazonController {
     @Autowired
     private AmazonService service;
 
-    @PostMapping("refreshAuth")
-    void refreshAuth() {
-        service.refreshAuth();
-    }
+//    @PostMapping("refreshAuth")
+//    void refreshAuth() {
+//        service.refreshAuth();
+//    }
 }

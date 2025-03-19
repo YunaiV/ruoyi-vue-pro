@@ -46,9 +46,19 @@ public class ErpProductCategoryDO extends BaseDO {
     private Integer sort;
     /**
      * 开启状态
-     *
      * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum}
      */
     private Integer status;
-
+    /**
+     * 海关编码
+     */
+    private String defaultHsCode;
+    /**
+     * 申报品名（英文）
+     */
+    private String defaultDeclaredTypeEn;
+    /**
+     * 申报品名
+     */
+    private String defaultDeclaredType;
 }

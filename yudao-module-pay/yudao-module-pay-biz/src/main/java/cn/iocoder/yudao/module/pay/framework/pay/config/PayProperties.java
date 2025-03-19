@@ -40,6 +40,15 @@ public class PayProperties {
     private String refundNotifyUrl;
 
     /**
+     * 转账回调地址
+     *
+     * 实际上，对应的 PayNotifyController 的 notifyTransfer 方法的 URL
+     *
+     * 回调顺序：支付渠道（支付宝支付、微信支付） => yudao-module-pay 的 transferNotifyUrl 地址 => 业务的 PayAppDO.transferNotifyUrl 地址
+     */
+    private String transferNotifyUrl;
+
+    /**
      * 支付订单 no 的前缀
      */
     @NotEmpty(message = "支付订单 no 的前缀不能为空")

@@ -2,13 +2,17 @@ package com.somle.kingdee.model;
 
 import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.somle.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@ToString
 public class KingdeeResponse {
     private JsonNode data;
     private String description;
@@ -16,10 +20,10 @@ public class KingdeeResponse {
 
 
     public <T> T getData(Class<T> objectClass) {
-        return JsonUtils.parseObject(data, objectClass);
+        return JsonUtilsX.parseObject(data, objectClass);
     }
 
     public <T> List<T> getDataList(Class<T> objectClass) {
-        return JsonUtils.parseArray(data, objectClass);
+        return JsonUtilsX.parseArray(data, objectClass);
     }
 }

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.category.ErpProductCategoryListReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.category.ErpProductCategoryRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.category.ErpProductCategorySaveReqVO;
@@ -39,6 +40,7 @@ public class ErpProductCategoryController {
     @PostMapping("/create")
     @Operation(summary = "创建产品分类")
     @PreAuthorize("@ss.hasPermission('erp:product-category:create')")
+    @Idempotent
     public CommonResult<Long> createProductCategory(@Valid @RequestBody ErpProductCategorySaveReqVO createReqVO) {
         return success(productCategoryService.createProductCategory(createReqVO));
     }

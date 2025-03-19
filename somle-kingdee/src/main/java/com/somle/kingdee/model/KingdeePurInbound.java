@@ -34,6 +34,21 @@ public class KingdeePurInbound {
     private String createTime;
 
     /**
+     * 交货方式id (Delivery type ID)
+     */
+    private String deliveryTypeId;
+
+    /**
+     * 交货方式名称 (Delivery type name)
+     */
+    private String deliveryTypeName;
+
+    /**
+     * 交货方式编码 (Delivery type number)
+     */
+    private String deliveryTypeNumber;
+
+    /**
      * 业务员id (Employee ID)
      */
     private String empId;

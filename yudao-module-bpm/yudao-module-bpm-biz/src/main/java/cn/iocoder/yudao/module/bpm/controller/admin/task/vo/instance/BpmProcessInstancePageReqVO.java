@@ -18,8 +18,8 @@ public class BpmProcessInstancePageReqVO extends PageParam {
     @Schema(description = "流程名称", example = "芋道")
     private String name;
 
-    @Schema(description = "流程定义的编号", example = "2048")
-    private String processDefinitionId;
+    @Schema(description = "流程定义的标识", example = "2048")
+    private String processDefinitionKey; // 精准匹配
 
     @Schema(description = "流程实例的状态", example = "1")
     @InEnum(BpmProcessInstanceStatusEnum.class)

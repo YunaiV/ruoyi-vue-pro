@@ -4,7 +4,7 @@ package com.somle.microsoft.controller;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.somle.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import com.somle.microsoft.model.PowerbiReportReqVO;
 import com.somle.microsoft.model.PowerbiReportRespVO;
 import com.somle.microsoft.service.MicrosoftService;

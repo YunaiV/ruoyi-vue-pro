@@ -1,9 +1,9 @@
 package com.somle.eccang.model;
 
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.somle.framework.common.util.json.JsonUtils;
 import lombok.*;
 
 import java.util.List;
@@ -15,6 +15,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@ToString
 public class EccangResponse {
     private String code;
     private String message;
@@ -50,7 +51,7 @@ public class EccangResponse {
         private Integer pageSize;
 
         public <T> List<T> getData(Class<T> objectClass) {
-            return JsonUtils.parseArray(data,objectClass);
+            return JsonUtilsX.parseArray(data,objectClass);
         }
 
         public int getTotal() {
@@ -82,10 +83,10 @@ public class EccangResponse {
 
 
     public <T> T getBizContent(Class<T> objectClass) {
-        return JsonUtils.parseObject(bizContent, objectClass);
+        return JsonUtilsX.parseObject(bizContent, objectClass);
     }
 
     public <T> List<T> getBizContentList(Class<T> objectClass) {
-        return JsonUtils.parseArray(bizContent, objectClass);
+        return JsonUtilsX.parseArray(bizContent, objectClass);
     }
 }

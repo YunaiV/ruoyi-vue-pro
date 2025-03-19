@@ -12,12 +12,14 @@ import com.dingtalk.api.request.OapiUserListidRequest;
 import com.dingtalk.api.request.OapiV2UserGetRequest;
 import com.dingtalk.api.response.OapiUserListidResponse;
 import com.dingtalk.api.response.OapiV2UserGetResponse;
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.framework.common.util.web.RequestX;
+import cn.iocoder.yudao.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
+import cn.iocoder.yudao.framework.common.util.web.RequestX;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.annotation.PostConstruct;
 
 import lombok.SneakyThrows;
+import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.integration.support.MessageBuilder;
 //import org.springframework.messaging.MessageChannel;
@@ -30,7 +32,7 @@ import com.somle.dingtalk.model.DingTalkDepartment;
 import com.somle.dingtalk.model.DingTalkResponse;
 import com.somle.dingtalk.model.DingTalkToken;
 import com.somle.dingtalk.repository.DingTalkTokenRepository;
-import com.somle.framework.common.util.web.WebUtils;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,8 +40,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class DingTalkService {
     private DingTalkToken token;
-    private final String host = "https://api.dingtalk.com";
-    private final String baseHost = "https://oapi.dingtalk.com";
+    private final String HOST = "https://api.dingtalk.com";
+    private final String BASE_HOST = "https://oapi.dingtalk.com";
+
 
 
 
@@ -49,10 +52,9 @@ public class DingTalkService {
     @Autowired
     DingTalkTokenRepository tokenRepository;
 
-    @Scheduled(cron = "0 0 0 * * *") // Executes at 00:00 AM every day
     @PostConstruct
     private void init() {
-        token = refreshAuth();
+        this.token = tokenRepository.findAll().get(0);
     }
 
 
@@ -61,24 +63,57 @@ public class DingTalkService {
     //     String response = restTemplate.getForObject(url, String.class);
     //     log.debug(response.toString());
 
-    //     JSONObject jsonObject = JsonUtils.parseObject(response);
+    //     JSONObject jsonObject = JsonUtilsSomle.parseObject(response);
     //     return jsonObject.getString("access_token");
     // }
 
-    public DingTalkToken refreshAuth() {
-        String url = host + "/v1.0/oauth2/accessToken";
-        var payload = JsonUtils.newObject();
-        DingTalkToken token = tokenRepository.findAll().get(0);
-        payload.put("appKey", token.getAppKey());
-        payload.put("appSecret", token.getAppSecret());
+//    @Scheduled(cron = "0 0 * * * ?") // Executes at the start of every hour
+    @Scheduled(initialDelay = 2000, fixedRate = 3600000)
+    public void refreshAuth() {
+        String url = HOST + "/v1.0/oauth2/accessToken";
+        var payload = JsonUtilsX.newObject();
+        payload.put("appKey", this.token.getAppKey());
+        payload.put("appSecret", this.token.getAppSecret());
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.POST)
             .url(url)
             .payload(payload)
             .build();
-        String accessToken = WebUtils.sendRequest(request, JSONObject.class).getString("accessToken");
-        token.setAccessToken(accessToken);
-        return token;
+        ObjectNode result= WebUtils.sendRequest(request, ObjectNode.class);
+        JSONObject jsonObject=new JSONObject(result);
+        String accessToken =jsonObject.getString("accessToken");
+        this.token.setAccessToken(accessToken);
+    }
+
+    @SneakyThrows
+    public void sendRobotMessage(String content, String accessToken) {
+        var endpoint = "/robot/send";
+        var keyword = "ALERT";
+        // 构造消息内容
+        JSONObject json = new JSONObject();
+        json.put("msgtype", "text");
+
+        JSONObject text = new JSONObject();
+        text.put("content", keyword + "\n" + content);
+
+        json.put("text", text);
+
+        var queryParams = Map.of("access_token", accessToken);
+
+        RequestX request = RequestX.builder()
+            .requestMethod(RequestX.Method.POST)
+            .url(BASE_HOST + endpoint)
+            .queryParams(queryParams)
+            .payload(json)
+            .build();
+
+        try (Response response = WebUtils.sendRequest(request)) {
+            if (response.isSuccessful()) {
+                System.out.println("Response: " + response.body().string());
+            } else {
+                System.out.println("Failed: " + response.message());
+            }
+        }
     }
 
 
@@ -91,12 +126,12 @@ public class DingTalkService {
         );
         Map<String, String> headers = Map.of(
         );
-        var payload = JsonUtils.newObject();
+        var payload = JsonUtilsX.newObject();
         payload.put("dept_id", deptId);
         try {
             var request = RequestX.builder()
                 .requestMethod(RequestX.Method.POST)
-                .url(baseHost + endUrl)
+                .url(BASE_HOST + endUrl)
                 .queryParams(params)
                 .headers(headers)
                 .payload(payload)
@@ -163,11 +198,11 @@ public class DingTalkService {
         );
         Map<String, String> headers = Map.of(
         );
-        var payload = JsonUtils.newObject();
+        var payload = JsonUtilsX.newObject();
         payload.put("dept_id", deptId);
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.POST)
-            .url(baseHost + endUrl)
+            .url(BASE_HOST + endUrl)
             .queryParams(params)
             .headers(headers)
             .payload(payload)
@@ -241,7 +276,7 @@ public class DingTalkService {
         );
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.POST)
-            .url(baseHost + endUrl)
+            .url(BASE_HOST + endUrl)
             .queryParams(params)
             .headers(headers)
             .payload(dept)

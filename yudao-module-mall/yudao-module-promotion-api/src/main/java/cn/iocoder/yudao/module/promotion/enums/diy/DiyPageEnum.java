@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.promotion.enums.diy;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,13 +13,13 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @Getter
-public enum DiyPageEnum implements IntArrayValuable {
+public enum DiyPageEnum implements ArrayValuable<Integer> {
 
     INDEX(1, "首页"),
     MY(2, "我的"),
     ;
 
-    private static final int[] ARRAYS = Arrays.stream(values()).mapToInt(DiyPageEnum::getPage).toArray();
+    private static final Integer[] ARRAYS = Arrays.stream(values()).map(DiyPageEnum::getPage).toArray(Integer[]::new);
 
     /**
      * 页面编号
@@ -32,7 +32,7 @@ public enum DiyPageEnum implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

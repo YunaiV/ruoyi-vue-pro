@@ -1,8 +1,8 @@
 package com.somle.otto.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.somle.framework.common.util.web.RequestX;
-import com.somle.framework.common.util.web.WebUtils;
+import cn.iocoder.yudao.framework.common.util.web.RequestX;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import com.somle.otto.model.pojo.OttoAccount;
 import com.somle.otto.model.req.OttoReceiptReq;
 import com.somle.otto.model.resp.OttoCommonResp;
@@ -53,8 +53,9 @@ public class OttoClient {
                 .queryParams(map)
                 .headers(Map.of("Authorization", "Bearer " + getAccessToken()))
                 .build();
-        Response response = WebUtils.sendRequest(requestX);
-        return handleResponse(response);
+        try(Response response = WebUtils.sendRequest(requestX)){
+            return handleResponse(response);
+        }
     }
 
     /**
@@ -81,8 +82,9 @@ public class OttoClient {
                 .headers(Map.of("Authorization", "Bearer " + getAccessToken()))
                 .build();
 
-        Response response = WebUtils.sendRequest(requestX);
-        return handleResponse(response);
+        try(Response response = WebUtils.sendRequest(requestX)){
+            return handleResponse(response);
+        }
     }
 
     // 根据链接获取更多结算数据
@@ -95,9 +97,10 @@ public class OttoClient {
                 .build();
 
         try {
-            Response response = WebUtils.sendRequest(requestX);
-            if (response.isSuccessful()) {
-                return parseResponse(response);
+            try(Response response = WebUtils.sendRequest(requestX)){
+                if (response.isSuccessful()) {
+                    return parseResponse(response);
+                }
             }
             log.error("Failed to fetch data from link: {}", links.getHref());
         } catch (IOException e) {
@@ -132,12 +135,8 @@ public class OttoClient {
 
     // 解析响应
     private OttoCommonResp<Object> parseResponse(Response response) throws IOException {
-        if (response.body() == null) {
-            throw new RuntimeException("Response 为空");
-        }
-        String jsonResponse = response.body().string();
         //new TypeReference<OttoCommonResp<Object>>()
-        OttoCommonResp<Object> commonResp = WebUtils.parseResponse(jsonResponse, new TypeReference<>() {
+        OttoCommonResp<Object> commonResp = WebUtils.parseResponse(response, new TypeReference<>() {
         });
         handleLinksRecursively(commonResp);
         return commonResp;

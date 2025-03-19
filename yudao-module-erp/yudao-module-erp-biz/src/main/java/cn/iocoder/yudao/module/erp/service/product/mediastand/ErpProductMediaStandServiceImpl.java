@@ -1,0 +1,35 @@
+package cn.iocoder.yudao.module.erp.service.product.mediastand;
+
+import org.springframework.stereotype.Service;
+import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductSaveReqVO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
+import cn.iocoder.yudao.module.erp.service.product.ErpProductServiceImpl;
+import cn.iocoder.yudao.module.erp.service.product.bo.ErpProductBO;
+import org.springframework.stereotype.Service;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PRODUCT_FIELD_NOT_MATCH;
+import cn.iocoder.yudao.module.erp.service.product.mediastand.bo.MediaStandBO;
+
+/**
+ * 多媒体支架
+ * 
+ * @author Wqh
+ */
+@Service
+public class ErpProductMediaStandServiceImpl extends ErpProductServiceImpl implements ErpProductMediaStandService {
+    @Override
+    public ErpProductBO toBO(ErpProductSaveReqVO saveReqVO) {
+        validateFields(saveReqVO);
+        return BeanUtils.toBean(saveReqVO, MediaStandBO.class);
+    }
+
+    @Override
+    public ErpProductBO toBO(ErpProductDO productDO) {
+        return BeanUtils.toBean(productDO, MediaStandBO.class);
+    }
+    @Override
+    public void validateFields(ErpProductSaveReqVO saveReqVO){
+        ThrowUtil.ifThrow(BeanUtils.areAllNonNullFieldsPresent(saveReqVO, MediaStandBO.class),PRODUCT_FIELD_NOT_MATCH);
+    }
+}

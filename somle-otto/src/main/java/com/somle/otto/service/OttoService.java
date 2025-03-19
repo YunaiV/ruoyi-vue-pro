@@ -1,6 +1,6 @@
 package com.somle.otto.service;
 
-import com.somle.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import com.somle.otto.model.pojo.OttoAuthToken;
 import com.somle.otto.model.resp.OttoAccessTokenResp;
 import com.somle.otto.repository.OttoAccountDao;
@@ -60,7 +60,7 @@ public class OttoService {
                         try {
                             String bodyString = responseBody.string();
                             log.debug("Response body: {}", bodyString);
-                            return JsonUtils.parseObject(bodyString, OttoAccessTokenResp.class);
+                            return JsonUtilsX.parseObject(bodyString, OttoAccessTokenResp.class);
                         } catch (IOException e) {
                             log.error("Error reading response body", e);
                             throw new RuntimeException("Error reading response body", e);

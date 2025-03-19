@@ -178,6 +178,11 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
     }
 
     @Override
+    protected PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body) throws Throwable {
+        throw new UnsupportedOperationException("未实现");
+    }
+
+    @Override
     public PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) {
         throw new UnsupportedOperationException("待实现");
     }

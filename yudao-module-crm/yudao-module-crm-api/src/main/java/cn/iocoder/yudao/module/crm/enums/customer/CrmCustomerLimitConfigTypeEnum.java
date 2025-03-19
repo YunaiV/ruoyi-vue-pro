@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.crm.enums.customer;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,7 +15,7 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum CrmCustomerLimitConfigTypeEnum implements IntArrayValuable {
+public enum CrmCustomerLimitConfigTypeEnum implements ArrayValuable<Integer> {
 
     /**
      * 拥有客户数限制
@@ -27,7 +27,7 @@ public enum CrmCustomerLimitConfigTypeEnum implements IntArrayValuable {
     CUSTOMER_LOCK_LIMIT(2, "锁定客户数限制"),
     ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmCustomerLimitConfigTypeEnum::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(CrmCustomerLimitConfigTypeEnum::getType).toArray(Integer[]::new);
 
     /**
      * 状态
@@ -45,7 +45,7 @@ public enum CrmCustomerLimitConfigTypeEnum implements IntArrayValuable {
     }
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

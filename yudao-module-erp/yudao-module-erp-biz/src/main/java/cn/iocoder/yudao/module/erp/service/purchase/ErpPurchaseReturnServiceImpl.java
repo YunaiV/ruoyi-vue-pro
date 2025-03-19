@@ -9,7 +9,6 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.returns.ErpPurchaseReturnPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.returns.ErpPurchaseReturnSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseReturnDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseReturnItemDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseReturnItemMapper;
@@ -22,7 +21,6 @@ import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpStockRecordService;
 import cn.iocoder.yudao.module.erp.service.stock.bo.ErpStockRecordCreateReqBO;
 import jakarta.annotation.Resource;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -58,9 +56,9 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
 
     @Resource
     private ErpProductService productService;
-    @Resource
-    @Lazy // 延迟加载，避免循环依赖
-    private ErpPurchaseOrderService purchaseOrderService;
+    //    @Resource
+//    @Lazy // 延迟加载，避免循环依赖
+//    private ErpPurchaseOrderService purchaseOrderService;
     @Resource
     private ErpAccountService accountService;
     @Resource
@@ -70,7 +68,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
     @Transactional(rollbackFor = Exception.class)
     public Long createPurchaseReturn(ErpPurchaseReturnSaveReqVO createReqVO) {
         // 1.1 校验采购订单已审核
-        ErpPurchaseOrderDO purchaseOrder = purchaseOrderService.validatePurchaseOrder(createReqVO.getOrderId());
+//        ErpPurchaseOrderDO purchaseOrder = purchaseOrderService.validatePurchaseOrder(createReqVO.getOrderId());
         // 1.2 校验退货项的有效性
         List<ErpPurchaseReturnItemDO> purchaseReturnItems = validatePurchaseReturnItems(createReqVO.getItems());
         // 1.3 校验结算账户
@@ -81,8 +79,8 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
 
         // 2.1 插入退货
         ErpPurchaseReturnDO purchaseReturn = BeanUtils.toBean(createReqVO, ErpPurchaseReturnDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()))
-                .setOrderNo(purchaseOrder.getNo()).setSupplierId(purchaseOrder.getSupplierId());
+            .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()));
+//                .setOrderNo(purchaseOrder.getNo()).setSupplierId(purchaseOrder.getSupplierId());
         calculateTotalPrice(purchaseReturn, purchaseReturnItems);
         purchaseReturnMapper.insert(purchaseReturn);
         // 2.2 插入退货项
@@ -103,15 +101,15 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
             throw exception(PURCHASE_RETURN_UPDATE_FAIL_APPROVE, purchaseReturn.getNo());
         }
         // 1.2 校验采购订单已审核
-        ErpPurchaseOrderDO purchaseOrder = purchaseOrderService.validatePurchaseOrder(updateReqVO.getOrderId());
+//        ErpPurchaseOrderDO purchaseOrder = purchaseOrderService.validatePurchaseOrder(updateReqVO.getOrderId());
         // 1.3 校验结算账户
         accountService.validateAccount(updateReqVO.getAccountId());
         // 1.4 校验订单项的有效性
         List<ErpPurchaseReturnItemDO> purchaseReturnItems = validatePurchaseReturnItems(updateReqVO.getItems());
 
         // 2.1 更新退货
-        ErpPurchaseReturnDO updateObj = BeanUtils.toBean(updateReqVO, ErpPurchaseReturnDO.class)
-                .setOrderNo(purchaseOrder.getNo()).setSupplierId(purchaseOrder.getSupplierId());
+        ErpPurchaseReturnDO updateObj = BeanUtils.toBean(updateReqVO, ErpPurchaseReturnDO.class);
+//                .setOrderNo(purchaseOrder.getNo()).setSupplierId(purchaseOrder.getSupplierId());
         calculateTotalPrice(updateObj, purchaseReturnItems);
         purchaseReturnMapper.updateById(updateObj);
         // 2.2 更新退货项
@@ -145,7 +143,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
         Map<Long, BigDecimal> returnCountMap = purchaseReturnItemMapper.selectOrderItemCountSumMapByReturnIds(
                 convertList(purchaseReturns, ErpPurchaseReturnDO::getId));
         // 2. 更新采购订单的出库数量
-        purchaseOrderService.updatePurchaseOrderReturnCount(orderId, returnCountMap);
+//        purchaseOrderService.updatePurchaseOrderReturnCount(orderId, returnCountMap);
     }
 
     @Override

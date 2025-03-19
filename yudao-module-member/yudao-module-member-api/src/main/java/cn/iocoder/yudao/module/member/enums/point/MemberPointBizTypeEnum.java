@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.member.enums.point;
 
 import cn.hutool.core.util.EnumUtil;
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,7 +14,7 @@ import java.util.Objects;
  */
 @AllArgsConstructor
 @Getter
-public enum MemberPointBizTypeEnum implements IntArrayValuable {
+public enum MemberPointBizTypeEnum implements ArrayValuable<Integer> {
 
     SIGN(1, "签到", "签到获得 {} 积分", true),
     ADMIN(2, "管理员修改", "管理员修改 {} 积分", true),
@@ -46,8 +46,8 @@ public enum MemberPointBizTypeEnum implements IntArrayValuable {
     private final boolean add;
 
     @Override
-    public int[] array() {
-        return new int[0];
+    public Integer[] array() {
+        return new Integer[0];
     }
 
     public static MemberPointBizTypeEnum getByType(Integer type) {

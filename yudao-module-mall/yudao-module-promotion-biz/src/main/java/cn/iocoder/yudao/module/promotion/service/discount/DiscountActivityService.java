@@ -8,7 +8,6 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountActivit
 import cn.iocoder.yudao.module.promotion.dal.dataobject.discount.DiscountProductDO;
 import jakarta.validation.Valid;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -27,7 +26,7 @@ public interface DiscountActivityService {
      * @param skuIds SKU 编号数组
      * @return 匹配的限时折扣商品
      */
-    List<DiscountProductDO> getMatchDiscountProductList(Collection<Long> skuIds);
+    List<DiscountProductDO> getMatchDiscountProductListBySkuIds(Collection<Long> skuIds);
 
     /**
      * 创建限时折扣活动
@@ -89,16 +88,5 @@ public interface DiscountActivityService {
      * @return 活动的商品列表
      */
     List<DiscountProductDO> getDiscountProductsByActivityId(Collection<Long> activityIds);
-
-    /**
-     * 获取指定 spu 编号最近参加的活动，每个 spuId 只返回一条记录
-     *
-     * @param spuIds   spu 编号
-     * @param status   状态
-     * @param dateTime 当前日期时间
-     * @return 折扣活动列表
-     */
-    List<DiscountActivityDO> getDiscountActivityBySpuIdsAndStatusAndDateTimeLt(
-            Collection<Long> spuIds, Integer status, LocalDateTime dateTime);
 
 }

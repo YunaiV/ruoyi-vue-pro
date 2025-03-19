@@ -1,19 +1,11 @@
 package com.somle.esb.job;
 
 
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import com.somle.esb.model.OssData;
-import com.somle.framework.common.util.collection.PageUtils;
-import com.somle.framework.common.util.date.LocalDateTimeUtils;
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
 import com.somle.wangdian.model.WangdianTradeReqVO;
-import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class WangdianTradeDataJob extends WangdianDataJob{
@@ -32,7 +24,7 @@ public class WangdianTradeDataJob extends WangdianDataJob{
                 .pageNo(0)
                 .build();
 
-            PageUtils.getAllPages(
+            StreamX.iterate(
                 wangdianService.client.execute("trade_query.php", reqVO),
                 response -> !response.getInteger("total_count").equals(0),
                 respoonse ->{

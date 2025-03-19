@@ -36,8 +36,8 @@ public class DictDataServiceImpl implements DictDataService {
      * 排序 dictType > sort
      */
     private static final Comparator<DictDataDO> COMPARATOR_TYPE_AND_SORT = Comparator
-            .comparing(DictDataDO::getDictType)
-            .thenComparingInt(DictDataDO::getSort);
+        .comparing(DictDataDO::getDictType)
+        .thenComparingInt(DictDataDO::getSort);
 
     @Resource
     private DictTypeService dictTypeService;
@@ -125,7 +125,7 @@ public class DictDataServiceImpl implements DictDataService {
         }
         DictDataDO dictData = dictDataMapper.selectById(id);
         if (dictData == null) {
-            throw exception(DICT_DATA_NOT_EXISTS);
+            throw exception(DICT_DATA_NOT_EXISTS, id);
         }
     }
 
@@ -146,12 +146,12 @@ public class DictDataServiceImpl implements DictDataService {
             return;
         }
         Map<String, DictDataDO> dictDataMap = CollectionUtils.convertMap(
-                dictDataMapper.selectByDictTypeAndValues(dictType, values), DictDataDO::getValue);
+            dictDataMapper.selectByDictTypeAndValues(dictType, values), DictDataDO::getValue);
         // 校验
         values.forEach(value -> {
             DictDataDO dictData = dictDataMap.get(value);
             if (dictData == null) {
-                throw exception(DICT_DATA_NOT_EXISTS);
+                throw exception(DICT_DATA_NOT_EXISTS, value);
             }
             if (!CommonStatusEnum.ENABLE.getStatus().equals(dictData.getStatus())) {
                 throw exception(DICT_DATA_NOT_ENABLE, dictData.getLabel());

@@ -16,9 +16,6 @@ public class UserProfileRespVO {
     @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "工号", requiredMode = Schema.RequiredMode.REQUIRED, example = "0001")
-    private String employeeId;
-
     @Schema(description = "用户账号", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
     private String username;
 

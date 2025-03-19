@@ -21,6 +21,10 @@ public class DeepSeekChatOptions implements ChatOptions {
 
     public static final String MODEL_DEFAULT = "deepseek-chat";
 
+    public static final String MODEL_REASONER = "deepseek-reasoner";
+
+    public static final String MODEL_REASONER_ALL = "deepseek-reasoner-all";
+
     /**
      * 模型
      */

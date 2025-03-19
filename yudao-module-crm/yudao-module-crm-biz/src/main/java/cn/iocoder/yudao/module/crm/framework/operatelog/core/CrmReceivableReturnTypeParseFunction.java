@@ -6,7 +6,7 @@ import com.mzt.logapi.service.IParseFunction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.CRM_RECEIVABLE_RETURN_TYPE;
+import static cn.iocoder.yudao.module.crm.enums.CrmDictTypeConstants.CRM_RECEIVABLE_RETURN_TYPE;
 
 /**
  * CRM 回款方式的 {@link IParseFunction} 实现类

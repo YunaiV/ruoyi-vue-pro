@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.promotion.enums.common;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,14 +14,14 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @Getter
-public enum PromotionActivityStatusEnum implements IntArrayValuable {
+public enum PromotionActivityStatusEnum implements ArrayValuable<Integer> {
 
     WAIT(10, "未开始"),
     RUN(20, "进行中"),
     END(30, "已结束"),
     CLOSE(40, "已关闭");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(PromotionActivityStatusEnum::getStatus).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(PromotionActivityStatusEnum::getStatus).toArray(Integer[]::new);
 
     /**
      * 状态值
@@ -33,7 +33,7 @@ public enum PromotionActivityStatusEnum implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

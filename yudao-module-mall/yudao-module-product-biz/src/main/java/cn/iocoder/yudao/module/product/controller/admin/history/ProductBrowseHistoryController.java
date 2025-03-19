@@ -51,7 +51,8 @@ public class ProductBrowseHistoryController {
                 convertSet(pageResult.getList(), ProductBrowseHistoryDO::getSpuId));
         return success(BeanUtils.toBean(pageResult, ProductBrowseHistoryRespVO.class,
                 vo -> Optional.ofNullable(spuMap.get(vo.getSpuId()))
-                        .ifPresent(spu -> vo.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl()).setPrice(spu.getPrice()))));
+                        .ifPresent(spu -> vo.setSpuName(spu.getName()).setPicUrl(spu.getPicUrl()).setPrice(spu.getPrice())
+                                .setSalesCount(spu.getSalesCount()).setStock(spu.getStock()))));
     }
 
 }

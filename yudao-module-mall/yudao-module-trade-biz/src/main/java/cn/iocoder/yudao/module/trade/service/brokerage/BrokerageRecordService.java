@@ -32,7 +32,7 @@ public interface BrokerageRecordService {
      * @param id 编号
      * @return 佣金记录
      */
-    BrokerageRecordDO getBrokerageRecord(Integer id);
+    BrokerageRecordDO getBrokerageRecord(Long id);
 
     /**
      * 获得佣金记录分页

@@ -90,6 +90,9 @@ public class TradePriceCalculatorHelper {
         if (param.getBargainRecordId() != null) {
             return TradeOrderTypeEnum.BARGAIN.getType();
         }
+        if (param.getPointActivityId() != null) {
+            return TradeOrderTypeEnum.POINT.getType();
+        }
         return TradeOrderTypeEnum.NORMAL.getType();
     }
 

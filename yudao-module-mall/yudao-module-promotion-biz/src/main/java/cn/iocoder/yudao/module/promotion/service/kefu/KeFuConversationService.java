@@ -14,6 +14,14 @@ import java.util.List;
 public interface KeFuConversationService {
 
     /**
+     * 获得客服会话
+     *
+     * @param id 编号
+     * @return 客服会话
+     */
+    KeFuConversationDO getConversation(Long id);
+
+    /**
      * 【管理员】删除客服会话
      *
      * @param id 编号

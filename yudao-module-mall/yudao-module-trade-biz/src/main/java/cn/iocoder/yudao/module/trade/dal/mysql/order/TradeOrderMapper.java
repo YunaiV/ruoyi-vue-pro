@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.order.vo.AppTradeOrderPageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
+import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -106,10 +107,22 @@ public interface TradeOrderMapper extends BaseMapperX<TradeOrderDO> {
                 .eq(TradeOrderDO::getCommentStatus, commentStatus));
     }
 
-    default List<TradeOrderDO> selectListByUserIdAndSeckillActivityId(Long userId, Long seckillActivityId) {
-        return selectList(new LambdaUpdateWrapper<>(TradeOrderDO.class)
-                .eq(TradeOrderDO::getUserId, userId)
-                .eq(TradeOrderDO::getSeckillActivityId, seckillActivityId));
+    default List<TradeOrderDO> selectListByUserIdAndActivityId(Long userId, Long activityId, TradeOrderTypeEnum type) {
+        LambdaQueryWrapperX<TradeOrderDO> queryWrapperX = new LambdaQueryWrapperX<>();
+        queryWrapperX.eq(TradeOrderDO::getUserId, userId);
+        if (TradeOrderTypeEnum.isSeckill(type.getType())) {
+            queryWrapperX.eq(TradeOrderDO::getSeckillActivityId, activityId);
+        }
+        if (TradeOrderTypeEnum.isBargain(type.getType())) {
+            queryWrapperX.eq(TradeOrderDO::getBargainActivityId, activityId);
+        }
+        if (TradeOrderTypeEnum.isCombination(type.getType())) {
+            queryWrapperX.eq(TradeOrderDO::getCombinationActivityId, activityId);
+        }
+        if (TradeOrderTypeEnum.isPoint(type.getType())) {
+            queryWrapperX.eq(TradeOrderDO::getPointActivityId, activityId);
+        }
+        return selectList(queryWrapperX);
     }
 
     default TradeOrderDO selectOneByPickUpVerifyCode(String pickUpVerifyCode) {

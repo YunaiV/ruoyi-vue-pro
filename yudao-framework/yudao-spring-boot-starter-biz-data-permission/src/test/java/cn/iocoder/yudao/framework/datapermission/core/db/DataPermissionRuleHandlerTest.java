@@ -8,10 +8,10 @@ import com.baomidou.mybatisplus.extension.plugins.inner.DataPermissionIntercepto
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
-import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.InExpression;
+import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionList;
 import net.sf.jsqlparser.schema.Column;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,7 +81,7 @@ public class DataPermissionRuleHandlerTest extends BaseMockitoUnitTest {
                 Column column = MyBatisUtils.buildColumn(tableName, tableAlias, COLUMN);
                 ExpressionList<LongValue> values = new ExpressionList<>(new LongValue(10L),
                         new LongValue(20L));
-                return new InExpression(column, new Parenthesis((values)));
+                return new InExpression(column, new ParenthesedExpressionList((values)));
             }
 
         };

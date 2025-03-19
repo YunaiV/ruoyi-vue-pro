@@ -36,6 +36,8 @@ public interface ErrorCodeConstants {
     ErrorCode ORDER_UPDATE_ADDRESS_FAIL_STATUS_NOT_DELIVERED = new ErrorCode(1_011_000_031, "交易订单修改收货地址失败，原因：订单不是【待发货】状态");
     ErrorCode ORDER_CREATE_FAIL_EXIST_UNPAID = new ErrorCode(1_011_000_032, "交易订单创建失败，原因：存在未付款订单");
     ErrorCode ORDER_CANCEL_PAID_FAIL = new ErrorCode(1_011_000_033, "交易订单取消支付失败，原因：订单不是【{}】状态");
+    ErrorCode ORDER_PICK_UP_FAIL_NOT_VERIFY_USER = new ErrorCode(1_011_000_034, "交易订单自提失败，原因：你没有核销该门店订单的权限");
+    ErrorCode ORDER_CREATE_FAIL_INSUFFICIENT_USER_POINTS = new ErrorCode(1_011_000_035, "交易订单创建失败，原因：用户积分不足");
 
     // ========== After Sale 模块 1-011-000-100 ==========
     ErrorCode AFTER_SALE_NOT_FOUND = new ErrorCode(1_011_000_100, "售后单不存在");
@@ -58,11 +60,12 @@ public interface ErrorCodeConstants {
 
     // ========== Price 相关 1-011-003-000 ============
     ErrorCode PRICE_CALCULATE_PAY_PRICE_ILLEGAL = new ErrorCode(1_011_003_000, "支付价格计算异常，原因：价格小于等于 0");
-    ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_TEMPLATE_NOT_FOUND = new ErrorCode(1_011_003_002, "计算快递运费异常，找不到对应的运费模板");
-    ErrorCode PRICE_CALCULATE_COUPON_NOT_MATCH_NORMAL_ORDER = new ErrorCode(1_011_003_004, "参与秒杀、拼团、砍价的营销商品，无法使用优惠劵");
-    ErrorCode PRICE_CALCULATE_SECKILL_TOTAL_LIMIT_COUNT = new ErrorCode(1_011_003_005, "参与秒杀的商品，超过了秒杀总限购数量");
-    ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_TYPE_ILLEGAL = new ErrorCode(1_011_003_006, "计算快递运费异常，配送方式不匹配");
-    ErrorCode PRICE_CALCULATE_COUPON_CAN_NOT_USE = new ErrorCode(1_011_003_007, "该优惠劵无法使用，原因：{}」");
+    ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_TEMPLATE_NOT_FOUND = new ErrorCode(1_011_003_001, "计算快递运费异常，找不到对应的运费模板");
+    ErrorCode PRICE_CALCULATE_COUPON_NOT_MATCH_NORMAL_ORDER = new ErrorCode(1_011_003_002, "参与秒杀、拼团、砍价的营销商品，无法使用优惠劵");
+    ErrorCode PRICE_CALCULATE_SECKILL_TOTAL_LIMIT_COUNT = new ErrorCode(1_011_003_003, "参与秒杀的商品，超过了秒杀总限购数量");
+    ErrorCode PRICE_CALCULATE_POINT_TOTAL_LIMIT_COUNT = new ErrorCode(1_011_003_004, "参与积分活动的商品，超过了积分活动商品总限购数量");
+    ErrorCode PRICE_CALCULATE_DELIVERY_PRICE_TYPE_ILLEGAL = new ErrorCode(1_011_003_005, "计算快递运费异常，配送方式不匹配");
+    ErrorCode PRICE_CALCULATE_COUPON_CAN_NOT_USE = new ErrorCode(1_011_003_006, "该优惠劵无法使用，原因：{}」");
 
     // ========== 物流 Express 模块 1-011-004-000 ==========
     ErrorCode EXPRESS_NOT_EXISTS = new ErrorCode(1_011_004_000, "快递公司不存在");
@@ -79,6 +82,7 @@ public interface ErrorCodeConstants {
 
     // ==========  物流 PICK_UP 模块 1-011-006-000 ==========
     ErrorCode PICK_UP_STORE_NOT_EXISTS = new ErrorCode(1_011_006_000, "自提门店不存在");
+    ErrorCode PICK_UP_STORE_STAFF_NOT_EXISTS = new ErrorCode(1_011_006_000, "自提门店店员不存在");
 
     // ========== 分销用户 模块 1-011-007-000 ==========
     ErrorCode BROKERAGE_USER_NOT_EXISTS = new ErrorCode(1_011_007_000, "分销用户不存在");
@@ -90,6 +94,7 @@ public interface ErrorCodeConstants {
     ErrorCode BROKERAGE_BIND_OVERRIDE = new ErrorCode(1_011_007_006, "已绑定了推广人");
     ErrorCode BROKERAGE_BIND_LOOP = new ErrorCode(1_011_007_007, "下级不能绑定自己的上级");
     ErrorCode BROKERAGE_USER_LEVEL_NOT_SUPPORT = new ErrorCode(1_011_007_008, "目前只支持 level 小于等于 2");
+    ErrorCode BROKERAGE_CREATE_USER_EXISTS = new ErrorCode(1_011_007_009, "分销用户已存在");
 
     // ========== 分销提现 模块 1-011-008-000 ==========
     ErrorCode BROKERAGE_WITHDRAW_NOT_EXISTS = new ErrorCode(1_011_008_000, "佣金提现记录不存在");

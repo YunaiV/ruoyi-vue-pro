@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.erp.controller.admin.stock.vo.record;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
-import cn.iocoder.yudao.module.erp.enums.DictTypeConstants;
+import cn.iocoder.yudao.module.erp.enums.ErpDictTypeConstants;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -36,7 +36,7 @@ public class ErpStockRecordRespVO {
 
     @Schema(description = "业务类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     @ExcelProperty(value = "业务类型", converter = DictConvert.class)
-    @DictFormat(DictTypeConstants.STOCK_RECORD_BIZ_TYPE)
+    @DictFormat(ErpDictTypeConstants.STOCK_RECORD_BIZ_TYPE)
     private Integer bizType;
 
     @Schema(description = "业务编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "27093")

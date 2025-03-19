@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.crm.enums.common;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 @RequiredArgsConstructor
 @Getter
-public enum CrmAuditStatusEnum implements IntArrayValuable {
+public enum CrmAuditStatusEnum implements ArrayValuable<Integer> {
 
     DRAFT(0, "未提交"),
     PROCESS(10, "审批中"),
@@ -24,10 +24,10 @@ public enum CrmAuditStatusEnum implements IntArrayValuable {
     private final Integer status;
     private final String name;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmAuditStatusEnum::getStatus).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(CrmAuditStatusEnum::getStatus).toArray(Integer[]::new);
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

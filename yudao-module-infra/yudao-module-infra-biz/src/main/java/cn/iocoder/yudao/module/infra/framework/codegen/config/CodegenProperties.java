@@ -34,4 +34,10 @@ public class CodegenProperties {
     @NotNull(message = "代码生成的前端类型不能为空")
     private Integer frontType;
 
+    /**
+     * 是否生成单元测试
+     */
+    @NotNull(message = "是否生成单元测试不能为空")
+    private Boolean unitTestEnable;
+
 }

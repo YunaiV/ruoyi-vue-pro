@@ -173,6 +173,22 @@ public class CrmReceivableController {
         return success(true);
     }
 
+    @PutMapping("/approve")
+    @Operation(summary = "审批回款")
+    @PreAuthorize("@ss.hasPermission('crm:receivable:approve')")
+    public CommonResult<Boolean> approveReceivable(@RequestParam("id") Long id) {
+        receivableService.approveReceivable(id, getLoginUserId());
+        return success(true);
+    }
+
+    @PutMapping("/cancelApprove")
+    @Operation(summary = "取消回款审批")
+    @PreAuthorize("@ss.hasPermission('crm:receivable:approve')")
+    public CommonResult<Boolean> cancelApproveReceivable(@RequestParam("id") Long id) {
+        receivableService.cancelApproveReceivable(id, getLoginUserId());
+        return success(true);
+    }
+
     @GetMapping("/audit-count")
     @Operation(summary = "获得待审核回款数量")
     @PreAuthorize("@ss.hasPermission('crm:receivable:query')")

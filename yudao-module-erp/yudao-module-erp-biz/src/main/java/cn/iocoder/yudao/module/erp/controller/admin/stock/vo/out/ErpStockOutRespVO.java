@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static cn.iocoder.yudao.module.erp.enums.DictTypeConstants.AUDIT_STATUS;
+import static cn.iocoder.yudao.module.erp.enums.ErpDictTypeConstants.AUDIT_STATUS;
 
 @Schema(description = "管理后台 - ERP 其它出库单 Response VO")
 @Data

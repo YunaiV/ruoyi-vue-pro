@@ -1,25 +1,28 @@
 package com.somle.kingdee.service;
 
 import cn.hutool.core.util.ObjUtil;
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
-import com.somle.framework.common.util.web.RequestX;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
+import cn.iocoder.yudao.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
+import cn.iocoder.yudao.framework.common.util.web.RequestX;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import com.somle.kingdee.model.*;
-import com.somle.framework.common.util.web.WebUtils;
 import com.somle.kingdee.model.supplier.KingdeeSupplier;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
+
 import static com.somle.kingdee.util.SignatureUtils.*;
 
 /**
@@ -36,18 +39,26 @@ public class KingdeeClient {
         this.token = token;
     }
 
-    public KingdeeToken refreshAuth() {
-        return fillAuth(pushAuth(token));
+    /**
+     * 根据OuterInstanceId覆盖内存的KingdeeToken
+     *
+     * @return KingdeeToken
+     */
+    protected KingdeeToken refreshAuth() {
+        return fillAuth(pushAuth(token.getOuterInstanceId()));
     }
 
-    public KingdeeToken fillAuth(KingdeeToken token) {
-        token.setAppSignature(getAppSignature(token));
-        token.setAppToken(getAppToken(token));
+    private KingdeeToken fillAuth(KingdeeToken newToken) {
+        String signature = getAppSignature(newToken);
+        token.setAppSignature(signature);
+        newToken.setAppSignature(signature);//响应返回值没有签名->需要计算
+
+        token.setAppToken(getAppToken(newToken));
         log.info("tokens filled successfully");
         return token;
     }
 
-    public String getAppToken(KingdeeToken token) {
+    private String getAppToken(KingdeeToken token) {
         log.info("preparing app token");
         String appKey = token.getAppKey();
         String appSignature = token.getAppSignature();
@@ -63,14 +74,13 @@ public class KingdeeClient {
             .requestMethod(RequestX.Method.GET)
             .url(fullUrl)
             .queryParams(params)
-            .headers(getAuthHeaders(ctime,apiSignature))
+            .headers(getAuthHeaders(ctime, apiSignature))
             .build();
         KingdeeResponse response = WebUtils.sendRequest(request, KingdeeResponse.class);
         return response.getData(JSONObject.class).getString("app-token");
     }
 
-    public KingdeeToken pushAuth(KingdeeToken token) {
-        String outerInstanceId = token.getOuterInstanceId();
+    private KingdeeToken pushAuth(String outerInstanceId) {
         String reqMtd = "POST";
         String ctime = String.valueOf(System.currentTimeMillis());
         String endUrl = "/jdyconnector/app_management/push_app_authorize";
@@ -82,13 +92,12 @@ public class KingdeeClient {
             .requestMethod(RequestX.Method.POST)
             .url(fullUrl)
             .queryParams(params)
-            .headers(getAuthHeaders(ctime,apiSignature))
+            .headers(getAuthHeaders(ctime, apiSignature))
             .build();
         KingdeeResponse response = WebUtils.sendRequest(request, KingdeeResponse.class);
         return response.getDataList(KingdeeToken.class).get(0);
 
     }
-
 
 
     public KingdeeResponse getSupplier() {
@@ -111,17 +120,36 @@ public class KingdeeClient {
 
     public KingdeeResponse getVoucherDetail(String id) {
         String endUrl = "/jdy/v2/fi/voucher_detail";
-        TreeMap<String, String>  params = new TreeMap<>();
+        TreeMap<String, String> params = new TreeMap<>();
         params.put("id", id);
         KingdeeResponse response = getResponse(endUrl, params);
         return response;
     }
 
-    public KingdeeUnit getMeasureUnitByNumber(String number) {
-        String endUrl = "/jdy/v2/bd/measure_unit_detail";
-        TreeMap<String, String>  params = new TreeMap<>();
-        params.put("number", number);
-        return getResponse(endUrl, params).getData(KingdeeUnit.class);
+    /**
+     * 安全设置单位id，如果它存在。
+     * @param unitName 单位名称
+     * @param setter   回调函数
+     */
+    private void setUnitId(String unitName, Consumer<KingdeeUnit> setter) {
+        getMeasureUnitByNumber(unitName, (kingdeeUnit, e) -> {
+            if (e == null) {
+                setter.accept(kingdeeUnit);
+            }
+        });
+    }
+
+    public void getMeasureUnitByNumber(String number, BiConsumer<KingdeeUnit, Exception> callback) {
+        try {
+            String endUrl = "/jdy/v2/bd/measure_unit_detail";
+            TreeMap<String, String> params = new TreeMap<>();
+            params.put("number", number);
+            KingdeeUnit kingdeeUnit = getResponse(endUrl, params).getData(KingdeeUnit.class);
+            callback.accept(kingdeeUnit, null);
+        } catch (Exception e) {
+            log.debug("getMeasureUnitByNumber error,当前产品的单位也许不存在。", e);
+            callback.accept(null, e);
+        }
     }
 
     public KingdeeResponse getMaterial(String number) {
@@ -132,33 +160,53 @@ public class KingdeeClient {
         return response;
     }
 
-    public KingdeeResponse addProduct(KingdeeProduct product) {
-        KingdeeProduct kingdeeProductCopy = new KingdeeProduct();
-        BeanUtils.copyProperties(product, kingdeeProductCopy);
+    public KingdeeResponse addProduct(KingdeeProductSaveReqVO product) {
+        KingdeeProductSaveReqVO reqVO = new KingdeeProductSaveReqVO();
+        BeanUtils.copyProperties(product, reqVO);
         try {
-            String id = getMaterial(kingdeeProductCopy.getNumber()).getData(JSONObject.class).getString("id");
-            kingdeeProductCopy.setId(id);
+            String id = getMaterial(reqVO.getNumber()).getData(JSONObject.class).getString("id");
+            reqVO.setId(id);
         } catch (Exception e) {
-            log.debug("id not found for " + kingdeeProductCopy.getNumber() + "adding new");
+            log.debug("id not found for ({}) adding new", reqVO.getNumber());
         }
-
-        kingdeeProductCopy.setVolumeUnitId(getMeasureUnitByNumber("立方厘米").getId());
-        kingdeeProductCopy.setWeightUnitId(getMeasureUnitByNumber("kg").getId());
-        kingdeeProductCopy.setBaseUnitId(getMeasureUnitByNumber("套").getId());
-        kingdeeProductCopy.setCustomField(
-            getCustomFieldByDisplayName("bd_material", "部门"),
-            getAuxInfoByNumber(kingdeeProductCopy.getSaleDepartmentId().toString()).getId()
-        );
+        setUnitId("立方厘米", kingdeeUnit -> reqVO.setVolumeUnitId(kingdeeUnit.getId()));
+        setUnitId("kg", kingdeeUnit -> reqVO.setWeightUnitId(kingdeeUnit.getId()));
+        setUnitId("套", kingdeeUnit -> reqVO.setBaseUnitId(kingdeeUnit.getId()));
         try {
-            kingdeeProductCopy.setCustomField(getCustomFieldByDisplayName("bd_material", "报关品名"), kingdeeProductCopy.getDeclaredTypeZh());
+            Optional.ofNullable(getAuxInfoByNumber(reqVO.getSaleDepartmentId().toString()))
+                .ifPresent(kingdeeUnit ->
+                    setCustomFieldSafely(reqVO, "部门", kingdeeUnit.getId())
+                );
         } catch (Exception e) {
-            log.debug("custom field 报关品名 skipped for " + token.getAccountName());
+            log.debug("getAuxInfoByNumber error for sale department ID: {}", reqVO.getSaleDepartmentId(), e);
         }
+        setCustomFieldSafely(reqVO, "部门", reqVO.getDeclaredTypeZh());
+        setCustomFieldSafely(reqVO, "报关品名", reqVO.getDeclaredTypeZh());
+        setCustomFieldSafely(reqVO, "报关品名(英文)", reqVO.getDeclaredTypeEn());
+        reqVO.setIgnoreWarn(true);//保存覆盖已存在产品
         log.debug("adding product");
         String endUrl = "/jdy/v2/bd/material";
-        TreeMap<String, String>  params = new TreeMap<>();
-        KingdeeResponse response = postResponse(endUrl, params, kingdeeProductCopy);
-        return response;
+        TreeMap<String, String> params = new TreeMap<>();
+        return postResponse(endUrl, params, reqVO);
+    }
+
+
+    /**
+     * 根绝字段名称获取id，如果有该字段、则设置value，没有就日志记录
+     *
+     * @param reqVO       对象
+     * @param displayName 属性名称
+     * @param fieldValue  属性值
+     */
+    private void setCustomFieldSafely(KingdeeProductSaveReqVO reqVO, String displayName, String fieldValue) {
+        try {
+            KingdeeCustomField customField = getCustomFieldByDisplayName("bd_material", displayName);
+            if (customField != null) {
+                reqVO.setCustomField(customField, fieldValue);
+            }
+        } catch (Exception e) {
+            log.debug("custom field " + displayName + " skipped for " + token.getAccountName(), e);
+        }
     }
 
     public KingdeeResponse addSupplier(KingdeeSupplier kingdeeSupplier) {
@@ -171,7 +219,7 @@ public class KingdeeClient {
             log.debug("id not found for " + supplierCopy.getNumber() + "adding new");
         }
         String endUrl = "/jdy/v2/bd/supplier";
-        TreeMap<String, String>  params = new TreeMap<>();
+        TreeMap<String, String> params = new TreeMap<>();
         KingdeeResponse response = postResponse(endUrl, params, supplierCopy);
         return response;
     }
@@ -192,37 +240,37 @@ public class KingdeeClient {
         String groupId = getAuxInfoTypeByNumber("BM").getId();
         //根据number查找金蝶辅助资料中是否存在，number对应erp中的deptId
         KingdeeAuxInfo auxInfoByNumber = getAuxInfoByNumber(departmentCopy.getNumber());
-        if (ObjUtil.isNotEmpty(auxInfoByNumber)){
+        if (ObjUtil.isNotEmpty(auxInfoByNumber)) {
             departmentCopy.setId(auxInfoByNumber.getId());
-        }else {
+        } else {
             //不存在则根据名称去查找是否存在
             KingdeeAuxInfo auxInfoByName = getAuxInfoByName(departmentCopy.getName());
-            if (ObjUtil.isNotEmpty(auxInfoByName)){
+            if (ObjUtil.isNotEmpty(auxInfoByName)) {
                 departmentCopy.setId(auxInfoByName.getId());
             }
         }
         departmentCopy.setGroupId(groupId);
 
-        KingdeeResponse response = postResponse("/jdy/v2/bd/aux_info",  new TreeMap<>(), departmentCopy);
+        KingdeeResponse response = postResponse("/jdy/v2/bd/aux_info", new TreeMap<>(), departmentCopy);
     }
 
     public Stream<KingdeeResponse> list(String endpoint) {
         log.debug("kingdee listing");
         return Stream.iterate(1, n -> n + 1)
-            .map(n->{
+            .map(n -> {
                 String endUrl = endpoint;
-                TreeMap<String, String>  params = new TreeMap<>();
+                TreeMap<String, String> params = new TreeMap<>();
                 params.put("page_size", "100"); //max 100
                 params.put("page", String.valueOf(n));
                 return getResponse(endUrl, params);
             })
-            .takeWhile(n->n.getData(KingdeePage.class).getPage() <= n.getData(KingdeePage.class).getTotalPage());
+            .takeWhile(n -> n.getData(KingdeePage.class).getPage() <= n.getData(KingdeePage.class).getTotalPage());
     }
 
     public KingdeeResponse post(String endpoint, JSONObject payload) {
         log.debug("kingdee posting");
         String endUrl = endpoint;
-        TreeMap<String, String>  params = new TreeMap<>();
+        TreeMap<String, String> params = new TreeMap<>();
         KingdeeResponse response = postResponse(endUrl, params, payload);
         return response;
     }
@@ -230,42 +278,42 @@ public class KingdeeClient {
     public KingdeeAuxInfo getAuxInfoByNumber(String number) {
         log.debug("fetching aux info");
         String endUrl = "/jdy/v2/bd/aux_info";
-        TreeMap<String, String>  params = new TreeMap<>();
+        TreeMap<String, String> params = new TreeMap<>();
         params.put("number", number);
         KingdeeResponse response = getResponse(endUrl, params);
         Optional<KingdeeAuxInfo> first = response.getData(KingdeePage.class).getRowsList(KingdeeAuxInfo.class).stream()
-                .filter(n->n.getNumber().equals(number))
-                .findFirst();
+            .filter(n -> n.getNumber().equals(number))
+            .findFirst();
         return first.orElse(null);
     }
 
     public KingdeeAuxInfo getAuxInfoByName(String name) {
         log.debug("fetching aux info");
         String endUrl = "/jdy/v2/bd/aux_info";
-        TreeMap<String, String>  params = new TreeMap<>();
+        TreeMap<String, String> params = new TreeMap<>();
         params.put("name", name);
         KingdeeResponse response = getResponse(endUrl, params);
         Optional<KingdeeAuxInfo> first = response.getData(KingdeePage.class).getRowsList(KingdeeAuxInfo.class).stream()
-                .filter(n -> n.getName().equals(name))
-                .findFirst();
+            .filter(n -> n.getName().equals(name))
+            .findFirst();
         return first.orElse(null);
     }
 
     public KingdeeAuxInfoType getAuxInfoTypeByNumber(String number) {
         log.debug("fetching aux info");
         String endUrl = "/jdy/v2/bd/aux_info_type";
-        TreeMap<String, String>  params = new TreeMap<>();
+        TreeMap<String, String> params = new TreeMap<>();
         params.put("number", number);
         KingdeeResponse response = getResponse(endUrl, params);
         return response.getData(KingdeePage.class).getRowsList(KingdeeAuxInfoType.class).stream()
-            .filter(n->n.getNumber().equals(number))
+            .filter(n -> n.getNumber().equals(number))
             .findFirst().get();
     }
 
     public Stream<KingdeeCustomField> getCustomField(String entity_number) {
         log.debug("fetching custom field");
         String endUrl = "/jdy/v2/sys/custom_field";
-        TreeMap<String, String>  params = new TreeMap<>();
+        TreeMap<String, String> params = new TreeMap<>();
         params.put("entity_number", entity_number);
         KingdeeResponse response = getResponse(endUrl, params);
         var data = response.getData(KingdeeCustomFieldRespVO.class);
@@ -274,29 +322,73 @@ public class KingdeeClient {
 
     public KingdeeCustomField getCustomFieldByDisplayName(String entity_number, String displayName) {
         return getCustomField(entity_number)
-            .filter(n->n.getDisplayName().equals(displayName))
+            .filter(n -> n.getDisplayName().equals(displayName))
             .findFirst().get();
     }
 
-    public Stream<KingdeePurRequest> getPurRequest(KingdeePurRequestReqVO vo) {
+    public Stream<KingdeePage> streamPurRequest(KingdeePurRequestReqVO vo) {
         log.debug("fetching purchase request");
         String endUrl = "/jdy/v2/scm/pur_request";
-        KingdeeResponse response = getResponse(endUrl, vo);
-        return response.getData(KingdeePage.class).getRowsList(KingdeePurRequest.class).stream();
+        return StreamX.iterate(
+            getPage(JsonUtilsX.toJSONObject(vo), endUrl),
+            page -> page.hasNext(),
+            page -> {
+                vo.setPage(String.valueOf(page.getPage() + 1));
+                return getPage(JsonUtilsX.toJSONObject(vo), endUrl);
+            }
+        );
     }
 
-    public Stream<KingdeePurRequest> getPurOrder(KingdeePurOrderReqVO vo) {
+    public Stream<KingdeePage> streamPurOrder(KingdeePurOrderReqVO vo) {
         log.debug("fetching purchase order");
         String endUrl = "/jdy/v2/scm/pur_order";
-        KingdeeResponse response = getResponse(endUrl, vo);
-        return response.getData(KingdeePage.class).getRowsList(KingdeePurRequest.class).stream();
+        return StreamX.iterate(
+            getPage(JsonUtilsX.toJSONObject(vo), endUrl),
+            page -> page.hasNext(),
+            page -> {
+                vo.setPage(String.valueOf(page.getPage() + 1));
+                return getPage(JsonUtilsX.toJSONObject(vo), endUrl);
+            }
+        );
+    }
+
+    /**
+     * 获取采购单入库列表
+     *
+     * @param vo 请求参数
+     *           2025.03.07 gumaomao
+     */
+    public Stream<KingdeePage> streamPurInbound(KingdeePurInboundReqVO vo) {
+        log.debug("fetching purchase inbound");
+        String endpoint = "/jdy/v2/scm/pur_inbound";
+        return StreamX.iterate(
+            getPage(JsonUtilsX.toJSONObject(vo), endpoint),
+            page -> page.hasNext(),
+            page -> {
+                vo.setPage(String.valueOf(page.getPage() + 1));
+                return getPage(JsonUtilsX.toJSONObject(vo), endpoint);
+            }
+        );
+    }
+
+    public KingdeePurOrderDetail getPurOrderDetail(String purOrderNumber) {
+        String endUrl = "/jdy/v2/scm/pur_order_detail";
+        TreeMap<String, String> params = new TreeMap<>();
+        params.put("number", purOrderNumber);
+        KingdeeResponse response = getResponse(endUrl, params);
+        return response.getData(KingdeePurOrderDetail.class);
+    }
+
+    public KingdeePurRequestDetail getPurRequestDetail(String purOrderNumber) {
+        String endUrl = "/jdy/v2/scm/pur_request_detail";
+        TreeMap<String, String> params = new TreeMap<>();
+        params.put("number", purOrderNumber);
+        KingdeeResponse response = getResponse(endUrl, params);
+        return response.getData(KingdeePurRequestDetail.class);
     }
 
 
-
-
-
-    private KingdeeResponse fetchResponse(String requestMethod, String endUrl, TreeMap<String, String>  params, Object body) {
+    private KingdeeResponse fetchResponse(String requestMethod, String endUrl, TreeMap<String, String> params, Object body) {
         String cts = String.valueOf(System.currentTimeMillis());
         String signature = getApiSignature(requestMethod, endUrl, params, cts);
         Map<String, String> headers = getApiHeaders(cts, signature, token.getAppToken());
@@ -331,21 +423,25 @@ public class KingdeeClient {
         }
     }
 
-    public KingdeeResponse getResponse(String endUrl, TreeMap<String, String>  params) {
+    public KingdeeResponse getResponse(String endUrl, TreeMap<String, String> params) {
         return fetchResponse("GET", endUrl, params, null);
 
     }
 
-    public KingdeeResponse postResponse(String endUrl, TreeMap<String, String>  params, Object payload) {
+    public KingdeeResponse postResponse(String endUrl, TreeMap<String, String> params, Object payload) {
         return fetchResponse("POST", endUrl, params, payload);
     }
 
     public KingdeeResponse getResponse(String endUrl, Object params) {
-        return fetchResponse("GET", endUrl, new TreeMap<>(JsonUtils.toStringMap(params)), null);
+        return fetchResponse("GET", endUrl, new TreeMap<>(JsonUtilsX.toStringMap(params)), null);
     }
 
     public KingdeeResponse postResponse(String endUrl, Object params, Object payload) {
-        return fetchResponse("POST", endUrl, new TreeMap<>(JsonUtils.toStringMap(params)), payload);
+        return fetchResponse("POST", endUrl, new TreeMap<>(JsonUtilsX.toStringMap(params)), payload);
     }
 
+    private KingdeePage getPage(JSONObject payload, String endpoint) {
+        KingdeeResponse response = getResponse(endpoint, payload);
+        return response.getData(KingdeePage.class);
+    }
 }

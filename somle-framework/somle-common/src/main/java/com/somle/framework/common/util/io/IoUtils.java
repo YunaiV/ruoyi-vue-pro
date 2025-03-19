@@ -3,14 +3,9 @@ package com.somle.framework.common.util.io;
 import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 /**
  * IO 工具类，用于 {@link IoUtil} 缺失的方法
@@ -44,6 +39,14 @@ public class IoUtils {
         return result;
     }
 
-
+    /**
+     * 创建一个 Reader 对象，使用 UTF-8 编码。
+     *
+     * @param inputStream 输入流
+     * @return Reader 对象
+     */
+    public static Reader createUtf8Reader(InputStream inputStream) {
+        return new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+    }
 
 }

@@ -52,7 +52,6 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-erp-biz</artifactId>
             <version>${revision}</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -61,8 +60,8 @@
         </dependency>
 
         <dependency>
-            <groupId>com.somle</groupId>
-            <artifactId>somle-spring-boot-starter-test</artifactId>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -80,11 +79,6 @@
         <dependency>
             <groupId>com.somle</groupId>
             <artifactId>somle-ai</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.somle</groupId>
-            <artifactId>somle-erp</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
@@ -148,6 +142,13 @@
             <artifactId>somle-bestbuy</artifactId>
             <version>${revision}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-cdiscount</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
 
     </dependencies>
 

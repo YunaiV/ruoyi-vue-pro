@@ -10,8 +10,8 @@ import java.util.List;
 @Data
 @Builder
 public class AmazonSpReportSaveVO {
-    private String reportType; // Optional: Min count 1, Max count 10
-    private List<String> marketplaceIds; // Optional: Min count 1, Max count 10
+    private String reportType;
+    private List<String> marketplaceIds;
     private ReportOptions reportOptions;
     private String dataStartTime;
     private String dataEndTime;

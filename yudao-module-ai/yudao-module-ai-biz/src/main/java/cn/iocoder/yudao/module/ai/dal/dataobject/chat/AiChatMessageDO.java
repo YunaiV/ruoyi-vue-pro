@@ -1,13 +1,18 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.chat;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import org.springframework.ai.chat.messages.MessageType;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
+import org.springframework.ai.chat.messages.MessageType;
+
+import java.util.List;
 
 /**
  * AI Chat 消息 DO
@@ -65,6 +70,15 @@ public class AiChatMessageDO extends BaseDO {
      * 关联 {@link AiChatRoleDO#getId()} 字段
      */
     private Long roleId;
+
+
+    /**
+     * 段落编号数组
+     *
+     * 关联 {@link AiKnowledgeSegmentDO#getId()} 字段
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<Long> segmentIds;
 
     /**
      * 模型标志

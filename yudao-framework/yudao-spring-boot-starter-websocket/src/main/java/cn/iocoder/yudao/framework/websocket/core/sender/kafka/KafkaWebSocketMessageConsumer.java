@@ -12,7 +12,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 @RequiredArgsConstructor
 public class KafkaWebSocketMessageConsumer {
 
-    private final KafkaWebSocketMessageSender rabbitMQWebSocketMessageSender;
+    private final KafkaWebSocketMessageSender kafkaWebSocketMessageSender;
 
     @RabbitHandler
     @KafkaListener(
@@ -20,7 +20,7 @@ public class KafkaWebSocketMessageConsumer {
             // 在 Group 上，使用 UUID 生成其后缀。这样，启动的 Consumer 的 Group 不同，以达到广播消费的目的
             groupId = "${yudao.websocket.sender-kafka.consumer-group}" + "-" + "#{T(java.util.UUID).randomUUID()}")
     public void onMessage(KafkaWebSocketMessage message) {
-        rabbitMQWebSocketMessageSender.send(message.getSessionId(),
+        kafkaWebSocketMessageSender.send(message.getSessionId(),
                 message.getUserType(), message.getUserId(),
                 message.getMessageType(), message.getMessageContent());
     }

@@ -2,15 +2,11 @@ package com.somle.esb.job;
 
 
 import com.somle.eccang.model.EccangOrderVO;
-import com.somle.eccang.service.EccangService;
-import com.somle.esb.model.Domain;
 import com.somle.esb.model.OssData;
-import com.somle.esb.service.EsbService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EccangOrderPlatformPayDataJob extends EccangDataJob{
+public class EccangOrderPlatformPayDataJob extends EccangDataJob {
 
 
     @Override
@@ -19,8 +15,10 @@ public class EccangOrderPlatformPayDataJob extends EccangDataJob{
 
         eccangService.getOrderPlusArchivePages(
                 EccangOrderVO.builder()
-                    .platformPaidDateStart(beforeYesterdayFirstSecond)
-                    .platformPaidDateEnd(beforeYesterdayLastSecond)
+                    .condition(EccangOrderVO.Condition.builder()
+                        .platformPaidDateStart(beforeYesterdayFirstSecond)
+                        .platformPaidDateEnd(beforeYesterdayLastSecond)
+                        .build())
                     .build(),
                 beforeYesterday.getYear()
             )
@@ -37,8 +35,7 @@ public class EccangOrderPlatformPayDataJob extends EccangDataJob{
                 service.send(data);
             });
 
-        
-        
+
         return "data upload success";
     }
 }

@@ -44,7 +44,7 @@ public class BrokerageRecordController {
     @Operation(summary = "获得佣金记录")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('trade:brokerage-record:query')")
-    public CommonResult<BrokerageRecordRespVO> getBrokerageRecord(@RequestParam("id") Integer id) {
+    public CommonResult<BrokerageRecordRespVO> getBrokerageRecord(@RequestParam("id") Long id) {
         BrokerageRecordDO brokerageRecord = brokerageRecordService.getBrokerageRecord(id);
         return success(BrokerageRecordConvert.INSTANCE.convert(brokerageRecord));
     }

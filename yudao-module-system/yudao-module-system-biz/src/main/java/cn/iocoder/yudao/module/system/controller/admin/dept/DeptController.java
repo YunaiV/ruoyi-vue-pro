@@ -2,8 +2,9 @@ package cn.iocoder.yudao.module.system.controller.admin.dept;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.*;
+import cn.iocoder.yudao.module.system.convert.dept.DeptConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,11 +29,16 @@ public class DeptController {
     @Resource
     private DeptService deptService;
 
+    @Resource
+    private DeptApi deptApi;
+
+    private DeptConvert deptConvert = DeptConvert.INSTANCE;
+
     @PostMapping("create")
     @Operation(summary = "创建部门")
     @PreAuthorize("@ss.hasPermission('system:dept:create')")
     public CommonResult<Long> createDept(@Valid @RequestBody DeptSaveReqVO createReqVO) {
-        Long deptId = deptService.createDept(createReqVO);
+        Long deptId = deptService.createDept(deptConvert.toSaveReqDTO(createReqVO));
         return success(deptId);
     }
 
@@ -40,7 +46,7 @@ public class DeptController {
     @Operation(summary = "更新部门")
     @PreAuthorize("@ss.hasPermission('system:dept:update')")
     public CommonResult<Boolean> updateDept(@Valid @RequestBody DeptSaveReqVO updateReqVO) {
-        deptService.updateDept(updateReqVO);
+        deptService.updateDept(deptConvert.toSaveReqDTO(updateReqVO));
         return success(true);
     }
 
@@ -58,7 +64,7 @@ public class DeptController {
     @PreAuthorize("@ss.hasPermission('system:dept:query')")
     public CommonResult<List<DeptRespVO>> getDeptList(DeptListReqVO reqVO) {
         List<DeptDO> list = deptService.getDeptList(reqVO);
-        return success(BeanUtils.toBean(list, DeptRespVO.class));
+        return success(deptConvert.toRespVOs(deptConvert.toRespDTOs(list)));
     }
 
     @GetMapping(value = {"/list-all-simple", "/simple-list"})
@@ -66,7 +72,7 @@ public class DeptController {
     public CommonResult<List<DeptSimpleRespVO>> getSimpleDeptList() {
         List<DeptDO> list = deptService.getDeptList(
                 new DeptListReqVO().setStatus(CommonStatusEnum.ENABLE.getStatus()));
-        return success(BeanUtils.toBean(list, DeptSimpleRespVO.class));
+        return success(deptConvert.toSimpleRespVOs(list));
     }
 
     @GetMapping("/get")
@@ -75,7 +81,7 @@ public class DeptController {
     @PreAuthorize("@ss.hasPermission('system:dept:query')")
     public CommonResult<DeptRespVO> getDept(@RequestParam("id") Long id) {
         DeptDO dept = deptService.getDept(id);
-        return success(BeanUtils.toBean(dept, DeptRespVO.class));
+        return success(deptConvert.toRespVO(deptConvert.toRespDTO(dept)));
     }
 
     @GetMapping("/getTreeDeptList")

@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +38,7 @@ public class AppDiyTemplateController {
     // TODO @疯狂：要不要把 used 和 get 接口合并哈；不传递 id，直接拿默认；
     @GetMapping("/used")
     @Operation(summary = "使用中的装修模板")
+    @PermitAll
     public CommonResult<AppDiyTemplatePropertyRespVO> getUsedDiyTemplate() {
         DiyTemplateDO diyTemplate = diyTemplateService.getUsedDiyTemplate();
         return success(buildVo(diyTemplate));
@@ -45,6 +47,7 @@ public class AppDiyTemplateController {
     @GetMapping("/get")
     @Operation(summary = "获得装修模板")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PermitAll
     public CommonResult<AppDiyTemplatePropertyRespVO> getDiyTemplate(@RequestParam("id") Long id) {
         DiyTemplateDO diyTemplate = diyTemplateService.getDiyTemplate(id);
         return success(buildVo(diyTemplate));

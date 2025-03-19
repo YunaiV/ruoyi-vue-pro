@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.pay.dal.mysql.transfer.PayTransferMapper;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferStatusEnum;
+import cn.iocoder.yudao.module.pay.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
@@ -49,6 +50,9 @@ import static cn.iocoder.yudao.module.pay.enums.transfer.PayTransferStatusEnum.*
 public class PayTransferServiceImpl implements PayTransferService {
 
     private static final String TRANSFER_NO_PREFIX = "T";
+
+    @Resource
+    private PayProperties payProperties;
 
     @Resource
     private PayTransferMapper transferMapper;
@@ -96,13 +100,15 @@ public class PayTransferServiceImpl implements PayTransferService {
             transfer = INSTANCE.convert(reqDTO)
                     .setChannelId(channel.getId())
                     .setNo(no).setStatus(WAITING.getStatus())
-                    .setNotifyUrl(payApp.getTransferNotifyUrl());
+                    .setNotifyUrl(payApp.getTransferNotifyUrl())
+                    .setAppId(channel.getAppId());
             transferMapper.insert(transfer);
         }
         try {
             // 3. 调用三方渠道发起转账
             PayTransferUnifiedReqDTO transferUnifiedReq = INSTANCE.convert2(transfer)
                     .setOutTransferNo(transfer.getNo());
+            transferUnifiedReq.setNotifyUrl(genChannelTransferNotifyUrl(channel));
             PayTransferRespDTO unifiedTransferResp = client.unifiedTransfer(transferUnifiedReq);
             // 4. 通知转账结果
             getSelf().notifyTransfer(channel, unifiedTransferResp);
@@ -114,6 +120,16 @@ public class PayTransferServiceImpl implements PayTransferService {
         }
 
         return transfer.getId();
+    }
+
+    /**
+     * 根据支付渠道的编码，生成支付渠道的回调地址
+     *
+     * @param channel 支付渠道
+     * @return 支付渠道的回调地址  配置地址 + "/" + channel id
+     */
+    private String genChannelTransferNotifyUrl(PayChannelDO channel) {
+        return payProperties.getTransferNotifyUrl() + "/" + channel.getId();
     }
 
     private PayTransferDO validateTransferCanCreate(PayTransferCreateReqDTO dto, Long appId) {
@@ -154,7 +170,7 @@ public class PayTransferServiceImpl implements PayTransferService {
 
     private void notifyTransferInProgress(PayChannelDO channel, PayTransferRespDTO notify) {
         // 1.校验
-        PayTransferDO transfer = transferMapper.selectByNo(notify.getOutTransferNo());
+        PayTransferDO transfer = transferMapper.selectByAppIdAndNo(channel.getAppId(), notify.getOutTransferNo());
         if (transfer == null) {
             throw exception(PAY_TRANSFER_NOT_FOUND);
         }
@@ -172,16 +188,12 @@ public class PayTransferServiceImpl implements PayTransferService {
             throw exception(PAY_TRANSFER_STATUS_IS_NOT_WAITING);
         }
         log.info("[notifyTransferInProgress][transfer({}) 更新为转账进行中状态]", transfer.getId());
-
-        // 3. 插入转账通知记录
-        notifyService.createPayNotifyTask(PayNotifyTypeEnum.TRANSFER.getType(),
-                transfer.getId());
     }
 
 
     private void notifyTransferSuccess(PayChannelDO channel, PayTransferRespDTO notify) {
         // 1.校验
-        PayTransferDO transfer = transferMapper.selectByNo(notify.getOutTransferNo());
+        PayTransferDO transfer = transferMapper.selectByAppIdAndNo(channel.getAppId(), notify.getOutTransferNo());
         if (transfer == null) {
             throw exception(PAY_TRANSFER_NOT_FOUND);
         }
@@ -210,7 +222,7 @@ public class PayTransferServiceImpl implements PayTransferService {
 
     private void notifyTransferClosed(PayChannelDO channel, PayTransferRespDTO notify) {
         // 1.校验
-        PayTransferDO transfer = transferMapper.selectByNo(notify.getOutTransferNo());
+        PayTransferDO transfer = transferMapper.selectByAppIdAndNo(channel.getAppId(), notify.getOutTransferNo());
         if (transfer == null) {
             throw exception(PAY_TRANSFER_NOT_FOUND);
         }
@@ -283,7 +295,7 @@ public class PayTransferServiceImpl implements PayTransferService {
         }
     }
 
-    private void notifyTransfer(Long channelId, PayTransferRespDTO notify) {
+    public void notifyTransfer(Long channelId, PayTransferRespDTO notify) {
         // 校验渠道是否有效
         PayChannelDO channel = channelService.validPayChannel(channelId);
         // 通知转账结果给对应的业务

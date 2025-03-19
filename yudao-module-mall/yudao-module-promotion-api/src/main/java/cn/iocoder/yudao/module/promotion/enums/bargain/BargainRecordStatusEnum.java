@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.promotion.enums.bargain;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,14 +13,14 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @Getter
-public enum BargainRecordStatusEnum implements IntArrayValuable {
+public enum BargainRecordStatusEnum implements ArrayValuable<Integer> {
 
     IN_PROGRESS(1, "砍价中"),
     SUCCESS(2, "砍价成功"),
     FAILED(3, "砍价失败"), // 活动到期时，会自动将到期的砍价全部设置为过期
     ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BargainRecordStatusEnum::getStatus).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(BargainRecordStatusEnum::getStatus).toArray(Integer[]::new);
 
     /**
      * 值
@@ -32,7 +32,7 @@ public enum BargainRecordStatusEnum implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

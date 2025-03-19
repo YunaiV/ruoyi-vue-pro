@@ -26,8 +26,6 @@ public interface DeliveryPickUpStoreConvert {
 
     DeliveryPickUpStoreDO convert(DeliveryPickUpStoreUpdateReqVO bean);
 
-    DeliveryPickUpStoreRespVO convert(DeliveryPickUpStoreDO bean);
-
     List<DeliveryPickUpStoreRespVO> convertList(List<DeliveryPickUpStoreDO> list);
 
     PageResult<DeliveryPickUpStoreRespVO> convertPage(PageResult<DeliveryPickUpStoreDO> page);
@@ -43,14 +41,13 @@ public interface DeliveryPickUpStoreConvert {
 
     default List<AppDeliveryPickUpStoreRespVO> convertList(List<DeliveryPickUpStoreDO> list,
                                                            Double latitude, Double longitude) {
-        List<AppDeliveryPickUpStoreRespVO> voList =  CollectionUtils.convertList(list, store -> {
+        return CollectionUtils.convertList(list, store -> {
             AppDeliveryPickUpStoreRespVO storeVO = convert03(store);
             if (latitude != null && longitude != null) {
                 storeVO.setDistance(NumberUtils.getDistance(latitude, longitude, storeVO.getLatitude(), storeVO.getLongitude()));
             }
             return storeVO;
         });
-        return voList;
     }
     @Mapping(source = "areaId", target = "areaName", qualifiedByName = "convertAreaIdToAreaName")
     AppDeliveryPickUpStoreRespVO convert03(DeliveryPickUpStoreDO bean);

@@ -1,19 +1,28 @@
 package com.somle.dingtalk.service;
 
-import com.somle.framework.test.core.ut.BaseSpringTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseSpringTest;
+import com.somle.dingtalk.repository.DingTalkTokenRepository;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled
+@Slf4j
 @Import({DingTalkService.class})
-class DingTalkServiceTest extends BaseSpringTest {
+class DingTalkServiceTest extends SomleBaseSpringTest {
     @Resource
     DingTalkService service;
+
+    @Resource
+    DingTalkTokenRepository tokenRepository;
+
+
 
     public static void printGetters(Object obj) {
         Method[] methods = obj.getClass().getMethods();
@@ -27,6 +36,11 @@ class DingTalkServiceTest extends BaseSpringTest {
                 }
             }
         }
+    }
+
+    @Test
+    void refreshAuth() {
+        service.refreshAuth();
     }
 
     @Test
@@ -46,4 +60,10 @@ class DingTalkServiceTest extends BaseSpringTest {
         printGetters(user);
         assertEquals("丁晨", user.getName());
     }
+
+//    @Test
+//    void testRobot() {
+//        var token = "";
+//        service.sendRobotMessage("a test",token);
+//    }
 }

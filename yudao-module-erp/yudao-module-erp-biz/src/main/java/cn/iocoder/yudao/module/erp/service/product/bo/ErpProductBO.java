@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.erp.service.product.bo;
 
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.json.GuidePriceJson;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author: Wqh
@@ -19,10 +21,6 @@ public class ErpProductBO {
      */
     private String name;
     /**
-     * 产品分类编号
-     */
-    private Long categoryId;
-    /**
      * 部门id
      */
     private Long deptId;
@@ -30,6 +28,10 @@ public class ErpProductBO {
      * SKU（编码）
      */
     private String barCode;
+    /**
+     * 产品分类编号
+     */
+    private Long categoryId;
     /**
      * 单位编号
      */
@@ -39,9 +41,17 @@ public class ErpProductBO {
      */
     private String material;
     /**
+     * 产品材质-关联海关分类
+     */
+    private Long customCategoryId;
+    /**
      * 产品状态（1启用，0禁用）
      */
     private Boolean status;
+    /**
+     * 品牌
+     */
+    private String brand;
     /**
      * 备注
      */
@@ -49,7 +59,7 @@ public class ErpProductBO {
     /**
      * 基础重量（kg）
      */
-    private Integer weight;
+    private BigDecimal weight;
     /**
      * 系列
      */
@@ -87,25 +97,33 @@ public class ErpProductBO {
      */
     private String primaryImageUrl;
     /**
-     * 副图urls
+     * 次图urls
      */
     private String secondaryImageUrls;
     /**
      * 副图urlList
      */
-    private String secondaryImageUrlList;
+    private List<String> secondaryImageUrlList;
+    /**
+     * 指导价list
+     */
+    private List<GuidePriceJson> guidePriceList;
     /**
      * 指导价，json格式
      */
     private String guidePrices;
     /**
-     * 指导价list
+     * 专利国别
      */
-    private String guidePriceList;
+    private String patentCountryCodes;
     /**
-     * 专利
+     * 专利国别list
      */
-    private String patent;
+    private List<Integer> patentCountryCodeList;
+    /**
+     * 专利类型
+     */
+    private Integer patentType;
     /**
      * PO产品经理id
      */
@@ -122,4 +140,24 @@ public class ErpProductBO {
      * 维护工程师id
      */
     private Long maintenanceEngineerId;
+    /**
+     * 设计说明
+     */
+    private String description;
+    /**
+     * 包装高度（mm）
+     */
+    private Integer packageHeight;
+    /**
+     * 包装长度（mm）
+     */
+    private Integer packageLength;
+    /**
+     * 包装重量
+     */
+    private BigDecimal packageWeight;
+    /**
+     * 包装宽度（mm）
+     */
+    private Integer packageWidth;
 }

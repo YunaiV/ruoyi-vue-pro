@@ -124,11 +124,6 @@
         </dependency>
 
         <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>transmittable-thread-local</artifactId>
         </dependency>
@@ -137,6 +132,62 @@
             <groupId>com.fhs-opensource</groupId> <!-- VO 数据翻译 -->
             <artifactId>easy-trans-anno</artifactId> <!-- 默认引入的原因，方便 xxx-module-api 包使用 -->
         </dependency>
+
+
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-json</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bucket4j</groupId>
+            <artifactId>bucket4j-core</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.belerweb</groupId>
+            <artifactId>pinyin4j</artifactId>
+            <version>2.5.1</version>
+        </dependency>
+
 
         <!-- Test 测试相关 -->
         <dependency>

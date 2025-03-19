@@ -39,7 +39,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.xiaoymin</groupId>
+            <groupId>com.github.xingfudeshi</groupId>
             <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
         </dependency>
         <dependency>

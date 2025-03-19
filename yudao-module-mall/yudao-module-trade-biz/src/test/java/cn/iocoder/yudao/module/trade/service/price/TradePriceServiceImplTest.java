@@ -72,7 +72,7 @@ public class TradePriceServiceImplTest extends BaseMockitoUnitTest {
                         .setStatus(ProductSpuStatusEnum.ENABLE.getStatus())));
 
         // 调用
-        TradePriceCalculateRespBO calculateRespBO = tradePriceService.calculatePrice(calculateReqBO);
+        TradePriceCalculateRespBO calculateRespBO = tradePriceService.calculateOrderPrice(calculateReqBO);
         // 断言
         assertEquals(TradeOrderTypeEnum.NORMAL.getType(), calculateRespBO.getType());
         assertEquals(0, calculateRespBO.getPromotions().size());

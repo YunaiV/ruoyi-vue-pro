@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.erp.controller.admin.finance.vo.payment;
 
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Schema(description = "管理后台 - ERP 付款单 Response VO")
 @Data
+@ExcelIgnoreUnannotated
 public class ErpFinancePaymentRespVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "23752")

@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
-import cn.iocoder.yudao.module.bpm.service.definition.dto.BpmModelMetaInfoRespDTO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
@@ -18,7 +18,7 @@ import java.util.Set;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
- * Flowable流程定义接口
+ * 流程定义接口
  *
  * @author yunlong.li
  * @author ZJQ
@@ -48,10 +48,12 @@ public interface BpmProcessDefinitionService {
      * @param model 流程模型
      * @param modelMetaInfo 流程模型元信息
      * @param bpmnBytes BPMN XML 字节数组
+     * @param simpleJson SIMPLE Model JSON
      * @param form 表单
      * @return 流程编号
      */
-    String createProcessDefinition(Model model, BpmModelMetaInfoRespDTO modelMetaInfo, byte[] bpmnBytes, BpmFormDO form);
+    String createProcessDefinition(Model model, BpmModelMetaInfoVO modelMetaInfo,
+                                   byte[] bpmnBytes, String simpleJson, BpmFormDO form);
 
     /**
      * 更新流程定义状态
@@ -60,6 +62,14 @@ public interface BpmProcessDefinitionService {
      * @param state 状态
      */
     void updateProcessDefinitionState(String id, Integer state);
+
+    /**
+     * 更新模型编号
+     *
+     * @param modelId 流程定义编号
+     * @param sort 排序
+     */
+    void updateProcessDefinitionSortByModelId(String modelId, Long sort);
 
     /**
      * 获得流程定义对应的 BPMN
@@ -132,6 +142,15 @@ public interface BpmProcessDefinitionService {
      * @return 流程定义
      */
     ProcessDefinition getActiveProcessDefinition(String key);
+
+    /**
+     * 判断用户是否可以使用该流程定义，进行流程的发起
+     *
+     * @param processDefinition 流程定义
+     * @param userId 用户编号
+     * @return 是否可以发起流程
+     */
+    boolean canUserStartProcessDefinition(BpmProcessDefinitionInfoDO processDefinition, Long userId);
 
     /**
      * 获得 ids 对应的 Deployment Map

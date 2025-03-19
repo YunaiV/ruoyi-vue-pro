@@ -3,18 +3,15 @@ package cn.iocoder.yudao.module.erp.dal.redis.no;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.text.StrPool;
-import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
-import cn.iocoder.yudao.module.erp.dal.redis.RedisKeyConstants;
+import cn.iocoder.yudao.module.erp.dal.redis.ErpRedisKeyConstants;
 import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PURCHASE_REQUEST_NO_EXISTS;
 
 
 /**
@@ -62,7 +59,7 @@ public class ErpNoRedisDAO {
      */
     public static final String PURCHASE_ORDER_NO_PREFIX = "CGDD";
     /**
-     * 采购订单 {@link cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO}
+     * 采购申请 {@link cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO}
      */
     public static final String PURCHASE_REQUEST_NO_PREFIX = "CGSQ";
     /**
@@ -95,14 +92,14 @@ public class ErpNoRedisDAO {
      */
     public String generate(String prefix, ErrorCode message) {
         // 递增序号
-        String noPrefix = prefix + StrPool.DASHED + DateUtil.format(LocalDateTime.now(), DatePattern.PURE_DATE_PATTERN);
-        String key = RedisKeyConstants.NO + noPrefix;
+        String keyPrefix = prefix + StrPool.DASHED + DateUtil.format(LocalDateTime.now(), DatePattern.PURE_DATE_PATTERN);
+        String key = ErpRedisKeyConstants.NO + keyPrefix;
         Long no = stringRedisTemplate.opsForValue().increment(key);
         //判断no是否大于6位数
         ThrowUtil.ifGreater(no, 999999L, message);
         // 设置过期时间
         stringRedisTemplate.expire(key, Duration.ofDays(1L));
-        return noPrefix + StrPool.DASHED + String.format("%06d", no);
+        return keyPrefix + StrPool.DASHED + String.format("%06d", no);
     }
 
 }

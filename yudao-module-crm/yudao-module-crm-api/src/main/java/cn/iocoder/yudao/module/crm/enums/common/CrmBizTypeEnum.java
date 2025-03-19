@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.crm.enums.common;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -15,7 +15,7 @@ import java.util.Arrays;
  */
 @RequiredArgsConstructor
 @Getter
-public enum CrmBizTypeEnum implements IntArrayValuable {
+public enum CrmBizTypeEnum implements ArrayValuable<Integer> {
 
     CRM_CLUE(1, "线索"),
     CRM_CUSTOMER(2, "客户"),
@@ -27,7 +27,7 @@ public enum CrmBizTypeEnum implements IntArrayValuable {
     CRM_RECEIVABLE_PLAN(8, "回款计划")
     ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmBizTypeEnum::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(CrmBizTypeEnum::getType).toArray(Integer[]::new);
 
     /**
      * 类型
@@ -45,7 +45,7 @@ public enum CrmBizTypeEnum implements IntArrayValuable {
     }
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 
