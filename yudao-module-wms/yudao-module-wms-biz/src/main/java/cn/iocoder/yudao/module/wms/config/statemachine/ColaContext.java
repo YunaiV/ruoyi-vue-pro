@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.wms.config.statemachine;
 
+import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,15 +13,21 @@ import java.util.List;
 
 public class ColaContext<T> {
 
-    public static <X> ColaContext<X> from(X requestDO) {
+
+    public static <X> ColaContext<X> from(X requestDO, WmsApprovalReqVO approvalReqVO) {
         ColaContext<X> context = new ColaContext<>();
         context.data=requestDO;
+        context.approvalReqVO=approvalReqVO;
         context.success=true;
         return context;
     }
-
+    /**
+     * 是否被处理
+     **/
+    private Boolean handled = false;
     private Boolean success = true;
     private T data;
+    private WmsApprovalReqVO approvalReqVO;
     private List<String> errors = new ArrayList<>();
 
 
@@ -31,8 +39,21 @@ public class ColaContext<T> {
         return !success;
     }
 
+    public Boolean handled() {
+        return handled;
+    }
+
+    public void handled(Boolean handled) {
+        this.handled=handled;
+    }
+
+
     public T data() {
         return data;
+    }
+
+    public WmsApprovalReqVO approvalReqVO() {
+        return approvalReqVO;
     }
 
     public void addError(String message) {

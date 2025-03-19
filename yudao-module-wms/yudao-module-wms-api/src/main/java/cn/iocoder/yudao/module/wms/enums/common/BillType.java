@@ -14,8 +14,8 @@ import java.util.Arrays;
 @Getter
 public enum BillType implements ArrayValuable<Integer>, DictEnum {
 
-    INBOUND(0, "出库单"),
-    OUTBOUND(1, "入库单");
+    INBOUND(0, "入库单"),
+    OUTBOUND(1, "出库单");
 
     public static final Integer[] VALUES = Arrays.stream(values()).map(BillType::getValue).toArray(Integer[]::new);
 

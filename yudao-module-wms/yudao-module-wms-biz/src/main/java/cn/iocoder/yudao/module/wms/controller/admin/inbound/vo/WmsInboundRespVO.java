@@ -11,7 +11,7 @@ import java.util.List;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 
 /**
- * @table-fields : tenant_id,no,creator,actual_arrival_time,create_time,creator_comment,source_bill_id,trace_no,type,refer_no,updater,update_time,plan_arrival_time,init_age,shipping_method,source_bill_no,source_bill_type,id,status,warehouse_id
+ * @table-fields : tenant_id,no,creator,actual_arrival_time,create_time,creator_comment,type,source_bill_id,trace_no,refer_no,updater,update_time,plan_arrival_time,init_age,source_bill_no,shipping_method,source_bill_type,id,warehouse_id,status
  */
 @Schema(description = "管理后台 - 入库单 Response VO")
 @Data
@@ -34,7 +34,7 @@ public class WmsInboundRespVO {
     @ExcelProperty("仓库ID")
     private Long warehouseId;
 
-    @Schema(description = "入库单类型 ; InboundStatus : 0-起草中 , 0-待审批 , 0-已驳回 , 0-已通过", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "入库单类型 ; InboundStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @ExcelProperty("入库单类型")
     private Integer status;
 
@@ -46,7 +46,7 @@ public class WmsInboundRespVO {
     @ExcelProperty("来源单据号")
     private String sourceBillNo;
 
-    @Schema(description = "来源单据类型 ; SourceBillType : 0-出库单 , 1-入库单", example = "2")
+    @Schema(description = "来源单据类型 ; BillType : 0-入库单 , 1-出库单", example = "2")
     @ExcelProperty("来源单据类型")
     private Integer sourceBillType;
 

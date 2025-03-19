@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.wms.service.inbound;
 
 import java.util.*;
+import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
+import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 import jakarta.validation.*;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
@@ -27,7 +29,9 @@ public interface WmsInboundService {
      *
      * @param updateReqVO 更新信息
      */
-    WmsInboundDO updateInbound(@Valid WmsInboundSaveReqVO updateReqVO);
+    WmsInboundDO updateInbound(WmsInboundSaveReqVO updateReqVO);
+
+    WmsInboundDO updateInboundStatus(Long id, Integer status);
 
     /**
      * 删除入库单
@@ -56,4 +60,6 @@ public interface WmsInboundService {
      * 按 warehouseId 查询 WmsInboundDO
      */
     List<WmsInboundDO> selectByWarehouseId(Long warehouseId, int limit);
+
+    void approve(InboundStatus.Event event, WmsApprovalReqVO approvalReqVO);
 }

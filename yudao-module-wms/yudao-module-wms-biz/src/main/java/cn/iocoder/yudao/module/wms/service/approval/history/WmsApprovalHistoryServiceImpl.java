@@ -20,7 +20,6 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
  * @author 李方捷
  */
 @Service
-@Validated
 public class WmsApprovalHistoryServiceImpl implements WmsApprovalHistoryService {
 
     @Resource
@@ -84,4 +83,4 @@ public class WmsApprovalHistoryServiceImpl implements WmsApprovalHistoryService 
     public PageResult<WmsApprovalHistoryDO> getApprovalHistoryPage(WmsApprovalHistoryPageReqVO pageReqVO) {
         return approvalHistoryMapper.selectPage(pageReqVO);
     }
-}
+}

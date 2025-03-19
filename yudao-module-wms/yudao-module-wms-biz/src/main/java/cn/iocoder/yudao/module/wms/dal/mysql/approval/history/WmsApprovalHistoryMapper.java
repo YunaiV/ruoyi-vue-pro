@@ -34,4 +34,18 @@ public interface WmsApprovalHistoryMapper extends BaseMapperX<WmsApprovalHistory
     default List<WmsApprovalHistoryDO> selectByIdxBill(String billType, String statusType, String billId) {
         return selectList(new LambdaQueryWrapperX<WmsApprovalHistoryDO>().eq(WmsApprovalHistoryDO::getBillType, billType).eq(WmsApprovalHistoryDO::getStatusType, statusType).eq(WmsApprovalHistoryDO::getBillId, billId));
     }
+
+    /**
+     * 按 bill_type,status_type,bill_id 查询 WmsApprovalHistoryDO 清单
+     */
+    default List<WmsApprovalHistoryDO> selectByIdxBill(Integer billType, String statusType, String billId) {
+        return selectList(new LambdaQueryWrapperX<WmsApprovalHistoryDO>().eq(WmsApprovalHistoryDO::getBillType, billType).eq(WmsApprovalHistoryDO::getStatusType, statusType).eq(WmsApprovalHistoryDO::getBillId, billId));
+    }
+
+    /**
+     * 按 bill_type,status_type,bill_id 查询 WmsApprovalHistoryDO 清单
+     */
+    default List<WmsApprovalHistoryDO> selectByIdxBill(Integer billType, String statusType, Long billId) {
+        return selectList(new LambdaQueryWrapperX<WmsApprovalHistoryDO>().eq(WmsApprovalHistoryDO::getBillType, billType).eq(WmsApprovalHistoryDO::getStatusType, statusType).eq(WmsApprovalHistoryDO::getBillId, billId));
+    }
 }

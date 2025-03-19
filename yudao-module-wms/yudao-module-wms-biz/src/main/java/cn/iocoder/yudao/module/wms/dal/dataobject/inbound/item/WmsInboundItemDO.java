@@ -59,9 +59,4 @@ public class WmsInboundItemDO extends BaseDO {
      * 来源详情ID
      */
     private Long sourceItemId;
-
-    /**
-     * 产品
-     */
-    private ErpProductRespSimpleVO product;
 }

@@ -32,12 +32,12 @@ public class WmsApprovalHistoryDO extends BaseDO {
     /**
      * 代码
      */
-    private String billType;
+    private Integer billType;
 
     /**
      * 名称
      */
-    private String billId;
+    private Long billId;
 
     /**
      * 状态类型

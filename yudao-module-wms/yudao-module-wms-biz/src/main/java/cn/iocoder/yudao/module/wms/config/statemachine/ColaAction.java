@@ -14,8 +14,8 @@ import java.util.function.Function;
 @Getter
 public abstract class ColaAction<S, E,D>  {
 
-    public static class ColaActionWhen<D> implements Condition<ColaContext<D>> {
 
+    public static class ColaActionWhen<D> implements Condition<ColaContext<D>> {
         private final ColaAction<?,?,D> colaAction;
         public ColaActionWhen(ColaAction<?,?,D> colaAction) {
             this.colaAction=colaAction;
@@ -23,7 +23,9 @@ public abstract class ColaAction<S, E,D>  {
 
         @Override
         public boolean isSatisfied(ColaContext<D> context) {
-            return colaAction.when(context);
+            boolean when=colaAction.when(context);
+            context.handled(true);
+            return when;
         }
 
     }
@@ -58,7 +60,6 @@ public abstract class ColaAction<S, E,D>  {
     public ColaActionWhen<D> getColaActionWhen() {
         return new ColaActionWhen<>(this);
     }
-
     public ColaActionPerform<S,E,D> getColaActionPerform() {
         return new ColaActionPerform<>(this);
     }

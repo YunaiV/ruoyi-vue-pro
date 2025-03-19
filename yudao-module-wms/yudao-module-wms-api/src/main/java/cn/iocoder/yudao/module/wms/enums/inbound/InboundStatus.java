@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * 入库单类型
@@ -22,6 +23,9 @@ public enum InboundStatus implements ArrayValuable<Integer>, DictEnum {
 
     public static final Integer[] VALUES = Arrays.stream(values()).map(InboundStatus::getValue).toArray(Integer[]::new);
 
+    public static String getType() {
+        return InboundStatus.class.getSimpleName();
+    }
 
     private final Integer value;
     private final String label;
@@ -53,6 +57,24 @@ public enum InboundStatus implements ArrayValuable<Integer>, DictEnum {
             }
         }
         return null;
+    }
+
+    public boolean matchAny(InboundStatus... status) {
+        for (InboundStatus s : status) {
+            if(s==this) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean matchAny(Integer... values) {
+        for (Integer v : values) {
+            if(Objects.equals(v, this.getValue())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

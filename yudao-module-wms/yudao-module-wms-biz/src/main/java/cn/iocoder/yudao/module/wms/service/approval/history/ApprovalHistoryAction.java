@@ -1,0 +1,39 @@
+package cn.iocoder.yudao.module.wms.service.approval.history;
+
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.wms.config.statemachine.ColaAction;
+import cn.iocoder.yudao.module.wms.config.statemachine.ColaContext;
+import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalHistorySaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
+import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
+import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import java.util.function.Function;
+
+/**
+ * @author: LeeFJ
+ * @date: 2025/3/19 10:10
+ * @description:
+ */
+public abstract class ApprovalHistoryAction<E,D> extends ColaAction<Integer, E,D> {
+
+    @Resource
+    @Lazy
+    protected WmsApprovalHistoryService approvalHistoryService;
+
+    public ApprovalHistoryAction(Integer from, Integer to, Function<D, Integer> getter, E event) {
+        super(from, to, getter, event);
+    }
+    /**
+     * 变更状态
+     **/
+    @Override
+    public void perform(Integer from, Integer to, E event, ColaContext<D> context) {
+        // 保存审批历史
+        WmsApprovalHistorySaveReqVO historySaveReqVO = BeanUtils.toBean(context.approvalReqVO(), WmsApprovalHistorySaveReqVO.class);
+        historySaveReqVO.setStatusBefore(from).setStatusAfter(to);
+        approvalHistoryService.createApprovalHistory(historySaveReqVO);
+    }
+}

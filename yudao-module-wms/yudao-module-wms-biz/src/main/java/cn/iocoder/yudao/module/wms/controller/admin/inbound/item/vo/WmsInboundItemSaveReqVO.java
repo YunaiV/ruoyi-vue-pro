@@ -35,7 +35,4 @@ public class WmsInboundItemSaveReqVO {
 
     @Schema(description = "来源详情ID", example = "30830")
     private Long sourceItemId;
-
-    @Schema(description = "产品", example = "")
-    private ErpProductRespSimpleVO product;
 }

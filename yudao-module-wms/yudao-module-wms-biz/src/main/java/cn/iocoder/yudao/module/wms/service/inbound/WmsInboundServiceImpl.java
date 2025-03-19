@@ -1,12 +1,16 @@
 package cn.iocoder.yudao.module.wms.service.inbound;
 
+import cn.iocoder.yudao.module.wms.config.statemachine.ColaContext;
+import cn.iocoder.yudao.module.wms.config.statemachine.StateMachineWrapper;
+import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
+import cn.iocoder.yudao.module.wms.enums.common.BillType;
+import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.*;
@@ -20,6 +24,7 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.WmsInboundItemMapper;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * 入库单 Service 实现类
@@ -27,7 +32,6 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
  * @author 李方捷
  */
 @Service
-@Validated
 public class WmsInboundServiceImpl implements WmsInboundService {
 
     @Resource
@@ -44,6 +48,9 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     @Resource
     private WmsInboundMapper inboundMapper;
 
+    @Resource(name = InboundAction.STATE_MACHINE_NAME)
+    private StateMachineWrapper<Integer, InboundStatus.Event, WmsInboundDO> inboundStateMachine;
+
     /**
      * @sign : 5D2F5734A2A97234
      */
@@ -53,6 +60,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         // 设置单据号
         String no = noRedisDAO.generate(WmsNoRedisDAO.INBOUND_NO_PREFIX, INBOUND_NOT_EXISTS);
         createReqVO.setNo(no);
+        createReqVO.setStatus(inboundStateMachine.getInitStatus());
         if (inboundMapper.getByNo(createReqVO.getNo()) != null) {
             throw exception(INBOUND_NO_DUPLICATE);
         }
@@ -94,6 +102,10 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     public WmsInboundDO updateInbound(WmsInboundSaveReqVO updateReqVO) {
         // 校验存在
         WmsInboundDO exists = validateInboundExists(updateReqVO.getId());
+        // 判断是否允许编辑
+        if (!inboundStateMachine.canEdit(exists.getStatus())) {
+            throw exception(INBOUND_CAN_NOT_EDIT);
+        }
         // 单据号不允许被修改
         updateReqVO.setNo(exists.getNo());
         // 按 wms_inbound.warehouse_id -> wms_warehouse.id 的引用关系，校验存在性
@@ -110,7 +122,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
             List<WmsInboundItemDO> toInsetList = compareResult.getTargetMoreThanBaseList();
             List<WmsInboundItemDO> toUpdateList = compareResult.getIntersectionList();
             List<WmsInboundItemDO> toDeleteList = compareResult.getBaseMoreThanTargetList();
-            List<WmsInboundItemDO> finalList = compareResult.getBaseMoreThanTargetList();
+            List<WmsInboundItemDO> finalList = new ArrayList<>();
             finalList.addAll(toInsetList);
             finalList.addAll(toUpdateList);
             // 校验 toInsetList 中是否有重复的 productId
@@ -134,6 +146,14 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         return inbound;
     }
 
+    @Override
+    public WmsInboundDO updateInboundStatus(Long id, Integer status) {
+        WmsInboundDO inboundDO = validateInboundExists(id);
+        inboundDO.setStatus(status);
+        inboundMapper.updateById(inboundDO);
+        return inboundDO;
+    }
+
     /**
      * @sign : FFFDDAD5269478BB
      */
@@ -142,6 +162,10 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     public void deleteInbound(Long id) {
         // 校验存在
         WmsInboundDO inbound = validateInboundExists(id);
+        // 判断是否允许删除
+        if (!inboundStateMachine.canDelete(inbound.getStatus())) {
+            throw exception(INBOUND_CAN_NOT_EDIT);
+        }
         // 唯一索引去重
         inbound.setNo(inboundMapper.flagUKeyAsLogicDelete(inbound.getNo()));
         inboundMapper.updateById(inbound);
@@ -176,4 +200,21 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     public List<WmsInboundDO> selectByWarehouseId(Long warehouseId, int limit) {
         return inboundMapper.selectByWarehouseId(warehouseId, limit);
     }
-}
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void approve(InboundStatus.Event event, WmsApprovalReqVO approvalReqVO) {
+        // 设置业务默认值
+        approvalReqVO.setBillType(BillType.INBOUND.getValue());
+        approvalReqVO.setStatusType(InboundStatus.getType());
+        // 获得业务对象
+        WmsInboundDO inbound = validateInboundExists(approvalReqVO.getBillId());
+        ColaContext<WmsInboundDO> ctx = ColaContext.from(inbound, approvalReqVO);
+        // 触发事件
+        inboundStateMachine.fireEvent(event, ctx);
+        // 如果未处理，则抛出异常
+        if (!ctx.handled()) {
+            throw exception(INBOUND_APPROVAL_CONDITION_IS_NOT_MATCH);
+        }
+    }
+}

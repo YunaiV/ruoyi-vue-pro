@@ -40,6 +40,9 @@ public interface ErrorCodeConstants {
     ErrorCode INBOUND_NO_OUT_OF_BOUNDS = new ErrorCode(2_001_400_004, "入库单单据号越界");
     ErrorCode INBOUND_ITEM_PRODUCT_ID_REPEATED = new ErrorCode(2_001_400_005, "入库单标准产品ID重复");
     ErrorCode INBOUND_ITEM_PRODUCT_SKU_REPEATED = new ErrorCode(2_001_400_006, "入库单标准产品SKU重复");
+    ErrorCode INBOUND_CAN_NOT_EDIT = new ErrorCode(2_001_400_007, "入库单不允许编辑");
+    ErrorCode INBOUND_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_400_008, "入库单不符合审批条件");
+    ErrorCode INBOUND_CAN_NOT_DELETE = new ErrorCode(2_001_400_009, "入库单不允许删除");
 
     // ========== WMS_INBOUND_ITEM 入库单详情表 2_001_500_000 ==========
     ErrorCode INBOUND_ITEM_NOT_EXISTS = new ErrorCode(2_001_500_001, "入库单详情不存在");
@@ -54,4 +57,5 @@ public interface ErrorCodeConstants {
     // ========== WMS_APPROVAL_HISTORY 审批历史表 2_001_700_000 ==========
     ErrorCode APPROVAL_HISTORY_NOT_EXISTS = new ErrorCode(2_001_700_001, "审批历史不存在");
     ErrorCode APPROVAL_HISTORY_BE_REFERRED = new ErrorCode(2_001_700_002, "审批历史被引用");
+    ErrorCode APPROVAL_HISTORY_CAN_NOT_EDIT = new ErrorCode(2_001_700_003, "审批历史不允许编辑");
 }

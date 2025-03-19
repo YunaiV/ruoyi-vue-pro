@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : no,actual_arrival_time,create_time,creator_comment,source_bill_id,trace_no,type,refer_no,plan_arrival_time,init_age,shipping_method,source_bill_no,source_bill_type,status,warehouse_id
+ * @table-fields : no,actual_arrival_time,create_time,creator_comment,type,source_bill_id,trace_no,refer_no,plan_arrival_time,init_age,source_bill_no,shipping_method,source_bill_type,warehouse_id,status
  */
 @Schema(description = "管理后台 - 入库单分页 Request VO")
 @Data
@@ -26,7 +26,7 @@ public class WmsInboundPageReqVO extends PageParam {
     @Schema(description = "仓库ID", example = "23620")
     private Long warehouseId;
 
-    @Schema(description = "入库单类型 ; InboundStatus : 0-起草中 , 0-待审批 , 0-已驳回 , 0-已通过", example = "1")
+    @Schema(description = "入库单类型 ; InboundStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", example = "1")
     private Integer status;
 
     @Schema(description = "来源单据ID", example = "24655")
@@ -35,7 +35,7 @@ public class WmsInboundPageReqVO extends PageParam {
     @Schema(description = "来源单据号")
     private String sourceBillNo;
 
-    @Schema(description = "来源单据类型 ; SourceBillType : 0-出库单 , 1-入库单", example = "2")
+    @Schema(description = "来源单据类型 ; BillType : 0-入库单 , 1-出库单", example = "2")
     private Integer sourceBillType;
 
     @Schema(description = "参考号")

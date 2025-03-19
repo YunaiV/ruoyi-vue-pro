@@ -23,7 +23,6 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
  * @author 李方捷
  */
 @Service
-@Validated
 public class WmsInboundItemServiceImpl implements WmsInboundItemService {
 
     @Resource
@@ -122,4 +121,4 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
     public List<WmsInboundItemDO> selectByInboundId(Long inboundId, int limit) {
         return inboundItemMapper.selectByInboundId(inboundId, limit);
     }
-}
+}

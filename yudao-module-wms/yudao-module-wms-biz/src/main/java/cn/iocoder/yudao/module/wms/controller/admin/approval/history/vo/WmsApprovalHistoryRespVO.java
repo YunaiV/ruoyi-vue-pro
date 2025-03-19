@@ -20,13 +20,13 @@ public class WmsApprovalHistoryRespVO {
     @ExcelProperty("主键")
     private Long id;
 
-    @Schema(description = "代码", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @ExcelProperty("代码")
-    private String billType;
+    @Schema(description = "来源单据类型 ; BillType : 0-入库单 , 1-出库单", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @ExcelProperty("来源单据类型")
+    private Integer billType;
 
-    @Schema(description = "名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "29844")
-    @ExcelProperty("名称")
-    private String billId;
+    @Schema(description = "业务单据ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "29844")
+    @ExcelProperty("业务单据ID")
+    private Long billId;
 
     @Schema(description = "状态类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @ExcelProperty("状态类型")

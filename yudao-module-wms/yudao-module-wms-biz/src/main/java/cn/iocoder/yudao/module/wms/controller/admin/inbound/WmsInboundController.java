@@ -5,9 +5,11 @@ import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.ErpProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
+import cn.iocoder.yudao.module.wms.enums.common.BillType;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import org.springframework.context.annotation.Lazy;
@@ -139,11 +141,12 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 @Validated
 public class WmsInboundController {
 
-    @Resource()
-    @Lazy()
+    @Resource
+    @Lazy
     private WmsInboundItemService inboundItemService;
 
     @Resource
+    @Lazy
     private WmsInboundService inboundService;
 
     @Resource
@@ -168,6 +171,30 @@ public class WmsInboundController {
     @PreAuthorize("@ss.hasPermission('wms:inbound:update')")
     public CommonResult<Boolean> updateInbound(@Validated(ValidationGroup.update.class) @RequestBody WmsInboundSaveReqVO updateReqVO) {
         inboundService.updateInbound(updateReqVO);
+        return success(true);
+    }
+
+    @PutMapping("/submit")
+    @Operation(summary = "提交审批")
+    @PreAuthorize("@ss.hasPermission('wms:inbound:submit')")
+    public CommonResult<Boolean> submit(@RequestBody WmsApprovalReqVO approvalReqVO) {
+        inboundService.approve(InboundStatus.Event.SUBMIT, approvalReqVO);
+        return success(true);
+    }
+
+    @PutMapping("/agree")
+    @Operation(summary = "同意审批")
+    @PreAuthorize("@ss.hasPermission('wms:inbound:agree')")
+    public CommonResult<Boolean> agree(@RequestBody WmsApprovalReqVO approvalReqVO) {
+        inboundService.approve(InboundStatus.Event.AGREE, approvalReqVO);
+        return success(true);
+    }
+
+    @PutMapping("/reject")
+    @Operation(summary = "驳回审批")
+    @PreAuthorize("@ss.hasPermission('wms:inbound:reject')")
+    public CommonResult<Boolean> reject(@RequestBody WmsApprovalReqVO approvalReqVO) {
+        inboundService.approve(InboundStatus.Event.REJECT, approvalReqVO);
         return success(true);
     }
 
@@ -203,15 +230,13 @@ public class WmsInboundController {
         // 组装入库单详情
         List<WmsInboundItemDO> inboundItemList = inboundItemService.selectByInboundId(inboundVO.getId());
         inboundVO.setItemList(BeanUtils.toBean(inboundItemList, WmsInboundItemRespVO.class));
-
-        Map<Long, ErpProductDTO> productDTOMap=productApi.getProductMap(StreamX.from(inboundItemList).map(WmsInboundItemDO::getProductId).toList());
+        Map<Long, ErpProductDTO> productDTOMap = productApi.getProductMap(StreamX.from(inboundItemList).map(WmsInboundItemDO::getProductId).toList());
         Map<Long, ErpProductRespSimpleVO> productVOMap = new HashMap<>();
         for (ErpProductDTO productDTO : productDTOMap.values()) {
             ErpProductRespSimpleVO productVO = BeanUtils.toBean(productDTO, ErpProductRespSimpleVO.class);
             productVOMap.put(productDTO.getId(), productVO);
         }
-        StreamX.from(inboundVO.getItemList()).assemble(productVOMap,WmsInboundItemRespVO::getProductId,WmsInboundItemRespVO::setProduct);
-
+        StreamX.from(inboundVO.getItemList()).assemble(productVOMap, WmsInboundItemRespVO::getProductId, WmsInboundItemRespVO::setProduct);
         // 返回
         return success(inboundVO);
     }
@@ -246,4 +271,4 @@ public class WmsInboundController {
         // 导出 Excel
         ExcelUtils.write(response, "入库单.xls", "数据", WmsInboundRespVO.class, BeanUtils.toBean(list, WmsInboundRespVO.class));
     }
-}
+}

@@ -8,14 +8,13 @@ import cn.iocoder.yudao.module.wms.enums.inbound.InboundType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import jakarta.validation.constraints.*;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemSaveReqVO;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 
 /**
- * @table-fields : no,actual_arrival_time,creator_comment,source_bill_id,trace_no,type,refer_no,plan_arrival_time,init_age,shipping_method,source_bill_no,source_bill_type,id,status,warehouse_id
+ * @table-fields : no,actual_arrival_time,creator_comment,type,source_bill_id,trace_no,refer_no,plan_arrival_time,init_age,source_bill_no,shipping_method,source_bill_type,id,warehouse_id,status
  */
 @Schema(description = "管理后台 - 入库单新增/修改 Request VO")
 @Data
@@ -37,7 +36,7 @@ public class WmsInboundSaveReqVO {
     @NotNull(message = "仓库ID不能为空", groups = { ValidationGroup.create.class })
     private Long warehouseId;
 
-    @Schema(description = "入库单类型 ; InboundStatus : 0-起草中 , 0-待审批 , 0-已驳回 , 0-已通过", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "入库单类型 ; InboundStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @InEnum(InboundStatus.class)
     private Integer status;
 
@@ -47,7 +46,7 @@ public class WmsInboundSaveReqVO {
     @Schema(description = "来源单据号")
     private String sourceBillNo;
 
-    @Schema(description = "来源单据类型 ; SourceBillType : 0-出库单 , 1-入库单", example = "2")
+    @Schema(description = "来源单据类型 ; BillType : 0-入库单 , 1-出库单", example = "2")
     @InEnum(BillType.class)
     private Integer sourceBillType;
 

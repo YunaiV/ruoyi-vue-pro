@@ -17,11 +17,11 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class WmsApprovalHistoryPageReqVO extends PageParam {
 
-    @Schema(description = "代码", example = "2")
-    private String billType;
+    @Schema(description = "来源单据类型 ; BillType : 0-入库单 , 1-出库单", example = "2")
+    private Integer billType;
 
-    @Schema(description = "名称", example = "29844")
-    private String billId;
+    @Schema(description = "业务单据ID", example = "29844")
+    private Long billId;
 
     @Schema(description = "状态类型", example = "1")
     private String statusType;

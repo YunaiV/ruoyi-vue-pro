@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.wms.config.statemachine;
 
 import com.alibaba.cola.statemachine.StateMachine;
 import com.alibaba.cola.statemachine.Visitor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.function.Function;
@@ -15,6 +17,7 @@ public class StateMachineWrapper<S, E,D> implements StateMachine<S, E, ColaConte
 
     private StateMachine<S, E, ColaContext<D>> stateMachine;
     private Function<D,S> getter;
+
 
     public StateMachineWrapper(StateMachine<S, E, ColaContext<D>> stateMachine, Function<D,S> getter) {
         this.stateMachine = stateMachine;
@@ -35,7 +38,6 @@ public class StateMachineWrapper<S, E,D> implements StateMachine<S, E, ColaConte
     public List<S> fireParallelEvent(S sourceState, E event, ColaContext<D> ctx) {
         return stateMachine.fireParallelEvent(sourceState,event,ctx);
     }
-
 
 
     public S fireEvent(E event, ColaContext<D> ctx) {
@@ -63,4 +65,24 @@ public class StateMachineWrapper<S, E,D> implements StateMachine<S, E, ColaConte
     public String accept(Visitor visitor) {
         return stateMachine.accept(visitor);
     }
+
+
+    @Setter
+    @Getter
+    private S initStatus;
+
+    @Setter
+    private List<S> statusCanEdit;
+
+    @Setter
+    private List<S> statusCanDelete;
+
+    public boolean canEdit(S status) {
+        return statusCanEdit.contains(status);
+    }
+    public boolean canDelete(S status) {
+        return statusCanDelete.contains(status);
+    }
+
+
 }
