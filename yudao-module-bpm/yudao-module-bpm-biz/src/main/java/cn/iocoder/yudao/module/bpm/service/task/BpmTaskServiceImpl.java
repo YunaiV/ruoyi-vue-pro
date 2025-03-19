@@ -599,6 +599,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      */
     private Map<String, Object> validateAndSetNextAssignees(String taskDefinitionKey, Map<String, Object> variables, BpmnModel bpmnModel,
                                                             Map<String, List<Long>> nextAssignees, ProcessInstance processInstance) {
+        if (taskDefinitionKey.equals(START_USER_NODE_ID)) {
+            return variables;
+        }
         // 1. 获取下一个将要执行的节点集合
         FlowElement flowElement = bpmnModel.getFlowElement(taskDefinitionKey);
         List<FlowNode> nextFlowNodes = getNextFlowNodes(flowElement, bpmnModel, variables);
