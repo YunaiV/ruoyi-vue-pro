@@ -83,4 +83,9 @@ public class ErpProductApiImpl implements ErpProductApi {
     public List<ErpProductRespDTO> getProductDTOListByStatus(Boolean status) {
         return erpProductService.getProductDTOListByStatus(status);
     }
+
+    @Override
+    public List<Long> listProductIdByBarCode(String barCode) {
+        return erpProductService.listProductIdByBarCode(barCode);
+    }
 }

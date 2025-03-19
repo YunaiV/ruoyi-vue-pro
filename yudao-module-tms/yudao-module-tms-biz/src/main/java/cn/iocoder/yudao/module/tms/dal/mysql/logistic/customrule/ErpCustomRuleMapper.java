@@ -35,10 +35,10 @@ public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
             .likeIfPresent(ErpCustomRuleDO::getFbaBarCode, reqVO.getFbaBarCode())  // FBA条形码
             .betweenIfPresent(ErpCustomRuleDO::getCreateTime, reqVO.getCreateTime())  // 创建时间范围
             .betweenIfPresent(ErpCustomRuleDO::getUpdateTime, reqVO.getUpdateTime())  // 更新时间范围
+            .eqIfExists(ErpCustomRuleDO::getProductId, reqVO.getProductId()) // 产品id
             .orderByAsc(ErpCustomRuleDO::getId)  // 按id降序排序
             .leftJoin(ErpCustomProductDO.class, ErpCustomProductDO::getProductId, ErpCustomRuleDO::getProductId)  // 左连接产品表
 //            .likeIfExists(ErpProductDO::getBarCode, reqVO.getBarCode()) // 产品SKU编码
-            //TODO 根据barCode查询
             ;
     }
 
