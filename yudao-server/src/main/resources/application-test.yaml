@@ -4,7 +4,10 @@ kingdee:
   outerInstanceIds:
     - 369949131390717952 #金蝶沙盒
 
-debug: false
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration # 不开启 Quartz 的自动配置
 
 --- #################### 数据库相关配置 ####################
 
@@ -42,25 +45,28 @@ spring:
         test-while-idle: true
         test-on-borrow: false
         test-on-return: false
+        remove-abandoned: true # 启用废弃连接的移除功能
+        log-abandoned: true # 启用废弃连接的日志记录
+        remove-abandoned-timeout-millis: 1000 # 设置废弃连接的超时阈值为 1000ms（单位：毫秒）
       primary: master
       datasource:
         master:
-          url: jdbc:mysql://192.168.10.151:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
-          username: it003
-          password: asivJssflioKK
-#        slave: # 模拟从库，可根据自己需要修改 # 模拟从库，可根据自己需要修改
-#          lazy: true # 开启懒加载，保证启动速度
-#          url: jdbc:mysql://192.168.10.151:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
-#          username: it003
-#          password: asivJssflioKK
+          url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
+          username: root
+          password: 'YMCA@1978'
+        slave: # 模拟从库，可根据自己需要修改 # 模拟从库，可根据自己需要修改
+          lazy: true # 开启懒加载，保证启动速度
+          url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
+          username: root
+          password: 'YMCA@1978'
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   data:
     redis:
-      host: 192.168.10.151 # 地址
+      host: 127.0.0.1 # 地址
       port: 6379 # 端口
       database: 1 # 数据库索引
-      password: uniplore # 密码，建议生产环境开启
+#    password: 123456 # 密码，建议生产环境开启
 
 --- #################### 定时任务相关配置 ####################
 # Quartz 配置项，对应 QuartzProperties 配置)
@@ -72,26 +78,26 @@ spring:
     wait-for-jobs-to-complete-on-shutdown: true # 应用关闭时，是否等待定时任务执行完成。默认为 false ，建议设置为 true
     properties: # 添加 Quartz Scheduler 附加属性，更多可以看 http://www.quartz-scheduler.org/documentation/2.4.0-SNAPSHOT/configuration.html 文档
       org:
-#        quartz:
-#          # Scheduler 相关配置
-#          scheduler:
-#            instanceName: schedulerName
-#            instanceId: AUTO # 自动生成 instance ID
-          # JobStore 相关配置
-#          jobStore:
-#            # JobStore 实现类。可见博客：https://blog.csdn.net/weixin_42458219/article/details/122247162
-#            class: org.quartz.simpl.RAMJobStore
-#            isClustered: false # 是集群模式
-#            clusterCheckinInterval: 15000 # 集群检查频率，单位：毫秒。默认为 15000，即 15 秒
-#            misfireThreshold: 60000 # misfire 阀值，单位：毫秒。
-          # 线程池相关配置
-          threadPool:
-            threadCount: 25 # 线程池大小。默认为 10 。
-            threadPriority: 5 # 线程优先级
-            class: org.quartz.simpl.SimpleThreadPool # 线程池类型
-#    jdbc: # 使用 JDBC 的 JobStore 的时候，JDBC 的配置
-##      initialize-schema: ALWAYS # 是否自动使用 SQL 初始化 Quartz 表结构。
-#      initialize-schema: NEVER # 是否自动使用 SQL 初始化 Quartz 表结构。这里设置成 never ，我们手动创建表结构。
+        #        quartz:
+        #          # Scheduler 相关配置
+        #          scheduler:
+        #            instanceName: schedulerName
+        #            instanceId: AUTO # 自动生成 instance ID
+        # JobStore 相关配置
+        #          jobStore:
+        #            # JobStore 实现类。可见博客：https://blog.csdn.net/weixin_42458219/article/details/122247162
+        #            class: org.quartz.simpl.RAMJobStore
+        #            isClustered: false # 是集群模式
+        #            clusterCheckinInterval: 15000 # 集群检查频率，单位：毫秒。默认为 15000，即 15 秒
+        #            misfireThreshold: 60000 # misfire 阀值，单位：毫秒。
+        # 线程池相关配置
+        threadPool:
+          threadCount: 25 # 线程池大小。默认为 10 。
+          threadPriority: 5 # 线程优先级
+          class: org.quartz.simpl.SimpleThreadPool # 线程池类型
+  #    jdbc: # 使用 JDBC 的 JobStore 的时候，JDBC 的配置
+  ##      initialize-schema: ALWAYS # 是否自动使用 SQL 初始化 Quartz 表结构。
+  #      initialize-schema: NEVER # 是否自动使用 SQL 初始化 Quartz 表结构。这里设置成 never ，我们手动创建表结构。
   jpa:
     open-in-view: false
 
@@ -101,7 +107,7 @@ spring:
 mybatis-plus:
   configuration:
     #开发环境中开启mysql日志
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 # rocketmq 配置项，对应 RocketMQProperties 配置类
 rocketmq:
   name-server: 127.0.0.1:9876 # RocketMQ Namesrv

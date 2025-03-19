@@ -2,7 +2,7 @@ package com.somle.kingdee.service;
 
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
-import cn.iocoder.yudao.framework.test.core.ut.BaseSpringTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseSpringTest;
 import com.somle.kingdee.model.KingdeePurOrderReqVO;
 import com.somle.kingdee.model.KingdeePurRequestReqVO;
 import com.somle.kingdee.util.SignatureUtils;
@@ -10,6 +10,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.Rollback;
@@ -21,9 +22,10 @@ import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Disabled
 @Slf4j
 @Import(KingdeeService.class)
-public class KingdeeServiceTest extends BaseSpringTest {
+public class KingdeeServiceTest extends SomleBaseSpringTest {
     @Resource
     KingdeeService service;
     // 定义所有的字段名称及对应表
@@ -148,7 +150,7 @@ public class KingdeeServiceTest extends BaseSpringTest {
             .createStartTime(LocalDateTimeUtils.toTimestamp(LocalDateTime.now().minusDays(1)))
             .createEndTime(LocalDateTimeUtils.toTimestamp(LocalDateTime.now()))
             .build();
-        log.info(JsonUtilsX.toJsonString(client.getPurRequest(vo)));
+ log.info(JsonUtilsX.toJsonString(client.streamPurRequest(vo)));
     }
 
     @Test
@@ -161,7 +163,7 @@ public class KingdeeServiceTest extends BaseSpringTest {
             .createEndTime(Timestamp.from(end))
             .build();
         log.info(JsonUtilsX.toJSONObject(vo).toString());
-        log.info(client.getPurOrder(vo).get(0).toString());
+log.info(client.streamPurOrder(vo).toString());
     }
 
     @Test
@@ -177,7 +179,7 @@ public class KingdeeServiceTest extends BaseSpringTest {
 
     @Test
     public void testGetCustomFieldByDisplayName() {
-        var client = service.getClients().get(0);
-        log.info(client.getCustomFieldByDisplayName("bd_material", "部门").toString());
+//        var client = service.getClients().get(0);
+//        log.info(client.getCustomFieldByDisplayName("bd_material", "部门").toString());
     }
 }

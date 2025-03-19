@@ -12,6 +12,7 @@ import com.somle.eccang.model.*;
 import com.somle.eccang.model.EccangResponse.EccangPage;
 import com.somle.eccang.model.exception.EccangResponseException;
 import com.somle.eccang.model.req.EccangInventoryBatchReqVO;
+import com.somle.eccang.model.req.EccangReceivingReqVo;
 import com.somle.eccang.model.req.EccangRmaReturnReqVO;
 import com.somle.eccang.repository.EccangTokenRepository;
 import jakarta.annotation.PostConstruct;
@@ -176,13 +177,17 @@ public class EccangService {
     private Stream<EccangPage> getAllPage(JSONObject payload, String endpoint) {
         payload.put("page", 1);
         payload.put("page_size", pageSize);
-        return StreamX.iterate(
-            getPage(payload, endpoint),
-            EccangPage::hasNext,
-            eccangPage -> {
-                log.debug("have next,endpoint:{}当前进度：{}/{}", endpoint, (eccangPage.getPage() - 1) * pageSize + eccangPage.getData().size(), eccangPage.getTotal());
-                payload.put("page", eccangPage.getPage() + 1);
-                return getPage(payload, endpoint);
+        return Stream.iterate(
+            getPage(payload, endpoint), Objects::nonNull,
+            bizContent -> {
+                if (bizContent.hasNext()) {
+                    log.debug("have next,endpoint:{}当前进度：{}/{}", endpoint, (bizContent.getPage() - 1) * pageSize + bizContent.getData().size(), bizContent.getTotal());
+                    payload.put("page", bizContent.getPage() + 1);
+                    return getPage(payload, endpoint);
+                } else {
+                    log.debug("no next page");
+                    return null;
+                }
             }
         );
     }
@@ -438,6 +443,16 @@ public class EccangService {
         return getAllPage(JsonUtilsX.toJSONObject(eccangRmaReturnReqVO), "getRmaReturnList");
     }
 
+    /**
+     * @return java.util.stream.Stream<com.somle.eccang.model.EccangResponse.EccangPage>
+     * @Author gumaomao
+     * @Description 入库单管理——查询入库单信息
+     * @Date  2025/03/13
+     **/
+    public Stream<EccangPage> streamReceiving(EccangReceivingReqVo eccangReceivingReqVo) {
+        String endpoint = "getReceiving";
+        return getAllPage(JsonUtilsX.toJSONObject(eccangReceivingReqVo), endpoint);
+    }
     public String parseCountryCode(String code) {
         switch (code) {
             case "USA":

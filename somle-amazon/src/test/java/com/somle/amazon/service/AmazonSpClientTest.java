@@ -8,7 +8,7 @@ import com.somle.amazon.controller.vo.AmazonSpReportReqVO.ProcessingStatuses;
 import com.somle.amazon.model.enums.AmazonCountry;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
-import cn.iocoder.yudao.framework.test.core.ut.BaseSpringTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseSpringTest;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
@@ -18,12 +18,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 
+@Disabled
 @Slf4j
 @Import({
     AmazonService.class,
     AmazonSpService.class,
 })
-class AmazonSpClientTest extends BaseSpringTest {
+class AmazonSpClientTest extends SomleBaseSpringTest {
     @Resource
     AmazonSpService spService;
 

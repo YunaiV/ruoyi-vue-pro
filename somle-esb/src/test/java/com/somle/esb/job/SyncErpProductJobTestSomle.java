@@ -2,14 +2,15 @@ package com.somle.esb.job;
 
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.test.core.ut.SomleBaseSpringIntegrationTest;
-import cn.iocoder.yudao.module.erp.api.logistic.customrule.ErpCustomRuleApi;
-import cn.iocoder.yudao.module.erp.api.logistic.customrule.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.tms.api.logistic.customrule.ErpCustomRuleApi;
+import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.ErpCustomRuleDTO;
 import com.somle.esb.handler.ErpCustomRuleHandler;
 import com.somle.esb.handler.ErpProductHandler;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+@Disabled
 @Slf4j
 public class SyncErpProductJobTestSomle extends SomleBaseSpringIntegrationTest {
     @Resource

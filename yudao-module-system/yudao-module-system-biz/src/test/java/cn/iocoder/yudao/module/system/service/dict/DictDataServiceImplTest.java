@@ -172,7 +172,8 @@ public class DictDataServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testValidateDictDataExists_notExists() {
-        assertServiceException(() -> dictDataService.validateDictDataExists(randomLongId()), DICT_DATA_NOT_EXISTS);
+        var someId = randomLongId();
+        assertServiceException(() -> dictDataService.validateDictDataExists(someId), DICT_DATA_NOT_EXISTS, someId);
     }
 
     @Test
@@ -275,7 +276,7 @@ public class DictDataServiceImplTest extends BaseDbUnitTest {
         List<String> values = singletonList(randomString());
 
         // 调用, 并断言异常
-        assertServiceException(() -> dictDataService.validateDictDataList(dictType, values), DICT_DATA_NOT_EXISTS);
+        assertServiceException(() -> dictDataService.validateDictDataList(dictType, values), DICT_DATA_NOT_EXISTS, values.get(0));
     }
 
     @Test

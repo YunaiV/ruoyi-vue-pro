@@ -38,7 +38,7 @@ public class CodegenBuilderTest extends BaseMockitoUnitTest {
         assertEquals("用户", table.getTableComment());
         assertEquals("system", table.getModuleName());
         assertEquals("user", table.getBusinessName());
-        assertEquals("User", table.getClassName());
+        assertEquals("SystemUser", table.getClassName());
         assertEquals("用户", table.getClassComment());
     }
 

@@ -23,6 +23,7 @@
 <!--        <module>yudao-module-mall</module>-->
         <module>yudao-module-crm</module>
         <module>yudao-module-erp</module>
+        <module>yudao-module-tms</module>
         <module>yudao-module-wms</module>
         <module>yudao-module-ai</module>
 
@@ -159,6 +160,17 @@
             </plugin>
         </plugins>
     </build>
+
+    <!-- 生成测试报告插件 -->
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+            </plugin>
+        </plugins>
+    </reporting>
 
     <!-- 使用 huawei / aliyun 的 Maven 源，提升下载速度 -->
     <repositories>
