@@ -50,7 +50,7 @@ public class MicrosoftService {
 //    @Scheduled(cron = "0 */30 * * * *")
     @Scheduled(initialDelay = 2000, fixedRate = 1800000)
     @SneakyThrows
-    public void getPasswordToken() {
+    public void refreshPasswordToken() {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         RequestBody body = new FormBody.Builder()
@@ -122,7 +122,6 @@ public class MicrosoftService {
         String bodyString = null;
         try {
             bodyString = response.body().string();
-            log.error(bodyString);
             var jsonObject = JsonUtilsX.parseObject(bodyString, JSONObject.class);
             var embedUrl = jsonObject.getString("embedUrl");
             result = embedUrl;
@@ -146,6 +145,7 @@ public class MicrosoftService {
                 .addHeader("Content-Type", "application/x-www-form-urlencoded")
                 .build();
         Response response = client.newCall(request).execute();
+
 
         var jsonObject = JsonUtilsX.parseObject(response.body().string(), JSONObject.class);
         var token = jsonObject.getString("token");
