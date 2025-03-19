@@ -599,6 +599,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      */
     private Map<String, Object> validateAndSetNextAssignees(String taskDefinitionKey, Map<String, Object> variables, BpmnModel bpmnModel,
                                                             Map<String, List<Long>> nextAssignees, ProcessInstance processInstance) {
+        // Simple设计器第一个节点默认为发起人节点，不校验是否存在审批人
         if (taskDefinitionKey.equals(START_USER_NODE_ID)) {
             return variables;
         }
