@@ -12,7 +12,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 /**
  * 入库单 DO
  * @author 李方捷
- * @table-fields : no,actual_arrival_time,creator_comment,type,source_bill_id,trace_no,refer_no,plan_arrival_time,init_age,source_bill_no,shipping_method,source_bill_type,id,warehouse_id,status
+ * @table-fields : no,inbound_status,actual_arrival_time,audit_status,creator_comment,type,source_bill_id,trace_no,refer_no,plan_arrival_time,init_age,source_bill_no,shipping_method,source_bill_type,id,warehouse_id
  */
 @TableName("wms_inbound")
 // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -45,11 +45,6 @@ public class WmsInboundDO extends BaseDO {
      * 仓库ID
      */
     private Long warehouseId;
-
-    /**
-     * 状态
-     */
-    private Integer status;
 
     /**
      * 来源单据ID
@@ -100,4 +95,14 @@ public class WmsInboundDO extends BaseDO {
      * 初始库龄
      */
     private Integer initAge;
+
+    /**
+     * 入库单类型 ; InboundStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过
+     */
+    private Integer auditStatus;
+
+    /**
+     * 入库状态
+     */
+    private Integer inboundStatus;
 }

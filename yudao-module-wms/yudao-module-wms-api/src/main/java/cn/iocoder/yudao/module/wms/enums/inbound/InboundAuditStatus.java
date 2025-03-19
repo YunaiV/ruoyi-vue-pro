@@ -9,21 +9,22 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * 入库状态
+ * 入库单审批状态
  **/
 @RequiredArgsConstructor
 @Getter
-public enum InboundStatus implements ArrayValuable<Integer>, DictEnum {
+public enum InboundAuditStatus implements ArrayValuable<Integer>, DictEnum {
 
-    NONE(0, "未入库"),
-    PART(1, "部分入库"),
-    ALL(2, "已入库"),
+    DRAFT(0, "起草中"),
+    AUDIT(1, "待审批"),
+    REJECT(2, "已驳回"),
+    PASS(3, "已通过"),
    ;
 
-    public static final Integer[] VALUES = Arrays.stream(values()).map(InboundStatus::getValue).toArray(Integer[]::new);
+    public static final Integer[] VALUES = Arrays.stream(values()).map(InboundAuditStatus::getValue).toArray(Integer[]::new);
 
     public static String getType() {
-        return InboundStatus.class.getSimpleName();
+        return InboundAuditStatus.class.getSimpleName();
     }
 
     private final Integer value;
@@ -32,8 +33,8 @@ public enum InboundStatus implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 value 匹配枚举，name 优先
      **/
-    public static InboundStatus parse(Integer value) {
-        for (InboundStatus e : InboundStatus.values()) {
+    public static InboundAuditStatus parse(Integer value) {
+        for (InboundAuditStatus e : InboundAuditStatus.values()) {
             if(e.getValue().equals(value)) {
                 return e;
             }
@@ -44,13 +45,13 @@ public enum InboundStatus implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 name 或 label 匹配枚举，name 优先
      **/
-    public static InboundStatus parse(String nameOrLabel) {
-        for (InboundStatus e : InboundStatus.values()) {
+    public static InboundAuditStatus parse(String nameOrLabel) {
+        for (InboundAuditStatus e : InboundAuditStatus.values()) {
             if(e.name().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
         }
-        for (InboundStatus e : InboundStatus.values()) {
+        for (InboundAuditStatus e : InboundAuditStatus.values()) {
             if(e.getLabel().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
@@ -58,8 +59,8 @@ public enum InboundStatus implements ArrayValuable<Integer>, DictEnum {
         return null;
     }
 
-    public boolean matchAny(InboundStatus... status) {
-        for (InboundStatus s : status) {
+    public boolean matchAny(InboundAuditStatus... status) {
+        for (InboundAuditStatus s : status) {
             if(s==this) {
                 return true;
             }

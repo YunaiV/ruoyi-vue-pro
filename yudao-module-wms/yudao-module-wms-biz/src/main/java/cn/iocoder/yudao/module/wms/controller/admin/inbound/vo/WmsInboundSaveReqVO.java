@@ -11,10 +11,10 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemSaveReqVO;
-import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
+import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
 
 /**
- * @table-fields : no,actual_arrival_time,creator_comment,type,source_bill_id,trace_no,refer_no,plan_arrival_time,init_age,source_bill_no,shipping_method,source_bill_type,id,warehouse_id,status
+ * @table-fields : no,inbound_status,actual_arrival_time,audit_status,creator_comment,type,source_bill_id,trace_no,refer_no,plan_arrival_time,init_age,source_bill_no,shipping_method,source_bill_type,id,warehouse_id
  */
 @Schema(description = "管理后台 - 入库单新增/修改 Request VO")
 @Data
@@ -35,10 +35,6 @@ public class WmsInboundSaveReqVO {
     @Schema(description = "仓库ID", example = "23620")
     @NotNull(message = "仓库ID不能为空", groups = { ValidationGroup.create.class })
     private Long warehouseId;
-
-    @Schema(description = "入库单类型 ; InboundStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @InEnum(InboundStatus.class)
-    private Integer status;
 
     @Schema(description = "来源单据ID", example = "24655")
     private Long sourceBillId;
@@ -74,4 +70,10 @@ public class WmsInboundSaveReqVO {
 
     @Schema(description = "详情清单", example = "")
     private List<WmsInboundItemSaveReqVO> itemList;
+
+    @Schema(description = "入库单类型 ; InboundStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", example = "")
+    private Integer auditStatus;
+
+    @Schema(description = "入库状态", example = "")
+    private Integer inboundStatus;
 }

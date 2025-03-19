@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : inbound_id,source_item_id,left_quantity,actual_quantity,create_time,product_id,plan_quantity
+ * @table-fields : inbound_id,source_item_id,left_quantity,inbound_status,actual_quantity,create_time,product_id,plan_quantity
  */
 @Schema(description = "管理后台 - 入库单详情分页 Request VO")
 @Data
@@ -38,4 +38,7 @@ public class WmsInboundItemPageReqVO extends PageParam {
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
+
+    @Schema(description = "入库状态 ; InboundStatus : 0-未入库 , 1-部分入库 , 2-已入库", example = "")
+    private Integer inboundStatus;
 }

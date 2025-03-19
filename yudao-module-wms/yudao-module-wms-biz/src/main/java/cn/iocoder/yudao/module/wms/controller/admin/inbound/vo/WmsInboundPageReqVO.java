@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : no,actual_arrival_time,create_time,creator_comment,type,source_bill_id,trace_no,refer_no,plan_arrival_time,init_age,source_bill_no,shipping_method,source_bill_type,warehouse_id,status
+ * @table-fields : no,inbound_status,actual_arrival_time,create_time,audit_status,creator_comment,type,source_bill_id,trace_no,refer_no,plan_arrival_time,init_age,source_bill_no,shipping_method,source_bill_type,warehouse_id
  */
 @Schema(description = "管理后台 - 入库单分页 Request VO")
 @Data
@@ -25,9 +25,6 @@ public class WmsInboundPageReqVO extends PageParam {
 
     @Schema(description = "仓库ID", example = "23620")
     private Long warehouseId;
-
-    @Schema(description = "入库单类型 ; InboundStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", example = "1")
-    private Integer status;
 
     @Schema(description = "来源单据ID", example = "24655")
     private Long sourceBillId;
@@ -64,4 +61,10 @@ public class WmsInboundPageReqVO extends PageParam {
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
+
+    @Schema(description = "入库单类型 ; InboundStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", example = "")
+    private Integer auditStatus;
+
+    @Schema(description = "入库状态", example = "")
+    private Integer inboundStatus;
 }

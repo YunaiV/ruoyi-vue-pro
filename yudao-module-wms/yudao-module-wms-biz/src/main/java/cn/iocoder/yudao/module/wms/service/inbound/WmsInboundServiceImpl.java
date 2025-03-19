@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsAppro
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
 import cn.iocoder.yudao.module.wms.enums.common.BillType;
+import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import org.springframework.context.annotation.Lazy;
@@ -16,7 +17,6 @@ import java.util.*;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.wms.dal.mysql.inbound.WmsInboundMapper;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -24,7 +24,6 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.WmsInboundItemMapper;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * 入库单 Service 实现类
@@ -49,7 +48,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     private WmsInboundMapper inboundMapper;
 
     @Resource(name = InboundAction.STATE_MACHINE_NAME)
-    private StateMachineWrapper<Integer, InboundStatus.Event, WmsInboundDO> inboundStateMachine;
+    private StateMachineWrapper<Integer, InboundAuditStatus.Event, WmsInboundDO> inboundStateMachine;
 
     /**
      * @sign : 5D2F5734A2A97234
@@ -60,7 +59,8 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         // 设置单据号
         String no = noRedisDAO.generate(WmsNoRedisDAO.INBOUND_NO_PREFIX, INBOUND_NOT_EXISTS);
         createReqVO.setNo(no);
-        createReqVO.setStatus(inboundStateMachine.getInitStatus());
+        createReqVO.setAuditStatus(inboundStateMachine.getInitStatus());
+        createReqVO.setInboundStatus(InboundStatus.NONE.getValue());
         if (inboundMapper.getByNo(createReqVO.getNo()) != null) {
             throw exception(INBOUND_NO_DUPLICATE);
         }
@@ -81,6 +81,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
                 item.setId(null);
                 // 设置归属
                 item.setInboundId(inbound.getId());
+                item.setInboundStatus(InboundStatus.NONE.getValue());
                 toInsetList.add(BeanUtils.toBean(item, WmsInboundItemDO.class));
             });
             // 校验 toInsetList 中是否有重复的 productId
@@ -103,7 +104,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         // 校验存在
         WmsInboundDO exists = validateInboundExists(updateReqVO.getId());
         // 判断是否允许编辑
-        if (!inboundStateMachine.canEdit(exists.getStatus())) {
+        if (!inboundStateMachine.canEdit(exists.getAuditStatus())) {
             throw exception(INBOUND_CAN_NOT_EDIT);
         }
         // 单据号不允许被修改
@@ -133,6 +134,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
             // 设置归属
             finalList.forEach(item -> {
                 item.setInboundId(updateReqVO.getId());
+                item.setInboundStatus(InboundStatus.NONE.getValue());
             });
             // 保存详情
             inboundItemMapper.insertBatch(toInsetList);
@@ -149,7 +151,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     @Override
     public WmsInboundDO updateInboundStatus(Long id, Integer status) {
         WmsInboundDO inboundDO = validateInboundExists(id);
-        inboundDO.setStatus(status);
+        inboundDO.setAuditStatus(status);
         inboundMapper.updateById(inboundDO);
         return inboundDO;
     }
@@ -163,7 +165,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         // 校验存在
         WmsInboundDO inbound = validateInboundExists(id);
         // 判断是否允许删除
-        if (!inboundStateMachine.canDelete(inbound.getStatus())) {
+        if (!inboundStateMachine.canDelete(inbound.getAuditStatus())) {
             throw exception(INBOUND_CAN_NOT_EDIT);
         }
         // 唯一索引去重
@@ -203,10 +205,10 @@ public class WmsInboundServiceImpl implements WmsInboundService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void approve(InboundStatus.Event event, WmsApprovalReqVO approvalReqVO) {
+    public void approve(InboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO) {
         // 设置业务默认值
         approvalReqVO.setBillType(BillType.INBOUND.getValue());
-        approvalReqVO.setStatusType(InboundStatus.getType());
+        approvalReqVO.setStatusType(InboundAuditStatus.getType());
         // 获得业务对象
         WmsInboundDO inbound = validateInboundExists(approvalReqVO.getBillId());
         ColaContext<WmsInboundDO> ctx = ColaContext.from(inbound, approvalReqVO);

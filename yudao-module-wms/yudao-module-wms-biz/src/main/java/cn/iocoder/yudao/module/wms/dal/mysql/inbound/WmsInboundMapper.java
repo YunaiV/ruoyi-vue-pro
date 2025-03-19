@@ -21,7 +21,8 @@ public interface WmsInboundMapper extends BaseMapperX<WmsInboundDO> {
 				.eqIfPresent(WmsInboundDO::getNo, reqVO.getNo())
 				.eqIfPresent(WmsInboundDO::getType, reqVO.getType())
 				.eqIfPresent(WmsInboundDO::getWarehouseId, reqVO.getWarehouseId())
-				.eqIfPresent(WmsInboundDO::getStatus, reqVO.getStatus())
+				.eqIfPresent(WmsInboundDO::getAuditStatus, reqVO.getAuditStatus())
+                .eqIfPresent(WmsInboundDO::getInboundStatus, reqVO.getInboundStatus())
 				.eqIfPresent(WmsInboundDO::getSourceBillId, reqVO.getSourceBillId())
 				.eqIfPresent(WmsInboundDO::getSourceBillNo, reqVO.getSourceBillNo())
 				.eqIfPresent(WmsInboundDO::getSourceBillType, reqVO.getSourceBillType())
@@ -70,4 +71,4 @@ public interface WmsInboundMapper extends BaseMapperX<WmsInboundDO> {
         wrapper.eq(WmsInboundDO::getWarehouseId, warehouseId);
         return selectPage(reqVO, wrapper).getList();
     }
-}
+}

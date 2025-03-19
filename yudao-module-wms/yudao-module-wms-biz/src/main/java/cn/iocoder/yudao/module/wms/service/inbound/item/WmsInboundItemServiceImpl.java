@@ -121,4 +121,4 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
     public List<WmsInboundItemDO> selectByInboundId(Long inboundId, int limit) {
         return inboundItemMapper.selectByInboundId(inboundId, limit);
     }
-}
+}

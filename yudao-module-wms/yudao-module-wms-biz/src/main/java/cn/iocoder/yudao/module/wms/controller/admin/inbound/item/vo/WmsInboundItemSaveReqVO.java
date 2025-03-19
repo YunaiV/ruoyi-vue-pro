@@ -5,9 +5,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
 import jakarta.validation.constraints.*;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 
 /**
- * @table-fields : inbound_id,source_item_id,left_quantity,actual_quantity,product_id,plan_quantity,id
+ * @table-fields : inbound_id,source_item_id,left_quantity,inbound_status,actual_quantity,product_id,plan_quantity,id
  */
 @Schema(description = "管理后台 - 入库单详情新增/修改 Request VO")
 @Data
@@ -35,4 +37,8 @@ public class WmsInboundItemSaveReqVO {
 
     @Schema(description = "来源详情ID", example = "30830")
     private Long sourceItemId;
+
+    @Schema(description = "入库状态 ; InboundStatus : 0-未入库 , 1-部分入库 , 2-已入库", example = "")
+    @InEnum(InboundStatus.class)
+    private Integer inboundStatus;
 }
