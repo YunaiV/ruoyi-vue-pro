@@ -20,10 +20,6 @@ public class UserRespVO{
     @ExcelProperty("用户编号")
     private Long id;
 
-    @Schema(description = "工号", requiredMode = Schema.RequiredMode.REQUIRED, example = "000000")
-    @ExcelProperty("工号")
-    private String employeeId;
-
     @Schema(description = "用户账号", requiredMode = Schema.RequiredMode.REQUIRED, example = "yudao")
     @ExcelProperty("用户名称")
     private String username;

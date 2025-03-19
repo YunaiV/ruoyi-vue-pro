@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.trade.enums.brokerage;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,7 +14,7 @@ import java.util.Arrays;
  */
 @AllArgsConstructor
 @Getter
-public enum BrokerageWithdrawStatusEnum implements IntArrayValuable {
+public enum BrokerageWithdrawStatusEnum implements ArrayValuable<Integer> {
 
     AUDITING(0, "审核中"),
     AUDIT_SUCCESS(10, "审核通过"),
@@ -23,7 +23,7 @@ public enum BrokerageWithdrawStatusEnum implements IntArrayValuable {
     WITHDRAW_FAIL(21, "提现失败"),
     ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(BrokerageWithdrawStatusEnum::getStatus).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(BrokerageWithdrawStatusEnum::getStatus).toArray(Integer[]::new);
 
     /**
      * 状态
@@ -35,7 +35,7 @@ public enum BrokerageWithdrawStatusEnum implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.crm.dal.dataobject.business;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -48,6 +49,7 @@ public class CrmBusinessProductDO extends BaseDO {
      *
      * 冗余 {@link CrmProductDO#getPrice()}
      */
+    @TableField(exist = false)
     private BigDecimal productPrice;
     /**
      * 商机价格, 单位：元

@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.promotion.service.reward;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.product.api.category.ProductCategoryApi;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
+import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.promotion.api.reward.dto.RewardActivityMatchRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityBaseVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivityCreateReqVO;
@@ -13,19 +16,15 @@ import cn.iocoder.yudao.module.promotion.controller.admin.reward.vo.RewardActivi
 import cn.iocoder.yudao.module.promotion.dal.dataobject.reward.RewardActivityDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.reward.RewardActivityMapper;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionProductScopeEnum;
-import cn.iocoder.yudao.module.promotion.util.PromotionUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static cn.hutool.core.collection.CollUtil.intersectionDistinct;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.anyMatch;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 
 /**
@@ -52,9 +51,9 @@ public class RewardActivityServiceImpl implements RewardActivityService {
         // 1.2 校验商品是否冲突
         validateRewardActivitySpuConflicts(null, createReqVO);
 
-        // 2. 插入
+        // 插入
         RewardActivityDO rewardActivity = BeanUtils.toBean(createReqVO, RewardActivityDO.class)
-                .setStatus(PromotionUtils.calculateActivityStatus(createReqVO.getEndTime()));
+                .setStatus(CommonStatusEnum.ENABLE.getStatus());
         rewardActivityMapper.insert(rewardActivity);
         // 返回
         return rewardActivity.getId();
@@ -73,8 +72,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
         validateRewardActivitySpuConflicts(updateReqVO.getId(), updateReqVO);
 
         // 2. 更新
-        RewardActivityDO updateObj = BeanUtils.toBean(updateReqVO, RewardActivityDO.class)
-                .setStatus(PromotionUtils.calculateActivityStatus(updateReqVO.getEndTime()));
+        RewardActivityDO updateObj = BeanUtils.toBean(updateReqVO, RewardActivityDO.class);
         rewardActivityMapper.updateById(updateObj);
     }
 
@@ -87,8 +85,7 @@ public class RewardActivityServiceImpl implements RewardActivityService {
         }
 
         // 更新
-        RewardActivityDO updateObj = new RewardActivityDO().setId(id).setStatus(CommonStatusEnum.DISABLE.getStatus());
-        rewardActivityMapper.updateById(updateObj);
+        rewardActivityMapper.updateById(new RewardActivityDO().setId(id).setStatus(CommonStatusEnum.DISABLE.getStatus()));
     }
 
     @Override
@@ -118,22 +115,61 @@ public class RewardActivityServiceImpl implements RewardActivityService {
      * @param rewardActivity 请求
      */
     private void validateRewardActivitySpuConflicts(Long id, RewardActivityBaseVO rewardActivity) {
-        List<RewardActivityDO> list = rewardActivityMapper.selectList(RewardActivityDO::getProductScope,
-                rewardActivity.getProductScope(), RewardActivityDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
+        // 1. 获得开启的所有的活动
+        List<RewardActivityDO> list = rewardActivityMapper.selectList(RewardActivityDO::getStatus, CommonStatusEnum.ENABLE.getStatus());
         if (id != null) { // 排除自己这个活动
             list.removeIf(activity -> id.equals(activity.getId()));
         }
 
-        // 情况一：全部商品参加
-        if (PromotionProductScopeEnum.isAll(rewardActivity.getProductScope()) && !list.isEmpty()) {
-            throw exception(REWARD_ACTIVITY_SCOPE_ALL_EXISTS);
-        }
-        if (PromotionProductScopeEnum.isSpu(rewardActivity.getProductScope()) ||  // 情况二：指定商品参加
-                PromotionProductScopeEnum.isCategory(rewardActivity.getProductScope())) {  // 情况三：指定商品类型参加
-            if (anyMatch(list, item -> !intersectionDistinct(item.getProductScopeValues(),
-                    rewardActivity.getProductScopeValues()).isEmpty())) {
-                throw exception(PromotionProductScopeEnum.isSpu(rewardActivity.getProductScope()) ?
-                        REWARD_ACTIVITY_SPU_CONFLICTS : REWARD_ACTIVITY_SCOPE_CATEGORY_EXISTS);
+        // 2. 完全不允许重叠
+        for (RewardActivityDO item : list) {
+            // 2.1 校验满减送活动时间是否冲突，如果时段不冲突那么不同的时间段内则可以存在相同的商品范围
+            if (!LocalDateTimeUtil.isOverlap(item.getStartTime(), item.getEndTime(),
+                    rewardActivity.getStartTime(), rewardActivity.getEndTime())) {
+                continue;
+            }
+            // 2.2 校验商品范围是否重叠
+            // 情况一：如果与该时间段内商品范围为全部的活动冲突，或 rewardActivity 商品范围为全部，那么则直接校验不通过
+            // 例如说，rewardActivity 是全部活动，结果有个 db 里的 activity 是某个分类，它也是冲突的。也就是说，当前时间段内，有且仅有只能有一个活动！
+            if (PromotionProductScopeEnum.isAll(item.getProductScope()) ||
+                    PromotionProductScopeEnum.isAll(rewardActivity.getProductScope())) {
+                throw exception(REWARD_ACTIVITY_SCOPE_EXISTS, item.getName(),
+                        PromotionProductScopeEnum.isAll(item.getProductScope()) ?
+                                "该活动商品范围为全部已覆盖包含本活动范围" : "本活动商品范围为全部已覆盖包含了该活动商品范围");
+            }
+            // 情况二：如果与该时间段内商品范围为类别的活动冲突
+            if (PromotionProductScopeEnum.isCategory(item.getProductScope())) {
+                // 校验分类是否冲突
+                if (PromotionProductScopeEnum.isCategory(rewardActivity.getProductScope())) {
+                    if (!intersectionDistinct(item.getProductScopeValues(), rewardActivity.getProductScopeValues()).isEmpty()) {
+                        throw exception(REWARD_ACTIVITY_SCOPE_EXISTS, item.getName(), "商品分类范围重叠");
+                    }
+                }
+                // 校验商品分类是否冲突
+                if (PromotionProductScopeEnum.isSpu(rewardActivity.getProductScope())) {
+                    List<ProductSpuRespDTO> spuList = productSpuApi.getSpuList(rewardActivity.getProductScopeValues());
+                    if (!intersectionDistinct(item.getProductScopeValues(),
+                            convertSet(spuList, ProductSpuRespDTO::getCategoryId)).isEmpty()) {
+                        throw exception(REWARD_ACTIVITY_SCOPE_EXISTS, item.getName(), "该活动商品分类范围已包含本活动所选商品");
+                    }
+                }
+            }
+            // 情况三：如果与该时间段内商品范围为商品的活动冲突
+            if (PromotionProductScopeEnum.isSpu(item.getProductScope())) {
+                // 校验商品是否冲突
+                if (PromotionProductScopeEnum.isSpu(rewardActivity.getProductScope())) {
+                    if (!intersectionDistinct(item.getProductScopeValues(), rewardActivity.getProductScopeValues()).isEmpty()) {
+                        throw exception(REWARD_ACTIVITY_SCOPE_EXISTS, item.getName(), "活动商品范围所选商品重叠");
+                    }
+                }
+                // 校验商品分类是否冲突
+                if (PromotionProductScopeEnum.isCategory(rewardActivity.getProductScope())) {
+                    List<ProductSpuRespDTO> spuList = productSpuApi.getSpuList(item.getProductScopeValues());
+                    if (!intersectionDistinct(rewardActivity.getProductScopeValues(),
+                            convertSet(spuList, ProductSpuRespDTO::getCategoryId)).isEmpty()) {
+                        throw exception(REWARD_ACTIVITY_SCOPE_EXISTS, item.getName(), "本活动商品分类范围包含了该活动所选商品");
+                    }
+                }
             }
         }
     }
@@ -157,14 +193,47 @@ public class RewardActivityServiceImpl implements RewardActivityService {
     }
 
     @Override
-    public List<RewardActivityMatchRespDTO> getMatchRewardActivityList(Collection<Long> spuIds) {
-        List<RewardActivityDO> list = rewardActivityMapper.selectListBySpuIdsAndStatus(spuIds, CommonStatusEnum.ENABLE.getStatus());
-        return BeanUtils.toBean(list, RewardActivityMatchRespDTO.class);
-    }
+    public List<RewardActivityMatchRespDTO> getMatchRewardActivityListBySpuIds(Collection<Long> spuIds) {
+        // 1. 查询商品分类
+        List<ProductSpuRespDTO> spuList = productSpuApi.getSpuList(spuIds);
+        if (CollUtil.isEmpty(spuList)) {
+            return Collections.emptyList();
+        }
+        Map<Long, ProductSpuRespDTO> spuMap = convertMap(spuList, ProductSpuRespDTO::getId);
 
-    @Override
-    public List<RewardActivityDO> getRewardActivityListByStatusAndDateTimeLt(Integer status, LocalDateTime dateTime) {
-        return rewardActivityMapper.selectListByStatusAndDateTimeLt(status, dateTime);
+        // 2. 查询出指定 spuId 的 spu 参加的活动
+        List<RewardActivityDO> activityList = rewardActivityMapper.selectListBySpuIdAndStatusAndNow(
+                spuIds, convertSet(spuList, ProductSpuRespDTO::getCategoryId), CommonStatusEnum.ENABLE.getStatus());
+        if (CollUtil.isEmpty(activityList)) {
+            return Collections.emptyList();
+        }
+
+        // 3. 转换成 Response DTO
+        return convertList(activityList, activity -> {
+            RewardActivityMatchRespDTO activityDTO = BeanUtils.toBean(activity, RewardActivityMatchRespDTO.class);
+            // 3.1 设置对应匹配的 spuIds
+            activityDTO.setSpuIds(new ArrayList<>());
+            for (Long spuId : spuIds) {
+                if (PromotionProductScopeEnum.isAll(activityDTO.getProductScope())) {
+                    activityDTO.getSpuIds().add(spuId);
+                } else if (PromotionProductScopeEnum.isSpu(activityDTO.getProductScope())) {
+                    if (CollUtil.contains(activityDTO.getProductScopeValues(), spuId)) {
+                        activityDTO.getSpuIds().add(spuId);
+                    }
+                } else if (PromotionProductScopeEnum.isCategory(activityDTO.getProductScope())) {
+                    ProductSpuRespDTO spu = spuMap.get(spuId);
+                    if (spu != null && CollUtil.contains(activityDTO.getProductScopeValues(), spu.getCategoryId())) {
+                        activityDTO.getSpuIds().add(spuId);
+                    }
+                }
+            }
+
+            // 3.2 设置每个 Rule 的描述
+            activityDTO.setRules(convertList(activity.getRules(), rule ->
+                    BeanUtils.toBean(rule, RewardActivityMatchRespDTO.Rule.class)
+                            .setDescription(getRewardActivityRuleDescription(activityDTO.getConditionType(), rule))));
+            return activityDTO;
+        });
     }
 
 }

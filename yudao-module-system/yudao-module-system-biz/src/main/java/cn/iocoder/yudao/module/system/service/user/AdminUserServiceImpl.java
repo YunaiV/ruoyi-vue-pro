@@ -13,6 +13,7 @@ import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.datapermission.core.util.DataPermissionUtils;
 import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
+import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthRegisterReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
@@ -42,8 +43,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.system.enums.LogRecordConstants.*;
 
@@ -81,8 +81,6 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Resource
     private ConfigApi configApi;
     private static final ReentrantLock LOCK = new ReentrantLock(true);
-    //工号前缀
-    private static final String EMPLOYEE_ID_PREFIX = "SM%06d";
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -116,13 +114,31 @@ public class AdminUserServiceImpl implements AdminUserService {
         // 3. 记录操作日志上下文
         LogRecordContext.putVariable("user", user);
         Long id = user.getId();
-        //自动生成工号
-        user.setEmployeeId(generateEmployeeId(id));
         //修改
         userMapper.updateById(user);
         return id;
     }
 
+
+    @Override
+    public Long registerUser(AuthRegisterReqVO registerReqVO) {
+        // 1.1 校验账户配合
+        tenantService.handleTenantInfo(tenant -> {
+            long count = userMapper.selectCount();
+            if (count >= tenant.getAccountCount()) {
+                throw exception(USER_COUNT_MAX, tenant.getAccountCount());
+            }
+        });
+        // 1.2 校验正确性
+        validateUserForCreateOrUpdate(null, registerReqVO.getUsername(), null, null, null, null);
+
+        // 2. 插入用户
+        AdminUserDO user = BeanUtils.toBean(registerReqVO, AdminUserDO.class);
+        user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
+        user.setPassword(encodePassword(registerReqVO.getPassword())); // 加密密码
+        userMapper.insert(user);
+        return user.getId();
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -136,10 +152,6 @@ public class AdminUserServiceImpl implements AdminUserService {
                 updateReqVO.getMobile(), updateReqVO.getEmail(), updateReqVO.getDeptId(), updateReqVO.getPostIds());
         // 2.1 更新用户
         AdminUserDO updateObj = BeanUtils.toBean(updateReqVO, AdminUserDO.class);
-        //判断工号是否为空
-        if (StrUtil.isBlank(oldUser.getEmployeeId())){
-            updateObj.setEmployeeId(generateEmployeeId(oldUser.getId()));
-        }
         userMapper.updateById(updateObj);
         // 2.2 更新岗位
         updateUserPost(updateReqVO, updateObj);
@@ -264,7 +276,12 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Override
     public PageResult<AdminUserDO> getUserPage(UserPageReqVO reqVO) {
-        return userMapper.selectPage(reqVO, getDeptCondition(reqVO.getDeptId()));
+        // 如果有角色编号，查询角色对应的用户编号
+        Set<Long> userIds = reqVO.getRoleId() != null ?
+                permissionService.getUserRoleIdListByRoleId(singleton(reqVO.getRoleId())) : null;
+
+        // 分页查询
+        return userMapper.selectPage(reqVO, getDeptCondition(reqVO.getDeptId()), userIds);
     }
 
     @Override
@@ -327,6 +344,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     /**
      * 获得部门条件：查询指定部门的子部门编号们，包括自身
+     *
      * @param deptId 部门编号
      * @return 部门编号集合
      */
@@ -526,13 +544,4 @@ public class AdminUserServiceImpl implements AdminUserService {
     private String encodePassword(String password) {
         return passwordEncoder.encode(password);
     }
-
-    /**
-     * 自动生成工号
-     * @return java.lang.String
-     **/
-    private String generateEmployeeId(Long id) {
-        return EMPLOYEE_ID_PREFIX.formatted(id);
-    }
-
 }

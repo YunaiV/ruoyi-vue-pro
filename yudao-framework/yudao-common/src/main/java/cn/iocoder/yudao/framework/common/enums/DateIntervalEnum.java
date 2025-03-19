@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.common.enums;
 
 import cn.hutool.core.util.ArrayUtil;
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,7 +14,7 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum DateIntervalEnum implements IntArrayValuable {
+public enum DateIntervalEnum implements ArrayValuable<Integer> {
 
     DAY(1, "天"),
     WEEK(2, "周"),
@@ -23,7 +23,7 @@ public enum DateIntervalEnum implements IntArrayValuable {
     YEAR(5, "年")
     ;
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(DateIntervalEnum::getInterval).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(DateIntervalEnum::getInterval).toArray(Integer[]::new);
 
     /**
      * 类型
@@ -35,7 +35,7 @@ public enum DateIntervalEnum implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

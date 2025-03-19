@@ -7,11 +7,10 @@ import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptSaveReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptTreeRespVO;
 import cn.iocoder.yudao.module.system.convert.dept.DeptConvert;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptTreeRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.DeptMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
@@ -19,12 +18,13 @@ import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.integration.support.MessageBuilder;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import jakarta.annotation.Resource;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -41,6 +41,9 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 public class DeptServiceImpl implements DeptService {
 
     @Resource
+    private MessageChannel departmentOutputChannel;
+
+    @Resource
     private DeptMapper deptMapper;
 
     private DeptConvert deptConvert = DeptConvert.INSTANCE;
@@ -48,25 +51,28 @@ public class DeptServiceImpl implements DeptService {
     @Override
     @CacheEvict(cacheNames = RedisKeyConstants.DEPT_CHILDREN_ID_LIST,
             allEntries = true) // allEntries 清空所有缓存，因为操作一个部门，涉及到多个缓存
-    public Long createDept(DeptSaveReqVO createReqVO) {
-        if (createReqVO.getParentId() == null) {
-            createReqVO.setParentId(DeptDO.PARENT_ID_ROOT);
+    public Long createDept(DeptSaveReqDTO saveReqDTO) {
+        if (saveReqDTO.getParentId() == null) {
+            saveReqDTO.setParentId(DeptDO.PARENT_ID_ROOT);
         }
         // 校验父部门的有效性
-        validateParentDept(null, createReqVO.getParentId());
+        validateParentDept(null, saveReqDTO.getParentId());
         // 校验部门名的唯一性
-        validateDeptNameUnique(null, createReqVO.getParentId(), createReqVO.getName());
+        validateDeptNameUnique(null, saveReqDTO.getParentId(), saveReqDTO.getName());
 
         // 插入部门
-        DeptDO dept = BeanUtils.toBean(createReqVO, DeptDO.class);
-        deptMapper.insert(dept);
-        return dept.getId();
+        DeptDO deptDO = BeanUtils.toBean(saveReqDTO, DeptDO.class);
+        deptMapper.insert(deptDO);
+
+        // 发送管道
+        departmentOutputChannel.send(MessageBuilder.withPayload(deptConvert.toRespDTO(deptDO)).build());
+        return deptDO.getId();
     }
 
     @Override
     @CacheEvict(cacheNames = RedisKeyConstants.DEPT_CHILDREN_ID_LIST,
             allEntries = true) // allEntries 清空所有缓存，因为操作一个部门，涉及到多个缓存
-    public void updateDept(DeptSaveReqVO updateReqVO) {
+    public void updateDept(DeptSaveReqDTO updateReqVO) {
         if (updateReqVO.getParentId() == null) {
             updateReqVO.setParentId(DeptDO.PARENT_ID_ROOT);
         }
@@ -80,6 +86,9 @@ public class DeptServiceImpl implements DeptService {
         // 更新部门
         DeptDO updateObj = BeanUtils.toBean(updateReqVO, DeptDO.class);
         deptMapper.updateById(updateObj);
+
+        // 发送管道
+        departmentOutputChannel.send(MessageBuilder.withPayload(deptConvert.toRespDTO(updateObj)).build());
     }
 
 //    @Override
@@ -191,10 +200,10 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
-    public List<DeptDO> getChildDeptList(Long id) {
+    public List<DeptDO> getChildDeptList(Collection<Long> ids) {
         List<DeptDO> children = new LinkedList<>();
         // 遍历每一层
-        Collection<Long> parentIds = Collections.singleton(id);
+        Collection<Long> parentIds = ids;
         // 使用 Short.MAX_VALUE 避免 bug 场景下，存在死循环
         for (int i = 0; i < Short.MAX_VALUE; i++) {
             // 查询当前层，所有的子部门
@@ -208,6 +217,11 @@ public class DeptServiceImpl implements DeptService {
             parentIds = convertSet(depts, DeptDO::getId);
         }
         return children;
+    }
+
+    @Override
+    public List<DeptDO> getDeptListByLeaderUserId(Long id) {
+        return deptMapper.selectListByLeaderUserId(id);
     }
 
     @Override
@@ -271,11 +285,11 @@ public class DeptServiceImpl implements DeptService {
         List<DeptDO> deptDOList = deptMapper.selectList();
         //过滤出二级部门
         List<DeptDO> secondLevelDept = deptDOList.stream().filter(deptDO -> getDeptLevel(deptDO.getId()) == 2).toList();
-        List<DeptTreeRespVO> deptTreeRespVos = deptConvert.convertList(secondLevelDept);
+        List<DeptTreeRespVO> deptTreeRespVos = deptConvert.buildDeptTree(secondLevelDept);
         for (DeptTreeRespVO deptTreeRespVO : deptTreeRespVos){
             //获取所有子部门
             List<DeptDO> childDeptList = getChildDeptList(deptTreeRespVO.getId());
-            List<DeptTreeRespVO> childDeptListTree = deptConvert.convertList(childDeptList);
+            List<DeptTreeRespVO> childDeptListTree = deptConvert.buildDeptTree(childDeptList);
             deptTreeRespVO.setChildren(childDeptListTree);
         }
         return deptTreeRespVos;

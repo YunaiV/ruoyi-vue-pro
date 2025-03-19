@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.crm.service.clue;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
+import cn.iocoder.yudao.framework.common.enums.enums.DictTypeConstants;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.customer.CrmCust
 import cn.iocoder.yudao.module.crm.dal.dataobject.clue.CrmClueDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.followup.CrmFollowUpRecordDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.clue.CrmClueMapper;
+import cn.iocoder.yudao.module.crm.enums.CrmDictTypeConstants;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
@@ -22,6 +23,7 @@ import cn.iocoder.yudao.module.crm.service.followup.bo.CrmFollowUpCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
+import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
@@ -65,11 +67,13 @@ public class CrmClueServiceImpl implements CrmClueService {
 
     @Resource
     private AdminUserApi adminUserApi;
+    @Resource
+    private DictDataApi dictDataApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_CLUE_TYPE, subType = CRM_CLUE_CREATE_SUB_TYPE, bizNo = "{{#clue.id}}",
-            success = CRM_CLUE_CREATE_SUCCESS)
+        success = CRM_CLUE_CREATE_SUCCESS)
     public Long createClue(CrmClueSaveReqVO createReqVO) {
         // 1.1 校验关联数据
         validateRelationDataExists(createReqVO);
@@ -82,7 +86,7 @@ public class CrmClueServiceImpl implements CrmClueService {
 
         // 3. 创建数据权限
         CrmPermissionCreateReqBO createReqBO = new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CLUE.getType())
-                .setBizId(clue.getId()).setUserId(clue.getOwnerUserId()).setLevel(CrmPermissionLevelEnum.OWNER.getLevel());
+            .setBizId(clue.getId()).setUserId(clue.getOwnerUserId()).setLevel(CrmPermissionLevelEnum.OWNER.getLevel());
         crmPermissionService.createPermission(createReqBO);
 
         // 4. 记录操作日志上下文
@@ -92,8 +96,8 @@ public class CrmClueServiceImpl implements CrmClueService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = CRM_CLUE_TYPE, subType = CRM_CLUE_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
-            success = CRM_CLUE_UPDATE_SUCCESS)
+    @LogRecord(type = CRM_CLUE_TYPE, subType = CRM_CLUE_UPDATE_SUB_TYPE, bizNo = "{{#updateReq.id}}",
+        success = CRM_CLUE_UPDATE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CLUE, bizId = "#updateReq.id", level = CrmPermissionLevelEnum.OWNER)
     public void updateClue(CrmClueSaveReqVO updateReq) {
         Assert.notNull(updateReq.getId(), "线索编号不能为空");
@@ -114,14 +118,27 @@ public class CrmClueServiceImpl implements CrmClueService {
     private void validateRelationDataExists(CrmClueSaveReqVO reqVO) {
         // 校验负责人
         if (Objects.nonNull(reqVO.getOwnerUserId()) &&
-                Objects.isNull(adminUserApi.getUser(reqVO.getOwnerUserId()))) {
+            Objects.isNull(adminUserApi.getUser(reqVO.getOwnerUserId()))) {
             throw exception(USER_NOT_EXISTS);
+        }
+        // 1.3 校验标签值是否存在
+        if (CollUtil.isNotEmpty(reqVO.getLabelCodes())) {
+            Collection<String> labelCodesAsString = reqVO.getLabelCodes().stream()
+                .map(String::valueOf)
+                .toList();
+            dictDataApi.validateDictDataList(CrmDictTypeConstants.CRM_CLIENT_TAG, labelCodesAsString);
+        }
+        if (CollUtil.isNotEmpty(reqVO.getCountryCodes())) {
+            Collection<String> countryCodes = reqVO.getCountryCodes().stream()
+                .map(String::valueOf)
+                .toList();
+            dictDataApi.validateDictDataList(DictTypeConstants.COUNTRY_CODE, countryCodes);
         }
     }
 
     @Override
     @LogRecord(type = CRM_CLUE_TYPE, subType = CRM_CLUE_FOLLOW_UP_SUB_TYPE, bizNo = "{{#id}}",
-            success = CRM_CLUE_FOLLOW_UP_SUCCESS)
+        success = CRM_CLUE_FOLLOW_UP_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CLUE, bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
     public void updateClueFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent) {
         // 校验线索是否存在
@@ -129,7 +146,7 @@ public class CrmClueServiceImpl implements CrmClueService {
 
         // 更新线索
         clueMapper.updateById(new CrmClueDO().setId(id).setFollowUpStatus(true).setContactNextTime(contactNextTime)
-                .setContactLastTime(LocalDateTime.now()).setContactLastContent(contactLastContent));
+            .setContactLastTime(LocalDateTime.now()).setContactLastContent(contactLastContent));
 
         // 3. 记录操作日志上下文
         LogRecordContext.putVariable("clueName", oldClue.getName());
@@ -138,7 +155,7 @@ public class CrmClueServiceImpl implements CrmClueService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_CLUE_TYPE, subType = CRM_CLUE_DELETE_SUB_TYPE, bizNo = "{{#id}}",
-            success = CRM_CLUE_DELETE_SUCCESS)
+        success = CRM_CLUE_DELETE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CLUE, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteClue(Long id) {
         // 1. 校验存在
@@ -160,7 +177,7 @@ public class CrmClueServiceImpl implements CrmClueService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_CLUE_TYPE, subType = CRM_CLUE_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.id}}",
-            success = CRM_CLUE_TRANSFER_SUCCESS)
+        success = CRM_CLUE_TRANSFER_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CLUE, bizId = "#reqVO.id", level = CrmPermissionLevelEnum.OWNER)
     public void transferClue(CrmClueTransferReqVO reqVO, Long userId) {
         // 1 校验线索是否存在
@@ -168,7 +185,7 @@ public class CrmClueServiceImpl implements CrmClueService {
 
         // 2.1 数据权限转移
         crmPermissionService.transferPermission(new CrmPermissionTransferReqBO(userId, CrmBizTypeEnum.CRM_CLUE.getType(),
-                        reqVO.getId(), reqVO.getNewOwnerUserId(), reqVO.getOldOwnerPermissionLevel()));
+            reqVO.getId(), reqVO.getNewOwnerUserId(), reqVO.getOldOwnerPermissionLevel()));
         // 2.2 设置新的负责人
         clueMapper.updateById(new CrmClueDO().setId(reqVO.getId()).setOwnerUserId(reqVO.getNewOwnerUserId()));
 
@@ -179,7 +196,7 @@ public class CrmClueServiceImpl implements CrmClueService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_CLUE_TYPE, subType = CRM_CLUE_TRANSLATE_SUB_TYPE, bizNo = "{{#id}}",
-            success = CRM_CLUE_TRANSLATE_SUCCESS)
+        success = CRM_CLUE_TRANSLATE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CLUE, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void transformClue(Long id, Long userId) {
         // 1.1 校验线索都存在
@@ -195,11 +212,11 @@ public class CrmClueServiceImpl implements CrmClueService {
         clueMapper.updateById(new CrmClueDO().setId(id).setTransformStatus(Boolean.TRUE).setCustomerId(customerId));
         // 2.3 复制跟进记录
         List<CrmFollowUpRecordDO> followUpRecords = followUpRecordService.getFollowUpRecordByBiz(
-                CrmBizTypeEnum.CRM_CLUE.getType(), singleton(clue.getId()));
+            CrmBizTypeEnum.CRM_CLUE.getType(), singleton(clue.getId()));
         if (CollUtil.isNotEmpty(followUpRecords)) {
             followUpRecordService.createFollowUpRecordBatch(convertList(followUpRecords, record ->
-                    BeanUtils.toBean(record, CrmFollowUpCreateReqBO.class)
-                            .setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType()).setBizId(customerId)));
+                BeanUtils.toBean(record, CrmFollowUpCreateReqBO.class)
+                    .setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType()).setBizId(customerId)));
         }
 
         // 3. 记录操作日志上下文
@@ -218,14 +235,6 @@ public class CrmClueServiceImpl implements CrmClueService {
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CLUE, bizId = "#id", level = CrmPermissionLevelEnum.READ)
     public CrmClueDO getClue(Long id) {
         return clueMapper.selectById(id);
-    }
-
-    @Override
-    public List<CrmClueDO> getClueList(Collection<Long> ids, Long userId) {
-        if (CollUtil.isEmpty(ids)) {
-            return ListUtil.empty();
-        }
-        return clueMapper.selectBatchIds(ids, userId);
     }
 
     @Override

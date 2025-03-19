@@ -59,6 +59,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId> <!-- 解决 https://github.com/alibaba/easyexcel/issues/3954 问题 -->
+        </dependency>
+
+        <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-biz-ip</artifactId>
             <optional>true</optional> <!-- 设置为 optional，只有在 AreaConvert 的时候使用 -->

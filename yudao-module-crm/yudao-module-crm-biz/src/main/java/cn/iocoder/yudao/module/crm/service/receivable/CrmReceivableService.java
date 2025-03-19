@@ -59,6 +59,23 @@ public interface CrmReceivableService {
      */
     void submitReceivable(Long id, Long userId);
 
+
+    /**
+     * 审批回款
+     *
+     * @param id     回款编号
+     * @param userId 用户编号
+     */
+    void approveReceivable(Long id, Long userId);
+
+    /**
+     * 取消回款审批
+     *
+     * @param id     回款编号
+     * @param userId 用户编号
+     */
+    void cancelApproveReceivable(Long id, Long userId);
+
     /**
      * 获得回款
      *

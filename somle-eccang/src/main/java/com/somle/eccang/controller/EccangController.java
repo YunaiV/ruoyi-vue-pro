@@ -4,9 +4,9 @@ import com.somle.eccang.model.EccangOrder;
 import com.somle.eccang.model.EccangOrderVO;
 import com.somle.eccang.model.EccangResponse.EccangPage;
 import com.somle.eccang.model.EccangProduct;
+import com.somle.eccang.model.EccangInventoryBatchLogVO;
 import com.somle.eccang.service.EccangService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.integration.support.MessageBuilder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/eccang")
 public class EccangController {
-    @Autowired 
+    @Autowired
     EccangService eccangService;
 
     @GetMapping("/getInventory")
@@ -29,24 +29,29 @@ public class EccangController {
         @RequestParam String startTime,
         @RequestParam String endTime
     ) {
-        return eccangService.getInventoryBatchLog(LocalDateTime.parse(startTime), LocalDateTime.parse(endTime)).toList();
+        EccangInventoryBatchLogVO vo = new EccangInventoryBatchLogVO();
+        vo.setDateFrom(LocalDateTime.parse(startTime));
+        vo.setDateTo(LocalDateTime.parse(endTime));
+        return eccangService.getInventoryBatchLog(vo).toList();
     }
 
     @GetMapping("/getOrderShip")
     public List<EccangOrder> getOrderShip(
-            @RequestParam String startTime,
-            @RequestParam String endTime
+        @RequestParam String startTime,
+        @RequestParam String endTime
     ) {
         var vo = EccangOrderVO.builder()
+            .condition(EccangOrderVO.Condition.builder()
                 .platformShipDateStart(LocalDateTime.parse(startTime))
                 .platformShipDateEnd(LocalDateTime.parse(endTime))
-                .build();
+                .build())
+            .build();
         return eccangService.getOrderUnarchive(vo).toList();
     }
 
-    @GetMapping("/getOrder")
+    @PostMapping("/getOrder")
     public List<EccangPage> getOrder(
-        EccangOrderVO order
+        @RequestBody EccangOrderVO order
     ) {
         return eccangService.getOrderUnarchivePages(order).toList();
     }
@@ -56,7 +61,6 @@ public class EccangController {
     ) {
         return eccangService.getProducts().toList();
     }
-
 
 
     @GetMapping("/list")

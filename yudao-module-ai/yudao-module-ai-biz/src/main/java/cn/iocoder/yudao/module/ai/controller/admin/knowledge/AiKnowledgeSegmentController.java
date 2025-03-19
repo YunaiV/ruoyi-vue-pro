@@ -29,7 +29,7 @@ public class AiKnowledgeSegmentController {
 
     @GetMapping("/page")
     @Operation(summary = "获取段落分页")
-    public CommonResult<PageResult<AiKnowledgeSegmentRespVO>> getKnowledgeSegmentPageMy(@Valid AiKnowledgeSegmentPageReqVO pageReqVO) {
+    public CommonResult<PageResult<AiKnowledgeSegmentRespVO>> getKnowledgeSegmentPage(@Valid AiKnowledgeSegmentPageReqVO pageReqVO) {
         PageResult<AiKnowledgeSegmentDO> pageResult = segmentService.getKnowledgeSegmentPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, AiKnowledgeSegmentRespVO.class));
     }

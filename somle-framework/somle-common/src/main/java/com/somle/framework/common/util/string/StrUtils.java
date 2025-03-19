@@ -89,7 +89,7 @@ public class StrUtils {
     /**
      * 移除字符串中，包含指定字符串的行
      *
-     * @param content  字符串
+     * @param content 字符串
      * @param sequence 包含的字符串
      * @return 移除后的字符串
      */
@@ -121,6 +121,32 @@ public class StrUtils {
             }
         }
         return pinyin.toString();
+    }
+
+    /**
+     * 将各种格式的字符串转换为驼峰命名
+     * hello-world
+     * hello.world
+     * hello world
+     * hello_world
+     * 其他可能的分隔符格式（如空格、连字符、下划线等）
+     * TODO 以后遇见其他格式，在下方新增
+     * @param input 输入字符串
+     * @return 驼峰命名的字符串
+     */
+    public static String toCamelCase(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+
+        // 将所有特殊字符替换为下划线
+        String replacedInput = input.replaceAll("[\\s.-]", "_");
+
+        // 将整个字符串转换为小写
+        String lowerCaseInput = replacedInput.toLowerCase();
+
+        // 使用 Hutool 的 toCamelCase 方法转换为驼峰命名
+        return StrUtil.toCamelCase(lowerCaseInput);
     }
 
 }

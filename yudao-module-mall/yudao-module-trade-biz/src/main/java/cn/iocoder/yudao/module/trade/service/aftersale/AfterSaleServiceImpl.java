@@ -386,7 +386,7 @@ public class AfterSaleServiceImpl implements AfterSaleService {
             public void afterCommit() {
                 // 创建退款单
                 PayRefundCreateReqDTO createReqDTO = AfterSaleConvert.INSTANCE.convert(userIp, afterSale, tradeOrderProperties)
-                        .setReason(StrUtil.format("退款【{}】", afterSale.getSpuName()));
+                        .setReason(StrUtil.format("退款【{}】", afterSale.getSpuName()));;
                 Long payRefundId = payRefundApi.createRefund(createReqDTO);
                 // 更新售后单的退款单号
                 tradeAfterSaleMapper.updateById(new AfterSaleDO().setId(afterSale.getId()).setPayRefundId(payRefundId));
@@ -399,7 +399,7 @@ public class AfterSaleServiceImpl implements AfterSaleService {
     @AfterSaleLog(operateType = AfterSaleOperateTypeEnum.MEMBER_CANCEL)
     public void cancelAfterSale(Long userId, Long id) {
         // 校验售后单的状态，并状态待退款
-        AfterSaleDO afterSale = tradeAfterSaleMapper.selectById(id);
+        AfterSaleDO afterSale = tradeAfterSaleMapper.selectByIdAndUserId(id, userId);
         if (afterSale == null) {
             throw exception(AFTER_SALE_NOT_FOUND);
         }

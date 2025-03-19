@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCand
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateStrategy;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.event.BpmProcessInstanceEventPublisher;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
@@ -56,12 +57,15 @@ public class BpmFlowableConfiguration {
     @Bean
     public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> bpmProcessEngineConfigurationConfigurer(
             ObjectProvider<FlowableEventListener> listeners,
+            ObjectProvider<FlowableFunctionDelegate> customFlowableFunctionDelegates,
             BpmActivityBehaviorFactory bpmActivityBehaviorFactory) {
         return configuration -> {
             // 注册监听器，例如说 BpmActivityEventListener
             configuration.setEventListeners(ListUtil.toList(listeners.iterator()));
             // 设置 ActivityBehaviorFactory 实现类，用于流程任务的审核人的自定义
             configuration.setActivityBehaviorFactory(bpmActivityBehaviorFactory);
+            // 设置自定义的函数
+            configuration.setCustomFlowableFunctionDelegates(ListUtil.toList(customFlowableFunctionDelegates.stream().iterator()));
         };
     }
 

@@ -1,15 +1,13 @@
 package com.somle.kingdee.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.somle.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import lombok.Data;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -21,11 +19,21 @@ public class KingdeePage {
     private JsonNode rows;
     private Integer totalPage;
 
-//    public <T> List<T> getRows(Class<T> objectClass) {
-//        return JsonUtils.parseArray(rows.toString(), objectClass);
-//    }
-
     public <T> List<T> getRowsList(Class<T> objectClass) {
-        return JsonUtils.parseArray(rows, objectClass);
+        return JsonUtilsX.parseArray(rows, objectClass);
+    }
+
+    public int getTotal() {
+        Integer rowCount = 1;
+        rowCount = Objects.requireNonNullElse(totalPage, rowCount);
+        return rowCount;
+    }
+
+    public boolean isLastPage() {
+        return page == null || (page * pageSize) >= totalPage;
+    }
+
+    public boolean hasNext() {
+        return page != null && (page * pageSize) < totalPage;
     }
 }

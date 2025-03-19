@@ -10,9 +10,11 @@ import cn.iocoder.yudao.framework.ai.config.YudaoAiAutoConfiguration;
 import cn.iocoder.yudao.framework.ai.config.YudaoAiProperties;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
+import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatOptions;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import com.alibaba.cloud.ai.tongyi.TongYiAutoConfiguration;
 import com.alibaba.cloud.ai.tongyi.TongYiConnectionProperties;
 import com.alibaba.cloud.ai.tongyi.chat.TongYiChatModel;
@@ -54,15 +56,23 @@ import org.springframework.ai.qianfan.api.QianFanApi;
 import org.springframework.ai.qianfan.api.QianFanImageApi;
 import org.springframework.ai.stabilityai.StabilityAiImageModel;
 import org.springframework.ai.stabilityai.api.StabilityAiApi;
+import org.springframework.ai.vectorstore.RedisVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 import org.springframework.ai.zhipuai.ZhiPuAiImageModel;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
 import org.springframework.ai.zhipuai.api.ZhiPuAiImageApi;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
+import redis.clients.jedis.JedisPooled;
+import redis.clients.jedis.search.Schema;
 
 import java.util.List;
+
+import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatOptions;
+
 
 /**
  * AI Model 模型工厂的实现类
@@ -82,7 +92,9 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 case YI_YAN:
                     return buildYiYanChatModel(apiKey);
                 case DEEP_SEEK:
-                    return buildDeepSeekChatModel(apiKey);
+//                     return buildDeepSeekChatModel(apiKey);
+                    // 替换 DEEP_SEEK 对接方式，支持三方的Reasoner模式
+                    return buildDeepSeekReasonerChatModel(apiKey,url);
                 case ZHI_PU:
                     return buildZhiPuChatModel(apiKey, url);
                 case XING_HUO:
@@ -191,6 +203,25 @@ public class AiModelFactoryImpl implements AiModelFactory {
         });
     }
 
+    @Override
+    public VectorStore getOrCreateVectorStore(EmbeddingModel embeddingModel, AiPlatformEnum platform, String apiKey, String url) {
+        String cacheKey = buildClientCacheKey(VectorStore.class, platform, apiKey, url);
+        return Singleton.get(cacheKey, (Func0<VectorStore>) () -> {
+            String prefix = StrUtil.format("{}#{}:", platform.getPlatform(), apiKey);
+            var config = RedisVectorStore.RedisVectorStoreConfig.builder()
+                    .withIndexName(cacheKey)
+                    .withPrefix(prefix)
+                    .withMetadataFields(new RedisVectorStore.MetadataField("knowledgeId", Schema.FieldType.NUMERIC))
+                    .build();
+            RedisProperties redisProperties = SpringUtils.getBean(RedisProperties.class);
+            RedisVectorStore redisVectorStore = new RedisVectorStore(config, embeddingModel,
+                    new JedisPooled(redisProperties.getHost(), redisProperties.getPort()),
+                    true);
+            redisVectorStore.afterPropertiesSet();
+            return redisVectorStore;
+        });
+    }
+
     private static String buildClientCacheKey(Class<?> clazz, Object... params) {
         if (ArrayUtil.isEmpty(params)) {
             return clazz.getName();
@@ -251,6 +282,13 @@ public class AiModelFactoryImpl implements AiModelFactory {
      */
     private static DeepSeekChatModel buildDeepSeekChatModel(String apiKey) {
         return new DeepSeekChatModel(apiKey);
+    }
+
+    /**
+     * 可参考 {@link YudaoAiAutoConfiguration#deepSeekChatModel(YudaoAiProperties)}
+     */
+    private static DeepSeekChatModel buildDeepSeekReasonerChatModel(String apiKey,String url) {
+        return new DeepSeekChatModel(apiKey,DeepSeekChatOptions.builder().model(DeepSeekChatOptions.MODEL_REASONER).temperature(0.7F).build(),url);
     }
 
     /**

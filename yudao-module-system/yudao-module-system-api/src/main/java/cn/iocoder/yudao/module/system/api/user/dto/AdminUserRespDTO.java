@@ -18,10 +18,6 @@ public class AdminUserRespDTO {
      */
     private Long id;
     /**
-     * 工号
-     */
-    private String employeeId;
-    /**
      * 密码
      */
     private String password;

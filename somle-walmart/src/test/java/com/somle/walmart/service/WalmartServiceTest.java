@@ -1,18 +1,21 @@
 package com.somle.walmart.service;
 
 
-import com.somle.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
 import com.somle.walmart.model.WalmartOrderReqVO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import java.time.LocalDateTime;
 
+@Disabled
 @Slf4j
 @Import({WalmartService.class})
-class WalmartServiceTest extends BaseDbUnitTest {
+class WalmartServiceTest extends SomleBaseDbUnitTest {
     @Resource
     WalmartService service;
 

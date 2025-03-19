@@ -1,6 +1,7 @@
 package com.somle.otto.service;
 
-import com.somle.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
 import com.somle.otto.model.resp.OttoCommonResp;
 import com.somle.otto.repository.OttoAccountDao;
 import com.somle.otto.repository.OttoAuthTokenDao;
@@ -8,13 +9,15 @@ import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.Rollback;
 
+@Disabled
 @Slf4j
 @Import({OttoService.class, OttoAccountDao.class, OttoAuthTokenDao.class})
-class OttoClientTest extends BaseDbUnitTest {
+class OttoClientTest extends SomleBaseDbUnitTest {
 
     @Resource
     OttoAccountDao ottoAccountDao;

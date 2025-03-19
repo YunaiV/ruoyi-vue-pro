@@ -12,7 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import static cn.iocoder.yudao.module.crm.enums.DictTypeConstants.*;
+import static cn.iocoder.yudao.module.crm.enums.CrmDictTypeConstants.*;
 
 /**
  * 客户 Excel 导入 VO

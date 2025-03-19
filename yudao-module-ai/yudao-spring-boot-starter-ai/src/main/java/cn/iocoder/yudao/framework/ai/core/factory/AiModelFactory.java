@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
+import org.springframework.ai.vectorstore.VectorStore;
 
 /**
  * AI Model 模型工厂的接口类
@@ -91,5 +92,18 @@ public interface AiModelFactory {
      * @return ChatModel 对象
      */
     EmbeddingModel getOrCreateEmbeddingModel(AiPlatformEnum platform, String apiKey, String url);
+
+    /**
+     * 基于指定配置，获得 VectorStore 对象
+     * <p>
+     * 如果不存在，则进行创建
+     *
+     * @param embeddingModel 嵌入模型
+     * @param platform       平台
+     * @param apiKey         API KEY
+     * @param url            API URL
+     * @return VectorStore 对象
+     */
+    VectorStore getOrCreateVectorStore(EmbeddingModel embeddingModel, AiPlatformEnum platform, String apiKey, String url);
 
 }

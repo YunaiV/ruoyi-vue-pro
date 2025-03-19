@@ -4,10 +4,13 @@ import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductSimpleRespVO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductServiceDelegator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,8 +21,10 @@ import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import java.io.IOException;
 import java.util.List;
+
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -39,6 +44,7 @@ public class ErpProductController {
     @PostMapping("/create")
     @Operation(summary = "创建产品")
     @PreAuthorize("@ss.hasPermission('erp:product:create')")
+    @Idempotent
     public CommonResult<Long> createProduct(@Valid @RequestBody ErpProductSaveReqVO createReqVO) {
         return success(productService.createProduct(createReqVO));
     }
@@ -65,25 +71,41 @@ public class ErpProductController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('erp:product:query')")
     public CommonResult<ErpProductRespVO> getProduct(@RequestParam("id") Long id) {
-        return success(productService.getProduct(id));
+        ErpProductRespVO productRespVO = productService.getProduct(id);
+        if (productRespVO == null) {
+            return success(null);
+        }
+        return success(productRespVO);
     }
 
     @GetMapping("/page")
     @Operation(summary = "获得产品分页")
     @PreAuthorize("@ss.hasPermission('erp:product:query')")
     public CommonResult<PageResult<ErpProductRespVO>> getProductPage(@Valid ErpProductPageReqVO pageReqVO) {
-        return success(productService.getProductVOPage(pageReqVO));
+        PageResult<ErpProductRespVO> productVOPage = productService.getProductVOPage(pageReqVO);
+        return success(productVOPage);
     }
 
     @GetMapping("/simple-list")
     @Operation(summary = "获得产品精简列表", description = "只包含被开启的产品，主要用于前端的下拉选项")
-    public CommonResult<List<ErpProductRespVO>> getProductSimpleList() {
+    public CommonResult<List<ErpProductSimpleRespVO>> getProductSimpleList() {
         List<ErpProductRespVO> list = productService.getProductVOListByStatus(true);
-        return success(convertList(list, product -> new ErpProductRespVO().setId(product.getId())
-                .setName(product.getName()).setBarCode(product.getBarCode())
-                .setCategoryId(product.getCategoryId()).setCategoryName(product.getCategoryName())
-                .setUnitId(product.getUnitId()).setUnitName(product.getUnitName())));
+//        pageReqVO.setPageSize(100);//返回100个结果
+//        PageResult<ErpProductRespVO> voPage = productService.getProductVOPage(pageReqVO);
+//        List<ErpProductRespVO> list = voPage.getList();
+        return success(convertList(list, vo -> BeanUtils.toBean(vo, ErpProductSimpleRespVO.class)));
     }
+
+    //获得产品精简列表(高效)
+    @GetMapping("/simple-list-efficient")
+    @Operation(summary = "获得产品精简列表(高效)返回100个结果")
+    public CommonResult<List<ErpProductSimpleRespVO>> getProductSimpleListEfficient(@Valid ErpProductPageReqVO pageReqVO) {
+        pageReqVO.setPageSize(100);//返回100个结果
+        PageResult<ErpProductRespVO> voPage = productService.getProductVOPage(pageReqVO);
+        List<ErpProductRespVO> list = voPage.getList();
+        return success(convertList(list, vo -> BeanUtils.toBean(vo, ErpProductSimpleRespVO.class)));
+    }
+
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出产品 Excel")
@@ -95,7 +117,7 @@ public class ErpProductController {
         PageResult<ErpProductRespVO> pageResult = productService.getProductVOPage(pageReqVO);
         // 导出 Excel
         ExcelUtils.write(response, "产品.xls", "数据", ErpProductRespVO.class,
-                pageResult.getList());
+            pageResult.getList());
     }
 
 }

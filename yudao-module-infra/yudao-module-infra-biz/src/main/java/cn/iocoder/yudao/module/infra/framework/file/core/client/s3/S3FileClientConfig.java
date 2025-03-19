@@ -28,7 +28,8 @@ public class S3FileClientConfig implements FileClientConfig {
      * 2. 阿里云：https://help.aliyun.com/document_detail/31837.html
      * 3. 腾讯云：https://cloud.tencent.com/document/product/436/6224
      * 4. 七牛云：https://developer.qiniu.com/kodo/4088/s3-access-domainname
-     * 5. 华为云：https://developer.huaweicloud.com/endpoint?OBS
+     * 5. 华为云：https://console.huaweicloud.com/apiexplorer/#/endpoint/OBS
+     * 6. 火山云：https://www.volcengine.com/docs/6349/107356
      */
     @NotNull(message = "endpoint 不能为空")
     private String endpoint;
@@ -39,6 +40,7 @@ public class S3FileClientConfig implements FileClientConfig {
      * 3. 腾讯云：https://cloud.tencent.com/document/product/436/11142
      * 4. 七牛云：https://developer.qiniu.com/kodo/8556/set-the-custom-source-domain-name
      * 5. 华为云：https://support.huaweicloud.com/usermanual-obs/obs_03_0032.html
+     * 6. 火山云：https://www.volcengine.com/docs/6349/128983
      */
     @URL(message = "domain 必须是 URL 格式")
     private String domain;
@@ -55,6 +57,7 @@ public class S3FileClientConfig implements FileClientConfig {
      * 3. 腾讯云：https://console.cloud.tencent.com/cam/capi
      * 4. 七牛云：https://portal.qiniu.com/user/key
      * 5. 华为云：https://support.huaweicloud.com/qs-obs/obs_qs_0005.html
+     * 6. 火山云：https://console.volcengine.com/iam/keymanage/
      */
     @NotNull(message = "accessKey 不能为空")
     private String accessKey;

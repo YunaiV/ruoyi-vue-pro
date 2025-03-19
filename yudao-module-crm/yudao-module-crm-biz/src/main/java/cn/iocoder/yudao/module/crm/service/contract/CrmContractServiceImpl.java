@@ -8,8 +8,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.bpm.api.task.BpmProcessInstanceApi;
-import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractSaveReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.contract.vo.contract.CrmContractTransferReqVO;
@@ -29,8 +29,8 @@ import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
-import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
 import cn.iocoder.yudao.module.crm.service.receivable.CrmReceivableService;
+import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
@@ -44,6 +44,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -78,8 +79,7 @@ public class CrmContractServiceImpl implements CrmContractService {
 
     @Resource
     private CrmPermissionService crmPermissionService;
-    @Resource
-    private CrmProductService productService;
+
     @Resource
     private CrmCustomerService customerService;
     @Resource
@@ -94,7 +94,7 @@ public class CrmContractServiceImpl implements CrmContractService {
     @Resource
     private AdminUserApi adminUserApi;
     @Resource
-    private BpmProcessInstanceApi bpmProcessInstanceApi;
+    private ErpProductApi erpProductApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -208,7 +208,7 @@ public class CrmContractServiceImpl implements CrmContractService {
 
     private List<CrmContractProductDO> validateContractProducts(List<CrmContractSaveReqVO.Product> list) {
         // 1. 校验产品存在
-        productService.validProductList(convertSet(list, CrmContractSaveReqVO.Product::getProductId));
+        erpProductApi.validProductList(convertSet(list, CrmContractSaveReqVO.Product::getProductId));
         // 2. 转化为 CrmContractProductDO 列表
         return convertList(list, o -> BeanUtils.toBean(o, CrmContractProductDO.class,
                 item -> item.setTotalPrice(MoneyUtils.priceMultiply(item.getContractPrice(), item.getCount()))));
@@ -270,7 +270,7 @@ public class CrmContractServiceImpl implements CrmContractService {
     }
 
     @Override
-    @LogRecord(type = CRM_CONTRACT_TYPE, subType = CRM_CONTRACT_FOLLOW_UP_SUB_TYPE, bizNo = "{{#id}",
+    @LogRecord(type = CRM_CONTRACT_TYPE, subType = CRM_CONTRACT_FOLLOW_UP_SUB_TYPE, bizNo = "{{#id}}",
             success = CRM_CONTRACT_FOLLOW_UP_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTRACT, bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
     public void updateContractFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent) {
@@ -289,24 +289,57 @@ public class CrmContractServiceImpl implements CrmContractService {
     @LogRecord(type = CRM_CONTRACT_TYPE, subType = CRM_CONTRACT_SUBMIT_SUB_TYPE, bizNo = "{{#id}}",
             success = CRM_CONTRACT_SUBMIT_SUCCESS)
     public void submitContract(Long id, Long userId) {
-        // 1. 校验合同是否在审批
-        CrmContractDO contract = validateContractExists(id);
-        if (ObjUtil.notEqual(contract.getAuditStatus(), CrmAuditStatusEnum.DRAFT.getStatus())) {
+        //1. 校验合同是否处于草稿或者已退回状态
+        boolean isContractDraftOrReject = contractMapper.selectCount(new LambdaQueryWrapperX<CrmContractDO>()
+                .eq(CrmContractDO::getId, id)
+                .in(CrmContractDO::getAuditStatus, Arrays.asList(CrmAuditStatusEnum.DRAFT.getStatus(), CrmAuditStatusEnum.REJECT.getStatus()))) > 0;
+        if (!isContractDraftOrReject) {
             throw exception(CONTRACT_SUBMIT_FAIL_NOT_DRAFT);
         }
 
-        // 2. 创建合同审批流程实例
-        String processInstanceId = bpmProcessInstanceApi.createProcessInstance(userId, new BpmProcessInstanceCreateReqDTO()
-                .setProcessDefinitionKey(BPM_PROCESS_DEFINITION_KEY).setBusinessKey(String.valueOf(id)));
-
-        // 3. 更新合同工作流编号
-        contractMapper.updateById(new CrmContractDO().setId(id).setProcessInstanceId(processInstanceId)
-                .setAuditStatus(CrmAuditStatusEnum.PROCESS.getStatus()));
-
-        // 3. 记录日志
-        LogRecordContext.putVariable("contractName", contract.getName());
+       //2.修改合同状态为审批中
+        contractMapper.updateById(new CrmContractDO().setId(id).setAuditStatus(CrmAuditStatusEnum.PROCESS.getStatus()));
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_CONTRACT_TYPE, subType = CRM_CONTRACT_APPROVE_SUB_TYPE, bizNo = "{{#id}}",
+            success = CRM_CONTRACT_APPROVE_SUCCESS)
+    public void approveContract(Long id, Long userId) {
+        //1. 校验合同是否处于审批中状态
+        boolean isContractProcess = contractMapper.selectCount(new LambdaQueryWrapperX<CrmContractDO>()
+                .eq(CrmContractDO::getId, id)
+                .eq(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.PROCESS.getStatus())) > 0;
+        if (!isContractProcess) {
+            throw exception(CONTRACT_APPROVE_FAIL_NOT_PROCESS);
+        }
+
+        //2.修改合同状态为审核通过
+        contractMapper.updateById(new CrmContractDO().setId(id).setAuditStatus(CrmAuditStatusEnum.APPROVE.getStatus()));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @LogRecord(type = CRM_CONTRACT_TYPE, subType = CRM_CONTRACT_CANCEL_APPROVE_SUB_TYPE, bizNo = "{{#id}}",
+            success = CRM_CONTRACT_CANCEL_SUCCESS)
+    public void cancelApproveContract(Long id, Long userId) {
+        //1.校验合同是否处于审批通过,审批中的状态
+        boolean isContractApprove = contractMapper.selectCount(new LambdaQueryWrapperX<CrmContractDO>()
+                .eq(CrmContractDO::getId, id)
+                .in(CrmContractDO::getAuditStatus, CrmAuditStatusEnum.APPROVE.getStatus(), CrmAuditStatusEnum.PROCESS.getStatus())) > 0;
+        if (!isContractApprove) {
+            throw exception(CONTRACT_CANCEL_APPROVE_FAIL_NOT_APPROVE);
+        }
+
+        //2.查看此合同是否有相应的关联单据，如果有的话，则不允许退回
+        Long receivableCountByContractId = receivableService.getReceivableCountByContractId(id);
+        if (receivableCountByContractId > 0) {
+            throw exception(CONTRACT_CANCEL_APPROVE_FAIL_RECEIVABLE_EXIST);
+        }
+
+        //3.修改合同状态为审核不通过状态
+        contractMapper.updateById(new CrmContractDO().setId(id).setAuditStatus(CrmAuditStatusEnum.REJECT.getStatus()));
+    }
     @Override
     public void updateContractAuditStatus(Long id, Integer bpmResult) {
         // 1.1 校验合同是否存在

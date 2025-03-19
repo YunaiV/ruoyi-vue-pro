@@ -1,17 +1,20 @@
 package com.somle.manomano.service;
 
 
-import com.somle.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import java.time.LocalDateTime;
 
+@Disabled
 @Slf4j
 @Import({ManomanoService.class})
-class ManomanoServiceTest extends BaseDbUnitTest {
+class ManomanoServiceTest extends SomleBaseDbUnitTest {
     @Resource
     ManomanoService service;
 

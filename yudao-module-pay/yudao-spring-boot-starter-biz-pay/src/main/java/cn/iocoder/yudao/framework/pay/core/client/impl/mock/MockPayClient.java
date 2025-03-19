@@ -58,6 +58,11 @@ public class MockPayClient extends AbstractPayClient<NonePayClientConfig> {
     }
 
     @Override
+    protected PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body) throws Throwable {
+        throw new UnsupportedOperationException("未实现");
+    }
+
+    @Override
     protected PayRefundRespDTO doParseRefundNotify(Map<String, String> params, String body) {
         throw new UnsupportedOperationException("模拟支付无退款回调");
     }

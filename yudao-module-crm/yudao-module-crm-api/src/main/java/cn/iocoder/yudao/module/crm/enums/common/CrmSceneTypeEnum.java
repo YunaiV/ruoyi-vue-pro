@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.crm.enums.common;
 
 import cn.hutool.core.util.ObjUtil;
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,13 +14,13 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum CrmSceneTypeEnum implements IntArrayValuable {
+public enum CrmSceneTypeEnum implements ArrayValuable<Integer> {
 
     OWNER(1, "我负责的"),
     INVOLVED(2, "我参与的"),
     SUBORDINATE(3, "下属负责的");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(CrmSceneTypeEnum::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(CrmSceneTypeEnum::getType).toArray(Integer[]::new);
 
     /**
      * 场景类型
@@ -44,7 +44,7 @@ public enum CrmSceneTypeEnum implements IntArrayValuable {
     }
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

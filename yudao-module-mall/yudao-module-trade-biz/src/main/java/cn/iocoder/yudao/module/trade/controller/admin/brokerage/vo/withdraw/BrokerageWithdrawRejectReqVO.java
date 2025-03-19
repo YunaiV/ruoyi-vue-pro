@@ -14,7 +14,7 @@ public class BrokerageWithdrawRejectReqVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "7161")
     @NotNull(message = "编号不能为空")
-    private Integer id;
+    private Long id;
 
     @Schema(description = "审核驳回原因", example = "不对")
     @NotEmpty(message = "审核驳回原因不能为空")

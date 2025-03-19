@@ -11,7 +11,7 @@ public interface ErrorCodeConstants {
 
     // ========== 促销活动相关 1-013-001-000 ============
     ErrorCode DISCOUNT_ACTIVITY_NOT_EXISTS = new ErrorCode(1_013_001_000, "限时折扣活动不存在");
-    ErrorCode DISCOUNT_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1_013_001_001, "存在商品参加了其它限时折扣活动");
+    ErrorCode DISCOUNT_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1_013_001_001, "存在商品参加了其它限时折扣活动【{}】");
     ErrorCode DISCOUNT_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_001_002, "限时折扣活动已关闭，不能修改");
     ErrorCode DISCOUNT_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED = new ErrorCode(1_013_001_003, "限时折扣活动未关闭，不能删除");
     ErrorCode DISCOUNT_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_001_004, "限时折扣活动已关闭，不能重复关闭");
@@ -38,14 +38,22 @@ public interface ErrorCodeConstants {
 
     // ========== 满减送活动 1-013-006-000 ==========
     ErrorCode REWARD_ACTIVITY_NOT_EXISTS = new ErrorCode(1_013_006_000, "满减送活动不存在");
-    ErrorCode REWARD_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1_013_006_001, "存在商品参加了其它满减送活动");
+    ErrorCode REWARD_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1_013_006_001, "该时间段存在商品参加了其它满减送活动");
     ErrorCode REWARD_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_006_002, "满减送活动已关闭，不能修改");
     ErrorCode REWARD_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED = new ErrorCode(1_013_006_003, "满减送活动未关闭，不能删除");
     ErrorCode REWARD_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_006_004, "满减送活动已关闭，不能重复关闭");
-    ErrorCode REWARD_ACTIVITY_SCOPE_ALL_EXISTS = new ErrorCode(1_013_006_005, "已存在商品范围为全场的满减送活动");
-    ErrorCode REWARD_ACTIVITY_SCOPE_CATEGORY_EXISTS = new ErrorCode(1_013_006_006, "存在商品类型参加了其它满减送活动");
+    ErrorCode REWARD_ACTIVITY_SCOPE_EXISTS = new ErrorCode(1_013_006_005, "与该时间段满减送活动【{}】商品范围冲突，原因：{}");
 
-    // ========== TODO 空着 1-013-007-000 ============
+    // ========== 积分商城活动 1-013-007-000 ==========
+    ErrorCode POINT_ACTIVITY_NOT_EXISTS = new ErrorCode(1_013_007_000, "积分商城活动不存在");
+    ErrorCode POINT_ACTIVITY_SPU_CONFLICTS = new ErrorCode(1_013_007_001, "存在商品参加了其它积分商城活动");
+    ErrorCode POINT_ACTIVITY_UPDATE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_007_002, "积分商城活动已关闭，不能修改");
+    ErrorCode POINT_ACTIVITY_DELETE_FAIL_STATUS_NOT_CLOSED_OR_END = new ErrorCode(1_013_007_003, "积分商城活动未关闭或未结束，不能删除");
+    ErrorCode POINT_ACTIVITY_CLOSE_FAIL_STATUS_CLOSED = new ErrorCode(1_013_007_004, "积分商城活动已关闭，不能重复关闭");
+    ErrorCode POINT_ACTIVITY_JOIN_ACTIVITY_STATUS_CLOSED = new ErrorCode(1_013_007_005, "积分商品兑换失败，原因：积分商城活动已关闭");
+    ErrorCode POINT_ACTIVITY_JOIN_ACTIVITY_SINGLE_LIMIT_COUNT_EXCEED = new ErrorCode(1_013_007_006, "积分商品兑换失败，原因：单次限购超出");
+    ErrorCode POINT_ACTIVITY_JOIN_ACTIVITY_PRODUCT_NOT_EXISTS = new ErrorCode(1_013_007_007, "积分商品兑换失败，原因：商品不存在");
+    ErrorCode POINT_ACTIVITY_UPDATE_STOCK_FAIL = new ErrorCode(1_013_007_008, "积分商品兑换失败，原因：积分商品库存不足");
 
     // ========== 秒杀活动 1-013-008-000 ==========
     ErrorCode SECKILL_ACTIVITY_NOT_EXISTS = new ErrorCode(1_013_008_000, "秒杀活动不存在");

@@ -86,6 +86,7 @@ public class RoleServiceImpl implements RoleService {
         roleMapper.updateById(updateObj);
 
         // 3. 记录操作日志上下文
+        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(role, RoleSaveReqVO.class));
         LogRecordContext.putVariable("role", role);
     }
 
@@ -118,7 +119,6 @@ public class RoleServiceImpl implements RoleService {
         permissionService.processRoleDeleted(id);
 
         // 3. 记录操作日志上下文
-        LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(role, RoleSaveReqVO.class));
         LogRecordContext.putVariable("role", role);
     }
 

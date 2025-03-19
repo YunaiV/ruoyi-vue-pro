@@ -1,7 +1,7 @@
 package com.somle.shopify.controller;
 
 
-import com.somle.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import com.somle.shopify.service.ShopifyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

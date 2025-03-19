@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.erp.controller.admin.product.vo.product;
 
-import lombok.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import java.math.BigDecimal;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -15,26 +18,35 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class ErpProductPageReqVO extends PageParam {
 
-    @Schema(description = "产品名称", example = "张三")
+    @Schema(description = "产品名称", example = "电视机")
     private String name;
 
-    @Schema(description = "产品分类编号", example = "30796")
+    @Schema(description = "产品分类编号")
     private Long categoryId;
 
-    @Schema(description = "创建时间")
+    @Schema(description = "创建时间(\"yyyy-MM-dd HH:mm:ss\")")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
-    @Schema(description = "部门id", example = "8369")
+    @Schema(description = "修改时间(\"yyyy-MM-dd HH:mm:ss\")")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime[] updateTime;
+
+    @Schema(description = "更新人")
+    private String updater;
+    @Schema(description = "创建人")
+    private String creator;
+
+    @Schema(description = "部门id")
     private Long deptId;
 
     @Schema(description = "SKU（编码）")
     private String barCode;
 
-    @Schema(description = "单位编号", example = "30975")
+    @Schema(description = "单位编号")
     private Long unitId;
 
-    @Schema(description = "品牌",example = "you")
+    @Schema(description = "品牌")
     private String brand;
 
     @Schema(description = "材料（中文）")
@@ -47,7 +59,7 @@ public class ErpProductPageReqVO extends PageParam {
     private String remark;
 
     @Schema(description = "基础重量（kg）")
-    private Integer weight;
+    private BigDecimal weight;
 
     @Schema(description = "系列")
     private String series;
@@ -73,46 +85,28 @@ public class ErpProductPageReqVO extends PageParam {
     @Schema(description = "基础高度（mm）")
     private Integer height;
 
-    @Schema(description = "专利")
-    private String patent;
+    @Schema(description = "包装长度（整数，没有小数点，单位mm，必须为正数）")
+    private Integer packageLength;
 
-    @Schema(description = "PO产品经理id", example = "28770")
+    @Schema(description = "包装宽度（整数，没有小数点，单位mm，必须为正数）")
+    private Integer packageWidth;
+
+    @Schema(description = "包装高度（整数，没有小数点，单位mm，必须为正数）")
+    private Integer packageHeight;
+
+    @Schema(description = "包装重量（保留至小数点后两位，单位kg，必须为非负数）")
+    private BigDecimal packageWeight;
+
+    @Schema(description = "PO产品经理id")
     private Long productOwnerId;
 
-    @Schema(description = "ID工业设计id", example = "27774")
+    @Schema(description = "ID工业设计id")
     private Long industrialDesignerId;
 
-    @Schema(description = "RD研发工程师id", example = "10321")
+    @Schema(description = "RD研发工程师id")
     private Long researchDeveloperId;
 
-    @Schema(description = "维护工程师id", example = "22163")
+    @Schema(description = "维护工程师id")
     private Long maintenanceEngineerId;
-
-    @Schema(description = "层板承重")
-    private BigDecimal shelfLoadCapacity;
-
-    @Schema(description = "层板数量", example = "352")
-    private Integer shelvesCount;
-
-    @Schema(description = "电视调节方式")
-    private String tvAdjustmentMethod;
-
-    @Schema(description = "层板调节方式")
-    private String shelfAdjustmentMethod;
-
-    @Schema(description = "设计说明", example = "你说的对")
-    private String description;
-
-    @Schema(description = "宽度最大值")
-    private BigDecimal widthMax;
-
-    @Schema(description = "宽度最小值")
-    private BigDecimal widthMin;
-
-    @Schema(description = "长度最大值")
-    private BigDecimal lengthMax;
-
-    @Schema(description = "长度最小值")
-    private BigDecimal lengthMin;
 
 }

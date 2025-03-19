@@ -50,6 +50,17 @@ public interface TradeOrderUpdateService {
     void updateOrderPaid(Long id, Long payOrderId);
 
     /**
+     * 同步订单的支付状态
+     *
+     * 1. Quietly 表示，即使同步失败，也不会抛出异常
+     * 2. 什么时候回出现异常？因为是主动同步，可能和支付模块的回调通知 {@link #updateOrderPaid(Long, Long)} 存在并发冲突，导致抛出异常
+     *
+     * @param id 订单编号
+     * @param payOrderId 支付订单编号
+     */
+    void syncOrderPayStatusQuietly(Long id, Long payOrderId);
+
+    /**
      * 【管理员】发货交易订单
      *
      * @param deliveryReqVO 发货请求
@@ -118,16 +129,18 @@ public interface TradeOrderUpdateService {
     /**
      * 【管理员】核销订单
      *
+     * @param userId 管理员编号
      * @param id 订单编号
      */
-    void pickUpOrderByAdmin(Long id);
+    void pickUpOrderByAdmin(Long userId, Long id);
 
     /**
      * 【管理员】核销订单
      *
+     * @param userId 管理员编号
      * @param pickUpVerifyCode 自提核销码
      */
-    void pickUpOrderByAdmin(String pickUpVerifyCode);
+    void pickUpOrderByAdmin(Long userId, String pickUpVerifyCode);
 
     /**
      * 【管理员】根据自提核销码，查询订单

@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Schema(description = "管理后台 - 自提门店精简信息 Response VO")
 @Data
 @NoArgsConstructor
@@ -28,5 +30,8 @@ public class DeliveryPickUpStoreSimpleRespVO {
 
     @Schema(description = "门店详细地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "复旦大学路 188 号")
     private String detailAddress;
+
+    @Schema(description = "绑定用户编号组数", requiredMode = Schema.RequiredMode.REQUIRED, example = "23128")
+    private List<Long> verifyUserIds;
 
 }

@@ -1,15 +1,35 @@
 package com.somle.framework.common.util.general;
 
 import org.springframework.retry.RetryCallback;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
+import org.springframework.retry.policy.ExceptionClassifierRetryPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
+import org.springframework.web.client.HttpClientErrorException;
+
+import java.net.SocketTimeoutException;
+import java.util.Map;
 
 public class CoreUtils {
 
-    private static final RetryTemplate retryTemplate = RetryTemplate.builder()
-        .maxAttempts(3)
-        .fixedBackoff(2000) // 2000 ms between retries
-        .retryOn(Exception.class) // specify the exception to retry on
-        .build();
+    private static final RetryTemplate retryTemplate;
+
+    static {
+        var retryPolicy = new ExceptionClassifierRetryPolicy();
+        retryPolicy.setPolicyMap(Map.of(
+            HttpClientErrorException.class, new SimpleRetryPolicy(10),
+            SocketTimeoutException.class, new SimpleRetryPolicy(10)
+        ));
+
+        var exponentialBackOffPolicy = new ExponentialBackOffPolicy();
+        exponentialBackOffPolicy.setInitialInterval(2000);
+        exponentialBackOffPolicy.setMultiplier(2);
+        exponentialBackOffPolicy.setMaxInterval(180000);
+
+        retryTemplate = new RetryTemplate();
+        retryTemplate.setRetryPolicy(retryPolicy);
+        retryTemplate.setBackOffPolicy(exponentialBackOffPolicy);
+    }
 
     public static <T, E extends Throwable> T retry(RetryCallback<T, E> retryCallback) throws E {
         return retryTemplate.execute(retryCallback);

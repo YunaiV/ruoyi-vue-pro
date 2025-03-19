@@ -18,6 +18,7 @@ import com.google.common.cache.LoadingCache;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,6 +64,7 @@ public class AppBargainActivityController {
     @GetMapping("/list")
     @Operation(summary = "获得砍价活动列表", description = "用于小程序首页")
     @Parameter(name = "count", description = "需要展示的数量", example = "6")
+    @PermitAll
     public CommonResult<List<AppBargainActivityRespVO>> getBargainActivityList(
             @RequestParam(name = "count", defaultValue = "6") Integer count) {
         return success(bargainActivityListCache.getUnchecked(count));
@@ -80,6 +82,7 @@ public class AppBargainActivityController {
 
     @GetMapping("/page")
     @Operation(summary = "获得砍价活动分页")
+    @PermitAll
     public CommonResult<PageResult<AppBargainActivityRespVO>> getBargainActivityPage(PageParam pageReqVO) {
         PageResult<BargainActivityDO> result = bargainActivityService.getBargainActivityPage(pageReqVO);
         if (CollUtil.isEmpty(result.getList())) {
@@ -93,6 +96,7 @@ public class AppBargainActivityController {
     @GetMapping("/get-detail")
     @Operation(summary = "获得砍价活动详情")
     @Parameter(name = "id", description = "活动编号", example = "1")
+    @PermitAll
     public CommonResult<AppBargainActivityDetailRespVO> getBargainActivityDetail(@RequestParam("id") Long id) {
         BargainActivityDO activity = bargainActivityService.getBargainActivity(id);
         if (activity == null) {

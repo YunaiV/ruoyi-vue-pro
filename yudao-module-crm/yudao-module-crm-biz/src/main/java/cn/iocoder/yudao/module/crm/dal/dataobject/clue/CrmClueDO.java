@@ -2,13 +2,16 @@ package cn.iocoder.yudao.module.crm.dal.dataobject.clue;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
-import cn.iocoder.yudao.module.crm.enums.DictTypeConstants;
+import cn.iocoder.yudao.module.crm.enums.CrmDictTypeConstants;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * CRM 线索 DO
@@ -54,20 +57,20 @@ public class CrmClueDO extends BaseDO {
 
     /**
      * 负责人的用户编号
-     *
+     * <p>
      * 关联 AdminUserDO 的 id 字段
      */
     private Long ownerUserId;
 
     /**
      * 转化状态
-     *
+     * <p>
      * true 表示已转换，会更新 {@link #customerId} 字段
      */
     private Boolean transformStatus;
     /**
      * 客户编号
-     *
+     * <p>
      * 关联 {@link CrmCustomerDO#getId()}
      */
     private Long customerId;
@@ -94,7 +97,7 @@ public class CrmClueDO extends BaseDO {
     private String email;
     /**
      * 所在地
-     *
+     * <p>
      * 关联 {@link cn.iocoder.yudao.framework.ip.core.Area#getId()} 字段
      */
     private Integer areaId;
@@ -104,20 +107,20 @@ public class CrmClueDO extends BaseDO {
     private String detailAddress;
     /**
      * 所属行业
-     *
-     * 对应字典 {@link DictTypeConstants#CRM_CUSTOMER_INDUSTRY}
+     * <p>
+     * 对应字典 {@link CrmDictTypeConstants#CRM_CUSTOMER_INDUSTRY}
      */
     private Integer industryId;
     /**
      * 客户等级
-     *
-     * 对应字典 {@link DictTypeConstants#CRM_CUSTOMER_LEVEL}
+     * <p>
+     * 对应字典 {@link CrmDictTypeConstants#CRM_CUSTOMER_LEVEL}
      */
     private Integer level;
     /**
      * 客户来源
-     *
-     * 对应字典 {@link DictTypeConstants#CRM_CUSTOMER_SOURCE}
+     * <p>
+     * 对应字典 {@link CrmDictTypeConstants#CRM_CUSTOMER_SOURCE}
      */
     private Integer source;
     /**
@@ -125,4 +128,33 @@ public class CrmClueDO extends BaseDO {
      */
     private String remark;
 
+    /**
+     * 公司介绍
+     * <p>
+     * 存储公司简介，通常用于展示公司背景信息
+     */
+    private String companyIntroduction;
+
+    /**
+     * 官网
+     * <p>
+     * 存储公司官方网站的 URL 地址
+     */
+    private String companyWebsite;
+
+    /**
+     * 客户标签列表
+     * <p>
+     * 对应字典 {@link CrmDictTypeConstants#CRM_CLIENT_TAG}
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<Long> labelCodes;
+
+    /**
+     * 国家列表
+     * <p>
+     * 对应字典 {@link cn.iocoder.yudao.framework.common.enums.enums.DictTypeConstants#COUNTRY_CODE}
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<Long> countryCodes;
 }

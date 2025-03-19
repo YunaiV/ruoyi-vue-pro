@@ -1,13 +1,16 @@
 package com.somle.esb.job;
 
 
+import cn.iocoder.yudao.framework.common.util.csv.TsvUtils;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO.ProcessingStatuses;
 
 import com.somle.esb.model.OssData;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class AmazonspSettlementReportDataJob extends AmazonspDataJob {
@@ -25,9 +28,9 @@ public class AmazonspSettlementReportDataJob extends AmazonspDataJob {
                 .pageSize(100)
                 .build();
 
-        amazonService.account.getSellers().stream()
-            .flatMap(seller ->
-                amazonService.spClient.getReportStream(seller, vo, null)
+        amazonSpService.clients.stream()
+            .flatMap(client ->
+                client.getReportStream(vo)
             )
             .forEach(report -> {
                 OssData data = OssData.builder()
@@ -36,7 +39,7 @@ public class AmazonspSettlementReportDataJob extends AmazonspDataJob {
                     .syncType("inc")
                     .requestTimestamp(System.currentTimeMillis())
                     .folderDate(beforeYesterday)
-                    .content(report)
+                    .content(TsvUtils.toMapList(report))
                     .headers(null)
                     .build();
                 service.send(data);

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class BrokerageRecordRespVO extends BrokerageRecordBaseVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "28896")
-    private Integer id;
+    private Long id;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;

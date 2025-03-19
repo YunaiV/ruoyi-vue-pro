@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,6 +49,7 @@ public class AppCouponTemplateController {
     @GetMapping("/get")
     @Operation(summary = "获得优惠劵模版")
     @Parameter(name = "id", description = "优惠券模板编号", required = true, example = "1024")
+    @PermitAll
     public CommonResult<AppCouponTemplateRespVO> getCouponTemplate(Long id) {
         CouponTemplateDO template = couponTemplateService.getCouponTemplate(id);
         if (template == null) {
@@ -66,6 +68,7 @@ public class AppCouponTemplateController {
             @Parameter(name = "productScope", description = "使用类型"),
             @Parameter(name = "count", description = "数量", required = true)
     })
+    @PermitAll
     public CommonResult<List<AppCouponTemplateRespVO>> getCouponTemplateList(
             @RequestParam(value = "spuId", required = false) Long spuId,
             @RequestParam(value = "productScope", required = false) Integer productScope,
@@ -73,7 +76,7 @@ public class AppCouponTemplateController {
         // 1.1 处理查询条件：商品范围编号
         Long productScopeValue = getProductScopeValue(productScope, spuId);
         // 1.2 处理查询条件：领取方式 = 直接领取
-        List<Integer> canTakeTypes = singletonList(CouponTakeTypeEnum.USER.getValue());
+        List<Integer> canTakeTypes = singletonList(CouponTakeTypeEnum.USER.getType());
 
         // 2. 查询
         List<CouponTemplateDO> list = couponTemplateService.getCouponTemplateList(canTakeTypes, productScope,
@@ -88,6 +91,7 @@ public class AppCouponTemplateController {
     @GetMapping("/list-by-ids")
     @Operation(summary = "获得优惠劵模版列表")
     @Parameter(name = "ids", description = "优惠券模板编号列表")
+    @PermitAll
     public CommonResult<List<AppCouponTemplateRespVO>> getCouponTemplateList(
             @RequestParam(value = "ids", required = false) Set<Long> ids) {
         // 1. 查询
@@ -101,11 +105,12 @@ public class AppCouponTemplateController {
 
     @GetMapping("/page")
     @Operation(summary = "获得优惠劵模版分页")
+    @PermitAll
     public CommonResult<PageResult<AppCouponTemplateRespVO>> getCouponTemplatePage(AppCouponTemplatePageReqVO pageReqVO) {
         // 1.1 处理查询条件：商品范围编号
         Long productScopeValue = getProductScopeValue(pageReqVO.getProductScope(), pageReqVO.getSpuId());
         // 1.2 处理查询条件：领取方式 = 直接领取
-        List<Integer> canTakeTypes = singletonList(CouponTakeTypeEnum.USER.getValue());
+        List<Integer> canTakeTypes = singletonList(CouponTakeTypeEnum.USER.getType());
 
         // 2. 分页查询
         PageResult<CouponTemplateDO> pageResult = couponTemplateService.getCouponTemplatePage(
@@ -134,7 +139,7 @@ public class AppCouponTemplateController {
             ProductSpuRespDTO spu = productSpuApi.getSpu(spuId);
             return spu != null ? spu.getCategoryId() : null;
         }
-        // 商品卷：直接返回
+        // 商品劵：直接返回
         return spuId;
     }
 

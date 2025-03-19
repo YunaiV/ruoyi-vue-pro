@@ -15,13 +15,19 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.somle</groupId>
-            <artifactId>somle-common</artifactId>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-common</artifactId>
+        </dependency>
+
+        <!--被yudao-spring-boot-starter-mybatis以provided依赖-->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-web</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.somle</groupId>
-            <artifactId>somle-spring-boot-starter-test</artifactId>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -35,7 +41,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-integration</artifactId>
         </dependency>
-
 
     </dependencies>
 

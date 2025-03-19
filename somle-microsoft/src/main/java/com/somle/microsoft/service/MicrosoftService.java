@@ -1,11 +1,10 @@
 package com.somle.microsoft.service;
 
 
-import com.somle.framework.common.util.json.JSONArray;
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.json.JSONArray;
+import cn.iocoder.yudao.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 
-import com.somle.framework.common.util.web.WebUtils;
 import com.somle.microsoft.model.MicrosoftClient;
 import com.somle.microsoft.model.PowerbiAccount;
 import com.somle.microsoft.model.PowerbiReportReqVO;
@@ -21,8 +20,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -48,24 +45,14 @@ public class MicrosoftService {
     public void init() {
         microsoftClient = microsoftClientRepository.findAll().get(0);
         powerbiAccount = powerbiAccountRepository.findAll().get(0);
-        getPasswordToken();
     }
 
-    @Scheduled(cron = "0 */30 * * * *")
+//    @Scheduled(cron = "0 */30 * * * *")
+    @Scheduled(initialDelay = 2000, fixedRate = 1800000)
     @SneakyThrows
     public void getPasswordToken() {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
-//        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-//        var bodyString = WebUtils.urlWithParams("", Map.of(
-//                "grant_type", "password",
-//                "resource", "https://analysis.chinacloudapi.cn/powerbi/api",
-//                "client_id", microsoftClient.getClientId(),
-//                "client_secrete", microsoftClient.getClientSecret(),
-//                "username", powerbiAccount.getUsername(),
-//                "password", powerbiAccount.getPassword()
-//        ));
-//        RequestBody body = RequestBody.create(mediaType, bodyString);
         RequestBody body = new FormBody.Builder()
                 .add("grant_type", "password")
                 .add("resource", "https://analysis.chinacloudapi.cn/powerbi/api")
@@ -80,8 +67,8 @@ public class MicrosoftService {
                 .build();
         Response response = client.newCall(request).execute();
 
-        var jsonObject = JsonUtils.parseObject(response.body().string(), JSONObject.class);
-        token = jsonObject.getString("access_token");
+        var jsonObject = JsonUtilsX.parseObject(response.body().string(), JSONObject.class);
+        this.token = jsonObject.getString("access_token");
     }
 
     @SneakyThrows
@@ -96,7 +83,7 @@ public class MicrosoftService {
                 .build();
         Response response = client.newCall(request).execute();
 
-        var jsonObject = JsonUtils.parseObject(response.body().string(), JSONObject.class);
+        var jsonObject = JsonUtilsX.parseObject(response.body().string(), JSONObject.class);
         var value = jsonObject.getJSONArray("value");
 
         return value;
@@ -106,17 +93,16 @@ public class MicrosoftService {
     public JSONArray getReports(String groupId) {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
-        MediaType mediaType = MediaType.parse("text/plain");
-        RequestBody body = RequestBody.create(mediaType, "");
         Request request = new Request.Builder()
-                .url(String.format("https://api.powerbi.cn/v1.0/myorg/groups/%s}/reports", groupId))
-                .method("GET", body)
+                .url(String.format("https://api.powerbi.cn/v1.0/myorg/groups/%s/reports", groupId))
+                .method("GET", null)
                 .addHeader("Authorization", "Bearer " + token)
                 .build();
         Response response = client.newCall(request).execute();
 
-        var jsonObject = JsonUtils.parseObject(response.body().string(), JSONObject.class);
+        var jsonObject = JsonUtilsX.parseObject(response.body().string(), JSONObject.class);
         var value = jsonObject.getJSONArray("value");
+        log.info(value.toString());
 
         return value;
     }
@@ -137,7 +123,7 @@ public class MicrosoftService {
         try {
             bodyString = response.body().string();
             log.error(bodyString);
-            var jsonObject = JsonUtils.parseObject(bodyString, JSONObject.class);
+            var jsonObject = JsonUtilsX.parseObject(bodyString, JSONObject.class);
             var embedUrl = jsonObject.getString("embedUrl");
             result = embedUrl;
         } catch (Exception e) {
@@ -161,7 +147,7 @@ public class MicrosoftService {
                 .build();
         Response response = client.newCall(request).execute();
 
-        var jsonObject = JsonUtils.parseObject(response.body().string(), JSONObject.class);
+        var jsonObject = JsonUtilsX.parseObject(response.body().string(), JSONObject.class);
         var token = jsonObject.getString("token");
 
         return token;

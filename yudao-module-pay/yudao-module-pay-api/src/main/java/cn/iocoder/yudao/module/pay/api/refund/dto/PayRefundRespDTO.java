@@ -18,6 +18,13 @@ public class PayRefundRespDTO {
      */
     private Long id;
 
+    /**
+     * 渠道编码
+     *
+     * 枚举 PayChannelEnum
+     */
+    private String channelCode;
+
     // ========== 退款相关字段 ==========
     /**
      * 退款状态

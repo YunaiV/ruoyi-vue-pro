@@ -3,6 +3,7 @@ package com.somle.esb.job;
 
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
+import com.somle.amazon.service.AmazonAdService;
 import com.somle.amazon.service.AmazonService;
 import com.somle.esb.model.Domain;
 import com.somle.esb.model.OssData;
@@ -18,7 +19,7 @@ public class AmazonadDataJob extends DataJob{
     EsbService service;
 
     @Autowired
-    AmazonService amazonService;
+    AmazonAdService amazonAdService;
 
     final String DATABASE = Domain.AMAZONAD.toString();
 
@@ -27,19 +28,6 @@ public class AmazonadDataJob extends DataJob{
     public String execute(String param) throws Exception {
         setDate(param);
 
-        amazonService.adClient.getAllAdReport(beforeYesterday)
-            .forEach(page -> {
-                OssData data = OssData.builder()
-                    .database(DATABASE)
-                    .tableName("ad_report")
-                    .syncType("inc")
-                    .requestTimestamp(System.currentTimeMillis())
-                    .folderDate(beforeYesterday)
-                    .content(page)
-                    .headers(null)
-                    .build();
-                service.send(data);
-            });
-        return "data upload success";
+        throw new Exception("template data job do not execute");
     }
 }

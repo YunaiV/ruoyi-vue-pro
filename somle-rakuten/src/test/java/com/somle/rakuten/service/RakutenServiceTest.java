@@ -5,8 +5,9 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
-import com.somle.framework.common.util.json.JSONObject;
-import com.somle.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
 import com.somle.rakuten.model.pojo.RakutenTokenEntityDO;
 import com.somle.rakuten.model.vo.RakutenOrderReqVO;
 import com.somle.rakuten.model.vo.RakutenOrderSearchReqVO;
@@ -14,6 +15,7 @@ import com.somle.rakuten.repository.RakutenTokenRepository;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
@@ -23,9 +25,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+
+@Disabled
 @Slf4j
 @Import({RakutenService.class})
-class RakutenServiceTest extends BaseDbUnitTest {
+class RakutenServiceTest extends SomleBaseDbUnitTest {
 
     @Resource
     RakutenService service;

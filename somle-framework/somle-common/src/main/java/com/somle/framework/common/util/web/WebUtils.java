@@ -11,11 +11,13 @@ import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 import java.util.zip.GZIPInputStream;
 
 @Slf4j
@@ -26,8 +28,7 @@ public class WebUtils {
         .build();
 
 
-
-    public static String urlWithParams(String url, MultiValuedMap<String,String> queryParams) {
+    public static String urlWithParams(String url, MultiValuedMap<String, String> queryParams) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
         for (Map.Entry<String, String> queryParam : queryParams.entries()) {
             urlBuilder.addQueryParameter(queryParam.getKey(), queryParam.getValue());
@@ -50,7 +51,7 @@ public class WebUtils {
     }
 
 
-    public static Headers toHeaders(MultiValuedMap<String,String> headerMap) {
+    public static Headers toHeaders(MultiValuedMap<String, String> headerMap) {
         var headersBuilder = new Headers.Builder();
         for (Map.Entry<String, String> entry : headerMap.entries()) {
             headersBuilder.add(entry.getKey(), entry.getValue());
@@ -139,54 +140,91 @@ public class WebUtils {
 
     @SneakyThrows
     public static Response sendRequest(RequestX requestX) {
-        return client.newCall(toOkHttp(requestX)).execute();
+        return client.newCall(toOkHttp(requestX))
+            .execute();
     }
 
-    @SneakyThrows
     public static <T> T sendRequest(RequestX requestX, Class<T> responseClass) {
-        var response = client.newCall(toOkHttp(requestX)).execute();
-        return parseResponse(response, responseClass);
+        // 使用try-with-resources确保response被关闭
+        try (Response response = client.newCall(toOkHttp(requestX))
+            .execute()) {
+            return parseResponse(response, responseClass);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 发送一个 HTTP 请求并处理响应或异常。
+     *
+     * @param requestX 请求对象，包含了需要发送的请求的详细信息。
+     * @param callback 回调函数，用于处理响应结果或异常。
+     */
+    public static void sendRequest(RequestX requestX, BiConsumer<Response, Exception> callback) {
+        try (Response response = client.newCall(toOkHttp(requestX)).execute()) {
+            callback.accept(response, null);
+        } catch (IOException e) {
+            callback.accept(null, e);
+        }
     }
 
 
-
-
-
-    @SneakyThrows
+    /**
+     * 获取 HTTP 响应的 Body 内容并返回为字符串
+     *
+     * @param response OkHttp 的 Response 对象
+     * @return 响应 Body 的字符串
+     * @throws IllegalStateException 如果 response 或 response body 为空
+     * @throws RuntimeException 如果读取 response body 发生 IOException
+     */
     public static String getBodyString(Response response) {
-        assert response.body() != null;
-        String responseString = response.body().string();
-        log.debug("response: " + responseString);
-        return responseString;
+        if (response == null || response.body() == null) {
+            throw new IllegalStateException("Response or body is null");
+        }
+        try (ResponseBody responseBody = response.body()) {
+            String responseString = responseBody.string();
+            log.debug("Response: {}", responseString);
+            return responseString;
+        } catch (IOException e) {
+            log.error("Failed to read response body", e);
+            throw new RuntimeException("Error reading response body", e);
+        }
     }
+
 
     public static <T> T parseResponse(Response response, Class<T> responseClass) {
-        return JsonUtils.parseObject(getBodyString(response), responseClass);
+        String bodyString = "";
+        try {
+            bodyString = getBodyString(response);
+            return JsonUtils.parseObject(bodyString, responseClass);
+        } catch (Exception e) {
+            throw new RuntimeException("parse error in response with body: \n" + bodyString + "\ncause: " + e);
+        }
+
     }
 
 
     @SneakyThrows
     public static String urlToString(String urlString, String compression) {
+        InputStream inputStream = urlToInputStream(urlString, compression);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        IOUtils.copy(inputStream, byteArrayOutputStream);
+        return byteArrayOutputStream.toString();
+    }
+
+
+    @SneakyThrows
+    private static InputStream urlToInputStream(String urlString, String compression) {
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
-        // Choose input stream based on compression type
         InputStream inputStream = connection.getInputStream();
-        if ("gzip".equalsIgnoreCase(compression)) {
+        if ("GZIP".equalsIgnoreCase(compression)) {
             inputStream = new GZIPInputStream(inputStream);
         }
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        IOUtils.copy(inputStream, byteArrayOutputStream);
-        String jsonString = byteArrayOutputStream.toString();
-        return jsonString;
+        return inputStream;
     }
 
-//    public static <T> T parallelRun(int parallelism, Callable<T> codeBlock) {
-//        ForkJoinPool customThreadPool = new ForkJoinPool(parallelism);
-//        var result = customThreadPool.submit(codeBlock).join();
-//        customThreadPool.shutdown();
-//        return result;
-//    }
 
     // TODO: a general method to handle http exception (429, timeout etc)
 
@@ -199,10 +237,10 @@ public class WebUtils {
      * @param <T>          返回对象的类型
      * @return 反序列化后的对象
      */
-    public static <T> T parseResponse(String response, TypeReference<T> valueTypeRef) {
+    public static <T> T parseResponse(Response response, TypeReference<T> valueTypeRef) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            return objectMapper.readValue(response, valueTypeRef);
+            return objectMapper.readValue(getBodyString(response), valueTypeRef);
         } catch (Exception e) {
             throw new RuntimeException("Error parsing response", e);
         }

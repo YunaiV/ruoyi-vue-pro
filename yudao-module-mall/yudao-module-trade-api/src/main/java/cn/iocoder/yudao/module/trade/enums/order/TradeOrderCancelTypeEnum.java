@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.trade.enums.order;
 
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -13,14 +13,14 @@ import java.util.Arrays;
  */
 @RequiredArgsConstructor
 @Getter
-public enum TradeOrderCancelTypeEnum implements IntArrayValuable {
+public enum TradeOrderCancelTypeEnum implements ArrayValuable<Integer> {
 
     PAY_TIMEOUT(10, "超时未支付"),
     AFTER_SALE_CLOSE(20, "退款关闭"),
     MEMBER_CANCEL(30, "买家取消"),
     COMBINATION_CLOSE(40, "拼团关闭");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TradeOrderCancelTypeEnum::getType).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(TradeOrderCancelTypeEnum::getType).toArray(Integer[]::new);
 
     /**
      * 关闭类型
@@ -32,7 +32,7 @@ public enum TradeOrderCancelTypeEnum implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 

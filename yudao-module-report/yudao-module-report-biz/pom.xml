@@ -64,11 +64,6 @@
             <groupId>org.jeecgframework.jimureport</groupId>
             <artifactId>jimureport-spring-boot3-starter-fastjson2</artifactId>
         </dependency>
-        <!-- 单独依赖升级版本，解决低版本validator失败问题 -->
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>cn.iocoder.boot</groupId>

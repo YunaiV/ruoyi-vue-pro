@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.idempotent.core.aop;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
@@ -14,6 +15,7 @@ import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 拦截声明了 {@link Idempotent} 注解的方法，实现幂等操作
@@ -49,7 +51,11 @@ public class IdempotentAspect {
         // 锁定失败，抛出异常
         if (!success) {
             log.info("[aroundPointCut][方法({}) 参数({}) 存在重复请求]", joinPoint.getSignature().toString(), joinPoint.getArgs());
-            throw new ServiceException(GlobalErrorCodeConstants.REPEATED_REQUESTS.getCode(), idempotent.message());
+            String message = idempotent.message();
+            if (GlobalErrorCodeConstants.REPEATED_REQUESTS.getMsg().equals(message)) {
+                message = StrUtil.format("重复提交间隔时间不能小于'{}'秒", TimeUnit.SECONDS.toSeconds(idempotent.timeout()));
+            }
+            throw new ServiceException(GlobalErrorCodeConstants.REPEATED_REQUESTS.getCode(), message);
         }
 
         // 2. 执行逻辑

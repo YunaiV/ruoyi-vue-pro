@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.framework.mybatis.core.type.StringListTypeHandler;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
-import cn.iocoder.yudao.module.crm.enums.DictTypeConstants;
+import cn.iocoder.yudao.module.crm.enums.CrmDictTypeConstants;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -18,7 +18,7 @@ import java.util.List;
 
 /**
  * 跟进记录 DO
- *
+ * <p>
  * 用于记录客户、联系人的每一次跟进
  *
  * @author 芋道源码
@@ -41,21 +41,21 @@ public class CrmFollowUpRecordDO extends BaseDO {
 
     /**
      * 数据类型
-     *
+     * <p>
      * 枚举 {@link CrmBizTypeEnum}
      */
     private Integer bizType;
     /**
      * 数据编号
-     *
+     * <p>
      * 关联 {@link CrmBizTypeEnum} 对应模块 DO 的 id 字段
      */
     private Long bizId;
 
     /**
      * 跟进类型
-     *
-     * 关联 {@link DictTypeConstants#CRM_FOLLOW_UP_TYPE} 字典
+     * <p>
+     * 关联 {@link CrmDictTypeConstants#CRM_FOLLOW_UP_TYPE} 字典
      */
     private Integer type;
     /**
@@ -80,14 +80,14 @@ public class CrmFollowUpRecordDO extends BaseDO {
 
     /**
      * 关联的商机编号数组
-     *
+     * <p>
      * 关联 {@link CrmBusinessDO#getId()}
      */
     @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> businessIds;
     /**
      * 关联的联系人编号数组
-     *
+     * <p>
      * 关联 {@link CrmContactDO#getId()}
      */
     @TableField(typeHandler = LongListTypeHandler.class)

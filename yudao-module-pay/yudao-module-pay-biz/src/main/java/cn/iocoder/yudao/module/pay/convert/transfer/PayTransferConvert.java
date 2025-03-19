@@ -24,7 +24,8 @@ public interface PayTransferConvert {
 
     PayTransferCreateReqDTO convert(PayDemoTransferCreateReqVO vo);
 
-    PayTransferRespVO  convert(PayTransferDO bean);
+    PayTransferRespVO convert(PayTransferDO bean);
 
     PageResult<PayTransferPageItemRespVO> convertPage(PageResult<PayTransferDO> pageResult);
+
 }

@@ -9,15 +9,11 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowledgeDocumentUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateReqVO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeDocumentMapper;
 import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeSegmentMapper;
 import cn.iocoder.yudao.module.ai.enums.knowledge.AiKnowledgeDocumentStatusEnum;
-import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
-import cn.iocoder.yudao.module.ai.service.model.AiChatModelService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
@@ -49,23 +45,15 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
     private AiKnowledgeSegmentMapper segmentMapper;
 
     @Resource
-    private TokenTextSplitter tokenTextSplitter;
-    @Resource
     private TokenCountEstimator tokenCountEstimator;
-
-    @Resource
-    private AiApiKeyService apiKeyService;
     @Resource
     private AiKnowledgeService knowledgeService;
-    @Resource
-    private AiChatModelService chatModelService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createKnowledgeDocument(AiKnowledgeDocumentCreateReqVO createReqVO) {
-        // 0. 校验
-        AiKnowledgeDO knowledge = knowledgeService.validateKnowledgeExists(createReqVO.getKnowledgeId());
-        AiChatModelDO model = chatModelService.validateChatModel(knowledge.getModelId());
+        // 0. 校验并获取向量存储实例
+        VectorStore vectorStore = knowledgeService.getVectorStoreById(createReqVO.getKnowledgeId());
 
         // 1.1 下载文档
         TikaDocumentReader loader = new TikaDocumentReader(downloadFile(createReqVO.getUrl()));
@@ -82,6 +70,9 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
             return documentId;
         }
 
+        // 2 构造文本分段器
+        TokenTextSplitter tokenTextSplitter = new TokenTextSplitter(createReqVO.getDefaultSegmentTokens(), createReqVO.getMinSegmentWordCount(), createReqVO.getMinChunkLengthToEmbed(),
+                createReqVO.getMaxNumSegments(), createReqVO.getKeepSeparator());
         // 2.1 文档分段
         List<Document> segments = tokenTextSplitter.apply(documents);
         // 2.2 分段内容入库
@@ -92,9 +83,7 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
                         .setStatus(CommonStatusEnum.ENABLE.getStatus()));
         segmentMapper.insertBatch(segmentDOList);
 
-        // 3.1 获取向量存储实例
-        VectorStore vectorStore = apiKeyService.getOrCreateVectorStore(model.getKeyId());
-        // 3.2 向量化并存储
+        // 3. 向量化并存储
         segments.forEach(segment -> segment.getMetadata().put(AiKnowledgeSegmentDO.FIELD_KNOWLEDGE_ID, createReqVO.getKnowledgeId()));
         vectorStore.add(segments);
         return documentId;

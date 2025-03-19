@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.trade.enums.order;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.framework.common.core.IntArrayValuable;
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -14,13 +14,13 @@ import java.util.Arrays;
  */
 @RequiredArgsConstructor
 @Getter
-public enum TradeOrderItemAfterSaleStatusEnum implements IntArrayValuable {
+public enum TradeOrderItemAfterSaleStatusEnum implements ArrayValuable<Integer> {
 
     NONE(0, "未售后"),
     APPLY(10, "售后中"),
     SUCCESS(20, "售后成功");
 
-    public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(TradeOrderItemAfterSaleStatusEnum::getStatus).toArray();
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(TradeOrderItemAfterSaleStatusEnum::getStatus).toArray(Integer[]::new);
 
     /**
      * 状态值
@@ -32,7 +32,7 @@ public enum TradeOrderItemAfterSaleStatusEnum implements IntArrayValuable {
     private final String name;
 
     @Override
-    public int[] array() {
+    public Integer[] array() {
         return ARRAYS;
     }
 
