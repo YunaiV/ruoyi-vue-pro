@@ -1,23 +1,23 @@
 package com.somle.autonomous.service;
 
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
 import com.somle.autonomous.enums.AutonomousOrderStatus;
 import com.somle.autonomous.model.AutonomousAccount;
 import com.somle.autonomous.repository.AutonomousAccountRepository;
 import com.somle.autonomous.req.AutonomousOrderReq;
 import com.somle.autonomous.resp.AutonomousOrderResp;
-import com.somle.framework.test.core.ut.BaseDbUnitTest;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.Rollback;
 
 import java.util.Optional;
 
 @Slf4j
-@Import(AutonomousAccountRepository.class)
-class AutonomousClientTest extends BaseDbUnitTest {
+@DataJpaTest
+class AutonomousClientTest extends SomleBaseDbUnitTest {
 
     @Resource
     AutonomousAccountRepository autonomousAccountRepository;

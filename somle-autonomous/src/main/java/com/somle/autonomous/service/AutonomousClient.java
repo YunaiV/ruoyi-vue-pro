@@ -1,18 +1,19 @@
 package com.somle.autonomous.service;
 
+import cn.iocoder.yudao.framework.common.util.web.RequestX;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.somle.autonomous.model.AutonomousAccount;
 import com.somle.autonomous.model.AutonomousAuthToken;
 import com.somle.autonomous.req.AutonomousOrderReq;
 import com.somle.autonomous.resp.AutonomousCommonResp;
 import com.somle.autonomous.resp.AutonomousOrderResp;
-import com.somle.framework.common.util.web.RequestX;
-import com.somle.framework.common.util.web.WebUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 public class AutonomousClient {
@@ -42,11 +43,24 @@ public class AutonomousClient {
             .headers(generateHeaders())
             .queryParams(req)
             .build();
+        AtomicReference<AutonomousOrderResp> autonomousOrderResp = new AtomicReference<>();
 
-        Response response = WebUtils.sendRequest(requestX);
-        TypeReference<AutonomousCommonResp<AutonomousOrderResp>> typeRef = new TypeReference<>() {
-        };
-        return handleResponse(response, typeRef).getData();
+        WebUtils.sendRequest(requestX, (response, e) -> {
+            if (e != null) {
+                log.error("response = {}", response);
+                //抛出e
+                try {
+                    throw e;
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            } else {
+                TypeReference<AutonomousCommonResp<AutonomousOrderResp>> typeRef = new TypeReference<>() {
+                };
+                autonomousOrderResp.set(handleResponse(response, typeRef).getData());
+            }
+        });
+        return autonomousOrderResp.get();
     }
 
     //获取已发货(排除退款+部分退款状态的订单，汇总可得结算价格（第三方平台客服干预下会强制部分退款，这部分暂不考虑，无法纳入测量）)
@@ -74,10 +88,7 @@ public class AutonomousClient {
             throw new RuntimeException("Response 为空");
         }
         if (response.isSuccessful()) {
-            // 使用 isSuccessful() 检查HTTP响应码是否表示成功
-            String json = response.body()
-                .string();
-            return WebUtils.parseResponse(json, typeReference);
+            return WebUtils.parseResponse(response, typeReference);
         } else {
             // 错误处理逻辑
             String errorResponse = response.body()
