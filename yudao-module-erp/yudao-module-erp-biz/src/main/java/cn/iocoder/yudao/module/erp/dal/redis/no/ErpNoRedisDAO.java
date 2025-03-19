@@ -14,7 +14,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 
-
 /**
  * Erp 订单序号的 Redis DAO
  *
@@ -87,8 +86,7 @@ public class ErpNoRedisDAO {
     /**
      * 生成序号，使用当前日期，格式为 {PREFIX} + "_" + yyyyMMdd + "_" + 6 位自增
      * 例如说：QTRK-20211009-000001 （没有中间空格）
-     *<p>
-     *     可能出现并发问题、考虑redisson解决、后续
+     *
      * @param prefix 前缀
      * @return 序号
      */

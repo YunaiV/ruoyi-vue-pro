@@ -1,6 +1,7 @@
 package com.somle.kingdee.service;
 
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import cn.iocoder.yudao.framework.common.util.web.RequestX;
@@ -128,7 +129,7 @@ public class KingdeeClient {
     /**
      * 安全设置单位id，如果它存在。
      * @param unitName 单位名称
-     * @param setter 回调函数
+     * @param setter   回调函数
      */
     private void setUnitId(String unitName, Consumer<KingdeeUnit> setter) {
         getMeasureUnitByNumber(unitName, (kingdeeUnit, e) -> {
@@ -137,6 +138,7 @@ public class KingdeeClient {
             }
         });
     }
+
     public void getMeasureUnitByNumber(String number, BiConsumer<KingdeeUnit, Exception> callback) {
         try {
             String endUrl = "/jdy/v2/bd/measure_unit_detail";
@@ -187,7 +189,6 @@ public class KingdeeClient {
         TreeMap<String, String> params = new TreeMap<>();
         return postResponse(endUrl, params, reqVO);
     }
-
 
 
     /**
@@ -325,33 +326,51 @@ public class KingdeeClient {
             .findFirst().get();
     }
 
-    public List<KingdeePurRequest> getPurRequest(KingdeePurRequestReqVO vo) {
+    public Stream<KingdeePage> streamPurRequest(KingdeePurRequestReqVO vo) {
         log.debug("fetching purchase request");
         String endUrl = "/jdy/v2/scm/pur_request";
-        KingdeeResponse response = getResponse(endUrl, vo);
-        return response.getData(KingdeePage.class).getRowsList(KingdeePurRequest.class).stream().toList();
+        return StreamX.iterate(
+            getPage(JsonUtilsX.toJSONObject(vo), endUrl),
+            page -> page.hasNext(),
+            page -> {
+                vo.setPage(String.valueOf(page.getPage() + 1));
+                return getPage(JsonUtilsX.toJSONObject(vo), endUrl);
+            }
+        );
     }
 
-    public List<KingdeePurOrder> getPurOrder(KingdeePurOrderReqVO vo) {
+    public Stream<KingdeePage> streamPurOrder(KingdeePurOrderReqVO vo) {
         log.debug("fetching purchase order");
         String endUrl = "/jdy/v2/scm/pur_order";
-        KingdeeResponse response = getResponse(endUrl, vo);
-        return response.getData(KingdeePage.class).getRowsList(KingdeePurOrder.class).stream().toList();
+        return StreamX.iterate(
+            getPage(JsonUtilsX.toJSONObject(vo), endUrl),
+            page -> page.hasNext(),
+            page -> {
+                vo.setPage(String.valueOf(page.getPage() + 1));
+                return getPage(JsonUtilsX.toJSONObject(vo), endUrl);
+            }
+        );
     }
 
     /**
      * 获取采购单入库列表
-     * @param vo 请求参数
-     * @return List<KingdeePurInbound> 金蝶采购单入库列表
-     * 2025.03.07 gumaomao
      *
-     * */
-    public List<KingdeePurInbound> getPurInbound(KingdeePurInboundReqVO vo) {
+     * @param vo 请求参数
+     *           2025.03.07 gumaomao
+     */
+    public Stream<KingdeePage> streamPurInbound(KingdeePurInboundReqVO vo) {
         log.debug("fetching purchase inbound");
-        String endUrl = "/jdy/v2/scm/pur_inbound";
-        KingdeeResponse response = getResponse(endUrl, vo);
-        return response.getData(KingdeePage.class).getRowsList(KingdeePurInbound.class).stream().toList();
+        String endpoint = "/jdy/v2/scm/pur_inbound";
+        return StreamX.iterate(
+            getPage(JsonUtilsX.toJSONObject(vo), endpoint),
+            page -> page.hasNext(),
+            page -> {
+                vo.setPage(String.valueOf(page.getPage() + 1));
+                return getPage(JsonUtilsX.toJSONObject(vo), endpoint);
+            }
+        );
     }
+
     public KingdeePurOrderDetail getPurOrderDetail(String purOrderNumber) {
         String endUrl = "/jdy/v2/scm/pur_order_detail";
         TreeMap<String, String> params = new TreeMap<>();
@@ -421,4 +440,8 @@ public class KingdeeClient {
         return fetchResponse("POST", endUrl, new TreeMap<>(JsonUtilsX.toStringMap(params)), payload);
     }
 
+    private KingdeePage getPage(JSONObject payload, String endpoint) {
+        KingdeeResponse response = getResponse(endpoint, payload);
+        return response.getData(KingdeePage.class);
+    }
 }

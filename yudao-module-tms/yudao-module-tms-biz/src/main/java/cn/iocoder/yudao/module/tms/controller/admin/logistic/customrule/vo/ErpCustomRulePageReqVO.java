@@ -52,7 +52,10 @@ public class ErpCustomRulePageReqVO extends PageParam {
 
     @Schema(description = "FBA条形码")
     private String fbaBarCode;
+//
+//    @Schema(description = "SKU（编码）")
+//    private String barCode;//ERP产品的SKU编码 //暂时根据productId查询
 
-    @Schema(description = "SKU（编码）")
-    private String barCode;//ERP产品的SKU编码
+    @Schema(description = "产品id")
+    private Long productId;
 }
