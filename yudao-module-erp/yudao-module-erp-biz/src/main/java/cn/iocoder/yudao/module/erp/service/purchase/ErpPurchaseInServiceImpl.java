@@ -22,7 +22,6 @@ import cn.iocoder.yudao.module.erp.service.stock.ErpStockRecordService;
 import cn.iocoder.yudao.module.erp.service.stock.bo.ErpStockRecordCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -58,9 +57,9 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
 
     @Resource
     private ErpProductService productService;
-    @Resource
-    @Lazy // 延迟加载，避免循环依赖
-    private ErpPurchaseOrderService purchaseOrderService;
+    //    @Resource
+//    @Lazy // 延迟加载，避免循环依赖
+//    private ErpPurchaseOrderService purchaseOrderService;
     @Resource
     private ErpAccountService accountService;
     @Resource
@@ -73,7 +72,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     @Transactional(rollbackFor = Exception.class)
     public Long createPurchaseIn(ErpPurchaseInSaveReqVO createReqVO) {
         // 1.1 校验采购订单已审核
-        ErpPurchaseOrderDO purchaseOrder = purchaseOrderService.validatePurchaseOrder(createReqVO.getOrderId());
+//        ErpPurchaseOrderDO purchaseOrder = purchaseOrderService.validatePurchaseOrder(createReqVO.getOrderId());
         // 1.2 校验入库项的有效性
         List<ErpPurchaseInItemDO> purchaseInItems = validatePurchaseInItems(createReqVO.getItems());
         // 1.3 校验结算账户
@@ -84,8 +83,8 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
 
         // 2.1 插入入库
         ErpPurchaseInDO purchaseIn = BeanUtils.toBean(createReqVO, ErpPurchaseInDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()))
-                .setOrderNo(purchaseOrder.getNo()).setSupplierId(purchaseOrder.getSupplierId());
+            .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus()));
+//                .setOrderNo(purchaseOrder.getNo()).setSupplierId(purchaseOrder.getSupplierId());
         calculateTotalPrice(purchaseIn, purchaseInItems);
         purchaseInMapper.insert(purchaseIn);
         // 2.2 插入入库项
@@ -106,26 +105,26 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
             throw exception(PURCHASE_IN_UPDATE_FAIL_APPROVE, purchaseIn.getNo());
         }
         // 1.2 校验采购订单已审核
-        ErpPurchaseOrderDO purchaseOrder = purchaseOrderService.validatePurchaseOrder(updateReqVO.getOrderId());
+//        ErpPurchaseOrderDO purchaseOrder = purchaseOrderService.validatePurchaseOrder(updateReqVO.getOrderId());
         // 1.3 校验结算账户
         accountService.validateAccount(updateReqVO.getAccountId());
         // 1.4 校验订单项的有效性
         List<ErpPurchaseInItemDO> purchaseInItems = validatePurchaseInItems(updateReqVO.getItems());
 
         // 2.1 更新入库
-        ErpPurchaseInDO updateObj = BeanUtils.toBean(updateReqVO, ErpPurchaseInDO.class)
-                .setOrderNo(purchaseOrder.getNo()).setSupplierId(purchaseOrder.getSupplierId());
-        calculateTotalPrice(updateObj, purchaseInItems);
-        purchaseInMapper.updateById(updateObj);
-        // 2.2 更新入库项
-        updatePurchaseInItemList(updateReqVO.getId(), purchaseInItems);
-
-        // 3.1 更新采购订单的入库数量
-        updatePurchaseOrderInCount(updateObj.getOrderId());
-        // 3.2 注意：如果采购订单编号变更了，需要更新“老”采购订单的入库数量
-        if (ObjectUtil.notEqual(purchaseIn.getOrderId(), updateObj.getOrderId())) {
-            updatePurchaseOrderInCount(purchaseIn.getOrderId());
-        }
+//        ErpPurchaseInDO updateObj = BeanUtils.toBean(updateReqVO, ErpPurchaseInDO.class)
+//                .setOrderNo(purchaseOrder.getNo()).setSupplierId(purchaseOrder.getSupplierId());
+//        calculateTotalPrice(updateObj, purchaseInItems);
+//        purchaseInMapper.updateById(updateObj);
+//        // 2.2 更新入库项
+//        updatePurchaseInItemList(updateReqVO.getId(), purchaseInItems);
+//
+//        // 3.1 更新采购订单的入库数量
+//        updatePurchaseOrderInCount(updateObj.getOrderId());
+//        // 3.2 注意：如果采购订单编号变更了，需要更新“老”采购订单的入库数量
+//        if (ObjectUtil.notEqual(purchaseIn.getOrderId(), updateObj.getOrderId())) {
+//            updatePurchaseOrderInCount(purchaseIn.getOrderId());
+//        }
     }
 
     private void calculateTotalPrice(ErpPurchaseInDO purchaseIn, List<ErpPurchaseInItemDO> purchaseInItems) {
@@ -148,7 +147,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         Map<Long, BigDecimal> returnCountMap = purchaseInItemMapper.selectOrderItemCountSumMapByInIds(
                 convertList(purchaseIns, ErpPurchaseInDO::getId));
         // 2. 更新采购订单的入库数量
-        purchaseOrderService.updatePurchaseOrderInCount(orderId, returnCountMap);
+//        purchaseOrderService.updatePurchaseOrderInCount(orderId, returnCountMap);
     }
 
     @Override

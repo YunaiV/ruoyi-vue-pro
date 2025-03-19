@@ -14,7 +14,9 @@ import org.springframework.validation.annotation.Validated;
 import java.util.Collection;
 import java.util.List;
 
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.SUPPLIER_NOT_ENABLE;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.SUPPLIER_NOT_EXISTS;
 
 /**
  * ERP 供应商 Service 实现类

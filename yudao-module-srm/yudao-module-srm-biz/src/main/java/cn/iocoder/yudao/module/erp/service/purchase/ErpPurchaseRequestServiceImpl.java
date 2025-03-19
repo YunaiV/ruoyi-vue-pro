@@ -7,11 +7,12 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestItemsSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.ErpPurchaseRequestSaveReqVO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestItemsMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestMapper;
-import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
+import cn.iocoder.yudao.module.erp.dal.redis.no.SrmNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
-import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +26,8 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_BATCH_INSERT_ERROR;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_INSERT_ERROR;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.diffList;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 
 /**
@@ -39,8 +41,7 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService {
     private final ErpPurchaseRequestMapper erpPurchaseRequestMapper;
     private final ErpPurchaseRequestItemsMapper erpPurchaseRequestItemsMapper;
-    private final ErpProductService productService;
-    private final ErpNoRedisDAO noRedisDAO;
+    private final SrmNoRedisDAO noRedisDAO;
 
 
     @Override
@@ -51,7 +52,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         //转化为LocalDate
         LocalDate dateTime = date.toLocalDate();
         //生成单据编号
-        String no = noRedisDAO.generate(ErpNoRedisDAO.PURCHASE_REQUEST_NO_PREFIX, PURCHASE_REQUEST_NO_OUT_OF_BOUNDS);
+        String no = noRedisDAO.generate(SrmNoRedisDAO.PURCHASE_REQUEST_NO_PREFIX, PURCHASE_REQUEST_NO_OUT_OF_BOUNDS);
         //校验编号no是否在数据库中重复
         ThrowUtil.ifThrow(erpPurchaseRequestMapper.selectByNo(no) != null ,PURCHASE_REQUEST_NO_EXISTS);
         //bean拷贝
@@ -74,7 +75,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
 
     private List<ErpPurchaseRequestItemsDO> validatePurchaseRequestItems(List<ErpPurchaseRequestItemsSaveReqVO> items) {
         // 1. 校验产品存在
-        productService.validProductList(convertSet(items, ErpPurchaseRequestItemsSaveReqVO::getProductId));
+//        productService.validProductList(convertSet(items, ErpPurchaseRequestItemsSaveReqVO::getProductId));
         // 2. 转化为 ErpPurchaseRequestItemsDO 列表
         return convertList(items, o -> BeanUtils.toBean(o, ErpPurchaseRequestItemsDO.class));
     }

@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.purchase;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -38,14 +37,14 @@ public class ErpPurchaseOrderItemDO extends BaseDO {
     /**
      * 产品编号
      *
-     * 关联 {@link ErpProductDO#getId()}
      */
+//     * 关联 {@link cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO#getId()}
     private Long productId;
     /**
      * 产品单位单位
      *
-     * 冗余 {@link ErpProductDO#getUnitId()}
      */
+//     * 冗余 {@link cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO#getUnitId()}
     private Long productUnitId;
 
     /**

@@ -54,8 +54,8 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
     @Resource
     private ErpNoRedisDAO noRedisDAO;
 
-    @Resource
-    private ErpSupplierService supplierService;
+    //    @Resource
+//    private ErpSupplierService supplierService;
     @Resource
     private ErpAccountService accountService;
     @Resource
@@ -73,7 +73,7 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
         List<ErpFinancePaymentItemDO> paymentItems = validateFinancePaymentItems(
                 createReqVO.getSupplierId(), createReqVO.getItems());
         // 1.2 校验供应商
-        supplierService.validateSupplier(createReqVO.getSupplierId());
+//        supplierService.validateSupplier(createReqVO.getSupplierId());
         // 1.3 校验结算账户
         if (createReqVO.getAccountId() != null) {
             accountService.validateAccount(createReqVO.getAccountId());
@@ -109,7 +109,7 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
             throw exception(FINANCE_PAYMENT_UPDATE_FAIL_APPROVE, payment.getNo());
         }
         // 1.2 校验供应商
-        supplierService.validateSupplier(updateReqVO.getSupplierId());
+//        supplierService.validateSupplier(updateReqVO.getSupplierId());
         // 1.3 校验结算账户
         if (updateReqVO.getAccountId() != null) {
             accountService.validateAccount(updateReqVO.getAccountId());

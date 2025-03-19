@@ -52,8 +52,8 @@ public class ErpPurchaseReturnController {
     private ErpStockService stockService;
     @Resource
     private ErpProductService productService;
-    @Resource
-    private ErpSupplierService supplierService;
+//    @Resource
+//    private ErpSupplierService supplierService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -144,8 +144,8 @@ public class ErpPurchaseReturnController {
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
                 convertSet(purchaseReturnItemList, ErpPurchaseReturnItemDO::getProductId));
         // 1.3 供应商信息
-        Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(
-                convertSet(pageResult.getList(), ErpPurchaseReturnDO::getSupplierId));
+//        Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(
+//                convertSet(pageResult.getList(), ErpPurchaseReturnDO::getSupplierId));
         // 1.4 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSet(pageResult.getList(), purchaseReturn -> Long.parseLong(purchaseReturn.getCreator())));
@@ -155,7 +155,7 @@ public class ErpPurchaseReturnController {
                     item -> MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
                             .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()))));
             purchaseReturn.setProductNames(CollUtil.join(purchaseReturn.getItems(), "，", ErpPurchaseReturnRespVO.Item::getProductName));
-            MapUtils.findAndThen(supplierMap, purchaseReturn.getSupplierId(), supplier -> purchaseReturn.setSupplierName(supplier.getName()));
+//            MapUtils.findAndThen(supplierMap, purchaseReturn.getSupplierId(), supplier -> purchaseReturn.setSupplierName(supplier.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(purchaseReturn.getCreator()), user -> purchaseReturn.setCreatorName(user.getNickname()));
         });
     }

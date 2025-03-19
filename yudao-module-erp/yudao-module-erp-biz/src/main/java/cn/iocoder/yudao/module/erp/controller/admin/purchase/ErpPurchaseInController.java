@@ -52,8 +52,8 @@ public class ErpPurchaseInController {
     private ErpStockService stockService;
     @Resource
     private ErpProductService productService;
-    @Resource
-    private ErpSupplierService supplierService;
+//    @Resource
+//    private ErpSupplierService supplierService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -144,8 +144,8 @@ public class ErpPurchaseInController {
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
                 convertSet(purchaseInItemList, ErpPurchaseInItemDO::getProductId));
         // 1.3 供应商信息
-        Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(
-                convertSet(pageResult.getList(), ErpPurchaseInDO::getSupplierId));
+//        Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(
+//                convertSet(pageResult.getList(), ErpPurchaseInDO::getSupplierId));
         // 1.4 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSet(pageResult.getList(), purchaseIn -> Long.parseLong(purchaseIn.getCreator())));
@@ -155,7 +155,7 @@ public class ErpPurchaseInController {
                     item -> MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
                             .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()))));
             purchaseIn.setProductNames(CollUtil.join(purchaseIn.getItems(), "，", ErpPurchaseInRespVO.Item::getProductName));
-            MapUtils.findAndThen(supplierMap, purchaseIn.getSupplierId(), supplier -> purchaseIn.setSupplierName(supplier.getName()));
+//            MapUtils.findAndThen(supplierMap, purchaseIn.getSupplierId(), supplier -> purchaseIn.setSupplierName(supplier.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(purchaseIn.getCreator()), user -> purchaseIn.setCreatorName(user.getNickname()));
         });
     }

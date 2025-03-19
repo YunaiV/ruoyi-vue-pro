@@ -34,7 +34,7 @@ public class ErpCustomRuleHandler {
 
     private final KingdeeService kingdeeService;
     private final EccangService eccangService;
-    private final ErpSupplierProductService erpSupplierProductService;
+    //    private final ErpSupplierProductService erpSupplierProductService;
     private final ErpToEccangConverter erpToEccangConverter;
     private final ErpToKingdeeConverter erpToKingdeeConverter;
     private final DictDataApi dictDataApi;

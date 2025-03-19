@@ -46,8 +46,7 @@ public class ErpFinancePaymentController {
 
     @Resource
     private ErpFinancePaymentService financePaymentService;
-    @Resource
-    private ErpSupplierService supplierService;
+
     @Resource
     private ErpAccountService accountService;
 
@@ -129,9 +128,9 @@ public class ErpFinancePaymentController {
         List<ErpFinancePaymentItemDO> paymentItemList = financePaymentService.getFinancePaymentItemListByPaymentIds(
                 convertSet(pageResult.getList(), ErpFinancePaymentDO::getId));
         Map<Long, List<ErpFinancePaymentItemDO>> financePaymentItemMap = convertMultiMap(paymentItemList, ErpFinancePaymentItemDO::getPaymentId);
-        // 1.2 供应商信息
-        Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(
-                convertSet(pageResult.getList(), ErpFinancePaymentDO::getSupplierId));
+//        // 1.2 供应商信息
+//        Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(
+//                convertSet(pageResult.getList(), ErpFinancePaymentDO::getSupplierId));
         // 1.3 结算账户信息
         Map<Long, ErpAccountDO> accountMap = accountService.getAccountMap(
                 convertSet(pageResult.getList(), ErpFinancePaymentDO::getAccountId));
@@ -141,7 +140,7 @@ public class ErpFinancePaymentController {
         // 2. 开始拼接
         return BeanUtils.toBean(pageResult, ErpFinancePaymentRespVO.class, payment -> {
             payment.setItems(BeanUtils.toBean(financePaymentItemMap.get(payment.getId()), ErpFinancePaymentRespVO.Item.class));
-            MapUtils.findAndThen(supplierMap, payment.getSupplierId(), supplier -> payment.setSupplierName(supplier.getName()));
+//            MapUtils.findAndThen(supplierMap, payment.getSupplierId(), supplier -> payment.setSupplierName(supplier.getName()));
             MapUtils.findAndThen(accountMap, payment.getAccountId(), account -> payment.setAccountName(account.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(payment.getCreator()), user -> payment.setCreatorName(user.getNickname()));
             MapUtils.findAndThen(userMap, payment.getFinanceUserId(), user -> payment.setFinanceUserName(user.getNickname()));

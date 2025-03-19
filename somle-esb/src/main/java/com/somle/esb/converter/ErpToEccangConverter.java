@@ -45,7 +45,7 @@ public class ErpToEccangConverter {
     private final DeptApi deptApi;
     private final AdminUserApi userApi;
     private final DictDataApi dictDataApi;
-    private final ErpSupplierProductService erpSupplierProductService;
+//    private final ErpSupplierProductService erpSupplierProductService;
 
     /**
      * 将ERP产品列表转换为完整的Eccang产品列表。

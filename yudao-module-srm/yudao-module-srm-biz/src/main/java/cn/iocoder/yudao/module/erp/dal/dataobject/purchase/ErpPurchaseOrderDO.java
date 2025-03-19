@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.purchase;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpAccountDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -49,8 +48,8 @@ public class ErpPurchaseOrderDO extends BaseDO {
     /**
      * 结算账户编号
      *
-     * 关联 {@link ErpAccountDO#getId()}
      */
+//     * 关联 {@link cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpAccountDO#getId()}
     private Long accountId;
     /**
      * 下单时间

@@ -8,13 +8,12 @@ import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderSaveReqVO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseOrderItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseOrderMapper;
-import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
+import cn.iocoder.yudao.module.erp.dal.redis.no.SrmNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
-import cn.iocoder.yudao.module.erp.service.finance.ErpAccountService;
-import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,14 +46,14 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     private ErpPurchaseOrderItemMapper purchaseOrderItemMapper;
 
     @Resource
-    private ErpNoRedisDAO noRedisDAO;
-
-    @Resource
-    private ErpProductService productService;
+    private SrmNoRedisDAO noRedisDAO;
+    //
+//    @Resource
+//    private ErpProductService productService;
     @Resource
     private ErpSupplierService supplierService;
-    @Resource
-    private ErpAccountService accountService;
+//    @Resource
+//    private ErpAccountService accountService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -65,10 +64,10 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         supplierService.validateSupplier(createReqVO.getSupplierId());
         // 1.3 校验结算账户
         if (createReqVO.getAccountId() != null) {
-            accountService.validateAccount(createReqVO.getAccountId());
+//            accountService.validateAccount(createReqVO.getAccountId());
         }
         // 1.4 生成订单号，并校验唯一性
-        String no = noRedisDAO.generate(ErpNoRedisDAO.PURCHASE_ORDER_NO_PREFIX, PURCHASE_ORDER_NO_OUT_OF_BOUNDS);
+        String no = noRedisDAO.generate(SrmNoRedisDAO.PURCHASE_ORDER_NO_PREFIX, PURCHASE_ORDER_NO_OUT_OF_BOUNDS);
         ThrowUtil.ifThrow(purchaseOrderMapper.selectByNo(no) != null ,PURCHASE_ORDER_NO_EXISTS);
         // 2.1 插入订单
         ErpPurchaseOrderDO purchaseOrder = BeanUtils.toBean(createReqVO, ErpPurchaseOrderDO.class, in -> in
@@ -92,9 +91,9 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         // 1.2 校验供应商
         supplierService.validateSupplier(updateReqVO.getSupplierId());
         // 1.3 校验结算账户
-        if (updateReqVO.getAccountId() != null) {
-            accountService.validateAccount(updateReqVO.getAccountId());
-        }
+//        if (updateReqVO.getAccountId() != null) {
+//            accountService.validateAccount(updateReqVO.getAccountId());
+//        }
         // 1.4 校验订单项的有效性
         List<ErpPurchaseOrderItemDO> purchaseOrderItems = validatePurchaseOrderItems(updateReqVO.getItems());
 
@@ -147,13 +146,13 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     }
 
     private List<ErpPurchaseOrderItemDO> validatePurchaseOrderItems(List<ErpPurchaseOrderSaveReqVO.Item> list) {
-        // 1. 校验产品存在
-        List<ErpProductDO> productList = productService.validProductList(
-                convertSet(list, ErpPurchaseOrderSaveReqVO.Item::getProductId));
-        Map<Long, ErpProductDO> productMap = convertMap(productList, ErpProductDO::getId);
-        // 2. 转化为 ErpPurchaseOrderItemDO 列表
+//        // 1. 校验产品存在
+//        List<ErpProductDO> productList = productService.validProductList(
+//                convertSet(list, ErpPurchaseOrderSaveReqVO.Item::getProductId));
+//        Map<Long, ErpProductDO> productMap = convertMap(productList, ErpProductDO::getId);
+//        // 2. 转化为 ErpPurchaseOrderItemDO 列表
         return convertList(list, o -> BeanUtils.toBean(o, ErpPurchaseOrderItemDO.class, item -> {
-            item.setProductUnitId(productMap.get(item.getProductId()).getUnitId());
+//            item.setProductUnitId(productMap.get(item.getProductId()).getUnitId());
             item.setTotalPrice(MoneyUtils.priceMultiply(item.getProductPrice(), item.getCount()));
             if (item.getTotalPrice() == null) {
                 return;
@@ -193,8 +192,9 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
                 return;
             }
             if (inCount.compareTo(item.getCount()) > 0) {
-                throw exception(PURCHASE_ORDER_ITEM_IN_FAIL_PRODUCT_EXCEED,
-                        productService.getProduct(item.getProductId()).getName(), item.getCount());
+                throw exception(PURCHASE_ORDER_ITEM_IN_FAIL_PRODUCT_EXCEED
+//                    ,productService.getProduct(item.getProductId()).getName(), item.getCount()
+                );
             }
             purchaseOrderItemMapper.updateById(new ErpPurchaseOrderItemDO().setId(item.getId()).setInCount(inCount));
         });
@@ -213,8 +213,9 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
                 return;
             }
             if (returnCount.compareTo(item.getInCount()) > 0) {
-                throw exception(PURCHASE_ORDER_ITEM_RETURN_FAIL_IN_EXCEED,
-                        productService.getProduct(item.getProductId()).getName(), item.getInCount());
+                throw exception(PURCHASE_ORDER_ITEM_RETURN_FAIL_IN_EXCEED
+//                        productService.getProduct(item.getProductId()).getName(), item.getInCount()
+                );
             }
             purchaseOrderItemMapper.updateById(new ErpPurchaseOrderItemDO().setId(item.getId()).setReturnCount(returnCount));
         });
