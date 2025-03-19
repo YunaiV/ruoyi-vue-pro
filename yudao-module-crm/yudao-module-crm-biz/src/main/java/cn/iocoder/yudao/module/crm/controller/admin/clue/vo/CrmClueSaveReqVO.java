@@ -52,12 +52,10 @@ public class CrmClueSaveReqVO {
 
     @Schema(description = "手机号", example = "18000000000")
     @DiffLogField(name = "手机号")
-    @Mobile
     private String mobile;
 
     @Schema(description = "电话", example = "18000000000")
     @DiffLogField(name = "电话")
-    @Telephone
     private String telephone;
 
     @Schema(description = "QQ", example = "123456789")
