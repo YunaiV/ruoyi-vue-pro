@@ -58,4 +58,12 @@ public interface ErrorCodeConstants {
     ErrorCode APPROVAL_HISTORY_NOT_EXISTS = new ErrorCode(2_001_700_001, "审批历史不存在");
     ErrorCode APPROVAL_HISTORY_BE_REFERRED = new ErrorCode(2_001_700_002, "审批历史被引用");
     ErrorCode APPROVAL_HISTORY_CAN_NOT_EDIT = new ErrorCode(2_001_700_003, "审批历史不允许编辑");
+
+    // ========== WMS_STOCK_WAREHOUSE 仓库库存表 2_001_800_000 ==========
+    ErrorCode STOCK_WAREHOUSE_NOT_EXISTS = new ErrorCode(2_001_800_001, "仓库库存不存在");
+    ErrorCode STOCK_WAREHOUSE_WAREHOUSE_ID_PRODUCT_ID_DUPLICATE = new ErrorCode(2_001_800_002, "仓库ID,产品ID已存在");
+    ErrorCode STOCK_WAREHOUSE_BE_REFERRED = new ErrorCode(2_001_800_003, "仓库库存被引用");
+    ErrorCode STOCK_WAREHOUSE_CAN_NOT_EDIT = new ErrorCode(2_001_800_004, "仓库库存不允许编辑");
+    ErrorCode STOCK_WAREHOUSE_CAN_NOT_DELETE = new ErrorCode(2_001_800_005, "仓库库存不允许删除");
+    ErrorCode STOCK_WAREHOUSE_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_800_006, "仓库库存不符合审批条件");
 }

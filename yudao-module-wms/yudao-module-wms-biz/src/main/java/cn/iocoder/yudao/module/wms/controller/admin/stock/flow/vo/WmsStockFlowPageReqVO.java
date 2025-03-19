@@ -1,0 +1,71 @@
+package cn.iocoder.yudao.module.wms.controller.admin.stock.flow.vo;
+
+import lombok.*;
+import java.util.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import org.springframework.format.annotation.DateTimeFormat;
+import java.time.LocalDateTime;
+
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+
+@Schema(description = "管理后台 - 库存流水分页 Request VO")
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class WmsStockFlowPageReqVO extends PageParam {
+
+    @Schema(description = "库存类型", example = "2")
+    private Integer stockType;
+
+    @Schema(description = "库存ID，分别指向三张库存表的ID", example = "17743")
+    private Long stockId;
+
+    @Schema(description = "流水发生的原因", example = "不香")
+    private Integer reason;
+
+    @Schema(description = "流水触发的单据ID", example = "21958")
+    private Long reasonBillId;
+
+    @Schema(description = "流水触发的单据下对应的明细ID", example = "30829")
+    private Long reasonItemId;
+
+    @Schema(description = "前一个流水ID", example = "31237")
+    private Long prevFlowId;
+
+    @Schema(description = "变更量")
+    private Integer deltaQuantity;
+
+    @Schema(description = "采购计划量")
+    private Integer purchasePlanQuantity;
+
+    @Schema(description = "采购在途量")
+    private Integer purchaseTransitQuantity;
+
+    @Schema(description = "退件在途数量")
+    private Integer returnTransitQuantity;
+
+    @Schema(description = "待上架数量")
+    private Integer pendingShelvingQuantity;
+
+    @Schema(description = "可用量，在库的良品数量")
+    private Integer availableQuantity;
+
+    @Schema(description = "可售量，未被单据占用的良品数量")
+    private Integer sellableQuantity;
+
+    @Schema(description = "待出库量")
+    private Integer pendingOutboundQuantity;
+
+    @Schema(description = "不良品数量")
+    private Integer defectiveQuantity;
+
+    @Schema(description = "流水发生的时间")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime[] flowTime;
+
+    @Schema(description = "创建时间")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime[] createTime;
+
+}
