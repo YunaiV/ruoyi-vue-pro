@@ -16,7 +16,6 @@ import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.stock.ErpStockRecordBizTypeEnum;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
-import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
 import cn.iocoder.yudao.module.erp.service.stock.bo.ErpStockRecordCreateReqBO;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;

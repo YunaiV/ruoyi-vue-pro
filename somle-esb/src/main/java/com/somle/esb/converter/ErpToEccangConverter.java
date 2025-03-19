@@ -10,7 +10,6 @@ import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
-import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierProductService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
