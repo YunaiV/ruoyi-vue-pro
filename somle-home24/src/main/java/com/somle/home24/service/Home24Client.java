@@ -37,7 +37,7 @@ public class Home24Client {
 
     @Nullable
     private Home24CommonOrdersResp<Object> getResp(Home24OrderReq orderReq) {
-        Home24CommonOrdersResp<Object> resp = null;
+        Home24CommonOrdersResp<Object> home24Resp = null;
         int offset = 0;
         int totalCount = 0;
 
@@ -61,17 +61,17 @@ public class Home24Client {
 
 
             // 如果这是第一次请求响应，初始化响应对象
-            if (resp == null && respOrders.get() != null) {
-                resp = respOrders.get();
-                totalCount = resp.getTotal_count();
+            if (home24Resp == null && respOrders.get() != null) {
+                home24Resp = respOrders.get();
+                totalCount = home24Resp.getTotal_count();
 
                 // 确保 orders 列表已经初始化
-                if (resp.getOrders() == null) {
-                    resp.setOrders(new ArrayList<>()); // 初始化为空列表
+                if (home24Resp.getOrders() == null) {
+                    home24Resp.setOrders(new ArrayList<>()); // 初始化为空列表
                 }
-            } else if (resp != null & respOrders.get() != null && respOrders.get().getOrders() != null) {
+            } else if (home24Resp != null & respOrders.get() != null && respOrders.get().getOrders() != null) {
                 //合并Order
-                resp.getOrders()
+                home24Resp.getOrders()
                     .addAll(respOrders.get().getOrders());
             }
 
@@ -81,7 +81,7 @@ public class Home24Client {
 
         } while (offset < totalCount); // 如果当前的 offset 小于总数量，则继续请求
 
-        return resp;
+        return home24Resp;
     }
 
 
@@ -99,7 +99,16 @@ public class Home24Client {
             AtomicReference<Home24CommonInvoicesResp<Object>> respInvoices = new AtomicReference<>();
             RequestX request = createRequest(invoicesReq, "/api/invoices", RequestX.Method.GET);
             WebUtils.sendRequest(request, (res, e) -> {
-                respInvoices.set(handleResponse(res, Home24CommonInvoicesResp.class));
+                if (e != null) {
+                    log.error("请求失败 {}", e.getMessage());
+                    try {
+                        throw e;
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
+                } else {
+                    respInvoices.set(handleResponse(res, Home24CommonInvoicesResp.class));
+                }
             });
 
 
