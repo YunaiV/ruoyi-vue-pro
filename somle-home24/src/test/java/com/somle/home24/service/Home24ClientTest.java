@@ -1,6 +1,6 @@
 package com.somle.home24.service;
 
-import com.somle.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
 import com.somle.home24.model.req.Home24InvoicesReq;
 import com.somle.home24.model.req.Home24OrderReq;
 import com.somle.home24.model.resp.Home24CommonInvoicesResp;
@@ -11,12 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.Rollback;
 
 @Slf4j
-@Import(Home24AccountRepository.class)
-class Home24ClientTest extends BaseDbUnitTest {
+class Home24ClientTest extends SomleBaseDbUnitTest {
     @Resource
     Home24AccountRepository home24AccountRepository;
 

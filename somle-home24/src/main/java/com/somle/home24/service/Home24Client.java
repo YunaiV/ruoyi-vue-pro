@@ -1,8 +1,8 @@
 package com.somle.home24.service;
 
+import cn.iocoder.yudao.framework.common.util.web.RequestX;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.somle.framework.common.util.web.RequestX;
-import com.somle.framework.common.util.web.WebUtils;
 import com.somle.home24.model.pojo.Home24Account;
 import com.somle.home24.model.req.Home24InvoicesReq;
 import com.somle.home24.model.req.Home24OrderReq;
@@ -11,9 +11,11 @@ import com.somle.home24.model.resp.Home24CommonOrdersResp;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 public class Home24Client {
@@ -30,6 +32,11 @@ public class Home24Client {
 
     // 获取订单-通过offset递归http
     public Home24CommonOrdersResp<Object> getOrder(Home24OrderReq orderReq) {
+        return getResp(orderReq);
+    }
+
+    @Nullable
+    private Home24CommonOrdersResp<Object> getResp(Home24OrderReq orderReq) {
         Home24CommonOrdersResp<Object> resp = null;
         int offset = 0;
         int totalCount = 0;
@@ -37,24 +44,35 @@ public class Home24Client {
         do {
             // 设置偏移量
             orderReq.setOffset(offset);
-
+            AtomicReference<Home24CommonOrdersResp<Object>> respOrders = new AtomicReference<>();
             // 发送请求并处理响应
-            Response response = WebUtils.sendRequest(createRequest(orderReq, "/api/orders", RequestX.Method.GET));
-            Home24CommonOrdersResp<Object> respOrders = handleResponse(response, Home24CommonOrdersResp.class);
+            WebUtils.sendRequest(createRequest(orderReq, "/api/orders", RequestX.Method.GET), (response, e) -> {
+                if (e != null) {
+                    log.error("请求失败 {}", e.getMessage());
+                    try {
+                        throw e;
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
+                } else {
+                    respOrders.set(handleResponse(response, Home24CommonOrdersResp.class));
+                }
+            });
+
 
             // 如果这是第一次请求响应，初始化响应对象
-            if (resp == null && respOrders != null) {
-                resp = respOrders;
+            if (resp == null && respOrders.get() != null) {
+                resp = respOrders.get();
                 totalCount = resp.getTotal_count();
 
                 // 确保 orders 列表已经初始化
                 if (resp.getOrders() == null) {
                     resp.setOrders(new ArrayList<>()); // 初始化为空列表
                 }
-            } else if (respOrders != null && respOrders.getOrders() != null) {
+            } else if (resp != null & respOrders.get() != null && respOrders.get().getOrders() != null) {
                 //合并Order
                 resp.getOrders()
-                    .addAll(respOrders.getOrders());
+                    .addAll(respOrders.get().getOrders());
             }
 
 
@@ -78,22 +96,26 @@ public class Home24Client {
             invoicesReq.setOffset(offset);
 
             // 发送请求并处理响应
-            Response response = WebUtils.sendRequest(createRequest(invoicesReq, "/api/invoices", RequestX.Method.GET));
-            Home24CommonInvoicesResp<Object> respInvoices = handleResponse(response, Home24CommonInvoicesResp.class);
+            AtomicReference<Home24CommonInvoicesResp<Object>> respInvoices = new AtomicReference<>();
+            RequestX request = createRequest(invoicesReq, "/api/invoices", RequestX.Method.GET);
+            WebUtils.sendRequest(request, (res, e) -> {
+                respInvoices.set(handleResponse(res, Home24CommonInvoicesResp.class));
+            });
+
 
             // 如果这是第一次请求响应，初始化响应对象
-            if (resp == null && respInvoices != null) {
-                resp = respInvoices;
+            if (resp == null && respInvoices.get() != null) {
+                resp = respInvoices.get();
                 totalCount = resp.getTotal_count();
 
                 // 确保 invoices 列表已经初始化
                 if (resp.getInvoices() == null) {
                     resp.setInvoices(new ArrayList<>()); // 初始化为空列表
                 }
-            } else if (respInvoices != null && respInvoices.getInvoices() != null) {
+            } else if (resp != null & respInvoices.get() != null && respInvoices.get().getInvoices() != null) {
                 // 合并发票数据
                 resp.getInvoices()
-                    .addAll(respInvoices.getInvoices());
+                    .addAll(respInvoices.get().getInvoices());
             }
 
             // 更新偏移量
@@ -153,16 +175,12 @@ public class Home24Client {
         if (response.body() == null) {
             throw new RuntimeException("Response 为空");
         }
-
-        String jsonResponse = response.body()
-            .string();
-
         // 解析不同的响应类型
         if (respClass == Home24CommonOrdersResp.class) {
-            return (T) WebUtils.parseResponse(jsonResponse, new TypeReference<Home24CommonOrdersResp<Object>>() {
+            return (T) WebUtils.parseResponse(response, new TypeReference<Home24CommonOrdersResp<Object>>() {
             });
         } else if (respClass == Home24CommonInvoicesResp.class) {
-            return (T) WebUtils.parseResponse(jsonResponse, new TypeReference<Home24CommonInvoicesResp<Object>>() {
+            return (T) WebUtils.parseResponse(response, new TypeReference<Home24CommonInvoicesResp<Object>>() {
             });
         } else {
             throw new IllegalArgumentException("Unknown response type: " + respClass);
