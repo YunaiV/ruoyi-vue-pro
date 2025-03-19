@@ -124,7 +124,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
             Optional.ofNullable(inItemMapper.selectById(item.getInItemId())).ifPresent(o -> {
                 Long orderItemId = o.getOrderItemId();
                 ErpPurchaseOrderItemDO orderItemDO = orderItemMapper.selectById(orderItemId);
-                //采购订单项
+                //采购订单项-退货数量
                 orderItemStorageMachine.fireEvent(ErpStorageStatus.fromCode(orderItemDO.getInStatus()), ErpEventEnum.STOCK_ADJUSTMENT,
                     ErpInCountDTO.builder().orderItemId(orderItemId)
                         .returnCount(item.getCount()).build());
@@ -263,6 +263,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
         if (CollUtil.isNotEmpty(diffList.get(0))) {
             diffList.get(0).forEach(o -> o.setReturnId(id));
             purchaseReturnItemMapper.insertBatch(diffList.get(0));
+            initSlaveStatus(diffList.get(0));
         }
         if (CollUtil.isNotEmpty(diffList.get(1))) {
             purchaseReturnItemMapper.updateBatch(diffList.get(1));

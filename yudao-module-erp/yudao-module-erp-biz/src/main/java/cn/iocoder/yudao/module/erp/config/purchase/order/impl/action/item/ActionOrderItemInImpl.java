@@ -56,10 +56,16 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
         if (event == null) {
             return; // 防止空指针异常
         }
-        //  计算最新入库数量
+        // 计算最新入库数量
         BigDecimal oldInCount = oldData.getInCount() == null ? BigDecimal.ZERO : oldData.getInCount();
         BigDecimal dtoCount = dto.getCount() == null ? BigDecimal.ZERO : dto.getCount();
         BigDecimal newInCount = oldInCount.add(dtoCount); // 计算新的入库数量
+        //退货数量
+        BigDecimal returnCount = dto.getReturnCount() == null ? BigDecimal.ZERO : dto.getReturnCount();
+        if (dto.getReturnCount() != null) {
+            returnCount = returnCount.add(dto.getReturnCount());
+            oldData.setReturnCount(returnCount);
+        }
 
         if (event == ErpEventEnum.STORAGE_INIT) {
 
@@ -78,22 +84,27 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
                 to = (ErpStorageStatus.ALL_IN_STORAGE);
                 //执行状态完毕
             }
-            //传递给采购申请项
+
         }
         // 更新数据库中的采购项状态
         itemMapper.updateById(oldData
             .setInStatus(to.getCode())//状态
             .setInCount(newInCount)//入库数量
         );
-        // -触发订单入库状态变更
-        // 根据订单项ID查询订单信息
-        ErpPurchaseOrderDO orderDO = mapper.selectById(oldData.getOrderId());
-        if (orderDO == null) {
-            log.error("未找到对应的采购订单,订单ID={}", oldData.getOrderId());
-            return;
-        }
-        storageStateMachine.fireEvent(ErpStorageStatus.fromCode(orderDO.getInStatus()), event, orderDO);
 
+        // 3. 记录日志
+        log.debug("订单子项入库状态机触发({})事件：对象ID={}，状态 {} -> {}, 入库数量={}",
+            event.getDesc(),
+            oldData.getId(),
+            from.getDesc(),
+            to.getDesc(),
+            dto.getCount());
+        //4.0
+        transferOrder(event, oldData);
+        transferRequestItem(oldData, dtoCount);
+    }
+
+    private void transferRequestItem(ErpPurchaseOrderItemDO oldData, BigDecimal dtoCount) {
         //2.0 联动申请项的入库数量
         Optional.ofNullable(oldData.getPurchaseApplyItemId()).ifPresent(
             applyItemId -> {
@@ -110,13 +121,15 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
                 );
             }
         );
+    }
 
-        // 3. 记录日志
-        log.debug("订单子项入库状态机触发({})事件：对象ID={}，状态 {} -> {}, 入库数量={}",
-            event.getDesc(),
-            oldData.getId(),
-            from.getDesc(),
-            to.getDesc(),
-            dto.getCount());
+    private void transferOrder(ErpEventEnum event, ErpPurchaseOrderItemDO oldData) {
+        // -触发订单入库状态变更
+        // 根据订单项ID查询订单信息
+        ErpPurchaseOrderDO orderDO = mapper.selectById(oldData.getOrderId());
+        if (orderDO == null) {
+            log.error("未找到对应的采购订单,订单ID={}", oldData.getOrderId());
+        }
+        storageStateMachine.fireEvent(ErpStorageStatus.fromCode(orderDO.getInStatus()), event, orderDO);
     }
 }
