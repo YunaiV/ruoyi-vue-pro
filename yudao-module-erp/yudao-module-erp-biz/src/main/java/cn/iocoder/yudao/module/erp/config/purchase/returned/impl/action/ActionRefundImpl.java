@@ -22,7 +22,7 @@ public class ActionRefundImpl implements Action<ErpReturnStatus, ErpEventEnum, E
     @Transactional
     public void execute(ErpReturnStatus from, ErpReturnStatus to, ErpEventEnum event, ErpPurchaseReturnDO context) {
         ErpPurchaseReturnDO returnDO = erpPurchaseReturnMapper.selectById(context.getId());
-        returnDO.setAuditStatus(to.getCode());
+        returnDO.setRefundStatus(to.getCode());
         erpPurchaseReturnMapper.updateById(returnDO);
 
         log.debug("退货状态机-退货-触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());

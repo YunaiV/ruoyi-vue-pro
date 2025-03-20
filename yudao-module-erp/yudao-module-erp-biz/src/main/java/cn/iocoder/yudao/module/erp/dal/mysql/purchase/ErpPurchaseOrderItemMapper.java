@@ -35,4 +35,9 @@ public interface ErpPurchaseOrderItemMapper extends BaseMapperX<ErpPurchaseOrder
     default List<ErpPurchaseOrderItemDO> selectListByPurchaseApplyItemIds(Collection<Long> purchaseApplyItemIds) {
         return selectList(ErpPurchaseOrderItemDO::getPurchaseApplyItemId, purchaseApplyItemIds);
     }
+
+    //根据ApplyItemId 查询数量
+    default Long selectCountByPurchaseApplyItemId(Long purchaseApplyItemId) {
+        return selectCount(ErpPurchaseOrderItemDO::getPurchaseApplyItemId, purchaseApplyItemId);
+    }
 }

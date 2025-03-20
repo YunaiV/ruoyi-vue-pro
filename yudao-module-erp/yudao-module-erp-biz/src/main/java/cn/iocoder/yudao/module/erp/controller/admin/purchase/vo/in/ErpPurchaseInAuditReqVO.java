@@ -17,7 +17,7 @@ public class ErpPurchaseInAuditReqVO {
 
     // 审核/反审核
     @NotNull(groups = validation.OnAudit.class, message = "审核状态不能为空")
-    @Schema(description = "审核/审核撤销")
+    @Schema(description = "审核通过/审核撤销")
     private Boolean reviewed;
     //通过与否
     @NotNull(groups = validation.OnAudit.class, message = "审核通过与否不能为空")

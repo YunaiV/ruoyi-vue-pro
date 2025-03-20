@@ -100,4 +100,14 @@ public class ErpPurchaseReturnItemDO extends BaseDO {
      * 箱率
      */
     private String containerRate;
+
+    /**
+     * 申请人id
+     */
+    private Long applicantId;
+
+    /**
+     * 申请部门id
+     */
+    private Long applicationDeptId;
 }

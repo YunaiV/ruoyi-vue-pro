@@ -52,9 +52,9 @@ public interface ErrorCodeConstants {
     ErrorCode PURCHASE_IN_FAIL_PAYMENT_PRICE_EXCEED = new ErrorCode(1_030_102_007, "付款金额({})超过采购入库单总金额({})");
     ErrorCode PURCHASE_IN_PROCESS_FAIL_EXISTS_PAYMENT = new ErrorCode(1_030_102_008, "反审核失败，已存在对应的付款单");
     ErrorCode PURCHASE_IN_NO_OUT_OF_BOUNDS = new ErrorCode(1_030_101_009, "采购入库单号编码大于999999,生成失败");
-    ErrorCode PURCHASE_IN_PROCESS_FAIL_PAYMENT_STATUS = new ErrorCode(1_030_102_010, "反审核失败，付款状态不是未付款");
+    ErrorCode PURCHASE_IN_PROCESS_FAIL_PAYMENT_STATUS = new ErrorCode(1_030_102_010, "反审核失败，已付款入库单不能反审核");
     ErrorCode PURCHASE_IN_ITEM_NOT_EXISTS = new ErrorCode(1_030_102_011, "采购入库单项({})不存在");
-
+    ErrorCode PURCHASE_IN_ITEM_NOT_AUDIT = new ErrorCode(1_030_102_012, "采购入库单项({})关联的入库单未审核，无法创建退货单");
     // ========== ERP 采购退货（1-030-103-000） ==========
     ErrorCode PURCHASE_RETURN_NOT_EXISTS = new ErrorCode(1_030_103_000, "采购退货单不存在");
     ErrorCode PURCHASE_RETURN_DELETE_FAIL_APPROVE = new ErrorCode(1_030_103_001, "采购退货单({})已审核，无法删除");
@@ -66,6 +66,7 @@ public interface ErrorCodeConstants {
     ErrorCode PURCHASE_RETURN_FAIL_REFUND_PRICE_EXCEED = new ErrorCode(1_030_103_007, "退款金额({})超过采购退货单总金额({})");
     ErrorCode PURCHASE_RETURN_PROCESS_FAIL_EXISTS_REFUND = new ErrorCode(1_030_103_008, "反审核失败，已存在对应的退款单");
     ErrorCode PURCHASE_RETURN_NO_OUT_OF_BOUNDS = new ErrorCode(1_030_103_009, "采购退货单号编码大于999999,生成失败");
+    ErrorCode PURCHASE_RETURN_PROCESS_FAIL_PAYMENT_STATUS = new ErrorCode(1_030_103_010, "已审核的退货单才可以退款");
 
     // ========== ERP 客户（1-030-200-000）==========
     ErrorCode CUSTOMER_NOT_EXISTS = new ErrorCode(1_020_200_000, "客户不存在");
@@ -208,6 +209,7 @@ public interface ErrorCodeConstants {
     ErrorCode PURCHASE_REQUEST_MANUAL_CLOSED = new ErrorCode(1_030_603_112, "采购申请单({})已手动关闭");
     ErrorCode PURCHASE_REQUEST_UPDATE_FAIL_APPROVE = new ErrorCode(1_030_603_120, "采购申请单({})已审核，无法修改");
     ErrorCode PURCHASE_REQUEST_DELETE_FAIL_APPROVE = new ErrorCode(1_030_603_121, "采购申请单({})已审核，无法删除");
+    ErrorCode PURCHASE_REQUEST_DELETE_FAIL_CLOSE = new ErrorCode(1_030_603_121, "采购申请单({})已关闭，无法删除");
     ErrorCode PURCHASE_REQUEST_ADD_FAIL_APPROVE = new ErrorCode(1_030_603_122, "采购申请单添加失败");
     ErrorCode PURCHASE_REQUEST_UPDATE_FAIL_REQUEST_ID = new ErrorCode(1_030_603_123, "申请单子表id为({})不属于该采购申请单");
     ErrorCode PURCHASE_REQUEST_ADD_FAIL_PRODUCT = new ErrorCode(1_030_603_124, "采购申请单的产品添加失败");
@@ -224,6 +226,7 @@ public interface ErrorCodeConstants {
     ErrorCode PURCHASE_REQUEST_UPDATE_FAIL = new ErrorCode(1_030_603_140, "订单编号({})更新状态失败，请联系管理员");
     ErrorCode PURCHASE_REQUEST_ITEM_CLOSED = new ErrorCode(1_030_603_141, "订单项编号({})已关闭,采购项无法修改");
     ErrorCode PURCHASE_REQUEST_ITEM_MANUAL_CLOSED = new ErrorCode(1_030_603_142, "id({})已手动关闭,采购项无法修改");
+    ErrorCode PURCHASE_REQUEST_ITEM_ORDERED = new ErrorCode(1_030_603_143, "申请项({})存在对应的采购订单项，无法反审核");
     //采购子项不存在
     ErrorCode PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_ID = new ErrorCode(1_030_603_143, "采购请求ID=({})没有子项");
     //当前状态不能触发事件

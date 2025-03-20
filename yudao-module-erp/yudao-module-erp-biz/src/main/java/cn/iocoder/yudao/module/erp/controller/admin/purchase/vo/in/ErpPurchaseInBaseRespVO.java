@@ -39,11 +39,6 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
     @ExcelProperty("入库时间")
     private LocalDateTime inTime;
 
-    @Schema(description = "采购订单id")
-    private Long orderId;
-    @Schema(description = "采购订单号")
-    private String orderNo;
-
     @Schema(description = "审核意见")
     private String reviewComment;
 

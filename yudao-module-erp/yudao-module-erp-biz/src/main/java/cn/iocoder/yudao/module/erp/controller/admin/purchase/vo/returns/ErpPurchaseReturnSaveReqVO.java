@@ -85,5 +85,11 @@ public class ErpPurchaseReturnSaveReqVO {
 
         @Schema(description = "箱率")
         private String containerRate;
+
+        @Schema(description = "申请人id")
+        private Long applicantId;
+
+        @Schema(description = "申请人部门id")
+        private Long applicationDeptId;
     }
 }

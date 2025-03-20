@@ -38,6 +38,7 @@ import org.springframework.validation.annotation.Validated;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -409,8 +410,11 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         });
         // 2. 遍历删除，并记录操作日志
         purchaseOrders.forEach(purchaseOrder -> {
+            List<ErpPurchaseOrderItemDO> dos = purchaseOrderItemMapper.selectListByOrderId(purchaseOrder.getId());
+            //校验是否存在入库项
+            dos.forEach(ErpPurchaseOrderServiceImpl::validHasInPurchaseItem);
             //联动申请项
-            for (ErpPurchaseOrderItemDO item : purchaseOrderItemMapper.selectListByOrderId(purchaseOrder.getId())) {
+            for (ErpPurchaseOrderItemDO item : dos) {
                 Optional.ofNullable(item.getPurchaseApplyItemId()).ifPresent(id -> {
                     ErpPurchaseRequestItemsDO requestItemsDO = requestItemsMapper.selectById(id);
                     ErpOrderCountDTO dto = ErpOrderCountDTO.builder().purchaseOrderItemId(item.getId())
@@ -422,11 +426,6 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
                         requestItemOffMachine.fireEvent(ErpOffStatus.fromCode(requestItemsDO.getOffStatus()), ErpEventEnum.ACTIVATE, requestItemsDO);
                     }
                 });
-                //判断订单项是否存在入库项
-                if (!Objects.equals(item.getInStatus(), ErpStorageStatus.NONE_IN_STORAGE.getCode())) {
-                    //存在入库项，则发抛出异常
-                    throw exception(PURCHASE_ORDER_DELETE_FAIL);
-                }
             }
 
             // 2.1 删除订单
@@ -434,6 +433,19 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
             // 2.2 删除订单项
             purchaseOrderItemMapper.deleteByOrderId(purchaseOrder.getId());
         });
+    }
+
+    /**
+     * 校验是否存在入库项
+     *
+     * @param item 订单项
+     */
+    private static void validHasInPurchaseItem(ErpPurchaseOrderItemDO item) {
+        //判断订单项是否存在入库项
+        if (!Objects.equals(item.getInStatus(), ErpStorageStatus.NONE_IN_STORAGE.getCode())) {
+            //存在入库项，则发抛出异常
+            throw exception(PURCHASE_ORDER_DELETE_FAIL);
+        }
     }
 
     @Override
@@ -474,7 +486,32 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         return purchaseOrderMapper.selectPage(pageReqVO);
     }
 
+    @Override
+    public Collection<ErpPurchaseOrderDO> getPurchaseOrderList(Collection<Long> orderIds) {
+        if (CollUtil.isEmpty(orderIds)) {
+            return Collections.emptyList();
+        }
+        return purchaseOrderMapper.selectByIds(orderIds);
+    }
+
+    @Override
+    public ErpPurchaseOrderDO getPurchaseOrderByItemId(Long itemId) {
+        AtomicReference<ErpPurchaseOrderDO> orderDO = new AtomicReference<>();
+        Optional.ofNullable(purchaseOrderItemMapper.selectById(itemId)).ifPresent(item -> {
+            orderDO.set(purchaseOrderMapper.selectById(item.getOrderId()));
+        });
+        return orderDO.get();
+    }
     // ==================== 订单项 ====================
+
+
+    //}
+    @Override
+    public List<ErpPurchaseOrderItemDO> getPurchaseOrderItemList(Collection<Long> itemIds) {
+        if (CollUtil.isEmpty(itemIds))
+            return Collections.emptyList();
+        return purchaseOrderItemMapper.selectByIds(itemIds);
+    }
 
     @Override
     public List<ErpPurchaseOrderItemDO> getPurchaseOrderItemListByOrderId(Long orderId) {

@@ -14,10 +14,12 @@ import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.*;
 import cn.iocoder.yudao.module.erp.controller.admin.tools.validation;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInItemDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseInService;
+import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseOrderService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpStockService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpWarehouseService;
@@ -31,6 +33,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -67,6 +70,8 @@ public class ErpPurchaseInController {
     private AdminUserApi adminUserApi;
     @Resource
     private DeptApi deptApi;
+    @Autowired
+    private ErpPurchaseOrderService erpPurchaseOrderService;
 
     @PostMapping("/create")
     @Operation(summary = "创建采购入库")
@@ -205,6 +210,8 @@ public class ErpPurchaseInController {
         // 1.6 获取仓库信息
         Map<Long, ErpWarehouseDO> warehouseMap = erpWarehouseService.getWarehouseMap(
             convertSet(purchaseInItemList, ErpPurchaseInItemDO::getWarehouseId));
+        //1.7 订单项map orderItemId
+        Map<Long, ErpPurchaseOrderDO> orderItemMap = erpPurchaseOrderService.getPurchaseOrderItemMap(purchaseInItemList.stream().map(ErpPurchaseInItemDO::getOrderItemId).collect(Collectors.toSet()));
         // 2. 开始拼接
         return BeanUtils.toBean(list, ErpPurchaseInBaseRespVO.class, purchaseIn -> {
             purchaseIn.setItems(BeanUtils.toBean(purchaseInItemMap.get(purchaseIn.getId()), ErpPurchaseInBaseRespVO.Item.class,
@@ -221,6 +228,8 @@ public class ErpPurchaseInController {
                     MapUtils.findAndThen(deptMap, item.getApplicationDeptId(), dept -> item.setApplicationDeptName(dept.getName()));
                     //人员
                     MapUtils.findAndThen(userMap, item.getApplicantId(), user -> item.setApplicantName(user.getNickname()));
+                    //订单的no
+                    MapUtils.findAndThen(orderItemMap, item.getOrderItemId(), order -> item.setOrderNo(order.getNo()));
                 }));
 //            purchaseIn.setProductNames(CollUtil.join(purchaseIn.getItems(), "，", ErpPurchaseInBaseRespVO.Item::getProductName));
             //产品-带出相关字段

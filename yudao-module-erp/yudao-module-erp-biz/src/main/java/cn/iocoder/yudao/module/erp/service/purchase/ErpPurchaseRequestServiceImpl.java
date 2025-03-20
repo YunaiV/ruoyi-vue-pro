@@ -223,7 +223,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
 
     private void validMerge(List<ErpPurchaseRequestItemsDO> itemsDOS) {
         //1. 校验申请单需已审核
-        List<ErpPurchaseRequestDO> requestDOS = erpPurchaseRequestMapper.selectBatchIds(convertList(itemsDOS, ErpPurchaseRequestItemsDO::getRequestId));
+        List<ErpPurchaseRequestDO> requestDOS = erpPurchaseRequestMapper.selectByIds(convertList(itemsDOS, ErpPurchaseRequestItemsDO::getRequestId));
         for (ErpPurchaseRequestDO requestDO : requestDOS) {
             ThrowUtil.ifThrow(!requestDO.getStatus().equals(ErpAuditStatus.APPROVED.getCode()), PURCHASE_REQUEST_MERGE_FAIL, requestDO.getNo());
         }
@@ -332,6 +332,12 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
                 auditMachine.fireEvent(currentStatus, ErpEventEnum.REJECT, req);
             }
         } else {
+            //反审核
+            //存在对应的采购订单项->异常
+            List<ErpPurchaseRequestItemsDO> itemsDOS = erpPurchaseRequestItemsMapper.selectListByRequestId(req.getRequestId());
+            for (ErpPurchaseRequestItemsDO itemsDO : itemsDOS) {
+                ThrowUtil.ifThrow(erpPurchaseOrderItemMapper.selectCountByPurchaseApplyItemId(itemsDO.getId()) > 0, PURCHASE_REQUEST_ITEM_ORDERED, itemsDO.getId());
+            }
             log.debug("采购申请单撤回审核，ID: {}", req.getRequestId());
             auditMachine.fireEvent(currentStatus, ErpEventEnum.WITHDRAW_REVIEW, req);
         }
@@ -367,7 +373,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
             }
         } else if (itemIds != null && !itemIds.isEmpty()) {
             // 批量处理采购订单子项状态
-            List<ErpPurchaseRequestItemsDO> itemsDOList = erpPurchaseRequestItemsMapper.selectBatchIds(itemIds);
+            List<ErpPurchaseRequestItemsDO> itemsDOList = erpPurchaseRequestItemsMapper.selectByIds(itemIds);
             if (itemsDOList != null && !itemsDOList.isEmpty()) {
                 itemsDOList.forEach(itemsDO ->
                     offItemMachine.fireEvent(ErpOffStatus.fromCode(itemsDO.getOffStatus()), event, itemsDO)
@@ -381,13 +387,15 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     @Transactional(rollbackFor = Exception.class)
     public void deletePurchaseRequest(List<Long> ids) {
         // 1. 校验不处于已审批
-        List<ErpPurchaseRequestDO> purchaseRequestDOs = erpPurchaseRequestMapper.selectBatchIds(ids);
+        List<ErpPurchaseRequestDO> purchaseRequestDOs = erpPurchaseRequestMapper.selectByIds(ids);
         if (CollUtil.isEmpty(purchaseRequestDOs)) {
             return;
         }
-        // 1.1 非已审核->异常
+        // 1.1 已审核->异常
         purchaseRequestDOs.forEach(erpPurchaseRequestDO -> {
-            ThrowUtil.ifThrow(!erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.APPROVED.getCode()), PURCHASE_REQUEST_DELETE_FAIL_APPROVE, erpPurchaseRequestDO.getNo());
+            ThrowUtil.ifThrow(erpPurchaseRequestDO.getStatus().equals(ErpAuditStatus.APPROVED.getCode()), PURCHASE_REQUEST_DELETE_FAIL_APPROVE, erpPurchaseRequestDO.getNo());
+            //已关闭->异常
+            ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(ErpOffStatus.CLOSED.getCode()), PURCHASE_REQUEST_DELETE_FAIL_CLOSE, erpPurchaseRequestDO.getNo());
         });
         //1.2 校验存在关联的采购订单
         ThrowUtil.ifThrow(!validHasApplyItemId(purchaseRequestDOs), PURCHASE_REQUEST_DELETE_FAIL);

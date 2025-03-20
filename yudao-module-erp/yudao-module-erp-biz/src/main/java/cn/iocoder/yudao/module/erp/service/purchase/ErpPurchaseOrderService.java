@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * ERP 采购订单 Service 接口
@@ -93,8 +94,34 @@ public interface ErpPurchaseOrderService {
      */
     PageResult<ErpPurchaseOrderDO> getPurchaseOrderPage(ErpPurchaseOrderPageReqVO pageReqVO);
 
+    /**
+     * 根据订单id获得订单map
+     */
+    default Map<Long, ErpPurchaseOrderDO> getPurchaseOrderMap(Collection<Long> orderIds) {
+        return this.getPurchaseOrderList(orderIds).stream().collect(Collectors.toMap(ErpPurchaseOrderDO::getId, v -> v));
+    }
+
+    /**
+     * 根据id 获得订单集合
+     * @param orderIds 订单ids
+     * @return 订单集合
+     */
+    Collection<ErpPurchaseOrderDO> getPurchaseOrderList(Collection<Long> orderIds);
+
+    //根据订单项id获得订单
+    ErpPurchaseOrderDO getPurchaseOrderByItemId(Long itemId);
+
     // ==================== 采购订单项 ====================
 
+    /**
+     * 根据订单项id获得订单map
+     */
+    default Map<Long, ErpPurchaseOrderDO> getPurchaseOrderItemMap(Collection<Long> itemIds) {
+        //TODO 可以优化批量
+        return this.getPurchaseOrderItemList(itemIds).stream().collect(Collectors.toMap(ErpPurchaseOrderItemDO::getId, v -> getPurchaseOrderByItemId(v.getId())));
+    }
+
+    List<ErpPurchaseOrderItemDO> getPurchaseOrderItemList(Collection<Long> itemIds);
     /**
      * 校验采购订单项是否存在
      *
