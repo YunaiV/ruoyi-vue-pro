@@ -12,7 +12,7 @@ public class ErpInCountDTO {
     //订单项
     private Long orderItemId;
     //入库差额
-    private BigDecimal count;
+    private BigDecimal inCount;
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

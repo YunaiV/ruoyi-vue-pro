@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.erp.dal.mysql.logistic.customrule;
+package cn.iocoder.yudao.module.tms.dal.mysql.logistic.customrule;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;

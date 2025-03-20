@@ -58,13 +58,13 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
         }
         // 计算最新入库数量
         BigDecimal oldInCount = oldData.getInCount() == null ? BigDecimal.ZERO : oldData.getInCount();
-        BigDecimal dtoCount = dto.getCount() == null ? BigDecimal.ZERO : dto.getCount();
+        BigDecimal dtoCount = dto.getInCount() == null ? BigDecimal.ZERO : dto.getInCount();
         BigDecimal newInCount = oldInCount.add(dtoCount); // 计算新的入库数量
         //退货数量
-        BigDecimal returnCount = dto.getReturnCount() == null ? BigDecimal.ZERO : dto.getReturnCount();
+        BigDecimal oldReturnCount = dto.getReturnCount() == null ? BigDecimal.ZERO : dto.getReturnCount();
         if (dto.getReturnCount() != null) {
-            returnCount = returnCount.add(dto.getReturnCount());
-            oldData.setReturnCount(returnCount);
+            oldReturnCount = oldReturnCount.add(dto.getReturnCount());
+            oldData.setReturnCount(oldReturnCount);//退货数量
         }
 
         if (event == ErpEventEnum.STORAGE_INIT) {
@@ -93,12 +93,14 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
         );
 
         // 3. 记录日志
-        log.debug("订单子项入库状态机触发({})事件：对象ID={}，状态 {} -> {}, 入库数量={}",
+        log.debug("订单项入库状态机触发({})事件：订单项ID={}，状态 {} -> {}, 入库数量={}, 退货数量={}",
             event.getDesc(),
             oldData.getId(),
             from.getDesc(),
             to.getDesc(),
-            dto.getCount());
+            dto.getInCount(),
+            dto.getReturnCount()
+        );
         //4.0
         transferOrder(event, oldData);
         transferRequestItem(oldData, dtoCount);
@@ -117,7 +119,7 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
                 BigDecimal changeCount = result.subtract(dtoCount);
                 purchaseRequestItemStateMachine.fireEvent(ErpStorageStatus.fromCode(applyItemDO.getInStatus())
                     , ErpEventEnum.STOCK_ADJUSTMENT
-                    , ErpInCountDTO.builder().applyItemId(applyItemId).count(changeCount).build()
+                    , ErpInCountDTO.builder().applyItemId(applyItemId).inCount(changeCount).build()
                 );
             }
         );

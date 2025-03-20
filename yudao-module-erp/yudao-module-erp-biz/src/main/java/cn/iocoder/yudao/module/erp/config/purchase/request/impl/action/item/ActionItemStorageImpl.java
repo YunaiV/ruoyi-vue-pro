@@ -38,7 +38,7 @@ public class ActionItemStorageImpl implements Action<ErpStorageStatus, ErpEventE
         ErpPurchaseRequestItemsDO itemsDO = mapper.selectById(context.getApplyItemId());
         if (event == ErpEventEnum.STOCK_ADJUSTMENT) {
             BigDecimal oldCount = itemsDO.getInCount() == null ? BigDecimal.ZERO : itemsDO.getInCount();
-            BigDecimal changeCount = context.getCount();
+            BigDecimal changeCount = context.getInCount();
             itemsDO.setInCount(oldCount.add(changeCount));//入库数量
             //根据入库数量来动态计算当前状态
 

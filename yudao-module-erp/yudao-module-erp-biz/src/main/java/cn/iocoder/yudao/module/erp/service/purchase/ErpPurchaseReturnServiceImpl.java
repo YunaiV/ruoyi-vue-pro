@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.returns.ErpPurch
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.returns.ErpPurchaseReturnPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.returns.ErpPurchaseReturnSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInItemDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseReturnDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseReturnItemDO;
@@ -90,7 +91,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createPurchaseReturn(ErpPurchaseReturnSaveReqVO createReqVO) {
-        // 1.1 校验退货单已审核
+        // 1.1 校验入库单已审核
         // 1.2 校验退货项的有效性
         List<ErpPurchaseReturnItemDO> item = validatePurchaseReturnItems(createReqVO.getItems());
         // 1.3 校验结算账户
@@ -98,7 +99,6 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
         // 1.4 生成退货单号，并校验唯一性
         String no = noRedisDAO.generate(ErpNoRedisDAO.PURCHASE_RETURN_NO_PREFIX, PURCHASE_RETURN_NO_OUT_OF_BOUNDS);
         ThrowUtil.ifThrow(purchaseReturnMapper.selectByNo(no) != null ,PURCHASE_RETURN_NO_EXISTS);
-
         // 2.1 插入退货
         ErpPurchaseReturnDO purchaseReturn = BeanUtils.toBean(createReqVO, ErpPurchaseReturnDO.class, in -> in
             .setNo(no).setAuditStatus(ErpAuditStatus.PENDING_REVIEW.getCode()));
@@ -108,9 +108,6 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
         // 2.2 插入退货项
         item.forEach(o -> o.setReturnId(purchaseReturn.getId()));
         purchaseReturnItemMapper.insertBatch(item);
-
-        // 3. 更新退货单的退货数量
-//        updatePurchaseOrderReturnCount(createReqVO.getOrderId());
         //更新主子表状态
         initMasterStatus(purchaseReturn);
         //子表-入库状态机
@@ -122,12 +119,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
         //订单入库状态机
         for (ErpPurchaseReturnItemDO item : items) {
             Optional.ofNullable(inItemMapper.selectById(item.getInItemId())).ifPresent(o -> {
-                Long orderItemId = o.getOrderItemId();
-                ErpPurchaseOrderItemDO orderItemDO = orderItemMapper.selectById(orderItemId);
-                //采购订单项-退货数量
-                orderItemStorageMachine.fireEvent(ErpStorageStatus.fromCode(orderItemDO.getInStatus()), ErpEventEnum.STOCK_ADJUSTMENT,
-                    ErpInCountDTO.builder().orderItemId(orderItemId)
-                        .returnCount(item.getCount()).build());
+                syncCountLogic(o, item.getCount());
             });
         }
     }
@@ -159,13 +151,6 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
         purchaseReturnMapper.updateById(updateObj);
         // 2.2 更新退货项
         updatePurchaseReturnItemList(updateReqVO.getId(), purchaseReturnItems);
-
-//        // 3.1 更新退货单的出库数量
-//        updatePurchaseOrderReturnCount(updateObj.getOrderId());
-//        // 3.2 注意：如果退货单编号变更了，需要更新“老”退货单的出库数量
-//        if (ObjectUtil.notEqual(purchaseReturn.getOrderId(), updateObj.getOrderId())) {
-//            updatePurchaseOrderReturnCount(purchaseReturn.getOrderId());
-//        }
     }
 
     private void calculateTotalPrice(ErpPurchaseReturnDO purchaseReturn, List<ErpPurchaseReturnItemDO> purchaseReturnItems) {
@@ -180,16 +165,6 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
         purchaseReturn.setDiscountPrice(MoneyUtils.priceMultiplyPercent(purchaseReturn.getTotalPrice(), purchaseReturn.getDiscountPercent()));
         purchaseReturn.setTotalPrice(purchaseReturn.getTotalPrice().subtract(purchaseReturn.getDiscountPrice()).add(purchaseReturn.getOtherPrice()));
     }
-
-//    private void updatePurchaseOrderReturnCount(Long orderId) {
-//        // 1.1 查询退货单对应的采购出库单列表
-//        List<ErpPurchaseReturnDO> purchaseReturns = purchaseReturnMapper.selectListByOrderId(orderId);
-//        // 1.2 查询对应的退货单项的退货数量
-//        Map<Long, BigDecimal> returnCountMap = purchaseReturnItemMapper.selectOrderItemCountSumMapByReturnIds(
-//                convertList(purchaseReturns, ErpPurchaseReturnDO::getId));
-//        // 2. 更新退货单的出库数量
-//        purchaseOrderService.updatePurchaseOrderReturnCount(orderId, returnCountMap);
-//    }
 
     public void updatePurchaseReturnStatus(Long id, Integer status) {
         boolean approve = ErpAuditStatus.APPROVED.getCode().equals(status);
@@ -262,15 +237,41 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
         // 第二步，批量添加、修改、删除
         if (CollUtil.isNotEmpty(diffList.get(0))) {
             diffList.get(0).forEach(o -> o.setReturnId(id));
-            purchaseReturnItemMapper.insertBatch(diffList.get(0));
             initSlaveStatus(diffList.get(0));
+            purchaseReturnItemMapper.insertBatch(diffList.get(0));
         }
         if (CollUtil.isNotEmpty(diffList.get(1))) {
+            for (ErpPurchaseReturnItemDO itemDO : diffList.get(1)) {
+                BigDecimal newCount = itemDO.getCount();
+                BigDecimal oldCount = purchaseReturnItemMapper.selectById(itemDO.getId()).getCount();
+                //
+                syncCountLogic(inItemMapper.selectById(itemDO.getInItemId()), newCount.subtract(oldCount));
+            }
             purchaseReturnItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
+            for (ErpPurchaseReturnItemDO itemDO : diffList.get(2)) {
+                syncCountLogic(inItemMapper.selectById(itemDO.getInItemId()), itemDO.getCount().negate());
+
+            }
+            //
             purchaseReturnItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpPurchaseReturnItemDO::getId));
         }
+    }
+
+    /**
+     * 同步给订单项退货数量
+     *
+     * @param inItemDO ErpPurchaseInItemDO
+     * @param number   BigDecimal
+     */
+    private void syncCountLogic(ErpPurchaseInItemDO inItemDO, BigDecimal number) {
+        Long orderItemId = inItemDO.getOrderItemId();
+        ErpPurchaseOrderItemDO orderItemDO = orderItemMapper.selectById(orderItemId);
+
+        orderItemStorageMachine.fireEvent(ErpStorageStatus.fromCode(orderItemDO.getInStatus()), ErpEventEnum.STOCK_ADJUSTMENT,
+            ErpInCountDTO.builder().orderItemId(orderItemId)
+                .returnCount(number).build());
     }
 
     @Override
@@ -286,16 +287,20 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
                 throw exception(PURCHASE_RETURN_DELETE_FAIL_APPROVE, purchaseReturn.getNo());
             }
         });
-
+        //同步退货数量
+        for (ErpPurchaseReturnDO returnDO : purchaseReturns) {
+            List<ErpPurchaseReturnItemDO> returnItemDOS = purchaseReturnItemMapper.selectListByReturnId(returnDO.getId());
+            Optional.ofNullable(returnItemDOS).ifPresent(item -> {
+                item.forEach(itemDO ->
+                    syncCountLogic(inItemMapper.selectById(itemDO.getInItemId()), itemDO.getCount().negate()));
+            });
+        }
         // 2. 遍历删除，并记录操作日志
         purchaseReturns.forEach(purchaseReturn -> {
             // 2.1 删除订单
             purchaseReturnMapper.deleteById(purchaseReturn.getId());
             // 2.2 删除订单项
             purchaseReturnItemMapper.deleteByReturnId(purchaseReturn.getId());
-
-            // 2.3 更新退货单的出库数量
-//            updatePurchaseOrderReturnCount(purchaseReturn.getOrderId());
         });
 
     }

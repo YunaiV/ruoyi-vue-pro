@@ -92,13 +92,13 @@ public class ErpPurchaseInSaveReqVO {
         @NotNull(message = "采购订单项id不能为空")
         private Long orderItemId;
 
-        @Schema(description = "采购订单id", requiredMode = Schema.RequiredMode.REQUIRED)
-        @NotNull(message = "采购订单编号不能为空")
-        private Long orderId;
-
-        @Schema(description = "采购订单编号-展示用(源单单号,采购单)")
-        @NotNull(message = "采购订单no不能为空")
-        private String orderNo;
+//        @Schema(description = "采购订单id", requiredMode = Schema.RequiredMode.REQUIRED)
+//        @NotNull(message = "采购订单编号不能为空")
+//        private Long orderId;
+//
+//        @Schema(description = "采购订单编号-展示用(源单单号,采购单)")
+//        @NotNull(message = "采购订单no不能为空")
+//        private String orderNo;
 
         @Schema(description = "仓库编号", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "仓库编号不能为空")
@@ -114,6 +114,9 @@ public class ErpPurchaseInSaveReqVO {
         @Schema(description = "入库数量", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "入库数量不能为空")
         private BigDecimal count;
+
+        @Schema(description = "税额，单位：元")
+        private BigDecimal taxPrice;
 
         @Schema(description = "价税合计")
         private BigDecimal allAmount;
@@ -142,5 +145,11 @@ public class ErpPurchaseInSaveReqVO {
 
         @Schema(description = "箱率")
         private String containerRate;
+
+        @Schema(description = "申请人id")
+        private Long applicantId;
+
+        @Schema(description = "申请人部门id")
+        private Long applicationDeptId;
     }
 }

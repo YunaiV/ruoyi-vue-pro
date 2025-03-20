@@ -21,6 +21,8 @@ import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseInService;
 import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpStockService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpWarehouseService;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,7 +31,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -37,10 +38,9 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -65,6 +65,8 @@ public class ErpPurchaseInController {
     private ErpWarehouseService erpWarehouseService;
     @Resource
     private AdminUserApi adminUserApi;
+    @Resource
+    private DeptApi deptApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建采购入库")
@@ -140,8 +142,8 @@ public class ErpPurchaseInController {
     @PutMapping("/submitAudit")
     @Operation(summary = "提交审核")
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:submitAudit')")
-    public CommonResult<Boolean> submitAudit(@RequestParam("inIds") @NotNull Collection<Long> inIds) {
-        purchaseInService.submitAudit(inIds.stream().distinct().toList());
+    public CommonResult<Boolean> submitAudit(@Valid @RequestBody ErpPurchaseInSubmitReqVO vo) {
+        purchaseInService.submitAudit(vo.getInIds().stream().distinct().toList());
         return success(true);
     }
 
@@ -157,7 +159,7 @@ public class ErpPurchaseInController {
     @PostMapping("/changePayStatus")
     @Operation(summary = "切换付款状态")
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:changePayStatus')")
-    public CommonResult<Boolean> changePayStatus(ErpPurchaseInPayReqVO vo) {
+    public CommonResult<Boolean> changePayStatus(@Valid @RequestBody ErpPurchaseInPayReqVO vo) {
 //        purchaseInService.changePayStatus(reqVO.getInId(), reqVO.getPayStatus());
         purchaseInService.switchPayStatus(vo);
         return success(true);
@@ -178,9 +180,28 @@ public class ErpPurchaseInController {
         // 1.3 供应商信息
         Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(
             convertSet(list, ErpPurchaseInDO::getSupplierId));
-        // 1.4 管理员信息
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-            convertSet(list, purchaseIn -> Long.parseLong(purchaseIn.getCreator())));
+        // 1.4 人员信息
+        Set<Long> userIds = Stream.concat(
+                list.stream()
+                    .flatMap(orderDO -> Stream.of(
+                        orderDO.getAuditorId(),//审核者
+                        safeParseLong(orderDO.getCreator()),
+                        safeParseLong(orderDO.getUpdater())
+                    )),
+                purchaseInItemList.stream()
+                    .flatMap(orderItemDO -> Stream.of(
+                        safeParseLong(orderItemDO.getCreator()),
+                        safeParseLong(orderItemDO.getUpdater()),
+                        orderItemDO.getApplicantId()
+                    ))
+            )
+            .distinct()
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
+        // 1.5 部门
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
+            convertSet(purchaseInItemList, ErpPurchaseInItemDO::getApplicationDeptId));
         // 1.6 获取仓库信息
         Map<Long, ErpWarehouseDO> warehouseMap = erpWarehouseService.getWarehouseMap(
             convertSet(purchaseInItemList, ErpPurchaseInItemDO::getWarehouseId));
@@ -196,13 +217,33 @@ public class ErpPurchaseInController {
                     );
                     // 设置仓库信息
                     MapUtils.findAndThen(warehouseMap, item.getWarehouseId(), erpWarehouseDO -> item.setWarehouseName(erpWarehouseDO.getName()));
+                    //部门
+                    MapUtils.findAndThen(deptMap, item.getApplicationDeptId(), dept -> item.setApplicationDeptName(dept.getName()));
+                    //人员
+                    MapUtils.findAndThen(userMap, item.getApplicantId(), user -> item.setApplicantName(user.getNickname()));
                 }));
 //            purchaseIn.setProductNames(CollUtil.join(purchaseIn.getItems(), "，", ErpPurchaseInBaseRespVO.Item::getProductName));
             //产品-带出相关字段
-
             MapUtils.findAndThen(supplierMap, purchaseIn.getSupplierId(), supplier -> purchaseIn.setSupplierName(supplier.getName()));
-            MapUtils.findAndThen(userMap, Long.parseLong(purchaseIn.getCreator()), user -> purchaseIn.setCreator(user.getNickname()));
+
+            //人员
+            MapUtils.findAndThen(userMap, safeParseLong(purchaseIn.getCreator()), user -> purchaseIn.setCreator(user.getNickname()));
+            MapUtils.findAndThen(userMap, safeParseLong(purchaseIn.getAuditor()), user -> purchaseIn.setAuditor(user.getNickname()));
+
         });
     }
 
+    /**
+     * 安全转换id为 Long
+     *
+     * @param value String类型的id
+     * @return id
+     */
+    private Long safeParseLong(String value) {
+        try {
+            return Optional.ofNullable(value).map(Long::parseLong).orElse(null);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
 }

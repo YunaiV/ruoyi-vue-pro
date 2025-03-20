@@ -93,7 +93,12 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     public Long createPurchaseIn(ErpPurchaseInSaveReqVO createReqVO) {
         // 1.1 校验采购订单已审核
         for (ErpPurchaseInSaveReqVO.Item item : createReqVO.getItems()) {
-            purchaseOrderService.validatePurchaseOrder(item.getOrderId());
+            ErpPurchaseOrderItemDO aDo = orderItemMapper.selectById(item.getOrderItemId());
+            if (aDo != null) {
+                Optional.ofNullable(aDo.getOrderId()).ifPresent(orderId -> {
+                    purchaseOrderService.validatePurchaseOrder(orderId);
+                });
+            }
         }
 //        ErpPurchaseOrderDO purchaseOrder = purchaseOrderService.validatePurchaseOrder(createReqVO.getOrderId());
         // 1.2 校验入库项的有效性
@@ -130,7 +135,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
                 orderItemStorageMachine.fireEvent(ErpStorageStatus.fromCode(orderItemDO.getInStatus()), ErpEventEnum.STOCK_ADJUSTMENT,
                     ErpInCountDTO.builder().orderItemId(orderItemId)
                         //正数
-                        .count(purchaseInItem.getCount()).build());
+                        .inCount(purchaseInItem.getCount()).build());
             });
         }
     }
@@ -142,29 +147,34 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updatePurchaseIn(ErpPurchaseInSaveReqVO updateReqVO) {
+    public void updatePurchaseIn(ErpPurchaseInSaveReqVO vo) {
         // 1.1 校验存在
-        ErpPurchaseInDO purchaseIn = validatePurchaseInExists(updateReqVO.getId());
+        ErpPurchaseInDO purchaseIn = validatePurchaseInExists(vo.getId());
         if (ErpAuditStatus.APPROVED.getCode().equals(purchaseIn.getAuditStatus())) {
             throw exception(PURCHASE_IN_UPDATE_FAIL_APPROVE, purchaseIn.getNo());
         }
         // 1.2 校验采购订单已审核
-        for (ErpPurchaseInSaveReqVO.Item item : updateReqVO.getItems()) {
-            purchaseOrderService.validatePurchaseOrder(item.getOrderId());
+        for (ErpPurchaseInSaveReqVO.Item item : vo.getItems()) {
+            ErpPurchaseOrderItemDO aDo = orderItemMapper.selectById(item.getOrderItemId());
+            if (aDo != null) {
+                Optional.ofNullable(aDo.getOrderId()).ifPresent(orderId -> {
+                    purchaseOrderService.validatePurchaseOrder(orderId);
+                });
+            }
         }
         // 1.3 校验结算账户
-        accountService.validateAccount(updateReqVO.getAccountId());
+        accountService.validateAccount(vo.getAccountId());
         // 1.4 校验订单项的有效性
-        List<ErpPurchaseInItemDO> purchaseInItems = validatePurchaseInItems(updateReqVO.getItems());
+        List<ErpPurchaseInItemDO> purchaseInItems = validatePurchaseInItems(vo.getItems());
 
         // 2.1 更新入库
-        ErpPurchaseInDO updateObj = BeanUtils.toBean(updateReqVO, ErpPurchaseInDO.class);
+        ErpPurchaseInDO updateObj = BeanUtils.toBean(vo, ErpPurchaseInDO.class);
 //            .setOrderNo(purchaseOrder.getNo())
 //            .setSupplierId(purchaseOrder.getSupplierId());
         calculateTotalPrice(updateObj, purchaseInItems);//合计
         purchaseInMapper.updateById(updateObj);
         // 2.2 更新入库项
-        updatePurchaseInItemList(updateReqVO.getId(), purchaseInItems);
+        updatePurchaseInItemList(vo.getId(), purchaseInItems);
 
     }
 
@@ -235,7 +245,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
                     orderItemStorageMachine.fireEvent(ErpStorageStatus.fromCode(orderItemDO.getInStatus()), ErpEventEnum.STOCK_ADJUSTMENT,
                         ErpInCountDTO.builder().orderItemId(orderItemId)
                             //新旧数值差
-                            .count(inItemDO.getCount().subtract(oldData.getCount())).build());
+                            .inCount(inItemDO.getCount().subtract(oldData.getCount())).build());
                 });
             }
             purchaseInItemMapper.updateBatch(diffList.get(1));
@@ -248,7 +258,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
                     orderItemStorageMachine.fireEvent(ErpStorageStatus.fromCode(orderItemDO.getInStatus()), ErpEventEnum.STOCK_ADJUSTMENT,
                         ErpInCountDTO.builder().orderItemId(orderItemId)
                             //取反数量
-                            .count(inItemDO.getCount().negate()).build());
+                            .inCount(inItemDO.getCount().negate()).build());
                 });
             }
             purchaseInItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpPurchaseInItemDO::getId));
@@ -275,7 +285,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
                     orderItemStorageMachine.fireEvent(ErpStorageStatus.fromCode(orderItemDO.getInStatus()), ErpEventEnum.STOCK_ADJUSTMENT,
                         ErpInCountDTO.builder().orderItemId(orderItemId)
                             //删除->订单项减少
-                            .count(inItemDO.getCount().negate()).build());
+                            .inCount(inItemDO.getCount().negate()).build());
                 });
             }
         });

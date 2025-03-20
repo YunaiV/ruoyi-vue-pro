@@ -142,4 +142,5 @@ public class ErpPurchaseInDO extends BaseDO {
      * 付款状态
      */
     private Integer payStatus;
+
 }

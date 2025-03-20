@@ -88,11 +88,11 @@ public class ErpPurchaseInItemDO extends BaseDO {
      * 目的：方便更新关联的采购订单项的入库数量
      */
     private Long orderItemId;
-    /**
-     * 采购订单编号-展示用(源单单号,采购单)
-     * 关联 {@link ErpPurchaseOrderDO#getNo()}
-     */
-    private String orderNo;
+//    /**
+//     * 采购订单编号-展示用(源单单号,采购单)
+//     * 关联 {@link ErpPurchaseOrderDO#getNo()}
+//     */
+//    private String orderNo;
 
     /**
      * 币别id(财务管理-币别维护)

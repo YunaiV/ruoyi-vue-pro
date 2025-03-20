@@ -26,13 +26,11 @@ public interface ErpOrderInConvert {
         if (oldItem == null) {
             return null;
         }
-
         ErpPurchaseInSaveReqVO.Item target = new ErpPurchaseInSaveReqVO.Item();
         BeanUtils.copyProperties(oldItem, target); // 复制相同属性
         target.setId(null); // 创建时 ID 需要为 null
         target.setSource("采购项合并入库"); // 单据来源，默认写死
-        target.setOrderId(oldItem.getOrderId()); // 订单编号转 int 作为源单号
-
+//        target.setOrderId(oldItem.getOrderId()); // 订单编号转 int 作为源单号
         return target;
     }
 

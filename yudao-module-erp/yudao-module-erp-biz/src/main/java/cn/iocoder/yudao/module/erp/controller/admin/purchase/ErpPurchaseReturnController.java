@@ -120,7 +120,7 @@ public class ErpPurchaseReturnController {
     }
 
     //提交审核
-    @PostMapping("/submitAudit")
+    @PutMapping("/submitAudit")
     @Operation(summary = "提交审核")
     @PreAuthorize("@ss.hasPermission('erp:purchase-return:submit')")
     public CommonResult<Boolean> submitPurchaseReturn(@NotNull @RequestBody ErpPurchaseReturnAuditReqVO reqVO) {
@@ -129,7 +129,7 @@ public class ErpPurchaseReturnController {
     }
 
     //审核通过|审核撤销
-    @PostMapping("/auditStatus")
+    @PutMapping("/auditStatus")
     @Operation(summary = "审核/反审核")
     @PreAuthorize("@ss.hasPermission('erp:purchase-return:review')")
     public CommonResult<Boolean> auditPurchaseReturn(@NotNull @RequestBody ErpPurchaseReturnAuditReqVO reqVO) {
@@ -138,7 +138,7 @@ public class ErpPurchaseReturnController {
     }
 
     //切换退款状态
-    @PostMapping("/refundStatus")
+    @PutMapping("/refundStatus")
     @Operation(summary = "切换退款状态")
     @PreAuthorize("@ss.hasPermission('erp:purchase-return:refund')")
     public CommonResult<Boolean> refundPurchaseReturn(@NotNull @RequestBody ErpPurchaseReturnAuditReqVO reqVO) {

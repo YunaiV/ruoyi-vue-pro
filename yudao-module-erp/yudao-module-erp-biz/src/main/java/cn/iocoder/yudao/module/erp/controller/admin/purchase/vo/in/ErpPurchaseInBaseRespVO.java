@@ -143,18 +143,18 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
 
         @Schema(description = "付款状态")
         private Integer payStatus;
-//
-//        @Schema(description = "申请人id")
-//        private Long applicantId;
-//        //申请人名称
-//        @Schema(description = "申请人名称")
-//        private String applicantName;
-//
-//        @Schema(description = "申请部门id")
-//        private Long applicationDeptId;
-//        //申请部门名称
-//        @Schema(description = "申请部门名称")
-//        private String applicationDeptName;
+
+        @Schema(description = "申请人id")
+        private Long applicantId;
+        //申请人名称
+        @Schema(description = "申请人名称")
+        private String applicantName;
+
+        @Schema(description = "申请部门id")
+        private Long applicationDeptId;
+        //申请部门名称
+        @Schema(description = "申请部门名称")
+        private String applicationDeptName;
 
         @Schema(description = "来源单据类型")
         private String source;

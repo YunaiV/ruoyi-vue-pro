@@ -151,7 +151,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
             //付款
             requestItemPaymentMachine.fireEvent(ErpPaymentStatus.NONE_PAYMENT, ErpEventEnum.PAYMENT_INIT, orderItemDO);
             //入库
-            requestItemStorageMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, ErpEventEnum.STORAGE_INIT, ErpInCountDTO.builder().orderItemId(orderItemDO.getId()).count(orderItemDO.getCount()).build());
+            requestItemStorageMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, ErpEventEnum.STORAGE_INIT, ErpInCountDTO.builder().orderItemId(orderItemDO.getId()).inCount(orderItemDO.getCount()).build());
             //执行
             requestItemExecutionMachine.fireEvent(ErpExecutionStatus.PENDING, ErpEventEnum.EXECUTION_INIT, orderItemDO);
         }
