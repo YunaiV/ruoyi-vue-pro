@@ -68,4 +68,6 @@ public interface WmsInboundService {
     void approve(InboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO);
 
     WmsInboundRespVO getInboundWithItemList(Long id);
+
+    void finishInbound(WmsInboundRespVO inboundRespVO);
 }

@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
@@ -258,4 +259,28 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         StreamX.from(inboundVO.getItemList()).assemble(productVOMap, WmsInboundItemRespVO::getProductId, WmsInboundItemRespVO::setProduct);
         return inboundVO;
     }
-}
+
+    @Override
+    @Transactional
+    public void finishInbound(WmsInboundRespVO inboundRespVO) {
+        int countOfNone=0;
+        for (WmsInboundItemRespVO respVO : inboundRespVO.getItemList()) {
+            if(InboundStatus.NONE.matchAny(respVO.getInboundStatus())) {
+                countOfNone++;
+            }
+        }
+        if(countOfNone>0) {
+            throw exception(INBOUND_NOT_COMPLETE);
+        }
+
+        // 处理明细的入库状态
+        List<WmsInboundItemDO> itemList = BeanUtils.toBean(inboundRespVO.getItemList(), WmsInboundItemDO.class);
+        inboundItemMapper.updateBatch(itemList);
+
+        // 处理入库单状态
+        WmsInboundDO inboundDO = BeanUtils.toBean(inboundRespVO, WmsInboundDO.class);
+        inboundDO.setInboundStatus(InboundStatus.ALL.getValue());
+        inboundMapper.updateById(inboundDO);
+
+    }
+}

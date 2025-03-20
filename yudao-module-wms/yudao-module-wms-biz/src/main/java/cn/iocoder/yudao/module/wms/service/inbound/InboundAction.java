@@ -53,7 +53,7 @@ public class InboundAction implements StateMachineConfigure<Integer, InboundAudi
     public static class Agree extends BaseInboundAction {
 
         @Resource
-        private WmsStockWarehouseService warehouseService;
+        private WmsStockWarehouseService stockWarehouseService;
 
         public Agree() {
             // 指定事件以及前后的状态与状态提取器
@@ -65,7 +65,8 @@ public class InboundAction implements StateMachineConfigure<Integer, InboundAudi
             super.perform(from, to, event, context);
             // 调整库存
             WmsInboundRespVO inboundRespVO=inboundService.getInboundWithItemList(context.data().getId());
-            warehouseService.batchInbound(inboundRespVO);
+            stockWarehouseService.batchInbound(inboundRespVO);
+
         }
     }
 
