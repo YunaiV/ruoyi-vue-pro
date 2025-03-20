@@ -13,9 +13,13 @@ import java.util.List;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemSaveReqVO;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : no,inbound_status,actual_arrival_time,company_id,audit_status,creator_comment,source_bill_id,trace_no,type,refer_no,plan_arrival_time,init_age,shipping_method,source_bill_no,source_bill_type,id,dept_id,warehouse_id
+ * @table-fields : no,inbound_status,company_id,arrival_actual_time,audit_status,creator_comment,source_bill_id,trace_no,type,init_age,shipping_method,source_bill_no,source_bill_type,id,dept_id,arrival_plan_time,warehouse_id
  */
 @Schema(description = "管理后台 - 入库单新增/修改 Request VO")
 @Data
@@ -28,7 +32,7 @@ public class WmsInboundSaveReqVO {
     @Schema(description = "单据号")
     private String no;
 
-    @Schema(description = "入库单类型 ; InboundType : 1-手工", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "入库单类型 ; InboundType : 1-手工入库 , 2-采购入库", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "入库单类型不能为空", groups = { ValidationGroup.create.class })
     @InEnum(InboundType.class)
     private Integer type;
@@ -47,21 +51,12 @@ public class WmsInboundSaveReqVO {
     @InEnum(BillType.class)
     private Integer sourceBillType;
 
-    @Schema(description = "参考号")
-    private String referNo;
-
     @Schema(description = "跟踪号")
     private String traceNo;
 
     @Schema(description = "运输方式 ; ShippingMethod : 0-海运 , 1-铁路 , 2-空运 , 3-集卡")
     @InEnum(ShippingMethod.class)
     private Integer shippingMethod;
-
-    @Schema(description = "预计到货时间")
-    private LocalDateTime planArrivalTime;
-
-    @Schema(description = "实际到货时间")
-    private LocalDateTime actualArrivalTime;
 
     @Schema(description = "特别说明，创建方专用")
     private String creatorComment;
@@ -85,4 +80,12 @@ public class WmsInboundSaveReqVO {
 
     @Schema(description = "库存归属部门ID", example = "")
     private Long deptId;
+
+    @Schema(description = "实际到货时间", example = "")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime arrivalActualTime;
+
+    @Schema(description = "预计到货时间", example = "")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime arrivalPlanTime;
 }

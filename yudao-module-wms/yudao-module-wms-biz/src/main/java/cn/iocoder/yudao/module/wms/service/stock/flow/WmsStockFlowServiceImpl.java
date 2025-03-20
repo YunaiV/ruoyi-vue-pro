@@ -199,4 +199,9 @@ public class WmsStockFlowServiceImpl implements WmsStockFlowService {
             this.updateStockFlow(BeanUtils.toBean(lastStockFlowDO, WmsStockFlowSaveReqVO.class));
         }
     }
+
+    @Override
+    public List<WmsStockFlowDO> selectStockFlow(Long stockType, Long stockId) {
+        return stockFlowMapper.selectStockFlow(stockType, stockId);
+    }
 }

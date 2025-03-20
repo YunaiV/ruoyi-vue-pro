@@ -7,9 +7,11 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : no,inbound_status,actual_arrival_time,company_id,create_time,audit_status,creator_comment,source_bill_id,trace_no,type,refer_no,plan_arrival_time,init_age,shipping_method,source_bill_no,source_bill_type,dept_id,warehouse_id
+ * @table-fields : no,inbound_status,company_id,create_time,arrival_actual_time,audit_status,creator_comment,source_bill_id,trace_no,type,init_age,shipping_method,source_bill_no,source_bill_type,dept_id,arrival_plan_time,warehouse_id
  */
 @Schema(description = "管理后台 - 入库单分页 Request VO")
 @Data
@@ -20,7 +22,7 @@ public class WmsInboundPageReqVO extends PageParam {
     @Schema(description = "单据号")
     private String no;
 
-    @Schema(description = "入库单类型 ; InboundType : 1-手工", example = "1")
+    @Schema(description = "入库单类型 ; InboundType : 1-手工入库 , 2-采购入库", example = "1")
     private Integer type;
 
     @Schema(description = "仓库ID", example = "23620")
@@ -35,22 +37,11 @@ public class WmsInboundPageReqVO extends PageParam {
     @Schema(description = "来源单据类型 ; BillType : 0-入库单 , 1-出库单", example = "2")
     private Integer sourceBillType;
 
-    @Schema(description = "参考号")
-    private String referNo;
-
     @Schema(description = "跟踪号")
     private String traceNo;
 
     @Schema(description = "运输方式 ; ShippingMethod : 0-海运 , 1-铁路 , 2-空运 , 3-集卡")
     private Integer shippingMethod;
-
-    @Schema(description = "预计到货时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime[] planArrivalTime;
-
-    @Schema(description = "实际到货时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime[] actualArrivalTime;
 
     @Schema(description = "特别说明，创建方专用")
     private String creatorComment;
@@ -73,4 +64,12 @@ public class WmsInboundPageReqVO extends PageParam {
 
     @Schema(description = "库存归属部门ID", example = "")
     private Long deptId;
+
+    @Schema(description = "实际到货时间", example = "")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime arrivalActualTime;
+
+    @Schema(description = "预计到货时间", example = "")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime arrivalPlanTime;
 }

@@ -56,53 +56,48 @@ public class WmsStockFlowController {
     @Resource
     private WmsStockFlowService stockFlowService;
 
-    /**
-     * @sign : F7B60067C4EBBC25
-     */
-    @PostMapping("/create")
-    @Operation(summary = "创建库存流水")
-    @PreAuthorize("@ss.hasPermission('wms:stock-flow:create')")
-    public CommonResult<Long> createStockFlow(@Valid @RequestBody WmsStockFlowSaveReqVO createReqVO) {
-        return success(stockFlowService.createStockFlow(createReqVO).getId());
-    }
-
-    /**
-     * @sign : 70D5A6239EA6C813
-     */
-    @PutMapping("/update")
-    @Operation(summary = "更新库存流水")
-    @PreAuthorize("@ss.hasPermission('wms:stock-flow:update')")
-    public CommonResult<Boolean> updateStockFlow(@Valid @RequestBody WmsStockFlowSaveReqVO updateReqVO) {
-        stockFlowService.updateStockFlow(updateReqVO);
-        return success(true);
-    }
-
-    @DeleteMapping("/delete")
-    @Operation(summary = "删除库存流水")
-    @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('wms:stock-flow:delete')")
-    public CommonResult<Boolean> deleteStockFlow(@RequestParam("id") Long id) {
-        stockFlowService.deleteStockFlow(id);
-        return success(true);
-    }
-
+    // /**
+    // * @sign : F7B60067C4EBBC25
+    // */
+    // @PostMapping("/create")
+    // @Operation(summary = "创建库存流水")
+    // @PreAuthorize("@ss.hasPermission('wms:stock-flow:create')")
+    // public CommonResult<Long> createStockFlow(@Valid @RequestBody WmsStockFlowSaveReqVO createReqVO) {
+    // return success(stockFlowService.createStockFlow(createReqVO).getId());
+    // }
+    // /**
+    // * @sign : 70D5A6239EA6C813
+    // */
+    // @PutMapping("/update")
+    // @Operation(summary = "更新库存流水")
+    // @PreAuthorize("@ss.hasPermission('wms:stock-flow:update')")
+    // public CommonResult<Boolean> updateStockFlow(@Valid @RequestBody WmsStockFlowSaveReqVO updateReqVO) {
+    // stockFlowService.updateStockFlow(updateReqVO);
+    // return success(true);
+    // }
+    // @DeleteMapping("/delete")
+    // @Operation(summary = "删除库存流水")
+    // @Parameter(name = "id", description = "编号", required = true)
+    // @PreAuthorize("@ss.hasPermission('wms:stock-flow:delete')")
+    // public CommonResult<Boolean> deleteStockFlow(@RequestParam("id") Long id) {
+    // stockFlowService.deleteStockFlow(id);
+    // return success(true);
+    // }
     /**
      * @sign : 1840B90C7B488D12
      */
-    @GetMapping("/get")
+    @GetMapping("/flows")
     @Operation(summary = "获得库存流水")
-    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @Parameter(name = "stockType", description = "库存类型", required = true, example = "1")
+    @Parameter(name = "stockId", description = "库存ID", required = true, example = "1")
     @PreAuthorize("@ss.hasPermission('wms:stock-flow:query')")
-    public CommonResult<WmsStockFlowRespVO> getStockFlow(@RequestParam("id") Long id) {
+    public CommonResult<List<WmsStockFlowRespVO>> getStockFlow(@RequestParam("stockType") Long stockType, @RequestParam("stockId") Long stockId) {
         // 查询数据
-        WmsStockFlowDO stockFlow = stockFlowService.getStockFlow(id);
-        if (stockFlow == null) {
-            throw exception(STOCK_FLOW_NOT_EXISTS);
-        }
+        List<WmsStockFlowDO> stockFlowList = stockFlowService.selectStockFlow(stockType, stockId);
         // 转换
-        WmsStockFlowRespVO stockFlowVO = BeanUtils.toBean(stockFlow, WmsStockFlowRespVO.class);
+        List<WmsStockFlowRespVO> stockFlowVOList = BeanUtils.toBean(stockFlowList, WmsStockFlowRespVO.class);
         // 返回
-        return success(stockFlowVO);
+        return success(stockFlowVOList);
     }
 
     /**
@@ -119,15 +114,14 @@ public class WmsStockFlowController {
         // 返回
         return success(voPageResult);
     }
-
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出库存流水 Excel")
-    @PreAuthorize("@ss.hasPermission('wms:stock-flow:export')")
-    @ApiAccessLog(operateType = EXPORT)
-    public void exportStockFlowExcel(@Valid WmsStockFlowPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
-        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<WmsStockFlowDO> list = stockFlowService.getStockFlowPage(pageReqVO).getList();
-        // 导出 Excel
-        ExcelUtils.write(response, "库存流水.xls", "数据", WmsStockFlowRespVO.class, BeanUtils.toBean(list, WmsStockFlowRespVO.class));
-    }
+    // @GetMapping("/export-excel")
+    // @Operation(summary = "导出库存流水 Excel")
+    // @PreAuthorize("@ss.hasPermission('wms:stock-flow:export')")
+    // @ApiAccessLog(operateType = EXPORT)
+    // public void exportStockFlowExcel(@Valid WmsStockFlowPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
+    // pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+    // List<WmsStockFlowDO> list = stockFlowService.getStockFlowPage(pageReqVO).getList();
+    // // 导出 Excel
+    // ExcelUtils.write(response, "库存流水.xls", "数据", WmsStockFlowRespVO.class, BeanUtils.toBean(list, WmsStockFlowRespVO.class));
+    // }
 }

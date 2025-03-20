@@ -21,7 +21,6 @@ public interface WmsInboundItemFlowMapper extends BaseMapperX<WmsInboundItemFlow
 				.eqIfPresent(WmsInboundItemFlowDO::getInboundId, reqVO.getInboundId())
 				.eqIfPresent(WmsInboundItemFlowDO::getInboundItemId, reqVO.getInboundItemId())
 				.eqIfPresent(WmsInboundItemFlowDO::getProductId, reqVO.getProductId())
-				.eqIfPresent(WmsInboundItemFlowDO::getProductSku, reqVO.getProductSku())
 				.eqIfPresent(WmsInboundItemFlowDO::getOutboundId, reqVO.getOutboundId())
 				.eqIfPresent(WmsInboundItemFlowDO::getOutboundItemId, reqVO.getOutboundItemId())
 				.eqIfPresent(WmsInboundItemFlowDO::getChangedQuantity, reqVO.getChangedQuantity())
@@ -40,4 +39,4 @@ public interface WmsInboundItemFlowMapper extends BaseMapperX<WmsInboundItemFlow
         wrapper.eq(WmsInboundItemFlowDO::getInboundId, inboundId);
         return selectPage(reqVO, wrapper).getList();
     }
-}
+}

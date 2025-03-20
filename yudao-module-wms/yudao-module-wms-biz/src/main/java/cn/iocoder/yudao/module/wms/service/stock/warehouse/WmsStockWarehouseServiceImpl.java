@@ -132,6 +132,11 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
         }
     }
 
+    @Override
+    public WmsStockWarehouseDO getStockWarehouse(Long warehouseId, Long productId) {
+        return stockWarehouseMapper.getByWarehouseIdAndProductId(warehouseId, productId);
+    }
+
     /**
      * 执行入库的原子操作,以加锁的方式单个出入库
      */

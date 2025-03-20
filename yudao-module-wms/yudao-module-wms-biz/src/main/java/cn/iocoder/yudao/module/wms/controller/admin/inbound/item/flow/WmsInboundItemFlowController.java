@@ -30,6 +30,8 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_FLOW_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_FLOW_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 @Tag(name = "入库单库存详情扣减")
 @RestController
@@ -50,6 +52,9 @@ public class WmsInboundItemFlowController {
         return success(inboundItemFlowService.createInboundItemFlow(createReqVO).getId());
     }
 
+    /**
+     * @sign : 611DCC9C3D746175
+     */
     @PutMapping("/update")
     @Operation(summary = "更新入库单库存详情扣减")
     @PreAuthorize("@ss.hasPermission('wms:inbound-item-flow:update')")

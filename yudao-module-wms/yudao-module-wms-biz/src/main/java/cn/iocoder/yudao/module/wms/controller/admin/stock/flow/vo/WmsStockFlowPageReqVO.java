@@ -18,7 +18,7 @@ import java.sql.Timestamp;
 @ToString(callSuper = true)
 public class WmsStockFlowPageReqVO extends PageParam {
 
-    @Schema(description = "库存类型 ; StockType : 1-仓库库存 , 1-仓位库存 , 1-所有者库存", example = "2")
+    @Schema(description = "库存类型 ; StockType : 1-仓库库存 , 2-仓位库存 , 3-所有者库存", example = "2")
     private Integer stockType;
 
     @Schema(description = "库存ID，分别指向三张库存表的ID", example = "17743")

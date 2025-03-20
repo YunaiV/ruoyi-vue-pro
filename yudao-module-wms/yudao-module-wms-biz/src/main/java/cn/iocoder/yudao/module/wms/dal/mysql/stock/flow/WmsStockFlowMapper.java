@@ -69,4 +69,8 @@ public interface WmsStockFlowMapper extends BaseMapperX<WmsStockFlowDO> {
     default WmsStockFlowDO getLastFlow(Long warehouseId, Integer stockType, Long stockId) {
         return selectOne(new LambdaQueryWrapperX<WmsStockFlowDO>().eq(WmsStockFlowDO::getWarehouseId, warehouseId).eq(WmsStockFlowDO::getStockType, stockType).eq(WmsStockFlowDO::getStockId, stockId).eq(WmsStockFlowDO::getNextFlowId, 0));
     }
+
+    default List<WmsStockFlowDO> selectStockFlow(Long stockType, Long stockId) {
+        return selectList(new LambdaQueryWrapperX<WmsStockFlowDO>().eq(WmsStockFlowDO::getStockType, stockType).eq(WmsStockFlowDO::getStockId, stockId));
+    }
 }

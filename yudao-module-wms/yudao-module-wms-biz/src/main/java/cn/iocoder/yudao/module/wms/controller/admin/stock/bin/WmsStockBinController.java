@@ -42,51 +42,46 @@ public class WmsStockBinController {
     @Resource
     private WmsStockBinService stockBinService;
 
-    /**
-     * @sign : 7472CDCA246B810A
-     */
-    @PostMapping("/create")
-    @Operation(summary = "创建仓位库存")
-    @PreAuthorize("@ss.hasPermission('wms:stock-bin:create')")
-    public CommonResult<Long> createStockBin(@Valid @RequestBody WmsStockBinSaveReqVO createReqVO) {
-        return success(stockBinService.createStockBin(createReqVO).getId());
-    }
-
-    /**
-     * @sign : AC84893CE186DA40
-     */
-    @PutMapping("/update")
-    @Operation(summary = "更新仓位库存")
-    @PreAuthorize("@ss.hasPermission('wms:stock-bin:update')")
-    public CommonResult<Boolean> updateStockBin(@Valid @RequestBody WmsStockBinSaveReqVO updateReqVO) {
-        stockBinService.updateStockBin(updateReqVO);
-        return success(true);
-    }
-
-    @DeleteMapping("/delete")
-    @Operation(summary = "删除仓位库存")
-    @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('wms:stock-bin:delete')")
-    public CommonResult<Boolean> deleteStockBin(@RequestParam("id") Long id) {
-        stockBinService.deleteStockBin(id);
-        return success(true);
-    }
-
+    // /**
+    // * @sign : 7472CDCA246B810A
+    // */
+    // @PostMapping("/create")
+    // @Operation(summary = "创建仓位库存")
+    // @PreAuthorize("@ss.hasPermission('wms:stock-bin:create')")
+    // public CommonResult<Long> createStockBin(@Valid @RequestBody WmsStockBinSaveReqVO createReqVO) {
+    // return success(stockBinService.createStockBin(createReqVO).getId());
+    // }
+    // /**
+    // * @sign : AC84893CE186DA40
+    // */
+    // @PutMapping("/update")
+    // @Operation(summary = "更新仓位库存")
+    // @PreAuthorize("@ss.hasPermission('wms:stock-bin:update')")
+    // public CommonResult<Boolean> updateStockBin(@Valid @RequestBody WmsStockBinSaveReqVO updateReqVO) {
+    // stockBinService.updateStockBin(updateReqVO);
+    // return success(true);
+    // }
+    // @DeleteMapping("/delete")
+    // @Operation(summary = "删除仓位库存")
+    // @Parameter(name = "id", description = "编号", required = true)
+    // @PreAuthorize("@ss.hasPermission('wms:stock-bin:delete')")
+    // public CommonResult<Boolean> deleteStockBin(@RequestParam("id") Long id) {
+    // stockBinService.deleteStockBin(id);
+    // return success(true);
+    // }
     /**
      * @sign : D7B68E7D4D845527
      */
-    @GetMapping("/get")
-    @Operation(summary = "获得仓位库存")
-    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @GetMapping("/stocks")
+    @Operation(summary = "获得产品的仓位库存")
+    @Parameter(name = "warehouseId", description = "仓库ID", required = true, example = "1024")
+    @Parameter(name = "productId", description = "产品ID", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('wms:stock-bin:query')")
-    public CommonResult<WmsStockBinRespVO> getStockBin(@RequestParam("id") Long id) {
+    public CommonResult<List<WmsStockBinRespVO>> getStockBin(@RequestParam("warehouseId") Long warehouseId, @RequestParam("productId") Long productId) {
         // 查询数据
-        WmsStockBinDO stockBin = stockBinService.getStockBin(id);
-        if (stockBin == null) {
-            throw exception(STOCK_BIN_NOT_EXISTS);
-        }
+        List<WmsStockBinDO> stockBinList = stockBinService.selectStockBin(warehouseId, productId);
         // 转换
-        WmsStockBinRespVO stockBinVO = BeanUtils.toBean(stockBin, WmsStockBinRespVO.class);
+        List<WmsStockBinRespVO> stockBinVO = BeanUtils.toBean(stockBinList, WmsStockBinRespVO.class);
         // 返回
         return success(stockBinVO);
     }
@@ -105,15 +100,14 @@ public class WmsStockBinController {
         // 返回
         return success(voPageResult);
     }
-
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出仓位库存 Excel")
-    @PreAuthorize("@ss.hasPermission('wms:stock-bin:export')")
-    @ApiAccessLog(operateType = EXPORT)
-    public void exportStockBinExcel(@Valid WmsStockBinPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
-        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<WmsStockBinDO> list = stockBinService.getStockBinPage(pageReqVO).getList();
-        // 导出 Excel
-        ExcelUtils.write(response, "仓位库存.xls", "数据", WmsStockBinRespVO.class, BeanUtils.toBean(list, WmsStockBinRespVO.class));
-    }
+    // @GetMapping("/export-excel")
+    // @Operation(summary = "导出仓位库存 Excel")
+    // @PreAuthorize("@ss.hasPermission('wms:stock-bin:export')")
+    // @ApiAccessLog(operateType = EXPORT)
+    // public void exportStockBinExcel(@Valid WmsStockBinPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
+    // pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+    // List<WmsStockBinDO> list = stockBinService.getStockBinPage(pageReqVO).getList();
+    // // 导出 Excel
+    // ExcelUtils.write(response, "仓位库存.xls", "数据", WmsStockBinRespVO.class, BeanUtils.toBean(list, WmsStockBinRespVO.class));
+    // }
 }

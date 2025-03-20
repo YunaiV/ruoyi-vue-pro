@@ -70,4 +70,6 @@ public interface WmsStockFlowService {
      * 此方法必须包含在 WmsStockOwnershipServiceImpl.inboundSingleItem 方法中
      */
     void createForInbound(Long warehouseId, Long productId, Integer quantity, Long inboundId, Long inboundItemId, WmsStockOwnershipDO stockOwnershipDO);
+
+    List<WmsStockFlowDO> selectStockFlow(Long stockType, Long stockId);
 }

@@ -51,4 +51,6 @@ public interface WmsStockBinService {
      * @return 仓位库存分页
      */
     PageResult<WmsStockBinDO> getStockBinPage(WmsStockBinPageReqVO pageReqVO);
+
+    List<WmsStockBinDO> selectStockBin(Long warehouseId, Long productId);
 }

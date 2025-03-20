@@ -4,6 +4,7 @@ import jakarta.validation.*;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import java.util.List;
 
 /**
  * 所有者库存 Service 接口
@@ -55,4 +56,13 @@ public interface WmsStockOwnershipService {
      * 此方法必须包含在 WmsStockWarehouseServiceImpl.inboundSingleItemTransactional 方法中
      */
     void inboundSingleItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long inboundId, Long inboundItemId);
+
+    /**
+     * 获取库存归属
+     *
+     * @param warehouseId 仓库id
+     * @param productId   产品id
+     * @return 库存归属
+     */
+    List<WmsStockOwnershipDO> selectStockOwnership(Long warehouseId, Long productId);
 }

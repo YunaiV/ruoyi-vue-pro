@@ -12,7 +12,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 /**
  * 入库单 DO
  * @author 李方捷
- * @table-fields : no,inbound_status,actual_arrival_time,company_id,audit_status,creator_comment,source_bill_id,trace_no,type,refer_no,plan_arrival_time,init_age,shipping_method,source_bill_no,source_bill_type,id,dept_id,warehouse_id
+ * @table-fields : no,inbound_status,company_id,arrival_actual_time,audit_status,creator_comment,source_bill_id,trace_no,type,init_age,shipping_method,source_bill_no,source_bill_type,id,dept_id,arrival_plan_time,warehouse_id
  */
 @TableName("wms_inbound")
 // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -62,11 +62,6 @@ public class WmsInboundDO extends BaseDO {
     private Integer sourceBillType;
 
     /**
-     * 参考号
-     */
-    private String referNo;
-
-    /**
      * 跟踪号
      */
     private String traceNo;
@@ -75,16 +70,6 @@ public class WmsInboundDO extends BaseDO {
      * 运输方式，1-海运；2-火车；3-空运；4、集卡
      */
     private Integer shippingMethod;
-
-    /**
-     * 预计到货时间
-     */
-    private LocalDateTime planArrivalTime;
-
-    /**
-     * 实际到货时间
-     */
-    private LocalDateTime actualArrivalTime;
 
     /**
      * 特别说明，创建方专用
@@ -115,4 +100,14 @@ public class WmsInboundDO extends BaseDO {
      * 库存归属部门ID
      */
     private Long deptId;
+
+    /**
+     * 实际到货时间
+     */
+    private LocalDateTime arrivalActualTime;
+
+    /**
+     * 预计到货时间
+     */
+    private LocalDateTime arrivalPlanTime;
 }

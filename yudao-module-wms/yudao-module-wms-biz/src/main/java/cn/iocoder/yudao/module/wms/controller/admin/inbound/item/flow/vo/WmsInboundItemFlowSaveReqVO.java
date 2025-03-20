@@ -6,7 +6,7 @@ import java.util.*;
 import jakarta.validation.constraints.*;
 
 /**
- * @table-fields : inbound_id,product_sku,changed_quantity,product_id,id,inbound_item_id,outbound_id,outbound_item_id
+ * @table-fields : inbound_id,changed_quantity,product_id,id,inbound_item_id,outbound_id,outbound_item_id
  */
 @Schema(description = "管理后台 - 入库单库存详情扣减新增/修改 Request VO")
 @Data
@@ -26,10 +26,6 @@ public class WmsInboundItemFlowSaveReqVO {
     @Schema(description = "标准产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "30952")
     @NotNull(message = "标准产品ID不能为空")
     private Long productId;
-
-    @Schema(description = "标准产品SKU", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "标准产品SKU不能为空")
-    private String productSku;
 
     @Schema(description = "出库单ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11015")
     @NotNull(message = "出库单ID不能为空")

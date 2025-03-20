@@ -44,46 +44,44 @@ public class WmsStockWarehouseController {
     @Resource
     private WmsStockWarehouseService stockWarehouseService;
 
-    /**
-     * @sign : AD9D4916BFDB9B45
-     */
-    @PostMapping("/create")
-    @Operation(summary = "创建仓库库存")
-    @PreAuthorize("@ss.hasPermission('wms:stock-warehouse:create')")
-    public CommonResult<Long> createStockWarehouse(@Valid @RequestBody WmsStockWarehouseSaveReqVO createReqVO) {
-        return success(stockWarehouseService.createStockWarehouse(createReqVO).getId());
-    }
-
-    /**
-     * @sign : A68FAA9D68AA9447
-     */
-    @PutMapping("/update")
-    @Operation(summary = "更新仓库库存")
-    @PreAuthorize("@ss.hasPermission('wms:stock-warehouse:update')")
-    public CommonResult<Boolean> updateStockWarehouse(@Valid @RequestBody WmsStockWarehouseSaveReqVO updateReqVO) {
-        stockWarehouseService.updateStockWarehouse(updateReqVO);
-        return success(true);
-    }
-
-    @DeleteMapping("/delete")
-    @Operation(summary = "删除仓库库存")
-    @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('wms:stock-warehouse:delete')")
-    public CommonResult<Boolean> deleteStockWarehouse(@RequestParam("id") Long id) {
-        stockWarehouseService.deleteStockWarehouse(id);
-        return success(true);
-    }
-
+    // /**
+    // * @sign : AD9D4916BFDB9B45
+    // */
+    // @PostMapping("/create")
+    // @Operation(summary = "创建仓库库存")
+    // @PreAuthorize("@ss.hasPermission('wms:stock-warehouse:create')")
+    // public CommonResult<Long> createStockWarehouse(@Valid @RequestBody WmsStockWarehouseSaveReqVO createReqVO) {
+    // return success(stockWarehouseService.createStockWarehouse(createReqVO).getId());
+    // }
+    // /**
+    // * @sign : A68FAA9D68AA9447
+    // */
+    // @PutMapping("/update")
+    // @Operation(summary = "更新仓库库存")
+    // @PreAuthorize("@ss.hasPermission('wms:stock-warehouse:update')")
+    // public CommonResult<Boolean> updateStockWarehouse(@Valid @RequestBody WmsStockWarehouseSaveReqVO updateReqVO) {
+    // stockWarehouseService.updateStockWarehouse(updateReqVO);
+    // return success(true);
+    // }
+    // @DeleteMapping("/delete")
+    // @Operation(summary = "删除仓库库存")
+    // @Parameter(name = "id", description = "编号", required = true)
+    // @PreAuthorize("@ss.hasPermission('wms:stock-warehouse:delete')")
+    // public CommonResult<Boolean> deleteStockWarehouse(@RequestParam("id") Long id) {
+    // stockWarehouseService.deleteStockWarehouse(id);
+    // return success(true);
+    // }
     /**
      * @sign : 6807425D09A7BD34
      */
-    @GetMapping("/get")
-    @Operation(summary = "获得仓库库存")
-    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @GetMapping("/stock")
+    @Operation(summary = "获得产品的仓库库存")
+    @Parameter(name = "warehouseId", description = "仓库ID", required = true, example = "1")
+    @Parameter(name = "productId", description = "产品ID", required = true, example = "1")
     @PreAuthorize("@ss.hasPermission('wms:stock-warehouse:query')")
-    public CommonResult<WmsStockWarehouseRespVO> getStockWarehouse(@RequestParam("id") Long id) {
+    public CommonResult<WmsStockWarehouseRespVO> getStockWarehouse(@RequestParam("warehouseId") Long warehouseId, @RequestParam("productId") Long productId) {
         // 查询数据
-        WmsStockWarehouseDO stockWarehouse = stockWarehouseService.getStockWarehouse(id);
+        WmsStockWarehouseDO stockWarehouse = stockWarehouseService.getStockWarehouse(warehouseId, productId);
         if (stockWarehouse == null) {
             throw exception(STOCK_WAREHOUSE_NOT_EXISTS);
         }
@@ -117,15 +115,14 @@ public class WmsStockWarehouseController {
         // 返回
         return success(voPageResult);
     }
-
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出仓库库存 Excel")
-    @PreAuthorize("@ss.hasPermission('wms:stock-warehouse:export')")
-    @ApiAccessLog(operateType = EXPORT)
-    public void exportStockWarehouseExcel(@Valid WmsStockWarehousePageReqVO pageReqVO, HttpServletResponse response) throws IOException {
-        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<WmsStockWarehouseDO> list = stockWarehouseService.getStockWarehousePage(pageReqVO).getList();
-        // 导出 Excel
-        ExcelUtils.write(response, "仓库库存.xls", "数据", WmsStockWarehouseRespVO.class, BeanUtils.toBean(list, WmsStockWarehouseRespVO.class));
-    }
+    // @GetMapping("/export-excel")
+    // @Operation(summary = "导出仓库库存 Excel")
+    // @PreAuthorize("@ss.hasPermission('wms:stock-warehouse:export')")
+    // @ApiAccessLog(operateType = EXPORT)
+    // public void exportStockWarehouseExcel(@Valid WmsStockWarehousePageReqVO pageReqVO, HttpServletResponse response) throws IOException {
+    // pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+    // List<WmsStockWarehouseDO> list = stockWarehouseService.getStockWarehousePage(pageReqVO).getList();
+    // // 导出 Excel
+    // ExcelUtils.write(response, "仓库库存.xls", "数据", WmsStockWarehouseRespVO.class, BeanUtils.toBean(list, WmsStockWarehouseRespVO.class));
+    // }
 }

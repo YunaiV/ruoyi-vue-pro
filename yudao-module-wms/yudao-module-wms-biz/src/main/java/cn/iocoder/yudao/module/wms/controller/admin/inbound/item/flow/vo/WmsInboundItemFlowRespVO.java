@@ -9,7 +9,7 @@ import com.alibaba.excel.annotation.*;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,creator,create_time,changed_quantity,outbound_id,outbound_item_id,updater,inbound_id,product_sku,update_time,product_id,id,inbound_item_id
+ * @table-fields : inbound_id,tenant_id,creator,update_time,create_time,changed_quantity,product_id,id,inbound_item_id,outbound_id,outbound_item_id,updater
  */
 @Schema(description = "管理后台 - 入库单库存详情扣减 Response VO")
 @Data
@@ -31,10 +31,6 @@ public class WmsInboundItemFlowRespVO {
     @Schema(description = "标准产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "30952")
     @ExcelProperty("标准产品ID")
     private Long productId;
-
-    @Schema(description = "标准产品SKU", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("标准产品SKU")
-    private String productSku;
 
     @Schema(description = "出库单ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11015")
     @ExcelProperty("出库单ID")

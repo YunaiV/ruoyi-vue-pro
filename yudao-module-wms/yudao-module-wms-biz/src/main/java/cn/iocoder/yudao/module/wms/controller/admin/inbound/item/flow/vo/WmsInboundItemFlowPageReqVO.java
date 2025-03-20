@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : inbound_id,product_sku,create_time,changed_quantity,product_id,inbound_item_id,outbound_id,outbound_item_id
+ * @table-fields : inbound_id,create_time,changed_quantity,product_id,inbound_item_id,outbound_id,outbound_item_id
  */
 @Schema(description = "管理后台 - 入库单库存详情扣减分页 Request VO")
 @Data
@@ -25,9 +25,6 @@ public class WmsInboundItemFlowPageReqVO extends PageParam {
 
     @Schema(description = "标准产品ID", example = "30952")
     private Long productId;
-
-    @Schema(description = "标准产品SKU")
-    private String productSku;
 
     @Schema(description = "出库单ID", example = "11015")
     private Long outboundId;

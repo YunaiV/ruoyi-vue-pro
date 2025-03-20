@@ -140,4 +140,9 @@ public class WmsStockOwnershipServiceImpl implements WmsStockOwnershipService {
         // 记录流水
         stockFlowService.createForInbound(warehouseId, productId, quantity, inboundId, inboundItemId, stockOwnershipDO);
     }
-}
+
+    @Override
+    public List<WmsStockOwnershipDO> selectStockOwnership(Long warehouseId, Long productId) {
+        return stockOwnershipMapper.selectStockOwnership(warehouseId, productId);
+    }
+}

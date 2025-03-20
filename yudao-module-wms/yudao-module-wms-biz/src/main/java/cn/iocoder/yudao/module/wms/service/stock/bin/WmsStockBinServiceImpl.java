@@ -94,4 +94,9 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
     public PageResult<WmsStockBinDO> getStockBinPage(WmsStockBinPageReqVO pageReqVO) {
         return stockBinMapper.selectPage(pageReqVO);
     }
+
+    @Override
+    public List<WmsStockBinDO> selectStockBin(Long warehouseId, Long productId) {
+        return stockBinMapper.selectStockBin(warehouseId, productId);
+    }
 }

@@ -21,7 +21,7 @@ public class WmsStockFlowSaveReqVO {
     @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "9446")
     private Long id;
 
-    @Schema(description = "库存类型 ; StockType : 1-仓库库存 , 1-仓位库存 , 1-所有者库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @Schema(description = "库存类型 ; StockType : 1-仓库库存 , 2-仓位库存 , 3-所有者库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "库存类型不能为空")
     @InEnum(StockType.class)
     private Integer stockType;
