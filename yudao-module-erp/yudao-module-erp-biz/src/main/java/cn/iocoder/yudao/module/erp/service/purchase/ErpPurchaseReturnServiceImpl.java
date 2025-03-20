@@ -18,11 +18,9 @@ import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
 import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.status.ErpReturnStatus;
 import cn.iocoder.yudao.module.erp.enums.status.ErpStorageStatus;
-import cn.iocoder.yudao.module.erp.enums.stock.ErpStockRecordBizTypeEnum;
 import cn.iocoder.yudao.module.erp.service.finance.ErpAccountService;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpStockRecordService;
-import cn.iocoder.yudao.module.erp.service.stock.bo.ErpStockRecordCreateReqBO;
 import com.alibaba.cola.statemachine.StateMachine;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -148,11 +146,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePurchaseReturn(ErpPurchaseReturnSaveReqVO vo) {
-        // 1.1 校验存在
-        ErpPurchaseReturnDO purchaseReturn = validatePurchaseReturnExists(vo.getId());
-        if (ErpAuditStatus.APPROVED.getCode().equals(purchaseReturn.getAuditStatus())) {
-            throw exception(PURCHASE_RETURN_UPDATE_FAIL_APPROVE, purchaseReturn.getNo());
-        }
+        ThrowUtil.ifThrow(validAudit(vo.getId()), PURCHASE_RETURN_UPDATE_FAIL_APPROVE);
         validReqItemsAuditStatus(vo);
         // 1.2 校验退货单已审核
         // 1.3 校验结算账户
@@ -168,6 +162,13 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
         updatePurchaseReturnItemList(vo.getId(), purchaseReturnItems);
     }
 
+
+    private Boolean validAudit(Long returnId) {
+        // 1.1 校验已审核
+        ErpPurchaseReturnDO purchaseReturn = validatePurchaseReturnExists(returnId);
+        return ErpAuditStatus.APPROVED.getCode().equals(purchaseReturn.getAuditStatus());
+    }
+
     private void calculateTotalPrice(ErpPurchaseReturnDO purchaseReturn, List<ErpPurchaseReturnItemDO> purchaseReturnItems) {
         purchaseReturn.setTotalCount(getSumValue(purchaseReturnItems, ErpPurchaseReturnItemDO::getCount, BigDecimal::add));
         purchaseReturn.setTotalProductPrice(getSumValue(purchaseReturnItems, ErpPurchaseReturnItemDO::getTotalPrice, BigDecimal::add, BigDecimal.ZERO));
@@ -179,38 +180,6 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
         }
         purchaseReturn.setDiscountPrice(MoneyUtils.priceMultiplyPercent(purchaseReturn.getTotalPrice(), purchaseReturn.getDiscountPercent()));
         purchaseReturn.setTotalPrice(purchaseReturn.getTotalPrice().subtract(purchaseReturn.getDiscountPrice()).add(purchaseReturn.getOtherPrice()));
-    }
-
-    public void updatePurchaseReturnStatus(Long id, Integer status) {
-        boolean approve = ErpAuditStatus.APPROVED.getCode().equals(status);
-        // 1.1 校验存在
-        ErpPurchaseReturnDO purchaseReturn = validatePurchaseReturnExists(id);
-        // 1.2 校验状态
-        if (purchaseReturn.getAuditStatus().equals(status)) {
-            throw exception(approve ? PURCHASE_RETURN_APPROVE_FAIL : PURCHASE_RETURN_PROCESS_FAIL);
-        }
-        // 1.3 校验已退款
-        if (!approve && purchaseReturn.getRefundPrice().compareTo(BigDecimal.ZERO) > 0) {
-            throw exception(PURCHASE_RETURN_PROCESS_FAIL_EXISTS_REFUND);
-        }
-
-        // 2. 更新状态
-        int updateCount = purchaseReturnMapper.updateByIdAndStatus(id, purchaseReturn.getAuditStatus(),
-            new ErpPurchaseReturnDO().setAuditStatus(status));
-        if (updateCount == 0) {
-            throw exception(approve ? PURCHASE_RETURN_APPROVE_FAIL : PURCHASE_RETURN_PROCESS_FAIL);
-        }
-
-        // 3. 变更库存
-        List<ErpPurchaseReturnItemDO> purchaseReturnItems = purchaseReturnItemMapper.selectListByReturnId(id);
-        Integer bizType = approve ? ErpStockRecordBizTypeEnum.PURCHASE_RETURN.getType()
-            : ErpStockRecordBizTypeEnum.PURCHASE_RETURN_CANCEL.getType();
-        purchaseReturnItems.forEach(purchaseReturnItem -> {
-            BigDecimal count = approve ? purchaseReturnItem.getCount().negate() : purchaseReturnItem.getCount();
-            stockRecordService.createStockRecord(new ErpStockRecordCreateReqBO(
-                purchaseReturnItem.getProductId(), purchaseReturnItem.getWarehouseId(), count,
-                bizType, purchaseReturnItem.getReturnId(), purchaseReturnItem.getId(), purchaseReturn.getNo()));
-        });
     }
 
     @Override
@@ -252,30 +221,18 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
         // 第二步，批量添加、修改、删除
         if (CollUtil.isNotEmpty(diffList.get(0))) {
             diffList.get(0).forEach(o -> o.setReturnId(id));
-//            linkSlaveStatus(diffList.get(0));
             purchaseReturnItemMapper.insertBatch(diffList.get(0));
         }
         if (CollUtil.isNotEmpty(diffList.get(1))) {
-//            for (ErpPurchaseReturnItemDO itemDO : diffList.get(1)) {
-//                BigDecimal newCount = itemDO.getCount();
-//                BigDecimal oldCount = purchaseReturnItemMapper.selectById(itemDO.getId()).getCount();
-//                //
-//                syncCountLogic(inItemMapper.selectById(itemDO.getInItemId()), newCount.subtract(oldCount));
-//            }
             purchaseReturnItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-//            for (ErpPurchaseReturnItemDO itemDO : diffList.get(2)) {
-//                syncCountLogic(inItemMapper.selectById(itemDO.getInItemId()), itemDO.getCount().negate());
-//
-//            }
-            //
             purchaseReturnItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpPurchaseReturnItemDO::getId));
         }
     }
 
     /**
-     * 同步给订单项退货数量
+     * 联动订单项
      *
      * @param inItemDO ErpPurchaseInItemDO
      * @param number   BigDecimal
@@ -292,17 +249,18 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deletePurchaseReturn(List<Long> ids) {
-        // 1. 校验不处于已审批
         List<ErpPurchaseReturnDO> purchaseReturns = purchaseReturnMapper.selectListByIds(ids);
         if (CollUtil.isEmpty(purchaseReturns)) {
             return;
         }
-        purchaseReturns.forEach(purchaseReturn -> {
-            if (ErpAuditStatus.APPROVED.getCode().equals(purchaseReturn.getAuditStatus())) {
-                throw exception(PURCHASE_RETURN_DELETE_FAIL_APPROVE, purchaseReturn.getNo());
-            }
-        });
+        //1. 校验已审核
+        purchaseReturns.forEach(purchaseReturn -> ThrowUtil.ifThrow(validAudit(purchaseReturn.getId()), PURCHASE_RETURN_DELETE_FAIL_APPROVE));
 
+        //1.2 回滚数据状态
+        for (ErpPurchaseReturnDO purchaseReturn : purchaseReturns) {
+            List<ErpPurchaseReturnItemDO> itemDOS = purchaseReturnItemMapper.selectListByReturnId(purchaseReturn.getId());
+            rollBackStatus(itemDOS);
+        }
         // 2. 遍历删除，并记录操作日志
         purchaseReturns.forEach(purchaseReturn -> {
             // 2.1 删除订单
@@ -394,15 +352,19 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
                     log.debug("退货单拒绝审核，ID: {}", purchaseReturnDO.getId());
                     auditStatusMachine.fireEvent(currentStatus, ErpEventEnum.REJECT, req);
                     //同步
-                    Optional.ofNullable(returnItemDOS).ifPresent(item -> {
-                        item.forEach(itemDO ->
-                            syncCountLogic(inItemMapper.selectById(itemDO.getInItemId()), itemDO.getCount().negate()));
-                    });
+                    rollBackStatus(returnItemDOS);
                 }
             } else {
                 log.debug("退货单撤回审核，ID: {}", purchaseReturnDO.getId());
                 auditStatusMachine.fireEvent(currentStatus, ErpEventEnum.WITHDRAW_REVIEW, req);
             }
+        });
+    }
+
+    private void rollBackStatus(List<ErpPurchaseReturnItemDO> returnItemDOS) {
+        Optional.ofNullable(returnItemDOS).ifPresent(item -> {
+            item.forEach(itemDO ->
+                syncCountLogic(inItemMapper.selectById(itemDO.getInItemId()), itemDO.getCount().negate()));
         });
     }
 

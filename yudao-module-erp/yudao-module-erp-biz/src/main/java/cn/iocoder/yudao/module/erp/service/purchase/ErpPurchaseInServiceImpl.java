@@ -119,16 +119,33 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         ThrowUtil.ifThrow(!purchaseInItemMapper.insertBatch(purchaseInItems), GlobalErrorCodeConstants.DB_BATCH_INSERT_ERROR);
         //3.0 设置初始化状态
         initMasterStatus(purchaseIn);
-//        initSlaveStatus(purchaseInItems);
+        initSlaveStatus(purchaseInItems);
         return purchaseIn.getId();
     }
 
+    private void initSlaveStatus(List<ErpPurchaseInItemDO> purchaseInItems) {
+        for (ErpPurchaseInItemDO purchaseInItem : purchaseInItems) {
+            itemPaymentMachine.fireEvent(ErpPaymentStatus.NONE_PAYMENT, ErpEventEnum.PAYMENT_INIT, purchaseInItem);
+        }
+    }
 
     private void initMasterStatus(ErpPurchaseInDO purchaseIn) {
         auditMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.AUDIT_INIT, ErpPurchaseInAuditReqVO.builder().inId(purchaseIn.getId()).build());
         paymentMachine.fireEvent(ErpPaymentStatus.NONE_PAYMENT, ErpEventEnum.PAYMENT_INIT, purchaseIn);
     }
 
+    private void rollbackSlaveStatus(List<ErpPurchaseInItemDO> diffList) {
+        for (ErpPurchaseInItemDO inItemDO : diffList) {
+            Optional.ofNullable(inItemDO.getOrderItemId()).ifPresent(orderItemId -> {
+                ErpPurchaseOrderItemDO orderItemDO = orderItemMapper.selectById(orderItemId);
+
+                orderItemStorageMachine.fireEvent(ErpStorageStatus.fromCode(orderItemDO.getInStatus()), ErpEventEnum.STOCK_ADJUSTMENT,
+                    ErpInCountDTO.builder().orderItemId(orderItemId)
+                        //取反数量
+                        .inCount(inItemDO.getCount().negate()).build());
+            });
+        }
+    }
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePurchaseIn(ErpPurchaseInSaveReqVO vo) {
@@ -241,23 +258,10 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         }
     }
 
-    private void rollbackSlaveStatus(List<ErpPurchaseInItemDO> diffList) {
-        for (ErpPurchaseInItemDO inItemDO : diffList) {
-            Optional.ofNullable(inItemDO.getOrderItemId()).ifPresent(orderItemId -> {
-                ErpPurchaseOrderItemDO orderItemDO = orderItemMapper.selectById(orderItemId);
-
-                orderItemStorageMachine.fireEvent(ErpStorageStatus.fromCode(orderItemDO.getInStatus()), ErpEventEnum.STOCK_ADJUSTMENT,
-                    ErpInCountDTO.builder().orderItemId(orderItemId)
-                        //取反数量
-                        .inCount(inItemDO.getCount().negate()).build());
-            });
-        }
-    }
 
     private void linkSlaveStatus(List<ErpPurchaseInItemDO> purchaseInItems) {
         //执行状态+入库状态
         for (ErpPurchaseInItemDO purchaseInItem : purchaseInItems) {
-            itemPaymentMachine.fireEvent(ErpPaymentStatus.NONE_PAYMENT, ErpEventEnum.PAYMENT_INIT, purchaseInItem);
             //传递给订单项入库状态机 数量
             Optional.ofNullable(purchaseInItem.getOrderItemId()).ifPresent(orderItemId -> {//存在订单项
                 //校验订单项是否存在
