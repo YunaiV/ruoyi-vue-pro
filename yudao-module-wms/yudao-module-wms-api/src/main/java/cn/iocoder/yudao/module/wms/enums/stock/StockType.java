@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.wms.enums.inbound;
+package cn.iocoder.yudao.module.wms.enums.stock;
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import cn.iocoder.yudao.framework.common.enums.DictEnum;
@@ -8,17 +8,18 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 
 /**
- * 入库单类型
+ * 库存类型
  **/
 @RequiredArgsConstructor
 @Getter
-public enum InboundType implements ArrayValuable<Integer>, DictEnum {
+public enum StockType implements ArrayValuable<Integer>, DictEnum {
 
-    MANUAL(1, "手工入库"),
-    PURCHASE(2, "采购入库"),
+    WAREHOUSE(1, "仓库库存"),
+    BIN(2, "仓位库存"),
+    OWNER(3, "所有者库存"),
    ;
 
-    public static final Integer[] VALUES = Arrays.stream(values()).map(InboundType::getValue).toArray(Integer[]::new);
+    public static final Integer[] VALUES = Arrays.stream(values()).map(StockType::getValue).toArray(Integer[]::new);
 
 
     private final Integer value;
@@ -27,8 +28,8 @@ public enum InboundType implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 value 匹配枚举，name 优先
      **/
-    public static InboundType parse(Integer value) {
-        for (InboundType e : InboundType.values()) {
+    public static StockType parse(Integer value) {
+        for (StockType e : StockType.values()) {
             if(e.getValue().equals(value)) {
                 return e;
             }
@@ -39,13 +40,13 @@ public enum InboundType implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 name 或 label 匹配枚举，name 优先
      **/
-    public static InboundType parse(String nameOrLabel) {
-        for (InboundType e : InboundType.values()) {
+    public static StockType parse(String nameOrLabel) {
+        for (StockType e : StockType.values()) {
             if(e.name().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
         }
-        for (InboundType e : InboundType.values()) {
+        for (StockType e : StockType.values()) {
             if(e.getLabel().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }

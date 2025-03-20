@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.wms.service.stock.warehouse;
 
-import java.util.*;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import jakarta.validation.*;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 
 /**
  * 仓库库存 Service 接口
@@ -51,4 +50,9 @@ public interface WmsStockWarehouseService {
      * @return 仓库库存分页
      */
     PageResult<WmsStockWarehouseDO> getStockWarehousePage(WmsStockWarehousePageReqVO pageReqVO);
+
+    /**
+     * 批量入库，其内部逐个调用 inboundAtomically
+     */
+    void batchInbound(WmsInboundRespVO inboundRespVO);
 }

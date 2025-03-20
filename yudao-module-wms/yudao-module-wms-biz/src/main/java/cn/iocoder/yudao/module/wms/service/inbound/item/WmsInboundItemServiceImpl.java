@@ -1,17 +1,19 @@
 package cn.iocoder.yudao.module.wms.service.inbound.item;
 
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
+import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
+import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.WmsInboundItemMapper;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -120,5 +122,37 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
      */
     public List<WmsInboundItemDO> selectByInboundId(Long inboundId, int limit) {
         return inboundItemMapper.selectByInboundId(inboundId, limit);
+    }
+
+    @Override
+    public void updateActualQuantity(List<WmsInboundItemSaveReqVO> updateReqVOList) {
+        if (CollectionUtils.isEmpty(updateReqVOList)) {
+            return;
+        }
+        Set<Long> inboundIds = StreamX.from(updateReqVOList).toSet(WmsInboundItemSaveReqVO::getInboundId);
+        if (inboundIds.size() > 1) {
+            throw exception(INBOUND_ITEM_INBOUND_ID_DUPLICATE);
+        }
+        Long inboundId = inboundIds.stream().findFirst().get();
+        WmsInboundDO inboundDO = inboundService.validateInboundExists(inboundId);
+        InboundAuditStatus auditStatus = InboundAuditStatus.parse(inboundDO.getAuditStatus());
+        InboundStatus inboundStatus = InboundStatus.parse(inboundDO.getInboundStatus());
+        // 除了审批中的情况，其它情况不允许修改实际入库量
+        if (!auditStatus.matchAny(InboundAuditStatus.AUDITING)) {
+            throw exception(INBOUND_CAN_NOT_EDIT);
+        }
+        // 除了未入库的情况，其它情况不允许修改实际入库量
+        if (!inboundStatus.matchAny(InboundStatus.NONE)) {
+            throw exception(INBOUND_CAN_NOT_EDIT);
+        }
+        Map<Long, WmsInboundItemSaveReqVO> updateReqVOMap = StreamX.from(updateReqVOList).toMap(WmsInboundItemSaveReqVO::getId);
+        List<WmsInboundItemDO> inboundItemDOSInDB = inboundItemMapper.selectByIds(StreamX.from(updateReqVOList).toList(WmsInboundItemSaveReqVO::getId));
+        for (WmsInboundItemDO itemDO : inboundItemDOSInDB) {
+            // todo 数值校验
+            WmsInboundItemSaveReqVO updateReqVO = updateReqVOMap.get(itemDO.getId());
+            itemDO.setActualQuantity(updateReqVO.getActualQuantity());
+        }
+        // 保存
+        inboundItemMapper.updateBatch(inboundItemDOSInDB);
     }
 }

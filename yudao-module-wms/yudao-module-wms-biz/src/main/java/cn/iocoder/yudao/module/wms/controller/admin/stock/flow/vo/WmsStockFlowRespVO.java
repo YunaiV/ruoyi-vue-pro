@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,reason,defective_quantity,creator,create_time,purchase_transit_quantity,flow_time,return_transit_quantity,stock_id,purchase_plan_quantity,updater,stock_type,available_quantity,outbound_pending_quantity,update_time,shelving_pending_quantity,sellable_quantity,delta_quantity,id,reason_bill_id,reason_item_id,prev_flow_id
+ * @table-fields : tenant_id,reason,purchase_plan_quantity,updater,available_quantity,outbound_pending_quantity,update_time,product_id,shelving_pending_quantity,sellable_quantity,id,reason_bill_id,defective_quantity,creator,create_time,purchase_transit_quantity,flow_time,next_flow_id,return_transit_quantity,stock_id,stock_type,delta_quantity,prev_flow_id,reason_item_id,warehouse_id
  */
 @Schema(description = "管理后台 - 库存流水 Response VO")
 @Data
@@ -21,7 +21,7 @@ public class WmsStockFlowRespVO {
     @ExcelProperty("主键")
     private Long id;
 
-    @Schema(description = "库存类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @Schema(description = "库存类型 ; StockType : 1-仓库库存 , 1-仓位库存 , 1-所有者库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @ExcelProperty("库存类型")
     private Integer stockType;
 
@@ -29,7 +29,7 @@ public class WmsStockFlowRespVO {
     @ExcelProperty("库存ID")
     private Long stockId;
 
-    @Schema(description = "流水发生的原因", requiredMode = Schema.RequiredMode.REQUIRED, example = "不香")
+    @Schema(description = "流水发生的原因 ; StockReason : 1-入库", requiredMode = Schema.RequiredMode.REQUIRED, example = "不香")
     @ExcelProperty("流水发生的原因")
     private Integer reason;
 
@@ -61,10 +61,6 @@ public class WmsStockFlowRespVO {
     @ExcelProperty("退件在途数量")
     private Integer returnTransitQuantity;
 
-    @Schema(description = "待上架数量")
-    @ExcelProperty("待上架数量")
-    private Integer pendingShelvingQuantity;
-
     @Schema(description = "可用量，在库的良品数量")
     @ExcelProperty("可用量")
     private Integer availableQuantity;
@@ -72,10 +68,6 @@ public class WmsStockFlowRespVO {
     @Schema(description = "可售量，未被单据占用的良品数量")
     @ExcelProperty("可售量")
     private Integer sellableQuantity;
-
-    @Schema(description = "待出库量")
-    @ExcelProperty("待出库量")
-    private Integer pendingOutboundQuantity;
 
     @Schema(description = "不良品数量")
     @ExcelProperty("不良品数量")
@@ -113,4 +105,16 @@ public class WmsStockFlowRespVO {
     @Schema(description = "租户编号", example = "")
     @ExcelProperty("租户编号")
     private Long tenantId;
+
+    @Schema(description = "上一个流水ID", example = "")
+    @ExcelProperty("上一个流水ID")
+    private Long nextFlowId;
+
+    @Schema(description = "产品ID", example = "")
+    @ExcelProperty("产品ID")
+    private Long productId;
+
+    @Schema(description = "仓库ID", example = "")
+    @ExcelProperty("仓库ID")
+    private Long warehouseId;
 }

@@ -26,11 +26,7 @@ public class WmsStockWarehouseRespVO {
 
     @Schema(description = "产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "3153")
     @ExcelProperty("产品ID")
-    private String productId;
-
-    @Schema(description = "产品SKU", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("产品SKU")
-    private String productSku;
+    private Long productId;
 
     @Schema(description = "采购计划量", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("采购计划量")
@@ -44,10 +40,6 @@ public class WmsStockWarehouseRespVO {
     @ExcelProperty("退件在途数量")
     private Integer returnTransitQuantity;
 
-    @Schema(description = "待上架数量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("待上架数量")
-    private Integer pendingShelvingQuantity;
-
     @Schema(description = "可用量，在库的良品数量", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("可用量")
     private Integer availableQuantity;
@@ -55,10 +47,6 @@ public class WmsStockWarehouseRespVO {
     @Schema(description = "可售量，未被单据占用的良品数量", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("可售量")
     private Integer sellableQuantity;
-
-    @Schema(description = "待出库量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("待出库量")
-    private Integer pendingOutboundQuantity;
 
     @Schema(description = "不良品数量", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("不良品数量")
@@ -76,7 +64,7 @@ public class WmsStockWarehouseRespVO {
     @ExcelProperty("更新人姓名")
     private String updaterName;
 
-    @Schema(description = "待上架数量", example = "")
+    @Schema(description = "待上架数量，上架是指从拣货区上架到货架", example = "")
     @ExcelProperty("待上架数量")
     private Integer shelvingPendingQuantity;
 

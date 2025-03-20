@@ -63,4 +63,6 @@ public interface WmsInboundItemService {
     default List<WmsInboundItemDO> selectByInboundId(Long inboundId) {
         return selectByInboundId(inboundId, Integer.MAX_VALUE);
     }
+
+    void updateActualQuantity(List<WmsInboundItemSaveReqVO> updateReqVOList);
 }

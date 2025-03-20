@@ -21,11 +21,7 @@ public class WmsStockWarehouseSaveReqVO {
 
     @Schema(description = "产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "3153")
     @NotEmpty(message = "产品ID不能为空")
-    private String productId;
-
-    @Schema(description = "产品SKU", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "产品SKU不能为空")
-    private String productSku;
+    private Long productId;
 
     @Schema(description = "采购计划量", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "采购计划量不能为空")
@@ -39,10 +35,6 @@ public class WmsStockWarehouseSaveReqVO {
     @NotNull(message = "退件在途数量不能为空")
     private Integer returnTransitQuantity;
 
-    @Schema(description = "待上架数量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "待上架数量不能为空")
-    private Integer pendingShelvingQuantity;
-
     @Schema(description = "可用量，在库的良品数量", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "可用量不能为空")
     private Integer availableQuantity;
@@ -51,15 +43,11 @@ public class WmsStockWarehouseSaveReqVO {
     @NotNull(message = "可售量不能为空")
     private Integer sellableQuantity;
 
-    @Schema(description = "待出库量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "待出库量不能为空")
-    private Integer pendingOutboundQuantity;
-
     @Schema(description = "不良品数量", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "不良品数量不能为空")
     private Integer defectiveQuantity;
 
-    @Schema(description = "待上架数量", example = "")
+    @Schema(description = "待上架数量，上架是指从拣货区上架到货架", example = "")
     private Integer shelvingPendingQuantity;
 
     @Schema(description = "待出库量", example = "")

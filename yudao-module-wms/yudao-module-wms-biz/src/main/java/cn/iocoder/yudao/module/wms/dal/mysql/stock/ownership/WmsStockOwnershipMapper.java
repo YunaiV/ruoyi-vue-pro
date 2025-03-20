@@ -20,11 +20,10 @@ public interface WmsStockOwnershipMapper extends BaseMapperX<WmsStockOwnershipDO
         return selectPage(reqVO, new LambdaQueryWrapperX<WmsStockOwnershipDO>()
 				.eqIfPresent(WmsStockOwnershipDO::getWarehouseId, reqVO.getWarehouseId())
 				.eqIfPresent(WmsStockOwnershipDO::getProductId, reqVO.getProductId())
-				.eqIfPresent(WmsStockOwnershipDO::getProductSku, reqVO.getProductSku())
-				.eqIfPresent(WmsStockOwnershipDO::getInventorySubjectId, reqVO.getInventorySubjectId())
-				.eqIfPresent(WmsStockOwnershipDO::getInventoryOwnerId, reqVO.getInventoryOwnerId())
+				.eqIfPresent(WmsStockOwnershipDO::getCompanyId, reqVO.getCompanyId())
+				.eqIfPresent(WmsStockOwnershipDO::getDeptId, reqVO.getDeptId())
 				.eqIfPresent(WmsStockOwnershipDO::getAvailableQuantity, reqVO.getAvailableQuantity())
-				.eqIfPresent(WmsStockOwnershipDO::getPendingOutboundQuantity, reqVO.getPendingOutboundQuantity())
+				.eqIfPresent(WmsStockOwnershipDO::getOutboundPendingQuantity, reqVO.getOutboundPendingQuantity())
 				.betweenIfPresent(WmsStockOwnershipDO::getCreateTime, reqVO.getCreateTime())
 				.orderByDesc(WmsStockOwnershipDO::getId));
     }
@@ -32,9 +31,10 @@ public interface WmsStockOwnershipMapper extends BaseMapperX<WmsStockOwnershipDO
     /**
      * 按 warehouse_id,dept_id,product_id 查询唯一的 WmsStockOwnershipDO
      */
-    default WmsStockOwnershipDO getByUk(Long warehouseId, Long deptId, Long productId) {
+    default WmsStockOwnershipDO getByUkProductOwner(Long warehouseId, Long companyId, Long deptId, Long productId) {
         LambdaQueryWrapperX<WmsStockOwnershipDO> wrapper = new LambdaQueryWrapperX<>();
         wrapper.eq(WmsStockOwnershipDO::getWarehouseId, warehouseId);
+        wrapper.eq(WmsStockOwnershipDO::getCompanyId, companyId);
         wrapper.eq(WmsStockOwnershipDO::getDeptId, deptId);
         wrapper.eq(WmsStockOwnershipDO::getProductId, productId);
         return selectOne(wrapper);

@@ -1,11 +1,9 @@
 package cn.iocoder.yudao.module.wms.service.stock.ownership;
 
-import java.util.*;
 import jakarta.validation.*;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 
 /**
  * 所有者库存 Service 接口
@@ -51,4 +49,10 @@ public interface WmsStockOwnershipService {
      * @return 所有者库存分页
      */
     PageResult<WmsStockOwnershipDO> getStockOwnershipPage(WmsStockOwnershipPageReqVO pageReqVO);
+
+    /**
+     * 调整归属库存
+     * 此方法必须包含在 WmsStockWarehouseServiceImpl.inboundSingleItemTransactional 方法中
+     */
+    void inboundSingleItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long inboundId, Long inboundItemId);
 }

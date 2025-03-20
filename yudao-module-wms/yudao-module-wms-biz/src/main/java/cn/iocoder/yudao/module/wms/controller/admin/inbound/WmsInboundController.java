@@ -44,16 +44,13 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 @Validated
 public class WmsInboundController {
 
-    @Resource
-    @Lazy
+    @Resource()
+    @Lazy()
     private WmsInboundItemService inboundItemService;
 
     @Resource
     @Lazy
     private WmsInboundService inboundService;
-
-    @Resource
-    private ErpProductApi productApi;
 
     /**
      * @sign : 9362CEB68950BDF7
@@ -117,28 +114,7 @@ public class WmsInboundController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('wms:inbound:query')")
     public CommonResult<WmsInboundRespVO> getInbound(@RequestParam("id") Long id) {
-        // 查询数据
-        WmsInboundDO inbound = inboundService.getInbound(id);
-        if (inbound == null) {
-            throw exception(INBOUND_NOT_EXISTS);
-        }
-        // 转换
-        WmsInboundRespVO inboundVO = BeanUtils.toBean(inbound, WmsInboundRespVO.class);
-        // 人员姓名填充
-        AdminUserApi.inst().prepareFill(List.of(inboundVO))
-			.mapping(WmsInboundRespVO::getCreator, WmsInboundRespVO::setCreatorName)
-			.mapping(WmsInboundRespVO::getCreator, WmsInboundRespVO::setUpdaterName)
-			.fill();
-        // 组装入库单详情
-        List<WmsInboundItemDO> inboundItemList = inboundItemService.selectByInboundId(inboundVO.getId());
-        inboundVO.setItemList(BeanUtils.toBean(inboundItemList, WmsInboundItemRespVO.class));
-        Map<Long, ErpProductDTO> productDTOMap = productApi.getProductMap(StreamX.from(inboundItemList).map(WmsInboundItemDO::getProductId).toList());
-        Map<Long, ErpProductRespSimpleVO> productVOMap = new HashMap<>();
-        for (ErpProductDTO productDTO : productDTOMap.values()) {
-            ErpProductRespSimpleVO productVO = BeanUtils.toBean(productDTO, ErpProductRespSimpleVO.class);
-            productVOMap.put(productDTO.getId(), productVO);
-        }
-        StreamX.from(inboundVO.getItemList()).assemble(productVOMap, WmsInboundItemRespVO::getProductId, WmsInboundItemRespVO::setProduct);
+        WmsInboundRespVO inboundVO = inboundService.getInboundWithItemList(id);
         // 返回
         return success(inboundVO);
     }
@@ -173,4 +149,4 @@ public class WmsInboundController {
         // 导出 Excel
         ExcelUtils.write(response, "入库单.xls", "数据", WmsInboundRespVO.class, BeanUtils.toBean(list, WmsInboundRespVO.class));
     }
-}
+}

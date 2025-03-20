@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.stock.ownership;
 
+import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
+import cn.iocoder.yudao.module.wms.service.stock.flow.WmsStockFlowService;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -26,12 +28,15 @@ public class WmsStockOwnershipServiceImpl implements WmsStockOwnershipService {
     @Resource
     private WmsStockOwnershipMapper stockOwnershipMapper;
 
+    @Resource
+    private WmsStockFlowService stockFlowService;
+
     /**
-     * @sign : 986513F27AB1F6B0
+     * @sign : 4AF969274F47ADC0
      */
     @Override
     public WmsStockOwnershipDO createStockOwnership(WmsStockOwnershipSaveReqVO createReqVO) {
-        if (stockOwnershipMapper.getByUk(createReqVO.getWarehouseId(), createReqVO.getDeptId(), createReqVO.getProductId()) != null) {
+        if (stockOwnershipMapper.getByUkProductOwner(createReqVO.getWarehouseId(), createReqVO.getCompanyId(), createReqVO.getDeptId(), createReqVO.getProductId()) != null) {
             throw exception(STOCK_OWNERSHIP_WAREHOUSE_ID_DEPT_ID_PRODUCT_ID_DUPLICATE);
         }
         // 插入
@@ -42,14 +47,14 @@ public class WmsStockOwnershipServiceImpl implements WmsStockOwnershipService {
     }
 
     /**
-     * @sign : ACC816A98557AA2E
+     * @sign : 355EF86754CB268D
      */
     @Override
     public WmsStockOwnershipDO updateStockOwnership(WmsStockOwnershipSaveReqVO updateReqVO) {
         // 校验存在
         WmsStockOwnershipDO exists = validateStockOwnershipExists(updateReqVO.getId());
-        if (!Objects.equals(updateReqVO.getId(), exists.getId()) && Objects.equals(updateReqVO.getWarehouseId(), exists.getWarehouseId()) && Objects.equals(updateReqVO.getDeptId(), exists.getDeptId()) && Objects.equals(updateReqVO.getProductId(), exists.getProductId())) {
-            throw exception(STOCK_OWNERSHIP_WAREHOUSE_ID_DEPT_ID_PRODUCT_ID_DUPLICATE);
+        if (!Objects.equals(updateReqVO.getId(), exists.getId()) && Objects.equals(updateReqVO.getWarehouseId(), exists.getWarehouseId()) && Objects.equals(updateReqVO.getCompanyId(), exists.getCompanyId()) && Objects.equals(updateReqVO.getDeptId(), exists.getDeptId()) && Objects.equals(updateReqVO.getProductId(), exists.getProductId())) {
+            throw exception(STOCK_OWNERSHIP_WAREHOUSE_ID_COMPANY_ID_DEPT_ID_PRODUCT_ID_DUPLICATE);
         }
         // 更新
         WmsStockOwnershipDO stockOwnership = BeanUtils.toBean(updateReqVO, WmsStockOwnershipDO.class);
@@ -59,7 +64,7 @@ public class WmsStockOwnershipServiceImpl implements WmsStockOwnershipService {
     }
 
     /**
-     * @sign : 211EF09CCAD1AEF1
+     * @sign : AE46873A88A81B7D
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -68,6 +73,7 @@ public class WmsStockOwnershipServiceImpl implements WmsStockOwnershipService {
         WmsStockOwnershipDO stockOwnership = validateStockOwnershipExists(id);
         // 唯一索引去重
         stockOwnership.setWarehouseId(stockOwnershipMapper.flagUKeyAsLogicDelete(stockOwnership.getWarehouseId()));
+        stockOwnership.setCompanyId(stockOwnershipMapper.flagUKeyAsLogicDelete(stockOwnership.getCompanyId()));
         stockOwnership.setDeptId(stockOwnershipMapper.flagUKeyAsLogicDelete(stockOwnership.getDeptId()));
         stockOwnership.setProductId(stockOwnershipMapper.flagUKeyAsLogicDelete(stockOwnership.getProductId()));
         stockOwnershipMapper.updateById(stockOwnership);
@@ -95,4 +101,43 @@ public class WmsStockOwnershipServiceImpl implements WmsStockOwnershipService {
     public PageResult<WmsStockOwnershipDO> getStockOwnershipPage(WmsStockOwnershipPageReqVO pageReqVO) {
         return stockOwnershipMapper.selectPage(pageReqVO);
     }
-}
+
+    /**
+     * 调整归属库存
+     * 此方法必须包含在 WmsStockWarehouseServiceImpl.inboundSingleItemTransactional 方法中
+     */
+    @Override
+    public void inboundSingleItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long inboundId, Long inboundItemId) {
+        // 查询库存记录
+        WmsStockOwnershipDO stockOwnershipDO = stockOwnershipMapper.getByUkProductOwner(warehouseId, companyId, deptId, productId);
+        // 如果不存在就创建
+        if (stockOwnershipDO == null) {
+            stockOwnershipDO = new WmsStockOwnershipDO();
+            // 
+            stockOwnershipDO.setCompanyId(companyId);
+            stockOwnershipDO.setDeptId(deptId);
+            stockOwnershipDO.setWarehouseId(warehouseId);
+            stockOwnershipDO.setProductId(productId);
+            // 可用量
+            stockOwnershipDO.setAvailableQuantity(0);
+            // 待上架量
+            stockOwnershipDO.setShelvingPendingQuantity(quantity);
+            // 待出库量
+            stockOwnershipDO.setOutboundPendingQuantity(0);
+            // 
+            stockOwnershipMapper.insert(stockOwnershipDO);
+        } else {
+            // 如果存在就修改
+            // 可用量
+            // stockOwnership.setAvailableQuantity(0);
+            // 待上架量
+            stockOwnershipDO.setShelvingPendingQuantity(stockOwnershipDO.getShelvingPendingQuantity() + quantity);
+            // 待出库量
+            // stockOwnership.setOutboundPendingQuantity(0);
+            // 
+            stockOwnershipMapper.updateById(stockOwnershipDO);
+        }
+        // 记录流水
+        stockFlowService.createForInbound(warehouseId, productId, quantity, inboundId, inboundItemId, stockOwnershipDO);
+    }
+}

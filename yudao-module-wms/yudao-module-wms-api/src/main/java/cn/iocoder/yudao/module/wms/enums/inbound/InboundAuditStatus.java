@@ -16,7 +16,7 @@ import java.util.Objects;
 public enum InboundAuditStatus implements ArrayValuable<Integer>, DictEnum {
 
     DRAFT(0, "起草中"),
-    AUDIT(1, "待审批"),
+    AUDITING(1, "待审批"),
     REJECT(2, "已驳回"),
     PASS(3, "已通过"),
    ;

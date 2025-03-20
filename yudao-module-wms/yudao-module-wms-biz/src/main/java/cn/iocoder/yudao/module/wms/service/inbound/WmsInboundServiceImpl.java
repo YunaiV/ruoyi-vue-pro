@@ -1,13 +1,19 @@
 package cn.iocoder.yudao.module.wms.service.inbound;
 
+import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.config.statemachine.ColaContext;
 import cn.iocoder.yudao.module.wms.config.statemachine.StateMachineWrapper;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.ErpProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
 import cn.iocoder.yudao.module.wms.enums.common.BillType;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
+import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -47,6 +53,13 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     @Resource
     private WmsInboundMapper inboundMapper;
 
+    @Resource
+    @Lazy
+    private WmsInboundItemService inboundItemService;
+
+    @Resource
+    private ErpProductApi productApi;
+
     @Resource(name = InboundAction.STATE_MACHINE_NAME)
     private StateMachineWrapper<Integer, InboundAuditStatus.Event, WmsInboundDO> inboundStateMachine;
 
@@ -82,6 +95,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
                 // 设置归属
                 item.setInboundId(inbound.getId());
                 item.setInboundStatus(InboundStatus.NONE.getValue());
+                item.setActualQuantity(0);
                 toInsetList.add(BeanUtils.toBean(item, WmsInboundItemDO.class));
             });
             // 校验 toInsetList 中是否有重复的 productId
@@ -135,6 +149,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
             finalList.forEach(item -> {
                 item.setInboundId(updateReqVO.getId());
                 item.setInboundStatus(InboundStatus.NONE.getValue());
+                item.setActualQuantity(0);
             });
             // 保存详情
             inboundItemMapper.insertBatch(toInsetList);
@@ -178,7 +193,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     /**
      * @sign : 6549448A5F16EE5E
      */
-    private WmsInboundDO validateInboundExists(Long id) {
+    public WmsInboundDO validateInboundExists(Long id) {
         WmsInboundDO inbound = inboundMapper.selectById(id);
         if (inbound == null) {
             throw exception(INBOUND_NOT_EXISTS);
@@ -219,4 +234,28 @@ public class WmsInboundServiceImpl implements WmsInboundService {
             throw exception(INBOUND_APPROVAL_CONDITION_IS_NOT_MATCH);
         }
     }
-}
+
+    @Override
+    public WmsInboundRespVO getInboundWithItemList(Long id) {
+        // 查询数据
+        WmsInboundDO inbound = this.getInbound(id);
+        if (inbound == null) {
+            throw exception(INBOUND_NOT_EXISTS);
+        }
+        // 转换
+        WmsInboundRespVO inboundVO = BeanUtils.toBean(inbound, WmsInboundRespVO.class);
+        // 人员姓名填充
+        AdminUserApi.inst().prepareFill(List.of(inboundVO)).mapping(WmsInboundRespVO::getCreator, WmsInboundRespVO::setCreatorName).mapping(WmsInboundRespVO::getCreator, WmsInboundRespVO::setUpdaterName).fill();
+        // 组装入库单详情
+        List<WmsInboundItemDO> inboundItemList = inboundItemService.selectByInboundId(inboundVO.getId());
+        inboundVO.setItemList(BeanUtils.toBean(inboundItemList, WmsInboundItemRespVO.class));
+        Map<Long, ErpProductDTO> productDTOMap = productApi.getProductMap(StreamX.from(inboundItemList).map(WmsInboundItemDO::getProductId).toList());
+        Map<Long, ErpProductRespSimpleVO> productVOMap = new HashMap<>();
+        for (ErpProductDTO productDTO : productDTOMap.values()) {
+            ErpProductRespSimpleVO productVO = BeanUtils.toBean(productDTO, ErpProductRespSimpleVO.class);
+            productVOMap.put(productDTO.getId(), productVO);
+        }
+        StreamX.from(inboundVO.getItemList()).assemble(productVOMap, WmsInboundItemRespVO::getProductId, WmsInboundItemRespVO::setProduct);
+        return inboundVO;
+    }
+}

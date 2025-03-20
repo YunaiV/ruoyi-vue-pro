@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : available_quantity,outbound_pending_quantity,company_id,create_time,product_id,dept_id,warehouse_id
+ * @table-fields : available_quantity,outbound_pending_quantity,company_id,create_time,product_id,shelving_pending_quantity,dept_id,warehouse_id
  */
 @Schema(description = "管理后台 - 所有者库存分页 Request VO")
 @Data
@@ -23,20 +23,8 @@ public class WmsStockOwnershipPageReqVO extends PageParam {
     @Schema(description = "产品ID", example = "1919")
     private Long productId;
 
-    @Schema(description = "产品SKU")
-    private String productSku;
-
-    @Schema(description = "库存主体ID", example = "28887")
-    private Long inventorySubjectId;
-
-    @Schema(description = "库存归属ID", example = "15579")
-    private Long inventoryOwnerId;
-
     @Schema(description = "可用库存")
     private Integer availableQuantity;
-
-    @Schema(description = "待出库库存")
-    private Integer pendingOutboundQuantity;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
@@ -50,4 +38,7 @@ public class WmsStockOwnershipPageReqVO extends PageParam {
 
     @Schema(description = "待出库库存", example = "")
     private Integer outboundPendingQuantity;
+
+    @Schema(description = "待上架数量，上架是指从拣货区上架到货架", example = "")
+    private Integer shelvingPendingQuantity;
 }

@@ -48,6 +48,11 @@ public interface WmsInboundService {
     WmsInboundDO getInbound(Long id);
 
     /**
+     * 校验存在性
+     */
+    WmsInboundDO validateInboundExists(Long id);
+
+    /**
      * 获得入库单分页
      *
      * @param pageReqVO 分页查询
@@ -61,4 +66,6 @@ public interface WmsInboundService {
     List<WmsInboundDO> selectByWarehouseId(Long warehouseId, int limit);
 
     void approve(InboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO);
+
+    WmsInboundRespVO getInboundWithItemList(Long id);
 }

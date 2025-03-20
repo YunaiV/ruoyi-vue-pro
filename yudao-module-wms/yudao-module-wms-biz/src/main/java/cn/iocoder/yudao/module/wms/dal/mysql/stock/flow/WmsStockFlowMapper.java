@@ -28,10 +28,10 @@ public interface WmsStockFlowMapper extends BaseMapperX<WmsStockFlowDO> {
 				.eqIfPresent(WmsStockFlowDO::getPurchasePlanQuantity, reqVO.getPurchasePlanQuantity())
 				.eqIfPresent(WmsStockFlowDO::getPurchaseTransitQuantity, reqVO.getPurchaseTransitQuantity())
 				.eqIfPresent(WmsStockFlowDO::getReturnTransitQuantity, reqVO.getReturnTransitQuantity())
-				.eqIfPresent(WmsStockFlowDO::getPendingShelvingQuantity, reqVO.getPendingShelvingQuantity())
+				.eqIfPresent(WmsStockFlowDO::getShelvingPendingQuantity, reqVO.getShelvingPendingQuantity())
 				.eqIfPresent(WmsStockFlowDO::getAvailableQuantity, reqVO.getAvailableQuantity())
 				.eqIfPresent(WmsStockFlowDO::getSellableQuantity, reqVO.getSellableQuantity())
-				.eqIfPresent(WmsStockFlowDO::getPendingOutboundQuantity, reqVO.getPendingOutboundQuantity())
+				.eqIfPresent(WmsStockFlowDO::getOutboundPendingQuantity, reqVO.getOutboundPendingQuantity())
 				.eqIfPresent(WmsStockFlowDO::getDefectiveQuantity, reqVO.getDefectiveQuantity())
 				.betweenIfPresent(WmsStockFlowDO::getFlowTime, reqVO.getFlowTime())
 				.betweenIfPresent(WmsStockFlowDO::getCreateTime, reqVO.getCreateTime())
@@ -43,5 +43,30 @@ public interface WmsStockFlowMapper extends BaseMapperX<WmsStockFlowDO> {
      */
     default List<WmsStockFlowDO> selectByStockTypeAndStockId(Integer stockType, Long stockId) {
         return selectList(new LambdaQueryWrapperX<WmsStockFlowDO>().eq(WmsStockFlowDO::getStockType, stockType).eq(WmsStockFlowDO::getStockId, stockId));
+    }
+
+    /**
+     * 按 product_id 查询 WmsStockFlowDO 清单
+     */
+    default List<WmsStockFlowDO> selectByProductId(Long productId) {
+        return selectList(new LambdaQueryWrapperX<WmsStockFlowDO>().eq(WmsStockFlowDO::getProductId, productId));
+    }
+
+    /**
+     * 按 warehouse_id,stock_type,stock_id 查询 WmsStockFlowDO 清单
+     */
+    default List<WmsStockFlowDO> selectByIdxStock(Long warehouseId, Integer stockType, Long stockId) {
+        return selectList(new LambdaQueryWrapperX<WmsStockFlowDO>().eq(WmsStockFlowDO::getWarehouseId, warehouseId).eq(WmsStockFlowDO::getStockType, stockType).eq(WmsStockFlowDO::getStockId, stockId));
+    }
+
+    /**
+     * 按 warehouse_id 查询 WmsStockFlowDO 清单
+     */
+    default List<WmsStockFlowDO> selectByWarehouseId(Long warehouseId) {
+        return selectList(new LambdaQueryWrapperX<WmsStockFlowDO>().eq(WmsStockFlowDO::getWarehouseId, warehouseId));
+    }
+
+    default WmsStockFlowDO getLastFlow(Long warehouseId, Integer stockType, Long stockId) {
+        return selectOne(new LambdaQueryWrapperX<WmsStockFlowDO>().eq(WmsStockFlowDO::getWarehouseId, warehouseId).eq(WmsStockFlowDO::getStockType, stockType).eq(WmsStockFlowDO::getStockId, stockId).eq(WmsStockFlowDO::getNextFlowId, 0));
     }
 }

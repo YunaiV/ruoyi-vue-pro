@@ -37,12 +37,7 @@ public class WmsStockWarehouseDO extends BaseDO {
     /**
      * 产品ID
      */
-    private String productId;
-
-    /**
-     * 产品SKU
-     */
-    private String productSku;
+    private Long productId;
 
     /**
      * 采购计划量
@@ -60,11 +55,6 @@ public class WmsStockWarehouseDO extends BaseDO {
     private Integer returnTransitQuantity;
 
     /**
-     * 待上架数量
-     */
-    private Integer pendingShelvingQuantity;
-
-    /**
      * 可用量，在库的良品数量
      */
     private Integer availableQuantity;
@@ -73,11 +63,6 @@ public class WmsStockWarehouseDO extends BaseDO {
      * 可售量，未被单据占用的良品数量
      */
     private Integer sellableQuantity;
-
-    /**
-     * 待出库量
-     */
-    private Integer pendingOutboundQuantity;
 
     /**
      * 不良品数量

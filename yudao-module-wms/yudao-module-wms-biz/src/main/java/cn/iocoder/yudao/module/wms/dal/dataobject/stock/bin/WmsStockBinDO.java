@@ -42,7 +42,7 @@ public class WmsStockBinDO extends BaseDO {
     /**
      * 产品ID
      */
-    private String productId;
+    private Long productId;
 
     /**
      * 可用量，在库的良品数量

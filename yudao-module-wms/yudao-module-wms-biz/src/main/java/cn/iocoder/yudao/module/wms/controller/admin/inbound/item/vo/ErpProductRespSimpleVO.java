@@ -18,6 +18,11 @@ public class ErpProductRespSimpleVO extends BaseDO {
     @ExcelProperty("产品编号")
     private Long id;
 
+
+    @Schema(description = "部门id", requiredMode = Schema.RequiredMode.REQUIRED, example = "50003")
+    @ExcelProperty("部门id")
+    private Long deptId;
+
     @Schema(description = "产品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
     @ExcelProperty("产品名称")
     private String name;

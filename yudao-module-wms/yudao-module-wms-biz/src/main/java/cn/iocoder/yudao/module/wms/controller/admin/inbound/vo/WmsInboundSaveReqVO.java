@@ -12,9 +12,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemSaveReqVO;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
+import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 
 /**
- * @table-fields : no,inbound_status,actual_arrival_time,audit_status,creator_comment,type,source_bill_id,trace_no,refer_no,plan_arrival_time,init_age,source_bill_no,shipping_method,source_bill_type,id,warehouse_id
+ * @table-fields : no,inbound_status,actual_arrival_time,company_id,audit_status,creator_comment,source_bill_id,trace_no,type,refer_no,plan_arrival_time,init_age,shipping_method,source_bill_no,source_bill_type,id,dept_id,warehouse_id
  */
 @Schema(description = "管理后台 - 入库单新增/修改 Request VO")
 @Data
@@ -71,9 +72,17 @@ public class WmsInboundSaveReqVO {
     @Schema(description = "详情清单", example = "")
     private List<WmsInboundItemSaveReqVO> itemList;
 
-    @Schema(description = "入库单类型 ; InboundStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", example = "")
+    @Schema(description = "入库单审批状态 ; InboundAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", example = "")
+    @InEnum(InboundAuditStatus.class)
     private Integer auditStatus;
 
-    @Schema(description = "入库状态", example = "")
+    @Schema(description = "入库状态 ; InboundStatus : 0-未入库 , 1-部分入库 , 2-已入库", example = "")
+    @InEnum(InboundStatus.class)
     private Integer inboundStatus;
+
+    @Schema(description = "库存财务公司ID", example = "")
+    private Long companyId;
+
+    @Schema(description = "库存归属部门ID", example = "")
+    private Long deptId;
 }

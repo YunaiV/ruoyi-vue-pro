@@ -25,7 +25,7 @@ public class WmsStockBinSaveReqVO {
 
     @Schema(description = "产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11713")
     @NotEmpty(message = "产品ID不能为空")
-    private String productId;
+    private Long productId;
 
     @Schema(description = "可用量，在库的良品数量", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "可用量不能为空")

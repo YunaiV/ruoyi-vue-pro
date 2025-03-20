@@ -51,88 +51,93 @@ public class WmsInboundItemController {
     @Resource
     private WmsInboundItemService inboundItemService;
 
-    /**
-     * @sign : FDA8F53584D62A17
-     */
-    @PostMapping("/create")
-    @Operation(summary = "创建入库单详情")
-    @PreAuthorize("@ss.hasPermission('wms:inbound-item:create')")
-    public CommonResult<Long> createInboundItem(@Validated(ValidationGroup.create.class) @RequestBody WmsInboundItemSaveReqVO createReqVO) {
-        return success(inboundItemService.createInboundItem(createReqVO).getId());
-    }
-
+    // /**
+    // * @sign : FDA8F53584D62A17
+    // */
+    // @PostMapping("/create")
+    // @Operation(summary = "创建入库单详情")
+    // @PreAuthorize("@ss.hasPermission('wms:inbound-item:create')")
+    // public CommonResult<Long> createInboundItem(@Validated(ValidationGroup.create.class) @RequestBody WmsInboundItemSaveReqVO createReqVO) {
+    // return success(inboundItemService.createInboundItem(createReqVO).getId());
+    // }
+    // /**
+    // * @sign : 18BE32AD9E053614
+    // */
+    // @PutMapping("/update")
+    // @Operation(summary = "更新入库单详情")
+    // @PreAuthorize("@ss.hasPermission('wms:inbound-item:update')")
+    // public CommonResult<Boolean> updateInboundItem(@Validated(ValidationGroup.update.class) @RequestBody WmsInboundItemSaveReqVO updateReqVO) {
+    // inboundItemService.updateInboundItem(updateReqVO);
+    // return success(true);
+    // }
     /**
      * @sign : 18BE32AD9E053614
      */
-    @PutMapping("/update")
-    @Operation(summary = "更新入库单详情")
+    @PutMapping("/update-actual-quantity")
+    @Operation(summary = "设置实际入库量")
     @PreAuthorize("@ss.hasPermission('wms:inbound-item:update')")
-    public CommonResult<Boolean> updateInboundItem(@Validated(ValidationGroup.update.class) @RequestBody WmsInboundItemSaveReqVO updateReqVO) {
-        inboundItemService.updateInboundItem(updateReqVO);
+    public CommonResult<Boolean> updateActualQuantity(@Validated(ValidationGroup.update.class) @RequestBody List<WmsInboundItemSaveReqVO> updateReqVOList) {
+        inboundItemService.updateActualQuantity(updateReqVOList);
         return success(true);
     }
-
-    @DeleteMapping("/delete")
-    @Operation(summary = "删除入库单详情")
-    @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('wms:inbound-item:delete')")
-    public CommonResult<Boolean> deleteInboundItem(@RequestParam("id") Long id) {
-        inboundItemService.deleteInboundItem(id);
-        return success(true);
-    }
-
-    /**
-     * @sign : F0DA74F2E45ABE2D
-     */
-    @GetMapping("/get")
-    @Operation(summary = "获得入库单详情")
-    @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('wms:inbound-item:query')")
-    public CommonResult<WmsInboundItemRespVO> getInboundItem(@RequestParam("id") Long id) {
-        // 查询数据
-        WmsInboundItemDO inboundItem = inboundItemService.getInboundItem(id);
-        if (inboundItem == null) {
-            throw exception(INBOUND_ITEM_NOT_EXISTS);
-        }
-        // 转换
-        WmsInboundItemRespVO inboundItemVO = BeanUtils.toBean(inboundItem, WmsInboundItemRespVO.class);
-        // 人员姓名填充
-        AdminUserApi.inst().prepareFill(List.of(inboundItemVO))
-			.mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setCreatorName)
-			.mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setUpdaterName)
-			.fill();
-        // 返回
-        return success(inboundItemVO);
-    }
-
-    /**
-     * @sign : 83456B9A2BFF8F84
-     */
-    @GetMapping("/page")
-    @Operation(summary = "获得入库单详情分页")
-    @PreAuthorize("@ss.hasPermission('wms:inbound-item:query')")
-    public CommonResult<PageResult<WmsInboundItemRespVO>> getInboundItemPage(@Valid WmsInboundItemPageReqVO pageReqVO) {
-        // 查询数据
-        PageResult<WmsInboundItemDO> doPageResult = inboundItemService.getInboundItemPage(pageReqVO);
-        // 转换
-        PageResult<WmsInboundItemRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsInboundItemRespVO.class);
-        // 人员姓名填充
-        AdminUserApi.inst().prepareFill(voPageResult.getList())
-			.mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setCreatorName)
-			.mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setUpdaterName)
-			.fill();
-        // 返回
-        return success(voPageResult);
-    }
-
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出入库单详情 Excel")
-    @PreAuthorize("@ss.hasPermission('wms:inbound-item:export')")
-    @ApiAccessLog(operateType = EXPORT)
-    public void exportInboundItemExcel(@Valid WmsInboundItemPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
-        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<WmsInboundItemDO> list = inboundItemService.getInboundItemPage(pageReqVO).getList();
-        // 导出 Excel
-        ExcelUtils.write(response, "入库单详情.xls", "数据", WmsInboundItemRespVO.class, BeanUtils.toBean(list, WmsInboundItemRespVO.class));
-    }
+    // @DeleteMapping("/delete")
+    // @Operation(summary = "删除入库单详情")
+    // @Parameter(name = "id", description = "编号", required = true)
+    // @PreAuthorize("@ss.hasPermission('wms:inbound-item:delete')")
+    // public CommonResult<Boolean> deleteInboundItem(@RequestParam("id") Long id) {
+    // inboundItemService.deleteInboundItem(id);
+    // return success(true);
+    // }
+    // /**
+    // * @sign : F0DA74F2E45ABE2D
+    // */
+    // @GetMapping("/get")
+    // @Operation(summary = "获得入库单详情")
+    // @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    // @PreAuthorize("@ss.hasPermission('wms:inbound-item:query')")
+    // public CommonResult<WmsInboundItemRespVO> getInboundItem(@RequestParam("id") Long id) {
+    // // 查询数据
+    // WmsInboundItemDO inboundItem = inboundItemService.getInboundItem(id);
+    // if (inboundItem == null) {
+    // throw exception(INBOUND_ITEM_NOT_EXISTS);
+    // }
+    // // 转换
+    // WmsInboundItemRespVO inboundItemVO = BeanUtils.toBean(inboundItem, WmsInboundItemRespVO.class);
+    // // 人员姓名填充
+    // AdminUserApi.inst().prepareFill(List.of(inboundItemVO))
+    // .mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setCreatorName)
+    // .mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setUpdaterName)
+    // .fill();
+    // // 返回
+    // return success(inboundItemVO);
+    // }
+    // /**
+    // * @sign : 83456B9A2BFF8F84
+    // */
+    // @GetMapping("/page")
+    // @Operation(summary = "获得入库单详情分页")
+    // @PreAuthorize("@ss.hasPermission('wms:inbound-item:query')")
+    // public CommonResult<PageResult<WmsInboundItemRespVO>> getInboundItemPage(@Valid WmsInboundItemPageReqVO pageReqVO) {
+    // // 查询数据
+    // PageResult<WmsInboundItemDO> doPageResult = inboundItemService.getInboundItemPage(pageReqVO);
+    // // 转换
+    // PageResult<WmsInboundItemRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsInboundItemRespVO.class);
+    // // 人员姓名填充
+    // AdminUserApi.inst().prepareFill(voPageResult.getList())
+    // .mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setCreatorName)
+    // .mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setUpdaterName)
+    // .fill();
+    // // 返回
+    // return success(voPageResult);
+    // }
+    // @GetMapping("/export-excel")
+    // @Operation(summary = "导出入库单详情 Excel")
+    // @PreAuthorize("@ss.hasPermission('wms:inbound-item:export')")
+    // @ApiAccessLog(operateType = EXPORT)
+    // public void exportInboundItemExcel(@Valid WmsInboundItemPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
+    // pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+    // List<WmsInboundItemDO> list = inboundItemService.getInboundItemPage(pageReqVO).getList();
+    // // 导出 Excel
+    // ExcelUtils.write(response, "入库单详情.xls", "数据", WmsInboundItemRespVO.class, BeanUtils.toBean(list, WmsInboundItemRespVO.class));
+    // }
 }

@@ -21,10 +21,7 @@ public class WmsStockWarehousePageReqVO extends PageParam {
     private Long warehouseId;
 
     @Schema(description = "产品ID", example = "3153")
-    private String productId;
-
-    @Schema(description = "产品SKU")
-    private String productSku;
+    private Long productId;
 
     @Schema(description = "采购计划量")
     private Integer purchasePlanQuantity;
@@ -35,17 +32,11 @@ public class WmsStockWarehousePageReqVO extends PageParam {
     @Schema(description = "退件在途数量")
     private Integer returnTransitQuantity;
 
-    @Schema(description = "待上架数量")
-    private Integer pendingShelvingQuantity;
-
     @Schema(description = "可用量，在库的良品数量")
     private Integer availableQuantity;
 
     @Schema(description = "可售量，未被单据占用的良品数量")
     private Integer sellableQuantity;
-
-    @Schema(description = "待出库量")
-    private Integer pendingOutboundQuantity;
 
     @Schema(description = "不良品数量")
     private Integer defectiveQuantity;
@@ -54,7 +45,7 @@ public class WmsStockWarehousePageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
-    @Schema(description = "待上架数量", example = "")
+    @Schema(description = "待上架数量，上架是指从拣货区上架到货架", example = "")
     private Integer shelvingPendingQuantity;
 
     @Schema(description = "待出库量", example = "")

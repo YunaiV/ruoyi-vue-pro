@@ -20,14 +20,11 @@ public interface WmsStockWarehouseMapper extends BaseMapperX<WmsStockWarehouseDO
         return selectPage(reqVO, new LambdaQueryWrapperX<WmsStockWarehouseDO>()
 				.eqIfPresent(WmsStockWarehouseDO::getWarehouseId, reqVO.getWarehouseId())
 				.eqIfPresent(WmsStockWarehouseDO::getProductId, reqVO.getProductId())
-				.eqIfPresent(WmsStockWarehouseDO::getProductSku, reqVO.getProductSku())
 				.eqIfPresent(WmsStockWarehouseDO::getPurchasePlanQuantity, reqVO.getPurchasePlanQuantity())
 				.eqIfPresent(WmsStockWarehouseDO::getPurchaseTransitQuantity, reqVO.getPurchaseTransitQuantity())
 				.eqIfPresent(WmsStockWarehouseDO::getReturnTransitQuantity, reqVO.getReturnTransitQuantity())
-				.eqIfPresent(WmsStockWarehouseDO::getPendingShelvingQuantity, reqVO.getPendingShelvingQuantity())
 				.eqIfPresent(WmsStockWarehouseDO::getAvailableQuantity, reqVO.getAvailableQuantity())
 				.eqIfPresent(WmsStockWarehouseDO::getSellableQuantity, reqVO.getSellableQuantity())
-				.eqIfPresent(WmsStockWarehouseDO::getPendingOutboundQuantity, reqVO.getPendingOutboundQuantity())
 				.eqIfPresent(WmsStockWarehouseDO::getDefectiveQuantity, reqVO.getDefectiveQuantity())
 				.betweenIfPresent(WmsStockWarehouseDO::getCreateTime, reqVO.getCreateTime())
 				.orderByDesc(WmsStockWarehouseDO::getId));
@@ -37,6 +34,16 @@ public interface WmsStockWarehouseMapper extends BaseMapperX<WmsStockWarehouseDO
      * 按 warehouse_id,product_id 查询唯一的 WmsStockWarehouseDO
      */
     default WmsStockWarehouseDO getByWarehouseIdAndProductId(Long warehouseId, String productId) {
+        LambdaQueryWrapperX<WmsStockWarehouseDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsStockWarehouseDO::getWarehouseId, warehouseId);
+        wrapper.eq(WmsStockWarehouseDO::getProductId, productId);
+        return selectOne(wrapper);
+    }
+
+    /**
+     * 按 warehouse_id,product_id 查询唯一的 WmsStockWarehouseDO
+     */
+    default WmsStockWarehouseDO getByWarehouseIdAndProductId(Long warehouseId, Long productId) {
         LambdaQueryWrapperX<WmsStockWarehouseDO> wrapper = new LambdaQueryWrapperX<>();
         wrapper.eq(WmsStockWarehouseDO::getWarehouseId, warehouseId);
         wrapper.eq(WmsStockWarehouseDO::getProductId, productId);

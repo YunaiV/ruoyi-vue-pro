@@ -24,7 +24,7 @@ public class WmsStockBinPageReqVO extends PageParam {
     private Long binId;
 
     @Schema(description = "产品ID", example = "11713")
-    private String productId;
+    private Long productId;
 
     @Schema(description = "可用量，在库的良品数量")
     private Integer availableQuantity;

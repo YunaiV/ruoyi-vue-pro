@@ -14,9 +14,9 @@ import java.time.LocalDateTime;
 
 
 /**
- * Erp 订单序号的 Redis DAO
+ * WMS 单据序号的 Redis DAO
  *
- * @author HUIHUI
+ * @author LeeFJ
  */
 @Repository
 public class WmsNoRedisDAO {

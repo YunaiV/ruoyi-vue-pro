@@ -9,7 +9,7 @@ import com.alibaba.excel.annotation.*;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : available_quantity,tenant_id,outbound_pending_quantity,creator,update_time,create_time,bin_id,product_id,sellable_quantity,id,warehouse_id,updater
+ * @table-fields : available_quantity,tenant_id,creator,outbound_pending_quantity,update_time,create_time,bin_id,product_id,sellable_quantity,id,updater,warehouse_id
  */
 @Schema(description = "管理后台 - 仓位库存 Response VO")
 @Data
@@ -30,7 +30,7 @@ public class WmsStockBinRespVO {
 
     @Schema(description = "产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11713")
     @ExcelProperty("产品ID")
-    private String productId;
+    private Long productId;
 
     @Schema(description = "可用量，在库的良品数量", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("可用量")

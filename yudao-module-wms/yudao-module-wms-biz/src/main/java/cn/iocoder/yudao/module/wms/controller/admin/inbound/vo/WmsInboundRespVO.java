@@ -11,7 +11,7 @@ import java.util.List;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 
 /**
- * @table-fields : tenant_id,no,creator,inbound_status,actual_arrival_time,create_time,audit_status,creator_comment,type,source_bill_id,trace_no,refer_no,updater,update_time,plan_arrival_time,init_age,source_bill_no,shipping_method,source_bill_type,id,warehouse_id
+ * @table-fields : tenant_id,no,creator,inbound_status,actual_arrival_time,company_id,create_time,audit_status,creator_comment,source_bill_id,trace_no,type,refer_no,updater,update_time,plan_arrival_time,init_age,shipping_method,source_bill_no,source_bill_type,id,dept_id,warehouse_id
  */
 @Schema(description = "管理后台 - 入库单 Response VO")
 @Data
@@ -107,11 +107,19 @@ public class WmsInboundRespVO {
     @ExcelProperty("详情清单")
     private List<WmsInboundItemRespVO> itemList;
 
-    @Schema(description = "入库单类型 ; InboundStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", example = "")
-    @ExcelProperty("入库单类型 ; InboundStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过")
+    @Schema(description = "入库单审批状态 ; InboundAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", example = "")
+    @ExcelProperty("入库单审批状态")
     private Integer auditStatus;
 
-    @Schema(description = "入库状态", example = "")
+    @Schema(description = "入库状态 ; InboundStatus : 0-未入库 , 1-部分入库 , 2-已入库", example = "")
     @ExcelProperty("入库状态")
     private Integer inboundStatus;
+
+    @Schema(description = "库存财务公司ID", example = "")
+    @ExcelProperty("库存财务公司ID")
+    private Long companyId;
+
+    @Schema(description = "库存归属部门ID", example = "")
+    @ExcelProperty("库存归属部门ID")
+    private Long deptId;
 }
