@@ -31,8 +31,8 @@ public class ErpPurchaseRequestPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] requestTime;
 
-    @Schema(description = "状态")
-    private Integer status;
+//    @Schema(description = "状态")
+//    private Integer status;
 
 //    @Schema(description = "关闭状态")
 //    private Integer offStatus;

@@ -166,8 +166,14 @@ public class ErpPurchaseReturnController {
         // 2. 开始拼接
         return BeanUtils.toBean(list, ErpPurchaseReturnBaseRespVO.class, purchaseReturn -> {
             purchaseReturn.setItems(BeanUtils.toBean(purchaseReturnItemMap.get(purchaseReturn.getId()), ErpPurchaseReturnBaseRespVO.Item.class,
-                    item -> MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
-                            .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()))));
+                    item -> {
+                        MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
+                            .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName())
+                            .setProduct(product)
+                        );
+                    }
+                )
+            );
             purchaseReturn.setProductNames(CollUtil.join(purchaseReturn.getItems(), "，", ErpPurchaseReturnBaseRespVO.Item::getProductName));
             MapUtils.findAndThen(supplierMap, purchaseReturn.getSupplierId(), supplier -> purchaseReturn.setSupplierName(supplier.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(purchaseReturn.getCreator()), user -> purchaseReturn.setCreator(user.getNickname()));

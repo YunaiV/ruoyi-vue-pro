@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.returns;
 
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.base.ErpPurchaseBaseRespVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
@@ -35,6 +36,7 @@ public class ErpPurchaseReturnBaseRespVO extends ErpPurchaseBaseRespVO {
     @Schema(description = "产品信息")
     @ExcelProperty("产品信息")
     private String productNames;
+
 
     @Schema(description = "供应商id")
     private Long supplierId;
@@ -109,6 +111,8 @@ public class ErpPurchaseReturnBaseRespVO extends ErpPurchaseBaseRespVO {
         @Schema(description = "采购订单项编号")
         private Long orderItemId;
 
+        @Schema(description = "入库项id", requiredMode = Schema.RequiredMode.REQUIRED)
+        private Long inItemId;
         /**
          * 采购订单编号
          * <p>
@@ -125,7 +129,7 @@ public class ErpPurchaseReturnBaseRespVO extends ErpPurchaseBaseRespVO {
         @Schema(description = "仓库编号")
         private Long warehouseId;
 
-        @Schema(description = "产品编号")
+        @Schema(description = "产品id")
         private Long productId;
 
         @Schema(description = "产品单位单位")
@@ -190,6 +194,9 @@ public class ErpPurchaseReturnBaseRespVO extends ErpPurchaseBaseRespVO {
 
         @Schema(description = "箱率")
         private String containerRate;
+
+        @Schema(description = "产品信息")
+        private ErpProductRespVO product;
     }
 
 }

@@ -23,7 +23,7 @@ public interface ErpPurchaseRequestMapper extends BaseMapperX<ErpPurchaseRequest
             //supplierId 供应商编号
             .eqIfPresent(ErpPurchaseRequestDO::getSupplierId, reqVO.getSupplierId())
             .betweenIfPresent(ErpPurchaseRequestDO::getRequestTime, reqVO.getRequestTime())
-            .eqIfPresent(ErpPurchaseRequestDO::getStatus, reqVO.getStatus())
+//            .eqIfPresent(ErpPurchaseRequestDO::getStatus, reqVO.getStatus())
 //            .eqIfPresent(ErpPurchaseRequestDO::getOffStatus, reqVO.getOffStatus())
 //                .eqIfPresent(ErpPurchaseRequestDO::getOrderStatus, reqVO.getOrderStatus())
             .eqIfPresent(ErpPurchaseRequestDO::getAuditorId, reqVO.getAuditorId()) //审核者

@@ -33,7 +33,7 @@ logging:
 spring:
   # 数据源配置项
   datasource:
-    url: jdbc:mysql://192.168.10.151:3306/ruoyi-vue-dev-purchase?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
+    url: jdbc:mysql://192.168.10.151:3306/ruoyi-vue-pro?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
     driverClassName: com.mysql.cj.jdbc.Driver
     username: it003
     password: asivJssflioKK
@@ -75,6 +75,6 @@ spring:
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:
   info:
-    base-package: cn.iocoder.yudao.module
-somle:
-  base-package: com.somle.amazon
+    base-package: cn.iocoder.yudao
+#somle:
+#  base-package: com.somle.amazon

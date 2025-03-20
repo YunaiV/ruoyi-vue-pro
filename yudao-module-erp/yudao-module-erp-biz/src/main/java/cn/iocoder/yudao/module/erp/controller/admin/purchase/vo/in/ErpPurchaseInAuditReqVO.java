@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in;
 
 import cn.iocoder.yudao.module.erp.controller.admin.tools.validation;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
@@ -26,7 +25,6 @@ public class ErpPurchaseInAuditReqVO {
 
     //审核意见
     @Schema(description = "审核意见")
-    @NotBlank(groups = validation.OnAudit.class, message = "审核意见不能是空字串")
     private String reviewComment;
 
 }

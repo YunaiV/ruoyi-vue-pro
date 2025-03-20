@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.erp.dal.mysql.purchase;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
@@ -40,4 +42,16 @@ public interface ErpPurchaseOrderItemMapper extends BaseMapperX<ErpPurchaseOrder
     default Long selectCountByPurchaseApplyItemId(Long purchaseApplyItemId) {
         return selectCount(ErpPurchaseOrderItemDO::getPurchaseApplyItemId, purchaseApplyItemId);
     }
+
+    default MPJLambdaWrapper<ErpPurchaseOrderItemDO> getDOWrapper() {
+        return new MPJLambdaWrapperX<ErpPurchaseOrderItemDO>()
+            .selectAll(ErpPurchaseOrderItemDO.class);
+    }
+
+//    //BO
+//    default MPJLambdaWrapper<ErpPurchaseOrderItemDO> getBOWrapper() {
+//        return getDOWrapper()
+//            .leftJoin(ErpPurchaseOrderDO.class, ErpPurchaseOrderDO::getId, ErpPurchaseOrderItemDO::getOrderId)
+//            .selectAsClass(ErpPurchaseOrderDO.class, ErpPurchaseOrderItemBO.class);
+//    }
 }

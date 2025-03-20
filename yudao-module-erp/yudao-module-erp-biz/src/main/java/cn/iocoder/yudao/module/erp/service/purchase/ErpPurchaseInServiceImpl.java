@@ -232,28 +232,15 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         if (CollUtil.isNotEmpty(diffList.get(0))) {
             diffList.get(0).forEach(o -> {
                 o.setInId(id);
+                o.setSource("WEB录入");
             });
             purchaseInItemMapper.insertBatch(diffList.get(0));
-            //初始化
-//            initSlaveStatus(diffList.get(0));
         }
         if (CollUtil.isNotEmpty(diffList.get(1))) {
-            //变更入库数量
-//            for (ErpPurchaseInItemDO inItemDO : diffList.get(1)) {
-//                Optional.ofNullable(inItemDO.getOrderItemId()).ifPresent(orderItemId -> {
-//                    ErpPurchaseInItemDO oldData = purchaseInItemMapper.selectById(inItemDO.getId());
-//                    ErpPurchaseOrderItemDO orderItemDO = orderItemMapper.selectById(orderItemId);
-//
-//                    orderItemStorageMachine.fireEvent(ErpStorageStatus.fromCode(orderItemDO.getInStatus()), ErpEventEnum.STOCK_ADJUSTMENT,
-//                        ErpInCountDTO.builder().orderItemId(orderItemId)
-//                            //新旧数值差
-//                            .inCount(inItemDO.getCount().subtract(oldData.getCount())).build());
-//                });
-//            }
+
             purchaseInItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-//            rollbackStatus(diffList.get(2));
             purchaseInItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpPurchaseInItemDO::getId));
         }
     }

@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -17,64 +18,114 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class ErpPurchaseOrderPageReqVO extends PageParam {
 
-    /**
-     * 入库状态 - 无
-     */
-    public static final Integer IN_STATUS_NONE = 0;
-    /**
-     * 入库状态 - 部分
-     */
-    public static final Integer IN_STATUS_PART = 1;
-    /**
-     * 入库状态 - 全部
-     */
-    public static final Integer IN_STATUS_ALL = 2;
+    @Schema(description = "采购状态")
+    private Integer status;
 
-    /**
-     * 退货状态 - 无
-     */
-    public static final Integer RETURN_STATUS_NONE = 0;
-    /**
-     * 退货状态 - 部分
-     */
-    public static final Integer RETURN_STATUS_PART = 1;
-    /**
-     * 退货状态 - 全部
-     */
-    public static final Integer RETURN_STATUS_ALL = 2;
-
-    @Schema(description = "采购单编号-单据编号", example = "CGDD-20250108-000027")
-    private String no;
-
-    @Schema(description = "供应商编号", example = "1724")
+    @Schema(description = "供应商编号")
     private Long supplierId;
+
+    @Schema(description = "结算账户编号")
+    private Long accountId;
 
     @Schema(description = "采购时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] orderTime;
 
-    @Schema(description = "备注", example = "你猜")
+    @Schema(description = "合计数量")
+    private BigDecimal totalCount;
+
+    @Schema(description = "合计价格，单位：元")
+    private BigDecimal totalPrice;
+
+    @Schema(description = "合计产品价格，单位：元")
+    private BigDecimal totalProductPrice;
+
+    @Schema(description = "合计税额，单位：元")
+    private BigDecimal totalTaxPrice;
+
+    @Schema(description = "优惠率，百分比")
+    private BigDecimal discountPercent;
+
+    @Schema(description = "优惠金额，单位：元")
+    private BigDecimal discountPrice;
+
+    @Schema(description = "定金金额，单位：元")
+    private BigDecimal depositPrice;
+
+    @Schema(description = "附件地址")
+    private String fileUrl;
+
+    @Schema(description = "备注")
     private String remark;
 
-    @Schema(description = "采购状态", example = "2")
-    private Integer status;
+    @Schema(description = "采购入库数量")
+    private BigDecimal totalInCount;
 
-    @Schema(description = "创建者")
-    private String creator;
+    @Schema(description = "采购退货数量")
+    private BigDecimal totalReturnCount;
 
-    @Schema(description = "产品编号", example = "1")
-    private Long productId;
+    @Schema(description = "单据日期")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime[] noTime;
 
-    @Schema(description = "入库状态", example = "2")
+    @Schema(description = "创建时间")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime[] createTime;
+
+    @Schema(description = "结算日期")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime[] settlementDate;
+
+    @Schema(description = "审核人id")
+    private Long auditorId;
+
+    @Schema(description = "审核时间")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime[] auditTime;
+
+    @Schema(description = "财务主体id")
+    private Long purchaseEntityId;
+
+    @Schema(description = "验货单json")
+    private String inspectionJson;
+
+    @Schema(description = "完工单json")
+    private String completionJson;
+
+    @Schema(description = "x码")
+    private String xCode;
+
+    @Schema(description = "箱率")
+    private String containerRate;
+
+    @Schema(description = "仓库id")
+    private Long warehouseId;
+
+    @Schema(description = "开关状态")
+    private Integer offStatus;
+
+    @Schema(description = "执行状态")
+    private Integer executeStatus;
+
+    @Schema(description = "入库状态")
     private Integer inStatus;
 
-    @Schema(description = "退货状态", example = "2")
-    private Integer returnStatus;
+    @Schema(description = "付款状态")
+    private Integer payStatus;
 
-    @Schema(description = "是否可入库", example = "true")
-    private Boolean inEnable;
+    @Schema(description = "审核状态")
+    private Integer auditStatus;
 
-    @Schema(description = "是否可退货", example = "true")
-    private Boolean returnEnable;
+    @Schema(description = "收货地址")
+    private String address;
+
+    @Schema(description = "付款条款")
+    private String paymentTerms;
+
+    @Schema(description = "采购状态")
+    private Integer orderStatus;
+
+    @Schema(description = "总验货通过数量")
+    private Integer totalInspectionPassCount;
 
 }

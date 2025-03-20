@@ -32,6 +32,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -81,6 +82,8 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
     StateMachine<ErpReturnStatus, ErpEventEnum, ErpPurchaseReturnDO> refundStateMachine;
     @Resource(name = PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME)
     private StateMachine<ErpStorageStatus, ErpEventEnum, ErpInCountDTO> orderItemStorageMachine;
+    @Autowired
+    private ErpPurchaseInItemMapper erpPurchaseInItemMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -199,6 +202,13 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
         List<ErpProductDO> productList = productService.validProductList(
             convertSet(list, ErpPurchaseReturnSaveReqVO.Item::getProductId));
         Map<Long, ErpProductDO> productMap = convertMap(productList, ErpProductDO::getId);
+        // 1.1 校验入库项存在
+        //收集inItemId集合
+        Set<Long> inItemIdSet = list.stream().map(ErpPurchaseReturnSaveReqVO.Item::getInItemId).collect(Collectors.toSet());
+        for (Long aLong : inItemIdSet) {
+            ErpPurchaseInItemDO inItemDO = erpPurchaseInItemMapper.selectById(aLong);
+            ThrowUtil.ifThrow(inItemDO == null, PURCHASE_IN_ITEM_NOT_EXISTS, aLong);
+        }
         // 2. 转化为 ErpPurchaseReturnItemDO 列表
         return convertList(list, o -> BeanUtils.toBean(o, ErpPurchaseReturnItemDO.class, item -> {
             item.setProductUnitId(productMap.get(item.getProductId()).getUnitId());

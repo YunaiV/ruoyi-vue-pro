@@ -56,7 +56,8 @@ public interface ErrorCodeConstants {
     ErrorCode PURCHASE_IN_ITEM_NOT_EXISTS = new ErrorCode(1_030_102_011, "采购入库单项({})不存在");
     ErrorCode PURCHASE_IN_ITEM_NOT_AUDIT = new ErrorCode(1_030_102_012, "采购入库单项({})关联的入库单未审核，无法创建退货单");
     // ========== ERP 采购退货（1-030-103-000） ==========
-    ErrorCode PURCHASE_RETURN_NOT_EXISTS = new ErrorCode(1_030_103_000, "采购退货单不存在");
+    ErrorCode PURCHASE_RETURN_NOT_EXISTS = new ErrorCode(1_030_103_000, "采购退货单({})不存在");
+    ErrorCode PURCHASE_RETURN_ITEM_NOT_EXISTS = new ErrorCode(1_030_103_001, "采购退货项({})不存在");
     ErrorCode PURCHASE_RETURN_DELETE_FAIL_APPROVE = new ErrorCode(1_030_103_001, "采购退货单({})已审核，无法删除");
     ErrorCode PURCHASE_RETURN_PROCESS_FAIL = new ErrorCode(1_030_103_002, "反审核失败，只有已审核的退货单才能反审核");
     ErrorCode PURCHASE_RETURN_APPROVE_FAIL = new ErrorCode(1_030_103_003, "审核失败，只有未审核的退货单才能审核");
