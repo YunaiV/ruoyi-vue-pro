@@ -13,7 +13,7 @@
 
     <name>${project.artifactId}</name>
     <description>
-        srm 模块
+        srm(采购申请，采购订单，供应商，供应商产品，采购入库，采购退货,采购统计)
     </description>
 
     <dependencies>

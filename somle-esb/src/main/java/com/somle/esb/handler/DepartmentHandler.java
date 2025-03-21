@@ -18,6 +18,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
+import static cn.iocoder.yudao.module.system.enums.esb.EsbChannels.DEPARTMENT_CHANNEL;
+
 
 /**
  * @Description: $
@@ -35,7 +37,7 @@ public class DepartmentHandler {
     private final ErpToKingdeeConverter erpToKingdeeConverter;
     private final KingdeeService kingdeeService;
 
-    @ServiceActivator(inputChannel = "departmentOutputChannel")
+    @ServiceActivator(inputChannel = DEPARTMENT_CHANNEL)
     public void handle(@Payload DeptRespDTO department) {
         Long deptId = department.getId();
         //同步到易仓

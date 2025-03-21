@@ -11,9 +11,7 @@ import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.ErpSupplierProdu
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpSupplierDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpSupplierProductDO;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.ErpSupplierProductMapper;
-import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -35,8 +33,6 @@ import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.*;
 @Validated
 @RequiredArgsConstructor
 public class ErpSupplierProductServiceImpl implements ErpSupplierProductService {
-    @Resource
-    MessageChannel erpCustomRuleChannel;
     private final ErpSupplierProductMapper supplierProductMapper;
     //    private final ErpProductService productService;
     private final ErpSupplierService supplierService;

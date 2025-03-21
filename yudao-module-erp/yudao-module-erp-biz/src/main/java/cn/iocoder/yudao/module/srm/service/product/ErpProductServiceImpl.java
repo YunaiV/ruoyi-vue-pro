@@ -49,6 +49,8 @@ import static cn.iocoder.yudao.module.srm.dal.redis.ErpRedisKeyConstants.PRODUCT
 import static cn.iocoder.yudao.module.srm.dal.redis.ErpRedisKeyConstants.PRODUCT_LIST;
 import static cn.iocoder.yudao.module.srm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.esb.EsbChannels.ERP_CUSTOM_RULE_CHANNEL;
+import static cn.iocoder.yudao.module.system.enums.esb.EsbChannels.ERP_PRODUCT_CHANNEL;
 
 /**
  * ERP 产品 Service 实现类
@@ -60,10 +62,10 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_E
 @Validated
 public class ErpProductServiceImpl implements ErpProductService {
 
-    @Resource
-    MessageChannel erpCustomRuleChannel;
-    @Resource
-    MessageChannel erpProductChannel;
+    @Resource(name = ERP_CUSTOM_RULE_CHANNEL)
+    MessageChannel ruleChannel;
+    @Resource(name = ERP_PRODUCT_CHANNEL)
+    MessageChannel productChannel;
     @Resource
     protected ErpProductMapper productMapper;
     @Resource
@@ -206,21 +208,21 @@ public class ErpProductServiceImpl implements ErpProductService {
                 .ifPresent(dtos::add); // 如果存在DTO，添加到dtos列表中
             // 如果dtos中有数据，则发送消息
             if (!dtos.isEmpty()) {
-                erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos.stream().distinct().toList()).build());
+                ruleChannel.send(MessageBuilder.withPayload(dtos.stream().distinct().toList()).build());
             }
             //获取创建人id
             Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
             ErpProductDTO erpProductDTO = BeanUtils.toBean(productDO, ErpProductDTO.class);
             erpProductDTO.setCreator(String.valueOf(loginUserId));
             //同步数据
-            erpProductChannel.send(MessageBuilder.withPayload(List.of(erpProductDTO)).build());
+            productChannel.send(MessageBuilder.withPayload(List.of(erpProductDTO)).build());
         } else {
             //获取创建人id
             Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
             ErpProductDTO erpProductDTO = BeanUtils.toBean(productDO, ErpProductDTO.class);
             erpProductDTO.setCreator(String.valueOf(loginUserId));
             //同步数据
-            erpProductChannel.send(MessageBuilder.withPayload(List.of(erpProductDTO)).build());
+            productChannel.send(MessageBuilder.withPayload(List.of(erpProductDTO)).build());
         }
     }
 

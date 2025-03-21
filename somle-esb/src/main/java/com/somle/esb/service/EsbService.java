@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import com.somle.esb.model.OssData;
 import com.somle.shopify.service.ShopifyService;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ import java.net.Proxy;
 @Service
 public class EsbService {
 
-    @Autowired
+    @Resource
     MessageChannel dataChannel;
 
     @Autowired
@@ -28,7 +29,6 @@ public class EsbService {
 
     @Autowired
     private ConfigApi configApi;
-
 
 
     @Autowired
@@ -46,14 +46,14 @@ public class EsbService {
             Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort));
 
             OkHttpClient client = new OkHttpClient.Builder()
-                .proxy(proxy)
-                .proxyAuthenticator((route, response) -> {
-                    String credential = okhttp3.Credentials.basic(proxyUsername, proxyPassword);
-                    return response.request().newBuilder()
-                        .header("Proxy-Authorization", credential)
-                        .build();
-                })
-                .build();
+                    .proxy(proxy)
+                    .proxyAuthenticator((route, response) -> {
+                        String credential = okhttp3.Credentials.basic(proxyUsername, proxyPassword);
+                        return response.request().newBuilder()
+                                .header("Proxy-Authorization", credential)
+                                .build();
+                    })
+                    .build();
 
             shopifyService.client.setWebClient(client);
             log.info("using proxy");
@@ -72,7 +72,6 @@ public class EsbService {
             System.out.println(beanName);
         }
     }
-
 
 
     public void send(OssData data) {

@@ -1,16 +1,12 @@
 package com.somle.ai.service;
 
+import cn.iocoder.yudao.framework.common.util.web.RequestX;
+import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import com.somle.ai.model.AiName;
 import com.somle.ai.model.AiReqVO;
 import com.somle.ai.model.AiResponse;
-import cn.iocoder.yudao.framework.common.util.web.RequestX;
-import cn.iocoder.yudao.framework.common.util.web.WebUtils;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Service;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -20,8 +16,6 @@ import java.util.stream.Stream;
 @Service
 public class AiService {
 
-    @Autowired
-    private MessageChannel dataChannel;
 
     private final String baseUrl = "http://ai.somle.com:55003";
     private final Map<String, String> headers = Map.of(

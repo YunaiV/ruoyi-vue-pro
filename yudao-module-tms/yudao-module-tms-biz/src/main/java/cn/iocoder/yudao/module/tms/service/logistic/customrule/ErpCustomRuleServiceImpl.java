@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.customrule.ErpCustomR
 import cn.iocoder.yudao.module.tms.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
 import cn.iocoder.yudao.module.tms.service.logistic.category.product.ErpCustomProductService;
 import cn.iocoder.yudao.module.tms.service.logistic.customrule.bo.ErpCustomRuleBO;
+import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_BATCH_INSERT_ERROR;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_UPDATE_ERROR;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.system.enums.esb.EsbChannels.ERP_CUSTOM_RULE_CHANNEL;
 import static cn.iocoder.yudao.module.tms.enums.ErrorCodeConstants.*;
 
 /**
@@ -48,8 +50,8 @@ import static cn.iocoder.yudao.module.tms.enums.ErrorCodeConstants.*;
 public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
     @Autowired
     ErpCustomRuleMapper customRuleMapper;
-    @Autowired
-    MessageChannel erpCustomRuleChannel;
+    @Resource(name = ERP_CUSTOM_RULE_CHANNEL)
+    MessageChannel channel;
     @Autowired
     ErpCustomRuleApi tmsCustomRuleApi;
     @Autowired
@@ -110,7 +112,7 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
     //同步海关规则方法
     private void syncErpCustomRule(List<Long> ruleIds) {
         List<ErpCustomRuleDTO> dtos = tmsCustomRuleApi.listCustomRules(ruleIds);
-        erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos).build());
+        channel.send(MessageBuilder.withPayload(dtos).build());
     }
 
     @Override
@@ -146,7 +148,7 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
 //        ThrowUtil.ifThrow(customRuleMapper.selectById(id) == null,CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS_BY_PRODUCT_ID);
         ErpCustomRuleDO ruleDO = customRuleMapper.selectById(id);
         if (ruleDO == null) return null;
-        if ( erpProductApi.getProductDto(ruleDO.getProductId()).getCustomCategoryId() == null) {
+        if (erpProductApi.getProductDto(ruleDO.getProductId()).getCustomCategoryId() == null) {
             //不存在海关规则->原始table
             return BeanUtils.toBean(ruleDO, ErpCustomRuleBO.class);
         } else {
@@ -189,10 +191,10 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
     private void baseValidator(ErpCustomRuleSaveReqVO vo) {
         //国家
         Optional.ofNullable(vo.getCountryCode())
-            .ifPresent(countryCodes -> dictDataApi.validateDictDataList(DictTypeConstants.COUNTRY_CODE,
-                countryCodes.stream()
-                    .map(String::valueOf)
-                    .collect(Collectors.toSet())));
+                .ifPresent(countryCodes -> dictDataApi.validateDictDataList(DictTypeConstants.COUNTRY_CODE,
+                        countryCodes.stream()
+                                .map(String::valueOf)
+                                .collect(Collectors.toSet())));
         //货币
         Optional.ofNullable(vo.getDeclaredValueCurrencyCode()).ifPresent(i -> dictDataApi.validateDictDataList(DictTypeConstants.CURRENCY_CODE, Collections.singleton(String.valueOf(i))));
         //物流属性

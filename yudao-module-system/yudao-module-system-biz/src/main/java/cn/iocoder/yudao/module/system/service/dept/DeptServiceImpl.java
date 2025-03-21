@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.DeptMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -23,12 +24,12 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.system.enums.esb.EsbChannels.DEPARTMENT_CHANNEL;
 
 /**
  * 部门 Service 实现类
@@ -40,8 +41,8 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 @Slf4j
 public class DeptServiceImpl implements DeptService {
 
-    @Resource
-    private MessageChannel departmentOutputChannel;
+    @Resource(name = DEPARTMENT_CHANNEL)
+    private MessageChannel channel;
 
     @Resource
     private DeptMapper deptMapper;
@@ -65,7 +66,7 @@ public class DeptServiceImpl implements DeptService {
         deptMapper.insert(deptDO);
 
         // 发送管道
-        departmentOutputChannel.send(MessageBuilder.withPayload(deptConvert.toRespDTO(deptDO)).build());
+        channel.send(MessageBuilder.withPayload(deptConvert.toRespDTO(deptDO)).build());
         return deptDO.getId();
     }
 
@@ -88,7 +89,7 @@ public class DeptServiceImpl implements DeptService {
         deptMapper.updateById(updateObj);
 
         // 发送管道
-        departmentOutputChannel.send(MessageBuilder.withPayload(deptConvert.toRespDTO(updateObj)).build());
+        channel.send(MessageBuilder.withPayload(deptConvert.toRespDTO(updateObj)).build());
     }
 
 //    @Override

@@ -1,17 +1,12 @@
 package com.somle.esb.service;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.UUID;
-import java.util.zip.GZIPOutputStream;
-
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClientBuilder;
 import com.somle.esb.model.AliyunToken;
+import com.somle.esb.model.OssData;
 import com.somle.esb.repository.AliyunTokenRepository;
 import jakarta.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
@@ -19,10 +14,14 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
+import java.util.zip.GZIPOutputStream;
 
-import com.aliyun.oss.OSS;
-import com.aliyun.oss.OSSClientBuilder;
-import com.somle.esb.model.OssData;
+import static cn.iocoder.yudao.module.system.enums.esb.EsbChannels.DATA_CHANNEL;
 
 @Service
 public class AliyunService {
@@ -46,7 +45,7 @@ public class AliyunService {
         ossClient = new OSSClientBuilder().build(endpoint, token.getAccessKeyId(), token.getAccessKeySecret());
     }
 
-    @ServiceActivator(inputChannel = "dataChannel")
+    @ServiceActivator(inputChannel = DATA_CHANNEL)
     @Order(2)
     public void storeOss(Message<OssData> message) throws IOException {
 

@@ -15,6 +15,8 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
+import static cn.iocoder.yudao.module.system.enums.esb.EsbChannels.DK_DEPARTMENT_CHANNEL;
+
 
 /**
  * @Description: $
@@ -31,7 +33,7 @@ public class DingtalkDepartmentHandler {
     private final DeptApi deptApi;
     private final EsbMappingService mappingService;
 
-    @ServiceActivator(inputChannel = "dingtalkDepartmentOutputChannel")
+    @ServiceActivator(inputChannel = DK_DEPARTMENT_CHANNEL)
     public void handle(@Payload DingTalkDepartment dingTalkDepartment) {
         log.info("begin syncing: " + dingTalkDepartment.toString());
         // 同步到系统
