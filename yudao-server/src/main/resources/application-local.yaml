@@ -7,7 +7,6 @@ kingdee:
 debug: false
 
 --- #################### 数据库相关配置 ####################
-
 spring:
   autoconfigure:
     exclude:
@@ -67,6 +66,10 @@ spring:
       port: 6379 # 端口
       database: 1 # 数据库索引
       password: uniplore # 密码，建议生产环境开启
+  task:
+    scheduling:
+      simple:
+        concurrency-limit: 0  # local中0并发，关闭定时
 
 --- #################### 定时任务相关配置 ####################
 # Quartz 配置项，对应 QuartzProperties 配置)
