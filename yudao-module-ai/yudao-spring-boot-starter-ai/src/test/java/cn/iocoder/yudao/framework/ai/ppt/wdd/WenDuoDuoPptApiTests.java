@@ -16,9 +16,13 @@ import java.util.Objects;
  */
 public class WenDuoDuoPptApiTests {
 
-    private final WenDuoDuoPptApi wenDuoDuoPptApi = new WenDuoDuoPptApi("https://docmee.cn");
+    private final WenDuoDuoPptApi wenDuoDuoPptApi;
 
     private final String token = ""; // API Token
+
+    {
+        wenDuoDuoPptApi = new WenDuoDuoPptApi(token);
+    }
 
     @Test
     @Disabled
@@ -38,7 +42,7 @@ public class WenDuoDuoPptApiTests {
     @Test
     @Disabled
     public void testCreateTask() {
-        WenDuoDuoPptApi.ApiResponse apiResponse = wenDuoDuoPptApi.createTask(token, 1, "dify 介绍", null);
+        WenDuoDuoPptApi.ApiResponse apiResponse = wenDuoDuoPptApi.createTask(1, "dify 介绍", null);
         System.out.println(apiResponse);
     }
 
@@ -49,7 +53,7 @@ public class WenDuoDuoPptApiTests {
         WenDuoDuoPptApi.CreateOutlineRequest request = new WenDuoDuoPptApi.CreateOutlineRequest(
                 "1901539019628613632", "medium", null, null, null, null);
         // 调用
-        Flux<Map<String, Object>> flux = wenDuoDuoPptApi.createOutline(token, request);
+        Flux<Map<String, Object>> flux = wenDuoDuoPptApi.createOutline(request);
         StringBuffer contentBuffer = new StringBuffer();
         flux.doOnNext(chunk -> {
             contentBuffer.append(chunk.get("text"));
@@ -72,7 +76,7 @@ public class WenDuoDuoPptApiTests {
         WenDuoDuoPptApi.UpdateOutlineRequest request = new WenDuoDuoPptApi.UpdateOutlineRequest(
                 "1901539019628613632", TEST_OUT_LINE_CONTENT, "精简一点，三个章节即可");
         // 调用
-        Flux<Map<String, Object>> flux = wenDuoDuoPptApi.updateOutline(token, request);
+        Flux<Map<String, Object>> flux = wenDuoDuoPptApi.updateOutline(request);
         StringBuffer contentBuffer = new StringBuffer();
         flux.doOnNext(chunk -> {
             contentBuffer.append(chunk.get("text"));
@@ -98,7 +102,7 @@ public class WenDuoDuoPptApiTests {
                 1, null, null, null);
         WenDuoDuoPptApi.TemplateQueryRequest request = new WenDuoDuoPptApi.TemplateQueryRequest(1, 10, filter);
         // 调用
-        WenDuoDuoPptApi.PagePptTemplateInfo pptTemplatePage = wenDuoDuoPptApi.getTemplatePage(token, request);
+        WenDuoDuoPptApi.PagePptTemplateInfo pptTemplatePage = wenDuoDuoPptApi.getTemplatePage(request);
         // 打印结果
         System.out.println(pptTemplatePage);
     }
@@ -110,9 +114,9 @@ public class WenDuoDuoPptApiTests {
     @Disabled
     public void testGeneratePptx() {
         // 准备参数
-        WenDuoDuoPptApi.CreatePptRequest request = new WenDuoDuoPptApi.CreatePptRequest("1901539019628613632", "1805081814809960448", TEST_OUT_LINE_CONTENT);
+        WenDuoDuoPptApi.PptCreateRequest request = new WenDuoDuoPptApi.PptCreateRequest("1901539019628613632", "1805081814809960448", TEST_OUT_LINE_CONTENT);
         // 调用
-        WenDuoDuoPptApi.PptInfo pptInfo = wenDuoDuoPptApi.create(token, request);
+        WenDuoDuoPptApi.PptInfo pptInfo = wenDuoDuoPptApi.create(request);
         // 打印结果
         System.out.println(pptInfo);
     }
@@ -309,6 +313,7 @@ public class WenDuoDuoPptApiTests {
             #### 7.2.2 合作共赢
             期待与更多的企业和机构合作，共同推动AI技术的应用。
             #### 7.2.3 共创未来
-            让我们一起用AI技术改变世界，共创美好未来。""";
+            让我们一起用AI技术改变世界，共创美好未来。
+            """;
 
 }

@@ -18,10 +18,10 @@ import java.io.File;
 public class XunFeiPptApiTests {
 
     // 讯飞 API 配置信息，实际使用时请替换为您的应用信息
-    private static final String APP_ID = "";
-    private static final String API_SECRET = "";
+    private static final String APP_ID = "6c8ac023";
+    private static final String API_SECRET = "Y2RjM2Q1MWJjZTdkYmFiODc0OGE5NmRk";
 
-    private final XunFeiPptApi xunfeiPptApi = new XunFeiPptApi(XunFeiPptApi.BASE_URL, APP_ID, API_SECRET);
+    private final XunFeiPptApi xunfeiPptApi = new XunFeiPptApi(APP_ID, API_SECRET);
 
     /**
      * 获取 PPT 模板列表
@@ -75,6 +75,7 @@ public class XunFeiPptApiTests {
 
     /**
      * 创建大纲（通过文本）
+     *
      * @return 创建大纲响应
      */
     private XunFeiPptApi.CreateResponse getCreateResponse() {
@@ -160,7 +161,7 @@ public class XunFeiPptApiTests {
     @Disabled
     public void testPollCheckProgress() throws InterruptedException {
         // 准备参数 - 使用之前创建 PP T时返回的 sid
-        String sid = "fa36e926f2ed434987fcb4c1f0776ffb"; // 替换为实际的sid
+        String sid = "1690ef6ee0344e72b5c5434f403b8eaa"; // 替换为实际的sid
 
         // 最大轮询次数
         int maxPolls = 20;

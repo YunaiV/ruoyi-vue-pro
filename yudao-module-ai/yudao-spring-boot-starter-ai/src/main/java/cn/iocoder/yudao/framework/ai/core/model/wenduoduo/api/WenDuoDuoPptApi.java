@@ -8,6 +8,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +36,7 @@ import java.util.function.Predicate;
 public class WenDuoDuoPptApi {
 
     public static final String BASE_URL = "https://docmee.cn";
+    public static final String TOKEN_NAME = "token";
 
     private final WebClient webClient;
 
@@ -43,17 +45,24 @@ public class WenDuoDuoPptApi {
     private final Function<Object, Function<ClientResponse, Mono<? extends Throwable>>> EXCEPTION_FUNCTION =
             reqParam -> response -> response.bodyToMono(String.class).handle((responseBody, sink) -> {
                 HttpRequest request = response.request();
-                log.error("[wdd-api] 调用失败！请求方式:[{}]，请求地址:[{}]，请求参数:[{}]，响应数据: [{}]",
+                log.error("[WenDuoDuoPptApi] 调用失败！请求方式:[{}]，请求地址:[{}]，请求参数:[{}]，响应数据: [{}]",
                         request.getMethod(), request.getURI(), reqParam, responseBody);
-                sink.error(new IllegalStateException("[wdd-api] 调用失败！"));
+                sink.error(new IllegalStateException("[WenDuoDuoPptApi] 调用失败！"));
             });
 
-    // TODO @新：是不是不用 baseUrl 哈
-    public WenDuoDuoPptApi(String baseUrl) {
+    /**
+     * 构造方法
+     *
+     * @param token API令牌，可为空，后续API调用时单独指定
+     */
+    public WenDuoDuoPptApi(String token) {
+        Assert.hasText(token, "token 不能为空");
         this.webClient = WebClient.builder()
-                .baseUrl(baseUrl)
-                // TODO @新：建议，token 作为 defaultHeader
-                .defaultHeaders((headers) -> headers.setContentType(MediaType.APPLICATION_JSON))
+                .baseUrl(BASE_URL)
+                .defaultHeaders((headers) -> {
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                    headers.add(TOKEN_NAME, token);
+                })
                 .build();
     }
 
@@ -90,7 +99,7 @@ public class WenDuoDuoPptApi {
      * @return 任务ID
      * @see <a href="https://docmee.cn/open-platform/api#%E5%88%9B%E5%BB%BA%E4%BB%BB%E5%8A%A1">创建任务</a>
      */
-    public ApiResponse createTask(String token, Integer type, String content, List<MultipartFile> files) {
+    public ApiResponse createTask(Integer type, String content, List<MultipartFile> files) {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
         formData.add("type", type);
         if (content != null) {
@@ -103,7 +112,6 @@ public class WenDuoDuoPptApi {
         }
         return this.webClient.post()
                 .uri("/api/ppt/v2/createTask")
-                .header("token", token)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData(formData))
                 .retrieve()
@@ -146,10 +154,9 @@ public class WenDuoDuoPptApi {
      * @param request 请求体
      * @return 模板列表
      */
-    public PagePptTemplateInfo getTemplatePage(String token, TemplateQueryRequest request) {
+    public PagePptTemplateInfo getTemplatePage(TemplateQueryRequest request) {
         return this.webClient.post()
                 .uri("/api/ppt/templates")
-                .header("token", token)
                 .bodyValue(request)
                 .retrieve()
                 .onStatus(STATUS_PREDICATE, EXCEPTION_FUNCTION.apply(request))
@@ -163,10 +170,9 @@ public class WenDuoDuoPptApi {
      *
      * @return 大纲内容流
      */
-    public Flux<Map<String, Object>> createOutline(String token, CreateOutlineRequest request) {
+    public Flux<Map<String, Object>> createOutline(CreateOutlineRequest request) {
         return this.webClient.post()
                 .uri("/api/ppt/v2/generateContent")
-                .header("token", token)
                 .body(Mono.just(request), CreateOutlineRequest.class)
                 .retrieve()
                 .onStatus(STATUS_PREDICATE, EXCEPTION_FUNCTION.apply(request))
@@ -180,10 +186,9 @@ public class WenDuoDuoPptApi {
      * @param request 请求体
      * @return 大纲内容流
      */
-    public Flux<Map<String, Object>> updateOutline(String token, UpdateOutlineRequest request) {
+    public Flux<Map<String, Object>> updateOutline(UpdateOutlineRequest request) {
         return this.webClient.post()
                 .uri("/api/ppt/v2/updateContent")
-                .header("token", token)
                 .body(Mono.just(request), UpdateOutlineRequest.class)
                 .retrieve()
                 .onStatus(STATUS_PREDICATE, EXCEPTION_FUNCTION.apply(request))
@@ -196,11 +201,10 @@ public class WenDuoDuoPptApi {
      *
      * @return PPT信息
      */
-    public PptInfo create(String token, CreatePptRequest request) {
+    public PptInfo create(PptCreateRequest request) {
         return this.webClient.post()
                 .uri("/api/ppt/v2/generatePptx")
-                .header("token", token)
-                .body(Mono.just(request), CreatePptRequest.class)
+                .body(Mono.just(request), PptCreateRequest.class)
                 .retrieve()
                 .onStatus(STATUS_PREDICATE, EXCEPTION_FUNCTION.apply(request))
                 .bodyToMono(ApiResponse.class)
@@ -214,7 +218,9 @@ public class WenDuoDuoPptApi {
                 .block();
     }
 
-
+    /**
+     * 创建Token请求参数
+     */
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     public record CreateTokenRequest(
             String apiKey,
@@ -276,18 +282,19 @@ public class WenDuoDuoPptApi {
     }
 
     /**
-     * 生成 PPT 请求
+     * 生成 PPT 请求参数
      */
-    // TODO @新：要不按照 PptCreateRequest 这样的风格
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
-    public record CreatePptRequest(
+    public record PptCreateRequest(
             String id,
             String templateId,
             String markdown
     ) {
     }
 
-    // TODO @新：要不写下类注释
+    /**
+     * PPT 信息
+     */
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     public record PptInfo(
             String id,
@@ -309,7 +316,9 @@ public class WenDuoDuoPptApi {
     ) {
     }
 
-    // TODO @新：要不写下类注释
+    /**
+     * 模板查询请求参数
+     */
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     public record TemplateQueryRequest(
             int page,
@@ -317,6 +326,9 @@ public class WenDuoDuoPptApi {
             Filter filters
     ) {
 
+        /**
+         * 模板查询过滤条件
+         */
         @JsonInclude(value = JsonInclude.Include.NON_NULL)
         public record Filter(
                 int type,
@@ -328,7 +340,9 @@ public class WenDuoDuoPptApi {
 
     }
 
-    // TODO @新：要不写下类注释
+    /**
+     * PPT模板分页信息
+     */
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     public record PagePptTemplateInfo(
             List<PptTemplateInfo> data,
@@ -336,8 +350,9 @@ public class WenDuoDuoPptApi {
     ) {
     }
 
-
-    // TODO @新：要不写下类注释
+    /**
+     * PPT模板信息
+     */
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     public record PptTemplateInfo(
             String id,
