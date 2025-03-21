@@ -142,8 +142,6 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
     private void initMasterStatus(ErpPurchaseReturnDO purchaseReturn) {
         auditStatusMachine.fireEvent(ErpAuditStatus.DRAFT, ErpEventEnum.AUDIT_INIT, ErpPurchaseReturnAuditReqVO.builder().ids(Collections.singletonList(purchaseReturn.getId())).build());
         refundStateMachine.fireEvent(ErpReturnStatus.NOT_RETURN, ErpEventEnum.RETURN_INIT, purchaseReturn);
-        //联动订单数据
-
     }
 
     @Override
@@ -355,13 +353,13 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
                 if (req.getPass()) {
                     log.debug("退货单通过审核，ID: {}", purchaseReturnDO.getId());
                     auditStatusMachine.fireEvent(currentStatus, ErpEventEnum.AGREE, req);
-                    //同步
+                    //联动
                     linkSlaveStatus(returnItemDOS);
                 } else {
                     //反审核
                     log.debug("退货单拒绝审核，ID: {}", purchaseReturnDO.getId());
                     auditStatusMachine.fireEvent(currentStatus, ErpEventEnum.REJECT, req);
-                    //同步
+                    //联动
                     rollBackStatus(returnItemDOS);
                 }
             } else {

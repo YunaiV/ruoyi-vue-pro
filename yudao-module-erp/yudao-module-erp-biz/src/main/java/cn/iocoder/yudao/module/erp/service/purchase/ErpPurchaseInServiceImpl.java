@@ -393,7 +393,13 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
             inItemId -> {
                 //校验
                 ErpPurchaseInItemDO inItemDO = validatePurchaseInItemExists(inItemId);
-                itemPaymentMachine.fireEvent(ErpPaymentStatus.fromCode(inItemDO.getPayStatus()), finalEventEnum, inItemDO);
+                if (inItemDO.getPayStatus() == null) {
+                    itemPaymentMachine.fireEvent(ErpPaymentStatus.NONE_PAYMENT, finalEventEnum, inItemDO);
+                } else {
+                    itemPaymentMachine.fireEvent(ErpPaymentStatus.fromCode(inItemDO.getPayStatus()), finalEventEnum, inItemDO);
+
+                }
+
             }
         );
     }
