@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.tms.controller.admin.logistic.category.product.vo;
 
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.srm.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.ErpCustomCategoryDO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;

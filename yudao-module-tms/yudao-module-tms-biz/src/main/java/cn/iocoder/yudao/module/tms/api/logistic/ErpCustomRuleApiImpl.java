@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.tms.api.logistic;
 
-import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.srm.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.srm.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.tms.api.logistic.customrule.ErpCustomRuleApi;
 import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.tms.convert.logistic.ErpCustomRuleConvert;

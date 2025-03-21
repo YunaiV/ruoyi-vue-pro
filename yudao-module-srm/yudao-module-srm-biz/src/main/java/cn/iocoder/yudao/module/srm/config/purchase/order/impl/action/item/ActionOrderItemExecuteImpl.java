@@ -1,0 +1,32 @@
+package cn.iocoder.yudao.module.srm.config.purchase.order.impl.action.item;
+
+import cn.hutool.json.JSONUtil;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
+import cn.iocoder.yudao.module.srm.dal.mysql.purchase.ErpPurchaseOrderItemMapper;
+import cn.iocoder.yudao.module.srm.enums.SrmEventEnum;
+import cn.iocoder.yudao.module.srm.enums.status.ErpExecutionStatus;
+import com.alibaba.cola.statemachine.Action;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+@Component
+@Slf4j
+public class ActionOrderItemExecuteImpl implements Action<ErpExecutionStatus, SrmEventEnum, ErpPurchaseOrderItemDO> {
+
+    @Resource
+    ErpPurchaseOrderItemMapper mapper;
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void execute(ErpExecutionStatus from, ErpExecutionStatus to, SrmEventEnum event, ErpPurchaseOrderItemDO context) {
+        ErpPurchaseOrderItemDO aDo = mapper.selectById(context.getId());
+        aDo.setExecuteStatus(to.getCode());
+        mapper.updateById(aDo);
+        //log
+        log.debug("执行状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
+
+    }
+}

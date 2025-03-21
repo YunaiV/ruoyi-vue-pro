@@ -12,4 +12,7 @@ public interface Validation {
 
     interface OnSwitch {
     }
+
+    interface OnSubmitAudit {
+    }
 }

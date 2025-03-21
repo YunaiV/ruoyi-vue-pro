@@ -2,8 +2,8 @@ package com.somle.esb.job;
 
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.test.core.ut.SomleBaseSpringIntegrationTest;
-import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.srm.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.srm.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.tms.api.logistic.customrule.ErpCustomRuleApi;
 import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.ErpCustomRuleDTO;
 import com.somle.esb.handler.ErpCustomRuleHandler;

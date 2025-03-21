@@ -1,5 +1,5 @@
 package cn.iocoder.yudao.module.tms.api.logistic.customrule.dto;
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.srm.api.product.dto.ErpProductDTO;
 import lombok.Data;
 
 import java.math.BigDecimal;
