@@ -26,7 +26,6 @@ import cn.iocoder.yudao.module.erp.enums.status.ErpPaymentStatus;
 import cn.iocoder.yudao.module.erp.enums.status.ErpStorageStatus;
 import cn.iocoder.yudao.module.erp.service.finance.ErpAccountService;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
-import cn.iocoder.yudao.module.erp.service.stock.ErpStockRecordService;
 import com.alibaba.cola.statemachine.StateMachine;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -73,8 +72,6 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     @Resource
     private ErpAccountService accountService;
     @Resource
-    private ErpStockRecordService stockRecordService;
-    @Resource
     ErpPurchaseOrderItemMapper orderItemMapper;
 
     @Resource(name = PURCHASE_IN_AUDIT_STATE_MACHINE)
@@ -95,9 +92,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         for (ErpPurchaseInSaveReqVO.Item item : createReqVO.getItems()) {
             ErpPurchaseOrderItemDO aDo = orderItemMapper.selectById(item.getOrderItemId());
             if (aDo != null) {
-                Optional.ofNullable(aDo.getOrderId()).ifPresent(orderId -> {
-                    purchaseOrderService.validatePurchaseOrder(orderId);
-                });
+                Optional.ofNullable(aDo.getOrderId()).ifPresent(orderId -> purchaseOrderService.validatePurchaseOrder(orderId));
             }
         }
 //        ErpPurchaseOrderDO purchaseOrder = purchaseOrderService.validatePurchaseOrder(createReqVO.getOrderId());
@@ -158,9 +153,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         for (ErpPurchaseInSaveReqVO.Item item : vo.getItems()) {
             ErpPurchaseOrderItemDO aDo = orderItemMapper.selectById(item.getOrderItemId());
             if (aDo != null) {
-                Optional.ofNullable(aDo.getOrderId()).ifPresent(orderId -> {
-                    purchaseOrderService.validatePurchaseOrder(orderId);
-                });
+                Optional.ofNullable(aDo.getOrderId()).ifPresent(orderId -> purchaseOrderService.validatePurchaseOrder(orderId));
             }
         }
         // 1.3 校验结算账户
@@ -241,7 +234,9 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
             purchaseInItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            purchaseInItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpPurchaseInItemDO::getId));
+            if (diffList.get(2) != null) {
+                purchaseInItemMapper.deleteByIds(convertList(diffList.get(2), ErpPurchaseInItemDO::getId));
+            }
         }
     }
 
@@ -313,7 +308,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     public ErpPurchaseInDO validatePurchaseIn(Long id) {
         ErpPurchaseInDO purchaseIn = validatePurchaseInExists(id);
         if (ObjectUtil.notEqual(purchaseIn.getAuditStatus(), ErpAuditStatus.APPROVED.getCode())) {
-            throw exception(PURCHASE_IN_NOT_APPROVE);
+            throw exception(PURCHASE_IN_NOT_APPROVE, purchaseIn.getNo());
         }
         return purchaseIn;
     }
@@ -382,7 +377,15 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
 
     @Override
     public void switchPayStatus(ErpPurchaseInPayReqVO vo) {
-        ErpEventEnum eventEnum = null;
+        //1.0 校验，已审核才可以
+        vo.getInItemIds().stream().distinct().forEach(
+            item -> {
+                Long inId = purchaseInItemMapper.selectById(item).getInId();
+                ErpPurchaseInDO purchaseInDO = purchaseInMapper.selectById(inId);
+                ThrowUtil.ifThrow(!purchaseInDO.getAuditStatus().equals(ErpAuditStatus.APPROVED.getCode()), PURCHASE_IN_NOT_APPROVE, purchaseInDO.getNo());
+            }
+        );
+        ErpEventEnum eventEnum;
         if (vo.getPass()) {
             eventEnum = COMPLETE_PAYMENT;
         } else {
@@ -397,7 +400,6 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
                     itemPaymentMachine.fireEvent(ErpPaymentStatus.NONE_PAYMENT, finalEventEnum, inItemDO);
                 } else {
                     itemPaymentMachine.fireEvent(ErpPaymentStatus.fromCode(inItemDO.getPayStatus()), finalEventEnum, inItemDO);
-
                 }
 
             }
