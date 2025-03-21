@@ -62,9 +62,6 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     @Lazy
     private WmsInboundItemService inboundItemService;
 
-    @Resource
-    private ErpProductApi productApi;
-
     @Resource(name = InboundAction.STATE_MACHINE_NAME)
     private StateMachineWrapper<Integer, InboundAuditStatus.Event, WmsInboundDO> inboundStateMachine;
 
@@ -254,15 +251,11 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         // 组装入库单详情
         List<WmsInboundItemDO> inboundItemList = inboundItemService.selectByInboundId(inboundVO.getId());
         inboundVO.setItemList(BeanUtils.toBean(inboundItemList, WmsInboundItemRespVO.class));
-        Map<Long, ErpProductDTO> productDTOMap = productApi.getProductMap(StreamX.from(inboundItemList).map(WmsInboundItemDO::getProductId).toList());
-        Map<Long, ErpProductRespSimpleVO> productVOMap = new HashMap<>();
-        for (ErpProductDTO productDTO : productDTOMap.values()) {
-            ErpProductRespSimpleVO productVO = BeanUtils.toBean(productDTO, ErpProductRespSimpleVO.class);
-            productVOMap.put(productDTO.getId(), productVO);
-        }
-        StreamX.from(inboundVO.getItemList()).assemble(productVOMap, WmsInboundItemRespVO::getProductId, WmsInboundItemRespVO::setProduct);
+        inboundItemService.assembleProducts(inboundVO.getItemList());
         return inboundVO;
     }
+
+
 
     @Override
     public void finishInbound(WmsInboundRespVO inboundRespVO) {

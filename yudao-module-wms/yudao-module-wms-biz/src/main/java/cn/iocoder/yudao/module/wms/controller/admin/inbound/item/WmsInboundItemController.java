@@ -80,6 +80,7 @@ public class WmsInboundItemController {
         inboundItemService.updateActualQuantity(updateReqVOList);
         return success(true);
     }
+
     // @DeleteMapping("/delete")
     // @Operation(summary = "删除入库单详情")
     // @Parameter(name = "id", description = "编号", required = true)
@@ -130,6 +131,29 @@ public class WmsInboundItemController {
     // // 返回
     // return success(voPageResult);
     // }
+
+    @GetMapping("/pickup-pending")
+    @Operation(summary = "待上架的入库明细")
+    @PreAuthorize("@ss.hasPermission('wms:inbound-item:query')")
+    public CommonResult<PageResult<WmsInboundItemRespVO>> getPickupPending(@Valid WmsPickupPendingPageReqVO pageReqVO) {
+        // 查询数据
+        PageResult<WmsInboundItemDO> doPageResult = inboundItemService.getPickupPending(pageReqVO);
+        // 转换
+        PageResult<WmsInboundItemRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsInboundItemRespVO.class);
+        // 填充产品信息
+        inboundItemService.assembleProducts(voPageResult.getList());
+        // 填充入库单信息
+        inboundItemService.assembleInbound(voPageResult.getList());
+        // 人员姓名填充
+        AdminUserApi.inst().prepareFill(voPageResult.getList())
+			.mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setCreatorName)
+			.mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setUpdaterName)
+			.fill();
+        // 返回
+        return success(voPageResult);
+    }
+
+
     // @GetMapping("/export-excel")
     // @Operation(summary = "导出入库单详情 Excel")
     // @PreAuthorize("@ss.hasPermission('wms:inbound-item:export')")
@@ -140,4 +164,4 @@ public class WmsInboundItemController {
     // // 导出 Excel
     // ExcelUtils.write(response, "入库单详情.xls", "数据", WmsInboundItemRespVO.class, BeanUtils.toBean(list, WmsInboundItemRespVO.class));
     // }
-}
+}

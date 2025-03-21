@@ -4,6 +4,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.segments.ColumnSegment;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import org.springframework.util.StringUtils;
 
@@ -129,6 +130,15 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
     @Override
     public LambdaQueryWrapperX<T> in(SFunction<T, ?> column, Collection<?> coll) {
         super.in(column, coll);
+        return this;
+    }
+
+    /**
+     * 两个字段的大于比较
+     **/
+    public LambdaQueryWrapperX<T> gtColumn(SFunction<T, ?> column1, SFunction<T, ?> column2) {
+        ColumnSegment columnSegment = columnToSqlSegment(column2);
+        super.gtSql(column1, columnSegment.getSqlSegment());
         return this;
     }
 

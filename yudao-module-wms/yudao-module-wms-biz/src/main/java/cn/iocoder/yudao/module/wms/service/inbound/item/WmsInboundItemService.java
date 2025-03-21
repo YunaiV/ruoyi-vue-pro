@@ -68,4 +68,12 @@ public interface WmsInboundItemService {
     List<WmsInboundItemDO> selectByIds(List<Long> ids);
 
     void updateById(WmsInboundItemDO inboundItemDO);
+
+
+
+    PageResult<WmsInboundItemDO> getPickupPending(WmsPickupPendingPageReqVO pageReqVO);
+
+    void assembleProducts(List<WmsInboundItemRespVO> itemList);
+
+    void assembleInbound(List<WmsInboundItemRespVO> itemList);
 }

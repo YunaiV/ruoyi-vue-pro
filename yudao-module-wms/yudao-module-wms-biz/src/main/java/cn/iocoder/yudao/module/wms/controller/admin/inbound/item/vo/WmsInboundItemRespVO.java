@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 import com.alibaba.excel.annotation.*;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.ErpProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 
 /**
  * @table-fields : tenant_id,creator,inbound_status,create_time,plan_quantity,updater,inbound_id,source_item_id,left_quantity,update_time,actual_quantity,product_id,shelved_quantity,id
@@ -83,6 +85,10 @@ public class WmsInboundItemRespVO {
     private Integer inboundStatus;
 
     @Schema(description = "已上架量，已经拣货到仓位的库存量", example = "")
-    @ExcelProperty("已上架量，已经拣货到仓位的库存量")
+    @ExcelProperty("已上架量")
     private Integer shelvedQuantity;
+
+    @Schema(description = "入库单", example = "")
+    @ExcelProperty("入库单")
+    private WmsInboundRespVO inbound;
 }

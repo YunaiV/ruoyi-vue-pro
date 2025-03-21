@@ -117,4 +117,4 @@ public interface ErrorCodeConstants {
     ErrorCode PICKUP_ITEM_INBOUND_ITEM_ID_WAREHOUSE_ID_NOT_SAME = new ErrorCode(2_001_013_007, "拣货仓库错误");
     ErrorCode PICKUP_ITEM_INBOUND_ITEM_ID_NOT_SAME = new ErrorCode(2_001_013_008, "拣货明细错误");
     ErrorCode INBOUND_ITEM_PICKUP_LEFT_QUANTITY_NOT_ENOUGH = new ErrorCode(2_001_013_008, "入库单明细的待上架库存不足");
-}
+}

@@ -1,21 +1,26 @@
 package cn.iocoder.yudao.module.wms.service.inbound.item;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.*;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
+import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.WmsInboundItemMapper;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import jakarta.annotation.Resource;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.*;
-import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.WmsInboundItemMapper;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 
@@ -33,6 +38,10 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
 
     @Resource
     private WmsInboundItemMapper inboundItemMapper;
+
+
+    @Resource
+    private ErpProductApi productApi;
 
     /**
      * @sign : F55768BA65271F63
@@ -167,5 +176,28 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
     @Override
     public void updateById(WmsInboundItemDO inboundItemDO) {
         inboundItemMapper.updateById(inboundItemDO);
+    }
+
+    @Override
+    public PageResult<WmsInboundItemDO> getPickupPending(WmsPickupPendingPageReqVO pageReqVO) {
+        return inboundItemMapper.getPickupPending(pageReqVO);
+    }
+
+    @Override
+    public void assembleInbound(List<WmsInboundItemRespVO> itemList) {
+        List<WmsInboundDO> inboundDOList = inboundService.selectByIds(StreamX.from(itemList).toList(WmsInboundItemRespVO::getInboundId));
+        Map<Long, WmsInboundRespVO> inboundMap = StreamX.from(inboundDOList).toMap(WmsInboundDO::getId, inboundDO -> BeanUtils.toBean(inboundDO, WmsInboundRespVO.class) );
+        StreamX.from(itemList).assemble(inboundMap, WmsInboundItemRespVO::getInboundId, WmsInboundItemRespVO::setInbound);
+    }
+
+    @Override
+    public void assembleProducts(List<WmsInboundItemRespVO> itemList) {
+        Map<Long, ErpProductDTO> productDTOMap = productApi.getProductMap(StreamX.from(itemList).map(WmsInboundItemRespVO::getProductId).toList());
+        Map<Long, ErpProductRespSimpleVO> productVOMap = new HashMap<>();
+        for (ErpProductDTO productDTO : productDTOMap.values()) {
+            ErpProductRespSimpleVO productVO = BeanUtils.toBean(productDTO, ErpProductRespSimpleVO.class);
+            productVOMap.put(productDTO.getId(), productVO);
+        }
+        StreamX.from(itemList).assemble(productVOMap, WmsInboundItemRespVO::getProductId, WmsInboundItemRespVO::setProduct);
     }
 }

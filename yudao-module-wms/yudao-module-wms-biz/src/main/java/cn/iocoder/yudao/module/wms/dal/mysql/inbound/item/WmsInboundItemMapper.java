@@ -1,12 +1,16 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.inbound.item;
 
-import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsPickupPendingPageReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.*;
+
+import java.util.List;
 
 /**
  * 入库单详情 Mapper
@@ -50,5 +54,15 @@ public interface WmsInboundItemMapper extends BaseMapperX<WmsInboundItemDO> {
         return selectPage(reqVO, wrapper).getList();
     }
 
-    List<WmsInboundItemDO> selectByInboundIds(List<Long> inboundItemIdList);
-}
+    default PageResult<WmsInboundItemDO> getPickupPending(WmsPickupPendingPageReqVO reqVO) {
+
+        MPJLambdaWrapperX<WmsInboundItemDO> query = new MPJLambdaWrapperX<>();
+        query.gt(WmsInboundItemDO::getActualQuantity, WmsInboundItemDO::getShelvedQuantity)
+            .innerJoin(WmsInboundDO.class, WmsInboundDO::getId,WmsInboundItemDO::getInboundId)
+            .likeIfExists(WmsInboundDO::getNo, reqVO.getInboundNo())
+            .orderByDesc(WmsInboundItemDO::getId);
+
+        return selectPage(reqVO,query);
+
+    }
+}
