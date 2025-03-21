@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms.service.inbound;
 
+import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -20,6 +21,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.*;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
@@ -261,8 +264,9 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     }
 
     @Override
-    @Transactional
     public void finishInbound(WmsInboundRespVO inboundRespVO) {
+        // 校验本方法在事务中
+        JdbcUtils.requireTransaction();
         int countOfNone=0;
         for (WmsInboundItemRespVO respVO : inboundRespVO.getItemList()) {
             if(InboundStatus.NONE.matchAny(respVO.getInboundStatus())) {
@@ -280,6 +284,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         // 处理入库单状态
         WmsInboundDO inboundDO = BeanUtils.toBean(inboundRespVO, WmsInboundDO.class);
         inboundDO.setInboundStatus(InboundStatus.ALL.getValue());
+        inboundDO.setArrivalActualTime(LocalDateTime.now());
         inboundMapper.updateById(inboundDO);
 
     }

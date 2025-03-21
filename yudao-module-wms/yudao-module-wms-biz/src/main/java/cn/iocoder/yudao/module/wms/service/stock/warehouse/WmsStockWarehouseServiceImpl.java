@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
+import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.ErpProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
@@ -127,21 +128,20 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
     }
 
     @Override
-    public void batchInbound(WmsInboundRespVO inboundRespVO) {
+    public WmsStockWarehouseDO getStockWarehouse(Long warehouseId, Long productId) {
+        return stockWarehouseMapper.getByWarehouseIdAndProductId(warehouseId, productId);
+    }
 
-        // 如果有二次入库,过滤到已入库和部分入库的明细行
-        List<WmsInboundItemRespVO> itemList=inboundRespVO.getItemList();
-        List<WmsInboundItemRespVO> inboundItemList=
-        StreamX.from(itemList).filter(item->{
-            return  InboundStatus.NONE.matchAny(item.getInboundStatus());
-        }).toList();
-        inboundRespVO.setItemList(inboundItemList);
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void inbound(WmsInboundRespVO inboundRespVO) {
 
         Long warehouseId = inboundRespVO.getWarehouseId();
         Long companyId = inboundRespVO.getCompanyId();
         Long inboundDeptId = inboundRespVO.getDeptId();
 
-        for (WmsInboundItemRespVO item : inboundItemList) {
+        List<WmsInboundItemRespVO> itemList=inboundRespVO.getItemList();
+        for (WmsInboundItemRespVO item : itemList) {
             Long productId = item.getProductId();
             Long deptId = inboundDeptId;
             // 如果入库单上未指定部门,默认按产品的部门ID
@@ -157,15 +157,13 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
         inboundService.finishInbound(inboundRespVO);
     }
 
-    @Override
-    public WmsStockWarehouseDO getStockWarehouse(Long warehouseId, Long productId) {
-        return stockWarehouseMapper.getByWarehouseIdAndProductId(warehouseId, productId);
-    }
 
     /**
      * 执行入库的原子操作,以加锁的方式单个出入库
      */
     private InboundStatus inboundSingleItemAtomically(Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long inboundId, Long inboundItemId) {
+        // 校验本方法在事务中
+        JdbcUtils.requireTransaction();
         WmsStockWarehouseServiceImpl currentProxy = SpringUtils.getBeanByExactType(WmsStockWarehouseServiceImpl.class);
         AtomicReference<InboundStatus> status = new AtomicReference<>();
         lockRedisDAO.lockStockLevels(warehouseId, productId, () -> {
@@ -181,8 +179,10 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
     /**
      * 在事务中执行入库操作
      */
-    @Transactional(rollbackFor = Exception.class)
+
     protected InboundStatus inboundSingleItemTransactional(Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long inboundId, Long inboundItemId) {
+        // 校验本方法在事务中
+        JdbcUtils.requireTransaction();
         // 获得仓库库存记录
         WmsStockWarehouseDO stockWarehouseDO = stockWarehouseMapper.getByWarehouseIdAndProductId(warehouseId, productId);
         // 如果没有就创建

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms.service.stock.flow;
 
+import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
@@ -100,6 +101,8 @@ public class WmsStockFlowServiceImpl implements WmsStockFlowService {
      */
     @Override
     public void createForInbound(Long warehouseId, Long productId, Integer quantity, Long inboundId, Long inboundItemId, WmsStockWarehouseDO stockWarehouseDO) {
+        // 校验本方法在事务中
+        JdbcUtils.requireTransaction();
         StockType stockType = StockType.WAREHOUSE;
         StockReason reason = StockReason.INBOUND;
         // 获取上一个流水
@@ -153,6 +156,8 @@ public class WmsStockFlowServiceImpl implements WmsStockFlowService {
      */
     @Override
     public void createForInbound(Long warehouseId, Long productId, Integer quantity, Long inboundId, Long inboundItemId, WmsStockOwnershipDO stockOwnershipDO) {
+        // 校验本方法在事务中
+        JdbcUtils.requireTransaction();
         StockType stockType = StockType.OWNER;
         StockReason reason = StockReason.INBOUND;
         // 获取上一个流水
@@ -204,4 +209,4 @@ public class WmsStockFlowServiceImpl implements WmsStockFlowService {
     public List<WmsStockFlowDO> selectStockFlow(Long stockType, Long stockId) {
         return stockFlowMapper.selectStockFlow(stockType, stockId);
     }
-}
+}

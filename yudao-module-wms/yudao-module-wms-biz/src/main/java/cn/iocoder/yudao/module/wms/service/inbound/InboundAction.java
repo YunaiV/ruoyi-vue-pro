@@ -65,7 +65,7 @@ public class InboundAction implements StateMachineConfigure<Integer, InboundAudi
             super.perform(from, to, event, context);
             // 调整库存
             WmsInboundRespVO inboundRespVO=inboundService.getInboundWithItemList(context.data().getId());
-            stockWarehouseService.batchInbound(inboundRespVO);
+            stockWarehouseService.inbound(inboundRespVO);
 
         }
     }

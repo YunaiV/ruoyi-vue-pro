@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms.service.stock.ownership;
 
+import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.service.stock.flow.WmsStockFlowService;
 import org.springframework.stereotype.Service;
@@ -108,6 +109,8 @@ public class WmsStockOwnershipServiceImpl implements WmsStockOwnershipService {
      */
     @Override
     public void inboundSingleItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long inboundId, Long inboundItemId) {
+        // 校验本方法在事务中
+        JdbcUtils.requireTransaction();
         // 查询库存记录
         WmsStockOwnershipDO stockOwnershipDO = stockOwnershipMapper.getByUkProductOwner(warehouseId, companyId, deptId, productId);
         // 如果不存在就创建
@@ -145,4 +148,4 @@ public class WmsStockOwnershipServiceImpl implements WmsStockOwnershipService {
     public List<WmsStockOwnershipDO> selectStockOwnership(Long warehouseId, Long productId) {
         return stockOwnershipMapper.selectStockOwnership(warehouseId, productId);
     }
-}
+}

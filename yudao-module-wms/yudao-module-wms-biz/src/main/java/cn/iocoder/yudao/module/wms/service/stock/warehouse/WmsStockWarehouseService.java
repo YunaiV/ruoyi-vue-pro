@@ -52,9 +52,9 @@ public interface WmsStockWarehouseService {
     PageResult<WmsStockWarehouseDO> getStockWarehousePage(WmsStockWarehousePageReqVO pageReqVO);
 
     /**
-     * 批量入库，其内部逐个调用 inboundAtomically
+     * 入库
      */
-    void batchInbound(WmsInboundRespVO inboundRespVO);
+    void inbound(WmsInboundRespVO inboundRespVO);
 
     WmsStockWarehouseDO getStockWarehouse(Long warehouseId, Long productId);
 }

@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 @Repository
 public class WmsNoRedisDAO {
 
+
     /**
      * 序号的缓存
      *
@@ -37,6 +38,8 @@ public class WmsNoRedisDAO {
      * 出库单单据号前缀
      */
     public static final String OUTBOUND_NO_PREFIX = "OUBD";
+
+    public static final String PICKUP_NO_PREFIX = "PIUP";
 
 
 
