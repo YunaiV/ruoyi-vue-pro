@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.erp.api.purchase.ErpInCountDTO;
+import cn.iocoder.yudao.module.erp.api.purchase.SrmInCountDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInAuditReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInPayReqVO;
@@ -81,7 +81,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     @Resource(name = PURCHASE_IN_ITEM_PAYMENT_STATE_MACHINE)
     private StateMachine<ErpPaymentStatus, ErpEventEnum, ErpPurchaseInItemDO> itemPaymentMachine;
     @Resource(name = PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME)
-    private StateMachine<ErpStorageStatus, ErpEventEnum, ErpInCountDTO> orderItemStorageMachine;
+    private StateMachine<ErpStorageStatus, ErpEventEnum, SrmInCountDTO> orderItemStorageMachine;
     @Resource(name = PURCHASE_IN_AUDIT_STATE_MACHINE)
     private StateMachine<ErpAuditStatus, ErpEventEnum, ErpPurchaseInAuditReqVO> purchaseInAuditStateMachine;
 
@@ -135,7 +135,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
                 ErpPurchaseOrderItemDO orderItemDO = orderItemMapper.selectById(orderItemId);
 
                 orderItemStorageMachine.fireEvent(ErpStorageStatus.fromCode(orderItemDO.getInStatus()), ErpEventEnum.STOCK_ADJUSTMENT,
-                    ErpInCountDTO.builder().orderItemId(orderItemId)
+                    SrmInCountDTO.builder().orderItemId(orderItemId)
                         //取反数量
                         .inCount(inItemDO.getCount().negate()).build());
             });
@@ -251,7 +251,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
                 ErpPurchaseOrderItemDO orderItemDO = orderItemMapper.selectById(orderItemId);
                 //更新订单项入库数量+状态 入库状态机,创建入库单->增加入库数量
                 orderItemStorageMachine.fireEvent(ErpStorageStatus.fromCode(orderItemDO.getInStatus()), ErpEventEnum.STOCK_ADJUSTMENT,
-                    ErpInCountDTO.builder().orderItemId(orderItemId)
+                    SrmInCountDTO.builder().orderItemId(orderItemId)
                         //正数
                         .inCount(purchaseInItem.getCount()).build());
             });

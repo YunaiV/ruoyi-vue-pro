@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Data
 @Builder
-public class ErpInCountDTO {
+public class SrmInCountDTO {
 
     //订单项
     private Long orderItemId;

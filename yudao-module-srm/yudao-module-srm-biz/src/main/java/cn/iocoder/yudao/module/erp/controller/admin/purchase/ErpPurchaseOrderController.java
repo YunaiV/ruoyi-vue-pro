@@ -24,6 +24,7 @@ import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import cn.iocoder.yudao.module.system.api.utils.Validation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -72,14 +73,14 @@ public class ErpPurchaseOrderController {
     @Operation(summary = "创建采购订单")
     @Idempotent
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:create')")
-    public CommonResult<Long> createPurchaseOrder(@Validated(validation.OnCreate.class) @RequestBody ErpPurchaseOrderSaveReqVO createReqVO) {
+    public CommonResult<Long> createPurchaseOrder(@Validated(Validation.OnCreate.class) @RequestBody ErpPurchaseOrderSaveReqVO createReqVO) {
         return success(purchaseOrderService.createPurchaseOrder(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新采购订单")
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:update')")
-    public CommonResult<Boolean> updatePurchaseOrder(@Validated(validation.OnUpdate.class) @RequestBody ErpPurchaseOrderSaveReqVO updateReqVO) {
+    public CommonResult<Boolean> updatePurchaseOrder(@Validated(Validation.OnUpdate.class) @RequestBody ErpPurchaseOrderSaveReqVO updateReqVO) {
         purchaseOrderService.updatePurchaseOrder(updateReqVO);
         return success(true);
     }
@@ -142,7 +143,7 @@ public class ErpPurchaseOrderController {
     @Parameter(name = "requestId", description = "申请单编号", required = true)
     @Parameter(name = "reviewed", description = "审核状态", required = true)
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:review')")
-    public CommonResult<Boolean> reviewPurchaseRequest(@Validated(validation.OnAudit.class) @RequestBody ErpPurchaseOrderAuditReqVO req) {
+    public CommonResult<Boolean> reviewPurchaseRequest(@Validated(Validation.OnAudit.class) @RequestBody ErpPurchaseOrderAuditReqVO req) {
         purchaseOrderService.reviewPurchaseOrder(req);
         return success(true);
     }
@@ -150,7 +151,7 @@ public class ErpPurchaseOrderController {
     @PutMapping("/enableStatus")
     @Operation(summary = "关闭/启用")
     @PreAuthorize("@ss.hasPermission('erp:purchasereq-order:enable')")
-    public CommonResult<Boolean> switchPurchaseOrderStatus(@Validated(validation.OnSwitch.class) @RequestBody ErpPurchaseOrderAuditReqVO reqVO) {
+    public CommonResult<Boolean> switchPurchaseOrderStatus(@Validated(Validation.OnSwitch.class) @RequestBody ErpPurchaseOrderAuditReqVO reqVO) {
         //获得reqVO的item的ids
         List<Long> itemIds = reqVO.getItems().stream().map(ErpPurchaseOrderAuditReqVO.requestItems::getId).collect(Collectors.toSet()).stream().toList();
         purchaseOrderService.switchPurchaseOrderStatus(itemIds, reqVO.getEnable());

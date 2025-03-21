@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.erp.config.purchase.request;
 
-import cn.iocoder.yudao.module.erp.api.purchase.ErpInCountDTO;
-import cn.iocoder.yudao.module.erp.api.purchase.ErpOrderCountDTO;
+import cn.iocoder.yudao.module.erp.api.purchase.SrmInCountDTO;
+import cn.iocoder.yudao.module.erp.api.purchase.TmsOrderCountDTO;
 import cn.iocoder.yudao.module.erp.config.BaseFailCallbackImpl;
 import cn.iocoder.yudao.module.erp.config.purchase.request.impl.action.item.ActionItemStorageImpl;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
@@ -26,7 +26,7 @@ public class ErpPurchaseRequestItemStatusMachine {
     @Resource
     private Action<ErpOffStatus, ErpEventEnum, ErpPurchaseRequestItemsDO> actionItemOffImpl;
     @Resource
-    private Action<ErpOrderStatus, ErpEventEnum, ErpOrderCountDTO> actionItemOrderImpl;
+    private Action<ErpOrderStatus, ErpEventEnum, TmsOrderCountDTO> actionItemOrderImpl;
     @Resource
     private BaseFailCallbackImpl baseFailCallbackImpl;
 
@@ -63,8 +63,8 @@ public class ErpPurchaseRequestItemStatusMachine {
 
     //    子项采购状态
     @Bean(ErpStateMachines.PURCHASE_REQUEST_ITEM_ORDER_STATE_MACHINE_NAME)
-    public StateMachine<ErpOrderStatus, ErpEventEnum, ErpOrderCountDTO> getPurchaseOrderStateMachine() {
-        StateMachineBuilder<ErpOrderStatus, ErpEventEnum, ErpOrderCountDTO> builder = StateMachineBuilderFactory.create();
+    public StateMachine<ErpOrderStatus, ErpEventEnum, TmsOrderCountDTO> getPurchaseOrderStateMachine() {
+        StateMachineBuilder<ErpOrderStatus, ErpEventEnum, TmsOrderCountDTO> builder = StateMachineBuilderFactory.create();
         //初始化事件
         builder.internalTransition()
             .within(ErpOrderStatus.OT_ORDERED)
@@ -110,8 +110,8 @@ public class ErpPurchaseRequestItemStatusMachine {
     ActionItemStorageImpl actionItemStorageImpl;
 
     @Bean(ErpStateMachines.PURCHASE_REQUEST_ITEM_STORAGE_STATE_MACHINE_NAME)
-    public StateMachine<ErpStorageStatus, ErpEventEnum, ErpInCountDTO> buildPurchaseOrderItemStorageStateMachine() {
-        StateMachineBuilder<ErpStorageStatus, ErpEventEnum, ErpInCountDTO> builder = StateMachineBuilderFactory.create();
+    public StateMachine<ErpStorageStatus, ErpEventEnum, SrmInCountDTO> buildPurchaseOrderItemStorageStateMachine() {
+        StateMachineBuilder<ErpStorageStatus, ErpEventEnum, SrmInCountDTO> builder = StateMachineBuilderFactory.create();
         // 初始化入库
         builder.externalTransition()
             .from(ErpStorageStatus.NONE_IN_STORAGE)

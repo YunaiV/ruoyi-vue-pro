@@ -9,7 +9,7 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class ErpOrderCountDTO {
+public class TmsOrderCountDTO {
     //申请单订单项ID
     private Long purchaseOrderItemId;
     //订购数量

@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.erp.api.purchase.ErpInCountDTO;
+import cn.iocoder.yudao.module.erp.api.purchase.SrmInCountDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.returns.ErpPurchaseReturnAuditReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.returns.ErpPurchaseReturnPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.returns.ErpPurchaseReturnSaveReqVO;
@@ -81,7 +81,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
     @Resource(name = PURCHASE_RETURN_REFUND_STATE_MACHINE_NAME)
     StateMachine<ErpReturnStatus, ErpEventEnum, ErpPurchaseReturnDO> refundStateMachine;
     @Resource(name = PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME)
-    private StateMachine<ErpStorageStatus, ErpEventEnum, ErpInCountDTO> orderItemStorageMachine;
+    private StateMachine<ErpStorageStatus, ErpEventEnum, SrmInCountDTO> orderItemStorageMachine;
     @Autowired
     private ErpPurchaseInItemMapper erpPurchaseInItemMapper;
 
@@ -250,7 +250,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
         ErpPurchaseOrderItemDO orderItemDO = orderItemMapper.selectById(orderItemId);
 
         orderItemStorageMachine.fireEvent(ErpStorageStatus.fromCode(orderItemDO.getInStatus()), ErpEventEnum.STOCK_ADJUSTMENT,
-            ErpInCountDTO.builder().orderItemId(orderItemId)
+            SrmInCountDTO.builder().orderItemId(orderItemId)
                 .returnCount(number).build());
     }
 

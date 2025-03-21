@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.resp;
 
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.framework.mybatis.core.vo.BaseVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.resp.ErpPurchaseRequestItemRespVO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ContentStyle;

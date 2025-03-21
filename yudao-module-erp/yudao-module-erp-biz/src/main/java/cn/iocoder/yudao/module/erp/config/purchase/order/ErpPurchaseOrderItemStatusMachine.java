@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.erp.config.purchase.order;
 
-import cn.iocoder.yudao.module.erp.api.purchase.ErpInCountDTO;
+import cn.iocoder.yudao.module.erp.api.purchase.SrmInCountDTO;
 import cn.iocoder.yudao.module.erp.config.BaseFailCallbackImpl;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.enums.ErpEventEnum;
@@ -133,8 +133,8 @@ public class ErpPurchaseOrderItemStatusMachine {
     private Action actionOrderItemPayImpl;
 
     @Bean(ErpStateMachines.PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME)
-    public StateMachine<ErpStorageStatus, ErpEventEnum, ErpInCountDTO> buildPurchaseOrderItemStorageStateMachine() {
-        StateMachineBuilder<ErpStorageStatus, ErpEventEnum, ErpInCountDTO> builder = StateMachineBuilderFactory.create();
+    public StateMachine<ErpStorageStatus, ErpEventEnum, SrmInCountDTO> buildPurchaseOrderItemStorageStateMachine() {
+        StateMachineBuilder<ErpStorageStatus, ErpEventEnum, SrmInCountDTO> builder = StateMachineBuilderFactory.create();
 
         // 初始化入库
         builder.externalTransition()

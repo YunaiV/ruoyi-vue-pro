@@ -10,7 +10,7 @@ import java.math.BigDecimal;
  */
 @Data
 @Builder
-public class ErpInPayCountDTO {
+public class SrmInPayCountDTO {
     private Long InItemId;
     private BigDecimal payCount;
 }

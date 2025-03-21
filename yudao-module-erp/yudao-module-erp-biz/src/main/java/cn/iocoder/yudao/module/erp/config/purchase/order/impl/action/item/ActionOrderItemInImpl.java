@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.erp.config.purchase.order.impl.action.item;
 
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
-import cn.iocoder.yudao.module.erp.api.purchase.ErpInCountDTO;
+import cn.iocoder.yudao.module.erp.api.purchase.SrmInCountDTO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
@@ -28,7 +28,7 @@ import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PURCHASE_REQU
 //订单项入库状态机
 @Component
 @Slf4j
-public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventEnum, ErpInCountDTO> {
+public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventEnum, SrmInCountDTO> {
 
     @Resource
     private ErpPurchaseOrderItemMapper itemMapper;
@@ -46,7 +46,7 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
     //入库项(->入库主单)->订单项(->订单主单)->申请项(->订单主单)
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void execute(ErpStorageStatus from, ErpStorageStatus to, ErpEventEnum event, ErpInCountDTO dto) {
+    public void execute(ErpStorageStatus from, ErpStorageStatus to, ErpEventEnum event, SrmInCountDTO dto) {
         // 1. 先查询数据库中的采购项信息
         ErpPurchaseOrderItemDO oldData = itemMapper.selectById(dto.getOrderItemId());
         if (oldData == null) {
@@ -119,7 +119,7 @@ public class ActionOrderItemInImpl implements Action<ErpStorageStatus, ErpEventE
                 BigDecimal changeCount = result.subtract(dtoCount);
                 purchaseRequestItemStateMachine.fireEvent(ErpStorageStatus.fromCode(applyItemDO.getInStatus())
                     , ErpEventEnum.STOCK_ADJUSTMENT
-                    , ErpInCountDTO.builder().applyItemId(applyItemId).inCount(changeCount).build()
+                    , SrmInCountDTO.builder().applyItemId(applyItemId).inCount(changeCount).build()
                 );
             }
         );

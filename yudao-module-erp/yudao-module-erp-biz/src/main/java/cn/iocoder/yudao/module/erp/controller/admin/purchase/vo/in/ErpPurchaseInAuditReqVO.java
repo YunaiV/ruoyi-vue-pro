@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in;
 
-import cn.iocoder.yudao.module.erp.controller.admin.tools.validation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.erp.config.purchase.request.impl.action.item;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
-import cn.iocoder.yudao.module.erp.api.purchase.ErpInCountDTO;
+import cn.iocoder.yudao.module.erp.api.purchase.SrmInCountDTO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestItemsMapper;
@@ -24,7 +24,7 @@ import static cn.iocoder.yudao.module.erp.enums.ErpStateMachines.PURCHASE_REQUES
 
 @Slf4j
 @Component
-public class ActionItemStorageImpl implements Action<ErpStorageStatus, ErpEventEnum, ErpInCountDTO> {
+public class ActionItemStorageImpl implements Action<ErpStorageStatus, ErpEventEnum, SrmInCountDTO> {
     @Autowired
     private ErpPurchaseRequestItemsMapper mapper;
     @Resource(name = PURCHASE_REQUEST_STORAGE_STATE_MACHINE_NAME)
@@ -34,7 +34,7 @@ public class ActionItemStorageImpl implements Action<ErpStorageStatus, ErpEventE
 
     @Override
     @Transactional
-    public void execute(ErpStorageStatus f, ErpStorageStatus t, ErpEventEnum event, ErpInCountDTO context) {
+    public void execute(ErpStorageStatus f, ErpStorageStatus t, ErpEventEnum event, SrmInCountDTO context) {
         ErpPurchaseRequestItemsDO itemsDO = mapper.selectById(context.getApplyItemId());
         if (event == ErpEventEnum.STOCK_ADJUSTMENT) {
             BigDecimal oldCount = itemsDO.getInCount() == null ? BigDecimal.ZERO : itemsDO.getInCount();
