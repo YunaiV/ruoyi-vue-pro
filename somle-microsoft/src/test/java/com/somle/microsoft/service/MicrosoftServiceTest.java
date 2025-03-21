@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
 import com.somle.microsoft.model.PowerbiReportReqVO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,10 +22,14 @@ class MicrosoftServiceTest extends SomleBaseDbUnitTest {
     @MockBean
     MessageChannel dataChannel;
 
+    @BeforeEach
+    void setUp() {
+        service.refreshPasswordToken();
+    }
 
     @Test
     void getToken() {
-        service.getPasswordToken();
+        service.refreshPasswordToken();
     }
 
     @Test

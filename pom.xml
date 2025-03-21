@@ -23,6 +23,7 @@
 <!--        <module>yudao-module-mall</module>-->
         <module>yudao-module-crm</module>
         <module>yudao-module-erp</module>
+        <module>yudao-module-srm</module>
         <module>yudao-module-tms</module>
         <module>yudao-module-ai</module>
 
@@ -48,6 +49,7 @@
         <module>somle-bestbuy</module>
         <module>somle-cdiscount</module>
 <!--        <module>yudao-module-iot</module>-->
+        <module>somle-autonomous</module>
     </modules>
 
     <name>${project.artifactId}</name>

@@ -8,8 +8,8 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.ToString;
-
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "管理后台 - CRM 联系人 Response VO")
 @Data
@@ -119,4 +119,7 @@ public class CrmContactRespVO {
     @ExcelProperty("更新时间")
     private LocalDateTime updateTime;
 
+    //国家-字典-long
+    @Schema(description = "国家")
+    private List<Long> countryCodes;
 }

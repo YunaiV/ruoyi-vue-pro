@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import lombok.Data;
 
 @Schema(description = "管理后台 - ERP 供应商产品新增/修改 Request VO")
 @Data

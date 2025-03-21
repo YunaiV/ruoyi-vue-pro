@@ -16,7 +16,6 @@ import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.stock.ErpStockRecordBizTypeEnum;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
-import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
 import cn.iocoder.yudao.module.erp.service.stock.bo.ErpStockRecordCreateReqBO;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -55,8 +54,8 @@ public class ErpStockInServiceImpl implements ErpStockInService {
     private ErpProductService productService;
     @Resource
     private ErpWarehouseService warehouseService;
-    @Resource
-    private ErpSupplierService supplierService;
+    //    @Resource
+//    private ErpSupplierService supplierService;
     @Resource
     private ErpStockRecordService stockRecordService;
 
@@ -66,7 +65,7 @@ public class ErpStockInServiceImpl implements ErpStockInService {
         // 1.1 校验入库项的有效性
         List<ErpStockInItemDO> stockInItems = validateStockInItems(createReqVO.getItems());
         // 1.2 校验供应商
-        supplierService.validateSupplier(createReqVO.getSupplierId());
+//        supplierService.validateSupplier(createReqVO.getSupplierId());
         // 1.3 生成入库单号，并校验唯一性
         String no = noRedisDAO.generate(ErpNoRedisDAO.STOCK_IN_NO_PREFIX, STOCK_IN_NO_OUT_OF_BOUNDS);
         ThrowUtil.ifThrow(stockInMapper.selectByNo(no) != null ,STOCK_IN_NO_EXISTS);
@@ -92,7 +91,7 @@ public class ErpStockInServiceImpl implements ErpStockInService {
             throw exception(STOCK_IN_UPDATE_FAIL_APPROVE, stockIn.getNo());
         }
         // 1.2 校验供应商
-        supplierService.validateSupplier(updateReqVO.getSupplierId());
+//        supplierService.validateSupplier(updateReqVO.getSupplierId());
         // 1.3 校验入库项的有效性
         List<ErpStockInItemDO> stockInItems = validateStockInItems(updateReqVO.getItems());
 

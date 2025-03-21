@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.crm.controller.admin.contact.vo;
 
-import cn.iocoder.yudao.framework.common.validation.Mobile;
-import cn.iocoder.yudao.framework.common.validation.Telephone;
 import cn.iocoder.yudao.module.crm.framework.operatelog.core.*;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,8 +7,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
-
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY;
 
@@ -42,12 +40,10 @@ public class CrmContactSaveReqVO {
     private Long ownerUserId;
 
     @Schema(description = "手机号", example = "1387171766")
-    @Mobile
     @DiffLogField(name = "手机号")
     private String mobile;
 
     @Schema(description = "电话", example = "021-0029922")
-    @Telephone
     @DiffLogField(name = "电话")
     private String telephone;
 
@@ -94,5 +90,9 @@ public class CrmContactSaveReqVO {
 
     @Schema(description = "关联商机 ID", example = "122233")
     private Long businessId; // 注意：该字段用于在【商机】详情界面「新建联系人」时，自动进行关联
+
+    //国家-字典-long
+    @Schema(description = "国家")
+    private List<Long> countryCodes;
 
 }

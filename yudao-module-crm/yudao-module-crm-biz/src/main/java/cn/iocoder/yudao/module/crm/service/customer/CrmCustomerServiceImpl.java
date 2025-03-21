@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.crm.service.customer;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
@@ -42,12 +43,9 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
 import java.time.LocalDateTime;
 import java.util.*;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
@@ -97,15 +95,18 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 1. 校验拥有客户是否到达上限
         validateCustomerExceedOwnerLimit(createReqVO.getOwnerUserId(), 1);
 
-        // 2. 插入客户
+        //2. 检验客户名称是否唯一
+        validateCustomerNameUnique(createReqVO.getName(),null);
+
+        // 3. 插入客户
         CrmCustomerDO customer = initCustomer(createReqVO, userId);
         customerMapper.insert(customer);
 
-        // 3. 创建数据权限
+        // 4. 创建数据权限
         permissionService.createPermission(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
             .setBizId(customer.getId()).setUserId(userId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel())); // 设置当前操作的人为负责人
 
-        // 4. 记录操作日志上下文
+        // 5. 记录操作日志上下文
         LogRecordContext.putVariable("customer", customer);
         return customer.getId();
     }
@@ -132,6 +133,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         updateReqVO.setOwnerUserId(null);  // 更新的时候，要把 updateReqVO 负责人设置为空，避免修改
         // 1. 校验存在
         CrmCustomerDO oldCustomer = validateCustomerExists(updateReqVO.getId());
+        // 1.1 校验更新后的客户名称不能与其他客户重复
+        validateCustomerNameUnique(updateReqVO.getName(), oldCustomer);
 
         // 2. 更新客户
         CrmCustomerDO updateObj = BeanUtils.toBean(updateReqVO, CrmCustomerDO.class);
@@ -658,6 +661,23 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
      */
     private CrmCustomerServiceImpl getSelf() {
         return SpringUtil.getBean(getClass());
+    }
+
+
+    @Override
+    public void validateCustomerNameUnique(String customerName, CrmCustomerDO oldCustomerDo) {
+        Assert.notNull(customerName, "客户名称不能为空！");
+        CrmCustomerDO newCustomer  = customerMapper.selectByCustomerName(customerName.trim());
+
+        //新增客户信息时名称不能重复
+        if (ObjectUtil.isEmpty(oldCustomerDo) && ObjectUtil.isNotEmpty(newCustomer)) {
+            throw exception(CUSTOMER_CREATE_NAME_NOT_UNIQUE, CrmBizTypeEnum.CRM_CUSTOMER.getName());
+        }
+
+        //更新客户信息时名称不能与其他客户重复,但可与原先重复
+        if (ObjectUtil.isNotEmpty(oldCustomerDo) && ObjectUtil.isNotEmpty(newCustomer) && !oldCustomerDo.getId().equals(newCustomer.getId())) {
+            throw exception(CUSTOMER_UPDATE_NAME_NOT_UNIQUE, CrmBizTypeEnum.CRM_CUSTOMER.getName());
+        }
     }
 
 }
