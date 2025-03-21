@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.tms.controller.admin.logistic.customrule.vo;
 
 
-import cn.iocoder.yudao.module.srm.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.fhs.core.trans.vo.VO;

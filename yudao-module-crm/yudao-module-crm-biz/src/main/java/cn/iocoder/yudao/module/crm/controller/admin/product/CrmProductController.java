@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.crm.controller.admin.product;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.srm.api.product.ErpProductApi;
-import cn.iocoder.yudao.module.srm.api.product.dto.ErpProductRespDTO;
-import cn.iocoder.yudao.module.srm.api.product.dto.ErpProductSimpleRespDTO;
+import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductRespDTO;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductSimpleRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
