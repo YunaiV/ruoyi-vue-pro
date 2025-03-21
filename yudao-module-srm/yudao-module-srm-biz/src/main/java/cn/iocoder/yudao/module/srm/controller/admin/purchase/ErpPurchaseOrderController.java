@@ -26,9 +26,10 @@ import cn.iocoder.yudao.module.system.api.utils.Validation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -47,22 +48,15 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 @RestController
 @RequestMapping("/erp/purchase-order")
 @Validated
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ErpPurchaseOrderController {
 
-    @Resource
-    private ErpPurchaseOrderService purchaseOrderService;
-    @Resource
-    WmsWarehouseApi wmsWarehouseApi;
-    @Resource
-    private ErpSupplierService supplierService;
-    @Resource
-    private ErpProductApi erpProductApi;
-
-
-    @Resource
-    private AdminUserApi adminUserApi;
-    @Resource
-    private DeptApi deptApi;
+    private final ErpPurchaseOrderService purchaseOrderService;
+    private final ErpSupplierService supplierService;
+    private final WmsWarehouseApi wmsWarehouseApi;
+    private final ErpProductApi erpProductApi;
+    private final AdminUserApi adminUserApi;
+    private final DeptApi deptApi;
 //    warehouse
 
     @PostMapping("/create")

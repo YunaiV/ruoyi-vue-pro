@@ -25,10 +25,11 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -47,17 +48,13 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 @RestController
 @RequestMapping("/erp/purchase-return")
 @Validated
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ErpPurchaseReturnController {
 
-    @Resource
-    private ErpPurchaseReturnService purchaseReturnService;
-    @Resource
-    ErpProductApi erpProductApi;
-    @Resource
-    private ErpSupplierService supplierService;
-
-    @Resource
-    private AdminUserApi adminUserApi;
+    private final ErpPurchaseReturnService purchaseReturnService;
+    private final ErpSupplierService supplierService;
+    private final ErpProductApi erpProductApi;
+    private final AdminUserApi adminUserApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建采购退货")

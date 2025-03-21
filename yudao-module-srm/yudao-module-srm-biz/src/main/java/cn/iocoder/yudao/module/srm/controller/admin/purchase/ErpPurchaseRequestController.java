@@ -30,6 +30,7 @@ import cn.iocoder.yudao.module.system.api.utils.Validation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -65,6 +66,11 @@ public class ErpPurchaseRequestController {
     private final AdminUserApi adminUserApi;
     private final DeptApi deptApi;
     private final ErpSupplierService erpSupplierService;
+
+    @PostConstruct
+    public void init() {
+        System.out.println("erpPurchaseRequestService = " + erpPurchaseRequestService);
+    }
 
     @PostMapping("/create")
     @Operation(summary = "创建ERP采购申请单")
