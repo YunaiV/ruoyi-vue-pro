@@ -3,10 +3,7 @@ package cn.iocoder.yudao.module.iot.controller.admin.thingmodel;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelListReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelRespVO;
-import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -64,13 +61,12 @@ public class IotThingModelController {
         return success(BeanUtils.toBean(thingModel, IotThingModelRespVO.class));
     }
 
-    @GetMapping("/list-by-product-id")
-    @Operation(summary = "获得产品物模型")
+    @GetMapping("/tsl-by-product-id")
+    @Operation(summary = "获得产品物模型 TSL")
     @Parameter(name = "productId", description = "产品ID", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('iot:thing-model:query')")
-    public CommonResult<List<IotThingModelRespVO>> getThingModelListByProductId(@RequestParam("productId") Long productId) {
-        List<IotThingModelDO> list = thingModelService.getThingModelListByProductId(productId);
-        return success(BeanUtils.toBean(list, IotThingModelRespVO.class));
+    public CommonResult<IotThingModelTSLRespVO> getThingModelTslByProductId(@RequestParam("productId") Long productId) {
+        return success(thingModelService.getThingModelTslByProductId(productId));
     }
 
     // TODO @puhui @super：getThingModelListByProductId 和 getThingModelListByProductId 可以融合么？

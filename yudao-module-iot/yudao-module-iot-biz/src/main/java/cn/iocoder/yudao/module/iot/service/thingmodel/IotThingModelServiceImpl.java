@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.thingmodel;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -13,6 +14,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelS
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelListReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelTSLRespVO;
 import cn.iocoder.yudao.module.iot.convert.thingmodel.IotThingModelConvert;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
@@ -147,6 +149,30 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     @Override
     public List<IotThingModelDO> getThingModelList(IotThingModelListReqVO reqVO) {
         return thingModelMapper.selectList(reqVO);
+    }
+
+    @Override
+    public IotThingModelTSLRespVO getThingModelTslByProductId(Long productId) {
+        IotThingModelTSLRespVO tslRespVO = new IotThingModelTSLRespVO();
+        // 1. 获得产品所有物模型定义
+        List<IotThingModelDO> thingModelList = thingModelMapper.selectListByProductId(productId);
+        if (CollUtil.isEmpty(thingModelList)) {
+            return tslRespVO;
+        }
+
+        // 2.1 设置公共部分参数
+        IotThingModelDO thingModel = thingModelList.get(0);
+        tslRespVO.setProductId(thingModel.getProductId()).setProductKey(thingModel.getProductKey());
+        // 2.2 处理属性列表
+        tslRespVO.setProperties(convertList(filterList(thingModelList, item ->
+                ObjUtil.equal(IotThingModelTypeEnum.PROPERTY.getType(), item.getType())), IotThingModelDO::getProperty));
+        // 2.3 处理服务列表
+        tslRespVO.setServices(convertList(filterList(thingModelList, item ->
+                ObjUtil.equal(IotThingModelTypeEnum.SERVICE.getType(), item.getType())), IotThingModelDO::getService));
+        // 2.4 处理事件列表
+        tslRespVO.setEvents(convertList(filterList(thingModelList, item ->
+                ObjUtil.equal(IotThingModelTypeEnum.EVENT.getType(), item.getType())), IotThingModelDO::getEvent));
+        return tslRespVO;
     }
 
     /**
