@@ -10,11 +10,14 @@ import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundIt
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehousePageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehouseSaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.warehouse.WmsStockWarehouseMapper;
 import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
+import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
 import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
+import cn.iocoder.yudao.module.wms.service.stock.bin.WmsStockBinService;
 import cn.iocoder.yudao.module.wms.service.stock.flow.WmsStockFlowService;
 import cn.iocoder.yudao.module.wms.service.stock.ownership.WmsStockOwnershipService;
 import jakarta.annotation.Resource;
@@ -52,6 +55,9 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
     @Resource
     private WmsInboundService inboundService;
 
+
+    @Resource
+    private WmsStockBinService stockBinService;
 
 
 
@@ -152,6 +158,9 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
             // 执行入库的原子操作
             InboundStatus inboundStatus=inboundSingleItemAtomically(companyId, deptId, warehouseId, productId, item.getActualQuantity(), inboundRespVO.getId(), item.getId());
             item.setInboundStatus(inboundStatus.getValue());
+            if(inboundStatus!=InboundStatus.NONE) {
+                item.setLeftQuantity(item.getActualQuantity());
+            }
         }
         // 完成最终的入库
         inboundService.finishInbound(inboundRespVO);
@@ -228,7 +237,7 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
             stockWarehouseMapper.updateById(stockWarehouseDO);
         }
         // 记录流水
-        stockFlowService.createForInbound(warehouseId, productId, quantity, inboundId, inboundItemId, stockWarehouseDO);
+        stockFlowService.createForStockWarehouse(StockReason.INBOUND, productId,stockWarehouseDO, quantity, inboundId, inboundItemId);
         // 调整归属库存
         stockOwnershipService.inboundSingleItem(companyId, deptId, warehouseId, productId, quantity, inboundId, inboundItemId);
         // TODO 如果是采购入库
@@ -236,5 +245,34 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
 
         // 当前逻辑,默认全部入库
         return InboundStatus.ALL;
+    }
+
+    /**
+     * 汇总拣货库存,仅处理可用与可售
+     **/
+    @Override
+    public void refreshForPickup(Long warehouseId, Long productId,Long pickupId,Long pickupItemId) {
+
+        List<WmsStockBinDO> stockBinList =  stockBinService.selectStockBin(warehouseId, productId);
+
+        Integer availableQuantity = 0;
+        Integer sellableQuantity = 0;
+
+        for (WmsStockBinDO wmsStockBinDO : stockBinList) {
+            availableQuantity+=wmsStockBinDO.getAvailableQuantity();
+            sellableQuantity+=wmsStockBinDO.getSellableQuantity();
+        }
+
+        WmsStockWarehouseDO stockWarehouseDO = stockWarehouseMapper.getByWarehouseIdAndProductId(warehouseId, productId);
+
+        stockWarehouseDO.setAvailableQuantity(availableQuantity);
+        stockWarehouseDO.setShelvingPendingQuantity(sellableQuantity);
+
+        // 更新库存
+        stockWarehouseMapper.updateById(stockWarehouseDO);
+        // 记录流水
+        stockFlowService.createForStockWarehouse(StockReason.PICKUP, productId,stockWarehouseDO, sellableQuantity,pickupId, pickupItemId);
+
+
     }
 }

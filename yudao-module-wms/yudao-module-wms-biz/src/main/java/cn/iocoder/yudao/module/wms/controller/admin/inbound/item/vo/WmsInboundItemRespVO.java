@@ -10,7 +10,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.ErpProductRespSimpleVO;
 
 /**
- * @table-fields : tenant_id,creator,inbound_status,create_time,plan_quantity,updater,inbound_id,source_item_id,left_quantity,update_time,actual_quantity,product_id,id
+ * @table-fields : tenant_id,creator,inbound_status,create_time,plan_quantity,updater,inbound_id,source_item_id,left_quantity,update_time,actual_quantity,product_id,shelved_quantity,id
  */
 @Schema(description = "管理后台 - 入库单详情 Response VO")
 @Data
@@ -81,4 +81,8 @@ public class WmsInboundItemRespVO {
     @Schema(description = "入库状态 ; InboundStatus : 0-未入库 , 1-部分入库 , 2-已入库", example = "")
     @ExcelProperty("入库状态")
     private Integer inboundStatus;
+
+    @Schema(description = "已上架量，已经拣货到仓位的库存量", example = "")
+    @ExcelProperty("已上架量，已经拣货到仓位的库存量")
+    private Integer shelvedQuantity;
 }

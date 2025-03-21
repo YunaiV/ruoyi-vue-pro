@@ -1,5 +1,8 @@
 package cn.iocoder.yudao.module.wms.controller.admin.pickup;
 
+import cn.iocoder.yudao.module.wms.controller.admin.pickup.item.vo.WmsPickupItemRespVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
+import cn.iocoder.yudao.module.wms.service.pickup.item.WmsPickupItemService;
 import org.springframework.web.bind.annotation.*;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -26,12 +29,33 @@ import cn.iocoder.yudao.module.wms.service.pickup.WmsPickupService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import org.springframework.context.annotation.Lazy;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 @Tag(name = "拣货单")
 @RestController
 @RequestMapping("/wms/pickup")
 @Validated
 public class WmsPickupController {
+
+    // @GetMapping("/export-excel")
+    // @Operation(summary = "导出拣货单 Excel")
+    // @PreAuthorize("@ss.hasPermission('wms:pickup:export')")
+    // @ApiAccessLog(operateType = EXPORT)
+    // public void exportPickupExcel(@Valid WmsPickupPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
+    // pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+    // List<WmsPickupDO> list = pickupService.getPickupPage(pageReqVO).getList();
+    // // 导出 Excel
+    // ExcelUtils.write(response, "拣货单.xls", "数据", WmsPickupRespVO.class, BeanUtils.toBean(list, WmsPickupRespVO.class));
+    // }
+    @Resource
+    @Lazy
+    private WmsPickupItemService pickupItemService;
 
     @Resource
     private WmsPickupService pickupService;
@@ -42,32 +66,30 @@ public class WmsPickupController {
     @PostMapping("/create")
     @Operation(summary = "创建拣货单")
     @PreAuthorize("@ss.hasPermission('wms:pickup:create')")
-    public CommonResult<Long> createPickup(@Valid @RequestBody WmsPickupSaveReqVO createReqVO) {
+    public CommonResult<Long> createPickup(@RequestBody WmsPickupSaveReqVO createReqVO) {
         return success(pickupService.createPickup(createReqVO).getId());
     }
 
+    // /**
+    // * @sign : E1B13418492DDEBD
+    // */
+    // @PutMapping("/update")
+    // @Operation(summary = "更新拣货单")
+    // @PreAuthorize("@ss.hasPermission('wms:pickup:update')")
+    // public CommonResult<Boolean> updatePickup(@Valid @RequestBody WmsPickupSaveReqVO updateReqVO) {
+    // pickupService.updatePickup(updateReqVO);
+    // return success(true);
+    // }
+    // @DeleteMapping("/delete")
+    // @Operation(summary = "删除拣货单")
+    // @Parameter(name = "id", description = "编号", required = true)
+    // @PreAuthorize("@ss.hasPermission('wms:pickup:delete')")
+    // public CommonResult<Boolean> deletePickup(@RequestParam("id") Long id) {
+    // pickupService.deletePickup(id);
+    // return success(true);
+    // }
     /**
-     * @sign : E1B13418492DDEBD
-     */
-    @PutMapping("/update")
-    @Operation(summary = "更新拣货单")
-    @PreAuthorize("@ss.hasPermission('wms:pickup:update')")
-    public CommonResult<Boolean> updatePickup(@Valid @RequestBody WmsPickupSaveReqVO updateReqVO) {
-        pickupService.updatePickup(updateReqVO);
-        return success(true);
-    }
-
-    @DeleteMapping("/delete")
-    @Operation(summary = "删除拣货单")
-    @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('wms:pickup:delete')")
-    public CommonResult<Boolean> deletePickup(@RequestParam("id") Long id) {
-        pickupService.deletePickup(id);
-        return success(true);
-    }
-
-    /**
-     * @sign : 213DD832CA7993D8
+     * @sign : 882A350F07B4DCFE
      */
     @GetMapping("/get")
     @Operation(summary = "获得拣货单")
@@ -86,6 +108,9 @@ public class WmsPickupController {
 			.mapping(WmsPickupRespVO::getCreator, WmsPickupRespVO::setCreatorName)
 			.mapping(WmsPickupRespVO::getCreator, WmsPickupRespVO::setUpdaterName)
 			.fill();
+        // 组装拣货单详情
+        List<WmsPickupItemDO> pickupItemList = pickupItemService.selectByPickupId(pickupVO.getId());
+        pickupVO.setItemList(BeanUtils.toBean(pickupItemList, WmsPickupItemRespVO.class));
         // 返回
         return success(pickupVO);
     }
@@ -108,16 +133,5 @@ public class WmsPickupController {
 			.fill();
         // 返回
         return success(voPageResult);
-    }
-
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出拣货单 Excel")
-    @PreAuthorize("@ss.hasPermission('wms:pickup:export')")
-    @ApiAccessLog(operateType = EXPORT)
-    public void exportPickupExcel(@Valid WmsPickupPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
-        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<WmsPickupDO> list = pickupService.getPickupPage(pageReqVO).getList();
-        // 导出 Excel
-        ExcelUtils.write(response, "拣货单.xls", "数据", WmsPickupRespVO.class, BeanUtils.toBean(list, WmsPickupRespVO.class));
     }
 }

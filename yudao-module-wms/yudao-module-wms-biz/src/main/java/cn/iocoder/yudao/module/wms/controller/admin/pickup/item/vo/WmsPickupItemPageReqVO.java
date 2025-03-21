@@ -24,10 +24,10 @@ public class WmsPickupItemPageReqVO extends PageParam {
     private Long inboundId;
 
     @Schema(description = "入库单明细ID", example = "21563")
-    private Integer inboundItemId;
+    private Long inboundItemId;
 
     @Schema(description = "产品ID", example = "17566")
-    private Integer productId;
+    private Long productId;
 
     @Schema(description = "拣货数量")
     private Integer quantity;

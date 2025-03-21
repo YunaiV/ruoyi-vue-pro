@@ -84,4 +84,9 @@ public class WmsPickupItemServiceImpl implements WmsPickupItemService {
     public PageResult<WmsPickupItemDO> getPickupItemPage(WmsPickupItemPageReqVO pageReqVO) {
         return pickupItemMapper.selectPage(pageReqVO);
     }
+
+    @Override
+    public List<WmsPickupItemDO> selectByPickupId(Long id) {
+        return pickupItemMapper.selectByPickupId(id);
+    }
 }

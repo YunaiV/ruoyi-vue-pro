@@ -30,11 +30,11 @@ public class WmsPickupItemRespVO {
 
     @Schema(description = "入库单明细ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "21563")
     @ExcelProperty("入库单明细ID")
-    private Integer inboundItemId;
+    private Long inboundItemId;
 
     @Schema(description = "产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "17566")
     @ExcelProperty("产品ID")
-    private Integer productId;
+    private Long productId;
 
     @Schema(description = "拣货数量", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("拣货数量")

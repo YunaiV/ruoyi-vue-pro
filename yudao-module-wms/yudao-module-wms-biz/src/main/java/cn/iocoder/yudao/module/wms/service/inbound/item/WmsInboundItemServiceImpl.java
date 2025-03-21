@@ -155,4 +155,17 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
         // 保存
         inboundItemMapper.updateBatch(inboundItemDOSInDB);
     }
-}
+
+    @Override
+    public List<WmsInboundItemDO> selectByIds(List<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return inboundItemMapper.selectByIds(ids);
+    }
+
+    @Override
+    public void updateById(WmsInboundItemDO inboundItemDO) {
+        inboundItemMapper.updateById(inboundItemDO);
+    }
+}

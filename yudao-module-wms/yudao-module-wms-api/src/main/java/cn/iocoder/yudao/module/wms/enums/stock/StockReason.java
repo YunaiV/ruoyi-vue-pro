@@ -15,6 +15,7 @@ import java.util.Arrays;
 public enum StockReason implements ArrayValuable<Integer>, DictEnum {
 
     INBOUND(1, "入库"),
+    PICKUP(2, "拣货"),
 
    ;
 

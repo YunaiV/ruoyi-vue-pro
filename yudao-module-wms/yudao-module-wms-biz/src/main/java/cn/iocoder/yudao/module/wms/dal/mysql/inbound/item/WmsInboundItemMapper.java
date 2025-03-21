@@ -49,4 +49,6 @@ public interface WmsInboundItemMapper extends BaseMapperX<WmsInboundItemDO> {
         wrapper.eq(WmsInboundItemDO::getInboundId, inboundId);
         return selectPage(reqVO, wrapper).getList();
     }
+
+    List<WmsInboundItemDO> selectByInboundIds(List<Long> inboundItemIdList);
 }

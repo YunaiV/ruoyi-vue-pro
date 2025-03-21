@@ -38,16 +38,6 @@ public interface WmsStockBinMapper extends BaseMapperX<WmsStockBinDO> {
     /**
      * 按 bin_id,product_id 查询唯一的 WmsStockBinDO
      */
-    default WmsStockBinDO getByBinIdAndProductId(Long binId, String productId) {
-        LambdaQueryWrapperX<WmsStockBinDO> wrapper = new LambdaQueryWrapperX<>();
-        wrapper.eq(WmsStockBinDO::getBinId, binId);
-        wrapper.eq(WmsStockBinDO::getProductId, productId);
-        return selectOne(wrapper);
-    }
-
-    /**
-     * 按 bin_id,product_id 查询唯一的 WmsStockBinDO
-     */
     default WmsStockBinDO getByBinIdAndProductId(Long binId, Long productId) {
         LambdaQueryWrapperX<WmsStockBinDO> wrapper = new LambdaQueryWrapperX<>();
         wrapper.eq(WmsStockBinDO::getBinId, binId);
@@ -61,4 +51,4 @@ public interface WmsStockBinMapper extends BaseMapperX<WmsStockBinDO> {
         wrapper.eq(WmsStockBinDO::getProductId, productId);
         return selectList(wrapper);
     }
-}
+}

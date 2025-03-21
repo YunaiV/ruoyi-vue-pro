@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms.service.warehouse.bin;
 
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.zone.WmsWarehouseZoneDO;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
@@ -148,4 +149,12 @@ public class WmsWarehouseBinServiceImpl implements WmsWarehouseBinService {
     public List<WmsWarehouseBinDO> selectByZoneId(Long zoneId, int limit) {
         return warehouseBinMapper.selectByZoneId(zoneId, limit);
     }
-}
+
+    @Override
+    public List<WmsWarehouseBinDO> selectByIds(List<Long> ids) {
+        if(CollectionUtils.isEmpty(ids)) {
+            return List.of();
+        }
+        return warehouseBinMapper.selectByIds(ids);
+    }
+}

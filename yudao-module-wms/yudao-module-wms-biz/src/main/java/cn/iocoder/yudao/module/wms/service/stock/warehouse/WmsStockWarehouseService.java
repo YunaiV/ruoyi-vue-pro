@@ -57,4 +57,9 @@ public interface WmsStockWarehouseService {
     void inbound(WmsInboundRespVO inboundRespVO);
 
     WmsStockWarehouseDO getStockWarehouse(Long warehouseId, Long productId);
+
+    /**
+     * 为拣货刷新库存
+     **/
+    void refreshForPickup(Long warehouseId, Long productId,Long pickupId,Long pickupItemId);
 }

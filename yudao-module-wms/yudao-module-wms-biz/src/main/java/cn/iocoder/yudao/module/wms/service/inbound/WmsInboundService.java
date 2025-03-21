@@ -70,4 +70,6 @@ public interface WmsInboundService {
     WmsInboundRespVO getInboundWithItemList(Long id);
 
     void finishInbound(WmsInboundRespVO inboundRespVO);
+
+    List<WmsInboundDO> selectByIds(List<Long> ids);
 }

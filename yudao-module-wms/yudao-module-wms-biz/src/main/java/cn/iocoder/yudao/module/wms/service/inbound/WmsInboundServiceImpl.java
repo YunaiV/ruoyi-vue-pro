@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms.service.inbound;
 
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
@@ -287,5 +288,13 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         inboundDO.setArrivalActualTime(LocalDateTime.now());
         inboundMapper.updateById(inboundDO);
 
+    }
+
+    @Override
+    public List<WmsInboundDO> selectByIds(List<Long> ids) {
+        if(CollectionUtils.isEmpty(ids)) {
+            return List.of();
+        }
+        return inboundMapper.selectByIds(ids);
     }
 }

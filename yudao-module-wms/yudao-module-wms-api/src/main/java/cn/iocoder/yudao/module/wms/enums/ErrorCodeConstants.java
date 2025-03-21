@@ -39,7 +39,6 @@ public interface ErrorCodeConstants {
     ErrorCode INBOUND_BE_REFERRED = new ErrorCode(2_001_004_003, "入库单被引用");
     ErrorCode INBOUND_NO_OUT_OF_BOUNDS = new ErrorCode(2_001_004_004, "入库单单据号越界");
     ErrorCode INBOUND_ITEM_PRODUCT_ID_REPEATED = new ErrorCode(2_001_004_005, "入库单标准产品ID重复");
-    ErrorCode INBOUND_ITEM_PRODUCT_SKU_REPEATED = new ErrorCode(2_001_004_006, "入库单标准产品SKU重复");
     ErrorCode INBOUND_CAN_NOT_EDIT = new ErrorCode(2_001_004_007, "入库单不允许编辑");
     ErrorCode INBOUND_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_004_008, "入库单不符合审批条件");
     ErrorCode INBOUND_CAN_NOT_DELETE = new ErrorCode(2_001_004_009, "入库单不允许删除");
@@ -114,4 +113,8 @@ public interface ErrorCodeConstants {
     ErrorCode PICKUP_ITEM_CAN_NOT_EDIT = new ErrorCode(2_001_013_003, "拣货单详情不允许编辑");
     ErrorCode PICKUP_ITEM_CAN_NOT_DELETE = new ErrorCode(2_001_013_004, "拣货单详情不允许删除");
     ErrorCode PICKUP_ITEM_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_013_005, "拣货单详情不符合审批条件");
-}
+    ErrorCode PICKUP_ITEM_INBOUND_ITEM_ID_REPEATED = new ErrorCode(2_001_013_006, "入库单详情ID重复");
+    ErrorCode PICKUP_ITEM_INBOUND_ITEM_ID_WAREHOUSE_ID_NOT_SAME = new ErrorCode(2_001_013_007, "拣货仓库错误");
+    ErrorCode PICKUP_ITEM_INBOUND_ITEM_ID_NOT_SAME = new ErrorCode(2_001_013_008, "拣货明细错误");
+    ErrorCode INBOUND_ITEM_PICKUP_LEFT_QUANTITY_NOT_ENOUGH = new ErrorCode(2_001_013_008, "入库单明细的待上架库存不足");
+}

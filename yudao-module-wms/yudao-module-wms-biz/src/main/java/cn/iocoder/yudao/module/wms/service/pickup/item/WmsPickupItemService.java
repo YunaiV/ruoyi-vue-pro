@@ -51,4 +51,6 @@ public interface WmsPickupItemService {
      * @return 拣货单详情分页
      */
     PageResult<WmsPickupItemDO> getPickupItemPage(WmsPickupItemPageReqVO pageReqVO);
+
+    List<WmsPickupItemDO> selectByPickupId(Long id);
 }

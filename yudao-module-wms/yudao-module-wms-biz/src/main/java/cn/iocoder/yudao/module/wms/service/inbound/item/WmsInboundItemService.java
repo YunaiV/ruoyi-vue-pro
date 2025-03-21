@@ -5,7 +5,6 @@ import jakarta.validation.*;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 
 /**
  * 入库单详情 Service 接口
@@ -65,4 +64,8 @@ public interface WmsInboundItemService {
     }
 
     void updateActualQuantity(List<WmsInboundItemSaveReqVO> updateReqVOList);
+
+    List<WmsInboundItemDO> selectByIds(List<Long> ids);
+
+    void updateById(WmsInboundItemDO inboundItemDO);
 }

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.wms.service.stock.ownership;
 
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
+import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
 import cn.iocoder.yudao.module.wms.service.stock.flow.WmsStockFlowService;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
@@ -141,7 +142,7 @@ public class WmsStockOwnershipServiceImpl implements WmsStockOwnershipService {
             stockOwnershipMapper.updateById(stockOwnershipDO);
         }
         // 记录流水
-        stockFlowService.createForInbound(warehouseId, productId, quantity, inboundId, inboundItemId, stockOwnershipDO);
+        stockFlowService.createForStockOwner(StockReason.INBOUND,  productId, stockOwnershipDO,quantity, inboundId, inboundItemId);
     }
 
     @Override

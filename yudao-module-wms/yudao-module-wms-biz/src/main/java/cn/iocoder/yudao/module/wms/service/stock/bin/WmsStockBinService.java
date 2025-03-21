@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.wms.service.stock.bin;
 
 import java.util.*;
+
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.WmsPickupDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
 import jakarta.validation.*;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 
 /**
  * 仓位库存 Service 接口
@@ -53,4 +56,8 @@ public interface WmsStockBinService {
     PageResult<WmsStockBinDO> getStockBinPage(WmsStockBinPageReqVO pageReqVO);
 
     List<WmsStockBinDO> selectStockBin(Long warehouseId, Long productId);
+
+    WmsStockBinDO getStockBin(Long binId, Long productId);
+
+    void pickupItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundItemDO inboundItemDO);
 }

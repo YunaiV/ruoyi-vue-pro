@@ -42,12 +42,12 @@ public class WmsPickupItemDO extends BaseDO {
     /**
      * 入库单明细ID
      */
-    private Integer inboundItemId;
+    private Long inboundItemId;
 
     /**
      * 产品ID
      */
-    private Integer productId;
+    private Long productId;
 
     /**
      * 拣货数量

@@ -61,4 +61,6 @@ public interface WmsWarehouseBinService {
      * 按 zoneId 查询 WmsWarehouseBinDO
      */
     List<WmsWarehouseBinDO> selectByZoneId(Long zoneId, int limit);
+
+    List<WmsWarehouseBinDO> selectByIds(List<Long> ids);
 }

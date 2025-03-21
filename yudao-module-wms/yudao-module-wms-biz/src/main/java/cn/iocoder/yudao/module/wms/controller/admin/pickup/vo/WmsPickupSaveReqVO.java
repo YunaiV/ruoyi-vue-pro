@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
 import jakarta.validation.constraints.*;
+import java.util.List;
+import cn.iocoder.yudao.module.wms.controller.admin.pickup.item.vo.WmsPickupItemSaveReqVO;
 
 /**
  * @table-fields : no,id,warehouse_id
@@ -19,6 +21,8 @@ public class WmsPickupSaveReqVO {
     private String no;
 
     @Schema(description = "仓库ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "22380")
-    @NotNull(message = "仓库ID不能为空")
     private Long warehouseId;
+
+    @Schema(description = "详情清单", example = "")
+    private List<WmsPickupItemSaveReqVO> itemList;
 }

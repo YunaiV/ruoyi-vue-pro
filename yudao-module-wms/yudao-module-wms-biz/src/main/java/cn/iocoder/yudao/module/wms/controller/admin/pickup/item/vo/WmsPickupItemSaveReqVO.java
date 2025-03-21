@@ -25,11 +25,11 @@ public class WmsPickupItemSaveReqVO {
 
     @Schema(description = "入库单明细ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "21563")
     @NotNull(message = "入库单明细ID不能为空")
-    private Integer inboundItemId;
+    private Long inboundItemId;
 
     @Schema(description = "产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "17566")
     @NotNull(message = "产品ID不能为空")
-    private Integer productId;
+    private Long productId;
 
     @Schema(description = "拣货数量", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "拣货数量不能为空")

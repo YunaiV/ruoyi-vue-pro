@@ -1,5 +1,14 @@
 package cn.iocoder.yudao.module.wms.service.stock.bin;
 
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
+import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.WmsPickupDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
+import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
+import cn.iocoder.yudao.module.wms.service.stock.flow.WmsStockFlowService;
+import cn.iocoder.yudao.module.wms.service.stock.warehouse.WmsStockWarehouseService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -8,7 +17,6 @@ import java.util.*;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.bin.WmsStockBinMapper;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -25,6 +33,13 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
 
     @Resource
     private WmsStockBinMapper stockBinMapper;
+
+    @Resource
+    WmsStockFlowService stockFlowService;
+
+    @Resource
+    @Lazy
+    WmsStockWarehouseService stockWarehouseService;
 
     /**
      * @sign : 1D6010DA80E2C817
@@ -91,6 +106,11 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
     }
 
     @Override
+    public WmsStockBinDO getStockBin(Long binId, Long productId) {
+        return stockBinMapper.getByBinIdAndProductId(binId, productId);
+    }
+
+    @Override
     public PageResult<WmsStockBinDO> getStockBinPage(WmsStockBinPageReqVO pageReqVO) {
         return stockBinMapper.selectPage(pageReqVO);
     }
@@ -99,4 +119,47 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
     public List<WmsStockBinDO> selectStockBin(Long warehouseId, Long productId) {
         return stockBinMapper.selectStockBin(warehouseId, productId);
     }
-}
+
+
+
+    public void pickupItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundItemDO inboundItemDO) {
+
+        JdbcUtils.requireTransaction();
+        WmsStockBinDO stockBinDO = this.getStockBin(pickupItemDO.getBinId(), inboundItemDO.getProductId());
+        if(stockBinDO==null) {
+
+            stockBinDO = new WmsStockBinDO();
+            stockBinDO.setWarehouseId(pickup.getWarehouseId());
+            stockBinDO.setBinId(pickupItemDO.getBinId());
+            stockBinDO.setProductId(inboundItemDO.getProductId());
+            // 可用库存
+            stockBinDO.setAvailableQuantity(pickupItemDO.getQuantity());
+            // 可售库存
+            stockBinDO.setSellableQuantity(pickupItemDO.getQuantity());
+            // 待上出库量
+            stockBinDO.setOutboundPendingQuantity(0);
+            // 新建
+            stockBinMapper.insert(stockBinDO);
+
+        } else {
+
+            // 可用库存
+            stockBinDO.setAvailableQuantity(stockBinDO.getAvailableQuantity()+ pickupItemDO.getQuantity());
+            // 可售库存
+            stockBinDO.setSellableQuantity(stockBinDO.getSellableQuantity()+ pickupItemDO.getQuantity());
+            // 待上出库量
+            // stockBinDO.setOutboundPendingQuantity(0);
+            // 保存
+            stockBinMapper.updateById(stockBinDO);
+        }
+
+        // 记录流水
+        stockFlowService.createForStockBin(StockReason.PICKUP, inboundItemDO.getProductId(), stockBinDO,pickupItemDO.getQuantity(), pickupItemDO.getPickupId(), pickupItemDO.getId());
+
+        // 刷新库存
+        stockWarehouseService.refreshForPickup(pickup.getWarehouseId(), inboundItemDO.getProductId(), pickup.getId(), pickupItemDO.getId());
+
+
+    }
+
+}
