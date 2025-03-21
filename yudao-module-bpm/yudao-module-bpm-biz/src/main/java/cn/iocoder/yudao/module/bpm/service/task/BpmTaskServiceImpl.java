@@ -613,15 +613,16 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             Integer candidateStrategy = parseCandidateStrategy(nextFlowNode);
             // 2.1 情况一：如果节点中的审批人策略为 发起人自选
             if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy())) {
-                // 如果节点存在，但未配置审批人
-                List<Long> assignees = nextAssignees != null ? nextAssignees.get(nextFlowNode.getId()) : null;
-                if (CollUtil.isEmpty(assignees)) {
-                    throw exception(PROCESS_INSTANCE_START_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
-                }
+                // 先从历史中获取审批人，在发起人会把所有的审批人保存到历史中，这里从历史中获取
                 processVariables = FlowableUtils.getStartUserSelectAssignees(processInstance.getProcessVariables());
                 // 特殊：如果当前节点已经存在审批人，则不允许覆盖
                 if (processVariables != null && CollUtil.isNotEmpty(processVariables.get(nextFlowNode.getId()))) {
                     continue;
+                }
+                // 如果节点存在，但未配置审批人
+                List<Long> assignees = nextAssignees != null ? nextAssignees.get(nextFlowNode.getId()) : null;
+                if (CollUtil.isEmpty(assignees)) {
+                    throw exception(PROCESS_INSTANCE_START_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
                 }
                 // 设置 PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES
                 if (processVariables == null) {
@@ -632,12 +633,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             }
             // 2.2 情况二：如果节点中的审批人策略为 审批人，在审批时选择下一个节点的审批人，并且该节点的审批人为空
             if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy())) {
+                // 获取审批人自选的历史变量
+                processVariables = FlowableUtils.getApproveUserSelectAssignees(processInstance.getProcessVariables());
                 // 如果节点存在，但未配置审批人
                 List<Long> assignees = nextAssignees != null ? nextAssignees.get(nextFlowNode.getId()) : null;
                 if (CollUtil.isEmpty(assignees)) {
                     throw exception(PROCESS_INSTANCE_APPROVE_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
                 }
-                processVariables = FlowableUtils.getApproveUserSelectAssignees(processInstance.getProcessVariables());
                 if (processVariables == null) {
                     processVariables = new HashMap<>();
                 }
