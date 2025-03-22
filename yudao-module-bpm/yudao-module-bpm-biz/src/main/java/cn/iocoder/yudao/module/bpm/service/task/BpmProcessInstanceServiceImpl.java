@@ -267,7 +267,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
         List<FlowNode> nextFlowNodes = BpmnModelUtils.getNextFlowNodes(flowElement, bpmnModel, processVariables);
 
-        // TODO @小北：还是可以优化下哈；“4. 组装节点信息” 只拼接出 candidateUserIds；之后，再第二次循环，查询用户和部门信息，进行拼接
         // 2. 收集所有节点的候选用户 ID
         Set<Long> allCandidateUsers = new HashSet<>();
         for (FlowNode node : nextFlowNodes) {
@@ -287,13 +286,13 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                     loginUserId, historicProcessInstance.getProcessDefinitionId(), processVariables);
 
             // 4.2 组装候选用户信息
-            List<UserSimpleBaseVO> candidateUsers = new ArrayList<>();
-            for (Long userId : candidateUserIds) {
-                UserSimpleBaseVO user = BpmProcessInstanceConvert.INSTANCE.buildUser(userId, userMap, deptMap);
+            List<UserSimpleBaseVO> candidateUsers = convertList(candidateUserIds, userId -> {
+                AdminUserRespDTO user = userMap.get(userId);
                 if (user != null) {
-                    candidateUsers.add(user);
+                    return BpmProcessInstanceConvert.INSTANCE.buildUser(userId, userMap, deptMap);
                 }
-            }
+                return null;
+            });
 
             // 4.3 构建节点信息
             return new ActivityNode()
