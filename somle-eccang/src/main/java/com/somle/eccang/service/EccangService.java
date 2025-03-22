@@ -19,6 +19,7 @@ import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
@@ -37,8 +38,6 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static cn.iocoder.yudao.module.system.enums.esb.EsbChannels.EC_SALE_OUTPUT_CHANNEL;
-
 @Slf4j
 @Service
 public class EccangService {
@@ -51,8 +50,8 @@ public class EccangService {
     @Autowired
     EccangTokenRepository tokenRepo;
 
-    @Resource(name = EC_SALE_OUTPUT_CHANNEL)
-    MessageChannel channel;
+    @Resource
+    MessageChannel eccangSaleOutputChannel;
 
 
     @PostConstruct
@@ -263,7 +262,7 @@ public class EccangService {
             .build();
         getOrderUnarchive(vo)
             .forEach(order -> {
-                channel.send(MessageBuilder.withPayload(order).build());
+                eccangSaleOutputChannel.send(MessageBuilder.withPayload(order).build());
             });
     }
 

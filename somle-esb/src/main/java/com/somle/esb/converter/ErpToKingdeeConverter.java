@@ -14,6 +14,7 @@ import com.somle.kingdee.model.KingdeeAuxInfoDetail;
 import com.somle.kingdee.model.KingdeeProductSaveReqVO;
 import com.somle.kingdee.model.supplier.KingdeeSupplier;
 import com.somle.kingdee.model.supplier.SupplierBomentity;
+import com.somle.kingdee.service.KingdeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,8 +31,9 @@ import static com.somle.esb.util.ConstantConvertUtils.getCountrySuffix;
 @Service
 public class ErpToKingdeeConverter {
 
-    //    @Autowired
-//    KingdeeService kingdeeService;
+    @Autowired
+    KingdeeService kingdeeService;
+
     @Autowired
     private DeptApi deptApi;
     @Autowired

@@ -17,8 +17,6 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
-import static cn.iocoder.yudao.module.system.enums.esb.EsbChannels.DK_USER_CHANNEL;
-
 /**
  * @Description: $
  * @Author: c-tao
@@ -35,7 +33,7 @@ public class DingtalkUserHandler {
     private final AdminUserApi adminUserApi;
     private final EsbMappingService mappingService;
 
-    @ServiceActivator(inputChannel = DK_USER_CHANNEL)
+    @ServiceActivator(inputChannel = "dingtalkUserOutputChannel")
     public void syncUser(@Payload OapiV2UserGetResponse.UserGetResponse dingTalkUser) {
 
         LoginUser loginUser = new LoginUser();

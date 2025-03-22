@@ -12,8 +12,6 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 
-import static cn.iocoder.yudao.module.system.enums.esb.EsbChannels.DATA_CHANNEL;
-
 @Slf4j
 @Configuration
 public class IntegrationConfig {
@@ -28,7 +26,7 @@ public class IntegrationConfig {
         return new PublishSubscribeChannel();
     }
 
-    @Bean(name = DATA_CHANNEL)
+    @Bean
     public MessageChannel dataChannel() {
         return new PublishSubscribeChannel();
     }

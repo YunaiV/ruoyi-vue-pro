@@ -18,7 +18,6 @@
 
 
     <dependencies>
-
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-tms-api</artifactId>
@@ -97,6 +96,9 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-protection</artifactId>
         </dependency>
+
+
+
 
     </dependencies>
 

@@ -7,13 +7,11 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.messaging.MessageChannel;
 
-import static cn.iocoder.yudao.module.system.enums.esb.EsbChannels.DEPARTMENT_CHANNEL;
-
 @Slf4j
 @Configuration
 public class SystemIntegrationConfig {
 
-    @Bean(name = DEPARTMENT_CHANNEL)
+    @Bean
     public MessageChannel departmentOutputChannel() {
         return new PublishSubscribeChannel(new SimpleAsyncTaskExecutor());
     }

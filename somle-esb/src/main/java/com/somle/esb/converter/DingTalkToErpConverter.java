@@ -2,11 +2,13 @@ package com.somle.esb.converter;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptSaveReqDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserReqDTO;
 import com.dingtalk.api.response.OapiV2UserGetResponse;
 import com.somle.dingtalk.model.DingTalkDepartment;
+import com.somle.dingtalk.service.DingTalkService;
 import com.somle.esb.model.EsbMapping;
 import com.somle.esb.service.EsbMappingService;
 import lombok.extern.slf4j.Slf4j;
@@ -16,16 +18,18 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class DingTalkToErpConverter {
-    //    @Autowired
-//    DingTalkService dingTalkService;
-//
-//    @Autowired
-//    private DeptApi deptApi;
+    @Autowired
+    DingTalkService dingTalkService;
+
+
+    @Autowired
+    private DeptApi deptApi;
+
     @Autowired
     private AdminUserApi adminUserApi;
+
     @Autowired
     EsbMappingService mappingService;
-
     private static final String CHINESE_CHAR_PATTERN = "[\\u4E00-\\u9FA5]+";
     private static final String ENGLISH_CHAR_PATTERN = "^[a-zA-Z\\s]+$";
 

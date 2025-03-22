@@ -1,16 +1,20 @@
 package com.somle.esb.converter;
 
 import com.somle.eccang.model.EccangOrder;
+import com.somle.eccang.service.EccangService;
 import com.somle.esb.model.EsbAddress;
 import com.somle.esb.model.EsbCustomer;
 import com.somle.esb.model.EsbSale;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 public class EccangToErpConverter {
 
+    @Autowired
+    EccangService eccangService;
 
     public EsbAddress toEsb(EccangOrder.EccangAddress address) {
         log.debug(address.toString());

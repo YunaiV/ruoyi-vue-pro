@@ -1,17 +1,19 @@
-package cn.iocoder.yudao.module.erp.service.purchase;
+package cn.iocoder.yudao.module.srm.service.purchase;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.ErpSupplierProductPageReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.ErpSupplierProductRespVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.ErpSupplierProductSaveReqVO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierProductDO;
-import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpSupplierProductMapper;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.ErpSupplierProductPageReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.ErpSupplierProductRespVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.ErpSupplierProductSaveReqVO;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpSupplierDO;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpSupplierProductDO;
+import cn.iocoder.yudao.module.srm.dal.mysql.purchase.ErpSupplierProductMapper;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -22,7 +24,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_UPDATE_ERROR;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.module.erp.enums.SrmErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.*;
 
 /**
  * ERP 供应商产品 Service 实现类
@@ -33,7 +35,10 @@ import static cn.iocoder.yudao.module.erp.enums.SrmErrorCodeConstants.*;
 @Validated
 @RequiredArgsConstructor
 public class ErpSupplierProductServiceImpl implements ErpSupplierProductService {
+    @Resource
+    MessageChannel erpCustomRuleChannel;
     private final ErpSupplierProductMapper supplierProductMapper;
+    //    private final ErpProductService productService;
     private final ErpSupplierService supplierService;
 
     @Override

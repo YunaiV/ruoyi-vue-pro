@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static cn.iocoder.yudao.module.system.enums.esb.EsbChannels.ERP_CUSTOM_RULE_CHANNEL;
-
 /**
  * @Description: $
  * @Author: c-tao
@@ -48,7 +46,7 @@ public class ErpCustomRuleHandler {
      * @Date 11:18 2024/11/5
      * @Param [message]
      **/
-    @ServiceActivator(inputChannel = ERP_CUSTOM_RULE_CHANNEL)
+    @ServiceActivator(inputChannel = "erpCustomRuleChannel")
     public void syncCustomRulesToEccang(@Payload List<ErpCustomRuleDTO> customRules) {
         List<EccangProduct> eccangProducts = erpToEccangConverter.convertByErpCustomDTOs(processRules(customRules));
         eccangProducts.forEach(eccangProduct -> eccangService.addBatchProduct(List.of(eccangProduct)));
@@ -62,7 +60,7 @@ public class ErpCustomRuleHandler {
      * @Date 11:18 2024/11/5
      * @Param [message]
      **/
-    @ServiceActivator(inputChannel = ERP_CUSTOM_RULE_CHANNEL)
+    @ServiceActivator(inputChannel = "erpCustomRuleChannel")
     public void syncCustomRulesToKingdee(@Payload List<ErpCustomRuleDTO> customRules) {
         List<KingdeeProductSaveReqVO> kingdee = erpToKingdeeConverter.convert(processRules(customRules));
         kingdee.forEach(kingdeeService::addProduct);

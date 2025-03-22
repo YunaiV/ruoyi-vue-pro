@@ -1,14 +1,15 @@
 package com.somle.esb.job;
 
+import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
+import com.somle.dingtalk.config.DingtalkIntegrationConfig;
 import com.somle.dingtalk.service.DingTalkService;
-import jakarta.annotation.Resource;
+import com.somle.esb.enums.TenantId;
+import com.somle.esb.handler.DingtalkDepartmentHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Component;
-
-import static cn.iocoder.yudao.module.system.enums.esb.EsbChannels.DK_DEPARTMENT_CHANNEL;
 
 /**
  * @className: syncDepartmentsJob
@@ -19,18 +20,18 @@ import static cn.iocoder.yudao.module.system.enums.esb.EsbChannels.DK_DEPARTMENT
  */
 @Slf4j
 @Component
-public class SyncDepartmentsJob extends DataJob {
+public class SyncDepartmentsJob extends DataJob{
     @Autowired
     DingTalkService dingTalkService;
 
-    @Resource(name = DK_DEPARTMENT_CHANNEL)
-    MessageChannel channel;
+    @Autowired
+    MessageChannel dingtalkDepartmentOutputChannel;
 
 
     @Override
-    public String execute(String param) {
+    public String execute(String param){
         dingTalkService.getDepartmentStream().forEach(department -> {
-            channel.send(MessageBuilder.withPayload(department).build());
+            dingtalkDepartmentOutputChannel.send(MessageBuilder.withPayload(department).build());
         });
         return "sync success";
     }

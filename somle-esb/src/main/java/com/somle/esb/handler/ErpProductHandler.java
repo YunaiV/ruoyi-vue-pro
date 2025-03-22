@@ -16,8 +16,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static cn.iocoder.yudao.module.system.enums.esb.EsbChannels.ERP_PRODUCT_CHANNEL;
-
 /**
  * @Description: $
  * @Author: c-tao
@@ -34,7 +32,7 @@ public class ErpProductHandler {
     private final ErpToEccangConverter erpToEccangConverter;
     private final ErpToKingdeeConverter erpToKingdeeConverter;
 
-    @ServiceActivator(inputChannel = ERP_PRODUCT_CHANNEL)
+    @ServiceActivator(inputChannel = "erpProductChannel")
     public void syncProductsToEccang(@Payload List<ErpProductDTO> erpProductDTOS) {
         List<EccangProduct> eccangProducts = erpToEccangConverter.convertByErpProducts(erpProductDTOS);
         for (EccangProduct eccangProduct : eccangProducts) {
@@ -44,7 +42,7 @@ public class ErpProductHandler {
         log.info("syncProductsToEccang end,sku = ({})", eccangProducts.stream().map(EccangProduct::getProductSku).toList());
     }
 
-    @ServiceActivator(inputChannel = ERP_PRODUCT_CHANNEL)
+    @ServiceActivator(inputChannel = "erpProductChannel")
     public void syncProductsToKingdee(@Payload List<ErpProductDTO> products) {
         log.info("syncProductsToKingdee");
         List<KingdeeProductSaveReqVO> kingdee = erpToKingdeeConverter.toKingdeeProducts(products);
