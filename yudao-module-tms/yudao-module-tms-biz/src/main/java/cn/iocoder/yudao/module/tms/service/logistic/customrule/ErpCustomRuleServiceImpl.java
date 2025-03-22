@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.customrule.ErpCustomR
 import cn.iocoder.yudao.module.tms.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
 import cn.iocoder.yudao.module.tms.service.logistic.category.product.ErpCustomProductService;
 import cn.iocoder.yudao.module.tms.service.logistic.customrule.bo.ErpCustomRuleBO;
+import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,7 @@ import static cn.iocoder.yudao.module.tms.enums.ErrorCodeConstants.*;
 public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
     @Autowired
     ErpCustomRuleMapper customRuleMapper;
-    @Autowired
+    @Resource
     MessageChannel erpCustomRuleChannel;
     @Autowired
     ErpCustomRuleApi tmsCustomRuleApi;

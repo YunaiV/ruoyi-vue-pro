@@ -5,6 +5,7 @@ import com.somle.dingtalk.config.DingtalkIntegrationConfig;
 import com.somle.dingtalk.service.DingTalkService;
 import com.somle.esb.enums.TenantId;
 import com.somle.esb.handler.DingtalkDepartmentHandler;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.support.MessageBuilder;
@@ -24,7 +25,7 @@ public class SyncDepartmentsJob extends DataJob{
     @Autowired
     DingTalkService dingTalkService;
 
-    @Autowired
+    @Resource
     MessageChannel dingtalkDepartmentOutputChannel;
 
 
