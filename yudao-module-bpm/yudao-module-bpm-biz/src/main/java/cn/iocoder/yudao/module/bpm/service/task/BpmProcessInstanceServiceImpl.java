@@ -14,7 +14,6 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
-import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
@@ -262,47 +261,31 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             processVariables.putAll(reqVO.getProcessVariables());
         }
 
-        // 3 获取当前任务节点的信息
-        // 3.1 获取下一个将要执行的节点集合
+        // 3. 获取下一个将要执行的节点集合
         FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
         List<FlowNode> nextFlowNodes = BpmnModelUtils.getNextFlowNodes(flowElement, bpmnModel, processVariables);
-
-        // 2. 收集所有节点的候选用户 ID
-        Set<Long> allCandidateUsers = new HashSet<>();
-        for (FlowNode node : nextFlowNodes) {
-            List<Long> candidateUserIds = getTaskCandidateUserList(bpmnModel, node.getId(),
-                    loginUserId, historicProcessInstance.getProcessDefinitionId(), processVariables);
-            allCandidateUsers.addAll(candidateUserIds);
+        List<ActivityNode> nextActivityNodes = convertList(nextFlowNodes, node -> new ActivityNode().setId(node.getId())
+                .setName(node.getName()).setNodeType(BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType())
+                .setStatus(BpmTaskStatusEnum.RUNNING.getStatus())
+                .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(node))
+                .setCandidateUserIds(getTaskCandidateUserList(bpmnModel, node.getId(),
+                        loginUserId, historicProcessInstance.getProcessDefinitionId(), processVariables)));
+        if (CollUtil.isNotEmpty(nextActivityNodes)) {
+            return nextActivityNodes;
         }
 
-        // 3. 批量查询用户和部门信息
-        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(new ArrayList<>(allCandidateUsers));
+        // 4. 拼接基础信息
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertSetByFlatMap(nextActivityNodes, ActivityNode::getCandidateUserIds, Collection::stream));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
-
-        // 4. 组装节点信息
-        return convertList(nextFlowNodes, node -> {
-            // 4.1 获取当前节点的候选用户 ID
-            List<Long> candidateUserIds = getTaskCandidateUserList(bpmnModel, node.getId(),
-                    loginUserId, historicProcessInstance.getProcessDefinitionId(), processVariables);
-
-            // 4.2 组装候选用户信息
-            List<UserSimpleBaseVO> candidateUsers = convertList(candidateUserIds, userId -> {
-                AdminUserRespDTO user = userMap.get(userId);
-                if (user != null) {
-                    return BpmProcessInstanceConvert.INSTANCE.buildUser(userId, userMap, deptMap);
-                }
-                return null;
-            });
-
-            // 4.3 构建节点信息
-            return new ActivityNode()
-                    .setNodeType(BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType())
-                    .setId(node.getId())
-                    .setName(node.getName())
-                    .setStatus(BpmTaskStatusEnum.RUNNING.getStatus())
-                    .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(node))
-                    .setCandidateUsers(candidateUsers);
-        });
+        nextActivityNodes.forEach(node -> node.setCandidateUsers(convertList(node.getCandidateUserIds(), userId -> {
+            AdminUserRespDTO user = userMap.get(userId);
+            if (user != null) {
+                return BpmProcessInstanceConvert.INSTANCE.buildUser(userId, userMap, deptMap);
+            }
+            return null;
+        })));
+        return nextActivityNodes;
     }
 
     @Override
