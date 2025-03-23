@@ -27,6 +27,8 @@ import cn.iocoder.yudao.module.erp.enums.status.*;
 import cn.iocoder.yudao.module.erp.service.purchase.bo.ErpPurchaseOrderItemBO;
 import cn.iocoder.yudao.module.erp.service.purchase.bo.ErpPurchaseOrderWordBO;
 import com.alibaba.cola.statemachine.StateMachine;
+import com.aspose.words.Document;
+import com.aspose.words.SaveFormat;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
@@ -40,8 +42,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -604,18 +605,28 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
             item.setTotalPriceUntaxed(item.getTotalPrice().subtract(item.getTaxPrice()));
         })));
         xwpfTemplate.render(wordBO);
-        //3 转换pdf，返回响应
-        try {
-            String outputFileName = "采购合同.pdf";
-            // 设置响应头word，准备下载
-            response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-            response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode("output.docx", StandardCharsets.UTF_8));
-            //
-            
-            xwpfTemplate.writeAndClose(response.getOutputStream());
-        } catch (IOException e) {
+        // 3. 转换pdf，返回响应
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(); // 用于捕获输出流
+        String outputFileName = "output.pdf";
+        try (OutputStream out = response.getOutputStream();) {
+            // 将生成的模板写入 ByteArrayOutputStream
+            xwpfTemplate.write(byteArrayOutputStream);
+            byte[] documentData = byteArrayOutputStream.toByteArray(); // 获取字节数组
+
+            // 将字节数组转成输入流
+            InputStream inputStreamResult = new ByteArrayInputStream(documentData);
+
+            // 设置响应头，准备下载
+            response.setContentType("application/pdf");
+            response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(outputFileName, StandardCharsets.UTF_8));
+            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+
+            // 通过输入流写入响应
+            Document document = new Document(inputStreamResult);
+            document.save(out, SaveFormat.PDF);
+//            out.flush();
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
 }
