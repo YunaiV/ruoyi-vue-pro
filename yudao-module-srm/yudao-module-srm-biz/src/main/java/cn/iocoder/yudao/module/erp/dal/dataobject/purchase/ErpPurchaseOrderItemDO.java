@@ -76,6 +76,7 @@ public class ErpPurchaseOrderItemDO extends TenantBaseDO {
     /**
      * 下单数量
      */
+    //取后两位小数点 json的时候
     private BigDecimal count;
     /**
      * 总价，单位：元

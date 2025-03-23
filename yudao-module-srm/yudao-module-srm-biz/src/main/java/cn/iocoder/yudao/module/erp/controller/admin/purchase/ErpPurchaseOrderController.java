@@ -57,7 +57,7 @@ public class ErpPurchaseOrderController {
     private final ErpProductApi erpProductApi;
     private final AdminUserApi adminUserApi;
     private final DeptApi deptApi;
-//    warehouse
+    //    warehouse
 
     @PostMapping("/create")
     @Operation(summary = "创建采购订单")
@@ -83,7 +83,6 @@ public class ErpPurchaseOrderController {
         purchaseOrderService.deletePurchaseOrder(ids);
         return success(true);
     }
-
 
     @GetMapping("/get")
     @Operation(summary = "获得采购订单")
@@ -111,8 +110,7 @@ public class ErpPurchaseOrderController {
     @Operation(summary = "导出采购订单 Excel")
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:export')")
     @ApiAccessLog(operateType = EXPORT)
-    public void exportPurchaseOrderExcel(@Valid ErpPurchaseOrderPageReqVO pageReqVO,
-                                         HttpServletResponse response) throws IOException {
+    public void exportPurchaseOrderExcel(@Valid ErpPurchaseOrderPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ErpPurchaseOrderBaseRespVO> voList = bindList(purchaseOrderService.getPurchaseOrderPage(pageReqVO).getList());
         // 导出 Excel
@@ -156,66 +154,52 @@ public class ErpPurchaseOrderController {
         return success(true);
     }
 
+    //根据采购单id生成采购合同
+    @PostMapping("/generateContract")
+    @Operation(summary = "生成采购合同")
+    @PreAuthorize("@ss.hasPermission('erp:purchasereq-order:generateContract')")
+    public CommonResult<Boolean> generateContract(@Validated @RequestBody ErpPurchaseOrderGenerateContractReqVO reqVO, HttpServletResponse response) {
+        purchaseOrderService.generateContract(reqVO, response);
+        return success(true);
+    }
+
     private List<ErpPurchaseOrderBaseRespVO> bindList(List<ErpPurchaseOrderDO> list) {
         // 1.1 订单项
-        List<ErpPurchaseOrderItemDO> purchaseOrderItemList = purchaseOrderService.getPurchaseOrderItemListByOrderIds(
-            convertSet(list, ErpPurchaseOrderDO::getId));
+        List<ErpPurchaseOrderItemDO> purchaseOrderItemList = purchaseOrderService.getPurchaseOrderItemListByOrderIds(convertSet(list, ErpPurchaseOrderDO::getId));
         Map<Long, List<ErpPurchaseOrderItemDO>> purchaseOrderItemMap = convertMultiMap(purchaseOrderItemList, ErpPurchaseOrderItemDO::getOrderId);
         // 1.2 产品
-        Map<Long, ErpProductDTO> productMap = erpProductApi.getProductMap(
-            convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getProductId));
+        Map<Long, ErpProductDTO> productMap = erpProductApi.getProductMap(convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getProductId));
         // 1.3 供应商
-        Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(
-            convertSet(list, ErpPurchaseOrderDO::getSupplierId));
+        Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(convertSet(list, ErpPurchaseOrderDO::getSupplierId));
         // 1.4 人员
-        Set<Long> userIds = Stream.concat(
-                list.stream()
-                    .flatMap(orderDO -> Stream.of(
-                        orderDO.getAuditorId(),//审核者
-                        safeParseLong(orderDO.getCreator()),
-                        safeParseLong(orderDO.getUpdater())
-                    )),
-                purchaseOrderItemList.stream()
-                    .flatMap(orderItemDO -> Stream.of(
-                        safeParseLong(orderItemDO.getCreator()),
-                        safeParseLong(orderItemDO.getUpdater()),
-                        orderItemDO.getApplicantId()
-                    ))
-            )
-            .distinct()
-            .filter(Objects::nonNull)
-            .collect(Collectors.toSet());
+        Set<Long> userIds = Stream.concat(list.stream().flatMap(orderDO -> Stream.of(orderDO.getAuditorId(),//审核者
+            safeParseLong(orderDO.getCreator()), safeParseLong(orderDO.getUpdater()))), purchaseOrderItemList.stream().flatMap(orderItemDO -> Stream.of(safeParseLong(orderItemDO.getCreator()), safeParseLong(orderItemDO.getUpdater()), orderItemDO.getApplicantId()))).distinct().filter(Objects::nonNull).collect(Collectors.toSet());
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         // 1.5 部门
-        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(
-            convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getApplicationDeptId));
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getApplicationDeptId));
         // 1.6 仓库
-        Map<Long, ErpWarehouseDTO> warehouseMap = wmsWarehouseApi.getWarehouseMap(
-            convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getWarehouseId));
+        Map<Long, ErpWarehouseDTO> warehouseMap = wmsWarehouseApi.getWarehouseMap(convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getWarehouseId));
 
         // 2. 开始拼接
         return BeanUtils.toBean(list, ErpPurchaseOrderBaseRespVO.class, respVO -> {
-            respVO.setItems(BeanUtils.toBean(purchaseOrderItemMap.get(respVO.getId()), ErpPurchaseOrderBaseRespVO.Item.class,
-                item -> {
-                    //设置产品
-                    MapUtils.findAndThen(productMap, item.getProductId(), item::setProduct);
-                    // 设置仓库
-                    MapUtils.findAndThen(warehouseMap, item.getWarehouseId(), erpWarehouseDO -> item.setWarehouseName(erpWarehouseDO.getName()));
-                    //人员
-                    MapUtils.findAndThen(userMap, Long.parseLong(item.getCreator()), user -> item.setCreator(user.getNickname()));
-                    MapUtils.findAndThen(userMap, Long.parseLong(item.getUpdater()), user -> item.setUpdater(user.getNickname()));
-                    //申请人name
-                    MapUtils.findAndThen(userMap, item.getApplicantId(), user -> item.setApplicantName(user.getNickname()));
-                    //部门name
-                    MapUtils.findAndThen(deptMap, item.getApplicationDeptId(), dept -> item.setDepartmentName(dept.getName()));
-                }));
+            respVO.setItems(BeanUtils.toBean(purchaseOrderItemMap.get(respVO.getId()), ErpPurchaseOrderBaseRespVO.Item.class, item -> {
+                //设置产品
+                MapUtils.findAndThen(productMap, item.getProductId(), item::setProduct);
+                // 设置仓库
+                MapUtils.findAndThen(warehouseMap, item.getWarehouseId(), erpWarehouseDO -> item.setWarehouseName(erpWarehouseDO.getName()));
+                //人员
+                MapUtils.findAndThen(userMap, Long.parseLong(item.getCreator()), user -> item.setCreator(user.getNickname()));
+                MapUtils.findAndThen(userMap, Long.parseLong(item.getUpdater()), user -> item.setUpdater(user.getNickname()));
+                //申请人name
+                MapUtils.findAndThen(userMap, item.getApplicantId(), user -> item.setApplicantName(user.getNickname()));
+                //部门name
+                MapUtils.findAndThen(deptMap, item.getApplicationDeptId(), dept -> item.setDepartmentName(dept.getName()));
+            }));
             MapUtils.findAndThen(supplierMap, respVO.getSupplierId(), supplier -> respVO.setSupplierName(supplier.getName()));
             //人员
             MapUtils.findAndThen(userMap, Long.parseLong(respVO.getCreator()), user -> respVO.setCreator(user.getNickname()));
             MapUtils.findAndThen(userMap, Long.parseLong(respVO.getUpdater()), user -> respVO.setUpdater(user.getNickname()));
-            Optional.ofNullable(respVO.getAuditor()).ifPresent(auditor ->
-                MapUtils.findAndThen(userMap, Long.parseLong(auditor), user -> respVO.setAuditorName(user.getNickname()))
-            );
+            Optional.ofNullable(respVO.getAuditor()).ifPresent(auditor -> MapUtils.findAndThen(userMap, Long.parseLong(auditor), user -> respVO.setAuditorName(user.getNickname())));
         });
     }
 

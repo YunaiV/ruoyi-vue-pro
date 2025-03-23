@@ -55,11 +55,10 @@ public class SyncErpProductJobTestSomle extends SomleBaseSpringIntegrationTest {
                 }
                 //根据detailDTOS获得产品id集合
                 List<Long> productIds = detailDTOS.stream().map(ErpCustomRuleDTO::getProductId).toList();
-                List<ErpProductDTO> productDTOs = erpProductApi.listProductDTOs(null);
                 // 过滤掉已经在 `customRuleDTOS` 中的产品
-                List<ErpProductDTO> productDTOS = productDTOs.stream()
+                List<ErpProductDTO> pDTOs = erpProductApi.listProductDTOs(null).stream()
                     .filter(dto -> !productIds.contains(dto.getId())).toList();
-                productDTOS.forEach(dto -> {
+                pDTOs.forEach(dto -> {
                     erpProductHandler.syncProductsToKingdee(List.of(dto));
                     erpProductHandler.syncProductsToEccang(List.of(dto));
                 });

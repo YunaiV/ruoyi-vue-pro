@@ -1,12 +1,10 @@
 package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderAuditReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderMergeReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderPageReqVO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.ErpPurchaseOrderSaveReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.*;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
@@ -38,18 +36,18 @@ public interface ErpPurchaseOrderService {
      */
     void updatePurchaseOrder(@Valid ErpPurchaseOrderSaveReqVO updateReqVO);
 
-//    /**
-//     * 更新采购订单的状态
-//     *
-//     * @param id 编号
-//     * @param status 状态
-//     */
-//    void updatePurchaseOrderStatus(Long id, Integer status);
+    //    /**
+    //     * 更新采购订单的状态
+    //     *
+    //     * @param id 编号
+    //     * @param status 状态
+    //     */
+    //    void updatePurchaseOrderStatus(Long id, Integer status);
 
     /**
      * 更新采购订单的入库数量
      *
-     * @param itemId         编号
+     * @param itemId     编号
      * @param inCountMap 入库数量 Map：key 采购订单项编号；value 入库数量
      */
     void updatePurchaseOrderInCount(Long itemId, Map<Long, BigDecimal> inCountMap);
@@ -85,7 +83,6 @@ public interface ErpPurchaseOrderService {
      */
     ErpPurchaseOrderDO validatePurchaseOrder(Long id);
 
-
     /**
      * 获得采购订单分页
      *
@@ -98,11 +95,13 @@ public interface ErpPurchaseOrderService {
      * 根据订单id获得订单map
      */
     default Map<Long, ErpPurchaseOrderDO> getPurchaseOrderMap(Collection<Long> orderIds) {
-        return this.getPurchaseOrderList(orderIds).stream().collect(Collectors.toMap(ErpPurchaseOrderDO::getId, v -> v));
+        return this.getPurchaseOrderList(orderIds).stream()
+            .collect(Collectors.toMap(ErpPurchaseOrderDO::getId, v -> v));
     }
 
     /**
      * 根据id 获得订单集合
+     *
      * @param orderIds 订单ids
      * @return 订单集合
      */
@@ -118,16 +117,19 @@ public interface ErpPurchaseOrderService {
      */
     default Map<Long, ErpPurchaseOrderDO> getPurchaseOrderItemMap(Collection<Long> itemIds) {
         //TODO 可以优化批量
-        return this.getPurchaseOrderItemList(itemIds).stream().collect(Collectors.toMap(ErpPurchaseOrderItemDO::getId, v -> getPurchaseOrderByItemId(v.getId())));
+        return this.getPurchaseOrderItemList(itemIds).stream()
+            .collect(Collectors.toMap(ErpPurchaseOrderItemDO::getId, v -> getPurchaseOrderByItemId(v.getId())));
     }
 
     List<ErpPurchaseOrderItemDO> getPurchaseOrderItemList(Collection<Long> itemIds);
+
     /**
      * 校验采购订单项是否存在
      *
      * @param id 订单项id
      */
     ErpPurchaseOrderItemDO validatePurchaseOrderItemExists(Long id);
+
     /**
      * 获得采购订单项列表
      *
@@ -173,5 +175,10 @@ public interface ErpPurchaseOrderService {
      */
     void merge(ErpPurchaseOrderMergeReqVO reqVO);
 
-
+    /**
+     * 生成采购合同
+     *
+     * @param reqVO vo
+     */
+    void generateContract(ErpPurchaseOrderGenerateContractReqVO reqVO, HttpServletResponse response);
 }

@@ -30,7 +30,6 @@ import cn.iocoder.yudao.module.system.api.utils.Validation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -67,10 +66,6 @@ public class ErpPurchaseRequestController {
     private final DeptApi deptApi;
     private final ErpSupplierService erpSupplierService;
 
-    @PostConstruct
-    public void init() {
-        System.out.println("erpPurchaseRequestService = " + erpPurchaseRequestService);
-    }
 
     @PostMapping("/create")
     @Operation(summary = "创建ERP采购申请单")
@@ -221,8 +216,8 @@ public class ErpPurchaseRequestController {
                 BeanUtils.toBean(purchaseRequestItemMap.get(purchaseRequest.getId()), ErpPurchaseRequestItemRespVO.class,
                     item -> {
                         MapUtils.findAndThen(productMap, item.getProductId(), product -> item
-                            .setProductName(product.getName())
-                            .setProductBarCode(product.getBarCode())
+                                .setProductName(product.getName())
+                                .setProductBarCode(product.getBarCode())
 //                            .setProductUnitName(product.getUnitName())
                         );
                         //产品仓库填充
@@ -233,7 +228,7 @@ public class ErpPurchaseRequestController {
                         item.setOrderCount(ObjectUtils.defaultIfNull(item.getOrderCount(), 0));//已订购数量
                         item.setInCount(ObjectUtils.defaultIfNull(item.getInCount(), 0));//入库
                         if (item.getApproveCount() != null) {
-                        item.setUnOrderCount(ObjectUtils.defaultIfNull(item.getApproveCount() - item.getOrderCount(), 0));//未订购
+                            item.setUnOrderCount(ObjectUtils.defaultIfNull(item.getApproveCount() - item.getOrderCount(), 0));//未订购
                         }
                     }
                 )
