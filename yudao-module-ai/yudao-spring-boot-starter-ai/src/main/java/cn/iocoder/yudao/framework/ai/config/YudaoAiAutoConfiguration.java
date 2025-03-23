@@ -9,7 +9,6 @@ import cn.iocoder.yudao.framework.ai.core.model.doubao.DouBaoChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiiconflowApiConstants;
-import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiiconflowmageApi;
 import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;

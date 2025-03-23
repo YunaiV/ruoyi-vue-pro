@@ -147,8 +147,8 @@ public class AiImageServiceImpl implements AiImageService {
                     .build();
         } else if (ObjUtil.equal(model.getPlatform(), AiPlatformEnum.SILICON_FLOW.getPlatform())) {
             // https://docs.siliconflow.cn/cn/api-reference/images/images-generations
-            return SiliconflowImageOptions.builder().withModel(model.getModel())
-                    .withHeight(draw.getHeight()).withWidth(draw.getWidth())
+            return SiliconflowImageOptions.builder().model(model.getModel())
+                    .withHeight(draw.getHeight()).withHeight(draw.getWidth())
                     .build();
         }  else if (ObjUtil.equal(model.getPlatform(), AiPlatformEnum.STABLE_DIFFUSION.getPlatform())) {
             // https://platform.stability.ai/docs/api-reference#tag/SDXL-and-SD1.6/operation/textToImage
