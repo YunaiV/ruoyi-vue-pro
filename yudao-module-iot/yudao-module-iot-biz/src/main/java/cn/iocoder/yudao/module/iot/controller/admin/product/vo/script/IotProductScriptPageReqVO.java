@@ -1,6 +1,10 @@
 package cn.iocoder.yudao.module.iot.controller.admin.product.vo.script;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.iot.enums.product.IotProductScriptLanguageEnum;
+import cn.iocoder.yudao.module.iot.enums.product.IotProductScriptStatusEnum;
+import cn.iocoder.yudao.module.iot.enums.product.IotProductScriptTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,13 +27,16 @@ public class IotProductScriptPageReqVO extends PageParam {
     @Schema(description = "产品唯一标识符")
     private String productKey;
 
-    @Schema(description = "脚本类型(property_parser=属性解析,event_parser=事件解析,command_encoder=命令编码)", example = "2")
-    private String scriptType;
+    @Schema(description = "脚本类型", example = "1")
+    @InEnum(IotProductScriptTypeEnum.class)
+    private Integer scriptType;
 
     @Schema(description = "脚本语言")
+    @InEnum(IotProductScriptLanguageEnum.class)
     private String scriptLanguage;
 
-    @Schema(description = "状态(0=禁用 1=启用)", example = "2")
+    @Schema(description = "状态", example = "0")
+    @InEnum(IotProductScriptStatusEnum.class)
     private Integer status;
 
     @Schema(description = "备注说明", example = "你说的对")

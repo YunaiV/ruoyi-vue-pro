@@ -1,5 +1,9 @@
 package cn.iocoder.yudao.module.iot.controller.admin.product.vo.script;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.iot.enums.product.IotProductScriptLanguageEnum;
+import cn.iocoder.yudao.module.iot.enums.product.IotProductScriptStatusEnum;
+import cn.iocoder.yudao.module.iot.enums.product.IotProductScriptTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -20,9 +24,10 @@ public class IotProductScriptSaveReqVO {
     @NotEmpty(message = "产品唯一标识符不能为空")
     private String productKey;
 
-    @Schema(description = "脚本类型(property_parser=属性解析,event_parser=事件解析,command_encoder=命令编码)", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @NotEmpty(message = "脚本类型(property_parser=属性解析,event_parser=事件解析,command_encoder=命令编码)不能为空")
-    private String scriptType;
+    @Schema(description = "脚本类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "脚本类型不能为空")
+    @InEnum(IotProductScriptTypeEnum.class)
+    private Integer scriptType;
 
     @Schema(description = "脚本内容", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "脚本内容不能为空")
@@ -30,10 +35,12 @@ public class IotProductScriptSaveReqVO {
 
     @Schema(description = "脚本语言", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "脚本语言不能为空")
+    @InEnum(IotProductScriptLanguageEnum.class)
     private String scriptLanguage;
 
-    @Schema(description = "状态(0=禁用 1=启用)", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @NotNull(message = "状态(0=禁用 1=启用)不能为空")
+    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
+    @NotNull(message = "状态不能为空")
+    @InEnum(IotProductScriptStatusEnum.class)
     private Integer status;
 
     @Schema(description = "备注说明", example = "你说的对")

@@ -147,14 +147,14 @@ public class IotProductScriptServiceImpl implements IotProductScriptService {
 
             // 根据脚本类型设置特定参数
             switch (testReqVO.getScriptType()) {
-                case "property_parser":
+                case 1: // PROPERTY_PARSER
                     params.put("method", "property");
                     break;
-                case "event_parser":
+                case 2: // EVENT_PARSER
                     params.put("method", "event");
                     params.put("identifier", "default");
                     break;
-                case "command_encoder":
+                case 3: // COMMAND_ENCODER
                     params.put("method", "command");
                     break;
                 default:

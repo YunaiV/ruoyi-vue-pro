@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.iot.controller.admin.product.vo.script;
 
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.iot.enums.product.IotProductScriptTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -16,9 +18,10 @@ public class IotProductScriptTestReqVO {
     @NotNull(message = "产品ID不能为空")
     private Long productId;
 
-    @Schema(description = "脚本类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "property_parser")
-    @NotEmpty(message = "脚本类型不能为空")
-    private String scriptType;
+    @Schema(description = "脚本类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "脚本类型不能为空")
+    @InEnum(value = IotProductScriptTypeEnum.class)
+    private Integer scriptType;
 
     @Schema(description = "脚本内容", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "脚本内容不能为空")

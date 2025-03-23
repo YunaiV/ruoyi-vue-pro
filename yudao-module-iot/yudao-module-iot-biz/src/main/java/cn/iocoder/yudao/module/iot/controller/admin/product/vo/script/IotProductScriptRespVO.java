@@ -24,9 +24,9 @@ public class IotProductScriptRespVO {
     @ExcelProperty("产品唯一标识符")
     private String productKey;
 
-    @Schema(description = "脚本类型(property_parser=属性解析,event_parser=事件解析,command_encoder=命令编码)", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @ExcelProperty("脚本类型(property_parser=属性解析,event_parser=事件解析,command_encoder=命令编码)")
-    private String scriptType;
+    @Schema(description = "脚本类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @ExcelProperty("脚本类型")
+    private Integer scriptType;
 
     @Schema(description = "脚本内容", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("脚本内容")
@@ -36,8 +36,8 @@ public class IotProductScriptRespVO {
     @ExcelProperty("脚本语言")
     private String scriptLanguage;
 
-    @Schema(description = "状态(0=禁用 1=启用)", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @ExcelProperty("状态(0=禁用 1=启用)")
+    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
+    @ExcelProperty("状态")
     private Integer status;
 
     @Schema(description = "备注说明", example = "你说的对")
