@@ -981,7 +981,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(taskList.get(0).getProcessDefinitionId());
         List<String> activityIds = CollUtil.newArrayList(convertSet(taskList, Task::getTaskDefinitionKey));
         EndEvent endEvent = BpmnModelUtils.getEndEvent(bpmnModel);
-        Assert.notNull(endEvent, "结束节点不能未空");
+        Assert.notNull(endEvent, "结束节点不能为空");
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(processInstanceId)
                 .moveActivityIdsToSingleActivityId(activityIds, endEvent.getId())

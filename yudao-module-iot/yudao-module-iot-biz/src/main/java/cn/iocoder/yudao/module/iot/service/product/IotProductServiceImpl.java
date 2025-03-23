@@ -1,20 +1,23 @@
 package cn.iocoder.yudao.module.iot.service.product;
 
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.product.vo.IotProductPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.product.vo.IotProductSaveReqVO;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.product.IotProductMapper;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
+import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
+import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
@@ -31,32 +34,25 @@ public class IotProductServiceImpl implements IotProductService {
     @Resource
     private IotProductMapper productMapper;
 
+    @Resource
+    @Lazy  // 延迟加载，解决循环依赖
+    private IotDevicePropertyService devicePropertyDataService;
+
     @Override
     public Long createProduct(IotProductSaveReqVO createReqVO) {
-        // 1. 生成 ProductKey
-        createProductKey(createReqVO);
+        // 1. 校验 ProductKey
+        TenantUtils.executeIgnore(() -> {
+            // 为什么忽略租户？避免多个租户之间，productKey 重复，导致 TDengine 设备属性表重复
+            if (productMapper.selectByProductKey(createReqVO.getProductKey()) != null) {
+                throw exception(PRODUCT_KEY_EXISTS);
+            }
+        });
+
         // 2. 插入
-        IotProductDO product = BeanUtils.toBean(createReqVO, IotProductDO.class);
+        IotProductDO product = BeanUtils.toBean(createReqVO, IotProductDO.class)
+                .setStatus(IotProductStatusEnum.UNPUBLISHED.getStatus());
         productMapper.insert(product);
         return product.getId();
-    }
-
-    /**
-     * 创建 ProductKey
-     *
-     * @param createReqVO 创建信息
-     */
-    private void createProductKey(IotProductSaveReqVO createReqVO) {
-        String productKey = createReqVO.getProductKey();
-        // 1. productKey为空，生成随机的 11 位字符串
-        if (StrUtil.isEmpty(productKey)) {
-            productKey = UUID.randomUUID().toString().replace("-", "").substring(0, 11);
-        }
-        // 2. 校验唯一性
-        if (productMapper.selectByProductKey(productKey) != null) {
-            throw exception(PRODUCT_IDENTIFICATION_EXISTS);
-        }
-        createReqVO.setProductKey(productKey);
     }
 
     @Override
@@ -81,16 +77,26 @@ public class IotProductServiceImpl implements IotProductService {
         productMapper.deleteById(id);
     }
 
-    private IotProductDO validateProductExists(Long id) {
-        IotProductDO iotProductDO = productMapper.selectById(id);
-        if (iotProductDO == null) {
+    @Override
+    public IotProductDO validateProductExists(Long id) {
+        IotProductDO product = productMapper.selectById(id);
+        if (product == null) {
             throw exception(PRODUCT_NOT_EXISTS);
         }
-        return iotProductDO;
+        return product;
     }
 
-    private void validateProductStatus(IotProductDO iotProductDO) {
-        if (Objects.equals(iotProductDO.getStatus(), IotProductStatusEnum.PUBLISHED.getType())) {
+    @Override
+    public IotProductDO validateProductExists(String productKey) {
+        IotProductDO product = productMapper.selectByProductKey(productKey);
+        if (product == null) {
+            throw exception(PRODUCT_NOT_EXISTS);
+        }
+        return product;
+    }
+
+    private void validateProductStatus(IotProductDO product) {
+        if (Objects.equals(product.getStatus(), IotProductStatusEnum.PUBLISHED.getStatus())) {
             throw exception(PRODUCT_STATUS_NOT_DELETE);
         }
     }
@@ -101,15 +107,28 @@ public class IotProductServiceImpl implements IotProductService {
     }
 
     @Override
+    public IotProductDO getProductByProductKey(String productKey) {
+        return productMapper.selectByProductKey(productKey);
+    }
+
+    @Override
     public PageResult<IotProductDO> getProductPage(IotProductPageReqVO pageReqVO) {
         return productMapper.selectPage(pageReqVO);
     }
 
     @Override
+    @DSTransactional(rollbackFor = Exception.class)
     public void updateProductStatus(Long id, Integer status) {
         // 1. 校验存在
         validateProductExists(id);
-        // 2. 更新
+
+        // 2. 更新为发布状态，需要创建产品超级表数据模型
+        // TODO @芋艿：【待定 001】1）是否需要操作后，在 redis 进行缓存，实现一个“快照”的情况，类似 tl；
+        if (Objects.equals(status, IotProductStatusEnum.PUBLISHED.getStatus())) {
+            devicePropertyDataService.defineDevicePropertyData(id);
+        }
+
+        // 3. 更新
         IotProductDO updateObj = IotProductDO.builder().id(id).status(status).build();
         productMapper.updateById(updateObj);
     }
@@ -118,5 +137,11 @@ public class IotProductServiceImpl implements IotProductService {
     public List<IotProductDO> getProductList() {
         return productMapper.selectList();
     }
+
+    @Override
+    public Long getProductCount(LocalDateTime createTime) {
+        return productMapper.selectCountByCreateTime(createTime);
+    }
+
 
 }

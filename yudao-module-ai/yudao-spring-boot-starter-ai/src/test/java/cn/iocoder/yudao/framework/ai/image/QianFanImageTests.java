@@ -10,14 +10,15 @@ import org.springframework.ai.qianfan.api.QianFanImageApi;
 
 import static cn.iocoder.yudao.framework.ai.image.StabilityAiImageModelTests.viewImage;
 
+// TODO @芋艿：百度千帆 API 提供了 V2 版本，目前 Spring AI 不兼容，可关键 <https://github.com/spring-projects/spring-ai/issues/2179> 进展
+
 /**
  * {@link QianFanImageModel} 集成测试类
  */
 public class QianFanImageTests {
 
-    private final QianFanImageApi imageApi = new QianFanImageApi(
-            "qS8k8dYr2nXunagK4SSU8Xjj", "pHGbx51ql2f0hOyabQvSZezahVC3hh3e");
-    private final QianFanImageModel imageModel = new QianFanImageModel(imageApi);
+    private final QianFanImageModel imageModel = new QianFanImageModel(
+            new QianFanImageApi("qS8k8dYr2nXunagK4SSU8Xjj", "pHGbx51ql2f0hOyabQvSZezahVC3hh3e")); // 密钥
 
     @Test
     @Disabled
@@ -25,9 +26,9 @@ public class QianFanImageTests {
         // 准备参数
         // 只支持 1024x1024、768x768、768x1024、1024x768、576x1024、1024x576
         QianFanImageOptions imageOptions = QianFanImageOptions.builder()
-                .withModel(QianFanImageApi.ImageModel.Stable_Diffusion_XL.getValue())
-                .withWidth(1024).withHeight(1024)
-                .withN(1)
+                .model(QianFanImageApi.ImageModel.Stable_Diffusion_XL.getValue())
+                .width(1024).height(1024)
+                .N(1)
                 .build();
         ImagePrompt prompt = new ImagePrompt("good", imageOptions);
 

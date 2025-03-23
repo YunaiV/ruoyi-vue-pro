@@ -32,7 +32,7 @@ public interface AiChatRoleService {
      * 创建【我的】聊天角色
      *
      * @param createReqVO 创建信息
-     * @param userId 用户编号
+     * @param userId      用户编号
      * @return 编号
      */
     Long createChatRoleMy(AiChatRoleSaveMyReqVO createReqVO, Long userId);
@@ -48,7 +48,7 @@ public interface AiChatRoleService {
      * 创建【我的】聊天角色
      *
      * @param updateReqVO 更新信息
-     * @param userId 用户编号
+     * @param userId      用户编号
      */
     void updateChatRoleMy(AiChatRoleSaveMyReqVO updateReqVO, Long userId);
 
@@ -62,7 +62,7 @@ public interface AiChatRoleService {
     /**
      * 删除【我的】聊天角色
      *
-     * @param id 编号
+     * @param id     编号
      * @param userId 用户编号
      */
     void deleteChatRoleMy(Long id, Long userId);
@@ -106,7 +106,7 @@ public interface AiChatRoleService {
      * 获得【我的】聊天角色分页
      *
      * @param pageReqVO 分页查询
-     * @param userId 用户编号
+     * @param userId    用户编号
      * @return 聊天角色分页
      */
     PageResult<AiChatRoleDO> getChatRoleMyPage(AiChatRolePageReqVO pageReqVO, Long userId);

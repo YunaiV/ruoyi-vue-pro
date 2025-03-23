@@ -17,17 +17,16 @@ import lombok.Data;
 @Data
 public class AiKnowledgeSegmentDO extends BaseDO {
 
-    public static final String FIELD_KNOWLEDGE_ID = "knowledgeId";
+    /**
+     * 向量库的编号 - 空值
+     */
+    public static final String VECTOR_ID_EMPTY = "";
 
     /**
      * 编号
      */
     @TableId
     private Long id;
-    /**
-     * 向量库的编号
-     */
-    private String vectorId;
     /**
      * 知识库编号
      * <p>
@@ -45,13 +44,24 @@ public class AiKnowledgeSegmentDO extends BaseDO {
      */
     private String content;
     /**
-     * 字符数
+     * 切片内容长度
      */
-    private Integer wordCount;
+    private Integer contentLength;
+
+    /**
+     * 向量库的编号
+     */
+    private String vectorId;
     /**
      * token 数量
      */
     private Integer tokens;
+
+    /**
+     * 召回次数
+     */
+    private Integer retrievalCount;
+
     /**
      * 状态
      * <p>

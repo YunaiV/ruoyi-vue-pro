@@ -94,6 +94,7 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
         if (userIds == null) { // 没查询到用户，说明肯定也没他的订单
             return PageResult.empty();
         }
+
         // 分页查询
         return tradeOrderMapper.selectPage(reqVO, userIds);
     }
@@ -126,7 +127,7 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
             return new TradeOrderSummaryRespVO();
         }
         // 查询每个售后状态对应的数量、金额
-        List<Map<String, Object>> list = tradeOrderMapper.selectOrderSummaryGroupByRefundStatus(reqVO, null);
+        List<Map<String, Object>> list = tradeOrderMapper.selectOrderSummaryGroupByRefundStatus(reqVO, userIds);
 
         TradeOrderSummaryRespVO vo = new TradeOrderSummaryRespVO().setAfterSaleCount(0L).setAfterSalePrice(0L);
         for (Map<String, Object> map : list) {

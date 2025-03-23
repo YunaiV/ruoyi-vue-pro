@@ -21,9 +21,8 @@ import java.util.Collection;
 public interface ProductBrowseHistoryMapper extends BaseMapperX<ProductBrowseHistoryDO> {
 
     default ProductBrowseHistoryDO selectByUserIdAndSpuId(Long userId, Long spuId) {
-        return selectOne(new LambdaQueryWrapperX<ProductBrowseHistoryDO>()
-                .eq(ProductBrowseHistoryDO::getUserId, userId)
-                .eq(ProductBrowseHistoryDO::getSpuId, spuId));
+        return selectFirstOne(ProductBrowseHistoryDO::getUserId, userId,
+                ProductBrowseHistoryDO::getSpuId, spuId);
     }
 
     default PageResult<ProductBrowseHistoryDO> selectPage(ProductBrowseHistoryPageReqVO reqVO) {

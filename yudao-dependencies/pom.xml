@@ -14,7 +14,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>2.4.0-SNAPSHOT</revision>
+        <revision>2.4.1-SNAPSHOT</revision>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
         <spring.boot.version>3.4.1</spring.boot.version>
@@ -32,8 +32,9 @@
         <dm8.jdbc.version>8.1.3.140</dm8.jdbc.version>
         <kingbase.jdbc.version>8.6.0</kingbase.jdbc.version>
         <opengauss.jdbc.version>5.1.0</opengauss.jdbc.version>
+        <taos.version>3.3.3</taos.version>
         <!-- 消息队列 -->
-        <rocketmq-spring.version>2.3.1</rocketmq-spring.version>
+        <rocketmq-spring.version>2.3.2</rocketmq-spring.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.7</lock4j.version>
         <!-- 监控相关 -->
@@ -53,25 +54,27 @@
         <mapstruct.version>1.6.3</mapstruct.version>
         <hutool-5.version>5.8.35</hutool-5.version>
         <hutool-6.version>6.0.0-M19</hutool-6.version>
-        <easyexcel.verion>4.0.3</easyexcel.verion>
+        <easyexcel.version>4.0.3</easyexcel.version>
         <velocity.version>2.4.1</velocity.version>
         <fastjson.version>1.2.83</fastjson.version>
         <guava.version>33.4.0-jre</guava.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <commons-net.version>3.11.1</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
-        <tika-core.version>2.9.2</tika-core.version>
+        <tika-core.version>3.1.0</tika-core.version>
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
         <netty.version>4.1.116.Final</netty.version>
         <mqtt.version>1.2.5</mqtt.version>
+        <pf4j-spring.version>0.9.0</pf4j-spring.version>
+        <vertx.version>4.5.13</vertx.version>
         <!-- 三方云服务相关 -->
         <commons-io.version>2.17.0</commons-io.version>
         <commons-compress.version>1.27.1</commons-compress.version>
         <aws-java-sdk-s3.version>1.12.777</aws-java-sdk-s3.version>
         <justauth.version>2.0.5</justauth.version>
         <jimureport.version>1.8.1</jimureport.version>
-        <weixin-java.version>4.6.0</weixin-java.version>
+        <weixin-java.version>4.7.2.B</weixin-java.version>
     </properties>
 
     <dependencyManagement>
@@ -263,6 +266,12 @@
                 <version>${kingbase.jdbc.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.taosdata.jdbc</groupId>
+                <artifactId>taos-jdbcdriver</artifactId>
+                <version>${taos.version}</version>
+            </dependency>
+
             <!-- Job 定时任务相关 -->
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
@@ -276,7 +285,6 @@
                 <artifactId>yudao-spring-boot-starter-mq</artifactId>
                 <version>${revision}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.apache.rocketmq</groupId>
                 <artifactId>rocketmq-spring-boot-starter</artifactId>
@@ -471,7 +479,7 @@
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>easyexcel</artifactId>
-                <version>${easyexcel.verion}</version>
+                <version>${easyexcel.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
@@ -589,6 +597,36 @@
                         <artifactId>druid</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <!-- PF4J -->
+            <dependency>
+                <groupId>org.pf4j</groupId>
+                <artifactId>pf4j-spring</artifactId>
+                <version>${pf4j-spring.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- Vert.x -->
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-core</artifactId>
+                <version>${vertx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-web</artifactId>
+                <version>${vertx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-mqtt</artifactId>
+                <version>${vertx.version}</version>
             </dependency>
 
             <!-- MQTT -->

@@ -92,9 +92,35 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
 
     default T selectOne(SFunction<T, ?> field1, Object value1, SFunction<T, ?> field2, Object value2,
                         SFunction<T, ?> field3, Object value3) {
-        return selectOne(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2)
-                .eq(field3, value3));
+        return selectOne(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2).eq(field3, value3));
     }
+
+    /**
+     * 获取满足条件的第 1 条记录
+     *
+     * 目的：解决并发场景下，插入多条记录后，使用 selectOne 会报错的问题
+     *
+     * @param field 字段名
+     * @param value 字段值
+     * @return 实体
+     */
+    default T selectFirstOne(SFunction<T, ?> field, Object value) {
+        // 如果明确使用 MySQL 等场景，可以考虑使用 LIMIT 1 进行优化
+        List<T> list = selectList(new LambdaQueryWrapper<T>().eq(field, value));
+        return CollUtil.getFirst(list);
+    }
+
+    default T selectFirstOne(SFunction<T, ?> field1, Object value1, SFunction<T, ?> field2, Object value2) {
+        List<T> list = selectList(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2));
+        return CollUtil.getFirst(list);
+    }
+
+    default T selectFirstOne(SFunction<T,?> field1, Object value1, SFunction<T,?> field2, Object value2,
+                             SFunction<T,?> field3, Object value3) {
+        List<T> list = selectList(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2).eq(field3, value3));
+        return CollUtil.getFirst(list);
+    }
+
 
     default Long selectCount() {
         return selectCount(new QueryWrapper<>());

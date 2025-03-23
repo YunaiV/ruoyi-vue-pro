@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
-import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
+import com.github.binarywang.wxpay.bean.order.WxPayAppOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderV3Request;
 import com.github.binarywang.wxpay.bean.result.WxPayUnifiedOrderV3Result;
@@ -41,7 +41,7 @@ public class WxAppPayClient extends AbstractWxPayClient {
         // 构建 WxPayUnifiedOrderRequest 对象
         WxPayUnifiedOrderRequest request = buildPayUnifiedOrderRequestV2(reqDTO);
         // 执行请求
-        WxPayMpOrderResult response = client.createOrder(request);
+        WxPayAppOrderResult response = client.createOrder(request);
 
         // 转换结果
         return PayOrderRespDTO.waitingOf(PayOrderDisplayModeEnum.APP.getMode(), toJsonString(response),

@@ -4,6 +4,10 @@ server:
 --- #################### 数据库相关配置 ####################
 
 spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.ai.autoconfigure.vectorstore.qdrant.QdrantVectorStoreAutoConfiguration # 禁用 AI 模块的 Qdrant，手动创建
+      - org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusVectorStoreAutoConfiguration # 禁用 AI 模块的 Milvus，手动创建
   # 数据源配置项
   datasource:
     druid: # Druid 【监控】相关的全局配置
@@ -214,3 +218,8 @@ iot:
     keepalive: 60
     # 清除会话(设置为false,断开连接，重连后使用原来的会话 保留订阅的主题，能接收离线期间的消息)
     clearSession: true
+
+
+# 插件配置
+pf4j:
+  pluginsDir: ${user.home}/plugins # 插件目录

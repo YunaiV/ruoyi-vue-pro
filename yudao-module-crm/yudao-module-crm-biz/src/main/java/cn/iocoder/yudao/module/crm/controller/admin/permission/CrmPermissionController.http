@@ -2,7 +2,7 @@
 POST {{baseUrl}}/crm/permission/create
 Content-Type: application/json
 Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
 
 {
   "userId": 1,
@@ -15,7 +15,7 @@ tenant-id: {{adminTenentId}}
 PUT {{baseUrl}}/crm/permission/update
 Content-Type: application/json
 Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
 
 {
   "userId": 1,
@@ -28,5 +28,5 @@ tenant-id: {{adminTenentId}}
 ### 请求 /delete
 DELETE {{baseUrl}}/crm/permission/delete?bizType=2&bizId=1&id=1
 Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
 

@@ -22,9 +22,12 @@ import java.util.List;
  */
 public class ZhiPuAiChatModelTests {
 
-    private final ZhiPuAiApi zhiPuAiApi = new ZhiPuAiApi("32f84543e54eee31f8d56b2bd6020573.3vh9idLJZ2ZhxDEs");
-    private final ZhiPuAiChatModel chatModel = new ZhiPuAiChatModel(zhiPuAiApi,
-            ZhiPuAiChatOptions.builder().withModel(ZhiPuAiApi.ChatModel.GLM_4.getModelName()).build());
+    private final ZhiPuAiChatModel chatModel = new ZhiPuAiChatModel(
+            new ZhiPuAiApi("32f84543e54eee31f8d56b2bd6020573.3vh9idLJZ2ZhxDEs"), // 密钥
+            ZhiPuAiChatOptions.builder()
+                    .model(ZhiPuAiApi.ChatModel.GLM_4.getName()) // 模型
+                    .build()
+    );
 
     @Test
     @Disabled

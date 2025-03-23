@@ -1,4 +1,4 @@
 ### 请求 /menu/list 接口 => 成功
 GET {{baseUrl}}/system/dict-data/list-all-simple
 Authorization: Bearer {{token}}
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}

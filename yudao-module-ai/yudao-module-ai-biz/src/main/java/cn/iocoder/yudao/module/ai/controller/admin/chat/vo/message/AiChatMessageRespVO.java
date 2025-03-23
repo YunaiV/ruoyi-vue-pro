@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "管理后台 - AI 聊天消息 Response VO")
 @Data
@@ -39,6 +40,12 @@ public class AiChatMessageRespVO {
     @Schema(description = "是否携带上下文", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     private Boolean useContext;
 
+    @Schema(description = "知识库段落编号数组", example = "[1,2,3]")
+    private List<Long> segmentIds;
+
+    @Schema(description = "知识库段落数组")
+    private List<KnowledgeSegment> segments;
+
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "2024-05-12 12:51")
     private LocalDateTime createTime;
 
@@ -46,5 +53,23 @@ public class AiChatMessageRespVO {
 
     @Schema(description = "角色名字", example = "小黄")
     private String roleName;
+
+    @Schema(description = "知识库段落", example = "Java 开发手册")
+    @Data
+    public static class KnowledgeSegment {
+
+        @Schema(description = "段落编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+        private Long id;
+
+        @Schema(description = "切片内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "Java 开发手册")
+        private String content;
+
+        @Schema(description = "文档编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "24790")
+        private Long documentId;
+
+        @Schema(description = "文档名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "产品使用手册")
+        private String documentName;
+
+    }
 
 }
