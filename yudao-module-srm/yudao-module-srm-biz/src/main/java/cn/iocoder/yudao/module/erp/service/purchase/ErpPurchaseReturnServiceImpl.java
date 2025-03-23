@@ -61,7 +61,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
     private final ErpAccountApi erpAccountApi;
 
     @Resource(name = PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME)
-    private StateMachine<ErpStorageStatus, SrmEventEnum, SrmInCountDTO> orderItemStorageMachine;
+    StateMachine<ErpStorageStatus, SrmEventEnum, SrmInCountDTO> orderItemStorageMachine;
     @Resource(name = PURCHASE_RETURN_AUDIT_STATE_MACHINE_NAME)
     StateMachine<SrmAuditStatus, SrmEventEnum, ErpPurchaseReturnAuditReqVO> auditStatusMachine;
     @Resource(name = PURCHASE_RETURN_REFUND_STATE_MACHINE_NAME)
