@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactory;
 import cn.iocoder.yudao.framework.ai.core.factory.AiModelFactoryImpl;
+import cn.iocoder.yudao.framework.ai.core.model.baichuan.BaiChuanChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.doubao.DouBaoChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.hunyuan.HunYuanChatModel;
@@ -191,6 +192,33 @@ public class YudaoAiAutoConfiguration {
                 .toolCallingManager(getToolCallingManager())
                 .build();
         return new XingHuoChatModel(openAiChatModel);
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.baichuan.enable", havingValue = "true")
+    public BaiChuanChatModel baiChuanChatClient(YudaoAiProperties yudaoAiProperties) {
+        YudaoAiProperties.BaiChuanProperties properties = yudaoAiProperties.getBaichuan();
+        return buildBaiChuanChatClient(properties);
+    }
+
+    public BaiChuanChatModel buildBaiChuanChatClient(YudaoAiProperties.BaiChuanProperties properties) {
+        if (StrUtil.isEmpty(properties.getModel())) {
+            properties.setModel(BaiChuanChatModel.MODEL_DEFAULT);
+        }
+        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
+                .openAiApi(OpenAiApi.builder()
+                        .baseUrl(BaiChuanChatModel.BASE_URL)
+                        .apiKey(properties.getApiKey())
+                        .build())
+                .defaultOptions(OpenAiChatOptions.builder()
+                        .model(properties.getModel())
+                        .temperature(properties.getTemperature())
+                        .maxTokens(properties.getMaxTokens())
+                        .topP(properties.getTopP())
+                        .build())
+                .toolCallingManager(getToolCallingManager())
+                .build();
+        return new BaiChuanChatModel(openAiChatModel);
     }
 
     @Bean

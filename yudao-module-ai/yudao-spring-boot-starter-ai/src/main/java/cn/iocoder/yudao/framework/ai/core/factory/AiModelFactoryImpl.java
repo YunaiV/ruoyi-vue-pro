@@ -11,6 +11,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.ai.config.YudaoAiAutoConfiguration;
 import cn.iocoder.yudao.framework.ai.config.YudaoAiProperties;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import cn.iocoder.yudao.framework.ai.core.model.baichuan.BaiChuanChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.doubao.DouBaoChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.hunyuan.HunYuanChatModel;
@@ -150,6 +151,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildMoonshotChatModel(apiKey, url);
                 case XING_HUO:
                     return buildXingHuoChatModel(apiKey);
+                case BAI_CHUAN:
+                    return buildBaiChuanChatModel(apiKey);
                 case OPENAI:
                     return buildOpenAiChatModel(apiKey, url);
                 case AZURE_OPENAI:
@@ -186,6 +189,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(MoonshotChatModel.class);
             case XING_HUO:
                 return SpringUtil.getBean(XingHuoChatModel.class);
+            case BAI_CHUAN:
+                return SpringUtil.getBean(AzureOpenAiChatModel.class);
             case OPENAI:
                 return SpringUtil.getBean(OpenAiChatModel.class);
             case AZURE_OPENAI:
@@ -439,6 +444,15 @@ public class AiModelFactoryImpl implements AiModelFactory {
         YudaoAiProperties.XingHuoProperties properties = new YudaoAiProperties.XingHuoProperties()
                 .setAppKey(keys.get(0)).setSecretKey(keys.get(1));
         return new YudaoAiAutoConfiguration().buildXingHuoChatClient(properties);
+    }
+
+    /**
+     * 可参考 {@link YudaoAiAutoConfiguration#baiChuanChatClient(YudaoAiProperties)}
+     */
+    private BaiChuanChatModel buildBaiChuanChatModel(String apiKey) {
+        YudaoAiProperties.BaiChuanProperties properties = new YudaoAiProperties.BaiChuanProperties()
+                .setApiKey(apiKey);
+        return new YudaoAiAutoConfiguration().buildBaiChuanChatClient(properties);
     }
 
     /**
