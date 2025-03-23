@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.system.controller.admin.tenant;
 
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -9,7 +10,6 @@ import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantSaveReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantSimpleRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +27,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 @Tag(name = "管理后台 - 租户")
 @RestController
@@ -45,13 +46,25 @@ public class TenantController {
         return success(tenant != null ? tenant.getId() : null);
     }
 
+    @GetMapping({ "simple-list" })
+    @PermitAll
+    @Operation(summary = "获取租户精简信息列表", description = "只包含被开启的租户，用于【首页】功能的选择租户选项")
+    public CommonResult<List<TenantRespVO>> getTenantSimpleList() {
+        List<TenantDO> list = tenantService.getTenantListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        return success(convertList(list, tenantDO ->
+                new TenantRespVO().setId(tenantDO.getId()).setName(tenantDO.getName())));
+    }
+
     @GetMapping("/get-by-website")
     @PermitAll
     @Operation(summary = "使用域名，获得租户信息", description = "登录界面，根据用户的域名，获得租户信息")
     @Parameter(name = "website", description = "域名", required = true, example = "www.iocoder.cn")
-    public CommonResult<TenantSimpleRespVO> getTenantByWebsite(@RequestParam("website") String website) {
+    public CommonResult<TenantRespVO> getTenantByWebsite(@RequestParam("website") String website) {
         TenantDO tenant = tenantService.getTenantByWebsite(website);
-        return success(BeanUtils.toBean(tenant, TenantSimpleRespVO.class));
+        if (tenant == null || CommonStatusEnum.isDisable(tenant.getStatus())) {
+            return success(null);
+        }
+        return success(new TenantRespVO().setId(tenant.getId()).setName(tenant.getName()));
     }
 
     @PostMapping("/create")
@@ -99,8 +112,7 @@ public class TenantController {
     @Operation(summary = "导出租户 Excel")
     @PreAuthorize("@ss.hasPermission('system:tenant:export')")
     @ApiAccessLog(operateType = EXPORT)
-    public void exportTenantExcel(@Valid TenantPageReqVO exportReqVO,
-                                  HttpServletResponse response) throws IOException {
+    public void exportTenantExcel(@Valid TenantPageReqVO exportReqVO, HttpServletResponse response) throws IOException {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<TenantDO> list = tenantService.getTenantPage(exportReqVO).getList();
         // 导出 Excel

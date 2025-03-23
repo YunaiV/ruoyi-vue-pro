@@ -2,24 +2,21 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.d
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.user.BpmTaskCandidateUserStrategy;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
-import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import com.google.common.collect.Sets;
 import jakarta.annotation.Resource;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.ServiceTask;
-import org.flowable.bpmn.model.Task;
-import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 发起人自选 {@link BpmTaskCandidateUserStrategy} 实现类
@@ -55,7 +52,7 @@ public class BpmTaskCandidateStartUserSelectStrategy extends AbstractBpmTaskCand
                 execution.getProcessInstanceId());
         // 获得审批人
         List<Long> assignees = startUserSelectAssignees.get(execution.getCurrentActivityId());
-        return new LinkedHashSet<>(assignees);
+        return CollUtil.isNotEmpty(assignees) ? new LinkedHashSet<>(assignees) : Sets.newLinkedHashSet();
     }
 
     @Override
@@ -70,28 +67,7 @@ public class BpmTaskCandidateStartUserSelectStrategy extends AbstractBpmTaskCand
         }
         // 获得审批人
         List<Long> assignees = startUserSelectAssignees.get(activityId);
-        return new LinkedHashSet<>(assignees);
-    }
-
-    /**
-     * 获得发起人自选审批人或抄送人的 Task 列表
-     *
-     * @param bpmnModel BPMN 模型
-     * @return Task 列表
-     */
-    public static List<Task> getStartUserSelectTaskList(BpmnModel bpmnModel) {
-        if (bpmnModel == null) {
-            return Collections.emptyList();
-        }
-        List<Task> tasks = new ArrayList<>();
-        tasks.addAll(BpmnModelUtils.getBpmnModelElements(bpmnModel, UserTask.class));
-        tasks.addAll(BpmnModelUtils.getBpmnModelElements(bpmnModel, ServiceTask.class));
-        if (CollUtil.isEmpty(tasks)) {
-            return Collections.emptyList();
-        }
-        tasks.removeIf(task -> ObjectUtil.notEqual(BpmnModelUtils.parseCandidateStrategy(task),
-                BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy()));
-        return tasks;
+        return CollUtil.isNotEmpty(assignees) ? new LinkedHashSet<>(assignees) : Sets.newLinkedHashSet();
     }
 
 }

@@ -26,6 +26,7 @@ public enum BpmReasonEnum {
     TIMEOUT_REJECT("审批超时，系统自动不通过"),
     ASSIGN_START_USER_APPROVE("审批人与提交人为同一人时，自动通过"),
     ASSIGN_START_USER_APPROVE_WHEN_SKIP("审批人与提交人为同一人时，自动通过"),
+    ASSIGN_START_USER_APPROVE_WHEN_SKIP_START_USER_NODE("发起人节点首次自动通过"), // 目前仅“子流程”使用
     ASSIGN_START_USER_APPROVE_WHEN_DEPT_LEADER_NOT_FOUND("审批人与提交人为同一人时，找不到部门负责人，自动通过"),
     ASSIGN_START_USER_TRANSFER_DEPT_LEADER("审批人与提交人为同一人时，转交给部门负责人审批"),
     ASSIGN_EMPTY_APPROVE("审批人为空，自动通过"),

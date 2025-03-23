@@ -48,7 +48,7 @@ springdoc:
   default-flat-param-object: true # 参见 https://doc.xiaominfo.com/docs/faq/v4/knife4j-parameterobject-flat-param 文档
 
 knife4j:
-  enable: true
+  enable: false # TODO 芋艿：需要关闭增强，具体原因见：https://github.com/xiaoymin/knife4j/issues/874
   setting:
     language: zh_cn
 
@@ -271,6 +271,7 @@ yudao:
     ignore-urls:
       - /admin-api/system/tenant/get-id-by-name # 基于名字获取租户，不许带租户编号
       - /admin-api/system/tenant/get-by-website # 基于域名获取租户，不许带租户编号
+      - /admin-api/system/tenant/simple-list # 获取租户列表，不许带租户编号
       - /admin-api/system/captcha/get # 获取图片验证码，和租户无关
       - /admin-api/system/captcha/check # 校验图片验证码，和租户无关
       - /admin-api/infra/file/*/get/** # 获取图片，和租户无关
@@ -303,6 +304,8 @@ yudao:
       - infra_job
       - infra_job_log
       - infra_job_log
+      - iot_plugin_info
+      - iot_plugin_instance
       - infra_data_source_config
       - jimu_dict
       - jimu_dict_item
@@ -328,6 +331,8 @@ yudao:
       - mail_account
       - mail_template
       - sms_template
+      - iot:device
+      - iot:thing_model_list
   sms-code: # 短信验证码相关的配置项
     expire-times: 10m
     send-frequency: 1m
@@ -340,12 +345,16 @@ yudao:
       receive-expire-time: 14d # 收货的过期时间
       comment-expire-time: 7d # 评论的过期时间
     express:
-      client: kd_niao
+      client: KD_NIAO
       kd-niao:
         api-key: cb022f1e-48f1-4c4a-a723-9001ac9676b8
         business-id: 1809751
+        request-type: 1002 # 免费版 1002；付费版 8001
       kd100:
         key: pLXUGAwK5305
         customer: E77DF18BE109F454A5CD319E44BF5177
 
 debug: false
+# 插件配置 TODO 芋艿：【IOT】需要处理下
+pf4j:
+  pluginsDir: /Users/anhaohao/code/gitee/ruoyi-vue-pro/plugins # 插件目录

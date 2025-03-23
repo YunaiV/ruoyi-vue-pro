@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * IOT 产品的状态枚举类
+ * IoT 产品的状态枚举类
  *
  * @author ahh
  */
@@ -18,12 +18,12 @@ public enum IotProductStatusEnum implements ArrayValuable<Integer> {
     UNPUBLISHED(0, "开发中"),
     PUBLISHED(1, "已发布");
 
-    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotProductStatusEnum::getType).toArray(Integer[]::new);
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotProductStatusEnum::getStatus).toArray(Integer[]::new);
 
     /**
      * 类型
      */
-    private final Integer type;
+    private final Integer status;
     /**
      * 描述
      */

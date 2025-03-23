@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockedStatic;
+import org.mockito.stubbing.Answer;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -50,6 +51,8 @@ public class AliyunSmsClientTest extends BaseMockitoUnitTest {
             // mock 方法
             httpUtilsMockedStatic.when(() -> HttpUtils.post(anyString(), anyMap(), anyString()))
                     .thenReturn("{\"Message\":\"OK\",\"RequestId\":\"30067CE9-3710-5984-8881-909B21D8DB28\",\"Code\":\"OK\",\"BizId\":\"800025323183427988\"}");
+            httpUtilsMockedStatic.when(() -> HttpUtils.encodeUtf8(anyString()))
+                    .then((Answer<String>) invocationOnMock -> (String) invocationOnMock.getArguments()[0]);
 
             // 调用
             SmsSendRespDTO result = smsClient.sendSms(sendLogId, mobile,
@@ -75,6 +78,8 @@ public class AliyunSmsClientTest extends BaseMockitoUnitTest {
             // mock 方法
             httpUtilsMockedStatic.when(() -> HttpUtils.post(anyString(), anyMap(), anyString()))
                     .thenReturn("{\"Message\":\"手机号码格式错误\",\"RequestId\":\"B7700B8E-227E-5886-9564-26036172F01F\",\"Code\":\"isv.MOBILE_NUMBER_ILLEGAL\"}");
+            httpUtilsMockedStatic.when(() -> HttpUtils.encodeUtf8(anyString()))
+                    .then((Answer<String>) invocationOnMock -> (String) invocationOnMock.getArguments()[0]);
 
             // 调用
             SmsSendRespDTO result = smsClient.sendSms(sendLogId, mobile, apiTemplateId, templateParams);
@@ -127,6 +132,8 @@ public class AliyunSmsClientTest extends BaseMockitoUnitTest {
             // mock 方法
             httpUtilsMockedStatic.when(() -> HttpUtils.post(anyString(), anyMap(), anyString()))
                     .thenReturn("{\"TemplateCode\":\"SMS_207945135\",\"RequestId\":\"6F4CC077-29C8-5BA5-AB62-5FF95068A5AC\",\"Message\":\"OK\",\"TemplateContent\":\"您的验证码${code}，该验证码5分钟内有效，请勿泄漏于他人！\",\"TemplateName\":\"公告通知\",\"TemplateType\":0,\"Code\":\"OK\",\"CreateDate\":\"2020-12-23 17:34:42\",\"Reason\":\"无审批备注\",\"TemplateStatus\":1}");
+            httpUtilsMockedStatic.when(() -> HttpUtils.encodeUtf8(anyString()))
+                    .then((Answer<String>) invocationOnMock -> (String) invocationOnMock.getArguments()[0]);
 
             // 调用
             SmsTemplateRespDTO result = smsClient.getSmsTemplate(apiTemplateId);

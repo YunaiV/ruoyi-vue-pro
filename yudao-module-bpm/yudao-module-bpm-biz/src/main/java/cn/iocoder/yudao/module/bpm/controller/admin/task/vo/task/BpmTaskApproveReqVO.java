@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Map;
 
 @Schema(description = "管理后台 - 通过流程任务的 Request VO")
@@ -22,5 +23,8 @@ public class BpmTaskApproveReqVO {
 
     @Schema(description = "变量实例（动态表单）", requiredMode = Schema.RequiredMode.REQUIRED)
     private Map<String, Object> variables;
+
+    @Schema(description = "下一个节点审批人", example = "{nodeId:[1, 2]}")
+    private Map<String, List<Long>> nextAssignees; // 为什么是 Map，而不是 List 呢？因为下一个节点可能是多个，例如说并行网关的情况
 
 }

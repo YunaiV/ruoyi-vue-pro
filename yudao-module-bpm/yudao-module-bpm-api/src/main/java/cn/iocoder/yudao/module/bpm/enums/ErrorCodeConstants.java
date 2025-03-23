@@ -24,6 +24,7 @@ public interface ErrorCodeConstants {
     ErrorCode MODEL_DEPLOY_FAIL_BPMN_START_EVENT_NOT_EXISTS = new ErrorCode(1_009_002_005, "部署流程失败，原因：BPMN 流程图中，没有开始事件");
     ErrorCode MODEL_DEPLOY_FAIL_BPMN_USER_TASK_NAME_NOT_EXISTS = new ErrorCode(1_009_002_006, "部署流程失败，原因：BPMN 流程图中，用户任务({})的名字不存在");
     ErrorCode MODEL_UPDATE_FAIL_NOT_MANAGER = new ErrorCode(1_009_002_007, "操作流程失败，原因：你不是该流程({})的管理员");
+    ErrorCode MODEL_DEPLOY_FAIL_FIRST_USER_TASK_CANDIDATE_STRATEGY_ERROR = new ErrorCode(1_009_002_008, "部署流程失败，原因：首个任务({})的审批人不能是【审批人自选】");
 
     // ========== 流程定义 1-009-003-000 ==========
     ErrorCode PROCESS_DEFINITION_KEY_NOT_MATCH = new ErrorCode(1_009_003_000, "流程定义的标识期望是({})，当前是({})，请修改 BPMN 流程图");
@@ -39,6 +40,8 @@ public interface ErrorCodeConstants {
     ErrorCode PROCESS_INSTANCE_START_USER_SELECT_ASSIGNEES_NOT_EXISTS = new ErrorCode(1_009_004_004, "任务({})的候选人({})不存在");
     ErrorCode PROCESS_INSTANCE_START_USER_CAN_START = new ErrorCode(1_009_004_005, "发起流程失败，你没有权限发起该流程");
     ErrorCode PROCESS_INSTANCE_CANCEL_FAIL_NOT_ALLOW = new ErrorCode(1_009_004_005, "流程取消失败，该流程不允许取消");
+    ErrorCode PROCESS_INSTANCE_HTTP_TRIGGER_CALL_ERROR = new ErrorCode(1_009_004_006, "流程 Http 触发器请求调用失败");
+    ErrorCode PROCESS_INSTANCE_APPROVE_USER_SELECT_ASSIGNEES_NOT_CONFIG = new ErrorCode(1_009_004_007, "下一个任务({})的审批人未配置");
 
     // ========== 流程任务 1-009-005-000 ==========
     ErrorCode TASK_OPERATE_FAIL_ASSIGN_NOT_SELF = new ErrorCode(1_009_005_001, "操作失败，原因：该任务的审批人不是你");

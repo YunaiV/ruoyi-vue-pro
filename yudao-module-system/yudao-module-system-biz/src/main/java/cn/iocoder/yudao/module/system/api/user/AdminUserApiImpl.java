@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.api.user;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
+import cn.iocoder.yudao.framework.datapermission.core.util.DataPermissionUtils;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
@@ -12,7 +12,10 @@ import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
@@ -56,10 +59,11 @@ public class AdminUserApiImpl implements AdminUserApi {
     }
 
     @Override
-    @DataPermission(enable = false) // 禁用数据权限。原因是，一般基于指定 id 的 API 查询，都是数据拼接为主
     public List<AdminUserRespDTO> getUserList(Collection<Long> ids) {
-        List<AdminUserDO> users = userService.getUserList(ids);
-        return BeanUtils.toBean(users, AdminUserRespDTO.class);
+        return DataPermissionUtils.executeIgnore(() -> { // 禁用数据权限。原因是，一般基于指定 id 的 API 查询，都是数据拼接为主
+            List<AdminUserDO> users = userService.getUserList(ids);
+            return BeanUtils.toBean(users, AdminUserRespDTO.class);
+        });
     }
 
     @Override

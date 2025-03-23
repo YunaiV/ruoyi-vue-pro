@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.system.framework.sms.core.client.impl;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.format.FastDateFormat;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.http.HttpUtil;
@@ -19,8 +18,6 @@ import cn.iocoder.yudao.module.system.framework.sms.core.enums.SmsTemplateAuditS
 import cn.iocoder.yudao.module.system.framework.sms.core.property.SmsChannelProperties;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -156,10 +153,9 @@ public class HuaweiSmsClient extends AbstractSmsClient {
                 .setAuditStatus(SmsTemplateAuditStatusEnum.SUCCESS.getStatus()).setAuditReason(null);
     }
 
-    @SuppressWarnings("CharsetObjectCanBeUsed")
-    private static void appendToBody(StringBuilder body, String key, String value) throws UnsupportedEncodingException {
+    private static void appendToBody(StringBuilder body, String key, String value) {
         if (StrUtil.isNotEmpty(value)) {
-            body.append(key).append(URLEncoder.encode(value, CharsetUtil.CHARSET_UTF_8.name()));
+            body.append(key).append(HttpUtils.encodeUtf8(value));
         }
     }
 
