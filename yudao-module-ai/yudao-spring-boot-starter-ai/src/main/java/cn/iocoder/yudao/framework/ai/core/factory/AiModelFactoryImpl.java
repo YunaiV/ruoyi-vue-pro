@@ -15,10 +15,10 @@ import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.doubao.DouBaoChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
-import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiiconflowApiConstants;
-import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiiconflowmageApi;
+import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
 import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
-import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconflowImageModel;
+import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowImageApi;
+import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowImageModel;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
@@ -45,6 +45,7 @@ import org.springframework.ai.autoconfigure.moonshot.MoonshotAutoConfiguration;
 import org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration;
 import org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration;
 import org.springframework.ai.autoconfigure.qianfan.QianFanAutoConfiguration;
+import org.springframework.ai.autoconfigure.stabilityai.StabilityAiImageAutoConfiguration;
 import org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusServiceClientConnectionDetails;
 import org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusServiceClientProperties;
 import org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusVectorStoreAutoConfiguration;
@@ -228,7 +229,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
             case OPENAI:
                 return buildOpenAiImageModel(apiKey, url);
             case SILICON_FLOW:
-                return buildSiiconflowImageModel(apiKey,url);
+                return buildSiliconFlowImageModel(apiKey,url);
             case STABLE_DIFFUSION:
                 return buildStabilityAiImageModel(apiKey, url);
             default:
@@ -474,12 +475,12 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     /**
-     * Siiconflow
+     * 创建 SiliconFlowImageModel 对象
      */
-    private SiliconflowImageModel buildSiiconflowImageModel(String apiToken, String url) {
-        url = StrUtil.blankToDefault(url, SiiconflowApiConstants.DEFAULT_BASE_URL);
-        SiiconflowmageApi openAiApi = SiiconflowmageApi.builder().baseUrl(url).apiKey(apiToken).build();
-        return new SiliconflowImageModel(openAiApi);
+    private SiliconFlowImageModel buildSiliconFlowImageModel(String apiToken, String url) {
+        url = StrUtil.blankToDefault(url, SiliconFlowApiConstants.DEFAULT_BASE_URL);
+        SiliconFlowImageApi openAiApi = new SiliconFlowImageApi(url, apiToken);
+        return new SiliconFlowImageModel(openAiApi);
     }
 
     /**
@@ -490,6 +491,9 @@ public class AiModelFactoryImpl implements AiModelFactory {
         return OllamaChatModel.builder().ollamaApi(ollamaApi).toolCallingManager(getToolCallingManager()).build();
     }
 
+    /**
+     * 可参考 {@link StabilityAiImageAutoConfiguration} 的 stabilityAiImageModel 方法
+     */
     private StabilityAiImageModel buildStabilityAiImageModel(String apiKey, String url) {
         url = StrUtil.blankToDefault(url, StabilityAiApi.DEFAULT_BASE_URL);
         StabilityAiApi stabilityAiApi = new StabilityAiApi(apiKey, StabilityAiApi.DEFAULT_IMAGE_MODEL, url);

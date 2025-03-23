@@ -17,20 +17,16 @@
 package cn.iocoder.yudao.framework.ai.core.model.siliconflow;
 
 /**
- * Common value constants for Siiconflow api.
+ * SiliconFlow API 枚举类
  *
  * @author zzt
  */
-public final class SiiconflowApiConstants {
+public final class SiliconFlowApiConstants {
 
 	public static final String DEFAULT_BASE_URL = "https://api.siliconflow.cn";
 
 	public static final String MODEL_DEFAULT = "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B";
 
 	public static final String PROVIDER_NAME = "Siiconflow";
-
-	private SiiconflowApiConstants() {
-
-	}
 
 }

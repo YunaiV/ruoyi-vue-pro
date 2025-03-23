@@ -1,27 +1,27 @@
 package cn.iocoder.yudao.framework.ai.image;
 
-import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiiconflowmageApi;
-import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconflowImageModel;
-import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconflowImageOptions;
+import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowImageApi;
+import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowImageModel;
+import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowImageOptions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 
 /**
- * {@link SiliconflowImageModel} 集成测试
+ * {@link SiliconFlowImageModel} 集成测试
  */
 public class SiliconFlowImageModelTests {
 
-    private final SiliconflowImageModel imageModel = new SiliconflowImageModel(
-            new SiiconflowmageApi("sk-epsakfenqnyzoxhmbucsxlhkdqlcbnimslqoivkshalvdozz") // 密钥
+    private final SiliconFlowImageModel imageModel = new SiliconFlowImageModel(
+            new SiliconFlowImageApi("sk-epsakfenqnyzoxhmbucsxlhkdqlcbnimslqoivkshalvdozz") // 密钥
     );
 
     @Test
     @Disabled
     public void testCall() {
         // 准备参数
-        SiliconflowImageOptions imageOptions = SiliconflowImageOptions.builder()
+        SiliconFlowImageOptions imageOptions = SiliconFlowImageOptions.builder()
                 .model("Kwai-Kolors/Kolors")
                 .build();
         ImagePrompt prompt = new ImagePrompt("万里长城", imageOptions);

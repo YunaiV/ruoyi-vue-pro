@@ -17,6 +17,7 @@
 package cn.iocoder.yudao.framework.ai.core.model.siliconflow;
 
 import io.micrometer.observation.ObservationRegistry;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.image.*;
@@ -25,8 +26,8 @@ import org.springframework.ai.image.observation.ImageModelObservationContext;
 import org.springframework.ai.image.observation.ImageModelObservationConvention;
 import org.springframework.ai.image.observation.ImageModelObservationDocumentation;
 import org.springframework.ai.model.ModelOptionsUtils;
+import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.api.OpenAiImageApi;
-import org.springframework.ai.openai.api.common.OpenAiApiConstants;
 import org.springframework.ai.openai.metadata.OpenAiImageGenerationMetadata;
 import org.springframework.ai.retry.RetryUtils;
 import org.springframework.http.ResponseEntity;
@@ -36,77 +37,44 @@ import org.springframework.util.Assert;
 import java.util.List;
 
 /**
- * cv openapi图片模型方法
+ * 硅基流动 {@link ImageModel} 实现类
+ *
+ * 参考 {@link OpenAiImageModel} 实现
  *
  * @author zzt
  */
-public class SiliconflowImageModel implements ImageModel {
+public class SiliconFlowImageModel implements ImageModel {
 
-	private static final Logger logger = LoggerFactory.getLogger(SiliconflowImageModel.class);
+	private static final Logger logger = LoggerFactory.getLogger(SiliconFlowImageModel.class);
 
 	private static final ImageModelObservationConvention DEFAULT_OBSERVATION_CONVENTION = new DefaultImageModelObservationConvention();
 
-	/**
-	 * The default options used for the image completion requests.
-	 */
-	private final SiliconflowImageOptions defaultOptions;
+	private final SiliconFlowImageOptions defaultOptions;
 
-	/**
-	 * The retry template used to retry the OpenAI Image API calls.
-	 */
 	private final RetryTemplate retryTemplate;
 
-	/**
-	 * Low-level access to the OpenAI Image API.
-	 */
-	private final SiiconflowmageApi siiconflowmageApi;
+	private final SiliconFlowImageApi siliconFlowImageApi;
 
-	/**
-	 * Observation registry used for instrumentation.
-	 */
 	private final ObservationRegistry observationRegistry;
 
-	/**
-	 * Conventions to use for generating observations.
-	 */
+    @Setter
 	private ImageModelObservationConvention observationConvention = DEFAULT_OBSERVATION_CONVENTION;
 
-	/**
-	 * Creates an instance of the OpenAiImageModel.
-	 * @param siiconflowmageApi The OpenAiImageApi instance to be used for interacting with
-	 * the OpenAI Image API.
-	 * @throws IllegalArgumentException if openAiImageApi is null
-	 */
-	public SiliconflowImageModel(SiiconflowmageApi siiconflowmageApi) {
-		this(siiconflowmageApi, SiliconflowImageOptions.builder().build(), RetryUtils.DEFAULT_RETRY_TEMPLATE);
+	public SiliconFlowImageModel(SiliconFlowImageApi siliconFlowImageApi) {
+		this(siliconFlowImageApi, SiliconFlowImageOptions.builder().build(), RetryUtils.DEFAULT_RETRY_TEMPLATE);
 	}
 
-	/**
-	 * Initializes a new instance of the OpenAiImageModel.
-	 * @param siiconflowmageApi The OpenAiImageApi instance to be used for interacting with
-	 * the OpenAI Image API.
-	 * @param options The OpenAiImageOptions to configure the image model.
-	 * @param retryTemplate The retry template.
-	 */
-	public SiliconflowImageModel(SiiconflowmageApi siiconflowmageApi, SiliconflowImageOptions options, RetryTemplate retryTemplate) {
-		this(siiconflowmageApi, options, retryTemplate, ObservationRegistry.NOOP);
+	public SiliconFlowImageModel(SiliconFlowImageApi siliconFlowImageApi, SiliconFlowImageOptions options, RetryTemplate retryTemplate) {
+		this(siliconFlowImageApi, options, retryTemplate, ObservationRegistry.NOOP);
 	}
 
-	/**
-	 * Initializes a new instance of the OpenAiImageModel.
-	 * @param siiconflowmageApi The OpenAiImageApi instance to be used for interacting with
-	 * the OpenAI Image API.
-	 * @param options The OpenAiImageOptions to configure the image model.
-	 * @param retryTemplate The retry template.
-	 * @param observationRegistry The ObservationRegistry used for instrumentation.
-	 */
-	public SiliconflowImageModel(SiiconflowmageApi siiconflowmageApi, SiliconflowImageOptions options, RetryTemplate retryTemplate,
+	public SiliconFlowImageModel(SiliconFlowImageApi siliconFlowImageApi, SiliconFlowImageOptions options, RetryTemplate retryTemplate,
                                  ObservationRegistry observationRegistry) {
-		Assert.notNull(siiconflowmageApi, "OpenAiImageApi must not be null");
+		Assert.notNull(siliconFlowImageApi, "OpenAiImageApi must not be null");
 		Assert.notNull(options, "options must not be null");
 		Assert.notNull(retryTemplate, "retryTemplate must not be null");
 		Assert.notNull(observationRegistry, "observationRegistry must not be null");
-		this.siiconflowmageApi = siiconflowmageApi;
+		this.siliconFlowImageApi = siliconFlowImageApi;
 		this.defaultOptions = options;
 		this.retryTemplate = retryTemplate;
 		this.observationRegistry = observationRegistry;
@@ -114,11 +82,11 @@ public class SiliconflowImageModel implements ImageModel {
 
 	@Override
 	public ImageResponse call(ImagePrompt imagePrompt) {
-		SiiconflowmageApi.SiliconflowImageRequest imageRequest = createRequest(imagePrompt);
+		SiliconFlowImageApi.SiliconflowImageRequest imageRequest = createRequest(imagePrompt);
 
 		var observationContext = ImageModelObservationContext.builder()
 			.imagePrompt(imagePrompt)
-			.provider(OpenAiApiConstants.PROVIDER_NAME)
+			.provider(SiliconFlowApiConstants.PROVIDER_NAME)
 			.requestOptions(imagePrompt.getOptions())
 			.build();
 
@@ -127,7 +95,7 @@ public class SiliconflowImageModel implements ImageModel {
 					this.observationRegistry)
 			.observe(() -> {
 				ResponseEntity<OpenAiImageApi.OpenAiImageResponse> imageResponseEntity = this.retryTemplate
-					.execute(ctx -> this.siiconflowmageApi.createImage(imageRequest));
+					.execute(ctx -> this.siliconFlowImageApi.createImage(imageRequest));
 
 				ImageResponse imageResponse = convertResponse(imageResponseEntity, imageRequest);
 
@@ -137,17 +105,17 @@ public class SiliconflowImageModel implements ImageModel {
 			});
 	}
 
-	private SiiconflowmageApi.SiliconflowImageRequest createRequest(ImagePrompt imagePrompt) {
+	private SiliconFlowImageApi.SiliconflowImageRequest createRequest(ImagePrompt imagePrompt) {
 		String instructions = imagePrompt.getInstructions().get(0).getText();
 
-		SiiconflowmageApi.SiliconflowImageRequest imageRequest = new SiiconflowmageApi.SiliconflowImageRequest(instructions,
+		SiliconFlowImageApi.SiliconflowImageRequest imageRequest = new SiliconFlowImageApi.SiliconflowImageRequest(instructions,
 				imagePrompt.getOptions().getModel());
 
-		return ModelOptionsUtils.merge(imagePrompt.getOptions(), imageRequest, SiiconflowmageApi.SiliconflowImageRequest.class);
+		return ModelOptionsUtils.merge(imagePrompt.getOptions(), imageRequest, SiliconFlowImageApi.SiliconflowImageRequest.class);
 	}
 
 	private ImageResponse convertResponse(ResponseEntity<OpenAiImageApi.OpenAiImageResponse> imageResponseEntity,
-										  SiiconflowmageApi.SiliconflowImageRequest siliconflowImageRequest) {
+										  SiliconFlowImageApi.SiliconflowImageRequest siliconflowImageRequest) {
 		OpenAiImageApi.OpenAiImageResponse imageApiResponse = imageResponseEntity.getBody();
 		if (imageApiResponse == null) {
 			logger.warn("No image response returned for request: {}", siliconflowImageRequest);
