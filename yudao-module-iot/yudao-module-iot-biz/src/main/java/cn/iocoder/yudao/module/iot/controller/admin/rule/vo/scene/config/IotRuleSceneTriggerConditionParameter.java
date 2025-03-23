@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerConditionParameterOperatorEnum;
 import lombok.Data;
 
+// TODO @puhui999：这个要不内嵌到 IoTRuleSceneDO 里面？
 /**
  * 触发条件参数
  *
