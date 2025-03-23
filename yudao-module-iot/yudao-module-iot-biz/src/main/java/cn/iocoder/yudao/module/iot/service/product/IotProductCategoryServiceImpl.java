@@ -29,7 +29,7 @@ import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PRODUCT_CATEG
 public class IotProductCategoryServiceImpl implements IotProductCategoryService {
 
     @Resource
-    private IotProductCategoryMapper productCategoryMapper;
+    private IotProductCategoryMapper iotProductCategoryMapper;
 
     @Resource
     private IotProductService productService;
@@ -40,7 +40,7 @@ public class IotProductCategoryServiceImpl implements IotProductCategoryService 
     public Long createProductCategory(IotProductCategorySaveReqVO createReqVO) {
         // 插入
         IotProductCategoryDO productCategory = BeanUtils.toBean(createReqVO, IotProductCategoryDO.class);
-        productCategoryMapper.insert(productCategory);
+        iotProductCategoryMapper.insert(productCategory);
         // 返回
         return productCategory.getId();
     }
@@ -51,7 +51,7 @@ public class IotProductCategoryServiceImpl implements IotProductCategoryService 
         validateProductCategoryExists(updateReqVO.getId());
         // 更新
         IotProductCategoryDO updateObj = BeanUtils.toBean(updateReqVO, IotProductCategoryDO.class);
-        productCategoryMapper.updateById(updateObj);
+        iotProductCategoryMapper.updateById(updateObj);
     }
 
     @Override
@@ -59,18 +59,18 @@ public class IotProductCategoryServiceImpl implements IotProductCategoryService 
         // 校验存在
         validateProductCategoryExists(id);
         // 删除
-        productCategoryMapper.deleteById(id);
+        iotProductCategoryMapper.deleteById(id);
     }
 
     private void validateProductCategoryExists(Long id) {
-        if (productCategoryMapper.selectById(id) == null) {
+        if (iotProductCategoryMapper.selectById(id) == null) {
             throw exception(PRODUCT_CATEGORY_NOT_EXISTS);
         }
     }
 
     @Override
     public IotProductCategoryDO getProductCategory(Long id) {
-        return productCategoryMapper.selectById(id);
+        return iotProductCategoryMapper.selectById(id);
     }
 
     @Override
@@ -78,28 +78,28 @@ public class IotProductCategoryServiceImpl implements IotProductCategoryService 
         if (CollUtil.isEmpty(ids)) {
             return CollUtil.newArrayList();
         }
-        return productCategoryMapper.selectBatchIds(ids);
+        return iotProductCategoryMapper.selectBatchIds(ids);
     }
 
     @Override
     public PageResult<IotProductCategoryDO> getProductCategoryPage(IotProductCategoryPageReqVO pageReqVO) {
-        return productCategoryMapper.selectPage(pageReqVO);
+        return iotProductCategoryMapper.selectPage(pageReqVO);
     }
 
     @Override
     public List<IotProductCategoryDO> getProductCategoryListByStatus(Integer status) {
-        return productCategoryMapper.selectListByStatus(status);
+        return iotProductCategoryMapper.selectListByStatus(status);
     }
 
     @Override
     public Long getProductCategoryCount(LocalDateTime createTime) {
-        return productCategoryMapper.selectCountByCreateTime(createTime);
+        return iotProductCategoryMapper.selectCountByCreateTime(createTime);
     }
 
     @Override
     public Map<String, Integer> getProductCategoryDeviceCountMap() {
         // 1. 获取所有数据
-        List<IotProductCategoryDO> categoryList = productCategoryMapper.selectList();
+        List<IotProductCategoryDO> categoryList = iotProductCategoryMapper.selectList();
         List<IotProductDO> productList = productService.getProductList();
         // TODO @super：不要 list 查询，返回内存，而是查询一个 Map<productId, count>
         Map<Long, Integer> deviceCountMapByProductId = deviceService.getDeviceCountMapByProductId();
