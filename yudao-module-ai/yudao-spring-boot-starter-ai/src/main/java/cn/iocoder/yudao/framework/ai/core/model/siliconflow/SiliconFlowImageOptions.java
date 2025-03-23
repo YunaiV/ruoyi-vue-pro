@@ -89,12 +89,12 @@ public class SiliconFlowImageOptions implements ImageOptions {
 
     @Override
     public Integer getN() {
-        return null;
+        return batchSize;
     }
 
     @Override
     public String getResponseFormat() {
-        return null;
+        return "url";
     }
 
     @Override

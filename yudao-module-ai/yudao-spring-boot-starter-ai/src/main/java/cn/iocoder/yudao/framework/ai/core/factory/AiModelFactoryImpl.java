@@ -207,6 +207,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(QianFanImageModel.class);
             case ZHI_PU:
                 return SpringUtil.getBean(ZhiPuAiImageModel.class);
+            case SILICON_FLOW:
+                return SpringUtil.getBean(SiliconFlowImageModel.class);
             case OPENAI:
                 return SpringUtil.getBean(OpenAiImageModel.class);
             case STABLE_DIFFUSION:
