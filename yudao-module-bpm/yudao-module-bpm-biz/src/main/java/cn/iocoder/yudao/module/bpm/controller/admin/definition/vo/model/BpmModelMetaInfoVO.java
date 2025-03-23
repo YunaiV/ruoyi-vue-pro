@@ -59,7 +59,7 @@ public class BpmModelMetaInfoVO {
     @Schema(description = "可发起用户编号数组", example = "[1,2,3]")
     private List<Long> startUserIds;
 
-    @Schema(description = "可发起部门编号数组")
+    @Schema(description = "可发起部门编号数组", example = "[2,4,6]")
     private List<Long> startDeptIds;
 
     @Schema(description = "可管理用户编号数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "[2,4,6]")

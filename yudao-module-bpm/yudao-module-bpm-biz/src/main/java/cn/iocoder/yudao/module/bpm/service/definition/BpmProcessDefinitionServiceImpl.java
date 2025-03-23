@@ -51,6 +51,7 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
 
     @Resource
     private BpmProcessDefinitionInfoMapper processDefinitionMapper;
+
     @Resource
     private AdminUserApi adminUserApi;
 
@@ -93,18 +94,17 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
             return false;
         }
 
-        // 获取用户所在部门
-        AdminUserRespDTO user = adminUserApi.getUser(userId);
-        Long userDeptId = user != null ? user.getDeptId() : null;
-
         // 校验用户是否在允许发起的用户列表中
-        if (!CollUtil.isEmpty(processDefinition.getStartUserIds())) {
+        if (CollUtil.isNotEmpty(processDefinition.getStartUserIds())) {
             return processDefinition.getStartUserIds().contains(userId);
         }
 
         // 校验用户是否在允许发起的部门列表中
-        if (!CollUtil.isEmpty(processDefinition.getStartDeptIds()) && userDeptId != null) {
-            return processDefinition.getStartDeptIds().contains(userDeptId);
+        if (CollUtil.isNotEmpty(processDefinition.getStartDeptIds())) {
+            AdminUserRespDTO user = adminUserApi.getUser(userId);
+            return user != null
+                    && user.getDeptId() != null
+                    && processDefinition.getStartDeptIds().contains(user.getDeptId());
         }
 
         // 都为空，则所有人都可以发起

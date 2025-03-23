@@ -154,7 +154,7 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     /**
      * 可发起部门编号数组
      *
-     * 关联 {@link AdminUserRespDTO#getId()} 字段的数组
+     * 关联 {@link AdminUserRespDTO#getDeptId()} 字段的数组
      */
     @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> startDeptIds;

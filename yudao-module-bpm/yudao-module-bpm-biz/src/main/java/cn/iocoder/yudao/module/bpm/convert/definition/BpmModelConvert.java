@@ -76,8 +76,7 @@ public interface BpmModelConvert {
     default BpmModelRespVO buildModel0(Model model,
                                        BpmModelMetaInfoVO metaInfo, BpmFormDO form, BpmCategoryDO category,
                                        Deployment deployment, ProcessDefinition processDefinition,
-                                       List<AdminUserRespDTO> startUsers,
-                                       List<DeptRespDTO> startDepts) {
+                                       List<AdminUserRespDTO> startUsers, List<DeptRespDTO> startDepts) {
         BpmModelRespVO modelRespVO = new BpmModelRespVO().setId(model.getId()).setName(model.getName())
                 .setKey(model.getKey()).setCategory(model.getCategory())
                 .setCreateTime(DateUtils.of(model.getCreateTime()));
@@ -99,10 +98,9 @@ public interface BpmModelConvert {
                 modelRespVO.getProcessDefinition().setDeploymentTime(DateUtils.of(deployment.getDeploymentTime()));
             }
         }
-        // User
-        modelRespVO.setStartUsers(BeanUtils.toBean(startUsers, UserSimpleBaseVO.class));
-        // Dept
-        modelRespVO.setStartDepts(BeanUtils.toBean(startDepts, DeptSimpleBaseVO.class));
+        // User、Dept
+        modelRespVO.setStartUsers(BeanUtils.toBean(startUsers, UserSimpleBaseVO.class))
+                .setStartDepts(BeanUtils.toBean(startDepts, DeptSimpleBaseVO.class));
         return modelRespVO;
     }
 

@@ -83,13 +83,12 @@ public class BpmModelController {
         List<ProcessDefinition> processDefinitions = processDefinitionService.getProcessDefinitionListByDeploymentIds(
                 deploymentMap.keySet());
         Map<String, ProcessDefinition> processDefinitionMap = convertMap(processDefinitions, ProcessDefinition::getDeploymentId);
-        // 获得 User Map
+        // 获得 User Map、Dept Map
         Set<Long> userIds = convertSetByFlatMap(list, model -> {
             BpmModelMetaInfoVO metaInfo = BpmModelConvert.INSTANCE.parseMetaInfo(model);
             return metaInfo != null ? metaInfo.getStartUserIds().stream() : Stream.empty();
         });
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
-        // 获得 Dept Map
         Set<Long> deptIds = convertSetByFlatMap(list, model -> {
             BpmModelMetaInfoVO metaInfo = BpmModelConvert.INSTANCE.parseMetaInfo(model);
             return metaInfo != null && metaInfo.getStartDeptIds() != null ? metaInfo.getStartDeptIds().stream() : Stream.empty();
