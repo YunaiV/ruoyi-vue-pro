@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelListReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelTSLRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import jakarta.validation.Valid;
 
@@ -89,5 +90,13 @@ public interface IotThingModelService {
      * @return 物模型数量
      */
     Long getThingModelCount(LocalDateTime createTime);
+
+    /**
+     * 通过产品 ID 获取产品物模型 TSL
+     *
+     * @param productId 产品 ID
+     * @return 产品物模型 TSL
+     */
+    IotThingModelTSLRespVO getThingModelTslByProductId(Long productId);
 
 }
