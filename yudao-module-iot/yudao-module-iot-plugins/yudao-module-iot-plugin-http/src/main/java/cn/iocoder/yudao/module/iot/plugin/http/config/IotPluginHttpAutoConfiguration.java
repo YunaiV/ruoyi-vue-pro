@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.iot.plugin.common.downstream.IotDeviceDownstreamH
 import cn.iocoder.yudao.module.iot.plugin.http.downstream.IotDeviceDownstreamHandlerImpl;
 import cn.iocoder.yudao.module.iot.plugin.http.upstream.IotDeviceUpstreamServer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,8 +20,9 @@ public class IotPluginHttpAutoConfiguration {
 
     @Bean(initMethod = "start", destroyMethod = "stop")
     public IotDeviceUpstreamServer deviceUpstreamServer(IotDeviceUpstreamApi deviceUpstreamApi,
-                                                        IotPluginHttpProperties properties) {
-        return new IotDeviceUpstreamServer(properties, deviceUpstreamApi);
+                                                        IotPluginHttpProperties properties,
+                                                        ApplicationContext applicationContext) {
+        return new IotDeviceUpstreamServer(properties, deviceUpstreamApi, applicationContext);
     }
 
     @Bean

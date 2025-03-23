@@ -9,7 +9,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * 独立运行入口
  */
 @Slf4j
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {
+        // common 的包
+        "cn.iocoder.yudao.module.iot.plugin.common",
+        // http 的包
+        "cn.iocoder.yudao.module.iot.plugin.http",
+        // script 的包
+        "cn.iocoder.yudao.module.iot.plugin.script"
+})
 public class IotHttpPluginApplication {
 
     public static void main(String[] args) {

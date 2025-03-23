@@ -9,6 +9,7 @@
     </parent>
     <modules>
         <module>yudao-module-iot-plugin-common</module>
+        <module>yudao-module-iot-plugin-script</module>
         <module>yudao-module-iot-plugin-http</module>
         <module>yudao-module-iot-plugin-mqtt</module>
         <module>yudao-module-iot-plugin-emqx</module>

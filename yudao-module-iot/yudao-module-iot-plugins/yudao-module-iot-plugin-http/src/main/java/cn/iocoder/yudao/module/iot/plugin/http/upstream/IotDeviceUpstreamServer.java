@@ -8,6 +8,7 @@ import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 
 /**
  * IoT 设备下行服务端，接收来自 device 设备的请求，转发给 server 服务器
@@ -24,7 +25,8 @@ public class IotDeviceUpstreamServer {
     private final IotPluginHttpProperties properties;
 
     public IotDeviceUpstreamServer(IotPluginHttpProperties properties,
-                                   IotDeviceUpstreamApi deviceUpstreamApi) {
+                                   IotDeviceUpstreamApi deviceUpstreamApi,
+                                   ApplicationContext applicationContext) {
         this.properties = properties;
         // 创建 Vertx 实例
         this.vertx = Vertx.vertx();
@@ -33,7 +35,8 @@ public class IotDeviceUpstreamServer {
         router.route().handler(BodyHandler.create()); // 处理 Body
 
         // 使用统一的 Handler 处理所有上行请求
-        IotDeviceUpstreamVertxHandler upstreamHandler = new IotDeviceUpstreamVertxHandler(deviceUpstreamApi);
+        IotDeviceUpstreamVertxHandler upstreamHandler = new IotDeviceUpstreamVertxHandler(deviceUpstreamApi,
+                applicationContext);
         router.post(IotDeviceUpstreamVertxHandler.PROPERTY_PATH).handler(upstreamHandler);
         router.post(IotDeviceUpstreamVertxHandler.EVENT_PATH).handler(upstreamHandler);
 

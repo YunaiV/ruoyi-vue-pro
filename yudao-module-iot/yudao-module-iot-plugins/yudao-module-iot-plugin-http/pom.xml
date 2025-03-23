@@ -94,34 +94,34 @@
                     </archive>
                 </configuration>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-shade-plugin</artifactId>-->
-<!--                <version>3.6.0</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>shade</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <minimizeJar>true</minimizeJar>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--                <configuration>-->
-<!--                    <archive>-->
-<!--                        <manifestEntries>-->
-<!--                            <Plugin-Id>${plugin.id}</Plugin-Id>-->
-<!--                            <Plugin-Class>${plugin.class}</Plugin-Class>-->
-<!--                            <Plugin-Version>${plugin.version}</Plugin-Version>-->
-<!--                            <Plugin-Provider>${plugin.provider}</Plugin-Provider>-->
-<!--                            <Plugin-Description>${plugin.description}</Plugin-Description>-->
-<!--                            <Plugin-Dependencies>${plugin.dependencies}</Plugin-Dependencies>-->
-<!--                        </manifestEntries>-->
-<!--                    </archive>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
+            <!--            <plugin>-->
+            <!--                <groupId>org.apache.maven.plugins</groupId>-->
+            <!--                <artifactId>maven-shade-plugin</artifactId>-->
+            <!--                <version>3.6.0</version>-->
+            <!--                <executions>-->
+            <!--                    <execution>-->
+            <!--                        <phase>package</phase>-->
+            <!--                        <goals>-->
+            <!--                            <goal>shade</goal>-->
+            <!--                        </goals>-->
+            <!--                        <configuration>-->
+            <!--                            <minimizeJar>true</minimizeJar>-->
+            <!--                        </configuration>-->
+            <!--                    </execution>-->
+            <!--                </executions>-->
+            <!--                <configuration>-->
+            <!--                    <archive>-->
+            <!--                        <manifestEntries>-->
+            <!--                            <Plugin-Id>${plugin.id}</Plugin-Id>-->
+            <!--                            <Plugin-Class>${plugin.class}</Plugin-Class>-->
+            <!--                            <Plugin-Version>${plugin.version}</Plugin-Version>-->
+            <!--                            <Plugin-Provider>${plugin.provider}</Plugin-Provider>-->
+            <!--                            <Plugin-Description>${plugin.description}</Plugin-Description>-->
+            <!--                            <Plugin-Dependencies>${plugin.dependencies}</Plugin-Dependencies>-->
+            <!--                        </manifestEntries>-->
+            <!--                    </archive>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
 
             <!-- 独立模式 -->
             <plugin>
@@ -160,6 +160,13 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web</artifactId>
+        </dependency>
+
+        <!-- 添加脚本引擎模块依赖 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-iot-plugin-script</artifactId>
+            <version>${revision}</version>
         </dependency>
     </dependencies>
 </project>
