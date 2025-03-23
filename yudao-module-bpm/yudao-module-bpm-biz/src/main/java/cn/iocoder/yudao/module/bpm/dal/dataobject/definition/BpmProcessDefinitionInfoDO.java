@@ -152,6 +152,14 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     private List<Long> startUserIds;
 
     /**
+     * 可发起部门编号数组
+     *
+     * 关联 {@link AdminUserRespDTO#getId()} 字段的数组
+     */
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> startDeptIds;
+
+    /**
      * 可管理用户编号数组
      *
      * 关联 {@link AdminUserRespDTO#getId()} 字段的数组
