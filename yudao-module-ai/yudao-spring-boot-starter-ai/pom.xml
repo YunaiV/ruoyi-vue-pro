@@ -117,6 +117,13 @@
             </exclusions>
         </dependency>
 
+        <!-- 腾讯大模型图像创作引擎-->
+        <dependency>
+            <groupId>com.tencentcloudapi</groupId>
+            <artifactId>tencentcloud-sdk-java-aiart</artifactId>
+            <version>3.1.1215</version>
+        </dependency>
+
         <!-- Test 测试相关 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

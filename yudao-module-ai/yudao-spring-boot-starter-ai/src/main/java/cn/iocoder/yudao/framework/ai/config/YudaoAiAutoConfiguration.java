@@ -8,6 +8,8 @@ import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.doubao.DouBaoChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiiconflowApiConstants;
+import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiiconflowmageApi;
 import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
@@ -113,11 +115,11 @@ public class YudaoAiAutoConfiguration {
 
     public SiliconFlowChatModel buildSiliconFlowChatClient(YudaoAiProperties.SiliconFlowProperties properties) {
         if (StrUtil.isEmpty(properties.getModel())) {
-            properties.setModel(SiliconFlowChatModel.MODEL_DEFAULT);
+            properties.setModel(SiiconflowApiConstants.MODEL_DEFAULT);
         }
         OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
                 .openAiApi(OpenAiApi.builder()
-                        .baseUrl(SiliconFlowChatModel.BASE_URL)
+                        .baseUrl(SiiconflowApiConstants.DEFAULT_BASE_URL)
                         .apiKey(properties.getApiKey())
                         .build())
                 .defaultOptions(OpenAiChatOptions.builder()

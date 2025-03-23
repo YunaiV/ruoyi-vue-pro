@@ -15,7 +15,10 @@ import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.doubao.DouBaoChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiiconflowApiConstants;
+import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiiconflowmageApi;
 import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
+import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconflowImageModel;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
@@ -224,6 +227,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return buildZhiPuAiImageModel(apiKey, url);
             case OPENAI:
                 return buildOpenAiImageModel(apiKey, url);
+            case SILICON_FLOW:
+                return buildSiiconflowImageModel(apiKey,url);
             case STABLE_DIFFUSION:
                 return buildStabilityAiImageModel(apiKey, url);
             default:
@@ -466,6 +471,15 @@ public class AiModelFactoryImpl implements AiModelFactory {
         url = StrUtil.blankToDefault(url, OpenAiApiConstants.DEFAULT_BASE_URL);
         OpenAiImageApi openAiApi = OpenAiImageApi.builder().baseUrl(url).apiKey(openAiToken).build();
         return new OpenAiImageModel(openAiApi);
+    }
+
+    /**
+     * Siiconflow
+     */
+    private SiliconflowImageModel buildSiiconflowImageModel(String apiToken, String url) {
+        url = StrUtil.blankToDefault(url, SiiconflowApiConstants.DEFAULT_BASE_URL);
+        SiiconflowmageApi openAiApi = SiiconflowmageApi.builder().baseUrl(url).apiKey(apiToken).build();
+        return new SiliconflowImageModel(openAiApi);
     }
 
     /**
