@@ -2,9 +2,12 @@ package cn.iocoder.yudao.module.wms.service.stock.bin;
 
 import java.util.*;
 
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.WmsPickupDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
+import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
 import jakarta.validation.*;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
@@ -59,7 +62,9 @@ public interface WmsStockBinService {
 
     WmsStockBinDO getStockBin(Long binId, Long productId);
 
-    void pickupItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundItemDO inboundItemDO);
+    void pickupItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO , WmsInboundItemRespVO inboundItemVO);
 
     Map<Long, Map<Long, WmsStockBinDO>> getStockBinMap(Collection<Long> binIds, Collection<Long> productIds);
+
+    void outboundSingleItem(StockReason reason, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId);
 }

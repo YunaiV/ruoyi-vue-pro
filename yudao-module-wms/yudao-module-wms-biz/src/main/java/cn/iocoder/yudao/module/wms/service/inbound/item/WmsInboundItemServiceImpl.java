@@ -10,7 +10,9 @@ import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.*;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.WmsInboundItemMapper;
+import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.flow.WmsInboundItemFlowMapper;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
@@ -18,9 +20,7 @@ import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 
@@ -39,9 +39,12 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
     @Resource
     private WmsInboundItemMapper inboundItemMapper;
 
-
     @Resource
     private ErpProductApi productApi;
+
+    @Resource
+    @Lazy
+    private WmsInboundItemFlowMapper inboundItemFlowMapper;
 
     /**
      * @sign : F55768BA65271F63
@@ -185,8 +188,26 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
     @Override
     public void assembleInbound(List<WmsInboundItemRespVO> itemList) {
         List<WmsInboundDO> inboundDOList = inboundService.selectByIds(StreamX.from(itemList).toList(WmsInboundItemRespVO::getInboundId));
-        Map<Long, WmsInboundRespVO> inboundMap = StreamX.from(inboundDOList).toMap(WmsInboundDO::getId, inboundDO -> BeanUtils.toBean(inboundDO, WmsInboundRespVO.class) );
+        Map<Long, WmsInboundRespVO> inboundMap = StreamX.from(inboundDOList).toMap(WmsInboundDO::getId, inboundDO -> BeanUtils.toBean(inboundDO, WmsInboundRespVO.class));
         StreamX.from(itemList).assemble(inboundMap, WmsInboundItemRespVO::getInboundId, WmsInboundItemRespVO::setInbound);
+    }
+
+    @Override
+    public void updateForPickup(WmsInboundItemRespVO inboundItemVO, Integer quantity) {
+        inboundItemVO.setOutboundAvailableQuantity(quantity);
+        WmsInboundItemDO inboundItemDO= BeanUtils.toBean(inboundItemVO, WmsInboundItemDO.class);
+        inboundItemMapper.updateById(inboundItemDO);
+
+        //
+        WmsInboundItemFlowDO flowDO=new WmsInboundItemFlowDO();
+        flowDO.setInboundId(inboundItemDO.getInboundId());
+        flowDO.setInboundItemId(inboundItemDO.getId());
+        flowDO.setProductId(inboundItemDO.getProductId());
+        flowDO.setOutboundQuantity(quantity);
+        flowDO.setOutboundId(-1L);
+        flowDO.setOutboundItemId(-1L);
+        inboundItemFlowMapper.insert(flowDO);
+
     }
 
     @Override

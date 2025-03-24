@@ -69,11 +69,11 @@ public interface WmsInboundItemService {
 
     void updateById(WmsInboundItemDO inboundItemDO);
 
-
-
     PageResult<WmsInboundItemDO> getPickupPending(WmsPickupPendingPageReqVO pageReqVO);
 
     void assembleProducts(List<WmsInboundItemRespVO> itemList);
 
     void assembleInbound(List<WmsInboundItemRespVO> itemList);
+
+    void updateForPickup(WmsInboundItemRespVO inboundItemVO, Integer quantity);
 }

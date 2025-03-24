@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 
 /**
- * @table-fields : tenant_id,creator,inbound_status,create_time,plan_quantity,updater,inbound_id,source_item_id,left_quantity,update_time,actual_quantity,product_id,shelved_quantity,id
+ * @table-fields : tenant_id,outbound_available_quantity,creator,inbound_status,create_time,plan_quantity,updater,inbound_id,source_item_id,update_time,actual_quantity,product_id,shelved_quantity,id
  */
 @Schema(description = "管理后台 - 入库单详情 Response VO")
 @Data
@@ -38,10 +38,6 @@ public class WmsInboundItemRespVO {
     @Schema(description = "实际入库量", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("实际入库量")
     private Integer actualQuantity;
-
-    @Schema(description = "批次剩余库存，出库后的剩余库存量")
-    @ExcelProperty("批次剩余库存")
-    private Integer leftQuantity;
 
     @Schema(description = "来源详情ID", example = "30830")
     @ExcelProperty("来源详情ID")
@@ -91,4 +87,8 @@ public class WmsInboundItemRespVO {
     @Schema(description = "入库单", example = "")
     @ExcelProperty("入库单")
     private WmsInboundRespVO inbound;
+
+    @Schema(description = "批次剩余库存，出库后的剩余库存量", example = "")
+    @ExcelProperty("批次剩余库存，出库后的剩余库存量")
+    private Integer outboundAvailableQuantity;
 }

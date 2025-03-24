@@ -70,6 +70,6 @@ public class WmsInboundItemFlowRespVO {
     private String updater;
 
     @Schema(description = "变化的数量，出库量", example = "")
-    @ExcelProperty("变化的数量，出库量")
+    @ExcelProperty("变化的数量")
     private Integer outboundQuantity;
 }

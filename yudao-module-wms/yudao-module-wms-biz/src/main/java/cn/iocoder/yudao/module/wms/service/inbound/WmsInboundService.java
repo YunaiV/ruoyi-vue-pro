@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.wms.service.inbound;
 
 import java.util.*;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
+import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
 import jakarta.validation.*;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
@@ -77,5 +77,5 @@ public interface WmsInboundService {
     /**
      * 更新入库批次余额
      **/
-    void updateLeftQuantity(Long warehouseId, Long productId,Long outboundId, Long outboundItemId ,Integer quantity);
+    void updateAvailableQuantity(StockReason reason, Long warehouseId, Long productId, Long outboundId, Long outboundItemId , Integer quantity);
 }

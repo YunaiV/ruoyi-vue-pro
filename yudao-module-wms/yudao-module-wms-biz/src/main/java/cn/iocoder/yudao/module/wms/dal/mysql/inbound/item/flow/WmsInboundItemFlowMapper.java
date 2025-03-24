@@ -39,4 +39,4 @@ public interface WmsInboundItemFlowMapper extends BaseMapperX<WmsInboundItemFlow
         wrapper.eq(WmsInboundItemFlowDO::getInboundId, inboundId);
         return selectPage(reqVO, wrapper).getList();
     }
-}
+}

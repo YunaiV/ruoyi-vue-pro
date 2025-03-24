@@ -70,7 +70,6 @@ public class WmsInboundItemController {
     // inboundItemService.updateInboundItem(updateReqVO);
     // return success(true);
     // }
-
     @PutMapping("/update-actual-quantity")
     @Operation(summary = "设置实际入库量")
     @PreAuthorize("@ss.hasPermission('wms:inbound-item:update')")
@@ -129,7 +128,6 @@ public class WmsInboundItemController {
     // // 返回
     // return success(voPageResult);
     // }
-
     @GetMapping("/pickup-pending")
     @Operation(summary = "待上架的入库明细")
     @PreAuthorize("@ss.hasPermission('wms:inbound-item:query')")
@@ -150,8 +148,6 @@ public class WmsInboundItemController {
         // 返回
         return success(voPageResult);
     }
-
-
     // @GetMapping("/export-excel")
     // @Operation(summary = "导出入库单详情 Excel")
     // @PreAuthorize("@ss.hasPermission('wms:inbound-item:export')")
@@ -162,4 +158,4 @@ public class WmsInboundItemController {
     // // 导出 Excel
     // ExcelUtils.write(response, "入库单详情.xls", "数据", WmsInboundItemRespVO.class, BeanUtils.toBean(list, WmsInboundItemRespVO.class));
     // }
-}
+}

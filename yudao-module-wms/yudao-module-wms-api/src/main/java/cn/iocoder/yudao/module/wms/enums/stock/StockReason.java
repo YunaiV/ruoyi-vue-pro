@@ -16,7 +16,9 @@ public enum StockReason implements ArrayValuable<Integer>, DictEnum {
 
     INBOUND(1, "入库"),
     PICKUP(2, "拣货"),
-    OUTBOUND(3, "出库"),
+    OUTBOUND_AGREE(3, "出库"),
+    OUTBOUND_SUBMIT(4, "提交出库单"),
+    OUTBOUND_REJECT(5, "拒绝出库单"),
    ;
 
     public static final Integer[] VALUES = Arrays.stream(values()).map(StockReason::getValue).toArray(Integer[]::new);

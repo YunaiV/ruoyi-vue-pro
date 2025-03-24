@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : inbound_id,source_item_id,left_quantity,inbound_status,actual_quantity,create_time,product_id,plan_quantity,shelved_quantity
+ * @table-fields : inbound_id,outbound_available_quantity,source_item_id,inbound_status,actual_quantity,create_time,product_id,plan_quantity,shelved_quantity
  */
 @Schema(description = "管理后台 - 入库单详情分页 Request VO")
 @Data
@@ -29,9 +29,6 @@ public class WmsInboundItemPageReqVO extends PageParam {
     @Schema(description = "实际入库量")
     private Integer actualQuantity;
 
-    @Schema(description = "批次剩余库存，出库后的剩余库存量")
-    private Integer leftQuantity;
-
     @Schema(description = "来源详情ID", example = "30830")
     private Long sourceItemId;
 
@@ -44,4 +41,7 @@ public class WmsInboundItemPageReqVO extends PageParam {
 
     @Schema(description = "已上架量，已经拣货到仓位的库存量", example = "")
     private Integer shelvedQuantity;
+
+    @Schema(description = "批次剩余库存，出库后的剩余库存量", example = "")
+    private Integer outboundAvailableQuantity;
 }

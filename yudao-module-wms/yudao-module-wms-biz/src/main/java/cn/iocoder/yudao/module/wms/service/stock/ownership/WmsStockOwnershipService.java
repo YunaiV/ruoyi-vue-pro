@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms.service.stock.ownership;
 
+import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
 import jakarta.validation.*;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
@@ -70,5 +71,10 @@ public interface WmsStockOwnershipService {
      * 调整归属库存
      * 此方法必须包含在 WmsStockWarehouseServiceImpl.outboundSingleItemTransactional 方法中
      */
-    void outboundSingleItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long outboundId, Long outboundItemId);
+    void outboundSingleItem(StockReason reason, Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long outboundId, Long outboundItemId);
+
+    /**
+     * 调整归属库存
+     */
+    void refreshForPickup(Long warehouseId, Long companyId, Long deptId, Long productId, Long pickupId, Long pickupItemId, Integer quantity);
 }

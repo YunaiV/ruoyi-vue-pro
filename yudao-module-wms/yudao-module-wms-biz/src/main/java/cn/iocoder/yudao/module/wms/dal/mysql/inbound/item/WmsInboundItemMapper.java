@@ -11,7 +11,6 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 import org.apache.ibatis.annotations.Mapper;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,7 +28,7 @@ public interface WmsInboundItemMapper extends BaseMapperX<WmsInboundItemDO> {
 				.eqIfPresent(WmsInboundItemDO::getProductId, reqVO.getProductId())
 				.eqIfPresent(WmsInboundItemDO::getPlanQuantity, reqVO.getPlanQuantity())
 				.eqIfPresent(WmsInboundItemDO::getActualQuantity, reqVO.getActualQuantity())
-				.eqIfPresent(WmsInboundItemDO::getLeftQuantity, reqVO.getLeftQuantity())
+				.eqIfPresent(WmsInboundItemDO::getOutboundAvailableQuantity, reqVO.getOutboundAvailableQuantity())
 				.eqIfPresent(WmsInboundItemDO::getSourceItemId, reqVO.getSourceItemId())
 				.betweenIfPresent(WmsInboundItemDO::getCreateTime, reqVO.getCreateTime())
 				.orderByDesc(WmsInboundItemDO::getId));
@@ -58,26 +57,18 @@ public interface WmsInboundItemMapper extends BaseMapperX<WmsInboundItemDO> {
     }
 
     default PageResult<WmsInboundItemDO> getPickupPending(WmsPickupPendingPageReqVO reqVO) {
-
         MPJLambdaWrapperX<WmsInboundItemDO> query = new MPJLambdaWrapperX<>();
-        query.gt(WmsInboundItemDO::getActualQuantity, WmsInboundItemDO::getShelvedQuantity)
-            .innerJoin(WmsInboundDO.class, WmsInboundDO::getId,WmsInboundItemDO::getInboundId)
-            .likeIfExists(WmsInboundDO::getNo, reqVO.getInboundNo())
-            .orderByDesc(WmsInboundItemDO::getId);
-
-        return selectPage(reqVO,query);
-
+        query.gt(WmsInboundItemDO::getActualQuantity, WmsInboundItemDO::getShelvedQuantity).innerJoin(WmsInboundDO.class, WmsInboundDO::getId, WmsInboundItemDO::getInboundId).likeIfExists(WmsInboundDO::getNo, reqVO.getInboundNo())
+				.orderByDesc(WmsInboundItemDO::getId);
+        return selectPage(reqVO, query);
     }
 
     default List<WmsInboundItemDO> selectLeftItemList(Long warehouseId, Long productId) {
         MPJLambdaWrapperX<WmsInboundItemDO> query = new MPJLambdaWrapperX<>();
-        query.select(WmsInboundItemDO::getId,WmsInboundItemDO::getInboundId,WmsInboundItemDO::getProductId,WmsInboundItemDO::getLeftQuantity);
-        query.innerJoin(WmsInboundDO.class, WmsInboundDO::getId,WmsInboundItemDO::getInboundId);
-        query.in(WmsInboundDO::getInboundStatus, Arrays.asList(InboundStatus.ALL.getValue(),InboundStatus.PART.getValue()));
-        query.eq(WmsInboundDO::getWarehouseId, warehouseId).eq(WmsInboundItemDO::getProductId, productId)
-            .gt(WmsInboundItemDO::getLeftQuantity,0)
-            .last("ORDER BY DATEDIFF(t1.inbound_time, now())+t1.init_age desc")
-         ;
+        query.select(WmsInboundItemDO::getId, WmsInboundItemDO::getInboundId, WmsInboundItemDO::getProductId, WmsInboundItemDO::getOutboundAvailableQuantity);
+        query.innerJoin(WmsInboundDO.class, WmsInboundDO::getId, WmsInboundItemDO::getInboundId);
+        query.in(WmsInboundDO::getInboundStatus, Arrays.asList(InboundStatus.ALL.getValue(), InboundStatus.PART.getValue()));
+        query.eq(WmsInboundDO::getWarehouseId, warehouseId).eq(WmsInboundItemDO::getProductId, productId).gt(WmsInboundItemDO::getOutboundAvailableQuantity, 0).last("ORDER BY DATEDIFF(t1.inbound_time, now())+t1.init_age desc");
         return selectList(query);
     }
 }

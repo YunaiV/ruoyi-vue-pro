@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 
 /**
- * @table-fields : inbound_id,source_item_id,left_quantity,inbound_status,actual_quantity,product_id,plan_quantity,shelved_quantity,id
+ * @table-fields : inbound_id,outbound_available_quantity,source_item_id,inbound_status,actual_quantity,product_id,plan_quantity,shelved_quantity,id
  */
 @Schema(description = "管理后台 - 入库单详情新增/修改 Request VO")
 @Data
@@ -32,9 +32,6 @@ public class WmsInboundItemSaveReqVO {
     @Schema(description = "实际入库量", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer actualQuantity;
 
-    @Schema(description = "批次剩余库存，出库后的剩余库存量")
-    private Integer leftQuantity;
-
     @Schema(description = "来源详情ID", example = "30830")
     private Long sourceItemId;
 
@@ -44,4 +41,7 @@ public class WmsInboundItemSaveReqVO {
 
     @Schema(description = "已上架量，已经拣货到仓位的库存量", example = "")
     private Integer shelvedQuantity;
+
+    @Schema(description = "批次剩余库存，出库后的剩余库存量", example = "")
+    private Integer outboundAvailableQuantity;
 }

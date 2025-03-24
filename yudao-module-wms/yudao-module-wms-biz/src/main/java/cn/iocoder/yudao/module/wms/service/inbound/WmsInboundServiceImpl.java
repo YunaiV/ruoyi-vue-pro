@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
 import cn.iocoder.yudao.module.wms.enums.common.BillType;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
+import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import org.springframework.context.annotation.Bean;
@@ -298,7 +299,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
      * 按 warehouseId 查询尚有出库量的 WmsInboundDO
      */
     @Override
-    public void updateLeftQuantity(Long warehouseId, Long productId, Long outboundId, Long outboundItemId ,Integer quantity) {
+    public void updateAvailableQuantity(StockReason reason, Long warehouseId, Long productId, Long outboundId, Long outboundItemId , Integer quantity) {
         List<WmsInboundItemDO> itemsList=inboundItemMapper.selectLeftItemList(warehouseId,productId);
         if(itemsList.isEmpty()) {
             throw exception(INBOUND_ITEM_NOT_EXISTS);
@@ -306,13 +307,12 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         List<WmsInboundItemDO> itemsToUpdate=new ArrayList<>();
         List<WmsInboundItemFlowDO> inboundItemFlowList = new ArrayList<>();
         for (WmsInboundItemDO itemDO : itemsList) {
-            Integer left=itemDO.getLeftQuantity();
+            Integer available=itemDO.getOutboundAvailableQuantity();
             Integer flowQuantity=0;
-            if(left>quantity) { // 需要多次扣除
-                flowQuantity=left;
-                quantity=quantity-flowQuantity;
-                left=0;
-                itemDO.setLeftQuantity(left);
+            if(available>quantity) { // 需要多次扣除
+                flowQuantity=quantity;
+                available=available-flowQuantity;
+                itemDO.setOutboundAvailableQuantity(available);
                 itemsToUpdate.add(itemDO);
                 //
                 WmsInboundItemFlowDO flowDO=new WmsInboundItemFlowDO();
@@ -324,11 +324,11 @@ public class WmsInboundServiceImpl implements WmsInboundService {
                 flowDO.setOutboundItemId(outboundItemId);
                 inboundItemFlowList.add(flowDO);
 
-            } else if(left.equals(quantity)) { // 更好单次扣除
-                flowQuantity=left;
-                left=0;
+            } else if(available.equals(quantity)) { // 更好单次扣除
+                flowQuantity=available;
+                available=0;
                 quantity=0;
-                itemDO.setLeftQuantity(left);
+                itemDO.setOutboundAvailableQuantity(available);
                 itemsToUpdate.add(itemDO);
                 //
                 WmsInboundItemFlowDO flowDO=new WmsInboundItemFlowDO();
@@ -343,8 +343,8 @@ public class WmsInboundServiceImpl implements WmsInboundService {
                 break;
             } else { // 单次扣除
                 flowQuantity=quantity;
-                left=left-flowQuantity;
-                itemDO.setLeftQuantity(left);
+                available=available-flowQuantity;
+                itemDO.setOutboundAvailableQuantity(available);
                 itemsToUpdate.add(itemDO);
 
                 //

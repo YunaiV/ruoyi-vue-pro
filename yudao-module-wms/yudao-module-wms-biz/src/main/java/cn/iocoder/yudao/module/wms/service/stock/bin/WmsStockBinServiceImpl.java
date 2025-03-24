@@ -3,12 +3,18 @@ package cn.iocoder.yudao.module.wms.service.stock.bin;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.WmsPickupDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
+import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.WmsInboundItemMapper;
 import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
+import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.stock.flow.WmsStockFlowService;
+import cn.iocoder.yudao.module.wms.service.stock.ownership.WmsStockOwnershipService;
 import cn.iocoder.yudao.module.wms.service.stock.warehouse.WmsStockWarehouseService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
@@ -41,6 +47,12 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
     @Resource
     @Lazy
     WmsStockWarehouseService stockWarehouseService;
+    @Autowired
+    private WmsStockOwnershipService wmsStockOwnershipService;
+
+    @Resource
+    @Lazy
+    WmsInboundItemService inboundItemService;
 
     /**
      * @sign : 1D6010DA80E2C817
@@ -123,16 +135,16 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
 
 
 
-    public void pickupItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundItemDO inboundItemDO) {
+    public void pickupItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO , WmsInboundItemRespVO inboundItemVO) {
 
         JdbcUtils.requireTransaction();
-        WmsStockBinDO stockBinDO = this.getStockBin(pickupItemDO.getBinId(), inboundItemDO.getProductId());
+        WmsStockBinDO stockBinDO = this.getStockBin(pickupItemDO.getBinId(), inboundItemVO.getProductId());
         if(stockBinDO==null) {
 
             stockBinDO = new WmsStockBinDO();
             stockBinDO.setWarehouseId(pickup.getWarehouseId());
             stockBinDO.setBinId(pickupItemDO.getBinId());
-            stockBinDO.setProductId(inboundItemDO.getProductId());
+            stockBinDO.setProductId(inboundItemVO.getProductId());
             // 可用库存
             stockBinDO.setAvailableQuantity(pickupItemDO.getQuantity());
             // 可售库存
@@ -155,11 +167,21 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
         }
 
         // 记录流水
-        stockFlowService.createForStockBin(StockReason.PICKUP, inboundItemDO.getProductId(), stockBinDO,pickupItemDO.getQuantity(), pickupItemDO.getPickupId(), pickupItemDO.getId());
+        stockFlowService.createForStockBin(StockReason.PICKUP, inboundItemVO.getProductId(), stockBinDO,pickupItemDO.getQuantity(), pickupItemDO.getPickupId(), pickupItemDO.getId());
 
         // 刷新库存
-        stockWarehouseService.refreshForPickup(pickup.getWarehouseId(), inboundItemDO.getProductId(), pickup.getId(), pickupItemDO.getId());
+        stockWarehouseService.refreshForPickup(pickup.getWarehouseId(), inboundItemVO.getProductId(), pickup.getId(), pickupItemDO.getId(),pickupItemDO.getQuantity());
+        //
+        Long deptId=inboundDO.getDeptId();
+        if(deptId==null) {
+            deptId=inboundItemVO.getProduct().getDeptId();
+        }
 
+        // 更新入库记录
+        inboundItemService.updateForPickup(inboundItemVO, pickupItemDO.getQuantity());
+
+        // 刷新所有者库存
+        wmsStockOwnershipService.refreshForPickup(pickup.getWarehouseId(), inboundDO.getCompanyId(), deptId,inboundItemVO.getProductId(), pickup.getId(), pickupItemDO.getId(),pickupItemDO.getQuantity());
 
     }
 
@@ -172,6 +194,35 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
             map.put(stockBinDO.getProductId(), stockBinDO);
         }
         return result;
+    }
+
+    @Override
+    public void outboundSingleItem(StockReason reason,Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
+        JdbcUtils.requireTransaction();
+        WmsStockBinDO stockBinDO = this.getStockBin(binId, productId);
+        if(stockBinDO==null) {
+
+             throw exception(STOCK_BIN_NOT_EXISTS);
+
+        } else {
+
+            // 可用库存
+            stockBinDO.setAvailableQuantity(stockBinDO.getAvailableQuantity() - quantity);
+            // 可售库存
+            stockBinDO.setSellableQuantity(stockBinDO.getSellableQuantity() - quantity);
+            // 待上出库量
+            stockBinDO.setOutboundPendingQuantity(stockBinDO.getOutboundPendingQuantity() + quantity);
+            // 保存
+            stockBinMapper.updateById(stockBinDO);
+        }
+
+        // 记录流水
+        stockFlowService.createForStockBin(reason, productId, stockBinDO,quantity, outboundId, outboundItemId);
+
+
+
+
+
     }
 
 }

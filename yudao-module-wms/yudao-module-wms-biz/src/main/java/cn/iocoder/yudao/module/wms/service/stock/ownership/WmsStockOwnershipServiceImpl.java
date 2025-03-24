@@ -151,7 +151,7 @@ public class WmsStockOwnershipServiceImpl implements WmsStockOwnershipService {
     }
 
     @Override
-    public void outboundSingleItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
+    public void outboundSingleItem(StockReason reason,Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
         // 查询库存记录
@@ -171,6 +171,30 @@ public class WmsStockOwnershipServiceImpl implements WmsStockOwnershipService {
             stockOwnershipMapper.updateById(stockOwnershipDO);
         }
         // 记录流水
-        stockFlowService.createForStockOwner(StockReason.OUTBOUND,  productId, stockOwnershipDO,quantity, outboundId, outboundItemId);
+        stockFlowService.createForStockOwner(reason,  productId, stockOwnershipDO,quantity, outboundId, outboundItemId);
+    }
+
+    @Override
+    public void refreshForPickup(Long warehouseId, Long companyId, Long deptId, Long productId, Long pickupId, Long pickupItemId, Integer quantity) {
+        // 校验本方法在事务中
+        JdbcUtils.requireTransaction();
+        // 查询库存记录
+        WmsStockOwnershipDO stockOwnershipDO = stockOwnershipMapper.getByUkProductOwner(warehouseId, companyId, deptId, productId);
+        // 如果不存在就创建
+        if (stockOwnershipDO == null) {
+            throw exception(STOCK_OWNERSHIP_NOT_EXISTS);
+        } else {
+            // 如果存在就修改
+            // 可用量
+             stockOwnershipDO.setAvailableQuantity(stockOwnershipDO.getAvailableQuantity()+quantity);
+            // 待上架量
+            stockOwnershipDO.setShelvingPendingQuantity(stockOwnershipDO.getShelvingPendingQuantity() - quantity);
+            // 待出库量
+            // stockOwnershipDO.setOutboundPendingQuantity(stockOwnershipDO.getOutboundPendingQuantity()+quantity);
+            //
+            stockOwnershipMapper.updateById(stockOwnershipDO);
+        }
+        // 记录流水
+        stockFlowService.createForStockOwner(StockReason.PICKUP,  productId, stockOwnershipDO,quantity, pickupId, pickupItemId);
     }
 }

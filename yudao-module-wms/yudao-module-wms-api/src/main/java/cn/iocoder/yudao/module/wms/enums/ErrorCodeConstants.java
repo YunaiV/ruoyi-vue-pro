@@ -138,5 +138,4 @@ public interface ErrorCodeConstants {
     ErrorCode OUTBOUND_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_015_007, "出库单不符合审批条件");
     ErrorCode OUTBOUND_ITEM_PRODUCT_ID_REPEATED = new ErrorCode(2_001_015_007, "出库单产品重复");
     ErrorCode OUTBOUND_ITEM_OUTBOUND_ID_DUPLICATE = new ErrorCode(2_001_015_008, "详情不是一个出库单");
-
-}
+}

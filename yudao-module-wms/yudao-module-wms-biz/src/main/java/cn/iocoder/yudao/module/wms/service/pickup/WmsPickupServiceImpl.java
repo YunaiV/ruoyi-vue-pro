@@ -5,6 +5,8 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.pickup.vo.WmsPickupPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.pickup.vo.WmsPickupSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
@@ -103,37 +105,39 @@ public class WmsPickupServiceImpl implements WmsPickupService {
             wmsPickupItemDO.setPickupId(pickup.getId());
         });
         // 拣货到仓位
-        this.pickup(pickup, toInsetList, inboundItemDOList);
+        this.pickup(pickup, toInsetList, BeanUtils.toBean(inboundItemDOList,WmsInboundItemRespVO.class));
         // 保存单据
         pickupItemMapper.insertBatch(toInsetList);
         // 返回
         return pickup;
     }
 
-    private void pickup(WmsPickupDO pickup, List<WmsPickupItemDO> wmsPickupItemDOList, List<WmsInboundItemDO> inboundItemDOList) {
+    private void pickup(WmsPickupDO pickup, List<WmsPickupItemDO> wmsPickupItemDOList, List<WmsInboundItemRespVO> inboundItemVOList) {
         JdbcUtils.requireTransaction();
-        Map<Long, WmsInboundItemDO> inboundItemDOMap = StreamX.from(inboundItemDOList).toMap(WmsInboundItemDO::getId);
+        Map<Long, WmsInboundItemRespVO> inboundItemVOMap = StreamX.from(inboundItemVOList).toMap(WmsInboundItemRespVO::getId);
+        List<WmsInboundDO> inboundDOList = inboundService.selectByIds(StreamX.from(inboundItemVOList).toList(WmsInboundItemRespVO::getInboundId));
+        Map<Long, WmsInboundDO> inboundMap =StreamX.from(inboundDOList).toMap(WmsInboundDO::getId);
         // 
         for (WmsPickupItemDO pickupItemDO : wmsPickupItemDOList) {
-            WmsInboundItemDO inboundItemDO = inboundItemDOMap.get(pickupItemDO.getInboundItemId());
-            if (inboundItemDO == null) {
+            WmsInboundItemRespVO inboundItemVO = inboundItemVOMap.get(pickupItemDO.getInboundItemId());
+            if (inboundItemVO == null) {
                 throw exception(INBOUND_ITEM_NOT_EXISTS);
             }
-            int pickupLeft = inboundItemDO.getActualQuantity() - inboundItemDO.getShelvedQuantity();
+            int pickupLeft = inboundItemVO.getActualQuantity() - inboundItemVO.getShelvedQuantity();
             if (pickupLeft < pickupItemDO.getQuantity()) {
                 throw exception(INBOUND_ITEM_PICKUP_LEFT_QUANTITY_NOT_ENOUGH);
             }
             // 设置已拣货量
-            inboundItemDO.setShelvedQuantity(inboundItemDO.getShelvedQuantity() + pickupItemDO.getQuantity());
-            pickupItemDO.setInboundId(inboundItemDO.getInboundId());
-            pickupItemDO.setInboundItemId(inboundItemDO.getId());
-            pickupItemDO.setProductId(inboundItemDO.getProductId());
+            inboundItemVO.setShelvedQuantity(inboundItemVO.getShelvedQuantity() + pickupItemDO.getQuantity());
+            pickupItemDO.setInboundId(inboundItemVO.getInboundId());
+            pickupItemDO.setInboundItemId(inboundItemVO.getId());
+            pickupItemDO.setProductId(inboundItemVO.getProductId());
             pickupItemDO.setPickupId(pickup.getId());
             // 调整仓位库存
             lockRedisDAO.lockStockLevels(pickup.getWarehouseId(), pickupItemDO.getProductId(), () -> {
-                stockBinService.pickupItem(pickup, pickupItemDO, inboundItemDO);
+                stockBinService.pickupItem(pickup, pickupItemDO, inboundMap.get(inboundItemVO.getInboundId()),inboundItemVO);
             });
-            inboundItemService.updateById(inboundItemDO);
+            inboundItemService.updateById(BeanUtils.toBean(inboundItemVO,WmsInboundItemDO.class));
         }
     }
 
