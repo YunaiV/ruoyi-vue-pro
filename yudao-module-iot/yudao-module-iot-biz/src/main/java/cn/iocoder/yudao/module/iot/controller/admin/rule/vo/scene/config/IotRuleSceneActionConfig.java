@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
 import lombok.Data;
 
+// TODO @puhui999：这个要不内嵌到 IoTRuleSceneDO 里面？
 /**
  * 执行器配置
  *

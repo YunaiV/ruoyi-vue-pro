@@ -61,15 +61,15 @@ public class IotThingModelController {
         return success(BeanUtils.toBean(thingModel, IotThingModelRespVO.class));
     }
 
+    // TODO @puhui999：要不叫 get-tsl，去掉 product-id；后续，把
     @GetMapping("/tsl-by-product-id")
     @Operation(summary = "获得产品物模型 TSL")
-    @Parameter(name = "productId", description = "产品ID", required = true, example = "1024")
+    @Parameter(name = "productId", description = "产品 ID", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('iot:thing-model:query')")
     public CommonResult<IotThingModelTSLRespVO> getThingModelTslByProductId(@RequestParam("productId") Long productId) {
         return success(thingModelService.getThingModelTslByProductId(productId));
     }
 
-    // TODO @puhui @super：getThingModelListByProductId 和 getThingModelListByProductId 可以融合么？
     @GetMapping("/list")
     @Operation(summary = "获得产品物模型列表")
     @PreAuthorize("@ss.hasPermission('iot:thing-model:query')")

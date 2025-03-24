@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
+// TODO @芋艿：规则场景 要不要，统一改成 场景联动
 @Tag(name = "管理后台 - IoT 规则场景")
 @RestController
 @RequestMapping("/iot/rule-scene")

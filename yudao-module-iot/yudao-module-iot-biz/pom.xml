@@ -69,6 +69,13 @@
             <artifactId>yudao-spring-boot-starter-excel</artifactId>
         </dependency>
 
+        <!-- 脚本插件相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-iot-plugin-script</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
         <!-- 消息队列相关 -->
         <dependency>
             <groupId>org.apache.rocketmq</groupId>
@@ -87,7 +94,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.pf4j</groupId>  <!-- PF4J：内置插件机制 -->
+            <groupId>org.pf4j</groupId>            <!-- PF4J：内置插件机制 -->
             <artifactId>pf4j-spring</artifactId>
         </dependency>
 

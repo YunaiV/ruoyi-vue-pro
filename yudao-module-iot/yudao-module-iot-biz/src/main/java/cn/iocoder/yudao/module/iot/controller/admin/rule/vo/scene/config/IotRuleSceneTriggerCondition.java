@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.util.List;
 
+// TODO @puhui999：这个要不内嵌到 IoTRuleSceneDO 里面？
 /**
  * 触发条件
  *

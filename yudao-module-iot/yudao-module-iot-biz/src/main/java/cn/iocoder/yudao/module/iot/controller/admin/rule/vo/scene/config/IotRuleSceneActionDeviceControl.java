@@ -9,6 +9,7 @@ import lombok.Data;
 import java.util.List;
 import java.util.Map;
 
+// TODO @puhui999：这个要不内嵌到 IoTRuleSceneDO 里面？
 /**
  * 执行设备控制
  *

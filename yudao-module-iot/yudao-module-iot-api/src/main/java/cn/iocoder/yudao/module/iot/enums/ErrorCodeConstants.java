@@ -75,4 +75,7 @@ public interface ErrorCodeConstants {
     // ========== IoT 规则场景（场景联动） 1-050-011-000 ==========
     ErrorCode RULE_SCENE_NOT_EXISTS = new ErrorCode(1_050_011_000, "IoT 规则场景（场景联动）不存在");
 
+    // ========== IoT 产品脚本信息 1-050-012-000 ==========
+    ErrorCode PRODUCT_SCRIPT_NOT_EXISTS = new ErrorCode(1_050_012_000, "IoT 产品脚本信息不存在");
+
 }
