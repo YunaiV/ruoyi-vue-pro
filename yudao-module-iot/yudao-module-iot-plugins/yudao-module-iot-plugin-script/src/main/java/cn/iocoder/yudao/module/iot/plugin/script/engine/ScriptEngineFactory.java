@@ -1,15 +1,14 @@
 package cn.iocoder.yudao.module.iot.plugin.script.engine;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
  * 脚本引擎工厂，用于创建不同类型的脚本引擎
  */
 @Component
+@Slf4j
 public class ScriptEngineFactory {
-    private static final Logger logger = LoggerFactory.getLogger(ScriptEngineFactory.class);
 
     /**
      * 创建JavaScript脚本引擎
@@ -17,7 +16,7 @@ public class ScriptEngineFactory {
      * @return JavaScript脚本引擎
      */
     public JsScriptEngine createJsEngine() {
-        logger.debug("创建JavaScript脚本引擎");
+        log.debug("创建JavaScript脚本引擎");
         return new JsScriptEngine();
     }
 

@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.iot.plugin.script.util;
 
 import cn.hutool.json.JSONUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.concurrent.*;
@@ -10,8 +9,8 @@ import java.util.concurrent.*;
 /**
  * 脚本工具类，提供执行脚本的辅助方法
  */
+@Slf4j
 public class ScriptUtils {
-    private static final Logger logger = LoggerFactory.getLogger(ScriptUtils.class);
 
     /**
      * 默认脚本执行超时时间（毫秒）
@@ -90,7 +89,7 @@ public class ScriptUtils {
             // 使用hutool的JSONUtil工具类解析JSON
             return JSONUtil.toBean(json, Map.class);
         } catch (Exception e) {
-            logger.error("解析JSON失败: {}", e.getMessage());
+            log.error("解析JSON失败: {}", e.getMessage());
             return null;
         }
     }
@@ -114,12 +113,12 @@ public class ScriptUtils {
             try {
                 return Integer.parseInt((String) obj);
             } catch (NumberFormatException e) {
-                logger.debug("无法将字符串转换为整数: {}", obj);
+                log.debug("无法将字符串转换为整数: {}", obj);
                 return null;
             }
         }
 
-        logger.debug("无法将对象转换为整数: {}", obj.getClass().getName());
+        log.debug("无法将对象转换为整数: {}", obj.getClass().getName());
         return null;
     }
 
@@ -142,12 +141,12 @@ public class ScriptUtils {
             try {
                 return Double.parseDouble((String) obj);
             } catch (NumberFormatException e) {
-                logger.debug("无法将字符串转换为双精度浮点数: {}", obj);
+                log.debug("无法将字符串转换为双精度浮点数: {}", obj);
                 return null;
             }
         }
 
-        logger.debug("无法将对象转换为双精度浮点数: {}", obj.getClass().getName());
+        log.debug("无法将对象转换为双精度浮点数: {}", obj.getClass().getName());
         return null;
     }
 

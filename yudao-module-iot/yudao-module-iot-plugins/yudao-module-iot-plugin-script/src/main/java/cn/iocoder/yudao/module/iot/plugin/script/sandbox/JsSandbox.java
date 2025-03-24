@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.plugin.script.sandbox;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.script.ScriptEngine;
 import java.util.Arrays;
@@ -12,8 +11,8 @@ import java.util.regex.Pattern;
 /**
  * JavaScript脚本沙箱，限制脚本的执行权限
  */
+@Slf4j
 public class JsSandbox implements ScriptSandbox {
-    private static final Logger logger = LoggerFactory.getLogger(JsSandbox.class);
 
     /**
      * 禁止使用的关键字
@@ -59,10 +58,10 @@ public class JsSandbox implements ScriptSandbox {
             engine.eval("var Packages = undefined;");
 
             // 增强安全控制可以在这里添加
-            logger.debug("已应用JavaScript安全沙箱限制");
+            log.debug("已应用JavaScript安全沙箱限制");
 
         } catch (Exception e) {
-            logger.warn("应用JavaScript沙箱限制失败: {}", e.getMessage());
+            log.warn("应用JavaScript沙箱限制失败: {}", e.getMessage());
         }
     }
 
@@ -75,20 +74,20 @@ public class JsSandbox implements ScriptSandbox {
         // 检查禁止的关键字
         for (String keyword : FORBIDDEN_KEYWORDS) {
             if (script.contains(keyword)) {
-                logger.warn("脚本包含禁止使用的关键字: {}", keyword);
+                log.warn("脚本包含禁止使用的关键字: {}", keyword);
                 return false;
             }
         }
 
         // 使用正则表达式检查更复杂的模式
         if (FORBIDDEN_PATTERN.matcher(script).find()) {
-            logger.warn("脚本包含禁止使用的模式");
+            log.warn("脚本包含禁止使用的模式");
             return false;
         }
 
         // 脚本长度限制
         if (script.length() > 1024 * 100) { // 限制100KB
-            logger.warn("脚本太大，超过了限制");
+            log.warn("脚本太大，超过了限制");
             return false;
         }
 

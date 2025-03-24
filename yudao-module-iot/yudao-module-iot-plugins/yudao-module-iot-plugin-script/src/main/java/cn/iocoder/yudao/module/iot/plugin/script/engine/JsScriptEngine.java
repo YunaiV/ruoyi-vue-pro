@@ -4,8 +4,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.module.iot.plugin.script.context.ScriptContext;
 import cn.iocoder.yudao.module.iot.plugin.script.sandbox.JsSandbox;
 import cn.iocoder.yudao.module.iot.plugin.script.util.ScriptUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.script.*;
 import java.util.Map;
@@ -16,8 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * JavaScript脚本引擎实现
  * 使用JSR-223 Nashorn脚本引擎
  */
+@Slf4j
 public class JsScriptEngine extends AbstractScriptEngine {
-    private static final Logger logger = LoggerFactory.getLogger(JsScriptEngine.class);
 
     /**
      * 默认脚本执行超时时间（毫秒）
@@ -46,7 +45,7 @@ public class JsScriptEngine extends AbstractScriptEngine {
 
     @Override
     public void init() {
-        logger.info("初始化JavaScript脚本引擎");
+        log.info("初始化JavaScript脚本引擎");
 
         // 创建脚本引擎管理器
         engineManager = new ScriptEngineManager();
@@ -54,7 +53,7 @@ public class JsScriptEngine extends AbstractScriptEngine {
         // 获取JavaScript引擎
         engine = engineManager.getEngineByName(JS_ENGINE_NAME);
         if (engine == null) {
-            logger.error("无法创建JavaScript引擎，尝试使用JavaScript名称获取");
+            log.error("无法创建JavaScript引擎，尝试使用JavaScript名称获取");
             engine = engineManager.getEngineByName("JavaScript");
         }
 
@@ -62,7 +61,7 @@ public class JsScriptEngine extends AbstractScriptEngine {
             throw new IllegalStateException("无法创建JavaScript引擎，请检查环境配置");
         }
 
-        logger.info("成功创建JavaScript引擎: {}", engine.getClass().getName());
+        log.info("成功创建JavaScript引擎: {}", engine.getClass().getName());
 
         // 默认使用JS沙箱
         if (sandbox == null) {
@@ -100,7 +99,7 @@ public class JsScriptEngine extends AbstractScriptEngine {
                 // 执行脚本
                 return engine.eval(script, bindings);
             } catch (ScriptException e) {
-                logger.error("执行JavaScript脚本异常: {}", e.getMessage());
+                log.error("执行JavaScript脚本异常: {}", e.getMessage());
                 throw new RuntimeException("脚本执行异常: " + e.getMessage(), e);
             }
         };
@@ -109,7 +108,7 @@ public class JsScriptEngine extends AbstractScriptEngine {
             // 使用超时执行器执行脚本
             return ScriptUtils.executeWithTimeout(task, DEFAULT_TIMEOUT_MS);
         } catch (Exception e) {
-            logger.error("执行JavaScript脚本错误: {}", e.getMessage());
+            log.error("执行JavaScript脚本错误: {}", e.getMessage());
             throw new RuntimeException("脚本执行失败: " + e.getMessage(), e);
         }
     }
@@ -137,7 +136,7 @@ public class JsScriptEngine extends AbstractScriptEngine {
                 // 执行脚本
                 return engine.eval(script, bindings);
             } catch (ScriptException e) {
-                logger.error("执行JavaScript脚本异常: {}", e.getMessage());
+                log.error("执行JavaScript脚本异常: {}", e.getMessage());
                 throw new RuntimeException("脚本执行异常: " + e.getMessage(), e);
             }
         };
@@ -146,14 +145,14 @@ public class JsScriptEngine extends AbstractScriptEngine {
             // 使用超时执行器执行脚本
             return ScriptUtils.executeWithTimeout(task, DEFAULT_TIMEOUT_MS);
         } catch (Exception e) {
-            logger.error("执行JavaScript脚本错误: {}", e.getMessage());
+            log.error("执行JavaScript脚本错误: {}", e.getMessage());
             throw new RuntimeException("脚本执行失败: " + e.getMessage(), e);
         }
     }
 
     @Override
     public void destroy() {
-        logger.info("销毁JavaScript脚本引擎");
+        log.info("销毁JavaScript脚本引擎");
         cachedScripts.clear();
         engine = null;
         engineManager = null;

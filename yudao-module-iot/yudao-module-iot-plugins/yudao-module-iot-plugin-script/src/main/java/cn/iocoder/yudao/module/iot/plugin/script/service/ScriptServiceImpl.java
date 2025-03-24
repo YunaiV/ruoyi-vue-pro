@@ -6,13 +6,12 @@ import cn.iocoder.yudao.module.iot.plugin.script.engine.AbstractScriptEngine;
 import cn.iocoder.yudao.module.iot.plugin.script.engine.ScriptEngineFactory;
 import cn.iocoder.yudao.module.iot.plugin.script.sandbox.JsSandbox;
 import cn.iocoder.yudao.module.iot.plugin.script.sandbox.ScriptSandbox;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,10 +19,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * 脚本服务实现类
  */
 @Service
+@Slf4j
 public class ScriptServiceImpl implements ScriptService {
-    private static final Logger logger = LoggerFactory.getLogger(ScriptServiceImpl.class);
 
-    @Autowired
+    @Resource
     private ScriptEngineFactory engineFactory;
 
     /**
@@ -50,7 +49,7 @@ public class ScriptServiceImpl implements ScriptService {
             try {
                 engine.destroy();
             } catch (Exception e) {
-                logger.error("销毁脚本引擎失败", e);
+                log.error("销毁脚本引擎失败", e);
             }
         }
         engineCache.clear();
@@ -75,7 +74,7 @@ public class ScriptServiceImpl implements ScriptService {
             // 执行脚本
             return engine.execute(script, context);
         } catch (Exception e) {
-            logger.error("执行脚本失败: {}", e.getMessage());
+            log.error("执行脚本失败: {}", e.getMessage());
             throw new RuntimeException("执行脚本失败: " + e.getMessage(), e);
         }
     }
@@ -101,7 +100,7 @@ public class ScriptServiceImpl implements ScriptService {
     public boolean validateScript(String scriptType, String script) {
         ScriptSandbox sandbox = sandboxCache.get(scriptType.toLowerCase());
         if (sandbox == null) {
-            logger.warn("找不到脚本类型[{}]对应的沙箱，使用默认JS沙箱", scriptType);
+            log.warn("找不到脚本类型[{}]对应的沙箱，使用默认JS沙箱", scriptType);
             sandbox = new JsSandbox();
             sandboxCache.put(scriptType.toLowerCase(), sandbox);
         }

@@ -19,7 +19,7 @@
         <!-- 引入公共模块 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-iot-plugin-common</artifactId>
+            <artifactId>yudao-module-iot-api</artifactId>
             <version>${revision}</version>
         </dependency>
 

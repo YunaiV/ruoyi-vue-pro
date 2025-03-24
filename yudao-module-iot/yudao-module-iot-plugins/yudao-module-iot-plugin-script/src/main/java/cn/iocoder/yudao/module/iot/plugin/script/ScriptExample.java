@@ -2,8 +2,7 @@ package cn.iocoder.yudao.module.iot.plugin.script;
 
 import cn.iocoder.yudao.module.iot.plugin.script.context.PluginScriptContext;
 import cn.iocoder.yudao.module.iot.plugin.script.service.ScriptService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,8 +13,8 @@ import java.util.Map;
  * 脚本使用示例类
  */
 @Component
+@Slf4j
 public class ScriptExample {
-    private static final Logger logger = LoggerFactory.getLogger(ScriptExample.class);
 
     @Autowired
     private ScriptService scriptService;
@@ -31,7 +30,7 @@ public class ScriptExample {
         params.put("b", 20);
 
         Object result = scriptService.executeJavaScript(script, params);
-        logger.info("脚本执行结果: {}", result);
+        log.info("脚本执行结果: {}", result);
     }
 
     /**
@@ -73,17 +72,17 @@ public class ScriptExample {
             Object result = scriptService.executeJavaScript(script, context);
             if (result != null) {
                 // 处理结果
-                logger.info("设备数据处理结果: {}", result);
+                log.info("设备数据处理结果: {}", result);
 
                 // 安全地将结果转换为Map
                 if (result instanceof Map) {
                     return (Map<String, Object>) result;
                 } else {
-                    logger.warn("脚本返回结果类型不是Map: {}", result.getClass().getName());
+                    log.warn("脚本返回结果类型不是Map: {}", result.getClass().getName());
                 }
             }
         } catch (Exception e) {
-            logger.error("处理设备数据失败: {}", e.getMessage());
+            log.error("处理设备数据失败: {}", e.getMessage());
         }
 
         return new HashMap<>();
@@ -121,10 +120,10 @@ public class ScriptExample {
             if (result instanceof String) {
                 return (String) result;
             } else if (result != null) {
-                logger.warn("脚本返回结果类型不是String: {}", result.getClass().getName());
+                log.warn("脚本返回结果类型不是String: {}", result.getClass().getName());
             }
         } catch (Exception e) {
-            logger.error("生成设备命令失败: {}", e.getMessage());
+            log.error("生成设备命令失败: {}", e.getMessage());
         }
 
         return null;
