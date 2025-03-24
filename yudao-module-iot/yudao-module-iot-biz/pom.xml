@@ -70,11 +70,11 @@
         </dependency>
 
         <!-- 脚本插件相关 -->
-        <dependency>
+        <!--<dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-iot-plugin-script</artifactId>
             <version>${revision}</version>
-        </dependency>
+        </dependency>-->
 
         <!-- 消息队列相关 -->
         <dependency>
