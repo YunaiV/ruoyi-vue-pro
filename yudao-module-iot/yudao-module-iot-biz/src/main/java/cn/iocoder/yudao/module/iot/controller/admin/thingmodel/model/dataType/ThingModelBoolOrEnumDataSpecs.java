@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -16,16 +19,12 @@ import lombok.EqualsAndHashCode;
 @JsonIgnoreProperties({"dataType"}) // 忽略子类中的 dataType 字段，从而避免重复
 public class ThingModelBoolOrEnumDataSpecs extends ThingModelDataSpecs {
 
-    // TODO @puhui999：要不写下参数校验？这样，注释可以简洁一点
-    /**
-     * 枚举项的名称。
-     * 可包含中文、大小写英文字母、数字、下划线（_）和短划线（-）
-     * 必须以中文、英文字母或数字开头，长度不超过 20 个字符
-     */
+    @NotEmpty(message = "枚举项的名称不能为空")
+    @Pattern(regexp = "^[\\u4e00-\\u9fa5a-zA-Z0-9][\\u4e00-\\u9fa5a-zA-Z0-9_-]{0,19}$",
+            message = "枚举项的名称只能包含中文、大小写英文字母、数字、下划线和短划线，必须以中文、英文字母或数字开头，长度不超过 20 个字符")
     private String name;
-    /**
-     * 枚举值。
-     */
+
+    @NotNull(message = "枚举值不能为空")
     private Integer value;
 
 }
