@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 /**
- * {@link IotDataBridgeExecute} 实现类的测试
+ * {@link IotDataBridgeExecute} 实现类的单元测试
  *
  * @author HUIHUI
  */
@@ -41,114 +41,125 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
     @BeforeEach
     public void setUp() {
         // 创建共享的测试消息
-        message = IotDeviceMessage.builder().requestId("TEST-001").reportTime(LocalDateTime.now()).tenantId(1L)
-                .productKey("testProduct").deviceName("testDevice").deviceKey("testDeviceKey")
-                .type("property").identifier("temperature").data("{\"value\": 60}")
+        message = IotDeviceMessage.builder()
+                .requestId("TEST-001")
+                .reportTime(LocalDateTime.now())
+                .tenantId(1L)
+                .productKey("testProduct")
+                .deviceName("testDevice")
+                .deviceKey("testDeviceKey")
+                .type("property")
+                .identifier("temperature")
+                .data("{\"value\": 60}")
                 .build();
-
-        // 配置 RestTemplate mock 返回成功响应
-        // TODO @puhui999：这个应该放到 testHttpDataBridge 里
-        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(), any(Class.class)))
-                .thenReturn(new ResponseEntity<>("Success", HttpStatus.OK));
     }
 
     @Test
-    public void testKafkaMQDataBridge() {
+    public void testKafkaMQDataBridge() throws Exception {
         // 1. 创建执行器实例
         IotKafkaMQDataBridgeExecute action = new IotKafkaMQDataBridgeExecute();
 
         // 2. 创建配置
-        // TODO @puhui999：可以改成链式哈。
-        IotDataBridgeKafkaMQConfig config = new IotDataBridgeKafkaMQConfig();
-        config.setBootstrapServers("127.0.0.1:9092");
-        config.setTopic("test-topic");
-        config.setSsl(false);
-        config.setUsername(null);
-        config.setPassword(null);
+        IotDataBridgeKafkaMQConfig config = new IotDataBridgeKafkaMQConfig()
+                .setBootstrapServers("127.0.0.1:9092")
+                .setTopic("test-topic")
+                .setSsl(false)
+                .setUsername(null)
+                .setPassword(null);
 
-        // 3. 执行两次测试，验证缓存
-        log.info("[testKafkaMQDataBridge][第一次执行，应该会创建新的 producer]");
-        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
-
-        log.info("[testKafkaMQDataBridge][第二次执行，应该会复用缓存的 producer]");
-        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
+        // 3. 执行测试并验证缓存
+        executeAndVerifyCache(action, config, "KafkaMQ");
     }
 
     @Test
-    public void testRabbitMQDataBridge() {
+    public void testRabbitMQDataBridge() throws Exception {
         // 1. 创建执行器实例
         IotRabbitMQDataBridgeExecute action = new IotRabbitMQDataBridgeExecute();
 
         // 2. 创建配置
-        IotDataBridgeRabbitMQConfig config = new IotDataBridgeRabbitMQConfig();
-        config.setHost("localhost");
-        config.setPort(5672);
-        config.setVirtualHost("/");
-        config.setUsername("admin");
-        config.setPassword("123456");
-        config.setExchange("test-exchange");
-        config.setRoutingKey("test-key");
-        config.setQueue("test-queue");
+        IotDataBridgeRabbitMQConfig config = new IotDataBridgeRabbitMQConfig()
+                .setHost("localhost")
+                .setPort(5672)
+                .setVirtualHost("/")
+                .setUsername("admin")
+                .setPassword("123456")
+                .setExchange("test-exchange")
+                .setRoutingKey("test-key")
+                .setQueue("test-queue");
 
-        // 3. 执行两次测试，验证缓存
-        log.info("[testRabbitMQDataBridge][第一次执行，应该会创建新的 producer]");
-        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
-
-        log.info("[testRabbitMQDataBridge][第二次执行，应该会复用缓存的 producer]");
-        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
+        // 3. 执行测试并验证缓存
+        executeAndVerifyCache(action, config, "RabbitMQ");
     }
 
     @Test
-    public void testRedisStreamMQDataBridge() {
+    public void testRedisStreamMQDataBridge() throws Exception {
         // 1. 创建执行器实例
         IotRedisStreamMQDataBridgeExecute action = new IotRedisStreamMQDataBridgeExecute();
 
         // 2. 创建配置
-        IotDataBridgeRedisStreamMQConfig config = new IotDataBridgeRedisStreamMQConfig();
-        config.setHost("127.0.0.1");
-        config.setPort(6379);
-        config.setDatabase(0);
-        config.setPassword("123456");
-        config.setTopic("test-stream");
+        IotDataBridgeRedisMQConfig config = new IotDataBridgeRedisMQConfig()
+                .setHost("127.0.0.1")
+                .setPort(6379)
+                .setDatabase(0)
+                .setPassword("123456")
+                .setTopic("test-stream");
 
-        // 3. 执行两次测试，验证缓存
-        log.info("[testRedisStreamMQDataBridge][第一次执行，应该会创建新的 producer]");
-        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
-
-        log.info("[testRedisStreamMQDataBridge][第二次执行，应该会复用缓存的 producer]");
-        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
+        // 3. 执行测试并验证缓存
+        executeAndVerifyCache(action, config, "RedisStreamMQ");
     }
 
     @Test
-    public void testRocketMQDataBridge() {
+    public void testRocketMQDataBridge() throws Exception {
         // 1. 创建执行器实例
         IotRocketMQDataBridgeExecute action = new IotRocketMQDataBridgeExecute();
 
         // 2. 创建配置
-        IotDataBridgeRocketMQConfig config = new IotDataBridgeRocketMQConfig();
-        config.setNameServer("127.0.0.1:9876");
-        config.setGroup("test-group");
-        config.setTopic("test-topic");
-        config.setTags("test-tag");
+        IotDataBridgeRocketMQConfig config = new IotDataBridgeRocketMQConfig()
+                .setNameServer("127.0.0.1:9876")
+                .setGroup("test-group")
+                .setTopic("test-topic")
+                .setTags("test-tag");
 
-        // 3. 执行两次测试，验证缓存
-        log.info("[testRocketMQDataBridge][第一次执行，应该会创建新的 producer]");
-        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
-
-        log.info("[testRocketMQDataBridge][第二次执行，应该会复用缓存的 producer]");
-        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
+        // 3. 执行测试并验证缓存
+        executeAndVerifyCache(action, config, "RocketMQ");
     }
 
     @Test
     public void testHttpDataBridge() throws Exception {
-        // 创建配置
-        IotDataBridgeHttpConfig config = new IotDataBridgeHttpConfig();
-        config.setUrl("https://doc.iocoder.cn/");
-        config.setMethod(HttpMethod.GET.name());
+        // 1. 配置 RestTemplate mock 返回成功响应
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(), any(Class.class)))
+                .thenReturn(new ResponseEntity<>("Success", HttpStatus.OK));
 
-        // 执行测试
+        // 2. 创建配置
+        IotDataBridgeHttpConfig config = new IotDataBridgeHttpConfig()
+                .setUrl("https://doc.iocoder.cn/")
+                .setMethod(HttpMethod.GET.name());
+
+        // 3. 执行测试
         log.info("[testHttpDataBridge][执行HTTP数据桥接测试]");
-        httpDataBridgeExecute.execute(message, new IotDataBridgeDO().setType(httpDataBridgeExecute.getType()).setConfig(config));
+        httpDataBridgeExecute.execute(message, new IotDataBridgeDO()
+                .setType(httpDataBridgeExecute.getType())
+                .setConfig(config));
+    }
+
+    /**
+     * 执行测试并验证缓存的通用方法
+     *
+     * @param action 执行器实例
+     * @param config 配置对象
+     * @param mqType MQ类型
+     * @throws Exception 如果执行过程中发生异常
+     */
+    private void executeAndVerifyCache(IotDataBridgeExecute<?> action, IotDataBridgeAbstractConfig config, String mqType) throws Exception {
+        log.info("[test{}DataBridge][第一次执行，应该会创建新的 producer]", mqType);
+        action.execute(message, new IotDataBridgeDO()
+                .setType(action.getType())
+                .setConfig(config));
+
+        log.info("[test{}DataBridge][第二次执行，应该会复用缓存的 producer]", mqType);
+        action.execute(message, new IotDataBridgeDO()
+                .setType(action.getType())
+                .setConfig(config));
     }
 
 }
