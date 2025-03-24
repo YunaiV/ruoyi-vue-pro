@@ -76,6 +76,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
         List<ErpPurchaseReturnItemDO> item = validatePurchaseReturnItems(vo.getItems());
         // 1.2.1 校验退货项是否同一个入库单
         checkInItemId(item);
+
         // 1.3 校验结算账户
         erpAccountApi.validateAccount(vo.getAccountId());
         // 1.4 生成退货单号，并校验唯一性

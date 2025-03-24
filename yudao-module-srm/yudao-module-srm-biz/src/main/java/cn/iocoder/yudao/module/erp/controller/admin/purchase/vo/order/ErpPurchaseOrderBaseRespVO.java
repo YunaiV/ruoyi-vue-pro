@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order;
 
 import cn.iocoder.yudao.framework.mybatis.core.vo.BaseVO;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
-import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.resp.ErpPurchaseRequestItemRespVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -24,12 +23,12 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
     @Schema(description = "id")
     private Long id;
     @Schema(description = "采购单编号")
-    @ExcelProperty("采购单编号")
+
     private String no;
     @Schema(description = "单据日期")
     private LocalDateTime noTime;
     @Schema(description = "采购时间")
-    @ExcelProperty("采购时间")
+
     private LocalDateTime orderTime;
     @Schema(description = "订单项列表")
     private List<Item> items;
@@ -51,13 +50,12 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
     @Schema(description = "交货日期")
     private LocalDateTime deliveryDate;
     // ========== 审核信息 ==========
-    @Schema(description = "审核者id")
-    @ExcelProperty("审核者id")
-    private String auditor;
-    private Long auditorId;
+
     @Schema(description = "审核人名称")
-    @ExcelProperty("审核人名称")
-    private String auditorName;
+    private String auditor;
+    @Schema(description = "审核者id")
+    private Long auditorId;
+
     @Schema(description = "审核时间")
     @ExcelProperty("审核时间")
     @ContentStyle(shrinkToFit = BooleanEnum.TRUE)
@@ -133,7 +131,11 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
     @Schema(description = "附件地址")
     private String fileUrl;
 
+    @Schema(description = "总验货通过数量")
+    private Integer totalInspectionPassCount;
 
+    @Schema(description = "总完工数量")
+    private Integer totalCompletionCount;
     /**
      * 验货单，JSON 格式
      */
@@ -144,6 +146,7 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
      */
     @Schema(description = "完工单json")
     private String completionJson;
+
     @Data
     public static class Item extends BaseVO {
         @Schema(description = "订单项编号")
@@ -154,8 +157,12 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
         @Schema(description = "erp产品")
         private ErpProductDTO product;
 
+        @Schema(description = "币别id(财务管理-币别维护)")
+        private Long currencyId;
+
         @Schema(description = "币别名称")
-        private Long currencyName;
+        private String currencyName;
+
         @Schema(description = "产品下单数量")
         private BigDecimal count;
         @Schema(description = "产品单价")
@@ -173,12 +180,15 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
         private String remark;
         @Schema(description = "供应商付款条款")
         private String supplierRule;
+
         // ========== 采购入库 ==========
         //待入库数量
         @Schema(description = "待入库数量")
         private BigDecimal waitInCount;
+
         @Schema(description = "采购入库数量")
         private BigDecimal inCount;
+
         // ========== 采购退货（出库）） ==========
         @Schema(description = "采购退货数量")
         private BigDecimal returnCount;
@@ -233,11 +243,9 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
         private Long purchaseApplyItemId;
         @Schema(description = "采购申请单No")
         private String erpPurchaseRequestItemNo;
-        @Schema(description = "申请项")
-        private ErpPurchaseRequestItemRespVO purchaseRequestItem;
+        //        @Schema(description = "申请项")
+//        private ErpPurchaseRequestItemRespVO purchaseRequestItem;
 
-        @Schema(description = "币别id(财务管理-币别维护)")
-        private Long currencyId;
 
         @Schema(description = "交货日期")
         private LocalDateTime deliveryTime;

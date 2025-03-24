@@ -39,8 +39,8 @@ public class ErpPurchaseOrderItemDO extends TenantBaseDO {
     /**
      * 仓库编号
      * <p>
-     * 关联  {@link cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO#getId()}
      */
+//     * 关联  {@link cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO#getId()}
     private Long warehouseId; // 仓库编号
     /**
      * 采购订单编号
@@ -51,14 +51,14 @@ public class ErpPurchaseOrderItemDO extends TenantBaseDO {
     /**
      * 产品编号
      * <p>
-     * 关联 {@link cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO#getId()}
      */
+//     * 关联 {@link cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO#getId()}
     private Long productId;
     /**
      * 产品单位单位
      * <p>
-     * 冗余 {@link cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO#getUnitId()}
      */
+//     * 冗余 {@link cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO#getUnitId()}
     private Long productUnitId;
     /**
      * 商品行备注
@@ -186,4 +186,12 @@ public class ErpPurchaseOrderItemDO extends TenantBaseDO {
      * 部门id
      */
     private Long applicationDeptId;
+
+    private String sku;
+
+    private String barCode;
+    /**
+     * 单据来源
+     */
+    private String source;
 }

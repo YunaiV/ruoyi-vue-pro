@@ -110,4 +110,8 @@ public class ErpPurchaseReturnItemDO extends BaseDO {
      * 申请部门id
      */
     private Long applicationDeptId;
+
+    private String sku;
+
+    private String barCode;
 }

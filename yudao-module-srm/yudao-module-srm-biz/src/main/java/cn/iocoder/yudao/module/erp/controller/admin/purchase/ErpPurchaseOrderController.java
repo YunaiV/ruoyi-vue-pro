@@ -35,6 +35,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -188,6 +189,8 @@ public class ErpPurchaseOrderController {
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getApplicationDeptId));
         // 1.6 仓库
         Map<Long, ErpWarehouseDTO> warehouseMap = wmsWarehouseApi.getWarehouseMap(convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getWarehouseId));
+        //1.7 币别map
+//        Map<Long, ErpCurrencyDTO> currencyMap = erpCurrencyApi.getCurrencyMap(convertSet(list, ErpPurchaseOrderDO::getCurrencyId));
 
         // 2. 开始拼接
         return BeanUtils.toBean(list, ErpPurchaseOrderBaseRespVO.class, respVO -> {
@@ -203,12 +206,15 @@ public class ErpPurchaseOrderController {
                 MapUtils.findAndThen(userMap, item.getApplicantId(), user -> item.setApplicantName(user.getNickname()));
                 //部门name
                 MapUtils.findAndThen(deptMap, item.getApplicationDeptId(), dept -> item.setDepartmentName(dept.getName()));
+                //待入库数量
+                item.setWaitInCount(item.getCount().subtract(item.getInCount() == null ? BigDecimal.ZERO : item.getInCount()));
             }));
             MapUtils.findAndThen(supplierMap, respVO.getSupplierId(), supplier -> respVO.setSupplierName(supplier.getName()));
             //人员
+            MapUtils.findAndThen(userMap, respVO.getAuditorId(), user -> respVO.setAuditor(user.getNickname()));
             MapUtils.findAndThen(userMap, Long.parseLong(respVO.getCreator()), user -> respVO.setCreator(user.getNickname()));
             MapUtils.findAndThen(userMap, Long.parseLong(respVO.getUpdater()), user -> respVO.setUpdater(user.getNickname()));
-            Optional.ofNullable(respVO.getAuditor()).ifPresent(auditor -> MapUtils.findAndThen(userMap, Long.parseLong(auditor), user -> respVO.setAuditorName(user.getNickname())));
+            //待入库数量
         });
     }
 

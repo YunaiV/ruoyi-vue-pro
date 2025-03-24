@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.erp.convert.purchase.ErpOrderInConvert;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
+import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseInItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseOrderItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseOrderMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestItemsMapper;
@@ -110,6 +111,8 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     StateMachine<ErpOffStatus, SrmEventEnum, ErpPurchaseRequestItemsDO> requestItemOffMachine;
     @Autowired
     private ResourcePatternResolver resourcePatternResolver;
+    @Autowired
+    private ErpPurchaseInItemMapper erpPurchaseInItemMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -117,7 +120,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         // 校验编号
         //        validatePurchaseOrderExists(createReqVO.getNo());
         // 1.1 校验订单项的有效性
-        List<ErpPurchaseOrderItemDO> purchaseOrderItems = validatePurchaseOrderItems(createReqVO.getItems());
+        List<ErpPurchaseOrderItemDO> orderItems = validatePurchaseOrderItems(createReqVO.getItems());
         // 1.2 校验供应商
         supplierService.validateSupplier(createReqVO.getSupplierId());
         // 1.3 校验结算账户
@@ -129,19 +132,19 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         ThrowUtil.ifThrow(purchaseOrderMapper.selectByNo(no) != null, PURCHASE_ORDER_NO_EXISTS);
         // 2.1 插入订单
         ErpPurchaseOrderDO orderDO = BeanUtils.toBean(createReqVO, ErpPurchaseOrderDO.class, in -> in.setNo(no));
-        calculateTotalPrice(orderDO, purchaseOrderItems);
+        calculateTotalPrice(orderDO, orderItems);
         // 2.1.1 插入单据日期+结算日期
         orderDO.setNoTime(LocalDateTime.now());
         orderDO.setSettlementDate(createReqVO.getSettlementDate() == null ? LocalDateTime.now() : createReqVO.getSettlementDate());
         orderDO.setOrderTime(LocalDateTime.now());
         ThrowUtil.ifSqlThrow(purchaseOrderMapper.insert(orderDO), GlobalErrorCodeConstants.DB_INSERT_ERROR);
         // 2.2 插入订单项
-        purchaseOrderItems.forEach(o -> o.setOrderId(orderDO.getId()));
-        purchaseOrderItemMapper.insertBatch(purchaseOrderItems);
-        purchaseOrderItems = purchaseOrderItemMapper.selectListByOrderId(orderDO.getId());
+        orderItems.forEach(o -> o.setOrderId(orderDO.getId()).setSource("WEB录入"));
+        purchaseOrderItemMapper.insertBatch(orderItems);
+        orderItems = purchaseOrderItemMapper.selectListByOrderId(orderDO.getId());
         //3.0 设置初始化状态
         initMasterState(orderDO);
-        initSlaveStatus(purchaseOrderItems);
+        initSlaveStatus(orderItems);
         return orderDO.getId();
     }
 
@@ -393,10 +396,15 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         if (CollUtil.isEmpty(purchaseOrders)) {
             return;
         }
-        purchaseOrders.forEach(purchaseOrder -> {
-            if (SrmAuditStatus.APPROVED.getCode().equals(purchaseOrder.getAuditStatus())) {
-                throw exception(PURCHASE_ORDER_DELETE_FAIL_APPROVE, purchaseOrder.getNo());
+        purchaseOrders.forEach(orderDO -> {
+            if (SrmAuditStatus.APPROVED.getCode().equals(orderDO.getAuditStatus())) {
+                throw exception(PURCHASE_ORDER_DELETE_FAIL_APPROVE, orderDO.getNo());
             }
+            //存在对应的采购入库项->异常
+            purchaseOrderItemMapper.selectListByOrderId(orderDO.getId()).forEach(item -> {
+                boolean b = erpPurchaseInItemMapper.existsByOrderItemId(item.getId());
+                ThrowUtil.ifThrow(b, PURCHASE_ORDER_ITEM_IN_FAIL_EXISTS_DEL, item.getId());
+            });
         });
         // 2. 遍历删除，并记录操作日志
         purchaseOrders.forEach(purchaseOrder -> {
@@ -548,6 +556,12 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
                 auditMachine.fireEvent(currentStatus, SrmEventEnum.REJECT, req);
             }
         } else {
+            //反审核
+            //存在对应的采购入库项->异常
+            purchaseOrderItemMapper.selectListByOrderId(orderDO.getId()).forEach(item -> {
+                boolean b = erpPurchaseInItemMapper.existsByOrderItemId(item.getId());
+                ThrowUtil.ifThrow(b, PURCHASE_ORDER_ITEM_IN_FAIL_EXISTS_IN, item.getId());
+            });
             log.debug("采购订单撤回审核，ID: {}", orderDO.getId());
             auditMachine.fireEvent(currentStatus, SrmEventEnum.WITHDRAW_REVIEW, req);
         }

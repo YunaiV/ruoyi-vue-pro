@@ -131,4 +131,8 @@ public class ErpPurchaseInItemDO extends BaseDO {
      * 汇率
      */
     private BigDecimal exchangeRate;
+
+    private String sku;
+
+    private String barCode;
 }

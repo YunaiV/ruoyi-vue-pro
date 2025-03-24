@@ -11,7 +11,9 @@ import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.erp.api.product.ErpProductUnitApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductUnitDTO;
 import cn.iocoder.yudao.module.erp.api.stock.WmsWarehouseApi;
 import cn.iocoder.yudao.module.erp.api.stock.dto.ErpWarehouseDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req.*;
@@ -65,6 +67,7 @@ public class ErpPurchaseRequestController {
     private final AdminUserApi adminUserApi;
     private final DeptApi deptApi;
     private final ErpSupplierService erpSupplierService;
+    private final ErpProductUnitApi erpProductUnitApi;
 
 
     @PostMapping("/create")
@@ -202,6 +205,10 @@ public class ErpPurchaseRequestController {
         Map<Long, ErpSupplierDO> supplierMap = erpSupplierService.getSupplierMap(
             convertSet(oldList, ErpPurchaseRequestDO::getSupplierId)
         );
+        //1.6 收集单位id map，从prodcut里面
+        Map<Long, ErpProductUnitDTO> unitMap = erpProductUnitApi.getProductUnitMap(
+            productMap.values().stream().map(ErpProductDTO::getUnitId).collect(Collectors.toSet())
+        );
         //2 开始拼接
         return BeanUtils.toBean(oldList, ErpPurchaseRequestRespVO.class, purchaseRequest -> {
             //2.1 申请单填充
@@ -210,15 +217,18 @@ public class ErpPurchaseRequestController {
             MapUtils.findAndThen(userMap, purchaseRequest.getAuditorId(), user -> purchaseRequest.setAuditor(user.getNickname()));//审核者
             //设置部门信息
             MapUtils.findAndThen(deptMap, purchaseRequest.getApplicationDeptId(), dept -> purchaseRequest.setApplicationDept(dept.getName()));
+
             //供应商信息
             MapUtils.findAndThen(supplierMap, purchaseRequest.getSupplierId(), supplier -> purchaseRequest.setSupplierName(supplier.getName()));
             purchaseRequest.setItems(
                 BeanUtils.toBean(purchaseRequestItemMap.get(purchaseRequest.getId()), ErpPurchaseRequestItemRespVO.class,
                     item -> {
                         MapUtils.findAndThen(productMap, item.getProductId(), product -> item
-                                .setProductName(product.getName())
-                                .setProductBarCode(product.getBarCode())
-//                            .setProductUnitName(product.getUnitName())
+                            .setProductName(product.getName())
+                            .setProductBarCode(product.getBarCode())
+                            .setProductUnitName(unitMap.get(product.getUnitId()).getName())
+                            .setProductUnitId(unitMap.get(product.getUnitId()).getId())
+                            .setNo(product.getBarCode())
                         );
                         //产品仓库填充
                         MapUtils.findAndThen(warehouseMap, item.getWarehouseId(), erpWarehouseDO -> item.setWarehouseName(erpWarehouseDO.getName()));

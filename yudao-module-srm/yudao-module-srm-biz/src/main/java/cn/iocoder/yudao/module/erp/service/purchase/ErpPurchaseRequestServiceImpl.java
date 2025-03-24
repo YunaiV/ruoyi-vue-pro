@@ -119,10 +119,10 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
 
     private void initSlaveStatus(List<ErpPurchaseRequestItemsDO> itemsDOS) {
         itemsDOS.forEach(i -> {
-            orderItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, SrmEventEnum.ORDER_INIT, TmsOrderCountDTO.builder().purchaseOrderItemId(i.getId()).build());
-            offItemMachine.fireEvent(ErpOffStatus.OPEN, SrmEventEnum.OFF_INIT, i);
-            //入库
-            storageItemMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, SrmEventEnum.STORAGE_INIT, SrmInCountDTO.builder().applyItemId(i.getId()).build());
+                orderItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, SrmEventEnum.ORDER_INIT, TmsOrderCountDTO.builder().purchaseOrderItemId(i.getId()).build());
+                offItemMachine.fireEvent(ErpOffStatus.OPEN, SrmEventEnum.OFF_INIT, i);
+                //入库
+                storageItemMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, SrmEventEnum.STORAGE_INIT, SrmInCountDTO.builder().applyItemId(i.getId()).build());
             }
         );
     }
@@ -215,8 +215,12 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         });
         //3.0 持久化
         Long orderId = erpPurchaseOrderService.createPurchaseOrder(saveReqVO);
-        // 更新订单
+        // 更新订单->设置来源"采购合并"
         erpPurchaseOrderService.updatePurchaseOrder(saveReqVO);
+        List<ErpPurchaseOrderItemDO> itemDOS = erpPurchaseOrderItemMapper.selectListByOrderId(orderId);
+        itemDOS.forEach(itemDO -> itemDO.setSource("采购合并"));
+        erpPurchaseOrderItemMapper.updateBatch(itemDOS);
+        //修改子单据的来源
         return orderId;
     }
 

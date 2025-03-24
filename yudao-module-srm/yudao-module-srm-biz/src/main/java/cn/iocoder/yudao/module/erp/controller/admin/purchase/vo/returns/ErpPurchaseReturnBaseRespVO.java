@@ -61,8 +61,8 @@ public class ErpPurchaseReturnBaseRespVO extends ErpPurchaseBaseRespVO {
     /**
      * 已退款金额，单位：元
      * <p>
-     * 目的：和 {@link cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinancePaymentDO} 结合，记录已支付金额
      */
+//     * 目的：和 {@link cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinancePaymentDO} 结合，记录已支付金额
     private BigDecimal refundPrice;
 
     /**
@@ -102,14 +102,15 @@ public class ErpPurchaseReturnBaseRespVO extends ErpPurchaseBaseRespVO {
 
     @Schema(description = "退货项列表")
     private List<Item> items;
+
     @Data
     public static class Item {
 
         @Schema(description = "退货项编号", example = "11756")
         private Long id;
 
-        @Schema(description = "采购订单项编号")
-        private Long orderItemId;
+//        @Schema(description = "采购订单项编号")
+//        private Long orderItemId;
 
         @Schema(description = "入库项id", requiredMode = Schema.RequiredMode.REQUIRED)
         private Long inItemId;
@@ -124,7 +125,7 @@ public class ErpPurchaseReturnBaseRespVO extends ErpPurchaseBaseRespVO {
          * <p>
          * 冗余 {@link ErpPurchaseOrderDO#getNo()}
          */
-        private String orderNo;
+//        private String orderNo;
 
         @Schema(description = "仓库编号")
         private Long warehouseId;
@@ -176,7 +177,7 @@ public class ErpPurchaseReturnBaseRespVO extends ErpPurchaseBaseRespVO {
         private BigDecimal stockCount; // 该字段仅仅在“详情”和“编辑”时使用
 
         @Schema(description = "价税合计")
-        private  BigDecimal allAmount;
+        private BigDecimal allAmount;
 
         @Schema(description = "报关品名-产品(产品的品牌)")
         private String customsDeclaration;

@@ -42,11 +42,9 @@ public class ErpPurchaseRequestRespVO extends BaseVO {
     @Schema(description = "审核者id")
     @ExcelProperty("审核者id")
     private String auditor;
-    private Long auditorId;
 
-    @Schema(description = "审核人名称")
-    @ExcelProperty("审核人名称")
-    private String auditorName;
+    @Schema(description = "审核者id")
+    private Long auditorId;
 
     @Schema(description = "审核时间")
     @ExcelProperty("审核时间")

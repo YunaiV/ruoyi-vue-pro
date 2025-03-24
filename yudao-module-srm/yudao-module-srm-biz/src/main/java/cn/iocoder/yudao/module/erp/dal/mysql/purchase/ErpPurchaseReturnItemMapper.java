@@ -47,9 +47,9 @@ public interface ErpPurchaseReturnItemMapper extends BaseMapperX<ErpPurchaseRetu
         }
         // SQL sum 查询
         List<Map<String, Object>> result = selectMaps(new QueryWrapper<ErpPurchaseReturnItemDO>()
-                .select("order_item_id, SUM(count) AS sumCount")
-                .groupBy("order_item_id")
-                .in("return_id", returnIds));
+            .select("order_item_id, SUM(count) AS sumCount")
+            .groupBy("order_item_id")
+            .in("return_id", returnIds));
         // 获得数量
         return convertMap(result, obj -> (Long) obj.get("order_item_id"), obj -> (BigDecimal) obj.get("sumCount"));
     }
@@ -62,4 +62,13 @@ public interface ErpPurchaseReturnItemMapper extends BaseMapperX<ErpPurchaseRetu
         return selectList(new LambdaQueryWrapper<ErpPurchaseReturnItemDO>().in(ErpPurchaseReturnItemDO::getId, ids));
     }
 
+    //通过入库项id查找对应的采购退货项
+    default List<ErpPurchaseReturnItemDO> selectListByInItemId(Long inItemId) {
+        return selectList(new LambdaQueryWrapper<ErpPurchaseReturnItemDO>().eq(ErpPurchaseReturnItemDO::getInItemId, inItemId));
+    }
+
+    //入库项id存在对应的采购退货项
+    default boolean existsByInItemId(Long inItemId) {
+        return selectCount(new LambdaQueryWrapper<ErpPurchaseReturnItemDO>().eq(ErpPurchaseReturnItemDO::getInItemId, inItemId)) > 0;
+    }
 }

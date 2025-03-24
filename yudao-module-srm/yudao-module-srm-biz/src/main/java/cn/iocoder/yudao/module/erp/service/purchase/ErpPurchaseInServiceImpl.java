@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemD
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseInItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseInMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseOrderItemMapper;
+import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseReturnItemMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.SrmNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.SrmEventEnum;
 import cn.iocoder.yudao.module.erp.enums.status.ErpPaymentStatus;
@@ -79,6 +80,8 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     private StateMachine<ErpStorageStatus, SrmEventEnum, SrmInCountDTO> orderItemStorageMachine;
     @Resource(name = PURCHASE_IN_AUDIT_STATE_MACHINE)
     private StateMachine<SrmAuditStatus, SrmEventEnum, ErpPurchaseInAuditReqVO> purchaseInAuditStateMachine;
+    @Autowired
+    private ErpPurchaseReturnItemMapper erpPurchaseReturnItemMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -97,7 +100,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         erpAccountApi.validateAccount(createReqVO.getAccountId());
         // 1.4 生成入库单号，并校验唯一性
         String no = noRedisDAO.generate(SrmNoRedisDAO.PURCHASE_IN_NO_PREFIX, PURCHASE_IN_NO_OUT_OF_BOUNDS);
-        ThrowUtil.ifThrow(purchaseInMapper.selectByNo(no) != null ,PURCHASE_IN_NO_EXISTS);
+        ThrowUtil.ifThrow(purchaseInMapper.selectByNo(no) != null, PURCHASE_IN_NO_EXISTS);
 
         // 2.1 插入入库
         ErpPurchaseInDO purchaseIn = BeanUtils.toBean(createReqVO, ErpPurchaseInDO.class, in -> in
@@ -136,6 +139,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
             });
         }
     }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePurchaseIn(ErpPurchaseInSaveReqVO vo) {
@@ -195,7 +199,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     private List<ErpPurchaseInItemDO> validatePurchaseInItems(List<ErpPurchaseInSaveReqVO.Item> list) {
         // 1. 校验产品存在
         List<ErpProductDTO> productList = erpProductApi.validProductList(
-                convertSet(list, ErpPurchaseInSaveReqVO.Item::getProductId));
+            convertSet(list, ErpPurchaseInSaveReqVO.Item::getProductId));
         Map<Long, ErpProductDTO> productMap = convertMap(productList, ErpProductDTO::getId);
         // 2. 转化为 ErpPurchaseInItemDO 列表
         return convertList(list, o -> BeanUtils.toBean(o, ErpPurchaseInItemDO.class, item -> {
@@ -214,7 +218,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         // 第一步，对比新老数据，获得添加、修改、删除的列表
         List<ErpPurchaseInItemDO> oldList = purchaseInItemMapper.selectListByInId(id);
         List<List<ErpPurchaseInItemDO>> diffList = diffList(oldList, newList, // id 不同，就认为是不同的记录
-                (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
+            (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
 
         // 第二步，批量添加、修改、删除
         if (CollUtil.isNotEmpty(diffList.get(0))) {
@@ -261,6 +265,14 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         if (CollUtil.isEmpty(purchaseIns)) {
             return;
         }
+        for (ErpPurchaseInDO inDO : purchaseIns) {
+            //校验,入库项存在对应的退货项 -> 异常
+            purchaseInItemMapper.selectListByInId(inDO.getId()).forEach(purchaseInItem -> {
+                boolean b = erpPurchaseReturnItemMapper.existsByInItemId(purchaseInItem.getId());
+                ThrowUtil.ifThrow(b, PURCHASE_IN_DELETE_FAIL, purchaseInItem.getId());
+            });
+        }
+
         //2. 联动回滚状态数量
         purchaseIns.forEach(purchaseIn -> {
             if (SrmAuditStatus.APPROVED.getCode().equals(purchaseIn.getAuditStatus())) {
@@ -329,7 +341,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     }
 
     @Override
-    public void submitAudit(Collection<Long > inIds) {
+    public void submitAudit(Collection<Long> inIds) {
         for (Long inId : inIds) {
             ErpPurchaseInDO erpPurchaseInDO = validatePurchaseInExists(inId);
             purchaseInAuditStateMachine.fireEvent(SrmAuditStatus.fromCode(erpPurchaseInDO.getAuditStatus())
@@ -359,6 +371,12 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
             }
         } else {
             //撤销审核
+            //校验,入库项存在对应的退货项 -> 异常
+            purchaseInItemMapper.selectListByInId(inDO.getId()).forEach(purchaseInItem -> {
+                boolean b = erpPurchaseReturnItemMapper.existsByInItemId(purchaseInItem.getId());
+                ThrowUtil.ifThrow(b, PURCHASE_IN_PROCESS_FAIL_RETURN_ITEM_EXISTS, purchaseInItem.getId());
+            });
+
             // 1.3 校验已付款
             if (!Objects.equals(inDO.getPayStatus(), ErpPaymentStatus.NONE_PAYMENT.getCode())) {
                 throw exception(PURCHASE_IN_PROCESS_FAIL_PAYMENT_STATUS);

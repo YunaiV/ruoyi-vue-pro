@@ -27,7 +27,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -106,7 +105,7 @@ public class ErpPurchaseReturnController {
     @PreAuthorize("@ss.hasPermission('erp:purchase-return:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportPurchaseReturnExcel(@Valid ErpPurchaseReturnPageReqVO pageReqVO,
-                                    HttpServletResponse response) throws IOException {
+                                          HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         PageResult<ErpPurchaseReturnDO> page = purchaseReturnService.getPurchaseReturnPage(pageReqVO);
         // 导出 Excel
@@ -117,7 +116,7 @@ public class ErpPurchaseReturnController {
     @PutMapping("/submitAudit")
     @Operation(summary = "提交审核")
     @PreAuthorize("@ss.hasPermission('erp:purchase-return:submit')")
-    public CommonResult<Boolean> submitPurchaseReturn(@NotNull @RequestBody ErpPurchaseReturnAuditReqVO reqVO) {
+    public CommonResult<Boolean> submitPurchaseReturn(@Valid ErpPurchaseReturnAuditReqVO reqVO) {
         purchaseReturnService.submitAudit(reqVO.getIds());
         return success(true);
     }
@@ -126,7 +125,7 @@ public class ErpPurchaseReturnController {
     @PutMapping("/auditStatus")
     @Operation(summary = "审核/反审核")
     @PreAuthorize("@ss.hasPermission('erp:purchase-return:review')")
-    public CommonResult<Boolean> auditPurchaseReturn(@NotNull @RequestBody ErpPurchaseReturnAuditReqVO reqVO) {
+    public CommonResult<Boolean> auditPurchaseReturn(@Valid ErpPurchaseReturnAuditReqVO reqVO) {
         purchaseReturnService.review(reqVO);
         return success(true);
     }
@@ -135,7 +134,7 @@ public class ErpPurchaseReturnController {
     @PutMapping("/refundStatus")
     @Operation(summary = "切换退款状态")
     @PreAuthorize("@ss.hasPermission('erp:purchase-return:refund')")
-    public CommonResult<Boolean> refundPurchaseReturn(@NotNull @RequestBody ErpPurchaseReturnAuditReqVO reqVO) {
+    public CommonResult<Boolean> refundPurchaseReturn(@Valid ErpPurchaseReturnAuditReqVO reqVO) {
         purchaseReturnService.refund(reqVO);
         return success(true);
     }
@@ -150,7 +149,7 @@ public class ErpPurchaseReturnController {
         Map<Long, List<ErpPurchaseReturnItemDO>> purchaseReturnItemMap = convertMultiMap(purchaseReturnItemList, ErpPurchaseReturnItemDO::getReturnId);
         // 1.2 产品信息
         Map<Long, ErpProductDTO> productMap = erpProductApi.getProductMap(
-                convertSet(purchaseReturnItemList, ErpPurchaseReturnItemDO::getProductId));
+            convertSet(purchaseReturnItemList, ErpPurchaseReturnItemDO::getProductId));
         // 1.3 供应商信息
         Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(
             convertSet(list, ErpPurchaseReturnDO::getSupplierId));
@@ -164,7 +163,7 @@ public class ErpPurchaseReturnController {
                         MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
                                 .setProductBarCode(product.getBarCode())
 //                            .setProductUnitName(product.getUnitName())
-                            .setProduct(product)
+                                .setProduct(product)
                         );
                     }
                 )

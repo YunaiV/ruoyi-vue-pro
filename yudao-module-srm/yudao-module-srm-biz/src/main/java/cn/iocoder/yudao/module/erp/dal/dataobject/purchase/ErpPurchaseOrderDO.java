@@ -173,5 +173,8 @@ public class ErpPurchaseOrderDO extends TenantBaseDO {
      * 总验货通过数量
      */
     private Integer totalInspectionPassCount;
-
+    /**
+     * 总完工数量
+     */
+    private Integer totalCompletionCount;
 }

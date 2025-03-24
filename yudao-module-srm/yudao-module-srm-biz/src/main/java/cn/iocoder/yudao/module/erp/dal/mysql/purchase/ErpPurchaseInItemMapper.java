@@ -31,4 +31,14 @@ public interface ErpPurchaseInItemMapper extends BaseMapperX<ErpPurchaseInItemDO
     default Long sumInItemsByItemId(Long orderItemId) {
         return selectCount(ErpPurchaseInItemDO::getOrderItemId, orderItemId);
     }
+
+    //根据orderItemId找对应的入库项
+    default List<ErpPurchaseInItemDO> selectListByOrderItemId(Long orderItemId) {
+        return selectList(ErpPurchaseInItemDO::getOrderItemId, orderItemId);
+    }
+
+    //根据orderItemId是否存在入库项
+    default boolean existsByOrderItemId(Long orderItemId) {
+        return selectCount(ErpPurchaseInItemDO::getOrderItemId, orderItemId) > 0;
+    }
 }

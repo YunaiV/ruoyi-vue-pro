@@ -23,6 +23,10 @@ public class ErpPurchaseRequestItemRespVO extends BaseVO {
     private String no;
 
     // ========== 产品信息 ==========
+//
+//    @Schema(description = "产品信息")
+//    private ErpProductDTO product;
+
     @Schema(description = "产品编号")
     @ExcelProperty("产品编号")
     private Long productId;
@@ -41,7 +45,7 @@ public class ErpPurchaseRequestItemRespVO extends BaseVO {
 
     @Schema(description = "产品单位ID")
     @ExcelProperty("产品单位ID")
-    private String productUnitId;
+    private Long productUnitId;
 
     @Schema(description = "仓库id")
     private Long warehouseId;
@@ -56,10 +60,6 @@ public class ErpPurchaseRequestItemRespVO extends BaseVO {
     @NotNull(message = "产品数量不能为空")
     @ExcelProperty("产品数量")
     private Integer count;
-
-    @Schema(description = "已入库数量")
-    @ExcelProperty("已入库数量")
-    private Integer inQty;
 
     @Schema(description = "参考单价")
     @ExcelProperty("参考单价")
