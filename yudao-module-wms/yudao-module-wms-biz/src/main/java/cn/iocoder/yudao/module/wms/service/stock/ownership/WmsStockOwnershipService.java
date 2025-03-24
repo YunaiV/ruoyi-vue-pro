@@ -65,4 +65,10 @@ public interface WmsStockOwnershipService {
      * @return 库存归属
      */
     List<WmsStockOwnershipDO> selectStockOwnership(Long warehouseId, Long productId);
+
+    /**
+     * 调整归属库存
+     * 此方法必须包含在 WmsStockWarehouseServiceImpl.outboundSingleItemTransactional 方法中
+     */
+    void outboundSingleItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long outboundId, Long outboundItemId);
 }

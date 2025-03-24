@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.wms.dal.mysql.stock.bin;
 
 import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
@@ -49,6 +50,16 @@ public interface WmsStockBinMapper extends BaseMapperX<WmsStockBinDO> {
         LambdaQueryWrapperX<WmsStockBinDO> wrapper = new LambdaQueryWrapperX<>();
         wrapper.eq(WmsStockBinDO::getWarehouseId, warehouseId);
         wrapper.eq(WmsStockBinDO::getProductId, productId);
+        return selectList(wrapper);
+    }
+
+    default List<WmsStockBinDO> selectStockBinList(Collection<Long> binIds, Collection<Long> productIds) {
+        if(CollectionUtils.isEmpty(binIds) && CollectionUtils.isEmpty(productIds)) {
+            return new ArrayList<>();
+        }
+        LambdaQueryWrapperX<WmsStockBinDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.in(WmsStockBinDO::getBinId, binIds);
+        wrapper.in(WmsStockBinDO::getProductId, productIds);
         return selectList(wrapper);
     }
 }

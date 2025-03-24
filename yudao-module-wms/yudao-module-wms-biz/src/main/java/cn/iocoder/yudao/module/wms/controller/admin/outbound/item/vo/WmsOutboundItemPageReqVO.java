@@ -6,9 +6,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
-
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+/**
+ * @table-fields : source_item_id,outbound_status,actual_quantity,create_time,bin_id,product_id,plan_quantity,outbound_id
+ */
 @Schema(description = "管理后台 - 出库单详情分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -21,13 +23,7 @@ public class WmsOutboundItemPageReqVO extends PageParam {
     @Schema(description = "标准产品ID", example = "20572")
     private Long productId;
 
-    @Schema(description = "标准产品SKU")
-    private String productSku;
-
-    @Schema(description = "预期量")
-    private Integer expectedQuantity;
-
-    @Schema(description = "实际量")
+    @Schema(description = "实际出库量")
     private Integer actualQuantity;
 
     @Schema(description = "来源详情ID", example = "11448")
@@ -37,4 +33,12 @@ public class WmsOutboundItemPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
+    @Schema(description = "出库状态 ; OutboundStatus : 0-未出库 , 1-部分出库 , 2-已出库", example = "")
+    private Integer outboundStatus;
+
+    @Schema(description = "计划出库量", example = "")
+    private Integer planQuantity;
+
+    @Schema(description = "出库库位ID", example = "")
+    private Long binId;
 }

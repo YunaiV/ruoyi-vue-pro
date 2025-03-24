@@ -9,11 +9,12 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
  * 出库单详情 DO
- *
  * @author 李方捷
+ * @table-fields : source_item_id,outbound_status,actual_quantity,bin_id,product_id,plan_quantity,id,outbound_id
  */
 @TableName("wms_outbound_item")
-@KeySequence("wms_outbound_item_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+// 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@KeySequence("wms_outbound_item_seq")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -27,29 +28,39 @@ public class WmsOutboundItemDO extends BaseDO {
      */
     @TableId
     private Long id;
+
     /**
      * 入库单ID
      */
     private Long outboundId;
+
     /**
      * 标准产品ID
      */
     private Long productId;
-    /**
-     * 标准产品SKU
-     */
-    private String productSku;
-    /**
-     * 预期量
-     */
-    private Integer expectedQuantity;
+
     /**
      * 实际量
      */
     private Integer actualQuantity;
+
     /**
      * 来源详情ID
      */
     private Long sourceItemId;
 
+    /**
+     * 出库状态 ; OutboundStatus : 0-未出库 , 1-部分出库 , 2-已出库
+     */
+    private Integer outboundStatus;
+
+    /**
+     * 计划出库量
+     */
+    private Integer planQuantity;
+
+    /**
+     * 出库库位ID
+     */
+    private Long binId;
 }

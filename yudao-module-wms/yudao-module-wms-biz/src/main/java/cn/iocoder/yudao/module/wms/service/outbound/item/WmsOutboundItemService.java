@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.outbound.item;
 
 import java.util.*;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 import jakarta.validation.*;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.item.WmsOutboundItemDO;
@@ -20,14 +21,14 @@ public interface WmsOutboundItemService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createOutboundItem(@Valid WmsOutboundItemSaveReqVO createReqVO);
+    WmsOutboundItemDO createOutboundItem(@Valid WmsOutboundItemSaveReqVO createReqVO);
 
     /**
      * 更新出库单详情
      *
      * @param updateReqVO 更新信息
      */
-    void updateOutboundItem(@Valid WmsOutboundItemSaveReqVO updateReqVO);
+    WmsOutboundItemDO updateOutboundItem(@Valid WmsOutboundItemSaveReqVO updateReqVO);
 
     /**
      * 删除出库单详情
@@ -52,4 +53,7 @@ public interface WmsOutboundItemService {
      */
     PageResult<WmsOutboundItemDO> getOutboundItemPage(WmsOutboundItemPageReqVO pageReqVO);
 
+    List<WmsOutboundItemDO> selectByOutboundId(Long outboundId);
+
+    void assembleProducts(List<WmsOutboundItemRespVO> itemList);
 }

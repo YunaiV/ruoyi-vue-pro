@@ -45,16 +45,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 @Validated
 public class WmsPickupController {
 
-    // @GetMapping("/export-excel")
-    // @Operation(summary = "导出拣货单 Excel")
-    // @PreAuthorize("@ss.hasPermission('wms:pickup:export')")
-    // @ApiAccessLog(operateType = EXPORT)
-    // public void exportPickupExcel(@Valid WmsPickupPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
-    // pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-    // List<WmsPickupDO> list = pickupService.getPickupPage(pageReqVO).getList();
-    // // 导出 Excel
-    // ExcelUtils.write(response, "拣货单.xls", "数据", WmsPickupRespVO.class, BeanUtils.toBean(list, WmsPickupRespVO.class));
-    // }
+
     @Resource
     @Lazy
     private WmsPickupItemService pickupItemService;
@@ -136,4 +127,15 @@ public class WmsPickupController {
         // 返回
         return success(voPageResult);
     }
-}
+
+    // @GetMapping("/export-excel")
+    // @Operation(summary = "导出拣货单 Excel")
+    // @PreAuthorize("@ss.hasPermission('wms:pickup:export')")
+    // @ApiAccessLog(operateType = EXPORT)
+    // public void exportPickupExcel(@Valid WmsPickupPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
+    // pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+    // List<WmsPickupDO> list = pickupService.getPickupPage(pageReqVO).getList();
+    // // 导出 Excel
+    // ExcelUtils.write(response, "拣货单.xls", "数据", WmsPickupRespVO.class, BeanUtils.toBean(list, WmsPickupRespVO.class));
+    // }
+}

@@ -6,7 +6,13 @@ import java.util.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import com.alibaba.excel.annotation.*;
+import java.util.List;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+/**
+ * @table-fields : tenant_id,no,creator,company_id,create_time,audit_status,creator_comment,type,source_bill_id,updater,update_time,outbound_status,source_bill_no,source_bill_type,id,dept_id,warehouse_id
+ */
 @Schema(description = "管理后台 - 出库单 Response VO")
 @Data
 @ExcelIgnoreUnannotated
@@ -24,16 +30,12 @@ public class WmsOutboundRespVO {
     @ExcelProperty("仓库ID")
     private Long warehouseId;
 
-    @Schema(description = "类型", example = "1")
-    @ExcelProperty("类型")
+    @Schema(description = "出库单类型 ; OutboundType : 1-手工出库 , 2-订单出库", example = "1")
+    @ExcelProperty("出库单类型")
     private Integer type;
 
-    @Schema(description = "状态", example = "1")
-    @ExcelProperty("状态")
-    private String status;
-
-    @Schema(description = "审核状态", example = "2")
-    @ExcelProperty("审核状态")
+    @Schema(description = "出库单审批状态 ; OutboundAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", example = "2")
+    @ExcelProperty("出库单审批状态")
     private Integer auditStatus;
 
     @Schema(description = "来源单据ID", example = "32195")
@@ -44,16 +46,56 @@ public class WmsOutboundRespVO {
     @ExcelProperty("来源单据号")
     private String sourceBillNo;
 
-    @Schema(description = "来源单据类型", example = "2")
+    @Schema(description = "来源单据类型 ; BillType : 0-入库单 , 1-出库单", example = "2")
     @ExcelProperty("来源单据类型")
     private Integer sourceBillType;
 
     @Schema(description = "特别说明，创建方专用")
-    @ExcelProperty("特别说明，创建方专用")
+    @ExcelProperty("特别说明")
     private String creatorComment;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "创建人姓名", example = "张三")
+    @ExcelProperty("创建人姓名")
+    private String creatorName;
+
+    @Schema(description = "更新人姓名", example = "李四")
+    @ExcelProperty("更新人姓名")
+    private String updaterName;
+
+    @Schema(description = "详情清单", example = "")
+    @ExcelProperty("详情清单")
+    private List<WmsOutboundItemRespVO> itemList;
+
+    @Schema(description = "出库状态 ; OutboundStatus : 0-未出库 , 1-部分出库 , 2-已出库", example = "")
+    @ExcelProperty("出库状态")
+    private Integer outboundStatus;
+
+    @Schema(description = "创建者", example = "")
+    @ExcelProperty("创建者")
+    private String creator;
+
+    @Schema(description = "更新者", example = "")
+    @ExcelProperty("更新者")
+    private String updater;
+
+    @Schema(description = "更新时间", example = "")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @ExcelProperty("更新时间")
+    private LocalDateTime updateTime;
+
+    @Schema(description = "租户编号", example = "")
+    @ExcelProperty("租户编号")
+    private Long tenantId;
+
+    @Schema(description = "库存财务公司ID", example = "")
+    @ExcelProperty("库存财务公司ID")
+    private Long companyId;
+
+    @Schema(description = "库存归属部门ID", example = "")
+    @ExcelProperty("库存归属部门ID")
+    private Long deptId;
 }

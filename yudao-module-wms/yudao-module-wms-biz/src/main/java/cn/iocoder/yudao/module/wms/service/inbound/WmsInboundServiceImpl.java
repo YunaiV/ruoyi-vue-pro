@@ -166,7 +166,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     }
 
     @Override
-    public WmsInboundDO updateInboundStatus(Long id, Integer status) {
+    public WmsInboundDO updateInboundAuditStatus(Long id, Integer status) {
         WmsInboundDO inboundDO = validateInboundExists(id);
         inboundDO.setAuditStatus(status);
         inboundMapper.updateById(inboundDO);

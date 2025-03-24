@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.wms.service.outbound;
 
 import java.util.*;
+import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
+import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
+import cn.iocoder.yudao.module.wms.enums.outbound.OutboundAuditStatus;
 import jakarta.validation.*;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
@@ -20,14 +23,14 @@ public interface WmsOutboundService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createOutbound(@Valid WmsOutboundSaveReqVO createReqVO);
+    WmsOutboundDO createOutbound(@Valid WmsOutboundSaveReqVO createReqVO);
 
     /**
      * 更新出库单
      *
      * @param updateReqVO 更新信息
      */
-    void updateOutbound(@Valid WmsOutboundSaveReqVO updateReqVO);
+    WmsOutboundDO updateOutbound(@Valid WmsOutboundSaveReqVO updateReqVO);
 
     /**
      * 删除出库单
@@ -52,4 +55,11 @@ public interface WmsOutboundService {
      */
     PageResult<WmsOutboundDO> getOutboundPage(WmsOutboundPageReqVO pageReqVO);
 
+    void approve(OutboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO);
+
+    WmsOutboundDO updateOutboundAuditStatus(Long id, Integer status);
+
+    WmsOutboundRespVO getOutboundWithItemList(Long id);
+
+    void finishOutbound(WmsOutboundRespVO outboundRespVO);
 }

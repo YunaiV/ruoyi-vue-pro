@@ -60,4 +60,6 @@ public interface WmsStockBinService {
     WmsStockBinDO getStockBin(Long binId, Long productId);
 
     void pickupItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundItemDO inboundItemDO);
+
+    Map<Long, Map<Long, WmsStockBinDO>> getStockBinMap(Collection<Long> binIds, Collection<Long> productIds);
 }

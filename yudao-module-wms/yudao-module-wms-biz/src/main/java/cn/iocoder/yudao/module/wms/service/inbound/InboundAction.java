@@ -126,7 +126,7 @@ public class InboundAction implements StateMachineConfigure<Integer, InboundAudi
             super.perform(from, to, event, context);
             WmsInboundDO inboundDO = context.data();
             inboundDO.setAuditStatus(to);
-            inboundService.updateInboundStatus(inboundDO.getId(),to);
+            inboundService.updateInboundAuditStatus(inboundDO.getId(),to);
         }
 
     }

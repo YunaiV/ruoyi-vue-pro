@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms.service.stock.bin;
 
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
@@ -160,6 +161,17 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
         stockWarehouseService.refreshForPickup(pickup.getWarehouseId(), inboundItemDO.getProductId(), pickup.getId(), pickupItemDO.getId());
 
 
+    }
+
+    @Override
+    public Map<Long, Map<Long, WmsStockBinDO>> getStockBinMap(Collection<Long> binIds, Collection<Long> productIds) {
+        Map<Long, Map<Long, WmsStockBinDO>> result = new HashMap<>();
+        List<WmsStockBinDO> list= stockBinMapper.selectStockBinList(binIds,productIds);
+        for (WmsStockBinDO stockBinDO : list) {
+            Map<Long, WmsStockBinDO> map = result.computeIfAbsent(stockBinDO.getBinId(), k -> new HashMap<>());
+            map.put(stockBinDO.getProductId(), stockBinDO);
+        }
+        return result;
     }
 
 }

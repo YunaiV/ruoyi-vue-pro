@@ -81,6 +81,7 @@ public interface ErrorCodeConstants {
     ErrorCode STOCK_BIN_CAN_NOT_EDIT = new ErrorCode(2_001_009_004, "仓位库存不允许编辑");
     ErrorCode STOCK_BIN_CAN_NOT_DELETE = new ErrorCode(2_001_009_005, "仓位库存不允许删除");
     ErrorCode STOCK_BIN_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_009_006, "仓位库存不符合审批条件");
+    ErrorCode STOCK_BIN_NOT_ENOUGH = new ErrorCode(2_001_009_007, "仓位库存不足");
 
     // ========== WMS_STOCK_OWNERSHIP 所有者库存表 2_001_010_000 ==========
     ErrorCode STOCK_OWNERSHIP_NOT_EXISTS = new ErrorCode(2_001_010_001, "所有者库存不存在");
@@ -117,4 +118,24 @@ public interface ErrorCodeConstants {
     ErrorCode PICKUP_ITEM_INBOUND_ITEM_ID_WAREHOUSE_ID_NOT_SAME = new ErrorCode(2_001_013_007, "拣货仓库错误");
     ErrorCode PICKUP_ITEM_INBOUND_ITEM_ID_NOT_SAME = new ErrorCode(2_001_013_008, "拣货明细错误");
     ErrorCode INBOUND_ITEM_PICKUP_LEFT_QUANTITY_NOT_ENOUGH = new ErrorCode(2_001_013_008, "入库单明细的待上架库存不足");
-}
+
+    // ========== WMS_OUTBOUND_ITEM 出库单详情表 2_001_014_000 ==========
+    ErrorCode OUTBOUND_ITEM_NOT_EXISTS = new ErrorCode(2_001_014_001, "出库单详情不存在");
+    ErrorCode OUTBOUND_ITEM_OUTBOUND_ID_PRODUCT_ID_DUPLICATE = new ErrorCode(2_001_014_002, "入库单ID,标准产品ID已存在");
+    ErrorCode OUTBOUND_ITEM_BE_REFERRED = new ErrorCode(2_001_014_003, "出库单详情被引用");
+    ErrorCode OUTBOUND_ITEM_CAN_NOT_EDIT = new ErrorCode(2_001_014_004, "出库单详情不允许编辑");
+    ErrorCode OUTBOUND_ITEM_CAN_NOT_DELETE = new ErrorCode(2_001_014_005, "出库单详情不允许删除");
+    ErrorCode OUTBOUND_ITEM_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_014_006, "出库单详情不符合审批条件");
+    ErrorCode OUTBOUND_WAREHOUSE_ERROR = new ErrorCode(2_001_014_007, "出库仓库错误");
+
+
+    // ========== WMS_OUTBOUND 出库单 2_001_015_000 ==========
+    ErrorCode OUTBOUND_NOT_EXISTS = new ErrorCode(2_001_015_001, "出库单不存在");
+    ErrorCode OUTBOUND_NO_DUPLICATE = new ErrorCode(2_001_015_002, "单据号已存在");
+    ErrorCode OUTBOUND_BE_REFERRED = new ErrorCode(2_001_015_003, "出库单被引用");
+    ErrorCode OUTBOUND_NO_OUT_OF_BOUNDS = new ErrorCode(2_001_015_004, "出库单单据号越界");
+    ErrorCode OUTBOUND_CAN_NOT_EDIT = new ErrorCode(2_001_015_005, "出库单不允许编辑");
+    ErrorCode OUTBOUND_CAN_NOT_DELETE = new ErrorCode(2_001_015_006, "出库单不允许删除");
+    ErrorCode OUTBOUND_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_015_007, "出库单不符合审批条件");
+    ErrorCode OUTBOUND_ITEM_PRODUCT_ID_REPEATED = new ErrorCode(2_001_015_007, "出库单产品重复");
+}

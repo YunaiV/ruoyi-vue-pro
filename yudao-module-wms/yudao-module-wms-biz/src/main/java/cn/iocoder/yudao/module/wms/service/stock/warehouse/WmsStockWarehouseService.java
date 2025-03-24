@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.stock.warehouse;
 
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
 import jakarta.validation.*;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
@@ -62,4 +63,9 @@ public interface WmsStockWarehouseService {
      * 为拣货刷新库存
      **/
     void refreshForPickup(Long warehouseId, Long productId,Long pickupId,Long pickupItemId);
+
+    /**
+     * 出
+     **/
+    void outbound(WmsOutboundRespVO outboundRespVO);
 }

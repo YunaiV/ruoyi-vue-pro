@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.wms.enums.stock;
+package cn.iocoder.yudao.module.wms.enums.outbound;
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import cn.iocoder.yudao.framework.common.enums.DictEnum;
@@ -8,18 +8,17 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 
 /**
- * 流水发生的原因
+ * 出库单类型
  **/
 @RequiredArgsConstructor
 @Getter
-public enum StockReason implements ArrayValuable<Integer>, DictEnum {
+public enum OutboundType implements ArrayValuable<Integer>, DictEnum {
 
-    INBOUND(1, "入库"),
-    PICKUP(2, "拣货"),
-    OUTBOUND(3, "出库"),
+    MANUAL(1, "手工出库"),
+    ORDER(2, "订单出库"),
    ;
 
-    public static final Integer[] VALUES = Arrays.stream(values()).map(StockReason::getValue).toArray(Integer[]::new);
+    public static final Integer[] VALUES = Arrays.stream(values()).map(OutboundType::getValue).toArray(Integer[]::new);
 
 
     private final Integer value;
@@ -28,8 +27,8 @@ public enum StockReason implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 value 匹配枚举，name 优先
      **/
-    public static StockReason parse(Integer value) {
-        for (StockReason e : StockReason.values()) {
+    public static OutboundType parse(Integer value) {
+        for (OutboundType e : OutboundType.values()) {
             if(e.getValue().equals(value)) {
                 return e;
             }
@@ -40,13 +39,13 @@ public enum StockReason implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 name 或 label 匹配枚举，name 优先
      **/
-    public static StockReason parse(String nameOrLabel) {
-        for (StockReason e : StockReason.values()) {
+    public static OutboundType parse(String nameOrLabel) {
+        for (OutboundType e : OutboundType.values()) {
             if(e.name().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
         }
-        for (StockReason e : StockReason.values()) {
+        for (OutboundType e : OutboundType.values()) {
             if(e.getLabel().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }

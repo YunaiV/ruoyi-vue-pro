@@ -30,7 +30,7 @@ public interface WmsInboundService {
      */
     WmsInboundDO updateInbound(WmsInboundSaveReqVO updateReqVO);
 
-    WmsInboundDO updateInboundStatus(Long id, Integer status);
+    WmsInboundDO updateInboundAuditStatus(Long id, Integer status);
 
     /**
      * 删除入库单
