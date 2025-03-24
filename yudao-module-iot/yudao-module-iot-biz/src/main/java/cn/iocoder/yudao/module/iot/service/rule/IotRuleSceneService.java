@@ -18,7 +18,7 @@ import java.util.List;
 public interface IotRuleSceneService {
 
     /**
-     * 创建规则场景（场景联动）
+     * 创建场景联动
      *
      * @param createReqVO 创建信息
      * @return 编号
@@ -26,32 +26,32 @@ public interface IotRuleSceneService {
     Long createRuleScene(@Valid IotRuleSceneSaveReqVO createReqVO);
 
     /**
-     * 更新规则场景（场景联动）
+     * 更新场景联动
      *
      * @param updateReqVO 更新信息
      */
     void updateRuleScene(@Valid IotRuleSceneSaveReqVO updateReqVO);
 
     /**
-     * 删除规则场景（场景联动）
+     * 删除场景联动
      *
      * @param id 编号
      */
     void deleteRuleScene(Long id);
 
     /**
-     * 获得规则场景（场景联动）
+     * 获得场景联动
      *
      * @param id 编号
-     * @return 规则场景（场景联动）
+     * @return 场景联动
      */
     IotRuleSceneDO getRuleScene(Long id);
 
     /**
-     * 获得规则场景（场景联动）分页
+     * 获得场景联动分页
      *
      * @param pageReqVO 分页查询
-     * @return 规则场景（场景联动）分页
+     * @return 场景联动分页
      */
     PageResult<IotRuleSceneDO> getRuleScenePage(IotRuleScenePageReqVO pageReqVO);
 

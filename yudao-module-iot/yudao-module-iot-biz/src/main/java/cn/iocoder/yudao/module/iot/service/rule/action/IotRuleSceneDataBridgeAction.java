@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.iot.service.rule.action;
 
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.config.IotRuleSceneActionConfig;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.service.rule.IotDataBridgeService;
@@ -29,7 +29,7 @@ public class IotRuleSceneDataBridgeAction implements IotRuleSceneAction {
     private List<IotDataBridgeExecute<?>> dataBridgeExecutes;
 
     @Override
-    public void execute(IotDeviceMessage message, IotRuleSceneActionConfig config) throws Exception {
+    public void execute(IotDeviceMessage message, IotRuleSceneDO.ActionConfig config) throws Exception {
         // 1.1 如果消息为空，直接返回
         if (message == null) {
             return;

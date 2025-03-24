@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.rule.action;
 
-import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.config.IotRuleSceneActionConfig;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 
@@ -23,7 +23,7 @@ public interface IotRuleSceneAction {
      *                2. 非空的情况：设备触发
      * @param config  配置
      */
-    void execute(@Nullable IotDeviceMessage message, IotRuleSceneActionConfig config) throws Exception;
+    void execute(@Nullable IotDeviceMessage message, IotRuleSceneDO.ActionConfig config) throws Exception;
 
     /**
      * 获得类型
