@@ -157,7 +157,6 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
         Map<Long, WmsInboundItemSaveReqVO> updateReqVOMap = StreamX.from(updateReqVOList).toMap(WmsInboundItemSaveReqVO::getId);
         List<WmsInboundItemDO> inboundItemDOSInDB = inboundItemMapper.selectByIds(StreamX.from(updateReqVOList).toList(WmsInboundItemSaveReqVO::getId));
         for (WmsInboundItemDO itemDO : inboundItemDOSInDB) {
-            // todo 数值校验
             WmsInboundItemSaveReqVO updateReqVO = updateReqVOMap.get(itemDO.getId());
             itemDO.setActualQuantity(updateReqVO.getActualQuantity());
         }

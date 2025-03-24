@@ -62,4 +62,6 @@ public interface WmsOutboundService {
     WmsOutboundRespVO getOutboundWithItemList(Long id);
 
     void finishOutbound(WmsOutboundRespVO outboundRespVO);
+
+    WmsOutboundDO validateOutboundExists(Long id);
 }

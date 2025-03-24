@@ -126,7 +126,7 @@ public class WmsPickupServiceImpl implements WmsPickupService {
             // 设置已拣货量
             inboundItemDO.setShelvedQuantity(inboundItemDO.getShelvedQuantity() + pickupItemDO.getQuantity());
             pickupItemDO.setInboundId(inboundItemDO.getInboundId());
-            pickupItemDO.setInboundItemId(inboundItemDO.getInboundId());
+            pickupItemDO.setInboundItemId(inboundItemDO.getId());
             pickupItemDO.setProductId(inboundItemDO.getProductId());
             pickupItemDO.setPickupId(pickup.getId());
             // 调整仓位库存
@@ -239,4 +239,4 @@ public class WmsPickupServiceImpl implements WmsPickupService {
     public PageResult<WmsPickupDO> getPickupPage(WmsPickupPageReqVO pageReqVO) {
         return pickupMapper.selectPage(pageReqVO);
     }
-}
+}

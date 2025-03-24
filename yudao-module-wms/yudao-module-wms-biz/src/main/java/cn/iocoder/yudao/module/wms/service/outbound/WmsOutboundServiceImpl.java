@@ -34,8 +34,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.*;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 
@@ -92,7 +92,6 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         // 插入
         WmsOutboundDO outbound = BeanUtils.toBean(createReqVO, WmsOutboundDO.class);
         outboundMapper.insert(outbound);
-
         // 保存出库单详情详情
         List<WmsOutboundItemDO> toInsetList = new ArrayList<>();
         StreamX.from(createReqVO.getItemList()).filter(Objects::nonNull).forEach(item -> {
@@ -116,18 +115,16 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         if (warehouseIdSetOfBin.size() != 1) {
             throw exception(OUTBOUND_WAREHOUSE_ERROR);
         }
-
         Long warehouseId = StreamX.from(warehouseIdSetOfBin).first();
-        if(!Objects.equals(warehouseId, outboundDO.getWarehouseId())) {
+        if (!Objects.equals(warehouseId, outboundDO.getWarehouseId())) {
             throw exception(OUTBOUND_WAREHOUSE_ERROR);
         }
-
-        Map<Long,Map<Long,WmsStockBinDO>> binMap = stockBinService.getStockBinMap(binIdList, StreamX.from(itemList).toList(WmsOutboundItemDO::getProductId));
+        Map<Long, Map<Long, WmsStockBinDO>> binMap = stockBinService.getStockBinMap(binIdList, StreamX.from(itemList).toList(WmsOutboundItemDO::getProductId));
         // 校验仓位库存
         for (WmsOutboundItemDO itemDO : itemList) {
             WmsStockBinDO stockBinDO = null;
-            Map<Long,WmsStockBinDO> map= binMap.get(itemDO.getBinId());
-            if(map!=null) {
+            Map<Long, WmsStockBinDO> map = binMap.get(itemDO.getBinId());
+            if (map != null) {
                 stockBinDO = map.get(itemDO.getProductId());
             }
             if (stockBinDO == null) {
@@ -156,7 +153,6 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         // 更新
         WmsOutboundDO outbound = BeanUtils.toBean(updateReqVO, WmsOutboundDO.class);
         outboundMapper.updateById(outbound);
-
         // 保存出库单详情详情
         if (updateReqVO.getItemList() != null) {
             List<WmsOutboundItemDO> existsInDB = outboundItemMapper.selectByOutboundId(updateReqVO.getId());
@@ -216,7 +212,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     /**
      * @sign : 87FB607B65309CC4
      */
-    private WmsOutboundDO validateOutboundExists(Long id) {
+    public WmsOutboundDO validateOutboundExists(Long id) {
         WmsOutboundDO outbound = outboundMapper.selectById(id);
         if (outbound == null) {
             throw exception(OUTBOUND_NOT_EXISTS);
@@ -266,7 +262,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         // 处理入库单状态
         WmsOutboundDO outboundDO = BeanUtils.toBean(outboundRespVO, WmsOutboundDO.class);
         outboundDO.setOutboundStatus(OutboundStatus.ALL.getValue());
-        // outboundDO.setArrivalActualTime(LocalDateTime.now());
+        outboundDO.setOutboundTime(LocalDateTime.now());
         outboundMapper.updateById(outboundDO);
     }
 

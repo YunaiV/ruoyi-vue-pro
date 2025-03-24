@@ -56,4 +56,6 @@ public interface WmsOutboundItemService {
     List<WmsOutboundItemDO> selectByOutboundId(Long outboundId);
 
     void assembleProducts(List<WmsOutboundItemRespVO> itemList);
+
+    void updateActualQuantity(List<WmsOutboundItemSaveReqVO> updateReqVOList);
 }

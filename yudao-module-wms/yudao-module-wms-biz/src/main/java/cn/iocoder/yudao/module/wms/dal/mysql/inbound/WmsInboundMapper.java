@@ -27,10 +27,9 @@ public interface WmsInboundMapper extends BaseMapperX<WmsInboundDO> {
 				.eqIfPresent(WmsInboundDO::getSourceBillNo, reqVO.getSourceBillNo())
 				.eqIfPresent(WmsInboundDO::getSourceBillType, reqVO.getSourceBillType())
 				.eqIfPresent(WmsInboundDO::getTraceNo, reqVO.getTraceNo())
-				.eqIfPresent(WmsInboundDO::getShippingMethod, reqVO.getShippingMethod())
-				//.betweenIfPresent(WmsInboundDO::getArrivalPlanTime, reqVO.getArrivalPlanTime())
-				//.betweenIfPresent(WmsInboundDO::getArrivalActualTime, reqVO.getArrivalActualTime())
-				.eqIfPresent(WmsInboundDO::getCreatorComment, reqVO.getCreatorComment())
+				.eqIfPresent(WmsInboundDO::getShippingMethod, // .betweenIfPresent(WmsInboundDO::getArrivalPlanTime, reqVO.getArrivalPlanTime())
+        reqVO.getShippingMethod()).// .betweenIfPresent(WmsInboundDO::getArrivalActualTime, reqVO.getArrivalActualTime())
+        eqIfPresent(WmsInboundDO::getCreatorComment, reqVO.getCreatorComment())
 				.eqIfPresent(WmsInboundDO::getInitAge, reqVO.getInitAge())
 				.betweenIfPresent(WmsInboundDO::getCreateTime, reqVO.getCreateTime())
 				.orderByDesc(WmsInboundDO::getId));
@@ -70,4 +69,4 @@ public interface WmsInboundMapper extends BaseMapperX<WmsInboundDO> {
         wrapper.eq(WmsInboundDO::getWarehouseId, warehouseId);
         return selectPage(reqVO, wrapper).getList();
     }
-}
+}

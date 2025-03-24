@@ -10,7 +10,9 @@ import cn.iocoder.yudao.module.wms.config.statemachine.StateMachineWrapper;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.ErpProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
+import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.flow.WmsInboundItemFlowMapper;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
 import cn.iocoder.yudao.module.wms.enums.common.BillType;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
@@ -22,7 +24,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.*;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.*;
@@ -47,6 +48,10 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     @Resource
     @Lazy
     private WmsInboundItemMapper inboundItemMapper;
+
+    @Resource
+    @Lazy
+    private WmsInboundItemFlowMapper inboundItemFlowMapper;
 
     @Resource
     private WmsNoRedisDAO noRedisDAO;
@@ -255,39 +260,113 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         return inboundVO;
     }
 
-
-
     @Override
     public void finishInbound(WmsInboundRespVO inboundRespVO) {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
-        int countOfNone=0;
+        int countOfNone = 0;
         for (WmsInboundItemRespVO respVO : inboundRespVO.getItemList()) {
-            if(InboundStatus.NONE.matchAny(respVO.getInboundStatus())) {
+            if (InboundStatus.NONE.matchAny(respVO.getInboundStatus())) {
                 countOfNone++;
             }
         }
-        if(countOfNone>0) {
+        if (countOfNone > 0) {
             throw exception(INBOUND_NOT_COMPLETE);
         }
-
         // 处理明细的入库状态
         List<WmsInboundItemDO> itemList = BeanUtils.toBean(inboundRespVO.getItemList(), WmsInboundItemDO.class);
         inboundItemMapper.updateBatch(itemList);
-
         // 处理入库单状态
         WmsInboundDO inboundDO = BeanUtils.toBean(inboundRespVO, WmsInboundDO.class);
         inboundDO.setInboundStatus(InboundStatus.ALL.getValue());
-        inboundDO.setArrivalActualTime(LocalDateTime.now());
+        if (inboundDO.getArrivalActualTime() == null) {
+            inboundDO.setArrivalActualTime(LocalDateTime.now());
+        }
+        inboundDO.setInboundTime(LocalDateTime.now());
         inboundMapper.updateById(inboundDO);
-
     }
 
     @Override
     public List<WmsInboundDO> selectByIds(List<Long> ids) {
-        if(CollectionUtils.isEmpty(ids)) {
+        if (CollectionUtils.isEmpty(ids)) {
             return List.of();
         }
         return inboundMapper.selectByIds(ids);
     }
+
+    /**
+     * 按 warehouseId 查询尚有出库量的 WmsInboundDO
+     */
+    @Override
+    public void updateLeftQuantity(Long warehouseId, Long productId, Long outboundId, Long outboundItemId ,Integer quantity) {
+        List<WmsInboundItemDO> itemsList=inboundItemMapper.selectLeftItemList(warehouseId,productId);
+        if(itemsList.isEmpty()) {
+            throw exception(INBOUND_ITEM_NOT_EXISTS);
+        }
+        List<WmsInboundItemDO> itemsToUpdate=new ArrayList<>();
+        List<WmsInboundItemFlowDO> inboundItemFlowList = new ArrayList<>();
+        for (WmsInboundItemDO itemDO : itemsList) {
+            Integer left=itemDO.getLeftQuantity();
+            Integer flowQuantity=0;
+            if(left>quantity) { // 需要多次扣除
+                flowQuantity=left;
+                quantity=quantity-flowQuantity;
+                left=0;
+                itemDO.setLeftQuantity(left);
+                itemsToUpdate.add(itemDO);
+                //
+                WmsInboundItemFlowDO flowDO=new WmsInboundItemFlowDO();
+                flowDO.setInboundId(itemDO.getInboundId());
+                flowDO.setInboundItemId(itemDO.getId());
+                flowDO.setProductId(itemDO.getProductId());
+                flowDO.setOutboundQuantity(flowQuantity);
+                flowDO.setOutboundId(outboundId);
+                flowDO.setOutboundItemId(outboundItemId);
+                inboundItemFlowList.add(flowDO);
+
+            } else if(left.equals(quantity)) { // 更好单次扣除
+                flowQuantity=left;
+                left=0;
+                quantity=0;
+                itemDO.setLeftQuantity(left);
+                itemsToUpdate.add(itemDO);
+                //
+                WmsInboundItemFlowDO flowDO=new WmsInboundItemFlowDO();
+                flowDO.setInboundId(itemDO.getInboundId());
+                flowDO.setInboundItemId(itemDO.getId());
+                flowDO.setProductId(itemDO.getProductId());
+                flowDO.setOutboundQuantity(flowQuantity);
+                flowDO.setOutboundId(outboundId);
+                flowDO.setOutboundItemId(outboundItemId);
+                inboundItemFlowList.add(flowDO);
+
+                break;
+            } else { // 单次扣除
+                flowQuantity=quantity;
+                left=left-flowQuantity;
+                itemDO.setLeftQuantity(left);
+                itemsToUpdate.add(itemDO);
+
+                //
+                WmsInboundItemFlowDO flowDO=new WmsInboundItemFlowDO();
+                flowDO.setInboundId(itemDO.getInboundId());
+                flowDO.setInboundItemId(itemDO.getId());
+                flowDO.setProductId(itemDO.getProductId());
+                flowDO.setOutboundQuantity(flowQuantity);
+                flowDO.setOutboundId(outboundId);
+                flowDO.setOutboundItemId(outboundItemId);
+                inboundItemFlowList.add(flowDO);
+
+                break;
+            }
+        }
+
+        // 保存余量
+        inboundItemMapper.updateBatch(itemsToUpdate);
+        // 保存流水
+        inboundItemFlowMapper.insertBatch(inboundItemFlowList);
+
+    }
+
+
 }

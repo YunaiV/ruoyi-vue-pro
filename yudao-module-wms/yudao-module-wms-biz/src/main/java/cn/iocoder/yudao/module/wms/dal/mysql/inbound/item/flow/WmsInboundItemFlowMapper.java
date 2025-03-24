@@ -23,7 +23,7 @@ public interface WmsInboundItemFlowMapper extends BaseMapperX<WmsInboundItemFlow
 				.eqIfPresent(WmsInboundItemFlowDO::getProductId, reqVO.getProductId())
 				.eqIfPresent(WmsInboundItemFlowDO::getOutboundId, reqVO.getOutboundId())
 				.eqIfPresent(WmsInboundItemFlowDO::getOutboundItemId, reqVO.getOutboundItemId())
-				.eqIfPresent(WmsInboundItemFlowDO::getChangedQuantity, reqVO.getChangedQuantity())
+				.eqIfPresent(WmsInboundItemFlowDO::getOutboundQuantity, reqVO.getOutboundQuantity())
 				.betweenIfPresent(WmsInboundItemFlowDO::getCreateTime, reqVO.getCreateTime())
 				.orderByDesc(WmsInboundItemFlowDO::getId));
     }

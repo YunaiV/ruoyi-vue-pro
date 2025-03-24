@@ -9,9 +9,11 @@ import com.alibaba.excel.annotation.*;
 import java.util.List;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,no,creator,company_id,create_time,audit_status,creator_comment,type,source_bill_id,updater,update_time,outbound_status,source_bill_no,source_bill_type,id,dept_id,warehouse_id
+ * @table-fields : tenant_id,no,creator,company_id,create_time,audit_status,creator_comment,outbound_time,source_bill_id,type,updater,update_time,outbound_status,source_bill_no,source_bill_type,id,dept_id,warehouse_id
  */
 @Schema(description = "管理后台 - 出库单 Response VO")
 @Data
@@ -98,4 +100,9 @@ public class WmsOutboundRespVO {
     @Schema(description = "库存归属部门ID", example = "")
     @ExcelProperty("库存归属部门ID")
     private Long deptId;
+
+    @Schema(description = "出库时间", example = "")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @ExcelProperty("出库时间")
+    private LocalDateTime outboundTime;
 }

@@ -9,9 +9,11 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : no,inbound_status,company_id,create_time,arrival_actual_time,audit_status,creator_comment,source_bill_id,trace_no,type,init_age,shipping_method,source_bill_no,source_bill_type,dept_id,arrival_plan_time,warehouse_id
+ * @table-fields : no,inbound_status,company_id,create_time,inbound_time,arrival_actual_time,audit_status,creator_comment,source_bill_id,trace_no,type,init_age,shipping_method,source_bill_no,source_bill_type,dept_id,arrival_plan_time,warehouse_id
  */
 @Schema(description = "管理后台 - 入库单分页 Request VO")
 @Data
@@ -72,4 +74,8 @@ public class WmsInboundPageReqVO extends PageParam {
     @Schema(description = "预计到货时间", example = "")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime arrivalPlanTime;
+
+    @Schema(description = "入库时间", example = "")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime inboundTime;
 }

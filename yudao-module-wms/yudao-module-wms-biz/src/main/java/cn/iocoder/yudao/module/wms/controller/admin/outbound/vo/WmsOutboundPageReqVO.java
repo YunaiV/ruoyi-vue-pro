@@ -7,9 +7,11 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : no,company_id,outbound_status,create_time,source_bill_no,source_bill_type,audit_status,creator_comment,dept_id,type,source_bill_id,warehouse_id
+ * @table-fields : no,company_id,create_time,audit_status,creator_comment,outbound_time,source_bill_id,type,outbound_status,source_bill_no,source_bill_type,dept_id,warehouse_id
  */
 @Schema(description = "管理后台 - 出库单分页 Request VO")
 @Data
@@ -53,4 +55,8 @@ public class WmsOutboundPageReqVO extends PageParam {
 
     @Schema(description = "库存归属部门ID", example = "")
     private Long deptId;
+
+    @Schema(description = "出库时间", example = "")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime outboundTime;
 }

@@ -128,7 +128,6 @@ public interface ErrorCodeConstants {
     ErrorCode OUTBOUND_ITEM_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_014_006, "出库单详情不符合审批条件");
     ErrorCode OUTBOUND_WAREHOUSE_ERROR = new ErrorCode(2_001_014_007, "出库仓库错误");
 
-
     // ========== WMS_OUTBOUND 出库单 2_001_015_000 ==========
     ErrorCode OUTBOUND_NOT_EXISTS = new ErrorCode(2_001_015_001, "出库单不存在");
     ErrorCode OUTBOUND_NO_DUPLICATE = new ErrorCode(2_001_015_002, "单据号已存在");
@@ -138,4 +137,6 @@ public interface ErrorCodeConstants {
     ErrorCode OUTBOUND_CAN_NOT_DELETE = new ErrorCode(2_001_015_006, "出库单不允许删除");
     ErrorCode OUTBOUND_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_015_007, "出库单不符合审批条件");
     ErrorCode OUTBOUND_ITEM_PRODUCT_ID_REPEATED = new ErrorCode(2_001_015_007, "出库单产品重复");
+    ErrorCode OUTBOUND_ITEM_OUTBOUND_ID_DUPLICATE = new ErrorCode(2_001_015_008, "详情不是一个出库单");
+
 }

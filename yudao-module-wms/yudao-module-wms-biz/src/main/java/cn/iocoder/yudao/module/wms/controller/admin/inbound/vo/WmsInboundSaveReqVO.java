@@ -14,12 +14,13 @@ import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundIt
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 import org.springframework.format.annotation.DateTimeFormat;
-
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : no,inbound_status,company_id,arrival_actual_time,audit_status,creator_comment,source_bill_id,trace_no,type,init_age,shipping_method,source_bill_no,source_bill_type,id,dept_id,arrival_plan_time,warehouse_id
+ * @table-fields : no,inbound_status,company_id,inbound_time,arrival_actual_time,audit_status,creator_comment,source_bill_id,trace_no,type,init_age,shipping_method,source_bill_no,source_bill_type,id,dept_id,arrival_plan_time,warehouse_id
  */
 @Schema(description = "管理后台 - 入库单新增/修改 Request VO")
 @Data
@@ -88,4 +89,8 @@ public class WmsInboundSaveReqVO {
     @Schema(description = "预计到货时间", example = "")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime arrivalPlanTime;
+
+    @Schema(description = "入库时间", example = "")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime inboundTime;
 }

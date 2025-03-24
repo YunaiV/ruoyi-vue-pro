@@ -70,9 +70,7 @@ public class WmsInboundItemController {
     // inboundItemService.updateInboundItem(updateReqVO);
     // return success(true);
     // }
-    /**
-     * @sign : 18BE32AD9E053614
-     */
+
     @PutMapping("/update-actual-quantity")
     @Operation(summary = "设置实际入库量")
     @PreAuthorize("@ss.hasPermission('wms:inbound-item:update')")

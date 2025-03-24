@@ -154,4 +154,4 @@ public class WmsOutboundController {
         outboundService.approve(OutboundAuditStatus.Event.REJECT, approvalReqVO);
         return success(true);
     }
-}
+}

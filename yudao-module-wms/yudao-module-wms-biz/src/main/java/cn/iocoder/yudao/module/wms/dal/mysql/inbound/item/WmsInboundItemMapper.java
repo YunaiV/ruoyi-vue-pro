@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.inbound.item;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
@@ -8,8 +9,10 @@ import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundIt
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsPickupPendingPageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
+import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -64,5 +67,17 @@ public interface WmsInboundItemMapper extends BaseMapperX<WmsInboundItemDO> {
 
         return selectPage(reqVO,query);
 
+    }
+
+    default List<WmsInboundItemDO> selectLeftItemList(Long warehouseId, Long productId) {
+        MPJLambdaWrapperX<WmsInboundItemDO> query = new MPJLambdaWrapperX<>();
+        query.select(WmsInboundItemDO::getId,WmsInboundItemDO::getInboundId,WmsInboundItemDO::getProductId,WmsInboundItemDO::getLeftQuantity);
+        query.innerJoin(WmsInboundDO.class, WmsInboundDO::getId,WmsInboundItemDO::getInboundId);
+        query.in(WmsInboundDO::getInboundStatus, Arrays.asList(InboundStatus.ALL.getValue(),InboundStatus.PART.getValue()));
+        query.eq(WmsInboundDO::getWarehouseId, warehouseId).eq(WmsInboundItemDO::getProductId, productId)
+            .gt(WmsInboundItemDO::getLeftQuantity,0)
+            .last("ORDER BY DATEDIFF(t1.inbound_time, now())+t1.init_age desc")
+         ;
+        return selectList(query);
     }
 }

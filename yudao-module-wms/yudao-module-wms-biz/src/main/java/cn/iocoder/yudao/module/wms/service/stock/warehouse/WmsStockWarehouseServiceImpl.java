@@ -308,8 +308,9 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
             OutboundStatus outboundStatus=outboundSingleItemAtomically(companyId, deptId, warehouseId, productId, item.getActualQuantity(), outboundRespVO.getId(), item.getId());
             item.setOutboundStatus(outboundStatus.getValue());
             if(outboundStatus!=OutboundStatus.NONE) {
-                //item.setLeftQuantity(item.getActualQuantity());
+                //TODO  继续其它逻辑
             }
+
         }
         // 完成最终的入库
         outboundService.finishOutbound(outboundRespVO);
@@ -339,7 +340,7 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
      * 在事务中执行出库操作
      */
 
-    protected OutboundStatus outboundSingleItemTransactional(Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long inboundId, Long inboundItemId) {
+    protected OutboundStatus outboundSingleItemTransactional(Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
         // 获得仓库库存记录
@@ -367,10 +368,15 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
             // stockWarehouseDO.setDefectiveQuantity(0);
             stockWarehouseMapper.updateById(stockWarehouseDO);
         }
+
+
+        // 更新入库批次余额
+        inboundService.updateLeftQuantity(warehouseId, productId,outboundId, outboundItemId,quantity);
+
         // 记录流水
-        stockFlowService.createForStockWarehouse(StockReason.OUTBOUND, productId,stockWarehouseDO, quantity, inboundId, inboundItemId);
+        stockFlowService.createForStockWarehouse(StockReason.OUTBOUND, productId,stockWarehouseDO, quantity, outboundId, outboundItemId);
         // 调整归属库存
-        stockOwnershipService.outboundSingleItem(companyId, deptId, warehouseId, productId, quantity, inboundId, inboundItemId);
+        stockOwnershipService.outboundSingleItem(companyId, deptId, warehouseId, productId, quantity, outboundId, outboundItemId);
 
         log.info("出库:productId=" + productId + ";quantity=" + quantity);
 
