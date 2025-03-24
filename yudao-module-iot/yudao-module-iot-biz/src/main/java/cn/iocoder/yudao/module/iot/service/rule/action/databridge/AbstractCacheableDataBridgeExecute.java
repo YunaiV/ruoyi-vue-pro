@@ -101,7 +101,7 @@ public abstract class AbstractCacheableDataBridgeExecute<Config, Producer> imple
     @Override
     @SuppressWarnings({"unchecked"})
     public void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
-        if (ObjUtil.notEqual(message.getType(), getType())) {
+        if (ObjUtil.notEqual(dataBridge.getType(), getType())) {
             return;
         }
         try {

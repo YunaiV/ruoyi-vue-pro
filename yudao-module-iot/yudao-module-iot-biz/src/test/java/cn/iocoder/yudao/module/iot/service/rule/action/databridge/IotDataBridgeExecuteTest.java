@@ -92,12 +92,12 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testRedisStreamMQDataBridge() throws Exception {
+    public void testRedisStreamDataBridge() throws Exception {
         // 1. 创建执行器实例
-        IotRedisStreamMQDataBridgeExecute action = new IotRedisStreamMQDataBridgeExecute();
+        IotRedisStreamDataBridgeExecute action = new IotRedisStreamDataBridgeExecute();
 
         // 2. 创建配置
-        IotDataBridgeRedisMQConfig config = new IotDataBridgeRedisMQConfig()
+        IotDataBridgeRedisStreamConfig config = new IotDataBridgeRedisStreamConfig()
                 .setHost("127.0.0.1")
                 .setPort(6379)
                 .setDatabase(0)
@@ -105,7 +105,7 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
                 .setTopic("test-stream");
 
         // 3. 执行测试并验证缓存
-        executeAndVerifyCache(action, config, "RedisStreamMQ");
+        executeAndVerifyCache(action, config, "RedisStream");
     }
 
     @Test

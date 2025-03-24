@@ -1,12 +1,9 @@
 package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeRedisStreamMQConfig;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeRedisStreamConfig;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -21,14 +18,14 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Component;
 
 /**
- * Redis Stream MQ 的 {@link IotDataBridgeExecute} 实现类
+ * Redis Stream 的 {@link IotDataBridgeExecute} 实现类
  *
  * @author HUIHUI
  */
 @Component
 @Slf4j
-public class IotRedisStreamMQDataBridgeExecute extends
-        AbstractCacheableDataBridgeExecute<IotDataBridgeRedisStreamMQConfig, RedisTemplate<String, Object>> {
+public class IotRedisStreamDataBridgeExecute extends
+        AbstractCacheableDataBridgeExecute<IotDataBridgeRedisStreamConfig, RedisTemplate<String, Object>> {
 
     @Override
     public Integer getType() {
@@ -36,7 +33,7 @@ public class IotRedisStreamMQDataBridgeExecute extends
     }
 
     @Override
-    public void execute0(IotDeviceMessage message, IotDataBridgeRedisStreamMQConfig config) throws Exception {
+    public void execute0(IotDeviceMessage message, IotDataBridgeRedisStreamConfig config) throws Exception {
         // 1. 获取 RedisTemplate
         RedisTemplate<String, Object> redisTemplate = getProducer(config);
 
@@ -48,7 +45,7 @@ public class IotRedisStreamMQDataBridgeExecute extends
     }
 
     @Override
-    protected RedisTemplate<String, Object> initProducer(IotDataBridgeRedisStreamMQConfig config) {
+    protected RedisTemplate<String, Object> initProducer(IotDataBridgeRedisStreamConfig config) {
         // 1.1 创建 Redisson 配置
         Config redissonConfig = new Config();
         SingleServerConfig serverConfig = redissonConfig.useSingleServer()
@@ -59,20 +56,17 @@ public class IotRedisStreamMQDataBridgeExecute extends
             serverConfig.setPassword(config.getPassword());
         }
 
-        // TODO @huihui：看看能不能简化一些。按道理说，不用这么多的哈。
-        // 2.1 创建 RedissonClient
+        // TODO @芋艿：看看怎么优化
+        // 创建 RedisTemplate 并配置
         RedissonClient redisson = Redisson.create(redissonConfig);
-        // 2.2 创建并配置 RedisTemplate
         RedisTemplate<String, Object> template = new RedisTemplate<>();
-        // 设置 RedisConnection 工厂。😈 它就是实现多种 Java Redis 客户端接入的秘密工厂。感兴趣的胖友，可以自己去撸下。
         template.setConnectionFactory(new RedissonConnectionFactory(redisson));
-        // 使用 String 序列化方式，序列化 KEY 。
+        // 设置序列化器
         template.setKeySerializer(RedisSerializer.string());
         template.setHashKeySerializer(RedisSerializer.string());
-        // 使用 JSON 序列化方式（库是 Jackson ），序列化 VALUE 。
-        template.setValueSerializer(buildRedisSerializer());
-        template.setHashValueSerializer(buildRedisSerializer());
-        template.afterPropertiesSet();// 初始化
+        template.setValueSerializer(RedisSerializer.json());
+        template.setHashValueSerializer(RedisSerializer.json());
+        template.afterPropertiesSet();
         return template;
     }
 
@@ -82,15 +76,6 @@ public class IotRedisStreamMQDataBridgeExecute extends
         if (factory != null) {
             ((RedissonConnectionFactory) factory).destroy();
         }
-    }
-
-    // TODO @huihui：看看能不能简化一些。按道理说，不用这么多的哈。
-    public static RedisSerializer<?> buildRedisSerializer() {
-        RedisSerializer<Object> json = RedisSerializer.json();
-        // 解决 LocalDateTime 的序列化
-        ObjectMapper objectMapper = (ObjectMapper) ReflectUtil.getFieldValue(json, "mapper");
-        objectMapper.registerModules(new JavaTimeModule());
-        return json;
     }
 
 }
