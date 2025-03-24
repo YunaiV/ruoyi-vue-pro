@@ -94,23 +94,18 @@ public class WmsPickupServiceImpl implements WmsPickupService {
         if (isInboundItemIdRepeated) {
             throw exception(PICKUP_ITEM_INBOUND_ITEM_ID_REPEATED);
         }
-
         WmsPickupDO pickup = BeanUtils.toBean(createReqVO, WmsPickupDO.class);
         // 校验入库单与仓位的仓库必须是同一个仓库
         List<WmsInboundItemDO> inboundItemDOList = processAndValidateForPickIn(pickup, toInsetList);
-
         // 插入
         pickupMapper.insert(pickup);
         toInsetList.forEach(wmsPickupItemDO -> {
             wmsPickupItemDO.setPickupId(pickup.getId());
         });
-
         // 拣货到仓位
         this.pickup(pickup, toInsetList, inboundItemDOList);
-
         // 保存单据
         pickupItemMapper.insertBatch(toInsetList);
-
         // 返回
         return pickup;
     }
@@ -244,4 +239,4 @@ public class WmsPickupServiceImpl implements WmsPickupService {
     public PageResult<WmsPickupDO> getPickupPage(WmsPickupPageReqVO pageReqVO) {
         return pickupMapper.selectPage(pageReqVO);
     }
-}
+}
