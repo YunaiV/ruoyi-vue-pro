@@ -40,6 +40,7 @@ public interface SrmErrorCodeConstants {
     ErrorCode PURCHASE_ORDER_IN_ITEM_NOT_OPEN = new ErrorCode(1_030_101_019, "采购订单项({})已完全入库，无法再次入库");
     ErrorCode PURCHASE_ORDER_ITEM_NOT_AUDIT = new ErrorCode(1_030_101_020, "采购订单项({})的订单不是已审核状态，无法合并入库");
     ErrorCode PURCHASE_ORDER_DELETE_FAIL = new ErrorCode(1_030_101_021, "该订单存在关联入库项，无法删除");
+    ErrorCode PURCHASE_ORDER_GENERATE_CONTRACT_FAIL = new ErrorCode(1_030_101_022, "获取采购合同模板失败");
 
     // ========== ERP 采购入库（1-030-102-000） ==========
     ErrorCode PURCHASE_IN_NOT_EXISTS = new ErrorCode(1_030_102_000, "采购入库单不存在");
@@ -68,6 +69,7 @@ public interface SrmErrorCodeConstants {
     ErrorCode PURCHASE_RETURN_PROCESS_FAIL_EXISTS_REFUND = new ErrorCode(1_030_103_008, "反审核失败，已存在对应的退款单");
     ErrorCode PURCHASE_RETURN_NO_OUT_OF_BOUNDS = new ErrorCode(1_030_103_009, "采购退货单号编码大于999999,生成失败");
     ErrorCode PURCHASE_RETURN_PROCESS_FAIL_PAYMENT_STATUS = new ErrorCode(1_030_103_010, "已审核的退货单才可以退款");
+    ErrorCode PURCHASE_RETURN_IN_ITEM_IN_ID_NOT_SAME = new ErrorCode(1_030_103_011, "退货项中存在多个入库单的入库项");
 
     // ========== ERP 客户（1-030-200-000）==========
     ErrorCode CUSTOMER_NOT_EXISTS = new ErrorCode(1_020_200_000, "客户不存在");

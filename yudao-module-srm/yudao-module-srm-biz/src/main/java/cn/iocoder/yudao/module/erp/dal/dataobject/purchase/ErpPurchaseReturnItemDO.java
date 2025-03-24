@@ -30,7 +30,7 @@ public class ErpPurchaseReturnItemDO extends BaseDO {
     private Long id;
     /**
      * 采购退货编号
-     *
+     * <p>
      * 关联 {@link ErpPurchaseReturnDO#getId()}
      */
     private Long returnId;
@@ -42,22 +42,24 @@ public class ErpPurchaseReturnItemDO extends BaseDO {
 
     /**
      * 仓库编号
-     *
-     * 关联 {@link cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO#getId()}
+     * <p>
      */
     private Long warehouseId;
     /**
      * 产品编号
-     *
-     * 关联 {@link cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO#getId()}
+     * <p>
      */
     private Long productId;
     /**
      * 产品单位单位
-     *
-     * 冗余 {@link cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO#getUnitId()}
+     * <p>
      */
     private Long productUnitId;
+
+    /**
+     * 币种编号
+     */
+    private Long currencyId;
 
     /**
      * 产品单位单价，单位：元
@@ -69,7 +71,7 @@ public class ErpPurchaseReturnItemDO extends BaseDO {
     private BigDecimal count;
     /**
      * 总价，单位：元
-     *
+     * <p>
      * totalPrice = productPrice * count
      */
     private BigDecimal totalPrice;
@@ -79,7 +81,7 @@ public class ErpPurchaseReturnItemDO extends BaseDO {
     private BigDecimal taxPercent;
     /**
      * 税额，单位：元
-     *
+     * <p>
      * taxPrice = totalPrice * taxPercent
      */
     private BigDecimal taxPrice;

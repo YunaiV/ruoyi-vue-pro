@@ -227,7 +227,7 @@ public class ErpPurchaseRequestController {
                         MapUtils.findAndThen(userMap, safeParseLong(item.getUpdater()), user -> item.setUpdater(user.getNickname()));
                         item.setOrderCount(ObjectUtils.defaultIfNull(item.getOrderCount(), 0));//已订购数量
                         item.setInCount(ObjectUtils.defaultIfNull(item.getInCount(), 0));//入库
-                        if (item.getApproveCount() != null) {
+                        if (item.getApproveCount() != null && item.getOrderCount() != null) {
                             item.setUnOrderCount(ObjectUtils.defaultIfNull(item.getApproveCount() - item.getOrderCount(), 0));//未订购
                         }
                     }

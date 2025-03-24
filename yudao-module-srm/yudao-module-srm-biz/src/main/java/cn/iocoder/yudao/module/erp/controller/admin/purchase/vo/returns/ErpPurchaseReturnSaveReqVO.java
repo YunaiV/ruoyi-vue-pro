@@ -41,8 +41,6 @@ public class ErpPurchaseReturnSaveReqVO {
     @Schema(description = "退货清单列表")
     private List<Item> items;
 
-    @Schema(description = "币别ID,财务管理-币别维护")
-    private Long currencyId;
 
     @Data
     public static class Item {
@@ -79,6 +77,9 @@ public class ErpPurchaseReturnSaveReqVO {
 
         @Schema(description = "增值税税率，百分比")
         private BigDecimal taxPercent;
+
+        @Schema(description = "币别ID,财务管理-币别维护")
+        private Long currencyId;
 
         @Schema(description = "备注")
         private String remark;

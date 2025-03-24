@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
@@ -9,7 +10,9 @@ import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.finance.ErpAccountApi;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.erp.api.product.ErpProductUnitApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductUnitDTO;
 import cn.iocoder.yudao.module.erp.api.purchase.SrmInCountDTO;
 import cn.iocoder.yudao.module.erp.api.purchase.TmsOrderCountDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInSaveReqVO;
@@ -32,22 +35,24 @@ import com.aspose.words.SaveFormat;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
-import com.somle.esb.service.AliyunService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.io.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -68,7 +73,6 @@ import static cn.iocoder.yudao.module.erp.enums.SrmStateMachines.*;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
 
-    private final AliyunService aliyunService;
     private final ErpPurchaseOrderMapper purchaseOrderMapper;
     private final ErpPurchaseOrderItemMapper purchaseOrderItemMapper;
     private final ErpPurchaseRequestItemsMapper requestItemsMapper;
@@ -77,6 +81,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     private final ErpPurchaseInService purchaseInService;
     private final ErpAccountApi erpAccountApi;
     private final ErpProductApi erpProductApi;
+    private final ErpProductUnitApi erpProductUnitApi;
 
     @Resource(name = PURCHASE_ORDER_OFF_STATE_MACHINE_NAME)
     StateMachine<ErpOffStatus, SrmEventEnum, ErpPurchaseOrderDO> offMachine;
@@ -103,6 +108,8 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     StateMachine<ErpExecutionStatus, SrmEventEnum, ErpPurchaseOrderItemDO> requestItemExecutionMachine;
     @Resource(name = PURCHASE_REQUEST_ITEM_OFF_STATE_MACHINE_NAME)
     StateMachine<ErpOffStatus, SrmEventEnum, ErpPurchaseRequestItemsDO> requestItemOffMachine;
+    @Autowired
+    private ResourcePatternResolver resourcePatternResolver;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -479,9 +486,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     @Override
     public ErpPurchaseOrderDO getPurchaseOrderByItemId(Long itemId) {
         AtomicReference<ErpPurchaseOrderDO> orderDO = new AtomicReference<>();
-        Optional.ofNullable(purchaseOrderItemMapper.selectById(itemId)).ifPresent(item -> {
-            orderDO.set(purchaseOrderMapper.selectById(item.getOrderId()));
-        });
+        Optional.ofNullable(purchaseOrderItemMapper.selectById(itemId)).ifPresent(item -> orderDO.set(purchaseOrderMapper.selectById(item.getOrderId())));
         return orderDO.get();
     }
     // ==================== 订单项 ====================
@@ -584,44 +589,34 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
 
     @Override
     public void generateContract(ErpPurchaseOrderGenerateContractReqVO reqVO, HttpServletResponse response) {
-        reqVO.setTemplateName("template-word/采购合同模板-wdy.docx"); //test
-        ErpPurchaseOrderDO orderDO = getPurchaseOrder(reqVO.getOrderId());
+        ErpPurchaseOrderDO orderDO = validatePurchaseOrder(reqVO.getOrderId());
         //1 从OSS拿到模板word
-        XWPFTemplate xwpfTemplate = null;
-        try (InputStream inputStream = aliyunService.downloadOssFileToStream(reqVO.getTemplateName())) {
+        XWPFTemplate xwpfTemplate;
+        try (InputStream stream = resourcePatternResolver.getResource("classpath:purchase/order/%s".formatted(reqVO.getTemplateName())).getInputStream()) {
             LoopRowTableRenderPolicy policy = new LoopRowTableRenderPolicy();
             Configure config = Configure.builder().bind("products", policy).build();
-            xwpfTemplate = XWPFTemplate.compile(inputStream, config);
+            xwpfTemplate = XWPFTemplate.compile(stream, config);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw exception(PURCHASE_ORDER_GENERATE_CONTRACT_FAIL);
         }
         //2 模板word渲染数据
         List<ErpPurchaseOrderItemDO> itemDOS = purchaseOrderItemMapper.selectListByOrderId(orderDO.getId());
-        //收集productIds
-        Set<Long> productIds = itemDOS.stream().map(ErpPurchaseOrderItemDO::getProductId).collect(Collectors.toSet());
-        Map<Long, ErpProductDTO> productMap = erpProductApi.getProductMap(productIds);
-        ErpPurchaseOrderWordBO wordBO = BeanUtils.toBean(orderDO, ErpPurchaseOrderWordBO.class, peek -> peek.setProducts(BeanUtils.toBean(itemDOS, ErpPurchaseOrderItemBO.class, item -> {
-            item.setProduct(productMap.get(item.getProductId()));
-            item.setTotalPriceUntaxed(item.getTotalPrice().subtract(item.getTaxPrice()));
-        })));
+        ErpPurchaseOrderWordBO wordBO = bindDataFormOrderItemDO(itemDOS, orderDO);
         xwpfTemplate.render(wordBO);
         // 3. 转换pdf，返回响应
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(); // 用于捕获输出流
-        String outputFileName = "output.pdf";
-        try (OutputStream out = response.getOutputStream();) {
+        try (OutputStream out = response.getOutputStream()) {
             // 将生成的模板写入 ByteArrayOutputStream
             xwpfTemplate.write(byteArrayOutputStream);
             byte[] documentData = byteArrayOutputStream.toByteArray(); // 获取字节数组
-
             // 将字节数组转成输入流
             InputStream inputStreamResult = new ByteArrayInputStream(documentData);
-
             // 设置响应头，准备下载
             response.setContentType("application/pdf");
-            response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(outputFileName, StandardCharsets.UTF_8));
+            response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode("采购合同.pdf", StandardCharsets.UTF_8));
             response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-            // 通过输入流写入响应
+            // 写入响应
             Document document = new Document(inputStreamResult);
             document.save(out, SaveFormat.PDF);
 //            out.flush();
@@ -629,4 +624,55 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
             throw new RuntimeException(e);
         }
     }
+
+    private ErpPurchaseOrderWordBO bindDataFormOrderItemDO(List<ErpPurchaseOrderItemDO> itemDOS, ErpPurchaseOrderDO orderDO) {
+        //收集productIds
+        Set<Long> productIds = itemDOS.stream().map(ErpPurchaseOrderItemDO::getProductId).collect(Collectors.toSet());
+        Map<Long, ErpProductDTO> productMap = erpProductApi.getProductMap(productIds);
+        //收集产品的单位map getProductUnitMap
+        Map<Long, ErpProductUnitDTO> unitMap = erpProductUnitApi.getProductUnitMap(productMap.values().stream().map(ErpProductDTO::getUnitId).collect(Collectors.toSet()));
+        AtomicInteger index = new AtomicInteger(1);
+        //单位名称
+        //不含税总额
+        //总金额
+        //数量*含税单价
+        return BeanUtils.toBean(orderDO, ErpPurchaseOrderWordBO.class, peek -> peek.setProducts(BeanUtils.toBean(itemDOS, ErpPurchaseOrderItemBO.class, item -> {
+            item.setIndex(index.getAndIncrement());
+            item.setProduct(productMap.get(item.getProductId()));
+            //单位名称
+            item.setUnitName(unitMap.get(item.getProductUnitId()).getName());
+            //不含税总额
+            item.setTotalPriceUntaxed(item.getProductPrice().multiply(item.getCount()).setScale(2, RoundingMode.HALF_UP));
+            item.setTotalTaxPrice(item.getTaxPrice().setScale(2, RoundingMode.HALF_UP));
+            //总金额
+            item.setTotalProductPrice(item.getCount().multiply(item.getActTaxPrice()).setScale(2, RoundingMode.HALF_UP));//数量*含税单价
+            item.setDeliveryTimeFormat(DateUtil.format(item.getDeliveryTime(), "yyyy-MM-dd"));
+            item.setCount(item.getCount().setScale(0, RoundingMode.HALF_UP));
+        })).setTotalCount(peek.getTotalCount().setScale(0, RoundingMode.HALF_UP)));
+    }
+
+    /**
+     * 获取 JAR 包中的模板文件列表（只列出以 .docx 结尾的文件）
+     *
+     * @return 文件名列表
+     */
+    public List<String> getTemplateList() {
+        List<String> templateList = new ArrayList<>();
+        try {
+            org.springframework.core.io.Resource[] resources = resourcePatternResolver.getResources("classpath:purchase/order/*.docx");
+            //获取文件名列表
+            for (org.springframework.core.io.Resource resource : resources) {
+                Optional.ofNullable(resource.getFilename()).ifPresent(fileName -> {
+                    if (fileName.endsWith(".docx")) {
+                        templateList.add(fileName);
+                    }
+                });
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return templateList;
+    }
+
 }

@@ -19,4 +19,6 @@ public class ErpPurchaseOrderWordBO extends ErpPurchaseOrderDO {
 
     //不含税总额
     private BigDecimal totalPriceUntaxed;
+
+  
 }

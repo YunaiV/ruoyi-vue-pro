@@ -37,7 +37,7 @@ public class ErpPurchaseReturnDO extends BaseDO {
     private String no;
     /**
      * 审批状态
-     *
+     * <p>
      * 枚举 {@link SrmAuditStatus}
      */
     private Integer auditStatus;
@@ -55,13 +55,13 @@ public class ErpPurchaseReturnDO extends BaseDO {
     private String reviewComment;
     /**
      * 供应商编号
-     *
+     * <p>
      * 关联 {@link cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO#getId()}
      */
     private Long supplierId;
     /**
      * 结算账户编号
-     *
+     * <p>
      * 关联 {@link cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpAccountDO#getId()}
      */
     private Long accountId;
@@ -89,13 +89,13 @@ public class ErpPurchaseReturnDO extends BaseDO {
     private BigDecimal totalCount;
     /**
      * 最终合计价格，单位：元
-     *
+     * <p>
      * totalPrice = totalProductPrice + totalTaxPrice - discountPrice + otherPrice
      */
     private BigDecimal totalPrice;
     /**
      * 已退款金额，单位：元
-     *
+     * <p>
      * 目的：和 {@link cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinancePaymentDO} 结合，记录已支付金额
      */
     private BigDecimal refundPrice;
@@ -114,7 +114,7 @@ public class ErpPurchaseReturnDO extends BaseDO {
     private BigDecimal discountPercent;
     /**
      * 优惠金额，单位：元
-     *
+     * <p>
      * discountPrice = (totalProductPrice + totalTaxPrice) * discountPercent
      */
     private BigDecimal discountPrice;
@@ -122,10 +122,7 @@ public class ErpPurchaseReturnDO extends BaseDO {
      * 其它金额，单位：元
      */
     private BigDecimal otherPrice;
-    /**
-     * 币种编号
-     */
-    private Long currencyId;
+
     /**
      * 附件地址
      */

@@ -181,4 +181,11 @@ public interface ErpPurchaseOrderService {
      * @param reqVO vo
      */
     void generateContract(ErpPurchaseOrderGenerateContractReqVO reqVO, HttpServletResponse response);
+
+    /**
+     * 查询采购合同模板
+     *
+     * @return 模板名称集合
+     */
+    List<String> getTemplateList();
 }

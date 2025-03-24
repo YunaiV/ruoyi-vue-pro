@@ -154,6 +154,15 @@ public class ErpPurchaseOrderController {
         return success(true);
     }
 
+    //查查询采购合同的模板List<String>
+    @GetMapping("/getTemplateList")
+    @Operation(summary = "查询采购合同模板")
+    @PreAuthorize("@ss.hasPermission('erp:purchasereq-order:generateContract')")
+    public CommonResult<List<String>> getTemplateList() {
+        List<String> templateList = purchaseOrderService.getTemplateList();
+        return success(templateList);
+    }
+
     //根据采购单id生成采购合同
     @PostMapping("/generateContract")
     @Operation(summary = "生成采购合同")
