@@ -18,7 +18,7 @@ import lombok.Data;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = IotDataBridgeHttpConfig.class, name = "1"),
         @JsonSubTypes.Type(value = IotDataBridgeMqttConfig.class, name = "10"),
-        @JsonSubTypes.Type(value = IotDataBridgeRedisStreamMQConfig.class, name = "21"),
+        @JsonSubTypes.Type(value = IotDataBridgeRedisStreamConfig.class, name = "21"),
         @JsonSubTypes.Type(value = IotDataBridgeRocketMQConfig.class, name = "30"),
         @JsonSubTypes.Type(value = IotDataBridgeRabbitMQConfig.class, name = "31"),
         @JsonSubTypes.Type(value = IotDataBridgeKafkaMQConfig.class, name = "32"),

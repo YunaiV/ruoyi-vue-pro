@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.iot.controller.admin.thingmodel;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 
 @Tag(name = "管理后台 - IoT 产品物模型")
 @RestController
@@ -61,13 +66,31 @@ public class IotThingModelController {
         return success(BeanUtils.toBean(thingModel, IotThingModelRespVO.class));
     }
 
-    // TODO @puhui999：要不叫 get-tsl，去掉 product-id；后续，把
-    @GetMapping("/tsl-by-product-id")
+    @GetMapping("/get-tsl")
     @Operation(summary = "获得产品物模型 TSL")
     @Parameter(name = "productId", description = "产品 ID", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('iot:thing-model:query')")
-    public CommonResult<IotThingModelTSLRespVO> getThingModelTslByProductId(@RequestParam("productId") Long productId) {
-        return success(thingModelService.getThingModelTslByProductId(productId));
+    public CommonResult<IotThingModelTSLRespVO> getThingModelTsl(@RequestParam("productId") Long productId) {
+        IotThingModelTSLRespVO tslRespVO = new IotThingModelTSLRespVO();
+        // 1. 获得产品所有物模型定义
+        List<IotThingModelDO> thingModels = thingModelService.getThingModelListByProductId(productId);
+        if (CollUtil.isEmpty(thingModels)) {
+            return success(tslRespVO);
+        }
+
+        // 2.1 设置公共部分参数
+        IotThingModelDO thingModel = thingModels.get(0);
+        tslRespVO.setProductId(thingModel.getProductId()).setProductKey(thingModel.getProductKey());
+        // 2.2 处理属性列表
+        tslRespVO.setProperties(convertList(filterList(thingModels, item ->
+                ObjUtil.equal(IotThingModelTypeEnum.PROPERTY.getType(), item.getType())), IotThingModelDO::getProperty));
+        // 2.3 处理服务列表
+        tslRespVO.setServices(convertList(filterList(thingModels, item ->
+                ObjUtil.equal(IotThingModelTypeEnum.SERVICE.getType(), item.getType())), IotThingModelDO::getService));
+        // 2.4 处理事件列表
+        tslRespVO.setEvents(convertList(filterList(thingModels, item ->
+                ObjUtil.equal(IotThingModelTypeEnum.EVENT.getType(), item.getType())), IotThingModelDO::getEvent));
+        return success(tslRespVO);
     }
 
     @GetMapping("/list")

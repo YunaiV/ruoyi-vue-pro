@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * IoT 规则场景（场景联动） Mapper
+ * IoT 场景联动 Mapper
  *
  * @author HUIHUI
  */

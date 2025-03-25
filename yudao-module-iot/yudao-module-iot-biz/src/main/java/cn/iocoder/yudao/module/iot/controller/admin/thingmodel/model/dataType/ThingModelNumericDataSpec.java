@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -18,18 +20,21 @@ public class ThingModelNumericDataSpec extends ThingModelDataSpecs {
 
     /**
      * 最大值，需转为字符串类型。值必须与 dataType 类型一致。
-     * 例如，当 dataType 为 int 时，取值为 "200"，而不是 200。
      */
+    @NotEmpty(message = "最大值不能为空")
+    @Pattern(regexp = "^-?\\d+(\\.\\d+)?$", message = "最大值必须为数值类型")
     private String max;
     /**
      * 最小值，需转为字符串类型。值必须与 dataType 类型一致。
-     * 例如，当 dataType 为 int 时，取值为 "0"，而不是 0。
      */
+    @NotEmpty(message = "最小值不能为空")
+    @Pattern(regexp = "^-?\\d+(\\.\\d+)?$", message = "最小值必须为数值类型")
     private String min;
     /**
      * 步长，需转为字符串类型。值必须与 dataType 类型一致。
-     * 例如，当 dataType 为 int 时，取值为 "10"，而不是 10。
      */
+    @NotEmpty(message = "步长不能为空")
+    @Pattern(regexp = "^-?\\d+(\\.\\d+)?$", message = "步长必须为数值类型")
     private String step;
     /**
      * 精度。当 dataType 为 float 或 double 时可选传入。
