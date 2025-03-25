@@ -38,6 +38,8 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.APPROVAL_HIST
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.APPROVAL_HISTORY_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.APPROVAL_HISTORY_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 @Tag(name = "审批历史")
 @RestController
@@ -48,36 +50,33 @@ public class WmsApprovalHistoryController {
     @Resource
     private WmsApprovalHistoryService approvalHistoryService;
 
-//    /**
-//     * @sign : 3655A9938D11E84E
-//     */
-//    @PostMapping("/create")
-//    @Operation(summary = "创建审批历史")
-//    @PreAuthorize("@ss.hasPermission('wms:approval-history:create')")
-//    public CommonResult<Long> createApprovalHistory(@Valid @RequestBody WmsApprovalHistorySaveReqVO createReqVO) {
-//        return success(approvalHistoryService.createApprovalHistory(createReqVO).getId());
-//    }
-
-//    /**
-//     * @sign : 8EB272B59BCEA5B7
-//     */
-//    @PutMapping("/update")
-//    @Operation(summary = "更新审批历史")
-//    @PreAuthorize("@ss.hasPermission('wms:approval-history:update')")
-//    public CommonResult<Boolean> updateApprovalHistory(@Valid @RequestBody WmsApprovalHistorySaveReqVO updateReqVO) {
-//        approvalHistoryService.updateApprovalHistory(updateReqVO);
-//        return success(true);
-//    }
-
-//    @DeleteMapping("/delete")
-//    @Operation(summary = "删除审批历史")
-//    @Parameter(name = "id", description = "编号", required = true)
-//    @PreAuthorize("@ss.hasPermission('wms:approval-history:delete')")
-//    public CommonResult<Boolean> deleteApprovalHistory(@RequestParam("id") Long id) {
-//        approvalHistoryService.deleteApprovalHistory(id);
-//        return success(true);
-//    }
-
+    // /**
+    // * @sign : 3655A9938D11E84E
+    // */
+    // @PostMapping("/create")
+    // @Operation(summary = "创建审批历史")
+    // @PreAuthorize("@ss.hasPermission('wms:approval-history:create')")
+    // public CommonResult<Long> createApprovalHistory(@Valid @RequestBody WmsApprovalHistorySaveReqVO createReqVO) {
+    // return success(approvalHistoryService.createApprovalHistory(createReqVO).getId());
+    // }
+    // /**
+    // * @sign : 8EB272B59BCEA5B7
+    // */
+    // @PutMapping("/update")
+    // @Operation(summary = "更新审批历史")
+    // @PreAuthorize("@ss.hasPermission('wms:approval-history:update')")
+    // public CommonResult<Boolean> updateApprovalHistory(@Valid @RequestBody WmsApprovalHistorySaveReqVO updateReqVO) {
+    // approvalHistoryService.updateApprovalHistory(updateReqVO);
+    // return success(true);
+    // }
+    // @DeleteMapping("/delete")
+    // @Operation(summary = "删除审批历史")
+    // @Parameter(name = "id", description = "编号", required = true)
+    // @PreAuthorize("@ss.hasPermission('wms:approval-history:delete')")
+    // public CommonResult<Boolean> deleteApprovalHistory(@RequestParam("id") Long id) {
+    // approvalHistoryService.deleteApprovalHistory(id);
+    // return success(true);
+    // }
     /**
      * @sign : 2EACE20AECAC531F
      */
@@ -121,15 +120,14 @@ public class WmsApprovalHistoryController {
         // 返回
         return success(voPageResult);
     }
-
-//    @GetMapping("/export-excel")
-//    @Operation(summary = "导出审批历史 Excel")
-//    @PreAuthorize("@ss.hasPermission('wms:approval-history:export')")
-//    @ApiAccessLog(operateType = EXPORT)
-//    public void exportApprovalHistoryExcel(@Valid WmsApprovalHistoryPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
-//        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-//        List<WmsApprovalHistoryDO> list = approvalHistoryService.getApprovalHistoryPage(pageReqVO).getList();
-//        // 导出 Excel
-//        ExcelUtils.write(response, "审批历史.xls", "数据", WmsApprovalHistoryRespVO.class, BeanUtils.toBean(list, WmsApprovalHistoryRespVO.class));
-//    }
-}
+    // @GetMapping("/export-excel")
+    // @Operation(summary = "导出审批历史 Excel")
+    // @PreAuthorize("@ss.hasPermission('wms:approval-history:export')")
+    // @ApiAccessLog(operateType = EXPORT)
+    // public void exportApprovalHistoryExcel(@Valid WmsApprovalHistoryPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
+    // pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+    // List<WmsApprovalHistoryDO> list = approvalHistoryService.getApprovalHistoryPage(pageReqVO).getList();
+    // // 导出 Excel
+    // ExcelUtils.write(response, "审批历史.xls", "数据", WmsApprovalHistoryRespVO.class, BeanUtils.toBean(list, WmsApprovalHistoryRespVO.class));
+    // }
+}

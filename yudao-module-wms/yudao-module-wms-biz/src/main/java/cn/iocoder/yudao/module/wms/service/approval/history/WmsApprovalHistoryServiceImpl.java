@@ -83,4 +83,4 @@ public class WmsApprovalHistoryServiceImpl implements WmsApprovalHistoryService 
     public PageResult<WmsApprovalHistoryDO> getApprovalHistoryPage(WmsApprovalHistoryPageReqVO pageReqVO) {
         return approvalHistoryMapper.selectPage(pageReqVO);
     }
-}
+}

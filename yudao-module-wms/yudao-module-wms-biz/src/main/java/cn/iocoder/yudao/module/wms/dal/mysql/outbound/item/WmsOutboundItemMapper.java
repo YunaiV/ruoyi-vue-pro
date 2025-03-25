@@ -20,8 +20,8 @@ public interface WmsOutboundItemMapper extends BaseMapperX<WmsOutboundItemDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<WmsOutboundItemDO>()
 				.eqIfPresent(WmsOutboundItemDO::getOutboundId, reqVO.getOutboundId())
 				.eqIfPresent(WmsOutboundItemDO::getProductId, reqVO.getProductId())
-				.eqIfPresent(WmsOutboundItemDO::getPlanQuantity, reqVO.getPlanQuantity())
-				.eqIfPresent(WmsOutboundItemDO::getActualQuantity, reqVO.getActualQuantity())
+				.eqIfPresent(WmsOutboundItemDO::getPlanQty, reqVO.getPlanQty())
+				.eqIfPresent(WmsOutboundItemDO::getActualQty, reqVO.getActualQty())
 				.eqIfPresent(WmsOutboundItemDO::getSourceItemId, reqVO.getSourceItemId())
 				.betweenIfPresent(WmsOutboundItemDO::getCreateTime, reqVO.getCreateTime())
 				.orderByDesc(WmsOutboundItemDO::getId));
@@ -42,4 +42,4 @@ public interface WmsOutboundItemMapper extends BaseMapperX<WmsOutboundItemDO> {
         wrapper.eq(WmsOutboundItemDO::getOutboundId, outboundId);
         return selectList(wrapper);
     }
-}
+}

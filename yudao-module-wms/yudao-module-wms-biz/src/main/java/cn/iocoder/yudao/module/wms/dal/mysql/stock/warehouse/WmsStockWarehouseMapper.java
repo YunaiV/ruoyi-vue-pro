@@ -20,12 +20,12 @@ public interface WmsStockWarehouseMapper extends BaseMapperX<WmsStockWarehouseDO
         return selectPage(reqVO, new LambdaQueryWrapperX<WmsStockWarehouseDO>()
 				.eqIfPresent(WmsStockWarehouseDO::getWarehouseId, reqVO.getWarehouseId())
 				.eqIfPresent(WmsStockWarehouseDO::getProductId, reqVO.getProductId())
-				.eqIfPresent(WmsStockWarehouseDO::getPurchasePlanQuantity, reqVO.getPurchasePlanQuantity())
-				.eqIfPresent(WmsStockWarehouseDO::getPurchaseTransitQuantity, reqVO.getPurchaseTransitQuantity())
-				.eqIfPresent(WmsStockWarehouseDO::getReturnTransitQuantity, reqVO.getReturnTransitQuantity())
-				.eqIfPresent(WmsStockWarehouseDO::getAvailableQuantity, reqVO.getAvailableQuantity())
-				.eqIfPresent(WmsStockWarehouseDO::getSellableQuantity, reqVO.getSellableQuantity())
-				.eqIfPresent(WmsStockWarehouseDO::getDefectiveQuantity, reqVO.getDefectiveQuantity())
+				.eqIfPresent(WmsStockWarehouseDO::getPurchasePlanQty, reqVO.getPurchasePlanQty())
+				.eqIfPresent(WmsStockWarehouseDO::getPurchaseTransitQty, reqVO.getPurchaseTransitQty())
+				.eqIfPresent(WmsStockWarehouseDO::getReturnTransitQty, reqVO.getReturnTransitQty())
+				.eqIfPresent(WmsStockWarehouseDO::getAvailableQty, reqVO.getAvailableQty())
+				.eqIfPresent(WmsStockWarehouseDO::getSellableQty, reqVO.getSellableQty())
+				.eqIfPresent(WmsStockWarehouseDO::getDefectiveQty, reqVO.getDefectiveQty())
 				.betweenIfPresent(WmsStockWarehouseDO::getCreateTime, reqVO.getCreateTime())
 				.orderByDesc(WmsStockWarehouseDO::getId));
     }
@@ -49,4 +49,4 @@ public interface WmsStockWarehouseMapper extends BaseMapperX<WmsStockWarehouseDO
         wrapper.eq(WmsStockWarehouseDO::getProductId, productId);
         return selectOne(wrapper);
     }
-}
+}

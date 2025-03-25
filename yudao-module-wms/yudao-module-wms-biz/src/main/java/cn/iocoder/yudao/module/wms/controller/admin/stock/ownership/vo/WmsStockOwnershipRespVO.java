@@ -9,7 +9,7 @@ import com.alibaba.excel.annotation.*;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,creator,company_id,create_time,updater,available_quantity,outbound_pending_quantity,update_time,product_id,shelving_pending_quantity,id,dept_id,warehouse_id
+ * @table-fields : tenant_id,creator,company_id,create_time,outbound_pending_qty,available_qty,updater,update_time,product_id,shelving_pending_qty,id,dept_id,warehouse_id
  */
 @Schema(description = "管理后台 - 所有者库存 Response VO")
 @Data
@@ -28,10 +28,6 @@ public class WmsStockOwnershipRespVO {
     @ExcelProperty("产品ID")
     private Long productId;
 
-    @Schema(description = "可用库存", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("可用库存")
-    private Integer availableQuantity;
-
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
@@ -43,10 +39,6 @@ public class WmsStockOwnershipRespVO {
     @Schema(description = "库存归属部门ID", example = "")
     @ExcelProperty("库存归属部门ID")
     private Long deptId;
-
-    @Schema(description = "待出库库存", example = "")
-    @ExcelProperty("待出库库存")
-    private Integer outboundPendingQuantity;
 
     @Schema(description = "创建者", example = "")
     @ExcelProperty("创建者")
@@ -65,7 +57,15 @@ public class WmsStockOwnershipRespVO {
     @ExcelProperty("租户编号")
     private Long tenantId;
 
+    @Schema(description = "可用库存", example = "")
+    @ExcelProperty("可用库存")
+    private Integer availableQty;
+
+    @Schema(description = "待出库库存", example = "")
+    @ExcelProperty("待出库库存")
+    private Integer outboundPendingQty;
+
     @Schema(description = "待上架数量，上架是指从拣货区上架到货架", example = "")
-    @ExcelProperty("待上架数量")
-    private Integer shelvingPendingQuantity;
+    @ExcelProperty("待上架数量，上架是指从拣货区上架到货架")
+    private Integer shelvingPendingQty;
 }

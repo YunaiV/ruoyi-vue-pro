@@ -24,15 +24,15 @@ public interface WmsStockFlowMapper extends BaseMapperX<WmsStockFlowDO> {
 				.eqIfPresent(WmsStockFlowDO::getReasonBillId, reqVO.getReasonBillId())
 				.eqIfPresent(WmsStockFlowDO::getReasonItemId, reqVO.getReasonItemId())
 				.eqIfPresent(WmsStockFlowDO::getPrevFlowId, reqVO.getPrevFlowId())
-				.eqIfPresent(WmsStockFlowDO::getDeltaQuantity, reqVO.getDeltaQuantity())
-				.eqIfPresent(WmsStockFlowDO::getPurchasePlanQuantity, reqVO.getPurchasePlanQuantity())
-				.eqIfPresent(WmsStockFlowDO::getPurchaseTransitQuantity, reqVO.getPurchaseTransitQuantity())
-				.eqIfPresent(WmsStockFlowDO::getReturnTransitQuantity, reqVO.getReturnTransitQuantity())
-				.eqIfPresent(WmsStockFlowDO::getShelvingPendingQuantity, reqVO.getShelvingPendingQuantity())
-				.eqIfPresent(WmsStockFlowDO::getAvailableQuantity, reqVO.getAvailableQuantity())
-				.eqIfPresent(WmsStockFlowDO::getSellableQuantity, reqVO.getSellableQuantity())
-				.eqIfPresent(WmsStockFlowDO::getOutboundPendingQuantity, reqVO.getOutboundPendingQuantity())
-				.eqIfPresent(WmsStockFlowDO::getDefectiveQuantity, reqVO.getDefectiveQuantity())
+				.eqIfPresent(WmsStockFlowDO::getDeltaQty, reqVO.getDeltaQty())
+				.eqIfPresent(WmsStockFlowDO::getPurchasePlanQty, reqVO.getPurchasePlanQty())
+				.eqIfPresent(WmsStockFlowDO::getPurchaseTransitQty, reqVO.getPurchaseTransitQty())
+				.eqIfPresent(WmsStockFlowDO::getReturnTransitQty, reqVO.getReturnTransitQty())
+				.eqIfPresent(WmsStockFlowDO::getShelvingPendingQty, reqVO.getShelvingPendingQty())
+				.eqIfPresent(WmsStockFlowDO::getAvailableQty, reqVO.getAvailableQty())
+				.eqIfPresent(WmsStockFlowDO::getSellableQty, reqVO.getSellableQty())
+				.eqIfPresent(WmsStockFlowDO::getOutboundPendingQty, reqVO.getOutboundPendingQty())
+				.eqIfPresent(WmsStockFlowDO::getDefectiveQty, reqVO.getDefectiveQty())
 				.betweenIfPresent(WmsStockFlowDO::getFlowTime, reqVO.getFlowTime())
 				.betweenIfPresent(WmsStockFlowDO::getCreateTime, reqVO.getCreateTime())
 				.orderByDesc(WmsStockFlowDO::getId));
@@ -73,4 +73,4 @@ public interface WmsStockFlowMapper extends BaseMapperX<WmsStockFlowDO> {
     default List<WmsStockFlowDO> selectStockFlow(Long stockType, Long stockId) {
         return selectList(new LambdaQueryWrapperX<WmsStockFlowDO>().eq(WmsStockFlowDO::getStockType, stockType).eq(WmsStockFlowDO::getStockId, stockId));
     }
-}
+}

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : inbound_id,outbound_available_quantity,source_item_id,inbound_status,actual_quantity,create_time,product_id,plan_quantity,shelved_quantity
+ * @table-fields : inbound_id,outbound_available_qty,source_item_id,inbound_status,actual_qty,create_time,plan_qty,product_id,shelved_qty,latest_flow_id
  */
 @Schema(description = "管理后台 - 入库单详情分页 Request VO")
 @Data
@@ -23,12 +23,6 @@ public class WmsInboundItemPageReqVO extends PageParam {
     @Schema(description = "标准产品ID", example = "27659")
     private Long productId;
 
-    @Schema(description = "计划入库量")
-    private Integer planQuantity;
-
-    @Schema(description = "实际入库量")
-    private Integer actualQuantity;
-
     @Schema(description = "来源详情ID", example = "30830")
     private Long sourceItemId;
 
@@ -39,9 +33,18 @@ public class WmsInboundItemPageReqVO extends PageParam {
     @Schema(description = "入库状态 ; InboundStatus : 0-未入库 , 1-部分入库 , 2-已入库", example = "")
     private Integer inboundStatus;
 
-    @Schema(description = "已上架量，已经拣货到仓位的库存量", example = "")
-    private Integer shelvedQuantity;
+    @Schema(description = "实际入库量", example = "")
+    private Integer actualQty;
 
     @Schema(description = "批次剩余库存，出库后的剩余库存量", example = "")
-    private Integer outboundAvailableQuantity;
+    private Integer outboundAvailableQty;
+
+    @Schema(description = "计划入库量", example = "")
+    private Integer planQty;
+
+    @Schema(description = "已上架量，已经拣货到仓位的库存量", example = "")
+    private Integer shelvedQty;
+
+    @Schema(description = "最新的流水ID", example = "")
+    private Long latestFlowId;
 }

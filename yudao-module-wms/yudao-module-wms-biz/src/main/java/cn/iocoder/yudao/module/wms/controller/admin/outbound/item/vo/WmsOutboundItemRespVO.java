@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,creator,create_time,bin_id,plan_quantity,outbound_id,updater,source_item_id,update_time,outbound_status,actual_quantity,product_id,id
+ * @table-fields : tenant_id,creator,create_time,bin_id,plan_qty,outbound_id,updater,source_item_id,update_time,actual_qty,outbound_status,product_id,id
  */
 @Schema(description = "管理后台 - 出库单详情 Response VO")
 @Data
@@ -31,10 +31,6 @@ public class WmsOutboundItemRespVO {
     @Schema(description = "标准产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "20572")
     @ExcelProperty("标准产品ID")
     private Long productId;
-
-    @Schema(description = "实际出库量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("实际出库量")
-    private Integer actualQuantity;
 
     @Schema(description = "来源详情ID", example = "11448")
     @ExcelProperty("来源详情ID")
@@ -64,10 +60,6 @@ public class WmsOutboundItemRespVO {
     @ExcelProperty("出库状态")
     private Integer outboundStatus;
 
-    @Schema(description = "计划出库量", example = "")
-    @ExcelProperty("计划出库量")
-    private Integer planQuantity;
-
     @Schema(description = "创建者", example = "")
     @ExcelProperty("创建者")
     private String creator;
@@ -88,4 +80,12 @@ public class WmsOutboundItemRespVO {
     @Schema(description = "出库库位ID", example = "")
     @ExcelProperty("出库库位ID")
     private Long binId;
+
+    @Schema(description = "实际出库量", example = "")
+    @ExcelProperty("实际出库量")
+    private Integer actualQty;
+
+    @Schema(description = "计划出库量", example = "")
+    @ExcelProperty("计划出库量")
+    private Integer planQty;
 }

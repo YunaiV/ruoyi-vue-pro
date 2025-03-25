@@ -56,4 +56,8 @@ public interface WmsInboundItemFlowService {
      * 按 inboundId 查询 WmsInboundItemFlowDO
      */
     List<WmsInboundItemFlowDO> selectByInboundId(Long inboundId, int limit);
+
+    void insert(WmsInboundItemFlowDO flowDO);
+
+    List<WmsInboundItemFlowDO> selectByActionId(Long latestOutboundActionId);
 }

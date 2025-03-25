@@ -10,7 +10,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 /**
  * 仓位库存 DO
  * @author 李方捷
- * @table-fields : available_quantity,outbound_pending_quantity,bin_id,product_id,sellable_quantity,id,warehouse_id
+ * @table-fields : outbound_pending_qty,bin_id,product_id,available_qty,id,sellable_qty,warehouse_id
  */
 @TableName("wms_stock_bin")
 // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -47,15 +47,15 @@ public class WmsStockBinDO extends BaseDO {
     /**
      * 可用量，在库的良品数量
      */
-    private Integer availableQuantity;
-
-    /**
-     * 可售量，未被单据占用的良品数量
-     */
-    private Integer sellableQuantity;
+    private Integer availableQty;
 
     /**
      * 待出库量
      */
-    private Integer outboundPendingQuantity;
+    private Integer outboundPendingQty;
+
+    /**
+     * 可售量，未被单据占用的良品数量
+     */
+    private Integer sellableQty;
 }

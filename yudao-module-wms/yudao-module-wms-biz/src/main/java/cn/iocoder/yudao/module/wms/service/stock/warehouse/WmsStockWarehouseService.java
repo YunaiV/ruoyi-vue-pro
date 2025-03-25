@@ -53,22 +53,9 @@ public interface WmsStockWarehouseService {
      */
     PageResult<WmsStockWarehouseDO> getStockWarehousePage(WmsStockWarehousePageReqVO pageReqVO);
 
-    /**
-     * 入库
-     */
-    void inbound(WmsInboundRespVO inboundRespVO);
-
     WmsStockWarehouseDO getStockWarehouse(Long warehouseId, Long productId);
 
-    /**
-     * 为拣货刷新库存
-     **/
-    void refreshForPickup(Long warehouseId, Long productId,Long pickupId,Long pickupItemId,Integer pickupQuantity);
+    WmsStockWarehouseDO getByWarehouseIdAndProductId(Long warehouseId, Long productId);
 
-    /**
-     * 出库
-     **/
-    void outbound(WmsOutboundRespVO outboundRespVO,StockReason reason);
-
-
+    void insertOrUpdate(WmsStockWarehouseDO stockWarehouseDO);
 }

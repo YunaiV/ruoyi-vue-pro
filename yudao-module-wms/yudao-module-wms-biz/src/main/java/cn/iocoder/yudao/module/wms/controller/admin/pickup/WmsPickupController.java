@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms.controller.admin.pickup;
 
+import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.pickup.item.vo.WmsPickupItemRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
 import cn.iocoder.yudao.module.wms.service.pickup.item.WmsPickupItemService;
@@ -38,13 +39,14 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_NOT_EX
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_NOT_EXISTS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 @Tag(name = "拣货单")
 @RestController
 @RequestMapping("/wms/pickup")
 @Validated
 public class WmsPickupController {
-
 
     @Resource
     @Lazy
@@ -127,7 +129,6 @@ public class WmsPickupController {
         // 返回
         return success(voPageResult);
     }
-
     // @GetMapping("/export-excel")
     // @Operation(summary = "导出拣货单 Excel")
     // @PreAuthorize("@ss.hasPermission('wms:pickup:export')")

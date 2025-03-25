@@ -6,7 +6,7 @@ import java.util.*;
 import jakarta.validation.constraints.*;
 
 /**
- * @table-fields : inbound_id,quantity,bin_id,product_id,id,inbound_item_id,pickup_id
+ * @table-fields : inbound_id,bin_id,product_id,qty,id,inbound_item_id,pickup_id
  */
 @Schema(description = "管理后台 - 拣货单详情新增/修改 Request VO")
 @Data
@@ -31,11 +31,10 @@ public class WmsPickupItemSaveReqVO {
     @NotNull(message = "产品ID不能为空")
     private Long productId;
 
-    @Schema(description = "拣货数量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "拣货数量不能为空")
-    private Integer quantity;
-
     @Schema(description = "仓位ID，拣货到目标仓位", requiredMode = Schema.RequiredMode.REQUIRED, example = "8732")
     @NotNull(message = "仓位ID不能为空")
     private Long binId;
+
+    @Schema(description = "拣货数量", example = "")
+    private Integer qty;
 }

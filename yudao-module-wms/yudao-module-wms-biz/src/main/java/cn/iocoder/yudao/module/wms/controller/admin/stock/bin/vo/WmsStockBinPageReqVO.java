@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : available_quantity,outbound_pending_quantity,create_time,bin_id,product_id,sellable_quantity,warehouse_id
+ * @table-fields : create_time,outbound_pending_qty,bin_id,product_id,available_qty,sellable_qty,warehouse_id
  */
 @Schema(description = "管理后台 - 仓位库存分页 Request VO")
 @Data
@@ -26,16 +26,16 @@ public class WmsStockBinPageReqVO extends PageParam {
     @Schema(description = "产品ID", example = "11713")
     private Long productId;
 
-    @Schema(description = "可用量，在库的良品数量")
-    private Integer availableQuantity;
-
-    @Schema(description = "可售量，未被单据占用的良品数量")
-    private Integer sellableQuantity;
-
-    @Schema(description = "待出库量")
-    private Integer outboundPendingQuantity;
-
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
+
+    @Schema(description = "可用量，在库的良品数量", example = "")
+    private Integer availableQty;
+
+    @Schema(description = "待出库量", example = "")
+    private Integer outboundPendingQty;
+
+    @Schema(description = "可售量，未被单据占用的良品数量", example = "")
+    private Integer sellableQty;
 }

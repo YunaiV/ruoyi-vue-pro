@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.approval.history.ApprovalHistoryAction;
+import cn.iocoder.yudao.module.wms.service.quantity.InboundExecutor;
+import cn.iocoder.yudao.module.wms.service.quantity.context.InboundContext;
 import cn.iocoder.yudao.module.wms.service.stock.warehouse.WmsStockWarehouseService;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
@@ -55,6 +57,9 @@ public class InboundAction implements StateMachineConfigure<Integer, InboundAudi
         @Resource
         private WmsStockWarehouseService stockWarehouseService;
 
+        @Resource
+        private InboundExecutor inboundExecutor;
+
         public Agree() {
             // 指定事件以及前后的状态与状态提取器
             super(InboundAuditStatus.AUDITING.getValue(), InboundAuditStatus.PASS.getValue(), WmsInboundDO::getAuditStatus, InboundAuditStatus.Event.AGREE);
@@ -64,8 +69,9 @@ public class InboundAction implements StateMachineConfigure<Integer, InboundAudi
         public void perform(Integer from, Integer to, InboundAuditStatus.Event event, ColaContext<WmsInboundDO> context) {
             super.perform(from, to, event, context);
             // 调整库存
-            WmsInboundRespVO inboundRespVO=inboundService.getInboundWithItemList(context.data().getId());
-            stockWarehouseService.inbound(inboundRespVO);
+            InboundContext inboundContext=new InboundContext();
+            inboundContext.setInboundId(context.data().getId());
+            inboundExecutor.execute(inboundContext);
 
         }
     }

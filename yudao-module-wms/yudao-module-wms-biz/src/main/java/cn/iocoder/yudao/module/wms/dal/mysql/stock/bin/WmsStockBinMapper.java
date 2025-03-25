@@ -22,9 +22,9 @@ public interface WmsStockBinMapper extends BaseMapperX<WmsStockBinDO> {
 				.eqIfPresent(WmsStockBinDO::getWarehouseId, reqVO.getWarehouseId())
 				.eqIfPresent(WmsStockBinDO::getBinId, reqVO.getBinId())
 				.eqIfPresent(WmsStockBinDO::getProductId, reqVO.getProductId())
-				.eqIfPresent(WmsStockBinDO::getAvailableQuantity, reqVO.getAvailableQuantity())
-				.eqIfPresent(WmsStockBinDO::getSellableQuantity, reqVO.getSellableQuantity())
-				.eqIfPresent(WmsStockBinDO::getOutboundPendingQuantity, reqVO.getOutboundPendingQuantity())
+				.eqIfPresent(WmsStockBinDO::getAvailableQty, reqVO.getAvailableQty())
+				.eqIfPresent(WmsStockBinDO::getSellableQty, reqVO.getSellableQty())
+				.eqIfPresent(WmsStockBinDO::getOutboundPendingQty, reqVO.getOutboundPendingQty())
 				.betweenIfPresent(WmsStockBinDO::getCreateTime, reqVO.getCreateTime())
 				.orderByDesc(WmsStockBinDO::getId));
     }
@@ -54,7 +54,7 @@ public interface WmsStockBinMapper extends BaseMapperX<WmsStockBinDO> {
     }
 
     default List<WmsStockBinDO> selectStockBinList(Collection<Long> binIds, Collection<Long> productIds) {
-        if(CollectionUtils.isEmpty(binIds) && CollectionUtils.isEmpty(productIds)) {
+        if (CollectionUtils.isEmpty(binIds) && CollectionUtils.isEmpty(productIds)) {
             return new ArrayList<>();
         }
         LambdaQueryWrapperX<WmsStockBinDO> wrapper = new LambdaQueryWrapperX<>();

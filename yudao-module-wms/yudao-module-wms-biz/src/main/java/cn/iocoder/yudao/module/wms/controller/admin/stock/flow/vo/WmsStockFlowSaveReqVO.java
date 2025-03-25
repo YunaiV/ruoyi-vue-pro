@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.wms.enums.stock.StockType;
 import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
 
 /**
- * @table-fields : defective_quantity,reason,purchase_transit_quantity,flow_time,next_flow_id,return_transit_quantity,purchase_plan_quantity,stock_id,available_quantity,stock_type,outbound_pending_quantity,product_id,shelving_pending_quantity,sellable_quantity,delta_quantity,id,reason_bill_id,prev_flow_id,reason_item_id,warehouse_id
+ * @table-fields : reason,outbound_pending_qty,delta_qty,flow_time,available_qty,next_flow_id,purchase_transit_qty,stock_id,stock_type,product_id,shelving_pending_qty,id,reason_bill_id,defective_qty,return_transit_qty,sellable_qty,purchase_plan_qty,prev_flow_id,reason_item_id,warehouse_id
  */
 @Schema(description = "管理后台 - 库存流水新增/修改 Request VO")
 @Data
@@ -45,36 +45,8 @@ public class WmsStockFlowSaveReqVO {
     @NotNull(message = "前一个流水ID不能为空")
     private Long prevFlowId;
 
-    @Schema(description = "变更量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "变更量不能为空")
-    private Integer deltaQuantity;
-
-    @Schema(description = "采购计划量")
-    private Integer purchasePlanQuantity;
-
-    @Schema(description = "采购在途量")
-    private Integer purchaseTransitQuantity;
-
-    @Schema(description = "退件在途数量")
-    private Integer returnTransitQuantity;
-
-    @Schema(description = "可用量，在库的良品数量")
-    private Integer availableQuantity;
-
-    @Schema(description = "可售量，未被单据占用的良品数量")
-    private Integer sellableQuantity;
-
-    @Schema(description = "不良品数量")
-    private Integer defectiveQuantity;
-
     @Schema(description = "流水发生的时间")
     private Timestamp flowTime;
-
-    @Schema(description = "待上架数量", example = "")
-    private Integer shelvingPendingQuantity;
-
-    @Schema(description = "待出库量", example = "")
-    private Integer outboundPendingQuantity;
 
     @Schema(description = "上一个流水ID", example = "")
     private Long nextFlowId;
@@ -84,4 +56,31 @@ public class WmsStockFlowSaveReqVO {
 
     @Schema(description = "仓库ID", example = "")
     private Long warehouseId;
+
+    @Schema(description = "可用量，在库的良品数量", example = "")
+    private Integer availableQty;
+
+    @Schema(description = "不良品数量", example = "")
+    private Integer defectiveQty;
+
+    @Schema(description = "变更量", example = "")
+    private Integer deltaQty;
+
+    @Schema(description = "待出库量", example = "")
+    private Integer outboundPendingQty;
+
+    @Schema(description = "采购计划量", example = "")
+    private Integer purchasePlanQty;
+
+    @Schema(description = "采购在途量", example = "")
+    private Integer purchaseTransitQty;
+
+    @Schema(description = "退件在途数量", example = "")
+    private Integer returnTransitQty;
+
+    @Schema(description = "可售量，未被单据占用的良品数量", example = "")
+    private Integer sellableQty;
+
+    @Schema(description = "待上架数量", example = "")
+    private Integer shelvingPendingQty;
 }

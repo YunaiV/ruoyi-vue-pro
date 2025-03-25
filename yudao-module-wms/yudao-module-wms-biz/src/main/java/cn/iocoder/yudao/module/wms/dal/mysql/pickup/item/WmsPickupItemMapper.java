@@ -22,7 +22,7 @@ public interface WmsPickupItemMapper extends BaseMapperX<WmsPickupItemDO> {
 				.eqIfPresent(WmsPickupItemDO::getInboundId, reqVO.getInboundId())
 				.eqIfPresent(WmsPickupItemDO::getInboundItemId, reqVO.getInboundItemId())
 				.eqIfPresent(WmsPickupItemDO::getProductId, reqVO.getProductId())
-				.eqIfPresent(WmsPickupItemDO::getQuantity, reqVO.getQuantity())
+				.eqIfPresent(WmsPickupItemDO::getQty, reqVO.getQty())
 				.eqIfPresent(WmsPickupItemDO::getBinId, reqVO.getBinId())
 				.betweenIfPresent(WmsPickupItemDO::getCreateTime, reqVO.getCreateTime())
 				.orderByDesc(WmsPickupItemDO::getId));
@@ -34,4 +34,4 @@ public interface WmsPickupItemMapper extends BaseMapperX<WmsPickupItemDO> {
     default List<WmsPickupItemDO> selectByPickupId(Long pickupId) {
         return selectList(new LambdaQueryWrapperX<WmsPickupItemDO>().eq(WmsPickupItemDO::getPickupId, pickupId));
     }
-}
+}

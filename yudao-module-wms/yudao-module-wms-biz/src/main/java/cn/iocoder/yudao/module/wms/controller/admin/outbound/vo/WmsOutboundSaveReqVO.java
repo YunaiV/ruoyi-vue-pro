@@ -19,7 +19,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : no,company_id,audit_status,creator_comment,outbound_time,source_bill_id,type,outbound_status,source_bill_no,source_bill_type,id,dept_id,warehouse_id
+ * @table-fields : no,company_id,outbound_time,audit_status,creator_comment,type,source_bill_id,latest_outbound_action_id,outbound_status,source_bill_no,source_bill_type,id,dept_id,warehouse_id
  */
 @Schema(description = "管理后台 - 出库单新增/修改 Request VO")
 @Data
@@ -74,4 +74,7 @@ public class WmsOutboundSaveReqVO {
     @Schema(description = "出库时间", example = "")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime outboundTime;
+
+    @Schema(description = "出库动作ID，与flow关联", example = "")
+    private Long latestOutboundActionId;
 }

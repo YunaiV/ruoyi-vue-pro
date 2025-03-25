@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : inbound_id,quantity,create_time,bin_id,product_id,inbound_item_id,pickup_id
+ * @table-fields : inbound_id,create_time,bin_id,product_id,qty,inbound_item_id,pickup_id
  */
 @Schema(description = "管理后台 - 拣货单详情分页 Request VO")
 @Data
@@ -29,13 +29,13 @@ public class WmsPickupItemPageReqVO extends PageParam {
     @Schema(description = "产品ID", example = "17566")
     private Long productId;
 
-    @Schema(description = "拣货数量")
-    private Integer quantity;
-
     @Schema(description = "仓位ID，拣货到目标仓位", example = "8732")
     private Long binId;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
+
+    @Schema(description = "拣货数量", example = "")
+    private Integer qty;
 }

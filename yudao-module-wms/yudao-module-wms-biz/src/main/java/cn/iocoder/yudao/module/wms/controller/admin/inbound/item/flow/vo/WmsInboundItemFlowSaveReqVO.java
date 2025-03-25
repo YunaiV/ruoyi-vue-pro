@@ -6,7 +6,7 @@ import java.util.*;
 import jakarta.validation.constraints.*;
 
 /**
- * @table-fields : inbound_id,product_id,id,inbound_item_id,outbound_id,outbound_quantity,outbound_item_id
+ * @table-fields : inbound_id,outbound_action_id,outbound_qty,product_id,id,inbound_item_id,outbound_id,outbound_item_id
  */
 @Schema(description = "管理后台 - 入库单库存详情扣减新增/修改 Request VO")
 @Data
@@ -36,5 +36,8 @@ public class WmsInboundItemFlowSaveReqVO {
     private Long outboundItemId;
 
     @Schema(description = "变化的数量，出库量", example = "")
-    private Integer outboundQuantity;
+    private Integer outboundQty;
+
+    @Schema(description = "出库动作ID", example = "")
+    private Long outboundActionId;
 }

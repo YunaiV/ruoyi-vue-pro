@@ -53,12 +53,6 @@ public interface WmsStockOwnershipService {
     PageResult<WmsStockOwnershipDO> getStockOwnershipPage(WmsStockOwnershipPageReqVO pageReqVO);
 
     /**
-     * 调整归属库存
-     * 此方法必须包含在 WmsStockWarehouseServiceImpl.inboundSingleItemTransactional 方法中
-     */
-    void inboundSingleItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long inboundId, Long inboundItemId);
-
-    /**
      * 获取库存归属
      *
      * @param warehouseId 仓库id
@@ -67,14 +61,7 @@ public interface WmsStockOwnershipService {
      */
     List<WmsStockOwnershipDO> selectStockOwnership(Long warehouseId, Long productId);
 
-    /**
-     * 调整归属库存
-     * 此方法必须包含在 WmsStockWarehouseServiceImpl.outboundSingleItemTransactional 方法中
-     */
-    void outboundSingleItem(StockReason reason, Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long outboundId, Long outboundItemId);
+    WmsStockOwnershipDO getByUkProductOwner(Long warehouseId, Long companyId, Long deptId, Long productId);
 
-    /**
-     * 调整归属库存
-     */
-    void refreshForPickup(Long warehouseId, Long companyId, Long deptId, Long productId, Long pickupId, Long pickupItemId, Integer quantity);
+    void insertOrUpdate(WmsStockOwnershipDO stockOwnershipDO);
 }

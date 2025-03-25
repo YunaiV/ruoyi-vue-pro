@@ -9,7 +9,7 @@ import com.alibaba.excel.annotation.*;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,defective_quantity,creator,create_time,purchase_transit_quantity,return_transit_quantity,purchase_plan_quantity,updater,available_quantity,outbound_pending_quantity,update_time,product_id,shelving_pending_quantity,sellable_quantity,id,warehouse_id
+ * @table-fields : tenant_id,creator,create_time,outbound_pending_qty,available_qty,purchase_transit_qty,updater,update_time,product_id,shelving_pending_qty,id,defective_qty,return_transit_qty,sellable_qty,purchase_plan_qty,warehouse_id
  */
 @Schema(description = "管理后台 - 仓库库存 Response VO")
 @Data
@@ -28,30 +28,6 @@ public class WmsStockWarehouseRespVO {
     @ExcelProperty("产品ID")
     private Long productId;
 
-    @Schema(description = "采购计划量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("采购计划量")
-    private Integer purchasePlanQuantity;
-
-    @Schema(description = "采购在途量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("采购在途量")
-    private Integer purchaseTransitQuantity;
-
-    @Schema(description = "退件在途数量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("退件在途数量")
-    private Integer returnTransitQuantity;
-
-    @Schema(description = "可用量，在库的良品数量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("可用量")
-    private Integer availableQuantity;
-
-    @Schema(description = "可售量，未被单据占用的良品数量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("可售量")
-    private Integer sellableQuantity;
-
-    @Schema(description = "不良品数量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("不良品数量")
-    private Integer defectiveQuantity;
-
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
@@ -63,14 +39,6 @@ public class WmsStockWarehouseRespVO {
     @Schema(description = "更新人姓名", example = "李四")
     @ExcelProperty("更新人姓名")
     private String updaterName;
-
-    @Schema(description = "待上架数量，上架是指从拣货区上架到货架", example = "")
-    @ExcelProperty("待上架数量")
-    private Integer shelvingPendingQuantity;
-
-    @Schema(description = "待出库量", example = "")
-    @ExcelProperty("待出库量")
-    private Integer outboundPendingQuantity;
 
     @Schema(description = "创建者", example = "")
     @ExcelProperty("创建者")
@@ -88,4 +56,36 @@ public class WmsStockWarehouseRespVO {
     @Schema(description = "租户编号", example = "")
     @ExcelProperty("租户编号")
     private Long tenantId;
+
+    @Schema(description = "可用量，在库的良品数量", example = "")
+    @ExcelProperty("可用量，在库的良品数量")
+    private Integer availableQty;
+
+    @Schema(description = "不良品数量", example = "")
+    @ExcelProperty("不良品数量")
+    private Integer defectiveQty;
+
+    @Schema(description = "待出库量", example = "")
+    @ExcelProperty("待出库量")
+    private Integer outboundPendingQty;
+
+    @Schema(description = "采购计划量", example = "")
+    @ExcelProperty("采购计划量")
+    private Integer purchasePlanQty;
+
+    @Schema(description = "采购在途量", example = "")
+    @ExcelProperty("采购在途量")
+    private Integer purchaseTransitQty;
+
+    @Schema(description = "退件在途数量", example = "")
+    @ExcelProperty("退件在途数量")
+    private Integer returnTransitQty;
+
+    @Schema(description = "可售量，未被单据占用的良品数量", example = "")
+    @ExcelProperty("可售量，未被单据占用的良品数量")
+    private Integer sellableQty;
+
+    @Schema(description = "待上架数量，上架是指从拣货区上架到货架", example = "")
+    @ExcelProperty("待上架数量，上架是指从拣货区上架到货架")
+    private Integer shelvingPendingQty;
 }

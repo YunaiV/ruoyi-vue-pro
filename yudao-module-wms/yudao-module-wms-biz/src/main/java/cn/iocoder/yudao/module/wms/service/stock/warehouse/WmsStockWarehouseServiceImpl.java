@@ -28,11 +28,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_WAREHOUSE_NOT_EXISTS;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_WAREHOUSE_WAREHOUSE_ID_PRODUCT_ID_DUPLICATE;
@@ -50,9 +48,6 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
     private WmsStockWarehouseMapper stockWarehouseMapper;
 
     @Resource
-    private WmsStockFlowService stockFlowService;
-
-    @Resource
     @Lazy
     private WmsStockOwnershipService stockOwnershipService;
 
@@ -64,14 +59,8 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
     @Lazy
     private WmsOutboundService outboundService;
 
-
     @Resource
     private WmsStockBinService stockBinService;
-
-
-
-    @Resource
-    private WmsLockRedisDAO lockRedisDAO;
 
     /**
      * @sign : 8EB2B4EFB4F2439A
@@ -148,296 +137,51 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void inbound(WmsInboundRespVO inboundRespVO) {
-
-        Long warehouseId = inboundRespVO.getWarehouseId();
-        Long companyId = inboundRespVO.getCompanyId();
-        Long inboundDeptId = inboundRespVO.getDeptId();
-
-        List<WmsInboundItemRespVO> itemList=inboundRespVO.getItemList();
-        for (WmsInboundItemRespVO item : itemList) {
-            Long productId = item.getProductId();
-            Long deptId = inboundDeptId;
-            // 如果入库单上未指定部门,默认按产品的部门ID
-            if (deptId == null) {
-                ErpProductRespSimpleVO productVO = item.getProduct();
-                deptId = productVO.getDeptId();
-            }
-            // 执行入库的原子操作
-            InboundStatus inboundStatus=inboundSingleItemAtomically(companyId, deptId, warehouseId, productId, item.getActualQuantity(), inboundRespVO.getId(), item.getId());
-            item.setInboundStatus(inboundStatus.getValue());
-            // if(inboundStatus!=InboundStatus.NONE) {
-            //    item.setOutboundAvailableQuantity(item.getActualQuantity());
-            // }
-        }
-        // 完成最终的入库
-        inboundService.finishInbound(inboundRespVO);
-    }
-
-
-    /**
-     * 执行入库的原子操作,以加锁的方式单个出入库
-     */
-    private InboundStatus inboundSingleItemAtomically(Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long inboundId, Long inboundItemId) {
-        // 校验本方法在事务中
-        JdbcUtils.requireTransaction();
-        WmsStockWarehouseServiceImpl currentProxy = SpringUtils.getBeanByExactType(WmsStockWarehouseServiceImpl.class);
-        AtomicReference<InboundStatus> status = new AtomicReference<>();
-        lockRedisDAO.lockStockLevels(warehouseId, productId, () -> {
-            try {
-                status.set(currentProxy.inboundSingleItemTransactional(companyId, deptId, warehouseId, productId, quantity, inboundId, inboundItemId));
-            } catch (Exception e) {
-                log.error("inboundSingleItemTransactional Error", e);
-            }
-        });
-        return status.get();
-    }
-
-    /**
-     * 在事务中执行入库操作
-     */
-
-    protected InboundStatus inboundSingleItemTransactional(Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long inboundId, Long inboundItemId) {
-        // 校验本方法在事务中
-        JdbcUtils.requireTransaction();
-        // 获得仓库库存记录
-        WmsStockWarehouseDO stockWarehouseDO = stockWarehouseMapper.getByWarehouseIdAndProductId(warehouseId, productId);
-        // 如果没有就创建
-        if (stockWarehouseDO == null) {
-            stockWarehouseDO = new WmsStockWarehouseDO();
-            stockWarehouseDO.setWarehouseId(warehouseId);
-            stockWarehouseDO.setProductId(productId);
-            // 采购计划量
-            stockWarehouseDO.setPurchasePlanQuantity(0);
-            // 采购在途量
-            stockWarehouseDO.setPurchaseTransitQuantity(0);
-            // 退货在途量
-            stockWarehouseDO.setReturnTransitQuantity(0);
-            // 待上架量
-            stockWarehouseDO.setShelvingPendingQuantity(quantity);
-            // 可用量，在库的良品数量
-            stockWarehouseDO.setAvailableQuantity(0);
-            // 可售量
-            stockWarehouseDO.setSellableQuantity(0);
-            // 待出库量
-            stockWarehouseDO.setOutboundPendingQuantity(0);
-            // 不良品数量
-            stockWarehouseDO.setDefectiveQuantity(0);
-            stockWarehouseMapper.insert(stockWarehouseDO);
-        } else {
-            // 如果有就修改
-            // 采购计划量
-            // stockWarehouseDO.setPurchasePlanQuantity(0);
-            // 采购在途量
-            // stockWarehouseDO.setPurchaseTransitQuantity(0);
-            // 退货在途量
-            // stockWarehouseDO.setReturnTransitQuantity(0);
-            // 待上架量
-            stockWarehouseDO.setShelvingPendingQuantity(stockWarehouseDO.getShelvingPendingQuantity() + quantity);
-            // 可用量，在库的良品数量
-            // stockWarehouseDO.setAvailableQuantity(0);
-            // 可售量
-            // stockWarehouseDO.setSellableQuantity(0);
-            // 待出库量
-            // stockWarehouseDO.setOutboundPendingQuantity(0);
-            // 不良品数量
-            // stockWarehouseDO.setDefectiveQuantity(0);
-            stockWarehouseMapper.updateById(stockWarehouseDO);
-        }
-        // 记录流水
-        stockFlowService.createForStockWarehouse(StockReason.INBOUND, productId,stockWarehouseDO, quantity, inboundId, inboundItemId);
-        // 调整归属库存
-        stockOwnershipService.inboundSingleItem(companyId, deptId, warehouseId, productId, quantity, inboundId, inboundItemId);
-        // TODO 如果是采购入库
-        log.info("入库:productId=" + productId + ";quantity=" + quantity);
-
-        // 当前逻辑,默认全部入库
-        return InboundStatus.ALL;
-    }
-
-    /**
-     * 汇总拣货库存,仅处理可用与可售
-     **/
-    @Override
-    public void refreshForPickup(Long warehouseId, Long productId, Long pickupId, Long pickupItemId, Integer pickupQuantity) {
-
-        List<WmsStockBinDO> stockBinList =  stockBinService.selectStockBin(warehouseId, productId);
-
-        Integer availableQuantity = 0;
-        Integer sellableQuantity = 0;
-
-        for (WmsStockBinDO wmsStockBinDO : stockBinList) {
-            availableQuantity+=wmsStockBinDO.getAvailableQuantity();
-            sellableQuantity+=wmsStockBinDO.getSellableQuantity();
-        }
-
-        WmsStockWarehouseDO stockWarehouseDO = stockWarehouseMapper.getByWarehouseIdAndProductId(warehouseId, productId);
-
-        stockWarehouseDO.setAvailableQuantity(availableQuantity);
-        stockWarehouseDO.setSellableQuantity(sellableQuantity);
-        stockWarehouseDO.setShelvingPendingQuantity(stockWarehouseDO.getShelvingPendingQuantity() - pickupQuantity);
-
-        // 更新库存
-        stockWarehouseMapper.updateById(stockWarehouseDO);
-        // 记录流水
-        stockFlowService.createForStockWarehouse(StockReason.PICKUP, productId,stockWarehouseDO, sellableQuantity,pickupId, pickupItemId);
-
-
+    public WmsStockWarehouseDO getByWarehouseIdAndProductId(Long warehouseId, Long productId) {
+        return stockWarehouseMapper.getByWarehouseIdAndProductId(warehouseId, productId);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void outbound(WmsOutboundRespVO outboundRespVO, StockReason reason) {
-
-        Long warehouseId = outboundRespVO.getWarehouseId();
-        Long companyId = outboundRespVO.getCompanyId();
-        Long outboundDeptId = outboundRespVO.getDeptId();
-
-        List<WmsOutboundItemRespVO> itemList=outboundRespVO.getItemList();
-        for (WmsOutboundItemRespVO item : itemList) {
-            Long productId = item.getProductId();
-            Long deptId = outboundDeptId;
-            // 如果入库单上未指定部门,默认按产品的部门ID
-            if (deptId == null) {
-                ErpProductRespSimpleVO productVO = item.getProduct();
-                deptId = productVO.getDeptId();
-            }
-            // 执行入库的原子操作
-            OutboundStatus outboundStatus = outboundSingleItemAtomically(reason, companyId, deptId, warehouseId, productId, item.getBinId(), item.getActualQuantity(), outboundRespVO.getId(), item.getId());
-            item.setOutboundStatus(outboundStatus.getValue());
-            if(outboundStatus!=OutboundStatus.NONE) {
-                //TODO  继续其它逻辑
-            }
-
-        }
-        // 完成最终的入库
-        outboundService.finishOutbound(outboundRespVO);
-
-    }
-
-
-    /**
-     * 执行出库的原子操作,以加锁的方式单个出入库
-     */
-    private OutboundStatus outboundSingleItemAtomically(StockReason reason, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
-        // 校验本方法在事务中
-        JdbcUtils.requireTransaction();
-        WmsStockWarehouseServiceImpl currentProxy = SpringUtils.getBeanByExactType(WmsStockWarehouseServiceImpl.class);
-        AtomicReference<OutboundStatus> status = new AtomicReference<>();
-        lockRedisDAO.lockStockLevels(warehouseId, productId, () -> {
-            try {
-                status.set(currentProxy.outboundSingleItemTransactional(reason, companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId));
-            } catch (Exception e) {
-                log.error("inboundSingleItemTransactional Error", e);
-            }
-        });
-        return status.get();
-    }
-
-
-    /**
-     * 在事务中执行出库操作
-     */
-
-    protected OutboundStatus outboundSingleItemTransactional(StockReason reason, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
-        // 校验本方法在事务中
-        JdbcUtils.requireTransaction();
-        // 获得仓库库存记录
-        WmsStockWarehouseDO stockWarehouseDO = stockWarehouseMapper.getByWarehouseIdAndProductId(warehouseId, productId);
-
-
-        // 如果没有就创建
+    public void insertOrUpdate(WmsStockWarehouseDO stockWarehouseDO) {
         if (stockWarehouseDO == null) {
             throw exception(STOCK_WAREHOUSE_NOT_EXISTS);
+        }
+        // 采购计划量
+        if (stockWarehouseDO.getPurchasePlanQty() == null) {
+            stockWarehouseDO.setPurchasePlanQty(0);
+        }
+        // 采购在途量
+        if (stockWarehouseDO.getPurchaseTransitQty() == null) {
+            stockWarehouseDO.setPurchaseTransitQty(0);
+        }
+        // 退货在途量
+        if (stockWarehouseDO.getReturnTransitQty() == null) {
+            stockWarehouseDO.setReturnTransitQty(0);
+        }
+        // 待上架量
+        if (stockWarehouseDO.getShelvingPendingQty() == null) {
+            stockWarehouseDO.setShelvingPendingQty(0);
+        }
+        // 可用量，在库的良品数量
+        if (stockWarehouseDO.getAvailableQty() == null) {
+            stockWarehouseDO.setAvailableQty(0);
+        }
+        // 可售量
+        if (stockWarehouseDO.getSellableQty() == null) {
+            stockWarehouseDO.setSellableQty(0);
+        }
+        // 待出库量
+        if (stockWarehouseDO.getOutboundPendingQty() == null) {
+            stockWarehouseDO.setOutboundPendingQty(0);
+        }
+        // 不良品数量
+        if (stockWarehouseDO.getDefectiveQty() == null) {
+            stockWarehouseDO.setDefectiveQty(0);
+        }
+        if (stockWarehouseDO.getId() == null) {
+            stockWarehouseMapper.insert(stockWarehouseDO);
         } else {
-
-            if (reason == StockReason.OUTBOUND_SUBMIT) {
-
-                // 如果有就修改
-                // 采购计划量
-                // stockWarehouseDO.setPurchasePlanQuantity(0);
-                // 采购在途量
-                // stockWarehouseDO.setPurchaseTransitQuantity(0);
-                // 退货在途量
-                // stockWarehouseDO.setReturnTransitQuantity(0);
-                // 待上架量
-                // stockWarehouseDO.setShelvingPendingQuantity(stockWarehouseDO.getShelvingPendingQuantity() + quantity);
-                // 可用量，在库的良品数量
-                // stockWarehouseDO.setAvailableQuantity(stockWarehouseDO.getAvailableQuantity() - quantity);
-                // 可售量
-                // stockWarehouseDO.setSellableQuantity(stockWarehouseDO.getSellableQuantity() - quantity);
-                // 待出库量
-                stockWarehouseDO.setOutboundPendingQuantity(stockWarehouseDO.getOutboundPendingQuantity() + quantity);
-                // 不良品数量
-                // stockWarehouseDO.setDefectiveQuantity(0);
-
-            }
-
-            else if (reason == StockReason.OUTBOUND_REJECT) {
-
-                // 如果有就修改
-                // 采购计划量
-                // stockWarehouseDO.setPurchasePlanQuantity(0);
-                // 采购在途量
-                // stockWarehouseDO.setPurchaseTransitQuantity(0);
-                // 退货在途量
-                // stockWarehouseDO.setReturnTransitQuantity(0);
-                // 待上架量
-                // stockWarehouseDO.setShelvingPendingQuantity(stockWarehouseDO.getShelvingPendingQuantity() + quantity);
-                // 可用量，在库的良品数量
-                // stockWarehouseDO.setAvailableQuantity(stockWarehouseDO.getAvailableQuantity() - quantity);
-                // 可售量
-                // stockWarehouseDO.setSellableQuantity(stockWarehouseDO.getSellableQuantity() - quantity);
-                // 待出库量
-                stockWarehouseDO.setOutboundPendingQuantity(stockWarehouseDO.getOutboundPendingQuantity() - quantity);
-                // 不良品数量
-                // stockWarehouseDO.setDefectiveQuantity(0);
-
-            }
-
-            else if (reason == StockReason.OUTBOUND_AGREE) {
-                // 如果有就修改
-                // 采购计划量
-                // stockWarehouseDO.setPurchasePlanQuantity(0);
-                // 采购在途量
-                // stockWarehouseDO.setPurchaseTransitQuantity(0);
-                // 退货在途量
-                // stockWarehouseDO.setReturnTransitQuantity(0);
-                // 待上架量
-                // stockWarehouseDO.setShelvingPendingQuantity(stockWarehouseDO.getShelvingPendingQuantity() + quantity);
-                // 可用量，在库的良品数量
-                stockWarehouseDO.setAvailableQuantity(stockWarehouseDO.getAvailableQuantity() - quantity);
-                // 可售量
-                stockWarehouseDO.setSellableQuantity(stockWarehouseDO.getSellableQuantity() - quantity);
-                // 待出库量
-                // stockWarehouseDO.setOutboundPendingQuantity(stockWarehouseDO.getOutboundPendingQuantity() + quantity);
-                // 不良品数量
-                // stockWarehouseDO.setDefectiveQuantity(0);
-            } else {
-                //
-                throw exception(STOCK_WAREHOUSE_NOT_EXISTS);
-            }
-
-
-            // 更新库存
             stockWarehouseMapper.updateById(stockWarehouseDO);
-            // 记录流水
-            stockFlowService.createForStockWarehouse(reason, productId, stockWarehouseDO, quantity, outboundId, outboundItemId);
-
-            // 更新入库批次余额
-            inboundService.updateAvailableQuantity(reason, warehouseId, productId, outboundId, outboundItemId, quantity);
-
-            // 调整归属库存
-            stockOwnershipService.outboundSingleItem(reason, companyId, deptId, warehouseId, productId, quantity, outboundId, outboundItemId);
-            // 调整仓位库存
-            stockBinService.outboundSingleItem(reason,warehouseId, binId, productId, quantity, outboundId, outboundItemId);
-
-            log.info("出库:productId=" + productId + ";quantity=" + quantity);
-
-            // 当前逻辑,默认全部入库
-            return OutboundStatus.ALL;
-
         }
     }
 }

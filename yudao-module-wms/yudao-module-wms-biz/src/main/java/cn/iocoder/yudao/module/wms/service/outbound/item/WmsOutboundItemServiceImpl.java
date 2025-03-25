@@ -26,9 +26,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
 import java.util.*;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 
@@ -161,7 +159,7 @@ public class WmsOutboundItemServiceImpl implements WmsOutboundItemService {
         List<WmsOutboundItemDO> outboundItemDOSInDB = outboundItemMapper.selectByIds(StreamX.from(updateReqVOList).toList(WmsOutboundItemSaveReqVO::getId));
         for (WmsOutboundItemDO itemDO : outboundItemDOSInDB) {
             WmsOutboundItemSaveReqVO updateReqVO = updateReqVOMap.get(itemDO.getId());
-            itemDO.setActualQuantity(updateReqVO.getActualQuantity());
+            itemDO.setActualQty(updateReqVO.getActualQty());
         }
         // 保存
         outboundItemMapper.updateBatch(outboundItemDOSInDB);

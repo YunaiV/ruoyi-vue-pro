@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 
 /**
- * @table-fields : tenant_id,outbound_available_quantity,creator,inbound_status,create_time,plan_quantity,updater,inbound_id,source_item_id,update_time,actual_quantity,product_id,shelved_quantity,id
+ * @table-fields : tenant_id,outbound_available_qty,creator,inbound_status,create_time,plan_qty,shelved_qty,latest_flow_id,updater,inbound_id,source_item_id,update_time,actual_qty,product_id,id
  */
 @Schema(description = "管理后台 - 入库单详情 Response VO")
 @Data
@@ -30,14 +30,6 @@ public class WmsInboundItemRespVO {
     @Schema(description = "标准产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "27659")
     @ExcelProperty("标准产品ID")
     private Long productId;
-
-    @Schema(description = "计划入库量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("计划入库量")
-    private Integer planQuantity;
-
-    @Schema(description = "实际入库量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("实际入库量")
-    private Integer actualQuantity;
 
     @Schema(description = "来源详情ID", example = "30830")
     @ExcelProperty("来源详情ID")
@@ -80,15 +72,27 @@ public class WmsInboundItemRespVO {
     @ExcelProperty("入库状态")
     private Integer inboundStatus;
 
-    @Schema(description = "已上架量，已经拣货到仓位的库存量", example = "")
-    @ExcelProperty("已上架量")
-    private Integer shelvedQuantity;
-
     @Schema(description = "入库单", example = "")
     @ExcelProperty("入库单")
     private WmsInboundRespVO inbound;
 
+    @Schema(description = "实际入库量", example = "")
+    @ExcelProperty("实际入库量")
+    private Integer actualQty;
+
     @Schema(description = "批次剩余库存，出库后的剩余库存量", example = "")
-    @ExcelProperty("批次剩余库存，出库后的剩余库存量")
-    private Integer outboundAvailableQuantity;
+    @ExcelProperty("批次剩余库存")
+    private Integer outboundAvailableQty;
+
+    @Schema(description = "计划入库量", example = "")
+    @ExcelProperty("计划入库量")
+    private Integer planQty;
+
+    @Schema(description = "已上架量，已经拣货到仓位的库存量", example = "")
+    @ExcelProperty("已上架量")
+    private Integer shelvedQty;
+
+    @Schema(description = "最新的流水ID", example = "")
+    @ExcelProperty("最新的流水ID")
+    private Long latestFlowId;
 }

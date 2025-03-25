@@ -18,12 +18,12 @@ public class WmsApprovalHistorySaveReqVO {
     private Long id;
 
     @Schema(description = "来源单据类型 ; BillType : 0-入库单 , 1-出库单", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @NotNull(message = "代码不能为空")
+    @NotNull(message = "来源单据类型不能为空")
     @InEnum(BillType.class)
     private Integer billType;
 
     @Schema(description = "业务单据ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "29844")
-    @NotNull(message = "名称不能为空")
+    @NotNull(message = "业务单据ID不能为空")
     private Long billId;
 
     @Schema(description = "状态类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")

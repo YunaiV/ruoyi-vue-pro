@@ -20,6 +20,8 @@ import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
 import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
+import cn.iocoder.yudao.module.wms.service.quantity.PickupExecutor;
+import cn.iocoder.yudao.module.wms.service.quantity.context.PickupContext;
 import cn.iocoder.yudao.module.wms.service.stock.bin.WmsStockBinService;
 import cn.iocoder.yudao.module.wms.service.warehouse.bin.WmsWarehouseBinService;
 import jakarta.annotation.Resource;
@@ -48,18 +50,7 @@ public class WmsPickupServiceImpl implements WmsPickupService {
     private WmsNoRedisDAO noRedisDAO;
 
     @Resource
-    private WmsLockRedisDAO lockRedisDAO;
-
-    @Resource
     private WmsPickupMapper pickupMapper;
-
-    @Resource
-    @Lazy
-    private WmsStockBinService stockBinService;
-
-    @Resource
-    @Lazy
-    private WmsInboundService inboundService;
 
     @Resource
     @Lazy
@@ -67,7 +58,15 @@ public class WmsPickupServiceImpl implements WmsPickupService {
 
     @Resource
     @Lazy
+    private WmsInboundService inboundService;
+
+    @Resource
+    @Lazy
     private WmsWarehouseBinService wmsWarehouseBinService;
+
+    @Resource
+    @Lazy
+    private PickupExecutor pickupExecutor;
 
     /**
      * @sign : E7A4B1135281D8DB
@@ -105,7 +104,7 @@ public class WmsPickupServiceImpl implements WmsPickupService {
             wmsPickupItemDO.setPickupId(pickup.getId());
         });
         // 拣货到仓位
-        this.pickup(pickup, toInsetList, BeanUtils.toBean(inboundItemDOList,WmsInboundItemRespVO.class));
+        this.pickup(pickup, toInsetList, BeanUtils.toBean(inboundItemDOList, WmsInboundItemRespVO.class));
         // 保存单据
         pickupItemMapper.insertBatch(toInsetList);
         // 返回
@@ -113,32 +112,11 @@ public class WmsPickupServiceImpl implements WmsPickupService {
     }
 
     private void pickup(WmsPickupDO pickup, List<WmsPickupItemDO> wmsPickupItemDOList, List<WmsInboundItemRespVO> inboundItemVOList) {
-        JdbcUtils.requireTransaction();
-        Map<Long, WmsInboundItemRespVO> inboundItemVOMap = StreamX.from(inboundItemVOList).toMap(WmsInboundItemRespVO::getId);
-        List<WmsInboundDO> inboundDOList = inboundService.selectByIds(StreamX.from(inboundItemVOList).toList(WmsInboundItemRespVO::getInboundId));
-        Map<Long, WmsInboundDO> inboundMap =StreamX.from(inboundDOList).toMap(WmsInboundDO::getId);
-        // 
-        for (WmsPickupItemDO pickupItemDO : wmsPickupItemDOList) {
-            WmsInboundItemRespVO inboundItemVO = inboundItemVOMap.get(pickupItemDO.getInboundItemId());
-            if (inboundItemVO == null) {
-                throw exception(INBOUND_ITEM_NOT_EXISTS);
-            }
-            int pickupLeft = inboundItemVO.getActualQuantity() - inboundItemVO.getShelvedQuantity();
-            if (pickupLeft < pickupItemDO.getQuantity()) {
-                throw exception(INBOUND_ITEM_PICKUP_LEFT_QUANTITY_NOT_ENOUGH);
-            }
-            // 设置已拣货量
-            inboundItemVO.setShelvedQuantity(inboundItemVO.getShelvedQuantity() + pickupItemDO.getQuantity());
-            pickupItemDO.setInboundId(inboundItemVO.getInboundId());
-            pickupItemDO.setInboundItemId(inboundItemVO.getId());
-            pickupItemDO.setProductId(inboundItemVO.getProductId());
-            pickupItemDO.setPickupId(pickup.getId());
-            // 调整仓位库存
-            lockRedisDAO.lockStockLevels(pickup.getWarehouseId(), pickupItemDO.getProductId(), () -> {
-                stockBinService.pickupItem(pickup, pickupItemDO, inboundMap.get(inboundItemVO.getInboundId()),inboundItemVO);
-            });
-            inboundItemService.updateById(BeanUtils.toBean(inboundItemVO,WmsInboundItemDO.class));
-        }
+        PickupContext context = new PickupContext();
+        context.setWmsPickupItemDOList(wmsPickupItemDOList);
+        context.setInboundItemVOList(inboundItemVOList);
+        context.setPickup(pickup);
+        pickupExecutor.execute(context);
     }
 
     private List<WmsInboundItemDO> processAndValidateForPickIn(WmsPickupDO pickup, List<WmsPickupItemDO> toInsetList) {
@@ -243,4 +221,4 @@ public class WmsPickupServiceImpl implements WmsPickupService {
     public PageResult<WmsPickupDO> getPickupPage(WmsPickupPageReqVO pageReqVO) {
         return pickupMapper.selectPage(pageReqVO);
     }
-}
+}

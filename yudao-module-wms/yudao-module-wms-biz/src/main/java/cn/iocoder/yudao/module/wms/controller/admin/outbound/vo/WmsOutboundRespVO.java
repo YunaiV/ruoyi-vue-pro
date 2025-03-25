@@ -13,7 +13,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,no,creator,company_id,create_time,audit_status,creator_comment,outbound_time,source_bill_id,type,updater,update_time,outbound_status,source_bill_no,source_bill_type,id,dept_id,warehouse_id
+ * @table-fields : tenant_id,no,creator,company_id,create_time,outbound_time,audit_status,creator_comment,type,source_bill_id,updater,update_time,latest_outbound_action_id,outbound_status,source_bill_no,source_bill_type,id,dept_id,warehouse_id
  */
 @Schema(description = "管理后台 - 出库单 Response VO")
 @Data
@@ -105,4 +105,8 @@ public class WmsOutboundRespVO {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @ExcelProperty("出库时间")
     private LocalDateTime outboundTime;
+
+    @Schema(description = "出库动作ID，与flow关联", example = "")
+    @ExcelProperty("出库动作ID，与flow关联")
+    private Long latestOutboundActionId;
 }

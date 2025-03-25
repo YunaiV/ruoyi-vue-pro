@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.inbound.item;
 
 import java.util.*;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
 import jakarta.validation.*;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
@@ -75,5 +76,7 @@ public interface WmsInboundItemService {
 
     void assembleInbound(List<WmsInboundItemRespVO> itemList);
 
-    void updateForPickup(WmsInboundItemRespVO inboundItemVO, Integer quantity);
+    List<WmsInboundItemDO> selectItemListHasAvailableQty(Long warehouseId, Long productId);
+
+    void saveItems(List<WmsInboundItemDO> itemsToUpdate, List<WmsInboundItemFlowDO> inboundItemFlowList);
 }

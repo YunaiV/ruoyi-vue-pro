@@ -9,7 +9,7 @@ import com.alibaba.excel.annotation.*;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : bill_id,tenant_id,status_after,creator,update_time,create_time,status_type,bill_type,comment,id,status_before,updater
+ * @table-fields : bill_id,tenant_id,creator,status_after,update_time,create_time,status_type,bill_type,comment,id,status_before,updater
  */
 @Schema(description = "管理后台 - 审批历史 Response VO")
 @Data

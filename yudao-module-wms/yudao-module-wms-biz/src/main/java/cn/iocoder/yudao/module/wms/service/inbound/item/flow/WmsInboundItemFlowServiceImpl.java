@@ -111,4 +111,14 @@ public class WmsInboundItemFlowServiceImpl implements WmsInboundItemFlowService 
     public List<WmsInboundItemFlowDO> selectByInboundId(Long inboundId, int limit) {
         return inboundItemFlowMapper.selectByInboundId(inboundId, limit);
     }
-}
+
+    @Override
+    public void insert(WmsInboundItemFlowDO flowDO) {
+        inboundItemFlowMapper.insert(flowDO);
+    }
+
+    @Override
+    public List<WmsInboundItemFlowDO> selectByActionId(Long latestOutboundActionId) {
+        return inboundItemFlowMapper.selectByOutboundActionId(latestOutboundActionId);
+    }
+}

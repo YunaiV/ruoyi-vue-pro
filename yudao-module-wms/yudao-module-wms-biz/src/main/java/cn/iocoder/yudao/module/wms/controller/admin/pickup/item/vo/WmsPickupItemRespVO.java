@@ -9,7 +9,7 @@ import com.alibaba.excel.annotation.*;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : inbound_id,tenant_id,creator,update_time,quantity,create_time,bin_id,product_id,id,inbound_item_id,pickup_id,updater
+ * @table-fields : inbound_id,tenant_id,creator,update_time,create_time,bin_id,product_id,qty,id,inbound_item_id,pickup_id,updater
  */
 @Schema(description = "管理后台 - 拣货单详情 Response VO")
 @Data
@@ -35,10 +35,6 @@ public class WmsPickupItemRespVO {
     @Schema(description = "产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "17566")
     @ExcelProperty("产品ID")
     private Long productId;
-
-    @Schema(description = "拣货数量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("拣货数量")
-    private Integer quantity;
 
     @Schema(description = "仓位ID，拣货到目标仓位", requiredMode = Schema.RequiredMode.REQUIRED, example = "8732")
     @ExcelProperty("仓位ID")
@@ -72,4 +68,8 @@ public class WmsPickupItemRespVO {
     @Schema(description = "租户编号", example = "")
     @ExcelProperty("租户编号")
     private Long tenantId;
+
+    @Schema(description = "拣货数量", example = "")
+    @ExcelProperty("拣货数量")
+    private Integer qty;
 }

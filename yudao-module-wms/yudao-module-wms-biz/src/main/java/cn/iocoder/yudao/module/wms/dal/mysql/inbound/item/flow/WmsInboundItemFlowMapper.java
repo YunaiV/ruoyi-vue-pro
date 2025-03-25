@@ -23,7 +23,7 @@ public interface WmsInboundItemFlowMapper extends BaseMapperX<WmsInboundItemFlow
 				.eqIfPresent(WmsInboundItemFlowDO::getProductId, reqVO.getProductId())
 				.eqIfPresent(WmsInboundItemFlowDO::getOutboundId, reqVO.getOutboundId())
 				.eqIfPresent(WmsInboundItemFlowDO::getOutboundItemId, reqVO.getOutboundItemId())
-				.eqIfPresent(WmsInboundItemFlowDO::getOutboundQuantity, reqVO.getOutboundQuantity())
+				.eqIfPresent(WmsInboundItemFlowDO::getOutboundQty, reqVO.getOutboundQty())
 				.betweenIfPresent(WmsInboundItemFlowDO::getCreateTime, reqVO.getCreateTime())
 				.orderByDesc(WmsInboundItemFlowDO::getId));
     }
@@ -38,5 +38,12 @@ public interface WmsInboundItemFlowMapper extends BaseMapperX<WmsInboundItemFlow
         LambdaQueryWrapperX<WmsInboundItemFlowDO> wrapper = new LambdaQueryWrapperX<>();
         wrapper.eq(WmsInboundItemFlowDO::getInboundId, inboundId);
         return selectPage(reqVO, wrapper).getList();
+    }
+
+    /**
+     * 按 outbound_action_id 查询 WmsInboundItemFlowDO 清单
+     */
+    default List<WmsInboundItemFlowDO> selectByOutboundActionId(Long outboundActionId) {
+        return selectList(new LambdaQueryWrapperX<WmsInboundItemFlowDO>().eq(WmsInboundItemFlowDO::getOutboundActionId, outboundActionId));
     }
 }

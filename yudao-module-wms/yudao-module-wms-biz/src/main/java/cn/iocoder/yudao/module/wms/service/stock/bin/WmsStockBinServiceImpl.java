@@ -47,6 +47,7 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
     @Resource
     @Lazy
     WmsStockWarehouseService stockWarehouseService;
+
     @Autowired
     private WmsStockOwnershipService wmsStockOwnershipService;
 
@@ -133,62 +134,10 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
         return stockBinMapper.selectStockBin(warehouseId, productId);
     }
 
-
-
-    public void pickupItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO , WmsInboundItemRespVO inboundItemVO) {
-
-        JdbcUtils.requireTransaction();
-        WmsStockBinDO stockBinDO = this.getStockBin(pickupItemDO.getBinId(), inboundItemVO.getProductId());
-        if(stockBinDO==null) {
-
-            stockBinDO = new WmsStockBinDO();
-            stockBinDO.setWarehouseId(pickup.getWarehouseId());
-            stockBinDO.setBinId(pickupItemDO.getBinId());
-            stockBinDO.setProductId(inboundItemVO.getProductId());
-            // 可用库存
-            stockBinDO.setAvailableQuantity(pickupItemDO.getQuantity());
-            // 可售库存
-            stockBinDO.setSellableQuantity(pickupItemDO.getQuantity());
-            // 待上出库量
-            stockBinDO.setOutboundPendingQuantity(0);
-            // 新建
-            stockBinMapper.insert(stockBinDO);
-
-        } else {
-
-            // 可用库存
-            stockBinDO.setAvailableQuantity(stockBinDO.getAvailableQuantity()+ pickupItemDO.getQuantity());
-            // 可售库存
-            stockBinDO.setSellableQuantity(stockBinDO.getSellableQuantity()+ pickupItemDO.getQuantity());
-            // 待上出库量
-            // stockBinDO.setOutboundPendingQuantity(0);
-            // 保存
-            stockBinMapper.updateById(stockBinDO);
-        }
-
-        // 记录流水
-        stockFlowService.createForStockBin(StockReason.PICKUP, inboundItemVO.getProductId(), stockBinDO,pickupItemDO.getQuantity(), pickupItemDO.getPickupId(), pickupItemDO.getId());
-
-        // 刷新库存
-        stockWarehouseService.refreshForPickup(pickup.getWarehouseId(), inboundItemVO.getProductId(), pickup.getId(), pickupItemDO.getId(),pickupItemDO.getQuantity());
-        //
-        Long deptId=inboundDO.getDeptId();
-        if(deptId==null) {
-            deptId=inboundItemVO.getProduct().getDeptId();
-        }
-
-        // 更新入库记录
-        inboundItemService.updateForPickup(inboundItemVO, pickupItemDO.getQuantity());
-
-        // 刷新所有者库存
-        wmsStockOwnershipService.refreshForPickup(pickup.getWarehouseId(), inboundDO.getCompanyId(), deptId,inboundItemVO.getProductId(), pickup.getId(), pickupItemDO.getId(),pickupItemDO.getQuantity());
-
-    }
-
     @Override
     public Map<Long, Map<Long, WmsStockBinDO>> getStockBinMap(Collection<Long> binIds, Collection<Long> productIds) {
         Map<Long, Map<Long, WmsStockBinDO>> result = new HashMap<>();
-        List<WmsStockBinDO> list= stockBinMapper.selectStockBinList(binIds,productIds);
+        List<WmsStockBinDO> list = stockBinMapper.selectStockBinList(binIds, productIds);
         for (WmsStockBinDO stockBinDO : list) {
             Map<Long, WmsStockBinDO> map = result.computeIfAbsent(stockBinDO.getBinId(), k -> new HashMap<>());
             map.put(stockBinDO.getProductId(), stockBinDO);
@@ -197,32 +146,26 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
     }
 
     @Override
-    public void outboundSingleItem(StockReason reason,Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
-        JdbcUtils.requireTransaction();
-        WmsStockBinDO stockBinDO = this.getStockBin(binId, productId);
-        if(stockBinDO==null) {
-
-             throw exception(STOCK_BIN_NOT_EXISTS);
-
+    public void insertOrUpdate(WmsStockBinDO stockBinDO) {
+        if (stockBinDO == null) {
+            throw exception(STOCK_BIN_NOT_EXISTS);
+        }
+        // 可用库存
+        if (stockBinDO.getAvailableQty() == null) {
+            stockBinDO.setAvailableQty(0);
+        }
+        // 可售库存
+        if (stockBinDO.getSellableQty() == null) {
+            stockBinDO.setSellableQty(0);
+        }
+        // 待上出库量
+        if (stockBinDO.getOutboundPendingQty() == null) {
+            stockBinDO.setOutboundPendingQty(0);
+        }
+        if (stockBinDO.getId() == null) {
+            stockBinMapper.insert(stockBinDO);
         } else {
-
-            // 可用库存
-            stockBinDO.setAvailableQuantity(stockBinDO.getAvailableQuantity() - quantity);
-            // 可售库存
-            stockBinDO.setSellableQuantity(stockBinDO.getSellableQuantity() - quantity);
-            // 待上出库量
-            stockBinDO.setOutboundPendingQuantity(stockBinDO.getOutboundPendingQuantity() + quantity);
-            // 保存
             stockBinMapper.updateById(stockBinDO);
         }
-
-        // 记录流水
-        stockFlowService.createForStockBin(reason, productId, stockBinDO,quantity, outboundId, outboundItemId);
-
-
-
-
-
     }
-
 }

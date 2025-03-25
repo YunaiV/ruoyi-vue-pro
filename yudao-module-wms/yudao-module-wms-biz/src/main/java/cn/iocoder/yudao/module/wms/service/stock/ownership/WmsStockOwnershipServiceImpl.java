@@ -104,97 +104,37 @@ public class WmsStockOwnershipServiceImpl implements WmsStockOwnershipService {
         return stockOwnershipMapper.selectPage(pageReqVO);
     }
 
-    /**
-     * 调整归属库存
-     * 此方法必须包含在 WmsStockWarehouseServiceImpl.inboundSingleItemTransactional 方法中
-     */
-    @Override
-    public void inboundSingleItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long inboundId, Long inboundItemId) {
-        // 校验本方法在事务中
-        JdbcUtils.requireTransaction();
-        // 查询库存记录
-        WmsStockOwnershipDO stockOwnershipDO = stockOwnershipMapper.getByUkProductOwner(warehouseId, companyId, deptId, productId);
-        // 如果不存在就创建
-        if (stockOwnershipDO == null) {
-            stockOwnershipDO = new WmsStockOwnershipDO();
-            // 
-            stockOwnershipDO.setCompanyId(companyId);
-            stockOwnershipDO.setDeptId(deptId);
-            stockOwnershipDO.setWarehouseId(warehouseId);
-            stockOwnershipDO.setProductId(productId);
-            // 可用量
-            stockOwnershipDO.setAvailableQuantity(0);
-            // 待上架量
-            stockOwnershipDO.setShelvingPendingQuantity(quantity);
-            // 待出库量
-            stockOwnershipDO.setOutboundPendingQuantity(0);
-            // 
-            stockOwnershipMapper.insert(stockOwnershipDO);
-        } else {
-            // 如果存在就修改
-            // 可用量
-            // stockOwnership.setAvailableQuantity(0);
-            // 待上架量
-            stockOwnershipDO.setShelvingPendingQuantity(stockOwnershipDO.getShelvingPendingQuantity() + quantity);
-            // 待出库量
-            // stockOwnership.setOutboundPendingQuantity(0);
-            // 
-            stockOwnershipMapper.updateById(stockOwnershipDO);
-        }
-        // 记录流水
-        stockFlowService.createForStockOwner(StockReason.INBOUND,  productId, stockOwnershipDO,quantity, inboundId, inboundItemId);
-    }
-
     @Override
     public List<WmsStockOwnershipDO> selectStockOwnership(Long warehouseId, Long productId) {
         return stockOwnershipMapper.selectStockOwnership(warehouseId, productId);
     }
 
     @Override
-    public void outboundSingleItem(StockReason reason,Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
-        // 校验本方法在事务中
-        JdbcUtils.requireTransaction();
-        // 查询库存记录
-        WmsStockOwnershipDO stockOwnershipDO = stockOwnershipMapper.getByUkProductOwner(warehouseId, companyId, deptId, productId);
-        // 如果不存在就创建
-        if (stockOwnershipDO == null) {
-            throw exception(STOCK_OWNERSHIP_NOT_EXISTS);
-        } else {
-            // 如果存在就修改
-            // 可用量
-            stockOwnershipDO.setAvailableQuantity(stockOwnershipDO.getAvailableQuantity()-quantity);
-            // 待上架量
-            // stockOwnershipDO.setShelvingPendingQuantity(stockOwnershipDO.getShelvingPendingQuantity() + quantity);
-            // 待出库量
-            stockOwnershipDO.setOutboundPendingQuantity(stockOwnershipDO.getOutboundPendingQuantity()+quantity);
-            //
-            stockOwnershipMapper.updateById(stockOwnershipDO);
-        }
-        // 记录流水
-        stockFlowService.createForStockOwner(reason,  productId, stockOwnershipDO,quantity, outboundId, outboundItemId);
+    public WmsStockOwnershipDO getByUkProductOwner(Long warehouseId, Long companyId, Long deptId, Long productId) {
+        return stockOwnershipMapper.getByUkProductOwner(warehouseId, companyId, deptId, productId);
     }
 
     @Override
-    public void refreshForPickup(Long warehouseId, Long companyId, Long deptId, Long productId, Long pickupId, Long pickupItemId, Integer quantity) {
-        // 校验本方法在事务中
-        JdbcUtils.requireTransaction();
-        // 查询库存记录
-        WmsStockOwnershipDO stockOwnershipDO = stockOwnershipMapper.getByUkProductOwner(warehouseId, companyId, deptId, productId);
-        // 如果不存在就创建
+    public void insertOrUpdate(WmsStockOwnershipDO stockOwnershipDO) {
         if (stockOwnershipDO == null) {
             throw exception(STOCK_OWNERSHIP_NOT_EXISTS);
+        }
+        // 可用量
+        if (stockOwnershipDO.getAvailableQty() == null) {
+            stockOwnershipDO.setAvailableQty(0);
+        }
+        // 待上架量
+        if (stockOwnershipDO.getShelvingPendingQty() == null) {
+            stockOwnershipDO.setShelvingPendingQty(0);
+        }
+        // 待出库量
+        if (stockOwnershipDO.getOutboundPendingQty() == null) {
+            stockOwnershipDO.setOutboundPendingQty(0);
+        }
+        if (stockOwnershipDO.getId() == null) {
+            stockOwnershipMapper.insert(stockOwnershipDO);
         } else {
-            // 如果存在就修改
-            // 可用量
-             stockOwnershipDO.setAvailableQuantity(stockOwnershipDO.getAvailableQuantity()+quantity);
-            // 待上架量
-            stockOwnershipDO.setShelvingPendingQuantity(stockOwnershipDO.getShelvingPendingQuantity() - quantity);
-            // 待出库量
-            // stockOwnershipDO.setOutboundPendingQuantity(stockOwnershipDO.getOutboundPendingQuantity()+quantity);
-            //
             stockOwnershipMapper.updateById(stockOwnershipDO);
         }
-        // 记录流水
-        stockFlowService.createForStockOwner(StockReason.PICKUP,  productId, stockOwnershipDO,quantity, pickupId, pickupItemId);
     }
 }

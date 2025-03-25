@@ -2,13 +2,10 @@ package cn.iocoder.yudao.module.wms.service.inbound;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
-import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.config.statemachine.ColaContext;
 import cn.iocoder.yudao.module.wms.config.statemachine.StateMachineWrapper;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
-import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.ErpProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
@@ -20,7 +17,6 @@ import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
@@ -103,7 +99,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
                 // 设置归属
                 item.setInboundId(inbound.getId());
                 item.setInboundStatus(InboundStatus.NONE.getValue());
-                item.setActualQuantity(0);
+                item.setActualQty(0);
                 toInsetList.add(BeanUtils.toBean(item, WmsInboundItemDO.class));
             });
             // 校验 toInsetList 中是否有重复的 productId
@@ -157,7 +153,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
             finalList.forEach(item -> {
                 item.setInboundId(updateReqVO.getId());
                 item.setInboundStatus(InboundStatus.NONE.getValue());
-                item.setActualQuantity(0);
+                item.setActualQty(0);
             });
             // 保存详情
             inboundItemMapper.insertBatch(toInsetList);
@@ -270,6 +266,12 @@ public class WmsInboundServiceImpl implements WmsInboundService {
             if (InboundStatus.NONE.matchAny(respVO.getInboundStatus())) {
                 countOfNone++;
             }
+            if(respVO.getOutboundAvailableQty()==null) {
+                respVO.setOutboundAvailableQty(0);
+            }
+            if(respVO.getShelvedQty()==null) {
+                respVO.setShelvedQty(0);
+            }
         }
         if (countOfNone > 0) {
             throw exception(INBOUND_NOT_COMPLETE);
@@ -294,79 +296,4 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         }
         return inboundMapper.selectByIds(ids);
     }
-
-    /**
-     * 按 warehouseId 查询尚有出库量的 WmsInboundDO
-     */
-    @Override
-    public void updateAvailableQuantity(StockReason reason, Long warehouseId, Long productId, Long outboundId, Long outboundItemId , Integer quantity) {
-        List<WmsInboundItemDO> itemsList=inboundItemMapper.selectLeftItemList(warehouseId,productId);
-        if(itemsList.isEmpty()) {
-            throw exception(INBOUND_ITEM_NOT_EXISTS);
-        }
-        List<WmsInboundItemDO> itemsToUpdate=new ArrayList<>();
-        List<WmsInboundItemFlowDO> inboundItemFlowList = new ArrayList<>();
-        for (WmsInboundItemDO itemDO : itemsList) {
-            Integer available=itemDO.getOutboundAvailableQuantity();
-            Integer flowQuantity=0;
-            if(available>quantity) { // 需要多次扣除
-                flowQuantity=quantity;
-                available=available-flowQuantity;
-                itemDO.setOutboundAvailableQuantity(available);
-                itemsToUpdate.add(itemDO);
-                //
-                WmsInboundItemFlowDO flowDO=new WmsInboundItemFlowDO();
-                flowDO.setInboundId(itemDO.getInboundId());
-                flowDO.setInboundItemId(itemDO.getId());
-                flowDO.setProductId(itemDO.getProductId());
-                flowDO.setOutboundQuantity(flowQuantity);
-                flowDO.setOutboundId(outboundId);
-                flowDO.setOutboundItemId(outboundItemId);
-                inboundItemFlowList.add(flowDO);
-
-            } else if(available.equals(quantity)) { // 更好单次扣除
-                flowQuantity=available;
-                available=0;
-                quantity=0;
-                itemDO.setOutboundAvailableQuantity(available);
-                itemsToUpdate.add(itemDO);
-                //
-                WmsInboundItemFlowDO flowDO=new WmsInboundItemFlowDO();
-                flowDO.setInboundId(itemDO.getInboundId());
-                flowDO.setInboundItemId(itemDO.getId());
-                flowDO.setProductId(itemDO.getProductId());
-                flowDO.setOutboundQuantity(flowQuantity);
-                flowDO.setOutboundId(outboundId);
-                flowDO.setOutboundItemId(outboundItemId);
-                inboundItemFlowList.add(flowDO);
-
-                break;
-            } else { // 单次扣除
-                flowQuantity=quantity;
-                available=available-flowQuantity;
-                itemDO.setOutboundAvailableQuantity(available);
-                itemsToUpdate.add(itemDO);
-
-                //
-                WmsInboundItemFlowDO flowDO=new WmsInboundItemFlowDO();
-                flowDO.setInboundId(itemDO.getInboundId());
-                flowDO.setInboundItemId(itemDO.getId());
-                flowDO.setProductId(itemDO.getProductId());
-                flowDO.setOutboundQuantity(flowQuantity);
-                flowDO.setOutboundId(outboundId);
-                flowDO.setOutboundItemId(outboundItemId);
-                inboundItemFlowList.add(flowDO);
-
-                break;
-            }
-        }
-
-        // 保存余量
-        inboundItemMapper.updateBatch(itemsToUpdate);
-        // 保存流水
-        inboundItemFlowMapper.insertBatch(inboundItemFlowList);
-
-    }
-
-
 }

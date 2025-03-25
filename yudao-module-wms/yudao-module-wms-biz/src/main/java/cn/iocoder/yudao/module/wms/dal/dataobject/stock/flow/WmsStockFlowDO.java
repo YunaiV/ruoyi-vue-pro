@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 /**
  * 库存流水 DO
  * @author 李方捷
- * @table-fields : defective_quantity,reason,purchase_transit_quantity,flow_time,next_flow_id,return_transit_quantity,purchase_plan_quantity,stock_id,available_quantity,stock_type,outbound_pending_quantity,product_id,shelving_pending_quantity,sellable_quantity,delta_quantity,id,reason_bill_id,prev_flow_id,reason_item_id,warehouse_id
+ * @table-fields : reason,outbound_pending_qty,delta_qty,flow_time,available_qty,next_flow_id,purchase_transit_qty,stock_id,stock_type,product_id,shelving_pending_qty,id,reason_bill_id,defective_qty,return_transit_qty,sellable_qty,purchase_plan_qty,prev_flow_id,reason_item_id,warehouse_id
  */
 @TableName("wms_stock_flow")
 // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -62,54 +62,9 @@ public class WmsStockFlowDO extends BaseDO {
     private Long prevFlowId;
 
     /**
-     * 变更量
-     */
-    private Integer deltaQuantity;
-
-    /**
-     * 采购计划量
-     */
-    private Integer purchasePlanQuantity;
-
-    /**
-     * 采购在途量
-     */
-    private Integer purchaseTransitQuantity;
-
-    /**
-     * 退件在途数量
-     */
-    private Integer returnTransitQuantity;
-
-    /**
-     * 可用量，在库的良品数量
-     */
-    private Integer availableQuantity;
-
-    /**
-     * 可售量，未被单据占用的良品数量
-     */
-    private Integer sellableQuantity;
-
-    /**
-     * 不良品数量
-     */
-    private Integer defectiveQuantity;
-
-    /**
      * 流水发生的时间
      */
     private Timestamp flowTime;
-
-    /**
-     * 待上架数量
-     */
-    private Integer shelvingPendingQuantity;
-
-    /**
-     * 待出库量
-     */
-    private Integer outboundPendingQuantity;
 
     /**
      * 上一个流水ID
@@ -125,4 +80,49 @@ public class WmsStockFlowDO extends BaseDO {
      * 仓库ID
      */
     private Long warehouseId;
+
+    /**
+     * 可用量，在库的良品数量
+     */
+    private Integer availableQty;
+
+    /**
+     * 不良品数量
+     */
+    private Integer defectiveQty;
+
+    /**
+     * 变更量
+     */
+    private Integer deltaQty;
+
+    /**
+     * 待出库量
+     */
+    private Integer outboundPendingQty;
+
+    /**
+     * 采购计划量
+     */
+    private Integer purchasePlanQty;
+
+    /**
+     * 采购在途量
+     */
+    private Integer purchaseTransitQty;
+
+    /**
+     * 退件在途数量
+     */
+    private Integer returnTransitQty;
+
+    /**
+     * 可售量，未被单据占用的良品数量
+     */
+    private Integer sellableQty;
+
+    /**
+     * 待上架数量
+     */
+    private Integer shelvingPendingQty;
 }

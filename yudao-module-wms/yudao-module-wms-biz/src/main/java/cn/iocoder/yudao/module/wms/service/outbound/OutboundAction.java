@@ -3,13 +3,13 @@ package cn.iocoder.yudao.module.wms.service.outbound;
 import cn.iocoder.yudao.module.wms.config.statemachine.ColaContext;
 import cn.iocoder.yudao.module.wms.config.statemachine.StateMachineConfigure;
 import cn.iocoder.yudao.module.wms.config.statemachine.StateMachineWrapper;
-import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
-import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.enums.outbound.OutboundAuditStatus;
-import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
 import cn.iocoder.yudao.module.wms.service.approval.history.ApprovalHistoryAction;
-import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
+import cn.iocoder.yudao.module.wms.service.quantity.OutboundAgreeExecutor;
+import cn.iocoder.yudao.module.wms.service.quantity.OutboundRejectExecutor;
+import cn.iocoder.yudao.module.wms.service.quantity.OutboundSubmitExecutor;
+import cn.iocoder.yudao.module.wms.service.quantity.context.OutboundContext;
 import cn.iocoder.yudao.module.wms.service.stock.warehouse.WmsStockWarehouseService;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
@@ -45,7 +45,7 @@ public class OutboundAction implements StateMachineConfigure<Integer, OutboundAu
     public static class Submit extends BaseOutboundAction {
 
         @Resource
-        private WmsStockWarehouseService stockWarehouseService;
+        private OutboundSubmitExecutor outboundSubmitExecutor;
 
         public Submit() {
             // 指定事件以及前后的状态与状态提取器
@@ -56,8 +56,9 @@ public class OutboundAction implements StateMachineConfigure<Integer, OutboundAu
         public void perform(Integer from, Integer to, OutboundAuditStatus.Event event, ColaContext<WmsOutboundDO> context) {
             super.perform(from, to, event, context);
             // 调整库存
-            WmsOutboundRespVO outboundRespVO=outboundService.getOutboundWithItemList(context.data().getId());
-            stockWarehouseService.outbound(outboundRespVO, StockReason.OUTBOUND_SUBMIT);
+            OutboundContext outboundContext = new OutboundContext();
+            outboundContext.setOutboundId(context.data().getId());
+            outboundSubmitExecutor.execute(outboundContext);
         }
     }
 
@@ -68,7 +69,7 @@ public class OutboundAction implements StateMachineConfigure<Integer, OutboundAu
     public static class Agree extends BaseOutboundAction {
 
         @Resource
-        private WmsStockWarehouseService stockWarehouseService;
+        private OutboundAgreeExecutor outboundAgreeExecutor;
 
         public Agree() {
             // 指定事件以及前后的状态与状态提取器
@@ -79,8 +80,9 @@ public class OutboundAction implements StateMachineConfigure<Integer, OutboundAu
         public void perform(Integer from, Integer to, OutboundAuditStatus.Event event, ColaContext<WmsOutboundDO> context) {
             super.perform(from, to, event, context);
             // 调整库存
-            WmsOutboundRespVO outboundRespVO=outboundService.getOutboundWithItemList(context.data().getId());
-            stockWarehouseService.outbound(outboundRespVO, StockReason.OUTBOUND_AGREE);
+            OutboundContext outboundContext = new OutboundContext();
+            outboundContext.setOutboundId(context.data().getId());
+            outboundAgreeExecutor.execute(outboundContext);
 
         }
     }
@@ -91,8 +93,10 @@ public class OutboundAction implements StateMachineConfigure<Integer, OutboundAu
     @Component
     public static class Reject extends BaseOutboundAction {
 
+
+
         @Resource
-        private WmsStockWarehouseService stockWarehouseService;
+        private OutboundRejectExecutor outboundRejectExecutor;
 
         public Reject() {
             // 指定事件以及前后的状态与状态提取器
@@ -103,8 +107,9 @@ public class OutboundAction implements StateMachineConfigure<Integer, OutboundAu
         public void perform(Integer from, Integer to, OutboundAuditStatus.Event event, ColaContext<WmsOutboundDO> context) {
             super.perform(from, to, event, context);
             // 调整库存
-            WmsOutboundRespVO outboundRespVO=outboundService.getOutboundWithItemList(context.data().getId());
-            stockWarehouseService.outbound(outboundRespVO, StockReason.OUTBOUND_REJECT);
+            OutboundContext outboundContext = new OutboundContext();
+            outboundContext.setOutboundId(context.data().getId());
+            outboundRejectExecutor.execute(outboundContext);
         }
     }
 

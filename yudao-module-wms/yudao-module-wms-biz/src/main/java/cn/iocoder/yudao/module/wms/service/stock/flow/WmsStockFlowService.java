@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.wms.service.stock.flow;
 
 import java.util.*;
 
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
@@ -65,18 +66,18 @@ public interface WmsStockFlowService {
     /**
      * 创建仓库库存变化流水
      */
-    void createForStockWarehouse(StockReason reason, Long productId,WmsStockWarehouseDO stockWarehouseDO,Integer quantity, Long reasonId, Long reasonItemId);
+    void createForStockWarehouse(StockReason reason, Long productId, WmsStockWarehouseDO stockWarehouseDO, Integer quantity, Long reasonId, Long reasonItemId);
 
     /**
      * 创建所有者库存变化流水
      */
-    void createForStockOwner(StockReason reason, Long productId,WmsStockOwnershipDO stockOwnershipDO,Integer quantity, Long reasonId, Long reasonItemId);
+    void createForStockOwner(StockReason reason, Long productId, WmsStockOwnershipDO stockOwnershipDO, Integer quantity, Long reasonId, Long reasonItemId);
 
     /**
      * 创建仓位库存变化流水
      */
-    void createForStockBin(StockReason reason, Long productId,WmsStockBinDO stockBinDO,Integer quantity, Long reasonId, Long reasonItemId);
-
+    void createForStockBin(StockReason reason, Long productId, WmsStockBinDO stockBinDO, Integer quantity, Long reasonId, Long reasonItemId);
 
     List<WmsStockFlowDO> selectStockFlow(Long stockType, Long stockId);
+
 }

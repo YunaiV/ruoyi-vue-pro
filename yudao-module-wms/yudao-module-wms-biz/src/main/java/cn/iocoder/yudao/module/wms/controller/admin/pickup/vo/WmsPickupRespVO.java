@@ -11,7 +11,7 @@ import java.util.List;
 import cn.iocoder.yudao.module.wms.controller.admin.pickup.item.vo.WmsPickupItemRespVO;
 
 /**
- * @table-fields : tenant_id,no,creator,update_time,create_time,id,warehouse_id,updater
+ * @table-fields : tenant_id,no,creator,update_time,create_time,id,updater,warehouse_id
  */
 @Schema(description = "管理后台 - 拣货单 Response VO")
 @Data

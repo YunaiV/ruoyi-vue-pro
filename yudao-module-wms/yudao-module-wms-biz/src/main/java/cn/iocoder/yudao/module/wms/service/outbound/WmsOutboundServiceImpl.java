@@ -33,7 +33,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
 import java.time.LocalDateTime;
 import java.util.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -130,7 +129,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
             if (stockBinDO == null) {
                 throw exception(STOCK_BIN_NOT_EXISTS);
             }
-            if (stockBinDO.getAvailableQuantity() < itemDO.getPlanQuantity()) {
+            if (stockBinDO.getAvailableQty() < itemDO.getPlanQty()) {
                 throw exception(STOCK_BIN_NOT_ENOUGH);
             }
         }
@@ -171,6 +170,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
             processAndValidateForOutbound(outbound, finalList);
             // 设置归属
             finalList.forEach(item -> {
+                item.setOutboundStatus(OutboundStatus.NONE.getValue());
                 item.setOutboundId(updateReqVO.getId());
             });
             // 保存详情
@@ -275,8 +275,8 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     @Transactional(rollbackFor = Exception.class)
     public void approve(OutboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO) {
         // 设置业务默认值
-        approvalReqVO.setBillType(BillType.INBOUND.getValue());
-        approvalReqVO.setStatusType(InboundAuditStatus.getType());
+        approvalReqVO.setBillType(BillType.OUTBOUND.getValue());
+        approvalReqVO.setStatusType(OutboundAuditStatus.getType());
         // 获得业务对象
         WmsOutboundDO inbound = validateOutboundExists(approvalReqVO.getBillId());
         ColaContext<WmsOutboundDO> ctx = ColaContext.from(inbound, approvalReqVO);

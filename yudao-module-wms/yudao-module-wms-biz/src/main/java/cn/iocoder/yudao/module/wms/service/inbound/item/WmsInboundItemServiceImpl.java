@@ -161,7 +161,7 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
         List<WmsInboundItemDO> inboundItemDOSInDB = inboundItemMapper.selectByIds(StreamX.from(updateReqVOList).toList(WmsInboundItemSaveReqVO::getId));
         for (WmsInboundItemDO itemDO : inboundItemDOSInDB) {
             WmsInboundItemSaveReqVO updateReqVO = updateReqVOMap.get(itemDO.getId());
-            itemDO.setActualQuantity(updateReqVO.getActualQuantity());
+            itemDO.setActualQty(updateReqVO.getActualQty());
         }
         // 保存
         inboundItemMapper.updateBatch(inboundItemDOSInDB);
@@ -193,20 +193,22 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
     }
 
     @Override
-    public void updateForPickup(WmsInboundItemRespVO inboundItemVO, Integer quantity) {
-        inboundItemVO.setOutboundAvailableQuantity(quantity);
-        WmsInboundItemDO inboundItemDO= BeanUtils.toBean(inboundItemVO, WmsInboundItemDO.class);
-        inboundItemMapper.updateById(inboundItemDO);
+    public List<WmsInboundItemDO> selectItemListHasAvailableQty(Long warehouseId, Long productId) {
+        return inboundItemMapper.selectItemListHasAvailableQty(warehouseId, productId);
+    }
 
-        //
-        WmsInboundItemFlowDO flowDO=new WmsInboundItemFlowDO();
-        flowDO.setInboundId(inboundItemDO.getInboundId());
-        flowDO.setInboundItemId(inboundItemDO.getId());
-        flowDO.setProductId(inboundItemDO.getProductId());
-        flowDO.setOutboundQuantity(quantity);
-        flowDO.setOutboundId(-1L);
-        flowDO.setOutboundItemId(-1L);
-        inboundItemFlowMapper.insert(flowDO);
+    @Override
+    public void saveItems(List<WmsInboundItemDO> itemsToUpdate, List<WmsInboundItemFlowDO> inboundItemFlowList) {
+        // 保存流水
+        inboundItemFlowMapper.insertBatch(inboundItemFlowList);
+        Map<Long,WmsInboundItemFlowDO> flowDOMap=StreamX.from(inboundItemFlowList).toMap(WmsInboundItemFlowDO::getInboundItemId);
+
+        for (WmsInboundItemDO itemDO : itemsToUpdate) {
+            WmsInboundItemFlowDO flowDO=flowDOMap.get(itemDO.getId());
+            itemDO.setLatestFlowId(flowDO.getId());
+        }
+        // 保存余量
+        inboundItemMapper.updateBatch(itemsToUpdate);
 
     }
 

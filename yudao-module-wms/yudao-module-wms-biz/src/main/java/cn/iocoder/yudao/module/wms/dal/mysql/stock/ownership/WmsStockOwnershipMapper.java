@@ -22,8 +22,8 @@ public interface WmsStockOwnershipMapper extends BaseMapperX<WmsStockOwnershipDO
 				.eqIfPresent(WmsStockOwnershipDO::getProductId, reqVO.getProductId())
 				.eqIfPresent(WmsStockOwnershipDO::getCompanyId, reqVO.getCompanyId())
 				.eqIfPresent(WmsStockOwnershipDO::getDeptId, reqVO.getDeptId())
-				.eqIfPresent(WmsStockOwnershipDO::getAvailableQuantity, reqVO.getAvailableQuantity())
-				.eqIfPresent(WmsStockOwnershipDO::getOutboundPendingQuantity, reqVO.getOutboundPendingQuantity())
+				.eqIfPresent(WmsStockOwnershipDO::getAvailableQty, reqVO.getAvailableQty())
+				.eqIfPresent(WmsStockOwnershipDO::getOutboundPendingQty, reqVO.getOutboundPendingQty())
 				.betweenIfPresent(WmsStockOwnershipDO::getCreateTime, reqVO.getCreateTime())
 				.orderByDesc(WmsStockOwnershipDO::getId));
     }
@@ -46,4 +46,4 @@ public interface WmsStockOwnershipMapper extends BaseMapperX<WmsStockOwnershipDO
         wrapper.eq(WmsStockOwnershipDO::getProductId, productId);
         return selectList(wrapper);
     }
-}
+}

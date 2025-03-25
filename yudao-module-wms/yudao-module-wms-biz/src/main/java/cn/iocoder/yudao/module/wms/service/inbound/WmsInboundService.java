@@ -73,9 +73,4 @@ public interface WmsInboundService {
     void finishInbound(WmsInboundRespVO inboundRespVO);
 
     List<WmsInboundDO> selectByIds(List<Long> ids);
-
-    /**
-     * 更新入库批次余额
-     **/
-    void updateAvailableQuantity(StockReason reason, Long warehouseId, Long productId, Long outboundId, Long outboundItemId , Integer quantity);
 }

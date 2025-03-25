@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : inbound_id,create_time,product_id,inbound_item_id,outbound_id,outbound_quantity,outbound_item_id
+ * @table-fields : inbound_id,outbound_action_id,outbound_qty,create_time,product_id,inbound_item_id,outbound_id,outbound_item_id
  */
 @Schema(description = "管理后台 - 入库单库存详情扣减分页 Request VO")
 @Data
@@ -37,5 +37,8 @@ public class WmsInboundItemFlowPageReqVO extends PageParam {
     private LocalDateTime[] createTime;
 
     @Schema(description = "变化的数量，出库量", example = "")
-    private Integer outboundQuantity;
+    private Integer outboundQty;
+
+    @Schema(description = "出库动作ID", example = "")
+    private Long outboundActionId;
 }

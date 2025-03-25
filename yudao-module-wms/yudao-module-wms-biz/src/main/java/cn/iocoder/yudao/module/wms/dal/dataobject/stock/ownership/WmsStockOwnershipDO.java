@@ -10,7 +10,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 /**
  * 所有者库存 DO
  * @author 李方捷
- * @table-fields : available_quantity,outbound_pending_quantity,company_id,product_id,shelving_pending_quantity,id,dept_id,warehouse_id
+ * @table-fields : company_id,outbound_pending_qty,product_id,shelving_pending_qty,available_qty,id,dept_id,warehouse_id
  */
 @TableName("wms_stock_ownership")
 // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -40,11 +40,6 @@ public class WmsStockOwnershipDO extends BaseDO {
     private Long productId;
 
     /**
-     * 可用库存
-     */
-    private Integer availableQuantity;
-
-    /**
      * 库存财务主体公司ID
      */
     private Long companyId;
@@ -55,12 +50,17 @@ public class WmsStockOwnershipDO extends BaseDO {
     private Long deptId;
 
     /**
+     * 可用库存
+     */
+    private Integer availableQty;
+
+    /**
      * 待出库库存
      */
-    private Integer outboundPendingQuantity;
+    private Integer outboundPendingQty;
 
     /**
      * 待上架数量，上架是指从拣货区上架到货架
      */
-    private Integer shelvingPendingQuantity;
+    private Integer shelvingPendingQty;
 }

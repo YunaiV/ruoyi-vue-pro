@@ -9,7 +9,7 @@ import com.alibaba.excel.annotation.*;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : available_quantity,tenant_id,creator,outbound_pending_quantity,update_time,create_time,bin_id,product_id,sellable_quantity,id,updater,warehouse_id
+ * @table-fields : tenant_id,creator,update_time,create_time,outbound_pending_qty,bin_id,product_id,available_qty,id,sellable_qty,updater,warehouse_id
  */
 @Schema(description = "管理后台 - 仓位库存 Response VO")
 @Data
@@ -32,18 +32,6 @@ public class WmsStockBinRespVO {
     @ExcelProperty("产品ID")
     private Long productId;
 
-    @Schema(description = "可用量，在库的良品数量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("可用量")
-    private Integer availableQuantity;
-
-    @Schema(description = "可售量，未被单据占用的良品数量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("可售量")
-    private Integer sellableQuantity;
-
-    @Schema(description = "待出库量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("待出库量")
-    private Integer outboundPendingQuantity;
-
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
@@ -64,4 +52,16 @@ public class WmsStockBinRespVO {
     @Schema(description = "租户编号", example = "")
     @ExcelProperty("租户编号")
     private Long tenantId;
+
+    @Schema(description = "可用量，在库的良品数量", example = "")
+    @ExcelProperty("可用量，在库的良品数量")
+    private Integer availableQty;
+
+    @Schema(description = "待出库量", example = "")
+    @ExcelProperty("待出库量")
+    private Integer outboundPendingQty;
+
+    @Schema(description = "可售量，未被单据占用的良品数量", example = "")
+    @ExcelProperty("可售量，未被单据占用的良品数量")
+    private Integer sellableQty;
 }

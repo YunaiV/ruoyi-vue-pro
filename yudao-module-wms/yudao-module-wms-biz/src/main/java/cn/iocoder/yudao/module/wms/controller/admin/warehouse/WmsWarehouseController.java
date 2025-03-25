@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.controller.admin.warehouse;
 
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import jakarta.annotation.PostConstruct;
 import org.springframework.web.bind.annotation.*;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -39,6 +40,8 @@ public class WmsWarehouseController {
 
     @Resource
     private WmsWarehouseService warehouseService;
+
+
 
     /**
      * @sign : 85CB8518B4499F29
@@ -121,4 +124,4 @@ public class WmsWarehouseController {
         // 导出 Excel
         ExcelUtils.write(response, "仓库.xls", "数据", WmsWarehouseRespVO.class, BeanUtils.toBean(list, WmsWarehouseRespVO.class));
     }
-}
+}
