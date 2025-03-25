@@ -72,6 +72,9 @@ public class BpmApprovalDetailRespVO {
         @Schema(description = "候选人用户列表")
         private List<UserSimpleBaseVO> candidateUsers; // 只包含未生成 ApprovalTaskInfo 的用户列表
 
+        @Schema(description = "流程编号", example = "8761d8e0-0922-11f0-bd37-00ff1db677bf")
+        private String processInstanceId;
+
     }
 
     @Schema(description = "活动节点的任务信息")

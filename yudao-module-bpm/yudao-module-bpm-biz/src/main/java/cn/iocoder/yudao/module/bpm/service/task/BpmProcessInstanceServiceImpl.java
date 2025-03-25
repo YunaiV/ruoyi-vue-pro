@@ -387,8 +387,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                                                       List<HistoricActivityInstance> activities, List<HistoricTaskInstance> tasks) {
         // 遍历 tasks 列表，只处理已结束的 UserTask
         // 为什么不通过 activities 呢？因为，加签场景下，它只存在于 tasks，没有 activities，导致如果遍历 activities 的话，它无法成为一个节点
-        // TODO @芋艿：子流程只有activity，这里获取不到已结束的子流程；
-        // TODO @lesan：【子流程】基于 activities 查询出 usertask、callactivity，然后拼接？如果是子流程，就是可以点击过去？
         List<HistoricTaskInstance> endTasks = filterList(tasks, task -> task.getEndTime() != null);
         List<ActivityNode> approvalNodes = convertList(endTasks, task -> {
             FlowElement flowNode = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
@@ -410,7 +408,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
         // 遍历 activities，只处理已结束的 StartEvent、EndEvent
         List<HistoricActivityInstance> endActivities = filterList(activities, activity -> activity.getEndTime() != null
-                && (StrUtil.equalsAny(activity.getActivityType(), ELEMENT_EVENT_START, ELEMENT_EVENT_END)));
+                && (StrUtil.equalsAny(activity.getActivityType(), ELEMENT_EVENT_START, ELEMENT_CALL_ACTIVITY, ELEMENT_EVENT_END)));
         endActivities.forEach(activity -> {
             // StartEvent：只处理 BPMN 的场景。因为，SIMPLE 情况下，已经有 START_USER_NODE 节点
             if (ELEMENT_EVENT_START.equals(activity.getActivityType())
@@ -444,7 +442,18 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 }
                 approvalNodes.add(endNode);
             }
+            // CallActivity
+            if (ELEMENT_CALL_ACTIVITY.equals(activity.getActivityType())) {
+                ActivityNode callActivity = new ActivityNode().setId(activity.getId())
+                        .setName(BpmSimpleModelNodeTypeEnum.CHILD_PROCESS.getName())
+                        .setNodeType(BpmSimpleModelNodeTypeEnum.CHILD_PROCESS.getType()).setStatus(processInstanceStatus)
+                        .setStartTime(DateUtils.of(activity.getStartTime()))
+                        .setEndTime(DateUtils.of(activity.getEndTime()))
+                        .setProcessInstanceId(activity.getProcessInstanceId());
+                approvalNodes.add(callActivity);
+            }
         });
+        approvalNodes.sort(Comparator.comparing(ActivityNode::getStartTime));
         return approvalNodes;
     }
 
@@ -464,7 +473,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 HistoricActivityInstance::getActivityId);
 
         // 按照 activityId 分组，构建 ApprovalNodeInfo 节点
-        // TODO @lesan：【子流程】在子流程进行审批的时候，HistoricActivityInstance 里面可以拿到 runActivities.get(0).getCalledProcessInstanceId()。要不要支持跳转？？？
         Map<String, HistoricTaskInstance> taskMap = convertMap(tasks, HistoricTaskInstance::getId);
         return convertList(runningTaskMap.entrySet(), entry -> {
             String activityId = entry.getKey();
@@ -509,6 +517,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                         userId -> ObjectUtils.equalsAny(userId, approvalTaskInfo.getOwner(),
                                 approvalTaskInfo.getAssignee())); // 委派或者向前加签情况，需要先比较 owner
                 activityNode.setCandidateUserIds(CollUtil.sub(candidateUserIds, index + 1, candidateUserIds.size()));
+            }
+            if (BpmSimpleModelNodeTypeEnum.CHILD_PROCESS.getType().equals(activityNode.getNodeType())) {
+                activityNode.setProcessInstanceId(firstActivity.getProcessInstanceId());
             }
             return activityNode;
         });
