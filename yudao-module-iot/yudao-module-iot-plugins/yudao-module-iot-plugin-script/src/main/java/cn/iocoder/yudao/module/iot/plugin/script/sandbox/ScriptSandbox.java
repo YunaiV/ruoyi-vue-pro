@@ -20,4 +20,5 @@ public interface ScriptSandbox {
      * @return 是否安全
      */
     boolean validateScript(String script);
-} 
+
+}

@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.iot.plugin.script.service.ScriptServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+// TODO @haohao：这个模块，是不是融合到 plugin-common 里哈？
 /**
  * 脚本模块配置类
  */
@@ -31,7 +32,7 @@ public class ScriptConfiguration {
     @Bean
     public ScriptService scriptService(ScriptEngineFactory engineFactory) {
         ScriptServiceImpl service = new ScriptServiceImpl();
-        // 如果有其他配置可以在这里设置
+        // TODO @haohao：如果有其他配置可以在这里设置
         return service;
     }
-} 
+}

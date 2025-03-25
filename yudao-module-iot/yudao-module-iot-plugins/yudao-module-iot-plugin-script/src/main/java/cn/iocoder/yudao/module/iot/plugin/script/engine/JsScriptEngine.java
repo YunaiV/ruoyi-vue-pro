@@ -12,8 +12,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * JavaScript脚本引擎实现
- * 使用JSR-223 Nashorn脚本引擎
+ * JavaScript 脚本引擎实现
+ * 使用 JSR-223 Nashorn 脚本引擎
  */
 @Slf4j
 public class JsScriptEngine extends AbstractScriptEngine {
@@ -24,7 +24,7 @@ public class JsScriptEngine extends AbstractScriptEngine {
     private static final long DEFAULT_TIMEOUT_MS = 5000;
 
     /**
-     * JavaScript引擎名称
+     * JavaScript 引擎名称
      */
     private static final String JS_ENGINE_NAME = "nashorn";
 
@@ -45,25 +45,24 @@ public class JsScriptEngine extends AbstractScriptEngine {
 
     @Override
     public void init() {
-        log.info("初始化JavaScript脚本引擎");
+        log.info("初始化 JavaScript 脚本引擎");
 
         // 创建脚本引擎管理器
         engineManager = new ScriptEngineManager();
 
-        // 获取JavaScript引擎
+        // 获取 JavaScript 引擎
         engine = engineManager.getEngineByName(JS_ENGINE_NAME);
         if (engine == null) {
-            log.error("无法创建JavaScript引擎，尝试使用JavaScript名称获取");
+            log.error("无法创建JavaScript引擎，尝试使用 JavaScript 名称获取");
             engine = engineManager.getEngineByName("JavaScript");
         }
-
         if (engine == null) {
-            throw new IllegalStateException("无法创建JavaScript引擎，请检查环境配置");
+            throw new IllegalStateException("无法创建 JavaScript 引擎，请检查环境配置");
         }
 
         log.info("成功创建JavaScript引擎: {}", engine.getClass().getName());
 
-        // 默认使用JS沙箱
+        // 默认使用 JS 沙箱
         if (sandbox == null) {
             setSandbox(new JsSandbox());
         }
@@ -99,7 +98,7 @@ public class JsScriptEngine extends AbstractScriptEngine {
                 // 执行脚本
                 return engine.eval(script, bindings);
             } catch (ScriptException e) {
-                log.error("执行JavaScript脚本异常: {}", e.getMessage());
+                log.error("执行 JavaScript 脚本异常: {}", e.getMessage());
                 throw new RuntimeException("脚本执行异常: " + e.getMessage(), e);
             }
         };
@@ -136,7 +135,7 @@ public class JsScriptEngine extends AbstractScriptEngine {
                 // 执行脚本
                 return engine.eval(script, bindings);
             } catch (ScriptException e) {
-                log.error("执行JavaScript脚本异常: {}", e.getMessage());
+                log.error("执行 JavaScript 脚本异常: {}", e.getMessage());
                 throw new RuntimeException("脚本执行异常: " + e.getMessage(), e);
             }
         };
@@ -152,9 +151,10 @@ public class JsScriptEngine extends AbstractScriptEngine {
 
     @Override
     public void destroy() {
-        log.info("销毁JavaScript脚本引擎");
+        log.info("销毁 JavaScript 脚本引擎");
         cachedScripts.clear();
         engine = null;
         engineManager = null;
     }
+
 }

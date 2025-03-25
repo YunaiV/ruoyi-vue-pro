@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
+// TODO @haohao：要不复用 commonstatus？
 /**
  * IoT 产品脚本状态枚举
  *

@@ -37,6 +37,7 @@ public interface ScriptContext {
      */
     Object getParameter(String key);
 
+    // TODO @haohao：这个要不也是 setFunction
     /**
      * 注册函数
      *
@@ -44,4 +45,5 @@ public interface ScriptContext {
      * @param function 函数对象
      */
     void registerFunction(String name, Object function);
-} 
+
+}

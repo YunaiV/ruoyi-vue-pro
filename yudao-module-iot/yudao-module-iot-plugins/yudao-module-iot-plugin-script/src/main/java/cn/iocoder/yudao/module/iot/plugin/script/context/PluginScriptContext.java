@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.iot.plugin.script.context;
 
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,18 +13,22 @@ public class PluginScriptContext implements ScriptContext {
     /**
      * 上下文参数
      */
+    @Getter
     private final Map<String, Object> parameters = new HashMap<>();
 
     /**
      * 上下文函数
      */
+    @Getter
     private final Map<String, Object> functions = new HashMap<>();
 
     /**
      * 日志函数接口
      */
     public interface LogFunction {
+
         void log(String message);
+
     }
 
     /**
@@ -47,16 +53,6 @@ public class PluginScriptContext implements ScriptContext {
     }
 
     @Override
-    public Map<String, Object> getParameters() {
-        return parameters;
-    }
-
-    @Override
-    public Map<String, Object> getFunctions() {
-        return functions;
-    }
-
-    @Override
     public void setParameter(String key, Object value) {
         parameters.put(key, value);
     }
@@ -71,6 +67,7 @@ public class PluginScriptContext implements ScriptContext {
         functions.put(name, function);
     }
 
+    // TODO @haohao：setParameters？这样的话，with 都是一些比较个性的参数
     /**
      * 批量设置参数
      *
@@ -87,11 +84,13 @@ public class PluginScriptContext implements ScriptContext {
     /**
      * 添加设备相关的上下文参数
      *
-     * @param deviceId   设备ID
+     * @param deviceId   设备 ID
      * @param deviceData 设备数据
      * @return 当前上下文对象
      */
+    // TODO @haohao：是不是加个 (String productKey, String deviceName, Map<String, Object> deviceData) {
     public PluginScriptContext withDeviceContext(String deviceId, Map<String, Object> deviceData) {
+        // TODO @haohao：deviceId 一般是分开，还是合并哈？
         parameters.put("deviceId", deviceId);
         parameters.put("deviceData", deviceData);
         return this;
@@ -110,6 +109,7 @@ public class PluginScriptContext implements ScriptContext {
         return this;
     }
 
+    // TODO @haohao：setParameter 可以融合哈？
     /**
      * 设置单个参数
      *
@@ -121,4 +121,5 @@ public class PluginScriptContext implements ScriptContext {
         parameters.put(key, value);
         return this;
     }
+
 }

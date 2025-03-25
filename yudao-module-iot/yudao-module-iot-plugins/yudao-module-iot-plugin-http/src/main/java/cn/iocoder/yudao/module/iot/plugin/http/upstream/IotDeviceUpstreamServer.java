@@ -35,8 +35,7 @@ public class IotDeviceUpstreamServer {
         router.route().handler(BodyHandler.create()); // 处理 Body
 
         // 使用统一的 Handler 处理所有上行请求
-        IotDeviceUpstreamVertxHandler upstreamHandler = new IotDeviceUpstreamVertxHandler(deviceUpstreamApi,
-                applicationContext);
+        IotDeviceUpstreamVertxHandler upstreamHandler = new IotDeviceUpstreamVertxHandler(deviceUpstreamApi, applicationContext);
         router.post(IotDeviceUpstreamVertxHandler.PROPERTY_PATH).handler(upstreamHandler);
         router.post(IotDeviceUpstreamVertxHandler.EVENT_PATH).handler(upstreamHandler);
 

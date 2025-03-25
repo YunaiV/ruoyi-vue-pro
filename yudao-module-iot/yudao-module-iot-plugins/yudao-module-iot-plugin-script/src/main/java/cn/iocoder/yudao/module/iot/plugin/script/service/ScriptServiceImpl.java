@@ -38,6 +38,7 @@ public class ScriptServiceImpl implements ScriptService {
     @PostConstruct
     public void init() {
         // 初始化常用的脚本引擎和沙箱
+        // TODO @haohao：js 是不是要枚举下哈。
         getEngine("js");
         sandboxCache.put("js", new JsSandbox());
     }
@@ -49,6 +50,7 @@ public class ScriptServiceImpl implements ScriptService {
             try {
                 engine.destroy();
             } catch (Exception e) {
+                // TODO @haohao：engine 类名
                 log.error("销毁脚本引擎失败", e);
             }
         }
@@ -58,6 +60,7 @@ public class ScriptServiceImpl implements ScriptService {
 
     @Override
     public Object executeScript(String scriptType, String script, ScriptContext context) {
+        // TODO @haohao：可以使用 hutool assert
         if (scriptType == null || script == null) {
             throw new IllegalArgumentException("脚本类型和内容不能为空");
         }
@@ -74,6 +77,7 @@ public class ScriptServiceImpl implements ScriptService {
             // 执行脚本
             return engine.execute(script, context);
         } catch (Exception e) {
+            // TODO @haohao：最好把 e 堆栈出来哈；然后，engine 类名
             log.error("执行脚本失败: {}", e.getMessage());
             throw new RuntimeException("执行脚本失败: " + e.getMessage(), e);
         }
@@ -83,16 +87,19 @@ public class ScriptServiceImpl implements ScriptService {
     public Object executeScript(String scriptType, String script, Map<String, Object> params) {
         // 创建默认上下文
         ScriptContext context = new PluginScriptContext(params);
+        // 执行脚本
         return executeScript(scriptType, script, context);
     }
 
     @Override
     public Object executeJavaScript(String script, ScriptContext context) {
+        // TODO @haohao：枚举哈
         return executeScript("js", script, context);
     }
 
     @Override
     public Object executeJavaScript(String script, Map<String, Object> params) {
+        // TODO @haohao：枚举哈
         return executeScript("js", script, params);
     }
 
@@ -100,7 +107,8 @@ public class ScriptServiceImpl implements ScriptService {
     public boolean validateScript(String scriptType, String script) {
         ScriptSandbox sandbox = sandboxCache.get(scriptType.toLowerCase());
         if (sandbox == null) {
-            log.warn("找不到脚本类型[{}]对应的沙箱，使用默认JS沙箱", scriptType);
+            // TODO @haohao：疑问，为啥默认 JsSandbox 哈？
+            log.warn("[validateScript][找不到脚本类型[{}]对应的沙箱，使用默认 JS 沙箱]", scriptType);
             sandbox = new JsSandbox();
             sandboxCache.put(scriptType.toLowerCase(), sandbox);
         }
@@ -120,4 +128,4 @@ public class ScriptServiceImpl implements ScriptService {
             return engine;
         });
     }
-} 
+}

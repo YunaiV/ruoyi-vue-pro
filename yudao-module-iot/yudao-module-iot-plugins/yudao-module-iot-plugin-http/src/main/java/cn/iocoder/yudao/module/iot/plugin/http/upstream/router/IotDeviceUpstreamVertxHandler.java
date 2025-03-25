@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.plugin.http.upstream.router;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -150,10 +151,11 @@ public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
         Map<String, Object> properties = scriptService.parsePropertyData(productKey, deviceName, body);
 
         // 如果脚本解析结果为空，使用默认解析逻辑
-        if (properties.isEmpty()) {
+        // TODO @芋艿：注释说明一下，为什么要这么处理？
+        if (CollUtil.isNotEmpty(properties)) {
             properties = new HashMap<>();
-            Map<String, Object> params = body.getJsonObject("params") != null ? body.getJsonObject("params").getMap()
-                    : null;
+            Map<String, Object> params = body.getJsonObject("params") != null ?
+                    body.getJsonObject("params").getMap() : null;
             if (params != null) {
                 // 将标准格式的 params 转换为平台需要的 properties 格式
                 for (Map.Entry<String, Object> entry : params.entrySet()) {
@@ -193,7 +195,7 @@ public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
         Map<String, Object> params = scriptService.parseEventData(productKey, deviceName, identifier, body);
 
         // 如果脚本解析结果为空，使用默认解析逻辑
-        if (params.isEmpty()) {
+        if (CollUtil.isNotEmpty(params)) {
             if (body.containsKey("params")) {
                 params = body.getJsonObject("params").getMap();
             } else {

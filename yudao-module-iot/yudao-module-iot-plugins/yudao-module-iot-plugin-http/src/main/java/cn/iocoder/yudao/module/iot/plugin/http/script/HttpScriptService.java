@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * HTTP协议脚本处理服务
+ * HTTP 协议脚本处理服务
  * 用于管理和执行设备数据解析脚本
  *
  * @author haohao
@@ -25,8 +25,10 @@ public class HttpScriptService {
 
     private final ScriptService scriptService;
 
+    // TODO @haohao：后续可以考虑放到 guava 缓存
+    // TODO @haohao：可能要抽一个 script factory 之类的？方便多个 emqx、http 之类复用？
     /**
-     * 脚本缓存，按产品Key缓存脚本内容
+     * 脚本缓存，按产品 Key 缓存脚本内容
      */
     private final Map<String, String> scriptCache = new ConcurrentHashMap<>();
 
@@ -76,6 +78,7 @@ public class HttpScriptService {
                     productKey, deviceName, e);
         }
 
+        // TODO @芋艿：解析失败，是不是不能返回空？！
         // 解析失败，返回空数据
         return new HashMap<>();
     }
@@ -115,13 +118,14 @@ public class HttpScriptService {
                     productKey, deviceName, identifier, payload, result);
 
             // 处理结果
+            // TODO @haohao：处理结果，可以复用么？
             if (result instanceof Map) {
                 return (Map<String, Object>) result;
             } else if (result instanceof String) {
                 try {
                     return new JsonObject((String) result).getMap();
                 } catch (Exception e) {
-                    log.warn("[parseEventData][脚本返回的字符串不是有效的JSON] result:{}", result);
+                    log.warn("[parseEventData][脚本返回的字符串不是有效的 JSON] result:{}", result);
                 }
             }
         } catch (Exception e) {
@@ -129,6 +133,7 @@ public class HttpScriptService {
                     productKey, deviceName, identifier, e);
         }
 
+        // TODO @芋艿：解析失败，是不是不能返回空？！
         // 解析失败，返回空数据
         return new HashMap<>();
     }
@@ -191,10 +196,11 @@ public class HttpScriptService {
     /**
      * 设置产品解析脚本
      *
-     * @param productKey 产品Key
+     * @param productKey 产品 Key
      * @param script     脚本内容
      */
     public void setScript(String productKey, String script) {
+        // TODO @haohao：if return 会好点哈
         if (StrUtil.isNotBlank(productKey) && StrUtil.isNotBlank(script)) {
             // 验证脚本是否有效
             if (scriptService.validateScript("js", script)) {
@@ -209,13 +215,14 @@ public class HttpScriptService {
     /**
      * 清除产品解析脚本
      *
-     * @param productKey 产品Key
+     * @param productKey 产品 Key
      */
     public void clearScript(String productKey) {
-        if (StrUtil.isNotBlank(productKey)) {
-            scriptCache.remove(productKey);
-            log.info("[clearScript][清除产品:{}的解析脚本]", productKey);
+        if (StrUtil.isBlank(productKey)) {
+           return;
         }
+        scriptCache.remove(productKey);
+        log.info("[clearScript][清除产品({})的解析脚本]", productKey);
     }
 
     /**
@@ -225,4 +232,5 @@ public class HttpScriptService {
         scriptCache.clear();
         log.info("[clearAllScripts][清除所有脚本缓存]");
     }
+
 }

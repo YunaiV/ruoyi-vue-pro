@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+// TODO @haohao：类似阿里云的脚本，貌似是一个？这个可以简化么？【微信讨论哈】类似阿里云，貌似是加了个 topic？
 /**
  * IoT 产品脚本信息 DO
  *

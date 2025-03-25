@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.plugin.script.sandbox;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.script.ScriptEngine;
@@ -8,8 +9,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+// TODO @haohao：这个是不是融合到 ScriptEngine 里
 /**
- * JavaScript脚本沙箱，限制脚本的执行权限
+ * JavaScript 脚本沙箱，限制脚本的执行权限
  */
 @Slf4j
 public class JsSandbox implements ScriptSandbox {
@@ -34,6 +36,7 @@ public class JsSandbox implements ScriptSandbox {
                     "(?:\\bchild_process\\b)|" +
                     "(?:\\bwindow\\b)");
 
+    // TODO @haohao：这个没用到哈。
     /**
      * 脚本执行超时时间（毫秒）
      */
@@ -44,30 +47,28 @@ public class JsSandbox implements ScriptSandbox {
         if (!(engineContext instanceof ScriptEngine)) {
             throw new IllegalArgumentException("引擎上下文类型不正确，无法应用JavaScript沙箱");
         }
-
         ScriptEngine engine = (ScriptEngine) engineContext;
 
-        // 在Nashorn引擎中，可以通过以下方式设置安全限制
+        // 在 Nashorn 引擎中，可以通过以下方式设置安全限制
         try {
             // 设置严格模式
             String securityPrefix = "'use strict';\n";
 
-            // 禁用Java.type等访问系统资源的功能
+            // 禁用 Java.type 等访问系统资源的功能
             engine.eval("var Java = undefined;");
             engine.eval("var JavaImporter = undefined;");
             engine.eval("var Packages = undefined;");
 
             // 增强安全控制可以在这里添加
-            log.debug("已应用JavaScript安全沙箱限制");
-
+            log.debug("已应用 JavaScript 安全沙箱限制");
         } catch (Exception e) {
-            log.warn("应用JavaScript沙箱限制失败: {}", e.getMessage());
+            log.warn("应用 JavaScript 沙箱限制失败: {}", e.getMessage());
         }
     }
 
     @Override
     public boolean validateScript(String script) {
-        if (script == null || script.isEmpty()) {
+        if (StrUtil.isNotEmpty(script)) {
             return false;
         }
 
@@ -86,11 +87,12 @@ public class JsSandbox implements ScriptSandbox {
         }
 
         // 脚本长度限制
-        if (script.length() > 1024 * 100) { // 限制100KB
+        if (script.length() > 1024 * 100) { // 限制 100 KB
             log.warn("脚本太大，超过了限制");
             return false;
         }
 
         return true;
     }
+
 }

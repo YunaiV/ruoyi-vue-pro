@@ -48,4 +48,4 @@ public abstract class AbstractScriptEngine {
     public void setSandbox(ScriptSandbox sandbox) {
         this.sandbox = sandbox;
     }
-} 
+}

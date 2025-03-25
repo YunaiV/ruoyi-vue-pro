@@ -12,7 +12,7 @@ public interface ScriptService {
     /**
      * 执行脚本
      *
-     * @param scriptType 脚本类型（如js、groovy等）
+     * @param scriptType 脚本类型（如 js、groovy 等）
      * @param script     脚本内容
      * @param context    脚本上下文
      * @return 脚本执行结果
@@ -22,7 +22,7 @@ public interface ScriptService {
     /**
      * 执行脚本
      *
-     * @param scriptType 脚本类型（如js、groovy等）
+     * @param scriptType 脚本类型（如 js、groovy 等）
      * @param script     脚本内容
      * @param params     脚本参数
      * @return 脚本执行结果
@@ -30,7 +30,7 @@ public interface ScriptService {
     Object executeScript(String scriptType, String script, Map<String, Object> params);
 
     /**
-     * 执行JavaScript脚本
+     * 执行 JavaScript 脚本
      *
      * @param script  脚本内容
      * @param context 脚本上下文
@@ -39,7 +39,7 @@ public interface ScriptService {
     Object executeJavaScript(String script, ScriptContext context);
 
     /**
-     * 执行JavaScript脚本
+     * 执行 JavaScript 脚本
      *
      * @param script 脚本内容
      * @param params 脚本参数
@@ -55,4 +55,5 @@ public interface ScriptService {
      * @return 脚本是否安全
      */
     boolean validateScript(String scriptType, String script);
-} 
+
+}

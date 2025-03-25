@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.plugin.script.engine;
 
+import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -11,12 +12,12 @@ import org.springframework.stereotype.Component;
 public class ScriptEngineFactory {
 
     /**
-     * 创建JavaScript脚本引擎
+     * 创建 JavaScript 脚本引擎
      *
      * @return JavaScript脚本引擎
      */
     public JsScriptEngine createJsEngine() {
-        log.debug("创建JavaScript脚本引擎");
+        log.debug("创建 JavaScript 脚本引擎");
         return new JsScriptEngine();
     }
 
@@ -27,10 +28,7 @@ public class ScriptEngineFactory {
      * @return 脚本引擎
      */
     public AbstractScriptEngine createEngine(String scriptType) {
-        if (scriptType == null || scriptType.isEmpty()) {
-            throw new IllegalArgumentException("脚本类型不能为空");
-        }
-
+        Assert.notBlank(scriptType, "脚本类型不能为空");
         switch (scriptType.toLowerCase()) {
             case "js":
             case "javascript":
@@ -40,4 +38,5 @@ public class ScriptEngineFactory {
                 throw new IllegalArgumentException("不支持的脚本类型: " + scriptType);
         }
     }
-} 
+
+}

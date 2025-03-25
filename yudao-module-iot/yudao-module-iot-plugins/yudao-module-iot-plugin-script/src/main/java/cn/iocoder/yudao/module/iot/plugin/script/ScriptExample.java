@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO @haohao：写到单测类里；
 /**
  * 脚本使用示例类
  */
