@@ -117,6 +117,7 @@ public class AiWorkflowServiceImpl implements AiWorkflowService {
     }
 
     private Tinyflow parseFlowParam(String model) {
+        // TODO @lesan：可以使用 jackson 哇？
         JSONObject json = JSONObject.parseObject(model);
         JSONArray nodeArr = json.getJSONArray("nodes");
         Tinyflow  tinyflow = new Tinyflow(json.toJSONString());
@@ -128,6 +129,7 @@ public class AiWorkflowServiceImpl implements AiWorkflowService {
                     AiApiKeyDO apiKey = apiKeyService.getApiKey(data.getLong("llmId"));
                     switch (apiKey.getPlatform()) {
                         // TODO @lesan 需要讨论一下这里怎么弄
+                        // TODO @lesan llmId 对应 model 的编号如何？这样的话，就是 apiModelService 提供一个获取 LLM 的方法。然后，创建的方法，也在 AiModelFactory 提供。可以先接个 deepseek 先。deepseek yyds！
                         case "OpenAI":
                             break;
                         case "Ollama":
@@ -152,6 +154,5 @@ public class AiWorkflowServiceImpl implements AiWorkflowService {
         }
         return tinyflow;
     }
-
 
 }

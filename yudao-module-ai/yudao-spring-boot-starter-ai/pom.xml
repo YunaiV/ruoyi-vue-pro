@@ -118,8 +118,8 @@
             </exclusions>
         </dependency>
 
+        <!-- TinyFlow：AI 工作流 -->
         <dependency>
-            <!-- Tinyflow：工作流 -->
             <groupId>dev.tinyflow</groupId>
             <artifactId>tinyflow-java-core</artifactId>
             <version>${tinyflow.version}</version>

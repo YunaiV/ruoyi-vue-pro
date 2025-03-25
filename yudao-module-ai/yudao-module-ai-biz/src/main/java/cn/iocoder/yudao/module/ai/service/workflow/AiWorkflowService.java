@@ -66,4 +66,5 @@ public interface AiWorkflowService {
      * @param testReqVO 测试数据
      */
     Object testWorkflow(AiWorkflowTestReqVO testReqVO);
+
 }

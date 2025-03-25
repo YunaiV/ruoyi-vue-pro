@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class AiWorkflowSaveReqVO {
 
-    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "编号", example = "1")
     private Long id;
 
     @Schema(description = "工作流标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "FLOW")

@@ -21,17 +21,17 @@ public class AiWorkflowDO extends BaseDO {
      */
     @TableId
     private Long id;
-
-    /**
-     * 工作流标识
-     */
-    private String definitionKey;
-
     /**
      * 工作流名称
      */
     private String name;
+    /**
+     * 工作流标识
+     */
+    // TODO @lesan：要不换成 code？主要想，和 bpm 工作流，有点区分，字段上。
+    private String definitionKey;
 
+    // TODO @lesan：graph 用这个如何？发现大家貌似更爱用这个字段哈。图！
     /**
      * 工作流模型 JSON 数据
      */
