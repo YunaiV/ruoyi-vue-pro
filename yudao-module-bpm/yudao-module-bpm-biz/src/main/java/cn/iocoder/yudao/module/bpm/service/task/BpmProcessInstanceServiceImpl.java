@@ -823,6 +823,10 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 && Boolean.FALSE.equals(processDefinitionInfo.getAllowCancelRunningProcess())) {
             throw exception(PROCESS_INSTANCE_CANCEL_FAIL_NOT_ALLOW);
         }
+        // 1.4 子流程不允许取消
+        if (StrUtil.isNotBlank(instance.getSuperExecutionId())) {
+            throw exception(CHILD_PROCESS_INSTANCE_CANCEL_FAIL_NOT_ALLOW);
+        }
 
         // 2. 取消流程
         updateProcessInstanceCancel(cancelReqVO.getId(),
@@ -851,6 +855,15 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
         // 2. 结束流程
         taskService.moveTaskToEnd(id, reason);
+
+        // 3. 取消所有子流程
+        List<ProcessInstance> subProcessInstances = runtimeService.createProcessInstanceQuery()
+                .superProcessInstanceId(id)
+                .list();
+        subProcessInstances.forEach(processInstance -> {
+            updateProcessInstanceCancel(processInstance.getProcessInstanceId(),
+                    BpmReasonEnum.CANCEL_CHILD_PROCESS_INSTANCE_BY_MAIN_PROCESS.getReason());
+        });
     }
 
     @Override
