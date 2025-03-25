@@ -813,7 +813,6 @@ public class SimpleModelUtils {
             callActivity.setCalledElementType("key");
             // 1. 是否异步
             if (node.getChildProcessSetting().getAsync()) {
-                // TODO @lesan: 这里目前测试没有跳过执行call activity 后面的节点
                 callActivity.setAsynchronous(true);
             }
 
