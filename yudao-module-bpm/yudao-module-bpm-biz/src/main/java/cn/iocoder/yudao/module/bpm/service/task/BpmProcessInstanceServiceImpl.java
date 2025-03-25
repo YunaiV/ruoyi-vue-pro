@@ -853,10 +853,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 BpmProcessInstanceStatusEnum.CANCEL.getStatus());
         runtimeService.setVariable(id, BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_REASON, reason);
 
-        // 2. 结束流程
-        taskService.moveTaskToEnd(id, reason);
-
-        // 3. 取消所有子流程
+        // 2. 取消所有子流程
         List<ProcessInstance> subProcessInstances = runtimeService.createProcessInstanceQuery()
                 .superProcessInstanceId(id)
                 .list();
@@ -864,6 +861,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             updateProcessInstanceCancel(processInstance.getProcessInstanceId(),
                     BpmReasonEnum.CANCEL_CHILD_PROCESS_INSTANCE_BY_MAIN_PROCESS.getReason());
         });
+
+        // 3. 结束流程
+        taskService.moveTaskToEnd(id, reason);
     }
 
     @Override
