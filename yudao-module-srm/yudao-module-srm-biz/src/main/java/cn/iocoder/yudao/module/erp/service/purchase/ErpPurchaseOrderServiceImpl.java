@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.erp.api.purchase.TmsOrderCountDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.*;
 import cn.iocoder.yudao.module.erp.convert.purchase.ErpOrderInConvert;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInItemDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
@@ -237,31 +238,6 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
             throw exception(PURCHASE_ORDER_CODE_DUPLICATE, No);
         }
     }
-
-    //    @Override
-    //    @Transactional(rollbackFor = Exception.class)
-    //    public void updatePurchaseOrderStatus(Long id, Integer status) {
-    //        boolean approve = SrmAuditStatus.APPROVED.getCode().equals(status);
-    //        // 1.1 校验存在
-    //        ErpPurchaseOrderDO purchaseOrder = validatePurchaseOrderExists(id);
-    //        // 1.2 校验状态
-    //        if (purchaseOrder.getStatus().equals(status)) {
-    //            throw exception(approve ? PURCHASE_ORDER_APPROVE_FAIL : PURCHASE_ORDER_PROCESS_FAIL);
-    //        }
-    //        // 1.3 存在采购入单，无法反审核
-    //        if (!approve && purchaseOrder.getTotalInCount().compareTo(BigDecimal.ZERO) > 0) {
-    //            throw exception(PURCHASE_ORDER_PROCESS_FAIL_EXISTS_IN);
-    //        }
-    //        // 1.4 存在采购退货单，无法反审核
-    //        if (!approve && purchaseOrder.getTotalReturnCount().compareTo(BigDecimal.ZERO) > 0) {
-    //            throw exception(PURCHASE_ORDER_PROCESS_FAIL_EXISTS_RETURN);
-    //        }
-    //        // 2. 更新状态
-    //        int updateCount = purchaseOrderMapper.updateByIdAndStatus(id, purchaseOrder.getStatus(), new ErpPurchaseOrderDO().setStatus(status).setAuditorId(SecurityFrameworkUtils.getLoginUserId()).setAuditTime(LocalDateTime.now()));//2.1 设置审核人的id+时间
-    //        if (updateCount == 0) {
-    //            throw exception(approve ? PURCHASE_ORDER_APPROVE_FAIL : PURCHASE_ORDER_PROCESS_FAIL);
-    //        }
-    //    }
 
     private List<ErpPurchaseOrderItemDO> validatePurchaseOrderItems(List<ErpPurchaseOrderSaveReqVO.Item> list) {
         // 1. 校验产品存在
@@ -593,17 +569,21 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         }
         List<ErpPurchaseOrderItemDO> orderItemDOS = purchaseOrderItemMapper.selectListByItemIds(reqVO.getItemIds());
         //转换
-        ErpPurchaseInSaveReqVO inSaveReqVO = BeanUtils.toBean(reqVO, ErpPurchaseInSaveReqVO.class, vo -> {
-            vo.setNo(null).setItems(ErpOrderInConvert.INSTANCE.convertToErpPurchaseInSaveReqVOItems(orderItemDOS)).setId(null).setInTime(LocalDateTime.now());
+        ErpPurchaseInSaveReqVO vo = BeanUtils.toBean(reqVO, ErpPurchaseInSaveReqVO.class, saveReqVO -> {
+            saveReqVO.setNo(null).setItems(ErpOrderInConvert.INSTANCE.convertToErpPurchaseInSaveReqVOItems(orderItemDOS)).setId(null).setInTime(LocalDateTime.now());
         });
 
         //service持久化
-        purchaseInService.createPurchaseIn(inSaveReqVO);
+        Long purchaseIn = purchaseInService.createPurchaseIn(vo);
+        //修改采购单项的source = 合并入库
+        List<ErpPurchaseInItemDO> itemDOS = erpPurchaseInItemMapper.selectListByInId(purchaseIn);
+        itemDOS.forEach(itemDO -> itemDO.setSource("采购合并"));
+        erpPurchaseInItemMapper.updateBatch(itemDOS);
     }
 
     @Override
     public void generateContract(ErpPurchaseOrderGenerateContractReqVO reqVO, HttpServletResponse response) {
-        ErpPurchaseOrderDO orderDO = validatePurchaseOrder(reqVO.getOrderId());
+        ErpPurchaseOrderDO orderDO = validatePurchaseOrderExists(reqVO.getOrderId());
         //1 从OSS拿到模板word
         XWPFTemplate xwpfTemplate;
         try (InputStream stream = resourcePatternResolver.getResource("classpath:purchase/order/%s".formatted(reqVO.getTemplateName())).getInputStream()) {
@@ -617,7 +597,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         List<ErpPurchaseOrderItemDO> itemDOS = purchaseOrderItemMapper.selectListByOrderId(orderDO.getId());
         ErpPurchaseOrderWordBO wordBO = bindDataFormOrderItemDO(itemDOS, orderDO);
         xwpfTemplate.render(wordBO);
-        // 3. 转换pdf，返回响应
+        //3 转换pdf，返回响应
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(); // 用于捕获输出流
         try (OutputStream out = response.getOutputStream()) {
             // 将生成的模板写入 ByteArrayOutputStream
@@ -685,7 +665,6 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         return templateList;
     }
 
