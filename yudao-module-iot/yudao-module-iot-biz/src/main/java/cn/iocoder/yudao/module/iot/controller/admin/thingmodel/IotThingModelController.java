@@ -72,22 +72,20 @@ public class IotThingModelController {
     @PreAuthorize("@ss.hasPermission('iot:thing-model:query')")
     public CommonResult<IotThingModelTSLRespVO> getThingModelTsl(@RequestParam("productId") Long productId) {
         IotThingModelTSLRespVO tslRespVO = new IotThingModelTSLRespVO();
+        // TODO @puhui999：是不是要先查询产品哈？原因是，万一没配置物模型，但是产品已经有了！
         // 1. 获得产品所有物模型定义
         List<IotThingModelDO> thingModels = thingModelService.getThingModelListByProductId(productId);
         if (CollUtil.isEmpty(thingModels)) {
             return success(tslRespVO);
         }
 
-        // 2.1 设置公共部分参数
+        // 2. 设置公共部分参数
         IotThingModelDO thingModel = thingModels.get(0);
         tslRespVO.setProductId(thingModel.getProductId()).setProductKey(thingModel.getProductKey());
-        // 2.2 处理属性列表
         tslRespVO.setProperties(convertList(filterList(thingModels, item ->
                 ObjUtil.equal(IotThingModelTypeEnum.PROPERTY.getType(), item.getType())), IotThingModelDO::getProperty));
-        // 2.3 处理服务列表
         tslRespVO.setServices(convertList(filterList(thingModels, item ->
                 ObjUtil.equal(IotThingModelTypeEnum.SERVICE.getType(), item.getType())), IotThingModelDO::getService));
-        // 2.4 处理事件列表
         tslRespVO.setEvents(convertList(filterList(thingModels, item ->
                 ObjUtil.equal(IotThingModelTypeEnum.EVENT.getType(), item.getType())), IotThingModelDO::getEvent));
         return success(tslRespVO);

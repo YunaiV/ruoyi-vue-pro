@@ -56,7 +56,6 @@ public class IotRedisStreamDataBridgeExecute extends
             serverConfig.setPassword(config.getPassword());
         }
 
-        // TODO @芋艿：看看怎么优化
         // 创建 RedisTemplate 并配置
         RedissonClient redisson = Redisson.create(redissonConfig);
         RedisTemplate<String, Object> template = new RedisTemplate<>();

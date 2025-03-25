@@ -41,16 +41,9 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
     @BeforeEach
     public void setUp() {
         // 创建共享的测试消息
-        message = IotDeviceMessage.builder()
-                .requestId("TEST-001")
-                .reportTime(LocalDateTime.now())
-                .tenantId(1L)
-                .productKey("testProduct")
-                .deviceName("testDevice")
-                .deviceKey("testDeviceKey")
-                .type("property")
-                .identifier("temperature")
-                .data("{\"value\": 60}")
+        message = IotDeviceMessage.builder().requestId("TEST-001").reportTime(LocalDateTime.now()).tenantId(1L)
+                .productKey("testProduct").deviceName("testDevice").deviceKey("testDeviceKey")
+                .type("property").identifier("temperature").data("{\"value\": 60}")
                 .build();
     }
 
@@ -132,14 +125,12 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
 
         // 2. 创建配置
         IotDataBridgeHttpConfig config = new IotDataBridgeHttpConfig()
-                .setUrl("https://doc.iocoder.cn/")
-                .setMethod(HttpMethod.GET.name());
+                .setUrl("https://doc.iocoder.cn/").setMethod(HttpMethod.GET.name());
 
         // 3. 执行测试
         log.info("[testHttpDataBridge][执行HTTP数据桥接测试]");
         httpDataBridgeExecute.execute(message, new IotDataBridgeDO()
-                .setType(httpDataBridgeExecute.getType())
-                .setConfig(config));
+                .setType(httpDataBridgeExecute.getType()).setConfig(config));
     }
 
     /**
@@ -147,19 +138,16 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
      *
      * @param action 执行器实例
      * @param config 配置对象
-     * @param mqType MQ类型
+     * @param type MQ 类型
      * @throws Exception 如果执行过程中发生异常
      */
-    private void executeAndVerifyCache(IotDataBridgeExecute<?> action, IotDataBridgeAbstractConfig config, String mqType) throws Exception {
-        log.info("[test{}DataBridge][第一次执行，应该会创建新的 producer]", mqType);
-        action.execute(message, new IotDataBridgeDO()
-                .setType(action.getType())
-                .setConfig(config));
+    private void executeAndVerifyCache(IotDataBridgeExecute<?> action, IotDataBridgeAbstractConfig config, String type)
+            throws Exception {
+        log.info("[test{}DataBridge][第一次执行，应该会创建新的 producer]", type);
+        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
 
-        log.info("[test{}DataBridge][第二次执行，应该会复用缓存的 producer]", mqType);
-        action.execute(message, new IotDataBridgeDO()
-                .setType(action.getType())
-                .setConfig(config));
+        log.info("[test{}DataBridge][第二次执行，应该会复用缓存的 producer]", type);
+        action.execute(message, new IotDataBridgeDO().setType(action.getType()).setConfig(config));
     }
 
 }
