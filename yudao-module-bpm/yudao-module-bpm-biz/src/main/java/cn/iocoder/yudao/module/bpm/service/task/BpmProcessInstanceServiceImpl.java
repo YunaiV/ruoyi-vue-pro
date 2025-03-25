@@ -453,6 +453,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 approvalNodes.add(callActivity);
             }
         });
+
+        // 按照时间排序
         approvalNodes.sort(Comparator.comparing(ActivityNode::getStartTime));
         return approvalNodes;
     }
@@ -836,7 +838,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         }
         // 1.4 子流程不允许取消
         if (StrUtil.isNotBlank(instance.getSuperExecutionId())) {
-            throw exception(CHILD_PROCESS_INSTANCE_CANCEL_FAIL_NOT_ALLOW);
+            throw exception(PROCESS_INSTANCE_CANCEL_CHILD_FAIL_NOT_ALLOW);
         }
 
         // 2. 取消流程
@@ -865,13 +867,10 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         runtimeService.setVariable(id, BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_REASON, reason);
 
         // 2. 取消所有子流程
-        List<ProcessInstance> subProcessInstances = runtimeService.createProcessInstanceQuery()
-                .superProcessInstanceId(id)
-                .list();
-        subProcessInstances.forEach(processInstance -> {
-            updateProcessInstanceCancel(processInstance.getProcessInstanceId(),
-                    BpmReasonEnum.CANCEL_CHILD_PROCESS_INSTANCE_BY_MAIN_PROCESS.getReason());
-        });
+        List<ProcessInstance> childProcessInstances = runtimeService.createProcessInstanceQuery()
+                .superProcessInstanceId(id).list();
+        childProcessInstances.forEach(processInstance -> updateProcessInstanceCancel(
+                processInstance.getProcessInstanceId(), BpmReasonEnum.CANCEL_CHILD_PROCESS_INSTANCE_BY_MAIN_PROCESS.getReason()));
 
         // 3. 结束流程
         taskService.moveTaskToEnd(id, reason);
