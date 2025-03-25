@@ -36,4 +36,6 @@ public class ErpPurchaseOrderWordBO extends ErpPurchaseOrderDO {
     private String signingPlace;
     //签订日期
     private LocalDateTime signingDate;
+    //签订日期格式化str
+    private String signingDateFormat;
 }

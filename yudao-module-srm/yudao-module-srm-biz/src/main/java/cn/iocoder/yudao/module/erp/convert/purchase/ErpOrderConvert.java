@@ -83,6 +83,8 @@ public interface ErpOrderConvert {
         //数量*含税单价
         return BeanUtils.toBean(orderDO, ErpPurchaseOrderWordBO.class, peek -> {
             BeanUtils.copyProperties(vo, peek);
+            //signingDateFormat 日期格式化
+            peek.setSigningDateFormat(DateUtil.format(peek.getSigningDate(), NORM_DATE_PATTERN));
             peek.setProducts(BeanUtils.toBean(itemDOS, ErpPurchaseOrderItemBO.class, item -> {
                 item.setIndex(index.getAndIncrement());
                 //不含税总额
