@@ -82,7 +82,7 @@ public class ErpFinanceSubjectController {
     @GetMapping("/page")
     @Operation(summary = "获得Erp财务主体分页")
     @PreAuthorize("@ss.hasPermission('erp:finance-subject:query')")
-    public CommonResult<PageResult<ErpFinanceSubjectRespVO>> getFinanceSubjectPage(@NotNull @Valid ErpFinanceSubjectPageReqVO pageReqVO) {
+    public CommonResult<PageResult<ErpFinanceSubjectRespVO>> getFinanceSubjectPage(@Valid ErpFinanceSubjectPageReqVO pageReqVO) {
         PageResult<ErpFinanceSubjectDO> pageResult = financeSubjectService.getFinanceSubjectPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, ErpFinanceSubjectRespVO.class));
     }

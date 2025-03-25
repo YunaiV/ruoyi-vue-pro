@@ -8,6 +8,10 @@ WORKDIR /word
 ## 将后端项目的 Jar 文件，复制到镜像中
 COPY ./target/*.jar app.jar
 
+# 安装字体和时区设置
+#apt-get update && apt-get install -y tzdata fonts-arphic-uming &&
+#RUN cp C:\Windows\Fonts\* /usr/share/fonts && fc-cache -fv
+
 ## 设置 TZ 时区
 ENV TZ=Asia/Shanghai
 ## 设置 JAVA_OPTS 环境变量，可通过 docker run -e "JAVA_OPTS=" 进行覆盖

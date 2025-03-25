@@ -30,6 +30,12 @@ public class ErpPurchaseRequestItemRespVO extends BaseVO {
     @Schema(description = "产品编号")
     @ExcelProperty("产品编号")
     private Long productId;
+    
+    @Schema(description = "产品报关品名")
+    private String declaredType;
+
+    @Schema(description = "产品sku")
+    private String barCode;
 
     @Schema(description = "产品名称", example = "巧克力")
     @ExcelProperty("产品名称")

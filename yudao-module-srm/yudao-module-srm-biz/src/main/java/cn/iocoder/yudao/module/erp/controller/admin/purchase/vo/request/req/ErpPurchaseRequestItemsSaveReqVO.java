@@ -17,9 +17,26 @@ public class ErpPurchaseRequestItemsSaveReqVO {
 //    @NotNull(groups = validation.OnUpdate.class, message = "更新时，子项id不能为空")
     private Long id;
 
-    @Schema(description = "商品id", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "商品id不能为空")
+
+    @Schema(description = "产品报关品名")
+    @NotBlank(message = "产品报关品名不能为空")
+    private String declaredType;
+
+    @Schema(description = "产品sku")
+    @NotBlank(message = "产品sku不能为空")
+    private String barCode;
+
+    @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "产品编号不能为空")
     private Long productId;
+    //产品名称
+    @Schema(description = "产品名称")
+    @NotBlank(message = "产品名称不能为空")
+    private String productName;
+
+    @Schema(description = "产品单位名称")
+    @NotBlank(message = "产品单位名称不能为空")
+    private String productUnitName;
 
     @Schema(description = "仓库id")
     private Long warehouseId;

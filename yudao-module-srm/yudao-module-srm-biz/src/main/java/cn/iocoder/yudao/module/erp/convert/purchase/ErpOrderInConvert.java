@@ -21,7 +21,12 @@ public interface ErpOrderInConvert {
         return null;
     }
 
-
+    /**
+     * 采购项转换成采购入库单vo
+     *
+     * @param oldItem 采购项
+     * @return 入库项vo
+     */
     default ErpPurchaseInSaveReqVO.Item convertToErpPurchaseInSaveReqVOItem(@Param("oldItem") ErpPurchaseOrderItemDO oldItem) {
         if (oldItem == null) {
             return null;
@@ -39,9 +44,7 @@ public interface ErpOrderInConvert {
         if (items == null || items.isEmpty()) {
             return List.of();
         }
-        return items.stream()
-            .map(this::convertToErpPurchaseInSaveReqVOItem)
-            .collect(Collectors.toList());
+        return items.stream().map(this::convertToErpPurchaseInSaveReqVOItem).collect(Collectors.toList());
     }
 
 

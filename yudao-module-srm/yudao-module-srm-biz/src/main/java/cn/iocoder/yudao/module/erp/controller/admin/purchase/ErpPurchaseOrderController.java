@@ -9,7 +9,6 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.erp.api.stock.WmsWarehouseApi;
 import cn.iocoder.yudao.module.erp.api.stock.dto.ErpWarehouseDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.*;
@@ -178,7 +177,7 @@ public class ErpPurchaseOrderController {
         List<ErpPurchaseOrderItemDO> purchaseOrderItemList = purchaseOrderService.getPurchaseOrderItemListByOrderIds(convertSet(list, ErpPurchaseOrderDO::getId));
         Map<Long, List<ErpPurchaseOrderItemDO>> purchaseOrderItemMap = convertMultiMap(purchaseOrderItemList, ErpPurchaseOrderItemDO::getOrderId);
         // 1.2 产品
-        Map<Long, ErpProductDTO> productMap = erpProductApi.getProductMap(convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getProductId));
+//        Map<Long, ErpProductDTO> productMap = erpProductApi.getProductMap(convertSet(purchaseOrderItemList, ErpPurchaseOrderItemDO::getProductId));
         // 1.3 供应商
         Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(convertSet(list, ErpPurchaseOrderDO::getSupplierId));
         // 1.4 人员
@@ -196,7 +195,6 @@ public class ErpPurchaseOrderController {
         return BeanUtils.toBean(list, ErpPurchaseOrderBaseRespVO.class, respVO -> {
             respVO.setItems(BeanUtils.toBean(purchaseOrderItemMap.get(respVO.getId()), ErpPurchaseOrderBaseRespVO.Item.class, item -> {
                 //设置产品
-                MapUtils.findAndThen(productMap, item.getProductId(), item::setProduct);
                 // 设置仓库
                 MapUtils.findAndThen(warehouseMap, item.getWarehouseId(), erpWarehouseDO -> item.setWarehouseName(erpWarehouseDO.getName()));
                 //人员

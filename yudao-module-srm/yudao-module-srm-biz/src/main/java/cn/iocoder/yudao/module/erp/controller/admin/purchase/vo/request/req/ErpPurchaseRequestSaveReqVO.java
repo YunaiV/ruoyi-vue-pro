@@ -33,8 +33,7 @@ public class ErpPurchaseRequestSaveReqVO {
     @NotNull(message = "申请部门不能为空")
     private Long applicationDeptId;
 
-    @Schema(description = "单据日期", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "单据日期不能为空")
+    @Schema(description = "单据日期")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime requestTime;
 
@@ -50,6 +49,7 @@ public class ErpPurchaseRequestSaveReqVO {
 
     @Schema(description = "收货地址")
     private String delivery;
+
 
     @Schema(description = "商品信息")
     @NotNull(message = "商品信息不能为空")

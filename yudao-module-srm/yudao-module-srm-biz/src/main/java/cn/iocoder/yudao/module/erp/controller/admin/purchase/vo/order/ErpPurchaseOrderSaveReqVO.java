@@ -89,12 +89,25 @@ public class ErpPurchaseOrderSaveReqVO {
 //        @NotNull(groups = validation.OnUpdate.class, message = "更新时，订单项id不能为空")
         private Long id;
 
+        @Schema(description = "产品报关品名")
+        @NotBlank(message = "产品报关品名不能为空")
+        private String declaredType;
+
+        @Schema(description = "产品sku")
+        @NotBlank(message = "产品sku不能为空")
+        private String barCode;
+
         @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "产品编号不能为空")
         private Long productId;
         //产品名称
         @Schema(description = "产品名称")
+        @NotBlank(message = "产品名称不能为空")
         private String productName;
+
+        @Schema(description = "产品单位名称")
+        @NotBlank(message = "产品单位名称不能为空")
+        private String productUnitName;
 
         @Schema(description = "产品单价")
         @DecimalMin(value = "0.00", message = "产品单价不能小于0")
@@ -116,6 +129,10 @@ public class ErpPurchaseOrderSaveReqVO {
         @Schema(description = "币别id(财务管理-币别维护)")
         private Long currencyId;
 
+        @Schema(description = "币别名称")
+        @NotBlank(message = "币别名称不能为空")
+        private String currencyName;
+
         @Schema(description = "含税单价")
         @DecimalMin(value = "0.00", message = "含税单价不能小于0")
         private BigDecimal actTaxPrice;
@@ -135,7 +152,6 @@ public class ErpPurchaseOrderSaveReqVO {
 
         @Schema(description = "商品行备注")
         private String remark;
-
         // ========== 采购入库 ==========
 //        /**
 //         * 采购入库数量

@@ -55,4 +55,26 @@ public class ErpPurchaseRequestPageReqVO extends PageParam {
     //supplierId 供应商编号
     @Schema(description = "供应商编号")
     private String supplierId;
+
+
+    @Schema(description = "审核状态")
+    private Integer status;
+
+    @Schema(description = "关闭状态")
+    private Integer offStatus;
+
+    @Schema(description = "订购状态")
+    private Integer orderStatus;
+
+    @Schema(description = "单据标签")
+    private String tag;
+
+    @Schema(description = "收货地址")
+    private String delivery;
+
+    @Schema(description = "审核意见")
+    private String reviewComment;
+
+    @Schema(description = "入库状态")
+    private Integer inStatus;
 }

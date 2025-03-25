@@ -48,6 +48,7 @@ public class ErpPurchaseReturnSaveReqVO {
         @Schema(description = "退货项编号")
         private Long id;
 
+
         @Schema(description = "入库项id", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "入库项id不能为空")
         private Long inItemId;
@@ -59,6 +60,17 @@ public class ErpPurchaseReturnSaveReqVO {
         @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "产品编号不能为空")
         private Long productId;
+        @Schema(description = "报关品名(入库带出)")
+        private String declaredType;
+
+        @Schema(description = "产品sku(入库项带出)")
+        private String barCode;
+
+        @Schema(description = "产品名称(入库项带出)")
+        private String productName;
+
+        @Schema(description = "产品单位名称(入库项带出)")
+        private String productUnitName;
 
         @Schema(description = "产品单位单位", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "产品单位单位不能为空")
@@ -67,8 +79,8 @@ public class ErpPurchaseReturnSaveReqVO {
         @Schema(description = "产品单价")
         private BigDecimal productPrice;
 
-        @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED)
-        @NotNull(message = "产品数量不能为空")
+        @Schema(description = "退货", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "退货数量不能为空")
         private BigDecimal count;
 
         @Schema(description = "含税单价")
@@ -80,6 +92,9 @@ public class ErpPurchaseReturnSaveReqVO {
 
         @Schema(description = "币别ID,财务管理-币别维护")
         private Long currencyId;
+        
+        @Schema(description = "币别名称")
+        private String currencyName;
 
         @Schema(description = "备注")
         private String remark;

@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.erp.service.purchase.bo;
 
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import lombok.Data;
 
@@ -12,7 +11,7 @@ public class ErpPurchaseOrderItemBO extends ErpPurchaseOrderItemDO {
     Integer index;
 
     //产品信息
-    ErpProductDTO product;
+//    ErpProductDTO product;
 
     private BigDecimal count;
 

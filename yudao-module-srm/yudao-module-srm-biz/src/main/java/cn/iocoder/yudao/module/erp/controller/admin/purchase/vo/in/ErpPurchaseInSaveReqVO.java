@@ -131,6 +131,9 @@ public class ErpPurchaseInSaveReqVO {
         @Schema(description = "币别ID,财务管理-币别维护")
         private Long currencyId;
 
+        @Schema(description = "币别名称")
+        private String currencyName;
+
         @Schema(description = "汇率,财务管理-币别维护")
         private BigDecimal exchangeRate;
 

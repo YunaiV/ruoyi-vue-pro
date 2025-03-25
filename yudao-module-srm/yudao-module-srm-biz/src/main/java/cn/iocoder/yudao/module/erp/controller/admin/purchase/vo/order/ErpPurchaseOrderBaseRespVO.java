@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order;
 
 import cn.iocoder.yudao.framework.mybatis.core.vo.BaseVO;
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -9,6 +8,8 @@ import com.alibaba.excel.annotation.write.style.ContentStyle;
 import com.alibaba.excel.enums.BooleanEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -151,11 +152,29 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
     public static class Item extends BaseVO {
         @Schema(description = "订单项编号")
         private Long id;
-        @Schema(description = "产品编号")
-        private Long productId;
 
-        @Schema(description = "erp产品")
-        private ErpProductDTO product;
+        @Schema(description = "产品报关品名")
+        @NotBlank(message = "产品报关品名不能为空")
+        private String declaredType;
+
+        @Schema(description = "产品sku")
+        @NotBlank(message = "产品sku不能为空")
+        private String barCode;
+
+        @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "产品编号不能为空")
+        private Long productId;
+        //产品名称
+        @Schema(description = "产品名称")
+        @NotBlank(message = "产品名称不能为空")
+        private String productName;
+
+        @Schema(description = "产品单位名称")
+        @NotBlank(message = "产品单位名称不能为空")
+        private String productUnitName;
+//
+//        @Schema(description = "erp产品")
+//        private ErpProductDTO product;
 
         @Schema(description = "币别id(财务管理-币别维护)")
         private Long currencyId;

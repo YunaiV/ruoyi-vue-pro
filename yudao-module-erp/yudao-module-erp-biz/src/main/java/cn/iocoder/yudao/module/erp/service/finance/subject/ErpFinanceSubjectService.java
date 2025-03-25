@@ -46,6 +46,7 @@ public interface ErpFinanceSubjectService {
      */
     ErpFinanceSubjectDO getFinanceSubject(Long id);
 
+
     /**
      * 获得Erp财务主体分页
      *
@@ -55,4 +56,12 @@ public interface ErpFinanceSubjectService {
     PageResult<ErpFinanceSubjectDO> getFinanceSubjectPage(ErpFinanceSubjectPageReqVO pageReqVO);
 
     List<ErpFinanceSubjectSimpleRespVO> ListFinanceSubjectSimple();
+
+    /**
+     * 校验财务主体集合
+     *
+     * @param ids ids
+     * @return ErpFinanceSubjectDO
+     */
+    List<ErpFinanceSubjectDO> listFinanceSubject(List<Long> ids);
 }

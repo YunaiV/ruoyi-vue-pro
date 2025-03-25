@@ -60,7 +60,10 @@ public class ErpPurchaseReturnItemDO extends BaseDO {
      * 币种编号
      */
     private Long currencyId;
-
+    /**
+     * 币别名称
+     */
+    private String currencyName;
     /**
      * 产品单位单价，单位：元
      */
@@ -110,8 +113,16 @@ public class ErpPurchaseReturnItemDO extends BaseDO {
      * 申请部门id
      */
     private Long applicationDeptId;
-
-    private String sku;
-
+    /**
+     * 报关品名
+     */
+    private String declaredType;
+    /**
+     * 产品sku
+     */
     private String barCode;
+    /**
+     * 产品名称
+     */
+    private String productName;
 }

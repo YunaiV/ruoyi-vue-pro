@@ -98,6 +98,10 @@ public class ErpPurchaseInItemDO extends BaseDO {
      */
     private Long currencyId;
     /**
+     * 币别名称
+     */
+    private String currencyName;
+    /**
      * 付款状态
      */
     private Integer payStatus;
@@ -131,8 +135,20 @@ public class ErpPurchaseInItemDO extends BaseDO {
      * 汇率
      */
     private BigDecimal exchangeRate;
-
-    private String sku;
-
+    /**
+     * 报关品名
+     */
+    private String declaredType;
+    /**
+     * 产品名称
+     */
+    private String productName;
+    /**
+     * 产品单位名称
+     */
+    private String productUnitName;
+    /**
+     * 产品sku
+     */
     private String barCode;
 }

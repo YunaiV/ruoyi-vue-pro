@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.erp.api.product.ErpProductUnitApi;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.erp.api.purchase.SrmInCountDTO;
 import cn.iocoder.yudao.module.erp.api.purchase.TmsOrderCountDTO;
 import cn.iocoder.yudao.module.erp.api.stock.WmsWarehouseApi;
@@ -81,6 +81,8 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     StateMachine<ErpStorageStatus, SrmEventEnum, ErpPurchaseRequestDO> storageMachine;
     @Resource(name = PURCHASE_REQUEST_ITEM_STORAGE_STATE_MACHINE_NAME)
     StateMachine<ErpStorageStatus, SrmEventEnum, SrmInCountDTO> storageItemMachine;
+    @Autowired
+    private ErpProductUnitApi erpProductUnitApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -119,12 +121,11 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
 
     private void initSlaveStatus(List<ErpPurchaseRequestItemsDO> itemsDOS) {
         itemsDOS.forEach(i -> {
-                orderItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, SrmEventEnum.ORDER_INIT, TmsOrderCountDTO.builder().purchaseOrderItemId(i.getId()).build());
-                offItemMachine.fireEvent(ErpOffStatus.OPEN, SrmEventEnum.OFF_INIT, i);
-                //入库
-                storageItemMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, SrmEventEnum.STORAGE_INIT, SrmInCountDTO.builder().applyItemId(i.getId()).build());
-            }
-        );
+            orderItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, SrmEventEnum.ORDER_INIT, TmsOrderCountDTO.builder().purchaseOrderItemId(i.getId()).build());
+            offItemMachine.fireEvent(ErpOffStatus.OPEN, SrmEventEnum.OFF_INIT, i);
+            //入库
+            storageItemMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, SrmEventEnum.STORAGE_INIT, SrmInCountDTO.builder().applyItemId(i.getId()).build());
+        });
     }
 
     private void initMasterStatus(ErpPurchaseRequestDO purchaseRequest) {
@@ -145,11 +146,19 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     @Override
     public List<ErpPurchaseRequestItemsDO> validatePurchaseRequestItems(List<ErpPurchaseRequestItemsSaveReqVO> items) {
         // 1. 校验产品有效性
-        erpProductApi.validProductList(convertSet(items, ErpPurchaseRequestItemsSaveReqVO::getProductId));
+        List<ErpProductDTO> dtoList = erpProductApi.validProductList(convertSet(items, ErpPurchaseRequestItemsSaveReqVO::getProductId));
+        Map<Long, ErpProductDTO> dtoMap = erpProductApi.getProductMap(convertSet(dtoList, ErpProductDTO::getId));
         // 1.1 校验仓库有效性
         wmsWarehouseApi.validWarehouseList(convertSet(items, ErpPurchaseRequestItemsSaveReqVO::getWarehouseId));
+        // 1.2 把产品转化为sku+报关品名
         // 2. 转化为 ErpPurchaseRequestItemsDO 列表
-        return convertList(items, o -> BeanUtils.toBean(o, ErpPurchaseRequestItemsDO.class));
+        return convertList(items, o -> BeanUtils.toBean(o, ErpPurchaseRequestItemsDO.class, item -> {
+            //产品名称
+            item.setProductName(dtoMap.get(item.getProductId()).getName());
+            item.setBarCode(dtoMap.get(item.getProductId()).getBarCode());
+            //产品单位名称(产品必有单位)
+            item.setProductUnitName(erpProductUnitApi.getProductUnitList(Collections.singleton(dtoMap.get(item.getProductId()).getUnitId())).get(0).getName());
+        }));
     }
 
     /**
@@ -170,9 +179,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
     @Transactional(rollbackFor = Exception.class)
     public Long merge(ErpPurchaseRequestOrderReqVO reqVO) {
         // 获取所有 itemIds
-        List<Long> itemIds = reqVO.getItems().stream()
-            .map(ErpPurchaseRequestOrderReqVO.requestItems::getId)
-            .collect(Collectors.toList());
+        List<Long> itemIds = reqVO.getItems().stream().map(ErpPurchaseRequestOrderReqVO.requestItems::getId).collect(Collectors.toList());
 
         // 查询 itemDOS 并校验
         List<ErpPurchaseRequestItemsDO> itemsDOS = erpPurchaseRequestItemsMapper.selectListByIds(itemIds);
@@ -181,24 +188,21 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         //申请单已审核+未关闭才可以合并
         validMerge(itemsDOS);
         // 创建 itemsMap 和 requestItemDOMap
-        Map<Long, ErpPurchaseRequestOrderReqVO.requestItems> itemsMap = reqVO.getItems().stream()
-            .collect(Collectors.toMap(ErpPurchaseRequestOrderReqVO.requestItems::getId, Function.identity()));
-        Map<Long, ErpPurchaseRequestItemsDO> requestItemDOMap = itemsDOS.stream()
-            .collect(Collectors.toMap(ErpPurchaseRequestItemsDO::getId, Function.identity()));
+        Map<Long, ErpPurchaseRequestOrderReqVO.requestItems> itemsMap = reqVO.getItems().stream().collect(Collectors.toMap(ErpPurchaseRequestOrderReqVO.requestItems::getId, Function.identity()));
+        Map<Long, ErpPurchaseRequestItemsDO> requestItemDOMap = itemsDOS.stream().collect(Collectors.toMap(ErpPurchaseRequestItemsDO::getId, Function.identity()));
 
         // ErpPurchaseRequestItemsDO item -> 订单vo item
-        List<ErpPurchaseOrderSaveReqVO.Item> itemList = ErpOrderConvert.INSTANCE.convertToErpPurchaseOrderSaveReqVOItemList(itemsDOS, itemsMap, requestItemDOMap);
+        List<ErpPurchaseOrderSaveReqVO.Item> voItemList = ErpOrderConvert.INSTANCE.convertToErpPurchaseOrderSaveReqVOItemList(itemsDOS, itemsMap, requestItemDOMap);
         // 获取申请单编号映射
-        Set<Long> requestIds = itemsDOS.stream()
-            .map(ErpPurchaseRequestItemsDO::getRequestId)
-            .collect(Collectors.toSet());
-        Map<Long, ErpPurchaseRequestDO> rDOMap = erpPurchaseRequestMapper.selectByIds(requestIds).stream()
-            .collect(Collectors.toMap(ErpPurchaseRequestDO::getId, Function.identity()));
+        Set<Long> requestIds = itemsDOS.stream().map(ErpPurchaseRequestItemsDO::getRequestId).collect(Collectors.toSet());
+        Map<Long, ErpPurchaseRequestDO> rDOMap = erpPurchaseRequestMapper.selectByIds(requestIds).stream().collect(Collectors.toMap(ErpPurchaseRequestDO::getId, Function.identity()));
 
         //后置渲染，申请单的no编号
-        itemList.forEach(item -> {
+        voItemList.forEach(item -> {
             Long itemId = item.getPurchaseApplyItemId();
             ErpPurchaseRequestItemsDO itemDO = requestItemDOMap.get(itemId);
+            item.setId(null);
+            item.setPurchaseApplyItemId(itemId);//采购申请项id
             //获得requestDO
             ErpPurchaseRequestDO aDo = rDOMap.get(itemDO.getRequestId());
             item.setErpPurchaseRequestItemNo(aDo.getNo());
@@ -210,12 +214,14 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         ErpPurchaseOrderSaveReqVO saveReqVO = BeanUtils.toBean(reqVO, ErpPurchaseOrderSaveReqVO.class, vo -> {
             vo.setId(null);
             vo.setNoTime(LocalDateTime.now());
-            vo.setItems(itemList);
-            vo.setRemark("申请人期望采购日期:" + DateUtil.format(reqVO.getOrderTime(), DatePattern.CHINESE_DATE_TIME_PATTERN));
+            vo.setItems(voItemList);
+//            vo.setRemark("申请人期望采购日期: " + DateUtil.format(reqVO.getOrderTime(), DatePattern.CHINESE_DATE_PATTERN));
         });
         //3.0 持久化
         Long orderId = erpPurchaseOrderService.createPurchaseOrder(saveReqVO);
+
         // 更新订单->设置来源"采购合并"
+        saveReqVO.setId(orderId);
         erpPurchaseOrderService.updatePurchaseOrder(saveReqVO);
         List<ErpPurchaseOrderItemDO> itemDOS = erpPurchaseOrderItemMapper.selectListByOrderId(orderId);
         itemDOS.forEach(itemDO -> itemDO.setSource("采购合并"));
@@ -281,8 +287,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         // 第一步，对比新老数据，获得添加、修改、删除的列表
         List<ErpPurchaseRequestItemsDO> oldList = erpPurchaseRequestItemsMapper.selectListByRequestId(id);
         // id 不同，就认为是不同的记录
-        List<List<ErpPurchaseRequestItemsDO>> diffList = diffList(oldList, itemsDOList,
-            (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
+        List<List<ErpPurchaseRequestItemsDO>> diffList = diffList(oldList, itemsDOList, (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
         // 第二步，批量添加、修改、删除
         if (CollUtil.isNotEmpty(diffList.get(0))) {
             diffList.get(0).forEach(o -> o.setRequestId(id));
@@ -378,9 +383,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
             // 批量处理采购订单子项状态
             List<ErpPurchaseRequestItemsDO> itemsDOList = erpPurchaseRequestItemsMapper.selectByIds(itemIds);
             if (itemsDOList != null && !itemsDOList.isEmpty()) {
-                itemsDOList.forEach(itemsDO ->
-                    offItemMachine.fireEvent(ErpOffStatus.fromCode(itemsDO.getOffStatus()), event, itemsDO)
-                );
+                itemsDOList.forEach(itemsDO -> offItemMachine.fireEvent(ErpOffStatus.fromCode(itemsDO.getOffStatus()), event, itemsDO));
             }
         }
     }

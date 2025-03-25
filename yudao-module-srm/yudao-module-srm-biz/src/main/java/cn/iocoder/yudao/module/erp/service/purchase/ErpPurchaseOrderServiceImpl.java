@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.erp.service.purchase;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
@@ -9,14 +8,16 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.finance.ErpAccountApi;
+import cn.iocoder.yudao.module.erp.api.finance.ErpFinanceSubjectApi;
+import cn.iocoder.yudao.module.erp.api.finance.dto.ErpFinanceSubjectDTO;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductUnitApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductUnitDTO;
 import cn.iocoder.yudao.module.erp.api.purchase.SrmInCountDTO;
 import cn.iocoder.yudao.module.erp.api.purchase.TmsOrderCountDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.*;
+import cn.iocoder.yudao.module.erp.convert.purchase.ErpOrderConvert;
 import cn.iocoder.yudao.module.erp.convert.purchase.ErpOrderInConvert;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInItemDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
@@ -29,7 +30,6 @@ import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestItemsMap
 import cn.iocoder.yudao.module.erp.dal.redis.no.SrmNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.SrmEventEnum;
 import cn.iocoder.yudao.module.erp.enums.status.*;
-import cn.iocoder.yudao.module.erp.service.purchase.bo.ErpPurchaseOrderItemBO;
 import cn.iocoder.yudao.module.erp.service.purchase.bo.ErpPurchaseOrderWordBO;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.aspose.words.Document;
@@ -49,12 +49,10 @@ import org.springframework.validation.annotation.Validated;
 
 import java.io.*;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -78,12 +76,15 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     private final ErpPurchaseOrderMapper purchaseOrderMapper;
     private final ErpPurchaseOrderItemMapper purchaseOrderItemMapper;
     private final ErpPurchaseRequestItemsMapper requestItemsMapper;
+    private final ErpPurchaseInItemMapper erpPurchaseInItemMapper;
     private final SrmNoRedisDAO noRedisDAO;
     private final ErpSupplierService supplierService;
     private final ErpPurchaseInService purchaseInService;
     private final ErpAccountApi erpAccountApi;
     private final ErpProductApi erpProductApi;
     private final ErpProductUnitApi erpProductUnitApi;
+    private final ErpFinanceSubjectApi erpFinanceSubjectApi;
+    private final ResourcePatternResolver resourcePatternResolver;
 
     @Resource(name = PURCHASE_ORDER_OFF_STATE_MACHINE_NAME)
     StateMachine<ErpOffStatus, SrmEventEnum, ErpPurchaseOrderDO> offMachine;
@@ -110,10 +111,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     StateMachine<ErpExecutionStatus, SrmEventEnum, ErpPurchaseOrderItemDO> requestItemExecutionMachine;
     @Resource(name = PURCHASE_REQUEST_ITEM_OFF_STATE_MACHINE_NAME)
     StateMachine<ErpOffStatus, SrmEventEnum, ErpPurchaseRequestItemsDO> requestItemOffMachine;
-    @Autowired
-    private ResourcePatternResolver resourcePatternResolver;
-    @Autowired
-    private ErpPurchaseInItemMapper erpPurchaseInItemMapper;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -242,7 +240,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     private List<ErpPurchaseOrderItemDO> validatePurchaseOrderItems(List<ErpPurchaseOrderSaveReqVO.Item> list) {
         // 1. 校验产品存在
         List<ErpProductDTO> productList = erpProductApi.validProductList(convertSet(list, ErpPurchaseOrderSaveReqVO.Item::getProductId));
-        Map<Long, ErpProductDTO> productMap = convertMap(productList, ErpProductDTO::getId);
+        Map<Long, ErpProductDTO> dtoMap = convertMap(productList, ErpProductDTO::getId);
         // 2. 转化为 ErpPurchaseOrderItemDO 列表
         return convertList(list, o -> BeanUtils.toBean(o, ErpPurchaseOrderItemDO.class, item -> {
             //            item = ErpOrderConvert.INSTANCE.convertToErpPurchaseOrderItemDO(o);//convert转换一下
@@ -254,9 +252,12 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
                 item.setTaxPrice(MoneyUtils.priceMultiplyPercent(item.getTotalPrice(), item.getTaxPercent()));
             }
             //根据产品来设置产品单位
-            item.setProductUnitId(productMap.get(item.getProductId()).getUnitId());
-            //            item.setCurrencyId(o.getCurrencyId());
-            //            item.setPurchaseApplyItemId(o.getPurchaseApplyItemId());
+            item.setProductUnitId(dtoMap.get(item.getProductId()).getUnitId());
+            //产品名称
+            item.setProductName(dtoMap.get(item.getProductId()).getName());
+            item.setBarCode(dtoMap.get(item.getProductId()).getBarCode());
+            //产品单位名称(产品必有单位)
+            item.setProductUnitName(erpProductUnitApi.getProductUnitList(Collections.singleton(dtoMap.get(item.getProductId()).getUnitId())).get(0).getName());
         }));
     }
 
@@ -572,7 +573,6 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         ErpPurchaseInSaveReqVO vo = BeanUtils.toBean(reqVO, ErpPurchaseInSaveReqVO.class, saveReqVO -> {
             saveReqVO.setNo(null).setItems(ErpOrderInConvert.INSTANCE.convertToErpPurchaseInSaveReqVOItems(orderItemDOS)).setId(null).setInTime(LocalDateTime.now());
         });
-
         //service持久化
         Long purchaseIn = purchaseInService.createPurchaseIn(vo);
         //修改采购单项的source = 合并入库
@@ -595,16 +595,16 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         }
         //2 模板word渲染数据
         List<ErpPurchaseOrderItemDO> itemDOS = purchaseOrderItemMapper.selectListByOrderId(orderDO.getId());
-        ErpPurchaseOrderWordBO wordBO = bindDataFormOrderItemDO(itemDOS, orderDO);
+        Map<Long, ErpFinanceSubjectDTO> dtoMap = convertMap(erpFinanceSubjectApi.validateFinanceSubject(List.of(reqVO.getPartyAId(), reqVO.getPartyBId())), ErpFinanceSubjectDTO::getId);
+        ErpPurchaseOrderWordBO wordBO = ErpOrderConvert.INSTANCE.bindDataFormOrderItemDO(itemDOS, orderDO, reqVO, dtoMap);
         xwpfTemplate.render(wordBO);
         //3 转换pdf，返回响应
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(); // 用于捕获输出流
         try (OutputStream out = response.getOutputStream()) {
             // 将生成的模板写入 ByteArrayOutputStream
             xwpfTemplate.write(byteArrayOutputStream);
-            byte[] documentData = byteArrayOutputStream.toByteArray(); // 获取字节数组
             // 将字节数组转成输入流
-            InputStream inputStreamResult = new ByteArrayInputStream(documentData);
+            InputStream inputStreamResult = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());// 获取字节数组
             // 设置响应头，准备下载
             response.setContentType("application/pdf");
             response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode("采购合同.pdf", StandardCharsets.UTF_8));
@@ -619,31 +619,6 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         }
     }
 
-    private ErpPurchaseOrderWordBO bindDataFormOrderItemDO(List<ErpPurchaseOrderItemDO> itemDOS, ErpPurchaseOrderDO orderDO) {
-        //收集productIds
-        Set<Long> productIds = itemDOS.stream().map(ErpPurchaseOrderItemDO::getProductId).collect(Collectors.toSet());
-        Map<Long, ErpProductDTO> productMap = erpProductApi.getProductMap(productIds);
-        //收集产品的单位map getProductUnitMap
-        Map<Long, ErpProductUnitDTO> unitMap = erpProductUnitApi.getProductUnitMap(productMap.values().stream().map(ErpProductDTO::getUnitId).collect(Collectors.toSet()));
-        AtomicInteger index = new AtomicInteger(1);
-        //单位名称
-        //不含税总额
-        //总金额
-        //数量*含税单价
-        return BeanUtils.toBean(orderDO, ErpPurchaseOrderWordBO.class, peek -> peek.setProducts(BeanUtils.toBean(itemDOS, ErpPurchaseOrderItemBO.class, item -> {
-            item.setIndex(index.getAndIncrement());
-            item.setProduct(productMap.get(item.getProductId()));
-            //单位名称
-            item.setUnitName(unitMap.get(item.getProductUnitId()).getName());
-            //不含税总额
-            item.setTotalPriceUntaxed(item.getProductPrice().multiply(item.getCount()).setScale(2, RoundingMode.HALF_UP));
-            item.setTotalTaxPrice(item.getTaxPrice().setScale(2, RoundingMode.HALF_UP));
-            //总金额
-            item.setTotalProductPrice(item.getCount().multiply(item.getActTaxPrice()).setScale(2, RoundingMode.HALF_UP));//数量*含税单价
-            item.setDeliveryTimeFormat(DateUtil.format(item.getDeliveryTime(), "yyyy-MM-dd"));
-            item.setCount(item.getCount().setScale(0, RoundingMode.HALF_UP));
-        })).setTotalCount(peek.getTotalCount().setScale(0, RoundingMode.HALF_UP)));
-    }
 
     /**
      * 获取 JAR 包中的模板文件列表（只列出以 .docx 结尾的文件）

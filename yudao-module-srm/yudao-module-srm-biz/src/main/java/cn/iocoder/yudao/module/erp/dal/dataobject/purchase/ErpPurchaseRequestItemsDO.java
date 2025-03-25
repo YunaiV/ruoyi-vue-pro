@@ -33,9 +33,25 @@ public class ErpPurchaseRequestItemsDO extends TenantBaseDO {
      */
     private Long productId;
 
-    private String sku;
+    //快照
+    /**
+     * 报关品名
+     */
+    private String declaredType;
 
+    /**
+     * 产品sku
+     */
     private String barCode;
+    /**
+     * 产品名称
+     */
+    private String productName;
+    /**
+     * 产品单位名称
+     */
+    private String productUnitName;
+    //快照 end
     /**
      * 申请单id
      */

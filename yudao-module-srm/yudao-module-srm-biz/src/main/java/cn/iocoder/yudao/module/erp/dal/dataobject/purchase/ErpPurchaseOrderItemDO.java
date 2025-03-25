@@ -70,10 +70,6 @@ public class ErpPurchaseOrderItemDO extends TenantBaseDO {
      */
     private BigDecimal productPrice;
     /**
-     * 产品名称
-     */
-    private String productName;
-    /**
      * 下单数量
      */
     //取后两位小数点 json的时候
@@ -177,6 +173,10 @@ public class ErpPurchaseOrderItemDO extends TenantBaseDO {
      */
     private Long currencyId;
     /**
+     * 币别名称
+     */
+    private String currencyName;
+    /**
      * 申请人id
      */
     private Long applicantId;
@@ -187,9 +187,21 @@ public class ErpPurchaseOrderItemDO extends TenantBaseDO {
      */
     private Long applicationDeptId;
 
-    private String sku;
+    /**
+     * 报关品名
+     */
+    private String declaredType;
 
     private String barCode;
+    /**
+     * 产品名称
+     */
+    private String productName;
+    /**
+     * 产品单位名称
+     */
+    private String productUnitName;
+
     /**
      * 单据来源
      */
