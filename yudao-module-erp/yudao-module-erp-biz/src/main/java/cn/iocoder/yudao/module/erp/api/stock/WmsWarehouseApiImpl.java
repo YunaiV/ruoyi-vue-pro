@@ -29,6 +29,7 @@ public class WmsWarehouseApiImpl implements WmsWarehouseApi {
 
     @Override
     public void validWarehouseList(Set<Long> longs) {
+        //TODO 批量代优化
         for (Long aLong : longs) {
             erpWarehouseService.validWarehouse(aLong);
         }

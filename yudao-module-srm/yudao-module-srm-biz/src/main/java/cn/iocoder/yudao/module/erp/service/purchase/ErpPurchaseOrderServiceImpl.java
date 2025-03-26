@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.erp.api.purchase.SrmInCountDTO;
 import cn.iocoder.yudao.module.erp.api.purchase.SrmPayCountDTO;
 import cn.iocoder.yudao.module.erp.api.purchase.TmsOrderCountDTO;
+import cn.iocoder.yudao.module.erp.config.purchase.PurchaseOrderTemplateManager;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.*;
 import cn.iocoder.yudao.module.erp.convert.purchase.ErpOrderConvert;
@@ -36,8 +37,6 @@ import com.alibaba.cola.statemachine.StateMachine;
 import com.aspose.words.Document;
 import com.aspose.words.SaveFormat;
 import com.deepoove.poi.XWPFTemplate;
-import com.deepoove.poi.config.Configure;
-import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -86,6 +85,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     private final ErpProductUnitApi erpProductUnitApi;
     private final ErpFinanceSubjectApi erpFinanceSubjectApi;
     private final ResourcePatternResolver resourcePatternResolver;
+    private final PurchaseOrderTemplateManager purchaseOrderTemplateManager;
 
     @Resource(name = PURCHASE_ORDER_OFF_STATE_MACHINE_NAME)
     StateMachine<ErpOffStatus, SrmEventEnum, ErpPurchaseOrderDO> offMachine;
@@ -593,14 +593,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     public void generateContract(ErpPurchaseOrderGenerateContractReqVO reqVO, HttpServletResponse response) {
         ErpPurchaseOrderDO orderDO = validatePurchaseOrderExists(reqVO.getOrderId());
         //1 从OSS拿到模板word
-        XWPFTemplate xwpfTemplate;
-        try (InputStream stream = resourcePatternResolver.getResource("classpath:purchase/order/%s".formatted(reqVO.getTemplateName())).getInputStream()) {
-            LoopRowTableRenderPolicy policy = new LoopRowTableRenderPolicy();
-            Configure config = Configure.builder().bind("products", policy).build();
-            xwpfTemplate = XWPFTemplate.compile(stream, config);
-        } catch (IOException e) {
-            throw exception(PURCHASE_ORDER_GENERATE_CONTRACT_FAIL);
-        }
+        XWPFTemplate xwpfTemplate = purchaseOrderTemplateManager.getTemplate("classpath:purchase/order/%s".formatted(reqVO.getTemplateName()));
         //2 模板word渲染数据
         List<ErpPurchaseOrderItemDO> itemDOS = purchaseOrderItemMapper.selectListByOrderId(orderDO.getId());
         Map<Long, ErpFinanceSubjectDTO> dtoMap = convertMap(erpFinanceSubjectApi.validateFinanceSubject(List.of(reqVO.getPartyAId(), reqVO.getPartyBId())), ErpFinanceSubjectDTO::getId);

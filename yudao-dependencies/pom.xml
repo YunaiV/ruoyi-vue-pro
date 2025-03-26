@@ -79,7 +79,7 @@
         <weixin-java.version>4.6.0</weixin-java.version>
         <mqtt.version>1.2.5</mqtt.version>
         <dingtalk.version>2.0.0</dingtalk.version>
-<!--        <guava.version>33.3.1-jre</guava.version>-->
+        <!--        <guava.version>33.3.1-jre</guava.version>-->
         <bucket4j.version>8.10.1</bucket4j.version>
         <commons-collection4.version>4.4</commons-collection4.version>
 
@@ -89,11 +89,11 @@
         <dependencies>
             <!--索迈相关-->
 
-<!--            <dependency>-->
-<!--                <groupId>com.aliyun</groupId>-->
-<!--                <artifactId>dingtalk</artifactId>-->
-<!--                <version>${dingtalk.version}</version>-->
-<!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>com.aliyun</groupId>-->
+            <!--                <artifactId>dingtalk</artifactId>-->
+            <!--                <version>${dingtalk.version}</version>-->
+            <!--            </dependency>-->
 
             <dependency>
                 <groupId>com.bucket4j</groupId>
@@ -101,11 +101,11 @@
                 <version>${bucket4j.version}</version>
             </dependency>
 
-<!--            <dependency>-->
-<!--                <groupId>com.google.guava</groupId>-->
-<!--                <artifactId>guava</artifactId>-->
-<!--                <version>${guava.version}</version>-->
-<!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>com.google.guava</groupId>-->
+            <!--                <artifactId>guava</artifactId>-->
+            <!--                <version>${guava.version}</version>-->
+            <!--            </dependency>-->
 
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -120,37 +120,44 @@
             </dependency>
 
 
-<!--            <dependency>-->
-<!--                <groupId>com.somle</groupId>-->
-<!--                <artifactId>somle-framework</artifactId>-->
-<!--                <version>${revision}</version>-->
-<!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>com.somle</groupId>-->
+            <!--                <artifactId>somle-framework</artifactId>-->
+            <!--                <version>${revision}</version>-->
+            <!--            </dependency>-->
 
-<!--            <dependency>-->
-<!--                <groupId>com.somle</groupId>-->
-<!--                <artifactId>somle-common</artifactId>-->
-<!--                <version>${revision}</version>-->
-<!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>com.somle</groupId>-->
+            <!--                <artifactId>somle-common</artifactId>-->
+            <!--                <version>${revision}</version>-->
+            <!--            </dependency>-->
 
-<!--            <dependency>-->
-<!--                <groupId>com.somle</groupId>-->
-<!--                <artifactId>somle-spring-boot-starter-test</artifactId>-->
-<!--                <version>${revision}</version>-->
-<!--                <scope>test</scope>-->
-<!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>com.somle</groupId>-->
+            <!--                <artifactId>somle-spring-boot-starter-test</artifactId>-->
+            <!--                <version>${revision}</version>-->
+            <!--                <scope>test</scope>-->
+            <!--            </dependency>-->
             <dependency><!--ERP模块状态机-wdy-->
                 <groupId>com.alibaba.cola</groupId>
                 <artifactId>cola-component-statemachine</artifactId>
                 <version>5.0.0</version>
             </dependency>
-
-
+            <dependency>
+                <groupId>com.deepoove</groupId>
+                <artifactId>poi-tl</artifactId>
+                <version>1.12.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.luhuiguo</groupId>
+                <artifactId>aspose-words</artifactId>
+                <version>23.1</version>
+            </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
                 <version>1.15</version>
             </dependency>
-
 
 
             <dependency>
@@ -231,7 +238,8 @@
             </dependency>
 
             <dependency>
-                <groupId>com.github.xingfudeshi</groupId> <!-- TODO 芋艿：https://github.com/xiaoymin/knife4j/issues/874 -->
+                <groupId>com.github.xingfudeshi
+                </groupId> <!-- TODO 芋艿：https://github.com/xiaoymin/knife4j/issues/874 -->
                 <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
             </dependency>

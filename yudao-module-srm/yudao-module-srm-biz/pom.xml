@@ -95,14 +95,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.luhuiguo</groupId>
-            <artifactId>aspose-words</artifactId>
-            <version>23.1</version>
-        </dependency>
-        <dependency>
             <groupId>com.deepoove</groupId>
             <artifactId>poi-tl</artifactId>
-            <version>1.12.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.luhuiguo</groupId>
+            <artifactId>aspose-words</artifactId>
         </dependency>
     </dependencies>
 
