@@ -155,10 +155,15 @@ public class WmsOutboundItemServiceImpl implements WmsOutboundItemService {
         if (!outboundStatus.matchAny(OutboundStatus.NONE)) {
             throw exception(INBOUND_CAN_NOT_EDIT);
         }
+        // 校验数量
+
         Map<Long, WmsOutboundItemSaveReqVO> updateReqVOMap = StreamX.from(updateReqVOList).toMap(WmsOutboundItemSaveReqVO::getId);
         List<WmsOutboundItemDO> outboundItemDOSInDB = outboundItemMapper.selectByIds(StreamX.from(updateReqVOList).toList(WmsOutboundItemSaveReqVO::getId));
         for (WmsOutboundItemDO itemDO : outboundItemDOSInDB) {
             WmsOutboundItemSaveReqVO updateReqVO = updateReqVOMap.get(itemDO.getId());
+            if(updateReqVO.getActualQty()==null || updateReqVO.getActualQty()<=0) {
+                throw exception(OUTBOUND_ITEM_ACTUAL_QTY_ERROR);
+            }
             itemDO.setActualQty(updateReqVO.getActualQty());
         }
         // 保存

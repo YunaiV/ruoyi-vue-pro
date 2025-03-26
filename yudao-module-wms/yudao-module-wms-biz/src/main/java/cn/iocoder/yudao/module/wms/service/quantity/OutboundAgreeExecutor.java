@@ -71,11 +71,8 @@ public class OutboundAgreeExecutor extends OutboundExecutor {
         List<WmsInboundItemFlowDO> inboundItemFlowList = new ArrayList<>();
         Map<Long,WmsInboundItemDO> map=StreamX.from(inboundItemsList).toMap(WmsInboundItemDO::getId);
         for (WmsInboundItemFlowDO flowDO : flowDOList) {
-
             WmsInboundItemDO inboundItemDO = map.get(flowDO.getInboundItemId());
-            Integer qty=flowDO.getOutboundQty();
-            inboundItemDO.setOutboundAvailableQty(inboundItemDO.getOutboundAvailableQty()+qty);
-
+            inboundItemDO.setOutboundAvailableQty(inboundItemDO.getOutboundAvailableQty()+quantity);
 
             //
             WmsInboundItemFlowDO newFlowDO=new WmsInboundItemFlowDO();
@@ -83,7 +80,7 @@ public class OutboundAgreeExecutor extends OutboundExecutor {
             newFlowDO.setInboundId(inboundItemDO.getInboundId());
             newFlowDO.setInboundItemId(inboundItemDO.getId());
             newFlowDO.setProductId(inboundItemDO.getProductId());
-            newFlowDO.setOutboundQty(qty);
+            newFlowDO.setOutboundQty(quantity);
             newFlowDO.setOutboundId(outboundId);
             newFlowDO.setOutboundItemId(outboundItemId);
             inboundItemFlowList.add(newFlowDO);

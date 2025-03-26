@@ -94,6 +94,9 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         // 保存出库单详情详情
         List<WmsOutboundItemDO> toInsetList = new ArrayList<>();
         StreamX.from(createReqVO.getItemList()).filter(Objects::nonNull).forEach(item -> {
+            if(item.getPlanQty()==null || item.getPlanQty()<=0) {
+                throw exception(OUTBOUND_ITEM_PLAN_QTY_ERROR);
+            }
             item.setId(null);
             // 设置归属
             item.setOutboundId(outbound.getId());
@@ -170,6 +173,9 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
             processAndValidateForOutbound(outbound, finalList);
             // 设置归属
             finalList.forEach(item -> {
+                if(item.getPlanQty()==null || item.getPlanQty()<=0) {
+                    throw exception(OUTBOUND_ITEM_PLAN_QTY_ERROR);
+                }
                 item.setOutboundStatus(OutboundStatus.NONE.getValue());
                 item.setOutboundId(updateReqVO.getId());
             });

@@ -151,30 +151,32 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
 
     private void processStockWarehouseItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO, WmsInboundItemRespVO inboundItemVO) {
 
+
         // 刷新库存
         Long warehouseId = pickup.getWarehouseId();
         Long productId = inboundItemVO.getProductId();
+        Integer quantity = pickupItemDO.getQty();
 
-        List<WmsStockBinDO> stockBinList = stockBinService.selectStockBin(warehouseId, productId);
+        //List<WmsStockBinDO> stockBinList = stockBinService.selectStockBin(warehouseId, productId);
 
-        Integer availableQuantity = 0;
-        Integer sellableQuantity = 0;
-
-        for (WmsStockBinDO wmsStockBinDO : stockBinList) {
-            availableQuantity += wmsStockBinDO.getAvailableQty();
-            sellableQuantity += wmsStockBinDO.getSellableQty();
-        }
+//        Integer availableQuantity = 0;
+//        Integer sellableQuantity = 0;
+//
+//        for (WmsStockBinDO wmsStockBinDO : stockBinList) {
+//            availableQuantity += wmsStockBinDO.getAvailableQty();
+//            sellableQuantity += wmsStockBinDO.getSellableQty();
+//        }
 
         WmsStockWarehouseDO stockWarehouseDO = stockWarehouseService.getByWarehouseIdAndProductId(warehouseId, productId);
 
-        stockWarehouseDO.setAvailableQty(availableQuantity);
-        stockWarehouseDO.setSellableQty(sellableQuantity);
-        stockWarehouseDO.setShelvingPendingQty(stockWarehouseDO.getShelvingPendingQty() - pickupItemDO.getQty());
+        stockWarehouseDO.setAvailableQty(stockWarehouseDO.getAvailableQty()+quantity);
+        stockWarehouseDO.setSellableQty(stockWarehouseDO.getSellableQty()+quantity);
+        stockWarehouseDO.setShelvingPendingQty(stockWarehouseDO.getShelvingPendingQty() - quantity);
 
         // 更新库存
         stockWarehouseService.insertOrUpdate(stockWarehouseDO);
         // 记录流水
-        stockFlowService.createForStockWarehouse(this.getReason(), productId, stockWarehouseDO, sellableQuantity, pickup.getId(), pickupItemDO.getId());
+        stockFlowService.createForStockWarehouse(this.getReason(), productId, stockWarehouseDO, quantity, pickup.getId(), pickupItemDO.getId());
     }
 
 

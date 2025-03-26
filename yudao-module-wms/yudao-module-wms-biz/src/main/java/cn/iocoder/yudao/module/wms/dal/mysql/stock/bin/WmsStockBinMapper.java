@@ -46,10 +46,11 @@ public interface WmsStockBinMapper extends BaseMapperX<WmsStockBinDO> {
         return selectOne(wrapper);
     }
 
-    default List<WmsStockBinDO> selectStockBin(Long warehouseId, Long productId) {
+    default List<WmsStockBinDO> selectStockBin(Long warehouseId,Long binId, Long productId) {
         LambdaQueryWrapperX<WmsStockBinDO> wrapper = new LambdaQueryWrapperX<>();
-        wrapper.eq(WmsStockBinDO::getWarehouseId, warehouseId);
-        wrapper.eq(WmsStockBinDO::getProductId, productId);
+        wrapper.eqIfPresent(WmsStockBinDO::getWarehouseId, warehouseId);
+        wrapper.eqIfPresent(WmsStockBinDO::getProductId, productId);
+        wrapper.eqIfPresent(WmsStockBinDO::getBinId, binId);
         return selectList(wrapper);
     }
 

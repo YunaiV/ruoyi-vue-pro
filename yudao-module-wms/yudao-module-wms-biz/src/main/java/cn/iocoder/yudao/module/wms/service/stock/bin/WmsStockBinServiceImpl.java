@@ -130,8 +130,8 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
     }
 
     @Override
-    public List<WmsStockBinDO> selectStockBin(Long warehouseId, Long productId) {
-        return stockBinMapper.selectStockBin(warehouseId, productId);
+    public List<WmsStockBinDO> selectStockBin(Long warehouseId, Long binId,Long productId) {
+        return stockBinMapper.selectStockBin(warehouseId, binId, productId);
     }
 
     @Override

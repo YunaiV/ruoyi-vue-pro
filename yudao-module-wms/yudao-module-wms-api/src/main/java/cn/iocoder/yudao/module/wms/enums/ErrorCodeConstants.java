@@ -43,6 +43,8 @@ public interface ErrorCodeConstants {
     ErrorCode INBOUND_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_004_008, "入库单不符合审批条件");
     ErrorCode INBOUND_CAN_NOT_DELETE = new ErrorCode(2_001_004_009, "入库单不允许删除");
     ErrorCode INBOUND_NOT_COMPLETE = new ErrorCode(2_001_004_010, "入库单未完全入库");
+    ErrorCode INBOUND_ITEM_PLAN_QTY_ERROR = new ErrorCode(2_001_004_020, "计划入库量错误");
+    ErrorCode INBOUND_ITEM_ACTUAL_QTY_ERROR = new ErrorCode(2_001_004_021, "实际入库量错误");
 
     // ========== WMS_INBOUND_ITEM 入库单详情表 2_001_005_000 ==========
     ErrorCode INBOUND_ITEM_NOT_EXISTS = new ErrorCode(2_001_005_001, "入库单详情不存在");
@@ -120,6 +122,8 @@ public interface ErrorCodeConstants {
     ErrorCode PICKUP_ITEM_INBOUND_ITEM_ID_WAREHOUSE_ID_NOT_SAME = new ErrorCode(2_001_013_007, "拣货仓库错误");
     ErrorCode PICKUP_ITEM_INBOUND_ITEM_ID_NOT_SAME = new ErrorCode(2_001_013_008, "拣货明细错误");
     ErrorCode INBOUND_ITEM_PICKUP_LEFT_QUANTITY_NOT_ENOUGH = new ErrorCode(2_001_013_008, "入库单明细的待上架库存不足");
+    ErrorCode PICKUP_ITEM_QTY_ERROR = new ErrorCode(2_001_013_009, "拣货数量错误");
+
 
     // ========== WMS_OUTBOUND_ITEM 出库单详情表 2_001_014_000 ==========
     ErrorCode OUTBOUND_ITEM_NOT_EXISTS = new ErrorCode(2_001_014_001, "出库单详情不存在");
@@ -140,4 +144,7 @@ public interface ErrorCodeConstants {
     ErrorCode OUTBOUND_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_015_007, "出库单不符合审批条件");
     ErrorCode OUTBOUND_ITEM_PRODUCT_ID_REPEATED = new ErrorCode(2_001_015_007, "出库单产品重复");
     ErrorCode OUTBOUND_ITEM_OUTBOUND_ID_DUPLICATE = new ErrorCode(2_001_015_008, "详情不是一个出库单");
-}
+    ErrorCode OUTBOUND_ITEM_PLAN_QTY_ERROR = new ErrorCode(2_001_015_009, "计划出库量错误");
+    ErrorCode OUTBOUND_ITEM_ACTUAL_QTY_ERROR = new ErrorCode(2_001_015_010, "实际出库量错误");
+
+}

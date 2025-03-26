@@ -95,6 +95,9 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         if (createReqVO.getItemList() != null) {
             List<WmsInboundItemDO> toInsetList = new ArrayList<>();
             StreamX.from(createReqVO.getItemList()).filter(Objects::nonNull).forEach(item -> {
+                if(item.getPlanQty()==null || item.getPlanQty()<=0) {
+                    throw exception(INBOUND_ITEM_PLAN_QTY_ERROR);
+                }
                 item.setId(null);
                 // 设置归属
                 item.setInboundId(inbound.getId());
@@ -151,6 +154,9 @@ public class WmsInboundServiceImpl implements WmsInboundService {
             }
             // 设置归属
             finalList.forEach(item -> {
+                if(item.getPlanQty()==null || item.getPlanQty()<=0) {
+                    throw exception(INBOUND_ITEM_PLAN_QTY_ERROR);
+                }
                 item.setInboundId(updateReqVO.getId());
                 item.setInboundStatus(InboundStatus.NONE.getValue());
                 item.setActualQty(0);

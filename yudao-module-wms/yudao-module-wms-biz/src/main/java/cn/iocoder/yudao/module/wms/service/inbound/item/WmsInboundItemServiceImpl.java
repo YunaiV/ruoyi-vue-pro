@@ -161,6 +161,9 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
         List<WmsInboundItemDO> inboundItemDOSInDB = inboundItemMapper.selectByIds(StreamX.from(updateReqVOList).toList(WmsInboundItemSaveReqVO::getId));
         for (WmsInboundItemDO itemDO : inboundItemDOSInDB) {
             WmsInboundItemSaveReqVO updateReqVO = updateReqVOMap.get(itemDO.getId());
+            if(updateReqVO.getActualQty()==null || updateReqVO.getActualQty()<=0) {
+                throw exception(INBOUND_ITEM_ACTUAL_QTY_ERROR);
+            }
             itemDO.setActualQty(updateReqVO.getActualQty());
         }
         // 保存

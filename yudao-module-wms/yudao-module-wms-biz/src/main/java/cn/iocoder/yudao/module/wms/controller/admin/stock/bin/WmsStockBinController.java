@@ -77,9 +77,9 @@ public class WmsStockBinController {
     @Parameter(name = "warehouseId", description = "仓库ID", required = true, example = "1024")
     @Parameter(name = "productId", description = "产品ID", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('wms:stock-bin:query')")
-    public CommonResult<List<WmsStockBinRespVO>> getStockBin(@RequestParam("warehouseId") Long warehouseId, @RequestParam("productId") Long productId) {
+    public CommonResult<List<WmsStockBinRespVO>> getStockBin(@RequestParam("warehouseId") Long warehouseId,@RequestParam("binId") Long binId, @RequestParam("productId") Long productId) {
         // 查询数据
-        List<WmsStockBinDO> stockBinList = stockBinService.selectStockBin(warehouseId, productId);
+        List<WmsStockBinDO> stockBinList = stockBinService.selectStockBin(warehouseId,binId, productId);
         // 转换
         List<WmsStockBinRespVO> stockBinVO = BeanUtils.toBean(stockBinList, WmsStockBinRespVO.class);
         // 返回
@@ -110,4 +110,4 @@ public class WmsStockBinController {
     // // 导出 Excel
     // ExcelUtils.write(response, "仓位库存.xls", "数据", WmsStockBinRespVO.class, BeanUtils.toBean(list, WmsStockBinRespVO.class));
     // }
-}
+}

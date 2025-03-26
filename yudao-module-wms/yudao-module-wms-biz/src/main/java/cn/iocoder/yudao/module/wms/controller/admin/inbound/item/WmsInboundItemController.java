@@ -89,26 +89,26 @@ public class WmsInboundItemController {
     // /**
     // * @sign : F0DA74F2E45ABE2D
     // */
-    // @GetMapping("/get")
-    // @Operation(summary = "获得入库单详情")
-    // @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    // @PreAuthorize("@ss.hasPermission('wms:inbound-item:query')")
-    // public CommonResult<WmsInboundItemRespVO> getInboundItem(@RequestParam("id") Long id) {
-    // // 查询数据
-    // WmsInboundItemDO inboundItem = inboundItemService.getInboundItem(id);
-    // if (inboundItem == null) {
-    // throw exception(INBOUND_ITEM_NOT_EXISTS);
-    // }
-    // // 转换
-    // WmsInboundItemRespVO inboundItemVO = BeanUtils.toBean(inboundItem, WmsInboundItemRespVO.class);
-    // // 人员姓名填充
-    // AdminUserApi.inst().prepareFill(List.of(inboundItemVO))
-    // .mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setCreatorName)
-    // .mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setUpdaterName)
-    // .fill();
-    // // 返回
-    // return success(inboundItemVO);
-    // }
+    @GetMapping("/get")
+    @Operation(summary = "获得入库单详情")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('wms:inbound-item:query')")
+    public CommonResult<WmsInboundItemRespVO> getInboundItem(@RequestParam("id") Long id) {
+        // 查询数据
+        WmsInboundItemDO inboundItem = inboundItemService.getInboundItem(id);
+        if (inboundItem == null) {
+            throw exception(INBOUND_ITEM_NOT_EXISTS);
+        }
+        // 转换
+        WmsInboundItemRespVO inboundItemVO = BeanUtils.toBean(inboundItem, WmsInboundItemRespVO.class);
+        // 人员姓名填充
+        AdminUserApi.inst().prepareFill(List.of(inboundItemVO))
+            .mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setCreatorName)
+            .mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setUpdaterName)
+            .fill();
+        // 返回
+        return success(inboundItemVO);
+    }
     // /**
     // * @sign : 83456B9A2BFF8F84
     // */
@@ -158,4 +158,4 @@ public class WmsInboundItemController {
     // // 导出 Excel
     // ExcelUtils.write(response, "入库单详情.xls", "数据", WmsInboundItemRespVO.class, BeanUtils.toBean(list, WmsInboundItemRespVO.class));
     // }
-}
+}

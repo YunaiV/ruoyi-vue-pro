@@ -57,7 +57,11 @@ public interface WmsStockBinService {
      */
     PageResult<WmsStockBinDO> getStockBinPage(WmsStockBinPageReqVO pageReqVO);
 
-    List<WmsStockBinDO> selectStockBin(Long warehouseId, Long productId);
+    List<WmsStockBinDO> selectStockBin(Long warehouseId,Long binId, Long productId);
+
+    default List<WmsStockBinDO> selectStockBin(Long warehouseId, Long productId){
+        return selectStockBin(warehouseId, null, productId);
+    }
 
     WmsStockBinDO getStockBin(Long binId, Long productId);
 

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundIt
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
+import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
 import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
 import cn.iocoder.yudao.module.wms.enums.stock.StockType;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,9 @@ public class WmsStockFlowServiceImpl implements WmsStockFlowService {
 
     @Resource
     private WmsStockFlowMapper stockFlowMapper;
+
+    @Resource
+    private WmsLockRedisDAO lockRedisDAO;
 
     /**
      * @sign : 5CDC0A12A8B023F4
@@ -175,36 +179,41 @@ public class WmsStockFlowServiceImpl implements WmsStockFlowService {
      * 创建仓库库存变化流水
      */
     public void createFor(StockReason reason, StockType stockType, Long stockId, Long warehouseId, Long productId, Integer quantity, Long reasonId, Long reasonItemId, Consumer<WmsStockFlowDO> consumer) {
-        // 校验本方法在事务中
-        JdbcUtils.requireTransaction();
-        // 获取上一个流水
-        WmsStockFlowDO lastStockFlowDO = this.getLastFlow(warehouseId, stockType.getValue(), stockId);
-        // 创建本次流水
-        WmsStockFlowDO stockFlowDO = new WmsStockFlowDO();
-        stockFlowDO.setWarehouseId(warehouseId);
-        stockFlowDO.setProductId(productId);
-        stockFlowDO.setStockType(stockType.getValue());
-        stockFlowDO.setStockId(stockId);
-        stockFlowDO.setReason(reason.getValue());
-        stockFlowDO.setReasonBillId(reasonId);
-        stockFlowDO.setReasonItemId(reasonItemId);
-        if (lastStockFlowDO != null) {
-            stockFlowDO.setPrevFlowId(lastStockFlowDO.getId());
-        } else {
-            stockFlowDO.setPrevFlowId(0L);
-        }
-        // 变更量
-        stockFlowDO.setDeltaQty(quantity);
-        consumer.accept(stockFlowDO);
-        // 
-        stockFlowDO.setFlowTime(new Timestamp(System.currentTimeMillis()));
-        // 保存
-        stockFlowMapper.insert(stockFlowDO);
-        // 关联前项流水
-        if (lastStockFlowDO != null) {
-            lastStockFlowDO.setNextFlowId(stockFlowDO.getId());
-            this.updateStockFlow(BeanUtils.toBean(lastStockFlowDO, WmsStockFlowSaveReqVO.class));
-        }
+
+        lockRedisDAO.lockFlow(warehouseId, stockType.getValue(), stockId,()->{
+
+            // 校验本方法在事务中
+            JdbcUtils.requireTransaction();
+            // 获取上一个流水
+            WmsStockFlowDO lastStockFlowDO = this.getLastFlow(warehouseId, stockType.getValue(), stockId);
+            // 创建本次流水
+            WmsStockFlowDO stockFlowDO = new WmsStockFlowDO();
+            stockFlowDO.setWarehouseId(warehouseId);
+            stockFlowDO.setProductId(productId);
+            stockFlowDO.setStockType(stockType.getValue());
+            stockFlowDO.setStockId(stockId);
+            stockFlowDO.setReason(reason.getValue());
+            stockFlowDO.setReasonBillId(reasonId);
+            stockFlowDO.setReasonItemId(reasonItemId);
+            if (lastStockFlowDO != null) {
+                stockFlowDO.setPrevFlowId(lastStockFlowDO.getId());
+            } else {
+                stockFlowDO.setPrevFlowId(0L);
+            }
+            // 变更量
+            stockFlowDO.setDeltaQty(quantity);
+            consumer.accept(stockFlowDO);
+            //
+            stockFlowDO.setFlowTime(new Timestamp(System.currentTimeMillis()));
+            // 保存
+            stockFlowMapper.insert(stockFlowDO);
+            // 关联前项流水
+            if (lastStockFlowDO != null) {
+                lastStockFlowDO.setNextFlowId(stockFlowDO.getId());
+                this.updateStockFlow(BeanUtils.toBean(lastStockFlowDO, WmsStockFlowSaveReqVO.class));
+            }
+
+        });
     }
 
     @Override

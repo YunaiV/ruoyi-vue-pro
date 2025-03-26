@@ -22,12 +22,17 @@ public class WmsLockRedisDAO {
     private static final String WMS_STOCK_WAREHOUSE_LOCK = "wms:stock-warehouse:lock:%d:%d";
     private static final String WMS_STOCK_BIN_LOCK = "wms:stock-bin:lock:%d:%d";
     private static final String WMS_STOCK_OWNER_LOCK = "wms:stock-owner:lock:%d:%d";
+    private static final String WMS_STOCK_FLOW_LOCK = "wms:stock-flow:lock:%d:%d:%d";
 
     @Resource
     private RedissonClient redissonClient;
 
 
 
+    public void lockFlow(Long warehouseId, Integer stockType, Long stockId,Runnable runnable) {
+        String key = formatKey(WMS_STOCK_FLOW_LOCK,warehouseId,Long.valueOf(stockType),stockId);
+        lock(key,runnable,8,8);
+    }
 
     /**
      * 仓库库存锁
