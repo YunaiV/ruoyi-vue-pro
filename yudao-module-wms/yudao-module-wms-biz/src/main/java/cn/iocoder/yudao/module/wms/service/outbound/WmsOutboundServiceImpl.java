@@ -247,22 +247,11 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     public void finishOutbound(WmsOutboundRespVO outboundRespVO) {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
-        int countOfNone = 0;
-        for (WmsOutboundItemRespVO respVO : outboundRespVO.getItemList()) {
-            if (InboundStatus.NONE.matchAny(respVO.getOutboundStatus())) {
-                countOfNone++;
-            }
-        }
-        if (countOfNone > 0) {
-            throw exception(INBOUND_NOT_COMPLETE);
-        }
         // 处理明细的出库状态
         List<WmsOutboundItemDO> itemList = BeanUtils.toBean(outboundRespVO.getItemList(), WmsOutboundItemDO.class);
         outboundItemMapper.updateBatch(itemList);
         // 处理入库单状态
         WmsOutboundDO outboundDO = BeanUtils.toBean(outboundRespVO, WmsOutboundDO.class);
-        outboundDO.setOutboundStatus(OutboundStatus.ALL.getValue());
-        outboundDO.setOutboundTime(LocalDateTime.now());
         outboundMapper.updateById(outboundDO);
     }
 

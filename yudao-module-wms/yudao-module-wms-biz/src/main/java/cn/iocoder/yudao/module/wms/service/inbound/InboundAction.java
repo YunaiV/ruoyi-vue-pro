@@ -44,7 +44,7 @@ public class InboundAction implements StateMachineConfigure<Integer, InboundAudi
     public static class Submit extends BaseInboundAction {
         public Submit() {
             // 指定事件以及前后的状态与状态提取器
-            super(InboundAuditStatus.DRAFT.getValue(), InboundAuditStatus.AUDITING.getValue(), WmsInboundDO::getAuditStatus, InboundAuditStatus.Event.SUBMIT);
+            super(new Integer[] {InboundAuditStatus.DRAFT.getValue(),InboundAuditStatus.REJECT.getValue()}, InboundAuditStatus.AUDITING.getValue(), WmsInboundDO::getAuditStatus, InboundAuditStatus.Event.SUBMIT);
         }
     }
 
@@ -115,9 +115,15 @@ public class InboundAction implements StateMachineConfigure<Integer, InboundAudi
         @Lazy
         protected WmsInboundService inboundService;
 
-        public BaseInboundAction(Integer from, Integer to, Function<WmsInboundDO, Integer> getter, InboundAuditStatus.Event event) {
+        public BaseInboundAction(Integer[] from, Integer to, Function<WmsInboundDO, Integer> getter, InboundAuditStatus.Event event) {
             super(from, to, getter, event);
         }
+
+        public BaseInboundAction(Integer from, Integer to, Function<WmsInboundDO, Integer> getter, InboundAuditStatus.Event event) {
+            super(new Integer[]{from}, to, getter, event);
+        }
+
+
 
         @Override
         public boolean when(ColaContext<WmsInboundDO> context) {

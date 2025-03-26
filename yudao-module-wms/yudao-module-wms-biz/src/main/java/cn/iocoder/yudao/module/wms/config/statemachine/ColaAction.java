@@ -4,6 +4,7 @@ import com.alibaba.cola.statemachine.Action;
 import com.alibaba.cola.statemachine.Condition;
 import lombok.Getter;
 
+import java.util.Arrays;
 import java.util.function.Function;
 
 /**
@@ -45,12 +46,13 @@ public abstract class ColaAction<S, E,D>  {
 
 
 
-    private final S from;
+    private final S[] from;
     private final S to;
     private final E event;
     private Function<D,S> getter;
 
-    public ColaAction(S from, S to, Function<D,S> getter, E event) {
+
+    public ColaAction(S[] from, S to, Function<D,S> getter, E event) {
         this.from = from;
         this.to = to;
         this.event = event;

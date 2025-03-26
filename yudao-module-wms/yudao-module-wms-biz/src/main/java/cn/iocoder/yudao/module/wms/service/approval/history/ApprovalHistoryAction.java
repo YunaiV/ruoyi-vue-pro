@@ -20,7 +20,7 @@ public abstract class ApprovalHistoryAction<E,D> extends ColaAction<Integer, E,D
     @Lazy
     protected WmsApprovalHistoryService approvalHistoryService;
 
-    public ApprovalHistoryAction(Integer from, Integer to, Function<D, Integer> getter, E event) {
+    public ApprovalHistoryAction(Integer[] from, Integer to, Function<D, Integer> getter, E event) {
         super(from, to, getter, event);
     }
     /**

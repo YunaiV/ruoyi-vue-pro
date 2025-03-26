@@ -8,9 +8,11 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundIt
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
+import cn.iocoder.yudao.module.wms.enums.outbound.OutboundStatus;
 import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -142,5 +144,15 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
         stockBinDO.setSellableQty(stockBinDO.getSellableQty() - quantity);
         // 待出库量
         stockBinDO.setOutboundPendingQty(stockBinDO.getOutboundPendingQty() + quantity);
+    }
+
+    @Override
+    protected void updateOutbound(WmsOutboundRespVO outboundRespVO) {
+        List<WmsOutboundItemRespVO> itemRespVOList=outboundRespVO.getItemList();
+        for (WmsOutboundItemRespVO itemRespVO : itemRespVOList) {
+            itemRespVO.setOutboundStatus(OutboundStatus.NONE.getValue());
+        }
+        outboundRespVO.setOutboundStatus(OutboundStatus.NONE.getValue());
+        outboundRespVO.setOutboundTime(LocalDateTime.now());
     }
 }

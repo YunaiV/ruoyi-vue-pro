@@ -49,7 +49,7 @@ public class OutboundAction implements StateMachineConfigure<Integer, OutboundAu
 
         public Submit() {
             // 指定事件以及前后的状态与状态提取器
-            super(OutboundAuditStatus.DRAFT.getValue(), OutboundAuditStatus.AUDITING.getValue(), WmsOutboundDO::getAuditStatus, OutboundAuditStatus.Event.SUBMIT);
+            super(new Integer[] {OutboundAuditStatus.DRAFT.getValue(),OutboundAuditStatus.REJECT.getValue()}, OutboundAuditStatus.AUDITING.getValue(), WmsOutboundDO::getAuditStatus, OutboundAuditStatus.Event.SUBMIT);
         }
 
         @Override
@@ -61,6 +61,7 @@ public class OutboundAction implements StateMachineConfigure<Integer, OutboundAu
             outboundSubmitExecutor.execute(outboundContext);
         }
     }
+
 
     /**
      * 同意
@@ -141,8 +142,12 @@ public class OutboundAction implements StateMachineConfigure<Integer, OutboundAu
         @Lazy
         protected WmsOutboundService outboundService;
 
-        public BaseOutboundAction(Integer from, Integer to, Function<WmsOutboundDO, Integer> getter, OutboundAuditStatus.Event event) {
+        public BaseOutboundAction(Integer[] from, Integer to, Function<WmsOutboundDO, Integer> getter, OutboundAuditStatus.Event event) {
             super(from, to, getter, event);
+        }
+
+        public BaseOutboundAction(Integer from, Integer to, Function<WmsOutboundDO, Integer> getter, OutboundAuditStatus.Event event) {
+            super(new Integer[] {from}, to, getter, event);
         }
 
         @Override

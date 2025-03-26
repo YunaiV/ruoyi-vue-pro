@@ -133,10 +133,10 @@ public class WmsOutboundItemController {
     // ExcelUtils.write(response, "出库单详情.xls", "数据", WmsOutboundItemRespVO.class, BeanUtils.toBean(list, WmsOutboundItemRespVO.class));
     // }
     @PutMapping("/update-actual-quantity")
-    @Operation(summary = "设置实际入库量")
+    @Operation(summary = "设置实际出库量")
     @PreAuthorize("@ss.hasPermission('wms:outbound-item:update')")
     public CommonResult<Boolean> updateActualQuantity(@Validated(ValidationGroup.update.class) @RequestBody List<WmsOutboundItemSaveReqVO> updateReqVOList) {
         outboundItemService.updateActualQuantity(updateReqVOList);
         return success(true);
     }
-}
+}

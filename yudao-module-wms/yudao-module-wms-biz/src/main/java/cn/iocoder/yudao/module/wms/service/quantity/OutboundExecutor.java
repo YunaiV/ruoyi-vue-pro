@@ -43,6 +43,13 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
         super(reason);
     }
 
+    protected abstract Integer getExecuteQuantity(WmsOutboundItemRespVO item);
+    protected abstract void updateStockWarehouseQty(WmsStockWarehouseDO stockWarehouseDO, Integer quantity);
+    protected abstract void processInboundItem(WmsOutboundRespVO outboundRespVO,Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId);
+    protected abstract void updateStockOwnershipQty(WmsStockOwnershipDO stockOwnershipDO, Integer quantity);
+    protected abstract void updateStockBinQty(WmsStockBinDO stockBinDO, Integer quantity);
+    protected abstract void updateOutbound(WmsOutboundRespVO outboundRespVO);
+
     @Override
     @Transactional
     public void execute(OutboundContext context) {
@@ -64,13 +71,9 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
             }
             // 执行入库的原子操作
             Integer quantity=getExecuteQuantity(item);
-            OutboundStatus outboundStatus = outboundSingleItemAtomically(outboundRespVO,companyId, deptId, warehouseId, item.getBinId(),productId, quantity, outboundRespVO.getId(), item.getId());
-            item.setOutboundStatus(outboundStatus.getValue());
-            if(outboundStatus!=OutboundStatus.NONE) {
-                //TODO  继续其它逻辑
-            }
-
+            outboundSingleItemAtomically(outboundRespVO,companyId, deptId, warehouseId, item.getBinId(),productId, quantity, outboundRespVO.getId(), item.getId());
         }
+        updateOutbound(outboundRespVO);
         // 完成最终的入库
         outboundService.finishOutbound(outboundRespVO);
 
@@ -106,11 +109,7 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
         return OutboundStatus.ALL;
     }
 
-    protected abstract Integer getExecuteQuantity(WmsOutboundItemRespVO item);
-    protected abstract void updateStockWarehouseQty(WmsStockWarehouseDO stockWarehouseDO, Integer quantity);
-    protected abstract void processInboundItem(WmsOutboundRespVO outboundRespVO,Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId);
-    protected abstract void updateStockOwnershipQty(WmsStockOwnershipDO stockOwnershipDO, Integer quantity);
-    protected abstract void updateStockBinQty(WmsStockBinDO stockBinDO, Integer quantity);
+
 
     /**
      * 在事务中执行出库操作
