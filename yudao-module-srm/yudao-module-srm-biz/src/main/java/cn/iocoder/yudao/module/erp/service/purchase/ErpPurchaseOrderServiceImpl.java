@@ -199,8 +199,9 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         if (SrmAuditStatus.APPROVED.getCode().equals(purchaseOrder.getAuditStatus())) {
             throw exception(PURCHASE_ORDER_UPDATE_FAIL_APPROVE, purchaseOrder.getNo());
         }
-        // 1.2 校验供应商
-        supplierService.validateSupplier(updateReqVO.getSupplierId());
+        if (ErpOffStatus.OPEN.getCode().equals(purchaseOrder.getAuditStatus()))
+            // 1.2 校验供应商
+            supplierService.validateSupplier(updateReqVO.getSupplierId());
         // 1.3 校验结算账户
         if (updateReqVO.getAccountId() != null) {
             erpAccountApi.validateAccount(updateReqVO.getAccountId());
@@ -593,7 +594,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     public void generateContract(ErpPurchaseOrderGenerateContractReqVO reqVO, HttpServletResponse response) {
         ErpPurchaseOrderDO orderDO = validatePurchaseOrderExists(reqVO.getOrderId());
         //1 从OSS拿到模板word
-        XWPFTemplate xwpfTemplate = purchaseOrderTemplateManager.getTemplate("classpath:purchase/order/%s".formatted(reqVO.getTemplateName()));
+        XWPFTemplate xwpfTemplate = purchaseOrderTemplateManager.getTemplate("purchase/order/%s".formatted(reqVO.getTemplateName()));
         //2 模板word渲染数据
         List<ErpPurchaseOrderItemDO> itemDOS = purchaseOrderItemMapper.selectListByOrderId(orderDO.getId());
         Map<Long, ErpFinanceSubjectDTO> dtoMap = convertMap(erpFinanceSubjectApi.validateFinanceSubject(List.of(reqVO.getPartyAId(), reqVO.getPartyBId())), ErpFinanceSubjectDTO::getId);

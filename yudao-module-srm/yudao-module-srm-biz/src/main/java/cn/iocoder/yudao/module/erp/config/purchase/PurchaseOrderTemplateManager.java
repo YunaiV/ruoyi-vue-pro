@@ -14,6 +14,10 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.erp.enums.SrmErrorCodeConstants.PURCHASE_ORDER_GENERATE_CONTRACT_FAIL;
+import static cn.iocoder.yudao.module.erp.enums.SrmErrorCodeConstants.PURCHASE_ORDER_GENERATE_CONTRACT_FAIL_PARSE;
+
 /**
  * 加载时间长-大概17S
  */
@@ -31,8 +35,8 @@ public class PurchaseOrderTemplateManager {
             try (InputStream stream = resourcePatternResolver.getResource("classpath:" + templateName).getInputStream()) {
                 return stream.readAllBytes();
             } catch (IOException e) {
-//                throw exception(PURCHASE_ORDER_GENERATE_CONTRACT_FAIL,templateName,e.getMessage());
-                throw new RuntimeException("加载模板失败: " + name, e);
+                throw exception(PURCHASE_ORDER_GENERATE_CONTRACT_FAIL, templateName, e.getCause().getMessage());
+//                throw new RuntimeException("加载模板失败: " + name, e);
             }
         });
 
@@ -42,8 +46,8 @@ public class PurchaseOrderTemplateManager {
             Configure config = Configure.builder().bind("products", policy).build();
             return XWPFTemplate.compile(input, config);
         } catch (IOException e) {
-
-            throw new RuntimeException("解析模板失败: " + templateName, e);
+            throw exception(PURCHASE_ORDER_GENERATE_CONTRACT_FAIL_PARSE, templateName, e.getCause().getMessage());
+//            throw new RuntimeException("解析模板失败: " + templateName, e);
         }
     }
 
