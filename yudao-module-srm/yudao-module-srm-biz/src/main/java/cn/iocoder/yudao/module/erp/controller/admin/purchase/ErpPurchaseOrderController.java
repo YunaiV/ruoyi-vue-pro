@@ -167,9 +167,8 @@ public class ErpPurchaseOrderController {
     @PostMapping("/generateContract")
     @Operation(summary = "生成采购合同")
     @PreAuthorize("@ss.hasPermission('erp:purchasereq-order:generateContract')")
-    public CommonResult<Boolean> generateContract(@Validated @RequestBody ErpPurchaseOrderGenerateContractReqVO reqVO, HttpServletResponse response) {
+    public void generateContract(@Validated @RequestBody ErpPurchaseOrderGenerateContractReqVO reqVO, HttpServletResponse response) {
         purchaseOrderService.generateContract(reqVO, response);
-        return success(true);
     }
 
     private List<ErpPurchaseOrderBaseRespVO> bindList(List<ErpPurchaseOrderDO> list) {
