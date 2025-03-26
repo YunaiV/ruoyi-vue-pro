@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.erp.config.purchase.in.impl.action.item;
 
 import cn.hutool.json.JSONUtil;
+import cn.iocoder.yudao.module.erp.api.purchase.SrmPayCountDTO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInItemDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseInItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseInMapper;
+import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseOrderItemMapper;
 import cn.iocoder.yudao.module.erp.enums.SrmEventEnum;
 import cn.iocoder.yudao.module.erp.enums.status.ErpPaymentStatus;
 import com.alibaba.cola.statemachine.Action;
@@ -15,8 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import static cn.iocoder.yudao.module.erp.enums.SrmStateMachines.PURCHASE_IN_PAYMENT_STATE_MACHINE;
+import java.math.BigDecimal;
 
+import static cn.iocoder.yudao.module.erp.enums.SrmStateMachines.PURCHASE_IN_PAYMENT_STATE_MACHINE;
+import static cn.iocoder.yudao.module.erp.enums.SrmStateMachines.PURCHASE_ORDER_ITEM_PAYMENT_STATE_MACHINE_NAME;
+
+/**
+ * 入库付款 -> 订单项付款状态机
+ */
 @Slf4j
 @Component
 public class ActionInPayItemImpl implements Action<ErpPaymentStatus, SrmEventEnum, ErpPurchaseInItemDO> {
@@ -24,8 +33,12 @@ public class ActionInPayItemImpl implements Action<ErpPaymentStatus, SrmEventEnu
     private ErpPurchaseInItemMapper mapper;
     @Resource(name = PURCHASE_IN_PAYMENT_STATE_MACHINE)
     private StateMachine<ErpPaymentStatus, SrmEventEnum, ErpPurchaseInDO> stateMachine;
+    @Resource(name = PURCHASE_ORDER_ITEM_PAYMENT_STATE_MACHINE_NAME)
+    private StateMachine<ErpPaymentStatus, SrmEventEnum, SrmPayCountDTO> purchaseOrderItemPaymentStateMachine;
     @Autowired
     private ErpPurchaseInMapper erpPurchaseInMapper;
+    @Autowired
+    private ErpPurchaseOrderItemMapper erpPurchaseOrderItemMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -36,7 +49,7 @@ public class ActionInPayItemImpl implements Action<ErpPaymentStatus, SrmEventEnu
         // 付款金额调整 - 动态状态
 //        if (event == SrmEventEnum.PAYMENT_ADJUSTMENT) {
 //            BigDecimal paymentPrice = inItemDO.getProductPrice(); // 已支付金额
-//            BigDecimal totalProductPrice = inItemDO.getTotalProductPrice(); // 合计产品金额
+//            BigDecimal totalProductPrice = inItemDO.getTotalPrice(); // 合计产品金额
 //
 //            if (paymentPrice.compareTo(totalProductPrice) >= 0) {
 //                // 完全支付
@@ -53,13 +66,31 @@ public class ActionInPayItemImpl implements Action<ErpPaymentStatus, SrmEventEnu
         // 更新数据库状态
         inItemDO.setPayStatus(to.getCode());
         mapper.updateById(inItemDO);
-        log.debug("付款状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
+        log.debug("入库子项付款状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
         //传递给主表状态机
         forwardMsg(inItemDO);
+        //传递给订单项状态机
+//        if (event == SrmEventEnum.COMPLETE_PAYMENT || event == SrmEventEnum.CANCEL_PAYMENT) {
+        //付款调整 传递
+        forwardPayMsg(inItemDO, event);
+//        }
+    }
+
+    private void forwardPayMsg(ErpPurchaseInItemDO inItemDO, SrmEventEnum event) {
+        Long orderItemId = inItemDO.getOrderItemId();
+        ErpPurchaseOrderItemDO orderItemDO = erpPurchaseOrderItemMapper.selectById(orderItemId);
+        BigDecimal totalPrice = inItemDO.getTotalPrice();//已付款金额
+
+        if (event == SrmEventEnum.CANCEL_PAYMENT) {
+            totalPrice = totalPrice.negate();//取反
+        }
+        purchaseOrderItemPaymentStateMachine.fireEvent(ErpPaymentStatus.fromCode(orderItemDO.getPayStatus()), SrmEventEnum.PAYMENT_ADJUSTMENT,
+            SrmPayCountDTO.builder().orderItemId(orderItemId).payCountDiff(totalPrice).build());
     }
 
     private void forwardMsg(ErpPurchaseInItemDO inItemDO) {
         ErpPurchaseInDO erpPurchaseInDO = erpPurchaseInMapper.selectById(inItemDO.getInId());
+        //付款调整->主表动态判断
         stateMachine.fireEvent(ErpPaymentStatus.fromCode(erpPurchaseInDO.getPayStatus()), SrmEventEnum.PAYMENT_ADJUSTMENT, erpPurchaseInDO);
     }
 

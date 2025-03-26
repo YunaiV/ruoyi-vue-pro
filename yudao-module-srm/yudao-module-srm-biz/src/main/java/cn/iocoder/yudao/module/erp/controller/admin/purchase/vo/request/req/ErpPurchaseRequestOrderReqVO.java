@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.request.req;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -21,6 +22,10 @@ public class ErpPurchaseRequestOrderReqVO {
     @NotNull(message = "项目列表不能为空")
     @Schema(description = "项目列表", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<requestItems> items;
+
+    @Schema(description = "订单币别名称")
+    @NotBlank(message = "订单币别名称不能为空")
+    private String currencyName;
 
     @Data
     public static class requestItems {

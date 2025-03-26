@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductUnitApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.erp.api.purchase.SrmInCountDTO;
+import cn.iocoder.yudao.module.erp.api.purchase.SrmPayCountDTO;
 import cn.iocoder.yudao.module.erp.api.purchase.TmsOrderCountDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseInSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.*;
@@ -102,7 +103,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     //    @Resource(name = PURCHASE_ORDER_ITEM_PURCHASE_STATE_MACHINE_NAME)
     //    StateMachine<ErpOrderStatus, SrmEventEnum, ErpPurchaseOrderItemDO> requestItemPurchaseMachine;
     @Resource(name = PURCHASE_ORDER_ITEM_PAYMENT_STATE_MACHINE_NAME)
-    StateMachine<ErpPaymentStatus, SrmEventEnum, ErpPurchaseOrderItemDO> requestItemPaymentMachine;
+    StateMachine<ErpPaymentStatus, SrmEventEnum, SrmPayCountDTO> requestItemPaymentMachine;
     @Resource(name = PURCHASE_ORDER_PAYMENT_STATE_MACHINE_NAME)
     StateMachine<ErpPaymentStatus, SrmEventEnum, ErpPurchaseOrderDO> purchaseOrderPaymentMachine;
     @Resource(name = PURCHASE_ORDER_EXECUTION_STATE_MACHINE_NAME)
@@ -157,7 +158,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
             //开关
             orderItemOffMachine.fireEvent(ErpOffStatus.OPEN, SrmEventEnum.OFF_INIT, orderItemDO);
             //付款
-            requestItemPaymentMachine.fireEvent(ErpPaymentStatus.NONE_PAYMENT, SrmEventEnum.PAYMENT_INIT, orderItemDO);
+            requestItemPaymentMachine.fireEvent(ErpPaymentStatus.NONE_PAYMENT, SrmEventEnum.PAYMENT_INIT, SrmPayCountDTO.builder().orderItemId(orderItemDO.getId()).build());
             //入库
             requestItemStorageMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, SrmEventEnum.STORAGE_INIT, SrmInCountDTO.builder().orderItemId(orderItemDO.getId()).inCount(orderItemDO.getCount()).build());
             //执行
@@ -559,8 +560,10 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void merge(ErpPurchaseOrderMergeReqVO reqVO) {
+
         //校验
-        for (Long itemId : reqVO.getItemIds()) {
+        for (ErpPurchaseOrderMergeReqVO.item item : reqVO.getItems()) {
+            Long itemId = item.getItemId();
             ErpPurchaseOrderItemDO aDo = validatePurchaseOrderItemExists(itemId);
             ErpPurchaseOrderDO order = getPurchaseOrder(aDo.getOrderId());
             //非已审核+非开启+非完全入库,异常
@@ -568,16 +571,21 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
             ThrowUtil.ifThrow(!Objects.equals(aDo.getOffStatus(), ErpOffStatus.OPEN.getCode()), PURCHASE_ORDER_ITEM_NOT_OPEN, itemId);
             ThrowUtil.ifThrow(!Objects.equals(aDo.getInStatus(), ErpStorageStatus.ALL_IN_STORAGE.getCode()), PURCHASE_ORDER_IN_ITEM_NOT_OPEN, itemId);
         }
-        List<ErpPurchaseOrderItemDO> orderItemDOS = purchaseOrderItemMapper.selectListByItemIds(reqVO.getItemIds());
+        List<Long> itemIds = reqVO.getItems().stream().map(ErpPurchaseOrderMergeReqVO.item::getItemId).collect(Collectors.toList());
+        List<ErpPurchaseOrderItemDO> orderItemDOS = purchaseOrderItemMapper.selectListByItemIds(itemIds);
         //转换
         ErpPurchaseInSaveReqVO vo = BeanUtils.toBean(reqVO, ErpPurchaseInSaveReqVO.class, saveReqVO -> {
-            saveReqVO.setNo(null).setItems(ErpOrderInConvert.INSTANCE.convertToErpPurchaseInSaveReqVOItems(orderItemDOS)).setId(null).setInTime(LocalDateTime.now());
+            saveReqVO
+                .setNo(null)
+                .setItems(ErpOrderInConvert.INSTANCE.convertToErpPurchaseInSaveReqVOItems(orderItemDOS))
+                .setId(null)
+                .setInTime(LocalDateTime.now());
         });
         //service持久化
         Long purchaseIn = purchaseInService.createPurchaseIn(vo);
         //修改采购单项的source = 合并入库
         List<ErpPurchaseInItemDO> itemDOS = erpPurchaseInItemMapper.selectListByInId(purchaseIn);
-        itemDOS.forEach(itemDO -> itemDO.setSource("采购合并"));
+        itemDOS.forEach(itemDO -> itemDO.setSource("合并入库"));
         erpPurchaseInItemMapper.updateBatch(itemDOS);
     }
 
@@ -613,9 +621,9 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
             // 写入响应
             Document document = new Document(inputStreamResult);
             document.save(out, SaveFormat.PDF);
-//            out.flush();
+            out.flush();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw exception(PURCHASE_ORDER_GENERATE_CONTRACT_FAIL_ERROR);
         }
     }
 

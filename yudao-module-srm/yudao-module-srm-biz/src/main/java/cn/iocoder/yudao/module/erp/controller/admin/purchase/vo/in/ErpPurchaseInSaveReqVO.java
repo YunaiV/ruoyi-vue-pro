@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.system.api.utils.Validation;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
@@ -85,69 +84,20 @@ public class ErpPurchaseInSaveReqVO {
         @Schema(description = "型号规格(产品带出)")
         private String model;
 
-        @Schema(description = "产品名称(快照)")
-        private String productName;
-
         @Schema(description = "采购订单项id", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "采购订单项id不能为空")
         private Long orderItemId;
 
-//        @Schema(description = "采购订单id", requiredMode = Schema.RequiredMode.REQUIRED)
-//        @NotNull(message = "采购订单编号不能为空")
-//        private Long orderId;
-//
-//        @Schema(description = "采购订单编号-展示用(源单单号,采购单)")
-//        @NotNull(message = "采购订单no不能为空")
-//        private String orderNo;
-
-        @Schema(description = "仓库编号", requiredMode = Schema.RequiredMode.REQUIRED)
-        @NotNull(message = "仓库编号不能为空")
-        private Long warehouseId;
-
-        @Schema(description = "产品单位(产品带出来)", requiredMode = Schema.RequiredMode.REQUIRED)
-        @NotNull(message = "产品单位单位不能为空")
-        private Long productUnitId;
-
-        @Schema(description = "产品单价")
-        private BigDecimal productPrice;
 
         @Schema(description = "入库数量", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "入库数量不能为空")
         private BigDecimal count;
-
-        @Schema(description = "税额，单位：元")
-        private BigDecimal taxPrice;
-
-        @Schema(description = "价税合计")
-        private BigDecimal allAmount;
-
-        @Schema(description = "增值税税率，百分比")
-        private BigDecimal taxPercent;
-
-        @Schema(description = "含税单价")
-        @DecimalMin(value = "0.00", message = "含税产品单价不能小于0")
-        private BigDecimal actTaxPrice;
-
-        @Schema(description = "币别ID,财务管理-币别维护")
-        private Long currencyId;
-
-        @Schema(description = "币别名称")
-        private String currencyName;
-
-        @Schema(description = "汇率,财务管理-币别维护")
-        private BigDecimal exchangeRate;
 
         @Schema(description = "备注")
         private String remark;
 
         @Schema(description = "单据来源描述")
         private String source;
-
-//        @Schema(description = "源单单号")
-//        private int srcNo;
-
-        @Schema(description = "箱率")
-        private String containerRate;
 
         @Schema(description = "申请人id")
         private Long applicantId;

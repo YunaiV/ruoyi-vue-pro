@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.returns;
 
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.base.ErpPurchaseBaseRespVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
@@ -130,10 +129,20 @@ public class ErpPurchaseReturnBaseRespVO extends ErpPurchaseBaseRespVO {
         @Schema(description = "仓库编号")
         private Long warehouseId;
 
-        @Schema(description = "产品id")
-        private Long productId;
+        @Schema(description = "报关品名(入库带出)")
+        private String declaredType;
 
-        @Schema(description = "产品单位单位")
+        @Schema(description = "产品sku(入库项带出)")
+        private String barCode;
+
+        @Schema(description = "产品名称(入库项带出)")
+        private String productName;
+
+        @Schema(description = "产品单位名称(入库项带出)")
+        private String productUnitName;
+
+        @Schema(description = "产品单位单位", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "产品单位单位不能为空")
         private Long productUnitId;
 
         @Schema(description = "产品单价", example = "100.00")
@@ -166,12 +175,6 @@ public class ErpPurchaseReturnBaseRespVO extends ErpPurchaseBaseRespVO {
 
         // ========== 关联字段 ==========
 
-        @Schema(description = "产品名称")
-        private String productName;
-        @Schema(description = "产品条码")
-        private String productBarCode;
-        @Schema(description = "产品单位名称")
-        private String productUnitName;
 
         @Schema(description = "库存数量")
         private BigDecimal stockCount; // 该字段仅仅在“详情”和“编辑”时使用
@@ -196,8 +199,6 @@ public class ErpPurchaseReturnBaseRespVO extends ErpPurchaseBaseRespVO {
         @Schema(description = "箱率")
         private String containerRate;
 
-        @Schema(description = "产品信息")
-        private ErpProductDTO product;
     }
 
 }

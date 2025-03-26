@@ -214,11 +214,26 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
             Optional.ofNullable(item.getOrderItemId()).ifPresent(orderItemId -> {
                 ErpPurchaseOrderItemDO orderItemDO = orderItemMap.get(orderItemId);
                 if (orderItemDO != null) {
+                    //TODO 后续可以直接返回订单项VO，不存储订单项相关属性
+                    //产品
+                    item.setProductId(orderItemDO.getProductId());
                     item.setProductName(orderItemDO.getProductName());
                     item.setProductUnitName(orderItemDO.getProductUnitName());
                     item.setBarCode(orderItemDO.getBarCode());
+                    item.setProductPrice(orderItemDO.getProductPrice());
+                    item.setTaxPrice(orderItemDO.getTaxPrice());
+                    item.setAllAmount(orderItemDO.getAllAmount());
+                    item.setExchangeRate(orderItemDO.getExchangeRate());
+                    item.setActTaxPrice(orderItemDO.getActTaxPrice());
+                    item.setContainerRate(orderItemDO.getContainerRate());
+                    item.setCurrencyId(orderItemDO.getCurrencyId());
                     //报关品名
                     item.setDeclaredType(orderItemDO.getDeclaredType());
+                    //币别名称
+                    item.setCurrencyId(orderItemDO.getCurrencyId());
+                    item.setCurrencyName(orderItemDO.getCurrencyName());
+                    //仓库
+                    item.setWarehouseId(orderItemDO.getWarehouseId());
                 }
             });
         }));

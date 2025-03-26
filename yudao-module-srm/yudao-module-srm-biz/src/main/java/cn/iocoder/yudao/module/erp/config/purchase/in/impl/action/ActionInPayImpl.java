@@ -74,7 +74,7 @@ public class ActionInPayImpl implements Action<ErpPaymentStatus, SrmEventEnum, E
         }
 
         erpPurchaseInMapper.updateById(erpPurchaseInDO.setPayStatus(to.getCode()));
-        log.debug("付款状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(erpPurchaseInDO), from.getDesc(), to.getDesc());
+        log.debug("入库主单付款状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(erpPurchaseInDO), from.getDesc(), to.getDesc());
     }
 
 }

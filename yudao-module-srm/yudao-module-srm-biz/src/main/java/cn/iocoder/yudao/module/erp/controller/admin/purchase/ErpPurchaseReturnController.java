@@ -158,14 +158,7 @@ public class ErpPurchaseReturnController {
             convertSet(list, purchaseReturn -> Long.parseLong(purchaseReturn.getCreator())));
         // 2. 开始拼接
         return BeanUtils.toBean(list, ErpPurchaseReturnBaseRespVO.class, purchaseReturn -> {
-            purchaseReturn.setItems(BeanUtils.toBean(purchaseReturnItemMap.get(purchaseReturn.getId()), ErpPurchaseReturnBaseRespVO.Item.class,
-                    item -> {
-                        MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
-                                .setProductBarCode(product.getBarCode())
-//                            .setProductUnitName(product.getUnitName())
-                                .setProduct(product)
-                        );
-                    }
+            purchaseReturn.setItems(BeanUtils.toBean(purchaseReturnItemMap.get(purchaseReturn.getId()), ErpPurchaseReturnBaseRespVO.Item.class
                 )
             );
             purchaseReturn.setProductNames(CollUtil.join(purchaseReturn.getItems(), "，", ErpPurchaseReturnBaseRespVO.Item::getProductName));

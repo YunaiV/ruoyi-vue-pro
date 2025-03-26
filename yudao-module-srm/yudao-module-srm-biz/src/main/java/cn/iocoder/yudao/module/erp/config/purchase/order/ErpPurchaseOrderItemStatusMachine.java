@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.erp.config.purchase.order;
 
 import cn.iocoder.yudao.module.erp.api.purchase.SrmInCountDTO;
+import cn.iocoder.yudao.module.erp.api.purchase.SrmPayCountDTO;
 import cn.iocoder.yudao.module.erp.config.BaseFailCallbackImpl;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.enums.SrmEventEnum;
@@ -27,12 +28,10 @@ public class ErpPurchaseOrderItemStatusMachine {
     @Resource
     private BaseFailCallbackImpl baseFailCallbackImpl;
 
-    
-
-
 
     @Resource
     private Action actionOrderItemOffImpl;
+
     //采购订单子项状态机
     @Bean(SrmStateMachines.PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME)
     public StateMachine<ErpOffStatus, SrmEventEnum, ErpPurchaseOrderItemDO> getPurchaseOrderItemStateMachine() {
@@ -68,6 +67,7 @@ public class ErpPurchaseOrderItemStatusMachine {
 
     @Resource
     private Action actionOrderItemExecuteImpl;
+
     // 采购订单子项执行状态机
     @Bean(SrmStateMachines.PURCHASE_ORDER_ITEM_EXECUTION_STATE_MACHINE_NAME)
     public StateMachine<ErpExecutionStatus, SrmEventEnum, ErpPurchaseOrderItemDO> getPurchaseOrderItemExecutionStateMachine() {
@@ -129,8 +129,7 @@ public class ErpPurchaseOrderItemStatusMachine {
 
     @Resource
     private Action actionOrderItemInImpl;
-    @Resource
-    private Action actionOrderItemPayImpl;
+
 
     @Bean(SrmStateMachines.PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME)
     public StateMachine<ErpStorageStatus, SrmEventEnum, SrmInCountDTO> buildPurchaseOrderItemStorageStateMachine() {
@@ -184,9 +183,12 @@ public class ErpPurchaseOrderItemStatusMachine {
         return builder.build(SrmStateMachines.PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME);
     }
 
+    @Resource
+    private Action actionOrderItemPayImpl;
+
     @Bean(SrmStateMachines.PURCHASE_ORDER_ITEM_PAYMENT_STATE_MACHINE_NAME)
-    public StateMachine<ErpPaymentStatus, SrmEventEnum, ErpPurchaseOrderItemDO> getPurchaseOrderItemPaymentStateMachine() {
-        StateMachineBuilder<ErpPaymentStatus, SrmEventEnum, ErpPurchaseOrderItemDO> builder = StateMachineBuilderFactory.create();
+    public StateMachine<ErpPaymentStatus, SrmEventEnum, SrmPayCountDTO> getPurchaseOrderItemPaymentStateMachine() {
+        StateMachineBuilder<ErpPaymentStatus, SrmEventEnum, SrmPayCountDTO> builder = StateMachineBuilderFactory.create();
 
         // 初始化付款状态
         builder.internalTransition()

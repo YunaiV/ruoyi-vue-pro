@@ -24,19 +24,19 @@ public interface ErpOrderInConvert {
     /**
      * 采购项转换成采购入库单vo
      *
-     * @param oldItem 采购项
+     * @param orderItemDO 采购项
      * @return 入库项vo
      */
-    default ErpPurchaseInSaveReqVO.Item convertToErpPurchaseInSaveReqVOItem(@Param("oldItem") ErpPurchaseOrderItemDO oldItem) {
-        if (oldItem == null) {
+    default ErpPurchaseInSaveReqVO.Item convertToErpPurchaseInSaveReqVOItem(@Param("orderItemDO") ErpPurchaseOrderItemDO orderItemDO) {
+        if (orderItemDO == null) {
             return null;
         }
-        ErpPurchaseInSaveReqVO.Item target = new ErpPurchaseInSaveReqVO.Item();
-        BeanUtils.copyProperties(oldItem, target); // 复制相同属性
-        target.setId(null); // 创建时 ID 需要为 null
-        target.setSource("采购项合并入库"); // 单据来源，默认写死
-//        target.setOrderId(oldItem.getOrderId()); // 订单编号转 int 作为源单号
-        return target;
+        ErpPurchaseInSaveReqVO.Item inVOItem = new ErpPurchaseInSaveReqVO.Item();
+        BeanUtils.copyProperties(orderItemDO, inVOItem); // 复制相同属性
+        inVOItem.setId(null); // 创建时 ID 需要为 null
+        inVOItem.setSource("采购项合并入库"); // 单据来源，默认写死
+//        inVOItem.setOrderId(orderItemDO.getOrderId()); // 订单编号转 int 作为源单号
+        return inVOItem;
     }
 
     // 批量转换方法

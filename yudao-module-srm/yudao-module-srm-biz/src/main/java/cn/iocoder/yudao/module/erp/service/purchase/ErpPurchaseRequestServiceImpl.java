@@ -208,6 +208,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
             item.setErpPurchaseRequestItemNo(aDo.getNo());
             item.setApplicantId(aDo.getApplicantId());//申请人
             item.setApplicationDeptId(aDo.getApplicationDeptId());//申请部门
+            item.setCurrencyName(reqVO.getCurrencyName());//订单币别名称
         });
 
         //2.0 构造VO入参类

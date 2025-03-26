@@ -121,6 +121,10 @@ public class ErpPurchaseOrderItemDO extends TenantBaseDO {
      * 应付款余额，查询时显示，新增时无需填写
      */
     private BigDecimal payableBalance;
+    /**
+     * 已付款金额
+     */
+    private BigDecimal payPrice;
     // ========== 采购入库 ==========
     /**
      * 采购入库数量

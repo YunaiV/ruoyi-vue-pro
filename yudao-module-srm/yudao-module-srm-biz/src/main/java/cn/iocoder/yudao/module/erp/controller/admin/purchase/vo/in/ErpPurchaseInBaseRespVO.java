@@ -156,5 +156,17 @@ public class ErpPurchaseInBaseRespVO extends ErpPurchaseBaseRespVO {
 
         @Schema(description = "采购订单编号-展示用(源单单号,采购单)")
         private String orderNo;
+
+        @Schema(description = "报关品名")
+        private String declaredType;
+
+        @Schema(description = "条码")
+        private String barCode;
+
+        @Schema(description = "产品名称")
+        private String productName;
+
+        @Schema(description = "产品单位名称")
+        private String productUnitName;
     }
 }

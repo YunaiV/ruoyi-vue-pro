@@ -200,6 +200,9 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
         @Schema(description = "供应商付款条款")
         private String supplierRule;
 
+        @Schema(description = "已付款金额")
+        private BigDecimal payPrice;
+
         // ========== 采购入库 ==========
         //待入库数量
         @Schema(description = "待入库数量")
