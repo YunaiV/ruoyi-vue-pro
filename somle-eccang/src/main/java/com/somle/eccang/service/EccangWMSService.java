@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import com.somle.eccang.model.EccangResponse;
 import com.somle.eccang.model.EccangWMSResponse;
 import com.somle.eccang.model.EccangWMSToken;
+import com.somle.eccang.model.req.EccangAsnListReqVo;
 import com.somle.eccang.model.req.EccangSpecialOrdersReqVo;
 import com.somle.eccang.repository.EccangWMSTokenRepository;
 import jakarta.annotation.PostConstruct;
@@ -23,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import java.util.stream.Stream;
 
 
@@ -63,8 +63,24 @@ public class EccangWMSService {
         );
     }
 
+    public Stream<EccangResponse.EccangPage> streamAsnList(EccangAsnListReqVo eccangAsnListReqVo) {
+        String endpoint = "getAsnList";
+        return StreamX.iterate(
+            getPage(JsonUtilsX.toJSONObject(eccangAsnListReqVo), endpoint),
+            page -> page.hasNext(),
+            page -> {
+                eccangAsnListReqVo.setPage(page.getPage() + 1);
+                return getPage(JsonUtilsX.toJSONObject(eccangAsnListReqVo), endpoint);
+            }
+        );
+    }
+
     private EccangResponse.EccangPage getPage(JSONObject payload, String endpoint) {
         EccangWMSResponse response = getResponse(payload, endpoint);
+        //当没有数据时,直接返回空页,否则下边会转换报错
+        if (response.getData().isEmpty()) {
+            return EccangResponse.EccangPage.builder().total(0).totalCount(0).data(null).build();
+        }
         EccangResponse.EccangPage page = response.getEccangPage();
         return page;
     }
