@@ -8,7 +8,6 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
-import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.stock.WmsWarehouseApi;
 import cn.iocoder.yudao.module.erp.api.stock.dto.ErpWarehouseDTO;
 import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.order.*;
@@ -54,7 +53,6 @@ public class ErpPurchaseOrderController {
     private final ErpPurchaseOrderService purchaseOrderService;
     private final ErpSupplierService supplierService;
     private final WmsWarehouseApi wmsWarehouseApi;
-    private final ErpProductApi erpProductApi;
     private final AdminUserApi adminUserApi;
     private final DeptApi deptApi;
     //    warehouse

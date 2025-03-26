@@ -55,8 +55,8 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
     private ErpProductService productService;
     @Resource
     private ErpCustomerService customerService;
-    @Resource
-    private ErpAccountService accountService;
+//    @Resource
+//    private ErpAccountService accountService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -70,7 +70,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
         customerService.validateCustomer(createReqVO.getCustomerId());
         // 1.3 校验结算账户
         if (createReqVO.getAccountId() != null) {
-            accountService.validateAccount(createReqVO.getAccountId());
+//            accountService.validateAccount(createReqVO.getAccountId());
         }
         // 1.4 校验销售人员
         if (createReqVO.getSaleUserId() != null) {
@@ -103,7 +103,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
         customerService.validateCustomer(updateReqVO.getCustomerId());
         // 1.3 校验结算账户
         if (updateReqVO.getAccountId() != null) {
-            accountService.validateAccount(updateReqVO.getAccountId());
+//            accountService.validateAccount(updateReqVO.getAccountId());
         }
         // 1.4 校验销售人员
         if (updateReqVO.getSaleUserId() != null) {
