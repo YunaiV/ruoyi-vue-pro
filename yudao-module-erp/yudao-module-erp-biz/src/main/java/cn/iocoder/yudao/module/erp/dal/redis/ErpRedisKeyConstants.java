@@ -24,8 +24,4 @@ public interface ErpRedisKeyConstants {
      */
     String PRODUCT_LIST = "erp:product_list:";
 
-    /**
-     * 财务主体集合的缓存
-     */
-    String FINANCE_SUBJECT_LIST = "erp:erp_finance_subject:list";
 }

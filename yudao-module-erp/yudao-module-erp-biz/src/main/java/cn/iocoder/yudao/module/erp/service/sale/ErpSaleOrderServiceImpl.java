@@ -15,7 +15,6 @@ import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleOrderItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleOrderMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
-import cn.iocoder.yudao.module.erp.service.finance.ErpAccountService;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
@@ -79,11 +78,11 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
         }
         // 1.5 生成订单号，并校验唯一性
         String no = noRedisDAO.generate(ErpNoRedisDAO.SALE_ORDER_NO_PREFIX, SALE_ORDER_NO_OUT_OF_BOUNDS);
-        ThrowUtil.ifThrow(saleOrderMapper.selectByNo(no) != null ,SALE_ORDER_NO_EXISTS);
+        ThrowUtil.ifThrow(saleOrderMapper.selectByNo(no) != null, SALE_ORDER_NO_EXISTS);
 
         // 2.1 插入订单
         ErpSaleOrderDO saleOrder = BeanUtils.toBean(createReqVO, ErpSaleOrderDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PENDING_REVIEW.getCode()));
+            .setNo(no).setStatus(ErpAuditStatus.PENDING_REVIEW.getCode()));
         calculateTotalPrice(saleOrder, saleOrderItems);
         saleOrderMapper.insert(saleOrder);
         // 2.2 插入订单项
@@ -155,7 +154,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
 
         // 2. 更新状态
         int updateCount = saleOrderMapper.updateByIdAndStatus(id, saleOrder.getStatus(),
-                new ErpSaleOrderDO().setStatus(status));
+            new ErpSaleOrderDO().setStatus(status));
         if (updateCount == 0) {
             throw exception(approve ? SALE_ORDER_APPROVE_FAIL : SALE_ORDER_PROCESS_FAIL);
         }
@@ -164,7 +163,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
     private List<ErpSaleOrderItemDO> validateSaleOrderItems(List<ErpSaleOrderSaveReqVO.Item> list) {
         // 1. 校验产品存在
         List<ErpProductDO> productList = productService.validProductList(
-                convertSet(list, ErpSaleOrderSaveReqVO.Item::getProductId));
+            convertSet(list, ErpSaleOrderSaveReqVO.Item::getProductId));
         Map<Long, ErpProductDO> productMap = convertMap(productList, ErpProductDO::getId);
         // 2. 转化为 ErpSaleOrderItemDO 列表
         return convertList(list, o -> BeanUtils.toBean(o, ErpSaleOrderItemDO.class, item -> {
@@ -183,7 +182,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
         // 第一步，对比新老数据，获得添加、修改、删除的列表
         List<ErpSaleOrderItemDO> oldList = saleOrderItemMapper.selectListByOrderId(id);
         List<List<ErpSaleOrderItemDO>> diffList = diffList(oldList, newList, // id 不同，就认为是不同的记录
-                (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
+            (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
 
         // 第二步，批量添加、修改、删除
         if (CollUtil.isNotEmpty(diffList.get(0))) {
@@ -209,7 +208,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
             }
             if (outCount.compareTo(item.getCount()) > 0) {
                 throw exception(SALE_ORDER_ITEM_OUT_FAIL_PRODUCT_EXCEED,
-                        productService.getProduct(item.getProductId()).getName(), item.getCount());
+                    productService.getProduct(item.getProductId()).getName(), item.getCount());
             }
             saleOrderItemMapper.updateById(new ErpSaleOrderItemDO().setId(item.getId()).setOutCount(outCount));
         });
@@ -229,7 +228,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
             }
             if (returnCount.compareTo(item.getOutCount()) > 0) {
                 throw exception(SALE_ORDER_ITEM_RETURN_FAIL_OUT_EXCEED,
-                        productService.getProduct(item.getProductId()).getName(), item.getOutCount());
+                    productService.getProduct(item.getProductId()).getName(), item.getOutCount());
             }
             saleOrderItemMapper.updateById(new ErpSaleOrderItemDO().setId(item.getId()).setReturnCount(returnCount));
         });
