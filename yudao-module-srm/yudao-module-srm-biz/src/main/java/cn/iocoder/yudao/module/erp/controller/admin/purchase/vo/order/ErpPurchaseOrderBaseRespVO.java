@@ -129,6 +129,13 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
     @Schema(description = "合计税额，单位：元")
     private BigDecimal totalTaxPrice;
 
+    @Schema(description = "币别id(财务管理-币别维护)")
+    private Long currencyId;
+
+    @Schema(description = "币别名称")
+    @NotBlank(message = "币别名称不能为空")
+    private String currencyName;
+
     @Schema(description = "附件地址")
     private String fileUrl;
 

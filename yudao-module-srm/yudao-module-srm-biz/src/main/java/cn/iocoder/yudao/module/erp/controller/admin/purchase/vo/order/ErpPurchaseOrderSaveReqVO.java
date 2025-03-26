@@ -37,7 +37,13 @@ public class ErpPurchaseOrderSaveReqVO {
 
     @Schema(description = "结算日期")
     private LocalDateTime settlementDate;
+    
+    @Schema(description = "币别id(财务管理-币别维护)")
+    private Long currencyId;
 
+    @Schema(description = "币别名称")
+    @NotBlank(message = "币别名称不能为空")
+    private String currencyName;
     //收获地址
     @Schema(description = "收获地址")
     private String address;
