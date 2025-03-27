@@ -45,6 +45,7 @@ public interface ErrorCodeConstants {
     ErrorCode INBOUND_NOT_COMPLETE = new ErrorCode(2_001_004_010, "入库单未完全入库");
     ErrorCode INBOUND_ITEM_PLAN_QTY_ERROR = new ErrorCode(2_001_004_020, "计划入库量错误");
     ErrorCode INBOUND_ITEM_ACTUAL_QTY_ERROR = new ErrorCode(2_001_004_021, "实际入库量错误");
+    ErrorCode INBOUND_AUDIT_ERROR = new ErrorCode(2_001_004_022, "出库单审批状态错误");
 
     // ========== WMS_INBOUND_ITEM 入库单详情表 2_001_005_000 ==========
     ErrorCode INBOUND_ITEM_NOT_EXISTS = new ErrorCode(2_001_005_001, "入库单详情不存在");
@@ -133,6 +134,7 @@ public interface ErrorCodeConstants {
     ErrorCode OUTBOUND_ITEM_CAN_NOT_DELETE = new ErrorCode(2_001_014_005, "出库单详情不允许删除");
     ErrorCode OUTBOUND_ITEM_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_014_006, "出库单详情不符合审批条件");
     ErrorCode OUTBOUND_WAREHOUSE_ERROR = new ErrorCode(2_001_014_007, "出库仓库错误");
+    ErrorCode OUTBOUND_AUDIT_ERROR = new ErrorCode(2_001_014_008, "出库单审批状态错误");
 
     // ========== WMS_OUTBOUND 出库单 2_001_015_000 ==========
     ErrorCode OUTBOUND_NOT_EXISTS = new ErrorCode(2_001_015_001, "出库单不存在");

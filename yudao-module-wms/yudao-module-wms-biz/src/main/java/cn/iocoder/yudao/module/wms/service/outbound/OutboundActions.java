@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_AUDIT_ERROR;
+
 /**
  * @author: LeeFJ
  * @date: 2025/3/19 10:00
@@ -153,7 +156,7 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
         String fromAuditStatusNames = StrUtils.join(StreamX.from(fromAuditStatusList).toSet(OutboundAuditStatus::getLabel));
         // 组装消息
         String message=String.format(AUDIT_ERROR_MESSAGE,currStatus.getLabel(),fromAuditStatusNames,event.getLabel());
-        throw new IllegalStateException(message);
+        throw exception(OUTBOUND_AUDIT_ERROR,message);
 
     }
 

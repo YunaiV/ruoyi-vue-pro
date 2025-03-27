@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_AUDIT_ERROR;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_NOT_EXISTS;
 
 /**
@@ -141,7 +142,7 @@ public class InboundActions implements StateMachineConfigure<Integer, InboundAud
         String fromAuditStatusNames = StrUtils.join(StreamX.from(fromAuditStatusList).toSet(InboundAuditStatus::getLabel));
         // 组装消息
         String message=String.format(AUDIT_ERROR_MESSAGE,currStatus.getLabel(),fromAuditStatusNames,event.getLabel());
-        throw new IllegalStateException(message);
+        throw exception(INBOUND_AUDIT_ERROR,message);
     }
 
     /**
