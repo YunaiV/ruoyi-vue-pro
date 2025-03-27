@@ -1,6 +1,5 @@
 package com.somle.eccang.model;
 
-import cn.hutool.core.annotation.Alias;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;

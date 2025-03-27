@@ -16,12 +16,13 @@ public class EccangAsnListDataJob extends EccangDataJob {
     @Override
     public String execute(String param) throws Exception {
         setDate(param);
-        eccangWMSService.streamAsnList(EccangAsnListReqVo.builder()
+        var VO = EccangAsnListReqVo.builder()
             .modifyDateFrom(beforeYesterdayFirstSecond.toString())
             .modifyDateTo(beforeYesterdayLastSecond.toString())
             .page(1)
             .pageSize(100)
-            .build()).forEach(page -> {
+            .build();
+        eccangWMSService.streamAsnList(VO).forEach(page -> {
             OssData data = OssData.builder()
                 .database(DATABASE)
                 .tableName("asn_list")
