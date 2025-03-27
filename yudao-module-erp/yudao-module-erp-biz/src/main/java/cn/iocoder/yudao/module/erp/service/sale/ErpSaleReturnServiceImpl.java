@@ -17,7 +17,6 @@ import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleReturnMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.stock.ErpStockRecordBizTypeEnum;
-import cn.iocoder.yudao.module.erp.service.finance.ErpAccountService;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpStockRecordService;
 import cn.iocoder.yudao.module.erp.service.stock.bo.ErpStockRecordCreateReqBO;
@@ -62,8 +61,8 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     private ErpSaleOrderService saleOrderService;
-    @Resource
-    private ErpAccountService accountService;
+    //    @Resource
+//    private ErpAccountService accountService;
     @Resource
     private ErpStockRecordService stockRecordService;
 
@@ -78,19 +77,19 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
         // 1.2 校验退货项的有效性
         List<ErpSaleReturnItemDO> saleReturnItems = validateSaleReturnItems(createReqVO.getItems());
         // 1.3 校验结算账户
-        accountService.validateAccount(createReqVO.getAccountId());
+//        accountService.validateAccount(createReqVO.getAccountId());
         // 1.4 校验销售人员
         if (createReqVO.getSaleUserId() != null) {
             adminUserApi.validateUser(createReqVO.getSaleUserId());
         }
         // 1.5 生成退货单号，并校验唯一性
         String no = noRedisDAO.generate(ErpNoRedisDAO.SALE_RETURN_NO_PREFIX, SALE_RETURN_NO_OUT_OF_BOUNDS);
-        ThrowUtil.ifThrow(saleReturnMapper.selectByNo(no) != null ,SALE_RETURN_NO_EXISTS);
+        ThrowUtil.ifThrow(saleReturnMapper.selectByNo(no) != null, SALE_RETURN_NO_EXISTS);
 
         // 2.1 插入退货
         ErpSaleReturnDO saleReturn = BeanUtils.toBean(createReqVO, ErpSaleReturnDO.class, in -> in
                 .setNo(no).setStatus(ErpAuditStatus.PENDING_REVIEW.getCode()))
-                .setOrderNo(saleOrder.getNo()).setCustomerId(saleOrder.getCustomerId());
+            .setOrderNo(saleOrder.getNo()).setCustomerId(saleOrder.getCustomerId());
         calculateTotalPrice(saleReturn, saleReturnItems);
         saleReturnMapper.insert(saleReturn);
         // 2.2 插入退货项
@@ -113,7 +112,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
         // 1.2 校验销售订单已审核
         ErpSaleOrderDO saleOrder = saleOrderService.validateSaleOrder(updateReqVO.getOrderId());
         // 1.3 校验结算账户
-        accountService.validateAccount(updateReqVO.getAccountId());
+//        accountService.validateAccount(updateReqVO.getAccountId());
         // 1.4 校验销售人员
         if (updateReqVO.getSaleUserId() != null) {
             adminUserApi.validateUser(updateReqVO.getSaleUserId());
@@ -123,7 +122,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
 
         // 2.1 更新退货
         ErpSaleReturnDO updateObj = BeanUtils.toBean(updateReqVO, ErpSaleReturnDO.class)
-                .setOrderNo(saleOrder.getNo()).setCustomerId(saleOrder.getCustomerId());
+            .setOrderNo(saleOrder.getNo()).setCustomerId(saleOrder.getCustomerId());
         calculateTotalPrice(updateObj, saleReturnItems);
         saleReturnMapper.updateById(updateObj);
         // 2.2 更新退货项
@@ -155,7 +154,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
         List<ErpSaleReturnDO> saleReturns = saleReturnMapper.selectListByOrderId(orderId);
         // 1.2 查询对应的销售订单项的退货数量
         Map<Long, BigDecimal> returnCountMap = saleReturnItemMapper.selectOrderItemCountSumMapByReturnIds(
-                convertList(saleReturns, ErpSaleReturnDO::getId));
+            convertList(saleReturns, ErpSaleReturnDO::getId));
         // 2. 更新销售订单的出库数量
         saleOrderService.updateSaleOrderReturnCount(orderId, returnCountMap);
     }
@@ -177,7 +176,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
 
         // 2. 更新状态
         int updateCount = saleReturnMapper.updateByIdAndStatus(id, saleReturn.getStatus(),
-                new ErpSaleReturnDO().setStatus(status));
+            new ErpSaleReturnDO().setStatus(status));
         if (updateCount == 0) {
             throw exception(approve ? SALE_RETURN_APPROVE_FAIL : SALE_RETURN_PROCESS_FAIL);
         }
@@ -185,12 +184,12 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
         // 3. 变更库存
         List<ErpSaleReturnItemDO> saleReturnItems = saleReturnItemMapper.selectListByReturnId(id);
         Integer bizType = approve ? ErpStockRecordBizTypeEnum.SALE_RETURN.getType()
-                : ErpStockRecordBizTypeEnum.SALE_RETURN_CANCEL.getType();
+            : ErpStockRecordBizTypeEnum.SALE_RETURN_CANCEL.getType();
         saleReturnItems.forEach(saleReturnItem -> {
             BigDecimal count = approve ? saleReturnItem.getCount() : saleReturnItem.getCount().negate();
             stockRecordService.createStockRecord(new ErpStockRecordCreateReqBO(
-                    saleReturnItem.getProductId(), saleReturnItem.getWarehouseId(), count,
-                    bizType, saleReturnItem.getReturnId(), saleReturnItem.getId(), saleReturn.getNo()));
+                saleReturnItem.getProductId(), saleReturnItem.getWarehouseId(), count,
+                bizType, saleReturnItem.getReturnId(), saleReturnItem.getId(), saleReturn.getNo()));
         });
     }
 
@@ -209,7 +208,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
     private List<ErpSaleReturnItemDO> validateSaleReturnItems(List<ErpSaleReturnSaveReqVO.Item> list) {
         // 1. 校验产品存在
         List<ErpProductDO> productList = productService.validProductList(
-                convertSet(list, ErpSaleReturnSaveReqVO.Item::getProductId));
+            convertSet(list, ErpSaleReturnSaveReqVO.Item::getProductId));
         Map<Long, ErpProductDO> productMap = convertMap(productList, ErpProductDO::getId);
         // 2. 转化为 ErpSaleReturnItemDO 列表
         return convertList(list, o -> BeanUtils.toBean(o, ErpSaleReturnItemDO.class, item -> {
@@ -228,7 +227,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
         // 第一步，对比新老数据，获得添加、修改、删除的列表
         List<ErpSaleReturnItemDO> oldList = saleReturnItemMapper.selectListByReturnId(id);
         List<List<ErpSaleReturnItemDO>> diffList = diffList(oldList, newList, // id 不同，就认为是不同的记录
-                (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
+            (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
 
         // 第二步，批量添加、修改、删除
         if (CollUtil.isNotEmpty(diffList.get(0))) {

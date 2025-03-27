@@ -168,7 +168,7 @@ logging:
     root: info
 erp:
   template:
-    preload-list: purchase/order/采购合同模板.docx #模板并行预热
+    preload-list: "purchase/order/采购合同模板.docx" #模板并行预热
 
 --- #################### 微信公众号相关配置 ####################
 wx: # 参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-starters/wx-java-mp-spring-boot-starter/README.md 文档

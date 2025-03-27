@@ -1,23 +1,28 @@
 package cn.iocoder.yudao.module.erp.config.purchase;
 
+import com.aspose.words.Document;
+import com.aspose.words.SaveFormat;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.config.ConfigureBuilder;
 import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.erp.enums.SrmErrorCodeConstants.PURCHASE_ORDER_GENERATE_CONTRACT_FAIL;
@@ -25,8 +30,8 @@ import static cn.iocoder.yudao.module.erp.enums.SrmErrorCodeConstants.PURCHASE_O
 
 @Slf4j
 @Component
+//@Profile("prod")
 public class PurchaseOrderTemplateManager {
-
     @Autowired
     private ResourcePatternResolver resourcePatternResolver;
     // 多策略标签：products, services, packages
@@ -77,16 +82,36 @@ public class PurchaseOrderTemplateManager {
     }
 
     /**
-     * 应用启动时预加载模板（支持多个）
+     * 启动后自动预加载模板（异步并行）
      */
-    @PostConstruct
-    public void preloadDefaultTemplates() {
-        preloadTemplateList.parallelStream().forEach(templateName -> {
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void preloadTemplates() {
+        log.info("开始预热 Word 模板：{}", preloadTemplateList);
+        long wordStart = System.currentTimeMillis();
+        preloadTemplateList.parallelStream().forEach(template -> {
             try {
-                getTemplate(templateName);
+                getTemplate(template);
             } catch (Exception e) {
-                log.error("预加载采购合同模板失败: {}", templateName, e);
+                log.error("⚠️ 模板预热失败（已忽略）：{}", template, e);
             }
         });
+
+        if (!preloadTemplateList.isEmpty()) {
+            String firstTemplate = preloadTemplateList.get(0);
+            if (templateCache.containsKey(firstTemplate)) {
+                Executors.newSingleThreadExecutor().submit(() -> {
+                    long start = System.currentTimeMillis();
+                    try (InputStream input = new ByteArrayInputStream(templateCache.get(firstTemplate))) {
+                        Document doc = new Document(input);
+                        doc.save(new ByteArrayOutputStream(), SaveFormat.PDF);
+                        log.info("✅ PDF 引擎预热完成，耗时 {}ms", System.currentTimeMillis() - start);
+                    } catch (Exception e) {
+                        log.warn("PDF 引擎预热失败", e);
+                    }
+                });
+            }
+        }
+        log.info("Word 模板预热流程完成, 耗时{}ms", System.currentTimeMillis() - wordStart);
     }
 }

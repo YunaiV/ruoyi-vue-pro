@@ -63,6 +63,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     private final ErpPurchaseInItemMapper purchaseInItemMapper;
     private final ErpProductApi erpProductApi;
     private final SrmNoRedisDAO noRedisDAO;
+    @Resource
     private final ErpAccountApi erpAccountApi;
     private final ErpPurchaseOrderItemMapper orderItemMapper;
     @Resource
