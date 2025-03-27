@@ -17,7 +17,6 @@ import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleReturnMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
 import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.stock.ErpStockRecordBizTypeEnum;
-import cn.iocoder.yudao.module.erp.service.finance.ErpAccountService;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpStockRecordService;
 import cn.iocoder.yudao.module.erp.service.stock.bo.ErpStockRecordCreateReqBO;
@@ -62,8 +61,8 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     private ErpSaleOrderService saleOrderService;
-    @Resource
-    private ErpAccountService accountService;
+//    @Resource
+//    private ErpAccountService accountService;
     @Resource
     private ErpStockRecordService stockRecordService;
 
@@ -78,7 +77,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
         // 1.2 校验退货项的有效性
         List<ErpSaleReturnItemDO> saleReturnItems = validateSaleReturnItems(createReqVO.getItems());
         // 1.3 校验结算账户
-        accountService.validateAccount(createReqVO.getAccountId());
+//        accountService.validateAccount(createReqVO.getAccountId());
         // 1.4 校验销售人员
         if (createReqVO.getSaleUserId() != null) {
             adminUserApi.validateUser(createReqVO.getSaleUserId());
@@ -113,7 +112,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
         // 1.2 校验销售订单已审核
         ErpSaleOrderDO saleOrder = saleOrderService.validateSaleOrder(updateReqVO.getOrderId());
         // 1.3 校验结算账户
-        accountService.validateAccount(updateReqVO.getAccountId());
+//        accountService.validateAccount(updateReqVO.getAccountId());
         // 1.4 校验销售人员
         if (updateReqVO.getSaleUserId() != null) {
             adminUserApi.validateUser(updateReqVO.getSaleUserId());

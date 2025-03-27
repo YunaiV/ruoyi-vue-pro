@@ -1,18 +1,17 @@
 package cn.iocoder.yudao.module.erp.config.purchase.returned;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.erp.config.purchase.request.ErpPurchaseRequestStatusMachine;
-import cn.iocoder.yudao.module.erp.config.purchase.request.impl.BaseConditionImpl;
-import cn.iocoder.yudao.module.erp.config.purchase.request.impl.action.ActionAuditImpl;
-import cn.iocoder.yudao.module.erp.config.purchase.request.impl.action.ActionOffImpl;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseRequestDO;
-import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseRequestMapper;
-import cn.iocoder.yudao.module.erp.enums.ErpStateMachines;
-import cn.iocoder.yudao.module.erp.enums.SrmEventEnum;
 import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
-import cn.iocoder.yudao.module.erp.enums.status.ErpOffStatus;
-import cn.iocoder.yudao.module.erp.enums.status.ErpOrderStatus;
+import cn.iocoder.yudao.module.srm.config.purchase.request.ErpPurchaseRequestStatusMachine;
+import cn.iocoder.yudao.module.srm.config.purchase.request.impl.BaseConditionImpl;
+import cn.iocoder.yudao.module.srm.config.purchase.request.impl.action.ActionAuditImpl;
+import cn.iocoder.yudao.module.srm.config.purchase.request.impl.action.ActionOffImpl;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpPurchaseOrderDO;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpPurchaseRequestDO;
+import cn.iocoder.yudao.module.srm.dal.mysql.purchase.ErpPurchaseRequestMapper;
+import cn.iocoder.yudao.module.srm.enums.SrmEventEnum;
+import cn.iocoder.yudao.module.srm.enums.status.ErpOffStatus;
+import cn.iocoder.yudao.module.srm.enums.status.ErpOrderStatus;
 import com.alibaba.cola.statemachine.StateMachine;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +21,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 
+import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME;
+import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME;
+
 @Slf4j
 @ComponentScan(value = "cn.iocoder.yudao.module.erp")
 @ContextConfiguration(classes = {ErpPurchaseRequestStatusMachine.class})
@@ -30,12 +32,12 @@ class ErpPurchaseReturnedStatusMachineTest extends BaseDbUnitTest {
 
     @Resource
     ErpPurchaseRequestMapper mapper;
-//    @Resource(name = ErpStateMachines.PURCHASE_REQUEST_AUDIT_STATE_MACHINE_NAME)
+    //    @Resource(name = ErpStateMachines.PURCHASE_REQUEST_AUDIT_STATE_MACHINE_NAME)
     StateMachine<ErpAuditStatus, SrmEventEnum, ErpPurchaseRequestDO> auditMachine;
-    @Resource(name = ErpStateMachines.PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME)
+    @Resource(name = PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME)
     StateMachine<ErpOffStatus, SrmEventEnum, ErpPurchaseRequestDO> offMachine;
 
-    @Resource(name = ErpStateMachines.PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME)
+    @Resource(name = PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME)
     StateMachine<ErpOrderStatus, SrmEventEnum, ErpPurchaseRequestDO> orderMachine;
 
     @BeforeAll
