@@ -80,9 +80,11 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     private final SrmNoRedisDAO noRedisDAO;
     private final ErpSupplierService supplierService;
     private final ErpPurchaseInService purchaseInService;
+    @Resource
     private final ErpAccountApi erpAccountApi;
     private final ErpProductApi erpProductApi;
     private final ErpProductUnitApi erpProductUnitApi;
+    @Resource
     private final ErpFinanceSubjectApi erpFinanceSubjectApi;
     private final ResourcePatternResolver resourcePatternResolver;
     private final PurchaseOrderTemplateManager purchaseOrderTemplateManager;

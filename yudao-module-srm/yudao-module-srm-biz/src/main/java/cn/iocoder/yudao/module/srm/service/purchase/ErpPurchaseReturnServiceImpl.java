@@ -58,6 +58,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
     private final ErpPurchaseInMapper inMapper;
     private final ErpPurchaseOrderItemMapper orderItemMapper;
     private final ErpProductApi erpProductApi;
+    @Resource
     private final ErpAccountApi erpAccountApi;
 
     @Resource(name = PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME)

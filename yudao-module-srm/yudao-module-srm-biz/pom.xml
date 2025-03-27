@@ -95,12 +95,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-fms-api</artifactId>
-            <version>${revision}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>com.deepoove</groupId>
             <artifactId>poi-tl</artifactId>
         </dependency>
@@ -108,7 +102,12 @@
             <groupId>com.luhuiguo</groupId>
             <artifactId>aspose-words</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-fms-api</artifactId>
+            <version>${revision}</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>

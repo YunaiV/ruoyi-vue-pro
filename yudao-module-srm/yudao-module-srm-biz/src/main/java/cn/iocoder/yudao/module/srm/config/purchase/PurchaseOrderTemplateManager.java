@@ -30,8 +30,8 @@ import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PURCHASE_O
 
 @Slf4j
 @Component
+//@Profile("prod")
 public class PurchaseOrderTemplateManager {
-
     @Autowired
     private ResourcePatternResolver resourcePatternResolver;
     // 多策略标签：products, services, packages

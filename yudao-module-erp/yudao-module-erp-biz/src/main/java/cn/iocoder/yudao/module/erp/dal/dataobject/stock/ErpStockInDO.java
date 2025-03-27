@@ -36,9 +36,8 @@ public class ErpStockInDO extends BaseDO {
     private String no;
     /**
      * 供应商编号
-     *
-     * 关联 {@link cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO#getId()}
      */
+//     * 关联 {@link cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpSupplierDO#getId()}
     private Long supplierId;
     /**
      * 入库时间
@@ -54,7 +53,7 @@ public class ErpStockInDO extends BaseDO {
     private BigDecimal totalPrice;
     /**
      * 状态
-     *
+     * <p>
      * 枚举 {@link ErpAuditStatus}
      */
     private Integer status;
