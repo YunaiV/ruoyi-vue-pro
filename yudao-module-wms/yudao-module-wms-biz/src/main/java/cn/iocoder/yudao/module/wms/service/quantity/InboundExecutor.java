@@ -78,7 +78,7 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
         AtomicReference<InboundStatus> status = new AtomicReference<>();
-        lockRedisDAO.lockStockLevels(warehouseId, productId, () -> {
+        lockRedisDAO.lockStockLevels(warehouseId, 0L,companyId,deptId, productId, () -> {
             try {
                 InboundStatus inboundStatus = this.processItem(companyId, deptId, warehouseId, productId, planQuantity,actualQuantity, inboundId, inboundItemId);
                 status.set(inboundStatus);

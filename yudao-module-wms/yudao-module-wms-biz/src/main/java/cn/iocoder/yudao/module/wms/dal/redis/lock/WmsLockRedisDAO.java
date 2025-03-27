@@ -20,7 +20,7 @@ public class WmsLockRedisDAO {
 
 
     private static final String WMS_STOCK_WAREHOUSE_LOCK = "wms:stock-warehouse:lock:%d:%d";
-    private static final String WMS_STOCK_BIN_LOCK = "wms:stock-bin:lock:%d:%d";
+    private static final String WMS_STOCK_BIN_LOCK = "wms:stock-bin:lock:%d:%d:%d";
     private static final String WMS_STOCK_OWNER_LOCK = "wms:stock-owner:lock:%d:%d";
     private static final String WMS_STOCK_FLOW_LOCK = "wms:stock-flow:lock:%d:%d:%d";
 
@@ -37,9 +37,23 @@ public class WmsLockRedisDAO {
     /**
      * 仓库库存锁
      **/
-    public void lockStockLevels(Long warehouseId, Long productId, Runnable runnable) {
+    public void lockStockLevels(Long warehouseId,Long productId, Runnable runnable) {
+        lockStockLevels(warehouseId,0L,0L,0L, productId,runnable);
+    }
+
+    /**
+     * 仓库库存锁
+     **/
+    public void lockStockLevels(Long warehouseId,Long productId, Long binId , Runnable runnable) {
+        lockStockLevels(warehouseId,binId,0L,0L, productId,runnable);
+    }
+
+    /**
+     * 仓库库存锁
+     **/
+    public void lockStockLevels(Long warehouseId, Long binId , Long companyId, Long deptId ,Long productId, Runnable runnable) {
         String warehouseLockKey = formatKey(WMS_STOCK_WAREHOUSE_LOCK,warehouseId,productId);
-        String binLockKey = formatKey(WMS_STOCK_BIN_LOCK,warehouseId,productId);
+        String binLockKey = formatKey(WMS_STOCK_BIN_LOCK,warehouseId,binId,productId);
         String ownerLockKey = formatKey(WMS_STOCK_OWNER_LOCK,warehouseId,productId);
 
         // 给仓指定仓库与产品库存加锁

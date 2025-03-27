@@ -86,7 +86,7 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
         AtomicReference<OutboundStatus> status = new AtomicReference<>();
-        lockRedisDAO.lockStockLevels(warehouseId, productId, () -> {
+        lockRedisDAO.lockStockLevels(warehouseId,binId, companyId, deptId, productId, () -> {
             try {
                 OutboundStatus outboundStatus=this.processItem(outboundRespVO,item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
                 status.set(outboundStatus);

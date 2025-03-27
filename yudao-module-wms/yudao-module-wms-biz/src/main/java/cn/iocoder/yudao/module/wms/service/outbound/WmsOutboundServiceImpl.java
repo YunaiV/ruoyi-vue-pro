@@ -129,7 +129,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
             if (stockBinDO == null) {
                 throw exception(STOCK_BIN_NOT_EXISTS);
             }
-            if (stockBinDO.getAvailableQty() < itemDO.getPlanQty()) {
+            if (stockBinDO.getSellableQty() < itemDO.getPlanQty()) {
                 throw exception(STOCK_BIN_NOT_ENOUGH);
             }
         }

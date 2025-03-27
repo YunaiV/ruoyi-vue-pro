@@ -55,9 +55,9 @@ public class OutboundFinishExecutor extends OutboundExecutor {
         Integer actualQty=item.getActualQty();
 
         // 可用量
-        stockWarehouseDO.setAvailableQty(stockWarehouseDO.getAvailableQty() + actualQty);
+        stockWarehouseDO.setAvailableQty(stockWarehouseDO.getAvailableQty() - actualQty);
         // 可售量
-        stockWarehouseDO.setSellableQty(stockWarehouseDO.getSellableQty() + quantity);
+        stockWarehouseDO.setSellableQty(stockWarehouseDO.getSellableQty() - quantity);
         // 待出库量
         stockWarehouseDO.setOutboundPendingQty(stockWarehouseDO.getOutboundPendingQty() - actualQty);
     }
@@ -100,7 +100,7 @@ public class OutboundFinishExecutor extends OutboundExecutor {
     protected void updateStockOwnershipQty(WmsStockOwnershipDO stockOwnershipDO, WmsOutboundItemRespVO item, Integer quantity) {
         Integer actualQty=item.getActualQty();
         // 可用量
-        stockOwnershipDO.setAvailableQty(stockOwnershipDO.getAvailableQty() + actualQty);
+        stockOwnershipDO.setAvailableQty(stockOwnershipDO.getAvailableQty() - actualQty);
         // 待出库量
         stockOwnershipDO.setOutboundPendingQty(stockOwnershipDO.getOutboundPendingQty() - actualQty);
     }
@@ -111,7 +111,7 @@ public class OutboundFinishExecutor extends OutboundExecutor {
         // 可用库存
         stockBinDO.setAvailableQty(stockBinDO.getAvailableQty() - actualQty);
         // 可售库存
-        stockBinDO.setSellableQty(stockBinDO.getSellableQty() + quantity);
+        stockBinDO.setSellableQty(stockBinDO.getSellableQty() - quantity);
         // 待出库量
         stockBinDO.setOutboundPendingQty(stockBinDO.getOutboundPendingQty() - actualQty);
     }

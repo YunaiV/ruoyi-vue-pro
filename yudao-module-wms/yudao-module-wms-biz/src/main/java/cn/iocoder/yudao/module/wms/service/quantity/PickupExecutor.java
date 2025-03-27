@@ -81,7 +81,7 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
             pickupItemDO.setProductId(inboundItemVO.getProductId());
             pickupItemDO.setPickupId(pickup.getId());
             // 调整仓位库存
-            lockRedisDAO.lockStockLevels(pickup.getWarehouseId(), pickupItemDO.getProductId(), () -> {
+            lockRedisDAO.lockStockLevels(pickup.getWarehouseId(),pickupItemDO.getBinId(), pickupItemDO.getProductId(), () -> {
                 this.processItem(pickup, pickupItemDO, inboundMap.get(inboundItemVO.getInboundId()), inboundItemVO);
             });
             inboundItemService.updateById(BeanUtils.toBean(inboundItemVO, WmsInboundItemDO.class));
