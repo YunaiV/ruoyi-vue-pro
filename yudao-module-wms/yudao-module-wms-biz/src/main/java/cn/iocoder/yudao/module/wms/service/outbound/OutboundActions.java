@@ -95,13 +95,12 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
         }
     }
 
+
     /**
      * 拒绝
      **/
     @Component
     public static class RejectAction extends BaseOutboundAction {
-
-
 
         @Resource
         private OutboundRejectExecutor outboundRejectExecutor;
@@ -120,7 +119,6 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
             outboundRejectExecutor.execute(outboundContext);
         }
     }
-
 
 
     /**
