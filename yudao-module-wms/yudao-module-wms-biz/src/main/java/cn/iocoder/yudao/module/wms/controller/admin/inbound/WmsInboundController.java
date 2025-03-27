@@ -97,6 +97,14 @@ public class WmsInboundController {
         return success(true);
     }
 
+    @PutMapping("/abandon")
+    @Operation(summary = "作废")
+    @PreAuthorize("@ss.hasPermission('wms:inbound:abandon')")
+    public CommonResult<Boolean> abandon(@RequestBody WmsApprovalReqVO approvalReqVO) {
+        inboundService.approve(InboundAuditStatus.Event.ABANDON, approvalReqVO);
+        return success(true);
+    }
+
     @DeleteMapping("/delete")
     @Operation(summary = "删除入库单")
     @Parameter(name = "id", description = "编号", required = true)
@@ -149,4 +157,4 @@ public class WmsInboundController {
         // 导出 Excel
         ExcelUtils.write(response, "入库单.xls", "数据", WmsInboundRespVO.class, BeanUtils.toBean(list, WmsInboundRespVO.class));
     }
-}
+}

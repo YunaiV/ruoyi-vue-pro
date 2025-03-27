@@ -71,6 +71,10 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
             if (inboundItemVO == null) {
                 throw exception(INBOUND_ITEM_NOT_EXISTS);
             }
+            // 拣货量不能大于入库量
+            if(pickupItemDO.getQty()> inboundItemVO.getActualQty()) {
+                throw exception(INBOUND_ITEM_ACTUAL_QTY_ERROR);
+            }
             // 设置已拣货量
             pickupItemDO.setInboundId(inboundItemVO.getInboundId());
             pickupItemDO.setInboundItemId(inboundItemVO.getId());
@@ -168,9 +172,11 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
 //        }
 
         WmsStockWarehouseDO stockWarehouseDO = stockWarehouseService.getByWarehouseIdAndProductId(warehouseId, productId);
-
+        // 可用
         stockWarehouseDO.setAvailableQty(stockWarehouseDO.getAvailableQty()+quantity);
+        // 可售
         stockWarehouseDO.setSellableQty(stockWarehouseDO.getSellableQty()+quantity);
+        // 待上架
         stockWarehouseDO.setShelvingPendingQty(stockWarehouseDO.getShelvingPendingQty() - quantity);
 
         // 更新库存

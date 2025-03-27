@@ -81,7 +81,7 @@ public class InboundActions implements StateMachineConfigure<Integer, InboundAud
         private InboundExecutor inboundExecutor;
 
         public AgreeAction() {
-            // 指定事件以及前后的状态与状态提取器
+            // 指定事件以及前后的状态与状态值提取器
             super(InboundAuditStatus.AUDITING.getValue(), InboundAuditStatus.PASS.getValue(), WmsInboundDO::getAuditStatus, InboundAuditStatus.Event.AGREE);
         }
 
@@ -96,14 +96,32 @@ public class InboundActions implements StateMachineConfigure<Integer, InboundAud
         }
     }
 
+
+
     /**
      * 拒绝
      **/
     @Component
     public static class RejectAction extends BaseInboundAction {
         public RejectAction() {
-            // 指定事件以及前后的状态与状态提取器
+            // 指定事件以及前后的状态与状态值提取器
             super(InboundAuditStatus.AUDITING.getValue(), InboundAuditStatus.REJECT.getValue(), WmsInboundDO::getAuditStatus, InboundAuditStatus.Event.REJECT);
+        }
+    }
+
+
+    /**
+     * 作废
+     **/
+    @Component
+    public static class AbandonAction extends BaseInboundAction {
+        public AbandonAction() {
+            // 指定事件以及前后的状态与状态值提取器
+            super(new Integer[] {
+                InboundAuditStatus.DRAFT.getValue(),
+                InboundAuditStatus.REJECT.getValue(),
+                InboundAuditStatus.AUDITING.getValue()
+            }, InboundAuditStatus.ABANDONED.getValue(), WmsInboundDO::getAuditStatus, InboundAuditStatus.Event.REJECT);
         }
     }
 

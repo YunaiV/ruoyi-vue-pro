@@ -57,6 +57,10 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
                 ErpProductRespSimpleVO productVO = item.getProduct();
                 deptId = productVO.getDeptId();
             }
+            // 如果实际量未填，则按计划量入库
+            if(item.getActualQty()==null) {
+                item.setActualQty(item.getPlanQty());
+            }
             // 执行入库的原子操作
             InboundStatus inboundStatus = inboundSingleItemAtomically(companyId, deptId, warehouseId, productId, item.getActualQty(), inboundRespVO.getId(), item.getId());
             item.setInboundStatus(inboundStatus.getValue());
