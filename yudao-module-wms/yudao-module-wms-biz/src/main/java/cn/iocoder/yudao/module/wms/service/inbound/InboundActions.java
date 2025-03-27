@@ -37,27 +37,31 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_
  */
 @Slf4j
 @Configuration
-public class InboundAction implements StateMachineConfigure<Integer, InboundAuditStatus.Event, ColaContext<WmsInboundDO>>,FailCallback<Integer, InboundAuditStatus.Event, ColaContext<WmsInboundDO>> {
+public class InboundActions implements StateMachineConfigure<Integer, InboundAuditStatus.Event, ColaContext<WmsInboundDO>>,FailCallback<Integer, InboundAuditStatus.Event, ColaContext<WmsInboundDO>> {
 
     /**
      * 状态机名称
      **/
     public static final String STATE_MACHINE_NAME = "inboundActionStateMachine";
+    /**
+     * 错误消息
+     **/
     public static final String AUDIT_ERROR_MESSAGE = "审核错误，当前入库单状态为%s，在%s状态时才允许%s";
 
     /**
      * 提交
      **/
     @Component
-    public static class Submit extends BaseInboundAction {
-        public Submit() {
-            // 指定事件以及前后的状态与状态提取器
+    public static class SubmitAction extends BaseInboundAction {
+
+        public SubmitAction() {
+            // 指定事件以及前后的状态与状态值提取器
             super(new Integer[] {InboundAuditStatus.DRAFT.getValue(),InboundAuditStatus.REJECT.getValue()}, InboundAuditStatus.AUDITING.getValue(), WmsInboundDO::getAuditStatus, InboundAuditStatus.Event.SUBMIT);
         }
 
         @Override
         public boolean when(ColaContext<WmsInboundDO> context) {
-            // 检查是否有入库单明细
+            // 检查是否有入库单明细条数
             WmsInboundRespVO inbound = inboundService.getInboundWithItemList(context.data().getId());
             if(CollectionUtils.isEmpty(inbound.getItemList())) {
                 throw exception(INBOUND_ITEM_NOT_EXISTS);
@@ -70,12 +74,12 @@ public class InboundAction implements StateMachineConfigure<Integer, InboundAudi
      * 同意
      **/
     @Component
-    public static class Agree extends BaseInboundAction {
+    public static class AgreeAction extends BaseInboundAction {
 
         @Resource
         private InboundExecutor inboundExecutor;
 
-        public Agree() {
+        public AgreeAction() {
             // 指定事件以及前后的状态与状态提取器
             super(InboundAuditStatus.AUDITING.getValue(), InboundAuditStatus.PASS.getValue(), WmsInboundDO::getAuditStatus, InboundAuditStatus.Event.AGREE);
         }
@@ -95,26 +99,25 @@ public class InboundAction implements StateMachineConfigure<Integer, InboundAudi
      * 拒绝
      **/
     @Component
-    public static class Reject extends BaseInboundAction {
-        public Reject() {
+    public static class RejectAction extends BaseInboundAction {
+        public RejectAction() {
             // 指定事件以及前后的状态与状态提取器
             super(InboundAuditStatus.AUDITING.getValue(), InboundAuditStatus.REJECT.getValue(), WmsInboundDO::getAuditStatus, InboundAuditStatus.Event.REJECT);
         }
-
     }
-
 
 
     /**
      * 状态机
      **/
-    @Bean(InboundAction.STATE_MACHINE_NAME)
+    @Bean(InboundActions.STATE_MACHINE_NAME)
     public StateMachineWrapper<Integer, InboundAuditStatus.Event, WmsInboundDO> inboundActionStateMachine() {
-        //
+        // 创建状态机构建器
         StateMachineBuilder<Integer, InboundAuditStatus.Event, ColaContext<WmsInboundDO>> builder = StateMachineBuilderFactory.create();
+        // 初始化状态机状态
         Map<Integer, List<Integer>> conditionMap = this.initActions(builder, BaseInboundAction.class,this);
-
-        StateMachineWrapper<Integer, InboundAuditStatus.Event, WmsInboundDO> machine=new StateMachineWrapper<>(builder.build(InboundAction.STATE_MACHINE_NAME), WmsInboundDO::getAuditStatus);
+        // 创建状态机
+        StateMachineWrapper<Integer, InboundAuditStatus.Event, WmsInboundDO> machine=new StateMachineWrapper<>(builder.build(InboundActions.STATE_MACHINE_NAME), WmsInboundDO::getAuditStatus);
         // 设置允许的基本操作
         machine.setInitStatus(InboundAuditStatus.DRAFT.getValue());
         machine.setStatusCanEdit(Arrays.asList(InboundAuditStatus.DRAFT.getValue(), InboundAuditStatus.REJECT.getValue()));
@@ -125,6 +128,9 @@ public class InboundAction implements StateMachineConfigure<Integer, InboundAudi
     }
 
 
+    /**
+     * 状态机失败情况的处理
+     **/
     @Override
     public void onFail(Integer to, InboundAuditStatus.Event event, ColaContext<WmsInboundDO> context) {
         // 当前状态
@@ -169,6 +175,7 @@ public class InboundAction implements StateMachineConfigure<Integer, InboundAudi
         @Override
         public void perform(Integer from, Integer to, InboundAuditStatus.Event event, ColaContext<WmsInboundDO> context) {
             super.perform(from, to, event, context);
+            // 变更状态值
             WmsInboundDO inboundDO = context.data();
             inboundDO.setAuditStatus(to);
             inboundService.updateInboundAuditStatus(inboundDO.getId(),to);

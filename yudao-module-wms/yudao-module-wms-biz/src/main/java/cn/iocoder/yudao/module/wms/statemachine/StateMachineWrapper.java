@@ -15,7 +15,7 @@ import java.util.function.Function;
  * @date: 2025/2/28 14:16
  * @description:
  */
-public class StateMachineWrapper<S, E,D> implements StateMachine<S, E, ColaContext<D>> {
+public class StateMachineWrapper<S, E, D> implements StateMachine<S, E, ColaContext<D>> {
 
     private StateMachine<S, E, ColaContext<D>> stateMachine;
     private Function<D,S> getter;

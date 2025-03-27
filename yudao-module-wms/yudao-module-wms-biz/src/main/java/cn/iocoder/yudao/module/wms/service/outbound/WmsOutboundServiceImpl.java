@@ -65,7 +65,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     @Lazy
     private WmsStockBinService stockBinService;
 
-    @Resource(name = OutboundAction.STATE_MACHINE_NAME)
+    @Resource(name = OutboundActions.STATE_MACHINE_NAME)
     private StateMachineWrapper<Integer, OutboundAuditStatus.Event, WmsOutboundDO> outboundStateMachine;
 
     /**

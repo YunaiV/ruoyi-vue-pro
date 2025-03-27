@@ -62,7 +62,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     @Lazy
     private WmsInboundItemService inboundItemService;
 
-    @Resource(name = InboundAction.STATE_MACHINE_NAME)
+    @Resource(name = InboundActions.STATE_MACHINE_NAME)
     private StateMachineWrapper<Integer, InboundAuditStatus.Event, WmsInboundDO> inboundStateMachine;
 
     /**

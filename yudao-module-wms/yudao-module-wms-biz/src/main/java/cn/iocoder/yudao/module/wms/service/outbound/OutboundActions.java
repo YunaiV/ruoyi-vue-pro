@@ -2,8 +2,6 @@ package cn.iocoder.yudao.module.wms.service.outbound;
 
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
-import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
 import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
 import cn.iocoder.yudao.module.wms.statemachine.StateMachineConfigure;
 import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
@@ -36,26 +34,27 @@ import java.util.function.Function;
  */
 @Slf4j
 @Configuration
-public class OutboundAction implements StateMachineConfigure<Integer, OutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> , FailCallback<Integer, OutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> {
+public class OutboundActions implements StateMachineConfigure<Integer, OutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> , FailCallback<Integer, OutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> {
 
     /**
      * 状态机名称
      **/
     public static final String STATE_MACHINE_NAME = "outboundActionStateMachine";
+    /**
+     * 错误消息
+     **/
     public static final String AUDIT_ERROR_MESSAGE = "审核错误，当前出库单状态为%s，在%s状态时才允许%s";
-
-
 
     /**
      * 提交
      **/
     @Component
-    public static class Submit extends BaseOutboundAction {
+    public static class SubmitAction extends BaseOutboundAction {
 
         @Resource
         private OutboundSubmitExecutor outboundSubmitExecutor;
 
-        public Submit() {
+        public SubmitAction() {
             // 指定事件以及前后的状态与状态提取器
             super(new Integer[] {OutboundAuditStatus.DRAFT.getValue(),OutboundAuditStatus.REJECT.getValue()}, OutboundAuditStatus.AUDITING.getValue(), WmsOutboundDO::getAuditStatus, OutboundAuditStatus.Event.SUBMIT);
         }
@@ -75,12 +74,12 @@ public class OutboundAction implements StateMachineConfigure<Integer, OutboundAu
      * 同意
      **/
     @Component
-    public static class Agree extends BaseOutboundAction {
+    public static class AgreeAction extends BaseOutboundAction {
 
         @Resource
         private OutboundAgreeExecutor outboundAgreeExecutor;
 
-        public Agree() {
+        public AgreeAction() {
             // 指定事件以及前后的状态与状态提取器
             super(OutboundAuditStatus.AUDITING.getValue(), OutboundAuditStatus.PASS.getValue(), WmsOutboundDO::getAuditStatus, OutboundAuditStatus.Event.AGREE);
         }
@@ -100,14 +99,14 @@ public class OutboundAction implements StateMachineConfigure<Integer, OutboundAu
      * 拒绝
      **/
     @Component
-    public static class Reject extends BaseOutboundAction {
+    public static class RejectAction extends BaseOutboundAction {
 
 
 
         @Resource
         private OutboundRejectExecutor outboundRejectExecutor;
 
-        public Reject() {
+        public RejectAction() {
             // 指定事件以及前后的状态与状态提取器
             super(OutboundAuditStatus.AUDITING.getValue(), OutboundAuditStatus.REJECT.getValue(), WmsOutboundDO::getAuditStatus, OutboundAuditStatus.Event.REJECT);
         }
@@ -127,13 +126,14 @@ public class OutboundAction implements StateMachineConfigure<Integer, OutboundAu
     /**
      * 状态机
      **/
-    @Bean(OutboundAction.STATE_MACHINE_NAME)
+    @Bean(OutboundActions.STATE_MACHINE_NAME)
     public StateMachineWrapper<Integer, OutboundAuditStatus.Event, WmsOutboundDO> inboundActionStateMachine() {
-        //
+        //  创建状态机构建器
         StateMachineBuilder<Integer, OutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> builder = StateMachineBuilderFactory.create();
+        // 初始化状态机状态
         Map<Integer, List<Integer>> conditionMap = this.initActions(builder, BaseOutboundAction.class,this);
-
-        StateMachineWrapper<Integer, OutboundAuditStatus.Event, WmsOutboundDO> machine=new StateMachineWrapper<>(builder.build(OutboundAction.STATE_MACHINE_NAME), WmsOutboundDO::getAuditStatus);
+        // 创建状态机
+        StateMachineWrapper<Integer, OutboundAuditStatus.Event, WmsOutboundDO> machine=new StateMachineWrapper<>(builder.build(OutboundActions.STATE_MACHINE_NAME), WmsOutboundDO::getAuditStatus);
         // 设置允许的基本操作
         machine.setInitStatus(OutboundAuditStatus.DRAFT.getValue());
         machine.setStatusCanEdit(Arrays.asList(OutboundAuditStatus.DRAFT.getValue(), OutboundAuditStatus.REJECT.getValue()));
