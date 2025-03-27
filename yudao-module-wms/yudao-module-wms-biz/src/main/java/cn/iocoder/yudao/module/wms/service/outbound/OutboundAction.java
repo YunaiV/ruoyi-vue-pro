@@ -1,8 +1,12 @@
 package cn.iocoder.yudao.module.wms.service.outbound;
 
-import cn.iocoder.yudao.module.wms.config.statemachine.ColaContext;
-import cn.iocoder.yudao.module.wms.config.statemachine.StateMachineConfigure;
-import cn.iocoder.yudao.module.wms.config.statemachine.StateMachineWrapper;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
+import cn.iocoder.yudao.framework.common.util.string.StrUtils;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
+import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
+import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
+import cn.iocoder.yudao.module.wms.statemachine.StateMachineConfigure;
+import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.enums.outbound.OutboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.approval.history.ApprovalHistoryAction;
@@ -10,7 +14,7 @@ import cn.iocoder.yudao.module.wms.service.quantity.OutboundAgreeExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.OutboundRejectExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.OutboundSubmitExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.context.OutboundContext;
-import cn.iocoder.yudao.module.wms.service.stock.warehouse.WmsStockWarehouseService;
+import com.alibaba.cola.statemachine.builder.FailCallback;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import jakarta.annotation.Resource;
@@ -21,6 +25,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -30,12 +36,14 @@ import java.util.function.Function;
  */
 @Slf4j
 @Configuration
-public class OutboundAction implements StateMachineConfigure<Integer, OutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> {
+public class OutboundAction implements StateMachineConfigure<Integer, OutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> , FailCallback<Integer, OutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> {
 
     /**
      * 状态机名称
      **/
     public static final String STATE_MACHINE_NAME = "outboundActionStateMachine";
+    public static final String AUDIT_ERROR_MESSAGE = "审核错误，当前出库单状态为%s，在%s状态时才允许%s";
+
 
 
     /**
@@ -123,14 +131,32 @@ public class OutboundAction implements StateMachineConfigure<Integer, OutboundAu
     public StateMachineWrapper<Integer, OutboundAuditStatus.Event, WmsOutboundDO> inboundActionStateMachine() {
         //
         StateMachineBuilder<Integer, OutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> builder = StateMachineBuilderFactory.create();
-        this.initActions(builder, BaseOutboundAction.class);
+        Map<Integer, List<Integer>> conditionMap = this.initActions(builder, BaseOutboundAction.class,this);
 
         StateMachineWrapper<Integer, OutboundAuditStatus.Event, WmsOutboundDO> machine=new StateMachineWrapper<>(builder.build(OutboundAction.STATE_MACHINE_NAME), WmsOutboundDO::getAuditStatus);
         // 设置允许的基本操作
         machine.setInitStatus(OutboundAuditStatus.DRAFT.getValue());
         machine.setStatusCanEdit(Arrays.asList(OutboundAuditStatus.DRAFT.getValue(), OutboundAuditStatus.REJECT.getValue()));
         machine.setStatusCanDelete(Arrays.asList(OutboundAuditStatus.DRAFT.getValue(), OutboundAuditStatus.REJECT.getValue()));
+        // 设置状态地图
+        machine.setConditionMap(conditionMap);
         return machine;
+    }
+
+
+    @Override
+    public void onFail(Integer to, OutboundAuditStatus.Event event, ColaContext<WmsOutboundDO> context) {
+
+        // 当前状态
+        OutboundAuditStatus currStatus= OutboundAuditStatus.parse(context.data().getAuditStatus());
+        // 允许的可审批状态
+        List<Integer> fromList = context.getStateMachineWrapper().getFroms(to);
+        List<OutboundAuditStatus> fromAuditStatusList = OutboundAuditStatus.parse(fromList);
+        String fromAuditStatusNames = StrUtils.join(StreamX.from(fromAuditStatusList).toSet(OutboundAuditStatus::getLabel));
+        // 组装消息
+        String message=String.format(AUDIT_ERROR_MESSAGE,currStatus.getLabel(),fromAuditStatusNames,event.getLabel());
+        throw new IllegalStateException(message);
+
     }
 
     /**

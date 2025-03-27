@@ -1,15 +1,18 @@
 package cn.iocoder.yudao.module.wms.service.inbound;
 
-import cn.iocoder.yudao.module.wms.config.statemachine.ColaContext;
-import cn.iocoder.yudao.module.wms.config.statemachine.StateMachineConfigure;
-import cn.iocoder.yudao.module.wms.config.statemachine.StateMachineWrapper;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
+import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
+import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
+import cn.iocoder.yudao.module.wms.statemachine.StateMachineConfigure;
+import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.approval.history.ApprovalHistoryAction;
 import cn.iocoder.yudao.module.wms.service.quantity.InboundExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.context.InboundContext;
-import cn.iocoder.yudao.module.wms.service.stock.warehouse.WmsStockWarehouseService;
+import com.alibaba.cola.statemachine.builder.FailCallback;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import jakarta.annotation.Resource;
@@ -20,7 +23,12 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_NOT_EXISTS;
 
 /**
  * @author: LeeFJ
@@ -29,13 +37,13 @@ import java.util.function.Function;
  */
 @Slf4j
 @Configuration
-public class InboundAction implements StateMachineConfigure<Integer, InboundAuditStatus.Event, ColaContext<WmsInboundDO>> {
+public class InboundAction implements StateMachineConfigure<Integer, InboundAuditStatus.Event, ColaContext<WmsInboundDO>>,FailCallback<Integer, InboundAuditStatus.Event, ColaContext<WmsInboundDO>> {
 
     /**
      * 状态机名称
      **/
     public static final String STATE_MACHINE_NAME = "inboundActionStateMachine";
-
+    public static final String AUDIT_ERROR_MESSAGE = "审核错误，当前入库单状态为%s，在%s状态时才允许%s";
 
     /**
      * 提交
@@ -46,6 +54,16 @@ public class InboundAction implements StateMachineConfigure<Integer, InboundAudi
             // 指定事件以及前后的状态与状态提取器
             super(new Integer[] {InboundAuditStatus.DRAFT.getValue(),InboundAuditStatus.REJECT.getValue()}, InboundAuditStatus.AUDITING.getValue(), WmsInboundDO::getAuditStatus, InboundAuditStatus.Event.SUBMIT);
         }
+
+        @Override
+        public boolean when(ColaContext<WmsInboundDO> context) {
+            // 检查是否有入库单明细
+            WmsInboundRespVO inbound = inboundService.getInboundWithItemList(context.data().getId());
+            if(CollectionUtils.isEmpty(inbound.getItemList())) {
+                throw exception(INBOUND_ITEM_NOT_EXISTS);
+            }
+            return super.when(context);
+        }
     }
 
     /**
@@ -53,9 +71,6 @@ public class InboundAction implements StateMachineConfigure<Integer, InboundAudi
      **/
     @Component
     public static class Agree extends BaseInboundAction {
-
-        @Resource
-        private WmsStockWarehouseService stockWarehouseService;
 
         @Resource
         private InboundExecutor inboundExecutor;
@@ -85,6 +100,7 @@ public class InboundAction implements StateMachineConfigure<Integer, InboundAudi
             // 指定事件以及前后的状态与状态提取器
             super(InboundAuditStatus.AUDITING.getValue(), InboundAuditStatus.REJECT.getValue(), WmsInboundDO::getAuditStatus, InboundAuditStatus.Event.REJECT);
         }
+
     }
 
 
@@ -96,14 +112,30 @@ public class InboundAction implements StateMachineConfigure<Integer, InboundAudi
     public StateMachineWrapper<Integer, InboundAuditStatus.Event, WmsInboundDO> inboundActionStateMachine() {
         //
         StateMachineBuilder<Integer, InboundAuditStatus.Event, ColaContext<WmsInboundDO>> builder = StateMachineBuilderFactory.create();
-        this.initActions(builder, BaseInboundAction.class);
+        Map<Integer, List<Integer>> conditionMap = this.initActions(builder, BaseInboundAction.class,this);
 
         StateMachineWrapper<Integer, InboundAuditStatus.Event, WmsInboundDO> machine=new StateMachineWrapper<>(builder.build(InboundAction.STATE_MACHINE_NAME), WmsInboundDO::getAuditStatus);
         // 设置允许的基本操作
         machine.setInitStatus(InboundAuditStatus.DRAFT.getValue());
         machine.setStatusCanEdit(Arrays.asList(InboundAuditStatus.DRAFT.getValue(), InboundAuditStatus.REJECT.getValue()));
         machine.setStatusCanDelete(Arrays.asList(InboundAuditStatus.DRAFT.getValue(), InboundAuditStatus.REJECT.getValue()));
+        // 设置状态地图
+        machine.setConditionMap(conditionMap);
         return machine;
+    }
+
+
+    @Override
+    public void onFail(Integer to, InboundAuditStatus.Event event, ColaContext<WmsInboundDO> context) {
+        // 当前状态
+        InboundAuditStatus currStatus= InboundAuditStatus.parse(context.data().getAuditStatus());
+        // 允许的可审批状态
+        List<Integer> fromList = context.getStateMachineWrapper().getFroms(to);
+        List<InboundAuditStatus> fromAuditStatusList = InboundAuditStatus.parse(fromList);
+        String fromAuditStatusNames = StrUtils.join(StreamX.from(fromAuditStatusList).toSet(InboundAuditStatus::getLabel));
+        // 组装消息
+        String message=String.format(AUDIT_ERROR_MESSAGE,currStatus.getLabel(),fromAuditStatusNames,event.getLabel());
+        throw new IllegalStateException(message);
     }
 
     /**
@@ -123,8 +155,9 @@ public class InboundAction implements StateMachineConfigure<Integer, InboundAudi
             super(new Integer[]{from}, to, getter, event);
         }
 
-
-
+        /**
+         * 默认的条件判断都为通过
+         **/
         @Override
         public boolean when(ColaContext<WmsInboundDO> context) {
             return context.success();

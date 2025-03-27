@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -31,7 +33,7 @@ public enum InboundAuditStatus implements ArrayValuable<Integer>, DictEnum {
     private final String label;
 
     /**
-     * 按 value 匹配枚举，name 优先
+     * 按 value 匹配枚举
      **/
     public static InboundAuditStatus parse(Integer value) {
         for (InboundAuditStatus e : InboundAuditStatus.values()) {
@@ -41,6 +43,15 @@ public enum InboundAuditStatus implements ArrayValuable<Integer>, DictEnum {
         }
         return null;
     }
+
+    /**
+     * 按 value 匹配枚举
+     **/
+    public static List<InboundAuditStatus> parse(Collection<Integer> value) {
+        return value.stream().map(InboundAuditStatus::parse).toList();
+    }
+
+
 
     /**
      * 按 name 或 label 匹配枚举，name 优先
@@ -83,6 +94,15 @@ public enum InboundAuditStatus implements ArrayValuable<Integer>, DictEnum {
     }
 
     public static enum Event {
-        SUBMIT,AGREE, REJECT;
+
+        SUBMIT("提交审核"),AGREE("通过审核"), REJECT("拒绝审核");
+
+        @Getter
+        private String label;
+
+        Event(String label) {
+            this.label = label;
+        }
+
     }
 }

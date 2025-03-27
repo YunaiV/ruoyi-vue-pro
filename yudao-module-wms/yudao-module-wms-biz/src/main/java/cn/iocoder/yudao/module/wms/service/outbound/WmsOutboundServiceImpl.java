@@ -6,8 +6,8 @@ import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.wms.config.statemachine.ColaContext;
-import cn.iocoder.yudao.module.wms.config.statemachine.StateMachineWrapper;
+import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
+import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundPageReqVO;
@@ -21,8 +21,6 @@ import cn.iocoder.yudao.module.wms.dal.mysql.outbound.WmsOutboundMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.outbound.item.WmsOutboundItemMapper;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
 import cn.iocoder.yudao.module.wms.enums.common.BillType;
-import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
-import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 import cn.iocoder.yudao.module.wms.enums.outbound.OutboundAuditStatus;
 import cn.iocoder.yudao.module.wms.enums.outbound.OutboundStatus;
 import cn.iocoder.yudao.module.wms.service.outbound.item.WmsOutboundItemService;
@@ -32,8 +30,7 @@ import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
-import java.time.LocalDateTime;
+
 import java.util.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
@@ -274,12 +271,8 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         approvalReqVO.setStatusType(OutboundAuditStatus.getType());
         // 获得业务对象
         WmsOutboundDO inbound = validateOutboundExists(approvalReqVO.getBillId());
-        ColaContext<WmsOutboundDO> ctx = ColaContext.from(inbound, approvalReqVO);
+        ColaContext<WmsOutboundDO> ctx = outboundStateMachine.createContext(approvalReqVO,inbound);
         // 触发事件
         outboundStateMachine.fireEvent(event, ctx);
-        // 如果未处理，则抛出异常
-        if (!ctx.handled()) {
-            throw exception(INBOUND_APPROVAL_CONDITION_IS_NOT_MATCH);
-        }
     }
 }

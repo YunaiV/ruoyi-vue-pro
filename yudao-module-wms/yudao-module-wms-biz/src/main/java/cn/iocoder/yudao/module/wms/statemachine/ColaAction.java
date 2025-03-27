@@ -1,10 +1,9 @@
-package cn.iocoder.yudao.module.wms.config.statemachine;
+package cn.iocoder.yudao.module.wms.statemachine;
 
 import com.alibaba.cola.statemachine.Action;
 import com.alibaba.cola.statemachine.Condition;
 import lombok.Getter;
 
-import java.util.Arrays;
 import java.util.function.Function;
 
 /**
@@ -13,7 +12,7 @@ import java.util.function.Function;
  * @description:
  */
 @Getter
-public abstract class ColaAction<S, E,D>  {
+public abstract class ColaAction<S, E, D>  {
 
 
     public static class ColaActionWhen<D> implements Condition<ColaContext<D>> {
@@ -25,7 +24,7 @@ public abstract class ColaAction<S, E,D>  {
         @Override
         public boolean isSatisfied(ColaContext<D> context) {
             boolean when=colaAction.when(context);
-            context.handled(true);
+            context.isSatisfied(true);
             return when;
         }
 
@@ -41,6 +40,7 @@ public abstract class ColaAction<S, E,D>  {
         @Override
         public void execute(S from, S to, E event, ColaContext<D> context) {
             this.colaAction.perform(from, to, event, context);
+            context.isPerformed(true);
         }
     }
 

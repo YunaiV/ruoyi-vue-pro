@@ -3,18 +3,16 @@ package cn.iocoder.yudao.module.wms.service.inbound;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.wms.config.statemachine.ColaContext;
-import cn.iocoder.yudao.module.wms.config.statemachine.StateMachineWrapper;
+import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
+import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.flow.WmsInboundItemFlowMapper;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
 import cn.iocoder.yudao.module.wms.enums.common.BillType;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
-import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import org.springframework.context.annotation.Lazy;
@@ -236,13 +234,9 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         approvalReqVO.setStatusType(InboundAuditStatus.getType());
         // 获得业务对象
         WmsInboundDO inbound = validateInboundExists(approvalReqVO.getBillId());
-        ColaContext<WmsInboundDO> ctx = ColaContext.from(inbound, approvalReqVO);
+        ColaContext<WmsInboundDO> ctx =  inboundStateMachine.createContext(approvalReqVO,inbound);
         // 触发事件
         inboundStateMachine.fireEvent(event, ctx);
-        // 如果未处理，则抛出异常
-        if (!ctx.handled()) {
-            throw exception(INBOUND_APPROVAL_CONDITION_IS_NOT_MATCH);
-        }
     }
 
     @Override

@@ -1,6 +1,8 @@
-package cn.iocoder.yudao.module.wms.config.statemachine;
+package cn.iocoder.yudao.module.wms.statemachine;
 
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,21 +16,26 @@ import java.util.List;
 public class ColaContext<T> {
 
 
-    public static <X> ColaContext<X> from(X requestDO, WmsApprovalReqVO approvalReqVO) {
+    static <X> ColaContext<X> from(X requestDO, WmsApprovalReqVO approvalReqVO,StateMachineWrapper stateMachineWrapper) {
         ColaContext<X> context = new ColaContext<>();
         context.data=requestDO;
         context.approvalReqVO=approvalReqVO;
         context.success=true;
+        context.stateMachineWrapper=stateMachineWrapper;
         return context;
     }
     /**
      * 是否被处理
      **/
-    private Boolean handled = false;
+    private Boolean satisfied = false;
+    private Boolean performed = false;
     private Boolean success = true;
     private T data;
     private WmsApprovalReqVO approvalReqVO;
     private List<String> errors = new ArrayList<>();
+
+    @Getter
+    private StateMachineWrapper stateMachineWrapper;
 
 
     public Boolean success() {
@@ -39,12 +46,25 @@ public class ColaContext<T> {
         return !success;
     }
 
-    public Boolean handled() {
-        return handled;
+    public Boolean isSatisfied() {
+        return satisfied;
     }
 
-    public void handled(Boolean handled) {
-        this.handled=handled;
+
+    /**
+     * 是否匹配条件，包括状态条件与其它数据具备的条件
+     **/
+    public void isSatisfied(Boolean satisfied) {
+        this.satisfied =satisfied;
+    }
+
+    public Boolean isPerformed() {
+        return performed;
+    }
+
+
+    public void isPerformed(Boolean performed) {
+        this.performed = performed;
     }
 
 

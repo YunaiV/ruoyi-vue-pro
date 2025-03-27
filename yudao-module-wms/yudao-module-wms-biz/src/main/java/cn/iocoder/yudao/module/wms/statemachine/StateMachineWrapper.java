@@ -1,11 +1,13 @@
-package cn.iocoder.yudao.module.wms.config.statemachine;
+package cn.iocoder.yudao.module.wms.statemachine;
 
+import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.alibaba.cola.statemachine.Visitor;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -77,6 +79,10 @@ public class StateMachineWrapper<S, E,D> implements StateMachine<S, E, ColaConte
     @Setter
     private List<S> statusCanDelete;
 
+
+    @Setter
+    private Map<S, List<S>> conditionMap;
+
     public boolean canEdit(S status) {
         return statusCanEdit.contains(status);
     }
@@ -84,5 +90,11 @@ public class StateMachineWrapper<S, E,D> implements StateMachine<S, E, ColaConte
         return statusCanDelete.contains(status);
     }
 
+    public List<S> getFroms(S to) {
+        return conditionMap.get(to);
+    }
 
+    public ColaContext<D> createContext(WmsApprovalReqVO approvalReqVO,D data) {
+        return ColaContext.from(data,approvalReqVO,this);
+    }
 }

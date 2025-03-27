@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.wms.service.approval.history;
 
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.wms.config.statemachine.ColaAction;
-import cn.iocoder.yudao.module.wms.config.statemachine.ColaContext;
+import cn.iocoder.yudao.module.wms.statemachine.ColaAction;
+import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalHistorySaveReqVO;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
