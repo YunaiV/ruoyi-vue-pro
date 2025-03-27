@@ -78,7 +78,7 @@ public class EccangWMSService {
     private EccangResponse.EccangPage getPage(JSONObject payload, String endpoint) {
         EccangWMSResponse response = getResponse(payload, endpoint);
         //当没有数据时,直接返回空页,否则下边会转换报错
-        if (response.getData().isEmpty()) {
+        if (response.getData() == null) {
             return EccangResponse.EccangPage.builder().total(0).totalCount(0).data(null).build();
         }
         EccangResponse.EccangPage page = response.getEccangPage();

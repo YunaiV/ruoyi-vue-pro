@@ -17,15 +17,17 @@ public class EccangAsnListDataJob extends EccangDataJob {
     public String execute(String param) throws Exception {
         setDate(param);
         eccangWMSService.streamAsnList(EccangAsnListReqVo.builder()
+            .modifyDateFrom(beforeYesterdayFirstSecond.toString())
+            .modifyDateTo(beforeYesterdayLastSecond.toString())
             .page(1)
             .pageSize(100)
             .build()).forEach(page -> {
             OssData data = OssData.builder()
                 .database(DATABASE)
                 .tableName("asn_list")
-                .syncType("full")
+                .syncType("inc")
                 .requestTimestamp(System.currentTimeMillis())
-                .folderDate(today)
+                .folderDate(beforeYesterday)
                 .content(page)
                 .headers(null)
                 .build();
