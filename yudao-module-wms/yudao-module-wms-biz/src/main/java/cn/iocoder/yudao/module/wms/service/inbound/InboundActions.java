@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
+import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
 import cn.iocoder.yudao.module.wms.statemachine.StateMachineConfigure;
 import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
@@ -28,8 +29,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_AUDIT_ERROR;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_NOT_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 
 /**
  * @author: LeeFJ
@@ -97,6 +97,27 @@ public class InboundActions implements StateMachineConfigure<Integer, InboundAud
     }
 
 
+    /**
+     * 强制完成
+     **/
+    @Component
+    public static class ForceFinishAction extends BaseInboundAction {
+        public ForceFinishAction() {
+            // 指定事件以及前后的状态与状态值提取器
+            super(InboundAuditStatus.AUDITING.getValue(), InboundAuditStatus.REJECT.getValue(), WmsInboundDO::getAuditStatus, InboundAuditStatus.Event.FORCE_FINISH);
+        }
+
+        @Override
+        public boolean when(ColaContext<WmsInboundDO> context) {
+            InboundStatus inboundStatus = InboundStatus.parse(context.data().getInboundStatus());
+            if(inboundStatus.matchAny(InboundStatus.PART)) {
+                throw exception(INBOUND_FORCE_FINISH_NOT_ALLOWED);
+            }
+            return super.when(context);
+        }
+    }
+
+
 
     /**
      * 拒绝
@@ -122,6 +143,15 @@ public class InboundActions implements StateMachineConfigure<Integer, InboundAud
                 InboundAuditStatus.REJECT.getValue(),
                 InboundAuditStatus.AUDITING.getValue()
             }, InboundAuditStatus.ABANDONED.getValue(), WmsInboundDO::getAuditStatus, InboundAuditStatus.Event.REJECT);
+        }
+
+        @Override
+        public boolean when(ColaContext<WmsInboundDO> context) {
+            InboundStatus inboundStatus = InboundStatus.parse(context.data().getInboundStatus());
+            if(inboundStatus.matchAny(InboundStatus.PART,InboundStatus.ALL)) {
+                throw exception(INBOUND_ABANDON_NOT_ALLOWED);
+            }
+            return super.when(context);
         }
     }
 

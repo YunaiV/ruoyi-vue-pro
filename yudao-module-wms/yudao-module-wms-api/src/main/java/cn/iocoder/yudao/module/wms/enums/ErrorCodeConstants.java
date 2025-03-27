@@ -45,7 +45,11 @@ public interface ErrorCodeConstants {
     ErrorCode INBOUND_NOT_COMPLETE = new ErrorCode(2_001_004_010, "入库单未完全入库");
     ErrorCode INBOUND_ITEM_PLAN_QTY_ERROR = new ErrorCode(2_001_004_020, "计划入库量错误");
     ErrorCode INBOUND_ITEM_ACTUAL_QTY_ERROR = new ErrorCode(2_001_004_021, "实际入库量错误");
-    ErrorCode INBOUND_AUDIT_ERROR = new ErrorCode(2_001_004_022, "出库单审批状态错误");
+    ErrorCode INBOUND_AUDIT_ERROR = new ErrorCode(2_001_004_022, "入库单审批状态错误");
+    ErrorCode INBOUND_ABANDON_NOT_ALLOWED = new ErrorCode(2_001_004_023, "入库单不允许废弃");
+    ErrorCode INBOUND_FORCE_FINISH_NOT_ALLOWED = new ErrorCode(2_001_004_024, "入库单不允许强制完成");
+
+
 
     // ========== WMS_INBOUND_ITEM 入库单详情表 2_001_005_000 ==========
     ErrorCode INBOUND_ITEM_NOT_EXISTS = new ErrorCode(2_001_005_001, "入库单详情不存在");

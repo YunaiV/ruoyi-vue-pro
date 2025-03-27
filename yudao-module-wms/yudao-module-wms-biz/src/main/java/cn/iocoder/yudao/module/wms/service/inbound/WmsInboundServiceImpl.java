@@ -261,11 +261,22 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     public void finishInbound(WmsInboundRespVO inboundRespVO) {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
+        int total= inboundRespVO.getItemList().size();
         int countOfNone = 0;
+        int countOfPart = 0;
+        int countOfAll = 0;
         for (WmsInboundItemRespVO respVO : inboundRespVO.getItemList()) {
+
             if (InboundStatus.NONE.matchAny(respVO.getInboundStatus())) {
                 countOfNone++;
             }
+            if (InboundStatus.PART.matchAny(respVO.getInboundStatus())) {
+                countOfPart++;
+            }
+            if (InboundStatus.ALL.matchAny(respVO.getInboundStatus())) {
+                countOfAll++;
+            }
+
             if(respVO.getOutboundAvailableQty()==null) {
                 respVO.setOutboundAvailableQty(0);
             }
@@ -276,12 +287,22 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         if (countOfNone > 0) {
             throw exception(INBOUND_NOT_COMPLETE);
         }
+
+        InboundStatus inboundStatus = InboundStatus.NONE;
+        if(countOfPart>0) {
+            inboundStatus = InboundStatus.PART;
+        }
+        if(total==countOfAll) {
+            inboundStatus = InboundStatus.ALL;
+        }
+
+
         // 处理明细的入库状态
         List<WmsInboundItemDO> itemList = BeanUtils.toBean(inboundRespVO.getItemList(), WmsInboundItemDO.class);
         inboundItemMapper.updateBatch(itemList);
         // 处理入库单状态
         WmsInboundDO inboundDO = BeanUtils.toBean(inboundRespVO, WmsInboundDO.class);
-        inboundDO.setInboundStatus(InboundStatus.ALL.getValue());
+        inboundDO.setInboundStatus(inboundStatus.getValue());
         if (inboundDO.getArrivalActualTime() == null) {
             inboundDO.setArrivalActualTime(LocalDateTime.now());
         }

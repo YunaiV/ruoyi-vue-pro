@@ -38,10 +38,10 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
     }
 
     @Override
-    protected void updateStockWarehouseQty(WmsStockWarehouseDO stockWarehouseDO, Integer quantity) {
+    protected void updateStockWarehouseQty(WmsStockWarehouseDO stockWarehouseDO, WmsOutboundItemRespVO item, Integer quantity) {
 
         // 可用量
-        stockWarehouseDO.setAvailableQty(stockWarehouseDO.getAvailableQty() - quantity);
+        // stockWarehouseDO.setAvailableQty(stockWarehouseDO.getAvailableQty() - quantity);
         // 可售量
         stockWarehouseDO.setSellableQty(stockWarehouseDO.getSellableQty() - quantity);
         // 待出库量
@@ -49,7 +49,7 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
 
     }
 
-    protected void processInboundItem(WmsOutboundRespVO outboundRespVO, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
+    protected void processInboundItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
 
         Long actionId= IdUtil.getSnowflakeNextId();
 
@@ -129,17 +129,17 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
     }
 
     @Override
-    protected void updateStockOwnershipQty(WmsStockOwnershipDO stockOwnershipDO, Integer quantity) {
+    protected void updateStockOwnershipQty(WmsStockOwnershipDO stockOwnershipDO, WmsOutboundItemRespVO item, Integer quantity) {
         // 可用量
-        stockOwnershipDO.setAvailableQty(stockOwnershipDO.getAvailableQty()-quantity);
+        // stockOwnershipDO.setAvailableQty(stockOwnershipDO.getAvailableQty()-quantity);
         // 待出库量
         stockOwnershipDO.setOutboundPendingQty(stockOwnershipDO.getOutboundPendingQty()+quantity);
     }
 
     @Override
-    protected void updateStockBinQty(WmsStockBinDO stockBinDO, Integer quantity) {
+    protected void updateStockBinQty(WmsStockBinDO stockBinDO, WmsOutboundItemRespVO item, Integer quantity) {
         // 可用库存
-        stockBinDO.setAvailableQty(stockBinDO.getAvailableQty() - quantity);
+        // stockBinDO.setAvailableQty(stockBinDO.getAvailableQty() - quantity);
         // 可售库存
         stockBinDO.setSellableQty(stockBinDO.getSellableQty() - quantity);
         // 待出库量

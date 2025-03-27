@@ -21,7 +21,8 @@ public enum InboundAuditStatus implements ArrayValuable<Integer>, DictEnum {
     AUDITING(1, "待审批"),
     REJECT(2, "已驳回"),
     PASS(3, "已通过"),
-    ABANDONED(3, "已作废"),
+    FORCE_FINISHED(4, "强制完成"),
+    ABANDONED(5, "已作废"),
    ;
 
     public static final Integer[] VALUES = Arrays.stream(values()).map(InboundAuditStatus::getValue).toArray(Integer[]::new);
@@ -94,11 +95,11 @@ public enum InboundAuditStatus implements ArrayValuable<Integer>, DictEnum {
         return VALUES;
     }
 
-    public static enum Event {
+    @Getter
+    public enum Event {
 
-        SUBMIT("提交审核"),AGREE("通过审核"), REJECT("拒绝审核"),ABANDON("作废");
+        SUBMIT("提交审核"),AGREE("通过审核"), REJECT("拒绝审核"),ABANDON("作废"),FORCE_FINISH("强制完成");
 
-        @Getter
         private String label;
 
         Event(String label) {

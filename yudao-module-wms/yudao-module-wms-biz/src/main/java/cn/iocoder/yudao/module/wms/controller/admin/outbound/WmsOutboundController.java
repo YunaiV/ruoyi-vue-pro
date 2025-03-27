@@ -154,4 +154,12 @@ public class WmsOutboundController {
         outboundService.approve(OutboundAuditStatus.Event.REJECT, approvalReqVO);
         return success(true);
     }
-}
+
+    @PutMapping("/finish")
+    @Operation(summary = "完成出库")
+    @PreAuthorize("@ss.hasPermission('wms:inbound:finish')")
+    public CommonResult<Boolean> finish(@RequestBody WmsApprovalReqVO approvalReqVO) {
+        outboundService.approve(OutboundAuditStatus.Event.FINISH, approvalReqVO);
+        return success(true);
+    }
+}

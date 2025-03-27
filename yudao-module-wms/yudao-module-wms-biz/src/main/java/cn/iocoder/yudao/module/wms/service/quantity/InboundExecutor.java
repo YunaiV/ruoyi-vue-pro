@@ -62,7 +62,7 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
                 item.setActualQty(item.getPlanQty());
             }
             // 执行入库的原子操作
-            InboundStatus inboundStatus = inboundSingleItemAtomically(companyId, deptId, warehouseId, productId, item.getActualQty(), inboundRespVO.getId(), item.getId());
+            InboundStatus inboundStatus = inboundSingleItemAtomically(companyId, deptId, warehouseId, productId, item.getPlanQty(), item.getActualQty(), inboundRespVO.getId(), item.getId());
             item.setInboundStatus(inboundStatus.getValue());
 
         }
@@ -74,13 +74,13 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
     /**
      * 执行入库的原子操作,以加锁的方式单个出入库
      */
-    private InboundStatus inboundSingleItemAtomically(Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long inboundId, Long inboundItemId) {
+    private InboundStatus inboundSingleItemAtomically(Long companyId, Long deptId, Long warehouseId, Long productId, Integer planQuantity, Integer actualQuantity, Long inboundId, Long inboundItemId) {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
         AtomicReference<InboundStatus> status = new AtomicReference<>();
         lockRedisDAO.lockStockLevels(warehouseId, productId, () -> {
             try {
-                InboundStatus inboundStatus = this.processItem(companyId, deptId, warehouseId, productId, quantity, inboundId, inboundItemId);
+                InboundStatus inboundStatus = this.processItem(companyId, deptId, warehouseId, productId, planQuantity,actualQuantity, inboundId, inboundItemId);
                 status.set(inboundStatus);
             } catch (Exception e) {
                 log.error("inboundSingleItemTransactional Error" , e);
@@ -90,20 +90,26 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
         return status.get();
     }
 
-    protected InboundStatus processItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long inboundId, Long inboundItemId) {
+    protected InboundStatus processItem(Long companyId, Long deptId, Long warehouseId, Long productId,Integer planQuantity, Integer actualQuantity, Long inboundId, Long inboundItemId) {
 
         // 调整仓库库存
-        this.processStockWarehouseItem(companyId, deptId, warehouseId, productId, quantity, inboundId, inboundItemId);
+        this.processStockWarehouseItem(companyId, deptId, warehouseId, productId, actualQuantity, inboundId, inboundItemId);
         // 调整归属库存
-        this.processStockOwnershipItem(companyId, deptId, warehouseId, productId, quantity, inboundId, inboundItemId);
+        this.processStockOwnershipItem(companyId, deptId, warehouseId, productId, actualQuantity, inboundId, inboundItemId);
         // 当前逻辑,默认全部入库
-        return InboundStatus.ALL;
+        if(actualQuantity==0) {
+            return InboundStatus.NONE;
+        } else if(actualQuantity<planQuantity) {
+            return InboundStatus.PART;
+        } else {
+            return InboundStatus.ALL;
+        }
     }
 
     /**
      * 调整仓库库存
      **/
-    protected void processStockWarehouseItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long inboundId, Long inboundItemId) {
+    protected void processStockWarehouseItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer actualQuantity, Long inboundId, Long inboundItemId) {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
         // 获得仓库库存记录
@@ -114,15 +120,15 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
             stockWarehouseDO.setWarehouseId(warehouseId);
             stockWarehouseDO.setProductId(productId);
             // 待上架量
-            stockWarehouseDO.setShelvingPendingQty(quantity);
+            stockWarehouseDO.setShelvingPendingQty(actualQuantity);
         } else {
             // 待上架量
-            stockWarehouseDO.setShelvingPendingQty(stockWarehouseDO.getShelvingPendingQty() + quantity);
+            stockWarehouseDO.setShelvingPendingQty(stockWarehouseDO.getShelvingPendingQty() + actualQuantity);
         }
         // 保存
         stockWarehouseService.insertOrUpdate(stockWarehouseDO);
         // 记录流水
-        stockFlowService.createForStockWarehouse(this.getReason(), productId, stockWarehouseDO, quantity, inboundId, inboundItemId);
+        stockFlowService.createForStockWarehouse(this.getReason(), productId, stockWarehouseDO, actualQuantity, inboundId, inboundItemId);
 
     }
 
@@ -131,7 +137,7 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
      * 调整归属库存
      * 此方法必须包含在 WmsStockWarehouseServiceImpl.inboundSingleItemTransactional 方法中
      */
-    private void processStockOwnershipItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer quantity, Long inboundId, Long inboundItemId) {
+    private void processStockOwnershipItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer actualQuantity, Long inboundId, Long inboundItemId) {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
         // 查询库存记录
@@ -145,15 +151,15 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
             stockOwnershipDO.setWarehouseId(warehouseId);
             stockOwnershipDO.setProductId(productId);
             // 待上架量
-            stockOwnershipDO.setShelvingPendingQty(quantity);
+            stockOwnershipDO.setShelvingPendingQty(actualQuantity);
         } else {
             // 待上架量
-            stockOwnershipDO.setShelvingPendingQty(stockOwnershipDO.getShelvingPendingQty() + quantity);
+            stockOwnershipDO.setShelvingPendingQty(stockOwnershipDO.getShelvingPendingQty() + actualQuantity);
         }
         // 保存
         stockOwnershipService.insertOrUpdate(stockOwnershipDO);
         // 记录流水
-        stockFlowService.createForStockOwner(this.getReason(), productId, stockOwnershipDO, quantity, inboundId, inboundItemId);
+        stockFlowService.createForStockOwner(this.getReason(), productId, stockOwnershipDO, actualQuantity, inboundId, inboundItemId);
     }
 
 

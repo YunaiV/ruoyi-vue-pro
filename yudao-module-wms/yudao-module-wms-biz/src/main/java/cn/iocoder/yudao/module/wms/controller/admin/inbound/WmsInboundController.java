@@ -97,6 +97,14 @@ public class WmsInboundController {
         return success(true);
     }
 
+    @PutMapping("/force-finish")
+    @Operation(summary = "强制完成")
+    @PreAuthorize("@ss.hasPermission('wms:inbound:force-finish')")
+    public CommonResult<Boolean> forceFinish(@RequestBody WmsApprovalReqVO approvalReqVO) {
+        inboundService.approve(InboundAuditStatus.Event.FORCE_FINISH, approvalReqVO);
+        return success(true);
+    }
+
     @PutMapping("/abandon")
     @Operation(summary = "作废")
     @PreAuthorize("@ss.hasPermission('wms:inbound:abandon')")

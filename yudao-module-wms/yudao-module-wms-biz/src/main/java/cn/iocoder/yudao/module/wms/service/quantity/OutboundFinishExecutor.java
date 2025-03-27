@@ -28,13 +28,13 @@ import java.util.Map;
  */
 
 @Component
-public class OutboundAgreeExecutor extends OutboundExecutor {
+public class OutboundFinishExecutor extends OutboundExecutor {
 
     @Resource
     @Lazy
     private WmsInboundItemFlowService inboundItemFlowService;
 
-    public OutboundAgreeExecutor() {
+    public OutboundFinishExecutor() {
         super(StockReason.OUTBOUND_AGREE);
     }
 
@@ -44,17 +44,25 @@ public class OutboundAgreeExecutor extends OutboundExecutor {
         return item.getActualQty() - item.getPlanQty();
     }
 
+    protected Integer getActualQuantity(WmsOutboundItemRespVO item) {
+        // 取消原先的计划入库量，加上本次的实际入库量
+        return item.getActualQty() - item.getPlanQty();
+    }
+
     @Override
-    protected void updateStockWarehouseQty(WmsStockWarehouseDO stockWarehouseDO, Integer quantity) {
+    protected void updateStockWarehouseQty(WmsStockWarehouseDO stockWarehouseDO, WmsOutboundItemRespVO item, Integer quantity) {
+
+        Integer actualQty=item.getActualQty();
+
         // 可用量
-        stockWarehouseDO.setAvailableQty(stockWarehouseDO.getAvailableQty() + quantity);
+        stockWarehouseDO.setAvailableQty(stockWarehouseDO.getAvailableQty() + actualQty);
         // 可售量
         stockWarehouseDO.setSellableQty(stockWarehouseDO.getSellableQty() + quantity);
         // 待出库量
-        stockWarehouseDO.setOutboundPendingQty(stockWarehouseDO.getOutboundPendingQty() - quantity);
+        stockWarehouseDO.setOutboundPendingQty(stockWarehouseDO.getOutboundPendingQty() - actualQty);
     }
 
-    protected void processInboundItem(WmsOutboundRespVO outboundRespVO, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
+    protected void processInboundItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
 
 
 
@@ -89,21 +97,23 @@ public class OutboundAgreeExecutor extends OutboundExecutor {
     }
 
     @Override
-    protected void updateStockOwnershipQty(WmsStockOwnershipDO stockOwnershipDO, Integer quantity) {
+    protected void updateStockOwnershipQty(WmsStockOwnershipDO stockOwnershipDO, WmsOutboundItemRespVO item, Integer quantity) {
+        Integer actualQty=item.getActualQty();
         // 可用量
-        stockOwnershipDO.setAvailableQty(stockOwnershipDO.getAvailableQty() + quantity);
+        stockOwnershipDO.setAvailableQty(stockOwnershipDO.getAvailableQty() + actualQty);
         // 待出库量
-        stockOwnershipDO.setOutboundPendingQty(stockOwnershipDO.getOutboundPendingQty() - quantity);
+        stockOwnershipDO.setOutboundPendingQty(stockOwnershipDO.getOutboundPendingQty() - actualQty);
     }
 
     @Override
-    protected void updateStockBinQty(WmsStockBinDO stockBinDO, Integer quantity) {
+    protected void updateStockBinQty(WmsStockBinDO stockBinDO,WmsOutboundItemRespVO item,  Integer quantity) {
+        Integer actualQty=item.getActualQty();
         // 可用库存
-        stockBinDO.setAvailableQty(stockBinDO.getAvailableQty() + quantity);
+        stockBinDO.setAvailableQty(stockBinDO.getAvailableQty() - actualQty);
         // 可售库存
         stockBinDO.setSellableQty(stockBinDO.getSellableQty() + quantity);
         // 待出库量
-        stockBinDO.setOutboundPendingQty(stockBinDO.getOutboundPendingQty() - quantity);
+        stockBinDO.setOutboundPendingQty(stockBinDO.getOutboundPendingQty() - actualQty);
     }
 
     @Override

@@ -2,13 +2,13 @@ package cn.iocoder.yudao.module.wms.service.outbound;
 
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
+import cn.iocoder.yudao.module.wms.service.quantity.OutboundFinishExecutor;
 import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
 import cn.iocoder.yudao.module.wms.statemachine.StateMachineConfigure;
 import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.enums.outbound.OutboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.approval.history.ApprovalHistoryAction;
-import cn.iocoder.yudao.module.wms.service.quantity.OutboundAgreeExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.OutboundRejectExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.OutboundSubmitExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.context.OutboundContext;
@@ -58,7 +58,7 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
         private OutboundSubmitExecutor outboundSubmitExecutor;
 
         public SubmitAction() {
-            // 指定事件以及前后的状态与状态提取器
+            // 指定事件以及前后的状态与状态值提取器
             super(new Integer[] {OutboundAuditStatus.DRAFT.getValue(),OutboundAuditStatus.REJECT.getValue()}, OutboundAuditStatus.AUDITING.getValue(), WmsOutboundDO::getAuditStatus, OutboundAuditStatus.Event.SUBMIT);
         }
 
@@ -72,19 +72,32 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
         }
     }
 
-
     /**
      * 同意
      **/
     @Component
     public static class AgreeAction extends BaseOutboundAction {
 
-        @Resource
-        private OutboundAgreeExecutor outboundAgreeExecutor;
-
         public AgreeAction() {
-            // 指定事件以及前后的状态与状态提取器
+            // 指定事件以及前后的状态与状态值提取器
             super(OutboundAuditStatus.AUDITING.getValue(), OutboundAuditStatus.PASS.getValue(), WmsOutboundDO::getAuditStatus, OutboundAuditStatus.Event.AGREE);
+        }
+
+    }
+
+
+    /**
+     * 同意
+     **/
+    @Component
+    public static class OutboundAction extends BaseOutboundAction {
+
+        @Resource
+        private OutboundFinishExecutor outboundFinishExecutor;
+
+        public OutboundAction() {
+            // 指定事件以及前后的状态与状态值提取器
+            super(OutboundAuditStatus.PASS.getValue(), OutboundAuditStatus.FINISHED.getValue(), WmsOutboundDO::getAuditStatus, OutboundAuditStatus.Event.FINISH);
         }
 
         @Override
@@ -93,7 +106,7 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
             // 调整库存
             OutboundContext outboundContext = new OutboundContext();
             outboundContext.setOutboundId(context.data().getId());
-            outboundAgreeExecutor.execute(outboundContext);
+            outboundFinishExecutor.execute(outboundContext);
 
         }
     }
@@ -109,7 +122,7 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
         private OutboundRejectExecutor outboundRejectExecutor;
 
         public RejectAction() {
-            // 指定事件以及前后的状态与状态提取器
+            // 指定事件以及前后的状态与状态值提取器
             super(OutboundAuditStatus.AUDITING.getValue(), OutboundAuditStatus.REJECT.getValue(), WmsOutboundDO::getAuditStatus, OutboundAuditStatus.Event.REJECT);
         }
 
