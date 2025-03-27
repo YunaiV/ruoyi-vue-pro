@@ -32,6 +32,7 @@ public interface ErpPurchaseRequestItemsMapper extends BaseMapperX<ErpPurchaseRe
 
     /**
      * 根据 itemIds 查询
+     *
      * @param itemIds 子表产品项ids
      * @return 集合
      */
@@ -42,8 +43,10 @@ public interface ErpPurchaseRequestItemsMapper extends BaseMapperX<ErpPurchaseRe
         }
         return selectBatchIds(itemIds);
     }
+
     /**
      * 基于采购订单id，获得采购订单的产品项
+     *
      * @param ids 主表采购订单ids
      * @return key：采购订单id；value：采购项集合
      */
@@ -52,4 +55,6 @@ public interface ErpPurchaseRequestItemsMapper extends BaseMapperX<ErpPurchaseRe
             .in(ErpPurchaseRequestItemsDO::getRequestId, ids))
             .stream().collect(Collectors.groupingBy(ErpPurchaseRequestItemsDO::getRequestId));
     }
+
+
 }

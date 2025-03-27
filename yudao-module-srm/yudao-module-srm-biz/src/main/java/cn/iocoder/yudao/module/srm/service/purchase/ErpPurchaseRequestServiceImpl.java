@@ -177,9 +177,9 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long merge(ErpPurchaseRequestOrderReqVO reqVO) {
+    public Long merge(ErpPurchaseRequestMergeReqVO reqVO) {
         // 获取所有 itemIds
-        List<Long> itemIds = reqVO.getItems().stream().map(ErpPurchaseRequestOrderReqVO.requestItems::getId).collect(Collectors.toList());
+        List<Long> itemIds = reqVO.getItems().stream().map(ErpPurchaseRequestMergeReqVO.requestItems::getId).collect(Collectors.toList());
 
         // 查询 itemDOS 并校验
         List<ErpPurchaseRequestItemsDO> itemsDOS = erpPurchaseRequestItemsMapper.selectListByIds(itemIds);
@@ -188,7 +188,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         //申请单已审核+未关闭才可以合并
         validMerge(itemsDOS);
         // 创建 itemsMap 和 requestItemDOMap
-        Map<Long, ErpPurchaseRequestOrderReqVO.requestItems> itemsMap = reqVO.getItems().stream().collect(Collectors.toMap(ErpPurchaseRequestOrderReqVO.requestItems::getId, Function.identity()));
+        Map<Long, ErpPurchaseRequestMergeReqVO.requestItems> itemsMap = reqVO.getItems().stream().collect(Collectors.toMap(ErpPurchaseRequestMergeReqVO.requestItems::getId, Function.identity()));
         Map<Long, ErpPurchaseRequestItemsDO> requestItemDOMap = itemsDOS.stream().collect(Collectors.toMap(ErpPurchaseRequestItemsDO::getId, Function.identity()));
 
         // ErpPurchaseRequestItemsDO item -> 订单vo item

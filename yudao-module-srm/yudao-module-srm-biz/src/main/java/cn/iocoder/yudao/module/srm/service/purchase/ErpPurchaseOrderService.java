@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.*;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.bo.ErpPurchaseOrderItemBO;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -90,6 +91,21 @@ public interface ErpPurchaseOrderService {
      * @return 采购订单分页
      */
     PageResult<ErpPurchaseOrderDO> getPurchaseOrderPage(ErpPurchaseOrderPageReqVO pageReqVO);
+
+    /**
+     * 获得采购订单分页BO，一个订单项+对应订单
+     */
+    PageResult<ErpPurchaseOrderItemBO> getPurchaseOrderPageBO(ErpPurchaseOrderPageReqVO pageReqVO);
+
+    /**
+     * 获得采购订单BO集合，一个订单项+对应订单
+     */
+    List<ErpPurchaseOrderItemBO> getPurchaseOrderBOList(ErpPurchaseOrderPageReqVO pageReqVO);
+
+    /**
+     * 获得采购订单BO，一个订单项+对应订单
+     */
+    ErpPurchaseOrderItemBO getPurchaseOrderBO(Long id);
 
     /**
      * 根据订单id获得订单map

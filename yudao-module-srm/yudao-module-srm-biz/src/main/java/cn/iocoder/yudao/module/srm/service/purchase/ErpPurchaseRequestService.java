@@ -144,5 +144,5 @@ public interface ErpPurchaseRequestService {
      * @param reqVO 采购申请单子项
      * @Return 订单id
      */
-    Long merge(ErpPurchaseRequestOrderReqVO reqVO);
+    Long merge(ErpPurchaseRequestMergeReqVO reqVO);
 }

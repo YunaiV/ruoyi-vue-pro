@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.srm.service.purchase;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -25,6 +26,7 @@ import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpPurchaseInItemDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.bo.ErpPurchaseOrderItemBO;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.ErpPurchaseInItemMapper;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.ErpPurchaseOrderItemMapper;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.ErpPurchaseOrderMapper;
@@ -461,7 +463,31 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
 
     @Override
     public PageResult<ErpPurchaseOrderDO> getPurchaseOrderPage(ErpPurchaseOrderPageReqVO pageReqVO) {
-        return purchaseOrderMapper.selectPage(pageReqVO);
+        List<Long> orderIds = null;
+        if (pageReqVO.getErpPurchaseRequestItemNo() != null && !StrUtil.isEmpty(pageReqVO.getErpPurchaseRequestItemNo())) {
+            //查找对应的DO，限定申请单对应的订单id，汇总ids
+            orderIds = new ArrayList<>(purchaseOrderItemMapper.selectIdsByErpPurchaseRequestItemNo(pageReqVO.getErpPurchaseRequestItemNo()).stream().map(ErpPurchaseOrderItemDO::getOrderId).distinct().toList());
+            if (orderIds.isEmpty()) {
+                orderIds = new ArrayList<>(1); // 初始化一个新的ArrayList
+                orderIds.add(-1L); // 指定一个不存在的数据,说明ItemNo 不存在对应的订单
+            }
+        }
+        return purchaseOrderMapper.selectPage(pageReqVO, orderIds);
+    }
+
+    @Override
+    public PageResult<ErpPurchaseOrderItemBO> getPurchaseOrderPageBO(ErpPurchaseOrderPageReqVO pageReqVO) {
+        return purchaseOrderItemMapper.selectErpPurchaseOrderItemBOPage(pageReqVO);
+    }
+
+    @Override
+    public ErpPurchaseOrderItemBO getPurchaseOrderBO(Long id) {
+        return purchaseOrderItemMapper.selectErpPurchaseOrderItemBOById(id);
+    }
+
+    @Override
+    public List<ErpPurchaseOrderItemBO> getPurchaseOrderBOList(ErpPurchaseOrderPageReqVO pageReqVO) {
+        return purchaseOrderItemMapper.selectErpPurchaseOrderItemBOS(pageReqVO);
     }
 
     @Override
@@ -578,11 +604,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         List<ErpPurchaseOrderItemDO> orderItemDOS = purchaseOrderItemMapper.selectListByItemIds(itemIds);
         //转换
         ErpPurchaseInSaveReqVO vo = BeanUtils.toBean(reqVO, ErpPurchaseInSaveReqVO.class, saveReqVO -> {
-            saveReqVO
-                .setNo(null)
-                .setItems(ErpOrderInConvert.INSTANCE.convertToErpPurchaseInSaveReqVOItems(orderItemDOS))
-                .setId(null)
-                .setInTime(LocalDateTime.now());
+            saveReqVO.setNo(null).setItems(ErpOrderInConvert.INSTANCE.convertToErpPurchaseInSaveReqVOItems(orderItemDOS)).setId(null).setInTime(LocalDateTime.now());
         });
         //service持久化
         Long purchaseIn = purchaseInService.createPurchaseIn(vo);

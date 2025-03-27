@@ -6,11 +6,11 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.fms.api.finance.dto.ErpFinanceSubjectDTO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.ErpPurchaseOrderGenerateContractReqVO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.ErpPurchaseOrderSaveReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.ErpPurchaseRequestOrderReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.ErpPurchaseRequestMergeReqVO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpPurchaseOrderDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpPurchaseRequestItemsDO;
-import cn.iocoder.yudao.module.srm.service.purchase.bo.ErpPurchaseOrderItemBO;
+import cn.iocoder.yudao.module.srm.service.purchase.bo.ErpPurchaseOrderItemWordBO;
 import cn.iocoder.yudao.module.srm.service.purchase.bo.ErpPurchaseOrderWordBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -36,7 +36,7 @@ public interface ErpOrderConvert {
      * @param itemDOMap       采购项Map
      * @return 采购订单的入参reqVO的item
      */
-    default ErpPurchaseOrderSaveReqVO.Item convertToErpPurchaseOrderSaveReqVOItem(ErpPurchaseRequestItemsDO itemDO, Map<Long, ErpPurchaseRequestOrderReqVO.requestItems> requestItemsMap, Map<Long, ErpPurchaseRequestItemsDO> itemDOMap) {
+    default ErpPurchaseOrderSaveReqVO.Item convertToErpPurchaseOrderSaveReqVOItem(ErpPurchaseRequestItemsDO itemDO, Map<Long, ErpPurchaseRequestMergeReqVO.requestItems> requestItemsMap, Map<Long, ErpPurchaseRequestItemsDO> itemDOMap) {
         ErpPurchaseOrderSaveReqVO.Item item = new ErpPurchaseOrderSaveReqVO.Item();
         BeanUtil.copyProperties(itemDOMap.get(itemDO.getId()), item);
         item.setId(null);
@@ -60,7 +60,7 @@ public interface ErpOrderConvert {
     }
 
     //list
-    default List<ErpPurchaseOrderSaveReqVO.Item> convertToErpPurchaseOrderSaveReqVOItemList(List<ErpPurchaseRequestItemsDO> itemDOList, Map<Long, ErpPurchaseRequestOrderReqVO.requestItems> requestItemsMap, Map<Long, ErpPurchaseRequestItemsDO> itemDOMap) {
+    default List<ErpPurchaseOrderSaveReqVO.Item> convertToErpPurchaseOrderSaveReqVOItemList(List<ErpPurchaseRequestItemsDO> itemDOList, Map<Long, ErpPurchaseRequestMergeReqVO.requestItems> requestItemsMap, Map<Long, ErpPurchaseRequestItemsDO> itemDOMap) {
         return itemDOList.stream().map(itemDO -> convertToErpPurchaseOrderSaveReqVOItem(itemDO, requestItemsMap, itemDOMap)).collect(Collectors.toList());
     }
 
@@ -85,7 +85,7 @@ public interface ErpOrderConvert {
             BeanUtils.copyProperties(vo, peek);
             //signingDateFormat 日期格式化
             peek.setSigningDateFormat(DateUtil.format(peek.getSigningDate(), NORM_DATE_PATTERN));
-            peek.setProducts(BeanUtils.toBean(itemDOS, ErpPurchaseOrderItemBO.class, item -> {
+            peek.setProducts(BeanUtils.toBean(itemDOS, ErpPurchaseOrderItemWordBO.class, item -> {
                 item.setIndex(index.getAndIncrement());
                 //不含税总额
                 item.setTotalPriceUntaxed(item.getProductPrice().multiply(item.getCount()).setScale(2, RoundingMode.HALF_UP));

@@ -16,7 +16,7 @@ public class ErpPurchaseOrderWordBO extends ErpPurchaseOrderDO {
     // 采购订单产品表
 //    private TableRenderData order;
 
-    List<ErpPurchaseOrderItemBO> products;
+    List<ErpPurchaseOrderItemWordBO> products;
 
     //不含税总额
     private BigDecimal totalPriceUntaxed;

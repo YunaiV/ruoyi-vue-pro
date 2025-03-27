@@ -101,8 +101,10 @@ public class ErpPurchaseOrderController {
     public CommonResult<PageResult<ErpPurchaseOrderBaseRespVO>> getPurchaseOrderPage(@Valid ErpPurchaseOrderPageReqVO pageReqVO) {
         PageResult<ErpPurchaseOrderDO> pageResult = purchaseOrderService.getPurchaseOrderPage(pageReqVO);
         List<ErpPurchaseOrderBaseRespVO> voList = bindList(pageResult.getList());
+        //
         return success(new PageResult<>(voList, pageResult.getTotal()));
     }
+
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出采购订单 Excel")
@@ -169,7 +171,7 @@ public class ErpPurchaseOrderController {
         purchaseOrderService.generateContract(reqVO, response);
     }
 
-    private List<ErpPurchaseOrderBaseRespVO> bindList(List<ErpPurchaseOrderDO> list) {
+    private List<ErpPurchaseOrderBaseRespVO> bindList(List<? extends ErpPurchaseOrderDO> list) {
         // 1.1 订单项
         List<ErpPurchaseOrderItemDO> purchaseOrderItemList = purchaseOrderService.getPurchaseOrderItemListByOrderIds(convertSet(list, ErpPurchaseOrderDO::getId));
         Map<Long, List<ErpPurchaseOrderItemDO>> purchaseOrderItemMap = convertMultiMap(purchaseOrderItemList, ErpPurchaseOrderItemDO::getOrderId);

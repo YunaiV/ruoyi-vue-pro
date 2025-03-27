@@ -116,7 +116,7 @@ public class ErpPurchaseRequestController {
     @PostMapping("/merge")
     @Operation(summary = "合并采购")
     @PreAuthorize("@ss.hasPermission('erp:purchase-request:merge')")
-    public CommonResult<Long> mergePurchaseOrder(@Validated @RequestBody ErpPurchaseRequestOrderReqVO reqVO) {
+    public CommonResult<Long> mergePurchaseOrder(@Validated @RequestBody ErpPurchaseRequestMergeReqVO reqVO) {
         Long orderId = erpPurchaseRequestService.merge(reqVO);
         return success(orderId);
     }

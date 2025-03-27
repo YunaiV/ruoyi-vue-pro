@@ -127,5 +127,7 @@ public class ErpPurchaseOrderPageReqVO extends PageParam {
 
     @Schema(description = "总验货通过数量")
     private Integer totalInspectionPassCount;
-
+    
+    @Schema(description = "采购申请单No")
+    private String erpPurchaseRequestItemNo;
 }

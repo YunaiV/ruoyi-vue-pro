@@ -162,6 +162,14 @@ public class ErpPurchaseOrderDO extends TenantBaseDO {
      */
     private String paymentTerms;
     /**
+     * 装运港
+     */
+    private String portOfLoading;
+    /**
+     * 目的港
+     */
+    private String portOfDischarge;
+    /**
      * 采购状态
      */
     private Integer orderStatus;

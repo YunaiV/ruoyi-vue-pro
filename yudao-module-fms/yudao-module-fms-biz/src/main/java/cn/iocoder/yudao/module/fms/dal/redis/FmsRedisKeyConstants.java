@@ -18,4 +18,8 @@ public interface FmsRedisKeyConstants {
      * 财务主体集合的缓存
      */
     String FINANCE_SUBJECT_LIST = "erp:erp_finance_subject:list";
+    /**
+     * 财务主体详情的缓存
+     */
+    String FINANCE_SUBJECT_DETAIL = "erp:erp_finance_subject:detail";
 }

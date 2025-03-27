@@ -6,7 +6,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class ErpPurchaseOrderItemBO extends ErpPurchaseOrderItemDO {
+public class ErpPurchaseOrderItemWordBO extends ErpPurchaseOrderItemDO {
     //序号
     Integer index;
 
