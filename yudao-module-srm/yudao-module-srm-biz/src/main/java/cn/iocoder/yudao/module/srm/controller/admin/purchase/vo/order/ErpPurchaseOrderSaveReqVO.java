@@ -54,6 +54,11 @@ public class ErpPurchaseOrderSaveReqVO {
     @Schema(description = "采购主体编号")
     private Long purchaseEntityId;
 
+    @Schema(description = "装运港")
+    private String portOfLoading;
+
+    @Schema(description = "目的港")
+    private String portOfDischarge;
 
     @Schema(description = "优惠率，百分比")
     private BigDecimal discountPercent;
@@ -147,6 +152,9 @@ public class ErpPurchaseOrderSaveReqVO {
         @DecimalMin(value = "0.0", message = "价税合计必须大于0")
         private BigDecimal allAmount;
 
+        @Schema(description = "参考单价")
+        @DecimalMin(value = "0.0", message = "参考单价必须大于0")
+        private BigDecimal referenceUnitPrice;
         //应付款余额
         @Schema(description = "应付款余额(查询+修改)")
         private BigDecimal payableBalance;
