@@ -4,6 +4,8 @@ package cn.iocoder.yudao.module.tms.service.logistic.category.product;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.tms.api.logistic.customrule.ErpCustomRuleApi;
+import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.ErpCustomRuleDTO;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.product.vo.ErpCustomProductPageReqVO;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.product.vo.ErpCustomProductSaveReqVO;
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.product.ErpCustomProductDO;
@@ -16,11 +18,15 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.CUSTOM_PRODUCT_NOT_EXISTS;
@@ -42,17 +48,22 @@ public class ErpCustomProductServiceImpl implements ErpCustomProductService {
     ErpProductApi erpProductApi;
     @Autowired
     ErpCustomCategoryService erpCustomCategoryService;
+    @Autowired
+    ErpCustomRuleApi erpCustomRuleApi;
+    @Resource
+    MessageChannel erpCustomRuleChannel;
 
     @Override
     @CacheEvict(value = TMS_CUSTOM_PRODUCT_LIST, allEntries = true)
-    public Long createCustomProduct(ErpCustomProductSaveReqVO createReqVO) {
+    public Long createCustomProduct(ErpCustomProductSaveReqVO vo) {
         //校验存在
         //产品存在+分类存在
-        validData(createReqVO);
+        validData(vo);
         // 插入
-        ErpCustomProductDO customProduct = BeanUtils.toBean(createReqVO, ErpCustomProductDO.class);
+        ErpCustomProductDO customProduct = BeanUtils.toBean(vo, ErpCustomProductDO.class);
         customProductMapper.insert(customProduct);
         // 返回
+        this.syncErpCustomRule(vo.getProductId());
         return customProduct.getId();
     }
 
@@ -62,15 +73,29 @@ public class ErpCustomProductServiceImpl implements ErpCustomProductService {
     }
 
     @CacheEvict(value = TMS_CUSTOM_PRODUCT_LIST, allEntries = true)
-    @CachePut(value = TMS_CUSTOM_PRODUCT, key = "#updateReqVO.getId()")
-    public ErpCustomProductDO updateCustomProduct(ErpCustomProductSaveReqVO updateReqVO) {
-        validData(updateReqVO);
+    @CachePut(value = TMS_CUSTOM_PRODUCT, key = "#vo.getId()")
+    public ErpCustomProductDO updateCustomProduct(ErpCustomProductSaveReqVO vo) {
+        validData(vo);
         // 校验存在
-        validateCustomProductExists(updateReqVO.getId());
+        validateCustomProductExists(vo.getId());
         // 更新
-        ErpCustomProductDO updateObj = BeanUtils.toBean(updateReqVO, ErpCustomProductDO.class);
+        ErpCustomProductDO updateObj = BeanUtils.toBean(vo, ErpCustomProductDO.class);
         customProductMapper.updateById(updateObj);
+        this.syncErpCustomRule(vo.getProductId());
         return updateObj;
+    }
+
+    //同步海关规则方法
+    private void syncErpCustomRule(Long productId) {
+        //更新产品时->覆盖n个海关规则
+        //找到产品id对应的所有海关规则DTO(含海关信息+海关分类)，如果没有海关分类信息，那么就不更新海关规则
+        List<ErpCustomRuleDTO> dtos = new ArrayList<>();
+        // 从产品ID获取海关规则 + 从分类ID获取海关规则
+        Optional.ofNullable(erpCustomRuleApi.listDTOsByProductId(productId))
+            .ifPresent(dtos::addAll);
+        if (!dtos.isEmpty()) {
+            erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos.stream().distinct().toList()).build());
+        }
     }
 
     @Override

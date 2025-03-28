@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.ErpCust
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.ErpCustomCategorySaveReqVO;
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.ErpCustomCategoryDO;
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.item.ErpCustomCategoryItemDO;
+import cn.iocoder.yudao.module.tms.service.logistic.category.bo.ErpCustomCategoryBO;
 import jakarta.validation.Valid;
 
 import java.util.Collection;
@@ -63,6 +64,7 @@ public interface ErpCustomCategoryService {
      * @param ids ids
      */
     void validCustomRuleCategory(List<Long> ids);
+
     /**
      * 获得海关分类分页
      *
@@ -78,6 +80,17 @@ public interface ErpCustomCategoryService {
      * @return 海关分类list
      */
     List<ErpCustomCategoryDO> getCustomRuleCategoryList(ErpCustomCategoryPageReqVO pageReqVO);
+
+
+    /**
+     * 获得海关分类分页BO PageResult
+     */
+    PageResult<ErpCustomCategoryBO> getCustomRuleCategoryPageBO(ErpCustomCategoryPageReqVO pageReqVO);
+
+    /**
+     * 获得获得海关分类分页BO 单个对象
+     */
+    ErpCustomCategoryBO getCustomRuleCategoryBO(Long id);
 
 
     // ==================== 子表（海关分类子表） ====================

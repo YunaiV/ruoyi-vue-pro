@@ -32,7 +32,7 @@ public class ErpCustomRuleApiImpl implements ErpCustomRuleApi {
     ErpCustomRuleService tmsCustomRuleService;
 
     @Override
-    public List<ErpCustomRuleDTO> listCustomRules(List<Long> ids) {
+    public List<ErpCustomRuleDTO> listCustomRulesByIds(List<Long> ids) {
         // 获取 BO 列表
         List<ErpCustomRuleBO> boList = tmsCustomRuleService.getCustomRuleBOList(ids);
         if (boList.isEmpty()) {
@@ -66,6 +66,7 @@ public class ErpCustomRuleApiImpl implements ErpCustomRuleApi {
     public List<ErpCustomRuleDTO> listDTOsByProductId(Long productId) {
         //获取规则和产品信息
         List<ErpCustomRuleBO> ruleBOS = customRuleMapper.selectByProductId(List.of(productId));
+        //根据产品id->海关分类BO
         if (ruleBOS.isEmpty()) {
             return null;
         }

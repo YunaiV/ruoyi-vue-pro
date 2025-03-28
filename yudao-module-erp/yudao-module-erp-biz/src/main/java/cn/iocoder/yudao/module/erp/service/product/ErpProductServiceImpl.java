@@ -200,11 +200,7 @@ public class ErpProductServiceImpl implements ErpProductService {
             List<ErpCustomRuleDTO> dtos = new ArrayList<>();
             // 从产品ID获取海关规则 + 从分类ID获取海关规则
             Optional.ofNullable(erpCustomRuleApi.listDTOsByProductId(productDO.getId()))
-                .ifPresent(dtos::addAll); // 如果不为空，添加到dtos列表中
-            Optional.ofNullable(productDO.getCustomCategoryId())
-                .map(erpCustomRuleApi::getErpCustomRule) // 获取分类ID对应的海关规则DTO
-                .ifPresent(dtos::add); // 如果存在DTO，添加到dtos列表中
-            // 如果dtos中有数据，则发送消息
+                .ifPresent(dtos::addAll);
             if (!dtos.isEmpty()) {
                 erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos.stream().distinct().toList()).build());
             }
@@ -311,6 +307,7 @@ public class ErpProductServiceImpl implements ErpProductService {
         List<ErpProductDO> list = productMapper.selectListByStatus(status);
         return buildProductVOList(list);
     }
+
     @Override
     @Cacheable(cacheNames = PRODUCT_LIST, key = "'DTO'+#status", unless = "#result == null")
     public List<ErpProductRespDTO> getProductDTOListByStatus(Boolean status) {
@@ -404,11 +401,11 @@ public class ErpProductServiceImpl implements ErpProductService {
             return Collections.emptyList();
         }
         Map<Long, ErpProductUnitDO> unitMap = productUnitService.getProductUnitMap(
-                convertSet(erpProductDOs, ErpProductDO::getUnitId));
+            convertSet(erpProductDOs, ErpProductDO::getUnitId));
 
         return BeanUtils.toBean(erpProductDOs, ErpProductRespDTO.class, erpProductRespDTO -> {
             MapUtils.findAndThen(unitMap, erpProductRespDTO.getUnitId(),
-                    unit -> erpProductRespDTO.setUnitName(unit.getName()));
+                unit -> erpProductRespDTO.setUnitName(unit.getName()));
         });
     }
 

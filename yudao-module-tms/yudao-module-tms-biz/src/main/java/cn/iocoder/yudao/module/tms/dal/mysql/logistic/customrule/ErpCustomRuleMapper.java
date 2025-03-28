@@ -50,7 +50,7 @@ public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
             .likeIfExists(ErpCustomCategoryDO::getDeclaredTypeEn, reqVO.getDeclaredTypeEn())  // 申报品名en
             .selectAsClass(ErpCustomCategoryDO.class, ErpCustomRuleBO.class)
 //            .leftJoin(ErpCustomCategoryItemDO.class, ErpCustomCategoryItemDO::getCustomCategoryId, ErpCustomCategoryDO::getId )
-            .leftJoin(ErpCustomCategoryItemDO.class, on->
+            .leftJoin(ErpCustomCategoryItemDO.class, on ->
                 on.eq(ErpCustomCategoryItemDO::getCustomCategoryId, ErpCustomCategoryDO::getId)
                     .eq(ErpCustomCategoryItemDO::getCountryCode, ErpCustomRuleDO::getCountryCode)
             )
@@ -129,7 +129,7 @@ public interface ErpCustomRuleMapper extends BaseMapperX<ErpCustomRuleDO> {
         return this.selectJoinOne(ErpCustomRuleBO.class, wrapper);
     }
 
-    //通过ids查ErpCustomRuleBO集合
+    //通过ids查ErpCustomRuleBO集合 关联国家查询1:1
     default List<ErpCustomRuleBO> selectCustomRuleBOByIds(Collection<Long> ids) {
         MPJLambdaWrapper<ErpCustomRuleDO> wrapper = getBOWrapper(new ErpCustomRulePageReqVO());
         if (ids != null) {

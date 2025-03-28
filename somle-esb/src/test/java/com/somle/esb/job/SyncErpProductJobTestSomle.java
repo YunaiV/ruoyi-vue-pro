@@ -38,7 +38,7 @@ public class SyncErpProductJobTestSomle extends SomleBaseSpringIntegrationTest {
         try {
             TenantContextHolder.setTenantId(50001L);// 自动
             // 发送消息
-            Optional.ofNullable(erpCustomRuleApi.listCustomRules(null)).ifPresent(detailDTOS -> {
+            Optional.ofNullable(erpCustomRuleApi.listCustomRulesByIds(null)).ifPresent(detailDTOS -> {
                 barCodes.set(detailDTOS.stream().map(dto -> dto.getProductDTO().getBarCode()).toList());
                 log.info("预计同步产品skus大小={{}},barCodes = {{}}", barCodes.get().size(), barCodes.get());
                 int total = detailDTOS.size();

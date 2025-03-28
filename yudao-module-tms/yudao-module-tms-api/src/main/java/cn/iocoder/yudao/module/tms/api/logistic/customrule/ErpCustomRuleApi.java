@@ -14,7 +14,7 @@ public interface ErpCustomRuleApi {
      * @param ids 海关规则id集合,为空则返回所有
      * @return 海关规则DTO集合
      */
-    List<ErpCustomRuleDTO> listCustomRules(List<Long> ids);
+    List<ErpCustomRuleDTO> listCustomRulesByIds(List<Long> ids);
 
     /**
      * 根据海关规则id 获得DTO（含海关的产品）

@@ -52,10 +52,10 @@ public class ErpProductDO extends TenantBaseDO {
      * 材料（中文）
      */
     private String material;
-    /**
-     * 产品材质-关联海关分类
-     */
-    private Long customCategoryId;
+//    /**
+//     * 产品材质-关联海关分类
+//     */
+//    private Long customCategoryId;
     /**
      * 产品状态（1启用，0禁用）
      */

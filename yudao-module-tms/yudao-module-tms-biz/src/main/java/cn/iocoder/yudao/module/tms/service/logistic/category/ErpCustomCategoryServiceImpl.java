@@ -14,6 +14,8 @@ import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.ErpCustomCat
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.item.ErpCustomCategoryItemDO;
 import cn.iocoder.yudao.module.tms.dal.mysql.logistic.category.ErpCustomCategoryMapper;
 import cn.iocoder.yudao.module.tms.dal.mysql.logistic.category.item.ErpCustomCategoryItemMapper;
+import cn.iocoder.yudao.module.tms.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
+import cn.iocoder.yudao.module.tms.service.logistic.category.bo.ErpCustomCategoryBO;
 import cn.iocoder.yudao.module.tms.service.logistic.category.item.ErpCustomCategoryItemService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,8 @@ public class ErpCustomCategoryServiceImpl implements ErpCustomCategoryService {
     private ErpCustomCategoryItemMapper customRuleCategoryItemMapper;
     @Autowired
     private ErpCustomCategoryItemService itemService;
+    @Autowired
+    private ErpCustomRuleMapper erpCustomRuleMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -145,6 +149,22 @@ public class ErpCustomCategoryServiceImpl implements ErpCustomCategoryService {
         return customRuleCategoryMapper.getCustomRuleCategoryList(pageReqVO);
     }
 
+    @Override
+    public PageResult<ErpCustomCategoryBO> getCustomRuleCategoryPageBO(ErpCustomCategoryPageReqVO pageReqVO) {
+        if (pageReqVO == null) {
+            pageReqVO = new ErpCustomCategoryPageReqVO();
+        }
+        return customRuleCategoryMapper.selectPageBO(pageReqVO);
+    }
+
+    @Override
+    public ErpCustomCategoryBO getCustomRuleCategoryBO(Long id) {
+        if (id == null) {
+            return null;
+        }
+        return customRuleCategoryMapper.getErpCustomCategoryBO(id);
+    }
+
     // ==================== 子表（海关分类子表） ====================
 
     @Override
@@ -166,8 +186,7 @@ public class ErpCustomCategoryServiceImpl implements ErpCustomCategoryService {
      */
     private List<Long> updateCustomRuleCategoryItemList(Long categoryId, List<ErpCustomCategoryItemDO> itemsDOList) {
         List<ErpCustomCategoryItemDO> oldList = customRuleCategoryItemMapper.selectListByCategoryId(categoryId);
-        List<List<ErpCustomCategoryItemDO>> diffedList = diffList(oldList, itemsDOList,
-            (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
+        List<List<ErpCustomCategoryItemDO>> diffedList = diffList(oldList, itemsDOList, (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
         List<Long> itemIds = new ArrayList<>();
         //批量添加、修改、删除
         if (CollUtil.isNotEmpty(diffedList.get(0))) {
@@ -189,7 +208,7 @@ public class ErpCustomCategoryServiceImpl implements ErpCustomCategoryService {
         customRuleCategoryItemMapper.deleteByCategoryId(categoryId);
     }
 
-//    //同步海关规则方法 categoryId
+    //    //同步海关规则方法 categoryId
 //    private void syncCustomRuleCategory(Long categoryId) {
 //        List<ErpCustomRuleBO> ruleBOS = customRuleMapper.selectBOListEqCountryCodeByCategoryId(new ErpCustomRulePageReqVO(), categoryId);
 //        //获得变更的海关规则ids
@@ -199,9 +218,10 @@ public class ErpCustomCategoryServiceImpl implements ErpCustomCategoryService {
 //
 //    //同步海关规则方法 categoryItemId
 //    private void syncCustomRuleCategoryItem(List<Long> categoryItemId) {
-//        List<ErpCustomRuleBO> ruleBOS = customRuleMapper.selectBOListEqCountryCodeByItemId(new ErpCustomRulePageReqVO(), categoryItemId);
+//
+//        List<ErpCustomRuleBO> ruleBOS = erpCustomRuleMapper.selectBOListEqCountryCodeByItemId(new ErpCustomRulePageReqVO(), categoryItemId);
 //        //获得变更的海关规则ids
 //        List<Long> ids = ruleBOS.stream().map(ErpCustomRuleBO::getId).toList();
-//        erpCustomRuleService.syncErpCustomRule(ids);
+//
 //    }
 }

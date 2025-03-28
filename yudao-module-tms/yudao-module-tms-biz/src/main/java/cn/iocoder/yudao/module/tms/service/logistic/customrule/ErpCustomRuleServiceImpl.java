@@ -109,7 +109,7 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
 
     //同步海关规则方法
     private void syncErpCustomRule(List<Long> ruleIds) {
-        List<ErpCustomRuleDTO> dtos = tmsCustomRuleApi.listCustomRules(ruleIds);
+        List<ErpCustomRuleDTO> dtos = tmsCustomRuleApi.listCustomRulesByIds(ruleIds);
         erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos).build());
     }
 
@@ -146,7 +146,7 @@ public class ErpCustomRuleServiceImpl implements ErpCustomRuleService {
 //        ThrowUtil.ifThrow(customRuleMapper.selectById(id) == null,CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS_BY_PRODUCT_ID);
         ErpCustomRuleDO ruleDO = customRuleMapper.selectById(id);
         if (ruleDO == null) return null;
-        if ( erpProductApi.getProductDto(ruleDO.getProductId()).getCustomCategoryId() == null) {
+        if (erpProductApi.getProductDto(ruleDO.getProductId()).getCustomCategoryId() == null) {
             //不存在海关规则->原始table
             return BeanUtils.toBean(ruleDO, ErpCustomRuleBO.class);
         } else {
