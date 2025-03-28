@@ -37,7 +37,7 @@ public class ErpPurchaseOrderSaveReqVO {
 
     @Schema(description = "结算日期")
     private LocalDateTime settlementDate;
-    
+
     @Schema(description = "币别id(财务管理-币别维护)")
     private Long currencyId;
 
@@ -136,13 +136,13 @@ public class ErpPurchaseOrderSaveReqVO {
 
         @Schema(description = "税额")
         private BigDecimal taxPrice;
-
-        @Schema(description = "币别id(财务管理-币别维护)")
-        private Long currencyId;
-
-        @Schema(description = "币别名称")
-        @NotBlank(message = "币别名称不能为空")
-        private String currencyName;
+//
+//        @Schema(description = "币别id(财务管理-币别维护)")
+//        private Long currencyId;
+//
+//        @Schema(description = "币别名称")
+//        @NotBlank(message = "币别名称不能为空")
+//        private String currencyName;
 
         @Schema(description = "含税单价")
         @DecimalMin(value = "0.00", message = "含税单价不能小于0")

@@ -11,7 +11,7 @@ import lombok.Data;
 @Builder
 public class TmsOrderCountDTO {
     //申请单订单项ID
-    private Long purchaseOrderItemId;
+    private Long purchaseRequestItemId;
     //订购数量
     private Integer quantity;
 

@@ -182,12 +182,12 @@ public class ErpPurchaseOrderBaseRespVO extends BaseVO {
 //
 //        @Schema(description = "erp产品")
 //        private ErpProductDTO product;
-
-        @Schema(description = "币别id(财务管理-币别维护)")
-        private Long currencyId;
-
-        @Schema(description = "币别名称")
-        private String currencyName;
+//
+//        @Schema(description = "币别id(财务管理-币别维护)")
+//        private Long currencyId;
+//
+//        @Schema(description = "币别名称")
+//        private String currencyName;
 
         @Schema(description = "产品下单数量")
         private BigDecimal count;

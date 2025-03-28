@@ -122,6 +122,11 @@ public interface ErpPurchaseRequestService {
 
     /**
      * 校验采购订单的子项目是否合法
+     */
+    ErpPurchaseRequestItemsDO validItemIdExist(Long id);
+
+    /**
+     * 校验采购订单的子项目是否合法
      *
      * @param items 采购订单子项目集合
      *              1、校验产品有效性 2、校验仓库有效性

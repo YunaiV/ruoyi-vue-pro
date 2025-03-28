@@ -43,6 +43,6 @@ public class ActionOrderOffImpl implements Action<ErpOffStatus, SrmEventEnum, Er
         ErpPurchaseOrderDO aDo = mapper.selectById(context.getId());
         aDo.setOffStatus(to.getCode());
         ThrowUtil.ifSqlThrow(mapper.updateById(aDo), DB_UPDATE_ERROR);
-        log.debug("开关状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
+        log.debug("订单开关状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
     }
 }

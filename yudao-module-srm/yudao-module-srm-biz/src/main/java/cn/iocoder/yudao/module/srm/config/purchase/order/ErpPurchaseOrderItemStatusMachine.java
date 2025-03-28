@@ -59,6 +59,12 @@ public class ErpPurchaseOrderItemStatusMachine {
             .to(ErpOffStatus.CLOSED)
             .on(SrmEventEnum.AUTO_CLOSE)
             .perform(actionOrderItemOffImpl);
+        //关闭撤销
+        builder.externalTransitions()
+            .fromAmong(ErpOffStatus.MANUAL_CLOSED, ErpOffStatus.CLOSED, ErpOffStatus.OPEN)
+            .to(ErpOffStatus.OPEN)
+            .on(SrmEventEnum.CANCEL_DELETE)
+            .perform(actionOrderItemOffImpl);
         //错误回调函数
         builder.setFailCallback(baseFailCallbackImpl);
         return builder.build(SrmStateMachines.PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME);

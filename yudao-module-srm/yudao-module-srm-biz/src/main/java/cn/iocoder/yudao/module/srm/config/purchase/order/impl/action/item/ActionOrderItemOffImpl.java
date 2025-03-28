@@ -31,7 +31,7 @@ public class ActionOrderItemOffImpl implements Action<ErpOffStatus, SrmEventEnum
     private ErpPurchaseOrderMapper orderMapper;
 
     @Override
-    @Transactional( rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void execute(ErpOffStatus from, ErpOffStatus to, SrmEventEnum event, ErpPurchaseOrderItemDO context) {
         // 查询采购订单子项
         ErpPurchaseOrderItemDO itemDO = itemMapper.selectById(context.getId());
@@ -47,7 +47,7 @@ public class ActionOrderItemOffImpl implements Action<ErpOffStatus, SrmEventEnum
 
         ErpPurchaseOrderDO orderDO = orderMapper.selectById(context.getOrderId());
         if (orderDO == null) {
-            log.warn("子项ID={} 关联的订单ID={} 不存在，无法更新主表状态", context.getId(), context.getOrderId());
+            log.warn("订单子项ID={} 关联的订单ID={} 不存在，无法更新主表状态", context.getId(), context.getOrderId());
             return;
         }
 
@@ -55,7 +55,7 @@ public class ActionOrderItemOffImpl implements Action<ErpOffStatus, SrmEventEnum
     }
 
     /**
-     * 根据所有子项的状态，决定是否更新主表状态
+     * 根据所有子项的状态，决定是否传递状态事件
      */
     @Transactional()
     public void updateOrderStatusIfNeeded(ErpPurchaseOrderDO orderDO, SrmEventEnum event, ErpOffStatus to) {

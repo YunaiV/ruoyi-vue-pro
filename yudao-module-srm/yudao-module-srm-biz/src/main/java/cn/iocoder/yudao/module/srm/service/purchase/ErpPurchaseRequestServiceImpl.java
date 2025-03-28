@@ -121,7 +121,7 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
 
     private void initSlaveStatus(List<ErpPurchaseRequestItemsDO> itemsDOS) {
         itemsDOS.forEach(i -> {
-            orderItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, SrmEventEnum.ORDER_INIT, TmsOrderCountDTO.builder().purchaseOrderItemId(i.getId()).build());
+            orderItemMachine.fireEvent(ErpOrderStatus.OT_ORDERED, SrmEventEnum.ORDER_INIT, TmsOrderCountDTO.builder().purchaseRequestItemId(i.getId()).build());
             offItemMachine.fireEvent(ErpOffStatus.OPEN, SrmEventEnum.OFF_INIT, i);
             //入库
             storageItemMachine.fireEvent(ErpStorageStatus.NONE_IN_STORAGE, SrmEventEnum.STORAGE_INIT, SrmInCountDTO.builder().applyItemId(i.getId()).build());
@@ -208,7 +208,6 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
             item.setErpPurchaseRequestItemNo(aDo.getNo());
             item.setApplicantId(aDo.getApplicantId());//申请人
             item.setApplicationDeptId(aDo.getApplicationDeptId());//申请部门
-            item.setCurrencyName(reqVO.getCurrencyName());//订单币别名称
         });
 
         //2.0 构造VO入参类
@@ -438,6 +437,14 @@ public class ErpPurchaseRequestServiceImpl implements ErpPurchaseRequestService 
         ErpPurchaseRequestDO erpPurchaseRequestDO = erpPurchaseRequestMapper.selectById(id);
         ThrowUtil.ifThrow(erpPurchaseRequestDO == null, PURCHASE_REQUEST_NOT_EXISTS);
         return erpPurchaseRequestDO;
+    }
+
+    //校验子项是否合法by itemId
+    @Override
+    public ErpPurchaseRequestItemsDO validItemIdExist(Long itemId) {
+        ErpPurchaseRequestItemsDO requestItemsDO = erpPurchaseRequestItemsMapper.selectById(itemId);
+        ThrowUtil.ifThrow(requestItemsDO == null, PURCHASE_REQUEST_ITEM_NOT_EXISTS);
+        return requestItemsDO;
     }
 
     @Override

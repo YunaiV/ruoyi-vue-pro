@@ -16,6 +16,7 @@ public enum SrmEventEnum {
     ACTIVATE("开启"),
     MANUAL_CLOSE("手动关闭"),
     AUTO_CLOSE("自动关闭"),
+    CANCEL_DELETE("关闭撤销"),
 //    SELF_INSPECTION("申请单主子表开关自检"),
 
     // 订购事件
@@ -57,7 +58,6 @@ public enum SrmEventEnum {
     RETURN_EXCEPTION("退款异常"),
     //退款完成
     RETURN_COMPLETE("退款完成"),
-
 
 
     //入库事件
