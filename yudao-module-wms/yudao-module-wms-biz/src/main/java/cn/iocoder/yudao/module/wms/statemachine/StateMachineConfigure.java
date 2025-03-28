@@ -20,7 +20,7 @@ import java.util.Map;
 public interface StateMachineConfigure<S, E, D> {
 
     /**
-     * 初始化
+     * 初始化状态机
      **/
     default Map<S,List<S>> initActions(StateMachineBuilder<S, E, D> builder, Class actionType, FailCallback<S,E,D> failCallback) {
 
@@ -38,6 +38,9 @@ public interface StateMachineConfigure<S, E, D> {
     }
 
 
+    /**
+     * 绑定状态机动作
+     **/
     default void bindAction(StateMachineBuilder<S, E, D> builder, ColaAction<S,E,D> action,Map<S,List<S>> conditionMap) {
 
         S[] from = action.getFrom();
@@ -49,6 +52,7 @@ public interface StateMachineConfigure<S, E, D> {
             conditionMap.put(action.getTo(),list);
         }
 
+        // 为每个 Action 配置条件判断函数和执行函数
         for (S item : from) {
             list.add(item);
             builder.externalTransition()

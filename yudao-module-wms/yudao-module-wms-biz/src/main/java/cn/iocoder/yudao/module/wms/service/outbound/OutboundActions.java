@@ -2,16 +2,16 @@ package cn.iocoder.yudao.module.wms.service.outbound;
 
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
-import cn.iocoder.yudao.module.wms.service.quantity.OutboundFinishExecutor;
-import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
-import cn.iocoder.yudao.module.wms.statemachine.StateMachineConfigure;
-import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.enums.outbound.OutboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.approval.history.ApprovalHistoryAction;
+import cn.iocoder.yudao.module.wms.service.quantity.OutboundFinishExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.OutboundRejectExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.OutboundSubmitExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.context.OutboundContext;
+import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
+import cn.iocoder.yudao.module.wms.statemachine.StateMachineConfigure;
+import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
 import com.alibaba.cola.statemachine.builder.FailCallback;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
@@ -25,7 +25,6 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_AUDIT_ERROR;
@@ -33,7 +32,7 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_AUDI
 /**
  * @author: LeeFJ
  * @date: 2025/3/19 10:00
- * @description:
+ * @description: 出库单状态机与动作配置
  */
 @Slf4j
 @Configuration
@@ -59,7 +58,7 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
 
         public SubmitAction() {
             // 指定事件以及前后的状态与状态值提取器
-            super(new Integer[] {OutboundAuditStatus.DRAFT.getValue(),OutboundAuditStatus.REJECT.getValue()}, OutboundAuditStatus.AUDITING.getValue(), WmsOutboundDO::getAuditStatus, OutboundAuditStatus.Event.SUBMIT);
+            super(new Integer[]{OutboundAuditStatus.DRAFT.getValue(), OutboundAuditStatus.REJECT.getValue()}, OutboundAuditStatus.AUDITING.getValue(), OutboundAuditStatus.Event.SUBMIT);
         }
 
         @Override
@@ -80,7 +79,7 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
 
         public AgreeAction() {
             // 指定事件以及前后的状态与状态值提取器
-            super(OutboundAuditStatus.AUDITING.getValue(), OutboundAuditStatus.PASS.getValue(), WmsOutboundDO::getAuditStatus, OutboundAuditStatus.Event.AGREE);
+            super(OutboundAuditStatus.AUDITING.getValue(), OutboundAuditStatus.PASS.getValue(), OutboundAuditStatus.Event.AGREE);
         }
 
     }
@@ -97,7 +96,7 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
 
         public OutboundAction() {
             // 指定事件以及前后的状态与状态值提取器
-            super(OutboundAuditStatus.PASS.getValue(), OutboundAuditStatus.FINISHED.getValue(), WmsOutboundDO::getAuditStatus, OutboundAuditStatus.Event.FINISH);
+            super(OutboundAuditStatus.PASS.getValue(), OutboundAuditStatus.FINISHED.getValue(), OutboundAuditStatus.Event.FINISH);
         }
 
         @Override
@@ -123,7 +122,7 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
 
         public RejectAction() {
             // 指定事件以及前后的状态与状态值提取器
-            super(OutboundAuditStatus.AUDITING.getValue(), OutboundAuditStatus.REJECT.getValue(), WmsOutboundDO::getAuditStatus, OutboundAuditStatus.Event.REJECT);
+            super(OutboundAuditStatus.AUDITING.getValue(), OutboundAuditStatus.REJECT.getValue(), OutboundAuditStatus.Event.REJECT);
         }
 
         @Override
@@ -138,7 +137,7 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
 
 
     /**
-     * 状态机
+     * 创建与配置状态机
      **/
     @Bean(OutboundActions.STATE_MACHINE_NAME)
     public StateMachineWrapper<Integer, OutboundAuditStatus.Event, WmsOutboundDO> inboundActionStateMachine() {
@@ -158,6 +157,9 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
     }
 
 
+    /**
+     * 处理失败的情况
+     **/
     @Override
     public void onFail(Integer to, OutboundAuditStatus.Event event, ColaContext<WmsOutboundDO> context) {
 
@@ -174,7 +176,7 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
     }
 
     /**
-     * InboundAction 基类
+     * OutboundAction 基类
      **/
     public static class BaseOutboundAction extends ApprovalHistoryAction<OutboundAuditStatus.Event, WmsOutboundDO> {
 
@@ -182,12 +184,12 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
         @Lazy
         protected WmsOutboundService outboundService;
 
-        public BaseOutboundAction(Integer[] from, Integer to, Function<WmsOutboundDO, Integer> getter, OutboundAuditStatus.Event event) {
-            super(from, to, getter, event);
+        public BaseOutboundAction(Integer[] from, Integer to, OutboundAuditStatus.Event event) {
+            super(from, to, WmsOutboundDO::getAuditStatus, event);
         }
 
-        public BaseOutboundAction(Integer from, Integer to, Function<WmsOutboundDO, Integer> getter, OutboundAuditStatus.Event event) {
-            super(new Integer[] {from}, to, getter, event);
+        public BaseOutboundAction(Integer from, Integer to, OutboundAuditStatus.Event event) {
+            super(new Integer[]{from}, to, WmsOutboundDO::getAuditStatus, event);
         }
 
         @Override

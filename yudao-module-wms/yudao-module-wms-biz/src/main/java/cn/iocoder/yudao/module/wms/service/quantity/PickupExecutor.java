@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.wms.service.quantity;
 
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
@@ -17,13 +16,10 @@ import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.inbound.item.flow.WmsInboundItemFlowService;
 import cn.iocoder.yudao.module.wms.service.quantity.context.PickupContext;
-import cn.iocoder.yudao.module.wms.service.stock.bin.WmsStockBinService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +30,7 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 /**
  * @author: LeeFJ
  * @date: 2025/3/25 9:34
- * @description:
+ * @description: 拣货数量执行器
  */
 @Slf4j
 @Component
@@ -57,16 +53,18 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
     @Override
     public void execute(PickupContext context) {
 
+        // 确认在事务内
         JdbcUtils.requireTransaction();
 
+        // 准备需要的数据
         WmsPickupDO pickup = context.getPickup();
         List<WmsPickupItemDO> wmsPickupItemDOList = context.getWmsPickupItemDOList();
         List<WmsInboundItemRespVO> inboundItemVOList = context.getInboundItemVOList();
-
+        //
         Map<Long, WmsInboundItemRespVO> inboundItemVOMap = StreamX.from(inboundItemVOList).toMap(WmsInboundItemRespVO::getId);
         List<WmsInboundDO> inboundDOList = inboundService.selectByIds(StreamX.from(inboundItemVOList).toList(WmsInboundItemRespVO::getInboundId));
         Map<Long, WmsInboundDO> inboundMap = StreamX.from(inboundDOList).toMap(WmsInboundDO::getId);
-        //
+        // 循环明细
         for (WmsPickupItemDO pickupItemDO : wmsPickupItemDOList) {
             WmsInboundItemRespVO inboundItemVO = inboundItemVOMap.get(pickupItemDO.getInboundItemId());
             if (inboundItemVO == null) {
@@ -94,6 +92,9 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
     }
 
 
+    /**
+     * 处理明细行
+     **/
     private void processItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO, WmsInboundItemRespVO inboundItemVO) {
         this.processStockBin(pickup, pickupItemDO, inboundDO, inboundItemVO);
         this.processStockWarehouseItem(pickup, pickupItemDO, inboundDO, inboundItemVO);
@@ -102,6 +103,9 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
     }
 
 
+    /**
+     * 处理库存仓位
+     **/
     private void processStockBin(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO, WmsInboundItemRespVO inboundItemVO) {
 
         JdbcUtils.requireTransaction();
@@ -127,6 +131,9 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
         stockFlowService.createForStockBin(this.getReason(), inboundItemVO.getProductId(), stockBinDO, pickupItemDO.getQty(), pickupItemDO.getPickupId(), pickupItemDO.getId());
     }
 
+    /**
+     * 处理库存库位
+     **/
     private void processInboundItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO, WmsInboundItemRespVO inboundItemVO) {
 
         Integer quantity = pickupItemDO.getQty();
@@ -145,7 +152,7 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
         WmsInboundItemDO inboundItemDO = BeanUtils.toBean(inboundItemVO, WmsInboundItemDO.class);
         inboundItemService.updateById(inboundItemDO);
 
-        //
+        // 记录流水
         WmsInboundItemFlowDO flowDO = new WmsInboundItemFlowDO();
         flowDO.setInboundId(inboundItemDO.getInboundId());
         flowDO.setInboundItemId(inboundItemDO.getId());
@@ -157,6 +164,9 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
 
     }
 
+    /**
+     * 处理库存库位
+     **/
     private void processStockWarehouseItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO, WmsInboundItemRespVO inboundItemVO) {
 
 
@@ -190,6 +200,9 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
     }
 
 
+    /**
+     * 处理库存库位
+     **/
     private void processStockOwnershipItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO, WmsInboundItemRespVO inboundItemVO) {
 
         Long warehouseId = pickup.getWarehouseId();

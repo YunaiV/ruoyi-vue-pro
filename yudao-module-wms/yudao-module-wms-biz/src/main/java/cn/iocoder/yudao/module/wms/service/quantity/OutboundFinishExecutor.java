@@ -39,16 +39,14 @@ public class OutboundFinishExecutor extends OutboundExecutor {
     }
 
     @Override
-    protected Integer getExecuteQuantity(WmsOutboundItemRespVO item) {
+    protected Integer getExecuteQty(WmsOutboundItemRespVO item) {
         // 取消原先的计划入库量，加上本次的实际入库量
         return item.getActualQty() - item.getPlanQty();
     }
 
-    protected Integer getActualQuantity(WmsOutboundItemRespVO item) {
-        // 取消原先的计划入库量，加上本次的实际入库量
-        return item.getActualQty() - item.getPlanQty();
-    }
-
+    /**
+     * 更新仓库库存
+     */
     @Override
     protected void updateStockWarehouseQty(WmsStockWarehouseDO stockWarehouseDO, WmsOutboundItemRespVO item, Integer quantity) {
 
@@ -62,9 +60,10 @@ public class OutboundFinishExecutor extends OutboundExecutor {
         stockWarehouseDO.setOutboundPendingQty(stockWarehouseDO.getOutboundPendingQty() - actualQty);
     }
 
+    /**
+     * 更新入库单库存
+     */
     protected void processInboundItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
-
-
 
         List<WmsInboundItemFlowDO> flowDOList = inboundItemFlowService.selectByActionId(outboundRespVO.getLatestOutboundActionId());
 
@@ -79,7 +78,7 @@ public class OutboundFinishExecutor extends OutboundExecutor {
             WmsInboundItemDO inboundItemDO = map.get(flowDO.getInboundItemId());
             inboundItemDO.setOutboundAvailableQty(inboundItemDO.getOutboundAvailableQty()+quantity);
 
-            //
+            // 记录流水
             WmsInboundItemFlowDO newFlowDO=new WmsInboundItemFlowDO();
             newFlowDO.setOutboundActionId(actionId);
             newFlowDO.setInboundId(inboundItemDO.getInboundId());
@@ -96,6 +95,9 @@ public class OutboundFinishExecutor extends OutboundExecutor {
 
     }
 
+    /**
+     * 更新所有者库存
+     **/
     @Override
     protected void updateStockOwnershipQty(WmsStockOwnershipDO stockOwnershipDO, WmsOutboundItemRespVO item, Integer quantity) {
         Integer actualQty=item.getActualQty();
@@ -105,6 +107,9 @@ public class OutboundFinishExecutor extends OutboundExecutor {
         stockOwnershipDO.setOutboundPendingQty(stockOwnershipDO.getOutboundPendingQty() - actualQty);
     }
 
+    /**
+     * 更新库存货位
+     **/
     @Override
     protected void updateStockBinQty(WmsStockBinDO stockBinDO,WmsOutboundItemRespVO item,  Integer quantity) {
         Integer actualQty=item.getActualQty();
@@ -116,6 +121,9 @@ public class OutboundFinishExecutor extends OutboundExecutor {
         stockBinDO.setOutboundPendingQty(stockBinDO.getOutboundPendingQty() - actualQty);
     }
 
+    /**
+     * 更新出库单
+     **/
     @Override
     protected void updateOutbound(WmsOutboundRespVO outboundRespVO) {
         List<WmsOutboundItemRespVO> itemRespVOList=outboundRespVO.getItemList();

@@ -23,7 +23,7 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 /**
  * @author: LeeFJ
  * @date: 2025/3/25 13:16
- * @description:
+ * @description: 出库执行器
  */
 @Slf4j
 public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
@@ -38,11 +38,29 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
         super(reason);
     }
 
-    protected abstract Integer getExecuteQuantity(WmsOutboundItemRespVO item);
+    /**
+     * 根据不同的业务动作获得执行量
+     **/
+    protected abstract Integer getExecuteQty(WmsOutboundItemRespVO item);
+    /**
+     * 更新仓库库存量
+     **/
     protected abstract void updateStockWarehouseQty(WmsStockWarehouseDO stockWarehouseDO, WmsOutboundItemRespVO item, Integer quantity);
+    /**
+     * 更新库存货位库存量
+     **/
     protected abstract void processInboundItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId);
+    /**
+     * 更新库存货位库存量
+     **/
     protected abstract void updateStockOwnershipQty(WmsStockOwnershipDO stockOwnershipDO, WmsOutboundItemRespVO item, Integer quantity);
+    /**
+     * 更新库存货位库存量
+     **/
     protected abstract void updateStockBinQty(WmsStockBinDO stockBinDO, WmsOutboundItemRespVO item,Integer quantity);
+    /**
+     * 更新出库单
+     **/
     protected abstract void updateOutbound(WmsOutboundRespVO outboundRespVO);
 
     @Override
@@ -63,8 +81,8 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
                 deptId = productVO.getDeptId();
             }
             // 执行入库的原子操作
-            Integer quantity=getExecuteQuantity(item);
-            outboundSingleItemAtomically(outboundRespVO,item,companyId, deptId, warehouseId, item.getBinId(),productId, quantity, outboundRespVO.getId(), item.getId());
+            Integer quantity= getExecuteQty(item);
+            outboundSingleItem(outboundRespVO,item,companyId, deptId, warehouseId, item.getBinId(),productId, quantity, outboundRespVO.getId(), item.getId());
         }
         updateOutbound(outboundRespVO);
         // 完成最终的入库
@@ -73,9 +91,9 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
     }
 
     /**
-     * 执行出库的原子操作,以加锁的方式单个出入库
-     */
-    private OutboundStatus outboundSingleItemAtomically(WmsOutboundRespVO outboundRespVO,WmsOutboundItemRespVO item,Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
+     * 处理单个详情
+     **/
+    private OutboundStatus outboundSingleItem(WmsOutboundRespVO outboundRespVO,WmsOutboundItemRespVO item,Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
         OutboundStatus status = OutboundStatus.NONE;
@@ -89,6 +107,9 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
     }
 
 
+    /**
+     * 按不同的分类处理库存
+     **/
     private OutboundStatus processItem(WmsOutboundRespVO outboundRespVO,WmsOutboundItemRespVO item,Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
 
         this.processStockWarehouseItem(item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
@@ -100,11 +121,9 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
     }
 
 
-
     /**
-     * 在事务中执行出库操作
-     */
-
+     * 处理仓库库存
+     **/
     private void processStockWarehouseItem(WmsOutboundItemRespVO item,Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
@@ -127,7 +146,9 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
     }
 
 
-
+    /**
+     * 处理所有者库存
+     **/
     private void processStockOwnerShipItem(WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
 
         // 校验本方法在事务中
@@ -147,6 +168,9 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
     }
 
 
+    /**
+     * 处理仓位库存
+     **/
     private void processStockBinItem(WmsOutboundItemRespVO item,Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
         // 调整仓位库存
         JdbcUtils.requireTransaction();
@@ -161,8 +185,5 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
         // 记录流水
         stockFlowService.createForStockBin(this.getReason(), productId, stockBinDO,quantity, outboundId, outboundItemId);
     }
-
-
-
 
 }

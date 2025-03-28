@@ -4,15 +4,15 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
-import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
-import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
-import cn.iocoder.yudao.module.wms.statemachine.StateMachineConfigure;
-import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
+import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
 import cn.iocoder.yudao.module.wms.service.approval.history.ApprovalHistoryAction;
 import cn.iocoder.yudao.module.wms.service.quantity.InboundExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.context.InboundContext;
+import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
+import cn.iocoder.yudao.module.wms.statemachine.StateMachineConfigure;
+import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
 import com.alibaba.cola.statemachine.builder.FailCallback;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
@@ -26,7 +26,6 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
@@ -34,7 +33,7 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 /**
  * @author: LeeFJ
  * @date: 2025/3/19 10:00
- * @description:
+ * @description: 入库单状态机与动作配置
  */
 @Slf4j
 @Configuration
@@ -57,7 +56,7 @@ public class InboundActions implements StateMachineConfigure<Integer, InboundAud
 
         public SubmitAction() {
             // 指定事件以及前后的状态与状态值提取器
-            super(new Integer[] {InboundAuditStatus.DRAFT.getValue(),InboundAuditStatus.REJECT.getValue()}, InboundAuditStatus.AUDITING.getValue(), WmsInboundDO::getAuditStatus, InboundAuditStatus.Event.SUBMIT);
+            super(new Integer[]{InboundAuditStatus.DRAFT.getValue(), InboundAuditStatus.REJECT.getValue()}, InboundAuditStatus.AUDITING.getValue(), InboundAuditStatus.Event.SUBMIT);
         }
 
         @Override
@@ -82,7 +81,7 @@ public class InboundActions implements StateMachineConfigure<Integer, InboundAud
 
         public AgreeAction() {
             // 指定事件以及前后的状态与状态值提取器
-            super(InboundAuditStatus.AUDITING.getValue(), InboundAuditStatus.PASS.getValue(), WmsInboundDO::getAuditStatus, InboundAuditStatus.Event.AGREE);
+            super(InboundAuditStatus.AUDITING.getValue(), InboundAuditStatus.PASS.getValue(), InboundAuditStatus.Event.AGREE);
         }
 
         @Override
@@ -104,7 +103,7 @@ public class InboundActions implements StateMachineConfigure<Integer, InboundAud
     public static class ForceFinishAction extends BaseInboundAction {
         public ForceFinishAction() {
             // 指定事件以及前后的状态与状态值提取器
-            super(InboundAuditStatus.AUDITING.getValue(), InboundAuditStatus.REJECT.getValue(), WmsInboundDO::getAuditStatus, InboundAuditStatus.Event.FORCE_FINISH);
+            super(InboundAuditStatus.AUDITING.getValue(), InboundAuditStatus.REJECT.getValue(), InboundAuditStatus.Event.FORCE_FINISH);
         }
 
         @Override
@@ -118,7 +117,6 @@ public class InboundActions implements StateMachineConfigure<Integer, InboundAud
     }
 
 
-
     /**
      * 拒绝
      **/
@@ -126,7 +124,7 @@ public class InboundActions implements StateMachineConfigure<Integer, InboundAud
     public static class RejectAction extends BaseInboundAction {
         public RejectAction() {
             // 指定事件以及前后的状态与状态值提取器
-            super(InboundAuditStatus.AUDITING.getValue(), InboundAuditStatus.REJECT.getValue(), WmsInboundDO::getAuditStatus, InboundAuditStatus.Event.REJECT);
+            super(InboundAuditStatus.AUDITING.getValue(), InboundAuditStatus.REJECT.getValue(), InboundAuditStatus.Event.REJECT);
         }
     }
 
@@ -142,7 +140,7 @@ public class InboundActions implements StateMachineConfigure<Integer, InboundAud
                 InboundAuditStatus.DRAFT.getValue(),
                 InboundAuditStatus.REJECT.getValue(),
                 InboundAuditStatus.AUDITING.getValue()
-            }, InboundAuditStatus.ABANDONED.getValue(), WmsInboundDO::getAuditStatus, InboundAuditStatus.Event.REJECT);
+            }, InboundAuditStatus.ABANDONED.getValue(), InboundAuditStatus.Event.REJECT);
         }
 
         @Override
@@ -157,7 +155,7 @@ public class InboundActions implements StateMachineConfigure<Integer, InboundAud
 
 
     /**
-     * 状态机
+     * 创建与配置状态机
      **/
     @Bean(InboundActions.STATE_MACHINE_NAME)
     public StateMachineWrapper<Integer, InboundAuditStatus.Event, WmsInboundDO> inboundActionStateMachine() {
@@ -202,12 +200,12 @@ public class InboundActions implements StateMachineConfigure<Integer, InboundAud
         @Lazy
         protected WmsInboundService inboundService;
 
-        public BaseInboundAction(Integer[] from, Integer to, Function<WmsInboundDO, Integer> getter, InboundAuditStatus.Event event) {
-            super(from, to, getter, event);
+        public BaseInboundAction(Integer[] from, Integer to, InboundAuditStatus.Event event) {
+            super(from, to, WmsInboundDO::getAuditStatus, event);
         }
 
-        public BaseInboundAction(Integer from, Integer to, Function<WmsInboundDO, Integer> getter, InboundAuditStatus.Event event) {
-            super(new Integer[]{from}, to, getter, event);
+        public BaseInboundAction(Integer from, Integer to, InboundAuditStatus.Event event) {
+            super(new Integer[]{from}, to, WmsInboundDO::getAuditStatus, event);
         }
 
         /**

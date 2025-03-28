@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.wms.service.quantity;
 
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
-import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.ErpProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.ErpProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * @author: LeeFJ
  * @date: 2025/3/25 8:41
- * @description:
+ * @description: 入库单执行器
  */
 
 @Slf4j
@@ -63,7 +63,7 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
     }
 
     /**
-     * 执行入库的原子操作,以加锁的方式单个出入库
+     * 执行入库
      */
     private InboundStatus inboundSingleItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer planQuantity, Integer actualQuantity, Long inboundId, Long inboundItemId) {
         // 校验本方法在事务中
@@ -81,6 +81,9 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
         return status.get();
     }
 
+    /**
+     * 处理单个详情
+     **/
     protected InboundStatus processItem(Long companyId, Long deptId, Long warehouseId, Long productId,Integer planQuantity, Integer actualQuantity, Long inboundId, Long inboundItemId) {
 
         // 调整仓库库存
@@ -126,7 +129,6 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
 
     /**
      * 调整归属库存
-     * 此方法必须包含在 WmsStockWarehouseServiceImpl.inboundSingleItemTransactional 方法中
      */
     private void processStockOwnershipItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer actualQuantity, Long inboundId, Long inboundItemId) {
         // 校验本方法在事务中

@@ -12,6 +12,9 @@ import jakarta.annotation.Resource;
 import lombok.Getter;
 import org.springframework.context.annotation.Lazy;
 
+/**
+ * 数量处理执行器
+ */
 public abstract class ActionExecutor<T extends ActionContext> {
 
     @Getter
@@ -45,6 +48,8 @@ public abstract class ActionExecutor<T extends ActionContext> {
         this.reason = reason;
     }
 
-
+    /**
+     * 执行库存调整
+     **/
     public abstract void execute(T context);
 }

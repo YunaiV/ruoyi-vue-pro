@@ -35,10 +35,13 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
     }
 
     @Override
-    protected Integer getExecuteQuantity(WmsOutboundItemRespVO item) {
+    protected Integer getExecuteQty(WmsOutboundItemRespVO item) {
         return item.getPlanQty();
     }
 
+    /**
+     * 更新仓库库存
+     **/
     @Override
     protected void updateStockWarehouseQty(WmsStockWarehouseDO stockWarehouseDO, WmsOutboundItemRespVO item, Integer quantity) {
 
@@ -51,6 +54,9 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
 
     }
 
+    /**
+     * 更新入库单详情
+     **/
     protected void processInboundItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
 
         Long actionId= IdUtil.getSnowflakeNextId();
@@ -69,7 +75,8 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
         if(CollectionUtils.isEmpty(itemsList)) {
             throw exception(INBOUND_ITEM_NOT_EXISTS);
         }
-        //
+
+        // 从多个有可用库存的库中，从第一个开始扣除
         List<WmsInboundItemDO> itemsToUpdate=new ArrayList<>();
         List<WmsInboundItemFlowDO> inboundItemFlowList = new ArrayList<>();
         for (WmsInboundItemDO itemDO : itemsList) {
@@ -91,7 +98,7 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
                 flowDO.setOutboundItemId(outboundItemId);
                 inboundItemFlowList.add(flowDO);
 
-            } else if(available.equals(quantity)) { // 更好单次扣除
+            } else if (available.equals(quantity)) { // 刚好单次扣除
                 flowQty=available;
                 available=0;
                 quantity=0;
@@ -130,14 +137,15 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
             }
         }
 
-
-
         // 保存详情与流水
         inboundItemService.saveItems(itemsToUpdate,inboundItemFlowList);
 
 
     }
 
+    /**
+     * 更新所有者库存
+     **/
     @Override
     protected void updateStockOwnershipQty(WmsStockOwnershipDO stockOwnershipDO, WmsOutboundItemRespVO item, Integer quantity) {
         // 可用量
@@ -146,6 +154,9 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
         stockOwnershipDO.setOutboundPendingQty(stockOwnershipDO.getOutboundPendingQty()+quantity);
     }
 
+    /**
+     * 更新库存货位
+     **/
     @Override
     protected void updateStockBinQty(WmsStockBinDO stockBinDO, WmsOutboundItemRespVO item, Integer quantity) {
         // 可用库存
@@ -156,6 +167,9 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
         stockBinDO.setOutboundPendingQty(stockBinDO.getOutboundPendingQty() + quantity);
     }
 
+    /**
+     * 更新出库单
+     **/
     @Override
     protected void updateOutbound(WmsOutboundRespVO outboundRespVO) {
         List<WmsOutboundItemRespVO> itemRespVOList=outboundRespVO.getItemList();

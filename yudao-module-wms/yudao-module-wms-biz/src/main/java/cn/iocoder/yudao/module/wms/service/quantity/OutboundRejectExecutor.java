@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespV
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.stock.flow.WmsStockFlowDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.enums.outbound.OutboundStatus;
@@ -21,9 +20,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_NOT_EXISTS;
 
 /**
  * @author: LeeFJ
@@ -43,6 +39,9 @@ public class OutboundRejectExecutor extends OutboundExecutor {
     private WmsInboundItemFlowService inboundItemFlowService;
 
 
+    /**
+     * 更新仓库库存
+     **/
     @Override
     protected void updateStockWarehouseQty(WmsStockWarehouseDO stockWarehouseDO, WmsOutboundItemRespVO item,  Integer quantity) {
         // 可用量
@@ -53,13 +52,16 @@ public class OutboundRejectExecutor extends OutboundExecutor {
         stockWarehouseDO.setOutboundPendingQty(stockWarehouseDO.getOutboundPendingQty() - quantity);
     }
 
+
     @Override
-    protected Integer getExecuteQuantity(WmsOutboundItemRespVO item) {
+    protected Integer getExecuteQty(WmsOutboundItemRespVO item) {
         return item.getPlanQty();
     }
 
+    /**
+     * 更新入库单明细
+     **/
     protected void processInboundItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
-
 
 
         List<WmsInboundItemFlowDO> flowDOList = inboundItemFlowService.selectByActionId(outboundRespVO.getLatestOutboundActionId());
@@ -75,7 +77,6 @@ public class OutboundRejectExecutor extends OutboundExecutor {
             WmsInboundItemDO inboundItemDO = map.get(flowDO.getInboundItemId());
             Integer qty=flowDO.getOutboundQty();
             inboundItemDO.setOutboundAvailableQty(inboundItemDO.getOutboundAvailableQty()+qty);
-
 
             //
             WmsInboundItemFlowDO newFlowDO=new WmsInboundItemFlowDO();
@@ -94,6 +95,9 @@ public class OutboundRejectExecutor extends OutboundExecutor {
 
     }
 
+    /**
+     * 更新所有者库存
+     **/
     @Override
     protected void updateStockOwnershipQty(WmsStockOwnershipDO stockOwnershipDO,WmsOutboundItemRespVO item,  Integer quantity) {
         // 可用量
@@ -102,6 +106,9 @@ public class OutboundRejectExecutor extends OutboundExecutor {
         stockOwnershipDO.setOutboundPendingQty(stockOwnershipDO.getOutboundPendingQty() - quantity);
     }
 
+    /**
+     * 更新库存货位
+     **/
     @Override
     protected void updateStockBinQty(WmsStockBinDO stockBinDO,WmsOutboundItemRespVO item,  Integer quantity) {
         // 可用库存
@@ -112,6 +119,9 @@ public class OutboundRejectExecutor extends OutboundExecutor {
         stockBinDO.setOutboundPendingQty(stockBinDO.getOutboundPendingQty() - quantity);
     }
 
+    /**
+     * 更新出库单
+     **/
     @Override
     protected void updateOutbound(WmsOutboundRespVO outboundRespVO) {
         List<WmsOutboundItemRespVO> itemRespVOList=outboundRespVO.getItemList();

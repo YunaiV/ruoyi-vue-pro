@@ -13,11 +13,18 @@ import java.util.function.Function;
 /**
  * @author: LeeFJ
  * @date: 2025/2/28 14:16
- * @description:
+ * @description: 状态机包装类
  */
 public class StateMachineWrapper<S, E, D> implements StateMachine<S, E, ColaContext<D>> {
 
+    /**
+     * 状态机
+     **/
     private StateMachine<S, E, ColaContext<D>> stateMachine;
+
+    /**
+     * 状态属性值提取器
+     **/
     private Function<D,S> getter;
 
 
@@ -45,7 +52,6 @@ public class StateMachineWrapper<S, E, D> implements StateMachine<S, E, ColaCont
     public S fireEvent(E event, ColaContext<D> ctx) {
         return stateMachine.fireEvent(getter.apply(ctx.data()),event,ctx);
     }
-
 
 
     @Override
@@ -83,17 +89,30 @@ public class StateMachineWrapper<S, E, D> implements StateMachine<S, E, ColaCont
     @Setter
     private Map<S, List<S>> conditionMap;
 
+    /**
+     * 当前状态是否可编辑
+     */
     public boolean canEdit(S status) {
         return statusCanEdit.contains(status);
     }
+
+    /**
+     * 当前状态是否可删除
+     */
     public boolean canDelete(S status) {
         return statusCanDelete.contains(status);
     }
 
+    /**
+     * 获得起始状态
+     */
     public List<S> getFroms(S to) {
         return conditionMap.get(to);
     }
 
+    /**
+     * 创建上下文
+     */
     public ColaContext<D> createContext(WmsApprovalReqVO approvalReqVO,D data) {
         return ColaContext.from(data,approvalReqVO,this);
     }
