@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.wms.service.inbound;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
 import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
 import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
@@ -43,6 +45,9 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     @Resource
     @Lazy
     private WmsInboundItemMapper inboundItemMapper;
+
+    @Resource
+    protected WmsLockRedisDAO lockRedisDAO;
 
     @Resource
     @Lazy
@@ -227,13 +232,22 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void approve(InboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO) {
         // 设置业务默认值
         approvalReqVO.setBillType(BillType.INBOUND.getValue());
         approvalReqVO.setStatusType(InboundAuditStatus.getType());
         // 获得业务对象
         WmsInboundDO inbound = validateInboundExists(approvalReqVO.getBillId());
+        // 锁在外，事务在锁内
+        WmsInboundServiceImpl proxy = SpringUtils.getBeanByExactType(WmsInboundServiceImpl.class);
+        lockRedisDAO.lockByWarehouse(inbound.getWarehouseId(),()->{
+            proxy.fireEvent(event,approvalReqVO,inbound);
+        });
+
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    protected void  fireEvent(InboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO,WmsInboundDO inbound) {
         ColaContext<WmsInboundDO> ctx =  inboundStateMachine.createContext(approvalReqVO,inbound);
         // 触发事件
         inboundStateMachine.fireEvent(event, ctx);

@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.wms.service.quantity;
 
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.ErpProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
@@ -18,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -38,12 +42,11 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
         super(StockReason.INBOUND);
     }
 
+
     @Override
-    @Transactional
     public void execute(InboundContext context) {
 
-        WmsInboundRespVO inboundRespVO = inboundService.getInboundWithItemList(context.getInboundId());
-
+        final WmsInboundRespVO inboundRespVO = inboundService.getInboundWithItemList(context.getInboundId());
         Long warehouseId = inboundRespVO.getWarehouseId();
         Long companyId = inboundRespVO.getCompanyId();
         Long inboundDeptId = inboundRespVO.getDeptId();
@@ -62,7 +65,7 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
                 item.setActualQty(item.getPlanQty());
             }
             // 执行入库的原子操作
-            InboundStatus inboundStatus = inboundSingleItemAtomically(companyId, deptId, warehouseId, productId, item.getPlanQty(), item.getActualQty(), inboundRespVO.getId(), item.getId());
+            InboundStatus inboundStatus = inboundSingleItem(companyId, deptId, warehouseId, productId, item.getPlanQty(), item.getActualQty(), inboundRespVO.getId(), item.getId());
             item.setInboundStatus(inboundStatus.getValue());
 
         }
@@ -74,19 +77,19 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
     /**
      * 执行入库的原子操作,以加锁的方式单个出入库
      */
-    private InboundStatus inboundSingleItemAtomically(Long companyId, Long deptId, Long warehouseId, Long productId, Integer planQuantity, Integer actualQuantity, Long inboundId, Long inboundItemId) {
+    private InboundStatus inboundSingleItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer planQuantity, Integer actualQuantity, Long inboundId, Long inboundItemId) {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
         AtomicReference<InboundStatus> status = new AtomicReference<>();
-        lockRedisDAO.lockStockLevels(warehouseId, 0L,companyId,deptId, productId, () -> {
-            try {
-                InboundStatus inboundStatus = this.processItem(companyId, deptId, warehouseId, productId, planQuantity,actualQuantity, inboundId, inboundItemId);
-                status.set(inboundStatus);
-            } catch (Exception e) {
-                log.error("inboundSingleItemTransactional Error" , e);
-                throw e;
-            }
-        });
+
+        try {
+            InboundStatus inboundStatus = this.processItem(companyId, deptId, warehouseId, productId, planQuantity,actualQuantity, inboundId, inboundItemId);
+            status.set(inboundStatus);
+        } catch (Exception e) {
+            log.error("inboundSingleItem Error" , e);
+            throw e;
+        }
+
         return status.get();
     }
 

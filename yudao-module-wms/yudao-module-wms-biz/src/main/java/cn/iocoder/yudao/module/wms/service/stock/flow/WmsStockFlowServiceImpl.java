@@ -180,40 +180,40 @@ public class WmsStockFlowServiceImpl implements WmsStockFlowService {
      */
     public void createFor(StockReason reason, StockType stockType, Long stockId, Long warehouseId, Long productId, Integer quantity, Long reasonId, Long reasonItemId, Consumer<WmsStockFlowDO> consumer) {
 
-        lockRedisDAO.lockFlow(warehouseId, stockType.getValue(), stockId,()->{
 
-            // 校验本方法在事务中
-            JdbcUtils.requireTransaction();
-            // 获取上一个流水
-            WmsStockFlowDO lastStockFlowDO = this.getLastFlow(warehouseId, stockType.getValue(), stockId);
-            // 创建本次流水
-            WmsStockFlowDO stockFlowDO = new WmsStockFlowDO();
-            stockFlowDO.setWarehouseId(warehouseId);
-            stockFlowDO.setProductId(productId);
-            stockFlowDO.setStockType(stockType.getValue());
-            stockFlowDO.setStockId(stockId);
-            stockFlowDO.setReason(reason.getValue());
-            stockFlowDO.setReasonBillId(reasonId);
-            stockFlowDO.setReasonItemId(reasonItemId);
-            if (lastStockFlowDO != null) {
-                stockFlowDO.setPrevFlowId(lastStockFlowDO.getId());
-            } else {
-                stockFlowDO.setPrevFlowId(0L);
-            }
-            // 变更量
-            stockFlowDO.setDeltaQty(quantity);
-            consumer.accept(stockFlowDO);
-            //
-            stockFlowDO.setFlowTime(new Timestamp(System.currentTimeMillis()));
-            // 保存
-            stockFlowMapper.insert(stockFlowDO);
-            // 关联前项流水
-            if (lastStockFlowDO != null) {
-                lastStockFlowDO.setNextFlowId(stockFlowDO.getId());
-                this.updateStockFlow(BeanUtils.toBean(lastStockFlowDO, WmsStockFlowSaveReqVO.class));
-            }
 
-        });
+        // 校验本方法在事务中
+        JdbcUtils.requireTransaction();
+        // 获取上一个流水
+        WmsStockFlowDO lastStockFlowDO = this.getLastFlow(warehouseId, stockType.getValue(), stockId);
+        // 创建本次流水
+        WmsStockFlowDO stockFlowDO = new WmsStockFlowDO();
+        stockFlowDO.setWarehouseId(warehouseId);
+        stockFlowDO.setProductId(productId);
+        stockFlowDO.setStockType(stockType.getValue());
+        stockFlowDO.setStockId(stockId);
+        stockFlowDO.setReason(reason.getValue());
+        stockFlowDO.setReasonBillId(reasonId);
+        stockFlowDO.setReasonItemId(reasonItemId);
+        if (lastStockFlowDO != null) {
+            stockFlowDO.setPrevFlowId(lastStockFlowDO.getId());
+        } else {
+            stockFlowDO.setPrevFlowId(0L);
+        }
+        // 变更量
+        stockFlowDO.setDeltaQty(quantity);
+        consumer.accept(stockFlowDO);
+        //
+        stockFlowDO.setFlowTime(new Timestamp(System.currentTimeMillis()));
+        // 保存
+        stockFlowMapper.insert(stockFlowDO);
+        // 关联前项流水
+        if (lastStockFlowDO != null) {
+            lastStockFlowDO.setNextFlowId(stockFlowDO.getId());
+            this.updateStockFlow(BeanUtils.toBean(lastStockFlowDO, WmsStockFlowSaveReqVO.class));
+        }
+
+
     }
 
     @Override

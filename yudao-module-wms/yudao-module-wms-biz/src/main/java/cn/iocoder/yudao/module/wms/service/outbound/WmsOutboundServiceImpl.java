@@ -4,8 +4,10 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
 import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
 import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
@@ -53,6 +55,9 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
 
     @Resource
     private WmsNoRedisDAO noRedisDAO;
+
+    @Resource
+    protected WmsLockRedisDAO lockRedisDAO;
 
     @Resource
     private WmsOutboundMapper outboundMapper;
@@ -264,15 +269,24 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void approve(OutboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO) {
         // 设置业务默认值
         approvalReqVO.setBillType(BillType.OUTBOUND.getValue());
         approvalReqVO.setStatusType(OutboundAuditStatus.getType());
         // 获得业务对象
         WmsOutboundDO inbound = validateOutboundExists(approvalReqVO.getBillId());
-        ColaContext<WmsOutboundDO> ctx = outboundStateMachine.createContext(approvalReqVO,inbound);
+        // 锁在外，事务在锁内
+        WmsOutboundServiceImpl proxy = SpringUtils.getBeanByExactType(WmsOutboundServiceImpl.class);
+        lockRedisDAO.lockByWarehouse(inbound.getWarehouseId(),()->{
+            proxy.fireEvent(event, approvalReqVO, inbound);
+        });
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    protected void fireEvent(OutboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO, WmsOutboundDO inbound) {
+        ColaContext<WmsOutboundDO> ctx = outboundStateMachine.createContext(approvalReqVO, inbound);
         // 触发事件
         outboundStateMachine.fireEvent(event, ctx);
     }
+
 }

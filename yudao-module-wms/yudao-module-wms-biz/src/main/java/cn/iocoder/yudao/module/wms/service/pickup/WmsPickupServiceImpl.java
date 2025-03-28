@@ -4,9 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
-import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.pickup.vo.WmsPickupPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.pickup.vo.WmsPickupSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
@@ -22,7 +21,6 @@ import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.quantity.PickupExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.context.PickupContext;
-import cn.iocoder.yudao.module.wms.service.stock.bin.WmsStockBinService;
 import cn.iocoder.yudao.module.wms.service.warehouse.bin.WmsWarehouseBinService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
@@ -30,6 +28,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
 
@@ -45,6 +45,9 @@ public class WmsPickupServiceImpl implements WmsPickupService {
     @Resource
     @Lazy
     private WmsPickupItemMapper pickupItemMapper;
+
+    @Resource
+    protected WmsLockRedisDAO lockRedisDAO;
 
     @Resource
     private WmsNoRedisDAO noRedisDAO;
@@ -68,11 +71,12 @@ public class WmsPickupServiceImpl implements WmsPickupService {
     @Lazy
     private PickupExecutor pickupExecutor;
 
+
+
     /**
      * @sign : E7A4B1135281D8DB
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public WmsPickupDO createPickup(WmsPickupSaveReqVO createReqVO) {
         // 设置单据号
         String no = noRedisDAO.generate(WmsNoRedisDAO.PICKUP_NO_PREFIX, PICKUP_NOT_EXISTS);
@@ -98,6 +102,21 @@ public class WmsPickupServiceImpl implements WmsPickupService {
         WmsPickupDO pickup = BeanUtils.toBean(createReqVO, WmsPickupDO.class);
         // 校验入库单与仓位的仓库必须是同一个仓库
         List<WmsInboundItemDO> inboundItemDOList = processAndValidateForPickIn(pickup, toInsetList);
+
+        WmsPickupServiceImpl proxy = SpringUtils.getBeanByExactType(WmsPickupServiceImpl.class);
+        AtomicReference<WmsPickupDO> pickupDO = new AtomicReference<>();
+        lockRedisDAO.lockByWarehouse(pickup.getWarehouseId(),()->{
+            pickupDO.set(proxy.createPickupInLock(pickup, toInsetList));
+        });
+        return pickupDO.get();
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    protected WmsPickupDO createPickupInLock(WmsPickupDO pickup, List<WmsPickupItemDO> toInsetList) {
+        // 取得锁之后需要重新取数
+        List<Long> inboundItemIdList = StreamX.from(toInsetList).toList(WmsPickupItemDO::getInboundItemId);
+        List<WmsInboundItemDO> inboundItemDOList = inboundItemService.selectByIds(inboundItemIdList);
         // 插入
         pickupMapper.insert(pickup);
         toInsetList.forEach(wmsPickupItemDO -> {
@@ -112,6 +131,7 @@ public class WmsPickupServiceImpl implements WmsPickupService {
         // 返回
         return pickup;
     }
+
 
     private void pickup(WmsPickupDO pickup, List<WmsPickupItemDO> wmsPickupItemDOList, List<WmsInboundItemRespVO> inboundItemVOList) {
         PickupContext context = new PickupContext();

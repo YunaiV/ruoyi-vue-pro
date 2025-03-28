@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.wms.dal.redis.lock;
 
+
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Repository;
-
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -18,56 +18,25 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class WmsLockRedisDAO {
 
+    private static final String WMS_STOCK_FLOW_LOCK = "wms:warehouse-product:lock:%d:%d";
 
-    private static final String WMS_STOCK_WAREHOUSE_LOCK = "wms:stock-warehouse:lock:%d:%d";
-    private static final String WMS_STOCK_BIN_LOCK = "wms:stock-bin:lock:%d:%d:%d";
-    private static final String WMS_STOCK_OWNER_LOCK = "wms:stock-owner:lock:%d:%d";
-    private static final String WMS_STOCK_FLOW_LOCK = "wms:stock-flow:lock:%d:%d:%d";
+    private static final String WMS_STOCK_WAREHOUSE_LOCK = "wms:warehouse-product:lock:%d";
+
 
     @Resource
     private RedissonClient redissonClient;
 
 
-
-    public void lockFlow(Long warehouseId, Integer stockType, Long stockId,Runnable runnable) {
-        String key = formatKey(WMS_STOCK_FLOW_LOCK,warehouseId,Long.valueOf(stockType),stockId);
-        lock(key,runnable,8,8);
+    public void lockByWarehouse(Long warehouseId, Runnable runnable) {
+        String key = formatKey(WMS_STOCK_WAREHOUSE_LOCK, warehouseId);
+        if(SpringUtils.isProd()) {
+            // 高负载时，如果锁的时长不够，可能导致库存不准确
+            lock(key, runnable, 16, 16);
+        } else {
+            // 压测时加大锁的时长
+            lock(key, runnable, 600, 600);
+        }
     }
-
-    /**
-     * 仓库库存锁
-     **/
-    public void lockStockLevels(Long warehouseId,Long productId, Runnable runnable) {
-        lockStockLevels(warehouseId,0L,0L,0L, productId,runnable);
-    }
-
-    /**
-     * 仓库库存锁
-     **/
-    public void lockStockLevels(Long warehouseId,Long productId, Long binId , Runnable runnable) {
-        lockStockLevels(warehouseId,binId,0L,0L, productId,runnable);
-    }
-
-    /**
-     * 仓库库存锁
-     **/
-    public void lockStockLevels(Long warehouseId, Long binId , Long companyId, Long deptId ,Long productId, Runnable runnable) {
-        String warehouseLockKey = formatKey(WMS_STOCK_WAREHOUSE_LOCK,warehouseId,productId);
-        String binLockKey = formatKey(WMS_STOCK_BIN_LOCK,warehouseId,binId,productId);
-        String ownerLockKey = formatKey(WMS_STOCK_OWNER_LOCK,warehouseId,productId);
-
-        // 给仓指定仓库与产品库存加锁
-        lock(warehouseLockKey,()->{
-            // 给指定仓库的仓位分项的产品加锁
-            lock(binLockKey,()->{
-                // 给指定仓库的所有者分项的产品加锁
-                lock(ownerLockKey, runnable,8,8);
-            },8,8);
-        },8,8);
-    }
-
-
-
 
 
     private void lock(String lockKey, Runnable runnable, int waitSeconds, int leaseSeconds) {

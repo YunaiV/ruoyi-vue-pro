@@ -1,7 +1,11 @@
 package cn.iocoder.yudao.module.wms.service.quantity;
 
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.ErpProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
@@ -16,6 +20,7 @@ import cn.iocoder.yudao.module.wms.service.outbound.WmsOutboundService;
 import cn.iocoder.yudao.module.wms.service.quantity.context.OutboundContext;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -51,11 +56,9 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
     protected abstract void updateOutbound(WmsOutboundRespVO outboundRespVO);
 
     @Override
-    @Transactional
     public void execute(OutboundContext context) {
 
         WmsOutboundRespVO outboundRespVO=outboundService.getOutboundWithItemList(context.getOutboundId());
-
         Long warehouseId = outboundRespVO.getWarehouseId();
         Long companyId = outboundRespVO.getCompanyId();
         Long outboundDeptId = outboundRespVO.getDeptId();
@@ -85,17 +88,14 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
     private OutboundStatus outboundSingleItemAtomically(WmsOutboundRespVO outboundRespVO,WmsOutboundItemRespVO item,Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
-        AtomicReference<OutboundStatus> status = new AtomicReference<>();
-        lockRedisDAO.lockStockLevels(warehouseId,binId, companyId, deptId, productId, () -> {
-            try {
-                OutboundStatus outboundStatus=this.processItem(outboundRespVO,item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
-                status.set(outboundStatus);
-            } catch (Exception e) {
-                log.error("outboundSingleItemTransactional Error", e);
-                throw e;
-            }
-        });
-        return status.get();
+        OutboundStatus status = OutboundStatus.NONE;
+        try {
+            status=this.processItem(outboundRespVO,item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
+        } catch (Exception e) {
+            log.error("outboundSingleItemTransactional Error", e);
+            throw e;
+        }
+        return status;
     }
 
 

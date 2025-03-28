@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.wms.service.quantity;
 
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
@@ -21,6 +22,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -53,7 +55,6 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
     }
 
     @Override
-    @Transactional
     public void execute(PickupContext context) {
 
         JdbcUtils.requireTransaction();
@@ -75,15 +76,18 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
             if(pickupItemDO.getQty()> inboundItemVO.getActualQty()) {
                 throw exception(INBOUND_ITEM_ACTUAL_QTY_ERROR);
             }
+            // 拣货量不能大于可拣货的量
+            Integer pickupAvaAty = inboundItemVO.getActualQty() - inboundItemVO.getShelvedQty();
+            if(pickupItemDO.getQty() > pickupAvaAty) {
+                throw exception(INBOUND_ITEM_ACTUAL_QTY_ERROR);
+            }
             // 设置已拣货量
             pickupItemDO.setInboundId(inboundItemVO.getInboundId());
             pickupItemDO.setInboundItemId(inboundItemVO.getId());
             pickupItemDO.setProductId(inboundItemVO.getProductId());
             pickupItemDO.setPickupId(pickup.getId());
             // 调整仓位库存
-            lockRedisDAO.lockStockLevels(pickup.getWarehouseId(),pickupItemDO.getBinId(), pickupItemDO.getProductId(), () -> {
-                this.processItem(pickup, pickupItemDO, inboundMap.get(inboundItemVO.getInboundId()), inboundItemVO);
-            });
+            this.processItem(pickup, pickupItemDO, inboundMap.get(inboundItemVO.getInboundId()), inboundItemVO);
             inboundItemService.updateById(BeanUtils.toBean(inboundItemVO, WmsInboundItemDO.class));
         }
 
