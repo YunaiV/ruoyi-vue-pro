@@ -11,9 +11,9 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductUnitApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
-import cn.iocoder.yudao.module.fms.api.finance.ErpAccountApi;
-import cn.iocoder.yudao.module.fms.api.finance.ErpFinanceSubjectApi;
-import cn.iocoder.yudao.module.fms.api.finance.dto.ErpFinanceSubjectDTO;
+import cn.iocoder.yudao.module.fms.api.finance.FmsAccountApi;
+import cn.iocoder.yudao.module.fms.api.finance.FmsFinanceSubjectApi;
+import cn.iocoder.yudao.module.fms.api.finance.dto.FmsFinanceSubjectDTO;
 import cn.iocoder.yudao.module.srm.api.purchase.SrmInCountDTO;
 import cn.iocoder.yudao.module.srm.api.purchase.SrmPayCountDTO;
 import cn.iocoder.yudao.module.srm.api.purchase.TmsOrderCountDTO;
@@ -83,11 +83,11 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
     private final ErpSupplierService supplierService;
     private final ErpPurchaseInService purchaseInService;
     @Resource
-    private final ErpAccountApi erpAccountApi;
+    private final FmsAccountApi erpAccountApi;
     private final ErpProductApi erpProductApi;
     private final ErpProductUnitApi erpProductUnitApi;
     @Resource
-    private final ErpFinanceSubjectApi erpFinanceSubjectApi;
+    private final FmsFinanceSubjectApi erpFinanceSubjectApi;
     private final ResourcePatternResolver resourcePatternResolver;
     private final PurchaseOrderTemplateManager purchaseOrderTemplateManager;
 
@@ -627,7 +627,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         XWPFTemplate xwpfTemplate = purchaseOrderTemplateManager.getTemplate("purchase/order/%s".formatted(reqVO.getTemplateName()));
         //2 模板word渲染数据
         List<ErpPurchaseOrderItemDO> itemDOS = purchaseOrderItemMapper.selectListByOrderId(orderDO.getId());
-        Map<Long, ErpFinanceSubjectDTO> dtoMap = convertMap(erpFinanceSubjectApi.validateFinanceSubject(List.of(reqVO.getPartyAId(), reqVO.getPartyBId())), ErpFinanceSubjectDTO::getId);
+        Map<Long, FmsFinanceSubjectDTO> dtoMap = convertMap(erpFinanceSubjectApi.validateFinanceSubject(List.of(reqVO.getPartyAId(), reqVO.getPartyBId())), FmsFinanceSubjectDTO::getId);
         ErpPurchaseOrderWordBO wordBO = ErpOrderConvert.INSTANCE.bindDataFormOrderItemDO(itemDOS, orderDO, reqVO, dtoMap);
         xwpfTemplate.render(wordBO);
         //3 转换pdf，返回响应

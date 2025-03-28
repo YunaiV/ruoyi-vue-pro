@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
-import cn.iocoder.yudao.module.fms.api.finance.ErpAccountApi;
+import cn.iocoder.yudao.module.fms.api.finance.FmsAccountApi;
 import cn.iocoder.yudao.module.srm.api.purchase.SrmInCountDTO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.returns.ErpPurchaseReturnAuditReqVO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.returns.ErpPurchaseReturnPageReqVO;
@@ -59,7 +59,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
     private final ErpPurchaseOrderItemMapper orderItemMapper;
     private final ErpProductApi erpProductApi;
     @Resource
-    private final ErpAccountApi erpAccountApi;
+    private final FmsAccountApi erpAccountApi;
 
     @Resource(name = PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME)
     StateMachine<ErpStorageStatus, SrmEventEnum, SrmInCountDTO> orderItemStorageMachine;

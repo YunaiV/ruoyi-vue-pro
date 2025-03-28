@@ -5,8 +5,8 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.text.StrPool;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
-import cn.iocoder.yudao.module.fms.dal.dataobject.finance.ErpFinancePaymentDO;
-import cn.iocoder.yudao.module.fms.dal.dataobject.finance.ErpFinanceReceiptDO;
+import cn.iocoder.yudao.module.fms.dal.dataobject.finance.FmsFinancePaymentDO;
+import cn.iocoder.yudao.module.fms.dal.dataobject.finance.FmsFinanceReceiptDO;
 import cn.iocoder.yudao.module.fms.dal.redis.FmsRedisKeyConstants;
 import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -27,11 +27,11 @@ public class FmsNoRedisDAO {
 
 
     /**
-     * 付款单 {@link ErpFinancePaymentDO}
+     * 付款单 {@link FmsFinancePaymentDO}
      */
     public static final String FINANCE_PAYMENT_NO_PREFIX = "FKD";
     /**
-     * 收款单 {@link ErpFinanceReceiptDO}
+     * 收款单 {@link FmsFinanceReceiptDO}
      */
     public static final String FINANCE_RECEIPT_NO_PREFIX = "SKD";
 

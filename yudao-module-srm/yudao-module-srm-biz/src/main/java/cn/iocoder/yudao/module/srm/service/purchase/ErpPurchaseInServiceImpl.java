@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
-import cn.iocoder.yudao.module.fms.api.finance.ErpAccountApi;
+import cn.iocoder.yudao.module.fms.api.finance.FmsAccountApi;
 import cn.iocoder.yudao.module.srm.api.purchase.SrmInCountDTO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.ErpPurchaseInAuditReqVO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.ErpPurchaseInPageReqVO;
@@ -64,7 +64,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     private final ErpProductApi erpProductApi;
     private final SrmNoRedisDAO noRedisDAO;
     @Resource
-    private final ErpAccountApi erpAccountApi;
+    private final FmsAccountApi erpAccountApi;
     private final ErpPurchaseOrderItemMapper orderItemMapper;
     @Resource
     @Lazy // 延迟加载，避免循环依赖

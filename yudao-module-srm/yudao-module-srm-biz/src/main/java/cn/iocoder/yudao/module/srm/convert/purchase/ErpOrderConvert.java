@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.srm.convert.purchase;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.fms.api.finance.dto.ErpFinanceSubjectDTO;
+import cn.iocoder.yudao.module.fms.api.finance.dto.FmsFinanceSubjectDTO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.ErpPurchaseOrderGenerateContractReqVO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.ErpPurchaseOrderSaveReqVO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.ErpPurchaseRequestMergeReqVO;
@@ -71,7 +71,7 @@ public interface ErpOrderConvert {
     /**
      * 合同渲染BO用
      */
-    default ErpPurchaseOrderWordBO bindDataFormOrderItemDO(List<ErpPurchaseOrderItemDO> itemDOS, ErpPurchaseOrderDO orderDO, ErpPurchaseOrderGenerateContractReqVO vo, Map<Long, ErpFinanceSubjectDTO> dtoMap) {
+    default ErpPurchaseOrderWordBO bindDataFormOrderItemDO(List<ErpPurchaseOrderItemDO> itemDOS, ErpPurchaseOrderDO orderDO, ErpPurchaseOrderGenerateContractReqVO vo, Map<Long, FmsFinanceSubjectDTO> dtoMap) {
 //        Set<Long> productIds = itemDOS.stream().map(ErpPurchaseOrderItemDO::getProductId).collect(Collectors.toSet());
 //        Map<Long, ErpProductDTO> productMap = erpProductApi.getProductMap(productIds);
         //收集产品的单位map getProductUnitMap
