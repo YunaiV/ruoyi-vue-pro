@@ -55,6 +55,17 @@
         </dependency>
 
         <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-oms-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-oms-biz</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-quartz</artifactId>
         </dependency>

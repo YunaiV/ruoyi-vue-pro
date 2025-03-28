@@ -109,6 +109,13 @@
            <version>${revision}</version>
        </dependency>
 
+        <!-- OMS 相关模块。默认注释，保证编译速度 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-oms-biz</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
         <!-- TMS 相关模块。默认注释，保证编译速度 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>

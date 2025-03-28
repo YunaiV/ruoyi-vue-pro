@@ -1,7 +1,6 @@
 package com.somle.esb.job;
 
 
-import com.somle.eccang.service.EccangService;
 import com.somle.esb.model.Domain;
 import com.somle.esb.service.EsbService;
 import com.somle.shopify.service.ShopifyService;

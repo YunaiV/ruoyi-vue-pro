@@ -27,7 +27,6 @@ import com.somle.esb.service.EsbService;
 import cn.iocoder.yudao.framework.test.core.ut.SomleBaseSpringTest;
 import com.somle.kingdee.service.KingdeeService;
 import com.somle.matomo.service.MatomoService;
-import com.somle.shopify.service.ShopifyService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -48,7 +47,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 //    DingTalkService.class,
 //    KingdeeService.class,
 //    AmazonService.class,
-    ShopifyService.class,
 
 //    DeptServiceImpl.class,
 //    AdminUserServiceImpl.class,

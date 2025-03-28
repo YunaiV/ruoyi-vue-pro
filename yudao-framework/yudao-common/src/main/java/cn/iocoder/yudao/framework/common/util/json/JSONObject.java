@@ -5,6 +5,7 @@ package cn.iocoder.yudao.framework.common.util.json;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 
@@ -31,6 +32,11 @@ public class JSONObject extends ObjectNode{
     public JSONObject(ObjectNode other) {
         super(JsonUtilsX.getNodeFactory());
         this.setAll(other);
+    }
+
+    public JSONObject(JsonNode other) {
+        super(JsonUtilsX.getNodeFactory());
+        other.fields().forEachRemaining(entry -> this.set(entry.getKey(), entry.getValue()));
     }
 
 
@@ -96,4 +102,15 @@ public class JSONObject extends ObjectNode{
 //    public List<Map.Entry<String, JsonNode>> entrySet() {
 //        return ListUtil.toList(node.fields());
 //    }
+
+    public JSONObject getJSONObject(String fieldName) {
+        JsonNode value=this.get(fieldName);
+        if(value==null) {
+            return null;
+        }
+        if(value instanceof NullNode) {
+            return null;
+        }
+        return new JSONObject((ObjectNode) value);
+    }
 }
