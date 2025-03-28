@@ -12,7 +12,7 @@ public class AiWorkflowTestReqVO {
 
     @Schema(description = "工作流模型", requiredMode = Schema.RequiredMode.REQUIRED, example = "{}")
     @NotEmpty(message = "工作流模型不能为空")
-    private String model;
+    private String graph;
 
     @Schema(description = "参数", requiredMode = Schema.RequiredMode.REQUIRED, example = "{}")
     private Map<String, Object> params;

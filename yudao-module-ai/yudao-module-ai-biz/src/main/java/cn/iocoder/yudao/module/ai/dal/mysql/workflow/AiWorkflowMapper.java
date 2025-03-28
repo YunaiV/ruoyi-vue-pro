@@ -15,14 +15,16 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface AiWorkflowMapper extends BaseMapperX<AiWorkflowDO> {
 
-    default AiWorkflowDO selectByKey(String key) {
-        return selectOne(AiWorkflowDO::getDefinitionKey, key);
+    default AiWorkflowDO selectByCode(String code) {
+        return selectOne(AiWorkflowDO::getCode, code);
     }
 
     default PageResult<AiWorkflowDO> selectPage(AiWorkflowPageReqVO pageReqVO) {
         return selectPage(pageReqVO, new LambdaQueryWrapperX<AiWorkflowDO>()
+                .eqIfPresent(AiWorkflowDO::getStatus, pageReqVO.getStatus())
                 .likeIfPresent(AiWorkflowDO::getName, pageReqVO.getName())
-                .likeIfPresent(AiWorkflowDO::getDefinitionKey, pageReqVO.getDefinitionKey()));
+                .likeIfPresent(AiWorkflowDO::getCode, pageReqVO.getCode())
+                .betweenIfPresent(AiWorkflowDO::getCreateTime, pageReqVO.getCreateTime()));
     }
 
 }

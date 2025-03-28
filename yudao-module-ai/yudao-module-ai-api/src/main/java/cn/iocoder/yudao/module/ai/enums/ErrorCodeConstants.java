@@ -63,6 +63,6 @@ public interface ErrorCodeConstants {
 
     // ========== AI 工作流 1-040-011-000 ==========
     ErrorCode WORKFLOW_NOT_EXISTS = new ErrorCode(1_040_011_000, "工作流不存在");
-    ErrorCode WORKFLOW_KEY_EXISTS = new ErrorCode(1_040_011_001, "工作流标识已存在");
+    ErrorCode WORKFLOW_CODE_EXISTS = new ErrorCode(1_040_011_001, "工作流标识已存在");
 
 }

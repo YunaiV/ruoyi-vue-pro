@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.workflow;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -28,13 +29,23 @@ public class AiWorkflowDO extends BaseDO {
     /**
      * 工作流标识
      */
-    // TODO @lesan：要不换成 code？主要想，和 bpm 工作流，有点区分，字段上。
-    private String definitionKey;
+    private String code;
 
-    // TODO @lesan：graph 用这个如何？发现大家貌似更爱用这个字段哈。图！
     /**
      * 工作流模型 JSON 数据
      */
-    private String model;
+    private String graph;
+
+    /**
+     * 备注
+     */
+    private String remark;
+
+    /**
+     * 状态
+     *
+     * 枚举 {@link CommonStatusEnum}
+     */
+    private Integer status;
 
 }

@@ -67,15 +67,6 @@ public class AiWorkflowController {
         return success(BeanUtils.toBean(pageResult, AiWorkflowRespVO.class));
     }
 
-    // TODO @lesan：要不融合到 updateWorkflow 接口？
-    @PutMapping("/updateWorkflowModel")
-    @Operation(summary = "更新 AI 工作流模型")
-    @PreAuthorize("@ss.hasPermission('ai:workflow:update')")
-    public CommonResult<Boolean> updateWorkflowModel(@Valid @RequestBody AiWorkflowUpdateModelReqVO updateReqVO) {
-        workflowService.updateWorkflowModel(updateReqVO);
-        return success(true);
-    }
-
     @PostMapping("/test")
     @Operation(summary = "测试 AI 工作流")
     @PreAuthorize("@ss.hasPermission('ai:workflow:test')")
