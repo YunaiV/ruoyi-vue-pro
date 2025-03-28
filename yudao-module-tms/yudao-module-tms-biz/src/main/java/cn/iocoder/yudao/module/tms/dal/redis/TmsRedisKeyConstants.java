@@ -4,11 +4,11 @@ public interface TmsRedisKeyConstants {
 
 
     /**
-     * ErpCustomProductService 服务的缓存单体
+     * TmsCustomProductService 服务的缓存单体
      */
     String TMS_CUSTOM_PRODUCT = "tms:custom_product_service:";
     /**
-     * ErpCustomProductService 服务的缓存集合+分页+list
+     * TmsCustomProductService 服务的缓存集合+分页+list
      */
     String TMS_CUSTOM_PRODUCT_LIST = "tms:custom_product_service:list:";
 }
