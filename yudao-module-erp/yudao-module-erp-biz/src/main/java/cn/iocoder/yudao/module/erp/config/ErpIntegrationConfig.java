@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.srm.config;
+package cn.iocoder.yudao.module.erp.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

@@ -4,7 +4,7 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
-import cn.iocoder.yudao.module.erp.api.supplier.dto.ErpSupplierDTO;
+import cn.iocoder.yudao.module.srm.api.supplier.dto.SrmSupplierDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
@@ -158,7 +158,7 @@ public class ErpToKingdeeConverter {
     }
 
 
-    public KingdeeSupplier toKingdee(ErpSupplierDTO erpSupplierDTO) {
+    public KingdeeSupplier toKingdee(SrmSupplierDTO erpSupplierDTO) {
         KingdeeSupplier kingdeeSupplier = new KingdeeSupplier();
         kingdeeSupplier.setName(erpSupplierDTO.getName());
         kingdeeSupplier.setAccountOpenAddr(erpSupplierDTO.getBankAddress());
