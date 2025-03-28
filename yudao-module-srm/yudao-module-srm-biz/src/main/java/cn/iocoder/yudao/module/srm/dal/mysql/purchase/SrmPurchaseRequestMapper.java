@@ -1,0 +1,45 @@
+package cn.iocoder.yudao.module.srm.dal.mysql.purchase;
+
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.SrmPurchaseRequestPageReqVO;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestDO;
+import org.apache.ibatis.annotations.Mapper;
+
+/**
+ * ERP采购申请单 Mapper
+ *
+ * @author 索迈管理员
+ */
+@Mapper
+public interface SrmPurchaseRequestMapper extends BaseMapperX<SrmPurchaseRequestDO> {
+
+    default PageResult<SrmPurchaseRequestDO> selectPage(SrmPurchaseRequestPageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<SrmPurchaseRequestDO>()
+            .eqIfPresent(SrmPurchaseRequestDO::getNo, reqVO.getNo())
+            .eqIfPresent(SrmPurchaseRequestDO::getApplicantId, reqVO.getApplicantId())
+            .eqIfPresent(SrmPurchaseRequestDO::getApplicationDeptId, reqVO.getApplicationDeptId())
+            //supplierId 供应商编号
+            .eqIfPresent(SrmPurchaseRequestDO::getSupplierId, reqVO.getSupplierId())
+            .betweenIfPresent(SrmPurchaseRequestDO::getRequestTime, reqVO.getRequestTime())
+            .eqIfPresent(SrmPurchaseRequestDO::getAuditorId, reqVO.getAuditorId()) //审核者
+            .betweenIfPresent(SrmPurchaseRequestDO::getAuditTime, reqVO.getAuditTime())
+            .betweenIfPresent(SrmPurchaseRequestDO::getCreateTime, reqVO.getCreateTime())
+            //状态
+            .eqIfPresent(SrmPurchaseRequestDO::getStatus, reqVO.getStatus())
+            .eqIfPresent(SrmPurchaseRequestDO::getOffStatus, reqVO.getOffStatus())
+            .eqIfPresent(SrmPurchaseRequestDO::getOrderStatus, reqVO.getOrderStatus())
+            .eqIfPresent(SrmPurchaseRequestDO::getInStatus, reqVO.getInStatus())
+            .eqIfPresent(SrmPurchaseRequestDO::getTag, reqVO.getTag())
+            //
+            .likeIfPresent(SrmPurchaseRequestDO::getDelivery, reqVO.getDelivery())
+            .likeIfPresent(SrmPurchaseRequestDO::getReviewComment, reqVO.getReviewComment())
+            .orderByDesc(SrmPurchaseRequestDO::getId));
+    }
+
+    default SrmPurchaseRequestDO selectByNo(String no) {
+        return selectOne(SrmPurchaseRequestDO::getNo, no);
+    }
+
+}

@@ -6,10 +6,10 @@ import cn.hutool.core.text.StrPool;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.module.srm.dal.redis.SrmRedisKeyConstants;
-import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpPurchaseInDO;
-import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpPurchaseOrderDO;
-import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpPurchaseRequestDO;
-import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.ErpPurchaseReturnDO;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseInDO;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestDO;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseReturnDO;
 import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -59,19 +59,19 @@ public class SrmNoRedisDAO {
 //    public static final String SALE_RETURN_NO_PREFIX = "XSTH";
 
     /**
-     * 采购订单 {@link ErpPurchaseOrderDO}
+     * 采购订单 {@link SrmPurchaseOrderDO}
      */
     public static final String PURCHASE_ORDER_NO_PREFIX = "CGDD";
     /**
-     * 采购申请 {@link ErpPurchaseRequestDO}
+     * 采购申请 {@link SrmPurchaseRequestDO}
      */
     public static final String PURCHASE_REQUEST_NO_PREFIX = "CGSQ";
     /**
-     * 采购入库 {@link ErpPurchaseInDO}
+     * 采购入库 {@link SrmPurchaseInDO}
      */
     public static final String PURCHASE_IN_NO_PREFIX = "CGRK";
     /**
-     * 采购退货 {@link ErpPurchaseReturnDO}
+     * 采购退货 {@link SrmPurchaseReturnDO}
      */
     public static final String PURCHASE_RETURN_NO_PREFIX = "CGTH";
 //
