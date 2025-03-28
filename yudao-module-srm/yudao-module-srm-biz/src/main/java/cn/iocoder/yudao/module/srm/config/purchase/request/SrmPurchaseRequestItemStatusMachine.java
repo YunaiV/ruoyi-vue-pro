@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 @Configuration
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class SrmPurchaseRequestItemStatusMachine {
+public class ErpPurchaseRequestItemStatusMachine {
     @Resource
     private Action<SrmOffStatus, SrmEventEnum, SrmPurchaseRequestItemsDO> actionItemOffImpl;
     @Resource
