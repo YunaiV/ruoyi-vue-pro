@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo;
+package cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;

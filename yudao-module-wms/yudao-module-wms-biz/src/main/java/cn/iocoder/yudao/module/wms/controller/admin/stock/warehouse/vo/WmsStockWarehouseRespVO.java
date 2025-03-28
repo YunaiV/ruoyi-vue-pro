@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo;
 
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.ErpProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
@@ -88,4 +90,10 @@ public class WmsStockWarehouseRespVO {
     @Schema(description = "待上架数量，上架是指从拣货区上架到货架", example = "")
     @ExcelProperty("待上架数量，上架是指从拣货区上架到货架")
     private Integer shelvingPendingQty;
+
+    @Schema(description = "仓库", example = "")
+    private WmsWarehouseSimpleRespVO warehouse;
+
+    @Schema(description = "产品", example = "")
+    private ErpProductRespSimpleVO product;
 }

@@ -4,6 +4,7 @@ import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import org.apache.ibatis.annotations.Mapper;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.*;
@@ -17,9 +18,23 @@ import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.*;
 public interface WmsStockWarehouseMapper extends BaseMapperX<WmsStockWarehouseDO> {
 
     default PageResult<WmsStockWarehouseDO> selectPage(WmsStockWarehousePageReqVO reqVO) {
+
+        MPJLambdaWrapperX<WmsStockWarehouseDO> wrapper = new MPJLambdaWrapperX();
+        wrapper.innerJoin("erp_product p t.product_id=p.id");
+
+        // 仓库
+        wrapper.eqIfPresent(WmsStockWarehouseDO::getWarehouseId, reqVO.getWarehouseId())
+        // 产品
+        .eqIfPresent(WmsStockWarehouseDO::getProductId, reqVO.getProductId())
+            ;
+
+
+
+
         return selectPage(reqVO, new LambdaQueryWrapperX<WmsStockWarehouseDO>()
-				.eqIfPresent(WmsStockWarehouseDO::getWarehouseId, reqVO.getWarehouseId())
-				.eqIfPresent(WmsStockWarehouseDO::getProductId, reqVO.getProductId())
+
+
+
 				.eqIfPresent(WmsStockWarehouseDO::getPurchasePlanQty, reqVO.getPurchasePlanQty())
 				.eqIfPresent(WmsStockWarehouseDO::getPurchaseTransitQty, reqVO.getPurchaseTransitQty())
 				.eqIfPresent(WmsStockWarehouseDO::getReturnTransitQty, reqVO.getReturnTransitQty())
