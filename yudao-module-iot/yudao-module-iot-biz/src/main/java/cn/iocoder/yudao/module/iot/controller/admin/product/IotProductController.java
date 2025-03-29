@@ -93,6 +93,21 @@ public class IotProductController {
         }));
     }
 
+    @GetMapping("/get-by-key")
+    @Operation(summary = "通过 ProductKey 获得产品")
+    @Parameter(name = "productKey", description = "产品Key", required = true, example = "abc123")
+    @PreAuthorize("@ss.hasPermission('iot:product:query')")
+    public CommonResult<IotProductRespVO> getProductByKey(@RequestParam("productKey") String productKey) {
+        IotProductDO product = productService.getProductByProductKey(productKey);
+        // 拼接数据
+        IotProductCategoryDO category = categoryService.getProductCategory(product.getCategoryId());
+        return success(BeanUtils.toBean(product, IotProductRespVO.class, bean -> {
+            if (category != null) {
+                bean.setCategoryName(category.getName());
+            }
+        }));
+    }
+
     @GetMapping("/page")
     @Operation(summary = "获得产品分页")
     @PreAuthorize("@ss.hasPermission('iot:product:query')")
