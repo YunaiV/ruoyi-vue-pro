@@ -219,4 +219,13 @@ public interface IotDeviceService {
      */
     Map<Integer, Long> getDeviceCountMapByState();
 
+    /**
+     * 通过产品标识和设备名称列表获取设备列表
+     *
+     * @param productKey  产品标识
+     * @param deviceNames 设备名称列表
+     * @return 设备列表
+     */
+    List<IotDeviceDO> getDevicesByProductKeyAndNames(String productKey, List<String> deviceNames);
+
 }

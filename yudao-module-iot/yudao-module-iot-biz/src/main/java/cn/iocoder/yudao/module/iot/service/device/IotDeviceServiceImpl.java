@@ -451,4 +451,12 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         ));
     }
 
+    @Override
+    public List<IotDeviceDO> getDevicesByProductKeyAndNames(String productKey, List<String> deviceNames) {
+        if (StrUtil.isBlank(productKey) || CollUtil.isEmpty(deviceNames)) {
+            return Collections.emptyList();
+        }
+        return deviceMapper.selectByProductKeyAndDeviceNames(productKey, deviceNames);
+    }
+
 }
