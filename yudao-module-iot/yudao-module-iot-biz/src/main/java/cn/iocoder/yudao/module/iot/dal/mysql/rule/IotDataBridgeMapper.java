@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.IotDataBr
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * IoT 数据桥梁 Mapper
  *
@@ -20,6 +22,12 @@ public interface IotDataBridgeMapper extends BaseMapperX<IotDataBridgeDO> {
                 .likeIfPresent(IotDataBridgeDO::getName, reqVO.getName())
                 .eqIfPresent(IotDataBridgeDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(IotDataBridgeDO::getCreateTime, reqVO.getCreateTime())
+                .orderByDesc(IotDataBridgeDO::getId));
+    }
+
+    default List<IotDataBridgeDO> selectList(Integer status) {
+        return selectList(new LambdaQueryWrapperX<IotDataBridgeDO>()
+                .eqIfPresent(IotDataBridgeDO::getStatus, status)
                 .orderByDesc(IotDataBridgeDO::getId));
     }
 

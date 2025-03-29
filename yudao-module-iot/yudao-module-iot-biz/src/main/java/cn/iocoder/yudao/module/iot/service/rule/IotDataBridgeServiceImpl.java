@@ -10,6 +10,8 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DATA_BRIDGE_NOT_EXISTS;
 
@@ -65,6 +67,11 @@ public class IotDataBridgeServiceImpl implements IotDataBridgeService {
     @Override
     public PageResult<IotDataBridgeDO> getDataBridgePage(IotDataBridgePageReqVO pageReqVO) {
         return dataBridgeMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<IotDataBridgeDO> getDataBridgeList(Integer status) {
+        return dataBridgeMapper.selectList(status);
     }
 
 }
