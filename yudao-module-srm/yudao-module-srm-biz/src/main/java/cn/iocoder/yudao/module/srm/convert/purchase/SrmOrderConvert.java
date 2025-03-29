@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.srm.convert.purchase;
 
+import static cn.hutool.core.date.DatePattern.NORM_DATE_PATTERN;
+
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -12,19 +14,17 @@ import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemD
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.srm.service.purchase.bo.SrmPurchaseOrderItemWordBO;
 import cn.iocoder.yudao.module.srm.service.purchase.bo.SrmPurchaseOrderWordBO;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
-
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
-import static cn.hutool.core.date.DatePattern.NORM_DATE_PATTERN;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
 @Mapper
 public interface SrmOrderConvert {
+
     SrmOrderConvert INSTANCE = Mappers.getMapper(SrmOrderConvert.class);
 
 
@@ -38,6 +38,7 @@ public interface SrmOrderConvert {
      */
     default SrmPurchaseOrderSaveReqVO.Item convertToErpPurchaseOrderSaveReqVOItem(SrmPurchaseRequestItemsDO itemDO, Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> requestItemsMap, Map<Long, SrmPurchaseRequestItemsDO> itemDOMap) {
         SrmPurchaseOrderSaveReqVO.Item item = new SrmPurchaseOrderSaveReqVO.Item();
+        //SrmPurchaseRequestItemsDO ->  SrmPurchaseOrderSaveReqVO.Item
         BeanUtil.copyProperties(itemDOMap.get(itemDO.getId()), item);
         item.setId(null);
         // 设置产品ID
@@ -49,11 +50,8 @@ public interface SrmOrderConvert {
         // 设置下单数量(采购) == 申请项批准数量
         item.setCount(itemDO.getApproveCount());
         //价税合计
-        // 自动映射其他属性
-        item.setDeliveryTime(itemDOMap.get(itemDO.getId()).getExpectArrivalDate());
         item.setProductPrice(itemDO.getActTaxPrice());//含税单价 -> 产品单价
         item.setDeliveryTime(itemDO.getExpectArrivalDate());//交货日期 -> 期望到货日期
-        //
         //申请项id
         item.setPurchaseApplyItemId(itemDO.getId());
         return item;
@@ -61,21 +59,23 @@ public interface SrmOrderConvert {
 
     //list
     default List<SrmPurchaseOrderSaveReqVO.Item> convertToErpPurchaseOrderSaveReqVOItemList(List<SrmPurchaseRequestItemsDO> itemDOList, Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> requestItemsMap, Map<Long, SrmPurchaseRequestItemsDO> itemDOMap) {
-        return itemDOList.stream().map(itemDO -> convertToErpPurchaseOrderSaveReqVOItem(itemDO, requestItemsMap, itemDOMap)).collect(Collectors.toList());
+        return itemDOList.stream()
+            .map(itemDO -> convertToErpPurchaseOrderSaveReqVOItem(itemDO, requestItemsMap, itemDOMap))
+            .collect(Collectors.toList());
     }
 
     //SrmPurchaseOrderSaveReqVO.Item->SrmPurchaseOrderItemDO
 
-//    SrmPurchaseOrderItemDO convertToErpPurchaseOrderItemDO(SrmPurchaseOrderSaveReqVO.Item item);
+    //    SrmPurchaseOrderItemDO convertToErpPurchaseOrderItemDO(SrmPurchaseOrderSaveReqVO.Item item);
 
     /**
      * 合同渲染BO用
      */
     default SrmPurchaseOrderWordBO bindDataFormOrderItemDO(List<SrmPurchaseOrderItemDO> itemDOS, SrmPurchaseOrderDO orderDO, SrmPurchaseOrderGenerateContractReqVO vo, Map<Long, FmsFinanceSubjectDTO> dtoMap) {
-//        Set<Long> productIds = itemDOS.stream().map(SrmPurchaseOrderItemDO::getProductId).collect(Collectors.toSet());
-//        Map<Long, ErpProductDTO> productMap = erpProductApi.getProductMap(productIds);
+        //        Set<Long> productIds = itemDOS.stream().map(SrmPurchaseOrderItemDO::getProductId).collect(Collectors.toSet());
+        //        Map<Long, ErpProductDTO> productMap = erpProductApi.getProductMap(productIds);
         //收集产品的单位map getProductUnitMap
-//        Map<Long, ErpProductUnitDTO> unitMap = erpProductUnitApi.getProductUnitMap(productMap.values().stream().map(ErpProductDTO::getUnitId).collect(Collectors.toSet()));
+        //        Map<Long, ErpProductUnitDTO> unitMap = erpProductUnitApi.getProductUnitMap(productMap.values().stream().map(ErpProductDTO::getUnitId).collect(Collectors.toSet()));
         AtomicInteger index = new AtomicInteger(1);
         //单位名称
         //不含税总额
@@ -88,10 +88,12 @@ public interface SrmOrderConvert {
             peek.setProducts(BeanUtils.toBean(itemDOS, SrmPurchaseOrderItemWordBO.class, item -> {
                 item.setIndex(index.getAndIncrement());
                 //不含税总额
-                item.setTotalPriceUntaxed(item.getProductPrice().multiply(item.getCount()).setScale(2, RoundingMode.HALF_UP));
+                item.setTotalPriceUntaxed(
+                    item.getProductPrice().multiply(item.getCount()).setScale(2, RoundingMode.HALF_UP));
                 item.setTotalTaxPrice(item.getTaxPrice().setScale(2, RoundingMode.HALF_UP));
                 //总金额
-                item.setTotalProductPrice(item.getCount().multiply(item.getActTaxPrice()).setScale(2, RoundingMode.HALF_UP));//数量*含税单价
+                item.setTotalProductPrice(
+                    item.getCount().multiply(item.getActTaxPrice()).setScale(2, RoundingMode.HALF_UP));//数量*含税单价
                 item.setDeliveryTimeFormat(DateUtil.format(item.getDeliveryTime(), NORM_DATE_PATTERN));
                 item.setCount(item.getCount().setScale(0, RoundingMode.HALF_UP));
             })).setTotalCount(peek.getTotalCount().setScale(0, RoundingMode.HALF_UP));

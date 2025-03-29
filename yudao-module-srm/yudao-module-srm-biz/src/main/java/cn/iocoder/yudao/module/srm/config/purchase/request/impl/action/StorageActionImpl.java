@@ -19,7 +19,7 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class StoragActionImpl implements Action<SrmStorageStatus, SrmEventEnum, SrmPurchaseRequestDO> {
+public class StorageActionImpl implements Action<SrmStorageStatus, SrmEventEnum, SrmPurchaseRequestDO> {
 
     @Autowired
     SrmPurchaseRequestItemsMapper itemsMapper;

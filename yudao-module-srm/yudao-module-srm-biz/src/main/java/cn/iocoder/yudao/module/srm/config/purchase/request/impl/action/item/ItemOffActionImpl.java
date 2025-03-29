@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.srm.config.purchase.request.impl.action.item;
 
 
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_UPDATE_ERROR;
+import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME;
+
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
@@ -10,19 +13,15 @@ import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseRequestItemsMap
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseRequestMapper;
 import cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants;
 import cn.iocoder.yudao.module.srm.enums.SrmEventEnum;
-import cn.iocoder.yudao.module.srm.enums.SrmStateMachines;
 import cn.iocoder.yudao.module.srm.enums.status.SrmOffStatus;
 import com.alibaba.cola.statemachine.Action;
 import com.alibaba.cola.statemachine.StateMachine;
+import jakarta.annotation.Resource;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_UPDATE_ERROR;
 
 @Slf4j
 @Component
@@ -34,8 +33,7 @@ public class ItemOffActionImpl implements Action<SrmOffStatus, SrmEventEnum, Srm
     @Autowired
     private SrmPurchaseRequestMapper requestMapper;
 
-    @Autowired
-    @Qualifier(value = SrmStateMachines.PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME)
+    @Resource(name = PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME)
     private StateMachine<SrmOffStatus, SrmEventEnum, SrmPurchaseRequestDO> machine;
 
     @Override
@@ -43,17 +41,17 @@ public class ItemOffActionImpl implements Action<SrmOffStatus, SrmEventEnum, Srm
     public void execute(SrmOffStatus from, SrmOffStatus to, SrmEventEnum event, SrmPurchaseRequestItemsDO context) {
         // 查询当前 Item
         SrmPurchaseRequestItemsDO itemsDO = mapper.selectById(context.getId());
-        if (itemsDO == null) {
+        if(itemsDO == null) {
             throw ServiceExceptionUtil.exception(SrmErrorCodeConstants.PURCHASE_REQUEST_ITEM_NOT_EXISTS, context.getId());
         }
         // 更新 Item 状态
         itemsDO.setOffStatus(to.getCode());
         ThrowUtil.ifSqlThrow(mapper.updateById(itemsDO), DB_UPDATE_ERROR);
-//        log.info("更新采购项状态：ID={}，状态={} -> {}", itemsDO.getId(), from, to);
+        //        log.info("更新采购项状态：ID={}，状态={} -> {}", itemsDO.getId(), from, to);
 
         // 查询同一个采购请求的所有子项
         List<SrmPurchaseRequestItemsDO> itemList = mapper.selectListByRequestId(itemsDO.getRequestId());
-        if (itemList.isEmpty()) {
+        if(itemList.isEmpty()) {
             log.warn("采购请求ID={} 没有子项", itemsDO.getRequestId());
             throw ServiceExceptionUtil.exception(SrmErrorCodeConstants.PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_ID, context.getId());
         }
@@ -63,21 +61,21 @@ public class ItemOffActionImpl implements Action<SrmOffStatus, SrmEventEnum, Srm
         boolean hasOpen = itemList.stream().anyMatch(item -> item.getOffStatus().equals(SrmOffStatus.OPEN.getCode()));
 
         SrmPurchaseRequestDO requestDO = requestMapper.selectById(itemsDO.getRequestId());
-        if (requestDO == null) {
+        if(requestDO == null) {
             log.error("采购申请单不存在，ID: {}", itemsDO.getRequestId());
             throw ServiceExceptionUtil.exception(SrmErrorCodeConstants.PURCHASE_REQUEST_NOT_EXISTS, itemsDO.getRequestId());
         }
 
-        if (allClosed) {
+        if(allClosed) {
             log.debug("所有子项已关闭，传递事件: ID={}", requestDO.getId());
             //主表是开启状态
-            if (requestDO.getOffStatus().equals(SrmOffStatus.OPEN.getCode())) {
+            if(requestDO.getOffStatus().equals(SrmOffStatus.OPEN.getCode())) {
                 machine.fireEvent(SrmOffStatus.fromCode(requestDO.getOffStatus()), event, requestDO);
             }
-        } else if (hasOpen) {
+        } else if(hasOpen) {
             log.info("存在已开启的子项，传递事件: ID={}", requestDO.getId());
             //主表不是开启状态
-            if (!requestDO.getOffStatus().equals(SrmOffStatus.OPEN.getCode())) {
+            if(!requestDO.getOffStatus().equals(SrmOffStatus.OPEN.getCode())) {
                 machine.fireEvent(SrmOffStatus.fromCode(requestDO.getOffStatus()), event, requestDO);
             }
         }

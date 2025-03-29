@@ -7,10 +7,11 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ContentStyle;
 import com.alibaba.excel.enums.BooleanEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
+import jakarta.validation.constraints.DecimalMin;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Data;
 
 @Schema(description = "管理后台 - ERP采购申请单 Response VO")
 @Data
@@ -103,6 +104,24 @@ public class SrmPurchaseRequestRespVO extends BaseVO {
     @Schema(description = "审核意见")
     @ExcelProperty("审核意见")
     private String reviewComment;
+
+
+    @Schema(description = "结算账户编号")
+    private Long accountId;
+
+    @Schema(description = "定金金额，单位：元")
+    @DecimalMin(value = "0.00", message = "定金金额不能小于0")
+    private BigDecimal depositPrice;
+
+    @Schema(description = "优惠率，百分比")
+    private BigDecimal discountPercent;
+
+    @Schema(description = "附件地址")
+    private String fileUrl;
+
+    @Schema(description = "备注")
+    private String remark;
+
 //    /**
 //     * 采购单ID
 //     *

@@ -210,4 +210,17 @@ public class SrmPurchaseOrderItemDO extends TenantBaseDO {
      * 单据来源
      */
     private String source;
+
+    /**
+     * 验货单，JSON 格式
+     */
+    private String inspectionJson;
+    //总验货通过数量
+    private Integer totalInspectionPassCount;
+    /**
+     * 完工单，JSON 格式
+     */
+    private String completionJson;
+    //总完工单通过数量
+    private Integer totalCompletionPassCount;
 }

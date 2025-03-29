@@ -4,10 +4,14 @@ import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * ERP 采购订单 DO
@@ -15,7 +19,8 @@ import java.time.LocalDateTime;
  * @author 王岽宇
  */
 @TableName("erp_purchase_order")
-@KeySequence("erp_purchase_order_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@KeySequence("erp_purchase_order_seq")
+// 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -53,6 +58,11 @@ public class SrmPurchaseOrderDO extends TenantBaseDO {
      * 合计数量
      */
     private BigDecimal totalCount;
+
+    /**
+     * 币别名称
+     */
+    private String currencyName;
     /**
      * 合计价格，单位：元
      */
@@ -114,14 +124,6 @@ public class SrmPurchaseOrderDO extends TenantBaseDO {
      */
     private Long purchaseEntityId;
     /**
-     * 验货单json
-     */
-    private String inspectionJson;
-    /**
-     * 完工单json
-     */
-    private String completionJson;
-    /**
      * x码
      */
     private String xCode;
@@ -177,12 +179,4 @@ public class SrmPurchaseOrderDO extends TenantBaseDO {
      * 审核意见
      */
     private String reviewComment;
-    /**
-     * 总验货通过数量
-     */
-    private Integer totalInspectionPassCount;
-    /**
-     * 总完工数量
-     */
-    private Integer totalCompletionCount;
 }

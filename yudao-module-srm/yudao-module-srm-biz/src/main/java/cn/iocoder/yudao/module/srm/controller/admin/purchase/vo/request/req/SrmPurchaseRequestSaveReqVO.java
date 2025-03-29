@@ -1,18 +1,17 @@
 package cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req;
 
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+
 import cn.iocoder.yudao.module.system.api.utils.Validation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
-
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * @author Administrator
@@ -20,6 +19,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Schema(description = "管理后台 - ERP采购申请单新增/修改 Request VO")
 @Data
 public class SrmPurchaseRequestSaveReqVO {
+
     @Schema(description = "id")
     @Null(groups = Validation.OnCreate.class, message = "创建时，申请单id必须为空")
     @NotNull(groups = Validation.OnUpdate.class, message = "更新时，申请单id不能为空")
@@ -43,8 +43,7 @@ public class SrmPurchaseRequestSaveReqVO {
     @Schema(description = "单据标签")
     private String tag;
 
-    @Schema(description = "供应商id", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "供应商不能为空")
+    @Schema(description = "供应商id")
     private Long supplierId;
 
     @Schema(description = "收货地址")

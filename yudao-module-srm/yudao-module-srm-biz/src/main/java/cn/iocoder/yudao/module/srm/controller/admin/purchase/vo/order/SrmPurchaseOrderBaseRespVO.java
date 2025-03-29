@@ -10,11 +10,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Data;
 
 @Schema(description = "管理后台 - ERP 采购订单 Response VO")
 @Data
@@ -34,8 +33,8 @@ public class SrmPurchaseOrderBaseRespVO extends BaseVO {
     @Schema(description = "订单项列表")
     private List<Item> items;
 
-//    @ExcelProperty("产品名称汇总")
-//    private String productNames;
+    //    @ExcelProperty("产品名称汇总")
+    //    private String productNames;
 
     @Schema(description = "供应商编号")
     private Long supplierId;
@@ -139,24 +138,9 @@ public class SrmPurchaseOrderBaseRespVO extends BaseVO {
     @Schema(description = "附件地址")
     private String fileUrl;
 
-    @Schema(description = "总验货通过数量")
-    private Integer totalInspectionPassCount;
-
-    @Schema(description = "总完工数量")
-    private Integer totalCompletionCount;
-    /**
-     * 验货单，JSON 格式
-     */
-    @Schema(description = "验货单json")
-    private String inspectionJson;
-    /**
-     * 完工单，JSON 格式
-     */
-    @Schema(description = "完工单json")
-    private String completionJson;
-
     @Data
     public static class Item extends BaseVO {
+
         @Schema(description = "订单项编号")
         private Long id;
 
@@ -179,15 +163,15 @@ public class SrmPurchaseOrderBaseRespVO extends BaseVO {
         @Schema(description = "产品单位名称")
         @NotBlank(message = "产品单位名称不能为空")
         private String productUnitName;
-//
-//        @Schema(description = "erp产品")
-//        private ErpProductDTO product;
-//
-//        @Schema(description = "币别id(财务管理-币别维护)")
-//        private Long currencyId;
-//
-//        @Schema(description = "币别名称")
-//        private String currencyName;
+        //
+        //        @Schema(description = "erp产品")
+        //        private ErpProductDTO product;
+        //
+        //        @Schema(description = "币别id(财务管理-币别维护)")
+        //        private Long currencyId;
+        //
+        //        @Schema(description = "币别名称")
+        //        private String currencyName;
 
         @Schema(description = "产品下单数量")
         private BigDecimal count;
@@ -229,12 +213,12 @@ public class SrmPurchaseOrderBaseRespVO extends BaseVO {
         @Schema(description = "报关品名-产品(产品的品牌)")
         private String customsDeclaration;
         //        @Schema(description = "源单行号")
-//        private int srcSeq;
-//        //        private String srcBillTypeId;// 源单类型ID
-//        @Schema(description = "源单类型")
-//        private String srcBillTypeName;
-//        @Schema(description = "源单单号(采购单No)")
-//        private int srcNo;
+        //        private int srcSeq;
+        //        //        private String srcBillTypeId;// 源单类型ID
+        //        @Schema(description = "源单类型")
+        //        private String srcBillTypeName;
+        //        @Schema(description = "源单单号(采购单No)")
+        //        private int srcNo;
         @Schema(description = "x码")
         private String xcode;
         @Schema(description = "箱率")
@@ -265,15 +249,14 @@ public class SrmPurchaseOrderBaseRespVO extends BaseVO {
         @Schema(description = "付款状态")
         private Integer payStatus;
         /**
-         * 采购申请项ID
-         * {@link SrmPurchaseRequestItemsDO#getId()}
+         * 采购申请项ID {@link SrmPurchaseRequestItemsDO#getId()}
          */
         @Schema(description = "采购申请项ID")
         private Long purchaseApplyItemId;
         @Schema(description = "采购申请单No")
         private String erpPurchaseRequestItemNo;
         //        @Schema(description = "申请项")
-//        private SrmPurchaseRequestItemRespVO purchaseRequestItem;
+        //        private SrmPurchaseRequestItemRespVO purchaseRequestItem;
 
 
         @Schema(description = "交货日期")
@@ -289,5 +272,22 @@ public class SrmPurchaseOrderBaseRespVO extends BaseVO {
 
         @Schema(description = "部门名称")
         private String departmentName;
+
+        /**
+         * 验货单，JSON 格式
+         */
+        @Schema(description = "验货单json")
+        private String inspectionJson;
+        //总验货通过数量
+        @Schema(description = "总验货通过数量")
+        private Integer totalInspectionPassCount;
+        /**
+         * 完工单，JSON 格式
+         */
+        @Schema(description = "完工单json")
+        private String completionJson;
+
+        @Schema(description = "总完工单通过数量")
+        private Integer totalCompletionPassCount;
     }
 }

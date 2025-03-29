@@ -3,12 +3,16 @@ package cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order;
 import cn.iocoder.yudao.module.system.api.utils.Validation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
-import lombok.Data;
-
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Data;
 
 @Schema(description = "管理后台 - ERP 采购订单新增/修改 Request VO")
 @Data
@@ -17,13 +21,13 @@ public class SrmPurchaseOrderSaveReqVO {
 
     @Schema(description = "id")
     @Null(groups = Validation.OnCreate.class, message = "创建时，订单id必须为空")
-//    @NotNull(groups = validation.OnUpdate.class, message = "更新时，订单id不能为空")
+    //    @NotNull(groups = validation.OnUpdate.class, message = "更新时，订单id不能为空")
     private Long id;
 
-//    @Schema(description = "单据编号")
-//    @Pattern(regexp = "^[^\\r\\n]*$", message = "单据编号不能包含换行符")
-//    @Pattern(regexp = "^\\S.*\\S$", message = "单据编号开头和结尾不能是空格")
-//    private String no;
+    //    @Schema(description = "单据编号")
+    //    @Pattern(regexp = "^[^\\r\\n]*$", message = "单据编号不能包含换行符")
+    //    @Pattern(regexp = "^\\S.*\\S$", message = "单据编号开头和结尾不能是空格")
+    //    private String no;
 
     @Schema(description = "单据日期", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime noTime;
@@ -78,26 +82,13 @@ public class SrmPurchaseOrderSaveReqVO {
     @Size(min = 1, message = "商品信息至少一个")
     private List<@Valid Item> items;
 
-    /**
-     * 验货单，JSON 格式
-     */
-    @Schema(description = "验货单json")
-    private String inspectionJson;
-    //总验货通过数量
-    @Schema(description = "总验货通过数量")
-    private Integer totalInspectionPassCount;
-    /**
-     * 完工单，JSON 格式
-     */
-    @Schema(description = "完工单json")
-    private String completionJson;
 
     @Data
     public static class Item {
 
         @Schema(description = "订单项编号")
         @Null(groups = Validation.OnCreate.class, message = "创建时，订单项id必须为空")
-//        @NotNull(groups = validation.OnUpdate.class, message = "更新时，订单项id不能为空")
+        //        @NotNull(groups = validation.OnUpdate.class, message = "更新时，订单项id不能为空")
         private Long id;
 
         @Schema(description = "产品报关品名")
@@ -136,13 +127,13 @@ public class SrmPurchaseOrderSaveReqVO {
 
         @Schema(description = "税额")
         private BigDecimal taxPrice;
-//
-//        @Schema(description = "币别id(财务管理-币别维护)")
-//        private Long currencyId;
-//
-//        @Schema(description = "币别名称")
-//        @NotBlank(message = "币别名称不能为空")
-//        private String currencyName;
+        //
+        //        @Schema(description = "币别id(财务管理-币别维护)")
+        //        private Long currencyId;
+        //
+        //        @Schema(description = "币别名称")
+        //        @NotBlank(message = "币别名称不能为空")
+        //        private String currencyName;
 
         @Schema(description = "含税单价")
         @DecimalMin(value = "0.00", message = "含税单价不能小于0")
@@ -166,12 +157,15 @@ public class SrmPurchaseOrderSaveReqVO {
 
         @Schema(description = "商品行备注")
         private String remark;
+
+        @Schema(description = "单据来源描述")
+        private String source;
         // ========== 采购入库 ==========
-//        /**
-//         * 采购入库数量
-//         */
-//        @DecimalMin(value = "0.00", message = "采购入库数量不能小于0")
-//        private BigDecimal inCount;
+        //        /**
+        //         * 采购入库数量
+        //         */
+        //        @DecimalMin(value = "0.00", message = "采购入库数量不能小于0")
+        //        private BigDecimal inCount;
 
         @Schema(description = "优惠率，百分比", requiredMode = Schema.RequiredMode.REQUIRED)
         private BigDecimal discountPercent;
@@ -199,6 +193,23 @@ public class SrmPurchaseOrderSaveReqVO {
 
         @Schema(description = "申请人id")
         private Long applicantId;
+
+        /**
+         * 验货单，JSON 格式
+         */
+        @Schema(description = "验货单json")
+        private String inspectionJson;
+        //总验货通过数量
+        @Schema(description = "总验货通过数量")
+        private Integer totalInspectionPassCount;
+        /**
+         * 完工单，JSON 格式
+         */
+        @Schema(description = "完工单json")
+        private String completionJson;
+
+        @Schema(description = "总完工单通过数量")
+        private Integer totalCompletionPassCount;
     }
 
 }

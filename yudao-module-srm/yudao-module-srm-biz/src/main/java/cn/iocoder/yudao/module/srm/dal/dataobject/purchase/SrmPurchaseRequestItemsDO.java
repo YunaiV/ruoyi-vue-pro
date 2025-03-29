@@ -4,10 +4,14 @@ import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * ERP采购申请单子 DO
@@ -23,6 +27,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SrmPurchaseRequestItemsDO extends TenantBaseDO {
+
     /**
      * id
      */
@@ -61,6 +66,10 @@ public class SrmPurchaseRequestItemsDO extends TenantBaseDO {
      */
     private Integer count; //联动申请项采购数量+采购状态
     /**
+     * 批准数量
+     */
+    private Integer approveCount;
+    /**
      * 入库数量
      */
     private BigDecimal inCount;
@@ -68,10 +77,6 @@ public class SrmPurchaseRequestItemsDO extends TenantBaseDO {
      * 仓库编号
      */
     private Long warehouseId;
-    /**
-     * 批准数量
-     */
-    private Integer approveCount;
     /**
      * 含税单价
      */
@@ -102,20 +107,20 @@ public class SrmPurchaseRequestItemsDO extends TenantBaseDO {
      * 税率，百分比
      */
     private BigDecimal taxPercent;
-//    /**
-//     * ERP 采购订单ID
-//     * {@link SrmPurchaseOrderDO#getId()} ()}
-//     */
-//    private Long purchaseOrderId;
+    //    /**
+    //     * ERP 采购订单ID
+    //     * {@link SrmPurchaseOrderDO#getId()} ()}
+    //     */
+    //    private Long purchaseOrderId;
     /**
      * 产品已订购数量
      */
     private Integer orderedQuantity;
-//    /**
-//     * ERP 采购订单项ID
-//     * {@link SrmPurchaseOrderItemDO#getId()} ()}
-//     */
-//    private Long purchaseOrderItemId;
+    //    /**
+    //     * ERP 采购订单项ID
+    //     * {@link SrmPurchaseOrderItemDO#getId()} ()}
+    //     */
+    //    private Long purchaseOrderItemId;
     /**
      * 期望到货日期
      */

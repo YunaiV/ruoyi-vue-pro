@@ -5,11 +5,10 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.Data;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Data;
 
 @Schema(description = "管理后台 - ERP采购申请单采购 Request VO")
 @Data
@@ -39,8 +38,25 @@ public class SrmPurchaseRequestMergeReqVO {
     @Schema(description = "目的港")
     private String portOfDischarge;
 
+    @Schema(description = "结算账户编号")
+    private Long accountId;
+
+    @Schema(description = "定金金额，单位：元")
+    @DecimalMin(value = "0.00", message = "定金金额不能小于0")
+    private BigDecimal depositPrice;
+
+    @Schema(description = "优惠率，百分比")
+    private BigDecimal discountPercent;
+
+    @Schema(description = "附件地址")
+    private String fileUrl;
+
+    @Schema(description = "备注")
+    private String remark;
+
     @Data
     public static class requestItems {
+
         // 项目ID
         @NotNull(message = "申请单项ID不能为空")
         @Schema(description = "申请单项ID", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -53,6 +69,11 @@ public class SrmPurchaseRequestMergeReqVO {
         //仓库
         @Schema(description = "仓库id")
         private Long warehouseId;
+
+        @Schema(description = "产品单价")
+        @DecimalMin(value = "0.00", message = "产品单价不能小于0")
+        @NotNull(message = "产品单价不能为空")
+        private BigDecimal productPrice;
         //含税单价
         @Schema(description = "含税单价")
         @Positive(message = "含税单价必须为正数")

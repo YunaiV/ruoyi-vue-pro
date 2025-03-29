@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.srm.enums;
 
 
 public interface SrmStateMachines {
+
     // ========== ERP 采购申请单 ==========
     //采购申请主表开关状态机
     String PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME = "purchaseRequestOff";
@@ -13,9 +14,9 @@ public interface SrmStateMachines {
     String PURCHASE_REQUEST_STORAGE_STATE_MACHINE_NAME = "purchaseRequestStorage";
     // ========== ERP 采购申请单子表 ==========
     //采购申请子项开关状态机
-    String PURCHASE_REQUEST_ITEM_OFF_STATE_MACHINE_NAME = "purchaseRequestItemOff";
+    String PURCHASE_REQUEST_ITEM_OFF_STATE_MACHINE_NAME = "requestItemOff";
     //采购子项采购状态机
-    String PURCHASE_REQUEST_ITEM_ORDER_STATE_MACHINE_NAME = "purchaseRequestItem";
+    String PURCHASE_REQUEST_ITEM_ORDER_STATE_MACHINE_NAME = "purchaseRequestItemAudit";
     //采购申请项入库状态机
     String PURCHASE_REQUEST_ITEM_STORAGE_STATE_MACHINE_NAME = "purchaseRequestItemStorage";
 

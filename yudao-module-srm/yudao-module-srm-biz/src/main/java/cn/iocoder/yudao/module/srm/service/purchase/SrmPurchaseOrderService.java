@@ -1,14 +1,17 @@
 package cn.iocoder.yudao.module.srm.service.purchase;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.*;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderAuditReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderGenerateContractReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderMergeReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderPageReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderSaveReqVO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.bo.SrmPurchaseOrderItemBO;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
@@ -111,8 +114,7 @@ public interface SrmPurchaseOrderService {
      * 根据订单id获得订单map
      */
     default Map<Long, SrmPurchaseOrderDO> getPurchaseOrderMap(Collection<Long> orderIds) {
-        return this.getPurchaseOrderList(orderIds).stream()
-            .collect(Collectors.toMap(SrmPurchaseOrderDO::getId, v -> v));
+        return this.getPurchaseOrderList(orderIds).stream().collect(Collectors.toMap(SrmPurchaseOrderDO::getId, v -> v));
     }
 
     /**
@@ -133,8 +135,7 @@ public interface SrmPurchaseOrderService {
      */
     default Map<Long, SrmPurchaseOrderDO> getPurchaseOrderItemMap(Collection<Long> itemIds) {
         //TODO 可以优化批量
-        return this.getPurchaseOrderItemList(itemIds).stream()
-            .collect(Collectors.toMap(SrmPurchaseOrderItemDO::getId, v -> getPurchaseOrderByItemId(v.getId())));
+        return this.getPurchaseOrderItemList(itemIds).stream().collect(Collectors.toMap(SrmPurchaseOrderItemDO::getId, v -> getPurchaseOrderByItemId(v.getId())));
     }
 
     List<SrmPurchaseOrderItemDO> getPurchaseOrderItemList(Collection<Long> itemIds);
@@ -145,6 +146,14 @@ public interface SrmPurchaseOrderService {
      * @param id 订单项id
      */
     SrmPurchaseOrderItemDO validatePurchaseOrderItemExists(Long id);
+
+    /**
+     * 校验采购订单项是否存在
+     *
+     * @param ids 订单项id集合
+     * @return 订单项集合
+     */
+    List<SrmPurchaseOrderItemDO> validatePurchaseOrderItemExists(@NotNull Collection<Long> ids);
 
     /**
      * 获得采购订单项列表

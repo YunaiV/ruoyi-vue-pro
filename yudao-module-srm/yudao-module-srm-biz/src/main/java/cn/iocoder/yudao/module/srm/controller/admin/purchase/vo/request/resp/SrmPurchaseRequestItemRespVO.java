@@ -4,10 +4,9 @@ import cn.iocoder.yudao.framework.mybatis.core.vo.BaseVO;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.Data;
 
 @Data
 public class SrmPurchaseRequestItemRespVO extends BaseVO {
@@ -23,14 +22,14 @@ public class SrmPurchaseRequestItemRespVO extends BaseVO {
     private String no;
 
     // ========== 产品信息 ==========
-//
-//    @Schema(description = "产品信息")
-//    private ErpProductDTO product;
+    //
+    //    @Schema(description = "产品信息")
+    //    private ErpProductDTO product;
 
     @Schema(description = "产品编号")
     @ExcelProperty("产品编号")
     private Long productId;
-    
+
     @Schema(description = "产品报关品名")
     private String declaredType;
 
@@ -100,9 +99,8 @@ public class SrmPurchaseRequestItemRespVO extends BaseVO {
     @ExcelProperty("未订购数量")
     private Integer unOrderCount;
 
-    @Schema(description = "已订购数量", example = "100")
-    @ExcelProperty("已订购数量")
-    private Integer orderCount;
+    @Schema(description = "已订购数量")
+    private Integer orderedQuantity;
 
     @Schema(description = "已入库数量", example = "100")
     @ExcelProperty("已入库数量")
@@ -126,8 +124,5 @@ public class SrmPurchaseRequestItemRespVO extends BaseVO {
     //期望到货日期
     @Schema(description = "期望到货日期")
     private LocalDateTime expectArrivalDate;
-    /**
-     * 产品已订购数量
-     */
-    private Integer orderedQuantity;
+
 }
