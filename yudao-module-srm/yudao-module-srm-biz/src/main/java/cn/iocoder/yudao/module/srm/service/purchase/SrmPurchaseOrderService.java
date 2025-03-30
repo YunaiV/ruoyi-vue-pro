@@ -1,17 +1,14 @@
 package cn.iocoder.yudao.module.srm.service.purchase;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderAuditReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderGenerateContractReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderMergeReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderPageReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderSaveReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.*;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.bo.SrmPurchaseOrderItemBO;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
@@ -40,6 +37,10 @@ public interface SrmPurchaseOrderService {
      */
     void updatePurchaseOrder(@Valid SrmPurchaseOrderSaveReqVO updateReqVO);
 
+    /**
+     * 更新item订单子表
+     */
+    void updatePurchaseOrderItemList(List<SrmPurchaseOrderItemDO> itemsDOList);
     //    /**
     //     * 更新采购订单的状态
     //     *
@@ -162,6 +163,11 @@ public interface SrmPurchaseOrderService {
      * @return 采购订单项列表
      */
     List<SrmPurchaseOrderItemDO> getPurchaseOrderItemListByOrderId(Long orderId);
+
+    /**
+     * 获得订单项列表-根据采购申请项Id集合
+     */
+    List<SrmPurchaseOrderItemDO> getPurchaseOrderItemListByApplyIds(Collection<Long> applyIds);
 
     /**
      * 获得采购订单项 List

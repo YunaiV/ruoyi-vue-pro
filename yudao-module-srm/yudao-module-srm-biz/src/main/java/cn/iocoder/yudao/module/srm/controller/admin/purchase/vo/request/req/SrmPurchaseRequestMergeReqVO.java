@@ -54,6 +54,12 @@ public class SrmPurchaseRequestMergeReqVO {
     @Schema(description = "备注")
     private String remark;
 
+    @Schema(description = "结算日期")
+    private LocalDateTime settlementDate;
+    
+    @Schema(description = "收获地址")
+    private String address;
+
     @Data
     public static class requestItems {
 

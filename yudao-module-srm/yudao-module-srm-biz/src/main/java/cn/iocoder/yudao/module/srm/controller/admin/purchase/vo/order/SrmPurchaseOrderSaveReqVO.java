@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,10 +25,10 @@ public class SrmPurchaseOrderSaveReqVO {
     //    @NotNull(groups = validation.OnUpdate.class, message = "更新时，订单id不能为空")
     private Long id;
 
-    //    @Schema(description = "单据编号")
-    //    @Pattern(regexp = "^[^\\r\\n]*$", message = "单据编号不能包含换行符")
-    //    @Pattern(regexp = "^\\S.*\\S$", message = "单据编号开头和结尾不能是空格")
-    //    private String no;
+    @Schema(description = "单据编号")
+    @Pattern(regexp = "^[^\\r\\n]*$", message = "单据编号不能包含换行符")
+    @Pattern(regexp = "^\\S.*\\S$", message = "单据编号开头和结尾不能是空格")
+    private String no;
 
     @Schema(description = "单据日期", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime noTime;

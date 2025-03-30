@@ -1,17 +1,20 @@
 package cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req;
 
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
-
 import cn.iocoder.yudao.module.system.api.utils.Validation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import static cn.iocoder.yudao.module.srm.dal.redis.no.SrmNoRedisDAO.PURCHASE_REQUEST_NO_PREFIX;
 
 /**
  * @author Administrator
@@ -37,6 +40,10 @@ public class SrmPurchaseRequestSaveReqVO {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime requestTime;
 
+    @Pattern(regexp = "^" + PURCHASE_REQUEST_NO_PREFIX + "-\\d{8}-\\d{6}$",
+             message = "单据编号格式不正确，正确格式如：" + PURCHASE_REQUEST_NO_PREFIX + "-20250108-000001")
+    @Pattern(regexp = "^" + PURCHASE_REQUEST_NO_PREFIX + "-\\d{8}-[0-8]\\d{5}$",
+             message = "单据编号格式不正确，注意后6位序号中不能以9开头,正确格式:" + PURCHASE_REQUEST_NO_PREFIX + "-20250108-000001")
     @Schema(description = "单据编号", example = "CGDD-20250108-000027")
     private String no;
 
@@ -48,7 +55,6 @@ public class SrmPurchaseRequestSaveReqVO {
 
     @Schema(description = "收货地址")
     private String delivery;
-
 
     @Schema(description = "商品信息")
     @NotNull(message = "商品信息不能为空")

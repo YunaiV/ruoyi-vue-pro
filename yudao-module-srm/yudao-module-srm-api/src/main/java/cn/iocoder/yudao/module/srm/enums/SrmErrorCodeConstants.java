@@ -142,6 +142,7 @@ public interface SrmErrorCodeConstants {
     ErrorCode PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_OPEN = new ErrorCode(1_030_603_146, "采购申请项({})不处于开启状态");
     //存在对应订单，无法手动关闭
     ErrorCode PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_MANUAL_CLOSE = new ErrorCode(1_030_603_147, "申请单存在关联订单,无法手动关闭状态");
+    ErrorCode PURCHASE_REQUEST_NO_EXISTS_BY_NO = new ErrorCode(1_030_603_148, "采购申请单号({})已存在");
     //采购订单
     // ========== ERP 采购订单 1-030-604-300 ==========
 

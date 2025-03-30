@@ -1,4 +1,11 @@
-package cn.iocoder.yudao.module.srm.service.purchase;
+package cn.iocoder.yudao.module.srm.service.purchase.impl;
+
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_UPDATE_ERROR;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PRODUCT_CODE_DUPLICATE;
+import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PRODUCT_UNIT_NAME_DUPLICATE;
+import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.SUPPLIER_PRODUCT_NOT_EXISTS;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
@@ -11,20 +18,16 @@ import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.SrmSupplierProdu
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmSupplierDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmSupplierProductDO;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmSupplierProductMapper;
+import cn.iocoder.yudao.module.srm.service.purchase.SrmSupplierProductService;
+import cn.iocoder.yudao.module.srm.service.purchase.SrmSupplierService;
 import jakarta.annotation.Resource;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_UPDATE_ERROR;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.*;
 
 /**
  * ERP 供应商产品 Service 实现类
@@ -35,6 +38,7 @@ import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.*;
 @Validated
 @RequiredArgsConstructor
 public class SrmSupplierProductServiceImpl implements SrmSupplierProductService {
+
     @Resource
     MessageChannel erpCustomRuleChannel;
     private final SrmSupplierProductMapper supplierProductMapper;
@@ -61,8 +65,8 @@ public class SrmSupplierProductServiceImpl implements SrmSupplierProductService 
         SrmSupplierProductDO updateObj = BeanUtils.toBean(updateReqVO, SrmSupplierProductDO.class);
         ThrowUtil.ifSqlThrow(supplierProductMapper.updateById(updateObj), DB_UPDATE_ERROR);
         //同步数据-暂停
-//        var dtos = customRuleMapper.selectProductAllInfoListBySupplierId(id);
-//        erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos).build());
+        //        var dtos = customRuleMapper.selectProductAllInfoListBySupplierId(id);
+        //        erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos).build());
     }
 
     @Override
@@ -74,21 +78,21 @@ public class SrmSupplierProductServiceImpl implements SrmSupplierProductService 
     }
 
     private void validateSupplierProductExists(Long id) {
-        if (supplierProductMapper.selectById(id) == null) {
+        if(supplierProductMapper.selectById(id) == null) {
             throw exception(SUPPLIER_PRODUCT_NOT_EXISTS);
         }
     }
 
     private void validateSupplierProductCodeUnique(Long id, String code) {
         SrmSupplierProductDO supplierProduct = supplierProductMapper.selectByCode(code);
-        if (supplierProduct == null) {
+        if(supplierProduct == null) {
             return;
         }
         // 如果 id 为空，说明不用比较是否为相同 id 的字典类型
-        if (id == null) {
+        if(id == null) {
             throw exception(PRODUCT_CODE_DUPLICATE);
         }
-        if (!supplierProduct.getId().equals(id)) {
+        if(!supplierProduct.getId().equals(id)) {
             throw exception(PRODUCT_UNIT_NAME_DUPLICATE);
         }
     }
@@ -110,19 +114,18 @@ public class SrmSupplierProductServiceImpl implements SrmSupplierProductService 
     }
 
     private List<SrmSupplierProductRespVO> buildSupplierProductVOList(List<SrmSupplierProductDO> list) {
-        if (CollUtil.isEmpty(list)) {
+        if(CollUtil.isEmpty(list)) {
             return Collections.emptyList();
         }
         // 1.2 产品信息
-//        Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
-//            convertSet(list, SrmSupplierProductDO::getProductId));
+        //        Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
+        //            convertSet(list, SrmSupplierProductDO::getProductId));
         // 1.3 供应商信息
-        Map<Long, SrmSupplierDO> supplierMap = supplierService.getSupplierMap(
-            convertSet(list, SrmSupplierProductDO::getSupplierId));
+        Map<Long, SrmSupplierDO> supplierMap = supplierService.getSupplierMap(convertSet(list, SrmSupplierProductDO::getSupplierId));
         return BeanUtils.toBean(list, SrmSupplierProductRespVO.class, supplierProduct -> {
-//            MapUtils.findAndThen(productMap, supplierProduct.getProductId(), product -> supplierProduct.setProductName(product.getName()));
+            //            MapUtils.findAndThen(productMap, supplierProduct.getProductId(), product -> supplierProduct.setProductName(product.getName()));
             MapUtils.findAndThen(supplierMap, supplierProduct.getSupplierId(), supplier -> supplierProduct.setSupplierName(supplier.getName()));
-//            MapUtils.findAndThen(userMap, Long.parseLong(supplierProduct.getCreator()), user -> supplierProduct.setCreatorName(user.getNickname()));
+            //            MapUtils.findAndThen(userMap, Long.parseLong(supplierProduct.getCreator()), user -> supplierProduct.setCreatorName(user.getNickname()));
         });
     }
 

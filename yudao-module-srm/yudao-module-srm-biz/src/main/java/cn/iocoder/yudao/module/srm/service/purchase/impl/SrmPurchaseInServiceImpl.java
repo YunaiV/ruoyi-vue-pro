@@ -1,4 +1,28 @@
-package cn.iocoder.yudao.module.srm.service.purchase;
+package cn.iocoder.yudao.module.srm.service.purchase.impl;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.diffList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getSumValue;
+import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PURCHASE_IN_DELETE_FAIL;
+import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PURCHASE_IN_DELETE_FAIL_APPROVE;
+import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PURCHASE_IN_FAIL_PAYMENT_PRICE_EXCEED;
+import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PURCHASE_IN_ITEM_NOT_EXISTS;
+import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PURCHASE_IN_NOT_APPROVE;
+import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PURCHASE_IN_NOT_EXISTS;
+import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PURCHASE_IN_NO_EXISTS;
+import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PURCHASE_IN_NO_OUT_OF_BOUNDS;
+import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PURCHASE_IN_PROCESS_FAIL_PAYMENT_STATUS;
+import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PURCHASE_IN_PROCESS_FAIL_RETURN_ITEM_EXISTS;
+import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PURCHASE_IN_UPDATE_FAIL_APPROVE;
+import static cn.iocoder.yudao.module.srm.enums.SrmEventEnum.CANCEL_PAYMENT;
+import static cn.iocoder.yudao.module.srm.enums.SrmEventEnum.COMPLETE_PAYMENT;
+import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_IN_AUDIT_STATE_MACHINE;
+import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_IN_ITEM_PAYMENT_STATE_MACHINE;
+import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_IN_PAYMENT_STATE_MACHINE;
+import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -24,11 +48,20 @@ import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseOrderItemMapper
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseReturnItemMapper;
 import cn.iocoder.yudao.module.srm.dal.redis.no.SrmNoRedisDAO;
 import cn.iocoder.yudao.module.srm.enums.SrmEventEnum;
+import cn.iocoder.yudao.module.srm.enums.status.SrmAuditStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmPaymentStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmStorageStatus;
-import cn.iocoder.yudao.module.srm.enums.status.SrmAuditStatus;
+import cn.iocoder.yudao.module.srm.service.purchase.SrmPurchaseInService;
+import cn.iocoder.yudao.module.srm.service.purchase.SrmPurchaseOrderService;
 import com.alibaba.cola.statemachine.StateMachine;
 import jakarta.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,16 +69,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
-import java.math.BigDecimal;
-import java.util.*;
-
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.srm.enums.SrmEventEnum.CANCEL_PAYMENT;
-import static cn.iocoder.yudao.module.srm.enums.SrmEventEnum.COMPLETE_PAYMENT;
-import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.*;
 
 
 /**
@@ -88,13 +111,13 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
     @Transactional(rollbackFor = Exception.class)
     public Long createPurchaseIn(SrmPurchaseInSaveReqVO createReqVO) {
         // 1.1 校验采购订单已审核
-        for (SrmPurchaseInSaveReqVO.Item item : createReqVO.getItems()) {
+        for(SrmPurchaseInSaveReqVO.Item item : createReqVO.getItems()) {
             SrmPurchaseOrderItemDO aDo = orderItemMapper.selectById(item.getOrderItemId());
-            if (aDo != null) {
+            if(aDo != null) {
                 Optional.ofNullable(aDo.getOrderId()).ifPresent(orderId -> purchaseOrderService.validatePurchaseOrder(orderId));
             }
         }
-//        SrmPurchaseOrderDO purchaseOrder = purchaseOrderService.validatePurchaseOrder(createReqVO.getOrderId());
+        //        SrmPurchaseOrderDO purchaseOrder = purchaseOrderService.validatePurchaseOrder(createReqVO.getOrderId());
         // 1.2 校验入库项的有效性
         List<SrmPurchaseInItemDO> purchaseInItems = validatePurchaseInItems(createReqVO.getItems());
         // 1.3 校验结算账户
@@ -117,7 +140,7 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
     }
 
     private void initSlaveStatus(List<SrmPurchaseInItemDO> purchaseInItems) {
-        for (SrmPurchaseInItemDO purchaseInItem : purchaseInItems) {
+        for(SrmPurchaseInItemDO purchaseInItem : purchaseInItems) {
             itemPaymentMachine.fireEvent(SrmPaymentStatus.NONE_PAYMENT, SrmEventEnum.PAYMENT_INIT, purchaseInItem);
         }
     }
@@ -128,7 +151,7 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
     }
 
     private void rollbackSlaveStatus(List<SrmPurchaseInItemDO> diffList) {
-        for (SrmPurchaseInItemDO inItemDO : diffList) {
+        for(SrmPurchaseInItemDO inItemDO : diffList) {
             Optional.ofNullable(inItemDO.getOrderItemId()).ifPresent(orderItemId -> {
                 SrmPurchaseOrderItemDO orderItemDO = orderItemMapper.selectById(orderItemId);
 
@@ -144,13 +167,13 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
     public void updatePurchaseIn(SrmPurchaseInSaveReqVO vo) {
         // 1.1 校验存在
         SrmPurchaseInDO purchaseIn = validatePurchaseInExists(vo.getId());
-        if (SrmAuditStatus.APPROVED.getCode().equals(purchaseIn.getAuditStatus())) {
+        if(SrmAuditStatus.APPROVED.getCode().equals(purchaseIn.getAuditStatus())) {
             throw exception(PURCHASE_IN_UPDATE_FAIL_APPROVE, purchaseIn.getNo());
         }
         // 1.2 校验采购订单已审核
-        for (SrmPurchaseInSaveReqVO.Item item : vo.getItems()) {
+        for(SrmPurchaseInSaveReqVO.Item item : vo.getItems()) {
             SrmPurchaseOrderItemDO aDo = orderItemMapper.selectById(item.getOrderItemId());
-            if (aDo != null) {
+            if(aDo != null) {
                 Optional.ofNullable(aDo.getOrderId()).ifPresent(orderId -> purchaseOrderService.validatePurchaseOrder(orderId));
             }
         }
@@ -161,8 +184,8 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
 
         // 2.1 更新入库
         SrmPurchaseInDO updateObj = BeanUtils.toBean(vo, SrmPurchaseInDO.class);
-//            .setOrderNo(purchaseOrder.getNo())
-//            .setSupplierId(purchaseOrder.getSupplierId());
+        //            .setOrderNo(purchaseOrder.getNo())
+        //            .setSupplierId(purchaseOrder.getSupplierId());
         calculateTotalPrice(updateObj, purchaseInItems);//合计
         purchaseInMapper.updateById(updateObj);
         // 2.2 更新入库项
@@ -176,7 +199,7 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
         purchaseIn.setTotalTaxPrice(getSumValue(purchaseInItems, SrmPurchaseInItemDO::getTaxPrice, BigDecimal::add, BigDecimal.ZERO));
         purchaseIn.setTotalPrice(purchaseIn.getTotalProductPrice().add(purchaseIn.getTotalTaxPrice()));
         // 计算优惠价格
-        if (purchaseIn.getDiscountPercent() == null) {
+        if(purchaseIn.getDiscountPercent() == null) {
             purchaseIn.setDiscountPercent(BigDecimal.ZERO);
         }
         purchaseIn.setDiscountPrice(MoneyUtils.priceMultiplyPercent(purchaseIn.getTotalPrice(), purchaseIn.getDiscountPercent()));
@@ -186,10 +209,10 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
     @Override
     public void updatePurchaseInPaymentPrice(Long id, BigDecimal paymentPrice) {
         SrmPurchaseInDO purchaseIn = purchaseInMapper.selectById(id);
-        if (purchaseIn.getPaymentPrice().equals(paymentPrice)) {
+        if(purchaseIn.getPaymentPrice().equals(paymentPrice)) {
             return;
         }
-        if (paymentPrice.compareTo(purchaseIn.getTotalPrice()) > 0) {
+        if(paymentPrice.compareTo(purchaseIn.getTotalPrice()) > 0) {
             throw exception(PURCHASE_IN_FAIL_PAYMENT_PRICE_EXCEED, paymentPrice, purchaseIn.getTotalPrice());
         }
         purchaseInMapper.updateById(new SrmPurchaseInDO().setId(id).setPaymentPrice(paymentPrice));
@@ -205,16 +228,16 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
         return convertList(list, o -> BeanUtils.toBean(o, SrmPurchaseInItemDO.class, item -> {
             item.setProductUnitId(productMap.get(item.getProductId()).getUnitId());
             item.setTotalPrice(MoneyUtils.priceMultiply(item.getProductPrice(), item.getCount()));
-            if (item.getTotalPrice() == null) {
+            if(item.getTotalPrice() == null) {
                 return;
             }
-            if (item.getTaxPercent() != null) {
+            if(item.getTaxPercent() != null) {
                 item.setTaxPrice(MoneyUtils.priceMultiplyPercent(item.getTotalPrice(), item.getTaxPercent()));
             }
             //根据订单项来填充入库项product属性
             Optional.ofNullable(item.getOrderItemId()).ifPresent(orderItemId -> {
                 SrmPurchaseOrderItemDO orderItemDO = orderItemMap.get(orderItemId);
-                if (orderItemDO != null) {
+                if(orderItemDO != null) {
                     //TODO 后续可以直接返回订单项VO，不存储订单项相关属性
                     //产品
                     item.setProductId(orderItemDO.getProductId());
@@ -247,19 +270,19 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
             (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
 
         // 第二步，批量添加、修改、删除
-        if (CollUtil.isNotEmpty(diffList.get(0))) {
+        if(CollUtil.isNotEmpty(diffList.get(0))) {
             diffList.get(0).forEach(o -> {
                 o.setInId(id);
                 o.setSource("WEB录入");
             });
             purchaseInItemMapper.insertBatch(diffList.get(0));
         }
-        if (CollUtil.isNotEmpty(diffList.get(1))) {
+        if(CollUtil.isNotEmpty(diffList.get(1))) {
 
             purchaseInItemMapper.updateBatch(diffList.get(1));
         }
-        if (CollUtil.isNotEmpty(diffList.get(2))) {
-            if (diffList.get(2) != null) {
+        if(CollUtil.isNotEmpty(diffList.get(2))) {
+            if(diffList.get(2) != null) {
                 purchaseInItemMapper.deleteByIds(convertList(diffList.get(2), SrmPurchaseInItemDO::getId));
             }
         }
@@ -268,7 +291,7 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
 
     private void linkSlaveStatus(List<SrmPurchaseInItemDO> purchaseInItems) {
         //执行状态+入库状态
-        for (SrmPurchaseInItemDO purchaseInItem : purchaseInItems) {
+        for(SrmPurchaseInItemDO purchaseInItem : purchaseInItems) {
             //传递给订单项入库状态机 数量
             Optional.ofNullable(purchaseInItem.getOrderItemId()).ifPresent(orderItemId -> {//存在订单项
                 //校验订单项是否存在
@@ -287,10 +310,10 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
     public void deletePurchaseIn(List<Long> ids) {
         // 1. 已审批->无法删除
         List<SrmPurchaseInDO> purchaseIns = purchaseInMapper.selectByIds(ids);
-        if (CollUtil.isEmpty(purchaseIns)) {
+        if(CollUtil.isEmpty(purchaseIns)) {
             return;
         }
-        for (SrmPurchaseInDO inDO : purchaseIns) {
+        for(SrmPurchaseInDO inDO : purchaseIns) {
             //校验,入库项存在对应的退货项 -> 异常
             purchaseInItemMapper.selectListByInId(inDO.getId()).forEach(purchaseInItem -> {
                 boolean b = srmPurchaseReturnItemMapper.existsByInItemId(purchaseInItem.getId());
@@ -300,7 +323,7 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
 
         //2. 联动回滚状态数量
         purchaseIns.forEach(purchaseIn -> {
-            if (SrmAuditStatus.APPROVED.getCode().equals(purchaseIn.getAuditStatus())) {
+            if(SrmAuditStatus.APPROVED.getCode().equals(purchaseIn.getAuditStatus())) {
                 throw exception(PURCHASE_IN_DELETE_FAIL_APPROVE, purchaseIn.getNo());
             }
             rollbackSlaveStatus(purchaseInItemMapper.selectListByInId(purchaseIn.getId()));
@@ -317,7 +340,7 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
 
     private SrmPurchaseInDO validatePurchaseInExists(Long id) {
         SrmPurchaseInDO purchaseIn = purchaseInMapper.selectById(id);
-        if (purchaseIn == null) {
+        if(purchaseIn == null) {
             throw exception(PURCHASE_IN_NOT_EXISTS);
         }
         return purchaseIn;
@@ -326,7 +349,9 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
     //验证入库项是否存在
     private SrmPurchaseInItemDO validatePurchaseInItemExists(Long id) {
         SrmPurchaseInItemDO purchaseInItem = purchaseInItemMapper.selectById(id);
-        if (purchaseInItem == null) throw exception(PURCHASE_IN_ITEM_NOT_EXISTS, id);
+        if(purchaseInItem == null) {
+            throw exception(PURCHASE_IN_ITEM_NOT_EXISTS, id);
+        }
         return purchaseInItem;
     }
 
@@ -338,7 +363,7 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
     @Override
     public SrmPurchaseInDO validatePurchaseIn(Long id) {
         SrmPurchaseInDO purchaseIn = validatePurchaseInExists(id);
-        if (ObjectUtil.notEqual(purchaseIn.getAuditStatus(), SrmAuditStatus.APPROVED.getCode())) {
+        if(ObjectUtil.notEqual(purchaseIn.getAuditStatus(), SrmAuditStatus.APPROVED.getCode())) {
             throw exception(PURCHASE_IN_NOT_APPROVE, purchaseIn.getNo());
         }
         return purchaseIn;
@@ -358,7 +383,7 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
 
     @Override
     public List<SrmPurchaseInItemDO> getPurchaseInItemListByInIds(Collection<Long> inIds) {
-        if (CollUtil.isEmpty(inIds)) {
+        if(CollUtil.isEmpty(inIds)) {
             return Collections.emptyList();
         }
         return purchaseInItemMapper.selectListByInIds(inIds);
@@ -366,7 +391,7 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
 
     @Override
     public void submitAudit(Collection<Long> inIds) {
-        for (Long inId : inIds) {
+        for(Long inId : inIds) {
             SrmPurchaseInDO srmPurchaseInDO = validatePurchaseInExists(inId);
             purchaseInAuditStateMachine.fireEvent(SrmAuditStatus.fromCode(srmPurchaseInDO.getAuditStatus()), SrmEventEnum.SUBMIT_FOR_REVIEW, SrmPurchaseInAuditReqVO.builder().inId(inId).build());//提交审核
         }
@@ -375,14 +400,14 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void review(SrmPurchaseInAuditReqVO req) {
-//        purchaseInAuditStateMachine.fireEvent(SrmAuditStatus.fromCode(erpPurchaseInDO.getAuditorStatus()), SrmEventEnum.SUBMIT_FOR_REVIEW, req);//提交审核
+        //        purchaseInAuditStateMachine.fireEvent(SrmAuditStatus.fromCode(erpPurchaseInDO.getAuditorStatus()), SrmEventEnum.SUBMIT_FOR_REVIEW, req);//提交审核
         // 查询采购订单信息
         SrmPurchaseInDO inDO = validatePurchaseInExists(req.getInId());
         // 获取当前订单状态
         SrmAuditStatus currentStatus = SrmAuditStatus.fromCode(inDO.getAuditStatus());
-        if (Boolean.TRUE.equals(req.getReviewed())) {
+        if(Boolean.TRUE.equals(req.getReviewed())) {
             // 审核操作
-            if (req.getPass()) {
+            if(req.getPass()) {
                 log.debug("采购订单通过审核，ID: {}", inDO.getId());
                 //联动状态
                 auditMachine.fireEvent(currentStatus, SrmEventEnum.AGREE, req);
@@ -400,7 +425,7 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
             });
 
             // 1.3 校验已付款
-            if (!Objects.equals(inDO.getPayStatus(), SrmPaymentStatus.NONE_PAYMENT.getCode())) {
+            if(!Objects.equals(inDO.getPayStatus(), SrmPaymentStatus.NONE_PAYMENT.getCode())) {
                 throw exception(PURCHASE_IN_PROCESS_FAIL_PAYMENT_STATUS);
             }
             //回滚状态
@@ -419,7 +444,7 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
             ThrowUtil.ifThrow(!purchaseInDO.getAuditStatus().equals(SrmAuditStatus.APPROVED.getCode()), PURCHASE_IN_NOT_APPROVE, purchaseInDO.getNo());
         });
         SrmEventEnum eventEnum;
-        if (vo.getPass()) {
+        if(vo.getPass()) {
             eventEnum = COMPLETE_PAYMENT;
         } else {
             eventEnum = CANCEL_PAYMENT;
@@ -428,7 +453,7 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
         vo.getInItemIds().stream().distinct().forEach(inItemId -> {
             //校验
             SrmPurchaseInItemDO inItemDO = validatePurchaseInItemExists(inItemId);
-            if (inItemDO.getPayStatus() == null) {
+            if(inItemDO.getPayStatus() == null) {
                 itemPaymentMachine.fireEvent(SrmPaymentStatus.NONE_PAYMENT, finalEventEnum, inItemDO);
             } else {
                 itemPaymentMachine.fireEvent(SrmPaymentStatus.fromCode(inItemDO.getPayStatus()), finalEventEnum, inItemDO);

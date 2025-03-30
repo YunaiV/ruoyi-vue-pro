@@ -168,4 +168,11 @@ public interface SrmPurchaseRequestService {
      * @Return 订单id
      */
     Long merge(SrmPurchaseRequestMergeReqVO reqVO);
+
+    /**
+     * 获得最新的采购申请单编号
+     *
+     * @return 最新的采购申请单编号
+     */
+    String getMaxSerialNumber();
 }

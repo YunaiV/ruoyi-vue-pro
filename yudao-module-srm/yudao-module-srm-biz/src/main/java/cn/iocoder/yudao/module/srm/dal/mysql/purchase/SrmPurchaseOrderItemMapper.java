@@ -8,9 +8,10 @@ import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.bo.SrmPurchaseOrderItemBO;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
+import org.apache.ibatis.annotations.Mapper;
+
 import java.util.Collection;
 import java.util.List;
-import org.apache.ibatis.annotations.Mapper;
 
 /**
  * ERP 采购订单明项目 Mapper
@@ -63,23 +64,26 @@ public interface SrmPurchaseOrderItemMapper extends BaseMapperX<SrmPurchaseOrder
 
     //获得ErpPurchaseOrderItemBO分页查询
     default PageResult<SrmPurchaseOrderItemBO> selectErpPurchaseOrderItemBOPage(SrmPurchaseOrderPageReqVO reqVO) {
-        MPJLambdaWrapper<SrmPurchaseOrderItemDO> wrapper = getBOWrapper(reqVO).selectAssociation(
-            SrmPurchaseOrderDO.class, SrmPurchaseOrderItemBO::getSrmPurchaseOrderDO);//一对一关联
+        MPJLambdaWrapper<SrmPurchaseOrderItemDO> wrapper =
+            getBOWrapper(reqVO).selectAssociation(SrmPurchaseOrderDO.class,
+                SrmPurchaseOrderItemBO::getSrmPurchaseOrderDO);//一对一关联
         return selectJoinPage(reqVO, SrmPurchaseOrderItemBO.class, wrapper);
     }
 
     //获得ErpPurchaseOrderItemBO 一个
     default SrmPurchaseOrderItemBO selectErpPurchaseOrderItemBOById(Long id) {
-        MPJLambdaWrapper<SrmPurchaseOrderItemDO> wrapper = getBOWrapper(null).selectAssociation(
-                SrmPurchaseOrderDO.class, SrmPurchaseOrderItemBO::getSrmPurchaseOrderDO)//一对一关联
-            .eq(SrmPurchaseOrderItemDO::getId, id);
+        MPJLambdaWrapper<SrmPurchaseOrderItemDO> wrapper =
+            getBOWrapper(null).selectAssociation(SrmPurchaseOrderDO.class,
+                    SrmPurchaseOrderItemBO::getSrmPurchaseOrderDO)//一对一关联
+                .eq(SrmPurchaseOrderItemDO::getId, id);
         return selectJoinOne(SrmPurchaseOrderItemBO.class, wrapper);
     }
 
     //获得ErpPurchaseOrderItemBO列表查询
     default List<SrmPurchaseOrderItemBO> selectErpPurchaseOrderItemBOS(SrmPurchaseOrderPageReqVO reqVO) {
-        MPJLambdaWrapper<SrmPurchaseOrderItemDO> wrapper = getBOWrapper(reqVO).selectAssociation(
-            SrmPurchaseOrderDO.class, SrmPurchaseOrderItemBO::getSrmPurchaseOrderDO);//一对一关联
+        MPJLambdaWrapper<SrmPurchaseOrderItemDO> wrapper =
+            getBOWrapper(reqVO).selectAssociation(SrmPurchaseOrderDO.class,
+                SrmPurchaseOrderItemBO::getSrmPurchaseOrderDO);//一对一关联
         return selectJoinList(SrmPurchaseOrderItemBO.class, wrapper);
     }
 
@@ -114,12 +118,15 @@ public interface SrmPurchaseOrderItemMapper extends BaseMapperX<SrmPurchaseOrder
         return new MPJLambdaWrapperX<SrmPurchaseOrderItemDO>().selectAll(SrmPurchaseOrderItemDO.class);
     }
 
-
     default Collection<SrmPurchaseOrderItemDO> selectIdsByErpPurchaseRequestItemNo(String erpPurchaseRequestItemNo) {
-        MPJLambdaWrapper<SrmPurchaseOrderItemDO> wrapper = new MPJLambdaWrapperX<SrmPurchaseOrderItemDO>().selectAll(
-                SrmPurchaseOrderItemDO.class)
-            .like(SrmPurchaseOrderItemDO::getErpPurchaseRequestItemNo, erpPurchaseRequestItemNo);
+        MPJLambdaWrapper<SrmPurchaseOrderItemDO> wrapper =
+            new MPJLambdaWrapperX<SrmPurchaseOrderItemDO>().selectAll(SrmPurchaseOrderItemDO.class)
+                .like(SrmPurchaseOrderItemDO::getErpPurchaseRequestItemNo, erpPurchaseRequestItemNo);
         return selectList(wrapper);
+    }
+
+    default List<SrmPurchaseOrderItemDO> selectListByApplyIds(Collection<Long> applyIds) {
+        return selectList(SrmPurchaseOrderItemDO::getPurchaseApplyItemId, applyIds);
     }
 
     //    //BO
