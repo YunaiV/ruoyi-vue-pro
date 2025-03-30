@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.workflow.vo.AiWorkflowPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.workflow.vo.AiWorkflowSaveReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.workflow.vo.AiWorkflowTestReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.workflow.vo.AiWorkflowUpdateModelReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.workflow.AiWorkflowDO;
 import jakarta.validation.Valid;
 
@@ -52,13 +51,6 @@ public interface AiWorkflowService {
      * @return AI 工作流分页
      */
     PageResult<AiWorkflowDO> getWorkflowPage(AiWorkflowPageReqVO pageReqVO);
-
-    /**
-     * 修改工作流模型 JSON 数据
-     *
-     * @param updateReqVO 更新数据
-     */
-    void updateWorkflowModel(AiWorkflowUpdateModelReqVO updateReqVO);
 
     /**
      * 测试 AI 工作流
