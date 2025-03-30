@@ -1,10 +1,5 @@
 package cn.iocoder.yudao.module.srm.controller.admin.purchase;
 
-import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
@@ -15,12 +10,7 @@ import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.module.erp.api.stock.WmsWarehouseApi;
 import cn.iocoder.yudao.module.erp.api.stock.dto.ErpWarehouseDTO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderAuditReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderBaseRespVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderGenerateContractReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderMergeReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderPageReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderSaveReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.*;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmSupplierDO;
@@ -36,29 +26,23 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - ERP 采购订单")
 @RestController
@@ -107,7 +91,7 @@ public class SrmPurchaseOrderController {
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:query')")
     public CommonResult<SrmPurchaseOrderBaseRespVO> getPurchaseOrder(@RequestParam("id") Long id) {
         SrmPurchaseOrderDO purchaseOrder = purchaseOrderService.getPurchaseOrder(id);
-        if(purchaseOrder == null) {
+        if (purchaseOrder == null) {
             return success(null);
         }
         List<SrmPurchaseOrderBaseRespVO> vos = bindList(Collections.singletonList(purchaseOrder));
@@ -122,6 +106,13 @@ public class SrmPurchaseOrderController {
         List<SrmPurchaseOrderBaseRespVO> voList = bindList(pageResult.getList());
         //
         return success(new PageResult<>(voList, pageResult.getTotal()));
+    }
+
+    //get获得最大流水号
+    @GetMapping("/getMaxSerialNo")
+    @Operation(summary = "获得采购订单最大流水号")
+    public CommonResult<String> getMaxSerialNo() {
+        return success(purchaseOrderService.getMaxSerialNumber());
     }
 
 
@@ -243,9 +234,9 @@ public class SrmPurchaseOrderController {
      * @return id
      */
     private Long safeParseLong(String value) {
-        try{
+        try {
             return Optional.ofNullable(value).map(Long::parseLong).orElse(null);
-        } catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             return null;
         }
     }

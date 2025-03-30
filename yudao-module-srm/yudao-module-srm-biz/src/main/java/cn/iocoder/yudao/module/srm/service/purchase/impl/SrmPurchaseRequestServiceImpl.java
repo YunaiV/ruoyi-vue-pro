@@ -258,34 +258,34 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updatePurchaseRequest(SrmPurchaseRequestSaveReqVO updateReqVO) {
+    public void updatePurchaseRequest(SrmPurchaseRequestSaveReqVO vo) {
         //1 校验
-        SrmPurchaseRequestDO srmPurchaseRequestDO = validateIdExists(updateReqVO.getId());
+        SrmPurchaseRequestDO srmPurchaseRequestDO = validateIdExists(vo.getId());
         //1.1 校验items是否存在
-        List<SrmPurchaseRequestItemsDO> itemsDOList = validatePurchaseRequestItems(updateReqVO.getItems());
+        List<SrmPurchaseRequestItemsDO> itemsDOList = validatePurchaseRequestItems(vo.getItems());
         //1.2 状态校验
-        updateStatusCheck(srmPurchaseRequestDO, updateReqVO.getItems().stream().map(SrmPurchaseRequestItemsSaveReqVO::getId).toList());
+        updateStatusCheck(srmPurchaseRequestDO, vo.getItems().stream().map(SrmPurchaseRequestItemsSaveReqVO::getId).toList());
         //1.4 校验主子表关联
-        List<SrmPurchaseRequestItemsDO> requestItemsDOS = erpPurchaseRequestItemsMapper.findItemsGroupedByRequestId(List.of(updateReqVO.getId())).get(updateReqVO.getId());
+        List<SrmPurchaseRequestItemsDO> requestItemsDOS = erpPurchaseRequestItemsMapper.findItemsGroupedByRequestId(List.of(vo.getId())).get(vo.getId());
         List<Long> requestItemsIds = convertList(requestItemsDOS, SrmPurchaseRequestItemsDO::getId);
-        validatePurchaseRequestItemsMasterId(updateReqVO.getId(), requestItemsIds);
+        validatePurchaseRequestItemsMasterId(vo.getId(), requestItemsIds);
         //1.5 设置no
         String oldNo = srmPurchaseRequestDO.getNo();
-        if (!oldNo.equals(updateReqVO.getNo())) {
-            voSetNo(updateReqVO);
+        if (!oldNo.equals(vo.getNo())) {
+            voSetNo(vo);
         }
-        if (!oldNo.equals(updateReqVO.getNo())) {
+        if (!oldNo.equals(vo.getNo())) {
             //关联更新采购申请项冗余字段erpPurchaseRequestItemNo
             List<SrmPurchaseOrderItemDO> srmPurchaseOrderItemDOList = srmPurchaseOrderService.getPurchaseOrderItemListByApplyIds(requestItemsDOS.stream().map(SrmPurchaseRequestItemsDO::getId).distinct().toList());
-            srmPurchaseOrderItemDOList.forEach(item -> item.setErpPurchaseRequestItemNo(updateReqVO.getNo()));
+            srmPurchaseOrderItemDOList.forEach(item -> item.setErpPurchaseRequestItemNo(vo.getNo()));
             srmPurchaseOrderService.updatePurchaseOrderItemList(srmPurchaseOrderItemDOList);
         }
         // 2 更新
         // 2.2 更新主表
-        SrmPurchaseRequestDO updateObj = BeanUtils.toBean(updateReqVO, SrmPurchaseRequestDO.class);
+        SrmPurchaseRequestDO updateObj = BeanUtils.toBean(vo, SrmPurchaseRequestDO.class);
         srmPurchaseRequestMapper.updateById(updateObj);
         // 2.3 更新子表
-        updatePurchaseRequestItemList(updateReqVO.getId(), itemsDOList);
+        updatePurchaseRequestItemList(vo.getId(), itemsDOList);
     }
 
     //判断当前状态是否可以更新

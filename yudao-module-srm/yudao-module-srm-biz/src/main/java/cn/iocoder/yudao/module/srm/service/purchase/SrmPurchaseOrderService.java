@@ -39,6 +39,8 @@ public interface SrmPurchaseOrderService {
 
     /**
      * 更新item订单子表
+     *
+     * @param itemsDOList 订单子表集合
      */
     void updatePurchaseOrderItemList(List<SrmPurchaseOrderItemDO> itemsDOList);
     //    /**
@@ -219,4 +221,11 @@ public interface SrmPurchaseOrderService {
      * @return 模板名称集合
      */
     List<String> getTemplateList();
+
+    /**
+     * 获得最新可用的采购订单编号
+     *
+     * @return 最新的采购订单编号
+     */
+    String getMaxSerialNumber();
 }

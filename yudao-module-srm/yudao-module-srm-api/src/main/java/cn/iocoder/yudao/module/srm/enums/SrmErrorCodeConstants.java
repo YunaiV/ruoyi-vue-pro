@@ -48,6 +48,8 @@ public interface SrmErrorCodeConstants {
     ErrorCode PURCHASE_ORDER_ITEM_IN_FAIL_EXISTS_IN = new ErrorCode(1_030_101_021, "采购订单项({})存在对应的入库项，无法反审核");
     //无法删除,采购订单项({})存在对应的入库项
     ErrorCode PURCHASE_ORDER_ITEM_IN_FAIL_EXISTS_DEL = new ErrorCode(1_030_101_021, "采购订单项({})存在对应的入库项，无法删除");
+    //采购订单主单单号({})已存在
+    ErrorCode PURCHASE_ORDER_NO_HAS_EXISTS = new ErrorCode(1_030_101_004, "采购订单NO:({})已经存在");
 
     // ========== ERP 采购入库（1-030-102-000） ==========
     ErrorCode PURCHASE_IN_NOT_EXISTS = new ErrorCode(1_030_102_000, "采购入库单不存在");
@@ -143,8 +145,6 @@ public interface SrmErrorCodeConstants {
     //存在对应订单，无法手动关闭
     ErrorCode PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_MANUAL_CLOSE = new ErrorCode(1_030_603_147, "申请单存在关联订单,无法手动关闭状态");
     ErrorCode PURCHASE_REQUEST_NO_EXISTS_BY_NO = new ErrorCode(1_030_603_148, "采购申请单号({})已存在");
-    //采购订单
-    // ========== ERP 采购订单 1-030-604-300 ==========
 
     // ========== ERP 采购入库单 1-030-605-300 ==========
     // ========== ERP 采购退货单 1-030-606-300 ==========

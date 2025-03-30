@@ -96,11 +96,11 @@ public class SrmPurchaseRequestController {
     }
 
     //get获得最大流水号
-    @GetMapping("/getMaxSerialNumber")
+    @GetMapping("/getMaxSerialNo")
     @Operation(summary = "获得ERP采购申请单NO流水号")
-    public CommonResult<String> getMaxSerialNumber() {
-        String maxSerialNumber = srmPurchaseRequestService.getMaxSerialNumber();
-        return success(maxSerialNumber);
+    @PreAuthorize("@ss.hasPermission('erp:purchase-request:query')")
+    public CommonResult<String> getMaxSerialNo() {
+        return success(srmPurchaseRequestService.getMaxSerialNumber());
     }
 
     //提交审核 submitAudit
