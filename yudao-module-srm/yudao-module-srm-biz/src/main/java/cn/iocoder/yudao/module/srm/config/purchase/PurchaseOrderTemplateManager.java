@@ -31,9 +31,15 @@ import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PURCHASE_O
 @Slf4j
 @Component
 public class PurchaseOrderTemplateManager {
-    @Value("${spring.profiles.active}")
+
+    @Value("${spring.profiles.active:}")
     private String profile;
 
+    @Value("${erp.template.scan-path:purchase/order/}")
+    private String templateScanPath;
+
+    @Value("${erp.template.enable-preload:false}")
+    private boolean enablePreload;
     @Autowired
     private ResourcePatternResolver resourcePatternResolver;
 
@@ -42,9 +48,6 @@ public class PurchaseOrderTemplateManager {
     private final Map<String, byte[]> templateCache = new ConcurrentHashMap<>();
 
     private final Configure configure;
-
-    @Value("#{'${erp.template.preload-list:purchase/order/采购合同模板.docx}'.split(',')}")
-    private List<String> preloadTemplateList;
 
     public PurchaseOrderTemplateManager() {
         ConfigureBuilder builder = Configure.builder();
@@ -61,7 +64,7 @@ public class PurchaseOrderTemplateManager {
                 }
                 try (InputStream stream = resource.getInputStream()) {
                     byte[] bytes = stream.readAllBytes();
-                    log.info("✅ 采购模板加载成功并缓存: {}", name);
+                    log.info("采购模板加载成功并缓存: {}", name);
                     return bytes;
                 }
             } catch (IOException e) {
@@ -78,46 +81,70 @@ public class PurchaseOrderTemplateManager {
 
     @EventListener(ApplicationReadyEvent.class)
     public void preloadTemplates() {
-        if (!profile.equals("prod")) {
+        // 非 prod 且没开启，才跳过
+        if (!"prod".equalsIgnoreCase(profile) && !enablePreload) {
+            log.info("🌱 当前环境为 [{}]，未启用手动开关，跳过模板预热", profile);
             return;
         }
-        log.info("🚀 启动后开始异步预热 Word 模板与 PDF 引擎：{}", preloadTemplateList);
+        try {
+            //扫描指定文件夹下所有 .docx 模板
+            Resource[] resources = resourcePatternResolver.getResources("classpath:" + templateScanPath + "*.docx");
 
-        CompletableFuture.runAsync(() -> {
-            log.info("👉 [1] 开始加载 Word 模板...");
-            long wordStart = System.currentTimeMillis();
-            for (String template : preloadTemplateList) {
-                try {
-                    getTemplate(template);
-                } catch (Exception e) {
-                    log.error("⚠️ Word 模板预热失败（已忽略）：{}", template, e);
+            log.info("检测到 {} 个模板文件：", resources.length);
+
+
+            CompletableFuture.runAsync(() -> {
+                for (Resource resource : resources) {
+                    log.info("模板文件：{}", resource.getFilename());
                 }
-            }
-            log.info("✅ [1] Word 模板预热完成，耗时 {}ms", System.currentTimeMillis() - wordStart);
-        }).thenRunAsync(() -> {
-            if (preloadTemplateList.isEmpty()) {
-                return;
-            }
-            for (String templateName : preloadTemplateList) {
-                byte[] templateBytes = templateCache.get(templateName);
+                log.info("[1] 开始加载 Word 模板...");
+                long wordStart = System.currentTimeMillis();
+                for (Resource resource : resources) {
+                    try {
+                        String templateName = extractTemplateName(resource);
+                        getTemplate(templateName);
+                    } catch (Exception e) {
+                        log.error("⚠️ Word 模板预热失败（已忽略）：{}", resource.getFilename(), e);
+                    }
+                }
 
-                if (templateBytes != null) {
-                    try (InputStream input = new ByteArrayInputStream(templateBytes)) {
-                        long pdfStart = System.currentTimeMillis();
-                        Document doc = new Document(input);
-                        doc.save(new ByteArrayOutputStream(), SaveFormat.PDF);
-                        log.info("✅ [2] PDF 引擎预热完成，耗时 {}ms", System.currentTimeMillis() - pdfStart);
+                log.info("[1] Word 模板预热完成，耗时 {}ms", System.currentTimeMillis() - wordStart);
+            }).thenRunAsync(() -> {
+                for (Resource resource : resources) {
+                    try {
+                        String templateName = extractTemplateName(resource);
+                        byte[] templateBytes = templateCache.get(templateName);
+                        if (templateBytes != null) {
+                            try (InputStream input = new ByteArrayInputStream(templateBytes)) {
+                                long pdfStart = System.currentTimeMillis();
+                                Document doc = new Document(input);
+                                doc.save(new ByteArrayOutputStream(), SaveFormat.PDF);
+                                log.info("[2] PDF 引擎预热完成 [{}]，耗时 {}ms", templateName, System.currentTimeMillis() - pdfStart);
+                            }
+                        } else {
+                            log.warn("⚠️ PDF 引擎预热跳过：模板 [{}] 未成功加载", templateName);
+                        }
                     } catch (Exception e) {
                         log.warn("⚠️ PDF 引擎预热失败", e);
                     }
-                } else {
-                    log.warn("⚠️ PDF 引擎预热跳过：模板 [{}] 未成功加载", templateName);
                 }
-            }
+            });
 
-        });
+        } catch (IOException e) {
+            log.error("❌ 模板文件夹扫描失败", e);
+        }
 
-        log.info("✅ Word/PDF 预热任务已提交（异步中），主线程继续启动流程");
+        log.info("Word/PDF 预热任务已提交（异步中），主线程继续启动流程");
     }
 
+    /**
+     * 提取模板路径相对 classpath 的路径（用于缓存键）
+     */
+    private String extractTemplateName(Resource resource) throws IOException {
+        String path = resource.getURL().getPath();
+        // 提取 classpath: 之后的路径，例如 purchase/order/采购合同模板.docx
+        int index = path.indexOf("purchase/order/");
+        return path.substring(index);
+    }
 }
+

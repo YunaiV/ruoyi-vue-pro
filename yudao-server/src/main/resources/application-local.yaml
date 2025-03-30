@@ -7,6 +7,10 @@ kingdee:
 debug: false
 
 --- #################### 数据库相关配置 ####################
+erp:
+  template:
+    scan-path: purchase/order/
+    enable-preload: true
 spring:
   autoconfigure:
     exclude:
@@ -36,10 +40,10 @@ spring:
             multi-statement-allow: true
     dynamic: # 多数据源配置
       druid: # Druid 【连接池】相关的全局配置
-        initial-size: 5 # 初始连接数
-        min-idle: 10 # 最小连接池数量
-        max-active: 20 # 最大连接池数量
-        max-wait: 600000 # 配置获取连接等待超时的时间，单位：毫秒
+        initial-size: 1 # 初始连接数
+        min-idle: 1 # 最小连接池数量
+        max-active: 10 # 最大连接池数量
+        max-wait: 5000 # 配置获取连接等待超时的时间，单位：毫秒
         time-between-eviction-runs-millis: 60000 # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位：毫秒
         min-evictable-idle-time-millis: 300000 # 配置一个连接在池中最小生存的时间，单位：毫秒
         max-evictable-idle-time-millis: 900000 # 配置一个连接在池中最大生存的时间，单位：毫秒
@@ -75,7 +79,7 @@ spring:
 # Quartz 配置项，对应 QuartzProperties 配置)
 spring:
   quartz:
-    auto-startup: true # 测试环境，需要开启 Job，测试环境memory不保存任何job信息，需手动添加任务
+    auto-startup: false # 测试环境，需要开启 Job，测试环境memory不保存任何job信息，需手动添加任务
     scheduler-name: schedulerName # Scheduler 名字。默认为 schedulerName
     job-store-type: memory # Job 存储器类型。默认为 memory 表示内存，可选 jdbc 使用数据库。
     wait-for-jobs-to-complete-on-shutdown: false # 应用关闭时，是否等待定时任务执行完成。默认为 false ，建议设置为 true
@@ -142,6 +146,8 @@ management:
       base-path: /actuator # Actuator 提供的 API 接口的根目录。默认为 /actuator
       exposure:
         include: '*' # 需要开放的端点。默认值只打开 health 和 info 两个端点。通过设置 * ，可以开放所有端点。
+    access:
+      default: none
 
 # Spring Boot Admin 配置项
 spring:
@@ -152,6 +158,7 @@ spring:
         url: http://127.0.0.1:${server.port}/${spring.boot.admin.context-path} # 设置 Spring Boot Admin Server 地址
         instance:
           service-host-type: IP # 注册实例时，优先使用 IP [IP, HOST_NAME, CANONICAL_HOST_NAME]
+        enabled: false
       # Spring Boot Admin Server 服务端的相关配置
       context-path: /admin # 配置 Spring
 
@@ -166,9 +173,7 @@ logging:
           module:
             erp: debug
     root: info
-erp:
-  template:
-    preload-list: "purchase/order/采购合同模板.docx" #模板并行预热
+
 
 --- #################### 微信公众号相关配置 ####################
 wx: # 参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-starters/wx-java-mp-spring-boot-starter/README.md 文档
