@@ -84,6 +84,9 @@ public class IotProductController {
     @PreAuthorize("@ss.hasPermission('iot:product:query')")
     public CommonResult<IotProductRespVO> getProduct(@RequestParam("id") Long id) {
         IotProductDO product = productService.getProduct(id);
+        if (product == null) {
+            return success(null);
+        }
         // 拼接数据
         IotProductCategoryDO category = categoryService.getProductCategory(product.getCategoryId());
         return success(BeanUtils.toBean(product, IotProductRespVO.class, bean -> {
@@ -99,6 +102,9 @@ public class IotProductController {
     @PreAuthorize("@ss.hasPermission('iot:product:query')")
     public CommonResult<IotProductRespVO> getProductByKey(@RequestParam("productKey") String productKey) {
         IotProductDO product = productService.getProductByProductKey(productKey);
+        if (product == null) {
+            return success(null);
+        }
         // 拼接数据
         IotProductCategoryDO category = categoryService.getProductCategory(product.getCategoryId());
         return success(BeanUtils.toBean(product, IotProductRespVO.class, bean -> {

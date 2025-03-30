@@ -226,6 +226,6 @@ public interface IotDeviceService {
      * @param deviceNames 设备名称列表
      * @return 设备列表
      */
-    List<IotDeviceDO> getDevicesByProductKeyAndNames(String productKey, List<String> deviceNames);
+    List<IotDeviceDO> getDeviceListByProductKeyAndNames(String productKey, List<String> deviceNames);
 
 }

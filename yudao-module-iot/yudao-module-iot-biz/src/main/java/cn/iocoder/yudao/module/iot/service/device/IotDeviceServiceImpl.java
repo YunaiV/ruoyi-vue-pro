@@ -452,7 +452,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     @Override
-    public List<IotDeviceDO> getDevicesByProductKeyAndNames(String productKey, List<String> deviceNames) {
+    public List<IotDeviceDO> getDeviceListByProductKeyAndNames(String productKey, List<String> deviceNames) {
         if (StrUtil.isBlank(productKey) || CollUtil.isEmpty(deviceNames)) {
             return Collections.emptyList();
         }

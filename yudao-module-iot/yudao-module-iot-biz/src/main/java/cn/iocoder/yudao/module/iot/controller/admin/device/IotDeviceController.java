@@ -185,11 +185,12 @@ public class IotDeviceController {
         return success(deviceService.getMqttConnectionParams(deviceId));
     }
 
+    // TODO @haohao：可以使用 @RequestParam("productKey") String productKey, @RequestParam("deviceNames") List<String> deviceNames 来接收哇？
     @GetMapping("/list-by-product-key-and-names")
     @Operation(summary = "通过产品标识和设备名称列表获取设备")
     @PreAuthorize("@ss.hasPermission('iot:device:query')")
     public CommonResult<List<IotDeviceRespVO>> getDevicesByProductKeyAndNames(@Valid IotDeviceByProductKeyAndNamesReqVO reqVO) {
-        List<IotDeviceDO> devices = deviceService.getDevicesByProductKeyAndNames(reqVO.getProductKey(), reqVO.getDeviceNames());
+        List<IotDeviceDO> devices = deviceService.getDeviceListByProductKeyAndNames(reqVO.getProductKey(), reqVO.getDeviceNames());
         return success(BeanUtils.toBean(devices, IotDeviceRespVO.class));
     }
 
