@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
-import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
-import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
+import cn.iocoder.yudao.framework.ai.core.model.baichuan.BaiChuanChatModel;
+import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
@@ -18,26 +18,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link SiliconFlowChatModel} 集成测试
+ * {@link BaiChuanChatModel} 集成测试
  *
  * @author 芋道源码
  */
-public class SiliconFlowChatModelTests {
+public class BaiChuanChatModelTests {
 
     private final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
             .openAiApi(OpenAiApi.builder()
-                    .baseUrl(SiliconFlowApiConstants.DEFAULT_BASE_URL)
-                    .apiKey("sk-epsakfenqnyzoxhmbucsxlhkdqlcbnimslqoivkshalvdozz") // apiKey
+                    .baseUrl(BaiChuanChatModel.BASE_URL)
+                    .apiKey("sk-61b6766a94c70786ed02673f5e16af3c") // apiKey
                     .build())
             .defaultOptions(OpenAiChatOptions.builder()
-                    .model(SiliconFlowApiConstants.MODEL_DEFAULT) // 模型
-//                    .model("deepseek-ai/DeepSeek-R1") // 模型（deepseek-ai/DeepSeek-R1）可用赠费
-//                    .model("Pro/deepseek-ai/DeepSeek-R1") // 模型（Pro/deepseek-ai/DeepSeek-R1）需要付费
+                    .model("Baichuan4-Turbo") // 模型（https://platform.baichuan-ai.com/docs/api）
                     .temperature(0.7)
                     .build())
             .build();
 
-    private final SiliconFlowChatModel chatModel = new SiliconFlowChatModel(openAiChatModel);
+    private final DeepSeekChatModel chatModel = new DeepSeekChatModel(openAiChatModel);
 
     @Test
     @Disabled

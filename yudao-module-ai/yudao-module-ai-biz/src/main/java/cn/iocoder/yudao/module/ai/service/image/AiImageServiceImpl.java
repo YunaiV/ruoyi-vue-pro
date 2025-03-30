@@ -11,6 +11,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowImageOptions;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
@@ -144,7 +145,12 @@ public class AiImageServiceImpl implements AiImageService {
                     .withStyle(MapUtil.getStr(draw.getOptions(), "style")) // 风格
                     .withResponseFormat("b64_json")
                     .build();
-        } else if (ObjUtil.equal(model.getPlatform(), AiPlatformEnum.STABLE_DIFFUSION.getPlatform())) {
+        } else if (ObjUtil.equal(model.getPlatform(), AiPlatformEnum.SILICON_FLOW.getPlatform())) {
+            // https://docs.siliconflow.cn/cn/api-reference/images/images-generations
+            return SiliconFlowImageOptions.builder().model(model.getModel())
+                    .height(draw.getHeight()).width(draw.getWidth())
+                    .build();
+        }  else if (ObjUtil.equal(model.getPlatform(), AiPlatformEnum.STABLE_DIFFUSION.getPlatform())) {
             // https://platform.stability.ai/docs/api-reference#tag/SDXL-and-SD1.6/operation/textToImage
             // https://platform.stability.ai/docs/api-reference#tag/Text-to-Image/operation/textToImage
             return StabilityAiImageOptions.builder().model(model.getModel())

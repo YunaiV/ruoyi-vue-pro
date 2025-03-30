@@ -212,6 +212,10 @@ yudao:
       appKey: 75b161ed2aef4719b275d6e7f2a4d4cd
       secretKey: YWYxYWI2MTA4ODI2NGZlYTQyNjAzZTcz
       model: generalv3.5
+    baichuan: # 百川智能
+      enable: true
+      api-key: sk-abc
+      model: Baichuan4-Turbo
     midjourney:
       enable: true
   #    base-url: https://api.holdai.top/mj-relax/mj

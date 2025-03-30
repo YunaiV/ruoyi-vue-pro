@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.ai.core.model.siliconflow;
+package cn.iocoder.yudao.framework.ai.core.model.baichuan;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,15 +10,17 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import reactor.core.publisher.Flux;
 
 /**
- * 硅基流动 {@link ChatModel} 实现类
+ * 百川 {@link ChatModel} 实现类
  *
- * 1. API 文档：<a href="https://docs.siliconflow.cn/cn/api-reference/chat-completions/chat-completions">API 文档</a>
- *
- * @author fansili
+ * @author 芋道源码
  */
 @Slf4j
 @RequiredArgsConstructor
-public class SiliconFlowChatModel implements ChatModel {
+public class BaiChuanChatModel implements ChatModel {
+
+    public static final String BASE_URL = "https://api.baichuan-ai.com";
+
+    public static final String MODEL_DEFAULT = "Baichuan4-Turbo";
 
     /**
      * 兼容 OpenAI 接口，进行复用
