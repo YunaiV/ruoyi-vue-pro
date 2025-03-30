@@ -14,7 +14,6 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
-import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
@@ -63,7 +62,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -263,30 +261,31 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             processVariables.putAll(reqVO.getProcessVariables());
         }
 
-        // 3 获取当前任务节点的信息
-        // 3.1 获取下一个将要执行的节点集合
+        // 3. 获取下一个将要执行的节点集合
         FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
         List<FlowNode> nextFlowNodes = BpmnModelUtils.getNextFlowNodes(flowElement, bpmnModel, processVariables);
-        return convertList(nextFlowNodes, node -> {
-            List<Long> candidateUserIds = getTaskCandidateUserList(bpmnModel, node.getId(),
-                    loginUserId, historicProcessInstance.getProcessDefinitionId(), processVariables);
-            // 3.2 获取节点的审批人信息
-            Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(candidateUserIds);
-            // 3.3 获取节点的审批人部门信息
-            Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
-            // 3.4 存在一个节点多人审批的情况，组装审批人信息
-            List<UserSimpleBaseVO> candidateUsers = new ArrayList<>();
-            userMap.forEach((key, value) -> candidateUsers.add(BpmProcessInstanceConvert.INSTANCE.buildUser(key, userMap, deptMap)));
-            return new ActivityNode().setNodeType(BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType())
-                    .setId(node.getId())
-                    .setName(node.getName())
-                    .setStatus(BpmTaskStatusEnum.RUNNING.getStatus())
-                    .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(node))
-                    // TODO @小北：先把 candidateUserIds 设置完，然后最后拼接 candidateUsers 信息。这样，如果有多个节点，就不用重复查询啦；类似 buildApprovalDetail 思路；
-                    // TODO 先拼接处 List ActivityNode
-                    // TODO 接着，再起一段，处理 adminUserApi.getUserMap(candidateUserIds)、deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId))
-                    .setCandidateUsers(candidateUsers);
-        });
+        List<ActivityNode> nextActivityNodes = convertList(nextFlowNodes, node -> new ActivityNode().setId(node.getId())
+                .setName(node.getName()).setNodeType(BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType())
+                .setStatus(BpmTaskStatusEnum.RUNNING.getStatus())
+                .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(node))
+                .setCandidateUserIds(getTaskCandidateUserList(bpmnModel, node.getId(),
+                        loginUserId, historicProcessInstance.getProcessDefinitionId(), processVariables)));
+        if (CollUtil.isNotEmpty(nextActivityNodes)) {
+            return nextActivityNodes;
+        }
+
+        // 4. 拼接基础信息
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertSetByFlatMap(nextActivityNodes, ActivityNode::getCandidateUserIds, Collection::stream));
+        Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
+        nextActivityNodes.forEach(node -> node.setCandidateUsers(convertList(node.getCandidateUserIds(), userId -> {
+            AdminUserRespDTO user = userMap.get(userId);
+            if (user != null) {
+                return BpmProcessInstanceConvert.INSTANCE.buildUser(userId, userMap, deptMap);
+            }
+            return null;
+        })));
+        return nextActivityNodes;
     }
 
     @Override
@@ -388,8 +387,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                                                       List<HistoricActivityInstance> activities, List<HistoricTaskInstance> tasks) {
         // 遍历 tasks 列表，只处理已结束的 UserTask
         // 为什么不通过 activities 呢？因为，加签场景下，它只存在于 tasks，没有 activities，导致如果遍历 activities 的话，它无法成为一个节点
-        // TODO @芋艿：子流程只有activity，这里获取不到已结束的子流程；
-        // TODO @lesan：【子流程】基于 activities 查询出 usertask、callactivity，然后拼接？如果是子流程，就是可以点击过去？
         List<HistoricTaskInstance> endTasks = filterList(tasks, task -> task.getEndTime() != null);
         List<ActivityNode> approvalNodes = convertList(endTasks, task -> {
             FlowElement flowNode = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
@@ -411,7 +408,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
         // 遍历 activities，只处理已结束的 StartEvent、EndEvent
         List<HistoricActivityInstance> endActivities = filterList(activities, activity -> activity.getEndTime() != null
-                && (StrUtil.equalsAny(activity.getActivityType(), ELEMENT_EVENT_START, ELEMENT_EVENT_END)));
+                && (StrUtil.equalsAny(activity.getActivityType(), ELEMENT_EVENT_START, ELEMENT_CALL_ACTIVITY, ELEMENT_EVENT_END)));
         endActivities.forEach(activity -> {
             // StartEvent：只处理 BPMN 的场景。因为，SIMPLE 情况下，已经有 START_USER_NODE 节点
             if (ELEMENT_EVENT_START.equals(activity.getActivityType())
@@ -445,7 +442,20 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 }
                 approvalNodes.add(endNode);
             }
+            // CallActivity
+            if (ELEMENT_CALL_ACTIVITY.equals(activity.getActivityType())) {
+                ActivityNode callActivity = new ActivityNode().setId(activity.getId())
+                        .setName(BpmSimpleModelNodeTypeEnum.CHILD_PROCESS.getName())
+                        .setNodeType(BpmSimpleModelNodeTypeEnum.CHILD_PROCESS.getType()).setStatus(processInstanceStatus)
+                        .setStartTime(DateUtils.of(activity.getStartTime()))
+                        .setEndTime(DateUtils.of(activity.getEndTime()))
+                        .setProcessInstanceId(activity.getProcessInstanceId());
+                approvalNodes.add(callActivity);
+            }
         });
+
+        // 按照时间排序
+        approvalNodes.sort(Comparator.comparing(ActivityNode::getStartTime));
         return approvalNodes;
     }
 
@@ -465,7 +475,6 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 HistoricActivityInstance::getActivityId);
 
         // 按照 activityId 分组，构建 ApprovalNodeInfo 节点
-        // TODO @lesan：【子流程】在子流程进行审批的时候，HistoricActivityInstance 里面可以拿到 runActivities.get(0).getCalledProcessInstanceId()。要不要支持跳转？？？
         Map<String, HistoricTaskInstance> taskMap = convertMap(tasks, HistoricTaskInstance::getId);
         return convertList(runningTaskMap.entrySet(), entry -> {
             String activityId = entry.getKey();
@@ -510,6 +519,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                         userId -> ObjectUtils.equalsAny(userId, approvalTaskInfo.getOwner(),
                                 approvalTaskInfo.getAssignee())); // 委派或者向前加签情况，需要先比较 owner
                 activityNode.setCandidateUserIds(CollUtil.sub(candidateUserIds, index + 1, candidateUserIds.size()));
+            }
+            if (BpmSimpleModelNodeTypeEnum.CHILD_PROCESS.getType().equals(activityNode.getNodeType())) {
+                activityNode.setProcessInstanceId(firstActivity.getProcessInstanceId());
             }
             return activityNode;
         });
@@ -824,6 +836,10 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 && Boolean.FALSE.equals(processDefinitionInfo.getAllowCancelRunningProcess())) {
             throw exception(PROCESS_INSTANCE_CANCEL_FAIL_NOT_ALLOW);
         }
+        // 1.4 子流程不允许取消
+        if (StrUtil.isNotBlank(instance.getSuperExecutionId())) {
+            throw exception(PROCESS_INSTANCE_CANCEL_CHILD_FAIL_NOT_ALLOW);
+        }
 
         // 2. 取消流程
         updateProcessInstanceCancel(cancelReqVO.getId(),
@@ -850,7 +866,13 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 BpmProcessInstanceStatusEnum.CANCEL.getStatus());
         runtimeService.setVariable(id, BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_REASON, reason);
 
-        // 2. 结束流程
+        // 2. 取消所有子流程
+        List<ProcessInstance> childProcessInstances = runtimeService.createProcessInstanceQuery()
+                .superProcessInstanceId(id).list();
+        childProcessInstances.forEach(processInstance -> updateProcessInstanceCancel(
+                processInstance.getProcessInstanceId(), BpmReasonEnum.CANCEL_CHILD_PROCESS_INSTANCE_BY_MAIN_PROCESS.getReason()));
+
+        // 3. 结束流程
         taskService.moveTaskToEnd(id, reason);
     }
 
@@ -915,10 +937,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                     BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getProcessAfterTriggerSetting();
 
                     BpmHttpRequestUtils.executeBpmHttpRequest(instance,
-                            setting.getUrl(),
-                            setting.getHeader(),
-                            setting.getBody(),
-                            true, setting.getResponse());
+                            setting.getUrl(), setting.getHeader(), setting.getBody(), true, setting.getResponse());
                 }
             }
         });
@@ -937,10 +956,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             }
             BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getProcessBeforeTriggerSetting();
             BpmHttpRequestUtils.executeBpmHttpRequest(instance,
-                    setting.getUrl(),
-                    setting.getHeader(),
-                    setting.getBody(),
-                    true, setting.getResponse());
+                    setting.getUrl(), setting.getHeader(), setting.getBody(), true, setting.getResponse());
         });
     }
 

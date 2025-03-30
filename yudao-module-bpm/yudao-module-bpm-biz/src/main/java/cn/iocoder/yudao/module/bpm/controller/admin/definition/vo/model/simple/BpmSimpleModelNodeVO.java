@@ -112,7 +112,7 @@ public class BpmSimpleModelNodeVO {
     /**
      * 条件节点设置
      */
-    private ConditionSetting conditionSetting; // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
+    private ConditionSetting conditionSetting; // 仅用于条件节点 BpmSimpleModelNodeTypeEnum.CONDITION_NODE
 
     @Schema(description = "路由分支组", example = "[]")
     private List<RouterSetting> routerGroups;
@@ -241,7 +241,7 @@ public class BpmSimpleModelNodeVO {
     @Schema(description = "条件设置")
     @Data
     @Valid
-    // 仅用于条件节点 BpmSimpleModelNodeType.CONDITION_NODE
+    // 仅用于条件节点 BpmSimpleModelNodeTypeEnum.CONDITION_NODE
     public static class ConditionSetting {
 
         @Schema(description = "条件类型", example = "1")

@@ -12,6 +12,8 @@ import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitio
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmProcessDefinitionInfoMapper;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.BpmnModel;
@@ -49,6 +51,9 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
 
     @Resource
     private BpmProcessDefinitionInfoMapper processDefinitionMapper;
+
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @Override
     public ProcessDefinition getProcessDefinition(String id) {
@@ -88,12 +93,22 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
         if (processDefinition == null) {
             return false;
         }
-        // 为空，则所有人都可以发起
-        if (CollUtil.isEmpty(processDefinition.getStartUserIds())) {
-            return true;
+
+        // 校验用户是否在允许发起的用户列表中
+        if (CollUtil.isNotEmpty(processDefinition.getStartUserIds())) {
+            return processDefinition.getStartUserIds().contains(userId);
         }
-        // 不为空，则需要存在里面
-        return processDefinition.getStartUserIds().contains(userId);
+
+        // 校验用户是否在允许发起的部门列表中
+        if (CollUtil.isNotEmpty(processDefinition.getStartDeptIds())) {
+            AdminUserRespDTO user = adminUserApi.getUser(userId);
+            return user != null
+                    && user.getDeptId() != null
+                    && processDefinition.getStartDeptIds().contains(user.getDeptId());
+        }
+
+        // 都为空，则所有人都可以发起
+        return true;
     }
 
     @Override

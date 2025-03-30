@@ -59,6 +59,9 @@ public class BpmModelMetaInfoVO {
     @Schema(description = "可发起用户编号数组", example = "[1,2,3]")
     private List<Long> startUserIds;
 
+    @Schema(description = "可发起部门编号数组", example = "[2,4,6]")
+    private List<Long> startDeptIds;
+
     @Schema(description = "可管理用户编号数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "[2,4,6]")
     @NotEmpty(message = "可管理用户编号数组不能为空")
     private List<Long> managerUserIds;
@@ -87,6 +90,12 @@ public class BpmModelMetaInfoVO {
 
     @Schema(description = "流程后置通知设置", example = "{}")
     private HttpRequestSetting processAfterTriggerSetting;
+
+    @Schema(description = "任务前置通知设置", example = "{}")
+    private HttpRequestSetting taskBeforeTriggerSetting;
+
+    @Schema(description = "任务后置通知设置", example = "{}")
+    private HttpRequestSetting taskAfterTriggerSetting;
 
     @Schema(description = "流程 ID 规则")
     @Data

@@ -6,12 +6,14 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.*;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
@@ -23,6 +25,7 @@ import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskSignTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmHttpRequestUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmFormService;
@@ -597,47 +600,54 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      */
     private Map<String, Object> validateAndSetNextAssignees(String taskDefinitionKey, Map<String, Object> variables, BpmnModel bpmnModel,
                                                             Map<String, List<Long>> nextAssignees, ProcessInstance processInstance) {
+        // simple 设计器第一个节点默认为发起人节点，不校验是否存在审批人
+        if (Objects.equals(taskDefinitionKey, START_USER_NODE_ID)) {
+            return variables;
+        }
         // 1. 获取下一个将要执行的节点集合
         FlowElement flowElement = bpmnModel.getFlowElement(taskDefinitionKey);
         List<FlowNode> nextFlowNodes = getNextFlowNodes(flowElement, bpmnModel, variables);
 
         // 2. 校验选择的下一个节点的审批人，是否合法
-        Map<String, List<Long>> processVariables;
         for (FlowNode nextFlowNode : nextFlowNodes) {
             Integer candidateStrategy = parseCandidateStrategy(nextFlowNode);
             // 2.1 情况一：如果节点中的审批人策略为 发起人自选
             if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy())) {
+                // 特殊：如果当前节点已经存在审批人，则不允许覆盖
+                Map<String, List<Long>> startUserSelectAssignees = FlowableUtils.getStartUserSelectAssignees(processInstance.getProcessVariables());
+                if (startUserSelectAssignees != null && CollUtil.isNotEmpty(startUserSelectAssignees.get(nextFlowNode.getId()))) {
+                    continue;
+                }
                 // 如果节点存在，但未配置审批人
                 List<Long> assignees = nextAssignees != null ? nextAssignees.get(nextFlowNode.getId()) : null;
                 if (CollUtil.isEmpty(assignees)) {
                     throw exception(PROCESS_INSTANCE_START_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
                 }
-                processVariables = FlowableUtils.getStartUserSelectAssignees(processInstance.getProcessVariables());
-                // 特殊：如果当前节点已经存在审批人，则不允许覆盖
-                if (processVariables != null && CollUtil.isNotEmpty(processVariables.get(nextFlowNode.getId()))) {
-                    continue;
-                }
+
                 // 设置 PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES
-                if (processVariables == null) {
-                    processVariables = new HashMap<>();
+                if (startUserSelectAssignees == null) {
+                    startUserSelectAssignees = new HashMap<>();
                 }
-                processVariables.put(nextFlowNode.getId(), assignees);
-                variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES, processVariables);
+                startUserSelectAssignees.put(nextFlowNode.getId(), assignees);
+                variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES, startUserSelectAssignees);
+                continue;
             }
+
             // 2.2 情况二：如果节点中的审批人策略为 审批人，在审批时选择下一个节点的审批人，并且该节点的审批人为空
             if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy())) {
                 // 如果节点存在，但未配置审批人
+                Map<String, List<Long>> approveUserSelectAssignees = FlowableUtils.getApproveUserSelectAssignees(processInstance.getProcessVariables());
                 List<Long> assignees = nextAssignees != null ? nextAssignees.get(nextFlowNode.getId()) : null;
                 if (CollUtil.isEmpty(assignees)) {
                     throw exception(PROCESS_INSTANCE_APPROVE_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
                 }
-                processVariables = FlowableUtils.getApproveUserSelectAssignees(processInstance.getProcessVariables());
-                if (processVariables == null) {
-                    processVariables = new HashMap<>();
-                }
+
                 // 设置 PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES
-                processVariables.put(nextFlowNode.getId(), assignees);
-                variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES, processVariables);
+                if (approveUserSelectAssignees == null) {
+                    approveUserSelectAssignees = new HashMap<>();
+                }
+                approveUserSelectAssignees.put(nextFlowNode.getId(), assignees);
+                variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES, approveUserSelectAssignees);
             }
         }
         return variables;
@@ -1174,12 +1184,26 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
         updateTaskStatus(task.getId(), BpmTaskStatusEnum.RUNNING.getStatus());
 
-        // 2. 处理自动通过的情况，例如说：1）无审批人时，是否自动通过、不通过；2）非【人工审核】时，是否自动通过、不通过
         ProcessInstance processInstance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
         if (processInstance == null) {
             log.error("[processTaskCreated][taskId({}) 没有找到流程实例]", task.getId());
             return;
         }
+        BpmProcessDefinitionInfoDO processDefinitionInfo = bpmProcessDefinitionService.
+                getProcessDefinitionInfo(processInstance.getProcessDefinitionId());
+        if (processDefinitionInfo == null) {
+            log.error("[processTaskCreated][processDefinitionId({}) 没有找到流程定义]", processInstance.getProcessDefinitionId());
+            return;
+        }
+
+        // 2. 任务前置通知
+        if (ObjUtil.isNotNull(processDefinitionInfo.getTaskBeforeTriggerSetting())){
+            BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getTaskBeforeTriggerSetting();
+            BpmHttpRequestUtils.executeBpmHttpRequest(processInstance,
+                    setting.getUrl(), setting.getHeader(), setting.getBody(), true, setting.getResponse());
+        }
+
+        // 3. 处理自动通过的情况，例如说：1）无审批人时，是否自动通过、不通过；2）非【人工审核】时，是否自动通过、不通过
         BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(processInstance.getProcessDefinitionId());
         FlowElement userTaskElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
         Integer approveType = BpmnModelUtils.parseApproveType(userTaskElement);
@@ -1389,6 +1413,28 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             }
 
         });
+    }
+
+    @Override
+    public void processTaskCompleted(Task task) {
+        ProcessInstance processInstance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
+        if (processInstance == null) {
+            log.error("[processTaskCompleted][taskId({}) 没有找到流程实例]", task.getId());
+            return;
+        }
+        BpmProcessDefinitionInfoDO processDefinitionInfo = bpmProcessDefinitionService.
+                getProcessDefinitionInfo(processInstance.getProcessDefinitionId());
+        if (processDefinitionInfo == null) {
+            log.error("[processTaskCompleted][processDefinitionId({}) 没有找到流程定义]", processInstance.getProcessDefinitionId());
+            return;
+        }
+
+        // 任务后置通知
+        if (ObjUtil.isNotNull(processDefinitionInfo.getTaskAfterTriggerSetting())){
+            BpmModelMetaInfoVO.HttpRequestSetting setting = processDefinitionInfo.getTaskAfterTriggerSetting();
+            BpmHttpRequestUtils.executeBpmHttpRequest(processInstance,
+                    setting.getUrl(), setting.getHeader(), setting.getBody(), true, setting.getResponse());
+        }
     }
 
     @Override
