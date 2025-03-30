@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.Version;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -30,6 +31,9 @@ public class SrmPurchaseOrderItemDO extends TenantBaseDO {
      */
     @TableId
     private Long id;
+    
+    @Version
+    private Long version;
     /**
      * 供应商产品编码
      * <p>

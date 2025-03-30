@@ -4,14 +4,11 @@ import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.Version;
+import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 /**
  * ERP采购申请单子 DO
@@ -33,6 +30,8 @@ public class SrmPurchaseRequestItemsDO extends TenantBaseDO {
      */
     @TableId
     private Long id;
+    @Version
+    private Long version;
     /**
      * 商品id
      */

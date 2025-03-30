@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -32,6 +31,8 @@ import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PURCHASE_O
 @Slf4j
 @Component
 public class PurchaseOrderTemplateManager {
+    @Value("${spring.profiles.active}")
+    private String profile;
 
     @Autowired
     private ResourcePatternResolver resourcePatternResolver;
@@ -75,9 +76,11 @@ public class PurchaseOrderTemplateManager {
         }
     }
 
-    @Profile("prod")
     @EventListener(ApplicationReadyEvent.class)
     public void preloadTemplates() {
+        if (!profile.equals("prod")) {
+            return;
+        }
         log.info("🚀 启动后开始异步预热 Word 模板与 PDF 引擎：{}", preloadTemplateList);
 
         CompletableFuture.runAsync(() -> {

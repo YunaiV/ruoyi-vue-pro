@@ -11,11 +11,12 @@ import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseReturnDO;
 import cn.iocoder.yudao.module.srm.dal.redis.SrmRedisKeyConstants;
 import jakarta.annotation.Resource;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 
 /**
@@ -96,8 +97,7 @@ public class SrmNoRedisDAO {
      */
     public String generate(String prefix, ErrorCode message) {
         // 递增序号
-        String keyPrefix =
-            prefix + StrPool.DASHED + DateUtil.format(LocalDateTime.now(), DatePattern.PURE_DATE_PATTERN);
+        String keyPrefix = prefix + StrPool.DASHED + DateUtil.format(LocalDateTime.now(), DatePattern.PURE_DATE_PATTERN);
         String key = SrmRedisKeyConstants.NO + keyPrefix;
         Long no = stringRedisTemplate.opsForValue().increment(key);
         //判断no是否大于6位数
@@ -114,7 +114,7 @@ public class SrmNoRedisDAO {
      * @param fullSerialNo 全部流水号，例如说 "PO-20211009-000001"
      */
     public void setManualSerial(String prefix, String fullSerialNo) {
-        try{
+        try {
             // 解析出日期和流水号数字部分
             String[] parts = fullSerialNo.split("-");
             String datePart = parts[1];           // 20250329
@@ -130,16 +130,16 @@ public class SrmNoRedisDAO {
             long currentNo = current != null ? Long.parseLong(current) : 0;
 
             // 如果手动编号比当前大，则更新 Redis 的值
-            if(manualNo > currentNo) {
+            if (manualNo > currentNo) {
                 stringRedisTemplate.opsForValue().set(key, String.valueOf(manualNo));
             }
-        } catch(Exception e){
+        } catch (Exception e) {
             log.error("[setManualSerial][prefix({}) fullSerialNo({}) 发生异常]", prefix, fullSerialNo, e);
         }
     }
 
     /**
-     * 获取某个前缀和当前日期下的最大编号（不会触发自增，只读取 Redis）
+     * 获取某个前缀和当前日期下的最大可用编号（不会触发自增，只读取 Redis）
      *
      * @param prefix 编号前缀，例如 "PO"
      * @return 最大编号字符串，例如 "PO-20250329-000123"，如果没有生成过返回 null
@@ -151,14 +151,14 @@ public class SrmNoRedisDAO {
         String redisKey = SrmRedisKeyConstants.NO + keyPrefix;
 
         String current = stringRedisTemplate.opsForValue().get(redisKey);
-        if(current == null) {
+        if (current == null) {
             return generate(prefix, message); // 表示该前缀今天尚未生成过编号
         }
 
-        try{
-            long no = Long.parseLong(current);
+        try {
+            long no = Long.parseLong(current) + 1L;
             return keyPrefix + StrPool.DASHED + String.format("%06d", no);
-        } catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             log.error("[getMaxSerial] Redis 值格式错误：key = {}, value = {}", redisKey, current, e);
             return null;
         }
@@ -171,10 +171,10 @@ public class SrmNoRedisDAO {
      * @return true = 已存在；false = 可能未生成过
      */
     public boolean isSerialExists(String fullSerialNo) {
-        try{
+        try {
             // 拆分编号
             String[] parts = fullSerialNo.split(StrPool.DASHED);
-            if(parts.length != 3) {
+            if (parts.length != 3) {
                 return false;
             }
 
@@ -190,7 +190,7 @@ public class SrmNoRedisDAO {
 
             // 获取当前 Redis 中最大流水号
             String current = stringRedisTemplate.opsForValue().get(redisKey);
-            if(current == null) {
+            if (current == null) {
                 return false;
             }
 
@@ -199,7 +199,7 @@ public class SrmNoRedisDAO {
             // 判断该编号是否 <= 当前最大编号
             return checkNo <= currentNo;
 
-        } catch(Exception e){
+        } catch (Exception e) {
             log.warn("[isSerialExists] 编号解析失败: {}", fullSerialNo, e);
             return false;
         }

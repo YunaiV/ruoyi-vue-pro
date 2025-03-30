@@ -1,10 +1,5 @@
 package cn.iocoder.yudao.module.srm.controller.admin.purchase;
 
-import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -21,11 +16,7 @@ import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductUnitDTO;
 import cn.iocoder.yudao.module.erp.api.stock.WmsWarehouseApi;
 import cn.iocoder.yudao.module.erp.api.stock.dto.ErpWarehouseDTO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.SrmPurchaseRequestAuditReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.SrmPurchaseRequestEnableReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.SrmPurchaseRequestMergeReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.SrmPurchaseRequestPageReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.SrmPurchaseRequestSaveReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.*;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.resp.SrmPurchaseRequestItemRespVO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.resp.SrmPurchaseRequestRespVO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestDO;
@@ -44,28 +35,21 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 /**
  * @author Administrator
@@ -159,7 +143,7 @@ public class SrmPurchaseRequestController {
     @PreAuthorize("@ss.hasPermission('erp:purchase-request:query')")
     public CommonResult<SrmPurchaseRequestRespVO> getPurchaseRequest(@RequestParam("id") Long id) {
         SrmPurchaseRequestDO purchaseRequest = srmPurchaseRequestService.getPurchaseRequest(id);
-        if(purchaseRequest == null) {
+        if (purchaseRequest == null) {
             return success(null);
         }
         List<SrmPurchaseRequestRespVO> vos = bindList(Collections.singletonList(purchaseRequest));
@@ -187,7 +171,7 @@ public class SrmPurchaseRequestController {
     }
 
     private List<SrmPurchaseRequestRespVO> bindList(List<SrmPurchaseRequestDO> oldList) {
-        if(CollUtil.isEmpty(oldList)) {
+        if (CollUtil.isEmpty(oldList)) {
             return Collections.emptyList();
         }
         // 1.1 申请单-产品项
@@ -207,7 +191,7 @@ public class SrmPurchaseRequestController {
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(oldList, SrmPurchaseRequestDO::getApplicationDeptId));
         //1.5 供应商信息
         Map<Long, SrmSupplierDO> supplierMap = srmSupplierService.getSupplierMap(convertSet(oldList, SrmPurchaseRequestDO::getSupplierId));
-        //1.6 收集单位id map，从prodcut里面
+        //1.6 收集单位id map，从product里面
         Map<Long, ErpProductUnitDTO> unitMap = erpProductUnitApi.getProductUnitMap(productMap.values().stream().map(ErpProductDTO::getUnitId).collect(Collectors.toSet()));
         //2 开始拼接
         return BeanUtils.toBean(oldList, SrmPurchaseRequestRespVO.class, purchaseRequest -> {
@@ -229,7 +213,7 @@ public class SrmPurchaseRequestController {
                 MapUtils.findAndThen(userMap, safeParseLong(item.getUpdater()), user -> item.setUpdater(user.getNickname()));
                 item.setOrderedQuantity(ObjectUtils.defaultIfNull(item.getOrderedQuantity(), 0));//已订购数量
                 item.setInCount(ObjectUtils.defaultIfNull(item.getInCount(), 0));//入库
-                if(item.getApproveCount() != null && item.getOrderedQuantity() != null) {
+                if (item.getApproveCount() != null && item.getOrderedQuantity() != null) {
                     item.setUnOrderCount(ObjectUtils.defaultIfNull(
                         item.getApproveCount() - item.getOrderedQuantity(), 0));//未订购
                 }
@@ -256,9 +240,9 @@ public class SrmPurchaseRequestController {
      * @return id
      */
     private Long safeParseLong(String value) {
-        try{
+        try {
             return Optional.ofNullable(value).map(Long::parseLong).orElse(null);
-        } catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             return null;
         }
     }

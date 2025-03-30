@@ -4,9 +4,10 @@ import cn.iocoder.yudao.framework.mybatis.core.vo.BaseVO;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import lombok.Data;
 
 @Data
 public class SrmPurchaseRequestItemRespVO extends BaseVO {
@@ -125,4 +126,6 @@ public class SrmPurchaseRequestItemRespVO extends BaseVO {
     @Schema(description = "期望到货日期")
     private LocalDateTime expectArrivalDate;
 
+    @Schema(description = "版本号")
+    private Long version;
 }

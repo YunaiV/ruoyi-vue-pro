@@ -75,4 +75,7 @@ public class SrmPurchaseRequestItemsSaveReqVO {
     //期望到货日期
     @Schema(description = "期望到货日期")
     private LocalDateTime expectArrivalDate;
+
+    @Schema(description = "版本号")
+    private Long version;
 }

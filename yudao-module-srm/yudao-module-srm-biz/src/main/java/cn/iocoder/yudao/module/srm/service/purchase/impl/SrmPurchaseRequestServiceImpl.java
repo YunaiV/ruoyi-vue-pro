@@ -271,7 +271,9 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
         validatePurchaseRequestItemsMasterId(updateReqVO.getId(), requestItemsIds);
         //1.5 设置no
         String oldNo = srmPurchaseRequestDO.getNo();
-        voSetNo(updateReqVO);
+        if (!oldNo.equals(updateReqVO.getNo())) {
+            voSetNo(updateReqVO);
+        }
         if (!oldNo.equals(updateReqVO.getNo())) {
             //关联更新采购申请项冗余字段erpPurchaseRequestItemNo
             List<SrmPurchaseOrderItemDO> srmPurchaseOrderItemDOList = srmPurchaseOrderService.getPurchaseOrderItemListByApplyIds(requestItemsDOS.stream().map(SrmPurchaseRequestItemsDO::getId).distinct().toList());
@@ -305,11 +307,11 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void updatePurchaseRequestItemList(Long id, List<SrmPurchaseRequestItemsDO> itemsDOList) {
+    public void updatePurchaseRequestItemList(Long id, List<SrmPurchaseRequestItemsDO> newList) {
         // 第一步，对比新老数据，获得添加、修改、删除的列表
         List<SrmPurchaseRequestItemsDO> oldList = erpPurchaseRequestItemsMapper.selectListByRequestId(id);
         // id 不同，就认为是不同的记录
-        List<List<SrmPurchaseRequestItemsDO>> diffList = diffList(oldList, itemsDOList, (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
+        List<List<SrmPurchaseRequestItemsDO>> diffList = diffList(oldList, newList, (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
         // 第二步，批量添加、修改、删除
         if (CollUtil.isNotEmpty(diffList.get(0))) {
             diffList.get(0).forEach(o -> o.setRequestId(id));

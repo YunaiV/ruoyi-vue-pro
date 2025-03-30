@@ -10,10 +10,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import lombok.Data;
 
 @Schema(description = "管理后台 - ERP 采购订单 Response VO")
 @Data
@@ -137,6 +138,15 @@ public class SrmPurchaseOrderBaseRespVO extends BaseVO {
 
     @Schema(description = "附件地址")
     private String fileUrl;
+
+    @Schema(description = "装运港")
+    private String portOfLoading;
+
+    @Schema(description = "目的港")
+    private String portOfDischarge;
+
+    @Schema(description = "版本号")
+    private Long version;
 
     @Data
     public static class Item extends BaseVO {
@@ -289,5 +299,8 @@ public class SrmPurchaseOrderBaseRespVO extends BaseVO {
 
         @Schema(description = "总完工单通过数量")
         private Integer totalCompletionPassCount;
+
+        @Schema(description = "版本号")
+        private Long version;
     }
 }

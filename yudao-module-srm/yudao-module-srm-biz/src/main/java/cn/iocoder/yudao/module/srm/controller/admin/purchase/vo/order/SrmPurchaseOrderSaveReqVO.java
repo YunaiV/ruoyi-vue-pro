@@ -3,17 +3,12 @@ package cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order;
 import cn.iocoder.yudao.module.system.api.utils.Validation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import lombok.Data;
 
 @Schema(description = "管理后台 - ERP 采购订单新增/修改 Request VO")
 @Data
@@ -83,6 +78,8 @@ public class SrmPurchaseOrderSaveReqVO {
     @Size(min = 1, message = "商品信息至少一个")
     private List<@Valid Item> items;
 
+    @Schema(description = "版本号")
+    private Long version;
 
     @Data
     public static class Item {
@@ -131,10 +128,6 @@ public class SrmPurchaseOrderSaveReqVO {
         //
         //        @Schema(description = "币别id(财务管理-币别维护)")
         //        private Long currencyId;
-        //
-        //        @Schema(description = "币别名称")
-        //        @NotBlank(message = "币别名称不能为空")
-        //        private String currencyName;
 
         @Schema(description = "含税单价")
         @DecimalMin(value = "0.00", message = "含税单价不能小于0")
@@ -211,6 +204,9 @@ public class SrmPurchaseOrderSaveReqVO {
 
         @Schema(description = "总完工单通过数量")
         private Integer totalCompletionPassCount;
+
+        @Schema(description = "版本号")
+        private Long version;
     }
 
 }

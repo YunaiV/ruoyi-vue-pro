@@ -8,10 +8,11 @@ import com.alibaba.excel.annotation.write.style.ContentStyle;
 import com.alibaba.excel.enums.BooleanEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import lombok.Data;
 
 @Schema(description = "管理后台 - ERP采购申请单 Response VO")
 @Data
@@ -122,6 +123,8 @@ public class SrmPurchaseRequestRespVO extends BaseVO {
     @Schema(description = "备注")
     private String remark;
 
+    @Schema(description = "版本号")
+    private Long version;
 //    /**
 //     * 采购单ID
 //     *
