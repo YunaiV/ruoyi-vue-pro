@@ -20,10 +20,6 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class SiliconFlowChatModel implements ChatModel {
 
-    public static final String BASE_URL = "https://api.siliconflow.cn";
-
-    public static final String MODEL_DEFAULT = "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B";
-
     /**
      * 兼容 OpenAI 接口，进行复用
      */

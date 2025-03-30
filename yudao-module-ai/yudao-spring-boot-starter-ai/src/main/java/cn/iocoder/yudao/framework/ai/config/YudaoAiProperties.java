@@ -44,6 +44,12 @@ public class YudaoAiProperties {
     private XingHuoProperties xinghuo;
 
     /**
+     * 百川
+     */
+    @SuppressWarnings("SpellCheckingInspection")
+    private BaiChuanProperties baichuan;
+
+    /**
      * Midjourney 绘图
      */
     private MidjourneyProperties midjourney;
@@ -114,6 +120,19 @@ public class YudaoAiProperties {
         private String appId;
         private String appKey;
         private String secretKey;
+
+        private String model;
+        private Double temperature;
+        private Integer maxTokens;
+        private Double topP;
+
+    }
+
+    @Data
+    public static class  BaiChuanProperties {
+
+        private String enable;
+        private String apiKey;
 
         private String model;
         private Double temperature;

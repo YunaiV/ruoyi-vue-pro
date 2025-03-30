@@ -187,7 +187,7 @@ public class SimpleModelUtils {
     /**
      * 构建有附加节点的连线
      *
-     * @param nodeId 当前节点 ID
+     * @param nodeId       当前节点 ID
      * @param attachNodeId 附属节点 ID
      * @param targetNodeId 目标节点 ID
      */
@@ -662,6 +662,10 @@ public class SimpleModelUtils {
      * 构造条件表达式
      */
     public static String buildConditionExpression(BpmSimpleModelNodeVO.ConditionSetting conditionSetting) {
+        // 并行网关不需要设置条件
+        if (conditionSetting == null) {
+            return null;
+        }
         return buildConditionExpression(conditionSetting.getConditionType(), conditionSetting.getConditionExpression(),
                 conditionSetting.getConditionGroups());
     }
@@ -813,7 +817,6 @@ public class SimpleModelUtils {
             callActivity.setCalledElementType("key");
             // 1. 是否异步
             if (node.getChildProcessSetting().getAsync()) {
-                // TODO @lesan: 这里目前测试没有跳过执行call activity 后面的节点
                 callActivity.setAsynchronous(true);
             }
 
@@ -959,8 +962,8 @@ public class SimpleModelUtils {
         if (nodeType == BpmSimpleModelNodeTypeEnum.CONDITION_BRANCH_NODE) {
             // 查找满足条件的 BpmSimpleModelNodeVO 节点
             BpmSimpleModelNodeVO matchConditionNode = CollUtil.findOne(currentNode.getConditionNodes(),
-                        conditionNode -> !BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow())
-                                && evalConditionExpress(variables, conditionNode.getConditionSetting()));
+                    conditionNode -> !BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow())
+                            && evalConditionExpress(variables, conditionNode.getConditionSetting()));
             if (matchConditionNode == null) {
                 matchConditionNode = CollUtil.findOne(currentNode.getConditionNodes(),
                         conditionNode -> BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow()));
@@ -974,8 +977,8 @@ public class SimpleModelUtils {
         if (nodeType == BpmSimpleModelNodeTypeEnum.INCLUSIVE_BRANCH_NODE) {
             // 查找满足条件的 BpmSimpleModelNodeVO 节点
             Collection<BpmSimpleModelNodeVO> matchConditionNodes = CollUtil.filterNew(currentNode.getConditionNodes(),
-                        conditionNode -> !BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow())
-                                && evalConditionExpress(variables, conditionNode.getConditionSetting()));
+                    conditionNode -> !BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow())
+                            && evalConditionExpress(variables, conditionNode.getConditionSetting()));
             if (CollUtil.isEmpty(matchConditionNodes)) {
                 matchConditionNodes = CollUtil.filterNew(currentNode.getConditionNodes(),
                         conditionNode -> BooleanUtil.isTrue(conditionNode.getConditionSetting().getDefaultFlow()));

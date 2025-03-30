@@ -148,7 +148,6 @@ public class BpmProcessInstanceController {
                 processDefinition, processDefinitionInfo, startUser, dept));
     }
 
-    // TODO @lesan：【子流程】子流程如果取消，主流程应该是通过、还是不通过哈？还是禁用掉子流程的取消？
     @DeleteMapping("/cancel-by-start-user")
     @Operation(summary = "用户取消流程实例", description = "取消发起的流程")
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:cancel')")

@@ -67,8 +67,8 @@ public class MenuController {
     }
 
     @GetMapping({"/list-all-simple", "simple-list"})
-    @Operation(summary = "获取菜单精简信息列表", description = "只包含被开启的菜单，用于【角色分配菜单】功能的选项。" +
-            "在多租户的场景下，会只返回租户所在套餐有的菜单")
+    @Operation(summary = "获取菜单精简信息列表",
+            description = "只包含被开启的菜单，用于【角色分配菜单】功能的选项。在多租户的场景下，会只返回租户所在套餐有的菜单")
     public CommonResult<List<MenuSimpleRespVO>> getSimpleMenuList() {
         List<MenuDO> list = menuService.getMenuListByTenant(
                 new MenuListReqVO().setStatus(CommonStatusEnum.ENABLE.getStatus()));

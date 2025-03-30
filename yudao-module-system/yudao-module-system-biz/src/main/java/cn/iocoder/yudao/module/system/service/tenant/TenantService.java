@@ -38,7 +38,7 @@ public interface TenantService {
      * 更新租户的角色菜单
      *
      * @param tenantId 租户编号
-     * @param menuIds 菜单编号数组
+     * @param menuIds  菜单编号数组
      */
     void updateTenantRoleMenu(Long tenantId, Set<Long> menuIds);
 
@@ -96,6 +96,14 @@ public interface TenantService {
      * @return 租户数组
      */
     List<TenantDO> getTenantListByPackageId(Long packageId);
+
+    /**
+     * 获得指定状态的租户列表
+     *
+     * @param status 状态
+     * @return 租户列表
+     */
+    List<TenantDO> getTenantListByStatus(Integer status);
 
     /**
      * 进行租户的信息处理逻辑

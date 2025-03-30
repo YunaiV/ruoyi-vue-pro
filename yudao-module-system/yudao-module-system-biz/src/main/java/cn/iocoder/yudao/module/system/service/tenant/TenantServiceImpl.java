@@ -266,6 +266,11 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
+    public List<TenantDO> getTenantListByStatus(Integer status) {
+        return tenantMapper.selectListByStatus(status);
+    }
+
+    @Override
     public void handleTenantInfo(TenantInfoHandler handler) {
         // 如果禁用，则不执行逻辑
         if (isTenantDisable()) {

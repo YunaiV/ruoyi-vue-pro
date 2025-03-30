@@ -43,4 +43,8 @@ public interface TenantMapper extends BaseMapperX<TenantDO> {
         return selectList(TenantDO::getPackageId, packageId);
     }
 
+    default List<TenantDO> selectListByStatus(Integer status) {
+        return selectList(TenantDO::getStatus, status);
+    }
+
 }

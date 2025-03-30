@@ -279,6 +279,13 @@ public interface BpmTaskService {
     void processTaskAssigned(Task task);
 
     /**
+     * 处理 Task 完成事件，目前是发送任务后置通知
+     *
+     * @param task 任务实体
+     */
+    void processTaskCompleted(Task task);
+
+    /**
      * 处理 Task 审批超时事件，可能会处理多个当前审批中的任务
      *
      * @param processInstanceId 流程示例编号

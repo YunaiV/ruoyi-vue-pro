@@ -47,7 +47,7 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
     public static final Set<FlowableEngineEventType> TASK_EVENTS = ImmutableSet.<FlowableEngineEventType>builder()
             .add(FlowableEngineEventType.TASK_CREATED)
             .add(FlowableEngineEventType.TASK_ASSIGNED)
-//            .add(FlowableEngineEventType.TASK_COMPLETED) // 由于审批通过时，已经记录了 task 的 status 为通过，所以不需要监听了。
+            .add(FlowableEngineEventType.TASK_COMPLETED) // 由于审批通过时，已经记录了 task 的 status 为通过，这里仅处理任务后置通知。
             .add(FlowableEngineEventType.ACTIVITY_CANCELLED)
             .add(FlowableEngineEventType.TIMER_FIRED) // 监听审批超时
             .build();
@@ -64,6 +64,11 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
     @Override
     protected void taskAssigned(FlowableEngineEntityEvent event) {
         taskService.processTaskAssigned((Task) event.getEntity());
+    }
+
+    @Override
+    protected void taskCompleted(FlowableEngineEntityEvent event) {
+        taskService.processTaskCompleted((Task) event.getEntity());
     }
 
     @Override

@@ -212,6 +212,10 @@ yudao:
       appKey: 75b161ed2aef4719b275d6e7f2a4d4cd
       secretKey: YWYxYWI2MTA4ODI2NGZlYTQyNjAzZTcz
       model: generalv3.5
+    baichuan: # 百川智能
+      enable: true
+      api-key: sk-abc
+      model: Baichuan4-Turbo
     midjourney:
       enable: true
   #    base-url: https://api.holdai.top/mj-relax/mj
@@ -271,6 +275,7 @@ yudao:
     ignore-urls:
       - /admin-api/system/tenant/get-id-by-name # 基于名字获取租户，不许带租户编号
       - /admin-api/system/tenant/get-by-website # 基于域名获取租户，不许带租户编号
+      - /admin-api/system/tenant/simple-list # 获取租户列表，不许带租户编号
       - /admin-api/system/captcha/get # 获取图片验证码，和租户无关
       - /admin-api/system/captcha/check # 校验图片验证码，和租户无关
       - /admin-api/infra/file/*/get/** # 获取图片，和租户无关

@@ -152,6 +152,14 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
     private List<Long> startUserIds;
 
     /**
+     * 可发起部门编号数组
+     *
+     * 关联 {@link AdminUserRespDTO#getDeptId()} 字段的数组
+     */
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> startDeptIds;
+
+    /**
      * 可管理用户编号数组
      *
      * 关联 {@link AdminUserRespDTO#getId()} 字段的数组
@@ -198,5 +206,17 @@ public class BpmProcessDefinitionInfoDO extends BaseDO {
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private BpmModelMetaInfoVO.HttpRequestSetting processAfterTriggerSetting;
+
+    /**
+     * 任务前置通知设置
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private BpmModelMetaInfoVO.HttpRequestSetting taskBeforeTriggerSetting;
+
+    /**
+     * 任务后置通知设置
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private BpmModelMetaInfoVO.HttpRequestSetting taskAfterTriggerSetting;
 
 }

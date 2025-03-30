@@ -46,10 +46,7 @@ public class BpmHttpCallbackTrigger extends BpmAbstractHttpRequestTrigger {
                 .setKey("taskDefineKey") // 重要：回调请求 taskDefineKey 需要传给被调用方，用于回调执行
                 .setType(BpmHttpRequestParamTypeEnum.FIXED_VALUE.getType()).setValue(setting.getCallbackTaskDefineKey()));
         BpmHttpRequestUtils.executeBpmHttpRequest(processInstance,
-                setting.getUrl(),
-                setting.getHeader(),
-                setting.getBody(),
-                false, null);
+                setting.getUrl(), setting.getHeader(), setting.getBody(), false, null);
     }
 
 }
