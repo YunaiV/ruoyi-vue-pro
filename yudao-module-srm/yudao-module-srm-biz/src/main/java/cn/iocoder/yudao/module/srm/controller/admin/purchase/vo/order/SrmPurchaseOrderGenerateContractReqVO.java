@@ -32,10 +32,6 @@ public class SrmPurchaseOrderGenerateContractReqVO {
     @DateTimeFormat(pattern = DatePattern.NORM_DATE_PATTERN)
     private LocalDateTime signingDate;
 
-    @Schema(description = "币别名称(计价单位)", requiredMode = Schema.RequiredMode.REQUIRED, example = "CNY")
-    @NotBlank(message = "币别名称(计价单位)不能为空")
-    private String currencyName;
-
     //甲方乙方
     //甲方主体id
     @Schema(description = "甲方主体id", requiredMode = Schema.RequiredMode.REQUIRED)
