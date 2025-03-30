@@ -144,8 +144,16 @@ public class IotRuleSceneDO extends TenantBaseDO {
     @Data
     public static class TriggerConditionParameter {
 
+        // TODO @芋艿: identifier0 存事件和服务的 identifier 属性的情况 identifier0 就为 null 解决前端回显问题
         /**
-         * 标识符（属性、事件、服务）
+         * 标识符（事件、服务）
+         *
+         * 关联 {@link IotThingModelDO#getIdentifier()}
+         */
+        private String identifier0;
+
+        /**
+         * 标识符（属性）
          *
          * 关联 {@link IotThingModelDO#getIdentifier()}
          */

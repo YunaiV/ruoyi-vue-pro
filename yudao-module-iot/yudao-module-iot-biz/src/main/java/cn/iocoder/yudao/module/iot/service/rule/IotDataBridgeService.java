@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.IotDataBr
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 /**
  * IoT 数据桥梁 Service 接口
  *
@@ -50,5 +52,13 @@ public interface IotDataBridgeService {
      * @return 数据桥梁分页
      */
     PageResult<IotDataBridgeDO> getDataBridgePage(IotDataBridgePageReqVO pageReqVO);
+
+    /**
+     * 获取数据桥梁列表
+     *
+     * @param status 状态，如果为空，则不进行筛选
+     * @return 数据桥梁列表
+     */
+    List<IotDataBridgeDO> getDataBridgeList(Integer status);
 
 }

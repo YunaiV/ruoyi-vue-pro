@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.controller.admin.rule;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -17,7 +18,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 @Tag(name = "管理后台 - IoT 数据桥梁")
 @RestController
@@ -67,6 +71,14 @@ public class IotDataBridgeController {
     public CommonResult<PageResult<IotDataBridgeRespVO>> getDataBridgePage(@Valid IotDataBridgePageReqVO pageReqVO) {
         PageResult<IotDataBridgeDO> pageResult = dataBridgeService.getDataBridgePage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, IotDataBridgeRespVO.class));
+    }
+
+    @GetMapping("/simple-list")
+    @Operation(summary = "获取数据桥梁的精简信息列表", description = "主要用于前端的下拉选项")
+    public CommonResult<List<IotDataBridgeRespVO>> getSimpleDataBridgeList() {
+        List<IotDataBridgeDO> list = dataBridgeService.getDataBridgeList(CommonStatusEnum.ENABLE.getStatus());
+        return success(convertList(list, dataBridge -> // 只返回 id、name 字段
+                new IotDataBridgeRespVO().setId(dataBridge.getId()).setName(dataBridge.getName())));
     }
 
 }

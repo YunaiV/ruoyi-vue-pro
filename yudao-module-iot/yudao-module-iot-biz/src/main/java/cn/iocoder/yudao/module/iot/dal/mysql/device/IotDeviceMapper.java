@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -75,6 +76,12 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
     default Long selectCountByCreateTime(@Nullable LocalDateTime createTime) {
         return selectCount(new LambdaQueryWrapperX<IotDeviceDO>()
                 .geIfPresent(IotDeviceDO::getCreateTime, createTime));
+    }
+
+    default List<IotDeviceDO> selectByProductKeyAndDeviceNames(String productKey, Collection<String> deviceNames) {
+        return selectList(new LambdaQueryWrapperX<IotDeviceDO>()
+                .eq(IotDeviceDO::getProductKey, productKey)
+                .in(IotDeviceDO::getDeviceName, deviceNames));
     }
 
     /**
