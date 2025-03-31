@@ -46,7 +46,7 @@ public interface SrmPurchaseInService {
     /**
      * 更新采购入库的付款金额
      *
-     * @param id 编号
+     * @param id           编号
      * @param paymentPrice 付款金额
      */
     void updatePurchaseInPaymentPrice(Long id, BigDecimal paymentPrice);
@@ -100,9 +100,18 @@ public interface SrmPurchaseInService {
      */
     List<SrmPurchaseInItemDO> getPurchaseInItemListByInIds(Collection<Long> inIds);
 
+    /**
+     * 提交审核
+     *
+     * @param inIds 入库单ids
+     */
+    void submitAudit(Collection<Long> inIds);
 
-    void submitAudit(Collection<Long > inIds);
-
+    /**
+     * 审核|反审核
+     *
+     * @param req vo
+     */
     void review(SrmPurchaseInAuditReqVO req);
 
     /**

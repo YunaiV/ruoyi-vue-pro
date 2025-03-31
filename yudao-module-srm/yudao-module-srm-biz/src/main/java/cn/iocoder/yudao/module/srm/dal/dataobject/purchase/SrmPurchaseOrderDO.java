@@ -34,7 +34,7 @@ public class SrmPurchaseOrderDO extends TenantBaseDO {
 
     @Version
     private Long version;
-    
+
     /**
      * 采购单编号
      */
@@ -52,14 +52,9 @@ public class SrmPurchaseOrderDO extends TenantBaseDO {
      */
     private Long accountId;
     /**
-     * 采购时间
-     */
-    private LocalDateTime orderTime;
-    /**
      * 合计数量
      */
     private BigDecimal totalCount;
-
     /**
      * 币别名称
      */

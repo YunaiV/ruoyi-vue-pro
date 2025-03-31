@@ -73,6 +73,7 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
     private final ErpProductApi erpProductApi;
     private final DeptApi deptApi;
     private final AdminUserApi adminUserApi;
+    private final ErpProductUnitApi erpProductUnitApi;
 
     @Resource(name = PURCHASE_REQUEST_AUDIT_STATE_MACHINE_NAME)
     StateMachine<SrmAuditStatus, SrmEventEnum, SrmPurchaseRequestAuditReqVO> auditMachine;
@@ -89,17 +90,12 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
     StateMachine<SrmOrderStatus, SrmEventEnum, SrmOrderCountDTO> orderItemMachine;
     @Resource(name = PURCHASE_REQUEST_ITEM_STORAGE_STATE_MACHINE_NAME)
     StateMachine<SrmStorageStatus, SrmEventEnum, SrmInCountDTO> storageItemMachine;
-    @Autowired
-    private ErpProductUnitApi erpProductUnitApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createPurchaseRequest(SrmPurchaseRequestSaveReqVO vo) {
         //获取单据日期，不为空就拿，为空就当前时间
-        LocalDateTime date = vo.getRequestTime();
-        if (date == null) {
-            vo.setRequestTime(LocalDateTime.now());
-        }
+        vo.setRequestTime(vo.getRequestTime() == null ? LocalDateTime.now() : vo.getRequestTime());
         //1.校验
         voSetNo(vo);
         //1.2 校验子表合法
@@ -216,11 +212,10 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
         //后置渲染，申请单的no编号
         voItemList.forEach(item -> {
             Long itemId = item.getPurchaseApplyItemId();
-            SrmPurchaseRequestItemsDO itemDO = requestItemDOMap.get(itemId);
             item.setId(null);
             item.setPurchaseApplyItemId(itemId);//采购申请项id
-            //获得requestDO
-            SrmPurchaseRequestDO aDo = rDOMap.get(itemDO.getRequestId());
+            //获得主表DO
+            SrmPurchaseRequestDO aDo = rDOMap.get(requestItemDOMap.get(itemId).getRequestId());
             item.setErpPurchaseRequestItemNo(aDo.getNo());
             item.setApplicantId(aDo.getApplicantId());//申请人
             item.setApplicationDeptId(aDo.getApplicationDeptId());//申请部门
@@ -231,12 +226,10 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
         //2.0 构造VO入参类
         SrmPurchaseOrderSaveReqVO saveReqVO = BeanUtils.toBean(reqVO, SrmPurchaseOrderSaveReqVO.class, vo -> {
             vo.setId(null);
-            vo.setNoTime(LocalDateTime.now());
             vo.setItems(voItemList);
             //            vo.setRemark("申请人期望采购日期: " + DateUtil.format(reqVO.getOrderTime(), DatePattern.CHINESE_DATE_PATTERN));
         });
         //3.0 持久化
-
         //        saveReqVO.setId(orderId);
         //        srmPurchaseOrderService.updatePurchaseOrder(saveReqVO);
         return srmPurchaseOrderService.createPurchaseOrder(saveReqVO);

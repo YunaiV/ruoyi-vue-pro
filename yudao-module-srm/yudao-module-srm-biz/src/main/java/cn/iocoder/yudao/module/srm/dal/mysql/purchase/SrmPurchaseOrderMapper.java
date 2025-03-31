@@ -9,8 +9,9 @@ import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemD
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.bo.SrmPurchaseOrderBO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
-import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * ERP 采购订单 Mapper
@@ -25,7 +26,6 @@ public interface SrmPurchaseOrderMapper extends BaseMapperX<SrmPurchaseOrderDO> 
             .eqIfPresent(SrmPurchaseOrderDO::getStatus, reqVO.getStatus())
             .eqIfPresent(SrmPurchaseOrderDO::getSupplierId, reqVO.getSupplierId())
             .eqIfPresent(SrmPurchaseOrderDO::getAccountId, reqVO.getAccountId())
-            .betweenIfPresent(SrmPurchaseOrderDO::getOrderTime, reqVO.getOrderTime())
             .eqIfPresent(SrmPurchaseOrderDO::getTotalCount, reqVO.getTotalCount())
             .eqIfPresent(SrmPurchaseOrderDO::getTotalPrice, reqVO.getTotalPrice())
             .eqIfPresent(SrmPurchaseOrderDO::getTotalProductPrice, reqVO.getTotalProductPrice())
@@ -68,7 +68,7 @@ public interface SrmPurchaseOrderMapper extends BaseMapperX<SrmPurchaseOrderDO> 
 
     default PageResult<SrmPurchaseOrderDO> selectPage(SrmPurchaseOrderPageReqVO reqVO, List<Long> orderIds) {
         MPJLambdaWrapper<SrmPurchaseOrderDO> wrapper = wrapper(reqVO);
-        if(orderIds != null && !orderIds.isEmpty()) {
+        if (orderIds != null && !orderIds.isEmpty()) {
             wrapper.in(SrmPurchaseOrderDO::getId, orderIds);
         }
         return selectPage(reqVO, wrapper);

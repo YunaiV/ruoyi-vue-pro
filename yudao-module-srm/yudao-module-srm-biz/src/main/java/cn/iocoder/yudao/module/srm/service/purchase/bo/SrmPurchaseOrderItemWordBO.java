@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 
+/**
+ * 返回给word的订单子项
+ */
 @Data
 public class SrmPurchaseOrderItemWordBO extends SrmPurchaseOrderItemDO {
     //序号

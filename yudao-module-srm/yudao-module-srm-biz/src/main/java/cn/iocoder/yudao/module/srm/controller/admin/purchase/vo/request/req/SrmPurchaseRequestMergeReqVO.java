@@ -22,8 +22,11 @@ public class SrmPurchaseRequestMergeReqVO {
     @NotNull(message = "供应商编号不能为空")
     private Long supplierId;
 
-    @Schema(description = "期望采购时间")
-    private LocalDateTime orderTime;
+    @Schema(description = "单据日期", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime noTime;
+    //    @Schema(description = "期望采购时间")
+//    private LocalDateTime orderTime;
+    
     // 项目列表
     @NotNull(message = "项目列表不能为空")
     @Schema(description = "项目列表", requiredMode = Schema.RequiredMode.REQUIRED)

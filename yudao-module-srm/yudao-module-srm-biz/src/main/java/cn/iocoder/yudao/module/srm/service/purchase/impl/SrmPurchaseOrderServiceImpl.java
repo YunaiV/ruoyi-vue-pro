@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.srm.service.purchase.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
@@ -65,6 +64,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.srm.dal.redis.no.SrmNoRedisDAO.PURCHASE_ORDER_NO_PREFIX;
@@ -128,8 +128,6 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createPurchaseOrder(SrmPurchaseOrderSaveReqVO vo) {
-        // 校验编号
-        //        validatePurchaseOrderExists(vo.getNo());
         // 1.1 校验订单项的有效性
         List<SrmPurchaseOrderItemDO> orderItems = validatePurchaseOrderItems(vo.getItems());
         // 1.2 校验供应商
@@ -148,18 +146,14 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
         SrmPurchaseOrderDO orderDO = BeanUtils.toBean(vo, SrmPurchaseOrderDO.class, in -> in.setNo(vo.getNo()));
         calculateTotalPrice(orderDO, orderItems);
         // 2.1.1 插入单据日期+结算日期
-        orderDO.setNoTime(LocalDateTime.now());
-        orderDO.setSettlementDate(vo.getSettlementDate() == null ? LocalDateTime.now() : vo.getSettlementDate());
-        orderDO.setOrderTime(LocalDateTime.now());
-        ThrowUtil.ifSqlThrow(purchaseOrderMapper.insert(orderDO), GlobalErrorCodeConstants.DB_INSERT_ERROR);
+        orderDO.setNoTime(vo.getNoTime() == null ? LocalDateTime.now() : vo.getNoTime());
+        ThrowUtil.ifSqlThrow(purchaseOrderMapper.insert(orderDO), DB_INSERT_ERROR);
         // 2.2 插入订单项
         orderItems.forEach(o -> {
-            if (o.getSource() == null) {
-                o.setSource(SOURCE);
-            }
+            o.setSource(o.getSource() == null ? SOURCE : o.getSource());
             o.setOrderId(orderDO.getId());
         });
-        purchaseOrderItemMapper.insertBatch(orderItems);
+        ThrowUtil.ifThrow(!purchaseOrderItemMapper.insertBatch(orderItems), DB_BATCH_INSERT_ERROR);
         orderItems = purchaseOrderItemMapper.selectListByOrderId(orderDO.getId());
         //3.0 设置初始化状态
         initMasterState(orderDO);
@@ -171,6 +165,10 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
      * @param purchaseApplyItemIds 采购申请项ids
      */
     private void validPurchaseApplyItemId(List<Long> purchaseApplyItemIds, List<SrmPurchaseOrderItemDO> orderItems) {
+        ///判断purchaseApplyItemIds 是否是空的,且如果只有一个元素，元素不能为空
+        if (CollUtil.isEmpty(purchaseApplyItemIds) || purchaseApplyItemIds.size() == 1 && purchaseApplyItemIds.get(0) == null) {
+            return;
+        }
         //Map
         Map<Long, SrmPurchaseOrderItemDO> map = convertMap(orderItems, SrmPurchaseOrderItemDO::getPurchaseApplyItemId);
 
@@ -230,8 +228,7 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePurchaseOrder(SrmPurchaseOrderSaveReqVO vo) {
-        //        validatePurchaseOrderExists(vo.getNo());
-        // 1.1 校验存在,校验不处于已审批+TODO 已关闭+手动关闭
+        // 1.1 校验存在,校验不处于已审批
         SrmPurchaseOrderDO purchaseOrder = validatePurchaseOrderExists(vo.getId());
         if (SrmAuditStatus.APPROVED.getCode().equals(purchaseOrder.getAuditStatus())) {
             throw exception(PURCHASE_ORDER_UPDATE_FAIL_APPROVE, purchaseOrder.getNo());
@@ -255,7 +252,7 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
         // 2.1 更新订单
         SrmPurchaseOrderDO updateObj = BeanUtils.toBean(vo, SrmPurchaseOrderDO.class);
         calculateTotalPrice(updateObj, purchaseOrderItems);//计算item合计。
-        purchaseOrderMapper.updateById(updateObj);
+        ThrowUtil.ifSqlThrow(purchaseOrderMapper.updateById(updateObj), DB_UPDATE_ERROR);
         // 2.2 更新订单项
         updatePurchaseOrderItemList(vo.getId(), purchaseOrderItems);
     }
@@ -700,7 +697,7 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
     public void generateContract(SrmPurchaseOrderGenerateContractReqVO reqVO, HttpServletResponse response) {
         SrmPurchaseOrderDO orderDO = validatePurchaseOrderExists(reqVO.getOrderId());
         //1 从OSS拿到模板word
-        XWPFTemplate xwpfTemplate = purchaseOrderTemplateManager.getTemplate("purchase/order/%s".formatted(reqVO.getTemplateName()));
+        XWPFTemplate xwpfTemplate = purchaseOrderTemplateManager.getTemplate(StrUtil.format("purchase/order/{}", reqVO.getTemplateName()));
         //2 模板word渲染数据
         List<SrmPurchaseOrderItemDO> itemDOS = purchaseOrderItemMapper.selectListByOrderId(orderDO.getId());
         Map<Long, FmsFinanceSubjectDTO> dtoMap = convertMap(erpFinanceSubjectApi.validateFinanceSubject(List.of(reqVO.getPartyAId(), reqVO.getPartyBId())), FmsFinanceSubjectDTO::getId);

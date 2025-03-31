@@ -33,6 +33,9 @@ public class SrmPurchaseRequestItemRespVO extends BaseVO {
 
     @Schema(description = "产品报关品名")
     private String declaredType;
+    
+    @Schema(description = "报关品名英文")
+    private String declaredTypeEn;
 
     @Schema(description = "产品sku")
     private String barCode;

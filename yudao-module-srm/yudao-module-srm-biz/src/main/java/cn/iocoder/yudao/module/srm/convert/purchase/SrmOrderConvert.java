@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.srm.convert.purchase;
 
-import static cn.hutool.core.date.DatePattern.NORM_DATE_PATTERN;
-
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -14,13 +12,16 @@ import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemD
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.srm.service.purchase.bo.SrmPurchaseOrderItemWordBO;
 import cn.iocoder.yudao.module.srm.service.purchase.bo.SrmPurchaseOrderWordBO;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
+
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
+
+import static cn.hutool.core.date.DatePattern.NORM_DATE_PATTERN;
 
 @Mapper
 public interface SrmOrderConvert {
@@ -63,10 +64,6 @@ public interface SrmOrderConvert {
             .map(itemDO -> convertToErpPurchaseOrderSaveReqVOItem(itemDO, requestItemsMap, itemDOMap))
             .collect(Collectors.toList());
     }
-
-    //SrmPurchaseOrderSaveReqVO.Item->SrmPurchaseOrderItemDO
-
-    //    SrmPurchaseOrderItemDO convertToErpPurchaseOrderItemDO(SrmPurchaseOrderSaveReqVO.Item item);
 
     /**
      * 合同渲染BO用

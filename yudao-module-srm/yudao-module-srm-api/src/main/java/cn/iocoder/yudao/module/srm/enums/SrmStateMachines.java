@@ -50,6 +50,7 @@ public interface SrmStateMachines {
     String PURCHASE_IN_PAYMENT_STATE_MACHINE = "purchaseInPay";
     // ========== ERP 入库单子项 ==========
     String PURCHASE_IN_ITEM_PAYMENT_STATE_MACHINE = "purchaseInItemPay";
+    
     // ========== ERP 退货单 ==========
     //审核
     String PURCHASE_RETURN_AUDIT_STATE_MACHINE_NAME = "purchaseReturnAudit";
