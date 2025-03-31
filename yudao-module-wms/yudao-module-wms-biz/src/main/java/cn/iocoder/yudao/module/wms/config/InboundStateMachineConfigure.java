@@ -2,10 +2,9 @@ package cn.iocoder.yudao.module.wms.config;
 
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
-import cn.iocoder.yudao.module.wms.service.inbound.transition.BaseInboundTransition;
+import cn.iocoder.yudao.module.wms.service.inbound.transition.*;
 import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
 import cn.iocoder.yudao.module.wms.statemachine.ColaTransition;
-import cn.iocoder.yudao.module.wms.statemachine.StateMachineConfigure;
 import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
 import com.alibaba.cola.statemachine.builder.FailCallback;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
@@ -26,7 +25,7 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
  */
 @Slf4j
 @Configuration
-public class InboundStateMachineConfigure implements StateMachineConfigure<Integer, WmsInboundAuditStatus.Event, ColaContext<WmsInboundDO>>, FailCallback<Integer, WmsInboundAuditStatus.Event, ColaContext<WmsInboundDO>> {
+public class InboundStateMachineConfigure implements FailCallback<Integer, WmsInboundAuditStatus.Event, ColaContext<WmsInboundDO>> {
 
     /**
      * 状态机名称
@@ -41,7 +40,7 @@ public class InboundStateMachineConfigure implements StateMachineConfigure<Integ
         // 创建状态机构建器
         StateMachineBuilder<Integer, WmsInboundAuditStatus.Event, ColaContext<WmsInboundDO>> builder = StateMachineBuilderFactory.create();
         // 初始化状态机状态
-        List<ColaTransition<Integer, WmsInboundAuditStatus.Event, ColaContext<WmsInboundDO>>> colaTransitions = this.initActions(builder, BaseInboundTransition.class, this);
+        List<ColaTransition<Integer, WmsInboundAuditStatus.Event, ColaContext<WmsInboundDO>>> colaTransitions = ColaTransition.initActions(builder, BaseInboundTransition.class, this);
         // 创建状态机
         StateMachineWrapper<Integer, WmsInboundAuditStatus.Event, WmsInboundDO> machine = new StateMachineWrapper<>(builder.build(InboundStateMachineConfigure.STATE_MACHINE_NAME), colaTransitions, WmsInboundDO::getAuditStatus);
         // 设置允许的基本操作

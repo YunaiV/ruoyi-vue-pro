@@ -8,6 +8,6 @@ import lombok.Data;
  * @description:
  */
 @Data
-public class OutboundContext extends ActionContext {
+public class OutboundContext {
     private Long outboundId;
 }

@@ -1,9 +1,16 @@
 package cn.iocoder.yudao.module.wms.statemachine;
 
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import com.alibaba.cola.statemachine.Action;
 import com.alibaba.cola.statemachine.Condition;
+import com.alibaba.cola.statemachine.builder.FailCallback;
+import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -107,6 +114,43 @@ public abstract class ColaTransition<S, E, D>  {
      * 在子类中实现业务动作
      **/
     public abstract void perform(S from, S to, E event, ColaContext<D> context);
+
+
+    /**
+     * 绑定状态机动作
+     **/
+    private  static <S, E, D> void bindAction(StateMachineBuilder<S, E, D> builder, ColaTransition<S,E,D> action) {
+
+        S[] from = action.getFrom();
+
+        // 为每个 Action 配置条件判断函数和执行函数
+        for (S item : from) {
+
+            builder.externalTransition()
+                // 设置状态走向
+                .from(item).to(action.getTo())
+                // 设置事件
+                .on(action.getEvent())
+                // 设置条件判断函数
+                .when((Condition<D>) action.getColaActionWhen())
+                // 执行变更
+                .perform((Action<S, E, D>) action.getColaActionPerform());
+        }
+    }
+
+    /**
+     * 初始化状态机
+     **/
+    public static <S, E, D> List<ColaTransition<S, E, D>> initActions(StateMachineBuilder<S, E, D> builder, Class actionType, FailCallback<S,E,D> failCallback) {
+
+        List<ColaTransition<S, E, D>> actions = SpringUtils.getBeans(actionType);
+        if(actions==null) {
+            return actions;
+        }
+        builder.setFailCallback(failCallback);
+        return actions;
+
+    }
 
 
 }

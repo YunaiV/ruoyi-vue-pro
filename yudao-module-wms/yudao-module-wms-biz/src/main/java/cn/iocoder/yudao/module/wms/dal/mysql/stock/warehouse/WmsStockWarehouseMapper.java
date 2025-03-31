@@ -33,8 +33,6 @@ public interface WmsStockWarehouseMapper extends BaseMapperX<WmsStockWarehouseDO
 
         return selectPage(reqVO, new LambdaQueryWrapperX<WmsStockWarehouseDO>()
 
-
-
 				.eqIfPresent(WmsStockWarehouseDO::getPurchasePlanQty, reqVO.getPurchasePlanQty())
 				.eqIfPresent(WmsStockWarehouseDO::getPurchaseTransitQty, reqVO.getPurchaseTransitQty())
 				.eqIfPresent(WmsStockWarehouseDO::getReturnTransitQty, reqVO.getReturnTransitQty())

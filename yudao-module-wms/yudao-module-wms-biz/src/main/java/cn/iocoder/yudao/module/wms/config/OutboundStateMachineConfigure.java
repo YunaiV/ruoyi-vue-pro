@@ -5,7 +5,6 @@ import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.outbound.transition.BaseOutboundTransition;
 import cn.iocoder.yudao.module.wms.statemachine.ColaTransition;
 import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
-import cn.iocoder.yudao.module.wms.statemachine.StateMachineConfigure;
 import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
 import com.alibaba.cola.statemachine.builder.FailCallback;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
@@ -27,7 +26,7 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_STAT
  */
 @Slf4j
 @Configuration
-public class OutboundStateMachineConfigure implements StateMachineConfigure<Integer, WmsOutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> , FailCallback<Integer, WmsOutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> {
+public class OutboundStateMachineConfigure implements FailCallback<Integer, WmsOutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> {
 
     /**
      * 状态机名称
@@ -42,7 +41,7 @@ public class OutboundStateMachineConfigure implements StateMachineConfigure<Inte
         //  创建状态机构建器
         StateMachineBuilder<Integer, WmsOutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> builder = StateMachineBuilderFactory.create();
         // 初始化状态机状态
-        List<ColaTransition<Integer, WmsOutboundAuditStatus.Event, ColaContext<WmsOutboundDO>>> colaTransitions = this.initActions(builder, BaseOutboundTransition.class, this);
+        List<ColaTransition<Integer, WmsOutboundAuditStatus.Event, ColaContext<WmsOutboundDO>>> colaTransitions = ColaTransition.initActions(builder, BaseOutboundTransition.class, this);
         // 创建状态机
         StateMachineWrapper<Integer, WmsOutboundAuditStatus.Event, WmsOutboundDO> machine = new StateMachineWrapper<>(builder.build(OutboundStateMachineConfigure.STATE_MACHINE_NAME), colaTransitions, WmsOutboundDO::getAuditStatus);
         // 设置允许的基本操作

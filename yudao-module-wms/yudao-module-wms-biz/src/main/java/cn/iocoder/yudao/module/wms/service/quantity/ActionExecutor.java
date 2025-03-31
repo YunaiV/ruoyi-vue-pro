@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.wms.service.quantity;
 import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
 import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
-import cn.iocoder.yudao.module.wms.service.quantity.context.ActionContext;
 import cn.iocoder.yudao.module.wms.service.stock.bin.WmsStockBinService;
 import cn.iocoder.yudao.module.wms.service.stock.flow.WmsStockFlowService;
 import cn.iocoder.yudao.module.wms.service.stock.ownership.WmsStockOwnershipService;
@@ -15,7 +14,7 @@ import org.springframework.context.annotation.Lazy;
 /**
  * 数量处理执行器
  */
-public abstract class ActionExecutor<T extends ActionContext> {
+public abstract class ActionExecutor<T> {
 
     @Getter
     private WmsStockReason reason;

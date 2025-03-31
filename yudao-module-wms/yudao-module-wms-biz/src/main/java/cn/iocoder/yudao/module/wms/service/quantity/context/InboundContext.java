@@ -8,7 +8,7 @@ import lombok.Data;
  * @description:
  */
 @Data
-public class InboundContext extends ActionContext {
+public class InboundContext {
 
     private Long inboundId;
 
