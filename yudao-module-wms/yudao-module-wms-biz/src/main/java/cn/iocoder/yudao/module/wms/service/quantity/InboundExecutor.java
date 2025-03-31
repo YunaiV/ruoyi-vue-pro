@@ -6,8 +6,8 @@ import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.ErpProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
-import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
-import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
+import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
 import cn.iocoder.yudao.module.wms.service.quantity.context.InboundContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -27,7 +27,7 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
 
 
     public InboundExecutor() {
-        super(StockReason.INBOUND);
+        super(WmsStockReason.INBOUND);
     }
 
 
@@ -53,7 +53,7 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
                 item.setActualQty(item.getPlanQty());
             }
             // 执行入库的原子操作
-            InboundStatus inboundStatus = inboundSingleItem(companyId, deptId, warehouseId, productId, item.getPlanQty(), item.getActualQty(), inboundRespVO.getId(), item.getId());
+            WmsInboundStatus inboundStatus = inboundSingleItem(companyId, deptId, warehouseId, productId, item.getPlanQty(), item.getActualQty(), inboundRespVO.getId(), item.getId());
             item.setInboundStatus(inboundStatus.getValue());
 
         }
@@ -65,13 +65,13 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
     /**
      * 执行入库
      */
-    private InboundStatus inboundSingleItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer planQuantity, Integer actualQuantity, Long inboundId, Long inboundItemId) {
+    private WmsInboundStatus inboundSingleItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer planQuantity, Integer actualQuantity, Long inboundId, Long inboundItemId) {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
-        AtomicReference<InboundStatus> status = new AtomicReference<>();
+        AtomicReference<WmsInboundStatus> status = new AtomicReference<>();
 
         try {
-            InboundStatus inboundStatus = this.processItem(companyId, deptId, warehouseId, productId, planQuantity,actualQuantity, inboundId, inboundItemId);
+            WmsInboundStatus inboundStatus = this.processItem(companyId, deptId, warehouseId, productId, planQuantity,actualQuantity, inboundId, inboundItemId);
             status.set(inboundStatus);
         } catch (Exception e) {
             log.error("inboundSingleItem Error" , e);
@@ -84,7 +84,7 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
     /**
      * 处理单个详情
      **/
-    protected InboundStatus processItem(Long companyId, Long deptId, Long warehouseId, Long productId,Integer planQuantity, Integer actualQuantity, Long inboundId, Long inboundItemId) {
+    protected WmsInboundStatus processItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer planQuantity, Integer actualQuantity, Long inboundId, Long inboundItemId) {
 
         // 调整仓库库存
         this.processStockWarehouseItem(companyId, deptId, warehouseId, productId, actualQuantity, inboundId, inboundItemId);
@@ -92,11 +92,11 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
         this.processStockOwnershipItem(companyId, deptId, warehouseId, productId, actualQuantity, inboundId, inboundItemId);
         // 当前逻辑,默认全部入库
         if(actualQuantity==0) {
-            return InboundStatus.NONE;
+            return WmsInboundStatus.NONE;
         } else if(actualQuantity<planQuantity) {
-            return InboundStatus.PART;
+            return WmsInboundStatus.PART;
         } else {
-            return InboundStatus.ALL;
+            return WmsInboundStatus.ALL;
         }
     }
 

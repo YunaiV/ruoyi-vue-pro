@@ -13,8 +13,8 @@ import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutbound
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.item.WmsOutboundItemDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.outbound.item.WmsOutboundItemMapper;
-import cn.iocoder.yudao.module.wms.enums.outbound.OutboundAuditStatus;
-import cn.iocoder.yudao.module.wms.enums.outbound.OutboundStatus;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
 import cn.iocoder.yudao.module.wms.service.outbound.WmsOutboundService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
@@ -140,14 +140,14 @@ public class WmsOutboundItemServiceImpl implements WmsOutboundItemService {
         }
         Long outboundId = outboundIds.stream().findFirst().get();
         WmsOutboundDO outboundDO = outboundService.validateOutboundExists(outboundId);
-        OutboundAuditStatus auditStatus = OutboundAuditStatus.parse(outboundDO.getAuditStatus());
-        OutboundStatus outboundStatus = OutboundStatus.parse(outboundDO.getOutboundStatus());
+        WmsOutboundAuditStatus auditStatus = WmsOutboundAuditStatus.parse(outboundDO.getAuditStatus());
+        WmsOutboundStatus wmsOutboundStatus = WmsOutboundStatus.parse(outboundDO.getOutboundStatus());
         // 审批通过后，设置实际出库量
-        if (!auditStatus.matchAny(OutboundAuditStatus.PASS)) {
+        if (!auditStatus.matchAny(WmsOutboundAuditStatus.PASS)) {
             throw exception(OUTBOUND_CAN_NOT_EDIT);
         }
         // 除了未入库的情况，其它情况不允许修改实际入库量
-        if (!outboundStatus.matchAny(OutboundStatus.NONE)) {
+        if (!wmsOutboundStatus.matchAny(WmsOutboundStatus.NONE)) {
             throw exception(INBOUND_CAN_NOT_EDIT);
         }
         // 校验数量

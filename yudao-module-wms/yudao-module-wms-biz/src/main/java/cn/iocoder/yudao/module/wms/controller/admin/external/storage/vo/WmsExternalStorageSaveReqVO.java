@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.wms.controller.admin.external.storage.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.wms.enums.warehouse.ExternalStorageType;
-import cn.iocoder.yudao.module.wms.enums.common.ValidStatus;
+import cn.iocoder.yudao.module.wms.enums.warehouse.WmsExternalStorageType;
+import cn.iocoder.yudao.module.wms.enums.common.WmsValidStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import jakarta.validation.constraints.*;
@@ -27,13 +27,13 @@ public class WmsExternalStorageSaveReqVO {
 
     @Schema(description = "外部仓类型 ; ExternalStorageType : 1-三方仓 , 2-平台仓", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "外部仓类型不能为空")
-    @InEnum(ExternalStorageType.class)
+    @InEnum(WmsExternalStorageType.class)
     private Integer type;
 
     @Schema(description = "对接参数，JSON格式的对接需要的参数")
     private String apiParameters;
 
     @Schema(description = "状态，WMS通用的对象有效状态 ; ValidStatus : 0-不可用 , 1-可用", example = "")
-    @InEnum(ValidStatus.class)
+    @InEnum(WmsValidStatus.class)
     private Integer status;
 }

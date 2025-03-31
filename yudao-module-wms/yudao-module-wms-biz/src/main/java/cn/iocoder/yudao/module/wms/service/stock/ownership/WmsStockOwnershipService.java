@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.wms.service.stock.ownership;
 
-import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
 import jakarta.validation.*;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;

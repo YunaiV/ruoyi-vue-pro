@@ -2,10 +2,9 @@ package cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import java.util.*;
 import jakarta.validation.constraints.*;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.wms.enums.common.ValidStatus;
+import cn.iocoder.yudao.module.wms.enums.common.WmsValidStatus;
 
 /**
  * @table-fields : zone_id,code,picking_order,name,id,status,warehouse_id
@@ -38,6 +37,6 @@ public class WmsWarehouseBinSaveReqVO {
 
     @Schema(description = "状态，WMS通用的对象有效状态 ; ValidStatus : 0-不可用 , 1-可用", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "状态不能为空")
-    @InEnum(ValidStatus.class)
+    @InEnum(WmsValidStatus.class)
     private Integer status;
 }

@@ -9,8 +9,8 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundIt
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
-import cn.iocoder.yudao.module.wms.enums.outbound.OutboundStatus;
-import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
 import cn.iocoder.yudao.module.wms.service.inbound.item.flow.WmsInboundItemFlowService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
@@ -35,7 +35,7 @@ public class OutboundFinishExecutor extends OutboundExecutor {
     private WmsInboundItemFlowService inboundItemFlowService;
 
     public OutboundFinishExecutor() {
-        super(StockReason.OUTBOUND_AGREE);
+        super(WmsStockReason.OUTBOUND_AGREE);
     }
 
     @Override
@@ -128,9 +128,9 @@ public class OutboundFinishExecutor extends OutboundExecutor {
     protected void updateOutbound(WmsOutboundRespVO outboundRespVO) {
         List<WmsOutboundItemRespVO> itemRespVOList=outboundRespVO.getItemList();
         for (WmsOutboundItemRespVO itemRespVO : itemRespVOList) {
-            itemRespVO.setOutboundStatus(OutboundStatus.ALL.getValue());
+            itemRespVO.setOutboundStatus(WmsOutboundStatus.ALL.getValue());
         }
-        outboundRespVO.setOutboundStatus(OutboundStatus.ALL.getValue());
+        outboundRespVO.setOutboundStatus(WmsOutboundStatus.ALL.getValue());
         outboundRespVO.setOutboundTime(LocalDateTime.now());
     }
 

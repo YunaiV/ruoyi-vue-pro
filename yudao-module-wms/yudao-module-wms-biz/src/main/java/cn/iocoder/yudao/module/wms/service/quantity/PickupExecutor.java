@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
-import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.inbound.item.flow.WmsInboundItemFlowService;
 import cn.iocoder.yudao.module.wms.service.quantity.context.PickupContext;
@@ -47,7 +47,7 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
     private WmsInboundItemFlowService inboundItemFlowService;
 
     public PickupExecutor() {
-        super(StockReason.PICKUP);
+        super(WmsStockReason.PICKUP);
     }
 
     @Override

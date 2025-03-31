@@ -13,17 +13,17 @@ import java.util.Objects;
  **/
 @RequiredArgsConstructor
 @Getter
-public enum InboundStatus implements ArrayValuable<Integer>, DictEnum {
+public enum WmsInboundStatus implements ArrayValuable<Integer>, DictEnum {
 
     NONE(0, "未入库"),
     PART(1, "部分入库"),
     ALL(2, "已入库"),
    ;
 
-    public static final Integer[] VALUES = Arrays.stream(values()).map(InboundStatus::getValue).toArray(Integer[]::new);
+    public static final Integer[] VALUES = Arrays.stream(values()).map(WmsInboundStatus::getValue).toArray(Integer[]::new);
 
     public static String getType() {
-        return InboundStatus.class.getSimpleName();
+        return WmsInboundStatus.class.getSimpleName();
     }
 
     private final Integer value;
@@ -32,8 +32,8 @@ public enum InboundStatus implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 value 匹配枚举，name 优先
      **/
-    public static InboundStatus parse(Integer value) {
-        for (InboundStatus e : InboundStatus.values()) {
+    public static WmsInboundStatus parse(Integer value) {
+        for (WmsInboundStatus e : WmsInboundStatus.values()) {
             if(e.getValue().equals(value)) {
                 return e;
             }
@@ -44,13 +44,13 @@ public enum InboundStatus implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 name 或 label 匹配枚举，name 优先
      **/
-    public static InboundStatus parse(String nameOrLabel) {
-        for (InboundStatus e : InboundStatus.values()) {
+    public static WmsInboundStatus parse(String nameOrLabel) {
+        for (WmsInboundStatus e : WmsInboundStatus.values()) {
             if(e.name().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
         }
-        for (InboundStatus e : InboundStatus.values()) {
+        for (WmsInboundStatus e : WmsInboundStatus.values()) {
             if(e.getLabel().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
@@ -58,8 +58,8 @@ public enum InboundStatus implements ArrayValuable<Integer>, DictEnum {
         return null;
     }
 
-    public boolean matchAny(InboundStatus... status) {
-        for (InboundStatus s : status) {
+    public boolean matchAny(WmsInboundStatus... status) {
+        for (WmsInboundStatus s : status) {
             if(s==this) {
                 return true;
             }

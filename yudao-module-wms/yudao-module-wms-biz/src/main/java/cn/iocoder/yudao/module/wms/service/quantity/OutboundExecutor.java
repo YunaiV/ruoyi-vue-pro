@@ -7,8 +7,8 @@ import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespV
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
-import cn.iocoder.yudao.module.wms.enums.outbound.OutboundStatus;
-import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.outbound.WmsOutboundService;
 import cn.iocoder.yudao.module.wms.service.quantity.context.OutboundContext;
@@ -34,7 +34,7 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
     @Resource
     protected WmsInboundItemService inboundItemService;
 
-    public OutboundExecutor(StockReason reason) {
+    public OutboundExecutor(WmsStockReason reason) {
         super(reason);
     }
 
@@ -93,10 +93,10 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
     /**
      * 处理单个详情
      **/
-    private OutboundStatus outboundSingleItem(WmsOutboundRespVO outboundRespVO,WmsOutboundItemRespVO item,Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
+    private WmsOutboundStatus outboundSingleItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
-        OutboundStatus status = OutboundStatus.NONE;
+        WmsOutboundStatus status = WmsOutboundStatus.NONE;
         try {
             status=this.processItem(outboundRespVO,item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
         } catch (Exception e) {
@@ -110,14 +110,14 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
     /**
      * 按不同的分类处理库存
      **/
-    private OutboundStatus processItem(WmsOutboundRespVO outboundRespVO,WmsOutboundItemRespVO item,Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
+    private WmsOutboundStatus processItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
 
         this.processStockWarehouseItem(item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
         this.processInboundItem(outboundRespVO,item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
         this.processStockOwnerShipItem(item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
         this.processStockBinItem(item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
         // 当前逻辑,默认全部入库
-        return OutboundStatus.ALL;
+        return WmsOutboundStatus.ALL;
     }
 
 

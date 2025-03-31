@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.wms.enums.outbound;
+package cn.iocoder.yudao.module.wms.enums.warehouse;
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import cn.iocoder.yudao.framework.common.enums.DictEnum;
@@ -8,17 +8,17 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 
 /**
- * 出库单类型
+ * 分区类型
  **/
 @RequiredArgsConstructor
 @Getter
-public enum OutboundType implements ArrayValuable<Integer>, DictEnum {
+public enum WmsWarehouseAreaPartitionType implements ArrayValuable<Integer>, DictEnum {
 
-    MANUAL(1, "手工出库"),
-    ORDER(2, "订单出库"),
-   ;
 
-    public static final Integer[] VALUES = Arrays.stream(values()).map(OutboundType::getValue).toArray(Integer[]::new);
+    PICK (1, "标准品"),
+    STORE(2, "不良品");
+
+    public static final Integer[] VALUES = Arrays.stream(values()).map(WmsWarehouseAreaPartitionType::getValue).toArray(Integer[]::new);
 
 
     private final Integer value;
@@ -27,8 +27,8 @@ public enum OutboundType implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 value 匹配枚举，name 优先
      **/
-    public static OutboundType parse(Integer value) {
-        for (OutboundType e : OutboundType.values()) {
+    public static WmsWarehouseAreaPartitionType parse(Integer value) {
+        for (WmsWarehouseAreaPartitionType e : WmsWarehouseAreaPartitionType.values()) {
             if(e.getValue().equals(value)) {
                 return e;
             }
@@ -39,13 +39,13 @@ public enum OutboundType implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 name 或 label 匹配枚举，name 优先
      **/
-    public static OutboundType parse(String nameOrLabel) {
-        for (OutboundType e : OutboundType.values()) {
+    public static WmsWarehouseAreaPartitionType parse(String nameOrLabel) {
+        for (WmsWarehouseAreaPartitionType e : WmsWarehouseAreaPartitionType.values()) {
             if(e.name().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
         }
-        for (OutboundType e : OutboundType.values()) {
+        for (WmsWarehouseAreaPartitionType e : WmsWarehouseAreaPartitionType.values()) {
             if(e.getLabel().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }

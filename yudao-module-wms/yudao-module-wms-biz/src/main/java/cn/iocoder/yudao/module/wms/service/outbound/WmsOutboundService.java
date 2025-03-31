@@ -1,14 +1,11 @@
 package cn.iocoder.yudao.module.wms.service.outbound;
 
-import java.util.*;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
-import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
-import cn.iocoder.yudao.module.wms.enums.outbound.OutboundAuditStatus;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
 import jakarta.validation.*;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 
 /**
  * 出库单 Service 接口
@@ -55,7 +52,7 @@ public interface WmsOutboundService {
      */
     PageResult<WmsOutboundDO> getOutboundPage(WmsOutboundPageReqVO pageReqVO);
 
-    void approve(OutboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO);
+    void approve(WmsOutboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO);
 
     WmsOutboundDO updateOutboundAuditStatus(Long id, Integer status);
 

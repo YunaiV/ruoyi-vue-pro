@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.quantity;
 
 import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
-import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
 import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
 import cn.iocoder.yudao.module.wms.service.quantity.context.ActionContext;
 import cn.iocoder.yudao.module.wms.service.stock.bin.WmsStockBinService;
@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Lazy;
 public abstract class ActionExecutor<T extends ActionContext> {
 
     @Getter
-    private StockReason reason;
+    private WmsStockReason reason;
 
     @Resource
     protected WmsLockRedisDAO lockRedisDAO;
@@ -44,7 +44,7 @@ public abstract class ActionExecutor<T extends ActionContext> {
     protected WmsStockBinService stockBinService;
 
 
-    public ActionExecutor(StockReason reason) {
+    public ActionExecutor(WmsStockReason reason) {
         this.reason = reason;
     }
 

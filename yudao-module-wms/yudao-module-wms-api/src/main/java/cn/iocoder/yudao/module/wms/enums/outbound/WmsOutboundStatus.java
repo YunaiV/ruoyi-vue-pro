@@ -13,17 +13,17 @@ import java.util.Objects;
  **/
 @RequiredArgsConstructor
 @Getter
-public enum OutboundStatus implements ArrayValuable<Integer>, DictEnum {
+public enum WmsOutboundStatus implements ArrayValuable<Integer>, DictEnum {
 
     NONE(0, "未出库"),
     PART(1, "部分出库"),
     ALL(2, "已出库"),
    ;
 
-    public static final Integer[] VALUES = Arrays.stream(values()).map(OutboundStatus::getValue).toArray(Integer[]::new);
+    public static final Integer[] VALUES = Arrays.stream(values()).map(WmsOutboundStatus::getValue).toArray(Integer[]::new);
 
     public static String getType() {
-        return OutboundStatus.class.getSimpleName();
+        return WmsOutboundStatus.class.getSimpleName();
     }
 
     private final Integer value;
@@ -32,8 +32,8 @@ public enum OutboundStatus implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 value 匹配枚举，name 优先
      **/
-    public static OutboundStatus parse(Integer value) {
-        for (OutboundStatus e : OutboundStatus.values()) {
+    public static WmsOutboundStatus parse(Integer value) {
+        for (WmsOutboundStatus e : WmsOutboundStatus.values()) {
             if(e.getValue().equals(value)) {
                 return e;
             }
@@ -44,13 +44,13 @@ public enum OutboundStatus implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 name 或 label 匹配枚举，name 优先
      **/
-    public static OutboundStatus parse(String nameOrLabel) {
-        for (OutboundStatus e : OutboundStatus.values()) {
+    public static WmsOutboundStatus parse(String nameOrLabel) {
+        for (WmsOutboundStatus e : WmsOutboundStatus.values()) {
             if(e.name().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
         }
-        for (OutboundStatus e : OutboundStatus.values()) {
+        for (WmsOutboundStatus e : WmsOutboundStatus.values()) {
             if(e.getLabel().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
@@ -58,8 +58,8 @@ public enum OutboundStatus implements ArrayValuable<Integer>, DictEnum {
         return null;
     }
 
-    public boolean matchAny(OutboundStatus... status) {
-        for (OutboundStatus s : status) {
+    public boolean matchAny(WmsOutboundStatus... status) {
+        for (WmsOutboundStatus s : status) {
             if(s==this) {
                 return true;
             }

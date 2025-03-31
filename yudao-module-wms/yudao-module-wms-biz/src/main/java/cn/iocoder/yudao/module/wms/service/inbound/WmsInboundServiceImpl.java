@@ -12,9 +12,9 @@ import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundIt
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.flow.WmsInboundItemFlowMapper;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
-import cn.iocoder.yudao.module.wms.enums.common.BillType;
-import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
-import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
+import cn.iocoder.yudao.module.wms.enums.common.WmsBillType;
+import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
+import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import org.springframework.context.annotation.Lazy;
@@ -68,7 +68,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     private WmsInboundItemService inboundItemService;
 
     @Resource(name = InboundActions.STATE_MACHINE_NAME)
-    private StateMachineWrapper<Integer, InboundAuditStatus.Event, WmsInboundDO> inboundStateMachine;
+    private StateMachineWrapper<Integer, WmsInboundAuditStatus.Event, WmsInboundDO> inboundStateMachine;
 
     /**
      * @sign : 5D2F5734A2A97234
@@ -80,7 +80,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         String no = noRedisDAO.generate(WmsNoRedisDAO.INBOUND_NO_PREFIX, INBOUND_NOT_EXISTS);
         createReqVO.setNo(no);
         createReqVO.setAuditStatus(inboundStateMachine.getInitStatus());
-        createReqVO.setInboundStatus(InboundStatus.NONE.getValue());
+        createReqVO.setInboundStatus(WmsInboundStatus.NONE.getValue());
         if (inboundMapper.getByNo(createReqVO.getNo()) != null) {
             throw exception(INBOUND_NO_DUPLICATE);
         }
@@ -104,7 +104,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
                 item.setId(null);
                 // 设置归属
                 item.setInboundId(inbound.getId());
-                item.setInboundStatus(InboundStatus.NONE.getValue());
+                item.setInboundStatus(WmsInboundStatus.NONE.getValue());
                 item.setActualQty(0);
                 toInsetList.add(BeanUtils.toBean(item, WmsInboundItemDO.class));
             });
@@ -161,7 +161,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
                     throw exception(INBOUND_ITEM_PLAN_QTY_ERROR);
                 }
                 item.setInboundId(updateReqVO.getId());
-                item.setInboundStatus(InboundStatus.NONE.getValue());
+                item.setInboundStatus(WmsInboundStatus.NONE.getValue());
                 item.setActualQty(0);
             });
             // 保存详情
@@ -232,10 +232,10 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     }
 
     @Override
-    public void approve(InboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO) {
+    public void approve(WmsInboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO) {
         // 设置业务默认值
-        approvalReqVO.setBillType(BillType.INBOUND.getValue());
-        approvalReqVO.setStatusType(InboundAuditStatus.getType());
+        approvalReqVO.setBillType(WmsBillType.INBOUND.getValue());
+        approvalReqVO.setStatusType(WmsInboundAuditStatus.getType());
         // 获得业务对象
         WmsInboundDO inbound = validateInboundExists(approvalReqVO.getBillId());
         // 锁在外，事务在锁内
@@ -247,7 +247,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    protected void  fireEvent(InboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO,WmsInboundDO inbound) {
+    protected void  fireEvent(WmsInboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO, WmsInboundDO inbound) {
         ColaContext<WmsInboundDO> ctx =  inboundStateMachine.createContext(approvalReqVO,inbound);
         // 触发事件
         inboundStateMachine.fireEvent(event, ctx);
@@ -281,13 +281,13 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         int countOfAll = 0;
         for (WmsInboundItemRespVO respVO : inboundRespVO.getItemList()) {
 
-            if (InboundStatus.NONE.matchAny(respVO.getInboundStatus())) {
+            if (WmsInboundStatus.NONE.matchAny(respVO.getInboundStatus())) {
                 countOfNone++;
             }
-            if (InboundStatus.PART.matchAny(respVO.getInboundStatus())) {
+            if (WmsInboundStatus.PART.matchAny(respVO.getInboundStatus())) {
                 countOfPart++;
             }
-            if (InboundStatus.ALL.matchAny(respVO.getInboundStatus())) {
+            if (WmsInboundStatus.ALL.matchAny(respVO.getInboundStatus())) {
                 countOfAll++;
             }
 
@@ -302,12 +302,12 @@ public class WmsInboundServiceImpl implements WmsInboundService {
             throw exception(INBOUND_NOT_COMPLETE);
         }
 
-        InboundStatus inboundStatus = InboundStatus.NONE;
+        WmsInboundStatus inboundStatus = WmsInboundStatus.NONE;
         if(countOfPart>0) {
-            inboundStatus = InboundStatus.PART;
+            inboundStatus = WmsInboundStatus.PART;
         }
         if(total==countOfAll) {
-            inboundStatus = InboundStatus.ALL;
+            inboundStatus = WmsInboundStatus.ALL;
         }
 
 

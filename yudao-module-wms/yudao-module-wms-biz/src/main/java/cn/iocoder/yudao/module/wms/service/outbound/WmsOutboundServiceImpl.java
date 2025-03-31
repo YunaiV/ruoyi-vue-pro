@@ -22,9 +22,9 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinD
 import cn.iocoder.yudao.module.wms.dal.mysql.outbound.WmsOutboundMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.outbound.item.WmsOutboundItemMapper;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
-import cn.iocoder.yudao.module.wms.enums.common.BillType;
-import cn.iocoder.yudao.module.wms.enums.outbound.OutboundAuditStatus;
-import cn.iocoder.yudao.module.wms.enums.outbound.OutboundStatus;
+import cn.iocoder.yudao.module.wms.enums.common.WmsBillType;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
 import cn.iocoder.yudao.module.wms.service.outbound.item.WmsOutboundItemService;
 import cn.iocoder.yudao.module.wms.service.stock.bin.WmsStockBinService;
 import cn.iocoder.yudao.module.wms.service.warehouse.bin.WmsWarehouseBinService;
@@ -71,7 +71,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     private WmsStockBinService stockBinService;
 
     @Resource(name = OutboundActions.STATE_MACHINE_NAME)
-    private StateMachineWrapper<Integer, OutboundAuditStatus.Event, WmsOutboundDO> outboundStateMachine;
+    private StateMachineWrapper<Integer, WmsOutboundAuditStatus.Event, WmsOutboundDO> outboundStateMachine;
 
     /**
      * @sign : A523E13094CD30CE
@@ -82,7 +82,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         // 设置单据号
         String no = noRedisDAO.generate(WmsNoRedisDAO.OUTBOUND_NO_PREFIX, OUTBOUND_NOT_EXISTS);
         createReqVO.setAuditStatus(outboundStateMachine.getInitStatus());
-        createReqVO.setOutboundStatus(OutboundStatus.NONE.getValue());
+        createReqVO.setOutboundStatus(WmsOutboundStatus.NONE.getValue());
         createReqVO.setNo(no);
         if (outboundMapper.getByNo(createReqVO.getNo()) != null) {
             throw exception(OUTBOUND_NO_DUPLICATE);
@@ -102,7 +102,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
             item.setId(null);
             // 设置归属
             item.setOutboundId(outbound.getId());
-            item.setOutboundStatus(OutboundStatus.NONE.getValue());
+            item.setOutboundStatus(WmsOutboundStatus.NONE.getValue());
             toInsetList.add(BeanUtils.toBean(item, WmsOutboundItemDO.class));
         });
         processAndValidateForOutbound(outbound, toInsetList);
@@ -178,7 +178,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
                 if(item.getPlanQty()==null || item.getPlanQty()<=0) {
                     throw exception(OUTBOUND_ITEM_PLAN_QTY_ERROR);
                 }
-                item.setOutboundStatus(OutboundStatus.NONE.getValue());
+                item.setOutboundStatus(WmsOutboundStatus.NONE.getValue());
                 item.setOutboundId(updateReqVO.getId());
             });
             // 保存详情
@@ -269,10 +269,10 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     }
 
     @Override
-    public void approve(OutboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO) {
+    public void approve(WmsOutboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO) {
         // 设置业务默认值
-        approvalReqVO.setBillType(BillType.OUTBOUND.getValue());
-        approvalReqVO.setStatusType(OutboundAuditStatus.getType());
+        approvalReqVO.setBillType(WmsBillType.OUTBOUND.getValue());
+        approvalReqVO.setStatusType(WmsOutboundAuditStatus.getType());
         // 获得业务对象
         WmsOutboundDO inbound = validateOutboundExists(approvalReqVO.getBillId());
         // 锁在外，事务在锁内
@@ -283,7 +283,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    protected void fireEvent(OutboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO, WmsOutboundDO inbound) {
+    protected void fireEvent(WmsOutboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO, WmsOutboundDO inbound) {
         ColaContext<WmsOutboundDO> ctx = outboundStateMachine.createContext(approvalReqVO, inbound);
         // 触发事件
         outboundStateMachine.fireEvent(event, ctx);

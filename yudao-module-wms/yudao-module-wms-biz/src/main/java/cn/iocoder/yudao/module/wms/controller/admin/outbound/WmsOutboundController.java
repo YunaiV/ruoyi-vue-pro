@@ -2,10 +2,7 @@ package cn.iocoder.yudao.module.wms.controller.admin.outbound;
 
 import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
-import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.item.WmsOutboundItemDO;
-import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
-import cn.iocoder.yudao.module.wms.enums.outbound.OutboundAuditStatus;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.outbound.item.WmsOutboundItemService;
 import org.springframework.web.bind.annotation.*;
 import jakarta.annotation.Resource;
@@ -14,7 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.constraints.*;
 import jakarta.validation.*;
 import jakarta.servlet.http.*;
 import java.util.*;
@@ -32,15 +28,7 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.service.outbound.WmsOutboundService;
 import org.springframework.context.annotation.Lazy;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_NOT_EXISTS;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 @Tag(name = "出库单")
@@ -135,7 +123,7 @@ public class WmsOutboundController {
     @Operation(summary = "提交审批")
     @PreAuthorize("@ss.hasPermission('wms:inbound:submit')")
     public CommonResult<Boolean> submit(@RequestBody WmsApprovalReqVO approvalReqVO) {
-        outboundService.approve(OutboundAuditStatus.Event.SUBMIT, approvalReqVO);
+        outboundService.approve(WmsOutboundAuditStatus.Event.SUBMIT, approvalReqVO);
         return success(true);
     }
 
@@ -143,7 +131,7 @@ public class WmsOutboundController {
     @Operation(summary = "同意审批")
     @PreAuthorize("@ss.hasPermission('wms:inbound:agree')")
     public CommonResult<Boolean> agree(@RequestBody WmsApprovalReqVO approvalReqVO) {
-        outboundService.approve(OutboundAuditStatus.Event.AGREE, approvalReqVO);
+        outboundService.approve(WmsOutboundAuditStatus.Event.AGREE, approvalReqVO);
         return success(true);
     }
 
@@ -151,7 +139,7 @@ public class WmsOutboundController {
     @Operation(summary = "驳回审批")
     @PreAuthorize("@ss.hasPermission('wms:inbound:reject')")
     public CommonResult<Boolean> reject(@RequestBody WmsApprovalReqVO approvalReqVO) {
-        outboundService.approve(OutboundAuditStatus.Event.REJECT, approvalReqVO);
+        outboundService.approve(WmsOutboundAuditStatus.Event.REJECT, approvalReqVO);
         return success(true);
     }
 
@@ -159,7 +147,7 @@ public class WmsOutboundController {
     @Operation(summary = "完成出库")
     @PreAuthorize("@ss.hasPermission('wms:inbound:finish')")
     public CommonResult<Boolean> finish(@RequestBody WmsApprovalReqVO approvalReqVO) {
-        outboundService.approve(OutboundAuditStatus.Event.FINISH, approvalReqVO);
+        outboundService.approve(WmsOutboundAuditStatus.Event.FINISH, approvalReqVO);
         return success(true);
     }
 }

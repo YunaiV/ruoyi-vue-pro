@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.wms.enums.common.ValidStatus;
-import cn.iocoder.yudao.module.wms.enums.warehouse.WarehouseMode;
+import cn.iocoder.yudao.module.wms.enums.common.WmsValidStatus;
+import cn.iocoder.yudao.module.wms.enums.warehouse.WmsWarehouseMode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import jakarta.validation.constraints.*;
@@ -19,7 +19,7 @@ public class WmsWarehouseSaveReqVO {
 
     @Schema(description = "仓库经营方式 ; WarehouseMode : 0-自营 , 1-三方仓 , 2-平台仓", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "仓库经营方式不能为空")
-    @InEnum(WarehouseMode.class)
+    @InEnum(WmsWarehouseMode.class)
     private Integer mode;
 
     @Schema(description = "代码", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -64,6 +64,6 @@ public class WmsWarehouseSaveReqVO {
     private Integer isSync;
 
     @Schema(description = "状态，WMS通用的对象有效状态 ; ValidStatus : 0-不可用 , 1-可用", example = "")
-    @InEnum(ValidStatus.class)
+    @InEnum(WmsValidStatus.class)
     private Integer status;
 }

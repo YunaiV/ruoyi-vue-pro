@@ -2,14 +2,12 @@ package cn.iocoder.yudao.module.wms.controller.admin.stock.flow.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import java.util.*;
 import jakarta.validation.constraints.*;
-import org.springframework.format.annotation.DateTimeFormat;
-import java.time.LocalDateTime;
+
 import java.sql.Timestamp;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.wms.enums.stock.StockType;
-import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
 
 /**
  * @table-fields : reason,outbound_pending_qty,delta_qty,flow_time,available_qty,next_flow_id,purchase_transit_qty,stock_id,stock_type,product_id,shelving_pending_qty,id,reason_bill_id,defective_qty,return_transit_qty,sellable_qty,purchase_plan_qty,prev_flow_id,reason_item_id,warehouse_id
@@ -32,7 +30,7 @@ public class WmsStockFlowSaveReqVO {
 
     @Schema(description = "流水发生的原因 ; StockReason : 1-入库", requiredMode = Schema.RequiredMode.REQUIRED, example = "不香")
     @NotNull(message = "流水发生的原因不能为空")
-    @InEnum(StockReason.class)
+    @InEnum(WmsStockReason.class)
     private Integer reason;
 
     @Schema(description = "流水触发的单据ID", example = "21958")

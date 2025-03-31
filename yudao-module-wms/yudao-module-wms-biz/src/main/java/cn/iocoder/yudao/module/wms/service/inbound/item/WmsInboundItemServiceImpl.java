@@ -14,8 +14,8 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.WmsInboundItemMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.flow.WmsInboundItemFlowMapper;
-import cn.iocoder.yudao.module.wms.enums.inbound.InboundAuditStatus;
-import cn.iocoder.yudao.module.wms.enums.inbound.InboundStatus;
+import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
+import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
 import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
@@ -148,14 +148,14 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
         }
         Long inboundId = inboundIds.stream().findFirst().get();
         WmsInboundDO inboundDO = inboundService.validateInboundExists(inboundId);
-        InboundAuditStatus auditStatus = InboundAuditStatus.parse(inboundDO.getAuditStatus());
-        InboundStatus inboundStatus = InboundStatus.parse(inboundDO.getInboundStatus());
+        WmsInboundAuditStatus auditStatus = WmsInboundAuditStatus.parse(inboundDO.getAuditStatus());
+        WmsInboundStatus inboundStatus = WmsInboundStatus.parse(inboundDO.getInboundStatus());
         // 除了审批中的情况，其它情况不允许修改实际入库量
-        if (!auditStatus.matchAny(InboundAuditStatus.AUDITING)) {
+        if (!auditStatus.matchAny(WmsInboundAuditStatus.AUDITING)) {
             throw exception(INBOUND_CAN_NOT_EDIT);
         }
         // 除了未入库的情况，其它情况不允许修改实际入库量
-        if (!inboundStatus.matchAny(InboundStatus.NONE)) {
+        if (!inboundStatus.matchAny(WmsInboundStatus.NONE)) {
             throw exception(INBOUND_CAN_NOT_EDIT);
         }
         Map<Long, WmsInboundItemSaveReqVO> updateReqVOMap = StreamX.from(updateReqVOList).toMap(WmsInboundItemSaveReqVO::getId);

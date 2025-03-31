@@ -1,25 +1,21 @@
 package cn.iocoder.yudao.module.wms.service.stock.flow;
 
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
-import cn.iocoder.yudao.module.wms.enums.stock.StockReason;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
 import cn.iocoder.yudao.module.wms.enums.stock.StockType;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.flow.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.flow.WmsStockFlowDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.flow.WmsStockFlowMapper;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -106,7 +102,7 @@ public class WmsStockFlowServiceImpl implements WmsStockFlowService {
     /**
      * 创建仓库库存变化流水
      */
-    public void createForStockWarehouse(StockReason reason, Long productId, WmsStockWarehouseDO stockWarehouseDO, Integer quantity, Long reasonId, Long reasonItemId) {
+    public void createForStockWarehouse(WmsStockReason reason, Long productId, WmsStockWarehouseDO stockWarehouseDO, Integer quantity, Long reasonId, Long reasonItemId) {
         createFor(reason, StockType.WAREHOUSE, stockWarehouseDO.getId(), stockWarehouseDO.getWarehouseId(), productId, quantity, reasonId, reasonItemId, stockFlowDO -> {
             // 采购计划量
             stockFlowDO.setPurchasePlanQty(stockWarehouseDO.getPurchasePlanQty());
@@ -130,7 +126,7 @@ public class WmsStockFlowServiceImpl implements WmsStockFlowService {
     /**
      * 创建所有者库存变化流水
      */
-    public void createForStockOwner(StockReason reason, Long productId, WmsStockOwnershipDO stockOwnershipDO, Integer quantity, Long reasonId, Long reasonItemId) {
+    public void createForStockOwner(WmsStockReason reason, Long productId, WmsStockOwnershipDO stockOwnershipDO, Integer quantity, Long reasonId, Long reasonItemId) {
         createFor(reason, StockType.OWNER, stockOwnershipDO.getId(), stockOwnershipDO.getWarehouseId(), productId, quantity, reasonId, reasonItemId, stockFlowDO -> {
             // 采购计划量
             // stockFlowDO.setPurchasePlanQty(stockOwnershipDO.getPurchasePlanQty());
@@ -154,7 +150,7 @@ public class WmsStockFlowServiceImpl implements WmsStockFlowService {
     /**
      * 创建仓位库存变化流水
      */
-    public void createForStockBin(StockReason reason, Long productId, WmsStockBinDO stockBinDO, Integer quantity, Long reasonId, Long reasonItemId) {
+    public void createForStockBin(WmsStockReason reason, Long productId, WmsStockBinDO stockBinDO, Integer quantity, Long reasonId, Long reasonItemId) {
         createFor(reason, StockType.BIN, stockBinDO.getId(), stockBinDO.getWarehouseId(), productId, quantity, reasonId, reasonItemId, stockFlowDO -> {
             // 采购计划量
             // stockFlowDO.setPurchasePlanQty(stockOwnershipDO.getPurchasePlanQty());
@@ -178,7 +174,7 @@ public class WmsStockFlowServiceImpl implements WmsStockFlowService {
     /**
      * 创建仓库库存变化流水
      */
-    public void createFor(StockReason reason, StockType stockType, Long stockId, Long warehouseId, Long productId, Integer quantity, Long reasonId, Long reasonItemId, Consumer<WmsStockFlowDO> consumer) {
+    public void createFor(WmsStockReason reason, StockType stockType, Long stockId, Long warehouseId, Long productId, Integer quantity, Long reasonId, Long reasonItemId, Consumer<WmsStockFlowDO> consumer) {
 
 
 

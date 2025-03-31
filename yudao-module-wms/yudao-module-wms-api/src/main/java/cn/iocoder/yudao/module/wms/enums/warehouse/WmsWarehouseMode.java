@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.wms.enums.stock;
+package cn.iocoder.yudao.module.wms.enums.warehouse;
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import cn.iocoder.yudao.framework.common.enums.DictEnum;
@@ -8,20 +8,17 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 
 /**
- * 流水发生的原因
+ * 仓库经营方式
  **/
 @RequiredArgsConstructor
 @Getter
-public enum StockReason implements ArrayValuable<Integer>, DictEnum {
+public enum WmsWarehouseMode implements ArrayValuable<Integer>, DictEnum {
 
-    INBOUND(1, "入库"),
-    PICKUP(2, "拣货"),
-    OUTBOUND_AGREE(3, "出库"),
-    OUTBOUND_SUBMIT(4, "提交出库单"),
-    OUTBOUND_REJECT(5, "拒绝出库单"),
-   ;
+    SELF_OWNED(0, "自营"),
+    THIRD_PARTY(1, "三方仓"),
+    PLATFORM(2, "平台仓");
 
-    public static final Integer[] VALUES = Arrays.stream(values()).map(StockReason::getValue).toArray(Integer[]::new);
+    public static final Integer[] VALUES = Arrays.stream(values()).map(WmsWarehouseMode::getValue).toArray(Integer[]::new);
 
 
     private final Integer value;
@@ -30,8 +27,8 @@ public enum StockReason implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 value 匹配枚举，name 优先
      **/
-    public static StockReason parse(Integer value) {
-        for (StockReason e : StockReason.values()) {
+    public static WmsWarehouseMode parse(Integer value) {
+        for (WmsWarehouseMode e : WmsWarehouseMode.values()) {
             if(e.getValue().equals(value)) {
                 return e;
             }
@@ -42,13 +39,13 @@ public enum StockReason implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 name 或 label 匹配枚举，name 优先
      **/
-    public static StockReason parse(String nameOrLabel) {
-        for (StockReason e : StockReason.values()) {
+    public static WmsWarehouseMode parse(String nameOrLabel) {
+        for (WmsWarehouseMode e : WmsWarehouseMode.values()) {
             if(e.name().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
         }
-        for (StockReason e : StockReason.values()) {
+        for (WmsWarehouseMode e : WmsWarehouseMode.values()) {
             if(e.getLabel().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }

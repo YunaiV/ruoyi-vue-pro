@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.wms.service.outbound;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
-import cn.iocoder.yudao.module.wms.enums.outbound.OutboundAuditStatus;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.approval.history.ApprovalHistoryAction;
 import cn.iocoder.yudao.module.wms.service.quantity.OutboundFinishExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.OutboundRejectExecutor;
@@ -36,7 +36,7 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_AUDI
  */
 @Slf4j
 @Configuration
-public class OutboundActions implements StateMachineConfigure<Integer, OutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> , FailCallback<Integer, OutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> {
+public class OutboundActions implements StateMachineConfigure<Integer, WmsOutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> , FailCallback<Integer, WmsOutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> {
 
     /**
      * 状态机名称
@@ -58,11 +58,11 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
 
         public SubmitAction() {
             // 指定事件以及前后的状态与状态值提取器
-            super(new Integer[]{OutboundAuditStatus.DRAFT.getValue(), OutboundAuditStatus.REJECT.getValue()}, OutboundAuditStatus.AUDITING.getValue(), OutboundAuditStatus.Event.SUBMIT);
+            super(new Integer[]{WmsOutboundAuditStatus.DRAFT.getValue(), WmsOutboundAuditStatus.REJECT.getValue()}, WmsOutboundAuditStatus.AUDITING.getValue(), WmsOutboundAuditStatus.Event.SUBMIT);
         }
 
         @Override
-        public void perform(Integer from, Integer to, OutboundAuditStatus.Event event, ColaContext<WmsOutboundDO> context) {
+        public void perform(Integer from, Integer to, WmsOutboundAuditStatus.Event event, ColaContext<WmsOutboundDO> context) {
             super.perform(from, to, event, context);
             // 调整库存
             OutboundContext outboundContext = new OutboundContext();
@@ -79,7 +79,7 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
 
         public AgreeAction() {
             // 指定事件以及前后的状态与状态值提取器
-            super(OutboundAuditStatus.AUDITING.getValue(), OutboundAuditStatus.PASS.getValue(), OutboundAuditStatus.Event.AGREE);
+            super(WmsOutboundAuditStatus.AUDITING.getValue(), WmsOutboundAuditStatus.PASS.getValue(), WmsOutboundAuditStatus.Event.AGREE);
         }
 
     }
@@ -96,11 +96,11 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
 
         public OutboundAction() {
             // 指定事件以及前后的状态与状态值提取器
-            super(OutboundAuditStatus.PASS.getValue(), OutboundAuditStatus.FINISHED.getValue(), OutboundAuditStatus.Event.FINISH);
+            super(WmsOutboundAuditStatus.PASS.getValue(), WmsOutboundAuditStatus.FINISHED.getValue(), WmsOutboundAuditStatus.Event.FINISH);
         }
 
         @Override
-        public void perform(Integer from, Integer to, OutboundAuditStatus.Event event, ColaContext<WmsOutboundDO> context) {
+        public void perform(Integer from, Integer to, WmsOutboundAuditStatus.Event event, ColaContext<WmsOutboundDO> context) {
             super.perform(from, to, event, context);
             // 调整库存
             OutboundContext outboundContext = new OutboundContext();
@@ -122,11 +122,11 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
 
         public RejectAction() {
             // 指定事件以及前后的状态与状态值提取器
-            super(OutboundAuditStatus.AUDITING.getValue(), OutboundAuditStatus.REJECT.getValue(), OutboundAuditStatus.Event.REJECT);
+            super(WmsOutboundAuditStatus.AUDITING.getValue(), WmsOutboundAuditStatus.REJECT.getValue(), WmsOutboundAuditStatus.Event.REJECT);
         }
 
         @Override
-        public void perform(Integer from, Integer to, OutboundAuditStatus.Event event, ColaContext<WmsOutboundDO> context) {
+        public void perform(Integer from, Integer to, WmsOutboundAuditStatus.Event event, ColaContext<WmsOutboundDO> context) {
             super.perform(from, to, event, context);
             // 调整库存
             OutboundContext outboundContext = new OutboundContext();
@@ -140,17 +140,17 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
      * 创建与配置状态机
      **/
     @Bean(OutboundActions.STATE_MACHINE_NAME)
-    public StateMachineWrapper<Integer, OutboundAuditStatus.Event, WmsOutboundDO> inboundActionStateMachine() {
+    public StateMachineWrapper<Integer, WmsOutboundAuditStatus.Event, WmsOutboundDO> inboundActionStateMachine() {
         //  创建状态机构建器
-        StateMachineBuilder<Integer, OutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> builder = StateMachineBuilderFactory.create();
+        StateMachineBuilder<Integer, WmsOutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> builder = StateMachineBuilderFactory.create();
         // 初始化状态机状态
         Map<Integer, List<Integer>> conditionMap = this.initActions(builder, BaseOutboundAction.class,this);
         // 创建状态机
-        StateMachineWrapper<Integer, OutboundAuditStatus.Event, WmsOutboundDO> machine=new StateMachineWrapper<>(builder.build(OutboundActions.STATE_MACHINE_NAME), WmsOutboundDO::getAuditStatus);
+        StateMachineWrapper<Integer, WmsOutboundAuditStatus.Event, WmsOutboundDO> machine=new StateMachineWrapper<>(builder.build(OutboundActions.STATE_MACHINE_NAME), WmsOutboundDO::getAuditStatus);
         // 设置允许的基本操作
-        machine.setInitStatus(OutboundAuditStatus.DRAFT.getValue());
-        machine.setStatusCanEdit(Arrays.asList(OutboundAuditStatus.DRAFT.getValue(), OutboundAuditStatus.REJECT.getValue()));
-        machine.setStatusCanDelete(Arrays.asList(OutboundAuditStatus.DRAFT.getValue(), OutboundAuditStatus.REJECT.getValue()));
+        machine.setInitStatus(WmsOutboundAuditStatus.DRAFT.getValue());
+        machine.setStatusCanEdit(Arrays.asList(WmsOutboundAuditStatus.DRAFT.getValue(), WmsOutboundAuditStatus.REJECT.getValue()));
+        machine.setStatusCanDelete(Arrays.asList(WmsOutboundAuditStatus.DRAFT.getValue(), WmsOutboundAuditStatus.REJECT.getValue()));
         // 设置状态地图
         machine.setConditionMap(conditionMap);
         return machine;
@@ -161,14 +161,14 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
      * 处理失败的情况
      **/
     @Override
-    public void onFail(Integer to, OutboundAuditStatus.Event event, ColaContext<WmsOutboundDO> context) {
+    public void onFail(Integer to, WmsOutboundAuditStatus.Event event, ColaContext<WmsOutboundDO> context) {
 
         // 当前状态
-        OutboundAuditStatus currStatus= OutboundAuditStatus.parse(context.data().getAuditStatus());
+        WmsOutboundAuditStatus currStatus= WmsOutboundAuditStatus.parse(context.data().getAuditStatus());
         // 允许的可审批状态
         List<Integer> fromList = context.getStateMachineWrapper().getFroms(to);
-        List<OutboundAuditStatus> fromAuditStatusList = OutboundAuditStatus.parse(fromList);
-        String fromAuditStatusNames = StrUtils.join(StreamX.from(fromAuditStatusList).toSet(OutboundAuditStatus::getLabel));
+        List<WmsOutboundAuditStatus> fromAuditStatusList = WmsOutboundAuditStatus.parse(fromList);
+        String fromAuditStatusNames = StrUtils.join(StreamX.from(fromAuditStatusList).toSet(WmsOutboundAuditStatus::getLabel));
         // 组装消息
         String message=String.format(AUDIT_ERROR_MESSAGE,currStatus.getLabel(),fromAuditStatusNames,event.getLabel());
         throw exception(OUTBOUND_AUDIT_ERROR,message);
@@ -178,17 +178,17 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
     /**
      * OutboundAction 基类
      **/
-    public static class BaseOutboundAction extends ApprovalHistoryAction<OutboundAuditStatus.Event, WmsOutboundDO> {
+    public static class BaseOutboundAction extends ApprovalHistoryAction<WmsOutboundAuditStatus.Event, WmsOutboundDO> {
 
         @Resource
         @Lazy
         protected WmsOutboundService outboundService;
 
-        public BaseOutboundAction(Integer[] from, Integer to, OutboundAuditStatus.Event event) {
+        public BaseOutboundAction(Integer[] from, Integer to, WmsOutboundAuditStatus.Event event) {
             super(from, to, WmsOutboundDO::getAuditStatus, event);
         }
 
-        public BaseOutboundAction(Integer from, Integer to, OutboundAuditStatus.Event event) {
+        public BaseOutboundAction(Integer from, Integer to, WmsOutboundAuditStatus.Event event) {
             super(new Integer[]{from}, to, WmsOutboundDO::getAuditStatus, event);
         }
 
@@ -201,7 +201,7 @@ public class OutboundActions implements StateMachineConfigure<Integer, OutboundA
          * 变更状态
          **/
         @Override
-        public void perform(Integer from, Integer to, OutboundAuditStatus.Event event, ColaContext<WmsOutboundDO> context) {
+        public void perform(Integer from, Integer to, WmsOutboundAuditStatus.Event event, ColaContext<WmsOutboundDO> context) {
             super.perform(from, to, event, context);
             WmsOutboundDO inboundDO = context.data();
             inboundDO.setAuditStatus(to);

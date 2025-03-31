@@ -8,16 +8,18 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 
 /**
- * 状态，WMS通用的对象有效状态
+ * 运输方式
  **/
 @RequiredArgsConstructor
 @Getter
-public enum ValidStatus implements ArrayValuable<Integer>, DictEnum {
+public enum WmsShippingMethod implements ArrayValuable<Integer>, DictEnum {
 
-    INVALID(0, "不可用"),
-    VALID(1, "可用");
+    OCEAN(0, "海运"),
+    RAIL(1, "铁路"),
+    AIR(2, "空运"),
+    TRUCK(3, "集卡");
 
-    public static final Integer[] VALUES = Arrays.stream(values()).map(ValidStatus::getValue).toArray(Integer[]::new);
+    public static final Integer[] VALUES = Arrays.stream(values()).map(WmsShippingMethod::getValue).toArray(Integer[]::new);
 
 
     private final Integer value;
@@ -26,8 +28,8 @@ public enum ValidStatus implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 value 匹配枚举，name 优先
      **/
-    public static ValidStatus parse(Integer value) {
-        for (ValidStatus e : ValidStatus.values()) {
+    public static WmsShippingMethod parse(Integer value) {
+        for (WmsShippingMethod e : WmsShippingMethod.values()) {
             if(e.getValue().equals(value)) {
                 return e;
             }
@@ -38,13 +40,13 @@ public enum ValidStatus implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 name 或 label 匹配枚举，name 优先
      **/
-    public static ValidStatus parse(String nameOrLabel) {
-        for (ValidStatus e : ValidStatus.values()) {
+    public static WmsShippingMethod parse(String nameOrLabel) {
+        for (WmsShippingMethod e : WmsShippingMethod.values()) {
             if(e.name().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
         }
-        for (ValidStatus e : ValidStatus.values()) {
+        for (WmsShippingMethod e : WmsShippingMethod.values()) {
             if(e.getLabel().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }

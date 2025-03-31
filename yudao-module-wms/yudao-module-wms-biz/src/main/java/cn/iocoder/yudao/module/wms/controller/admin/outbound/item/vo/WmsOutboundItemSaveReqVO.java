@@ -3,10 +3,9 @@ package cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo;
 import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import java.util.*;
 import jakarta.validation.constraints.*;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.wms.enums.outbound.OutboundStatus;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
 
 /**
  * @table-fields : source_item_id,actual_qty,outbound_status,bin_id,plan_qty,product_id,id,outbound_id
@@ -30,7 +29,7 @@ public class WmsOutboundItemSaveReqVO {
     private Long sourceItemId;
 
     @Schema(description = "出库状态 ; OutboundStatus : 0-未出库 , 1-部分出库 , 2-已出库", example = "")
-    @InEnum(OutboundStatus.class)
+    @InEnum(WmsOutboundStatus.class)
     private Integer outboundStatus;
 
     @Schema(description = "出库库位ID", example = "")

@@ -3,19 +3,17 @@ package cn.iocoder.yudao.module.wms.controller.admin.outbound.vo;
 import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import java.util.*;
 import jakarta.validation.constraints.*;
 import java.util.List;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemSaveReqVO;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.wms.enums.outbound.OutboundType;
-import cn.iocoder.yudao.module.wms.enums.outbound.OutboundAuditStatus;
-import cn.iocoder.yudao.module.wms.enums.common.BillType;
-import cn.iocoder.yudao.module.wms.enums.outbound.OutboundStatus;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundType;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
+import cn.iocoder.yudao.module.wms.enums.common.WmsBillType;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
@@ -38,11 +36,11 @@ public class WmsOutboundSaveReqVO {
 
     @Schema(description = "出库单类型 ; OutboundType : 1-手工出库 , 2-订单出库", example = "1")
     @NotNull(message = "出库单类型不能为空", groups = { ValidationGroup.create.class })
-    @InEnum(OutboundType.class)
+    @InEnum(WmsOutboundType.class)
     private Integer type;
 
     @Schema(description = "出库单审批状态 ; OutboundAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", example = "2")
-    @InEnum(OutboundAuditStatus.class)
+    @InEnum(WmsOutboundAuditStatus.class)
     private Integer auditStatus;
 
     @Schema(description = "来源单据ID", example = "32195")
@@ -52,7 +50,7 @@ public class WmsOutboundSaveReqVO {
     private String sourceBillNo;
 
     @Schema(description = "来源单据类型 ; BillType : 0-入库单 , 1-出库单", example = "2")
-    @InEnum(BillType.class)
+    @InEnum(WmsBillType.class)
     private Integer sourceBillType;
 
     @Schema(description = "特别说明，创建方专用")
@@ -62,7 +60,7 @@ public class WmsOutboundSaveReqVO {
     private List<WmsOutboundItemSaveReqVO> itemList;
 
     @Schema(description = "出库状态 ; OutboundStatus : 0-未出库 , 1-部分出库 , 2-已出库", example = "")
-    @InEnum(OutboundStatus.class)
+    @InEnum(WmsOutboundStatus.class)
     private Integer outboundStatus;
 
     @Schema(description = "库存财务公司ID", example = "")

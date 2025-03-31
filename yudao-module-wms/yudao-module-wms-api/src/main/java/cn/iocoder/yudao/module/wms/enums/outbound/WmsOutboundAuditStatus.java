@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.wms.enums.inbound;
+package cn.iocoder.yudao.module.wms.enums.outbound;
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import cn.iocoder.yudao.framework.common.enums.DictEnum;
@@ -11,24 +11,23 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 入库单审批状态
+ * 出库单审批状态
  **/
 @RequiredArgsConstructor
 @Getter
-public enum InboundAuditStatus implements ArrayValuable<Integer>, DictEnum {
+public enum WmsOutboundAuditStatus implements ArrayValuable<Integer>, DictEnum {
 
     DRAFT(0, "起草中"),
     AUDITING(1, "待审批"),
     REJECT(2, "已驳回"),
     PASS(3, "已通过"),
-    FORCE_FINISHED(4, "强制完成"),
-    ABANDONED(5, "已作废"),
+    FINISHED(4, "已出库"),
    ;
 
-    public static final Integer[] VALUES = Arrays.stream(values()).map(InboundAuditStatus::getValue).toArray(Integer[]::new);
+    public static final Integer[] VALUES = Arrays.stream(values()).map(WmsOutboundAuditStatus::getValue).toArray(Integer[]::new);
 
     public static String getType() {
-        return InboundAuditStatus.class.getSimpleName();
+        return WmsOutboundAuditStatus.class.getSimpleName();
     }
 
     private final Integer value;
@@ -37,8 +36,8 @@ public enum InboundAuditStatus implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 value 匹配枚举
      **/
-    public static InboundAuditStatus parse(Integer value) {
-        for (InboundAuditStatus e : InboundAuditStatus.values()) {
+    public static WmsOutboundAuditStatus parse(Integer value) {
+        for (WmsOutboundAuditStatus e : WmsOutboundAuditStatus.values()) {
             if(e.getValue().equals(value)) {
                 return e;
             }
@@ -49,22 +48,20 @@ public enum InboundAuditStatus implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 value 匹配枚举
      **/
-    public static List<InboundAuditStatus> parse(Collection<Integer> value) {
-        return value.stream().map(InboundAuditStatus::parse).toList();
+    public static List<WmsOutboundAuditStatus> parse(Collection<Integer> value) {
+        return value.stream().map(WmsOutboundAuditStatus::parse).toList();
     }
-
-
 
     /**
      * 按 name 或 label 匹配枚举，name 优先
      **/
-    public static InboundAuditStatus parse(String nameOrLabel) {
-        for (InboundAuditStatus e : InboundAuditStatus.values()) {
+    public static WmsOutboundAuditStatus parse(String nameOrLabel) {
+        for (WmsOutboundAuditStatus e : WmsOutboundAuditStatus.values()) {
             if(e.name().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
         }
-        for (InboundAuditStatus e : InboundAuditStatus.values()) {
+        for (WmsOutboundAuditStatus e : WmsOutboundAuditStatus.values()) {
             if(e.getLabel().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
@@ -72,8 +69,8 @@ public enum InboundAuditStatus implements ArrayValuable<Integer>, DictEnum {
         return null;
     }
 
-    public boolean matchAny(InboundAuditStatus... status) {
-        for (InboundAuditStatus s : status) {
+    public boolean matchAny(WmsOutboundAuditStatus... status) {
+        for (WmsOutboundAuditStatus s : status) {
             if(s==this) {
                 return true;
             }
@@ -95,11 +92,11 @@ public enum InboundAuditStatus implements ArrayValuable<Integer>, DictEnum {
         return VALUES;
     }
 
-    @Getter
-    public enum Event {
+    public static enum Event {
 
-        SUBMIT("提交审核"),AGREE("通过审核"), REJECT("拒绝审核"),ABANDON("作废"),FORCE_FINISH("强制完成");
+        SUBMIT("提交审核"),AGREE("通过审核"), REJECT("拒绝审核"),FINISH("完成出库");
 
+        @Getter
         private String label;
 
         Event(String label) {

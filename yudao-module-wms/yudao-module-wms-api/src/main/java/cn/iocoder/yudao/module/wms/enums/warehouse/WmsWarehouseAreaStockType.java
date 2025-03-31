@@ -12,13 +12,13 @@ import java.util.Arrays;
  **/
 @RequiredArgsConstructor
 @Getter
-public enum WarehouseAreaStockType implements ArrayValuable<Integer>, DictEnum {
+public enum WmsWarehouseAreaStockType implements ArrayValuable<Integer>, DictEnum {
 
 
     PICK (1, "拣货"),
     STORE(2, "存储");
 
-    public static final Integer[] VALUES = Arrays.stream(values()).map(WarehouseAreaStockType::getValue).toArray(Integer[]::new);
+    public static final Integer[] VALUES = Arrays.stream(values()).map(WmsWarehouseAreaStockType::getValue).toArray(Integer[]::new);
 
 
     private final Integer value;
@@ -27,8 +27,8 @@ public enum WarehouseAreaStockType implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 value 匹配枚举，name 优先
      **/
-    public static WarehouseAreaStockType parse(Integer value) {
-        for (WarehouseAreaStockType e : WarehouseAreaStockType.values()) {
+    public static WmsWarehouseAreaStockType parse(Integer value) {
+        for (WmsWarehouseAreaStockType e : WmsWarehouseAreaStockType.values()) {
             if(e.getValue().equals(value)) {
                 return e;
             }
@@ -39,13 +39,13 @@ public enum WarehouseAreaStockType implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 name 或 label 匹配枚举，name 优先
      **/
-    public static WarehouseAreaStockType parse(String nameOrLabel) {
-        for (WarehouseAreaStockType e : WarehouseAreaStockType.values()) {
+    public static WmsWarehouseAreaStockType parse(String nameOrLabel) {
+        for (WmsWarehouseAreaStockType e : WmsWarehouseAreaStockType.values()) {
             if(e.name().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
         }
-        for (WarehouseAreaStockType e : WarehouseAreaStockType.values()) {
+        for (WmsWarehouseAreaStockType e : WmsWarehouseAreaStockType.values()) {
             if(e.getLabel().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }

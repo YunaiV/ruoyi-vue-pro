@@ -12,12 +12,12 @@ import java.util.Arrays;
  **/
 @RequiredArgsConstructor
 @Getter
-public enum BillType implements ArrayValuable<Integer>, DictEnum {
+public enum WmsBillType implements ArrayValuable<Integer>, DictEnum {
 
     INBOUND(0, "入库单"),
     OUTBOUND(1, "出库单");
 
-    public static final Integer[] VALUES = Arrays.stream(values()).map(BillType::getValue).toArray(Integer[]::new);
+    public static final Integer[] VALUES = Arrays.stream(values()).map(WmsBillType::getValue).toArray(Integer[]::new);
 
 
     private final Integer value;
@@ -26,8 +26,8 @@ public enum BillType implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 value 匹配枚举，name 优先
      **/
-    public static BillType parse(Integer value) {
-        for (BillType e : BillType.values()) {
+    public static WmsBillType parse(Integer value) {
+        for (WmsBillType e : WmsBillType.values()) {
             if(e.getValue().equals(value)) {
                 return e;
             }
@@ -38,13 +38,13 @@ public enum BillType implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 name 或 label 匹配枚举，name 优先
      **/
-    public static BillType parse(String nameOrLabel) {
-        for (BillType e : BillType.values()) {
+    public static WmsBillType parse(String nameOrLabel) {
+        for (WmsBillType e : WmsBillType.values()) {
             if(e.name().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
         }
-        for (BillType e : BillType.values()) {
+        for (WmsBillType e : WmsBillType.values()) {
             if(e.getLabel().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
