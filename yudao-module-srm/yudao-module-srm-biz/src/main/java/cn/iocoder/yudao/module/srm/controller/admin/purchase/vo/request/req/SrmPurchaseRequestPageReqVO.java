@@ -58,7 +58,7 @@ public class SrmPurchaseRequestPageReqVO extends PageParam {
 
 
     @Schema(description = "审核状态")
-    private Integer status;
+    private Integer auditStatus;
 
     @Schema(description = "关闭状态")
     private Integer offStatus;

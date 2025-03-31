@@ -81,9 +81,9 @@ public class PurchaseOrderTemplateManager {
 
     @EventListener(ApplicationReadyEvent.class)
     public void preloadTemplates() {
-        // 非 prod 且没开启，才跳过
-        if (!"prod".equalsIgnoreCase(profile) && !enablePreload) {
-            log.info("🌱 当前环境为 [{}]，未启用手动开关，跳过模板预热", profile);
+        // 默认跳过缓存
+        if (!enablePreload) {
+            log.info("🌱 当前环境为 [{}]，跳过模板预热", profile);
             return;
         }
         try {

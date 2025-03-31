@@ -43,6 +43,7 @@ public class SrmPurchaseRequestItemsDO extends TenantBaseDO {
      */
     private String declaredType;
 
+    private String declaredTypeEn;
     /**
      * 产品sku
      */

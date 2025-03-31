@@ -53,16 +53,16 @@ class SrmPurchaseReturnedStatusMachineTest extends BaseDbUnitTest {
         System.out.println(auditMachine.generatePlantUML());
         //
         SrmPurchaseRequestDO requestDO = mapper.selectById(32603L);
-        System.out.println("requestDO状态 = " + ErpAuditStatus.fromCode(requestDO.getStatus()).getDesc());
+        System.out.println("requestDO状态 = " + ErpAuditStatus.fromCode(requestDO.getAuditStatus()).getDesc());
 //        mapper.update(requestDO, new LambdaQueryWrapperX<SrmPurchaseRequestDO>().eq(SrmPurchaseRequestDO::getId, requestDO.getId()));
         //
 
         auditMachine.fireEvent(ErpAuditStatus.DRAFT, SrmEventEnum.AUDIT_INIT, requestDO);//初始化
-        auditMachine.fireEvent(ErpAuditStatus.fromCode(mapper.selectById(32603L).getStatus()), SrmEventEnum.SUBMIT_FOR_REVIEW, requestDO);//提交审核
-        auditMachine.fireEvent(ErpAuditStatus.fromCode(mapper.selectById(32603L).getStatus()), SrmEventEnum.AGREE, requestDO);//审核同意
-        auditMachine.fireEvent(ErpAuditStatus.fromCode(mapper.selectById(32603L).getStatus()), SrmEventEnum.WITHDRAW_REVIEW, requestDO);//反审核
-        auditMachine.fireEvent(ErpAuditStatus.fromCode(mapper.selectById(32603L).getStatus()), SrmEventEnum.SUBMIT_FOR_REVIEW, requestDO);//提交审核
-        auditMachine.fireEvent(ErpAuditStatus.fromCode(mapper.selectById(32603L).getStatus()), SrmEventEnum.AGREE, requestDO);//审核同意
+        auditMachine.fireEvent(ErpAuditStatus.fromCode(mapper.selectById(32603L).getAuditStatus()), SrmEventEnum.SUBMIT_FOR_REVIEW, requestDO);//提交审核
+        auditMachine.fireEvent(ErpAuditStatus.fromCode(mapper.selectById(32603L).getAuditStatus()), SrmEventEnum.AGREE, requestDO);//审核同意
+        auditMachine.fireEvent(ErpAuditStatus.fromCode(mapper.selectById(32603L).getAuditStatus()), SrmEventEnum.WITHDRAW_REVIEW, requestDO);//反审核
+        auditMachine.fireEvent(ErpAuditStatus.fromCode(mapper.selectById(32603L).getAuditStatus()), SrmEventEnum.SUBMIT_FOR_REVIEW, requestDO);//提交审核
+        auditMachine.fireEvent(ErpAuditStatus.fromCode(mapper.selectById(32603L).getAuditStatus()), SrmEventEnum.AGREE, requestDO);//审核同意
     }
 
     @Test

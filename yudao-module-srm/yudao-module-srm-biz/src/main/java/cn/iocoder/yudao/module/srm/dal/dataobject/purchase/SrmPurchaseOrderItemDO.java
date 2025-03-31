@@ -25,26 +25,21 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("ALL")
 public class SrmPurchaseOrderItemDO extends TenantBaseDO {
     /**
      * 编号
      */
     @TableId
     private Long id;
-    
+
     @Version
     private Long version;
     /**
-     * 供应商产品编码
-     * <p>
-     * 关联 {@link SrmSupplierProductDO#getId()}
-     */
-//    private Long supplierProductId;
-    /**
      * 仓库编号
      * <p>
+     * 关联  {@link cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO#getId()}
      */
-//     * 关联  {@link cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO#getId()}
     private Long warehouseId; // 仓库编号
     /**
      * 采购订单编号
@@ -199,6 +194,8 @@ public class SrmPurchaseOrderItemDO extends TenantBaseDO {
      * 报关品名
      */
     private String declaredType;
+
+    private String declaredTypeEn;
 
     private String barCode;
     /**

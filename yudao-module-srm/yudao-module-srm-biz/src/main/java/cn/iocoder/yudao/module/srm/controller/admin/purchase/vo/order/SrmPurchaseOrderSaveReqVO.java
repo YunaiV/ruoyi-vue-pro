@@ -97,6 +97,10 @@ public class SrmPurchaseOrderSaveReqVO {
         @NotBlank(message = "产品报关品名不能为空")
         private String declaredType;
 
+        @Schema(description = "产品报关品名英文")
+        @NotBlank(message = "产品报关品名英文不能为空")
+        private String declaredTypeEn;
+
         @Schema(description = "产品sku")
         @NotBlank(message = "产品sku不能为空")
         private String barCode;

@@ -5,14 +5,18 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import lombok.Data;
 
 @Schema(description = "管理后台 - ERP采购申请单采购 Request VO")
 @Data
 public class SrmPurchaseRequestMergeReqVO {
+
+    @Schema(description = "订单No")
+    private String no;
 
     @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "供应商编号不能为空")
@@ -56,7 +60,7 @@ public class SrmPurchaseRequestMergeReqVO {
 
     @Schema(description = "结算日期")
     private LocalDateTime settlementDate;
-    
+
     @Schema(description = "收获地址")
     private String address;
 

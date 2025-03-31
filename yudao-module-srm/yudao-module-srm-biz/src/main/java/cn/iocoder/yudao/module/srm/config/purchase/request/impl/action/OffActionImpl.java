@@ -10,8 +10,8 @@ import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseRequestItemsMap
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseRequestMapper;
 import cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants;
 import cn.iocoder.yudao.module.srm.enums.SrmEventEnum;
-import cn.iocoder.yudao.module.srm.enums.status.SrmOffStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmAuditStatus;
+import cn.iocoder.yudao.module.srm.enums.status.SrmOffStatus;
 import com.alibaba.cola.statemachine.Action;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ public class OffActionImpl implements Action<SrmOffStatus, SrmEventEnum, SrmPurc
         //手动关闭+自动关闭事件
         if (event == SrmEventEnum.MANUAL_CLOSE || event == SrmEventEnum.AUTO_CLOSE) {
             //未审核->异常
-            ThrowUtil.ifThrow(Objects.equals(context.getStatus(), SrmAuditStatus.PENDING_REVIEW.getCode()), SrmErrorCodeConstants.PURCHASE_REQUEST_CLOSE_FAIL, context.getNo());
+            ThrowUtil.ifThrow(Objects.equals(context.getAuditStatus(), SrmAuditStatus.PENDING_REVIEW.getCode()), SrmErrorCodeConstants.PURCHASE_REQUEST_CLOSE_FAIL, context.getNo());
         }
     }
 

@@ -10,8 +10,8 @@ import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseOrderItemMapper
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseRequestItemsMapper;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseRequestMapper;
 import cn.iocoder.yudao.module.srm.enums.SrmEventEnum;
-import cn.iocoder.yudao.module.srm.enums.status.SrmOffStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmAuditStatus;
+import cn.iocoder.yudao.module.srm.enums.status.SrmOffStatus;
 import com.alibaba.cola.statemachine.Action;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +72,7 @@ public class AuditActionImpl implements Action<SrmAuditStatus, SrmEventEnum, Srm
             data.setAuditorId(getLoginUserId());
         }
         //持久化变更状态
-        data.setStatus(to.getCode());
+        data.setAuditStatus(to.getCode());
         ThrowUtil.ifThrow(!itemsMapper.updateBatch(itemsDOS), DB_BATCH_UPDATE_ERROR);
         ThrowUtil.ifSqlThrow(mapper.updateById(data), DB_UPDATE_ERROR);
         log.debug("审核状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(data), from.getDesc(), to.getDesc());

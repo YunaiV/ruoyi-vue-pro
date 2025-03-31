@@ -151,4 +151,8 @@ public class SrmPurchaseInItemDO extends BaseDO {
      * 产品sku
      */
     private String barCode;
+    /**
+     * 报关品名英文
+     */
+    private String declaredTypeEn;
 }

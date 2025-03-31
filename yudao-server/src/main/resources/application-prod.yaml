@@ -13,6 +13,7 @@ kingdee:
 erp:
   template:
     scan-path: purchase/order/
+    enable-preload: true
 spring:
   # 数据源配置项
   datasource:

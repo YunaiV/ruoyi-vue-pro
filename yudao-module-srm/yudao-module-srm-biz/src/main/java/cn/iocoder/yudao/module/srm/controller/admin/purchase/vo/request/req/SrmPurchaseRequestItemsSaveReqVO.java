@@ -17,10 +17,13 @@ public class SrmPurchaseRequestItemsSaveReqVO {
 //    @NotNull(groups = validation.OnUpdate.class, message = "更新时，子项id不能为空")
     private Long id;
 
-
     @Schema(description = "产品报关品名")
     @NotBlank(message = "产品报关品名不能为空")
     private String declaredType;
+
+    @Schema(description = "产品报关品名英文")
+    @NotBlank(message = "产品报关品名英文不能为空")
+    private String declaredTypeEn;
 
     @Schema(description = "产品sku")
     @NotBlank(message = "产品sku不能为空")

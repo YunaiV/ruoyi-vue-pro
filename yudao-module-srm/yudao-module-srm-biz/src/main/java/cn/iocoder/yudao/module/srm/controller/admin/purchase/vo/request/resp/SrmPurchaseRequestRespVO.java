@@ -76,7 +76,7 @@ public class SrmPurchaseRequestRespVO extends BaseVO {
     @Schema(description = "审核状态（待审核，审核通过，审核未通过）")
     @ExcelProperty(value = "审核状态", converter = DictConvert.class)
 //    @DictFormat(DictTypeConstants.AUDIT_STATUS)
-    private Integer status;
+    private Integer auditStatus;
 
     @Schema(description = "关闭状态（已关闭，已开启）")
     @ExcelProperty("关闭状态")

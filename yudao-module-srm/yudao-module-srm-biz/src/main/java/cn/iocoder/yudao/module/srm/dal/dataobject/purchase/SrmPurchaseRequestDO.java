@@ -49,7 +49,7 @@ public class SrmPurchaseRequestDO extends TenantBaseDO {
     /**
      * 审核状态
      */
-    private Integer status;
+    private Integer auditStatus;
 //    private Integer status = SrmAuditStatus.DRAFT.getCode(); // 默认草稿;
     /**
      * 关闭状态

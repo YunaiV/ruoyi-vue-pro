@@ -10,7 +10,7 @@ debug: false
 erp:
   template:
     scan-path: purchase/order/
-    enable-preload: true
+    enable-preload: false
 spring:
   autoconfigure:
     exclude:

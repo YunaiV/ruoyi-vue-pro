@@ -27,7 +27,7 @@ public interface SrmPurchaseRequestMapper extends BaseMapperX<SrmPurchaseRequest
             .betweenIfPresent(SrmPurchaseRequestDO::getAuditTime, reqVO.getAuditTime())
             .betweenIfPresent(SrmPurchaseRequestDO::getCreateTime, reqVO.getCreateTime())
             //状态
-            .eqIfPresent(SrmPurchaseRequestDO::getStatus, reqVO.getStatus())
+            .eqIfPresent(SrmPurchaseRequestDO::getAuditStatus, reqVO.getAuditStatus())
             .eqIfPresent(SrmPurchaseRequestDO::getOffStatus, reqVO.getOffStatus())
             .eqIfPresent(SrmPurchaseRequestDO::getOrderStatus, reqVO.getOrderStatus())
             .eqIfPresent(SrmPurchaseRequestDO::getInStatus, reqVO.getInStatus())

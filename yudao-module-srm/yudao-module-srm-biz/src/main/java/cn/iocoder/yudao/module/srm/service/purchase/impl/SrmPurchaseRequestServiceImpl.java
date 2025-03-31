@@ -236,18 +236,17 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
             //            vo.setRemark("申请人期望采购日期: " + DateUtil.format(reqVO.getOrderTime(), DatePattern.CHINESE_DATE_PATTERN));
         });
         //3.0 持久化
-        Long orderId = srmPurchaseOrderService.createPurchaseOrder(saveReqVO);
 
         //        saveReqVO.setId(orderId);
         //        srmPurchaseOrderService.updatePurchaseOrder(saveReqVO);
-        return orderId;
+        return srmPurchaseOrderService.createPurchaseOrder(saveReqVO);
     }
 
     private void validMerge(List<SrmPurchaseRequestItemsDO> itemsDOS) {
         //1. 校验申请单需已审核
         List<SrmPurchaseRequestDO> requestDOS = srmPurchaseRequestMapper.selectByIds(convertList(itemsDOS, SrmPurchaseRequestItemsDO::getRequestId));
         for (SrmPurchaseRequestDO requestDO : requestDOS) {
-            ThrowUtil.ifThrow(!requestDO.getStatus().equals(SrmAuditStatus.APPROVED.getCode()), PURCHASE_REQUEST_MERGE_FAIL, requestDO.getNo());
+            ThrowUtil.ifThrow(!requestDO.getAuditStatus().equals(SrmAuditStatus.APPROVED.getCode()), PURCHASE_REQUEST_MERGE_FAIL, requestDO.getNo());
         }
         //2. 校验申请项需处于开启状态
         for (SrmPurchaseRequestItemsDO itemsDO : itemsDOS) {
@@ -291,7 +290,7 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
     //判断当前状态是否可以更新
     private void updateStatusCheck(SrmPurchaseRequestDO requestDO, List<Long> itemIds) {
         //1.1 判断已审核
-        ThrowUtil.ifThrow(requestDO.getStatus().equals(SrmAuditStatus.APPROVED.getCode()), PURCHASE_REQUEST_UPDATE_FAIL_APPROVE, requestDO.getNo());
+        ThrowUtil.ifThrow(requestDO.getAuditStatus().equals(SrmAuditStatus.APPROVED.getCode()), PURCHASE_REQUEST_UPDATE_FAIL_APPROVE, requestDO.getNo());
         //1.2 判断已关闭
         ThrowUtil.ifThrow(requestDO.getOffStatus().equals(SrmOffStatus.CLOSED.getCode()), PURCHASE_REQUEST_CLOSED, requestDO.getNo());
         //1.3 判断已手动关闭
@@ -352,7 +351,7 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
             throw ServiceExceptionUtil.exception(PURCHASE_REQUEST_NOT_EXISTS, req.getRequestId());
         }
         // 获取当前申请单状态
-        SrmAuditStatus currentStatus = SrmAuditStatus.fromCode(requestDO.getStatus());
+        SrmAuditStatus currentStatus = SrmAuditStatus.fromCode(requestDO.getAuditStatus());
         if (Boolean.TRUE.equals(req.getReviewed())) {
             // 审核操作
             if (req.getPass()) {
@@ -381,7 +380,7 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
         if (!CollUtil.isEmpty(ids)) {
             List<SrmPurchaseRequestDO> dos = srmPurchaseRequestMapper.selectByIds(ids);
             for (SrmPurchaseRequestDO aDo : dos) {
-                auditMachine.fireEvent(SrmAuditStatus.fromCode(aDo.getStatus()), SrmEventEnum.SUBMIT_FOR_REVIEW, SrmPurchaseRequestAuditReqVO.builder().requestId(aDo.getId()).build());
+                auditMachine.fireEvent(SrmAuditStatus.fromCode(aDo.getAuditStatus()), SrmEventEnum.SUBMIT_FOR_REVIEW, SrmPurchaseRequestAuditReqVO.builder().requestId(aDo.getId()).build());
             }
         }
     }
@@ -430,7 +429,7 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
         }
         // 1.1 已审核->异常
         purchaseRequestDOs.forEach(erpPurchaseRequestDO -> {
-            ThrowUtil.ifThrow(erpPurchaseRequestDO.getStatus().equals(SrmAuditStatus.APPROVED.getCode()), PURCHASE_REQUEST_DELETE_FAIL_APPROVE, erpPurchaseRequestDO.getNo());
+            ThrowUtil.ifThrow(erpPurchaseRequestDO.getAuditStatus().equals(SrmAuditStatus.APPROVED.getCode()), PURCHASE_REQUEST_DELETE_FAIL_APPROVE, erpPurchaseRequestDO.getNo());
             //已关闭->异常
             ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(SrmOffStatus.CLOSED.getCode()), PURCHASE_REQUEST_DELETE_FAIL_CLOSE, erpPurchaseRequestDO.getNo());
         });
