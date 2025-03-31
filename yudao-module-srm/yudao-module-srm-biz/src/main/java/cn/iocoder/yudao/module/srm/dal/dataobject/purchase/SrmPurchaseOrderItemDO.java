@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
  *
  * @author wdy
  */
-@TableName("erp_purchase_order_items")
-@KeySequence("erp_purchase_order_items_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("srm_purchase_order_items")
+@KeySequence("srm_purchase_order_items_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -72,7 +72,7 @@ public class SrmPurchaseOrderItemDO extends TenantBaseDO {
      * 下单数量
      */
     //取后两位小数点 json的时候
-    private BigDecimal count;
+    private BigDecimal qty;
     /**
      * 总价，单位：元
      * totalPrice = productPrice * count

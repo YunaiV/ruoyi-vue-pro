@@ -176,7 +176,7 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
         for (SrmPurchaseRequestItemsDO requestItemsDO : requestItemsDOS) {
             //剩余可采购数量 > 采购数量 -> e
             int i = requestItemsDO.getApproveCount() - requestItemsDO.getOrderedQuantity();
-            if (i < map.get(requestItemsDO.getId()).getCount().intValue()) {
+            if (i < map.get(requestItemsDO.getId()).getQty().intValue()) {
                 //数量不足
                 throw exception(PURCHASE_ORDER_ITEM_PURCHASE_FAIL_EXCEED, requestItemsDO.getId(), i);
             }
@@ -205,7 +205,7 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
             Optional.ofNullable(orderItemDO.getPurchaseApplyItemId()).ifPresent(itemId -> {
                 SrmPurchaseRequestItemsDO itemsDO = srmPurchaseRequestService.validItemIdExist(itemId);
                 //下单数量 <-> 申请单已订购数量
-                SrmOrderCountDTO dto = SrmOrderCountDTO.builder().purchaseRequestItemId(itemsDO.getId()).quantity(orderItemDO.getCount().intValue()).build();
+                SrmOrderCountDTO dto = SrmOrderCountDTO.builder().purchaseRequestItemId(itemsDO.getId()).quantity(orderItemDO.getQty().intValue()).build();
                 requestOrderItemMachine.fireEvent(SrmOrderStatus.fromCode(itemsDO.getOrderStatus()), SrmEventEnum.ORDER_ADJUSTMENT, dto);
             });
         }
@@ -276,7 +276,7 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
 
     //计算采购订单的总价、税费、折扣价格,|计算总数量|计算总商品价格|计算总税费|计算折扣价格
     private void calculateTotalPrice(SrmPurchaseOrderDO purchaseOrder, List<SrmPurchaseOrderItemDO> purchaseOrderItems) {
-        purchaseOrder.setTotalCount(getSumValue(purchaseOrderItems, SrmPurchaseOrderItemDO::getCount, BigDecimal::add));
+        purchaseOrder.setTotalCount(getSumValue(purchaseOrderItems, SrmPurchaseOrderItemDO::getQty, BigDecimal::add));
         purchaseOrder.setTotalProductPrice(getSumValue(purchaseOrderItems, SrmPurchaseOrderItemDO::getTotalPrice, BigDecimal::add, BigDecimal.ZERO));
         purchaseOrder.setTotalTaxPrice(getSumValue(purchaseOrderItems, SrmPurchaseOrderItemDO::getTaxPrice, BigDecimal::add, BigDecimal.ZERO));
         purchaseOrder.setTotalPrice(purchaseOrder.getTotalProductPrice().add(purchaseOrder.getTotalTaxPrice()));
@@ -303,7 +303,7 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
         // 2. 转化为 SrmPurchaseOrderItemDO 列表
         return convertList(list, o -> BeanUtils.toBean(o, SrmPurchaseOrderItemDO.class, item -> {
             //            item = SrmOrderConvert.INSTANCE.convertToErpPurchaseOrderItemDO(o);//convert转换一下
-            item.setTotalPrice(MoneyUtils.priceMultiply(item.getProductPrice(), item.getCount()));
+            item.setTotalPrice(MoneyUtils.priceMultiply(item.getProductPrice(), item.getQty()));
             if (item.getTotalPrice() == null) {
                 return;
             }
@@ -367,8 +367,8 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
             Optional.ofNullable(orderItemDO.getPurchaseApplyItemId()).ifPresent(purchaseApplyItemId -> {
                 SrmPurchaseRequestItemsDO requestItemsDO = requestItemsMap.get(purchaseApplyItemId);  // 从map中获取request item
                 // 验证:采购的产品数量 <= 申请项的剩余订购数量(批准数量 - 已订购数量)
-                int newCount = orderItemDO.getCount().intValue();
-                int oldCount = oldOrderItem.getCount().intValue();
+                int newCount = orderItemDO.getQty().intValue();
+                int oldCount = oldOrderItem.getQty().intValue();
                 int changCount = newCount - oldCount;
                 SrmOrderCountDTO dto = SrmOrderCountDTO.builder().purchaseRequestItemId(requestItemsDO.getId()).quantity(changCount).build();
                 if (changCount < 0) {
@@ -393,8 +393,8 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
             if (item.getInCount().equals(inCount)) {
                 return;
             }
-            if (inCount.compareTo(item.getCount()) > 0) {
-                throw exception(PURCHASE_ORDER_ITEM_IN_FAIL_PRODUCT_EXCEED, erpProductApi.getProductDto(item.getProductId()).getName(), item.getCount());
+            if (inCount.compareTo(item.getQty()) > 0) {
+                throw exception(PURCHASE_ORDER_ITEM_IN_FAIL_PRODUCT_EXCEED, erpProductApi.getProductDto(item.getProductId()).getName(), item.getQty());
             }
             purchaseOrderItemMapper.updateById(new SrmPurchaseOrderItemDO().setId(item.getId()).setInCount(inCount));
         });
@@ -465,7 +465,7 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
     private void deleteSyncLogic(SrmPurchaseOrderItemDO item) {
         Optional.ofNullable(item.getPurchaseApplyItemId()).ifPresent(id -> {
             SrmPurchaseRequestItemsDO requestItemsDO = requestItemsMapper.selectById(id);
-            SrmOrderCountDTO dto = SrmOrderCountDTO.builder().purchaseRequestItemId(item.getPurchaseApplyItemId()).quantity(item.getCount().negate().intValue()).build();//减少申请个数的订购数量
+            SrmOrderCountDTO dto = SrmOrderCountDTO.builder().purchaseRequestItemId(item.getPurchaseApplyItemId()).quantity(item.getQty().negate().intValue()).build();//减少申请个数的订购数量
             //撤销自动关闭
             requestItemOffMachine.fireEvent(SrmOffStatus.fromCode(requestItemsDO.getOffStatus()), SrmEventEnum.CANCEL_DELETE, requestItemsDO);
             //订购状态

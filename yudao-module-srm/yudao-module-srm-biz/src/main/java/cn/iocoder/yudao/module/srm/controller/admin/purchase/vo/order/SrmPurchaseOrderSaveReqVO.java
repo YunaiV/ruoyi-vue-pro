@@ -155,7 +155,7 @@ public class SrmPurchaseOrderSaveReqVO {
         @Schema(description = "下单数量")//审核人填写
         @NotNull(message = "count下单数量不能为空")
         @Min(value = 0, message = "产品数量必须大于0")
-        private Integer count;
+        private Integer qty;
 
         @Schema(description = "商品行备注")
         private String remark;

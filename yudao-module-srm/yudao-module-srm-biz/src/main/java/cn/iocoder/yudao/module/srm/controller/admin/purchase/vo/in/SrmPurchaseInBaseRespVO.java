@@ -77,7 +77,7 @@ public class SrmPurchaseInBaseRespVO extends SrmPurchaseBaseRespVO {
 
         @Schema(description = "产品数量")
         @NotNull(message = "产品数量不能为空")
-        private BigDecimal count;
+        private BigDecimal qty;
 
         @Schema(description = "税率，百分比")
         private BigDecimal taxPercent;

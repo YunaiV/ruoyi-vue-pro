@@ -91,7 +91,7 @@ public class SrmPurchaseInSaveReqVO {
 
         @Schema(description = "入库数量", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "入库数量不能为空")
-        private BigDecimal count;
+        private BigDecimal qty;
 
         @Schema(description = "备注")
         private String remark;

@@ -42,10 +42,10 @@ public class ItemStorageActionImpl implements Action<SrmStorageStatus, SrmEventE
             itemsDO.setInCount(oldCount.add(changeCount));//入库数量
             //根据入库数量来动态计算当前状态
 
-            if (itemsDO.getInCount().compareTo(BigDecimal.valueOf(itemsDO.getCount())) >= 0) {
+            if (itemsDO.getInCount().compareTo(BigDecimal.valueOf(itemsDO.getQty())) >= 0) {
                 //入库量 >= 申请量
                 t = SrmStorageStatus.ALL_IN_STORAGE;
-            } else if (itemsDO.getInCount().compareTo(BigDecimal.valueOf(itemsDO.getCount())) < 0) {
+            } else if (itemsDO.getInCount().compareTo(BigDecimal.valueOf(itemsDO.getQty())) < 0) {
                 //入库量 < 申请量
                 t = SrmStorageStatus.PARTIALLY_IN_STORAGE;
             } else {

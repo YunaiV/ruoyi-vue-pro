@@ -47,7 +47,7 @@ public class SrmPurchaseRequestItemsSaveReqVO {
     @Schema(description = "申请数量", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "申请数量不能为空")
     @Positive(message = "申请数量必须为正数")
-    private Integer count;
+    private Integer qty;
 
     @Schema(description = "批准数量", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @PositiveOrZero(message = "批准数量不能为负数")

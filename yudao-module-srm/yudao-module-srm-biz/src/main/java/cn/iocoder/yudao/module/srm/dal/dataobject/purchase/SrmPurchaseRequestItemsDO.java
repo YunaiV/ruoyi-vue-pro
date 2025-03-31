@@ -15,8 +15,8 @@ import java.time.LocalDateTime;
  *
  * @author 索迈管理员
  */
-@TableName("erp_purchase_request_items")
-@KeySequence("erp_purchase_request_items_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("srm_purchase_request_items")
+@KeySequence("srm_purchase_request_items_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -64,7 +64,7 @@ public class SrmPurchaseRequestItemsDO extends TenantBaseDO {
     /**
      * 申请数量//可以考虑换bigDecimal
      */
-    private Integer count; //联动申请项采购数量+采购状态
+    private Integer qty; //联动申请项采购数量+采购状态
     /**
      * 批准数量
      */

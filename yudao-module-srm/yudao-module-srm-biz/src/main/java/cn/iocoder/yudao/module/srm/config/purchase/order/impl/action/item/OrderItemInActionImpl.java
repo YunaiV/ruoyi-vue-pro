@@ -76,7 +76,7 @@ public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventE
             if (newInCount.compareTo(BigDecimal.ZERO) <= 0) {
                 // 未入库,最新入库数量 <= 0
                 to = (SrmStorageStatus.NONE_IN_STORAGE);
-            } else if (newInCount.compareTo(oldData.getCount()) < 0) {//入库值 小于 申请数量
+            } else if (newInCount.compareTo(oldData.getQty()) < 0) {//入库值 小于 申请数量
                 // 部分入库
                 to = (SrmStorageStatus.PARTIALLY_IN_STORAGE);
             } else {

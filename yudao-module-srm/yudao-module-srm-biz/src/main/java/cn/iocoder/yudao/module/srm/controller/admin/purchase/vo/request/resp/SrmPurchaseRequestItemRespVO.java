@@ -33,7 +33,7 @@ public class SrmPurchaseRequestItemRespVO extends BaseVO {
 
     @Schema(description = "产品报关品名")
     private String declaredType;
-    
+
     @Schema(description = "报关品名英文")
     private String declaredTypeEn;
 
@@ -68,7 +68,7 @@ public class SrmPurchaseRequestItemRespVO extends BaseVO {
     @Schema(description = "产品数量", example = "100")
     @NotNull(message = "产品数量不能为空")
     @ExcelProperty("产品数量")
-    private Integer count;
+    private Integer qty;
 
     @Schema(description = "参考单价")
     @ExcelProperty("参考单价")

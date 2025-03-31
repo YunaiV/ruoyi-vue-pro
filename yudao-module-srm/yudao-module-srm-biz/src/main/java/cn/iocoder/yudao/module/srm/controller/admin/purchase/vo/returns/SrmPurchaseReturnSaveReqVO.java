@@ -81,7 +81,7 @@ public class SrmPurchaseReturnSaveReqVO {
 
         @Schema(description = "退货", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "退货数量不能为空")
-        private BigDecimal count;
+        private BigDecimal qty;
 
         @Schema(description = "含税单价")
         @DecimalMin(value = "0.00", message = "含税单价不能小于0")
@@ -92,7 +92,7 @@ public class SrmPurchaseReturnSaveReqVO {
 
         @Schema(description = "币别ID,财务管理-币别维护")
         private Long currencyId;
-        
+
         @Schema(description = "币别名称")
         private String currencyName;
 

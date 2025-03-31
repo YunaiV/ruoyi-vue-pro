@@ -4,10 +4,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import lombok.Data;
 
 @Schema(description = "管理后台 - ERP 采购订单 合并 VO")
 @Data
@@ -56,6 +57,6 @@ public class SrmPurchaseOrderMergeReqVO {
 
         @Schema(description = "入库数量", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "入库数量不能为空")
-        private BigDecimal count;
+        private BigDecimal qty;
     }
 }

@@ -155,7 +155,7 @@ public class SrmPurchaseReturnBaseRespVO extends SrmPurchaseBaseRespVO {
 
         @Schema(description = "产品数量")
         @NotNull(message = "产品数量不能为空")
-        private BigDecimal count;
+        private BigDecimal qty;
 
         /**
          * 总价，单位：元

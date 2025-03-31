@@ -16,7 +16,7 @@ public class SrmPurchaseOrderItemWordBO extends SrmPurchaseOrderItemDO {
     //产品信息
 //    ErpProductDTO product;
 
-    private BigDecimal count;
+    private BigDecimal qty;
 
     //不含税总额  =  产品单价productPrice * 数量
     private BigDecimal totalPriceUntaxed;

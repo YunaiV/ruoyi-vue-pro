@@ -50,7 +50,7 @@ public interface SrmOrderConvert {
         //申请项id
         item.setPurchaseApplyItemId(itemDO.getId());
         // 设置下单数量(采购) == 申请项批准数量
-        item.setCount(reqVO.getOrderQuantity()); //合并时vo -> 数量
+        item.setQty(reqVO.getOrderQuantity()); //合并时vo -> 数量
         //价税合计
         item.setDeliveryTime(itemDO.getExpectArrivalDate());//交货日期 -> 期望到货日期
         return item;
@@ -84,13 +84,13 @@ public interface SrmOrderConvert {
                 item.setIndex(index.getAndIncrement());
                 //不含税总额
                 item.setTotalPriceUntaxed(
-                    item.getProductPrice().multiply(item.getCount()).setScale(2, RoundingMode.HALF_UP));
+                    item.getProductPrice().multiply(item.getQty()).setScale(2, RoundingMode.HALF_UP));
                 item.setTotalTaxPrice(item.getTaxPrice().setScale(2, RoundingMode.HALF_UP));
                 //总金额
                 item.setTotalProductPrice(
-                    item.getCount().multiply(item.getActTaxPrice()).setScale(2, RoundingMode.HALF_UP));//数量*含税单价
+                    item.getQty().multiply(item.getActTaxPrice()).setScale(2, RoundingMode.HALF_UP));//数量*含税单价
                 item.setDeliveryTimeFormat(DateUtil.format(item.getDeliveryTime(), NORM_DATE_PATTERN));
-                item.setCount(item.getCount().setScale(0, RoundingMode.HALF_UP));
+                item.setQty(item.getQty().setScale(0, RoundingMode.HALF_UP));
             })).setTotalCount(peek.getTotalCount().setScale(0, RoundingMode.HALF_UP));
             //渲染甲方乙方
             peek.setA(dtoMap.get(vo.getPartyAId()));

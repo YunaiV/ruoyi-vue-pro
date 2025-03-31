@@ -181,7 +181,7 @@ public class SrmPurchaseOrderBaseRespVO extends BaseVO {
         //        private String currencyName;
 
         @Schema(description = "产品下单数量")
-        private BigDecimal count;
+        private BigDecimal qty;
         @Schema(description = "产品单价")
         private BigDecimal productPrice;
         @Schema(description = "含税单价", example = "120.00")
