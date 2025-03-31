@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.oms.service.OmsShopService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -18,5 +19,10 @@ public class OmsShopServiceImpl extends ServiceImpl<OmsShopMapper, OmsShopDO> im
     @Override
     public List<OmsShopDO> getByPlatformCode(String platformCode) {
         return omsShopMapper.getByPlatformCode(platformCode);
+    }
+
+    @Override
+    public OmsShopDO getByPlatformShopCode(String platformShopCode) {
+        return omsShopMapper.getByPlatformShopCode(platformShopCode);
     }
 }

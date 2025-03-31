@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsShopDO;
 import org.apache.ibatis.annotations.Mapper;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,6 +24,9 @@ public interface OmsShopMapper extends BaseMapperX<OmsShopDO> {
         return selectList(bindQueryWrapper(OmsShopDO.builder().platformShopCode(platformCode).build()));
     }
 
+    default OmsShopDO getByPlatformShopCode(String platformShopCode) {
+        return selectOne(bindQueryWrapper(OmsShopDO.builder().platformShopCode(platformShopCode).build()));
+    }
 
 
 }

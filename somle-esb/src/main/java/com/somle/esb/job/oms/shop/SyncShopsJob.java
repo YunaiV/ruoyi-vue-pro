@@ -2,81 +2,67 @@ package com.somle.esb.job.oms.shop;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsShopDO;
-import cn.iocoder.yudao.module.oms.service.OmsShopService;
+import com.somle.esb.client.oms.SyncOmsClient;
 import com.somle.esb.converter.oms.SalesPlatformToOmsConverter;
 import com.somle.esb.enums.SalesPlatform;
 import com.somle.esb.enums.SyncOmsType;
 import com.somle.esb.enums.TenantId;
-import com.somle.esb.job.oms.SyncOmsClient;
-import com.somle.esb.model.ShopProfileDTO;
-import jakarta.annotation.Resource;
+import com.somle.esb.job.oms.SyncOmsDataJob;
+import com.somle.esb.model.OmsProfileDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class SyncShopsJob implements JobHandler {
-
-
-    @Resource
-    ApplicationContext applicationContext;
-
-    @Resource
-    OmsShopService omsShopService;
-
-    @Override
-    public String execute(String param) throws Exception {
-        return "";
-    }
+public class SyncShopsJob extends SyncOmsDataJob {
 
 
     /**
-     * @param salesPlatform 指定销售平台
+     * @param salesPlatform        指定销售平台
      * @param shopProfileClientMap
      * @Author: gumaomao
      * @Date: 2025/03/28
      * @Description: 同步指定平台的店铺资料
      * @return:
      */
-    public void syncShopProfile(SalesPlatform salesPlatform,Map<SalesPlatform, SyncOmsClient> shopProfileClientMap) {
+    public void syncShopProfile(SalesPlatform salesPlatform, Map<SalesPlatform, SyncOmsClient> shopProfileClientMap) {
         // 设置租户为默认租户
         TenantContextHolder.setTenantId(TenantId.DEFAULT.getId());
         // 按平台获取店铺资料对接的客户端类型
-        SyncOmsClient<?,?> shopProfileClient=shopProfileClientMap.get(salesPlatform);
-        if(shopProfileClient==null) {
-            log.error( salesPlatform.name() + " 店铺信息客户端未实现，请参考 ShopProfileClient 实现");
+        SyncOmsClient<?, ?> shopProfileClient = shopProfileClientMap.get(salesPlatform);
+        if (shopProfileClient == null) {
+            log.error(salesPlatform.name() + " Oms同步客户端未实现，请参考 SyncOmsClient 实现");
             return;
         }
 
         // 获取店铺信息
         List<?> shops = shopProfileClient.getShops();
 
-        if(CollectionUtils.isEmpty(shops)) {
+        if (CollectionUtils.isEmpty(shops)) {
             throw new RuntimeException("缺少店铺信息");
         }
 
         // 转换VO
-        ShopProfileDTO<List<?>> shopProfileDTO=new ShopProfileDTO<>(salesPlatform, SyncOmsType.SHOP,shops);
-        List<OmsShopDO> shopVOs= SalesPlatformToOmsConverter.convert(shopProfileDTO);
+        OmsProfileDTO<List<?>> omsProfileDTO = new OmsProfileDTO<>(salesPlatform, SyncOmsType.SHOP, shops);
+        List<OmsShopDO> shopVOs = SalesPlatformToOmsConverter.convert(omsProfileDTO, shopProfileClient);
 
 
         // 同步店铺资料
-        syncShops(salesPlatform,shopVOs);
+        syncShops(salesPlatform, shopVOs);
     }
 
 
     /**
      * 同步店铺资料
      **/
-    public void syncShops(SalesPlatform salesPlatform,List<OmsShopDO> shops) {
+    public void syncShops(SalesPlatform salesPlatform, List<OmsShopDO> shops) {
 
-        if(CollectionUtils.isEmpty(shops)) {
+        if (CollectionUtils.isEmpty(shops)) {
             throw new RuntimeException("缺少店铺信息");
         }
 
@@ -89,7 +75,7 @@ public class SyncShopsJob implements JobHandler {
         Map<String, OmsShopDO> existShopMap = Optional.ofNullable(existShops)
             .orElse(Collections.emptyList())
             .stream()
-            .collect(Collectors.toMap(omsShopDO->omsShopDO.getPlatformShopCode(), omsShopDO -> omsShopDO));
+            .collect(Collectors.toMap(omsShopDO -> omsShopDO.getPlatformShopCode(), omsShopDO -> omsShopDO));
 
         shops.forEach(shop -> {
             OmsShopDO existShop = existShopMap.get(shop.getPlatformShopCode());
@@ -102,14 +88,14 @@ public class SyncShopsJob implements JobHandler {
             }
         });
 
-        if(CollectionUtil.isNotEmpty(createShops)) {
+        if (CollectionUtil.isNotEmpty(createShops)) {
             omsShopService.saveBatch(createShops);
         }
 
         if (CollectionUtil.isNotEmpty(updateShops)) {
             omsShopService.updateBatchById(updateShops);
         }
-        log.info("sync shop profile success,salesPlatform:{},shopCount:{}",salesPlatform.name(),shops.size());
+        log.info("sync shop profile success,salesPlatform:{},shopCount:{}", salesPlatform.name(), shops.size());
     }
 
 }

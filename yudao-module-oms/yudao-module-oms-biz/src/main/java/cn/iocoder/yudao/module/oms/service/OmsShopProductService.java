@@ -1,31 +1,23 @@
 package cn.iocoder.yudao.module.oms.service;
 
-import java.util.*;
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsShopProductDO;
+import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * OMS店铺产品 Service 接口
  *
  * @author 索迈管理员
  */
-public interface OmsShopProductService {
+public interface OmsShopProductService extends IService<OmsShopProductDO> {
+
 
     /**
-    * 批量创建
-    **/
-    void batchCreate(List<OmsShopProductDO> listToCreate);
-
-    /**
-    * 批量更新
-    **/
-    void batchUpdate(List<OmsShopProductDO> listToUpdate);
-
-    /**
-     * 根据店铺编号查询产品
-     *
-     * @param id 店铺编号
-     * @return 产品
+     * @param platformCode 平台代码
+     * @Description: 通过平台代码获取店铺产品集合
+     * @return: @return {@link List }<{@link OmsShopProductDO }>
      */
-    List<OmsShopProductDO> selectByShopId(Long id);
+    List<OmsShopProductDO> getByPlatformCode(String platformCode);
 
 }

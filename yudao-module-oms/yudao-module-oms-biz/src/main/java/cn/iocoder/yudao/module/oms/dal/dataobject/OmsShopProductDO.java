@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.oms.dal.dataobject;
 
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+
 import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.*;
 
 /**
  * OMS店铺产品
@@ -27,14 +30,20 @@ public class OmsShopProductDO extends TenantBaseDO {
     private Long id;
 
     /**
-    * 店铺id
-    **/
+     * 店铺id
+     **/
     private Long shopId;
 
     /**
      * 平台sku
      **/
     private String platformCode;
+
+    /**
+     * 外部资源来源id，唯一标识
+     */
+    private String sourceId;
+
     /**
      * 店铺产品名称
      */

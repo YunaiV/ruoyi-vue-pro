@@ -1,21 +1,23 @@
 package com.somle.shopify.service;
 
 import cn.iocoder.yudao.framework.common.util.json.JSONArray;
-import com.fasterxml.jackson.databind.JsonNode;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import cn.iocoder.yudao.framework.common.util.web.RequestX;
 import cn.iocoder.yudao.framework.common.util.web.WebUtils;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.somle.shopify.enums.ShopifyAPI;
-import com.somle.shopify.model.reps.ShopifyShopRepsDTO;
 import com.somle.shopify.model.ShopifyToken;
+import com.somle.shopify.model.reps.ShopifyProductRepsVO;
+import com.somle.shopify.model.reps.ShopifyShopRepsVO;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
-import java.util.*;
-import lombok.extern.slf4j.Slf4j;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,16 +55,13 @@ public class ShopifyClient {
     /**
      * 获得店铺信息
      **/
-    public List<ShopifyShopRepsDTO> getShops() {
-        JSONObject shop=getResult(ShopifyAPI.GET_SHOP, new HashMap<>());
-        List<ShopifyShopRepsDTO> shops = new ArrayList<>();
-        shops.add(JsonUtilsX.parseObject(shop, ShopifyShopRepsDTO.class));
+    public List<ShopifyShopRepsVO> getShops() {
+        JSONObject shop = getResult(ShopifyAPI.GET_SHOP, new HashMap<>());
+        List<ShopifyShopRepsVO> shops = new ArrayList<>();
+        shops.add(JsonUtilsX.parseObject(shop, ShopifyShopRepsVO.class));
         return shops;
     }
-    public Integer getProductCount() {
-        JSONObject result=getRawResult(ShopifyAPI.GET_PRODUCT_COUNT, new HashMap<>());
-        return result.getInteger(ShopifyAPI.GET_PRODUCT_COUNT.jsonField());
-    }
+
 
     /**
      * 获得订单信息
@@ -72,7 +71,7 @@ public class ShopifyClient {
         var endpoint = "/admin/api/2024-10/orders.json?status=any";
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.GET)
-            .url(url+endpoint)
+            .url(url + endpoint)
             .headers(getHeaders())
             .build();
         var bodyString = sendRequest(request).body().string();
@@ -81,30 +80,16 @@ public class ShopifyClient {
     }
 
     /**
-     * 获得原始订单信息
-     **/
-    public JSONObject getRawOrders(Map<String,?> params) {
-        return getRawResult(ShopifyAPI.GET_ORDERS,params);
-    }
-
-    /**
      * 获得商品信息
      **/
-    public List<JSONObject> getProducts(Map<String,?> params) {
-        JSONArray productArr = getResult(ShopifyAPI.GET_PRODUCTS,params);
-        List<JSONObject> products = new ArrayList<>();
+    public List<ShopifyProductRepsVO> getProducts(Map<String, ?> params) {
+        JSONArray productArr = getResult(ShopifyAPI.GET_PRODUCTS, params);
+        List<ShopifyProductRepsVO> products = new ArrayList<>();
         for (JsonNode productNode : productArr) {
-            JSONObject productJson = new JSONObject(productNode);
-            products.add(productJson);
+            ShopifyProductRepsVO shopifyProductRepsVO = JsonUtilsX.parseObject(productNode, ShopifyProductRepsVO.class);
+            products.add(shopifyProductRepsVO);
         }
         return products;
-    }
-
-    /**
-     * 获得原始商品信息
-     **/
-    public JSONObject getRawProducts(Map<String,?> params) {
-        return getRawResult(ShopifyAPI.GET_PRODUCTS,params);
     }
 
 
@@ -116,7 +101,7 @@ public class ShopifyClient {
         var endpoint = "/admin/api/2024-10/shopify_payments/payouts.json";
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.GET)
-            .url(url+endpoint)
+            .url(url + endpoint)
             .headers(getHeaders())
             .build();
         var bodyString = sendRequest(request).body().string();
@@ -125,27 +110,18 @@ public class ShopifyClient {
     }
 
     /**
-     * 获得原始结算信息
-     **/
-    public JSONObject getRawPayouts(Map<String,?> params) {
-        return getRawResult(ShopifyAPI.GET_PAYOUTS,params);
-    }
-
-
-
-    /**
+     * @return 返回原始报文
      * @Author LeeFJ
      * @Description
      * @Date 8:19 2025/2/8
      * @Param
-     * @return  返回原始报文
      **/
-    private JSONObject getRawResult(ShopifyAPI api,Map<String,?> params) {
+    private JSONObject getRawResult(ShopifyAPI api, Map<String, ?> params) {
         Response response = null;
         try {
             var request = RequestX.builder()
                 .requestMethod(api.method())
-                .url(url+api.url())
+                .url(url + api.url())
                 .headers(getHeaders())
                 .queryParams(params)
                 .build();
@@ -156,22 +132,22 @@ public class ShopifyClient {
             log.error("{}异常", api.action(), t);
             return null;
         } finally {
-            if(response!=null) {
+            if (response != null) {
                 response.code();
             }
         }
     }
 
     /**
+     * @return 返回有效的业务报文
      * @Author LeeFJ
      * @Description
      * @Date 8:19 2025/2/8
      * @Param
-     * @return  返回有效的业务报文
      **/
-    private <T> T getResult(ShopifyAPI api, Map<String,?> params) {
-        var result = getRawResult(api,params);
-        if(result==null) {
+    private <T> T getResult(ShopifyAPI api, Map<String, ?> params) {
+        var result = getRawResult(api, params);
+        if (result == null) {
             return null;
         }
         return (T) api.getData(result, api.returnType());
