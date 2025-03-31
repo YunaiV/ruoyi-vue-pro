@@ -3,8 +3,8 @@
 FROM eclipse-temurin:21-jre
 
 ## 创建目录，并使用它作为工作目录
-RUN mkdir -p /word
-WORKDIR /word
+RUN mkdir -p /work
+WORKDIR /work
 ## 将后端项目的 Jar 文件，复制到镜像中
 COPY ./target/*.jar app.jar
 
