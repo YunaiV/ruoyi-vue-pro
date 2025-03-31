@@ -33,7 +33,7 @@ public interface SrmOrderConvert {
      * 让采购项关联申请项 采购项:申请项 N:1
      *
      * @param itemDO          采购项
-     * @param requestItemsMap ?
+     * @param requestItemsMap 申请项Map key:申请项id value:申请项
      * @param itemDOMap       采购项Map
      * @return 采购订单的入参reqVO的item
      */
@@ -50,7 +50,7 @@ public interface SrmOrderConvert {
         //申请项id
         item.setPurchaseApplyItemId(itemDO.getId());
         // 设置下单数量(采购) == 申请项批准数量
-        item.setCount(itemDO.getApproveCount());
+        item.setCount(reqVO.getOrderQuantity()); //合并时vo -> 数量
         //价税合计
         item.setDeliveryTime(itemDO.getExpectArrivalDate());//交货日期 -> 期望到货日期
         return item;
