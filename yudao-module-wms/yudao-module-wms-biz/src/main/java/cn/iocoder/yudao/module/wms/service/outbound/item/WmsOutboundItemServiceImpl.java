@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
-import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.ErpProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemSaveReqVO;
@@ -121,9 +121,9 @@ public class WmsOutboundItemServiceImpl implements WmsOutboundItemService {
     @Override
     public void assembleProducts(List<WmsOutboundItemRespVO> itemList) {
         Map<Long, ErpProductDTO> productDTOMap = productApi.getProductMap(StreamX.from(itemList).map(WmsOutboundItemRespVO::getProductId).toList());
-        Map<Long, ErpProductRespSimpleVO> productVOMap = new HashMap<>();
+        Map<Long, WmsProductRespSimpleVO> productVOMap = new HashMap<>();
         for (ErpProductDTO productDTO : productDTOMap.values()) {
-            ErpProductRespSimpleVO productVO = BeanUtils.toBean(productDTO, ErpProductRespSimpleVO.class);
+            WmsProductRespSimpleVO productVO = BeanUtils.toBean(productDTO, WmsProductRespSimpleVO.class);
             productVOMap.put(productDTO.getId(), productVO);
         }
         StreamX.from(itemList).assemble(productVOMap, WmsOutboundItemRespVO::getProductId, WmsOutboundItemRespVO::setProduct);

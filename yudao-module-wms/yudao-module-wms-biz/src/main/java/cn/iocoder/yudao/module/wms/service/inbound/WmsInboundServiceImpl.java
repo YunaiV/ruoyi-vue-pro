@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
+import cn.iocoder.yudao.module.wms.config.InboundStateMachineConfigure;
 import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
 import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
@@ -67,7 +68,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     @Lazy
     private WmsInboundItemService inboundItemService;
 
-    @Resource(name = InboundTransitions.STATE_MACHINE_NAME)
+    @Resource(name = InboundStateMachineConfigure.STATE_MACHINE_NAME)
     private StateMachineWrapper<Integer, WmsInboundAuditStatus.Event, WmsInboundDO> inboundStateMachine;
 
     /**

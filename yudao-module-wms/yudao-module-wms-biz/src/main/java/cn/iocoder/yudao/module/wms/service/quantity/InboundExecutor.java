@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.wms.service.quantity;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
-import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.ErpProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
@@ -45,7 +45,7 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
             Long deptId = inboundDeptId;
             // 如果入库单上未指定部门,默认按产品的部门ID
             if (deptId == null) {
-                ErpProductRespSimpleVO productVO = item.getProduct();
+                WmsProductRespSimpleVO productVO = item.getProduct();
                 deptId = productVO.getDeptId();
             }
             // 如果实际量未填，则按计划量入库

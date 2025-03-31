@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo;
 
-import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.ErpProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import java.util.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import com.alibaba.excel.annotation.*;
@@ -95,5 +94,5 @@ public class WmsStockWarehouseRespVO {
     private WmsWarehouseSimpleRespVO warehouse;
 
     @Schema(description = "产品", example = "")
-    private ErpProductRespSimpleVO product;
+    private WmsProductRespSimpleVO product;
 }

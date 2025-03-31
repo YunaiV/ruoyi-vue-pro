@@ -1,0 +1,78 @@
+package cn.iocoder.yudao.module.wms.config;
+
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
+import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
+import cn.iocoder.yudao.module.wms.service.inbound.transition.BaseInboundTransition;
+import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
+import cn.iocoder.yudao.module.wms.statemachine.ColaTransition;
+import cn.iocoder.yudao.module.wms.statemachine.StateMachineConfigure;
+import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
+import com.alibaba.cola.statemachine.builder.FailCallback;
+import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
+import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
+
+/**
+ * @author: LeeFJ
+ * @date: 2025/3/19 10:00
+ * @description: 入库单状态机与动作配置
+ */
+@Slf4j
+@Configuration
+public class InboundStateMachineConfigure implements StateMachineConfigure<Integer, WmsInboundAuditStatus.Event, ColaContext<WmsInboundDO>>, FailCallback<Integer, WmsInboundAuditStatus.Event, ColaContext<WmsInboundDO>> {
+
+    /**
+     * 状态机名称
+     **/
+    public static final String STATE_MACHINE_NAME = "inboundActionStateMachine";
+
+    /**
+     * 创建与配置状态机
+     **/
+    @Bean(InboundStateMachineConfigure.STATE_MACHINE_NAME)
+    public StateMachineWrapper<Integer, WmsInboundAuditStatus.Event, WmsInboundDO> inboundActionStateMachine() {
+        // 创建状态机构建器
+        StateMachineBuilder<Integer, WmsInboundAuditStatus.Event, ColaContext<WmsInboundDO>> builder = StateMachineBuilderFactory.create();
+        // 初始化状态机状态
+        List<ColaTransition<Integer, WmsInboundAuditStatus.Event, ColaContext<WmsInboundDO>>> colaTransitions = this.initActions(builder, BaseInboundTransition.class, this);
+        // 创建状态机
+        StateMachineWrapper<Integer, WmsInboundAuditStatus.Event, WmsInboundDO> machine = new StateMachineWrapper<>(builder.build(InboundStateMachineConfigure.STATE_MACHINE_NAME), colaTransitions, WmsInboundDO::getAuditStatus);
+        // 设置允许的基本操作
+        // machine.setInitStatus(WmsInboundAuditStatus.DRAFT.getValue());
+        // machine.setStatusCanEdit(Arrays.asList(WmsInboundAuditStatus.DRAFT.getValue(), WmsInboundAuditStatus.REJECT.getValue()));
+        // machine.setStatusCanDelete(Arrays.asList(WmsInboundAuditStatus.DRAFT.getValue(), WmsInboundAuditStatus.REJECT.getValue()));
+        return machine;
+    }
+
+
+    /**
+     * 状态机失败情况的处理
+     **/
+    @Override
+    public void onFail(Integer from, WmsInboundAuditStatus.Event event, ColaContext<WmsInboundDO> context) {
+        // 当前状态
+        WmsInboundAuditStatus currStatus= WmsInboundAuditStatus.parse(context.data().getAuditStatus());
+        if (currStatus == null) {
+            throw exception(INBOUND_STATUS_PARSE_ERROR);
+        }
+        // 目标状态
+        Integer to = context.getTo(from, event);
+        WmsInboundAuditStatus toStatus = WmsInboundAuditStatus.parse(to);
+        if (toStatus == null) {
+            throw exception(INBOUND_STATUS_PARSE_ERROR);
+        }
+        // 组装消息
+        throw exception(INBOUND_AUDIT_FAIL, currStatus.getLabel(), toStatus.getLabel(), event.getLabel());
+    }
+
+
+
+
+}

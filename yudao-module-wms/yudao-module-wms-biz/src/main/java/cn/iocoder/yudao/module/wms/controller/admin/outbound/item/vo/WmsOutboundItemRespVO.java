@@ -5,7 +5,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import com.alibaba.excel.annotation.*;
-import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.ErpProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -48,7 +48,7 @@ public class WmsOutboundItemRespVO {
 
     @Schema(description = "产品", example = "")
     @ExcelProperty("产品")
-    private ErpProductRespSimpleVO product;
+    private WmsProductRespSimpleVO product;
 
     @Schema(description = "出库单", example = "")
     @ExcelProperty("出库单")

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo;
+package cn.iocoder.yudao.module.wms.controller.admin.product;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
@@ -12,7 +12,7 @@ import lombok.Data;
 @Schema(description = "管理后台 - ERP 产品 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class ErpProductRespSimpleVO extends BaseDO {
+public class WmsProductRespSimpleVO extends BaseDO {
 
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "731")
     @ExcelProperty("产品编号")

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.quantity;
 
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
-import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.ErpProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
@@ -77,7 +77,7 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
             Long deptId = outboundDeptId;
             // 如果入库单上未指定部门,默认按产品的部门ID
             if (deptId == null) {
-                ErpProductRespSimpleVO productVO = item.getProduct();
+                WmsProductRespSimpleVO productVO = item.getProduct();
                 deptId = productVO.getDeptId();
             }
             // 执行入库的原子操作
