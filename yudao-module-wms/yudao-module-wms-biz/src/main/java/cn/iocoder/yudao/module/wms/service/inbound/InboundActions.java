@@ -43,10 +43,6 @@ public class InboundActions implements StateMachineConfigure<Integer, WmsInbound
      * 状态机名称
      **/
     public static final String STATE_MACHINE_NAME = "inboundActionStateMachine";
-    /**
-     * 错误消息
-     **/
-    public static final String AUDIT_ERROR_MESSAGE = "审核错误，当前入库单状态为%s，在%s状态时才允许%s";
 
     /**
      * 提交
@@ -187,8 +183,7 @@ public class InboundActions implements StateMachineConfigure<Integer, WmsInbound
         List<WmsInboundAuditStatus> fromAuditStatusList = WmsInboundAuditStatus.parse(fromList);
         String fromAuditStatusNames = StrUtils.join(StreamX.from(fromAuditStatusList).toSet(WmsInboundAuditStatus::getLabel));
         // 组装消息
-        String message=String.format(AUDIT_ERROR_MESSAGE,currStatus.getLabel(),fromAuditStatusNames,event.getLabel());
-        throw exception(INBOUND_AUDIT_ERROR,message);
+        throw exception(INBOUND_AUDIT_FAIL,currStatus.getLabel(),fromAuditStatusNames,event.getLabel());
     }
 
     /**

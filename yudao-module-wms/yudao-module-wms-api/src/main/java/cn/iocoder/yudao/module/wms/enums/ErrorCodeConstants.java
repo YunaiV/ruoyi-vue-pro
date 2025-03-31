@@ -49,6 +49,10 @@ public interface ErrorCodeConstants {
     ErrorCode INBOUND_ABANDON_NOT_ALLOWED = new ErrorCode(2_001_004_023, "入库单不允许废弃");
     ErrorCode INBOUND_FORCE_FINISH_NOT_ALLOWED = new ErrorCode(2_001_004_024, "入库单不允许强制完成");
 
+    ErrorCode INBOUND_AUDIT_FAIL = new ErrorCode(2_001_004_025, "审核错误，当前入库单状态为{}，在{}状态时才允许{}");
+
+
+
 
 
     // ========== WMS_INBOUND_ITEM 入库单详情表 2_001_005_000 ==========
@@ -139,6 +143,7 @@ public interface ErrorCodeConstants {
     ErrorCode OUTBOUND_ITEM_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_014_006, "出库单详情不符合审批条件");
     ErrorCode OUTBOUND_WAREHOUSE_ERROR = new ErrorCode(2_001_014_007, "出库仓库错误");
     ErrorCode OUTBOUND_AUDIT_ERROR = new ErrorCode(2_001_014_008, "出库单审批状态错误");
+    ErrorCode OUTBOUND_AUDIT_FAIL = new ErrorCode(2_001_014_009, "审核错误，当前出库单状态为%s，在%s状态时才允许%s");
 
     // ========== WMS_OUTBOUND 出库单 2_001_015_000 ==========
     ErrorCode OUTBOUND_NOT_EXISTS = new ErrorCode(2_001_015_001, "出库单不存在");

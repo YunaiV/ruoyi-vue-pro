@@ -28,6 +28,7 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_AUDIT_ERROR;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_AUDIT_FAIL;
 
 /**
  * @author: LeeFJ
@@ -42,10 +43,6 @@ public class OutboundActions implements StateMachineConfigure<Integer, WmsOutbou
      * 状态机名称
      **/
     public static final String STATE_MACHINE_NAME = "outboundActionStateMachine";
-    /**
-     * 错误消息
-     **/
-    public static final String AUDIT_ERROR_MESSAGE = "审核错误，当前出库单状态为%s，在%s状态时才允许%s";
 
     /**
      * 提交
@@ -170,9 +167,7 @@ public class OutboundActions implements StateMachineConfigure<Integer, WmsOutbou
         List<WmsOutboundAuditStatus> fromAuditStatusList = WmsOutboundAuditStatus.parse(fromList);
         String fromAuditStatusNames = StrUtils.join(StreamX.from(fromAuditStatusList).toSet(WmsOutboundAuditStatus::getLabel));
         // 组装消息
-        String message=String.format(AUDIT_ERROR_MESSAGE,currStatus.getLabel(),fromAuditStatusNames,event.getLabel());
-        throw exception(OUTBOUND_AUDIT_ERROR,message);
-
+        throw exception(OUTBOUND_AUDIT_FAIL,currStatus.getLabel(),fromAuditStatusNames,event.getLabel());
     }
 
     /**
