@@ -40,21 +40,19 @@ public interface SrmOrderConvert {
     default SrmPurchaseOrderSaveReqVO.Item convertToErpPurchaseOrderSaveReqVOItem(SrmPurchaseRequestItemsDO itemDO, Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> requestItemsMap, Map<Long, SrmPurchaseRequestItemsDO> itemDOMap) {
         SrmPurchaseOrderSaveReqVO.Item item = new SrmPurchaseOrderSaveReqVO.Item();
         //SrmPurchaseRequestItemsDO ->  SrmPurchaseOrderSaveReqVO.Item
-        BeanUtil.copyProperties(itemDOMap.get(itemDO.getId()), item);
+        SrmPurchaseRequestItemsDO requestItemsDO = itemDOMap.get(itemDO.getId());
+        BeanUtil.copyProperties(requestItemsDO, item);
+        SrmPurchaseRequestMergeReqVO.requestItems reqVO = requestItemsMap.get(itemDO.getId());
+        BeanUtil.copyProperties(reqVO, item);
         item.setId(null);
-        // 设置产品ID
-        item.setProductId(itemDO.getProductId());
-        item.setProductPrice(itemDO.getActTaxPrice());
-        //采购订单的申请数量
         //产品项
+        item.setPurchaseApplyItemId(itemDO.getId());
+        //申请项id
         item.setPurchaseApplyItemId(itemDO.getId());
         // 设置下单数量(采购) == 申请项批准数量
         item.setCount(itemDO.getApproveCount());
         //价税合计
-        item.setProductPrice(itemDO.getActTaxPrice());//含税单价 -> 产品单价
         item.setDeliveryTime(itemDO.getExpectArrivalDate());//交货日期 -> 期望到货日期
-        //申请项id
-        item.setPurchaseApplyItemId(itemDO.getId());
         return item;
     }
 
