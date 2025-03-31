@@ -67,7 +67,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     @Lazy
     private WmsInboundItemService inboundItemService;
 
-    @Resource(name = InboundActions.STATE_MACHINE_NAME)
+    @Resource(name = InboundTransitions.STATE_MACHINE_NAME)
     private StateMachineWrapper<Integer, WmsInboundAuditStatus.Event, WmsInboundDO> inboundStateMachine;
 
     /**
@@ -79,7 +79,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         // 设置单据号
         String no = noRedisDAO.generate(WmsNoRedisDAO.INBOUND_NO_PREFIX, INBOUND_NOT_EXISTS);
         createReqVO.setNo(no);
-        createReqVO.setAuditStatus(inboundStateMachine.getInitStatus());
+        createReqVO.setAuditStatus(WmsInboundAuditStatus.DRAFT.getValue());
         createReqVO.setInboundStatus(WmsInboundStatus.NONE.getValue());
         if (inboundMapper.getByNo(createReqVO.getNo()) != null) {
             throw exception(INBOUND_NO_DUPLICATE);
@@ -128,7 +128,8 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         // 校验存在
         WmsInboundDO exists = validateInboundExists(updateReqVO.getId());
         // 判断是否允许编辑
-        if (!inboundStateMachine.canEdit(exists.getAuditStatus())) {
+        WmsInboundAuditStatus auditStatus= WmsInboundAuditStatus.parse(exists.getAuditStatus());
+        if (!auditStatus.matchAny(WmsInboundAuditStatus.DRAFT, WmsInboundAuditStatus.REJECT)) {
             throw exception(INBOUND_CAN_NOT_EDIT);
         }
         // 单据号不允许被修改
@@ -193,7 +194,8 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         // 校验存在
         WmsInboundDO inbound = validateInboundExists(id);
         // 判断是否允许删除
-        if (!inboundStateMachine.canDelete(inbound.getAuditStatus())) {
+        WmsInboundAuditStatus auditStatus= WmsInboundAuditStatus.parse(inbound.getAuditStatus());
+        if (!auditStatus.matchAny(WmsInboundAuditStatus.DRAFT, WmsInboundAuditStatus.REJECT)) {
             throw exception(INBOUND_CAN_NOT_EDIT);
         }
         // 唯一索引去重

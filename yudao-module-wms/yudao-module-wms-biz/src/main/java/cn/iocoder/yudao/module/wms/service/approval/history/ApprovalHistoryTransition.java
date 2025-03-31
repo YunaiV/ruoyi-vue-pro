@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.approval.history;
 
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.wms.statemachine.ColaAction;
+import cn.iocoder.yudao.module.wms.statemachine.ColaTransition;
 import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalHistorySaveReqVO;
 import jakarta.annotation.Resource;
@@ -14,13 +14,13 @@ import java.util.function.Function;
  * @date: 2025/3/19 10:10
  * @description:
  */
-public abstract class ApprovalHistoryAction<E,D> extends ColaAction<Integer, E,D> {
+public abstract class ApprovalHistoryTransition<E,D> extends ColaTransition<Integer, E,D> {
 
     @Resource
     @Lazy
     protected WmsApprovalHistoryService approvalHistoryService;
 
-    public ApprovalHistoryAction(Integer[] from, Integer to, Function<D, Integer> getter, E event) {
+    public ApprovalHistoryTransition(Integer[] from, Integer to, Function<D, Integer> getter, E event) {
         super(from, to, getter, event);
     }
     /**

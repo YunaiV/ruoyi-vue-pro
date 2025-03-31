@@ -15,7 +15,7 @@ import java.util.function.Function;
  * @param <D> 数据对象
  */
 @Getter
-public abstract class ColaAction<S, E, D>  {
+public abstract class ColaTransition<S, E, D>  {
 
 
     /**
@@ -23,14 +23,14 @@ public abstract class ColaAction<S, E, D>  {
      * @param <D> 数据对象
      */
     public static class ColaActionWhen<D> implements Condition<ColaContext<D>> {
-        private final ColaAction<?,?,D> colaAction;
-        public ColaActionWhen(ColaAction<?,?,D> colaAction) {
-            this.colaAction=colaAction;
+        private final ColaTransition<?,?,D> colaTransition;
+        public ColaActionWhen(ColaTransition<?,?,D> colaTransition) {
+            this.colaTransition = colaTransition;
         }
 
         @Override
         public boolean isSatisfied(ColaContext<D> context) {
-            boolean when=colaAction.when(context);
+            boolean when= colaTransition.when(context);
             context.isSatisfied(true);
             return when;
         }
@@ -41,15 +41,15 @@ public abstract class ColaAction<S, E, D>  {
      * 承接状态机动作
      **/
     private static class ColaActionPerform<S, E, D> implements Action<S, E, ColaContext<D>> {
-        private final ColaAction<S,E,D> colaAction;
-        public ColaActionPerform(ColaAction<S,E,D> colaAction) {
-            this.colaAction=colaAction;
+        private final ColaTransition<S,E,D> colaTransition;
+        public ColaActionPerform(ColaTransition<S,E,D> colaTransition) {
+            this.colaTransition = colaTransition;
         }
 
 
         @Override
         public void execute(S from, S to, E event, ColaContext<D> context) {
-            this.colaAction.perform(from, to, event, context);
+            this.colaTransition.perform(from, to, event, context);
             context.isPerformed(true);
         }
     }
@@ -76,7 +76,7 @@ public abstract class ColaAction<S, E, D>  {
     private Function<D,S> getter;
 
 
-    public ColaAction(S[] from, S to, Function<D,S> getter, E event) {
+    public ColaTransition(S[] from, S to, Function<D,S> getter, E event) {
         this.from = from;
         this.to = to;
         this.event = event;
@@ -99,7 +99,9 @@ public abstract class ColaAction<S, E, D>  {
     /**
      * 在子类中实现条件判断
      **/
-    public abstract boolean when(ColaContext<D> context);
+    public boolean when(ColaContext<D> context) {
+        return true;
+    }
 
     /**
      * 在子类中实现业务动作

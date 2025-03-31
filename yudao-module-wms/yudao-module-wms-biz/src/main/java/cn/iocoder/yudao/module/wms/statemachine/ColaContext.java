@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.statemachine;
 
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -134,5 +135,7 @@ public class ColaContext<T> {
         }
     }
 
-
+    public <S,E> S getTo(S from, E event) {
+        return (S)stateMachineWrapper.getTo(from,event);
+    }
 }

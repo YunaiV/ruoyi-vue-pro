@@ -71,6 +71,7 @@ public interface ErrorCodeConstants {
     ErrorCode INBOUND_ITEM_FLOW_CAN_NOT_EDIT = new ErrorCode(2_001_006_003, "入库单库存详情扣减不允许编辑");
     ErrorCode INBOUND_ITEM_FLOW_CAN_NOT_DELETE = new ErrorCode(2_001_006_004, "入库单库存详情扣减不允许删除");
     ErrorCode INBOUND_ITEM_FLOW_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_006_005, "入库单库存详情扣减不符合审批条件");
+    ErrorCode INBOUND_STATUS_PARSE_ERROR = new ErrorCode(2_001_006_006, "无法完成入库单状态转换");
 
     // ========== WMS_APPROVAL_HISTORY 审批历史表 2_001_007_000 ==========
     ErrorCode APPROVAL_HISTORY_NOT_EXISTS = new ErrorCode(2_001_007_001, "审批历史不存在");
@@ -134,6 +135,7 @@ public interface ErrorCodeConstants {
     ErrorCode PICKUP_ITEM_QTY_ERROR = new ErrorCode(2_001_013_009, "拣货数量错误");
 
 
+
     // ========== WMS_OUTBOUND_ITEM 出库单详情表 2_001_014_000 ==========
     ErrorCode OUTBOUND_ITEM_NOT_EXISTS = new ErrorCode(2_001_014_001, "出库单详情不存在");
     ErrorCode OUTBOUND_ITEM_OUTBOUND_ID_PRODUCT_ID_DUPLICATE = new ErrorCode(2_001_014_002, "入库单ID,标准产品ID已存在");
@@ -157,5 +159,9 @@ public interface ErrorCodeConstants {
     ErrorCode OUTBOUND_ITEM_OUTBOUND_ID_DUPLICATE = new ErrorCode(2_001_015_008, "详情不是一个出库单");
     ErrorCode OUTBOUND_ITEM_PLAN_QTY_ERROR = new ErrorCode(2_001_015_009, "计划出库量错误");
     ErrorCode OUTBOUND_ITEM_ACTUAL_QTY_ERROR = new ErrorCode(2_001_015_010, "实际出库量错误");
+    ErrorCode OUTBOUND_STATUS_PARSE_ERROR = new ErrorCode(2_001_015_011, "无法完成出库单状态转换");
+
+
+
 
 }

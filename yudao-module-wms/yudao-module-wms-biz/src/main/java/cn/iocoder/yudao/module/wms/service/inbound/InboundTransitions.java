@@ -1,16 +1,15 @@
 package cn.iocoder.yudao.module.wms.service.inbound;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.common.util.collection.StreamX;
-import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
-import cn.iocoder.yudao.module.wms.service.approval.history.ApprovalHistoryAction;
+import cn.iocoder.yudao.module.wms.service.approval.history.ApprovalHistoryTransition;
 import cn.iocoder.yudao.module.wms.service.quantity.InboundExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.context.InboundContext;
 import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
+import cn.iocoder.yudao.module.wms.statemachine.ColaTransition;
 import cn.iocoder.yudao.module.wms.statemachine.StateMachineConfigure;
 import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
 import com.alibaba.cola.statemachine.builder.FailCallback;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
@@ -37,7 +35,7 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
  */
 @Slf4j
 @Configuration
-public class InboundActions implements StateMachineConfigure<Integer, WmsInboundAuditStatus.Event, ColaContext<WmsInboundDO>>,FailCallback<Integer, WmsInboundAuditStatus.Event, ColaContext<WmsInboundDO>> {
+public class InboundTransitions implements StateMachineConfigure<Integer, WmsInboundAuditStatus.Event, ColaContext<WmsInboundDO>>, FailCallback<Integer, WmsInboundAuditStatus.Event, ColaContext<WmsInboundDO>> {
 
     /**
      * 状态机名称
@@ -48,11 +46,21 @@ public class InboundActions implements StateMachineConfigure<Integer, WmsInbound
      * 提交
      **/
     @Component
-    public static class SubmitAction extends BaseInboundAction {
+    public static class SubmitTransition extends BaseInboundTransition {
 
-        public SubmitAction() {
-            // 指定事件以及前后的状态与状态值提取器
-            super(new Integer[]{WmsInboundAuditStatus.DRAFT.getValue(), WmsInboundAuditStatus.REJECT.getValue()}, WmsInboundAuditStatus.AUDITING.getValue(), WmsInboundAuditStatus.Event.SUBMIT);
+        public SubmitTransition() {
+            // 指定事件以及前后的状态
+            super(
+                // from
+                new WmsInboundAuditStatus[]{
+                    WmsInboundAuditStatus.DRAFT,
+                    WmsInboundAuditStatus.REJECT
+                },
+                // to
+                WmsInboundAuditStatus.AUDITING,
+                // event
+                WmsInboundAuditStatus.Event.SUBMIT
+            );
         }
 
         @Override
@@ -70,14 +78,21 @@ public class InboundActions implements StateMachineConfigure<Integer, WmsInbound
      * 同意
      **/
     @Component
-    public static class AgreeAction extends BaseInboundAction {
+    public static class AgreeTransition extends BaseInboundTransition {
 
         @Resource
         private InboundExecutor inboundExecutor;
 
-        public AgreeAction() {
-            // 指定事件以及前后的状态与状态值提取器
-            super(WmsInboundAuditStatus.AUDITING.getValue(), WmsInboundAuditStatus.PASS.getValue(), WmsInboundAuditStatus.Event.AGREE);
+        public AgreeTransition() {
+            // 指定事件以及前后的状态
+            super(
+                // from
+                WmsInboundAuditStatus.AUDITING,
+                // to
+                WmsInboundAuditStatus.PASS,
+                // event
+                WmsInboundAuditStatus.Event.AGREE
+            );
         }
 
         @Override
@@ -96,10 +111,17 @@ public class InboundActions implements StateMachineConfigure<Integer, WmsInbound
      * 强制完成
      **/
     @Component
-    public static class ForceFinishAction extends BaseInboundAction {
-        public ForceFinishAction() {
-            // 指定事件以及前后的状态与状态值提取器
-            super(WmsInboundAuditStatus.AUDITING.getValue(), WmsInboundAuditStatus.REJECT.getValue(), WmsInboundAuditStatus.Event.FORCE_FINISH);
+    public static class ForceFinishTransition extends BaseInboundTransition {
+        public ForceFinishTransition() {
+            // 指定事件以及前后的状态
+            super(
+                // from
+                WmsInboundAuditStatus.AUDITING,
+                // to
+                WmsInboundAuditStatus.REJECT,
+                // event
+                WmsInboundAuditStatus.Event.FORCE_FINISH
+            );
         }
 
         @Override
@@ -117,10 +139,17 @@ public class InboundActions implements StateMachineConfigure<Integer, WmsInbound
      * 拒绝
      **/
     @Component
-    public static class RejectAction extends BaseInboundAction {
-        public RejectAction() {
-            // 指定事件以及前后的状态与状态值提取器
-            super(WmsInboundAuditStatus.AUDITING.getValue(), WmsInboundAuditStatus.REJECT.getValue(), WmsInboundAuditStatus.Event.REJECT);
+    public static class RejectTransition extends BaseInboundTransition {
+        public RejectTransition() {
+            // 指定事件以及前后的状态
+            super(
+                // from
+                WmsInboundAuditStatus.AUDITING,
+                // to
+                WmsInboundAuditStatus.REJECT,
+                // event
+                WmsInboundAuditStatus.Event.REJECT
+            );
         }
     }
 
@@ -129,14 +158,21 @@ public class InboundActions implements StateMachineConfigure<Integer, WmsInbound
      * 作废
      **/
     @Component
-    public static class AbandonAction extends BaseInboundAction {
-        public AbandonAction() {
-            // 指定事件以及前后的状态与状态值提取器
-            super(new Integer[] {
-                WmsInboundAuditStatus.DRAFT.getValue(),
-                WmsInboundAuditStatus.REJECT.getValue(),
-                WmsInboundAuditStatus.AUDITING.getValue()
-            }, WmsInboundAuditStatus.ABANDONED.getValue(), WmsInboundAuditStatus.Event.REJECT);
+    public static class AbandonTransition extends BaseInboundTransition {
+        public AbandonTransition() {
+            // 指定事件以及前后的状态
+            super(
+                // from
+                new WmsInboundAuditStatus[]{
+                    WmsInboundAuditStatus.DRAFT,
+                    WmsInboundAuditStatus.REJECT,
+                    WmsInboundAuditStatus.AUDITING
+                },
+                // to
+                WmsInboundAuditStatus.ABANDONED,
+                // event
+                WmsInboundAuditStatus.Event.REJECT
+            );
         }
 
         @Override
@@ -153,20 +189,18 @@ public class InboundActions implements StateMachineConfigure<Integer, WmsInbound
     /**
      * 创建与配置状态机
      **/
-    @Bean(InboundActions.STATE_MACHINE_NAME)
+    @Bean(InboundTransitions.STATE_MACHINE_NAME)
     public StateMachineWrapper<Integer, WmsInboundAuditStatus.Event, WmsInboundDO> inboundActionStateMachine() {
         // 创建状态机构建器
         StateMachineBuilder<Integer, WmsInboundAuditStatus.Event, ColaContext<WmsInboundDO>> builder = StateMachineBuilderFactory.create();
         // 初始化状态机状态
-        Map<Integer, List<Integer>> conditionMap = this.initActions(builder, BaseInboundAction.class,this);
+        List<ColaTransition<Integer, WmsInboundAuditStatus.Event, ColaContext<WmsInboundDO>>> colaTransitions = this.initActions(builder, BaseInboundTransition.class, this);
         // 创建状态机
-        StateMachineWrapper<Integer, WmsInboundAuditStatus.Event, WmsInboundDO> machine=new StateMachineWrapper<>(builder.build(InboundActions.STATE_MACHINE_NAME), WmsInboundDO::getAuditStatus);
+        StateMachineWrapper<Integer, WmsInboundAuditStatus.Event, WmsInboundDO> machine = new StateMachineWrapper<>(builder.build(InboundTransitions.STATE_MACHINE_NAME), colaTransitions, WmsInboundDO::getAuditStatus);
         // 设置允许的基本操作
-        machine.setInitStatus(WmsInboundAuditStatus.DRAFT.getValue());
-        machine.setStatusCanEdit(Arrays.asList(WmsInboundAuditStatus.DRAFT.getValue(), WmsInboundAuditStatus.REJECT.getValue()));
-        machine.setStatusCanDelete(Arrays.asList(WmsInboundAuditStatus.DRAFT.getValue(), WmsInboundAuditStatus.REJECT.getValue()));
-        // 设置状态地图
-        machine.setConditionMap(conditionMap);
+        // machine.setInitStatus(WmsInboundAuditStatus.DRAFT.getValue());
+        // machine.setStatusCanEdit(Arrays.asList(WmsInboundAuditStatus.DRAFT.getValue(), WmsInboundAuditStatus.REJECT.getValue()));
+        // machine.setStatusCanDelete(Arrays.asList(WmsInboundAuditStatus.DRAFT.getValue(), WmsInboundAuditStatus.REJECT.getValue()));
         return machine;
     }
 
@@ -175,32 +209,37 @@ public class InboundActions implements StateMachineConfigure<Integer, WmsInbound
      * 状态机失败情况的处理
      **/
     @Override
-    public void onFail(Integer to, WmsInboundAuditStatus.Event event, ColaContext<WmsInboundDO> context) {
+    public void onFail(Integer from, WmsInboundAuditStatus.Event event, ColaContext<WmsInboundDO> context) {
         // 当前状态
         WmsInboundAuditStatus currStatus= WmsInboundAuditStatus.parse(context.data().getAuditStatus());
-        // 允许的可审批状态
-        List<Integer> fromList = context.getStateMachineWrapper().getFroms(to);
-        List<WmsInboundAuditStatus> fromAuditStatusList = WmsInboundAuditStatus.parse(fromList);
-        String fromAuditStatusNames = StrUtils.join(StreamX.from(fromAuditStatusList).toSet(WmsInboundAuditStatus::getLabel));
+        if (currStatus == null) {
+            throw exception(INBOUND_STATUS_PARSE_ERROR);
+        }
+        // 目标状态
+        Integer to = context.getTo(from, event);
+        WmsInboundAuditStatus toStatus = WmsInboundAuditStatus.parse(to);
+        if (toStatus == null) {
+            throw exception(INBOUND_STATUS_PARSE_ERROR);
+        }
         // 组装消息
-        throw exception(INBOUND_AUDIT_FAIL,currStatus.getLabel(),fromAuditStatusNames,event.getLabel());
+        throw exception(INBOUND_AUDIT_FAIL, currStatus.getLabel(), toStatus.getLabel(), event.getLabel());
     }
 
     /**
      * InboundAction 基类
      **/
-    public static class BaseInboundAction extends ApprovalHistoryAction<WmsInboundAuditStatus.Event, WmsInboundDO> {
+    public static class BaseInboundTransition extends ApprovalHistoryTransition<WmsInboundAuditStatus.Event, WmsInboundDO> {
 
         @Resource
         @Lazy
         protected WmsInboundService inboundService;
 
-        public BaseInboundAction(Integer[] from, Integer to, WmsInboundAuditStatus.Event event) {
-            super(from, to, WmsInboundDO::getAuditStatus, event);
+        public BaseInboundTransition(WmsInboundAuditStatus[] from, WmsInboundAuditStatus to, WmsInboundAuditStatus.Event event) {
+            super(Arrays.stream(from).map(WmsInboundAuditStatus::getValue).toArray(Integer[]::new), to.getValue(), WmsInboundDO::getAuditStatus, event);
         }
 
-        public BaseInboundAction(Integer from, Integer to, WmsInboundAuditStatus.Event event) {
-            super(new Integer[]{from}, to, WmsInboundDO::getAuditStatus, event);
+        public BaseInboundTransition(WmsInboundAuditStatus from, WmsInboundAuditStatus to, WmsInboundAuditStatus.Event event) {
+            super(new Integer[]{from.getValue()}, to.getValue(), WmsInboundDO::getAuditStatus, event);
         }
 
         /**

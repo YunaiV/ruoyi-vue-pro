@@ -70,7 +70,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     @Lazy
     private WmsStockBinService stockBinService;
 
-    @Resource(name = OutboundActions.STATE_MACHINE_NAME)
+    @Resource(name = OutboundTransitions.STATE_MACHINE_NAME)
     private StateMachineWrapper<Integer, WmsOutboundAuditStatus.Event, WmsOutboundDO> outboundStateMachine;
 
     /**
@@ -81,7 +81,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     public WmsOutboundDO createOutbound(WmsOutboundSaveReqVO createReqVO) {
         // 设置单据号
         String no = noRedisDAO.generate(WmsNoRedisDAO.OUTBOUND_NO_PREFIX, OUTBOUND_NOT_EXISTS);
-        createReqVO.setAuditStatus(outboundStateMachine.getInitStatus());
+        createReqVO.setAuditStatus(WmsOutboundAuditStatus.DRAFT.getValue());
         createReqVO.setOutboundStatus(WmsOutboundStatus.NONE.getValue());
         createReqVO.setNo(no);
         if (outboundMapper.getByNo(createReqVO.getNo()) != null) {
@@ -149,7 +149,8 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         // 校验存在
         WmsOutboundDO exists = validateOutboundExists(updateReqVO.getId());
         // 判断是否允许编辑
-        if (!outboundStateMachine.canEdit(exists.getAuditStatus())) {
+        WmsOutboundAuditStatus auditStatus= WmsOutboundAuditStatus.parse(exists.getAuditStatus());
+        if (!auditStatus.matchAny(WmsOutboundAuditStatus.DRAFT, WmsOutboundAuditStatus.REJECT)) {
             throw exception(OUTBOUND_CAN_NOT_EDIT);
         }
         // 单据号不允许被修改
@@ -207,7 +208,8 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         // 校验存在
         WmsOutboundDO outbound = validateOutboundExists(id);
         // 判断是否允许删除
-        if (!outboundStateMachine.canDelete(outbound.getAuditStatus())) {
+        WmsOutboundAuditStatus auditStatus= WmsOutboundAuditStatus.parse(outbound.getAuditStatus());
+        if (!auditStatus.matchAny(WmsOutboundAuditStatus.DRAFT, WmsOutboundAuditStatus.REJECT)) {
             throw exception(INBOUND_CAN_NOT_EDIT);
         }
         // 唯一索引去重

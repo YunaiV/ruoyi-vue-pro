@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.wms.enums.inbound;
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import cn.iocoder.yudao.framework.common.enums.DictEnum;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -32,6 +33,8 @@ public enum WmsInboundAuditStatus implements ArrayValuable<Integer>, DictEnum {
     }
 
     private final Integer value;
+
+    @NotNull
     private final String label;
 
     /**

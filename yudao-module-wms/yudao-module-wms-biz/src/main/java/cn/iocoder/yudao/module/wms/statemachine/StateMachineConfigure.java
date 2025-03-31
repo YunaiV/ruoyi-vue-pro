@@ -22,18 +22,18 @@ public interface StateMachineConfigure<S, E, D> {
     /**
      * 初始化状态机
      **/
-    default Map<S,List<S>> initActions(StateMachineBuilder<S, E, D> builder, Class actionType, FailCallback<S,E,D> failCallback) {
+    default List<ColaTransition<S, E, D>> initActions(StateMachineBuilder<S, E, D> builder, Class actionType, FailCallback<S,E,D> failCallback) {
 
         Map<S,List<S>> conditionMap = new HashMap<>();
-        List<? extends ColaAction<S, E, D>> actions = SpringUtils.getBeans(actionType);
+        List<ColaTransition<S, E, D>> actions = SpringUtils.getBeans(actionType);
         if(actions==null) {
-            return conditionMap;
+            return actions;
         }
-        for (ColaAction<S, E, D> action : actions) {
+        for (ColaTransition<S, E, D> action : actions) {
             bindAction(builder,action,conditionMap);
         }
         builder.setFailCallback(failCallback);
-        return conditionMap;
+        return actions;
 
     }
 
@@ -41,7 +41,7 @@ public interface StateMachineConfigure<S, E, D> {
     /**
      * 绑定状态机动作
      **/
-    default void bindAction(StateMachineBuilder<S, E, D> builder, ColaAction<S,E,D> action,Map<S,List<S>> conditionMap) {
+    default void bindAction(StateMachineBuilder<S, E, D> builder, ColaTransition<S,E,D> action, Map<S,List<S>> conditionMap) {
 
         S[] from = action.getFrom();
 
