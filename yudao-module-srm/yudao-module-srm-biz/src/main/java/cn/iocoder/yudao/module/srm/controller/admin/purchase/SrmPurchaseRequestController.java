@@ -223,7 +223,7 @@ public class SrmPurchaseRequestController {
             purchaseRequest.setProductNames(CollUtil.join(purchaseRequest.getItems(), "，", SrmPurchaseRequestItemRespVO::getProductName));
             //订单产品总数
             purchaseRequest.setTotalCount(CollUtil.isEmpty(purchaseRequest.getItems()) ? 0
-                : purchaseRequest.getItems().stream().mapToInt(SrmPurchaseRequestItemRespVO::getCount).sum());
+                : purchaseRequest.getItems().stream().mapToInt(SrmPurchaseRequestItemRespVO::getQty).sum());
             //创建者、更新者、审核人、申请人填充
             MapUtils.findAndThen(userMap, purchaseRequest.getApplicantId(), user -> purchaseRequest.setApplicant(user.getNickname()));
             MapUtils.findAndThen(userMap, purchaseRequest.getAuditorId(), user -> purchaseRequest.setAuditor(user.getNickname()));

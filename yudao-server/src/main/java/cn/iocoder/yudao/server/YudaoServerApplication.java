@@ -2,10 +2,10 @@ package cn.iocoder.yudao.server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
@@ -31,7 +31,7 @@ public class YudaoServerApplication {
     }
 
     @Configuration
-    @Profile("prod")
+    @ConditionalOnProperty(name = "somle.jpa.enabled", havingValue = "true", matchIfMissing = true)
     @ComponentScan("com.somle")
     @EnableJpaRepositories(basePackages = "com.somle")
     @EntityScan(basePackages = "com.somle")

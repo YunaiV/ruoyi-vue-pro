@@ -1,10 +1,5 @@
 package cn.iocoder.yudao.module.srm.controller.admin.purchase;
 
-import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -18,12 +13,7 @@ import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.erp.api.stock.WmsWarehouseApi;
 import cn.iocoder.yudao.module.erp.api.stock.dto.ErpWarehouseDTO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.SrmPurchaseInAuditReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.SrmPurchaseInBaseRespVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.SrmPurchaseInPageReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.SrmPurchaseInPayReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.SrmPurchaseInSaveReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.SrmPurchaseInSubmitReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.*;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseInDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseInItemDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
@@ -41,30 +31,24 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import java.io.IOException;
-import java.math.RoundingMode;
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - ERP 采购入库")
 @RestController
@@ -126,7 +110,7 @@ public class SrmPurchaseInController {
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:query')")
     public CommonResult<SrmPurchaseInBaseRespVO> getPurchaseIn(@RequestParam("id") Long id) {
         SrmPurchaseInDO purchaseIn = purchaseInService.getPurchaseIn(id);
-        if(purchaseIn == null) {
+        if (purchaseIn == null) {
             return success(null);
         }
         SrmPurchaseInBaseRespVO respVO = bindList(Collections.singletonList(purchaseIn)).get(0);
@@ -182,7 +166,7 @@ public class SrmPurchaseInController {
     //TODO 合并出库
 
     private List<SrmPurchaseInBaseRespVO> bindList(List<SrmPurchaseInDO> list) {
-        if(CollUtil.isEmpty(list)) {
+        if (CollUtil.isEmpty(list)) {
             return Collections.emptyList();
         }
         // 1.1 入库项
@@ -208,9 +192,9 @@ public class SrmPurchaseInController {
                 //设置产品信息-带出相关字段
                 MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProduct(product).setTotalVolume(
                             product.getLength() * product.getHeight() * product.getWidth() *
-                                Double.parseDouble(String.valueOf(item.getCount())))//总体积=数量*产品体积
+                                Double.parseDouble(String.valueOf(item.getQty())))//总体积=数量*产品体积
                         .setTotalWeight(product.getWeight().setScale(2, RoundingMode.HALF_UP).longValue() *
-                            Double.parseDouble(String.valueOf(item.getCount())))
+                            Double.parseDouble(String.valueOf(item.getQty())))
                     //总重量=数量*产品重量
                 );
                 // 设置仓库信息
@@ -240,9 +224,9 @@ public class SrmPurchaseInController {
      * @return id
      */
     private Long safeParseLong(String value) {
-        try{
+        try {
             return Optional.ofNullable(value).map(Long::parseLong).orElse(null);
-        } catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             return null;
         }
     }

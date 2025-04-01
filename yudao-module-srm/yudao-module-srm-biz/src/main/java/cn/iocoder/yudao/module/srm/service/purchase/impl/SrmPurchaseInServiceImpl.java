@@ -111,6 +111,7 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
         ThrowUtil.ifSqlThrow(purchaseInMapper.insert(purchaseIn), GlobalErrorCodeConstants.DB_INSERT_ERROR);
         // 2.2 插入入库项
         purchaseInItems.forEach(o -> o.setInId(purchaseIn.getId()));
+        BeanUtils.copyProperties(purchaseInItems, createReqVO.getItems());
         ThrowUtil.ifThrow(!purchaseInItemMapper.insertBatch(purchaseInItems), GlobalErrorCodeConstants.DB_BATCH_INSERT_ERROR);
         //3.0 设置初始化状态
         initMasterStatus(purchaseIn);

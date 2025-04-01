@@ -215,7 +215,7 @@ public class SrmPurchaseOrderController {
                 //部门name
                 MapUtils.findAndThen(deptMap, item.getApplicationDeptId(), dept -> item.setDepartmentName(dept.getName()));
                 //待入库数量
-                item.setWaitInCount(item.getCount().subtract(
+                item.setWaitInCount(item.getQty().subtract(
                     item.getInCount() == null ? BigDecimal.ZERO : item.getInCount()));
             }));
             MapUtils.findAndThen(supplierMap, respVO.getSupplierId(), supplier -> respVO.setSupplierName(supplier.getName()));

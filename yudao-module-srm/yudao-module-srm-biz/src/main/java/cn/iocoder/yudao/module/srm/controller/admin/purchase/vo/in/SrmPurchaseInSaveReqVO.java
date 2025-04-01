@@ -93,6 +93,10 @@ public class SrmPurchaseInSaveReqVO {
         @NotNull(message = "入库数量不能为空")
         private BigDecimal qty;
 
+        @Schema(description = "仓库id", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "仓库id不能为空")
+        private Long warehouseId;
+
         @Schema(description = "备注")
         private String remark;
 
