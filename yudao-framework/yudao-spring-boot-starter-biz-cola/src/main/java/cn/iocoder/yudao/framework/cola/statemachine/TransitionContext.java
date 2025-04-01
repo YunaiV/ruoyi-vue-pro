@@ -1,8 +1,6 @@
-package cn.iocoder.yudao.module.wms.statemachine;
+package cn.iocoder.yudao.framework.cola.statemachine;
 
-import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import lombok.Getter;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,15 +12,14 @@ import java.util.List;
 
 public class TransitionContext<T> {
 
-
     /**
      * 创建上下文
      **/
-    static <X> TransitionContext<X> from(X requestDO, WmsApprovalReqVO approvalReqVO, StateMachineWrapper stateMachineWrapper) {
+    static <X> TransitionContext<X> from(X requestDO, ApprovalReqVO approvalReqVO, StateMachineWrapper stateMachineWrapper) {
         TransitionContext<X> context = new TransitionContext<>();
         context.data=requestDO;
-        context.approvalReqVO=approvalReqVO;
         context.success=true;
+        context.approvalReqVO=approvalReqVO;
         context.stateMachineWrapper=stateMachineWrapper;
         return context;
     }
@@ -48,9 +45,14 @@ public class TransitionContext<T> {
     private T data;
 
     /**
-     * 审批请求数据
+     * 审批请求
      **/
-    private WmsApprovalReqVO approvalReqVO;
+    private ApprovalReqVO approvalReqVO;
+
+    public ApprovalReqVO approvalReqVO() {
+        return approvalReqVO;
+    }
+
     private List<String> errors = new ArrayList<>();
 
     @Getter
@@ -107,12 +109,6 @@ public class TransitionContext<T> {
         return data;
     }
 
-    /**
-     * 获取审批请求数据
-     **/
-    public WmsApprovalReqVO approvalReqVO() {
-        return approvalReqVO;
-    }
 
     /**
      * 获取错误信息
@@ -133,6 +129,9 @@ public class TransitionContext<T> {
         }
     }
 
+    /**
+     * 根据 from 和 event 获取目标状态
+     **/
     public <S,E> S getTo(S from, E event) {
         return (S)stateMachineWrapper.getTo(from,event);
     }

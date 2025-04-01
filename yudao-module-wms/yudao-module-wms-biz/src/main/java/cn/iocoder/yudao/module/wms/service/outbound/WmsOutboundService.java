@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms.service.outbound;
 
+import cn.iocoder.yudao.framework.cola.statemachine.ApprovalReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
 import jakarta.validation.*;
@@ -52,7 +53,7 @@ public interface WmsOutboundService {
      */
     PageResult<WmsOutboundDO> getOutboundPage(WmsOutboundPageReqVO pageReqVO);
 
-    void approve(WmsOutboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO);
+    void approve(WmsOutboundAuditStatus.Event event, ApprovalReqVO approvalReqVO);
 
     WmsOutboundDO updateOutboundAuditStatus(Long id, Integer status);
 

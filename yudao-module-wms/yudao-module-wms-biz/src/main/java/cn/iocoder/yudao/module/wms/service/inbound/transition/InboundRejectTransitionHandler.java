@@ -11,15 +11,4 @@ import org.springframework.stereotype.Component;
 @Component
 public class InboundRejectTransitionHandler extends BaseInboundTransitionHandler {
 
-//    public InboundRejectTransition() {
-//        // 指定事件以及前后的状态
-//        super(
-//            // from
-//            WmsInboundAuditStatus.AUDITING,
-//            // to
-//            WmsInboundAuditStatus.REJECT,
-//            // event
-//            WmsInboundAuditStatus.Event.REJECT
-//        );
-//    }
 }

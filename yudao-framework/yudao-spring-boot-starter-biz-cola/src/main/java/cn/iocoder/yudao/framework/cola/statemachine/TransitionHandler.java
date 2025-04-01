@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.wms.statemachine;
+package cn.iocoder.yudao.framework.cola.statemachine;
 
 import com.alibaba.cola.statemachine.Action;
 import com.alibaba.cola.statemachine.Condition;
@@ -80,13 +80,6 @@ public abstract class TransitionHandler<S, E, D> {
     private Function<D,S> getter;
 
 
-//    public ColaTransition(S[] from, S to, Function<D,S> getter, E event) {
-//        this.from = from;
-//        this.to = to;
-//        this.event = event;
-//        this.getter = getter;
-//    }
-
     /**
      * 给状态机提供 when
      **/
@@ -101,7 +94,7 @@ public abstract class TransitionHandler<S, E, D> {
     }
 
     /**
-     * 在子类中实现条件判断
+     * 在子类中实现条件判断, 如需校验在子类中覆盖此方法，默认返回 true
      **/
     public boolean when(TransitionContext<D> context) {
         return true;

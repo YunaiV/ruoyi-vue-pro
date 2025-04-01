@@ -2,11 +2,11 @@ package cn.iocoder.yudao.module.wms.service.outbound.transition;
 
 
 
+import cn.iocoder.yudao.framework.cola.statemachine.TransitionContext;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.quantity.OutboundFinishExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.context.OutboundContext;
-import cn.iocoder.yudao.module.wms.statemachine.TransitionContext;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
@@ -22,17 +22,6 @@ public class OutboundExecuteTransitionHandler extends BaseOutboundTransitionHand
     @Resource
     private OutboundFinishExecutor outboundFinishExecutor;
 
-//    public OutboundExecuteTransition() {
-//        // 指定事件以及前后的状态
-//        super(
-//            // from
-//            WmsOutboundAuditStatus.PASS,
-//            // to
-//            WmsOutboundAuditStatus.FINISHED,
-//            // event
-//            WmsOutboundAuditStatus.Event.FINISH
-//        );
-//    }
 
     @Override
     public void perform(Integer from, Integer to, WmsOutboundAuditStatus.Event event, TransitionContext<WmsOutboundDO> context) {
@@ -41,6 +30,5 @@ public class OutboundExecuteTransitionHandler extends BaseOutboundTransitionHand
         OutboundContext outboundContext = new OutboundContext();
         outboundContext.setOutboundId(context.data().getId());
         outboundFinishExecutor.execute(outboundContext);
-
     }
 }

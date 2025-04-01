@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms.controller.admin.inbound;
 
+import cn.iocoder.yudao.framework.cola.statemachine.ApprovalReqVO;
 import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
@@ -70,7 +71,7 @@ public class WmsInboundController {
     @PutMapping("/submit")
     @Operation(summary = "提交审批")
     @PreAuthorize("@ss.hasPermission('wms:inbound:submit')")
-    public CommonResult<Boolean> submit(@RequestBody WmsApprovalReqVO approvalReqVO) {
+    public CommonResult<Boolean> submit(@RequestBody ApprovalReqVO approvalReqVO) {
         inboundService.approve(WmsInboundAuditStatus.Event.SUBMIT, approvalReqVO);
         return success(true);
     }
@@ -78,7 +79,7 @@ public class WmsInboundController {
     @PutMapping("/agree")
     @Operation(summary = "同意审批")
     @PreAuthorize("@ss.hasPermission('wms:inbound:agree')")
-    public CommonResult<Boolean> agree(@RequestBody WmsApprovalReqVO approvalReqVO) {
+    public CommonResult<Boolean> agree(@RequestBody ApprovalReqVO approvalReqVO) {
         inboundService.approve(WmsInboundAuditStatus.Event.AGREE, approvalReqVO);
         return success(true);
     }
@@ -86,7 +87,7 @@ public class WmsInboundController {
     @PutMapping("/reject")
     @Operation(summary = "驳回审批")
     @PreAuthorize("@ss.hasPermission('wms:inbound:reject')")
-    public CommonResult<Boolean> reject(@RequestBody WmsApprovalReqVO approvalReqVO) {
+    public CommonResult<Boolean> reject(@RequestBody ApprovalReqVO approvalReqVO) {
         inboundService.approve(WmsInboundAuditStatus.Event.REJECT, approvalReqVO);
         return success(true);
     }
@@ -94,7 +95,7 @@ public class WmsInboundController {
     @PutMapping("/force-finish")
     @Operation(summary = "强制完成")
     @PreAuthorize("@ss.hasPermission('wms:inbound:force-finish')")
-    public CommonResult<Boolean> forceFinish(@RequestBody WmsApprovalReqVO approvalReqVO) {
+    public CommonResult<Boolean> forceFinish(@RequestBody ApprovalReqVO approvalReqVO) {
         inboundService.approve(WmsInboundAuditStatus.Event.FORCE_FINISH, approvalReqVO);
         return success(true);
     }
@@ -102,7 +103,7 @@ public class WmsInboundController {
     @PutMapping("/abandon")
     @Operation(summary = "作废")
     @PreAuthorize("@ss.hasPermission('wms:inbound:abandon')")
-    public CommonResult<Boolean> abandon(@RequestBody WmsApprovalReqVO approvalReqVO) {
+    public CommonResult<Boolean> abandon(@RequestBody ApprovalReqVO approvalReqVO) {
         inboundService.approve(WmsInboundAuditStatus.Event.ABANDON, approvalReqVO);
         return success(true);
     }

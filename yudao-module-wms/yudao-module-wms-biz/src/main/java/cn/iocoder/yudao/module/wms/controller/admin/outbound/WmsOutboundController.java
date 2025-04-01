@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms.controller.admin.outbound;
 
+import cn.iocoder.yudao.framework.cola.statemachine.ApprovalReqVO;
 import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
@@ -122,7 +123,7 @@ public class WmsOutboundController {
     @PutMapping("/submit")
     @Operation(summary = "提交审批")
     @PreAuthorize("@ss.hasPermission('wms:inbound:submit')")
-    public CommonResult<Boolean> submit(@RequestBody WmsApprovalReqVO approvalReqVO) {
+    public CommonResult<Boolean> submit(@RequestBody ApprovalReqVO approvalReqVO) {
         outboundService.approve(WmsOutboundAuditStatus.Event.SUBMIT, approvalReqVO);
         return success(true);
     }
@@ -130,7 +131,7 @@ public class WmsOutboundController {
     @PutMapping("/agree")
     @Operation(summary = "同意审批")
     @PreAuthorize("@ss.hasPermission('wms:inbound:agree')")
-    public CommonResult<Boolean> agree(@RequestBody WmsApprovalReqVO approvalReqVO) {
+    public CommonResult<Boolean> agree(@RequestBody ApprovalReqVO approvalReqVO) {
         outboundService.approve(WmsOutboundAuditStatus.Event.AGREE, approvalReqVO);
         return success(true);
     }
@@ -138,7 +139,7 @@ public class WmsOutboundController {
     @PutMapping("/reject")
     @Operation(summary = "驳回审批")
     @PreAuthorize("@ss.hasPermission('wms:inbound:reject')")
-    public CommonResult<Boolean> reject(@RequestBody WmsApprovalReqVO approvalReqVO) {
+    public CommonResult<Boolean> reject(@RequestBody ApprovalReqVO approvalReqVO) {
         outboundService.approve(WmsOutboundAuditStatus.Event.REJECT, approvalReqVO);
         return success(true);
     }
@@ -146,7 +147,7 @@ public class WmsOutboundController {
     @PutMapping("/finish")
     @Operation(summary = "完成出库")
     @PreAuthorize("@ss.hasPermission('wms:inbound:finish')")
-    public CommonResult<Boolean> finish(@RequestBody WmsApprovalReqVO approvalReqVO) {
+    public CommonResult<Boolean> finish(@RequestBody ApprovalReqVO approvalReqVO) {
         outboundService.approve(WmsOutboundAuditStatus.Event.FINISH, approvalReqVO);
         return success(true);
     }

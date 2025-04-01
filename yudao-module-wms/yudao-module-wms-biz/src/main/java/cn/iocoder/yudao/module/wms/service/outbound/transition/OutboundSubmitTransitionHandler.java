@@ -2,11 +2,11 @@ package cn.iocoder.yudao.module.wms.service.outbound.transition;
 
 
 
+import cn.iocoder.yudao.framework.cola.statemachine.TransitionContext;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.quantity.OutboundSubmitExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.context.OutboundContext;
-import cn.iocoder.yudao.module.wms.statemachine.TransitionContext;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
@@ -21,21 +21,6 @@ public class OutboundSubmitTransitionHandler extends BaseOutboundTransitionHandl
 
     @Resource
     private OutboundSubmitExecutor outboundSubmitExecutor;
-
-//    public OutboundSubmitTransition() {
-//        // 指定事件以及前后的状态
-//        super(
-//            // from
-//            new WmsOutboundAuditStatus[]{
-//                WmsOutboundAuditStatus.DRAFT,
-//                WmsOutboundAuditStatus.REJECT
-//            },
-//            // to
-//            WmsOutboundAuditStatus.AUDITING,
-//            // event
-//            WmsOutboundAuditStatus.Event.SUBMIT
-//        );
-//    }
 
     @Override
     public void perform(Integer from, Integer to, WmsOutboundAuditStatus.Event event, TransitionContext<WmsOutboundDO> context) {

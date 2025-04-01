@@ -13,16 +13,4 @@ import org.springframework.stereotype.Component;
 @Component
 public class OutboundAgreeTransitionHandler extends BaseOutboundTransitionHandler {
 
-//    public OutboundAgreeTransition() {
-//        // 指定事件以及前后的状态
-//        super(
-//            // from
-//            WmsOutboundAuditStatus.AUDITING,
-//            // to
-//            WmsOutboundAuditStatus.PASS,
-//            // event
-//            WmsOutboundAuditStatus.Event.AGREE
-//        );
-//    }
-
 }

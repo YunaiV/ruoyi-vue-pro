@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.wms.service.inbound;
 
 import java.util.*;
+
+import cn.iocoder.yudao.framework.cola.statemachine.ApprovalReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
 import jakarta.validation.*;
@@ -65,7 +67,7 @@ public interface WmsInboundService {
      */
     List<WmsInboundDO> selectByWarehouseId(Long warehouseId, int limit);
 
-    void approve(WmsInboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO);
+    void approve(WmsInboundAuditStatus.Event event, ApprovalReqVO approvalReqVO);
 
     WmsInboundRespVO getInboundWithItemList(Long id);
 

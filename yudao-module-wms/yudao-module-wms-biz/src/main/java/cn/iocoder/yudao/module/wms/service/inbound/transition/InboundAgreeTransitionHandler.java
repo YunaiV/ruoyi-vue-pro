@@ -6,11 +6,11 @@ package cn.iocoder.yudao.module.wms.service.inbound.transition;
  * @description: 同意
  */
 
+import cn.iocoder.yudao.framework.cola.statemachine.TransitionContext;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.quantity.InboundExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.context.InboundContext;
-import cn.iocoder.yudao.module.wms.statemachine.TransitionContext;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
@@ -20,18 +20,6 @@ public class InboundAgreeTransitionHandler extends BaseInboundTransitionHandler 
 
     @Resource
     private InboundExecutor inboundExecutor;
-
-//    public InboundAgreeTransition() {
-//        // 指定事件以及前后的状态
-//        super(
-//            // from
-//            WmsInboundAuditStatus.AUDITING,
-//            // to
-//            WmsInboundAuditStatus.PASS,
-//            // event
-//            WmsInboundAuditStatus.Event.AGREE
-//        );
-//    }
 
     @Override
     public void perform(Integer from, Integer to, WmsInboundAuditStatus.Event event, TransitionContext<WmsInboundDO> context) {

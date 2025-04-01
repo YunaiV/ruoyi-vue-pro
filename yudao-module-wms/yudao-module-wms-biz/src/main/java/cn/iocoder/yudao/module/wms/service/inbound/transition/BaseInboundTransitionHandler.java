@@ -2,11 +2,11 @@ package cn.iocoder.yudao.module.wms.service.inbound.transition;
 
 
 
+import cn.iocoder.yudao.framework.cola.statemachine.TransitionContext;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.approval.history.ApprovalHistoryTransitionHandler;
 import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
-import cn.iocoder.yudao.module.wms.statemachine.TransitionContext;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 
@@ -20,14 +20,6 @@ public class BaseInboundTransitionHandler extends ApprovalHistoryTransitionHandl
     @Resource
     @Lazy
     protected WmsInboundService inboundService;
-
-//    public BaseInboundTransition(WmsInboundAuditStatus[] from, WmsInboundAuditStatus to, WmsInboundAuditStatus.Event event) {
-//        super(Arrays.stream(from).map(WmsInboundAuditStatus::getValue).toArray(Integer[]::new), to.getValue(), WmsInboundDO::getAuditStatus, event);
-//    }
-//
-//    public BaseInboundTransition(WmsInboundAuditStatus from, WmsInboundAuditStatus to, WmsInboundAuditStatus.Event event) {
-//        super(new Integer[]{from.getValue()}, to.getValue(), WmsInboundDO::getAuditStatus, event);
-//    }
 
     /**
      * 默认的条件判断都为通过
