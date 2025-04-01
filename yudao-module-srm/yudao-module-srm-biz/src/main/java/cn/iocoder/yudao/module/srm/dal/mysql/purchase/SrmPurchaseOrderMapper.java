@@ -3,15 +3,13 @@ package cn.iocoder.yudao.module.srm.dal.mysql.purchase;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderPageReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.req.SrmPurchaseOrderPageReqVO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
-import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.bo.SrmPurchaseOrderBO;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestItemsDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.apache.ibatis.annotations.Mapper;
-
-import java.util.List;
 
 /**
  * ERP 采购订单 Mapper
@@ -58,20 +56,17 @@ public interface SrmPurchaseOrderMapper extends BaseMapperX<SrmPurchaseOrderDO> 
 
     //getBOWrapper
     default MPJLambdaWrapper<SrmPurchaseOrderDO> getBOWrapper(SrmPurchaseOrderPageReqVO vo) {
-        return wrapper(vo).leftJoin(SrmPurchaseOrderItemDO.class, SrmPurchaseOrderItemDO::getOrderId,
-                SrmPurchaseOrderDO::getId)// 关联表
-            .likeIfExists(SrmPurchaseOrderItemDO::getErpPurchaseRequestItemNo,
-                vo.getErpPurchaseRequestItemNo())//采购申请单的单号
-            .selectCollection(SrmPurchaseOrderItemDO.class, SrmPurchaseOrderBO::getSrmPurchaseOrderItemBO);
-        //            .selectAsClass(SrmPurchaseOrderDO.class, SrmPurchaseOrderBO.class);
+        return wrapper(vo).innerJoin(SrmPurchaseOrderItemDO.class, SrmPurchaseOrderItemDO::getOrderId,
+            SrmPurchaseOrderDO::getId,
+            on -> on.likeIfExists(SrmPurchaseOrderItemDO::getErpPurchaseRequestItemNo, vo.getErpPurchaseRequestItemNo())
+                .eqIfExists(SrmPurchaseOrderItemDO::getProductId, vo.getProductId())
+                .likeIfExists(SrmPurchaseRequestItemsDO::getBarCode, vo.getBarCode())
+                .likeIfExists(SrmPurchaseRequestItemsDO::getProductUnitName, vo.getProductUnitName())
+                .likeIfExists(SrmPurchaseRequestItemsDO::getProductName, vo.getProductName()));
     }
 
-    default PageResult<SrmPurchaseOrderDO> selectPage(SrmPurchaseOrderPageReqVO reqVO, List<Long> orderIds) {
-        MPJLambdaWrapper<SrmPurchaseOrderDO> wrapper = wrapper(reqVO);
-        if (orderIds != null && !orderIds.isEmpty()) {
-            wrapper.in(SrmPurchaseOrderDO::getId, orderIds);
-        }
-        return selectPage(reqVO, wrapper);
+    default PageResult<SrmPurchaseOrderDO> selectPage(SrmPurchaseOrderPageReqVO reqVO) {
+        return selectPage(reqVO, getBOWrapper(reqVO));
     }
 
     default int updateByIdAndStatus(Long id, Integer status, SrmPurchaseOrderDO updateObj) {

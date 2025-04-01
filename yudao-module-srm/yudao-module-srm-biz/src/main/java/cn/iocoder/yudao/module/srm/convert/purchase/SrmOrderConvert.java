@@ -4,8 +4,8 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.fms.api.finance.dto.FmsFinanceSubjectDTO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderGenerateContractReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderSaveReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.req.SrmPurchaseOrderGenerateContractReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.req.SrmPurchaseOrderSaveReqVO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.SrmPurchaseRequestMergeReqVO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
@@ -28,7 +28,6 @@ public interface SrmOrderConvert {
 
     SrmOrderConvert INSTANCE = Mappers.getMapper(SrmOrderConvert.class);
 
-
     /**
      * 让采购项关联申请项 采购项:申请项 N:1
      *
@@ -37,7 +36,9 @@ public interface SrmOrderConvert {
      * @param itemDOMap       采购项Map
      * @return 采购订单的入参reqVO的item
      */
-    default SrmPurchaseOrderSaveReqVO.Item convertToErpPurchaseOrderSaveReqVOItem(SrmPurchaseRequestItemsDO itemDO, Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> requestItemsMap, Map<Long, SrmPurchaseRequestItemsDO> itemDOMap) {
+    default SrmPurchaseOrderSaveReqVO.Item convertToErpPurchaseOrderSaveReqVOItem(SrmPurchaseRequestItemsDO itemDO,
+        Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> requestItemsMap,
+        Map<Long, SrmPurchaseRequestItemsDO> itemDOMap) {
         SrmPurchaseOrderSaveReqVO.Item item = new SrmPurchaseOrderSaveReqVO.Item();
         //SrmPurchaseRequestItemsDO ->  SrmPurchaseOrderSaveReqVO.Item
         SrmPurchaseRequestItemsDO requestItemsDO = itemDOMap.get(itemDO.getId());
@@ -57,7 +58,10 @@ public interface SrmOrderConvert {
     }
 
     //list
-    default List<SrmPurchaseOrderSaveReqVO.Item> convertToErpPurchaseOrderSaveReqVOItemList(List<SrmPurchaseRequestItemsDO> itemDOList, Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> requestItemsMap, Map<Long, SrmPurchaseRequestItemsDO> itemDOMap) {
+    default List<SrmPurchaseOrderSaveReqVO.Item> convertToErpPurchaseOrderSaveReqVOItemList(
+        List<SrmPurchaseRequestItemsDO> itemDOList,
+        Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> requestItemsMap,
+        Map<Long, SrmPurchaseRequestItemsDO> itemDOMap) {
         return itemDOList.stream()
             .map(itemDO -> convertToErpPurchaseOrderSaveReqVOItem(itemDO, requestItemsMap, itemDOMap))
             .collect(Collectors.toList());
@@ -66,7 +70,8 @@ public interface SrmOrderConvert {
     /**
      * 合同渲染BO用
      */
-    default SrmPurchaseOrderWordBO bindDataFormOrderItemDO(List<SrmPurchaseOrderItemDO> itemDOS, SrmPurchaseOrderDO orderDO, SrmPurchaseOrderGenerateContractReqVO vo, Map<Long, FmsFinanceSubjectDTO> dtoMap) {
+    default SrmPurchaseOrderWordBO bindDataFormOrderItemDO(List<SrmPurchaseOrderItemDO> itemDOS,
+        SrmPurchaseOrderDO orderDO, SrmPurchaseOrderGenerateContractReqVO vo, Map<Long, FmsFinanceSubjectDTO> dtoMap) {
         //        Set<Long> productIds = itemDOS.stream().map(SrmPurchaseOrderItemDO::getProductId).collect(Collectors.toSet());
         //        Map<Long, ErpProductDTO> productMap = erpProductApi.getProductMap(productIds);
         //收集产品的单位map getProductUnitMap

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.srm.service.purchase;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.*;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.req.*;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.bo.SrmPurchaseOrderItemBO;
@@ -38,18 +38,16 @@ public interface SrmPurchaseOrderService {
     void updatePurchaseOrder(@Valid SrmPurchaseOrderSaveReqVO updateReqVO);
 
     /**
+     * 更新item订单项的json属性，完工单+验货单
+     */
+    void updatePurchaseOrderJson(@Valid SrmPurchaseOrderSaveJsonReqVO reqVO);
+
+    /**
      * 更新item订单子表
      *
      * @param itemsDOList 订单子表集合
      */
     void updatePurchaseOrderItemList(List<SrmPurchaseOrderItemDO> itemsDOList);
-    //    /**
-    //     * 更新采购订单的状态
-    //     *
-    //     * @param id 编号
-    //     * @param status 状态
-    //     */
-    //    void updatePurchaseOrderStatus(Long id, Integer status);
 
     /**
      * 更新采购订单的入库数量
@@ -117,7 +115,8 @@ public interface SrmPurchaseOrderService {
      * 根据订单id获得订单map
      */
     default Map<Long, SrmPurchaseOrderDO> getPurchaseOrderMap(Collection<Long> orderIds) {
-        return this.getPurchaseOrderList(orderIds).stream().collect(Collectors.toMap(SrmPurchaseOrderDO::getId, v -> v));
+        return this.getPurchaseOrderList(orderIds).stream()
+            .collect(Collectors.toMap(SrmPurchaseOrderDO::getId, v -> v));
     }
 
     /**
@@ -138,7 +137,8 @@ public interface SrmPurchaseOrderService {
      */
     default Map<Long, SrmPurchaseOrderDO> getPurchaseOrderItemMap(Collection<Long> itemIds) {
         //TODO 可以优化批量
-        return this.getPurchaseOrderItemList(itemIds).stream().collect(Collectors.toMap(SrmPurchaseOrderItemDO::getId, v -> getPurchaseOrderByItemId(v.getId())));
+        return this.getPurchaseOrderItemList(itemIds).stream()
+            .collect(Collectors.toMap(SrmPurchaseOrderItemDO::getId, v -> getPurchaseOrderByItemId(v.getId())));
     }
 
     List<SrmPurchaseOrderItemDO> getPurchaseOrderItemList(Collection<Long> itemIds);

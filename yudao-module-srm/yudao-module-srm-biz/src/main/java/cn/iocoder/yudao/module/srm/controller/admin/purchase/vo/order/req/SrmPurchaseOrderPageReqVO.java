@@ -1,15 +1,16 @@
-package cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order;
-
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+package cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.req;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 @Schema(description = "管理后台 - ERP 采购订单分页 Request VO")
 @Data
@@ -85,7 +86,6 @@ public class SrmPurchaseOrderPageReqVO extends PageParam {
     @Schema(description = "财务主体id")
     private Long purchaseEntityId;
 
-
     @Schema(description = "x码")
     private String xCode;
 
@@ -119,14 +119,33 @@ public class SrmPurchaseOrderPageReqVO extends PageParam {
     @Schema(description = "采购状态")
     private Integer orderStatus;
 
-//    @Schema(description = "验货单json")
-//    private String inspectionJson;
-//
-//    @Schema(description = "完工单json")
-//    private String completionJson;
-//    @Schema(description = "总验货通过数量")
-//    private Integer totalInspectionPassCount;
+    //    @Schema(description = "验货单json")
+    //    private String inspectionJson;
+    //
+    //    @Schema(description = "完工单json")
+    //    private String completionJson;
+    //    @Schema(description = "总验货通过数量")
+    //    private Integer totalInspectionPassCount;
 
+    //子表分割线
     @Schema(description = "采购申请单No")
     private String erpPurchaseRequestItemNo;
+
+    @Schema(description = "产品id")
+    private Long productId;
+
+    @Schema(description = "产品sku")
+    private String barCode;
+
+    @Schema(description = "产品名称")
+    private String productName;
+
+    @Schema(description = "产品单位名称")
+    private String productUnitName;
+
+    @Schema(description = "申请人id")
+    private Long applicantId;
+
+    @Schema(description = "申请人部门id")
+    private Long applicationDeptId;
 }

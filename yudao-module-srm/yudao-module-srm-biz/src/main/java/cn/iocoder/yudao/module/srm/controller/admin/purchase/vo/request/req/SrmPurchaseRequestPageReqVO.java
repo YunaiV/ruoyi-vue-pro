@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-
 @Schema(description = "管理后台 - ERP采购申请单分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -31,18 +30,17 @@ public class SrmPurchaseRequestPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] requestTime;
 
-//    @Schema(description = "状态")
-//    private Integer status;
+    //    @Schema(description = "状态")
+    //    private Integer status;
 
-//    @Schema(description = "关闭状态")
-//    private Integer offStatus;
-//
-//    @Schema(description = "订购状态")
-//    private Integer orderStatus;
+    //    @Schema(description = "关闭状态")
+    //    private Integer offStatus;
+    //
+    //    @Schema(description = "订购状态")
+    //    private Integer orderStatus;
 
     @Schema(description = "审核者id")
     private Long auditorId;
-
 
     @Schema(description = "审核时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
@@ -55,7 +53,6 @@ public class SrmPurchaseRequestPageReqVO extends PageParam {
     //supplierId 供应商编号
     @Schema(description = "供应商编号")
     private String supplierId;
-
 
     @Schema(description = "审核状态")
     private Integer auditStatus;
@@ -77,4 +74,17 @@ public class SrmPurchaseRequestPageReqVO extends PageParam {
 
     @Schema(description = "入库状态")
     private Integer inStatus;
+    //子表分割线
+
+    @Schema(description = "产品id")
+    private Long productId;
+
+    @Schema(description = "产品sku")
+    private String barCode;
+
+    @Schema(description = "产品名称")
+    private String productName;
+
+    @Schema(description = "产品单位名称")
+    private String productUnitName;
 }

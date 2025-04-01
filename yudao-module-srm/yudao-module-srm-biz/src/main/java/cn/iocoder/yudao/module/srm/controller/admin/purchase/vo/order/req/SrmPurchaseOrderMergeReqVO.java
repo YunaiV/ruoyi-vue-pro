@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order;
+package cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.req;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;

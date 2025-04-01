@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.srm.config.purchase.order.impl.action;
 
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderAuditReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.req.SrmPurchaseOrderAuditReqVO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseOrderMapper;
 import cn.iocoder.yudao.module.srm.enums.SrmEventEnum;
@@ -26,7 +26,7 @@ public class OrderAuditActionImpl implements Action<SrmAuditStatus, SrmEventEnum
     SrmPurchaseOrderMapper mapper;
 
     @Override
-    @Transactional( rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void execute(SrmAuditStatus from, SrmAuditStatus to, SrmEventEnum event, SrmPurchaseOrderAuditReqVO reqVO) {
 
         List<Long> orderIds = reqVO.getOrderIds();
@@ -40,9 +40,10 @@ public class OrderAuditActionImpl implements Action<SrmAuditStatus, SrmEventEnum
                 orderDO.setAuditorId(getLoginUserId());
                 orderDO.setReviewComment(reqVO.getReviewComment());//审核意见
             }
-//            orderDO.setReviewComment(reqVO.getReviewComment()); DB添加字段
+            //            orderDO.setReviewComment(reqVO.getReviewComment()); DB添加字段
             ThrowUtil.ifSqlThrow(mapper.updateById(orderDO), DB_UPDATE_ERROR);
-            log.debug("审核状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(reqVO), from.getDesc(), to.getDesc());
+            log.debug("审核状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(reqVO),
+                from.getDesc(), to.getDesc());
         });
     }
 }
