@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.req.SrmPurchaseOrderPageReqVO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
-import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestItemsDO;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.bo.SrmPurchaseOrderItemBO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -41,7 +41,7 @@ public interface SrmPurchaseOrderMapper extends BaseMapperX<SrmPurchaseOrderDO> 
             .eqIfPresent(SrmPurchaseOrderDO::getAuditorId, reqVO.getAuditorId())
             .betweenIfPresent(SrmPurchaseOrderDO::getAuditTime, reqVO.getAuditTime())
             .eqIfPresent(SrmPurchaseOrderDO::getPurchaseEntityId, reqVO.getPurchaseEntityId())
-            .likeIfPresent(SrmPurchaseOrderDO::getXCode, reqVO.getXCode())
+            //            .likeIfPresent(SrmPurchaseOrderDO::getXCode, reqVO.getXCode())
             .likeIfPresent(SrmPurchaseOrderDO::getContainerRate, reqVO.getContainerRate())
             .eqIfPresent(SrmPurchaseOrderDO::getWarehouseId, reqVO.getWarehouseId())
             .eqIfPresent(SrmPurchaseOrderDO::getOffStatus, reqVO.getOffStatus())
@@ -57,12 +57,17 @@ public interface SrmPurchaseOrderMapper extends BaseMapperX<SrmPurchaseOrderDO> 
     //getBOWrapper
     default MPJLambdaWrapper<SrmPurchaseOrderDO> getBOWrapper(SrmPurchaseOrderPageReqVO vo) {
         return wrapper(vo).innerJoin(SrmPurchaseOrderItemDO.class, SrmPurchaseOrderItemDO::getOrderId,
-            SrmPurchaseOrderDO::getId,
-            on -> on.likeIfExists(SrmPurchaseOrderItemDO::getErpPurchaseRequestItemNo, vo.getErpPurchaseRequestItemNo())
-                .eqIfExists(SrmPurchaseOrderItemDO::getProductId, vo.getProductId())
-                .likeIfExists(SrmPurchaseRequestItemsDO::getBarCode, vo.getBarCode())
-                .likeIfExists(SrmPurchaseRequestItemsDO::getProductUnitName, vo.getProductUnitName())
-                .likeIfExists(SrmPurchaseRequestItemsDO::getProductName, vo.getProductName()));
+                SrmPurchaseOrderDO::getId,
+                on -> on.likeIfExists(SrmPurchaseOrderItemDO::getErpPurchaseRequestItemNo, vo.getErpPurchaseRequestItemNo())
+                    .eqIfExists(SrmPurchaseOrderItemDO::getProductId, vo.getProductId())
+                    .likeIfExists(SrmPurchaseOrderItemDO::getBarCode, vo.getBarCode())
+                    .likeIfExists(SrmPurchaseOrderItemDO::getProductUnitName, vo.getProductUnitName())
+                    .likeIfExists(SrmPurchaseOrderItemDO::getProductName, vo.getProductName())
+                    //applicantId
+                    .eqIfExists(SrmPurchaseOrderItemDO::getApplicantId, vo.getApplicantId())
+                    .eqIfExists(SrmPurchaseOrderItemDO::getApplicationDeptId, vo.getApplicationDeptId()))
+            .selectAll(SrmPurchaseOrderItemDO.class)
+            .selectAsClass(SrmPurchaseOrderItemDO.class, SrmPurchaseOrderItemBO.class);
     }
 
     default PageResult<SrmPurchaseOrderDO> selectPage(SrmPurchaseOrderPageReqVO reqVO) {

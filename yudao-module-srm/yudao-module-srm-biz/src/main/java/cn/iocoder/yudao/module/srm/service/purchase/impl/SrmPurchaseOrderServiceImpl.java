@@ -587,15 +587,6 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
 
     @Override
     public PageResult<SrmPurchaseOrderDO> getPurchaseOrderPage(SrmPurchaseOrderPageReqVO pageReqVO) {
-        //        List<Long> orderIds = null;
-        //        if (pageReqVO.getErpPurchaseRequestItemNo() != null && !StrUtil.isEmpty(pageReqVO.getErpPurchaseRequestItemNo())) {
-        //            //查找对应的DO，限定申请单对应的订单id，汇总ids
-        //            orderIds = new ArrayList<>(purchaseOrderItemMapper.selectIdsByErpPurchaseRequestItemNo(pageReqVO.getErpPurchaseRequestItemNo()).stream().map(SrmPurchaseOrderItemDO::getOrderId).distinct().toList());
-        //            if (orderIds.isEmpty()) {
-        //                orderIds = new ArrayList<>(1); // 初始化一个新的ArrayList
-        //                orderIds.add(-1L); // 指定一个不存在的数据,说明ItemNo 不存在对应的订单
-        //            }
-        //        }
         return purchaseOrderMapper.selectPage(pageReqVO);
     }
 

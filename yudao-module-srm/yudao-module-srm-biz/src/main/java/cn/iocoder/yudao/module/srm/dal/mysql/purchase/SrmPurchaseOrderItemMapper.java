@@ -49,7 +49,7 @@ public interface SrmPurchaseOrderItemMapper extends BaseMapperX<SrmPurchaseOrder
             .eqIfExists(SrmPurchaseOrderDO::getAuditorId, reqVO.getAuditorId())
             //            .betweenIfPresent(SrmPurchaseOrderDO::getAuditTime, reqVO.getAuditTime())
             .eqIfExists(SrmPurchaseOrderDO::getPurchaseEntityId, reqVO.getPurchaseEntityId())
-            .likeIfExists(SrmPurchaseOrderDO::getXCode, reqVO.getXCode())
+            //            .likeIfExists(SrmPurchaseOrderDO::getXCode, reqVO.getXCode())
             .likeIfExists(SrmPurchaseOrderDO::getContainerRate, reqVO.getContainerRate())
             .eqIfExists(SrmPurchaseOrderDO::getWarehouseId, reqVO.getWarehouseId())
             .eqIfExists(SrmPurchaseOrderDO::getOffStatus, reqVO.getOffStatus())
