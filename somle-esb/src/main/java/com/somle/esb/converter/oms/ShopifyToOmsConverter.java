@@ -5,7 +5,8 @@ import cn.iocoder.yudao.module.oms.dal.dataobject.OmsShopDO;
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsShopProductDO;
 import cn.iocoder.yudao.module.oms.service.OmsShopService;
 import com.somle.esb.client.oms.SyncOmsClient;
-import com.somle.esb.enums.SalesPlatform;
+import com.somle.esb.enums.oms.SalesPlatformEnum;
+import com.somle.esb.enums.oms.ShopTypeEnum;
 import com.somle.esb.model.OmsProfileDTO;
 import com.somle.shopify.model.reps.ShopifyProductRepsVO;
 import com.somle.shopify.model.reps.ShopifyShopRepsVO;
@@ -16,6 +17,10 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static com.somle.esb.enums.ErrorCodeConstants.OMS_SYNC_SHOPIFY_SHOP_INFO_FIRST;
+import static com.somle.esb.enums.ErrorCodeConstants.OMS_SYNC_SHOPIFY_SHOP_INFO_LACK;
+
 
 @Component
 public class ShopifyToOmsConverter<IN, OUT> extends SalesPlatformToOmsConverter<IN, OUT> {
@@ -24,7 +29,7 @@ public class ShopifyToOmsConverter<IN, OUT> extends SalesPlatformToOmsConverter<
     OmsShopService omsShopService;
 
     public ShopifyToOmsConverter() {
-        super(SalesPlatform.SHOPIFY);
+        super(SalesPlatformEnum.SHOPIFY);
     }
 
     @Override
@@ -37,6 +42,7 @@ public class ShopifyToOmsConverter<IN, OUT> extends SalesPlatformToOmsConverter<
             shopDO.setCode(null);
             shopDO.setPlatformShopCode(shopifyShopRepsDTO.getId().toString());
             shopDO.setPlatformCode(shopInfoDTO.getSalesPlatform().name());
+            shopDO.setType(ShopTypeEnum.ONLINE.getType());
             return shopDO;
         }).toList();
         return omsShopDOs;
@@ -53,12 +59,12 @@ public class ShopifyToOmsConverter<IN, OUT> extends SalesPlatformToOmsConverter<
             .map(shops -> shops.get(0))
             .filter(ShopifyShopRepsVO.class::isInstance)
             .map(ShopifyShopRepsVO.class::cast)
-            .orElseThrow(() -> new IllegalStateException("无法获取有效的Shopify店铺信息"));
+            .orElseThrow(() -> exception(OMS_SYNC_SHOPIFY_SHOP_INFO_LACK));
 
         OmsShopDO omsShopDO = omsShopService.getByPlatformShopCode(shopifyShopRepsVO.getId().toString());
 
         if (omsShopDO == null) {
-            throw new IllegalStateException("请先同步Shopify店铺信息");
+            throw exception(OMS_SYNC_SHOPIFY_SHOP_INFO_FIRST);
         }
 
         List<ShopifyProductRepsVO> shopProductList = (List<ShopifyProductRepsVO>) shopProductInfoDTO.getPayload();

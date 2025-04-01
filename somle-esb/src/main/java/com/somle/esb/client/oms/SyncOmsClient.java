@@ -1,6 +1,6 @@
 package com.somle.esb.client.oms;
 
-import com.somle.esb.enums.SalesPlatform;
+import com.somle.esb.enums.oms.SalesPlatformEnum;
 
 import java.util.List;
 
@@ -13,13 +13,13 @@ import java.util.List;
 
 public abstract class SyncOmsClient<S, P> {
 
-    private final SalesPlatform salesPlatform;
+    private final SalesPlatformEnum salesPlatform;
 
-    public SyncOmsClient(SalesPlatform salesPlatform) {
+    public SyncOmsClient(SalesPlatformEnum salesPlatform) {
         this.salesPlatform = salesPlatform;
     }
 
-    public SalesPlatform getSalesPlatform() {
+    public SalesPlatformEnum getSalesPlatform() {
         return salesPlatform;
     }
 

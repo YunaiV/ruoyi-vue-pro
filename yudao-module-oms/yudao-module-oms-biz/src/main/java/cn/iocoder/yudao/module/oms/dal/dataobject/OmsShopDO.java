@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.oms.dal.dataobject;
 
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
@@ -51,5 +53,5 @@ public class OmsShopDO extends TenantBaseDO {
     /**
      * 店铺类型
      */
-    private String type;
+    private Integer type;
 }

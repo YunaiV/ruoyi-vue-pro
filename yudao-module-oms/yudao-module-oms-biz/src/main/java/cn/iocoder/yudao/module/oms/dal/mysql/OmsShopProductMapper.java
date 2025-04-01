@@ -18,11 +18,11 @@ import java.util.List;
 @Mapper
 public interface OmsShopProductMapper extends BaseMapperX<OmsShopProductDO> {
     default List<OmsShopProductDO> getByPlatformCode(String platformCode) {
-        MPJLambdaWrapper<OmsShopProductDO> eq = new MPJLambdaWrapperX<OmsShopProductDO>()
+        MPJLambdaWrapper<OmsShopProductDO> wrapper = new MPJLambdaWrapperX<OmsShopProductDO>()
             .selectAll(OmsShopProductDO.class)  // 选择所有列
             .leftJoin(OmsShopDO.class, OmsShopDO::getId, OmsShopProductDO::getShopId)
             .eq(OmsShopDO::getPlatformCode, platformCode);
 
-        return selectJoinList(OmsShopProductDO.class, eq);
+        return selectJoinList(OmsShopProductDO.class, wrapper);
     }
 }

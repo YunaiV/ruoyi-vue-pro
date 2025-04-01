@@ -6,9 +6,9 @@ import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsShopDO;
 import com.somle.esb.client.oms.SyncOmsClient;
 import com.somle.esb.converter.oms.SalesPlatformToOmsConverter;
-import com.somle.esb.enums.SalesPlatform;
-import com.somle.esb.enums.SyncOmsType;
 import com.somle.esb.enums.TenantId;
+import com.somle.esb.enums.oms.SalesPlatformEnum;
+import com.somle.esb.enums.oms.SyncOmsTypeEnum;
 import com.somle.esb.job.oms.SyncOmsDataJob;
 import com.somle.esb.model.OmsProfileDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +16,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static com.somle.esb.enums.ErrorCodeConstants.OMS_SYNC_SHOP_INFO_LACK;
 
 @Slf4j
 @Component
@@ -30,7 +33,7 @@ public class SyncShopsJob extends SyncOmsDataJob {
      * @Description: 同步指定平台的店铺资料
      * @return:
      */
-    public void syncShopProfile(SalesPlatform salesPlatform, Map<SalesPlatform, SyncOmsClient> shopProfileClientMap) {
+    public void syncShopProfile(SalesPlatformEnum salesPlatform, Map<SalesPlatformEnum, SyncOmsClient> shopProfileClientMap) {
         // 设置租户为默认租户
         TenantContextHolder.setTenantId(TenantId.DEFAULT.getId());
         // 按平台获取店铺资料对接的客户端类型
@@ -44,11 +47,11 @@ public class SyncShopsJob extends SyncOmsDataJob {
         List<?> shops = shopProfileClient.getShops();
 
         if (CollectionUtils.isEmpty(shops)) {
-            throw new RuntimeException("缺少店铺信息");
+            throw exception(OMS_SYNC_SHOP_INFO_LACK);
         }
 
         // 转换VO
-        OmsProfileDTO<List<?>> omsProfileDTO = new OmsProfileDTO<>(salesPlatform, SyncOmsType.SHOP, shops);
+        OmsProfileDTO<List<?>> omsProfileDTO = new OmsProfileDTO<>(salesPlatform, SyncOmsTypeEnum.SHOP, shops);
         List<OmsShopDO> shopVOs = SalesPlatformToOmsConverter.convert(omsProfileDTO, shopProfileClient);
 
 
@@ -60,10 +63,10 @@ public class SyncShopsJob extends SyncOmsDataJob {
     /**
      * 同步店铺资料
      **/
-    public void syncShops(SalesPlatform salesPlatform, List<OmsShopDO> shops) {
+    public void syncShops(SalesPlatformEnum salesPlatform, List<OmsShopDO> shops) {
 
         if (CollectionUtils.isEmpty(shops)) {
-            throw new RuntimeException("缺少店铺信息");
+            throw exception(OMS_SYNC_SHOP_INFO_LACK);
         }
 
         List<OmsShopDO> createShops = new ArrayList<>();

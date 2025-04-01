@@ -3,12 +3,16 @@ package com.somle.esb.converter.oms;
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsShopDO;
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsShopProductDO;
 import com.somle.esb.client.oms.SyncOmsClient;
-import com.somle.esb.enums.SalesPlatform;
+import com.somle.esb.enums.oms.SalesPlatformEnum;
 import com.somle.esb.model.OmsProfileDTO;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static com.somle.esb.enums.ErrorCodeConstants.OMS_SYNC_CONVERTER_METHOD_NOT_FOUND;
+import static com.somle.esb.enums.ErrorCodeConstants.OMS_SYNC_CONVERTER_NOT_FOUND;
 
 
 /**
@@ -31,16 +35,16 @@ public abstract class SalesPlatformToOmsConverter<IN, OUT> {
         String key = makeKey(omsProfileDTO.getSalesPlatform());
         SalesPlatformToOmsConverter<?, ?> converter = CONVERTERS.get(key);
         if (converter == null) {
-            throw new IllegalArgumentException("未找到对应的转换器:" + omsProfileDTO.getSalesPlatform().name());
+            throw exception(OMS_SYNC_CONVERTER_NOT_FOUND, omsProfileDTO.getSalesPlatform().name());
         }
 
-        switch (omsProfileDTO.getSyncOmsType()) {
+        switch (omsProfileDTO.getSyncOmsTypeEnum()) {
             case SHOP:
                 return converter.toOmsShopDO(omsProfileDTO);
             case PRODUCT:
                 return converter.toOmsShopProductDO(omsProfileDTO, shopProductProfileClient);
             default:
-                throw new IllegalArgumentException("未找到对应的转换方法:" + omsProfileDTO.getSalesPlatform().name());
+                throw exception(OMS_SYNC_CONVERTER_METHOD_NOT_FOUND, omsProfileDTO.getSalesPlatform().name());
         }
     }
 
@@ -50,7 +54,7 @@ public abstract class SalesPlatformToOmsConverter<IN, OUT> {
      * @Description: 转换器构造方法，初始化时将key和对应的类型转换器注册到map中
      * @return:
      */
-    protected SalesPlatformToOmsConverter(SalesPlatform salesPlatform) {
+    protected SalesPlatformToOmsConverter(SalesPlatformEnum salesPlatform) {
         CONVERTERS.put(makeKey(salesPlatform), this);
     }
 
@@ -59,7 +63,7 @@ public abstract class SalesPlatformToOmsConverter<IN, OUT> {
      * @Description: 跟进销售平台生成key
      * @return: @return {@link String }
      */
-    private static String makeKey(SalesPlatform salesPlatform) {
+    private static String makeKey(SalesPlatformEnum salesPlatform) {
         return salesPlatform.name();
     }
 

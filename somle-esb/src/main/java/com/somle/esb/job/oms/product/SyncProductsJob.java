@@ -6,9 +6,9 @@ import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsShopProductDO;
 import com.somle.esb.client.oms.SyncOmsClient;
 import com.somle.esb.converter.oms.SalesPlatformToOmsConverter;
-import com.somle.esb.enums.SalesPlatform;
-import com.somle.esb.enums.SyncOmsType;
 import com.somle.esb.enums.TenantId;
+import com.somle.esb.enums.oms.SalesPlatformEnum;
+import com.somle.esb.enums.oms.SyncOmsTypeEnum;
 import com.somle.esb.job.oms.SyncOmsDataJob;
 import com.somle.esb.model.OmsProfileDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -17,12 +17,15 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static com.somle.esb.enums.ErrorCodeConstants.OMS_SYNC_SHOP_PRODUCT_LACK;
+
 @Slf4j
 @Component
 public class SyncProductsJob extends SyncOmsDataJob {
 
 
-    public void syncShopProductProfile(SalesPlatform salesPlatform, Map<SalesPlatform, SyncOmsClient> shopProductProfileClientMap) {
+    public void syncShopProductProfile(SalesPlatformEnum salesPlatform, Map<SalesPlatformEnum, SyncOmsClient> shopProductProfileClientMap) {
         // 设置租户为默认租户
         TenantContextHolder.setTenantId(TenantId.DEFAULT.getId());
         // 按平台获取店铺资料对接的客户端类型
@@ -36,11 +39,11 @@ public class SyncProductsJob extends SyncOmsDataJob {
         List<?> shopProducts = shopProductProfileClient.getProducts();
 
         if (CollectionUtils.isEmpty(shopProducts)) {
-            throw new RuntimeException("缺少店铺产品信息");
+            throw exception(OMS_SYNC_SHOP_PRODUCT_LACK);
         }
 
         // 转换VO
-        OmsProfileDTO<List<?>> omsProfileDTO = new OmsProfileDTO<>(salesPlatform, SyncOmsType.PRODUCT, shopProducts);
+        OmsProfileDTO<List<?>> omsProfileDTO = new OmsProfileDTO<>(salesPlatform, SyncOmsTypeEnum.PRODUCT, shopProducts);
         List<OmsShopProductDO> shopProductVOs = SalesPlatformToOmsConverter.convert(omsProfileDTO, shopProductProfileClient);
 
         // 同步店铺产品信息
@@ -51,10 +54,10 @@ public class SyncProductsJob extends SyncOmsDataJob {
     /**
      * 保存店铺产品信息
      **/
-    public void syncShops(SalesPlatform salesPlatform, List<OmsShopProductDO> shopProductVOs) {
+    public void syncShops(SalesPlatformEnum salesPlatform, List<OmsShopProductDO> shopProductVOs) {
 
         if (CollectionUtils.isEmpty(shopProductVOs)) {
-            throw new RuntimeException("缺少店铺产品信息");
+            throw exception(OMS_SYNC_SHOP_PRODUCT_LACK);
         }
 
         List<OmsShopProductDO> createShopProducts = new ArrayList<>();
@@ -62,7 +65,7 @@ public class SyncProductsJob extends SyncOmsDataJob {
 
         List<OmsShopProductDO> existShopProducts = omsShopProductService.getByPlatformCode(salesPlatform.name());
 
-        // 使用Map存储已存在的店铺，key=sourceId, value=OmsShopProductDO
+        // 使用Map存储已存在的店铺产品信息，key=sourceId, value=OmsShopProductDO
         Map<String, OmsShopProductDO> existShopProductMap = Optional.ofNullable(existShopProducts)
             .orElse(Collections.emptyList())
             .stream()

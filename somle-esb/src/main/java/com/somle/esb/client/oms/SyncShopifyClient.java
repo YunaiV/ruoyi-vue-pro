@@ -1,7 +1,7 @@
 package com.somle.esb.client.oms;
 
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
-import com.somle.esb.enums.SalesPlatform;
+import com.somle.esb.enums.oms.SalesPlatformEnum;
 import com.somle.shopify.model.ShopifyToken;
 import com.somle.shopify.model.reps.ShopifyProductRepsVO;
 import com.somle.shopify.model.reps.ShopifyShopRepsVO;
@@ -28,7 +28,7 @@ public class SyncShopifyClient extends SyncOmsClient<JSONObject, JSONObject> {
     List<ShopifyClient> shopifyClients;
 
     public SyncShopifyClient() {
-        super(SalesPlatform.SHOPIFY);
+        super(SalesPlatformEnum.SHOPIFY);
     }
 
     /**
