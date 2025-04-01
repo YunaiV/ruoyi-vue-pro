@@ -193,24 +193,24 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
         purchaseInMapper.updateById(new SrmPurchaseInDO().setId(id).setPaymentPrice(paymentPrice));
     }
 
-    private List<SrmPurchaseInItemDO> validatePurchaseInItems(List<SrmPurchaseInSaveReqVO.Item> voList) {
+    private List<SrmPurchaseInItemDO> validatePurchaseInItems(List<SrmPurchaseInSaveReqVO.Item> voItems) {
         // 1.1 批量获取订单项,根据入库项的订单项id
-        Map<Long, SrmPurchaseOrderItemDO> orderItemMap = convertMap(purchaseOrderService.getPurchaseOrderItemList(convertSet(voList, SrmPurchaseInSaveReqVO.Item::getOrderItemId)), SrmPurchaseOrderItemDO::getId);
+        Map<Long, SrmPurchaseOrderItemDO> orderItemMap = convertMap(purchaseOrderService.getPurchaseOrderItemList(convertSet(voItems, SrmPurchaseInSaveReqVO.Item::getOrderItemId)), SrmPurchaseOrderItemDO::getId);
         //
-        return convertList(voList, voItem -> BeanUtils.toBean(voItem, SrmPurchaseInItemDO.class, item -> {
+        return convertList(voItems, voItem -> BeanUtils.toBean(voItem, SrmPurchaseInItemDO.class, inItemDO -> {
             // 金额计算
-            item.setTotalPrice(MoneyUtils.priceMultiply(item.getProductPrice(), item.getQty()));
-            if (item.getTaxPercent() != null && item.getTotalPrice() != null) {
-                item.setTaxPrice(MoneyUtils.priceMultiplyPercent(item.getTotalPrice(), item.getTaxPercent()));
+            inItemDO.setTotalPrice(MoneyUtils.priceMultiply(inItemDO.getProductPrice(), inItemDO.getQty()));
+            if (inItemDO.getTaxPercent() != null && inItemDO.getTotalPrice() != null) {
+                inItemDO.setTaxPrice(MoneyUtils.priceMultiplyPercent(inItemDO.getTotalPrice(), inItemDO.getTaxPercent()));
             }
             // 填充订单项字段
-            Optional.ofNullable(item.getOrderItemId()).ifPresent(orderItemId -> {
-                SrmPurchaseOrderItemDO orderItemDO = orderItemMap.get(orderItemId);
-                if (orderItemDO != null) {
-                    BeanUtils.copyProperties(SrmOrderInConvert.INSTANCE.toPurchaseInItem(orderItemDO), item);
-                    item.setOrderItemId(orderItemDO.getId());
-                }
-            });
+//            Optional.ofNullable(inItemDO.getOrderItemId()).ifPresent(orderItemId -> {
+//                SrmPurchaseOrderItemDO orderItemDO = orderItemMap.get(orderItemId);
+//                if (orderItemDO != null) {
+//                    BeanUtils.copyProperties(SrmOrderInConvert.INSTANCE.toPurchaseInItem(orderItemDO), inItemDO);
+//                    inItemDO.setOrderItemId(orderItemDO.getId());
+//                }
+//            });
         }));
     }
 

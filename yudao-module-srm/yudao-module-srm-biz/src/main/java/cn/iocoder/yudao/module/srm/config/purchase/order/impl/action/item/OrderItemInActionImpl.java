@@ -9,6 +9,8 @@ import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseOrderItemMapper
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseOrderMapper;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseRequestItemsMapper;
 import cn.iocoder.yudao.module.srm.enums.SrmEventEnum;
+import cn.iocoder.yudao.module.srm.enums.status.SrmOffStatus;
+import cn.iocoder.yudao.module.srm.enums.status.SrmPaymentStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmStorageStatus;
 import com.alibaba.cola.statemachine.Action;
 import com.alibaba.cola.statemachine.StateMachine;
@@ -19,11 +21,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.Optional;
 
 import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PURCHASE_REQUEST_ITEM_NOT_FOUND;
-import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_ORDER_STORAGE_STATE_MACHINE_NAME;
-import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_REQUEST_ITEM_STORAGE_STATE_MACHINE_NAME;
+import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.*;
 
 //订单项入库状态机
 @Component
@@ -41,6 +43,9 @@ public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventE
 
     @Resource(name = PURCHASE_REQUEST_ITEM_STORAGE_STATE_MACHINE_NAME)
     private StateMachine purchaseRequestItemStateMachine;
+
+    @Resource(name = PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME)
+    private StateMachine<SrmOffStatus, SrmEventEnum, SrmPurchaseOrderItemDO> purchaseOrderItemOffStateMachine;
 
     //入库项(->入库主单)->订单项(->订单主单)->申请项(->订单主单)
     @Override
@@ -81,7 +86,7 @@ public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventE
             } else {
                 // 全部入库
                 to = (SrmStorageStatus.ALL_IN_STORAGE);
-                //执行状态完毕
+
             }
 
         }
@@ -94,11 +99,13 @@ public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventE
         log.debug("订单项入库状态机触发({})事件：订单项ID={}，状态 {} -> {}, 入库数量={}, 退货数量={}", event.getDesc(),
             oldData.getId(), from.getDesc(), to.getDesc(), dto.getInCount(), dto.getReturnCount());
         //4.0
-        transferOrder(event, oldData);
-        transferRequestItem(oldData, dtoCount);
+        toOrder(event, oldData);
+        toRequestItem(oldData, dtoCount);
+        // 当前订单项，完全入库 + 完全付款 -> 关闭订单项
+        checkStatusAndClose(dto.getOrderItemId());
     }
 
-    private void transferRequestItem(SrmPurchaseOrderItemDO oldData, BigDecimal dtoCount) {
+    private void toRequestItem(SrmPurchaseOrderItemDO oldData, BigDecimal dtoCount) {
         //2.0 联动申请项的入库数量
         Optional.ofNullable(oldData.getPurchaseApplyItemId()).ifPresent(applyItemId -> {
             //传递给申请项入库状态机
@@ -114,7 +121,7 @@ public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventE
         });
     }
 
-    private void transferOrder(SrmEventEnum event, SrmPurchaseOrderItemDO oldData) {
+    private void toOrder(SrmEventEnum event, SrmPurchaseOrderItemDO oldData) {
         // -触发订单入库状态变更
         // 根据订单项ID查询订单信息
         SrmPurchaseOrderDO orderDO = mapper.selectById(oldData.getOrderId());
@@ -122,5 +129,14 @@ public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventE
             log.error("未找到对应的采购订单,订单ID={}", oldData.getOrderId());
         }
         storageStateMachine.fireEvent(SrmStorageStatus.fromCode(orderDO.getInStatus()), event, orderDO);
+    }
+
+    private void checkStatusAndClose(Long orderItemId) {
+        SrmPurchaseOrderItemDO orderItemDO = itemMapper.selectById(orderItemId);
+        if (Objects.equals(orderItemDO.getInStatus(), SrmStorageStatus.ALL_IN_STORAGE.getCode()) && Objects.equals(orderItemDO.getPayStatus(),
+            SrmPaymentStatus.ALL_PAYMENT.getCode())) {
+            // 当前订单项，完全入库 + 完全付款 -> 关闭订单项
+            purchaseOrderItemOffStateMachine.fireEvent(SrmOffStatus.fromCode(orderItemDO.getOffStatus()), SrmEventEnum.AUTO_CLOSE, orderItemDO);
+        }
     }
 }

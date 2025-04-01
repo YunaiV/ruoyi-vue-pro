@@ -13,7 +13,7 @@ import java.util.Map;
 public enum SrmPaymentStatus implements ArrayValuable<Integer> {
     NONE_PAYMENT(1, "未付款"),
     PARTIALLY_PAYMENT(2, "部分付款"),
-    ALL_PAYMENT(3, "已付款"),
+    ALL_PAYMENT(3, "完全付款"),
     PAYMENT_EXCEPTION(4, "付款异常"),
     ;
 

@@ -37,8 +37,8 @@ public interface SrmOrderConvert {
      * @return 采购订单的入参reqVO的item
      */
     default SrmPurchaseOrderSaveReqVO.Item convertToErpPurchaseOrderSaveReqVOItem(SrmPurchaseRequestItemsDO itemDO,
-        Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> requestItemsMap,
-        Map<Long, SrmPurchaseRequestItemsDO> itemDOMap) {
+        Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> requestItemsMap, Map<Long, SrmPurchaseRequestItemsDO> itemDOMap) {
+
         SrmPurchaseOrderSaveReqVO.Item item = new SrmPurchaseOrderSaveReqVO.Item();
         //SrmPurchaseRequestItemsDO ->  SrmPurchaseOrderSaveReqVO.Item
         SrmPurchaseRequestItemsDO requestItemsDO = itemDOMap.get(itemDO.getId());

@@ -69,11 +69,8 @@ public class InPayItemActionImpl implements Action<SrmPaymentStatus, SrmEventEnu
         log.debug("入库子项付款状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
         //传递给主表状态机
         forwardMsg(inItemDO);
-        //传递给订单项状态机
-//        if (event == SrmEventEnum.COMPLETE_PAYMENT || event == SrmEventEnum.CANCEL_PAYMENT) {
-        //付款调整 传递
+        //付款 传递给订单
         forwardPayMsg(inItemDO, event);
-//        }
     }
 
     private void forwardPayMsg(SrmPurchaseInItemDO inItemDO, SrmEventEnum event) {

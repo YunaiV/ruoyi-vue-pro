@@ -22,7 +22,7 @@ public class BaseFailCallbackImpl<S, E, C> implements FailCallback<S, E, C> {
         //如果sourceState 的类是erpAuditStatus
         String statusDesc = convertEventToDescription(sourceState);
         //        String msg = StrUtil.format("无法在({})状态下触发事件({})，上下文：{}", statusDesc, SrmEventEnum.valueOf(event.toString()).getDesc(), JSONUtil.toJsonStr(context));
-        String msg = StrUtil.format("无法在({})状态下触发事件({})，上下文：{}", statusDesc, SrmEventEnum.valueOf(event.toString()).getDesc(), context.getClass().getName());
+        String msg = StrUtil.format("无法在({})状态下触发({})事件，上下文：{}", statusDesc, SrmEventEnum.valueOf(event.toString()).getDesc(), context.getClass().getName());
         log.warn(msg);
         //        throw new IllegalArgumentException(msg);
         //        throw new ServiceException(msg);

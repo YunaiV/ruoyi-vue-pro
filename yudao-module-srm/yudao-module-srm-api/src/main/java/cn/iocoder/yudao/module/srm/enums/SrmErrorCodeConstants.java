@@ -51,16 +51,12 @@ public interface SrmErrorCodeConstants {
     ErrorCode PURCHASE_ORDER_GENERATE_CONTRACT_FAIL_PARSE = new ErrorCode(1_030_101_022, "解析模板({})失败,({})");
     ErrorCode PURCHASE_ORDER_GENERATE_CONTRACT_FAIL_ERROR =
         new ErrorCode(1_030_101_022, "生成合同发生错误，请联系管理员");
-    ErrorCode PURCHASE_ORDER_ITEM_IN_FAIL_EXISTS_IN =
-        new ErrorCode(1_030_101_021, "采购订单项({})存在对应的入库项，无法反审核");
-    //无法删除,采购订单项({})存在对应的入库项
-    ErrorCode PURCHASE_ORDER_ITEM_IN_FAIL_EXISTS_DEL =
-        new ErrorCode(1_030_101_021, "采购订单项({})存在对应的入库项，无法删除");
-    //采购订单主单单号({})已存在
+    ErrorCode PURCHASE_ORDER_ITEM_IN_FAIL_EXISTS_IN = new ErrorCode(1_030_101_021, "采购订单项编号({})存在对应的入库项，无法反审核");
+    ErrorCode PURCHASE_ORDER_ITEM_IN_FAIL_EXISTS_DEL = new ErrorCode(1_030_101_021, "采购订单项({})存在对应的入库项，无法删除");
     ErrorCode PURCHASE_ORDER_NO_HAS_EXISTS = new ErrorCode(1_030_101_004, "采购订单NO:({})已经存在");
-    //采购订单不处于已审核，无法修改验货+完工单
     ErrorCode PURCHASE_ORDER_ITEM_IN_FAIL_APPROVE =
         new ErrorCode(1_030_101_023, "采购订单项({})不处于已审核，无法修改验货+完工单");
+    ErrorCode PURCHASE_ORDER_NOT_AUDIT = new ErrorCode(1_030_101_024, "订单处于已审核,才可以生成采购合同");
 
     // ========== ERP 采购入库（1-030-102-000） ==========
     ErrorCode PURCHASE_IN_NOT_EXISTS = new ErrorCode(1_030_102_000, "采购入库单不存在");
@@ -160,7 +156,7 @@ public interface SrmErrorCodeConstants {
     //采购子项不存在
     ErrorCode PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_ID = new ErrorCode(1_030_603_143, "采购请求ID=({})没有子项");
     //当前状态不能触发事件
-    ErrorCode PURCHASE_REQUEST_NOT_EXISTS_BY_STATUS = new ErrorCode(1_030_603_144, "无法在当前状态({})下触发事件({})");
+    ErrorCode PURCHASE_REQUEST_NOT_EXISTS_BY_STATUS = new ErrorCode(1_030_603_144, "无法在({})在状态下触发({})事件");
     ErrorCode PURCHASE_REQUEST_MERGE_FAIL = new ErrorCode(1_030_603_145, "采购申请单({})未审核，无法合并");
     ErrorCode PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_OPEN = new ErrorCode(1_030_603_146, "采购申请项({})不处于开启状态");
     //存在对应订单，无法手动关闭

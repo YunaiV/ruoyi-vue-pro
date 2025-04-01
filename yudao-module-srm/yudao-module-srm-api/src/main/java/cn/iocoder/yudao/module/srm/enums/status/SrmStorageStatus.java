@@ -13,7 +13,7 @@ import java.util.Map;
 public enum SrmStorageStatus implements ArrayValuable<Integer> {
     NONE_IN_STORAGE(1, "未入库"),
     PARTIALLY_IN_STORAGE(2, "部分入库"),
-    ALL_IN_STORAGE(3, "已入库"),
+    ALL_IN_STORAGE(3, "全部入库"),
     ;
 
 

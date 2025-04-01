@@ -6,7 +6,9 @@ import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemD
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseOrderItemMapper;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseOrderMapper;
 import cn.iocoder.yudao.module.srm.enums.SrmEventEnum;
+import cn.iocoder.yudao.module.srm.enums.status.SrmOffStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmPaymentStatus;
+import cn.iocoder.yudao.module.srm.enums.status.SrmStorageStatus;
 import com.alibaba.cola.statemachine.Action;
 import com.alibaba.cola.statemachine.StateMachine;
 import jakarta.annotation.Resource;
@@ -15,7 +17,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
+import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME;
 import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_ORDER_PAYMENT_STATE_MACHINE_NAME;
 
 @Component
@@ -27,7 +31,8 @@ public class OrderItemPayActionImpl implements Action<SrmPaymentStatus, SrmEvent
     private SrmPurchaseOrderMapper mapper;
     @Resource(name = PURCHASE_ORDER_PAYMENT_STATE_MACHINE_NAME)
     private StateMachine<SrmPaymentStatus, SrmEventEnum, SrmPurchaseOrderDO> paymentStateMachine;
-
+    @Resource(name = PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME)
+    private StateMachine<SrmOffStatus, SrmEventEnum, SrmPurchaseOrderItemDO> purchaseOrderItemOffStateMachine;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -40,7 +45,6 @@ public class OrderItemPayActionImpl implements Action<SrmPaymentStatus, SrmEvent
         }
 
         // 2. 更新支付状态
-
         if (event == SrmEventEnum.PAYMENT_ADJUSTMENT) {
             // 2.1 更新支付金额
             if (context.getPayCountDiff() != null) {
@@ -70,5 +74,17 @@ public class OrderItemPayActionImpl implements Action<SrmPaymentStatus, SrmEvent
             return;
         }
         paymentStateMachine.fireEvent(SrmPaymentStatus.fromCode(orderDO.getPayStatus()), event, orderDO);
+        //当前订单项，完全入库 + 完全付款 -> 关闭订单项
+        checkStatusAndClose(orderItemDO.getId());
+    }
+
+
+    private void checkStatusAndClose(Long orderItemId) {
+        SrmPurchaseOrderItemDO orderItemDO = itemMapper.selectById(orderItemId);
+        if (Objects.equals(orderItemDO.getInStatus(), SrmStorageStatus.ALL_IN_STORAGE.getCode()) && Objects.equals(orderItemDO.getPayStatus(),
+            SrmPaymentStatus.ALL_PAYMENT.getCode())) {
+            // 当前订单项，完全入库 + 完全付款 -> 关闭订单项
+            purchaseOrderItemOffStateMachine.fireEvent(SrmOffStatus.fromCode(orderItemDO.getOffStatus()), SrmEventEnum.AUTO_CLOSE, orderItemDO);
+        }
     }
 }
