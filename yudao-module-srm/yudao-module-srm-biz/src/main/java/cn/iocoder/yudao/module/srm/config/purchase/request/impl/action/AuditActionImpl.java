@@ -52,7 +52,7 @@ public class AuditActionImpl implements Action<SrmAuditStatus, SrmEventEnum, Srm
             // 设置批准数量
             itemsDOS.forEach(itemDO -> {
                 SrmPurchaseRequestAuditReqVO.requestItems item = itemMap.get(itemDO.getId());
-                itemDO.setApproveCount(item.getApproveCount() == null ? itemDO.getQty() : item.getApproveCount());//默认(批准数量 = 申请数量)
+                itemDO.setApprovedQty(item.getApprovedQty() == null ? itemDO.getQty() : item.getApprovedQty());//默认(批准数量 = 申请数量)
             });
             //设置审核意见
             data.setReviewComment(req.getReviewComment());

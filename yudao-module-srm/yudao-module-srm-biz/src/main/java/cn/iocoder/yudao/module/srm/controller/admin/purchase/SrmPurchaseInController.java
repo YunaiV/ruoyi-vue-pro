@@ -86,15 +86,6 @@ public class SrmPurchaseInController {
         return success(true);
     }
 
-    //    @PutMapping("/update-status")
-    //    @Operation(summary = "更新采购入库的状态")
-    //    @PreAuthorize("@ss.hasPermission('erp:purchase-in:update-status')")
-    //    public CommonResult<Boolean> updatePurchaseInStatus(@RequestParam("id") Long id,
-    //                                                        @RequestParam("status") Integer status) {
-    //        purchaseInService.updatePurchaseInStatus(id, status);
-    //        return success(true);
-    //    }
-
     @DeleteMapping("/delete")
     @Operation(summary = "删除采购入库")
     @Parameter(name = "ids", description = "编号数组", required = true)

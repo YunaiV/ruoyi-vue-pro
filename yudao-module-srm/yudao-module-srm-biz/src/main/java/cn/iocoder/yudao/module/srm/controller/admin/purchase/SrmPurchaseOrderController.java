@@ -195,7 +195,7 @@ public class SrmPurchaseOrderController {
     @Operation(summary = "生成采购合同")
     @PreAuthorize("@ss.hasPermission('erp:purchasereq-order:generateContract')")
     public void generateContract(@Validated @RequestBody SrmPurchaseOrderGenerateContractReqVO reqVO,
-        HttpServletResponse response) {
+                                 HttpServletResponse response) {
         purchaseOrderService.generateContract(reqVO, response);
     }
 
@@ -248,7 +248,7 @@ public class SrmPurchaseOrderController {
                             dept -> item.setDepartmentName(dept.getName()));
                         //待入库数量
                         item.setWaitInCount(
-                            item.getQty().subtract(item.getInCount() == null ? BigDecimal.ZERO : item.getInCount()));
+                            item.getQty().subtract(item.getInboundClosedQty() == null ? BigDecimal.ZERO : item.getInboundClosedQty()));
                     }));
             MapUtils.findAndThen(supplierMap, respVO.getSupplierId(),
                 supplier -> respVO.setSupplierName(supplier.getName()));

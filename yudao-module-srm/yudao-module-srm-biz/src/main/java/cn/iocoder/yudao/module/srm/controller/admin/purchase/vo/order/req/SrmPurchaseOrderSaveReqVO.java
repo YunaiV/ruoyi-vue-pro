@@ -167,7 +167,7 @@ public class SrmPurchaseOrderSaveReqVO {
         //         * 采购入库数量
         //         */
         //        @DecimalMin(value = "0.00", message = "采购入库数量不能小于0")
-        //        private BigDecimal inCount;
+        //        private BigDecimal inboundClosedQty;
 
         @Schema(description = "优惠率，百分比", requiredMode = Schema.RequiredMode.REQUIRED)
         private BigDecimal discountPercent;

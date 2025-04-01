@@ -211,11 +211,11 @@ public class SrmPurchaseRequestController {
                 //产品创建者、更新者填充
                 MapUtils.findAndThen(userMap, safeParseLong(item.getCreator()), user -> item.setCreator(user.getNickname()));
                 MapUtils.findAndThen(userMap, safeParseLong(item.getUpdater()), user -> item.setUpdater(user.getNickname()));
-                item.setOrderedQuantity(ObjectUtils.defaultIfNull(item.getOrderedQuantity(), 0));//已订购数量
-                item.setInCount(ObjectUtils.defaultIfNull(item.getInCount(), 0));//入库
-                if (item.getApproveCount() != null && item.getOrderedQuantity() != null) {
+                item.setOrderClosedQty(ObjectUtils.defaultIfNull(item.getOrderClosedQty(), 0));//已订购数量
+                item.setInboundClosedQty(ObjectUtils.defaultIfNull(item.getInboundClosedQty(), 0));//入库
+                if (item.getApprovedQty() != null && item.getOrderClosedQty() != null) {
                     item.setUnOrderCount(ObjectUtils.defaultIfNull(
-                        item.getApproveCount() - item.getOrderedQuantity(), 0));//未订购
+                        item.getApprovedQty() - item.getOrderClosedQty(), 0));//未订购
                 }
             }));
             //2.2 申请单-产品项

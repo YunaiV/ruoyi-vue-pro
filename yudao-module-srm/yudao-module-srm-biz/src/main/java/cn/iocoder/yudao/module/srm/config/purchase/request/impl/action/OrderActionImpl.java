@@ -31,10 +31,10 @@ public class OrderActionImpl implements Action<SrmOrderStatus, SrmEventEnum, Srm
     @Override
     @Transactional
     public void execute(SrmOrderStatus from, SrmOrderStatus to, SrmEventEnum event, SrmPurchaseRequestDO context) {
-//        if (event == SrmEventEnum.ORDER_GOODS_ADD || event == SrmEventEnum.ORDER_GOODS_REDUCE) {
-//            updatePurchaseOrderStatus(context);
-//            return;
-//        }
+        //        if (event == SrmEventEnum.ORDER_GOODS_ADD || event == SrmEventEnum.ORDER_GOODS_REDUCE) {
+        //            updatePurchaseOrderStatus(context);
+        //            return;
+        //        }
 
         SrmPurchaseRequestDO requestDO = purchaseRequestMapper.selectById(context.getId());
         if (requestDO == null) {
@@ -43,17 +43,21 @@ public class OrderActionImpl implements Action<SrmOrderStatus, SrmEventEnum, Srm
         }
         //子数量调整
         if (event == SrmEventEnum.ORDER_ADJUSTMENT) {
-            List<SrmPurchaseRequestItemsDO> requestItemsDOS = purchaseRequestItemsMapper.selectListByRequestId(requestDO.getId());
+            List<SrmPurchaseRequestItemsDO> requestItemsDOS =
+                purchaseRequestItemsMapper.selectListByRequestId(requestDO.getId());
             //全部采购
-            if (requestItemsDOS.stream().allMatch(item -> item.getOrderStatus().equals(SrmOrderStatus.ORDERED.getCode()))) {
+            if (requestItemsDOS.stream()
+                .allMatch(item -> item.getOrderStatus().equals(SrmOrderStatus.ORDERED.getCode()))) {
                 requestDO.setOrderStatus(SrmOrderStatus.ORDERED.getCode());
             }
             //部分采购
-            if (requestItemsDOS.stream().anyMatch(item -> item.getOrderStatus().equals(SrmOrderStatus.PARTIALLY_ORDERED.getCode()))) {
+            if (requestItemsDOS.stream()
+                .anyMatch(item -> item.getOrderStatus().equals(SrmOrderStatus.PARTIALLY_ORDERED.getCode()))) {
                 requestDO.setOrderStatus(SrmOrderStatus.PARTIALLY_ORDERED.getCode());
             }
             //未采购,状态都是未采购
-            if (requestItemsDOS.stream().allMatch(item -> item.getOrderStatus().equals(SrmOrderStatus.OT_ORDERED.getCode()))) {
+            if (requestItemsDOS.stream()
+                .allMatch(item -> item.getOrderStatus().equals(SrmOrderStatus.OT_ORDERED.getCode()))) {
                 requestDO.setOrderStatus(SrmOrderStatus.OT_ORDERED.getCode());
             }
         } else {
@@ -63,8 +67,8 @@ public class OrderActionImpl implements Action<SrmOrderStatus, SrmEventEnum, Srm
         // 其他事件：直接更新采购申请的状态
 
         ThrowUtil.ifSqlThrow(purchaseRequestMapper.updateById(requestDO), GlobalErrorCodeConstants.DB_UPDATE_ERROR);
-        log.debug("采购状态机触发({})事件：将对象{},由状态 {}->{}",
-            event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), SrmOrderStatus.fromCode(requestDO.getOrderStatus()).getDesc());
+        log.debug("采购状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context),
+            from.getDesc(), SrmOrderStatus.fromCode(requestDO.getOrderStatus()).getDesc());
     }
 
     /**
@@ -79,12 +83,12 @@ public class OrderActionImpl implements Action<SrmOrderStatus, SrmEventEnum, Srm
         }
 
         // 1. 检查是否所有子项都满足 "批准数量 == 已订购数量"
-        boolean allFullyOrdered = items.stream()
-            .allMatch(item -> Objects.equals(item.getApproveCount(), item.getOrderedQuantity()));
+        boolean allFullyOrdered =
+            items.stream().allMatch(item -> Objects.equals(item.getApprovedQty(), item.getOrderClosedQty()));
 
         // 2. 检查是否所有子项的 "已订购数量 == 0 或 null"
-        boolean allNotOrdered = items.stream()
-            .allMatch(item -> item.getOrderedQuantity() == null || item.getOrderedQuantity() == 0);
+        boolean allNotOrdered =
+            items.stream().allMatch(item -> item.getOrderClosedQty() == null || item.getOrderClosedQty() == 0);
 
         SrmOrderStatus newStatus;
         if (allFullyOrdered) {

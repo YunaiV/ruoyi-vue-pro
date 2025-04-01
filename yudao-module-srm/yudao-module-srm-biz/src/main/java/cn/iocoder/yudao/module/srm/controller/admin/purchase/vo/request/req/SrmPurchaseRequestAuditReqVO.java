@@ -44,6 +44,6 @@ public class SrmPurchaseRequestAuditReqVO {
         //批准数量
         @NotNull(message = "批准数量不能为空")
         @Schema(description = "批准数量", requiredMode = Schema.RequiredMode.REQUIRED)
-        private Integer approveCount;
+        private Integer approvedQty;
     }
 }

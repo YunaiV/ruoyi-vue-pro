@@ -42,7 +42,6 @@ public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventE
     @Resource(name = PURCHASE_REQUEST_ITEM_STORAGE_STATE_MACHINE_NAME)
     private StateMachine purchaseRequestItemStateMachine;
 
-
     //入库项(->入库主单)->订单项(->订单主单)->申请项(->订单主单)
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -57,7 +56,7 @@ public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventE
             return; // 防止空指针异常
         }
         // 计算最新入库数量
-        BigDecimal oldInCount = oldData.getInCount() == null ? BigDecimal.ZERO : oldData.getInCount();
+        BigDecimal oldInCount = oldData.getInboundClosedQty() == null ? BigDecimal.ZERO : oldData.getInboundClosedQty();
         BigDecimal dtoCount = dto.getInCount() == null ? BigDecimal.ZERO : dto.getInCount();
         BigDecimal newInCount = oldInCount.add(dtoCount); // 计算新的入库数量
         //退货数量
@@ -87,20 +86,13 @@ public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventE
 
         }
         // 更新数据库中的采购项状态
-        itemMapper.updateById(oldData
-            .setInStatus(to.getCode())//状态
-            .setInCount(newInCount)//入库数量
+        itemMapper.updateById(oldData.setInStatus(to.getCode())//状态
+            .setInboundClosedQty(newInCount)//入库数量
         );
 
         // 3. 记录日志
-        log.debug("订单项入库状态机触发({})事件：订单项ID={}，状态 {} -> {}, 入库数量={}, 退货数量={}",
-            event.getDesc(),
-            oldData.getId(),
-            from.getDesc(),
-            to.getDesc(),
-            dto.getInCount(),
-            dto.getReturnCount()
-        );
+        log.debug("订单项入库状态机触发({})事件：订单项ID={}，状态 {} -> {}, 入库数量={}, 退货数量={}", event.getDesc(),
+            oldData.getId(), from.getDesc(), to.getDesc(), dto.getInCount(), dto.getReturnCount());
         //4.0
         transferOrder(event, oldData);
         transferRequestItem(oldData, dtoCount);
@@ -108,21 +100,18 @@ public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventE
 
     private void transferRequestItem(SrmPurchaseOrderItemDO oldData, BigDecimal dtoCount) {
         //2.0 联动申请项的入库数量
-        Optional.ofNullable(oldData.getPurchaseApplyItemId()).ifPresent(
-            applyItemId -> {
-                //传递给申请项入库状态机
-                SrmPurchaseRequestItemsDO applyItemDO = erpPurchaseRequestItemsMapper.selectById(applyItemId);
-                ThrowUtil.ifThrow(applyItemDO == null, PURCHASE_REQUEST_ITEM_NOT_FOUND, oldData.getId(), applyItemId);
-                BigDecimal oldCount = applyItemDO.getInCount();
-//                BigDecimal result = (oldCount != null && oldCount.compareTo(BigDecimal.ZERO) == 0) ? BigDecimal.ZERO : oldCount;
-                BigDecimal result = oldCount == null ? BigDecimal.ZERO : oldCount;
-                BigDecimal changeCount = result.subtract(dtoCount);
-                purchaseRequestItemStateMachine.fireEvent(SrmStorageStatus.fromCode(applyItemDO.getInStatus())
-                    , SrmEventEnum.STOCK_ADJUSTMENT
-                    , SrmInCountDTO.builder().applyItemId(applyItemId).inCount(changeCount).build()
-                );
-            }
-        );
+        Optional.ofNullable(oldData.getPurchaseApplyItemId()).ifPresent(applyItemId -> {
+            //传递给申请项入库状态机
+            SrmPurchaseRequestItemsDO applyItemDO = erpPurchaseRequestItemsMapper.selectById(applyItemId);
+            ThrowUtil.ifThrow(applyItemDO == null, PURCHASE_REQUEST_ITEM_NOT_FOUND, oldData.getId(), applyItemId);
+            BigDecimal oldCount = applyItemDO.getInboundClosedQty();
+            //                BigDecimal result = (oldCount != null && oldCount.compareTo(BigDecimal.ZERO) == 0) ? BigDecimal.ZERO : oldCount;
+            BigDecimal result = oldCount == null ? BigDecimal.ZERO : oldCount;
+            BigDecimal changeCount = result.subtract(dtoCount);
+            purchaseRequestItemStateMachine.fireEvent(SrmStorageStatus.fromCode(applyItemDO.getInStatus()),
+                SrmEventEnum.STOCK_ADJUSTMENT,
+                SrmInCountDTO.builder().applyItemId(applyItemId).inCount(changeCount).build());
+        });
     }
 
     private void transferOrder(SrmEventEnum event, SrmPurchaseOrderItemDO oldData) {

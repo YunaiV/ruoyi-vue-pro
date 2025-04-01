@@ -207,7 +207,7 @@ public class SrmPurchaseOrderBaseRespVO extends BaseVO {
         private BigDecimal waitInCount;
 
         @Schema(description = "采购入库数量")
-        private BigDecimal inCount;
+        private BigDecimal inboundClosedQty;
 
         // ========== 采购退货（出库）） ==========
         @Schema(description = "采购退货数量")
@@ -264,7 +264,6 @@ public class SrmPurchaseOrderBaseRespVO extends BaseVO {
         private String erpPurchaseRequestItemNo;
         //        @Schema(description = "申请项")
         //        private SrmPurchaseRequestItemRespVO purchaseRequestItem;
-
 
         @Schema(description = "交货日期")
         private LocalDateTime deliveryTime;

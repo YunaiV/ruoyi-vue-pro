@@ -92,7 +92,7 @@ public class SrmPurchaseRequestItemRespVO extends BaseVO {
 
     @Schema(description = "批准数量")
     @ExcelProperty("批准数量")
-    private Integer approveCount;
+    private Integer approvedQty;
 
     // ========== 其他状态信息 ==========
     @Schema(description = "关闭状态（已关闭，已开启）")
@@ -104,11 +104,11 @@ public class SrmPurchaseRequestItemRespVO extends BaseVO {
     private Integer unOrderCount;
 
     @Schema(description = "已订购数量")
-    private Integer orderedQuantity;
+    private Integer orderClosedQty;
 
     @Schema(description = "已入库数量", example = "100")
     @ExcelProperty("已入库数量")
-    private Integer inCount;
+    private Integer inboundClosedQty;
 
     @Schema(description = "行采购状态")
     @ExcelProperty("行采购状态")

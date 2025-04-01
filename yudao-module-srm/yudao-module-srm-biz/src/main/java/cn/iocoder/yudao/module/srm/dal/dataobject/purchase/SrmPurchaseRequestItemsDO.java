@@ -68,11 +68,12 @@ public class SrmPurchaseRequestItemsDO extends TenantBaseDO {
     /**
      * 批准数量
      */
-    private Integer approveCount;
+    private Integer approvedQty;
     /**
      * 入库数量
      */
-    private BigDecimal inCount;
+    private BigDecimal inboundClosedQty;
+    //inbound_closed_qty  inboundClosedQty
     /**
      * 仓库编号
      */
@@ -115,7 +116,7 @@ public class SrmPurchaseRequestItemsDO extends TenantBaseDO {
     /**
      * 产品已订购数量
      */
-    private Integer orderedQuantity;
+    private Integer orderClosedQty;
     //    /**
     //     * ERP 采购订单项ID
     //     * {@link SrmPurchaseOrderItemDO#getId()} ()}

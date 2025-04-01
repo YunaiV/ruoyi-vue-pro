@@ -20,7 +20,6 @@ import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseInItemDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseInItemMapper;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseInMapper;
-import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseOrderItemMapper;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseReturnItemMapper;
 import cn.iocoder.yudao.module.srm.dal.redis.no.SrmNoRedisDAO;
 import cn.iocoder.yudao.module.srm.enums.SrmEventEnum;
@@ -41,6 +40,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -65,9 +65,8 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
     private final SrmPurchaseInItemMapper purchaseInItemMapper;
     private final ErpProductApi erpProductApi;
     private final SrmNoRedisDAO noRedisDAO;
-    @Resource
     private final FmsAccountApi erpAccountApi;
-    private final SrmPurchaseOrderItemMapper orderItemMapper;
+    private final SrmPurchaseReturnItemMapper srmPurchaseReturnItemMapper;
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     SrmPurchaseOrderService purchaseOrderService;
@@ -83,20 +82,17 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
     private StateMachine<SrmStorageStatus, SrmEventEnum, SrmInCountDTO> orderItemStorageMachine;
     @Resource(name = PURCHASE_IN_AUDIT_STATE_MACHINE)
     private StateMachine<SrmAuditStatus, SrmEventEnum, SrmPurchaseInAuditReqVO> purchaseInAuditStateMachine;
-    @Autowired
-    private SrmPurchaseReturnItemMapper srmPurchaseReturnItemMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createPurchaseIn(SrmPurchaseInSaveReqVO createReqVO) {
         // 1.1 校验采购订单已审核
         for (SrmPurchaseInSaveReqVO.Item item : createReqVO.getItems()) {
-            SrmPurchaseOrderItemDO aDo = orderItemMapper.selectById(item.getOrderItemId());
+            SrmPurchaseOrderItemDO aDo = purchaseOrderService.validatePurchaseOrderItemExists(item.getOrderItemId());
             if (aDo != null) {
                 Optional.ofNullable(aDo.getOrderId()).ifPresent(orderId -> purchaseOrderService.validatePurchaseOrder(orderId));
             }
         }
-        //        SrmPurchaseOrderDO purchaseOrder = purchaseOrderService.validatePurchaseOrder(createReqVO.getOrderId());
         // 1.2 校验入库项的有效性
         List<SrmPurchaseInItemDO> purchaseInItems = validatePurchaseInItems(createReqVO.getItems());
         // 1.3 校验结算账户
@@ -111,7 +107,7 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
         ThrowUtil.ifSqlThrow(purchaseInMapper.insert(purchaseIn), GlobalErrorCodeConstants.DB_INSERT_ERROR);
         // 2.2 插入入库项
         purchaseInItems.forEach(o -> o.setInId(purchaseIn.getId()));
-        BeanUtils.copyProperties(purchaseInItems, createReqVO.getItems());
+        BeanUtils.copyProperties(createReqVO.getItems(), purchaseInItems);
         ThrowUtil.ifThrow(!purchaseInItemMapper.insertBatch(purchaseInItems), GlobalErrorCodeConstants.DB_BATCH_INSERT_ERROR);
         //3.0 设置初始化状态
         initMasterStatus(purchaseIn);
@@ -133,8 +129,7 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
     private void rollbackSlaveStatus(List<SrmPurchaseInItemDO> diffList) {
         for (SrmPurchaseInItemDO inItemDO : diffList) {
             Optional.ofNullable(inItemDO.getOrderItemId()).ifPresent(orderItemId -> {
-                SrmPurchaseOrderItemDO orderItemDO = orderItemMapper.selectById(orderItemId);
-
+                SrmPurchaseOrderItemDO orderItemDO = purchaseOrderService.validatePurchaseOrderItemExists(orderItemId);
                 orderItemStorageMachine.fireEvent(SrmStorageStatus.fromCode(orderItemDO.getInStatus()), SrmEventEnum.STOCK_ADJUSTMENT, SrmInCountDTO.builder().orderItemId(orderItemId)
                     //取反数量
                     .inCount(inItemDO.getQty().negate()).build());
@@ -152,7 +147,7 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
         }
         // 1.2 校验采购订单已审核
         for (SrmPurchaseInSaveReqVO.Item item : vo.getItems()) {
-            SrmPurchaseOrderItemDO aDo = orderItemMapper.selectById(item.getOrderItemId());
+            SrmPurchaseOrderItemDO aDo = purchaseOrderService.validatePurchaseOrderItemExists(item.getOrderItemId());
             if (aDo != null) {
                 Optional.ofNullable(aDo.getOrderId()).ifPresent(orderId -> purchaseOrderService.validatePurchaseOrder(orderId));
             }
@@ -198,20 +193,17 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
         purchaseInMapper.updateById(new SrmPurchaseInDO().setId(id).setPaymentPrice(paymentPrice));
     }
 
-    private List<SrmPurchaseInItemDO> validatePurchaseInItems(List<SrmPurchaseInSaveReqVO.Item> list) {
+    private List<SrmPurchaseInItemDO> validatePurchaseInItems(List<SrmPurchaseInSaveReqVO.Item> voList) {
         // 1. 校验产品存在
-        List<ErpProductDTO> productList = erpProductApi.validProductList(convertSet(list, SrmPurchaseInSaveReqVO.Item::getProductId));
+        List<ErpProductDTO> productList = erpProductApi.validProductList(convertSet(voList, SrmPurchaseInSaveReqVO.Item::getProductId));
         Map<Long, ErpProductDTO> productMap = convertMap(productList, ErpProductDTO::getId);
         // 1.2 批量获取订单项,根据入库项的订单项id
-        Map<Long, SrmPurchaseOrderItemDO> orderItemMap = convertMap(purchaseOrderService.getPurchaseOrderItemList(convertSet(list, SrmPurchaseInSaveReqVO.Item::getOrderItemId)), SrmPurchaseOrderItemDO::getId);
+        Map<Long, SrmPurchaseOrderItemDO> orderItemMap = convertMap(purchaseOrderService.getPurchaseOrderItemList(convertSet(voList, SrmPurchaseInSaveReqVO.Item::getOrderItemId)), SrmPurchaseOrderItemDO::getId);
         // 2. 转化为 SrmPurchaseInItemDO 列表
-        return convertList(list, o -> BeanUtils.toBean(o, SrmPurchaseInItemDO.class, item -> {
-            item.setProductUnitId(productMap.get(item.getProductId()).getUnitId());
+        return convertList(voList, voItem -> BeanUtils.toBean(voItem, SrmPurchaseInItemDO.class, item -> {
+//            item.setProductUnitId(productMap.get(item.getProductId()).getUnitId());
             item.setTotalPrice(MoneyUtils.priceMultiply(item.getProductPrice(), item.getQty()));
-            if (item.getTotalPrice() == null) {
-                return;
-            }
-            if (item.getTaxPercent() != null) {
+            if (item.getTaxPercent() != null && item.getTotalPrice() != null) {
                 item.setTaxPrice(MoneyUtils.priceMultiplyPercent(item.getTotalPrice(), item.getTaxPercent()));
             }
             //根据订单项来填充入库项product属性
@@ -275,8 +267,7 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
             //传递给订单项入库状态机 数量
             Optional.ofNullable(purchaseInItem.getOrderItemId()).ifPresent(orderItemId -> {//存在订单项
                 //校验订单项是否存在
-                purchaseOrderService.validatePurchaseOrderItemExists(orderItemId);
-                SrmPurchaseOrderItemDO orderItemDO = orderItemMapper.selectById(orderItemId);
+                SrmPurchaseOrderItemDO orderItemDO = purchaseOrderService.validatePurchaseOrderItemExists(orderItemId);
                 //更新订单项入库数量+状态 入库状态机,创建入库单->增加入库数量
                 orderItemStorageMachine.fireEvent(SrmStorageStatus.fromCode(orderItemDO.getInStatus()), SrmEventEnum.STOCK_ADJUSTMENT, SrmInCountDTO.builder().orderItemId(orderItemId)
                     //正数
@@ -367,6 +358,20 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
             return Collections.emptyList();
         }
         return purchaseInItemMapper.selectListByInIds(inIds);
+    }
+
+    @Override
+    public List<SrmPurchaseInItemDO> validatePurchaseInItemExists(List<Long> inIds) {
+        if (CollUtil.isEmpty(inIds)) {
+            return Collections.emptyList();
+        }
+        List<SrmPurchaseInItemDO> inItemDOS = purchaseInItemMapper.selectByIds(inIds);
+        //检验是否和ids数量一致，报错未对应入库项
+        if (inItemDOS.size() != inIds.size()) {
+            throw exception(PURCHASE_IN_ITEM_NOT_EXISTS, CollUtil.subtract(inIds, CollUtil.newArrayList(
+                inItemDOS.stream().map(SrmPurchaseInItemDO::getId).collect(Collectors.toSet()))));
+        }
+        return inItemDOS;
     }
 
     @Override

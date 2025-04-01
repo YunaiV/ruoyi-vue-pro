@@ -101,6 +101,13 @@ public interface SrmPurchaseInService {
     List<SrmPurchaseInItemDO> getPurchaseInItemListByInIds(Collection<Long> inIds);
 
     /**
+     * 检验入库id是否存在
+     *
+     * @param inIds 入库id
+     */
+    List<SrmPurchaseInItemDO> validatePurchaseInItemExists(List<Long> inIds);
+
+    /**
      * 提交审核
      *
      * @param inIds 入库单ids
