@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.Version;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -29,6 +30,8 @@ public class SrmPurchaseInItemDO extends BaseDO {
      */
     @TableId
     private Long id;
+    @Version
+    private Long version;
     /**
      * 采购入库编号
      * 关联 {@link SrmPurchaseInDO#getId()}

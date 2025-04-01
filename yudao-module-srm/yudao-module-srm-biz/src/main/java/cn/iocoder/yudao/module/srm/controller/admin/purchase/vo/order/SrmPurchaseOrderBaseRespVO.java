@@ -86,7 +86,7 @@ public class SrmPurchaseOrderBaseRespVO extends BaseVO {
     private String paymentTerms;
 
     @Schema(description = "采购主体编号")
-    private Long purchaseEntityId;
+    private Long purchaseCompanyId;
 
     @Schema(description = "结算日期")
     private LocalDateTime settlementDate;
@@ -146,6 +146,7 @@ public class SrmPurchaseOrderBaseRespVO extends BaseVO {
 
     @Schema(description = "版本号")
     private Long version;
+
 
     @Data
     public static class Item extends BaseVO {

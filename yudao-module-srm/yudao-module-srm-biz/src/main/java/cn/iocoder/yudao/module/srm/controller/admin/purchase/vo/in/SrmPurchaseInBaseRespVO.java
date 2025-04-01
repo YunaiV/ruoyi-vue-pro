@@ -42,6 +42,9 @@ public class SrmPurchaseInBaseRespVO extends SrmPurchaseBaseRespVO {
     @Schema(description = "审核意见")
     private String reviewComment;
 
+    @Schema(description = "版本号")
+    private Long version;
+
     @Schema(description = "入库项列表")
     private List<Item> items;
 
@@ -168,5 +171,8 @@ public class SrmPurchaseInBaseRespVO extends SrmPurchaseBaseRespVO {
 
         @Schema(description = "产品单位名称")
         private String productUnitName;
+
+        @Schema(description = "版本号")
+        private Long version;
     }
 }

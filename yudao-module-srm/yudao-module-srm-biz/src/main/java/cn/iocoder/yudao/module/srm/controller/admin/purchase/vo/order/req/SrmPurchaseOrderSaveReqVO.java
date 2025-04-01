@@ -23,9 +23,9 @@ public class SrmPurchaseOrderSaveReqVO {
     private Long id;
 
     @Pattern(regexp = "^" + PURCHASE_ORDER_NO_PREFIX + "-\\d{8}-\\d{6}$",
-             message = "单据编号格式不正确，正确格式如：" + PURCHASE_ORDER_NO_PREFIX + "-20250108-000001")
+        message = "单据编号格式不正确，正确格式如：" + PURCHASE_ORDER_NO_PREFIX + "-20250108-000001")
     @Pattern(regexp = "^" + PURCHASE_ORDER_NO_PREFIX + "-\\d{8}-[0-8]\\d{5}$",
-             message = "单据编号格式不正确，注意后6位序号中不能以9开头,正确格式:" + PURCHASE_ORDER_NO_PREFIX + "-20250108-000001")
+        message = "单据编号格式不正确，注意后6位序号中不能以9开头,正确格式:" + PURCHASE_ORDER_NO_PREFIX + "-20250108-000001")
     @Schema(description = "单据编号", example = "CGDD-20250108-000027")
     private String no;
 
@@ -56,7 +56,7 @@ public class SrmPurchaseOrderSaveReqVO {
     private String paymentTerms;
 
     @Schema(description = "采购主体编号")
-    private Long purchaseEntityId;
+    private Long purchaseCompanyId;
 
     @Schema(description = "装运港")
     private String portOfLoading;

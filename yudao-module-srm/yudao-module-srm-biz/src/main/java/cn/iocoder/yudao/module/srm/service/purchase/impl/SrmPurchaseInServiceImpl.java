@@ -8,13 +8,13 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.fms.api.finance.FmsAccountApi;
 import cn.iocoder.yudao.module.srm.api.purchase.SrmInCountDTO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.SrmPurchaseInAuditReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.SrmPurchaseInPageReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.SrmPurchaseInPayReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.SrmPurchaseInSaveReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.req.SrmPurchaseInAuditReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.req.SrmPurchaseInPageReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.req.SrmPurchaseInPayReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.req.SrmPurchaseInSaveReqVO;
+import cn.iocoder.yudao.module.srm.convert.purchase.SrmOrderInConvert;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseInDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseInItemDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
@@ -194,42 +194,21 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
     }
 
     private List<SrmPurchaseInItemDO> validatePurchaseInItems(List<SrmPurchaseInSaveReqVO.Item> voList) {
-        // 1. 校验产品存在
-        List<ErpProductDTO> productList = erpProductApi.validProductList(convertSet(voList, SrmPurchaseInSaveReqVO.Item::getProductId));
-        Map<Long, ErpProductDTO> productMap = convertMap(productList, ErpProductDTO::getId);
-        // 1.2 批量获取订单项,根据入库项的订单项id
+        // 1.1 批量获取订单项,根据入库项的订单项id
         Map<Long, SrmPurchaseOrderItemDO> orderItemMap = convertMap(purchaseOrderService.getPurchaseOrderItemList(convertSet(voList, SrmPurchaseInSaveReqVO.Item::getOrderItemId)), SrmPurchaseOrderItemDO::getId);
-        // 2. 转化为 SrmPurchaseInItemDO 列表
+        //
         return convertList(voList, voItem -> BeanUtils.toBean(voItem, SrmPurchaseInItemDO.class, item -> {
-//            item.setProductUnitId(productMap.get(item.getProductId()).getUnitId());
+            // 金额计算
             item.setTotalPrice(MoneyUtils.priceMultiply(item.getProductPrice(), item.getQty()));
             if (item.getTaxPercent() != null && item.getTotalPrice() != null) {
                 item.setTaxPrice(MoneyUtils.priceMultiplyPercent(item.getTotalPrice(), item.getTaxPercent()));
             }
-            //根据订单项来填充入库项product属性
+            // 填充订单项字段
             Optional.ofNullable(item.getOrderItemId()).ifPresent(orderItemId -> {
                 SrmPurchaseOrderItemDO orderItemDO = orderItemMap.get(orderItemId);
                 if (orderItemDO != null) {
-                    //TODO 后续可以直接返回订单项VO，不存储订单项相关属性
-                    //产品
-                    item.setProductId(orderItemDO.getProductId());
-                    item.setProductName(orderItemDO.getProductName());
-                    item.setProductUnitName(orderItemDO.getProductUnitName());
-                    item.setBarCode(orderItemDO.getBarCode());
-                    item.setProductPrice(orderItemDO.getProductPrice());
-                    item.setTaxPrice(orderItemDO.getTaxPrice());
-                    item.setAllAmount(orderItemDO.getAllAmount());
-                    item.setExchangeRate(orderItemDO.getExchangeRate());
-                    item.setActTaxPrice(orderItemDO.getActTaxPrice());
-                    item.setContainerRate(orderItemDO.getContainerRate());
-                    item.setCurrencyId(orderItemDO.getCurrencyId());
-                    //报关品名
-                    item.setDeclaredType(orderItemDO.getDeclaredType());
-                    //币别名称
-                    item.setCurrencyId(orderItemDO.getCurrencyId());
-                    item.setCurrencyName(orderItemDO.getCurrencyName());
-                    //仓库
-                    item.setWarehouseId(orderItemDO.getWarehouseId());
+                    BeanUtils.copyProperties(SrmOrderInConvert.INSTANCE.toPurchaseInItem(orderItemDO), item);
+                    item.setOrderItemId(orderItemDO.getId());
                 }
             });
         }));

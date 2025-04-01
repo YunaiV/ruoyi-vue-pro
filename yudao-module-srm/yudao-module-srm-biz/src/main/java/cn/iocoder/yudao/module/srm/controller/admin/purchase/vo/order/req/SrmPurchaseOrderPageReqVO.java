@@ -84,7 +84,7 @@ public class SrmPurchaseOrderPageReqVO extends PageParam {
     private LocalDateTime[] auditTime;
 
     @Schema(description = "财务主体id")
-    private Long purchaseEntityId;
+    private Long purchaseCompanyId;
 
     @Schema(description = "x码")
     private String xCode;

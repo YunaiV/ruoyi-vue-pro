@@ -118,7 +118,7 @@ public class SrmPurchaseOrderDO extends TenantBaseDO {
     /**
      * 财务主体id
      */
-    private Long purchaseEntityId;
+    private Long purchaseCompanyId;
     //    /**
     //     * x码
     //     */

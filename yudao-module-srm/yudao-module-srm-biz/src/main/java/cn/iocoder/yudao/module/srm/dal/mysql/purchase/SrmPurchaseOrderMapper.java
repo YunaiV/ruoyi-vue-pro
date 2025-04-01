@@ -40,7 +40,7 @@ public interface SrmPurchaseOrderMapper extends BaseMapperX<SrmPurchaseOrderDO> 
             .betweenIfPresent(SrmPurchaseOrderDO::getSettlementDate, reqVO.getSettlementDate())
             .eqIfPresent(SrmPurchaseOrderDO::getAuditorId, reqVO.getAuditorId())
             .betweenIfPresent(SrmPurchaseOrderDO::getAuditTime, reqVO.getAuditTime())
-            .eqIfPresent(SrmPurchaseOrderDO::getPurchaseEntityId, reqVO.getPurchaseEntityId())
+            .eqIfPresent(SrmPurchaseOrderDO::getPurchaseCompanyId, reqVO.getPurchaseCompanyId())
             //            .likeIfPresent(SrmPurchaseOrderDO::getXCode, reqVO.getXCode())
             .likeIfPresent(SrmPurchaseOrderDO::getContainerRate, reqVO.getContainerRate())
             .eqIfPresent(SrmPurchaseOrderDO::getWarehouseId, reqVO.getWarehouseId())

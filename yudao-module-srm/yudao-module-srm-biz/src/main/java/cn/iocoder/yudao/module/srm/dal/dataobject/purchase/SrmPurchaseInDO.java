@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.srm.enums.status.SrmAuditStatus;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.Version;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -29,6 +30,8 @@ public class SrmPurchaseInDO extends BaseDO {
      */
     @TableId
     private Long id;
+    @Version
+    private Long version;
     /**
      * 采购入库单据编号
      */

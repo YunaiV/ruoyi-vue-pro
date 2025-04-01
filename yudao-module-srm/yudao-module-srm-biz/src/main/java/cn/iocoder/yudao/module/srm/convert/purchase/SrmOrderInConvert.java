@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.srm.convert.purchase;
 
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.SrmPurchaseInSaveReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.req.SrmPurchaseInSaveReqVO;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseInItemDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
 import org.apache.ibatis.annotations.Param;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -22,9 +24,9 @@ public interface SrmOrderInConvert {
     }
 
     /**
-     * 采购项转换成采购入库单vo
+     * 订单项转换成采购入库项vo.item
      *
-     * @param orderItemDO 采购项
+     * @param orderItemDO 订单项
      * @return 入库项vo
      */
     default SrmPurchaseInSaveReqVO.Item convertToErpPurchaseInSaveReqVOItem(@Param("orderItemDO") SrmPurchaseOrderItemDO orderItemDO) {
@@ -32,7 +34,7 @@ public interface SrmOrderInConvert {
             return null;
         }
         SrmPurchaseInSaveReqVO.Item inVOItem = new SrmPurchaseInSaveReqVO.Item();
-        BeanUtils.copyProperties(orderItemDO, inVOItem); // 复制相同属性
+        BeanUtils.copyProperties(orderItemDO, inVOItem);
         inVOItem.setId(null); // 创建时 ID 需要为 null
         inVOItem.setSource("采购项合并入库"); // 单据来源，默认写死
 //        inVOItem.setOrderId(orderItemDO.getOrderId()); // 订单编号转 int 作为源单号
@@ -46,6 +48,15 @@ public interface SrmOrderInConvert {
         }
         return items.stream().map(this::convertToErpPurchaseInSaveReqVOItem).collect(Collectors.toList());
     }
+
+    /**
+     * 订单项 -> 入库项DO
+     */
+//    @Mapping(target = "orderItemId", ignore = true)
+//    @Mapping(target = "model", ignore = true)
+//    @Mapping(target = "inId", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    SrmPurchaseInItemDO toPurchaseInItem(SrmPurchaseOrderItemDO orderItemDO);
 
 
 }

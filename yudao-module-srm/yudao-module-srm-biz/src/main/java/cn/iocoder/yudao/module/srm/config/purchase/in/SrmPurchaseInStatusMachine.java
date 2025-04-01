@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.srm.config.purchase.in;
 
 import cn.iocoder.yudao.module.srm.config.purchase.in.impl.action.InAuditActionImpl;
 import cn.iocoder.yudao.module.srm.config.purchase.in.impl.action.InPayActionImpl;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.SrmPurchaseInAuditReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.req.SrmPurchaseInAuditReqVO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseInDO;
 import cn.iocoder.yudao.module.srm.enums.SrmEventEnum;
 import cn.iocoder.yudao.module.srm.enums.SrmStateMachines;

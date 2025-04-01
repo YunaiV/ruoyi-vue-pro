@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in;
+package cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.req;
 
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
 import cn.iocoder.yudao.module.system.api.utils.Validation;
@@ -64,6 +64,9 @@ public class SrmPurchaseInSaveReqVO {
     @Schema(description = "对账状态(false:未对账 ，true:已对账)")
     private Boolean reconciliationStatus;
 
+    @Schema(description = "版本号")
+    private Long version;
+
     @Schema(description = "入库清单列表")
     @Size(min = 1, message = "入库项至少有一个")
     @NotNull(message = "入库项不能为空")
@@ -108,5 +111,8 @@ public class SrmPurchaseInSaveReqVO {
 
         @Schema(description = "申请人部门id")
         private Long applicationDeptId;
+
+        @Schema(description = "版本号")
+        private Long version;
     }
 }
