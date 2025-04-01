@@ -115,8 +115,7 @@ public interface SrmPurchaseOrderService {
      * 根据订单id获得订单map
      */
     default Map<Long, SrmPurchaseOrderDO> getPurchaseOrderMap(Collection<Long> orderIds) {
-        return this.getPurchaseOrderList(orderIds).stream()
-            .collect(Collectors.toMap(SrmPurchaseOrderDO::getId, v -> v));
+        return this.getPurchaseOrderList(orderIds).stream().collect(Collectors.toMap(SrmPurchaseOrderDO::getId, v -> v));
     }
 
     /**

@@ -147,7 +147,6 @@ public class SrmPurchaseOrderBaseRespVO extends BaseVO {
     @Schema(description = "版本号")
     private Long version;
 
-
     @Data
     public static class Item extends BaseVO {
 

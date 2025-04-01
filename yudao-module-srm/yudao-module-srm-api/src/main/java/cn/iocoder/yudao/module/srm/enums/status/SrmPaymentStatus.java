@@ -11,10 +11,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Getter
 public enum SrmPaymentStatus implements ArrayValuable<Integer> {
-    NONE_PAYMENT(1, "未付款"),
-    PARTIALLY_PAYMENT(2, "部分付款"),
-    ALL_PAYMENT(3, "完全付款"),
-    PAYMENT_EXCEPTION(4, "付款异常"),
+    NONE_PAYMENT(1, "未付款"), PARTIALLY_PAYMENT(2, "部分付款"), ALL_PAYMENT(3, "完全付款"), PAYMENT_EXCEPTION(4, "付款异常"),
     ;
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(SrmPaymentStatus::getCode).toArray();

@@ -33,24 +33,20 @@ public class SrmPurchaseInItemDO extends BaseDO {
     @Version
     private Long version;
     /**
-     * 采购入库编号
-     * 关联 {@link SrmPurchaseInDO#getId()}
+     * 采购入库编号 关联 {@link SrmPurchaseInDO#getId()}
      */
     private Long inId;
 
     /**
-     * 仓库编号
-     * 关联 {@link cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO#getId()}
+     * 仓库编号 关联 {@link cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO#getId()}
      */
     private Long warehouseId;
     /**
-     * 产品编号
-     * 关联 {@link cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO#getId()}
+     * 产品编号 关联 {@link cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO#getId()}
      */
     private Long productId;
     /**
-     * 产品单位
-     * 冗余 {@link cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO#getUnitId()}
+     * 产品单位 冗余 {@link cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO#getUnitId()}
      */
     private Long productUnitId;
     /**
@@ -62,8 +58,7 @@ public class SrmPurchaseInItemDO extends BaseDO {
      */
     private BigDecimal qty;
     /**
-     * 总价，单位：元
-     * totalPrice = productPrice * qty
+     * 总价，单位：元 totalPrice = productPrice * qty
      */
     private BigDecimal totalPrice;
     /**
@@ -71,8 +66,7 @@ public class SrmPurchaseInItemDO extends BaseDO {
      */
     private BigDecimal taxPercent;
     /**
-     * 税额，单位：元
-     * taxPrice = totalPrice * taxPercent
+     * 税额，单位：元 taxPrice = totalPrice * taxPercent
      */
     private BigDecimal taxPrice;
     /**
@@ -80,21 +74,18 @@ public class SrmPurchaseInItemDO extends BaseDO {
      */
     private String remark;
     /**
-     * 箱率
-     * 关联 {@link SrmPurchaseOrderItemDO#getContainerRate()}
+     * 箱率 关联 {@link SrmPurchaseOrderItemDO#getContainerRate()}
      */
     private String containerRate;//箱率
     /**
-     * 采购订单项编号
-     * 关联 {@link SrmPurchaseOrderItemDO#getId()}
-     * 目的：方便更新关联的采购订单项的入库数量
+     * 采购订单项编号 关联 {@link SrmPurchaseOrderItemDO#getId()} 目的：方便更新关联的采购订单项的入库数量
      */
     private Long orderItemId;
-//    /**
-//     * 采购订单编号-展示用(源单单号,采购单)
-//     * 关联 {@link SrmPurchaseOrderDO#getNo()}
-//     */
-//    private String orderNo;
+    //    /**
+    //     * 采购订单编号-展示用(源单单号,采购单)
+    //     * 关联 {@link SrmPurchaseOrderDO#getNo()}
+    //     */
+    //    private String orderNo;
 
     /**
      * 币别id(财务管理-币别维护)

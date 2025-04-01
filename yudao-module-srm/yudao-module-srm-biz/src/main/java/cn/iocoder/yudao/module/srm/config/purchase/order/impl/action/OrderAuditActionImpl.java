@@ -42,8 +42,7 @@ public class OrderAuditActionImpl implements Action<SrmAuditStatus, SrmEventEnum
             }
             //            orderDO.setReviewComment(reqVO.getReviewComment()); DB添加字段
             ThrowUtil.ifSqlThrow(mapper.updateById(orderDO), DB_UPDATE_ERROR);
-            log.debug("审核状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(reqVO),
-                from.getDesc(), to.getDesc());
+            log.debug("审核状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(reqVO), from.getDesc(), to.getDesc());
         });
     }
 }

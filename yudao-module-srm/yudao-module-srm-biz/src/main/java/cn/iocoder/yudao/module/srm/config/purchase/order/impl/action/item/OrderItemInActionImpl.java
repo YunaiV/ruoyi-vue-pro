@@ -32,10 +32,10 @@ import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.*;
 @Slf4j
 public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventEnum, SrmInCountDTO> {
 
-    @Resource
-    private SrmPurchaseOrderItemMapper itemMapper;
     @Autowired
     SrmPurchaseRequestItemsMapper erpPurchaseRequestItemsMapper;
+    @Resource
+    private SrmPurchaseOrderItemMapper itemMapper;
     @Resource
     private SrmPurchaseOrderMapper mapper;
     @Resource(name = PURCHASE_ORDER_STORAGE_STATE_MACHINE_NAME)
@@ -96,8 +96,8 @@ public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventE
         );
 
         // 3. 记录日志
-        log.debug("订单项入库状态机触发({})事件：订单项ID={}，状态 {} -> {}, 入库数量={}, 退货数量={}", event.getDesc(),
-            oldData.getId(), from.getDesc(), to.getDesc(), dto.getInCount(), dto.getReturnCount());
+        log.debug("订单项入库状态机触发({})事件：订单项ID={}，状态 {} -> {}, 入库数量={}, 退货数量={}", event.getDesc(), oldData.getId(), from.getDesc(),
+            to.getDesc(), dto.getInCount(), dto.getReturnCount());
         //4.0
         toOrder(event, oldData);
         toRequestItem(oldData, dtoCount);
@@ -115,8 +115,7 @@ public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventE
             //                BigDecimal result = (oldCount != null && oldCount.compareTo(BigDecimal.ZERO) == 0) ? BigDecimal.ZERO : oldCount;
             BigDecimal result = oldCount == null ? BigDecimal.ZERO : oldCount;
             BigDecimal changeCount = result.subtract(dtoCount);
-            purchaseRequestItemStateMachine.fireEvent(SrmStorageStatus.fromCode(applyItemDO.getInStatus()),
-                SrmEventEnum.STOCK_ADJUSTMENT,
+            purchaseRequestItemStateMachine.fireEvent(SrmStorageStatus.fromCode(applyItemDO.getInStatus()), SrmEventEnum.STOCK_ADJUSTMENT,
                 SrmInCountDTO.builder().applyItemId(applyItemId).inCount(changeCount).build());
         });
     }

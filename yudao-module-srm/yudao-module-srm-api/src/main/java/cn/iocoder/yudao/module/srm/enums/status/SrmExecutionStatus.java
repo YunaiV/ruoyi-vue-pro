@@ -17,18 +17,10 @@ import java.util.Map;
 @Getter
 public enum SrmExecutionStatus implements ArrayValuable<Integer> {
 
-    PENDING(1, "待执行"),
-    IN_PROGRESS(2, "执行中"),
-    COMPLETED(3, "已完成"),
-    PAUSED(4, "已暂停"),
-    CANCELLED(5, "已取消"),
-    FAILED(6, "执行失败"),
+    PENDING(1, "待执行"), IN_PROGRESS(2, "执行中"), COMPLETED(3, "已完成"), PAUSED(4, "已暂停"), CANCELLED(5, "已取消"), FAILED(6, "执行失败"),
     ON_HOLD(7, "挂起中");
     /**
-     * 0	待执行（TO_BE_EXECUTED）	订单刚创建，尚未入库、未开始发货
-     * 1	执行中（EXECUTING）	有 部分入库记录，表示订单已开始履行
-     * 2	已完成（COMPLETED）	全部入库完成，交付结束，采购完毕
-     * 3	已取消（CANCELED）	采购单被作废、取消（用户操作、驳回、撤回）
+     * 0	待执行（TO_BE_EXECUTED）	订单刚创建，尚未入库、未开始发货 1	执行中（EXECUTING）	有 部分入库记录，表示订单已开始履行 2	已完成（COMPLETED）	全部入库完成，交付结束，采购完毕 3	已取消（CANCELED）	采购单被作废、取消（用户操作、驳回、撤回）
      * 4	已关闭（CLOSED）	被管理员/系统手动关闭，或满足某种“异常终止”条件
      */
 

@@ -28,7 +28,6 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PURCHASE_REQUEST_PROCESS_FAIL_CLOSE;
 
-
 @Slf4j
 @Component
 public class AuditActionImpl implements Action<SrmAuditStatus, SrmEventEnum, SrmPurchaseRequestAuditReqVO> {
@@ -47,8 +46,8 @@ public class AuditActionImpl implements Action<SrmAuditStatus, SrmEventEnum, Srm
         validate(from, to, event, data, itemsDOS);
         //审核通过(批准数量)
         if (event == SrmEventEnum.AGREE) {
-            Map<Long, SrmPurchaseRequestAuditReqVO.requestItems> itemMap = req.getItems().stream()
-                .collect(Collectors.toMap(SrmPurchaseRequestAuditReqVO.requestItems::getId, item -> item));
+            Map<Long, SrmPurchaseRequestAuditReqVO.requestItems> itemMap =
+                req.getItems().stream().collect(Collectors.toMap(SrmPurchaseRequestAuditReqVO.requestItems::getId, item -> item));
             // 设置批准数量
             itemsDOS.forEach(itemDO -> {
                 SrmPurchaseRequestAuditReqVO.requestItems item = itemMap.get(itemDO.getId());
@@ -85,19 +84,19 @@ public class AuditActionImpl implements Action<SrmAuditStatus, SrmEventEnum, Srm
             //不是开启->异常
             ThrowUtil.ifThrow(!SrmOffStatus.OPEN.getCode().equals(aDo.getOffStatus()), PURCHASE_REQUEST_PROCESS_FAIL_CLOSE);
             //已订购+部分订购->异常
-//            ThrowUtil.ifThrow(SrmOrderStatus.PARTIALLY_ORDERED.getCode().equals(aDo.getOrderStatus()) ||
-//                SrmOrderStatus.ORDERED.getCode().equals(aDo.getOrderStatus()
-//                ), PURCHASE_REQUEST_PROCESS_FAIL_ORDERED);
+            //            ThrowUtil.ifThrow(SrmOrderStatus.PARTIALLY_ORDERED.getCode().equals(aDo.getOrderStatus()) ||
+            //                SrmOrderStatus.ORDERED.getCode().equals(aDo.getOrderStatus()
+            //                ), PURCHASE_REQUEST_PROCESS_FAIL_ORDERED);
             //判断是否存在对应的采购单
-//            itemsDOS 获得它的id集合
+            //            itemsDOS 获得它的id集合
             List<Long> ids = itemsDOS.stream().map(SrmPurchaseRequestItemsDO::getId).distinct().toList();
             List<SrmPurchaseOrderItemDO> orderItemDOS = srmPurchaseOrderItemMapper.selectListByPurchaseApplyItemIds(ids);
             //对比差异，报错对应的id
-//            if (CollUtil.isNotEmpty(orderItemDOS)) {
-//                List<Long> orderItemIds = orderItemDOS.stream().map(SrmPurchaseOrderItemDO::getId).distinct().toList();
-//                List<Long> diff = CollUtil.subtract(ids, orderItemIds);
-//                ThrowUtil.ifThrow(CollUtil.isNotEmpty(diff), () -> new RuntimeException("存在未关闭的采购单，请先关闭采购单"));
-//            }
+            //            if (CollUtil.isNotEmpty(orderItemDOS)) {
+            //                List<Long> orderItemIds = orderItemDOS.stream().map(SrmPurchaseOrderItemDO::getId).distinct().toList();
+            //                List<Long> diff = CollUtil.subtract(ids, orderItemIds);
+            //                ThrowUtil.ifThrow(CollUtil.isNotEmpty(diff), () -> new RuntimeException("存在未关闭的采购单，请先关闭采购单"));
+            //            }
         }
     }
 }

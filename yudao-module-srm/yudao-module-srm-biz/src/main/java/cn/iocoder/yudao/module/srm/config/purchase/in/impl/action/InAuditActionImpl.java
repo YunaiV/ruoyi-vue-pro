@@ -19,11 +19,9 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_UPDATE_ERROR;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-
 @Slf4j
 @Component
 public class InAuditActionImpl implements Action<SrmAuditStatus, SrmEventEnum, SrmPurchaseInAuditReqVO> {
-
 
     @Resource
     private SrmPurchaseInMapper mapper;
@@ -34,17 +32,17 @@ public class InAuditActionImpl implements Action<SrmAuditStatus, SrmEventEnum, S
     @Transactional
     public void execute(SrmAuditStatus from, SrmAuditStatus to, SrmEventEnum event, SrmPurchaseInAuditReqVO req) {
         SrmPurchaseInDO data = mapper.selectById(req.getInId());
-//        List<SrmPurchaseInItemDO> itemDOS = itemsMapper.selectListByInId(req.getInId());
+        //        List<SrmPurchaseInItemDO> itemDOS = itemsMapper.selectListByInId(req.getInId());
         validate(from, to, event, data);
         //审核通过(批准数量)
         if (event == SrmEventEnum.AGREE) {
-//            Map<Long, SrmPurchaseRequestAuditReqVO.requestItems> itemMap = req.getItems().stream()
-//                .collect(Collectors.toMap(SrmPurchaseRequestAuditReqVO.requestItems::getId, item -> item));
+            //            Map<Long, SrmPurchaseRequestAuditReqVO.requestItems> itemMap = req.getItems().stream()
+            //                .collect(Collectors.toMap(SrmPurchaseRequestAuditReqVO.requestItems::getId, item -> item));
             // 设置批准数量
-//            itemsDOS.forEach(itemDO -> {
-//                SrmPurchaseRequestAuditReqVO.requestItems item = itemMap.get(itemDO.getId());
-//                itemDO.setApproveCount(item.getApproveCount() == null ? itemDO.getCount() : item.getApproveCount());//默认(批准数量 = 申请数量)
-//            });
+            //            itemsDOS.forEach(itemDO -> {
+            //                SrmPurchaseRequestAuditReqVO.requestItems item = itemMap.get(itemDO.getId());
+            //                itemDO.setApproveCount(item.getApproveCount() == null ? itemDO.getCount() : item.getApproveCount());//默认(批准数量 = 申请数量)
+            //            });
             //设置审核意见
             data.setReviewComment(req.getReviewComment());
             data.setAuditTime(LocalDateTime.now());
@@ -64,21 +62,21 @@ public class InAuditActionImpl implements Action<SrmAuditStatus, SrmEventEnum, S
         }
         //持久化变更状态
         data.setAuditStatus(to.getCode());
-//        ThrowUtil.ifThrow(!itemsMapper.updateBatch(itemsDOS), DB_BATCH_UPDATE_ERROR);
+        //        ThrowUtil.ifThrow(!itemsMapper.updateBatch(itemsDOS), DB_BATCH_UPDATE_ERROR);
         ThrowUtil.ifSqlThrow(mapper.updateById(data), DB_UPDATE_ERROR);
         log.debug("审核状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(data), from.getDesc(), to.getDesc());
     }
 
     //校验方法
     public void validate(SrmAuditStatus from, SrmAuditStatus to, SrmEventEnum event, SrmPurchaseInDO aDo) {
-//        //如果是反审核事件
-//        if (event == SrmEventEnum.WITHDRAW_REVIEW) {
-//            //不是开启->异常
-//            ThrowUtil.ifThrow(!SrmOffStatus.OPEN.getCode().equals(aDo.getOffStatus()), PURCHASE_REQUEST_PROCESS_FAIL_CLOSE);
-//            //已订购+部分订购->异常
-//            ThrowUtil.ifThrow(SrmOrderStatus.PARTIALLY_ORDERED.getCode().equals(aDo.getOrderStatus()) ||
-//                SrmOrderStatus.ORDERED.getCode().equals(aDo.getOrderStatus()
-//                ), PURCHASE_REQUEST_PROCESS_FAIL_ORDERED);
-//        }
+        //        //如果是反审核事件
+        //        if (event == SrmEventEnum.WITHDRAW_REVIEW) {
+        //            //不是开启->异常
+        //            ThrowUtil.ifThrow(!SrmOffStatus.OPEN.getCode().equals(aDo.getOffStatus()), PURCHASE_REQUEST_PROCESS_FAIL_CLOSE);
+        //            //已订购+部分订购->异常
+        //            ThrowUtil.ifThrow(SrmOrderStatus.PARTIALLY_ORDERED.getCode().equals(aDo.getOrderStatus()) ||
+        //                SrmOrderStatus.ORDERED.getCode().equals(aDo.getOrderStatus()
+        //                ), PURCHASE_REQUEST_PROCESS_FAIL_ORDERED);
+        //        }
     }
 }

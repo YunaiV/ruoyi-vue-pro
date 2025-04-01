@@ -21,7 +21,6 @@ class SrmPurchaseInMapperTest extends BaseDbUnitTest {
         vo.setAuditStatus(1);
         PageResult<SrmPurchaseInDO> page = srmPurchaseInMapper.selectPage(vo);
 
-
         log.info("page = {}", page);
     }
 }

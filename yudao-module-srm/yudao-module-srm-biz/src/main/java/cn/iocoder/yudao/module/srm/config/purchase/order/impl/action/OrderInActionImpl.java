@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemD
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseOrderItemMapper;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseOrderMapper;
 import cn.iocoder.yudao.module.srm.enums.SrmEventEnum;
-import cn.iocoder.yudao.module.srm.enums.status.SrmPaymentStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmStorageStatus;
 import com.alibaba.cola.statemachine.Action;
 import jakarta.annotation.Resource;

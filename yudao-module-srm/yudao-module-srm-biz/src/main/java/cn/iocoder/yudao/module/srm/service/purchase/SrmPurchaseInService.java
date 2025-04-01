@@ -35,13 +35,13 @@ public interface SrmPurchaseInService {
      */
     void updatePurchaseIn(@Valid SrmPurchaseInSaveReqVO updateReqVO);
 
-//    /**
-//     * 更新采购入库的状态
-//     *
-//     * @param id 编号
-//     * @param status 状态
-//     */
-//    void updatePurchaseInStatus(Long id, Integer status);
+    //    /**
+    //     * 更新采购入库的状态
+    //     *
+    //     * @param id 编号
+    //     * @param status 状态
+    //     */
+    //    void updatePurchaseInStatus(Long id, Integer status);
 
     /**
      * 更新采购入库的付款金额

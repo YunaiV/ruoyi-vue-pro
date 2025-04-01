@@ -1,10 +1,5 @@
 package cn.iocoder.yudao.module.srm.config.purchase.request;
 
-import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_REQUEST_AUDIT_STATE_MACHINE_NAME;
-import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME;
-import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME;
-import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_REQUEST_STORAGE_STATE_MACHINE_NAME;
-
 import cn.iocoder.yudao.module.srm.config.purchase.request.impl.action.StorageActionImpl;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.SrmPurchaseRequestAuditReqVO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestDO;
@@ -22,6 +17,8 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.*;
 
 @Slf4j
 @Configuration

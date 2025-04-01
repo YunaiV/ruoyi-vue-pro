@@ -14,7 +14,6 @@ import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.req.SrmPurcha
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.req.SrmPurchaseInPageReqVO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.req.SrmPurchaseInPayReqVO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.req.SrmPurchaseInSaveReqVO;
-import cn.iocoder.yudao.module.srm.convert.purchase.SrmOrderInConvert;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseInDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseInItemDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
@@ -49,7 +48,6 @@ import static cn.iocoder.yudao.module.srm.enums.SrmEventEnum.CANCEL_PAYMENT;
 import static cn.iocoder.yudao.module.srm.enums.SrmEventEnum.COMPLETE_PAYMENT;
 import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.*;
 
-
 /**
  * ERP 采购入库 Service 实现类
  *
@@ -70,7 +68,6 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     SrmPurchaseOrderService purchaseOrderService;
-
 
     @Resource(name = PURCHASE_IN_AUDIT_STATE_MACHINE)
     private StateMachine<SrmAuditStatus, SrmEventEnum, SrmPurchaseInAuditReqVO> auditMachine;
@@ -130,9 +127,10 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
         for (SrmPurchaseInItemDO inItemDO : diffList) {
             Optional.ofNullable(inItemDO.getOrderItemId()).ifPresent(orderItemId -> {
                 SrmPurchaseOrderItemDO orderItemDO = purchaseOrderService.validatePurchaseOrderItemExists(orderItemId);
-                orderItemStorageMachine.fireEvent(SrmStorageStatus.fromCode(orderItemDO.getInStatus()), SrmEventEnum.STOCK_ADJUSTMENT, SrmInCountDTO.builder().orderItemId(orderItemId)
-                    //取反数量
-                    .inCount(inItemDO.getQty().negate()).build());
+                orderItemStorageMachine.fireEvent(SrmStorageStatus.fromCode(orderItemDO.getInStatus()), SrmEventEnum.STOCK_ADJUSTMENT,
+                    SrmInCountDTO.builder().orderItemId(orderItemId)
+                        //取反数量
+                        .inCount(inItemDO.getQty().negate()).build());
             });
         }
     }
@@ -195,7 +193,9 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
 
     private List<SrmPurchaseInItemDO> validatePurchaseInItems(List<SrmPurchaseInSaveReqVO.Item> voItems) {
         // 1.1 批量获取订单项,根据入库项的订单项id
-        Map<Long, SrmPurchaseOrderItemDO> orderItemMap = convertMap(purchaseOrderService.getPurchaseOrderItemList(convertSet(voItems, SrmPurchaseInSaveReqVO.Item::getOrderItemId)), SrmPurchaseOrderItemDO::getId);
+        Map<Long, SrmPurchaseOrderItemDO> orderItemMap =
+            convertMap(purchaseOrderService.getPurchaseOrderItemList(convertSet(voItems, SrmPurchaseInSaveReqVO.Item::getOrderItemId)),
+                SrmPurchaseOrderItemDO::getId);
         //
         return convertList(voItems, voItem -> BeanUtils.toBean(voItem, SrmPurchaseInItemDO.class, inItemDO -> {
             // 金额计算
@@ -204,13 +204,13 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
                 inItemDO.setTaxPrice(MoneyUtils.priceMultiplyPercent(inItemDO.getTotalPrice(), inItemDO.getTaxPercent()));
             }
             // 填充订单项字段
-//            Optional.ofNullable(inItemDO.getOrderItemId()).ifPresent(orderItemId -> {
-//                SrmPurchaseOrderItemDO orderItemDO = orderItemMap.get(orderItemId);
-//                if (orderItemDO != null) {
-//                    BeanUtils.copyProperties(SrmOrderInConvert.INSTANCE.toPurchaseInItem(orderItemDO), inItemDO);
-//                    inItemDO.setOrderItemId(orderItemDO.getId());
-//                }
-//            });
+            //            Optional.ofNullable(inItemDO.getOrderItemId()).ifPresent(orderItemId -> {
+            //                SrmPurchaseOrderItemDO orderItemDO = orderItemMap.get(orderItemId);
+            //                if (orderItemDO != null) {
+            //                    BeanUtils.copyProperties(SrmOrderInConvert.INSTANCE.toPurchaseInItem(orderItemDO), inItemDO);
+            //                    inItemDO.setOrderItemId(orderItemDO.getId());
+            //                }
+            //            });
         }));
     }
 
@@ -239,7 +239,6 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
         }
     }
 
-
     private void linkSlaveStatus(List<SrmPurchaseInItemDO> purchaseInItems) {
         //执行状态+入库状态
         for (SrmPurchaseInItemDO purchaseInItem : purchaseInItems) {
@@ -248,9 +247,10 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
                 //校验订单项是否存在
                 SrmPurchaseOrderItemDO orderItemDO = purchaseOrderService.validatePurchaseOrderItemExists(orderItemId);
                 //更新订单项入库数量+状态 入库状态机,创建入库单->增加入库数量
-                orderItemStorageMachine.fireEvent(SrmStorageStatus.fromCode(orderItemDO.getInStatus()), SrmEventEnum.STOCK_ADJUSTMENT, SrmInCountDTO.builder().orderItemId(orderItemId)
-                    //正数
-                    .inCount(purchaseInItem.getQty()).build());
+                orderItemStorageMachine.fireEvent(SrmStorageStatus.fromCode(orderItemDO.getInStatus()), SrmEventEnum.STOCK_ADJUSTMENT,
+                    SrmInCountDTO.builder().orderItemId(orderItemId)
+                        //正数
+                        .inCount(purchaseInItem.getQty()).build());
             });
         }
     }
@@ -347,8 +347,8 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
         List<SrmPurchaseInItemDO> inItemDOS = purchaseInItemMapper.selectByIds(inIds);
         //检验是否和ids数量一致，报错未对应入库项
         if (inItemDOS.size() != inIds.size()) {
-            throw exception(PURCHASE_IN_ITEM_NOT_EXISTS, CollUtil.subtract(inIds, CollUtil.newArrayList(
-                inItemDOS.stream().map(SrmPurchaseInItemDO::getId).collect(Collectors.toSet()))));
+            throw exception(PURCHASE_IN_ITEM_NOT_EXISTS,
+                CollUtil.subtract(inIds, CollUtil.newArrayList(inItemDOS.stream().map(SrmPurchaseInItemDO::getId).collect(Collectors.toSet()))));
         }
         return inItemDOS;
     }
@@ -357,7 +357,8 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
     public void submitAudit(Collection<Long> inIds) {
         for (Long inId : inIds) {
             SrmPurchaseInDO srmPurchaseInDO = validatePurchaseInExists(inId);
-            purchaseInAuditStateMachine.fireEvent(SrmAuditStatus.fromCode(srmPurchaseInDO.getAuditStatus()), SrmEventEnum.SUBMIT_FOR_REVIEW, SrmPurchaseInAuditReqVO.builder().inId(inId).build());//提交审核
+            purchaseInAuditStateMachine.fireEvent(SrmAuditStatus.fromCode(srmPurchaseInDO.getAuditStatus()), SrmEventEnum.SUBMIT_FOR_REVIEW,
+                SrmPurchaseInAuditReqVO.builder().inId(inId).build());//提交审核
         }
     }
 

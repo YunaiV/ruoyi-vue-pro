@@ -63,10 +63,10 @@ public class SrmPurchaseInController {
     private final WmsWarehouseApi wmsWarehouseApi;
     private final AdminUserApi adminUserApi;
     private final DeptApi deptApi;
+    private final ErpProductApi erpProductApi;
     @Autowired
     @Lazy
     SrmPurchaseOrderService srmPurchaseOrderService;
-    private final ErpProductApi erpProductApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建采购入库")
@@ -122,8 +122,7 @@ public class SrmPurchaseInController {
     @Operation(summary = "导出采购入库 Excel")
     @PreAuthorize("@ss.hasPermission('erp:purchase-in:export')")
     @ApiAccessLog(operateType = EXPORT)
-    public void exportPurchaseInExcel(@Valid SrmPurchaseInPageReqVO pageReqVO, HttpServletResponse response)
-        throws IOException {
+    public void exportPurchaseInExcel(@Valid SrmPurchaseInPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         PageResult<SrmPurchaseInDO> page = purchaseInService.getPurchaseInPage(pageReqVO);
         // 导出 Excel
@@ -170,23 +169,24 @@ public class SrmPurchaseInController {
         Map<Long, SrmSupplierDO> supplierMap = supplierService.getSupplierMap(convertSet(list, SrmPurchaseInDO::getSupplierId));
         // 1.4 人员信息
         Set<Long> userIds = Stream.concat(list.stream().flatMap(orderDO -> Stream.of(orderDO.getAuditorId(),//审核者
-            safeParseLong(orderDO.getCreator()), safeParseLong(orderDO.getUpdater()))), purchaseInItemList.stream().flatMap(orderItemDO -> Stream.of(safeParseLong(orderItemDO.getCreator()), safeParseLong(orderItemDO.getUpdater()), orderItemDO.getApplicantId()))).distinct().filter(Objects::nonNull).collect(Collectors.toSet());
+                safeParseLong(orderDO.getCreator()), safeParseLong(orderDO.getUpdater()))), purchaseInItemList.stream()
+                .flatMap(orderItemDO -> Stream.of(safeParseLong(orderItemDO.getCreator()), safeParseLong(orderItemDO.getUpdater()), orderItemDO.getApplicantId())))
+            .distinct().filter(Objects::nonNull).collect(Collectors.toSet());
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         // 1.5 部门
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(purchaseInItemList, SrmPurchaseInItemDO::getApplicationDeptId));
         // 1.6 获取仓库信息
         Map<Long, ErpWarehouseDTO> warehouseMap = wmsWarehouseApi.getWarehouseMap(convertSet(purchaseInItemList, SrmPurchaseInItemDO::getWarehouseId));
         //1.7 订单项map orderItemId
-        Map<Long, SrmPurchaseOrderDO> orderItemMap = srmPurchaseOrderService.getPurchaseOrderItemMap(purchaseInItemList.stream().map(SrmPurchaseInItemDO::getOrderItemId).collect(Collectors.toSet()));
+        Map<Long, SrmPurchaseOrderDO> orderItemMap =
+            srmPurchaseOrderService.getPurchaseOrderItemMap(purchaseInItemList.stream().map(SrmPurchaseInItemDO::getOrderItemId).collect(Collectors.toSet()));
         // 2. 开始拼接
         return BeanUtils.toBean(list, SrmPurchaseInBaseRespVO.class, purchaseIn -> {
             purchaseIn.setItems(BeanUtils.toBean(purchaseInItemMap.get(purchaseIn.getId()), SrmPurchaseInBaseRespVO.Item.class, item -> {
                 //设置产品信息-带出相关字段
                 MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProduct(product).setTotalVolume(
-                            product.getLength() * product.getHeight() * product.getWidth() *
-                                Double.parseDouble(String.valueOf(item.getQty())))//总体积=数量*产品体积
-                        .setTotalWeight(product.getWeight().setScale(2, RoundingMode.HALF_UP).longValue() *
-                            Double.parseDouble(String.valueOf(item.getQty())))
+                            product.getLength() * product.getHeight() * product.getWidth() * Double.parseDouble(String.valueOf(item.getQty())))//总体积=数量*产品体积
+                        .setTotalWeight(product.getWeight().setScale(2, RoundingMode.HALF_UP).longValue() * Double.parseDouble(String.valueOf(item.getQty())))
                     //总重量=数量*产品重量
                 );
                 // 设置仓库信息

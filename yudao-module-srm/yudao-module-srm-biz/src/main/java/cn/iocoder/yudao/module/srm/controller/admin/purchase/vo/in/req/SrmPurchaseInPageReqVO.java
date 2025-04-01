@@ -28,8 +28,8 @@ public class SrmPurchaseInPageReqVO extends PageParam {
     @Schema(description = "单据日期")
     private LocalDateTime[] noTime;
 
-//    @Schema(description = "汇率,财务管理-币别维护",example = "5.8")
-//    private BigDecimal exchangeRate;
+    //    @Schema(description = "汇率,财务管理-币别维护",example = "5.8")
+    //    private BigDecimal exchangeRate;
 
     @Schema(description = "应付款余额")
     private BigDecimal payableBalance;

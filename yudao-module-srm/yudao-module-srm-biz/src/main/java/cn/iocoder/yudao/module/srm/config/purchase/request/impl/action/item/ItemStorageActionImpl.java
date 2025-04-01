@@ -37,8 +37,7 @@ public class ItemStorageActionImpl implements Action<SrmStorageStatus, SrmEventE
     public void execute(SrmStorageStatus f, SrmStorageStatus t, SrmEventEnum event, SrmInCountDTO context) {
         SrmPurchaseRequestItemsDO itemsDO = mapper.selectById(context.getApplyItemId());
         if (event == SrmEventEnum.STOCK_ADJUSTMENT) {
-            BigDecimal oldCount =
-                itemsDO.getInboundClosedQty() == null ? BigDecimal.ZERO : itemsDO.getInboundClosedQty();
+            BigDecimal oldCount = itemsDO.getInboundClosedQty() == null ? BigDecimal.ZERO : itemsDO.getInboundClosedQty();
             BigDecimal changeCount = context.getInCount();
             itemsDO.setInboundClosedQty(oldCount.add(changeCount));//入库数量
             //根据入库数量来动态计算当前状态
@@ -59,7 +58,6 @@ public class ItemStorageActionImpl implements Action<SrmStorageStatus, SrmEventE
         //传递事件给主申请单
         SrmPurchaseRequestDO requestDO = srmPurchaseRequestMapper.selectById(itemsDO.getRequestId());
         stateMachine.fireEvent(SrmStorageStatus.fromCode(requestDO.getInStatus()), event, requestDO);
-        log.debug("item入库状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context),
-            f.getDesc(), t.getDesc());
+        log.debug("item入库状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), f.getDesc(), t.getDesc());
     }
 }

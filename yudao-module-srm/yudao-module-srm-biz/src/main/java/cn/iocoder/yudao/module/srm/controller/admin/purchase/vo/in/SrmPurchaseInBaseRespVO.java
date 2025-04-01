@@ -97,8 +97,8 @@ public class SrmPurchaseInBaseRespVO extends SrmPurchaseBaseRespVO {
         @Schema(description = "备注")
         private String remark;
 
-//        @Schema(description = "汇率,财务管理-币别维护")
-//        private BigDecimal exchangeRate;
+        //        @Schema(description = "汇率,财务管理-币别维护")
+        //        private BigDecimal exchangeRate;
 
         @Schema(description = "结算日期")
         private LocalDateTime settlementDate;
@@ -122,16 +122,16 @@ public class SrmPurchaseInBaseRespVO extends SrmPurchaseBaseRespVO {
         @Schema(description = "商品总重量,单位：kg 千克")
         private Double totalWeight;
 
-//        @Schema(description = "源单行号")
-//        private int srcSeq;
+        //        @Schema(description = "源单行号")
+        //        private int srcSeq;
         // 源单类型ID
-//        private String srcBillTypeId;
+        //        private String srcBillTypeId;
 
-//        @Schema(description = "源单类型")
-//        private String srcBillTypeName;
+        //        @Schema(description = "源单类型")
+        //        private String srcBillTypeName;
 
-//        @Schema(description = "源单单号")
-//        private int srcNo;
+        //        @Schema(description = "源单单号")
+        //        private int srcNo;
 
         @Schema(description = "总价，单位：元,totalPrice = productPrice * count")
         private BigDecimal totalPrice;

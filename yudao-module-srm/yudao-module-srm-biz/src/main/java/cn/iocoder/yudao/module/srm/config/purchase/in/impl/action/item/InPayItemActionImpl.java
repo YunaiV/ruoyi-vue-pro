@@ -47,21 +47,21 @@ public class InPayItemActionImpl implements Action<SrmPaymentStatus, SrmEventEnu
         SrmPurchaseInItemDO inItemDO = mapper.selectById(context.getId());
 
         // 付款金额调整 - 动态状态
-//        if (event == SrmEventEnum.PAYMENT_ADJUSTMENT) {
-//            BigDecimal paymentPrice = inItemDO.getProductPrice(); // 已支付金额
-//            BigDecimal totalProductPrice = inItemDO.getTotalPrice(); // 合计产品金额
-//
-//            if (paymentPrice.compareTo(totalProductPrice) >= 0) {
-//                // 完全支付
-//                to = SrmPaymentStatus.ALL_PAYMENT;
-//            } else if (paymentPrice.compareTo(BigDecimal.ZERO) == 0) {
-//                // 未支付
-//                to = SrmPaymentStatus.NONE_PAYMENT;
-//            } else {
-//                // 部分支付
-//                to = SrmPaymentStatus.PARTIALLY_PAYMENT;
-//            }
-//        }
+        //        if (event == SrmEventEnum.PAYMENT_ADJUSTMENT) {
+        //            BigDecimal paymentPrice = inItemDO.getProductPrice(); // 已支付金额
+        //            BigDecimal totalProductPrice = inItemDO.getTotalPrice(); // 合计产品金额
+        //
+        //            if (paymentPrice.compareTo(totalProductPrice) >= 0) {
+        //                // 完全支付
+        //                to = SrmPaymentStatus.ALL_PAYMENT;
+        //            } else if (paymentPrice.compareTo(BigDecimal.ZERO) == 0) {
+        //                // 未支付
+        //                to = SrmPaymentStatus.NONE_PAYMENT;
+        //            } else {
+        //                // 部分支付
+        //                to = SrmPaymentStatus.PARTIALLY_PAYMENT;
+        //            }
+        //        }
 
         // 更新数据库状态
         inItemDO.setPayStatus(to.getCode());

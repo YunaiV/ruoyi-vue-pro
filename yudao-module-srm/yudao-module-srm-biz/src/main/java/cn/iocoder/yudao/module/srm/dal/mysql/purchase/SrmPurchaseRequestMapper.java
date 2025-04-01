@@ -19,8 +19,7 @@ import org.apache.ibatis.annotations.Mapper;
 public interface SrmPurchaseRequestMapper extends BaseMapperX<SrmPurchaseRequestDO> {
 
     default MPJLambdaWrapperX<SrmPurchaseRequestDO> queryWrapper(SrmPurchaseRequestPageReqVO reqVO) {
-        return new MPJLambdaWrapperX<SrmPurchaseRequestDO>().selectAll(SrmPurchaseRequestDO.class)
-            .eqIfPresent(SrmPurchaseRequestDO::getNo, reqVO.getNo())
+        return new MPJLambdaWrapperX<SrmPurchaseRequestDO>().selectAll(SrmPurchaseRequestDO.class).eqIfPresent(SrmPurchaseRequestDO::getNo, reqVO.getNo())
             .eqIfPresent(SrmPurchaseRequestDO::getApplicantId, reqVO.getApplicantId())
             .eqIfPresent(SrmPurchaseRequestDO::getApplicationDeptId, reqVO.getApplicationDeptId())
             //supplierId 供应商编号
@@ -30,26 +29,21 @@ public interface SrmPurchaseRequestMapper extends BaseMapperX<SrmPurchaseRequest
             .betweenIfPresent(SrmPurchaseRequestDO::getAuditTime, reqVO.getAuditTime())
             .betweenIfPresent(SrmPurchaseRequestDO::getCreateTime, reqVO.getCreateTime())
             //状态
-            .eqIfPresent(SrmPurchaseRequestDO::getAuditStatus, reqVO.getAuditStatus())
-            .eqIfPresent(SrmPurchaseRequestDO::getOffStatus, reqVO.getOffStatus())
-            .eqIfPresent(SrmPurchaseRequestDO::getOrderStatus, reqVO.getOrderStatus())
-            .eqIfPresent(SrmPurchaseRequestDO::getInStatus, reqVO.getInStatus())
+            .eqIfPresent(SrmPurchaseRequestDO::getAuditStatus, reqVO.getAuditStatus()).eqIfPresent(SrmPurchaseRequestDO::getOffStatus, reqVO.getOffStatus())
+            .eqIfPresent(SrmPurchaseRequestDO::getOrderStatus, reqVO.getOrderStatus()).eqIfPresent(SrmPurchaseRequestDO::getInStatus, reqVO.getInStatus())
             .eqIfPresent(SrmPurchaseRequestDO::getTag, reqVO.getTag())
             //
             .likeIfPresent(SrmPurchaseRequestDO::getDelivery, reqVO.getDelivery())
-            .likeIfPresent(SrmPurchaseRequestDO::getReviewComment, reqVO.getReviewComment())
-            .orderByDesc(SrmPurchaseRequestDO::getId);
+            .likeIfPresent(SrmPurchaseRequestDO::getReviewComment, reqVO.getReviewComment()).orderByDesc(SrmPurchaseRequestDO::getId);
     }
 
     //getBoWrapper
     default MPJLambdaWrapper<SrmPurchaseRequestDO> getBoWrapper(SrmPurchaseRequestPageReqVO reqVO) {
-        return queryWrapper(reqVO).innerJoin(SrmPurchaseRequestItemsDO.class, SrmPurchaseRequestItemsDO::getRequestId,
-                SrmPurchaseRequestDO::getId,
+        return queryWrapper(reqVO).innerJoin(SrmPurchaseRequestItemsDO.class, SrmPurchaseRequestItemsDO::getRequestId, SrmPurchaseRequestDO::getId,
                 on -> on.eqIfExists(SrmPurchaseRequestItemsDO::getProductId, reqVO.getProductId())
                     .likeIfExists(SrmPurchaseRequestItemsDO::getBarCode, reqVO.getBarCode())
                     .likeIfExists(SrmPurchaseRequestItemsDO::getProductUnitName, reqVO.getProductUnitName())
-                    .likeIfExists(SrmPurchaseRequestItemsDO::getProductName, reqVO.getProductName()))
-            .selectAll(SrmPurchaseRequestItemsDO.class)
+                    .likeIfExists(SrmPurchaseRequestItemsDO::getProductName, reqVO.getProductName())).selectAll(SrmPurchaseRequestItemsDO.class)
             .selectAsClass(SrmPurchaseRequestItemsDO.class, SrmPurchaseRequestBO.class);
     }
 

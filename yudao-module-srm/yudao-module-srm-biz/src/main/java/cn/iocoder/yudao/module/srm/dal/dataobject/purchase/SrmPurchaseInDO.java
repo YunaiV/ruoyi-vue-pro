@@ -37,28 +37,26 @@ public class SrmPurchaseInDO extends BaseDO {
      */
     private String no;
     /**
-     * 审核状态
-     * 枚举 {@link SrmAuditStatus}
+     * 审核状态 枚举 {@link SrmAuditStatus}
      */
     private Integer auditStatus;
     /**
-     * 供应商编号
-     * 关联 {@link SrmSupplierDO#getId()}
+     * 供应商编号 关联 {@link SrmSupplierDO#getId()}
      */
     private Long supplierId;
     /**
      * 结算账户编号
      */
-//     * 关联 {@link cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpAccountDO#getId()}
+    //     * 关联 {@link cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpAccountDO#getId()}
     private Long accountId;
     /**
      * 单据日期
      */
     private LocalDateTime noTime;
-//    /**
-//     * 币别
-//     */
-//    private Long currencyId;
+    //    /**
+    //     * 币别
+    //     */
+    //    private Long currencyId;
 
     /**
      * 审核人ID
@@ -68,7 +66,6 @@ public class SrmPurchaseInDO extends BaseDO {
      * 审核时间
      */
     private LocalDateTime auditTime;
-
 
     /**
      * 结算日期
@@ -83,25 +80,24 @@ public class SrmPurchaseInDO extends BaseDO {
      * 收获地址
      */
     private String address;
-//    /**
-//     * 采购订单编号
-//     * 关联 {@link SrmPurchaseOrderDO#getId()}
-//     */
-//    private Long orderId;
+    //    /**
+    //     * 采购订单编号
+    //     * 关联 {@link SrmPurchaseOrderDO#getId()}
+    //     */
+    //    private Long orderId;
 
     /**
      * 合计数量
      */
     private BigDecimal totalCount;
     /**
-     * 最终合计价格，单位：元
-     * totalPrice = totalProductPrice + totalTaxPrice - discountPrice + otherPrice
+     * 最终合计价格，单位：元 totalPrice = totalProductPrice + totalTaxPrice - discountPrice + otherPrice
      */
     private BigDecimal totalPrice;
     /**
      * 已支付金额，单位：元
      */
-//     * 目的：和 {@link cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinancePaymentDO} 结合，记录已支付金额
+    //     * 目的：和 {@link cn.iocoder.yudao.module.erp.dal.dataobject.finance.ErpFinancePaymentDO} 结合，记录已支付金额
     private BigDecimal paymentPrice;
     /**
      * 合计产品价格，单位：元
@@ -116,8 +112,7 @@ public class SrmPurchaseInDO extends BaseDO {
      */
     private BigDecimal discountPercent;
     /**
-     * 优惠金额，单位：元
-     * discountPrice = (totalProductPrice + totalTaxPrice) * discountPercent
+     * 优惠金额，单位：元 discountPrice = (totalProductPrice + totalTaxPrice) * discountPercent
      */
     private BigDecimal discountPrice;
     /**

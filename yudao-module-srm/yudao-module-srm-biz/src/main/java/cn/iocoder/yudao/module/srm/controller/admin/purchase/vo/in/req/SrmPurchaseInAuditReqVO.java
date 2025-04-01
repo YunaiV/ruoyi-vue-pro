@@ -10,7 +10,7 @@ import lombok.Data;
 @Builder
 public class SrmPurchaseInAuditReqVO {
     @NotNull(groups = {Validation.OnSubmitAudit.class, Validation.OnAudit.class}, message = "入库单ID不能为空")
-//    @Size(min = 1, groups = Validation.OnAudit.class, message = "入库单ID审核时候只能传一个")
+    //    @Size(min = 1, groups = Validation.OnAudit.class, message = "入库单ID审核时候只能传一个")
     @Schema(description = "入库单ID集合")
     private Long inId;
 

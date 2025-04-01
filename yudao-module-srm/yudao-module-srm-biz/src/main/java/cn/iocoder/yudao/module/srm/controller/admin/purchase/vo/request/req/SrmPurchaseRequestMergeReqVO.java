@@ -25,7 +25,7 @@ public class SrmPurchaseRequestMergeReqVO {
     @Schema(description = "单据日期", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime noTime;
     //    @Schema(description = "期望采购时间")
-//    private LocalDateTime orderTime;
+    //    private LocalDateTime orderTime;
 
     // 项目列表
     @NotNull(message = "项目列表不能为空")

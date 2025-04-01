@@ -36,15 +36,14 @@ public class ItemOrderActionImpl implements Action<SrmOrderStatus, SrmEventEnum,
     @Resource(name = SrmStateMachines.PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME)
     @Lazy
     StateMachine<SrmOrderStatus, SrmEventEnum, SrmPurchaseRequestDO> requestStateMachine;
-
-    @Autowired
-    private SrmPurchaseRequestItemsMapper itemsMapper;
     @Autowired
     @Lazy
     SrmPurchaseRequestService srmPurchaseRequestService;
     @Resource(name = PURCHASE_REQUEST_ITEM_OFF_STATE_MACHINE_NAME)
     @Lazy
     StateMachine<SrmOffStatus, SrmEventEnum, SrmPurchaseRequestItemsDO> offItemMachine;
+    @Autowired
+    private SrmPurchaseRequestItemsMapper itemsMapper;
 
     @Override
     @Transactional
@@ -74,15 +73,13 @@ public class ItemOrderActionImpl implements Action<SrmOrderStatus, SrmEventEnum,
             } else if (newCount >= rItemDO.getApprovedQty()) {
                 rItemDO.setOrderStatus(SrmOrderStatus.ORDERED.getCode());// 状态设为全部订购
                 //通知状态机 关闭行状态
-                offItemMachine.fireEvent(SrmOffStatus.fromCode(rItemDO.getOffStatus()), SrmEventEnum.AUTO_CLOSE,
-                    rItemDO);
+                offItemMachine.fireEvent(SrmOffStatus.fromCode(rItemDO.getOffStatus()), SrmEventEnum.AUTO_CLOSE, rItemDO);
             } else {
                 rItemDO.setOrderStatus(SrmOrderStatus.PARTIALLY_ORDERED.getCode());// 状态设为部分订购
                 //通知状态机，开启行状态
                 //如果是关闭 -> 撤销关闭
                 if (Objects.equals(SrmOffStatus.CLOSED.getCode(), rItemDO.getOffStatus())) {
-                    offItemMachine.fireEvent(SrmOffStatus.fromCode(rItemDO.getOffStatus()), SrmEventEnum.CANCEL_DELETE,
-                        rItemDO);
+                    offItemMachine.fireEvent(SrmOffStatus.fromCode(rItemDO.getOffStatus()), SrmEventEnum.CANCEL_DELETE, rItemDO);
                 }
             }
         } else {
@@ -93,11 +90,10 @@ public class ItemOrderActionImpl implements Action<SrmOrderStatus, SrmEventEnum,
         //传递事件
         if (event == SrmEventEnum.ORDER_ADJUSTMENT) {
             SrmPurchaseRequestDO requestDO = requestMapper.selectById(rItemDO.getRequestId());
-            requestStateMachine.fireEvent(SrmOrderStatus.fromCode(requestDO.getOrderStatus()),
-                SrmEventEnum.ORDER_ADJUSTMENT, requestDO);
+            requestStateMachine.fireEvent(SrmOrderStatus.fromCode(requestDO.getOrderStatus()), SrmEventEnum.ORDER_ADJUSTMENT, requestDO);
         }
 
-        log.debug("item订购状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context),
-            from.getDesc(), SrmOrderStatus.fromCode(rItemDO.getOrderStatus()).getDesc());
+        log.debug("item订购状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(),
+            SrmOrderStatus.fromCode(rItemDO.getOrderStatus()).getDesc());
     }
 }

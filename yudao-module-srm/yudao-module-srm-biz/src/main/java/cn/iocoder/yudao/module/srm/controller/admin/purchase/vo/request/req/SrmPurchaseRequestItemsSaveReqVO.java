@@ -14,7 +14,7 @@ public class SrmPurchaseRequestItemsSaveReqVO {
 
     @Schema(description = "id", requiredMode = Schema.RequiredMode.REQUIRED)
     @Null(groups = Validation.OnCreate.class, message = "创建时，子项id必须为空")
-//    @NotNull(groups = validation.OnUpdate.class, message = "更新时，子项id不能为空")
+    //    @NotNull(groups = validation.OnUpdate.class, message = "更新时，子项id不能为空")
     private Long id;
 
     @Schema(description = "产品报关品名")
@@ -72,8 +72,8 @@ public class SrmPurchaseRequestItemsSaveReqVO {
     private BigDecimal taxPrice;
 
     @Schema(description = "增值税税率，百分比")
-//    @DecimalMin(value = "0.0", message = "税率不能为负")
-//    @DecimalMax(value = "1.0", message = "税率不能超过100%")
+    //    @DecimalMin(value = "0.0", message = "税率不能为负")
+    //    @DecimalMax(value = "1.0", message = "税率不能超过100%")
     private BigDecimal taxPercent;
     //期望到货日期
     @Schema(description = "期望到货日期")

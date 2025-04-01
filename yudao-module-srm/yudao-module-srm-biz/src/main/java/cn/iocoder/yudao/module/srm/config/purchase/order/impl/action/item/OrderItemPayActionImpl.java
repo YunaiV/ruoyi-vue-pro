@@ -78,7 +78,6 @@ public class OrderItemPayActionImpl implements Action<SrmPaymentStatus, SrmEvent
         checkStatusAndClose(orderItemDO.getId());
     }
 
-
     private void checkStatusAndClose(Long orderItemId) {
         SrmPurchaseOrderItemDO orderItemDO = itemMapper.selectById(orderItemId);
         if (Objects.equals(orderItemDO.getInStatus(), SrmStorageStatus.ALL_IN_STORAGE.getCode()) && Objects.equals(orderItemDO.getPayStatus(),

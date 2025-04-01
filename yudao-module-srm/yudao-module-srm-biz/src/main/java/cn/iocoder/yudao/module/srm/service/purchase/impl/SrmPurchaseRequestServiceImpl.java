@@ -65,16 +65,15 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
     private final SrmPurchaseRequestMapper srmPurchaseRequestMapper;
     private final SrmPurchaseRequestItemsMapper erpPurchaseRequestItemsMapper;
     private final SrmPurchaseOrderItemMapper srmPurchaseOrderItemMapper;
-    @Autowired
-    @Lazy
-    SrmPurchaseOrderService srmPurchaseOrderService;
     private final SrmNoRedisDAO noRedisDAO;
     private final WmsWarehouseApi wmsWarehouseApi;
     private final ErpProductApi erpProductApi;
     private final DeptApi deptApi;
     private final AdminUserApi adminUserApi;
     private final ErpProductUnitApi erpProductUnitApi;
-
+    @Autowired
+    @Lazy
+    SrmPurchaseOrderService srmPurchaseOrderService;
     @Resource(name = PURCHASE_REQUEST_AUDIT_STATE_MACHINE_NAME)
     StateMachine<SrmAuditStatus, SrmEventEnum, SrmPurchaseRequestAuditReqVO> auditMachine;
     @Resource(name = PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME)
@@ -115,8 +114,7 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
         ThrowUtil.ifThrow(!erpPurchaseRequestItemsMapper.insertBatch(itemsDOList), PURCHASE_REQUEST_ADD_FAIL_PRODUCT);
         //5.初始化状态-主子表
         initMasterStatus(purchaseRequest);
-        List<SrmPurchaseRequestItemsDO> itemsDOS =
-            erpPurchaseRequestItemsMapper.selectListByRequestId(purchaseRequest.getId());
+        List<SrmPurchaseRequestItemsDO> itemsDOS = erpPurchaseRequestItemsMapper.selectListByRequestId(purchaseRequest.getId());
         initSlaveStatus(itemsDOS);
         return id;
     }
@@ -124,8 +122,7 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
     private void voSetNo(SrmPurchaseRequestSaveReqVO vo) {
         //生成单据编号
         if (vo.getNo() != null) {
-            ThrowUtil.ifThrow(srmPurchaseRequestMapper.selectByNo(vo.getNo()) != null, PURCHASE_REQUEST_NO_EXISTS_BY_NO,
-                vo.getNo());
+            ThrowUtil.ifThrow(srmPurchaseRequestMapper.selectByNo(vo.getNo()) != null, PURCHASE_REQUEST_NO_EXISTS_BY_NO, vo.getNo());
             noRedisDAO.setManualSerial(PURCHASE_REQUEST_NO_PREFIX, vo.getNo());
         } else {
             vo.setNo(noRedisDAO.generate(PURCHASE_REQUEST_NO_PREFIX, PURCHASE_REQUEST_NO_OUT_OF_BOUNDS));
@@ -136,12 +133,10 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
 
     private void initSlaveStatus(List<SrmPurchaseRequestItemsDO> itemsDOS) {
         itemsDOS.forEach(i -> {
-            orderItemMachine.fireEvent(SrmOrderStatus.OT_ORDERED, SrmEventEnum.ORDER_INIT,
-                SrmOrderCountDTO.builder().purchaseRequestItemId(i.getId()).build());
+            orderItemMachine.fireEvent(SrmOrderStatus.OT_ORDERED, SrmEventEnum.ORDER_INIT, SrmOrderCountDTO.builder().purchaseRequestItemId(i.getId()).build());
             requestItemsDOStateMachine.fireEvent(SrmOffStatus.OPEN, SrmEventEnum.OFF_INIT, i);
             //入库
-            storageItemMachine.fireEvent(SrmStorageStatus.NONE_IN_STORAGE, SrmEventEnum.STORAGE_INIT,
-                SrmInCountDTO.builder().applyItemId(i.getId()).build());
+            storageItemMachine.fireEvent(SrmStorageStatus.NONE_IN_STORAGE, SrmEventEnum.STORAGE_INIT, SrmInCountDTO.builder().applyItemId(i.getId()).build());
         });
     }
 
@@ -163,8 +158,7 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
     @Override
     public List<SrmPurchaseRequestItemsDO> validatePurchaseRequestItems(List<SrmPurchaseRequestItemsSaveReqVO> items) {
         // 1. 校验产品有效性
-        List<ErpProductDTO> dtoList =
-            erpProductApi.validProductList(convertSet(items, SrmPurchaseRequestItemsSaveReqVO::getProductId));
+        List<ErpProductDTO> dtoList = erpProductApi.validProductList(convertSet(items, SrmPurchaseRequestItemsSaveReqVO::getProductId));
         Map<Long, ErpProductDTO> dtoMap = erpProductApi.getProductMap(convertSet(dtoList, ErpProductDTO::getId));
         // 1.1 校验仓库有效性
         wmsWarehouseApi.validWarehouseList(convertSet(items, SrmPurchaseRequestItemsSaveReqVO::getWarehouseId));
@@ -175,9 +169,7 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
             item.setProductName(dtoMap.get(item.getProductId()).getName());
             item.setBarCode(dtoMap.get(item.getProductId()).getBarCode());
             //产品单位名称(产品必有单位)
-            item.setProductUnitName(
-                erpProductUnitApi.getProductUnitList(Collections.singleton(dtoMap.get(item.getProductId()).getUnitId()))
-                    .get(0).getName());
+            item.setProductUnitName(erpProductUnitApi.getProductUnitList(Collections.singleton(dtoMap.get(item.getProductId()).getUnitId())).get(0).getName());
         }));
     }
 
@@ -190,20 +182,18 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
     @Override
     public void validatePurchaseRequestItemsMasterId(Long masterId, List<Long> ids) {
         // 验证ids在数据库中是否存在
-        ThrowUtil.ifThrow(
-            erpPurchaseRequestItemsMapper.selectListByIds(ids).stream().noneMatch(i -> ids.contains(i.getId())),
-            PURCHASE_REQUEST_ITEM_NOT_EXISTS, ids);
+        ThrowUtil.ifThrow(erpPurchaseRequestItemsMapper.selectListByIds(ids).stream().noneMatch(i -> ids.contains(i.getId())), PURCHASE_REQUEST_ITEM_NOT_EXISTS,
+            ids);
         // 校验子单requestId是否关联主单的id
-        ThrowUtil.ifThrow(erpPurchaseRequestItemsMapper.selectListByRequestId(masterId).stream()
-            .noneMatch(i -> ids.contains(i.getId())), PURCHASE_REQUEST_UPDATE_FAIL_REQUEST_ID, masterId);
+        ThrowUtil.ifThrow(erpPurchaseRequestItemsMapper.selectListByRequestId(masterId).stream().noneMatch(i -> ids.contains(i.getId())),
+            PURCHASE_REQUEST_UPDATE_FAIL_REQUEST_ID, masterId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long merge(SrmPurchaseRequestMergeReqVO reqVO) {
         // 获取所有 itemIds
-        List<Long> itemIds = reqVO.getItems().stream().map(SrmPurchaseRequestMergeReqVO.requestItems::getId)
-            .collect(Collectors.toList());
+        List<Long> itemIds = reqVO.getItems().stream().map(SrmPurchaseRequestMergeReqVO.requestItems::getId).collect(Collectors.toList());
 
         // 查询 itemDOS 并校验
         List<SrmPurchaseRequestItemsDO> itemsDOS = erpPurchaseRequestItemsMapper.selectListByIds(itemIds);
@@ -212,8 +202,8 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
         //申请单已审核+未关闭才可以合并
         validMerge(itemsDOS);
         // 创建 itemsMap 和 requestItemDOMap
-        Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> itemsMap = reqVO.getItems().stream()
-            .collect(Collectors.toMap(SrmPurchaseRequestMergeReqVO.requestItems::getId, Function.identity()));
+        Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> itemsMap =
+            reqVO.getItems().stream().collect(Collectors.toMap(SrmPurchaseRequestMergeReqVO.requestItems::getId, Function.identity()));
         Map<Long, SrmPurchaseRequestItemsDO> requestItemDOMap =
             itemsDOS.stream().collect(Collectors.toMap(SrmPurchaseRequestItemsDO::getId, Function.identity()));
 
@@ -221,10 +211,9 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
         List<SrmPurchaseOrderSaveReqVO.Item> voItemList =
             SrmOrderConvert.INSTANCE.convertToErpPurchaseOrderSaveReqVOItemList(itemsDOS, itemsMap, requestItemDOMap);
         // 获取申请单编号映射
-        Set<Long> requestIds =
-            itemsDOS.stream().map(SrmPurchaseRequestItemsDO::getRequestId).collect(Collectors.toSet());
-        Map<Long, SrmPurchaseRequestDO> rDOMap = srmPurchaseRequestMapper.selectByIds(requestIds).stream()
-            .collect(Collectors.toMap(SrmPurchaseRequestDO::getId, Function.identity()));
+        Set<Long> requestIds = itemsDOS.stream().map(SrmPurchaseRequestItemsDO::getRequestId).collect(Collectors.toSet());
+        Map<Long, SrmPurchaseRequestDO> rDOMap =
+            srmPurchaseRequestMapper.selectByIds(requestIds).stream().collect(Collectors.toMap(SrmPurchaseRequestDO::getId, Function.identity()));
 
         //后置渲染，申请单的no编号
         voItemList.forEach(item -> {
@@ -254,16 +243,13 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
 
     private void validMerge(List<SrmPurchaseRequestItemsDO> itemsDOS) {
         //1. 校验申请单需已审核
-        List<SrmPurchaseRequestDO> requestDOS =
-            srmPurchaseRequestMapper.selectByIds(convertList(itemsDOS, SrmPurchaseRequestItemsDO::getRequestId));
+        List<SrmPurchaseRequestDO> requestDOS = srmPurchaseRequestMapper.selectByIds(convertList(itemsDOS, SrmPurchaseRequestItemsDO::getRequestId));
         for (SrmPurchaseRequestDO requestDO : requestDOS) {
-            ThrowUtil.ifThrow(!requestDO.getAuditStatus().equals(SrmAuditStatus.APPROVED.getCode()),
-                PURCHASE_REQUEST_MERGE_FAIL, requestDO.getNo());
+            ThrowUtil.ifThrow(!requestDO.getAuditStatus().equals(SrmAuditStatus.APPROVED.getCode()), PURCHASE_REQUEST_MERGE_FAIL, requestDO.getNo());
         }
         //2. 校验申请项需处于开启状态
         for (SrmPurchaseRequestItemsDO itemsDO : itemsDOS) {
-            ThrowUtil.ifThrow(!itemsDO.getOffStatus().equals(SrmOffStatus.OPEN.getCode()),
-                PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_OPEN, itemsDO.getId());
+            ThrowUtil.ifThrow(!itemsDO.getOffStatus().equals(SrmOffStatus.OPEN.getCode()), PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_OPEN, itemsDO.getId());
         }
     }
 
@@ -275,11 +261,9 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
         //1.1 校验items是否存在
         List<SrmPurchaseRequestItemsDO> itemsDOList = validatePurchaseRequestItems(vo.getItems());
         //1.2 状态校验
-        updateStatusCheck(srmPurchaseRequestDO,
-            vo.getItems().stream().map(SrmPurchaseRequestItemsSaveReqVO::getId).toList());
+        updateStatusCheck(srmPurchaseRequestDO, vo.getItems().stream().map(SrmPurchaseRequestItemsSaveReqVO::getId).toList());
         //1.4 校验主子表关联
-        List<SrmPurchaseRequestItemsDO> requestItemsDOS =
-            erpPurchaseRequestItemsMapper.findItemsGroupedByRequestId(List.of(vo.getId())).get(vo.getId());
+        List<SrmPurchaseRequestItemsDO> requestItemsDOS = erpPurchaseRequestItemsMapper.findItemsGroupedByRequestId(List.of(vo.getId())).get(vo.getId());
         List<Long> requestItemsIds = convertList(requestItemsDOS, SrmPurchaseRequestItemsDO::getId);
         validatePurchaseRequestItemsMasterId(vo.getId(), requestItemsIds);
         //1.5 设置no
@@ -290,8 +274,7 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
         if (!oldNo.equals(vo.getNo())) {
             //关联更新采购申请项冗余字段erpPurchaseRequestItemNo
             List<SrmPurchaseOrderItemDO> srmPurchaseOrderItemDOList =
-                srmPurchaseOrderService.getPurchaseOrderItemListByApplyIds(
-                    requestItemsDOS.stream().map(SrmPurchaseRequestItemsDO::getId).distinct().toList());
+                srmPurchaseOrderService.getPurchaseOrderItemListByApplyIds(requestItemsDOS.stream().map(SrmPurchaseRequestItemsDO::getId).distinct().toList());
             srmPurchaseOrderItemDOList.forEach(item -> item.setErpPurchaseRequestItemNo(vo.getNo()));
             srmPurchaseOrderService.updatePurchaseOrderItemList(srmPurchaseOrderItemDOList);
         }
@@ -306,23 +289,18 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
     //判断当前状态是否可以更新
     private void updateStatusCheck(SrmPurchaseRequestDO requestDO, List<Long> itemIds) {
         //1.1 判断已审核
-        ThrowUtil.ifThrow(requestDO.getAuditStatus().equals(SrmAuditStatus.APPROVED.getCode()),
-            PURCHASE_REQUEST_UPDATE_FAIL_APPROVE, requestDO.getNo());
+        ThrowUtil.ifThrow(requestDO.getAuditStatus().equals(SrmAuditStatus.APPROVED.getCode()), PURCHASE_REQUEST_UPDATE_FAIL_APPROVE, requestDO.getNo());
         //1.2 判断已关闭
-        ThrowUtil.ifThrow(requestDO.getOffStatus().equals(SrmOffStatus.CLOSED.getCode()), PURCHASE_REQUEST_CLOSED,
-            requestDO.getNo());
+        ThrowUtil.ifThrow(requestDO.getOffStatus().equals(SrmOffStatus.CLOSED.getCode()), PURCHASE_REQUEST_CLOSED, requestDO.getNo());
         //1.3 判断已手动关闭
-        ThrowUtil.ifThrow(requestDO.getOffStatus().equals(SrmOffStatus.MANUAL_CLOSED.getCode()),
-            PURCHASE_REQUEST_MANUAL_CLOSED, requestDO.getNo());
+        ThrowUtil.ifThrow(requestDO.getOffStatus().equals(SrmOffStatus.MANUAL_CLOSED.getCode()), PURCHASE_REQUEST_MANUAL_CLOSED, requestDO.getNo());
         //2 判断子表已关闭？手动关闭？
         List<SrmPurchaseRequestItemsDO> itemsDOList = erpPurchaseRequestItemsMapper.selectListByIds(itemIds);
         for (SrmPurchaseRequestItemsDO itemsDO : itemsDOList) {
             // 2.1 判断子表已关闭
-            ThrowUtil.ifThrow(itemsDO.getOffStatus().equals(SrmOffStatus.CLOSED.getCode()),
-                PURCHASE_REQUEST_ITEM_CLOSED, itemsDO.getId());
+            ThrowUtil.ifThrow(itemsDO.getOffStatus().equals(SrmOffStatus.CLOSED.getCode()), PURCHASE_REQUEST_ITEM_CLOSED, itemsDO.getId());
             // 2.2 判断子表已手动关闭
-            ThrowUtil.ifThrow(itemsDO.getOffStatus().equals(SrmOffStatus.MANUAL_CLOSED.getCode()),
-                PURCHASE_REQUEST_ITEM_MANUAL_CLOSED, itemsDO.getId());
+            ThrowUtil.ifThrow(itemsDO.getOffStatus().equals(SrmOffStatus.MANUAL_CLOSED.getCode()), PURCHASE_REQUEST_ITEM_MANUAL_CLOSED, itemsDO.getId());
         }
     }
 
@@ -331,8 +309,7 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
         // 第一步，对比新老数据，获得添加、修改、删除的列表
         List<SrmPurchaseRequestItemsDO> oldList = erpPurchaseRequestItemsMapper.selectListByRequestId(id);
         // id 不同，就认为是不同的记录
-        List<List<SrmPurchaseRequestItemsDO>> diffList =
-            diffList(oldList, newList, (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
+        List<List<SrmPurchaseRequestItemsDO>> diffList = diffList(oldList, newList, (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
         // 第二步，批量添加、修改、删除
         if (CollUtil.isNotEmpty(diffList.get(0))) {
             diffList.get(0).forEach(o -> o.setRequestId(id));
@@ -346,8 +323,7 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
         if (CollUtil.isNotEmpty(diffList.get(2))) {
             //触发关闭状态
             for (SrmPurchaseRequestItemsDO itemsDO : diffList.get(2)) {
-                requestItemsDOStateMachine.fireEvent(SrmOffStatus.fromCode(itemsDO.getOffStatus()),
-                    SrmEventEnum.MANUAL_CLOSE, itemsDO);
+                requestItemsDOStateMachine.fireEvent(SrmOffStatus.fromCode(itemsDO.getOffStatus()), SrmEventEnum.MANUAL_CLOSE, itemsDO);
             }
             erpPurchaseRequestItemsMapper.deleteByIds(convertList(diffList.get(2), SrmPurchaseRequestItemsDO::getId));
         }
@@ -387,11 +363,10 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
         } else {
             //反审核
             //存在对应的采购订单项->异常
-            List<SrmPurchaseRequestItemsDO> itemsDOS =
-                erpPurchaseRequestItemsMapper.selectListByRequestId(req.getRequestId());
+            List<SrmPurchaseRequestItemsDO> itemsDOS = erpPurchaseRequestItemsMapper.selectListByRequestId(req.getRequestId());
             for (SrmPurchaseRequestItemsDO itemsDO : itemsDOS) {
-                ThrowUtil.ifThrow(srmPurchaseOrderItemMapper.selectCountByPurchaseApplyItemId(itemsDO.getId()) > 0,
-                    PURCHASE_REQUEST_ITEM_ORDERED, itemsDO.getId());
+                ThrowUtil.ifThrow(srmPurchaseOrderItemMapper.selectCountByPurchaseApplyItemId(itemsDO.getId()) > 0, PURCHASE_REQUEST_ITEM_ORDERED,
+                    itemsDO.getId());
             }
             log.debug("采购申请单撤回审核，ID: {}", req.getRequestId());
             auditMachine.fireEvent(currentStatus, SrmEventEnum.WITHDRAW_REVIEW, req);
@@ -436,9 +411,7 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
                 //                ThrowUtil.ifThrow(!validHasApplyItemId(requestDoIds), PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_MANUAL_CLOSE);
                 //            }
                 if (!itemsDOList.isEmpty()) {
-                    itemsDOList.forEach(
-                        itemsDO -> requestItemsDOStateMachine.fireEvent(SrmOffStatus.fromCode(itemsDO.getOffStatus()),
-                            event, itemsDO));
+                    itemsDOList.forEach(itemsDO -> requestItemsDOStateMachine.fireEvent(SrmOffStatus.fromCode(itemsDO.getOffStatus()), event, itemsDO));
                 }
             }
         }
@@ -454,25 +427,22 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
         }
         // 1.1 已审核->异常
         purchaseRequestDOs.forEach(erpPurchaseRequestDO -> {
-            ThrowUtil.ifThrow(erpPurchaseRequestDO.getAuditStatus().equals(SrmAuditStatus.APPROVED.getCode()),
-                PURCHASE_REQUEST_DELETE_FAIL_APPROVE, erpPurchaseRequestDO.getNo());
+            ThrowUtil.ifThrow(erpPurchaseRequestDO.getAuditStatus().equals(SrmAuditStatus.APPROVED.getCode()), PURCHASE_REQUEST_DELETE_FAIL_APPROVE,
+                erpPurchaseRequestDO.getNo());
             //已关闭->异常
-            ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(SrmOffStatus.CLOSED.getCode()),
-                PURCHASE_REQUEST_DELETE_FAIL_CLOSE, erpPurchaseRequestDO.getNo());
+            ThrowUtil.ifThrow(erpPurchaseRequestDO.getOffStatus().equals(SrmOffStatus.CLOSED.getCode()), PURCHASE_REQUEST_DELETE_FAIL_CLOSE,
+                erpPurchaseRequestDO.getNo());
         });
         //1.2 校验存在关联的采购订单
         //收集ids
-        List<Long> requestDoIds =
-            purchaseRequestDOs.stream().map(SrmPurchaseRequestDO::getId).collect(Collectors.toList());
+        List<Long> requestDoIds = purchaseRequestDOs.stream().map(SrmPurchaseRequestDO::getId).collect(Collectors.toList());
         ThrowUtil.ifThrow(!validHasApplyItemId(requestDoIds), PURCHASE_REQUEST_DELETE_FAIL);
 
         //2.0 手动关闭所有行状态
         for (SrmPurchaseRequestDO requestDO : purchaseRequestDOs) {
-            List<SrmPurchaseRequestItemsDO> itemsDOS =
-                erpPurchaseRequestItemsMapper.selectListByRequestId(requestDO.getId());
+            List<SrmPurchaseRequestItemsDO> itemsDOS = erpPurchaseRequestItemsMapper.selectListByRequestId(requestDO.getId());
             itemsDOS.forEach(
-                itemsDO -> requestItemsDOStateMachine.fireEvent(SrmOffStatus.fromCode(itemsDO.getOffStatus()),
-                    SrmEventEnum.MANUAL_CLOSE, itemsDO));
+                itemsDO -> requestItemsDOStateMachine.fireEvent(SrmOffStatus.fromCode(itemsDO.getOffStatus()), SrmEventEnum.MANUAL_CLOSE, itemsDO));
         }
         //2.1 遍历删除，并记录操作日志
         purchaseRequestDOs.forEach(erpPurchaseRequest -> {
@@ -487,8 +457,7 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
     private Boolean validHasApplyItemId(Collection<Long> requestDoIds) {
         requestDoIds = requestDoIds.stream().distinct().toList();
         //收集purchaseRequestDOs的id
-        List<SrmPurchaseRequestItemsDO> requestItemsDOS =
-            erpPurchaseRequestItemsMapper.selectListByRequestIds(requestDoIds);
+        List<SrmPurchaseRequestItemsDO> requestItemsDOS = erpPurchaseRequestItemsMapper.selectListByRequestIds(requestDoIds);
         //收集item的id,去重
         Set<Long> itemIds = requestItemsDOS.stream().map(SrmPurchaseRequestItemsDO::getId).collect(Collectors.toSet());
         List<SrmPurchaseOrderItemDO> dos = srmPurchaseOrderItemMapper.selectListByPurchaseApplyItemIds(itemIds);
@@ -520,8 +489,8 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
         //批量查询 比较
         List<SrmPurchaseRequestItemsDO> itemsDOS = erpPurchaseRequestItemsMapper.selectBatchIds(itemIds);
         if (itemsDOS.size() != itemIds.size()) {
-            throw exception(PURCHASE_REQUEST_ITEM_NOT_EXISTS, CollUtil.subtract(itemIds, CollUtil.newArrayList(
-                itemsDOS.stream().map(SrmPurchaseRequestItemsDO::getId).collect(Collectors.toSet()))));
+            throw exception(PURCHASE_REQUEST_ITEM_NOT_EXISTS,
+                CollUtil.subtract(itemIds, CollUtil.newArrayList(itemsDOS.stream().map(SrmPurchaseRequestItemsDO::getId).collect(Collectors.toSet()))));
         }
         return itemsDOS;
     }
@@ -534,8 +503,8 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
         }
         List<SrmPurchaseRequestItemsDO> itemsDOS = erpPurchaseRequestItemsMapper.selectBatchIds(ids);
         if (itemsDOS.size() != ids.size()) {
-            throw exception(PURCHASE_REQUEST_ITEM_NOT_EXISTS, CollUtil.subtract(ids, CollUtil.newArrayList(
-                itemsDOS.stream().map(SrmPurchaseRequestItemsDO::getId).collect(Collectors.toSet()))));
+            throw exception(PURCHASE_REQUEST_ITEM_NOT_EXISTS,
+                CollUtil.subtract(ids, CollUtil.newArrayList(itemsDOS.stream().map(SrmPurchaseRequestItemsDO::getId).collect(Collectors.toSet()))));
         }
         //校验是否和ids数量一直，报错未对应的订单项
         return itemsDOS;

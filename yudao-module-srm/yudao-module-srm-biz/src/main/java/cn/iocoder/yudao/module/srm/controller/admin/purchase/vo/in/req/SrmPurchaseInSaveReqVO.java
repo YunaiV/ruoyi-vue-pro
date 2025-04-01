@@ -23,8 +23,7 @@ public class SrmPurchaseInSaveReqVO {
     private Long id;
 
     /**
-     * 采购订单号
-     * 冗余 {@link SrmPurchaseOrderDO#getNo()}
+     * 采购订单号 冗余 {@link SrmPurchaseOrderDO#getNo()}
      */
     @Schema(description = "入库单号")
     private String no;
@@ -42,8 +41,8 @@ public class SrmPurchaseInSaveReqVO {
     @Schema(description = "收货地址")
     private String address;
 
-//    @Schema(description = "结算日期")
-//    private LocalDateTime settlementDate;
+    //    @Schema(description = "结算日期")
+    //    private LocalDateTime settlementDate;
 
     @Schema(description = "结算账户编号")
     private Long accountId;
@@ -100,8 +99,7 @@ public class SrmPurchaseInSaveReqVO {
         private BigDecimal qty;
 
         /**
-         * 总价，单位：元
-         * totalPrice = productPrice * qty
+         * 总价，单位：元 totalPrice = productPrice * qty
          */
         @Schema(description = "总价，单位：元。totalPrice = productPrice * qty")
         @NotNull(message = "总价不能为空")

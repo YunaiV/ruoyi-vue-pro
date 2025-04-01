@@ -95,7 +95,7 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
     private final FmsFinanceSubjectApi erpFinanceSubjectApi;
     private final ResourcePatternResolver resourcePatternResolver;
     private final PurchaseOrderTemplateManager purchaseOrderTemplateManager;
-
+    private final String SOURCE = "WEB录入";
     @Resource(name = PURCHASE_ORDER_OFF_STATE_MACHINE_NAME)
     StateMachine<SrmOffStatus, SrmEventEnum, SrmPurchaseOrderDO> offMachine;
     @Resource(name = PURCHASE_ORDER_AUDIT_STATE_MACHINE_NAME)
@@ -119,11 +119,22 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
     StateMachine<SrmPaymentStatus, SrmEventEnum, SrmPayCountDTO> requestItemPaymentMachine;
     @Resource(name = PURCHASE_ORDER_ITEM_EXECUTION_STATE_MACHINE_NAME)
     StateMachine<SrmExecutionStatus, SrmEventEnum, SrmPurchaseOrderItemDO> requestItemExecutionMachine;
-
-    private final String SOURCE = "WEB录入";
     @Autowired
     @Lazy
     private SrmPurchaseRequestService srmPurchaseRequestService;
+
+    /**
+     * 校验是否存在入库项
+     *
+     * @param item 订单项
+     */
+    private static void validHasInPurchaseItem(SrmPurchaseOrderItemDO item) {
+        //判断订单项是否存在入库项
+        if (!Objects.equals(item.getInStatus(), SrmStorageStatus.NONE_IN_STORAGE.getCode())) {
+            //存在入库项，则发抛出异常
+            throw exception(PURCHASE_ORDER_DELETE_FAIL);
+        }
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -496,19 +507,6 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
             //订购状态
             requestOrderItemMachine.fireEvent(SrmOrderStatus.fromCode(requestItemsDO.getOrderStatus()), SrmEventEnum.ORDER_ADJUSTMENT, dto);
         });
-    }
-
-    /**
-     * 校验是否存在入库项
-     *
-     * @param item 订单项
-     */
-    private static void validHasInPurchaseItem(SrmPurchaseOrderItemDO item) {
-        //判断订单项是否存在入库项
-        if (!Objects.equals(item.getInStatus(), SrmStorageStatus.NONE_IN_STORAGE.getCode())) {
-            //存在入库项，则发抛出异常
-            throw exception(PURCHASE_ORDER_DELETE_FAIL);
-        }
     }
 
     @Override

@@ -11,11 +11,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Getter
 public enum SrmStorageStatus implements ArrayValuable<Integer> {
-    NONE_IN_STORAGE(1, "未入库"),
-    PARTIALLY_IN_STORAGE(2, "部分入库"),
-    ALL_IN_STORAGE(3, "全部入库"),
+    NONE_IN_STORAGE(1, "未入库"), PARTIALLY_IN_STORAGE(2, "部分入库"), ALL_IN_STORAGE(3, "全部入库"),
     ;
-
 
     public static final int[] ARRAYS = Arrays.stream(values()).mapToInt(SrmStorageStatus::getCode).toArray();
     private static final Map<Integer, SrmStorageStatus> STATUS_MAP = new HashMap<>();

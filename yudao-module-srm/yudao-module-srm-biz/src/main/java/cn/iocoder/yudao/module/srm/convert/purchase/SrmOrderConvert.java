@@ -58,20 +58,16 @@ public interface SrmOrderConvert {
     }
 
     //list
-    default List<SrmPurchaseOrderSaveReqVO.Item> convertToErpPurchaseOrderSaveReqVOItemList(
-        List<SrmPurchaseRequestItemsDO> itemDOList,
-        Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> requestItemsMap,
-        Map<Long, SrmPurchaseRequestItemsDO> itemDOMap) {
-        return itemDOList.stream()
-            .map(itemDO -> convertToErpPurchaseOrderSaveReqVOItem(itemDO, requestItemsMap, itemDOMap))
-            .collect(Collectors.toList());
+    default List<SrmPurchaseOrderSaveReqVO.Item> convertToErpPurchaseOrderSaveReqVOItemList(List<SrmPurchaseRequestItemsDO> itemDOList,
+        Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> requestItemsMap, Map<Long, SrmPurchaseRequestItemsDO> itemDOMap) {
+        return itemDOList.stream().map(itemDO -> convertToErpPurchaseOrderSaveReqVOItem(itemDO, requestItemsMap, itemDOMap)).collect(Collectors.toList());
     }
 
     /**
      * 合同渲染BO用
      */
-    default SrmPurchaseOrderWordBO bindDataFormOrderItemDO(List<SrmPurchaseOrderItemDO> itemDOS,
-        SrmPurchaseOrderDO orderDO, SrmPurchaseOrderGenerateContractReqVO vo, Map<Long, FmsFinanceSubjectDTO> dtoMap) {
+    default SrmPurchaseOrderWordBO bindDataFormOrderItemDO(List<SrmPurchaseOrderItemDO> itemDOS, SrmPurchaseOrderDO orderDO,
+        SrmPurchaseOrderGenerateContractReqVO vo, Map<Long, FmsFinanceSubjectDTO> dtoMap) {
         //        Set<Long> productIds = itemDOS.stream().map(SrmPurchaseOrderItemDO::getProductId).collect(Collectors.toSet());
         //        Map<Long, ErpProductDTO> productMap = erpProductApi.getProductMap(productIds);
         //收集产品的单位map getProductUnitMap
@@ -88,12 +84,10 @@ public interface SrmOrderConvert {
             peek.setProducts(BeanUtils.toBean(itemDOS, SrmPurchaseOrderItemWordBO.class, item -> {
                 item.setIndex(index.getAndIncrement());
                 //不含税总额
-                item.setTotalPriceUntaxed(
-                    item.getProductPrice().multiply(item.getQty()).setScale(2, RoundingMode.HALF_UP));
+                item.setTotalPriceUntaxed(item.getProductPrice().multiply(item.getQty()).setScale(2, RoundingMode.HALF_UP));
                 item.setTotalTaxPrice(item.getTaxPrice().setScale(2, RoundingMode.HALF_UP));
                 //总金额
-                item.setTotalProductPrice(
-                    item.getQty().multiply(item.getActTaxPrice()).setScale(2, RoundingMode.HALF_UP));//数量*含税单价
+                item.setTotalProductPrice(item.getQty().multiply(item.getActTaxPrice()).setScale(2, RoundingMode.HALF_UP));//数量*含税单价
                 item.setDeliveryTimeFormat(DateUtil.format(item.getDeliveryTime(), NORM_DATE_PATTERN));
                 item.setQty(item.getQty().setScale(0, RoundingMode.HALF_UP));
             })).setTotalCount(peek.getTotalCount().setScale(0, RoundingMode.HALF_UP));
