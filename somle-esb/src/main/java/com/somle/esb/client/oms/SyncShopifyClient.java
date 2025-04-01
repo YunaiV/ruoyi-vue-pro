@@ -1,6 +1,5 @@
 package com.somle.esb.client.oms;
 
-import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import com.somle.esb.enums.oms.SalesPlatformEnum;
 import com.somle.shopify.model.ShopifyToken;
 import com.somle.shopify.model.reps.ShopifyProductRepsVO;
@@ -19,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class SyncShopifyClient extends SyncOmsClient<JSONObject, JSONObject> {
+public class SyncShopifyClient extends SyncOmsClient<ShopifyShopRepsVO, ShopifyProductRepsVO> {
 
 
     @Resource
@@ -49,7 +48,7 @@ public class SyncShopifyClient extends SyncOmsClient<JSONObject, JSONObject> {
      * @Description: 获得shopify所有店铺信息
      * @return: @return {@link List }
      */
-    public List getShops() {
+    public List<ShopifyShopRepsVO> getShops() {
         List<ShopifyShopRepsVO> allShops = shopifyClients.stream()
             .map(ShopifyClient::getShops)
             .flatMap(List::stream)
@@ -62,7 +61,7 @@ public class SyncShopifyClient extends SyncOmsClient<JSONObject, JSONObject> {
      * @return: @return {@link List }
      */
     @Override
-    public List getProducts() {
+    public List<ShopifyProductRepsVO> getProducts() {
         List<ShopifyProductRepsVO> allProducts = shopifyClients.stream()
             .map(shopifyClient -> shopifyClient.getProducts(Collections.emptyMap()))
             .flatMap(List::stream)

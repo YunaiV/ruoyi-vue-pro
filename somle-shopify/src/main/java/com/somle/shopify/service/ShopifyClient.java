@@ -8,6 +8,8 @@ import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.somle.shopify.enums.ShopifyAPI;
 import com.somle.shopify.model.ShopifyToken;
+import com.somle.shopify.model.reps.ShopifyOrderRepsVO;
+import com.somle.shopify.model.reps.ShopifyPayoutRepsVO;
 import com.somle.shopify.model.reps.ShopifyProductRepsVO;
 import com.somle.shopify.model.reps.ShopifyShopRepsVO;
 import lombok.Setter;
@@ -67,21 +69,16 @@ public class ShopifyClient {
      * 获得订单信息
      **/
     @SneakyThrows
-    public JSONObject getOrders() {
-        var endpoint = "/admin/api/2024-10/orders.json?status=any";
-        var request = RequestX.builder()
-            .requestMethod(RequestX.Method.GET)
-            .url(url + endpoint)
-            .headers(getHeaders())
-            .build();
-        var bodyString = sendRequest(request).body().string();
-        var result = JsonUtilsX.parseObject(bodyString, JSONObject.class);
-        return result;
+    public List<ShopifyOrderRepsVO> getOrders() {
+        JSONArray orderArr = getResult(ShopifyAPI.GET_ORDERS, new HashMap<>());
+        List<ShopifyOrderRepsVO> orders = orderArr.stream().map(o -> JsonUtilsX.parseObject(o, ShopifyOrderRepsVO.class)).toList();
+        return orders;
     }
 
     /**
      * 获得商品信息
      **/
+    @SneakyThrows
     public List<ShopifyProductRepsVO> getProducts(Map<String, ?> params) {
         JSONArray productArr = getResult(ShopifyAPI.GET_PRODUCTS, params);
         List<ShopifyProductRepsVO> products = new ArrayList<>();
@@ -97,16 +94,10 @@ public class ShopifyClient {
      * 获得结算信息
      **/
     @SneakyThrows
-    public JSONObject getPayouts() {
-        var endpoint = "/admin/api/2024-10/shopify_payments/payouts.json";
-        var request = RequestX.builder()
-            .requestMethod(RequestX.Method.GET)
-            .url(url + endpoint)
-            .headers(getHeaders())
-            .build();
-        var bodyString = sendRequest(request).body().string();
-        var result = JsonUtilsX.parseObject(bodyString, JSONObject.class);
-        return result;
+    public List<ShopifyPayoutRepsVO> getPayouts() {
+        JSONArray payoutArr = getResult(ShopifyAPI.GET_PAYOUTS, new HashMap<>());
+        List<ShopifyPayoutRepsVO> payouts = payoutArr.stream().map(o -> JsonUtilsX.parseObject(o, ShopifyPayoutRepsVO.class)).toList();
+        return payouts;
     }
 
     /**

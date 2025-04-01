@@ -27,7 +27,7 @@ public abstract class SyncOmsClient<S, P> {
      * @Author: gumaomao
      * @Date: 2025/03/31
      * @Description: 从销售平台获取店铺信息
-     * @return: @return {@link List }<{@link S }>
+     * @return: @return {@link List }<{@link }>
      */
     public abstract List<S> getShops();
 

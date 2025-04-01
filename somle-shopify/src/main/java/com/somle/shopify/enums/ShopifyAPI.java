@@ -14,14 +14,13 @@ import cn.iocoder.yudao.framework.common.util.web.RequestX;
 /**
  * @Description Shopify 接口定义
  */
- public enum ShopifyAPI {
+public enum ShopifyAPI {
 
-    GET_SHOP("获取 Shopify 店铺信息","/admin/api/2025-01/shop.json", RequestX.Method.GET,"shop", JSONObject.class),
-    GET_ORDERS("获取 Shopify 订单信息","/admin/api/2024-10/orders.json?status=any",RequestX.Method.GET,"orders", JSONArray.class),
-    GET_PRODUCTS("获取 Shopify 商品信息","/admin/api/2024-10/products.json",RequestX.Method.GET,"products",JSONArray.class),
-    GET_PRODUCT_COUNT("获取 Shopify 商品数量","/admin/api/2024-10/products/count.json",RequestX.Method.GET,"count",JSONArray.class),
-    GET_PAYOUTS("获取 Shopify 结算信息","/admin/api/2024-10/shopify_payments/payouts.json",RequestX.Method.GET,"payouts",JSONArray.class)
-    ;
+    GET_SHOP("获取 Shopify 店铺信息", "/admin/api/2025-01/shop.json", RequestX.Method.GET, "shop", JSONObject.class),
+    GET_ORDERS("获取 Shopify 订单信息", "/admin/api/2024-10/orders.json?status=any", RequestX.Method.GET, "orders", JSONArray.class),
+    GET_PRODUCTS("获取 Shopify 商品信息", "/admin/api/2024-10/products.json", RequestX.Method.GET, "products", JSONArray.class),
+    GET_PRODUCT_COUNT("获取 Shopify 商品数量", "/admin/api/2024-10/products/count.json", RequestX.Method.GET, "count", JSONArray.class),
+    GET_PAYOUTS("获取 Shopify 结算信息", "/admin/api/2024-10/shopify_payments/payouts.json", RequestX.Method.GET, "payouts", JSONArray.class);
 
     private String action;
     private String url;
@@ -60,14 +59,14 @@ import cn.iocoder.yudao.framework.common.util.web.RequestX;
     /**
      * @Description 获取从报文获得有效数据
      **/
-    public <T> T getData(JSONObject result,Class<T> type) {
+    public <T> T getData(JSONObject result, Class<T> type) {
         if (result == null) {
             return null;
         }
-        if(JSONObject.class.isAssignableFrom(type)) {
-            return (T)result.getJSONObject(this.jsonField());
+        if (JSONObject.class.isAssignableFrom(type)) {
+            return (T) result.getJSONObject(this.jsonField());
         } else if (JSONArray.class.isAssignableFrom(type)) {
-            return (T)result.getJSONArray(this.jsonField());
+            return (T) result.getJSONArray(this.jsonField());
         } else {
             return null;
         }
