@@ -1,9 +1,11 @@
 package com.somle.esb.enums.oms;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+@AllArgsConstructor
 @Getter
-public enum SalesPlatformEnum {
+public enum PlatformEnum {
 
     AMAZON(true, "https://www.amazon.com/"),
     JINGDONG(false, null),
@@ -17,20 +19,16 @@ public enum SalesPlatformEnum {
     WANGDIAN(false, null),
     WAYFAIR(false, null);
 
-    private String siteURL;
-    private boolean isSyncProfile;
 
-    private SalesPlatformEnum(boolean isSyncProfile, String siteURL) {
-        this.isSyncProfile = isSyncProfile;
-        this.siteURL = siteURL;
-    }
+    private boolean isSyncProfile;
+    private String siteURL;
 
     /**
      * 是否匹配任意一个
      **/
-    public boolean isAnyMatch(SalesPlatformEnum... platforms) {
+    public boolean isAnyMatch(PlatformEnum... platforms) {
         boolean matched = false;
-        for (SalesPlatformEnum platform : platforms) {
+        for (PlatformEnum platform : platforms) {
             if (platform == this) {
                 matched = true;
                 break;

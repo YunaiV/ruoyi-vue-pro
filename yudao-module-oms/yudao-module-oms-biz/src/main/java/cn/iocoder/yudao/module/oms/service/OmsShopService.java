@@ -1,11 +1,35 @@
 package cn.iocoder.yudao.module.oms.service;
 
+import cn.iocoder.yudao.module.oms.api.dto.OmsShopSaveReqDTO;
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsShopDO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
-public interface OmsShopService extends IService<OmsShopDO> {
+public interface OmsShopService {
+
+    /**
+     * 创建店铺
+     *
+     * @param saveReqVO 创建信息
+     * @return 编号
+     */
+    Long createShop(@Valid OmsShopSaveReqDTO saveReqVO);
+
+    /**
+     * 更新店铺
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateShop(@Valid OmsShopSaveReqDTO updateReqVO);
+
+    /**
+     * 删除店铺
+     *
+     * @param id 编号
+     */
+    void deleteShop(Long id);
 
     /**
      * @Author: gumaomao
