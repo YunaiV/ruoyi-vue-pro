@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.module.wms.statemachine;
 
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
-import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,14 +12,14 @@ import java.util.List;
  * @description: 状态机事件上下文
  */
 
-public class ColaContext<T> {
+public class TransitionContext<T> {
 
 
     /**
      * 创建上下文
      **/
-    static <X> ColaContext<X> from(X requestDO, WmsApprovalReqVO approvalReqVO,StateMachineWrapper stateMachineWrapper) {
-        ColaContext<X> context = new ColaContext<>();
+    static <X> TransitionContext<X> from(X requestDO, WmsApprovalReqVO approvalReqVO, StateMachineWrapper stateMachineWrapper) {
+        TransitionContext<X> context = new TransitionContext<>();
         context.data=requestDO;
         context.approvalReqVO=approvalReqVO;
         context.success=true;

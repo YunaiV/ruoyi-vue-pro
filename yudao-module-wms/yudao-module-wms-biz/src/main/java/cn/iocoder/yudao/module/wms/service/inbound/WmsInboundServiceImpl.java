@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
 import cn.iocoder.yudao.module.wms.config.InboundStateMachineConfigure;
-import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
+import cn.iocoder.yudao.module.wms.statemachine.TransitionContext;
 import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
@@ -251,7 +251,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
 
     @Transactional(rollbackFor = Exception.class)
     protected void  fireEvent(WmsInboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO, WmsInboundDO inbound) {
-        ColaContext<WmsInboundDO> ctx =  inboundStateMachine.createContext(approvalReqVO,inbound);
+        TransitionContext<WmsInboundDO> ctx =  inboundStateMachine.createContext(approvalReqVO,inbound);
         // 触发事件
         inboundStateMachine.fireEvent(event, ctx);
     }

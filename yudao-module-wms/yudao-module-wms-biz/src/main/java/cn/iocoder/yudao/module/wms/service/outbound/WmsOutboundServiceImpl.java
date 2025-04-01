@@ -9,7 +9,7 @@ import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
 import cn.iocoder.yudao.module.wms.config.OutboundStateMachineConfigure;
-import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
+import cn.iocoder.yudao.module.wms.statemachine.TransitionContext;
 import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
@@ -287,7 +287,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
 
     @Transactional(rollbackFor = Exception.class)
     protected void fireEvent(WmsOutboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO, WmsOutboundDO inbound) {
-        ColaContext<WmsOutboundDO> ctx = outboundStateMachine.createContext(approvalReqVO, inbound);
+        TransitionContext<WmsOutboundDO> ctx = outboundStateMachine.createContext(approvalReqVO, inbound);
         // 触发事件
         outboundStateMachine.fireEvent(event, ctx);
     }

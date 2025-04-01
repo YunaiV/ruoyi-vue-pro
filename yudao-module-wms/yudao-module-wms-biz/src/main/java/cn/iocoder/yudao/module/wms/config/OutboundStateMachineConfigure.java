@@ -2,19 +2,13 @@ package cn.iocoder.yudao.module.wms.config;
 
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
-import cn.iocoder.yudao.module.wms.service.inbound.transition.BaseInboundTransition;
-import cn.iocoder.yudao.module.wms.service.outbound.transition.BaseOutboundTransition;
-import cn.iocoder.yudao.module.wms.statemachine.ColaTransition;
-import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
+import cn.iocoder.yudao.module.wms.service.outbound.transition.*;
+import cn.iocoder.yudao.module.wms.statemachine.TransitionContext;
 import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
 import com.alibaba.cola.statemachine.builder.FailCallback;
-import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
-import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_AUDIT_FAIL;
@@ -27,7 +21,7 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_STAT
  */
 @Slf4j
 @Configuration
-public class OutboundStateMachineConfigure implements FailCallback<Integer, WmsOutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> {
+public class OutboundStateMachineConfigure implements FailCallback<Integer, WmsOutboundAuditStatus.Event, TransitionContext<WmsOutboundDO>> {
 
     /**
      * 状态机名称
@@ -37,13 +31,65 @@ public class OutboundStateMachineConfigure implements FailCallback<Integer, WmsO
     /**
      * 状态机 Transition 基类
      **/
-    private static final Class BASE_TRANSITION_CLASS = BaseOutboundTransition.class;
+    private static final Class BASE_TRANSITION_CLASS = BaseOutboundTransitionHandler.class;
     /**
      * 创建与配置状态机
      **/
     @Bean(OutboundStateMachineConfigure.STATE_MACHINE_NAME)
     public StateMachineWrapper<Integer, WmsOutboundAuditStatus.Event, WmsOutboundDO> inboundActionStateMachine() {
-        return new StateMachineWrapper<>(STATE_MACHINE_NAME, BASE_TRANSITION_CLASS, WmsOutboundDO::getAuditStatus,this);
+        StateMachineWrapper<Integer, WmsOutboundAuditStatus.Event, WmsOutboundDO> wrapper = new StateMachineWrapper<>(STATE_MACHINE_NAME, BASE_TRANSITION_CLASS, WmsOutboundDO::getAuditStatus, this);
+
+        // 提交
+        wrapper.bindExternals(
+                // from
+                new Integer[]{
+                    WmsOutboundAuditStatus.DRAFT.getValue(),
+                    WmsOutboundAuditStatus.REJECT.getValue()
+                },
+                // event
+                WmsOutboundAuditStatus.Event.SUBMIT,
+                // to
+                WmsOutboundAuditStatus.AUDITING.getValue(),
+                // handler
+                OutboundSubmitTransitionHandler.class
+            )
+            // 同意
+            .bindExternal(
+                // from
+                WmsOutboundAuditStatus.AUDITING.getValue(),
+                // event
+                WmsOutboundAuditStatus.Event.AGREE,
+                // to
+                WmsOutboundAuditStatus.PASS.getValue(),
+                // handler
+                OutboundAgreeTransitionHandler.class
+            )
+            // 拒绝
+            .bindExternal(
+                // from
+                WmsOutboundAuditStatus.AUDITING.getValue(),
+                // event
+                WmsOutboundAuditStatus.Event.REJECT,
+                // to
+                WmsOutboundAuditStatus.REJECT.getValue(),
+                // handler
+                OutboundRejectTransitionHandler.class
+            )
+            // 执行
+            .bindExternal(
+                // from
+                WmsOutboundAuditStatus.PASS.getValue(),
+                // event
+                WmsOutboundAuditStatus.Event.FINISH,
+                // to
+                WmsOutboundAuditStatus.FINISHED.getValue(),
+                // handler
+                OutboundExecuteTransitionHandler.class
+            )
+        ;
+
+
+        return wrapper;
     }
 
 
@@ -51,7 +97,7 @@ public class OutboundStateMachineConfigure implements FailCallback<Integer, WmsO
      * 处理失败的情况
      **/
     @Override
-    public void onFail(Integer from, WmsOutboundAuditStatus.Event event, ColaContext<WmsOutboundDO> context) {
+    public void onFail(Integer from, WmsOutboundAuditStatus.Event event, TransitionContext<WmsOutboundDO> context) {
         // 当前状态
         WmsOutboundAuditStatus currStatus= WmsOutboundAuditStatus.parse(context.data().getAuditStatus());
         if (currStatus == null) {
