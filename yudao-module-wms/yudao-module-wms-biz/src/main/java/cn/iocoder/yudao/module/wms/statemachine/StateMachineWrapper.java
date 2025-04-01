@@ -1,8 +1,19 @@
 package cn.iocoder.yudao.module.wms.statemachine;
 
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
+import cn.iocoder.yudao.module.wms.config.OutboundStateMachineConfigure;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
+import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
+import com.alibaba.cola.statemachine.Action;
+import com.alibaba.cola.statemachine.Condition;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.alibaba.cola.statemachine.Visitor;
+import com.alibaba.cola.statemachine.builder.FailCallback;
+import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
+import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 
 import java.util.List;
 import java.util.function.Function;
@@ -19,7 +30,7 @@ public class StateMachineWrapper<S, E, D> implements StateMachine<S, E, ColaCont
      **/
     private StateMachine<S, E, ColaContext<D>> stateMachine;
 
-    private List<ColaTransition<S, E, ColaContext<D>>> actions;
+    private List<ColaTransition<S, E, D>> transitions;
 
 //    /**
 //     * 初始状态
@@ -49,11 +60,57 @@ public class StateMachineWrapper<S, E, D> implements StateMachine<S, E, ColaCont
     /**
      * 构造函数
      **/
-    public StateMachineWrapper(StateMachine<S, E, ColaContext<D>> stateMachine, List<ColaTransition<S, E, ColaContext<D>>> actions, Function<D,S> getter) {
-        this.stateMachine = stateMachine;
-        this.actions = actions;
+    public StateMachineWrapper(String name,Class baseTransitionClass, Function<D,S> getter,FailCallback<S,E,ColaContext<D>> failCallback) {
+
         this.getter = getter;
+
+        // 创建状态机构建器
+        StateMachineBuilder<S, E, ColaContext<D>> builder = StateMachineBuilderFactory.create();
+        initTransitions(builder, baseTransitionClass, failCallback);
+
+        // 创建状态机
+        this.stateMachine = builder.build(name);
+
     }
+
+    /**
+     * 初始化状态机
+     **/
+    private void initTransitions(StateMachineBuilder<S, E, ColaContext<D>> builder, Class baseTransitionClass, FailCallback<S,E,ColaContext<D>> failCallback) {
+
+        this.transitions = SpringUtils.getBeans(baseTransitionClass);
+        if(this.transitions==null) {
+            return;
+        }
+        for (ColaTransition<S, E, D> transition : transitions) {
+            bindTransition(builder, transition);
+        }
+        builder.setFailCallback(failCallback);
+    }
+
+    /**
+     * 绑定状态机动作
+     **/
+    private void bindTransition(StateMachineBuilder<S, E, ColaContext<D>> builder, ColaTransition<S,E,D> transition) {
+
+        S[] from = transition.getFrom();
+
+        // 为每个 Action 配置条件判断函数和执行函数
+        for (S item : from) {
+
+            builder.externalTransition()
+                // 设置状态走向
+                .from(item).to(transition.getTo())
+                // 设置事件
+                .on(transition.getEvent())
+                // 设置条件判断函数
+                .when(transition.getColaActionWhen())
+                // 执行变更
+                .perform(transition.getColaActionPerform());
+        }
+    }
+
+
 
 
     /**
@@ -135,13 +192,13 @@ public class StateMachineWrapper<S, E, D> implements StateMachine<S, E, ColaCont
      */
     public S getTo(S from,E event) {
 
-        for (ColaTransition<S, E, ColaContext<D>> action : actions) {
-            if(action.getEvent()!=event) {
+        for (ColaTransition<S, E, D> transition : this.transitions) {
+            if(transition.getEvent()!=event) {
                 continue;
             }
-            for (S f : action.getFrom()) {
+            for (S f : transition.getFrom()) {
                 if(from==f) {
-                    return action.getTo();
+                    return transition.getTo();
                 }
             }
         }

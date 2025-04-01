@@ -116,41 +116,6 @@ public abstract class ColaTransition<S, E, D>  {
     public abstract void perform(S from, S to, E event, ColaContext<D> context);
 
 
-    /**
-     * 绑定状态机动作
-     **/
-    private  static <S, E, D> void bindAction(StateMachineBuilder<S, E, D> builder, ColaTransition<S,E,D> action) {
-
-        S[] from = action.getFrom();
-
-        // 为每个 Action 配置条件判断函数和执行函数
-        for (S item : from) {
-
-            builder.externalTransition()
-                // 设置状态走向
-                .from(item).to(action.getTo())
-                // 设置事件
-                .on(action.getEvent())
-                // 设置条件判断函数
-                .when((Condition<D>) action.getColaActionWhen())
-                // 执行变更
-                .perform((Action<S, E, D>) action.getColaActionPerform());
-        }
-    }
-
-    /**
-     * 初始化状态机
-     **/
-    public static <S, E, D> List<ColaTransition<S, E, D>> initActions(StateMachineBuilder<S, E, D> builder, Class actionType, FailCallback<S,E,D> failCallback) {
-
-        List<ColaTransition<S, E, D>> actions = SpringUtils.getBeans(actionType);
-        if(actions==null) {
-            return actions;
-        }
-        builder.setFailCallback(failCallback);
-        return actions;
-
-    }
 
 
 }

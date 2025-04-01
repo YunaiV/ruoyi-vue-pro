@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.wms.config;
 
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
+import cn.iocoder.yudao.module.wms.service.inbound.transition.BaseInboundTransition;
 import cn.iocoder.yudao.module.wms.service.outbound.transition.BaseOutboundTransition;
 import cn.iocoder.yudao.module.wms.statemachine.ColaTransition;
 import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
@@ -34,21 +35,15 @@ public class OutboundStateMachineConfigure implements FailCallback<Integer, WmsO
     public static final String STATE_MACHINE_NAME = "outboundActionStateMachine";
 
     /**
+     * 状态机 Transition 基类
+     **/
+    private static final Class BASE_TRANSITION_CLASS = BaseOutboundTransition.class;
+    /**
      * 创建与配置状态机
      **/
     @Bean(OutboundStateMachineConfigure.STATE_MACHINE_NAME)
     public StateMachineWrapper<Integer, WmsOutboundAuditStatus.Event, WmsOutboundDO> inboundActionStateMachine() {
-        //  创建状态机构建器
-        StateMachineBuilder<Integer, WmsOutboundAuditStatus.Event, ColaContext<WmsOutboundDO>> builder = StateMachineBuilderFactory.create();
-        // 初始化状态机状态
-        List<ColaTransition<Integer, WmsOutboundAuditStatus.Event, ColaContext<WmsOutboundDO>>> colaTransitions = ColaTransition.initActions(builder, BaseOutboundTransition.class, this);
-        // 创建状态机
-        StateMachineWrapper<Integer, WmsOutboundAuditStatus.Event, WmsOutboundDO> machine = new StateMachineWrapper<>(builder.build(OutboundStateMachineConfigure.STATE_MACHINE_NAME), colaTransitions, WmsOutboundDO::getAuditStatus);
-        // 设置允许的基本操作
-        // machine.setInitStatus(WmsOutboundAuditStatus.DRAFT.getValue());
-        // machine.setStatusCanEdit(Arrays.asList(WmsOutboundAuditStatus.DRAFT.getValue(), WmsOutboundAuditStatus.REJECT.getValue()));
-        // machine.setStatusCanDelete(Arrays.asList(WmsOutboundAuditStatus.DRAFT.getValue(), WmsOutboundAuditStatus.REJECT.getValue()));
-        return machine;
+        return new StateMachineWrapper<>(STATE_MACHINE_NAME, BASE_TRANSITION_CLASS, WmsOutboundDO::getAuditStatus,this);
     }
 
 

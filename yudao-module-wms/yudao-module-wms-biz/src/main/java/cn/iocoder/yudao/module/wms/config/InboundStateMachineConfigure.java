@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.wms.config;
 
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.inbound.transition.*;
+import cn.iocoder.yudao.module.wms.service.outbound.transition.BaseOutboundTransition;
 import cn.iocoder.yudao.module.wms.statemachine.ColaContext;
 import cn.iocoder.yudao.module.wms.statemachine.ColaTransition;
 import cn.iocoder.yudao.module.wms.statemachine.StateMachineWrapper;
@@ -33,21 +35,16 @@ public class InboundStateMachineConfigure implements FailCallback<Integer, WmsIn
     public static final String STATE_MACHINE_NAME = "inboundActionStateMachine";
 
     /**
+     * 状态机 Transition 基类
+     **/
+    private static final Class BASE_TRANSITION_CLASS = BaseInboundTransition.class;
+
+    /**
      * 创建与配置状态机
      **/
     @Bean(InboundStateMachineConfigure.STATE_MACHINE_NAME)
     public StateMachineWrapper<Integer, WmsInboundAuditStatus.Event, WmsInboundDO> inboundActionStateMachine() {
-        // 创建状态机构建器
-        StateMachineBuilder<Integer, WmsInboundAuditStatus.Event, ColaContext<WmsInboundDO>> builder = StateMachineBuilderFactory.create();
-        // 初始化状态机状态
-        List<ColaTransition<Integer, WmsInboundAuditStatus.Event, ColaContext<WmsInboundDO>>> colaTransitions = ColaTransition.initActions(builder, BaseInboundTransition.class, this);
-        // 创建状态机
-        StateMachineWrapper<Integer, WmsInboundAuditStatus.Event, WmsInboundDO> machine = new StateMachineWrapper<>(builder.build(InboundStateMachineConfigure.STATE_MACHINE_NAME), colaTransitions, WmsInboundDO::getAuditStatus);
-        // 设置允许的基本操作
-        // machine.setInitStatus(WmsInboundAuditStatus.DRAFT.getValue());
-        // machine.setStatusCanEdit(Arrays.asList(WmsInboundAuditStatus.DRAFT.getValue(), WmsInboundAuditStatus.REJECT.getValue()));
-        // machine.setStatusCanDelete(Arrays.asList(WmsInboundAuditStatus.DRAFT.getValue(), WmsInboundAuditStatus.REJECT.getValue()));
-        return machine;
+        return new StateMachineWrapper<>(STATE_MACHINE_NAME, BASE_TRANSITION_CLASS, WmsInboundDO::getAuditStatus,this);
     }
 
 
