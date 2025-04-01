@@ -56,4 +56,6 @@ public interface WmsWarehouseService {
      * 按 externalStorageId 查询 WmsWarehouseDO
      */
     List<WmsWarehouseDO> selectByExternalStorageId(Long externalStorageId, int limit);
+
+    Map<Long, WmsWarehouseDO> getWarehouseMap(Set<Long> ids);
 }

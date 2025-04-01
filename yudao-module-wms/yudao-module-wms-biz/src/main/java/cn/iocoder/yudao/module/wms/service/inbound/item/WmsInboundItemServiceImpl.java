@@ -226,4 +226,6 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
         }
         StreamX.from(itemList).assemble(productVOMap, WmsInboundItemRespVO::getProductId, WmsInboundItemRespVO::setProduct);
     }
+
+
 }

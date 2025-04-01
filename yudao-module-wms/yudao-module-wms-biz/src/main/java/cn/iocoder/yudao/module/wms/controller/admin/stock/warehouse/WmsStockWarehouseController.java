@@ -112,6 +112,8 @@ public class WmsStockWarehouseController {
 			.mapping(WmsStockWarehouseRespVO::getCreator, WmsStockWarehouseRespVO::setCreatorName)
 			.mapping(WmsStockWarehouseRespVO::getCreator, WmsStockWarehouseRespVO::setUpdaterName)
 			.fill();
+        stockWarehouseService.assembleProducts(voPageResult.getList());
+        stockWarehouseService.assembleWarehouse(voPageResult.getList());
         // 返回
         return success(voPageResult);
     }
@@ -125,4 +127,4 @@ public class WmsStockWarehouseController {
     // // 导出 Excel
     // ExcelUtils.write(response, "仓库库存.xls", "数据", WmsStockWarehouseRespVO.class, BeanUtils.toBean(list, WmsStockWarehouseRespVO.class));
     // }
-}
+}

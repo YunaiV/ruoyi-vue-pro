@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.warehouse;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.module.wms.dal.dataobject.external.storage.WmsExternalStorageDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
@@ -162,4 +163,13 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
     public List<WmsWarehouseDO> selectByExternalStorageId(Long externalStorageId, int limit) {
         return warehouseMapper.selectByExternalStorageId(externalStorageId, limit);
     }
-}
+
+    @Override
+    public Map<Long, WmsWarehouseDO> getWarehouseMap(Set<Long> ids) {
+        if(CollectionUtils.isEmpty(ids)) {
+            return new HashMap<>();
+        }
+        List<WmsWarehouseDO> wmsWarehouseDOList = warehouseMapper.selectByIds(ids);
+        return StreamX.from(wmsWarehouseDOList).toMap(WmsWarehouseDO::getId);
+    }
+}

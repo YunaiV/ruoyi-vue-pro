@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.wms.service.stock.warehouse;
 
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 import jakarta.validation.*;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+
+import java.util.List;
 
 /**
  * 仓库库存 Service 接口
@@ -55,4 +58,8 @@ public interface WmsStockWarehouseService {
     WmsStockWarehouseDO getByWarehouseIdAndProductId(Long warehouseId, Long productId);
 
     void insertOrUpdate(WmsStockWarehouseDO stockWarehouseDO);
+
+    void assembleProducts(List<WmsStockWarehouseRespVO> list);
+
+    void assembleWarehouse(List<WmsStockWarehouseRespVO> list);
 }
