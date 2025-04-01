@@ -38,7 +38,7 @@ public interface SrmPurchaseOrderService {
     void updatePurchaseOrder(@Valid SrmPurchaseOrderSaveReqVO updateReqVO);
 
     /**
-     * 更新item订单项的json属性，完工单+验货单
+     * 更新item订单项的json属性，完工单+验货单,在已审核时
      */
     void updatePurchaseOrderJson(@Valid SrmPurchaseOrderSaveJsonReqVO reqVO);
 

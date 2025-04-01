@@ -268,7 +268,7 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
     @Override
     public void updatePurchaseOrderJson(SrmPurchaseOrderSaveJsonReqVO reqVO) {
         SrmPurchaseOrderDO purchaseOrder = validatePurchaseOrderExists(reqVO.getId());
-        //不处于已审核 ->e
+        //不处于已审核 -> e
         ThrowUtil.ifThrow(!SrmAuditStatus.APPROVED.getCode().equals(purchaseOrder.getAuditStatus()),
             PURCHASE_ORDER_ITEM_IN_FAIL_APPROVE, purchaseOrder.getNo());
         //验证子表id存在

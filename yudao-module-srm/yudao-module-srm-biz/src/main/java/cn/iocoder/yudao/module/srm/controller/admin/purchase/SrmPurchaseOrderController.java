@@ -84,7 +84,7 @@ public class SrmPurchaseOrderController {
     @Operation(summary = "更新采购订单json属性")
     @PreAuthorize("@ss.hasPermission('erp:purchase-order:update')")
     public CommonResult<Boolean> updatePurchaseOrderJson(@Validated @RequestBody SrmPurchaseOrderSaveJsonReqVO reqVO) {
-        //        purchaseOrderService.updatePurchaseOrder(reqVO);
+        purchaseOrderService.updatePurchaseOrderJson(reqVO);
         return success(true);
     }
 
