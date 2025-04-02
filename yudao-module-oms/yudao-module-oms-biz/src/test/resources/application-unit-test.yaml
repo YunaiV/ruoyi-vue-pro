@@ -33,9 +33,9 @@ spring:
     driverClassName: com.mysql.cj.jdbc.Driver
     username: it003
     password: asivJssflioKK
-#  sql:
-#    init:
-#      schema-locations: classpath:/sql/create_tables.sql
+  #  sql:
+  #    init:
+  #      schema-locations: classpath:/sql/create_tables.sql
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   data:
@@ -60,8 +60,8 @@ spring:
 --- #################### 芋道相关配置 ####################
 
 # 芋道配置项，设置当前项目所有自定义的配置
-#yudao:
-#  info:
-#    base-package: cn.iocoder.yudao.module
-somle:
-  base-package: cn.iocoder.yudao.module.oms
+yudao:
+  info:
+    base-package: cn.iocoder.yudao.module
+#somle:
+#  base-package: cn.iocoder.yudao.module.*
