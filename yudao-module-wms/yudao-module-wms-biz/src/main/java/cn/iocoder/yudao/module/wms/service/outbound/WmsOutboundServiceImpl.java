@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.wms.service.outbound;
 
-import cn.iocoder.yudao.framework.cola.statemachine.ApprovalReqVO;
 import cn.iocoder.yudao.framework.cola.statemachine.StateMachineWrapper;
 import cn.iocoder.yudao.framework.cola.statemachine.TransitionContext;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -11,6 +10,7 @@ import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.config.OutboundStateMachineConfigure;
+import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
@@ -23,6 +23,7 @@ import cn.iocoder.yudao.module.wms.dal.mysql.outbound.WmsOutboundMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.outbound.item.WmsOutboundItemMapper;
 import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
+import cn.iocoder.yudao.module.wms.enums.WmsConstants;
 import cn.iocoder.yudao.module.wms.enums.common.WmsBillType;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
@@ -286,7 +287,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     }
 
     @Override
-    public void approve(WmsOutboundAuditStatus.Event event, ApprovalReqVO approvalReqVO) {
+    public void approve(WmsOutboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO) {
         // 设置业务默认值
         approvalReqVO.setBillType(WmsBillType.OUTBOUND.getValue());
         approvalReqVO.setStatusType(WmsOutboundAuditStatus.getType());
@@ -300,8 +301,9 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    protected void fireEvent(WmsOutboundAuditStatus.Event event, ApprovalReqVO approvalReqVO, WmsOutboundDO inbound) {
-        TransitionContext<WmsOutboundDO> ctx = outboundStateMachine.createContext(approvalReqVO, inbound);
+    protected void fireEvent(WmsOutboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO, WmsOutboundDO inbound) {
+        TransitionContext<WmsOutboundDO> ctx = outboundStateMachine.createContext(inbound);
+        ctx.setExtra(WmsConstants.APPROVAL_REQ_VO_KEY, approvalReqVO);
         // 触发事件
         outboundStateMachine.fireEvent(event, ctx);
     }

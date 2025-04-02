@@ -21,6 +21,7 @@
         <module>yudao-spring-boot-starter-protection</module>
         <module>yudao-spring-boot-starter-job</module>
         <module>yudao-spring-boot-starter-mq</module>
+        <module>yudao-spring-boot-starter-statemachine</module>
 
         <module>yudao-spring-boot-starter-excel</module>
         <module>yudao-spring-boot-starter-test</module>
@@ -28,7 +29,7 @@
         <module>yudao-spring-boot-starter-biz-tenant</module>
         <module>yudao-spring-boot-starter-biz-data-permission</module>
         <module>yudao-spring-boot-starter-biz-ip</module>
-        <module>yudao-spring-boot-starter-biz-cola</module>
+
     </modules>
 
     <artifactId>yudao-framework</artifactId>

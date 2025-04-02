@@ -213,7 +213,7 @@ public class StateMachineWrapper<S, E, D> implements StateMachine<S, E, Transiti
     /**
      * 创建上下文
      */
-    public TransitionContext<D> createContext(ApprovalReqVO approvalReqVO, D data) {
-        return TransitionContext.from(data,approvalReqVO,this);
+    public TransitionContext<D> createContext(D data) {
+        return TransitionContext.from(data,this);
     }
 }

@@ -1,36 +1,44 @@
 package cn.iocoder.yudao.module.wms.controller.admin.outbound;
 
-import cn.iocoder.yudao.framework.cola.statemachine.ApprovalReqVO;
-import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
-import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
-import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
-import cn.iocoder.yudao.module.wms.service.outbound.item.WmsOutboundItemService;
-import org.springframework.web.bind.annotation.*;
-import jakarta.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.*;
-import jakarta.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
-import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.*;
-import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
-import cn.iocoder.yudao.module.wms.service.outbound.WmsOutboundService;
-import org.springframework.context.annotation.Lazy;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundSaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
+import cn.iocoder.yudao.module.wms.service.outbound.WmsOutboundService;
+import cn.iocoder.yudao.module.wms.service.outbound.item.WmsOutboundItemService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import java.io.IOException;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "出库单")
 @RestController
@@ -123,7 +131,7 @@ public class WmsOutboundController {
     @PutMapping("/submit")
     @Operation(summary = "提交审批")
     @PreAuthorize("@ss.hasPermission('wms:inbound:submit')")
-    public CommonResult<Boolean> submit(@RequestBody ApprovalReqVO approvalReqVO) {
+    public CommonResult<Boolean> submit(@RequestBody WmsApprovalReqVO approvalReqVO) {
         outboundService.approve(WmsOutboundAuditStatus.Event.SUBMIT, approvalReqVO);
         return success(true);
     }
@@ -131,7 +139,7 @@ public class WmsOutboundController {
     @PutMapping("/agree")
     @Operation(summary = "同意审批")
     @PreAuthorize("@ss.hasPermission('wms:inbound:agree')")
-    public CommonResult<Boolean> agree(@RequestBody ApprovalReqVO approvalReqVO) {
+    public CommonResult<Boolean> agree(@RequestBody WmsApprovalReqVO approvalReqVO) {
         outboundService.approve(WmsOutboundAuditStatus.Event.AGREE, approvalReqVO);
         return success(true);
     }
@@ -139,7 +147,7 @@ public class WmsOutboundController {
     @PutMapping("/reject")
     @Operation(summary = "驳回审批")
     @PreAuthorize("@ss.hasPermission('wms:inbound:reject')")
-    public CommonResult<Boolean> reject(@RequestBody ApprovalReqVO approvalReqVO) {
+    public CommonResult<Boolean> reject(@RequestBody WmsApprovalReqVO approvalReqVO) {
         outboundService.approve(WmsOutboundAuditStatus.Event.REJECT, approvalReqVO);
         return success(true);
     }
@@ -147,7 +155,7 @@ public class WmsOutboundController {
     @PutMapping("/finish")
     @Operation(summary = "完成出库")
     @PreAuthorize("@ss.hasPermission('wms:inbound:finish')")
-    public CommonResult<Boolean> finish(@RequestBody ApprovalReqVO approvalReqVO) {
+    public CommonResult<Boolean> finish(@RequestBody WmsApprovalReqVO approvalReqVO) {
         outboundService.approve(WmsOutboundAuditStatus.Event.FINISH, approvalReqVO);
         return success(true);
     }

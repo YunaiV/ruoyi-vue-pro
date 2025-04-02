@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.framework.cola.statemachine;
 
 import lombok.Getter;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: LeeFJ
@@ -15,11 +18,10 @@ public class TransitionContext<T> {
     /**
      * 创建上下文
      **/
-    static <X> TransitionContext<X> from(X requestDO, ApprovalReqVO approvalReqVO, StateMachineWrapper stateMachineWrapper) {
+    static <X> TransitionContext<X> from(X requestDO, StateMachineWrapper stateMachineWrapper) {
         TransitionContext<X> context = new TransitionContext<>();
         context.data=requestDO;
         context.success=true;
-        context.approvalReqVO=approvalReqVO;
         context.stateMachineWrapper=stateMachineWrapper;
         return context;
     }
@@ -45,13 +47,19 @@ public class TransitionContext<T> {
     private T data;
 
     /**
-     * 审批请求
+     * 其它额外数据
      **/
-    private ApprovalReqVO approvalReqVO;
+    private Map<String,Object> extraMap = new HashMap<>();
 
-    public ApprovalReqVO approvalReqVO() {
-        return approvalReqVO;
+    public Object setExtra(String key,Object extra) {
+        return extraMap.put(key,extra);
     }
+
+    public Object getExtra(String key) {
+        return extraMap.get(key);
+    }
+
+
 
     private List<String> errors = new ArrayList<>();
 

@@ -1,14 +1,15 @@
 package cn.iocoder.yudao.module.wms.service.inbound;
 
-import java.util.*;
-
-import cn.iocoder.yudao.framework.cola.statemachine.ApprovalReqVO;
-import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
-import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
-import jakarta.validation.*;
-import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundSaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
+import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
+import jakarta.validation.Valid;
+
+import java.util.List;
 
 /**
  * 入库单 Service 接口
@@ -67,7 +68,7 @@ public interface WmsInboundService {
      */
     List<WmsInboundDO> selectByWarehouseId(Long warehouseId, int limit);
 
-    void approve(WmsInboundAuditStatus.Event event, ApprovalReqVO approvalReqVO);
+    void approve(WmsInboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO);
 
     WmsInboundRespVO getInboundWithItemList(Long id);
 
