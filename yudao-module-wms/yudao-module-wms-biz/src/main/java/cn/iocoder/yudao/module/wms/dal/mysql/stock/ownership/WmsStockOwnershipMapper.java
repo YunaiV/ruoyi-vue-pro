@@ -1,12 +1,15 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.stock.ownership;
 
-import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.WmsStockOwnershipPageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.*;
+
+import java.util.List;
 
 /**
  * 所有者库存 Mapper
@@ -17,15 +20,50 @@ import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.*;
 public interface WmsStockOwnershipMapper extends BaseMapperX<WmsStockOwnershipDO> {
 
     default PageResult<WmsStockOwnershipDO> selectPage(WmsStockOwnershipPageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<WmsStockOwnershipDO>()
-				.eqIfPresent(WmsStockOwnershipDO::getWarehouseId, reqVO.getWarehouseId())
-				.eqIfPresent(WmsStockOwnershipDO::getProductId, reqVO.getProductId())
-				.eqIfPresent(WmsStockOwnershipDO::getCompanyId, reqVO.getCompanyId())
-				.eqIfPresent(WmsStockOwnershipDO::getDeptId, reqVO.getDeptId())
-				.eqIfPresent(WmsStockOwnershipDO::getAvailableQty, reqVO.getAvailableQty())
-				.eqIfPresent(WmsStockOwnershipDO::getOutboundPendingQty, reqVO.getOutboundPendingQty())
-				.betweenIfPresent(WmsStockOwnershipDO::getCreateTime, reqVO.getCreateTime())
-				.orderByDesc(WmsStockOwnershipDO::getId));
+
+        MPJLambdaWrapperX<WmsStockOwnershipDO> wrapper = new MPJLambdaWrapperX();
+        // 连接产品视图
+//        wrapper.innerJoin(WmsProductDO.class, WmsProductDO::getId, WmsStockWarehouseDO::getProductId)
+//            .likeIfExists(WmsProductDO::getBarCode, reqVO.getProductCode())
+//            .eqIfExists(WmsProductDO::getDeptId, reqVO.getProductDeptId());
+        // 按仓库
+        wrapper.eqIfPresent(WmsStockOwnershipDO::getWarehouseId, reqVO.getWarehouseId())
+            // 按产品ID
+            .eqIfPresent(WmsStockOwnershipDO::getProductId, reqVO.getProductId());
+
+//        betweenIf(wrapper,WmsStockWarehouseDO::getAvailableQty,reqVO.getAvailableQty());
+//        betweenIf(wrapper,WmsStockWarehouseDO::getDefectiveQty,reqVO.getDefectiveQty());
+//        betweenIf(wrapper,WmsStockWarehouseDO::getOutboundPendingQty,reqVO.getOutboundPendingQty());
+//        betweenIf(wrapper,WmsStockWarehouseDO::getPurchasePlanQty,reqVO.getPurchasePlanQty());
+//        betweenIf(wrapper,WmsStockWarehouseDO::getPurchaseTransitQty,reqVO.getPurchaseTransitQty());
+//        betweenIf(wrapper,WmsStockWarehouseDO::getReturnTransitQty,reqVO.getReturnTransitQty());
+//        betweenIf(wrapper,WmsStockWarehouseDO::getSellableQty,reqVO.getSellableQty());
+//        betweenIf(wrapper,WmsStockWarehouseDO::getShelvingPendingQty,reqVO.getShelvingPendingQty());
+
+        return selectPage(reqVO, wrapper);
+
+
+    }
+
+    private static void betweenIf(MPJLambdaWrapperX<WmsStockOwnershipDO> wrapper, SFunction<WmsStockOwnershipDO, ?> column, Integer[] range) {
+        if(range!=null && range.length>0) {
+            Integer[] array = new Integer[2];
+            if(range.length==1) {
+                array[0]= range[0];
+                array[1]=Integer.MAX_VALUE;
+            }
+            if(range.length>=2) {
+                array[0]= range[0];
+                array[1]= range[1];
+            }
+            if(array[0]==null) {
+                array[0]=Integer.MIN_VALUE;
+            }
+            if(array[1]==null) {
+                array[1]=Integer.MAX_VALUE;
+            }
+            wrapper.betweenIfPresent(column, array[0], array[1]);
+        }
     }
 
     /**

@@ -1,11 +1,16 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo;
 
+import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
-import com.alibaba.excel.annotation.*;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
@@ -24,9 +29,15 @@ public class WmsStockOwnershipRespVO {
     @ExcelProperty("仓库ID")
     private Long warehouseId;
 
+    @Schema(description = "仓库", example = "")
+    private WmsWarehouseSimpleRespVO warehouse;
+
     @Schema(description = "产品ID", example = "1919")
     @ExcelProperty("产品ID")
     private Long productId;
+
+    @Schema(description = "产品", example = "")
+    private WmsProductRespSimpleVO product;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
@@ -39,6 +50,11 @@ public class WmsStockOwnershipRespVO {
     @Schema(description = "库存归属部门ID", example = "")
     @ExcelProperty("库存归属部门ID")
     private Long deptId;
+
+    @Schema(description = "部门", example = "")
+    @ExcelProperty("部门")
+    private DeptSimpleRespVO dept;
+
 
     @Schema(description = "创建者", example = "")
     @ExcelProperty("创建者")
@@ -68,4 +84,6 @@ public class WmsStockOwnershipRespVO {
     @Schema(description = "待上架数量，上架是指从拣货区上架到货架", example = "")
     @ExcelProperty("待上架数量，上架是指从拣货区上架到货架")
     private Integer shelvingPendingQty;
+
+
 }

@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
@@ -34,11 +37,11 @@ public class WmsStockOwnershipPageReqVO extends PageParam {
     private Long deptId;
 
     @Schema(description = "可用库存", example = "")
-    private Integer availableQty;
+    private Integer[] availableQty;
 
     @Schema(description = "待出库库存", example = "")
-    private Integer outboundPendingQty;
+    private Integer[] outboundPendingQty;
 
     @Schema(description = "待上架数量，上架是指从拣货区上架到货架", example = "")
-    private Integer shelvingPendingQty;
+    private Integer[] shelvingPendingQty;
 }
