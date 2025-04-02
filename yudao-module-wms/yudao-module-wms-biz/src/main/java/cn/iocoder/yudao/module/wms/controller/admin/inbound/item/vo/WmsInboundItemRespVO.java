@@ -91,6 +91,10 @@ public class WmsInboundItemRespVO {
     @ExcelProperty("实际入库量")
     private Integer actualQty;
 
+    @Schema(description = "库龄", example = "")
+    @ExcelProperty("库龄")
+    private Integer age;
+
     @Schema(description = "批次剩余库存，出库后的剩余库存量", example = "")
     @ExcelProperty("批次剩余库存")
     private Integer outboundAvailableQty;

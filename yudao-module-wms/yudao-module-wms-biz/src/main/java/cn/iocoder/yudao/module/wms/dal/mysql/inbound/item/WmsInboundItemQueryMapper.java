@@ -20,6 +20,8 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface WmsInboundItemQueryMapper extends BaseMapperX<WmsInboundItemQueryDO> {
 
+    String AGE_EXPR = "(DATEDIFF(NOW(),t1.inbound_time)+IFNULL(t1.init_age,0))";
+
     default PageResult<WmsInboundItemQueryDO> selectPage(WmsInboundItemPageReqVO reqVO) {
 
         MPJLambdaWrapperX<WmsInboundItemQueryDO> wrapper = new MPJLambdaWrapperX();
@@ -27,6 +29,8 @@ public interface WmsInboundItemQueryMapper extends BaseMapperX<WmsInboundItemQue
         wrapper.selectAll(WmsInboundItemDO.class);
         wrapper.select(WmsInboundDO::getWarehouseId);
         wrapper.select(WmsPickupItemDO::getBinId);
+        wrapper.select(AGE_EXPR+" as age");
+
         //
         wrapper.innerJoin(WmsInboundDO.class,WmsInboundDO::getId, WmsInboundItemQueryDO::getInboundId)
             .likeIfExists(WmsInboundDO::getNo, reqVO.getInboundNo())
@@ -51,6 +55,8 @@ public interface WmsInboundItemQueryMapper extends BaseMapperX<WmsInboundItemQue
         wrapper.betweenIfPresent(WmsInboundItemDO::getOutboundAvailableQty,reqVO.getOutboundAvailableQty());
         wrapper.betweenIfPresent(WmsInboundItemDO::getPlanQty,reqVO.getPlanQty());
         wrapper.betweenIfPresent(WmsInboundItemDO::getShelvedQty,reqVO.getShelvedQty());
+
+        wrapper.betweenIfPresent(AGE_EXPR, reqVO.getAge());
 
         return selectPage(reqVO, wrapper);
 

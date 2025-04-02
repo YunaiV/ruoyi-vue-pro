@@ -31,4 +31,9 @@ public class WmsInboundItemQueryDO extends WmsInboundItemDO {
      * 仓位ID
      */
     private Long binId;
+
+    /**
+     * 库龄
+     */
+    private Integer age;
 }

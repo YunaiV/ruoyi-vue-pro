@@ -3,7 +3,6 @@ package cn.iocoder.yudao.framework.mybatis.core.query;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
-import com.baomidou.mybatisplus.core.conditions.segments.ColumnSegment;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.MPJWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
@@ -96,6 +95,20 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
             return (MPJLambdaWrapperX<T>) le(column, val2);
         }
         return this;
+    }
+
+    public MPJLambdaWrapperX<T> betweenIfPresent(String sqlExpr, Object[] values) {
+        Object val1 = ArrayUtils.get(values, 0);
+        Object val2 = ArrayUtils.get(values, 1);
+        if(val1!=null && val2!=null) {
+            return (MPJLambdaWrapperX<T>) super.between(sqlExpr, val1, val2);
+        } else if(val1!=null) {
+            return (MPJLambdaWrapperX<T>) ge(sqlExpr, val1);
+        } else if(val2!=null) {
+            return (MPJLambdaWrapperX<T>) le(sqlExpr, val2);
+        } else {
+            return this;
+        }
     }
 
     public MPJLambdaWrapperX<T> betweenIfPresent(SFunction<T, ?> column, Object[] values) {
