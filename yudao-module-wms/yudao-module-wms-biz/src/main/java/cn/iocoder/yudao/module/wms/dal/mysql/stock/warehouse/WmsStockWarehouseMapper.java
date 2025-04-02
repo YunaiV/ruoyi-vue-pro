@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehousePageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.product.WmsProductDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -29,8 +30,38 @@ public interface WmsStockWarehouseMapper extends BaseMapperX<WmsStockWarehouseDO
             // 按产品ID
             .eqIfPresent(WmsStockWarehouseDO::getProductId, reqVO.getProductId());
 
+        betweenIf(wrapper,WmsStockWarehouseDO::getAvailableQty,reqVO.getAvailableQty());
+        betweenIf(wrapper,WmsStockWarehouseDO::getDefectiveQty,reqVO.getDefectiveQty());
+        betweenIf(wrapper,WmsStockWarehouseDO::getOutboundPendingQty,reqVO.getOutboundPendingQty());
+        betweenIf(wrapper,WmsStockWarehouseDO::getPurchasePlanQty,reqVO.getPurchasePlanQty());
+        betweenIf(wrapper,WmsStockWarehouseDO::getPurchaseTransitQty,reqVO.getPurchaseTransitQty());
+        betweenIf(wrapper,WmsStockWarehouseDO::getReturnTransitQty,reqVO.getReturnTransitQty());
+        betweenIf(wrapper,WmsStockWarehouseDO::getSellableQty,reqVO.getSellableQty());
+        betweenIf(wrapper,WmsStockWarehouseDO::getShelvingPendingQty,reqVO.getShelvingPendingQty());
+
         return selectPage(reqVO, wrapper);
 
+    }
+
+    private static void betweenIf(MPJLambdaWrapperX<WmsStockWarehouseDO> wrapper, SFunction<WmsStockWarehouseDO, ?> column,Integer[] range) {
+        if(range!=null && range.length>0) {
+            Integer[] array = new Integer[2];
+            if(range.length==1) {
+                array[0]= range[0];
+                array[1]=Integer.MAX_VALUE;
+            }
+            if(range.length>=2) {
+                array[0]= range[0];
+                array[1]= range[1];
+            }
+            if(array[0]==null) {
+                array[0]=Integer.MIN_VALUE;
+            }
+            if(array[1]==null) {
+                array[1]=Integer.MAX_VALUE;
+            }
+            wrapper.betweenIfPresent(column, array[0], array[1]);
+        }
     }
 
     /**
