@@ -1,13 +1,18 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.stock.bin;
 
-import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsWarehouseProductVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 仓位库存 Mapper
@@ -54,7 +59,7 @@ public interface WmsStockBinMapper extends BaseMapperX<WmsStockBinDO> {
         return selectList(wrapper);
     }
 
-    default List<WmsStockBinDO> selectStockBinList(Collection<Long> binIds, Collection<Long> productIds) {
+    default List<WmsStockBinDO> selectStockBinListInBin(Collection<Long> binIds, Collection<Long> productIds) {
         if (CollectionUtils.isEmpty(binIds) && CollectionUtils.isEmpty(productIds)) {
             return new ArrayList<>();
         }
@@ -62,5 +67,23 @@ public interface WmsStockBinMapper extends BaseMapperX<WmsStockBinDO> {
         wrapper.in(WmsStockBinDO::getBinId, binIds);
         wrapper.in(WmsStockBinDO::getProductId, productIds);
         return selectList(wrapper);
+    }
+
+    default List<WmsStockBinDO> selectStockBinListInWarehouse(List<WmsWarehouseProductVO> warehouseProductList) {
+
+        LambdaQueryWrapperX<WmsStockBinDO> wrapper = new LambdaQueryWrapperX<>();
+        List<Object> params = new ArrayList<>();
+        List<String> units = new ArrayList<>();
+        int index=0;
+        for (WmsWarehouseProductVO vo : warehouseProductList) {
+            params.add(vo.getWarehouseId());
+            params.add(vo.getProductId());
+            units.add("({"+index+"},{"+(index+1)+"})");
+            index+=2;
+        }
+        wrapper.apply("(warehouse_id, product_id) IN ("+ StrUtils.join(units,",")+")",params.toArray());
+        return selectList(wrapper);
+
+
     }
 }

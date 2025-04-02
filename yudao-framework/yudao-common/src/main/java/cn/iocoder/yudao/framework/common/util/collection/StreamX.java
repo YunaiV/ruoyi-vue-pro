@@ -1,13 +1,23 @@
 package cn.iocoder.yudao.framework.common.util.collection;
 
 
-
-
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import lombok.Getter;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -774,7 +784,7 @@ public class StreamX<T> {
      * @param propertySetter 设置当前元素属性值的方法，将中间 Map 中获取到的属性值设置到当前元素属性中
      * @return 当前对象
      **/
-    public <K, M> StreamX<T> assemble(List<M> valueList, Function<M,K> keyPropertyGetter4List,Function<T,K> keyPropertyGetter, BiConsumer<T,M> propertySetter) {
+    public <K, M> StreamX<T> assemble(Collection<M> valueList, Function<M,K> keyPropertyGetter4List,Function<T,K> keyPropertyGetter, BiConsumer<T,M> propertySetter) {
         Map<K,M> propertyValueMap=StreamX.from(valueList).toMap(keyPropertyGetter4List,t->t);
         return this.assemble(propertyValueMap,keyPropertyGetter,propertySetter);
     }

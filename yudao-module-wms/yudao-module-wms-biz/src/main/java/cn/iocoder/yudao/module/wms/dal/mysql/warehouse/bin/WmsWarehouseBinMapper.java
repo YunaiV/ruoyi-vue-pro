@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.warehouse.bin;
 
-import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinPageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.*;
+
+import java.util.List;
 
 /**
  * 库位 Mapper
@@ -67,4 +68,6 @@ public interface WmsWarehouseBinMapper extends BaseMapperX<WmsWarehouseBinDO> {
         wrapper.eq(WmsWarehouseBinDO::getCode, code);
         return selectOne(wrapper);
     }
-}
+
+
+}

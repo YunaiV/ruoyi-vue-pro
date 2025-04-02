@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.wms.service.warehouse.bin;
 
-import java.util.*;
-import jakarta.validation.*;
-import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinSaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
+import jakarta.validation.Valid;
+
+import java.util.List;
 
 /**
  * 库位 Service 接口
@@ -63,4 +64,6 @@ public interface WmsWarehouseBinService {
     List<WmsWarehouseBinDO> selectByZoneId(Long zoneId, int limit);
 
     List<WmsWarehouseBinDO> selectByIds(List<Long> ids);
+
+
 }

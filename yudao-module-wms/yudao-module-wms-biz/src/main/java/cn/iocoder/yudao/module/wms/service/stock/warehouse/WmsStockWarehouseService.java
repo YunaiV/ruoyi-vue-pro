@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.wms.service.stock.warehouse;
 
-import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
-import jakarta.validation.*;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehousePageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehouseRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehouseSaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -62,4 +63,8 @@ public interface WmsStockWarehouseService {
     void assembleProducts(List<WmsStockWarehouseRespVO> list);
 
     void assembleWarehouse(List<WmsStockWarehouseRespVO> list);
+
+    String getWarehouseProductKey(Long warehouseId, Long productId);
+
+    void assembleStockBin(List<WmsStockWarehouseRespVO> list);
 }

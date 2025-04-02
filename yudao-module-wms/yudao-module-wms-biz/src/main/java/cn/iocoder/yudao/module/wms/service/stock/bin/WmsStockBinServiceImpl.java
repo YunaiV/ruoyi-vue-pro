@@ -1,23 +1,38 @@
 package cn.iocoder.yudao.module.wms.service.stock.bin;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsWarehouseProductVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinRespVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
+import cn.iocoder.yudao.module.wms.dal.mysql.stock.bin.WmsStockBinMapper;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.stock.flow.WmsStockFlowService;
 import cn.iocoder.yudao.module.wms.service.stock.ownership.WmsStockOwnershipService;
 import cn.iocoder.yudao.module.wms.service.stock.warehouse.WmsStockWarehouseService;
+import cn.iocoder.yudao.module.wms.service.warehouse.bin.WmsWarehouseBinService;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import jakarta.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.*;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.wms.dal.mysql.stock.bin.WmsStockBinMapper;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_BIN_ID_PRODUCT_ID_DUPLICATE;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_NOT_EXISTS;
 
 /**
  * 仓位库存 Service 实现类
@@ -40,6 +55,10 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
 
     @Autowired
     private WmsStockOwnershipService wmsStockOwnershipService;
+
+    @Autowired
+    @Lazy
+    private WmsWarehouseBinService warehouseBinService;
 
     @Resource
     @Lazy
@@ -125,9 +144,14 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
     }
 
     @Override
+    public List<WmsStockBinDO> selectStockBin(Long warehouseId, Long productId) {
+        return WmsStockBinService.super.selectStockBin(warehouseId, productId);
+    }
+
+    @Override
     public Map<Long, Map<Long, WmsStockBinDO>> getStockBinMap(Collection<Long> binIds, Collection<Long> productIds) {
         Map<Long, Map<Long, WmsStockBinDO>> result = new HashMap<>();
-        List<WmsStockBinDO> list = stockBinMapper.selectStockBinList(binIds, productIds);
+        List<WmsStockBinDO> list = stockBinMapper.selectStockBinListInBin(binIds, productIds);
         for (WmsStockBinDO stockBinDO : list) {
             Map<Long, WmsStockBinDO> map = result.computeIfAbsent(stockBinDO.getBinId(), k -> new HashMap<>());
             map.put(stockBinDO.getProductId(), stockBinDO);
@@ -158,4 +182,33 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
             stockBinMapper.updateById(stockBinDO);
         }
     }
+
+    public List<WmsStockBinRespVO> selectStockBinList(List<WmsWarehouseProductVO> warehouseProductList, Boolean withBin) {
+        if(CollectionUtils.isEmpty(warehouseProductList)) {
+            return List.of();
+        }
+        List<WmsStockBinDO> doList =  stockBinMapper.selectStockBinListInWarehouse(warehouseProductList);
+        List<WmsStockBinRespVO> voList = BeanUtils.toBean(doList, WmsStockBinRespVO.class);
+        if(withBin) {
+            List<WmsWarehouseBinDO> binDOList = warehouseBinService.selectByIds(StreamX.from(voList).toList(WmsStockBinRespVO::getBinId).stream().distinct().toList());
+            List<WmsWarehouseBinRespVO> binVOList = BeanUtils.toBean(binDOList, WmsWarehouseBinRespVO.class);
+            StreamX.from(voList).assemble(binVOList, WmsWarehouseBinRespVO::getId, WmsStockBinRespVO::getBinId,WmsStockBinRespVO::setBin);
+        }
+        return voList;
+    }
+
+    @Override
+    public Map<String, List<WmsStockBinRespVO>> selectStockBinGroup(List<WmsWarehouseProductVO> warehouseProductList, Boolean withBin) {
+        if(CollectionUtils.isEmpty(warehouseProductList)) {
+            return Map.of();
+        }
+        List<WmsStockBinRespVO> voList = selectStockBinList(warehouseProductList,withBin);
+        return StreamX.from(voList).groupBy(vo->{
+            return stockWarehouseService.getWarehouseProductKey(vo.getWarehouseId(),vo.getProductId());
+        });
+    }
+
+
+
+
 }

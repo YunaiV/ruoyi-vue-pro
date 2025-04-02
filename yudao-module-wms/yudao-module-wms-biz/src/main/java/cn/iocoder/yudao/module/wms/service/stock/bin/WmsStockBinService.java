@@ -1,11 +1,16 @@
 package cn.iocoder.yudao.module.wms.service.stock.bin;
 
-import java.util.*;
-
-import jakarta.validation.*;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsWarehouseProductVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
+import jakarta.validation.Valid;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 仓位库存 Service 接口
@@ -63,4 +68,7 @@ public interface WmsStockBinService {
     Map<Long, Map<Long, WmsStockBinDO>> getStockBinMap(Collection<Long> binIds, Collection<Long> productIds);
 
     void insertOrUpdate(WmsStockBinDO stockBinDO);
+
+
+    Map<String, List<WmsStockBinRespVO>> selectStockBinGroup(List<WmsWarehouseProductVO> warehouseProductList, Boolean withBin);
 }

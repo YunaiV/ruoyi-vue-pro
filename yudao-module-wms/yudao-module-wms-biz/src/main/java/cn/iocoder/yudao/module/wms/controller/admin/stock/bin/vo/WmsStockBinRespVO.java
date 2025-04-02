@@ -1,11 +1,16 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo;
 
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
-import com.alibaba.excel.annotation.*;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
@@ -24,13 +29,22 @@ public class WmsStockBinRespVO {
     @ExcelProperty("仓库ID")
     private Long warehouseId;
 
+    @Schema(description = "仓库", example = "")
+    private WmsWarehouseSimpleRespVO warehouse;
+
     @Schema(description = "库位ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "10839")
     @ExcelProperty("库位ID")
     private Long binId;
 
+    @Schema(description = "库位", example = "")
+    private WmsWarehouseBinRespVO bin;
+
     @Schema(description = "产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11713")
     @ExcelProperty("产品ID")
     private Long productId;
+
+    @Schema(description = "产品", example = "")
+    private WmsProductRespSimpleVO product;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")

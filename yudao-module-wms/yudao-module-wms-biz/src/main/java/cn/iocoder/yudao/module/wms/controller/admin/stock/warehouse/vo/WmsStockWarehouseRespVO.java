@@ -1,12 +1,17 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo;
 
 import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
-import com.alibaba.excel.annotation.*;
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
@@ -95,4 +100,10 @@ public class WmsStockWarehouseRespVO {
 
     @Schema(description = "产品", example = "")
     private WmsProductRespSimpleVO product;
+
+    @Schema(description = "仓位库存", example = "")
+    private List<WmsStockBinRespVO> stockBinList;
+
+
+
 }
