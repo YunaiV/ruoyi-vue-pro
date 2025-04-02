@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.req;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
 import cn.iocoder.yudao.module.system.api.utils.Validation;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
@@ -50,10 +49,10 @@ public class SrmPurchaseInSaveReqVO {
     @Schema(description = "优惠率，百分比")
     private BigDecimal discountPercent;
 
-    @Schema(description = "产品单价")
-    @DecimalMin(value = "0.00", message = "产品单价不能小于0")
-    @NotNull(message = "产品单价不能为空")
-    private BigDecimal productPrice;
+//    @Schema(description = "产品单价")
+//    @DecimalMin(value = "0.00", message = "产品单价不能小于0")
+//    @NotNull(message = "产品单价不能为空")
+//    private BigDecimal productPrice;
 
     @Schema(description = "其它金额，单位：元")
     private BigDecimal otherPrice;

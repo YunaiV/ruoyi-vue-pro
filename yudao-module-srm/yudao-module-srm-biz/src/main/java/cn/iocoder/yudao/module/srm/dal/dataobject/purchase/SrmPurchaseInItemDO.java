@@ -54,6 +54,10 @@ public class SrmPurchaseInItemDO extends BaseDO {
      */
     private BigDecimal productPrice;
     /**
+     * 已付款金额
+     */
+    private BigDecimal payPrice;
+    /**
      * 数量
      */
     private BigDecimal qty;

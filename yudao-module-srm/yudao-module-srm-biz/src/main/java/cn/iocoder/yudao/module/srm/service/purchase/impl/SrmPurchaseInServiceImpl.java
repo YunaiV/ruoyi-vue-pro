@@ -39,13 +39,14 @@ import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.srm.enums.SrmEventEnum.CANCEL_PAYMENT;
-import static cn.iocoder.yudao.module.srm.enums.SrmEventEnum.COMPLETE_PAYMENT;
+import static cn.iocoder.yudao.module.srm.enums.SrmEventEnum.PAYMENT_ADJUSTMENT;
+import static cn.iocoder.yudao.module.srm.enums.SrmEventEnum.PAYMENT_INIT;
 import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.*;
 
 /**
@@ -189,6 +190,18 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
             throw exception(PURCHASE_IN_FAIL_PAYMENT_PRICE_EXCEED, paymentPrice, purchaseIn.getTotalPrice());
         }
         purchaseInMapper.updateById(new SrmPurchaseInDO().setId(id).setPaymentPrice(paymentPrice));
+    }
+
+    //updatePurchaseInItemPaymentPrice
+    public void updatePurchaseInItemPaymentPrice(Long id, BigDecimal paymentPrice) {
+        SrmPurchaseInItemDO purchaseInItem = purchaseInItemMapper.selectById(id);
+        if (purchaseInItem.getPayPrice().equals(paymentPrice)) {
+            return;
+        }
+        if (paymentPrice.compareTo(purchaseInItem.getTotalPrice()) > 0) {
+            throw exception(PURCHASE_IN_FAIL_PAYMENT_ITEM_PRICE_EXCEED, paymentPrice, purchaseInItem.getTotalPrice());
+        }
+        purchaseInItemMapper.updateById(new SrmPurchaseInItemDO().setId(id).setPayPrice(paymentPrice));
     }
 
     private List<SrmPurchaseInItemDO> validatePurchaseInItems(List<SrmPurchaseInSaveReqVO.Item> voItems) {
@@ -403,27 +416,31 @@ public class SrmPurchaseInServiceImpl implements SrmPurchaseInService {
     @Override
     public void switchPayStatus(SrmPurchaseInPayReqVO vo) {
         //1.0 校验，已审核才可以
-        vo.getInItemIds().stream().distinct().forEach(item -> {
+        List<Long> itemIds = vo.getItems().stream().map(SrmPurchaseInPayReqVO.Item::getId).distinct().toList();
+        //map itemId:item
+        Map<Long, SrmPurchaseInPayReqVO.Item> itemMap =
+            vo.getItems().stream().collect(Collectors.toMap(SrmPurchaseInPayReqVO.Item::getId, Function.identity()));
+        itemIds.stream().distinct().forEach(item -> {
             Long inId = purchaseInItemMapper.selectById(item).getInId();
             SrmPurchaseInDO purchaseInDO = purchaseInMapper.selectById(inId);
             ThrowUtil.ifThrow(!purchaseInDO.getAuditStatus().equals(SrmAuditStatus.APPROVED.getCode()), PURCHASE_IN_NOT_APPROVE, purchaseInDO.getNo());
         });
-        SrmEventEnum eventEnum;
-        if (vo.getPass()) {
-            eventEnum = COMPLETE_PAYMENT;
-        } else {
-            eventEnum = CANCEL_PAYMENT;
-        }
-        SrmEventEnum finalEventEnum = eventEnum;
-        vo.getInItemIds().stream().distinct().forEach(inItemId -> {
+
+        itemIds.stream().distinct().forEach(inItemId -> {
             //校验
             SrmPurchaseInItemDO inItemDO = validatePurchaseInItemExists(inItemId);
-            if (inItemDO.getPayStatus() == null) {
-                itemPaymentMachine.fireEvent(SrmPaymentStatus.NONE_PAYMENT, finalEventEnum, inItemDO);
+            if (vo.getPass()) {
+                updatePurchaseInItemPaymentPrice(inItemDO.getInId(), itemMap.get(inItemId).getPayPrice());
             } else {
-                itemPaymentMachine.fireEvent(SrmPaymentStatus.fromCode(inItemDO.getPayStatus()), finalEventEnum, inItemDO);
+                updatePurchaseInItemPaymentPrice(inItemDO.getInId(), BigDecimal.ZERO);
             }
-
+            if (inItemDO.getPayStatus() == null) {
+                itemPaymentMachine.fireEvent(SrmPaymentStatus.NONE_PAYMENT, PAYMENT_INIT, inItemDO);
+            } else {
+                //付款金额调整
+                updatePurchaseInItemPaymentPrice(inItemDO.getInId(), itemMap.get(inItemId).getPayPrice());
+                itemPaymentMachine.fireEvent(SrmPaymentStatus.fromCode(inItemDO.getPayStatus()), PAYMENT_ADJUSTMENT, inItemDO);
+            }
         });
     }
 }

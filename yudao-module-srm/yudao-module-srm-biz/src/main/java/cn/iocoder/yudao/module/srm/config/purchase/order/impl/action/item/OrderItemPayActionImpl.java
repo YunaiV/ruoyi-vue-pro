@@ -73,7 +73,10 @@ public class OrderItemPayActionImpl implements Action<SrmPaymentStatus, SrmEvent
             log.error("未找到对应的采购订单,订单ID={}", orderItemDO.getOrderId());
             return;
         }
-        paymentStateMachine.fireEvent(SrmPaymentStatus.fromCode(orderDO.getPayStatus()), event, orderDO);
+        //不等于初始化
+        if (event != SrmEventEnum.PAYMENT_INIT) {
+            paymentStateMachine.fireEvent(SrmPaymentStatus.fromCode(orderDO.getPayStatus()), SrmEventEnum.PAYMENT_ADJUSTMENT, orderDO);
+        }
         //当前订单项，完全入库 + 完全付款 -> 关闭订单项
         checkStatusAndClose(orderItemDO.getId());
     }

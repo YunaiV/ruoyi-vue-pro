@@ -27,10 +27,8 @@ public class SrmPurchaseRequestStatusMachine {
 
     @Resource
     private Action<SrmAuditStatus, SrmEventEnum, SrmPurchaseRequestAuditReqVO> auditActionImpl;
-    @Resource
-    private Action<SrmOffStatus, SrmEventEnum, SrmPurchaseRequestDO> offActionImpl;
-    @Resource
-    private Action<SrmOrderStatus, SrmEventEnum, SrmPurchaseRequestDO> orderActionImpl;
+
+
     @Resource
     private FailCallback baseFailCallbackImpl;
 
@@ -56,6 +54,8 @@ public class SrmPurchaseRequestStatusMachine {
         return builder.build(PURCHASE_REQUEST_AUDIT_STATE_MACHINE_NAME);
     }
 
+    @Resource
+    private Action<SrmOffStatus, SrmEventEnum, SrmPurchaseRequestDO> offActionImpl;
     @Bean(PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME)
     public StateMachine<SrmOffStatus, SrmEventEnum, SrmPurchaseRequestDO> getPurchaseRequestOffStateMachine() {
         StateMachineBuilder<SrmOffStatus, SrmEventEnum, SrmPurchaseRequestDO> builder = StateMachineBuilderFactory.create();
@@ -73,6 +73,8 @@ public class SrmPurchaseRequestStatusMachine {
         return builder.build(PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME);
     }
 
+    @Resource
+    private Action<SrmOrderStatus, SrmEventEnum, SrmPurchaseRequestDO> orderActionImpl;
     @Bean(PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME)
     public StateMachine<SrmOrderStatus, SrmEventEnum, SrmPurchaseRequestDO> getPurchaseOrderStateMachine() {
         StateMachineBuilder<SrmOrderStatus, SrmEventEnum, SrmPurchaseRequestDO> builder = StateMachineBuilderFactory.create();

@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseOrderItemMapper
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseOrderMapper;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseRequestItemsMapper;
 import cn.iocoder.yudao.module.srm.enums.SrmEventEnum;
+import cn.iocoder.yudao.module.srm.enums.status.SrmExecutionStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmOffStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmPaymentStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmStorageStatus;
@@ -43,6 +44,9 @@ public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventE
 
     @Resource(name = PURCHASE_REQUEST_ITEM_STORAGE_STATE_MACHINE_NAME)
     private StateMachine purchaseRequestItemStateMachine;
+
+    @Resource(name = PURCHASE_ORDER_ITEM_EXECUTION_STATE_MACHINE_NAME)
+    private StateMachine<SrmExecutionStatus, SrmEventEnum, SrmPurchaseOrderItemDO> purchaseOrderItemExecutionStateMachine;
 
     @Resource(name = PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME)
     private StateMachine<SrmOffStatus, SrmEventEnum, SrmPurchaseOrderItemDO> purchaseOrderItemOffStateMachine;
@@ -103,6 +107,18 @@ public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventE
         toRequestItem(oldData, dtoCount);
         // 当前订单项，完全入库 + 完全付款 -> 关闭订单项
         checkStatusAndClose(dto.getOrderItemId());
+        //
+        toOrderExecute(dto.getOrderItemId());
+    }
+
+    private void toOrderExecute(Long orderItemId) {
+        SrmPurchaseOrderItemDO orderItemDO = itemMapper.selectById(orderItemId);
+        //部分入库->部分执行 , 完全入库 -> 完全执行
+        if (Objects.equals(orderItemDO.getInStatus(), SrmStorageStatus.ALL_IN_STORAGE.getCode())) {
+            purchaseOrderItemExecutionStateMachine.fireEvent(SrmExecutionStatus.fromCode(orderItemDO.getExecuteStatus()), SrmEventEnum.START_EXECUTION, orderItemDO);
+        } else if (Objects.equals(orderItemDO.getInStatus(), SrmStorageStatus.PARTIALLY_IN_STORAGE.getCode())) {
+            purchaseOrderItemExecutionStateMachine.fireEvent(SrmExecutionStatus.fromCode(orderItemDO.getExecuteStatus()), SrmEventEnum.COMPLETE_EXECUTION, orderItemDO);
+        }
     }
 
     private void toRequestItem(SrmPurchaseOrderItemDO oldData, BigDecimal dtoCount) {
