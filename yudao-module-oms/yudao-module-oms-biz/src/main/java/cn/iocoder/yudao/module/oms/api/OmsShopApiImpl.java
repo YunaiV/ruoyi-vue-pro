@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.oms.api;
 
+import cn.iocoder.yudao.module.oms.api.dto.OmsShopDTO;
 import cn.iocoder.yudao.module.oms.api.dto.OmsShopSaveReqDTO;
 import cn.iocoder.yudao.module.oms.service.OmsShopService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import java.util.*;
+
 
 /**
  * @Description: $
@@ -29,5 +32,15 @@ public class OmsShopApiImpl implements OmsShopApi {
     @Override
     public void deleteShop(Long id) {
         shopService.deleteShop(id);
+    }
+
+    @Override
+    public void createOrUpdateShopByPlatform(List<OmsShopSaveReqDTO> saveReqDTOs) {
+       shopService.createOrUpdateShopByPlatform(saveReqDTOs);
+    }
+
+    @Override
+    public OmsShopDTO getShopByPlatformShopCode(String platformShopCode) {
+        return shopService.getShopByPlatformShopCode(platformShopCode);
     }
 }

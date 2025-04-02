@@ -20,7 +20,10 @@ public class ShopifyService {
     public void init() {
         client = new ShopifyClient(tokenRepository.findAll().get(0));
     }
-    public List<ShopifyToken> getAllShopifyTokens() {
-        return tokenRepository.findAll();
+
+
+    public List<ShopifyClient> getAllShopifyClients() {
+        List<ShopifyClient> clients = tokenRepository.findAll().stream().map(ShopifyClient::new).toList();
+        return clients;
     }
 }

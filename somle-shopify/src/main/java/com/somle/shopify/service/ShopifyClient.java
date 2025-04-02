@@ -10,7 +10,7 @@ import com.somle.shopify.enums.ShopifyAPI;
 import com.somle.shopify.model.ShopifyToken;
 import com.somle.shopify.model.reps.ShopifyOrderRepsVO;
 import com.somle.shopify.model.reps.ShopifyPayoutRepsVO;
-import com.somle.shopify.model.reps.ShopifyProductRepsVO;
+import com.somle.shopify.model.reps.ShopifyShopProductRepsVO;
 import com.somle.shopify.model.reps.ShopifyShopRepsVO;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -79,12 +79,12 @@ public class ShopifyClient {
      * 获得商品信息
      **/
     @SneakyThrows
-    public List<ShopifyProductRepsVO> getProducts(Map<String, ?> params) {
+    public List<ShopifyShopProductRepsVO> getProducts(Map<String, ?> params) {
         JSONArray productArr = getResult(ShopifyAPI.GET_PRODUCTS, params);
-        List<ShopifyProductRepsVO> products = new ArrayList<>();
+        List<ShopifyShopProductRepsVO> products = new ArrayList<>();
         for (JsonNode productNode : productArr) {
-            ShopifyProductRepsVO shopifyProductRepsVO = JsonUtilsX.parseObject(productNode, ShopifyProductRepsVO.class);
-            products.add(shopifyProductRepsVO);
+            ShopifyShopProductRepsVO shopifyShopProductRepsVO = JsonUtilsX.parseObject(productNode, ShopifyShopProductRepsVO.class);
+            products.add(shopifyShopProductRepsVO);
         }
         return products;
     }

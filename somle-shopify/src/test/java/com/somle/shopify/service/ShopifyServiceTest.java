@@ -13,7 +13,6 @@ import java.util.HashMap;
 
 @Disabled
 @Slf4j
-@Import({ShopifyClient.class})
 class ShopifyServiceTest extends SomleBaseDbUnitTest {
 //    @Resource
 //    ShopifyClient client;

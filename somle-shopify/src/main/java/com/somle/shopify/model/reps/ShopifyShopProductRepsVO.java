@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ShopifyProductRepsVO {
+public class ShopifyShopProductRepsVO {
 
     private Long id;
     private String title;

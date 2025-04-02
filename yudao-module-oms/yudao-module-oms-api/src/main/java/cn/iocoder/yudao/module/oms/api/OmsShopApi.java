@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.oms.api;
 
+import cn.iocoder.yudao.module.oms.api.dto.OmsShopDTO;
 import cn.iocoder.yudao.module.oms.api.dto.OmsShopSaveReqDTO;
 import jakarta.validation.Valid;
+
+import java.util.List;
 
 /**
  * @Description: $
@@ -30,4 +33,17 @@ public interface OmsShopApi {
      * @param id 编号
      */
     void deleteShop(Long id);
+
+    /**
+     * @Description: 按平台创建或更新店铺信息
+     * @return:
+     */
+    void createOrUpdateShopByPlatform(@Valid List<OmsShopSaveReqDTO> saveReqDTOs);
+
+    /**
+     * @param platformShopCode 平台店铺代码
+     * @Description: 按平台店铺代码获取店铺信息
+     * @return: @return {@link OmsShopDTO }
+     */
+    OmsShopDTO getShopByPlatformShopCode(String platformShopCode);
 }
