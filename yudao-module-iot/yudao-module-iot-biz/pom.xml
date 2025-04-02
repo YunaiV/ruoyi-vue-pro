@@ -24,6 +24,16 @@
             <artifactId>yudao-module-iot-api</artifactId>
             <version>${revision}</version>
         </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-iot-component-http</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-iot-component-emqx</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
@@ -70,11 +80,11 @@
         </dependency>
 
         <!-- 脚本插件相关 -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-iot-plugin-script</artifactId>
-            <version>${revision}</version>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>cn.iocoder.boot</groupId>-->
+        <!--            <artifactId>yudao-module-iot-plugin-script</artifactId>-->
+        <!--            <version>${revision}</version>-->
+        <!--        </dependency>-->
 
         <!-- 消息队列相关 -->
         <dependency>
