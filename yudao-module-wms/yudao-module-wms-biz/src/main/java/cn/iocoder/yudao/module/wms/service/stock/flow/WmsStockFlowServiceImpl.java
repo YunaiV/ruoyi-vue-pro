@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwners
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
-import cn.iocoder.yudao.module.wms.enums.stock.StockType;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsStockType;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.transaction.annotation.Transactional;
@@ -103,7 +103,7 @@ public class WmsStockFlowServiceImpl implements WmsStockFlowService {
      * 创建仓库库存变化流水
      */
     public void createForStockWarehouse(WmsStockReason reason, Long productId, WmsStockWarehouseDO stockWarehouseDO, Integer quantity, Long reasonId, Long reasonItemId) {
-        createFor(reason, StockType.WAREHOUSE, stockWarehouseDO.getId(), stockWarehouseDO.getWarehouseId(), productId, quantity, reasonId, reasonItemId, stockFlowDO -> {
+        createFor(reason, WmsStockType.WAREHOUSE, stockWarehouseDO.getId(), stockWarehouseDO.getWarehouseId(), productId, quantity, reasonId, reasonItemId, stockFlowDO -> {
             // 采购计划量
             stockFlowDO.setPurchasePlanQty(stockWarehouseDO.getPurchasePlanQty());
             // 采购在途量
@@ -127,7 +127,7 @@ public class WmsStockFlowServiceImpl implements WmsStockFlowService {
      * 创建所有者库存变化流水
      */
     public void createForStockOwner(WmsStockReason reason, Long productId, WmsStockOwnershipDO stockOwnershipDO, Integer quantity, Long reasonId, Long reasonItemId) {
-        createFor(reason, StockType.OWNER, stockOwnershipDO.getId(), stockOwnershipDO.getWarehouseId(), productId, quantity, reasonId, reasonItemId, stockFlowDO -> {
+        createFor(reason, WmsStockType.OWNER, stockOwnershipDO.getId(), stockOwnershipDO.getWarehouseId(), productId, quantity, reasonId, reasonItemId, stockFlowDO -> {
             // 采购计划量
             // stockFlowDO.setPurchasePlanQty(stockOwnershipDO.getPurchasePlanQty());
             // 采购在途量
@@ -151,7 +151,7 @@ public class WmsStockFlowServiceImpl implements WmsStockFlowService {
      * 创建仓位库存变化流水
      */
     public void createForStockBin(WmsStockReason reason, Long productId, WmsStockBinDO stockBinDO, Integer quantity, Long reasonId, Long reasonItemId) {
-        createFor(reason, StockType.BIN, stockBinDO.getId(), stockBinDO.getWarehouseId(), productId, quantity, reasonId, reasonItemId, stockFlowDO -> {
+        createFor(reason, WmsStockType.BIN, stockBinDO.getId(), stockBinDO.getWarehouseId(), productId, quantity, reasonId, reasonItemId, stockFlowDO -> {
             // 采购计划量
             // stockFlowDO.setPurchasePlanQty(stockOwnershipDO.getPurchasePlanQty());
             // 采购在途量
@@ -174,7 +174,7 @@ public class WmsStockFlowServiceImpl implements WmsStockFlowService {
     /**
      * 创建仓库库存变化流水
      */
-    public void createFor(WmsStockReason reason, StockType stockType, Long stockId, Long warehouseId, Long productId, Integer quantity, Long reasonId, Long reasonItemId, Consumer<WmsStockFlowDO> consumer) {
+    public void createFor(WmsStockReason reason, WmsStockType stockType, Long stockId, Long warehouseId, Long productId, Integer quantity, Long reasonId, Long reasonItemId, Consumer<WmsStockFlowDO> consumer) {
 
 
 

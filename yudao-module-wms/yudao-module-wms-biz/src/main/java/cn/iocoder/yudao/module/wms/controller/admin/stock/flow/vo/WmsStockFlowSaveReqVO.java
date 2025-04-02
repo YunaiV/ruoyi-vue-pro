@@ -6,7 +6,7 @@ import jakarta.validation.constraints.*;
 
 import java.sql.Timestamp;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.wms.enums.stock.StockType;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsStockType;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
 
 /**
@@ -21,7 +21,7 @@ public class WmsStockFlowSaveReqVO {
 
     @Schema(description = "库存类型 ; StockType : 1-仓库库存 , 2-仓位库存 , 3-所有者库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "库存类型不能为空")
-    @InEnum(StockType.class)
+    @InEnum(WmsStockType.class)
     private Integer stockType;
 
     @Schema(description = "库存ID，分别指向三张库存表的ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "17743")
