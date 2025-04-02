@@ -7,7 +7,6 @@ import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehousePageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.product.WmsProductDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -30,39 +29,19 @@ public interface WmsStockWarehouseMapper extends BaseMapperX<WmsStockWarehouseDO
             // 按产品ID
             .eqIfPresent(WmsStockWarehouseDO::getProductId, reqVO.getProductId());
 
-        betweenIf(wrapper,WmsStockWarehouseDO::getAvailableQty,reqVO.getAvailableQty());
-        betweenIf(wrapper,WmsStockWarehouseDO::getDefectiveQty,reqVO.getDefectiveQty());
-        betweenIf(wrapper,WmsStockWarehouseDO::getOutboundPendingQty,reqVO.getOutboundPendingQty());
-        betweenIf(wrapper,WmsStockWarehouseDO::getPurchasePlanQty,reqVO.getPurchasePlanQty());
-        betweenIf(wrapper,WmsStockWarehouseDO::getPurchaseTransitQty,reqVO.getPurchaseTransitQty());
-        betweenIf(wrapper,WmsStockWarehouseDO::getReturnTransitQty,reqVO.getReturnTransitQty());
-        betweenIf(wrapper,WmsStockWarehouseDO::getSellableQty,reqVO.getSellableQty());
-        betweenIf(wrapper,WmsStockWarehouseDO::getShelvingPendingQty,reqVO.getShelvingPendingQty());
+        wrapper.betweenIfPresent(WmsStockWarehouseDO::getAvailableQty,reqVO.getAvailableQty());
+        wrapper.betweenIfPresent(WmsStockWarehouseDO::getDefectiveQty,reqVO.getDefectiveQty());
+        wrapper.betweenIfPresent(WmsStockWarehouseDO::getOutboundPendingQty,reqVO.getOutboundPendingQty());
+        wrapper.betweenIfPresent(WmsStockWarehouseDO::getPurchasePlanQty,reqVO.getPurchasePlanQty());
+        wrapper.betweenIfPresent(WmsStockWarehouseDO::getPurchaseTransitQty,reqVO.getPurchaseTransitQty());
+        wrapper.betweenIfPresent(WmsStockWarehouseDO::getReturnTransitQty,reqVO.getReturnTransitQty());
+        wrapper.betweenIfPresent(WmsStockWarehouseDO::getSellableQty,reqVO.getSellableQty());
+        wrapper.betweenIfPresent(WmsStockWarehouseDO::getShelvingPendingQty,reqVO.getShelvingPendingQty());
 
         return selectPage(reqVO, wrapper);
 
     }
 
-    private static void betweenIf(MPJLambdaWrapperX<WmsStockWarehouseDO> wrapper, SFunction<WmsStockWarehouseDO, ?> column,Integer[] range) {
-        if(range!=null && range.length>0) {
-            Integer[] array = new Integer[2];
-            if(range.length==1) {
-                array[0]= range[0];
-                array[1]=Integer.MAX_VALUE;
-            }
-            if(range.length>=2) {
-                array[0]= range[0];
-                array[1]= range[1];
-            }
-            if(array[0]==null) {
-                array[0]=Integer.MIN_VALUE;
-            }
-            if(array[1]==null) {
-                array[1]=Integer.MAX_VALUE;
-            }
-            wrapper.betweenIfPresent(column, array[0], array[1]);
-        }
-    }
 
     /**
      * 按 warehouse_id,product_id 查询唯一的 WmsStockWarehouseDO

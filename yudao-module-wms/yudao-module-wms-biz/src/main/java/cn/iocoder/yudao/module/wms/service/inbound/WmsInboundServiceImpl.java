@@ -91,7 +91,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     @Transactional(rollbackFor = Exception.class)
     public WmsInboundDO createInbound(WmsInboundSaveReqVO createReqVO) {
         // 设置单据号
-        String no = noRedisDAO.generate(WmsNoRedisDAO.INBOUND_NO_PREFIX, INBOUND_NOT_EXISTS);
+        String no = noRedisDAO.generate(WmsNoRedisDAO.INBOUND_NO_PREFIX, 3);
         createReqVO.setNo(no);
         createReqVO.setAuditStatus(WmsInboundAuditStatus.DRAFT.getValue());
         createReqVO.setInboundStatus(WmsInboundStatus.NONE.getValue());

@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
@@ -20,10 +23,22 @@ public class WmsInboundItemPageReqVO extends PageParam {
     @Schema(description = "入库单ID", example = "29327")
     private Long inboundId;
 
-    @Schema(description = "标准产品ID", example = "27659")
+    @Schema(description = "入库单编号", example = "IN20250325001")
+    private String inboundNo;
+
+    @Schema(description = "标准产品ID", example = "66")
     private Long productId;
 
-    @Schema(description = "来源详情ID", example = "30830")
+    @Schema(description = "仓库ID", example = "32")
+    private Long warehouseId;
+
+    @Schema(description = "仓位ID", example = "1")
+    private Long binId;
+
+    @Schema(description = "产品代码", example = "27659")
+    private String productCode;
+
+    @Schema(description = "来源详情ID", example = "30830", hidden = true)
     private Long sourceItemId;
 
     @Schema(description = "创建时间")
@@ -34,17 +49,21 @@ public class WmsInboundItemPageReqVO extends PageParam {
     private Integer inboundStatus;
 
     @Schema(description = "实际入库量", example = "")
-    private Integer actualQty;
+    private Integer[] actualQty;
 
     @Schema(description = "批次剩余库存，出库后的剩余库存量", example = "")
-    private Integer outboundAvailableQty;
+    private Integer[] outboundAvailableQty;
+
 
     @Schema(description = "计划入库量", example = "")
-    private Integer planQty;
+    private Integer[] planQty;
 
     @Schema(description = "已上架量，已经拣货到仓位的库存量", example = "")
-    private Integer shelvedQty;
+    private Integer[] shelvedQty;
 
-    @Schema(description = "最新的流水ID", example = "")
+    @Schema(description = "最新的流水ID", example = "", hidden = true)
     private Long latestFlowId;
+
+    @Schema(description = "库龄", example = "")
+    private Integer[] age;
 }

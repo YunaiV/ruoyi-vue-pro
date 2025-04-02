@@ -1,11 +1,16 @@
 package cn.iocoder.yudao.module.wms.service.inbound.item;
 
-import java.util.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
-import jakarta.validation.*;
-import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsPickupPendingPageReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemQueryDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
+import jakarta.validation.Valid;
+
+import java.util.List;
 
 /**
  * 入库单详情 Service 接口
@@ -50,7 +55,7 @@ public interface WmsInboundItemService {
      * @param pageReqVO 分页查询
      * @return 入库单详情分页
      */
-    PageResult<WmsInboundItemDO> getInboundItemPage(WmsInboundItemPageReqVO pageReqVO);
+    PageResult<WmsInboundItemQueryDO> getInboundItemPage(WmsInboundItemPageReqVO pageReqVO);
 
     /**
      * 按 inboundId 查询 WmsInboundItemDO
@@ -79,4 +84,8 @@ public interface WmsInboundItemService {
     List<WmsInboundItemDO> selectItemListHasAvailableQty(Long warehouseId, Long productId);
 
     void saveItems(List<WmsInboundItemDO> itemsToUpdate, List<WmsInboundItemFlowDO> inboundItemFlowList);
+
+    void assembleWarehouse(List<WmsInboundItemRespVO> list);
+
+    void assembleWarehouseBin(List<WmsInboundItemRespVO> list);
 }

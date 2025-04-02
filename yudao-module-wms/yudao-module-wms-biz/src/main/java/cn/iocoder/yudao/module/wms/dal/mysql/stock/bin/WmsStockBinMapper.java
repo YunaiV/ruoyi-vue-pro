@@ -12,7 +12,6 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.product.WmsProductDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.ArrayList;
@@ -48,36 +47,12 @@ public interface WmsStockBinMapper extends BaseMapperX<WmsStockBinDO> {
         ;
 
 
-        betweenIf(wrapper,WmsStockBinDO::getAvailableQty,reqVO.getAvailableQty());
-        betweenIf(wrapper,WmsStockBinDO::getOutboundPendingQty,reqVO.getOutboundPendingQty());
-        betweenIf(wrapper,WmsStockBinDO::getSellableQty,reqVO.getSellableQty());
+        wrapper.betweenIfPresent(WmsStockBinDO::getAvailableQty,reqVO.getAvailableQty());
+        wrapper.betweenIfPresent(WmsStockBinDO::getOutboundPendingQty,reqVO.getOutboundPendingQty());
+        wrapper.betweenIfPresent(WmsStockBinDO::getSellableQty,reqVO.getSellableQty());
 
         return selectPage(reqVO, wrapper);
 
-
-    }
-
-
-
-    private static void betweenIf(MPJLambdaWrapperX<WmsStockBinDO> wrapper, SFunction<WmsStockBinDO, ?> column, Integer[] range) {
-        if(range!=null && range.length>0) {
-            Integer[] array = new Integer[2];
-            if(range.length==1) {
-                array[0]= range[0];
-                array[1]=Integer.MAX_VALUE;
-            }
-            if(range.length>=2) {
-                array[0]= range[0];
-                array[1]= range[1];
-            }
-            if(array[0]==null) {
-                array[0]=Integer.MIN_VALUE;
-            }
-            if(array[1]==null) {
-                array[1]=Integer.MAX_VALUE;
-            }
-            wrapper.betweenIfPresent(column, array[0], array[1]);
-        }
     }
 
     /**

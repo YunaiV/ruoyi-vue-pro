@@ -47,6 +47,10 @@ public class WmsStockOwnershipRespVO {
     @ExcelProperty("库存财务主体公司ID")
     private Long companyId;
 
+//    @Schema(description = "财务公司", example = "")
+//    @ExcelProperty("库存公司")
+//    private FinanceCompanyVO company;
+
     @Schema(description = "库存归属部门ID", example = "")
     @ExcelProperty("库存归属部门ID")
     private Long deptId;

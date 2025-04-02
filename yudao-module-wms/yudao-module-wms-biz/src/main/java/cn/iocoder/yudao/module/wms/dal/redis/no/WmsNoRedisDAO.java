@@ -2,9 +2,6 @@ package cn.iocoder.yudao.module.wms.dal.redis.no;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.text.StrPool;
-import cn.iocoder.yudao.framework.common.exception.ErrorCode;
-import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -51,18 +48,17 @@ public class WmsNoRedisDAO {
      * 例如说：QTRK-20211009-000001 （没有中间空格）
      *
      * @param prefix 前缀
+     * @param seqLength 末尾序列长度
      * @return 序号
      */
-    public String generate(String prefix, ErrorCode message) {
+    public String generate(String prefix,int seqLength) {
         // 递增序号
-        String noPrefix = prefix + StrPool.DASHED + DateUtil.format(LocalDateTime.now(), DatePattern.PURE_DATE_PATTERN);
+        String noPrefix = prefix  + DateUtil.format(LocalDateTime.now(), DatePattern.PURE_DATE_PATTERN);
         String key = NO + noPrefix;
         Long no = stringRedisTemplate.opsForValue().increment(key);
-        //判断no是否大于6位数
-        ThrowUtil.ifGreater(no, 999999L, message);
         // 设置过期时间
         stringRedisTemplate.expire(key, Duration.ofDays(1L));
-        return noPrefix + StrPool.DASHED + String.format("%06d", no);
+        return noPrefix + String.format("%0"+seqLength+"d", no);
     }
 
 }

@@ -1,46 +1,36 @@
 package cn.iocoder.yudao.module.wms.controller.admin.inbound.item;
 
-import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
-import org.springframework.web.bind.annotation.*;
-import jakarta.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.constraints.*;
-import jakarta.validation.*;
-import jakarta.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
-import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.*;
-import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
-import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
+import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_NOT_EXISTS;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsPickupPendingPageReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemQueryDO;
+import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 @Tag(name = "入库单详情")
 @RestController
@@ -106,28 +96,36 @@ public class WmsInboundItemController {
             .mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setCreatorName)
             .mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setUpdaterName)
             .fill();
+
         // 返回
         return success(inboundItemVO);
     }
-    // /**
-    // * @sign : 83456B9A2BFF8F84
-    // */
-    // @GetMapping("/page")
-    // @Operation(summary = "获得入库单详情分页")
-    // @PreAuthorize("@ss.hasPermission('wms:inbound-item:query')")
-    // public CommonResult<PageResult<WmsInboundItemRespVO>> getInboundItemPage(@Valid WmsInboundItemPageReqVO pageReqVO) {
-    // // 查询数据
-    // PageResult<WmsInboundItemDO> doPageResult = inboundItemService.getInboundItemPage(pageReqVO);
-    // // 转换
-    // PageResult<WmsInboundItemRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsInboundItemRespVO.class);
-    // // 人员姓名填充
-    // AdminUserApi.inst().prepareFill(voPageResult.getList())
-    // .mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setCreatorName)
-    // .mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setUpdaterName)
-    // .fill();
-    // // 返回
-    // return success(voPageResult);
-    // }
+
+    /**
+     * @sign : 83456B9A2BFF8F84
+     */
+    @GetMapping("/page")
+    @Operation(summary = "批次库存查询")
+    @PreAuthorize("@ss.hasPermission('wms:inbound-item:query')")
+    public CommonResult<PageResult<WmsInboundItemRespVO>> getInboundItemPage(@Valid WmsInboundItemPageReqVO pageReqVO) {
+        // 查询数据
+        PageResult<WmsInboundItemQueryDO> doPageResult = inboundItemService.getInboundItemPage(pageReqVO);
+        // 转换
+        PageResult<WmsInboundItemRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsInboundItemRespVO.class);
+        // 人员姓名填充
+        AdminUserApi.inst().prepareFill(voPageResult.getList())
+            .mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setCreatorName)
+            .mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setUpdaterName)
+            .fill();
+
+        inboundItemService.assembleInbound(voPageResult.getList());
+        inboundItemService.assembleProducts(voPageResult.getList());
+        inboundItemService.assembleWarehouse(voPageResult.getList());
+        inboundItemService.assembleWarehouseBin(voPageResult.getList());
+
+        // 返回
+        return success(voPageResult);
+    }
     @GetMapping("/pickup-pending")
     @Operation(summary = "待上架的入库明细")
     @PreAuthorize("@ss.hasPermission('wms:inbound-item:query')")

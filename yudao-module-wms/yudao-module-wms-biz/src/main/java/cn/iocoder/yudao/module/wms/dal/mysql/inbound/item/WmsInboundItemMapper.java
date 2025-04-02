@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
 import org.apache.ibatis.annotations.Mapper;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,17 +22,6 @@ import java.util.List;
 @Mapper
 public interface WmsInboundItemMapper extends BaseMapperX<WmsInboundItemDO> {
 
-    default PageResult<WmsInboundItemDO> selectPage(WmsInboundItemPageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<WmsInboundItemDO>()
-				.eqIfPresent(WmsInboundItemDO::getInboundId, reqVO.getInboundId())
-				.eqIfPresent(WmsInboundItemDO::getProductId, reqVO.getProductId())
-				.eqIfPresent(WmsInboundItemDO::getPlanQty, reqVO.getPlanQty())
-				.eqIfPresent(WmsInboundItemDO::getActualQty, reqVO.getActualQty())
-				.eqIfPresent(WmsInboundItemDO::getOutboundAvailableQty, reqVO.getOutboundAvailableQty())
-				.eqIfPresent(WmsInboundItemDO::getSourceItemId, reqVO.getSourceItemId())
-				.betweenIfPresent(WmsInboundItemDO::getCreateTime, reqVO.getCreateTime())
-				.orderByDesc(WmsInboundItemDO::getId));
-    }
 
     /**
      * 按 inbound_id,product_id 查询唯一的 WmsInboundItemDO

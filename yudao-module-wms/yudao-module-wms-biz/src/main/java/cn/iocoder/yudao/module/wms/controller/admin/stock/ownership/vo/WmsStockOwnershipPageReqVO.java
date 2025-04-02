@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,6 +26,10 @@ public class WmsStockOwnershipPageReqVO extends PageParam {
 
     @Schema(description = "产品ID", example = "1919")
     private Long productId;
+
+    @Schema(description = "产品代码", example = "1919")
+    @ExcelProperty("产品代码")
+    private Long productCode;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

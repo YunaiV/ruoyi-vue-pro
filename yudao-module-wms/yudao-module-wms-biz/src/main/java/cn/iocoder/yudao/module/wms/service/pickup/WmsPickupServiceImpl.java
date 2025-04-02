@@ -79,7 +79,7 @@ public class WmsPickupServiceImpl implements WmsPickupService {
     @Override
     public WmsPickupDO createPickup(WmsPickupSaveReqVO createReqVO) {
         // 设置单据号
-        String no = noRedisDAO.generate(WmsNoRedisDAO.PICKUP_NO_PREFIX, PICKUP_NOT_EXISTS);
+        String no = noRedisDAO.generate(WmsNoRedisDAO.PICKUP_NO_PREFIX,3);
         createReqVO.setNo(no);
         if (pickupMapper.getByNo(createReqVO.getNo()) != null) {
             throw exception(PICKUP_NO_DUPLICATE);

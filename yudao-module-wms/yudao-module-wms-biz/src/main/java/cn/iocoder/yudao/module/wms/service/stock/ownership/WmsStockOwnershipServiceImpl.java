@@ -1,18 +1,38 @@
 package cn.iocoder.yudao.module.wms.service.stock.ownership;
 
-import cn.iocoder.yudao.module.wms.service.stock.flow.WmsStockFlowService;
-import org.springframework.stereotype.Service;
-import jakarta.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.*;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.WmsStockOwnershipPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.WmsStockOwnershipRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.WmsStockOwnershipSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.ownership.WmsStockOwnershipMapper;
+import cn.iocoder.yudao.module.wms.service.stock.flow.WmsStockFlowService;
+import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
+import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSHIP_NOT_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSHIP_WAREHOUSE_ID_COMPANY_ID_DEPT_ID_PRODUCT_ID_DUPLICATE;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSHIP_WAREHOUSE_ID_DEPT_ID_PRODUCT_ID_DUPLICATE;
 
 /**
  * 所有者库存 Service 实现类
@@ -28,6 +48,16 @@ public class WmsStockOwnershipServiceImpl implements WmsStockOwnershipService {
 
     @Resource
     private WmsStockFlowService stockFlowService;
+
+    @Resource
+    private ErpProductApi productApi;
+
+    @Resource
+    private DeptApi deptApi;
+
+    @Resource
+    @Lazy
+    private WmsWarehouseService warehouseService;
 
     /**
      * @sign : 4AF969274F47ADC0
@@ -132,5 +162,44 @@ public class WmsStockOwnershipServiceImpl implements WmsStockOwnershipService {
         } else {
             stockOwnershipMapper.updateById(stockOwnershipDO);
         }
+    }
+
+    @Override
+    public void assembleProducts(List<WmsStockOwnershipRespVO> list) {
+        Map<Long, ErpProductDTO> productDTOMap = productApi.getProductMap(StreamX.from(list).map(WmsStockOwnershipRespVO::getProductId).toList());
+        Map<Long, WmsProductRespSimpleVO> productVOMap = new HashMap<>();
+        for (ErpProductDTO productDTO : productDTOMap.values()) {
+            WmsProductRespSimpleVO productVO = BeanUtils.toBean(productDTO, WmsProductRespSimpleVO.class);
+            productVOMap.put(productDTO.getId(), productVO);
+        }
+        StreamX.from(list).assemble(productVOMap, WmsStockOwnershipRespVO::getProductId, WmsStockOwnershipRespVO::setProduct);
+    }
+
+    @Override
+    public void assembleWarehouse(List<WmsStockOwnershipRespVO> list) {
+
+        Map<Long, WmsWarehouseDO> warehouseDOMap = warehouseService.getWarehouseMap(StreamX.from(list).toSet(WmsStockOwnershipRespVO::getWarehouseId));
+        Map<Long, WmsWarehouseSimpleRespVO> warehouseVOMap = StreamX.from(warehouseDOMap.values())
+            .toMap(WmsWarehouseDO::getId, v-> BeanUtils.toBean(v, WmsWarehouseSimpleRespVO.class));
+
+        StreamX.from(list).assemble(warehouseVOMap, WmsStockOwnershipRespVO::getWarehouseId, WmsStockOwnershipRespVO::setWarehouse);
+    }
+
+    @Override
+    public void assembleDept(List<WmsStockOwnershipRespVO> list) {
+
+        Map<Long, DeptRespDTO> deptDTOMap = deptApi.getDeptMap(StreamX.from(list).map(WmsStockOwnershipRespVO::getDeptId).toList());
+        Map<Long, DeptSimpleRespVO> deptVOMap = new HashMap<>();
+        for (DeptRespDTO productDTO : deptDTOMap.values()) {
+            DeptSimpleRespVO deptVO = BeanUtils.toBean(productDTO, DeptSimpleRespVO.class);
+            deptVOMap.put(productDTO.getId(), deptVO);
+        }
+        StreamX.from(list).assemble(deptVOMap, WmsStockOwnershipRespVO::getDeptId, WmsStockOwnershipRespVO::setDept);
+
+    }
+
+    @Override
+    public void assembleCompany(List<WmsStockOwnershipRespVO> list) {
+        //todo 待东宇财务模块支持
     }
 }

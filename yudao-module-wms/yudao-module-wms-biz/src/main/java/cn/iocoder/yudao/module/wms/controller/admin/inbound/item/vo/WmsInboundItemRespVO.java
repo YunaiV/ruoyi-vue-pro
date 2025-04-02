@@ -1,13 +1,18 @@
 package cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
-import java.time.LocalDateTime;
-import com.alibaba.excel.annotation.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
-import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
+
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
  * @table-fields : tenant_id,outbound_available_qty,creator,inbound_status,create_time,plan_qty,shelved_qty,latest_flow_id,updater,inbound_id,source_item_id,update_time,actual_qty,product_id,id
@@ -20,6 +25,14 @@ public class WmsInboundItemRespVO {
     @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "30520")
     @ExcelProperty("主键")
     private Long id;
+
+    @Schema(description = "仓库ID", example = "23620")
+    @ExcelProperty("仓库ID")
+    private Long warehouseId;
+
+    @Schema(description = "仓位ID", example = "23620")
+    @ExcelProperty("仓位ID")
+    private Long binId;
 
     @Schema(description = "入库单ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "29327")
     @ExcelProperty("入库单ID")
@@ -93,4 +106,13 @@ public class WmsInboundItemRespVO {
     @Schema(description = "最新的流水ID", example = "")
     @ExcelProperty("最新的流水ID")
     private Long latestFlowId;
+
+    @Schema(description = "仓库", example = "")
+    private WmsWarehouseSimpleRespVO warehouse;
+
+    @Schema(description = "库位", example = "")
+    private WmsWarehouseBinRespVO bin;
+
+
+
 }
