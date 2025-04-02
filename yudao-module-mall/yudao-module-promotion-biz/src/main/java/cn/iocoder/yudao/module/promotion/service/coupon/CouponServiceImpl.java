@@ -22,6 +22,7 @@ import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTemplateValidityType
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
@@ -176,7 +177,7 @@ public class CouponServiceImpl implements CouponService {
      * @param couponId 模版编号
      * @param userId   用户编号
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW) // 每次调用开启一个新的事务
     public void invalidateCoupon(Long couponId, Long userId) {
         // 1.1 校验优惠券
         CouponDO coupon = couponMapper.selectByIdAndUserId(couponId, userId);
