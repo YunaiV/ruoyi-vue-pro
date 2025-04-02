@@ -263,13 +263,17 @@ public class CouponServiceImpl implements CouponService {
         if (CollUtil.isEmpty(userIds)) {
             throw exception(COUPON_TEMPLATE_USER_ALREADY_TAKE);
         }
-
         // 校验模板
         if (couponTemplate == null) {
             throw exception(COUPON_TEMPLATE_NOT_EXISTS);
         }
+        // 校验领取方式
+        if (ObjUtil.notEqual(couponTemplate.getTakeType(), takeType.getType())) {
+            throw exception(COUPON_TEMPLATE_CANNOT_TAKE);
+        }
         // 校验剩余数量
-        if (ObjUtil.notEqual(couponTemplate.getTakeLimitCount(), CouponTemplateDO.TIME_LIMIT_COUNT_MAX) // 非不限制
+        if (ObjUtil.equal(CouponTakeTypeEnum.USER.getType(), couponTemplate.getTakeType()) // 直接领取
+                && ObjUtil.notEqual(couponTemplate.getTakeLimitCount(), CouponTemplateDO.TIME_LIMIT_COUNT_MAX) // 非不限制
                 && couponTemplate.getTakeCount() + userIds.size() > couponTemplate.getTotalCount()) {
             throw exception(COUPON_TEMPLATE_NOT_ENOUGH);
         }
@@ -279,10 +283,7 @@ public class CouponServiceImpl implements CouponService {
                 throw exception(COUPON_TEMPLATE_EXPIRED);
             }
         }
-        // 校验领取方式
-        if (ObjectUtil.notEqual(couponTemplate.getTakeType(), takeType.getType())) {
-            throw exception(COUPON_TEMPLATE_CANNOT_TAKE);
-        }
+
     }
 
     /**
