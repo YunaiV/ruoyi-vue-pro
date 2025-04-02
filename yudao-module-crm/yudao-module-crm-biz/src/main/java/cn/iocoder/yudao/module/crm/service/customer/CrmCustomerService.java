@@ -195,4 +195,9 @@ public interface CrmCustomerService {
      */
     int autoPutCustomerPool();
 
+    /**
+     * 在新增或更新客户时检验客户名称是否唯一
+     * @param customerName 新增或更新时填入的客户名称， customerDo为空时，新增；不为空时，更新,且为原先的客户信息
+     */
+    void validateCustomerNameUnique(String customerName,CrmCustomerDO oldCustomerDo);
 }

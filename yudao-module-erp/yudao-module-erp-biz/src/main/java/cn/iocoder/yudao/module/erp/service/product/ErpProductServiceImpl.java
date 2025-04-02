@@ -95,6 +95,7 @@ public class ErpProductServiceImpl implements ErpProductService {
 
     @Override
     @CacheEvict(cacheNames = PRODUCT_LIST, allEntries = true)
+    @Transactional(rollbackFor = Exception.class)
     public Long createProduct(ErpProductSaveReqVO createReqVO) {
         //TODO 暂时编号不是系统自动生成，后续添加生成规则，流水号的递增由编号来判断，编号相同流水号便自增
         //校验是否存在相同的产品编码
@@ -132,6 +133,8 @@ public class ErpProductServiceImpl implements ErpProductService {
         ThrowUtil.ifSqlThrow(productMapper.insert(product), DB_INSERT_ERROR);
         this.syncProduct(product, false);
         // 返回
+        //创建产品的同时创建产品-海关分类表数据。
+
         return product.getId();
     }
 
@@ -328,6 +331,9 @@ public class ErpProductServiceImpl implements ErpProductService {
     @Override
     @Cacheable(cacheNames = PRODUCT_LIST, key = "#ids", unless = "#result == null")
     public List<ErpProductDO> listProducts(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
         return productMapper.selectBatchIds(ids);
     }
 
@@ -493,5 +499,14 @@ public class ErpProductServiceImpl implements ErpProductService {
         Integer level = deptApi.getDeptLevel(deptId);
         //判断登记是否符合要求
         ThrowUtil.ifThrow(!levels.contains(level), DEPT_LEVEL_NOT_MATCH);
+    }
+
+    @Override
+    public List<Long> listProductIdByBarCode(String barCode) {
+        if (StrUtil.isBlank(barCode)) {
+            return Collections.emptyList();
+        }
+        productMapper.selectIdListByBarCode(barCode);
+        return List.of();
     }
 }

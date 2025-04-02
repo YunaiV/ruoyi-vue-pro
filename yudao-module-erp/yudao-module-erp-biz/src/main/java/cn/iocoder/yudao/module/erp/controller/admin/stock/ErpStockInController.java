@@ -12,12 +12,10 @@ import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProduc
 import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.in.ErpStockInPageReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.in.ErpStockInRespVO;
 import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.in.ErpStockInSaveReqVO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpSupplierDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockInDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockInItemDO;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
-import cn.iocoder.yudao.module.erp.service.purchase.ErpSupplierService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpStockInService;
 import cn.iocoder.yudao.module.erp.service.stock.ErpStockService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -54,8 +52,8 @@ public class ErpStockInController {
     private ErpStockService stockService;
     @Resource
     private ErpProductService productService;
-    @Resource
-    private ErpSupplierService supplierService;
+//    @Resource
+//    private ErpSupplierService supplierService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -146,8 +144,8 @@ public class ErpStockInController {
         Map<Long, ErpProductRespVO> productMap = productService.getProductVOMap(
                 convertSet(stockInItemList, ErpStockInItemDO::getProductId));
         // 1.3 供应商信息
-        Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(
-                convertSet(pageResult.getList(), ErpStockInDO::getSupplierId));
+//        Map<Long, ErpSupplierDO> supplierMap = supplierService.getSupplierMap(
+//                convertSet(pageResult.getList(), ErpStockInDO::getSupplierId));
         // 1.4 管理员信息
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSet(pageResult.getList(), stockIn -> Long.parseLong(stockIn.getCreator())));
@@ -157,7 +155,7 @@ public class ErpStockInController {
                     item -> MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
                             .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()))));
             stockIn.setProductNames(CollUtil.join(stockIn.getItems(), "，", ErpStockInRespVO.Item::getProductName));
-            MapUtils.findAndThen(supplierMap, stockIn.getSupplierId(), supplier -> stockIn.setSupplierName(supplier.getName()));
+//            MapUtils.findAndThen(supplierMap, stockIn.getSupplierId(), supplier -> stockIn.setSupplierName(supplier.getName()));
             MapUtils.findAndThen(userMap, Long.parseLong(stockIn.getCreator()), user -> stockIn.setCreatorName(user.getNickname()));
         });
     }

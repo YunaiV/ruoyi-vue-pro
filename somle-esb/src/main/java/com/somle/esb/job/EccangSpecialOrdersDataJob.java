@@ -1,9 +1,15 @@
 package com.somle.esb.job;
 
 
+import com.somle.eccang.model.EccangResponse;
 import com.somle.eccang.model.req.EccangSpecialOrdersReqVo;
 import com.somle.esb.model.OssData;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 
 
 /**
@@ -20,8 +26,8 @@ public class EccangSpecialOrdersDataJob extends EccangDataJob {
     public String execute(String param) throws Exception {
         setDate(param);
         eccangWMSService.streamSpecialOrders(EccangSpecialOrdersReqVo.builder()
-            .spoAddTimeFrom(beforeYesterdayFirstSecond)
-            .spoAddTimeTo(beforeYesterdayLastSecond)
+            .spoCompleteTimeFrom(beforeYesterdayFirstSecond)
+            .spoCompleteTimeTo(beforeYesterdayLastSecond)
             .page(1)
             .pageSize(100)
             .build()).forEach(page -> {

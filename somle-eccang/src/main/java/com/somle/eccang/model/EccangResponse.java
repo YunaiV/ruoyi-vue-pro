@@ -42,6 +42,7 @@ public class EccangResponse {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
+    @Builder
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class EccangPage {
         private Integer total;

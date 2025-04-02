@@ -173,4 +173,10 @@ public class ErpProductServiceDelegator implements ErpProductService {
         ErpProductService service = getDefaultService();
         return service.getProductCountByUnitId(unitId);
     }
+
+    @Override
+    public List<Long> listProductIdByBarCode(String barCode) {
+        ErpProductService service = getDefaultService();
+        return service.listProductIdByBarCode(barCode);
+    }
 }

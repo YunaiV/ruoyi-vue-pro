@@ -56,4 +56,9 @@ public interface ErpProductApi {
      * @return 产品 DTO 列表
      */
     List<ErpProductRespDTO> getProductDTOListByStatus(Boolean status);
+
+    /**
+     * 根据barCode模糊查询productId集合
+     */
+    List<Long> listProductIdByBarCode(String barCode);
 }
