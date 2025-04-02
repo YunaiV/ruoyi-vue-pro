@@ -30,6 +30,8 @@ public class WmsStockWarehouseRespVO {
     @ExcelProperty("仓库ID")
     private Long warehouseId;
 
+
+
     @Schema(description = "产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "3153")
     @ExcelProperty("产品ID")
     private Long productId;

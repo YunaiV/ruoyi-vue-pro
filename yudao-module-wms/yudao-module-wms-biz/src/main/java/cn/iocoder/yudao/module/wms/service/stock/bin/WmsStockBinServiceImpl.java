@@ -4,18 +4,24 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsWarehouseProductVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.bin.WmsStockBinMapper;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.stock.flow.WmsStockFlowService;
 import cn.iocoder.yudao.module.wms.service.stock.ownership.WmsStockOwnershipService;
 import cn.iocoder.yudao.module.wms.service.stock.warehouse.WmsStockWarehouseService;
+import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import cn.iocoder.yudao.module.wms.service.warehouse.bin.WmsWarehouseBinService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +57,10 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
 
     @Resource
     @Lazy
+    private WmsWarehouseService warehouseService;
+
+    @Resource
+    @Lazy
     WmsStockWarehouseService stockWarehouseService;
 
     @Autowired
@@ -63,6 +73,9 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
     @Resource
     @Lazy
     WmsInboundItemService inboundItemService;
+
+    @Resource
+    private ErpProductApi productApi;
 
     /**
      * @sign : 1D6010DA80E2C817
@@ -190,9 +203,7 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
         List<WmsStockBinDO> doList =  stockBinMapper.selectStockBinListInWarehouse(warehouseProductList);
         List<WmsStockBinRespVO> voList = BeanUtils.toBean(doList, WmsStockBinRespVO.class);
         if(withBin) {
-            List<WmsWarehouseBinDO> binDOList = warehouseBinService.selectByIds(StreamX.from(voList).toList(WmsStockBinRespVO::getBinId).stream().distinct().toList());
-            List<WmsWarehouseBinRespVO> binVOList = BeanUtils.toBean(binDOList, WmsWarehouseBinRespVO.class);
-            StreamX.from(voList).assemble(binVOList, WmsWarehouseBinRespVO::getId, WmsStockBinRespVO::getBinId,WmsStockBinRespVO::setBin);
+            assembleBin(voList);
         }
         return voList;
     }
@@ -208,7 +219,36 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
         });
     }
 
+    @Override
+    public void assembleProducts(List<WmsStockBinRespVO> list) {
 
+        Map<Long, ErpProductDTO> productDTOMap = productApi.getProductMap(StreamX.from(list).map(WmsStockBinRespVO::getProductId).toList());
+        Map<Long, WmsProductRespSimpleVO> productVOMap = new HashMap<>();
+        for (ErpProductDTO productDTO : productDTOMap.values()) {
+            WmsProductRespSimpleVO productVO = BeanUtils.toBean(productDTO, WmsProductRespSimpleVO.class);
+            productVOMap.put(productDTO.getId(), productVO);
+        }
+        StreamX.from(list).assemble(productVOMap, WmsStockBinRespVO::getProductId, WmsStockBinRespVO::setProduct);
+
+    }
+
+    @Override
+    public void assembleWarehouse(List<WmsStockBinRespVO> list) {
+
+        Map<Long, WmsWarehouseDO> warehouseDOMap = warehouseService.getWarehouseMap(StreamX.from(list).toSet(WmsStockBinRespVO::getWarehouseId));
+        Map<Long, WmsWarehouseSimpleRespVO> warehouseVOMap = StreamX.from(warehouseDOMap.values())
+            .toMap(WmsWarehouseDO::getId, v-> BeanUtils.toBean(v, WmsWarehouseSimpleRespVO.class));
+
+        StreamX.from(list).assemble(warehouseVOMap, WmsStockBinRespVO::getWarehouseId, WmsStockBinRespVO::setWarehouse);
+
+    }
+
+    @Override
+    public void assembleBin(List<WmsStockBinRespVO> list) {
+        List<WmsWarehouseBinDO> binDOList = warehouseBinService.selectByIds(StreamX.from(list).toList(WmsStockBinRespVO::getBinId).stream().distinct().toList());
+        List<WmsWarehouseBinRespVO> binVOList = BeanUtils.toBean(binDOList, WmsWarehouseBinRespVO.class);
+        StreamX.from(list).assemble(binVOList, WmsWarehouseBinRespVO::getId, WmsStockBinRespVO::getBinId,WmsStockBinRespVO::setBin);
+    }
 
 
 }

@@ -71,4 +71,10 @@ public interface WmsStockBinService {
 
 
     Map<String, List<WmsStockBinRespVO>> selectStockBinGroup(List<WmsWarehouseProductVO> warehouseProductList, Boolean withBin);
+
+    void assembleProducts(List<WmsStockBinRespVO> list);
+
+    void assembleWarehouse(List<WmsStockBinRespVO> list);
+
+    void assembleBin(List<WmsStockBinRespVO> list);
 }

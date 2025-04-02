@@ -65,8 +65,6 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
     @Resource
     private WmsWarehouseService warehouseService;
 
-
-
     @Resource
     private ErpProductApi productApi;
 

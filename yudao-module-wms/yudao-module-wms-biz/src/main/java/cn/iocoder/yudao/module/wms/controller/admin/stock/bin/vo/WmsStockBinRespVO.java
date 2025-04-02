@@ -78,4 +78,5 @@ public class WmsStockBinRespVO {
     @Schema(description = "可售量，未被单据占用的良品数量", example = "")
     @ExcelProperty("可售量，未被单据占用的良品数量")
     private Integer sellableQty;
+
 }
