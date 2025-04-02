@@ -156,7 +156,7 @@ public class SrmPurchaseOrderController {
 
     @PutMapping("/enableStatus")
     @Operation(summary = "关闭/启用")
-    @PreAuthorize("@ss.hasPermission('srm:purchasereq-order:enable')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-order:enable')")
     public CommonResult<Boolean> switchPurchaseOrderStatus(@Validated(Validation.OnSwitch.class) @RequestBody SrmPurchaseOrderAuditReqVO reqVO) {
         //获得reqVO的item的ids
         List<Long> itemIds = reqVO.getItems().stream().map(SrmPurchaseOrderAuditReqVO.requestItems::getId).collect(Collectors.toSet()).stream().toList();
@@ -166,7 +166,7 @@ public class SrmPurchaseOrderController {
 
     @PostMapping("/merge")
     @Operation(summary = "合并入库")
-    @PreAuthorize("@ss.hasPermission('srm:purchasereq-order:merge')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-order:merge')")
     public CommonResult<Boolean> mergePurchaseOrder(@Validated @RequestBody SrmPurchaseOrderMergeReqVO reqVO) {
         purchaseOrderService.merge(reqVO);
         return success(true);
@@ -175,7 +175,7 @@ public class SrmPurchaseOrderController {
     //查查询采购合同的模板List<String>
     @GetMapping("/getTemplateList")
     @Operation(summary = "查询采购合同模板")
-    @PreAuthorize("@ss.hasPermission('srm:purchasereq-order:generateContract')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-order:generateContract')")
     public CommonResult<List<String>> getTemplateList() {
         List<String> templateList = purchaseOrderService.getTemplateList();
         return success(templateList);
@@ -184,7 +184,7 @@ public class SrmPurchaseOrderController {
     //根据采购单id生成采购合同
     @PostMapping("/generateContract")
     @Operation(summary = "生成采购合同")
-    @PreAuthorize("@ss.hasPermission('srm:purchasereq-order:generateContract')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-order:generateContract')")
     public void generateContract(@Validated @RequestBody SrmPurchaseOrderGenerateContractReqVO reqVO, HttpServletResponse response) {
         purchaseOrderService.generateContract(reqVO, response);
     }
