@@ -44,7 +44,7 @@ public interface SrmErrorCodeConstants {
     ErrorCode PURCHASE_ORDER_DELETE_FAIL = new ErrorCode(1_030_101_021, "该订单存在关联入库项，无法删除");
     ErrorCode PURCHASE_ORDER_GENERATE_CONTRACT_FAIL = new ErrorCode(1_030_101_022, "获取采购合同模板({})失败,({})");
     ErrorCode PURCHASE_ORDER_GENERATE_CONTRACT_FAIL_PARSE = new ErrorCode(1_030_101_022, "解析模板({})失败,({})");
-    ErrorCode PURCHASE_ORDER_GENERATE_CONTRACT_FAIL_ERROR = new ErrorCode(1_030_101_022, "生成合同发生错误，请联系管理员");
+    ErrorCode PURCHASE_ORDER_GENERATE_CONTRACT_FAIL_ERROR = new ErrorCode(1_030_101_022, "生成合同发生错误，请联系管理员,({})");
     ErrorCode PURCHASE_ORDER_ITEM_IN_FAIL_EXISTS_IN = new ErrorCode(1_030_101_021, "采购订单项编号({})存在对应的入库项，无法反审核");
     ErrorCode PURCHASE_ORDER_ITEM_IN_FAIL_EXISTS_DEL = new ErrorCode(1_030_101_021, "采购订单项({})存在对应的入库项，无法删除");
     ErrorCode PURCHASE_ORDER_NO_HAS_EXISTS = new ErrorCode(1_030_101_004, "采购订单NO:({})已经存在");

@@ -727,21 +727,21 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
         //3 转换pdf，返回响应
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(); // 用于捕获输出流
         try (OutputStream out = response.getOutputStream()) {
-            // 将生成的模板写入 ByteArrayOutputStream
             xwpfTemplate.write(byteArrayOutputStream);
-            // 将字节数组转成输入流
-            InputStream inputStreamResult = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());// 获取字节数组
             // 设置响应头，准备下载
             response.setContentType("application/pdf");
             response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode("采购合同.pdf", StandardCharsets.UTF_8));
             response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-            // 写入响应
-            Document document = new Document(inputStreamResult);
-            document.save(out, SaveFormat.PDF);
+            // 将字节数组转成输入流
+            try (InputStream inputStreamResult = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
+                // 使用 Aspose 转换为 PDF
+                Document document = new Document(inputStreamResult);
+                document.save(out, SaveFormat.PDF);
+            }
             out.flush();
         } catch (Exception e) {
-            throw exception(PURCHASE_ORDER_GENERATE_CONTRACT_FAIL_ERROR);
+            throw exception(PURCHASE_ORDER_GENERATE_CONTRACT_FAIL_ERROR, e.getMessage());
         }
     }
 

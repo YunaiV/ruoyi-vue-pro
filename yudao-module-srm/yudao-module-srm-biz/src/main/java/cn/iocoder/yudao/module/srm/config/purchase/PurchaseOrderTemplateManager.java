@@ -32,9 +32,6 @@ import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PURCHASE_O
 @Component
 public class PurchaseOrderTemplateManager {
 
-    @Value("${spring.profiles.active:}")
-    private String profile;
-
     @Value("${erp.template.scan-path:purchase/order/}")
     private String templateScanPath;
 
@@ -83,31 +80,24 @@ public class PurchaseOrderTemplateManager {
     public void preloadTemplates() {
         // 默认跳过缓存
         if (!enablePreload) {
-            log.info("🌱 当前环境为 [{}]，跳过模板预热", profile);
             return;
         }
         try {
             //扫描指定文件夹下所有 .docx 模板
             Resource[] resources = resourcePatternResolver.getResources("classpath:" + templateScanPath + "*.docx");
-
             log.info("检测到 {} 个模板文件：", resources.length);
-
-
             CompletableFuture.runAsync(() -> {
-                for (Resource resource : resources) {
-                    log.info("模板文件：{}", resource.getFilename());
-                }
                 log.info("[1] 开始加载 Word 模板...");
                 long wordStart = System.currentTimeMillis();
                 for (Resource resource : resources) {
                     try {
+                        log.info("模板文件：{}", resource.getFilename());
                         String templateName = extractTemplateName(resource);
                         getTemplate(templateName);
                     } catch (Exception e) {
                         log.error("⚠️ Word 模板预热失败（已忽略）：{}", resource.getFilename(), e);
                     }
                 }
-
                 log.info("[1] Word 模板预热完成，耗时 {}ms", System.currentTimeMillis() - wordStart);
             }).thenRunAsync(() -> {
                 for (Resource resource : resources) {
@@ -129,12 +119,9 @@ public class PurchaseOrderTemplateManager {
                     }
                 }
             });
-
         } catch (IOException e) {
             log.error("❌ 模板文件夹扫描失败", e);
         }
-
-        log.info("Word/PDF 预热任务已提交（异步中），主线程继续启动流程");
     }
 
     /**
@@ -142,9 +129,12 @@ public class PurchaseOrderTemplateManager {
      */
     private String extractTemplateName(Resource resource) throws IOException {
         String path = resource.getURL().getPath();
-        // 提取 classpath: 之后的路径，例如 purchase/order/采购合同模板.docx
-        int index = path.indexOf("purchase/order/");
-        return path.substring(index);
+        String normalizedScanPath = templateScanPath.startsWith("/") ? templateScanPath : "/" + templateScanPath;
+        int index = path.indexOf(normalizedScanPath);
+        if (index == -1) {
+            throw new IOException("无法解析模板路径，未包含扫描路径: " + templateScanPath);
+        }
+        return path.substring(index + 1); // 去掉前导斜杠
     }
 }
 
