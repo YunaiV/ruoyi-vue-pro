@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.srm.convert.purchase;
 
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.req.SrmPurchaseInSaveReqVO;
-import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseInItemDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
 import org.apache.ibatis.annotations.Param;
 import org.mapstruct.Mapper;
@@ -45,47 +44,6 @@ public interface SrmOrderInConvert {
             return List.of();
         }
         return items.stream().map(this::convertToErpPurchaseInSaveReqVOItem).collect(Collectors.toList());
-    }
-
-    /**
-     * 订单项 -> 入库项DO
-     */
-    //    @Mapping(target = "orderItemId", ignore = true)
-    //    @Mapping(target = "model", ignore = true)
-    //    @Mapping(target = "inId", ignore = true)
-    default SrmPurchaseInItemDO toPurchaseInItem(SrmPurchaseOrderItemDO orderItemDO) {
-        if (orderItemDO == null) {
-            return null;
-        }
-
-        SrmPurchaseInItemDO.SrmPurchaseInItemDOBuilder srmPurchaseInItemDO = SrmPurchaseInItemDO.builder();
-
-        srmPurchaseInItemDO.warehouseId(orderItemDO.getWarehouseId());
-        srmPurchaseInItemDO.productId(orderItemDO.getProductId());
-        srmPurchaseInItemDO.productUnitId(orderItemDO.getProductUnitId());
-        srmPurchaseInItemDO.productPrice(orderItemDO.getProductPrice());
-        //        srmPurchaseInItemDO.qty( orderItemDO.getQty() );
-        srmPurchaseInItemDO.totalPrice(orderItemDO.getTotalPrice());
-        srmPurchaseInItemDO.taxPercent(orderItemDO.getTaxPercent());
-        //        srmPurchaseInItemDO.taxPrice( orderItemDO.getTaxPrice() );
-        //        srmPurchaseInItemDO.remark( orderItemDO.getRemark() );
-        srmPurchaseInItemDO.containerRate(orderItemDO.getContainerRate());
-        srmPurchaseInItemDO.currencyId(orderItemDO.getCurrencyId());
-        srmPurchaseInItemDO.currencyName(orderItemDO.getCurrencyName());
-        //        srmPurchaseInItemDO.payStatus( orderItemDO.getPayStatus() );
-        srmPurchaseInItemDO.actTaxPrice(orderItemDO.getActTaxPrice());
-        //        srmPurchaseInItemDO.allAmount( orderItemDO.getAllAmount() );
-        //        srmPurchaseInItemDO.source( orderItemDO.getSource() );
-        //        srmPurchaseInItemDO.applicantId( orderItemDO.getApplicantId() );
-        //        srmPurchaseInItemDO.applicationDeptId( orderItemDO.getApplicationDeptId() );
-        srmPurchaseInItemDO.exchangeRate(orderItemDO.getExchangeRate());
-        srmPurchaseInItemDO.declaredType(orderItemDO.getDeclaredType());
-        srmPurchaseInItemDO.productName(orderItemDO.getProductName());
-        srmPurchaseInItemDO.productUnitName(orderItemDO.getProductUnitName());
-        srmPurchaseInItemDO.barCode(orderItemDO.getBarCode());
-        srmPurchaseInItemDO.declaredTypeEn(orderItemDO.getDeclaredTypeEn());
-
-        return srmPurchaseInItemDO.build();
     }
 
 }

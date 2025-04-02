@@ -96,6 +96,7 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
     private final ResourcePatternResolver resourcePatternResolver;
     private final PurchaseOrderTemplateManager purchaseOrderTemplateManager;
     private final String SOURCE = "WEB录入";
+
     @Resource(name = PURCHASE_ORDER_OFF_STATE_MACHINE_NAME)
     StateMachine<SrmOffStatus, SrmEventEnum, SrmPurchaseOrderDO> offMachine;
     @Resource(name = PURCHASE_ORDER_AUDIT_STATE_MACHINE_NAME)
@@ -714,7 +715,7 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
     public void generateContract(SrmPurchaseOrderGenerateContractReqVO reqVO, HttpServletResponse response) {
         SrmPurchaseOrderDO orderDO = validatePurchaseOrderExists(reqVO.getOrderId());
         // 校验订单状态是否已审核 未审核 -> e
-        ThrowUtil.ifThrow(!Objects.equals(orderDO.getAuditStatus(), SrmAuditStatus.APPROVED.getCode()), PURCHASE_ORDER_NOT_AUDIT, orderDO.getId());
+//        ThrowUtil.ifThrow(!Objects.equals(orderDO.getAuditStatus(), SrmAuditStatus.APPROVED.getCode()), PURCHASE_ORDER_NOT_AUDIT, orderDO.getId());
         //1 从OSS拿到模板word
         XWPFTemplate xwpfTemplate = purchaseOrderTemplateManager.getTemplate(StrUtil.format("purchase/order/{}", reqVO.getTemplateName()));
         //2 模板word渲染数据

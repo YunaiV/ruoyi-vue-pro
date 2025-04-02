@@ -42,14 +42,14 @@ public class SrmSupplierController {
     @PostMapping("/create")
     @Operation(summary = "创建供应商")
     @Idempotent
-    @PreAuthorize("@ss.hasPermission('erp:supplier:create')")
+    @PreAuthorize("@ss.hasPermission('srm:supplier:create')")
     public CommonResult<Long> createSupplier(@Valid @RequestBody SrmSupplierSaveReqVO createReqVO) {
         return success(supplierService.createSupplier(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新供应商")
-    @PreAuthorize("@ss.hasPermission('erp:supplier:update')")
+    @PreAuthorize("@ss.hasPermission('srm:supplier:update')")
     public CommonResult<Boolean> updateSupplier(@Valid @RequestBody SrmSupplierSaveReqVO updateReqVO) {
         supplierService.updateSupplier(updateReqVO);
         return success(true);
@@ -58,7 +58,7 @@ public class SrmSupplierController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除供应商")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:supplier:delete')")
+    @PreAuthorize("@ss.hasPermission('srm:supplier:delete')")
     public CommonResult<Boolean> deleteSupplier(@RequestParam("id") Long id) {
         supplierService.deleteSupplier(id);
         return success(true);
@@ -67,7 +67,7 @@ public class SrmSupplierController {
     @GetMapping("/get")
     @Operation(summary = "获得供应商")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('erp:supplier:query')")
+    @PreAuthorize("@ss.hasPermission('srm:supplier:query')")
     public CommonResult<SrmSupplierRespVO> getSupplier(@RequestParam("id") Long id) {
         SrmSupplierDO supplier = supplierService.getSupplier(id);
         return success(BeanUtils.toBean(supplier, SrmSupplierRespVO.class));
@@ -75,7 +75,7 @@ public class SrmSupplierController {
 
     @GetMapping("/page")
     @Operation(summary = "获得供应商分页")
-    @PreAuthorize("@ss.hasPermission('erp:supplier:query')")
+    @PreAuthorize("@ss.hasPermission('srm:supplier:query')")
     public CommonResult<PageResult<SrmSupplierRespVO>> getSupplierPage(@Valid SrmSupplierPageReqVO pageReqVO) {
         PageResult<SrmSupplierDO> pageResult = supplierService.getSupplierPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, SrmSupplierRespVO.class));
@@ -83,7 +83,7 @@ public class SrmSupplierController {
 
     @GetMapping("/simple-list")
     @Operation(summary = "获得供应商精简列表", description = "只包含被开启的供应商，主要用于前端的下拉选项")
-    @PreAuthorize("@ss.hasPermission('erp:supplier:query')")
+    @PreAuthorize("@ss.hasPermission('srm:supplier:query')")
     public CommonResult<List<SrmSupplierRespVO>> getSupplierSimpleList() {
         List<SrmSupplierDO> list = supplierService.getSupplierListByStatus(CommonStatusEnum.ENABLE.getStatus());
         return success(convertList(list, supplier -> new SrmSupplierRespVO().setId(supplier.getId()).setName(supplier.getName())));
@@ -91,7 +91,7 @@ public class SrmSupplierController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出供应商 Excel")
-    @PreAuthorize("@ss.hasPermission('erp:supplier:export')")
+    @PreAuthorize("@ss.hasPermission('srm:supplier:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportSupplierExcel(@Valid SrmSupplierPageReqVO pageReqVO,
                                     HttpServletResponse response) throws IOException {

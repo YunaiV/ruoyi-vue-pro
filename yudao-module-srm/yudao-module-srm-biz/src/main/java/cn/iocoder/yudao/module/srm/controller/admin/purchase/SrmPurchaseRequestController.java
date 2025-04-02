@@ -71,7 +71,7 @@ public class SrmPurchaseRequestController {
 
     @PostMapping("/create")
     @Operation(summary = "创建ERP采购申请单")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-request:create')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-request:create')")
     @Idempotent
     public CommonResult<Long> createPurchaseRequest(@Validated(Validation.OnCreate.class) @RequestBody SrmPurchaseRequestSaveReqVO createReqVO) {
         return success(srmPurchaseRequestService.createPurchaseRequest(createReqVO));
@@ -79,7 +79,7 @@ public class SrmPurchaseRequestController {
 
     @PutMapping("/update")
     @Operation(summary = "更新ERP采购申请单")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-request:update')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-request:update')")
     public CommonResult<Boolean> updatePurchaseRequest(@Validated(Validation.OnUpdate.class) @RequestBody SrmPurchaseRequestSaveReqVO updateReqVO) {
         srmPurchaseRequestService.updatePurchaseRequest(updateReqVO);
         return success(true);
@@ -88,7 +88,7 @@ public class SrmPurchaseRequestController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除ERP采购申请单")
     @Parameter(name = "id", description = "编号数组", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:purchase-request:delete')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-request:delete')")
     public CommonResult<Boolean> deletePurchaseRequest(@NotNull @RequestParam("ids") List<Long> ids) {
         srmPurchaseRequestService.deletePurchaseRequest(ids);
         return success(true);
@@ -97,7 +97,7 @@ public class SrmPurchaseRequestController {
     //get获得最大流水号
     @GetMapping("/getMaxSerialNo")
     @Operation(summary = "获得ERP采购申请单NO流水号")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-request:query')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-request:query')")
     public CommonResult<String> getMaxSerialNo() {
         return success(srmPurchaseRequestService.getMaxSerialNumber());
     }
@@ -106,7 +106,7 @@ public class SrmPurchaseRequestController {
     @PutMapping("/submitAudit")
     @Operation(summary = "提交审核")
     @Parameter(name = "ids", description = "申请单编号数组", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:purchase-request:submitAudit')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-request:submitAudit')")
     public CommonResult<Boolean> submitAudit(@NotNull @RequestBody Collection<Long> ids) {
         srmPurchaseRequestService.submitAudit(ids);
         return success(true);
@@ -114,7 +114,7 @@ public class SrmPurchaseRequestController {
 
     @PostMapping("/auditStatus")
     @Operation(summary = "审核/反审核")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-request:review')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-request:review')")
     public CommonResult<Boolean> reviewPurchaseRequest(@Validated @RequestBody SrmPurchaseRequestAuditReqVO req) {
         srmPurchaseRequestService.reviewPurchaseOrder(req);
         return success(true);
@@ -122,7 +122,7 @@ public class SrmPurchaseRequestController {
 
     @PostMapping("/merge")
     @Operation(summary = "合并采购")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-request:merge')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-request:merge')")
     public CommonResult<Long> mergePurchaseOrder(@Validated @RequestBody SrmPurchaseRequestMergeReqVO reqVO) {
         Long orderId = srmPurchaseRequestService.merge(reqVO);
         return success(orderId);
@@ -130,7 +130,7 @@ public class SrmPurchaseRequestController {
 
     @PutMapping("/enableStatus")
     @Operation(summary = "关闭/启用")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-request:enable')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-request:enable')")
     public CommonResult<Boolean> switchPurchaseOrderStatus(@Validated @RequestBody SrmPurchaseRequestEnableReqVO reqVO) {
         srmPurchaseRequestService.switchPurchaseOrderStatus(null, reqVO.getItemIds(), reqVO.getEnable());
         return success(true);
@@ -139,7 +139,7 @@ public class SrmPurchaseRequestController {
     @GetMapping("/get")
     @Operation(summary = "获得ERP采购申请单")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:purchase-request:query')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-request:query')")
     public CommonResult<SrmPurchaseRequestRespVO> getPurchaseRequest(@RequestParam("id") Long id) {
         SrmPurchaseRequestDO purchaseRequest = srmPurchaseRequestService.getPurchaseRequest(id);
         if (purchaseRequest == null) {
@@ -151,7 +151,7 @@ public class SrmPurchaseRequestController {
 
     @GetMapping("/page")
     @Operation(summary = "获得ERP采购申请单分页")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-request:query')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-request:query')")
     public CommonResult<PageResult<SrmPurchaseRequestRespVO>> getPurchaseRequestPage(@Valid SrmPurchaseRequestPageReqVO pageReqVO) {
         PageResult<SrmPurchaseRequestDO> pageResult = srmPurchaseRequestService.getPurchaseRequestPage(pageReqVO);
         return success(new PageResult<>(bindList(pageResult.getList()), pageResult.getTotal()));
@@ -159,7 +159,7 @@ public class SrmPurchaseRequestController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出ERP采购申请单 Excel")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-request:export')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-request:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportPurchaseRequestExcel(@Valid SrmPurchaseRequestPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);

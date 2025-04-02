@@ -58,14 +58,14 @@ public class SrmPurchaseReturnController {
     @PostMapping("/create")
     @Operation(summary = "创建采购退货")
     @Idempotent
-    @PreAuthorize("@ss.hasPermission('erp:purchase-return:create')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-return:create')")
     public CommonResult<Long> createPurchaseReturn(@Valid @RequestBody SrmPurchaseReturnSaveReqVO createReqVO) {
         return success(purchaseReturnService.createPurchaseReturn(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新采购退货")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-return:update')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-return:update')")
     public CommonResult<Boolean> updatePurchaseReturn(@Valid @RequestBody SrmPurchaseReturnSaveReqVO updateReqVO) {
         purchaseReturnService.updatePurchaseReturn(updateReqVO);
         return success(true);
@@ -74,7 +74,7 @@ public class SrmPurchaseReturnController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除采购退货")
     @Parameter(name = "ids", description = "编号数组", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:purchase-return:delete')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-return:delete')")
     public CommonResult<Boolean> deletePurchaseReturn(@RequestParam("ids") List<Long> ids) {
         purchaseReturnService.deletePurchaseReturn(ids);
         return success(true);
@@ -83,7 +83,7 @@ public class SrmPurchaseReturnController {
     @GetMapping("/get")
     @Operation(summary = "获得采购退货")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-return:query')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-return:query')")
     public CommonResult<SrmPurchaseReturnBaseRespVO> getPurchaseReturn(@RequestParam("id") Long id) {
         SrmPurchaseReturnDO purchaseReturn = purchaseReturnService.getPurchaseReturn(id);
         if (purchaseReturn == null) {
@@ -94,7 +94,7 @@ public class SrmPurchaseReturnController {
 
     @GetMapping("/page")
     @Operation(summary = "获得采购退货分页")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-return:query')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-return:query')")
     public CommonResult<PageResult<SrmPurchaseReturnBaseRespVO>> getPurchaseReturnPage(@Valid SrmPurchaseReturnPageReqVO pageReqVO) {
         PageResult<SrmPurchaseReturnDO> pageResult = purchaseReturnService.getPurchaseReturnPage(pageReqVO);
         return success(new PageResult<>(bindResult(pageResult.getList()), pageResult.getTotal()));
@@ -102,7 +102,7 @@ public class SrmPurchaseReturnController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出采购退货 Excel")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-return:export')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-return:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportPurchaseReturnExcel(@Valid SrmPurchaseReturnPageReqVO pageReqVO,
                                           HttpServletResponse response) throws IOException {
@@ -115,7 +115,7 @@ public class SrmPurchaseReturnController {
     //提交审核
     @PutMapping("/submitAudit")
     @Operation(summary = "提交审核")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-return:submit')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-return:submit')")
     public CommonResult<Boolean> submitPurchaseReturn(@Valid SrmPurchaseReturnAuditReqVO reqVO) {
         purchaseReturnService.submitAudit(reqVO.getIds());
         return success(true);
@@ -124,7 +124,7 @@ public class SrmPurchaseReturnController {
     //审核通过|审核撤销
     @PutMapping("/auditStatus")
     @Operation(summary = "审核/反审核")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-return:review')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-return:review')")
     public CommonResult<Boolean> auditPurchaseReturn(@Valid SrmPurchaseReturnAuditReqVO reqVO) {
         purchaseReturnService.review(reqVO);
         return success(true);
@@ -133,7 +133,7 @@ public class SrmPurchaseReturnController {
     //切换退款状态
     @PutMapping("/refundStatus")
     @Operation(summary = "切换退款状态")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-return:refund')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-return:refund')")
     public CommonResult<Boolean> refundPurchaseReturn(@Valid SrmPurchaseReturnAuditReqVO reqVO) {
         purchaseReturnService.refund(reqVO);
         return success(true);

@@ -11,6 +11,8 @@ import com.alibaba.cola.statemachine.Action;
 import com.alibaba.cola.statemachine.StateMachine;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +28,8 @@ public class OrderItemExecuteActionImpl implements Action<SrmExecutionStatus, Sr
     SrmPurchaseOrderItemMapper mapper;
     @Resource(name = PURCHASE_ORDER_EXECUTION_STATE_MACHINE_NAME)
     StateMachine<SrmExecutionStatus, SrmEventEnum, SrmPurchaseOrderDO> stateMachine;
-    @Resource
+    @Autowired
+    @Lazy
     SrmPurchaseOrderService srmPurchaseOrderService;
 
     @Override

@@ -43,14 +43,14 @@ public class SrmSupplierProductController {
     @PostMapping("/create")
     @Operation(summary = "创建ERP 供应商产品")
     @Idempotent
-    @PreAuthorize("@ss.hasPermission('erp:supplier-product:create')")
+    @PreAuthorize("@ss.hasPermission('srm:supplier-product:create')")
     public CommonResult<Long> createSupplierProduct(@Valid @RequestBody SrmSupplierProductSaveReqVO createReqVO) {
         return success(supplierProductService.createSupplierProduct(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新ERP 供应商产品")
-    @PreAuthorize("@ss.hasPermission('erp:supplier-product:update')")
+    @PreAuthorize("@ss.hasPermission('srm:supplier-product:update')")
     public CommonResult<Boolean> updateSupplierProduct(@Valid @RequestBody SrmSupplierProductSaveReqVO updateReqVO) {
         supplierProductService.updateSupplierProduct(updateReqVO);
         return success(true);
@@ -59,7 +59,7 @@ public class SrmSupplierProductController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除ERP 供应商产品")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:supplier-product:delete')")
+    @PreAuthorize("@ss.hasPermission('srm:supplier-product:delete')")
     public CommonResult<Boolean> deleteSupplierProduct(@RequestParam("id") Long id) {
         supplierProductService.deleteSupplierProduct(id);
         return success(true);
@@ -68,7 +68,7 @@ public class SrmSupplierProductController {
     @GetMapping("/get")
     @Operation(summary = "获得ERP 供应商产品")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('erp:supplier-product:query')")
+    @PreAuthorize("@ss.hasPermission('srm:supplier-product:query')")
     public CommonResult<SrmSupplierProductRespVO> getSupplierProduct(@RequestParam("id") Long id) {
         SrmSupplierProductDO supplierProduct = supplierProductService.getSupplierProduct(id);
         return success(BeanUtils.toBean(supplierProduct, SrmSupplierProductRespVO.class));
@@ -76,7 +76,7 @@ public class SrmSupplierProductController {
 
     @GetMapping("/page")
     @Operation(summary = "获得ERP 供应商产品分页")
-    @PreAuthorize("@ss.hasPermission('erp:supplier-product:query')")
+    @PreAuthorize("@ss.hasPermission('srm:supplier-product:query')")
     public CommonResult<PageResult<SrmSupplierProductRespVO>> getSupplierProductPage(@Valid SrmSupplierProductPageReqVO pageReqVO) {
         PageResult<SrmSupplierProductDO> pageResult = supplierProductService.getSupplierProductPage(pageReqVO);
         return success(supplierProductService.buildSupplierProductVOPageResult(pageResult));
@@ -91,7 +91,7 @@ public class SrmSupplierProductController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出ERP 供应商产品 Excel")
-    @PreAuthorize("@ss.hasPermission('erp:supplier-product:export')")
+    @PreAuthorize("@ss.hasPermission('srm:supplier-product:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportSupplierProductExcel(@Valid SrmSupplierProductPageReqVO pageReqVO,
               HttpServletResponse response) throws IOException {

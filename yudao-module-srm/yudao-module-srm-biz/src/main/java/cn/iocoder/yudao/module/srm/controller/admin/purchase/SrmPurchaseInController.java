@@ -71,7 +71,7 @@ public class SrmPurchaseInController {
     @PostMapping("/create")
     @Operation(summary = "创建采购入库")
     @Idempotent
-    @PreAuthorize("@ss.hasPermission('erp:purchase-in:create')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-in:create')")
     public CommonResult<Long> createPurchaseIn(@Valid @RequestBody SrmPurchaseInSaveReqVO createReqVO) {
         //给vo里面的项的source设置字符串a
         createReqVO.getItems().forEach(item -> item.setSource("WEB录入"));
@@ -81,7 +81,7 @@ public class SrmPurchaseInController {
 
     @PutMapping("/update")
     @Operation(summary = "更新采购入库")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-in:update')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-in:update')")
     public CommonResult<Boolean> updatePurchaseIn(@Valid @RequestBody SrmPurchaseInSaveReqVO updateReqVO) {
         purchaseInService.updatePurchaseIn(updateReqVO);
         return success(true);
@@ -90,7 +90,7 @@ public class SrmPurchaseInController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除采购入库")
     @Parameter(name = "ids", description = "编号数组", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:purchase-in:delete')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-in:delete')")
     public CommonResult<Boolean> deletePurchaseIn(@RequestParam("ids") List<Long> ids) {
         purchaseInService.deletePurchaseIn(ids);
         return success(true);
@@ -99,7 +99,7 @@ public class SrmPurchaseInController {
     @GetMapping("/get")
     @Operation(summary = "获得采购入库")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-in:query')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-in:query')")
     public CommonResult<SrmPurchaseInBaseRespVO> getPurchaseIn(@RequestParam("id") Long id) {
         SrmPurchaseInDO purchaseIn = purchaseInService.getPurchaseIn(id);
         if (purchaseIn == null) {
@@ -111,7 +111,7 @@ public class SrmPurchaseInController {
 
     @GetMapping("/page")
     @Operation(summary = "获得采购入库分页")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-in:query')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-in:query')")
     public CommonResult<PageResult<SrmPurchaseInBaseRespVO>> getPurchaseInPage(@Valid SrmPurchaseInPageReqVO pageReqVO) {
         PageResult<SrmPurchaseInDO> pageResult = purchaseInService.getPurchaseInPage(pageReqVO);
         List<SrmPurchaseInBaseRespVO> respVOS = bindList(pageResult.getList());
@@ -120,7 +120,7 @@ public class SrmPurchaseInController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出采购入库 Excel")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-in:export')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-in:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportPurchaseInExcel(@Valid SrmPurchaseInPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
@@ -131,7 +131,7 @@ public class SrmPurchaseInController {
 
     @PutMapping("/submitAudit")
     @Operation(summary = "提交审核")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-in:submitAudit')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-in:submitAudit')")
     public CommonResult<Boolean> submitAudit(@Valid @RequestBody SrmPurchaseInSubmitReqVO vo) {
         purchaseInService.submitAudit(vo.getInIds().stream().distinct().toList());
         return success(true);
@@ -139,7 +139,7 @@ public class SrmPurchaseInController {
 
     @PostMapping("/auditStatus")
     @Operation(summary = "审核/反审核")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-in:review')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-in:review')")
     public CommonResult<Boolean> reviewPurchaseRequest(@Validated(Validation.OnAudit.class) @RequestBody SrmPurchaseInAuditReqVO req) {
         purchaseInService.review(req);
         return success(true);
@@ -148,7 +148,7 @@ public class SrmPurchaseInController {
     //切换付款状态方法(暂时)
     @PostMapping("/changePayStatus")
     @Operation(summary = "切换付款状态")
-    @PreAuthorize("@ss.hasPermission('erp:purchase-in:changePayStatus')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-in:changePayStatus')")
     public CommonResult<Boolean> changePayStatus(@Valid @RequestBody SrmPurchaseInPayReqVO vo) {
         //        purchaseInService.changePayStatus(reqVO.getInId(), reqVO.getPayStatus());
         purchaseInService.switchPayStatus(vo);
