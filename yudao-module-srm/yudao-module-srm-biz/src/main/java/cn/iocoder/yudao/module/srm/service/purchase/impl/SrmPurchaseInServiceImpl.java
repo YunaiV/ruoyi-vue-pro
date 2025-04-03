@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.srm.service.purchase.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -27,7 +28,6 @@ import cn.iocoder.yudao.module.srm.enums.status.SrmPaymentStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmStorageStatus;
 import cn.iocoder.yudao.module.srm.service.purchase.SrmPurchaseInService;
 import cn.iocoder.yudao.module.srm.service.purchase.SrmPurchaseOrderService;
-import com.alibaba.cola.statemachine.StateMachine;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

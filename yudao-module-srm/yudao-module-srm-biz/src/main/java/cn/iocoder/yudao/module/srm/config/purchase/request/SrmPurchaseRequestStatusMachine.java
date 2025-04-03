@@ -1,5 +1,10 @@
 package cn.iocoder.yudao.module.srm.config.purchase.request;
 
+import cn.iocoder.yudao.framework.cola.statemachine.Action;
+import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
+import cn.iocoder.yudao.framework.cola.statemachine.builder.FailCallback;
+import cn.iocoder.yudao.framework.cola.statemachine.builder.StateMachineBuilder;
+import cn.iocoder.yudao.framework.cola.statemachine.builder.StateMachineBuilderFactory;
 import cn.iocoder.yudao.module.srm.config.purchase.request.impl.action.StorageActionImpl;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.SrmPurchaseRequestAuditReqVO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestDO;
@@ -8,11 +13,6 @@ import cn.iocoder.yudao.module.srm.enums.status.SrmAuditStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmOffStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmOrderStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmStorageStatus;
-import com.alibaba.cola.statemachine.Action;
-import com.alibaba.cola.statemachine.StateMachine;
-import com.alibaba.cola.statemachine.builder.FailCallback;
-import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
-import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

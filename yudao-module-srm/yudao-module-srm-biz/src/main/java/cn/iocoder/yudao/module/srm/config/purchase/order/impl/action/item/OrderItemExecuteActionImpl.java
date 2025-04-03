@@ -1,14 +1,14 @@
 package cn.iocoder.yudao.module.srm.config.purchase.order.impl.action.item;
 
 import cn.hutool.json.JSONUtil;
+import cn.iocoder.yudao.framework.cola.statemachine.Action;
+import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseOrderItemMapper;
 import cn.iocoder.yudao.module.srm.enums.SrmEventEnum;
 import cn.iocoder.yudao.module.srm.enums.status.SrmExecutionStatus;
 import cn.iocoder.yudao.module.srm.service.purchase.SrmPurchaseOrderService;
-import com.alibaba.cola.statemachine.Action;
-import com.alibaba.cola.statemachine.StateMachine;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

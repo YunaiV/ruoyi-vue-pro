@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.srm.config.purchase.request.impl.action;
 
 import cn.hutool.json.JSONUtil;
+import cn.iocoder.yudao.framework.cola.statemachine.Action;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestDO;
@@ -9,7 +10,6 @@ import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseRequestItemsMap
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseRequestMapper;
 import cn.iocoder.yudao.module.srm.enums.SrmEventEnum;
 import cn.iocoder.yudao.module.srm.enums.status.SrmOrderStatus;
-import com.alibaba.cola.statemachine.Action;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

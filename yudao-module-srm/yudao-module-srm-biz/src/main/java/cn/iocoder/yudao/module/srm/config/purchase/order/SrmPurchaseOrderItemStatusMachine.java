@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.srm.config.purchase.order;
 
-import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_ORDER_ITEM_EXECUTION_STATE_MACHINE_NAME;
-import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME;
-import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_ORDER_ITEM_PAYMENT_STATE_MACHINE_NAME;
-import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_ORDER_ITEM_STORAGE_STATE_MACHINE_NAME;
-
+import cn.iocoder.yudao.framework.cola.statemachine.Action;
+import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
+import cn.iocoder.yudao.framework.cola.statemachine.builder.FailCallback;
+import cn.iocoder.yudao.framework.cola.statemachine.builder.StateMachineBuilder;
+import cn.iocoder.yudao.framework.cola.statemachine.builder.StateMachineBuilderFactory;
 import cn.iocoder.yudao.module.srm.api.purchase.SrmInCountDTO;
 import cn.iocoder.yudao.module.srm.api.purchase.SrmPayCountDTO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
@@ -13,15 +13,12 @@ import cn.iocoder.yudao.module.srm.enums.status.SrmExecutionStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmOffStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmPaymentStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmStorageStatus;
-import com.alibaba.cola.statemachine.Action;
-import com.alibaba.cola.statemachine.StateMachine;
-import com.alibaba.cola.statemachine.builder.FailCallback;
-import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
-import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.*;
 
 @Slf4j
 @Configuration

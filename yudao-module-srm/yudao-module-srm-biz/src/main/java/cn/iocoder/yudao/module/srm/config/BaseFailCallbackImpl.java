@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.srm.config;
 
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.cola.statemachine.builder.FailCallback;
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import cn.iocoder.yudao.module.srm.enums.SrmEventEnum;
-import com.alibaba.cola.statemachine.builder.FailCallback;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

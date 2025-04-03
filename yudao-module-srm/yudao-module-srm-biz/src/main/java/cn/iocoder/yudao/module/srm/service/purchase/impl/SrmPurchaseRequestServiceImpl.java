@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.srm.service.purchase.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -30,7 +31,6 @@ import cn.iocoder.yudao.module.srm.service.purchase.SrmPurchaseOrderService;
 import cn.iocoder.yudao.module.srm.service.purchase.SrmPurchaseRequestService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import com.alibaba.cola.statemachine.StateMachine;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

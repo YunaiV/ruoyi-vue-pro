@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.srm.config.purchase.request.impl;
 
-import com.alibaba.cola.statemachine.Condition;
+import cn.iocoder.yudao.framework.cola.statemachine.Condition;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Component;

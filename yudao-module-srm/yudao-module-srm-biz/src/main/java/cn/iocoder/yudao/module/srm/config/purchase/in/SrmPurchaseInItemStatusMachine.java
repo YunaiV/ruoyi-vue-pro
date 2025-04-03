@@ -1,14 +1,14 @@
 package cn.iocoder.yudao.module.srm.config.purchase.in;
 
+import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
+import cn.iocoder.yudao.framework.cola.statemachine.builder.FailCallback;
+import cn.iocoder.yudao.framework.cola.statemachine.builder.StateMachineBuilder;
+import cn.iocoder.yudao.framework.cola.statemachine.builder.StateMachineBuilderFactory;
 import cn.iocoder.yudao.module.srm.config.purchase.in.impl.action.item.InPayItemActionImpl;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseInItemDO;
 import cn.iocoder.yudao.module.srm.enums.SrmEventEnum;
 import cn.iocoder.yudao.module.srm.enums.SrmStateMachines;
 import cn.iocoder.yudao.module.srm.enums.status.SrmPaymentStatus;
-import com.alibaba.cola.statemachine.StateMachine;
-import com.alibaba.cola.statemachine.builder.FailCallback;
-import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
-import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
