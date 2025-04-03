@@ -1,18 +1,16 @@
 package cn.iocoder.yudao.framework.cola.statemachine;
 
 import cn.iocoder.yudao.framework.cola.statemachine.builder.StateMachineBuilderImpl;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
-@Slf4j
 class StateMachineBuilderImplTest {
     public class BaseHandler implements Handler<String, Long, Integer> {
 
         @Override
         public void execute(String from, String to, Long event, Integer context) {
-            log.info("do something");
+            System.out.println("do something");
         }
 
         @Override
@@ -35,7 +33,7 @@ class StateMachineBuilderImplTest {
         var sm = builder.build("someSM");
         sm.setGetter(Objects::toString);
 
-        log.info(
+        System.out.println(
             sm.fireEvent(4L, 3)
         );
     }

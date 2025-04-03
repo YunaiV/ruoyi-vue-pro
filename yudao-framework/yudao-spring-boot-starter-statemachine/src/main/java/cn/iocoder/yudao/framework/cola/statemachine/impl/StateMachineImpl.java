@@ -11,7 +11,6 @@ import cn.iocoder.yudao.framework.cola.statemachine.Transition;
 import cn.iocoder.yudao.framework.cola.statemachine.Visitor;
 import cn.iocoder.yudao.framework.cola.statemachine.builder.ConditionFailCallback;
 import cn.iocoder.yudao.framework.cola.statemachine.builder.FailCallback;
-import lombok.Setter;
 
 /**
  * For performance consideration,
