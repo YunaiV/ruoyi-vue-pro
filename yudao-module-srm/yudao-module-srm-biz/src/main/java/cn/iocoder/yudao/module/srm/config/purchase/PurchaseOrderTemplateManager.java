@@ -13,6 +13,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -22,7 +23,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -38,6 +38,7 @@ public class PurchaseOrderTemplateManager {
 
     @Value("${erp.template.enable-preload:false}")
     private boolean enablePreload;
+
     @Autowired
     private ResourcePatternResolver resourcePatternResolver;
 
@@ -53,13 +54,8 @@ public class PurchaseOrderTemplateManager {
         this.configure = builder.build();
     }
 
-    /**
-     * 获取模板
-     *
-     * @param path 相对路径文件 purchase/order/采购合同模板.docx
-     * @return XWPFTemplate
-     */
     public XWPFTemplate getTemplate(String path) {
+        log.debug("获取模板: {}", path);
         byte[] templateBytes = templateCache.computeIfAbsent(path, p -> {
             try {
                 Resource resource = resourcePatternResolver.getResource("classpath:" + p);
@@ -88,50 +84,55 @@ public class PurchaseOrderTemplateManager {
         if (!enablePreload) {
             return;
         }
+        log.info("\uD83D\uDD04 启动异步模板预热任务...");
+        preloadTemplatesAsync();
+    }
+
+    @Async
+    public void preloadTemplatesAsync() {
         try {
             Resource[] resources = resourcePatternResolver.getResources("classpath:" + templateScanPath + "*.docx");
             log.info("检测到 {} 个模板文件：", resources.length);
 
-            CompletableFuture.runAsync(() -> {
-                log.info("[1] 开始加载 Word 模板...");
-                long wordStart = System.currentTimeMillis();
-                //获取文件名列表
-                for (org.springframework.core.io.Resource resource : resources) {
-                    try {
-                        Optional.ofNullable(resource.getFilename()).ifPresent(fileName -> {
-                            if (fileName.endsWith(".docx")) {
-                                getTemplate(templateScanPath + fileName);
-                            }
-                        });
-                    } catch (Exception e) {
-                        log.error("⚠️ Word 模板预热失败（已忽略）：{}", resource.getFilename(), e);
-                    }
+            for (Resource resource : resources) {
+                try {
+                    Optional.ofNullable(resource.getFilename()).ifPresent(fileName -> {
+                        if (fileName.endsWith(".docx")) {
+                            String templatePath = templateScanPath + fileName;
+                            getTemplate(templatePath);
+                        }
+                    });
+                } catch (Exception e) {
+                    log.error("⚠️ Word 模板预热失败（已忽略）：{}", resource.getFilename(), e);
                 }
-                log.info("[1] Word 模板预热完成，耗时 {}ms", System.currentTimeMillis() - wordStart);
-            }).thenRunAsync(() -> {
-                for (Resource resource : resources) {
-                    try {
-                        byte[] templateBytes = templateCache.get(templateScanPath + resource.getFilename());
+            }
+            log.info("[1] Word 模板预热完成");
+
+            for (Resource resource : resources) {
+                try {
+                    Optional.ofNullable(resource.getFilename()).ifPresent(fileName -> {
+                        String templatePath = templateScanPath + fileName;
+                        byte[] templateBytes = templateCache.get(templatePath);
                         if (templateBytes != null) {
                             try (InputStream input = new ByteArrayInputStream(templateBytes)) {
-                                long pdfStart = System.currentTimeMillis();
                                 Document doc = new Document(input);
                                 doc.save(new ByteArrayOutputStream(), SaveFormat.PDF);
-                                log.info("[2] PDF 引擎预热完成 [{}]，耗时 {}ms", resource.getFilename(), System.currentTimeMillis() - pdfStart);
+                                log.info("[2] PDF 引擎预热完成 [{}]", fileName);
+                            } catch (Exception e) {
+                                log.warn("⚠️ PDF 引擎预热失败：{}", fileName, e);
                             }
                         } else {
-                            log.warn("⚠️ PDF 引擎预热跳过：模板 [{}] 未成功加载", resource.getFilename());
+                            log.warn("⚠️ PDF 引擎预热跳过：模板 [{}] 未成功加载", fileName);
                         }
-                    } catch (Exception e) {
-                        log.warn("⚠️ PDF 引擎预热失败", e);
-                    }
+                    });
+                } catch (Exception e) {
+                    log.warn("⚠️ PDF 引擎预热失败", e);
                 }
-            });
+            }
+            log.info("[2] PDF 引擎预热全部完成");
+
         } catch (IOException e) {
             log.error("❌ 模板文件夹扫描失败", e);
         }
     }
-
-
 }
-

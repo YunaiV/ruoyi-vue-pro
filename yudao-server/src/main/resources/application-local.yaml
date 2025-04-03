@@ -175,7 +175,7 @@ logging:
       iocoder:
         yudao:
           module:
-            erp: debug
+            srm: debug
     root: info
 
 
