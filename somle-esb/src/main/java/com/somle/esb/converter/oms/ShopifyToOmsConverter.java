@@ -5,13 +5,14 @@ import cn.iocoder.yudao.module.oms.api.OmsShopApi;
 import cn.iocoder.yudao.module.oms.api.dto.OmsShopDTO;
 import cn.iocoder.yudao.module.oms.api.dto.OmsShopProductSaveReqDTO;
 import cn.iocoder.yudao.module.oms.api.dto.OmsShopSaveReqDTO;
-import cn.iocoder.yudao.module.oms.api.enums.shop.PlatformEnum;
 import cn.iocoder.yudao.module.oms.api.enums.shop.ShopTypeEnum;
+import com.somle.esb.enums.PlatformEnum;
 import com.somle.shopify.model.reps.ShopifyShopProductRepsVO;
 import com.somle.shopify.model.reps.ShopifyShopRepsVO;
 import com.somle.shopify.service.ShopifyClient;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -53,7 +54,6 @@ public class ShopifyToOmsConverter extends AbstractToOmsConverter<ShopifyShopRep
 
         //根据client再次请求获取店铺信息,shopify一个店铺对应一个client
         ShopifyShopRepsVO shopifyShopRepsVO = shopifyClient.getShops().get(0);
-
 
 
         OmsShopDTO omsShopDO = omsShopApi.getShopByPlatformShopCode(shopifyShopRepsVO.getId().toString());

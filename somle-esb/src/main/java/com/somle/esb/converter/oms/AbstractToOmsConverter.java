@@ -2,19 +2,18 @@ package com.somle.esb.converter.oms;
 
 import cn.iocoder.yudao.module.oms.api.dto.OmsShopProductSaveReqDTO;
 import cn.iocoder.yudao.module.oms.api.dto.OmsShopSaveReqDTO;
-import cn.iocoder.yudao.module.oms.api.enums.shop.PlatformEnum;
+import com.somle.esb.enums.PlatformEnum;
 import com.somle.shopify.service.ShopifyClient;
 import lombok.Getter;
 
 import java.util.List;
 
 
-
 /**
  * @Description: 公共转换器，向销售平台获取数据(如店铺信息，产品信息等)，转换为OMS模块DO对象
  */
 @Getter
-public abstract class AbstractToOmsConverter<SHOP,PRODUCT> {
+public abstract class AbstractToOmsConverter<SHOP, PRODUCT> {
     private PlatformEnum platform;
 
     /**

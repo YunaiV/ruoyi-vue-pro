@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.oms.api.enums.shop;
+package com.somle.esb.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
