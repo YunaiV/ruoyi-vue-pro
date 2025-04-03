@@ -79,4 +79,5 @@ public class WmsStockBinRespVO {
     @ExcelProperty("可售量，未被单据占用的良品数量")
     private Integer sellableQty;
 
+
 }

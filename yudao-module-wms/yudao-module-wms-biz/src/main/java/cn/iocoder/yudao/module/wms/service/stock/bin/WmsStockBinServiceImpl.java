@@ -250,5 +250,14 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
         StreamX.from(list).assemble(binVOList, WmsWarehouseBinRespVO::getId, WmsStockBinRespVO::getBinId,WmsStockBinRespVO::setBin);
     }
 
+    @Override
+    public List<WmsStockBinDO> selectStockBinByIds(List<Long> stockBinIds) {
+        if(CollectionUtils.isEmpty(stockBinIds)) {
+            return List.of();
+        }
+        return stockBinMapper.selectBatchIds(stockBinIds);
+
+    }
+
 
 }

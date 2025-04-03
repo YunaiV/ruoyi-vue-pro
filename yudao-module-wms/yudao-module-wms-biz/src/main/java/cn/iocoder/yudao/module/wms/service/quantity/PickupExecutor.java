@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsStockFlowDirection;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.inbound.item.flow.WmsInboundItemFlowService;
@@ -128,7 +129,7 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
         // 保存
         stockBinService.insertOrUpdate(stockBinDO);
         // 记录流水
-        stockFlowService.createForStockBin(this.getReason(), inboundItemVO.getProductId(), stockBinDO, pickupItemDO.getQty(), pickupItemDO.getPickupId(), pickupItemDO.getId());
+        stockFlowService.createForStockBin(this.getReason(), WmsStockFlowDirection.IN, inboundItemVO.getProductId(), stockBinDO, pickupItemDO.getQty(), pickupItemDO.getPickupId(), pickupItemDO.getId());
     }
 
     /**
@@ -196,7 +197,7 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
         // 更新库存
         stockWarehouseService.insertOrUpdate(stockWarehouseDO);
         // 记录流水
-        stockFlowService.createForStockWarehouse(this.getReason(), productId, stockWarehouseDO, quantity, pickup.getId(), pickupItemDO.getId());
+        stockFlowService.createForStockWarehouse(this.getReason(),WmsStockFlowDirection.OUT, productId, stockWarehouseDO, quantity, pickup.getId(), pickupItemDO.getId());
     }
 
 
@@ -234,7 +235,7 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
         // 保存
         stockOwnershipService.insertOrUpdate(stockOwnershipDO);
         // 记录流水
-        stockFlowService.createForStockOwner(this.getReason(), productId, stockOwnershipDO, quantity, pickup.getId(), pickupItemDO.getId());
+        stockFlowService.createForStockOwner(this.getReason(), WmsStockFlowDirection.IN, productId, stockOwnershipDO, quantity, pickup.getId(), pickupItemDO.getId());
 
     }
 

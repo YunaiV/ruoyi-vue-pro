@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsStockFlowDirection;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.outbound.WmsOutboundService;
@@ -45,7 +46,7 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
     /**
      * 更新仓库库存量
      **/
-    protected abstract void updateStockWarehouseQty(WmsStockWarehouseDO stockWarehouseDO, WmsOutboundItemRespVO item, Integer quantity);
+    protected abstract WmsStockFlowDirection updateStockWarehouseQty(WmsStockWarehouseDO stockWarehouseDO, WmsOutboundItemRespVO item, Integer quantity);
     /**
      * 更新库存货位库存量
      **/
@@ -53,11 +54,11 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
     /**
      * 更新库存货位库存量
      **/
-    protected abstract void updateStockOwnershipQty(WmsStockOwnershipDO stockOwnershipDO, WmsOutboundItemRespVO item, Integer quantity);
+    protected abstract WmsStockFlowDirection updateStockOwnershipQty(WmsStockOwnershipDO stockOwnershipDO, WmsOutboundItemRespVO item, Integer quantity);
     /**
      * 更新库存货位库存量
      **/
-    protected abstract void updateStockBinQty(WmsStockBinDO stockBinDO, WmsOutboundItemRespVO item,Integer quantity);
+    protected abstract WmsStockFlowDirection updateStockBinQty(WmsStockBinDO stockBinDO, WmsOutboundItemRespVO item,Integer quantity);
     /**
      * 更新出库单
      **/
@@ -130,18 +131,18 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
         // 获得仓库库存记录
         WmsStockWarehouseDO stockWarehouseDO = stockWarehouseService.getByWarehouseIdAndProductId(warehouseId, productId);
 
-
+        WmsStockFlowDirection wmsStockFlowDirection = null;
         // 如果没有就创建
         if (stockWarehouseDO == null) {
             throw exception(STOCK_WAREHOUSE_NOT_EXISTS);
         } else {
-            this.updateStockWarehouseQty(stockWarehouseDO, item,quantity);
+            wmsStockFlowDirection = this.updateStockWarehouseQty(stockWarehouseDO, item, quantity);
         }
 
         // 更新库存
         stockWarehouseService.insertOrUpdate(stockWarehouseDO);
         // 记录流水
-        stockFlowService.createForStockWarehouse(this.getReason(), productId, stockWarehouseDO, quantity, outboundId, outboundItemId);
+        stockFlowService.createForStockWarehouse(this.getReason(),wmsStockFlowDirection, productId, stockWarehouseDO, quantity, outboundId, outboundItemId);
 
     }
 
@@ -155,16 +156,17 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
         JdbcUtils.requireTransaction();
         // 查询库存记录
         WmsStockOwnershipDO stockOwnershipDO = stockOwnershipService.getByUkProductOwner(warehouseId, companyId, deptId, productId);
+        WmsStockFlowDirection wmsStockFlowDirection = null;
         // 如果不存在就创建
         if (stockOwnershipDO == null) {
             throw exception(STOCK_OWNERSHIP_NOT_EXISTS);
         } else { // 如果存在就修改
-            this.updateStockOwnershipQty(stockOwnershipDO,item,quantity);
+            wmsStockFlowDirection = this.updateStockOwnershipQty(stockOwnershipDO, item, quantity);
         }
         // 保存
         stockOwnershipService.insertOrUpdate(stockOwnershipDO);
         // 记录流水
-        stockFlowService.createForStockOwner(this.getReason(), productId, stockOwnershipDO,quantity, outboundId, outboundItemId);
+        stockFlowService.createForStockOwner(this.getReason(),wmsStockFlowDirection, productId, stockOwnershipDO,quantity, outboundId, outboundItemId);
     }
 
 
@@ -175,15 +177,16 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
         // 调整仓位库存
         JdbcUtils.requireTransaction();
         WmsStockBinDO stockBinDO = stockBinService.getStockBin(binId, productId);
+        WmsStockFlowDirection wmsStockFlowDirection = null;
         if(stockBinDO==null) {
             throw exception(STOCK_BIN_NOT_EXISTS);
         } else {
-            this.updateStockBinQty(stockBinDO,item,quantity);
+            wmsStockFlowDirection=this.updateStockBinQty(stockBinDO,item,quantity);
         }
         // 保存
         stockBinService.insertOrUpdate(stockBinDO);
         // 记录流水
-        stockFlowService.createForStockBin(this.getReason(), productId, stockBinDO,quantity, outboundId, outboundItemId);
+        stockFlowService.createForStockBin(this.getReason(),wmsStockFlowDirection,productId, stockBinDO,quantity, outboundId, outboundItemId);
     }
 
 }

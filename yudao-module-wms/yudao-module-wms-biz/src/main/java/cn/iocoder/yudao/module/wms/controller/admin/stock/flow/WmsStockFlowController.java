@@ -1,51 +1,29 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.flow;
 
-import org.springframework.web.bind.annotation.*;
-import jakarta.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.constraints.*;
-import jakarta.validation.*;
-import jakarta.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
-import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.*;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.flow.vo.*;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.flow.vo.WmsStockFlowPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.flow.vo.WmsStockFlowRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.flow.WmsStockFlowDO;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsStockType;
 import cn.iocoder.yudao.module.wms.service.stock.flow.WmsStockFlowService;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_FLOW_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_FLOW_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_FLOW_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_FLOW_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_FLOW_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_FLOW_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_FLOW_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_FLOW_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_FLOW_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_FLOW_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_FLOW_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "库存流水")
 @RestController
@@ -103,17 +81,55 @@ public class WmsStockFlowController {
     /**
      * @sign : E223AB2DDEC0F1A8
      */
-    @GetMapping("/page")
-    @Operation(summary = "获得库存流水分页")
+    @GetMapping("/page-warehouse")
+    @Operation(summary = "获得仓库库存流水分页")
     @PreAuthorize("@ss.hasPermission('wms:stock-flow:query')")
+    public CommonResult<PageResult<WmsStockFlowRespVO>> getStockFlowPageWarehouse(@Valid WmsStockFlowPageReqVO pageReqVO) {
+
+        pageReqVO.setStockType(WmsStockType.WAREHOUSE.getValue());
+        pageReqVO.setReason(new Integer[]{ WmsStockReason.INBOUND.getValue(), WmsStockReason.OUTBOUND_AGREE.getValue() });
+
+        return getStockFlowPage(pageReqVO);
+    }
+
+    @GetMapping("/page-ownership")
+    @Operation(summary = "获得所有者库存流水分页")
+    @PreAuthorize("@ss.hasPermission('wms:stock-flow:query')")
+    public CommonResult<PageResult<WmsStockFlowRespVO>> getStockFlowPageOwnership(@Valid WmsStockFlowPageReqVO pageReqVO) {
+        pageReqVO.setStockType(WmsStockType.OWNERSHIP.getValue());
+        pageReqVO.setReason(new Integer[]{ WmsStockReason.INBOUND.getValue(), WmsStockReason.OUTBOUND_AGREE.getValue() });
+        return getStockFlowPage(pageReqVO);
+    }
+
+    @GetMapping("/page-bin")
+    @Operation(summary = "获得仓位库存流水分页")
+    @PreAuthorize("@ss.hasPermission('wms:stock-flow:query')")
+    public CommonResult<PageResult<WmsStockFlowRespVO>> getStockFlowPageBin(@Valid WmsStockFlowPageReqVO pageReqVO) {
+        pageReqVO.setStockType(WmsStockType.BIN.getValue());
+        pageReqVO.setReason(new Integer[]{ WmsStockReason.INBOUND.getValue(), WmsStockReason.PICKUP.getValue(),WmsStockReason.OUTBOUND_AGREE.getValue() });
+        return getStockFlowPage(pageReqVO);
+    }
+
     public CommonResult<PageResult<WmsStockFlowRespVO>> getStockFlowPage(@Valid WmsStockFlowPageReqVO pageReqVO) {
         // 查询数据
         PageResult<WmsStockFlowDO> doPageResult = stockFlowService.getStockFlowPage(pageReqVO);
         // 转换
         PageResult<WmsStockFlowRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsStockFlowRespVO.class);
+
+        // 装配模型
+        stockFlowService.assembleProducts(voPageResult.getList());
+        stockFlowService.assembleWarehouse(voPageResult.getList());
+        stockFlowService.assembleBin(voPageResult.getList());
+        stockFlowService.assembleCompanyAndDept(voPageResult.getList());
+        stockFlowService.assembleInbound(voPageResult.getList());
+        stockFlowService.assembleOutbound(voPageResult.getList());
+        stockFlowService.assemblePickup(voPageResult.getList());
+
+
         // 返回
         return success(voPageResult);
     }
+
     // @GetMapping("/export-excel")
     // @Operation(summary = "导出库存流水 Excel")
     // @PreAuthorize("@ss.hasPermission('wms:stock-flow:export')")
@@ -124,4 +140,4 @@ public class WmsStockFlowController {
     // // 导出 Excel
     // ExcelUtils.write(response, "库存流水.xls", "数据", WmsStockFlowRespVO.class, BeanUtils.toBean(list, WmsStockFlowRespVO.class));
     // }
-}
+}

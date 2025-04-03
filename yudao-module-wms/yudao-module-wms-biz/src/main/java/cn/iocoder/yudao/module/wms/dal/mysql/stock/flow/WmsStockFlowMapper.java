@@ -1,12 +1,15 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.stock.flow;
 
-import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.flow.vo.WmsStockFlowPageReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.product.WmsProductDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.flow.WmsStockFlowDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.flow.vo.*;
+
+import java.util.List;
 
 /**
  * 库存流水 Mapper
@@ -17,25 +20,56 @@ import cn.iocoder.yudao.module.wms.controller.admin.stock.flow.vo.*;
 public interface WmsStockFlowMapper extends BaseMapperX<WmsStockFlowDO> {
 
     default PageResult<WmsStockFlowDO> selectPage(WmsStockFlowPageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<WmsStockFlowDO>()
-				.eqIfPresent(WmsStockFlowDO::getStockType, reqVO.getStockType())
-				.eqIfPresent(WmsStockFlowDO::getStockId, reqVO.getStockId())
-				.eqIfPresent(WmsStockFlowDO::getReason, reqVO.getReason())
-				.eqIfPresent(WmsStockFlowDO::getReasonBillId, reqVO.getReasonBillId())
-				.eqIfPresent(WmsStockFlowDO::getReasonItemId, reqVO.getReasonItemId())
-				.eqIfPresent(WmsStockFlowDO::getPrevFlowId, reqVO.getPrevFlowId())
-				.eqIfPresent(WmsStockFlowDO::getDeltaQty, reqVO.getDeltaQty())
-				.eqIfPresent(WmsStockFlowDO::getPurchasePlanQty, reqVO.getPurchasePlanQty())
-				.eqIfPresent(WmsStockFlowDO::getPurchaseTransitQty, reqVO.getPurchaseTransitQty())
-				.eqIfPresent(WmsStockFlowDO::getReturnTransitQty, reqVO.getReturnTransitQty())
-				.eqIfPresent(WmsStockFlowDO::getShelvingPendingQty, reqVO.getShelvingPendingQty())
-				.eqIfPresent(WmsStockFlowDO::getAvailableQty, reqVO.getAvailableQty())
-				.eqIfPresent(WmsStockFlowDO::getSellableQty, reqVO.getSellableQty())
-				.eqIfPresent(WmsStockFlowDO::getOutboundPendingQty, reqVO.getOutboundPendingQty())
-				.eqIfPresent(WmsStockFlowDO::getDefectiveQty, reqVO.getDefectiveQty())
-				.betweenIfPresent(WmsStockFlowDO::getFlowTime, reqVO.getFlowTime())
-				.betweenIfPresent(WmsStockFlowDO::getCreateTime, reqVO.getCreateTime())
-				.orderByDesc(WmsStockFlowDO::getId));
+
+
+        MPJLambdaWrapperX<WmsStockFlowDO> wrapper = new MPJLambdaWrapperX();
+
+        // 库存分类的固定条件
+        wrapper.eq(WmsStockFlowDO::getStockType, reqVO.getStockType());
+        wrapper.in(WmsStockFlowDO::getReason, reqVO.getReason());
+
+
+        // 连接产品视图
+        if(reqVO.getProductCode()!=null) {
+            wrapper.innerJoin(WmsProductDO.class, WmsProductDO::getId, WmsStockFlowDO::getProductId)
+                .likeIfExists(WmsProductDO::getBarCode, reqVO.getProductCode());
+        }
+
+        wrapper.eqIfPresent(WmsStockFlowDO::getWarehouseId, reqVO.getWarehouseId());
+        wrapper.eqIfPresent(WmsStockFlowDO::getDirection, reqVO.getDirection());
+        wrapper.eqIfPresent(WmsStockFlowDO::getProductId, reqVO.getProductId());
+
+
+
+//        if(reqVO.getZoneId()!=null) {
+//            wrapper.innerJoin(WmsWarehouseBinDO.class, WmsWarehouseBinDO::getId, WmsStockBinDO::getBinId)
+//                .eqIfExists(WmsWarehouseBinDO::getZoneId, reqVO.getZoneId());
+//        }
+//        // 按仓库
+//        wrapper.eqIfPresent(WmsStockBinDO::getWarehouseId, reqVO.getWarehouseId())
+//            // 按产品ID
+//            .eqIfPresent(WmsStockBinDO::getProductId, reqVO.getProductId())
+//            .eqIfPresent(WmsStockBinDO::getBinId, reqVO.getBinId())
+//        ;
+
+
+        wrapper.betweenIfPresent(WmsStockFlowDO::getAvailableQty,reqVO.getAvailableQty());
+        wrapper.betweenIfPresent(WmsStockFlowDO::getDefectiveQty,reqVO.getDefectiveQty());
+        wrapper.betweenIfPresent(WmsStockFlowDO::getDeltaQty,reqVO.getDeltaQty());
+
+
+        wrapper.betweenIfPresent(WmsStockFlowDO::getOutboundPendingQty,reqVO.getOutboundPendingQty());
+        wrapper.betweenIfPresent(WmsStockFlowDO::getPurchasePlanQty,reqVO.getPurchasePlanQty());
+        wrapper.betweenIfPresent(WmsStockFlowDO::getPurchaseTransitQty,reqVO.getPurchaseTransitQty());
+
+        wrapper.betweenIfPresent(WmsStockFlowDO::getReturnTransitQty,reqVO.getReturnTransitQty());
+        wrapper.betweenIfPresent(WmsStockFlowDO::getSellableQty,reqVO.getSellableQty());
+        wrapper.betweenIfPresent(WmsStockFlowDO::getShelvingPendingQty,reqVO.getShelvingPendingQty());
+
+        return selectPage(reqVO, wrapper);
+
+
+
     }
 
     /**
@@ -70,11 +104,7 @@ public interface WmsStockFlowMapper extends BaseMapperX<WmsStockFlowDO> {
         // 解决高并发插入冲突
         // List<WmsStockFlowDO> list=selectList(new LambdaQueryWrapperX<WmsStockFlowDO>().eq(WmsStockFlowDO::getWarehouseId, warehouseId).eq(WmsStockFlowDO::getStockType, stockType).eq(WmsStockFlowDO::getStockId, stockId).eq(WmsStockFlowDO::getNextFlowId, 0));
         // return list.isEmpty()?null:list.get(0);
-        LambdaQueryWrapperX<WmsStockFlowDO> wrapper =new LambdaQueryWrapperX<WmsStockFlowDO>()
-            .eq(WmsStockFlowDO::getWarehouseId, warehouseId)
-            .eq(WmsStockFlowDO::getStockType, stockType)
-            .eq(WmsStockFlowDO::getStockId, stockId)
-            .eq(WmsStockFlowDO::getNextFlowId, 0);
+        LambdaQueryWrapperX<WmsStockFlowDO> wrapper = new LambdaQueryWrapperX<WmsStockFlowDO>().eq(WmsStockFlowDO::getWarehouseId, warehouseId).eq(WmsStockFlowDO::getStockType, stockType).eq(WmsStockFlowDO::getStockId, stockId).eq(WmsStockFlowDO::getNextFlowId, 0);
         // 无并发
         return selectOne(wrapper);
     }

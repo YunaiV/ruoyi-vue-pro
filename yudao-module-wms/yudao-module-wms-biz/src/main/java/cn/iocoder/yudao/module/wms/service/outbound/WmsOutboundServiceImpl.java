@@ -247,6 +247,14 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     }
 
     @Override
+    public List<WmsOutboundDO> selectByIds(List<Long> list) {
+        if(CollectionUtils.isEmpty(list)) {
+            return List.of();
+        }
+        return outboundMapper.selectByIds(list);
+    }
+
+    @Override
     public WmsOutboundDO getOutbound(Long id) {
         return outboundMapper.selectById(id);
     }

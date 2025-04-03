@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsStockFlowDirection;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
 import cn.iocoder.yudao.module.wms.service.inbound.item.flow.WmsInboundItemFlowService;
 import jakarta.annotation.Resource;
@@ -48,7 +49,7 @@ public class OutboundFinishExecutor extends OutboundExecutor {
      * 更新仓库库存
      */
     @Override
-    protected void updateStockWarehouseQty(WmsStockWarehouseDO stockWarehouseDO, WmsOutboundItemRespVO item, Integer quantity) {
+    protected WmsStockFlowDirection updateStockWarehouseQty(WmsStockWarehouseDO stockWarehouseDO, WmsOutboundItemRespVO item, Integer quantity) {
 
         Integer actualQty=item.getActualQty();
 
@@ -58,6 +59,8 @@ public class OutboundFinishExecutor extends OutboundExecutor {
         stockWarehouseDO.setSellableQty(stockWarehouseDO.getSellableQty() - quantity);
         // 待出库量
         stockWarehouseDO.setOutboundPendingQty(stockWarehouseDO.getOutboundPendingQty() - actualQty);
+
+        return WmsStockFlowDirection.OUT;
     }
 
     /**
@@ -99,19 +102,21 @@ public class OutboundFinishExecutor extends OutboundExecutor {
      * 更新所有者库存
      **/
     @Override
-    protected void updateStockOwnershipQty(WmsStockOwnershipDO stockOwnershipDO, WmsOutboundItemRespVO item, Integer quantity) {
+    protected WmsStockFlowDirection updateStockOwnershipQty(WmsStockOwnershipDO stockOwnershipDO, WmsOutboundItemRespVO item, Integer quantity) {
         Integer actualQty=item.getActualQty();
         // 可用量
         stockOwnershipDO.setAvailableQty(stockOwnershipDO.getAvailableQty() - actualQty);
         // 待出库量
         stockOwnershipDO.setOutboundPendingQty(stockOwnershipDO.getOutboundPendingQty() - actualQty);
+
+        return WmsStockFlowDirection.OUT;
     }
 
     /**
      * 更新库存货位
      **/
     @Override
-    protected void updateStockBinQty(WmsStockBinDO stockBinDO,WmsOutboundItemRespVO item,  Integer quantity) {
+    protected  WmsStockFlowDirection updateStockBinQty(WmsStockBinDO stockBinDO,WmsOutboundItemRespVO item,  Integer quantity) {
         Integer actualQty=item.getActualQty();
         // 可用库存
         stockBinDO.setAvailableQty(stockBinDO.getAvailableQty() - actualQty);
@@ -119,6 +124,8 @@ public class OutboundFinishExecutor extends OutboundExecutor {
         stockBinDO.setSellableQty(stockBinDO.getSellableQty() - quantity);
         // 待出库量
         stockBinDO.setOutboundPendingQty(stockBinDO.getOutboundPendingQty() - actualQty);
+
+        return WmsStockFlowDirection.OUT;
     }
 
     /**

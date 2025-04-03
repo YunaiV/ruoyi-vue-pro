@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.wms.service.stock.ownership;
 
-import jakarta.validation.*;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.WmsStockOwnershipPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.WmsStockOwnershipRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.WmsStockOwnershipSaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
+import jakarta.validation.Valid;
+
 import java.util.List;
 
 /**
@@ -71,4 +74,6 @@ public interface WmsStockOwnershipService {
     void assembleDept(List<WmsStockOwnershipRespVO> list);
 
     void assembleCompany(List<WmsStockOwnershipRespVO> list);
+
+    List<WmsStockOwnershipDO> selectByIds(List<Long> stockOwnershipIds);
 }

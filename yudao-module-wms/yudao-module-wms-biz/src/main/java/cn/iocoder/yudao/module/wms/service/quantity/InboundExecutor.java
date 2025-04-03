@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimple
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsStockFlowDirection;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
 import cn.iocoder.yudao.module.wms.service.quantity.context.InboundContext;
 import lombok.extern.slf4j.Slf4j;
@@ -122,7 +123,7 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
         // 保存
         stockWarehouseService.insertOrUpdate(stockWarehouseDO);
         // 记录流水
-        stockFlowService.createForStockWarehouse(this.getReason(), productId, stockWarehouseDO, actualQuantity, inboundId, inboundItemId);
+        stockFlowService.createForStockWarehouse(this.getReason(), WmsStockFlowDirection.IN,productId, stockWarehouseDO, actualQuantity, inboundId, inboundItemId);
 
     }
 
@@ -152,7 +153,7 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
         // 保存
         stockOwnershipService.insertOrUpdate(stockOwnershipDO);
         // 记录流水
-        stockFlowService.createForStockOwner(this.getReason(), productId, stockOwnershipDO, actualQuantity, inboundId, inboundItemId);
+        stockFlowService.createForStockOwner(this.getReason(), WmsStockFlowDirection.IN, productId, stockOwnershipDO, actualQuantity, inboundId, inboundItemId);
     }
 
 

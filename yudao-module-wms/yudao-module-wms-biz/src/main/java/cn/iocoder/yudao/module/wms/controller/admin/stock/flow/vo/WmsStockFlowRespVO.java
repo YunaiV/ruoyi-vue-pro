@@ -1,16 +1,25 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.flow.vo;
 
+import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundSimpleRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundSimpleRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.pickup.vo.WmsPickupSimpleRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
-import java.time.LocalDateTime;
-import com.alibaba.excel.annotation.*;
+
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,reason,outbound_pending_qty,delta_qty,updater,update_time,product_id,shelving_pending_qty,id,reason_bill_id,defective_qty,purchase_plan_qty,creator,create_time,flow_time,available_qty,next_flow_id,purchase_transit_qty,stock_id,stock_type,return_transit_qty,sellable_qty,prev_flow_id,reason_item_id,warehouse_id
+ * @table-fields : tenant_id,reason,outbound_pending_qty,delta_qty,updater,update_time,product_id,shelving_pending_qty,id,reason_bill_id,defective_qty,purchase_plan_qty,direction,creator,create_time,flow_time,next_flow_id,available_qty,purchase_transit_qty,stock_id,stock_type,return_transit_qty,sellable_qty,warehouse_id,reason_item_id,prev_flow_id
  */
 @Schema(description = "管理后台 - 库存流水 Response VO")
 @Data
@@ -21,7 +30,7 @@ public class WmsStockFlowRespVO {
     @ExcelProperty("主键")
     private Long id;
 
-    @Schema(description = "库存类型 ; StockType : 1-仓库库存 , 2-仓位库存 , 3-所有者库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @Schema(description = "库存类型 ; WmsStockType : 1-仓库库存 , 2-仓位库存 , 3-所有者库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @ExcelProperty("库存类型")
     private Integer stockType;
 
@@ -29,7 +38,13 @@ public class WmsStockFlowRespVO {
     @ExcelProperty("库存ID")
     private Long stockId;
 
-    @Schema(description = "流水发生的原因 ; StockReason : 1-入库", requiredMode = Schema.RequiredMode.REQUIRED, example = "不香")
+    @Schema(description = "仓库", example = "")
+    private WmsWarehouseSimpleRespVO warehouse;
+
+    @Schema(description = "库位", example = "")
+    private WmsWarehouseBinRespVO bin;
+
+    @Schema(description = "流水发生的原因 ; WmsStockReason : 1-入库 , 2-拣货 , 3-出库 , 4-提交出库单 , 5-拒绝出库单", requiredMode = Schema.RequiredMode.REQUIRED, example = "不香")
     @ExcelProperty("流水发生的原因")
     private Integer reason;
 
@@ -78,12 +93,15 @@ public class WmsStockFlowRespVO {
     @ExcelProperty("产品ID")
     private Long productId;
 
+    @Schema(description = "产品", example = "")
+    private WmsProductRespSimpleVO product;
+
     @Schema(description = "仓库ID", example = "")
     @ExcelProperty("仓库ID")
     private Long warehouseId;
 
     @Schema(description = "可用量，在库的良品数量", example = "")
-    @ExcelProperty("可用量，在库的良品数量")
+    @ExcelProperty("可用量")
     private Integer availableQty;
 
     @Schema(description = "不良品数量", example = "")
@@ -111,10 +129,26 @@ public class WmsStockFlowRespVO {
     private Integer returnTransitQty;
 
     @Schema(description = "可售量，未被单据占用的良品数量", example = "")
-    @ExcelProperty("可售量，未被单据占用的良品数量")
+    @ExcelProperty("可售量")
     private Integer sellableQty;
 
     @Schema(description = "待上架数量", example = "")
     @ExcelProperty("待上架数量")
     private Integer shelvingPendingQty;
+
+    @Schema(description = "库存流水方向 ; WmsStockFlowDirection : -1-流出 , 1-流入", example = "")
+    @ExcelProperty("库存流水方向")
+    private Integer direction;
+
+    @Schema(description = "入库单", example = "")
+    private WmsInboundSimpleRespVO inbound;
+
+    @Schema(description = "出库单", example = "")
+    private WmsOutboundSimpleRespVO outbound;
+
+    @Schema(description = "拣货单", example = "")
+    private WmsPickupSimpleRespVO pickup;
+
+    @Schema(description = "部门", example = "")
+    private DeptSimpleRespVO dept;
 }

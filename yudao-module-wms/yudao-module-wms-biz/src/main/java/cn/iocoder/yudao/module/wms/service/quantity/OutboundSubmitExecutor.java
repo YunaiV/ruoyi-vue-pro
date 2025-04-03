@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsStockFlowDirection;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
 import org.springframework.stereotype.Component;
 
@@ -43,7 +44,7 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
      * 更新仓库库存
      **/
     @Override
-    protected void updateStockWarehouseQty(WmsStockWarehouseDO stockWarehouseDO, WmsOutboundItemRespVO item, Integer quantity) {
+    protected WmsStockFlowDirection updateStockWarehouseQty(WmsStockWarehouseDO stockWarehouseDO, WmsOutboundItemRespVO item, Integer quantity) {
 
         // 可用量
         // stockWarehouseDO.setAvailableQty(stockWarehouseDO.getAvailableQty() - quantity);
@@ -51,6 +52,8 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
         stockWarehouseDO.setSellableQty(stockWarehouseDO.getSellableQty() - quantity);
         // 待出库量
         stockWarehouseDO.setOutboundPendingQty(stockWarehouseDO.getOutboundPendingQty() + quantity);
+
+        return WmsStockFlowDirection.OUT;
 
     }
 
@@ -147,24 +150,28 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
      * 更新所有者库存
      **/
     @Override
-    protected void updateStockOwnershipQty(WmsStockOwnershipDO stockOwnershipDO, WmsOutboundItemRespVO item, Integer quantity) {
+    protected  WmsStockFlowDirection updateStockOwnershipQty(WmsStockOwnershipDO stockOwnershipDO, WmsOutboundItemRespVO item, Integer quantity) {
         // 可用量
         // stockOwnershipDO.setAvailableQty(stockOwnershipDO.getAvailableQty()-quantity);
         // 待出库量
         stockOwnershipDO.setOutboundPendingQty(stockOwnershipDO.getOutboundPendingQty()+quantity);
+
+        return WmsStockFlowDirection.IN;
     }
 
     /**
      * 更新库存货位
      **/
     @Override
-    protected void updateStockBinQty(WmsStockBinDO stockBinDO, WmsOutboundItemRespVO item, Integer quantity) {
+    protected  WmsStockFlowDirection updateStockBinQty(WmsStockBinDO stockBinDO, WmsOutboundItemRespVO item, Integer quantity) {
         // 可用库存
         // stockBinDO.setAvailableQty(stockBinDO.getAvailableQty() - quantity);
         // 可售库存
         stockBinDO.setSellableQty(stockBinDO.getSellableQty() - quantity);
         // 待出库量
         stockBinDO.setOutboundPendingQty(stockBinDO.getOutboundPendingQty() + quantity);
+
+        return WmsStockFlowDirection.OUT;
     }
 
     /**

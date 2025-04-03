@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.pickup.vo.WmsPickupPageReqVO
 import cn.iocoder.yudao.module.wms.controller.admin.pickup.vo.WmsPickupSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.WmsPickupDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
@@ -248,5 +249,13 @@ public class WmsPickupServiceImpl implements WmsPickupService {
     @Override
     public PageResult<WmsPickupDO> getPickupPage(WmsPickupPageReqVO pageReqVO) {
         return pickupMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<WmsPickupDO> selectByIds(List<Long> list) {
+        if(CollectionUtils.isEmpty(list)) {
+            return List.of();
+        }
+        return pickupMapper.selectByIds(list);
     }
 }

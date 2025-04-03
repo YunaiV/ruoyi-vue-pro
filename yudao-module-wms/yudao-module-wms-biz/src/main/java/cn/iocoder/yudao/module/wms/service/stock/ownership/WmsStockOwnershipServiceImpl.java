@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.stock.ownership;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
@@ -201,5 +202,13 @@ public class WmsStockOwnershipServiceImpl implements WmsStockOwnershipService {
     @Override
     public void assembleCompany(List<WmsStockOwnershipRespVO> list) {
         //todo 待东宇财务模块支持
+    }
+
+    @Override
+    public List<WmsStockOwnershipDO> selectByIds(List<Long> stockOwnershipIds) {
+        if(CollectionUtils.isEmpty(stockOwnershipIds)) {
+            return List.of();
+        }
+        return stockOwnershipMapper.selectByIds(stockOwnershipIds);
     }
 }

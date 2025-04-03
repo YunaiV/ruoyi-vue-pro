@@ -1,11 +1,15 @@
 package cn.iocoder.yudao.module.wms.service.outbound;
 
-import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
-import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
-import jakarta.validation.*;
-import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundSaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
+import jakarta.validation.Valid;
+
+import java.util.List;
 
 /**
  * 出库单 Service 接口
@@ -61,4 +65,6 @@ public interface WmsOutboundService {
     void finishOutbound(WmsOutboundRespVO outboundRespVO);
 
     WmsOutboundDO validateOutboundExists(Long id);
+
+    List<WmsOutboundDO> selectByIds(List<Long> list);
 }

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo;
 
-import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
@@ -85,7 +85,7 @@ public class WmsInboundItemRespVO {
 
     @Schema(description = "入库单", example = "")
     @ExcelProperty("入库单")
-    private WmsInboundRespVO inbound;
+    private WmsInboundSimpleRespVO inbound;
 
     @Schema(description = "实际入库量", example = "")
     @ExcelProperty("实际入库量")
@@ -116,6 +116,10 @@ public class WmsInboundItemRespVO {
 
     @Schema(description = "库位", example = "")
     private WmsWarehouseBinRespVO bin;
+
+
+
+
 
 
 
