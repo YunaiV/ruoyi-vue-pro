@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.srm.config.purchase;
 
+import cn.hutool.core.util.URLUtil;
 import com.aspose.words.Document;
 import com.aspose.words.SaveFormat;
 import com.deepoove.poi.XWPFTemplate;
@@ -19,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -52,6 +54,12 @@ public class PurchaseOrderTemplateManager {
         this.configure = builder.build();
     }
 
+    /**
+     * 获取模板
+     *
+     * @param templateName 相对路径文件 purchase/order/采购合同模板.docx
+     * @return XWPFTemplate
+     */
     public XWPFTemplate getTemplate(String templateName) {
         byte[] templateBytes = templateCache.computeIfAbsent(templateName, name -> {
             try {
@@ -91,8 +99,8 @@ public class PurchaseOrderTemplateManager {
                 long wordStart = System.currentTimeMillis();
                 for (Resource resource : resources) {
                     try {
-                        log.info("模板文件：{}", resource.getFilename());
                         String templateName = extractTemplateName(resource);
+                        log.info("模板文件：{}", templateName);
                         getTemplate(templateName);
                     } catch (Exception e) {
                         log.error("⚠️ Word 模板预热失败（已忽略）：{}", resource.getFilename(), e);
@@ -134,7 +142,7 @@ public class PurchaseOrderTemplateManager {
         if (index == -1) {
             throw new IOException("无法解析模板路径，未包含扫描路径: " + templateScanPath);
         }
-        return path.substring(index + 1); // 去掉前导斜杠
+        return URLUtil.decode(path.substring(index + 1), StandardCharsets.UTF_8);
     }
 }
 
