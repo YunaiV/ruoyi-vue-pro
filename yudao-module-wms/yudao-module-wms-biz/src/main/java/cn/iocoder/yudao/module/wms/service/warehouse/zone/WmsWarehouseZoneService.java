@@ -59,4 +59,6 @@ public interface WmsWarehouseZoneService {
     List<WmsWarehouseZoneDO> selectByWarehouseId(Long warehouseId, int limit);
 
     List<WmsWarehouseZoneDO> getSimpleList(@Valid WmsWarehouseZonePageReqVO pageReqVO);
+
+    List<WmsWarehouseZoneDO> selectByIds(List<Long> list);
 }

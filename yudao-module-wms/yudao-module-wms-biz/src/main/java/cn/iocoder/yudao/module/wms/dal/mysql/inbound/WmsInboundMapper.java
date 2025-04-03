@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.inbound;
 
-import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundPageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.*;
+
+import java.util.List;
 
 /**
  * 入库单 Mapper
@@ -70,4 +71,15 @@ public interface WmsInboundMapper extends BaseMapperX<WmsInboundDO> {
         wrapper.eq(WmsInboundDO::getWarehouseId, warehouseId);
         return selectPage(reqVO, wrapper).getList();
     }
-}
+
+    default List<WmsInboundDO> getSimpleList(WmsInboundPageReqVO pageReqVO) {
+        LambdaQueryWrapperX<WmsInboundDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.likeIfPresent(WmsInboundDO::getNo, pageReqVO.getNo());
+        wrapper.likeIfPresent(WmsInboundDO::getTraceNo, pageReqVO.getTraceNo());
+        wrapper.likeIfPresent(WmsInboundDO::getSourceBillNo, pageReqVO.getSourceBillNo());
+        wrapper.eqIfPresent(WmsInboundDO::getType, pageReqVO.getType());
+        wrapper.eqIfPresent(WmsInboundDO::getWarehouseId, pageReqVO.getWarehouseId());
+        wrapper.eqIfPresent(WmsInboundDO::getTraceNo, pageReqVO.getTraceNo());
+        return selectList(wrapper);
+    }
+}

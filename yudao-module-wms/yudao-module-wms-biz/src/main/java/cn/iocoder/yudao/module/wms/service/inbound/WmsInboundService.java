@@ -75,4 +75,6 @@ public interface WmsInboundService {
     void finishInbound(WmsInboundRespVO inboundRespVO);
 
     List<WmsInboundDO> selectByIds(List<Long> ids);
+
+    List<WmsInboundDO> getSimpleList(@Valid WmsInboundPageReqVO pageReqVO);
 }

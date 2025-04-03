@@ -349,4 +349,9 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         }
         return inboundMapper.selectByIds(ids);
     }
+
+    @Override
+    public List<WmsInboundDO> getSimpleList(WmsInboundPageReqVO pageReqVO) {
+        return inboundMapper.getSimpleList(pageReqVO);
+    }
 }

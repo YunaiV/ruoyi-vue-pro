@@ -187,4 +187,12 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
     public List<WmsWarehouseDO> getSimpleList(WmsWarehousePageReqVO pageReqVO) {
         return warehouseMapper.getSimpleList(pageReqVO);
     }
+
+    @Override
+    public List<WmsWarehouseDO> selectByIds(List<Long> ids) {
+        if(CollectionUtils.isEmpty(ids)) {
+            return List.of();
+        }
+        return warehouseMapper.selectByIds(ids);
+    }
 }

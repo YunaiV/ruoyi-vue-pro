@@ -20,7 +20,8 @@ public interface WmsWarehouseMapper extends BaseMapperX<WmsWarehouseDO> {
     default PageResult<WmsWarehouseDO> selectPage(WmsWarehousePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<WmsWarehouseDO>()
 				.eqIfPresent(WmsWarehouseDO::getMode, reqVO.getMode())
-				.eqIfPresent(WmsWarehouseDO::getCode, reqVO.getCode())
+				.likeIfPresent(WmsWarehouseDO::getCode, reqVO.getCode())
+                .eqIfPresent(WmsWarehouseDO::getStatus, reqVO.getStatus())
 				.likeIfPresent(WmsWarehouseDO::getName, reqVO.getName())
 				.eqIfPresent(WmsWarehouseDO::getExternalStorageId, reqVO.getExternalStorageId())
 				.likeIfPresent(WmsWarehouseDO::getCompanyName, reqVO.getCompanyName())

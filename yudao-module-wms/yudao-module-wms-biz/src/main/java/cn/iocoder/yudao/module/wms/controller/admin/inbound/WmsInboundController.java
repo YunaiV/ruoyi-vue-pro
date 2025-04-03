@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsAppro
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundSimpleRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
@@ -155,6 +156,21 @@ public class WmsInboundController {
 			.fill();
         // 返回
         return success(voPageResult);
+    }
+
+    /**
+     * @sign : 1F430B4B7632C52B
+     */
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得入库精简列表")
+    @PreAuthorize("@ss.hasPermission('wms:inbound:query')")
+    public CommonResult<List<WmsInboundSimpleRespVO>> getInboundSimpleList(@Valid WmsInboundPageReqVO pageReqVO) {
+        // 查询数据
+        List<WmsInboundDO> doList = inboundService.getSimpleList(pageReqVO);
+        // 转换
+        List<WmsInboundSimpleRespVO> voList = BeanUtils.toBean(doList, WmsInboundSimpleRespVO.class);
+
+        return success(voList);
     }
 
     @GetMapping("/export-excel")

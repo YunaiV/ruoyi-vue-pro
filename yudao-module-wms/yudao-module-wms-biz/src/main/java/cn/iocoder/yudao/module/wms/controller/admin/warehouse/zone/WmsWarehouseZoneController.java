@@ -4,14 +4,18 @@ import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.zone.vo.WmsWarehouseZonePageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.zone.vo.WmsWarehouseZoneRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.zone.vo.WmsWarehouseZoneSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.zone.vo.WmsWarehouseZoneSimpleRespVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.zone.WmsWarehouseZoneDO;
+import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import cn.iocoder.yudao.module.wms.service.warehouse.zone.WmsWarehouseZoneService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -46,6 +50,9 @@ public class WmsWarehouseZoneController {
 
     @Resource
     private WmsWarehouseZoneService warehouseZoneService;
+
+    @Resource
+    private WmsWarehouseService warehouseService;
 
     /**
      * @sign : 3414BB55B7829714
@@ -121,6 +128,13 @@ public class WmsWarehouseZoneController {
         PageResult<WmsWarehouseZoneDO> doPageResult = warehouseZoneService.getWarehouseZonePage(pageReqVO);
         // 转换
         PageResult<WmsWarehouseZoneRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsWarehouseZoneRespVO.class);
+
+        // 装配仓库
+        List<WmsWarehouseDO> warehouseDOList = warehouseService.selectByIds(StreamX.from(voPageResult.getList()).toList(WmsWarehouseZoneRespVO::getWarehouseId));
+        StreamX.from(voPageResult.getList()).assemble(warehouseDOList, WmsWarehouseDO::getId, WmsWarehouseZoneRespVO::getWarehouseId, (b,w)->{
+            b.setWarehouse(BeanUtils.toBean(w, WmsWarehouseSimpleRespVO.class));
+        });
+
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
 			.mapping(WmsWarehouseZoneRespVO::getCreator, WmsWarehouseZoneRespVO::setCreatorName)

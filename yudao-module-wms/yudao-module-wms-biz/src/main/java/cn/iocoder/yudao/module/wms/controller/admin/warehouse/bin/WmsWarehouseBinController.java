@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -11,8 +12,14 @@ import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehous
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinSimpleRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.zone.vo.WmsWarehouseZoneSimpleRespVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.zone.WmsWarehouseZoneDO;
+import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import cn.iocoder.yudao.module.wms.service.warehouse.bin.WmsWarehouseBinService;
+import cn.iocoder.yudao.module.wms.service.warehouse.zone.WmsWarehouseZoneService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,6 +53,12 @@ public class WmsWarehouseBinController {
 
     @Resource
     private WmsWarehouseBinService warehouseBinService;
+
+    @Resource
+    private WmsWarehouseService warehouseService;
+
+    @Resource
+    private WmsWarehouseZoneService warehouseZoneService;
 
     /**
      * @sign : 9D03CAD0A777558E
@@ -121,6 +134,16 @@ public class WmsWarehouseBinController {
         PageResult<WmsWarehouseBinDO> doPageResult = warehouseBinService.getWarehouseBinPage(pageReqVO);
         // 转换
         PageResult<WmsWarehouseBinRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsWarehouseBinRespVO.class);
+        // 装配仓库
+        List<WmsWarehouseDO> warehouseDOList = warehouseService.selectByIds(StreamX.from(voPageResult.getList()).toList(WmsWarehouseBinRespVO::getWarehouseId));
+        StreamX.from(voPageResult.getList()).assemble(warehouseDOList, WmsWarehouseDO::getId, WmsWarehouseBinRespVO::getWarehouseId, (b,w)->{
+            b.setWarehouse(BeanUtils.toBean(w, WmsWarehouseSimpleRespVO.class));
+        });
+        // 装配库区
+        List<WmsWarehouseZoneDO> warehouseZoneDOList = warehouseZoneService.selectByIds(StreamX.from(voPageResult.getList()).toList(WmsWarehouseBinRespVO::getZoneId));
+        StreamX.from(voPageResult.getList()).assemble(warehouseZoneDOList, WmsWarehouseZoneDO::getId, WmsWarehouseBinRespVO::getZoneId, (b,w)->{
+            b.setZone(BeanUtils.toBean(w, WmsWarehouseZoneSimpleRespVO.class));
+        });
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
 			.mapping(WmsWarehouseBinRespVO::getCreator, WmsWarehouseBinRespVO::setCreatorName)

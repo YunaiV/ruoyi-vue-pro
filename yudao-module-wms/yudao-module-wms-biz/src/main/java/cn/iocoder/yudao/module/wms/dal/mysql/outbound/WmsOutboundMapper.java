@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.outbound;
 
-import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundPageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.*;
+
+import java.util.List;
 
 /**
  * 出库单 Mapper
@@ -53,4 +54,12 @@ public interface WmsOutboundMapper extends BaseMapperX<WmsOutboundDO> {
     default List<WmsOutboundDO> selectByType(Integer type) {
         return selectList(new LambdaQueryWrapperX<WmsOutboundDO>().eq(WmsOutboundDO::getType, type));
     }
-}
+
+    default List<WmsOutboundDO> getSimpleList(WmsOutboundPageReqVO pageReqVO) {
+        LambdaQueryWrapperX<WmsOutboundDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.likeIfPresent(WmsOutboundDO::getNo, pageReqVO.getNo());
+        wrapper.eqIfPresent(WmsOutboundDO::getWarehouseId, pageReqVO.getWarehouseId());
+        wrapper.eqIfPresent(WmsOutboundDO::getType, pageReqVO.getType());
+        return selectList(wrapper);
+    }
+}

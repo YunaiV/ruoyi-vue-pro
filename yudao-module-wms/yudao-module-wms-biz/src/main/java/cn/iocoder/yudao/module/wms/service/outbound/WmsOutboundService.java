@@ -67,4 +67,6 @@ public interface WmsOutboundService {
     WmsOutboundDO validateOutboundExists(Long id);
 
     List<WmsOutboundDO> selectByIds(List<Long> list);
+
+    List<WmsOutboundDO> getSimpleList(@Valid WmsOutboundPageReqVO pageReqVO);
 }

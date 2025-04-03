@@ -255,6 +255,11 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     }
 
     @Override
+    public List<WmsOutboundDO> getSimpleList(WmsOutboundPageReqVO pageReqVO) {
+        return outboundMapper.getSimpleList(pageReqVO);
+    }
+
+    @Override
     public WmsOutboundDO getOutbound(Long id) {
         return outboundMapper.selectById(id);
     }

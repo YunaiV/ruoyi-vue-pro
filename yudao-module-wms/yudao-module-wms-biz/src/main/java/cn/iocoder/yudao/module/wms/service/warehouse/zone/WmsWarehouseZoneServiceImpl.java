@@ -144,4 +144,12 @@ public class WmsWarehouseZoneServiceImpl implements WmsWarehouseZoneService {
     public List<WmsWarehouseZoneDO> getSimpleList(WmsWarehouseZonePageReqVO pageReqVO) {
         return warehouseZoneMapper.getSimpleList(pageReqVO);
     }
+
+    @Override
+    public List<WmsWarehouseZoneDO> selectByIds(List<Long> ids) {
+        if(CollectionUtils.isEmpty(ids)) {
+            return List.of();
+        }
+        return warehouseZoneMapper.selectByIds(ids);
+    }
 }

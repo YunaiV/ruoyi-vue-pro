@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsAppro
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundSimpleRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.outbound.WmsOutboundService;
@@ -113,6 +114,22 @@ public class WmsOutboundController {
 			.mapping(WmsOutboundRespVO::getCreator, WmsOutboundRespVO::setCreatorName)
 			.mapping(WmsOutboundRespVO::getCreator, WmsOutboundRespVO::setUpdaterName)
 			.fill();
+        // 返回
+        return success(voPageResult);
+    }
+
+
+    /**
+     * @sign : 352DBC195CCFA967
+     */
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得出库单精简列表")
+    @PreAuthorize("@ss.hasPermission('wms:outbound:query')")
+    public CommonResult<List<WmsOutboundSimpleRespVO>> getOutboundSimpleList(@Valid WmsOutboundPageReqVO pageReqVO) {
+        // 查询数据
+        List<WmsOutboundDO> doPageResult = outboundService.getSimpleList(pageReqVO);
+        // 转换
+        List<WmsOutboundSimpleRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsOutboundSimpleRespVO.class);
         // 返回
         return success(voPageResult);
     }
