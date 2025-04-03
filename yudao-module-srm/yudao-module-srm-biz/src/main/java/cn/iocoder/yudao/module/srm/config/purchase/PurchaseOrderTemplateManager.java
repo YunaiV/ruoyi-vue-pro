@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.srm.config.purchase;
 
-import cn.hutool.core.util.URLUtil;
 import com.aspose.words.Document;
 import com.aspose.words.SaveFormat;
 import com.deepoove.poi.XWPFTemplate;
@@ -20,9 +19,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -57,51 +56,53 @@ public class PurchaseOrderTemplateManager {
     /**
      * 获取模板
      *
-     * @param templateName 相对路径文件 purchase/order/采购合同模板.docx
+     * @param path 相对路径文件 purchase/order/采购合同模板.docx
      * @return XWPFTemplate
      */
-    public XWPFTemplate getTemplate(String templateName) {
-        byte[] templateBytes = templateCache.computeIfAbsent(templateName, name -> {
+    public XWPFTemplate getTemplate(String path) {
+        byte[] templateBytes = templateCache.computeIfAbsent(path, p -> {
             try {
-                Resource resource = resourcePatternResolver.getResource("classpath:" + name);
+                Resource resource = resourcePatternResolver.getResource("classpath:" + p);
                 if (!resource.exists()) {
-                    throw exception(PURCHASE_ORDER_GENERATE_CONTRACT_FAIL, name, "模板文件不存在");
+                    throw exception(PURCHASE_ORDER_GENERATE_CONTRACT_FAIL, p, "模板文件不存在");
                 }
                 try (InputStream stream = resource.getInputStream()) {
                     byte[] bytes = stream.readAllBytes();
-                    log.info("采购模板加载成功并缓存: {}", name);
+                    log.info("采购模板加载成功并缓存: {}", p);
                     return bytes;
                 }
             } catch (IOException e) {
-                throw exception(PURCHASE_ORDER_GENERATE_CONTRACT_FAIL, name, e.getMessage());
+                throw exception(PURCHASE_ORDER_GENERATE_CONTRACT_FAIL, p, e.getMessage());
             }
         });
 
         try (InputStream input = new ByteArrayInputStream(templateBytes)) {
             return XWPFTemplate.compile(input, configure);
         } catch (IOException e) {
-            throw exception(PURCHASE_ORDER_GENERATE_CONTRACT_FAIL_PARSE, templateName, e.getMessage());
+            throw exception(PURCHASE_ORDER_GENERATE_CONTRACT_FAIL_PARSE, path, e.getMessage());
         }
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void preloadTemplates() {
-        // 默认跳过缓存
         if (!enablePreload) {
             return;
         }
         try {
-            //扫描指定文件夹下所有 .docx 模板
             Resource[] resources = resourcePatternResolver.getResources("classpath:" + templateScanPath + "*.docx");
             log.info("检测到 {} 个模板文件：", resources.length);
+
             CompletableFuture.runAsync(() -> {
                 log.info("[1] 开始加载 Word 模板...");
                 long wordStart = System.currentTimeMillis();
-                for (Resource resource : resources) {
+                //获取文件名列表
+                for (org.springframework.core.io.Resource resource : resources) {
                     try {
-                        String templateName = extractTemplateName(resource);
-                        log.info("模板文件：{}", templateName);
-                        getTemplate(templateName);
+                        Optional.ofNullable(resource.getFilename()).ifPresent(fileName -> {
+                            if (fileName.endsWith(".docx")) {
+                                getTemplate(templateScanPath + fileName);
+                            }
+                        });
                     } catch (Exception e) {
                         log.error("⚠️ Word 模板预热失败（已忽略）：{}", resource.getFilename(), e);
                     }
@@ -110,17 +111,16 @@ public class PurchaseOrderTemplateManager {
             }).thenRunAsync(() -> {
                 for (Resource resource : resources) {
                     try {
-                        String templateName = extractTemplateName(resource);
-                        byte[] templateBytes = templateCache.get(templateName);
+                        byte[] templateBytes = templateCache.get(templateScanPath + resource.getFilename());
                         if (templateBytes != null) {
                             try (InputStream input = new ByteArrayInputStream(templateBytes)) {
                                 long pdfStart = System.currentTimeMillis();
                                 Document doc = new Document(input);
                                 doc.save(new ByteArrayOutputStream(), SaveFormat.PDF);
-                                log.info("[2] PDF 引擎预热完成 [{}]，耗时 {}ms", templateName, System.currentTimeMillis() - pdfStart);
+                                log.info("[2] PDF 引擎预热完成 [{}]，耗时 {}ms", resource.getFilename(), System.currentTimeMillis() - pdfStart);
                             }
                         } else {
-                            log.warn("⚠️ PDF 引擎预热跳过：模板 [{}] 未成功加载", templateName);
+                            log.warn("⚠️ PDF 引擎预热跳过：模板 [{}] 未成功加载", resource.getFilename());
                         }
                     } catch (Exception e) {
                         log.warn("⚠️ PDF 引擎预热失败", e);
@@ -132,17 +132,6 @@ public class PurchaseOrderTemplateManager {
         }
     }
 
-    /**
-     * 提取模板路径相对 classpath 的路径（用于缓存键）
-     */
-    private String extractTemplateName(Resource resource) throws IOException {
-        String path = resource.getURL().getPath();
-        String normalizedScanPath = templateScanPath.startsWith("/") ? templateScanPath : "/" + templateScanPath;
-        int index = path.indexOf(normalizedScanPath);
-        if (index == -1) {
-            throw new IOException("无法解析模板路径，未包含扫描路径: " + templateScanPath);
-        }
-        return URLUtil.decode(path.substring(index + 1), StandardCharsets.UTF_8);
-    }
+
 }
 
