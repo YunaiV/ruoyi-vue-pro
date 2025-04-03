@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.component.emqx.upstream;
 
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.component.core.heartbeat.IotComponentRegistry;
 import cn.iocoder.yudao.module.iot.component.emqx.config.IotComponentEmqxProperties;
@@ -29,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class IotDeviceUpstreamServer {
 
+    // TODO @haohao：抽到 IotComponentEmqxProperties 里？
     /**
      * 重连延迟时间(毫秒)
      */
@@ -101,7 +103,7 @@ public class IotDeviceUpstreamServer {
         CompletableFuture<Void> httpFuture = server.listen(finalAuthPort)
                 .toCompletionStage()
                 .toCompletableFuture()
-                .thenAccept(v -> log.info("[start][HTTP服务器启动完成，端口: {}]", server.actualPort()));
+                .thenAccept(v -> log.info("[start][HTTP 服务器启动完成，端口: {}]", server.actualPort()));
 
         // 2. 连接 MQTT Broker
         CompletableFuture<Void> mqttFuture = connectMqtt()
@@ -110,7 +112,7 @@ public class IotDeviceUpstreamServer {
                 .thenAccept(v -> {
                     // 2.1 添加 MQTT 断开重连监听器
                     client.closeHandler(closeEvent -> {
-                        log.warn("[closeHandler][MQTT连接已断开，准备重连]");
+                        log.warn("[closeHandler][MQTT 连接已断开，准备重连]");
                         reconnectWithDelay();
                     });
                     // 2. 设置 MQTT 消息处理器
@@ -135,7 +137,7 @@ public class IotDeviceUpstreamServer {
      */
     private void setupMessageHandler() {
         client.publishHandler(mqttMessageHandler::handle);
-        log.debug("[setupMessageHandler][MQTT消息处理器设置完成]");
+        log.debug("[setupMessageHandler][MQTT 消息处理器设置完成]");
     }
 
     /**
@@ -159,22 +161,20 @@ public class IotDeviceUpstreamServer {
      * @return 连接结果的Future
      */
     private Future<Void> connectMqtt() {
-        // 检查必要的MQTT配置
+        // 检查必要的 MQTT 配置
         String host = emqxProperties.getMqttHost();
         Integer port = emqxProperties.getMqttPort();
-
         if (host == null) {
-            String msg = "[connectMqtt][MQTT Host为null，无法连接]";
+            String msg = "[connectMqtt][MQTT Host 为 null，无法连接]";
             log.error(msg);
             return Future.failedFuture(new IllegalStateException(msg));
         }
-
         if (port == null) {
-            log.warn("[connectMqtt][MQTT Port为null，使用默认端口1883]");
-            port = 1883; // 默认MQTT端口
+            log.warn("[connectMqtt][MQTT Port 为 null，使用默认端口 1883]");
+            port = 1883; // 默认 MQTT 端口
         }
 
-        final Integer finalPort = port; // 为lambda表达式创建final变量
+        final Integer finalPort = port;
         return client.connect(finalPort, host)
                 .compose(connAck -> {
                     log.info("[connectMqtt][MQTT客户端连接成功]");
@@ -195,19 +195,15 @@ public class IotDeviceUpstreamServer {
     private Future<Void> subscribeToTopics() {
         String[] topics = emqxProperties.getMqttTopics();
         if (ArrayUtil.isEmpty(topics)) {
-            log.warn("[subscribeToTopics][未配置MQTT主题或为null，使用默认主题]");
-            // 默认订阅所有设备上下行主题
-            topics = new String[]{"/device/#"};
+            log.warn("[subscribeToTopics][未配置 MQTT 主题或为 null，使用默认主题]");
+            topics = new String[]{"/device/#"}; // 默认订阅所有设备上下行主题
         }
         log.info("[subscribeToTopics][开始订阅设备上行消息主题]");
 
         Future<Void> compositeFuture = Future.succeededFuture();
         for (String topic : topics) {
-            if (topic == null) {
-                continue; // 跳过null主题
-            }
-            String trimmedTopic = topic.trim();
-            if (trimmedTopic.isEmpty()) {
+            String trimmedTopic = StrUtil.trim(topic);
+            if (StrUtil.isBlank(trimmedTopic)) {
                 continue;
             }
             compositeFuture = compositeFuture.compose(v -> client.subscribe(trimmedTopic, DEFAULT_QOS.value())

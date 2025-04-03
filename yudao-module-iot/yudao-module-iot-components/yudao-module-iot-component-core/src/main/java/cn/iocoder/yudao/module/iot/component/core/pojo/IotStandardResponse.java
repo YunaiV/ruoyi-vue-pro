@@ -62,13 +62,8 @@ public class IotStandardResponse {
      * @return 成功响应
      */
     public static IotStandardResponse success(String id, String method, Object data) {
-        return new IotStandardResponse()
-                .setId(id)
-                .setCode(200)
-                .setData(data)
-                .setMessage("success")
-                .setMethod(method)
-                .setVersion("1.0");
+        return new IotStandardResponse().setId(id).setCode(200).setData(data).setMessage("success")
+                .setMethod(method).setVersion("1.0");
     }
 
     /**
@@ -81,13 +76,8 @@ public class IotStandardResponse {
      * @return 错误响应
      */
     public static IotStandardResponse error(String id, String method, Integer code, String message) {
-        return new IotStandardResponse()
-                .setId(id)
-                .setCode(code)
-                .setData(null)
-                .setMessage(message)
-                .setMethod(method)
-                .setVersion("1.0");
+        return new IotStandardResponse().setId(id).setCode(code).setData(null).setMessage(message)
+                .setMethod(method).setVersion("1.0");
     }
 
 }

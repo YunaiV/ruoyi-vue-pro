@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.component.core.heartbeat;
 
 import lombok.Data;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +8,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+// TODO @haohao：组件相关的注释，要不把 组件 => 网络组件？可能更容易理解？
+// TODO @haohao：yudao-module-iot-components => yudao-module-iot-net-components 增加一个 net 如何？虽然会长一点，但是意思更精准？
 /**
  * IoT 组件注册表
  * <p>
@@ -22,14 +23,14 @@ public class IotComponentRegistry {
      * 组件信息
      */
     @Data
-    @ToString
     public static class IotComponentInfo {
+
         /**
-         * 组件Key
+         * 组件 Key
          */
         private final String pluginKey;
         /**
-         * 主机IP
+         * 主机 IP
          */
         private final String hostIp;
         /**
@@ -37,23 +38,24 @@ public class IotComponentRegistry {
          */
         private final Integer downstreamPort;
         /**
-         * 进程ID
+         * 进程 ID
          */
         private final String processId;
+
     }
 
     /**
-     * 组件映射表，key为组件Key
+     * 组件映射表：key 为组件 Key
      */
     private final Map<String, IotComponentInfo> components = new ConcurrentHashMap<>();
 
     /**
      * 注册组件
      *
-     * @param pluginKey      组件Key
-     * @param hostIp         主机IP
+     * @param pluginKey      组件 Key
+     * @param hostIp         主机 IP
      * @param downstreamPort 下游端口
-     * @param processId      进程ID
+     * @param processId      进程 ID
      */
     public void registerComponent(String pluginKey, String hostIp, Integer downstreamPort, String processId) {
         log.info("[registerComponent][注册组件, pluginKey={}, hostIp={}, downstreamPort={}, processId={}]",
@@ -64,7 +66,7 @@ public class IotComponentRegistry {
     /**
      * 注销组件
      *
-     * @param pluginKey 组件Key
+     * @param pluginKey 组件 Key
      */
     public void unregisterComponent(String pluginKey) {
         log.info("[unregisterComponent][注销组件, pluginKey={}]", pluginKey);
@@ -83,10 +85,11 @@ public class IotComponentRegistry {
     /**
      * 获取指定组件
      *
-     * @param pluginKey 组件Key
+     * @param pluginKey 组件 Key
      * @return 组件信息
      */
     public IotComponentInfo getComponent(String pluginKey) {
         return components.get(pluginKey);
     }
+
 }

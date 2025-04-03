@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * IoT HTTP组件配置属性
+ * IoT HTTP 组件配置属性
  */
 @ConfigurationProperties(prefix = "yudao.iot.component.http")
 @Validated

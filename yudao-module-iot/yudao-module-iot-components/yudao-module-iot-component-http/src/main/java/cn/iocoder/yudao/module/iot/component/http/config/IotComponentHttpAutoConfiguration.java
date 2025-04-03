@@ -19,6 +19,7 @@ import org.springframework.context.event.EventListener;
 
 import java.lang.management.ManagementFactory;
 
+// TODO @haohao：类似 IotComponentEmqxAutoConfiguration 的建议
 /**
  * IoT 组件 HTTP 的自动配置类
  *

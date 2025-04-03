@@ -16,7 +16,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
  */
 @RestController
 @Validated
-@Primary
+@Primary // 保证优先匹配，因为 yudao-module-iot-component-core 也有 IotDeviceUpstreamApi 的实现，并且也可能会被 biz 引入
 public class IoTDeviceUpstreamApiImpl implements IotDeviceUpstreamApi {
 
     @Resource

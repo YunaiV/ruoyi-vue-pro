@@ -9,6 +9,7 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.ext.web.RoutingContext;
 import org.springframework.http.MediaType;
 
+// TODO @haohao：名字要改下哈。
 /**
  * IoT 插件的通用工具类
  *

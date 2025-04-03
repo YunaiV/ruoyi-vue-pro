@@ -167,6 +167,7 @@ public class IotDeviceDownstreamHandlerImpl implements IotDeviceDownstreamHandle
         log.info("[publishMessage][发送消息成功][topic: {}][payload: {}]", topic, payload);
     }
 
+    // TODO @haohao：这个要不抽到 IotPluginCommonUtils 里？
     /**
      * 生成请求 ID
      */

@@ -24,13 +24,15 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class IotComponentCommonAutoConfiguration {
 
     /**
-     * 创建EMQX设备下行服务器
-     * 当yudao.iot.component.emqx.enabled=true时，使用emqxDeviceDownstreamHandler
+     * 创建 EMQX 设备下行服务器
+     *
+     * 当 yudao.iot.component.emqx.enabled = true 时，优先使用 emqxDeviceDownstreamHandler
      */
     @Bean
     @ConditionalOnProperty(prefix = "yudao.iot.component.emqx", name = "enabled", havingValue = "true")
-    public IotDeviceDownstreamServer emqxDeviceDownstreamServer(IotComponentCommonProperties properties,
-                                                                @Qualifier("emqxDeviceDownstreamHandler") IotDeviceDownstreamHandler deviceDownstreamHandler) {
+    public IotDeviceDownstreamServer emqxDeviceDownstreamServer(
+            IotComponentCommonProperties properties,
+            @Qualifier("emqxDeviceDownstreamHandler") IotDeviceDownstreamHandler deviceDownstreamHandler) {
         return new IotDeviceDownstreamServer(properties, deviceDownstreamHandler);
     }
 

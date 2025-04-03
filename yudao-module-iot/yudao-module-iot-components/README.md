@@ -133,3 +133,5 @@ Parameter 1 of method deviceDownstreamServer in IotPluginCommonAutoConfiguration
 ### 5. 使用默认配置
 
 组件现已加入完善的默认配置和空值处理机制，使配置更加灵活。但需要注意的是，这些默认配置值必须通过在主应用配置文件中设置相应的属性才能生效。
+
+// TODO 芋艿：后续继续完善 README.md

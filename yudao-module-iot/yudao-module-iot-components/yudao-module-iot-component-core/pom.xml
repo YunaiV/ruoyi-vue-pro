@@ -13,6 +13,7 @@
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
+    <!-- TODO @芋艿：description 后续统一优化一波 -->
     <description>
         物联网组件核心模块
     </description>
@@ -49,4 +50,4 @@
             <optional>true</optional>
         </dependency>
     </dependencies>
-</project> 
+</project>
