@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.warehouse.zone;
 
-import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.zone.vo.WmsWarehouseZonePageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.zone.WmsWarehouseZoneDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.wms.controller.admin.warehouse.zone.vo.*;
+
+import java.util.List;
 
 /**
  * 库区 Mapper
@@ -56,4 +57,13 @@ public interface WmsWarehouseZoneMapper extends BaseMapperX<WmsWarehouseZoneDO> 
         wrapper.eq(WmsWarehouseZoneDO::getCode, code);
         return selectOne(wrapper);
     }
-}
+
+    default List<WmsWarehouseZoneDO> getSimpleList(WmsWarehouseZonePageReqVO pageReqVO) {
+        LambdaQueryWrapperX<WmsWarehouseZoneDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.likeIfPresent(WmsWarehouseZoneDO::getCode, pageReqVO.getCode());
+        wrapper.likeIfPresent(WmsWarehouseZoneDO::getName, pageReqVO.getName());
+        wrapper.eqIfPresent(WmsWarehouseZoneDO::getWarehouseId, pageReqVO.getWarehouseId());
+        wrapper.eqIfPresent(WmsWarehouseZoneDO::getStockType, pageReqVO.getStockType());
+        return selectList(wrapper);
+    }
+}

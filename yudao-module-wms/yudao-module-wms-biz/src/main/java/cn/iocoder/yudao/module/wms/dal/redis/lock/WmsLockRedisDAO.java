@@ -18,8 +18,6 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 public class WmsLockRedisDAO {
 
-    private static final String WMS_STOCK_FLOW_LOCK = "wms:warehouse-product:lock:%d:%d";
-
     private static final String WMS_STOCK_WAREHOUSE_LOCK = "wms:warehouse-product:lock:%d";
 
 

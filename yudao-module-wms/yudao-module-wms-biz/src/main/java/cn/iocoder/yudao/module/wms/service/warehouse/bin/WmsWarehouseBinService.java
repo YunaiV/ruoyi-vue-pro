@@ -66,4 +66,5 @@ public interface WmsWarehouseBinService {
     List<WmsWarehouseBinDO> selectByIds(List<Long> ids);
 
 
+    List<WmsWarehouseBinDO> getSimpleList(@Valid WmsWarehouseBinPageReqVO pageReqVO);
 }

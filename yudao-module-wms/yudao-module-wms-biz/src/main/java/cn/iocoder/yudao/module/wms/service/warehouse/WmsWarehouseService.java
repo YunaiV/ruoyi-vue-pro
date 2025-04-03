@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.wms.service.warehouse;
 
-import java.util.*;
-import jakarta.validation.*;
-import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehousePageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
+import jakarta.validation.Valid;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 仓库 Service 接口
@@ -58,4 +61,6 @@ public interface WmsWarehouseService {
     List<WmsWarehouseDO> selectByExternalStorageId(Long externalStorageId, int limit);
 
     Map<Long, WmsWarehouseDO> getWarehouseMap(Set<Long> ids);
+
+    List<WmsWarehouseDO> getSimpleList(@Valid WmsWarehousePageReqVO pageReqVO);
 }

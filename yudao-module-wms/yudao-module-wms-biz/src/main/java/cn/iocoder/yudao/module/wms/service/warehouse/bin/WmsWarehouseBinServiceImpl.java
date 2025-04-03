@@ -168,5 +168,10 @@ public class WmsWarehouseBinServiceImpl implements WmsWarehouseBinService {
         return warehouseBinMapper.selectByIds(ids);
     }
 
+    @Override
+    public List<WmsWarehouseBinDO> getSimpleList(WmsWarehouseBinPageReqVO pageReqVO) {
+        return warehouseBinMapper.getSimpleList(pageReqVO);
+    }
+
 
 }

@@ -1,33 +1,42 @@
 package cn.iocoder.yudao.module.wms.controller.admin.warehouse.zone;
 
-import org.springframework.web.bind.annotation.*;
-import jakarta.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.constraints.*;
-import jakarta.validation.*;
-import jakarta.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
-import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.*;
-import cn.iocoder.yudao.module.wms.controller.admin.warehouse.zone.vo.*;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.zone.vo.WmsWarehouseZonePageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.zone.vo.WmsWarehouseZoneRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.zone.vo.WmsWarehouseZoneSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.zone.vo.WmsWarehouseZoneSimpleRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.zone.WmsWarehouseZoneDO;
 import cn.iocoder.yudao.module.wms.service.warehouse.zone.WmsWarehouseZoneService;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.WAREHOUSE_ZONE_NOT_EXISTS;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.WAREHOUSE_ZONE_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 @Tag(name = "库区")
 @RestController
@@ -89,6 +98,18 @@ public class WmsWarehouseZoneController {
         return success(warehouseZoneVO);
     }
 
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得库区精简列表")
+    @PreAuthorize("@ss.hasPermission('wms:warehouse-zone:query')")
+    public CommonResult<List<WmsWarehouseZoneSimpleRespVO>> getWarehouseZoneSimpleList(@Valid WmsWarehouseZonePageReqVO pageReqVO) {
+        // 查询数据
+        List<WmsWarehouseZoneDO> doList = warehouseZoneService.getSimpleList(pageReqVO);
+        // 转换
+        List<WmsWarehouseZoneSimpleRespVO> voList = BeanUtils.toBean(doList, WmsWarehouseZoneSimpleRespVO.class);
+
+        return success(voList);
+    }
+
     /**
      * @sign : 5C5385F8891360A6
      */
@@ -119,4 +140,4 @@ public class WmsWarehouseZoneController {
         // 导出 Excel
         ExcelUtils.write(response, "库区.xls", "数据", WmsWarehouseZoneRespVO.class, BeanUtils.toBean(list, WmsWarehouseZoneRespVO.class));
     }
-}
+}

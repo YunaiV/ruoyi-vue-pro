@@ -69,5 +69,14 @@ public interface WmsWarehouseBinMapper extends BaseMapperX<WmsWarehouseBinDO> {
         return selectOne(wrapper);
     }
 
+    default List<WmsWarehouseBinDO> getSimpleList(WmsWarehouseBinPageReqVO pageReqVO) {
+        LambdaQueryWrapperX<WmsWarehouseBinDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.likeIfPresent(WmsWarehouseBinDO::getCode, pageReqVO.getCode());
+        wrapper.likeIfPresent(WmsWarehouseBinDO::getName, pageReqVO.getName());
+        wrapper.eqIfPresent(WmsWarehouseBinDO::getWarehouseId, pageReqVO.getWarehouseId());
+        wrapper.eqIfPresent(WmsWarehouseBinDO::getZoneId, pageReqVO.getZoneId());
+        return selectList(wrapper);
+    }
+
 
 }

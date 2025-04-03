@@ -1,29 +1,39 @@
 package cn.iocoder.yudao.module.wms.service.warehouse;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehousePageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.external.storage.WmsExternalStorageDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.zone.WmsWarehouseZoneDO;
+import cn.iocoder.yudao.module.wms.dal.mysql.warehouse.WmsWarehouseMapper;
 import cn.iocoder.yudao.module.wms.service.external.storage.WmsExternalStorageService;
 import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
 import cn.iocoder.yudao.module.wms.service.warehouse.bin.WmsWarehouseBinService;
 import cn.iocoder.yudao.module.wms.service.warehouse.zone.WmsWarehouseZoneService;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import jakarta.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.*;
-import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.wms.dal.mysql.warehouse.WmsWarehouseMapper;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.EXTERNAL_STORAGE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.WAREHOUSE_BE_REFERRED;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.WAREHOUSE_CODE_DUPLICATE;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.WAREHOUSE_NAME_DUPLICATE;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.WAREHOUSE_NOT_EXISTS;
 
 /**
  * 仓库 Service 实现类
@@ -171,5 +181,10 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
         }
         List<WmsWarehouseDO> wmsWarehouseDOList = warehouseMapper.selectByIds(ids);
         return StreamX.from(wmsWarehouseDOList).toMap(WmsWarehouseDO::getId);
+    }
+
+    @Override
+    public List<WmsWarehouseDO> getSimpleList(WmsWarehousePageReqVO pageReqVO) {
+        return warehouseMapper.getSimpleList(pageReqVO);
     }
 }

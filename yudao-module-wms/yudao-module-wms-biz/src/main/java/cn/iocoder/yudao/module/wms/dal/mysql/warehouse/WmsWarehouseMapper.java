@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.warehouse;
 
-import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehousePageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.*;
+
+import java.util.List;
 
 /**
  * 仓库 Mapper
@@ -65,4 +66,11 @@ public interface WmsWarehouseMapper extends BaseMapperX<WmsWarehouseDO> {
         wrapper.eq(WmsWarehouseDO::getCode, code);
         return selectOne(wrapper);
     }
-}
+
+    default List<WmsWarehouseDO> getSimpleList(WmsWarehousePageReqVO pageReqVO) {
+        LambdaQueryWrapperX<WmsWarehouseDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.likeIfPresent(WmsWarehouseDO::getCode, pageReqVO.getCode());
+        wrapper.likeIfPresent(WmsWarehouseDO::getName, pageReqVO.getName());
+        return selectList(wrapper);
+    }
+}
