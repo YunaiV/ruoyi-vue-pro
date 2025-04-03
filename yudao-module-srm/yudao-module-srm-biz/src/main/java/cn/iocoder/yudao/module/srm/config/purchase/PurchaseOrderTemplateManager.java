@@ -94,6 +94,7 @@ public class PurchaseOrderTemplateManager {
             Resource[] resources = resourcePatternResolver.getResources("classpath:" + templateScanPath + "*.docx");
             log.info("检测到 {} 个模板文件：", resources.length);
 
+            long wordStart = System.currentTimeMillis();
             for (Resource resource : resources) {
                 try {
                     Optional.ofNullable(resource.getFilename()).ifPresent(fileName -> {
@@ -106,8 +107,9 @@ public class PurchaseOrderTemplateManager {
                     log.error("⚠️ Word 模板预热失败（已忽略）：{}", resource.getFilename(), e);
                 }
             }
-            log.info("[1] Word 模板预热完成");
+            log.info("[1] Word 模板预热完成，耗时 {}ms", System.currentTimeMillis() - wordStart);
 
+            long pdfStart = System.currentTimeMillis();
             for (Resource resource : resources) {
                 try {
                     Optional.ofNullable(resource.getFilename()).ifPresent(fileName -> {
@@ -129,7 +131,7 @@ public class PurchaseOrderTemplateManager {
                     log.warn("⚠️ PDF 引擎预热失败", e);
                 }
             }
-            log.info("[2] PDF 引擎预热全部完成");
+            log.info("[2] PDF 引擎预热全部完成，耗时 {}ms", System.currentTimeMillis() - pdfStart);
 
         } catch (IOException e) {
             log.error("❌ 模板文件夹扫描失败", e);
