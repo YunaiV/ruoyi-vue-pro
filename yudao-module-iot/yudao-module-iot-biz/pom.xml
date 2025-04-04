@@ -93,10 +93,10 @@
             <optional>true</optional>
         </dependency>
 
-        <dependency>
-            <groupId>org.pf4j</groupId>            <!-- PF4J：内置插件机制 -->
-            <artifactId>pf4j-spring</artifactId>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.pf4j</groupId>            &lt;!&ndash; PF4J：内置插件机制 &ndash;&gt;-->
+        <!--            <artifactId>pf4j-spring</artifactId>-->
+        <!--        </dependency>-->
 
         <!-- TODO @芋艿：bom 管理 -->
         <dependency>
@@ -137,12 +137,12 @@
         <!-- IoT 网络组件：接收来自设备的上行数据 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-iot-component-http</artifactId>
+            <artifactId>yudao-module-iot-net-component-http</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-iot-component-emqx</artifactId>
+            <artifactId>yudao-module-iot-net-component-emqx</artifactId>
             <version>${revision}</version>
         </dependency>
     </dependencies>

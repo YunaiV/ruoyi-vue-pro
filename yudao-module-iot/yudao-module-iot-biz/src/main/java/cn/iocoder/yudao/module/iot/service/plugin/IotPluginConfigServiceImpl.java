@@ -9,8 +9,6 @@ import cn.iocoder.yudao.module.iot.dal.mysql.plugin.IotPluginConfigMapper;
 import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.pf4j.PluginWrapper;
-import org.pf4j.spring.SpringPluginManager;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,8 +33,8 @@ public class IotPluginConfigServiceImpl implements IotPluginConfigService {
     @Resource
     private IotPluginInstanceService pluginInstanceService;
 
-    @Resource
-    private SpringPluginManager springPluginManager;
+//    @Resource
+//    private SpringPluginManager springPluginManager;
 
     @Override
     public Long createPluginConfig(PluginConfigSaveReqVO createReqVO) {
@@ -130,16 +128,16 @@ public class IotPluginConfigServiceImpl implements IotPluginConfigService {
         validatePluginConfigFile(pluginKeyNew);
 
         // 4. 更新插件配置
-        IotPluginConfigDO updatedPluginConfig = new IotPluginConfigDO()
-                .setId(pluginConfigDO.getId())
-                .setPluginKey(pluginKeyNew)
-                .setStatus(IotPluginStatusEnum.STOPPED.getStatus()) // TODO @haohao：这个状态，是不是非 stop 哈？
-                .setFileName(file.getOriginalFilename())
-                .setScript("") // TODO @haohao：这个设置为 "" 会不会覆盖数据里的哈？应该从插件里读取？未来？
-                .setConfigSchema(springPluginManager.getPlugin(pluginKeyNew).getDescriptor().getPluginDescription())
-                .setVersion(springPluginManager.getPlugin(pluginKeyNew).getDescriptor().getVersion())
-                .setDescription(springPluginManager.getPlugin(pluginKeyNew).getDescriptor().getPluginDescription());
-        pluginConfigMapper.updateById(updatedPluginConfig);
+//        IotPluginConfigDO updatedPluginConfig = new IotPluginConfigDO()
+//                .setId(pluginConfigDO.getId())
+//                .setPluginKey(pluginKeyNew)
+//                .setStatus(IotPluginStatusEnum.STOPPED.getStatus()) // TODO @haohao：这个状态，是不是非 stop 哈？
+//                .setFileName(file.getOriginalFilename())
+//                .setScript("") // TODO @haohao：这个设置为 "" 会不会覆盖数据里的哈？应该从插件里读取？未来？
+//                .setConfigSchema(springPluginManager.getPlugin(pluginKeyNew).getDescriptor().getPluginDescription())
+//                .setVersion(springPluginManager.getPlugin(pluginKeyNew).getDescriptor().getVersion())
+//                .setDescription(springPluginManager.getPlugin(pluginKeyNew).getDescriptor().getPluginDescription());
+//        pluginConfigMapper.updateById(updatedPluginConfig);
     }
 
     /**
@@ -149,13 +147,13 @@ public class IotPluginConfigServiceImpl implements IotPluginConfigService {
      */
     private void validatePluginConfigFile(String pluginKeyNew) {
         // TODO @haohao：校验 file 相关参数，是否完整，类似：version 之类是不是可以解析到
-        PluginWrapper plugin = springPluginManager.getPlugin(pluginKeyNew);
-        if (plugin == null) {
-            throw exception(PLUGIN_INSTALL_FAILED);
-        }
-        if (plugin.getDescriptor().getVersion() == null) {
-            throw exception(PLUGIN_INSTALL_FAILED);
-        }
+//        PluginWrapper plugin = springPluginManager.getPlugin(pluginKeyNew);
+//        if (plugin == null) {
+//            throw exception(PLUGIN_INSTALL_FAILED);
+//        }
+//        if (plugin.getDescriptor().getVersion() == null) {
+//            throw exception(PLUGIN_INSTALL_FAILED);
+//        }
     }
 
     @Override

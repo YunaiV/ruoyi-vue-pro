@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.plugin;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotPluginInstanceHeartbeatReqDTO;
@@ -9,13 +8,8 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginConfigDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInstanceDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.plugin.IotPluginInstanceMapper;
 import cn.iocoder.yudao.module.iot.dal.redis.plugin.DevicePluginProcessIdRedisDAO;
-import cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants;
-import cn.iocoder.yudao.module.iot.enums.plugin.IotPluginStatusEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.pf4j.PluginState;
-import org.pf4j.PluginWrapper;
-import org.pf4j.spring.SpringPluginManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -23,16 +17,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
  * IoT 插件实例 Service 实现类
@@ -54,8 +41,8 @@ public class IotPluginInstanceServiceImpl implements IotPluginInstanceService {
     @Resource
     private DevicePluginProcessIdRedisDAO devicePluginProcessIdRedisDAO;
 
-    @Resource
-    private SpringPluginManager pluginManager;
+//    @Resource
+//    private SpringPluginManager pluginManager;
 
     @Value("${pf4j.pluginsDir}")
     private String pluginsDir;
@@ -120,17 +107,17 @@ public class IotPluginInstanceServiceImpl implements IotPluginInstanceService {
 
     @Override
     public void stopAndUnloadPlugin(String pluginKey) {
-        PluginWrapper plugin = pluginManager.getPlugin(pluginKey);
-        if (plugin == null) {
-            log.warn("插件不存在或已卸载: {}", pluginKey);
-            return;
-        }
-        if (plugin.getPluginState().equals(PluginState.STARTED)) {
-            pluginManager.stopPlugin(pluginKey); // 停止插件
-            log.info("已停止插件: {}", pluginKey);
-        }
-        pluginManager.unloadPlugin(pluginKey); // 卸载插件
-        log.info("已卸载插件: {}", pluginKey);
+//        PluginWrapper plugin = pluginManager.getPlugin(pluginKey);
+//        if (plugin == null) {
+//            log.warn("插件不存在或已卸载: {}", pluginKey);
+//            return;
+//        }
+//        if (plugin.getPluginState().equals(PluginState.STARTED)) {
+//            pluginManager.stopPlugin(pluginKey); // 停止插件
+//            log.info("已停止插件: {}", pluginKey);
+//        }
+//        pluginManager.unloadPlugin(pluginKey); // 卸载插件
+//        log.info("已卸载插件: {}", pluginKey);
     }
 
     @Override
@@ -151,65 +138,66 @@ public class IotPluginInstanceServiceImpl implements IotPluginInstanceService {
 
     @Override
     public String uploadAndLoadNewPlugin(MultipartFile file) {
-        String pluginKeyNew;
-        // TODO @haohao：多节点，是不是要上传 s3 之类的存储器；然后定时去加载
-        Path pluginsPath = Paths.get(pluginsDir);
-        try {
-            FileUtil.mkdir(pluginsPath.toFile()); // 创建插件目录
-            String filename = file.getOriginalFilename();
-            if (filename != null) {
-                Path jarPath = pluginsPath.resolve(filename);
-                Files.copy(file.getInputStream(), jarPath, StandardCopyOption.REPLACE_EXISTING); // 保存上传的 JAR 文件
-                pluginKeyNew = pluginManager.loadPlugin(jarPath.toAbsolutePath()); // 加载插件
-                log.info("已加载插件: {}", pluginKeyNew);
-            } else {
-                throw exception(ErrorCodeConstants.PLUGIN_INSTALL_FAILED);
-            }
-        } catch (IOException e) {
-            log.error("[uploadAndLoadNewPlugin][上传插件文件失败]", e);
-            throw exception(ErrorCodeConstants.PLUGIN_INSTALL_FAILED, e);
-        } catch (Exception e) {
-            log.error("[uploadAndLoadNewPlugin][加载插件失败]", e);
-            throw exception(ErrorCodeConstants.PLUGIN_INSTALL_FAILED, e);
-        }
-        return pluginKeyNew;
+//        String pluginKeyNew;
+//        // TODO @haohao：多节点，是不是要上传 s3 之类的存储器；然后定时去加载
+//        Path pluginsPath = Paths.get(pluginsDir);
+//        try {
+//            FileUtil.mkdir(pluginsPath.toFile()); // 创建插件目录
+//            String filename = file.getOriginalFilename();
+//            if (filename != null) {
+//                Path jarPath = pluginsPath.resolve(filename);
+//                Files.copy(file.getInputStream(), jarPath, StandardCopyOption.REPLACE_EXISTING); // 保存上传的 JAR 文件
+////                pluginKeyNew = pluginManager.loadPlugin(jarPath.toAbsolutePath()); // 加载插件
+////                log.info("已加载插件: {}", pluginKeyNew);
+//            } else {
+//                throw exception(ErrorCodeConstants.PLUGIN_INSTALL_FAILED);
+//            }
+//        } catch (IOException e) {
+//            log.error("[uploadAndLoadNewPlugin][上传插件文件失败]", e);
+//            throw exception(ErrorCodeConstants.PLUGIN_INSTALL_FAILED, e);
+//        } catch (Exception e) {
+//            log.error("[uploadAndLoadNewPlugin][加载插件失败]", e);
+//            throw exception(ErrorCodeConstants.PLUGIN_INSTALL_FAILED, e);
+//        }
+//        return pluginKeyNew;
+        return null;
     }
 
     @Override
     public void updatePluginStatus(IotPluginConfigDO pluginConfigDO, Integer status) {
-        String pluginKey = pluginConfigDO.getPluginKey();
-        PluginWrapper plugin = pluginManager.getPlugin(pluginKey);
-
-        if (plugin == null) {
-            // 插件不存在且状态为停止，抛出异常
-            if (IotPluginStatusEnum.STOPPED.getStatus().equals(pluginConfigDO.getStatus())) {
-                throw exception(ErrorCodeConstants.PLUGIN_STATUS_INVALID);
-            }
-            return;
-        }
-
-        // 启动插件
-        if (status.equals(IotPluginStatusEnum.RUNNING.getStatus())
-                && plugin.getPluginState() != PluginState.STARTED) {
-            try {
-                pluginManager.startPlugin(pluginKey);
-            } catch (Exception e) {
-                log.error("[updatePluginStatus][启动插件({}) 失败]", pluginKey, e);
-                throw exception(ErrorCodeConstants.PLUGIN_START_FAILED, e);
-            }
-            log.info("已启动插件: {}", pluginKey);
-        }
-        // 停止插件
-        else if (status.equals(IotPluginStatusEnum.STOPPED.getStatus())
-                && plugin.getPluginState() == PluginState.STARTED) {
-            try {
-                pluginManager.stopPlugin(pluginKey);
-            } catch (Exception e) {
-                log.error("[updatePluginStatus][停止插件({}) 失败]", pluginKey, e);
-                throw exception(ErrorCodeConstants.PLUGIN_STOP_FAILED, e);
-            }
-            log.info("已停止插件: {}", pluginKey);
-        }
+//        String pluginKey = pluginConfigDO.getPluginKey();
+//        PluginWrapper plugin = pluginManager.getPlugin(pluginKey);
+//
+//        if (plugin == null) {
+//            // 插件不存在且状态为停止，抛出异常
+//            if (IotPluginStatusEnum.STOPPED.getStatus().equals(pluginConfigDO.getStatus())) {
+//                throw exception(ErrorCodeConstants.PLUGIN_STATUS_INVALID);
+//            }
+//            return;
+//        }
+//
+//        // 启动插件
+//        if (status.equals(IotPluginStatusEnum.RUNNING.getStatus())
+//                && plugin.getPluginState() != PluginState.STARTED) {
+//            try {
+//                pluginManager.startPlugin(pluginKey);
+//            } catch (Exception e) {
+//                log.error("[updatePluginStatus][启动插件({}) 失败]", pluginKey, e);
+//                throw exception(ErrorCodeConstants.PLUGIN_START_FAILED, e);
+//            }
+//            log.info("已启动插件: {}", pluginKey);
+//        }
+//        // 停止插件
+//        else if (status.equals(IotPluginStatusEnum.STOPPED.getStatus())
+//                && plugin.getPluginState() == PluginState.STARTED) {
+//            try {
+//                pluginManager.stopPlugin(pluginKey);
+//            } catch (Exception e) {
+//                log.error("[updatePluginStatus][停止插件({}) 失败]", pluginKey, e);
+//                throw exception(ErrorCodeConstants.PLUGIN_STOP_FAILED, e);
+//            }
+//            log.info("已停止插件: {}", pluginKey);
+//        }
     }
 
     // ========== 设备与插件的映射操作 ==========
