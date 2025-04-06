@@ -9,13 +9,18 @@ import cn.iocoder.yudao.module.iot.controller.admin.product.vo.script.IotProduct
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductScriptDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.product.IotProductScriptMapper;
+import cn.iocoder.yudao.module.iot.script.context.DeviceScriptContext;
+import cn.iocoder.yudao.module.iot.script.service.ScriptService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PRODUCT_NOT_EXISTS;
@@ -38,8 +43,8 @@ public class IotProductScriptServiceImpl implements IotProductScriptService {
     @Resource
     private IotProductService productService;
 
-//    @Resource
-//    private ScriptService scriptService;
+    @Resource
+    private ScriptService scriptService;
 
     @Override
     public Long createProductScript(IotProductScriptSaveReqVO createReqVO) {
@@ -116,90 +121,103 @@ public class IotProductScriptServiceImpl implements IotProductScriptService {
 
     @Override
     public IotProductScriptTestRespVO testProductScript(IotProductScriptTestReqVO testReqVO) {
-//        long startTime = System.currentTimeMillis();
-//
-//        try {
-//            // 验证产品是否存在
-//            validateProductExists(testReqVO.getProductId());
-//
-//            // 根据ID获取已保存的脚本（如果有）
-//            IotProductScriptDO existingScript = null;
-//            if (testReqVO.getId() != null) {
-//                existingScript = getProductScript(testReqVO.getId());
-//            }
-//
-//            // 创建测试上下文
-//            PluginScriptContext context = new PluginScriptContext();
-//            IotProductDO product = productService.getProduct(testReqVO.getProductId());
-//
-//            // 设置设备上下文（使用产品信息，没有具体设备）
-//            context.withDeviceContext(product.getProductKey(), null);
-//
-//            // 设置输入参数
-//            Map<String, Object> params = new HashMap<>();
-//            params.put("input", testReqVO.getTestInput());
-//            params.put("productKey", product.getProductKey());
-//            params.put("scriptType", testReqVO.getScriptType());
-//
-//            // 根据脚本类型设置特定参数
-//            switch (testReqVO.getScriptType()) {
-//                case 1: // PROPERTY_PARSER
-//                    params.put("method", "property");
-//                    break;
-//                case 2: // EVENT_PARSER
-//                    params.put("method", "event");
-//                    params.put("identifier", "default");
-//                    break;
-//                case 3: // COMMAND_ENCODER
-//                    params.put("method", "command");
-//                    break;
-//                default:
-//                    // 默认不添加额外参数
-//            }
-//
-//            // 添加所有参数到上下文
-//            for (Map.Entry<String, Object> entry : params.entrySet()) {
-//                context.setParameter(entry.getKey(), entry.getValue());
-//            }
-//
-//            // 执行脚本
-//            Object result = scriptService.executeScript(
-//                    testReqVO.getScriptLanguage(),
-//                    testReqVO.getScriptContent(),
-//                    context);
-//
-//            // 更新测试结果（如果是已保存的脚本）
-//            if (existingScript != null) {
-//                IotProductScriptDO updateObj = new IotProductScriptDO();
-//                updateObj.setId(existingScript.getId());
-//                updateObj.setLastTestTime(LocalDateTime.now());
-//                updateObj.setLastTestResult(1); // 1表示成功
-//                productScriptMapper.updateById(updateObj);
-//            }
-//
-//            long executionTime = System.currentTimeMillis() - startTime;
-//            return IotProductScriptTestRespVO.success(result, executionTime);
-//
-//        } catch (Exception e) {
-//            log.error("[testProductScript][测试脚本异常]", e);
-//
-//            // 如果是已保存的脚本，更新测试失败状态
-//            if (testReqVO.getId() != null) {
-//                try {
-//                    IotProductScriptDO updateObj = new IotProductScriptDO();
-//                    updateObj.setId(testReqVO.getId());
-//                    updateObj.setLastTestTime(LocalDateTime.now());
-//                    updateObj.setLastTestResult(0); // 0表示失败
-//                    productScriptMapper.updateById(updateObj);
-//                } catch (Exception ex) {
-//                    log.error("[testProductScript][更新脚本测试结果异常]", ex);
-//                }
-//            }
-//
-//            long executionTime = System.currentTimeMillis() - startTime;
-//            return IotProductScriptTestRespVO.error(e.getMessage(), executionTime);
-//        }
-        return null;
+        long startTime = System.currentTimeMillis();
+
+        try {
+            // 验证产品是否存在
+            validateProductExists(testReqVO.getProductId());
+
+            // 根据ID获取已保存的脚本（如果有）
+            IotProductScriptDO existingScript = null;
+            if (testReqVO.getId() != null) {
+                existingScript = getProductScript(testReqVO.getId());
+            }
+
+            // 创建测试上下文
+            IotProductDO product = productService.getProduct(testReqVO.getProductId());
+            DeviceScriptContext context = new DeviceScriptContext();
+
+            // 设置设备上下文（使用产品信息，测试时无具体设备）
+            context.withDeviceInfo(product.getProductKey(), null);
+
+            // 设置输入参数
+            Map<String, Object> params = new HashMap<>();
+            params.put("input", testReqVO.getTestInput());
+            params.put("productKey", product.getProductKey());
+            params.put("scriptType", testReqVO.getScriptType());
+
+            // 根据脚本类型设置特定参数
+            switch (testReqVO.getScriptType()) {
+                case 1: // PROPERTY_PARSER
+                    params.put("method", "property");
+                    // 添加一些模拟的属性数据
+                    Map<String, Object> properties = new HashMap<>();
+                    properties.put("temp", 25.5);
+                    properties.put("humidity", 60);
+                    context.withProperties(properties);
+                    break;
+                case 2: // EVENT_PARSER
+                    params.put("method", "event");
+                    params.put("identifier", "default");
+                    // 添加事件数据
+                    Map<String, Object> eventParams = new HashMap<>();
+                    eventParams.put("timestamp", System.currentTimeMillis());
+                    params.put("eventParams", eventParams);
+                    break;
+                case 3: // COMMAND_ENCODER
+                    params.put("method", "command");
+                    // 添加命令参数
+                    Map<String, Object> cmdParams = new HashMap<>();
+                    cmdParams.put("cmdName", "setValue");
+                    cmdParams.put("cmdValue", 100);
+                    params.put("cmdParams", cmdParams);
+                    break;
+                default:
+                    // 默认不添加额外参数
+            }
+
+            // 添加所有参数到上下文
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                context.setParameter(entry.getKey(), entry.getValue());
+            }
+
+            // 执行脚本
+            Object result = scriptService.executeScript(
+                    testReqVO.getScriptLanguage(),
+                    testReqVO.getScriptContent(),
+                    context);
+
+            // 更新测试结果（如果是已保存的脚本）
+            if (existingScript != null) {
+                IotProductScriptDO updateObj = new IotProductScriptDO();
+                updateObj.setId(existingScript.getId());
+                updateObj.setLastTestTime(LocalDateTime.now());
+                updateObj.setLastTestResult(1); // 1表示成功
+                productScriptMapper.updateById(updateObj);
+            }
+
+            long executionTime = System.currentTimeMillis() - startTime;
+            return IotProductScriptTestRespVO.success(result, executionTime);
+
+        } catch (Exception e) {
+            log.error("[testProductScript][测试脚本异常]", e);
+
+            // 如果是已保存的脚本，更新测试失败状态
+            if (testReqVO.getId() != null) {
+                try {
+                    IotProductScriptDO updateObj = new IotProductScriptDO();
+                    updateObj.setId(testReqVO.getId());
+                    updateObj.setLastTestTime(LocalDateTime.now());
+                    updateObj.setLastTestResult(0); // 0表示失败
+                    productScriptMapper.updateById(updateObj);
+                } catch (Exception ex) {
+                    log.error("[testProductScript][更新脚本测试结果异常]", ex);
+                }
+            }
+
+            long executionTime = System.currentTimeMillis() - startTime;
+            return IotProductScriptTestRespVO.error(e.getMessage(), executionTime);
+        }
     }
 
     @Override

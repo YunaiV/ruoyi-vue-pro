@@ -37,10 +37,10 @@
             <scope>provided</scope> <!-- 设置为 provided，只有工具类需要使用到 -->
         </dependency>
 
-        <dependency>
-            <groupId>org.pf4j</groupId> <!-- PF4J：内置插件机制 -->
-            <artifactId>pf4j-spring</artifactId>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.pf4j</groupId> &lt;!&ndash; PF4J：内置插件机制 &ndash;&gt;-->
+        <!--            <artifactId>pf4j-spring</artifactId>-->
+        <!--        </dependency>-->
 
         <!-- 参数校验 -->
         <dependency>

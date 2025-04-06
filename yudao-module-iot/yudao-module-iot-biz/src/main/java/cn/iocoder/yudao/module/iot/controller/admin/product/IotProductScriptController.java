@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.script.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductScriptDO;
+import cn.iocoder.yudao.module.iot.script.example.ProductScriptSamples;
 import cn.iocoder.yudao.module.iot.service.product.IotProductScriptService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,6 +28,9 @@ public class IotProductScriptController {
 
     @Resource
     private IotProductScriptService productScriptService;
+
+    @Resource
+    private ProductScriptSamples scriptSamples;
 
     @PostMapping("/create")
     @Operation(summary = "创建产品脚本")
@@ -95,5 +99,27 @@ public class IotProductScriptController {
             @Valid @RequestBody IotProductScriptUpdateStatusReqVO updateStatusReqVO) {
         productScriptService.updateProductScriptStatus(updateStatusReqVO.getId(), updateStatusReqVO.getStatus());
         return success(true);
+    }
+
+    @GetMapping("/sample")
+    @Operation(summary = "获取示例脚本")
+    @Parameter(name = "type", description = "脚本类型(1=属性解析, 2=事件解析, 3=命令编码)", required = true, example = "1")
+    @PreAuthorize("@ss.hasPermission('iot:product-script:query')")
+    public CommonResult<String> getSampleScript(@RequestParam("type") Integer type) {
+        String sample;
+        switch (type) {
+            case 1:
+                sample = scriptSamples.getPropertyParserSample();
+                break;
+            case 2:
+                sample = scriptSamples.getEventParserSample();
+                break;
+            case 3:
+                sample = scriptSamples.getCommandEncoderSample();
+                break;
+            default:
+                sample = "// 不支持的脚本类型";
+        }
+        return success(sample);
     }
 }

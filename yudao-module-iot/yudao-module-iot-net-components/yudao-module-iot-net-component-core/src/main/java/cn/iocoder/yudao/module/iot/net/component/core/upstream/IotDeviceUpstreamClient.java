@@ -3,10 +3,8 @@ package cn.iocoder.yudao.module.iot.net.component.core.upstream;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.*;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.annotation.Resource;
-
 /**
  * 设备数据 Upstream 上行客户端
  * <p>
