@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.tms.dal.mysql.logistic.customrule.ErpCustomRuleMa
 import cn.iocoder.yudao.module.tms.service.logistic.category.bo.ErpCustomCategoryBO;
 import cn.iocoder.yudao.module.tms.service.logistic.category.item.ErpCustomCategoryItemService;
 import jakarta.annotation.Resource;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,6 +57,7 @@ public class ErpCustomCategoryServiceImpl implements ErpCustomCategoryService {
     public Long createCustomRuleCategory(ErpCustomCategorySaveReqVO createReqVO) {
         //材质-字典校验
         dictDataApi.validateDictDataList(PRODUCT_MATERIAL.getName(), List.of(String.valueOf(createReqVO.getMaterial())));
+        validateCustomRuleCategoryNotExists(createReqVO);
         // 插入
         ErpCustomCategoryDO customRuleCategory = ErpCustomCategoryConvert.INSTANCE.convert(createReqVO);
         customRuleCategoryMapper.insert(customRuleCategory);
@@ -67,6 +69,18 @@ public class ErpCustomCategoryServiceImpl implements ErpCustomCategoryService {
 //        this.syncCustomRuleCategory(categoryId);
         return categoryId;
     }
+
+    //海关分类重复性校验
+    private void validateCustomRuleCategoryNotExists(ErpCustomCategorySaveReqVO createReqVO) {
+        Collection<ErpCustomCategoryDO> categoryList =
+            customRuleCategoryMapper.getCustomRuleByMaterialAndDeclaredType(
+                createReqVO.getMaterial(), createReqVO.getDeclaredType());
+
+        if (CollectionUtils.isNotEmpty(categoryList)) {
+            throw exception(ErrorCodeConstants.CUSTOM_RULE_CATEGORY_EXISTS, createReqVO.getDeclaredType());
+        }
+    }
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)

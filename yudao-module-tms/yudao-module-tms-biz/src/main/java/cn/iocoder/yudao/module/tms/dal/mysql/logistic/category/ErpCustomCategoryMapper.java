@@ -11,6 +11,7 @@ import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import jakarta.validation.constraints.NotNull;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
 import java.util.List;
 
 
@@ -75,6 +76,10 @@ public interface ErpCustomCategoryMapper extends BaseMapperX<ErpCustomCategoryDO
     //获得海关分类列表的list
     default List<ErpCustomCategoryDO> getCustomRuleCategoryList(@NotNull ErpCustomCategoryPageReqVO reqVO) {
         return selectJoinList(ErpCustomCategoryDO.class, buildQueryWrapper(reqVO));
+    }
+
+    default Collection<ErpCustomCategoryDO> getCustomRuleByMaterialAndDeclaredType(Integer material, String declaredType) {
+        return selectList(new MPJLambdaWrapper<ErpCustomCategoryDO>().eq(ErpCustomCategoryDO::getMaterial, material).eq(ErpCustomCategoryDO::getDeclaredType, declaredType));
     }
 
 //    //获得BO List

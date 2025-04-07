@@ -3,7 +3,6 @@ package cn.iocoder.yudao.framework.common.util.web;
 import cn.hutool.http.ContentType;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
-import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -17,10 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.zip.GZIPInputStream;
@@ -115,7 +112,7 @@ public class WebUtils {
             }
         }
 
-        log.debug("full url: " + fullUrl);
+        log.info("full url: " + fullUrl);
         Request.Builder requestBuilder = new Request.Builder()
             .url(fullUrl);
 
