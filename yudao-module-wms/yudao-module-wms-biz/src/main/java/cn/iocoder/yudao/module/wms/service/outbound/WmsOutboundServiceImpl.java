@@ -8,16 +8,21 @@ import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.config.OutboundStateMachineConfigure;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.item.WmsOutboundItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.outbound.WmsOutboundMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.outbound.item.WmsOutboundItemMapper;
@@ -29,6 +34,7 @@ import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
 import cn.iocoder.yudao.module.wms.service.outbound.item.WmsOutboundItemService;
 import cn.iocoder.yudao.module.wms.service.stock.bin.WmsStockBinService;
+import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import cn.iocoder.yudao.module.wms.service.warehouse.bin.WmsWarehouseBinService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
@@ -36,6 +42,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -85,6 +92,13 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     @Resource
     @Lazy
     private WmsStockBinService stockBinService;
+
+    @Resource
+    @Lazy
+    private WmsWarehouseService warehouseService;
+
+    @Resource
+    private DeptApi deptApi;
 
     @Resource(name = OutboundStateMachineConfigure.STATE_MACHINE_NAME)
     private StateMachineWrapper<Integer, WmsOutboundAuditStatus.Event, WmsOutboundDO> outboundStateMachine;
@@ -258,6 +272,34 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     public List<WmsOutboundDO> getSimpleList(WmsOutboundPageReqVO pageReqVO) {
         return outboundMapper.getSimpleList(pageReqVO);
     }
+
+    @Override
+    public void assembleWarehouse(List<WmsOutboundRespVO> list) {
+        Map<Long, WmsWarehouseDO> warehouseDOMap = warehouseService.getWarehouseMap(StreamX.from(list).toSet(WmsOutboundRespVO::getWarehouseId));
+        Map<Long, WmsWarehouseSimpleRespVO> warehouseVOMap = StreamX.from(warehouseDOMap.values())
+            .toMap(WmsWarehouseDO::getId, v-> BeanUtils.toBean(v, WmsWarehouseSimpleRespVO.class));
+
+        StreamX.from(list).assemble(warehouseVOMap, WmsOutboundRespVO::getWarehouseId, WmsOutboundRespVO::setWarehouse);
+    }
+
+    @Override
+    public void assembleDept(List<WmsOutboundRespVO> list) {
+        Map<Long, DeptRespDTO> deptDTOMap = deptApi.getDeptMap(StreamX.from(list).map(WmsOutboundRespVO::getDeptId).toList());
+        Map<Long, DeptSimpleRespVO> deptVOMap = new HashMap<>();
+        for (DeptRespDTO productDTO : deptDTOMap.values()) {
+            DeptSimpleRespVO deptVO = BeanUtils.toBean(productDTO, DeptSimpleRespVO.class);
+            deptVOMap.put(productDTO.getId(), deptVO);
+        }
+        StreamX.from(list).assemble(deptVOMap, WmsOutboundRespVO::getDeptId, WmsOutboundRespVO::setDept);
+    }
+
+    @Override
+    public void assembleCompany(List<WmsOutboundRespVO> list) {
+        //todo 待东宇财务模块支持
+    }
+
+
+
 
     @Override
     public WmsOutboundDO getOutbound(Long id) {

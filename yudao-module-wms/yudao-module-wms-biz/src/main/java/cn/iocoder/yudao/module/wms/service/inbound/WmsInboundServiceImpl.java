@@ -8,13 +8,17 @@ import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.config.InboundStateMachineConfigure;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
@@ -36,7 +40,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -80,6 +86,9 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     @Resource
     @Lazy
     private WmsInboundItemService inboundItemService;
+
+    @Resource
+    private DeptApi deptApi;
 
     @Resource(name = InboundStateMachineConfigure.STATE_MACHINE_NAME)
     private StateMachineWrapper<Integer, WmsInboundAuditStatus.Event, WmsInboundDO> inboundStateMachine;
@@ -354,4 +363,31 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     public List<WmsInboundDO> getSimpleList(WmsInboundPageReqVO pageReqVO) {
         return inboundMapper.getSimpleList(pageReqVO);
     }
+
+    @Override
+    public void assembleWarehouse(List<WmsInboundRespVO> list) {
+        Map<Long, WmsWarehouseDO> warehouseDOMap = warehouseService.getWarehouseMap(StreamX.from(list).toSet(WmsInboundRespVO::getWarehouseId));
+        Map<Long, WmsWarehouseSimpleRespVO> warehouseVOMap = StreamX.from(warehouseDOMap.values())
+            .toMap(WmsWarehouseDO::getId, v-> BeanUtils.toBean(v, WmsWarehouseSimpleRespVO.class));
+
+        StreamX.from(list).assemble(warehouseVOMap, WmsInboundRespVO::getWarehouseId, WmsInboundRespVO::setWarehouse);
+    }
+
+    @Override
+    public void assembleDept(List<WmsInboundRespVO> list) {
+        Map<Long, DeptRespDTO> deptDTOMap = deptApi.getDeptMap(StreamX.from(list).map(WmsInboundRespVO::getDeptId).toList());
+        Map<Long, DeptSimpleRespVO> deptVOMap = new HashMap<>();
+        for (DeptRespDTO productDTO : deptDTOMap.values()) {
+            DeptSimpleRespVO deptVO = BeanUtils.toBean(productDTO, DeptSimpleRespVO.class);
+            deptVOMap.put(productDTO.getId(), deptVO);
+        }
+        StreamX.from(list).assemble(deptVOMap, WmsInboundRespVO::getDeptId, WmsInboundRespVO::setDept);
+    }
+
+    @Override
+    public void assembleCompany(List<WmsInboundRespVO> list) {
+        //todo 待东宇财务模块支持
+    }
+
+
 }

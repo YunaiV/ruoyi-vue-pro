@@ -5,6 +5,9 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.inbound.transition.InboundAbandonTransitionHandler;
 import cn.iocoder.yudao.module.wms.service.inbound.transition.InboundAgreeTransitionHandler;
+import cn.iocoder.yudao.module.wms.service.inbound.transition.InboundForceFinishTransitionHandler;
+import cn.iocoder.yudao.module.wms.service.inbound.transition.InboundRejectTransitionHandler;
+import cn.iocoder.yudao.module.wms.service.inbound.transition.InboundSubmitTransitionHandler;
 import cn.iocoder.yudao.module.wms.service.inbound.transition.InboundTransitionFailCallback;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -45,7 +48,7 @@ public class InboundStateMachineConfigure {
                 // to
                 WmsInboundAuditStatus.AUDITING.getValue(),
                 // handler
-                InboundAbandonTransitionHandler.class
+                InboundSubmitTransitionHandler.class
             )
             // 废弃
             .bindExternals(
@@ -82,7 +85,7 @@ public class InboundStateMachineConfigure {
                 // to
                 WmsInboundAuditStatus.FORCE_FINISHED.getValue(),
                 // handler
-                InboundAgreeTransitionHandler.class
+                InboundForceFinishTransitionHandler.class
             )
             // 拒绝
             .bindExternal(
@@ -93,7 +96,7 @@ public class InboundStateMachineConfigure {
                 // to
                 WmsInboundAuditStatus.REJECT.getValue(),
                 // handler
-                InboundAgreeTransitionHandler.class
+                InboundRejectTransitionHandler.class
             )
             // 失败处理
             .setFailCallback(InboundTransitionFailCallback.class)

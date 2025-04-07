@@ -1,15 +1,17 @@
 package cn.iocoder.yudao.module.wms.controller.admin.outbound.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import org.springframework.format.annotation.DateTimeFormat;
-import java.time.LocalDateTime;
-import com.alibaba.excel.annotation.*;
-import java.util.List;
+import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
@@ -109,4 +111,11 @@ public class WmsOutboundRespVO {
     @Schema(description = "出库动作ID，与flow关联", example = "")
     @ExcelProperty("出库动作ID，与flow关联")
     private Long latestOutboundActionId;
+
+    @Schema(description = "仓库", example = "")
+    private WmsWarehouseSimpleRespVO warehouse;
+
+    @Schema(description = "部门", example = "")
+    @ExcelProperty("部门")
+    private DeptSimpleRespVO dept;
 }

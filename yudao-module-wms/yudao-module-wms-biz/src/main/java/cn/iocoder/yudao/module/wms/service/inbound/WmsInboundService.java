@@ -77,4 +77,10 @@ public interface WmsInboundService {
     List<WmsInboundDO> selectByIds(List<Long> ids);
 
     List<WmsInboundDO> getSimpleList(@Valid WmsInboundPageReqVO pageReqVO);
+
+    void assembleWarehouse(List<WmsInboundRespVO> list);
+
+    void assembleDept(List<WmsInboundRespVO> list);
+
+    void assembleCompany(List<WmsInboundRespVO> list);
 }

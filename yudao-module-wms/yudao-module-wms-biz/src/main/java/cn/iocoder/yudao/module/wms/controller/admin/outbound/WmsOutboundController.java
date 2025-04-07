@@ -109,6 +109,10 @@ public class WmsOutboundController {
         PageResult<WmsOutboundDO> doPageResult = outboundService.getOutboundPage(pageReqVO);
         // 转换
         PageResult<WmsOutboundRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsOutboundRespVO.class);
+
+        outboundService.assembleWarehouse(voPageResult.getList());
+        outboundService.assembleDept(voPageResult.getList());
+        outboundService.assembleCompany(voPageResult.getList());
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
 			.mapping(WmsOutboundRespVO::getCreator, WmsOutboundRespVO::setCreatorName)

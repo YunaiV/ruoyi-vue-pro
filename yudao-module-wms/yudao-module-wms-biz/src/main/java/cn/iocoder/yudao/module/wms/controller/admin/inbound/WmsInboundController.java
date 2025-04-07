@@ -149,6 +149,12 @@ public class WmsInboundController {
         PageResult<WmsInboundDO> doPageResult = inboundService.getInboundPage(pageReqVO);
         // 转换
         PageResult<WmsInboundRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsInboundRespVO.class);
+
+        // 装配
+        inboundService.assembleWarehouse(voPageResult.getList());
+        inboundService.assembleDept(voPageResult.getList());
+        inboundService.assembleCompany(voPageResult.getList());
+
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
 			.mapping(WmsInboundRespVO::getCreator, WmsInboundRespVO::setCreatorName)

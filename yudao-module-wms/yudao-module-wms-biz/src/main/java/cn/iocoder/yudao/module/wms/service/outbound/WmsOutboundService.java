@@ -69,4 +69,10 @@ public interface WmsOutboundService {
     List<WmsOutboundDO> selectByIds(List<Long> list);
 
     List<WmsOutboundDO> getSimpleList(@Valid WmsOutboundPageReqVO pageReqVO);
+
+    void assembleWarehouse(List<WmsOutboundRespVO> list);
+
+    void assembleDept(List<WmsOutboundRespVO> list);
+
+    void assembleCompany(List<WmsOutboundRespVO> list);
 }
