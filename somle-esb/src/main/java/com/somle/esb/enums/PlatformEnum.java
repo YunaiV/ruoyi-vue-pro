@@ -1,4 +1,4 @@
-package com.somle.esb.enums.oms;
+package com.somle.esb.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

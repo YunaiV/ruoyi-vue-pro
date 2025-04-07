@@ -1,6 +1,5 @@
 package com.somle.esb.job.oms.shop;
 
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.yudao.module.oms.api.OmsShopApi;
 import cn.iocoder.yudao.module.oms.api.dto.OmsShopSaveReqDTO;
@@ -8,15 +7,11 @@ import com.somle.esb.converter.oms.AbstractToOmsConverter;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
 import java.util.*;
-
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static com.somle.esb.enums.ErrorCodeConstants.OMS_SYNC_SHOP_INFO_LACK;
 
 @Slf4j
 @Component
-public class ShopsSyncJob<SHOP> implements JobHandler {
+public class ShopsSyncJob<SHOP,PRODUCT> implements JobHandler {
 
     @Resource
     OmsShopApi omsShopApi;
@@ -30,13 +25,9 @@ public class ShopsSyncJob<SHOP> implements JobHandler {
     /**
      * 同步店铺资料
      **/
-    public void syncShops(AbstractToOmsConverter<SHOP> converter, List<SHOP> shops) {
-
-        var omsShops = converter.toShop(shops);
-
-        for (OmsShopSaveReqDTO omsShop : omsShops) {
-            omsShopApi.createShop(omsShop);
-        }
+    public void syncShops(AbstractToOmsConverter<SHOP,PRODUCT> converter, List<SHOP> shops) {
+        List<OmsShopSaveReqDTO> omsShops = converter.toShop(shops);
+        omsShopApi.createOrUpdateShopByPlatform(omsShops);
     }
 
 

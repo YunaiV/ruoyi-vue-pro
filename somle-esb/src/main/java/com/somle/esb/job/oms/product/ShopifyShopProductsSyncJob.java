@@ -1,4 +1,4 @@
-package com.somle.esb.job.oms.shop;
+package com.somle.esb.job.oms.product;
 
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import com.somle.esb.converter.oms.ShopifyToOmsConverter;
@@ -8,9 +8,11 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+
 @Slf4j
 @Component
-public class ShopifyShopsSyncJob extends ShopsSyncJob {
+public class ShopifyShopProductsSyncJob extends ShopProductsSyncJob {
 
     @Resource
     ShopifyService shopifyService;
@@ -23,8 +25,8 @@ public class ShopifyShopsSyncJob extends ShopsSyncJob {
         // 设置租户为默认租户
         TenantContextHolder.setTenantId(TenantId.DEFAULT.getId());
         shopifyService.getAllShopifyClients().forEach(shopifyClient -> {
-            syncShops(shopifyToOmsConverter, shopifyClient.getShops());
+            syncShopProducts(shopifyToOmsConverter, shopifyClient.getProducts(new HashMap<>()),shopifyClient);
         });
-        return "sync shopify shops success!";
+        return "sync shopify shopProducts success!";
     }
 }

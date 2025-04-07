@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.oms.service;
 
+import cn.iocoder.yudao.module.oms.api.dto.OmsShopProductSaveReqDTO;
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsShopProductDO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -14,10 +15,16 @@ public interface OmsShopProductService extends IService<OmsShopProductDO> {
 
 
     /**
-     * @param platformCode 平台代码
-     * @Description: 通过平台代码获取店铺产品集合
+     * @Description: 按平台创建或更新店铺产品信息
+     * @return:
+     */
+     void createOrUpdateShopProductByPlatform(List<OmsShopProductSaveReqDTO> saveReqDTOs);
+
+    /**
+     * @param shopId 店铺ID
+     * @Description: 通过店铺ID获取店铺产品列表
      * @return: @return {@link List }<{@link OmsShopProductDO }>
      */
-    List<OmsShopProductDO> getByPlatformCode(String platformCode);
+     List<OmsShopProductDO> getByShopId(Long shopId);
 
 }

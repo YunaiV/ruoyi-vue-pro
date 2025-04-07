@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.oms.convert;
 
 
+import cn.iocoder.yudao.module.oms.api.dto.OmsShopDTO;
 import cn.iocoder.yudao.module.oms.api.dto.OmsShopSaveReqDTO;
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsShopDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 /**
  * @Description: $
@@ -17,4 +20,7 @@ public interface OmsShopConvert {
     OmsShopConvert INSTANCE = Mappers.getMapper(OmsShopConvert.class);
 
     OmsShopDO convert(OmsShopSaveReqDTO saveReqDTO);
+
+    List<OmsShopDO> toOmsShopDOs(List<OmsShopSaveReqDTO> saveReqDTOs);
+    OmsShopDTO toOmsShopDTO(OmsShopDO omsShopDO);
 }
