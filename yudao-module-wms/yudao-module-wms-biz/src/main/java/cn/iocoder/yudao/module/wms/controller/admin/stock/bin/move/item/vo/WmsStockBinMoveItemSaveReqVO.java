@@ -5,6 +5,9 @@ import lombok.*;
 import java.util.*;
 import jakarta.validation.constraints.*;
 
+/**
+ * @table-fields : bin_move_id,product_id,qty,id,from_bin_id,to_bin_id
+ */
 @Schema(description = "管理后台 - 库位移动详情新增/修改 Request VO")
 @Data
 public class WmsStockBinMoveItemSaveReqVO {
@@ -28,5 +31,4 @@ public class WmsStockBinMoveItemSaveReqVO {
     @Schema(description = "移动数量", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "移动数量不能为空")
     private Integer qty;
-
 }

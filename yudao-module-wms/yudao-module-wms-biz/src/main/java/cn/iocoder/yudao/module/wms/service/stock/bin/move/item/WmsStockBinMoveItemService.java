@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.item.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.item.WmsStockBinMoveItemDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import java.util.List;
 
 /**
  * 库位移动详情 Service 接口
@@ -20,14 +21,14 @@ public interface WmsStockBinMoveItemService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createStockBinMoveItem(@Valid WmsStockBinMoveItemSaveReqVO createReqVO);
+    WmsStockBinMoveItemDO createStockBinMoveItem(@Valid WmsStockBinMoveItemSaveReqVO createReqVO);
 
     /**
      * 更新库位移动详情
      *
      * @param updateReqVO 更新信息
      */
-    void updateStockBinMoveItem(@Valid WmsStockBinMoveItemSaveReqVO updateReqVO);
+    WmsStockBinMoveItemDO updateStockBinMoveItem(@Valid WmsStockBinMoveItemSaveReqVO updateReqVO);
 
     /**
      * 删除库位移动详情
@@ -52,4 +53,8 @@ public interface WmsStockBinMoveItemService {
      */
     PageResult<WmsStockBinMoveItemDO> getStockBinMoveItemPage(WmsStockBinMoveItemPageReqVO pageReqVO);
 
+    /**
+     * 按 ID 集合查询 WmsStockBinMoveItemDO
+     */
+    List<WmsStockBinMoveItemDO> selectByIds(List<Long> idList);
 }
