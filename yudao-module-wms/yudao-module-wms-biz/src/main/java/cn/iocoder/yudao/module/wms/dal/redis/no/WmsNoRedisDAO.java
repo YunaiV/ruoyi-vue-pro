@@ -28,6 +28,10 @@ public class WmsNoRedisDAO {
     private static final String NO = "erp:seq_no:";
 
     /**
+     * 库位移动单的流水号前缀
+     **/
+    public static final String STOCK_BIN_MOVE_NO_PREFIX = "BIMV";
+    /**
      * 入库单单据号前缀
      */
     public static final String INBOUND_NO_PREFIX = "INBD";
@@ -36,6 +40,9 @@ public class WmsNoRedisDAO {
      */
     public static final String OUTBOUND_NO_PREFIX = "OUBD";
 
+    /**
+     * 拣货单单据号前缀
+     **/
     public static final String PICKUP_NO_PREFIX = "PIUP";
 
 

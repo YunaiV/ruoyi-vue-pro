@@ -153,4 +153,13 @@ public interface ErrorCodeConstants {
     ErrorCode OUTBOUND_ITEM_PLAN_QTY_ERROR = new ErrorCode(2_001_015_009, "计划出库量错误");
     ErrorCode OUTBOUND_ITEM_ACTUAL_QTY_ERROR = new ErrorCode(2_001_015_010, "实际出库量错误");
     ErrorCode OUTBOUND_STATUS_PARSE_ERROR = new ErrorCode(2_001_015_011, "无法完成出库单状态转换");
+
+    // ========== WMS_STOCK_BIN_MOVE 库位移动表 2_001_016_000 ==========
+    ErrorCode STOCK_BIN_MOVE_NOT_EXISTS = new ErrorCode(2_001_016_001, "库位移动不存在");
+    ErrorCode STOCK_BIN_MOVE_NO_DUPLICATE = new ErrorCode(2_001_016_002, "单据号已存在");
+    ErrorCode STOCK_BIN_MOVE_BE_REFERRED = new ErrorCode(2_001_016_003, "库位移动被引用");
+    ErrorCode STOCK_BIN_MOVE_NO_OUT_OF_BOUNDS = new ErrorCode(2_001_016_004, "库位移动单据号越界");
+    ErrorCode STOCK_BIN_MOVE_CAN_NOT_EDIT = new ErrorCode(2_001_016_005, "库位移动不允许编辑");
+    ErrorCode STOCK_BIN_MOVE_CAN_NOT_DELETE = new ErrorCode(2_001_016_006, "库位移动不允许删除");
+    ErrorCode STOCK_BIN_MOVE_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_016_007, "库位移动不符合审批条件");
 }
