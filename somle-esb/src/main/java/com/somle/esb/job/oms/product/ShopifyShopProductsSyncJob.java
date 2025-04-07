@@ -7,6 +7,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
@@ -20,9 +21,12 @@ public class ShopifyShopProductsSyncJob extends BaseShopProductsSyncJob {
     ShopifyToOmsConverter shopifyToOmsConverter;
 
 
-
     @Override
     public List<OmsShopProductSaveReqDTO> listProducts() {
-        return List.of();
+        return shopifyService.getAllShopifyClients().stream()
+            .flatMap(
+                client -> shopifyToOmsConverter.toProducts(client.getProducts(new HashMap<>()), client).stream()
+            )
+            .toList();
     }
 }
