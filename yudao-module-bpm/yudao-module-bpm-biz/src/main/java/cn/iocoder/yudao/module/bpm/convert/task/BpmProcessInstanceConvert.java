@@ -76,6 +76,15 @@ public interface BpmProcessInstanceConvert {
                     respVO.setStartUser(BeanUtils.toBean(startUser, UserSimpleBaseVO.class));
                     MapUtils.findAndThen(deptMap, startUser.getDeptId(), dept -> respVO.getStartUser().setDeptName(dept.getName()));
                 }
+                if (CollUtil.isNotEmpty(respVO.getTasks())) {
+                    respVO.getTasks().forEach(task -> {
+                        AdminUserRespDTO assigneeUser = userMap.get(task.getAssignee());
+                        if (assigneeUser!= null) {
+                            task.setAssigneeUser(BeanUtils.toBean(assigneeUser, UserSimpleBaseVO.class));
+                            MapUtils.findAndThen(deptMap, assigneeUser.getDeptId(), dept -> task.getAssigneeUser().setDeptName(dept.getName()));
+                        }
+                    });
+                }
             }
             // 摘要
             respVO.setSummary(FlowableUtils.getSummary(processDefinitionInfoMap.get(respVO.getProcessDefinitionId()),

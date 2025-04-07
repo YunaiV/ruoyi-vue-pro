@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * IOT 数据校验级别枚举类
+ * IoT 数据校验级别枚举类
  *
  * @author ahh
  */

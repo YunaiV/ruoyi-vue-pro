@@ -56,6 +56,15 @@ public class TradeExpressProperties {
         @NotEmpty(message = "快递鸟 Api Key 配置项不能为空")
         private String apiKey;
 
+        /**
+         * 接口指令
+         *
+         * 1. 1002：免费版（只能查询申通、圆通快递）
+         * 2. 8001：付费版
+         */
+        @NotEmpty(message = "RequestType 配置项不能为空")
+        private String requestType = "1002";
+
     }
 
     /**

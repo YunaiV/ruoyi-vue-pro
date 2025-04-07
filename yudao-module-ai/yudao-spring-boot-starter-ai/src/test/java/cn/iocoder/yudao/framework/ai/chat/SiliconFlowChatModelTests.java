@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.ai.chat;
 
+import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
 import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -25,11 +26,11 @@ public class SiliconFlowChatModelTests {
 
     private final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
             .openAiApi(OpenAiApi.builder()
-                    .baseUrl(SiliconFlowChatModel.BASE_URL)
+                    .baseUrl(SiliconFlowApiConstants.DEFAULT_BASE_URL)
                     .apiKey("sk-epsakfenqnyzoxhmbucsxlhkdqlcbnimslqoivkshalvdozz") // apiKey
                     .build())
             .defaultOptions(OpenAiChatOptions.builder()
-                    .model(SiliconFlowChatModel.MODEL_DEFAULT) // 模型
+                    .model(SiliconFlowApiConstants.MODEL_DEFAULT) // 模型
 //                    .model("deepseek-ai/DeepSeek-R1") // 模型（deepseek-ai/DeepSeek-R1）可用赠费
 //                    .model("Pro/deepseek-ai/DeepSeek-R1") // 模型（Pro/deepseek-ai/DeepSeek-R1）需要付费
                     .temperature(0.7)

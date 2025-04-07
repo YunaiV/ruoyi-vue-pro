@@ -13,7 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * 字段字段的 TypeHandler 实现类，基于 {@link cn.hutool.crypto.symmetric.AES} 实现
+ * 字段字段的 TypeHandler 实现类，基于 {@link AES} 实现
  * 可通过 jasypt.encryptor.password 配置项，设置密钥
  *
  * @author 芋道源码

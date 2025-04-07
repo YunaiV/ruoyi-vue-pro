@@ -275,7 +275,7 @@ public class MenuServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testValidateMenu_success() {
+    public void testValidateMenu_Name_success() {
         // mock 父子菜单
         MenuDO sonMenu = createParentAndSonMenu();
         // 准备参数
@@ -284,11 +284,11 @@ public class MenuServiceImplTest extends BaseDbUnitTest {
         String otherSonMenuName = randomString();
 
         // 调用，无需断言
-        menuService.validateMenu(parentId, otherSonMenuName, otherSonMenuId);
+        menuService.validateMenuName(parentId, otherSonMenuName, otherSonMenuId);
     }
 
     @Test
-    public void testValidateMenu_sonMenuNameDuplicate() {
+    public void testValidateMenu_sonMenuNameNameDuplicate() {
         // mock 父子菜单
         MenuDO sonMenu = createParentAndSonMenu();
         // 准备参数
@@ -297,7 +297,7 @@ public class MenuServiceImplTest extends BaseDbUnitTest {
         String otherSonMenuName = sonMenu.getName(); //相同名称
 
         // 调用，并断言异常
-        assertServiceException(() -> menuService.validateMenu(parentId, otherSonMenuName, otherSonMenuId),
+        assertServiceException(() -> menuService.validateMenuName(parentId, otherSonMenuName, otherSonMenuId),
                 MENU_NAME_DUPLICATE);
     }
 

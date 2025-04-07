@@ -11,11 +11,15 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.ai.config.YudaoAiAutoConfiguration;
 import cn.iocoder.yudao.framework.ai.config.YudaoAiProperties;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import cn.iocoder.yudao.framework.ai.core.model.baichuan.BaiChuanChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.deepseek.DeepSeekChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.doubao.DouBaoChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
 import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
+import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowImageApi;
+import cn.iocoder.yudao.framework.ai.core.model.siliconflow.SiliconFlowImageModel;
 import cn.iocoder.yudao.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
@@ -42,6 +46,7 @@ import org.springframework.ai.autoconfigure.moonshot.MoonshotAutoConfiguration;
 import org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration;
 import org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration;
 import org.springframework.ai.autoconfigure.qianfan.QianFanAutoConfiguration;
+import org.springframework.ai.autoconfigure.stabilityai.StabilityAiImageAutoConfiguration;
 import org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusServiceClientConnectionDetails;
 import org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusServiceClientProperties;
 import org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusVectorStoreAutoConfiguration;
@@ -146,6 +151,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildMoonshotChatModel(apiKey, url);
                 case XING_HUO:
                     return buildXingHuoChatModel(apiKey);
+                case BAI_CHUAN:
+                    return buildBaiChuanChatModel(apiKey);
                 case OPENAI:
                     return buildOpenAiChatModel(apiKey, url);
                 case AZURE_OPENAI:
@@ -182,6 +189,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(MoonshotChatModel.class);
             case XING_HUO:
                 return SpringUtil.getBean(XingHuoChatModel.class);
+            case BAI_CHUAN:
+                return SpringUtil.getBean(AzureOpenAiChatModel.class);
             case OPENAI:
                 return SpringUtil.getBean(OpenAiChatModel.class);
             case AZURE_OPENAI:
@@ -203,6 +212,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(QianFanImageModel.class);
             case ZHI_PU:
                 return SpringUtil.getBean(ZhiPuAiImageModel.class);
+            case SILICON_FLOW:
+                return SpringUtil.getBean(SiliconFlowImageModel.class);
             case OPENAI:
                 return SpringUtil.getBean(OpenAiImageModel.class);
             case STABLE_DIFFUSION:
@@ -224,6 +235,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return buildZhiPuAiImageModel(apiKey, url);
             case OPENAI:
                 return buildOpenAiImageModel(apiKey, url);
+            case SILICON_FLOW:
+                return buildSiliconFlowImageModel(apiKey,url);
             case STABLE_DIFFUSION:
                 return buildStabilityAiImageModel(apiKey, url);
             default:
@@ -434,6 +447,15 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     /**
+     * 可参考 {@link YudaoAiAutoConfiguration#baiChuanChatClient(YudaoAiProperties)}
+     */
+    private BaiChuanChatModel buildBaiChuanChatModel(String apiKey) {
+        YudaoAiProperties.BaiChuanProperties properties = new YudaoAiProperties.BaiChuanProperties()
+                .setApiKey(apiKey);
+        return new YudaoAiAutoConfiguration().buildBaiChuanChatClient(properties);
+    }
+
+    /**
      * 可参考 {@link OpenAiAutoConfiguration} 的 openAiChatModel 方法
      */
     private static OpenAiChatModel buildOpenAiChatModel(String openAiToken, String url) {
@@ -469,6 +491,15 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     /**
+     * 创建 SiliconFlowImageModel 对象
+     */
+    private SiliconFlowImageModel buildSiliconFlowImageModel(String apiToken, String url) {
+        url = StrUtil.blankToDefault(url, SiliconFlowApiConstants.DEFAULT_BASE_URL);
+        SiliconFlowImageApi openAiApi = new SiliconFlowImageApi(url, apiToken);
+        return new SiliconFlowImageModel(openAiApi);
+    }
+
+    /**
      * 可参考 {@link OllamaAutoConfiguration} 的 ollamaApi 方法
      */
     private static OllamaChatModel buildOllamaChatModel(String url) {
@@ -476,6 +507,9 @@ public class AiModelFactoryImpl implements AiModelFactory {
         return OllamaChatModel.builder().ollamaApi(ollamaApi).toolCallingManager(getToolCallingManager()).build();
     }
 
+    /**
+     * 可参考 {@link StabilityAiImageAutoConfiguration} 的 stabilityAiImageModel 方法
+     */
     private StabilityAiImageModel buildStabilityAiImageModel(String apiKey, String url) {
         url = StrUtil.blankToDefault(url, StabilityAiApi.DEFAULT_BASE_URL);
         StabilityAiApi stabilityAiApi = new StabilityAiApi(apiKey, StabilityAiApi.DEFAULT_IMAGE_MODEL, url);

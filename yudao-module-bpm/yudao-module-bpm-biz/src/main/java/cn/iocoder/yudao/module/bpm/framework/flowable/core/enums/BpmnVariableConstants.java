@@ -27,8 +27,16 @@ public class BpmnVariableConstants {
      * 流程实例的变量 - 发起用户选择的审批人 Map
      *
      * @see ProcessInstance#getProcessVariables()
+     * @see BpmTaskCandidateStrategyEnum#START_USER_SELECT
      */
     public static final String PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES = "PROCESS_START_USER_SELECT_ASSIGNEES";
+    /**
+     * 流程实例的变量 - 审批人选择的审批人 Map
+     *
+     * @see ProcessInstance#getProcessVariables()
+     * @see BpmTaskCandidateStrategyEnum#APPROVE_USER_SELECT
+     */
+    public static final String PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES = "PROCESS_APPROVE_USER_SELECT_ASSIGNEES";
     /**
      * 流程实例的变量 - 发起用户 ID
      *
@@ -50,6 +58,13 @@ public class BpmnVariableConstants {
      * @see <a href="https://blog.csdn.net/weixin_42065235/article/details/126039993">Flowable/Activiti之SkipExpression 完成自动审批</a>
      */
     public static final String PROCESS_INSTANCE_SKIP_EXPRESSION_ENABLED = "_FLOWABLE_SKIP_EXPRESSION_ENABLED";
+
+    /**
+     * 流程实例的变量 - 用于判断流程是否需要跳过发起人节点
+     *
+     * @see ProcessInstance#getProcessVariables()
+     */
+    public static final String PROCESS_INSTANCE_VARIABLE_SKIP_START_USER_NODE = "PROCESS_SKIP_START_USER_NODE";
 
     /**
      * 流程实例的变量 - 流程开始时间

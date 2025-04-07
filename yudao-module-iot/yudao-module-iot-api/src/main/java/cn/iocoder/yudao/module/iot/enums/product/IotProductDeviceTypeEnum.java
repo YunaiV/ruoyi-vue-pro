@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * IOT 产品的设备类型
+ * IoT 产品的设备类型
  *
  * @author ahh
  */
@@ -16,7 +16,7 @@ import java.util.Arrays;
 public enum IotProductDeviceTypeEnum implements ArrayValuable<Integer> {
 
     DIRECT(0, "直连设备"),
-    GATEWAY_CHILD(1, "网关子设备"),
+    GATEWAY_SUB(1, "网关子设备"),
     GATEWAY(2, "网关设备");
 
     /**
@@ -34,6 +34,26 @@ public enum IotProductDeviceTypeEnum implements ArrayValuable<Integer> {
     @Override
     public Integer[] array() {
         return ARRAYS;
+    }
+
+    /**
+     * 判断是否是网关
+     *
+     * @param type 类型
+     * @return 是否是网关
+     */
+    public static boolean isGateway(Integer type) {
+        return GATEWAY.getType().equals(type);
+    }
+
+    /**
+     * 判断是否是网关子设备
+     *
+     * @param type 类型
+     * @return 是否是网关子设备
+     */
+    public static boolean isGatewaySub(Integer type) {
+        return GATEWAY_SUB.getType().equals(type);
     }
 
 }

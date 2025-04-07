@@ -25,7 +25,7 @@ public class BpmModelRespVO extends BpmModelMetaInfoVO {
     @Schema(description = "流程图标", example = "https://www.iocoder.cn/yudao.jpg")
     private String icon;
 
-    @Schema(description = "流程分类编码", example = "1")
+    @Schema(description = "流程分类编号", example = "1")
     private String category;
     @Schema(description = "流程分类名字", example = "请假")
     private String categoryName;

@@ -1,26 +1,36 @@
 package cn.iocoder.yudao.module.iot.controller.admin.product;
 
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.product.vo.IotProductPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.product.vo.IotProductRespVO;
-import cn.iocoder.yudao.module.iot.controller.admin.product.vo.IotProductSaveReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.product.vo.IotProductSimpleRespVO;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductSaveReqVO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductCategoryDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
+import cn.iocoder.yudao.module.iot.service.product.IotProductCategoryService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
+import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 @Tag(name = "管理后台 - IoT 产品")
 @RestController
@@ -30,6 +40,8 @@ public class IotProductController {
 
     @Resource
     private IotProductService productService;
+    @Resource
+    private IotProductCategoryService categoryService;
 
     @PostMapping("/create")
     @Operation(summary = "创建产品")
@@ -72,7 +84,13 @@ public class IotProductController {
     @PreAuthorize("@ss.hasPermission('iot:product:query')")
     public CommonResult<IotProductRespVO> getProduct(@RequestParam("id") Long id) {
         IotProductDO product = productService.getProduct(id);
-        return success(BeanUtils.toBean(product, IotProductRespVO.class));
+        // 拼接数据
+        IotProductCategoryDO category = categoryService.getProductCategory(product.getCategoryId());
+        return success(BeanUtils.toBean(product, IotProductRespVO.class, bean -> {
+            if (category != null) {
+                bean.setCategoryName(category.getName());
+            }
+        }));
     }
 
     @GetMapping("/page")
@@ -80,16 +98,35 @@ public class IotProductController {
     @PreAuthorize("@ss.hasPermission('iot:product:query')")
     public CommonResult<PageResult<IotProductRespVO>> getProductPage(@Valid IotProductPageReqVO pageReqVO) {
         PageResult<IotProductDO> pageResult = productService.getProductPage(pageReqVO);
-        return success(BeanUtils.toBean(pageResult, IotProductRespVO.class));
+        // 拼接数据
+        Map<Long, IotProductCategoryDO> categoryMap = categoryService.getProductCategoryMap(
+                convertList(pageResult.getList(), IotProductDO::getCategoryId));
+        return success(BeanUtils.toBean(pageResult, IotProductRespVO.class, bean -> {
+            MapUtils.findAndThen(categoryMap, bean.getCategoryId(),
+                    category -> bean.setCategoryName(category.getName()));
+        }));
     }
 
-    // TODO @haohao：改成 simple-list 哈
-    @GetMapping("/list-all-simple")
-    @Operation(summary = "获得所有产品列表")
-    @PreAuthorize("@ss.hasPermission('iot:product:query')")
-    public CommonResult<List<IotProductSimpleRespVO>> listAllSimpleProducts() {
+    @GetMapping("/export-excel")
+    @Operation(summary = "导出产品 Excel")
+    @PreAuthorize("@ss.hasPermission('iot:product:export')")
+    @ApiAccessLog(operateType = EXPORT)
+    public void exportProductExcel(@Valid IotProductPageReqVO exportReqVO,
+                                   HttpServletResponse response) throws IOException {
+        exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        CommonResult<PageResult<IotProductRespVO>> result = getProductPage(exportReqVO);
+        // 导出 Excel
+        ExcelUtils.write(response, "产品.xls", "数据", IotProductRespVO.class,
+                result.getData().getList());
+    }
+
+    @GetMapping("/simple-list")
+    @Operation(summary = "获取产品的精简信息列表", description = "主要用于前端的下拉选项")
+    public CommonResult<List<IotProductRespVO>> getSimpleProductList() {
         List<IotProductDO> list = productService.getProductList();
-        return success(BeanUtils.toBean(list, IotProductSimpleRespVO.class));
+        return success(convertList(list, product -> // 只返回 id、name 字段
+                new IotProductRespVO().setId(product.getId()).setName(product.getName())
+                        .setDeviceType(product.getDeviceType())));
     }
 
 }

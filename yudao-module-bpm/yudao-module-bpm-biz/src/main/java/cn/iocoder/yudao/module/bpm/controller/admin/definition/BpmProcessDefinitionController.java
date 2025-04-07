@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
@@ -97,6 +99,17 @@ public class BpmProcessDefinitionController {
         // 2. 拼接 VO 返回
         return success(BpmProcessDefinitionConvert.INSTANCE.buildProcessDefinitionList(
                 list, null, processDefinitionMap, null, null));
+    }
+
+    @GetMapping("/simple-list")
+    @Operation(summary = "获得流程定义精简列表", description = "只包含未挂起的流程，主要用于前端的下拉选项")
+    public CommonResult<List<BpmProcessDefinitionRespVO>> getSimpleProcessDefinitionList() {
+        // 只查询未挂起的流程
+        List<ProcessDefinition> list = processDefinitionService.getProcessDefinitionListBySuspensionState(
+                SuspensionState.ACTIVE.getStateCode());
+        // 拼接 VO 返回，只返回 id、name、key
+        return success(convertList(list, definition -> new BpmProcessDefinitionRespVO()
+                .setId(definition.getId()).setName(definition.getName()).setKey(definition.getKey())));
     }
 
     @GetMapping ("/get")
