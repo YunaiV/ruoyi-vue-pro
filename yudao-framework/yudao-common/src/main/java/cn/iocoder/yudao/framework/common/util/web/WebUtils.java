@@ -106,13 +106,13 @@ public class WebUtils {
         String fullUrl = url;
         if (queryParams != null) {
             if (queryParams instanceof Map) {
-                fullUrl = urlWithParams(url, (Map) queryParams);
+                fullUrl = urlWithParams(url, queryParams);
             } else {
                 fullUrl = urlWithParams(url, queryParams);
             }
         }
 
-        log.info("full url: " + fullUrl);
+        log.debug("full url: " + fullUrl);
         Request.Builder requestBuilder = new Request.Builder()
             .url(fullUrl);
 
@@ -120,7 +120,7 @@ public class WebUtils {
             for (Map.Entry<String, String> header : headers.entrySet()) {
                 requestBuilder.addHeader(header.getKey(), header.getValue());
             }
-            log.debug("headers: " + headers.toString());
+            log.debug("headers: " + headers);
         }
 
         String bodyString = null;
