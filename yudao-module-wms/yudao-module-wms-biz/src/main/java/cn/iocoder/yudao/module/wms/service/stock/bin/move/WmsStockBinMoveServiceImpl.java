@@ -2,23 +2,32 @@ package cn.iocoder.yudao.module.wms.service.stock.bin.move;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMovePageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMoveSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.WmsStockBinMoveDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.item.WmsStockBinMoveItemDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.bin.move.WmsStockBinMoveMapper;
+import cn.iocoder.yudao.module.wms.dal.mysql.stock.bin.move.item.WmsStockBinMoveItemMapper;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_MOVE_ITEM_REPEATED;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_MOVE_NOT_EXISTS;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_MOVE_NO_DUPLICATE;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
  * 库位移动 Service 实现类
@@ -30,15 +39,20 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 public class WmsStockBinMoveServiceImpl implements WmsStockBinMoveService {
 
     @Resource
+    @Lazy
+    private WmsStockBinMoveItemMapper stockBinMoveItemMapper;
+
+    @Resource
     private WmsNoRedisDAO noRedisDAO;
 
     @Resource
     private WmsStockBinMoveMapper stockBinMoveMapper;
 
     /**
-     * @sign : 4F450E910B7AC4E6
+     * @sign : 9EAFE43CD7993903
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public WmsStockBinMoveDO createStockBinMove(WmsStockBinMoveSaveReqVO createReqVO) {
         // 设置单据号
         String no = noRedisDAO.generate(WmsNoRedisDAO.STOCK_BIN_MOVE_NO_PREFIX, 3);
@@ -49,19 +63,65 @@ public class WmsStockBinMoveServiceImpl implements WmsStockBinMoveService {
         // 插入
         WmsStockBinMoveDO stockBinMove = BeanUtils.toBean(createReqVO, WmsStockBinMoveDO.class);
         stockBinMoveMapper.insert(stockBinMove);
+        // 保存库位移动详情详情
+        if (createReqVO.getItemList() != null) {
+            List<WmsStockBinMoveItemDO> toInsetList = new ArrayList<>();
+            StreamX.from(createReqVO.getItemList()).filter(Objects::nonNull).forEach(item -> {
+                item.setId(null);
+                // 设置归属
+                item.setBinMoveId(stockBinMove.getId());
+                toInsetList.add(BeanUtils.toBean(item, WmsStockBinMoveItemDO.class));
+            });
+            Set<String> uniqueKeys=StreamX.from(toInsetList).toSet(itm->{
+                return StrUtils.join(Arrays.asList(itm.getProductId(),itm.getFromBinId(),itm.getToBinId()));
+            });
+            // 校验有重复的清单
+            if (uniqueKeys.size()!=toInsetList.size()) {
+                throw exception(STOCK_BIN_MOVE_ITEM_REPEATED);
+            }
+            stockBinMoveItemMapper.insertBatch(toInsetList);
+        }
         // 返回
         return stockBinMove;
     }
 
     /**
-     * @sign : B906C915ADF7E281
+     * @sign : CF76F2A3D4230C8A
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public WmsStockBinMoveDO updateStockBinMove(WmsStockBinMoveSaveReqVO updateReqVO) {
         // 校验存在
         WmsStockBinMoveDO exists = validateStockBinMoveExists(updateReqVO.getId());
         // 单据号不允许被修改
         updateReqVO.setNo(exists.getNo());
+        // 保存库位移动详情详情
+        if (updateReqVO.getItemList() != null) {
+            List<WmsStockBinMoveItemDO> existsInDB = stockBinMoveItemMapper.selectByBinMoveId(updateReqVO.getId());
+            StreamX.CompareResult<WmsStockBinMoveItemDO> compareResult = StreamX.compare(existsInDB, BeanUtils.toBean(updateReqVO.getItemList(), WmsStockBinMoveItemDO.class), WmsStockBinMoveItemDO::getId);
+            List<WmsStockBinMoveItemDO> toInsetList = compareResult.getTargetMoreThanBaseList();
+            List<WmsStockBinMoveItemDO> toUpdateList = compareResult.getIntersectionList();
+            List<WmsStockBinMoveItemDO> toDeleteList = compareResult.getBaseMoreThanTargetList();
+            List<WmsStockBinMoveItemDO> finalList = new ArrayList<>();
+            finalList.addAll(toInsetList);
+            finalList.addAll(toUpdateList);
+            // 校验 toInsetList 中是否有重复的 productId
+            Set<String> uniqueKeys=StreamX.from(finalList).toSet(itm->{
+                return StrUtils.join(Arrays.asList(itm.getProductId(),itm.getFromBinId(),itm.getToBinId()));
+            });
+            // 校验有重复的清单
+            if (uniqueKeys.size()!=toInsetList.size()) {
+                throw exception(STOCK_BIN_MOVE_ITEM_REPEATED);
+            }
+            // 设置归属
+            finalList.forEach(item -> {
+                item.setBinMoveId(updateReqVO.getId());
+            });
+            // 保存详情
+            stockBinMoveItemMapper.insertBatch(toInsetList);
+            stockBinMoveItemMapper.updateBatch(toUpdateList);
+            stockBinMoveItemMapper.deleteBatchIds(toDeleteList);
+        }
         // 更新
         WmsStockBinMoveDO stockBinMove = BeanUtils.toBean(updateReqVO, WmsStockBinMoveDO.class);
         stockBinMoveMapper.updateById(stockBinMove);
@@ -121,4 +181,4 @@ public class WmsStockBinMoveServiceImpl implements WmsStockBinMoveService {
     public List<WmsStockBinMoveDO> selectSimpleList(WmsStockBinMovePageReqVO reqVO) {
         return stockBinMoveMapper.selectSimpleList(reqVO);
     }
-}
+}

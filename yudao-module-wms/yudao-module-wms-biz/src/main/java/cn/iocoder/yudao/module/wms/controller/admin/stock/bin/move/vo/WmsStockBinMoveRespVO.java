@@ -7,6 +7,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import com.alibaba.excel.annotation.*;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+import java.util.List;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.item.vo.WmsStockBinMoveItemRespVO;
 
 /**
  * @table-fields : tenant_id,no,creator,update_time,create_time,id,updater,warehouse_id
@@ -48,4 +50,8 @@ public class WmsStockBinMoveRespVO {
     @Schema(description = "更新者", example = "")
     @ExcelProperty("更新者")
     private String updater;
+
+    @Schema(description = "详情清单", example = "")
+    @ExcelProperty("详情清单")
+    private List<WmsStockBinMoveItemRespVO> itemList;
 }

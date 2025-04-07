@@ -162,4 +162,15 @@ public interface ErrorCodeConstants {
     ErrorCode STOCK_BIN_MOVE_CAN_NOT_EDIT = new ErrorCode(2_001_016_005, "库位移动不允许编辑");
     ErrorCode STOCK_BIN_MOVE_CAN_NOT_DELETE = new ErrorCode(2_001_016_006, "库位移动不允许删除");
     ErrorCode STOCK_BIN_MOVE_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_016_007, "库位移动不符合审批条件");
-}
+
+    // ========== WMS_STOCK_BIN_MOVE_ITEM 库位移动详情表 2_001_017_000 ==========
+    ErrorCode STOCK_BIN_MOVE_ITEM_NOT_EXISTS = new ErrorCode(2_001_017_001, "库位移动详情不存在");
+    ErrorCode STOCK_BIN_MOVE_ITEM_BIN_MOVE_ID_PRODUCT_ID_FROM_BIN_ID_TO_BIN_ID_DUPLICATE = new ErrorCode(2_001_017_002, "库位移动表ID,产品ID,调出库位ID,调入库位ID已存在");
+    ErrorCode STOCK_BIN_MOVE_ITEM_BE_REFERRED = new ErrorCode(2_001_017_003, "库位移动详情被引用");
+    ErrorCode STOCK_BIN_MOVE_ITEM_CAN_NOT_EDIT = new ErrorCode(2_001_017_004, "库位移动详情不允许编辑");
+    ErrorCode STOCK_BIN_MOVE_ITEM_CAN_NOT_DELETE = new ErrorCode(2_001_017_005, "库位移动详情不允许删除");
+    ErrorCode STOCK_BIN_MOVE_ITEM_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_017_006, "库位移动详情不符合审批条件");
+    ErrorCode STOCK_BIN_MOVE_ITEM_EXISTS = new ErrorCode(2_001_017_006, "库位移动详情已存在");
+    ErrorCode STOCK_BIN_MOVE_ITEM_REPEATED = new ErrorCode(2_001_017_007, "库位移动详情重复");
+
+}

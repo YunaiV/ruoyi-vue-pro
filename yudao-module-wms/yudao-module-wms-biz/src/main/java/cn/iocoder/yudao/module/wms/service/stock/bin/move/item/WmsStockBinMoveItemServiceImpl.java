@@ -111,4 +111,9 @@ public class WmsStockBinMoveItemServiceImpl implements WmsStockBinMoveItemServic
         }
         return stockBinMoveItemMapper.selectByIds(idList);
     }
+
+    @Override
+    public List<WmsStockBinMoveItemDO> selectByBinMoveId(Long binMoveId) {
+        return stockBinMoveItemMapper.selectByBinMoveId(binMoveId);
+    }
 }

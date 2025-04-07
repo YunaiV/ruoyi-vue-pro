@@ -6,17 +6,21 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.item.vo.WmsStockBinMoveItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMovePageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMoveRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMoveSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.WmsStockBinMoveDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.item.WmsStockBinMoveItemDO;
 import cn.iocoder.yudao.module.wms.service.stock.bin.move.WmsStockBinMoveService;
+import cn.iocoder.yudao.module.wms.service.stock.bin.move.item.WmsStockBinMoveItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -41,6 +45,10 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_MOV
 @RequestMapping("/wms/stock-bin-move")
 @Validated
 public class WmsStockBinMoveController {
+
+    @Resource()
+    @Lazy()
+    private WmsStockBinMoveItemService stockBinMoveItemService;
 
     @Resource
     private WmsStockBinMoveService stockBinMoveService;
@@ -76,7 +84,7 @@ public class WmsStockBinMoveController {
     }
 
     /**
-     * @sign : D4D82FFCD0589E13
+     * @sign : 51C7A99B4BB4E361
      */
     @GetMapping("/get")
     @Operation(summary = "获得库位移动")
@@ -90,6 +98,9 @@ public class WmsStockBinMoveController {
         }
         // 转换
         WmsStockBinMoveRespVO stockBinMoveVO = BeanUtils.toBean(stockBinMove, WmsStockBinMoveRespVO.class);
+        // 组装库位移动详情
+        List<WmsStockBinMoveItemDO> stockBinMoveItemList = stockBinMoveItemService.selectByBinMoveId(stockBinMoveVO.getId());
+        stockBinMoveVO.setItemList(BeanUtils.toBean(stockBinMoveItemList, WmsStockBinMoveItemRespVO.class));
         // 返回
         return success(stockBinMoveVO);
     }
@@ -119,5 +130,4 @@ public class WmsStockBinMoveController {
         // 导出 Excel
         ExcelUtils.write(response, "库位移动.xls", "数据", WmsStockBinMoveRespVO.class, BeanUtils.toBean(list, WmsStockBinMoveRespVO.class));
     }
-
 }

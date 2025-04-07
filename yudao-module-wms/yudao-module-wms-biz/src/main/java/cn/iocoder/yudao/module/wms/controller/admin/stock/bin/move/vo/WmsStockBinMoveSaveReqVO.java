@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
 import jakarta.validation.constraints.*;
+import java.util.List;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.item.vo.WmsStockBinMoveItemSaveReqVO;
 
 /**
  * @table-fields : no,id,warehouse_id
@@ -21,4 +23,7 @@ public class WmsStockBinMoveSaveReqVO {
     @Schema(description = "仓库ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "15798")
     @NotNull(message = "仓库ID不能为空")
     private Long warehouseId;
+
+    @Schema(description = "详情清单", example = "")
+    private List<WmsStockBinMoveItemSaveReqVO> itemList;
 }
