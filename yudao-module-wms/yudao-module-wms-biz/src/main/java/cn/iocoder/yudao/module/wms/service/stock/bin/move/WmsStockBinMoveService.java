@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.wms.service.stock.bin.move;
 
-import java.util.*;
-import jakarta.validation.*;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.WmsStockBinMoveDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMovePageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMoveSaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.WmsStockBinMoveDO;
+import jakarta.validation.Valid;
+import java.util.List;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 
 /**
  * 库位移动 Service 接口
@@ -51,4 +52,14 @@ public interface WmsStockBinMoveService {
      * @return 库位移动分页
      */
     PageResult<WmsStockBinMoveDO> getStockBinMovePage(WmsStockBinMovePageReqVO pageReqVO);
+
+    /**
+     * 按 ID 集合查询 WmsStockBinMoveDO
+     */
+    List<WmsStockBinMoveDO> selectByIds(List<Long> idList);
+
+    /**
+     * 按 ID 集合查询 WmsStockBinMoveDO
+     */
+    List<WmsStockBinMoveDO> selectSimpleList(WmsStockBinMovePageReqVO reqVO);
 }

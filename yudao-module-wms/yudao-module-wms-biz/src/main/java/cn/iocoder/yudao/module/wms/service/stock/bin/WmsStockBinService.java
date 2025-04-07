@@ -79,4 +79,6 @@ public interface WmsStockBinService {
     void assembleBin(List<WmsStockBinRespVO> list);
 
     List<WmsStockBinDO> selectStockBinByIds(List<Long> stockBinIds);
+
+
 }

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.stock.bin.move;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMovePageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMoveSaveReqVO;
@@ -11,10 +12,13 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
+import java.util.List;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_MOVE_NOT_EXISTS;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_MOVE_NO_DUPLICATE;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
  * 库位移动 Service 实现类
@@ -100,4 +104,21 @@ public class WmsStockBinMoveServiceImpl implements WmsStockBinMoveService {
     public PageResult<WmsStockBinMoveDO> getStockBinMovePage(WmsStockBinMovePageReqVO pageReqVO) {
         return stockBinMoveMapper.selectPage(pageReqVO);
     }
-}
+
+    /**
+     * 按 ID 集合查询 WmsStockBinMoveDO
+     */
+    public List<WmsStockBinMoveDO> selectByIds(List<Long> idList) {
+        if (CollectionUtils.isEmpty(idList)) {
+            return List.of();
+        }
+        return stockBinMoveMapper.selectByIds(idList);
+    }
+
+    /**
+     * 按 ID 集合查询 WmsStockBinMoveDO
+     */
+    public List<WmsStockBinMoveDO> selectSimpleList(WmsStockBinMovePageReqVO reqVO) {
+        return stockBinMoveMapper.selectSimpleList(reqVO);
+    }
+}
