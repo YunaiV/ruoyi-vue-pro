@@ -20,14 +20,14 @@ public interface WmsStockBinMoveService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createStockBinMove(@Valid WmsStockBinMoveSaveReqVO createReqVO);
+    WmsStockBinMoveDO createStockBinMove(@Valid WmsStockBinMoveSaveReqVO createReqVO);
 
     /**
      * 更新库位移动
      *
      * @param updateReqVO 更新信息
      */
-    void updateStockBinMove(@Valid WmsStockBinMoveSaveReqVO updateReqVO);
+    WmsStockBinMoveDO updateStockBinMove(@Valid WmsStockBinMoveSaveReqVO updateReqVO);
 
     /**
      * 删除库位移动
@@ -51,5 +51,4 @@ public interface WmsStockBinMoveService {
      * @return 库位移动分页
      */
     PageResult<WmsStockBinMoveDO> getStockBinMovePage(WmsStockBinMovePageReqVO pageReqVO);
-
 }

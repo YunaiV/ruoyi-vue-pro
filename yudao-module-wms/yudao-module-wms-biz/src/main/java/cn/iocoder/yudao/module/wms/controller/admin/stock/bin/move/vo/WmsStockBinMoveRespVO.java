@@ -6,7 +6,11 @@ import java.util.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import com.alibaba.excel.annotation.*;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+/**
+ * @table-fields : tenant_id,no,creator,update_time,create_time,id,updater,warehouse_id
+ */
 @Schema(description = "管理后台 - 库位移动 Response VO")
 @Data
 @ExcelIgnoreUnannotated
@@ -16,7 +20,7 @@ public class WmsStockBinMoveRespVO {
     @ExcelProperty("主键")
     private Long id;
 
-    @Schema(description = "单据号", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "单据号")
     @ExcelProperty("单据号")
     private String no;
 
@@ -28,4 +32,20 @@ public class WmsStockBinMoveRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "创建者", example = "")
+    @ExcelProperty("创建者")
+    private String creator;
+
+    @Schema(description = "租户编号", example = "")
+    @ExcelProperty("租户编号")
+    private Long tenantId;
+
+    @Schema(description = "更新时间", example = "")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @ExcelProperty("更新时间")
+    private LocalDateTime updateTime;
+
+    @Schema(description = "更新者", example = "")
+    @ExcelProperty("更新者")
+    private String updater;
 }
