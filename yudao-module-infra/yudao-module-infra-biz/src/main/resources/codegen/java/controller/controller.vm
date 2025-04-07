@@ -49,7 +49,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     @PostMapping("/create")
     @Operation(summary = "创建${table.classComment}")
 #if ($sceneEnum.scene == 1)
-@Idempotent
+    @Idempotent
     @PreAuthorize("@ss.hasPermission('${permissionPrefix}:create')")
 #end
     public CommonResult<${primaryColumn.javaType}> create${simpleClassName}(@Valid @RequestBody ${sceneEnum.prefixClass}${table.className}SaveReqVO createReqVO) {
@@ -138,20 +138,19 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     }
 #end
 
-            @PostMapping("/import-excel")
-            @Operation(summary = "导入${table.classComment} Excel")
-            #if ($sceneEnum.scene == 1)
-                @PreAuthorize("@ss.hasPermission('${permissionPrefix}:import')")
-            #end
-            public CommonResult
-            <Boolean> import${simpleClassName}Excel(@RequestParam("file") MultipartFile file) throws Exception {
-                List
-                <${sceneEnum.prefixClass}${table.className}SaveReqVO> list =
-                    ExcelUtils.read(file, ${sceneEnum.prefixClass}${table.className}SaveReqVO.class);
-                    // 可根据业务需要批量保存或校验
-                    return success(true);
-                    }
-
+    @PostMapping("/import-excel")
+    @Operation(summary = "导入${table.classComment} Excel")
+    #if ($sceneEnum.scene == 1)
+        @PreAuthorize("@ss.hasPermission('${permissionPrefix}:import')")
+    #end
+    public CommonResult
+    <Boolean> import${simpleClassName}Excel(@RequestParam("file") MultipartFile file) throws Exception {
+        List
+        <${sceneEnum.prefixClass}${table.className}SaveReqVO> list =
+            ExcelUtils.read(file, ${sceneEnum.prefixClass}${table.className}SaveReqVO.class);
+            // 可根据业务需要批量保存或校验
+            return success(true);
+    }
 
 
 ## 特殊：主子表专属逻辑
