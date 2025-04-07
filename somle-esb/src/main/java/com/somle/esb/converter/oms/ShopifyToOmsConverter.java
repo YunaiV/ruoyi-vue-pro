@@ -22,32 +22,28 @@ import static cn.iocoder.yudao.module.oms.api.enums.OmsErrorCodeConstants.OMS_SY
 
 
 @Component
-public class ShopifyToOmsConverter extends AbstractToOmsConverter<ShopifyShopRepsVO, ShopifyShopProductRepsVO> {
+public class ShopifyToOmsConverter {
 
     @Resource
     OmsShopApi omsShopApi;
 
-    public ShopifyToOmsConverter() {
-        super(PlatformEnum.SHOPIFY);
-    }
+    private PlatformEnum platform = PlatformEnum.SHOPIFY;
 
-    @Override
-    public List<OmsShopSaveReqDTO> toShop(List<ShopifyShopRepsVO> shopInfoDTOs) {
+    public List<OmsShopSaveReqDTO> toShops(List<ShopifyShopRepsVO> shopInfoDTOs) {
         List<OmsShopSaveReqDTO> omsShopSaveReqDTOs = shopInfoDTOs.stream().map(shopInfoDTO -> {
             OmsShopSaveReqDTO shopDTO = new OmsShopSaveReqDTO();
             shopDTO.setName(null);
             shopDTO.setPlatformShopName(shopInfoDTO.getName());
             shopDTO.setCode(null);
             shopDTO.setPlatformShopCode(shopInfoDTO.getId().toString());
-            shopDTO.setPlatformCode(this.getPlatform().toString());
+            shopDTO.setPlatformCode(this.platform.toString());
             shopDTO.setType(ShopTypeEnum.ONLINE.getType());
             return shopDTO;
         }).toList();
         return omsShopSaveReqDTOs;
     }
 
-    @Override
-    public List<OmsShopProductSaveReqDTO> toProduct(List<ShopifyShopProductRepsVO> product, ShopifyClient shopifyClient) {
+    public List<OmsShopProductSaveReqDTO> toProducts(List<ShopifyShopProductRepsVO> product, ShopifyClient shopifyClient) {
         if (CollectionUtil.isEmpty(shopifyClient.getShops())) {
             throw exception(OMS_SYNC_SHOP_INFO_LACK);
         }

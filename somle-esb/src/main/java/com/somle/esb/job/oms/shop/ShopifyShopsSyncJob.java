@@ -1,16 +1,17 @@
 package com.somle.esb.job.oms.shop;
 
-import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
+import cn.iocoder.yudao.module.oms.api.dto.OmsShopSaveReqDTO;
 import com.somle.esb.converter.oms.ShopifyToOmsConverter;
-import com.somle.esb.enums.TenantId;
 import com.somle.shopify.service.ShopifyService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Slf4j
 @Component
-public class ShopifyShopsSyncJob extends ShopsSyncJob {
+public class ShopifyShopsSyncJob extends BaseShopsSyncJob {
 
     @Resource
     ShopifyService shopifyService;
@@ -19,12 +20,11 @@ public class ShopifyShopsSyncJob extends ShopsSyncJob {
     ShopifyToOmsConverter shopifyToOmsConverter;
 
     @Override
-    public String execute(String param) throws Exception {
-        // 设置租户为默认租户
-        TenantContextHolder.setTenantId(TenantId.DEFAULT.getId());
-        shopifyService.getAllShopifyClients().forEach(shopifyClient -> {
-            syncShops(shopifyToOmsConverter, shopifyClient.getShops());
-        });
-        return "sync shopify shops success!";
+    public List<OmsShopSaveReqDTO> listShops() {
+        return shopifyService.getAllShopifyClients().stream()
+            .flatMap(
+                client -> shopifyToOmsConverter.toShops(client.getShops()).stream()
+            )
+            .toList();
     }
 }
