@@ -53,7 +53,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 
 @Tag(name = "管理后台 - ERP 采购入库")
 @RestController
-@RequestMapping("/erp/purchase-in")
+@RequestMapping("/srm/purchase-in")
 @Validated
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class SrmPurchaseInController {

@@ -45,7 +45,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 
 @Tag(name = "管理后台 - ERP 采购退货")
 @RestController
-@RequestMapping("/erp/purchase-return")
+@RequestMapping("/srm/purchase-return")
 @Validated
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class SrmPurchaseReturnController {

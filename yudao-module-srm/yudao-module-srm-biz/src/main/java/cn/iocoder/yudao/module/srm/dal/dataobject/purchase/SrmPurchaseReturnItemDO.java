@@ -59,7 +59,7 @@ public class SrmPurchaseReturnItemDO extends BaseDO {
     /**
      * 币种编号
      */
-    private Long currencyId;
+//    private Long currencyId;
     /**
      * 币别名称
      */

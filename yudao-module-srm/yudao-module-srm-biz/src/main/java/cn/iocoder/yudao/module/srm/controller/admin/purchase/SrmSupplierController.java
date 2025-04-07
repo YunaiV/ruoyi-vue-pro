@@ -32,7 +32,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 
 @Tag(name = "管理后台 - ERP 供应商")
 @RestController
-@RequestMapping("/erp/supplier")
+@RequestMapping("/srm/supplier")
 @Validated
 public class SrmSupplierController {
 

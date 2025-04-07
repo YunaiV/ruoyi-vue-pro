@@ -31,7 +31,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - ERP 供应商产品")
 @RestController
-@RequestMapping("/erp/supplier-product")
+@RequestMapping("/srm/supplier-product")
 @Validated
 public class SrmSupplierProductController {
 

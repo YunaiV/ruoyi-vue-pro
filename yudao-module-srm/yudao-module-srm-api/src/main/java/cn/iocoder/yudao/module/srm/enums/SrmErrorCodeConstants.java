@@ -167,4 +167,8 @@ public interface SrmErrorCodeConstants {
     ErrorCode FINANCE_SUBJECT_NOT_EXISTS = new ErrorCode(1_030_611_000, "Erp财务主体不存在");
     // ========== 海关产品分类表1-030-607-000 ==========
     ErrorCode CUSTOM_PRODUCT_NOT_EXISTS = new ErrorCode(1_030_607_001, "海关产品分类表不存在");
+
+    // ========== 付款条款  ==========
+    ErrorCode PAYMENT_TERM_NOT_EXISTS = new ErrorCode(1_030_607_001, "付款条款不存在");
+
 }
