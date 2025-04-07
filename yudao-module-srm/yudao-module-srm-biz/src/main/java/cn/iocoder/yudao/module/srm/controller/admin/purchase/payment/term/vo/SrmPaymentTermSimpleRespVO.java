@@ -2,7 +2,9 @@ package cn.iocoder.yudao.module.srm.controller.admin.purchase.payment.term.vo;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
+@Data
 public class SrmPaymentTermSimpleRespVO {
     @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "10931")
     @ExcelProperty("主键")
