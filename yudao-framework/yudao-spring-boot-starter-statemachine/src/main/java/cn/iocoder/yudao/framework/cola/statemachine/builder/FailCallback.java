@@ -16,5 +16,5 @@ public interface FailCallback<S, E, C> {
      * @param event
      * @param context
      */
-    void onFail(S sourceState, E event, C context);
+    void onFail(S sourceState, S targetState,E event, C context);
 }

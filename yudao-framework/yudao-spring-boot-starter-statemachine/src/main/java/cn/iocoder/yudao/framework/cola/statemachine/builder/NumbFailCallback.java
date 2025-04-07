@@ -9,7 +9,7 @@ package cn.iocoder.yudao.framework.cola.statemachine.builder;
 public class NumbFailCallback<S, E, C> implements FailCallback<S, E, C> {
 
     @Override
-    public void onFail(S sourceState, E event, C context) {
+    public void onFail(S sourceState, S targetState, E event, C context) {
         //do nothing
     }
 }

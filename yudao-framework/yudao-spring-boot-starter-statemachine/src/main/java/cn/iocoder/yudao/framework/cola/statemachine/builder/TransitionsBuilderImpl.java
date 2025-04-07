@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.cola.statemachine.builder;
 import cn.iocoder.yudao.framework.cola.statemachine.*;
 import cn.iocoder.yudao.framework.cola.statemachine.impl.StateHelper;
 import cn.iocoder.yudao.framework.cola.statemachine.impl.TransitionType;
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,10 +60,18 @@ public class TransitionsBuilderImpl<S,E,C> extends AbstractTransitionBuilder<S,E
     }
 
     @Override
-    public void handle(Handler<S, E, C> handler) {
+    public When<S, E, C> handle(Handler<S, E, C> handler) {
         for(Transition transition : transitions){
             transition.setCondition(handler);
             transition.setAction(handler);
         }
+        return this;
+    }
+
+    @Override
+    public When<S, E, C> handle(Class<? extends Handler<S, E, C>> handlerType) {
+        Handler<S, E, C> handler = SpringUtils.getBean(handlerType);
+        this.handle(handler);
+        return this;
     }
 }
