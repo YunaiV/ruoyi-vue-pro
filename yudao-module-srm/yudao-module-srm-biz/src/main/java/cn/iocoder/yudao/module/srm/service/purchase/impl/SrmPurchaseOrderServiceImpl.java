@@ -267,7 +267,7 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
         // 2.1 更新订单
         SrmPurchaseOrderDO updateObj = BeanUtils.toBean(vo, SrmPurchaseOrderDO.class);
         calculateTotalPrice(updateObj, purchaseOrderItems);//计算item合计。
-        ThrowUtil.ifSqlThrow(purchaseOrderMapper.updateById(updateObj), DB_UPDATE_ERROR);
+        purchaseOrderMapper.updateById(updateObj);
         // 2.2 更新订单项
         updatePurchaseOrderItemList(vo.getId(), purchaseOrderItems);
     }
