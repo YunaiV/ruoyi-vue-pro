@@ -6,6 +6,7 @@ public interface SrmStateMachines {
     // ========== ERP 采购申请单 ==========
     //采购申请主表开关状态机
     String PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME = "purchaseRequestOff";
+
     //采购申请审核状态机
     String PURCHASE_REQUEST_AUDIT_STATE_MACHINE_NAME = "purchaseRequestAudit";
     //采购主表采购状态机
@@ -58,6 +59,5 @@ public interface SrmStateMachines {
     String PURCHASE_RETURN_REFUND_STATE_MACHINE_NAME = "purchaseReturnRefund";
     // ========== ERP 退货单子项 ==========
     String PURCHASE_RETURN_ITEM_REFUND_STATE_MACHINE_NAME = "purchaseReturnItemRefund";
-
 
 }

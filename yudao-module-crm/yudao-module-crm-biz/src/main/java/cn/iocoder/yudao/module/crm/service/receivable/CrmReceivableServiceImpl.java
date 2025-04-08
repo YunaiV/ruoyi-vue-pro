@@ -10,8 +10,6 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.bpm.api.task.BpmProcessInstanceApi;
-import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivablePageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.receivable.CrmReceivableSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
@@ -76,8 +74,6 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
 
     @Resource
     private AdminUserApi adminUserApi;
-    @Resource
-    private BpmProcessInstanceApi bpmProcessInstanceApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)

@@ -101,6 +101,7 @@ public class SrmPaymentTermController {
         @RequestParam("file") MultipartFile file) throws Exception {
         List<SrmPaymentTermSaveReqVO> list = ExcelUtils.read(file, SrmPaymentTermSaveReqVO.class);
         // 可根据业务需要批量保存或校验
+        paymentTermService.createPaymentTermList(list);
         return success(list);
     }
 

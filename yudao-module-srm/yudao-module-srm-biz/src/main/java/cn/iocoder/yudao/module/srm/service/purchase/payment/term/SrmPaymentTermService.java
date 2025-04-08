@@ -59,4 +59,11 @@ public interface SrmPaymentTermService {
      * @return 付款条款列表
      */
     List<SrmPaymentTermDO> getPaymentTermList();
+
+    /**
+     * 批量创建付款条款
+     *
+     * @param list 付款条款列表
+     */
+    void createPaymentTermList(List<SrmPaymentTermSaveReqVO> list);
 }

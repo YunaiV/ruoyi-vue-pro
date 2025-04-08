@@ -10,7 +10,7 @@ debug: false
 erp:
   template:
     scan-path: purchase/order/
-    enable-preload: true
+    enable-preload: false
 somle:
   jpa:
     enabled: false #在local环境关闭com.somle文件夹的自动配置

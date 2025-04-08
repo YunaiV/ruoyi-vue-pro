@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.payment.term.SrmPayme
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.payment.term.SrmPaymentTermMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
@@ -72,5 +73,13 @@ public class SrmPaymentTermServiceImpl implements SrmPaymentTermService {
     @Override
     public List<SrmPaymentTermDO> getPaymentTermList() {
         return paymentTermMapper.selectList();
+    }
+
+    @Override
+    @Transactional
+    public void createPaymentTermList(List<SrmPaymentTermSaveReqVO> list) {
+        for (SrmPaymentTermSaveReqVO srmPaymentTermSaveReqVO : list) {
+            createPaymentTerm(srmPaymentTermSaveReqVO);
+        }
     }
 }

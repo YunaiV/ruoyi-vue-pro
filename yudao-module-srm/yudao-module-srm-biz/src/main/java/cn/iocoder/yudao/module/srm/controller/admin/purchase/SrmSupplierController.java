@@ -28,7 +28,6 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 @Tag(name = "管理后台 - ERP 供应商")
 @RestController
@@ -86,7 +85,7 @@ public class SrmSupplierController {
     @PreAuthorize("@ss.hasPermission('srm:supplier:query')")
     public CommonResult<List<SrmSupplierRespVO>> getSupplierSimpleList() {
         List<SrmSupplierDO> list = supplierService.getSupplierListByStatus(CommonStatusEnum.ENABLE.getStatus());
-        return success(convertList(list, supplier -> new SrmSupplierRespVO().setId(supplier.getId()).setName(supplier.getName())));
+        return success(BeanUtils.toBean(list, SrmSupplierRespVO.class));
     }
 
     @GetMapping("/export-excel")
