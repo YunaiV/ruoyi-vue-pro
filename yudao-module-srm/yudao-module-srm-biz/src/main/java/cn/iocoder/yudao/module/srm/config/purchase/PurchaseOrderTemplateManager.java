@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.srm.config.purchase;
 
+import cn.iocoder.yudao.framework.common.util.io.TemplateManager;
 import com.aspose.words.Document;
 import com.aspose.words.SaveFormat;
 import com.deepoove.poi.XWPFTemplate;
@@ -26,7 +27,6 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PURCHASE_ORDER_GENERATE_CONTRACT_FAIL;
 import static cn.iocoder.yudao.module.srm.enums.SrmErrorCodeConstants.PURCHASE_ORDER_GENERATE_CONTRACT_FAIL_PARSE;
 
 @Slf4j
@@ -54,24 +54,9 @@ public class PurchaseOrderTemplateManager {
         this.configure = builder.build();
     }
 
-    public XWPFTemplate getTemplate(String path) {
+    public XWPFTemplate buildTemplate(String path) {
         log.debug("获取模板: {}", path);
-        byte[] templateBytes = templateCache.computeIfAbsent(path, p -> {
-            try {
-                Resource resource = resourcePatternResolver.getResource("classpath:" + p);
-                if (!resource.exists()) {
-                    throw exception(PURCHASE_ORDER_GENERATE_CONTRACT_FAIL, p, "模板文件不存在");
-                }
-                try (InputStream stream = resource.getInputStream()) {
-                    byte[] bytes = stream.readAllBytes();
-                    log.info("采购模板加载成功并缓存: {}", p);
-                    return bytes;
-                }
-            } catch (IOException e) {
-                throw exception(PURCHASE_ORDER_GENERATE_CONTRACT_FAIL, p, e.getMessage());
-            }
-        });
-
+        byte[] templateBytes = templateCache.computeIfAbsent(path, p -> TemplateManager.getTemplateBytes(resourcePatternResolver.getResource("classpath:" + p)));
         try (InputStream input = new ByteArrayInputStream(templateBytes)) {
             return XWPFTemplate.compile(input, configure);
         } catch (IOException e) {
@@ -88,6 +73,7 @@ public class PurchaseOrderTemplateManager {
         preloadTemplatesAsync();
     }
 
+
     @Async
     public void preloadTemplatesAsync() {
         try {
@@ -98,13 +84,15 @@ public class PurchaseOrderTemplateManager {
             for (Resource resource : resources) {
                 try {
                     Optional.ofNullable(resource.getFilename()).ifPresent(fileName -> {
-                        if (fileName.endsWith(".docx")) {
-                            String templatePath = templateScanPath + fileName;
-                            getTemplate(templatePath);
+                        String templatePath = templateScanPath + fileName;
+                        try (XWPFTemplate template = buildTemplate(templatePath)) {
+                            log.info("Word 模板预热成功: [{}]", fileName);
+                        } catch (Exception e) {
+                            log.error("Word 模板预热失败（已忽略）：{}", fileName, e);
                         }
                     });
                 } catch (Exception e) {
-                    log.error("⚠️ Word 模板预热失败（已忽略）：{}", resource.getFilename(), e);
+                    log.error("Word 模板预热失败", e);
                 }
             }
             log.info("[1] Word 模板预热完成，耗时 {}ms", System.currentTimeMillis() - wordStart);
@@ -121,20 +109,20 @@ public class PurchaseOrderTemplateManager {
                                 doc.save(new ByteArrayOutputStream(), SaveFormat.PDF);
                                 log.info("[2] PDF 引擎预热完成 [{}]", fileName);
                             } catch (Exception e) {
-                                log.warn("⚠️ PDF 引擎预热失败：{}", fileName, e);
+                                log.warn("PDF 引擎预热失败：{}", fileName, e);
                             }
                         } else {
-                            log.warn("⚠️ PDF 引擎预热跳过：模板 [{}] 未成功加载", fileName);
+                            log.warn("PDF 引擎预热跳过：模板 [{}] 未成功加载", fileName);
                         }
                     });
                 } catch (Exception e) {
-                    log.warn("⚠️ PDF 引擎预热失败", e);
+                    log.warn("PDF 引擎预热失败", e);
                 }
             }
             log.info("[2] PDF 引擎预热全部完成，耗时 {}ms", System.currentTimeMillis() - pdfStart);
 
         } catch (IOException e) {
-            log.error("❌ 模板文件夹扫描失败", e);
+            log.error("模板文件夹扫描失败", e);
         }
     }
 }
