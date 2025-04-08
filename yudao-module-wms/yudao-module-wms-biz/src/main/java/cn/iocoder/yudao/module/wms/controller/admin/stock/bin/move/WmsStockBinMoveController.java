@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -91,6 +92,9 @@ public class WmsStockBinMoveController {
         // 组装库位移动详情
         List<WmsStockBinMoveItemDO> stockBinMoveItemList = stockBinMoveItemService.selectByBinMoveId(stockBinMoveVO.getId());
         stockBinMoveVO.setItemList(BeanUtils.toBean(stockBinMoveItemList, WmsStockBinMoveItemRespVO.class));
+        stockBinMoveService.assembleWarehouse(Arrays.asList(stockBinMoveVO));
+        stockBinMoveItemService.assembleBin(stockBinMoveVO.getItemList());
+        stockBinMoveItemService.assembleProduct(stockBinMoveVO.getItemList());
         // 返回
         return success(stockBinMoveVO);
     }
@@ -106,6 +110,7 @@ public class WmsStockBinMoveController {
         PageResult<WmsStockBinMoveDO> doPageResult = stockBinMoveService.getStockBinMovePage(pageReqVO);
         // 转换
         PageResult<WmsStockBinMoveRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsStockBinMoveRespVO.class);
+        stockBinMoveService.assembleWarehouse(voPageResult.getList());
         // 返回
         return success(voPageResult);
     }

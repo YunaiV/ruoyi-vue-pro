@@ -86,6 +86,10 @@ public class WmsStockBinMoveItemController {
         PageResult<WmsStockBinMoveItemDO> doPageResult = stockBinMoveItemService.getStockBinMoveItemPage(pageReqVO);
         // 转换
         PageResult<WmsStockBinMoveItemRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsStockBinMoveItemRespVO.class);
+        // 关联
+        stockBinMoveItemService.assembleBin(voPageResult.getList());
+        stockBinMoveItemService.assembleProduct(voPageResult.getList());
+        stockBinMoveItemService.assembleBinMove(voPageResult.getList());
         // 返回
         return success(voPageResult);
     }
@@ -99,4 +103,4 @@ public class WmsStockBinMoveItemController {
     // // 导出 Excel
     // ExcelUtils.write(response, "库位移动详情.xls", "数据", WmsStockBinMoveItemRespVO.class, BeanUtils.toBean(list, WmsStockBinMoveItemRespVO.class));
     // }
-}
+}

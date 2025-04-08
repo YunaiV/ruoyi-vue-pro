@@ -1,11 +1,16 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.item.vo;
 
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMoveSimpleRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinRespVO;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
-import com.alibaba.excel.annotation.*;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
@@ -60,4 +65,17 @@ public class WmsStockBinMoveItemRespVO {
     @Schema(description = "更新者", example = "")
     @ExcelProperty("更新者")
     private String updater;
+
+
+    @Schema(description = "来源库位", example = "")
+    private WmsWarehouseBinRespVO fromBin;
+
+    @Schema(description = "目标库位", example = "")
+    private WmsWarehouseBinRespVO toBin;
+
+    @Schema(description = "产品", example = "")
+    private WmsProductRespSimpleVO product;
+
+    @Schema(description = "主单", example = "")
+    private WmsStockBinMoveSimpleRespVO binMove;
 }

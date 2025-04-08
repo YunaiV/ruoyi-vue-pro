@@ -1,14 +1,17 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import org.springframework.format.annotation.DateTimeFormat;
-import java.time.LocalDateTime;
-import com.alibaba.excel.annotation.*;
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
-import java.util.List;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.item.vo.WmsStockBinMoveItemRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
  * @table-fields : tenant_id,no,creator,update_time,create_time,execute_status,id,warehouse_id,updater
@@ -58,4 +61,8 @@ public class WmsStockBinMoveRespVO {
     @Schema(description = "库存类型 ; WmsMoveExecuteStatus : 0-草稿 , 1-已执行", example = "")
     @ExcelProperty("库存类型")
     private Integer executeStatus;
+
+    @Schema(description = "仓库", example = "")
+    private WmsWarehouseSimpleRespVO warehouse;
+
 }

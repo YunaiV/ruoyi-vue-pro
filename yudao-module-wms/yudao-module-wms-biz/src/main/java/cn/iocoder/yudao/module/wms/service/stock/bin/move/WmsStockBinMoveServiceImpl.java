@@ -6,9 +6,12 @@ import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMovePageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMoveRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMoveSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.WmsStockBinMoveDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.item.WmsStockBinMoveItemDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.bin.move.WmsStockBinMoveMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.bin.move.item.WmsStockBinMoveItemMapper;
 import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
@@ -16,6 +19,7 @@ import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsMoveExecuteStatus;
 import cn.iocoder.yudao.module.wms.service.quantity.BinMoveExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.context.BinMoveContext;
+import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,7 @@ import org.springframework.validation.annotation.Validated;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -57,6 +62,10 @@ public class WmsStockBinMoveServiceImpl implements WmsStockBinMoveService {
 
     @Resource
     protected WmsLockRedisDAO lockRedisDAO;
+
+    @Resource
+    @Lazy
+    private WmsWarehouseService warehouseService;
 
     /**
      * @sign : 9EAFE43CD7993903
@@ -221,5 +230,14 @@ public class WmsStockBinMoveServiceImpl implements WmsStockBinMoveService {
     public void finishMove(WmsStockBinMoveDO binMoveDO, List<WmsStockBinMoveItemDO> binMoveItemDOList) {
         binMoveDO.setExecuteStatus(WmsMoveExecuteStatus.MOVED.getValue());
         stockBinMoveMapper.updateById(binMoveDO);
+    }
+
+    @Override
+    public void assembleWarehouse(List<WmsStockBinMoveRespVO> list) {
+        Map<Long, WmsWarehouseDO> warehouseDOMap = warehouseService.getWarehouseMap(StreamX.from(list).toSet(WmsStockBinMoveRespVO::getWarehouseId));
+        Map<Long, WmsWarehouseSimpleRespVO> warehouseVOMap = StreamX.from(warehouseDOMap.values())
+            .toMap(WmsWarehouseDO::getId, v-> BeanUtils.toBean(v, WmsWarehouseSimpleRespVO.class));
+
+        StreamX.from(list).assemble(warehouseVOMap, WmsStockBinMoveRespVO::getWarehouseId, WmsStockBinMoveRespVO::setWarehouse);
     }
 }

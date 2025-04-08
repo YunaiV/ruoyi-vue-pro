@@ -29,6 +29,7 @@ public class WmsLockRedisDAO {
     public void lockByWarehouse(Long warehouseId, Runnable runnable) {
         lockByWarehouse(warehouseId, () -> {
             runnable.run();
+            return null;
         });
     }
 

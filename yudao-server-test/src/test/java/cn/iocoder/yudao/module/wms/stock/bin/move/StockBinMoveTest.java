@@ -30,7 +30,6 @@ public class StockBinMoveTest extends WmsBaseTest {
         Integer qty=1;
 
 
-
         // 确定从哪个仓位出哪个产品
         CommonResult<PageResult<WmsStockBinRespVO>> stockBinPageResult = this.getStockBinPage();
         if(stockBinPageResult.isError()) {

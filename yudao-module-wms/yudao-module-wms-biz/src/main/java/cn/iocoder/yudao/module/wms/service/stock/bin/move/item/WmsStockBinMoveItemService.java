@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.wms.service.stock.bin.move.item;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.item.vo.WmsStockBinMoveItemPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.item.vo.WmsStockBinMoveItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.item.vo.WmsStockBinMoveItemSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.item.WmsStockBinMoveItemDO;
 import jakarta.validation.Valid;
@@ -58,4 +59,10 @@ public interface WmsStockBinMoveItemService {
     List<WmsStockBinMoveItemDO> selectByIds(List<Long> idList);
 
     List<WmsStockBinMoveItemDO> selectByBinMoveId(Long binMoveId);
+
+    void assembleBin(List<WmsStockBinMoveItemRespVO> stockBinMoveItemList);
+
+    void assembleProduct(List<WmsStockBinMoveItemRespVO> stockBinMoveItemList);
+
+    void assembleBinMove(List<WmsStockBinMoveItemRespVO> list);
 }
