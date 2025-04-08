@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : no,create_time,warehouse_id
+ * @table-fields : no,create_time,execute_status,warehouse_id
  */
 @Schema(description = "管理后台 - 库位移动分页 Request VO")
 @Data
@@ -26,4 +26,7 @@ public class WmsStockBinMovePageReqVO extends PageParam {
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
+
+    @Schema(description = "库存类型 ; WmsMoveExecuteStatus : 0-草稿 , 1-已执行", example = "")
+    private Integer executeStatus;
 }

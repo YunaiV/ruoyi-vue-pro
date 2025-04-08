@@ -8,6 +8,8 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Repository;
 
+import java.util.function.Supplier;
+
 
 /**
  * WMS 分布式锁的 Redis DAO
@@ -24,36 +26,45 @@ public class WmsLockRedisDAO {
     @Resource
     private RedissonClient redissonClient;
 
-
     public void lockByWarehouse(Long warehouseId, Runnable runnable) {
+        lockByWarehouse(warehouseId, () -> {
+            runnable.run();
+        });
+    }
+
+    public <T> T lockByWarehouse(Long warehouseId, Supplier<T> runnable) {
         String key = formatKey(WMS_STOCK_WAREHOUSE_LOCK, warehouseId);
         if(SpringUtils.isProd()) {
             // 高负载时，如果锁的时长不够，可能导致库存不准确
-            lock(key, runnable, 16, 16);
+            return lock(key, runnable, 16, 16);
         } else {
             // 压测时加大锁的时长
-            lock(key, runnable, 600, 600);
+            return lock(key, runnable, 600, 600);
         }
     }
 
 
-    private void lock(String lockKey, Runnable runnable, int waitSeconds, int leaseSeconds) {
+    private <T> T lock(String lockKey, Supplier<T> runnable, int waitSeconds, int leaseSeconds) {
 
         RLock lock = redissonClient.getLock(lockKey);
         try {
             boolean isLocked = lock.tryLock(waitSeconds, leaseSeconds, java.util.concurrent.TimeUnit.SECONDS);
             // 执行逻辑
             if(isLocked) {
-                runnable.run();
+                return runnable.get();
+            } else {
+                return null;
             }
         } catch (InterruptedException e) {
             log.error("锁已被中断",e);
+            return null;
         } finally {
             // 释放锁
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
             }
         }
+
     }
 
     private static String formatKey(String format,Long... ids) {

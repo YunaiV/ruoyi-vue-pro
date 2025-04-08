@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -13,6 +14,7 @@ import lombok.Data;
 @Schema(description = "管理后台 - 仓库产品 VO")
 @Data
 @ExcelIgnoreUnannotated
+@Builder
 public class WmsWarehouseProductVO {
 
     @Schema(description = "仓库ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "14491")

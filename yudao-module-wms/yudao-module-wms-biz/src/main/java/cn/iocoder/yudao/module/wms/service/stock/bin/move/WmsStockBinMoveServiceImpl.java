@@ -11,7 +11,11 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.WmsStockBinMove
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.item.WmsStockBinMoveItemDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.bin.move.WmsStockBinMoveMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.bin.move.item.WmsStockBinMoveItemMapper;
+import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsMoveExecuteStatus;
+import cn.iocoder.yudao.module.wms.service.quantity.BinMoveExecutor;
+import cn.iocoder.yudao.module.wms.service.quantity.context.BinMoveContext;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -48,20 +52,37 @@ public class WmsStockBinMoveServiceImpl implements WmsStockBinMoveService {
     @Resource
     private WmsStockBinMoveMapper stockBinMoveMapper;
 
+    @Resource
+    private BinMoveExecutor binMoveExecutor;
+
+    @Resource
+    protected WmsLockRedisDAO lockRedisDAO;
+
     /**
      * @sign : 9EAFE43CD7993903
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public WmsStockBinMoveDO createStockBinMove(WmsStockBinMoveSaveReqVO createReqVO) {
+
+        WmsStockBinMoveDO stockBinMoveDO = lockRedisDAO.lockByWarehouse(createReqVO.getWarehouseId(),()->{
+            return createStockBinMoveInLock(createReqVO);
+        });
+
+        return stockBinMoveDO;
+    }
+
+    private WmsStockBinMoveDO createStockBinMoveInLock(WmsStockBinMoveSaveReqVO createReqVO) {
         // 设置单据号
         String no = noRedisDAO.generate(WmsNoRedisDAO.STOCK_BIN_MOVE_NO_PREFIX, 3);
         createReqVO.setNo(no);
+        // 指定初始状态
+        createReqVO.setExecuteStatus(WmsMoveExecuteStatus.DRAFT.getValue());
         if (stockBinMoveMapper.getByNo(createReqVO.getNo()) != null) {
             throw exception(STOCK_BIN_MOVE_NO_DUPLICATE);
         }
         // 插入
-        WmsStockBinMoveDO stockBinMove = BeanUtils.toBean(createReqVO, WmsStockBinMoveDO.class);
+        final WmsStockBinMoveDO stockBinMove = BeanUtils.toBean(createReqVO, WmsStockBinMoveDO.class);
         stockBinMoveMapper.insert(stockBinMove);
         // 保存库位移动详情详情
         if (createReqVO.getItemList() != null) {
@@ -72,15 +93,26 @@ public class WmsStockBinMoveServiceImpl implements WmsStockBinMoveService {
                 item.setBinMoveId(stockBinMove.getId());
                 toInsetList.add(BeanUtils.toBean(item, WmsStockBinMoveItemDO.class));
             });
-            Set<String> uniqueKeys=StreamX.from(toInsetList).toSet(itm->{
-                return StrUtils.join(Arrays.asList(itm.getProductId(),itm.getFromBinId(),itm.getToBinId()));
+            Set<String> uniqueKeys = StreamX.from(toInsetList).toSet(itm -> {
+                return StrUtils.join(Arrays.asList(itm.getProductId(), itm.getFromBinId(), itm.getToBinId()));
             });
             // 校验有重复的清单
-            if (uniqueKeys.size()!=toInsetList.size()) {
+            if (uniqueKeys.size() != toInsetList.size()) {
                 throw exception(STOCK_BIN_MOVE_ITEM_REPEATED);
             }
             stockBinMoveItemMapper.insertBatch(toInsetList);
         }
+
+        // 重新读取DO
+        WmsStockBinMoveDO newStockBinMove = stockBinMoveMapper.selectById(stockBinMove.getId());
+        List<WmsStockBinMoveItemDO> binMoveItemDOS = stockBinMoveItemMapper.selectByBinMoveId(newStockBinMove.getId());
+
+        // 执行库位移动
+        BinMoveContext context = new BinMoveContext();
+        context.setBinMoveDO(newStockBinMove);
+        context.setBinMoveItemDOList(binMoveItemDOS);
+        binMoveExecutor.execute(context);
+
         // 返回
         return stockBinMove;
     }
@@ -106,11 +138,11 @@ public class WmsStockBinMoveServiceImpl implements WmsStockBinMoveService {
             finalList.addAll(toInsetList);
             finalList.addAll(toUpdateList);
             // 校验 toInsetList 中是否有重复的 productId
-            Set<String> uniqueKeys=StreamX.from(finalList).toSet(itm->{
-                return StrUtils.join(Arrays.asList(itm.getProductId(),itm.getFromBinId(),itm.getToBinId()));
+            Set<String> uniqueKeys = StreamX.from(finalList).toSet(itm -> {
+                return StrUtils.join(Arrays.asList(itm.getProductId(), itm.getFromBinId(), itm.getToBinId()));
             });
             // 校验有重复的清单
-            if (uniqueKeys.size()!=toInsetList.size()) {
+            if (uniqueKeys.size() != toInsetList.size()) {
                 throw exception(STOCK_BIN_MOVE_ITEM_REPEATED);
             }
             // 设置归属

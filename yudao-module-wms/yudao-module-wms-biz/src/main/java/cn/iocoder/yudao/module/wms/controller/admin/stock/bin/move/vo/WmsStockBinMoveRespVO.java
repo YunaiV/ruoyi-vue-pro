@@ -11,7 +11,7 @@ import java.util.List;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.item.vo.WmsStockBinMoveItemRespVO;
 
 /**
- * @table-fields : tenant_id,no,creator,update_time,create_time,id,updater,warehouse_id
+ * @table-fields : tenant_id,no,creator,update_time,create_time,execute_status,id,warehouse_id,updater
  */
 @Schema(description = "管理后台 - 库位移动 Response VO")
 @Data
@@ -54,4 +54,8 @@ public class WmsStockBinMoveRespVO {
     @Schema(description = "详情清单", example = "")
     @ExcelProperty("详情清单")
     private List<WmsStockBinMoveItemRespVO> itemList;
+
+    @Schema(description = "库存类型 ; WmsMoveExecuteStatus : 0-草稿 , 1-已执行", example = "")
+    @ExcelProperty("库存类型")
+    private Integer executeStatus;
 }

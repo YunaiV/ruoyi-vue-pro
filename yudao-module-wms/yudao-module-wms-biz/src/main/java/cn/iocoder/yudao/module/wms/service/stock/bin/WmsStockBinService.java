@@ -69,6 +69,7 @@ public interface WmsStockBinService {
 
     void insertOrUpdate(WmsStockBinDO stockBinDO);
 
+    List<WmsStockBinRespVO> selectStockBinList(List<WmsWarehouseProductVO> warehouseProductList, Boolean withBin);
 
     Map<String, List<WmsStockBinRespVO>> selectStockBinGroup(List<WmsWarehouseProductVO> warehouseProductList, Boolean withBin);
 
