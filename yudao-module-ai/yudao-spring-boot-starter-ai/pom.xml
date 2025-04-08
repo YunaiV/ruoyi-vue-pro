@@ -123,6 +123,12 @@
             <groupId>dev.tinyflow</groupId>
             <artifactId>tinyflow-java-core</artifactId>
             <version>${tinyflow.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.agentsflex</groupId>
+                    <artifactId>agents-flex-store-elasticsearch</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Test 测试相关 -->
