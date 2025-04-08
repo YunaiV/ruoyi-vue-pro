@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.wms.service.stock.ownership.move;
 
-import java.util.*;
-import jakarta.validation.*;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.move.WmsStockOwnershipMoveDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move.vo.WmsStockOwnershipMovePageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move.vo.WmsStockOwnershipMoveSaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.move.WmsStockOwnershipMoveDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.move.item.WmsStockOwnershipMoveItemDO;
+import jakarta.validation.Valid;
+
 import java.util.List;
 
 /**
@@ -57,4 +58,6 @@ public interface WmsStockOwnershipMoveService {
      * 按 ID 集合查询 WmsStockOwnershipMoveDO
      */
     List<WmsStockOwnershipMoveDO> selectByIds(List<Long> idList);
+
+    void finishMove(WmsStockOwnershipMoveDO ownershipMoveDO, List<WmsStockOwnershipMoveItemDO> ownershipMoveItemDOList);
 }

@@ -71,7 +71,7 @@ public interface WmsStockFlowService {
     /**
      * 创建所有者库存变化流水
      */
-    void createForStockOwner(WmsStockReason reason, WmsStockFlowDirection direction, Long productId, WmsStockOwnershipDO stockOwnershipDO, Integer quantity, Long reasonId, Long reasonItemId);
+    void createForStockOwnership(WmsStockReason reason, WmsStockFlowDirection direction, Long productId, WmsStockOwnershipDO stockOwnershipDO, Integer quantity, Long reasonId, Long reasonItemId);
 
     /**
      * 创建仓位库存变化流水

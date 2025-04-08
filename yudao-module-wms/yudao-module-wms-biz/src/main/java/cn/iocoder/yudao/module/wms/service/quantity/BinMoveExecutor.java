@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_NOT_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_MOVE_ITEM_EXISTS;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_MOVE_QUANTITY_ERROR;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_NOT_ENOUGH;
 
@@ -50,6 +50,8 @@ public class BinMoveExecutor extends ActionExecutor<BinMoveContext> {
         super(WmsStockReason.STOCK_BIN_MOVE);
     }
 
+
+
     @Override
     public void execute(BinMoveContext context) {
 
@@ -60,7 +62,7 @@ public class BinMoveExecutor extends ActionExecutor<BinMoveContext> {
         WmsStockBinMoveDO binMoveDO = context.getBinMoveDO();
         List<WmsStockBinMoveItemDO> binMoveItemDOList = context.getBinMoveItemDOList();
         if(CollectionUtils.isEmpty(binMoveItemDOList)) {
-            throw exception(INBOUND_ITEM_NOT_EXISTS);
+            throw exception(STOCK_BIN_MOVE_ITEM_EXISTS);
         }
 
         List<WmsWarehouseProductVO> warehouseProductList = StreamX.from(binMoveItemDOList).toList(item->{
@@ -69,14 +71,14 @@ public class BinMoveExecutor extends ActionExecutor<BinMoveContext> {
 
         // 校验源库存是否充足
         List<WmsStockBinRespVO> stockBinList = stockBinService.selectStockBinList(warehouseProductList, false);
-        Map<String,WmsStockBinRespVO> stockBinMap = StreamX.from(stockBinList).toMap(e-> e.getBinId()+"-"+e.getProductId());
+        Map<String,WmsStockBinRespVO> stockBinMap = StreamX.from(stockBinList).toMap(e-> makeStockKey(e.getBinId(),e.getProductId()));
         for (WmsStockBinMoveItemDO binMoveItemDO : binMoveItemDOList) {
 
             if(binMoveItemDO.getQty()<=0) {
                 throw exception(STOCK_BIN_MOVE_QUANTITY_ERROR);
             }
 
-            WmsStockBinRespVO stockBinRespVO= stockBinMap.get(binMoveItemDO.getFromBinId()+"-"+binMoveItemDO.getProductId());
+            WmsStockBinRespVO stockBinRespVO= stockBinMap.get(makeStockKey(binMoveItemDO.getFromBinId(),binMoveItemDO.getProductId()));
             Integer avaQty = 0;
             if(stockBinRespVO!=null) {
                 avaQty = stockBinRespVO.getAvailableQty();
@@ -93,8 +95,8 @@ public class BinMoveExecutor extends ActionExecutor<BinMoveContext> {
 
         // 逐行处理
         for (WmsStockBinMoveItemDO binMoveItemDO : binMoveItemDOList) {
-            WmsStockBinRespVO fromStockBin = stockBinMap.get(binMoveItemDO.getFromBinId()+"-"+binMoveItemDO.getProductId());
-            WmsStockBinRespVO toStockBin = stockBinMap.get(binMoveItemDO.getToBinId()+"-"+binMoveItemDO.getProductId());
+            WmsStockBinRespVO fromStockBin = stockBinMap.get(makeStockKey(binMoveItemDO.getFromBinId(),binMoveItemDO.getProductId()));
+            WmsStockBinRespVO toStockBin = stockBinMap.get(makeStockKey(binMoveItemDO.getToBinId(),binMoveItemDO.getProductId()));
             this.processStockBin(binMoveDO.getWarehouseId(),binMoveItemDO,fromStockBin,toStockBin);
         }
 
@@ -144,6 +146,11 @@ public class BinMoveExecutor extends ActionExecutor<BinMoveContext> {
         stockBinService.insertOrUpdate(toStockBinDO);
         // 记录流水
         stockFlowService.createForStockBin(this.getReason(),WmsStockFlowDirection.IN, binMoveItemDO.getProductId(),toStockBinDO , binMoveItemDO.getQty(), binMoveItemDO.getBinMoveId(), binMoveItemDO.getId());
+    }
+
+
+    private String makeStockKey(Long binId,Long productId) {
+        return binId+"-"+productId;
     }
 
 

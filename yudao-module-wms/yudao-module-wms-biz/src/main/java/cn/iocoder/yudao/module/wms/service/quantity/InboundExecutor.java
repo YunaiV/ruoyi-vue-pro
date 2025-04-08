@@ -153,7 +153,7 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
         // 保存
         stockOwnershipService.insertOrUpdate(stockOwnershipDO);
         // 记录流水
-        stockFlowService.createForStockOwner(this.getReason(), WmsStockFlowDirection.IN, productId, stockOwnershipDO, actualQuantity, inboundId, inboundItemId);
+        stockFlowService.createForStockOwnership(this.getReason(), WmsStockFlowDirection.IN, productId, stockOwnershipDO, actualQuantity, inboundId, inboundItemId);
     }
 
 

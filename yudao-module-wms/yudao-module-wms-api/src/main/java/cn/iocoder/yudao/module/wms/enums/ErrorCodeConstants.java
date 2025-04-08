@@ -162,7 +162,7 @@ public interface ErrorCodeConstants {
     ErrorCode STOCK_BIN_MOVE_CAN_NOT_EDIT = new ErrorCode(2_001_016_005, "库位移动不允许编辑");
     ErrorCode STOCK_BIN_MOVE_CAN_NOT_DELETE = new ErrorCode(2_001_016_006, "库位移动不允许删除");
     ErrorCode STOCK_BIN_MOVE_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_016_007, "库位移动不符合审批条件");
-    ErrorCode STOCK_BIN_MOVE_QUANTITY_ERROR = new ErrorCode(2_001_016_008, "库位移动数量错误");
+    ErrorCode STOCK_BIN_MOVE_QUANTITY_ERROR = new ErrorCode(2_001_016_008, "库位库存移动数量错误");
 
     // ========== WMS_STOCK_BIN_MOVE_ITEM 库位移动详情表 2_001_017_000 ==========
     ErrorCode STOCK_BIN_MOVE_ITEM_NOT_EXISTS = new ErrorCode(2_001_017_001, "库位移动详情不存在");
@@ -192,5 +192,7 @@ public interface ErrorCodeConstants {
     ErrorCode STOCK_OWNERSHIP_MOVE_ITEM_CAN_NOT_DELETE = new ErrorCode(2_001_019_005, "所有者库存移动详情不允许删除");
     ErrorCode STOCK_OWNERSHIP_MOVE_ITEM_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_019_006, "所有者库存移动详情不符合审批条件");
     ErrorCode STOCK_OWNERSHIP_MOVE_ITEM_EXISTS = new ErrorCode(2_001_019_007, "所有者库存移动详情已存在");
+    ErrorCode STOCK_OWNERSHIP_MOVE_QUANTITY_ERROR = new ErrorCode(2_001_019_008, "所有者库存移动数量错误");
+
 
 }

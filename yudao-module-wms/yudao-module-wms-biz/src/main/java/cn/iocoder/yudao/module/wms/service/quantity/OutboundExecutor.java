@@ -166,7 +166,7 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
         // 保存
         stockOwnershipService.insertOrUpdate(stockOwnershipDO);
         // 记录流水
-        stockFlowService.createForStockOwner(this.getReason(),wmsStockFlowDirection, productId, stockOwnershipDO,quantity, outboundId, outboundItemId);
+        stockFlowService.createForStockOwnership(this.getReason(),wmsStockFlowDirection, productId, stockOwnershipDO,quantity, outboundId, outboundItemId);
     }
 
 

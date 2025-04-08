@@ -137,6 +137,14 @@ public class WmsStockOwnershipServiceImpl implements WmsStockOwnershipService {
     }
 
     @Override
+    public List<WmsStockOwnershipDO> selectStockOwnership(Long warehouseId, List<Long> productIdList) {
+        if(CollectionUtils.isEmpty(productIdList)) {
+            return List.of();
+        }
+        return stockOwnershipMapper.selectStockOwnership(warehouseId, productIdList);
+    }
+
+    @Override
     public WmsStockOwnershipDO getByUkProductOwner(Long warehouseId, Long companyId, Long deptId, Long productId) {
         return stockOwnershipMapper.getByUkProductOwner(warehouseId, companyId, deptId, productId);
     }

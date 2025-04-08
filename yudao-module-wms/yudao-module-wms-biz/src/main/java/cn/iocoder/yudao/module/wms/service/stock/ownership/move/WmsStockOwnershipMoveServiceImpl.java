@@ -11,7 +11,12 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.move.WmsStockO
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.move.item.WmsStockOwnershipMoveItemDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.ownership.move.WmsStockOwnershipMoveMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.ownership.move.item.WmsStockOwnershipMoveItemMapper;
+import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsMoveExecuteStatus;
+import cn.iocoder.yudao.module.wms.service.quantity.OwnershipMoveExecutor;
+import cn.iocoder.yudao.module.wms.service.quantity.context.OwnershipMoveContext;
+import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -48,15 +53,41 @@ public class WmsStockOwnershipMoveServiceImpl implements WmsStockOwnershipMoveSe
     @Resource
     private WmsStockOwnershipMoveMapper stockOwnershipMoveMapper;
 
+    @Resource
+    private OwnershipMoveExecutor ownershipMoveExecutor;
+
+    @Resource
+    protected WmsLockRedisDAO lockRedisDAO;
+
+    @Resource
+    @Lazy
+    private WmsWarehouseService warehouseService;
+
+
+
     /**
      * @sign : A2B315CE08CA7A20
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public WmsStockOwnershipMoveDO createStockOwnershipMove(WmsStockOwnershipMoveSaveReqVO createReqVO) {
+
+        WmsStockOwnershipMoveDO stockOwnershipMoveDO = lockRedisDAO.lockByWarehouse(createReqVO.getWarehouseId(),()->{
+            return createStockOwnershipMoveInLock(createReqVO);
+        });
+
+        return stockOwnershipMoveDO;
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public WmsStockOwnershipMoveDO createStockOwnershipMoveInLock(WmsStockOwnershipMoveSaveReqVO createReqVO) {
         // 设置单据号
         String no = noRedisDAO.generate(WmsNoRedisDAO.STOCK_OWNERSHIP_MOVE_NO_PREFIX, 3);
         createReqVO.setNo(no);
+        // 指定初始状态
+        createReqVO.setExecuteStatus(WmsMoveExecuteStatus.DRAFT.getValue());
+        //
         if (stockOwnershipMoveMapper.getByNo(createReqVO.getNo()) != null) {
             throw exception(STOCK_OWNERSHIP_MOVE_NO_DUPLICATE);
         }
@@ -83,6 +114,16 @@ public class WmsStockOwnershipMoveServiceImpl implements WmsStockOwnershipMoveSe
 
             stockOwnershipMoveItemMapper.insertBatch(toInsetList);
         }
+
+        // 重新读取DO
+        WmsStockOwnershipMoveDO newStockBinMove = stockOwnershipMoveMapper.selectById(stockOwnershipMove.getId());
+        List<WmsStockOwnershipMoveItemDO> binMoveItemDOS = stockOwnershipMoveItemMapper.selectByOwnershipMoveId(newStockBinMove.getId());
+
+        OwnershipMoveContext ownershipMoveContext = new OwnershipMoveContext();
+        ownershipMoveContext.setOwnershipMoveDO(newStockBinMove);
+        ownershipMoveContext.setOwnershipMoveItemDOS(binMoveItemDOS);
+
+        ownershipMoveExecutor.execute(ownershipMoveContext);
         // 返回
         return stockOwnershipMove;
     }
@@ -174,5 +215,11 @@ public class WmsStockOwnershipMoveServiceImpl implements WmsStockOwnershipMoveSe
             return List.of();
         }
         return stockOwnershipMoveMapper.selectByIds(idList);
+    }
+
+    @Override
+    public void finishMove(WmsStockOwnershipMoveDO ownershipMoveDO, List<WmsStockOwnershipMoveItemDO> ownershipMoveItemDOList) {
+        ownershipMoveDO.setExecuteStatus(WmsMoveExecuteStatus.MOVED.getValue());
+        stockOwnershipMoveMapper.updateById(ownershipMoveDO);
     }
 }

@@ -235,7 +235,7 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
         // 保存
         stockOwnershipService.insertOrUpdate(stockOwnershipDO);
         // 记录流水
-        stockFlowService.createForStockOwner(this.getReason(), WmsStockFlowDirection.IN, productId, stockOwnershipDO, quantity, pickup.getId(), pickupItemDO.getId());
+        stockFlowService.createForStockOwnership(this.getReason(), WmsStockFlowDirection.IN, productId, stockOwnershipDO, quantity, pickup.getId(), pickupItemDO.getId());
 
     }
 

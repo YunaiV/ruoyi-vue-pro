@@ -1,11 +1,8 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move;
 
-import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move.item.vo.WmsStockOwnershipMoveItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move.vo.WmsStockOwnershipMovePageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move.vo.WmsStockOwnershipMoveRespVO;
@@ -18,24 +15,19 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.util.List;
 
-import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSHIP_MOVE_NOT_EXISTS;
@@ -63,25 +55,25 @@ public class WmsStockOwnershipMoveController {
         return success(stockOwnershipMoveService.createStockOwnershipMove(createReqVO).getId());
     }
 
-    /**
-     * @sign : B17AAF1E8A33881D
-     */
-    @PutMapping("/update")
-    @Operation(summary = "更新所有者库存移动")
-    @PreAuthorize("@ss.hasPermission('wms:stock-ownership-move:update')")
-    public CommonResult<Boolean> updateStockOwnershipMove(@Valid @RequestBody WmsStockOwnershipMoveSaveReqVO updateReqVO) {
-        stockOwnershipMoveService.updateStockOwnershipMove(updateReqVO);
-        return success(true);
-    }
+//    /**
+//     * @sign : B17AAF1E8A33881D
+//     */
+//    @PutMapping("/update")
+//    @Operation(summary = "更新所有者库存移动")
+//    @PreAuthorize("@ss.hasPermission('wms:stock-ownership-move:update')")
+//    public CommonResult<Boolean> updateStockOwnershipMove(@Valid @RequestBody WmsStockOwnershipMoveSaveReqVO updateReqVO) {
+//        stockOwnershipMoveService.updateStockOwnershipMove(updateReqVO);
+//        return success(true);
+//    }
 
-    @DeleteMapping("/delete")
-    @Operation(summary = "删除所有者库存移动")
-    @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('wms:stock-ownership-move:delete')")
-    public CommonResult<Boolean> deleteStockOwnershipMove(@RequestParam("id") Long id) {
-        stockOwnershipMoveService.deleteStockOwnershipMove(id);
-        return success(true);
-    }
+//    @DeleteMapping("/delete")
+//    @Operation(summary = "删除所有者库存移动")
+//    @Parameter(name = "id", description = "编号", required = true)
+//    @PreAuthorize("@ss.hasPermission('wms:stock-ownership-move:delete')")
+//    public CommonResult<Boolean> deleteStockOwnershipMove(@RequestParam("id") Long id) {
+//        stockOwnershipMoveService.deleteStockOwnershipMove(id);
+//        return success(true);
+//    }
 
     /**
      * @sign : B7406A1F19B24A11
@@ -120,14 +112,14 @@ public class WmsStockOwnershipMoveController {
         return success(voPageResult);
     }
 
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出所有者库存移动 Excel")
-    @PreAuthorize("@ss.hasPermission('wms:stock-ownership-move:export')")
-    @ApiAccessLog(operateType = EXPORT)
-    public void exportStockOwnershipMoveExcel(@Valid WmsStockOwnershipMovePageReqVO pageReqVO, HttpServletResponse response) throws IOException {
-        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<WmsStockOwnershipMoveDO> list = stockOwnershipMoveService.getStockOwnershipMovePage(pageReqVO).getList();
-        // 导出 Excel
-        ExcelUtils.write(response, "所有者库存移动.xls", "数据", WmsStockOwnershipMoveRespVO.class, BeanUtils.toBean(list, WmsStockOwnershipMoveRespVO.class));
-    }
+//    @GetMapping("/export-excel")
+//    @Operation(summary = "导出所有者库存移动 Excel")
+//    @PreAuthorize("@ss.hasPermission('wms:stock-ownership-move:export')")
+//    @ApiAccessLog(operateType = EXPORT)
+//    public void exportStockOwnershipMoveExcel(@Valid WmsStockOwnershipMovePageReqVO pageReqVO, HttpServletResponse response) throws IOException {
+//        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+//        List<WmsStockOwnershipMoveDO> list = stockOwnershipMoveService.getStockOwnershipMovePage(pageReqVO).getList();
+//        // 导出 Excel
+//        ExcelUtils.write(response, "所有者库存移动.xls", "数据", WmsStockOwnershipMoveRespVO.class, BeanUtils.toBean(list, WmsStockOwnershipMoveRespVO.class));
+//    }
 }
