@@ -82,7 +82,13 @@
         <!--        <guava.version>33.3.1-jre</guava.version>-->
         <bucket4j.version>8.10.1</bucket4j.version>
         <commons-collection4.version>4.4</commons-collection4.version>
-
+        <cola.component.statemachine>5.0.0</cola.component.statemachine>
+        <!-- word+pdf生成 -->
+        <poi.tl>1.12.2</poi.tl>
+        <aspose.words>23.1</aspose.words>
+        <!-- 阿里云oss -->
+        <aliyun.oss>3.16.3</aliyun.oss>
+        <commons.codec>1.15</commons.codec>
     </properties>
 
     <dependencyManagement>
@@ -141,29 +147,29 @@
             <dependency><!--ERP模块状态机-wdy-->
                 <groupId>com.alibaba.cola</groupId>
                 <artifactId>cola-component-statemachine</artifactId>
-                <version>5.0.0</version>
+                <version>${cola.component.statemachine}</version>
             </dependency>
             <dependency>
                 <groupId>com.deepoove</groupId>
                 <artifactId>poi-tl</artifactId>
-                <version>1.12.2</version>
+                <version>${poi.tl}</version>
             </dependency>
             <dependency>
                 <groupId>com.luhuiguo</groupId>
                 <artifactId>aspose-words</artifactId>
-                <version>23.1</version>
+                <version>${aspose.words}</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.15</version>
+                <version>${commons.codec}</version>
             </dependency>
 
 
             <dependency>
                 <groupId>com.aliyun.oss</groupId>
                 <artifactId>aliyun-sdk-oss</artifactId>
-                <version>3.16.3</version>
+                <version>${aliyun.oss}</version>
             </dependency>
 
             <!-- 统一依赖管理 -->
