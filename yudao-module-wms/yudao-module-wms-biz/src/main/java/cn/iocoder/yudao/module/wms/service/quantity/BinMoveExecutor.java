@@ -2,23 +2,30 @@ package cn.iocoder.yudao.module.wms.service.quantity;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsWarehouseProductVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.WmsStockBinMoveDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.item.WmsStockBinMoveItemDO;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsStockFlowDirection;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
-import cn.iocoder.yudao.module.wms.service.inbound.item.flow.WmsInboundItemFlowService;
 import cn.iocoder.yudao.module.wms.service.quantity.context.BinMoveContext;
 import cn.iocoder.yudao.module.wms.service.stock.bin.WmsStockBinService;
+import cn.iocoder.yudao.module.wms.service.stock.bin.move.WmsStockBinMoveService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_NOT_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_MOVE_QUANTITY_ERROR;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_NOT_ENOUGH;
 
 /**
  * @author: LeeFJ
@@ -37,10 +44,10 @@ public class BinMoveExecutor extends ActionExecutor<BinMoveContext> {
 
     @Resource
     @Lazy
-    private WmsInboundItemFlowService inboundItemFlowService;
+    private WmsStockBinMoveService stockBinMoveService;
 
     public BinMoveExecutor() {
-        super(WmsStockReason.PICKUP);
+        super(WmsStockReason.STOCK_BIN_MOVE);
     }
 
     @Override
@@ -55,191 +62,90 @@ public class BinMoveExecutor extends ActionExecutor<BinMoveContext> {
         if(CollectionUtils.isEmpty(binMoveItemDOList)) {
             throw exception(INBOUND_ITEM_NOT_EXISTS);
         }
-        List<WmsWarehouseProductVO> warehouseProductList = StreamX.from(binMoveItemDOList).toList(item->{
-            return WmsWarehouseProductVO.builder().warehouseId(binMoveDO.getWarehouseId()).productId(0L).build();
-        });
-        // 校验源库存是否充足
-        //stockBinService.selectStockBinList();
 
-//
-//
-//        //
-//        Map<Long, WmsInboundItemRespVO> inboundItemVOMap = StreamX.from(inboundItemVOList).toMap(WmsInboundItemRespVO::getId);
-//        List<WmsInboundDO> inboundDOList = inboundService.selectByIds(StreamX.from(inboundItemVOList).toList(WmsInboundItemRespVO::getInboundId));
-//        Map<Long, WmsInboundDO> inboundMap = StreamX.from(inboundDOList).toMap(WmsInboundDO::getId);
-//        // 循环明细
-//        for (WmsPickupItemDO pickupItemDO : wmsPickupItemDOList) {
-//            WmsInboundItemRespVO inboundItemVO = inboundItemVOMap.get(pickupItemDO.getInboundItemId());
-//            if (inboundItemVO == null) {
-//                throw exception(INBOUND_ITEM_NOT_EXISTS);
-//            }
-//            // 拣货量不能大于入库量
-//            if(pickupItemDO.getQty()> inboundItemVO.getActualQty()) {
-//                throw exception(INBOUND_ITEM_ACTUAL_QTY_ERROR);
-//            }
-//            // 拣货量不能大于可拣货的量
-//            Integer pickupAvaAty = inboundItemVO.getActualQty() - inboundItemVO.getShelvedQty();
-//            if(pickupItemDO.getQty() > pickupAvaAty) {
-//                throw exception(INBOUND_ITEM_ACTUAL_QTY_ERROR);
-//            }
-//            // 设置已拣货量
-//            pickupItemDO.setInboundId(inboundItemVO.getInboundId());
-//            pickupItemDO.setInboundItemId(inboundItemVO.getId());
-//            pickupItemDO.setProductId(inboundItemVO.getProductId());
-//            pickupItemDO.setPickupId(pickup.getId());
-//            // 调整仓位库存
-//            this.processItem(pickup, pickupItemDO, inboundMap.get(inboundItemVO.getInboundId()), inboundItemVO);
-//            inboundItemService.updateById(BeanUtils.toBean(inboundItemVO, WmsInboundItemDO.class));
-//        }
+        List<WmsWarehouseProductVO> warehouseProductList = StreamX.from(binMoveItemDOList).toList(item->{
+            return WmsWarehouseProductVO.builder().warehouseId(binMoveDO.getWarehouseId()).productId(item.getProductId()).build();
+        });
+
+        // 校验源库存是否充足
+        List<WmsStockBinRespVO> stockBinList = stockBinService.selectStockBinList(warehouseProductList, false);
+        Map<String,WmsStockBinRespVO> stockBinMap = StreamX.from(stockBinList).toMap(e-> e.getBinId()+"-"+e.getProductId());
+        for (WmsStockBinMoveItemDO binMoveItemDO : binMoveItemDOList) {
+
+            if(binMoveItemDO.getQty()<=0) {
+                throw exception(STOCK_BIN_MOVE_QUANTITY_ERROR);
+            }
+
+            WmsStockBinRespVO stockBinRespVO= stockBinMap.get(binMoveItemDO.getFromBinId()+"-"+binMoveItemDO.getProductId());
+            Integer avaQty = 0;
+            if(stockBinRespVO!=null) {
+                avaQty = stockBinRespVO.getAvailableQty();
+            }
+            // 库存不足
+            if(avaQty<binMoveItemDO.getQty()) {
+                throw exception(STOCK_BIN_NOT_ENOUGH);
+            }
+
+
+
+        }
+
+
+        // 逐行处理
+        for (WmsStockBinMoveItemDO binMoveItemDO : binMoveItemDOList) {
+            WmsStockBinRespVO fromStockBin = stockBinMap.get(binMoveItemDO.getFromBinId()+"-"+binMoveItemDO.getProductId());
+            WmsStockBinRespVO toStockBin = stockBinMap.get(binMoveItemDO.getToBinId()+"-"+binMoveItemDO.getProductId());
+            this.processStockBin(binMoveDO.getWarehouseId(),binMoveItemDO,fromStockBin,toStockBin);
+        }
+
+        // 完成库位移动
+        stockBinMoveService.finishMove(binMoveDO,binMoveItemDOList);
 
     }
 
 
-//    /**
-//     * 处理明细行
-//     **/
-//    private void processItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO, WmsInboundItemRespVO inboundItemVO) {
-//        this.processStockBin(pickup, pickupItemDO, inboundDO, inboundItemVO);
-//        this.processStockWarehouseItem(pickup, pickupItemDO, inboundDO, inboundItemVO);
-//        this.processStockOwnershipItem(pickup, pickupItemDO, inboundDO, inboundItemVO);
-//        this.processInboundItem(pickup, pickupItemDO, inboundDO, inboundItemVO);
-//    }
-//
-//
-//    /**
-//     * 处理库存仓位
-//     **/
-//    private void processStockBin(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO, WmsInboundItemRespVO inboundItemVO) {
-//
-//        JdbcUtils.requireTransaction();
-//        WmsStockBinDO stockBinDO = stockBinService.getStockBin(pickupItemDO.getBinId(), inboundItemVO.getProductId());
-//        if (stockBinDO == null) {
-//            stockBinDO = new WmsStockBinDO();
-//            stockBinDO.setWarehouseId(pickup.getWarehouseId());
-//            stockBinDO.setBinId(pickupItemDO.getBinId());
-//            stockBinDO.setProductId(inboundItemVO.getProductId());
-//            // 可用库存
-//            stockBinDO.setAvailableQty(pickupItemDO.getQty());
-//            // 可售库存
-//            stockBinDO.setSellableQty(pickupItemDO.getQty());
-//        } else {
-//            // 可用库存
-//            stockBinDO.setAvailableQty(stockBinDO.getAvailableQty() + pickupItemDO.getQty());
-//            // 可售库存
-//            stockBinDO.setSellableQty(stockBinDO.getSellableQty() + pickupItemDO.getQty());
-//        }
-//        // 保存
-//        stockBinService.insertOrUpdate(stockBinDO);
-//        // 记录流水
-//        stockFlowService.createForStockBin(this.getReason(), WmsStockFlowDirection.IN, inboundItemVO.getProductId(), stockBinDO, pickupItemDO.getQty(), pickupItemDO.getPickupId(), pickupItemDO.getId());
-//    }
-//
-//    /**
-//     * 处理库存库位
-//     **/
-//    private void processInboundItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO, WmsInboundItemRespVO inboundItemVO) {
-//
-//        Integer quantity = pickupItemDO.getQty();
-//
-//        Integer shelvedQtyAfterPickup=inboundItemVO.getShelvedQty()+quantity;
-//
-//        // 判断拣货量是否大于实际入库量
-//        if(shelvedQtyAfterPickup>inboundItemVO.getActualQty()) {
-//            throw  exception(INBOUND_ITEM_PICKUP_LEFT_QUANTITY_NOT_ENOUGH);
-//        }
-//
-//        // 更新入库记录
-//        inboundItemVO.setOutboundAvailableQty(inboundItemVO.getOutboundAvailableQty()+quantity);
-//        inboundItemVO.setShelvedQty(shelvedQtyAfterPickup);
-//
-//        WmsInboundItemDO inboundItemDO = BeanUtils.toBean(inboundItemVO, WmsInboundItemDO.class);
-//        inboundItemService.updateById(inboundItemDO);
-//
-//        // 记录流水
-//        WmsInboundItemFlowDO flowDO = new WmsInboundItemFlowDO();
-//        flowDO.setInboundId(inboundItemDO.getInboundId());
-//        flowDO.setInboundItemId(inboundItemDO.getId());
-//        flowDO.setProductId(inboundItemDO.getProductId());
-//        flowDO.setOutboundQty(quantity);
-//        flowDO.setOutboundId(-1L);
-//        flowDO.setOutboundItemId(-1L);
-//        inboundItemFlowService.insert(flowDO);
-//
-//    }
-//
-//    /**
-//     * 处理库存库位
-//     **/
-//    private void processStockWarehouseItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO, WmsInboundItemRespVO inboundItemVO) {
-//
-//
-//        // 刷新库存
-//        Long warehouseId = pickup.getWarehouseId();
-//        Long productId = inboundItemVO.getProductId();
-//        Integer quantity = pickupItemDO.getQty();
-//
-//        //List<WmsStockBinDO> stockBinList = stockBinService.selectStockBin(warehouseId, productId);
-//
-////        Integer availableQuantity = 0;
-////        Integer sellableQuantity = 0;
-////
-////        for (WmsStockBinDO wmsStockBinDO : stockBinList) {
-////            availableQuantity += wmsStockBinDO.getAvailableQty();
-////            sellableQuantity += wmsStockBinDO.getSellableQty();
-////        }
-//
-//        WmsStockWarehouseDO stockWarehouseDO = stockWarehouseService.getByWarehouseIdAndProductId(warehouseId, productId);
-//        // 可用
-//        stockWarehouseDO.setAvailableQty(stockWarehouseDO.getAvailableQty()+quantity);
-//        // 可售
-//        stockWarehouseDO.setSellableQty(stockWarehouseDO.getSellableQty()+quantity);
-//        // 待上架
-//        stockWarehouseDO.setShelvingPendingQty(stockWarehouseDO.getShelvingPendingQty() - quantity);
-//
-//        // 更新库存
-//        stockWarehouseService.insertOrUpdate(stockWarehouseDO);
-//        // 记录流水
-//        stockFlowService.createForStockWarehouse(this.getReason(),WmsStockFlowDirection.OUT, productId, stockWarehouseDO, quantity, pickup.getId(), pickupItemDO.getId());
-//    }
-//
-//
-//    /**
-//     * 处理库存库位
-//     **/
-//    private void processStockOwnershipItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO, WmsInboundItemRespVO inboundItemVO) {
-//
-//        Long warehouseId = pickup.getWarehouseId();
-//        Long productId = inboundItemVO.getProductId();
-//        Long companyId = inboundDO.getCompanyId();
-//        Integer quantity = pickupItemDO.getQty();
-//        // 刷新库存
-//        Long deptId = inboundDO.getDeptId();
-//        if (deptId == null) {
-//            deptId = inboundItemVO.getProduct().getDeptId();
-//        }
-//        // 刷新所有者库存
-//        // wmsStockOwnershipService.refreshForPickup(pickup.getWarehouseId(), inboundDO.getCompanyId(), deptId,inboundItemVO.getProductId(), pickup.getId(), pickupItemDO.getId(),);
-//
-//        // 校验本方法在事务中
-//        JdbcUtils.requireTransaction();
-//        // 查询库存记录
-//        WmsStockOwnershipDO stockOwnershipDO = stockOwnershipService.getByUkProductOwner(warehouseId, companyId, deptId, productId);
-//        // 如果不存在就创建
-//        if (stockOwnershipDO == null) {
-//            throw exception(STOCK_OWNERSHIP_NOT_EXISTS);
-//        } else {
-//            // 如果存在就修改
-//            // 可用量
-//            stockOwnershipDO.setAvailableQty(stockOwnershipDO.getAvailableQty() + quantity);
-//            // 待上架量
-//            stockOwnershipDO.setShelvingPendingQty(stockOwnershipDO.getShelvingPendingQty() - quantity);
-//        }
-//        // 保存
-//        stockOwnershipService.insertOrUpdate(stockOwnershipDO);
-//        // 记录流水
-//        stockFlowService.createForStockOwner(this.getReason(), WmsStockFlowDirection.IN, productId, stockOwnershipDO, quantity, pickup.getId(), pickupItemDO.getId());
-//
-//    }
+
+    /**
+     * 处理库存仓位
+     **/
+    private void processStockBin(Long warehouseId,WmsStockBinMoveItemDO binMoveItemDO,WmsStockBinRespVO fromStockBinVO,WmsStockBinRespVO toStockBinVO) {
+
+        JdbcUtils.requireTransaction();
+
+        // 处理出方
+        WmsStockBinDO fromStockBinDO = BeanUtils.toBean(fromStockBinVO,WmsStockBinDO.class);
+        fromStockBinDO.setAvailableQty(fromStockBinDO.getAvailableQty()-binMoveItemDO.getQty());
+        fromStockBinDO.setSellableQty(fromStockBinDO.getSellableQty()-binMoveItemDO.getQty());
+        // 保存
+        stockBinService.insertOrUpdate(fromStockBinDO);
+        // 记录流水
+        stockFlowService.createForStockBin(this.getReason(), WmsStockFlowDirection.OUT, binMoveItemDO.getProductId(), fromStockBinDO , binMoveItemDO.getQty(), binMoveItemDO.getBinMoveId(), binMoveItemDO.getId());
+
+
+        // 入方
+        WmsStockBinDO toStockBinDO = null;
+        if (toStockBinVO == null) {
+            toStockBinDO = new WmsStockBinDO();
+            toStockBinDO.setWarehouseId(warehouseId);
+            toStockBinDO.setBinId(binMoveItemDO.getToBinId());
+            toStockBinDO.setProductId(binMoveItemDO.getProductId());
+            // 可用库存
+            toStockBinDO.setAvailableQty(binMoveItemDO.getQty());
+            // 可售库存
+            toStockBinDO.setSellableQty(binMoveItemDO.getQty());
+        } else {
+            toStockBinDO = BeanUtils.toBean(toStockBinVO,WmsStockBinDO.class);
+            // 可用库存
+            toStockBinDO.setAvailableQty(toStockBinDO.getAvailableQty() + binMoveItemDO.getQty());
+            // 可售库存
+            toStockBinDO.setSellableQty(toStockBinDO.getSellableQty() + binMoveItemDO.getQty());
+        }
+        // 保存
+        stockBinService.insertOrUpdate(toStockBinDO);
+        // 记录流水
+        stockFlowService.createForStockBin(this.getReason(),WmsStockFlowDirection.IN, binMoveItemDO.getProductId(),toStockBinDO , binMoveItemDO.getQty(), binMoveItemDO.getBinMoveId(), binMoveItemDO.getId());
+    }
+
 
 
 }

@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.item.vo.WmsStockBinMoveItemPageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.item.WmsStockBinMoveItemDO;
 import org.apache.ibatis.annotations.Mapper;
-
 import java.util.List;
 
 /**
@@ -46,4 +45,16 @@ public interface WmsStockBinMoveItemMapper extends BaseMapperX<WmsStockBinMoveIt
         wrapper.eq(WmsStockBinMoveItemDO::getToBinId, toBinId);
         return selectOne(wrapper);
     }
-}
+
+    /**
+     * 按 bin_move_id,product_id,from_bin_id,to_bin_id 查询唯一的 WmsStockBinMoveItemDO
+     */
+    default WmsStockBinMoveItemDO getByUk(Long binMoveId, Long productId, Long fromBinId, Long toBinId) {
+        LambdaQueryWrapperX<WmsStockBinMoveItemDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsStockBinMoveItemDO::getBinMoveId, binMoveId);
+        wrapper.eq(WmsStockBinMoveItemDO::getProductId, productId);
+        wrapper.eq(WmsStockBinMoveItemDO::getFromBinId, fromBinId);
+        wrapper.eq(WmsStockBinMoveItemDO::getToBinId, toBinId);
+        return selectOne(wrapper);
+    }
+}

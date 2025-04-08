@@ -5,7 +5,6 @@ import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.item.vo.WmsSt
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.item.vo.WmsStockBinMoveItemSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.item.WmsStockBinMoveItemDO;
 import jakarta.validation.Valid;
-
 import java.util.List;
 
 /**

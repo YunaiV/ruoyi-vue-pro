@@ -213,4 +213,13 @@ public class WmsStockBinMoveServiceImpl implements WmsStockBinMoveService {
     public List<WmsStockBinMoveDO> selectSimpleList(WmsStockBinMovePageReqVO reqVO) {
         return stockBinMoveMapper.selectSimpleList(reqVO);
     }
+
+    /**
+     * 完成库位移动
+     **/
+    @Override
+    public void finishMove(WmsStockBinMoveDO binMoveDO, List<WmsStockBinMoveItemDO> binMoveItemDOList) {
+        binMoveDO.setExecuteStatus(WmsMoveExecuteStatus.MOVED.getValue());
+        stockBinMoveMapper.updateById(binMoveDO);
+    }
 }

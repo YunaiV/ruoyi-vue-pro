@@ -20,7 +20,7 @@ public class WmsStockBinMoveItemSaveReqVO {
     private Long binMoveId;
 
     @Schema(description = "产品ID", example = "4832")
-    private Integer productId;
+    private Long productId;
 
     @Schema(description = "调出库位ID", example = "1149")
     private Long fromBinId;

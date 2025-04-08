@@ -37,7 +37,7 @@ public class WmsStockBinMoveItemDO extends BaseDO {
     /**
      * 产品ID
      */
-    private Integer productId;
+    private Long productId;
 
     /**
      * 调出库位ID

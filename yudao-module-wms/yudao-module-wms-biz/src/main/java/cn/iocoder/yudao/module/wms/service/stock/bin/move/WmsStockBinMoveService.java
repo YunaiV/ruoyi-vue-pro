@@ -4,9 +4,10 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMovePageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMoveSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.WmsStockBinMoveDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.item.WmsStockBinMoveItemDO;
 import jakarta.validation.Valid;
+
 import java.util.List;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 
 /**
  * 库位移动 Service 接口
@@ -62,4 +63,9 @@ public interface WmsStockBinMoveService {
      * 按 ID 集合查询 WmsStockBinMoveDO
      */
     List<WmsStockBinMoveDO> selectSimpleList(WmsStockBinMovePageReqVO reqVO);
+
+    /**
+     * 完成库位移动
+     **/
+    void finishMove(WmsStockBinMoveDO binMoveDO, List<WmsStockBinMoveItemDO> binMoveItemDOList);
 }

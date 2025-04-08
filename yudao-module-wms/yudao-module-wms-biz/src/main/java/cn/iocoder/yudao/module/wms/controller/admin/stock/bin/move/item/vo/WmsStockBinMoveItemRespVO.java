@@ -26,7 +26,7 @@ public class WmsStockBinMoveItemRespVO {
 
     @Schema(description = "产品ID", example = "4832")
     @ExcelProperty("产品ID")
-    private Integer productId;
+    private Long productId;
 
     @Schema(description = "调出库位ID", example = "1149")
     @ExcelProperty("调出库位ID")

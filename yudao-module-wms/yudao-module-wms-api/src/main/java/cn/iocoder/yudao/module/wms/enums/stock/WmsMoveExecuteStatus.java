@@ -15,7 +15,7 @@ import java.util.Arrays;
 public enum WmsMoveExecuteStatus implements ArrayValuable<Integer>, DictEnum {
 
     DRAFT(0, "草稿"),
-    EXECUTED(1, "已执行"),
+    MOVED(1, "已执行"),
    ;
 
     public static final Integer[] VALUES = Arrays.stream(values()).map(WmsMoveExecuteStatus::getValue).toArray(Integer[]::new);
