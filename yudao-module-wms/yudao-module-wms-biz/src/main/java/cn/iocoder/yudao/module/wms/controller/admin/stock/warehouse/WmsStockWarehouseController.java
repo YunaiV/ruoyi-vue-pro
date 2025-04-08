@@ -72,7 +72,7 @@ public class WmsStockWarehouseController {
     @PreAuthorize("@ss.hasPermission('wms:stock-warehouse:query')")
     public CommonResult<WmsStockWarehouseRespVO> getStockWarehouse(@RequestParam("warehouseId") Long warehouseId, @RequestParam("productId") Long productId) {
         // 查询数据
-        WmsStockWarehouseDO stockWarehouse = stockWarehouseService.getStockWarehouse(warehouseId, productId);
+        WmsStockWarehouseDO stockWarehouse = stockWarehouseService.getStockWarehouse(warehouseId, productId, false);
         if (stockWarehouse == null) {
             throw exception(STOCK_WAREHOUSE_NOT_EXISTS);
         }

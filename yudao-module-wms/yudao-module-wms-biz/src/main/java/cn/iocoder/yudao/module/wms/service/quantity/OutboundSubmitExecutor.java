@@ -66,7 +66,8 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
 
         outboundRespVO.setLatestOutboundActionId(actionId);
 
-        WmsStockBinDO stockBinDO =stockBinService.getStockBin(binId,productId);
+        WmsStockBinDO stockBinDO =stockBinService.getStockBin(binId,productId, false);
+        // 如果不存在抛出异常
         if(stockBinDO==null) {
             throw exception(INBOUND_ITEM_NOT_EXISTS);
         }

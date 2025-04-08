@@ -63,7 +63,7 @@ public interface WmsStockBinService {
         return selectStockBin(warehouseId, null, productId);
     }
 
-    WmsStockBinDO getStockBin(Long binId, Long productId);
+    WmsStockBinDO getStockBin(Long binId, Long productId, boolean createNew);
 
     Map<Long, Map<Long, WmsStockBinDO>> getStockBinMap(Collection<Long> binIds, Collection<Long> productIds);
 

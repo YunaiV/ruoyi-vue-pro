@@ -75,7 +75,7 @@ public interface WmsInboundItemService {
 
     void updateById(WmsInboundItemDO inboundItemDO);
 
-    PageResult<WmsInboundItemDO> getPickupPending(WmsPickupPendingPageReqVO pageReqVO);
+    PageResult<WmsInboundItemQueryDO> getPickupPending(WmsPickupPendingPageReqVO pageReqVO);
 
     void assembleProducts(List<WmsInboundItemRespVO> itemList);
 

@@ -131,13 +131,15 @@ public class WmsInboundItemController {
     @PreAuthorize("@ss.hasPermission('wms:inbound-item:query')")
     public CommonResult<PageResult<WmsInboundItemRespVO>> getPickupPending(@Valid WmsPickupPendingPageReqVO pageReqVO) {
         // 查询数据
-        PageResult<WmsInboundItemDO> doPageResult = inboundItemService.getPickupPending(pageReqVO);
+        PageResult<WmsInboundItemQueryDO> doPageResult = inboundItemService.getPickupPending(pageReqVO);
         // 转换
         PageResult<WmsInboundItemRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsInboundItemRespVO.class);
         // 填充产品信息
         inboundItemService.assembleProducts(voPageResult.getList());
         // 填充入库单信息
         inboundItemService.assembleInbound(voPageResult.getList());
+        // 填充仓库信息
+        inboundItemService.assembleWarehouse(voPageResult.getList());
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
 			.mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setCreatorName)

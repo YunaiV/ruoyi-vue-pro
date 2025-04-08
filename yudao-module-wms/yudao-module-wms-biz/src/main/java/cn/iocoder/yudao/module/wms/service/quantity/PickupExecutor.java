@@ -110,22 +110,12 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
     private void processStockBin(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO, WmsInboundItemRespVO inboundItemVO) {
 
         JdbcUtils.requireTransaction();
-        WmsStockBinDO stockBinDO = stockBinService.getStockBin(pickupItemDO.getBinId(), inboundItemVO.getProductId());
-        if (stockBinDO == null) {
-            stockBinDO = new WmsStockBinDO();
-            stockBinDO.setWarehouseId(pickup.getWarehouseId());
-            stockBinDO.setBinId(pickupItemDO.getBinId());
-            stockBinDO.setProductId(inboundItemVO.getProductId());
-            // 可用库存
-            stockBinDO.setAvailableQty(pickupItemDO.getQty());
-            // 可售库存
-            stockBinDO.setSellableQty(pickupItemDO.getQty());
-        } else {
-            // 可用库存
-            stockBinDO.setAvailableQty(stockBinDO.getAvailableQty() + pickupItemDO.getQty());
-            // 可售库存
-            stockBinDO.setSellableQty(stockBinDO.getSellableQty() + pickupItemDO.getQty());
-        }
+        WmsStockBinDO stockBinDO = stockBinService.getStockBin(pickupItemDO.getBinId(), inboundItemVO.getProductId(), true);
+
+        // 可用库存
+        stockBinDO.setAvailableQty(stockBinDO.getAvailableQty() + pickupItemDO.getQty());
+        // 可售库存
+        stockBinDO.setSellableQty(stockBinDO.getSellableQty() + pickupItemDO.getQty());
         // 保存
         stockBinService.insertOrUpdate(stockBinDO);
         // 记录流水
@@ -186,7 +176,10 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
 //            sellableQuantity += wmsStockBinDO.getSellableQty();
 //        }
 
-        WmsStockWarehouseDO stockWarehouseDO = stockWarehouseService.getByWarehouseIdAndProductId(warehouseId, productId);
+        WmsStockWarehouseDO stockWarehouseDO = stockWarehouseService.getStockWarehouse(warehouseId, productId, false);
+        if (stockWarehouseDO == null) {
+            throw exception(STOCK_WAREHOUSE_NOT_EXISTS);
+        }
         // 可用
         stockWarehouseDO.setAvailableQty(stockWarehouseDO.getAvailableQty()+quantity);
         // 可售
@@ -221,7 +214,7 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
         // 查询库存记录
-        WmsStockOwnershipDO stockOwnershipDO = stockOwnershipService.getByUkProductOwner(warehouseId, companyId, deptId, productId);
+        WmsStockOwnershipDO stockOwnershipDO = stockOwnershipService.getByUkProductOwner(warehouseId, companyId, deptId, productId, false);
         // 如果不存在就创建
         if (stockOwnershipDO == null) {
             throw exception(STOCK_OWNERSHIP_NOT_EXISTS);

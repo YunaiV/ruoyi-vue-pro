@@ -108,18 +108,9 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
         // 获得仓库库存记录
-        WmsStockWarehouseDO stockWarehouseDO = stockWarehouseService.getByWarehouseIdAndProductId(warehouseId, productId);
-        // 如果没有就创建
-        if (stockWarehouseDO == null) {
-            stockWarehouseDO = new WmsStockWarehouseDO();
-            stockWarehouseDO.setWarehouseId(warehouseId);
-            stockWarehouseDO.setProductId(productId);
-            // 待上架量
-            stockWarehouseDO.setShelvingPendingQty(actualQuantity);
-        } else {
-            // 待上架量
-            stockWarehouseDO.setShelvingPendingQty(stockWarehouseDO.getShelvingPendingQty() + actualQuantity);
-        }
+        WmsStockWarehouseDO stockWarehouseDO = stockWarehouseService.getStockWarehouse(warehouseId, productId, true);
+        // 待上架量
+        stockWarehouseDO.setShelvingPendingQty(stockWarehouseDO.getShelvingPendingQty() + actualQuantity);
         // 保存
         stockWarehouseService.insertOrUpdate(stockWarehouseDO);
         // 记录流水
@@ -135,21 +126,11 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
         // 查询库存记录
-        WmsStockOwnershipDO stockOwnershipDO = stockOwnershipService.getByUkProductOwner(warehouseId, companyId, deptId, productId);
-        // 如果不存在就创建
-        if (stockOwnershipDO == null) {
-            stockOwnershipDO = new WmsStockOwnershipDO();
-            //
-            stockOwnershipDO.setCompanyId(companyId);
-            stockOwnershipDO.setDeptId(deptId);
-            stockOwnershipDO.setWarehouseId(warehouseId);
-            stockOwnershipDO.setProductId(productId);
-            // 待上架量
-            stockOwnershipDO.setShelvingPendingQty(actualQuantity);
-        } else {
-            // 待上架量
-            stockOwnershipDO.setShelvingPendingQty(stockOwnershipDO.getShelvingPendingQty() + actualQuantity);
-        }
+        WmsStockOwnershipDO stockOwnershipDO = stockOwnershipService.getByUkProductOwner(warehouseId, companyId, deptId, productId, true);
+
+        // 待上架量
+        stockOwnershipDO.setShelvingPendingQty(stockOwnershipDO.getShelvingPendingQty() + actualQuantity);
+
         // 保存
         stockOwnershipService.insertOrUpdate(stockOwnershipDO);
         // 记录流水

@@ -145,8 +145,24 @@ public class WmsStockOwnershipServiceImpl implements WmsStockOwnershipService {
     }
 
     @Override
-    public WmsStockOwnershipDO getByUkProductOwner(Long warehouseId, Long companyId, Long deptId, Long productId) {
-        return stockOwnershipMapper.getByUkProductOwner(warehouseId, companyId, deptId, productId);
+    public WmsStockOwnershipDO getByUkProductOwner(Long warehouseId, Long companyId, Long deptId, Long productId, boolean createNew) {
+        WmsStockOwnershipDO stockOwnershipDO = stockOwnershipMapper.getByUkProductOwner(warehouseId, companyId, deptId, productId);
+        if(stockOwnershipDO==null && createNew) {
+            stockOwnershipDO = new WmsStockOwnershipDO();
+            stockOwnershipDO.setWarehouseId(warehouseId);
+            stockOwnershipDO.setCompanyId(companyId);
+            stockOwnershipDO.setDeptId(deptId);
+            stockOwnershipDO.setProductId(productId);
+            // 可用库存
+            stockOwnershipDO.setAvailableQty(0);
+            // 待上架数量
+            stockOwnershipDO.setShelvingPendingQty(0);
+            // 待出库量
+            stockOwnershipDO.setOutboundPendingQty(0);
+            // 不良品数量
+            stockOwnershipMapper.insert(stockOwnershipDO);
+        }
+        return stockOwnershipDO;
     }
 
     @Override

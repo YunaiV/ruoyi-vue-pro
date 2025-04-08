@@ -138,13 +138,34 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
     }
 
     @Override
-    public WmsStockWarehouseDO getStockWarehouse(Long warehouseId, Long productId) {
-        return stockWarehouseMapper.getByWarehouseIdAndProductId(warehouseId, productId);
-    }
-
-    @Override
-    public WmsStockWarehouseDO getByWarehouseIdAndProductId(Long warehouseId, Long productId) {
-        return stockWarehouseMapper.getByWarehouseIdAndProductId(warehouseId, productId);
+    public WmsStockWarehouseDO getStockWarehouse(Long warehouseId, Long productId, boolean createNew) {
+        WmsStockWarehouseDO stockWarehouseDO = stockWarehouseMapper.getByWarehouseIdAndProductId(warehouseId, productId);
+        if(stockWarehouseDO==null && createNew) {
+            stockWarehouseDO = new WmsStockWarehouseDO();
+            stockWarehouseDO.setWarehouseId(warehouseId);
+            stockWarehouseDO.setProductId(productId);
+            // 待上架量
+            stockWarehouseDO.setShelvingPendingQty(0);
+            // 采购计划量
+            stockWarehouseDO.setPurchasePlanQty(0);
+            // 采购在途量
+            stockWarehouseDO.setPurchaseTransitQty(0);
+            // 退货在途量
+            stockWarehouseDO.setReturnTransitQty(0);
+            // 可售量，未被单据占用的良品数量
+            stockWarehouseDO.setSellableQty(0);
+            // 可用量，在库的良品数量
+            stockWarehouseDO.setAvailableQty(0);
+            // 待出库量
+            stockWarehouseDO.setOutboundPendingQty(0);
+            // 不良品数量
+            stockWarehouseDO.setDefectiveQty(0);
+            // 待出库量
+            stockWarehouseDO.setOutboundPendingQty(0);
+            //
+            stockWarehouseMapper.insert(stockWarehouseDO);
+        }
+        return stockWarehouseDO;
     }
 
     @Override

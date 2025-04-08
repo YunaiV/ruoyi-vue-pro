@@ -87,8 +87,7 @@ public class OwnershipMoveExecutor extends ActionExecutor<OwnershipMoveContext> 
         // 逐行处理
         for (WmsStockOwnershipMoveItemDO ownershipMoveItemDO : ownershipMoveItemDOList) {
             WmsStockOwnershipDO fromStockOwnership = stockOwnershipMap.get(makeStockKey(ownershipMoveItemDO.getFromCompanyId(),ownershipMoveItemDO.getFromDeptId(),ownershipMoveItemDO.getProductId()));
-            WmsStockOwnershipDO toStockOwnership = stockOwnershipMap.get(makeStockKey(ownershipMoveItemDO.getToCompanyId(),ownershipMoveItemDO.getToDeptId(),ownershipMoveItemDO.getProductId()));
-            this.processStockBin(ownershipMoveDO.getWarehouseId(),ownershipMoveItemDO,fromStockOwnership,toStockOwnership);
+            this.processStockBin(ownershipMoveDO.getWarehouseId(),ownershipMoveItemDO,fromStockOwnership);
         }
 
         // 完成库位移动
@@ -101,7 +100,7 @@ public class OwnershipMoveExecutor extends ActionExecutor<OwnershipMoveContext> 
     /**
      * 处理库存仓位
      **/
-    private void processStockBin(Long warehouseId,WmsStockOwnershipMoveItemDO ownershipMoveItemDO,WmsStockOwnershipDO fromStockOwnershipDO,WmsStockOwnershipDO toStockOwnershipDO) {
+    private void processStockBin(Long warehouseId,WmsStockOwnershipMoveItemDO ownershipMoveItemDO,WmsStockOwnershipDO fromStockOwnershipDO) {
 
         JdbcUtils.requireTransaction();
 
@@ -112,20 +111,10 @@ public class OwnershipMoveExecutor extends ActionExecutor<OwnershipMoveContext> 
         // 记录流水
         stockFlowService.createForStockOwnership(this.getReason(), WmsStockFlowDirection.OUT, ownershipMoveItemDO.getProductId(), fromStockOwnershipDO , ownershipMoveItemDO.getQty(), ownershipMoveItemDO.getOwnershipMoveId(), ownershipMoveItemDO.getId());
 
-
         // 入方
-        if (toStockOwnershipDO == null) {
-            toStockOwnershipDO = new WmsStockOwnershipDO();
-            toStockOwnershipDO.setWarehouseId(warehouseId);
-            toStockOwnershipDO.setCompanyId(ownershipMoveItemDO.getToCompanyId());
-            toStockOwnershipDO.setDeptId(ownershipMoveItemDO.getToDeptId());
-            toStockOwnershipDO.setProductId(ownershipMoveItemDO.getProductId());
-            // 可用库存
-            toStockOwnershipDO.setAvailableQty(ownershipMoveItemDO.getQty());
-        } else {
-            // 可用库存
-            toStockOwnershipDO.setAvailableQty(toStockOwnershipDO.getAvailableQty() + ownershipMoveItemDO.getQty());
-        }
+        WmsStockOwnershipDO toStockOwnershipDO = stockOwnershipService.getByUkProductOwner(warehouseId, ownershipMoveItemDO.getToCompanyId(), ownershipMoveItemDO.getToDeptId(), ownershipMoveItemDO.getProductId(), true);
+        // 可用库存
+        toStockOwnershipDO.setAvailableQty(toStockOwnershipDO.getAvailableQty() + ownershipMoveItemDO.getQty());
         // 保存
         stockOwnershipService.insertOrUpdate(toStockOwnershipDO);
         // 记录流水

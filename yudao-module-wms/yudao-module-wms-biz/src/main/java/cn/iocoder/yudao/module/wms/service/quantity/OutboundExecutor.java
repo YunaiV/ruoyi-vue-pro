@@ -129,7 +129,7 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
         // 获得仓库库存记录
-        WmsStockWarehouseDO stockWarehouseDO = stockWarehouseService.getByWarehouseIdAndProductId(warehouseId, productId);
+        WmsStockWarehouseDO stockWarehouseDO = stockWarehouseService.getStockWarehouse(warehouseId, productId, false);
 
         WmsStockFlowDirection wmsStockFlowDirection = null;
         // 如果没有就创建
@@ -155,9 +155,9 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
         // 查询库存记录
-        WmsStockOwnershipDO stockOwnershipDO = stockOwnershipService.getByUkProductOwner(warehouseId, companyId, deptId, productId);
+        WmsStockOwnershipDO stockOwnershipDO = stockOwnershipService.getByUkProductOwner(warehouseId, companyId, deptId, productId, false);
         WmsStockFlowDirection wmsStockFlowDirection = null;
-        // 如果不存在就创建
+        // 如果不存在抛出异常
         if (stockOwnershipDO == null) {
             throw exception(STOCK_OWNERSHIP_NOT_EXISTS);
         } else { // 如果存在就修改
@@ -176,8 +176,9 @@ public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
     private void processStockBinItem(WmsOutboundItemRespVO item,Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
         // 调整仓位库存
         JdbcUtils.requireTransaction();
-        WmsStockBinDO stockBinDO = stockBinService.getStockBin(binId, productId);
+        WmsStockBinDO stockBinDO = stockBinService.getStockBin(binId, productId, false);
         WmsStockFlowDirection wmsStockFlowDirection = null;
+        // 如果不存在抛出异常
         if(stockBinDO==null) {
             throw exception(STOCK_BIN_NOT_EXISTS);
         } else {

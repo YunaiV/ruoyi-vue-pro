@@ -221,8 +221,8 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
     }
 
     @Override
-    public PageResult<WmsInboundItemDO> getPickupPending(WmsPickupPendingPageReqVO pageReqVO) {
-        return inboundItemMapper.getPickupPending(pageReqVO);
+    public PageResult<WmsInboundItemQueryDO> getPickupPending(WmsPickupPendingPageReqVO pageReqVO) {
+        return inboundItemQueryMapper.getPickupPending(pageReqVO);
     }
 
     @Override

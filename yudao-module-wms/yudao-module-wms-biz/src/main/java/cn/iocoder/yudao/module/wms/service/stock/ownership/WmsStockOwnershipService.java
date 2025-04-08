@@ -65,7 +65,7 @@ public interface WmsStockOwnershipService {
 
     List<WmsStockOwnershipDO> selectStockOwnership(Long warehouseId, List<Long> productId);
 
-    WmsStockOwnershipDO getByUkProductOwner(Long warehouseId, Long companyId, Long deptId, Long productId);
+    WmsStockOwnershipDO getByUkProductOwner(Long warehouseId, Long companyId, Long deptId, Long productId, boolean createNew);
 
     void insertOrUpdate(WmsStockOwnershipDO stockOwnershipDO);
 

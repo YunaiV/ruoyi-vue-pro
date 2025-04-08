@@ -54,9 +54,7 @@ public interface WmsStockWarehouseService {
      */
     PageResult<WmsStockWarehouseDO> getStockWarehousePage(WmsStockWarehousePageReqVO pageReqVO);
 
-    WmsStockWarehouseDO getStockWarehouse(Long warehouseId, Long productId);
-
-    WmsStockWarehouseDO getByWarehouseIdAndProductId(Long warehouseId, Long productId);
+    WmsStockWarehouseDO getStockWarehouse(Long warehouseId, Long productId, boolean createNew);
 
     void insertOrUpdate(WmsStockWarehouseDO stockWarehouseDO);
 

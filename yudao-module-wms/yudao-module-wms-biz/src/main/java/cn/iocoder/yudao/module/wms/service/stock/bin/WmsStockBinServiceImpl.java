@@ -142,8 +142,23 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
     }
 
     @Override
-    public WmsStockBinDO getStockBin(Long binId, Long productId) {
-        return stockBinMapper.getByBinIdAndProductId(binId, productId);
+    public WmsStockBinDO getStockBin(Long binId, Long productId, boolean createNew) {
+        WmsStockBinDO binDO=stockBinMapper.getByBinIdAndProductId(binId, productId);
+        if(binDO==null && createNew) {
+            Long warehouseId = warehouseBinService.getWarehouseBin(binId).getWarehouseId();
+            binDO = new WmsStockBinDO();
+            binDO.setWarehouseId(warehouseId);
+            binDO.setBinId(binId);
+            binDO.setProductId(productId);
+            // 可用库存
+            binDO.setAvailableQty(0);
+            // 可售库存
+            binDO.setSellableQty(0);
+            // 待出库量
+            binDO.setOutboundPendingQty(0);
+            stockBinMapper.insert(binDO);
+        }
+        return binDO;
     }
 
     @Override

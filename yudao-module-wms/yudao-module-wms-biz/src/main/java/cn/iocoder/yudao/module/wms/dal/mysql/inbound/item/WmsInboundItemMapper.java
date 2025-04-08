@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundIt
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsPickupPendingPageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemQueryDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -45,12 +46,7 @@ public interface WmsInboundItemMapper extends BaseMapperX<WmsInboundItemDO> {
         return selectPage(reqVO, wrapper).getList();
     }
 
-    default PageResult<WmsInboundItemDO> getPickupPending(WmsPickupPendingPageReqVO reqVO) {
-        MPJLambdaWrapperX<WmsInboundItemDO> query = new MPJLambdaWrapperX<>();
-        query.gt(WmsInboundItemDO::getActualQty, WmsInboundItemDO::getShelvedQty).innerJoin(WmsInboundDO.class, WmsInboundDO::getId, WmsInboundItemDO::getInboundId).likeIfExists(WmsInboundDO::getNo, reqVO.getInboundNo())
-				.orderByDesc(WmsInboundItemDO::getId);
-        return selectPage(reqVO, query);
-    }
+
 
     default List<WmsInboundItemDO> selectItemListHasAvailableQty(Long warehouseId, Long productId) {
         MPJLambdaWrapperX<WmsInboundItemDO> query = new MPJLambdaWrapperX<>();

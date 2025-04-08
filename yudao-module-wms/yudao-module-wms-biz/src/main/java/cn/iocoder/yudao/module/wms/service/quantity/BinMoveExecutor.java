@@ -125,23 +125,11 @@ public class BinMoveExecutor extends ActionExecutor<BinMoveContext> {
 
 
         // 入方
-        WmsStockBinDO toStockBinDO = null;
-        if (toStockBinVO == null) {
-            toStockBinDO = new WmsStockBinDO();
-            toStockBinDO.setWarehouseId(warehouseId);
-            toStockBinDO.setBinId(binMoveItemDO.getToBinId());
-            toStockBinDO.setProductId(binMoveItemDO.getProductId());
-            // 可用库存
-            toStockBinDO.setAvailableQty(binMoveItemDO.getQty());
-            // 可售库存
-            toStockBinDO.setSellableQty(binMoveItemDO.getQty());
-        } else {
-            toStockBinDO = BeanUtils.toBean(toStockBinVO,WmsStockBinDO.class);
-            // 可用库存
-            toStockBinDO.setAvailableQty(toStockBinDO.getAvailableQty() + binMoveItemDO.getQty());
-            // 可售库存
-            toStockBinDO.setSellableQty(toStockBinDO.getSellableQty() + binMoveItemDO.getQty());
-        }
+        WmsStockBinDO toStockBinDO = stockBinService.getStockBin(binMoveItemDO.getToBinId(),toStockBinVO.getProductId(), true);
+        // 可用库存
+        toStockBinDO.setAvailableQty(toStockBinDO.getAvailableQty() + binMoveItemDO.getQty());
+        // 可售库存
+        toStockBinDO.setSellableQty(toStockBinDO.getSellableQty() + binMoveItemDO.getQty());
         // 保存
         stockBinService.insertOrUpdate(toStockBinDO);
         // 记录流水
