@@ -5,7 +5,8 @@ import cn.iocoder.yudao.module.oms.api.dto.OmsShopSaveReqDTO;
 import cn.iocoder.yudao.module.oms.service.OmsShopService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
-import java.util.*;
+
+import java.util.List;
 
 
 /**
@@ -19,15 +20,15 @@ public class OmsShopApiImpl implements OmsShopApi {
     private OmsShopService shopService;
 
 
-    @Override
-    public Long createShop(OmsShopSaveReqDTO saveReqDTO) {
-        return shopService.createShop(saveReqDTO);
-    }
+//    @Override
+//    public Long createShop(OmsShopSaveReqDTO saveReqDTO) {
+//        return shopService.createShop(saveReqDTO);
+//    }
 
-    @Override
-    public void updateShop(OmsShopSaveReqDTO updateReqDTO) {
-        shopService.updateShop(updateReqDTO);
-    }
+//    @Override
+//    public void updateShop(OmsShopSaveReqDTO updateReqDTO) {
+//        shopService.updateShop(updateReqDTO);
+//    }
 
     @Override
     public void deleteShop(Long id) {
@@ -36,7 +37,7 @@ public class OmsShopApiImpl implements OmsShopApi {
 
     @Override
     public void createOrUpdateShopByPlatform(List<OmsShopSaveReqDTO> saveReqDTOs) {
-       shopService.createOrUpdateShopByPlatform(saveReqDTOs);
+        shopService.createOrUpdateShopByPlatform(saveReqDTOs);
     }
 
     @Override

@@ -1,11 +1,17 @@
 package cn.iocoder.yudao.module.oms.service;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.oms.api.dto.OmsShopDTO;
 import cn.iocoder.yudao.module.oms.api.dto.OmsShopSaveReqDTO;
+import cn.iocoder.yudao.module.oms.controller.admin.shop.vo.OmsShopPageReqVO;
+import cn.iocoder.yudao.module.oms.controller.admin.shop.vo.OmsShopRespVO;
+import cn.iocoder.yudao.module.oms.controller.admin.shop.vo.OmsShopSaveReqVO;
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsShopDO;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface OmsShopService {
 
@@ -13,16 +19,16 @@ public interface OmsShopService {
      * 创建店铺
      *
      * @param saveReqVO 创建信息
-     * @return 编号
+     * @return 店铺id
      */
-    Long createShop(@Valid OmsShopSaveReqDTO saveReqVO);
+    Long createShop(@Valid OmsShopSaveReqVO saveReqVO);
 
     /**
      * 更新店铺
      *
      * @param updateReqVO 更新信息
      */
-    void updateShop(@Valid OmsShopSaveReqDTO updateReqVO);
+    void updateShop(@Valid OmsShopSaveReqVO updateReqVO);
 
     /**
      * 删除店铺
@@ -45,10 +51,43 @@ public interface OmsShopService {
      * @return: @return {@link OmsShopDO }
      */
     OmsShopDTO getShopByPlatformShopCode(String platformShopCode);
+
     /**
      * @Description: 按平台创建或更新店铺信息
      * @return:
      */
     void createOrUpdateShopByPlatform(List<OmsShopSaveReqDTO> saveReqDTOs);
+
+    /**
+     * 按条件查询店铺，不分页
+     **/
+    List<OmsShopRespVO> getShopList(@Valid OmsShopPageReqVO pageReqVO);
+
+
+    /**
+     * 获得OMS 店铺分页
+     *
+     * @param pageReqVO 分页查询
+     * @return OMS 店铺分页
+     */
+    PageResult<OmsShopRespVO> getShopPage(OmsShopPageReqVO pageReqVO);
+
+    /**
+     * 获得OMS 店铺
+     */
+    OmsShopRespVO getShop(Long id);
+
+    /**
+     * @param id   shop的主键
+     * @param name 店铺名称
+     * @param code 店铺编码
+     * @Description: 更新店铺的名称和编码
+     */
+    Boolean updateShopNameAndCode(Long id, String name, String code);
+
+    /**
+     * 按ShopId集合获取全部店铺
+     **/
+    Map<Long, OmsShopRespVO> getShopMapByIds(Set<Long> shopIds);
 
 }

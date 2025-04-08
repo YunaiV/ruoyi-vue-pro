@@ -19,4 +19,6 @@ public interface OmsErrorCodeConstants {
     ErrorCode OMS_SYNC_SHOP_PRODUCT_LACK = new ErrorCode(1_040_501_001, "OMS同步缺少店铺产品信息");
 
     ErrorCode OMS_SYNC_SHOPIFY_SHOP_INFO_FIRST = new ErrorCode(1_040_501_002, "请先同步Shopify店铺信息");
+
+    ErrorCode SHOP_CAN_NOT_CREATE_ONLINE_SHOP = new ErrorCode(1_040_501_003, "不能创建线上店铺");
 }

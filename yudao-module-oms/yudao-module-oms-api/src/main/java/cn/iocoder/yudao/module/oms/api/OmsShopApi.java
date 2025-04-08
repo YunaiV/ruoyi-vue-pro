@@ -18,14 +18,14 @@ public interface OmsShopApi {
      * @param saveReqDTO 创建信息
      * @return 编号
      */
-    Long createShop(@Valid OmsShopSaveReqDTO saveReqDTO);
+//    Long createShop(@Valid OmsShopSaveReqDTO saveReqDTO);
 
     /**
      * 更新店铺
      *
      * @param updateReqDTO 更新信息
      */
-    void updateShop(@Valid OmsShopSaveReqDTO updateReqDTO);
+//    void updateShop(@Valid OmsShopSaveReqDTO updateReqDTO);
 
     /**
      * 删除店铺
