@@ -25,14 +25,12 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_MOVE_ITEM_REPEATED;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_MOVE_NOT_EXISTS;
@@ -73,11 +71,9 @@ public class WmsStockBinMoveServiceImpl implements WmsStockBinMoveService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public WmsStockBinMoveDO createStockBinMove(WmsStockBinMoveSaveReqVO createReqVO) {
-
-        WmsStockBinMoveDO stockBinMoveDO = lockRedisDAO.lockByWarehouse(createReqVO.getWarehouseId(),()->{
+        WmsStockBinMoveDO stockBinMoveDO = lockRedisDAO.lockByWarehouse(createReqVO.getWarehouseId(), () -> {
             return createStockBinMoveInLock(createReqVO);
         });
-
         return stockBinMoveDO;
     }
 
@@ -111,17 +107,14 @@ public class WmsStockBinMoveServiceImpl implements WmsStockBinMoveService {
             }
             stockBinMoveItemMapper.insertBatch(toInsetList);
         }
-
         // 重新读取DO
         WmsStockBinMoveDO newStockBinMove = stockBinMoveMapper.selectById(stockBinMove.getId());
         List<WmsStockBinMoveItemDO> binMoveItemDOS = stockBinMoveItemMapper.selectByBinMoveId(newStockBinMove.getId());
-
         // 执行库位移动
         BinMoveContext context = new BinMoveContext();
         context.setBinMoveDO(newStockBinMove);
         context.setBinMoveItemDOList(binMoveItemDOS);
         binMoveExecutor.execute(context);
-
         // 返回
         return stockBinMove;
     }
@@ -225,7 +218,7 @@ public class WmsStockBinMoveServiceImpl implements WmsStockBinMoveService {
 
     /**
      * 完成库位移动
-     **/
+     */
     @Override
     public void finishMove(WmsStockBinMoveDO binMoveDO, List<WmsStockBinMoveItemDO> binMoveItemDOList) {
         binMoveDO.setExecuteStatus(WmsMoveExecuteStatus.MOVED.getValue());
@@ -235,9 +228,7 @@ public class WmsStockBinMoveServiceImpl implements WmsStockBinMoveService {
     @Override
     public void assembleWarehouse(List<WmsStockBinMoveRespVO> list) {
         Map<Long, WmsWarehouseDO> warehouseDOMap = warehouseService.getWarehouseMap(StreamX.from(list).toSet(WmsStockBinMoveRespVO::getWarehouseId));
-        Map<Long, WmsWarehouseSimpleRespVO> warehouseVOMap = StreamX.from(warehouseDOMap.values())
-            .toMap(WmsWarehouseDO::getId, v-> BeanUtils.toBean(v, WmsWarehouseSimpleRespVO.class));
-
+        Map<Long, WmsWarehouseSimpleRespVO> warehouseVOMap = StreamX.from(warehouseDOMap.values()).toMap(WmsWarehouseDO::getId, v -> BeanUtils.toBean(v, WmsWarehouseSimpleRespVO.class));
         StreamX.from(list).assemble(warehouseVOMap, WmsStockBinMoveRespVO::getWarehouseId, WmsStockBinMoveRespVO::setWarehouse);
     }
-}
+}

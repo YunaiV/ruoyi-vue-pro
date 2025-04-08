@@ -26,8 +26,8 @@ public class WmsStockOwnershipMoveRespVO {
     @ExcelProperty("单据号")
     private String no;
 
-    @Schema(description = "执行状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @ExcelProperty("执行状态")
+    @Schema(description = "库存移动的执行状态 ; WmsMoveExecuteStatus : 0-草稿 , 1-已执行", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @ExcelProperty("库存移动的执行状态")
     private Integer executeStatus;
 
     @Schema(description = "仓库ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "13471")

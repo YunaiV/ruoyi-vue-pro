@@ -22,13 +22,11 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSHIP_MOVE_ITEM_REPEATED;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSHIP_MOVE_NOT_EXISTS;
@@ -63,22 +61,17 @@ public class WmsStockOwnershipMoveServiceImpl implements WmsStockOwnershipMoveSe
     @Lazy
     private WmsWarehouseService warehouseService;
 
-
-
     /**
      * @sign : A2B315CE08CA7A20
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public WmsStockOwnershipMoveDO createStockOwnershipMove(WmsStockOwnershipMoveSaveReqVO createReqVO) {
-
-        WmsStockOwnershipMoveDO stockOwnershipMoveDO = lockRedisDAO.lockByWarehouse(createReqVO.getWarehouseId(),()->{
+        WmsStockOwnershipMoveDO stockOwnershipMoveDO = lockRedisDAO.lockByWarehouse(createReqVO.getWarehouseId(), () -> {
             return createStockOwnershipMoveInLock(createReqVO);
         });
-
         return stockOwnershipMoveDO;
     }
-
 
     @Transactional(rollbackFor = Exception.class)
     public WmsStockOwnershipMoveDO createStockOwnershipMoveInLock(WmsStockOwnershipMoveSaveReqVO createReqVO) {
@@ -87,7 +80,7 @@ public class WmsStockOwnershipMoveServiceImpl implements WmsStockOwnershipMoveSe
         createReqVO.setNo(no);
         // 指定初始状态
         createReqVO.setExecuteStatus(WmsMoveExecuteStatus.DRAFT.getValue());
-        //
+        // 
         if (stockOwnershipMoveMapper.getByNo(createReqVO.getNo()) != null) {
             throw exception(STOCK_OWNERSHIP_MOVE_NO_DUPLICATE);
         }
@@ -103,26 +96,21 @@ public class WmsStockOwnershipMoveServiceImpl implements WmsStockOwnershipMoveSe
                 item.setOwnershipMoveId(stockOwnershipMove.getId());
                 toInsetList.add(BeanUtils.toBean(item, WmsStockOwnershipMoveItemDO.class));
             });
-
             // 重复校验
             Set<String> uniqueKeys = StreamX.from(toInsetList).toSet(itm -> {
                 return StrUtils.join(Arrays.asList(itm.getProductId(), itm.getFromCompanyId(), itm.getFromDeptId(), itm.getToCompanyId(), itm.getToDeptId()));
             });
-            if(uniqueKeys.size()!=toInsetList.size()) {
+            if (uniqueKeys.size() != toInsetList.size()) {
                 throw exception(STOCK_OWNERSHIP_MOVE_ITEM_REPEATED);
             }
-
             stockOwnershipMoveItemMapper.insertBatch(toInsetList);
         }
-
         // 重新读取DO
         WmsStockOwnershipMoveDO newStockBinMove = stockOwnershipMoveMapper.selectById(stockOwnershipMove.getId());
         List<WmsStockOwnershipMoveItemDO> binMoveItemDOS = stockOwnershipMoveItemMapper.selectByOwnershipMoveId(newStockBinMove.getId());
-
         OwnershipMoveContext ownershipMoveContext = new OwnershipMoveContext();
         ownershipMoveContext.setOwnershipMoveDO(newStockBinMove);
         ownershipMoveContext.setOwnershipMoveItemDOS(binMoveItemDOS);
-
         ownershipMoveExecutor.execute(ownershipMoveContext);
         // 返回
         return stockOwnershipMove;
@@ -152,7 +140,7 @@ public class WmsStockOwnershipMoveServiceImpl implements WmsStockOwnershipMoveSe
             Set<String> uniqueKeys = StreamX.from(finalList).toSet(itm -> {
                 return StrUtils.join(Arrays.asList(itm.getProductId(), itm.getFromCompanyId(), itm.getFromDeptId(), itm.getToCompanyId(), itm.getToDeptId()));
             });
-            if(uniqueKeys.size()!=finalList.size()) {
+            if (uniqueKeys.size() != finalList.size()) {
                 throw exception(STOCK_OWNERSHIP_MOVE_ITEM_REPEATED);
             }
             // 设置归属
@@ -222,4 +210,4 @@ public class WmsStockOwnershipMoveServiceImpl implements WmsStockOwnershipMoveSe
         ownershipMoveDO.setExecuteStatus(WmsMoveExecuteStatus.MOVED.getValue());
         stockOwnershipMoveMapper.updateById(ownershipMoveDO);
     }
-}
+}

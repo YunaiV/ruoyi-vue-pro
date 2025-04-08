@@ -20,7 +20,7 @@ public class WmsStockOwnershipMovePageReqVO extends PageParam {
     @Schema(description = "单据号")
     private String no;
 
-    @Schema(description = "执行状态", example = "1")
+    @Schema(description = "库存移动的执行状态 ; WmsMoveExecuteStatus : 0-草稿 , 1-已执行", example = "1")
     private Integer executeStatus;
 
     @Schema(description = "仓库ID", example = "13471")

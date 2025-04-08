@@ -27,6 +27,6 @@ public class WmsStockBinMovePageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
-    @Schema(description = "库存类型 ; WmsMoveExecuteStatus : 0-草稿 , 1-已执行", example = "")
+    @Schema(description = "库存移动的执行状态 ; WmsMoveExecuteStatus : 0-草稿 , 1-已执行", example = "")
     private Integer executeStatus;
 }

@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 
 /**
- * 库存类型
+ * 库存移动的执行状态
  **/
 @RequiredArgsConstructor
 @Getter

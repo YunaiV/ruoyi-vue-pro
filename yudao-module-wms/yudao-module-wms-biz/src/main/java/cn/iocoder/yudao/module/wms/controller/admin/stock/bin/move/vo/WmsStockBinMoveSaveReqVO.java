@@ -29,7 +29,7 @@ public class WmsStockBinMoveSaveReqVO {
     @Schema(description = "详情清单", example = "")
     private List<WmsStockBinMoveItemSaveReqVO> itemList;
 
-    @Schema(description = "库存类型 ; WmsMoveExecuteStatus : 0-草稿 , 1-已执行", example = "")
+    @Schema(description = "库存移动的执行状态 ; WmsMoveExecuteStatus : 0-草稿 , 1-已执行", example = "")
     @InEnum(WmsMoveExecuteStatus.class)
     private Integer executeStatus;
 }

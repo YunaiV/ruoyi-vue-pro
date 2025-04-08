@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.wms.service.pickup;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.wms.controller.admin.pickup.vo.WmsPickupPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.pickup.vo.WmsPickupRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.pickup.vo.WmsPickupSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.WmsPickupDO;
 import jakarta.validation.Valid;
@@ -54,4 +55,6 @@ public interface WmsPickupService {
     PageResult<WmsPickupDO> getPickupPage(WmsPickupPageReqVO pageReqVO);
 
     List<WmsPickupDO> selectByIds(List<Long> list);
+
+    void assembleWarehouse(List<WmsPickupRespVO> list);
 }

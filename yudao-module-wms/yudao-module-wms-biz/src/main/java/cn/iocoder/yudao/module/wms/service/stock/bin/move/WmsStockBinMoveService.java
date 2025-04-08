@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBi
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.WmsStockBinMoveDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.item.WmsStockBinMoveItemDO;
 import jakarta.validation.Valid;
-
 import java.util.List;
 
 /**
@@ -67,9 +66,8 @@ public interface WmsStockBinMoveService {
 
     /**
      * 完成库位移动
-     **/
+     */
     void finishMove(WmsStockBinMoveDO binMoveDO, List<WmsStockBinMoveItemDO> binMoveItemDOList);
-
 
     void assembleWarehouse(List<WmsStockBinMoveRespVO> list);
 }

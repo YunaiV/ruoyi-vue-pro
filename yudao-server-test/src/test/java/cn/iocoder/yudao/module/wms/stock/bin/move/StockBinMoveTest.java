@@ -34,6 +34,7 @@ public class StockBinMoveTest extends WmsBaseTest {
         CommonResult<PageResult<WmsStockBinRespVO>> stockBinPageResult = this.getStockBinPage();
         if(stockBinPageResult.isError()) {
             System.err.println("缺少库存数据，无法继续测试");
+            return;
         }
         List<WmsStockBinRespVO> stockBinList = stockBinPageResult.getData().getList();
         WmsStockBinRespVO fromStockBinVOBefore = stockBinList.get(0);
@@ -82,7 +83,7 @@ public class StockBinMoveTest extends WmsBaseTest {
         CommonResult<Long> postResult=createStockBinMove(createReqVO);
 
         if(postResult.isError()) {
-            Assert.assertTrue("创建库位移动失败",false);
+            Assert.assertTrue("创建库位库存移动失败",false);
         }
 
 
@@ -95,7 +96,8 @@ public class StockBinMoveTest extends WmsBaseTest {
         Assert.assertTrue("库存数量-FROM",fromStockBinVOAfter.getAvailableQty()==fromStockBinVOBefore.getAvailableQty()-qty);
         Assert.assertTrue("库存数量-TO",toStockBinVOAfter.getAvailableQty()==toStockBinVOBefore.getAvailableQty()+qty);
 
-
+        Assert.assertTrue("可售数量-FROM",fromStockBinVOAfter.getSellableQty()==fromStockBinVOBefore.getSellableQty()-qty);
+        Assert.assertTrue("可售数量-TO",toStockBinVOAfter.getSellableQty()==toStockBinVOBefore.getSellableQty()+qty);
 
         System.out.println();
 
