@@ -164,7 +164,6 @@ public interface ErrorCodeConstants {
     ErrorCode STOCK_BIN_MOVE_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_016_007, "库位移动不符合审批条件");
     ErrorCode STOCK_BIN_MOVE_QUANTITY_ERROR = new ErrorCode(2_001_016_008, "库位移动数量错误");
 
-
     // ========== WMS_STOCK_BIN_MOVE_ITEM 库位移动详情表 2_001_017_000 ==========
     ErrorCode STOCK_BIN_MOVE_ITEM_NOT_EXISTS = new ErrorCode(2_001_017_001, "库位移动详情不存在");
     ErrorCode STOCK_BIN_MOVE_ITEM_BIN_MOVE_ID_PRODUCT_ID_FROM_BIN_ID_TO_BIN_ID_DUPLICATE = new ErrorCode(2_001_017_002, "库位移动表ID,产品ID,调出库位ID,调入库位ID已存在");
@@ -174,4 +173,24 @@ public interface ErrorCodeConstants {
     ErrorCode STOCK_BIN_MOVE_ITEM_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_017_006, "库位移动详情不符合审批条件");
     ErrorCode STOCK_BIN_MOVE_ITEM_EXISTS = new ErrorCode(2_001_017_006, "库位移动详情已存在");
     ErrorCode STOCK_BIN_MOVE_ITEM_REPEATED = new ErrorCode(2_001_017_007, "库位移动详情重复");
+
+    // ========== WMS_STOCK_OWNERSHIP_MOVE 所有者库存移动表 2_001_018_000 ==========
+    ErrorCode STOCK_OWNERSHIP_MOVE_NOT_EXISTS = new ErrorCode(2_001_018_001, "所有者库存移动不存在");
+    ErrorCode STOCK_OWNERSHIP_MOVE_NO_DUPLICATE = new ErrorCode(2_001_018_002, "单据号已存在");
+    ErrorCode STOCK_OWNERSHIP_MOVE_BE_REFERRED = new ErrorCode(2_001_018_003, "所有者库存移动被引用");
+    ErrorCode STOCK_OWNERSHIP_MOVE_NO_OUT_OF_BOUNDS = new ErrorCode(2_001_018_004, "所有者库存移动单据号越界");
+    ErrorCode STOCK_OWNERSHIP_MOVE_CAN_NOT_EDIT = new ErrorCode(2_001_018_005, "所有者库存移动不允许编辑");
+    ErrorCode STOCK_OWNERSHIP_MOVE_CAN_NOT_DELETE = new ErrorCode(2_001_018_006, "所有者库存移动不允许删除");
+    ErrorCode STOCK_OWNERSHIP_MOVE_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_018_007, "所有者库存移动不符合审批条件");
+
+
+    // ========== WMS_STOCK_OWNERSHIP_MOVE_ITEM 所有者库存移动详情表 2_001_019_000 ==========
+    ErrorCode STOCK_OWNERSHIP_MOVE_ITEM_NOT_EXISTS = new ErrorCode(2_001_019_001, "所有者库存移动详情不存在");
+    ErrorCode STOCK_OWNERSHIP_MOVE_ITEM_REPEATED = new ErrorCode(2_001_019_002, "所有者移动详情重复");
+    ErrorCode STOCK_OWNERSHIP_MOVE_ITEM_BE_REFERRED = new ErrorCode(2_001_019_003, "所有者库存移动详情被引用");
+    ErrorCode STOCK_OWNERSHIP_MOVE_ITEM_CAN_NOT_EDIT = new ErrorCode(2_001_019_004, "所有者库存移动详情不允许编辑");
+    ErrorCode STOCK_OWNERSHIP_MOVE_ITEM_CAN_NOT_DELETE = new ErrorCode(2_001_019_005, "所有者库存移动详情不允许删除");
+    ErrorCode STOCK_OWNERSHIP_MOVE_ITEM_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_019_006, "所有者库存移动详情不符合审批条件");
+    ErrorCode STOCK_OWNERSHIP_MOVE_ITEM_EXISTS = new ErrorCode(2_001_019_007, "所有者库存移动详情已存在");
+
 }

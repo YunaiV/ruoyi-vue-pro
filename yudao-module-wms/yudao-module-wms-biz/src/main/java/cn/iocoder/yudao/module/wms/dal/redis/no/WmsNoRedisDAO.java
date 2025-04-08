@@ -28,9 +28,16 @@ public class WmsNoRedisDAO {
     private static final String NO = "erp:seq_no:";
 
     /**
-     * 库位移动单的流水号前缀
+     * 库位库存移动单的流水号前缀
      **/
     public static final String STOCK_BIN_MOVE_NO_PREFIX = "BIMV";
+
+    /**
+     * 所有者库存移动单的流水号前缀
+     **/
+    public static final String STOCK_OWNERSHIP_MOVE_NO_PREFIX = "OWMV";
+
+
     /**
      * 入库单单据号前缀
      */
