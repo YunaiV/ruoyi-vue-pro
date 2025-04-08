@@ -139,7 +139,7 @@ public interface SrmErrorCodeConstants {
     //采购子项不存在
     ErrorCode PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_ID = new ErrorCode(1_030_603_143, "采购请求ID=({})没有子项");
     //当前状态不能触发事件
-    ErrorCode PURCHASE_REQUEST_NOT_EXISTS_BY_STATUS = new ErrorCode(1_030_603_144, "{}无法在({})状态下触发({})事件");
+    ErrorCode PURCHASE_REQUEST_NOT_EXISTS_BY_STATUS = new ErrorCode(1_030_603_144, "{},无法在({})状态下触发({})事件");
     ErrorCode PURCHASE_REQUEST_MERGE_FAIL = new ErrorCode(1_030_603_145, "采购申请单({})未审核，无法合并");
     ErrorCode PURCHASE_REQUEST_ITEM_NOT_EXISTS_BY_OPEN = new ErrorCode(1_030_603_146, "采购申请项({})不处于开启状态");
     //存在对应订单，无法手动关闭
