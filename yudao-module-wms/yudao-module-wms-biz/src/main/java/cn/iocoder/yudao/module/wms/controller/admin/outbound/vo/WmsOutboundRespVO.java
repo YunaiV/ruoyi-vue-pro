@@ -9,10 +9,8 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
-
 import java.time.LocalDateTime;
 import java.util.List;
-
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
@@ -35,11 +33,11 @@ public class WmsOutboundRespVO {
     @ExcelProperty("仓库ID")
     private Long warehouseId;
 
-    @Schema(description = "出库单类型 ; OutboundType : 1-手工出库 , 2-订单出库", example = "1")
+    @Schema(description = "出库单类型 ; WmsOutboundType : 1-手工出库 , 2-订单出库", example = "1")
     @ExcelProperty("出库单类型")
     private Integer type;
 
-    @Schema(description = "出库单审批状态 ; OutboundAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", example = "2")
+    @Schema(description = "出库单审批状态 ; WmsOutboundAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过 , 4-已出库", example = "2")
     @ExcelProperty("出库单审批状态")
     private Integer auditStatus;
 
@@ -51,7 +49,7 @@ public class WmsOutboundRespVO {
     @ExcelProperty("来源单据号")
     private String sourceBillNo;
 
-    @Schema(description = "来源单据类型 ; BillType : 0-入库单 , 1-出库单", example = "2")
+    @Schema(description = "来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单", example = "2")
     @ExcelProperty("来源单据类型")
     private Integer sourceBillType;
 
@@ -75,7 +73,7 @@ public class WmsOutboundRespVO {
     @ExcelProperty("详情清单")
     private List<WmsOutboundItemRespVO> itemList;
 
-    @Schema(description = "出库状态 ; OutboundStatus : 0-未出库 , 1-部分出库 , 2-已出库", example = "")
+    @Schema(description = "出库状态 ; WmsOutboundStatus : 0-未出库 , 1-部分出库 , 2-已出库", example = "")
     @ExcelProperty("出库状态")
     private Integer outboundStatus;
 
@@ -110,7 +108,7 @@ public class WmsOutboundRespVO {
     private LocalDateTime outboundTime;
 
     @Schema(description = "出库动作ID，与flow关联", example = "")
-    @ExcelProperty("出库动作ID，与flow关联")
+    @ExcelProperty("出库动作ID")
     private Long latestOutboundActionId;
 
     @Schema(description = "仓库", example = "")

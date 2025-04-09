@@ -49,6 +49,7 @@ public interface ErrorCodeConstants {
     ErrorCode INBOUND_ABANDON_NOT_ALLOWED = new ErrorCode(2_001_004_023, "入库单不允许废弃");
     ErrorCode INBOUND_FORCE_FINISH_NOT_ALLOWED = new ErrorCode(2_001_004_024, "入库单不允许强制完成");
     ErrorCode INBOUND_AUDIT_FAIL = new ErrorCode(2_001_004_025, "审核错误，当前入库单状态为{}，在{}状态时才允许{}");
+    ErrorCode INBOUND_EXISTS = new ErrorCode(2_001_004_026, "入库单已存在");
 
     // ========== WMS_INBOUND_ITEM 入库单详情表 2_001_005_000 ==========
     ErrorCode INBOUND_ITEM_NOT_EXISTS = new ErrorCode(2_001_005_001, "入库单详情不存在");
@@ -153,6 +154,7 @@ public interface ErrorCodeConstants {
     ErrorCode OUTBOUND_ITEM_PLAN_QTY_ERROR = new ErrorCode(2_001_015_009, "计划出库量错误");
     ErrorCode OUTBOUND_ITEM_ACTUAL_QTY_ERROR = new ErrorCode(2_001_015_010, "实际出库量错误");
     ErrorCode OUTBOUND_STATUS_PARSE_ERROR = new ErrorCode(2_001_015_011, "无法完成出库单状态转换");
+    ErrorCode OUTBOUND_EXISTS = new ErrorCode(2_001_015_012, "出库单已存在");
 
     // ========== WMS_STOCK_BIN_MOVE 库位移动表 2_001_016_000 ==========
     ErrorCode STOCK_BIN_MOVE_NOT_EXISTS = new ErrorCode(2_001_016_001, "库位移动不存在");

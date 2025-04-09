@@ -36,11 +36,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -57,6 +55,7 @@ public class WmsInboundController {
     @Resource
     @Lazy
     private WmsInboundService inboundService;
+
     @Autowired
     private WmsApprovalHistoryService wmsApprovalHistoryService;
 
@@ -155,7 +154,6 @@ public class WmsInboundController {
         PageResult<WmsInboundDO> doPageResult = inboundService.getInboundPage(pageReqVO);
         // 转换
         PageResult<WmsInboundRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsInboundRespVO.class);
-
         // 装配
         inboundService.assembleWarehouse(voPageResult.getList());
         inboundService.assembleDept(voPageResult.getList());
@@ -181,7 +179,6 @@ public class WmsInboundController {
         List<WmsInboundDO> doList = inboundService.getSimpleList(pageReqVO);
         // 转换
         List<WmsInboundSimpleRespVO> voList = BeanUtils.toBean(doList, WmsInboundSimpleRespVO.class);
-
         return success(voList);
     }
 
@@ -195,4 +192,4 @@ public class WmsInboundController {
         // 导出 Excel
         ExcelUtils.write(response, "入库单.xls", "数据", WmsInboundRespVO.class, BeanUtils.toBean(list, WmsInboundRespVO.class));
     }
-}
+}

@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundPageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import org.apache.ibatis.annotations.Mapper;
-
 import java.util.List;
 
 /**
@@ -27,10 +26,10 @@ public interface WmsInboundMapper extends BaseMapperX<WmsInboundDO> {
 				.eqIfPresent(WmsInboundDO::getSourceBillId, reqVO.getSourceBillId())
 				.eqIfPresent(WmsInboundDO::getSourceBillNo, reqVO.getSourceBillNo())
 				.eqIfPresent(WmsInboundDO::getSourceBillType, reqVO.getSourceBillType())
-				.eqIfPresent(WmsInboundDO::getTraceNo, reqVO.getTraceNo()).// .betweenIfPresent(WmsInboundDO::getArrivalPlanTime, reqVO.getArrivalPlanTime())
-        eqIfPresent(// .betweenIfPresent(WmsInboundDO::getArrivalPlanTime, reqVO.getArrivalPlanTime())
-        WmsInboundDO::getShippingMethod, // .betweenIfPresent(WmsInboundDO::getArrivalActualTime, reqVO.getArrivalActualTime())
-        reqVO.getShippingMethod())
+				.eqIfPresent(WmsInboundDO::getTraceNo, // .betweenIfPresent(WmsInboundDO::getArrivalPlanTime, reqVO.getArrivalPlanTime())
+        reqVO.getTraceNo()).// .betweenIfPresent(WmsInboundDO::getArrivalPlanTime, reqVO.getArrivalPlanTime())
+        eqIfPresent(// .betweenIfPresent(WmsInboundDO::getArrivalActualTime, reqVO.getArrivalActualTime())
+        WmsInboundDO::getShippingMethod, reqVO.getShippingMethod())
 				.eqIfPresent(WmsInboundDO::getCreatorComment, reqVO.getCreatorComment())
 				.eqIfPresent(WmsInboundDO::getInitAge, reqVO.getInitAge())
 				.betweenIfPresent(WmsInboundDO::getCreateTime, reqVO.getCreateTime())
@@ -82,4 +81,4 @@ public interface WmsInboundMapper extends BaseMapperX<WmsInboundDO> {
         wrapper.eqIfPresent(WmsInboundDO::getTraceNo, pageReqVO.getTraceNo());
         return selectList(wrapper);
     }
-}
+}

@@ -89,6 +89,8 @@ public class WmsInventoryServiceImpl implements WmsInventoryService {
                 item.setId(null);
                 // 设置归属
                 item.setInventoryId(inventory.getId());
+                item.setExpectedQty(0);
+                item.setActualQty(0);
                 toInsetList.add(BeanUtils.toBean(item, WmsInventoryProductDO.class));
             });
             // 校验 toInsetList 中是否有重复的 productId
@@ -121,10 +123,9 @@ public class WmsInventoryServiceImpl implements WmsInventoryService {
             inventoryProductMapper.updateBatch(inventoryProductDOList);
         }
         // 分解库存到仓位
-        List<WmsInventoryBinDO> inventoryBinDOList = inventoryBinMapper.selectByInventoryId(inventory.getId());
         List<WmsWarehouseProductVO> wmsWarehouseProductVOList = new ArrayList<>();
-        for (WmsInventoryBinDO inventoryBinDO : inventoryBinDOList) {
-            wmsWarehouseProductVOList.add(WmsWarehouseProductVO.builder().warehouseId(inventory.getWarehouseId()).productId(inventoryBinDO.getProductId()).build());
+        for (WmsInventoryProductDO inventoryProductDO : inventoryProductDOList) {
+            wmsWarehouseProductVOList.add(WmsWarehouseProductVO.builder().warehouseId(inventory.getWarehouseId()).productId(inventoryProductDO.getProductId()).build());
         }
         // 数据库里已经有的
         List<WmsInventoryBinDO> allInventoryBinDOListInDB = inventoryBinMapper.selectByInventoryId(inventory.getId());

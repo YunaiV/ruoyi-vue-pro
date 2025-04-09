@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundPageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import org.apache.ibatis.annotations.Mapper;
-
 import java.util.List;
 
 /**
@@ -62,4 +61,4 @@ public interface WmsOutboundMapper extends BaseMapperX<WmsOutboundDO> {
         wrapper.eqIfPresent(WmsOutboundDO::getType, pageReqVO.getType());
         return selectList(wrapper);
     }
-}
+}

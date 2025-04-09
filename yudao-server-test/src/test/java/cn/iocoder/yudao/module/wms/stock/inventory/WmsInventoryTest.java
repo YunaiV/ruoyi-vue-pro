@@ -5,13 +5,15 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.wms.WmsBaseTest;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.product.vo.WmsInventoryProductSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventorySaveReqVO;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehouseRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinRespVO;
 import cn.iocoder.yudao.test.Profile;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author: LeeFJ
@@ -29,16 +31,16 @@ public class WmsInventoryTest extends WmsBaseTest {
 
 
         // 确定测试的产品清单
-        CommonResult<PageResult<WmsStockWarehouseRespVO>> stockBinPageResult = this.getStockWarehousePage(warehouseId);
+        CommonResult<PageResult<WmsStockBinRespVO>> stockBinPageResult = this.getStockBinPage(warehouseId);
         if(stockBinPageResult.isError()) {
             System.err.println("缺少库存数据，无法继续测试");
             return;
         }
 
-        List<WmsStockWarehouseRespVO> stockWarehouseList = stockBinPageResult.getData().getList();
-        List<Long> testProductIds1 = new ArrayList<>();
-        List<Long> testProductIds2 = new ArrayList<>();
-        for (WmsStockWarehouseRespVO stockBinRespVO : stockWarehouseList) {
+        List<WmsStockBinRespVO> stockBinList = stockBinPageResult.getData().getList();
+        Set<Long> testProductIds1 = new HashSet<>();
+        Set<Long> testProductIds2 = new HashSet<>();
+        for (WmsStockBinRespVO stockBinRespVO : stockBinList) {
             if(testProductIds1.size()<2) {
                 testProductIds1.add(stockBinRespVO.getProductId());
             } else {
@@ -66,17 +68,6 @@ public class WmsInventoryTest extends WmsBaseTest {
         }
 
 
-//        CommonResult<List<WmsStockBinRespVO>> fromStockBinResultAfter = getStockBin(warehouseId, fromStockBinVOBefore.getBinId(), fromStockBinVOBefore.getProductId());
-//        CommonResult<List<WmsStockBinRespVO>> toStockBinResultAfter = getStockBin(warehouseId, toStockBinVOBefore.getBinId(), toStockBinVOBefore.getProductId());
-//
-//        WmsStockBinRespVO fromStockBinVOAfter = fromStockBinResultAfter.getData().get(0);
-//        WmsStockBinRespVO toStockBinVOAfter = toStockBinResultAfter.getData().get(0);
-//
-//        Assert.assertTrue("库存数量-FROM",fromStockBinVOAfter.getAvailableQty()==fromStockBinVOBefore.getAvailableQty()-qty);
-//        Assert.assertTrue("库存数量-TO",toStockBinVOAfter.getAvailableQty()==toStockBinVOBefore.getAvailableQty()+qty);
-//
-//        Assert.assertTrue("可售数量-FROM",fromStockBinVOAfter.getSellableQty()==fromStockBinVOBefore.getSellableQty()-qty);
-//        Assert.assertTrue("可售数量-TO",toStockBinVOAfter.getSellableQty()==toStockBinVOBefore.getSellableQty()+qty);
 
         System.out.println();
 

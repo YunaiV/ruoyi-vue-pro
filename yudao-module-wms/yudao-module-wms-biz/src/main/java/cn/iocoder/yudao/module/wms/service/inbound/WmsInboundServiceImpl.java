@@ -39,14 +39,12 @@ import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_CAN_NOT_EDIT;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_PLAN_QTY_ERROR;
@@ -126,7 +124,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         if (createReqVO.getItemList() != null) {
             List<WmsInboundItemDO> toInsetList = new ArrayList<>();
             StreamX.from(createReqVO.getItemList()).filter(Objects::nonNull).forEach(item -> {
-                if(item.getPlanQty()==null || item.getPlanQty()<=0) {
+                if (item.getPlanQty() == null || item.getPlanQty() <= 0) {
                     throw exception(INBOUND_ITEM_PLAN_QTY_ERROR);
                 }
                 item.setId(null);
@@ -156,7 +154,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         // 校验存在
         WmsInboundDO exists = validateInboundExists(updateReqVO.getId());
         // 判断是否允许编辑
-        WmsInboundAuditStatus auditStatus= WmsInboundAuditStatus.parse(exists.getAuditStatus());
+        WmsInboundAuditStatus auditStatus = WmsInboundAuditStatus.parse(exists.getAuditStatus());
         if (!auditStatus.matchAny(WmsInboundAuditStatus.DRAFT, WmsInboundAuditStatus.REJECT)) {
             throw exception(INBOUND_CAN_NOT_EDIT);
         }
@@ -186,7 +184,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
             }
             // 设置归属
             finalList.forEach(item -> {
-                if(item.getPlanQty()==null || item.getPlanQty()<=0) {
+                if (item.getPlanQty() == null || item.getPlanQty() <= 0) {
                     throw exception(INBOUND_ITEM_PLAN_QTY_ERROR);
                 }
                 item.setInboundId(updateReqVO.getId());
@@ -222,7 +220,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         // 校验存在
         WmsInboundDO inbound = validateInboundExists(id);
         // 判断是否允许删除
-        WmsInboundAuditStatus auditStatus= WmsInboundAuditStatus.parse(inbound.getAuditStatus());
+        WmsInboundAuditStatus auditStatus = WmsInboundAuditStatus.parse(inbound.getAuditStatus());
         if (!auditStatus.matchAny(WmsInboundAuditStatus.DRAFT, WmsInboundAuditStatus.REJECT)) {
             throw exception(INBOUND_CAN_NOT_EDIT);
         }
@@ -270,17 +268,15 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         WmsInboundDO inbound = validateInboundExists(approvalReqVO.getBillId());
         // 锁在外，事务在锁内
         WmsInboundServiceImpl proxy = SpringUtils.getBeanByExactType(WmsInboundServiceImpl.class);
-        lockRedisDAO.lockByWarehouse(inbound.getWarehouseId(),()->{
-            proxy.fireEvent(event,approvalReqVO,inbound);
+        lockRedisDAO.lockByWarehouse(inbound.getWarehouseId(), () -> {
+            proxy.fireEvent(event, approvalReqVO, inbound);
         });
-
     }
 
     @Transactional(rollbackFor = Exception.class)
-    protected void  fireEvent(WmsInboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO, WmsInboundDO inbound) {
-
-        TransitionContext<WmsInboundDO> ctx =  inboundStateMachine.createContext(inbound);
-        ctx.setExtra(WmsConstants.APPROVAL_REQ_VO_KEY,approvalReqVO);
+    protected void fireEvent(WmsInboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO, WmsInboundDO inbound) {
+        TransitionContext<WmsInboundDO> ctx = inboundStateMachine.createContext(inbound);
+        ctx.setExtra(WmsConstants.APPROVAL_REQ_VO_KEY, approvalReqVO);
         // 触发事件
         inboundStateMachine.fireEvent(event, ctx);
     }
@@ -307,12 +303,11 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     public void finishInbound(WmsInboundRespVO inboundRespVO) {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
-        int total= inboundRespVO.getItemList().size();
+        int total = inboundRespVO.getItemList().size();
         int countOfNone = 0;
         int countOfPart = 0;
         int countOfAll = 0;
         for (WmsInboundItemRespVO respVO : inboundRespVO.getItemList()) {
-
             if (WmsInboundStatus.NONE.matchAny(respVO.getInboundStatus())) {
                 countOfNone++;
             }
@@ -322,27 +317,23 @@ public class WmsInboundServiceImpl implements WmsInboundService {
             if (WmsInboundStatus.ALL.matchAny(respVO.getInboundStatus())) {
                 countOfAll++;
             }
-
-            if(respVO.getOutboundAvailableQty()==null) {
+            if (respVO.getOutboundAvailableQty() == null) {
                 respVO.setOutboundAvailableQty(0);
             }
-            if(respVO.getShelvedQty()==null) {
+            if (respVO.getShelvedQty() == null) {
                 respVO.setShelvedQty(0);
             }
         }
         if (countOfNone > 0) {
             throw exception(INBOUND_NOT_COMPLETE);
         }
-
         WmsInboundStatus inboundStatus = WmsInboundStatus.NONE;
-        if(countOfPart>0) {
+        if (countOfPart > 0) {
             inboundStatus = WmsInboundStatus.PART;
         }
-        if(total==countOfAll) {
+        if (total == countOfAll) {
             inboundStatus = WmsInboundStatus.ALL;
         }
-
-
         // 处理明细的入库状态
         List<WmsInboundItemDO> itemList = BeanUtils.toBean(inboundRespVO.getItemList(), WmsInboundItemDO.class);
         inboundItemMapper.updateBatch(itemList);
@@ -372,9 +363,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     @Override
     public void assembleWarehouse(List<WmsInboundRespVO> list) {
         Map<Long, WmsWarehouseDO> warehouseDOMap = warehouseService.getWarehouseMap(StreamX.from(list).toSet(WmsInboundRespVO::getWarehouseId));
-        Map<Long, WmsWarehouseSimpleRespVO> warehouseVOMap = StreamX.from(warehouseDOMap.values())
-            .toMap(WmsWarehouseDO::getId, v-> BeanUtils.toBean(v, WmsWarehouseSimpleRespVO.class));
-
+        Map<Long, WmsWarehouseSimpleRespVO> warehouseVOMap = StreamX.from(warehouseDOMap.values()).toMap(WmsWarehouseDO::getId, v -> BeanUtils.toBean(v, WmsWarehouseSimpleRespVO.class));
         StreamX.from(list).assemble(warehouseVOMap, WmsInboundRespVO::getWarehouseId, WmsInboundRespVO::setWarehouse);
     }
 
@@ -391,14 +380,12 @@ public class WmsInboundServiceImpl implements WmsInboundService {
 
     @Override
     public void assembleCompany(List<WmsInboundRespVO> list) {
-        //todo 待东宇财务模块支持
+        // todo 待东宇财务模块支持
     }
 
     @Override
     public void assembleApprovalHistory(List<WmsInboundRespVO> list) {
-       Map<Long,List<WmsApprovalHistoryRespVO>> groupedApprovalHistory = approvalHistoryService.selectGroupedApprovalHistory(WmsBillType.INBOUND,StreamX.from(list).toList(WmsInboundRespVO::getId));
-       StreamX.from(list).assemble(groupedApprovalHistory,WmsInboundRespVO::getId,WmsInboundRespVO::setApprovalHistoryList);
+        Map<Long, List<WmsApprovalHistoryRespVO>> groupedApprovalHistory = approvalHistoryService.selectGroupedApprovalHistory(WmsBillType.INBOUND, StreamX.from(list).toList(WmsInboundRespVO::getId));
+        StreamX.from(list).assemble(groupedApprovalHistory, WmsInboundRespVO::getId, WmsInboundRespVO::setApprovalHistoryList);
     }
-
-
-}
+}

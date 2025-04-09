@@ -34,10 +34,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.io.IOException;
 import java.util.List;
-
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -109,7 +107,6 @@ public class WmsOutboundController {
         PageResult<WmsOutboundDO> doPageResult = outboundService.getOutboundPage(pageReqVO);
         // 转换
         PageResult<WmsOutboundRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsOutboundRespVO.class);
-
         outboundService.assembleWarehouse(voPageResult.getList());
         outboundService.assembleDept(voPageResult.getList());
         outboundService.assembleCompany(voPageResult.getList());
@@ -122,7 +119,6 @@ public class WmsOutboundController {
         // 返回
         return success(voPageResult);
     }
-
 
     /**
      * @sign : 352DBC195CCFA967
@@ -181,4 +177,4 @@ public class WmsOutboundController {
         outboundService.approve(WmsOutboundAuditStatus.Event.FINISH, approvalReqVO);
         return success(true);
     }
-}
+}

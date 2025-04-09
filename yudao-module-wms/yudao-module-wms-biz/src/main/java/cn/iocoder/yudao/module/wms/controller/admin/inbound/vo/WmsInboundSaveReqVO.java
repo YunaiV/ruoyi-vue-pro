@@ -17,7 +17,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : no,inbound_status,company_id,inbound_time,arrival_actual_time,audit_status,creator_comment,source_bill_id,trace_no,type,init_age,shipping_method,source_bill_no,source_bill_type,id,dept_id,arrival_plan_time,warehouse_id
+ * @table-fields : no,inbound_status,company_id,inbound_time,arrival_actual_time,audit_status,creator_comment,type,source_bill_id,trace_no,init_age,source_bill_no,shipping_method,source_bill_type,id,dept_id,warehouse_id,arrival_plan_time
  */
 @Schema(description = "管理后台 - 入库单新增/修改 Request VO")
 @Data

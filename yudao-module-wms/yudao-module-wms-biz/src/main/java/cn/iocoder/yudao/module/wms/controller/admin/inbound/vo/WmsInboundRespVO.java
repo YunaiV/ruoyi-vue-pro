@@ -9,14 +9,12 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
-
 import java.time.LocalDateTime;
 import java.util.List;
-
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,no,creator,inbound_status,company_id,create_time,inbound_time,arrival_actual_time,audit_status,creator_comment,source_bill_id,trace_no,type,updater,update_time,init_age,shipping_method,source_bill_no,source_bill_type,id,dept_id,arrival_plan_time,warehouse_id
+ * @table-fields : tenant_id,no,creator,inbound_status,company_id,inbound_time,create_time,arrival_actual_time,audit_status,creator_comment,type,source_bill_id,trace_no,updater,update_time,init_age,source_bill_no,shipping_method,source_bill_type,id,dept_id,warehouse_id,arrival_plan_time
  */
 @Schema(description = "管理后台 - 入库单 Response VO")
 @Data
@@ -140,5 +138,4 @@ public class WmsInboundRespVO {
 
     @Schema(description = "审批历史", example = "")
     List<WmsApprovalHistoryRespVO> approvalHistoryList;
-
 }
