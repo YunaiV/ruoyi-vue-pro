@@ -6,7 +6,6 @@ import org.springframework.core.io.Resource;
 
 /**
  * 模板预加载接口
- *
  * 用于定义模板预加载和缓存管理的相关方法，统一模板数据的获取和缓存刷新操作。 实现类应该负责将模板数据缓存在 Redis 或其他分布式缓存中，以提高性能和可靠性。
  */
 public interface TemplateService {
@@ -27,6 +26,15 @@ public interface TemplateService {
      * @return 编译后的模板
      */
     XWPFTemplate buildXWPDFTemplate(String path, Configure configure);
+
+    /**
+     * 重新编译模板
+     *
+     * @param path      模板路径，相对于类路径。purchase/ order/ 外币采购合同_英文. docx。
+     * @param configure 模板配置
+     * @return 编译后的模板
+     */
+    XWPFTemplate reBuildXWPDFTemplate(String path, Configure configure);
 
     //refreshTemplateBytes
     byte[] refreshTemplateBytes(String path);

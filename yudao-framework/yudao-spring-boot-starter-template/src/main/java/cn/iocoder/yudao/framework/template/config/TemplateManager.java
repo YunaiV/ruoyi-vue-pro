@@ -90,7 +90,7 @@ public class TemplateManager {
     }
 
     private void preloadSingleWordTemplate(String classpathPath, com.deepoove.poi.config.Configure configure) {
-        try (XWPFTemplate ignored = templateService.buildXWPDFTemplate(classpathPath, configure)) {
+        try (XWPFTemplate ignored = templateService.reBuildXWPDFTemplate(classpathPath, configure)) {
             log.info("Word 模板预热成功 [{}]", classpathPath);
         } catch (Exception e) {
             log.warn("Word 模板预热失败 [{}]: {}", classpathPath, e.getMessage());

@@ -30,6 +30,20 @@ public class TemplateServiceImpl implements TemplateService {
 
     private TemplateService self;
 
+    @Override
+    public XWPFTemplate buildXWPDFTemplate(String path, Configure configure) {
+        byte[] templateBytes = self.getTemplateBytesByPath(path);
+        if (templateBytes == null || templateBytes.length == 0) {
+            throw exception(GENERATE_CONTRACT_FAIL, path, "模板内容为空");
+        }
+
+        try (InputStream input = new ByteArrayInputStream(templateBytes)) {
+            return XWPFTemplate.compile(input, configure);
+        } catch (IOException e) {
+            throw exception(GENERATE_CONTRACT_FAIL_PARSE, path, e.getMessage());
+        }
+    }
+
     public static byte[] getTemplateBytesFromResource(Resource resource) {
         if (resource == null) {
             throw exception(GENERATE_CONTRACT_FAIL, "null", "资源对象不能为空");
@@ -51,8 +65,8 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public XWPFTemplate buildXWPDFTemplate(String path, Configure configure) {
-        byte[] templateBytes = self.getTemplateBytesByPath(path);
+    public XWPFTemplate reBuildXWPDFTemplate(String path, Configure configure) {
+        byte[] templateBytes = self.refreshTemplateBytes(path);
         if (templateBytes == null || templateBytes.length == 0) {
             throw exception(GENERATE_CONTRACT_FAIL, path, "模板内容为空");
         }
@@ -65,13 +79,6 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    @CachePut(cacheNames = REDIS_KEY_PREFIX, key = "#path", unless = "#result == null")
-    public byte[] refreshTemplateBytes(String path) {
-        Resource resource = resourcePatternResolver.getResource("classpath:" + path);
-        return getTemplateBytesFromResource(resource);
-    }
-
-    @Override
     @Cacheable(cacheNames = REDIS_KEY_PREFIX, key = "#path", unless = "#result == null")
     public byte[] getTemplateBytesByPath(String path) {
         Resource resource = resourcePatternResolver.getResource("classpath:" + path);
@@ -80,6 +87,14 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     public byte[] getTemplateBytes(Resource resource) {
+        return getTemplateBytesFromResource(resource);
+    }
+
+    @Override
+    @CachePut(cacheNames = REDIS_KEY_PREFIX, key = "#path", unless = "#result == null")
+    public byte[] refreshTemplateBytes(String path) {
+        log.debug("重新模板预热: {}", path);
+        Resource resource = resourcePatternResolver.getResource("classpath:" + path);
         return getTemplateBytesFromResource(resource);
     }
 }
