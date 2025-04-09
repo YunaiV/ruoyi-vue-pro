@@ -50,7 +50,7 @@ public class InboundStateMachineConfigure {
                 // handler
                 InboundSubmitTransitionHandler.class
             )
-            // 废弃
+            // 作废
             .bindExternals(
                 // from
                 new Integer[]{
@@ -59,7 +59,7 @@ public class InboundStateMachineConfigure {
                     WmsInboundAuditStatus.AUDITING.getValue()
                 },
                 // event
-                WmsInboundAuditStatus.Event.REJECT,
+                WmsInboundAuditStatus.Event.ABANDON,
                 // to
                 WmsInboundAuditStatus.ABANDONED.getValue(),
                 // handler

@@ -21,17 +21,25 @@ public class StateMachineWrapper<S, E, D> implements StateMachine<S, E, Transiti
     /**
      * 状态机
      **/
-    private StateMachine<S, E, TransitionContext<D>> stateMachine;
+    private StateMachine<S, E, TransitionContext<D>> $stateMachine;
 
     private List<TransitionHandler<S, E, D>> transitions = new ArrayList<>();
 
 
+    private String name;
     /**
      * 状态属性值提取器
      **/
     private Function<D,S> getter;
 
     private StateMachineBuilder<S, E, TransitionContext<D>> builder;
+
+    private StateMachine<S, E, TransitionContext<D>> stateMachine() {
+        if($stateMachine==null) {
+            $stateMachine = builder.build(name);
+        }
+        return $stateMachine;
+    }
 
     /**
      * 构造函数
@@ -41,8 +49,8 @@ public class StateMachineWrapper<S, E, D> implements StateMachine<S, E, Transiti
         this.getter = getter;
         // 创建状态机构建器
         this.builder = StateMachineBuilderFactory.create();
-        // 创建状态机
-        this.stateMachine = builder.build(name);
+        //
+        this.name = name;
 
     }
 
@@ -141,7 +149,7 @@ public class StateMachineWrapper<S, E, D> implements StateMachine<S, E, Transiti
      **/
     @Override
     public boolean verify(S from, E event) {
-        return stateMachine.verify(from, event);
+        return stateMachine().verify(from, event);
     }
 
     /**
@@ -149,7 +157,7 @@ public class StateMachineWrapper<S, E, D> implements StateMachine<S, E, Transiti
      **/
     @Override
     public S fireEvent(S from, E event, TransitionContext<D> ctx) {
-        return stateMachine.fireEvent(from,event,ctx);
+        return stateMachine().fireEvent(from,event,ctx);
     }
 
     /**
@@ -157,7 +165,7 @@ public class StateMachineWrapper<S, E, D> implements StateMachine<S, E, Transiti
      **/
     @Override
     public List<S> fireParallelEvent(S from, E event, TransitionContext<D> ctx) {
-        return stateMachine.fireParallelEvent(from,event,ctx);
+        return stateMachine().fireParallelEvent(from,event,ctx);
     }
 
 
@@ -165,28 +173,28 @@ public class StateMachineWrapper<S, E, D> implements StateMachine<S, E, Transiti
      * 触发事件，起始状态从 利用 getter 方法从上下文的数据对象获取
      **/
     public S fireEvent(E event, TransitionContext<D> ctx) {
-        return stateMachine.fireEvent(getter.apply(ctx.data()),event,ctx);
+        return stateMachine().fireEvent(getter.apply(ctx.data()),event,ctx);
     }
 
 
     @Override
     public String getMachineId() {
-        return stateMachine.getMachineId();
+        return stateMachine().getMachineId();
     }
 
     @Override
     public void showStateMachine() {
-        stateMachine.showStateMachine();
+        stateMachine().showStateMachine();
     }
 
     @Override
     public String generatePlantUML() {
-        return stateMachine.generatePlantUML();
+        return stateMachine().generatePlantUML();
     }
 
     @Override
     public String accept(Visitor visitor) {
-        return stateMachine.accept(visitor);
+        return stateMachine().accept(visitor);
     }
 
     /**
