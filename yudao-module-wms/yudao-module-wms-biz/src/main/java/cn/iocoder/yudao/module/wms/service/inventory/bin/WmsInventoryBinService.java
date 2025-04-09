@@ -2,9 +2,11 @@ package cn.iocoder.yudao.module.wms.service.inventory.bin;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo.WmsInventoryBinPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo.WmsInventoryBinRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo.WmsInventoryBinSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.bin.WmsInventoryBinDO;
 import jakarta.validation.Valid;
+
 import java.util.List;
 
 /**
@@ -58,4 +60,8 @@ public interface WmsInventoryBinService {
     List<WmsInventoryBinDO> selectByIds(List<Long> idList);
 
     List<WmsInventoryBinDO> selectByInventoryId(Long id);
+
+    void assembleProduct(List<WmsInventoryBinRespVO> binItemList);
+
+    void assembleBin(List<WmsInventoryBinRespVO> binItemList);
 }

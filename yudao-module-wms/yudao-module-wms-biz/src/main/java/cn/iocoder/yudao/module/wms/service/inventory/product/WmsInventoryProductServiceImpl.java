@@ -2,17 +2,26 @@ package cn.iocoder.yudao.module.wms.service.inventory.product;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.product.vo.WmsInventoryProductPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inventory.product.vo.WmsInventoryProductRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.product.vo.WmsInventoryProductSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.product.WmsInventoryProductDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.inventory.product.WmsInventoryProductMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_PRODUCT_EXISTS;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_PRODUCT_NOT_EXISTS;
@@ -29,6 +38,8 @@ public class WmsInventoryProductServiceImpl implements WmsInventoryProductServic
     @Resource
     private WmsInventoryProductMapper inventoryProductMapper;
 
+    @Resource
+    private ErpProductApi productApi;
     /**
      * @sign : 71250103111E09A9
      */
@@ -110,6 +121,17 @@ public class WmsInventoryProductServiceImpl implements WmsInventoryProductServic
 
     @Override
     public List<WmsInventoryProductDO> selectByInventoryId(Long id) {
-        return List.of();
+        return inventoryProductMapper.selectByInventoryId(id);
     }
-}
+
+    @Override
+    public void assembleProduct(List<WmsInventoryProductRespVO> inventoryProductList) {
+        Map<Long, ErpProductDTO> productDTOMap = productApi.getProductMap(StreamX.from(inventoryProductList).map(WmsInventoryProductRespVO::getProductId).toList());
+        Map<Long, WmsProductRespSimpleVO> productVOMap = new HashMap<>();
+        for (ErpProductDTO productDTO : productDTOMap.values()) {
+            WmsProductRespSimpleVO productVO = BeanUtils.toBean(productDTO, WmsProductRespSimpleVO.class);
+            productVOMap.put(productDTO.getId(), productVO);
+        }
+        StreamX.from(inventoryProductList).assemble(productVOMap, WmsInventoryProductRespVO::getProductId, WmsInventoryProductRespVO::setProduct);
+    }
+}

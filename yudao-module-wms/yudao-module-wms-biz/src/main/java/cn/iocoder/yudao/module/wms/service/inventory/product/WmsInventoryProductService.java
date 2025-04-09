@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.wms.service.inventory.product;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.product.vo.WmsInventoryProductPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inventory.product.vo.WmsInventoryProductRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.product.vo.WmsInventoryProductSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.product.WmsInventoryProductDO;
 import jakarta.validation.Valid;
@@ -58,4 +59,6 @@ public interface WmsInventoryProductService {
     List<WmsInventoryProductDO> selectByIds(List<Long> idList);
 
     List<WmsInventoryProductDO> selectByInventoryId(Long id);
+
+    void assembleProduct(List<WmsInventoryProductRespVO> inventoryProductList);
 }

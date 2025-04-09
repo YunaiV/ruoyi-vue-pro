@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.wms.service.inventory;
 
-import java.util.*;
-import jakarta.validation.*;
-import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.WmsInventoryDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventoryPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventoryRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventorySaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.WmsInventoryDO;
+import jakarta.validation.Valid;
+
 import java.util.List;
 
 /**
@@ -57,4 +58,6 @@ public interface WmsInventoryService {
      * 按 ID 集合查询 WmsInventoryDO
      */
     List<WmsInventoryDO> selectByIds(List<Long> idList);
+
+    void assembleWarehouse(List<WmsInventoryRespVO> list);
 }

@@ -2,17 +2,31 @@ package cn.iocoder.yudao.module.wms.service.inventory.bin;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo.WmsInventoryBinPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo.WmsInventoryBinRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo.WmsInventoryBinSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.bin.WmsInventoryBinDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.inventory.bin.WmsInventoryBinMapper;
+import cn.iocoder.yudao.module.wms.service.warehouse.bin.WmsWarehouseBinService;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_BIN_EXISTS;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_BIN_NOT_EXISTS;
@@ -28,6 +42,13 @@ public class WmsInventoryBinServiceImpl implements WmsInventoryBinService {
 
     @Resource
     private WmsInventoryBinMapper inventoryBinMapper;
+
+    @Resource
+    private ErpProductApi productApi;
+
+    @Autowired
+    @Lazy
+    private WmsWarehouseBinService warehouseBinService;
 
     /**
      * @sign : DE344227D83E204E
@@ -111,6 +132,24 @@ public class WmsInventoryBinServiceImpl implements WmsInventoryBinService {
 
     @Override
     public List<WmsInventoryBinDO> selectByInventoryId(Long id) {
-        return List.of();
+        return inventoryBinMapper.selectByInventoryId(id);
     }
-}
+
+    @Override
+    public void assembleProduct(List<WmsInventoryBinRespVO> binItemList) {
+        Map<Long, ErpProductDTO> productDTOMap = productApi.getProductMap(StreamX.from(binItemList).map(WmsInventoryBinRespVO::getProductId).toList());
+        Map<Long, WmsProductRespSimpleVO> productVOMap = new HashMap<>();
+        for (ErpProductDTO productDTO : productDTOMap.values()) {
+            WmsProductRespSimpleVO productVO = BeanUtils.toBean(productDTO, WmsProductRespSimpleVO.class);
+            productVOMap.put(productDTO.getId(), productVO);
+        }
+        StreamX.from(binItemList).assemble(productVOMap, WmsInventoryBinRespVO::getProductId, WmsInventoryBinRespVO::setProduct);
+    }
+
+    @Override
+    public void assembleBin(List<WmsInventoryBinRespVO> binItemList) {
+        List<WmsWarehouseBinDO> binDOList = warehouseBinService.selectByIds(StreamX.from(binItemList).toList(WmsInventoryBinRespVO::getBinId).stream().distinct().toList());
+        List<WmsWarehouseBinRespVO> binVOList = BeanUtils.toBean(binDOList, WmsWarehouseBinRespVO.class);
+        StreamX.from(binItemList).assemble(binVOList, WmsWarehouseBinRespVO::getId, WmsInventoryBinRespVO::getBinId,WmsInventoryBinRespVO::setBin);
+    }
+}

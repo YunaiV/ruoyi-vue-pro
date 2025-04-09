@@ -1,11 +1,15 @@
 package cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo;
 
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinRespVO;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
-import com.alibaba.excel.annotation.*;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
@@ -64,4 +68,10 @@ public class WmsInventoryBinRespVO {
     @Schema(description = "租户编号", example = "")
     @ExcelProperty("租户编号")
     private Long tenantId;
+
+    @Schema(description = "产品", example = "")
+    private WmsProductRespSimpleVO product;
+
+    @Schema(description = "仓位", example = "")
+    private WmsWarehouseBinRespVO bin;
 }

@@ -34,17 +34,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_NOT_EXISTS;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 @Tag(name = "盘点单")
 @RestController
@@ -67,7 +65,7 @@ public class WmsInventoryController {
      * @sign : EEF1FA4365B38CB4
      */
     @PostMapping("/create")
-    @Operation(summary = "创建盘点")
+    @Operation(summary = "创建盘点单")
     @PreAuthorize("@ss.hasPermission('wms:inventory:create')")
     public CommonResult<Long> createInventory(@Valid @RequestBody WmsInventorySaveReqVO createReqVO) {
         return success(inventoryService.createInventory(createReqVO).getId());
@@ -77,7 +75,7 @@ public class WmsInventoryController {
      * @sign : 30CB28F31026826D
      */
     @PutMapping("/update")
-    @Operation(summary = "更新盘点")
+    @Operation(summary = "更新盘点单")
     @PreAuthorize("@ss.hasPermission('wms:inventory:update')")
     public CommonResult<Boolean> updateInventory(@Valid @RequestBody WmsInventorySaveReqVO updateReqVO) {
         inventoryService.updateInventory(updateReqVO);
@@ -85,7 +83,7 @@ public class WmsInventoryController {
     }
 
     @DeleteMapping("/delete")
-    @Operation(summary = "删除盘点")
+    @Operation(summary = "删除盘点单")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('wms:inventory:delete')")
     public CommonResult<Boolean> deleteInventory(@RequestParam("id") Long id) {
@@ -97,7 +95,7 @@ public class WmsInventoryController {
      * @sign : FD03427E08081E43
      */
     @GetMapping("/get")
-    @Operation(summary = "获得盘点")
+    @Operation(summary = "获得盘点单")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('wms:inventory:query')")
     public CommonResult<WmsInventoryRespVO> getInventory(@RequestParam("id") Long id) {
@@ -114,6 +112,13 @@ public class WmsInventoryController {
         // 组装库位盘点
         List<WmsInventoryBinDO> inventoryBinList = inventoryBinService.selectByInventoryId(inventoryVO.getId());
         inventoryVO.setBinItemList(BeanUtils.toBean(inventoryBinList, WmsInventoryBinRespVO.class));
+
+        // 装配
+        inventoryService.assembleWarehouse(Arrays.asList(inventoryVO));
+        inventoryProductService.assembleProduct(inventoryVO.getProductItemList());
+        inventoryBinService.assembleProduct(inventoryVO.getBinItemList());
+        inventoryBinService.assembleBin(inventoryVO.getBinItemList());
+
         // 返回
         return success(inventoryVO);
     }
@@ -129,6 +134,8 @@ public class WmsInventoryController {
         PageResult<WmsInventoryDO> doPageResult = inventoryService.getInventoryPage(pageReqVO);
         // 转换
         PageResult<WmsInventoryRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsInventoryRespVO.class);
+        // 装配
+        inventoryService.assembleWarehouse(voPageResult.getList());
         // 返回
         return success(voPageResult);
     }
@@ -143,4 +150,4 @@ public class WmsInventoryController {
         // 导出 Excel
         ExcelUtils.write(response, "盘点.xls", "数据", WmsInventoryRespVO.class, BeanUtils.toBean(list, WmsInventoryRespVO.class));
     }
-}
+}
