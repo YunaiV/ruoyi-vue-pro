@@ -10,10 +10,10 @@ kingdee:
     - 94829067232219136
 
 --- #################### 数据库相关配置 ####################
-erp:
-  template:
-    scan-path: purchase/order/
-    enable-preload: true
+template:
+  enable-preload: true
+  scan-path:
+    - purchase/order/
 spring:
   # 数据源配置项
   datasource:

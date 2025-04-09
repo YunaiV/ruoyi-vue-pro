@@ -7,10 +7,11 @@ kingdee:
 debug: false
 
 --- #################### 数据库相关配置 ####################
-erp:
-  template:
-    scan-path: purchase/order/
-    enable-preload: false
+template:
+  enable-preload: true
+  scan-path:
+    - purchase/order/
+
 spring:
   autoconfigure:
     exclude:

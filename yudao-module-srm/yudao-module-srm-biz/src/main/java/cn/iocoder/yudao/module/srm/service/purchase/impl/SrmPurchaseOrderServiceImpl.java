@@ -8,6 +8,8 @@ import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.template.config.TemplateConfigureFactory;
+import cn.iocoder.yudao.framework.template.core.TemplateService;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductUnitApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
@@ -17,7 +19,6 @@ import cn.iocoder.yudao.module.fms.api.finance.dto.FmsFinanceSubjectDTO;
 import cn.iocoder.yudao.module.srm.api.purchase.SrmInCountDTO;
 import cn.iocoder.yudao.module.srm.api.purchase.SrmOrderCountDTO;
 import cn.iocoder.yudao.module.srm.api.purchase.SrmPayCountDTO;
-import cn.iocoder.yudao.module.srm.config.purchase.PurchaseOrderTemplateManager;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.req.SrmPurchaseInSaveReqVO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.req.*;
 import cn.iocoder.yudao.module.srm.convert.purchase.SrmOrderConvert;
@@ -94,9 +95,9 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
     private final ErpProductUnitApi erpProductUnitApi;
     private final FmsFinanceSubjectApi erpFinanceSubjectApi;
     private final ResourcePatternResolver resourcePatternResolver;
-    private final PurchaseOrderTemplateManager purchaseOrderTemplateManager;
+    private final TemplateService templateService;
+    private final TemplateConfigureFactory configureFactory;
     private final String SOURCE = "WEB录入";
-
     @Resource(name = PURCHASE_ORDER_OFF_STATE_MACHINE_NAME)
     StateMachine<SrmOffStatus, SrmEventEnum, SrmPurchaseOrderDO> offMachine;
     @Resource(name = PURCHASE_ORDER_AUDIT_STATE_MACHINE_NAME)
@@ -717,29 +718,31 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
         // 校验订单状态是否已审核 未审核 -> e
 //        ThrowUtil.ifThrow(!Objects.equals(orderDO.getAuditStatus(), SrmAuditStatus.APPROVED.getCode()), PURCHASE_ORDER_NOT_AUDIT, orderDO.getId());
         //1 从OSS拿到模板word
-        XWPFTemplate xwpfTemplate = purchaseOrderTemplateManager.buildTemplate(StrUtil.format("purchase/order/{}", reqVO.getTemplateName()));
-        //2 模板word渲染数据
-        List<SrmPurchaseOrderItemDO> itemDOS = purchaseOrderItemMapper.selectListByOrderId(orderDO.getId());
-        Map<Long, FmsFinanceSubjectDTO> dtoMap =
-            convertMap(erpFinanceSubjectApi.validateFinanceSubject(List.of(reqVO.getPartyAId(), reqVO.getPartyBId())), FmsFinanceSubjectDTO::getId);
-        SrmPurchaseOrderWordBO wordBO = SrmOrderConvert.INSTANCE.bindDataFormOrderItemDO(itemDOS, orderDO, reqVO, dtoMap);
-        xwpfTemplate.render(wordBO);
-        //3 转换pdf，返回响应
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(); // 用于捕获输出流
-        try (OutputStream out = response.getOutputStream()) {
-            xwpfTemplate.write(byteArrayOutputStream);
-            // 设置响应头，准备下载
-            response.setContentType("application/pdf");
-            response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode("采购合同.pdf", StandardCharsets.UTF_8));
-            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        try (XWPFTemplate xwpfTemplate = templateService.buildXWPDFTemplate(StrUtil.format("purchase/order/{}", reqVO.getTemplateName()),
+            configureFactory.build())) {
+            //2 模板word渲染数据
+            List<SrmPurchaseOrderItemDO> itemDOS = purchaseOrderItemMapper.selectListByOrderId(orderDO.getId());
+            Map<Long, FmsFinanceSubjectDTO> dtoMap =
+                convertMap(erpFinanceSubjectApi.validateFinanceSubject(List.of(reqVO.getPartyAId(), reqVO.getPartyBId())), FmsFinanceSubjectDTO::getId);
+            SrmPurchaseOrderWordBO wordBO = SrmOrderConvert.INSTANCE.bindDataFormOrderItemDO(itemDOS, orderDO, reqVO, dtoMap);
+            xwpfTemplate.render(wordBO);
+            //3 转换pdf，返回响应
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(); // 用于捕获输出流
+            try (OutputStream out = response.getOutputStream()) {
+                xwpfTemplate.write(byteArrayOutputStream);
+                // 设置响应头，准备下载
+                response.setContentType("application/pdf");
+                response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode("采购合同.pdf", StandardCharsets.UTF_8));
+                response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-            // 将字节数组转成输入流
-            try (InputStream inputStreamResult = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
-                // 使用 Aspose 转换为 PDF
-                Document document = new Document(inputStreamResult);
-                document.save(out, SaveFormat.PDF);
+                // 将字节数组转成输入流
+                try (InputStream inputStreamResult = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
+                    // 使用 Aspose 转换为 PDF
+                    Document document = new Document(inputStreamResult);
+                    document.save(out, SaveFormat.PDF);
+                }
+                out.flush();
             }
-            out.flush();
         } catch (Exception e) {
             throw exception(PURCHASE_ORDER_GENERATE_CONTRACT_FAIL_ERROR, e.getMessage());
         }
