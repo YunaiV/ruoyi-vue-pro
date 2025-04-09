@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cn.iocoder.boot</groupId>
+        <artifactId>yudao-module-iot-net-components</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>yudao-module-iot-net-component-server</artifactId>
+    <packaging>jar</packaging>
+
+    <name>${project.artifactId}</name>
+    <description>
+        IoT 网络组件的独立运行服务，用于聚合和启动多个网络组件实例。
+    </description>
+
+    <dependencies>
+        <!-- Spring Boot 核心 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- Web 相关 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Net Component 核心 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-iot-net-component-core</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <!-- Net Component HTTP -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-iot-net-component-http</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <!-- Net Component EMQX -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-iot-net-component-emqx</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <!-- 设置构建的 jar 包名 -->
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <!-- 打包 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>                <!-- 需要确认父 POM 中有定义 -->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>                            <!-- 将引入的 jar 打入其中 -->
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project> 

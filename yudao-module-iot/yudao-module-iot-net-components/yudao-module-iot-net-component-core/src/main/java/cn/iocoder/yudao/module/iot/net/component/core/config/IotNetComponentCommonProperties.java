@@ -31,26 +31,28 @@ public class IotNetComponentCommonProperties {
     /**
      * 网络组件消息转发配置
      */
-    private ForwardMessage forwardMessage = new ForwardMessage();
+    // private ForwardMessage forwardMessage = new ForwardMessage();
 
     /**
      * 消息转发配置
      */
-    @Data
-    public static class ForwardMessage {
+    /*
+     * @Data
+     * public static class ForwardMessage {
+     * 
+     * /**
+     * 是否转发所有设备消息到 EMQX
+     * <p>
+     * 默认为 true 开启
+     */
+    // private boolean forwardAllDeviceMessageToEmqx = true;
 
-        /**
-         * 是否转发所有设备消息到 EMQX
-         * <p>
-         * 默认为 true 开启
-         */
-        private boolean forwardAllDeviceMessageToEmqx = true;
-
-        /**
-         * 是否转发所有设备消息到 HTTP
-         * <p>
-         * 默认为 false 关闭
-         */
-        private boolean forwardAllDeviceMessageToHttp = false;
-    }
+    /**
+     * 是否转发所有设备消息到 HTTP
+     * <p>
+     * 默认为 false 关闭
+     */
+    // private boolean forwardAllDeviceMessageToHttp = false;
+    // }
+    
 }

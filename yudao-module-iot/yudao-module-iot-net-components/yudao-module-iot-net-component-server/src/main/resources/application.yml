@@ -1,0 +1,64 @@
+# 服务器配置
+server:
+  port: 18080 # 修改端口，避免与主应用的8080端口冲突
+
+# Spring 配置
+spring:
+  application:
+    name: iot-component-server
+  # 允许循环引用
+  main:
+    allow-circular-references: true
+    allow-bean-definition-overriding: true
+
+# Yudao 配置
+yudao:
+  info:
+    base-package: cn.iocoder.yudao # 主项目包路径，确保正确
+  iot:
+    component:
+      # 这里可以覆盖或添加 component-core 中的通用配置
+      instance-heartbeat-timeout: 30000 # 心跳超时时间
+
+      # 网络组件服务器专用配置
+      server:
+        # 上行通信配置，用于向主程序上报数据
+        upstream-url: http://127.0.0.1:48080 # 主程序 API 地址
+        upstream-connect-timeout: 30s # 连接超时
+        upstream-read-timeout: 30s # 读取超时
+        
+        # 下行通信配置，用于接收主程序的控制指令
+        downstream-port: 18888 # 下行服务器端口
+        
+        # 组件服务唯一标识
+        server-key: yudao-module-iot-net-component-server
+        
+        # 心跳频率，单位：毫秒
+        heartbeat-interval: 30000
+
+      # ====================================
+      # 针对引入的 HTTP 组件的配置
+      # ====================================
+      http:
+        enabled: true  # 启用HTTP组件
+        server-port: 8092 # HTTP组件服务端口
+
+      # ====================================
+      # 针对引入的 EMQX 组件的配置
+      # ====================================
+      emqx:
+        enabled: true        # 启用EMQX组件
+        mqtt-host: 127.0.0.1 # MQTT服务器主机地址
+        mqtt-port: 1883      # MQTT服务器端口
+        mqtt-username: yudao # MQTT服务器用户名
+        mqtt-password: 123456 # MQTT服务器密码
+        mqtt-ssl: false      # 是否启用SSL
+        mqtt-topics: # 订阅的主题列表
+          - "/sys/#"
+        auth-port: 8101      # 认证端口
+
+# 日志配置
+logging:
+  level:
+    cn.iocoder.yudao: INFO
+    root: INFO 
