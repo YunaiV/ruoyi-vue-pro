@@ -148,7 +148,7 @@ public class WmsOutboundController {
 
     @PutMapping("/submit")
     @Operation(summary = "提交审批")
-    @PreAuthorize("@ss.hasPermission('wms:inbound:submit')")
+    @PreAuthorize("@ss.hasPermission('wms:outbound:submit')")
     public CommonResult<Boolean> submit(@RequestBody WmsApprovalReqVO approvalReqVO) {
         outboundService.approve(WmsOutboundAuditStatus.Event.SUBMIT, approvalReqVO);
         return success(true);
@@ -156,7 +156,7 @@ public class WmsOutboundController {
 
     @PutMapping("/agree")
     @Operation(summary = "同意审批")
-    @PreAuthorize("@ss.hasPermission('wms:inbound:agree')")
+    @PreAuthorize("@ss.hasPermission('wms:outbound:agree')")
     public CommonResult<Boolean> agree(@RequestBody WmsApprovalReqVO approvalReqVO) {
         outboundService.approve(WmsOutboundAuditStatus.Event.AGREE, approvalReqVO);
         return success(true);
@@ -164,7 +164,7 @@ public class WmsOutboundController {
 
     @PutMapping("/reject")
     @Operation(summary = "驳回审批")
-    @PreAuthorize("@ss.hasPermission('wms:inbound:reject')")
+    @PreAuthorize("@ss.hasPermission('wms:outbound:reject')")
     public CommonResult<Boolean> reject(@RequestBody WmsApprovalReqVO approvalReqVO) {
         outboundService.approve(WmsOutboundAuditStatus.Event.REJECT, approvalReqVO);
         return success(true);
@@ -172,9 +172,9 @@ public class WmsOutboundController {
 
     @PutMapping("/finish")
     @Operation(summary = "完成出库")
-    @PreAuthorize("@ss.hasPermission('wms:inbound:finish')")
+    @PreAuthorize("@ss.hasPermission('wms:outbound:finish')")
     public CommonResult<Boolean> finish(@RequestBody WmsApprovalReqVO approvalReqVO) {
         outboundService.approve(WmsOutboundAuditStatus.Event.FINISH, approvalReqVO);
         return success(true);
     }
-}
+}
