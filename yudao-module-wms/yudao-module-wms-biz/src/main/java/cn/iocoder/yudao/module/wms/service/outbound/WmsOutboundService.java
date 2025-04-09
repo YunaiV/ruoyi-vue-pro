@@ -75,4 +75,6 @@ public interface WmsOutboundService {
     void assembleDept(List<WmsOutboundRespVO> list);
 
     void assembleCompany(List<WmsOutboundRespVO> list);
+
+    void assembleApprovalHistory(List<WmsOutboundRespVO> list);
 }

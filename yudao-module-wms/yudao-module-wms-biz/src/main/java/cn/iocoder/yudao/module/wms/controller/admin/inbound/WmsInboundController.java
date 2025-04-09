@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundSaveReq
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundSimpleRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
+import cn.iocoder.yudao.module.wms.service.approval.history.WmsApprovalHistoryService;
 import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -36,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
@@ -54,6 +57,8 @@ public class WmsInboundController {
     @Resource
     @Lazy
     private WmsInboundService inboundService;
+    @Autowired
+    private WmsApprovalHistoryService wmsApprovalHistoryService;
 
     /**
      * @sign : 9362CEB68950BDF7
@@ -134,6 +139,7 @@ public class WmsInboundController {
     @PreAuthorize("@ss.hasPermission('wms:inbound:query')")
     public CommonResult<WmsInboundRespVO> getInbound(@RequestParam("id") Long id) {
         WmsInboundRespVO inboundVO = inboundService.getInboundWithItemList(id);
+        inboundService.assembleApprovalHistory(Arrays.asList(inboundVO));
         // 返回
         return success(inboundVO);
     }
@@ -154,7 +160,7 @@ public class WmsInboundController {
         inboundService.assembleWarehouse(voPageResult.getList());
         inboundService.assembleDept(voPageResult.getList());
         inboundService.assembleCompany(voPageResult.getList());
-
+        inboundService.assembleApprovalHistory(voPageResult.getList());
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
 			.mapping(WmsInboundRespVO::getCreator, WmsInboundRespVO::setCreatorName)

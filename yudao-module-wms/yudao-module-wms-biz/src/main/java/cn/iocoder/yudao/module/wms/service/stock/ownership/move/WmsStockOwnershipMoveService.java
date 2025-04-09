@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.wms.service.stock.ownership.move;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move.vo.WmsStockOwnershipMovePageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move.vo.WmsStockOwnershipMoveRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move.vo.WmsStockOwnershipMoveSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.move.WmsStockOwnershipMoveDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.move.item.WmsStockOwnershipMoveItemDO;
@@ -59,4 +60,6 @@ public interface WmsStockOwnershipMoveService {
     List<WmsStockOwnershipMoveDO> selectByIds(List<Long> idList);
 
     void finishMove(WmsStockOwnershipMoveDO ownershipMoveDO, List<WmsStockOwnershipMoveItemDO> ownershipMoveItemDOList);
+
+    void assembleWarehouse(List<WmsStockOwnershipMoveRespVO> list);
 }

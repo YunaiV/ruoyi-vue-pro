@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.config.InboundStateMachineConfigure;
+import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalHistoryRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
@@ -31,6 +32,7 @@ import cn.iocoder.yudao.module.wms.enums.WmsConstants;
 import cn.iocoder.yudao.module.wms.enums.common.WmsBillType;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
+import cn.iocoder.yudao.module.wms.service.approval.history.WmsApprovalHistoryService;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import jakarta.annotation.Resource;
@@ -89,6 +91,9 @@ public class WmsInboundServiceImpl implements WmsInboundService {
 
     @Resource
     private DeptApi deptApi;
+
+    @Resource
+    private WmsApprovalHistoryService approvalHistoryService;
 
     @Resource(name = InboundStateMachineConfigure.STATE_MACHINE_NAME)
     private StateMachineWrapper<Integer, WmsInboundAuditStatus.Event, WmsInboundDO> inboundStateMachine;
@@ -387,6 +392,12 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     @Override
     public void assembleCompany(List<WmsInboundRespVO> list) {
         //todo 待东宇财务模块支持
+    }
+
+    @Override
+    public void assembleApprovalHistory(List<WmsInboundRespVO> list) {
+       Map<Long,List<WmsApprovalHistoryRespVO>> groupedApprovalHistory = approvalHistoryService.selectGroupedApprovalHistory(WmsBillType.INBOUND,StreamX.from(list).toList(WmsInboundRespVO::getId));
+       StreamX.from(list).assemble(groupedApprovalHistory,WmsInboundRespVO::getId,WmsInboundRespVO::setApprovalHistoryList);
     }
 
 

@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -97,6 +98,9 @@ public class WmsPickupController {
         // 组装拣货单详情
         List<WmsPickupItemDO> pickupItemList = pickupItemService.selectByPickupId(pickupVO.getId());
         pickupVO.setItemList(BeanUtils.toBean(pickupItemList, WmsPickupItemRespVO.class));
+        //
+        pickupService.assembleWarehouse(Arrays.asList(pickupVO));
+        pickupItemService.assembleProduct(pickupVO.getItemList());
         // 返回
         return success(pickupVO);
     }

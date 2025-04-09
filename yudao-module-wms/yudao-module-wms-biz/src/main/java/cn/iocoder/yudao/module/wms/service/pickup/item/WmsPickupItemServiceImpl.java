@@ -1,18 +1,27 @@
 package cn.iocoder.yudao.module.wms.service.pickup.item;
 
-import org.springframework.stereotype.Service;
-import jakarta.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.*;
-import cn.iocoder.yudao.module.wms.controller.admin.pickup.item.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.wms.controller.admin.pickup.item.vo.WmsPickupItemPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.pickup.item.vo.WmsPickupItemRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.pickup.item.vo.WmsPickupItemSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.pickup.item.WmsPickupItemMapper;
+import jakarta.annotation.Resource;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_ITEM_NOT_EXISTS;
 
 /**
  * 拣货单详情 Service 实现类
@@ -26,6 +35,8 @@ public class WmsPickupItemServiceImpl implements WmsPickupItemService {
     @Resource
     private WmsPickupItemMapper pickupItemMapper;
 
+    @Resource
+    private ErpProductApi productApi;
     /**
      * @sign : B28631E68735E52E
      */
@@ -89,4 +100,15 @@ public class WmsPickupItemServiceImpl implements WmsPickupItemService {
     public List<WmsPickupItemDO> selectByPickupId(Long id) {
         return pickupItemMapper.selectByPickupId(id);
     }
-}
+
+    @Override
+    public void assembleProduct(List<WmsPickupItemRespVO> itemList) {
+        Map<Long, ErpProductDTO> productDTOMap = productApi.getProductMap(StreamX.from(itemList).map(WmsPickupItemRespVO::getProductId).toList());
+        Map<Long, WmsProductRespSimpleVO> productVOMap = new HashMap<>();
+        for (ErpProductDTO productDTO : productDTOMap.values()) {
+            WmsProductRespSimpleVO productVO = BeanUtils.toBean(productDTO, WmsProductRespSimpleVO.class);
+            productVOMap.put(productDTO.getId(), productVO);
+        }
+        StreamX.from(itemList).assemble(productVOMap, WmsPickupItemRespVO::getProductId, WmsPickupItemRespVO::setProduct);
+    }
+}

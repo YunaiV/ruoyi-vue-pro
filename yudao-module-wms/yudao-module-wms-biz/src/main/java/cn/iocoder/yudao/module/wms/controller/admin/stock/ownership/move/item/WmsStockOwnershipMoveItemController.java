@@ -88,6 +88,9 @@ public class WmsStockOwnershipMoveItemController {
         PageResult<WmsStockOwnershipMoveItemDO> doPageResult = stockOwnershipMoveItemService.getStockOwnershipMoveItemPage(pageReqVO);
         // 转换
         PageResult<WmsStockOwnershipMoveItemRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsStockOwnershipMoveItemRespVO.class);
+        // 装配
+        stockOwnershipMoveItemService.assembleProduct(voPageResult.getList());
+        stockOwnershipMoveItemService.assembleCompanyAndDept(voPageResult.getList());
         // 返回
         return success(voPageResult);
     }

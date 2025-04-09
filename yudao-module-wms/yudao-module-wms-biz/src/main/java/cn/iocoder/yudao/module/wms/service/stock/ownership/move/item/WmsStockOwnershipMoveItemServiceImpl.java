@@ -2,8 +2,16 @@ package cn.iocoder.yudao.module.wms.service.stock.ownership.move.item;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move.item.vo.WmsStockOwnershipMoveItemPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move.item.vo.WmsStockOwnershipMoveItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move.item.vo.WmsStockOwnershipMoveItemSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.move.item.WmsStockOwnershipMoveItemDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.ownership.move.item.WmsStockOwnershipMoveItemMapper;
@@ -12,8 +20,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSHIP_MOVE_ITEM_EXISTS;
@@ -31,6 +43,11 @@ public class WmsStockOwnershipMoveItemServiceImpl implements WmsStockOwnershipMo
     @Resource
     private WmsStockOwnershipMoveItemMapper stockOwnershipMoveItemMapper;
 
+    @Resource
+    private ErpProductApi productApi;
+
+    @Resource
+    private DeptApi deptApi;
     /**
      * @sign : E8E4A45DABECEF25
      */
@@ -117,5 +134,38 @@ public class WmsStockOwnershipMoveItemServiceImpl implements WmsStockOwnershipMo
     @Override
     public List<WmsStockOwnershipMoveItemDO> selectByOwnershipMoveId(Long ownershipMoveId) {
         return stockOwnershipMoveItemMapper.selectByOwnershipMoveId(ownershipMoveId);
+    }
+
+
+    @Override
+    public void assembleProduct(List<WmsStockOwnershipMoveItemRespVO> itemList) {
+        Map<Long, ErpProductDTO> productDTOMap = productApi.getProductMap(StreamX.from(itemList).map(WmsStockOwnershipMoveItemRespVO::getProductId).toList());
+        Map<Long, WmsProductRespSimpleVO> productVOMap = new HashMap<>();
+        for (ErpProductDTO productDTO : productDTOMap.values()) {
+            WmsProductRespSimpleVO productVO = BeanUtils.toBean(productDTO, WmsProductRespSimpleVO.class);
+            productVOMap.put(productDTO.getId(), productVO);
+        }
+        StreamX.from(itemList).assemble(productVOMap, WmsStockOwnershipMoveItemRespVO::getProductId, WmsStockOwnershipMoveItemRespVO::setProduct);
+    }
+
+    @Override
+    public void assembleCompanyAndDept(List<WmsStockOwnershipMoveItemRespVO> itemList) {
+
+        Set<Long> deptId=new HashSet<>();
+        deptId.addAll(StreamX.from(itemList).map(WmsStockOwnershipMoveItemRespVO::getFromDeptId).toList());
+        deptId.addAll(StreamX.from(itemList).map(WmsStockOwnershipMoveItemRespVO::getToDeptId).toList());
+
+        Map<Long, DeptRespDTO> deptDTOMap = deptApi.getDeptMap(deptId);
+        Map<Long, DeptSimpleRespVO> deptVOMap = new HashMap<>();
+        for (DeptRespDTO productDTO : deptDTOMap.values()) {
+            DeptSimpleRespVO deptVO = BeanUtils.toBean(productDTO, DeptSimpleRespVO.class);
+            deptVOMap.put(productDTO.getId(), deptVO);
+        }
+        StreamX.from(itemList).assemble(deptVOMap, WmsStockOwnershipMoveItemRespVO::getFromDeptId, WmsStockOwnershipMoveItemRespVO::setFromDept);
+        StreamX.from(itemList).assemble(deptVOMap, WmsStockOwnershipMoveItemRespVO::getToDeptId, WmsStockOwnershipMoveItemRespVO::setToDept);
+
+        //todo 待东宇财务模块支持
+
+
     }
 }

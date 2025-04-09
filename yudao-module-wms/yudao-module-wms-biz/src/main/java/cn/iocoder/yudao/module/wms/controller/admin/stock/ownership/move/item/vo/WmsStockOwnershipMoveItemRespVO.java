@@ -1,11 +1,15 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move.item.vo;
 
+import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
-import com.alibaba.excel.annotation.*;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
@@ -28,6 +32,9 @@ public class WmsStockOwnershipMoveItemRespVO {
     @ExcelProperty("产品ID")
     private Long productId;
 
+    @Schema(description = "产品", example = "")
+    private WmsProductRespSimpleVO product;
+
     @Schema(description = "调出财务公司ID", example = "28314")
     @ExcelProperty("调出财务公司ID")
     private Long fromCompanyId;
@@ -43,6 +50,14 @@ public class WmsStockOwnershipMoveItemRespVO {
     @Schema(description = "调入部门ID", example = "12421")
     @ExcelProperty("调入部门ID")
     private Long toDeptId;
+
+    @Schema(description = "调出部门", example = "")
+    @ExcelProperty("调出部门")
+    private DeptSimpleRespVO fromDept;
+
+    @Schema(description = "调入部门", example = "")
+    @ExcelProperty("调入部门")
+    private DeptSimpleRespVO toDept;
 
     @Schema(description = "移动数量", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("移动数量")

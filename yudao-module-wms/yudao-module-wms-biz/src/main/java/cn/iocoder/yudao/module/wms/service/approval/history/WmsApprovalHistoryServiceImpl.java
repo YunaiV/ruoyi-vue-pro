@@ -1,18 +1,24 @@
 package cn.iocoder.yudao.module.wms.service.approval.history;
 
-import org.springframework.stereotype.Service;
-import jakarta.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.*;
-import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.approval.history.WmsApprovalHistoryDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalHistoryPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalHistoryRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalHistorySaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.approval.history.WmsApprovalHistoryDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.approval.history.WmsApprovalHistoryMapper;
+import cn.iocoder.yudao.module.wms.enums.common.WmsBillType;
+import jakarta.annotation.Resource;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.APPROVAL_HISTORY_NOT_EXISTS;
 
 /**
  * 审批历史 Service 实现类
@@ -83,4 +89,14 @@ public class WmsApprovalHistoryServiceImpl implements WmsApprovalHistoryService 
     public PageResult<WmsApprovalHistoryDO> getApprovalHistoryPage(WmsApprovalHistoryPageReqVO pageReqVO) {
         return approvalHistoryMapper.selectPage(pageReqVO);
     }
-}
+
+    @Override
+    public Map<Long, List<WmsApprovalHistoryRespVO>> selectGroupedApprovalHistory(WmsBillType billType, List<Long> billIds) {
+        if(CollectionUtils.isEmpty(billIds)) {
+            return Map.of();
+        }
+        List<WmsApprovalHistoryDO> doList = approvalHistoryMapper.selectGroupedApprovalHistory(billType, billIds);
+        List<WmsApprovalHistoryRespVO> voList = BeanUtils.toBean(doList, WmsApprovalHistoryRespVO.class);
+        return StreamX.from(voList).groupBy(WmsApprovalHistoryRespVO::getBillId);
+    }
+}

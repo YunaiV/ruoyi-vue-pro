@@ -25,19 +25,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Arrays;
 import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSHIP_MOVE_NOT_EXISTS;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSHIP_MOVE_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSHIP_MOVE_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSHIP_MOVE_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSHIP_MOVE_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 @Tag(name = "所有者库存移动")
 @RestController
@@ -98,6 +92,11 @@ public class WmsStockOwnershipMoveController {
         // 组装所有者库存移动详情
         List<WmsStockOwnershipMoveItemDO> stockOwnershipMoveItemList = stockOwnershipMoveItemService.selectByOwnershipMoveId(stockOwnershipMoveVO.getId());
         stockOwnershipMoveVO.setItemList(BeanUtils.toBean(stockOwnershipMoveItemList, WmsStockOwnershipMoveItemRespVO.class));
+        // 组装
+        stockOwnershipMoveService.assembleWarehouse(Arrays.asList(stockOwnershipMoveVO));
+        stockOwnershipMoveItemService.assembleProduct(stockOwnershipMoveVO.getItemList());
+        stockOwnershipMoveItemService.assembleCompanyAndDept(stockOwnershipMoveVO.getItemList());
+
         // 返回
         return success(stockOwnershipMoveVO);
     }
@@ -113,6 +112,8 @@ public class WmsStockOwnershipMoveController {
         PageResult<WmsStockOwnershipMoveDO> doPageResult = stockOwnershipMoveService.getStockOwnershipMovePage(pageReqVO);
         // 转换
         PageResult<WmsStockOwnershipMoveRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsStockOwnershipMoveRespVO.class);
+        // 组装
+        stockOwnershipMoveService.assembleWarehouse(voPageResult.getList());
         // 返回
         return success(voPageResult);
     }
@@ -126,4 +127,4 @@ public class WmsStockOwnershipMoveController {
     // // 导出 Excel
     // ExcelUtils.write(response, "所有者库存移动.xls", "数据", WmsStockOwnershipMoveRespVO.class, BeanUtils.toBean(list, WmsStockOwnershipMoveRespVO.class));
     // }
-}
+}

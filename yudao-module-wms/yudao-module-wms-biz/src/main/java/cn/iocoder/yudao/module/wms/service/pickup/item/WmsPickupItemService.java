@@ -1,11 +1,13 @@
 package cn.iocoder.yudao.module.wms.service.pickup.item;
 
-import java.util.*;
-import jakarta.validation.*;
-import cn.iocoder.yudao.module.wms.controller.admin.pickup.item.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.module.wms.controller.admin.pickup.item.vo.WmsPickupItemPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.pickup.item.vo.WmsPickupItemRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.pickup.item.vo.WmsPickupItemSaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
+import jakarta.validation.Valid;
+
+import java.util.List;
 
 /**
  * 拣货单详情 Service 接口
@@ -53,4 +55,6 @@ public interface WmsPickupItemService {
     PageResult<WmsPickupItemDO> getPickupItemPage(WmsPickupItemPageReqVO pageReqVO);
 
     List<WmsPickupItemDO> selectByPickupId(Long id);
+
+    void assembleProduct(List<WmsPickupItemRespVO> itemList);
 }
