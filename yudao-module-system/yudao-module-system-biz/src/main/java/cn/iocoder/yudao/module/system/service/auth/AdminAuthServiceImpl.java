@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
+import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import cn.iocoder.yudao.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.sms.dto.code.SmsCodeUseReqDTO;
@@ -67,6 +68,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     private CaptchaService captchaService;
     @Resource
     private SmsCodeApi smsCodeApi;
+    @Resource
+    private ConfigApi configApi;
 
     /**
      * 验证码的开关，默认为 true
@@ -74,6 +77,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     @Value("${yudao.captcha.enable:true}")
     @Setter // 为了单测：开启或者关闭验证码
     private Boolean captchaEnable;
+
+    static final String SYSTEM_USER_REGISTER_ENABLE_KEY = "system.user.register";
 
     @Override
     public AdminUserDO authenticate(String username, String password) {
@@ -264,6 +269,11 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public AuthLoginRespVO register(AuthRegisterReqVO registerReqVO) {
+        // 判断是否开启注册功能(true: 开启注册, false: 关闭注册)
+        String isOpenRegister = configApi.getConfigValueByKey(SYSTEM_USER_REGISTER_ENABLE_KEY);
+        if (Boolean.FALSE.toString().equals(isOpenRegister)) {
+            throw exception(AUTH_REGISTER_USER_DISABLED);
+        }
         // 1. 校验验证码
         validateCaptcha(registerReqVO);
 
