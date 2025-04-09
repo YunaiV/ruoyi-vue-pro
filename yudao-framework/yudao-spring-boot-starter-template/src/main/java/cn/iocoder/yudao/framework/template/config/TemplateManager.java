@@ -48,11 +48,7 @@ public class TemplateManager {
         long start = System.currentTimeMillis();
         var configure = configureFactory.build();
 
-        configureFactory.getRegistrars().forEach(registrar -> {
-            if (!registrar.enablePreload()) {
-                return;
-            }
-
+        configureFactory.getRegistrars().stream().filter(TemplatePolicyRegistrar::enablePreload).forEach(registrar -> {
             for (String path : registrar.scanPath()) {
                 try {
                     Resource[] resources = resourcePatternResolver.getResources("classpath:" + path + "*.docx");
