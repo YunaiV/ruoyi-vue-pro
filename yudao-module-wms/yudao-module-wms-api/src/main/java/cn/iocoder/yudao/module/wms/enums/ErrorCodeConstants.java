@@ -192,4 +192,7 @@ public interface ErrorCodeConstants {
     ErrorCode STOCK_OWNERSHIP_MOVE_ITEM_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_019_006, "所有者库存移动详情不符合审批条件");
     ErrorCode STOCK_OWNERSHIP_MOVE_ITEM_EXISTS = new ErrorCode(2_001_019_007, "所有者库存移动详情已存在");
     ErrorCode STOCK_OWNERSHIP_MOVE_QUANTITY_ERROR = new ErrorCode(2_001_019_008, "所有者库存移动数量错误");
-}
+
+
+
+}

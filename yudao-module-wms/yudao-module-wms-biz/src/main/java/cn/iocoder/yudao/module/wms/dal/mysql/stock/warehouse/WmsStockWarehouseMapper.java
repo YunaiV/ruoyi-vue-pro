@@ -9,6 +9,8 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.product.WmsProductDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * 仓库库存 Mapper
  *
@@ -61,5 +63,14 @@ public interface WmsStockWarehouseMapper extends BaseMapperX<WmsStockWarehouseDO
         wrapper.eq(WmsStockWarehouseDO::getWarehouseId, warehouseId);
         wrapper.eq(WmsStockWarehouseDO::getProductId, productId);
         return selectOne(wrapper);
+    }
+
+    /**
+     * 按仓库查询库存
+     **/
+    default List<WmsStockWarehouseDO> selectByWarehouse(Long warehouseId) {
+        LambdaQueryWrapperX<WmsStockWarehouseDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsStockWarehouseDO::getWarehouseId, warehouseId);
+        return selectList(wrapper);
     }
 }

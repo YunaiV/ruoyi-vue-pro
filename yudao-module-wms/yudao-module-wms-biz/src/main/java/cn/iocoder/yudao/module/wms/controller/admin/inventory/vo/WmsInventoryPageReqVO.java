@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.wms.controller.admin.inventory.result.vo;
+package cn.iocoder.yudao.module.wms.controller.admin.inventory.vo;
 
 import lombok.*;
 import java.util.*;
@@ -9,20 +9,23 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(description = "管理后台 - 库存盘点结果分页 Request VO")
+@Schema(description = "管理后台 - 盘点分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class WmsInventoryResultPageReqVO extends PageParam {
+public class WmsInventoryPageReqVO extends PageParam {
 
     @Schema(description = "单据号")
     private String no;
 
-    @Schema(description = "仓库ID", example = "17719")
+    @Schema(description = "仓库ID", example = "26854")
     private Long warehouseId;
 
+    @Schema(description = "出库单审批状态 ; WmsInventoryAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", example = "2")
+    private Integer auditStatus;
+
     @Schema(description = "创建者备注")
-    private String creatorComment;
+    private String creatorNotes;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

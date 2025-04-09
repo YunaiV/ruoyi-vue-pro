@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockW
 import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehouseSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
@@ -65,4 +66,6 @@ public interface WmsStockWarehouseService {
     String getWarehouseProductKey(Long warehouseId, Long productId);
 
     void assembleStockBin(List<WmsStockWarehouseRespVO> list);
+
+    List<WmsStockWarehouseDO> selectByWarehouse(@NotNull(message = "仓库ID不能为空") Long warehouseId);
 }

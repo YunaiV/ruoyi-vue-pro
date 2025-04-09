@@ -248,4 +248,9 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
         }, WmsStockWarehouseRespVO::setStockBinList);
 
     }
+
+    @Override
+    public List<WmsStockWarehouseDO> selectByWarehouse(Long warehouseId) {
+        return stockWarehouseMapper.selectByWarehouse(warehouseId);
+    }
 }
