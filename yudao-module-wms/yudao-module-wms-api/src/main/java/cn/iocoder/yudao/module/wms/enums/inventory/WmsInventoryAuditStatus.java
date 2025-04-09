@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 出库单审批状态
+ * 盘点单审批状态
  **/
 @RequiredArgsConstructor
 @Getter
@@ -93,7 +93,7 @@ public enum WmsInventoryAuditStatus implements ArrayValuable<Integer>, DictEnum 
 
     public static enum Event {
 
-        SUBMIT("提交审核"),AGREE("通过审核"), REJECT("拒绝审核"),FINISH("完成出库");
+        SUBMIT("提交审核"),AGREE("通过审核"), REJECT("拒绝审核"),FINISH("完成盘点");
 
         @Getter
         private String label;

@@ -16,11 +16,11 @@ import java.util.List;
 /**
  * @author: LeeFJ
  * @date: 2025/4/8 9:46
- * @description:
+ * @description: 库位库存移动测试
  */
 
 
-public class StockBinMoveTest extends WmsBaseTest {
+public class WmsStockBinMoveTest extends WmsBaseTest {
 
 
     @Test
@@ -31,7 +31,7 @@ public class StockBinMoveTest extends WmsBaseTest {
 
 
         // 确定从哪个仓位出哪个产品
-        CommonResult<PageResult<WmsStockBinRespVO>> stockBinPageResult = this.getStockBinPage();
+        CommonResult<PageResult<WmsStockBinRespVO>> stockBinPageResult = this.getStockBinPage(warehouseId);
         if(stockBinPageResult.isError()) {
             System.err.println("缺少库存数据，无法继续测试");
             return;
@@ -106,9 +106,9 @@ public class StockBinMoveTest extends WmsBaseTest {
 
 
     public static void main(String[] args) {
-        StockBinMoveTest stockBinMoveTest = new StockBinMoveTest();
-        stockBinMoveTest.setProfile(Profile.LOCAL);
-        stockBinMoveTest.testMove();
+        WmsStockBinMoveTest wmsStockBinMoveTest = new WmsStockBinMoveTest();
+        wmsStockBinMoveTest.setProfile(Profile.LOCAL);
+        wmsStockBinMoveTest.testMove();
     }
 
 

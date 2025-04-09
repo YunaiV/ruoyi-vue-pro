@@ -1,14 +1,13 @@
 package cn.iocoder.yudao.module.wms.controller.admin.inventory.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import jakarta.validation.constraints.*;
-import java.util.List;
-import cn.iocoder.yudao.module.wms.controller.admin.inventory.product.vo.WmsInventoryProductSaveReqVO;
-import cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo.WmsInventoryBinSaveReqVO;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo.WmsInventoryBinSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inventory.product.vo.WmsInventoryProductSaveReqVO;
 import cn.iocoder.yudao.module.wms.enums.inventory.WmsInventoryAuditStatus;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import java.util.List;
 
 /**
  * @table-fields : no,creator_notes,id,audit_status,warehouse_id
@@ -27,8 +26,7 @@ public class WmsInventorySaveReqVO {
     @NotNull(message = "仓库ID不能为空")
     private Long warehouseId;
 
-    @Schema(description = "出库单审批状态 ; WmsInventoryAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @NotNull(message = "出库单审批状态不能为空")
+    @Schema(description = "盘点单审批状态 ; WmsInventoryAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @InEnum(WmsInventoryAuditStatus.class)
     private Integer auditStatus;
 

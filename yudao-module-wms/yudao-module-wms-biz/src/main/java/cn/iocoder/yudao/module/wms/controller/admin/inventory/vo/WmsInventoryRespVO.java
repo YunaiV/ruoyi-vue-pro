@@ -31,8 +31,8 @@ public class WmsInventoryRespVO {
     @ExcelProperty("仓库ID")
     private Long warehouseId;
 
-    @Schema(description = "出库单审批状态 ; WmsInventoryAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @ExcelProperty("出库单审批状态")
+    @Schema(description = "盘点单审批状态 ; WmsInventoryAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @ExcelProperty("盘点单审批状态")
     private Integer auditStatus;
 
     @Schema(description = "创建者备注")

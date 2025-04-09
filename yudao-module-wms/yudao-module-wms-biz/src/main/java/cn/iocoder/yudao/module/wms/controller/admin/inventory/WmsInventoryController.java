@@ -34,16 +34,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.io.IOException;
 import java.util.List;
-
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_NOT_EXISTS;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
-@Tag(name = "盘点")
+@Tag(name = "盘点单")
 @RestController
 @RequestMapping("/wms/inventory")
 @Validated
@@ -140,4 +143,4 @@ public class WmsInventoryController {
         // 导出 Excel
         ExcelUtils.write(response, "盘点.xls", "数据", WmsInventoryRespVO.class, BeanUtils.toBean(list, WmsInventoryRespVO.class));
     }
-}
+}

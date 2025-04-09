@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.wms.stock.bin.move;
+package cn.iocoder.yudao.module.wms.stock.ownership.move;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -15,11 +15,11 @@ import java.util.List;
 /**
  * @author: LeeFJ
  * @date: 2025/4/8 9:46
- * @description:
+ * @description: 库存所有者库存移动测试
  */
 
 
-public class StockOwnershipMoveTest extends WmsBaseTest {
+public class WmsStockOwnershipMoveTest extends WmsBaseTest {
 
 
     @Test
@@ -30,7 +30,7 @@ public class StockOwnershipMoveTest extends WmsBaseTest {
 
 
         // 确定从哪个所有者库存出哪个产品
-        CommonResult<PageResult<WmsStockOwnershipRespVO>> stockOwnershipPageResult = this.getStockOwnershipPage();
+        CommonResult<PageResult<WmsStockOwnershipRespVO>> stockOwnershipPageResult = this.getStockOwnershipPage(warehouseId);
         if(stockOwnershipPageResult.isError()) {
             System.err.println("缺少库存数据，无法继续测试");
             return;
@@ -102,7 +102,7 @@ public class StockOwnershipMoveTest extends WmsBaseTest {
 
 
     public static void main(String[] args) {
-        StockOwnershipMoveTest stockBinMoveTest = new StockOwnershipMoveTest();
+        WmsStockOwnershipMoveTest stockBinMoveTest = new WmsStockOwnershipMoveTest();
         stockBinMoveTest.setProfile(Profile.LOCAL);
         stockBinMoveTest.testMove();
     }

@@ -11,10 +11,8 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
 import java.util.List;
 import java.util.Objects;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_PRODUCT_EXISTS;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_PRODUCT_NOT_EXISTS;
@@ -114,4 +112,4 @@ public class WmsInventoryProductServiceImpl implements WmsInventoryProductServic
     public List<WmsInventoryProductDO> selectByInventoryId(Long id) {
         return List.of();
     }
-}
+}

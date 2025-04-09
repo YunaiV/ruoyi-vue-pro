@@ -194,14 +194,14 @@ public interface ErrorCodeConstants {
     ErrorCode STOCK_OWNERSHIP_MOVE_QUANTITY_ERROR = new ErrorCode(2_001_019_008, "所有者库存移动数量错误");
 
     // ========== WMS_INVENTORY 盘点表 2_001_020_000 ==========
-    ErrorCode INVENTORY_NOT_EXISTS = new ErrorCode(2_001_020_001, "盘点不存在");
-    ErrorCode INVENTORY_EXISTS = new ErrorCode(2_001_020_002, "盘点已存在");
+    ErrorCode INVENTORY_NOT_EXISTS = new ErrorCode(2_001_020_001, "盘点单不存在");
+    ErrorCode INVENTORY_EXISTS = new ErrorCode(2_001_020_002, "盘点单已存在");
     ErrorCode INVENTORY_NO_DUPLICATE = new ErrorCode(2_001_020_003, "单据号已存在");
-    ErrorCode INVENTORY_BE_REFERRED = new ErrorCode(2_001_020_004, "盘点被引用");
-    ErrorCode INVENTORY_NO_OUT_OF_BOUNDS = new ErrorCode(2_001_020_005, "盘点单据号越界");
-    ErrorCode INVENTORY_CAN_NOT_EDIT = new ErrorCode(2_001_020_006, "盘点不允许编辑");
-    ErrorCode INVENTORY_CAN_NOT_DELETE = new ErrorCode(2_001_020_007, "盘点不允许删除");
-    ErrorCode INVENTORY_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_020_008, "盘点不符合审批条件");
+    ErrorCode INVENTORY_BE_REFERRED = new ErrorCode(2_001_020_004, "盘点单被引用");
+    ErrorCode INVENTORY_NO_OUT_OF_BOUNDS = new ErrorCode(2_001_020_005, "盘点单单据号越界");
+    ErrorCode INVENTORY_CAN_NOT_EDIT = new ErrorCode(2_001_020_006, "盘点单不允许编辑");
+    ErrorCode INVENTORY_CAN_NOT_DELETE = new ErrorCode(2_001_020_007, "盘点单不允许删除");
+    ErrorCode INVENTORY_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_020_008, "盘点单不符合审批条件");
 
     // ========== WMS_INVENTORY_PRODUCT 库存盘点产品表 2_001_021_000 ==========
     ErrorCode INVENTORY_PRODUCT_NOT_EXISTS = new ErrorCode(2_001_021_001, "库存盘点产品不存在");

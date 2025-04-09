@@ -5,7 +5,6 @@ import cn.iocoder.yudao.module.wms.controller.admin.inventory.product.vo.WmsInve
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.product.vo.WmsInventoryProductSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.product.WmsInventoryProductDO;
 import jakarta.validation.Valid;
-
 import java.util.List;
 
 /**

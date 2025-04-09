@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.product.vo.WmsInventoryProductPageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.product.WmsInventoryProductDO;
 import org.apache.ibatis.annotations.Mapper;
-
 import java.util.List;
 
 /**
@@ -38,7 +37,7 @@ public interface WmsInventoryProductMapper extends BaseMapperX<WmsInventoryProdu
         return selectOne(wrapper);
     }
 
-    default List<WmsInventoryProductDO> selectByInventoryId(Long id){
+    default List<WmsInventoryProductDO> selectByInventoryId(Long id) {
         return selectList(WmsInventoryProductDO::getInventoryId, id);
     }
-}
+}

@@ -2,12 +2,15 @@ package cn.iocoder.yudao.module.wms;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventorySaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMoveSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move.vo.WmsStockOwnershipMoveSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.WmsStockOwnershipPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.WmsStockOwnershipRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehousePageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehouseRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinSimpleRespVO;
 import cn.iocoder.yudao.test.BaseRestIntegrationTest;
@@ -23,17 +26,27 @@ public class WmsBaseTest extends BaseRestIntegrationTest {
 
 
 
-    public CommonResult<PageResult<WmsStockBinRespVO>> getStockBinPage() {
+    public CommonResult<PageResult<WmsStockWarehouseRespVO>> getStockWarehousePage(Long warehouseId) {
+        WmsStockWarehousePageReqVO pageReqVO=new WmsStockWarehousePageReqVO();
+        pageReqVO.setPageNo(1);
+        pageReqVO.setPageSize(100);
+        pageReqVO.setWarehouseId(warehouseId);
+        return getPage("/admin-api/wms/stock-warehouse/page",pageReqVO, WmsStockWarehouseRespVO.class);
+    }
+
+    public CommonResult<PageResult<WmsStockBinRespVO>> getStockBinPage(Long warehouseId) {
         WmsStockBinPageReqVO pageReqVO=new WmsStockBinPageReqVO();
         pageReqVO.setPageNo(1);
         pageReqVO.setPageSize(100);
+        pageReqVO.setWarehouseId(warehouseId);
         return getPage("/admin-api/wms/stock-bin/page",pageReqVO, WmsStockBinRespVO.class);
     }
 
-    public CommonResult<PageResult<WmsStockOwnershipRespVO>> getStockOwnershipPage() {
-        WmsStockBinPageReqVO pageReqVO=new WmsStockBinPageReqVO();
+    public CommonResult<PageResult<WmsStockOwnershipRespVO>> getStockOwnershipPage(Long warehouseId) {
+        WmsStockOwnershipPageReqVO pageReqVO=new WmsStockOwnershipPageReqVO();
         pageReqVO.setPageNo(1);
         pageReqVO.setPageSize(100);
+        pageReqVO.setWarehouseId(warehouseId);
         return getPage("/admin-api/wms/stock-ownership/page",pageReqVO, WmsStockOwnershipRespVO.class);
     }
 
@@ -56,6 +69,9 @@ public class WmsBaseTest extends BaseRestIntegrationTest {
         return getSimpleList("/wms/warehouse-bin//simple-list",pageReqVO, WmsWarehouseBinSimpleRespVO.class);
     }
 
+    public CommonResult<Long> createInventory(WmsInventorySaveReqVO createReqVO) {
+        return this.create("/wms/inventory/create",createReqVO);
+    }
 
     public CommonResult<Long> createStockBinMove(WmsStockBinMoveSaveReqVO createReqVO) {
         return this.create("/wms/stock-bin-move/create",createReqVO);
