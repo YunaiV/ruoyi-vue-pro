@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.oms.controller.admin.product.vo;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.oms.controller.admin.product.item.vo.OmsShopProductItemRespVO;
 import cn.iocoder.yudao.module.oms.controller.admin.shop.vo.OmsShopRespVO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Schema(description = "管理后台 - OMS 店铺产品 Response VO")
 @Data
@@ -58,4 +60,7 @@ public class OmsShopProductRespVO extends BaseDO {
 
     @Schema(description = "所属部门名称")
     private String deptName;
+
+    @Schema(description = "店铺产品关联项", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private List<OmsShopProductItemRespVO> items;
 }

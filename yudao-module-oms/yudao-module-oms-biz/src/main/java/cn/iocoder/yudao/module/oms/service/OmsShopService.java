@@ -73,9 +73,9 @@ public interface OmsShopService {
     PageResult<OmsShopRespVO> getShopPage(OmsShopPageReqVO pageReqVO);
 
     /**
-     * 获得OMS 店铺
+     * 通过主键id获得OMS店铺
      */
-    OmsShopRespVO getShop(Long id);
+    OmsShopRespVO getShopById(Long id);
 
     /**
      * @param id   shop的主键

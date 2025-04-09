@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.oms.api.dto.OmsShopProductSaveReqDTO;
 import cn.iocoder.yudao.module.oms.controller.admin.product.vo.OmsShopProductPageReqVO;
 import cn.iocoder.yudao.module.oms.controller.admin.product.vo.OmsShopProductRespVO;
+import cn.iocoder.yudao.module.oms.controller.admin.product.vo.OmsShopProductSaveReqVO;
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsShopProductDO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.validation.Valid;
@@ -45,4 +46,45 @@ public interface OmsShopProductService extends IService<OmsShopProductDO> {
      * @return OMS 店铺产品分页
      */
     PageResult<OmsShopProductDO> getShopProductPage(OmsShopProductPageReqVO pageReqVO);
+
+    /**
+     * 根据店铺编号查询产品
+     *
+     * @param id 店铺产品ID
+     * @return 产品
+     */
+    OmsShopProductRespVO getShopProductVoModel(Long id);
+
+
+    /**
+     * 创建店铺产品协同ERP产品明细
+     **/
+    Long createShopProductWithItems(@Valid OmsShopProductSaveReqVO createReqVO);
+
+    /**
+     * 创建ERP 店铺产品
+     *
+     * @param createReqVO 创建信息
+     * @return 编号
+     */
+    Long createShopProduct(@Valid OmsShopProductSaveReqVO createReqVO);
+
+    /**
+     * 更新店铺产品协同ERP产品明细
+     **/
+    void updateShopProductWithItems(@Valid OmsShopProductSaveReqVO updateReqVO);
+
+    /**
+     * 更新ERP 店铺产品
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateShopProduct(@Valid OmsShopProductSaveReqVO updateReqVO);
+
+    /**
+     * 删除ERP 店铺产品
+     *
+     * @param id 编号
+     */
+    void deleteShopProduct(Long id);
 }

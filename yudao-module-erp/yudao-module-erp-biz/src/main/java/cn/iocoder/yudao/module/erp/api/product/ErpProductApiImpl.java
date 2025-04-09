@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductRespDTO;
+import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ErpProductRespVO;
 import cn.iocoder.yudao.module.erp.convert.product.ErpProductConvert;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductMapper;
@@ -44,7 +45,7 @@ public class ErpProductApiImpl implements ErpProductApi {
         List<ErpProductDO> dos;
         if (ids != null) {
             dos = erpProductMapper.selectBatchIds(ids);
-        }else {
+        } else {
             dos = erpProductMapper.selectList();
         }
         return ErpProductConvert.INSTANCE.convert(dos);
@@ -87,5 +88,11 @@ public class ErpProductApiImpl implements ErpProductApi {
     @Override
     public List<Long> listProductIdByBarCode(String barCode) {
         return erpProductService.listProductIdByBarCode(barCode);
+    }
+
+    @Override
+    public List<ErpProductRespDTO> getProductVOList(Collection<Long> ids) {
+        List<ErpProductRespVO> productVOList = erpProductService.getProductVOList(ids);
+        return BeanUtils.toBean(productVOList, ErpProductRespDTO.class);
     }
 }

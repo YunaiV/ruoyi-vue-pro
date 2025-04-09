@@ -18,11 +18,14 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class OmsShopProductPageReqVO extends PageParam {
 
-    @Schema(description = "店铺产品名称", example = "赵六")
+    @Schema(description = "店铺产品名称")
     private String name;
 
     @Schema(description = "店铺ID")
     private Long shopId;
+
+    @Schema(description = "店铺別名")
+    private String shopName;
 
     @Schema(description = "平台编码")
     private String platformCode;

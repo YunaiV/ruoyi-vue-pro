@@ -21,7 +21,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.error;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.module.oms.api.enums.OmsErrorCodeConstants.SHOP_CAN_NOT_CREATE_ONLINE_SHOP;
+import static cn.iocoder.yudao.module.oms.api.enums.OmsErrorCodeConstants.OMS_SHOP_CAN_NOT_CREATE_ONLINE_SHOP;
 
 @Tag(name = "管理后台 - OMS 平台店铺")
 @RestController
@@ -53,7 +53,7 @@ public class OmsSaleShopController {
     @Parameter(name = "id", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('oms:shop:query')")
     public CommonResult<OmsShopRespVO> getShop(@RequestParam("id") Long id) {
-        OmsShopRespVO omsShopRespVO = omsShopService.getShop(id);
+        OmsShopRespVO omsShopRespVO = omsShopService.getShopById(id);
         return success(omsShopRespVO);
     }
 
@@ -79,7 +79,7 @@ public class OmsSaleShopController {
     public CommonResult<Long> createShop(@Validated(value = {ValidationGroup.create.class}) @RequestBody OmsShopSaveReqVO createReqVO) {
         // 不允许用户创建在线店铺
         if (createReqVO.getType() == ShopTypeEnum.ONLINE.getType()) {
-            return error(SHOP_CAN_NOT_CREATE_ONLINE_SHOP);
+            return error(OMS_SHOP_CAN_NOT_CREATE_ONLINE_SHOP);
         }
         return success(omsShopService.createShop(createReqVO));
     }

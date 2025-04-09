@@ -7,13 +7,22 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductRespDTO;
 import cn.iocoder.yudao.module.oms.api.dto.OmsShopProductSaveReqDTO;
+import cn.iocoder.yudao.module.oms.api.enums.OmsErrorCodeConstants;
+import cn.iocoder.yudao.module.oms.controller.admin.product.item.vo.OmsProductRespSimpleVO;
+import cn.iocoder.yudao.module.oms.controller.admin.product.item.vo.OmsShopProductItemRespVO;
+import cn.iocoder.yudao.module.oms.controller.admin.product.item.vo.OmsShopProductItemSaveReqVO;
 import cn.iocoder.yudao.module.oms.controller.admin.product.vo.OmsShopProductPageReqVO;
 import cn.iocoder.yudao.module.oms.controller.admin.product.vo.OmsShopProductRespVO;
+import cn.iocoder.yudao.module.oms.controller.admin.product.vo.OmsShopProductSaveReqVO;
 import cn.iocoder.yudao.module.oms.controller.admin.shop.vo.OmsShopRespVO;
 import cn.iocoder.yudao.module.oms.convert.OmsShopProductConvert;
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsShopProductDO;
+import cn.iocoder.yudao.module.oms.dal.dataobject.OmsShopProductItemDO;
 import cn.iocoder.yudao.module.oms.dal.mysql.OmsShopProductMapper;
+import cn.iocoder.yudao.module.oms.service.OmsShopProductItemService;
 import cn.iocoder.yudao.module.oms.service.OmsShopProductService;
 import cn.iocoder.yudao.module.oms.service.OmsShopService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
@@ -22,12 +31,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.module.oms.api.enums.OmsErrorCodeConstants.OMS_SHOP_PRODUCT_NOT_EXISTS;
 import static cn.iocoder.yudao.module.oms.api.enums.OmsErrorCodeConstants.OMS_SYNC_SHOP_PRODUCT_LACK;
 
 /**
@@ -36,7 +47,10 @@ import static cn.iocoder.yudao.module.oms.api.enums.OmsErrorCodeConstants.OMS_SY
 @Service
 @Slf4j
 public class OmsShopProductServiceImpl extends ServiceImpl<OmsShopProductMapper, OmsShopProductDO> implements OmsShopProductService {
+    private final String CREATOR = "SYNC";
 
+    //    @Resource
+//    MessageChannel eccangSkuRelationOutputChannel;
     @Resource
     private OmsShopProductMapper shopProductMapper;
 
@@ -44,7 +58,12 @@ public class OmsShopProductServiceImpl extends ServiceImpl<OmsShopProductMapper,
     private OmsShopService omsShopService;
 
     @Resource
+    private ErpProductApi erpProductApi;
+
+    @Resource
     private DeptApi deptApi;
+    @Resource
+    private OmsShopProductItemService omsShopProductItemService;
 
 
     @Override
@@ -72,6 +91,8 @@ public class OmsShopProductServiceImpl extends ServiceImpl<OmsShopProductMapper,
             .collect(Collectors.toMap(omsShopProductDO -> omsShopProductDO.getSourceId(), omsShopProductDO -> omsShopProductDO));
 
         shopProductDOs.forEach(shopProductDO -> {
+            //用创建者区分是否是同步过来的数据还是运营新增的数据
+            shopProductDO.setCreator(CREATOR);
             OmsShopProductDO existShopProDuctDO = existShopProductMap.get(shopProductDO.getSourceId());
             if (existShopProDuctDO != null) {
                 shopProductDO.setId(existShopProDuctDO.getId());
@@ -110,13 +131,152 @@ public class OmsShopProductServiceImpl extends ServiceImpl<OmsShopProductMapper,
                 prod.setDeptName(dept.getName());
             }
         });
-        
+
         return success(pageResultVO);
     }
 
     @Override
     public PageResult<OmsShopProductDO> getShopProductPage(OmsShopProductPageReqVO pageReqVO) {
         return shopProductMapper.selectPage(pageReqVO);
+    }
+
+
+    @Override
+    public OmsShopProductRespVO getShopProductVoModel(Long id) {
+        OmsShopProductDO shopProduct = shopProductMapper.selectById(id);
+        if (shopProduct == null) {
+            throw exception(OMS_SHOP_PRODUCT_NOT_EXISTS);
+        }
+        OmsShopProductRespVO respVO = BeanUtils.toBean(shopProduct, OmsShopProductRespVO.class);
+        List<OmsShopProductItemDO> items = omsShopProductItemService.getShopProductItemsByProductId(shopProduct.getId());
+        List<OmsShopProductItemRespVO> itemRespVOS = BeanUtils.toBean(items, OmsShopProductItemRespVO.class);
+        List<ErpProductRespDTO> productList = erpProductApi.getProductVOList(StreamX.from(items).map(OmsShopProductItemDO::getProductId).toList());
+        List<OmsProductRespSimpleVO> simpleProductList = BeanUtils.toBean(productList, OmsProductRespSimpleVO.class);
+        StreamX.from(itemRespVOS).assemble(simpleProductList, OmsProductRespSimpleVO::getId, OmsShopProductItemRespVO::getProductId, OmsShopProductItemRespVO::setProduct);
+        respVO.setItems(itemRespVOS);
+        // 店铺
+        OmsShopRespVO shopDO = omsShopService.getShopById(respVO.getShopId());
+        respVO.setShop(BeanUtils.toBean(shopDO, OmsShopRespVO.class));
+        return respVO;
+    }
+
+    @Transactional
+    @Override
+    public Long createShopProductWithItems(OmsShopProductSaveReqVO createReqVO) {
+        Long id = this.createShopProduct(createReqVO);
+        createReqVO.setId(id);
+        updateShopProductWithItems(createReqVO);
+//        sendToEccang(createReqVO.getId());
+        return id;
+    }
+
+    @Override
+    public Long createShopProduct(OmsShopProductSaveReqVO createReqVO) {
+        // 插入
+        OmsShopProductDO shopProduct = BeanUtils.toBean(createReqVO, OmsShopProductDO.class);
+        shopProduct.setSourceId(shopProduct.getPlatformCode() + shopProduct.getShopId());
+        shopProductMapper.insert(shopProduct);
+        // 返回
+        return shopProduct.getId();
+    }
+
+    @Override
+    @Transactional
+    public void updateShopProductWithItems(OmsShopProductSaveReqVO updateReqVO) {
+        // 保存主表
+        this.updateShopProduct(updateReqVO);
+        // 处理重表数据
+        List<OmsShopProductItemDO> itemsInDB = omsShopProductItemService.getShopProductItemsByProductId(updateReqVO.getId());
+        Set<Long> itemIdsInDB = StreamX.from(itemsInDB).toSet(OmsShopProductItemDO::getId);
+        Set<Long> itemIdsToDelete = new HashSet<>(itemIdsInDB);
+
+        // 循环处理
+        for (OmsShopProductItemSaveReqVO itemVO : updateReqVO.getItems()) {
+            // 此ID不使用前端传入的ID
+            itemVO.setShopProductId(updateReqVO.getId());
+            // id为空的需要新增
+            if (itemVO.getId() == null) {
+                omsShopProductItemService.createShopProductItem(itemVO);
+            } else {
+                omsShopProductItemService.updateShopProductItem(itemVO);
+            }
+            // 移除不需要删除的ID
+            itemIdsToDelete.remove(itemVO.getId());
+        }
+
+        omsShopProductItemService.deleteShopProductItemsByIds(new ArrayList<>(itemIdsToDelete));
+
+
+//        sendToEccang(updateReqVO.getId());
+
+    }
+
+//    private void sendToEccang(Long id) {
+//        OmsShopProductRespVO productVo = this.getShopProductVoModel(id);
+//
+//        // 条件判断
+//        if (productVo == null) {
+//            return;
+//        }
+//
+//        // 需要有店铺
+//        if (productVo.getShop() == null) {
+//            return;
+//        }
+//
+//        // 店铺需要维护别名
+//        if (StringUtil.isBlank(productVo.getShop().getName())) {
+//            return;
+//        }
+//
+//        // 与产品有关联关系
+//        if (!CollectionUtils.isEmpty(productVo.getItems())) {
+//            for (OmsShopProductItemRespVO item : productVo.getItems()) {
+//                if (item.getProduct() == null) {
+//                    return;
+//                }
+//            }
+//        }
+//
+//
+//        SkuRelationDTO dto = SkuRelationDTO.builder()
+//            .platformSku(productVo.getName())
+//            .account(productVo.getShop().getName())
+//            .relations(StreamX.from(productVo.getItems()).map(item -> SkuRelationDTO.Relation.builder()
+//                // 如果是非生产环境加 TEST- 前缀区别
+//                .productSku(SpringUtils.isProd() ? "" : "TEST-" + item.getProduct().getBarCode())
+//                .productSkuQty(item.getQuantity())
+//                .build()).toList())
+//            .build();
+//
+//
+//        AsyncTask.run(() -> {
+//            eccangSkuRelationOutputChannel.send(MessageBuilder.withPayload(dto).build());
+//        });
+//
+//    }
+
+    @Override
+    public void updateShopProduct(OmsShopProductSaveReqVO updateReqVO) {
+        // 校验存在
+        validateShopProductExists(updateReqVO.getId());
+        // 更新
+        OmsShopProductDO updateObj = BeanUtils.toBean(updateReqVO, OmsShopProductDO.class);
+        shopProductMapper.updateById(updateObj);
+    }
+
+    private void validateShopProductExists(Long id) {
+        if (shopProductMapper.selectById(id) == null) {
+            throw exception(OmsErrorCodeConstants.OMS_SHOP_PRODUCT_NOT_EXISTS);
+        }
+    }
+
+    @Override
+    public void deleteShopProduct(Long id) {
+        // 校验存在
+        validateShopProductExists(id);
+        // 删除
+        shopProductMapper.deleteById(id);
     }
 
 }

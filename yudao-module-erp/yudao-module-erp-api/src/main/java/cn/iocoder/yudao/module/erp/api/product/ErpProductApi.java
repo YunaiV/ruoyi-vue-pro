@@ -13,6 +13,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 public interface ErpProductApi {
     //getProductDto方法
     ErpProductDTO getProductDto(Long id);
+
     /**
      * 获得所有产品DTO，根据ids，如果ids为null返回所有
      */
@@ -56,4 +57,12 @@ public interface ErpProductApi {
      * 根据barCode模糊查询productId集合
      */
     List<Long> listProductIdByBarCode(String barCode);
+
+    /**
+     * 获得产品 VO 列表
+     *
+     * @param ids 编号数组
+     * @return 产品 VO 列表
+     */
+    List<ErpProductRespDTO> getProductVOList(Collection<Long> ids);
 }

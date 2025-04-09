@@ -26,8 +26,7 @@ import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.oms.api.enums.OmsErrorCodeConstants.OMS_SYNC_SHOP_INFO_LACK;
-import static cn.iocoder.yudao.module.oms.api.enums.OmsErrorCodeConstants.SHOP_NOT_EXISTS;
+import static cn.iocoder.yudao.module.oms.api.enums.OmsErrorCodeConstants.*;
 import static com.baomidou.mybatisplus.extension.toolkit.Db.saveBatch;
 import static com.baomidou.mybatisplus.extension.toolkit.Db.updateBatchById;
 
@@ -35,12 +34,18 @@ import static com.baomidou.mybatisplus.extension.toolkit.Db.updateBatchById;
 @Slf4j
 public class OmsShopServiceImpl implements OmsShopService {
 
+    private final String CREATOR = "SYNC";
+
     @Resource
     private OmsShopMapper shopMapper;
 
     @Override
     public Long createShop(OmsShopSaveReqVO saveReqDTO) {
         OmsShopDO shopDO = OmsShopConvert.INSTANCE.convert(saveReqDTO);
+        OmsShopDO omsShopDO = shopMapper.selectOne(OmsShopDO::getName, saveReqDTO.getName());
+        if (omsShopDO != null) {
+            throw exception(OMS_SHOP_NAME_EXISTS);
+        }
         ThrowUtil.ifSqlThrow(shopMapper.insert(shopDO), DB_INSERT_ERROR);
         return shopDO.getId();
     }
@@ -63,7 +68,7 @@ public class OmsShopServiceImpl implements OmsShopService {
 
     public void validateShopExists(Long id) {
         if (shopMapper.selectById(id) == null) {
-            throw exception(SHOP_NOT_EXISTS);
+            throw exception(OMS_SHOP_NOT_EXISTS);
         }
     }
 
@@ -98,6 +103,8 @@ public class OmsShopServiceImpl implements OmsShopService {
             .collect(Collectors.toMap(omsShopDO -> omsShopDO.getPlatformShopCode(), omsShopDO -> omsShopDO));
 
         shops.forEach(shop -> {
+            //用创建者区分是否是同步过来的数据还是运营新增的数据
+            shop.setCreator(CREATOR);
             OmsShopDO existShop = existShopMap.get(shop.getPlatformShopCode());
             if (existShop != null) {
                 shop.setId(existShop.getId());
@@ -130,7 +137,7 @@ public class OmsShopServiceImpl implements OmsShopService {
     }
 
     @Override
-    public OmsShopRespVO getShop(Long id) {
+    public OmsShopRespVO getShopById(Long id) {
         OmsShopDO omsShopDO = shopMapper.selectById(id);
         return BeanUtils.toBean(omsShopDO, OmsShopRespVO.class);
     }
@@ -139,7 +146,11 @@ public class OmsShopServiceImpl implements OmsShopService {
     public Boolean updateShopNameAndCode(Long id, String name, String code) {
         OmsShopDO omsShopDO = shopMapper.selectById(id);
         if (omsShopDO == null) {
-            throw exception(SHOP_NOT_EXISTS);
+            throw exception(OMS_SHOP_NOT_EXISTS);
+        }
+        OmsShopDO shopDO = shopMapper.selectOne(OmsShopDO::getName, name);
+        if (shopDO != null && !shopDO.getId().equals(id)) {
+            throw exception(OMS_SHOP_NAME_EXISTS);
         }
         omsShopDO.setName(name);
         omsShopDO.setCode(code);

@@ -25,7 +25,7 @@ public class OmsShopDO extends TenantBaseDO {
     private Long id;
 
     /**
-     * 店铺名称
+     * 店铺别名
      */
     private String name;
 

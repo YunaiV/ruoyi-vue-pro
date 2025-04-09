@@ -25,7 +25,7 @@ public interface OmsShopMapper extends BaseMapperX<OmsShopDO> {
     }
 
     default List<OmsShopDO> getByPlatformCode(String platformCode) {
-        return selectList(bindQueryWrapper(OmsShopPageReqVO.builder().platformShopCode(platformCode).build()));
+        return selectList(bindQueryWrapper(OmsShopPageReqVO.builder().platformCode(platformCode).build()));
     }
 
     default OmsShopDO getByPlatformShopCode(String platformShopCode) {
