@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -18,22 +19,22 @@ public class EccangDeliverBatchReqVO {
     private List<String> doCodeArr;
 
     // 创建时间-开始（大于等于）
-    private String createdStart;
+    private LocalDateTime createdStart;
 
     // 创建时间-结束（小于等于）
-    private String createdEnd;
+    private LocalDateTime createdEnd;
 
     // 出库时间-开始（大于等于）
-    private String shipStart;
+    private LocalDateTime shipStart;
 
     // 出库时间-结束（小于等于）
-    private String shipEnd;
+    private LocalDateTime shipEnd;
 
     // 更新时间-开始（大于等于）
-    private String updatedStart;
+    private LocalDateTime updatedStart;
 
     // 更新时间-结束（小于等于）
-    private String updatedEnd;
+    private LocalDateTime updatedEnd;
 
     // 状态：1:待确认，2:待发送，3:已发送，4:作废
     private Integer orderStatus;
@@ -42,8 +43,8 @@ public class EccangDeliverBatchReqVO {
     private String isMarkComplete;
 
     // 页码（默认1）
-    private String page;
+    private Integer page;
 
     // 每页数量（默认20，最大50）
-    private String pageSize;
+    private Integer pageSize;
 }

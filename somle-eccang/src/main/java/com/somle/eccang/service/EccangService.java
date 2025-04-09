@@ -173,7 +173,9 @@ public class EccangService {
 
     private Stream<EccangPage> getAllPage(JSONObject payload, String endpoint) {
         payload.put("page", 1);
-        payload.put("page_size", pageSize);
+        if (payload.get("page_size") == null) {
+            payload.put("page_size", pageSize);
+        }
         return Stream.iterate(
             getPage(payload, endpoint), Objects::nonNull,
             bizContent -> {
