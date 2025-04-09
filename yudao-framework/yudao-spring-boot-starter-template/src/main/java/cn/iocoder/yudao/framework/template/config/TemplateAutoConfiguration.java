@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.template.config;
 
+import cn.iocoder.yudao.framework.template.core.TemplateManager;
 import cn.iocoder.yudao.framework.template.core.TemplateService;
 import cn.iocoder.yudao.framework.template.core.impl.TemplateServiceRedisImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.data.redis.core.RedisTemplate;
 
 @AutoConfiguration
-@EnableConfigurationProperties(TemplateProperties.class)
+@EnableConfigurationProperties(TemplateRegistar.class)
 @Slf4j
 public class TemplateAutoConfiguration {
 
@@ -33,13 +34,10 @@ public class TemplateAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public TemplateManager templateManager(TemplateService templateService, ResourcePatternResolver resolver, TemplateProperties templateProperties,
-        TemplateConfigureFactory factory) {
+    public TemplateManager templateManager(TemplateService templateService, ResourcePatternResolver resolver, TemplateConfigureFactory factory) {
         TemplateManager manager = new TemplateManager();
         manager.setTemplateService(templateService);
         manager.setConfigureFactory(factory);
-        manager.setResourcePatternResolver(resolver);
-        manager.setTemplateProperties(templateProperties);
         return manager;
     }
 }

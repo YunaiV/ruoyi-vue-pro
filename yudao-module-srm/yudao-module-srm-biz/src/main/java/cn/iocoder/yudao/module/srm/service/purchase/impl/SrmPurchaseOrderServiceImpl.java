@@ -19,6 +19,7 @@ import cn.iocoder.yudao.module.fms.api.finance.dto.FmsFinanceSubjectDTO;
 import cn.iocoder.yudao.module.srm.api.purchase.SrmInCountDTO;
 import cn.iocoder.yudao.module.srm.api.purchase.SrmOrderCountDTO;
 import cn.iocoder.yudao.module.srm.api.purchase.SrmPayCountDTO;
+import cn.iocoder.yudao.module.srm.config.purchase.SrmTemplateConfig;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.req.SrmPurchaseInSaveReqVO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.req.*;
 import cn.iocoder.yudao.module.srm.convert.purchase.SrmOrderConvert;
@@ -718,8 +719,8 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
         // 校验订单状态是否已审核 未审核 -> e
 //        ThrowUtil.ifThrow(!Objects.equals(orderDO.getAuditStatus(), SrmAuditStatus.APPROVED.getCode()), PURCHASE_ORDER_NOT_AUDIT, orderDO.getId());
         //1 从OSS拿到模板word
-        try (XWPFTemplate xwpfTemplate = templateService.buildXWPDFTemplate(StrUtil.format("purchase/order/{}", reqVO.getTemplateName()),
-            configureFactory.build())) {
+        var resource = SrmTemplateConfig.getResource(reqVO.getTemplateName());
+        try (XWPFTemplate xwpfTemplate = templateService.buildXWPDFTemplate(resource)) {
             //2 模板word渲染数据
             List<SrmPurchaseOrderItemDO> itemDOS = purchaseOrderItemMapper.selectListByOrderId(orderDO.getId());
             Map<Long, FmsFinanceSubjectDTO> dtoMap =

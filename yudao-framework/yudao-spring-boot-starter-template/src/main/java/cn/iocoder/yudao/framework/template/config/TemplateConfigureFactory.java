@@ -16,11 +16,16 @@ import java.util.List;
 public class TemplateConfigureFactory {
 
     @Autowired
-    private List<TemplatePolicyRegistrar> registrars;
+    private List<TemplateRegistar> registrars;
 
     public Configure build() {
         ConfigureBuilder builder = Configure.builder();
-        registrars.forEach(r -> r.register(builder));
+        registrars.forEach(r -> {
+            builder.bind(
+                r.getTagName(),
+                r.getPolicy()
+            );
+        });
         return builder.build();
     }
 }

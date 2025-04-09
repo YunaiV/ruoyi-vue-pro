@@ -21,30 +21,28 @@ public interface TemplateService {
     /**
      * 从类路径获取模板并编译
      *
-     * @param path      模板路径，相对于类路径。purchase/order/外币采购合同_英文.docx。
-     * @param configure 模板配置
+     * @param resource      模板路径，相对于类路径。purchase/order/外币采购合同_英文.docx。
      * @return 编译后的模板
      */
-    XWPFTemplate buildXWPDFTemplate(String path, Configure configure);
+    XWPFTemplate buildXWPDFTemplate(Resource resource);
 
     /**
      * 重新编译模板
      *
-     * @param path      模板路径，相对于类路径。purchase/ order/ 外币采购合同_英文. docx。
-     * @param configure 模板配置
+     * @param resource      模板路径，相对于类路径。purchase/ order/ 外币采购合同_英文. docx。
      * @return 编译后的模板
      */
-    XWPFTemplate reBuildXWPDFTemplate(String path, Configure configure);
+    XWPFTemplate reBuildXWPDFTemplate(Resource resource);
 
     //refreshTemplateBytes
-    byte[] refreshTemplateBytes(String path);
+    byte[] refreshTemplateBytes(Resource resource);
 
     /**
      * 从类路径获取模板并编译后的字节数组
      *
-     * @param path 模板路径，相对于类路径
+     * @param resource
      * @return byte[]
      */
-    byte[] getTemplateBytesByPath(String path);
+    byte[] getTemplateBytesByPath(Resource resource);
 
 }

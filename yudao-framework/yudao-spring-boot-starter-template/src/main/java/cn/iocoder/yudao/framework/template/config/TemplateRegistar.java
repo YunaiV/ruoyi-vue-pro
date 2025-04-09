@@ -1,15 +1,23 @@
 package cn.iocoder.yudao.framework.template.config;
 
+import com.deepoove.poi.policy.RenderPolicy;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import lombok.NoArgsConstructor;
+import org.springframework.core.io.Resource;
 
 import java.util.List;
 
 @Data
-@Configuration
-@ConfigurationProperties(prefix = "template")
-public class TemplateProperties {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class TemplateRegistar {
+
+    private String tagName;
+
+    private RenderPolicy policy;
 
     /**
      * 是否启用模板预热
@@ -19,7 +27,7 @@ public class TemplateProperties {
     /**
      * 模板扫描路径（支持多个 classpath 目录）
      */
-    private List<String> scanPath;
+    private List<Resource> resources;
 
     /**
      * 缓存有效期（可选：预留未来用）

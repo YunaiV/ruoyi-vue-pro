@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.template.core.impl;
 
+import cn.iocoder.yudao.framework.template.config.TemplateConfigureFactory;
 import cn.iocoder.yudao.framework.template.core.TemplateService;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
@@ -30,17 +31,19 @@ public class TemplateServiceImpl implements TemplateService {
 
     private TemplateService self;
 
+    private TemplateConfigureFactory configureFactory;
+
     @Override
-    public XWPFTemplate buildXWPDFTemplate(String path, Configure configure) {
-        byte[] templateBytes = self.getTemplateBytesByPath(path);
+    public XWPFTemplate buildXWPDFTemplate(Resource resource) {
+        byte[] templateBytes = self.getTemplateBytesByPath(resource);
         if (templateBytes == null || templateBytes.length == 0) {
-            throw exception(GENERATE_CONTRACT_FAIL, path, "模板内容为空");
+            throw exception(GENERATE_CONTRACT_FAIL, resource.getFilename(), "模板内容为空");
         }
 
         try (InputStream input = new ByteArrayInputStream(templateBytes)) {
-            return XWPFTemplate.compile(input, configure);
+            return XWPFTemplate.compile(input, configureFactory.build());
         } catch (IOException e) {
-            throw exception(GENERATE_CONTRACT_FAIL_PARSE, path, e.getMessage());
+            throw exception(GENERATE_CONTRACT_FAIL_PARSE, resource.getFilename(), e.getMessage());
         }
     }
 
@@ -65,23 +68,22 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public XWPFTemplate reBuildXWPDFTemplate(String path, Configure configure) {
-        byte[] templateBytes = self.refreshTemplateBytes(path);
+    public XWPFTemplate reBuildXWPDFTemplate(Resource resource) {
+        byte[] templateBytes = self.refreshTemplateBytes(resource);
         if (templateBytes == null || templateBytes.length == 0) {
-            throw exception(GENERATE_CONTRACT_FAIL, path, "模板内容为空");
+            throw exception(GENERATE_CONTRACT_FAIL, resource.getFilename(), "模板内容为空");
         }
 
         try (InputStream input = new ByteArrayInputStream(templateBytes)) {
-            return XWPFTemplate.compile(input, configure);
+            return XWPFTemplate.compile(input, configureFactory.build());
         } catch (IOException e) {
-            throw exception(GENERATE_CONTRACT_FAIL_PARSE, path, e.getMessage());
+            throw exception(GENERATE_CONTRACT_FAIL_PARSE, resource.getFilename(), e.getMessage());
         }
     }
 
     @Override
-    @Cacheable(cacheNames = REDIS_KEY_PREFIX, key = "#path", unless = "#result == null")
-    public byte[] getTemplateBytesByPath(String path) {
-        Resource resource = resourcePatternResolver.getResource("classpath:" + path);
+    @Cacheable(cacheNames = REDIS_KEY_PREFIX, key = "#resource", unless = "#result == null")
+    public byte[] getTemplateBytesByPath(Resource resource) {
         return getTemplateBytesFromResource(resource);
     }
 
@@ -91,10 +93,9 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    @CachePut(cacheNames = REDIS_KEY_PREFIX, key = "#path", unless = "#result == null")
-    public byte[] refreshTemplateBytes(String path) {
-        log.debug("重新模板预热: {}", path);
-        Resource resource = resourcePatternResolver.getResource("classpath:" + path);
+    @CachePut(cacheNames = REDIS_KEY_PREFIX, key = "#resource", unless = "#result == null")
+    public byte[] refreshTemplateBytes(Resource resource) {
+        log.debug("重新模板预热: {}", resource.getFilename());
         return getTemplateBytesFromResource(resource);
     }
 }
