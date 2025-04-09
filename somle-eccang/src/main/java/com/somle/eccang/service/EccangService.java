@@ -10,10 +10,7 @@ import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import com.somle.eccang.model.*;
 import com.somle.eccang.model.EccangResponse.EccangPage;
 import com.somle.eccang.model.exception.EccangResponseException;
-import com.somle.eccang.model.req.EccangInventoryBatchReqVO;
-import com.somle.eccang.model.req.EccangReceivingDetailReqVO;
-import com.somle.eccang.model.req.EccangReceivingReqVo;
-import com.somle.eccang.model.req.EccangRmaReturnReqVO;
+import com.somle.eccang.model.req.*;
 import com.somle.eccang.repository.EccangTokenRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
@@ -460,6 +457,14 @@ public class EccangService {
     public Stream<EccangPage> streamReceivingDetail(EccangReceivingDetailReqVO eccangReceivingDetailReqVO) {
         String endpoint = "getReceivingDetailList";
         return getAllPage(JsonUtilsX.toJSONObject(eccangReceivingDetailReqVO), endpoint);
+    }
+
+    /**
+     * @Description: 头程管理-获取FBA发货管理数据（待发货）
+     */
+    public Stream<EccangPage> streamDeliverBatch(EccangDeliverBatchReqVO eccangDeliverBatchReqVO) {
+        String endpoint = "getDeliverBatch";
+        return getAllPage(JsonUtilsX.toJSONObject(eccangDeliverBatchReqVO), endpoint);
     }
 
     public String parseCountryCode(String code) {
