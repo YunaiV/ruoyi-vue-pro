@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.inventory.bin;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo.WmsInventoryBinPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo.WmsInventoryBinSaveReqVO;
@@ -8,7 +9,15 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.bin.WmsInventoryBinD
 import cn.iocoder.yudao.module.wms.dal.mysql.inventory.bin.WmsInventoryBinMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
+import java.util.Objects;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_BIN_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_BIN_NOT_EXISTS;
 
 /**
  * 库位盘点 Service 实现类
@@ -22,36 +31,64 @@ public class WmsInventoryBinServiceImpl implements WmsInventoryBinService {
     @Resource
     private WmsInventoryBinMapper inventoryBinMapper;
 
+    /**
+     * @sign : DE344227D83E204E
+     */
     @Override
-    public Long createInventoryBin(WmsInventoryBinSaveReqVO createReqVO) {
+    public WmsInventoryBinDO createInventoryBin(WmsInventoryBinSaveReqVO createReqVO) {
+        if (inventoryBinMapper.getByUkProductId(createReqVO.getInventoryId(), createReqVO.getBinId(), createReqVO.getProductId()) != null) {
+            throw exception(INVENTORY_BIN_EXISTS);
+        }
         // 插入
         WmsInventoryBinDO inventoryBin = BeanUtils.toBean(createReqVO, WmsInventoryBinDO.class);
         inventoryBinMapper.insert(inventoryBin);
         // 返回
-        return inventoryBin.getId();
+        return inventoryBin;
     }
 
+    /**
+     * @sign : 62E245F5DCE7AB97
+     */
     @Override
-    public void updateInventoryBin(WmsInventoryBinSaveReqVO updateReqVO) {
+    public WmsInventoryBinDO updateInventoryBin(WmsInventoryBinSaveReqVO updateReqVO) {
         // 校验存在
-        validateInventoryBinExists(updateReqVO.getId());
+        WmsInventoryBinDO exists = validateInventoryBinExists(updateReqVO.getId());
+        if (!Objects.equals(updateReqVO.getId(), exists.getId()) && Objects.equals(updateReqVO.getInventoryId(), exists.getInventoryId()) && Objects.equals(updateReqVO.getBinId(), exists.getBinId()) && Objects.equals(updateReqVO.getProductId(), exists.getProductId())) {
+            throw exception(INVENTORY_BIN_EXISTS);
+        }
         // 更新
-        WmsInventoryBinDO updateObj = BeanUtils.toBean(updateReqVO, WmsInventoryBinDO.class);
-        inventoryBinMapper.updateById(updateObj);
+        WmsInventoryBinDO inventoryBin = BeanUtils.toBean(updateReqVO, WmsInventoryBinDO.class);
+        inventoryBinMapper.updateById(inventoryBin);
+        // 返回
+        return inventoryBin;
     }
 
+    /**
+     * @sign : DD7A82091BC08B56
+     */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteInventoryBin(Long id) {
         // 校验存在
-        validateInventoryBinExists(id);
+        WmsInventoryBinDO inventoryBin = validateInventoryBinExists(id);
+        // 唯一索引去重
+        inventoryBin.setInventoryId(inventoryBinMapper.flagUKeyAsLogicDelete(inventoryBin.getInventoryId()));
+        inventoryBin.setBinId(inventoryBinMapper.flagUKeyAsLogicDelete(inventoryBin.getBinId()));
+        inventoryBin.setProductId(inventoryBinMapper.flagUKeyAsLogicDelete(inventoryBin.getProductId()));
+        inventoryBinMapper.updateById(inventoryBin);
         // 删除
         inventoryBinMapper.deleteById(id);
     }
 
-    private void validateInventoryBinExists(Long id) {
-        if (inventoryBinMapper.selectById(id) == null) {
-            //throw exception(INVENTORY_BIN_NOT_EXISTS);
+    /**
+     * @sign : D836A97E979452F4
+     */
+    private WmsInventoryBinDO validateInventoryBinExists(Long id) {
+        WmsInventoryBinDO inventoryBin = inventoryBinMapper.selectById(id);
+        if (inventoryBin == null) {
+            throw exception(INVENTORY_BIN_NOT_EXISTS);
         }
+        return inventoryBin;
     }
 
     @Override
@@ -64,4 +101,18 @@ public class WmsInventoryBinServiceImpl implements WmsInventoryBinService {
         return inventoryBinMapper.selectPage(pageReqVO);
     }
 
+    /**
+     * 按 ID 集合查询 WmsInventoryBinDO
+     */
+    public List<WmsInventoryBinDO> selectByIds(List<Long> idList) {
+        if (CollectionUtils.isEmpty(idList)) {
+            return List.of();
+        }
+        return inventoryBinMapper.selectByIds(idList);
+    }
+
+    @Override
+    public List<WmsInventoryBinDO> selectByInventoryId(Long id) {
+        return List.of();
+    }
 }

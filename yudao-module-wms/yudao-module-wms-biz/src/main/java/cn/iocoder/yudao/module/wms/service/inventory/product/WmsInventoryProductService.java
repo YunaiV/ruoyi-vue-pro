@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.wms.service.inventory.product;
 
-import java.util.*;
-import jakarta.validation.*;
-import cn.iocoder.yudao.module.wms.controller.admin.inventory.product.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.product.WmsInventoryProductDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.module.wms.controller.admin.inventory.product.vo.WmsInventoryProductPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inventory.product.vo.WmsInventoryProductSaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.product.WmsInventoryProductDO;
+import jakarta.validation.Valid;
+
+import java.util.List;
 
 /**
  * 库存盘点产品 Service 接口
@@ -20,14 +21,14 @@ public interface WmsInventoryProductService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createInventoryProduct(@Valid WmsInventoryProductSaveReqVO createReqVO);
+    WmsInventoryProductDO createInventoryProduct(@Valid WmsInventoryProductSaveReqVO createReqVO);
 
     /**
      * 更新库存盘点产品
      *
      * @param updateReqVO 更新信息
      */
-    void updateInventoryProduct(@Valid WmsInventoryProductSaveReqVO updateReqVO);
+    WmsInventoryProductDO updateInventoryProduct(@Valid WmsInventoryProductSaveReqVO updateReqVO);
 
     /**
      * 删除库存盘点产品
@@ -52,4 +53,10 @@ public interface WmsInventoryProductService {
      */
     PageResult<WmsInventoryProductDO> getInventoryProductPage(WmsInventoryProductPageReqVO pageReqVO);
 
+    /**
+     * 按 ID 集合查询 WmsInventoryProductDO
+     */
+    List<WmsInventoryProductDO> selectByIds(List<Long> idList);
+
+    List<WmsInventoryProductDO> selectByInventoryId(Long id);
 }

@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.WmsInventoryDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import java.util.List;
 
 /**
  * 盘点 Service 接口
@@ -20,14 +21,14 @@ public interface WmsInventoryService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createInventory(@Valid WmsInventorySaveReqVO createReqVO);
+    WmsInventoryDO createInventory(@Valid WmsInventorySaveReqVO createReqVO);
 
     /**
      * 更新盘点
      *
      * @param updateReqVO 更新信息
      */
-    void updateInventory(@Valid WmsInventorySaveReqVO updateReqVO);
+    WmsInventoryDO updateInventory(@Valid WmsInventorySaveReqVO updateReqVO);
 
     /**
      * 删除盘点
@@ -52,4 +53,8 @@ public interface WmsInventoryService {
      */
     PageResult<WmsInventoryDO> getInventoryPage(WmsInventoryPageReqVO pageReqVO);
 
+    /**
+     * 按 ID 集合查询 WmsInventoryDO
+     */
+    List<WmsInventoryDO> selectByIds(List<Long> idList);
 }

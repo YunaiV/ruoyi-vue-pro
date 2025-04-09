@@ -5,6 +5,9 @@ import lombok.*;
 import java.util.*;
 import jakarta.validation.constraints.*;
 
+/**
+ * @table-fields : notes,actual_qty,expected_qty,inventory_id,product_id,id
+ */
 @Schema(description = "管理后台 - 库存盘点产品新增/修改 Request VO")
 @Data
 public class WmsInventoryProductSaveReqVO {
@@ -21,14 +24,13 @@ public class WmsInventoryProductSaveReqVO {
     private Long productId;
 
     @Schema(description = "预期库存，产品总可用库存", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "预期库存，产品总可用库存不能为空")
+    @NotNull(message = "预期库存不能为空")
     private Integer expectedQty;
 
     @Schema(description = "实际库存，实盘数量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "实际库存，实盘数量不能为空")
+    @NotNull(message = "实际库存不能为空")
     private Integer actualQty;
 
     @Schema(description = "备注")
     private String notes;
-
 }

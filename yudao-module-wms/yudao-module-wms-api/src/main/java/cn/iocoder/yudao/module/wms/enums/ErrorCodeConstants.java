@@ -193,6 +193,31 @@ public interface ErrorCodeConstants {
     ErrorCode STOCK_OWNERSHIP_MOVE_ITEM_EXISTS = new ErrorCode(2_001_019_007, "所有者库存移动详情已存在");
     ErrorCode STOCK_OWNERSHIP_MOVE_QUANTITY_ERROR = new ErrorCode(2_001_019_008, "所有者库存移动数量错误");
 
+    // ========== WMS_INVENTORY 盘点表 2_001_020_000 ==========
+    ErrorCode INVENTORY_NOT_EXISTS = new ErrorCode(2_001_020_001, "盘点不存在");
+    ErrorCode INVENTORY_EXISTS = new ErrorCode(2_001_020_002, "盘点已存在");
+    ErrorCode INVENTORY_NO_DUPLICATE = new ErrorCode(2_001_020_003, "单据号已存在");
+    ErrorCode INVENTORY_BE_REFERRED = new ErrorCode(2_001_020_004, "盘点被引用");
+    ErrorCode INVENTORY_NO_OUT_OF_BOUNDS = new ErrorCode(2_001_020_005, "盘点单据号越界");
+    ErrorCode INVENTORY_CAN_NOT_EDIT = new ErrorCode(2_001_020_006, "盘点不允许编辑");
+    ErrorCode INVENTORY_CAN_NOT_DELETE = new ErrorCode(2_001_020_007, "盘点不允许删除");
+    ErrorCode INVENTORY_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_020_008, "盘点不符合审批条件");
 
+    // ========== WMS_INVENTORY_PRODUCT 库存盘点产品表 2_001_021_000 ==========
+    ErrorCode INVENTORY_PRODUCT_NOT_EXISTS = new ErrorCode(2_001_021_001, "库存盘点产品不存在");
+    ErrorCode INVENTORY_PRODUCT_EXISTS = new ErrorCode(2_001_021_002, "库存盘点产品已存在");
+    ErrorCode INVENTORY_PRODUCT_INVENTORY_ID_PRODUCT_ID_DUPLICATE = new ErrorCode(2_001_021_003, "盘点结果单ID,产品ID已存在");
+    ErrorCode INVENTORY_PRODUCT_BE_REFERRED = new ErrorCode(2_001_021_004, "库存盘点产品被引用");
+    ErrorCode INVENTORY_PRODUCT_CAN_NOT_EDIT = new ErrorCode(2_001_021_005, "库存盘点产品不允许编辑");
+    ErrorCode INVENTORY_PRODUCT_CAN_NOT_DELETE = new ErrorCode(2_001_021_006, "库存盘点产品不允许删除");
+    ErrorCode INVENTORY_PRODUCT_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_021_007, "库存盘点产品不符合审批条件");
 
-}
+    // ========== WMS_INVENTORY_BIN 库位盘点表 2_001_022_000 ==========
+    ErrorCode INVENTORY_BIN_NOT_EXISTS = new ErrorCode(2_001_022_001, "库位盘点不存在");
+    ErrorCode INVENTORY_BIN_EXISTS = new ErrorCode(2_001_022_002, "库位盘点已存在");
+    ErrorCode INVENTORY_BIN_INVENTORY_ID_BIN_ID_PRODUCT_ID_DUPLICATE = new ErrorCode(2_001_022_003, "盘点结果单ID,仓位ID,产品ID已存在");
+    ErrorCode INVENTORY_BIN_BE_REFERRED = new ErrorCode(2_001_022_004, "库位盘点被引用");
+    ErrorCode INVENTORY_BIN_CAN_NOT_EDIT = new ErrorCode(2_001_022_005, "库位盘点不允许编辑");
+    ErrorCode INVENTORY_BIN_CAN_NOT_DELETE = new ErrorCode(2_001_022_006, "库位盘点不允许删除");
+    ErrorCode INVENTORY_BIN_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_022_007, "库位盘点不符合审批条件");
+}

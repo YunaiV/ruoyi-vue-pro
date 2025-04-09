@@ -9,11 +9,12 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
  * 库位盘点 DO
- *
  * @author 李方捷
+ * @table-fields : notes,actual_quantity,bin_id,expected_qty,inventory_id,product_id,id
  */
 @TableName("wms_inventory_bin")
-@KeySequence("wms_inventory_bin_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+// 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@KeySequence("wms_inventory_bin_seq")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -27,25 +28,34 @@ public class WmsInventoryBinDO extends BaseDO {
      */
     @TableId
     private Long id;
+
     /**
      * 盘点结果单ID
      */
     private Long inventoryId;
+
     /**
      * 产品ID
      */
     private Long productId;
+
     /**
      * 预期库存，仓位可用库存
      */
     private Integer expectedQty;
+
     /**
      * 实际库存，实盘数量
      */
     private Integer actualQuantity;
+
     /**
      * 备注
      */
     private String notes;
 
+    /**
+     * 仓位ID
+     */
+    private Long binId;
 }
