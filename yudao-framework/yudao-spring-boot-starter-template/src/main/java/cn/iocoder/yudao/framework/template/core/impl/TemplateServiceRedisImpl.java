@@ -6,6 +6,7 @@ import com.deepoove.poi.config.Configure;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,6 +20,7 @@ import static cn.iocoder.yudao.framework.common.enums.ErrorCodeConstants.GENERAT
 import static cn.iocoder.yudao.framework.common.enums.ErrorCodeConstants.GENERATE_CONTRACT_FAIL_PARSE;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
+@Primary
 @Slf4j
 @Getter
 @Setter
@@ -29,7 +31,6 @@ public class TemplateServiceRedisImpl implements TemplateService {
 
     private ResourcePatternResolver resourcePatternResolver;
     private RedisTemplate<String, byte[]> redisTemplate;
-    private TemplateService self;
 
     public static byte[] getTemplateBytesFromResource(Resource resource) {
         if (resource == null) {

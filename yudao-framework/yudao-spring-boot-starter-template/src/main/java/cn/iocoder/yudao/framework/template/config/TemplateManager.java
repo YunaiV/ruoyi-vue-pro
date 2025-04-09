@@ -39,7 +39,7 @@ public class TemplateManager {
 
     @EventListener(ApplicationReadyEvent.class)
     public void preloadTemplatesOnStartup() {
-        log.debug("开始执行模板预热任务...");
+        log.info("启动模板预热任务...");
         preloadWordAndPdfTemplates();
     }
 
@@ -59,7 +59,7 @@ public class TemplateManager {
                     for (Resource resource : resources) {
                         String classpathPath = path + resource.getFilename();
                         preloadSingleWordTemplate(classpathPath, configure);
-                        preloadSinglePdfTemplate(resource, extractFileNameFromPath(classpathPath));
+                        preloadSinglePdfTemplate(resource, resource.getFilename());
                     }
                 } catch (IOException e) {
                     log.warn("模板加载失败 [{}]", path, e);
@@ -99,8 +99,4 @@ public class TemplateManager {
         }
     }
 
-    private String extractFileNameFromPath(String path) {
-        int index = path.lastIndexOf('/');
-        return index != -1 ? path.substring(index + 1) : path;
-    }
 }

@@ -20,7 +20,7 @@ public class TemplateAutoConfiguration {
     public TemplateService templateService(ResourcePatternResolver resolver, RedisTemplate<String, byte[]> byteArrayRedisTemplate) {
         TemplateServiceRedisImpl service = new TemplateServiceRedisImpl();
         service.setResourcePatternResolver(resolver);
-        service.setSelf(service); // 注入代理对象
+        //        service.setSelf(service); // 注入代理对象
         service.setRedisTemplate(byteArrayRedisTemplate);
         return service;
     }
