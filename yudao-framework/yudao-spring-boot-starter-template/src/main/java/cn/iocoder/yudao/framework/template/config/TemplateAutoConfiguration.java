@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.framework.template.config;
 
 import cn.iocoder.yudao.framework.template.core.TemplateService;
-import cn.iocoder.yudao.framework.template.core.impl.TemplateServiceImpl;
+import cn.iocoder.yudao.framework.template.core.impl.TemplateServiceRedisImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.data.redis.core.RedisTemplate;
 
 @AutoConfiguration
 @EnableConfigurationProperties(TemplateProperties.class)
@@ -16,10 +17,11 @@ public class TemplateAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public TemplateService templateService(ResourcePatternResolver resolver) {
-        TemplateServiceImpl service = new TemplateServiceImpl();
+    public TemplateService templateService(ResourcePatternResolver resolver, RedisTemplate<String, byte[]> byteArrayRedisTemplate) {
+        TemplateServiceRedisImpl service = new TemplateServiceRedisImpl();
         service.setResourcePatternResolver(resolver);
         service.setSelf(service); // 注入代理对象
+        service.setRedisTemplate(byteArrayRedisTemplate);
         return service;
     }
 

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.framework.template.config;
+package cn.iocoder.yudao.module.srm.config.purchase;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -8,21 +8,16 @@ import java.util.List;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "template")
-public class TemplateProperties {
+@ConfigurationProperties(prefix = "srm")
+public class PurchaseProperties {
 
     /**
      * 是否启用模板预热
      */
-    private boolean enablePreload;
+    private boolean enablePreload = false;
 
     /**
      * 模板扫描路径（支持多个 classpath 目录）
      */
     private List<String> scanPath;
-
-    /**
-     * 缓存有效期（可选：预留未来用）
-     */
-    private Long cacheTtlSeconds = 86400L; //一天
 }

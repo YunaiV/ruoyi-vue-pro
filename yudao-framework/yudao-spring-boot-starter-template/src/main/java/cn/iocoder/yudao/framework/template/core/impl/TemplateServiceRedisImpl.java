@@ -6,45 +6,30 @@ import com.deepoove.poi.config.Configure;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
 
 import static cn.iocoder.yudao.framework.common.enums.ErrorCodeConstants.GENERATE_CONTRACT_FAIL;
 import static cn.iocoder.yudao.framework.common.enums.ErrorCodeConstants.GENERATE_CONTRACT_FAIL_PARSE;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
-@Primary
 @Slf4j
 @Getter
 @Setter
-public class TemplateServiceImpl implements TemplateService {
+public class TemplateServiceRedisImpl implements TemplateService {
 
-    private static final String REDIS_KEY_PREFIX = "common:template";
+    private static final String REDIS_KEY_PREFIX = "common:template:";
+    private static final Duration CACHE_TTL = Duration.ofDays(1);
 
     private ResourcePatternResolver resourcePatternResolver;
-
+    private RedisTemplate<String, byte[]> redisTemplate;
     private TemplateService self;
-
-    @Override
-    public XWPFTemplate buildXWPDFTemplate(String path, Configure configure) {
-        byte[] templateBytes = self.getTemplateBytesByPath(path);
-        if (templateBytes == null || templateBytes.length == 0) {
-            throw exception(GENERATE_CONTRACT_FAIL, path, "模板内容为空");
-        }
-
-        try (InputStream input = new ByteArrayInputStream(templateBytes)) {
-            return XWPFTemplate.compile(input, configure);
-        } catch (IOException e) {
-            throw exception(GENERATE_CONTRACT_FAIL_PARSE, path, e.getMessage());
-        }
-    }
 
     public static byte[] getTemplateBytesFromResource(Resource resource) {
         if (resource == null) {
@@ -67,8 +52,8 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public XWPFTemplate reBuildXWPDFTemplate(String path, Configure configure) {
-        byte[] templateBytes = self.refreshTemplateBytes(path);
+    public XWPFTemplate buildXWPDFTemplate(String path, Configure configure) {
+        byte[] templateBytes = getTemplateBytesByPath(path);
         if (templateBytes == null || templateBytes.length == 0) {
             throw exception(GENERATE_CONTRACT_FAIL, path, "模板内容为空");
         }
@@ -81,23 +66,43 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    @Cacheable(cacheNames = REDIS_KEY_PREFIX, key = "#path", unless = "#result == null")
+    public XWPFTemplate reBuildXWPDFTemplate(String path, Configure configure) {
+        refreshTemplateBytes(path);
+        return buildXWPDFTemplate(path, configure);
+    }
+
+    @Override
     public byte[] getTemplateBytesByPath(String path) {
+        String redisKey = REDIS_KEY_PREFIX + path;
+        byte[] bytes = redisTemplate.opsForValue().get(redisKey);
+
+        if (bytes != null && bytes.length > 0) {
+            redisTemplate.expire(redisKey, CACHE_TTL);
+            log.debug("模板缓存命中并续期 [{}]", path);
+            return bytes;
+        }
+
+        log.debug("模板缓存未命中，加载并缓存 [{}]", path);
         Resource resource = resourcePatternResolver.getResource("classpath:" + path);
-        return getTemplateBytesFromResource(resource);
+        bytes = getTemplateBytesFromResource(resource);
+        if (bytes.length > 0) {
+            redisTemplate.opsForValue().set(redisKey, bytes, CACHE_TTL);
+        }
+        return bytes;
+    }
+
+    @Override
+    public byte[] refreshTemplateBytes(String path) {
+        String redisKey = REDIS_KEY_PREFIX + path;
+        Resource resource = resourcePatternResolver.getResource("classpath:" + path);
+        byte[] bytes = getTemplateBytesFromResource(resource);
+        redisTemplate.opsForValue().set(redisKey, bytes, CACHE_TTL);
+        log.debug("模板缓存已刷新 [{}]", path);
+        return bytes;
     }
 
     @Override
     public byte[] getTemplateBytes(Resource resource) {
         return getTemplateBytesFromResource(resource);
     }
-
-    @Override
-    @CachePut(cacheNames = REDIS_KEY_PREFIX, key = "#path", unless = "#result == null")
-    public byte[] refreshTemplateBytes(String path) {
-        log.debug("重新模板预热: {}", path);
-        Resource resource = resourcePatternResolver.getResource("classpath:" + path);
-        return getTemplateBytesFromResource(resource);
-    }
 }
-

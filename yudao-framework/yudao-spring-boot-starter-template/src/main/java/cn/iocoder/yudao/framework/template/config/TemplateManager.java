@@ -20,8 +20,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Configuration
@@ -41,50 +39,33 @@ public class TemplateManager {
 
     @EventListener(ApplicationReadyEvent.class)
     public void preloadTemplatesOnStartup() {
-        log.info("开始执行模板预热任务...");
-        preloadTemplatesAsync();
+        log.debug("开始执行模板预热任务...");
+        preloadWordAndPdfTemplates();
     }
 
     @Async
-    public void preloadTemplatesAsync() {
-        try {
-            List<String> classpathPaths = loadAllClasspathDocxPaths(templateProperties.getScanPath());
-            if (classpathPaths.isEmpty()) {
-                log.warn("未找到任何模板文件，请检查配置 template.scan-path");
-                return;
-            }
-
-            log.info("共检测到 {} 个模板文件", classpathPaths.size());
-            preloadWordAndPdfTemplates(classpathPaths);
-
-        } catch (IOException e) {
-            log.error("模板文件夹扫描失败", e);
-        } catch (Throwable t) {
-            log.error("模板预热任务执行异常", t);
-        }
-    }
-
-    private List<String> loadAllClasspathDocxPaths(List<String> scanPaths) throws IOException {
-        List<String> result = new ArrayList<>();
-        for (String basePath : scanPaths) {
-            Resource[] resources = resourcePatternResolver.getResources("classpath:" + basePath + "*.docx");
-            for (Resource resource : resources) {
-                result.add(basePath + resource.getFilename()); // classpath 相对路径
-            }
-        }
-        return result;
-    }
-
-    private void preloadWordAndPdfTemplates(List<String> classpathPaths) {
+    public void preloadWordAndPdfTemplates() {
         long start = System.currentTimeMillis();
         var configure = configureFactory.build();
 
-        for (String classpathPath : classpathPaths) {
-            preloadSingleWordTemplate(classpathPath, configure);
+        configureFactory.getRegistrars().forEach(registrar -> {
+            if (!registrar.enablePreload()) {
+                return;
+            }
 
-            Resource resource = resourcePatternResolver.getResource("classpath:" + classpathPath);
-            preloadSinglePdfTemplate(resource, extractFileNameFromPath(classpathPath));
-        }
+            for (String path : registrar.scanPath()) {
+                try {
+                    Resource[] resources = resourcePatternResolver.getResources("classpath:" + path + "*.docx");
+                    for (Resource resource : resources) {
+                        String classpathPath = path + resource.getFilename();
+                        preloadSingleWordTemplate(classpathPath, configure);
+                        preloadSinglePdfTemplate(resource, extractFileNameFromPath(classpathPath));
+                    }
+                } catch (IOException e) {
+                    log.warn("模板加载失败 [{}]", path, e);
+                }
+            }
+        });
 
         log.info("全部模板预热完成，耗时 {}ms", System.currentTimeMillis() - start);
     }

@@ -1,11 +1,9 @@
 package cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.req;
 
-import cn.hutool.core.date.DatePattern;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -29,7 +27,6 @@ public class SrmPurchaseOrderGenerateContractReqVO {
     //订立日期
     @Schema(description = "订立日期", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "订立日期不能为空")
-    @DateTimeFormat(pattern = DatePattern.NORM_DATE_PATTERN)
     private LocalDateTime signingDate;
 
     //甲方乙方

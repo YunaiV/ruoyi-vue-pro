@@ -46,11 +46,5 @@ public interface TemplateService {
      * @return byte[]
      */
     byte[] getTemplateBytesByPath(String path);
-    //    /**
-    //     * 从类路径获取模板并编译
-    //     * @param path 模板路径，相对于类路径
-    //     * @return 编译后的模板(默认策略)
-    //     */
-    //     XWPFTemplate buildXWPDFTemplate(String path);
 
 }

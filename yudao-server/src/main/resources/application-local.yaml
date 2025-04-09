@@ -6,11 +6,13 @@ kingdee:
 
 debug: false
 
---- #################### 数据库相关配置 ####################
 template:
-  enable-preload: true
-  scan-path:
+  enable-preload: true # word预热总开关
+srm:
+  enablePreload: true
+  scanPath:
     - purchase/order/
+--- #################### 数据库相关配置 ####################
 
 spring:
   autoconfigure:
@@ -173,6 +175,8 @@ logging:
         yudao:
           module:
             srm: debug
+          framework:
+            template: debug
     root: info
 
 
