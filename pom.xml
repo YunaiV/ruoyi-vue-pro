@@ -49,6 +49,7 @@
         <module>somle-otto</module>
         <module>somle-bestbuy</module>
         <module>somle-cdiscount</module>
+        <module>somle-home24</module>
 <!--        <module>yudao-module-iot</module>-->
         <module>somle-autonomous</module>
     </modules>
