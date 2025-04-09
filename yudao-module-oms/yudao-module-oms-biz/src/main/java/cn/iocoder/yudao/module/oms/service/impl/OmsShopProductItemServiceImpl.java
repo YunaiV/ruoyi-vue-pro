@@ -31,10 +31,8 @@ public class OmsShopProductItemServiceImpl implements OmsShopProductItemService 
 
     @Override
     public Long createShopProductItem(OmsShopProductItemSaveReqVO createReqVO) {
-        // 插入
         OmsShopProductItemDO shopProductItem = BeanUtils.toBean(createReqVO, OmsShopProductItemDO.class);
         shopProductItemMapper.insert(shopProductItem);
-        // 返回
         return shopProductItem.getId();
     }
 

@@ -26,7 +26,7 @@ public interface OmsShopProductMapper extends BaseMapperX<OmsShopProductDO> {
             .eqIfPresent(OmsShopProductDO::getShopId, reqVO.getShopId())
             .eqIfPresent(OmsShopProductDO::getDeptId, reqVO.getDeptId())
             .orderByDesc(OmsShopProductDO::getId)
-            .innerJoin(OmsShopDO.class, OmsShopDO::getId, OmsShopProductDO::getShopId)  // 连接店铺表
+            .leftJoin(OmsShopDO.class, OmsShopDO::getId, OmsShopProductDO::getShopId)  // 连接店铺表
             .likeIfExists(OmsShopDO::getPlatformCode, reqVO.getPlatformCode())
             .likeIfExists(OmsShopDO::getName, reqVO.getShopName());
     }

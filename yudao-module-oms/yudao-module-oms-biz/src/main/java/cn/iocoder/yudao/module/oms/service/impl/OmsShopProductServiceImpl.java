@@ -47,7 +47,7 @@ import static cn.iocoder.yudao.module.oms.api.enums.OmsErrorCodeConstants.OMS_SY
 @Service
 @Slf4j
 public class OmsShopProductServiceImpl extends ServiceImpl<OmsShopProductMapper, OmsShopProductDO> implements OmsShopProductService {
-    private final String CREATOR = "SYNC";
+    private final String CREATOR = "Admin";
 
     //    @Resource
 //    MessageChannel eccangSkuRelationOutputChannel;
@@ -163,7 +163,7 @@ public class OmsShopProductServiceImpl extends ServiceImpl<OmsShopProductMapper,
     @Transactional
     @Override
     public Long createShopProductWithItems(OmsShopProductSaveReqVO createReqVO) {
-        Long id = this.createShopProduct(createReqVO);
+        Long id = createShopProduct(createReqVO);
         createReqVO.setId(id);
         updateShopProductWithItems(createReqVO);
 //        sendToEccang(createReqVO.getId());
