@@ -106,7 +106,7 @@ public class SrmPurchaseRequestController {
     @PutMapping("/submitAudit")
     @Operation(summary = "提交审核")
     @Parameter(name = "ids", description = "申请单编号数组", required = true)
-    @PreAuthorize("@ss.hasPermission('srm:purchase-request:submitAudit')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-request:submit-audit')")
     public CommonResult<Boolean> submitAudit(@NotNull @RequestBody Collection<Long> ids) {
         srmPurchaseRequestService.submitAudit(ids);
         return success(true);

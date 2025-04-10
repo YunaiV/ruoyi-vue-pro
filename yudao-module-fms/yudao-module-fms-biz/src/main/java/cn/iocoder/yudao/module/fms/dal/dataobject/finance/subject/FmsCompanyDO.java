@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * Erp财务主体 DO
+ * Fms财务公司 DO
  *
  * @author 王岽宇
  */

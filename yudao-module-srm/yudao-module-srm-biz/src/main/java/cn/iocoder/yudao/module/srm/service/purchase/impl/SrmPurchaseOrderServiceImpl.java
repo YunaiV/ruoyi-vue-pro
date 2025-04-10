@@ -12,8 +12,8 @@ import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductUnitApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.fms.api.finance.FmsAccountApi;
-import cn.iocoder.yudao.module.fms.api.finance.FmsFinanceSubjectApi;
-import cn.iocoder.yudao.module.fms.api.finance.dto.FmsFinanceSubjectDTO;
+import cn.iocoder.yudao.module.fms.api.finance.FmsCompanyApi;
+import cn.iocoder.yudao.module.fms.api.finance.dto.FmsCompanyDTO;
 import cn.iocoder.yudao.module.srm.api.purchase.SrmInCountDTO;
 import cn.iocoder.yudao.module.srm.api.purchase.SrmOrderCountDTO;
 import cn.iocoder.yudao.module.srm.api.purchase.SrmPayCountDTO;
@@ -91,7 +91,7 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
     private final FmsAccountApi erpAccountApi;
     private final ErpProductApi erpProductApi;
     private final ErpProductUnitApi erpProductUnitApi;
-    private final FmsFinanceSubjectApi erpFinanceSubjectApi;
+    private final FmsCompanyApi erpCompanyApi;
     private final ResourcePatternResolver resourcePatternResolver;
     private final TemplateService templateService;
     private final String SOURCE = "WEB录入";
@@ -720,8 +720,8 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
         try (XWPFTemplate xwpfTemplate = templateService.buildXWPDFTemplate(resource)) {
             //2 模板word渲染数据
             List<SrmPurchaseOrderItemDO> itemDOS = purchaseOrderItemMapper.selectListByOrderId(orderDO.getId());
-            Map<Long, FmsFinanceSubjectDTO> dtoMap =
-                convertMap(erpFinanceSubjectApi.validateFinanceSubject(List.of(reqVO.getPartyAId(), reqVO.getPartyBId())), FmsFinanceSubjectDTO::getId);
+            Map<Long, FmsCompanyDTO> dtoMap =
+                convertMap(erpCompanyApi.validateCompany(List.of(reqVO.getPartyAId(), reqVO.getPartyBId())), FmsCompanyDTO::getId);
             SrmPurchaseOrderWordBO wordBO = SrmOrderConvert.INSTANCE.bindDataFormOrderItemDO(itemDOS, orderDO, reqVO, dtoMap);
             xwpfTemplate.render(wordBO);
             //3 转换pdf，返回响应

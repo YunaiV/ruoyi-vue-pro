@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.fms.api.finance.dto;
 import lombok.Data;
 
 @Data
-public class FmsFinanceSubjectDTO {
+public class FmsCompanyDTO {
 
     /**
      * 编号

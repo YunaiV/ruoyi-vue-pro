@@ -9,10 +9,10 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "管理后台 - Erp财务主体 Response VO")
+@Schema(description = "管理后台 - Fms财务公司 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class FmsFinanceSubjectRespVO {
+public class FmsCompanyRespVO {
 
     @Schema(description = "id")
     @ExcelProperty("编号")
