@@ -27,7 +27,7 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
  * @description: 出库执行器
  */
 @Slf4j
-public abstract class OutboundExecutor extends ActionExecutor<OutboundContext> {
+public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext> {
 
     @Resource
     protected WmsOutboundService outboundService;

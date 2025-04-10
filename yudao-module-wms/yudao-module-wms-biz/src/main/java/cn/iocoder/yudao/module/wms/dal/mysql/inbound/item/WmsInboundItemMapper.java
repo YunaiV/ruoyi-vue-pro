@@ -1,16 +1,14 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.inbound.item;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemPageReqVO;
-import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsPickupPendingPageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemQueryDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
 import org.apache.ibatis.annotations.Mapper;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -52,4 +50,32 @@ public interface WmsInboundItemMapper extends BaseMapperX<WmsInboundItemDO> {
         query.eq(WmsInboundDO::getWarehouseId, warehouseId).eq(WmsInboundItemDO::getProductId, productId).gt(WmsInboundItemDO::getOutboundAvailableQty, 0).last("ORDER BY DATEDIFF(t1.inbound_time, now())+t1.init_age desc");
         return selectList(query);
     }
-}
+
+
+
+//    default PageResult<WmsInboundItemOwnershipDO> selectInboundItemOwnershipList(Long productId) {
+//
+//
+//        MPJLambdaWrapperX<WmsInboundItemOwnershipDO> wrapper = new MPJLambdaWrapperX();
+//        //
+//        wrapper.selectAll(WmsInboundItemDO.class);
+//        wrapper.select(WmsInboundDO::getWarehouseId);
+//        wrapper.select(WmsPickupItemDO::getBinId);
+//        wrapper.select(AGE_EXPR+" as age");
+//
+//        //
+//        wrapper.innerJoin(WmsInboundDO.class,WmsInboundDO::getId, WmsInboundItemQueryDO::getInboundId);
+//
+//
+//
+//        PageResult<WmsInboundItemOwnershipDO> pageResult =selectPage(new PageParam(),wrapper);
+//
+//        List<WmsInboundItemOwnershipDO> list= selectList(wrapper);
+//
+//        return selectPage(new PageParam(), wrapper);
+//
+//
+//
+//    }
+
+}

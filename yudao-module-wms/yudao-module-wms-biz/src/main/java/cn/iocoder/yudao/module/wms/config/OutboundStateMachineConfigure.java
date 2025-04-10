@@ -21,7 +21,7 @@ public class OutboundStateMachineConfigure {
     /**
      * 状态机名称
      **/
-    public static final String STATE_MACHINE_NAME = "outboundActionStateMachine";
+    public static final String STATE_MACHINE_NAME = "outboundStateMachine";
     /**
      * 创建与配置状态机
      **/

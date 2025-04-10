@@ -8,14 +8,12 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
-
 import java.time.LocalDateTime;
 import java.util.List;
-
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,no,creator,inbound_status,company_id,inbound_time,create_time,arrival_actual_time,audit_status,creator_comment,type,source_bill_id,trace_no,updater,update_time,init_age,source_bill_no,shipping_method,source_bill_type,id,warehouse_id,arrival_plan_time
+ * @table-fields : tenant_id,no,creator,inbound_status,company_id,inbound_time,create_time,arrival_actual_time,audit_status,creator_comment,type,source_bill_id,trace_no,updater,update_time,init_age,source_bill_no,shipping_method,source_bill_type,id,dept_id,warehouse_id,arrival_plan_time
  */
 @Schema(description = "管理后台 - 入库单 Response VO")
 @Data
@@ -30,8 +28,8 @@ public class WmsInboundRespVO {
     @ExcelProperty("单据号")
     private String no;
 
-    @Schema(description = "入库单类型 ; WmsInboundType : 1-手工入库 , 2-采购入库", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @ExcelProperty("入库单类型")
+    @Schema(description = "WMS入库单类型 ; WmsInboundType : 1-手工入库 , 2-采购入库", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @ExcelProperty("WMS入库单类型")
     private Integer type;
 
     @Schema(description = "仓库ID", example = "23620")
@@ -46,16 +44,16 @@ public class WmsInboundRespVO {
     @ExcelProperty("来源单据号")
     private String sourceBillNo;
 
-    @Schema(description = "来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单", example = "2")
-    @ExcelProperty("来源单据类型")
+    @Schema(description = "WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单", example = "2")
+    @ExcelProperty("WMS来源单据类型")
     private Integer sourceBillType;
 
     @Schema(description = "跟踪号")
     @ExcelProperty("跟踪号")
     private String traceNo;
 
-    @Schema(description = "运输方式 ; WmsShippingMethod : 0-海运 , 1-铁路 , 2-空运 , 3-集卡")
-    @ExcelProperty("运输方式")
+    @Schema(description = "WMS运输方式 ; WmsShippingMethod : 0-海运 , 1-铁路 , 2-空运 , 3-集卡")
+    @ExcelProperty("WMS运输方式")
     private Integer shippingMethod;
 
     @Schema(description = "特别说明，创建方专用")
@@ -99,12 +97,12 @@ public class WmsInboundRespVO {
     @ExcelProperty("详情清单")
     private List<WmsInboundItemRespVO> itemList;
 
-    @Schema(description = "入库单审批状态 ; WmsInboundAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过 , 4-强制完成 , 5-已作废", example = "")
-    @ExcelProperty("入库单审批状态")
+    @Schema(description = "WMS入库单审批状态 ; WmsInboundAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过 , 4-强制完成 , 5-已作废", example = "")
+    @ExcelProperty("WMS入库单审批状态")
     private Integer auditStatus;
 
-    @Schema(description = "入库状态 ; WmsInboundStatus : 0-未入库 , 1-部分入库 , 2-已入库", example = "")
-    @ExcelProperty("入库状态")
+    @Schema(description = "WMS入库状态 ; WmsInboundStatus : 0-未入库 , 1-部分入库 , 2-已入库", example = "")
+    @ExcelProperty("WMS入库状态")
     private Integer inboundStatus;
 
     @Schema(description = "库存财务公司ID", example = "")
@@ -131,4 +129,8 @@ public class WmsInboundRespVO {
 
     @Schema(description = "审批历史", example = "")
     List<WmsApprovalHistoryRespVO> approvalHistoryList;
+
+    @Schema(description = "库存归属部门ID", example = "")
+    @ExcelProperty("库存归属部门ID")
+    private Long deptId;
 }

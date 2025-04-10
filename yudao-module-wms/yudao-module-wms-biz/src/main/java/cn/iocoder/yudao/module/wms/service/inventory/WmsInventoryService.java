@@ -60,4 +60,6 @@ public interface WmsInventoryService {
     List<WmsInventoryDO> selectByIds(List<Long> idList);
 
     void assembleWarehouse(List<WmsInventoryRespVO> list);
+
+    WmsInventoryDO updateOutboundAuditStatus(Long id, Integer status);
 }

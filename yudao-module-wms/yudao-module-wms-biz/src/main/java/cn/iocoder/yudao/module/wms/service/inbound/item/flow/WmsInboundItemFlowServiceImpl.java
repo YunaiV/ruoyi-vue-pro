@@ -16,6 +16,8 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.flow.WmsInboundItemFlowMapper;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
+import java.util.List;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 
 /**
  * 入库单库存详情扣减 Service 实现类
@@ -121,4 +123,14 @@ public class WmsInboundItemFlowServiceImpl implements WmsInboundItemFlowService 
     public List<WmsInboundItemFlowDO> selectByActionId(Long latestOutboundActionId) {
         return inboundItemFlowMapper.selectByOutboundActionId(latestOutboundActionId);
     }
-}
+
+    /**
+     * 按 ID 集合查询 WmsInboundItemFlowDO
+     */
+    public List<WmsInboundItemFlowDO> selectByIds(List<Long> idList) {
+        if (CollectionUtils.isEmpty(idList)) {
+            return List.of();
+        }
+        return inboundItemFlowMapper.selectByIds(idList);
+    }
+}

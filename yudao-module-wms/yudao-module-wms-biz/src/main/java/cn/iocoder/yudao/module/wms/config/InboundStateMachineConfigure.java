@@ -25,7 +25,7 @@ public class InboundStateMachineConfigure {
     /**
      * 状态机名称
      **/
-    public static final String STATE_MACHINE_NAME = "inboundActionStateMachine";
+    public static final String STATE_MACHINE_NAME = "inboundStateMachine";
 
 
     /**

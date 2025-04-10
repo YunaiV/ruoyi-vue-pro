@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.flow.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import java.util.List;
 
 /**
  * 入库单库存详情扣减 Service 接口
@@ -60,4 +61,9 @@ public interface WmsInboundItemFlowService {
     void insert(WmsInboundItemFlowDO flowDO);
 
     List<WmsInboundItemFlowDO> selectByActionId(Long latestOutboundActionId);
+
+    /**
+     * 按 ID 集合查询 WmsInboundItemFlowDO
+     */
+    List<WmsInboundItemFlowDO> selectByIds(List<Long> idList);
 }

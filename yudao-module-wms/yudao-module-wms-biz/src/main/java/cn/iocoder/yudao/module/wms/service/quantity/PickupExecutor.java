@@ -35,7 +35,7 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
  */
 @Slf4j
 @Component
-public class PickupExecutor extends ActionExecutor<PickupContext> {
+public class PickupExecutor extends QuantityExecutor<PickupContext> {
 
 
 
@@ -200,14 +200,27 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
     private void processStockOwnershipItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO, WmsInboundItemRespVO inboundItemVO) {
 
         Long warehouseId = pickup.getWarehouseId();
-        Long productId = inboundItemVO.getProductId();
-        Long companyId = inboundDO.getCompanyId();
         Integer quantity = pickupItemDO.getQty();
-        // 刷新库存
+        Long productId = inboundItemVO.getProductId();
+
+        // 公司ID首先以细行为准，明细行未指定时使用单据中的公司ID
+        Long companyId = inboundItemVO.getCompanyId();
+        if(companyId==null) {
+            companyId = inboundDO.getCompanyId();
+        }
+
+
+        // 部门ID首先考虑明细行，明细行未指定时使用单据中的部门ID
         Long deptId = inboundItemVO.getDeptId();
+        if(deptId==null) {
+            deptId=inboundDO.getDeptId();
+        }
+        // 如果入库单及明细上未指定部门,默认按产品的部门ID
         if (deptId == null) {
             deptId = inboundItemVO.getProduct().getDeptId();
         }
+
+
         // 刷新所有者库存
         // wmsStockOwnershipService.refreshForPickup(pickup.getWarehouseId(), inboundDO.getCompanyId(), deptId,inboundItemVO.getProductId(), pickup.getId(), pickupItemDO.getId(),);
 

@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @Component
-public class InboundExecutor extends ActionExecutor<InboundContext> {
+public class InboundExecutor extends QuantityExecutor<InboundContext> {
 
 
     public InboundExecutor() {
@@ -37,14 +37,23 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
 
         final WmsInboundRespVO inboundRespVO = inboundService.getInboundWithItemList(context.getInboundId());
         Long warehouseId = inboundRespVO.getWarehouseId();
-        Long companyId = inboundRespVO.getCompanyId();
+
 
 
         List<WmsInboundItemRespVO> itemList = inboundRespVO.getItemList();
         for (WmsInboundItemRespVO item : itemList) {
             Long productId = item.getProductId();
+            // 公司ID首先以细行为准，明细行未指定时使用单据中的公司ID
+            Long companyId = item.getCompanyId();
+            if(companyId==null) {
+                companyId=inboundRespVO.getCompanyId();
+            }
+            // 部门ID首先考虑明细行，明细行未指定时使用单据中的部门ID
             Long deptId = item.getDeptId();
-            // 如果入库单上未指定部门,默认按产品的部门ID
+            if(deptId==null) {
+                deptId=inboundRespVO.getDeptId();
+            }
+            // 如果入库单及明细上未指定部门,默认按产品的部门ID
             if (deptId == null) {
                 WmsProductRespSimpleVO productVO = item.getProduct();
                 deptId = productVO.getDeptId();

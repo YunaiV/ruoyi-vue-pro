@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Lazy;
 /**
  * 数量处理执行器
  */
-public abstract class ActionExecutor<T> {
+public abstract class QuantityExecutor<T> {
 
     @Getter
     private WmsStockReason reason;
@@ -43,7 +43,7 @@ public abstract class ActionExecutor<T> {
     protected WmsStockBinService stockBinService;
 
 
-    public ActionExecutor(WmsStockReason reason) {
+    public QuantityExecutor(WmsStockReason reason) {
         this.reason = reason;
     }
 

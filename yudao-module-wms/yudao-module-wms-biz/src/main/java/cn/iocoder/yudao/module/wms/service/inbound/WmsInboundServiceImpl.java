@@ -87,8 +87,6 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     @Lazy
     private WmsInboundItemService inboundItemService;
 
-
-
     @Resource
     private WmsApprovalHistoryService approvalHistoryService;
 
@@ -366,8 +364,6 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         StreamX.from(list).assemble(warehouseVOMap, WmsInboundRespVO::getWarehouseId, WmsInboundRespVO::setWarehouse);
     }
 
-
-
     @Override
     public void assembleCompany(List<WmsInboundRespVO> list) {
         // todo 待东宇财务模块支持
@@ -378,4 +374,4 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         Map<Long, List<WmsApprovalHistoryRespVO>> groupedApprovalHistory = approvalHistoryService.selectGroupedApprovalHistory(WmsBillType.INBOUND, StreamX.from(list).toList(WmsInboundRespVO::getId));
         StreamX.from(list).assemble(groupedApprovalHistory, WmsInboundRespVO::getId, WmsInboundRespVO::setApprovalHistoryList);
     }
-}
+}

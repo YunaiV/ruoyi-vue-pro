@@ -13,7 +13,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : no,inbound_status,company_id,inbound_time,create_time,arrival_actual_time,audit_status,creator_comment,type,source_bill_id,trace_no,init_age,source_bill_no,shipping_method,source_bill_type,warehouse_id,arrival_plan_time
+ * @table-fields : no,inbound_status,company_id,inbound_time,create_time,arrival_actual_time,audit_status,creator_comment,type,source_bill_id,trace_no,init_age,source_bill_no,shipping_method,source_bill_type,dept_id,warehouse_id,arrival_plan_time
  */
 @Schema(description = "管理后台 - 入库单分页 Request VO")
 @Data
@@ -24,7 +24,7 @@ public class WmsInboundPageReqVO extends PageParam {
     @Schema(description = "单据号")
     private String no;
 
-    @Schema(description = "入库单类型 ; WmsInboundType : 1-手工入库 , 2-采购入库", example = "1")
+    @Schema(description = "WMS入库单类型 ; WmsInboundType : 1-手工入库 , 2-采购入库", example = "1")
     private Integer type;
 
     @Schema(description = "仓库ID", example = "23620")
@@ -36,13 +36,13 @@ public class WmsInboundPageReqVO extends PageParam {
     @Schema(description = "来源单据号")
     private String sourceBillNo;
 
-    @Schema(description = "来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单", example = "2")
+    @Schema(description = "WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单", example = "2")
     private Integer sourceBillType;
 
     @Schema(description = "跟踪号")
     private String traceNo;
 
-    @Schema(description = "运输方式 ; WmsShippingMethod : 0-海运 , 1-铁路 , 2-空运 , 3-集卡")
+    @Schema(description = "WMS运输方式 ; WmsShippingMethod : 0-海运 , 1-铁路 , 2-空运 , 3-集卡")
     private Integer shippingMethod;
 
     @Schema(description = "特别说明，创建方专用")
@@ -55,10 +55,10 @@ public class WmsInboundPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
-    @Schema(description = "入库单审批状态 ; WmsInboundAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过 , 4-强制完成 , 5-已作废", example = "")
+    @Schema(description = "WMS入库单审批状态 ; WmsInboundAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过 , 4-强制完成 , 5-已作废", example = "")
     private Integer auditStatus;
 
-    @Schema(description = "入库状态 ; WmsInboundStatus : 0-未入库 , 1-部分入库 , 2-已入库", example = "")
+    @Schema(description = "WMS入库状态 ; WmsInboundStatus : 0-未入库 , 1-部分入库 , 2-已入库", example = "")
     private Integer inboundStatus;
 
     @Schema(description = "库存财务公司ID", example = "")
@@ -75,4 +75,7 @@ public class WmsInboundPageReqVO extends PageParam {
     @Schema(description = "入库时间", example = "")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime inboundTime;
+
+    @Schema(description = "库存归属部门ID", example = "")
+    private Long deptId;
 }

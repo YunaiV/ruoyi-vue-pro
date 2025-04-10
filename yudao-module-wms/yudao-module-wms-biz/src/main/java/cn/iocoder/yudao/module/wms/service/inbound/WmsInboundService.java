@@ -79,8 +79,6 @@ public interface WmsInboundService {
 
     void assembleWarehouse(List<WmsInboundRespVO> list);
 
-
-
     void assembleCompany(List<WmsInboundRespVO> list);
 
     void assembleApprovalHistory(List<WmsInboundRespVO> list);

@@ -30,7 +30,7 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSH
  */
 @Slf4j
 @Component
-public class OwnershipMoveExecutor extends ActionExecutor<OwnershipMoveContext> {
+public class OwnershipMoveExecutor extends QuantityExecutor<OwnershipMoveContext> {
 
 
 
@@ -87,7 +87,7 @@ public class OwnershipMoveExecutor extends ActionExecutor<OwnershipMoveContext> 
         // 逐行处理
         for (WmsStockOwnershipMoveItemDO ownershipMoveItemDO : ownershipMoveItemDOList) {
             WmsStockOwnershipDO fromStockOwnership = stockOwnershipMap.get(makeStockKey(ownershipMoveItemDO.getFromCompanyId(),ownershipMoveItemDO.getFromDeptId(),ownershipMoveItemDO.getProductId()));
-            this.processStockBin(ownershipMoveDO.getWarehouseId(),ownershipMoveItemDO,fromStockOwnership);
+            this.processStockOwnership(ownershipMoveDO.getWarehouseId(),ownershipMoveItemDO,fromStockOwnership);
         }
 
         // 完成库位移动
@@ -98,9 +98,9 @@ public class OwnershipMoveExecutor extends ActionExecutor<OwnershipMoveContext> 
 
 
     /**
-     * 处理库存仓位
+     * 处理所有者库存
      **/
-    private void processStockBin(Long warehouseId,WmsStockOwnershipMoveItemDO ownershipMoveItemDO,WmsStockOwnershipDO fromStockOwnershipDO) {
+    private void processStockOwnership(Long warehouseId, WmsStockOwnershipMoveItemDO ownershipMoveItemDO, WmsStockOwnershipDO fromStockOwnershipDO) {
 
         JdbcUtils.requireTransaction();
 

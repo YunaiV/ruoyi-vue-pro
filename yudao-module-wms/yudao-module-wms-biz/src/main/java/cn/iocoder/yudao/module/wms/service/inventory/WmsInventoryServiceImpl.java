@@ -281,4 +281,12 @@ public class WmsInventoryServiceImpl implements WmsInventoryService {
         Map<Long, WmsWarehouseSimpleRespVO> warehouseVOMap = StreamX.from(warehouseDOMap.values()).toMap(WmsWarehouseDO::getId, v -> BeanUtils.toBean(v, WmsWarehouseSimpleRespVO.class));
         StreamX.from(list).assemble(warehouseVOMap, WmsInventoryRespVO::getWarehouseId, WmsInventoryRespVO::setWarehouse);
     }
+
+    @Override
+    public WmsInventoryDO updateOutboundAuditStatus(Long id, Integer status) {
+        WmsInventoryDO inventoryDO = validateInventoryExists(id);
+        inventoryDO.setAuditStatus(status);
+        inventoryMapper.updateById(inventoryDO);
+        return inventoryDO;
+    }
 }

@@ -69,6 +69,7 @@ public interface ErrorCodeConstants {
     ErrorCode INBOUND_ITEM_FLOW_CAN_NOT_DELETE = new ErrorCode(2_001_006_004, "入库单库存详情扣减不允许删除");
     ErrorCode INBOUND_ITEM_FLOW_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_006_005, "入库单库存详情扣减不符合审批条件");
     ErrorCode INBOUND_STATUS_PARSE_ERROR = new ErrorCode(2_001_006_006, "无法完成入库单状态转换");
+    ErrorCode INBOUND_ITEM_FLOW_EXISTS = new ErrorCode(2_001_006_007, "入库单库存详情扣减已存在");
 
     // ========== WMS_APPROVAL_HISTORY 审批历史表 2_001_007_000 ==========
     ErrorCode APPROVAL_HISTORY_NOT_EXISTS = new ErrorCode(2_001_007_001, "审批历史不存在");
@@ -214,6 +215,8 @@ public interface ErrorCodeConstants {
     ErrorCode INVENTORY_PRODUCT_CAN_NOT_EDIT = new ErrorCode(2_001_021_005, "库存盘点产品不允许编辑");
     ErrorCode INVENTORY_PRODUCT_CAN_NOT_DELETE = new ErrorCode(2_001_021_006, "库存盘点产品不允许删除");
     ErrorCode INVENTORY_PRODUCT_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_021_007, "库存盘点产品不符合审批条件");
+    ErrorCode INVENTORY_AUDIT_FAIL = new ErrorCode(2_001_021_008, "审核错误，当前出库单状态为%s，在%s状态时才允许%s");
+    ErrorCode INVENTORY_STATUS_PARSE_ERROR = new ErrorCode(2_001_021_009, "盘点审批状态转换错误");
 
     // ========== WMS_INVENTORY_BIN 库位盘点表 2_001_022_000 ==========
     ErrorCode INVENTORY_BIN_NOT_EXISTS = new ErrorCode(2_001_022_001, "库位盘点不存在");
@@ -221,6 +224,4 @@ public interface ErrorCodeConstants {
     ErrorCode INVENTORY_BIN_INVENTORY_ID_BIN_ID_PRODUCT_ID_DUPLICATE = new ErrorCode(2_001_022_003, "盘点结果单ID,仓位ID,产品ID已存在");
     ErrorCode INVENTORY_BIN_BE_REFERRED = new ErrorCode(2_001_022_004, "库位盘点被引用");
     ErrorCode INVENTORY_BIN_CAN_NOT_EDIT = new ErrorCode(2_001_022_005, "库位盘点不允许编辑");
-    ErrorCode INVENTORY_BIN_CAN_NOT_DELETE = new ErrorCode(2_001_022_006, "库位盘点不允许删除");
-    ErrorCode INVENTORY_BIN_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_022_007, "库位盘点不符合审批条件");
 }

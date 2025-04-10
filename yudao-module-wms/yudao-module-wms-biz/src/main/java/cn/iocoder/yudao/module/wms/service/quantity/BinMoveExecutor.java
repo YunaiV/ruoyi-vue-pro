@@ -34,7 +34,7 @@ import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_NOT
  */
 @Slf4j
 @Component
-public class BinMoveExecutor extends ActionExecutor<BinMoveContext> {
+public class BinMoveExecutor extends QuantityExecutor<BinMoveContext> {
 
 
 
@@ -108,7 +108,7 @@ public class BinMoveExecutor extends ActionExecutor<BinMoveContext> {
 
 
     /**
-     * 处理库存仓位
+     * 处理仓位库存
      **/
     private void processStockBin(Long warehouseId,WmsStockBinMoveItemDO binMoveItemDO,WmsStockBinRespVO fromStockBinVO,WmsStockBinRespVO toStockBinVO) {
 

@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Lazy;
 /**
  * @author: LeeFJ
  * @date: 2025/3/31 16:17
- * @description: InboundAction 基类
+ * @description: InboundTransition 基类
  */
 public class BaseInboundTransitionHandler extends ApprovalHistoryTransitionHandler<WmsInboundAuditStatus.Event, WmsInboundDO> {
 

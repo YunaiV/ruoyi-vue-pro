@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Lazy;
 /**
  * @author: LeeFJ
  * @date: 2025/3/31 16:23
- * @description: OutboundAction 基类
+ * @description: OutboundTransition 基类
  */
 public class BaseOutboundTransitionHandler extends ApprovalHistoryTransitionHandler<WmsOutboundAuditStatus.Event, WmsOutboundDO> {
 
