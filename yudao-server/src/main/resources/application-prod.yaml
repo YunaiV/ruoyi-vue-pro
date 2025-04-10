@@ -9,8 +9,13 @@ kingdee:
     - 94828281114791936
     - 94829067232219136
 
+template:
+  enable-preload: true # word预热总开关
+srm:
+  enablePreload: true
+  scanPath:
+    - purchase/order/
 --- #################### 数据库相关配置 ####################
-
 spring:
   # 数据源配置项
   datasource:

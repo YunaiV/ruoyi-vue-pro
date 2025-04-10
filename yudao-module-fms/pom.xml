@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>cn.iocoder.boot</groupId>
+        <artifactId>yudao</artifactId>
+        <version>${revision}</version>
+    </parent>
+    <modules>
+        <module>yudao-module-fms-api</module>
+        <module>yudao-module-fms-biz</module>
+    </modules>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>yudao-module-fms</artifactId>
+    <packaging>pom</packaging>
+
+    <name>${project.artifactId}</name>
+    <description>
+        Financial Management System。
+        财务管理系统，例如应收应付、预算、报销、采购等功能模块。
+    </description>
+
+</project>

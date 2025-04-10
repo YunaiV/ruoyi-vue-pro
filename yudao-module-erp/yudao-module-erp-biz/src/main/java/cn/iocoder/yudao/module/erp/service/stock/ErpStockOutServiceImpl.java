@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockOutItemDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.stock.ErpStockOutItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.stock.ErpStockOutMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
-import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.stock.ErpStockRecordBizTypeEnum;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.sale.ErpCustomerService;
@@ -74,7 +74,7 @@ public class ErpStockOutServiceImpl implements ErpStockOutService {
 
         // 2.1 插入出库单
         ErpStockOutDO stockOut = BeanUtils.toBean(createReqVO, ErpStockOutDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus())
+                .setNo(no).setStatus(ErpAuditStatus.PENDING_REVIEW.getCode())
                 .setTotalCount(getSumValue(stockOutItems, ErpStockOutItemDO::getCount, BigDecimal::add))
                 .setTotalPrice(getSumValue(stockOutItems, ErpStockOutItemDO::getTotalPrice, BigDecimal::add, BigDecimal.ZERO)));
         stockOutMapper.insert(stockOut);
@@ -89,7 +89,7 @@ public class ErpStockOutServiceImpl implements ErpStockOutService {
     public void updateStockOut(ErpStockOutSaveReqVO updateReqVO) {
         // 1.1 校验存在
         ErpStockOutDO stockOut = validateStockOutExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVE.getStatus().equals(stockOut.getStatus())) {
+        if (ErpAuditStatus.APPROVED.getCode().equals(stockOut.getStatus())) {
             throw exception(STOCK_OUT_UPDATE_FAIL_APPROVE, stockOut.getNo());
         }
         // 1.2 校验客户
@@ -109,7 +109,7 @@ public class ErpStockOutServiceImpl implements ErpStockOutService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateStockOutStatus(Long id, Integer status) {
-        boolean approve = ErpAuditStatus.APPROVE.getStatus().equals(status);
+        boolean approve = ErpAuditStatus.APPROVED.getCode().equals(status);
         // 1.1 校验存在
         ErpStockOutDO stockOut = validateStockOutExists(id);
         // 1.2 校验状态
@@ -177,7 +177,7 @@ public class ErpStockOutServiceImpl implements ErpStockOutService {
             return;
         }
         stockOuts.forEach(stockOut -> {
-            if (ErpAuditStatus.APPROVE.getStatus().equals(stockOut.getStatus())) {
+            if (ErpAuditStatus.APPROVED.getCode().equals(stockOut.getStatus())) {
                 throw exception(STOCK_OUT_DELETE_FAIL_APPROVE, stockOut.getNo());
             }
         });

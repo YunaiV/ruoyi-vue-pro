@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.erp.service.product.tvcabinet.bo;
 
-import lombok.Data;
 import cn.iocoder.yudao.module.erp.service.product.bo.ErpProductBO;
+import lombok.Data;
 
 /**
  * 电视柜

@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpStockCheckItemDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.stock.ErpStockCheckItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.stock.ErpStockCheckMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
-import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import cn.iocoder.yudao.module.erp.enums.stock.ErpStockRecordBizTypeEnum;
 import cn.iocoder.yudao.module.erp.service.product.ErpProductService;
 import cn.iocoder.yudao.module.erp.service.stock.bo.ErpStockRecordCreateReqBO;
@@ -69,7 +69,7 @@ public class ErpStockCheckServiceImpl implements ErpStockCheckService {
 
         // 2.1 插入盘点单
         ErpStockCheckDO stockCheck = BeanUtils.toBean(createReqVO, ErpStockCheckDO.class, in -> in
-                .setNo(no).setStatus(ErpAuditStatus.PROCESS.getStatus())
+                .setNo(no).setStatus(ErpAuditStatus.PENDING_REVIEW.getCode())
                 .setTotalCount(getSumValue(stockCheckItems, ErpStockCheckItemDO::getCount, BigDecimal::add))
                 .setTotalPrice(getSumValue(stockCheckItems, ErpStockCheckItemDO::getTotalPrice, BigDecimal::add, BigDecimal.ZERO)));
         stockCheckMapper.insert(stockCheck);
@@ -84,7 +84,7 @@ public class ErpStockCheckServiceImpl implements ErpStockCheckService {
     public void updateStockCheck(ErpStockCheckSaveReqVO updateReqVO) {
         // 1.1 校验存在
         ErpStockCheckDO stockCheck = validateStockCheckExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVE.getStatus().equals(stockCheck.getStatus())) {
+        if (ErpAuditStatus.APPROVED.getCode().equals(stockCheck.getStatus())) {
             throw exception(STOCK_CHECK_UPDATE_FAIL_APPROVE, stockCheck.getNo());
         }
         // 1.2 校验盘点项的有效性
@@ -102,7 +102,7 @@ public class ErpStockCheckServiceImpl implements ErpStockCheckService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateStockCheckStatus(Long id, Integer status) {
-        boolean approve = ErpAuditStatus.APPROVE.getStatus().equals(status);
+        boolean approve = ErpAuditStatus.APPROVED.getCode().equals(status);
         // 1.1 校验存在
         ErpStockCheckDO stockCheck = validateStockCheckExists(id);
         // 1.2 校验状态
@@ -181,7 +181,7 @@ public class ErpStockCheckServiceImpl implements ErpStockCheckService {
             return;
         }
         stockChecks.forEach(stockCheck -> {
-            if (ErpAuditStatus.APPROVE.getStatus().equals(stockCheck.getStatus())) {
+            if (ErpAuditStatus.APPROVED.getCode().equals(stockCheck.getStatus())) {
                 throw exception(STOCK_CHECK_DELETE_FAIL_APPROVE, stockCheck.getNo());
             }
         });

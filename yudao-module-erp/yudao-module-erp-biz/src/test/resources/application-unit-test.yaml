@@ -75,6 +75,6 @@ spring:
 # 芋道配置项，设置当前项目所有自定义的配置
 yudao:
   info:
-    base-package: cn.iocoder.yudao.module
-somle:
-  base-package: com.somle.amazon
+    base-package: cn.iocoder.yudao
+#somle:
+#  base-package: com.somle.amazon

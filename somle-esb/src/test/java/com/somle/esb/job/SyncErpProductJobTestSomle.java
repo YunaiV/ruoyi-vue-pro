@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.test.core.ut.SomleBaseSpringIntegrationTest;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
-import cn.iocoder.yudao.module.tms.api.logistic.customrule.ErpCustomRuleApi;
-import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.ErpCustomRuleDTO;
+import cn.iocoder.yudao.module.tms.api.logistic.customrule.TmsCustomRuleApi;
+import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.TmsCustomRuleDTO;
 import com.somle.esb.handler.ErpCustomRuleHandler;
 import com.somle.esb.handler.ErpProductHandler;
 import jakarta.annotation.Resource;
@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public class SyncErpProductJobTestSomle extends SomleBaseSpringIntegrationTest {
     @Resource
-    ErpCustomRuleApi erpCustomRuleApi;
+    TmsCustomRuleApi tmsCustomRuleApi;
     @Resource
     ErpProductApi erpProductApi;
     @Mock
@@ -34,17 +34,17 @@ public class SyncErpProductJobTestSomle extends SomleBaseSpringIntegrationTest {
     @Test
     void syncErpProducts() {
         AtomicReference<List<String>> barCodes = new AtomicReference<>(new ArrayList<>());
-        AtomicReference<List<ErpCustomRuleDTO>> customRuleDTOS = new AtomicReference<>();
+        AtomicReference<List<TmsCustomRuleDTO>> customRuleDTOS = new AtomicReference<>();
         try {
             TenantContextHolder.setTenantId(50001L);// 自动
             // 发送消息
-            Optional.ofNullable(erpCustomRuleApi.listCustomRules(null)).ifPresent(detailDTOS -> {
+            Optional.ofNullable(tmsCustomRuleApi.listCustomRules(null)).ifPresent(detailDTOS -> {
                 barCodes.set(detailDTOS.stream().map(dto -> dto.getProductDTO().getBarCode()).toList());
                 log.info("预计同步产品skus大小={{}},barCodes = {{}}", barCodes.get().size(), barCodes.get());
                 int total = detailDTOS.size();
                 int processed = 0;
                 //输出预计同步的barcode集合
-                for (ErpCustomRuleDTO detailDTO : detailDTOS) {
+                for (TmsCustomRuleDTO detailDTO : detailDTOS) {
                     String barCode = detailDTO.getProductDTO().getBarCode();
                     log.debug("发送消息, BarCode = {}", barCode);
                     // 单独处理每个条目
@@ -54,12 +54,11 @@ public class SyncErpProductJobTestSomle extends SomleBaseSpringIntegrationTest {
                     log.info("SyncErpProduct Processed {}/{} ({}%)", processed, total, (100 * processed / total));
                 }
                 //根据detailDTOS获得产品id集合
-                List<Long> productIds = detailDTOS.stream().map(ErpCustomRuleDTO::getProductId).toList();
-                List<ErpProductDTO> productDTOs = erpProductApi.listProductDTOs(null);
+                List<Long> productIds = detailDTOS.stream().map(TmsCustomRuleDTO::getProductId).toList();
                 // 过滤掉已经在 `customRuleDTOS` 中的产品
-                List<ErpProductDTO> productDTOS = productDTOs.stream()
+                List<ErpProductDTO> pDTOs = erpProductApi.listProductDTOs(null).stream()
                     .filter(dto -> !productIds.contains(dto.getId())).toList();
-                productDTOS.forEach(dto -> {
+                pDTOs.forEach(dto -> {
                     erpProductHandler.syncProductsToKingdee(List.of(dto));
                     erpProductHandler.syncProductsToEccang(List.of(dto));
                 });

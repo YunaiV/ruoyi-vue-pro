@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.erp.dal.dataobject.sale;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -46,19 +44,19 @@ public class ErpSaleReturnItemDO extends BaseDO {
     /**
      * 仓库编号
      *
-     * 关联 {@link ErpWarehouseDO#getId()}
+     * 关联 {@link cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO#getId()}
      */
     private Long warehouseId;
     /**
      * 产品编号
      *
-     * 关联 {@link ErpProductDO#getId()}
+     * 关联 {@link cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO#getId()}
      */
     private Long productId;
     /**
      * 产品单位单位
      *
-     * 冗余 {@link ErpProductDO#getUnitId()}
+     * 冗余 {@link cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO#getUnitId()}
      */
     private Long productUnitId;
 

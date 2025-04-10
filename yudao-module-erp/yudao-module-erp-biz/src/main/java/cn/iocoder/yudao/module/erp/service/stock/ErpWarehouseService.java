@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.erp.service.stock;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.warehouse.ErpWarehouseSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.warehouse.ErpWarehousePageReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.warehouse.ErpWarehouseSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
 import jakarta.validation.Valid;
 
@@ -64,6 +64,12 @@ public interface ErpWarehouseService {
      * @return 仓库列表
      */
     List<ErpWarehouseDO> validWarehouseList(Collection<Long> ids);
+
+    /**
+     * 校验仓库得有效性(单个)
+     * @param id 仓库id
+     */
+    void validWarehouse(Long id);
 
     /**
      * 获得指定状态的仓库列表

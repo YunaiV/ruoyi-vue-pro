@@ -44,7 +44,7 @@ public class ErpProductApiImpl implements ErpProductApi {
         List<ErpProductDO> dos;
         if (ids != null) {
             dos = erpProductMapper.selectBatchIds(ids);
-        }else {
+        } else {
             dos = erpProductMapper.selectList();
         }
         return ErpProductConvert.INSTANCE.convert(dos);
