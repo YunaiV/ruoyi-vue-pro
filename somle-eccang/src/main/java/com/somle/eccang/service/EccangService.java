@@ -10,10 +10,7 @@ import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import com.somle.eccang.model.*;
 import com.somle.eccang.model.EccangResponse.EccangPage;
 import com.somle.eccang.model.exception.EccangResponseException;
-import com.somle.eccang.model.req.EccangInventoryBatchReqVO;
-import com.somle.eccang.model.req.EccangReceivingDetailReqVO;
-import com.somle.eccang.model.req.EccangReceivingReqVo;
-import com.somle.eccang.model.req.EccangRmaReturnReqVO;
+import com.somle.eccang.model.req.*;
 import com.somle.eccang.repository.EccangTokenRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -178,7 +175,9 @@ public class EccangService {
 
     private Stream<EccangPage> getAllPage(JSONObject payload, String endpoint) {
         payload.put("page", 1);
-        payload.put("page_size", pageSize);
+        if (payload.get("page_size") == null) {
+            payload.put("page_size", pageSize);
+        }
         return Stream.iterate(
             getPage(payload, endpoint), Objects::nonNull,
             bizContent -> {
@@ -239,6 +238,12 @@ public class EccangService {
         return post("getUserAccountList", Map.of("platform", platform)).getData(EccangUserAccount.class);
     }
 
+    /**
+     * @Description: 获取当前用户，有且只会有一个
+     */
+    public EccangUser getUser() {
+        return post("getUser", Map.of()).getData(EccangUser.class).get(0);
+    }
 
     public Stream<EccangUserAccount> getUserAccounts() {
         return getPlatforms().stream().flatMap(platform -> getUserAccounts(platform).stream());
@@ -462,6 +467,14 @@ public class EccangService {
     public Stream<EccangPage> streamReceivingDetail(EccangReceivingDetailReqVO eccangReceivingDetailReqVO) {
         String endpoint = "getReceivingDetailList";
         return getAllPage(JsonUtilsX.toJSONObject(eccangReceivingDetailReqVO), endpoint);
+    }
+
+    /**
+     * @Description: 头程管理-获取头程出货单数据
+     */
+    public Stream<EccangPage> streamShipBatch(EccangShipBatchReqVo eccangShipBatchReqVo) {
+        String endpoint = "getShipBatch";
+        return getAllPage(JsonUtilsX.toJSONObject(eccangShipBatchReqVo), endpoint);
     }
 
     public String parseCountryCode(String code) {
