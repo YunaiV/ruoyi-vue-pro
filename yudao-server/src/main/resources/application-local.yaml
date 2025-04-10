@@ -6,12 +6,9 @@ kingdee:
 
 debug: false
 
-template:
-  enable-preload: true # word预热总开关
 srm:
-  enablePreload: true
-  scanPath:
-    - purchase/order/
+  enable-preload: true
+
 --- #################### 数据库相关配置 ####################
 
 spring:

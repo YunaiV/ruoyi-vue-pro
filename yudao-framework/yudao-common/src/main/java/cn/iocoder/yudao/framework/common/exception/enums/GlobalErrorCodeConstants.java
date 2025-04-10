@@ -53,5 +53,6 @@ public interface GlobalErrorCodeConstants {
     // ========== 文件错误段 ==========
     ErrorCode FILE_NOT_EXISTS = new ErrorCode(1100, "文件不存在");
 
-
+    ErrorCode GENERATE_CONTRACT_FAIL = new ErrorCode(500001, "获取模板({})失败,({})");
+    ErrorCode GENERATE_CONTRACT_FAIL_PARSE = new ErrorCode(500002, "解析模板文件({})失败,({})");
 }

@@ -2,13 +2,11 @@ package cn.iocoder.yudao.module.srm.service.purchase.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.template.config.TemplateConfigureFactory;
 import cn.iocoder.yudao.framework.template.core.TemplateService;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductUnitApi;
@@ -19,7 +17,6 @@ import cn.iocoder.yudao.module.fms.api.finance.dto.FmsFinanceSubjectDTO;
 import cn.iocoder.yudao.module.srm.api.purchase.SrmInCountDTO;
 import cn.iocoder.yudao.module.srm.api.purchase.SrmOrderCountDTO;
 import cn.iocoder.yudao.module.srm.api.purchase.SrmPayCountDTO;
-import cn.iocoder.yudao.module.srm.config.purchase.SrmTemplateConfig;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.req.SrmPurchaseInSaveReqVO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.req.*;
 import cn.iocoder.yudao.module.srm.convert.purchase.SrmOrderConvert;
@@ -97,8 +94,8 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
     private final FmsFinanceSubjectApi erpFinanceSubjectApi;
     private final ResourcePatternResolver resourcePatternResolver;
     private final TemplateService templateService;
-    private final TemplateConfigureFactory configureFactory;
     private final String SOURCE = "WEB录入";
+
     @Resource(name = PURCHASE_ORDER_OFF_STATE_MACHINE_NAME)
     StateMachine<SrmOffStatus, SrmEventEnum, SrmPurchaseOrderDO> offMachine;
     @Resource(name = PURCHASE_ORDER_AUDIT_STATE_MACHINE_NAME)
@@ -717,9 +714,9 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
     public void generateContract(SrmPurchaseOrderGenerateContractReqVO reqVO, HttpServletResponse response) {
         SrmPurchaseOrderDO orderDO = validatePurchaseOrderExists(reqVO.getOrderId());
         // 校验订单状态是否已审核 未审核 -> e
-//        ThrowUtil.ifThrow(!Objects.equals(orderDO.getAuditStatus(), SrmAuditStatus.APPROVED.getCode()), PURCHASE_ORDER_NOT_AUDIT, orderDO.getId());
+        //        ThrowUtil.ifThrow(!Objects.equals(orderDO.getAuditStatus(), SrmAuditStatus.APPROVED.getCode()), PURCHASE_ORDER_NOT_AUDIT, orderDO.getId());
         //1 从OSS拿到模板word
-        var resource = SrmTemplateConfig.getResource(reqVO.getTemplateName());
+        org.springframework.core.io.Resource resource = getResourceByFilePath(reqVO);
         try (XWPFTemplate xwpfTemplate = templateService.buildXWPDFTemplate(resource)) {
             //2 模板word渲染数据
             List<SrmPurchaseOrderItemDO> itemDOS = purchaseOrderItemMapper.selectListByOrderId(orderDO.getId());
@@ -749,11 +746,16 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
         }
     }
 
+    private org.springframework.core.io.Resource getResourceByFilePath(SrmPurchaseOrderGenerateContractReqVO reqVO) {
+        return resourcePatternResolver.getResource("classpath:purchase/order/" + reqVO.getTemplateName());
+    }
+
     /**
      * 获取 JAR 包中的模板文件列表（只列出以 .docx 结尾的文件）
      *
      * @return 文件名列表
      */
+    @Override
     public List<String> getTemplateList() {
         List<String> templateList = new ArrayList<>();
         try {
