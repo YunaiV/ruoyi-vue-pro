@@ -7,9 +7,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import lombok.Data;
 
-@Schema(description = "管理后台 - Erp财务主体新增/修改 Request VO")
+@Schema(description = "管理后台 - Fms财务公司新增/修改 Request VO")
 @Data
-public class FmsFinanceSubjectSaveReqVO {
+public class FmsCompanySaveReqVO {
     @Schema(description = "id")
     @Null(groups = Validation.OnCreate.class, message = "创建时，id必须为空")
     @NotNull(groups = Validation.OnUpdate.class, message = "更新时，id不能为空")

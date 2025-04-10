@@ -11,11 +11,11 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(description = "管理后台 - Erp财务主体分页 Request VO")
+@Schema(description = "管理后台 - Fms财务公司分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class FmsFinanceSubjectPageReqVO extends PageParam {
+public class FmsCompanyPageReqVO extends PageParam {
 
     @Schema(description = "创建人")
     private String creator;
