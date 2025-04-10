@@ -2,7 +2,6 @@ package cn.iocoder.yudao.framework.template.core;
 
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import cn.iocoder.yudao.framework.template.config.TemplateConfigureFactory;
-import cn.iocoder.yudao.framework.template.config.TemplateProperties;
 import cn.iocoder.yudao.framework.template.core.impl.TemplateServiceImpl;
 import cn.iocoder.yudao.framework.template.core.impl.TemplateServiceRedisImpl;
 import cn.iocoder.yudao.framework.test.core.ut.BaseRedisUnitTest;
@@ -11,25 +10,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.io.IOException;
-
 @Slf4j
 @Disabled
-@Import({TemplateServiceImpl.class, TemplateConfigureFactory.class, TemplateProperties.class, RedisTemplate.class, YudaoRedisAutoConfiguration.class,
+@Import({TemplateServiceImpl.class, TemplateConfigureFactory.class, RedisTemplate.class, YudaoRedisAutoConfiguration.class,
     TemplateServiceRedisImpl.class, ResourcePatternResolver.class})
 class TemplateServiceTest extends BaseRedisUnitTest {
 
     private static final String TEST_TEMPLATE_PATH = "template/test.docx";
     private static final String REDIS_KEY_PREFIX = "common:template:";
-    @Autowired
-    ResourceLoader resourceLoader;
+    //    @Autowired
+//    ResourceLoader resourceLoader;
     @Resource
     RedisTemplate<String, byte[]> byteArrayRedisTemplate;
     @Resource
@@ -77,7 +72,7 @@ class TemplateServiceTest extends BaseRedisUnitTest {
     }
 
     @Test
-    void getTemplateBytes() throws IOException {
+    void getTemplateBytes() {
         // 准备测试数据
         ClassPathResource resource = new ClassPathResource(TEST_TEMPLATE_PATH);
 
