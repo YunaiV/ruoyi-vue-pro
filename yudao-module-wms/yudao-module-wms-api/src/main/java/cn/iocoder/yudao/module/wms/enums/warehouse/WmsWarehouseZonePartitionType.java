@@ -12,13 +12,13 @@ import java.util.Arrays;
  **/
 @RequiredArgsConstructor
 @Getter
-public enum WmsWarehouseAreaPartitionType implements ArrayValuable<Integer>, DictEnum {
+public enum WmsWarehouseZonePartitionType implements ArrayValuable<Integer>, DictEnum {
 
 
     PICK (1, "标准品"),
     STORE(2, "不良品");
 
-    public static final Integer[] VALUES = Arrays.stream(values()).map(WmsWarehouseAreaPartitionType::getValue).toArray(Integer[]::new);
+    public static final Integer[] VALUES = Arrays.stream(values()).map(WmsWarehouseZonePartitionType::getValue).toArray(Integer[]::new);
 
 
     private final Integer value;
@@ -27,8 +27,8 @@ public enum WmsWarehouseAreaPartitionType implements ArrayValuable<Integer>, Dic
     /**
      * 按 value 匹配枚举，name 优先
      **/
-    public static WmsWarehouseAreaPartitionType parse(Integer value) {
-        for (WmsWarehouseAreaPartitionType e : WmsWarehouseAreaPartitionType.values()) {
+    public static WmsWarehouseZonePartitionType parse(Integer value) {
+        for (WmsWarehouseZonePartitionType e : WmsWarehouseZonePartitionType.values()) {
             if(e.getValue().equals(value)) {
                 return e;
             }
@@ -39,13 +39,13 @@ public enum WmsWarehouseAreaPartitionType implements ArrayValuable<Integer>, Dic
     /**
      * 按 name 或 label 匹配枚举，name 优先
      **/
-    public static WmsWarehouseAreaPartitionType parse(String nameOrLabel) {
-        for (WmsWarehouseAreaPartitionType e : WmsWarehouseAreaPartitionType.values()) {
+    public static WmsWarehouseZonePartitionType parse(String nameOrLabel) {
+        for (WmsWarehouseZonePartitionType e : WmsWarehouseZonePartitionType.values()) {
             if(e.name().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
         }
-        for (WmsWarehouseAreaPartitionType e : WmsWarehouseAreaPartitionType.values()) {
+        for (WmsWarehouseZonePartitionType e : WmsWarehouseZonePartitionType.values()) {
             if(e.getLabel().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }

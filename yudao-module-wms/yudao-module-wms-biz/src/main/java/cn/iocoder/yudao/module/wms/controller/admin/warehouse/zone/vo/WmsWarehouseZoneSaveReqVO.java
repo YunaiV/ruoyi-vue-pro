@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import jakarta.validation.constraints.*;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.wms.enums.warehouse.WmsWarehouseAreaStockType;
-import cn.iocoder.yudao.module.wms.enums.warehouse.WmsWarehouseAreaPartitionType;
+import cn.iocoder.yudao.module.wms.enums.warehouse.WmsWarehouseZoneStockType;
+import cn.iocoder.yudao.module.wms.enums.warehouse.WmsWarehouseZonePartitionType;
 import cn.iocoder.yudao.module.wms.enums.common.WmsValidStatus;
 
 /**
@@ -32,12 +32,12 @@ public class WmsWarehouseZoneSaveReqVO {
 
     @Schema(description = "存货类型 ; WarehouseAreaStockType : 1-拣货 , 2-存储", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "存货类型不能为空")
-    @InEnum(WmsWarehouseAreaStockType.class)
+    @InEnum(WmsWarehouseZoneStockType.class)
     private Integer stockType;
 
     @Schema(description = "分区类型 ; WarehouseAreaPartitionType : 1-标准品 , 2-不良品", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "分区类型不能为空")
-    @InEnum(WmsWarehouseAreaPartitionType.class)
+    @InEnum(WmsWarehouseZonePartitionType.class)
     private Integer partitionType;
 
     @Schema(description = "状态，WMS通用的对象有效状态 ; ValidStatus : 0-不可用 , 1-可用", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
