@@ -139,4 +139,4 @@ public class WmsOutboundItemController {
         outboundItemService.updateActualQuantity(updateReqVOList);
         return success(true);
     }
-}
+}

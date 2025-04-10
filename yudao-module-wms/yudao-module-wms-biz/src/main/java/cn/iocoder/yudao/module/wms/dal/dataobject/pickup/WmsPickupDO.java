@@ -10,7 +10,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 /**
  * 拣货单 DO
  * @author 李方捷
- * @table-fields : no,id,warehouse_id
+ * @table-fields : no,source_bill_no,source_bill_type,id,source_bill_id,warehouse_id
  */
 @TableName("wms_pickup")
 // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -38,4 +38,19 @@ public class WmsPickupDO extends BaseDO {
      * 仓库ID
      */
     private Long warehouseId;
+
+    /**
+     * 来源单据ID
+     */
+    private Long sourceBillId;
+
+    /**
+     * 来源单据号
+     */
+    private String sourceBillNo;
+
+    /**
+     * 来源单据类型
+     */
+    private Integer sourceBillType;
 }

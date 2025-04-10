@@ -24,6 +24,8 @@ import org.springframework.validation.annotation.Validated;
 import java.util.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import java.util.List;
 
 /**
  * 出库单详情 Service 实现类
@@ -151,12 +153,11 @@ public class WmsOutboundItemServiceImpl implements WmsOutboundItemService {
             throw exception(INBOUND_CAN_NOT_EDIT);
         }
         // 校验数量
-
         Map<Long, WmsOutboundItemSaveReqVO> updateReqVOMap = StreamX.from(updateReqVOList).toMap(WmsOutboundItemSaveReqVO::getId);
         List<WmsOutboundItemDO> outboundItemDOSInDB = outboundItemMapper.selectByIds(StreamX.from(updateReqVOList).toList(WmsOutboundItemSaveReqVO::getId));
         for (WmsOutboundItemDO itemDO : outboundItemDOSInDB) {
             WmsOutboundItemSaveReqVO updateReqVO = updateReqVOMap.get(itemDO.getId());
-            if(updateReqVO.getActualQty()==null || updateReqVO.getActualQty()<=0) {
+            if (updateReqVO.getActualQty() == null || updateReqVO.getActualQty() <= 0) {
                 throw exception(OUTBOUND_ITEM_ACTUAL_QTY_ERROR);
             }
             itemDO.setActualQty(updateReqVO.getActualQty());
@@ -164,4 +165,14 @@ public class WmsOutboundItemServiceImpl implements WmsOutboundItemService {
         // 保存
         outboundItemMapper.updateBatch(outboundItemDOSInDB);
     }
-}
+
+    /**
+     * 按 ID 集合查询 WmsOutboundItemDO
+     */
+    public List<WmsOutboundItemDO> selectByIds(List<Long> idList) {
+        if (CollectionUtils.isEmpty(idList)) {
+            return List.of();
+        }
+        return outboundItemMapper.selectByIds(idList);
+    }
+}

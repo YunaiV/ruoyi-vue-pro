@@ -31,14 +31,12 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_ITEM_INBOUND_ITEM_ID_NOT_SAME;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_ITEM_INBOUND_ITEM_ID_REPEATED;
@@ -90,15 +88,13 @@ public class WmsPickupServiceImpl implements WmsPickupService {
     @Lazy
     private WmsWarehouseService warehouseService;
 
-
-
     /**
      * @sign : E7A4B1135281D8DB
      */
     @Override
     public WmsPickupDO createPickup(WmsPickupSaveReqVO createReqVO) {
         // 设置单据号
-        String no = noRedisDAO.generate(WmsNoRedisDAO.PICKUP_NO_PREFIX,3);
+        String no = noRedisDAO.generate(WmsNoRedisDAO.PICKUP_NO_PREFIX, 3);
         createReqVO.setNo(no);
         if (pickupMapper.getByNo(createReqVO.getNo()) != null) {
             throw exception(PICKUP_NO_DUPLICATE);
@@ -121,15 +117,13 @@ public class WmsPickupServiceImpl implements WmsPickupService {
         WmsPickupDO pickup = BeanUtils.toBean(createReqVO, WmsPickupDO.class);
         // 校验入库单与仓位的仓库必须是同一个仓库
         List<WmsInboundItemDO> inboundItemDOList = processAndValidateForPickIn(pickup, toInsetList);
-
         WmsPickupServiceImpl proxy = SpringUtils.getBeanByExactType(WmsPickupServiceImpl.class);
         AtomicReference<WmsPickupDO> pickupDO = new AtomicReference<>();
-        lockRedisDAO.lockByWarehouse(pickup.getWarehouseId(),()->{
+        lockRedisDAO.lockByWarehouse(pickup.getWarehouseId(), () -> {
             pickupDO.set(proxy.createPickupInLock(pickup, toInsetList));
         });
         return pickupDO.get();
     }
-
 
     @Transactional(rollbackFor = Exception.class)
     protected WmsPickupDO createPickupInLock(WmsPickupDO pickup, List<WmsPickupItemDO> toInsetList) {
@@ -150,7 +144,6 @@ public class WmsPickupServiceImpl implements WmsPickupService {
         // 返回
         return pickup;
     }
-
 
     private void pickup(WmsPickupDO pickup, List<WmsPickupItemDO> wmsPickupItemDOList, List<WmsInboundItemRespVO> inboundItemVOList) {
         PickupContext context = new PickupContext();
@@ -188,7 +181,7 @@ public class WmsPickupServiceImpl implements WmsPickupService {
         }
         // 校验数量
         for (WmsPickupItemDO itemDO : toInsetList) {
-            if(itemDO.getQty()==null || itemDO.getQty()<=0) {
+            if (itemDO.getQty() == null || itemDO.getQty() <= 0) {
                 throw exception(PICKUP_ITEM_QTY_ERROR);
             }
         }
@@ -271,7 +264,7 @@ public class WmsPickupServiceImpl implements WmsPickupService {
 
     @Override
     public List<WmsPickupDO> selectByIds(List<Long> list) {
-        if(CollectionUtils.isEmpty(list)) {
+        if (CollectionUtils.isEmpty(list)) {
             return List.of();
         }
         return pickupMapper.selectByIds(list);
@@ -280,9 +273,12 @@ public class WmsPickupServiceImpl implements WmsPickupService {
     @Override
     public void assembleWarehouse(List<WmsPickupRespVO> list) {
         Map<Long, WmsWarehouseDO> warehouseDOMap = warehouseService.getWarehouseMap(StreamX.from(list).toSet(WmsPickupRespVO::getWarehouseId));
-        Map<Long, WmsWarehouseSimpleRespVO> warehouseVOMap = StreamX.from(warehouseDOMap.values())
-            .toMap(WmsWarehouseDO::getId, v-> BeanUtils.toBean(v, WmsWarehouseSimpleRespVO.class));
-
+        Map<Long, WmsWarehouseSimpleRespVO> warehouseVOMap = StreamX.from(warehouseDOMap.values()).toMap(WmsWarehouseDO::getId, v -> BeanUtils.toBean(v, WmsWarehouseSimpleRespVO.class));
         StreamX.from(list).assemble(warehouseVOMap, WmsPickupRespVO::getWarehouseId, WmsPickupRespVO::setWarehouse);
+    }
+
+    @Override
+    public void createForInventory(WmsPickupSaveReqVO pickupSaveReqVO) {
+        this.createPickup(pickupSaveReqVO);
     }
 }

@@ -69,13 +69,18 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
 
         WmsOutboundRespVO outboundRespVO=outboundService.getOutboundWithItemList(context.getOutboundId());
         Long warehouseId = outboundRespVO.getWarehouseId();
-        Long companyId = outboundRespVO.getCompanyId();
-        Long outboundDeptId = outboundRespVO.getDeptId();
 
         List<WmsOutboundItemRespVO> itemList=outboundRespVO.getItemList();
         for (WmsOutboundItemRespVO item : itemList) {
             Long productId = item.getProductId();
-            Long deptId = outboundDeptId;
+            Long companyId = item.getCompanyId();
+            if(companyId==null) {
+                companyId=outboundRespVO.getCompanyId();
+            }
+            Long deptId = item.getDeptId();
+            if(deptId==null) {
+                deptId=outboundRespVO.getDeptId();
+            }
             // 如果入库单上未指定部门,默认按产品的部门ID
             if (deptId == null) {
                 WmsProductRespSimpleVO productVO = item.getProduct();

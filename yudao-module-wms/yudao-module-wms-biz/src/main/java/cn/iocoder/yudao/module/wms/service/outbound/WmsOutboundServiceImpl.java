@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsAppro
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundSaveReqVO;
@@ -33,6 +34,7 @@ import cn.iocoder.yudao.module.wms.enums.WmsConstants;
 import cn.iocoder.yudao.module.wms.enums.common.WmsBillType;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundType;
 import cn.iocoder.yudao.module.wms.service.approval.history.WmsApprovalHistoryService;
 import cn.iocoder.yudao.module.wms.service.outbound.item.WmsOutboundItemService;
 import cn.iocoder.yudao.module.wms.service.stock.bin.WmsStockBinService;
@@ -42,12 +44,14 @@ import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_CAN_NOT_EDIT;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_CAN_NOT_EDIT;
@@ -306,6 +310,37 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     }
 
     @Override
+    public WmsOutboundDO createForInventory(WmsOutboundSaveReqVO outboundSaveReqVO) {
+
+        //
+        WmsOutboundDO outbound = this.createOutbound(outboundSaveReqVO);
+        outbound.setType(WmsOutboundType.INVENTORY.getValue());
+
+        WmsApprovalReqVO approvalReqVO = new WmsApprovalReqVO();
+        approvalReqVO.setBillId(outbound.getId());
+        approvalReqVO.setComment("盘点出库");
+        this.approve(WmsOutboundAuditStatus.Event.SUBMIT, approvalReqVO);
+
+        // 拉取明细
+        List<WmsOutboundItemDO> outboundItemDOS = outboundItemService.selectByOutboundId(outbound.getId());
+
+        // 设置实际入库量
+        StreamX.from(outboundItemDOS).assemble(outboundSaveReqVO.getItemList(), WmsOutboundItemSaveReqVO::getProductId,WmsOutboundItemDO::getProductId,(a, b)->{
+            a.setActualQty(b.getActualQty());
+        });
+        // 保存实际入库量
+        outboundItemService.updateActualQuantity(BeanUtils.toBean(outboundItemDOS, WmsOutboundItemSaveReqVO.class));
+        // 同意确认收货
+        this.approve(WmsOutboundAuditStatus.Event.AGREE, approvalReqVO);
+        // 完成收货
+        this.approve(WmsOutboundAuditStatus.Event.FINISH, approvalReqVO);
+        //
+        return this.getOutbound(outbound.getId());
+
+
+    }
+
+    @Override
     public WmsOutboundDO getOutbound(Long id) {
         return outboundMapper.selectById(id);
     }
@@ -366,4 +401,4 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         // 触发事件
         outboundStateMachine.fireEvent(event, ctx);
     }
-}
+}

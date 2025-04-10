@@ -42,4 +42,4 @@ public interface WmsOutboundItemMapper extends BaseMapperX<WmsOutboundItemDO> {
         wrapper.eq(WmsOutboundItemDO::getOutboundId, outboundId);
         return selectList(wrapper);
     }
-}
+}

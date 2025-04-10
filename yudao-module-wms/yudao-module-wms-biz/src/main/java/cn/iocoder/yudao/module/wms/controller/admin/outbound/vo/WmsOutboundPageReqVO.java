@@ -25,10 +25,10 @@ public class WmsOutboundPageReqVO extends PageParam {
     @Schema(description = "仓库ID", example = "16056")
     private Long warehouseId;
 
-    @Schema(description = "出库单类型 ; WmsOutboundType : 1-手工出库 , 2-订单出库", example = "1")
+    @Schema(description = "WMS出库单类型 ; WmsOutboundType : 1-手工出库 , 2-订单出库", example = "1")
     private Integer type;
 
-    @Schema(description = "出库单审批状态 ; WmsOutboundAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过 , 4-已出库", example = "2")
+    @Schema(description = "WMS出库单审批状态 ; WmsOutboundAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过 , 4-已出库", example = "2")
     private Integer auditStatus;
 
     @Schema(description = "来源单据ID", example = "32195")
@@ -37,7 +37,7 @@ public class WmsOutboundPageReqVO extends PageParam {
     @Schema(description = "来源单据号")
     private String sourceBillNo;
 
-    @Schema(description = "来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单", example = "2")
+    @Schema(description = "WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单", example = "2")
     private Integer sourceBillType;
 
     @Schema(description = "特别说明，创建方专用")
@@ -47,7 +47,7 @@ public class WmsOutboundPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
-    @Schema(description = "出库状态 ; WmsOutboundStatus : 0-未出库 , 1-部分出库 , 2-已出库", example = "")
+    @Schema(description = "WMS出库状态 ; WmsOutboundStatus : 0-未出库 , 1-部分出库 , 2-已出库", example = "")
     private Integer outboundStatus;
 
     @Schema(description = "库存财务公司ID", example = "")

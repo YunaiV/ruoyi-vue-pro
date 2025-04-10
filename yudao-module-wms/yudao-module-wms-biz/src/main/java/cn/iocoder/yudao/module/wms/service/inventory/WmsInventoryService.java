@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.wms.service.inventory;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventoryPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventoryRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventorySaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.WmsInventoryDO;
+import cn.iocoder.yudao.module.wms.enums.inventory.WmsInventoryAuditStatus;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -62,4 +64,6 @@ public interface WmsInventoryService {
     void assembleWarehouse(List<WmsInventoryRespVO> list);
 
     WmsInventoryDO updateOutboundAuditStatus(Long id, Integer status);
+
+    void approve(WmsInventoryAuditStatus.Event event, WmsApprovalReqVO approvalReqVO);
 }

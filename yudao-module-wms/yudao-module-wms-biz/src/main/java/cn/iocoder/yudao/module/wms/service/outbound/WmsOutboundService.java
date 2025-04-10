@@ -76,4 +76,6 @@ public interface WmsOutboundService {
     void assembleCompany(List<WmsOutboundRespVO> list);
 
     void assembleApprovalHistory(List<WmsOutboundRespVO> list);
+
+    WmsOutboundDO createForInventory(WmsOutboundSaveReqVO outboundSaveReqVO);
 }

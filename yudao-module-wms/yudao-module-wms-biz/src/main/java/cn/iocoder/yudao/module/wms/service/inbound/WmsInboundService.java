@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundPageReq
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemOwnershipDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -82,4 +83,23 @@ public interface WmsInboundService {
     void assembleCompany(List<WmsInboundRespVO> list);
 
     void assembleApprovalHistory(List<WmsInboundRespVO> list);
+
+    /**
+     * 按入库顺序获得第一个入库批次
+     * @param warehouseId
+     * @param productId
+     * @param olderFirst 是否按入库时间升序
+     **/
+    WmsInboundItemOwnershipDO getInboundItemOwnership(Long warehouseId, Long productId, boolean olderFirst);
+
+    /**
+     * 按入库顺序获得第一个入库批次
+     * @param warehouseId
+     * @param productId
+     * @param olderFirst 是否按入库时间升序
+     * @param limit 最大数量
+     **/
+    List<WmsInboundItemOwnershipDO> selectInboundItemOwnershipList(Long warehouseId, Long productId,boolean olderFirst,int limit);
+
+    WmsInboundDO createForInventory(WmsInboundSaveReqVO inboundSaveReqVO);
 }

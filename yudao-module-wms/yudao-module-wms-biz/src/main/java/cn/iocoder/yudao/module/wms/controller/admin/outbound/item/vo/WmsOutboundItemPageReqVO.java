@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : source_item_id,actual_qty,create_time,outbound_status,bin_id,plan_qty,product_id,outbound_id
+ * @table-fields : source_item_id,company_id,outbound_status,actual_qty,create_time,bin_id,plan_qty,product_id,dept_id,outbound_id
  */
 @Schema(description = "管理后台 - 出库单详情分页 Request VO")
 @Data
@@ -41,4 +41,10 @@ public class WmsOutboundItemPageReqVO extends PageParam {
 
     @Schema(description = "计划出库量", example = "")
     private Integer planQty;
+
+    @Schema(description = "库存财务公司ID", example = "")
+    private Long companyId;
+
+    @Schema(description = "库存归属部门ID", example = "")
+    private Long deptId;
 }

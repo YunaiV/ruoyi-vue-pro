@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo.WmsInventoryBinRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.product.vo.WmsInventoryProductRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventoryPageReqVO;
@@ -14,6 +15,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventorySav
 import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.WmsInventoryDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.bin.WmsInventoryBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.product.WmsInventoryProductDO;
+import cn.iocoder.yudao.module.wms.enums.inventory.WmsInventoryAuditStatus;
 import cn.iocoder.yudao.module.wms.service.inventory.WmsInventoryService;
 import cn.iocoder.yudao.module.wms.service.inventory.bin.WmsInventoryBinService;
 import cn.iocoder.yudao.module.wms.service.inventory.product.WmsInventoryProductService;
@@ -149,5 +151,31 @@ public class WmsInventoryController {
         List<WmsInventoryDO> list = inventoryService.getInventoryPage(pageReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "盘点.xls", "数据", WmsInventoryRespVO.class, BeanUtils.toBean(list, WmsInventoryRespVO.class));
+    }
+
+
+
+    @PutMapping("/submit")
+    @Operation(summary = "提交审批")
+    @PreAuthorize("@ss.hasPermission('wms:inventory:submit')")
+    public CommonResult<Boolean> submit(@RequestBody WmsApprovalReqVO approvalReqVO) {
+        inventoryService.approve(WmsInventoryAuditStatus.Event.SUBMIT, approvalReqVO);
+        return success(true);
+    }
+
+    @PutMapping("/agree")
+    @Operation(summary = "同意审批")
+    @PreAuthorize("@ss.hasPermission('wms:inventory:agree')")
+    public CommonResult<Boolean> agree(@RequestBody WmsApprovalReqVO approvalReqVO) {
+        inventoryService.approve(WmsInventoryAuditStatus.Event.AGREE, approvalReqVO);
+        return success(true);
+    }
+
+    @PutMapping("/reject")
+    @Operation(summary = "驳回审批")
+    @PreAuthorize("@ss.hasPermission('wms:inventory:reject')")
+    public CommonResult<Boolean> reject(@RequestBody WmsApprovalReqVO approvalReqVO) {
+        inventoryService.approve(WmsInventoryAuditStatus.Event.REJECT, approvalReqVO);
+        return success(true);
     }
 }

@@ -1,14 +1,12 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.inbound.item;
 
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemQueryDO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
+import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -24,29 +22,85 @@ import static cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.WmsInboundItemQ
 public interface WmsInboundItemOwnershipQueryMapper extends BaseMapperX<WmsInboundItemOwnershipDO> {
 
 
+    //    select
+    //    t.product_id,t.company_id inbound_company_id,t.dept_id inbound_dept_id,
+    //    t1.warehouse_id,  t1.company_id item_company_id,t1.dept_id item_dept_id,(DATEDIFF(NOW(),t1.inbound_time)+IFNULL(t1.init_age,0)) age,inbound_time from wms_inbound_item t
+    //    join  wms_inbound t1 on t1.id=t.inbound_id
+    //    and t.inbound_status in (1,2) and t1.inbound_status in (1,2) and product_id=189
+    //    order by  t1.inbound_time asc
 
-    default PageResult<WmsInboundItemOwnershipDO> selectInboundItemOwnershipList(Long productId) {
+    /**
+     * 按入库顺序获得第一个入库批次
+     * @param warehouseId
+     * @param productId
+     * @param olderFirst 是否按入库时间升序
+     **/
+    default WmsInboundItemOwnershipDO getInboundItemOwnership(Long warehouseId, Long productId,boolean olderFirst) {
+        List<WmsInboundItemOwnershipDO> list = selectInboundItemOwnershipList(warehouseId,productId,olderFirst,1);
+        if(list.isEmpty()) {
+            return null;
+        } else {
+            return list.get(0);
+        }
+    }
 
+    /**
+     * 按入库顺序获得第一个入库批次
+     * @param warehouseId
+     * @param productId
+     * @param olderFirst 是否按入库时间升序
+     * @param limit 最大数量
+     **/
+    default List<WmsInboundItemOwnershipDO> selectInboundItemOwnershipList(Long warehouseId, Long productId,boolean olderFirst,int limit) {
 
+        // 主表
         MPJLambdaWrapperX<WmsInboundItemOwnershipDO> wrapper = new MPJLambdaWrapperX();
-        //
-        wrapper.selectAll(WmsInboundItemDO.class);
+        // 主表条件
+        wrapper.eq(WmsInboundItemQueryDO::getProductId, productId)
+            .in(WmsInboundItemQueryDO::getInboundStatus, WmsInboundStatus.ALL.getValue(),WmsInboundStatus.PART.getValue())
+        ;
+        // 查询主表字段
+        wrapper.select(WmsInboundItemDO::getProductId);
+        wrapper.selectAs(WmsInboundItemDO::getCompanyId,WmsInboundItemOwnershipDO::getInboundCompanyId);
+        wrapper.selectAs(WmsInboundItemDO::getDeptId,WmsInboundItemOwnershipDO::getInboundDeptId);
+        // 查询子表字段
         wrapper.select(WmsInboundDO::getWarehouseId);
-        wrapper.select(WmsPickupItemDO::getBinId);
+        wrapper.selectAs(WmsInboundDO::getCompanyId,WmsInboundItemOwnershipDO::getItemCompanyId);
+        wrapper.selectAs(WmsInboundDO::getDeptId,WmsInboundItemOwnershipDO::getItemDeptId);
+        wrapper.select(WmsInboundDO::getInboundTime);
         wrapper.select(AGE_EXPR+" as age");
+
 
         //
         wrapper.innerJoin(WmsInboundDO.class,WmsInboundDO::getId, WmsInboundItemQueryDO::getInboundId);
+        wrapper.eq(WmsInboundDO::getWarehouseId, warehouseId)
+            .in(WmsInboundItemQueryDO::getInboundStatus, WmsInboundStatus.ALL.getValue(),WmsInboundStatus.PART.getValue());
+        // 控制顺序
+        if(olderFirst) {
+            wrapper.orderByAsc(WmsInboundDO::getInboundTime);
+        } else {
+            wrapper.orderByDesc(WmsInboundDO::getInboundTime);
+        }
+
+        wrapper.last("limit "+limit);
+
+        List<WmsInboundItemOwnershipDO> list = selectList(wrapper);
+
+        for (WmsInboundItemOwnershipDO ownershipDO : list) {
+            // 优先使用详情表的公司字段字段
+            ownershipDO.setCompanyId(ownershipDO.getItemCompanyId());
+            if(ownershipDO.getCompanyId()==null) {
+                ownershipDO.setCompanyId(ownershipDO.getInboundCompanyId());
+            }
+            // 优先使用详情表的部门字段字段
+            ownershipDO.setDeptId(ownershipDO.getItemDeptId());
+            if(ownershipDO.getDeptId()==null) {
+                ownershipDO.setDeptId(ownershipDO.getInboundDeptId());
+            }
+        }
 
 
-
-        PageResult<WmsInboundItemOwnershipDO> pageResult =selectPage(new PageParam(),wrapper);
-
-        List<WmsInboundItemOwnershipDO> list= selectList(wrapper);
-
-        return selectPage(new PageParam(), wrapper);
-
-
+        return list;
 
     }
 

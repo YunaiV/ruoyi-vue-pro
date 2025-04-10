@@ -1,9 +1,13 @@
 package cn.iocoder.yudao.module.wms.service.inventory;
 
+import cn.iocoder.yudao.framework.cola.statemachine.StateMachineWrapper;
+import cn.iocoder.yudao.framework.cola.statemachine.TransitionContext;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.wms.config.InventoryStateMachineConfigure;
+import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventoryPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventoryRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventorySaveReqVO;
@@ -19,7 +23,10 @@ import cn.iocoder.yudao.module.wms.dal.mysql.inventory.WmsInventoryMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.inventory.bin.WmsInventoryBinMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.inventory.product.WmsInventoryProductMapper;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
+import cn.iocoder.yudao.module.wms.enums.WmsConstants;
+import cn.iocoder.yudao.module.wms.enums.common.WmsBillType;
 import cn.iocoder.yudao.module.wms.enums.inventory.WmsInventoryAuditStatus;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.stock.bin.WmsStockBinService;
 import cn.iocoder.yudao.module.wms.service.stock.warehouse.WmsStockWarehouseService;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
@@ -74,6 +81,10 @@ public class WmsInventoryServiceImpl implements WmsInventoryService {
     @Resource
     @Lazy
     private WmsWarehouseService warehouseService;
+
+    @Resource(name = InventoryStateMachineConfigure.STATE_MACHINE_NAME)
+    private StateMachineWrapper<Integer, WmsInventoryAuditStatus.Event, WmsInventoryDO> inventoryStateMachine;
+
 
     /**
      * @sign : A9D51C9E0E654C80
@@ -289,4 +300,22 @@ public class WmsInventoryServiceImpl implements WmsInventoryService {
         inventoryMapper.updateById(inventoryDO);
         return inventoryDO;
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void approve(WmsInventoryAuditStatus.Event event, WmsApprovalReqVO approvalReqVO) {
+        // 设置业务默认值
+        approvalReqVO.setBillType(WmsBillType.OUTBOUND.getValue());
+        approvalReqVO.setStatusType(WmsOutboundAuditStatus.getType());
+        // 获得业务对象
+        WmsInventoryDO inbound = validateInventoryExists(approvalReqVO.getBillId());
+
+        TransitionContext<WmsInventoryDO> ctx = inventoryStateMachine.createContext(inbound);
+        ctx.setExtra(WmsConstants.APPROVAL_REQ_VO_KEY, approvalReqVO);
+        // 触发事件
+        inventoryStateMachine.fireEvent(event, ctx);
+    }
+
+
+
 }

@@ -8,23 +8,23 @@ import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
-import cn.iocoder.yudao.module.system.api.dept.DeptApi;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.config.InboundStateMachineConfigure;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalHistoryRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
-import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.inbound.WmsInboundMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.WmsInboundItemMapper;
+import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.WmsInboundItemOwnershipQueryMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.flow.WmsInboundItemFlowMapper;
 import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
@@ -32,6 +32,7 @@ import cn.iocoder.yudao.module.wms.enums.WmsConstants;
 import cn.iocoder.yudao.module.wms.enums.common.WmsBillType;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
+import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundType;
 import cn.iocoder.yudao.module.wms.service.approval.history.WmsApprovalHistoryService;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
@@ -39,12 +40,13 @@ import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_CAN_NOT_EDIT;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_PLAN_QTY_ERROR;
@@ -72,6 +74,10 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     @Resource
     @Lazy
     private WmsInboundItemFlowMapper inboundItemFlowMapper;
+
+    @Resource
+    @Lazy
+    private WmsInboundItemOwnershipQueryMapper inboundItemOwnershipQueryMapper;
 
     @Resource
     private WmsNoRedisDAO noRedisDAO;
@@ -374,4 +380,58 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         Map<Long, List<WmsApprovalHistoryRespVO>> groupedApprovalHistory = approvalHistoryService.selectGroupedApprovalHistory(WmsBillType.INBOUND, StreamX.from(list).toList(WmsInboundRespVO::getId));
         StreamX.from(list).assemble(groupedApprovalHistory, WmsInboundRespVO::getId, WmsInboundRespVO::setApprovalHistoryList);
     }
-}
+
+
+    /**
+     * 按入库顺序获得第一个入库批次
+     * @param warehouseId
+     * @param productId
+     * @param olderFirst 是否按入库时间升序
+     **/
+    public WmsInboundItemOwnershipDO getInboundItemOwnership(Long warehouseId, Long productId, boolean olderFirst) {
+        return inboundItemOwnershipQueryMapper.getInboundItemOwnership(warehouseId, productId, olderFirst);
+    }
+
+    /**
+     * 按入库顺序获得第一个入库批次
+     * @param warehouseId
+     * @param productId
+     * @param olderFirst 是否按入库时间升序
+     * @param limit 最大数量
+     **/
+    public List<WmsInboundItemOwnershipDO> selectInboundItemOwnershipList(Long warehouseId, Long productId,boolean olderFirst,int limit) {
+        return inboundItemOwnershipQueryMapper.selectInboundItemOwnershipList(warehouseId, productId, olderFirst, limit);
+    }
+
+    @Override
+    public WmsInboundDO createForInventory(WmsInboundSaveReqVO inboundSaveReqVO) {
+
+        JdbcUtils.requireTransaction();
+        // 创建
+        WmsInboundDO inbound = this.createInbound(inboundSaveReqVO);
+        // 保存
+        inbound.setSourceBillType(WmsBillType.INVENTORY.getValue());
+        inbound.setType(WmsInboundType.INVENTORY.getValue());
+        inboundMapper.updateById(inbound);
+        //
+        WmsApprovalReqVO approvalReqVO = new WmsApprovalReqVO();
+        approvalReqVO.setBillId(inbound.getId());
+        approvalReqVO.setComment("盘点入库");
+
+        this.approve(WmsInboundAuditStatus.Event.SUBMIT, approvalReqVO);
+
+        // 拉取明细
+        List<WmsInboundItemDO> inboundItemDOS = inboundItemService.selectByInboundId(inbound.getId());
+        // 设置实际入库量
+        StreamX.from(inboundItemDOS).assemble(inboundSaveReqVO.getItemList(), WmsInboundItemSaveReqVO::getProductId,WmsInboundItemDO::getProductId,(a,b)->{
+           a.setActualQty(b.getActualQty());
+        });
+        // 保存实际入库量
+        inboundItemService.updateActualQuantity(BeanUtils.toBean(inboundItemDOS, WmsInboundItemSaveReqVO.class));
+        // 同意确认收货
+        this.approve(WmsInboundAuditStatus.Event.AGREE, approvalReqVO);
+        //
+        return this.getInbound(inbound.getId());
+    }
+
+}

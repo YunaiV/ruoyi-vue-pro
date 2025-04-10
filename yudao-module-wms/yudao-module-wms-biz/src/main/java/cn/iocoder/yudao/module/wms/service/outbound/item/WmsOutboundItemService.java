@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.item.WmsOutboundItemDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import java.util.List;
 
 /**
  * 出库单详情 Service 接口
@@ -58,4 +59,9 @@ public interface WmsOutboundItemService {
     void assembleProducts(List<WmsOutboundItemRespVO> itemList);
 
     void updateActualQuantity(List<WmsOutboundItemSaveReqVO> updateReqVOList);
+
+    /**
+     * 按 ID 集合查询 WmsOutboundItemDO
+     */
+    List<WmsOutboundItemDO> selectByIds(List<Long> idList);
 }

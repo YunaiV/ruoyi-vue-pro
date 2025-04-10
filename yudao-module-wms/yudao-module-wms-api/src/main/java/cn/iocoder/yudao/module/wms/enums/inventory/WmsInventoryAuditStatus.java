@@ -93,7 +93,7 @@ public enum WmsInventoryAuditStatus implements ArrayValuable<Integer>, DictEnum 
 
     public static enum Event {
 
-        SUBMIT("提交审核"),AGREE("通过审核"), REJECT("拒绝审核"),FINISH("完成盘点");
+        SUBMIT("提交审核"),AGREE("通过审核"), REJECT("拒绝审核");
 
         @Getter
         private String label;

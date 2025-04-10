@@ -7,11 +7,10 @@ import java.time.LocalDateTime;
 import com.alibaba.excel.annotation.*;
 import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
-
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,creator,create_time,bin_id,plan_qty,outbound_id,updater,source_item_id,update_time,actual_qty,outbound_status,product_id,id
+ * @table-fields : tenant_id,creator,company_id,create_time,bin_id,plan_qty,outbound_id,updater,source_item_id,update_time,outbound_status,actual_qty,product_id,id,dept_id
  */
 @Schema(description = "管理后台 - 出库单详情 Response VO")
 @Data
@@ -86,4 +85,12 @@ public class WmsOutboundItemRespVO {
     @Schema(description = "计划出库量", example = "")
     @ExcelProperty("计划出库量")
     private Integer planQty;
+
+    @Schema(description = "库存财务公司ID", example = "")
+    @ExcelProperty("库存财务公司ID")
+    private Long companyId;
+
+    @Schema(description = "库存归属部门ID", example = "")
+    @ExcelProperty("库存归属部门ID")
+    private Long deptId;
 }

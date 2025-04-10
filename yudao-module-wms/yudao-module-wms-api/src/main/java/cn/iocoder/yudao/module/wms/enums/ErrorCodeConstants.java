@@ -119,6 +119,7 @@ public interface ErrorCodeConstants {
     ErrorCode PICKUP_CAN_NOT_EDIT = new ErrorCode(2_001_012_005, "拣货单不允许编辑");
     ErrorCode PICKUP_CAN_NOT_DELETE = new ErrorCode(2_001_012_006, "拣货单不允许删除");
     ErrorCode PICKUP_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_012_007, "拣货单不符合审批条件");
+    ErrorCode PICKUP_EXISTS = new ErrorCode(2_001_012_008, "拣货单已存在");
 
     // ========== WMS_PICKUP_ITEM 拣货单详情表 2_001_013_000 ==========
     ErrorCode PICKUP_ITEM_NOT_EXISTS = new ErrorCode(2_001_013_001, "拣货单详情不存在");
@@ -142,6 +143,7 @@ public interface ErrorCodeConstants {
     ErrorCode OUTBOUND_WAREHOUSE_ERROR = new ErrorCode(2_001_014_007, "出库仓库错误");
     ErrorCode OUTBOUND_AUDIT_ERROR = new ErrorCode(2_001_014_008, "出库单审批状态错误");
     ErrorCode OUTBOUND_AUDIT_FAIL = new ErrorCode(2_001_014_009, "审核错误，当前出库单状态为%s，在%s状态时才允许%s");
+    ErrorCode OUTBOUND_ITEM_EXISTS = new ErrorCode(2_001_014_010, "出库单详情已存在");
 
     // ========== WMS_OUTBOUND 出库单 2_001_015_000 ==========
     ErrorCode OUTBOUND_NOT_EXISTS = new ErrorCode(2_001_015_001, "出库单不存在");

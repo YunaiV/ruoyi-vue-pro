@@ -26,10 +26,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.Arrays;
 import java.util.List;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_NOT_EXISTS;
@@ -98,7 +96,7 @@ public class WmsPickupController {
         // 组装拣货单详情
         List<WmsPickupItemDO> pickupItemList = pickupItemService.selectByPickupId(pickupVO.getId());
         pickupVO.setItemList(BeanUtils.toBean(pickupItemList, WmsPickupItemRespVO.class));
-        //
+        // 
         pickupService.assembleWarehouse(Arrays.asList(pickupVO));
         pickupItemService.assembleProduct(pickupVO.getItemList());
         // 返回
@@ -121,7 +119,6 @@ public class WmsPickupController {
 			.mapping(WmsPickupRespVO::getCreator, WmsPickupRespVO::setCreatorName)
 			.mapping(WmsPickupRespVO::getCreator, WmsPickupRespVO::setUpdaterName)
 			.fill();
-
         // 组装仓库
         pickupService.assembleWarehouse(voPageResult.getList());
         // 返回
@@ -137,4 +134,4 @@ public class WmsPickupController {
     // // 导出 Excel
     // ExcelUtils.write(response, "拣货单.xls", "数据", WmsPickupRespVO.class, BeanUtils.toBean(list, WmsPickupRespVO.class));
     // }
-}
+}
