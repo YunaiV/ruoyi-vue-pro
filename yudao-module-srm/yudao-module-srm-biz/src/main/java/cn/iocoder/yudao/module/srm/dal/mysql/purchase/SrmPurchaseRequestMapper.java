@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.srm.dal.mysql.purchase;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.SrmPurchaseRequestPageReqVO;
@@ -39,7 +38,9 @@ public interface SrmPurchaseRequestMapper extends BaseMapperX<SrmPurchaseRequest
 
     //getBoWrapper
     default MPJLambdaWrapper<SrmPurchaseRequestDO> getBoWrapper(SrmPurchaseRequestPageReqVO reqVO) {
-        return queryWrapper(reqVO).innerJoin(SrmPurchaseRequestItemsDO.class, SrmPurchaseRequestItemsDO::getRequestId, SrmPurchaseRequestDO::getId,
+        return queryWrapper(reqVO)
+            .distinct()
+            .innerJoin(SrmPurchaseRequestItemsDO.class, SrmPurchaseRequestItemsDO::getRequestId, SrmPurchaseRequestDO::getId,
                 on -> on.eqIfExists(SrmPurchaseRequestItemsDO::getProductId, reqVO.getProductId())
                     .likeIfExists(SrmPurchaseRequestItemsDO::getBarCode, reqVO.getBarCode())
                     .likeIfExists(SrmPurchaseRequestItemsDO::getProductUnitName, reqVO.getProductUnitName())
@@ -47,9 +48,9 @@ public interface SrmPurchaseRequestMapper extends BaseMapperX<SrmPurchaseRequest
             .selectAsClass(SrmPurchaseRequestItemsDO.class, SrmPurchaseRequestBO.class);
     }
 
-    default PageResult<SrmPurchaseRequestDO> selectPage(SrmPurchaseRequestPageReqVO reqVO) {
-        return selectPage(reqVO, getBoWrapper(reqVO));
-    }
+//    default PageResult<SrmPurchaseRequestDO> selectPage(SrmPurchaseRequestPageReqVO reqVO) {
+//        return selectPage(reqVO, getBoWrapper(reqVO));
+//    }
 
     default SrmPurchaseRequestDO selectByNo(String no) {
         return selectOne(SrmPurchaseRequestDO::getNo, no);

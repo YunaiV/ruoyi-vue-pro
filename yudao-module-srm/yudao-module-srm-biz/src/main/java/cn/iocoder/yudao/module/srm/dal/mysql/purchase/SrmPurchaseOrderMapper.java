@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.srm.dal.mysql.purchase;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.req.SrmPurchaseOrderPageReqVO;
@@ -56,9 +55,9 @@ public interface SrmPurchaseOrderMapper extends BaseMapperX<SrmPurchaseOrderDO> 
             .selectAsClass(SrmPurchaseOrderItemDO.class, SrmPurchaseOrderItemBO.class);
     }
 
-    default PageResult<SrmPurchaseOrderDO> selectPage(SrmPurchaseOrderPageReqVO reqVO) {
-        return selectPage(reqVO, getBOWrapper(reqVO));
-    }
+//    default PageResult<SrmPurchaseOrderDO> selectPage(SrmPurchaseOrderPageReqVO reqVO) {
+//        return selectPage(reqVO, getBOWrapper(reqVO));
+//    }
 
     default int updateByIdAndStatus(Long id, Integer status, SrmPurchaseOrderDO updateObj) {
         return update(updateObj,
