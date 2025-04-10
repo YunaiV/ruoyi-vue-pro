@@ -2,7 +2,7 @@ package cn.iocoder.yudao.framework.template.core.impl;
 
 import cn.hutool.core.net.URLDecoder;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.template.config.TemplateConfigureFactory;
+import cn.iocoder.yudao.framework.template.config.TemplateConfigFactory;
 import cn.iocoder.yudao.framework.template.core.TemplateService;
 import com.deepoove.poi.XWPFTemplate;
 import lombok.Getter;
@@ -32,7 +32,7 @@ public class TemplateServiceRedisImpl implements TemplateService {
     private static final Duration CACHE_TTL = Duration.ofDays(1);
 
     private RedisTemplate<String, byte[]> redisTemplate;
-    private TemplateConfigureFactory configureFactory;
+    private TemplateConfigFactory configureFactory;
 
     public static byte[] getTemplateBytesFromResource(Resource resource) {
         if (resource == null) {
@@ -62,7 +62,7 @@ public class TemplateServiceRedisImpl implements TemplateService {
     }
 
     @Override
-    public XWPFTemplate reBuildXWPDFTemplate(Resource resource) {
+    public XWPFTemplate rebuildXWPDFTemplate(Resource resource) {
         refreshTemplateBytes(resource);
         return buildXWPDFTemplate(resource);
     }

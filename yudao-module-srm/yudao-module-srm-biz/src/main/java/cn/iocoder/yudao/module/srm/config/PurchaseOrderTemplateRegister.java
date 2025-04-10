@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.srm.config;
 
-import cn.iocoder.yudao.framework.template.config.TemplateTagPolicyProperty;
-import cn.iocoder.yudao.framework.template.core.TemplatePolicyRegistrar;
+import cn.iocoder.yudao.framework.template.config.TemplatePolicy;
+import cn.iocoder.yudao.framework.template.config.TemplateRegister;
 import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
 import com.deepoove.poi.policy.RenderPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 @Component
-public class TemplatePurchaseOrderPolicyRegistrarImpl implements TemplatePolicyRegistrar {
+public class PurchaseOrderTemplateRegister implements TemplateRegister {
 
     String FILEPATH = "classpath:purchase/order/*.docx";
     @Value("${srm.enable-preload:false}")
@@ -28,8 +28,8 @@ public class TemplatePurchaseOrderPolicyRegistrarImpl implements TemplatePolicyR
     private ResourcePatternResolver resourcePatternResolver;
 
     @Override
-    public List<TemplateTagPolicyProperty> getPolicyProperties() {
-        ArrayList<TemplateTagPolicyProperty> list = new ArrayList<>();
+    public List<TemplatePolicy> getTemplatePolicies() {
+        ArrayList<TemplatePolicy> list = new ArrayList<>();
         Resource[] resources = null;
         try {
             resources = resourcePatternResolver.getResources(FILEPATH);
@@ -40,7 +40,7 @@ public class TemplatePurchaseOrderPolicyRegistrarImpl implements TemplatePolicyR
             HashMap<String, RenderPolicy> map = new HashMap<>();
             map.put("products", new LoopRowTableRenderPolicy());
 //            map.put("products", new LoopRowTableRenderPolicy());
-            list.add(TemplateTagPolicyProperty.builder().policies(List.of(map)).enablePreload(enablePreload).resource(resource).build());
+            list.add(TemplatePolicy.builder().policies(List.of(map)).enablePreload(enablePreload).resource(resource).build());
         }
         return list;
     }

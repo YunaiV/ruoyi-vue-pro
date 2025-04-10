@@ -10,13 +10,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.RedisTemplate;
 
 @AutoConfiguration
-//@EnableConfigurationProperties(TemplateTagPolicyProperty.class)
+//@EnableConfigurationProperties(TemplatePolicy.class)
 @Slf4j
 public class TemplateAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public TemplateService templateService(RedisTemplate<String, byte[]> byteArrayRedisTemplate, TemplateConfigureFactory configureFactory) {
+    public TemplateService templateService(RedisTemplate<String, byte[]> byteArrayRedisTemplate, TemplateConfigFactory configureFactory) {
         TemplateServiceRedisImpl service = new TemplateServiceRedisImpl();
         //        service.setSelf(service); // 注入代理对象
         service.setRedisTemplate(byteArrayRedisTemplate);
@@ -26,14 +26,14 @@ public class TemplateAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public TemplateConfigureFactory templateConfigureFactory() {
-        return new TemplateConfigureFactory(); // 如果需要注入策略 registrar，可在此处扩展
+    public TemplateConfigFactory templateConfigureFactory() {
+        return new TemplateConfigFactory(); // 如果需要注入策略 register，可在此处扩展
     }
 
 
     @Bean
     @ConditionalOnMissingBean
-    public TemplateManager templateManager(TemplateService templateService, TemplateConfigureFactory factory) {
+    public TemplateManager templateManager(TemplateService templateService, TemplateConfigFactory factory) {
         TemplateManager manager = new TemplateManager();
         manager.setTemplateService(templateService);
         manager.setConfigureFactory(factory);

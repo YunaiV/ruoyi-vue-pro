@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.template.core;
 
-import cn.iocoder.yudao.framework.template.config.TemplateConfigureFactory;
-import cn.iocoder.yudao.framework.template.config.TemplateTagPolicyProperty;
+import cn.iocoder.yudao.framework.template.config.TemplateConfigFactory;
+import cn.iocoder.yudao.framework.template.config.TemplatePolicy;
 import com.aspose.words.Document;
 import com.aspose.words.SaveFormat;
 import com.deepoove.poi.XWPFTemplate;
@@ -26,7 +26,7 @@ import java.io.InputStream;
 public class TemplateManager {
 
     @Autowired
-    private TemplateConfigureFactory configureFactory;
+    private TemplateConfigFactory configureFactory;
     @Autowired
     private TemplateService templateService;
 
@@ -40,17 +40,17 @@ public class TemplateManager {
     @Async
     public void preloadWordAndPdfTemplates() {
         long start = System.currentTimeMillis();
-        configureFactory.getRegistrars()
-            .forEach(registrar -> registrar.getPolicyProperties().stream().filter(TemplateTagPolicyProperty::getEnablePreload).forEach(
-                TemplateTagPolicyProperty -> {
-                    preloadSingleWordTemplate(TemplateTagPolicyProperty.getResource());
-                    preloadSinglePdfTemplate(TemplateTagPolicyProperty.getResource());
+        configureFactory.getRegisters()
+            .forEach(register -> register.getTemplatePolicies().stream().filter(TemplatePolicy::getEnablePreload).forEach(
+                TemplatePolicy -> {
+                    preloadSingleWordTemplate(TemplatePolicy.getResource());
+                    preloadSinglePdfTemplate(TemplatePolicy.getResource());
                 }));
         log.info("全部模板预热完成，耗时 {}ms", System.currentTimeMillis() - start);
     }
 
     private void preloadSingleWordTemplate(Resource resource) {
-        try (XWPFTemplate ignored = templateService.reBuildXWPDFTemplate(resource)) {
+        try (XWPFTemplate ignored = templateService.rebuildXWPDFTemplate(resource)) {
             log.info("Word 模板预热成功 [{}]", resource.getFilename());
         } catch (Exception e) {
             log.warn("Word 模板预热失败 [{}]: {}", resource, e.getMessage());

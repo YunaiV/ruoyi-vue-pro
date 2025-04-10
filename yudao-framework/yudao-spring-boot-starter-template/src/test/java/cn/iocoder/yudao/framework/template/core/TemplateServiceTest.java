@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.framework.template.core;
 
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
-import cn.iocoder.yudao.framework.template.config.TemplateConfigureFactory;
-import cn.iocoder.yudao.framework.template.config.TemplateProperties;
+import cn.iocoder.yudao.framework.template.config.TemplateConfigFactory;
 import cn.iocoder.yudao.framework.template.core.impl.TemplateServiceImpl;
 import cn.iocoder.yudao.framework.template.core.impl.TemplateServiceRedisImpl;
 import cn.iocoder.yudao.framework.test.core.ut.BaseRedisUnitTest;
@@ -22,7 +21,7 @@ import java.io.IOException;
 
 @Slf4j
 @Disabled
-@Import({TemplateServiceImpl.class, TemplateConfigureFactory.class, TemplateProperties.class, RedisTemplate.class, YudaoRedisAutoConfiguration.class,
+@Import({TemplateServiceImpl.class, TemplateConfigFactory.class, RedisTemplate.class, YudaoRedisAutoConfiguration.class,
     TemplateServiceRedisImpl.class, ResourcePatternResolver.class})
 class TemplateServiceTest extends BaseRedisUnitTest {
 

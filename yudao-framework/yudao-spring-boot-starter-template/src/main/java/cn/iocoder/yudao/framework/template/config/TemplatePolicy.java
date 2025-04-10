@@ -17,7 +17,7 @@ import java.util.Map;
  */
 @Data
 @Builder
-public class TemplateTagPolicyProperty {
+public class TemplatePolicy {
 
 
     /**

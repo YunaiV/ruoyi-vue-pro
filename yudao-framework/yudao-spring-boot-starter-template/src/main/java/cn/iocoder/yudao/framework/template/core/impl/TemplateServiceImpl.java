@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.framework.template.core.impl;
 
-import cn.iocoder.yudao.framework.template.config.TemplateConfigureFactory;
+import cn.iocoder.yudao.framework.template.config.TemplateConfigFactory;
 import cn.iocoder.yudao.framework.template.core.TemplateService;
 import com.deepoove.poi.XWPFTemplate;
 import lombok.Getter;
@@ -30,7 +30,7 @@ public class TemplateServiceImpl implements TemplateService {
 
     private TemplateService self;
 
-    private TemplateConfigureFactory configureFactory;
+    private TemplateConfigFactory configureFactory;
 
     @Override
     public XWPFTemplate buildXWPDFTemplate(Resource resource) {
@@ -67,7 +67,7 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public XWPFTemplate reBuildXWPDFTemplate(Resource resource) {
+    public XWPFTemplate rebuildXWPDFTemplate(Resource resource) {
         byte[] templateBytes = self.refreshTemplateBytes(resource);
         if (templateBytes == null || templateBytes.length == 0) {
             throw exception(GENERATE_CONTRACT_FAIL, resource.getFilename(), "模板内容为空");

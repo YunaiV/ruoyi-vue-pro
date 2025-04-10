@@ -2,7 +2,6 @@ package cn.iocoder.yudao.framework.template.config;
 
 import cn.hutool.core.net.URLDecoder;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.template.core.TemplatePolicyRegistrar;
 import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.config.ConfigureBuilder;
 import com.deepoove.poi.policy.RenderPolicy;
@@ -10,6 +9,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
@@ -20,23 +20,23 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 收集所有模块渲染 Word 的策略，模块实现 TemplatePolicyRegistrar 接口
+ * 收集所有模块渲染 Word 的策略
  */
 @Slf4j
 @Configuration
 @Getter
-public class TemplateConfigureFactory {
+public class TemplateConfigFactory {
 
     /**
      * 本地缓存（key = classpath 相对路径）
      */
     private final Map<String, Map<String, RenderPolicy>> resourceTagPolicyCache = new ConcurrentHashMap<>();
     @Autowired
-    private List<TemplatePolicyRegistrar> registrars;
+    private List<TemplateRegister> registers;
 
     public static String buildResourceKey(Resource resource) {
         try {
-            if (resource instanceof org.springframework.core.io.ClassPathResource classPathResource) {
+            if (resource instanceof ClassPathResource classPathResource) {
                 return classPathResource.getPath();
             }
 
@@ -54,12 +54,12 @@ public class TemplateConfigureFactory {
             return resourceTagPolicyCache;
         }
 
-        for (TemplatePolicyRegistrar registrar : registrars) {
-            List<TemplateTagPolicyProperty> properties = registrar.getPolicyProperties();
-            if (properties == null || properties.isEmpty()) continue;
+        for (TemplateRegister register : registers) {
+            List<TemplatePolicy> policies = register.getTemplatePolicies();
+            if (policies == null || policies.isEmpty()) continue;
 
-            for (TemplateTagPolicyProperty prop : properties) {
-                Resource resource = prop.getResource();
+            for (TemplatePolicy policy : policies) {
+                Resource resource = policy.getResource();
                 if (resource == null) continue;
 
                 String resourceKey = buildResourceKey(resource);
@@ -68,8 +68,8 @@ public class TemplateConfigureFactory {
                 Map<String, RenderPolicy> tagPolicyMap =
                     resourceTagPolicyCache.computeIfAbsent(resourceKey, key -> new HashMap<>());
 
-                if (prop.getPolicies() != null) {
-                    for (Map<String, RenderPolicy> policyEntry : prop.getPolicies()) {
+                if (policy.getPolicies() != null) {
+                    for (Map<String, RenderPolicy> policyEntry : policy.getPolicies()) {
                         tagPolicyMap.putAll(policyEntry);
                     }
                 }
