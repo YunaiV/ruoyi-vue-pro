@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.erp.service.product.chestdrawers.bo;
 
-import lombok.Data;
 import cn.iocoder.yudao.module.erp.service.product.bo.ErpProductBO;
+import lombok.Data;
 
 /**
  * 斗柜

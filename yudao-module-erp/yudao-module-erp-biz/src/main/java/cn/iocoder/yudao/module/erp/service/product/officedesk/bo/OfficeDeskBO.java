@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.erp.service.product.officedesk.bo;
 
-import lombok.Data;
 import cn.iocoder.yudao.module.erp.service.product.bo.ErpProductBO;
+import lombok.Data;
 
 /**
  * 办公桌

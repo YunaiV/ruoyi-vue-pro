@@ -16,9 +16,11 @@ import com.somle.eccang.model.req.EccangReceivingReqVo;
 import com.somle.eccang.model.req.EccangRmaReturnReqVO;
 import com.somle.eccang.repository.EccangTokenRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
@@ -49,7 +51,7 @@ public class EccangService {
     @Autowired
     EccangTokenRepository tokenRepo;
 
-    @Autowired
+    @Resource
     MessageChannel eccangSaleOutputChannel;
 
 

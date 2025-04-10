@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.returns.ErpSaleRetur
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOutDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleReturnDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleReturnItemDO;
-import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -43,7 +43,7 @@ public interface ErpSaleReturnMapper extends BaseMapperX<ErpSaleReturnDO> {
             query.apply("t.refund_price = t.total_price");
         }
         if (Boolean.TRUE.equals(reqVO.getRefundEnable())) {
-            query.eq(ErpSaleOutDO::getStatus, ErpAuditStatus.APPROVE.getStatus())
+            query.eq(ErpSaleOutDO::getStatus, ErpAuditStatus.APPROVED.getCode())
                     .apply("t.refund_price < t.total_price");
         }
         if (reqVO.getWarehouseId() != null || reqVO.getProductId() != null) {

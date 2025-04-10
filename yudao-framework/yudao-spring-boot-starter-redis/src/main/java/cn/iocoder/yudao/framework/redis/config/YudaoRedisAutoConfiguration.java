@@ -42,4 +42,22 @@ public class YudaoRedisAutoConfiguration {
         return json;
     }
 
+    /**
+     * 创建支持 byte[] 存储的 RedisTemplate
+     */
+    @Bean(name = "byteArrayRedisTemplate")
+    public RedisTemplate<String, byte[]> byteArrayRedisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, byte[]> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
+
+        // key 使用字符串序列器
+        template.setKeySerializer(RedisSerializer.string());
+        template.setHashKeySerializer(RedisSerializer.string());
+
+        // value 使用原始 byte[] 序列器
+        template.setValueSerializer(RedisSerializer.byteArray());
+        template.setHashValueSerializer(RedisSerializer.byteArray());
+
+        return template;
+    }
 }
