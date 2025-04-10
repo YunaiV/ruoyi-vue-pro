@@ -79,7 +79,7 @@ public interface WmsInboundService {
 
     void assembleWarehouse(List<WmsInboundRespVO> list);
 
-    void assembleDept(List<WmsInboundRespVO> list);
+
 
     void assembleCompany(List<WmsInboundRespVO> list);
 

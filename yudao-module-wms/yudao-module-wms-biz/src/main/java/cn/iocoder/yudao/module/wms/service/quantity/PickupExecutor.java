@@ -204,7 +204,7 @@ public class PickupExecutor extends ActionExecutor<PickupContext> {
         Long companyId = inboundDO.getCompanyId();
         Integer quantity = pickupItemDO.getQty();
         // 刷新库存
-        Long deptId = inboundDO.getDeptId();
+        Long deptId = inboundItemVO.getDeptId();
         if (deptId == null) {
             deptId = inboundItemVO.getProduct().getDeptId();
         }

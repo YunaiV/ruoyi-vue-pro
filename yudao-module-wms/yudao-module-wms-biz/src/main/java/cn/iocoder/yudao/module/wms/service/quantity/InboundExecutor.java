@@ -38,12 +38,12 @@ public class InboundExecutor extends ActionExecutor<InboundContext> {
         final WmsInboundRespVO inboundRespVO = inboundService.getInboundWithItemList(context.getInboundId());
         Long warehouseId = inboundRespVO.getWarehouseId();
         Long companyId = inboundRespVO.getCompanyId();
-        Long inboundDeptId = inboundRespVO.getDeptId();
+
 
         List<WmsInboundItemRespVO> itemList = inboundRespVO.getItemList();
         for (WmsInboundItemRespVO item : itemList) {
             Long productId = item.getProductId();
-            Long deptId = inboundDeptId;
+            Long deptId = item.getDeptId();
             // 如果入库单上未指定部门,默认按产品的部门ID
             if (deptId == null) {
                 WmsProductRespSimpleVO productVO = item.getProduct();

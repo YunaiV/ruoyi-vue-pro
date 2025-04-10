@@ -88,4 +88,6 @@ public interface WmsInboundItemService {
     void assembleWarehouse(List<WmsInboundItemRespVO> list);
 
     void assembleWarehouseBin(List<WmsInboundItemRespVO> list);
+
+    void assembleDept(List<WmsInboundItemRespVO> list);
 }

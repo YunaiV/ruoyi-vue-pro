@@ -17,7 +17,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : no,inbound_status,company_id,inbound_time,arrival_actual_time,audit_status,creator_comment,type,source_bill_id,trace_no,init_age,source_bill_no,shipping_method,source_bill_type,id,dept_id,warehouse_id,arrival_plan_time
+ * @table-fields : no,inbound_status,company_id,inbound_time,arrival_actual_time,audit_status,creator_comment,type,source_bill_id,trace_no,init_age,source_bill_no,shipping_method,source_bill_type,id,warehouse_id,arrival_plan_time
  */
 @Schema(description = "管理后台 - 入库单新增/修改 Request VO")
 @Data
@@ -30,7 +30,7 @@ public class WmsInboundSaveReqVO {
     @Schema(description = "单据号")
     private String no;
 
-    @Schema(description = "入库单类型 ; InboundType : 1-手工入库 , 2-采购入库", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "入库单类型 ; WmsInboundType : 1-手工入库 , 2-采购入库", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "入库单类型不能为空", groups = { ValidationGroup.create.class })
     @InEnum(WmsInboundType.class)
     private Integer type;
@@ -45,14 +45,14 @@ public class WmsInboundSaveReqVO {
     @Schema(description = "来源单据号")
     private String sourceBillNo;
 
-    @Schema(description = "来源单据类型 ; BillType : 0-入库单 , 1-出库单", example = "2")
+    @Schema(description = "来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单", example = "2")
     @InEnum(WmsBillType.class)
     private Integer sourceBillType;
 
     @Schema(description = "跟踪号")
     private String traceNo;
 
-    @Schema(description = "运输方式 ; ShippingMethod : 0-海运 , 1-铁路 , 2-空运 , 3-集卡")
+    @Schema(description = "运输方式 ; WmsShippingMethod : 0-海运 , 1-铁路 , 2-空运 , 3-集卡")
     @InEnum(WmsShippingMethod.class)
     private Integer shippingMethod;
 
@@ -65,19 +65,16 @@ public class WmsInboundSaveReqVO {
     @Schema(description = "详情清单", example = "")
     private List<WmsInboundItemSaveReqVO> itemList;
 
-    @Schema(description = "入库单审批状态 ; InboundAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", example = "")
+    @Schema(description = "入库单审批状态 ; WmsInboundAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过 , 4-强制完成 , 5-已作废", example = "")
     @InEnum(WmsInboundAuditStatus.class)
     private Integer auditStatus;
 
-    @Schema(description = "入库状态 ; InboundStatus : 0-未入库 , 1-部分入库 , 2-已入库", example = "")
+    @Schema(description = "入库状态 ; WmsInboundStatus : 0-未入库 , 1-部分入库 , 2-已入库", example = "")
     @InEnum(WmsInboundStatus.class)
     private Integer inboundStatus;
 
     @Schema(description = "库存财务公司ID", example = "")
     private Long companyId;
-
-    @Schema(description = "库存归属部门ID", example = "")
-    private Long deptId;
 
     @Schema(description = "实际到货时间", example = "")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

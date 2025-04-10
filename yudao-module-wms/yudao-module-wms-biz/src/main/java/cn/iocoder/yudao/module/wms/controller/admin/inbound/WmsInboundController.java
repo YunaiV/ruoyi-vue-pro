@@ -156,7 +156,6 @@ public class WmsInboundController {
         PageResult<WmsInboundRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsInboundRespVO.class);
         // 装配
         inboundService.assembleWarehouse(voPageResult.getList());
-        inboundService.assembleDept(voPageResult.getList());
         inboundService.assembleCompany(voPageResult.getList());
         inboundService.assembleApprovalHistory(voPageResult.getList());
         // 人员姓名填充
@@ -192,4 +191,4 @@ public class WmsInboundController {
         // 导出 Excel
         ExcelUtils.write(response, "入库单.xls", "数据", WmsInboundRespVO.class, BeanUtils.toBean(list, WmsInboundRespVO.class));
     }
-}
+}

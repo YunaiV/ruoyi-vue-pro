@@ -78,7 +78,9 @@ public class WmsInboundItemController {
     // }
     // /**
     // * @sign : F0DA74F2E45ABE2D
-    // */
+    /**
+     * @sign : F0DA74F2E45ABE2D
+     */
     @GetMapping("/get")
     @Operation(summary = "获得入库单详情")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
@@ -93,10 +95,9 @@ public class WmsInboundItemController {
         WmsInboundItemRespVO inboundItemVO = BeanUtils.toBean(inboundItem, WmsInboundItemRespVO.class);
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(List.of(inboundItemVO))
-            .mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setCreatorName)
-            .mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setUpdaterName)
-            .fill();
-
+			.mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setCreatorName)
+			.mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setUpdaterName)
+			.fill();
         // 返回
         return success(inboundItemVO);
     }
@@ -114,18 +115,19 @@ public class WmsInboundItemController {
         PageResult<WmsInboundItemRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsInboundItemRespVO.class);
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
-            .mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setCreatorName)
-            .mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setUpdaterName)
-            .fill();
-
+			.mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setCreatorName)
+			.mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setUpdaterName)
+			.fill();
+        // 装配
+        inboundItemService.assembleDept(voPageResult.getList());
         inboundItemService.assembleInbound(voPageResult.getList());
         inboundItemService.assembleProducts(voPageResult.getList());
         inboundItemService.assembleWarehouse(voPageResult.getList());
         inboundItemService.assembleWarehouseBin(voPageResult.getList());
-
         // 返回
         return success(voPageResult);
     }
+
     @GetMapping("/pickup-pending")
     @Operation(summary = "待上架的入库明细")
     @PreAuthorize("@ss.hasPermission('wms:inbound-item:query')")
@@ -134,6 +136,8 @@ public class WmsInboundItemController {
         PageResult<WmsInboundItemQueryDO> doPageResult = inboundItemService.getPickupPending(pageReqVO);
         // 转换
         PageResult<WmsInboundItemRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsInboundItemRespVO.class);
+        // 填充部门信息
+        inboundItemService.assembleDept(voPageResult.getList());
         // 填充产品信息
         inboundItemService.assembleProducts(voPageResult.getList());
         // 填充入库单信息

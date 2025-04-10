@@ -6,6 +6,9 @@ import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemSaveReqVO;
@@ -66,8 +69,6 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
     @Resource
     private WmsInboundItemQueryMapper inboundItemQueryMapper;
 
-
-
     @Resource
     private ErpProductApi productApi;
 
@@ -82,6 +83,9 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
     @Resource
     @Lazy
     private WmsWarehouseBinService warehouseBinService;
+
+    @Resource
+    private DeptApi deptApi;
 
     /**
      * @sign : F55768BA65271F63
@@ -198,7 +202,7 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
         List<WmsInboundItemDO> inboundItemDOSInDB = inboundItemMapper.selectByIds(StreamX.from(updateReqVOList).toList(WmsInboundItemSaveReqVO::getId));
         for (WmsInboundItemDO itemDO : inboundItemDOSInDB) {
             WmsInboundItemSaveReqVO updateReqVO = updateReqVOMap.get(itemDO.getId());
-            if(updateReqVO.getActualQty()==null || updateReqVO.getActualQty()<=0) {
+            if (updateReqVO.getActualQty() == null || updateReqVO.getActualQty() <= 0) {
                 throw exception(INBOUND_ITEM_ACTUAL_QTY_ERROR);
             }
             itemDO.setActualQty(updateReqVO.getActualQty());
@@ -241,23 +245,19 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
     public void saveItems(List<WmsInboundItemDO> itemsToUpdate, List<WmsInboundItemFlowDO> inboundItemFlowList) {
         // 保存流水
         inboundItemFlowMapper.insertBatch(inboundItemFlowList);
-        Map<Long,WmsInboundItemFlowDO> flowDOMap=StreamX.from(inboundItemFlowList).toMap(WmsInboundItemFlowDO::getInboundItemId);
-
+        Map<Long, WmsInboundItemFlowDO> flowDOMap = StreamX.from(inboundItemFlowList).toMap(WmsInboundItemFlowDO::getInboundItemId);
         for (WmsInboundItemDO itemDO : itemsToUpdate) {
-            WmsInboundItemFlowDO flowDO=flowDOMap.get(itemDO.getId());
+            WmsInboundItemFlowDO flowDO = flowDOMap.get(itemDO.getId());
             itemDO.setLatestFlowId(flowDO.getId());
         }
         // 保存余量
         inboundItemMapper.updateBatch(itemsToUpdate);
-
     }
 
     @Override
     public void assembleWarehouse(List<WmsInboundItemRespVO> list) {
         Map<Long, WmsWarehouseDO> warehouseDOMap = warehouseService.getWarehouseMap(StreamX.from(list).toSet(WmsInboundItemRespVO::getWarehouseId));
-        Map<Long, WmsWarehouseSimpleRespVO> warehouseVOMap = StreamX.from(warehouseDOMap.values())
-            .toMap(WmsWarehouseDO::getId, v-> BeanUtils.toBean(v, WmsWarehouseSimpleRespVO.class));
-
+        Map<Long, WmsWarehouseSimpleRespVO> warehouseVOMap = StreamX.from(warehouseDOMap.values()).toMap(WmsWarehouseDO::getId, v -> BeanUtils.toBean(v, WmsWarehouseSimpleRespVO.class));
         StreamX.from(list).assemble(warehouseVOMap, WmsInboundItemRespVO::getWarehouseId, WmsInboundItemRespVO::setWarehouse);
     }
 
@@ -265,7 +265,7 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
     public void assembleWarehouseBin(List<WmsInboundItemRespVO> list) {
         List<WmsWarehouseBinDO> binDOList = warehouseBinService.selectByIds(StreamX.from(list).toList(WmsInboundItemRespVO::getBinId).stream().distinct().toList());
         List<WmsWarehouseBinRespVO> binVOList = BeanUtils.toBean(binDOList, WmsWarehouseBinRespVO.class);
-        StreamX.from(list).assemble(binVOList, WmsWarehouseBinRespVO::getId, WmsInboundItemRespVO::getBinId,WmsInboundItemRespVO::setBin);
+        StreamX.from(list).assemble(binVOList, WmsWarehouseBinRespVO::getId, WmsInboundItemRespVO::getBinId, WmsInboundItemRespVO::setBin);
     }
 
     @Override
@@ -279,5 +279,14 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
         StreamX.from(itemList).assemble(productVOMap, WmsInboundItemRespVO::getProductId, WmsInboundItemRespVO::setProduct);
     }
 
-
+    @Override
+    public void assembleDept(List<WmsInboundItemRespVO> list) {
+        Map<Long, DeptRespDTO> deptDTOMap = deptApi.getDeptMap(StreamX.from(list).map(WmsInboundItemRespVO::getDeptId).toList());
+        Map<Long, DeptSimpleRespVO> deptVOMap = new HashMap<>();
+        for (DeptRespDTO productDTO : deptDTOMap.values()) {
+            DeptSimpleRespVO deptVO = BeanUtils.toBean(productDTO, DeptSimpleRespVO.class);
+            deptVOMap.put(productDTO.getId(), deptVO);
+        }
+        StreamX.from(list).assemble(deptVOMap, WmsInboundItemRespVO::getDeptId, WmsInboundItemRespVO::setDept);
+    }
 }

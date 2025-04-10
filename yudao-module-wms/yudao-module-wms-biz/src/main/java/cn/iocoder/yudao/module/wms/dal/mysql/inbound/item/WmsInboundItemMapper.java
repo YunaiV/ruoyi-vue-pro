@@ -11,7 +11,6 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemQueryDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
 import org.apache.ibatis.annotations.Mapper;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,7 +21,6 @@ import java.util.List;
  */
 @Mapper
 public interface WmsInboundItemMapper extends BaseMapperX<WmsInboundItemDO> {
-
 
     /**
      * 按 inbound_id,product_id 查询唯一的 WmsInboundItemDO
@@ -46,8 +44,6 @@ public interface WmsInboundItemMapper extends BaseMapperX<WmsInboundItemDO> {
         return selectPage(reqVO, wrapper).getList();
     }
 
-
-
     default List<WmsInboundItemDO> selectItemListHasAvailableQty(Long warehouseId, Long productId) {
         MPJLambdaWrapperX<WmsInboundItemDO> query = new MPJLambdaWrapperX<>();
         query.select(WmsInboundItemDO::getId, WmsInboundItemDO::getInboundId, WmsInboundItemDO::getProductId, WmsInboundItemDO::getOutboundAvailableQty);
@@ -56,4 +52,4 @@ public interface WmsInboundItemMapper extends BaseMapperX<WmsInboundItemDO> {
         query.eq(WmsInboundDO::getWarehouseId, warehouseId).eq(WmsInboundItemDO::getProductId, productId).gt(WmsInboundItemDO::getOutboundAvailableQty, 0).last("ORDER BY DATEDIFF(t1.inbound_time, now())+t1.init_age desc");
         return selectList(query);
     }
-}
+}

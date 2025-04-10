@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 /**
  * 入库单详情 DO
  * @author 李方捷
- * @table-fields : inbound_id,outbound_available_qty,source_item_id,inbound_status,actual_qty,plan_qty,product_id,shelved_qty,id,latest_flow_id
+ * @table-fields : inbound_id,outbound_available_qty,source_item_id,inbound_status,notes,actual_qty,plan_qty,product_id,shelved_qty,id,dept_id,latest_flow_id
  */
 @TableName("wms_inbound_item")
 // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -70,4 +70,14 @@ public class WmsInboundItemDO extends BaseDO {
      * 最新的流水ID
      */
     private Long latestFlowId;
+
+    /**
+     * 库存归属部门ID
+     */
+    private Long deptId;
+
+    /**
+     * 备注
+     */
+    private String notes;
 }

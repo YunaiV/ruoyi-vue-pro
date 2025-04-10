@@ -87,8 +87,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     @Lazy
     private WmsInboundItemService inboundItemService;
 
-    @Resource
-    private DeptApi deptApi;
+
 
     @Resource
     private WmsApprovalHistoryService approvalHistoryService;
@@ -367,16 +366,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         StreamX.from(list).assemble(warehouseVOMap, WmsInboundRespVO::getWarehouseId, WmsInboundRespVO::setWarehouse);
     }
 
-    @Override
-    public void assembleDept(List<WmsInboundRespVO> list) {
-        Map<Long, DeptRespDTO> deptDTOMap = deptApi.getDeptMap(StreamX.from(list).map(WmsInboundRespVO::getDeptId).toList());
-        Map<Long, DeptSimpleRespVO> deptVOMap = new HashMap<>();
-        for (DeptRespDTO productDTO : deptDTOMap.values()) {
-            DeptSimpleRespVO deptVO = BeanUtils.toBean(productDTO, DeptSimpleRespVO.class);
-            deptVOMap.put(productDTO.getId(), deptVO);
-        }
-        StreamX.from(list).assemble(deptVOMap, WmsInboundRespVO::getDeptId, WmsInboundRespVO::setDept);
-    }
+
 
     @Override
     public void assembleCompany(List<WmsInboundRespVO> list) {
@@ -388,4 +378,4 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         Map<Long, List<WmsApprovalHistoryRespVO>> groupedApprovalHistory = approvalHistoryService.selectGroupedApprovalHistory(WmsBillType.INBOUND, StreamX.from(list).toList(WmsInboundRespVO::getId));
         StreamX.from(list).assemble(groupedApprovalHistory, WmsInboundRespVO::getId, WmsInboundRespVO::setApprovalHistoryList);
     }
-}
+}

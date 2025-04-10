@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
 
 /**
- * @table-fields : inbound_id,outbound_available_qty,source_item_id,inbound_status,actual_qty,plan_qty,product_id,shelved_qty,id,latest_flow_id
+ * @table-fields : inbound_id,outbound_available_qty,source_item_id,inbound_status,notes,actual_qty,plan_qty,product_id,shelved_qty,id,dept_id,latest_flow_id
  */
 @Schema(description = "管理后台 - 入库单详情新增/修改 Request VO")
 @Data
@@ -46,4 +46,10 @@ public class WmsInboundItemSaveReqVO {
 
     @Schema(description = "最新的流水ID", example = "")
     private Long latestFlowId;
+
+    @Schema(description = "库存归属部门ID", example = "")
+    private Long deptId;
+
+    @Schema(description = "备注", example = "")
+    private String notes;
 }
