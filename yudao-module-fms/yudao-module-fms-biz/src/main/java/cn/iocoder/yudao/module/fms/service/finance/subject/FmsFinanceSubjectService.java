@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.fms.controller.admin.finance.subject.vo.FmsFinanceSubjectPageReqVO;
 import cn.iocoder.yudao.module.fms.controller.admin.finance.subject.vo.FmsFinanceSubjectSaveReqVO;
 import cn.iocoder.yudao.module.fms.controller.admin.finance.subject.vo.FmsFinanceSubjectSimpleRespVO;
-import cn.iocoder.yudao.module.fms.dal.dataobject.finance.subject.FmsFinanceSubjectDO;
+import cn.iocoder.yudao.module.fms.dal.dataobject.finance.subject.FmsCompanyDO;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public interface FmsFinanceSubjectService {
      * @param id 编号
      * @return Erp财务主体
      */
-    FmsFinanceSubjectDO getFinanceSubject(Long id);
+    FmsCompanyDO getFinanceSubject(Long id);
 
 
     /**
@@ -53,7 +53,7 @@ public interface FmsFinanceSubjectService {
      * @param pageReqVO 分页查询
      * @return Erp财务主体分页
      */
-    PageResult<FmsFinanceSubjectDO> getFinanceSubjectPage(FmsFinanceSubjectPageReqVO pageReqVO);
+    PageResult<FmsCompanyDO> getFinanceSubjectPage(FmsFinanceSubjectPageReqVO pageReqVO);
 
     List<FmsFinanceSubjectSimpleRespVO> ListFinanceSubjectSimple();
 
@@ -63,5 +63,5 @@ public interface FmsFinanceSubjectService {
      * @param ids ids
      * @return FmsFinanceSubjectDO
      */
-    List<FmsFinanceSubjectDO> listFinanceSubject(List<Long> ids);
+    List<FmsCompanyDO> listFinanceSubject(List<Long> ids);
 }

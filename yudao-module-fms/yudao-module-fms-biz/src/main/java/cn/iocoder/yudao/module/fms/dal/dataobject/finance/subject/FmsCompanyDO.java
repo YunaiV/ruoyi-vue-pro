@@ -11,15 +11,15 @@ import lombok.*;
  *
  * @author 王岽宇
  */
-@TableName("erp_finance_company")
-@KeySequence("erp_finance_company_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("fms_company")
+@KeySequence("fms_company_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FmsFinanceSubjectDO extends BaseDO {
+public class FmsCompanyDO extends BaseDO {
     //公司名称
     private String companyName;
     /**

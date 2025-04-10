@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.fms.controller.admin.finance.subject.vo.FmsFinanc
 import cn.iocoder.yudao.module.fms.controller.admin.finance.subject.vo.FmsFinanceSubjectRespVO;
 import cn.iocoder.yudao.module.fms.controller.admin.finance.subject.vo.FmsFinanceSubjectSaveReqVO;
 import cn.iocoder.yudao.module.fms.controller.admin.finance.subject.vo.FmsFinanceSubjectSimpleRespVO;
-import cn.iocoder.yudao.module.fms.dal.dataobject.finance.subject.FmsFinanceSubjectDO;
+import cn.iocoder.yudao.module.fms.dal.dataobject.finance.subject.FmsCompanyDO;
 import cn.iocoder.yudao.module.fms.service.finance.subject.FmsFinanceSubjectService;
 import cn.iocoder.yudao.module.system.api.utils.Validation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -68,7 +68,7 @@ public class FmsFinanceSubjectController {
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('fms:finance-subject:query')")
     public CommonResult<FmsFinanceSubjectRespVO> getFinanceSubject(@NotNull @RequestParam("id") Long id) {
-        FmsFinanceSubjectDO financeSubject = financeSubjectService.getFinanceSubject(id);
+        FmsCompanyDO financeSubject = financeSubjectService.getFinanceSubject(id);
         return success(BeanUtils.toBean(financeSubject, FmsFinanceSubjectRespVO.class));
     }
 
@@ -83,7 +83,7 @@ public class FmsFinanceSubjectController {
     @Operation(summary = "获得Erp财务主体分页")
     @PreAuthorize("@ss.hasPermission('fms:finance-subject:query')")
     public CommonResult<PageResult<FmsFinanceSubjectRespVO>> getFinanceSubjectPage(@Valid FmsFinanceSubjectPageReqVO pageReqVO) {
-        PageResult<FmsFinanceSubjectDO> pageResult = financeSubjectService.getFinanceSubjectPage(pageReqVO);
+        PageResult<FmsCompanyDO> pageResult = financeSubjectService.getFinanceSubjectPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, FmsFinanceSubjectRespVO.class));
     }
 
@@ -94,7 +94,7 @@ public class FmsFinanceSubjectController {
     public void exportFinanceSubjectExcel(@Valid FmsFinanceSubjectPageReqVO pageReqVO,
                                           HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<FmsFinanceSubjectDO> list = financeSubjectService.getFinanceSubjectPage(pageReqVO).getList();
+        List<FmsCompanyDO> list = financeSubjectService.getFinanceSubjectPage(pageReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "Erp财务主体.xls", "数据", FmsFinanceSubjectRespVO.class,
             BeanUtils.toBean(list, FmsFinanceSubjectRespVO.class));
