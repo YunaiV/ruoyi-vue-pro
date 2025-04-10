@@ -14,8 +14,8 @@ import java.math.BigDecimal;
  *
  * @author 芋道源码
  */
-@TableName("srm_purchase_in_items")
-@KeySequence("srm_purchase_in_items_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("srm_purchase_in_item")
+@KeySequence("srm_purchase_in_item_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

@@ -26,7 +26,7 @@ public class SrmPurchaseOrderBaseRespVO extends BaseVO {
 
     private String no;
     @Schema(description = "单据日期")
-    private LocalDateTime noTime;
+    private LocalDateTime billTime;
     @Schema(description = "采购时间")
 
     private LocalDateTime orderTime;

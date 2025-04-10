@@ -94,7 +94,7 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
     @Transactional(rollbackFor = Exception.class)
     public Long createPurchaseRequest(SrmPurchaseRequestSaveReqVO vo) {
         //获取单据日期，不为空就拿，为空就当前时间
-        vo.setRequestTime(vo.getRequestTime() == null ? LocalDateTime.now() : vo.getRequestTime());
+        vo.setBillTime(vo.getBillTime() == null ? LocalDateTime.now() : vo.getBillTime());
         //1.校验
         voSetNo(vo);
         //1.2 校验子表合法

@@ -58,14 +58,14 @@ public class TmsCustomProductController {
 
     @PostMapping("/create")
     @Operation(summary = "创建海关产品分类表")
-    @PreAuthorize("@ss.hasPermission('erp:custom-product:create')")
+    @PreAuthorize("@ss.hasPermission('tms:custom-product:create')")
     public CommonResult<Long> createCustomProduct(@Valid @RequestBody TmsCustomProductSaveReqVO createReqVO) {
         return success(customProductService.createCustomProduct(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新海关产品分类表")
-    @PreAuthorize("@ss.hasPermission('erp:custom-product:update')")
+    @PreAuthorize("@ss.hasPermission('tms:custom-product:update')")
     public CommonResult<Boolean> updateCustomProduct(@Valid @RequestBody TmsCustomProductSaveReqVO updateReqVO) {
         customProductService.updateCustomProduct(updateReqVO);
         return success(true);
@@ -74,7 +74,7 @@ public class TmsCustomProductController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除海关产品分类表")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:custom-product:delete')")
+    @PreAuthorize("@ss.hasPermission('tms:custom-product:delete')")
     public CommonResult<Boolean> deleteCustomProduct(@RequestParam("id") Long id) {
         customProductService.deleteCustomProduct(id);
         return success(true);
@@ -83,7 +83,7 @@ public class TmsCustomProductController {
     @GetMapping("/get")
     @Operation(summary = "获得海关产品分类表")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('erp:custom-product:query')")
+    @PreAuthorize("@ss.hasPermission('tms:custom-product:query')")
     public CommonResult<TmsCustomProductRespVO> getCustomProduct(@RequestParam("id") Long id) {
         TmsCustomProductDO customProduct = customProductService.getCustomProduct(id);
 
@@ -92,7 +92,7 @@ public class TmsCustomProductController {
 
     @GetMapping("/page")
     @Operation(summary = "获得海关产品分类表分页")
-    @PreAuthorize("@ss.hasPermission('erp:custom-product:query')")
+    @PreAuthorize("@ss.hasPermission('tms:custom-product:query')")
     public CommonResult<PageResult<TmsCustomProductRespVO>> getCustomProductPage(@Valid TmsCustomProductPageReqVO pageReqVO) {
         PageResult<TmsCustomProductDO> pageResult = customProductService.getCustomProductPage(pageReqVO);
         List<TmsCustomProductDO> list = pageResult.getList();
@@ -103,7 +103,7 @@ public class TmsCustomProductController {
     //精简列表接口
     @GetMapping("/simple-list")
     @Operation(summary = "获得海关产品分类表精简列表")
-    @PreAuthorize("@ss.hasPermission('erp:custom-product:query')")
+    @PreAuthorize("@ss.hasPermission('tms:custom-product:query')")
     public CommonResult<List<TmsCustomProductRespVO>> getCustomProductSimpleList() {
         List<TmsCustomProductDO> productDOS = customProductService.listCustomProductList();
         return success(bingResult(productDOS));
@@ -111,7 +111,7 @@ public class TmsCustomProductController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出海关产品分类表 Excel")
-    @PreAuthorize("@ss.hasPermission('erp:custom-product:export')")
+    @PreAuthorize("@ss.hasPermission('tms:custom-product:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportCustomProductExcel(@Valid TmsCustomProductPageReqVO pageReqVO,
                                          HttpServletResponse response) throws IOException {

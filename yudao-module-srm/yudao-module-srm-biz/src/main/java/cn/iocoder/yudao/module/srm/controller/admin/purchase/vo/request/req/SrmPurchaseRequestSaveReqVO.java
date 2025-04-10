@@ -38,7 +38,7 @@ public class SrmPurchaseRequestSaveReqVO {
 
     @Schema(description = "单据日期")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime requestTime;
+    private LocalDateTime billTime;
 
     @Pattern(regexp = "^" + PURCHASE_REQUEST_NO_PREFIX + "-\\d{8}-\\d{6}$",
         message = "单据编号格式不正确，正确格式如：" + PURCHASE_REQUEST_NO_PREFIX + "-20250108-000001")

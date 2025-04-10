@@ -52,7 +52,7 @@ public class SrmPurchaseInDO extends BaseDO {
     /**
      * 单据日期
      */
-    private LocalDateTime noTime;
+    private LocalDateTime billTime;
     //    /**
     //     * 币别
     //     */

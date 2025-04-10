@@ -25,7 +25,7 @@ public interface SrmPurchaseInMapper extends BaseMapperX<SrmPurchaseInDO> {
             .eqIfPresent(SrmPurchaseInDO::getReconciliationStatus, reqVO.getReconciliationEnable())
             .eqIfPresent(SrmPurchaseInDO::getAuditorId, reqVO.getAuditorId())
             //
-            .eqIfPresent(SrmPurchaseInDO::getAccountId, reqVO.getAccountId()).betweenIfPresent(SrmPurchaseInDO::getNoTime, reqVO.getNoTime())
+            .eqIfPresent(SrmPurchaseInDO::getAccountId, reqVO.getAccountId()).betweenIfPresent(SrmPurchaseInDO::getBillTime, reqVO.getBillTime())
             .betweenIfPresent(SrmPurchaseInDO::getAuditTime, reqVO.getAuditTime()).betweenIfPresent(SrmPurchaseInDO::getInTime, reqVO.getInTime());
 
     }

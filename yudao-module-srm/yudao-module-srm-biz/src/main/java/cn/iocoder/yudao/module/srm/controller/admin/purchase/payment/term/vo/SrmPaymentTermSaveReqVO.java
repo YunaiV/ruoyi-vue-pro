@@ -13,10 +13,10 @@ public class SrmPaymentTermSaveReqVO {
 
     @Schema(description = "人民币采购条款（中文）", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "人民币采购条款（中文）不能为空")
-    private String paymentTermCn;
+    private String paymentTermZh;
 
     @Schema(description = "外币采购条款（中文）")
-    private String paymentTermCnForeign;
+    private String paymentTermZhForeign;
 
     @Schema(description = "外币采购条款（英文）")
     private String paymentTermEnForeign;

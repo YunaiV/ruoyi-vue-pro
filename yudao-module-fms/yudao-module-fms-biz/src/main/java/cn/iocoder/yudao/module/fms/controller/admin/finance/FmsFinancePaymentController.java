@@ -40,7 +40,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 
 @Tag(name = "管理后台 - ERP 付款单")
 @RestController
-@RequestMapping("/erp/finance-payment")
+@RequestMapping("/fms/finance-payment")
 @Validated
 public class FmsFinancePaymentController {
 
@@ -55,14 +55,14 @@ public class FmsFinancePaymentController {
 
     @PostMapping("/create")
     @Operation(summary = "创建付款单")
-    @PreAuthorize("@ss.hasPermission('erp:finance-payment:create')")
+    @PreAuthorize("@ss.hasPermission('fms:finance-payment:create')")
     public CommonResult<Long> createFinancePayment(@Valid @RequestBody FmsFinancePaymentSaveReqVO createReqVO) {
         return success(financePaymentService.createFinancePayment(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新付款单")
-    @PreAuthorize("@ss.hasPermission('erp:finance-payment:update')")
+    @PreAuthorize("@ss.hasPermission('fms:finance-payment:update')")
     public CommonResult<Boolean> updateFinancePayment(@Valid @RequestBody FmsFinancePaymentSaveReqVO updateReqVO) {
         financePaymentService.updateFinancePayment(updateReqVO);
         return success(true);
@@ -70,7 +70,7 @@ public class FmsFinancePaymentController {
 
     @PutMapping("/update-status")
     @Operation(summary = "更新付款单的状态")
-    @PreAuthorize("@ss.hasPermission('erp:finance-payment:update-status')")
+    @PreAuthorize("@ss.hasPermission('fms:finance-payment:update-status')")
     public CommonResult<Boolean> updateFinancePaymentStatus(@RequestParam("id") Long id,
                                                             @RequestParam("status") Integer status) {
         financePaymentService.updateFinancePaymentStatus(id, status);
@@ -80,7 +80,7 @@ public class FmsFinancePaymentController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除付款单")
     @Parameter(name = "ids", description = "编号数组", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:finance-payment:delete')")
+    @PreAuthorize("@ss.hasPermission('fms:finance-payment:delete')")
     public CommonResult<Boolean> deleteFinancePayment(@RequestParam("ids") List<Long> ids) {
         financePaymentService.deleteFinancePayment(ids);
         return success(true);
@@ -89,7 +89,7 @@ public class FmsFinancePaymentController {
     @GetMapping("/get")
     @Operation(summary = "获得付款单")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('erp:finance-payment:query')")
+    @PreAuthorize("@ss.hasPermission('fms:finance-payment:query')")
     public CommonResult<FmsFinancePaymentRespVO> getFinancePayment(@RequestParam("id") Long id) {
         FmsFinancePaymentDO payment = financePaymentService.getFinancePayment(id);
         if (payment == null) {
@@ -102,7 +102,7 @@ public class FmsFinancePaymentController {
 
     @GetMapping("/page")
     @Operation(summary = "获得付款单分页")
-    @PreAuthorize("@ss.hasPermission('erp:finance-payment:query')")
+    @PreAuthorize("@ss.hasPermission('fms:finance-payment:query')")
     public CommonResult<PageResult<FmsFinancePaymentRespVO>> getFinancePaymentPage(@Valid FmsFinancePaymentPageReqVO pageReqVO) {
         PageResult<FmsFinancePaymentDO> pageResult = financePaymentService.getFinancePaymentPage(pageReqVO);
         return success(buildFinancePaymentVOPageResult(pageResult));
@@ -110,7 +110,7 @@ public class FmsFinancePaymentController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出付款单 Excel")
-    @PreAuthorize("@ss.hasPermission('erp:finance-payment:export')")
+    @PreAuthorize("@ss.hasPermission('fms:finance-payment:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportFinancePaymentExcel(@Valid FmsFinancePaymentPageReqVO pageReqVO,
                                           HttpServletResponse response) throws IOException {

@@ -32,7 +32,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 
 @Tag(name = "管理后台 - ERP 结算账户")
 @RestController
-@RequestMapping("/erp/account")
+@RequestMapping("/fms/account")
 @Validated
 public class FmsAccountController {
 
@@ -41,14 +41,14 @@ public class FmsAccountController {
 
     @PostMapping("/create")
     @Operation(summary = "创建结算账户")
-    @PreAuthorize("@ss.hasPermission('erp:account:create')")
+    @PreAuthorize("@ss.hasPermission('fms:account:create')")
     public CommonResult<Long> createAccount(@Valid @RequestBody FmsAccountSaveReqVO createReqVO) {
         return success(accountService.createAccount(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新结算账户")
-    @PreAuthorize("@ss.hasPermission('erp:account:update')")
+    @PreAuthorize("@ss.hasPermission('fms:account:update')")
     public CommonResult<Boolean> updateAccount(@Valid @RequestBody FmsAccountSaveReqVO updateReqVO) {
         accountService.updateAccount(updateReqVO);
         return success(true);
@@ -69,7 +69,7 @@ public class FmsAccountController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除结算账户")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:account:delete')")
+    @PreAuthorize("@ss.hasPermission('fms:account:delete')")
     public CommonResult<Boolean> deleteAccount(@RequestParam("id") Long id) {
         accountService.deleteAccount(id);
         return success(true);
@@ -78,7 +78,7 @@ public class FmsAccountController {
     @GetMapping("/get")
     @Operation(summary = "获得结算账户")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('erp:account:query')")
+    @PreAuthorize("@ss.hasPermission('fms:account:query')")
     public CommonResult<FmsAccountRespVO> getAccount(@RequestParam("id") Long id) {
         FmsAccountDO account = accountService.getAccount(id);
         return success(BeanUtils.toBean(account, FmsAccountRespVO.class));
@@ -94,7 +94,7 @@ public class FmsAccountController {
 
     @GetMapping("/page")
     @Operation(summary = "获得结算账户分页")
-    @PreAuthorize("@ss.hasPermission('erp:account:query')")
+    @PreAuthorize("@ss.hasPermission('fms:account:query')")
     public CommonResult<PageResult<FmsAccountRespVO>> getAccountPage(@Valid FmsAccountPageReqVO pageReqVO) {
         PageResult<FmsAccountDO> pageResult = accountService.getAccountPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, FmsAccountRespVO.class));
@@ -102,7 +102,7 @@ public class FmsAccountController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出结算账户 Excel")
-    @PreAuthorize("@ss.hasPermission('erp:account:export')")
+    @PreAuthorize("@ss.hasPermission('fms:account:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportAccountExcel(@Valid FmsAccountPageReqVO pageReqVO,
                                    HttpServletResponse response) throws IOException {

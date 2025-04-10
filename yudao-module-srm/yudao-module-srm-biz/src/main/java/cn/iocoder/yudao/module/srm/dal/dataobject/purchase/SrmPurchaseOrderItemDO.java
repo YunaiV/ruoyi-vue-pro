@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
  *
  * @author wdy
  */
-@TableName("srm_purchase_order_items")
-@KeySequence("srm_purchase_order_items_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("srm_purchase_order_item")
+@KeySequence("srm_purchase_order_item_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

@@ -12,11 +12,11 @@ public class SrmPaymentTermSimpleRespVO {
 
     @Schema(description = "人民币采购条款（中文）", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("人民币采购条款（中文）")
-    private String paymentTermCn;
+    private String paymentTermZh;
 
     @Schema(description = "外币采购条款（中文）")
     @ExcelProperty("外币采购条款（中文）")
-    private String paymentTermCnForeign;
+    private String paymentTermZhForeign;
 
     @Schema(description = "外币采购条款（英文）")
     @ExcelProperty("外币采购条款（英文）")

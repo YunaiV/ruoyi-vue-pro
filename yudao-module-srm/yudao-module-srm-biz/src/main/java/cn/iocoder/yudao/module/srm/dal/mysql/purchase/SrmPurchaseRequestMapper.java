@@ -24,7 +24,7 @@ public interface SrmPurchaseRequestMapper extends BaseMapperX<SrmPurchaseRequest
             .eqIfPresent(SrmPurchaseRequestDO::getApplicationDeptId, reqVO.getApplicationDeptId())
             //supplierId 供应商编号
             .eqIfPresent(SrmPurchaseRequestDO::getSupplierId, reqVO.getSupplierId())
-            .betweenIfPresent(SrmPurchaseRequestDO::getRequestTime, reqVO.getRequestTime())
+            .betweenIfPresent(SrmPurchaseRequestDO::getBillTime, reqVO.getBillTime())
             .eqIfPresent(SrmPurchaseRequestDO::getAuditorId, reqVO.getAuditorId()) //审核者
             .betweenIfPresent(SrmPurchaseRequestDO::getAuditTime, reqVO.getAuditTime())
             .betweenIfPresent(SrmPurchaseRequestDO::getCreateTime, reqVO.getCreateTime())

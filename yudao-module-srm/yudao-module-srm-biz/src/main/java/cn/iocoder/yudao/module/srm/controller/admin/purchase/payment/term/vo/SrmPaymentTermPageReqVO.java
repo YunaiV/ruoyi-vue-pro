@@ -22,10 +22,10 @@ public class SrmPaymentTermPageReqVO extends PageParam {
     private LocalDateTime[] createTime;
 
     @Schema(description = "人民币采购条款（中文）")
-    private String paymentTermCn;
+    private String paymentTermZh;
 
     @Schema(description = "外币采购条款（中文）")
-    private String paymentTermCnForeign;
+    private String paymentTermZhForeign;
 
     @Schema(description = "外币采购条款（英文）")
     private String paymentTermEnForeign;

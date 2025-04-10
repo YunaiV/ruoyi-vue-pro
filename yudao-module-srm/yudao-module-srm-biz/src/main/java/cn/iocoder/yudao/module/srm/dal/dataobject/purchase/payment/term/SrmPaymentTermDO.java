@@ -29,11 +29,11 @@ public class SrmPaymentTermDO extends BaseDO {
     /**
      * 人民币采购条款（中文）
      */
-    private String paymentTermCn;
+    private String paymentTermZh;
     /**
      * 外币采购条款（中文）
      */
-    private String paymentTermCnForeign;
+    private String paymentTermZhForeign;
     /**
      * 外币采购条款（英文）
      */
