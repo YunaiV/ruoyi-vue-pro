@@ -32,7 +32,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - Erp财务主体")
 @RestController
-@RequestMapping("/fms/finance-subject")
+@RequestMapping("/fms/company")
 @Validated
 public class FmsFinanceSubjectController {
 
@@ -41,14 +41,14 @@ public class FmsFinanceSubjectController {
 
     @PostMapping("/create")
     @Operation(summary = "创建Erp财务主体")
-    @PreAuthorize("@ss.hasPermission('fms:finance-subject:create')")
+    @PreAuthorize("@ss.hasPermission('fms:company:create')")
     public CommonResult<Long> createFinanceSubject(@Validated(Validation.OnCreate.class) @RequestBody FmsFinanceSubjectSaveReqVO createReqVO) {
         return success(financeSubjectService.createFinanceSubject(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新Erp财务主体")
-    @PreAuthorize("@ss.hasPermission('fms:finance-subject:update')")
+    @PreAuthorize("@ss.hasPermission('fms:company:update')")
     public CommonResult<Boolean> updateFinanceSubject(@Validated(Validation.OnUpdate.class) @RequestBody FmsFinanceSubjectSaveReqVO updateReqVO) {
         financeSubjectService.updateFinanceSubject(updateReqVO);
         return success(true);
@@ -57,7 +57,7 @@ public class FmsFinanceSubjectController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除Erp财务主体")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('fms:finance-subject:delete')")
+    @PreAuthorize("@ss.hasPermission('fms:company:delete')")
     public CommonResult<Boolean> deleteFinanceSubject(@NotNull @RequestParam("id") Long id) {
         financeSubjectService.deleteFinanceSubject(id);
         return success(true);
@@ -66,7 +66,7 @@ public class FmsFinanceSubjectController {
     @GetMapping("/get")
     @Operation(summary = "获得Erp财务主体")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('fms:finance-subject:query')")
+    @PreAuthorize("@ss.hasPermission('fms:company:query')")
     public CommonResult<FmsFinanceSubjectRespVO> getFinanceSubject(@NotNull @RequestParam("id") Long id) {
         FmsCompanyDO financeSubject = financeSubjectService.getFinanceSubject(id);
         return success(BeanUtils.toBean(financeSubject, FmsFinanceSubjectRespVO.class));
@@ -81,7 +81,7 @@ public class FmsFinanceSubjectController {
 
     @GetMapping("/page")
     @Operation(summary = "获得Erp财务主体分页")
-    @PreAuthorize("@ss.hasPermission('fms:finance-subject:query')")
+    @PreAuthorize("@ss.hasPermission('fms:company:query')")
     public CommonResult<PageResult<FmsFinanceSubjectRespVO>> getFinanceSubjectPage(@Valid FmsFinanceSubjectPageReqVO pageReqVO) {
         PageResult<FmsCompanyDO> pageResult = financeSubjectService.getFinanceSubjectPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, FmsFinanceSubjectRespVO.class));
@@ -89,7 +89,7 @@ public class FmsFinanceSubjectController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出Erp财务主体 Excel")
-    @PreAuthorize("@ss.hasPermission('fms:finance-subject:export')")
+    @PreAuthorize("@ss.hasPermission('fms:company:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportFinanceSubjectExcel(@Valid FmsFinanceSubjectPageReqVO pageReqVO,
                                           HttpServletResponse response) throws IOException {
