@@ -236,6 +236,12 @@ public class EccangService {
         return post("getUserAccountList", Map.of("platform", platform)).getData(EccangUserAccount.class);
     }
 
+    /**
+     * @Description: 获取当前用户，有且只会有一个
+     */
+    public EccangUser getUser() {
+        return post("getUser", Map.of()).getData(EccangUser.class).get(0);
+    }
 
     public Stream<EccangUserAccount> getUserAccounts() {
         return getPlatforms().stream().flatMap(platform -> getUserAccounts(platform).stream());
@@ -462,11 +468,11 @@ public class EccangService {
     }
 
     /**
-     * @Description: 头程管理-获取FBA发货管理数据（待发货）
+     * @Description: 头程管理-获取头程出货单数据
      */
-    public Stream<EccangPage> streamDeliverBatch(EccangDeliverBatchReqVO eccangDeliverBatchReqVO) {
-        String endpoint = "getDeliverBatch";
-        return getAllPage(JsonUtilsX.toJSONObject(eccangDeliverBatchReqVO), endpoint);
+    public Stream<EccangPage> streamShipBatch(EccangShipBatchReqVo eccangShipBatchReqVo) {
+        String endpoint = "getShipBatch";
+        return getAllPage(JsonUtilsX.toJSONObject(eccangShipBatchReqVo), endpoint);
     }
 
     public String parseCountryCode(String code) {
