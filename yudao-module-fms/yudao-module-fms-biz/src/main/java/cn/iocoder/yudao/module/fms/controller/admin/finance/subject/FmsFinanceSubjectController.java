@@ -73,6 +73,7 @@ public class FmsFinanceSubjectController {
     }
 
     @GetMapping("/simple-list")
+    @PreAuthorize("@ss.hasPermission('fms:company:query')")
     @Operation(summary = "获得Erp财务主体精简列表", description = "只包含被开启的财务主体，主要用于前端的下拉选项")
     public CommonResult<List<FmsFinanceSubjectSimpleRespVO>> getWarehouseSimpleList() {
         List<FmsFinanceSubjectSimpleRespVO> respVOS = financeSubjectService.ListFinanceSubjectSimple();
