@@ -19,9 +19,6 @@ public abstract class ApprovalHistoryTransitionHandler<E,D> extends TransitionHa
     @Lazy
     protected WmsApprovalHistoryService approvalHistoryService;
 
-//    public ApprovalHistoryTransition(Integer[] from, Integer to, Function<D, Integer> getter, E event) {
-//        super(from, to, getter, event);
-//    }
     /**
      * 变更状态
      **/

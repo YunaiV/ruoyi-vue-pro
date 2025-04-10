@@ -110,6 +110,15 @@ public class BaseRestIntegrationTest {
         return responseEntity.getBody();
     }
 
+    public CommonResult put(String url, Object param) {
+        url = processUrl(url);
+        HttpHeaders headers = getDefaultHeader();
+        HttpEntity<Object> entity = new HttpEntity<>(param, headers);
+        ResponseEntity<CommonResult> responseEntity=testRestTemplate.exchange(url, HttpMethod.PUT,entity,CommonResult.class);
+        log.info("\n\n  PUT {} \n    params: {} \n    result: {}\n\n",url, JsonUtilsX.toJsonString(param),responseEntity.getBody());
+        return responseEntity.getBody();
+    }
+
     private String processUrl(String url) {
         url = url.trim();
 
@@ -128,7 +137,21 @@ public class BaseRestIntegrationTest {
     }
 
     public <VO> CommonResult<Long> create(String url, VO param) {
-        return post(url,param);
+        CommonResult result = post(url,param);
+        if(result.isSuccess()) {
+           Long id = Long.valueOf(result.getData().toString());
+           result.setData(id);
+        }
+        return result;
+    }
+
+    public <VO> CommonResult<Boolean> update(String url, VO param) {
+        CommonResult result = put(url,param);
+        if(result.isSuccess()) {
+            Boolean data = Boolean.valueOf(result.getData().toString());
+            result.setData(data);
+        }
+        return result;
     }
 
     public <REQ,RESP>  CommonResult<PageResult<RESP>> getPage(String url, REQ reqVO, Class<RESP> respClass) {
@@ -167,8 +190,8 @@ public class BaseRestIntegrationTest {
         return result;
     }
 
-    public <REQ,RESP>  CommonResult<RESP> getOne(String url, REQ reqVO, Class<RESP> respClass) {
-        CommonResult result = get(url,reqVO, PageResult.class);
+    public <RESP>  CommonResult<RESP> getOne(String url, Long id, Class<RESP> respClass) {
+        CommonResult result = get(url,Map.of("id",id), PageResult.class);
         if(result.isError()) {
             return result;
         }

@@ -2,8 +2,10 @@ package cn.iocoder.yudao.module.wms.stock.inventory;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.wms.WmsBaseTest;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.product.vo.WmsInventoryProductSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventoryRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventorySaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinRespVO;
 import cn.iocoder.yudao.test.Profile;
@@ -67,12 +69,35 @@ public class WmsInventoryTest extends WmsBaseTest {
             Assert.assertTrue("创建盘点单失败",false);
         }
 
+        Long inventoryId = postResult.getData();
 
+        CommonResult<WmsInventoryRespVO> inventoryResult = this.getInventory(inventoryId);
+
+        WmsInventoryRespVO inventoryRespVO = inventoryResult.getData();
+
+
+
+
+        WmsInventorySaveReqVO updateReqVO = BeanUtils.toBean(inventoryRespVO, WmsInventorySaveReqVO.class);
+        updateReqVO.setBinItemList(null);
+
+        updateReqVO.getProductItemList().remove(0);
+        for (Long testProductId : testProductIds2) {
+            WmsInventoryProductSaveReqVO productSaveReqVO = new WmsInventoryProductSaveReqVO();
+            productSaveReqVO.setProductId(testProductId);
+            updateReqVO.getProductItemList().add(productSaveReqVO);
+        }
+        CommonResult<Boolean> updateResult = updateInventory(updateReqVO);
+        if(updateResult.isError()) {
+            Assert.assertTrue("更新盘点单失败",false);
+        }
 
         System.out.println();
 
 
     }
+
+
 
 
     public static void main(String[] args) {

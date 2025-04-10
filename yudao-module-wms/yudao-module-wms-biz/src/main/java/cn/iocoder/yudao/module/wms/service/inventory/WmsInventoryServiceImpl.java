@@ -202,6 +202,12 @@ public class WmsInventoryServiceImpl implements WmsInventoryService {
             }
             // 设置归属
             finalList.forEach(item -> {
+                if(item.getExpectedQty()==null) {
+                    item.setExpectedQty(0);
+                }
+                if(item.getActualQty()==null) {
+                    item.setActualQty(0);
+                }
                 item.setInventoryId(updateReqVO.getId());
             });
             // 保存详情

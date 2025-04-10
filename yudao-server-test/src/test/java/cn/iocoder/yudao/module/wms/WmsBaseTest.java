@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.wms;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventoryRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventorySaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMoveSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinPageReqVO;
@@ -77,9 +78,16 @@ public class WmsBaseTest extends BaseRestIntegrationTest {
         return this.create("/wms/stock-bin-move/create",createReqVO);
     }
 
+    public CommonResult<Boolean> updateInventory(WmsInventorySaveReqVO updateReqVO) {
+        return this.update("/wms/inventory/update",updateReqVO);
+    }
+
     public CommonResult<Long> createStockOwnershipMove(WmsStockOwnershipMoveSaveReqVO createReqVO) {
         return this.create("/wms/stock-ownership-move/create",createReqVO);
     }
 
 
+    protected CommonResult<WmsInventoryRespVO> getInventory(Long inventoryId) {
+        return getOne("/wms/inventory/get", inventoryId,WmsInventoryRespVO.class);
+    }
 }
