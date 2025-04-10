@@ -45,7 +45,7 @@ public class SrmPurchaseRequestDO extends TenantBaseDO {
     /**
      * 单据日期
      */
-    private LocalDateTime requestTime;
+    private LocalDateTime billTime;
     /**
      * 审核状态
      */

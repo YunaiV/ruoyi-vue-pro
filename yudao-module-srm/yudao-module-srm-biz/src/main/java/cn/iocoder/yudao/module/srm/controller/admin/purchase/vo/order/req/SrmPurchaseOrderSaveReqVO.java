@@ -30,7 +30,7 @@ public class SrmPurchaseOrderSaveReqVO {
     private String no;
 
     @Schema(description = "单据日期", requiredMode = Schema.RequiredMode.REQUIRED)
-    private LocalDateTime noTime;
+    private LocalDateTime billTime;
 
     @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "供应商编号不能为空")

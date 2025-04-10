@@ -18,10 +18,10 @@ public interface SrmPaymentTermMapper extends BaseMapperX<SrmPaymentTermDO> {
     default PageResult<SrmPaymentTermDO> selectPage(SrmPaymentTermPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<SrmPaymentTermDO>()
             .betweenIfPresent(SrmPaymentTermDO::getCreateTime, reqVO.getCreateTime())
-            .eqIfPresent(SrmPaymentTermDO::getPaymentTermCn, reqVO.getPaymentTermCn())
-            .eqIfPresent(SrmPaymentTermDO::getPaymentTermCnForeign, reqVO.getPaymentTermCnForeign())
-            .eqIfPresent(SrmPaymentTermDO::getPaymentTermEnForeign, reqVO.getPaymentTermEnForeign())
-            .eqIfPresent(SrmPaymentTermDO::getRemark, reqVO.getRemark())
+            .likeIfPresent(SrmPaymentTermDO::getPaymentTermZh, reqVO.getPaymentTermZh())
+            .likeIfPresent(SrmPaymentTermDO::getPaymentTermZhForeign, reqVO.getPaymentTermZhForeign())
+            .likeIfPresent(SrmPaymentTermDO::getPaymentTermEnForeign, reqVO.getPaymentTermEnForeign())
+            .likeIfPresent(SrmPaymentTermDO::getRemark, reqVO.getRemark())
             .orderByDesc(SrmPaymentTermDO::getId));
     }
 

@@ -102,7 +102,7 @@ public class SrmPurchaseOrderDO extends TenantBaseDO {
     /**
      * 单据日期
      */
-    private LocalDateTime noTime;
+    private LocalDateTime billTime;
     /**
      * 结算日期
      */

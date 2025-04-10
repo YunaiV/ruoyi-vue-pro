@@ -38,7 +38,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 
 @Tag(name = "管理后台 - ERP 收款单")
 @RestController
-@RequestMapping("/erp/finance-receipt")
+@RequestMapping("/fms/finance-receipt")
 @Validated
 public class FmsFinanceReceiptController {
 
@@ -54,14 +54,14 @@ public class FmsFinanceReceiptController {
 
     @PostMapping("/create")
     @Operation(summary = "创建收款单")
-    @PreAuthorize("@ss.hasPermission('erp:finance-receipt:create')")
+    @PreAuthorize("@ss.hasPermission('fms:finance-receipt:create')")
     public CommonResult<Long> createFinanceReceipt(@Valid @RequestBody FmsFinanceReceiptSaveReqVO createReqVO) {
         return success(financeReceiptService.createFinanceReceipt(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新收款单")
-    @PreAuthorize("@ss.hasPermission('erp:finance-receipt:update')")
+    @PreAuthorize("@ss.hasPermission('fms:finance-receipt:update')")
     public CommonResult<Boolean> updateFinanceReceipt(@Valid @RequestBody FmsFinanceReceiptSaveReqVO updateReqVO) {
         financeReceiptService.updateFinanceReceipt(updateReqVO);
         return success(true);
@@ -69,7 +69,7 @@ public class FmsFinanceReceiptController {
 
     @PutMapping("/update-status")
     @Operation(summary = "更新收款单的状态")
-    @PreAuthorize("@ss.hasPermission('erp:finance-receipt:update-status')")
+    @PreAuthorize("@ss.hasPermission('fms:finance-receipt:update-status')")
     public CommonResult<Boolean> updateFinanceReceiptStatus(@RequestParam("id") Long id,
                                                             @RequestParam("status") Integer status) {
         financeReceiptService.updateFinanceReceiptStatus(id, status);
@@ -79,7 +79,7 @@ public class FmsFinanceReceiptController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除收款单")
     @Parameter(name = "ids", description = "编号数组", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:finance-receipt:delete')")
+    @PreAuthorize("@ss.hasPermission('fms:finance-receipt:delete')")
     public CommonResult<Boolean> deleteFinanceReceipt(@RequestParam("ids") List<Long> ids) {
         financeReceiptService.deleteFinanceReceipt(ids);
         return success(true);
@@ -88,7 +88,7 @@ public class FmsFinanceReceiptController {
     @GetMapping("/get")
     @Operation(summary = "获得收款单")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('erp:finance-receipt:query')")
+    @PreAuthorize("@ss.hasPermission('fms:finance-receipt:query')")
     public CommonResult<FmsFinanceReceiptRespVO> getFinanceReceipt(@RequestParam("id") Long id) {
         FmsFinanceReceiptDO receipt = financeReceiptService.getFinanceReceipt(id);
         if (receipt == null) {
@@ -101,7 +101,7 @@ public class FmsFinanceReceiptController {
 
     @GetMapping("/page")
     @Operation(summary = "获得收款单分页")
-    @PreAuthorize("@ss.hasPermission('erp:finance-receipt:query')")
+    @PreAuthorize("@ss.hasPermission('fms:finance-receipt:query')")
     public CommonResult<PageResult<FmsFinanceReceiptRespVO>> getFinanceReceiptPage(@Valid FmsFinanceReceiptPageReqVO pageReqVO) {
         PageResult<FmsFinanceReceiptDO> pageResult = financeReceiptService.getFinanceReceiptPage(pageReqVO);
         return success(buildFinanceReceiptVOPageResult(pageResult));
@@ -109,7 +109,7 @@ public class FmsFinanceReceiptController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出收款单 Excel")
-    @PreAuthorize("@ss.hasPermission('erp:finance-receipt:export')")
+    @PreAuthorize("@ss.hasPermission('fms:finance-receipt:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportFinanceReceiptExcel(@Valid FmsFinanceReceiptPageReqVO pageReqVO,
                                           HttpServletResponse response) throws IOException {

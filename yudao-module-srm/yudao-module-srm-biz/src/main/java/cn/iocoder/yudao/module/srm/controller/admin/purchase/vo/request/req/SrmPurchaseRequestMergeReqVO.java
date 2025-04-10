@@ -23,7 +23,7 @@ public class SrmPurchaseRequestMergeReqVO {
     private Long supplierId;
 
     @Schema(description = "单据日期", requiredMode = Schema.RequiredMode.REQUIRED)
-    private LocalDateTime noTime;
+    private LocalDateTime billTime;
     //    @Schema(description = "期望采购时间")
     //    private LocalDateTime orderTime;
 

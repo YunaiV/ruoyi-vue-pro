@@ -157,7 +157,7 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
         SrmPurchaseOrderDO orderDO = BeanUtils.toBean(vo, SrmPurchaseOrderDO.class, in -> in.setNo(vo.getNo()));
         calculateTotalPrice(orderDO, orderItems);
         // 2.1.1 插入单据日期+结算日期
-        orderDO.setNoTime(vo.getNoTime() == null ? LocalDateTime.now() : vo.getNoTime());
+        orderDO.setBillTime(vo.getBillTime() == null ? LocalDateTime.now() : vo.getBillTime());
         ThrowUtil.ifSqlThrow(purchaseOrderMapper.insert(orderDO), DB_INSERT_ERROR);
         // 2.2 插入订单项
         orderItems.forEach(o -> {

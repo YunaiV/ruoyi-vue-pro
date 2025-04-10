@@ -39,7 +39,7 @@ public class SrmPurchaseRequestRespVO extends BaseVO {
 
     @Schema(description = "单据日期")
     @ExcelProperty("单据日期")
-    private LocalDateTime requestTime;
+    private LocalDateTime billTime;
     // ========== 审核信息 ==========
     @Schema(description = "审核者id")
     @ExcelProperty("审核者id")

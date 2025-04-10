@@ -28,7 +28,7 @@ public class SrmPurchaseRequestPageReqVO extends PageParam {
 
     @Schema(description = "单据日期")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime[] requestTime;
+    private LocalDateTime[] billTime;
 
     //    @Schema(description = "状态")
     //    private Integer status;

@@ -19,7 +19,7 @@ public class SrmPurchaseOrderMergeReqVO {
     @Size(min = 1, message = "入库项至少一个")
     Collection<@Valid item> items;
     @Schema(description = "单据日期")
-    private LocalDateTime noTime;
+    private LocalDateTime billTime;
     @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "供应商编号不能为空")
     private Long supplierId;

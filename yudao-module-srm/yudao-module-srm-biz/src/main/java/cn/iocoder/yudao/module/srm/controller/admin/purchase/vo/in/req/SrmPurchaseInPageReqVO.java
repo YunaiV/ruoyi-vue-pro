@@ -26,7 +26,7 @@ public class SrmPurchaseInPageReqVO extends PageParam {
     private String no;
 
     @Schema(description = "单据日期")
-    private LocalDateTime[] noTime;
+    private LocalDateTime[] billTime;
 
     //    @Schema(description = "汇率,财务管理-币别维护",example = "5.8")
     //    private BigDecimal exchangeRate;

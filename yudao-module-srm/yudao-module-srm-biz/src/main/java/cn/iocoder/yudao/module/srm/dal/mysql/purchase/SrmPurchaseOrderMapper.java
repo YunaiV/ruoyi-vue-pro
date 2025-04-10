@@ -30,7 +30,7 @@ public interface SrmPurchaseOrderMapper extends BaseMapperX<SrmPurchaseOrderDO> 
             .eqIfPresent(SrmPurchaseOrderDO::getDepositPrice, reqVO.getDepositPrice()).eqIfPresent(SrmPurchaseOrderDO::getFileUrl, reqVO.getFileUrl())
             .eqIfPresent(SrmPurchaseOrderDO::getRemark, reqVO.getRemark()).eqIfPresent(SrmPurchaseOrderDO::getTotalInCount, reqVO.getTotalInCount())
             .eqIfPresent(SrmPurchaseOrderDO::getTotalReturnCount, reqVO.getTotalReturnCount())
-            .betweenIfPresent(SrmPurchaseOrderDO::getNoTime, reqVO.getNoTime()).betweenIfPresent(SrmPurchaseOrderDO::getCreateTime, reqVO.getCreateTime())
+            .betweenIfPresent(SrmPurchaseOrderDO::getBillTime, reqVO.getBillTime()).betweenIfPresent(SrmPurchaseOrderDO::getCreateTime, reqVO.getCreateTime())
             .betweenIfPresent(SrmPurchaseOrderDO::getSettlementDate, reqVO.getSettlementDate())
             .eqIfPresent(SrmPurchaseOrderDO::getAuditorId, reqVO.getAuditorId()).betweenIfPresent(SrmPurchaseOrderDO::getAuditTime, reqVO.getAuditTime())
             .eqIfPresent(SrmPurchaseOrderDO::getPurchaseCompanyId, reqVO.getPurchaseCompanyId())
