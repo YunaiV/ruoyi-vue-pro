@@ -6,4 +6,13 @@ public interface Validation {
 
     interface OnUpdate {
     }
+
+    interface OnAudit {
+    }
+
+    interface OnSwitch {
+    }
+
+    interface OnSubmitAudit {
+    }
 }

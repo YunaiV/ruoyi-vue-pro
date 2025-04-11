@@ -4,8 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.warehouse.ErpWarehouseSaveReqVO;
 import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.warehouse.ErpWarehousePageReqVO;
+import cn.iocoder.yudao.module.erp.controller.admin.stock.vo.warehouse.ErpWarehouseSaveReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.stock.ErpWarehouseDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.stock.ErpWarehouseMapper;
 import jakarta.annotation.Resource;
@@ -20,7 +20,8 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.WAREHOUSE_NOT_ENABLE;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.WAREHOUSE_NOT_EXISTS;
 
 /**
  * ERP 仓库 Service 实现类
@@ -107,6 +108,16 @@ public class ErpWarehouseServiceImpl implements ErpWarehouseService {
         return list;
     }
 
+    /**
+     * 校验仓库得有效性(单个)
+     *
+     * @param id 仓库id
+     */
+    @Override
+    public void validWarehouse(Long id) {
+        validWarehouseList(Collections.singleton(id));
+    }
+
     @Override
     public List<ErpWarehouseDO> getWarehouseListByStatus(Integer status) {
         return warehouseMapper.selectListByStatus(status);
@@ -114,6 +125,9 @@ public class ErpWarehouseServiceImpl implements ErpWarehouseService {
 
     @Override
     public List<ErpWarehouseDO> getWarehouseList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)){
+            return Collections.emptyList();
+        }
         return warehouseMapper.selectBatchIds(ids);
     }
 

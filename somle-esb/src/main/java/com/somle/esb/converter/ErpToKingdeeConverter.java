@@ -4,12 +4,12 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
-import cn.iocoder.yudao.module.erp.api.supplier.dto.ErpSupplierDTO;
+import cn.iocoder.yudao.module.srm.api.supplier.dto.SrmSupplierDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import cn.iocoder.yudao.module.system.api.dict.dto.DictDataRespDTO;
-import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.ErpCustomRuleDTO;
+import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.TmsCustomRuleDTO;
 import com.somle.kingdee.model.KingdeeAuxInfoDetail;
 import com.somle.kingdee.model.KingdeeProductSaveReqVO;
 import com.somle.kingdee.model.supplier.KingdeeSupplier;
@@ -48,7 +48,7 @@ public class ErpToKingdeeConverter {
      * @param customRuleDTOs ERP产品列表
      * @return 转换后的Kingdee产品列表
      */
-    public List<KingdeeProductSaveReqVO> convert(List<ErpCustomRuleDTO> customRuleDTOs) {
+    public List<KingdeeProductSaveReqVO> convert(List<TmsCustomRuleDTO> customRuleDTOs) {
         log.debug("Converting ERP products to full Kingdee products");
         return customRuleDTOs.stream()
             .map(this::convert)
@@ -74,7 +74,7 @@ public class ErpToKingdeeConverter {
      * @param customRuleDTO ERP产品对象
      * @return 转换后的Kingdee产品对象
      */
-    private KingdeeProductSaveReqVO convert(ErpCustomRuleDTO customRuleDTO) {
+    private KingdeeProductSaveReqVO convert(TmsCustomRuleDTO customRuleDTO) {
         ErpProductDTO productDTO = customRuleDTO.getProductDTO();
         KingdeeProductSaveReqVO reqVO = new KingdeeProductSaveReqVO();
         //普通
@@ -161,7 +161,7 @@ public class ErpToKingdeeConverter {
     }
 
 
-    public KingdeeSupplier toKingdee(ErpSupplierDTO erpSupplierDTO) {
+    public KingdeeSupplier toKingdee(SrmSupplierDTO erpSupplierDTO) {
         KingdeeSupplier kingdeeSupplier = new KingdeeSupplier();
         kingdeeSupplier.setName(erpSupplierDTO.getName());
         kingdeeSupplier.setAccountOpenAddr(erpSupplierDTO.getBankAddress());

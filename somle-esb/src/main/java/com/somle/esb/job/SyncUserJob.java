@@ -8,6 +8,7 @@ import com.somle.dingtalk.service.DingTalkService;
 import com.somle.esb.enums.TenantId;
 import com.somle.esb.handler.DingtalkUserHandler;
 import com.somle.esb.service.EsbService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.support.MessageBuilder;
@@ -21,7 +22,7 @@ public class SyncUserJob extends DataJob {
     @Autowired
     DingTalkService dingTalkService;
 
-    @Autowired
+    @Resource
     MessageChannel dingtalkUserOutputChannel;
 
     @Override

@@ -9,7 +9,7 @@ public interface ErpRedisKeyConstants {
 
     /**
      * 序号的缓存
-     *
+     * <p>
      * KEY 格式：trade_no:{prefix}
      * VALUE 数据格式：编号自增
      */
@@ -23,4 +23,5 @@ public interface ErpRedisKeyConstants {
      * 产品的集合+分页的缓存
      */
     String PRODUCT_LIST = "erp:product_list:";
+
 }

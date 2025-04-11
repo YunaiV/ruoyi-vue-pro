@@ -47,6 +47,7 @@ public class WebUtils {
     }
 
     // TODO: Depreciated
+
     /**
      * use pojo's json format to make queryparams
      */
@@ -124,17 +125,17 @@ public class WebUtils {
         }
 
         String bodyString = null;
-        if(requestX.getContentType()==null) {
+        if (requestX.getContentType() == null) {
             requestX.setContentType(ContentType.JSON);
         }
-        if(requestX.getContentType()== ContentType.JSON) {
-            bodyString=JsonUtilsX.toJsonString(payload);
-        } else if (requestX.getContentType()==ContentType.FORM_URLENCODED) {
-            bodyString=buildUrlPatternBody(payload);
+        if (requestX.getContentType() == ContentType.JSON) {
+            bodyString = JsonUtilsX.toJsonString(payload);
+        } else if (requestX.getContentType() == ContentType.FORM_URLENCODED) {
+            bodyString = buildUrlPatternBody(payload);
         } else {
-            throw new IllegalArgumentException("不支持的 ContentType "+ requestX.getContentType().name());
+            throw new IllegalArgumentException("不支持的 ContentType " + requestX.getContentType().name());
         }
-        RequestBody body = RequestBody.create(bodyString, MediaType.parse(requestX.getContentType().getValue()+"; charset=utf-8"));
+        RequestBody body = RequestBody.create(bodyString, MediaType.parse(requestX.getContentType().getValue() + "; charset=utf-8"));
         log.info("body: " + bodyString);
 
 
@@ -158,7 +159,7 @@ public class WebUtils {
         return buildUrlPatternBody(json);
     }
 
-    public static String buildUrlPatternBody(JSONObject params)  {
+    public static String buildUrlPatternBody(JSONObject params) {
         Map<String, String> json = new HashMap<>();
         params.fieldNames().forEachRemaining(key -> {
             json.put(key, params.getString(key));
@@ -166,9 +167,9 @@ public class WebUtils {
         return buildUrlPatternBody(json);
     }
 
-    public static String buildUrlPatternBody(Map<String, String> params)  {
-        String body=urlWithParams(WWW_EVAL_COM, params);
-        body=body.substring(WWW_EVAL_COM.length()+2);
+    public static String buildUrlPatternBody(Map<String, String> params) {
+        String body = urlWithParams(WWW_EVAL_COM, params);
+        body = body.substring(WWW_EVAL_COM.length() + 2);
         return body;
     }
 
@@ -209,7 +210,7 @@ public class WebUtils {
      * @param response OkHttp 的 Response 对象
      * @return 响应 Body 的字符串
      * @throws IllegalStateException 如果 response 或 response body 为空
-     * @throws RuntimeException 如果读取 response body 发生 IOException
+     * @throws RuntimeException      如果读取 response body 发生 IOException
      */
     public static String getBodyString(Response response) {
         if (response == null || response.body() == null) {

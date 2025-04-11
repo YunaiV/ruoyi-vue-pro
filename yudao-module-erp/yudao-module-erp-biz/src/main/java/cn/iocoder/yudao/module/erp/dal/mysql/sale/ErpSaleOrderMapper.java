@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.erp.controller.admin.sale.vo.order.ErpSaleOrderPageReqVO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOrderDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOrderItemDO;
-import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
+import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -48,12 +48,12 @@ public interface ErpSaleOrderMapper extends BaseMapperX<ErpSaleOrderDO> {
         }
         // 可销售出库
         if (Boolean.TRUE.equals(reqVO.getOutEnable())) {
-            query.eq(ErpSaleOrderDO::getStatus, ErpAuditStatus.APPROVE.getStatus())
+            query.eq(ErpSaleOrderDO::getStatus, ErpAuditStatus.APPROVED.getCode())
                     .apply("t.out_count < t.total_count");
         }
         // 可销售退货
         if (Boolean.TRUE.equals(reqVO.getReturnEnable())) {
-            query.eq(ErpSaleOrderDO::getStatus, ErpAuditStatus.APPROVE.getStatus())
+            query.eq(ErpSaleOrderDO::getStatus, ErpAuditStatus.APPROVED.getCode())
                     .apply("t.return_count < t.out_count");
         }
         if (reqVO.getProductId() != null) {

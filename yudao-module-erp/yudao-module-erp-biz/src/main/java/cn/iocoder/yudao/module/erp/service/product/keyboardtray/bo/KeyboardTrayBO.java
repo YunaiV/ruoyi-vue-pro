@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.erp.service.product.keyboardtray.bo;
 
-import lombok.Data;
 import cn.iocoder.yudao.module.erp.service.product.bo.ErpProductBO;
+import lombok.Data;
 
 /**
  * 键盘托

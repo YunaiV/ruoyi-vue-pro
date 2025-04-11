@@ -24,8 +24,8 @@ import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import cn.iocoder.yudao.module.tms.api.logistic.customrule.ErpCustomRuleApi;
-import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.ErpCustomRuleDTO;
+import cn.iocoder.yudao.module.tms.api.logistic.customrule.TmsCustomRuleApi;
+import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.TmsCustomRuleDTO;
 import jakarta.annotation.Resource;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -75,7 +75,7 @@ public class ErpProductServiceImpl implements ErpProductService {
     @Resource
     AdminUserApi userApi;
     @Resource
-    ErpCustomRuleApi erpCustomRuleApi;
+    TmsCustomRuleApi tmsCustomRuleApi;
 
 
     private final ReentrantLock LOCK = new ReentrantLock();
@@ -197,7 +197,7 @@ public class ErpProductServiceImpl implements ErpProductService {
         if (isUpdate) {
             //更新产品时->覆盖n个海关规则
             //找到产品id对应的所有海关规则DTO(含海关信息+海关分类)，如果没有海关分类信息(产品逻辑必须有)，那么就不更新海关规则
-            List<ErpCustomRuleDTO> dtos = new ArrayList<>();
+            List<TmsCustomRuleDTO> dtos = new ArrayList<>();
             // 从产品ID获取海关规则 + 从分类ID获取海关规则
             Optional.ofNullable(erpCustomRuleApi.listDTOsByProductId(productDO.getId()))
                 .ifPresent(dtos::addAll);
@@ -307,7 +307,6 @@ public class ErpProductServiceImpl implements ErpProductService {
         List<ErpProductDO> list = productMapper.selectListByStatus(status);
         return buildProductVOList(list);
     }
-
     @Override
     @Cacheable(cacheNames = PRODUCT_LIST, key = "'DTO'+#status", unless = "#result == null")
     public List<ErpProductRespDTO> getProductDTOListByStatus(Boolean status) {

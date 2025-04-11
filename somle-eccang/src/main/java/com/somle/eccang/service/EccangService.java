@@ -1,7 +1,6 @@
 package com.somle.eccang.service;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.general.CoreUtils;
 import cn.iocoder.yudao.framework.common.util.general.Limiter;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
@@ -11,14 +10,14 @@ import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import com.somle.eccang.model.*;
 import com.somle.eccang.model.EccangResponse.EccangPage;
 import com.somle.eccang.model.exception.EccangResponseException;
-import com.somle.eccang.model.req.EccangInventoryBatchReqVO;
-import com.somle.eccang.model.req.EccangReceivingReqVo;
-import com.somle.eccang.model.req.EccangRmaReturnReqVO;
+import com.somle.eccang.model.req.*;
 import com.somle.eccang.repository.EccangTokenRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
@@ -49,7 +48,7 @@ public class EccangService {
     @Autowired
     EccangTokenRepository tokenRepo;
 
-    @Autowired
+    @Resource
     MessageChannel eccangSaleOutputChannel;
 
 
@@ -151,7 +150,7 @@ public class EccangService {
                 List<EccangResponse.EccangError> errors = response.getBizContentList(EccangResponse.EccangError.class);
                 if (errors.isEmpty()) {
                     throw new RuntimeException("response code is 300 but errors is empty,Error message from response: " + response);
-                }else {
+                } else {
                     throw new EccangResponseException(errors);
                 }
             case "429":
@@ -176,7 +175,9 @@ public class EccangService {
 
     private Stream<EccangPage> getAllPage(JSONObject payload, String endpoint) {
         payload.put("page", 1);
-        payload.put("page_size", pageSize);
+        if (payload.get("page_size") == null) {
+            payload.put("page_size", pageSize);
+        }
         return Stream.iterate(
             getPage(payload, endpoint), Objects::nonNull,
             bizContent -> {
@@ -237,6 +238,12 @@ public class EccangService {
         return post("getUserAccountList", Map.of("platform", platform)).getData(EccangUserAccount.class);
     }
 
+    /**
+     * @Description: 获取当前用户，有且只会有一个
+     */
+    public EccangUser getUser() {
+        return post("getUser", Map.of()).getData(EccangUser.class).get(0);
+    }
 
     public Stream<EccangUserAccount> getUserAccounts() {
         return getPlatforms().stream().flatMap(platform -> getUserAccounts(platform).stream());
@@ -294,8 +301,8 @@ public class EccangService {
             stream = getOrderUnarchivePages(orderParams);
         } catch (EccangResponseException e) {
             for (EccangResponse.EccangError eccangError : e.getEccangError()) {
-                if (eccangError.getErrorCode().equals("10001")){
-                    log.info("当前{}年不存在归档信息,跳过",year);
+                if (eccangError.getErrorCode().equals("10001")) {
+                    log.info("当前{}年不存在归档信息,跳过", year);
                     return Stream.empty();//跳过
                 }
             }
@@ -439,7 +446,7 @@ public class EccangService {
     }
 
     //退件列表
-    public Stream<EccangPage> getRmaReturnList(EccangRmaReturnReqVO eccangRmaReturnReqVO){
+    public Stream<EccangPage> getRmaReturnList(EccangRmaReturnReqVO eccangRmaReturnReqVO) {
         return getAllPage(JsonUtilsX.toJSONObject(eccangRmaReturnReqVO), "getRmaReturnList");
     }
 
@@ -447,12 +454,29 @@ public class EccangService {
      * @return java.util.stream.Stream<com.somle.eccang.model.EccangResponse.EccangPage>
      * @Author gumaomao
      * @Description 入库单管理——查询入库单信息
-     * @Date  2025/03/13
+     * @Date 2025/03/13
      **/
     public Stream<EccangPage> streamReceiving(EccangReceivingReqVo eccangReceivingReqVo) {
         String endpoint = "getReceiving";
         return getAllPage(JsonUtilsX.toJSONObject(eccangReceivingReqVo), endpoint);
     }
+
+    /**
+     * @Description: 入库单管理-获取入库单明细
+     */
+    public Stream<EccangPage> streamReceivingDetail(EccangReceivingDetailReqVO eccangReceivingDetailReqVO) {
+        String endpoint = "getReceivingDetailList";
+        return getAllPage(JsonUtilsX.toJSONObject(eccangReceivingDetailReqVO), endpoint);
+    }
+
+    /**
+     * @Description: 头程管理-获取头程出货单数据
+     */
+    public Stream<EccangPage> streamShipBatch(EccangShipBatchReqVo eccangShipBatchReqVo) {
+        String endpoint = "getShipBatch";
+        return getAllPage(JsonUtilsX.toJSONObject(eccangShipBatchReqVo), endpoint);
+    }
+
     public String parseCountryCode(String code) {
         switch (code) {
             case "USA":
