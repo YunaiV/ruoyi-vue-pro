@@ -42,5 +42,8 @@ public class SrmPaymentTermDO extends BaseDO {
      * 备注
      */
     private String remark;
-
+    /**
+     * 删除
+     */
+    private Boolean deleted;
 }
