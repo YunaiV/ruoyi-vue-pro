@@ -24,6 +24,7 @@ public class PurchaseOrderTemplateRegister implements TemplateRegister {
     String FILEPATH = "classpath:purchase/order/*.docx";
     @Value("${srm.enable-preload:false}")
     private boolean enablePreload;
+
     @Autowired
     private ResourcePatternResolver resourcePatternResolver;
 

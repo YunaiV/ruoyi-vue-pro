@@ -6,17 +6,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
-import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.ErpCustomCategoryPageReqVO;
-import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.ErpCustomCategorySaveReqVO;
-import cn.iocoder.yudao.module.tms.convert.logistic.category.ErpCustomCategoryConvert;
-import cn.iocoder.yudao.module.tms.convert.logistic.category.item.ErpCustomCategoryItemConvert;
-import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.ErpCustomCategoryDO;
-import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.item.ErpCustomCategoryItemDO;
-import cn.iocoder.yudao.module.tms.dal.mysql.logistic.category.ErpCustomCategoryMapper;
-import cn.iocoder.yudao.module.tms.dal.mysql.logistic.category.item.ErpCustomCategoryItemMapper;
-import cn.iocoder.yudao.module.tms.dal.mysql.logistic.customrule.ErpCustomRuleMapper;
-import cn.iocoder.yudao.module.tms.service.logistic.category.bo.ErpCustomCategoryBO;
-import cn.iocoder.yudao.module.tms.service.logistic.category.item.ErpCustomCategoryItemService;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.TmsCustomCategoryPageReqVO;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.TmsCustomCategorySaveReqVO;
 import cn.iocoder.yudao.module.tms.convert.logistic.category.TmsCustomCategoryConvert;
@@ -25,6 +14,8 @@ import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.TmsCustomCat
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.item.TmsCustomCategoryItemDO;
 import cn.iocoder.yudao.module.tms.dal.mysql.logistic.category.TmsCustomCategoryMapper;
 import cn.iocoder.yudao.module.tms.dal.mysql.logistic.category.item.TmsCustomCategoryItemMapper;
+import cn.iocoder.yudao.module.tms.dal.mysql.logistic.customrule.TmsCustomRuleMapper;
+import cn.iocoder.yudao.module.tms.service.logistic.category.bo.TmsCustomCategoryBO;
 import cn.iocoder.yudao.module.tms.service.logistic.category.item.TmsCustomCategoryItemService;
 import jakarta.annotation.Resource;
 import org.apache.commons.collections4.CollectionUtils;
@@ -57,7 +48,7 @@ public class TmsCustomCategoryServiceImpl implements TmsCustomCategoryService {
     @Resource
     private TmsCustomCategoryItemMapper customRuleCategoryItemMapper;
     @Autowired
-    private ErpCustomRuleMapper erpCustomRuleMapper;
+    private TmsCustomRuleMapper tmsCustomRuleMapper;
     @Autowired
     private TmsCustomCategoryItemService itemService;
 
@@ -80,8 +71,8 @@ public class TmsCustomCategoryServiceImpl implements TmsCustomCategoryService {
     }
 
     //海关分类重复性校验
-    private void validateCustomRuleCategoryNotExists(ErpCustomCategorySaveReqVO createReqVO) {
-        Collection<ErpCustomCategoryDO> categoryList =
+    private void validateCustomRuleCategoryNotExists(TmsCustomCategorySaveReqVO createReqVO) {
+        Collection<TmsCustomCategoryDO> categoryList =
             customRuleCategoryMapper.getCustomRuleByMaterialAndDeclaredType(
                 createReqVO.getMaterial(), createReqVO.getDeclaredType());
 
@@ -172,6 +163,21 @@ public class TmsCustomCategoryServiceImpl implements TmsCustomCategoryService {
         return customRuleCategoryMapper.getCustomRuleCategoryList(pageReqVO);
     }
 
+    @Override
+    public PageResult<TmsCustomCategoryBO> getCustomRuleCategoryPageBO(TmsCustomCategoryPageReqVO pageReqVO) {
+        if (pageReqVO == null) {
+            pageReqVO = new TmsCustomCategoryPageReqVO();
+        }
+        return customRuleCategoryMapper.selectPageBO(pageReqVO);
+    }
+
+    @Override
+    public TmsCustomCategoryBO getCustomRuleCategoryBO(Long id) {
+        if (id == null) {
+            return null;
+        }
+        return customRuleCategoryMapper.getTmsCustomCategoryBOById(id);
+    }
     // ==================== 子表（海关分类子表） ====================
 
     @Override
@@ -207,7 +213,7 @@ public class TmsCustomCategoryServiceImpl implements TmsCustomCategoryService {
             itemIds.addAll(diffedList.get(1).stream().map(TmsCustomCategoryItemDO::getId).toList());
         }
         if (CollUtil.isNotEmpty(diffedList.get(2))) {
-            customRuleCategoryItemMapper.deleteBatchIds(convertList(diffedList.get(2), TmsCustomCategoryItemDO::getId));
+            customRuleCategoryItemMapper.deleteByIds(convertList(diffedList.get(2), TmsCustomCategoryItemDO::getId));
         }
         return itemIds;
     }

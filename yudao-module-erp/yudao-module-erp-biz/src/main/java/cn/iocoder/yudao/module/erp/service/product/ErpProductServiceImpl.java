@@ -199,7 +199,7 @@ public class ErpProductServiceImpl implements ErpProductService {
             //找到产品id对应的所有海关规则DTO(含海关信息+海关分类)，如果没有海关分类信息(产品逻辑必须有)，那么就不更新海关规则
             List<TmsCustomRuleDTO> dtos = new ArrayList<>();
             // 从产品ID获取海关规则 + 从分类ID获取海关规则
-            Optional.ofNullable(erpCustomRuleApi.listDTOsByProductId(productDO.getId()))
+            Optional.ofNullable(tmsCustomRuleApi.listCustomRuleDTOsByProductId(productDO.getId()))
                 .ifPresent(dtos::addAll);
             if (!dtos.isEmpty()) {
                 erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos.stream().distinct().toList()).build());

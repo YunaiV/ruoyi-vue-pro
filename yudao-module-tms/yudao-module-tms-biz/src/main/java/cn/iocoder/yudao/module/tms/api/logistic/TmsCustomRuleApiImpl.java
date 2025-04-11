@@ -63,7 +63,7 @@ public class TmsCustomRuleApiImpl implements TmsCustomRuleApi {
 
 
     @Override
-    public List<TmsCustomRuleDTO> listDTOsByProductId(Long productId) {
+    public List<TmsCustomRuleDTO> listCustomRuleDTOsByProductId(Long productId) {
         //获取规则和产品信息
         List<TmsCustomRuleBO> ruleBOS = customRuleMapper.selectByProductId(List.of(productId));
         //根据产品id->海关分类BO

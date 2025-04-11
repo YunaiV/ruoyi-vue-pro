@@ -12,15 +12,16 @@ import cn.iocoder.yudao.module.system.api.dict.dto.DictDataRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.system.api.utils.Validation;
-import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.item.vo.ErpCustomCategoryItemRespVO;
-import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.item.vo.ErpCustomCategoryItemSimpleRespVO;
-import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.ErpCustomCategoryPageReqVO;
-import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.ErpCustomCategoryRespVO;
-import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.ErpCustomCategorySaveReqVO;
-import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.ErpCustomCategoryDO;
-import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.item.ErpCustomCategoryItemDO;
-import cn.iocoder.yudao.module.tms.service.logistic.category.ErpCustomCategoryService;
-import cn.iocoder.yudao.module.tms.service.logistic.category.item.ErpCustomCategoryItemService;
+import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.item.vo.TmsCustomCategoryItemRespVO;
+import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.item.vo.TmsCustomCategoryItemSimpleRespVO;
+import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.TmsCustomCategoryPageReqVO;
+import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.TmsCustomCategoryRespVO;
+import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.TmsCustomCategorySaveReqVO;
+import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.TmsCustomCategoryDO;
+import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.item.TmsCustomCategoryItemDO;
+import cn.iocoder.yudao.module.tms.service.logistic.category.TmsCustomCategoryService;
+import cn.iocoder.yudao.module.tms.service.logistic.category.bo.TmsCustomCategoryBO;
+import cn.iocoder.yudao.module.tms.service.logistic.category.item.TmsCustomCategoryItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -99,7 +100,7 @@ public class TmsCustomCategoryController {
     @Operation(summary = "获得海关分类分页")
     @PreAuthorize("@ss.hasPermission('tms:custom-category:query')")
     public CommonResult<PageResult<TmsCustomCategoryRespVO>> getCustomRuleCategoryPage(@Valid TmsCustomCategoryPageReqVO pageReqVO) {
-        PageResult<TmsCustomCategoryDO> pageResult = customRuleCategoryService.getCustomRuleCategoryPageBO(pageReqVO);
+        PageResult<TmsCustomCategoryBO> pageResult = customRuleCategoryService.getCustomRuleCategoryPageBO(pageReqVO);
         return success(new PageResult<>(BindingResult(pageResult.getList()), pageResult.getTotal()));
     }
 

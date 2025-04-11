@@ -31,8 +31,10 @@ public class TemplateConfigFactory {
      * 本地缓存（key = classpath 相对路径）
      */
     private final Map<String, Map<String, RenderPolicy>> resourceTagPolicyCache = new ConcurrentHashMap<>();
-    @Autowired
-    private List<TemplateRegister> registers;
+
+    @Autowired(required = false)
+    private List<TemplateRegister> registers = List.of();
+
 
     public static String buildResourceKey(Resource resource) {
         try {

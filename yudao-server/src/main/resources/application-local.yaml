@@ -72,8 +72,7 @@ spring:
       password: uniplore # 密码，建议生产环境开启
   task:
     scheduling:
-      simple:
-        concurrency-limit: 0  # local中0并发，关闭定时
+      enabled: false
 
 --- #################### 定时任务相关配置 ####################
 # Quartz 配置项，对应 QuartzProperties 配置)

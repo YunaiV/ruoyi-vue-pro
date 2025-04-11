@@ -18,6 +18,7 @@ import org.springframework.scheduling.annotation.Async;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.Optional;
 
 @Slf4j
 @Configuration
@@ -33,6 +34,7 @@ public class TemplateManager {
 
     @EventListener(ApplicationReadyEvent.class)
     public void preloadTemplatesOnStartup() {
+        log.info("TemplateRegister 策略实例数：{}", configureFactory.getRegisters().size());
         log.info("开始执行模板预热任务...");
         preloadWordAndPdfTemplates();
     }
@@ -40,12 +42,11 @@ public class TemplateManager {
     @Async
     public void preloadWordAndPdfTemplates() {
         long start = System.currentTimeMillis();
-        configureFactory.getRegisters()
-            .forEach(register -> register.getTemplatePolicies().stream().filter(TemplatePolicy::getEnablePreload).forEach(
-                TemplatePolicy -> {
-                    preloadSingleWordTemplate(TemplatePolicy.getResource());
-                    preloadSinglePdfTemplate(TemplatePolicy.getResource());
-                }));
+        Optional.ofNullable(configureFactory.getRegisters()).ifPresent(registers -> registers.forEach(
+            register -> register.getTemplatePolicies().stream().filter(TemplatePolicy::getEnablePreload).forEach(TemplatePolicy -> {
+                preloadSingleWordTemplate(TemplatePolicy.getResource());
+                preloadSinglePdfTemplate(TemplatePolicy.getResource());
+            })));
         log.info("全部模板预热完成，耗时 {}ms", System.currentTimeMillis() - start);
     }
 

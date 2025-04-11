@@ -26,7 +26,7 @@ public interface TmsCustomRuleConvert {
             .filter(Objects::nonNull)
             .map(BO -> {
                 ErpProductDTO productDO = productMap.get(BO.getProductId());
-                return ErpCustomRuleConvert.INSTANCE.convert(BO, productDO);
+                return TmsCustomRuleConvert.INSTANCE.convert(BO, productDO);
             })
             .toList();
     }

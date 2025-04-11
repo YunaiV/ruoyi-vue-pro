@@ -113,7 +113,7 @@ public class WebUtils {
             }
         }
 
-        log.debug("full url: " + fullUrl);
+        log.info("full url: " + fullUrl);
         Request.Builder requestBuilder = new Request.Builder()
             .url(fullUrl);
 
@@ -136,7 +136,7 @@ public class WebUtils {
             throw new IllegalArgumentException("不支持的 ContentType " + requestX.getContentType().name());
         }
         RequestBody body = RequestBody.create(bodyString, MediaType.parse(requestX.getContentType().getValue() + "; charset=utf-8"));
-        log.info("body: " + bodyString);
+        log.debug("body: " + bodyString);
 
 
         Request request;
