@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
 
 /**
- * @table-fields : source_item_id,company_id,outbound_status,actual_qty,bin_id,plan_qty,product_id,id,dept_id,outbound_id
+ * @table-fields : source_item_id,inbount_item_id,company_id,outbound_status,actual_qty,bin_id,plan_qty,product_id,id,dept_id,outbound_id
  */
 @Schema(description = "管理后台 - 出库单详情新增/修改 Request VO")
 @Data
@@ -28,12 +28,15 @@ public class WmsOutboundItemSaveReqVO {
     @Schema(description = "来源详情ID", example = "11448")
     private Long sourceItemId;
 
-    @Schema(description = "出库状态 ; OutboundStatus : 0-未出库 , 1-部分出库 , 2-已出库", example = "")
+    @Schema(description = "WMS出库状态 ; WmsOutboundStatus : 0-未出库 , 1-部分出库 , 2-已出库", example = "")
     @InEnum(WmsOutboundStatus.class)
     private Integer outboundStatus;
 
-    @Schema(description = "出库库位ID", example = "")
+    @Schema(description = "出库库位ID，在创建时指定；bin_id 和 inbount_item_id 需要指定其中一个，优先使用 inbount_item_id", example = "")
     private Long binId;
+
+    @Schema(description = "入库批次详情ID", example = "")
+    private Long inboundItemId;
 
     @Schema(description = "实际出库量", example = "")
     private Integer actualQty;
@@ -46,4 +49,7 @@ public class WmsOutboundItemSaveReqVO {
 
     @Schema(description = "库存归属部门ID", example = "")
     private Long deptId;
+
+    @Schema(description = "出库的入库批次详情ID，在创建时指定；bin_id 和 inbount_item_id 需要指定其中一个，优先使用 inbount_item_id", example = "")
+    private Long inbountItemId;
 }

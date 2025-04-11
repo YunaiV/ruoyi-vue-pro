@@ -274,5 +274,12 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
 
     }
 
+    /**
+     * 按库存批次详情ID 查询仓位库存清单
+     **/
+    public List<WmsStockBinDO> selectBinsByInboundItemId(Long warehouseId, Long productId, Long inboundItemId) {
+        return stockBinMapper.selectBinsByInboundItemId(warehouseId, productId, inboundItemId);
+    }
+
 
 }

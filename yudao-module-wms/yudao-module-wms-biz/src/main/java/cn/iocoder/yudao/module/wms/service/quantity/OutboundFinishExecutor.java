@@ -116,7 +116,7 @@ public class OutboundFinishExecutor extends OutboundExecutor {
      * 更新库存货位
      **/
     @Override
-    protected  WmsStockFlowDirection updateStockBinQty(WmsStockBinDO stockBinDO,WmsOutboundItemRespVO item,  Integer quantity) {
+    protected  WmsStockFlowDirection updateSingleStockBinQty(WmsStockBinDO stockBinDO, WmsOutboundItemRespVO item, Integer quantity) {
         Integer actualQty=item.getActualQty();
         // 可用库存
         stockBinDO.setAvailableQty(stockBinDO.getAvailableQty() - actualQty);
@@ -126,6 +126,11 @@ public class OutboundFinishExecutor extends OutboundExecutor {
         stockBinDO.setOutboundPendingQty(stockBinDO.getOutboundPendingQty() - actualQty);
 
         return WmsStockFlowDirection.OUT;
+    }
+
+    @Override
+    protected void updateMultiStockBinQty(Long warehouseId, Long productId, WmsOutboundItemRespVO item,Integer quantity) {
+        //TODO 按库存批次出库暂不实现
     }
 
     /**

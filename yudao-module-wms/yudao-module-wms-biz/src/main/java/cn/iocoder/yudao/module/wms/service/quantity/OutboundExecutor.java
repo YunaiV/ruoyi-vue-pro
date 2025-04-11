@@ -58,7 +58,9 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
     /**
      * 更新库存货位库存量
      **/
-    protected abstract WmsStockFlowDirection updateStockBinQty(WmsStockBinDO stockBinDO, WmsOutboundItemRespVO item,Integer quantity);
+    protected abstract WmsStockFlowDirection updateSingleStockBinQty(WmsStockBinDO stockBinDO, WmsOutboundItemRespVO item, Integer quantity);
+
+    protected abstract void updateMultiStockBinQty(Long warehouseId, Long productId,WmsOutboundItemRespVO item,Integer quantity);
     /**
      * 更新出库单
      **/
@@ -181,18 +183,28 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
     private void processStockBinItem(WmsOutboundItemRespVO item,Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
         // 调整仓位库存
         JdbcUtils.requireTransaction();
-        WmsStockBinDO stockBinDO = stockBinService.getStockBin(binId, productId, false);
-        WmsStockFlowDirection wmsStockFlowDirection = null;
-        // 如果不存在抛出异常
-        if(stockBinDO==null) {
-            throw exception(STOCK_BIN_NOT_EXISTS);
-        } else {
-            wmsStockFlowDirection=this.updateStockBinQty(stockBinDO,item,quantity);
+
+        // 指定了库存批次
+        if(item.getInbountItemId()!=null) {
+            // 获得库存批次对应的有货的仓位
+            updateMultiStockBinQty(warehouseId, productId, item, quantity);
+
+        } else { // 未指定库存批次，但指定了库存仓位
+            WmsStockBinDO stockBinDO = stockBinService.getStockBin(binId, productId, false);
+            WmsStockFlowDirection wmsStockFlowDirection = null;
+            // 如果不存在抛出异常
+            if (stockBinDO == null) {
+                throw exception(STOCK_BIN_NOT_EXISTS);
+            } else {
+                wmsStockFlowDirection = this.updateSingleStockBinQty(stockBinDO, item, quantity);
+            }
+            // 保存
+            stockBinService.insertOrUpdate(stockBinDO);
+            // 记录流水
+            stockFlowService.createForStockBin(this.getReason(), wmsStockFlowDirection, productId, stockBinDO, quantity, outboundId, outboundItemId);
         }
-        // 保存
-        stockBinService.insertOrUpdate(stockBinDO);
-        // 记录流水
-        stockFlowService.createForStockBin(this.getReason(),wmsStockFlowDirection,productId, stockBinDO,quantity, outboundId, outboundItemId);
     }
+
+
 
 }

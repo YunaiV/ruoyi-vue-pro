@@ -8,10 +8,15 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsWarehouseProductVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.WmsPickupDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.product.WmsProductDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
+import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.ArrayList;
@@ -105,6 +110,46 @@ public interface WmsStockBinMapper extends BaseMapperX<WmsStockBinDO> {
         wrapper.apply("(warehouse_id, product_id) IN ("+ StrUtils.join(units,",")+")",params.toArray());
         return selectList(wrapper);
 
+
+    }
+
+
+    /**
+     * 按库存批次详情ID 查询仓位库存清单
+     **/
+    default List<WmsStockBinDO> selectBinsByInboundItemId(Long warehouseId, Long productId, Long inboundItemId) {
+
+        MPJLambdaWrapperX<WmsStockBinDO> wrapper = new MPJLambdaWrapperX();
+        // 连接拣货明细
+        wrapper.innerJoin(WmsPickupItemDO.class, on -> on
+                    .eq(WmsPickupItemDO::getBinId,WmsStockBinDO::getBinId)
+                    .eq(WmsPickupItemDO::getProductId,WmsStockBinDO::getProductId));
+        // 连接拣货单
+        wrapper.innerJoin(WmsPickupDO.class, on -> on
+                .eq(WmsPickupDO::getId,WmsPickupItemDO::getPickupId)
+                .eq(WmsPickupDO::getWarehouseId,WmsStockBinDO::getWarehouseId));
+
+        // 连接入库单明细
+        wrapper.innerJoin(WmsInboundItemDO.class, on -> on
+            .eq(WmsInboundItemDO::getInboundId,WmsPickupItemDO::getInboundItemId)
+            .eq(WmsInboundItemDO::getProductId,WmsStockBinDO::getProductId))
+            .in(WmsInboundItemDO::getInboundStatus, WmsInboundStatus.ALL.getValue(), WmsInboundStatus.PART.getValue());
+
+
+        // 连接入库单
+        wrapper.innerJoin(WmsInboundDO.class, on -> on
+            .eq(WmsInboundDO::getId,WmsInboundItemDO::getInboundId)
+            .eq(WmsInboundDO::getWarehouseId,WmsStockBinDO::getWarehouseId)
+            .in(WmsInboundDO::getInboundStatus, WmsInboundStatus.ALL.getValue(), WmsInboundStatus.PART.getValue())
+        );
+
+        // 其它条件
+        wrapper.eq(WmsStockBinDO::getWarehouseId,warehouseId);
+        wrapper.eq(WmsStockBinDO::getProductId,productId);
+        wrapper.eq(WmsInboundItemDO::getId,inboundItemId);
+
+        // 返回结果
+        return selectList(wrapper);
 
     }
 }

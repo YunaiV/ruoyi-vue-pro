@@ -15,6 +15,8 @@ import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -79,10 +81,10 @@ public class WmsStockBinController {
     /**
      * @sign : 33164D4484F99F37
      */
-    @GetMapping("/page")
+    @PostMapping("/page")
     @Operation(summary = "获得仓位库存分页")
     @PreAuthorize("@ss.hasPermission('wms:stock-bin:query')")
-    public CommonResult<PageResult<WmsStockBinRespVO>> getStockBinPage(@Valid WmsStockBinPageReqVO pageReqVO) {
+    public CommonResult<PageResult<WmsStockBinRespVO>> getStockBinPage(@Valid @RequestBody WmsStockBinPageReqVO pageReqVO) {
         // 查询数据
         PageResult<WmsStockBinDO> doPageResult = stockBinService.getStockBinPage(pageReqVO);
 

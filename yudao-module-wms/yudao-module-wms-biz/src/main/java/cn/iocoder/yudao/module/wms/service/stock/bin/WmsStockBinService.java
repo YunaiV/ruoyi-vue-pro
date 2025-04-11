@@ -81,5 +81,9 @@ public interface WmsStockBinService {
 
     List<WmsStockBinDO> selectStockBinByIds(List<Long> stockBinIds);
 
+    /**
+     * 按库存批次详情ID 查询仓位库存清单
+     **/
+    List<WmsStockBinDO> selectBinsByInboundItemId(Long warehouseId, Long productId, Long inboundItemId);
 
 }
