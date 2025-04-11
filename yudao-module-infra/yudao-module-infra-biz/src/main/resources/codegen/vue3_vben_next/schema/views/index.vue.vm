@@ -8,9 +8,15 @@ import { Download, Plus } from '@vben/icons';
 import Form from './modules/form.vue';
 import { DocAlert } from '#/components/doc-alert';
 
+import { ref } from 'vue';
 import { $t } from '#/locales';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
+#if (${table.templateType} == 2)## 树表接口
+import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { handleTree } from '#/utils/tree';
+#else## 标准表接口
 import { get${simpleClassName}Page, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+#end
 import { downloadByData } from '#/utils/download';
 
 import { useGridColumns, useGridFormSchema } from './data';
@@ -19,6 +25,15 @@ const [FormModal, formModalApi] = useVbenModal({
   connectedComponent: Form,
   destroyOnClose: true,
 });
+
+#if (${table.templateType} == 2)## 树表特有：控制表格展开收缩
+/** 切换树形展开/收缩状态 */
+const isExpanded = ref(true);
+function toggleExpand() {
+  isExpanded.value = !isExpanded.value;
+  gridApi.grid.setAllTreeExpand(isExpanded.value);
+}
+#end
 
 /** 刷新表格 */
 function onRefresh() {
@@ -41,17 +56,24 @@ function onEdit(row: ${simpleClassName}Api.${simpleClassName}) {
   formModalApi.setData(row).open();
 }
 
+#if (${table.templateType} == 2)## 树表特有：新增下级
+/** 新增下级${table.classComment} */
+function onAddChild(row: ${simpleClassName}Api.${simpleClassName}) {
+  formModalApi.setData({ ${treeParentColumn.javaField}: row.id }).open();
+}
+#end
+
 /** 删除${table.classComment} */
 async function onDelete(row: ${simpleClassName}Api.${simpleClassName}) {
   const hideLoading = message.loading({
-    content: $t('ui.actionMessage.deleting', [row.${columns[0].javaField}]),
+    content: $t('ui.actionMessage.deleting', [row.id]),
     duration: 0,
     key: 'action_process_msg',
   });
   try {
     await delete${simpleClassName}(row.id as number);
     message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.${columns[0].javaField}]),
+      content: $t('ui.actionMessage.deleteSuccess', [row.id]),
       key: 'action_process_msg',
     });
     onRefresh();
@@ -74,6 +96,12 @@ function onActionClick({
       onDelete(row);
       break;
     }
+#if (${table.templateType} == 2)## 树表特有：新增下级
+    case 'add_child': {
+      onAddChild(row);
+      break;
+    }
+#end
   }
 }
 
@@ -84,20 +112,40 @@ const [Grid, gridApi] = useVbenVxeGrid({
   gridOptions: {
     columns: useGridColumns(onActionClick),
     height: 'auto',
-    keepSource: true,
+#if (${table.templateType} == 2)## 树表设置
+  treeConfig: {
+    parentField: '${treeParentColumn.javaField}',
+    rowField: 'id',
+    transform: true,
+    expandAll: true,
+    reserve: true,
+  },
+#else## 标准表设置
+    pagerConfig: {
+      enabled: true,
+    },
+#end
     proxyConfig: {
       ajax: {
+#if (${table.templateType} == 2)## 树表数据加载
+        query: async (_, formValues) => {
+          return await get${simpleClassName}List(formValues);
+        },
+#else## 标准表数据加载
         query: async ({ page }, formValues) => {
-          return await get${simpleClassName}Page({
+          const { items, total } = await get${simpleClassName}Page({
             pageNo: page.currentPage,
             pageSize: page.pageSize,
             ...formValues,
           });
+          return { items, total };
         },
+#end
       },
     },
     rowConfig: {
       keyField: 'id',
+      isHover: true,
     },
     toolbarConfig: {
       refresh: { code: 'query' },
@@ -112,8 +160,14 @@ const [Grid, gridApi] = useVbenVxeGrid({
     <DocAlert title="${table.classComment}" url="https://doc.iocoder.cn/${table.moduleName}/" />
 
     <FormModal @success="onRefresh" />
+
     <Grid table-title="${table.classComment}列表">
       <template #toolbar-tools>
+#if (${table.templateType} == 2)## 树表特有：展开/收缩按钮
+        <Button @click="toggleExpand" class="mr-2">
+          {{ isExpanded ? '收缩' : '展开' }}
+        </Button>
+#end
         <Button type="primary" @click="onCreate" v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:create']">
           <Plus class="size-5" />
           {{ $t('ui.actionTitle.create', ['${table.classComment}']) }}

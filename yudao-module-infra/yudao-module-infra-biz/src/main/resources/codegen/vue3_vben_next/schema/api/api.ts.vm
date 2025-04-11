@@ -17,6 +17,9 @@ export namespace ${simpleClassName}Api {
 #end
 #end
 #end
+#if ( $table.templateType == 2 )
+  children?: ${simpleClassName}[];
+#end
   }
 }
 
