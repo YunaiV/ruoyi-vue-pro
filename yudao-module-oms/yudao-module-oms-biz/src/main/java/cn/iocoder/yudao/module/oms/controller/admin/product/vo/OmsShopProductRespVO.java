@@ -28,8 +28,8 @@ public class OmsShopProductRespVO extends BaseDO {
     private OmsShopRespVO shop;
 
     @Schema(description = "平台sku", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("平台sku")
-    private String platformCode;
+    @ExcelProperty("店铺产品编号【平台sku】")
+    private String code;
 
     @Schema(description = "外部资源id", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("外部资源id")
@@ -53,7 +53,7 @@ public class OmsShopProductRespVO extends BaseDO {
 
     @Schema(description = "数量")
     @ExcelProperty("数量")
-    private Integer qty;
+    private Integer sellableQty;
 
     @Schema(description = "所属部门ID")
     private Long deptId;

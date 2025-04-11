@@ -23,10 +23,6 @@ public class OmsShopProductItemPageReqVO extends PageParam {
     @Schema(description = "产品编号", example = "27593")
     private Long productId;
 
-    @Schema(description = "产品数量", example = "27593")
-    private Long quantity;
-    
-
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;

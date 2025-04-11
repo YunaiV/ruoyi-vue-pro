@@ -10,17 +10,19 @@ import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import com.somle.eccang.model.*;
 import com.somle.eccang.model.EccangResponse.EccangPage;
 import com.somle.eccang.model.exception.EccangResponseException;
+import com.somle.eccang.model.reps.oms.EccangSkuRelationRespVO;
 import com.somle.eccang.model.req.EccangInventoryBatchReqVO;
 import com.somle.eccang.model.req.EccangReceivingDetailReqVO;
 import com.somle.eccang.model.req.EccangReceivingReqVo;
 import com.somle.eccang.model.req.EccangRmaReturnReqVO;
+import com.somle.eccang.model.req.oms.EccangModifySkuRelationReqVO;
+import com.somle.eccang.model.req.oms.EccangSkuRelationReqVO;
 import com.somle.eccang.repository.EccangTokenRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
@@ -326,6 +328,29 @@ public class EccangService {
             return getWmsProductList.get(0);
         }
         return null;
+    }
+
+    /**
+     * 设置平台SKU关系
+     **/
+    public EccangResponse setSkuRelation(String platformSku, String account, List<EccangModifySkuRelationReqVO.PCR> pcrList) {
+
+        EccangModifySkuRelationReqVO vo = EccangModifySkuRelationReqVO.builder().data(
+            List.of(EccangModifySkuRelationReqVO.ModifyData.builder().userAccount(List.of(account)).platformSku(platformSku).pcr(pcrList).build())
+        ).build();
+
+        return getResponse(vo, "modifySkuRelation");
+    }
+
+
+    /**
+     * 按平台SKU获得映射关系
+     **/
+    public List<EccangSkuRelationRespVO> getSkuRelation(String platformSku) {
+        EccangSkuRelationReqVO vo = EccangSkuRelationReqVO.builder().page(1).pageSize(100)
+            .condition(EccangSkuRelationReqVO.Condition.builder().platformSku(platformSku).build())
+            .build();
+        return post("getSkuRelation", vo, EccangSkuRelationRespVO.class);
     }
 
     public Stream<EccangPage> getInventory() {

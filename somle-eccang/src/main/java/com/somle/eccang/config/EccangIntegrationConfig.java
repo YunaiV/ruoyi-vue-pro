@@ -14,4 +14,9 @@ public class EccangIntegrationConfig {
     public MessageChannel eccangSaleOutputChannel() {
         return new PublishSubscribeChannel(new SimpleAsyncTaskExecutor());
     }
+
+    @Bean
+    public MessageChannel eccangSkuRelationOutputChannel() {
+        return new PublishSubscribeChannel(new SimpleAsyncTaskExecutor());
+    }
 }

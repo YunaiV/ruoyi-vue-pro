@@ -23,9 +23,9 @@ public class OmsShopProductSaveReqDTO {
     private Long shopId;
 
     /**
-     * 平台sku
+     * 店铺产品编码
      **/
-    private String platformCode;
+    private String code;
 
     /**
      * 外部资源来源id，唯一标识
@@ -53,9 +53,9 @@ public class OmsShopProductSaveReqDTO {
     private String url;
 
     /**
-     * 数量
+     * 可售数量
      */
-    private Integer qty;
+    private Integer sellableQty;
 
     /**
      * 部门ID

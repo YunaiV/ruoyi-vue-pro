@@ -20,7 +20,7 @@ public interface OmsShopProductMapper extends BaseMapperX<OmsShopProductDO> {
     default MPJLambdaWrapperX<OmsShopProductDO> bindQueryWrapper(OmsShopProductPageReqVO reqVO) {
         return (MPJLambdaWrapperX<OmsShopProductDO>) new MPJLambdaWrapperX<OmsShopProductDO>()
             .likeIfPresent(OmsShopProductDO::getName, reqVO.getName())
-            .likeIfPresent(OmsShopProductDO::getPlatformCode, reqVO.getPlatformProductCode())
+            .likeIfPresent(OmsShopProductDO::getCode, reqVO.getShopProductCode())
             .betweenIfPresent(OmsShopProductDO::getCreateTime, reqVO.getCreateTime())
             .eqIfPresent(OmsShopProductDO::getUrl, reqVO.getUrl())
             .eqIfPresent(OmsShopProductDO::getShopId, reqVO.getShopId())

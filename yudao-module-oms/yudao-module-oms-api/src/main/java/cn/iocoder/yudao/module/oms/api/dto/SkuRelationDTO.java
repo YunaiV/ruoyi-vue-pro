@@ -15,7 +15,8 @@ import java.util.List;
 @Builder
 public class SkuRelationDTO {
     private String platformSku;
-    private String account;
+    //店铺别名
+    private String shopName;
     private List<Relation> relations = new ArrayList<>();
 
     public SkuRelationDTO addRelation(String productSku, Long productSkuQty) {

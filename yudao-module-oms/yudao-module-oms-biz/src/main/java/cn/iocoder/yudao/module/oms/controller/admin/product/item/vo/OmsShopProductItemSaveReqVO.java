@@ -19,4 +19,8 @@ public class OmsShopProductItemSaveReqVO {
     @NotNull(message = "店铺产品编号不能为空")
     private Long shopProductId;
 
+    @Schema(description = "数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "27593")
+    @NotNull(message = "数量不能为空")
+    private Integer qty;
+
 }

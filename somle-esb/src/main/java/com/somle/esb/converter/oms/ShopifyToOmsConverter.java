@@ -65,11 +65,11 @@ public class ShopifyToOmsConverter {
                     .map(variant -> {
                         OmsShopProductSaveReqDTO shopProductDTO = new OmsShopProductSaveReqDTO();
                         shopProductDTO.setShopId(omsShopDO.getId());
-                        shopProductDTO.setPlatformCode(variant.getSku());
+                        shopProductDTO.setCode(variant.getSku());
                         shopProductDTO.setSourceId(variant.getId().toString());
                         shopProductDTO.setName(variant.getTitle());
                         shopProductDTO.setPrice(new BigDecimal(variant.getPrice()));
-                        shopProductDTO.setQty(variant.getInventoryQuantity());
+                        shopProductDTO.setSellableQty(variant.getInventoryQuantity());
                         return shopProductDTO;
                     })
             ).toList();

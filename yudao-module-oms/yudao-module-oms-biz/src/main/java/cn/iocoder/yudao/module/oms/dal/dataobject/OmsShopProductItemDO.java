@@ -36,4 +36,9 @@ public class OmsShopProductItemDO extends BaseDO {
      */
     private Long shopProductId;
 
+    /**
+     * 数量
+     */
+    private Integer qty;
+
 }

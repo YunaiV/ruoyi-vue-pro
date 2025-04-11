@@ -36,8 +36,8 @@ public class OmsShopProductPageReqVO extends PageParam {
     @Schema(description = "币种")
     private String currency;
 
-    @Schema(description = "平台SKU")
-    private String platformProductCode;
+    @Schema(description = "店铺产品编码【平台SKU】")
+    private String shopProductCode;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

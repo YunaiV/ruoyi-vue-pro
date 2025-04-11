@@ -37,7 +37,7 @@ public class OmsShopProductDO extends TenantBaseDO {
     /**
      * 平台sku
      **/
-    private String platformCode;
+    private String code;
 
     /**
      * 外部资源来源id，唯一标识
@@ -65,9 +65,9 @@ public class OmsShopProductDO extends TenantBaseDO {
     private String url;
 
     /**
-     * 数量
+     * 可售数量
      */
-    private Integer qty;
+    private Integer sellableQty;
 
     /**
      * 部门ID

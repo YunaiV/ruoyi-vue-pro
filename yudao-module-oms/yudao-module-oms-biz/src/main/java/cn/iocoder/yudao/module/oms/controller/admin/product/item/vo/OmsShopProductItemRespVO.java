@@ -22,7 +22,7 @@ public class OmsShopProductItemRespVO {
 
     @Schema(description = "产品数量", example = "27593")
     @ExcelProperty("产品数量")
-    private Long quantity;
+    private Long qty;
 
     @Schema(description = "关联产品", requiredMode = Schema.RequiredMode.REQUIRED, example = "27593")
     @ExcelProperty("关联产品")
