@@ -1,0 +1,223 @@
+import type { VbenFormSchema } from '#/adapter/form';
+import type { OnActionClickFn, VxeTableGridOptions } from '#/adapter/vxe-table';
+import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+
+import { z } from '#/adapter/form';
+import { CommonStatusEnum } from '#/utils/constants';
+import { DICT_TYPE, getDictOptions } from '#/utils/dict';
+import { getRangePickerDefaultProps } from '#/utils/date';
+import { useAccess } from '@vben/access';
+
+const { hasAccessByCodes } = useAccess();
+
+/** 新增/修改的表单 */
+export function useFormSchema(): VbenFormSchema[] {
+  return [
+    {
+      fieldName: 'id',
+      component: 'Input',
+      dependencies: {
+        triggerFields: [''],
+        show: () => false,
+      },
+    },
+#foreach($column in $columns)
+#if ($column.createOperation || $column.updateOperation)
+#if (!$column.primaryKey)## 忽略主键，不用在表单里
+  #set ($dictType = $column.dictType)
+  #set ($javaType = $column.javaType)
+  #set ($javaField = $column.javaField)
+  #set ($comment = $column.columnComment)
+  #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+    #set ($dictMethod = "number")
+  #elseif ($javaType == "String")
+    #set ($dictMethod = "string")
+  #elseif ($javaType == "Boolean")
+    #set ($dictMethod = "boolean")
+  #end
+    {
+      fieldName: '${javaField}',
+      label: '${comment}',
+  #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
+      rules: 'required',
+  #end
+  #if ($column.htmlType == "input")
+      component: 'Input',
+      componentProps: {
+        placeholder: '请输入${comment}',
+      },
+  #elseif($column.htmlType == "imageUpload")## 图片上传
+      component: 'FileUpload',
+      componentProps: {
+        fileType: 'image',
+        maxCount: 1,
+      },
+  #elseif($column.htmlType == "fileUpload")## 文件上传
+      component: 'FileUpload',
+      componentProps: {
+        fileType: 'file',
+        maxCount: 1,
+      },
+  #elseif($column.htmlType == "editor")## 文本编辑器
+      component: 'Editor',
+  #elseif($column.htmlType == "select")## 下拉框
+      component: 'Select',
+      componentProps: {
+        #if ("" != $dictType)## 有数据字典
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+        #else##没数据字典
+        options: [],
+        #end
+        placeholder: '请选择${comment}',
+      },
+  #elseif($column.htmlType == "checkbox")## 多选框
+      component: 'Checkbox',
+      componentProps: {
+        #if ("" != $dictType)## 有数据字典
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+        #else##没数据字典
+        options: [],
+        #end
+      },
+  #elseif($column.htmlType == "radio")## 单选框
+      component: 'RadioGroup',
+      componentProps: {
+        #if ("" != $dictType)## 有数据字典
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+        #else##没数据字典
+        options: [],
+        #end
+        buttonStyle: 'solid',
+        optionType: 'button',
+      },
+  #elseif($column.htmlType == "datetime")## 时间框
+      component: 'DatePicker',
+      componentProps: {
+        showTime: true,
+        format: 'YYYY-MM-DD HH:mm:ss',
+        valueFormat: 'x',
+      },
+  #elseif($column.htmlType == "textarea")## 文本域
+      component: 'Textarea',
+      componentProps: {
+        placeholder: '请输入${comment}',
+      },
+  #end
+    },
+#end
+#end
+#end
+  ];
+}
+
+/** 列表的搜索表单 */
+export function useGridFormSchema(): VbenFormSchema[] {
+  return [
+#foreach($column in $columns)
+#if ($column.listOperation)
+  #set ($dictType = $column.dictType)
+  #set ($javaType = $column.javaType)
+  #set ($javaField = $column.javaField)
+  #set ($comment = $column.columnComment)
+  #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+    #set ($dictMethod = "number")
+  #elseif ($javaType == "String")
+    #set ($dictMethod = "string")
+  #elseif ($javaType == "Boolean")
+    #set ($dictMethod = "boolean")
+  #end
+    {
+      fieldName: '${javaField}',
+      label: '${comment}',
+  #if ($column.htmlType == "input")
+      component: 'Input',
+      componentProps: {
+        allowClear: true,
+        placeholder: '请输入${comment}',
+      },
+  #elseif ($column.htmlType == "select")
+      component: 'Select',
+      componentProps: {
+        allowClear: true,
+        #if ("" != $dictType)## 设置了 dictType 数据字典的情况
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+        #else## 未设置 dictType 数据字典的情况
+        options: [],
+        #end
+        placeholder: '请选择${comment}',
+      },
+  #elseif ($column.htmlType == "radio")
+      component: 'Select',
+      componentProps: {
+        allowClear: true,
+        #if ("" != $dictType)## 设置了 dictType 数据字典的情况
+        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+        #else## 未设置 dictType 数据字典的情况
+        options: [],
+        #end
+      },
+  #elseif($column.htmlType == "datetime")
+      component: 'RangePicker',
+      componentProps: {
+        ...getRangePickerDefaultProps(),
+        allowClear: true,
+      },
+  #end
+    },
+#end
+#end
+  ];
+}
+
+/** 列表的字段 */
+export function useGridColumns<T = ${simpleClassName}Api.${simpleClassName}>(
+  onActionClick: OnActionClickFn<T>,
+): VxeTableGridOptions['columns'] {
+  return [
+#foreach($column in $columns)
+#if ($column.listOperationResult)
+  #set ($dictType = $column.dictType)
+  #set ($javaField = $column.javaField)
+  #set ($comment = $column.columnComment)
+    {
+      field: '${javaField}',
+      title: '${comment}',
+      minWidth: 120,
+  #if ($column.javaType == "LocalDateTime")## 时间类型
+      formatter: 'formatDateTime',
+  #elseif("" != $dictType)## 数据字典
+      cellRender: {
+        name: 'CellDict',
+        props: { type: DICT_TYPE.$dictType.toUpperCase() },
+      },
+  #end
+    },
+#end
+#end
+    {
+      field: 'operation',
+      title: '操作',
+      minWidth: 180,
+      align: 'center',
+      fixed: 'right',
+      cellRender: {
+        attrs: {
+          nameField: '${columns[0].javaField}',
+          nameTitle: '${table.classComment}',
+          onClick: onActionClick,
+        },
+        name: 'CellOperation',
+        options: [
+          {
+            code: 'edit',
+            show: hasAccessByCodes(['${table.moduleName}:${simpleClassName_strikeCase}:update']),
+          },
+          {
+            code: 'delete',
+            show: hasAccessByCodes(['${table.moduleName}:${simpleClassName_strikeCase}:delete']),
+          }
+        ],
+      },
+    },
+  ];
+}

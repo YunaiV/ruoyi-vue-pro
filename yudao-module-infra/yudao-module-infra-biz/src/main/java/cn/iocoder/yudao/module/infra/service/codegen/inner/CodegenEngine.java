@@ -144,6 +144,15 @@ public class CodegenEngine {
                     vue3FilePath("views/${table.moduleName}/${table.businessName}/${simpleClassName}Modal.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN.getType(), vue3VbenTemplatePath("api/api.ts"),
                     vue3FilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
+            // Vue3 vben5 schema 模版
+            .put(CodegenFrontTypeEnum.VUE3_VBEN_NEXT_SCHEMA.getType(), vue3VbenNextSchemaTemplatePath("views/data.ts"),
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/data.ts"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN_NEXT_SCHEMA.getType(), vue3VbenNextSchemaTemplatePath("views/index.vue"),
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN_NEXT_SCHEMA.getType(), vue3VbenNextSchemaTemplatePath("views/form.vue"),
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/form.vue"))
+            .put(CodegenFrontTypeEnum.VUE3_VBEN_NEXT_SCHEMA.getType(), vue3VbenNextSchemaTemplatePath("api/api.ts"),
+                    vue3FilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
             .build();
 
     @Resource
@@ -494,6 +503,10 @@ public class CodegenEngine {
 
     private static String vue3VbenTemplatePath(String path) {
         return "codegen/vue3_vben/" + path + ".vm";
+    }
+
+    private static String vue3VbenNextSchemaTemplatePath(String path) {
+        return "codegen/vue3_vben_next/schema/" + path + ".vm";
     }
 
     private static boolean isSubTemplate(String path) {
