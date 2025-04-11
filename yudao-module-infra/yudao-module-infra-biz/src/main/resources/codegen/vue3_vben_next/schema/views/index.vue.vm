@@ -13,7 +13,6 @@ import { $t } from '#/locales';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 #if (${table.templateType} == 2)## 树表接口
 import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
-import { handleTree } from '#/utils/tree';
 #else## 标准表接口
 import { get${simpleClassName}Page, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 #end
@@ -119,6 +118,9 @@ const [Grid, gridApi] = useVbenVxeGrid({
     transform: true,
     expandAll: true,
     reserve: true,
+  },
+  pagerConfig: {
+    enabled: false,
   },
 #else## 标准表设置
     pagerConfig: {
