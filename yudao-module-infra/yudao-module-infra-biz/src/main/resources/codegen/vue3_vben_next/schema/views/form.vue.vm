@@ -1,0 +1,118 @@
+<script lang="ts" setup>
+import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+
+import { useVbenModal } from '@vben/common-ui';
+import { message } from 'ant-design-vue';
+
+import { computed, ref } from 'vue';
+import { $t } from '#/locales';
+import { useVbenForm } from '#/adapter/form';
+import { get${simpleClassName}, create${simpleClassName}, update${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+
+import { useFormSchema } from '../data';
+
+const emit = defineEmits(['success']);
+const formData = ref<${simpleClassName}Api.${simpleClassName}>();
+#if (${table.templateType} == 2)## 树表特有：父ID处理
+const parentId = ref<number>(); // 新增下级时的父级 ID
+
+const getTitle = computed(() => {
+  if (formData.value?.id) {
+    return $t('ui.actionTitle.edit', ['${table.classComment}']);
+  }
+  return parentId.value
+    ? $t('ui.actionTitle.create', ['下级${table.classComment}'])
+    : $t('ui.actionTitle.create', ['${table.classComment}']);
+});
+#else## 标准表标题
+const getTitle = computed(() => {
+  return formData.value?.id
+    ? $t('ui.actionTitle.edit', ['${table.classComment}'])
+    : $t('ui.actionTitle.create', ['${table.classComment}']);
+});
+#end
+
+const [Form, formApi] = useVbenForm({
+  layout: 'horizontal',
+  schema: useFormSchema(),
+  showDefaultActions: false
+});
+
+const [Modal, modalApi] = useVbenModal({
+  async onConfirm() {
+    const { valid } = await formApi.validate();
+    if (!valid) {
+      return;
+    }
+    modalApi.lock();
+    // 提交表单
+    const data = (await formApi.getValues()) as ${simpleClassName}Api.${simpleClassName};
+    try {
+      await (formData.value?.id ? update${simpleClassName}(data) : create${simpleClassName}(data));
+      // 关闭并提示
+      await modalApi.close();
+      emit('success');
+      message.success({
+        content: $t('ui.actionMessage.operationSuccess'),
+        key: 'action_process_msg',
+      });
+    } finally {
+      modalApi.lock(false);
+    }
+  },
+  async onOpenChange(isOpen: boolean) {
+    if (!isOpen) {
+      return;
+    }
+    // 加载数据
+#if (${table.templateType} == 2)## 树表处理传入的父ID
+    let data = modalApi.getData<${simpleClassName}Api.${simpleClassName}>();
+#else## 标准表直接获取
+    const data = modalApi.getData<${simpleClassName}Api.${simpleClassName}>();
+#end
+    if (!data) {
+      return;
+    }
+
+#if (${table.templateType} == 2)## 树表特有：处理新增下级的情况
+    // 处理新增下级的情况
+    if (!data.id && data.${treeParentColumn.javaField}) {
+      parentId.value = data.${treeParentColumn.javaField};
+      formData.value = { ${treeParentColumn.javaField}: parentId.value } as ${simpleClassName}Api.${simpleClassName};
+      await formApi.setValues(formData.value);
+      return;
+    }
+#end
+
+    if (data.id) {
+      // 编辑
+      modalApi.lock();
+      try {
+#if (${table.templateType} == 2)## 树表获取数据后重新赋值
+        data = await get${simpleClassName}(data.id);
+        formData.value = data;
+#else## 标准表设置表单数据
+        formData.value = await get${simpleClassName}(data.id as number);
+#end
+        await formApi.setValues(formData.value);
+      } finally {
+        modalApi.lock(false);
+      }
+    } else {
+      // 新增
+#if (${table.templateType} == 2)## 树表特有：设置顶级ID
+      formData.value = { ${treeParentColumn.javaField}: 0 } as ${simpleClassName}Api.${simpleClassName};
+#else## 标准表：设置空值
+      formData.value = data;
+#end
+      await formApi.setValues(formData.value || {});
+    }
+  },
+});
+</script>
+
+<template>
+  <Modal :title="getTitle">
+    <Form class="mx-4" />
+  </Modal>
+</template>

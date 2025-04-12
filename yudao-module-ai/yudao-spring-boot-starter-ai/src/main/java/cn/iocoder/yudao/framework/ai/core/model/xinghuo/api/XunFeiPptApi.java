@@ -1,45 +1,44 @@
 package cn.iocoder.yudao.framework.ai.core.model.xinghuo.api;
 
+import cn.hutool.core.util.ObjUtil;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.digest.HmacAlgorithm;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-// TODO @新：要不改成 XunFeiPptApi
 /**
  * 讯飞智能 PPT 生成 API
  *
- * @see <a href="https://www.xfyun.cn/doc/spark/PPTv2.html">智能 PPT 生成 API</a>
- *
  * @author xiaoxin
+ * @see <a href="https://www.xfyun.cn/doc/spark/PPTv2.html">智能 PPT 生成 API</a>
  */
 @Slf4j
-public class XunfeiPptApi {
+public class XunFeiPptApi {
 
     public static final String BASE_URL = "https://zwapi.xfyun.cn/api/ppt/v2";
+    private static final String HEADER_APP_ID = "appId";
+    private static final String HEADER_TIMESTAMP = "timestamp";
+    private static final String HEADER_SIGNATURE = "signature";
 
     private final WebClient webClient;
     private final String appId;
@@ -49,18 +48,21 @@ public class XunfeiPptApi {
 
     private final Function<Object, Function<ClientResponse, Mono<? extends Throwable>>> EXCEPTION_FUNCTION =
             reqParam -> response -> response.bodyToMono(String.class).handle((responseBody, sink) -> {
-                log.error("[xunfei-ppt-api] 调用失败！请求参数:[{}]，响应数据: [{}]", reqParam, responseBody);
-                sink.error(new IllegalStateException("[xunfei-ppt-api] 调用失败！"));
+                log.error("[XunFeiPptApi] 调用失败！请求参数:[{}]，响应数据: [{}]", reqParam, responseBody);
+                sink.error(new IllegalStateException("[XunFeiPptApi] 调用失败！"));
             });
 
-    // TODO @新：是不是不用 baseUrl 哈
-    public XunfeiPptApi(String baseUrl, String appId, String apiSecret) {
-        // TODO @新：建议，增加 defaultheaders，例如说 appid 之类的；或者每个请求，通过 headers customer 处理。
-        this.webClient = WebClient.builder()
-                .baseUrl(baseUrl)
-                .build();
+    public XunFeiPptApi(String appId, String apiSecret) {
         this.appId = appId;
         this.apiSecret = apiSecret;
+        this.webClient = WebClient.builder()
+                .baseUrl(BASE_URL)
+                .defaultHeaders((headers) -> {
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                    headers.add(HEADER_APP_ID, appId);
+                })
+                .build();
+
     }
 
     /**
@@ -72,7 +74,7 @@ public class XunfeiPptApi {
         long timestamp = System.currentTimeMillis() / 1000;
         String ts = String.valueOf(timestamp);
         String signature = generateSignature(appId, apiSecret, timestamp);
-        return new SignatureInfo(appId, ts, signature);
+        return new SignatureInfo(ts, signature);
     }
 
     /**
@@ -84,43 +86,8 @@ public class XunfeiPptApi {
      * @return 签名
      */
     private String generateSignature(String appId, String apiSecret, long timestamp) {
-        try {
-            // TODO @新：使用 hutool 简化
-            String auth = md5(appId + timestamp);
-            return hmacSHA1Encrypt(auth, apiSecret);
-        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            log.error("[xunfei-ppt-api] 生成签名失败", e);
-            throw new IllegalStateException("[xunfei-ppt-api] 生成签名失败");
-        }
-    }
-
-    /**
-     * HMAC SHA1 加密
-     */
-    private String hmacSHA1Encrypt(String encryptText, String encryptKey)
-            throws NoSuchAlgorithmException, InvalidKeyException {
-        SecretKeySpec keySpec = new SecretKeySpec(
-                encryptKey.getBytes(StandardCharsets.UTF_8), "HmacSHA1");
-
-        Mac mac = Mac.getInstance("HmacSHA1");
-        mac.init(keySpec);
-        byte[] result = mac.doFinal(encryptText.getBytes(StandardCharsets.UTF_8));
-
-        return Base64.getEncoder().encodeToString(result);
-    }
-
-    /**
-     * MD5 哈希
-     */
-    private String md5(String text) throws NoSuchAlgorithmException {
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        byte[] digest = md.digest(text.getBytes(StandardCharsets.UTF_8));
-
-        StringBuilder sb = new StringBuilder();
-        for (byte b : digest) {
-            sb.append(String.format("%02x", b));
-        }
-        return sb.toString();
+        String auth = SecureUtil.md5(appId + timestamp);
+        return SecureUtil.hmac(HmacAlgorithm.HmacSHA1, apiSecret).digestBase64(auth, false);
     }
 
     /**
@@ -134,13 +101,11 @@ public class XunfeiPptApi {
         SignatureInfo signInfo = getSignature();
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("style", style);
-        // TODO @新：可以使用 ObjUtil.defaultIfNull
-        requestBody.put("pageSize", pageSize != null ? pageSize : 10);
+        requestBody.put("pageSize", ObjUtil.defaultIfNull(pageSize, 20));
         return this.webClient.post()
                 .uri("/template/list")
-                .header("appId", signInfo.appId)
-                .header("timestamp", signInfo.timestamp)
-                .header("signature", signInfo.signature)
+                .header(HEADER_TIMESTAMP, signInfo.timestamp)
+                .header(HEADER_SIGNATURE, signInfo.signature)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(requestBody)
                 .retrieve()
@@ -161,9 +126,8 @@ public class XunfeiPptApi {
         formData.add("query", query);
         return this.webClient.post()
                 .uri("/createOutline")
-                .header("appId", signInfo.appId)
-                .header("timestamp", signInfo.timestamp)
-                .header("signature", signInfo.signature)
+                .header(HEADER_TIMESTAMP, signInfo.timestamp)
+                .header(HEADER_SIGNATURE, signInfo.signature)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData(formData))
                 .retrieve()
@@ -207,12 +171,11 @@ public class XunfeiPptApi {
      */
     public CreateResponse create(CreatePptRequest request) {
         SignatureInfo signInfo = getSignature();
-        MultiValueMap<String, Object> formData = buildCreateFormData(request);
+        MultiValueMap<String, Object> formData = buildCreatePptFormData(request);
         return this.webClient.post()
                 .uri("/create")
-                .header("appId", signInfo.appId)
-                .header("timestamp", signInfo.timestamp)
-                .header("signature", signInfo.signature)
+                .header(HEADER_TIMESTAMP, signInfo.timestamp)
+                .header(HEADER_SIGNATURE, signInfo.signature)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData(formData))
                 .retrieve()
@@ -247,9 +210,8 @@ public class XunfeiPptApi {
         SignatureInfo signInfo = getSignature();
         return this.webClient.post()
                 .uri("/createPptByOutline")
-                .header("appId", signInfo.appId)
-                .header("timestamp", signInfo.timestamp)
-                .header("signature", signInfo.signature)
+                .header(HEADER_TIMESTAMP, signInfo.timestamp)
+                .header(HEADER_SIGNATURE, signInfo.signature)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .retrieve()
@@ -271,9 +233,8 @@ public class XunfeiPptApi {
                         .path("/progress")
                         .queryParam("sid", sid)
                         .build())
-                .header("appId", signInfo.appId)
-                .header("timestamp", signInfo.timestamp)
-                .header("signature", signInfo.signature)
+                .header(HEADER_TIMESTAMP, signInfo.timestamp)
+                .header(HEADER_SIGNATURE, signInfo.signature)
                 .retrieve()
                 .onStatus(STATUS_PREDICATE, EXCEPTION_FUNCTION.apply(sid))
                 .bodyToMono(ProgressResponse.class)
@@ -285,10 +246,10 @@ public class XunfeiPptApi {
      */
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private record SignatureInfo(
-            String appId,
             String timestamp,
             String signature
-    ) { }
+    ) {
+    }
 
     /**
      * 模板列表响应
@@ -300,7 +261,8 @@ public class XunfeiPptApi {
             String desc,
             Integer count,
             TemplatePageData data
-    ) { }
+    ) {
+    }
 
     /**
      * 模板列表数据
@@ -310,7 +272,8 @@ public class XunfeiPptApi {
             String total,
             List<TemplateInfo> records,
             Integer pageNum
-    ) { }
+    ) {
+    }
 
     /**
      * 模板信息
@@ -324,7 +287,8 @@ public class XunfeiPptApi {
             String industry,
             String style,
             String detailImage
-    ) { }
+    ) {
+    }
 
     /**
      * 创建响应
@@ -336,7 +300,8 @@ public class XunfeiPptApi {
             String desc,
             Integer count,
             CreateResponseData data
-    ) { }
+    ) {
+    }
 
     /**
      * 创建响应数据
@@ -348,7 +313,8 @@ public class XunfeiPptApi {
             String title,
             String subTitle,
             OutlineData outline
-    ) { }
+    ) {
+    }
 
     /**
      * 大纲数据结构
@@ -375,7 +341,8 @@ public class XunfeiPptApi {
             @JsonInclude(value = JsonInclude.Include.NON_NULL)
             public record ChapterContent(
                     String chapterTitle
-            ) { }
+            ) {
+            }
 
         }
 
@@ -397,7 +364,8 @@ public class XunfeiPptApi {
             int code,
             String desc,
             ProgressResponseData data
-    ) { }
+    ) {
+    }
 
     /**
      * 进度响应数据
@@ -407,13 +375,12 @@ public class XunfeiPptApi {
             int process,
             String pptId,
             String pptUrl,
-            // TODO @新：字段注释，去掉
-            String pptStatus,         // PPT构建状态：building（构建中），done（已完成），build_failed（生成失败）
-            String aiImageStatus,     // ai配图状态：building（构建中），done（已完成）
-            String cardNoteStatus,    // 演讲备注状态：building（构建中），done（已完成）
-            String errMsg,            // 生成PPT的失败信息
-            Integer totalPages,       // 生成PPT的总页数
-            Integer donePages         // 生成PPT的完成页数
+            String pptStatus,
+            String aiImageStatus,
+            String cardNoteStatus,
+            String errMsg,
+            Integer totalPages,
+            Integer donePages
     ) {
 
         /**
@@ -454,6 +421,7 @@ public class XunfeiPptApi {
      * 通过大纲创建 PPT 请求参数
      */
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
+    @Builder
     public record CreatePptByOutlineRequest(
             String query,                // 用户生成PPT要求（最多8000字）
             String outlineSid,           // 已生成大纲后，响应返回的请求大纲唯一id
@@ -469,109 +437,8 @@ public class XunfeiPptApi {
             Boolean isFigure,            // 是否自动配图
             String aiImage               // ai配图类型：normal、advanced
     ) {
-
-        /**
-         * 创建构建器
-         *
-         * @return 构建器
-         */
-        public static Builder builder() {
-            return new Builder();
-        }
-
-        // TODO @新：这个可以用 lombok 简化么？
-        /**
-         * 构建器类
-         */
-        public static class Builder {
-
-            private String query;
-            private String outlineSid;
-            private OutlineData outline;
-            private String templateId;
-            private String businessId;
-            private String author;
-            private Boolean isCardNote;
-            private Boolean search;
-            private String language;
-            private String fileUrl;
-            private String fileName;
-            private Boolean isFigure;
-            private String aiImage;
-
-            public Builder query(String query) {
-                this.query = query;
-                return this;
-            }
-
-            public Builder outlineSid(String outlineSid) {
-                this.outlineSid = outlineSid;
-                return this;
-            }
-
-            public Builder outline(OutlineData outline) {
-                this.outline = outline;
-                return this;
-            }
-
-            public Builder templateId(String templateId) {
-                this.templateId = templateId;
-                return this;
-            }
-
-            public Builder businessId(String businessId) {
-                this.businessId = businessId;
-                return this;
-            }
-
-            public Builder author(String author) {
-                this.author = author;
-                return this;
-            }
-
-            public Builder isCardNote(Boolean isCardNote) {
-                this.isCardNote = isCardNote;
-                return this;
-            }
-
-            public Builder search(Boolean search) {
-                this.search = search;
-                return this;
-            }
-
-            public Builder language(String language) {
-                this.language = language;
-                return this;
-            }
-
-            public Builder fileUrl(String fileUrl) {
-                this.fileUrl = fileUrl;
-                return this;
-            }
-
-            public Builder fileName(String fileName) {
-                this.fileName = fileName;
-                return this;
-            }
-
-            public Builder isFigure(Boolean isFigure) {
-                this.isFigure = isFigure;
-                return this;
-            }
-
-            public Builder aiImage(String aiImage) {
-                this.aiImage = aiImage;
-                return this;
-            }
-
-            public CreatePptByOutlineRequest build() {
-                return new CreatePptByOutlineRequest(
-                        query, outlineSid, outline, templateId, businessId, author,
-                        isCardNote, search, language, fileUrl, fileName, isFigure, aiImage
-                );
-            }
-        }
     }
+
 
     /**
      * 构建创建 PPT 的表单数据
@@ -579,12 +446,8 @@ public class XunfeiPptApi {
      * @param request 请求参数
      * @return 表单数据
      */
-    private MultiValueMap<String, Object> buildCreateFormData(CreatePptRequest request) {
+    private MultiValueMap<String, Object> buildCreatePptFormData(CreatePptRequest request) {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
-        // 添加请求参数
-        if (request.query() != null) {
-            formData.add("query", request.query());
-        }
         if (request.file() != null) {
             try {
                 formData.add("file", new ByteArrayResource(request.file().getBytes()) {
@@ -594,48 +457,51 @@ public class XunfeiPptApi {
                     }
                 });
             } catch (IOException e) {
-                log.error("[xunfei-ppt-api] 文件处理失败", e);
-                throw new IllegalStateException("[xunfei-ppt-api] 文件处理失败", e);
+                log.error("[XunFeiPptApi] 文件处理失败", e);
+                throw new IllegalStateException("[XunFeiPptApi] 文件处理失败", e);
             }
         }
-        // TODO @新：要不搞个 MapUtil.addIfPresent 方法？
-        if (request.fileUrl() != null) {
-            formData.add("fileUrl", request.fileUrl());
-        }
-        if (request.fileName() != null) {
-            formData.add("fileName", request.fileName());
-        }
-        if (request.templateId() != null) {
-            formData.add("templateId", request.templateId());
-        }
-        if (request.businessId() != null) {
-            formData.add("businessId", request.businessId());
-        }
-        if (request.author() != null) {
-            formData.add("author", request.author());
-        }
-        if (request.isCardNote() != null) {
-            formData.add("isCardNote", request.isCardNote().toString());
-        }
-        if (request.search() != null) {
-            formData.add("search", request.search().toString());
-        }
-        if (request.language() != null) {
-            formData.add("language", request.language());
-        }
-        if (request.isFigure() != null) {
-            formData.add("isFigure", request.isFigure().toString());
-        }
-        if (request.aiImage() != null) {
-            formData.add("aiImage", request.aiImage());
-        }
+        Map<String, Object> param = new HashMap<>();
+        addIfPresent(param, "query", request.query());
+        addIfPresent(param, "fileUrl", request.fileUrl());
+        addIfPresent(param, "fileName", request.fileName());
+        addIfPresent(param, "templateId", request.templateId());
+        addIfPresent(param, "businessId", request.businessId());
+        addIfPresent(param, "author", request.author());
+        addIfPresent(param, "isCardNote", request.isCardNote());
+        addIfPresent(param, "search", request.search());
+        addIfPresent(param, "language", request.language());
+        addIfPresent(param, "isFigure", request.isFigure());
+        addIfPresent(param, "aiImage", request.aiImage());
+        param.forEach(formData::add);
         return formData;
+    }
+
+    public static <K, V> void addIfPresent(Map<K, V> map, K key, V value) {
+        if (ObjUtil.isNull(key) || ObjUtil.isNull(map)) {
+            return;
+        }
+
+        boolean isPresent = false;
+        if (ObjUtil.isNotNull(value)) {
+            if (value instanceof String) {
+                // 字符串：需要有实际内容
+                isPresent = StringUtils.hasText((String) value);
+            } else {
+                // 其他类型：非 null 即视为存在
+                isPresent = true;
+            }
+        }
+        if (isPresent) {
+            map.put(key, value);
+        }
     }
 
     /**
      * 直接生成PPT请求参数
      */
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
+    @Builder
     public record CreatePptRequest(
             String query,                // 用户生成PPT要求（最多8000字）
             MultipartFile file,          // 上传文件
@@ -651,109 +517,6 @@ public class XunfeiPptApi {
             String aiImage               // ai配图类型：normal、advanced
     ) {
 
-        /**
-         * 创建构建器
-         *
-         * @return 构建器
-         */
-        public static Builder builder() {
-            return new Builder();
-        }
-
-        /**
-         * 构建器类
-         */
-        public static class Builder {
-
-            private String query;
-            private MultipartFile file;
-            private String fileUrl;
-            private String fileName;
-            private String templateId;
-            private String businessId;
-            private String author;
-            private Boolean isCardNote;
-            private Boolean search;
-            private String language;
-            private Boolean isFigure;
-            private String aiImage;
-
-            // TODO @新：这个可以用 lombok 简化么？
-
-            public Builder query(String query) {
-                this.query = query;
-                return this;
-            }
-
-            public Builder file(MultipartFile file) {
-                this.file = file;
-                return this;
-            }
-
-            public Builder fileUrl(String fileUrl) {
-                this.fileUrl = fileUrl;
-                return this;
-            }
-
-            public Builder fileName(String fileName) {
-                this.fileName = fileName;
-                return this;
-            }
-
-            public Builder templateId(String templateId) {
-                this.templateId = templateId;
-                return this;
-            }
-
-            public Builder businessId(String businessId) {
-                this.businessId = businessId;
-                return this;
-            }
-
-            public Builder author(String author) {
-                this.author = author;
-                return this;
-            }
-
-            public Builder isCardNote(Boolean isCardNote) {
-                this.isCardNote = isCardNote;
-                return this;
-            }
-
-            public Builder search(Boolean search) {
-                this.search = search;
-                return this;
-            }
-
-            public Builder language(String language) {
-                this.language = language;
-                return this;
-            }
-
-            public Builder isFigure(Boolean isFigure) {
-                this.isFigure = isFigure;
-                return this;
-            }
-
-            public Builder aiImage(String aiImage) {
-                this.aiImage = aiImage;
-                return this;
-            }
-
-            public CreatePptRequest build() {
-                // 验证参数
-                if (query == null && file == null && fileUrl == null) {
-                    throw new IllegalArgumentException("query、file、fileUrl必填其一");
-                }
-                if ((file != null || fileUrl != null) && fileName == null) {
-                    throw new IllegalArgumentException("如果传file或者fileUrl，fileName必填");
-                }
-                return new CreatePptRequest(
-                        query, file, fileUrl, fileName, templateId, businessId, author,
-                        isCardNote, search, language, isFigure, aiImage
-                );
-            }
-        }
     }
 
 }

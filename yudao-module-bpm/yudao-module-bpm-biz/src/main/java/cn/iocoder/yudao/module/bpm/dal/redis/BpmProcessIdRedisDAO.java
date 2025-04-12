@@ -10,6 +10,8 @@ import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+import static cn.hutool.core.date.DatePattern.*;
+
 /**
  * BPM 流程 Id 编码的 Redis DAO
  *
@@ -32,16 +34,16 @@ public class BpmProcessIdRedisDAO {
         String infix = "";
         switch (processIdRule.getInfix()) {
             case "DAY":
-                infix = DateUtil.format(LocalDateTime.now(), "yyyyMMDD");
+                infix = DateUtil.format(LocalDateTime.now(), PURE_DATE_PATTERN);
                 break;
             case "HOUR":
-                infix = DateUtil.format(LocalDateTime.now(), "yyyyMMDDHH");
+                infix = DateUtil.format(LocalDateTime.now(), PURE_DATE_PATTERN + "HH");
                 break;
             case "MINUTE":
-                infix = DateUtil.format(LocalDateTime.now(), "yyyyMMDDHHmm");
+                infix = DateUtil.format(LocalDateTime.now(), PURE_DATE_PATTERN + "HHmm");
                 break;
             case "SECOND":
-                infix = DateUtil.format(LocalDateTime.now(), "yyyyMMDDHHmmss");
+                infix = DateUtil.format(LocalDateTime.now(), PURE_DATETIME_PATTERN);
                 break;
         }
 

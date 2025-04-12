@@ -123,6 +123,18 @@
             <groupId>dev.tinyflow</groupId>
             <artifactId>tinyflow-java-core</artifactId>
             <version>${tinyflow.version}</version>
+            <exclusions>
+                <exclusion>
+                    <!-- 解决 https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/1318/ 问题 -->
+                    <groupId>com.agentsflex</groupId>
+                    <artifactId>agents-flex-store-elasticsearch</artifactId>
+                </exclusion>
+                <exclusion>
+                    <!-- TODO @芋艿：暂时移除 groovy，和 iot 冲突 -->
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy-all</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Test 测试相关 -->

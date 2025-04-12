@@ -7,7 +7,9 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.infra.api.websocket.WebSocketSenderApi;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
+import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessageListReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessageRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.kefu.vo.message.KeFuMessageSendReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.kefu.vo.message.AppKeFuMessagePageReqVO;
 import cn.iocoder.yudao.module.promotion.controller.app.kefu.vo.message.AppKeFuMessageSendReqVO;
@@ -15,12 +17,13 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuConversationDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.kefu.KeFuMessageDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.kefu.KeFuMessageMapper;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import jakarta.annotation.Resource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
 
@@ -66,9 +69,11 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
         conversationService.updateConversationLastMessage(kefuMessage);
 
         // 3.1 发送消息给会员
-        getSelf().sendAsyncMessageToMember(conversation.getUserId(), KEFU_MESSAGE_TYPE, kefuMessage);
+        AdminUserRespDTO user = adminUserApi.getUser(kefuMessage.getSenderId());
+        KeFuMessageRespVO message = BeanUtils.toBean(kefuMessage, KeFuMessageRespVO.class).setSenderAvatar(user.getAvatar());
+        getSelf().sendAsyncMessageToMember(conversation.getUserId(), KEFU_MESSAGE_TYPE, message);
         // 3.2 通知所有管理员更新对话
-        getSelf().sendAsyncMessageToAdmin(KEFU_MESSAGE_TYPE, kefuMessage);
+        getSelf().sendAsyncMessageToAdmin(KEFU_MESSAGE_TYPE, message);
         return kefuMessage.getId();
     }
 
@@ -84,7 +89,9 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
         // 2. 更新会话消息冗余
         conversationService.updateConversationLastMessage(kefuMessage);
         // 3. 通知所有管理员更新对话
-        getSelf().sendAsyncMessageToAdmin(KEFU_MESSAGE_TYPE, kefuMessage);
+        MemberUserRespDTO user = memberUserApi.getUser(kefuMessage.getSenderId());
+        KeFuMessageRespVO message = BeanUtils.toBean(kefuMessage, KeFuMessageRespVO.class).setSenderAvatar(user.getAvatar());
+        getSelf().sendAsyncMessageToAdmin(KEFU_MESSAGE_TYPE, message);
         return kefuMessage.getId();
     }
 
@@ -112,9 +119,11 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
         // 2.3 发送消息通知会员，管理员已读 -> 会员更新发送的消息状态
         KeFuMessageDO keFuMessage = getFirst(filterList(messageList, message -> UserTypeEnum.MEMBER.getValue().equals(message.getSenderType())));
         assert keFuMessage != null; // 断言避免警告
-        getSelf().sendAsyncMessageToMember(keFuMessage.getSenderId(), KEFU_MESSAGE_ADMIN_READ, conversation.getId());
+        getSelf().sendAsyncMessageToMember(keFuMessage.getSenderId(), KEFU_MESSAGE_ADMIN_READ,
+                new KeFuMessageRespVO().setConversationId(keFuMessage.getConversationId()));
         // 2.4 通知所有管理员消息已读
-        getSelf().sendAsyncMessageToAdmin(KEFU_MESSAGE_ADMIN_READ, conversation.getId());
+        getSelf().sendAsyncMessageToAdmin(KEFU_MESSAGE_ADMIN_READ,
+                new KeFuMessageRespVO().setConversationId(keFuMessage.getConversationId()));
     }
 
     private void validateReceiverExist(Long receiverId, Integer receiverType) {

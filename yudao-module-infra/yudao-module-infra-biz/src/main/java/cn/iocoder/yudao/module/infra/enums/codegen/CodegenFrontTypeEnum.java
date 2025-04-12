@@ -12,9 +12,10 @@ import lombok.Getter;
 @Getter
 public enum CodegenFrontTypeEnum {
 
-    VUE2(10), // Vue2 Element UI 标准模版
-    VUE3(20), // Vue3 Element Plus 标准模版
-    VUE3_VBEN(30), // Vue3 VBEN 模版
+    VUE2_ELEMENT_UI(10), // Vue2 Element UI 标准模版
+    VUE3_ELEMENT_PLUS(20), // Vue3 Element Plus 标准模版
+    VUE3_VBEN2_ANTD_SCHEMA(30), // Vue3 VBEN2 + ANTD + Schema 模版
+    VUE3_VBEN5_ANTD_SCHEMA(40), // Vue3 VBEN5 + ANTD + schema 模版
     ;
 
     /**

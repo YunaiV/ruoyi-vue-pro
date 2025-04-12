@@ -213,7 +213,7 @@ public class TradeDeliveryPriceCalculator implements TradePriceCalculator {
         }
         double totalChargeValue = getTotalChargeValue(orderItems, chargeMode);
         double totalPrice = TradePriceCalculatorHelper.calculateTotalPayPrice(orderItems);
-        return totalChargeValue >= templateFree.getFreeCount() && totalPrice >= templateFree.getFreePrice();
+        return totalChargeValue <= templateFree.getFreeCount() && totalPrice >= templateFree.getFreePrice();
     }
 
     private double getTotalChargeValue(List<OrderItem> orderItems, Integer chargeMode) {
