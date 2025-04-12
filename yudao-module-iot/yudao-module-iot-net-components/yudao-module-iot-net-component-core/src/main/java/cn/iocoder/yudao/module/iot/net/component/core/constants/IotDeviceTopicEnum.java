@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.net.component.core.constants;
 
 import lombok.Getter;
 
+// TODO @haohao：要不放到 enums 包下；
 /**
  * IoT 设备主题枚举
  * <p>
@@ -12,6 +13,7 @@ import lombok.Getter;
 @Getter
 public enum IotDeviceTopicEnum {
 
+    // TODO @haohao：SYS_TOPIC_PREFIX、SERVICE_TOPIC_PREFIX、REPLY_SUFFIX 类似这种，要不搞成这个里面的静态变量？不是枚举值
     /**
      * 系统主题前缀
      */
@@ -22,6 +24,7 @@ public enum IotDeviceTopicEnum {
      */
     SERVICE_TOPIC_PREFIX("/thing/service/", "服务调用主题前缀"),
 
+    // TODO @haohao：注释时，中英文之间，有个空格；
     /**
      * 设备属性设置主题
      * 请求Topic：/sys/${productKey}/${deviceName}/thing/service/property/set
@@ -75,6 +78,7 @@ public enum IotDeviceTopicEnum {
     private final String topic;
     private final String description;
 
+    // TODO @haohao：使用 lombok 去除
     IotDeviceTopicEnum(String topic, String description) {
         this.topic = topic;
         this.description = description;
@@ -89,6 +93,7 @@ public enum IotDeviceTopicEnum {
      * @return 完整的主题路径
      */
     public static String buildServiceTopic(String productKey, String deviceName, String serviceIdentifier) {
+        // TODO @haohao：貌似 SYS_TOPIC_PREFIX.getTopic() + productKey + "/" + deviceName 是统一的；
         return SYS_TOPIC_PREFIX.getTopic() + productKey + "/" + deviceName +
                 SERVICE_TOPIC_PREFIX.getTopic() + serviceIdentifier;
     }
@@ -127,7 +132,7 @@ public enum IotDeviceTopicEnum {
     }
 
     /**
-     * 构建设备OTA升级主题
+     * 构建设备 OTA 升级主题
      *
      * @param productKey 产品Key
      * @param deviceName 设备名称
@@ -170,4 +175,5 @@ public enum IotDeviceTopicEnum {
     public static String getReplyTopic(String requestTopic) {
         return requestTopic + REPLY_SUFFIX.getTopic();
     }
+
 }

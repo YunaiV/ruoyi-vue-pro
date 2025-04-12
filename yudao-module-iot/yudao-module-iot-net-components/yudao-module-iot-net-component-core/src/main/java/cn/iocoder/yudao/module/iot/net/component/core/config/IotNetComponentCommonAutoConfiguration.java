@@ -13,6 +13,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+// TODO @haohao：应该不用写 spring.factories 拉，因为被 imports 替代啦
 /**
  * IoT 网络组件的通用自动配置类
  *

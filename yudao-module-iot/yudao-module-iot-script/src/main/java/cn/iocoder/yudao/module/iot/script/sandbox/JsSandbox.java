@@ -56,6 +56,7 @@ public class JsSandbox implements ScriptSandbox {
      */
     public JsSandbox() {
         // 初始化 Java 相关的不安全关键字
+        // TODO @haohao：可以使用 addAll 哈。
         Arrays.asList(
                 "java.lang.System",
                 "java.io",

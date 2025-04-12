@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
  * @author haohao
  */
 @Data
-@Accessors(chain = true)
+@Accessors(chain = true) // TODO @haohao：貌似不用写 @Accessors(chain = true)，我全局加啦，可见 lombok.config
 public class IotStandardResponse {
 
     /**

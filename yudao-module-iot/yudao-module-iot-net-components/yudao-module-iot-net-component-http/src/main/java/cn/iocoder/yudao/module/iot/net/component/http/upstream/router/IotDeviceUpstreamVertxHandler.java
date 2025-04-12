@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.net.component.http.upstream.router;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjUtil;
@@ -35,6 +36,8 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 @Slf4j
 public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
 
+    // TODO @haohao：你说，咱要不要把 "/sys/:productKey/:deviceName"
+    //            + IotDeviceTopicEnum.PROPERTY_POST_TOPIC.getTopic()，也抽到 IotDeviceTopicEnum 的 build 这种？尽量都收敛掉？
     /**
      * 属性上报路径
      */
@@ -254,8 +257,8 @@ public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
             return PROPERTY_METHOD;
         }
 
-        return EVENT_METHOD_PREFIX +
-                (routingContext.pathParams().containsKey("identifier")
+        return EVENT_METHOD_PREFIX
+                + (routingContext.pathParams().containsKey("identifier")
                         ? routingContext.pathParam("identifier")
                         : "unknown")
                 +
@@ -275,7 +278,6 @@ public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
                 .setReportTime(LocalDateTime.now())
                 .setProductKey(productKey)
                 .setDeviceName(deviceName)).setState(IotDeviceStateEnum.ONLINE.getState());
-
         deviceUpstreamApi.updateDeviceState(reqDTO);
     }
 
@@ -311,8 +313,7 @@ public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
     private Map<String, Object> parsePropertiesFromBody(JsonObject body) {
         Map<String, Object> properties = MapUtil.newHashMap();
         JsonObject params = body.getJsonObject("params");
-
-        if (params == null) {
+        if (CollUtil.isEmpty(params)) {
             return properties;
         }
 
@@ -327,7 +328,6 @@ public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
                 properties.put(key, valueObj);
             }
         }
-
         return properties;
     }
 
@@ -364,15 +364,13 @@ public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
     private Map<String, Object> parseParamsFromBody(JsonObject body) {
         Map<String, Object> params = MapUtil.newHashMap();
         JsonObject paramsJson = body.getJsonObject("params");
-
-        if (paramsJson == null) {
+        if (CollUtil.isEmpty(paramsJson)) {
             return params;
         }
 
         for (String key : paramsJson.fieldNames()) {
             params.put(key, paramsJson.getValue(key));
         }
-
         return params;
     }
 }

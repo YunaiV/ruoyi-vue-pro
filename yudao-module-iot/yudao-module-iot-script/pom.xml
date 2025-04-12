@@ -44,6 +44,7 @@
         </dependency>
 
         <!-- JavaScript 引擎 - 使用 GraalJS 替代 Nashorn -->
+        <!-- TODO @haohao：得考虑下，jdk8 可能不支持 graalvm，后续哈；【优先级：低】 -->
         <dependency>
             <groupId>org.graalvm.sdk</groupId>
             <artifactId>graal-sdk</artifactId>

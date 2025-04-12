@@ -32,6 +32,7 @@ public class IotNetComponentServerConfiguration {
      * @return RestTemplate
      */
     @Bean
+    // TODO @haohao：貌似要独立一个 restTemplate 的名字？不然容易冲突；
     public RestTemplate restTemplate(IotNetComponentServerProperties properties) {
         return new RestTemplateBuilder()
                 .connectTimeout(properties.getUpstreamConnectTimeout())
@@ -104,6 +105,7 @@ public class IotNetComponentServerConfiguration {
         return new Object();
     }
 
+    // TODO @haohao：这个是不是木有用呀？
     /**
      * 配置默认的组件实例注册客户端
      *

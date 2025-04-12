@@ -28,6 +28,7 @@ public class ScriptUtils {
         return INSTANCE;
     }
 
+    // TODO @haohao：使用 lombok 简化掉
     private ScriptUtils() {
         // 私有构造函数
     }

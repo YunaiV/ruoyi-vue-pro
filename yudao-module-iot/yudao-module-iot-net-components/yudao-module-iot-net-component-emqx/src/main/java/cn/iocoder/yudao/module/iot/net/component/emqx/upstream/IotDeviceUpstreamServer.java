@@ -82,6 +82,7 @@ public class IotDeviceUpstreamServer {
         log.info("[start][开始启动服务]");
 
         // 检查 authPort 是否为 null
+        // TODO @haohao：authPort 里面搞默认值？包括下面，这个类不搞任何默认值，都交给 emqxProperties
         Integer authPort = emqxProperties.getAuthPort();
         if (authPort == null) {
             log.warn("[start][authPort 为 null，使用默认端口 8080]");

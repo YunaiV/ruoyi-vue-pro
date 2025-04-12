@@ -28,13 +28,13 @@ import org.springframework.context.event.EventListener;
  *
  * @author haohao
  */
-@Slf4j
 @AutoConfiguration
 @EnableConfigurationProperties(IotNetComponentEmqxProperties.class)
-@ConditionalOnProperty(prefix = "yudao.iot.component.emqx", name = "enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "yudao.iot.component.emqx", name = "enabled", havingValue = "true")
 @ComponentScan(basePackages = {
         "cn.iocoder.yudao.module.iot.net.component.emqx" // 只扫描 EMQX 组件包
-})
+}) // TODO @haohao：自动配置后，不需要这个哈。
+@Slf4j
 public class IotNetComponentEmqxAutoConfiguration {
 
     /**
@@ -42,6 +42,7 @@ public class IotNetComponentEmqxAutoConfiguration {
      */
     private static final String PLUGIN_KEY = "emqx";
 
+    // TODO @haohao：这个是不是要去掉哈。
     public IotNetComponentEmqxAutoConfiguration() {
         // 构造函数中不输出日志，移到 initialize 方法中
     }

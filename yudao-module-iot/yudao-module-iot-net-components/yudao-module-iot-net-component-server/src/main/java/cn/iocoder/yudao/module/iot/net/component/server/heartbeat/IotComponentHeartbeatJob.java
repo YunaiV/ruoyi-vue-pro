@@ -7,14 +7,12 @@ import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotPluginInst
 import cn.iocoder.yudao.module.iot.net.component.server.config.IotNetComponentServerProperties;
 import cn.iocoder.yudao.module.iot.net.component.server.downstream.IotComponentDownstreamServer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 
-import java.time.LocalDateTime;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.lang.ProcessHandle;
 
+// TODO @haohao：有办法服用 yudao-module-iot-net-component-core 的么？就是 server，只是一个启动器，没什么特殊的功能；
 /**
  * IoT 组件心跳任务
  * <p>

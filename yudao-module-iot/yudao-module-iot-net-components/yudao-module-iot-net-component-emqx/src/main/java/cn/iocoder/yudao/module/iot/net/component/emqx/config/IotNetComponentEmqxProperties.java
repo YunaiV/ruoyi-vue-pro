@@ -64,6 +64,7 @@ public class IotNetComponentEmqxProperties {
     @NotNull(message = "认证端口不能为空")
     private Integer authPort;
 
+    // TODO @haohao：可以使用 Duration 类型，可读性更好
     /**
      * 重连延迟时间(毫秒)
      * <p>
@@ -77,4 +78,5 @@ public class IotNetComponentEmqxProperties {
      * 默认值：10000 毫秒
      */
     private Integer connectionTimeoutMs = 10000;
+
 }

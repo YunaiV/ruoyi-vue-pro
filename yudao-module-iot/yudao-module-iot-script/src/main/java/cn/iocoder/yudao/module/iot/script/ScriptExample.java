@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+// TODO @haohao：挪到 test 目录下
 /**
  * 脚本使用示例类
  */

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO @haohao：这个是必须的哇？可以考虑基于 spring boot actuator；
 /**
  * 健康检查接口
  *
@@ -29,4 +30,4 @@ public class HealthController {
         result.put("timestamp", System.currentTimeMillis());
         return result;
     }
-} 
+}

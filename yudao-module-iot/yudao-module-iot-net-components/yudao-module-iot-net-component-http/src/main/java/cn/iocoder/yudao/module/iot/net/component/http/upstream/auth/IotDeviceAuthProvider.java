@@ -5,12 +5,13 @@ import io.vertx.ext.web.RoutingContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 
+// TODO @haohao：待实现，或者不需要？
 /**
  * IoT 设备认证提供者
  * <p>
  * 用于 HTTP 设备接入时的身份认证
  *
- * @author 芋道源码
+ * @author haohao
  */
 @Slf4j
 public class IotDeviceAuthProvider {

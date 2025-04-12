@@ -30,6 +30,7 @@ import java.util.Map;
 @Slf4j
 public class IotDeviceMqttMessageHandler {
 
+    // TODO @haohao：下面的，有办法也抽到 IotDeviceTopicEnum 么？想的是，尽量把这些 method、topic、url 统一化；
     private static final String PROPERTY_METHOD = "thing.event.property.post";
     private static final String EVENT_METHOD_PREFIX = "thing.event.";
     private static final String EVENT_METHOD_SUFFIX = ".post";
@@ -223,6 +224,7 @@ public class IotDeviceMqttMessageHandler {
      * @return 设备属性上报请求对象
      */
     private IotDevicePropertyReportReqDTO buildPropertyReportDTO(JSONObject jsonObject, String[] topicParts) {
+        // TODO @haohao：IotDevicePropertyReportReqDTO 可以考虑链式哈。其它也是，尽量让同类参数在一行；这样，阅读起来更聚焦；
         IotDevicePropertyReportReqDTO reportReqDTO = new IotDevicePropertyReportReqDTO();
         reportReqDTO.setRequestId(jsonObject.getStr("id"));
         reportReqDTO.setProcessId(IotNetComponentCommonUtils.getProcessId());
@@ -230,7 +232,7 @@ public class IotDeviceMqttMessageHandler {
         reportReqDTO.setProductKey(topicParts[2]);
         reportReqDTO.setDeviceName(topicParts[3]);
 
-        // 只使用标准JSON格式处理属性数据
+        // 只使用标准 JSON格式处理属性数据
         JSONObject params = jsonObject.getJSONObject("params");
         if (params == null) {
             log.warn("[buildPropertyReportDTO][消息格式不正确，缺少params字段][jsonObject: {}]", jsonObject);

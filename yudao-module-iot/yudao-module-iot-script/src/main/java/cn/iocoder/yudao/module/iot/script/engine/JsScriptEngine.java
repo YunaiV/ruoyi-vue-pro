@@ -63,6 +63,7 @@ public class JsScriptEngine extends AbstractScriptEngine implements AutoCloseabl
                 .build();
 
         // 创建隔离的临时目录路径
+        // TODO @haohao：貌似没用到？
         Path tempDirectory = Path.of(System.getProperty("java.io.tmpdir"), "graaljs-" + IdUtil.fastSimpleUUID());
 
         // 初始化 GraalJS 上下文
@@ -94,6 +95,7 @@ public class JsScriptEngine extends AbstractScriptEngine implements AutoCloseabl
             Source source = getOrCreateSource(script);
 
             // 执行脚本并捕获结果，添加超时控制
+            // TODO @haohao：通过线程池 + future 会好点？
             Value result;
             Thread executionThread = Thread.currentThread();
             Thread watchdogThread = new Thread(() -> {
@@ -236,11 +238,14 @@ public class JsScriptEngine extends AbstractScriptEngine implements AutoCloseabl
         if (result.isNumber()) {
             if (result.fitsInInt()) {
                 return result.asInt();
-            } else if (result.fitsInLong()) {
+            }
+            if (result.fitsInLong()) {
                 return result.asLong();
-            } else if (result.fitsInFloat()) {
+            }
+            if (result.fitsInFloat()) {
                 return result.asFloat();
-            } else if (result.fitsInDouble()) {
+            }
+            if (result.fitsInDouble()) {
                 return result.asDouble();
             }
         }

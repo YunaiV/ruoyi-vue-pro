@@ -61,13 +61,14 @@ public class IotNetComponentHttpAutoConfiguration {
 
         // 设置当前组件的核心标识
         // 注意：这里只为当前 HTTP 组件设置 pluginKey，不影响其他组件
+        // TODO @haohao：多个会存在冲突的问题哇？
         commonProperties.setPluginKey(PLUGIN_KEY);
 
         // 将 HTTP 组件注册到组件注册表
         componentRegistry.registerComponent(
                 PLUGIN_KEY,
                 SystemUtil.getHostInfo().getAddress(),
-                0, // 内嵌模式固定为 0
+                0, // 内嵌模式固定为 0：自动生成对应的 port 端口号
                 IotNetComponentCommonUtils.getProcessId());
 
         log.info("[initialize][IoT HTTP 组件初始化完成]");
@@ -115,4 +116,5 @@ public class IotNetComponentHttpAutoConfiguration {
     public IotDeviceDownstreamHandler deviceDownstreamHandler() {
         return new IotDeviceDownstreamHandlerImpl();
     }
+
 }

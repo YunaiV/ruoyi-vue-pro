@@ -107,6 +107,7 @@ public class IotProductScriptController {
     @PreAuthorize("@ss.hasPermission('iot:product-script:query')")
     public CommonResult<String> getSampleScript(@RequestParam("type") Integer type) {
         String sample;
+        // TODO @haohao：要不枚举下？
         switch (type) {
             case 1:
                 sample = scriptSamples.getPropertyParserSample();
@@ -118,6 +119,7 @@ public class IotProductScriptController {
                 sample = scriptSamples.getCommandEncoderSample();
                 break;
             default:
+                // TODO @haohao：不支持，返回 error 会不会好点哈？例如说，参数不正确；
                 sample = "// 不支持的脚本类型";
         }
         return success(sample);

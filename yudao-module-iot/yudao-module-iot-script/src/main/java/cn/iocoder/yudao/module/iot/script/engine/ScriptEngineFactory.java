@@ -79,7 +79,6 @@ public class ScriptEngineFactory implements DisposableBean {
 
     @Override
     public void destroy() {
-        // 应用关闭时，释放所有引擎资源
         log.info("应用关闭，释放所有脚本引擎资源...");
         releaseAllEngines();
     }

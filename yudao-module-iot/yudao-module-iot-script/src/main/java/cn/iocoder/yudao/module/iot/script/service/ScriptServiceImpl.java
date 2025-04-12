@@ -40,6 +40,7 @@ public class ScriptServiceImpl implements ScriptService {
         try {
             return engine.execute(script, context);
         } catch (Exception e) {
+            // TODO @haohao：最好打印一些参数；下面类似的也是
             log.error("执行脚本失败: {}", e.getMessage(), e);
             throw new RuntimeException("执行脚本失败: " + e.getMessage(), e);
         }
