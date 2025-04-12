@@ -14,15 +14,14 @@ import { useFormSchema } from '../data';
 const emit = defineEmits(['success']);
 const formData = ref<${simpleClassName}Api.${simpleClassName}>();
 #if (${table.templateType} == 2)## 树表特有：父ID处理
-// 新增下级时的父级ID
-const parentId = ref<number>();
+const parentId = ref<number>(); // 新增下级时的父级 ID
 
 const getTitle = computed(() => {
   if (formData.value?.id) {
     return $t('ui.actionTitle.edit', ['${table.classComment}']);
   }
-  return parentId.value 
-    ? $t('ui.actionTitle.create', ['下级${table.classComment}']) 
+  return parentId.value
+    ? $t('ui.actionTitle.create', ['下级${table.classComment}'])
     : $t('ui.actionTitle.create', ['${table.classComment}']);
 });
 #else## 标准表标题
@@ -36,10 +35,7 @@ const getTitle = computed(() => {
 const [Form, formApi] = useVbenForm({
   layout: 'horizontal',
   schema: useFormSchema(),
-  showDefaultActions: false,
-  commonConfig: {
-    labelWidth: 120
-  }
+  showDefaultActions: false
 });
 
 const [Modal, modalApi] = useVbenModal({
@@ -77,7 +73,7 @@ const [Modal, modalApi] = useVbenModal({
     if (!data) {
       return;
     }
-    
+
 #if (${table.templateType} == 2)## 树表特有：处理新增下级的情况
     // 处理新增下级的情况
     if (!data.id && data.${treeParentColumn.javaField}) {
@@ -87,7 +83,7 @@ const [Modal, modalApi] = useVbenModal({
       return;
     }
 #end
-    
+
     if (data.id) {
       // 编辑
       modalApi.lock();

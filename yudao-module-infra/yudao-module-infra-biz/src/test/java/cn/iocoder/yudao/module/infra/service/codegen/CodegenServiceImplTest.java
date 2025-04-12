@@ -105,7 +105,7 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         when(codegenBuilder.buildColumns(eq(table.getId()), same(fields)))
                 .thenReturn(columns);
         // mock 方法（CodegenProperties）
-        when(codegenProperties.getFrontType()).thenReturn(CodegenFrontTypeEnum.VUE3.getType());
+        when(codegenProperties.getFrontType()).thenReturn(CodegenFrontTypeEnum.VUE3_ELEMENT_PLUS.getType());
 
         // 调用
         List<Long> result = codegenService.createCodegenList(userId, reqVO);
@@ -116,7 +116,7 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         assertPojoEquals(table, dbTable);
         assertEquals(1L, dbTable.getDataSourceConfigId());
         assertEquals(CodegenSceneEnum.ADMIN.getScene(), dbTable.getScene());
-        assertEquals(CodegenFrontTypeEnum.VUE3.getType(), dbTable.getFrontType());
+        assertEquals(CodegenFrontTypeEnum.VUE3_ELEMENT_PLUS.getType(), dbTable.getFrontType());
         assertEquals("芋头", dbTable.getAuthor());
         // 断言（CodegenColumnDO）
         List<CodegenColumnDO> dbColumns = codegenColumnMapper.selectList();

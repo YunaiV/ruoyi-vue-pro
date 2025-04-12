@@ -9,7 +9,6 @@ import { get${simpleClassName}List } from '#/api/${table.moduleName}/${simpleCla
 import { handleTree } from '#/utils/tree';
 #end
 import { DICT_TYPE, getDictOptions } from '#/utils/dict';
-import { CommonStatusEnum } from '#/utils/constants';
 import { useAccess } from '@vben/access';
 
 const { hasAccessByCodes } = useAccess();

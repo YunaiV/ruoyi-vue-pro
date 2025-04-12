@@ -6,7 +6,6 @@ import { Page, useVbenModal } from '@vben/common-ui';
 import { Button, message } from 'ant-design-vue';
 import { Download, Plus } from '@vben/icons';
 import Form from './modules/form.vue';
-import { DocAlert } from '#/components/doc-alert';
 
 import { ref } from 'vue';
 import { $t } from '#/locales';
@@ -159,8 +158,6 @@ const [Grid, gridApi] = useVbenVxeGrid({
 
 <template>
   <Page auto-content-height>
-    <DocAlert title="${table.classComment}" url="https://doc.iocoder.cn/${table.moduleName}/" />
-
     <FormModal @success="onRefresh" />
 
     <Grid table-title="${table.classComment}列表">

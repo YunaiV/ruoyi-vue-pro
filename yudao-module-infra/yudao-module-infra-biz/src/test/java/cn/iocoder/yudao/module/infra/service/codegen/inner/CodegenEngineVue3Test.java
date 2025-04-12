@@ -23,7 +23,7 @@ public class CodegenEngineVue3Test extends CodegenEngineAbstractTest {
     public void testExecute_vue3_one() {
         // 准备参数
         CodegenTableDO table = getTable("student")
-                .setFrontType(CodegenFrontTypeEnum.VUE3.getType())
+                .setFrontType(CodegenFrontTypeEnum.VUE3_ELEMENT_PLUS.getType())
                 .setTemplateType(CodegenTemplateTypeEnum.ONE.getType());
         List<CodegenColumnDO> columns = getColumnList("student");
 
@@ -39,7 +39,7 @@ public class CodegenEngineVue3Test extends CodegenEngineAbstractTest {
     public void testExecute_vue3_tree() {
         // 准备参数
         CodegenTableDO table = getTable("category")
-                .setFrontType(CodegenFrontTypeEnum.VUE3.getType())
+                .setFrontType(CodegenFrontTypeEnum.VUE3_ELEMENT_PLUS.getType())
                 .setTemplateType(CodegenTemplateTypeEnum.TREE.getType());
         List<CodegenColumnDO> columns = getColumnList("category");
 
@@ -71,19 +71,19 @@ public class CodegenEngineVue3Test extends CodegenEngineAbstractTest {
                                          String path) {
         // 准备参数
         CodegenTableDO table = getTable("student")
-                .setFrontType(CodegenFrontTypeEnum.VUE3.getType())
+                .setFrontType(CodegenFrontTypeEnum.VUE3_ELEMENT_PLUS.getType())
                 .setTemplateType(templateType.getType());
         List<CodegenColumnDO> columns = getColumnList("student");
         // 准备参数（子表）
         CodegenTableDO contactTable = getTable("contact")
                 .setTemplateType(CodegenTemplateTypeEnum.SUB.getType())
-                .setFrontType(CodegenFrontTypeEnum.VUE3.getType())
+                .setFrontType(CodegenFrontTypeEnum.VUE3_ELEMENT_PLUS.getType())
                 .setSubJoinColumnId(100L).setSubJoinMany(true);
         List<CodegenColumnDO> contactColumns = getColumnList("contact");
         // 准备参数（班主任）
         CodegenTableDO teacherTable = getTable("teacher")
                 .setTemplateType(CodegenTemplateTypeEnum.SUB.getType())
-                .setFrontType(CodegenFrontTypeEnum.VUE3.getType())
+                .setFrontType(CodegenFrontTypeEnum.VUE3_ELEMENT_PLUS.getType())
                 .setSubJoinColumnId(200L).setSubJoinMany(false);
         List<CodegenColumnDO> teacherColumns = getColumnList("teacher");
 
