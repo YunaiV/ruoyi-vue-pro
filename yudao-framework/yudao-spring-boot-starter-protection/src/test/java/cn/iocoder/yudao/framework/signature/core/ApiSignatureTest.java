@@ -63,13 +63,12 @@ public class ApiSignatureTest {
         when(request.getReader()).thenReturn(new BufferedReader(new StringReader("test")));
         // mock 方法
         when(signatureRedisDAO.getAppSecret(eq(appId))).thenReturn(appSecret);
+        when(signatureRedisDAO.setNonce(eq(appId), eq(nonce), eq(120), eq(TimeUnit.SECONDS))).thenReturn(true);
 
         // 调用
         boolean result = apiSignatureAspect.verifySignature(apiSignature, request);
         // 断言结果
         assertTrue(result);
-        // 断言调用
-        verify(signatureRedisDAO).setNonce(eq(appId), eq(nonce), eq(120), eq(TimeUnit.SECONDS));
     }
 
 }
