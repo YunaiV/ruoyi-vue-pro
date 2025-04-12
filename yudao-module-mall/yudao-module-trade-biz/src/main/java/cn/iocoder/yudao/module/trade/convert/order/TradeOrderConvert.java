@@ -101,7 +101,8 @@ public interface TradeOrderConvert {
     default PayOrderCreateReqDTO convert(TradeOrderDO order, List<TradeOrderItemDO> orderItems,
                                          TradeOrderProperties orderProperties) {
         PayOrderCreateReqDTO createReqDTO = new PayOrderCreateReqDTO()
-                .setAppKey(orderProperties.getPayAppKey()).setUserIp(order.getUserIp());
+                .setAppKey(orderProperties.getPayAppKey()).setUserIp(order.getUserIp())
+                .setUserId(order.getUserId());
         // 商户相关字段
         createReqDTO.setMerchantOrderId(String.valueOf(order.getId()));
         String subject = orderItems.get(0).getSpuName();
