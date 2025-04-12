@@ -9,9 +9,7 @@ import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 
-
 public class DouBaoMcpTests {
-
 
     private final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
             .openAiApi(OpenAiApi.builder()
@@ -121,4 +119,4 @@ public class DouBaoMcpTests {
 
     }
 
-} 
+}

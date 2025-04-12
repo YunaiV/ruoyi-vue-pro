@@ -25,7 +25,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-
 /**
  * 文多多 API
  *
@@ -50,11 +49,6 @@ public class WenDuoDuoPptApi {
                 sink.error(new IllegalStateException("[WenDuoDuoPptApi] 调用失败！"));
             });
 
-    /**
-     * 构造方法
-     *
-     * @param token API令牌，可为空，后续API调用时单独指定
-     */
     public WenDuoDuoPptApi(String token) {
         Assert.hasText(token, "token 不能为空");
         this.webClient = WebClient.builder()
@@ -96,7 +90,7 @@ public class WenDuoDuoPptApi {
      * @param type    类型
      * @param content 内容
      * @param files   文件列表
-     * @return 任务ID
+     * @return 任务 ID
      * @see <a href="https://docmee.cn/open-platform/api#%E5%88%9B%E5%BB%BA%E4%BB%BB%E5%8A%A1">创建任务</a>
      */
     public ApiResponse createTask(Integer type, String content, List<MultipartFile> files) {
@@ -219,7 +213,7 @@ public class WenDuoDuoPptApi {
     }
 
     /**
-     * 创建Token请求参数
+     * 创建 Token 请求参数
      */
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     public record CreateTokenRequest(

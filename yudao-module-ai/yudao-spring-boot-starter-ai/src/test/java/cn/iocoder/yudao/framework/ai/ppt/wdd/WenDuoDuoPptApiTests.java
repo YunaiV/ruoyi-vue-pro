@@ -16,13 +16,8 @@ import java.util.Objects;
  */
 public class WenDuoDuoPptApiTests {
 
-    private final WenDuoDuoPptApi wenDuoDuoPptApi;
-
     private final String token = ""; // API Token
-
-    {
-        wenDuoDuoPptApi = new WenDuoDuoPptApi(token);
-    }
+    private final WenDuoDuoPptApi wenDuoDuoPptApi = new WenDuoDuoPptApi(token);
 
     @Test
     @Disabled

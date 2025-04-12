@@ -448,7 +448,6 @@ public class XunFeiPptApi {
      */
     private MultiValueMap<String, Object> buildCreatePptFormData(CreatePptRequest request) {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
-
         if (request.file() != null) {
             try {
                 formData.add("file", new ByteArrayResource(request.file().getBytes()) {
@@ -493,7 +492,6 @@ public class XunFeiPptApi {
                 isPresent = true;
             }
         }
-
         if (isPresent) {
             map.put(key, value);
         }
