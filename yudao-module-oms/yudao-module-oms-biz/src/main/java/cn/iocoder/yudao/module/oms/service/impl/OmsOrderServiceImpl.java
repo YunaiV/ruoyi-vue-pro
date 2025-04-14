@@ -198,7 +198,6 @@ public class OmsOrderServiceImpl implements OmsOrderService {
      * @param createOrders 已创建的订单集合
      * @Description: 新增订单时新增订单项
      */
-    @Transactional
     public void createOrderItems(List<OmsOrderSaveReqDTO> saveReqDTOs, List<OmsOrderDO> createOrders) {
         List<OmsOrderDO> existOrders = getByPlatformCode(saveReqDTOs.get(0).getPlatformCode());
         Set<String> sourceNos = createOrders.stream().map(OmsOrderDO::getSourceNo).collect(Collectors.toSet());
@@ -230,7 +229,6 @@ public class OmsOrderServiceImpl implements OmsOrderService {
      * @param existOrderMap 使用Map存储已存在的订单，key = sourceNo, value = OmsOrderDO
      * @Description: 更新订单项目 先删除后新增
      */
-    @Transactional
     public void updateOrderItems(List<OmsOrderSaveReqDTO> saveReqDTOs, Map<String, OmsOrderDO> existOrderMap) {
         List<Long> deleteOrderIds = new ArrayList<>();
         List<OmsOrderItemDO> orderItems = new ArrayList<>();

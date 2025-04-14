@@ -13,7 +13,7 @@ import java.util.List;
 public class ShopifyShopRepsVO {
 
 
-    private Integer id;
+    private Long id;
 
     private String name;
 
@@ -105,7 +105,7 @@ public class ShopifyShopRepsVO {
 
     private Boolean finances;
 
-    private Integer primaryLocationId;
+    private Long primaryLocationId;
 
     private Boolean checkoutApiSupported;
 
