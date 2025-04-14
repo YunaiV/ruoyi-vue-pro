@@ -56,8 +56,9 @@ public interface SrmPurchaseOrderMapper extends BaseMapperX<SrmPurchaseOrderDO> 
             .selectAsClass(SrmPurchaseOrderItemDO.class, SrmPurchaseOrderItemBO.class);
     }
 
+    //需要分页主表	主表单独查 + 子表用 IN 批量查
     default PageResult<SrmPurchaseOrderDO> selectPage(SrmPurchaseOrderPageReqVO reqVO) {
-        return selectPage(reqVO, getBOWrapper(reqVO));
+        return selectPage(reqVO, wrapper(reqVO));
     }
 
     default int updateByIdAndStatus(Long id, Integer status, SrmPurchaseOrderDO updateObj) {

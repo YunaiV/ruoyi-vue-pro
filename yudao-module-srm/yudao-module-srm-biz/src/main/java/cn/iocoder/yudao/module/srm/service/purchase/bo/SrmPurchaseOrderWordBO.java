@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.srm.service.purchase.bo;
 
-import cn.iocoder.yudao.module.fms.api.finance.dto.FmsFinanceSubjectDTO;
+import cn.iocoder.yudao.module.fms.api.finance.dto.FmsCompanyDTO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
 import lombok.Data;
 
@@ -22,9 +22,9 @@ public class SrmPurchaseOrderWordBO extends SrmPurchaseOrderDO {
     private BigDecimal totalPriceUntaxed;
 
     //付款方
-    FmsFinanceSubjectDTO a;
+    FmsCompanyDTO a;
     //供货方
-    FmsFinanceSubjectDTO b;
+    FmsCompanyDTO b;
 
     //付款条款
     private String paymentTerms;

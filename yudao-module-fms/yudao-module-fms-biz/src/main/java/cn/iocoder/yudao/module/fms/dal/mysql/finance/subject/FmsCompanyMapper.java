@@ -3,21 +3,21 @@ package cn.iocoder.yudao.module.fms.dal.mysql.finance.subject;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.fms.controller.admin.finance.subject.vo.FmsFinanceSubjectPageReqVO;
+import cn.iocoder.yudao.module.fms.controller.admin.finance.subject.vo.FmsCompanyPageReqVO;
 import cn.iocoder.yudao.module.fms.dal.dataobject.finance.subject.FmsCompanyDO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
 /**
- * Erp财务主体 Mapper
+ * Fms财务公司 Mapper
  *
  * @author 王岽宇
  */
 @Mapper
-public interface FmsFinanceSubjectMapper extends BaseMapperX<FmsCompanyDO> {
+public interface FmsCompanyMapper extends BaseMapperX<FmsCompanyDO> {
 
-    default PageResult<FmsCompanyDO> selectPage(FmsFinanceSubjectPageReqVO reqVO) {
+    default PageResult<FmsCompanyDO> selectPage(FmsCompanyPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<FmsCompanyDO>()
             .eqIfPresent(FmsCompanyDO::getCreator, reqVO.getCreator())
             .betweenIfPresent(FmsCompanyDO::getCreateTime, reqVO.getCreateTime())

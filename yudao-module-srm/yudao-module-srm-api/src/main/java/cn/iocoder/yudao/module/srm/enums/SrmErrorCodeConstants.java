@@ -163,8 +163,8 @@ public interface SrmErrorCodeConstants {
     ErrorCode CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS = new ErrorCode(1_030_610_000, "海关分类子表不存在");
     ErrorCode CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS_BY_PRODUCT_ID = new ErrorCode(1_030_610_001, "所选产品中不存在海关分类数据");
 
-    // ========== Erp财务主体 1-030-611-000 ==========
-    ErrorCode FINANCE_SUBJECT_NOT_EXISTS = new ErrorCode(1_030_611_000, "Erp财务主体不存在");
+    // ========== Fms财务公司 1-030-611-000 ==========
+    ErrorCode FINANCE_SUBJECT_NOT_EXISTS = new ErrorCode(1_030_611_000, "Fms财务公司不存在");
     // ========== 海关产品分类表1-030-607-000 ==========
     ErrorCode CUSTOM_PRODUCT_NOT_EXISTS = new ErrorCode(1_030_607_001, "海关产品分类表不存在");
 

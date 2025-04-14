@@ -5,10 +5,10 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-@Schema(description = "管理后台 - Erp财务主体 精简列表")
+@Schema(description = "管理后台 - Fms财务公司 精简列表")
 @Data
 @ExcelIgnoreUnannotated
-public class FmsFinanceSubjectSimpleRespVO {
+public class FmsCompanySimpleRespVO {
     @Schema(description = "id")
     @ExcelProperty("编号")
     private Long id;

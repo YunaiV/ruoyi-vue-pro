@@ -138,7 +138,7 @@ public class SrmPurchaseOrderController {
     @PostMapping("/submitAudit")
     @Operation(summary = "提交审核")
     @Parameter(name = "itemIds", description = "订单下的订单项Id集合", required = true)
-    @PreAuthorize("@ss.hasPermission('srm:purchase-order:submitAudit')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-order:submit-audit')")
     public CommonResult<Boolean> submitAudit(@Validated @RequestBody SrmPurchaseOrderAuditReqVO reqVO) {
         purchaseOrderService.submitAudit(reqVO.getOrderIds());
         return success(true);
@@ -175,7 +175,7 @@ public class SrmPurchaseOrderController {
     //查查询采购合同的模板List<String>
     @GetMapping("/getTemplateList")
     @Operation(summary = "查询采购合同模板")
-    @PreAuthorize("@ss.hasPermission('srm:purchase-order:generateContract')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-order:generate-contract')")
     public CommonResult<List<String>> getTemplateList() {
         List<String> templateList = purchaseOrderService.getTemplateList();
         return success(templateList);
@@ -184,7 +184,7 @@ public class SrmPurchaseOrderController {
     //根据采购单id生成采购合同
     @PostMapping("/generateContract")
     @Operation(summary = "生成采购合同")
-    @PreAuthorize("@ss.hasPermission('srm:purchase-order:generateContract')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-order:generate-contract')")
     public void generateContract(@Validated @RequestBody SrmPurchaseOrderGenerateContractReqVO reqVO, HttpServletResponse response) {
         purchaseOrderService.generateContract(reqVO, response);
     }
