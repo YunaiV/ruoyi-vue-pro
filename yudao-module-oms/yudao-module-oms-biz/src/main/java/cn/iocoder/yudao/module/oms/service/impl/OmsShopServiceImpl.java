@@ -34,7 +34,7 @@ import static com.baomidou.mybatisplus.extension.toolkit.Db.updateBatchById;
 @Slf4j
 public class OmsShopServiceImpl implements OmsShopService {
 
-    private final String CREATOR = "SYNC";
+    private final String CREATOR = "Admin";
 
     @Resource
     private OmsShopMapper shopMapper;

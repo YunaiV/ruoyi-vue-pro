@@ -3,12 +3,10 @@ package com.somle.amazon.service;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import cn.iocoder.yudao.framework.test.core.ut.SomleBaseSpringTest;
-import com.somle.amazon.controller.vo.AmazonSpListingReqVO;
-import com.somle.amazon.controller.vo.AmazonSpOrderReqVO;
-import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
+import com.somle.amazon.controller.vo.*;
 import com.somle.amazon.controller.vo.AmazonSpReportReqVO.ProcessingStatuses;
-import com.somle.amazon.controller.vo.AmazonSpReportSaveVO;
 import com.somle.amazon.model.enums.AmazonCountry;
+import com.somle.amazon.model.reps.AmazonSpListingRepsVO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,25 +57,23 @@ class AmazonSpClientTest extends SomleBaseSpringTest {
 
     @Test
     void getListing() {
-        var reqVO = AmazonSpListingReqVO.builder()
-            .sellerId(client.getAuth().getSellerId())
-            .marketplaceIds(List.of(AmazonCountry.findByCode("DE").getMarketplaceId()))
-            .includedData(List.of(AmazonSpListingReqVO.IncludedData.OFFERS))
-            .build();
-        var listing = client.searchListingsItems(reqVO);
-        log.info(listing);
+        AmazonSpMarketplaceParticipationVO marketplaceParticipations = client.getMarketplaceParticipations().get(0);
+        List<AmazonSpListingRepsVO.ProductItem> products = client.getProducts(List.of(marketplaceParticipations.getMarketplace().getId()));
+        log.info(products.toString());
     }
 
 
     @Test
     void getOrder() {
+        AmazonSpMarketplaceParticipationVO marketplaceParticipations = client.getMarketplaceParticipations().get(0);
         var vo = AmazonSpOrderReqVO.builder()
             .createdAfter(LocalDateTime.of(2024, 10, 23, 0, 0))
             .createdBefore(LocalDateTime.of(2024, 10, 24, 0, 0))
-            .marketplaceIds(List.of(AmazonCountry.findByCode("DE").getMarketplaceId()))
+            .marketplaceIds(List.of(marketplaceParticipations.getMarketplace().getId()))
             .build();
         // assert url equals "https://sellingpartnerapi-eu.amazon.com/orders/v0/orders?CreatedAfter=2024-10-23T00%3A00%3A00&CreatedBefore=2024-10-24T00%3A00%3A00&MarketplaceIds=A1F83G8C2ARO7P"
         var report = client.getOrder(vo);
+        List<AmazonSpOrderRespVO> list = client.streamOrder(vo).toList();
         log.info(report.toString());
     }
 

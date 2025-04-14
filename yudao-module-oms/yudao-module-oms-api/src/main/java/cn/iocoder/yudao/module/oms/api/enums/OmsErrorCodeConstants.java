@@ -23,4 +23,10 @@ public interface OmsErrorCodeConstants {
     ErrorCode OMS_SHOP_PRODUCT_NOT_EXISTS = new ErrorCode(1_040_501_005, "店铺产品不存在");
 
     ErrorCode OMS_SHOP_NAME_EXISTS = new ErrorCode(1_040_501_006, "店铺别名已存在");
+
+    ErrorCode OMS_ORDER_NOT_EXISTS = new ErrorCode(1_040_501_007, "订单不存在");
+
+    ErrorCode OMS_ORDER_ITEM_NOT_EXISTS = new ErrorCode(1_040_501_008, "订单项不存在");
+
+    ErrorCode OMS_SYNC_ORDER_INFO_LACK = new ErrorCode(1_040_501_009, "OMS同步缺少订单信息");
 }

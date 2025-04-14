@@ -75,7 +75,7 @@ public class ShopifyOrderRepsVO {
     private List<?> discountCodes;
 
     private Boolean dutiesIncluded;
-
+    //客户邮箱
     private String email;
 
     private Boolean estimatedTaxes;
