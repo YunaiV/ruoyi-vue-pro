@@ -76,7 +76,7 @@ public class AiWriteServiceImpl implements AiWriteService {
                 ? writeRole.getSystemMessage() : AiChatRoleEnum.AI_WRITE_ROLE.getSystemMessage();
         // 1.3 校验平台
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
-        StreamingChatModel chatModel = modalService.getChatModel(model.getKeyId());
+        StreamingChatModel chatModel = modalService.getChatModel(model.getId());
 
         // 2. 插入写作信息
         AiWriteDO writeDO = BeanUtils.toBean(generateReqVO, AiWriteDO.class, write -> write.setUserId(userId)
