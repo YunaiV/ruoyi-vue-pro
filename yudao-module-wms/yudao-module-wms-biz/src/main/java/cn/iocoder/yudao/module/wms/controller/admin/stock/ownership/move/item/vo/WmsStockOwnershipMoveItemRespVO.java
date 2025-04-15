@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move.item.vo;
 
+import cn.iocoder.yudao.module.wms.controller.admin.company.FmsCompanySimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
@@ -58,6 +59,15 @@ public class WmsStockOwnershipMoveItemRespVO {
     @Schema(description = "调入部门", example = "")
     @ExcelProperty("调入部门")
     private DeptSimpleRespVO toDept;
+
+
+    @Schema(description = "调出部门", example = "")
+    @ExcelProperty("调出部门")
+    private FmsCompanySimpleRespVO fromCompany;
+
+    @Schema(description = "调入部门", example = "")
+    @ExcelProperty("调入部门")
+    private FmsCompanySimpleRespVO toCompany;
 
     @Schema(description = "移动数量", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("移动数量")

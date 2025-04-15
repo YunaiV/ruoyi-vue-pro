@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.controller.admin.inbound.vo;
 
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalHistoryRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.company.FmsCompanySimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
@@ -133,4 +134,8 @@ public class WmsInboundRespVO {
     @Schema(description = "库存归属部门ID", example = "")
     @ExcelProperty("库存归属部门ID")
     private Long deptId;
+
+    @Schema(description = "财务公司", example = "")
+    @ExcelProperty("财务公司")
+    private FmsCompanySimpleRespVO company;
 }

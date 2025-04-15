@@ -91,7 +91,11 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-protection</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-fms-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
 
     </dependencies>

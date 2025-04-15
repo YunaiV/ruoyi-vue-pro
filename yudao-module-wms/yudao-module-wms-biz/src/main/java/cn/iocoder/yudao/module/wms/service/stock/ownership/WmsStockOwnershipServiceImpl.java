@@ -6,8 +6,11 @@ import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.fms.api.finance.FmsCompanyApi;
+import cn.iocoder.yudao.module.fms.api.finance.dto.FmsCompanyDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.wms.controller.admin.company.FmsCompanySimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.WmsStockOwnershipPageReqVO;
@@ -59,6 +62,9 @@ public class WmsStockOwnershipServiceImpl implements WmsStockOwnershipService {
     @Resource
     @Lazy
     private WmsWarehouseService warehouseService;
+
+    @Resource
+    private FmsCompanyApi companyApi;
 
     /**
      * @sign : 4AF969274F47ADC0
@@ -225,7 +231,9 @@ public class WmsStockOwnershipServiceImpl implements WmsStockOwnershipService {
 
     @Override
     public void assembleCompany(List<WmsStockOwnershipRespVO> list) {
-        //todo 待东宇财务模块支持
+        Map<Long, FmsCompanyDTO> companyMap = companyApi.getCompanyMap(StreamX.from(list).toList(WmsStockOwnershipRespVO::getCompanyId));
+        Map<Long, FmsCompanySimpleRespVO> companyVOMap = StreamX.from(companyMap.values()).toMap(FmsCompanyDTO::getId, v -> BeanUtils.toBean(v, FmsCompanySimpleRespVO.class));
+        StreamX.from(list).assemble(companyVOMap, WmsStockOwnershipRespVO::getCompanyId, WmsStockOwnershipRespVO::setCompany);
     }
 
     @Override

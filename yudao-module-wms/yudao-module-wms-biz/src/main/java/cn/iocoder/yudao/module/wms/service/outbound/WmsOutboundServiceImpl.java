@@ -8,12 +8,15 @@ import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
+import cn.iocoder.yudao.module.fms.api.finance.FmsCompanyApi;
+import cn.iocoder.yudao.module.fms.api.finance.dto.FmsCompanyDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.config.OutboundStateMachineConfigure;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalHistoryRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.company.FmsCompanySimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemSaveReqVO;
@@ -103,6 +106,9 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
 
     @Resource
     private DeptApi deptApi;
+
+    @Resource
+    private FmsCompanyApi companyApi;
 
     @Resource
     private WmsApprovalHistoryService approvalHistoryService;
@@ -300,7 +306,9 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
 
     @Override
     public void assembleCompany(List<WmsOutboundRespVO> list) {
-        // todo 待东宇财务模块支持
+        Map<Long, FmsCompanyDTO> companyMap = companyApi.getCompanyMap(StreamX.from(list).toList(WmsOutboundRespVO::getCompanyId));
+        Map<Long, FmsCompanySimpleRespVO> companyVOMap = StreamX.from(companyMap.values()).toMap(FmsCompanyDTO::getId, v -> BeanUtils.toBean(v, FmsCompanySimpleRespVO.class));
+        StreamX.from(list).assemble(companyVOMap, WmsOutboundRespVO::getCompanyId, WmsOutboundRespVO::setCompany);
     }
 
     @Override

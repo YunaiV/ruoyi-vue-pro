@@ -8,10 +8,13 @@ import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
+import cn.iocoder.yudao.module.fms.api.finance.FmsCompanyApi;
+import cn.iocoder.yudao.module.fms.api.finance.dto.FmsCompanyDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.config.InboundStateMachineConfigure;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalHistoryRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.company.FmsCompanySimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundPageReqVO;
@@ -95,6 +98,9 @@ public class WmsInboundServiceImpl implements WmsInboundService {
 
     @Resource
     private WmsApprovalHistoryService approvalHistoryService;
+
+    @Resource
+    private FmsCompanyApi companyApi;
 
     @Resource(name = InboundStateMachineConfigure.STATE_MACHINE_NAME)
     private StateMachineWrapper<Integer, WmsInboundAuditStatus.Event, WmsInboundDO> inboundStateMachine;
@@ -370,9 +376,12 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         StreamX.from(list).assemble(warehouseVOMap, WmsInboundRespVO::getWarehouseId, WmsInboundRespVO::setWarehouse);
     }
 
+
     @Override
     public void assembleCompany(List<WmsInboundRespVO> list) {
-        // todo 待东宇财务模块支持
+        Map<Long, FmsCompanyDTO> companyMap = companyApi.getCompanyMap(StreamX.from(list).toList(WmsInboundRespVO::getCompanyId));
+        Map<Long, FmsCompanySimpleRespVO> companyVOMap = StreamX.from(companyMap.values()).toMap(FmsCompanyDTO::getId, v -> BeanUtils.toBean(v, FmsCompanySimpleRespVO.class));
+        StreamX.from(list).assemble(companyVOMap, WmsInboundRespVO::getCompanyId, WmsInboundRespVO::setCompany);
     }
 
     @Override

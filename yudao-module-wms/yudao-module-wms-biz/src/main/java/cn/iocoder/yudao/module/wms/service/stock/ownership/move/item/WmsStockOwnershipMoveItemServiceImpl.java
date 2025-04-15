@@ -6,8 +6,11 @@ import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.fms.api.finance.FmsCompanyApi;
+import cn.iocoder.yudao.module.fms.api.finance.dto.FmsCompanyDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.wms.controller.admin.company.FmsCompanySimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move.item.vo.WmsStockOwnershipMoveItemPageReqVO;
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -48,6 +52,9 @@ public class WmsStockOwnershipMoveItemServiceImpl implements WmsStockOwnershipMo
 
     @Resource
     private DeptApi deptApi;
+
+    @Resource
+    private FmsCompanyApi companyApi;
     /**
      * @sign : E8E4A45DABECEF25
      */
@@ -151,11 +158,12 @@ public class WmsStockOwnershipMoveItemServiceImpl implements WmsStockOwnershipMo
     @Override
     public void assembleCompanyAndDept(List<WmsStockOwnershipMoveItemRespVO> itemList) {
 
-        Set<Long> deptId=new HashSet<>();
-        deptId.addAll(StreamX.from(itemList).map(WmsStockOwnershipMoveItemRespVO::getFromDeptId).toList());
-        deptId.addAll(StreamX.from(itemList).map(WmsStockOwnershipMoveItemRespVO::getToDeptId).toList());
+        // 装配部门
+        Set<Long> deptIds=new HashSet<>();
+        deptIds.addAll(StreamX.from(itemList).map(WmsStockOwnershipMoveItemRespVO::getFromDeptId).toList());
+        deptIds.addAll(StreamX.from(itemList).map(WmsStockOwnershipMoveItemRespVO::getToDeptId).toList());
 
-        Map<Long, DeptRespDTO> deptDTOMap = deptApi.getDeptMap(deptId);
+        Map<Long, DeptRespDTO> deptDTOMap = deptApi.getDeptMap(deptIds);
         Map<Long, DeptSimpleRespVO> deptVOMap = new HashMap<>();
         for (DeptRespDTO productDTO : deptDTOMap.values()) {
             DeptSimpleRespVO deptVO = BeanUtils.toBean(productDTO, DeptSimpleRespVO.class);
@@ -164,8 +172,17 @@ public class WmsStockOwnershipMoveItemServiceImpl implements WmsStockOwnershipMo
         StreamX.from(itemList).assemble(deptVOMap, WmsStockOwnershipMoveItemRespVO::getFromDeptId, WmsStockOwnershipMoveItemRespVO::setFromDept);
         StreamX.from(itemList).assemble(deptVOMap, WmsStockOwnershipMoveItemRespVO::getToDeptId, WmsStockOwnershipMoveItemRespVO::setToDept);
 
-        //todo 待东宇财务模块支持
 
+        // 装配公司
+        List<Long> companyIds=new ArrayList<>();
+        companyIds.addAll(StreamX.from(itemList).map(WmsStockOwnershipMoveItemRespVO::getFromCompanyId).toList());
+        companyIds.addAll(StreamX.from(itemList).map(WmsStockOwnershipMoveItemRespVO::getToCompanyId).toList());
+
+        Map<Long, FmsCompanyDTO> companyMap = companyApi.getCompanyMap(companyIds);
+        Map<Long, FmsCompanySimpleRespVO> companyVOMap = StreamX.from(companyMap.values()).toMap(FmsCompanyDTO::getId, v -> BeanUtils.toBean(v, FmsCompanySimpleRespVO.class));
+
+        StreamX.from(itemList).assemble(companyVOMap, WmsStockOwnershipMoveItemRespVO::getFromCompanyId, WmsStockOwnershipMoveItemRespVO::setFromCompany);
+        StreamX.from(itemList).assemble(companyVOMap, WmsStockOwnershipMoveItemRespVO::getToCompanyId, WmsStockOwnershipMoveItemRespVO::setToCompany);
 
     }
 }

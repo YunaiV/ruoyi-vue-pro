@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo;
 
+import cn.iocoder.yudao.module.wms.controller.admin.company.FmsCompanySimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
@@ -47,9 +48,9 @@ public class WmsStockOwnershipRespVO {
     @ExcelProperty("库存财务主体公司ID")
     private Long companyId;
 
-//    @Schema(description = "财务公司", example = "")
-//    @ExcelProperty("库存公司")
-//    private FinanceCompanyVO company;
+    @Schema(description = "财务公司", example = "")
+    @ExcelProperty("财务公司")
+    private FmsCompanySimpleRespVO company;
 
     @Schema(description = "库存归属部门ID", example = "")
     @ExcelProperty("库存归属部门ID")

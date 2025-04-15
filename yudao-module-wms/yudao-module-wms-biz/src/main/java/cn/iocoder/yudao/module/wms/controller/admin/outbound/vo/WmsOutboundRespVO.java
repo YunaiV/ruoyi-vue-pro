@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.controller.admin.outbound.vo;
 
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalHistoryRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.company.FmsCompanySimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
@@ -9,8 +10,10 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
 import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
@@ -120,4 +123,8 @@ public class WmsOutboundRespVO {
 
     @Schema(description = "审批历史", example = "")
     List<WmsApprovalHistoryRespVO> approvalHistoryList;
+
+    @Schema(description = "财务公司", example = "")
+    @ExcelProperty("财务公司")
+    private FmsCompanySimpleRespVO company;
 }
