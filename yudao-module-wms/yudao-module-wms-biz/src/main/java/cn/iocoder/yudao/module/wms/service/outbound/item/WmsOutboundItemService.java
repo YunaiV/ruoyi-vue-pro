@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.wms.service.outbound.item;
 
-import java.util.*;
-import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
-import jakarta.validation.*;
-import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.item.WmsOutboundItemDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemPageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemSaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.item.WmsOutboundItemDO;
+import jakarta.validation.Valid;
 import java.util.List;
 
 /**
@@ -64,4 +63,6 @@ public interface WmsOutboundItemService {
      * 按 ID 集合查询 WmsOutboundItemDO
      */
     List<WmsOutboundItemDO> selectByIds(List<Long> idList);
+
+    void assembleBin(List<WmsOutboundItemRespVO> itemList);
 }

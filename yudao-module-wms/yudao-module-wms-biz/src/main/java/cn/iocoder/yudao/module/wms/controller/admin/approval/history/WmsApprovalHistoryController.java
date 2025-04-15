@@ -95,7 +95,7 @@ public class WmsApprovalHistoryController {
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(List.of(approvalHistoryVO))
 			.mapping(WmsApprovalHistoryRespVO::getCreator, WmsApprovalHistoryRespVO::setCreatorName)
-			.mapping(WmsApprovalHistoryRespVO::getCreator, WmsApprovalHistoryRespVO::setUpdaterName)
+			.mapping(WmsApprovalHistoryRespVO::getUpdater, WmsApprovalHistoryRespVO::setUpdaterName)
 			.fill();
         // 返回
         return success(approvalHistoryVO);
@@ -115,7 +115,7 @@ public class WmsApprovalHistoryController {
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
 			.mapping(WmsApprovalHistoryRespVO::getCreator, WmsApprovalHistoryRespVO::setCreatorName)
-			.mapping(WmsApprovalHistoryRespVO::getCreator, WmsApprovalHistoryRespVO::setUpdaterName)
+			.mapping(WmsApprovalHistoryRespVO::getUpdater, WmsApprovalHistoryRespVO::setUpdaterName)
 			.fill();
         // 返回
         return success(voPageResult);
@@ -130,4 +130,4 @@ public class WmsApprovalHistoryController {
     // // 导出 Excel
     // ExcelUtils.write(response, "审批历史.xls", "数据", WmsApprovalHistoryRespVO.class, BeanUtils.toBean(list, WmsApprovalHistoryRespVO.class));
     // }
-}
+}

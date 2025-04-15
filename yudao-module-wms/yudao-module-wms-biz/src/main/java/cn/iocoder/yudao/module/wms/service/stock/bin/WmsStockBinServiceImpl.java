@@ -18,11 +18,13 @@ import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockW
 import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsWarehouseProductVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.zone.vo.WmsWarehouseZoneSimpleRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.product.WmsProductDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.zone.WmsWarehouseZoneDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.bin.WmsStockBinMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.bin.WmsStockBinProductMapper;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
@@ -31,6 +33,7 @@ import cn.iocoder.yudao.module.wms.service.stock.ownership.WmsStockOwnershipServ
 import cn.iocoder.yudao.module.wms.service.stock.warehouse.WmsStockWarehouseService;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import cn.iocoder.yudao.module.wms.service.warehouse.bin.WmsWarehouseBinService;
+import cn.iocoder.yudao.module.wms.service.warehouse.zone.WmsWarehouseZoneService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -70,6 +73,10 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
     @Resource
     @Lazy
     private WmsWarehouseService warehouseService;
+
+    @Resource
+    @Lazy
+    private WmsWarehouseZoneService warehouseZoneService;
 
     @Resource
     @Lazy
@@ -233,7 +240,7 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
         List<WmsStockBinDO> doList =  stockBinMapper.selectStockBinListInWarehouse(warehouseProductList);
         List<WmsStockBinRespVO> voList = BeanUtils.toBean(doList, WmsStockBinRespVO.class);
         if(withBin) {
-            assembleBin(voList);
+            assembleBin(voList,false);
         }
         return voList;
     }
@@ -274,11 +281,26 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
     }
 
     @Override
-    public void assembleBin(List<WmsStockBinRespVO> list) {
+    public void assembleBin(List<WmsStockBinRespVO> list, boolean withZone) {
         List<WmsWarehouseBinDO> binDOList = warehouseBinService.selectByIds(StreamX.from(list).toList(WmsStockBinRespVO::getBinId).stream().distinct().toList());
         List<WmsWarehouseBinRespVO> binVOList = BeanUtils.toBean(binDOList, WmsWarehouseBinRespVO.class);
         StreamX.from(list).assemble(binVOList, WmsWarehouseBinRespVO::getId, WmsStockBinRespVO::getBinId,WmsStockBinRespVO::setBin);
+
+        if(withZone) {
+            // 装配库区
+            List<Long> binIds= StreamX.from(list).toList(WmsStockBinRespVO::getBinId);
+            List<WmsWarehouseZoneDO> warehouseZoneDOList = warehouseZoneService.selectByIds(binIds);
+            Map<Long, WmsWarehouseZoneSimpleRespVO> warehouseZoneVOMap = StreamX.from(warehouseZoneDOList)
+                .toMap(WmsWarehouseZoneDO::getId, v-> BeanUtils.toBean(v, WmsWarehouseZoneSimpleRespVO.class));
+            StreamX.from(binVOList).assemble(warehouseZoneVOMap, WmsWarehouseBinRespVO::getZoneId, WmsWarehouseBinRespVO::setZone);
+        }
+
+
+
+
     }
+
+
 
     @Override
     public List<WmsStockBinDO> selectStockBinByIds(List<Long> stockBinIds) {
@@ -351,6 +373,8 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
         StreamX.from(list).assemble(stockWarehouseMap, WmsProductRespBinVO::getId, WmsProductRespBinVO::setStockWarehouseList);
 
     }
+
+
 
 
 }

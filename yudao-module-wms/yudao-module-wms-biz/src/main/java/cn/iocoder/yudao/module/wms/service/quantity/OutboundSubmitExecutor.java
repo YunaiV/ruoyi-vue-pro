@@ -66,54 +66,54 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
         Long actionId = IdUtil.getSnowflakeNextId();
         outboundRespVO.setLatestOutboundActionId(actionId);
 
-        if (item.getInbountItemId() != null) {
-            // 指定从批次库存出库：此时指定了出库的库存批次，但未指定仓位
-            processInboundItemForInbound(outboundRespVO, item,actionId,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
-        } else {
+//        if (item.getInboundItemId() != null) {
+//            // 指定从批次库存出库：此时指定了出库的库存批次，但未指定仓位
+//            processInboundItemForInbound(outboundRespVO, item,actionId,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
+//        } else {
             // 指定从仓位出库：此时未指定出库的批次库存，但指定了仓位
             processInboundItemForBin(outboundRespVO, item,actionId,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
-        }
+//        }
 
     }
 
-    /**
-     * 从指定批次出库,此时需要动态计算出库仓位
-     **/
-    protected void processInboundItemForInbound(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long actionId ,Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
-
-        WmsInboundItemDO inboundItem = inboundItemService.getInboundItem(item.getInbountItemId());
-        if(inboundItem==null) {
-            throw exception(INBOUND_ITEM_NOT_EXISTS);
-        }
-        if(quantity>inboundItem.getOutboundAvailableQty()) {
-            throw exception(INBOUND_ITEM_OUTBOUND_AVAILABLE_QTY_NOT_ENOUGH);
-        }
-
-        // 从多个有可用库存的入库批次，以先进先出的原则扣除
-        List<WmsInboundItemDO> itemsToUpdate = new ArrayList<>();
-        List<WmsInboundItemFlowDO> inboundItemFlowList = new ArrayList<>();
-
-        Integer available = inboundItem.getOutboundAvailableQty();
-        Integer flowQty = quantity;
-        available = available - flowQty;
-        inboundItem.setOutboundAvailableQty(available);
-        itemsToUpdate.add(inboundItem);
-
-        //
-        WmsInboundItemFlowDO flowDO = new WmsInboundItemFlowDO();
-        flowDO.setOutboundActionId(actionId);
-        flowDO.setInboundId(inboundItem.getInboundId());
-        flowDO.setInboundItemId(inboundItem.getId());
-        flowDO.setProductId(inboundItem.getProductId());
-        flowDO.setOutboundQty(flowQty);
-        flowDO.setOutboundId(outboundId);
-        flowDO.setOutboundItemId(outboundItemId);
-        inboundItemFlowList.add(flowDO);
-
-        // 保存详情与流水
-        inboundItemService.saveItems(itemsToUpdate,inboundItemFlowList);
-
-    }
+//    /**
+//     * 从指定批次出库,此时需要动态计算出库仓位
+//     **/
+//    protected void processInboundItemForInbound(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long actionId ,Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
+//
+//        WmsInboundItemDO inboundItem = inboundItemService.getInboundItem(item.getInboundItemId());
+//        if(inboundItem==null) {
+//            throw exception(INBOUND_ITEM_NOT_EXISTS);
+//        }
+//        if(quantity>inboundItem.getOutboundAvailableQty()) {
+//            throw exception(INBOUND_ITEM_OUTBOUND_AVAILABLE_QTY_NOT_ENOUGH);
+//        }
+//
+//        // 从多个有可用库存的入库批次，以先进先出的原则扣除
+//        List<WmsInboundItemDO> itemsToUpdate = new ArrayList<>();
+//        List<WmsInboundItemFlowDO> inboundItemFlowList = new ArrayList<>();
+//
+//        Integer available = inboundItem.getOutboundAvailableQty();
+//        Integer flowQty = quantity;
+//        available = available - flowQty;
+//        inboundItem.setOutboundAvailableQty(available);
+//        itemsToUpdate.add(inboundItem);
+//
+//        //
+//        WmsInboundItemFlowDO flowDO = new WmsInboundItemFlowDO();
+//        flowDO.setOutboundActionId(actionId);
+//        flowDO.setInboundId(inboundItem.getInboundId());
+//        flowDO.setInboundItemId(inboundItem.getId());
+//        flowDO.setProductId(inboundItem.getProductId());
+//        flowDO.setOutboundQty(flowQty);
+//        flowDO.setOutboundId(outboundId);
+//        flowDO.setOutboundItemId(outboundItemId);
+//        inboundItemFlowList.add(flowDO);
+//
+//        // 保存详情与流水
+//        inboundItemService.saveItems(itemsToUpdate,inboundItemFlowList);
+//
+//    }
 
     /**
      * 从指定仓位出库,此时需要动态计算库存批次
@@ -240,22 +240,22 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
         return WmsStockFlowDirection.OUT;
     }
 
-    @Override
-    protected void updateMultiStockBinQty(Long warehouseId, Long productId, WmsOutboundItemRespVO item,Integer quantity) {
-
-        // 判断仓位库存是否充足
-        List<WmsStockBinDO> wmsStockBinDOList = stockBinService.selectBinsByInboundItemId(warehouseId, productId, item.getInbountItemId());
-        Long totalSellableQty=0L;
-        for (WmsStockBinDO stockBinDO : wmsStockBinDOList) {
-            totalSellableQty+=stockBinDO.getSellableQty();
-        }
-        if(quantity>totalSellableQty) {
-            throw exception(STOCK_BIN_NOT_ENOUGH);
-        }
-
-        //TODO 按库存批次出库暂不实现
-
-    }
+//    @Override
+//    protected void updateMultiStockBinQty(Long warehouseId, Long productId, WmsOutboundItemRespVO item,Integer quantity) {
+//
+//        // 判断仓位库存是否充足
+//        List<WmsStockBinDO> wmsStockBinDOList = stockBinService.selectBinsByInboundItemId(warehouseId, productId, item.getInboundItemId());
+//        Long totalSellableQty=0L;
+//        for (WmsStockBinDO stockBinDO : wmsStockBinDOList) {
+//            totalSellableQty+=stockBinDO.getSellableQty();
+//        }
+//        if(quantity>totalSellableQty) {
+//            throw exception(STOCK_BIN_NOT_ENOUGH);
+//        }
+//
+//        //TODO 按库存批次出库暂不实现
+//
+//    }
 
     /**
      * 更新出库单

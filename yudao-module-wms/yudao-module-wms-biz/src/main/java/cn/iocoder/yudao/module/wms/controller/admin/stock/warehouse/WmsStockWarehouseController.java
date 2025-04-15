@@ -16,6 +16,8 @@ import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -81,7 +83,7 @@ public class WmsStockWarehouseController {
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(List.of(stockWarehouseVO))
 			.mapping(WmsStockWarehouseRespVO::getCreator, WmsStockWarehouseRespVO::setCreatorName)
-			.mapping(WmsStockWarehouseRespVO::getCreator, WmsStockWarehouseRespVO::setUpdaterName)
+			.mapping(WmsStockWarehouseRespVO::getUpdater, WmsStockWarehouseRespVO::setUpdaterName)
 			.fill();
         // 返回
         return success(stockWarehouseVO);
@@ -90,10 +92,10 @@ public class WmsStockWarehouseController {
     /**
      * @sign : 5473D7BBFDAEBB83
      */
-    @GetMapping("/page")
+    @PostMapping("/page")
     @Operation(summary = "获得仓库库存分页")
     @PreAuthorize("@ss.hasPermission('wms:stock-warehouse:query')")
-    public CommonResult<PageResult<WmsStockWarehouseRespVO>> getStockWarehousePage(@Valid WmsStockWarehousePageReqVO pageReqVO) {
+    public CommonResult<PageResult<WmsStockWarehouseRespVO>> getStockWarehousePage(@Valid @RequestBody WmsStockWarehousePageReqVO pageReqVO) {
         // 查询数据
         PageResult<WmsStockWarehouseDO> doPageResult = stockWarehouseService.getStockWarehousePage(pageReqVO);
         // 转换
@@ -101,7 +103,7 @@ public class WmsStockWarehouseController {
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
 			.mapping(WmsStockWarehouseRespVO::getCreator, WmsStockWarehouseRespVO::setCreatorName)
-			.mapping(WmsStockWarehouseRespVO::getCreator, WmsStockWarehouseRespVO::setUpdaterName)
+			.mapping(WmsStockWarehouseRespVO::getUpdater, WmsStockWarehouseRespVO::setUpdaterName)
 			.fill();
         stockWarehouseService.assembleProducts(voPageResult.getList());
         stockWarehouseService.assembleWarehouse(voPageResult.getList());

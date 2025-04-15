@@ -105,7 +105,7 @@ public class WmsWarehouseBinController {
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(List.of(warehouseBinVO))
 			.mapping(WmsWarehouseBinRespVO::getCreator, WmsWarehouseBinRespVO::setCreatorName)
-			.mapping(WmsWarehouseBinRespVO::getCreator, WmsWarehouseBinRespVO::setUpdaterName)
+			.mapping(WmsWarehouseBinRespVO::getUpdater, WmsWarehouseBinRespVO::setUpdaterName)
 			.fill();
         // 返回
         return success(warehouseBinVO);
@@ -147,7 +147,7 @@ public class WmsWarehouseBinController {
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
 			.mapping(WmsWarehouseBinRespVO::getCreator, WmsWarehouseBinRespVO::setCreatorName)
-			.mapping(WmsWarehouseBinRespVO::getCreator, WmsWarehouseBinRespVO::setUpdaterName)
+			.mapping(WmsWarehouseBinRespVO::getUpdater, WmsWarehouseBinRespVO::setUpdaterName)
 			.fill();
         // 返回
         return success(voPageResult);

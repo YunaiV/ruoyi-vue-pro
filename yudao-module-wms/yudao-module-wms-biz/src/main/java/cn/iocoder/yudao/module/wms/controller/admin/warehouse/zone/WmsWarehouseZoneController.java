@@ -99,7 +99,7 @@ public class WmsWarehouseZoneController {
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(List.of(warehouseZoneVO))
 			.mapping(WmsWarehouseZoneRespVO::getCreator, WmsWarehouseZoneRespVO::setCreatorName)
-			.mapping(WmsWarehouseZoneRespVO::getCreator, WmsWarehouseZoneRespVO::setUpdaterName)
+			.mapping(WmsWarehouseZoneRespVO::getUpdater, WmsWarehouseZoneRespVO::setUpdaterName)
 			.fill();
         // 返回
         return success(warehouseZoneVO);
@@ -138,7 +138,7 @@ public class WmsWarehouseZoneController {
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
 			.mapping(WmsWarehouseZoneRespVO::getCreator, WmsWarehouseZoneRespVO::setCreatorName)
-			.mapping(WmsWarehouseZoneRespVO::getCreator, WmsWarehouseZoneRespVO::setUpdaterName)
+			.mapping(WmsWarehouseZoneRespVO::getUpdater, WmsWarehouseZoneRespVO::setUpdaterName)
 			.fill();
         // 返回
         return success(voPageResult);

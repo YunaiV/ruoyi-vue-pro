@@ -79,5 +79,13 @@ public class WmsStockBinRespVO {
     @ExcelProperty("可售量，未被单据占用的良品数量")
     private Integer sellableQty;
 
+    @Schema(description = "创建人", example = "")
+    @ExcelProperty("创建人")
+    private String creatorName;
+
+    @Schema(description = "更新人", example = "")
+    @ExcelProperty("更新人")
+    private String updaterName;
+
 
 }

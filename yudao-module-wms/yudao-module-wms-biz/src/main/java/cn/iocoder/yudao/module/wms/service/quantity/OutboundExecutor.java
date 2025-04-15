@@ -60,7 +60,7 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
      **/
     protected abstract WmsStockFlowDirection updateSingleStockBinQty(WmsStockBinDO stockBinDO, WmsOutboundItemRespVO item, Integer quantity);
 
-    protected abstract void updateMultiStockBinQty(Long warehouseId, Long productId,WmsOutboundItemRespVO item,Integer quantity);
+    // protected abstract void updateMultiStockBinQty(Long warehouseId, Long productId,WmsOutboundItemRespVO item,Integer quantity);
     /**
      * 更新出库单
      **/
@@ -184,12 +184,12 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
         // 调整仓位库存
         JdbcUtils.requireTransaction();
 
-        // 指定了库存批次
-        if(item.getInbountItemId()!=null) {
-            // 获得库存批次对应的有货的仓位
-            updateMultiStockBinQty(warehouseId, productId, item, quantity);
-
-        } else { // 未指定库存批次，但指定了库存仓位
+//        // 指定了库存批次
+//        if(item.getInboundItemId()!=null) {
+//            // 获得库存批次对应的有货的仓位
+//            updateMultiStockBinQty(warehouseId, productId, item, quantity);
+//
+//        } else { // 未指定库存批次，但指定了库存仓位
             WmsStockBinDO stockBinDO = stockBinService.getStockBin(binId, productId, false);
             WmsStockFlowDirection wmsStockFlowDirection = null;
             // 如果不存在抛出异常
@@ -202,7 +202,7 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
             stockBinService.insertOrUpdate(stockBinDO);
             // 记录流水
             stockFlowService.createForStockBin(this.getReason(), wmsStockFlowDirection, productId, stockBinDO, quantity, outboundId, outboundItemId);
-        }
+//        }
     }
 
 

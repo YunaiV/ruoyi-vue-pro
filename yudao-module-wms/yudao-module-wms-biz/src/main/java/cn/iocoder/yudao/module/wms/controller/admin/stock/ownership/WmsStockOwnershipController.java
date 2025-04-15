@@ -15,6 +15,8 @@ import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -79,10 +81,10 @@ public class WmsStockOwnershipController {
     /**
      * @sign : EC951F0579860D97
      */
-    @GetMapping("/page")
+    @PostMapping("/page")
     @Operation(summary = "获得所有者库存分页")
     @PreAuthorize("@ss.hasPermission('wms:stock-ownership:query')")
-    public CommonResult<PageResult<WmsStockOwnershipRespVO>> getStockOwnershipPage(@Valid WmsStockOwnershipPageReqVO pageReqVO) {
+    public CommonResult<PageResult<WmsStockOwnershipRespVO>> getStockOwnershipPage(@Valid @RequestBody WmsStockOwnershipPageReqVO pageReqVO) {
         // 查询数据
         PageResult<WmsStockOwnershipDO> doPageResult = stockOwnershipService.getStockOwnershipPage(pageReqVO);
         // 转换

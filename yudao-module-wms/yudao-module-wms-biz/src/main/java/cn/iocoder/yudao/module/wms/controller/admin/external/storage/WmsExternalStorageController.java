@@ -92,7 +92,7 @@ public class WmsExternalStorageController {
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(List.of(externalStorageVO))
 			.mapping(WmsExternalStorageRespVO::getCreator, WmsExternalStorageRespVO::setCreatorName)
-			.mapping(WmsExternalStorageRespVO::getCreator, WmsExternalStorageRespVO::setUpdaterName)
+			.mapping(WmsExternalStorageRespVO::getUpdater, WmsExternalStorageRespVO::setUpdaterName)
 			.fill();
         // 返回
         return success(externalStorageVO);
@@ -112,7 +112,7 @@ public class WmsExternalStorageController {
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
 			.mapping(WmsExternalStorageRespVO::getCreator, WmsExternalStorageRespVO::setCreatorName)
-			.mapping(WmsExternalStorageRespVO::getCreator, WmsExternalStorageRespVO::setUpdaterName)
+			.mapping(WmsExternalStorageRespVO::getUpdater, WmsExternalStorageRespVO::setUpdaterName)
 			.fill();
         // 清除不需要的返回值
         voPageResult.getList().forEach(item -> {
@@ -132,4 +132,4 @@ public class WmsExternalStorageController {
         // 导出 Excel
         ExcelUtils.write(response, "外部存储库.xls", "数据", WmsExternalStorageRespVO.class, BeanUtils.toBean(list, WmsExternalStorageRespVO.class));
     }
-}
+}

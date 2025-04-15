@@ -78,7 +78,7 @@ public interface WmsStockBinService {
 
     void assembleWarehouse(List<WmsStockBinRespVO> list);
 
-    void assembleBin(List<WmsStockBinRespVO> list);
+    void assembleBin(List<WmsStockBinRespVO> list,boolean withZone);
 
     List<WmsStockBinDO> selectStockBinByIds(List<Long> stockBinIds);
 
@@ -93,4 +93,5 @@ public interface WmsStockBinService {
     void assembleDept(List<WmsProductRespBinVO> list);
 
     void assembleStockWarehouseList(Long warehouseId,List<WmsProductRespBinVO> list);
+
 }

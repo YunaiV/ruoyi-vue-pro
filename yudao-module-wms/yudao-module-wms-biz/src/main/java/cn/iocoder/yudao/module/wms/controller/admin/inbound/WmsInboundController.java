@@ -161,7 +161,7 @@ public class WmsInboundController {
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
 			.mapping(WmsInboundRespVO::getCreator, WmsInboundRespVO::setCreatorName)
-			.mapping(WmsInboundRespVO::getCreator, WmsInboundRespVO::setUpdaterName)
+			.mapping(WmsInboundRespVO::getUpdater, WmsInboundRespVO::setUpdaterName)
 			.fill();
         // 返回
         return success(voPageResult);
@@ -191,4 +191,4 @@ public class WmsInboundController {
         // 导出 Excel
         ExcelUtils.write(response, "入库单.xls", "数据", WmsInboundRespVO.class, BeanUtils.toBean(list, WmsInboundRespVO.class));
     }
-}
+}

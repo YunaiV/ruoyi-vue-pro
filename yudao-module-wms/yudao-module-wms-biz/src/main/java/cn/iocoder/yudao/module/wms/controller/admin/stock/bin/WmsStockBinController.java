@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.wms.controller.admin.stock.bin;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespBinVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinRespVO;
@@ -89,11 +90,19 @@ public class WmsStockBinController {
         // 查询数据
         PageResult<WmsStockBinDO> doPageResult = stockBinService.getStockBinPage(pageReqVO);
 
+
         // 转换
         PageResult<WmsStockBinRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsStockBinRespVO.class);
+        // 装配
         stockBinService.assembleProducts(voPageResult.getList());
         stockBinService.assembleWarehouse(voPageResult.getList());
-        stockBinService.assembleBin(voPageResult.getList());
+        stockBinService.assembleBin(voPageResult.getList(),true);
+
+        // 人员姓名填充
+        AdminUserApi.inst().prepareFill(voPageResult.getList())
+            .mapping(WmsStockBinRespVO::getCreator, WmsStockBinRespVO::setCreatorName)
+            .mapping(WmsStockBinRespVO::getUpdater, WmsStockBinRespVO::setUpdaterName)
+            .fill();
         // 返回
         return success(voPageResult);
     }

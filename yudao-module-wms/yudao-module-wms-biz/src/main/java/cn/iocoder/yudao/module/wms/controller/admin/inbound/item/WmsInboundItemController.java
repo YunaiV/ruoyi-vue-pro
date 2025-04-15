@@ -20,17 +20,18 @@ import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_NOT_EXISTS;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 @Tag(name = "入库单详情")
 @RestController
@@ -96,7 +97,7 @@ public class WmsInboundItemController {
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(List.of(inboundItemVO))
 			.mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setCreatorName)
-			.mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setUpdaterName)
+			.mapping(WmsInboundItemRespVO::getUpdater, WmsInboundItemRespVO::setUpdaterName)
 			.fill();
         // 返回
         return success(inboundItemVO);
@@ -105,10 +106,10 @@ public class WmsInboundItemController {
     /**
      * @sign : 83456B9A2BFF8F84
      */
-    @GetMapping("/page")
+    @PostMapping("/page")
     @Operation(summary = "批次库存查询")
     @PreAuthorize("@ss.hasPermission('wms:inbound-item:query')")
-    public CommonResult<PageResult<WmsInboundItemRespVO>> getInboundItemPage(@Valid WmsInboundItemPageReqVO pageReqVO) {
+    public CommonResult<PageResult<WmsInboundItemRespVO>> getInboundItemPage(@Valid @RequestBody WmsInboundItemPageReqVO pageReqVO) {
         // 查询数据
         PageResult<WmsInboundItemQueryDO> doPageResult = inboundItemService.getInboundItemPage(pageReqVO);
         // 转换
@@ -116,7 +117,7 @@ public class WmsInboundItemController {
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
 			.mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setCreatorName)
-			.mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setUpdaterName)
+			.mapping(WmsInboundItemRespVO::getUpdater, WmsInboundItemRespVO::setUpdaterName)
 			.fill();
         // 装配
         inboundItemService.assembleDept(voPageResult.getList());
@@ -147,7 +148,7 @@ public class WmsInboundItemController {
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
 			.mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setCreatorName)
-			.mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setUpdaterName)
+			.mapping(WmsInboundItemRespVO::getUpdater, WmsInboundItemRespVO::setUpdaterName)
 			.fill();
         // 返回
         return success(voPageResult);
@@ -162,4 +163,4 @@ public class WmsInboundItemController {
     // // 导出 Excel
     // ExcelUtils.write(response, "入库单详情.xls", "数据", WmsInboundItemRespVO.class, BeanUtils.toBean(list, WmsInboundItemRespVO.class));
     // }
-}
+}

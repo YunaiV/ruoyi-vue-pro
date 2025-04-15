@@ -6,26 +6,38 @@ import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
-import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo.WmsInventoryBinRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.item.WmsOutboundItemDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.outbound.item.WmsOutboundItemMapper;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
 import cn.iocoder.yudao.module.wms.service.outbound.WmsOutboundService;
+import cn.iocoder.yudao.module.wms.service.warehouse.bin.WmsWarehouseBinService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import java.util.*;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_CAN_NOT_EDIT;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_CAN_NOT_EDIT;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_ITEM_ACTUAL_QTY_ERROR;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_ITEM_NOT_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_ITEM_OUTBOUND_ID_DUPLICATE;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_ITEM_OUTBOUND_ID_PRODUCT_ID_DUPLICATE;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 
 /**
@@ -46,6 +58,9 @@ public class WmsOutboundItemServiceImpl implements WmsOutboundItemService {
 
     @Resource
     private ErpProductApi productApi;
+
+    @Resource
+    private WmsWarehouseBinService warehouseBinService;
 
     /**
      * @sign : 07E3106EC549C08B
@@ -175,5 +190,12 @@ public class WmsOutboundItemServiceImpl implements WmsOutboundItemService {
             return List.of();
         }
         return outboundItemMapper.selectByIds(idList);
+    }
+
+    @Override
+    public void assembleBin(List<WmsOutboundItemRespVO> itemList) {
+        List<WmsWarehouseBinDO> binDOList = warehouseBinService.selectByIds(StreamX.from(itemList).toList(WmsOutboundItemRespVO::getBinId).stream().distinct().toList());
+        List<WmsWarehouseBinRespVO> binVOList = BeanUtils.toBean(binDOList, WmsWarehouseBinRespVO.class);
+        StreamX.from(itemList).assemble(binVOList, WmsWarehouseBinRespVO::getId, WmsOutboundItemRespVO::getBinId, WmsOutboundItemRespVO::setBin);
     }
 }

@@ -91,7 +91,7 @@ public class WmsPickupController {
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(List.of(pickupVO))
 			.mapping(WmsPickupRespVO::getCreator, WmsPickupRespVO::setCreatorName)
-			.mapping(WmsPickupRespVO::getCreator, WmsPickupRespVO::setUpdaterName)
+			.mapping(WmsPickupRespVO::getUpdater, WmsPickupRespVO::setUpdaterName)
 			.fill();
         // 组装拣货单详情
         List<WmsPickupItemDO> pickupItemList = pickupItemService.selectByPickupId(pickupVO.getId());
@@ -117,7 +117,7 @@ public class WmsPickupController {
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
 			.mapping(WmsPickupRespVO::getCreator, WmsPickupRespVO::setCreatorName)
-			.mapping(WmsPickupRespVO::getCreator, WmsPickupRespVO::setUpdaterName)
+			.mapping(WmsPickupRespVO::getUpdater, WmsPickupRespVO::setUpdaterName)
 			.fill();
         // 组装仓库
         pickupService.assembleWarehouse(voPageResult.getList());
@@ -134,4 +134,4 @@ public class WmsPickupController {
     // // 导出 Excel
     // ExcelUtils.write(response, "拣货单.xls", "数据", WmsPickupRespVO.class, BeanUtils.toBean(list, WmsPickupRespVO.class));
     // }
-}
+}

@@ -92,6 +92,8 @@ public class WmsOutboundController {
     public CommonResult<WmsOutboundRespVO> getOutbound(@RequestParam("id") Long id) {
         // 查询数据
         WmsOutboundRespVO outboundVO = outboundService.getOutboundWithItemList(id);
+        // 装配出库仓位
+        outboundItemService.assembleBin(outboundVO.getItemList());
         // 返回
         return success(outboundVO);
     }
@@ -114,7 +116,7 @@ public class WmsOutboundController {
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
 			.mapping(WmsOutboundRespVO::getCreator, WmsOutboundRespVO::setCreatorName)
-			.mapping(WmsOutboundRespVO::getCreator, WmsOutboundRespVO::setUpdaterName)
+			.mapping(WmsOutboundRespVO::getUpdater, WmsOutboundRespVO::setUpdaterName)
 			.fill();
         // 返回
         return success(voPageResult);
@@ -177,4 +179,4 @@ public class WmsOutboundController {
         outboundService.approve(WmsOutboundAuditStatus.Event.FINISH, approvalReqVO);
         return success(true);
     }
-}
+}

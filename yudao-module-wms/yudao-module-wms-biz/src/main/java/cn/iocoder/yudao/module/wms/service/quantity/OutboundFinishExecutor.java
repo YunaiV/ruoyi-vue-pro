@@ -128,10 +128,10 @@ public class OutboundFinishExecutor extends OutboundExecutor {
         return WmsStockFlowDirection.OUT;
     }
 
-    @Override
-    protected void updateMultiStockBinQty(Long warehouseId, Long productId, WmsOutboundItemRespVO item,Integer quantity) {
-        //TODO 按库存批次出库暂不实现
-    }
+//    @Override
+//    protected void updateMultiStockBinQty(Long warehouseId, Long productId, WmsOutboundItemRespVO item,Integer quantity) {
+//        //TODO 按库存批次出库暂不实现
+//    }
 
     /**
      * 更新出库单

@@ -300,7 +300,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         // 转换
         WmsInboundRespVO inboundVO = BeanUtils.toBean(inbound, WmsInboundRespVO.class);
         // 人员姓名填充
-        AdminUserApi.inst().prepareFill(List.of(inboundVO)).mapping(WmsInboundRespVO::getCreator, WmsInboundRespVO::setCreatorName).mapping(WmsInboundRespVO::getCreator, WmsInboundRespVO::setUpdaterName).fill();
+        AdminUserApi.inst().prepareFill(List.of(inboundVO)).mapping(WmsInboundRespVO::getCreator, WmsInboundRespVO::setCreatorName).mapping(WmsInboundRespVO::getUpdater, WmsInboundRespVO::setUpdaterName).fill();
         // 组装入库单详情
         List<WmsInboundItemDO> inboundItemList = inboundItemService.selectByInboundId(inboundVO.getId());
         inboundVO.setItemList(BeanUtils.toBean(inboundItemList, WmsInboundItemRespVO.class));

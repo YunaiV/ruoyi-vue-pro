@@ -1,16 +1,18 @@
 package cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo;
 
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinRespVO;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
-import com.alibaba.excel.annotation.*;
-import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
-import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,creator,company_id,create_time,bin_id,plan_qty,outbound_id,updater,source_item_id,inbount_item_id,update_time,outbound_status,actual_qty,product_id,id,dept_id
+ * @table-fields : tenant_id,creator,company_id,create_time,bin_id,plan_qty,outbound_id,updater,source_item_id,update_time,actual_qty,outbound_status,product_id,id,dept_id
  */
 @Schema(description = "管理后台 - 出库单详情 Response VO")
 @Data
@@ -94,7 +96,7 @@ public class WmsOutboundItemRespVO {
     @ExcelProperty("库存归属部门ID")
     private Long deptId;
 
-    @Schema(description = "出库的入库批次详情ID，在创建时指定；bin_id 和 inbount_item_id 需要指定其中一个，优先使用 inbount_item_id", example = "")
-    @ExcelProperty("出库的入库批次详情ID，在创建时指定；bin_id 和 inbount_item_id 需要指定其中一个，优先使用 inbount_item_id")
-    private Long inbountItemId;
+    @Schema(description = "库位", example = "")
+    @ExcelProperty("库位")
+    private WmsWarehouseBinRespVO bin;
 }
