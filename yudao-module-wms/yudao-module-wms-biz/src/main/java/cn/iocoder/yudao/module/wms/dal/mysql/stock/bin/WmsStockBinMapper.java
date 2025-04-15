@@ -14,7 +14,6 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.WmsPickupDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.product.WmsProductDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
 import org.apache.ibatis.annotations.Mapper;
@@ -36,7 +35,7 @@ public interface WmsStockBinMapper extends BaseMapperX<WmsStockBinDO> {
 
         MPJLambdaWrapperX<WmsStockBinDO> wrapper = new MPJLambdaWrapperX();
         // 连接产品视图
-        wrapper.innerJoin(WmsProductDO.class, WmsProductDO::getId, WmsStockWarehouseDO::getProductId)
+        wrapper.innerJoin(WmsProductDO.class, WmsProductDO::getId, WmsStockBinDO::getProductId)
             .likeIfExists(WmsProductDO::getBarCode, reqVO.getProductCode())
             .eqIfExists(WmsProductDO::getDeptId, reqVO.getProductDeptId());
 
