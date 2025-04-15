@@ -20,21 +20,22 @@ public interface CrmFollowUpRecordMapper extends BaseMapperX<CrmFollowUpRecordDO
 
     default PageResult<CrmFollowUpRecordDO> selectPage(CrmFollowUpRecordPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<CrmFollowUpRecordDO>()
-                .eqIfPresent(CrmFollowUpRecordDO::getBizType, reqVO.getBizType())
-                .eqIfPresent(CrmFollowUpRecordDO::getBizId, reqVO.getBizId())
-                .orderByDesc(CrmFollowUpRecordDO::getId));
+            .eqIfPresent(CrmFollowUpRecordDO::getBizType, reqVO.getBizType())
+            .eqIfPresent(CrmFollowUpRecordDO::getBizId, reqVO.getBizId())
+            .orderByDesc(CrmFollowUpRecordDO::getId));
     }
 
     default void deleteByBiz(Integer bizType, Long bizId) {
         delete(new LambdaQueryWrapperX<CrmFollowUpRecordDO>()
-                .eq(CrmFollowUpRecordDO::getBizType, bizType)
-                .eq(CrmFollowUpRecordDO::getBizId, bizId));
+            .eq(CrmFollowUpRecordDO::getBizType, bizType)
+            .eq(CrmFollowUpRecordDO::getBizId, bizId));
     }
 
     default List<CrmFollowUpRecordDO> selectListByBiz(Integer bizType, Collection<Long> bizIds) {
         return selectList(new LambdaQueryWrapperX<CrmFollowUpRecordDO>()
-                .eq(CrmFollowUpRecordDO::getBizType, bizType)
-                .in(CrmFollowUpRecordDO::getBizId, bizIds));
+            .eq(CrmFollowUpRecordDO::getBizType, bizType)
+            .in(CrmFollowUpRecordDO::getBizId, bizIds)
+            .orderByDesc(CrmFollowUpRecordDO::getCreateTime));
     }
 
 }

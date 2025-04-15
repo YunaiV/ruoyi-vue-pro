@@ -30,13 +30,22 @@ public class CrmBusinessRespVO {
     @ExcelProperty("客户名称")
     private String customerName;
 
-    @Schema(description = "跟进状态", requiredMode = Schema.RequiredMode.REQUIRED, example ="true")
+
+    @Schema(description = "客户级别")
+    @ExcelProperty("客户级别")
+    private String customerLevel;
+
+    @Schema(description = "跟进状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @ExcelProperty("跟进状态")
     private Boolean followUpStatus;
 
     @Schema(description = "最后跟进时间")
     @ExcelProperty("最后跟进时间")
     private LocalDateTime contactLastTime;
+
+    @Schema(description = "最后跟进内容", example = "吃饭、睡觉、打逗逗")
+    @ExcelProperty("最后跟进内容")
+    private String contactLastContent;
 
     @Schema(description = "下次联系时间")
     @ExcelProperty("下次联系时间")
