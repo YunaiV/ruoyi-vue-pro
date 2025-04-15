@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.oms.controller.admin.order.item.vo.OmsOrderItemPa
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsOrderItemDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -38,5 +39,10 @@ public interface OmsOrderItemMapper extends BaseMapperX<OmsOrderItemDO> {
         }
         return delete(new LambdaQueryWrapperX<OmsOrderItemDO>()
             .in(OmsOrderItemDO::getOrderId, orderIds));
+    }
+
+
+    default List<OmsOrderItemDO> selectListByOrderIds(Collection<Long> orderIds) {
+        return selectList(OmsOrderItemDO::getOrderId, orderIds);
     }
 }

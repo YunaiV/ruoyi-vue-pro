@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.oms.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -244,6 +245,15 @@ public class OmsOrderServiceImpl implements OmsOrderService {
         }
         omsOrderItemService.deleteByOrderIds(deleteOrderIds);
         omsOrderItemService.saveOmsOrderItemDOList(orderItems);
+    }
+
+
+    @Override
+    public List<OmsOrderItemDO> getSaleOrderItemListByOrderIds(Collection<Long> orderIds) {
+        if (CollUtil.isEmpty(orderIds)) {
+            return Collections.emptyList();
+        }
+        return orderItemMapper.selectListByOrderIds(orderIds);
     }
 
 }

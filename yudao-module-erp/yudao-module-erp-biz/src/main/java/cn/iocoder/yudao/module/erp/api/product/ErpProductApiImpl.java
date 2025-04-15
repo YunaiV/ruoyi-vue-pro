@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PRODUCT_NOT_ENABLE;
@@ -94,5 +95,16 @@ public class ErpProductApiImpl implements ErpProductApi {
     public List<ErpProductRespDTO> getProductVOList(Collection<Long> ids) {
         List<ErpProductRespVO> productVOList = erpProductService.getProductVOList(ids);
         return BeanUtils.toBean(productVOList, ErpProductRespDTO.class);
+    }
+
+    @Override
+    public Map<Long, ErpProductRespDTO> getProductDTOMap(Collection<Long> ids) {
+        Map<Long, ErpProductRespVO> productVOMap = erpProductService.getProductVOMap(ids);
+        Map<Long, ErpProductRespDTO> productDTOMap = productVOMap.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+                ErpProductRespVO productVO = entry.getValue();
+                return BeanUtils.toBean(productVO, ErpProductRespDTO.class);
+            }));
+        return productDTOMap;
     }
 }

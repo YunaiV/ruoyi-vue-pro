@@ -80,11 +80,19 @@ public class OmsShopProductItemServiceImpl implements OmsShopProductItemService 
     }
 
     @Override
-    public List<OmsShopProductItemDO> getShopProductItemsByProductIds(List<Long> productIds) {
-        if (CollectionUtils.isEmpty(productIds)) {
+    public List<OmsShopProductItemDO> getShopProductItemsByProductIds(List<Long> shopProductIds) {
+        if (CollectionUtils.isEmpty(shopProductIds)) {
             return List.of();
         }
-        return shopProductItemMapper.selectList(OmsShopProductItemDO::getShopProductId, productIds);
+        return shopProductItemMapper.selectList(OmsShopProductItemDO::getShopProductId, shopProductIds);
+    }
+
+    @Override
+    public List<OmsShopProductItemDO> getShopProductItemsByShopProductCodes(List<String> shopProductCodes) {
+        if (CollectionUtils.isEmpty(shopProductCodes)) {
+            return List.of();
+        }
+        return shopProductItemMapper.getShopProductItemsByShopProductCodes(shopProductCodes);
     }
 
 }

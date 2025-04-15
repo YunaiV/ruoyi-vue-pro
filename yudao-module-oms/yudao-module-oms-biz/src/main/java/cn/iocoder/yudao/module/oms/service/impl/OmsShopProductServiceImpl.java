@@ -31,9 +31,11 @@ import cn.iocoder.yudao.module.oms.service.OmsShopProductService;
 import cn.iocoder.yudao.module.oms.service.OmsShopService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Service;
@@ -56,7 +58,8 @@ public class OmsShopProductServiceImpl extends ServiceImpl<OmsShopProductMapper,
     private final String CREATOR = "Admin";
 
     @Resource
-    MessageChannel eccangSkuRelationOutputChannel;
+    @Qualifier("omsShopProductOutPutChannel")
+    MessageChannel omsShopProductOutputChannel;
     @Resource
     private OmsShopProductMapper shopProductMapper;
 
@@ -73,8 +76,14 @@ public class OmsShopProductServiceImpl extends ServiceImpl<OmsShopProductMapper,
 
 
     @Override
-    public List<OmsShopProductDO> getByShopId(Long shopId) {
-        return shopProductMapper.selectList(OmsShopProductDO::getShopId, shopId);
+    public List<OmsShopProductDO> getByShopIds(List<Long> shopIds) {
+        if (CollectionUtils.isEmpty(shopIds)) {
+            return Collections.emptyList();
+        }
+
+        LambdaQueryWrapper<OmsShopProductDO> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(OmsShopProductDO::getShopId, shopIds);
+        return shopProductMapper.selectList(queryWrapper);
     }
 
     @Override
@@ -87,8 +96,9 @@ public class OmsShopProductServiceImpl extends ServiceImpl<OmsShopProductMapper,
 
         List<OmsShopProductDO> createShopProducts = new ArrayList<>();
         List<OmsShopProductDO> updateShopProducts = new ArrayList<>();
-        //同批次的产品都是一个店铺，所以取第一个即可
-        List<OmsShopProductDO> existShopProducts = getByShopId(shopProductDOs.get(0).getShopId());
+
+        List<Long> shopIds = shopProductDOs.stream().map(OmsShopProductDO::getShopId).distinct().collect(Collectors.toList());
+        List<OmsShopProductDO> existShopProducts = getByShopIds(shopIds);
 
         // 使用Map存储已存在的店铺产品信息，key=sourceId, value=OmsShopProductDO
         Map<String, OmsShopProductDO> existShopProductMap = Optional.ofNullable(existShopProducts)
@@ -258,7 +268,7 @@ public class OmsShopProductServiceImpl extends ServiceImpl<OmsShopProductMapper,
 
 
         AsyncTask.run(() -> {
-            eccangSkuRelationOutputChannel.send(MessageBuilder.withPayload(dto).build());
+            omsShopProductOutputChannel.send(MessageBuilder.withPayload(dto).build());
         });
 
     }

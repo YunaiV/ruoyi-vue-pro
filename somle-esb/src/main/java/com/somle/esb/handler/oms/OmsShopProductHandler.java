@@ -15,19 +15,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @Description: OMS同步SKU映射关系到易仓
+ * @Description: OMS同步数据到易仓
  * @Author: gumaomao
  * @Date: 2025/4/10
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class EccangSkuRelationHandler {
+public class OmsShopProductHandler {
 
     @Resource
     EccangService service;
 
-    @ServiceActivator(inputChannel = "eccangSkuRelationOutputChannel")
+    @ServiceActivator(inputChannel = "omsShopProductOutPutChannel")
     public void handleSale(SkuRelationDTO relationDTO) {
 
         if (SpringUtils.isProd()) {

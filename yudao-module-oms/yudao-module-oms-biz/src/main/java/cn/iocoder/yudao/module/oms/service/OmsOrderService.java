@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.oms.dal.dataobject.OmsOrderDO;
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsOrderItemDO;
 import jakarta.validation.Valid;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -109,5 +110,14 @@ public interface OmsOrderService {
      * @return: @return {@link List }<{@link OmsOrderDO }>
      */
     List<OmsOrderDO> getByPlatformCode(String platformCode);
+
+
+    /**
+     * 获得销售订单项 List
+     *
+     * @param orderIds 销售订单编号数组
+     * @return 销售订单项 List
+     */
+    List<OmsOrderItemDO> getSaleOrderItemListByOrderIds(Collection<Long> orderIds);
 
 }

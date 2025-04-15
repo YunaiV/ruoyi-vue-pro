@@ -35,7 +35,7 @@ public class OmsShopProductSaveReqVO {
 
     @Schema(description = "平台SKU", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "平台SKU不能为空")
-    private String platformCode;
+    private String code;
 
     @Schema(description = "链接", example = "https://www.iocoder.cn")
     private String url;

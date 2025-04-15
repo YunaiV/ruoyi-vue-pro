@@ -27,11 +27,11 @@ public interface OmsShopProductService extends IService<OmsShopProductDO> {
     void createOrUpdateShopProductByPlatform(List<OmsShopProductSaveReqDTO> saveReqDTOs);
 
     /**
-     * @param shopId 店铺ID
+     * @param shopIds 店铺ID集合
      * @Description: 通过店铺ID获取店铺产品列表
      * @return: @return {@link List }<{@link OmsShopProductDO }>
      */
-    List<OmsShopProductDO> getByShopId(Long shopId);
+    List<OmsShopProductDO> getByShopIds(List<Long> shopIds);
 
 
     /**

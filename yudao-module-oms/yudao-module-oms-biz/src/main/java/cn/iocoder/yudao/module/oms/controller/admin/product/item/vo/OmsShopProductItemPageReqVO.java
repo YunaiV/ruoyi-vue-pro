@@ -2,12 +2,14 @@ package cn.iocoder.yudao.module.oms.controller.admin.product.item.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -15,6 +17,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
+@Builder
 public class OmsShopProductItemPageReqVO extends PageParam {
 
     @Schema(description = "店铺产品编号", example = "27593")
@@ -22,6 +25,9 @@ public class OmsShopProductItemPageReqVO extends PageParam {
 
     @Schema(description = "产品编号", example = "27593")
     private Long productId;
+
+    @Schema(description = "店铺产品编码集合")
+    private List<String> shopProductCodes;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

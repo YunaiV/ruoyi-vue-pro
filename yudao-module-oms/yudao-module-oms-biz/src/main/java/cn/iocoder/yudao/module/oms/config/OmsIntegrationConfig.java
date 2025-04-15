@@ -1,4 +1,4 @@
-package com.somle.eccang.config;
+package cn.iocoder.yudao.module.oms.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -9,10 +9,13 @@ import org.springframework.messaging.MessageChannel;
 
 @Slf4j
 @Configuration
-public class EccangIntegrationConfig {
+public class OmsIntegrationConfig {
+
+
     @Bean
-    public MessageChannel eccangSaleOutputChannel() {
+    public MessageChannel omsShopProductOutPutChannel() {
         return new PublishSubscribeChannel(new SimpleAsyncTaskExecutor());
     }
+
 
 }

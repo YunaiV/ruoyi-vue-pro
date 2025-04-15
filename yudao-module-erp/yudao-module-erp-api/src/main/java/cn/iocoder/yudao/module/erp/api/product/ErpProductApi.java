@@ -65,4 +65,12 @@ public interface ErpProductApi {
      * @return 产品 VO 列表
      */
     List<ErpProductRespDTO> getProductVOList(Collection<Long> ids);
+
+    /**
+     * 获得产品 DTO Map
+     *
+     * @param ids 编号数组
+     * @return 产品 DTO Map
+     */
+    Map<Long, ErpProductRespDTO> getProductDTOMap(Collection<Long> ids);
 }
