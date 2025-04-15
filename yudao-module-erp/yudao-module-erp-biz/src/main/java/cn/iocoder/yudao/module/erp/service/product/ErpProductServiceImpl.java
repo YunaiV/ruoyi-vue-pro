@@ -189,31 +189,22 @@ public class ErpProductServiceImpl implements ErpProductService {
     }
 
     private void syncProduct(ErpProductDO productDO, Boolean isUpdate) {
-        if (isUpdate) {
-            //            //更新产品时->覆盖n个海关规则
-            //            //找到产品id对应的所有海关规则DTO(含海关信息+海关分类)，如果没有海关分类信息(产品逻辑必须有)，那么就不更新海关规则
-            //            List<TmsCustomRuleDTO> dtos = new ArrayList<>();
-            //            // 从产品ID获取海关规则 + 从分类ID获取海关规则
-            //            Optional.ofNullable(tmsCustomRuleApi.listCustomRuleDTOsByProductId(productDO.getId()))
-            //                .ifPresent(dtos::addAll);
-            //            if (!dtos.isEmpty()) {
-            //                erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos.stream().distinct().toList()).build());
-            //            }
-            //获取创建人id
-            Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
-            ErpProductDTO erpProductDTO = BeanUtils.toBean(productDO, ErpProductDTO.class);
-            erpProductDTO.setCreator(String.valueOf(loginUserId));
-            //同步数据
-            erpProductChannel.send(MessageBuilder.withPayload(List.of(erpProductDTO)).build());
-        } else {
-            //获取创建人id
-            Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
-            ErpProductDTO erpProductDTO = BeanUtils.toBean(productDO, ErpProductDTO.class);
-            erpProductDTO.setCreator(String.valueOf(loginUserId));
-            //同步数据
-            erpProductChannel.send(MessageBuilder.withPayload(List.of(erpProductDTO)).build());
+        Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
+        ErpProductDTO erpProductDTO = BeanUtils.toBean(productDO, ErpProductDTO.class);
+        erpProductDTO.setCreator(String.valueOf(loginUserId));
+
+        // 如果是更新操作，可拓展处理海关规则逻辑
+        if (Boolean.TRUE.equals(isUpdate)) {
+            // 如需覆盖海关规则，在此处理
+            // List<TmsCustomRuleDTO> dtos = tmsCustomRuleApi.listCustomRuleDTOsByProductId(productDO.getId());
+            // if (!CollectionUtils.isEmpty(dtos)) {
+            //     erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos.stream().distinct().toList()).build());
+            // }
         }
+        // 同步产品数据
+        erpProductChannel.send(MessageBuilder.withPayload(List.of(erpProductDTO)).build());
     }
+
 
     @Override
     @Caching(evict = {
