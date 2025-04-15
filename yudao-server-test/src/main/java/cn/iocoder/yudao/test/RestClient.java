@@ -129,6 +129,15 @@ public class RestClient {
         return result;
     }
 
+    public <VO> CommonResult<Boolean> update(String url, List<VO> param) {
+        CommonResult result = put(url,param);
+        if(result.isSuccess()) {
+            Boolean data = Boolean.valueOf(result.getData().toString());
+            result.setData(data);
+        }
+        return result;
+    }
+
     public <VO> CommonResult<Boolean> update(String url, VO param) {
         CommonResult result = put(url,param);
         if(result.isSuccess()) {

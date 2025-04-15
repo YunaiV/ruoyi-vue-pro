@@ -329,17 +329,19 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         approvalReqVO.setComment("盘点出库");
         this.approve(WmsOutboundAuditStatus.Event.SUBMIT, approvalReqVO);
 
+        // 同意确认收货
+        this.approve(WmsOutboundAuditStatus.Event.AGREE, approvalReqVO);
+
         // 拉取明细
         List<WmsOutboundItemDO> outboundItemDOS = outboundItemService.selectByOutboundId(outbound.getId());
 
-        // 设置实际入库量
+        // 设置实际出库量
         StreamX.from(outboundItemDOS).assemble(outboundSaveReqVO.getItemList(), WmsOutboundItemSaveReqVO::getProductId,WmsOutboundItemDO::getProductId,(a, b)->{
             a.setActualQty(b.getActualQty());
         });
         // 保存实际入库量
         outboundItemService.updateActualQuantity(BeanUtils.toBean(outboundItemDOS, WmsOutboundItemSaveReqVO.class));
-        // 同意确认收货
-        this.approve(WmsOutboundAuditStatus.Event.AGREE, approvalReqVO);
+
         // 完成收货
         this.approve(WmsOutboundAuditStatus.Event.FINISH, approvalReqVO);
         //

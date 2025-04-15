@@ -4,6 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.wms.WmsBaseTest;
+import cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo.WmsInventoryBinRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo.WmsInventoryBinSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.product.vo.WmsInventoryProductSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventoryRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventorySaveReqVO;
@@ -27,22 +29,39 @@ public class WmsInventoryTest extends WmsBaseTest {
 
     private final Long warehouseId = 32L;
 
-    @Test
-    public void testInventoryAll() {
-        // 创建与更新盘点单
-        WmsInventoryRespVO inventoryRespVO = testInventoryCreateAndUpdate();
-        // 设置盘点量
-        updateActualQuantity(inventoryRespVO);
 
-    }
 
+    /**
+     * 设置盘点量
+     **/
     private void updateActualQuantity(WmsInventoryRespVO inventoryRespVO) {
 
+        List<WmsInventoryBinSaveReqVO> saveReqVOS=new ArrayList<>();
+        int i=0;
+        for (WmsInventoryBinRespVO binItemVO : inventoryRespVO.getBinItemList()) {
 
+            WmsInventoryBinSaveReqVO saveReqVO = BeanUtils.toBean(binItemVO, WmsInventoryBinSaveReqVO.class);
+
+            int sign=i%3 - 1;
+
+            int actualQty=binItemVO.getExpectedQty()+sign;
+            saveReqVO.setActualQty(actualQty);
+
+            System.out.println(saveReqVO.getExpectedQty()+" -> "+saveReqVO.getActualQty());
+            i++;
+
+            saveReqVOS.add(saveReqVO);
+
+        }
+
+        this.inventoryClient().updateInventoryActualQuantity(saveReqVOS);
 
     }
 
 
+    /**
+     * 创建与更新盘点单
+     **/
     public WmsInventoryRespVO testInventoryCreateAndUpdate() {
 
 
@@ -116,13 +135,31 @@ public class WmsInventoryTest extends WmsBaseTest {
 
     }
 
+    @Test
+    public void testInventoryAll() {
+        // 创建与更新盘点单
+        WmsInventoryRespVO inventoryRespVO = testInventoryCreateAndUpdate();
+        // 提交盘点单
+        submit(inventoryRespVO.getId());
+        // 设置盘点量
+        updateActualQuantity(inventoryRespVO);
+        // 生效盘点单
+        agree(inventoryRespVO.getId());
+    }
 
+    private void submit(Long inventoryId) {
+        CommonResult<Boolean> result = this.inventoryClient().submit(inventoryId);
+    }
+
+    private void agree(Long inventoryId) {
+        CommonResult<Boolean> result = this.inventoryClient().agree(inventoryId);
+    }
 
 
     public static void main(String[] args) {
         WmsInventoryTest wmsInventoryTest = new WmsInventoryTest();
         wmsInventoryTest.setProfile(Profile.LOCAL);
-        // wmsInventoryTest.testMove();
+        wmsInventoryTest.testInventoryAll();
     }
 
 

@@ -416,6 +416,9 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     public WmsInboundDO createForInventory(WmsInboundSaveReqVO inboundSaveReqVO) {
 
         JdbcUtils.requireTransaction();
+
+        Map<Long,Integer> actualQtyMap = StreamX.from(inboundSaveReqVO.getItemList()).toMap(WmsInboundItemSaveReqVO::getProductId,WmsInboundItemSaveReqVO::getActualQty);
+
         // 创建
         WmsInboundDO inbound = this.createInbound(inboundSaveReqVO);
         // 保存
@@ -432,8 +435,8 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         // 拉取明细
         List<WmsInboundItemDO> inboundItemDOS = inboundItemService.selectByInboundId(inbound.getId());
         // 设置实际入库量
-        StreamX.from(inboundItemDOS).assemble(inboundSaveReqVO.getItemList(), WmsInboundItemSaveReqVO::getProductId,WmsInboundItemDO::getProductId,(a,b)->{
-           a.setActualQty(b.getActualQty());
+        StreamX.from(inboundItemDOS).assemble(actualQtyMap, WmsInboundItemDO::getProductId,(itemO,qty)->{
+            itemO.setActualQty(qty);
         });
         // 保存实际入库量
         inboundItemService.updateActualQuantity(BeanUtils.toBean(inboundItemDOS, WmsInboundItemSaveReqVO.class));

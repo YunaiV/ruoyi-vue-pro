@@ -32,10 +32,10 @@ import java.util.Objects;
 import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_ACTUAL_QTY_ERROR;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_BIN_EXISTS;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_BIN_INVENTORY_ID_DUPLICATE;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_BIN_NOT_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_BIN_QUANTITY_ERROR;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_CAN_NOT_EDIT;
 
 /**
@@ -186,8 +186,8 @@ public class WmsInventoryBinServiceImpl implements WmsInventoryBinService {
         List<WmsInventoryBinDO> inventoryBinDOSInDB = inventoryBinMapper.selectByIds(StreamX.from(updateReqVOList).toList(WmsInventoryBinSaveReqVO::getId));
         for (WmsInventoryBinDO itemDO : inventoryBinDOSInDB) {
             WmsInventoryBinSaveReqVO updateReqVO = updateReqVOMap.get(itemDO.getId());
-            if (updateReqVO.getActualQty() == null || updateReqVO.getActualQty() <= 0) {
-                throw exception(INBOUND_ITEM_ACTUAL_QTY_ERROR);
+            if (updateReqVO.getActualQty() == null || updateReqVO.getActualQty() < 0) {
+                throw exception(INVENTORY_BIN_QUANTITY_ERROR);
             }
             itemDO.setActualQty(updateReqVO.getActualQty());
         }

@@ -208,7 +208,7 @@ public interface ErrorCodeConstants {
     ErrorCode INVENTORY_NO_OUT_OF_BOUNDS = new ErrorCode(2_001_020_005, "盘点单单据号越界");
     ErrorCode INVENTORY_CAN_NOT_EDIT = new ErrorCode(2_001_020_006, "盘点单不允许编辑");
     ErrorCode INVENTORY_CAN_NOT_DELETE = new ErrorCode(2_001_020_007, "盘点单不允许删除");
-    ErrorCode INVENTORY_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_020_008, "盘点单不符合审批条件");
+
 
     // ========== WMS_INVENTORY_PRODUCT 库存盘点产品表 2_001_021_000 ==========
     ErrorCode INVENTORY_PRODUCT_NOT_EXISTS = new ErrorCode(2_001_021_001, "库存盘点产品不存在");
@@ -228,4 +228,5 @@ public interface ErrorCodeConstants {
     ErrorCode INVENTORY_BIN_INVENTORY_ID_DUPLICATE = new ErrorCode(2_001_022_003, "盘点单ID错误");
     ErrorCode INVENTORY_BIN_BE_REFERRED = new ErrorCode(2_001_022_004, "库位盘点被引用");
     ErrorCode INVENTORY_BIN_CAN_NOT_EDIT = new ErrorCode(2_001_022_005, "库位盘点不允许编辑");
-}
+    ErrorCode INVENTORY_BIN_QUANTITY_ERROR = new ErrorCode(2_001_022_006, "库位盘点数量错误");
+}

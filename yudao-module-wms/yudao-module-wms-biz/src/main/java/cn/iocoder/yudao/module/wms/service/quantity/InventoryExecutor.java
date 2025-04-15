@@ -1,14 +1,18 @@
 package cn.iocoder.yudao.module.wms.service.quantity;
 
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.pickup.item.vo.WmsPickupItemSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.pickup.vo.WmsPickupSaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.WmsInventoryDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.bin.WmsInventoryBinDO;
@@ -122,20 +126,21 @@ public class InventoryExecutor extends QuantityExecutor<InventoryContext> {
                 outboundItemSaveReqVO.setProductId(inventoryBinDO.getProductId());
                 outboundItemSaveReqVO.setPlanQty(deltaQty);
                 outboundItemSaveReqVO.setActualQty(deltaQty);
+                outboundItemSaveReqVO.setBinId(inventoryBinDO.getBinId());
                 outboundItemSaveReqVOList.add(outboundItemSaveReqVO);
 
             }
 
         }
 
-        // 如果有盘盈的货
+        // 如果有盘盈的货,执行入库和拣货
         if (!inboundItemSaveReqVOMap.isEmpty()) {
             executeInboundAndPickup(inventoryDO,new ArrayList<>(inboundItemSaveReqVOMap.values()),pickupItemSaveReqVOList);
         }
 
 
-        // 如果有盘盈的货
-        if (!inboundItemSaveReqVOMap.isEmpty()) {
+        // 如果有盘亏的货，执行出库
+        if (!outboundItemSaveReqVOList.isEmpty()) {
             executeOutbound(inventoryDO,outboundItemSaveReqVOList);
         }
 
@@ -189,8 +194,15 @@ public class InventoryExecutor extends QuantityExecutor<InventoryContext> {
         inboundSaveReqVO.setType(WmsInboundType.INVENTORY.getValue());
 
         // 执行入库
-        inboundService.createForInventory(inboundSaveReqVO);
+        WmsInboundDO inboundDO = inboundService.createForInventory(inboundSaveReqVO);
 
+        // 建立入库单与拣货单的对应关系
+        WmsInboundRespVO inbound = inboundService.getInboundWithItemList(inboundDO.getId());
+        Map<Long, WmsInboundItemRespVO> wmsInboundItemMap= StreamX.from(inbound.getItemList()).toMap(WmsInboundItemRespVO::getProductId);
+        StreamX.from(pickupItemSaveReqVOList).assemble(wmsInboundItemMap,WmsPickupItemSaveReqVO::getProductId,(saveReqVO,item)->{
+            saveReqVO.setInboundId(inboundDO.getId());
+            saveReqVO.setInboundItemId(item.getId());
+        });
         // 创建拣货单
         WmsPickupSaveReqVO pickupSaveReqVO = new WmsPickupSaveReqVO();
         pickupSaveReqVO.setWarehouseId(inventoryDO.getWarehouseId());
