@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.wms.stock.inventory;
+package cn.iocoder.yudao.module.wms.inventory;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -25,18 +25,32 @@ import java.util.Set;
 
 public class WmsInventoryTest extends WmsBaseTest {
 
+    private final Long warehouseId = 32L;
 
     @Test
-    public void testMove() {
+    public void testInventoryAll() {
+        // 创建与更新盘点单
+        WmsInventoryRespVO inventoryRespVO = testInventoryCreateAndUpdate();
+        // 设置盘点量
+        updateActualQuantity(inventoryRespVO);
 
-        Long warehouseId = 32L;
+    }
+
+    private void updateActualQuantity(WmsInventoryRespVO inventoryRespVO) {
+
+
+
+    }
+
+
+    public WmsInventoryRespVO testInventoryCreateAndUpdate() {
 
 
         // 确定测试的产品清单
-        CommonResult<PageResult<WmsStockBinRespVO>> stockBinPageResult = this.getStockBinPage(warehouseId);
+        CommonResult<PageResult<WmsStockBinRespVO>> stockBinPageResult = this.stockBinClient().getStockBinPage(warehouseId);
         if(stockBinPageResult.isError()) {
             System.err.println("缺少库存数据，无法继续测试");
-            return;
+            return null;
         }
 
         List<WmsStockBinRespVO> stockBinList = stockBinPageResult.getData().getList();
@@ -63,7 +77,7 @@ public class WmsInventoryTest extends WmsBaseTest {
             productSaveReqVOList.add(productSaveReqVO);
         }
         createReqVO.setProductItemList(productSaveReqVOList);
-        CommonResult<Long> postResult=createInventory(createReqVO);
+        CommonResult<Long> postResult=this.inventoryClient().createInventory(createReqVO);
 
         if(postResult.isError()) {
             Assert.assertTrue("创建盘点单失败",false);
@@ -71,7 +85,7 @@ public class WmsInventoryTest extends WmsBaseTest {
 
         Long inventoryId = postResult.getData();
 
-        CommonResult<WmsInventoryRespVO> inventoryResult = this.getInventory(inventoryId);
+        CommonResult<WmsInventoryRespVO> inventoryResult = this.inventoryClient().getInventory(inventoryId);
 
         WmsInventoryRespVO inventoryRespVO = inventoryResult.getData();
 
@@ -87,13 +101,18 @@ public class WmsInventoryTest extends WmsBaseTest {
             productSaveReqVO.setProductId(testProductId);
             updateReqVO.getProductItemList().add(productSaveReqVO);
         }
-        CommonResult<Boolean> updateResult = updateInventory(updateReqVO);
+        CommonResult<Boolean> updateResult = this.inventoryClient().updateInventory(updateReqVO);
+
         if(updateResult.isError()) {
             Assert.assertTrue("更新盘点单失败",false);
         }
 
-        System.out.println();
 
+        inventoryResult = this.inventoryClient().getInventory(inventoryId);
+
+        inventoryRespVO = inventoryResult.getData();
+
+        return inventoryRespVO;
 
     }
 
@@ -103,7 +122,7 @@ public class WmsInventoryTest extends WmsBaseTest {
     public static void main(String[] args) {
         WmsInventoryTest wmsInventoryTest = new WmsInventoryTest();
         wmsInventoryTest.setProfile(Profile.LOCAL);
-        wmsInventoryTest.testMove();
+        // wmsInventoryTest.testMove();
     }
 
 

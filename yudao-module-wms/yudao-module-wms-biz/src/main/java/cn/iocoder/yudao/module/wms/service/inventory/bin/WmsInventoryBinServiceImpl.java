@@ -11,9 +11,12 @@ import cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo.WmsInventor
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo.WmsInventoryBinSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinRespVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.WmsInventoryDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.bin.WmsInventoryBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.inventory.bin.WmsInventoryBinMapper;
+import cn.iocoder.yudao.module.wms.enums.inventory.WmsInventoryAuditStatus;
+import cn.iocoder.yudao.module.wms.service.inventory.WmsInventoryService;
 import cn.iocoder.yudao.module.wms.service.warehouse.bin.WmsWarehouseBinService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +29,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_ACTUAL_QTY_ERROR;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_BIN_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_BIN_INVENTORY_ID_DUPLICATE;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_BIN_NOT_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_CAN_NOT_EDIT;
 
 /**
  * 库位盘点 Service 实现类
@@ -49,6 +56,10 @@ public class WmsInventoryBinServiceImpl implements WmsInventoryBinService {
     @Autowired
     @Lazy
     private WmsWarehouseBinService warehouseBinService;
+
+    @Autowired
+    @Lazy
+    private WmsInventoryService inventoryService;
 
     /**
      * @sign : DE344227D83E204E
@@ -151,5 +162,37 @@ public class WmsInventoryBinServiceImpl implements WmsInventoryBinService {
         List<WmsWarehouseBinDO> binDOList = warehouseBinService.selectByIds(StreamX.from(binItemList).toList(WmsInventoryBinRespVO::getBinId).stream().distinct().toList());
         List<WmsWarehouseBinRespVO> binVOList = BeanUtils.toBean(binDOList, WmsWarehouseBinRespVO.class);
         StreamX.from(binItemList).assemble(binVOList, WmsWarehouseBinRespVO::getId, WmsInventoryBinRespVO::getBinId,WmsInventoryBinRespVO::setBin);
+    }
+
+    @Override
+    public void updateActualQuantity(List<WmsInventoryBinSaveReqVO> updateReqVOList) {
+
+        if (CollectionUtils.isEmpty(updateReqVOList)) {
+            return;
+        }
+        Set<Long> inventoryIds = StreamX.from(updateReqVOList).toSet(WmsInventoryBinSaveReqVO::getInventoryId);
+        if (inventoryIds.size() > 1) {
+            throw exception(INVENTORY_BIN_INVENTORY_ID_DUPLICATE);
+        }
+        Long inventoryId = inventoryIds.stream().findFirst().get();
+        WmsInventoryDO inventoryDO = inventoryService.validateInventoryExists(inventoryId);
+        WmsInventoryAuditStatus auditStatus = WmsInventoryAuditStatus.parse(inventoryDO.getAuditStatus());
+        // 除了审批中的情况，其它情况不允许修改实际盘点量
+        if (!auditStatus.matchAny(WmsInventoryAuditStatus.AUDITING)) {
+            throw exception(INVENTORY_CAN_NOT_EDIT);
+        }
+
+        Map<Long, WmsInventoryBinSaveReqVO> updateReqVOMap = StreamX.from(updateReqVOList).toMap(WmsInventoryBinSaveReqVO::getId);
+        List<WmsInventoryBinDO> inventoryBinDOSInDB = inventoryBinMapper.selectByIds(StreamX.from(updateReqVOList).toList(WmsInventoryBinSaveReqVO::getId));
+        for (WmsInventoryBinDO itemDO : inventoryBinDOSInDB) {
+            WmsInventoryBinSaveReqVO updateReqVO = updateReqVOMap.get(itemDO.getId());
+            if (updateReqVO.getActualQuantity() == null || updateReqVO.getActualQuantity() <= 0) {
+                throw exception(INBOUND_ITEM_ACTUAL_QTY_ERROR);
+            }
+            itemDO.setActualQuantity(updateReqVO.getActualQuantity());
+        }
+        // 保存
+        inventoryBinMapper.updateBatch(inventoryBinDOSInDB);
+
     }
 }

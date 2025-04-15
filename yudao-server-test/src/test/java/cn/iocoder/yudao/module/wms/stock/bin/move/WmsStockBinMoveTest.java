@@ -31,7 +31,7 @@ public class WmsStockBinMoveTest extends WmsBaseTest {
 
 
         // 确定从哪个仓位出哪个产品
-        CommonResult<PageResult<WmsStockBinRespVO>> stockBinPageResult = this.getStockBinPage(warehouseId);
+        CommonResult<PageResult<WmsStockBinRespVO>> stockBinPageResult = this.stockBinClient().getStockBinPage(warehouseId);
         if(stockBinPageResult.isError()) {
             System.err.println("缺少库存数据，无法继续测试");
             return;
@@ -46,7 +46,7 @@ public class WmsStockBinMoveTest extends WmsBaseTest {
         }
 
         // 找一个合适的目标仓位
-        CommonResult<List<WmsWarehouseBinSimpleRespVO>> binSimpleList = this.getBinSimpleList(warehouseId);
+        CommonResult<List<WmsWarehouseBinSimpleRespVO>> binSimpleList = this.warehouseBinClient().getBinSimpleList(warehouseId);
         WmsWarehouseBinSimpleRespVO toStockBin = null;
         for (WmsWarehouseBinSimpleRespVO wmsWarehouseBinSimpleRespVO : binSimpleList.getData()) {
             if(wmsWarehouseBinSimpleRespVO.getId().equals(fromStockBinVOBefore.getBinId())) {
@@ -58,7 +58,7 @@ public class WmsStockBinMoveTest extends WmsBaseTest {
 
         // 目标仓位库存情况
         WmsStockBinRespVO toStockBinVOBefore = null;
-        CommonResult<List<WmsStockBinRespVO>> toStockBinPageResult = this.getStockBin(warehouseId, toStockBin.getId(),fromStockBinVOBefore.getProductId());
+        CommonResult<List<WmsStockBinRespVO>> toStockBinPageResult = this.stockBinClient().getStockBin(warehouseId, toStockBin.getId(),fromStockBinVOBefore.getProductId());
         if(toStockBinPageResult.isError() || toStockBinPageResult.getData().isEmpty()) {
             toStockBinVOBefore = new WmsStockBinRespVO();
             toStockBinVOBefore.setProductId(fromStockBinVOBefore.getProductId());
@@ -80,15 +80,15 @@ public class WmsStockBinMoveTest extends WmsBaseTest {
         itemSaveReqVO.setToBinId(toStockBin.getId());
         itemSaveReqVO.setQty(qty);
         createReqVO.setItemList(List.of(itemSaveReqVO));
-        CommonResult<Long> postResult=createStockBinMove(createReqVO);
+        CommonResult<Long> postResult=this.stockBinClient().createStockBinMove(createReqVO);
 
         if(postResult.isError()) {
             Assert.assertTrue("创建库位库存移动失败",false);
         }
 
 
-        CommonResult<List<WmsStockBinRespVO>> fromStockBinResultAfter = getStockBin(warehouseId, fromStockBinVOBefore.getBinId(), fromStockBinVOBefore.getProductId());
-        CommonResult<List<WmsStockBinRespVO>> toStockBinResultAfter = getStockBin(warehouseId, toStockBinVOBefore.getBinId(), toStockBinVOBefore.getProductId());
+        CommonResult<List<WmsStockBinRespVO>> fromStockBinResultAfter = this.stockBinClient().getStockBin(warehouseId, fromStockBinVOBefore.getBinId(), fromStockBinVOBefore.getProductId());
+        CommonResult<List<WmsStockBinRespVO>> toStockBinResultAfter = this.stockBinClient().getStockBin(warehouseId, toStockBinVOBefore.getBinId(), toStockBinVOBefore.getProductId());
 
         WmsStockBinRespVO fromStockBinVOAfter = fromStockBinResultAfter.getData().get(0);
         WmsStockBinRespVO toStockBinVOAfter = toStockBinResultAfter.getData().get(0);

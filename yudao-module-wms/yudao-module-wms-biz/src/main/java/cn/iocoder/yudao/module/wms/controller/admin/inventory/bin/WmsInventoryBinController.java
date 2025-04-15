@@ -1,11 +1,22 @@
 package cn.iocoder.yudao.module.wms.controller.admin.inventory.bin;
 
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
+import cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo.WmsInventoryBinSaveReqVO;
 import cn.iocoder.yudao.module.wms.service.inventory.bin.WmsInventoryBinService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "库位盘点")
 @RestController
@@ -36,6 +47,15 @@ public class WmsInventoryBinController {
 //        inventoryBinService.updateInventoryBin(updateReqVO);
 //        return success(true);
 //    }
+
+    @PutMapping("/update-actual-quantity")
+    @Operation(summary = "设置实际库存量")
+    @PreAuthorize("@ss.hasPermission('wms:inventory-bin:update')")
+    public CommonResult<Boolean> updateActualQuantity(@Validated(ValidationGroup.update.class) @RequestBody List<WmsInventoryBinSaveReqVO> updateReqVOList) {
+        inventoryBinService.updateActualQuantity(updateReqVOList);
+        return success(true);
+    }
+
 //
 //    @DeleteMapping("/delete")
 //    @Operation(summary = "删除库位盘点")

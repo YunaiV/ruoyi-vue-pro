@@ -18,12 +18,30 @@ import java.util.Objects;
 @Getter
 public enum WmsInboundAuditStatus implements ArrayValuable<Integer>, DictEnum {
 
-    DRAFT(0, "起草中"),
-    AUDITING(1, "待审批"),
-    REJECT(2, "已驳回"),
-    PASS(3, "已通过"),
-    FORCE_FINISHED(4, "强制完成"),
-    ABANDONED(5, "已作废"),
+    /**
+     * 0:起草中
+     **/
+    DRAFT(0, "草稿"),
+    /**
+     * 1:待审批
+     **/
+    AUDITING(1, "待入库"),
+    /**
+     * 2:已驳回
+     **/
+    REJECT(2, "驳回"),
+    /**
+     * 3:已通过
+     **/
+    PASS(3, "已入库"),
+    /**
+     * 4:强制完成
+     **/
+    FORCE_FINISHED(4, "强制入库"),
+    /**
+     * 5:已作废
+     **/
+    ABANDONED(5, "作废"),
    ;
 
     public static final Integer[] VALUES = Arrays.stream(values()).map(WmsInboundAuditStatus::getValue).toArray(Integer[]::new);

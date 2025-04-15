@@ -30,7 +30,7 @@ public class WmsStockOwnershipMoveTest extends WmsBaseTest {
 
 
         // 确定从哪个所有者库存出哪个产品
-        CommonResult<PageResult<WmsStockOwnershipRespVO>> stockOwnershipPageResult = this.getStockOwnershipPage(warehouseId);
+        CommonResult<PageResult<WmsStockOwnershipRespVO>> stockOwnershipPageResult = this.stockOwnershipClient().getStockOwnershipPage(warehouseId);
         if(stockOwnershipPageResult.isError()) {
             System.err.println("缺少库存数据，无法继续测试");
             return;
@@ -75,15 +75,15 @@ public class WmsStockOwnershipMoveTest extends WmsBaseTest {
         itemSaveReqVO.setQty(qty);
 
         createReqVO.setItemList(List.of(itemSaveReqVO));
-        CommonResult<Long> postResult=createStockOwnershipMove(createReqVO);
+        CommonResult<Long> postResult=this.stockOwnershipClient().createStockOwnershipMove(createReqVO);
 
         if(postResult.isError()) {
             Assert.assertTrue("创建所有者库存移动失败",false);
         }
 
 
-        CommonResult<List<WmsStockOwnershipRespVO>> fromStockOwnershipResultAfter = getStockOwnership(warehouseId, fromStockOwnershipVOBefore.getCompanyId(),fromStockOwnershipVOBefore.getDeptId(), fromStockOwnershipVOBefore.getProductId());
-        CommonResult<List<WmsStockOwnershipRespVO>> toStockOwnershipResultAfter = getStockOwnership(warehouseId, toStockOwnershipBefore.getCompanyId(),toStockOwnershipBefore.getDeptId(), fromStockOwnershipVOBefore.getProductId());
+        CommonResult<List<WmsStockOwnershipRespVO>> fromStockOwnershipResultAfter = this.stockOwnershipClient().getStockOwnership(warehouseId, fromStockOwnershipVOBefore.getCompanyId(),fromStockOwnershipVOBefore.getDeptId(), fromStockOwnershipVOBefore.getProductId());
+        CommonResult<List<WmsStockOwnershipRespVO>> toStockOwnershipResultAfter = this.stockOwnershipClient().getStockOwnership(warehouseId, toStockOwnershipBefore.getCompanyId(),toStockOwnershipBefore.getDeptId(), fromStockOwnershipVOBefore.getProductId());
 
         WmsStockOwnershipRespVO fromStockOwnershipVOAfter = fromStockOwnershipResultAfter.getData().get(0);
         WmsStockOwnershipRespVO toStockOwnershipVOAfter = toStockOwnershipResultAfter.getData().get(0);

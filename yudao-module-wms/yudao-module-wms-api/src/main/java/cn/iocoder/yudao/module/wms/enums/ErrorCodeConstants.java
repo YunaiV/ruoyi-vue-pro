@@ -224,6 +224,7 @@ public interface ErrorCodeConstants {
     ErrorCode INVENTORY_BIN_NOT_EXISTS = new ErrorCode(2_001_022_001, "库位盘点不存在");
     ErrorCode INVENTORY_BIN_EXISTS = new ErrorCode(2_001_022_002, "库位盘点已存在");
     ErrorCode INVENTORY_BIN_INVENTORY_ID_BIN_ID_PRODUCT_ID_DUPLICATE = new ErrorCode(2_001_022_003, "盘点结果单ID,仓位ID,产品ID已存在");
+    ErrorCode INVENTORY_BIN_INVENTORY_ID_DUPLICATE = new ErrorCode(2_001_022_003, "盘点单ID错误");
     ErrorCode INVENTORY_BIN_BE_REFERRED = new ErrorCode(2_001_022_004, "库位盘点被引用");
     ErrorCode INVENTORY_BIN_CAN_NOT_EDIT = new ErrorCode(2_001_022_005, "库位盘点不允许编辑");
 }

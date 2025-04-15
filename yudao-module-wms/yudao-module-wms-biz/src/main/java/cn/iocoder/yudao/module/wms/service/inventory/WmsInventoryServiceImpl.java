@@ -258,7 +258,7 @@ public class WmsInventoryServiceImpl implements WmsInventoryService {
     /**
      * @sign : CCF673C00F6357F0
      */
-    private WmsInventoryDO validateInventoryExists(Long id) {
+    public WmsInventoryDO validateInventoryExists(Long id) {
         WmsInventoryDO inventory = inventoryMapper.selectById(id);
         if (inventory == null) {
             throw exception(INVENTORY_NOT_EXISTS);

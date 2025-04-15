@@ -64,4 +64,6 @@ public interface WmsInventoryBinService {
     void assembleProduct(List<WmsInventoryBinRespVO> binItemList);
 
     void assembleBin(List<WmsInventoryBinRespVO> binItemList);
+
+    void updateActualQuantity(List<WmsInventoryBinSaveReqVO> updateReqVOList);
 }
