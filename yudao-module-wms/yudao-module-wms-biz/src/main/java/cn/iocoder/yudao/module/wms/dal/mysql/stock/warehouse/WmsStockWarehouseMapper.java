@@ -73,4 +73,11 @@ public interface WmsStockWarehouseMapper extends BaseMapperX<WmsStockWarehouseDO
         wrapper.eq(WmsStockWarehouseDO::getWarehouseId, warehouseId);
         return selectList(wrapper);
     }
+
+    default List<WmsStockWarehouseDO> getByProductIds(Long warehouseId, List<Long> productIds) {
+        LambdaQueryWrapperX<WmsStockWarehouseDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eqIfPresent(WmsStockWarehouseDO::getWarehouseId, warehouseId);
+        wrapper.in(WmsStockWarehouseDO::getProductId, productIds);
+        return selectList(wrapper);
+    }
 }

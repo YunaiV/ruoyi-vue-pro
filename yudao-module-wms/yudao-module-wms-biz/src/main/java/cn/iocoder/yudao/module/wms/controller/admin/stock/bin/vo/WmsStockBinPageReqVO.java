@@ -50,4 +50,30 @@ public class WmsStockBinPageReqVO extends PageParam {
 
     @Schema(description = "可售量，未被单据占用的良品数量", example = "")
     private Integer[] sellableQty;
+
+
+
+    @Schema(description = "仓库库存-可用量，在库的良品数量", example = "")
+    private Integer[] warehouseAvailableQty;
+
+    @Schema(description = "仓库库存-不良品数量", example = "")
+    private Integer[] warehouseDefectiveQty;
+
+    @Schema(description = "仓库库存-待出库量", example = "")
+    private Integer[] warehouseOutboundPendingQty;
+
+    @Schema(description = "仓库库存-采购计划量", example = "")
+    private Integer[] warehousePurchasePlanQty;
+
+    @Schema(description = "仓库库存-采购在途量", example = "")
+    private Integer[] warehousePurchaseTransitQty;
+
+    @Schema(description = "仓库库存-退件在途数量", example = "")
+    private Integer[] warehouseReturnTransitQty;
+
+    @Schema(description = "仓库库存-可售量，未被单据占用的良品数量", example = "")
+    private Integer[] warehouseSellableQty;
+
+    @Schema(description = "仓库库存-待上架数量，上架是指从拣货区上架到货架", example = "")
+    private Integer[] warehouseShelvingPendingQty;
 }

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.wms.controller.admin.stock.bin;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespBinVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
@@ -96,6 +97,21 @@ public class WmsStockBinController {
         // 返回
         return success(voPageResult);
     }
+
+    @PostMapping("/grouped-page")
+    @Operation(summary = "获得按产品分组的仓位库存分页")
+    @PreAuthorize("@ss.hasPermission('wms:stock-bin:query')")
+    public CommonResult<PageResult<WmsProductRespBinVO>> getGroupedStockBinPage(@Valid @RequestBody WmsStockBinPageReqVO pageReqVO) {
+        // 查询数据
+        PageResult<WmsProductRespBinVO> voPageResult = stockBinService.getGroupedStockBinPage(pageReqVO);
+
+        stockBinService.assembleDept(voPageResult.getList());
+        stockBinService.assembleStockWarehouseList(pageReqVO.getWarehouseId(),voPageResult.getList());
+        // 返回
+        return success(voPageResult);
+    }
+
+
     // @GetMapping("/export-excel")
     // @Operation(summary = "导出仓位库存 Excel")
     // @PreAuthorize("@ss.hasPermission('wms:stock-bin:export')")
@@ -107,3 +123,4 @@ public class WmsStockBinController {
     // ExcelUtils.write(response, "仓位库存.xls", "数据", WmsStockBinRespVO.class, BeanUtils.toBean(list, WmsStockBinRespVO.class));
     // }
 }
+

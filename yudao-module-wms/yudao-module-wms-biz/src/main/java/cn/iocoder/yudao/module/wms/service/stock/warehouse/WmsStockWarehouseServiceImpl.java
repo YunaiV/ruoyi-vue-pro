@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.stock.warehouse;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
@@ -252,5 +253,13 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
     @Override
     public List<WmsStockWarehouseDO> selectByWarehouse(Long warehouseId) {
         return stockWarehouseMapper.selectByWarehouse(warehouseId);
+    }
+
+    @Override
+    public List<WmsStockWarehouseDO> getByProductIds(Long warehouseId, List<Long> productIds) {
+        if(CollectionUtils.isEmpty(productIds)) {
+            return List.of();
+        }
+        return stockWarehouseMapper.getByProductIds(warehouseId,productIds);
     }
 }

@@ -6,17 +6,25 @@ import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespBinVO;
 import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehouseRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsWarehouseProductVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.product.WmsProductDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.bin.WmsStockBinMapper;
+import cn.iocoder.yudao.module.wms.dal.mysql.stock.bin.WmsStockBinProductMapper;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.stock.flow.WmsStockFlowService;
 import cn.iocoder.yudao.module.wms.service.stock.ownership.WmsStockOwnershipService;
@@ -30,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -51,6 +60,9 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
 
     @Resource
     private WmsStockBinMapper stockBinMapper;
+
+    @Resource
+    private WmsStockBinProductMapper stockBinProductMapper;
 
     @Resource
     WmsStockFlowService stockFlowService;
@@ -76,6 +88,9 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
 
     @Resource
     private ErpProductApi productApi;
+
+    @Resource
+    private DeptApi deptApi;
 
     /**
      * @sign : 1D6010DA80E2C817
@@ -279,6 +294,62 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
      **/
     public List<WmsStockBinDO> selectBinsByInboundItemId(Long warehouseId, Long productId, Long inboundItemId) {
         return stockBinMapper.selectBinsByInboundItemId(warehouseId, productId, inboundItemId);
+    }
+
+    @Override
+    public PageResult<WmsProductRespBinVO> getGroupedStockBinPage(WmsStockBinPageReqVO pageReqVO) {
+        PageResult<WmsProductDO> doPageResult = stockBinProductMapper.getGroupedStockBinPage(pageReqVO);
+        PageResult<WmsProductRespBinVO> voPageResult = BeanUtils.toBean(doPageResult, WmsProductRespBinVO.class);
+        return voPageResult;
+    }
+
+
+    @Override
+    public void assembleDept(List<WmsProductRespBinVO> list) {
+        Map<Long, DeptRespDTO> deptDTOMap = deptApi.getDeptMap(StreamX.from(list).map(WmsProductRespBinVO::getDeptId).toList());
+        Map<Long, DeptSimpleRespVO> deptVOMap = new HashMap<>();
+        for (DeptRespDTO productDTO : deptDTOMap.values()) {
+            DeptSimpleRespVO deptVO = BeanUtils.toBean(productDTO, DeptSimpleRespVO.class);
+            deptVOMap.put(productDTO.getId(), deptVO);
+        }
+        StreamX.from(list).assemble(deptVOMap, WmsProductRespBinVO::getDeptId, WmsProductRespBinVO::setDept);
+    }
+
+
+    @Override
+    public void assembleStockWarehouseList(Long warehouseId, List<WmsProductRespBinVO> list) {
+
+        // 查询仓库库存
+        List<WmsStockWarehouseDO> stockWarehouseDOList = stockWarehouseService.getByProductIds(warehouseId,StreamX.from(list).toList(WmsProductRespBinVO::getId));
+        List<WmsStockWarehouseRespVO> stockWarehouseVOList = BeanUtils.toBean(stockWarehouseDOList, WmsStockWarehouseRespVO.class);
+
+        // 查询仓位库存
+        List<WmsWarehouseProductVO> warehouseProductList = new ArrayList<>();
+        for (WmsStockWarehouseRespVO simpleRespVO : stockWarehouseVOList) {
+            warehouseProductList.add(WmsWarehouseProductVO.builder().warehouseId(simpleRespVO.getWarehouseId()).productId(simpleRespVO.getProductId()).build());
+        }
+        List<WmsStockBinRespVO> stockBinList = this.selectStockBinList(warehouseProductList, false);
+        Map<String,List<WmsStockBinRespVO>> stockBinMap = StreamX.from(stockBinList).groupBy(e -> e.getWarehouseId()+"-"+e.getProductId());
+        StreamX.from(stockWarehouseVOList).assemble(stockBinMap, e->  e.getWarehouseId()+"-"+e.getProductId() , WmsStockWarehouseRespVO::setStockBinList);
+
+        // 装配仓库
+        Map<Long, WmsWarehouseDO> warehouseDOMap = warehouseService.getWarehouseMap(StreamX.from(stockWarehouseVOList).toSet(WmsStockWarehouseRespVO::getWarehouseId));
+        Map<Long, WmsWarehouseSimpleRespVO> warehouseVOMap = StreamX.from(warehouseDOMap.values())
+            .toMap(WmsWarehouseDO::getId, v-> BeanUtils.toBean(v, WmsWarehouseSimpleRespVO.class));
+        StreamX.from(stockWarehouseVOList).assemble(warehouseVOMap, WmsStockWarehouseRespVO::getWarehouseId, WmsStockWarehouseRespVO::setWarehouse);
+
+
+
+
+
+        // 仓库按产品分组
+        Map<Long, List<WmsStockWarehouseRespVO>> stockWarehouseMap = StreamX.from(stockWarehouseVOList).groupBy(v->v.getProductId());
+
+
+
+        // 装配仓库库存清单
+        StreamX.from(list).assemble(stockWarehouseMap, WmsProductRespBinVO::getId, WmsProductRespBinVO::setStockWarehouseList);
+
     }
 
 

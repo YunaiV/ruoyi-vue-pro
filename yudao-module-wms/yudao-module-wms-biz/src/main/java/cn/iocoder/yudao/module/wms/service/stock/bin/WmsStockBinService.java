@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.stock.bin;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespBinVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinSaveReqVO;
@@ -86,4 +87,10 @@ public interface WmsStockBinService {
      **/
     List<WmsStockBinDO> selectBinsByInboundItemId(Long warehouseId, Long productId, Long inboundItemId);
 
+
+    PageResult<WmsProductRespBinVO> getGroupedStockBinPage(@Valid WmsStockBinPageReqVO pageReqVO);
+
+    void assembleDept(List<WmsProductRespBinVO> list);
+
+    void assembleStockWarehouseList(Long warehouseId,List<WmsProductRespBinVO> list);
 }

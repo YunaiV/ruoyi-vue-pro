@@ -68,4 +68,6 @@ public interface WmsStockWarehouseService {
     void assembleStockBin(List<WmsStockWarehouseRespVO> list);
 
     List<WmsStockWarehouseDO> selectByWarehouse(@NotNull(message = "仓库ID不能为空") Long warehouseId);
+
+    List<WmsStockWarehouseDO> getByProductIds(Long warehouseId, List<Long> list);
 }

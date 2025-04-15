@@ -279,6 +279,7 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
         StreamX.from(itemList).assemble(productVOMap, WmsInboundItemRespVO::getProductId, WmsInboundItemRespVO::setProduct);
     }
 
+
     @Override
     public void assembleDept(List<WmsInboundItemRespVO> list) {
         Map<Long, DeptRespDTO> deptDTOMap = deptApi.getDeptMap(StreamX.from(list).map(WmsInboundItemRespVO::getDeptId).toList());
