@@ -62,7 +62,6 @@
         <root level="INFO">
             <appender-ref ref="STDOUT"/>
             <appender-ref ref="GRPC"/> <!-- 本地环境下，如果不想接入 SkyWalking 日志服务，可以注释掉本行 -->
-            <appender-ref ref="ASYNC"/>  <!-- 本地环境下，如果不想打印日志，可以注释掉本行 -->
         </root>
     </springProfile>
     <!-- 其它环境 -->

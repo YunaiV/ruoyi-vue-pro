@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
  * @author HUIHUI
  */
 @Repository
+@SuppressWarnings("all")
 public class ErpNoRedisDAO {
 
     /**

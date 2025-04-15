@@ -9,6 +9,7 @@ import com.somle.eccang.model.EccangResponse;
 import com.somle.eccang.model.EccangWMSResponse;
 import com.somle.eccang.model.EccangWMSToken;
 import com.somle.eccang.model.req.EccangAsnListReqVo;
+import com.somle.eccang.model.req.EccangProductInventoryReqVo;
 import com.somle.eccang.model.req.EccangSpecialOrdersReqVo;
 import com.somle.eccang.repository.EccangWMSTokenRepository;
 import jakarta.annotation.PostConstruct;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import java.util.stream.Stream;
 
 
@@ -71,6 +73,18 @@ public class EccangWMSService {
             page -> {
                 eccangAsnListReqVo.setPage(page.getPage() + 1);
                 return getPage(JsonUtilsX.toJSONObject(eccangAsnListReqVo), endpoint);
+            }
+        );
+    }
+
+    public Stream<EccangResponse.EccangPage> streamProductInventory(EccangProductInventoryReqVo eccangProductInventoryReqVo) {
+        String endpoint = "getProductInventory";
+        return StreamX.iterate(
+            getPage(JsonUtilsX.toJSONObject(eccangProductInventoryReqVo), endpoint),
+            page -> page.hasNext(),
+            page -> {
+                eccangProductInventoryReqVo.setPage(page.getPage() + 1);
+                return getPage(JsonUtilsX.toJSONObject(eccangProductInventoryReqVo), endpoint);
             }
         );
     }

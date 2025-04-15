@@ -3,7 +3,7 @@ package com.somle.esb.handler;
 import cn.iocoder.yudao.framework.common.enums.enums.DictTypeConstants;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
-import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.ErpCustomRuleDTO;
+import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.TmsCustomRuleDTO;
 import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.service.EccangService;
 import com.somle.esb.converter.ErpToEccangConverter;
@@ -47,7 +47,7 @@ public class ErpCustomRuleHandler {
      * @Param [message]
      **/
     @ServiceActivator(inputChannel = "erpCustomRuleChannel")
-    public void syncCustomRulesToEccang(@Payload List<ErpCustomRuleDTO> customRules) {
+    public void syncCustomRulesToEccang(@Payload List<TmsCustomRuleDTO> customRules) {
         List<EccangProduct> eccangProducts = erpToEccangConverter.convertByErpCustomDTOs(processRules(customRules));
         eccangProducts.forEach(eccangProduct -> eccangService.addBatchProduct(List.of(eccangProduct)));
         log.info("syncCustomRuleToEccang end ,sku={{}}", eccangProducts.stream().map(EccangProduct::getProductSku).toList());
@@ -61,7 +61,7 @@ public class ErpCustomRuleHandler {
      * @Param [message]
      **/
     @ServiceActivator(inputChannel = "erpCustomRuleChannel")
-    public void syncCustomRulesToKingdee(@Payload List<ErpCustomRuleDTO> customRules) {
+    public void syncCustomRulesToKingdee(@Payload List<TmsCustomRuleDTO> customRules) {
         List<KingdeeProductSaveReqVO> kingdee = erpToKingdeeConverter.convert(processRules(customRules));
         kingdee.forEach(kingdeeService::addProduct);
         log.info("syncCustomRuleToKingdee end,skus={{}}}", kingdee.stream().map(KingdeeProductSaveReqVO::getNumber).toList());
@@ -72,10 +72,10 @@ public class ErpCustomRuleHandler {
      * 复制 countryCode 为 CN 字典映射值的对象，添加到list中。相当于含有CN的规则，那么list就多一个无国别规则。
      *
      * @param customRules 原始海关规则列表
-     * @return 处理后的海关规则列表 List<ErpCustomRuleDTO>
+     * @return 处理后的海关规则列表 List<TmsCustomRuleDTO>
      */
-    private List<ErpCustomRuleDTO> processRules(List<ErpCustomRuleDTO> customRules) {
-        CopyOnWriteArrayList<ErpCustomRuleDTO> processedRules = new CopyOnWriteArrayList<>(customRules);
+    private List<TmsCustomRuleDTO> processRules(List<TmsCustomRuleDTO> customRules) {
+        CopyOnWriteArrayList<TmsCustomRuleDTO> processedRules = new CopyOnWriteArrayList<>(customRules);
         customRules.stream()
             .filter(customRule -> customRule.getCountryCode() != null)
             .forEach(customRule -> Optional.ofNullable(dictDataApi.parseDictData(DictTypeConstants.COUNTRY_CODE, "CN"))
@@ -84,8 +84,8 @@ public class ErpCustomRuleHandler {
                     Integer countryCode = Integer.valueOf(value);
                     if (customRule.getCountryCode().equals(countryCode)) {
                         //当前存在国家是CN的数据
-                        ErpCustomRuleDTO bean = BeanUtils.toBean(customRule, ErpCustomRuleDTO.class);
-                        processedRules.add(BeanUtils.toBean(bean.setCountryCode(null), ErpCustomRuleDTO.class));
+                        TmsCustomRuleDTO bean = BeanUtils.toBean(customRule, TmsCustomRuleDTO.class);
+                        processedRules.add(BeanUtils.toBean(bean.setCountryCode(null), TmsCustomRuleDTO.class));
                     }
                 }));
         return processedRules;

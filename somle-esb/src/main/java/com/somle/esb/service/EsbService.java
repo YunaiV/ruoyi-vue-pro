@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import com.somle.esb.model.OssData;
 import com.somle.shopify.service.ShopifyService;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ import java.net.Proxy;
 @Service
 public class EsbService {
 
-    @Autowired
+    @Resource
     MessageChannel dataChannel;
 
     @Autowired

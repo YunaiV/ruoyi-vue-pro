@@ -16,7 +16,7 @@ import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.ErpCustomRuleDTO;
+import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.TmsCustomRuleDTO;
 import com.somle.eccang.model.EccangCategory;
 import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.service.EccangService;
@@ -53,7 +53,7 @@ public class ErpToEccangConverter {
      * @param customRuleDTOs ERP产品列表
      * @return 转换后的Eccang产品列表
      */
-    public List<EccangProduct> convertByErpCustomDTOs(List<ErpCustomRuleDTO> customRuleDTOs) {
+    public List<EccangProduct> convertByErpCustomDTOs(List<TmsCustomRuleDTO> customRuleDTOs) {
         Map<Long, AdminUserRespDTO> userMap = userApi.getUserMap(convertSet(customRuleDTOs, erpCustomRuleDTO -> Long.parseLong(erpCustomRuleDTO.getProductDTO().getCreator())));
         return customRuleDTOs.stream()
             .map(product -> customRuleToProduct(product, userMap))
@@ -80,7 +80,7 @@ public class ErpToEccangConverter {
      * @param userMap       用户信息映射
      * @return 转换后的Eccang产品对象
      */
-    private EccangProduct customRuleToProduct(ErpCustomRuleDTO customRuleDTO, Map<Long, AdminUserRespDTO> userMap) {
+    private EccangProduct customRuleToProduct(TmsCustomRuleDTO customRuleDTO, Map<Long, AdminUserRespDTO> userMap) {
         EccangProduct eccangProduct = setDefaultValue(new EccangProduct());
         ErpProductDTO productDTO = customRuleDTO.getProductDTO();
         eccangProduct.setPdDeclarationStatement(String.valueOf(customRuleDTO.getId()));

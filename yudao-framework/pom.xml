@@ -31,7 +31,7 @@
         <module>yudao-spring-boot-starter-biz-tenant</module>
         <module>yudao-spring-boot-starter-biz-data-permission</module>
         <module>yudao-spring-boot-starter-biz-ip</module>
-
+        <module>yudao-spring-boot-starter-template</module>
     </modules>
 
     <artifactId>yudao-framework</artifactId>
