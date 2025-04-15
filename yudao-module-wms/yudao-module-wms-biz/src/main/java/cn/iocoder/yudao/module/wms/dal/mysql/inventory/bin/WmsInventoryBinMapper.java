@@ -21,8 +21,8 @@ public interface WmsInventoryBinMapper extends BaseMapperX<WmsInventoryBinDO> {
 				.eqIfPresent(WmsInventoryBinDO::getInventoryId, reqVO.getInventoryId())
 				.eqIfPresent(WmsInventoryBinDO::getProductId, reqVO.getProductId())
 				.eqIfPresent(WmsInventoryBinDO::getExpectedQty, reqVO.getExpectedQty())
-				.eqIfPresent(WmsInventoryBinDO::getActualQuantity, reqVO.getActualQuantity())
-				.eqIfPresent(WmsInventoryBinDO::getNotes, reqVO.getNotes())
+				.eqIfPresent(WmsInventoryBinDO::getActualQty, reqVO.getActualQty())
+				.eqIfPresent(WmsInventoryBinDO::getRemark, reqVO.getRemark())
 				.betweenIfPresent(WmsInventoryBinDO::getCreateTime, reqVO.getCreateTime())
 				.orderByDesc(WmsInventoryBinDO::getId));
     }
@@ -41,4 +41,4 @@ public interface WmsInventoryBinMapper extends BaseMapperX<WmsInventoryBinDO> {
     default List<WmsInventoryBinDO> selectByInventoryId(Long id) {
         return selectList(WmsInventoryBinDO::getInventoryId, id);
     }
-}
+}

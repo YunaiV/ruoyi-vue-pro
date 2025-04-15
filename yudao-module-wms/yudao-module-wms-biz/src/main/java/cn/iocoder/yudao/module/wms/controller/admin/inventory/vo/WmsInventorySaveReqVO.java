@@ -10,7 +10,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * @table-fields : no,creator_notes,id,audit_status,warehouse_id
+ * @table-fields : no,audit_status,id,creator_remark,warehouse_id
  */
 @Schema(description = "管理后台 - 盘点新增/修改 Request VO")
 @Data
@@ -26,16 +26,16 @@ public class WmsInventorySaveReqVO {
     @NotNull(message = "仓库ID不能为空")
     private Long warehouseId;
 
-    @Schema(description = "盘点单审批状态 ; WmsInventoryAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @Schema(description = "WMS盘点单审批状态 ; WmsInventoryAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @InEnum(WmsInventoryAuditStatus.class)
     private Integer auditStatus;
-
-    @Schema(description = "创建者备注")
-    private String creatorNotes;
 
     @Schema(description = "产品详情清单", example = "")
     private List<WmsInventoryProductSaveReqVO> productItemList;
 
     @Schema(description = "库位详情清单", example = "")
     private List<WmsInventoryBinSaveReqVO> binItemList;
+
+    @Schema(description = "创建者备注", example = "")
+    private String creatorRemark;
 }

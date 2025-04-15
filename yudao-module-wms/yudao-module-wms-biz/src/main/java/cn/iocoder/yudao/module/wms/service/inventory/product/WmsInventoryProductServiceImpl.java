@@ -16,12 +16,10 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_PRODUCT_EXISTS;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_PRODUCT_NOT_EXISTS;
@@ -40,6 +38,7 @@ public class WmsInventoryProductServiceImpl implements WmsInventoryProductServic
 
     @Resource
     private ErpProductApi productApi;
+
     /**
      * @sign : 71250103111E09A9
      */
@@ -134,4 +133,4 @@ public class WmsInventoryProductServiceImpl implements WmsInventoryProductServic
         }
         StreamX.from(inventoryProductList).assemble(productVOMap, WmsInventoryProductRespVO::getProductId, WmsInventoryProductRespVO::setProduct);
     }
-}
+}

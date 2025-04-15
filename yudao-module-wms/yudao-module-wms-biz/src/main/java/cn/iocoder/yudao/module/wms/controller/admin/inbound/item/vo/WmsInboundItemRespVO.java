@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,outbound_available_qty,creator,inbound_status,notes,company_id,create_time,plan_qty,shelved_qty,latest_flow_id,updater,inbound_id,source_item_id,update_time,actual_qty,product_id,id,dept_id
+ * @table-fields : tenant_id,outbound_available_qty,creator,inbound_status,company_id,create_time,plan_qty,shelved_qty,remark,latest_flow_id,updater,inbound_id,source_item_id,update_time,actual_qty,product_id,id,dept_id
  */
 @Schema(description = "管理后台 - 入库单详情 Response VO")
 @Data
@@ -78,8 +78,8 @@ public class WmsInboundItemRespVO {
     @ExcelProperty("产品")
     private WmsProductRespSimpleVO product;
 
-    @Schema(description = "入库状态 ; WmsInboundStatus : 0-未入库 , 1-部分入库 , 2-已入库", example = "")
-    @ExcelProperty("入库状态")
+    @Schema(description = "WMS入库状态 ; WmsInboundStatus : 0-未入库 , 1-部分入库 , 2-已入库", example = "")
+    @ExcelProperty("WMS入库状态")
     private Integer inboundStatus;
 
     @Schema(description = "入库单", example = "")
@@ -120,10 +120,6 @@ public class WmsInboundItemRespVO {
     @ExcelProperty("库存归属部门ID")
     private Long deptId;
 
-    @Schema(description = "备注", example = "")
-    @ExcelProperty("备注")
-    private String notes;
-
     @Schema(description = "部门", example = "")
     @ExcelProperty("部门")
     private DeptSimpleRespVO dept;
@@ -131,4 +127,8 @@ public class WmsInboundItemRespVO {
     @Schema(description = "库存财务公司ID", example = "")
     @ExcelProperty("库存财务公司ID")
     private Long companyId;
+
+    @Schema(description = "备注", example = "")
+    @ExcelProperty("备注")
+    private String remark;
 }

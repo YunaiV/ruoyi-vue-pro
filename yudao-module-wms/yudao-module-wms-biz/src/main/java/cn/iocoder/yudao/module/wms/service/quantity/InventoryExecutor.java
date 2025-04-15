@@ -90,7 +90,7 @@ public class InventoryExecutor extends QuantityExecutor<InventoryContext> {
 
         // 循环盘点明细
         for (WmsInventoryBinDO inventoryBinDO : wmsInventoryBinDOList) {
-            int deltaQty = inventoryBinDO.getActualQuantity() - inventoryBinDO.getExpectedQty();
+            int deltaQty = inventoryBinDO.getActualQty() - inventoryBinDO.getExpectedQty();
 
             // 如果盘赢，形成入库单+拣货单
             if (deltaQty > 0) {

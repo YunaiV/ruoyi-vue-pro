@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : outbound_available_qty,inbound_status,notes,company_id,create_time,plan_qty,shelved_qty,latest_flow_id,inbound_id,source_item_id,actual_qty,product_id,dept_id
+ * @table-fields : outbound_available_qty,inbound_status,company_id,create_time,plan_qty,shelved_qty,remark,latest_flow_id,inbound_id,source_item_id,actual_qty,product_id,dept_id
  */
 @Schema(description = "管理后台 - 入库单详情分页 Request VO")
 @Data
@@ -43,7 +43,7 @@ public class WmsInboundItemPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
-    @Schema(description = "入库状态 ; WmsInboundStatus : 0-未入库 , 1-部分入库 , 2-已入库", example = "")
+    @Schema(description = "WMS入库状态 ; WmsInboundStatus : 0-未入库 , 1-部分入库 , 2-已入库", example = "")
     private Integer inboundStatus;
 
     @Schema(description = "实际入库量", example = "")
@@ -67,9 +67,9 @@ public class WmsInboundItemPageReqVO extends PageParam {
     @Schema(description = "库存归属部门ID", example = "")
     private Long deptId;
 
-    @Schema(description = "备注", example = "")
-    private String notes;
-
     @Schema(description = "库存财务公司ID", example = "")
     private Long companyId;
+
+    @Schema(description = "备注", example = "")
+    private String remark;
 }

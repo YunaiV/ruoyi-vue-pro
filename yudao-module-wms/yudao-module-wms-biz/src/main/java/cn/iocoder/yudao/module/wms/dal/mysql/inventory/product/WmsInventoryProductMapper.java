@@ -22,7 +22,7 @@ public interface WmsInventoryProductMapper extends BaseMapperX<WmsInventoryProdu
 				.eqIfPresent(WmsInventoryProductDO::getProductId, reqVO.getProductId())
 				.eqIfPresent(WmsInventoryProductDO::getExpectedQty, reqVO.getExpectedQty())
 				.eqIfPresent(WmsInventoryProductDO::getActualQty, reqVO.getActualQty())
-				.eqIfPresent(WmsInventoryProductDO::getNotes, reqVO.getNotes())
+				.eqIfPresent(WmsInventoryProductDO::getRemark, reqVO.getRemark())
 				.betweenIfPresent(WmsInventoryProductDO::getCreateTime, reqVO.getCreateTime())
 				.orderByDesc(WmsInventoryProductDO::getId));
     }

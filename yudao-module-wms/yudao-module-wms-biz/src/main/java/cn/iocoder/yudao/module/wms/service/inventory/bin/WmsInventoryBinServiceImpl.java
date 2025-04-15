@@ -186,10 +186,10 @@ public class WmsInventoryBinServiceImpl implements WmsInventoryBinService {
         List<WmsInventoryBinDO> inventoryBinDOSInDB = inventoryBinMapper.selectByIds(StreamX.from(updateReqVOList).toList(WmsInventoryBinSaveReqVO::getId));
         for (WmsInventoryBinDO itemDO : inventoryBinDOSInDB) {
             WmsInventoryBinSaveReqVO updateReqVO = updateReqVOMap.get(itemDO.getId());
-            if (updateReqVO.getActualQuantity() == null || updateReqVO.getActualQuantity() <= 0) {
+            if (updateReqVO.getActualQty() == null || updateReqVO.getActualQty() <= 0) {
                 throw exception(INBOUND_ITEM_ACTUAL_QTY_ERROR);
             }
-            itemDO.setActualQuantity(updateReqVO.getActualQuantity());
+            itemDO.setActualQty(updateReqVO.getActualQty());
         }
         // 保存
         inventoryBinMapper.updateBatch(inventoryBinDOSInDB);

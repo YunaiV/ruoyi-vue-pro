@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : notes,actual_qty,create_time,expected_qty,inventory_id,product_id
+ * @table-fields : actual_qty,create_time,expected_qty,inventory_id,product_id,remark
  */
 @Schema(description = "管理后台 - 库存盘点产品分页 Request VO")
 @Data
@@ -29,10 +29,10 @@ public class WmsInventoryProductPageReqVO extends PageParam {
     @Schema(description = "实际库存，实盘数量")
     private Integer actualQty;
 
-    @Schema(description = "备注")
-    private String notes;
-
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
+
+    @Schema(description = "备注", example = "")
+    private String remark;
 }

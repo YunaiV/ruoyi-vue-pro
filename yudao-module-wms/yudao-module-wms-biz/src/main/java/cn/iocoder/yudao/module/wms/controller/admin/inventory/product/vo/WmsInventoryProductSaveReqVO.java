@@ -6,7 +6,7 @@ import java.util.*;
 import jakarta.validation.constraints.*;
 
 /**
- * @table-fields : notes,actual_qty,expected_qty,inventory_id,product_id,id
+ * @table-fields : actual_qty,expected_qty,inventory_id,product_id,remark,id
  */
 @Schema(description = "管理后台 - 库存盘点产品新增/修改 Request VO")
 @Data
@@ -31,6 +31,6 @@ public class WmsInventoryProductSaveReqVO {
     @NotNull(message = "实际库存不能为空")
     private Integer actualQty;
 
-    @Schema(description = "备注")
-    private String notes;
+    @Schema(description = "备注", example = "")
+    private String remark;
 }

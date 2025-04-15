@@ -7,13 +7,11 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
-
 import java.time.LocalDateTime;
-
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,creator,update_time,notes,actual_quantity,create_time,bin_id,expected_qty,inventory_id,product_id,id,updater
+ * @table-fields : tenant_id,creator,update_time,actual_qty,create_time,bin_id,expected_qty,inventory_id,product_id,remark,id,updater
  */
 @Schema(description = "管理后台 - 库位盘点 Response VO")
 @Data
@@ -35,14 +33,6 @@ public class WmsInventoryBinRespVO {
     @Schema(description = "预期库存，仓位可用库存", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("预期库存")
     private Integer expectedQty;
-
-    @Schema(description = "实际库存，实盘数量", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("实际库存")
-    private Integer actualQuantity;
-
-    @Schema(description = "备注")
-    @ExcelProperty("备注")
-    private String notes;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
@@ -74,4 +64,12 @@ public class WmsInventoryBinRespVO {
 
     @Schema(description = "仓位", example = "")
     private WmsWarehouseBinRespVO bin;
+
+    @Schema(description = "实际库存，实盘数量", example = "")
+    @ExcelProperty("实际库存，实盘数量")
+    private Integer actualQty;
+
+    @Schema(description = "备注", example = "")
+    @ExcelProperty("备注")
+    private String remark;
 }

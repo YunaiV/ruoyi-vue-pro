@@ -36,11 +36,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -114,13 +112,11 @@ public class WmsInventoryController {
         // 组装库位盘点
         List<WmsInventoryBinDO> inventoryBinList = inventoryBinService.selectByInventoryId(inventoryVO.getId());
         inventoryVO.setBinItemList(BeanUtils.toBean(inventoryBinList, WmsInventoryBinRespVO.class));
-
         // 装配
         inventoryService.assembleWarehouse(Arrays.asList(inventoryVO));
         inventoryProductService.assembleProduct(inventoryVO.getProductItemList());
         inventoryBinService.assembleProduct(inventoryVO.getBinItemList());
         inventoryBinService.assembleBin(inventoryVO.getBinItemList());
-
         // 返回
         return success(inventoryVO);
     }
@@ -153,8 +149,6 @@ public class WmsInventoryController {
         ExcelUtils.write(response, "盘点.xls", "数据", WmsInventoryRespVO.class, BeanUtils.toBean(list, WmsInventoryRespVO.class));
     }
 
-
-
     @PutMapping("/submit")
     @Operation(summary = "提交审批")
     @PreAuthorize("@ss.hasPermission('wms:inventory:submit')")
@@ -178,4 +172,4 @@ public class WmsInventoryController {
         inventoryService.approve(WmsInventoryAuditStatus.Event.REJECT, approvalReqVO);
         return success(true);
     }
-}
+}

@@ -8,14 +8,12 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
-
 import java.time.LocalDateTime;
 import java.util.List;
-
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,no,creator_notes,creator,update_time,create_time,id,audit_status,warehouse_id,updater
+ * @table-fields : tenant_id,no,creator,update_time,create_time,audit_status,id,creator_remark,updater,warehouse_id
  */
 @Schema(description = "管理后台 - 盘点 Response VO")
 @Data
@@ -34,13 +32,9 @@ public class WmsInventoryRespVO {
     @ExcelProperty("仓库ID")
     private Long warehouseId;
 
-    @Schema(description = "盘点单审批状态 ; WmsInventoryAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @ExcelProperty("盘点单审批状态")
+    @Schema(description = "WMS盘点单审批状态 ; WmsInventoryAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @ExcelProperty("WMS盘点单审批状态")
     private Integer auditStatus;
-
-    @Schema(description = "创建者备注")
-    @ExcelProperty("创建者备注")
-    private String creatorNotes;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
@@ -74,4 +68,8 @@ public class WmsInventoryRespVO {
     @Schema(description = "仓库", example = "")
     @ExcelProperty("仓库")
     private WmsWarehouseSimpleRespVO warehouse;
+
+    @Schema(description = "创建者备注", example = "")
+    @ExcelProperty("创建者备注")
+    private String creatorRemark;
 }

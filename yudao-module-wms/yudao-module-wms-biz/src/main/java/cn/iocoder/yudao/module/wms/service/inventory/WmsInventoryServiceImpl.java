@@ -35,13 +35,11 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_CAN_NOT_DELETE;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_CAN_NOT_EDIT;
@@ -84,7 +82,6 @@ public class WmsInventoryServiceImpl implements WmsInventoryService {
 
     @Resource(name = InventoryStateMachineConfigure.STATE_MACHINE_NAME)
     private StateMachineWrapper<Integer, WmsInventoryAuditStatus.Event, WmsInventoryDO> inventoryStateMachine;
-
 
     /**
      * @sign : A9D51C9E0E654C80
@@ -140,7 +137,7 @@ public class WmsInventoryServiceImpl implements WmsInventoryService {
                 inventoryProductDO.setExpectedQty(wmsStockWarehouseDO.getAvailableQty());
             }
         }
-        if(!CollectionUtils.isEmpty(inventoryProductDOList)) {
+        if (!CollectionUtils.isEmpty(inventoryProductDOList)) {
             inventoryProductMapper.updateBatch(inventoryProductDOList);
         }
         // 分解库存到仓位
@@ -165,7 +162,7 @@ public class WmsInventoryServiceImpl implements WmsInventoryService {
             inventoryBinDO.setProductId(stockBinRespVO.getProductId());
             inventoryBinDO.setBinId(stockBinRespVO.getBinId());
             inventoryBinDO.setExpectedQty(stockBinRespVO.getAvailableQty());
-            inventoryBinDO.setActualQuantity(0);
+            inventoryBinDO.setActualQty(0);
             toInsertInventoryBinDOList.add(inventoryBinDO);
         }
         // 需要删除的部分：数据库里有，但仓位库存里面没有的
@@ -213,10 +210,10 @@ public class WmsInventoryServiceImpl implements WmsInventoryService {
             }
             // 设置归属
             finalList.forEach(item -> {
-                if(item.getExpectedQty()==null) {
+                if (item.getExpectedQty() == null) {
                     item.setExpectedQty(0);
                 }
-                if(item.getActualQty()==null) {
+                if (item.getActualQty() == null) {
                     item.setActualQty(0);
                 }
                 item.setInventoryId(updateReqVO.getId());
@@ -309,13 +306,9 @@ public class WmsInventoryServiceImpl implements WmsInventoryService {
         approvalReqVO.setStatusType(WmsOutboundAuditStatus.getType());
         // 获得业务对象
         WmsInventoryDO inbound = validateInventoryExists(approvalReqVO.getBillId());
-
         TransitionContext<WmsInventoryDO> ctx = inventoryStateMachine.createContext(inbound);
         ctx.setExtra(WmsConstants.APPROVAL_REQ_VO_KEY, approvalReqVO);
         // 触发事件
         inventoryStateMachine.fireEvent(event, ctx);
     }
-
-
-
 }

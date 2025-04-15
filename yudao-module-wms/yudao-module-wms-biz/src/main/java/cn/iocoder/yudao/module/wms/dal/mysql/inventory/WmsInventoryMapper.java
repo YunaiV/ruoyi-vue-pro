@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.inventory;
 
-import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventoryPageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inventory.WmsInventoryDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.*;
+import java.util.List;
 
 /**
  * 盘点 Mapper
@@ -21,7 +21,7 @@ public interface WmsInventoryMapper extends BaseMapperX<WmsInventoryDO> {
 				.eqIfPresent(WmsInventoryDO::getNo, reqVO.getNo())
 				.eqIfPresent(WmsInventoryDO::getWarehouseId, reqVO.getWarehouseId())
 				.eqIfPresent(WmsInventoryDO::getAuditStatus, reqVO.getAuditStatus())
-				.eqIfPresent(WmsInventoryDO::getCreatorNotes, reqVO.getCreatorNotes())
+				.eqIfPresent(WmsInventoryDO::getCreatorRemark, reqVO.getCreatorRemark())
 				.betweenIfPresent(WmsInventoryDO::getCreateTime, reqVO.getCreateTime())
 				.orderByDesc(WmsInventoryDO::getId));
     }

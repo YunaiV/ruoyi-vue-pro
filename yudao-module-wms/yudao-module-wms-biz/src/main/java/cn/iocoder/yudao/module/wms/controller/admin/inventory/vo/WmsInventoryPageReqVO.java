@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : no,creator_notes,create_time,audit_status,warehouse_id
+ * @table-fields : no,create_time,audit_status,creator_remark,warehouse_id
  */
 @Schema(description = "管理后台 - 盘点分页 Request VO")
 @Data
@@ -23,13 +23,13 @@ public class WmsInventoryPageReqVO extends PageParam {
     @Schema(description = "仓库ID", example = "26854")
     private Long warehouseId;
 
-    @Schema(description = "盘点单审批状态 ; WmsInventoryAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", example = "2")
+    @Schema(description = "WMS盘点单审批状态 ; WmsInventoryAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过", example = "2")
     private Integer auditStatus;
-
-    @Schema(description = "创建者备注")
-    private String creatorNotes;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
+
+    @Schema(description = "创建者备注", example = "")
+    private String creatorRemark;
 }

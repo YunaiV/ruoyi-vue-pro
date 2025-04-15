@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
 
 /**
- * @table-fields : outbound_available_qty,inbound_status,notes,company_id,plan_qty,shelved_qty,latest_flow_id,inbound_id,source_item_id,actual_qty,product_id,id,dept_id
+ * @table-fields : outbound_available_qty,inbound_status,company_id,plan_qty,shelved_qty,remark,latest_flow_id,inbound_id,source_item_id,actual_qty,product_id,id,dept_id
  */
 @Schema(description = "管理后台 - 入库单详情新增/修改 Request VO")
 @Data
@@ -28,7 +28,7 @@ public class WmsInboundItemSaveReqVO {
     @Schema(description = "来源详情ID", example = "30830")
     private Long sourceItemId;
 
-    @Schema(description = "入库状态 ; WmsInboundStatus : 0-未入库 , 1-部分入库 , 2-已入库", example = "")
+    @Schema(description = "WMS入库状态 ; WmsInboundStatus : 0-未入库 , 1-部分入库 , 2-已入库", example = "")
     @InEnum(WmsInboundStatus.class)
     private Integer inboundStatus;
 
@@ -50,9 +50,9 @@ public class WmsInboundItemSaveReqVO {
     @Schema(description = "库存归属部门ID", example = "")
     private Long deptId;
 
-    @Schema(description = "备注", example = "")
-    private String notes;
-
     @Schema(description = "库存财务公司ID", example = "")
     private Long companyId;
+
+    @Schema(description = "备注", example = "")
+    private String remark;
 }
