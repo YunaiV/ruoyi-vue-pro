@@ -11,7 +11,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : no,company_id,create_time,outbound_time,audit_status,creator_comment,type,source_bill_id,latest_outbound_action_id,outbound_status,source_bill_no,source_bill_type,dept_id,warehouse_id
+ * @table-fields : no,company_id,create_time,remark,audit_status,creator_comment,outbound_time,source_bill_id,type,latest_outbound_action_id,outbound_status,source_bill_no,source_bill_type,dept_id,warehouse_id
  */
 @Schema(description = "管理后台 - 出库单分页 Request VO")
 @Data
@@ -25,7 +25,7 @@ public class WmsOutboundPageReqVO extends PageParam {
     @Schema(description = "仓库ID", example = "16056")
     private Long warehouseId;
 
-    @Schema(description = "WMS出库单类型 ; WmsOutboundType : 1-手工出库 , 2-订单出库", example = "1")
+    @Schema(description = "WMS出库单类型 ; WmsOutboundType : 1-手工出库 , 2-订单出库 , 3-盘点出库", example = "1")
     private Integer type;
 
     @Schema(description = "WMS出库单审批状态 ; WmsOutboundAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过 , 4-已出库", example = "2")
@@ -37,7 +37,7 @@ public class WmsOutboundPageReqVO extends PageParam {
     @Schema(description = "来源单据号")
     private String sourceBillNo;
 
-    @Schema(description = "WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单", example = "2")
+    @Schema(description = "WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单 , 2-盘点单", example = "2")
     private Integer sourceBillType;
 
     @Schema(description = "特别说明，创建方专用")
@@ -62,4 +62,7 @@ public class WmsOutboundPageReqVO extends PageParam {
 
     @Schema(description = "出库动作ID，与flow关联", example = "")
     private Long latestOutboundActionId;
+
+    @Schema(description = "备注", example = "")
+    private String remark;
 }

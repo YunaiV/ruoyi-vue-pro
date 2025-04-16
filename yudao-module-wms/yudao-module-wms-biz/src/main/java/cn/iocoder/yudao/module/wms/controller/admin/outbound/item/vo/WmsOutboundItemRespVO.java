@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,creator,company_id,create_time,bin_id,plan_qty,outbound_id,updater,source_item_id,update_time,actual_qty,outbound_status,product_id,id,dept_id
+ * @table-fields : tenant_id,creator,company_id,create_time,bin_id,plan_qty,remark,outbound_id,updater,source_item_id,update_time,actual_qty,outbound_status,product_id,id,dept_id
  */
 @Schema(description = "管理后台 - 出库单详情 Response VO")
 @Data
@@ -99,4 +99,8 @@ public class WmsOutboundItemRespVO {
     @Schema(description = "库位", example = "")
     @ExcelProperty("库位")
     private WmsWarehouseBinRespVO bin;
+
+    @Schema(description = "备注", example = "")
+    @ExcelProperty("备注")
+    private String remark;
 }

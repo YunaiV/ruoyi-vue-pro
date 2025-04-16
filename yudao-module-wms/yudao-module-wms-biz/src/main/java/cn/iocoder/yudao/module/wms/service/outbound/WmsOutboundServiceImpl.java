@@ -47,14 +47,12 @@ import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_CAN_NOT_EDIT;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_CAN_NOT_EDIT;
@@ -319,36 +317,27 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
 
     @Override
     public WmsOutboundDO createForInventory(WmsOutboundSaveReqVO outboundSaveReqVO) {
-
         outboundSaveReqVO.setType(WmsOutboundType.INVENTORY.getValue());
-        //
+        // 
         WmsOutboundDO outbound = this.createOutbound(outboundSaveReqVO);
-
-
         WmsApprovalReqVO approvalReqVO = new WmsApprovalReqVO();
         approvalReqVO.setBillId(outbound.getId());
         approvalReqVO.setComment("盘点出库");
         this.approve(WmsOutboundAuditStatus.Event.SUBMIT, approvalReqVO);
-
         // 同意确认收货
         this.approve(WmsOutboundAuditStatus.Event.AGREE, approvalReqVO);
-
         // 拉取明细
         List<WmsOutboundItemDO> outboundItemDOS = outboundItemService.selectByOutboundId(outbound.getId());
-
         // 设置实际出库量
-        StreamX.from(outboundItemDOS).assemble(outboundSaveReqVO.getItemList(), WmsOutboundItemSaveReqVO::getProductId,WmsOutboundItemDO::getProductId,(a, b)->{
+        StreamX.from(outboundItemDOS).assemble(outboundSaveReqVO.getItemList(), WmsOutboundItemSaveReqVO::getProductId, WmsOutboundItemDO::getProductId, (a, b) -> {
             a.setActualQty(b.getActualQty());
         });
         // 保存实际入库量
         outboundItemService.updateActualQuantity(BeanUtils.toBean(outboundItemDOS, WmsOutboundItemSaveReqVO.class));
-
         // 完成收货
         this.approve(WmsOutboundAuditStatus.Event.FINISH, approvalReqVO);
-        //
+        // 
         return this.getOutbound(outbound.getId());
-
-
     }
 
     @Override
@@ -412,4 +401,4 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         // 触发事件
         outboundStateMachine.fireEvent(event, ctx);
     }
-}
+}

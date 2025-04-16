@@ -31,14 +31,15 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_ITEM_INBOUND_ITEM_ID_NOT_SAME;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_ITEM_INBOUND_ITEM_ID_REPEATED;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_ITEM_INBOUND_ITEM_ID_WAREHOUSE_ID_NOT_SAME;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_ITEM_NOT_EXISTS;
@@ -110,8 +111,9 @@ public class WmsPickupServiceImpl implements WmsPickupService {
             toInsetList.add(BeanUtils.toBean(item, WmsPickupItemDO.class));
         });
         // 校验 toInsetList 中是否有重复的 inboundItemId
-        boolean isInboundItemIdRepeated = StreamX.isRepeated(toInsetList, WmsPickupItemDO::getInboundItemId);
-        if (isInboundItemIdRepeated) {
+        Set<String> binKey= StreamX.from(toInsetList).toSet(x-> x.getBinId()+"-"+x.getInboundItemId());
+        //boolean isInboundItemIdRepeated = StreamX.isRepeated(toInsetList, WmsPickupItemDO::getInboundItemId);
+        if (binKey.size()!=toInsetList.size()) {
             throw exception(PICKUP_ITEM_INBOUND_ITEM_ID_REPEATED);
         }
         WmsPickupDO pickup = BeanUtils.toBean(createReqVO, WmsPickupDO.class);
@@ -175,10 +177,7 @@ public class WmsPickupServiceImpl implements WmsPickupService {
         if (!Objects.equals(warehouseIdOfInboundItem, warehouseIdOfBin)) {
             throw exception(PICKUP_ITEM_INBOUND_ITEM_ID_WAREHOUSE_ID_NOT_SAME);
         }
-        // 校验拣货单明细是否对应
-        if (toInsetList.size() != inboundItemDOList.size()) {
-            throw exception(PICKUP_ITEM_INBOUND_ITEM_ID_NOT_SAME);
-        }
+
         // 校验数量
         for (WmsPickupItemDO itemDO : toInsetList) {
             if (itemDO.getQty() == null || itemDO.getQty() <= 0) {

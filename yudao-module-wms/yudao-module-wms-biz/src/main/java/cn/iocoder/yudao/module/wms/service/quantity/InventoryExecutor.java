@@ -119,13 +119,14 @@ public class InventoryExecutor extends QuantityExecutor<InventoryContext> {
             }
 
             // 如果盘亏，形成出库单
-            if (deltaQty > 0) {
+            if (deltaQty < 0) {
+
 
                 // 拣货单明细
                 WmsOutboundItemSaveReqVO outboundItemSaveReqVO = new WmsOutboundItemSaveReqVO();
                 outboundItemSaveReqVO.setProductId(inventoryBinDO.getProductId());
-                outboundItemSaveReqVO.setPlanQty(deltaQty);
-                outboundItemSaveReqVO.setActualQty(deltaQty);
+                outboundItemSaveReqVO.setPlanQty(Math.abs(deltaQty));
+                outboundItemSaveReqVO.setActualQty(Math.abs(deltaQty));
                 outboundItemSaveReqVO.setBinId(inventoryBinDO.getBinId());
                 outboundItemSaveReqVOList.add(outboundItemSaveReqVO);
 

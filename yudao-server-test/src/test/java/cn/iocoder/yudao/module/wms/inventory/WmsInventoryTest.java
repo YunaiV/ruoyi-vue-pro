@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventorySav
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinRespVO;
 import cn.iocoder.yudao.test.Profile;
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -32,6 +33,26 @@ public class WmsInventoryTest extends WmsBaseTest {
 
     private final Long warehouseId = 32L;
 
+    private final Set<Long> testProductIds1 = new HashSet<>();
+    private final Set<Long> testProductIds2 = new HashSet<>();
+    /**
+     * 第一组
+     **/
+    private final int testProductIds1Count=4;
+    private final int testProductIds1RemoveCount=1;
+    private int test1QtyDelta(int i){
+        return 1;
+    };
+
+    /**
+     * 第二组
+     **/
+    private final int testProductIds2Count=3;
+    private int test2QtyDelta(int i){
+        return -2;
+    };
+
+
 
 
 
@@ -50,15 +71,21 @@ public class WmsInventoryTest extends WmsBaseTest {
 
             WmsInventoryBinSaveReqVO saveReqVO = BeanUtils.toBean(binItemVO, WmsInventoryBinSaveReqVO.class);
 
-
-
-            int sign=i%3 - 1;
-
-            if(inventoryRespVO.getProductItemList().size()==1) {
-                sign = 1;
+            int delta=0;
+            if(testProductIds1.contains(binItemVO.getProductId())) {
+                delta=test1QtyDelta(i);
             }
 
-            int actualQty=binItemVO.getExpectedQty()+sign;
+            if(testProductIds2.contains(binItemVO.getProductId())) {
+                delta=test2QtyDelta(i);
+            }
+
+
+
+            int actualQty=binItemVO.getExpectedQty()+delta;
+            if(actualQty<0) {
+                actualQty=0;
+            }
             saveReqVO.setActualQty(actualQty);
             System.out.println(saveReqVO.getExpectedQty()+" -> "+saveReqVO.getActualQty());
             i++;
@@ -93,15 +120,14 @@ public class WmsInventoryTest extends WmsBaseTest {
         }
 
         List<WmsStockBinRespVO> stockBinList = stockBinPageResult.getData().getList();
-        Set<Long> testProductIds1 = new HashSet<>();
-        Set<Long> testProductIds2 = new HashSet<>();
+
         for (WmsStockBinRespVO stockBinRespVO : stockBinList) {
-            if(testProductIds1.size()<2) {
+            if(testProductIds1.size()<testProductIds1Count) {
                 testProductIds1.add(stockBinRespVO.getProductId());
             } else {
-//                if(testProductIds2.size()<3) {
-//                    testProductIds2.add(stockBinRespVO.getProductId());
-//                }
+                if(testProductIds2.size()<testProductIds2Count) {
+                    testProductIds2.add(stockBinRespVO.getProductId());
+                }
             }
         }
 
@@ -134,7 +160,11 @@ public class WmsInventoryTest extends WmsBaseTest {
         WmsInventorySaveReqVO updateReqVO = BeanUtils.toBean(inventoryRespVO, WmsInventorySaveReqVO.class);
         updateReqVO.setBinItemList(null);
 
-        updateReqVO.getProductItemList().remove(0);
+        int i=0;
+        while (i<testProductIds1RemoveCount && !updateReqVO.getProductItemList().isEmpty() ) {
+            updateReqVO.getProductItemList().remove(0);
+            i++;
+        }
         for (Long testProductId : testProductIds2) {
             WmsInventoryProductSaveReqVO productSaveReqVO = new WmsInventoryProductSaveReqVO();
             productSaveReqVO.setProductId(testProductId);
@@ -189,6 +219,11 @@ public class WmsInventoryTest extends WmsBaseTest {
             WmsStockBinRespVO stockBinRespVOAfter = binMapAfter.get(entryBefore.getKey());
             Integer delta = deltaMap.get(entryBefore.getKey());
             System.out.println(stockBinRespVOBefore.getProductId()+"@"+stockBinRespVOBefore.getBinId()+"\tdelta:"+delta+"; SellableQty : "+stockBinRespVOBefore.getSellableQty()+" -> "+stockBinRespVOAfter.getSellableQty()+"; AvailableQty : "+stockBinRespVOBefore.getAvailableQty()+" -> "+stockBinRespVOAfter.getAvailableQty());
+
+            // 校验
+            Assertions.assertEquals(stockBinRespVOBefore.getSellableQty() + delta,  stockBinRespVOAfter.getSellableQty());
+            Assertions.assertEquals(stockBinRespVOBefore.getAvailableQty() + delta, stockBinRespVOAfter.getAvailableQty());
+
         }
         System.out.println();
 

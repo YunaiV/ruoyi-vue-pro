@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : no,company_id,outbound_time,audit_status,creator_comment,type,source_bill_id,latest_outbound_action_id,outbound_status,source_bill_no,source_bill_type,id,dept_id,warehouse_id
+ * @table-fields : no,company_id,remark,audit_status,creator_comment,outbound_time,source_bill_id,type,latest_outbound_action_id,outbound_status,source_bill_no,source_bill_type,id,dept_id,warehouse_id
  */
 @Schema(description = "管理后台 - 出库单新增/修改 Request VO")
 @Data
@@ -33,7 +33,7 @@ public class WmsOutboundSaveReqVO {
     @NotNull(message = "仓库ID不能为空", groups = { ValidationGroup.create.class })
     private Long warehouseId;
 
-    @Schema(description = "WMS出库单类型 ; WmsOutboundType : 1-手工出库 , 2-订单出库", example = "1")
+    @Schema(description = "WMS出库单类型 ; WmsOutboundType : 1-手工出库 , 2-订单出库 , 3-盘点出库", example = "1")
     @NotNull(message = "WMS出库单类型不能为空", groups = { ValidationGroup.create.class })
     @InEnum(WmsOutboundType.class)
     private Integer type;
@@ -48,7 +48,7 @@ public class WmsOutboundSaveReqVO {
     @Schema(description = "来源单据号")
     private String sourceBillNo;
 
-    @Schema(description = "WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单", example = "2")
+    @Schema(description = "WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单 , 2-盘点单", example = "2")
     @InEnum(WmsBillType.class)
     private Integer sourceBillType;
 
@@ -74,4 +74,7 @@ public class WmsOutboundSaveReqVO {
 
     @Schema(description = "出库动作ID，与flow关联", example = "")
     private Long latestOutboundActionId;
+
+    @Schema(description = "备注", example = "")
+    private String remark;
 }
