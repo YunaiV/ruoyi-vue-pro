@@ -64,49 +64,25 @@ const [Modal, modalApi] = useVbenModal({
     if (!isOpen) {
       return;
     }
+
     // 加载数据
-#if (${table.templateType} == 2)## 树表处理传入的父ID
     let data = modalApi.getData<${simpleClassName}Api.${simpleClassName}>();
-#else## 标准表直接获取
-    const data = modalApi.getData<${simpleClassName}Api.${simpleClassName}>();
-#end
     if (!data) {
       return;
     }
-
-#if (${table.templateType} == 2)## 树表特有：处理新增下级的情况
-    // 处理新增下级的情况
-    if (!data.id && data.${treeParentColumn.javaField}) {
-      parentId.value = data.${treeParentColumn.javaField};
-      formData.value = { ${treeParentColumn.javaField}: parentId.value } as ${simpleClassName}Api.${simpleClassName};
-      await formApi.setValues(formData.value);
-      return;
-    }
-#end
 
     if (data.id) {
       // 编辑
       modalApi.lock();
       try {
-#if (${table.templateType} == 2)## 树表获取数据后重新赋值
         data = await get${simpleClassName}(data.id);
-        formData.value = data;
-#else## 标准表设置表单数据
-        formData.value = await get${simpleClassName}(data.id as number);
-#end
-        await formApi.setValues(formData.value);
       } finally {
         modalApi.lock(false);
       }
-    } else {
-      // 新增
-#if (${table.templateType} == 2)## 树表特有：设置顶级ID
-      formData.value = { ${treeParentColumn.javaField}: 0 } as ${simpleClassName}Api.${simpleClassName};
-#else## 标准表：设置空值
-      formData.value = data;
-#end
-      await formApi.setValues(formData.value || {});
     }
+    // 设置到 values
+    formData.value = data;
+    await formApi.setValues(formData.value);
   },
 });
 </script>

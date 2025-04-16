@@ -7,7 +7,7 @@ import { Button, message } from 'ant-design-vue';
 import { Download, Plus } from '@vben/icons';
 import Form from './modules/form.vue';
 
-import { ref } from 'vue';
+import { ref, h } from 'vue';
 import { $t } from '#/locales';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 #if (${table.templateType} == 2)## 树表接口
@@ -56,7 +56,7 @@ function onEdit(row: ${simpleClassName}Api.${simpleClassName}) {
 
 #if (${table.templateType} == 2)## 树表特有：新增下级
 /** 新增下级${table.classComment} */
-function onAddChild(row: ${simpleClassName}Api.${simpleClassName}) {
+function onAppend(row: ${simpleClassName}Api.${simpleClassName}) {
   formModalApi.setData({ ${treeParentColumn.javaField}: row.id }).open();
 }
 #end
@@ -86,20 +86,20 @@ function onActionClick({
   row,
 }: OnActionClickParams<${simpleClassName}Api.${simpleClassName}>) {
   switch (code) {
-    case 'edit': {
-      onEdit(row);
+  #if (${table.templateType} == 2)## 树表特有：新增下级
+    case 'append': {
+      onAppend(row);
       break;
     }
+  #end
     case 'delete': {
       onDelete(row);
       break;
     }
-#if (${table.templateType} == 2)## 树表特有：新增下级
-    case 'add_child': {
-      onAddChild(row);
+    case 'edit': {
+      onEdit(row);
       break;
     }
-#end
   }
 }
 
@@ -167,12 +167,16 @@ const [Grid, gridApi] = useVbenVxeGrid({
           {{ isExpanded ? '收缩' : '展开' }}
         </Button>
 #end
-        <Button type="primary" @click="onCreate" v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:create']">
-          <Plus class="size-5" />
+        <Button :icon="h(Plus)" type="primary" @click="onCreate" v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:create']">
           {{ $t('ui.actionTitle.create', ['${table.classComment}']) }}
         </Button>
-        <Button type="primary" class="ml-2" @click="onExport" v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:export']">
-          <Download class="size-5" />
+        <Button
+          :icon="h(Download)"
+          type="primary"
+          class="ml-2"
+          @click="onExport"
+          v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:export']"
+        >
           {{ $t('ui.actionTitle.export') }}
         </Button>
       </template>
