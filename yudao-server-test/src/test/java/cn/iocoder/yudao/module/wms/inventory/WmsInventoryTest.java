@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.wms.inventory;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.wms.WmsBaseTest;
 import cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo.WmsInventoryBinRespVO;
@@ -15,8 +16,10 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -31,31 +34,48 @@ public class WmsInventoryTest extends WmsBaseTest {
 
 
 
+
+
     /**
      * 设置盘点量
      **/
-    private void updateActualQuantity(WmsInventoryRespVO inventoryRespVO) {
+    private Map<String, WmsStockBinRespVO> updateActualQuantity(WmsInventoryRespVO inventoryRespVO) {
+
+        Map<String, WmsStockBinRespVO> binMapBefore = new HashMap<>();
 
         List<WmsInventoryBinSaveReqVO> saveReqVOS=new ArrayList<>();
+
         int i=0;
         for (WmsInventoryBinRespVO binItemVO : inventoryRespVO.getBinItemList()) {
 
             WmsInventoryBinSaveReqVO saveReqVO = BeanUtils.toBean(binItemVO, WmsInventoryBinSaveReqVO.class);
 
+
+
             int sign=i%3 - 1;
+
+            if(inventoryRespVO.getProductItemList().size()==1) {
+                sign = 1;
+            }
 
             int actualQty=binItemVO.getExpectedQty()+sign;
             saveReqVO.setActualQty(actualQty);
-
             System.out.println(saveReqVO.getExpectedQty()+" -> "+saveReqVO.getActualQty());
             i++;
-
             saveReqVOS.add(saveReqVO);
 
+
+
+            CommonResult<List<WmsStockBinRespVO>> stockBinResult = this.stockBinClient().getStockBin(warehouseId, binItemVO.getBinId(), binItemVO.getProductId());
+            binMapBefore.put(binItemVO.getProductId()+"-"+binItemVO.getBinId(),stockBinResult.getData().get(0));
         }
+
+
+
 
         this.inventoryClient().updateInventoryActualQuantity(saveReqVOS);
 
+        return binMapBefore;
     }
 
 
@@ -79,9 +99,9 @@ public class WmsInventoryTest extends WmsBaseTest {
             if(testProductIds1.size()<2) {
                 testProductIds1.add(stockBinRespVO.getProductId());
             } else {
-                if(testProductIds2.size()<3) {
-                    testProductIds2.add(stockBinRespVO.getProductId());
-                }
+//                if(testProductIds2.size()<3) {
+//                    testProductIds2.add(stockBinRespVO.getProductId());
+//                }
             }
         }
 
@@ -142,17 +162,36 @@ public class WmsInventoryTest extends WmsBaseTest {
         // 提交盘点单
         submit(inventoryRespVO.getId());
         // 设置盘点量
-        updateActualQuantity(inventoryRespVO);
+        Map<String, WmsStockBinRespVO> binMapBefore = updateActualQuantity(inventoryRespVO);
         // 生效盘点单
-        agree(inventoryRespVO.getId());
+        agree(inventoryRespVO.getId(),binMapBefore);
     }
 
     private void submit(Long inventoryId) {
         CommonResult<Boolean> result = this.inventoryClient().submit(inventoryId);
     }
 
-    private void agree(Long inventoryId) {
+    private void agree(Long inventoryId,Map<String, WmsStockBinRespVO> binMapBefore) {
+        //
         CommonResult<Boolean> result = this.inventoryClient().agree(inventoryId);
+        System.out.println("完成盘点 : "+result.getMsg());
+        //
+        CommonResult<WmsInventoryRespVO> inventoryResult = this.inventoryClient().getInventory(inventoryId);
+        Map<String, WmsStockBinRespVO> binMapAfter = new HashMap<>();
+        Map<String, Integer> deltaMap = StreamX.from(inventoryResult.getData().getBinItemList()).toMap(e->e.getProductId()+"-"+e.getBinId(),x->x.getActualQty()-x.getExpectedQty());
+        for (WmsInventoryBinRespVO binItemVO : inventoryResult.getData().getBinItemList()) {
+            CommonResult<List<WmsStockBinRespVO>> stockBinResult = this.stockBinClient().getStockBin(warehouseId, binItemVO.getBinId(), binItemVO.getProductId());
+            binMapAfter.put(binItemVO.getProductId()+"-"+binItemVO.getBinId(),stockBinResult.getData().get(0));
+        }
+        //
+        for (Map.Entry<String, WmsStockBinRespVO> entryBefore : binMapBefore.entrySet()) {
+            WmsStockBinRespVO stockBinRespVOBefore = entryBefore.getValue();
+            WmsStockBinRespVO stockBinRespVOAfter = binMapAfter.get(entryBefore.getKey());
+            Integer delta = deltaMap.get(entryBefore.getKey());
+            System.out.println(stockBinRespVOBefore.getProductId()+"@"+stockBinRespVOBefore.getBinId()+"\tdelta:"+delta+"; SellableQty : "+stockBinRespVOBefore.getSellableQty()+" -> "+stockBinRespVOAfter.getSellableQty()+"; AvailableQty : "+stockBinRespVOBefore.getAvailableQty()+" -> "+stockBinRespVOAfter.getAvailableQty());
+        }
+        System.out.println();
+
     }
 
 

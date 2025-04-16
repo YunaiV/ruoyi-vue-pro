@@ -320,9 +320,10 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     @Override
     public WmsOutboundDO createForInventory(WmsOutboundSaveReqVO outboundSaveReqVO) {
 
+        outboundSaveReqVO.setType(WmsOutboundType.INVENTORY.getValue());
         //
         WmsOutboundDO outbound = this.createOutbound(outboundSaveReqVO);
-        outbound.setType(WmsOutboundType.INVENTORY.getValue());
+
 
         WmsApprovalReqVO approvalReqVO = new WmsApprovalReqVO();
         approvalReqVO.setBillId(outbound.getId());

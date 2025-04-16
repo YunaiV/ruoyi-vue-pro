@@ -65,9 +65,17 @@ public class WmsStockOwnershipRespVO {
     @ExcelProperty("创建者")
     private String creator;
 
+    @Schema(description = "创建者名称", example = "")
+    @ExcelProperty("创建者名称")
+    private String creatorName;
+
     @Schema(description = "更新者", example = "")
     @ExcelProperty("更新者")
     private String updater;
+
+    @Schema(description = "更新者名称", example = "")
+    @ExcelProperty("更新者名称")
+    private String updaterName;
 
     @Schema(description = "更新时间", example = "")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

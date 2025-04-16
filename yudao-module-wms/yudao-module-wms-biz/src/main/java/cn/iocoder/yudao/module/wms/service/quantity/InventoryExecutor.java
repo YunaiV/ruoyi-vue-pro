@@ -243,6 +243,8 @@ public class InventoryExecutor extends QuantityExecutor<InventoryContext> {
         outboundSaveReqVO.setSourceBillNo(inventoryDO.getNo());
         outboundSaveReqVO.setSourceBillType(WmsBillType.INVENTORY.getValue());
 
+
+
         // 执行出库
         outboundService.createForInventory(outboundSaveReqVO);
 

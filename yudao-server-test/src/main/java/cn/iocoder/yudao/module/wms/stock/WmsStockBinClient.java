@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinPage
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinRespVO;
 import cn.iocoder.yudao.test.Profile;
 import cn.iocoder.yudao.test.RestClient;
+import org.junit.Assert;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 
 import java.util.List;
@@ -37,7 +38,14 @@ public class WmsStockBinClient extends RestClient {
     public CommonResult<List<WmsStockBinRespVO>> getStockBin(Long warehouseId, Long binId, Long productId) {
         WmsStockBinPageReqVO pageReqVO=new WmsStockBinPageReqVO();
         pageReqVO.setWarehouseId(warehouseId).setBinId(binId).setProductId(productId);
-        return getSimpleList("/admin-api/wms/stock-bin/stocks",pageReqVO, WmsStockBinRespVO.class);
+        CommonResult<List<WmsStockBinRespVO>> result = getSimpleList("/admin-api/wms/stock-bin/stocks",pageReqVO, WmsStockBinRespVO.class);
+
+        Assert.assertNotNull(result);
+        Assert.assertTrue(result.isSuccess());
+        Assert.assertNotNull(result.getData());
+        Assert.assertNotNull(result.getData());
+
+        return result;
     }
 
 }

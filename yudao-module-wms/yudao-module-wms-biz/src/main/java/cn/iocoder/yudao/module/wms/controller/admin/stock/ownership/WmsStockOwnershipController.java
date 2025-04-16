@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.wms.controller.admin.stock.ownership;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.WmsStockOwnershipPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.WmsStockOwnershipRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
@@ -94,6 +95,12 @@ public class WmsStockOwnershipController {
         stockOwnershipService.assembleWarehouse(voPageResult.getList());
         stockOwnershipService.assembleDept(voPageResult.getList());
         stockOwnershipService.assembleCompany(voPageResult.getList());
+
+        // 人员姓名填充
+        AdminUserApi.inst().prepareFill(voPageResult.getList())
+            .mapping(WmsStockOwnershipRespVO::getCreator, WmsStockOwnershipRespVO::setCreatorName)
+            .mapping(WmsStockOwnershipRespVO::getUpdater, WmsStockOwnershipRespVO::setUpdaterName)
+            .fill();
 
         // 返回
         return success(voPageResult);
