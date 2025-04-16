@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.wms.service.quantity;
 
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
-import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
@@ -19,7 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_NOT_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSHIP_NOT_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_WAREHOUSE_NOT_EXISTS;
 
 /**
  * @author: LeeFJ
@@ -83,11 +85,24 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
             if(deptId==null) {
                 deptId=outboundRespVO.getDeptId();
             }
-            // 如果入库单上未指定部门,默认按产品的部门ID
-            if (deptId == null) {
-                WmsProductRespSimpleVO productVO = item.getProduct();
-                deptId = productVO.getDeptId();
+
+            // 如果未指定归属，则按入库批次的先进先出进行处理
+            if (deptId == null || companyId == null) {
+                WmsInboundItemOwnershipDO inboundItemOwnership = inboundService.getInboundItemOwnership(warehouseId, productId, true);
+                if(inboundItemOwnership==null) {
+                    throw exception(STOCK_OWNERSHIP_NOT_EXISTS);
+                }
+                deptId = inboundItemOwnership.getDeptId();
+                companyId = inboundItemOwnership.getCompanyId();
             }
+            // 抛出异常
+            if (deptId == null || companyId == null) {
+                throw exception(STOCK_OWNERSHIP_NOT_EXISTS);
+            }
+
+
+
+
             // 执行入库的原子操作
             Integer quantity= getExecuteQty(item);
             outboundSingleItem(outboundRespVO,item,companyId, deptId, warehouseId, item.getBinId(),productId, quantity, outboundRespVO.getId(), item.getId());

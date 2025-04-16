@@ -106,6 +106,9 @@ public class WmsInboundItemRespVO {
     @ExcelProperty("已上架量")
     private Integer shelvedQty;
 
+    @Schema(description = "可上架量", example = "")
+    private Integer shelveAvailableQty;
+
     @Schema(description = "最新的流水ID", example = "")
     @ExcelProperty("最新的流水ID")
     private Long latestFlowId;
