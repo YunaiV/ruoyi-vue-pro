@@ -478,11 +478,29 @@ export function use${subSimpleClassName}GridColumns(
                     #set ($dictType = $column.dictType)
                     #set ($javaField = $column.javaField)
                     #set ($comment = $column.columnComment)
+                    #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+                        #set ($dictMethod = "number")
+                    #elseif ($javaType == "String")
+                        #set ($dictMethod = "string")
+                    #elseif ($javaType == "Boolean")
+                        #set ($dictMethod = "boolean")
+                    #end
                     {
                         field: '${javaField}',
                         title: '${comment}',
                         minWidth: 120,
                         slots: { default: '${javaField}' },
+                    #if ($column.htmlType == "select" || $column.htmlType == "checkbox" || $column.htmlType == "radio")
+                    #if ("" != $dictType)## 有数据字典
+                        params: {
+                            options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+                        },
+                    #else
+                        params: {
+                            options: [],
+                        },
+                    #end
+                    #end
                     },
                 #end
             #end
