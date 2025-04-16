@@ -33,7 +33,7 @@ public class OmsOrderRespVO {
 
     @Schema(description = "店铺id", example = "8058")
     @ExcelProperty("店铺id")
-    private String shopId;
+    private Long shopId;
 
     @Schema(description = "运费")
     @ExcelProperty("运费")
@@ -114,6 +114,10 @@ public class OmsOrderRespVO {
     @ExcelProperty("产品信息")
     private String productNames;
 
+
+    @Schema(description = "所属店铺", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("所属店铺")
+    private String shopName;
 
     @Data
     public static class Item {

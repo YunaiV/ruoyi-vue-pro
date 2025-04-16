@@ -3,17 +3,21 @@ package cn.iocoder.yudao.module.oms.controller.admin.order;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductRespDTO;
 import cn.iocoder.yudao.module.oms.controller.admin.order.vo.OmsOrderPageReqVO;
 import cn.iocoder.yudao.module.oms.controller.admin.order.vo.OmsOrderRespVO;
+import cn.iocoder.yudao.module.oms.controller.admin.shop.vo.OmsShopRespVO;
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsOrderDO;
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsOrderItemDO;
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsShopProductItemDO;
 import cn.iocoder.yudao.module.oms.service.OmsOrderService;
 import cn.iocoder.yudao.module.oms.service.OmsShopProductItemService;
+import cn.iocoder.yudao.module.oms.service.OmsShopService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -21,14 +25,19 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - OMS 销售订单")
 @RestController
@@ -42,6 +51,9 @@ public class OmsSaleOrderController {
     private OmsShopProductItemService omsShopProductItemService;
 
     @Resource
+    private OmsShopService omsShopService;
+
+    @Resource
     private ErpProductApi erpProductApi;
 
     @GetMapping("/page")
@@ -52,108 +64,69 @@ public class OmsSaleOrderController {
         return success(buildSaleOrderVOPageResult(pageResult));
     }
 
-//    private PageResult<OmsOrderRespVO> buildSaleOrderVOPageResult(PageResult<OmsOrderDO> pageResult) {
-//        if (CollUtil.isEmpty(pageResult.getList())) {
-//            return PageResult.empty(pageResult.getTotal());
-//        }
-//        PageResult<OmsOrderRespVO> allPageResult = new PageResult<>();
-//        List<OmsOrderRespVO> allList = new ArrayList<>();
-//
-//        // 1.1 订单项
-//        List<OmsOrderItemDO> saleOrderItemList = omsOrderService.getSaleOrderItemListByOrderIds(
-//            convertSet(pageResult.getList(), OmsOrderDO::getId));
-//        Map<Long, List<OmsOrderItemDO>> saleOrderItemMap = convertMultiMap(saleOrderItemList, OmsOrderItemDO::getOrderId);
-//        //1.2 产品信息
-//        saleOrderItemMap.keySet().forEach(orderId -> {
-//            List<OmsOrderItemDO> saleOrderItems = saleOrderItemMap.get(orderId);
-//            List<String> shopProductCodes = saleOrderItems.stream().map(OmsOrderItemDO::getShopProductCode).toList();
-//            List<OmsShopProductItemDO> shopProductItemList = omsShopProductItemService.getShopProductItemsByShopProductCodes(shopProductCodes);
-//            List<Long> productIds = shopProductItemList.stream().map(OmsShopProductItemDO::getProductId).distinct().toList();
-//            Map<Long, ErpProductRespDTO> productMap = erpProductApi.getProductDTOMap(productIds);
-//            PageResult<OmsOrderRespVO> bean = BeanUtils.toBean(pageResult, OmsOrderRespVO.class, saleOrder -> {
-//                List<OmsOrderRespVO.Item> items = new ArrayList<>();
-//                for (OmsShopProductItemDO omsShopProductItemDO : shopProductItemList) {
-//                    OmsOrderRespVO.Item item = new OmsOrderRespVO.Item();
-//                    item.setProductId(omsShopProductItemDO.getProductId());
-//                    item.setProductName(productMap.getOrDefault(omsShopProductItemDO.getProductId(), null).getName());
-//                    item.setProductBarCode(productMap.getOrDefault(omsShopProductItemDO.getProductId(), null).getBarCode());
-//                    item.setProductUnitName(productMap.getOrDefault(omsShopProductItemDO.getProductId(), null).getUnitName());
-//                    items.add(item);
-//                }
-//                saleOrder.setItems(items);
-//                saleOrder.setProductNames(CollUtil.join(items, "，", OmsOrderRespVO.Item::getProductName));
-//            });
-//            allList.addAll(bean.getList());
-//        });
-//        allPageResult.setTotal(pageResult.getTotal());
-//        allPageResult.setList(allList);
-//
-////
-////        // 1.2 产品信息
-////        List<String> shopProductCodes = saleOrderItemList.stream().map(OmsOrderItemDO::getShopProductCode).toList();
-////        List<OmsShopProductItemDO> shopProductItemList = omsShopProductItemService.getShopProductItemsByShopProductCodes(shopProductCodes);
-////        List<Long> productIds = shopProductItemList.stream().map(OmsShopProductItemDO::getProductId).distinct().toList();
-////        Map<Long, ErpProductRespDTO> productMap = erpProductApi.getProductDTOMap(productIds);
-////
-////        PageResult<OmsOrderRespVO> bean = BeanUtils.toBean(pageResult, OmsOrderRespVO.class, saleOrder -> {
-////            List<OmsOrderRespVO.Item> items = new ArrayList<>();
-////            for (OmsShopProductItemDO omsShopProductItemDO : shopProductItemList) {
-////                OmsOrderRespVO.Item item = new OmsOrderRespVO.Item();
-////                item.setProductId(omsShopProductItemDO.getProductId());
-////                item.setProductName(productMap.getOrDefault(omsShopProductItemDO.getProductId(), null).getName());
-////                item.setProductBarCode(productMap.getOrDefault(omsShopProductItemDO.getProductId(), null).getBarCode());
-////                item.setProductUnitName(productMap.getOrDefault(omsShopProductItemDO.getProductId(), null).getUnitName());
-////                items.add(item);
-////            }
-////            saleOrder.setItems(items);
-////            saleOrder.setProductNames(CollUtil.join(items, "，", OmsOrderRespVO.Item::getProductName));
-////        });
-//
-////        // 2. 开始拼接
-////        PageResult<OmsOrderRespVO> bean1  = BeanUtils.toBean(pageResult, OmsOrderRespVO.class, saleOrder -> {
-////            saleOrder.setItems(BeanUtils.toBean(saleOrderItemMap.get(saleOrder.getId()), OmsOrderRespVO.Item.class,
-////                item -> MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProductName(product.getName())
-////                    .setProductBarCode(product.getBarCode()).setProductUnitName(product.getUnitName()))));
-////            saleOrder.setProductNames(CollUtil.join(saleOrder.getItems(), "，", OmsOrderRespVO.Item::getProductName));
-////        });
-//
-//        return allPageResult;
-//    }
+    @GetMapping("/get")
+    @Operation(summary = "获得销售订单")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('oms:sale-out:query')")
+    public CommonResult<OmsOrderRespVO> getSaleOrder(@RequestParam("id") Long id) {
+        OmsOrderDO saleOrder = omsOrderService.getOrder(id);
+        if (saleOrder == null) {
+            return success(null);
+        }
+
+        OmsOrderPageReqVO vo = OmsOrderPageReqVO.builder().no(saleOrder.getNo()).shopId(saleOrder.getShopId()).sourceNo(saleOrder.getSourceNo()).build();
+        PageResult<OmsOrderDO> pageResult = new PageResult<>();
+        pageResult.setTotal(1L);
+        pageResult.setList(List.of(saleOrder));
+        PageResult<OmsOrderRespVO> result = buildSaleOrderVOPageResult(pageResult);
+        return success(result.getList().get(0));
+    }
 
 
     private PageResult<OmsOrderRespVO> buildSaleOrderVOPageResult(PageResult<OmsOrderDO> pageResult) {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return PageResult.empty(pageResult.getTotal());
         }
-        PageResult<OmsOrderRespVO> allPageResult = new PageResult<>();
-        allPageResult.setTotal(pageResult.getTotal());
-        allPageResult.setList(new ArrayList<>());
-        List<OmsOrderDO> saleOrderList = pageResult.getList();
-        for (OmsOrderDO omsOrderDO : saleOrderList) {
-            OmsOrderRespVO omsOrderRespVO = BeanUtils.toBean(omsOrderDO, OmsOrderRespVO.class);
-            // 1.1 订单项
-            List<OmsOrderItemDO> saleOrderItemList = omsOrderService.getSaleOrderItemListByOrderIds(List.of(omsOrderDO.getId()));
-            Map<Long, List<OmsOrderItemDO>> saleOrderItemMap = new HashMap<>();
-            saleOrderItemMap.put(omsOrderDO.getId(), saleOrderItemList);
 
+
+        // 1.1 订单项
+        List<OmsOrderItemDO> saleOrderItemList = omsOrderService.getSaleOrderItemListByOrderIds(
+            convertSet(pageResult.getList(), OmsOrderDO::getId));
+        Map<Long, List<OmsOrderItemDO>> saleOrderItemMap = convertMultiMap(saleOrderItemList, OmsOrderItemDO::getOrderId);
+        // 1.2 产品信息
+        Map<Long, List<ErpProductRespDTO>> productMap = new HashMap<>();
+        List<OmsOrderDO> omsOrderList = pageResult.getList();
+        for (OmsOrderDO omsOrderDO : omsOrderList) {
             List<OmsOrderItemDO> saleOrderItems = saleOrderItemMap.get(omsOrderDO.getId());
             List<String> shopProductCodes = saleOrderItems.stream().map(OmsOrderItemDO::getShopProductCode).toList();
             List<OmsShopProductItemDO> shopProductItemList = omsShopProductItemService.getShopProductItemsByShopProductCodes(shopProductCodes);
             List<Long> productIds = shopProductItemList.stream().map(OmsShopProductItemDO::getProductId).distinct().toList();
-            Map<Long, ErpProductRespDTO> productMap = erpProductApi.getProductDTOMap(productIds);
-            List<OmsOrderRespVO.Item> items = new ArrayList<>();
-            productMap.forEach((productId, erpProductRespDTO) -> {
-                OmsOrderRespVO.Item item = new OmsOrderRespVO.Item();
-                item.setProductId(productId);
-                item.setProductName(erpProductRespDTO.getName());
-                item.setProductBarCode(erpProductRespDTO.getBarCode());
-                item.setProductUnitName(erpProductRespDTO.getUnitName());
-                items.add(item);
-            });
-            omsOrderRespVO.setProductNames(CollUtil.join(items, "，", OmsOrderRespVO.Item::getProductName));
-            omsOrderRespVO.setItems(items);
-            allPageResult.getList().add(omsOrderRespVO);
+            Map<Long, ErpProductRespDTO> productDTOMap = erpProductApi.getProductDTOMap(productIds);
+            productMap.put(omsOrderDO.getId(), productDTOMap.values().stream().toList());
         }
-        return allPageResult;
+
+        //1.3 店铺信息
+        Set<Long> shopIds = omsOrderList.stream().map(OmsOrderDO::getShopId).collect(Collectors.toSet());
+        Map<Long, OmsShopRespVO> shopMap = omsShopService.getShopMapByIds(shopIds);
+
+
+        return BeanUtils.toBean(pageResult, OmsOrderRespVO.class, saleOrder -> {
+            MapUtils.findAndThen(productMap, saleOrder.getId(), productList -> {
+                saleOrder.setProductNames(CollUtil.join(productList, "，", ErpProductRespDTO::getName));
+
+                List<OmsOrderRespVO.Item> items = productList.stream().flatMap(product -> {
+                    OmsOrderRespVO.Item item = new OmsOrderRespVO.Item();
+                    return Stream.of(item.setProductId(product.getId())
+                        .setProductName(product.getName())
+                        .setProductBarCode(product.getBarCode())
+                        .setProductUnitName(product.getUnitName()));
+                }).toList();
+                saleOrder.setItems(items);
+            });
+
+            MapUtils.findAndThen(shopMap, saleOrder.getShopId(), shop -> {
+                saleOrder.setShopName(shop.getName());
+            });
+        });
     }
 }

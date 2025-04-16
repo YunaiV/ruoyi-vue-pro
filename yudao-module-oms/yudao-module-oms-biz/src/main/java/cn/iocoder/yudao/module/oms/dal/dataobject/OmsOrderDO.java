@@ -44,7 +44,7 @@ public class OmsOrderDO extends TenantBaseDO {
     /**
      * 店铺id
      */
-    private String shopId;
+    private Long shopId;
     /**
      * 运费
      */

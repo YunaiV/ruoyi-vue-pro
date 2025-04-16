@@ -30,7 +30,7 @@ public class OmsOrderPageReqVO extends PageParam {
     private String sourceNo;
 
     @Schema(description = "店铺id", example = "8058")
-    private String shopId;
+    private Long shopId;
 
     @Schema(description = "运费")
     private BigDecimal shippingCost;
