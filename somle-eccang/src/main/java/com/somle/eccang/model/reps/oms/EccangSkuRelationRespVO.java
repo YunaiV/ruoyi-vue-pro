@@ -15,15 +15,15 @@ public class EccangSkuRelationRespVO {
     /**
      * 平台SKU
      */
-    private String platform_sku;
+    private String platformSku;
     /**
      * 店铺别名
      */
-    private String user_account;
+    private String userAccount;
     /**
      * 仓库ID
      */
-    private String warehouse_id;
+    private String warehouseId;
     /**
      * 对应SKU数据对象
      */
@@ -35,23 +35,23 @@ public class EccangSkuRelationRespVO {
         /**
          * 仓库SKU
          */
-        private String product_sku;
+        private String productSku;
         /**
          * 仓库sku数量
          */
-        private String product_sku_qty;
+        private String productSkuQty;
         /**
          * 采购价
          */
-        private String product_sku_pu_price;
+        private String productSkuPuPrice;
         /**
          * 费用比例
          */
-        private String product_sku_expense_ratio;
+        private String productSkuExpenseRatio;
         /**
          * 更新时间
          */
-        private String update_time;
+        private String updateTime;
 
     }
 

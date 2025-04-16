@@ -52,7 +52,7 @@ public class OmsShopProductHandler {
                 .productSkuNameCn(relation.getProductSku()).build());
         }
 
-        service.setSkuRelation(relationDTO.getPlatformSku(), relationDTO.getShopName(), list);
+        service.modifySkuRelation(relationDTO.getPlatformSku(), relationDTO.getShopName(), list);
 
     }
 }

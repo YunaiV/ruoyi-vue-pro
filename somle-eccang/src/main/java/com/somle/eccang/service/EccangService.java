@@ -10,12 +10,8 @@ import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import com.somle.eccang.model.*;
 import com.somle.eccang.model.EccangResponse.EccangPage;
 import com.somle.eccang.model.exception.EccangResponseException;
-import com.somle.eccang.model.req.*;
 import com.somle.eccang.model.reps.oms.EccangSkuRelationRespVO;
-import com.somle.eccang.model.req.EccangInventoryBatchReqVO;
-import com.somle.eccang.model.req.EccangReceivingDetailReqVO;
-import com.somle.eccang.model.req.EccangReceivingReqVo;
-import com.somle.eccang.model.req.EccangRmaReturnReqVO;
+import com.somle.eccang.model.req.*;
 import com.somle.eccang.model.req.oms.EccangModifySkuRelationReqVO;
 import com.somle.eccang.model.req.oms.EccangSkuRelationReqVO;
 import com.somle.eccang.repository.EccangTokenRepository;
@@ -24,7 +20,6 @@ import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageChannel;
@@ -341,9 +336,9 @@ public class EccangService {
     }
 
     /**
-     * 设置平台SKU关系
+     * 修改平台SKU对应关系
      **/
-    public EccangResponse setSkuRelation(String platformSku, String account, List<EccangModifySkuRelationReqVO.PCR> pcrList) {
+    public EccangResponse modifySkuRelation(String platformSku, String account, List<EccangModifySkuRelationReqVO.PCR> pcrList) {
 
         EccangModifySkuRelationReqVO vo = EccangModifySkuRelationReqVO.builder().data(
             List.of(EccangModifySkuRelationReqVO.ModifyData.builder().userAccount(List.of(account)).platformSku(platformSku).pcr(pcrList).build())
