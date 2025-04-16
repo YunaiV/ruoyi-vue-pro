@@ -2,7 +2,13 @@
 import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 
 import { useVbenModal } from '@vben/common-ui';
-import { message } from 'ant-design-vue';
+import { message, Tabs } from 'ant-design-vue';
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 10 || $table.templateType == 12 )
+  #foreach ($subSimpleClassName in $subSimpleClassNames)
+  import ${subSimpleClassName}Form from './${subSimpleClassName}Form.vue'
+  #end
+#end
 
 import { computed, ref } from 'vue';
 import { $t } from '#/locales';
@@ -32,6 +38,18 @@ const getTitle = computed(() => {
 });
 #end
 
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 10 || $table.templateType == 12 )
+  #if ( $subTables && $subTables.size() > 0 )
+
+  /** 子表的表单 */
+  const subTabsName = ref('$subClassNameVars.get(0)')
+    #foreach ($subClassNameVar in $subClassNameVars)
+    const ${subClassNameVar}FormRef = ref()
+    #end
+  #end
+#end
+
 const [Form, formApi] = useVbenForm({
   layout: 'horizontal',
   schema: useFormSchema(),
@@ -44,9 +62,36 @@ const [Modal, modalApi] = useVbenModal({
     if (!valid) {
       return;
     }
+    ## 特殊：主子表专属逻辑
+    #if ( $table.templateType == 10 || $table.templateType == 12 )
+      #if ( $subTables && $subTables.size() > 0 )
+        // 校验子表单
+        #foreach ($subTable in $subTables)
+          #set ($index = $foreach.count - 1)
+          #set ($subClassNameVar = $subClassNameVars.get($index))
+          try {
+            await ${subClassNameVar}FormRef.value.validate()
+          } catch (e) {
+            subTabsName.value = '${subClassNameVar}'
+            return
+          }
+        #end
+      #end
+    #end
     modalApi.lock();
     // 提交表单
     const data = (await formApi.getValues()) as ${simpleClassName}Api.${simpleClassName};
+    ## 特殊：主子表专属逻辑
+    #if ( $table.templateType == 10 || $table.templateType == 12 )
+      #if ( $subTables && $subTables.size() > 0 )
+        // 拼接子表的数据
+        #foreach ($subTable in $subTables)
+          #set ($index = $foreach.count - 1)
+          #set ($subClassNameVar = $subClassNameVars.get($index))
+          data.${subClassNameVar}#if ( $subTable.subJoinMany)s#end = ${subClassNameVar}FormRef.value.getData()
+        #end
+      #end
+    #end
     try {
       await (formData.value?.id ? update${simpleClassName}(data) : create${simpleClassName}(data));
       // 关闭并提示
@@ -90,5 +135,20 @@ const [Modal, modalApi] = useVbenModal({
 <template>
   <Modal :title="getTitle">
     <Form class="mx-4" />
+    ## 特殊：主子表专属逻辑
+    #if ( $table.templateType == 10 || $table.templateType == 12 )
+      <!-- 子表的表单 -->
+      <Tabs v-model:active-key="subTabsName">
+        #foreach ($subTable in $subTables)
+          #set ($index = $foreach.count - 1)
+          #set ($subClassNameVar = $subClassNameVars.get($index))
+          #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+          #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+          <Tabs.TabPane key="$subClassNameVar" tab="${subTable.classComment}">
+            <${subSimpleClassName}Form ref="${subClassNameVar}FormRef" :${subJoinColumn_strikeCase}="formData.id" />
+          </Tabs.TabPane>
+        #end
+      </Tabs>
+    #end
   </Modal>
 </template>
