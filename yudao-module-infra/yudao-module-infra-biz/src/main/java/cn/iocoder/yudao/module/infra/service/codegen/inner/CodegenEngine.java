@@ -146,13 +146,13 @@ public class CodegenEngine {
                     vue3FilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
             // VUE3_VBEN5_ANTD_SCHEMA
             // TODO @puhui999：目录改成 vue3_vben5_antd；然后里面有 schema（目前我们在写的）和 general（你微信里提的，原生的，感觉也要搞！）
-            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3VbenNextSchemaTemplatePath("views/data.ts"),
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("views/data.ts"),
                     vue3FilePath("views/${table.moduleName}/${table.businessName}/data.ts"))
-            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3VbenNextSchemaTemplatePath("views/index.vue"),
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("views/index.vue"),
                     vue3FilePath("views/${table.moduleName}/${table.businessName}/index.vue"))
-            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3VbenNextSchemaTemplatePath("views/form.vue"),
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("views/form.vue"),
                     vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/form.vue"))
-            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3VbenNextSchemaTemplatePath("api/api.ts"),
+            .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("api/api.ts"),
                     vue3FilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
             // 主子表模板配置 - Vue3 vben5 schema 模版
             //.put(CodegenFrontTypeEnum.VUE3_VBEN_NEXT_SCHEMA.getType(), vue3VbenNextSchemaTemplatePath("views/master_slave_data.ts"),
@@ -515,8 +515,12 @@ public class CodegenEngine {
         return "codegen/vue3_vben/" + path + ".vm";
     }
 
-    private static String vue3VbenNextSchemaTemplatePath(String path) {
-        return "codegen/vue3_vben_next/schema/" + path + ".vm";
+    private static String vue3Vben5AntdSchemaTemplatePath(String path) {
+        return "codegen/vue3_vben5_antd/schema/" + path + ".vm";
+    }
+
+    private static String vue3Vben5AntdGeneralTemplatePath(String path) {
+        return "codegen/vue3_vben5_antd/general/" + path + ".vm";
     }
 
     private static boolean isSubTemplate(String path) {
