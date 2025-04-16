@@ -1,11 +1,10 @@
 package com.somle.esb.converter.oms;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import cn.iocoder.yudao.module.oms.api.OmsShopApi;
-import cn.iocoder.yudao.module.oms.api.dto.OmsOrderSaveReqDTO;
-import cn.iocoder.yudao.module.oms.api.dto.OmsShopDTO;
-import cn.iocoder.yudao.module.oms.api.dto.OmsShopProductSaveReqDTO;
-import cn.iocoder.yudao.module.oms.api.dto.OmsShopSaveReqDTO;
+import cn.iocoder.yudao.module.oms.api.dto.*;
 import cn.iocoder.yudao.module.oms.api.enums.shop.ShopTypeEnum;
 import com.somle.amazon.controller.vo.AmazonSpMarketplaceParticipationVO;
 import com.somle.amazon.controller.vo.AmazonSpMarketplaceVO;
@@ -15,7 +14,12 @@ import com.somle.esb.enums.PlatformEnum;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.oms.api.enums.OmsErrorCodeConstants.OMS_SYNC_SHOPIFY_SHOP_INFO_FIRST;
@@ -74,16 +78,35 @@ public class AmazonToOmsConverter {
         if (CollectionUtil.isEmpty(orders)) {
             return CollectionUtil.empty(List.class);
         }
-//        List<OmsOrderSaveReqDTO> omsOrderSaveReqDTOs = orders.stream()
-//            .map(order -> {
-//                OmsOrderSaveReqDTO omsOrderSaveReqDTO = new OmsOrderSaveReqDTO();
-//                omsOrderSaveReqDTO.setPlatformCode(this.platform.toString());
-//                omsOrderSaveReqDTO.setSourceNo(order.getAmazonOrderId());
-//                omsOrderSaveReqDTO.setShopId(null);
-//                omsOrderSaveReqDTO.setTotalPrice(new BigDecimal(order.getOrderTotal().getAmount()));
-//                omsOrderSaveReqDTO.setEmail(order.getBuyerInfo().getBuyerEmail());
-//                omsOrderSaveReqDTO.setSourceAddress(JsonUtilsX.toJsonString(order.getShippingAddress()));
-//            }).toList();
-        return null;
+
+        // key是platformShopCode
+        Map<String, OmsShopDTO> omsShopMap = omsShopApi.getByPlatformCode(this.platform.toString()).stream().collect(Collectors.toMap(OmsShopDTO::getPlatformShopCode, Function.identity()));
+
+        List<OmsOrderSaveReqDTO> omsOrderSaveReqDTOs = orders.stream()
+            .map(order -> {
+                OmsOrderSaveReqDTO omsOrderSaveReqDTO = new OmsOrderSaveReqDTO();
+                omsOrderSaveReqDTO.setPlatformCode(this.platform.toString());
+                omsOrderSaveReqDTO.setSourceNo(order.getAmazonOrderId());
+                MapUtils.findAndThen(omsShopMap, order.getMarketplaceId(), omsShopDTO -> omsOrderSaveReqDTO.setShopId(omsShopDTO.getId()));
+                omsOrderSaveReqDTO.setTotalPrice(new BigDecimal(Optional.ofNullable(order.getOrderTotal()).map(AmazonSpOrderRespVO.OrderTotal::getAmount).orElse("0.00")));
+                omsOrderSaveReqDTO.setEmail(order.getBuyerInfo().getBuyerEmail());
+                omsOrderSaveReqDTO.setSourceAddress(JsonUtilsX.toJsonString(order.getShippingAddress()));
+                //转换地址
+//                AmazonSpOrderRespVO.ShippingAddress shippingAddress = order.getShippingAddress();
+//                String address = shippingAddress.getCountryCode() + " " + shippingAddress.getStateOrRegion() + " " + shippingAddress.getCity() + " " + shippingAddress.getPostalCode();
+//                omsOrderSaveReqDTO.setAddress(address);
+
+                List<OmsOrderItemSaveReqDTO> omsOrderItemSaveReqDTOs = order.getOrderItems().stream()
+                    .map(orderItem -> {
+                        OmsOrderItemSaveReqDTO omsOrderItemSaveReqDTO = new OmsOrderItemSaveReqDTO();
+                        omsOrderItemSaveReqDTO.setShopProductCode(orderItem.getSellerSKU());
+                        omsOrderItemSaveReqDTO.setQty(orderItem.getQuantityOrdered());
+//                        omsOrderItemSaveReqDTO.setPrice(new BigDecimal(orderItem.getItemPrice().getAmount()));
+                        return omsOrderItemSaveReqDTO;
+                    }).toList();
+                omsOrderSaveReqDTO.setOmsOrderItemSaveReqDTOList(omsOrderItemSaveReqDTOs);
+                return omsOrderSaveReqDTO;
+            }).toList();
+        return omsOrderSaveReqDTOs;
     }
 }

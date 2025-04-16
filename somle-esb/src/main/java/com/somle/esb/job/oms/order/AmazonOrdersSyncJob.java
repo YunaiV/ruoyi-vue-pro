@@ -26,29 +26,6 @@ public class AmazonOrdersSyncJob extends BaseOrdersSyncJob {
     @Resource
     AmazonToOmsConverter amazonToOmsConverter;
 
-//    @Override
-//    public List<OmsOrderSaveReqDTO> listOrders() {
-//        return amazonSpService.clients.stream()
-//            .flatMap(client -> {
-//                // 获取所有marketplaceId
-//                List<String> marketplaceIds = client.getMarketplaceParticipations().stream()
-//                    .map(AmazonSpMarketplaceParticipationVO::getMarketplace)
-//                    .map(AmazonSpMarketplaceVO::getId)
-//                    .toList();
-//
-//                // 构建请求参数
-//                AmazonSpOrderReqVO vo = AmazonSpOrderReqVO.builder()
-//                    .createdAfter(LocalDateTime.of(2024, 10, 23, 0, 0))
-//                    .createdBefore(LocalDateTime.of(2024, 10, 24, 0, 0))
-//                    .marketplaceIds(marketplaceIds)
-//                    .build();
-//
-//                // 获取订单流并转换为DTO
-//                return amazonToOmsConverter.toOrders(client.streamOrder(vo).toList());
-//            })
-//            .toList();
-//    }
-
     @Override
     public List<OmsOrderSaveReqDTO> listOrders() {
         return amazonSpService.clients.stream()
@@ -80,7 +57,6 @@ public class AmazonOrdersSyncJob extends BaseOrdersSyncJob {
                     log.error("Failed to process orders for client: {}", client, e);
                     return Stream.empty();
                 }
-            })
-            .toList();
+            }).toList();
     }
 }

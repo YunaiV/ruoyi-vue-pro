@@ -46,4 +46,10 @@ public interface OmsShopApi {
      * @return: @return {@link OmsShopDTO }
      */
     OmsShopDTO getShopByPlatformShopCode(String platformShopCode);
+
+    /**
+     * @Author: gumaomao
+     * @Date: 2025/03/28  根据平台编码获取店铺信息集合
+     */
+    List<OmsShopDTO> getByPlatformCode(String platformCode);
 }

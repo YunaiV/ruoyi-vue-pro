@@ -105,7 +105,12 @@ public class ShopifyToOmsConverter {
                 omsOrderSaveReqDTO.setState(order.getCustomer().getState());
                 omsOrderSaveReqDTO.setCity(order.getCustomer().getDefaultAddress().getCity());
                 omsOrderSaveReqDTO.setSourceAddress(JsonUtilsX.toJsonString(order.getShippingAddress()));
-                omsOrderSaveReqDTO.setAddress(JsonUtilsX.toJsonString(order.getShippingAddress()));
+
+                //转换地址
+                ShopifyOrderRepsVO.ShippingAddressDTO shippingAddress = order.getShippingAddress();
+                String address = shippingAddress.getCountry() + " " + shippingAddress.getProvince() + " " + shippingAddress.getCity() + " " + shippingAddress.getAddress1();
+                omsOrderSaveReqDTO.setAddress(address);
+
                 List<OmsOrderItemSaveReqDTO> omsOrderItemSaveReqDTOs = order.getLineItems().stream()
                     .map(lineItem -> {
                         OmsOrderItemSaveReqDTO omsOrderItemSaveReqDTO = new OmsOrderItemSaveReqDTO();

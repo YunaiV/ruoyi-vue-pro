@@ -200,10 +200,9 @@ public class OmsOrderServiceImpl implements OmsOrderService {
      * @Description: 新增订单时新增订单项
      */
     public void createOrderItems(List<OmsOrderSaveReqDTO> saveReqDTOs, List<OmsOrderDO> createOrders) {
-        List<OmsOrderDO> existOrders = getByPlatformCode(saveReqDTOs.get(0).getPlatformCode());
         Set<String> sourceNos = createOrders.stream().map(OmsOrderDO::getSourceNo).collect(Collectors.toSet());
-        // 过滤出刚新增的订单
-        Map<String, OmsOrderDO> createdOrders = Optional.ofNullable(existOrders)
+        // 过滤出刚新增的订单 key = sourceNo
+        Map<String, OmsOrderDO> createdOrders = Optional.ofNullable(createOrders)
             .orElse(Collections.emptyList())
             .stream()
             .filter(omsOrderDO -> sourceNos.contains(omsOrderDO.getSourceNo()))

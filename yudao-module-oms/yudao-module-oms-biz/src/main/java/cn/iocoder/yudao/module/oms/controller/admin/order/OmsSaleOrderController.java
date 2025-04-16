@@ -89,23 +89,26 @@ public class OmsSaleOrderController {
         }
 
 
-        // 1.1 订单项
-        List<OmsOrderItemDO> saleOrderItemList = omsOrderService.getSaleOrderItemListByOrderIds(
-            convertSet(pageResult.getList(), OmsOrderDO::getId));
+        // 1 组装订单项 saleOrderItemMap 中key 为订单id，value 为单个订单所对应的订单项
+        List<OmsOrderItemDO> saleOrderItemList = omsOrderService.getSaleOrderItemListByOrderIds(convertSet(pageResult.getList(), OmsOrderDO::getId));
         Map<Long, List<OmsOrderItemDO>> saleOrderItemMap = convertMultiMap(saleOrderItemList, OmsOrderItemDO::getOrderId);
-        // 1.2 产品信息
+
+        // 2 组装产品信息 productMap 中key 为订单id，value 为单个订单所对应的所有产品信息
         Map<Long, List<ErpProductRespDTO>> productMap = new HashMap<>();
         List<OmsOrderDO> omsOrderList = pageResult.getList();
         for (OmsOrderDO omsOrderDO : omsOrderList) {
+            //2.1 先找出单个订单所对应的订单项
             List<OmsOrderItemDO> saleOrderItems = saleOrderItemMap.get(omsOrderDO.getId());
+            //2.2 收集单个订单的所有产品编码
             List<String> shopProductCodes = saleOrderItems.stream().map(OmsOrderItemDO::getShopProductCode).toList();
             List<OmsShopProductItemDO> shopProductItemList = omsShopProductItemService.getShopProductItemsByShopProductCodes(shopProductCodes);
             List<Long> productIds = shopProductItemList.stream().map(OmsShopProductItemDO::getProductId).distinct().toList();
+            //2.3 根据产品编码查询产品信息
             Map<Long, ErpProductRespDTO> productDTOMap = erpProductApi.getProductDTOMap(productIds);
             productMap.put(omsOrderDO.getId(), productDTOMap.values().stream().toList());
         }
 
-        //1.3 店铺信息
+        //1.3 店铺信息 shopMap 中key 为单个订单中的shop_id，value为所对应的店铺信息
         Set<Long> shopIds = omsOrderList.stream().map(OmsOrderDO::getShopId).collect(Collectors.toSet());
         Map<Long, OmsShopRespVO> shopMap = omsShopService.getShopMapByIds(shopIds);
 

@@ -1,6 +1,7 @@
 package com.somle.amazon.service;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.general.CoreUtils;
@@ -151,6 +152,9 @@ public class AmazonSpClient {
         try (var response = WebUtils.sendRequest(request)) {
             var bodyString = response.body().string();
             AmazonSpOrderRespVO result = JSONUtil.toBean(bodyString, AmazonSpOrderRespVO.class);
+            result.getPayload().getOrders().forEach(order -> {
+                order.setOrderItems(getAllOrderItems(AmazonSpOrderItemReqVO.builder().orderId(order.getAmazonOrderId()).build()));
+            });
             return result;
         }
     }
@@ -175,7 +179,36 @@ public class AmazonSpClient {
         if (amazonSpOrderRespVOS.isEmpty()) {
             return Collections.emptyList();
         }
-        return amazonSpOrderRespVOS.stream().flatMap(page -> page.getPayload().getOrders().stream()).toList();
+        return amazonSpOrderRespVOS.stream().flatMap(page -> page.getPayload().getOrders().stream()).filter(order -> CollectionUtil.isNotEmpty(order.getOrderItems())).toList();
+    }
+
+    public List<AmazonSpOrderItemRespVO.OrderItem> getAllOrderItems(AmazonSpOrderItemReqVO vo) {
+        AmazonSpOrderItemRespVO amazonSpOrderItemRespVO = getOrderItem(vo);
+        List<AmazonSpOrderItemRespVO.OrderItem> orderItems = Optional.ofNullable(amazonSpOrderItemRespVO.getPayload()).map(AmazonSpOrderItemRespVO.Payload::getOrderItems).orElse(Collections.emptyList());
+        while (amazonSpOrderItemRespVO.getPayload() != null && StrUtil.isNotEmpty(amazonSpOrderItemRespVO.getPayload().getNextToken())) {
+            amazonSpOrderItemRespVO = getOrderItem(vo.builder().nextToken(amazonSpOrderItemRespVO.getPayload().getNextToken()).build());
+            orderItems.addAll(amazonSpOrderItemRespVO.getPayload().getOrderItems());
+        }
+        return orderItems;
+    }
+
+    @SneakyThrows
+
+    public AmazonSpOrderItemRespVO getOrderItem(AmazonSpOrderItemReqVO vo) {
+        String endPoint = getEndPoint();
+        String partialUrl = "/orders/v0/orders/" + vo.getOrderId() + "/orderItems";
+        String fullUrl = endPoint + partialUrl;
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.GET)
+            .url(fullUrl)
+            .queryParams(vo)
+            .headers(generateHeaders(auth))
+            .build();
+        try (var response = WebUtils.sendRequest(request)) {
+            var bodyString = response.body().string();
+            AmazonSpOrderItemRespVO result = JSONUtil.toBean(bodyString, AmazonSpOrderItemRespVO.class);
+            return result;
+        }
     }
 
 

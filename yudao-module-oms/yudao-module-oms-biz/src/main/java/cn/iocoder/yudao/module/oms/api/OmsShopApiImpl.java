@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.oms.api;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.oms.api.dto.OmsShopDTO;
 import cn.iocoder.yudao.module.oms.api.dto.OmsShopSaveReqDTO;
 import cn.iocoder.yudao.module.oms.service.OmsShopService;
@@ -43,5 +45,13 @@ public class OmsShopApiImpl implements OmsShopApi {
     @Override
     public OmsShopDTO getShopByPlatformShopCode(String platformShopCode) {
         return shopService.getShopByPlatformShopCode(platformShopCode);
+    }
+
+    @Override
+    public List<OmsShopDTO> getByPlatformCode(String platformCode) {
+        if (platformCode == null) {
+            return CollectionUtil.empty(List.class);
+        }
+        return BeanUtils.toBean(shopService.getByPlatformCode(platformCode), OmsShopDTO.class);
     }
 }

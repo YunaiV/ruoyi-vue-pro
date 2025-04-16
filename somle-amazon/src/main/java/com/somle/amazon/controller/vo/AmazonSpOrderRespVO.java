@@ -47,6 +47,7 @@ public class AmazonSpOrderRespVO {
         private Boolean IsGlobalExpressEnabled;
         private String LastUpdateDate;
         private String ShipmentServiceLevelCategory;
+        private List<AmazonSpOrderItemRespVO.OrderItem> orderItems;
     }
 
     @Data
