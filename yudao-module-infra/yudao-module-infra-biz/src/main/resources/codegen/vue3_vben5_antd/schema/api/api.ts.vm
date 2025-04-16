@@ -108,31 +108,31 @@ export function export${simpleClassName}(params: any) {
 #if ( $table.templateType == 11 )
 /** 获得${subTable.classComment}分页 */
 export function get${subSimpleClassName}Page(params: PageParam) {
-  return requestClient.get<PageResult<${simpleClassName}Api.${simpleClassName}>>(`${baseURL}/${subSimpleClassName_strikeCase}/page`, { params });
+  return requestClient.get<PageResult<${simpleClassName}Api.${subSimpleClassName}>>(`${baseURL}/${subSimpleClassName_strikeCase}/page`, { params });
 }
 ## 情况二：非 MASTER_ERP 时，需要列表查询子表
 #else
   #if ( $subTable.subJoinMany )
 /** 获得${subTable.classComment}列表 */
 export function get${subSimpleClassName}ListBy${SubJoinColumnName}(${subJoinColumn.javaField}: number) {
-  return requestClient.get<${simpleClassName}Api.${simpleClassName}[]>(`${baseURL}/${subSimpleClassName_strikeCase}/list-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=${${subJoinColumn.javaField}}`);
+  return requestClient.get<${simpleClassName}Api.${subSimpleClassName}[]>(`${baseURL}/${subSimpleClassName_strikeCase}/list-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=${${subJoinColumn.javaField}}`);
 }
   #else
 /** 获得${subTable.classComment} */
 export function get${subSimpleClassName}By${SubJoinColumnName}(${subJoinColumn.javaField}: number) {
-  return requestClient.get<${simpleClassName}Api.${simpleClassName}>(`${baseURL}/${subSimpleClassName_strikeCase}/get-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=${${subJoinColumn.javaField}}`);
+  return requestClient.get<${simpleClassName}Api.${subSimpleClassName}>(`${baseURL}/${subSimpleClassName_strikeCase}/get-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=${${subJoinColumn.javaField}}`);
 }
   #end
 #end
 ## 特殊：MASTER_ERP 时，支持单个的新增、修改、删除操作
 #if ( $table.templateType == 11 )
 /** 新增${subTable.classComment} */
-export function create${subSimpleClassName}(data: ${simpleClassName}Api.${simpleClassName}) {
+export function create${subSimpleClassName}(data: ${simpleClassName}Api.${subSimpleClassName}) {
   return requestClient.post(`${baseURL}/${subSimpleClassName_strikeCase}/create`, data);
 }
 
 /** 修改${subTable.classComment} */
-export function update${subSimpleClassName}(data: ${simpleClassName}Api.${simpleClassName}) {
+export function update${subSimpleClassName}(data: ${simpleClassName}Api.${subSimpleClassName}) {
   return requestClient.put(`${baseURL}/${subSimpleClassName_strikeCase}/update`, data);
 }
 
@@ -143,7 +143,7 @@ export function delete${subSimpleClassName}(id: number) {
 
 /** 获得${subTable.classComment} */
 export function get${subSimpleClassName}(id: number) {
-  return requestClient.get<${simpleClassName}Api.${simpleClassName}>(`${baseURL}/${subSimpleClassName_strikeCase}/get?id=${id}`);
+  return requestClient.get<${simpleClassName}Api.${subSimpleClassName}>(`${baseURL}/${subSimpleClassName_strikeCase}/get?id=${id}`);
 }
 #end
 #end
