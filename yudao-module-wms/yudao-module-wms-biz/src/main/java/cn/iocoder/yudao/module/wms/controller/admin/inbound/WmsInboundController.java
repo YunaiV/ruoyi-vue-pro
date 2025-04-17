@@ -191,4 +191,4 @@ public class WmsInboundController {
         // 导出 Excel
         ExcelUtils.write(response, "入库单.xls", "数据", WmsInboundRespVO.class, BeanUtils.toBean(list, WmsInboundRespVO.class));
     }
-}
+}

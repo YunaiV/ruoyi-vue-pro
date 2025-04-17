@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.test;
 
+import cn.iocoder.yudao.module.erp.ErpClients;
+import cn.iocoder.yudao.module.wms.WmsClients;
 import jakarta.annotation.Resource;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +33,27 @@ public class BaseRestIntegrationTest {
     private ApplicationContext applicationContext;
 
     private static Map<Class<? extends RestClient>,RestClient> CLIENTS = new HashMap<>();
+
+    private WmsClients wmsClients = null;
+
+    public WmsClients wms() {
+        if(wmsClients==null) {
+            wmsClients = new WmsClients(this);
+        }
+        return wmsClients;
+    }
+
+
+    private ErpClients erpClients = null;
+
+    public ErpClients erp() {
+        if(erpClients==null) {
+            erpClients = new ErpClients(this);
+        }
+        return erpClients;
+    }
+
+
 
     public <C extends RestClient> C getClient(Class<C> clazz) {
 

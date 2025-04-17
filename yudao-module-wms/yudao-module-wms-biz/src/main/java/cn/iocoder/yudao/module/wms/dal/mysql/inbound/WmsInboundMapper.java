@@ -18,32 +18,23 @@ public interface WmsInboundMapper extends BaseMapperX<WmsInboundDO> {
 
     default PageResult<WmsInboundDO> selectPage(WmsInboundPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<WmsInboundDO>()
-				.eqIfPresent(WmsInboundDO::getNo, reqVO.getNo())
+				.eqIfPresent(WmsInboundDO::getCode, reqVO.getCode())
 				.eqIfPresent(WmsInboundDO::getType, reqVO.getType())
 				.eqIfPresent(WmsInboundDO::getWarehouseId, reqVO.getWarehouseId())
 				.eqIfPresent(WmsInboundDO::getAuditStatus, reqVO.getAuditStatus())
 				.eqIfPresent(WmsInboundDO::getInboundStatus, reqVO.getInboundStatus())
 				.eqIfPresent(WmsInboundDO::getSourceBillId, reqVO.getSourceBillId())
-				.eqIfPresent(WmsInboundDO::getSourceBillNo, reqVO.getSourceBillNo())
-				.eqIfPresent(WmsInboundDO::getSourceBillType, // .betweenIfPresent(WmsInboundDO::getArrivalPlanTime, reqVO.getArrivalPlanTime())
-        reqVO.getSourceBillType()).// .betweenIfPresent(WmsInboundDO::getArrivalPlanTime, reqVO.getArrivalPlanTime())
+				.eqIfPresent(WmsInboundDO::getSourceBillCode, reqVO.getSourceBillCode()).// .betweenIfPresent(WmsInboundDO::getArrivalPlanTime, reqVO.getArrivalPlanTime())
         eqIfPresent(// .betweenIfPresent(WmsInboundDO::getArrivalPlanTime, reqVO.getArrivalPlanTime())
-        WmsInboundDO::getTraceNo, // .betweenIfPresent(WmsInboundDO::getArrivalActualTime, reqVO.getArrivalActualTime())
-        reqVO.getTraceNo())
+        WmsInboundDO::getSourceBillType, // .betweenIfPresent(WmsInboundDO::getArrivalPlanTime, reqVO.getArrivalPlanTime())
+        reqVO.getSourceBillType()).// .betweenIfPresent(WmsInboundDO::getArrivalPlanTime, reqVO.getArrivalPlanTime())
+        eqIfPresent(// .betweenIfPresent(WmsInboundDO::getArrivalActualTime, reqVO.getArrivalActualTime())
+        WmsInboundDO::getTraceNo, reqVO.getTraceNo())
 				.eqIfPresent(WmsInboundDO::getShippingMethod, reqVO.getShippingMethod())
 				.eqIfPresent(WmsInboundDO::getCreatorComment, reqVO.getCreatorComment())
 				.eqIfPresent(WmsInboundDO::getInitAge, reqVO.getInitAge())
 				.betweenIfPresent(WmsInboundDO::getCreateTime, reqVO.getCreateTime())
 				.orderByDesc(WmsInboundDO::getId));
-    }
-
-    /**
-     * 按 no 查询唯一的 WmsInboundDO
-     */
-    default WmsInboundDO getByNo(String no) {
-        LambdaQueryWrapperX<WmsInboundDO> wrapper = new LambdaQueryWrapperX<>();
-        wrapper.eq(WmsInboundDO::getNo, no);
-        return selectOne(wrapper);
     }
 
     /**
@@ -74,12 +65,21 @@ public interface WmsInboundMapper extends BaseMapperX<WmsInboundDO> {
 
     default List<WmsInboundDO> getSimpleList(WmsInboundPageReqVO pageReqVO) {
         LambdaQueryWrapperX<WmsInboundDO> wrapper = new LambdaQueryWrapperX<>();
-        wrapper.likeIfPresent(WmsInboundDO::getNo, pageReqVO.getNo());
+        wrapper.likeIfPresent(WmsInboundDO::getCode, pageReqVO.getCode());
         wrapper.likeIfPresent(WmsInboundDO::getTraceNo, pageReqVO.getTraceNo());
-        wrapper.likeIfPresent(WmsInboundDO::getSourceBillNo, pageReqVO.getSourceBillNo());
+        wrapper.likeIfPresent(WmsInboundDO::getSourceBillCode, pageReqVO.getSourceBillCode());
         wrapper.eqIfPresent(WmsInboundDO::getType, pageReqVO.getType());
         wrapper.eqIfPresent(WmsInboundDO::getWarehouseId, pageReqVO.getWarehouseId());
         wrapper.eqIfPresent(WmsInboundDO::getTraceNo, pageReqVO.getTraceNo());
         return selectList(wrapper);
     }
-}
+
+    /**
+     * 按 code 查询唯一的 WmsInboundDO
+     */
+    default WmsInboundDO getByCode(String code) {
+        LambdaQueryWrapperX<WmsInboundDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsInboundDO::getCode, code);
+        return selectOne(wrapper);
+    }
+}

@@ -190,7 +190,7 @@ public class InventoryExecutor extends QuantityExecutor<InventoryContext> {
         inboundSaveReqVO.setWarehouseId(inventoryDO.getWarehouseId());
         inboundSaveReqVO.setItemList(inboundItemSaveReqVOList);
         inboundSaveReqVO.setSourceBillId(inventoryDO.getId());
-        inboundSaveReqVO.setSourceBillNo(inventoryDO.getNo());
+        inboundSaveReqVO.setSourceBillCode(inventoryDO.getNo());
         inboundSaveReqVO.setSourceBillType(WmsBillType.INVENTORY.getValue());
         inboundSaveReqVO.setType(WmsInboundType.INVENTORY.getValue());
 

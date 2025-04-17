@@ -34,7 +34,7 @@ public interface WmsInboundItemQueryMapper extends BaseMapperX<WmsInboundItemQue
 
         //
         wrapper.innerJoin(WmsInboundDO.class,WmsInboundDO::getId, WmsInboundItemQueryDO::getInboundId)
-            .likeIfExists(WmsInboundDO::getNo, reqVO.getInboundNo())
+            .likeIfExists(WmsInboundDO::getCode, reqVO.getInboundNo())
             .eqIfExists(WmsInboundDO::getWarehouseId, reqVO.getWarehouseId())
             .eqIfExists(WmsInboundDO::getDeptId, reqVO.getDeptId())
             .eqIfExists(WmsInboundDO::getCompanyId, reqVO.getCompanyId());
@@ -70,7 +70,7 @@ public interface WmsInboundItemQueryMapper extends BaseMapperX<WmsInboundItemQue
     default PageResult<WmsInboundItemQueryDO> getPickupPending(WmsPickupPendingPageReqVO reqVO) {
         MPJLambdaWrapperX<WmsInboundItemQueryDO> query = new MPJLambdaWrapperX<>();
         query.selectAll(WmsInboundItemDO.class).select(WmsInboundDO::getWarehouseId);
-        query.gt(WmsInboundItemDO::getActualQty, WmsInboundItemDO::getShelvedQty).innerJoin(WmsInboundDO.class, WmsInboundDO::getId, WmsInboundItemDO::getInboundId).likeIfExists(WmsInboundDO::getNo, reqVO.getInboundNo())
+        query.gt(WmsInboundItemDO::getActualQty, WmsInboundItemDO::getShelvedQty).innerJoin(WmsInboundDO.class, WmsInboundDO::getId, WmsInboundItemDO::getInboundId).likeIfExists(WmsInboundDO::getCode, reqVO.getInboundNo())
             .orderByDesc(WmsInboundItemDO::getId);
         return selectPage(reqVO, query);
     }

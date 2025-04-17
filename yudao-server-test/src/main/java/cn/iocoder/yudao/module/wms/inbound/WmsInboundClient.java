@@ -1,10 +1,10 @@
-package cn.iocoder.yudao.module.wms.inventory;
+package cn.iocoder.yudao.module.wms.inbound;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
-import cn.iocoder.yudao.module.wms.controller.admin.inventory.bin.vo.WmsInventoryBinSaveReqVO;
-import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventoryRespVO;
-import cn.iocoder.yudao.module.wms.controller.admin.inventory.vo.WmsInventorySaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundSaveReqVO;
 import cn.iocoder.yudao.test.Profile;
 import cn.iocoder.yudao.test.RestClient;
 import org.junit.Assert;
@@ -17,14 +17,14 @@ import java.util.List;
  * @date: 2025/4/11 8:36
  * @description:
  */
-public class WmsInventoryClient extends RestClient {
+public class WmsInboundClient extends RestClient {
 
-    public WmsInventoryClient(Profile profile, TestRestTemplate testRestTemplate) {
+    public WmsInboundClient(Profile profile, TestRestTemplate testRestTemplate) {
         super(profile, testRestTemplate);
     }
 
-    public CommonResult<Long> createInventory(WmsInventorySaveReqVO createReqVO) {
-        CommonResult<Long> result = this.create("/wms/inventory/create",createReqVO);
+    public CommonResult<Long> createInbound(WmsInboundSaveReqVO createReqVO) {
+        CommonResult<Long> result = this.create("/wms/inbound/create",createReqVO);
         Assert.assertNotNull(result);
         Assert.assertTrue(result.isSuccess());
         Assert.assertNotNull(result.getData());
@@ -34,8 +34,8 @@ public class WmsInventoryClient extends RestClient {
 
 
 
-    public CommonResult<Boolean> updateInventory(WmsInventorySaveReqVO updateReqVO) {
-        CommonResult<Boolean> result = this.update("/wms/inventory/update",updateReqVO);
+    public CommonResult<Boolean> updateInbound(WmsInboundSaveReqVO updateReqVO) {
+        CommonResult<Boolean> result = this.update("/wms/inbound/update",updateReqVO);
         Assert.assertNotNull(result);
         Assert.assertTrue(result.isSuccess());
         Assert.assertNotNull(result.getData());
@@ -43,18 +43,18 @@ public class WmsInventoryClient extends RestClient {
         return result;
     }
 
-    protected CommonResult<WmsInventoryRespVO> getInventory(Long inventoryId) {
-        CommonResult<WmsInventoryRespVO> result = getOne("/wms/inventory/get", inventoryId,WmsInventoryRespVO.class);
+    protected CommonResult<WmsInboundRespVO> getInbound(Long inboundId) {
+        CommonResult<WmsInboundRespVO> result = getOne("/wms/inbound/get", inboundId,WmsInboundRespVO.class);
         Assert.assertNotNull(result);
         Assert.assertTrue(result.isSuccess());
         Assert.assertNotNull(result.getData());
         Assert.assertNotNull(result.getData());
-        Assert.assertEquals(result.getData().getId(), inventoryId);
+        Assert.assertEquals(result.getData().getId(), inboundId);
         return result;
     }
 
-    public CommonResult<Boolean> updateInventoryActualQuantity(List<WmsInventoryBinSaveReqVO> binSaveReqVOS) {
-        CommonResult<Boolean> result = this.update("/wms/inventory-bin/update-actual-quantity",binSaveReqVOS);
+    public CommonResult<Boolean> updateInventoryActualQuantity(List<WmsInboundItemSaveReqVO> itemSaveReqVOS) {
+        CommonResult<Boolean> result = this.update("/wms/inbound-item/update-actual-quantity",itemSaveReqVOS);
         Assert.assertNotNull(result);
         Assert.assertTrue(result.isSuccess());
         Assert.assertNotNull(result.getData());
@@ -67,7 +67,7 @@ public class WmsInventoryClient extends RestClient {
         approvalReqVO.setBillId(inventoryId);
         approvalReqVO.setComment("提交审批");
         //
-        CommonResult<Boolean> result = this.update("/wms/inventory/submit",approvalReqVO);
+        CommonResult<Boolean> result = this.update("/wms/inbound/submit",approvalReqVO);
         Assert.assertNotNull(result);
         Assert.assertTrue(result.isSuccess());
         Assert.assertNotNull(result.getData());
@@ -78,8 +78,8 @@ public class WmsInventoryClient extends RestClient {
     public CommonResult<Boolean> agree(Long inventoryId) {
         WmsApprovalReqVO approvalReqVO = new WmsApprovalReqVO();
         approvalReqVO.setBillId(inventoryId);
-        approvalReqVO.setComment("调整库存");
-        CommonResult<Boolean> result = this.update("/wms/inventory/agree",approvalReqVO);
+        approvalReqVO.setComment("同意入库");
+        CommonResult<Boolean> result = this.update("/wms/inbound/agree",approvalReqVO);
         Assert.assertNotNull(result);
         Assert.assertTrue(result.isSuccess());
         Assert.assertNotNull(result.getData());

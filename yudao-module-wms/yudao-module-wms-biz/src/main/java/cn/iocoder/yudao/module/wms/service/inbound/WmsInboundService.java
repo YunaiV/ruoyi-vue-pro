@@ -90,7 +90,7 @@ public interface WmsInboundService {
      * @param warehouseId
      * @param productId
      * @param olderFirst 是否按入库时间升序
-     **/
+     */
     WmsInboundItemOwnershipDO getInboundItemOwnership(Long warehouseId, Long productId, boolean olderFirst);
 
     /**
@@ -98,16 +98,16 @@ public interface WmsInboundService {
      * @param warehouseId
      * @param productId
      * @param olderFirst 是否按入库时间升序
-     **/
-    List<WmsInboundItemOwnershipDO> selectInboundItemOwnershipList(Long warehouseId, Long productId,boolean olderFirst);
+     */
+    List<WmsInboundItemOwnershipDO> selectInboundItemOwnershipList(Long warehouseId, Long productId, boolean olderFirst);
 
     /**
      * 按入库顺序获得第一个入库批次
      * @param warehouseId
      * @param productIds
      * @param olderFirst 是否按入库时间升序
-     **/
-    Map<Long,WmsInboundItemOwnershipDO> getInboundItemOwnershipMap(Long warehouseId, List<Long> productIds, boolean olderFirst);
+     */
+    Map<Long, WmsInboundItemOwnershipDO> getInboundItemOwnershipMap(Long warehouseId, List<Long> productIds, boolean olderFirst);
 
     WmsInboundDO createForInventory(WmsInboundSaveReqVO inboundSaveReqVO);
 }

@@ -14,7 +14,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,no,creator,inbound_status,company_id,inbound_time,create_time,arrival_actual_time,audit_status,creator_comment,type,source_bill_id,trace_no,updater,update_time,init_age,source_bill_no,shipping_method,source_bill_type,id,dept_id,warehouse_id,arrival_plan_time
+ * @table-fields : tenant_id,creator,code,inbound_status,company_id,inbound_time,create_time,arrival_actual_time,audit_status,creator_comment,type,source_bill_id,trace_no,updater,source_bill_code,update_time,init_age,shipping_method,source_bill_type,id,dept_id,warehouse_id,arrival_plan_time
  */
 @Schema(description = "管理后台 - 入库单 Response VO")
 @Data
@@ -25,11 +25,7 @@ public class WmsInboundRespVO {
     @ExcelProperty("主键")
     private Long id;
 
-    @Schema(description = "单据号")
-    @ExcelProperty("单据号")
-    private String no;
-
-    @Schema(description = "WMS入库单类型 ; WmsInboundType : 1-手工入库 , 2-采购入库", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "WMS入库单类型 ; WmsInboundType : 1-手工入库 , 2-采购入库 , 3-盘点入库", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @ExcelProperty("WMS入库单类型")
     private Integer type;
 
@@ -41,11 +37,7 @@ public class WmsInboundRespVO {
     @ExcelProperty("来源单据ID")
     private Long sourceBillId;
 
-    @Schema(description = "来源单据号")
-    @ExcelProperty("来源单据号")
-    private String sourceBillNo;
-
-    @Schema(description = "WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单", example = "2")
+    @Schema(description = "WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单 , 2-盘点单", example = "2")
     @ExcelProperty("WMS来源单据类型")
     private Integer sourceBillType;
 
@@ -98,7 +90,7 @@ public class WmsInboundRespVO {
     @ExcelProperty("详情清单")
     private List<WmsInboundItemRespVO> itemList;
 
-    @Schema(description = "WMS入库单审批状态 ; WmsInboundAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过 , 4-强制完成 , 5-已作废", example = "")
+    @Schema(description = "WMS入库单审批状态 ; WmsInboundAuditStatus : 0-草稿 , 1-待入库 , 2-驳回 , 3-已入库 , 4-强制入库 , 5-作废", example = "")
     @ExcelProperty("WMS入库单审批状态")
     private Integer auditStatus;
 
@@ -138,4 +130,12 @@ public class WmsInboundRespVO {
     @Schema(description = "财务公司", example = "")
     @ExcelProperty("财务公司")
     private FmsCompanySimpleRespVO company;
+
+    @Schema(description = "单据号", example = "")
+    @ExcelProperty("单据号")
+    private String code;
+
+    @Schema(description = "来源单据号", example = "")
+    @ExcelProperty("来源单据号")
+    private String sourceBillCode;
 }

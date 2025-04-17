@@ -17,7 +17,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : no,inbound_status,company_id,inbound_time,arrival_actual_time,audit_status,creator_comment,type,source_bill_id,trace_no,init_age,source_bill_no,shipping_method,source_bill_type,id,dept_id,warehouse_id,arrival_plan_time
+ * @table-fields : code,inbound_status,company_id,inbound_time,arrival_actual_time,audit_status,creator_comment,type,source_bill_id,trace_no,source_bill_code,init_age,shipping_method,source_bill_type,id,dept_id,warehouse_id,arrival_plan_time
  */
 @Schema(description = "管理后台 - 入库单新增/修改 Request VO")
 @Data
@@ -27,10 +27,7 @@ public class WmsInboundSaveReqVO {
     @NotNull(message = "主键不能为空", groups = { ValidationGroup.update.class })
     private Long id;
 
-    @Schema(description = "单据号")
-    private String no;
-
-    @Schema(description = "WMS入库单类型 ; WmsInboundType : 1-手工入库 , 2-采购入库", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "WMS入库单类型 ; WmsInboundType : 1-手工入库 , 2-采购入库 , 3-盘点入库", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "WMS入库单类型不能为空", groups = { ValidationGroup.create.class })
     @InEnum(WmsInboundType.class)
     private Integer type;
@@ -42,10 +39,7 @@ public class WmsInboundSaveReqVO {
     @Schema(description = "来源单据ID", example = "24655")
     private Long sourceBillId;
 
-    @Schema(description = "来源单据号")
-    private String sourceBillNo;
-
-    @Schema(description = "WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单", example = "2")
+    @Schema(description = "WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单 , 2-盘点单", example = "2")
     @InEnum(WmsBillType.class)
     private Integer sourceBillType;
 
@@ -65,7 +59,7 @@ public class WmsInboundSaveReqVO {
     @Schema(description = "详情清单", example = "")
     private List<WmsInboundItemSaveReqVO> itemList;
 
-    @Schema(description = "WMS入库单审批状态 ; WmsInboundAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过 , 4-强制完成 , 5-已作废", example = "")
+    @Schema(description = "WMS入库单审批状态 ; WmsInboundAuditStatus : 0-草稿 , 1-待入库 , 2-驳回 , 3-已入库 , 4-强制入库 , 5-作废", example = "")
     @InEnum(WmsInboundAuditStatus.class)
     private Integer auditStatus;
 
@@ -90,4 +84,10 @@ public class WmsInboundSaveReqVO {
 
     @Schema(description = "库存归属部门ID", example = "")
     private Long deptId;
+
+    @Schema(description = "单据号", example = "")
+    private String code;
+
+    @Schema(description = "来源单据号", example = "")
+    private String sourceBillCode;
 }

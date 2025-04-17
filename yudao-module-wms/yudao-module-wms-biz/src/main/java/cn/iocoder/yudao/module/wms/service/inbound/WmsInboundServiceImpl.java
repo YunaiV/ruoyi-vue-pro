@@ -43,14 +43,12 @@ import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_CAN_NOT_EDIT;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_PLAN_QTY_ERROR;
@@ -114,10 +112,10 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     public WmsInboundDO createInbound(WmsInboundSaveReqVO createReqVO) {
         // 设置单据号
         String no = noRedisDAO.generate(WmsNoRedisDAO.INBOUND_NO_PREFIX, 3);
-        createReqVO.setNo(no);
+        createReqVO.setCode(no);
         createReqVO.setAuditStatus(WmsInboundAuditStatus.DRAFT.getValue());
         createReqVO.setInboundStatus(WmsInboundStatus.NONE.getValue());
-        if (inboundMapper.getByNo(createReqVO.getNo()) != null) {
+        if (inboundMapper.getByCode(createReqVO.getCode()) != null) {
             throw exception(INBOUND_NO_DUPLICATE);
         }
         // 按 wms_inbound.warehouse_id -> wms_warehouse.id 的引用关系，校验存在性
@@ -169,7 +167,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
             throw exception(INBOUND_CAN_NOT_EDIT);
         }
         // 单据号不允许被修改
-        updateReqVO.setNo(exists.getNo());
+        updateReqVO.setCode(exists.getCode());
         // 按 wms_inbound.warehouse_id -> wms_warehouse.id 的引用关系，校验存在性
         if (updateReqVO.getWarehouseId() != null) {
             WmsWarehouseDO warehouse = warehouseService.getWarehouse(updateReqVO.getWarehouseId());
@@ -235,7 +233,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
             throw exception(INBOUND_CAN_NOT_EDIT);
         }
         // 唯一索引去重
-        inbound.setNo(inboundMapper.flagUKeyAsLogicDelete(inbound.getNo()));
+        inbound.setCode(inboundMapper.flagUKeyAsLogicDelete(inbound.getCode()));
         inboundMapper.updateById(inbound);
         // 删除
         inboundMapper.deleteById(id);
@@ -377,7 +375,6 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         StreamX.from(list).assemble(warehouseVOMap, WmsInboundRespVO::getWarehouseId, WmsInboundRespVO::setWarehouse);
     }
 
-
     @Override
     public void assembleCompany(List<WmsInboundRespVO> list) {
         Map<Long, FmsCompanyDTO> companyMap = companyApi.getCompanyMap(StreamX.from(list).toList(WmsInboundRespVO::getCompanyId));
@@ -391,13 +388,12 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         StreamX.from(list).assemble(groupedApprovalHistory, WmsInboundRespVO::getId, WmsInboundRespVO::setApprovalHistoryList);
     }
 
-
     /**
      * 按入库顺序获得第一个入库批次
      * @param warehouseId
      * @param productId
      * @param olderFirst 是否按入库时间升序
-     **/
+     */
     public WmsInboundItemOwnershipDO getInboundItemOwnership(Long warehouseId, Long productId, boolean olderFirst) {
         return inboundItemOwnershipQueryMapper.getInboundItemOwnership(warehouseId, productId, olderFirst);
     }
@@ -407,8 +403,8 @@ public class WmsInboundServiceImpl implements WmsInboundService {
      * @param warehouseId
      * @param productIds
      * @param olderFirst 是否按入库时间升序
-     **/
-    public Map<Long,WmsInboundItemOwnershipDO> getInboundItemOwnershipMap(Long warehouseId, List<Long> productIds, boolean olderFirst) {
+     */
+    public Map<Long, WmsInboundItemOwnershipDO> getInboundItemOwnershipMap(Long warehouseId, List<Long> productIds, boolean olderFirst) {
         return inboundItemOwnershipQueryMapper.selectInboundItemOwnershipMap(warehouseId, productIds, olderFirst);
     }
 
@@ -417,44 +413,38 @@ public class WmsInboundServiceImpl implements WmsInboundService {
      * @param warehouseId
      * @param productId
      * @param olderFirst 是否按入库时间升序
-     **/
-    public List<WmsInboundItemOwnershipDO> selectInboundItemOwnershipList(Long warehouseId, Long productId,boolean olderFirst) {
+     */
+    public List<WmsInboundItemOwnershipDO> selectInboundItemOwnershipList(Long warehouseId, Long productId, boolean olderFirst) {
         Map<Long, List<WmsInboundItemOwnershipDO>> longListMap = inboundItemOwnershipQueryMapper.selectInboundItemOwnershipGroupedMap(warehouseId, Arrays.asList(productId), olderFirst);
         return longListMap.get(productId);
     }
 
     @Override
     public WmsInboundDO createForInventory(WmsInboundSaveReqVO inboundSaveReqVO) {
-
         JdbcUtils.requireTransaction();
-
-        Map<Long,Integer> actualQtyMap = StreamX.from(inboundSaveReqVO.getItemList()).toMap(WmsInboundItemSaveReqVO::getProductId,WmsInboundItemSaveReqVO::getActualQty);
-
+        Map<Long, Integer> actualQtyMap = StreamX.from(inboundSaveReqVO.getItemList()).toMap(WmsInboundItemSaveReqVO::getProductId, WmsInboundItemSaveReqVO::getActualQty);
         // 创建
         WmsInboundDO inbound = this.createInbound(inboundSaveReqVO);
         // 保存
         inbound.setSourceBillType(WmsBillType.INVENTORY.getValue());
         inbound.setType(WmsInboundType.INVENTORY.getValue());
         inboundMapper.updateById(inbound);
-        //
+        // 
         WmsApprovalReqVO approvalReqVO = new WmsApprovalReqVO();
         approvalReqVO.setBillId(inbound.getId());
         approvalReqVO.setComment("盘点入库");
-
         this.approve(WmsInboundAuditStatus.Event.SUBMIT, approvalReqVO);
-
         // 拉取明细
         List<WmsInboundItemDO> inboundItemDOS = inboundItemService.selectByInboundId(inbound.getId());
         // 设置实际入库量
-        StreamX.from(inboundItemDOS).assemble(actualQtyMap, WmsInboundItemDO::getProductId,(itemO,qty)->{
+        StreamX.from(inboundItemDOS).assemble(actualQtyMap, WmsInboundItemDO::getProductId, (itemO, qty) -> {
             itemO.setActualQty(qty);
         });
         // 保存实际入库量
         inboundItemService.updateActualQuantity(BeanUtils.toBean(inboundItemDOS, WmsInboundItemSaveReqVO.class));
         // 同意确认收货
         this.approve(WmsInboundAuditStatus.Event.AGREE, approvalReqVO);
-        //
+        // 
         return this.getInbound(inbound.getId());
     }
-
 }

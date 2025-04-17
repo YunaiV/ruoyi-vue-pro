@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.wms.stock.ownership.move;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.wms.WmsBaseTest;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move.item.vo.WmsStockOwnershipMoveItemSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move.vo.WmsStockOwnershipMoveSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.WmsStockOwnershipRespVO;
+import cn.iocoder.yudao.test.BaseRestIntegrationTest;
 import cn.iocoder.yudao.test.Profile;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ import java.util.List;
  */
 
 
-public class WmsStockOwnershipMoveTest extends WmsBaseTest {
+public class WmsStockOwnershipMoveTest extends BaseRestIntegrationTest {
 
 
     @Test
@@ -30,7 +30,7 @@ public class WmsStockOwnershipMoveTest extends WmsBaseTest {
 
 
         // 确定从哪个所有者库存出哪个产品
-        CommonResult<PageResult<WmsStockOwnershipRespVO>> stockOwnershipPageResult = this.stockOwnershipClient().getStockOwnershipPage(warehouseId);
+        CommonResult<PageResult<WmsStockOwnershipRespVO>> stockOwnershipPageResult = this.wms().stockOwnershipClient().getStockOwnershipPage(warehouseId);
         if(stockOwnershipPageResult.isError()) {
             System.err.println("缺少库存数据，无法继续测试");
             return;
@@ -75,15 +75,15 @@ public class WmsStockOwnershipMoveTest extends WmsBaseTest {
         itemSaveReqVO.setQty(qty);
 
         createReqVO.setItemList(List.of(itemSaveReqVO));
-        CommonResult<Long> postResult=this.stockOwnershipClient().createStockOwnershipMove(createReqVO);
+        CommonResult<Long> postResult=this.wms().stockOwnershipClient().createStockOwnershipMove(createReqVO);
 
         if(postResult.isError()) {
             Assert.assertTrue("创建所有者库存移动失败",false);
         }
 
 
-        CommonResult<List<WmsStockOwnershipRespVO>> fromStockOwnershipResultAfter = this.stockOwnershipClient().getStockOwnership(warehouseId, fromStockOwnershipVOBefore.getCompanyId(),fromStockOwnershipVOBefore.getDeptId(), fromStockOwnershipVOBefore.getProductId());
-        CommonResult<List<WmsStockOwnershipRespVO>> toStockOwnershipResultAfter = this.stockOwnershipClient().getStockOwnership(warehouseId, toStockOwnershipBefore.getCompanyId(),toStockOwnershipBefore.getDeptId(), fromStockOwnershipVOBefore.getProductId());
+        CommonResult<List<WmsStockOwnershipRespVO>> fromStockOwnershipResultAfter = this.wms().stockOwnershipClient().getStockOwnership(warehouseId, fromStockOwnershipVOBefore.getCompanyId(),fromStockOwnershipVOBefore.getDeptId(), fromStockOwnershipVOBefore.getProductId());
+        CommonResult<List<WmsStockOwnershipRespVO>> toStockOwnershipResultAfter = this.wms().stockOwnershipClient().getStockOwnership(warehouseId, toStockOwnershipBefore.getCompanyId(),toStockOwnershipBefore.getDeptId(), fromStockOwnershipVOBefore.getProductId());
 
         WmsStockOwnershipRespVO fromStockOwnershipVOAfter = fromStockOwnershipResultAfter.getData().get(0);
         WmsStockOwnershipRespVO toStockOwnershipVOAfter = toStockOwnershipResultAfter.getData().get(0);

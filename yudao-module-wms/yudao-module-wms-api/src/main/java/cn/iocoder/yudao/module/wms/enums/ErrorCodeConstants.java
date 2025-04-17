@@ -50,6 +50,7 @@ public interface ErrorCodeConstants {
     ErrorCode INBOUND_FORCE_FINISH_NOT_ALLOWED = new ErrorCode(2_001_004_024, "入库单不允许强制完成");
     ErrorCode INBOUND_AUDIT_FAIL = new ErrorCode(2_001_004_025, "审核错误，当前入库单状态为{}，在{}状态时才允许{}");
     ErrorCode INBOUND_EXISTS = new ErrorCode(2_001_004_026, "入库单已存在");
+    ErrorCode INBOUND_CODE_DUPLICATE = new ErrorCode(2_001_004_027, "单据号已存在");
 
     // ========== WMS_INBOUND_ITEM 入库单详情表 2_001_005_000 ==========
     ErrorCode INBOUND_ITEM_NOT_EXISTS = new ErrorCode(2_001_005_001, "入库单详情不存在");

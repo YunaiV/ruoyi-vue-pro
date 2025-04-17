@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.wms.controller.admin.stock.flow;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.flow.vo.WmsStockFlowPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.flow.vo.WmsStockFlowRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.flow.WmsStockFlowDO;
@@ -126,6 +127,12 @@ public class WmsStockFlowController {
         stockFlowService.assembleInbound(voPageResult.getList());
         stockFlowService.assembleOutbound(voPageResult.getList());
         stockFlowService.assemblePickup(voPageResult.getList());
+
+        // 人员姓名填充
+        AdminUserApi.inst().prepareFill(voPageResult.getList())
+            .mapping(WmsStockFlowRespVO::getCreator, WmsStockFlowRespVO::setCreatorName)
+            .mapping(WmsStockFlowRespVO::getUpdater, WmsStockFlowRespVO::setUpdaterName)
+            .fill();
 
 
         // 返回

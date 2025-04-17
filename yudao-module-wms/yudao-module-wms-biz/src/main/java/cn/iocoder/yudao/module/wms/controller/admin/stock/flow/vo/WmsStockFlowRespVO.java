@@ -151,4 +151,12 @@ public class WmsStockFlowRespVO {
 
     @Schema(description = "部门", example = "")
     private DeptSimpleRespVO dept;
+
+    @Schema(description = "创建人姓名", example = "张三")
+    @ExcelProperty("创建人姓名")
+    private String creatorName;
+
+    @Schema(description = "更新人姓名", example = "李四")
+    @ExcelProperty("更新人姓名")
+    private String updaterName;
 }
