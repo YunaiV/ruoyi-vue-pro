@@ -57,11 +57,9 @@ public class ShopifyClient {
     /**
      * 获得店铺信息
      **/
-    public List<ShopifyShopRepsVO> getShops() {
+    public ShopifyShopRepsVO getShop() {
         JSONObject shop = getResult(ShopifyAPI.GET_SHOP, new HashMap<>());
-        List<ShopifyShopRepsVO> shops = new ArrayList<>();
-        shops.add(JsonUtilsX.parseObject(shop, ShopifyShopRepsVO.class));
-        return shops;
+        return JsonUtilsX.parseObject(shop, ShopifyShopRepsVO.class);
     }
 
 

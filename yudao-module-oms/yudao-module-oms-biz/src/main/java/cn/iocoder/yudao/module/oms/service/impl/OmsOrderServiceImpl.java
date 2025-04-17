@@ -29,8 +29,6 @@ import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.oms.api.enums.OmsErrorCodeConstants.*;
-import static com.baomidou.mybatisplus.extension.toolkit.Db.saveBatch;
-import static com.baomidou.mybatisplus.extension.toolkit.Db.updateBatchById;
 
 /**
  * OMS订单 Service 实现类
@@ -133,6 +131,7 @@ public class OmsOrderServiceImpl implements OmsOrderService {
         return orderItemMapper.selectById(id);
     }
 
+    @Transactional
     @Override
     public void createOrUpdateOrderByPlatform(List<OmsOrderSaveReqDTO> saveReqDTOs) {
         if (CollectionUtils.isEmpty(saveReqDTOs)) {
@@ -144,36 +143,25 @@ public class OmsOrderServiceImpl implements OmsOrderService {
         List<OmsOrderDO> createOrders = new ArrayList<>();
         List<OmsOrderDO> updateOrders = new ArrayList<>();
 
-        List<OmsOrderDO> existOrders = getByPlatformCode(saveReqDTOs.get(0).getPlatformCode());
-
-        // 使用Map存储已存在的订单，key = sourceNo, value = OmsOrderDO
-        Map<String, OmsOrderDO> existOrderMap = Optional.ofNullable(existOrders)
-            .orElse(Collections.emptyList())
-            .stream()
-            .collect(Collectors.toMap(omsOrderDO -> omsOrderDO.getSourceNo(), omsOrderDO -> omsOrderDO));
-
         orders.forEach(order -> {
             //用创建者区分是否是同步过来的数据还是运营新增的数据
             order.setCreator(CREATOR);
-            OmsOrderDO existOrder = existOrderMap.get(order.getSourceNo());
-            if (existOrder != null) {
-                order.setId(existOrder.getId());
+            if (order.getId() != null) {
                 updateOrders.add(order);
             } else {
-                // 新增
                 createOrders.add(order);
             }
         });
 
         //新增订单时
         if (CollectionUtil.isNotEmpty(createOrders)) {
-            saveBatch(createOrders);
+            orderMapper.insertBatch(createOrders);
             createOrderItems(saveReqDTOs, createOrders);
         }
 
         if (CollectionUtil.isNotEmpty(updateOrders)) {
-            updateBatchById(updateOrders);
-            updateOrderItems(saveReqDTOs, existOrderMap);
+            orderMapper.updateById(updateOrders);
+            updateOrderItems(saveReqDTOs);
         }
 
         log.info("sync order success,salesPlatformCode:{},orderCount:{}", saveReqDTOs.get(0).getPlatformCode(), saveReqDTOs.size());
@@ -200,18 +188,24 @@ public class OmsOrderServiceImpl implements OmsOrderService {
      * @Description: 新增订单时新增订单项
      */
     public void createOrderItems(List<OmsOrderSaveReqDTO> saveReqDTOs, List<OmsOrderDO> createOrders) {
-        Set<String> sourceNos = createOrders.stream().map(OmsOrderDO::getSourceNo).collect(Collectors.toSet());
+        List<OmsOrderSaveReqDTO> saveReqOrders = saveReqDTOs.stream()
+            .filter(saveReqDTO -> saveReqDTO.getId() == null)
+            .collect(Collectors.toList());
+        Set<String> sourceNos = saveReqOrders.stream().map(OmsOrderSaveReqDTO::getSourceNo).collect(Collectors.toSet());
         // 过滤出刚新增的订单 key = sourceNo
-        Map<String, OmsOrderDO> createdOrders = Optional.ofNullable(createOrders)
+        Map<String, OmsOrderSaveReqDTO> createdOrders = Optional.ofNullable(saveReqOrders)
             .orElse(Collections.emptyList())
             .stream()
-            .filter(omsOrderDO -> sourceNos.contains(omsOrderDO.getSourceNo()))
+            .filter(omsOrderSaveReqDTO -> sourceNos.contains(omsOrderSaveReqDTO.getSourceNo()))
+            .collect(Collectors.toMap(omsOrderSaveReqDTO -> omsOrderSaveReqDTO.getSourceNo(), omsOrderSaveReqDTO -> omsOrderSaveReqDTO));
+
+        Map<String, OmsOrderDO> createOrderMap = createOrders.stream()
             .collect(Collectors.toMap(omsOrderDO -> omsOrderDO.getSourceNo(), omsOrderDO -> omsOrderDO));
 
         //取出所有订单项数据，并为其设置订单项的订单ID属性
-        List<OmsOrderItemDO> omsOrderItemDOs = saveReqDTOs.stream()
+        List<OmsOrderItemDO> omsOrderItemDOs = saveReqOrders.stream()
             .flatMap(saveReqDTO -> {
-                Long orderId = createdOrders.get(saveReqDTO.getSourceNo()).getId();
+                Long orderId = createOrderMap.get(saveReqDTO.getSourceNo()).getId();
                 return saveReqDTO.getOmsOrderItemSaveReqDTOList().stream()
                     .map(itemReqDTO -> {
                         OmsOrderItemDO itemDO = OmsOrderItemConvert.INSTANCE.toOmsOrderItemDO(itemReqDTO);
@@ -225,30 +219,79 @@ public class OmsOrderServiceImpl implements OmsOrderService {
 
 
     /**
-     * @param saveReqDTOs   从平台传过来的订单数据
-     * @param existOrderMap 使用Map存储已存在的订单，key = sourceNo, value = OmsOrderDO
-     * @Description: 更新订单项目 先删除后新增
+     * @param saveReqDTOs 从平台传过来的订单数据，里边包含订单项
+     * @Description: 更新订单项
+     * @return:
      */
-    public void updateOrderItems(List<OmsOrderSaveReqDTO> saveReqDTOs, Map<String, OmsOrderDO> existOrderMap) {
-        List<Long> deleteOrderIds = new ArrayList<>();
-        List<OmsOrderItemDO> orderItems = new ArrayList<>();
+    public void updateOrderItems(List<OmsOrderSaveReqDTO> saveReqDTOs) {
+        // 订单id不为null就是需要更新的数据
+        List<OmsOrderSaveReqDTO> updateSaveReqDTOs = saveReqDTOs.stream()
+            .filter(saveReqDTO -> {
+                return saveReqDTO.getId() != null;
+            })
+            .collect(Collectors.toList());
+        // --start-- 组装出orderIdToItemMap key是orderId value是一个Map<String, OmsOrderItemDO>,其中key是shopProductCode
+        List<OmsOrderItemDO> existOrderItems = orderItemMapper.selectListByOrderIds(updateSaveReqDTOs.stream()
+            .map(OmsOrderSaveReqDTO::getId)
+            .collect(Collectors.toList()));
 
-        for (OmsOrderSaveReqDTO saveReqDTO : saveReqDTOs) {
-            Long orderId = existOrderMap.get(saveReqDTO.getSourceNo()).getId();
-            for (OmsOrderItemSaveReqDTO omsOrderItemSaveReqDTO : saveReqDTO.getOmsOrderItemSaveReqDTOList()) {
-                omsOrderItemSaveReqDTO.setOrderId(orderId);
-                OmsOrderItemDO omsOrderItemDO = OmsOrderItemConvert.INSTANCE.toOmsOrderItemDO(omsOrderItemSaveReqDTO);
-                deleteOrderIds.add(orderId);
-                orderItems.add(omsOrderItemDO);
+        Map<Long, List<OmsOrderItemDO>> existOrderItemMap = existOrderItems.stream().collect(Collectors.groupingBy(OmsOrderItemDO::getOrderId));
+
+        Map<Long, Map<String, OmsOrderItemDO>> orderIdToItemMap = new HashMap<>();
+        for (Long orderId : existOrderItemMap.keySet()) {
+            List<OmsOrderItemDO> omsOrderItemDOList = existOrderItemMap.get(orderId);
+            Map<String, OmsOrderItemDO> orderItemDOMap = new HashMap();
+            for (OmsOrderItemDO omsOrderItemDO : omsOrderItemDOList) {
+                orderItemDOMap.put(omsOrderItemDO.getShopProductCode(), omsOrderItemDO);
+            }
+            orderIdToItemMap.put(orderId, orderItemDOMap);
+        }
+        //--end-- 组装出orderIdToItemMap key是orderId value是一个Map<String, OmsOrderItemDO>,其中key是shopProductCode
+
+
+        // key = orderId vale= 需要更新的订单项集合
+        Map<Long, List<OmsOrderItemSaveReqDTO>> existOrderItemSaveReqDTOMap = Optional.ofNullable(updateSaveReqDTOs)
+            .orElse(Collections.emptyList())
+            .stream()
+            .collect(Collectors.toMap(OmsOrderSaveReqDTO::getId, OmsOrderSaveReqDTO -> OmsOrderSaveReqDTO.getOmsOrderItemSaveReqDTOList()));
+
+        List<OmsOrderItemDO> createOrderItems = new ArrayList<>();
+        List<OmsOrderItemDO> updateOrderItems = new ArrayList<>();
+
+        for (OmsOrderSaveReqDTO updateSaveReqDTO : updateSaveReqDTOs) {
+            Long orderId = updateSaveReqDTO.getId();
+            List<OmsOrderItemSaveReqDTO> saveReqDTOList = existOrderItemSaveReqDTOMap.get(orderId);
+            for (OmsOrderItemSaveReqDTO omsOrderItemSaveReqDTO : saveReqDTOList) {
+                String shopProductCode = omsOrderItemSaveReqDTO.getShopProductCode();
+                OmsOrderItemDO omsOrderItemDO = orderIdToItemMap.get(orderId).get(shopProductCode);
+                if (omsOrderItemDO == null) {
+                    omsOrderItemSaveReqDTO.setOrderId(orderId);
+                    createOrderItems.add(OmsOrderItemConvert.INSTANCE.toOmsOrderItemDO(omsOrderItemSaveReqDTO));
+                }
+
+                if (omsOrderItemDO != null) {
+                    OmsOrderItemDO updateOrderItem = OmsOrderItemConvert.INSTANCE.toOmsOrderItemDO(omsOrderItemSaveReqDTO);
+                    updateOrderItem.setId(omsOrderItemDO.getId());
+                    updateOrderItems.add(updateOrderItem);
+                    orderIdToItemMap.get(orderId).remove(shopProductCode);
+                }
             }
         }
-        omsOrderItemService.deleteByOrderIds(deleteOrderIds);
-        omsOrderItemService.saveOmsOrderItemDOList(orderItems);
+
+        List<OmsOrderItemDO> deleteOrderItems = new ArrayList<>();
+        for (Long orderId : orderIdToItemMap.keySet()) {
+            Map<String, OmsOrderItemDO> orderItemDOMap = orderIdToItemMap.get(orderId);
+            deleteOrderItems.addAll(orderItemDOMap.values());
+        }
+
+        orderItemMapper.deleteByOrderIds(deleteOrderItems.stream().map(OmsOrderItemDO::getOrderId).collect(Collectors.toList()));
+        orderItemMapper.insertBatch(createOrderItems);
+        orderItemMapper.updateBatch(updateOrderItems);
     }
 
 
     @Override
-    public List<OmsOrderItemDO> getSaleOrderItemListByOrderIds(Collection<Long> orderIds) {
+    public List<OmsOrderItemDO> getOrderItemListByOrderIds(Collection<Long> orderIds) {
         if (CollUtil.isEmpty(orderIds)) {
             return Collections.emptyList();
         }

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.oms.api.dto;
+package com.somle.esb.model.oms.dto;
 
 import lombok.Builder;
 import lombok.Data;

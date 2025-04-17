@@ -45,8 +45,8 @@ public class AmazonOrdersSyncJob extends BaseOrdersSyncJob {
 
                 // 2. 构建请求参数（日期建议提取为常量或参数）
                 AmazonSpOrderReqVO vo = AmazonSpOrderReqVO.builder()
-                    .createdAfter(LocalDateTime.of(2024, 10, 23, 0, 0))
-                    .createdBefore(LocalDateTime.of(2024, 10, 24, 0, 0))
+                    .createdAfter(LocalDateTime.now().minusDays(1))
+                    .createdBefore(LocalDateTime.now())
                     .marketplaceIds(marketplaceIds)
                     .build();
 

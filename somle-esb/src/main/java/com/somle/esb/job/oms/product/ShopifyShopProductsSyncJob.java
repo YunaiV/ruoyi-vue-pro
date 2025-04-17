@@ -23,7 +23,7 @@ public class ShopifyShopProductsSyncJob extends BaseShopProductsSyncJob {
 
     @Override
     public List<OmsShopProductSaveReqDTO> listProducts() {
-        return shopifyService.getAllShopifyClients().stream()
+        return shopifyService.shopifyClients.stream()
             .flatMap(
                 client -> shopifyToOmsConverter.toProducts(client.getProducts(new HashMap<>()), client).stream()
             )

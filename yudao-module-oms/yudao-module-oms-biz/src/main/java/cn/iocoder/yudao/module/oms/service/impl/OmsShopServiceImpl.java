@@ -20,15 +20,13 @@ import cn.iocoder.yudao.module.oms.service.OmsShopService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.oms.api.enums.OmsErrorCodeConstants.*;
-import static com.baomidou.mybatisplus.extension.toolkit.Db.saveBatch;
-import static com.baomidou.mybatisplus.extension.toolkit.Db.updateBatchById;
 
 @Service
 @Slf4j
@@ -40,9 +38,9 @@ public class OmsShopServiceImpl implements OmsShopService {
     private OmsShopMapper shopMapper;
 
     @Override
-    public Long createShop(OmsShopSaveReqVO saveReqDTO) {
-        OmsShopDO shopDO = OmsShopConvert.INSTANCE.convert(saveReqDTO);
-        OmsShopDO omsShopDO = shopMapper.selectOne(OmsShopDO::getName, saveReqDTO.getName());
+    public Long createShop(OmsShopSaveReqVO saveReqVO) {
+        OmsShopDO shopDO = OmsShopConvert.INSTANCE.convert(saveReqVO);
+        OmsShopDO omsShopDO = shopMapper.selectOne(OmsShopDO::getName, saveReqVO.getName());
         if (omsShopDO != null) {
             throw exception(OMS_SHOP_NAME_EXISTS);
         }
@@ -83,6 +81,7 @@ public class OmsShopServiceImpl implements OmsShopService {
         return OmsShopConvert.INSTANCE.toOmsShopDTO(omsShopDO);
     }
 
+    @Transactional
     @Override
     public void createOrUpdateShopByPlatform(List<OmsShopSaveReqDTO> saveReqDTOs) {
         if (CollectionUtils.isEmpty(saveReqDTOs)) {
@@ -94,33 +93,23 @@ public class OmsShopServiceImpl implements OmsShopService {
         List<OmsShopDO> createShops = new ArrayList<>();
         List<OmsShopDO> updateShops = new ArrayList<>();
 
-        List<OmsShopDO> existShops = getByPlatformCode(shops.get(0).getPlatformCode());
-
-        // 使用Map存储已存在的店铺，key = platformShopCode, value = OmsShopDO
-        Map<String, OmsShopDO> existShopMap = Optional.ofNullable(existShops)
-            .orElse(Collections.emptyList())
-            .stream()
-            .collect(Collectors.toMap(omsShopDO -> omsShopDO.getPlatformShopCode(), omsShopDO -> omsShopDO));
 
         shops.forEach(shop -> {
             //用创建者区分是否是同步过来的数据还是运营新增的数据
             shop.setCreator(CREATOR);
-            OmsShopDO existShop = existShopMap.get(shop.getPlatformShopCode());
-            if (existShop != null) {
-                shop.setId(existShop.getId());
+            if (shop.getId() != null) {
                 updateShops.add(shop);
             } else {
-                // 新增
                 createShops.add(shop);
             }
         });
 
         if (CollectionUtil.isNotEmpty(createShops)) {
-            saveBatch(createShops);
+            shopMapper.insertBatch(createShops);
         }
 
         if (CollectionUtil.isNotEmpty(updateShops)) {
-            updateBatchById(updateShops);
+            shopMapper.updateBatch(updateShops);
         }
         log.info("sync shop success,salesPlatformCode:{},shopCount:{}", saveReqDTOs.get(0).getPlatformCode(), saveReqDTOs.size());
     }

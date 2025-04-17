@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.oms.api;
 
+import cn.iocoder.yudao.module.oms.api.dto.OmsShopProductDTO;
 import cn.iocoder.yudao.module.oms.api.dto.OmsShopProductSaveReqDTO;
 import jakarta.validation.Valid;
 
@@ -12,4 +13,6 @@ public interface OmsShopProductApi {
      * @return:
      */
     void createOrUpdateShopByPlatform(@Valid List<OmsShopProductSaveReqDTO> saveReqDTOs);
+
+    List<OmsShopProductDTO> getByShopIds(List<Long> shopIds);
 }

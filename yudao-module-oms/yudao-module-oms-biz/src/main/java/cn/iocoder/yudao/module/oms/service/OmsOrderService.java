@@ -118,6 +118,6 @@ public interface OmsOrderService {
      * @param orderIds 销售订单编号数组
      * @return 销售订单项 List
      */
-    List<OmsOrderItemDO> getSaleOrderItemListByOrderIds(Collection<Long> orderIds);
+    List<OmsOrderItemDO> getOrderItemListByOrderIds(Collection<Long> orderIds);
 
 }

@@ -153,7 +153,8 @@ public class AmazonSpClient {
             var bodyString = response.body().string();
             AmazonSpOrderRespVO result = JSONUtil.toBean(bodyString, AmazonSpOrderRespVO.class);
             result.getPayload().getOrders().forEach(order -> {
-                order.setOrderItems(getAllOrderItems(AmazonSpOrderItemReqVO.builder().orderId(order.getAmazonOrderId()).build()));
+                AmazonSpOrderItemReqVO amazonSpOrderItemReqVO = AmazonSpOrderItemReqVO.builder().orderId(order.getAmazonOrderId()).build();
+                order.setOrderItems(getAllOrderItems(amazonSpOrderItemReqVO));
             });
             return result;
         }
@@ -179,21 +180,27 @@ public class AmazonSpClient {
         if (amazonSpOrderRespVOS.isEmpty()) {
             return Collections.emptyList();
         }
-        return amazonSpOrderRespVOS.stream().flatMap(page -> page.getPayload().getOrders().stream()).filter(order -> CollectionUtil.isNotEmpty(order.getOrderItems())).toList();
+        return amazonSpOrderRespVOS.stream().flatMap(page -> page.getPayload().getOrders().stream())
+            .filter(order -> CollectionUtil.isNotEmpty(order.getOrderItems()))
+            .toList();
     }
 
     public List<AmazonSpOrderItemRespVO.OrderItem> getAllOrderItems(AmazonSpOrderItemReqVO vo) {
         AmazonSpOrderItemRespVO amazonSpOrderItemRespVO = getOrderItem(vo);
-        List<AmazonSpOrderItemRespVO.OrderItem> orderItems = Optional.ofNullable(amazonSpOrderItemRespVO.getPayload()).map(AmazonSpOrderItemRespVO.Payload::getOrderItems).orElse(Collections.emptyList());
-        while (amazonSpOrderItemRespVO.getPayload() != null && StrUtil.isNotEmpty(amazonSpOrderItemRespVO.getPayload().getNextToken())) {
-            amazonSpOrderItemRespVO = getOrderItem(vo.builder().nextToken(amazonSpOrderItemRespVO.getPayload().getNextToken()).build());
-            orderItems.addAll(amazonSpOrderItemRespVO.getPayload().getOrderItems());
+        List<AmazonSpOrderItemRespVO.OrderItem> orderItems = Optional.ofNullable(amazonSpOrderItemRespVO.getPayload())
+            .map(AmazonSpOrderItemRespVO.Payload::getOrderItems)
+            .orElse(Collections.emptyList());
+        AmazonSpOrderItemRespVO.Payload payload = amazonSpOrderItemRespVO.getPayload();
+        while (payload != null && StrUtil.isNotEmpty(payload.getNextToken())) {
+            vo = vo.builder().nextToken(payload.getNextToken()).build();
+            amazonSpOrderItemRespVO = getOrderItem(vo);
+            payload = amazonSpOrderItemRespVO.getPayload();
+            orderItems.addAll(payload.getOrderItems());
         }
         return orderItems;
     }
 
     @SneakyThrows
-
     public AmazonSpOrderItemRespVO getOrderItem(AmazonSpOrderItemReqVO vo) {
         String endPoint = getEndPoint();
         String partialUrl = "/orders/v0/orders/" + vo.getOrderId() + "/orderItems";

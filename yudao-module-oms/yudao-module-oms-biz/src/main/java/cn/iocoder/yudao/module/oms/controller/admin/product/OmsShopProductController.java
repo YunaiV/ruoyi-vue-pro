@@ -23,7 +23,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @RestController
 @RequestMapping("/oms/shop-product")
 @Validated
-public class OmsSaleShopProductController {
+public class OmsShopProductController {
 
     @Resource
     OmsShopProductService omsShopProductService;

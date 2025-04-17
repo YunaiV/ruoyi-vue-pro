@@ -21,7 +21,7 @@ public class ShopifyOrdersSyncJob extends BaseOrdersSyncJob {
 
     @Override
     public List<OmsOrderSaveReqDTO> listOrders() {
-        return shopifyService.getAllShopifyClients().stream()
+        return shopifyService.shopifyClients.stream()
             .flatMap(client -> {
                 try {
                     // 假设 getOrders() 返回 List<Order>，toOrders() 转换为 List<OmsOrderSaveReqDTO>

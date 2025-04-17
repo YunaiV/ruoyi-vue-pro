@@ -31,7 +31,6 @@ public class EsbService {
     private ConfigApi configApi;
 
 
-
     @Autowired
     private ApplicationContext applicationContext;
 
@@ -56,7 +55,7 @@ public class EsbService {
                 })
                 .build();
 
-            shopifyService.client.setWebClient(client);
+            shopifyService.shopifyClients.get(0).setWebClient(client);
             log.info("using proxy");
         } catch (Exception e) {
             log.error("not using proxy");
@@ -73,7 +72,6 @@ public class EsbService {
             System.out.println(beanName);
         }
     }
-
 
 
     public void send(OssData data) {

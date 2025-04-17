@@ -27,7 +27,7 @@ import static cn.iocoder.yudao.module.oms.api.enums.OmsErrorCodeConstants.OMS_SH
 @RestController
 @RequestMapping("/oms/platform-shop")
 @Validated
-public class OmsSaleShopController {
+public class OmsShopController {
     @Resource
     private OmsShopService omsShopService;
 
