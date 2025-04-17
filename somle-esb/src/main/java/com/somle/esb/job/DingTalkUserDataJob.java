@@ -1,6 +1,5 @@
 package com.somle.esb.job;
 
-import cn.hutool.core.collection.CollUtil;
 import com.dingtalk.api.response.OapiV2UserGetResponse;
 import com.somle.esb.model.OssData;
 import org.springframework.stereotype.Component;
@@ -20,15 +19,7 @@ public class DingTalkUserDataJob extends DingTalkDataJob {
     public String execute(String param) throws Exception {
         setDate(param);
         List<OapiV2UserGetResponse.UserGetResponse> list = dingTalkService.getUserDetailStream().toList();
-
-        // 当获取不到数据时，重试5次
-        int reTryTimes = 0;
-        while (CollUtil.isEmpty(list) && reTryTimes <= 4) {
-            list = dingTalkService.getUserDetailStream().toList();
-            reTryTimes++;
-            Thread.sleep(1000);
-        }
-
+        
         service.send(
             OssData.builder()
                 .database(DATABASE)
