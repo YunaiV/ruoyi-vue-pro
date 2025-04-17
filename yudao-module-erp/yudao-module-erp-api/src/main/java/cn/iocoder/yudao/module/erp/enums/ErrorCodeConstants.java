@@ -157,6 +157,8 @@ public interface ErrorCodeConstants {
 
     // ========== 海关分类 1-030-609-000 ==========
     ErrorCode CUSTOM_RULE_CATEGORY_NOT_EXISTS = new ErrorCode(1_030_609_000, "海关分类不存在");
+    //CUSTOM_RULE_CATEGORY_EXISTS
+    ErrorCode CUSTOM_RULE_CATEGORY_EXISTS = new ErrorCode(1_030_609_001, "当前报关品名({})的材质已存在，材质+报关品名不可以重复");
 
     // ========== 海关分类子表 1-030-610-000 ==========
     ErrorCode CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS = new ErrorCode(1_030_610_000, "海关分类子表不存在");

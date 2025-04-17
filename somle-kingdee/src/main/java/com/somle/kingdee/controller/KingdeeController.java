@@ -2,14 +2,12 @@ package com.somle.kingdee.controller;
 
 
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import com.somle.kingdee.model.KingdeeToken;
 import com.somle.kingdee.model.vo.KingdeeTokenVO;
-import com.somle.kingdee.service.KingdeeClient;
 import com.somle.kingdee.service.KingdeeService;
-import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -36,7 +34,6 @@ public class KingdeeController {
     }
 
 
-
     @PostMapping("/refreshAuth")
     @ResponseBody
     public void refreshAuth(
@@ -49,18 +46,8 @@ public class KingdeeController {
     public List<KingdeeTokenVO> listTokens() {
         // 获取金蝶令牌数据
         List<KingdeeToken> kingdeeTokens = kingdeeService.listKingdeeTokens();
-
-        // 使用 Stream 和 map 来简化转换过程
-        List<KingdeeTokenVO> voList = kingdeeTokens.stream()
-            .map(kingdeeToken -> {
-                KingdeeTokenVO vo = new KingdeeTokenVO();
-                BeanUtils.copyProperties(kingdeeToken, vo);
-                return vo;
-            })
+        return kingdeeTokens.stream().map(kingdeeToken -> BeanUtils.toBean(kingdeeToken, KingdeeTokenVO.class))
             .toList();
-
-        // 返回封装后的 VO 列表
-        return voList;
     }
 
 

@@ -27,6 +27,9 @@ import java.util.stream.Collectors;
 import static cn.iocoder.yudao.framework.common.util.number.LengthUtils.mmToCmAsFloat;
 import static com.somle.esb.util.ConstantConvertUtils.getCountrySuffix;
 
+/**
+ * 动态转换组件，根据第三方系统返回的数据，转换为XX格式。
+ */
 @Slf4j
 @Service
 public class ErpToKingdeeConverter {

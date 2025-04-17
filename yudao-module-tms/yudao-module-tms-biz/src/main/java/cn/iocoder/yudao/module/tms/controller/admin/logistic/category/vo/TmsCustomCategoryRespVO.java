@@ -37,6 +37,11 @@ public class TmsCustomCategoryRespVO {
     @ExcelProperty("材质对应string+报关品名")
     private String combinedValue;
 
+    //对应产品数量
+    @Schema(description = "对应产品数量")
+    @ExcelProperty("对应产品数量")
+    private Long productCount;
+
     @Schema(description = "创建时间")
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;

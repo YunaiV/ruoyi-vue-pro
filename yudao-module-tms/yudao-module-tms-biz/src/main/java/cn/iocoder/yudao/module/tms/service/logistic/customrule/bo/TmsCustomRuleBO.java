@@ -11,6 +11,10 @@ import java.math.BigDecimal;
 @Data
 public class TmsCustomRuleBO extends TmsCustomRuleDO {
     /**
+     * 申报品名
+     */
+    private String declaredType;
+    /**
      * 申报品名（英文）
      */
     private String declaredTypeEn;
@@ -22,10 +26,6 @@ public class TmsCustomRuleBO extends TmsCustomRuleDO {
      * 材质-字典
      */
     private Integer material;
-    /**
-     * 申报品名
-     */
-    private String declaredType;
     /**
      * 税率
      */

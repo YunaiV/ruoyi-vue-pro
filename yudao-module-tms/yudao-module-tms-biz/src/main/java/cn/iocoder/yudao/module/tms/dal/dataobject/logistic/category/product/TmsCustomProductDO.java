@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * 海关产品分类表 DO
+ * 海关-产品关联表 DO
  *
  * @author 王岽宇
  */

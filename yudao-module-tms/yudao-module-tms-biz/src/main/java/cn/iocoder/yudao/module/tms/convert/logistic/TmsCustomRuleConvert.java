@@ -24,9 +24,9 @@ public interface TmsCustomRuleConvert {
     default List<TmsCustomRuleDTO> convert(List<TmsCustomRuleBO> ruleBOList, Map<Long, ErpProductDTO> productMap) {
         return ruleBOList.stream()
             .filter(Objects::nonNull)
-            .map(ruleDO -> {
-                ErpProductDTO productDO = productMap.get(ruleDO.getProductId());
-                return TmsCustomRuleConvert.INSTANCE.convert(ruleDO, productDO);
+            .map(BO -> {
+                ErpProductDTO productDO = productMap.get(BO.getProductId());
+                return TmsCustomRuleConvert.INSTANCE.convert(BO, productDO);
             })
             .toList();
     }

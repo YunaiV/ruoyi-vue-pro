@@ -31,5 +31,5 @@ public interface TmsCustomRuleApi {
      * @param productId 产品id
      * @return List<TmsCustomRuleDTO> 海关规则DTO +产品 DTOs
      */
-    List<TmsCustomRuleDTO> listDTOsByProductId(@NotNull Long productId);
+    List<TmsCustomRuleDTO> listCustomRuleDTOsByProductId(@NotNull Long productId);
 }
