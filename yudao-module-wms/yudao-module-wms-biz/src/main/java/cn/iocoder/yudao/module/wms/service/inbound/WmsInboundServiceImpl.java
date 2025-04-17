@@ -426,7 +426,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         // 创建
         WmsInboundDO inbound = this.createInbound(inboundSaveReqVO);
         // 保存
-        inbound.setSourceBillType(WmsBillType.INVENTORY.getValue());
+        inbound.setUpstreamBillType(WmsBillType.INVENTORY.getValue());
         inbound.setType(WmsInboundType.INVENTORY.getValue());
         inboundMapper.updateById(inbound);
         // 

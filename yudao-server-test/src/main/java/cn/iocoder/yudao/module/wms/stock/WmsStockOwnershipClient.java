@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms.stock;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.move.vo.WmsStockOwnershipMoveSaveReqVO;
@@ -10,6 +11,7 @@ import cn.iocoder.yudao.test.RestClient;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: LeeFJ
@@ -35,10 +37,17 @@ public class WmsStockOwnershipClient extends RestClient {
 
 
 
-    public CommonResult<List<WmsStockOwnershipRespVO>> getStockOwnership(Long warehouseId, Long companyId , Long deptId, Long productId) {
+    public CommonResult<List<WmsStockOwnershipRespVO>> getStockOwnershipList(Long warehouseId,Long productId) {
+        WmsStockOwnershipPageReqVO pageReqVO=new WmsStockOwnershipPageReqVO();
+        pageReqVO.setWarehouseId(warehouseId).setProductId(productId);
+        return getSimpleList("/admin-api/wms/stock-ownership/stocks",pageReqVO, WmsStockOwnershipRespVO.class);
+    }
+
+    public CommonResult<WmsStockOwnershipRespVO> getStockOwnership(Long warehouseId, Long companyId , Long deptId, Long productId) {
         WmsStockOwnershipPageReqVO pageReqVO=new WmsStockOwnershipPageReqVO();
         pageReqVO.setWarehouseId(warehouseId).setCompanyId(companyId).setDeptId(deptId).setProductId(productId);
-        return getSimpleList("/admin-api/wms/stock-ownership/stocks",pageReqVO, WmsStockOwnershipRespVO.class);
+        Map<String,Object> param=BeanUtil.beanToMap(pageReqVO);
+        return getOne("/admin-api/wms/stock-ownership/stock", param,WmsStockOwnershipRespVO.class);
     }
 
 

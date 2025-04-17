@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.wms.controller.admin.pickup.vo.WmsPickupPageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.WmsPickupDO;
 import org.apache.ibatis.annotations.Mapper;
-
 import java.util.List;
 
 /**
@@ -49,4 +48,4 @@ public interface WmsPickupMapper extends BaseMapperX<WmsPickupDO> {
         wrapper.eq(WmsPickupDO::getCode, code);
         return selectOne(wrapper);
     }
-}
+}

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.wms.controller.admin.stock.ownership;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.WmsStockOwnershipPageReqVO;
@@ -66,18 +67,44 @@ public class WmsStockOwnershipController {
      * @sign : 7CDB60ED7A6D3E5E
      */
     @GetMapping("/stocks")
-    @Operation(summary = "获得产品的所有者库存")
+    @Operation(summary = "获得产品的所有者库存清单")
     @Parameter(name = "warehouseId", description = "仓库ID", required = true, example = "1024")
     @Parameter(name = "productId", description = "产品ID", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('wms:stock-ownership:query')")
-    public CommonResult<List<WmsStockOwnershipRespVO>> selectStockOwnership(@RequestParam("warehouseId") Long warehouseId, @RequestParam("productId") Long productId,@RequestParam("companyId") Long companyId,@RequestParam("deptId") Long deptId) {
+    public CommonResult<List<WmsStockOwnershipRespVO>> selectStockOwnershipList(@RequestParam("warehouseId") Long warehouseId, @RequestParam("productId") Long productId) {
+        // 查询数据
+        List<WmsStockOwnershipDO> stockOwnershipList = stockOwnershipService.selectStockOwnership(warehouseId, productId,null,null);
+        // 转换
+        List<WmsStockOwnershipRespVO> stockOwnershipVOList = BeanUtils.toBean(stockOwnershipList, WmsStockOwnershipRespVO.class);
+        // 返回
+        return success(stockOwnershipVOList);
+    }
+
+
+    /**
+     * @sign : 7CDB60ED7A6D3E5E
+     */
+    @GetMapping("/stock")
+    @Operation(summary = "获得产品的所有者库存")
+    @Parameter(name = "warehouseId", description = "仓库ID", required = true, example = "1024")
+    @Parameter(name = "productId", description = "产品ID", required = true, example = "1024")
+    @Parameter(name = "companyId", description = "公司ID", required = true, example = "1024")
+    @Parameter(name = "deptId", description = "部门ID", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('wms:stock-ownership:query')")
+    public CommonResult<WmsStockOwnershipRespVO> selectStockOwnership(@RequestParam("warehouseId") Long warehouseId, @RequestParam("productId") Long productId,@RequestParam("companyId") Long companyId,@RequestParam("deptId") Long deptId) {
         // 查询数据
         List<WmsStockOwnershipDO> stockOwnershipList = stockOwnershipService.selectStockOwnership(warehouseId, productId,companyId,deptId);
         // 转换
-        List<WmsStockOwnershipRespVO> stockOwnershipVO = BeanUtils.toBean(stockOwnershipList, WmsStockOwnershipRespVO.class);
-        // 返回
-        return success(stockOwnershipVO);
+        List<WmsStockOwnershipRespVO> stockOwnershipVOList = BeanUtils.toBean(stockOwnershipList, WmsStockOwnershipRespVO.class);
+        if(CollectionUtils.isEmpty(stockOwnershipVOList)) {
+            return success(null);
+        } else {
+            // 返回
+            return success(stockOwnershipVOList.get(0));
+        }
     }
+
+
 
     /**
      * @sign : EC951F0579860D97

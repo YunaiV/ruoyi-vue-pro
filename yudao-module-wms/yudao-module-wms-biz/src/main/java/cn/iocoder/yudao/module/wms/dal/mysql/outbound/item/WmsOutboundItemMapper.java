@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.outbound.item;
 
-import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemPageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.item.WmsOutboundItemDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.*;
+
+import java.util.List;
 
 /**
  * 出库单详情 Mapper
@@ -22,7 +23,7 @@ public interface WmsOutboundItemMapper extends BaseMapperX<WmsOutboundItemDO> {
 				.eqIfPresent(WmsOutboundItemDO::getProductId, reqVO.getProductId())
 				.eqIfPresent(WmsOutboundItemDO::getPlanQty, reqVO.getPlanQty())
 				.eqIfPresent(WmsOutboundItemDO::getActualQty, reqVO.getActualQty())
-				.eqIfPresent(WmsOutboundItemDO::getSourceItemId, reqVO.getSourceItemId())
+				.eqIfPresent(WmsOutboundItemDO::getUpstreamItemId, reqVO.getUpstreamItemId())
 				.betweenIfPresent(WmsOutboundItemDO::getCreateTime, reqVO.getCreateTime())
 				.orderByDesc(WmsOutboundItemDO::getId));
     }
@@ -42,4 +43,4 @@ public interface WmsOutboundItemMapper extends BaseMapperX<WmsOutboundItemDO> {
         wrapper.eq(WmsOutboundItemDO::getOutboundId, outboundId);
         return selectList(wrapper);
     }
-}
+}

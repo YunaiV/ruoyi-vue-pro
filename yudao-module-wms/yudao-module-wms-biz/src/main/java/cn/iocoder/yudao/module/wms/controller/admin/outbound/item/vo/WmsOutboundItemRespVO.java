@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,creator,company_id,create_time,bin_id,plan_qty,remark,outbound_id,updater,source_item_id,update_time,actual_qty,outbound_status,product_id,id,dept_id
+ * @table-fields : tenant_id,creator,company_id,create_time,bin_id,plan_qty,upstream_item_id,remark,outbound_id,updater,update_time,outbound_status,actual_qty,product_id,id,dept_id
  */
 @Schema(description = "管理后台 - 出库单详情 Response VO")
 @Data
@@ -30,10 +30,6 @@ public class WmsOutboundItemRespVO {
     @Schema(description = "标准产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "20572")
     @ExcelProperty("标准产品ID")
     private Long productId;
-
-    @Schema(description = "来源详情ID", example = "11448")
-    @ExcelProperty("来源详情ID")
-    private Long sourceItemId;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
@@ -103,4 +99,8 @@ public class WmsOutboundItemRespVO {
     @Schema(description = "备注", example = "")
     @ExcelProperty("备注")
     private String remark;
+
+    @Schema(description = "来源详情ID", example = "")
+    @ExcelProperty("来源详情ID")
+    private Long upstreamItemId;
 }

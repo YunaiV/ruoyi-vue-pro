@@ -23,9 +23,9 @@ public interface WmsOutboundMapper extends BaseMapperX<WmsOutboundDO> {
 				.eqIfPresent(WmsOutboundDO::getType, reqVO.getType())
 				.eqIfPresent(WmsOutboundDO::getOutboundStatus, reqVO.getOutboundStatus())
 				.eqIfPresent(WmsOutboundDO::getAuditStatus, reqVO.getAuditStatus())
-				.eqIfPresent(WmsOutboundDO::getSourceBillId, reqVO.getSourceBillId())
-				.eqIfPresent(WmsOutboundDO::getSourceBillCode, reqVO.getSourceBillCode())
-				.eqIfPresent(WmsOutboundDO::getSourceBillType, reqVO.getSourceBillType())
+				.eqIfPresent(WmsOutboundDO::getUpstreamBillId, reqVO.getUpstreamBillId())
+				.eqIfPresent(WmsOutboundDO::getUpstreamBillCode, reqVO.getUpstreamBillCode())
+				.eqIfPresent(WmsOutboundDO::getUpstreamBillType, reqVO.getUpstreamBillType())
 				.eqIfPresent(WmsOutboundDO::getCreatorComment, reqVO.getCreatorComment())
 				.betweenIfPresent(WmsOutboundDO::getCreateTime, reqVO.getCreateTime())
 				.orderByDesc(WmsOutboundDO::getId));

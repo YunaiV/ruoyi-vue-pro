@@ -186,6 +186,17 @@ public class RestClient {
         return result;
     }
 
+    public <RESP>  CommonResult<RESP> getOne(String url, Map<String,?> param, Class<RESP> respClass) {
+        CommonResult result = get(url,param);
+        if(result.isError()) {
+            return result;
+        }
+        Map data=(Map)result.getData();
+        RESP vo = BeanUtil.toBean(data,respClass);
+        result.setData(vo);
+        return result;
+    }
+
     public <RESP>  CommonResult<RESP> getOne(String url, Long id, Class<RESP> respClass) {
         CommonResult result = get(url,Map.of("id",id));
         if(result.isError()) {

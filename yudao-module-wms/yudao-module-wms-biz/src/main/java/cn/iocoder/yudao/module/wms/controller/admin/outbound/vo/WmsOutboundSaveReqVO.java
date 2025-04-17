@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : code,company_id,remark,outbound_time,audit_status,creator_comment,type,source_bill_id,source_bill_code,latest_outbound_action_id,outbound_status,source_bill_type,id,dept_id,warehouse_id
+ * @table-fields : code,company_id,remark,outbound_time,audit_status,creator_comment,type,upstream_bill_type,latest_outbound_action_id,outbound_status,upstream_bill_id,id,upstream_bill_code,dept_id,warehouse_id
  */
 @Schema(description = "管理后台 - 出库单新增/修改 Request VO")
 @Data
@@ -38,13 +38,6 @@ public class WmsOutboundSaveReqVO {
     @Schema(description = "WMS出库单审批状态 ; WmsOutboundAuditStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过 , 4-已出库", example = "2")
     @InEnum(WmsOutboundAuditStatus.class)
     private Integer auditStatus;
-
-    @Schema(description = "来源单据ID", example = "32195")
-    private Long sourceBillId;
-
-    @Schema(description = "WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单 , 2-盘点单", example = "2")
-    @InEnum(WmsBillType.class)
-    private Integer sourceBillType;
 
     @Schema(description = "特别说明，创建方专用")
     private String creatorComment;
@@ -75,6 +68,12 @@ public class WmsOutboundSaveReqVO {
     @Schema(description = "单据号", example = "")
     private String code;
 
+    @Schema(description = "来源单据ID", example = "")
+    private Long upstreamBillId;
+
     @Schema(description = "来源单据号", example = "")
-    private String sourceBillCode;
+    private String upstreamBillCode;
+
+    @Schema(description = "WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单 , 2-盘点单", example = "")
+    private Integer upstreamBillType;
 }

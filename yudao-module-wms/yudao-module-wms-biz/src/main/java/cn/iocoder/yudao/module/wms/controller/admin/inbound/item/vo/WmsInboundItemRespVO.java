@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,outbound_available_qty,creator,inbound_status,company_id,create_time,plan_qty,shelved_qty,remark,latest_flow_id,updater,inbound_id,source_item_id,update_time,actual_qty,product_id,id,dept_id
+ * @table-fields : tenant_id,outbound_available_qty,creator,inbound_status,company_id,create_time,plan_qty,shelved_qty,upstream_item_id,remark,latest_flow_id,updater,inbound_id,update_time,actual_qty,product_id,id,dept_id
  */
 @Schema(description = "管理后台 - 入库单详情 Response VO")
 @Data
@@ -41,10 +41,6 @@ public class WmsInboundItemRespVO {
     @Schema(description = "标准产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "27659")
     @ExcelProperty("标准产品ID")
     private Long productId;
-
-    @Schema(description = "来源详情ID", example = "30830")
-    @ExcelProperty("来源详情ID")
-    private Long sourceItemId;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
@@ -139,4 +135,8 @@ public class WmsInboundItemRespVO {
     @Schema(description = "财务公司", example = "")
     @ExcelProperty("财务公司")
     private FmsCompanySimpleRespVO company;
+
+    @Schema(description = "来源详情ID", example = "")
+    @ExcelProperty("来源详情ID")
+    private Long upstreamItemId;
 }

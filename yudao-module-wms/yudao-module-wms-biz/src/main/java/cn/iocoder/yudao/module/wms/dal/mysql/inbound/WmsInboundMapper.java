@@ -23,13 +23,13 @@ public interface WmsInboundMapper extends BaseMapperX<WmsInboundDO> {
 				.eqIfPresent(WmsInboundDO::getWarehouseId, reqVO.getWarehouseId())
 				.eqIfPresent(WmsInboundDO::getAuditStatus, reqVO.getAuditStatus())
 				.eqIfPresent(WmsInboundDO::getInboundStatus, reqVO.getInboundStatus())
-				.eqIfPresent(WmsInboundDO::getSourceBillId, reqVO.getSourceBillId())
-				.eqIfPresent(WmsInboundDO::getSourceBillCode, reqVO.getSourceBillCode()).// .betweenIfPresent(WmsInboundDO::getArrivalPlanTime, reqVO.getArrivalPlanTime())
+				.eqIfPresent(WmsInboundDO::getUpstreamBillId, reqVO.getUpstreamBillId())
+				.eqIfPresent(WmsInboundDO::getUpstreamBillCode, // .betweenIfPresent(WmsInboundDO::getArrivalPlanTime, reqVO.getArrivalPlanTime())
+        reqVO.getUpstreamBillCode()).// .betweenIfPresent(WmsInboundDO::getArrivalPlanTime, reqVO.getArrivalPlanTime())
         eqIfPresent(// .betweenIfPresent(WmsInboundDO::getArrivalPlanTime, reqVO.getArrivalPlanTime())
-        WmsInboundDO::getSourceBillType, // .betweenIfPresent(WmsInboundDO::getArrivalPlanTime, reqVO.getArrivalPlanTime())
-        reqVO.getSourceBillType()).// .betweenIfPresent(WmsInboundDO::getArrivalPlanTime, reqVO.getArrivalPlanTime())
-        eqIfPresent(// .betweenIfPresent(WmsInboundDO::getArrivalActualTime, reqVO.getArrivalActualTime())
-        WmsInboundDO::getTraceNo, reqVO.getTraceNo())
+        WmsInboundDO::getUpstreamBillType, // .betweenIfPresent(WmsInboundDO::getArrivalPlanTime, reqVO.getArrivalPlanTime())
+        reqVO.getUpstreamBillType()).// .betweenIfPresent(WmsInboundDO::getArrivalActualTime, reqVO.getArrivalActualTime())
+        eqIfPresent(WmsInboundDO::getTraceNo, reqVO.getTraceNo())
 				.eqIfPresent(WmsInboundDO::getShippingMethod, reqVO.getShippingMethod())
 				.eqIfPresent(WmsInboundDO::getCreatorComment, reqVO.getCreatorComment())
 				.eqIfPresent(WmsInboundDO::getInitAge, reqVO.getInitAge())
@@ -67,7 +67,7 @@ public interface WmsInboundMapper extends BaseMapperX<WmsInboundDO> {
         LambdaQueryWrapperX<WmsInboundDO> wrapper = new LambdaQueryWrapperX<>();
         wrapper.likeIfPresent(WmsInboundDO::getCode, pageReqVO.getCode());
         wrapper.likeIfPresent(WmsInboundDO::getTraceNo, pageReqVO.getTraceNo());
-        wrapper.likeIfPresent(WmsInboundDO::getSourceBillCode, pageReqVO.getSourceBillCode());
+        wrapper.likeIfPresent(WmsInboundDO::getUpstreamBillCode, pageReqVO.getUpstreamBillCode());
         wrapper.eqIfPresent(WmsInboundDO::getType, pageReqVO.getType());
         wrapper.eqIfPresent(WmsInboundDO::getWarehouseId, pageReqVO.getWarehouseId());
         wrapper.eqIfPresent(WmsInboundDO::getTraceNo, pageReqVO.getTraceNo());

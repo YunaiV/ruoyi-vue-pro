@@ -17,7 +17,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : code,inbound_status,company_id,inbound_time,arrival_actual_time,audit_status,creator_comment,type,source_bill_id,trace_no,source_bill_code,init_age,shipping_method,source_bill_type,id,dept_id,warehouse_id,arrival_plan_time
+ * @table-fields : code,inbound_status,company_id,inbound_time,arrival_actual_time,audit_status,creator_comment,type,trace_no,upstream_bill_type,upstream_bill_id,init_age,shipping_method,id,upstream_bill_code,dept_id,warehouse_id,arrival_plan_time
  */
 @Schema(description = "管理后台 - 入库单新增/修改 Request VO")
 @Data
@@ -35,13 +35,6 @@ public class WmsInboundSaveReqVO {
     @Schema(description = "仓库ID", example = "23620")
     @NotNull(message = "仓库ID不能为空", groups = { ValidationGroup.create.class })
     private Long warehouseId;
-
-    @Schema(description = "来源单据ID", example = "24655")
-    private Long sourceBillId;
-
-    @Schema(description = "WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单 , 2-盘点单", example = "2")
-    @InEnum(WmsBillType.class)
-    private Integer sourceBillType;
 
     @Schema(description = "跟踪号")
     private String traceNo;
@@ -88,6 +81,12 @@ public class WmsInboundSaveReqVO {
     @Schema(description = "单据号", example = "")
     private String code;
 
+    @Schema(description = "来源单据ID", example = "")
+    private Long upstreamBillId;
+
     @Schema(description = "来源单据号", example = "")
-    private String sourceBillCode;
+    private String upstreamBillCode;
+
+    @Schema(description = "WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单 , 2-盘点单", example = "")
+    private Integer upstreamBillType;
 }

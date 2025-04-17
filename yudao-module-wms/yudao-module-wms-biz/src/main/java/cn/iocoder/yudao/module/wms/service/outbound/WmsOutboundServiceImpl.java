@@ -401,4 +401,4 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         // 触发事件
         outboundStateMachine.fireEvent(event, ctx);
     }
-}
+}

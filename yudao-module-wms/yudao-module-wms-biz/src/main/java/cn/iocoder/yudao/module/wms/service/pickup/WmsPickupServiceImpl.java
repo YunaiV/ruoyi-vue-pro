@@ -277,4 +277,4 @@ public class WmsPickupServiceImpl implements WmsPickupService {
     public void createForInventory(WmsPickupSaveReqVO pickupSaveReqVO) {
         this.createPickup(pickupSaveReqVO);
     }
-}
+}

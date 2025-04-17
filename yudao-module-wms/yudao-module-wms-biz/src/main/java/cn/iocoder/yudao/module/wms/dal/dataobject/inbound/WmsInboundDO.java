@@ -12,7 +12,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 /**
  * 入库单 DO
  * @author 李方捷
- * @table-fields : code,inbound_status,company_id,inbound_time,arrival_actual_time,audit_status,creator_comment,type,source_bill_id,trace_no,source_bill_code,init_age,shipping_method,source_bill_type,id,dept_id,warehouse_id,arrival_plan_time
+ * @table-fields : code,inbound_status,company_id,inbound_time,arrival_actual_time,audit_status,creator_comment,type,trace_no,upstream_bill_type,upstream_bill_id,init_age,shipping_method,id,upstream_bill_code,dept_id,warehouse_id,arrival_plan_time
  */
 @TableName("wms_inbound")
 // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -40,16 +40,6 @@ public class WmsInboundDO extends BaseDO {
      * 仓库ID
      */
     private Long warehouseId;
-
-    /**
-     * 来源单据ID
-     */
-    private Long sourceBillId;
-
-    /**
-     * 来源单据类型
-     */
-    private Integer sourceBillType;
 
     /**
      * 跟踪号
@@ -112,7 +102,17 @@ public class WmsInboundDO extends BaseDO {
     private String code;
 
     /**
+     * 来源单据ID
+     */
+    private Long upstreamBillId;
+
+    /**
      * 来源单据号
      */
-    private String sourceBillCode;
+    private String upstreamBillCode;
+
+    /**
+     * WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单 , 2-盘点单
+     */
+    private Integer upstreamBillType;
 }

@@ -26,9 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_NOT_EXISTS;
@@ -146,11 +144,9 @@ public class WmsInboundItemController {
         inboundItemService.assembleInbound(voPageResult.getList());
         // 填充仓库信息
         inboundItemService.assembleWarehouse(voPageResult.getList());
-
         voPageResult.getList().forEach(item -> {
             item.setShelveAvailableQty(item.getActualQty() - item.getShelvedQty());
         });
-
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
 			.mapping(WmsInboundItemRespVO::getCreator, WmsInboundItemRespVO::setCreatorName)
@@ -169,4 +165,4 @@ public class WmsInboundItemController {
     // // 导出 Excel
     // ExcelUtils.write(response, "入库单详情.xls", "数据", WmsInboundItemRespVO.class, BeanUtils.toBean(list, WmsInboundItemRespVO.class));
     // }
-}
+}

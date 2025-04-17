@@ -189,9 +189,9 @@ public class InventoryExecutor extends QuantityExecutor<InventoryContext> {
         WmsInboundSaveReqVO inboundSaveReqVO = new WmsInboundSaveReqVO();
         inboundSaveReqVO.setWarehouseId(inventoryDO.getWarehouseId());
         inboundSaveReqVO.setItemList(inboundItemSaveReqVOList);
-        inboundSaveReqVO.setSourceBillId(inventoryDO.getId());
-        inboundSaveReqVO.setSourceBillCode(inventoryDO.getCode());
-        inboundSaveReqVO.setSourceBillType(WmsBillType.INVENTORY.getValue());
+        inboundSaveReqVO.setUpstreamBillId(inventoryDO.getId());
+        inboundSaveReqVO.setUpstreamBillCode(inventoryDO.getCode());
+        inboundSaveReqVO.setUpstreamBillType(WmsBillType.INVENTORY.getValue());
         inboundSaveReqVO.setType(WmsInboundType.INVENTORY.getValue());
 
         // 执行入库
@@ -208,9 +208,9 @@ public class InventoryExecutor extends QuantityExecutor<InventoryContext> {
         WmsPickupSaveReqVO pickupSaveReqVO = new WmsPickupSaveReqVO();
         pickupSaveReqVO.setWarehouseId(inventoryDO.getWarehouseId());
         pickupSaveReqVO.setItemList(pickupItemSaveReqVOList);
-        pickupSaveReqVO.setSourceBillId(inventoryDO.getId());
-        pickupSaveReqVO.setSourceBillCode(inventoryDO.getCode());
-        pickupSaveReqVO.setSourceBillType(WmsBillType.INVENTORY.getValue());
+        pickupSaveReqVO.setUpstreamBillId(inventoryDO.getId());
+        pickupSaveReqVO.setUpstreamBillCode(inventoryDO.getCode());
+        pickupSaveReqVO.setUpstreamBillType(WmsBillType.INVENTORY.getValue());
         // 执行拣货
         pickupService.createForInventory(pickupSaveReqVO);
 
@@ -240,9 +240,9 @@ public class InventoryExecutor extends QuantityExecutor<InventoryContext> {
         WmsOutboundSaveReqVO outboundSaveReqVO = new WmsOutboundSaveReqVO();
         outboundSaveReqVO.setWarehouseId(inventoryDO.getWarehouseId());
         outboundSaveReqVO.setItemList(outboundItemSaveReqVOList);
-        outboundSaveReqVO.setSourceBillId(inventoryDO.getId());
-        outboundSaveReqVO.setSourceBillCode(inventoryDO.getCode());
-        outboundSaveReqVO.setSourceBillType(WmsBillType.INVENTORY.getValue());
+        outboundSaveReqVO.setUpstreamBillId(inventoryDO.getId());
+        outboundSaveReqVO.setUpstreamBillCode(inventoryDO.getCode());
+        outboundSaveReqVO.setUpstreamBillType(WmsBillType.INVENTORY.getValue());
 
 
 

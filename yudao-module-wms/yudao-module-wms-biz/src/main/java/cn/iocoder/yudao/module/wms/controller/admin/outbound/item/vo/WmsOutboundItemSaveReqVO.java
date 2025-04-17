@@ -8,7 +8,7 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
 
 /**
- * @table-fields : source_item_id,actual_qty,company_id,outbound_status,bin_id,plan_qty,product_id,remark,id,dept_id,outbound_id
+ * @table-fields : company_id,outbound_status,actual_qty,bin_id,plan_qty,product_id,upstream_item_id,remark,id,dept_id,outbound_id
  */
 @Schema(description = "管理后台 - 出库单详情新增/修改 Request VO")
 @Data
@@ -24,9 +24,6 @@ public class WmsOutboundItemSaveReqVO {
     @Schema(description = "标准产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "20572")
     @NotNull(message = "标准产品ID不能为空", groups = { ValidationGroup.create.class, ValidationGroup.update.class })
     private Long productId;
-
-    @Schema(description = "来源详情ID", example = "11448")
-    private Long sourceItemId;
 
     @Schema(description = "WMS出库状态 ; WmsOutboundStatus : 0-未出库 , 1-部分出库 , 2-已出库", example = "")
     @InEnum(WmsOutboundStatus.class)
@@ -49,4 +46,7 @@ public class WmsOutboundItemSaveReqVO {
 
     @Schema(description = "备注", example = "")
     private String remark;
+
+    @Schema(description = "来源详情ID", example = "")
+    private Long upstreamItemId;
 }
