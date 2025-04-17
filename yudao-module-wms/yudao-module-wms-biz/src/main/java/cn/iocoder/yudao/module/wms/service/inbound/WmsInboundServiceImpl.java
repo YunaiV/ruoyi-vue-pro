@@ -46,6 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -404,12 +405,22 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     /**
      * 按入库顺序获得第一个入库批次
      * @param warehouseId
+     * @param productIds
+     * @param olderFirst 是否按入库时间升序
+     **/
+    public Map<Long,WmsInboundItemOwnershipDO> getInboundItemOwnershipMap(Long warehouseId, List<Long> productIds, boolean olderFirst) {
+        return inboundItemOwnershipQueryMapper.selectInboundItemOwnershipMap(warehouseId, productIds, olderFirst);
+    }
+
+    /**
+     * 按入库顺序获得第一个入库批次
+     * @param warehouseId
      * @param productId
      * @param olderFirst 是否按入库时间升序
-     * @param limit 最大数量
      **/
-    public List<WmsInboundItemOwnershipDO> selectInboundItemOwnershipList(Long warehouseId, Long productId,boolean olderFirst,int limit) {
-        return inboundItemOwnershipQueryMapper.selectInboundItemOwnershipList(warehouseId, productId, olderFirst, limit);
+    public List<WmsInboundItemOwnershipDO> selectInboundItemOwnershipList(Long warehouseId, Long productId,boolean olderFirst) {
+        Map<Long, List<WmsInboundItemOwnershipDO>> longListMap = inboundItemOwnershipQueryMapper.selectInboundItemOwnershipGroupedMap(warehouseId, Arrays.asList(productId), olderFirst);
+        return longListMap.get(productId);
     }
 
     @Override

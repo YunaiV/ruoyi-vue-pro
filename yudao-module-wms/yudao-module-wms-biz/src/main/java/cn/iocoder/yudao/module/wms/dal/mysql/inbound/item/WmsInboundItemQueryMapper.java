@@ -35,7 +35,9 @@ public interface WmsInboundItemQueryMapper extends BaseMapperX<WmsInboundItemQue
         //
         wrapper.innerJoin(WmsInboundDO.class,WmsInboundDO::getId, WmsInboundItemQueryDO::getInboundId)
             .likeIfExists(WmsInboundDO::getNo, reqVO.getInboundNo())
-            .eqIfExists(WmsInboundDO::getWarehouseId, reqVO.getWarehouseId());
+            .eqIfExists(WmsInboundDO::getWarehouseId, reqVO.getWarehouseId())
+            .eqIfExists(WmsInboundDO::getDeptId, reqVO.getDeptId())
+            .eqIfExists(WmsInboundDO::getCompanyId, reqVO.getCompanyId());
 
         wrapper.leftJoin(WmsPickupItemDO.class, WmsPickupItemDO::getInboundItemId, WmsInboundItemQueryDO::getId)
             .eqIfExists(WmsPickupItemDO::getBinId, reqVO.getBinId());

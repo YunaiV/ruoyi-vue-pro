@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo;
 
 import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.WmsStockOwnershipPureRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
@@ -86,6 +87,9 @@ public class WmsStockBinRespVO {
     @Schema(description = "更新人", example = "")
     @ExcelProperty("更新人")
     private String updaterName;
+
+    @Schema(description = "更新人", example = "")
+    private WmsStockOwnershipPureRespVO suggestedOwnership;
 
 
 }

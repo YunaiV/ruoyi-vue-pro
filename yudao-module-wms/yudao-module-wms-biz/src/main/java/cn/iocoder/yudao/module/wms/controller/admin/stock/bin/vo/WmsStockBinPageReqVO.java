@@ -76,4 +76,10 @@ public class WmsStockBinPageReqVO extends PageParam {
 
     @Schema(description = "仓库库存-待上架数量，上架是指从拣货区上架到货架", example = "")
     private Integer[] warehouseShelvingPendingQty;
+
+
+    @Schema(description = "是否返回 suggestedOwnership ", example = "")
+    private Integer withSuggestedOwnership;
+
+
 }

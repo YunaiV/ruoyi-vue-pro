@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo;
 
+import cn.iocoder.yudao.module.wms.controller.admin.company.FmsCompanySimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
@@ -134,4 +135,8 @@ public class WmsInboundItemRespVO {
     @Schema(description = "备注", example = "")
     @ExcelProperty("备注")
     private String remark;
+
+    @Schema(description = "财务公司", example = "")
+    @ExcelProperty("财务公司")
+    private FmsCompanySimpleRespVO company;
 }

@@ -125,6 +125,7 @@ public class WmsInboundItemController {
         inboundItemService.assembleProducts(voPageResult.getList());
         inboundItemService.assembleWarehouse(voPageResult.getList());
         inboundItemService.assembleWarehouseBin(voPageResult.getList());
+        inboundItemService.assembleCompany(voPageResult.getList());
         // 返回
         return success(voPageResult);
     }

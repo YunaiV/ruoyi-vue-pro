@@ -2,12 +2,16 @@ package cn.iocoder.yudao.module.wms.controller.admin.stock.bin;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespBinVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.WmsStockOwnershipPureRespVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemOwnershipDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
+import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
 import cn.iocoder.yudao.module.wms.service.stock.bin.WmsStockBinService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -35,6 +41,9 @@ public class WmsStockBinController {
 
     @Resource
     private WmsStockBinService stockBinService;
+
+    @Resource
+    private WmsInboundService inboundService;
 
     // /**
     // * @sign : 7472CDCA246B810A
@@ -98,6 +107,24 @@ public class WmsStockBinController {
         stockBinService.assembleWarehouse(voPageResult.getList());
         stockBinService.assembleBin(voPageResult.getList(),true);
 
+        // 获取建议库存
+        if(Objects.equals(1,pageReqVO.getWithSuggestedOwnership())) {
+            //List<WmsStockOwnershipPureRespVO> suggestedOwnershipList = new ArrayList<>();
+            Map<Long, List<Long>> productIdsMap = StreamX.from(voPageResult.getList()).groupBy(WmsStockBinRespVO::getWarehouseId,WmsStockBinRespVO::getProductId);
+
+            for (Map.Entry<Long, List<Long>> entry : productIdsMap.entrySet()) {
+                Map<Long, WmsInboundItemOwnershipDO> ownershipMap = inboundService.getInboundItemOwnershipMap(entry.getKey(), entry.getValue(), true);
+
+                StreamX.from(voPageResult.getList())
+                    .filter(e-> Objects.equals(entry.getKey(),e.getWarehouseId()))
+                    .forEach(e->{
+                        WmsInboundItemOwnershipDO ownership = ownershipMap.get(e.getProductId());
+                        e.setSuggestedOwnership(BeanUtils.toBean(ownership, WmsStockOwnershipPureRespVO.class));
+                    });
+            }
+
+        }
+
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
             .mapping(WmsStockBinRespVO::getCreator, WmsStockBinRespVO::setCreatorName)
@@ -116,6 +143,7 @@ public class WmsStockBinController {
 
         stockBinService.assembleDept(voPageResult.getList());
         stockBinService.assembleStockWarehouseList(pageReqVO.getWarehouseId(),voPageResult.getList());
+
         // 返回
         return success(voPageResult);
     }

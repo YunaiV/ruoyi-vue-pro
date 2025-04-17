@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemOwn
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 入库单 Service 接口
@@ -97,9 +98,16 @@ public interface WmsInboundService {
      * @param warehouseId
      * @param productId
      * @param olderFirst 是否按入库时间升序
-     * @param limit 最大数量
      **/
-    List<WmsInboundItemOwnershipDO> selectInboundItemOwnershipList(Long warehouseId, Long productId,boolean olderFirst,int limit);
+    List<WmsInboundItemOwnershipDO> selectInboundItemOwnershipList(Long warehouseId, Long productId,boolean olderFirst);
+
+    /**
+     * 按入库顺序获得第一个入库批次
+     * @param warehouseId
+     * @param productIds
+     * @param olderFirst 是否按入库时间升序
+     **/
+    Map<Long,WmsInboundItemOwnershipDO> getInboundItemOwnershipMap(Long warehouseId, List<Long> productIds, boolean olderFirst);
 
     WmsInboundDO createForInventory(WmsInboundSaveReqVO inboundSaveReqVO);
 }

@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.inbound.item;
 
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
@@ -9,7 +11,10 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemQue
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.WmsInboundItemQueryMapper.AGE_EXPR;
 
@@ -36,27 +41,49 @@ public interface WmsInboundItemOwnershipQueryMapper extends BaseMapperX<WmsInbou
      * @param olderFirst 是否按入库时间升序
      **/
     default WmsInboundItemOwnershipDO getInboundItemOwnership(Long warehouseId, Long productId,boolean olderFirst) {
-        List<WmsInboundItemOwnershipDO> list = selectInboundItemOwnershipList(warehouseId,productId,olderFirst,1);
-        if(list.isEmpty()) {
+        Map<Long, List<WmsInboundItemOwnershipDO>> map = selectInboundItemOwnershipGroupedMap(warehouseId, Arrays.asList(productId), olderFirst);
+        if (map.isEmpty()) {
             return null;
         } else {
-            return list.get(0);
+            if(CollectionUtils.isEmpty(map.get(productId))) {
+                return null;
+            } else {
+                return map.get(productId).get(0);
+            }
         }
     }
 
     /**
      * 按入库顺序获得第一个入库批次
      * @param warehouseId
-     * @param productId
+     * @param productIds
      * @param olderFirst 是否按入库时间升序
-     * @param limit 最大数量
      **/
-    default List<WmsInboundItemOwnershipDO> selectInboundItemOwnershipList(Long warehouseId, Long productId,boolean olderFirst,int limit) {
+    default Map<Long,WmsInboundItemOwnershipDO> selectInboundItemOwnershipMap(Long warehouseId, List<Long> productIds, boolean olderFirst) {
+        Map<Long, List<WmsInboundItemOwnershipDO>> groupedMap = selectInboundItemOwnershipGroupedMap(warehouseId, productIds, olderFirst);
+        Map<Long,WmsInboundItemOwnershipDO> map = new HashMap<>();
+        for (Map.Entry<Long, List<WmsInboundItemOwnershipDO>> entry : groupedMap.entrySet()) {
+            if(CollectionUtils.isEmpty(entry.getValue())) {
+                continue;
+            } else {
+                map.put(entry.getKey(), entry.getValue().get(0));
+            }
+        }
+        return map;
+    }
+
+    /**
+     * 按入库顺序获得第一个入库批次
+     * @param warehouseId
+     * @param productIds
+     * @param olderFirst 是否按入库时间升序
+     **/
+    default Map<Long, List<WmsInboundItemOwnershipDO>> selectInboundItemOwnershipGroupedMap(Long warehouseId, List<Long> productIds, boolean olderFirst) {
 
         // 主表
         MPJLambdaWrapperX<WmsInboundItemOwnershipDO> wrapper = new MPJLambdaWrapperX();
         // 主表条件
-        wrapper.eq(WmsInboundItemQueryDO::getProductId, productId)
+        wrapper.in(WmsInboundItemQueryDO::getProductId, productIds)
             .in(WmsInboundItemQueryDO::getInboundStatus, WmsInboundStatus.ALL.getValue(),WmsInboundStatus.PART.getValue())
         ;
         // 查询主表字段
@@ -82,26 +109,24 @@ public interface WmsInboundItemOwnershipQueryMapper extends BaseMapperX<WmsInbou
             wrapper.orderByDesc(WmsInboundDO::getInboundTime);
         }
 
-        wrapper.last("limit "+limit);
 
         List<WmsInboundItemOwnershipDO> list = selectList(wrapper);
+
 
         for (WmsInboundItemOwnershipDO ownershipDO : list) {
             // 优先使用详情表的公司字段字段
             ownershipDO.setCompanyId(ownershipDO.getItemCompanyId());
-            if(ownershipDO.getCompanyId()==null) {
+            if (ownershipDO.getCompanyId() == null) {
                 ownershipDO.setCompanyId(ownershipDO.getInboundCompanyId());
             }
             // 优先使用详情表的部门字段字段
             ownershipDO.setDeptId(ownershipDO.getItemDeptId());
-            if(ownershipDO.getDeptId()==null) {
+            if (ownershipDO.getDeptId() == null) {
                 ownershipDO.setDeptId(ownershipDO.getInboundDeptId());
             }
         }
 
-
-        return list;
-
+        return StreamX.from(list).groupBy(WmsInboundItemOwnershipDO::getProductId);
     }
 
 }
