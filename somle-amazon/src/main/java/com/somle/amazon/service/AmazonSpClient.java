@@ -386,6 +386,7 @@ public class AmazonSpClient {
             .pageSize(20)
             .pageToken(pageToken)
             .marketplaceIds(marketplaceIds)
+            .includedData(List.of(AmazonSpListingReqVO.IncludedData.OFFERS, AmazonSpListingReqVO.IncludedData.ATTRIBUTES, AmazonSpListingReqVO.IncludedData.SUMMARIES))
             .build();
         AmazonSpListingRepsVO amazonSpListingRepsVO = searchListingsItems(reqVO);
 

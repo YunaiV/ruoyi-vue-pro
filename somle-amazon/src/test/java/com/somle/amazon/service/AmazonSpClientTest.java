@@ -32,7 +32,7 @@ class AmazonSpClientTest extends SomleBaseSpringTest {
 
     @BeforeEach
     void setUp() {
-        client = spService.clients.get(1);
+        client = spService.clients.get(0);
     }
 
 //    @Test
