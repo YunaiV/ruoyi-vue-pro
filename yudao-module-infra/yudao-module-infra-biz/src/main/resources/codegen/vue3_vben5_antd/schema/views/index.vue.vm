@@ -134,12 +134,11 @@ const [Grid, gridApi] = useVbenVxeGrid({
         },
 #else## 标准表数据加载
         query: async ({ page }, formValues) => {
-          const { items, total } = await get${simpleClassName}Page({
+          return await get${simpleClassName}Page({
             pageNo: page.currentPage,
             pageSize: page.pageSize,
             ...formValues,
           });
-          return { items, total };
         },
 #end
       },

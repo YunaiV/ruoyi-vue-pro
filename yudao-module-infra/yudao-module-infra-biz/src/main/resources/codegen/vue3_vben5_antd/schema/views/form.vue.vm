@@ -57,8 +57,7 @@ const subTabsName = ref('$subClassNameVars.get(0)')
   #set ($subSimpleClassName = $subSimpleClassNames.get($index))
   #set ($subClassNameVar = $subClassNameVars.get($index))
   #if ($subTable.subJoinMany) ## 一对多
-/** {$subTable.classComment}表格配置 */
-const [${subSimpleClassName}Grid, {$subClassNameVar}GridApi] = useVbenVxeGrid({
+const [${subSimpleClassName}Grid, ${subClassNameVar}GridApi] = useVbenVxeGrid({
   gridOptions: {
     columns: use${subSimpleClassName}GridColumns(),
     border: true,
@@ -77,9 +76,9 @@ const [${subSimpleClassName}Grid, {$subClassNameVar}GridApi] = useVbenVxeGrid({
   },
 });
   #else
-const [${subSimpleClassName}Form, {$subClassNameVar}FormApi] = useVbenForm({
+const [${subSimpleClassName}Form, ${subClassNameVar}FormApi] = useVbenForm({
   layout: 'horizontal',
-  schema: useFormSchema(),
+  schema: use${subSimpleClassName}FormSchema(),
   showDefaultActions: false
 });
   #end
@@ -107,12 +106,15 @@ const [Modal, modalApi] = useVbenModal({
         #foreach ($subTable in $subTables)
           #set ($index = $foreach.count - 1)
           #set ($subClassNameVar = $subClassNameVars.get($index))
-          try {
-            await ${subClassNameVar}FormRef.value.validate()
-          } catch (e) {
-            subTabsName.value = '${subClassNameVar}'
-            return
-          }
+          #if ($subTable.subJoinMany) ## 一对多
+
+          #else
+            const { valid: ${subClassNameVar}Valid } = await ${subClassNameVar}FormApi.validate();
+            if (!${subClassNameVar}Valid) {
+              subTabsName.value = '${subClassNameVar}';
+              return;
+            }
+          #end
         #end
       #end
     #end
@@ -126,7 +128,11 @@ const [Modal, modalApi] = useVbenModal({
         #foreach ($subTable in $subTables)
           #set ($index = $foreach.count - 1)
           #set ($subClassNameVar = $subClassNameVars.get($index))
-          data.${subClassNameVar}#if ( $subTable.subJoinMany)s#end = ${subClassNameVar}FormRef.value.getData()
+          #if ($subTable.subJoinMany)
+            data.${subClassNameVar}s = ${subClassNameVar}GridApi.grid.getData();
+          #else
+            data.${subClassNameVar} = await ${subClassNameVar}FormApi.getValues();
+          #end
         #end
       #end
     #end
@@ -238,7 +244,7 @@ const [Modal, modalApi] = useVbenModal({
                     #end
                   #end
                 #end
-              </Grid>
+              </${subSimpleClassName}Grid>
             #else
               <${subSimpleClassName}Form class="mx-4" />
             #end

@@ -167,13 +167,13 @@ export function useGridFormSchema(): VbenFormSchema[] {
     {
       fieldName: '${javaField}',
       label: '${comment}',
-  #if ($column.htmlType == "input")
+  #if ($column.htmlType == "input" || $column.htmlType == "textarea" || $column.htmlType == "editor")
       component: 'Input',
       componentProps: {
         allowClear: true,
         placeholder: '请输入${comment}',
       },
-  #elseif ($column.htmlType == "select")
+  #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
       component: 'Select',
       componentProps: {
         allowClear: true,
@@ -183,16 +183,6 @@ export function useGridFormSchema(): VbenFormSchema[] {
         options: [],
         #end
         placeholder: '请选择${comment}',
-      },
-  #elseif ($column.htmlType == "radio")
-      component: 'Select',
-      componentProps: {
-        allowClear: true,
-        #if ("" != $dictType)## 设置了 dictType 数据字典的情况
-        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
-        #else## 未设置 dictType 数据字典的情况
-        options: [],
-        #end
       },
   #elseif($column.htmlType == "datetime")
       component: 'RangePicker',
@@ -400,7 +390,7 @@ export function use${subSimpleClassName}FormSchema(): VbenFormSchema[] {
 /** 列表的字段 */
 export function use${subSimpleClassName}GridColumns(
     onActionClick?: OnActionClickFn<${simpleClassName}Api.${subSimpleClassName}>,
-): VxeTableGridOptions<${subSimpleClassName}Api.${subSimpleClassName}>['columns'] {
+): VxeTableGridOptions<${simpleClassName}Api.${subSimpleClassName}>['columns'] {
     return [
         #foreach($column in $subColumns)
             #if ($column.listOperationResult)
@@ -471,37 +461,39 @@ export function use${subSimpleClassName}GridColumns(
     /** 列表的字段 */
     export function use${subSimpleClassName}GridColumns(
         onActionClick?: OnActionClickFn<${simpleClassName}Api.${subSimpleClassName}>,
-    ): VxeTableGridOptions<${subSimpleClassName}Api.${subSimpleClassName}>['columns'] {
+    ): VxeTableGridOptions<${simpleClassName}Api.${subSimpleClassName}>['columns'] {
         return [
             #foreach($column in $subColumns)
-                #if (!$column.primaryKey && $column.listOperationResult && $column.id != $subJoinColumn.id) ## 特殊：忽略主子表的 join 字段，不用填写
-                    #set ($dictType = $column.dictType)
-                    #set ($javaField = $column.javaField)
-                    #set ($comment = $column.columnComment)
-                    #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
-                        #set ($dictMethod = "number")
-                    #elseif ($javaType == "String")
-                        #set ($dictMethod = "string")
-                    #elseif ($javaType == "Boolean")
-                        #set ($dictMethod = "boolean")
-                    #end
-                    {
-                        field: '${javaField}',
-                        title: '${comment}',
-                        minWidth: 120,
-                        slots: { default: '${javaField}' },
-                    #if ($column.htmlType == "select" || $column.htmlType == "checkbox" || $column.htmlType == "radio")
-                    #if ("" != $dictType)## 有数据字典
-                        params: {
-                            options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+                #if ($column.createOperation || $column.updateOperation)
+                    #if (!$column.primaryKey && $column.listOperationResult && $column.id != $subJoinColumn.id) ## 特殊：忽略主子表的 join 字段，不用填写
+                        #set ($dictType = $column.dictType)
+                        #set ($javaField = $column.javaField)
+                        #set ($comment = $column.columnComment)
+                        #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+                            #set ($dictMethod = "number")
+                        #elseif ($javaType == "String")
+                            #set ($dictMethod = "string")
+                        #elseif ($javaType == "Boolean")
+                            #set ($dictMethod = "boolean")
+                        #end
+                        {
+                            field: '${javaField}',
+                            title: '${comment}',
+                            minWidth: 120,
+                            slots: { default: '${javaField}' },
+                            #if ($column.htmlType == "select" || $column.htmlType == "checkbox" || $column.htmlType == "radio")
+                                #if ("" != $dictType)## 有数据字典
+                                    params: {
+                                        options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+                                    },
+                                #else
+                                    params: {
+                                        options: [],
+                                    },
+                                #end
+                            #end
                         },
-                    #else
-                        params: {
-                            options: [],
-                        },
                     #end
-                    #end
-                    },
                 #end
             #end
             {
