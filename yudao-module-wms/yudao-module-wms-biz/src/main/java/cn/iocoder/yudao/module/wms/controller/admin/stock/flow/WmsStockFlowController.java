@@ -17,6 +17,8 @@ import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -81,10 +83,10 @@ public class WmsStockFlowController {
     /**
      * @sign : E223AB2DDEC0F1A8
      */
-    @GetMapping("/page-warehouse")
+    @PostMapping("/page-warehouse")
     @Operation(summary = "获得仓库库存流水分页")
     @PreAuthorize("@ss.hasPermission('wms:stock-flow:query')")
-    public CommonResult<PageResult<WmsStockFlowRespVO>> getStockFlowPageWarehouse(@Valid WmsStockFlowPageReqVO pageReqVO) {
+    public CommonResult<PageResult<WmsStockFlowRespVO>> getStockFlowPageWarehouse(@Valid @RequestBody WmsStockFlowPageReqVO pageReqVO) {
 
         pageReqVO.setStockType(WmsStockType.WAREHOUSE.getValue());
         pageReqVO.setReason(new Integer[]{ WmsStockReason.INBOUND.getValue(), WmsStockReason.OUTBOUND_AGREE.getValue() });
@@ -92,19 +94,19 @@ public class WmsStockFlowController {
         return getStockFlowPage(pageReqVO);
     }
 
-    @GetMapping("/page-ownership")
+    @PostMapping("/page-ownership")
     @Operation(summary = "获得所有者库存流水分页")
     @PreAuthorize("@ss.hasPermission('wms:stock-flow:query')")
-    public CommonResult<PageResult<WmsStockFlowRespVO>> getStockFlowPageOwnership(@Valid WmsStockFlowPageReqVO pageReqVO) {
+    public CommonResult<PageResult<WmsStockFlowRespVO>> getStockFlowPageOwnership(@Valid @RequestBody WmsStockFlowPageReqVO pageReqVO) {
         pageReqVO.setStockType(WmsStockType.OWNERSHIP.getValue());
         pageReqVO.setReason(new Integer[]{ WmsStockReason.INBOUND.getValue(), WmsStockReason.OUTBOUND_AGREE.getValue() });
         return getStockFlowPage(pageReqVO);
     }
 
-    @GetMapping("/page-bin")
+    @PostMapping("/page-bin")
     @Operation(summary = "获得仓位库存流水分页")
     @PreAuthorize("@ss.hasPermission('wms:stock-flow:query')")
-    public CommonResult<PageResult<WmsStockFlowRespVO>> getStockFlowPageBin(@Valid WmsStockFlowPageReqVO pageReqVO) {
+    public CommonResult<PageResult<WmsStockFlowRespVO>> getStockFlowPageBin(@Valid @RequestBody WmsStockFlowPageReqVO pageReqVO) {
         pageReqVO.setStockType(WmsStockType.BIN.getValue());
         pageReqVO.setReason(new Integer[]{ WmsStockReason.INBOUND.getValue(), WmsStockReason.PICKUP.getValue(),WmsStockReason.OUTBOUND_AGREE.getValue() });
         return getStockFlowPage(pageReqVO);
