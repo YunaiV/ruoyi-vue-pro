@@ -155,6 +155,11 @@
             <artifactId>somle-cdiscount</artifactId>
             <version>${revision}</version>
         </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-tms-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
 
     </dependencies>
