@@ -15,7 +15,7 @@ import { Plus } from "@vben/icons";
 import { Button, Tabs, Checkbox, Input, Textarea, Select,RadioGroup,CheckboxGroup, DatePicker } from 'ant-design-vue';
 import type { OnActionClickParams } from '#/adapter/vxe-table';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { use${subSimpleClassName}GridColumns } from '../data';
+import { use${subSimpleClassName}GridEditColumns } from '../data';
 import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 #else
 import { useVbenForm } from '#/adapter/form';
@@ -43,7 +43,7 @@ function onActionClick({
 
 const [${subSimpleClassName}Grid, ${subClassNameVar}GridApi] = useVbenVxeGrid({
 gridOptions: {
-  columns: use${subSimpleClassName}GridColumns(onActionClick),
+  columns: use${subSimpleClassName}GridEditColumns(onActionClick),
   border: true,
   showOverflow: true,
   autoResize: true,
@@ -73,13 +73,21 @@ const handleAdd = async () => {
 /** 提供获取表格数据的方法供父组件调用 */
 defineExpose({
   getData: (): ${simpleClassName}Api.${subSimpleClassName}[] => {
-    return [
-      ...${subClassNameVar}GridApi.grid.getData(),
-      ...${subClassNameVar}GridApi.grid.getInsertRecords().map((row) => {
-        delete row.id;
-        return row;
-      }),
-    ];
+    // 获取当前数据，但排除已删除的记录
+    const allData = ${subClassNameVar}GridApi.grid.getData();
+    const removedData = ${subClassNameVar}GridApi.grid.getRemoveRecords();
+    const removedIds = new Set(removedData.map((row) => row.id));
+
+    // 过滤掉已删除的记录
+    const currentData = allData.filter((row) => !removedIds.has(row.id));
+
+    // 获取新插入的记录并移除id
+    const insertedData = ${subClassNameVar}GridApi.grid.getInsertRecords().map((row) => {
+      delete row.id;
+      return row;
+    });
+
+    return [...currentData, ...insertedData];
   },
 });
 
@@ -94,6 +102,7 @@ watch(
       await nextTick();
       await ${subClassNameVar}GridApi.grid.loadData(await get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField}!));
     },
+    { immediate: true },
 );
 #else
 const [${subSimpleClassName}Form, ${subClassNameVar}FormApi] = useVbenForm({
@@ -122,6 +131,7 @@ watch(
       await nextTick();
       await ${subClassNameVar}FormApi.setValues(await get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField}!));
     },
+    { immediate: true },
 );
 #end
 </script>
