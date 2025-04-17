@@ -190,7 +190,7 @@ public class InventoryExecutor extends QuantityExecutor<InventoryContext> {
         inboundSaveReqVO.setWarehouseId(inventoryDO.getWarehouseId());
         inboundSaveReqVO.setItemList(inboundItemSaveReqVOList);
         inboundSaveReqVO.setSourceBillId(inventoryDO.getId());
-        inboundSaveReqVO.setSourceBillCode(inventoryDO.getNo());
+        inboundSaveReqVO.setSourceBillCode(inventoryDO.getCode());
         inboundSaveReqVO.setSourceBillType(WmsBillType.INVENTORY.getValue());
         inboundSaveReqVO.setType(WmsInboundType.INVENTORY.getValue());
 
@@ -209,7 +209,7 @@ public class InventoryExecutor extends QuantityExecutor<InventoryContext> {
         pickupSaveReqVO.setWarehouseId(inventoryDO.getWarehouseId());
         pickupSaveReqVO.setItemList(pickupItemSaveReqVOList);
         pickupSaveReqVO.setSourceBillId(inventoryDO.getId());
-        pickupSaveReqVO.setSourceBillNo(inventoryDO.getNo());
+        pickupSaveReqVO.setSourceBillCode(inventoryDO.getCode());
         pickupSaveReqVO.setSourceBillType(WmsBillType.INVENTORY.getValue());
         // 执行拣货
         pickupService.createForInventory(pickupSaveReqVO);
@@ -241,7 +241,7 @@ public class InventoryExecutor extends QuantityExecutor<InventoryContext> {
         outboundSaveReqVO.setWarehouseId(inventoryDO.getWarehouseId());
         outboundSaveReqVO.setItemList(outboundItemSaveReqVOList);
         outboundSaveReqVO.setSourceBillId(inventoryDO.getId());
-        outboundSaveReqVO.setSourceBillNo(inventoryDO.getNo());
+        outboundSaveReqVO.setSourceBillCode(inventoryDO.getCode());
         outboundSaveReqVO.setSourceBillType(WmsBillType.INVENTORY.getValue());
 
 

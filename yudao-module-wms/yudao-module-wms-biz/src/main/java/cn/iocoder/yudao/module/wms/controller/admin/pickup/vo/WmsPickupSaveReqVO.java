@@ -8,7 +8,7 @@ import java.util.List;
 import cn.iocoder.yudao.module.wms.controller.admin.pickup.item.vo.WmsPickupItemSaveReqVO;
 
 /**
- * @table-fields : no,source_bill_no,source_bill_type,id,source_bill_id,warehouse_id
+ * @table-fields : source_bill_code,code,source_bill_type,id,source_bill_id,warehouse_id
  */
 @Schema(description = "管理后台 - 拣货单新增/修改 Request VO")
 @Data
@@ -16,9 +16,6 @@ public class WmsPickupSaveReqVO {
 
     @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "8396")
     private Long id;
-
-    @Schema(description = "单据号")
-    private String no;
 
     @Schema(description = "仓库ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "22380")
     private Long warehouseId;
@@ -29,9 +26,12 @@ public class WmsPickupSaveReqVO {
     @Schema(description = "来源单据ID", example = "")
     private Long sourceBillId;
 
-    @Schema(description = "来源单据号", example = "")
-    private String sourceBillNo;
-
     @Schema(description = "来源单据类型", example = "")
     private Integer sourceBillType;
+
+    @Schema(description = "单据号", example = "")
+    private String code;
+
+    @Schema(description = "来源单据号", example = "")
+    private String sourceBillCode;
 }

@@ -55,10 +55,12 @@ public interface WmsStockOwnershipMapper extends BaseMapperX<WmsStockOwnershipDO
         return selectOne(wrapper);
     }
 
-    default List<WmsStockOwnershipDO> selectStockOwnership(Long warehouseId, Long productId) {
+    default List<WmsStockOwnershipDO> selectStockOwnership(Long warehouseId, Long productId,Long companyId,Long deptId) {
         LambdaQueryWrapperX<WmsStockOwnershipDO> wrapper = new LambdaQueryWrapperX<>();
         wrapper.eq(WmsStockOwnershipDO::getWarehouseId, warehouseId);
-        wrapper.eq(WmsStockOwnershipDO::getProductId, productId);
+        wrapper.eqIfPresent(WmsStockOwnershipDO::getProductId, productId);
+        wrapper.eqIfPresent(WmsStockOwnershipDO::getCompanyId, companyId);
+        wrapper.eqIfPresent(WmsStockOwnershipDO::getDeptId, deptId);
         return selectList(wrapper);
     }
 

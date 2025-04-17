@@ -12,7 +12,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,no,creator,update_time,create_time,source_bill_no,source_bill_type,id,source_bill_id,warehouse_id,updater
+ * @table-fields : source_bill_code,tenant_id,creator,update_time,code,create_time,source_bill_type,id,source_bill_id,warehouse_id,updater
  */
 @Schema(description = "管理后台 - 拣货单 Response VO")
 @Data
@@ -22,10 +22,6 @@ public class WmsPickupRespVO {
     @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "8396")
     @ExcelProperty("主键")
     private Long id;
-
-    @Schema(description = "单据号")
-    @ExcelProperty("单据号")
-    private String no;
 
     @Schema(description = "仓库ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "22380")
     @ExcelProperty("仓库ID")
@@ -71,11 +67,15 @@ public class WmsPickupRespVO {
     @ExcelProperty("来源单据ID")
     private Long sourceBillId;
 
-    @Schema(description = "来源单据号", example = "")
-    @ExcelProperty("来源单据号")
-    private String sourceBillNo;
-
     @Schema(description = "来源单据类型", example = "")
     @ExcelProperty("来源单据类型")
     private Integer sourceBillType;
+
+    @Schema(description = "单据号", example = "")
+    @ExcelProperty("单据号")
+    private String code;
+
+    @Schema(description = "来源单据号", example = "")
+    @ExcelProperty("来源单据号")
+    private String sourceBillCode;
 }

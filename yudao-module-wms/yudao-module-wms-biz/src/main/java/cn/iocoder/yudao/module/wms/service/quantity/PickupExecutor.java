@@ -186,7 +186,9 @@ public class PickupExecutor extends QuantityExecutor<PickupContext> {
         stockWarehouseDO.setSellableQty(stockWarehouseDO.getSellableQty()+quantity);
         // 待上架
         stockWarehouseDO.setShelvingPendingQty(stockWarehouseDO.getShelvingPendingQty() - quantity);
-
+        if(stockWarehouseDO.getShelvingPendingQty()<0) {
+            throw exception(STOCK_WAREHOUSE_NOT_ENOUGH);
+        }
         // 更新库存
         stockWarehouseService.insertOrUpdate(stockWarehouseDO);
         // 记录流水
@@ -237,6 +239,9 @@ public class PickupExecutor extends QuantityExecutor<PickupContext> {
             stockOwnershipDO.setAvailableQty(stockOwnershipDO.getAvailableQty() + quantity);
             // 待上架量
             stockOwnershipDO.setShelvingPendingQty(stockOwnershipDO.getShelvingPendingQty() - quantity);
+            if(stockOwnershipDO.getShelvingPendingQty()<0) {
+                throw exception(STOCK_OWNERSHIP_NOT_ENOUGH);
+            }
         }
         // 保存
         stockOwnershipService.insertOrUpdate(stockOwnershipDO);

@@ -70,9 +70,9 @@ public class WmsStockOwnershipController {
     @Parameter(name = "warehouseId", description = "仓库ID", required = true, example = "1024")
     @Parameter(name = "productId", description = "产品ID", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('wms:stock-ownership:query')")
-    public CommonResult<List<WmsStockOwnershipRespVO>> selectStockOwnership(@RequestParam("warehouseId") Long warehouseId, @RequestParam("productId") Long productId) {
+    public CommonResult<List<WmsStockOwnershipRespVO>> selectStockOwnership(@RequestParam("warehouseId") Long warehouseId, @RequestParam("productId") Long productId,@RequestParam("companyId") Long companyId,@RequestParam("deptId") Long deptId) {
         // 查询数据
-        List<WmsStockOwnershipDO> stockOwnershipList = stockOwnershipService.selectStockOwnership(warehouseId, productId);
+        List<WmsStockOwnershipDO> stockOwnershipList = stockOwnershipService.selectStockOwnership(warehouseId, productId,companyId,deptId);
         // 转换
         List<WmsStockOwnershipRespVO> stockOwnershipVO = BeanUtils.toBean(stockOwnershipList, WmsStockOwnershipRespVO.class);
         // 返回

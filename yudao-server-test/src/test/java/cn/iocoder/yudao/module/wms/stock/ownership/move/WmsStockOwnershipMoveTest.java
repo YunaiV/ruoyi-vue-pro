@@ -11,6 +11,7 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author: LeeFJ
@@ -45,20 +46,43 @@ public class WmsStockOwnershipMoveTest extends BaseRestIntegrationTest {
         }
 
 
-        // 找一个合适的目标仓位
-        WmsStockOwnershipRespVO toStockOwnershipBefore = null;
+        // 找一个合适的目标归属
+        WmsStockOwnershipRespVO toStockOwnershipVOBefore = null;
         for (WmsStockOwnershipRespVO stockOwnershipRespVO : stockOwnershipList) {
             if(stockOwnershipRespVO.getCompanyId().equals(fromStockOwnershipVOBefore.getCompanyId()) && stockOwnershipRespVO.getDeptId().equals(fromStockOwnershipVOBefore.getDeptId())) {
                 continue;
             }
-            toStockOwnershipBefore = stockOwnershipRespVO;
+            toStockOwnershipVOBefore = stockOwnershipRespVO;
             break;
         }
 
-        if(toStockOwnershipBefore==null) {
+        if(toStockOwnershipVOBefore==null) {
             System.err.println("缺少目标，无法继续测试");
             return;
         }
+
+        System.out.println("FromBefore("+fromStockOwnershipVOBefore.getProductId()+"):"+fromStockOwnershipVOBefore.getAvailableQty()+",companyId="+fromStockOwnershipVOBefore.getCompanyId()+",deptId="+fromStockOwnershipVOBefore.getDeptId());
+        System.out.println("toBefore("+toStockOwnershipVOBefore.getProductId()+"):"+toStockOwnershipVOBefore.getAvailableQty()+",companyId="+toStockOwnershipVOBefore.getCompanyId()+",deptId="+toStockOwnershipVOBefore.getDeptId());
+
+
+        CommonResult<List<WmsStockOwnershipRespVO>> stockOwnershipResult = this.wms().stockOwnershipClient().getStockOwnership(warehouseId, toStockOwnershipVOBefore.getCompanyId(), toStockOwnershipVOBefore.getDeptId(), fromStockOwnershipVOBefore.getProductId());
+        if(stockOwnershipResult.isError()) {
+            toStockOwnershipVOBefore.setProductId(fromStockOwnershipVOBefore.getProductId());
+            toStockOwnershipVOBefore.setAvailableQty(0);
+        } else {
+            for (WmsStockOwnershipRespVO e : stockOwnershipResult.getData()) {
+                if(Objects.equals(e.getCompanyId(), toStockOwnershipVOBefore.getCompanyId()) && Objects.equals(e.getDeptId(), toStockOwnershipVOBefore.getDeptId())) {
+                    toStockOwnershipVOBefore=e;
+                    break;
+                }
+            }
+        }
+
+
+
+
+        System.out.println("FromBefore("+fromStockOwnershipVOBefore.getProductId()+"):"+fromStockOwnershipVOBefore.getAvailableQty()+",companyId="+fromStockOwnershipVOBefore.getCompanyId()+",deptId="+fromStockOwnershipVOBefore.getDeptId());
+        System.out.println("toBefore("+toStockOwnershipVOBefore.getProductId()+"):"+toStockOwnershipVOBefore.getAvailableQty()+",companyId="+toStockOwnershipVOBefore.getCompanyId()+",deptId="+toStockOwnershipVOBefore.getDeptId());
 
 
 
@@ -70,11 +94,15 @@ public class WmsStockOwnershipMoveTest extends BaseRestIntegrationTest {
         itemSaveReqVO.setProductId(fromStockOwnershipVOBefore.getProductId());
         itemSaveReqVO.setFromCompanyId(fromStockOwnershipVOBefore.getCompanyId());
         itemSaveReqVO.setFromDeptId(fromStockOwnershipVOBefore.getDeptId());
-        itemSaveReqVO.setToCompanyId(toStockOwnershipBefore.getCompanyId());
-        itemSaveReqVO.setToDeptId(toStockOwnershipBefore.getDeptId());
+        itemSaveReqVO.setToCompanyId(toStockOwnershipVOBefore.getCompanyId());
+        itemSaveReqVO.setToDeptId(toStockOwnershipVOBefore.getDeptId());
         itemSaveReqVO.setQty(qty);
 
         createReqVO.setItemList(List.of(itemSaveReqVO));
+
+
+
+
         CommonResult<Long> postResult=this.wms().stockOwnershipClient().createStockOwnershipMove(createReqVO);
 
         if(postResult.isError()) {
@@ -83,13 +111,19 @@ public class WmsStockOwnershipMoveTest extends BaseRestIntegrationTest {
 
 
         CommonResult<List<WmsStockOwnershipRespVO>> fromStockOwnershipResultAfter = this.wms().stockOwnershipClient().getStockOwnership(warehouseId, fromStockOwnershipVOBefore.getCompanyId(),fromStockOwnershipVOBefore.getDeptId(), fromStockOwnershipVOBefore.getProductId());
-        CommonResult<List<WmsStockOwnershipRespVO>> toStockOwnershipResultAfter = this.wms().stockOwnershipClient().getStockOwnership(warehouseId, toStockOwnershipBefore.getCompanyId(),toStockOwnershipBefore.getDeptId(), fromStockOwnershipVOBefore.getProductId());
+        CommonResult<List<WmsStockOwnershipRespVO>> toStockOwnershipResultAfter = this.wms().stockOwnershipClient().getStockOwnership(warehouseId, toStockOwnershipVOBefore.getCompanyId(),toStockOwnershipVOBefore.getDeptId(), fromStockOwnershipVOBefore.getProductId());
 
         WmsStockOwnershipRespVO fromStockOwnershipVOAfter = fromStockOwnershipResultAfter.getData().get(0);
         WmsStockOwnershipRespVO toStockOwnershipVOAfter = toStockOwnershipResultAfter.getData().get(0);
 
+        System.out.println("FromAfter("+fromStockOwnershipVOAfter.getProductId()+"):"+fromStockOwnershipVOAfter.getAvailableQty()+",companyId="+fromStockOwnershipVOAfter.getCompanyId()+",deptId="+fromStockOwnershipVOAfter.getDeptId()+"");
+        System.out.println("toAfter("+toStockOwnershipVOAfter.getProductId()+"):"+toStockOwnershipVOAfter.getAvailableQty()+",companyId="+toStockOwnershipVOAfter.getCompanyId()+",deptId="+toStockOwnershipVOAfter.getDeptId());
+
+        System.out.println("FROM\t"+fromStockOwnershipVOBefore.getAvailableQty() +" -> " +  fromStockOwnershipVOAfter.getAvailableQty()+" , "+qty);
+        System.out.println("TO\t"+toStockOwnershipVOBefore.getAvailableQty() +" -> " +  toStockOwnershipVOAfter.getAvailableQty()+" , "+qty);
+
         Assert.assertTrue("库存数量-FROM",fromStockOwnershipVOAfter.getAvailableQty()==fromStockOwnershipVOBefore.getAvailableQty()-qty);
-        Assert.assertTrue("库存数量-TO",toStockOwnershipVOAfter.getAvailableQty()==toStockOwnershipBefore.getAvailableQty()+qty);
+        Assert.assertTrue("库存数量-TO",toStockOwnershipVOAfter.getAvailableQty()==toStockOwnershipVOBefore.getAvailableQty()+qty);
 
 
 

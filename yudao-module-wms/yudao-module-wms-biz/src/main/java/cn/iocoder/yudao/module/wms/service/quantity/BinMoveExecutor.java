@@ -116,8 +116,18 @@ public class BinMoveExecutor extends QuantityExecutor<BinMoveContext> {
 
         // 处理出方
         WmsStockBinDO fromStockBinDO = BeanUtils.toBean(fromStockBinVO,WmsStockBinDO.class);
+        //
+
+
         fromStockBinDO.setAvailableQty(fromStockBinDO.getAvailableQty()-binMoveItemDO.getQty());
+        if(fromStockBinDO.getAvailableQty()<0) {
+            throw exception(STOCK_BIN_NOT_ENOUGH);
+        }
+        //
         fromStockBinDO.setSellableQty(fromStockBinDO.getSellableQty()-binMoveItemDO.getQty());
+        if(fromStockBinDO.getSellableQty()<0) {
+            throw exception(STOCK_BIN_NOT_ENOUGH);
+        }
         // 保存
         stockBinService.insertOrUpdate(fromStockBinDO);
         // 记录流水
@@ -125,7 +135,7 @@ public class BinMoveExecutor extends QuantityExecutor<BinMoveContext> {
 
 
         // 入方
-        WmsStockBinDO toStockBinDO = stockBinService.getStockBin(binMoveItemDO.getToBinId(),toStockBinVO.getProductId(), true);
+        WmsStockBinDO toStockBinDO = stockBinService.getStockBin(binMoveItemDO.getToBinId(),binMoveItemDO.getProductId(), true);
         // 可用库存
         toStockBinDO.setAvailableQty(toStockBinDO.getAvailableQty() + binMoveItemDO.getQty());
         // 可售库存

@@ -10,7 +10,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 /**
  * 出库单 DO
  * @author 李方捷
- * @table-fields : no,company_id,remark,audit_status,creator_comment,outbound_time,source_bill_id,type,latest_outbound_action_id,outbound_status,source_bill_no,source_bill_type,id,dept_id,warehouse_id
+ * @table-fields : code,company_id,remark,outbound_time,audit_status,creator_comment,type,source_bill_id,source_bill_code,latest_outbound_action_id,outbound_status,source_bill_type,id,dept_id,warehouse_id
  */
 @TableName("wms_outbound")
 // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -28,11 +28,6 @@ public class WmsOutboundDO extends BaseDO {
      */
     @TableId
     private Long id;
-
-    /**
-     * 单据号
-     */
-    private String no;
 
     /**
      * 仓库ID
@@ -53,11 +48,6 @@ public class WmsOutboundDO extends BaseDO {
      * 来源单据ID
      */
     private Long sourceBillId;
-
-    /**
-     * 来源单据号
-     */
-    private String sourceBillNo;
 
     /**
      * 来源单据类型
@@ -98,4 +88,14 @@ public class WmsOutboundDO extends BaseDO {
      * 备注
      */
     private String remark;
+
+    /**
+     * 单据号
+     */
+    private String code;
+
+    /**
+     * 来源单据号
+     */
+    private String sourceBillCode;
 }

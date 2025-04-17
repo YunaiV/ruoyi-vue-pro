@@ -61,7 +61,7 @@ public interface WmsStockOwnershipService {
      * @param productId   产品id
      * @return 库存归属
      */
-    List<WmsStockOwnershipDO> selectStockOwnership(Long warehouseId, Long productId);
+    List<WmsStockOwnershipDO> selectStockOwnership(Long warehouseId, Long productId,Long companyId,Long deptId);
 
     List<WmsStockOwnershipDO> selectStockOwnership(Long warehouseId, List<Long> productId);
 

@@ -22,6 +22,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_NOT_EXISTS;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_ITEM_OUTBOUND_AVAILABLE_QTY_NOT_ENOUGH;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_NOT_ENOUGH;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_WAREHOUSE_NOT_ENOUGH;
 
 /**
  * @author: LeeFJ
@@ -51,6 +52,9 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
         // stockWarehouseDO.setAvailableQty(stockWarehouseDO.getAvailableQty() - quantity);
         // 可售量
         stockWarehouseDO.setSellableQty(stockWarehouseDO.getSellableQty() - quantity);
+        if(stockWarehouseDO.getSellableQty()<0) {
+            throw exception(STOCK_WAREHOUSE_NOT_ENOUGH);
+        }
         // 待出库量
         stockWarehouseDO.setOutboundPendingQty(stockWarehouseDO.getOutboundPendingQty() + quantity);
 
@@ -234,6 +238,9 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
         // stockBinDO.setAvailableQty(stockBinDO.getAvailableQty() - quantity);
         // 可售库存
         stockBinDO.setSellableQty(stockBinDO.getSellableQty() - quantity);
+        if(stockBinDO.getSellableQty()<0) {
+            throw exception(STOCK_BIN_NOT_ENOUGH);
+        }
         // 待出库量
         stockBinDO.setOutboundPendingQty(stockBinDO.getOutboundPendingQty() + quantity);
 

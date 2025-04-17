@@ -31,14 +31,12 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_ITEM_INBOUND_ITEM_ID_REPEATED;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_ITEM_INBOUND_ITEM_ID_WAREHOUSE_ID_NOT_SAME;
@@ -96,8 +94,8 @@ public class WmsPickupServiceImpl implements WmsPickupService {
     public WmsPickupDO createPickup(WmsPickupSaveReqVO createReqVO) {
         // 设置单据号
         String no = noRedisDAO.generate(WmsNoRedisDAO.PICKUP_NO_PREFIX, 3);
-        createReqVO.setNo(no);
-        if (pickupMapper.getByNo(createReqVO.getNo()) != null) {
+        createReqVO.setCode(no);
+        if (pickupMapper.getByNo(createReqVO.getCode()) != null) {
             throw exception(PICKUP_NO_DUPLICATE);
         }
         if (CollectionUtils.isEmpty(createReqVO.getItemList())) {
@@ -111,9 +109,9 @@ public class WmsPickupServiceImpl implements WmsPickupService {
             toInsetList.add(BeanUtils.toBean(item, WmsPickupItemDO.class));
         });
         // 校验 toInsetList 中是否有重复的 inboundItemId
-        Set<String> binKey= StreamX.from(toInsetList).toSet(x-> x.getBinId()+"-"+x.getInboundItemId());
-        //boolean isInboundItemIdRepeated = StreamX.isRepeated(toInsetList, WmsPickupItemDO::getInboundItemId);
-        if (binKey.size()!=toInsetList.size()) {
+        Set<String> binKey = StreamX.from(toInsetList).toSet(x -> x.getBinId() + "-" + x.getInboundItemId());
+        // boolean isInboundItemIdRepeated = StreamX.isRepeated(toInsetList, WmsPickupItemDO::getInboundItemId);
+        if (binKey.size() != toInsetList.size()) {
             throw exception(PICKUP_ITEM_INBOUND_ITEM_ID_REPEATED);
         }
         WmsPickupDO pickup = BeanUtils.toBean(createReqVO, WmsPickupDO.class);
@@ -177,7 +175,6 @@ public class WmsPickupServiceImpl implements WmsPickupService {
         if (!Objects.equals(warehouseIdOfInboundItem, warehouseIdOfBin)) {
             throw exception(PICKUP_ITEM_INBOUND_ITEM_ID_WAREHOUSE_ID_NOT_SAME);
         }
-
         // 校验数量
         for (WmsPickupItemDO itemDO : toInsetList) {
             if (itemDO.getQty() == null || itemDO.getQty() <= 0) {
@@ -198,7 +195,7 @@ public class WmsPickupServiceImpl implements WmsPickupService {
         // 校验存在
         WmsPickupDO exists = validatePickupExists(updateReqVO.getId());
         // 单据号不允许被修改
-        updateReqVO.setNo(exists.getNo());
+        updateReqVO.setCode(exists.getCode());
         // 保存拣货单详情详情
         if (updateReqVO.getItemList() != null) {
             List<WmsPickupItemDO> existsInDB = pickupItemMapper.selectByPickupId(updateReqVO.getId());
@@ -226,7 +223,7 @@ public class WmsPickupServiceImpl implements WmsPickupService {
     }
 
     /**
-     * @sign : E178F96C953E3D97
+     * @sign : 247F967D174F2EAA
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -234,7 +231,7 @@ public class WmsPickupServiceImpl implements WmsPickupService {
         // 校验存在
         WmsPickupDO pickup = validatePickupExists(id);
         // 唯一索引去重
-        pickup.setNo(pickupMapper.flagUKeyAsLogicDelete(pickup.getNo()));
+        pickup.setCode(pickupMapper.flagUKeyAsLogicDelete(pickup.getCode()));
         pickupMapper.updateById(pickup);
         // 删除
         pickupMapper.deleteById(id);

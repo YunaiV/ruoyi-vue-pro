@@ -22,6 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_NOT_ENOUGH;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSHIP_NOT_ENOUGH;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_WAREHOUSE_NOT_ENOUGH;
+
 /**
  * @author: LeeFJ
  * @date: 2025/3/25 13:15
@@ -55,10 +60,19 @@ public class OutboundFinishExecutor extends OutboundExecutor {
 
         // 可用量
         stockWarehouseDO.setAvailableQty(stockWarehouseDO.getAvailableQty() - actualQty);
+        if(stockWarehouseDO.getAvailableQty()<0) {
+            throw exception(STOCK_WAREHOUSE_NOT_ENOUGH);
+        }
         // 可售量
         stockWarehouseDO.setSellableQty(stockWarehouseDO.getSellableQty() - quantity);
+        if(stockWarehouseDO.getSellableQty()<0) {
+            throw exception(STOCK_WAREHOUSE_NOT_ENOUGH);
+        }
         // 待出库量
         stockWarehouseDO.setOutboundPendingQty(stockWarehouseDO.getOutboundPendingQty() - actualQty);
+        if(stockWarehouseDO.getOutboundPendingQty()<0) {
+            throw exception(STOCK_WAREHOUSE_NOT_ENOUGH);
+        }
 
         return WmsStockFlowDirection.OUT;
     }
@@ -106,9 +120,14 @@ public class OutboundFinishExecutor extends OutboundExecutor {
         Integer actualQty=item.getActualQty();
         // 可用量
         stockOwnershipDO.setAvailableQty(stockOwnershipDO.getAvailableQty() - actualQty);
+        if(stockOwnershipDO.getAvailableQty()<0) {
+            throw exception(STOCK_OWNERSHIP_NOT_ENOUGH);
+        }
         // 待出库量
         stockOwnershipDO.setOutboundPendingQty(stockOwnershipDO.getOutboundPendingQty() - actualQty);
-
+        if(stockOwnershipDO.getOutboundPendingQty()<0) {
+            throw exception(STOCK_OWNERSHIP_NOT_ENOUGH);
+        }
         return WmsStockFlowDirection.OUT;
     }
 
@@ -120,11 +139,19 @@ public class OutboundFinishExecutor extends OutboundExecutor {
         Integer actualQty=item.getActualQty();
         // 可用库存
         stockBinDO.setAvailableQty(stockBinDO.getAvailableQty() - actualQty);
+        if(stockBinDO.getAvailableQty()<0) {
+            throw exception(STOCK_BIN_NOT_ENOUGH);
+        }
         // 可售库存
         stockBinDO.setSellableQty(stockBinDO.getSellableQty() - quantity);
+        if(stockBinDO.getSellableQty()<0) {
+            throw exception(STOCK_BIN_NOT_ENOUGH);
+        }
         // 待出库量
         stockBinDO.setOutboundPendingQty(stockBinDO.getOutboundPendingQty() - actualQty);
-
+        if(stockBinDO.getOutboundPendingQty()<0) {
+            throw exception(STOCK_BIN_NOT_ENOUGH);
+        }
         return WmsStockFlowDirection.OUT;
     }
 

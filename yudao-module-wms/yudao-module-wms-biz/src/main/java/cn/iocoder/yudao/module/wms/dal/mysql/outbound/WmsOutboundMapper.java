@@ -18,13 +18,13 @@ public interface WmsOutboundMapper extends BaseMapperX<WmsOutboundDO> {
 
     default PageResult<WmsOutboundDO> selectPage(WmsOutboundPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<WmsOutboundDO>()
-				.eqIfPresent(WmsOutboundDO::getNo, reqVO.getNo())
+				.eqIfPresent(WmsOutboundDO::getCode, reqVO.getCode())
 				.eqIfPresent(WmsOutboundDO::getWarehouseId, reqVO.getWarehouseId())
 				.eqIfPresent(WmsOutboundDO::getType, reqVO.getType())
 				.eqIfPresent(WmsOutboundDO::getOutboundStatus, reqVO.getOutboundStatus())
 				.eqIfPresent(WmsOutboundDO::getAuditStatus, reqVO.getAuditStatus())
 				.eqIfPresent(WmsOutboundDO::getSourceBillId, reqVO.getSourceBillId())
-				.eqIfPresent(WmsOutboundDO::getSourceBillNo, reqVO.getSourceBillNo())
+				.eqIfPresent(WmsOutboundDO::getSourceBillCode, reqVO.getSourceBillCode())
 				.eqIfPresent(WmsOutboundDO::getSourceBillType, reqVO.getSourceBillType())
 				.eqIfPresent(WmsOutboundDO::getCreatorComment, reqVO.getCreatorComment())
 				.betweenIfPresent(WmsOutboundDO::getCreateTime, reqVO.getCreateTime())
@@ -36,7 +36,7 @@ public interface WmsOutboundMapper extends BaseMapperX<WmsOutboundDO> {
      */
     default WmsOutboundDO getByNo(String no) {
         LambdaQueryWrapperX<WmsOutboundDO> wrapper = new LambdaQueryWrapperX<>();
-        wrapper.eq(WmsOutboundDO::getNo, no);
+        wrapper.eq(WmsOutboundDO::getCode, no);
         return selectOne(wrapper);
     }
 
@@ -56,9 +56,18 @@ public interface WmsOutboundMapper extends BaseMapperX<WmsOutboundDO> {
 
     default List<WmsOutboundDO> getSimpleList(WmsOutboundPageReqVO pageReqVO) {
         LambdaQueryWrapperX<WmsOutboundDO> wrapper = new LambdaQueryWrapperX<>();
-        wrapper.likeIfPresent(WmsOutboundDO::getNo, pageReqVO.getNo());
+        wrapper.likeIfPresent(WmsOutboundDO::getCode, pageReqVO.getCode());
         wrapper.eqIfPresent(WmsOutboundDO::getWarehouseId, pageReqVO.getWarehouseId());
         wrapper.eqIfPresent(WmsOutboundDO::getType, pageReqVO.getType());
         return selectList(wrapper);
     }
-}
+
+    /**
+     * 按 code 查询唯一的 WmsOutboundDO
+     */
+    default WmsOutboundDO getByCode(String code) {
+        LambdaQueryWrapperX<WmsOutboundDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsOutboundDO::getCode, code);
+        return selectOne(wrapper);
+    }
+}

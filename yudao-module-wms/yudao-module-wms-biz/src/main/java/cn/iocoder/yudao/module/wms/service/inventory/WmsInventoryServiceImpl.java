@@ -91,10 +91,10 @@ public class WmsInventoryServiceImpl implements WmsInventoryService {
     public WmsInventoryDO createInventory(WmsInventorySaveReqVO createReqVO) {
         // 设置单据号等初始值
         String no = noRedisDAO.generate(WmsNoRedisDAO.INVENTORY_NO_PREFIX, 3);
-        createReqVO.setNo(no);
+        createReqVO.setCode(no);
         createReqVO.setAuditStatus(WmsInventoryAuditStatus.DRAFT.getValue());
         // 
-        if (inventoryMapper.getByNo(createReqVO.getNo()) != null) {
+        if (inventoryMapper.getByNo(createReqVO.getCode()) != null) {
             throw exception(INVENTORY_NO_DUPLICATE);
         }
         // 插入
@@ -192,7 +192,7 @@ public class WmsInventoryServiceImpl implements WmsInventoryService {
             throw exception(INVENTORY_CAN_NOT_EDIT);
         }
         // 单据号不允许被修改
-        updateReqVO.setNo(exists.getNo());
+        updateReqVO.setCode(exists.getCode());
         // 保存库存盘点产品详情
         if (updateReqVO.getProductItemList() != null) {
             List<WmsInventoryProductDO> existsInDB = inventoryProductMapper.selectByInventoryId(updateReqVO.getId());
@@ -246,7 +246,7 @@ public class WmsInventoryServiceImpl implements WmsInventoryService {
             throw exception(INVENTORY_CAN_NOT_DELETE);
         }
         // 唯一索引去重
-        inventory.setNo(inventoryMapper.flagUKeyAsLogicDelete(inventory.getNo()));
+        inventory.setCode(inventoryMapper.flagUKeyAsLogicDelete(inventory.getCode()));
         inventoryMapper.updateById(inventory);
         // 删除
         inventoryMapper.deleteById(id);

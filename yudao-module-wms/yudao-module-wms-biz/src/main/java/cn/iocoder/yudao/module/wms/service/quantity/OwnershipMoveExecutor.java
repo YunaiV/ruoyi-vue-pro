@@ -22,6 +22,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_NOT_ENOUGH;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSHIP_MOVE_ITEM_NOT_EXISTS;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSHIP_MOVE_QUANTITY_ERROR;
+import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSHIP_NOT_ENOUGH;
 
 /**
  * @author: LeeFJ
@@ -106,10 +107,14 @@ public class OwnershipMoveExecutor extends QuantityExecutor<OwnershipMoveContext
 
         // 处理出方
         fromStockOwnershipDO.setAvailableQty(fromStockOwnershipDO.getAvailableQty()-ownershipMoveItemDO.getQty());
+        if(fromStockOwnershipDO.getAvailableQty()<0) {
+            throw exception(STOCK_OWNERSHIP_NOT_ENOUGH);
+        }
         // 保存
         stockOwnershipService.insertOrUpdate(fromStockOwnershipDO);
         // 记录流水
         stockFlowService.createForStockOwnership(this.getReason(), WmsStockFlowDirection.OUT, ownershipMoveItemDO.getProductId(), fromStockOwnershipDO , ownershipMoveItemDO.getQty(), ownershipMoveItemDO.getOwnershipMoveId(), ownershipMoveItemDO.getId());
+
 
         // 入方
         WmsStockOwnershipDO toStockOwnershipDO = stockOwnershipService.getByUkProductOwner(warehouseId, ownershipMoveItemDO.getToCompanyId(), ownershipMoveItemDO.getToDeptId(), ownershipMoveItemDO.getProductId(), true);

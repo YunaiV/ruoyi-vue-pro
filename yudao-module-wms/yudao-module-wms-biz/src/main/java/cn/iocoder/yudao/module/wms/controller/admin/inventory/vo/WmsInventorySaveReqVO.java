@@ -10,7 +10,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * @table-fields : no,audit_status,id,creator_remark,warehouse_id
+ * @table-fields : code,id,audit_status,creator_remark,warehouse_id
  */
 @Schema(description = "管理后台 - 盘点新增/修改 Request VO")
 @Data
@@ -18,9 +18,6 @@ public class WmsInventorySaveReqVO {
 
     @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "10689")
     private Long id;
-
-    @Schema(description = "单据号")
-    private String no;
 
     @Schema(description = "仓库ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "26854")
     @NotNull(message = "仓库ID不能为空")
@@ -38,4 +35,7 @@ public class WmsInventorySaveReqVO {
 
     @Schema(description = "创建者备注", example = "")
     private String creatorRemark;
+
+    @Schema(description = "单据号", example = "")
+    private String code;
 }

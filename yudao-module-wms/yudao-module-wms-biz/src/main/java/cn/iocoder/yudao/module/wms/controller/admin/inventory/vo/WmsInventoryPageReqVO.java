@@ -9,16 +9,13 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : no,create_time,audit_status,creator_remark,warehouse_id
+ * @table-fields : code,create_time,audit_status,creator_remark,warehouse_id
  */
 @Schema(description = "管理后台 - 盘点分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class WmsInventoryPageReqVO extends PageParam {
-
-    @Schema(description = "单据号")
-    private String no;
 
     @Schema(description = "仓库ID", example = "26854")
     private Long warehouseId;
@@ -32,4 +29,7 @@ public class WmsInventoryPageReqVO extends PageParam {
 
     @Schema(description = "创建者备注", example = "")
     private String creatorRemark;
+
+    @Schema(description = "单据号", example = "")
+    private String code;
 }

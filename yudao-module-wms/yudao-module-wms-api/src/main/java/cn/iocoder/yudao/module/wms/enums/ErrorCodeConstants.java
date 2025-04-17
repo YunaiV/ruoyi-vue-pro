@@ -87,6 +87,7 @@ public interface ErrorCodeConstants {
     ErrorCode STOCK_WAREHOUSE_CAN_NOT_EDIT = new ErrorCode(2_001_008_004, "仓库库存不允许编辑");
     ErrorCode STOCK_WAREHOUSE_CAN_NOT_DELETE = new ErrorCode(2_001_008_005, "仓库库存不允许删除");
     ErrorCode STOCK_WAREHOUSE_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_008_006, "仓库库存不符合审批条件");
+    ErrorCode STOCK_WAREHOUSE_NOT_ENOUGH = new ErrorCode(2_001_008_007, "仓库库存不足");
 
     // ========== WMS_STOCK_BIN 仓位库存表 2_001_009_000 ==========
     ErrorCode STOCK_BIN_NOT_EXISTS = new ErrorCode(2_001_009_001, "仓位库存不存在");
@@ -105,6 +106,7 @@ public interface ErrorCodeConstants {
     ErrorCode STOCK_OWNERSHIP_CAN_NOT_DELETE = new ErrorCode(2_001_010_005, "所有者库存不允许删除");
     ErrorCode STOCK_OWNERSHIP_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_010_006, "所有者库存不符合审批条件");
     ErrorCode STOCK_OWNERSHIP_WAREHOUSE_ID_COMPANY_ID_DEPT_ID_PRODUCT_ID_DUPLICATE = new ErrorCode(2_001_010_007, "仓库ID,库存财务主体公司ID,库存归属部门ID,产品ID已存在");
+    ErrorCode STOCK_OWNERSHIP_NOT_ENOUGH = new ErrorCode(2_001_010_008, "所有者库存不足");
 
     // ========== WMS_STOCK_FLOW 库存流水表 2_001_011_000 ==========
     ErrorCode STOCK_FLOW_NOT_EXISTS = new ErrorCode(2_001_011_001, "库存流水不存在");
@@ -122,6 +124,7 @@ public interface ErrorCodeConstants {
     ErrorCode PICKUP_CAN_NOT_DELETE = new ErrorCode(2_001_012_006, "拣货单不允许删除");
     ErrorCode PICKUP_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_012_007, "拣货单不符合审批条件");
     ErrorCode PICKUP_EXISTS = new ErrorCode(2_001_012_008, "拣货单已存在");
+    ErrorCode PICKUP_CODE_DUPLICATE = new ErrorCode(2_001_012_009, "单据号已存在");
 
     // ========== WMS_PICKUP_ITEM 拣货单详情表 2_001_013_000 ==========
     ErrorCode PICKUP_ITEM_NOT_EXISTS = new ErrorCode(2_001_013_001, "拣货单详情不存在");
@@ -161,6 +164,7 @@ public interface ErrorCodeConstants {
     ErrorCode OUTBOUND_ITEM_ACTUAL_QTY_ERROR = new ErrorCode(2_001_015_010, "实际出库量错误");
     ErrorCode OUTBOUND_STATUS_PARSE_ERROR = new ErrorCode(2_001_015_011, "无法完成出库单状态转换");
     ErrorCode OUTBOUND_EXISTS = new ErrorCode(2_001_015_012, "出库单已存在");
+    ErrorCode OUTBOUND_CODE_DUPLICATE = new ErrorCode(2_001_015_013, "单据号已存在");
 
     // ========== WMS_STOCK_BIN_MOVE 库位移动表 2_001_016_000 ==========
     ErrorCode STOCK_BIN_MOVE_NOT_EXISTS = new ErrorCode(2_001_016_001, "库位移动不存在");
@@ -209,6 +213,8 @@ public interface ErrorCodeConstants {
     ErrorCode INVENTORY_NO_OUT_OF_BOUNDS = new ErrorCode(2_001_020_005, "盘点单单据号越界");
     ErrorCode INVENTORY_CAN_NOT_EDIT = new ErrorCode(2_001_020_006, "盘点单不允许编辑");
     ErrorCode INVENTORY_CAN_NOT_DELETE = new ErrorCode(2_001_020_007, "盘点单不允许删除");
+    ErrorCode INVENTORY_CODE_DUPLICATE = new ErrorCode(2_001_020_008, "单据号已存在");
+    ErrorCode INVENTORY_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_020_009, "盘点单不符合审批条件");
 
     // ========== WMS_INVENTORY_PRODUCT 库存盘点产品表 2_001_021_000 ==========
     ErrorCode INVENTORY_PRODUCT_NOT_EXISTS = new ErrorCode(2_001_021_001, "库存盘点产品不存在");
@@ -229,4 +235,4 @@ public interface ErrorCodeConstants {
     ErrorCode INVENTORY_BIN_BE_REFERRED = new ErrorCode(2_001_022_004, "库位盘点被引用");
     ErrorCode INVENTORY_BIN_CAN_NOT_EDIT = new ErrorCode(2_001_022_005, "库位盘点不允许编辑");
     ErrorCode INVENTORY_BIN_QUANTITY_ERROR = new ErrorCode(2_001_022_006, "库位盘点数量错误");
-}
+}

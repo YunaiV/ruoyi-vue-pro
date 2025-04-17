@@ -124,8 +124,8 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         String no = noRedisDAO.generate(WmsNoRedisDAO.OUTBOUND_NO_PREFIX, 3);
         createReqVO.setAuditStatus(WmsOutboundAuditStatus.DRAFT.getValue());
         createReqVO.setOutboundStatus(WmsOutboundStatus.NONE.getValue());
-        createReqVO.setNo(no);
-        if (outboundMapper.getByNo(createReqVO.getNo()) != null) {
+        createReqVO.setCode(no);
+        if (outboundMapper.getByNo(createReqVO.getCode()) != null) {
             throw exception(OUTBOUND_NO_DUPLICATE);
         }
         if (CollectionUtils.isEmpty(createReqVO.getItemList())) {
@@ -195,7 +195,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
             throw exception(OUTBOUND_CAN_NOT_EDIT);
         }
         // 单据号不允许被修改
-        updateReqVO.setNo(exists.getNo());
+        updateReqVO.setCode(exists.getCode());
         // 更新
         WmsOutboundDO outbound = BeanUtils.toBean(updateReqVO, WmsOutboundDO.class);
         outboundMapper.updateById(outbound);
@@ -254,7 +254,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
             throw exception(INBOUND_CAN_NOT_EDIT);
         }
         // 唯一索引去重
-        outbound.setNo(outboundMapper.flagUKeyAsLogicDelete(outbound.getNo()));
+        outbound.setCode(outboundMapper.flagUKeyAsLogicDelete(outbound.getCode()));
         outboundMapper.updateById(outbound);
         // 删除
         outboundMapper.deleteById(id);
@@ -401,4 +401,4 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         // 触发事件
         outboundStateMachine.fireEvent(event, ctx);
     }
-}
+}

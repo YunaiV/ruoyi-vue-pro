@@ -18,7 +18,7 @@ public interface WmsInventoryMapper extends BaseMapperX<WmsInventoryDO> {
 
     default PageResult<WmsInventoryDO> selectPage(WmsInventoryPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<WmsInventoryDO>()
-				.eqIfPresent(WmsInventoryDO::getNo, reqVO.getNo())
+				.eqIfPresent(WmsInventoryDO::getCode, reqVO.getCode())
 				.eqIfPresent(WmsInventoryDO::getWarehouseId, reqVO.getWarehouseId())
 				.eqIfPresent(WmsInventoryDO::getAuditStatus, reqVO.getAuditStatus())
 				.eqIfPresent(WmsInventoryDO::getCreatorRemark, reqVO.getCreatorRemark())
@@ -31,7 +31,7 @@ public interface WmsInventoryMapper extends BaseMapperX<WmsInventoryDO> {
      */
     default WmsInventoryDO getByNo(String no) {
         LambdaQueryWrapperX<WmsInventoryDO> wrapper = new LambdaQueryWrapperX<>();
-        wrapper.eq(WmsInventoryDO::getNo, no);
+        wrapper.eq(WmsInventoryDO::getCode, no);
         return selectOne(wrapper);
     }
 
@@ -41,4 +41,13 @@ public interface WmsInventoryMapper extends BaseMapperX<WmsInventoryDO> {
     default List<WmsInventoryDO> selectByWarehouseId(Long warehouseId) {
         return selectList(new LambdaQueryWrapperX<WmsInventoryDO>().eq(WmsInventoryDO::getWarehouseId, warehouseId));
     }
-}
+
+    /**
+     * 按 code 查询唯一的 WmsInventoryDO
+     */
+    default WmsInventoryDO getByCode(String code) {
+        LambdaQueryWrapperX<WmsInventoryDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsInventoryDO::getCode, code);
+        return selectOne(wrapper);
+    }
+}

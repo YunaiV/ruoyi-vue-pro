@@ -13,7 +13,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,no,creator,update_time,create_time,audit_status,id,creator_remark,updater,warehouse_id
+ * @table-fields : tenant_id,creator,update_time,code,create_time,id,audit_status,creator_remark,warehouse_id,updater
  */
 @Schema(description = "管理后台 - 盘点 Response VO")
 @Data
@@ -23,10 +23,6 @@ public class WmsInventoryRespVO {
     @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "10689")
     @ExcelProperty("主键")
     private Long id;
-
-    @Schema(description = "单据号")
-    @ExcelProperty("单据号")
-    private String no;
 
     @Schema(description = "仓库ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "26854")
     @ExcelProperty("仓库ID")
@@ -72,4 +68,8 @@ public class WmsInventoryRespVO {
     @Schema(description = "创建者备注", example = "")
     @ExcelProperty("创建者备注")
     private String creatorRemark;
+
+    @Schema(description = "单据号", example = "")
+    @ExcelProperty("单据号")
+    private String code;
 }
