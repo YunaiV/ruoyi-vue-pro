@@ -1,5 +1,6 @@
 package com.somle.esb.job;
 
+import cn.hutool.core.collection.CollUtil;
 import com.dingtalk.api.response.OapiV2UserGetResponse;
 import com.somle.esb.model.OssData;
 import org.springframework.stereotype.Component;
@@ -14,21 +15,30 @@ import java.util.List;
  * @description:
  */
 @Component
-public class DingTalkUserDataJob extends DingTalkDataJob{
+public class DingTalkUserDataJob extends DingTalkDataJob {
     @Override
     public String execute(String param) throws Exception {
         setDate(param);
         List<OapiV2UserGetResponse.UserGetResponse> list = dingTalkService.getUserDetailStream().toList();
+
+        // 当获取不到数据时，重试5次
+        int reTryTimes = 0;
+        while (CollUtil.isEmpty(list) && reTryTimes <= 4) {
+            list = dingTalkService.getUserDetailStream().toList();
+            reTryTimes++;
+            Thread.sleep(1000);
+        }
+
         service.send(
-                OssData.builder()
-                        .database(DATABASE)
-                        .tableName("user")
-                        .syncType("full")
-                        .requestTimestamp(System.currentTimeMillis())
-                        .folderDate(today)
-                        .content(list)
-                        .headers(null)
-                        .build()
+            OssData.builder()
+                .database(DATABASE)
+                .tableName("user")
+                .syncType("full")
+                .requestTimestamp(System.currentTimeMillis())
+                .folderDate(today)
+                .content(list)
+                .headers(null)
+                .build()
         );
 
         return "data upload success";
