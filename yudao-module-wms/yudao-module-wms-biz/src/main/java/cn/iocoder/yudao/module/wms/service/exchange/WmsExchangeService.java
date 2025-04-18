@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.exchange.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.exchange.WmsExchangeDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import java.util.List;
 
 /**
  * 换货单 Service 接口
@@ -20,14 +21,14 @@ public interface WmsExchangeService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createExchange(@Valid WmsExchangeSaveReqVO createReqVO);
+    WmsExchangeDO createExchange(@Valid WmsExchangeSaveReqVO createReqVO);
 
     /**
      * 更新换货单
      *
      * @param updateReqVO 更新信息
      */
-    void updateExchange(@Valid WmsExchangeSaveReqVO updateReqVO);
+    WmsExchangeDO updateExchange(@Valid WmsExchangeSaveReqVO updateReqVO);
 
     /**
      * 删除换货单
@@ -52,4 +53,8 @@ public interface WmsExchangeService {
      */
     PageResult<WmsExchangeDO> getExchangePage(WmsExchangePageReqVO pageReqVO);
 
+    /**
+     * 按 ID 集合查询 WmsExchangeDO
+     */
+    List<WmsExchangeDO> selectByIds(List<Long> idList);
 }

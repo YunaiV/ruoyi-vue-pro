@@ -57,6 +57,11 @@ public class WmsNoRedisDAO {
      **/
     public static final String INVENTORY_NO_PREFIX = "INVE";
 
+    /**
+     * 盘点单据号前缀
+     **/
+    public static final String EXCHANGE_NO_PREFIX = "EXCH";
+
 
 
 

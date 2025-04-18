@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.wms.service.exchange.defective;
 
-import java.util.*;
-import jakarta.validation.*;
-import cn.iocoder.yudao.module.wms.controller.admin.exchange.defective.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.exchange.defective.WmsExchangeDefectiveDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import cn.iocoder.yudao.module.wms.controller.admin.exchange.defective.vo.WmsExchangeDefectivePageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.exchange.defective.vo.WmsExchangeDefectiveSaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.exchange.defective.WmsExchangeDefectiveDO;
+import jakarta.validation.Valid;
+import java.util.List;
 
 /**
  * 良次换货详情 Service 接口
@@ -20,14 +20,14 @@ public interface WmsExchangeDefectiveService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createExchangeDefective(@Valid WmsExchangeDefectiveSaveReqVO createReqVO);
+    WmsExchangeDefectiveDO createExchangeDefective(@Valid WmsExchangeDefectiveSaveReqVO createReqVO);
 
     /**
      * 更新良次换货详情
      *
      * @param updateReqVO 更新信息
      */
-    void updateExchangeDefective(@Valid WmsExchangeDefectiveSaveReqVO updateReqVO);
+    WmsExchangeDefectiveDO updateExchangeDefective(@Valid WmsExchangeDefectiveSaveReqVO updateReqVO);
 
     /**
      * 删除良次换货详情
@@ -52,4 +52,10 @@ public interface WmsExchangeDefectiveService {
      */
     PageResult<WmsExchangeDefectiveDO> getExchangeDefectivePage(WmsExchangeDefectivePageReqVO pageReqVO);
 
+    /**
+     * 按 ID 集合查询 WmsExchangeDefectiveDO
+     */
+    List<WmsExchangeDefectiveDO> selectByIds(List<Long> idList);
+
+    List<WmsExchangeDefectiveDO> selectByExchangeId(Long id);
 }

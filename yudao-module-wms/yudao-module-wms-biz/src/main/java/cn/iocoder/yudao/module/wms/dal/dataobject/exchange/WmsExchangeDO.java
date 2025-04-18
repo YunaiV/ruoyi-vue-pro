@@ -9,11 +9,12 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 
 /**
  * 换货单 DO
- *
  * @author 李方捷
+ * @table-fields : code,remark,id,audit_status,type,warehouse_id
  */
 @TableName("wms_exchange")
-@KeySequence("wms_exchange_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+// 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@KeySequence("wms_exchange_seq")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -27,25 +28,29 @@ public class WmsExchangeDO extends BaseDO {
      */
     @TableId
     private Long id;
+
     /**
      * 单据号
      */
     private String code;
+
     /**
      * 类型
      */
     private Integer type;
+
     /**
      * 调出仓库ID
      */
     private Long warehouseId;
+
     /**
      * 状态
      */
-    private String auditStatus;
+    private Integer auditStatus;
+
     /**
      * 特别说明
      */
     private String remark;
-
 }

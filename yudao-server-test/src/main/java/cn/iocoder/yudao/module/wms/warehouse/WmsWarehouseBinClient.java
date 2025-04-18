@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehous
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinSimpleRespVO;
 import cn.iocoder.yudao.test.Profile;
 import cn.iocoder.yudao.test.RestClient;
+import org.junit.Assert;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 
 import java.util.List;
@@ -23,7 +24,17 @@ public class WmsWarehouseBinClient extends RestClient {
     public CommonResult<List<WmsWarehouseBinSimpleRespVO>> getBinSimpleList(Long warehouseId) {
         WmsWarehouseBinPageReqVO pageReqVO=new WmsWarehouseBinPageReqVO();
         pageReqVO.setWarehouseId(warehouseId);
-        return getSimpleList("/wms/warehouse-bin//simple-list",pageReqVO, WmsWarehouseBinSimpleRespVO.class);
+
+        CommonResult<List<WmsWarehouseBinSimpleRespVO>> result = getSimpleList("/wms/warehouse-bin//simple-list",pageReqVO, WmsWarehouseBinSimpleRespVO.class);
+
+        Assert.assertNotNull(result);
+        Assert.assertTrue(result.isSuccess());
+        Assert.assertNotNull(result.getData());
+
+        return result;
+
+
+
     }
 
 }

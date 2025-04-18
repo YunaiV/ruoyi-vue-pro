@@ -6,7 +6,13 @@ import java.util.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import com.alibaba.excel.annotation.*;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+/**
+ * @table-fields : tenant_id,exchange_id,creator,update_time,create_time,product_id,qty,remark,id,from_bin_id,to_bin_id,updater
+ */
 @Schema(description = "管理后台 - 良次换货详情 Response VO")
 @Data
 @ExcelIgnoreUnannotated
@@ -44,4 +50,32 @@ public class WmsExchangeDefectiveRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "创建人姓名", example = "张三")
+    @ExcelProperty("创建人姓名")
+    private String creatorName;
+
+    @Schema(description = "更新人姓名", example = "李四")
+    @ExcelProperty("更新人姓名")
+    private String updaterName;
+
+    @Schema(description = "产品", example = "")
+    @ExcelProperty("产品")
+    private WmsProductRespSimpleVO product;
+
+    @Schema(description = "创建者", example = "")
+    @ExcelProperty("创建者")
+    private String creator;
+
+    @Schema(description = "更新者", example = "")
+    @ExcelProperty("更新者")
+    private String updater;
+
+    @Schema(description = "更新时间", example = "")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @ExcelProperty("更新时间")
+    private LocalDateTime updateTime;
+
+    @Schema(description = "租户编号", example = "")
+    @ExcelProperty("租户编号")
+    private Long tenantId;
 }

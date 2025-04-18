@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms;
 
+import cn.iocoder.yudao.module.wms.exchange.WmsExchangeClient;
 import cn.iocoder.yudao.module.wms.inbound.WmsInboundClient;
 import cn.iocoder.yudao.module.wms.inventory.WmsInventoryClient;
 import cn.iocoder.yudao.module.wms.stock.WmsStockBinClient;
@@ -44,6 +45,12 @@ public class WmsClients {
     public WmsInboundClient inboundClient() {
         return this.baseRestIntegrationTest.getClient(WmsInboundClient.class);
     }
+
+    public WmsExchangeClient exchangeClient() {
+        return this.baseRestIntegrationTest.getClient(WmsExchangeClient.class);
+    }
+
+
 
 
 

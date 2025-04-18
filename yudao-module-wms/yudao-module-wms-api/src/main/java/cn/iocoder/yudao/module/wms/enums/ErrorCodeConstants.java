@@ -235,4 +235,22 @@ public interface ErrorCodeConstants {
     ErrorCode INVENTORY_BIN_BE_REFERRED = new ErrorCode(2_001_022_004, "库位盘点被引用");
     ErrorCode INVENTORY_BIN_CAN_NOT_EDIT = new ErrorCode(2_001_022_005, "库位盘点不允许编辑");
     ErrorCode INVENTORY_BIN_QUANTITY_ERROR = new ErrorCode(2_001_022_006, "库位盘点数量错误");
+
+    // ========== WMS_EXCHANGE 换货单 2_001_023_000 ==========
+    ErrorCode EXCHANGE_NOT_EXISTS = new ErrorCode(2_001_023_001, "换货单不存在");
+    ErrorCode EXCHANGE_EXISTS = new ErrorCode(2_001_023_002, "换货单已存在");
+    ErrorCode EXCHANGE_CODE_DUPLICATE = new ErrorCode(2_001_023_003, "单据号已存在");
+    ErrorCode EXCHANGE_BE_REFERRED = new ErrorCode(2_001_023_004, "换货单被引用");
+    ErrorCode EXCHANGE_NO_OUT_OF_BOUNDS = new ErrorCode(2_001_023_005, "换货单单据号越界");
+    ErrorCode EXCHANGE_CAN_NOT_EDIT = new ErrorCode(2_001_023_006, "换货单不允许编辑");
+    ErrorCode EXCHANGE_CAN_NOT_DELETE = new ErrorCode(2_001_023_007, "换货单不允许删除");
+    ErrorCode EXCHANGE_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_023_008, "换货单不符合审批条件");
+
+    // ========== WMS_EXCHANGE_DEFECTIVE 良次换货详情表 2_001_024_000 ==========
+    ErrorCode EXCHANGE_DEFECTIVE_NOT_EXISTS = new ErrorCode(2_001_024_001, "良次换货详情不存在");
+    ErrorCode EXCHANGE_DEFECTIVE_EXISTS = new ErrorCode(2_001_024_002, "良次换货详情已存在");
+    ErrorCode EXCHANGE_DEFECTIVE_BE_REFERRED = new ErrorCode(2_001_024_003, "良次换货详情被引用");
+    ErrorCode EXCHANGE_DEFECTIVE_CAN_NOT_EDIT = new ErrorCode(2_001_024_004, "良次换货详情不允许编辑");
+    ErrorCode EXCHANGE_DEFECTIVE_CAN_NOT_DELETE = new ErrorCode(2_001_024_005, "良次换货详情不允许删除");
+    ErrorCode EXCHANGE_DEFECTIVE_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_024_006, "良次换货详情不符合审批条件");
 }
