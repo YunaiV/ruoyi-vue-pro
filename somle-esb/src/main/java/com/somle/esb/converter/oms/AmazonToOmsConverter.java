@@ -75,35 +75,33 @@ public class AmazonToOmsConverter {
             throw exception(OMS_SYNC_SHOPIFY_SHOP_INFO_FIRST);
         }
 
+        List<Long> existShopIds = omsShopDTOMap.values().stream().map(OmsShopDTO::getId).toList();
+        List<OmsShopProductDTO> existShopProducts = omsShopProductApi.getByShopIds(existShopIds);
 
         List<OmsShopProductSaveReqDTO> omsShopProductDOs = new ArrayList<>();
         for (AmazonSpListingRepsVO.ProductItem amazonProductRepsDTO : product) {
-
-            if (CollectionUtil.isEmpty(amazonProductRepsDTO.getSummaries())) {
+            List<AmazonSpListingRepsVO.ProductSummary> summaryList = amazonProductRepsDTO.getSummaries();
+            if (CollectionUtil.isEmpty(summaryList)) {
                 continue;
             }
-
             OmsShopDTO omsShopDTO = omsShopDTOMap.get(amazonProductRepsDTO.getSummaries().get(0).getMarketplaceId());
-
             if (omsShopDTO == null) {
                 continue;
             }
-
-            List<OmsShopProductDTO> existShopProducts = omsShopProductApi.getByShopIds(List.of(omsShopDTO.getId()));
 
             // 使用Map存储已存在的店铺产品信息，key=sourceId, value=OmsShopProductDO
             Map<String, OmsShopProductDTO> existShopProductMap = Optional.ofNullable(existShopProducts)
                 .orElse(Collections.emptyList())
                 .stream()
                 .collect(Collectors.toMap(omsShopProductDO -> omsShopProductDO.getSourceId(), omsShopProductDO -> omsShopProductDO));
-
             OmsShopProductSaveReqDTO shopProductDTO = new OmsShopProductSaveReqDTO();
-
-            MapUtils.findAndThen(existShopProductMap, amazonProductRepsDTO.getSku() + '#' + amazonProductRepsDTO.getSummaries().get(0).getMarketplaceId(), omsShopProductDO -> shopProductDTO.setId(omsShopProductDO.getId()));
+            AmazonSpListingRepsVO.ProductSummary summary = summaryList.get(0);
+            MapUtils.findAndThen(existShopProductMap, amazonProductRepsDTO.getSku() + '#' + summary.getAsin(),
+                omsShopProductDO -> shopProductDTO.setId(omsShopProductDO.getId()));
             shopProductDTO.setShopId(omsShopDTO.getId());
             shopProductDTO.setCode(amazonProductRepsDTO.getSku());
-            shopProductDTO.setName(amazonProductRepsDTO.getSummaries().get(0).getItemName());
-            shopProductDTO.setSourceId(amazonProductRepsDTO.getSku() + '#' + amazonProductRepsDTO.getSummaries().get(0).getMarketplaceId());
+            shopProductDTO.setName(summary.getItemName());
+            shopProductDTO.setSourceId(amazonProductRepsDTO.getSku() + '#' + summary.getAsin());
             shopProductDTO.setPrice(null);
             shopProductDTO.setSellableQty(null);
             omsShopProductDOs.add(shopProductDTO);
