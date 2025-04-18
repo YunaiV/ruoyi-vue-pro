@@ -6,9 +6,8 @@ package cn.iocoder.yudao.framework.cola.statemachine.builder;
  * @author 龙也
  * @date 2022/9/15 12:02 PM
  */
-public class NumbConditionFailCallback<S, E, C> implements ConditionFailCallback<S, E, C> {
+public class NumbConditionFailCallback<S, E, C> {
 
-    @Override
     public void onFail(S sourceState, S targetState, E event, C context) {
         //do nothing
     }

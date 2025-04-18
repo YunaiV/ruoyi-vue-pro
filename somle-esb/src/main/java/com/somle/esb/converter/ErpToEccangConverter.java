@@ -174,7 +174,7 @@ public class ErpToEccangConverter {
 
 
     /**
-     * 转换后置操作-判断是否是新增还是添加
+     * 转换后置操作-判断是新增还是修改
      */
     private EccangProduct tearDown(EccangProduct eccangProduct) {
         //根据sku从eccang中获取产品，存在->修改,不存在->新增

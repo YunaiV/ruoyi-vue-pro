@@ -107,13 +107,13 @@ public class WebUtils {
         String fullUrl = url;
         if (queryParams != null) {
             if (queryParams instanceof Map) {
-                fullUrl = urlWithParams(url, (Map) queryParams);
+                fullUrl = urlWithParams(url, queryParams);
             } else {
                 fullUrl = urlWithParams(url, queryParams);
             }
         }
 
-        log.debug("full url: " + fullUrl);
+        log.info("full url: " + fullUrl);
         Request.Builder requestBuilder = new Request.Builder()
             .url(fullUrl);
 
@@ -121,7 +121,7 @@ public class WebUtils {
             for (Map.Entry<String, String> header : headers.entrySet()) {
                 requestBuilder.addHeader(header.getKey(), header.getValue());
             }
-            log.debug("headers: " + headers.toString());
+            log.debug("headers: " + headers);
         }
 
         String bodyString = null;
@@ -136,7 +136,7 @@ public class WebUtils {
             throw new IllegalArgumentException("不支持的 ContentType " + requestX.getContentType().name());
         }
         RequestBody body = RequestBody.create(bodyString, MediaType.parse(requestX.getContentType().getValue() + "; charset=utf-8"));
-        log.info("body: " + bodyString);
+        log.debug("body: " + bodyString);
 
 
         Request request;

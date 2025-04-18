@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.template.core.impl;
 import cn.iocoder.yudao.framework.template.config.TemplateConfigFactory;
 import cn.iocoder.yudao.framework.template.core.TemplateService;
 import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.config.Configure;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -34,13 +35,20 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     public XWPFTemplate buildXWPDFTemplate(Resource resource) {
-        byte[] templateBytes = self.getTemplateBytesByPath(resource);
+        return buildXWPDFTemplate(resource, null);
+    }
+
+    @Override
+    public XWPFTemplate buildXWPDFTemplate(Resource resource, Configure configure) {
+        byte[] templateBytes = getTemplateBytesCacheByResource(resource);
         if (templateBytes == null || templateBytes.length == 0) {
             throw exception(GENERATE_CONTRACT_FAIL, resource.getFilename(), "模板内容为空");
         }
 
         try (InputStream input = new ByteArrayInputStream(templateBytes)) {
-            return XWPFTemplate.compile(input, configureFactory.buildConfigure(resource));
+            // 如果没有传入策略，则使用默认 configureFactory 构建
+            Configure finalConfigure = configure != null ? configure : configureFactory.buildConfigure(resource);
+            return XWPFTemplate.compile(input, finalConfigure);
         } catch (IOException e) {
             throw exception(GENERATE_CONTRACT_FAIL_PARSE, resource.getFilename(), e.getMessage());
         }
@@ -82,7 +90,7 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     @Cacheable(cacheNames = REDIS_KEY_PREFIX, key = "#resource", unless = "#result == null")
-    public byte[] getTemplateBytesByPath(Resource resource) {
+    public byte[] getTemplateBytesCacheByResource(Resource resource) {
         return getTemplateBytesFromResource(resource);
     }
 

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.template.core;
 
 import com.deepoove.poi.XWPFTemplate;
+import com.deepoove.poi.config.Configure;
 import org.springframework.core.io.Resource;
 
 /**
@@ -18,13 +19,20 @@ public interface TemplateService {
     byte[] getTemplateBytes(Resource resource);
 
     /**
-     * 从类路径获取模板并编译
+     * 从类路径获取模板并编译，根据模板的TemplatePolicy来加载策略。
      *
      * @param resource      模板路径，相对于类路径。purchase/order/外币采购合同_英文.docx。
      * @return 编译后的模板
      */
     XWPFTemplate buildXWPDFTemplate(Resource resource);
 
+    /**
+     * 根据策略手动编译模板
+     *
+     * @param configure 模板配置
+     * @return 编译后的模板
+     */
+    XWPFTemplate buildXWPDFTemplate(Resource resource, Configure configure);
     /**
      * 重新编译模板
      *
@@ -42,6 +50,6 @@ public interface TemplateService {
      * @param resource
      * @return byte[]
      */
-    byte[] getTemplateBytesByPath(Resource resource);
+    byte[] getTemplateBytesCacheByResource(Resource resource);
 
 }

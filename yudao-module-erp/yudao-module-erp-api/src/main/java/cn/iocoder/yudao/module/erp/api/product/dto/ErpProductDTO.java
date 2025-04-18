@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @Builder
+@SuppressWarnings("ALL")
 public class ErpProductDTO {
     /**
      * 产品编号
@@ -44,6 +45,7 @@ public class ErpProductDTO {
     private String material;
     /**
      * 产品材质-关联海关分类
+     * {@link cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.ErpCustomCategoryDO::getId()}
      */
     private Long customCategoryId;
     /**
@@ -258,13 +260,13 @@ public class ErpProductDTO {
     private LocalDateTime updateTime;
     /**
      * 创建者，目前使用 SysUser 的 id 编号
-     *
+     * <p>
      * 使用 String 类型的原因是，未来可能会存在非数值的情况，留好拓展性。
      */
     private String creator;
     /**
      * 更新者，目前使用 SysUser 的 id 编号
-     *
+     * <p>
      * 使用 String 类型的原因是，未来可能会存在非数值的情况，留好拓展性。
      */
     private String updater;

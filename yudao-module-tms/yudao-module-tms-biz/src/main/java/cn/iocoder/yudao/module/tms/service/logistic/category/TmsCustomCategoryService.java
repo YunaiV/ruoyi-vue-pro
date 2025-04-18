@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.TmsCust
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.TmsCustomCategorySaveReqVO;
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.TmsCustomCategoryDO;
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.item.TmsCustomCategoryItemDO;
+import cn.iocoder.yudao.module.tms.service.logistic.category.bo.TmsCustomCategoryBO;
 import jakarta.validation.Valid;
 
 import java.util.Collection;
@@ -78,6 +79,17 @@ public interface TmsCustomCategoryService {
      * @return 海关分类list
      */
     List<TmsCustomCategoryDO> getCustomRuleCategoryList(TmsCustomCategoryPageReqVO pageReqVO);
+
+
+    /**
+     * 获得海关分类分页BO PageResult
+     */
+    PageResult<TmsCustomCategoryBO> getCustomRuleCategoryPageBO(TmsCustomCategoryPageReqVO pageReqVO);
+
+    /**
+     * 获得获得海关分类分页BO 单个对象
+     */
+    TmsCustomCategoryBO getCustomRuleCategoryBO(Long id);
 
 
     // ==================== 子表（海关分类子表） ====================

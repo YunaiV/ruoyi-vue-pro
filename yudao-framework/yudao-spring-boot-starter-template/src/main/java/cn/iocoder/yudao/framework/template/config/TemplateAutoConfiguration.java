@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.template.core.TemplateService;
 import cn.iocoder.yudao.framework.template.core.impl.TemplateServiceRedisImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,7 +33,7 @@ public class TemplateAutoConfiguration {
 
 
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnBean(TemplateRegister.class) //存在模板实现类的时候才注册
     public TemplateManager templateManager(TemplateService templateService, TemplateConfigFactory factory) {
         TemplateManager manager = new TemplateManager();
         manager.setTemplateService(templateService);

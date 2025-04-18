@@ -18,7 +18,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * ERP 海关规则 Mapper
+ * Tms 海关规则 Mapper
  *
  * @author 索迈管理员
  */
@@ -38,7 +38,7 @@ public interface TmsCustomRuleMapper extends BaseMapperX<TmsCustomRuleDO> {
             .eqIfExists(TmsCustomRuleDO::getProductId, reqVO.getProductId()) // 产品id
             .orderByAsc(TmsCustomRuleDO::getId)  // 按id降序排序
             .leftJoin(TmsCustomProductDO.class, TmsCustomProductDO::getProductId, TmsCustomRuleDO::getProductId)  // 左连接产品表
-//            .likeIfExists(ErpProductDO::getBarCode, reqVO.getBarCode()) // 产品SKU编码
+            //            .likeIfExists(TmsProductDO::getBarCode, reqVO.getBarCode()) // 产品SKU编码
             ;
     }
 
@@ -50,7 +50,7 @@ public interface TmsCustomRuleMapper extends BaseMapperX<TmsCustomRuleDO> {
             .likeIfExists(TmsCustomCategoryDO::getDeclaredTypeEn, reqVO.getDeclaredTypeEn())  // 申报品名en
             .selectAsClass(TmsCustomCategoryDO.class, TmsCustomRuleBO.class)
 //            .leftJoin(TmsCustomCategoryItemDO.class, TmsCustomCategoryItemDO::getCustomCategoryId, TmsCustomCategoryDO::getId )
-            .leftJoin(TmsCustomCategoryItemDO.class, on->
+            .leftJoin(TmsCustomCategoryItemDO.class, on ->
                 on.eq(TmsCustomCategoryItemDO::getCustomCategoryId, TmsCustomCategoryDO::getId)
                     .eq(TmsCustomCategoryItemDO::getCountryCode, TmsCustomRuleDO::getCountryCode)
             )
@@ -120,7 +120,7 @@ public interface TmsCustomRuleMapper extends BaseMapperX<TmsCustomRuleDO> {
         );
     }
 
-    //查到ErpCustomRuleBO通过id 关联国家查询
+    //查到TmsCustomRuleBO通过id 关联国家查询
     default TmsCustomRuleBO getCustomRuleBOById(@NotNull Long id) {
         MPJLambdaWrapper<TmsCustomRuleDO> wrapper = getBOWrapper(new TmsCustomRulePageReqVO());
         wrapper.eq(TmsCustomRuleDO::getId, id);
@@ -129,7 +129,7 @@ public interface TmsCustomRuleMapper extends BaseMapperX<TmsCustomRuleDO> {
         return this.selectJoinOne(TmsCustomRuleBO.class, wrapper);
     }
 
-    //通过ids查ErpCustomRuleBO集合
+    //通过ids查TmsCustomRuleBO集合 关联国家查询1:1
     default List<TmsCustomRuleBO> selectCustomRuleBOByIds(Collection<Long> ids) {
         MPJLambdaWrapper<TmsCustomRuleDO> wrapper = getBOWrapper(new TmsCustomRulePageReqVO());
         if (ids != null) {

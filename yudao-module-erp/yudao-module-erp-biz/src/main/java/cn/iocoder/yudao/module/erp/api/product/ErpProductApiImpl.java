@@ -41,7 +41,7 @@ public class ErpProductApiImpl implements ErpProductApi {
     public List<ErpProductDTO> listProductDTOs(List<Long> ids) {
         List<ErpProductDO> dos;
         if (ids != null) {
-            dos = erpProductMapper.selectBatchIds(ids);
+            dos = erpProductMapper.selectByIds(ids);
         } else {
             dos = erpProductMapper.selectList();
         }
@@ -50,16 +50,19 @@ public class ErpProductApiImpl implements ErpProductApi {
 
     @Override
     public Map<Long, ErpProductDTO> getProductMap(Collection<Long> ids) {
-        if(CollectionUtils.isEmpty(ids)) {
-            return new HashMap<>();
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyMap();
         }
-        Map<Long, ErpProductDO> productMap = convertMap(erpProductMapper.selectBatchIds(ids), ErpProductDO::getId);
+        Map<Long, ErpProductDO> productMap = convertMap(erpProductMapper.selectByIds(ids), ErpProductDO::getId);
         return ErpProductConvert.INSTANCE.convert(productMap);
     }
 
     @Override
     public List<ErpProductDTO> listProducts(Collection<Long> ids) {
-        List<ErpProductDO> erpProductDOs = erpProductMapper.selectBatchIds(ids);
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        List<ErpProductDO> erpProductDOs = erpProductMapper.selectByIds(ids);
         return ErpProductConvert.INSTANCE.convert(erpProductDOs);
     }
 
@@ -68,7 +71,7 @@ public class ErpProductApiImpl implements ErpProductApi {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        List<ErpProductDTO> list = BeanUtils.toBean(erpProductMapper.selectBatchIds(ids), ErpProductDTO.class);
+        List<ErpProductDTO> list = BeanUtils.toBean(erpProductMapper.selectByIds(ids), ErpProductDTO.class);
         Map<Long, ErpProductDTO> productMap = convertMap(list, ErpProductDTO::getId);
         for (Long id : ids) {
             ErpProductDTO product = productMap.get(id);

@@ -23,6 +23,8 @@ public class TransitionImpl<S,E,C> implements Transition<S,E,C> {
 
     private Condition<C> condition;
 
+    private Boolean conditionResult;
+
     private Action<S,E,C> action;
 
     private TransitionType type = TransitionType.EXTERNAL;
@@ -70,6 +72,16 @@ public class TransitionImpl<S,E,C> implements Transition<S,E,C> {
     @Override
     public void setCondition(Condition<C> condition) {
         this.condition = condition;
+    }
+
+    @Override
+    public Boolean getConditionResult() {
+        return this.conditionResult;
+    }
+
+    @Override
+    public void setConditionResult(Boolean result) {
+        this.conditionResult = result;
     }
 
     @Override

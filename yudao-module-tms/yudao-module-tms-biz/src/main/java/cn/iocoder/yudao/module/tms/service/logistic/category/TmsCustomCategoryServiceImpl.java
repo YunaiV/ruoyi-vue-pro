@@ -14,8 +14,11 @@ import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.TmsCustomCat
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.item.TmsCustomCategoryItemDO;
 import cn.iocoder.yudao.module.tms.dal.mysql.logistic.category.TmsCustomCategoryMapper;
 import cn.iocoder.yudao.module.tms.dal.mysql.logistic.category.item.TmsCustomCategoryItemMapper;
+import cn.iocoder.yudao.module.tms.dal.mysql.logistic.customrule.TmsCustomRuleMapper;
+import cn.iocoder.yudao.module.tms.service.logistic.category.bo.TmsCustomCategoryBO;
 import cn.iocoder.yudao.module.tms.service.logistic.category.item.TmsCustomCategoryItemService;
 import jakarta.annotation.Resource;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +48,8 @@ public class TmsCustomCategoryServiceImpl implements TmsCustomCategoryService {
     @Resource
     private TmsCustomCategoryItemMapper customRuleCategoryItemMapper;
     @Autowired
+    private TmsCustomRuleMapper tmsCustomRuleMapper;
+    @Autowired
     private TmsCustomCategoryItemService itemService;
 
     @Override
@@ -52,6 +57,7 @@ public class TmsCustomCategoryServiceImpl implements TmsCustomCategoryService {
     public Long createCustomRuleCategory(TmsCustomCategorySaveReqVO createReqVO) {
         //材质-字典校验
         dictDataApi.validateDictDataList(PRODUCT_MATERIAL.getName(), List.of(String.valueOf(createReqVO.getMaterial())));
+        validateCustomRuleCategoryNotExists(createReqVO);
         // 插入
         TmsCustomCategoryDO customRuleCategory = TmsCustomCategoryConvert.INSTANCE.convert(createReqVO);
         customRuleCategoryMapper.insert(customRuleCategory);
@@ -63,6 +69,18 @@ public class TmsCustomCategoryServiceImpl implements TmsCustomCategoryService {
 //        this.syncCustomRuleCategory(categoryId);
         return categoryId;
     }
+
+    //海关分类重复性校验
+    private void validateCustomRuleCategoryNotExists(TmsCustomCategorySaveReqVO createReqVO) {
+        Collection<TmsCustomCategoryDO> categoryList =
+            customRuleCategoryMapper.getCustomRuleByMaterialAndDeclaredType(
+                createReqVO.getMaterial(), createReqVO.getDeclaredType());
+
+        if (CollectionUtils.isNotEmpty(categoryList)) {
+            throw exception(ErrorCodeConstants.CUSTOM_RULE_CATEGORY_EXISTS, createReqVO.getDeclaredType());
+        }
+    }
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -145,6 +163,21 @@ public class TmsCustomCategoryServiceImpl implements TmsCustomCategoryService {
         return customRuleCategoryMapper.getCustomRuleCategoryList(pageReqVO);
     }
 
+    @Override
+    public PageResult<TmsCustomCategoryBO> getCustomRuleCategoryPageBO(TmsCustomCategoryPageReqVO pageReqVO) {
+        if (pageReqVO == null) {
+            pageReqVO = new TmsCustomCategoryPageReqVO();
+        }
+        return customRuleCategoryMapper.selectPageBO(pageReqVO);
+    }
+
+    @Override
+    public TmsCustomCategoryBO getCustomRuleCategoryBO(Long id) {
+        if (id == null) {
+            return null;
+        }
+        return customRuleCategoryMapper.getTmsCustomCategoryBOById(id);
+    }
     // ==================== 子表（海关分类子表） ====================
 
     @Override
@@ -180,7 +213,7 @@ public class TmsCustomCategoryServiceImpl implements TmsCustomCategoryService {
             itemIds.addAll(diffedList.get(1).stream().map(TmsCustomCategoryItemDO::getId).toList());
         }
         if (CollUtil.isNotEmpty(diffedList.get(2))) {
-            customRuleCategoryItemMapper.deleteBatchIds(convertList(diffedList.get(2), TmsCustomCategoryItemDO::getId));
+            customRuleCategoryItemMapper.deleteByIds(convertList(diffedList.get(2), TmsCustomCategoryItemDO::getId));
         }
         return itemIds;
     }
