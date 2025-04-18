@@ -89,7 +89,7 @@ public class AmazonSpClient {
     @SneakyThrows
     public AmazonSpListingRepsVO searchListingsItems(AmazonSpListingReqVO reqVO) {
         String endPoint = getEndPoint();
-        String partialUrl = "/listings/2021-08-01/items/" + auth.getSellerId();
+        String partialUrl = "/listings/2021-08-01/items/" + reqVO.getSellerId();
         String fullUrl = endPoint + partialUrl;
 
 
@@ -386,7 +386,7 @@ public class AmazonSpClient {
             .pageSize(20)
             .pageToken(pageToken)
             .marketplaceIds(marketplaceIds)
-            .includedData(List.of(AmazonSpListingReqVO.IncludedData.OFFERS, AmazonSpListingReqVO.IncludedData.ATTRIBUTES, AmazonSpListingReqVO.IncludedData.SUMMARIES))
+//            .includedData(List.of(AmazonSpListingReqVO.IncludedData.RELATIONSHIPS, AmazonSpListingReqVO.IncludedData.ATTRIBUTES))
             .build();
         AmazonSpListingRepsVO amazonSpListingRepsVO = searchListingsItems(reqVO);
 
@@ -398,9 +398,7 @@ public class AmazonSpClient {
         if (amazonSpListingRepsVO.getPagination() != null && StrUtils.isNonEmpty(amazonSpListingRepsVO.getPagination().getNextToken())) {
             collectListingItems(allProducts, marketplaceIds, amazonSpListingRepsVO.getPagination().getNextToken(), retryTimes);
         }
-
     }
-
 
 }
 

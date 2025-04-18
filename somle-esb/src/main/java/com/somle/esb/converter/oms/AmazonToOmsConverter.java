@@ -1,6 +1,7 @@
 package com.somle.esb.converter.oms;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import cn.iocoder.yudao.module.oms.api.OmsOrderApi;
@@ -18,10 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -67,36 +65,49 @@ public class AmazonToOmsConverter {
     }
 
 
-    public List<OmsShopProductSaveReqDTO> toProducts(List<AmazonSpListingRepsVO.ProductItem> product, String platformShopCode) {
+    public List<OmsShopProductSaveReqDTO> toProducts(List<AmazonSpListingRepsVO.ProductItem> product, List<String> platformShopCodes) {
 
 
-        OmsShopDTO omsShopDO = omsShopApi.getShopByPlatformShopCode(platformShopCode);
+        Map<String, OmsShopDTO> omsShopDTOMap = omsShopApi.getByPlatformCode(this.platform.toString()).stream()
+            .collect(Collectors.toMap(OmsShopDTO::getPlatformShopCode, Function.identity()));
 
-        if (omsShopDO == null) {
+        if (MapUtil.isEmpty(omsShopDTOMap)) {
             throw exception(OMS_SYNC_SHOPIFY_SHOP_INFO_FIRST);
         }
 
 
-        List<OmsShopProductDTO> existShopProducts = omsShopProductApi.getByShopIds(List.of(omsShopDO.getId()));
-        // 使用Map存储已存在的店铺产品信息，key=sourceId, value=OmsShopProductDO
-        Map<String, OmsShopProductDTO> existShopProductMap = Optional.ofNullable(existShopProducts)
-            .orElse(Collections.emptyList())
-            .stream()
-            .collect(Collectors.toMap(omsShopProductDO -> omsShopProductDO.getSourceId(), omsShopProductDO -> omsShopProductDO));
+        List<OmsShopProductSaveReqDTO> omsShopProductDOs = new ArrayList<>();
+        for (AmazonSpListingRepsVO.ProductItem amazonProductRepsDTO : product) {
 
-        List<OmsShopProductSaveReqDTO> omsShopProductDOs = product.stream().map(amazonProductRepsDTO -> {
-            OmsShopProductSaveReqDTO shopProductDTO = new OmsShopProductSaveReqDTO();
-            MapUtils.findAndThen(existShopProductMap, amazonProductRepsDTO.getSku() + this.platform.toString(), omsShopProductDO -> shopProductDTO.setId(omsShopProductDO.getId()));
-            shopProductDTO.setShopId(omsShopDO.getId());
-            shopProductDTO.setCode(amazonProductRepsDTO.getSku());
-            shopProductDTO.setSourceId(amazonProductRepsDTO.getSku() + this.platform.toString());
-            if (CollectionUtil.isNotEmpty(amazonProductRepsDTO.getSummaries())) {
-                shopProductDTO.setName(amazonProductRepsDTO.getSummaries().get(0).getItemName());
+            if (CollectionUtil.isEmpty(amazonProductRepsDTO.getSummaries())) {
+                continue;
             }
+
+            OmsShopDTO omsShopDTO = omsShopDTOMap.get(amazonProductRepsDTO.getSummaries().get(0).getMarketplaceId());
+
+            if (omsShopDTO == null) {
+                continue;
+            }
+
+            List<OmsShopProductDTO> existShopProducts = omsShopProductApi.getByShopIds(List.of(omsShopDTO.getId()));
+
+            // 使用Map存储已存在的店铺产品信息，key=sourceId, value=OmsShopProductDO
+            Map<String, OmsShopProductDTO> existShopProductMap = Optional.ofNullable(existShopProducts)
+                .orElse(Collections.emptyList())
+                .stream()
+                .collect(Collectors.toMap(omsShopProductDO -> omsShopProductDO.getSourceId(), omsShopProductDO -> omsShopProductDO));
+
+            OmsShopProductSaveReqDTO shopProductDTO = new OmsShopProductSaveReqDTO();
+
+            MapUtils.findAndThen(existShopProductMap, amazonProductRepsDTO.getSku() + '#' + amazonProductRepsDTO.getSummaries().get(0).getMarketplaceId(), omsShopProductDO -> shopProductDTO.setId(omsShopProductDO.getId()));
+            shopProductDTO.setShopId(omsShopDTO.getId());
+            shopProductDTO.setCode(amazonProductRepsDTO.getSku());
+            shopProductDTO.setName(amazonProductRepsDTO.getSummaries().get(0).getItemName());
+            shopProductDTO.setSourceId(amazonProductRepsDTO.getSku() + '#' + amazonProductRepsDTO.getSummaries().get(0).getMarketplaceId());
             shopProductDTO.setPrice(null);
             shopProductDTO.setSellableQty(null);
-            return shopProductDTO;
-        }).toList();
+            omsShopProductDOs.add(shopProductDTO);
+        }
         return omsShopProductDOs;
     }
 
@@ -125,8 +136,16 @@ public class AmazonToOmsConverter {
                     omsOrderSaveReqDTO.setPlatformCode(this.platform.toString());
                     omsOrderSaveReqDTO.setSourceNo(order.getAmazonOrderId());
                     MapUtils.findAndThen(omsShopMap, order.getMarketplaceId(), omsShopDTO -> omsOrderSaveReqDTO.setShopId(omsShopDTO.getId()));
-                    omsOrderSaveReqDTO.setTotalPrice(new BigDecimal(Optional.ofNullable(order.getOrderTotal()).map(AmazonSpOrderRespVO.OrderTotal::getAmount).orElse("0.00")));
-                    omsOrderSaveReqDTO.setEmail(order.getBuyerInfo().getBuyerEmail());
+
+                    AmazonSpOrderRespVO.OrderTotal orderTotal = order.getOrderTotal();
+                    if (orderTotal != null && orderTotal.getAmount() != null) {
+                        omsOrderSaveReqDTO.setTotalPrice(new BigDecimal(orderTotal.getAmount()));
+                    }
+
+                    if (order.getBuyerInfo() != null) {
+                        omsOrderSaveReqDTO.setEmail(order.getBuyerInfo().getBuyerEmail());
+                    }
+
                     omsOrderSaveReqDTO.setSourceAddress(JsonUtilsX.toJsonString(order.getShippingAddress()));
                     if (order.getShippingAddress() != null) {
                         omsOrderSaveReqDTO.setAddress(order.getShippingAddress().getStateOrRegion());
