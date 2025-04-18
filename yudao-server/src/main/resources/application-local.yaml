@@ -14,7 +14,7 @@ srm:
 spring:
   autoconfigure:
     exclude:
-      #      - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration # 默认 local 环境，不开启 Quartz 的自动配置
+      - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration # 默认 local 环境，不开启 Quartz 的自动配置
       - de.codecentric.boot.admin.server.config.AdminServerAutoConfiguration # 禁用 Spring Boot Admin 的 Server 的自动配置
       - de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration # 禁用 Spring Boot Admin 的 Server UI 的自动配置
       - de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration # 禁用 Spring Boot Admin 的 Client 的自动配置
@@ -79,7 +79,7 @@ spring:
 # Quartz 配置项，对应 QuartzProperties 配置)
 spring:
   quartz:
-    auto-startup: true # 测试环境，需要开启 Job，测试环境memory不保存任何job信息，需手动添加任务
+    auto-startup: false # 测试环境，需要开启 Job，测试环境memory不保存任何job信息，需手动添加任务
     scheduler-name: schedulerName # Scheduler 名字。默认为 schedulerName
     job-store-type: memory # Job 存储器类型。默认为 memory 表示内存，可选 jdbc 使用数据库。
     wait-for-jobs-to-complete-on-shutdown: false # 应用关闭时，是否等待定时任务执行完成。默认为 false ，建议设置为 true
