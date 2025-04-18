@@ -56,7 +56,7 @@ public class OmsShopProductServiceImpl extends ServiceImpl<OmsShopProductMapper,
     private final String CREATOR = "Admin";
 
     @Resource
-    @Qualifier("omsShopProductOutPutChannel")
+    @Qualifier("omsShopProductOutputChannel")
     MessageChannel omsShopProductOutputChannel;
     @Resource
     private OmsShopProductMapper shopProductMapper;

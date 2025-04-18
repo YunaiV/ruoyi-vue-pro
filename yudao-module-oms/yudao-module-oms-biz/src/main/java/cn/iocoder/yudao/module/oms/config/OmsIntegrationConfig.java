@@ -13,7 +13,7 @@ public class OmsIntegrationConfig {
 
 
     @Bean
-    public MessageChannel omsShopProductOutPutChannel() {
+    public MessageChannel omsShopProductOutputChannel() {
         return new PublishSubscribeChannel(new SimpleAsyncTaskExecutor());
     }
 
