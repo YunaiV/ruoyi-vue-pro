@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.framework.mybatis.core.mapper;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.SortablePageParam;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
+import cn.iocoder.yudao.framework.common.util.string.CharSymbols;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import com.baomidou.mybatisplus.annotation.DbType;
@@ -189,4 +191,22 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         return delete(new LambdaQueryWrapper<T>().eq(field, value));
     }
 
+    /**
+     * 在逻辑删除时，处理唯一键的值，以避免唯一键值冲突  flagUKeyAsLogicDelete
+     */
+    default <T> T flagUKeyAsLogicDelete(T uKeyValue) {
+        if(uKeyValue instanceof String) {
+            CharSequence str= (CharSequence) uKeyValue;
+            return (T)(str + CharSymbols.VERTICAL_LINE + IdUtil.nanoId(2));
+        } else if (uKeyValue instanceof Long) {
+            Long n= - (Long)uKeyValue;
+            return (T)n;
+        } else if (uKeyValue instanceof Integer) {
+            Integer n= - (Integer)uKeyValue;
+            return (T)n;
+        } else {
+            return uKeyValue;
+        }
+
+    }
 }

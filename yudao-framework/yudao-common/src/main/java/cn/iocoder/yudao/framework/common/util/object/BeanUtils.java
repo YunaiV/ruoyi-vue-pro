@@ -5,8 +5,10 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -101,6 +103,21 @@ public class BeanUtils {
             return;
         }
         BeanUtil.copyProperties(source, target, false);
+    }
+
+
+    /**
+     * 将 Map 中的值转换为目标类型
+     **/
+    public static <K,S, T> Map<K,T> toBean(Map<K,S> source, Class<T> targetType) {
+        if (source == null) {
+            return null;
+        }
+        Map<K,T> result = new HashMap<>();
+        for (Map.Entry<K, S> entry : source.entrySet()) {
+            result.put(entry.getKey(), toBean(entry.getValue(), targetType));
+        }
+        return result;
     }
 
 }

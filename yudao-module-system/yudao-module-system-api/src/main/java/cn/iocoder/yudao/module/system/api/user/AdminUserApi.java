@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.module.system.api.user;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserReqDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 /**
  * Admin 用户 API 接口
@@ -16,6 +17,9 @@ import java.util.Map;
  */
 public interface AdminUserApi {
 
+    public static AdminUserApi inst() {
+        return SpringUtils.getBean(AdminUserApi.class);
+    }
     /**
      * 通过用户 ID 查询用户
      *
@@ -112,4 +116,89 @@ public interface AdminUserApi {
     * @return java.lang.Integer
     **/
     Integer getUsernameIndex(String username);
+
+
+    public static class OperatorBuilder<T> {
+
+        private Collection<T> collection;
+        private List<Function<T,?>> getters = new ArrayList<>();
+        private List<BiConsumer<T,String>> setters = new ArrayList<>();
+        private List<Function<AdminUserRespDTO,String>> propertyGetters = new ArrayList<>();
+        private AdminUserApi userApi;
+        private Function<AdminUserRespDTO,String> defaultPropertyGetter;
+
+        public OperatorBuilder(AdminUserApi userApi,Collection<T> collection,Function<AdminUserRespDTO,String> defaultPropertyGetter) {
+            this.collection = collection;
+            this.userApi = userApi;
+            this.defaultPropertyGetter = defaultPropertyGetter;
+            if(this.defaultPropertyGetter==null) {
+                this.defaultPropertyGetter = AdminUserRespDTO::getNickname;
+            }
+        }
+
+        /**
+         * 设置填充关系
+         **/
+        public OperatorBuilder<T> mapping(Function<T,?> getter, BiConsumer<T,String> setter) {
+            return this.mapping(getter,setter,null);
+        }
+
+        /**
+         * 设置填充关系
+         **/
+        public OperatorBuilder<T> mapping(Function<T,?> getter, BiConsumer<T,String> setter,Function<AdminUserRespDTO,String> propertyGetter) {
+            this.getters.add(getter);
+            this.setters.add(setter);
+            propertyGetters.add(propertyGetter);
+            return this;
+        }
+
+        /**
+         * 执行填充
+         **/
+        public void fill() {
+
+            Set<Long> userIds=new HashSet<>();
+            for (T t : collection) {
+                for (int i = 0; i < getters.size(); i++) {
+                    Function<T, ?> getter = getters.get(i);
+                    Object userId = getter.apply(t);
+                    userIds.add(NumberUtils.parseLong(userId));
+                }
+            }
+
+            Map<Long, AdminUserRespDTO> userMap=userApi.getUserMap(userIds);
+            for (T t : collection) {
+                for (int i = 0; i < getters.size(); i++) {
+                    Function<T,?> getter = getters.get(i);
+                    BiConsumer<T,String> setter = setters.get(i);
+                    Long userId = NumberUtils.parseLong(getter.apply(t));
+                    AdminUserRespDTO user = userMap.get(userId);
+                    if(user!=null) {
+                        Function<AdminUserRespDTO,String> propertyGetter = propertyGetters.get(i);
+                        if(propertyGetter==null) {
+                            propertyGetter= this.defaultPropertyGetter;
+                        }
+                        String propValue=propertyGetter.apply(user);
+                        setter.accept(t,propValue);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 准备数据填充
+     **/
+    default <T> OperatorBuilder<T> prepareFill(Collection<T> list) {
+        return new OperatorBuilder<>(this,list,null);
+    }
+
+    /**
+     * 准备数据填充
+     **/
+    default <T> OperatorBuilder<T> prepareFill(Collection<T> list, Function<AdminUserRespDTO,String> propertyGetter) {
+        return new OperatorBuilder<>(this,list,propertyGetter);
+    }
+
 }

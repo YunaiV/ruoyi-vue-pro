@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.erp.api.product;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductRespDTO;
@@ -13,10 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PRODUCT_NOT_ENABLE;
@@ -57,7 +55,6 @@ public class ErpProductApiImpl implements ErpProductApi {
         }
         Map<Long, ErpProductDO> productMap = convertMap(erpProductMapper.selectByIds(ids), ErpProductDO::getId);
         return ErpProductConvert.INSTANCE.convert(productMap);
-
     }
 
     @Override

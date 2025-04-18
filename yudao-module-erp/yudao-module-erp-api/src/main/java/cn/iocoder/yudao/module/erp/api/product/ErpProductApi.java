@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.erp.api.product;
 
 
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductRespDTO;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +27,9 @@ public interface ErpProductApi {
      * @return 产品 DO Map
      */
     default Map<Long, ErpProductDTO> getProductMap(Collection<Long> ids) {
+        if(CollectionUtils.isEmpty(ids)) {
+            return new HashMap<>();
+        }
         return convertMap(listProducts(ids), ErpProductDTO::getId);
     }
 
