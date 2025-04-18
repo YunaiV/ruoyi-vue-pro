@@ -9,7 +9,6 @@ import cn.iocoder.yudao.framework.cola.statemachine.State;
 import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
 import cn.iocoder.yudao.framework.cola.statemachine.Transition;
 import cn.iocoder.yudao.framework.cola.statemachine.Visitor;
-import cn.iocoder.yudao.framework.cola.statemachine.builder.ConditionFailCallback;
 import cn.iocoder.yudao.framework.cola.statemachine.builder.FailCallback;
 
 /**
@@ -32,7 +31,7 @@ public class StateMachineImpl<S, E, C> implements StateMachine<S, E, C> {
 
     private FailCallback<S, E, C> failCallback;
 
-    private ConditionFailCallback<S, E, C> conditionFailCallback;
+
 
     /**
      * 状态属性值提取器(可选）
@@ -72,11 +71,18 @@ public class StateMachineImpl<S, E, C> implements StateMachine<S, E, C> {
         isReady();
         Transition<S, E, C> transition = routeTransition(sourceStateId, event, ctx);
 
+
         if (transition == null) {
             Debugger.debug("There is no Transition for " + event);
-            failCallback.onFail(sourceStateId, event, ctx);
+            failCallback.onFail(sourceStateId,null, event, ctx);
             return sourceStateId;
+        } else {
+            if(transition.getConditionResult()!=null && !transition.getConditionResult()) {
+                failCallback.onFail(sourceStateId,transition.getTarget().getId(), event, ctx);
+                return sourceStateId;
+            }
         }
+
 
         return transition.transit(ctx, false).getId();
     }
@@ -87,7 +93,7 @@ public class StateMachineImpl<S, E, C> implements StateMachine<S, E, C> {
         List<S> result = new ArrayList<>();
         if (transitions == null||transitions.isEmpty()) {
             Debugger.debug("There is no Transition for " + event);
-            failCallback.onFail(sourceState, event, context);
+            failCallback.onFail(sourceState,null, event, context);
             result.add(sourceState);
             return result;
         }
@@ -111,11 +117,11 @@ public class StateMachineImpl<S, E, C> implements StateMachine<S, E, C> {
         for (Transition<S, E, C> transition : transitions) {
             if (transition.getCondition() == null) {
                 transit = transition;
-            } else if (transition.getCondition().isSatisfied(ctx)) {
+            } else {
+                Boolean conditionResult=transition.getCondition().isSatisfied(ctx);
+                transition.setConditionResult(conditionResult);
                 transit = transition;
                 break;
-            } else {
-                conditionFailCallback.onFail(sourceStateId, transition.getTarget().getId(), event, ctx);
             }
         }
 
@@ -137,7 +143,7 @@ public class StateMachineImpl<S, E, C> implements StateMachine<S, E, C> {
             } else if (transition.getCondition().isSatisfied(context)) {
                 transit = transition;
             } else {
-                conditionFailCallback.onFail(sourceStateId, transition.getTarget().getId(), event, context);
+                failCallback.onFail(sourceStateId, transition.getTarget().getId(), event, context);
             }
             result.add(transit);
         }
@@ -199,7 +205,4 @@ public class StateMachineImpl<S, E, C> implements StateMachine<S, E, C> {
         this.failCallback = failCallback;
     }
 
-    public void setCondtionFailCallback(ConditionFailCallback<S, E, C> conditionFailCallback) {
-        this.conditionFailCallback = conditionFailCallback;
-    }
 }

@@ -47,6 +47,10 @@ public interface Transition<S, E, C>{
 
     void setCondition(Condition<C> condition);
 
+    Boolean getConditionResult();
+
+    void setConditionResult(Boolean result);
+
     Action<S,E,C> getAction();
 
     void setAction(Action<S, E, C> action);

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.cola.statemachine.builder;
 
 import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 
 /**
  * StateMachineBuilder
@@ -43,7 +44,11 @@ public interface StateMachineBuilder<S, E, C> {
      */
     void setFailCallback(FailCallback<S, E, C> callback);
 
-    void setConditionFailCallback(ConditionFailCallback<S, E, C> callback);
+    default void setFailCallback(Class<? extends FailCallback<S, E, C>> callback) {
+        setFailCallback(SpringUtils.getBean(callback));
+    }
+
+    //void setConditionFailCallback(ConditionFailCallback<S, E, C> callback);
 
     StateMachine<S, E, C> build(String machineId);
 
