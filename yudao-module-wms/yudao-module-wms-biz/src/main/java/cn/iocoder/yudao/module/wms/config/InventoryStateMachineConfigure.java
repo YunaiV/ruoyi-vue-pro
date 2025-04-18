@@ -33,7 +33,7 @@ public class InventoryStateMachineConfigure {
      * 创建与配置状态机
      **/
     @Bean(InventoryStateMachineConfigure.STATE_MACHINE_NAME)
-    public StateMachine<Integer, WmsInventoryAuditStatus.Event, TransitionContext<WmsInventoryDO>> inventoryActionStateMachine() {
+    public StateMachine<Integer, WmsInventoryAuditStatus.Event, TransitionContext<WmsInventoryDO>> inventoryStateMachine() {
 
         StateMachineBuilder<Integer, WmsInventoryAuditStatus.Event, TransitionContext<WmsInventoryDO>> builder = StateMachineBuilderFactory.create();
 
@@ -63,7 +63,7 @@ public class InventoryStateMachineConfigure {
         // 失败处理
         builder.setFailCallback(InventoryTransitionFailCallback.class);
 
-        return builder.build(OutboundStateMachineConfigure.STATE_MACHINE_NAME);
+        return builder.build(InventoryStateMachineConfigure.STATE_MACHINE_NAME,c->c.data().getAuditStatus());
 
 
     }

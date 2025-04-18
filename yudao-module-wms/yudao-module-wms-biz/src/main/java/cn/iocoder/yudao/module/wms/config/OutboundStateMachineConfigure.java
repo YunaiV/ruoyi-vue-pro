@@ -35,7 +35,7 @@ public class OutboundStateMachineConfigure {
      * 创建与配置状态机
      **/
     @Bean(OutboundStateMachineConfigure.STATE_MACHINE_NAME)
-    public StateMachine<Integer, WmsOutboundAuditStatus.Event, TransitionContext<WmsOutboundDO>> inboundActionStateMachine() {
+    public StateMachine<Integer, WmsOutboundAuditStatus.Event, TransitionContext<WmsOutboundDO>> outboundStateMachine() {
 
         StateMachineBuilder<Integer, WmsOutboundAuditStatus.Event, TransitionContext<WmsOutboundDO>> builder = StateMachineBuilderFactory.create();
 
@@ -67,12 +67,10 @@ public class OutboundStateMachineConfigure {
             .on(WmsOutboundAuditStatus.Event.FINISH)
             .handle(OutboundExecuteTransitionHandler.class);
 
-
         // 失败处理
         builder.setFailCallback(OutboundTransitionFailCallback.class);
 
-        return builder.build(OutboundStateMachineConfigure.STATE_MACHINE_NAME);
-
+        return builder.build(OutboundStateMachineConfigure.STATE_MACHINE_NAME,c->c.data().getAuditStatus());
 
     }
 

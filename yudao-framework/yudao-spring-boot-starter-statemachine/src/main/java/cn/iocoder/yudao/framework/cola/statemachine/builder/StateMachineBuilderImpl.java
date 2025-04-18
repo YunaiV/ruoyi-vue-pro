@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.framework.cola.statemachine.builder;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import cn.iocoder.yudao.framework.cola.statemachine.State;
 import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
 import cn.iocoder.yudao.framework.cola.statemachine.StateMachineFactory;
 import cn.iocoder.yudao.framework.cola.statemachine.impl.StateMachineImpl;
 import cn.iocoder.yudao.framework.cola.statemachine.impl.TransitionType;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * StateMachineBuilderImpl
@@ -56,9 +57,15 @@ public class StateMachineBuilderImpl<S, E, C> implements StateMachineBuilder<S, 
 
     @Override
     public StateMachine<S, E, C> build(String machineId) {
+        return build(machineId, null);
+    }
+
+    @Override
+    public StateMachine<S, E, C> build(String machineId, Function<C,S> getter) {
         stateMachine.setMachineId(machineId);
         stateMachine.setReady(true);
         stateMachine.setFailCallback(failCallback);
+        stateMachine.setGetter(getter);
         // stateMachine.setCondtionFailCallback(conditionFailCallback);
         StateMachineFactory.register(stateMachine);
         return stateMachine;

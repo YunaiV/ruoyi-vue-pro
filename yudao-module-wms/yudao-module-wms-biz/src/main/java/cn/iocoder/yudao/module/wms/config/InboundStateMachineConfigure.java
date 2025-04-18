@@ -41,6 +41,7 @@ public class InboundStateMachineConfigure {
 
         StateMachineBuilder<Integer, WmsInboundAuditStatus.Event, TransitionContext<WmsInboundDO>> builder = StateMachineBuilderFactory.create();
 
+
         // 提交
         builder.externalTransitions()
             .fromAmong(WmsInboundAuditStatus.DRAFT.getValue(),WmsInboundAuditStatus.REJECT.getValue())
@@ -80,7 +81,7 @@ public class InboundStateMachineConfigure {
         builder.setFailCallback(InboundTransitionFailCallback.class);
 
         // 返回
-        return builder.build(InboundStateMachineConfigure.STATE_MACHINE_NAME);
+        return builder.build(InboundStateMachineConfigure.STATE_MACHINE_NAME,c->c.data().getAuditStatus());
 
     }
 

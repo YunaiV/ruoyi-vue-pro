@@ -3,6 +3,8 @@ package cn.iocoder.yudao.framework.cola.statemachine.builder;
 import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
 import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 
+import java.util.function.Function;
+
 /**
  * StateMachineBuilder
  *
@@ -51,5 +53,6 @@ public interface StateMachineBuilder<S, E, C> {
     //void setConditionFailCallback(ConditionFailCallback<S, E, C> callback);
 
     StateMachine<S, E, C> build(String machineId);
+    StateMachine<S, E, C> build(String machineId, Function<C,S> getter);
 
 }
