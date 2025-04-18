@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.outbound;
 
-import cn.iocoder.yudao.framework.cola.statemachine.StateMachineWrapper;
-import cn.iocoder.yudao.framework.cola.statemachine.TransitionContext;
+import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
+import cn.iocoder.yudao.framework.cola.statemachine.builder.TransitionContext;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
@@ -112,7 +112,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     private WmsApprovalHistoryService approvalHistoryService;
 
     @Resource(name = OutboundStateMachineConfigure.STATE_MACHINE_NAME)
-    private StateMachineWrapper<Integer, WmsOutboundAuditStatus.Event, WmsOutboundDO> outboundStateMachine;
+    private StateMachine<Integer, WmsOutboundAuditStatus.Event, TransitionContext<WmsOutboundDO>> outboundStateMachine;
 
     /**
      * @sign : A523E13094CD30CE
@@ -395,10 +395,10 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    protected void fireEvent(WmsOutboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO, WmsOutboundDO inbound) {
-        TransitionContext<WmsOutboundDO> ctx = outboundStateMachine.createContext(inbound);
+    protected void fireEvent(WmsOutboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO, WmsOutboundDO outbound) {
+        TransitionContext<WmsOutboundDO> ctx = TransitionContext.from(outbound);
         ctx.setExtra(WmsConstants.APPROVAL_REQ_VO_KEY, approvalReqVO);
         // 触发事件
         outboundStateMachine.fireEvent(event, ctx);
     }
-}
+}

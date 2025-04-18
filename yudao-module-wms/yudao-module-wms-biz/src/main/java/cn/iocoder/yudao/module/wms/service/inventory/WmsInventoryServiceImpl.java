@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.inventory;
 
-import cn.iocoder.yudao.framework.cola.statemachine.StateMachineWrapper;
-import cn.iocoder.yudao.framework.cola.statemachine.TransitionContext;
+import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
+import cn.iocoder.yudao.framework.cola.statemachine.builder.TransitionContext;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
@@ -35,11 +35,13 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_CAN_NOT_DELETE;
 import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INVENTORY_CAN_NOT_EDIT;
@@ -81,7 +83,7 @@ public class WmsInventoryServiceImpl implements WmsInventoryService {
     private WmsWarehouseService warehouseService;
 
     @Resource(name = InventoryStateMachineConfigure.STATE_MACHINE_NAME)
-    private StateMachineWrapper<Integer, WmsInventoryAuditStatus.Event, WmsInventoryDO> inventoryStateMachine;
+    private StateMachine<Integer, WmsInventoryAuditStatus.Event, TransitionContext<WmsInventoryDO>> inventoryStateMachine;
 
     /**
      * @sign : A9D51C9E0E654C80
@@ -305,8 +307,8 @@ public class WmsInventoryServiceImpl implements WmsInventoryService {
         approvalReqVO.setBillType(WmsBillType.OUTBOUND.getValue());
         approvalReqVO.setStatusType(WmsOutboundAuditStatus.getType());
         // 获得业务对象
-        WmsInventoryDO inbound = validateInventoryExists(approvalReqVO.getBillId());
-        TransitionContext<WmsInventoryDO> ctx = inventoryStateMachine.createContext(inbound);
+        WmsInventoryDO inventoryDO = validateInventoryExists(approvalReqVO.getBillId());
+        TransitionContext<WmsInventoryDO> ctx = TransitionContext.from(inventoryDO);
         ctx.setExtra(WmsConstants.APPROVAL_REQ_VO_KEY, approvalReqVO);
         // 触发事件
         inventoryStateMachine.fireEvent(event, ctx);

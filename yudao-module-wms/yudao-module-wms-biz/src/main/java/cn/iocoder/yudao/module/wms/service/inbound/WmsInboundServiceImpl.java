@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.inbound;
 
-import cn.iocoder.yudao.framework.cola.statemachine.StateMachineWrapper;
-import cn.iocoder.yudao.framework.cola.statemachine.TransitionContext;
+import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
+import cn.iocoder.yudao.framework.cola.statemachine.builder.TransitionContext;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
@@ -102,7 +102,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     private FmsCompanyApi companyApi;
 
     @Resource(name = InboundStateMachineConfigure.STATE_MACHINE_NAME)
-    private StateMachineWrapper<Integer, WmsInboundAuditStatus.Event, WmsInboundDO> inboundStateMachine;
+    private StateMachine<Integer, WmsInboundAuditStatus.Event, TransitionContext<WmsInboundDO>> inboundStateMachine;
 
     /**
      * @sign : 5D2F5734A2A97234
@@ -283,7 +283,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
 
     @Transactional(rollbackFor = Exception.class)
     protected void fireEvent(WmsInboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO, WmsInboundDO inbound) {
-        TransitionContext<WmsInboundDO> ctx = inboundStateMachine.createContext(inbound);
+        TransitionContext<WmsInboundDO> ctx =  TransitionContext.from(inbound);
         ctx.setExtra(WmsConstants.APPROVAL_REQ_VO_KEY, approvalReqVO);
         // 触发事件
         inboundStateMachine.fireEvent(event, ctx);

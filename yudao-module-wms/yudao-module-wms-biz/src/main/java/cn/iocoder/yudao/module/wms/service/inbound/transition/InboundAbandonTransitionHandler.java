@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.inbound.transition;
 
 
-
-import cn.iocoder.yudao.framework.cola.statemachine.TransitionContext;
+import cn.iocoder.yudao.framework.cola.statemachine.builder.TransitionContext;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
 import org.springframework.stereotype.Component;

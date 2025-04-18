@@ -1,8 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.inbound.transition;
 
 
-
-import cn.iocoder.yudao.framework.cola.statemachine.TransitionContext;
+import cn.iocoder.yudao.framework.cola.statemachine.builder.TransitionContext;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.approval.history.ApprovalHistoryTransitionHandler;
@@ -20,14 +19,6 @@ public class BaseInboundTransitionHandler extends ApprovalHistoryTransitionHandl
     @Resource
     @Lazy
     protected WmsInboundService inboundService;
-
-    /**
-     * 默认的条件判断都为通过
-     **/
-    @Override
-    public boolean when(TransitionContext<WmsInboundDO> context) {
-        return context.success();
-    }
 
     /**
      * 变更状态
