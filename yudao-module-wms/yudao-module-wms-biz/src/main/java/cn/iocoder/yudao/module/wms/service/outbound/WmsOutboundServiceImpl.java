@@ -329,7 +329,9 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         // 拉取明细
         List<WmsOutboundItemDO> outboundItemDOS = outboundItemService.selectByOutboundId(outbound.getId());
         // 设置实际出库量
-        StreamX.from(outboundItemDOS).assemble(outboundSaveReqVO.getItemList(), WmsOutboundItemSaveReqVO::getProductId, WmsOutboundItemDO::getProductId, (a, b) -> {
+        StreamX.from(outboundItemDOS).assemble(outboundSaveReqVO.getItemList(),
+            itm->itm.getProductId()+"-"+itm.getBinId(),
+            itm->itm.getProductId()+"-"+itm.getBinId(), (a, b) -> {
             a.setActualQty(b.getActualQty());
         });
         // 保存实际入库量

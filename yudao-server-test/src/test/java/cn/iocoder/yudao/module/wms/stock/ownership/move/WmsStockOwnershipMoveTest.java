@@ -56,8 +56,14 @@ public class WmsStockOwnershipMoveTest extends BaseRestIntegrationTest {
         }
 
         if(toStockOwnershipVOBefore==null) {
-            System.err.println("缺少目标，无法继续测试");
-            return;
+            toStockOwnershipVOBefore = new WmsStockOwnershipRespVO();
+            toStockOwnershipVOBefore.setWarehouseId(warehouseId);
+            toStockOwnershipVOBefore.setCompanyId(1L);
+            toStockOwnershipVOBefore.setAvailableQty(0);
+            toStockOwnershipVOBefore.setDeptId(50013L);
+            toStockOwnershipVOBefore.setProductId(fromStockOwnershipVOBefore.getProductId());
+            //System.err.println("缺少目标，无法继续测试");
+            //return;
         }
 
         System.out.println("FromBefore("+fromStockOwnershipVOBefore.getProductId()+"):"+fromStockOwnershipVOBefore.getAvailableQty()+",companyId="+fromStockOwnershipVOBefore.getCompanyId()+",deptId="+fromStockOwnershipVOBefore.getDeptId());
@@ -70,6 +76,14 @@ public class WmsStockOwnershipMoveTest extends BaseRestIntegrationTest {
             toStockOwnershipVOBefore.setAvailableQty(0);
         } else {
             toStockOwnershipVOBefore = stockOwnershipResult.getData();
+        }
+        if(toStockOwnershipVOBefore==null) {
+            toStockOwnershipVOBefore = new WmsStockOwnershipRespVO();
+            toStockOwnershipVOBefore.setWarehouseId(warehouseId);
+            toStockOwnershipVOBefore.setCompanyId(1L);
+            toStockOwnershipVOBefore.setDeptId(50013L);
+            toStockOwnershipVOBefore.setAvailableQty(0);
+            toStockOwnershipVOBefore.setProductId(fromStockOwnershipVOBefore.getProductId());
         }
 
         System.out.println("FromBefore("+fromStockOwnershipVOBefore.getProductId()+"):"+fromStockOwnershipVOBefore.getAvailableQty()+",companyId="+fromStockOwnershipVOBefore.getCompanyId()+",deptId="+fromStockOwnershipVOBefore.getDeptId());
