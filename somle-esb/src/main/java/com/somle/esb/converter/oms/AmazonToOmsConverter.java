@@ -94,15 +94,15 @@ public class AmazonToOmsConverter {
             Map<String, OmsShopProductDTO> existShopProductMap = Optional.ofNullable(existShopProducts)
                 .orElse(Collections.emptyList())
                 .stream()
-                .collect(Collectors.toMap(omsShopProductDO -> omsShopProductDO.getSourceId(), omsShopProductDO -> omsShopProductDO));
+                .collect(Collectors.toMap(omsShopProductDO -> omsShopProductDO.getExternalId(), omsShopProductDO -> omsShopProductDO));
             OmsShopProductSaveReqDTO shopProductDTO = new OmsShopProductSaveReqDTO();
             AmazonSpListingRepsVO.ProductSummary summary = summaryList.get(0);
-            MapUtils.findAndThen(existShopProductMap, amazonProductRepsDTO.getSku() + '#' + summary.getAsin(),
+            MapUtils.findAndThen(existShopProductMap, amazonProductRepsDTO.getSku() + '#' + summary.getAsin() + summary.getFnSku(),
                 omsShopProductDO -> shopProductDTO.setId(omsShopProductDO.getId()));
             shopProductDTO.setShopId(omsShopDTO.getId());
             shopProductDTO.setCode(amazonProductRepsDTO.getSku());
             shopProductDTO.setName(summary.getItemName());
-            shopProductDTO.setSourceId(amazonProductRepsDTO.getSku() + '#' + summary.getAsin());
+            shopProductDTO.setExternalId(amazonProductRepsDTO.getSku() + '#' + summary.getAsin() + summary.getFnSku());
             shopProductDTO.setPrice(null);
             shopProductDTO.setSellableQty(null);
             omsShopProductDOs.add(shopProductDTO);
@@ -134,48 +134,7 @@ public class AmazonToOmsConverter {
         Map<String, OmsShopProductDTO> existShopProductMap = Optional.ofNullable(existShopProducts)
             .orElse(Collections.emptyList())
             .stream()
-            .collect(Collectors.toMap(omsShopProductDO -> omsShopProductDO.getSourceId(), omsShopProductDO -> omsShopProductDO));
-
-//        List<OmsOrderSaveReqDTO> omsOrderSaveReqDTOs = orders.stream()
-//            .map(order -> {
-//                try {
-//                    OmsOrderSaveReqDTO omsOrderSaveReqDTO = new OmsOrderSaveReqDTO();
-//                    MapUtils.findAndThen(existOrderMap, order.getAmazonOrderId(), omsOrderDTO -> omsOrderSaveReqDTO.setId(omsOrderDTO.getId()));
-//                    omsOrderSaveReqDTO.setPlatformCode(this.platform.toString());
-//                    omsOrderSaveReqDTO.setExternalCode(order.getAmazonOrderId());
-//                    MapUtils.findAndThen(omsShopMap, order.getMarketplaceId(), omsShopDTO -> omsOrderSaveReqDTO.setShopId(omsShopDTO.getId()));
-//
-//                    AmazonSpOrderRespVO.OrderTotal orderTotal = order.getOrderTotal();
-//                    if (orderTotal != null && orderTotal.getAmount() != null) {
-//                        omsOrderSaveReqDTO.setTotalPrice(new BigDecimal(orderTotal.getAmount()));
-//                    }
-//
-//                    if (order.getBuyerInfo() != null) {
-//                        omsOrderSaveReqDTO.setEmail(order.getBuyerInfo().getBuyerEmail());
-//                    }
-//
-//                    omsOrderSaveReqDTO.setExternalAddress(JsonUtilsX.toJsonString(order.getShippingAddress()));
-//                    if (order.getShippingAddress() != null) {
-//                        omsOrderSaveReqDTO.setAddress1(order.getShippingAddress().getStateOrRegion());
-//                    }
-//                    List<OmsOrderItemSaveReqDTO> omsOrderItemSaveReqDTOs = order.getOrderItems().stream()
-//                        .map(orderItem -> {
-//                            OmsOrderItemSaveReqDTO omsOrderItemSaveReqDTO = new OmsOrderItemSaveReqDTO();
-//                            omsOrderItemSaveReqDTO.setShopProductId(1L);
-//                            omsOrderItemSaveReqDTO.setQty(orderItem.getQuantityOrdered());
-//                            if (orderItem.getItemPrice() != null) {
-//                                omsOrderItemSaveReqDTO.setPrice(new BigDecimal(orderItem.getItemPrice().getAmount()));
-//                            }
-//                            return omsOrderItemSaveReqDTO;
-//                        }).toList();
-//                    omsOrderSaveReqDTO.setOmsOrderItemSaveReqDTOList(omsOrderItemSaveReqDTOs);
-//                    return omsOrderSaveReqDTO;
-//                } catch (Exception e) {
-//                    log.info("转换Amazon订单异常", e);
-//                }
-//                return null;
-//            }).toList();
-
+            .collect(Collectors.toMap(omsShopProductDO -> omsShopProductDO.getExternalId(), omsShopProductDO -> omsShopProductDO));
 
         List<OmsOrderSaveReqDTO> omsOrderSaveReqDTOs = new ArrayList<>();
         for (AmazonSpOrderRespVO.Order order : orders) {

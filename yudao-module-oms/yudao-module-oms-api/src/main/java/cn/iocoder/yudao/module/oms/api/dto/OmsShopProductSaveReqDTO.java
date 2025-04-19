@@ -30,7 +30,7 @@ public class OmsShopProductSaveReqDTO {
     /**
      * 外部资源来源id，唯一标识
      */
-    private String sourceId;
+    private String externalId;
 
     /**
      * 店铺产品名称

@@ -84,7 +84,7 @@ public class ShopifyToOmsConverter {
         Map<String, OmsShopProductDTO> existShopProductMap = Optional.ofNullable(existShopProducts)
             .orElse(Collections.emptyList())
             .stream()
-            .collect(Collectors.toMap(omsShopProductDO -> omsShopProductDO.getSourceId(), omsShopProductDO -> omsShopProductDO));
+            .collect(Collectors.toMap(omsShopProductDO -> omsShopProductDO.getExternalId(), omsShopProductDO -> omsShopProductDO));
 
 
         List<OmsShopProductSaveReqDTO> omsShopProductDOs = product.stream()
@@ -95,7 +95,7 @@ public class ShopifyToOmsConverter {
                         MapUtils.findAndThen(existShopProductMap, variant.getId().toString(), omsShopProductDO -> shopProductDTO.setId(omsShopProductDO.getId()));
                         shopProductDTO.setShopId(omsShopDO.getId());
                         shopProductDTO.setCode(variant.getSku());
-                        shopProductDTO.setSourceId(variant.getId().toString());
+                        shopProductDTO.setExternalId(variant.getId().toString());
                         shopProductDTO.setName(variant.getTitle());
                         if (variant.getPrice() != null) {
                             shopProductDTO.setPrice(new BigDecimal(variant.getPrice()));
@@ -136,7 +136,7 @@ public class ShopifyToOmsConverter {
         Map<String, OmsShopProductDTO> existShopProductMap = Optional.ofNullable(existShopProducts)
             .orElse(Collections.emptyList())
             .stream()
-            .collect(Collectors.toMap(omsShopProductDO -> omsShopProductDO.getSourceId(), omsShopProductDO -> omsShopProductDO));
+            .collect(Collectors.toMap(omsShopProductDO -> omsShopProductDO.getExternalId(), omsShopProductDO -> omsShopProductDO));
 
         List<OmsOrderSaveReqDTO> omsOrderSaveReqDTOs = new ArrayList<>();
 

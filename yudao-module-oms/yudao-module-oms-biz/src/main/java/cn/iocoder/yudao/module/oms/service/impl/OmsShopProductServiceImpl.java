@@ -179,7 +179,7 @@ public class OmsShopProductServiceImpl extends ServiceImpl<OmsShopProductMapper,
     public Long createShopProduct(OmsShopProductSaveReqVO createReqVO) {
         // 插入
         OmsShopProductDO shopProduct = BeanUtils.toBean(createReqVO, OmsShopProductDO.class);
-        shopProduct.setSourceId(shopProduct.getCode() + shopProduct.getShopId());
+        shopProduct.setExternalId(shopProduct.getCode() + shopProduct.getShopId());
         shopProductMapper.insert(shopProduct);
         // 返回
         return shopProduct.getId();

@@ -33,7 +33,7 @@ public class OmsShopProductRespVO extends BaseDO {
 
     @Schema(description = "外部资源id", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("外部资源id")
-    private String sourceId;
+    private String externalId;
 
     @Schema(description = "店铺产品名称")
     @ExcelProperty("店铺产品名称")
