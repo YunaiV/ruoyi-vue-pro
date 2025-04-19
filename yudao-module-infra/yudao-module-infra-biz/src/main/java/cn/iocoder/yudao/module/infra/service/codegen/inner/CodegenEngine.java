@@ -145,7 +145,6 @@ public class CodegenEngine {
             .put(CodegenFrontTypeEnum.VUE3_VBEN2_ANTD_SCHEMA.getType(), vue3VbenTemplatePath("api/api.ts"),
                     vue3FilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
             // VUE3_VBEN5_ANTD_SCHEMA
-            // TODO @puhui999：目录改成 vue3_vben5_antd；然后里面有 schema（目前我们在写的）和 general（你微信里提的，原生的，感觉也要搞！）
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("views/data.ts"),
                     vue3FilePath("views/${table.moduleName}/${table.businessName}/data.ts"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("views/index.vue"),
