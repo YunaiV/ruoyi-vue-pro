@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmCustomerParseFun
 import cn.iocoder.yudao.module.crm.framework.operatelog.core.SysAdminUserParseFunction;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -66,7 +67,7 @@ public class CrmBusinessSaveReqVO {
     private Long contactId; // 使用场景，在【联系人详情】添加商机时，如果需要关联两者，需要传递 contactId 字段
 
     @Schema(description = "产品列表")
-    private List<BusinessProduct> products;
+    private List<@Valid BusinessProduct> products;
 
     @Schema(description = "产品列表")
     @Data
@@ -79,7 +80,6 @@ public class CrmBusinessSaveReqVO {
         private Long productId;
 
         @Schema(description = "产品单价", requiredMode = Schema.RequiredMode.REQUIRED, example = "123.00")
-        @NotNull(message = "产品单价不能为空")
         private BigDecimal productPrice;
 
         @Schema(description = "商机价格", requiredMode = Schema.RequiredMode.REQUIRED, example = "123.00")

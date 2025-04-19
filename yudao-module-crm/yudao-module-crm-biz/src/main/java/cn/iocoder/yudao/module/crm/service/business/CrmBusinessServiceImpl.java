@@ -86,7 +86,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_CREATE_SUB_TYPE, bizNo = "{{#business.id}}",
-            success = CRM_BUSINESS_CREATE_SUCCESS)
+        success = CRM_BUSINESS_CREATE_SUCCESS)
     public Long createBusiness(CrmBusinessSaveReqVO createReqVO, Long userId) {
         // 1.1 校验产品项的有效性
         List<CrmBusinessProductDO> businessProducts = validateBusinessProducts(createReqVO.getProducts());
@@ -106,13 +106,13 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
         // 3. 创建数据权限
         permissionService.createPermission(new CrmPermissionCreateReqBO().setUserId(business.getOwnerUserId())
-                .setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType()).setBizId(business.getId())
-                .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
+            .setBizType(CrmBizTypeEnum.CRM_BUSINESS.getType()).setBizId(business.getId())
+            .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
 
         // 4. 在联系人的详情页，如果直接【新建商机】，则需要关联下
         if (createReqVO.getContactId() != null) {
             contactBusinessService.createContactBusinessList(new CrmContactBusinessReqVO().setContactId(createReqVO.getContactId())
-                    .setBusinessIds(Collections.singletonList(business.getId())));
+                .setBusinessIds(Collections.singletonList(business.getId())));
         }
 
         // 5. 记录操作日志上下文
@@ -123,7 +123,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
-            success = CRM_BUSINESS_UPDATE_SUCCESS)
+        success = CRM_BUSINESS_UPDATE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#updateReqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateBusiness(CrmBusinessSaveReqVO updateReqVO) {
         updateReqVO.setOwnerUserId(null).setStatusTypeId(null); // 不允许更新的字段
@@ -147,8 +147,8 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
-    @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_FOLLOW_UP_SUB_TYPE, bizNo = "{{#id}",
-            success = CRM_BUSINESS_FOLLOW_UP_SUCCESS)
+    @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_FOLLOW_UP_SUB_TYPE, bizNo = "{#id}",
+        success = CRM_BUSINESS_FOLLOW_UP_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
     public void updateBusinessFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent) {
         // 1. 校验存在
@@ -156,7 +156,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
         // 2. 更新联系人的跟进信息
         businessMapper.updateById(new CrmBusinessDO().setId(id).setFollowUpStatus(true).setContactNextTime(contactNextTime)
-                .setContactLastTime(LocalDateTime.now()));
+            .setContactLastTime(LocalDateTime.now()));
 
         // 3. 记录操作日志上下文
         LogRecordContext.putVariable("businessName", business.getName());
@@ -171,7 +171,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     private void updateBusinessProduct(Long id, List<CrmBusinessProductDO> newList) {
         List<CrmBusinessProductDO> oldList = businessProductMapper.selectListByBusinessId(id);
         List<List<CrmBusinessProductDO>> diffList = diffList(oldList, newList, // id 不同，就认为是不同的记录
-                (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
+            (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
         if (CollUtil.isNotEmpty(diffList.get(0))) {
             diffList.get(0).forEach(o -> o.setBusinessId(id));
             businessProductMapper.insertBatch(diffList.get(0));
@@ -208,7 +208,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         erpProductApi.validProductList(convertSet(list, CrmBusinessSaveReqVO.BusinessProduct::getProductId));
         // 2. 转化为 CrmBusinessProductDO 列表
         return convertList(list, o -> BeanUtils.toBean(o, CrmBusinessProductDO.class,
-                item -> item.setTotalPrice(MoneyUtils.priceMultiply(item.getBusinessPrice(), item.getCount()))));
+            item -> item.setTotalPrice(MoneyUtils.priceMultiply(item.getBusinessPrice(), item.getCount()))));
     }
 
     private void calculateTotalPrice(CrmBusinessDO business, List<CrmBusinessProductDO> businessProducts) {
@@ -219,7 +219,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
     @Override
     @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_UPDATE_STATUS_SUB_TYPE, bizNo = "{{#reqVO.id}}",
-            success = CRM_BUSINESS_UPDATE_STATUS_SUCCESS)
+        success = CRM_BUSINESS_UPDATE_STATUS_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#reqVO.id", level = CrmPermissionLevelEnum.WRITE)
     public void updateBusinessStatus(CrmBusinessUpdateStatusReqVO reqVO) {
         // 1.1 校验存在
@@ -235,25 +235,25 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         }
         // 1.4 校验是不是状态没变更
         if ((reqVO.getStatusId() != null && reqVO.getStatusId().equals(business.getStatusId()))
-                || (reqVO.getEndStatus() != null && reqVO.getEndStatus().equals(business.getEndStatus()))) {
+            || (reqVO.getEndStatus() != null && reqVO.getEndStatus().equals(business.getEndStatus()))) {
             throw exception(BUSINESS_UPDATE_STATUS_FAIL_STATUS_EQUALS);
         }
 
         // 2. 更新商机状态
         businessMapper.updateById(new CrmBusinessDO().setId(reqVO.getId()).setStatusId(reqVO.getStatusId())
-                .setEndStatus(reqVO.getEndStatus()));
+            .setEndStatus(reqVO.getEndStatus()));
 
         // 3. 记录操作日志上下文
         LogRecordContext.putVariable("businessName", business.getName());
         LogRecordContext.putVariable("oldStatusName", getBusinessStatusName(business.getEndStatus(),
-                businessStatusService.getBusinessStatus(business.getStatusId())));
+            businessStatusService.getBusinessStatus(business.getStatusId())));
         LogRecordContext.putVariable("newStatusName", getBusinessStatusName(reqVO.getEndStatus(), status));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_DELETE_SUB_TYPE, bizNo = "{{#id}}",
-            success = CRM_BUSINESS_DELETE_SUCCESS)
+        success = CRM_BUSINESS_DELETE_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteBusiness(Long id) {
         // 1.1 校验存在
@@ -294,7 +294,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_TRANSFER_SUB_TYPE, bizNo = "{{#reqVO.id}}",
-            success = CRM_BUSINESS_TRANSFER_SUCCESS)
+        success = CRM_BUSINESS_TRANSFER_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#reqVO.id", level = CrmPermissionLevelEnum.OWNER)
     public void transferBusiness(CrmBusinessTransferReqVO reqVO, Long userId) {
         // 1 校验商机是否存在
@@ -302,7 +302,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
 
         // 2.1 数据权限转移
         permissionService.transferPermission(new CrmPermissionTransferReqBO(userId, CrmBizTypeEnum.CRM_BUSINESS.getType(),
-                reqVO.getId(), reqVO.getNewOwnerUserId(), reqVO.getOldOwnerPermissionLevel()));
+            reqVO.getId(), reqVO.getNewOwnerUserId(), reqVO.getOldOwnerPermissionLevel()));
         // 2.2 设置新的负责人
         businessMapper.updateOwnerUserIdById(reqVO.getId(), reqVO.getNewOwnerUserId());
 
@@ -352,13 +352,13 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     public PageResult<CrmBusinessDO> getBusinessPageByContact(CrmBusinessPageReqVO pageReqVO) {
         // 1. 查询关联的商机编号
         List<CrmContactBusinessDO> contactBusinessList = contactBusinessService.getContactBusinessListByContactId(
-                pageReqVO.getContactId());
+            pageReqVO.getContactId());
         if (CollUtil.isEmpty(contactBusinessList)) {
             return PageResult.empty();
         }
         // 2. 查询商机分页
         return businessMapper.selectPageByContactId(pageReqVO,
-                convertSet(contactBusinessList, CrmContactBusinessDO::getBusinessId));
+            convertSet(contactBusinessList, CrmContactBusinessDO::getBusinessId));
     }
 
     @Override
