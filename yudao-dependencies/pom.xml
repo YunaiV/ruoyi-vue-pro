@@ -79,7 +79,7 @@
         <weixin-java.version>4.6.0</weixin-java.version>
         <mqtt.version>1.2.5</mqtt.version>
         <dingtalk.version>2.0.0</dingtalk.version>
-        <!--        <guava.version>33.3.1-jre</guava.version>-->
+<!--        <guava.version>33.3.1-jre</guava.version>-->
         <bucket4j.version>8.10.1</bucket4j.version>
         <commons-collection4.version>4.4</commons-collection4.version>
         <cola.component.statemachine>5.0.0</cola.component.statemachine>
@@ -95,11 +95,11 @@
         <dependencies>
             <!--索迈相关-->
 
-            <!--            <dependency>-->
-            <!--                <groupId>com.aliyun</groupId>-->
-            <!--                <artifactId>dingtalk</artifactId>-->
-            <!--                <version>${dingtalk.version}</version>-->
-            <!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>com.aliyun</groupId>-->
+<!--                <artifactId>dingtalk</artifactId>-->
+<!--                <version>${dingtalk.version}</version>-->
+<!--            </dependency>-->
 
             <dependency>
                 <groupId>com.bucket4j</groupId>
@@ -107,11 +107,11 @@
                 <version>${bucket4j.version}</version>
             </dependency>
 
-            <!--            <dependency>-->
-            <!--                <groupId>com.google.guava</groupId>-->
-            <!--                <artifactId>guava</artifactId>-->
-            <!--                <version>${guava.version}</version>-->
-            <!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>com.google.guava</groupId>-->
+<!--                <artifactId>guava</artifactId>-->
+<!--                <version>${guava.version}</version>-->
+<!--            </dependency>-->
 
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -126,17 +126,17 @@
             </dependency>
 
 
-            <!--            <dependency>-->
-            <!--                <groupId>com.somle</groupId>-->
-            <!--                <artifactId>somle-framework</artifactId>-->
-            <!--                <version>${revision}</version>-->
-            <!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>com.somle</groupId>-->
+<!--                <artifactId>somle-framework</artifactId>-->
+<!--                <version>${revision}</version>-->
+<!--            </dependency>-->
 
-            <!--            <dependency>-->
-            <!--                <groupId>com.somle</groupId>-->
-            <!--                <artifactId>somle-common</artifactId>-->
-            <!--                <version>${revision}</version>-->
-            <!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>com.somle</groupId>-->
+<!--                <artifactId>somle-common</artifactId>-->
+<!--                <version>${revision}</version>-->
+<!--            </dependency>-->
 
             <!--            <dependency>-->
             <!--                <groupId>com.somle</groupId>-->
@@ -162,14 +162,15 @@
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>${commons.codec}</version>
+                <version>1.15</version>
             </dependency>
+
 
 
             <dependency>
                 <groupId>com.aliyun.oss</groupId>
                 <artifactId>aliyun-sdk-oss</artifactId>
-                <version>${aliyun.oss}</version>
+                <version>3.16.3</version>
             </dependency>
 
             <!-- 统一依赖管理 -->
@@ -327,6 +328,12 @@
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
                 <artifactId>yudao-spring-boot-starter-redis</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-statemachine</artifactId>
                 <version>${revision}</version>
             </dependency>
 

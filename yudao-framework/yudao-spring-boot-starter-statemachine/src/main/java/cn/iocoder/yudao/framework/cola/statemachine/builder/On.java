@@ -17,5 +17,7 @@ public interface On<S, E, C> extends When<S, E, C>{
      */
     When<S, E, C> when(Condition<C> condition);
 
-    void handle(Handler<S, E, C> handler);
+    When<S, E, C> handle(Handler<S, E, C> handler);
+
+    When<S, E, C> handle(Class<? extends Handler<S, E, C>> handlerType);
 }

@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.enums.DbTypeEnum;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.mybatisplus.annotation.DbType;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -85,5 +86,17 @@ public class JdbcUtils {
     public static boolean isSQLServer(DbType dbType) {
         return ObjectUtils.equalsAny(dbType, DbType.SQL_SERVER, DbType.SQL_SERVER2005);
     }
+
+
+    /**
+     * 检测当前代码是否在本地数据库事务中,否则抛出异常
+     * */
+    public static void requireTransaction() {
+        boolean isInTransaction = TransactionSynchronizationManager.isActualTransactionActive();
+        if(!isInTransaction) {
+            throw new IllegalStateException("not running within a transaction,pls check");
+        }
+    }
+
 
 }

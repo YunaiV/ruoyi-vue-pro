@@ -3,7 +3,10 @@ package cn.iocoder.yudao.framework.common.util.spring;
 import cn.hutool.extra.spring.SpringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.BeansException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -54,6 +57,25 @@ public class SpringUtils extends SpringUtil  {
     public static boolean isProd() {
         String activeProfile = getActiveProfile();
         return Objects.equals(PROFILE_PROD, activeProfile);
+    }
+
+    /**
+     * 通过class获取Bean.
+     * @param superType
+     * @return
+     */
+    public static <T> List<T> getBeans(Class<T> superType) {
+        try {
+            String[] names=getApplicationContext().getBeanNamesForType(superType);
+            List<T> list=new ArrayList<>();
+            for (String name : names) {
+                T bean=(T)getApplicationContext().getBean(name);
+                list.add(bean);
+            }
+            return list;
+        } catch (BeansException e) {
+            return null;
+        }
     }
 
 //    /**

@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.framework.cola.statemachine.builder;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import cn.iocoder.yudao.framework.cola.statemachine.State;
 import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
 import cn.iocoder.yudao.framework.cola.statemachine.StateMachineFactory;
 import cn.iocoder.yudao.framework.cola.statemachine.impl.StateMachineImpl;
 import cn.iocoder.yudao.framework.cola.statemachine.impl.TransitionType;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * StateMachineBuilderImpl
@@ -23,7 +24,6 @@ public class StateMachineBuilderImpl<S, E, C> implements StateMachineBuilder<S, 
     private final Map<S, State<S, E, C>> stateMap = new ConcurrentHashMap<>();
     private final StateMachineImpl<S, E, C> stateMachine = new StateMachineImpl<>(stateMap);
     private FailCallback<S, E, C> failCallback = new NumbFailCallback<>();
-    private ConditionFailCallback<S, E, C> conditionFailCallback = new NumbConditionFailCallback<>();;
 
     @Override
     public ExternalTransitionBuilder<S, E, C> externalTransition() {
@@ -50,17 +50,23 @@ public class StateMachineBuilderImpl<S, E, C> implements StateMachineBuilder<S, 
         this.failCallback = callback;
     }
 
-    @Override
-    public void setConditionFailCallback(ConditionFailCallback<S, E, C> callback) {
-        this.conditionFailCallback = callback;
-    }
+//    @Override
+//    public void setConditionFailCallback(ConditionFailCallback<S, E, C> callback) {
+//        this.conditionFailCallback = callback;
+//    }
 
     @Override
     public StateMachine<S, E, C> build(String machineId) {
+        return build(machineId, null);
+    }
+
+    @Override
+    public StateMachine<S, E, C> build(String machineId, Function<C,S> getter) {
         stateMachine.setMachineId(machineId);
         stateMachine.setReady(true);
         stateMachine.setFailCallback(failCallback);
-        stateMachine.setCondtionFailCallback(conditionFailCallback);
+        stateMachine.setGetter(getter);
+        // stateMachine.setCondtionFailCallback(conditionFailCallback);
         StateMachineFactory.register(stateMachine);
         return stateMachine;
     }

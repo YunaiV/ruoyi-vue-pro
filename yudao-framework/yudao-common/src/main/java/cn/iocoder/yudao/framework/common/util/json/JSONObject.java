@@ -1,14 +1,12 @@
 package cn.iocoder.yudao.framework.common.util.json;
 
 
-
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -49,7 +47,25 @@ public class JSONObject extends ObjectNode{
     }
 
     public String getString(String fieldName) {
-        return this.get(fieldName).asText();
+        var value=this.get(fieldName);
+        if(value==null) {
+            return null;
+        }
+        if(value instanceof NullNode) {
+            return null;
+        }
+        return value.asText();
+    }
+
+    public BigDecimal getBigDecimal(String fieldName) {
+        var value=this.get(fieldName);
+        if(value==null) {
+            return null;
+        }
+        if(value instanceof NullNode) {
+            return null;
+        }
+        return new BigDecimal(value.asText());
     }
 
     public List<String> getStringList(String fieldName) {
@@ -59,9 +75,6 @@ public class JSONObject extends ObjectNode{
                 .collect(Collectors.toList()); // Collect into a list
     }
 
-    public Integer getInteger(String fieldName) {
-        return this.get(fieldName).asInt();
-    }
 
     public List<Integer> getIntegerList(String fieldName) {
         return StreamSupport.stream(this.get(fieldName).spliterator(), false)
@@ -70,9 +83,51 @@ public class JSONObject extends ObjectNode{
                 .collect(Collectors.toList()); // Collect into a list
     }
 
-    public JSONArray getJSONArray(String fieldName) {
-        return new JSONArray((ArrayNode) this.get(fieldName));
+    public Integer getInteger(String fieldName) {
+        var value=this.get(fieldName);
+        if(value==null) {
+            return null;
+        }
+        if(value instanceof NullNode) {
+            return null;
+        }
+        return value==null?null:value.asInt();
     }
+
+    public Long getLong(String fieldName) {
+        var value=this.get(fieldName);
+        if(value==null) {
+            return null;
+        }
+        if(value instanceof NullNode) {
+            return null;
+        }
+        return value==null?null:value.asLong();
+    }
+
+    public JSONArray getJSONArray(String fieldName) {
+        JsonNode value=this.get(fieldName);
+        if(value==null) {
+            return null;
+        }
+        if(value instanceof NullNode) {
+            return null;
+        }
+        return new JSONArray((ArrayNode) value);
+    }
+
+    public JSONObject getJSONObject(String fieldName) {
+        JsonNode value=this.get(fieldName);
+        if(value==null) {
+            return null;
+        }
+        if(value instanceof NullNode) {
+            return null;
+        }
+        return new JSONObject((ObjectNode) value);
+    }
+
+
 
     private void test(String fieldName) {
         this.get(1);

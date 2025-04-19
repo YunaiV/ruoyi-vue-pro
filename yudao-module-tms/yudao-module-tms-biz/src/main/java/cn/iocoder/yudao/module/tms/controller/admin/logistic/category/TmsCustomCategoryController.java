@@ -20,6 +20,7 @@ import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.TmsCust
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.TmsCustomCategoryDO;
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.item.TmsCustomCategoryItemDO;
 import cn.iocoder.yudao.module.tms.service.logistic.category.TmsCustomCategoryService;
+import cn.iocoder.yudao.module.tms.service.logistic.category.bo.TmsCustomCategoryBO;
 import cn.iocoder.yudao.module.tms.service.logistic.category.item.TmsCustomCategoryItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -87,10 +88,10 @@ public class TmsCustomCategoryController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('tms:custom-category:query')")
     public CommonResult<TmsCustomCategoryRespVO> getCustomRuleCategory(@NotNull(message = "id不能为null") @RequestParam("id") Long id) {
-        TmsCustomCategoryDO customRuleCategory = customRuleCategoryService.getCustomRuleCategory(id);
+        TmsCustomCategoryBO customRuleCategoryBO = customRuleCategoryService.getCustomRuleCategoryBO(id);
         List<TmsCustomCategoryRespVO> vos = null;
-        if (customRuleCategory != null) {
-            vos = BindingResult(List.of(customRuleCategory));
+        if (customRuleCategoryBO != null) {
+            vos = BindingResult(List.of(customRuleCategoryBO));
         }
         return success(vos != null ? vos.get(0) : null);
     }
@@ -99,7 +100,7 @@ public class TmsCustomCategoryController {
     @Operation(summary = "获得海关分类分页")
     @PreAuthorize("@ss.hasPermission('tms:custom-category:query')")
     public CommonResult<PageResult<TmsCustomCategoryRespVO>> getCustomRuleCategoryPage(@Valid TmsCustomCategoryPageReqVO pageReqVO) {
-        PageResult<TmsCustomCategoryDO> pageResult = customRuleCategoryService.getCustomRuleCategoryPage(pageReqVO);
+        PageResult<TmsCustomCategoryBO> pageResult = customRuleCategoryService.getCustomRuleCategoryPageBO(pageReqVO);
         return success(new PageResult<>(BindingResult(pageResult.getList()), pageResult.getTotal()));
     }
 
@@ -154,7 +155,7 @@ public class TmsCustomCategoryController {
     }
 
 
-    private List<TmsCustomCategoryRespVO> BindingResult(List<TmsCustomCategoryDO> listDOs) {
+    private List<TmsCustomCategoryRespVO> BindingResult(List<? extends TmsCustomCategoryDO> listDOs) {
         List<Long> ids = listDOs.stream().map(TmsCustomCategoryDO::getId).toList();
         Map<Long, List<TmsCustomCategoryItemDO>> itemMap = customRuleCategoryItemService.getCustomRuleCategoryItemMap(ids);
         //1 材料ids

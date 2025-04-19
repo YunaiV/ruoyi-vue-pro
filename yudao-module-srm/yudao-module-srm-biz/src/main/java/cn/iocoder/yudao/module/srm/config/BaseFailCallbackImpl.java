@@ -67,8 +67,8 @@ public class BaseFailCallbackImpl<S, E, C> implements FailCallback<S, E, C> {
         STATE_MACHINE_MAP_CN.put(key, description);
     }
 
-    public void onFail(S sourceState, E event, C context) {
-        String stateMachineDesc = getStateMachineDescription(sourceState, context);
+    public void onFail(S sourceState, S targetState, E event, C context) {
+        String stateMachineDesc = getStateMachineDescription(sourceState,targetState,event,context);
         String statusDesc = convertEventToDescription(sourceState);
 
         log.warn("{}无法在({})状态下触发({})事件，上下文：{}", stateMachineDesc, statusDesc, SrmEventEnum.valueOf(event.toString()).getDesc(),
@@ -78,7 +78,7 @@ public class BaseFailCallbackImpl<S, E, C> implements FailCallback<S, E, C> {
         throw exception(PURCHASE_REQUEST_NOT_EXISTS_BY_STATUS, stateMachineDesc, statusDesc, SrmEventEnum.valueOf(event.toString()).getDesc());
     }
 
-    private String getStateMachineDescription(S sourceState, C context) {
+    private String getStateMachineDescription(S sourceState, S targetState, E event, C context) {
         if (context == null || sourceState == null) {
             return "";
         }
@@ -103,6 +103,8 @@ public class BaseFailCallbackImpl<S, E, C> implements FailCallback<S, E, C> {
         }
         return null;
     }
+
+
 }
 
 

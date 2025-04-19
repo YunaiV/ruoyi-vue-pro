@@ -1,20 +1,23 @@
 package cn.iocoder.yudao.framework.cola.statemachine;
 
 import cn.iocoder.yudao.framework.cola.statemachine.builder.StateMachineBuilderImpl;
+import cn.iocoder.yudao.framework.cola.statemachine.builder.TransitionHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
+@Slf4j
 class StateMachineBuilderImplTest {
-    public class BaseHandler implements Handler<String, Long, Integer> {
+    public class BaseHandler implements TransitionHandler<String, Long, Integer> {
 
         @Override
-        public void execute(String from, String to, Long event, Integer context) {
-            System.out.println("do something");
+        public void perform(String from, String to, Long event, Integer context) {
+            log.info("do something");
         }
 
         @Override
-        public boolean isSatisfied(Integer context) {
+        public boolean when(Integer context) {
             return true;
         }
     }
@@ -30,11 +33,19 @@ class StateMachineBuilderImplTest {
             .on(4L)
             .handle(handler);
 
+        builder.setFailCallback((source, target, event, context) -> {
+            if(target==null) {
+                System.out.println("event match fail");
+            } else {
+                System.out.println("condition fail");
+            }
+        });
+
         var sm = builder.build("someSM");
         sm.setGetter(Objects::toString);
 
-        System.out.println(
-            sm.fireEvent(4L, 3)
+        log.info(
+            sm.fireEvent(4L, 32)
         );
     }
 

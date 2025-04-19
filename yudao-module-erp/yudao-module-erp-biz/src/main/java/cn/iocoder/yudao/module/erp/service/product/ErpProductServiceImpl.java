@@ -24,8 +24,6 @@ import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import cn.iocoder.yudao.module.tms.api.logistic.customrule.TmsCustomRuleApi;
-import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.TmsCustomRuleDTO;
 import jakarta.annotation.Resource;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -60,8 +58,7 @@ import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_E
 @Validated
 public class ErpProductServiceImpl implements ErpProductService {
 
-    @Resource
-    MessageChannel erpCustomRuleChannel;
+
     @Resource
     MessageChannel erpProductChannel;
     @Resource
@@ -74,8 +71,6 @@ public class ErpProductServiceImpl implements ErpProductService {
     DeptApi deptApi;
     @Resource
     AdminUserApi userApi;
-    @Resource
-    TmsCustomRuleApi tmsCustomRuleApi;
 
 
     private final ReentrantLock LOCK = new ReentrantLock();
@@ -194,35 +189,22 @@ public class ErpProductServiceImpl implements ErpProductService {
     }
 
     private void syncProduct(ErpProductDO productDO, Boolean isUpdate) {
-        if (isUpdate) {
-            //更新产品时->覆盖n个海关规则
-            //找到产品id对应的所有海关规则DTO(含海关信息+海关分类)，如果没有海关分类信息(产品逻辑必须有)，那么就不更新海关规则
-            List<TmsCustomRuleDTO> dtos = new ArrayList<>();
-            // 从产品ID获取海关规则 + 从分类ID获取海关规则
-            Optional.ofNullable(tmsCustomRuleApi.listDTOsByProductId(productDO.getId()))
-                .ifPresent(dtos::addAll); // 如果不为空，添加到dtos列表中
-            Optional.ofNullable(productDO.getCustomCategoryId())
-                .map(tmsCustomRuleApi::getErpCustomRule) // 获取分类ID对应的海关规则DTO
-                .ifPresent(dtos::add); // 如果存在DTO，添加到dtos列表中
-            // 如果dtos中有数据，则发送消息
-            if (!dtos.isEmpty()) {
-                erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos.stream().distinct().toList()).build());
-            }
-            //获取创建人id
-            Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
-            ErpProductDTO erpProductDTO = BeanUtils.toBean(productDO, ErpProductDTO.class);
-            erpProductDTO.setCreator(String.valueOf(loginUserId));
-            //同步数据
-            erpProductChannel.send(MessageBuilder.withPayload(List.of(erpProductDTO)).build());
-        } else {
-            //获取创建人id
-            Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
-            ErpProductDTO erpProductDTO = BeanUtils.toBean(productDO, ErpProductDTO.class);
-            erpProductDTO.setCreator(String.valueOf(loginUserId));
-            //同步数据
-            erpProductChannel.send(MessageBuilder.withPayload(List.of(erpProductDTO)).build());
+        Long loginUserId = SecurityFrameworkUtils.getLoginUserId();
+        ErpProductDTO erpProductDTO = BeanUtils.toBean(productDO, ErpProductDTO.class);
+        erpProductDTO.setCreator(String.valueOf(loginUserId));
+
+        // 如果是更新操作，可拓展处理海关规则逻辑
+        if (Boolean.TRUE.equals(isUpdate)) {
+            // 如需覆盖海关规则，在此处理
+            // List<TmsCustomRuleDTO> dtos = tmsCustomRuleApi.listCustomRuleDTOsByProductId(productDO.getId());
+            // if (!CollectionUtils.isEmpty(dtos)) {
+            //     erpCustomRuleChannel.send(MessageBuilder.withPayload(dtos.stream().distinct().toList()).build());
+            // }
         }
+        // 同步产品数据
+        erpProductChannel.send(MessageBuilder.withPayload(List.of(erpProductDTO)).build());
     }
+
 
     @Override
     @Caching(evict = {
@@ -404,11 +386,11 @@ public class ErpProductServiceImpl implements ErpProductService {
             return Collections.emptyList();
         }
         Map<Long, ErpProductUnitDO> unitMap = productUnitService.getProductUnitMap(
-                convertSet(erpProductDOs, ErpProductDO::getUnitId));
+            convertSet(erpProductDOs, ErpProductDO::getUnitId));
 
         return BeanUtils.toBean(erpProductDOs, ErpProductRespDTO.class, erpProductRespDTO -> {
             MapUtils.findAndThen(unitMap, erpProductRespDTO.getUnitId(),
-                    unit -> erpProductRespDTO.setUnitName(unit.getName()));
+                unit -> erpProductRespDTO.setUnitName(unit.getName()));
         });
     }
 

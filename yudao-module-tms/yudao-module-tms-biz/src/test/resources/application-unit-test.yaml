@@ -1,0 +1,100 @@
+#debug: true
+oss:
+  bucketName: somle-bigdata-dev
+  endpoint: https://oss-cn-hangzhou.aliyuncs.com
+spring:
+  main:
+    #    lazy-initialization: true # 如果开启懒加载，会导致ServiceActivator不能自动订阅inputChannel
+    banner-mode: off # 单元测试，禁用 Banner
+  test:
+    database:
+      replace: none
+
+logging:
+  level:
+    com.somle: DEBUG
+    cn.iocoder: DEBUG
+    org.quartz: DEBUG
+    org.springframework.scheduling.quartz: DEBUG
+    com.baomidou.mybatisplus: DEBUG
+    jdbc.sqlonly: DEBUG
+    org:
+      springframework:
+        integration:
+          config:
+            MessagingAnnotationBeanPostProcessor: DEBUG
+  quartz:
+    auto-startup: true
+
+## MyBatis Plus 的配置项
+mybatis-plus:
+  #  configuration:
+  #    map-underscore-to-camel-case: true # 虽然默认为 true ，但是还是显示去指定下。
+  global-config:
+    db-config:
+      #      id-type: NONE # “智能”模式，基于 IdTypeEnvironmentPostProcessor + 数据源的类型，自动适配成 AUTO、INPUT 模式。
+      id-type: AUTO # 自增 ID，适合 MySQL 等直接自增的数据库
+#      #      id-type: INPUT # 用户输入 ID，适合 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库
+#      #      id-type: ASSIGN_ID # 分配 ID，默认使用雪花算法。注意，Oracle、PostgreSQL、Kingbase、DB2、H2 数据库时，需要去除实体类上的 @KeySequence 注解
+#      logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+#      logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
+#    banner: false # 关闭控制台的 Banner 打印
+#  type-aliases-package: ${yudao.info.base-package}.module.*.dal.dataobject
+#  encryptor:
+#    password: XDV71a+xqStEA3WH # 加解密的秘钥，可使用 https://www.imaegoo.com/2020/aes-key-generator/ 网站生成
+#
+#mybatis-plus-join:
+#  banner: false # 是否打印 mybatis plus join banner，默认true
+#  sub-table-logic: true # 全局启用副表逻辑删除，默认true。关闭后关联查询不会加副表逻辑删除
+#  ms-cache: true # 拦截器MappedStatement缓存，默认 true
+#  table-alias: t # 表别名(默认 t)
+#  logic-del-type: on # 副表逻辑删除条件的位置，支持 WHERE、ON，默认 ON
+
+--- #################### 数据库相关配置 ####################
+
+spring:
+  # 数据源配置项
+  datasource:
+    url: jdbc:mysql://192.168.10.151:3306/ruoyi-vue-pro?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: it003
+    password: asivJssflioKK
+  #  sql:
+  #    init:
+  #      schema-locations: classpath:/sql/create_tables.sql
+
+  # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
+  data:
+    redis:
+      host: 127.0.0.1 # 地址
+      port: 16379 # 端口（单元测试，使用 16379 端口）
+      database: 0 # 数据库索引
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+mybatis:
+  lazy-initialization: true # 单元测试，设置 MyBatis Mapper 延迟加载，加速每个单元测试
+
+--- #################### 定时任务相关配置 ####################
+
+--- #################### 配置中心相关配置 ####################
+
+--- #################### 服务保障相关配置 ####################
+
+# Lock4j 配置项（单元测试，禁用 Lock4j）
+
+--- #################### 监控相关配置 ####################
+
+--- #################### 芋道相关配置 ####################
+
+# 芋道配置项，设置当前项目所有自定义的配置
+yudao:
+  info:
+    base-package: cn.iocoder.yudao.module
+#somle:
+#  base-package: com.somle.esb
+
+kingdee:
+  outerInstanceIds:
+    - 94464631434776576
