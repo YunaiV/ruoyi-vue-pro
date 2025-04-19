@@ -17,7 +17,9 @@ public enum CrmCustomerLevelEnum implements ArrayValuable<Integer> {
 
     IMPORTANT(1, "A（重点客户）"),
     GENERAL(2, "B（普通客户）"),
-    LOW_PRIORITY(3, "C（非优先客户）");
+    LOW_PRIORITY(3, "C（非优先客户）"),
+    //未设置客户级别
+    NO_LEVEL(0, "");
 
     public static final Integer[] ARRAYS = Arrays.stream(values()).map(CrmCustomerLevelEnum::getLevel).toArray(Integer[]::new);
 
@@ -33,6 +35,13 @@ public enum CrmCustomerLevelEnum implements ArrayValuable<Integer> {
     @Override
     public Integer[] array() {
         return ARRAYS;
+    }
+
+    public static CrmCustomerLevelEnum of(Integer level) {
+        return Arrays.stream(values())
+            .filter(e -> e.getLevel().equals(level))
+            .findFirst()
+            .orElse(NO_LEVEL);
     }
 
 }

@@ -14,9 +14,13 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusTypeDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.followup.CrmFollowUpRecordDO;
+import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.enums.customer.CrmCustomerLevelEnum;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessStatusService;
 import cn.iocoder.yudao.module.crm.service.customer.CrmCustomerService;
+import cn.iocoder.yudao.module.crm.service.followup.CrmFollowUpRecordService;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductUnitApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
@@ -74,17 +78,20 @@ public class CrmBusinessController {
     @Resource
     private DeptApi deptApi;
 
+    @Resource
+    private CrmFollowUpRecordService followUpRecordService;
+
     @PostMapping("/create")
     @Operation(summary = "创建商机")
     @PreAuthorize("@ss.hasPermission('crm:business:create')")
-    public CommonResult<Long> createBusiness(@Valid @RequestBody CrmBusinessSaveReqVO createReqVO) {
+    public CommonResult<Long> createBusiness(@Validated @RequestBody CrmBusinessSaveReqVO createReqVO) {
         return success(businessService.createBusiness(createReqVO, getLoginUserId()));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新商机")
     @PreAuthorize("@ss.hasPermission('crm:business:update')")
-    public CommonResult<Boolean> updateBusiness(@Valid @RequestBody CrmBusinessSaveReqVO updateReqVO) {
+    public CommonResult<Boolean> updateBusiness(@Validated @RequestBody CrmBusinessSaveReqVO updateReqVO) {
         businessService.updateBusiness(updateReqVO);
         return success(true);
     }
@@ -128,12 +135,12 @@ public class CrmBusinessController {
         List<ErpProductDTO> erpProductDOList = erpProductMap.values().stream().toList();
 
         Map<Long, ErpProductUnitDTO> unitMap = erpProductUnitApi.getProductUnitMap(
-                convertSet(erpProductDOList, ErpProductDTO::getUnitId));
+            convertSet(erpProductDOList, ErpProductDTO::getUnitId));
 
         businessVO.setProducts(BeanUtils.toBean(businessProducts, CrmBusinessRespVO.Product.class, businessProductVO ->
-                MapUtils.findAndThen(erpProductMap, businessProductVO.getProductId(),
-                        product -> businessProductVO.setProductName(product.getName())
-                                .setBarCode(product.getBarCode()).setProductUnitName(unitMap.get(product.getUnitId()).getName()))));
+            MapUtils.findAndThen(erpProductMap, businessProductVO.getProductId(),
+                product -> businessProductVO.setProductName(product.getName())
+                    .setBarCode(product.getBarCode()).setProductUnitName(unitMap.get(product.getUnitId()).getName()))));
         return businessVO;
     }
 
@@ -145,8 +152,8 @@ public class CrmBusinessController {
         reqVO.setPageSize(PAGE_SIZE_NONE); // 不分页
         PageResult<CrmBusinessDO> pageResult = businessService.getBusinessPage(reqVO, getLoginUserId());
         return success(convertList(pageResult.getList(), business -> // 只返回 id、name 字段
-                new CrmBusinessRespVO().setId(business.getId()).setName(business.getName())
-                        .setCustomerId(business.getCustomerId())));
+            new CrmBusinessRespVO().setId(business.getId()).setName(business.getName())
+                .setCustomerId(business.getCustomerId())));
     }
 
     @GetMapping("/page")
@@ -185,7 +192,7 @@ public class CrmBusinessController {
         List<CrmBusinessDO> list = businessService.getBusinessPage(exportReqVO, getLoginUserId()).getList();
         // 导出 Excel
         ExcelUtils.write(response, "商机.xls", "数据", CrmBusinessRespVO.class,
-                buildBusinessDetailList(list));
+            buildBusinessDetailList(list));
     }
 
     public List<CrmBusinessRespVO> buildBusinessDetailList(List<CrmBusinessDO> list) {
@@ -194,23 +201,32 @@ public class CrmBusinessController {
         }
         // 1.1 获取客户列表
         Map<Long, CrmCustomerDO> customerMap = customerService.getCustomerMap(
-                convertSet(list, CrmBusinessDO::getCustomerId));
+            convertSet(list, CrmBusinessDO::getCustomerId));
         // 1.2 获取创建人、负责人列表
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(list,
-                contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));
+            contact -> Stream.of(NumberUtils.parseLong(contact.getCreator()), contact.getOwnerUserId())));
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
         // 1.3 获得商机状态组
         Map<Long, CrmBusinessStatusTypeDO> statusTypeMap = businessStatusTypeService.getBusinessStatusTypeMap(
-                convertSet(list, CrmBusinessDO::getStatusTypeId));
+            convertSet(list, CrmBusinessDO::getStatusTypeId));
         Map<Long, CrmBusinessStatusDO> statusMap = businessStatusService.getBusinessStatusMap(
-                convertSet(list, CrmBusinessDO::getStatusId));
+            convertSet(list, CrmBusinessDO::getStatusId));
+
+        //1.4 获得最后跟进内容
+        List<CrmFollowUpRecordDO> followUpRecordList = followUpRecordService.getFollowUpRecordByBiz(
+            CrmBizTypeEnum.CRM_BUSINESS.getType(), convertList(list, CrmBusinessDO::getId));
+        Map<Long, CrmFollowUpRecordDO> followUpRecordMap = convertMap(followUpRecordList, CrmFollowUpRecordDO::getBizId);
+
         // 2. 拼接数据
         return BeanUtils.toBean(list, CrmBusinessRespVO.class, businessVO -> {
-            // 2.1 设置客户名称
-            MapUtils.findAndThen(customerMap, businessVO.getCustomerId(), customer -> businessVO.setCustomerName(customer.getName()));
+            // 2.1 设置客户名称和客户级别
+            MapUtils.findAndThen(customerMap, businessVO.getCustomerId(), customer -> {
+                businessVO.setCustomerName(customer.getName());
+                businessVO.setCustomerLevel(CrmCustomerLevelEnum.of(customer.getLevel()).getName());
+            });
             // 2.2 设置创建人、负责人名称
             MapUtils.findAndThen(userMap, NumberUtils.parseLong(businessVO.getCreator()),
-                    user -> businessVO.setCreatorName(user.getNickname()));
+                user -> businessVO.setCreatorName(user.getNickname()));
             MapUtils.findAndThen(userMap, businessVO.getOwnerUserId(), user -> {
                 businessVO.setOwnerUserName(user.getNickname());
                 MapUtils.findAndThen(deptMap, user.getDeptId(), dept -> businessVO.setOwnerUserDeptName(dept.getName()));
@@ -218,7 +234,9 @@ public class CrmBusinessController {
             // 2.3 设置商机状态
             MapUtils.findAndThen(statusTypeMap, businessVO.getStatusTypeId(), statusType -> businessVO.setStatusTypeName(statusType.getName()));
             MapUtils.findAndThen(statusMap, businessVO.getStatusId(), status -> businessVO.setStatusName(
-                    businessService.getBusinessStatusName(businessVO.getEndStatus(), status)));
+                businessService.getBusinessStatusName(businessVO.getEndStatus(), status)));
+            //2.4 设置最近的最后跟进内容
+            MapUtils.findAndThen(followUpRecordMap, businessVO.getId(), followUpRecord -> businessVO.setContactLastContent(followUpRecord.getContent()));
         });
     }
 

@@ -83,7 +83,7 @@ public interface ErrorCodeConstants {
     ErrorCode CUSTOMER_UPDATE_NAME_NOT_UNIQUE = new ErrorCode(1_020_006_017, "更新客户失败，原因：客户名称已存在");
     // ========== 权限管理 1_020_007_000 ==========
     ErrorCode CRM_PERMISSION_NOT_EXISTS = new ErrorCode(1_020_007_000, "数据权限不存在");
-    ErrorCode CRM_PERMISSION_DENIED = new ErrorCode(1_020_007_001, "{}操作失败，原因：没有权限");
+    ErrorCode CRM_PERMISSION_DENIED = new ErrorCode(1_020_007_001, "操作失败，该{}已不再由你负责或参与");
     ErrorCode CRM_PERMISSION_MODEL_TRANSFER_FAIL_OWNER_USER_EXISTS = new ErrorCode(1_020_007_003, "{}操作失败，原因：转移对象已经是该负责人");
     ErrorCode CRM_PERMISSION_DELETE_FAIL = new ErrorCode(1_020_007_004, "删除数据权限失败，原因：批量删除权限的时候，只能属于同一个 bizId 下");
     ErrorCode CRM_PERMISSION_DELETE_DENIED = new ErrorCode(1_020_007_006, "删除数据权限失败，原因：没有权限");

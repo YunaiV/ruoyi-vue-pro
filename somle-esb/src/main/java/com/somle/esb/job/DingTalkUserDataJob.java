@@ -14,21 +14,22 @@ import java.util.List;
  * @description:
  */
 @Component
-public class DingTalkUserDataJob extends DingTalkDataJob{
+public class DingTalkUserDataJob extends DingTalkDataJob {
     @Override
     public String execute(String param) throws Exception {
         setDate(param);
         List<OapiV2UserGetResponse.UserGetResponse> list = dingTalkService.getUserDetailStream().toList();
+        
         service.send(
-                OssData.builder()
-                        .database(DATABASE)
-                        .tableName("user")
-                        .syncType("full")
-                        .requestTimestamp(System.currentTimeMillis())
-                        .folderDate(today)
-                        .content(list)
-                        .headers(null)
-                        .build()
+            OssData.builder()
+                .database(DATABASE)
+                .tableName("user")
+                .syncType("full")
+                .requestTimestamp(System.currentTimeMillis())
+                .folderDate(today)
+                .content(list)
+                .headers(null)
+                .build()
         );
 
         return "data upload success";

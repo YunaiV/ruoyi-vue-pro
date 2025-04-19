@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -72,32 +74,32 @@ public class EccangRmaReturnReqVO {
     /**
      * 创建时间起始时间（格式：YYYY-MM-dd HH:mm:ss）
      */
-    private String createDateStart;
+    private LocalDateTime createDateStart;
 
     /**
      * 创建时间结束时间（格式：YYYY-MM-dd HH:mm:ss）
      */
-    private String createDateEnd;
+    private LocalDateTime createDateEnd;
 
     /**
      * 完成时间起始时间（格式：YYYY-MM-dd HH:mm:ss）
      */
-    private String completeDateStart;
+    private LocalDateTime completeDateStart;
 
     /**
      * 完成时间结束时间（格式：YYYY-MM-dd HH:mm:ss）
      */
-    private String completeDateEnd;
+    private LocalDateTime completeDateEnd;
 
     /**
      * 审核时间起始时间（格式：YYYY-MM-dd HH:mm:ss）
      */
-    private String verifyDateStart;
+    private LocalDateTime verifyDateStart;
 
     /**
      * 审核时间结束时间（格式：YYYY-MM-dd HH:mm:ss）
      */
-    private String verifyDateEnd;
+    private LocalDateTime verifyDateEnd;
 
     /**
      * SKU搜索类型：1、模糊搜索 2、精确搜索
