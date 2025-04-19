@@ -28,7 +28,7 @@ public class OmsShopProductSaveReqVO {
 
     @Schema(description = "币种")
     @ExcelProperty("币种")
-    private String currency;
+    private String currencyCode;
 
     @Schema(description = "店铺别名")
     private String name;

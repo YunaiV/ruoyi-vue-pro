@@ -20,9 +20,9 @@ public class OmsShopRespVO {
     @ExcelProperty("店铺名称")
     private String name;
 
-    @Schema(description = "平台店铺名称", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("平台店铺名称")
-    private String platformShopName;
+    @Schema(description = "外部来源名称", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("外部来源名称")
+    private String externalName;
 
     @Schema(description = "店铺编码")
     @ExcelProperty("店铺编码")

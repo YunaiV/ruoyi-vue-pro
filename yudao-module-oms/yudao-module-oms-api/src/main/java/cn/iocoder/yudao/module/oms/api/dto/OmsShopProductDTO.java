@@ -43,7 +43,7 @@ public class OmsShopProductDTO {
     /**
      * 币种
      **/
-    private String currency;
+    private String currencyCode;
 
     /**
      * 链接

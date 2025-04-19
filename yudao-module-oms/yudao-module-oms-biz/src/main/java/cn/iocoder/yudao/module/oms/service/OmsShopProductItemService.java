@@ -72,7 +72,7 @@ public interface OmsShopProductItemService {
     /**
      * 按ID集合获得全部Item
      **/
-    List<OmsShopProductItemDO> getShopProductItemsByProductIds(List<Long> shopProductIds);
+    List<OmsShopProductItemDO> getShopProductItemsByShopProductIds(List<Long> shopProductIds);
 
     /**
      * @param shopProductCodes 平台sku代码集合

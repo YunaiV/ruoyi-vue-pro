@@ -24,13 +24,13 @@ public class OmsOrderSaveReqDTO {
      */
     private String platformCode;
     /**
-     * 订单号
+     * 订单编码
      */
-    private String no;
+    private String code;
     /**
-     * 外部来源号，即平台订单号
+     * 外部单据编码，即平台订单号 唯一标识
      */
-    private String sourceNo;
+    private String externalCode;
     /**
      * 店铺id
      */
@@ -38,7 +38,7 @@ public class OmsOrderSaveReqDTO {
     /**
      * 运费
      */
-    private BigDecimal shippingCost;
+    private BigDecimal shippingFee;
     /**
      * 总金额
      */
@@ -62,11 +62,11 @@ public class OmsOrderSaveReqDTO {
     /**
      * 付款时间
      */
-    private LocalDateTime paymentTime;
+    private LocalDateTime payTime;
     /**
      * 电话
      */
-    private String telephone;
+    private String phone;
     /**
      * 公司名
      */
@@ -75,6 +75,16 @@ public class OmsOrderSaveReqDTO {
      * 收件人国家
      */
     private String buyerCountryCode;
+
+    /**
+     * 收件人姓名
+     */
+
+    private String recipientName;
+    /**
+     * 收件人国家
+     */
+    private String recipientCountryCode;
     /**
      * 收件人省【或为州】
      */
@@ -90,15 +100,25 @@ public class OmsOrderSaveReqDTO {
     /**
      * 外部来源原地址，用作备份
      */
-    private String sourceAddress;
+    private String externalAddress;
     /**
-     * 地址
+     * 地址1
      */
-    private String address;
+    private String address1;
+
+    /**
+     * 地址2
+     */
+    private String address2;
+
+    /**
+     * 地址3
+     */
+    private String address3;
     /**
      * 门牌号
      */
-    private String houseNumber;
+    private String houseNo;
     /**
      * 邮编
      */

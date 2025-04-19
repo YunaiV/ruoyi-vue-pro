@@ -25,7 +25,7 @@ public class OmsShopPageReqVO extends PageParam {
     @Schema(description = "平台店铺编码")
     private String platformShopCode;
 
-    @Schema(description = "平台名称")
+    @Schema(description = "平台编码")
     private String platformCode;
 
     @Schema(description = "店铺类型")

@@ -66,7 +66,7 @@ public class OmsShopProductController {
 
     @PutMapping("/update")
     @Operation(summary = "更新OMS 店铺产品")
-    @PreAuthorize("@ss.hasPermission('erp:shop-product:update')")
+    @PreAuthorize("@ss.hasPermission('oms:shop-product:update')")
     public CommonResult<Boolean> updateShopProduct(@Valid @RequestBody OmsShopProductSaveReqVO updateReqVO) {
         omsShopProductService.updateShopProductWithItems(updateReqVO);
         return success(true);

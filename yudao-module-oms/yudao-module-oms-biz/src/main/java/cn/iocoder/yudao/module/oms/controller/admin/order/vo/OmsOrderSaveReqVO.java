@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.oms.controller.admin.order.vo;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -11,73 +11,110 @@ import java.time.LocalDateTime;
 @Data
 public class OmsOrderSaveReqVO {
 
-    @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "16261")
+    /**
+     * 主键
+     */
+    @TableId
     private Long id;
-
-    @Schema(description = "所属平台", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "所属平台不能为空")
+    /**
+     * 所属平台
+     */
     private String platformCode;
-
-    @Schema(description = "订单号", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "订单号不能为空")
-    private String no;
-
-    @Schema(description = "外部来源号，即平台订单号", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "外部来源号，即平台订单号不能为空")
-    private String sourceNo;
-
-    @Schema(description = "店铺id", example = "8058")
-    private String shopId;
-
-    @Schema(description = "运费")
-    private BigDecimal shippingCost;
-
-    @Schema(description = "总金额", example = "10077")
+    /**
+     * 订单编码
+     */
+    private String code;
+    /**
+     * 外部单据编码，即平台订单号 唯一标识
+     */
+    private String externalCode;
+    /**
+     * 店铺id
+     */
+    private Long shopId;
+    /**
+     * 运费
+     */
+    private BigDecimal shippingFee;
+    /**
+     * 总金额
+     */
     private BigDecimal totalPrice;
-
-    @Schema(description = "买家姓名", example = "李四")
+    /**
+     * 买家姓名
+     */
     private String buyerName;
-
-    @Schema(description = "邮箱")
+    /**
+     * 邮箱
+     */
     private String email;
-
-    @Schema(description = "最迟送达时间")
+    /**
+     * 最迟送达时间
+     */
     private LocalDateTime deliveryLatestTime;
-
-    @Schema(description = "订单创建时间")
+    /**
+     * 订单创建时间
+     */
     private LocalDateTime orderCreateTime;
-
-    @Schema(description = "付款时间")
-    private LocalDateTime paymentTime;
-
-    @Schema(description = "电话")
-    private String telephone;
-
-    @Schema(description = "公司名", example = "张三")
+    /**
+     * 付款时间
+     */
+    private LocalDateTime payTime;
+    /**
+     * 电话
+     */
+    private String phone;
+    /**
+     * 公司名
+     */
     private String companyName;
 
-    @Schema(description = "收件人国家")
-    private String buyerCountryCode;
+    /**
+     * 收件人姓名
+     */
 
-    @Schema(description = "收件人省【或为州】")
+    private String recipientName;
+    /**
+     * 收件人国家
+     */
+    private String recipientCountryCode;
+    /**
+     * 收件人省【或为州】
+     */
     private String state;
-
-    @Schema(description = "城市")
+    /**
+     * 城市
+     */
     private String city;
-
-    @Schema(description = "区/县")
+    /**
+     * 区/县
+     */
     private String district;
+    /**
+     * 外部来源原地址，用作备份
+     */
+    private String externalAddress;
+    /**
+     * 地址1
+     */
+    private String address1;
 
-    @Schema(description = "外部来源原地址，用作备份")
-    private String sourceAddress;
+    /**
+     * 地址2
+     */
+    private String address2;
 
-    @Schema(description = "地址")
-    private String address;
-
-    @Schema(description = "门牌号")
-    private String houseNumber;
-
-    @Schema(description = "邮编")
+    /**
+     * 地址3
+     */
+    private String address3;
+    /**
+     * 门牌号
+     */
+    private String houseNo;
+    /**
+     * 邮编
+     */
     private String postalCode;
 
 }

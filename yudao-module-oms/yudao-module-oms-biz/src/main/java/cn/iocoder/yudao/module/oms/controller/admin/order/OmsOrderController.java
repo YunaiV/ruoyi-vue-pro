@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,6 +58,7 @@ public class OmsOrderController {
 
     @GetMapping("/page")
     @Operation(summary = "获得销售订单分页")
+    @PreAuthorize("@ss.hasPermission('oms:order:query')")
     public CommonResult<PageResult<OmsOrderRespVO>> getOrderPage(@Valid OmsOrderPageReqVO pageReqVO) {
         PageResult<OmsOrderDO> pageResult = omsOrderService.getOrderPage(pageReqVO);
         return success(buildOrderVOPageResult(pageResult));
@@ -65,13 +67,18 @@ public class OmsOrderController {
     @GetMapping("/get")
     @Operation(summary = "获得订单")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('oms:order:query')")
     public CommonResult<OmsOrderRespVO> getOrder(@RequestParam("id") Long id) {
         OmsOrderDO order = omsOrderService.getOrder(id);
         if (order == null) {
             return success(null);
         }
 
-        OmsOrderPageReqVO vo = OmsOrderPageReqVO.builder().no(order.getNo()).shopId(order.getShopId()).sourceNo(order.getSourceNo()).build();
+        OmsOrderPageReqVO vo = OmsOrderPageReqVO.builder()
+            .code(order.getCode())
+            .shopId(order.getShopId())
+            .externalCode(order.getExternalCode())
+            .build();
         PageResult<OmsOrderDO> pageResult = new PageResult<>();
         pageResult.setTotal(1L);
         pageResult.setList(List.of(order));
@@ -97,10 +104,9 @@ public class OmsOrderController {
             //2.1 先找出单个订单所对应的订单项
             List<OmsOrderItemDO> orderItems = orderItemMap.get(omsOrderDO.getId());
             //2.2 收集单个订单的所有产品编码
-            List<String> shopProductCodes = orderItems.stream().map(OmsOrderItemDO::getShopProductCode).toList();
-            List<OmsShopProductItemDO> shopProductItemList = omsShopProductItemService.getShopProductItemsByShopProductCodes(shopProductCodes);
+            List<OmsShopProductItemDO> shopProductItemList = omsShopProductItemService.getShopProductItemsByShopProductIds(orderItems.stream().map(OmsOrderItemDO::getShopProductId).toList());
             List<Long> productIds = shopProductItemList.stream().map(OmsShopProductItemDO::getProductId).distinct().toList();
-            //2.3 根据产品编码查询产品信息
+            //2.3 根据产品编码查询产品信息 productDTOMap key= productId
             Map<Long, ErpProductRespDTO> productDTOMap = erpProductApi.getProductDTOMap(productIds);
             productMap.put(omsOrderDO.getId(), productDTOMap.values().stream().toList());
         }
@@ -116,6 +122,7 @@ public class OmsOrderController {
 
                 List<OmsOrderRespVO.Item> items = productList.stream().flatMap(product -> {
                     OmsOrderRespVO.Item item = new OmsOrderRespVO.Item();
+
                     return Stream.of(item.setProductId(product.getId())
                         .setProductName(product.getName())
                         .setProductBarCode(product.getBarCode())
@@ -129,4 +136,71 @@ public class OmsOrderController {
             });
         });
     }
+    // todo 待优化订单项详情
+
+//    private PageResult<OmsOrderRespVO> buildOrderVOPageResult(PageResult<OmsOrderDO> pageResult) {
+//        if (CollUtil.isEmpty(pageResult.getList())) {
+//            return PageResult.empty(pageResult.getTotal());
+//        }
+//
+//
+//        // 1 组装订单项 orderItemMap 中key 为订单id，value 为单个订单所对应的订单项
+//        List<OmsOrderItemDO> orderItemList = omsOrderService.getOrderItemListByOrderIds(convertSet(pageResult.getList(), OmsOrderDO::getId));
+//        Map<Long, List<OmsOrderItemDO>> orderItemMap = convertMultiMap(orderItemList, OmsOrderItemDO::getOrderId);
+//
+//
+//        // 2 组装产品信息 productMap 中key 为订单id，value 为单个订单所对应的所有产品信息
+//
+//        List<OmsOrderDO> omsOrderList = pageResult.getList();
+//
+//        //1.3 店铺信息 shopMap 中key 为单个订单中的shop_id，value为所对应的店铺信息
+//        Set<Long> shopIds = omsOrderList.stream().map(OmsOrderDO::getShopId).collect(Collectors.toSet());
+//        Map<Long, OmsShopRespVO> shopMap = omsShopService.getShopMapByIds(shopIds);
+//
+//
+//        List<OmsOrderRespVO> list = new ArrayList<>();
+//        for (OmsOrderDO omsOrderDO : omsOrderList) {
+//            OmsOrderRespVO omsOrderRespVO = BeanUtils.toBean(omsOrderDO, OmsOrderRespVO.class);
+//            List<OmsOrderRespVO.Item> items = new ArrayList<>();
+//            List<ErpProductRespDTO> productList = new ArrayList<>();
+//
+//            //2.1 先找出单个订单所对应的订单项
+//            List<OmsOrderItemDO> orderItems = orderItemMap.get(omsOrderDO.getId());
+//            for (OmsOrderItemDO orderItem : orderItems) {
+//                OmsOrderRespVO.Item item = new OmsOrderRespVO.Item();
+//
+//                //2.2 收集单个订单的所有产品编码
+//                List<OmsShopProductItemDO> shopProductItemList = omsShopProductItemService.getShopProductItemsByShopProductIds(orderItems.stream().map(OmsOrderItemDO::getShopProductId).toList());
+//                Map<Long, OmsShopProductItemDO> shopProductItemMap = shopProductItemList.stream().collect(Collectors.toMap(OmsShopProductItemDO::getShopProductId, Function.identity()));
+//                List<Long> productIds = shopProductItemList.stream().map(OmsShopProductItemDO::getProductId).distinct().toList();
+//                //2.3 根据产品编码查询产品信息 productDTOMap key= productId
+//                Map<Long, ErpProductRespDTO> productDTOMap = erpProductApi.getProductDTOMap(productIds);
+//                productList.addAll(productDTOMap.values());
+//
+//                Long productId = shopProductItemMap.get(orderItem.getShopProductId()).getProductId();
+//                ErpProductRespDTO erpProductRespDTO = productDTOMap.get(productId);
+//                item.setProductId(productId)
+//                    .setProductName(erpProductRespDTO.getName())
+//                    .setProductBarCode(erpProductRespDTO.getBarCode())
+//                    .setProductUnitName(erpProductRespDTO.getUnitName())
+//                    .setQty(orderItem.getQty())
+//                    .setPrice(orderItem.getPrice());
+//                items.add(item);
+//            }
+//            omsOrderRespVO.setItems(items);
+//
+//            omsOrderRespVO.setProductNames(CollUtil.join(productList, "，", ErpProductRespDTO::getName));
+//
+//            omsOrderRespVO.setShopName(shopMap.get(omsOrderDO.getShopId()).getName());
+//            list.add(omsOrderRespVO);
+//        }
+//
+//        PageResult<OmsOrderRespVO> result = new PageResult<>();
+//        if (CollUtil.isNotEmpty(list)) {
+//            result.setList(list);
+//            result.setTotal(Long.parseLong(String.valueOf(list.size())));
+//        }
+//        return result;
+//    }
+
 }

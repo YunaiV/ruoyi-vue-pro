@@ -45,7 +45,7 @@ public class OmsShopProductRespVO extends BaseDO {
 
     @Schema(description = "币种")
     @ExcelProperty("币种")
-    private String currency;
+    private String currencyCode;
 
     @Schema(description = "产品链接")
     @ExcelProperty("产品链接")

@@ -24,7 +24,7 @@ public class OmsShopDTO {
     /**
      * 平台店铺名称
      */
-    private String platformShopName;
+    private String externalName;
 
     /**
      * 店铺编码

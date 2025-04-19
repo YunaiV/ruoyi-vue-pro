@@ -80,7 +80,7 @@ public class OmsShopProductItemServiceImpl implements OmsShopProductItemService 
     }
 
     @Override
-    public List<OmsShopProductItemDO> getShopProductItemsByProductIds(List<Long> shopProductIds) {
+    public List<OmsShopProductItemDO> getShopProductItemsByShopProductIds(List<Long> shopProductIds) {
         if (CollectionUtils.isEmpty(shopProductIds)) {
             return List.of();
         }

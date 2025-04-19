@@ -57,7 +57,7 @@ public class OmsShopProductDO extends TenantBaseDO {
     /**
      * 币种
      **/
-    private String currency;
+    private String currencyCode;
 
     /**
      * 链接

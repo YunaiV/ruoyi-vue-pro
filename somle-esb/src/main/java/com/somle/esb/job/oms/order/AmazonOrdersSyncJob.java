@@ -30,7 +30,7 @@ public class AmazonOrdersSyncJob extends BaseOrdersSyncJob {
     public List<OmsOrderSaveReqDTO> listOrders() {
         return amazonSpService.clients.stream()
             .flatMap(client -> {
-                // 1. 获取marketplaceIds（添加空值检查）
+
                 List<String> marketplaceIds = Optional.ofNullable(client.getMarketplaceParticipations())
                     .orElseGet(Collections::emptyList)
                     .stream()
@@ -43,10 +43,10 @@ public class AmazonOrdersSyncJob extends BaseOrdersSyncJob {
                     return Stream.empty();
                 }
 
-                // 2. 构建请求参数（日期建议提取为常量或参数）
+
                 AmazonSpOrderReqVO vo = AmazonSpOrderReqVO.builder()
-                    .createdAfter(LocalDateTime.now().minusDays(1))
-                    .createdBefore(LocalDateTime.now())
+                    .createdAfter(LocalDateTime.of(2024, 10, 23, 0, 0))
+                    .createdBefore(LocalDateTime.of(2024, 10, 24, 0, 0))
                     .marketplaceIds(marketplaceIds)
                     .build();
 

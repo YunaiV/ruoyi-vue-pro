@@ -24,16 +24,16 @@ public class OmsOrderPageReqVO extends PageParam {
     private String platformCode;
 
     @Schema(description = "订单号")
-    private String no;
+    private String code;
 
     @Schema(description = "外部来源号，即平台订单号")
-    private String sourceNo;
+    private String externalCode;
 
     @Schema(description = "店铺id", example = "8058")
     private Long shopId;
 
     @Schema(description = "运费")
-    private BigDecimal shippingCost;
+    private BigDecimal shippingFee;
 
     @Schema(description = "总金额", example = "10077")
     private BigDecimal totalPrice;
@@ -54,16 +54,19 @@ public class OmsOrderPageReqVO extends PageParam {
 
     @Schema(description = "付款时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime[] paymentTime;
+    private LocalDateTime[] payTime;
 
     @Schema(description = "电话")
-    private String telephone;
+    private String phone;
 
     @Schema(description = "公司名", example = "张三")
     private String companyName;
 
+    @Schema(description = "收件人姓名")
+    private String recipientName;
+
     @Schema(description = "收件人国家")
-    private String buyerCountryCode;
+    private String recipientCountryCode;
 
     @Schema(description = "收件人省【或为州】")
     private String state;
@@ -75,13 +78,19 @@ public class OmsOrderPageReqVO extends PageParam {
     private String district;
 
     @Schema(description = "外部来源原地址，用作备份")
-    private String sourceAddress;
+    private String externalAddress;
 
-    @Schema(description = "地址")
-    private String address;
+    @Schema(description = "地址1")
+    private String address1;
+
+    @Schema(description = "地址2")
+    private String address2;
+
+    @Schema(description = "地址3")
+    private String address3;
 
     @Schema(description = "门牌号")
-    private String houseNumber;
+    private String houseNo;
 
     @Schema(description = "邮编")
     private String postalCode;

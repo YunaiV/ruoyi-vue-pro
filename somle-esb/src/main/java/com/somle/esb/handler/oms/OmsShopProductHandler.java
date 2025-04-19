@@ -31,7 +31,7 @@ public class OmsShopProductHandler {
     @Resource
     EccangService service;
 
-    @ServiceActivator(inputChannel = "omsShopProductOutPutChannel")
+    @ServiceActivator(inputChannel = "omsShopProductOutputChannel")
     public void handleModifySkuRelation(OmsShopProductDTO productDTO) {
 
         if (productDTO == null) {

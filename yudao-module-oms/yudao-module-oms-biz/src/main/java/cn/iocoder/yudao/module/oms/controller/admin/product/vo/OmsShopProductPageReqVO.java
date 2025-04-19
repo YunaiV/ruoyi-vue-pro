@@ -34,7 +34,7 @@ public class OmsShopProductPageReqVO extends PageParam {
     private BigDecimal price;
 
     @Schema(description = "币种")
-    private String currency;
+    private String currencyCode;
 
     @Schema(description = "店铺产品编码【平台SKU】")
     private String shopProductCode;

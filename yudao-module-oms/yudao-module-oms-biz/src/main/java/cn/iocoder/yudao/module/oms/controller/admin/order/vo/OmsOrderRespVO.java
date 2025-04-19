@@ -25,11 +25,11 @@ public class OmsOrderRespVO {
 
     @Schema(description = "订单号", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("订单号")
-    private String no;
+    private String code;
 
     @Schema(description = "外部来源号，即平台订单号", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("外部来源号，即平台订单号")
-    private String sourceNo;
+    private String externalCode;
 
     @Schema(description = "店铺id", example = "8058")
     @ExcelProperty("店铺id")
@@ -37,7 +37,7 @@ public class OmsOrderRespVO {
 
     @Schema(description = "运费")
     @ExcelProperty("运费")
-    private BigDecimal shippingCost;
+    private BigDecimal shippingFee;
 
     @Schema(description = "总金额", example = "10077")
     @ExcelProperty("总金额")
@@ -61,11 +61,11 @@ public class OmsOrderRespVO {
 
     @Schema(description = "付款时间")
     @ExcelProperty("付款时间")
-    private LocalDateTime paymentTime;
+    private LocalDateTime payTime;
 
     @Schema(description = "电话")
     @ExcelProperty("电话")
-    private String telephone;
+    private String phone;
 
     @Schema(description = "公司名", example = "张三")
     @ExcelProperty("公司名")
@@ -73,7 +73,7 @@ public class OmsOrderRespVO {
 
     @Schema(description = "收件人国家")
     @ExcelProperty("收件人国家")
-    private String buyerCountryCode;
+    private String recipientCountryCode;
 
     @Schema(description = "收件人省【或为州】")
     @ExcelProperty("收件人省【或为州】")
@@ -89,15 +89,23 @@ public class OmsOrderRespVO {
 
     @Schema(description = "外部来源原地址，用作备份")
     @ExcelProperty("外部来源原地址，用作备份")
-    private String sourceAddress;
+    private String externalAddress;
 
-    @Schema(description = "地址")
-    @ExcelProperty("地址")
-    private String address;
+    @Schema(description = "地址1")
+    @ExcelProperty("地址1")
+    private String address1;
+
+    @Schema(description = "地址2")
+    @ExcelProperty("地址2")
+    private String address2;
+
+    @Schema(description = "地址3")
+    @ExcelProperty("地址3")
+    private String address3;
 
     @Schema(description = "门牌号")
     @ExcelProperty("门牌号")
-    private String houseNumber;
+    private String houseNo;
 
     @Schema(description = "邮编")
     @ExcelProperty("邮编")
@@ -132,11 +140,11 @@ public class OmsOrderRespVO {
         private Long productUnitId;
 
         @Schema(description = "产品单价", example = "100.00")
-        private BigDecimal productPrice;
+        private BigDecimal price;
 
         @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
         @NotNull(message = "产品数量不能为空")
-        private BigDecimal count;
+        private Integer qty;
 
         @Schema(description = "税率，百分比", example = "99.88")
         private BigDecimal taxPercent;

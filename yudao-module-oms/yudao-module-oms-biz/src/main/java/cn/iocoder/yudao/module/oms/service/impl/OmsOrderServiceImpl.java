@@ -135,7 +135,8 @@ public class OmsOrderServiceImpl implements OmsOrderService {
     @Override
     public void createOrUpdateOrderByPlatform(List<OmsOrderSaveReqDTO> saveReqDTOs) {
         if (CollectionUtils.isEmpty(saveReqDTOs)) {
-            throw exception(OMS_SYNC_ORDER_INFO_LACK);
+            log.info(OMS_SYNC_ORDER_INFO_LACK.getMsg());
+            return;
         }
 
         List<OmsOrderDO> orders = OmsOrderConvert.INSTANCE.toOmsOrderDOs(saveReqDTOs);
@@ -191,21 +192,21 @@ public class OmsOrderServiceImpl implements OmsOrderService {
         List<OmsOrderSaveReqDTO> saveReqOrders = saveReqDTOs.stream()
             .filter(saveReqDTO -> saveReqDTO.getId() == null)
             .collect(Collectors.toList());
-        Set<String> sourceNos = saveReqOrders.stream().map(OmsOrderSaveReqDTO::getSourceNo).collect(Collectors.toSet());
+        Set<String> externalCodes = saveReqOrders.stream().map(OmsOrderSaveReqDTO::getExternalCode).collect(Collectors.toSet());
         // 过滤出刚新增的订单 key = sourceNo
         Map<String, OmsOrderSaveReqDTO> createdOrders = Optional.ofNullable(saveReqOrders)
             .orElse(Collections.emptyList())
             .stream()
-            .filter(omsOrderSaveReqDTO -> sourceNos.contains(omsOrderSaveReqDTO.getSourceNo()))
-            .collect(Collectors.toMap(omsOrderSaveReqDTO -> omsOrderSaveReqDTO.getSourceNo(), omsOrderSaveReqDTO -> omsOrderSaveReqDTO));
+            .filter(omsOrderSaveReqDTO -> externalCodes.contains(omsOrderSaveReqDTO.getExternalCode()))
+            .collect(Collectors.toMap(omsOrderSaveReqDTO -> omsOrderSaveReqDTO.getExternalCode(), omsOrderSaveReqDTO -> omsOrderSaveReqDTO));
 
         Map<String, OmsOrderDO> createOrderMap = createOrders.stream()
-            .collect(Collectors.toMap(omsOrderDO -> omsOrderDO.getSourceNo(), omsOrderDO -> omsOrderDO));
+            .collect(Collectors.toMap(omsOrderDO -> omsOrderDO.getExternalCode(), omsOrderDO -> omsOrderDO));
 
         //取出所有订单项数据，并为其设置订单项的订单ID属性
         List<OmsOrderItemDO> omsOrderItemDOs = saveReqOrders.stream()
             .flatMap(saveReqDTO -> {
-                Long orderId = createOrderMap.get(saveReqDTO.getSourceNo()).getId();
+                Long orderId = createOrderMap.get(saveReqDTO.getExternalCode()).getId();
                 return saveReqDTO.getOmsOrderItemSaveReqDTOList().stream()
                     .map(itemReqDTO -> {
                         OmsOrderItemDO itemDO = OmsOrderItemConvert.INSTANCE.toOmsOrderItemDO(itemReqDTO);
@@ -237,12 +238,12 @@ public class OmsOrderServiceImpl implements OmsOrderService {
 
         Map<Long, List<OmsOrderItemDO>> existOrderItemMap = existOrderItems.stream().collect(Collectors.groupingBy(OmsOrderItemDO::getOrderId));
 
-        Map<Long, Map<String, OmsOrderItemDO>> orderIdToItemMap = new HashMap<>();
+        Map<Long, Map<Long, OmsOrderItemDO>> orderIdToItemMap = new HashMap<>();
         for (Long orderId : existOrderItemMap.keySet()) {
             List<OmsOrderItemDO> omsOrderItemDOList = existOrderItemMap.get(orderId);
-            Map<String, OmsOrderItemDO> orderItemDOMap = new HashMap();
+            Map<Long, OmsOrderItemDO> orderItemDOMap = new HashMap();
             for (OmsOrderItemDO omsOrderItemDO : omsOrderItemDOList) {
-                orderItemDOMap.put(omsOrderItemDO.getShopProductCode(), omsOrderItemDO);
+                orderItemDOMap.put(omsOrderItemDO.getShopProductId(), omsOrderItemDO);
             }
             orderIdToItemMap.put(orderId, orderItemDOMap);
         }
@@ -262,8 +263,8 @@ public class OmsOrderServiceImpl implements OmsOrderService {
             Long orderId = updateSaveReqDTO.getId();
             List<OmsOrderItemSaveReqDTO> saveReqDTOList = existOrderItemSaveReqDTOMap.get(orderId);
             for (OmsOrderItemSaveReqDTO omsOrderItemSaveReqDTO : saveReqDTOList) {
-                String shopProductCode = omsOrderItemSaveReqDTO.getShopProductCode();
-                OmsOrderItemDO omsOrderItemDO = orderIdToItemMap.get(orderId).get(shopProductCode);
+                Long shopProductId = omsOrderItemSaveReqDTO.getShopProductId();
+                OmsOrderItemDO omsOrderItemDO = orderIdToItemMap.get(orderId).get(shopProductId);
                 if (omsOrderItemDO == null) {
                     omsOrderItemSaveReqDTO.setOrderId(orderId);
                     createOrderItems.add(OmsOrderItemConvert.INSTANCE.toOmsOrderItemDO(omsOrderItemSaveReqDTO));
@@ -273,14 +274,14 @@ public class OmsOrderServiceImpl implements OmsOrderService {
                     OmsOrderItemDO updateOrderItem = OmsOrderItemConvert.INSTANCE.toOmsOrderItemDO(omsOrderItemSaveReqDTO);
                     updateOrderItem.setId(omsOrderItemDO.getId());
                     updateOrderItems.add(updateOrderItem);
-                    orderIdToItemMap.get(orderId).remove(shopProductCode);
+                    orderIdToItemMap.get(orderId).remove(shopProductId);
                 }
             }
         }
 
         List<OmsOrderItemDO> deleteOrderItems = new ArrayList<>();
         for (Long orderId : orderIdToItemMap.keySet()) {
-            Map<String, OmsOrderItemDO> orderItemDOMap = orderIdToItemMap.get(orderId);
+            Map<Long, OmsOrderItemDO> orderItemDOMap = orderIdToItemMap.get(orderId);
             deleteOrderItems.addAll(orderItemDOMap.values());
         }
 

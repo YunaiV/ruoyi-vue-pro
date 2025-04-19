@@ -45,7 +45,7 @@ public class OmsShopProductSaveReqDTO {
     /**
      * 币种
      **/
-    private String currency;
+    private String currencyCode;
 
     /**
      * 链接

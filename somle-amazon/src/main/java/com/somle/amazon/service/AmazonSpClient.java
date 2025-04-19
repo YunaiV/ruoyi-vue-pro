@@ -152,10 +152,12 @@ public class AmazonSpClient {
         try (var response = WebUtils.sendRequest(request)) {
             var bodyString = response.body().string();
             AmazonSpOrderRespVO result = JSONUtil.toBean(bodyString, AmazonSpOrderRespVO.class);
-            result.getPayload().getOrders().forEach(order -> {
-                AmazonSpOrderItemReqVO amazonSpOrderItemReqVO = AmazonSpOrderItemReqVO.builder().orderId(order.getAmazonOrderId()).build();
-                order.setOrderItems(getAllOrderItems(amazonSpOrderItemReqVO));
-            });
+            if (result.getPayload() != null) {
+                result.getPayload().getOrders().forEach(order -> {
+                    AmazonSpOrderItemReqVO amazonSpOrderItemReqVO = AmazonSpOrderItemReqVO.builder().orderId(order.getAmazonOrderId()).build();
+                    order.setOrderItems(getAllOrderItems(amazonSpOrderItemReqVO));
+                });
+            }
             return result;
         }
     }
@@ -164,7 +166,8 @@ public class AmazonSpClient {
     public Stream<AmazonSpOrderRespVO> streamOrder(AmazonSpOrderReqVO vo) {
         return StreamX.iterate(
             getOrder(vo),
-            page -> !StrUtils.isEmpty(page.getPayload().getNextToken()),
+            page -> page.getPayload() != null
+                && !StrUtils.isEmpty(page.getPayload().getNextToken()),
             page -> {
                 var nextToken = page.getPayload().getNextToken();
                 var reqVO = AmazonSpOrderReqVO.builder()
@@ -180,9 +183,17 @@ public class AmazonSpClient {
         if (amazonSpOrderRespVOS.isEmpty()) {
             return Collections.emptyList();
         }
-        return amazonSpOrderRespVOS.stream().flatMap(page -> page.getPayload().getOrders().stream())
-            .filter(order -> CollectionUtil.isNotEmpty(order.getOrderItems()))
-            .toList();
+
+        return amazonSpOrderRespVOS.stream()  // 1. 转为 Stream
+            .filter(Objects::nonNull)  // 2. 过滤掉 null 的 page
+            .map(AmazonSpOrderRespVO::getPayload)  // 3. 提取 payload
+            .filter(Objects::nonNull)  // 4. 过滤掉 null 的 payload
+            .map(AmazonSpOrderRespVO.Payload::getOrders)  // 5. 提取 orders
+            .filter(Objects::nonNull)  // 6. 过滤掉 null 的 orders
+            .flatMap(List::stream)  // 7. 扁平化 orders 流
+            .filter(order -> order != null
+                && CollectionUtil.isNotEmpty(order.getOrderItems()))  // 8. 过滤 null 订单 + 空 OrderItems
+            .toList();  // 9. 收集结果
     }
 
     public List<AmazonSpOrderItemRespVO.OrderItem> getAllOrderItems(AmazonSpOrderItemReqVO vo) {

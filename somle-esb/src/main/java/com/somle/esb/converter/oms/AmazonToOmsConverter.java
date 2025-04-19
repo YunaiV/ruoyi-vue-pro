@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.oms.api.dto.*;
 import cn.iocoder.yudao.module.oms.api.enums.shop.ShopTypeEnum;
 import com.somle.amazon.controller.vo.AmazonSpMarketplaceParticipationVO;
 import com.somle.amazon.controller.vo.AmazonSpMarketplaceVO;
+import com.somle.amazon.controller.vo.AmazonSpOrderItemRespVO;
 import com.somle.amazon.controller.vo.AmazonSpOrderRespVO;
 import com.somle.amazon.model.reps.AmazonSpListingRepsVO;
 import com.somle.esb.enums.PlatformEnum;
@@ -54,7 +55,7 @@ public class AmazonToOmsConverter {
             OmsShopSaveReqDTO shopDTO = new OmsShopSaveReqDTO();
             MapUtils.findAndThen(existShopMap, marketplace.getId(), omsShopDTO -> shopDTO.setId(omsShopDTO.getId()));
             shopDTO.setName(null);
-            shopDTO.setPlatformShopName(shopInfoDTO.getStoreName());
+            shopDTO.setExternalName(shopInfoDTO.getStoreName());
             shopDTO.setCode(null);
             shopDTO.setPlatformShopCode(marketplace.getId());
             shopDTO.setPlatformCode(this.platform.toString());
@@ -124,47 +125,104 @@ public class AmazonToOmsConverter {
         Map<String, OmsOrderDTO> existOrderMap = Optional.ofNullable(existOrders)
             .orElse(Collections.emptyList())
             .stream()
-            .collect(Collectors.toMap(omsOrderDTO -> omsOrderDTO.getSourceNo(), omsOrderDTO -> omsOrderDTO));
+            .collect(Collectors.toMap(omsOrderDTO -> omsOrderDTO.getExternalCode(), omsOrderDTO -> omsOrderDTO));
 
-        List<OmsOrderSaveReqDTO> omsOrderSaveReqDTOs = orders.stream()
-            .map(order -> {
-                try {
-                    OmsOrderSaveReqDTO omsOrderSaveReqDTO = new OmsOrderSaveReqDTO();
-                    MapUtils.findAndThen(existOrderMap, order.getAmazonOrderId(), omsOrderDTO -> omsOrderSaveReqDTO.setId(omsOrderDTO.getId()));
-                    omsOrderSaveReqDTO.setPlatformCode(this.platform.toString());
-                    omsOrderSaveReqDTO.setSourceNo(order.getAmazonOrderId());
-                    MapUtils.findAndThen(omsShopMap, order.getMarketplaceId(), omsShopDTO -> omsOrderSaveReqDTO.setShopId(omsShopDTO.getId()));
 
-                    AmazonSpOrderRespVO.OrderTotal orderTotal = order.getOrderTotal();
-                    if (orderTotal != null && orderTotal.getAmount() != null) {
-                        omsOrderSaveReqDTO.setTotalPrice(new BigDecimal(orderTotal.getAmount()));
-                    }
+        List<Long> shopIds = omsShopMap.values().stream().map(OmsShopDTO::getId).toList();
+        List<OmsShopProductDTO> existShopProducts = omsShopProductApi.getByShopIds(shopIds);
+        // 使用Map存储已存在的店铺产品信息，key=sourceId, value=OmsShopProductDO
+        Map<String, OmsShopProductDTO> existShopProductMap = Optional.ofNullable(existShopProducts)
+            .orElse(Collections.emptyList())
+            .stream()
+            .collect(Collectors.toMap(omsShopProductDO -> omsShopProductDO.getSourceId(), omsShopProductDO -> omsShopProductDO));
 
-                    if (order.getBuyerInfo() != null) {
-                        omsOrderSaveReqDTO.setEmail(order.getBuyerInfo().getBuyerEmail());
-                    }
+//        List<OmsOrderSaveReqDTO> omsOrderSaveReqDTOs = orders.stream()
+//            .map(order -> {
+//                try {
+//                    OmsOrderSaveReqDTO omsOrderSaveReqDTO = new OmsOrderSaveReqDTO();
+//                    MapUtils.findAndThen(existOrderMap, order.getAmazonOrderId(), omsOrderDTO -> omsOrderSaveReqDTO.setId(omsOrderDTO.getId()));
+//                    omsOrderSaveReqDTO.setPlatformCode(this.platform.toString());
+//                    omsOrderSaveReqDTO.setExternalCode(order.getAmazonOrderId());
+//                    MapUtils.findAndThen(omsShopMap, order.getMarketplaceId(), omsShopDTO -> omsOrderSaveReqDTO.setShopId(omsShopDTO.getId()));
+//
+//                    AmazonSpOrderRespVO.OrderTotal orderTotal = order.getOrderTotal();
+//                    if (orderTotal != null && orderTotal.getAmount() != null) {
+//                        omsOrderSaveReqDTO.setTotalPrice(new BigDecimal(orderTotal.getAmount()));
+//                    }
+//
+//                    if (order.getBuyerInfo() != null) {
+//                        omsOrderSaveReqDTO.setEmail(order.getBuyerInfo().getBuyerEmail());
+//                    }
+//
+//                    omsOrderSaveReqDTO.setExternalAddress(JsonUtilsX.toJsonString(order.getShippingAddress()));
+//                    if (order.getShippingAddress() != null) {
+//                        omsOrderSaveReqDTO.setAddress1(order.getShippingAddress().getStateOrRegion());
+//                    }
+//                    List<OmsOrderItemSaveReqDTO> omsOrderItemSaveReqDTOs = order.getOrderItems().stream()
+//                        .map(orderItem -> {
+//                            OmsOrderItemSaveReqDTO omsOrderItemSaveReqDTO = new OmsOrderItemSaveReqDTO();
+//                            omsOrderItemSaveReqDTO.setShopProductId(1L);
+//                            omsOrderItemSaveReqDTO.setQty(orderItem.getQuantityOrdered());
+//                            if (orderItem.getItemPrice() != null) {
+//                                omsOrderItemSaveReqDTO.setPrice(new BigDecimal(orderItem.getItemPrice().getAmount()));
+//                            }
+//                            return omsOrderItemSaveReqDTO;
+//                        }).toList();
+//                    omsOrderSaveReqDTO.setOmsOrderItemSaveReqDTOList(omsOrderItemSaveReqDTOs);
+//                    return omsOrderSaveReqDTO;
+//                } catch (Exception e) {
+//                    log.info("转换Amazon订单异常", e);
+//                }
+//                return null;
+//            }).toList();
 
-                    omsOrderSaveReqDTO.setSourceAddress(JsonUtilsX.toJsonString(order.getShippingAddress()));
-                    if (order.getShippingAddress() != null) {
-                        omsOrderSaveReqDTO.setAddress(order.getShippingAddress().getStateOrRegion());
-                    }
-                    List<OmsOrderItemSaveReqDTO> omsOrderItemSaveReqDTOs = order.getOrderItems().stream()
-                        .map(orderItem -> {
-                            OmsOrderItemSaveReqDTO omsOrderItemSaveReqDTO = new OmsOrderItemSaveReqDTO();
-                            omsOrderItemSaveReqDTO.setShopProductCode(orderItem.getSellerSKU());
-                            omsOrderItemSaveReqDTO.setQty(orderItem.getQuantityOrdered());
-                            if (orderItem.getItemPrice() != null) {
-                                omsOrderItemSaveReqDTO.setPrice(new BigDecimal(orderItem.getItemPrice().getAmount()));
-                            }
-                            return omsOrderItemSaveReqDTO;
-                        }).toList();
-                    omsOrderSaveReqDTO.setOmsOrderItemSaveReqDTOList(omsOrderItemSaveReqDTOs);
-                    return omsOrderSaveReqDTO;
-                } catch (Exception e) {
-                    log.info("转换Amazon订单异常", e);
+
+        List<OmsOrderSaveReqDTO> omsOrderSaveReqDTOs = new ArrayList<>();
+        for (AmazonSpOrderRespVO.Order order : orders) {
+            OmsOrderSaveReqDTO omsOrderSaveReqDTO = new OmsOrderSaveReqDTO();
+            // 判断订单项对应的shopProductId是否存在
+            boolean flag = true;
+            MapUtils.findAndThen(existOrderMap, order.getAmazonOrderId(), omsOrderDTO -> omsOrderSaveReqDTO.setId(omsOrderDTO.getId()));
+            omsOrderSaveReqDTO.setPlatformCode(this.platform.toString());
+            omsOrderSaveReqDTO.setExternalCode(order.getAmazonOrderId());
+            MapUtils.findAndThen(omsShopMap, order.getMarketplaceId(), omsShopDTO -> omsOrderSaveReqDTO.setShopId(omsShopDTO.getId()));
+
+            AmazonSpOrderRespVO.OrderTotal orderTotal = order.getOrderTotal();
+            if (orderTotal != null && orderTotal.getAmount() != null) {
+                omsOrderSaveReqDTO.setTotalPrice(new BigDecimal(orderTotal.getAmount()));
+            }
+
+            if (order.getBuyerInfo() != null) {
+                omsOrderSaveReqDTO.setEmail(order.getBuyerInfo().getBuyerEmail());
+            }
+
+            omsOrderSaveReqDTO.setExternalAddress(JsonUtilsX.toJsonString(order.getShippingAddress()));
+            if (order.getShippingAddress() != null) {
+                omsOrderSaveReqDTO.setAddress1(order.getShippingAddress().getStateOrRegion());
+            }
+
+            List<AmazonSpOrderItemRespVO.OrderItem> orderItems = order.getOrderItems();
+            List<OmsOrderItemSaveReqDTO> omsOrderItemSaveReqDTOs = new ArrayList<>();
+            for (AmazonSpOrderItemRespVO.OrderItem orderItem : orderItems) {
+                OmsOrderItemSaveReqDTO omsOrderItemSaveReqDTO = new OmsOrderItemSaveReqDTO();
+                if (orderItem.getASIN() == null || orderItem.getSellerSKU() == null) {
+                    flag = false;
+                    break;
                 }
-                return null;
-            }).toList();
+                String sourceId = orderItem.getSellerSKU() + "#" + orderItem.getASIN();
+                omsOrderItemSaveReqDTO.setShopProductId(existShopProductMap.get(sourceId).getId());
+                omsOrderItemSaveReqDTO.setQty(orderItem.getQuantityOrdered());
+                if (orderItem.getItemPrice() != null) {
+                    omsOrderItemSaveReqDTO.setPrice(new BigDecimal(orderItem.getItemPrice().getAmount()));
+                }
+                omsOrderItemSaveReqDTOs.add(omsOrderItemSaveReqDTO);
+            }
+            if (!flag) {
+                continue;
+            }
+            omsOrderSaveReqDTO.setOmsOrderItemSaveReqDTOList(omsOrderItemSaveReqDTOs);
+            omsOrderSaveReqDTOs.add(omsOrderSaveReqDTO);
+        }
         return omsOrderSaveReqDTOs;
     }
 }

@@ -19,10 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -57,7 +54,7 @@ public class ShopifyToOmsConverter {
         OmsShopSaveReqDTO shopDTO = new OmsShopSaveReqDTO();
         MapUtils.findAndThen(existShopMap, shopInfoDTO.getId().toString(), omsShopDTO -> shopDTO.setId(omsShopDTO.getId()));
         shopDTO.setName(null);
-        shopDTO.setPlatformShopName(shopInfoDTO.getName());
+        shopDTO.setExternalName(shopInfoDTO.getName());
         shopDTO.setCode(null);
         shopDTO.setPlatformShopCode(shopInfoDTO.getId().toString());
         shopDTO.setPlatformCode(this.platform.toString());
@@ -132,42 +129,55 @@ public class ShopifyToOmsConverter {
         Map<String, OmsOrderDTO> existOrderMap = Optional.ofNullable(existOrders)
             .orElse(Collections.emptyList())
             .stream()
-            .collect(Collectors.toMap(omsOrderDTO -> omsOrderDTO.getSourceNo(), omsOrderDTO -> omsOrderDTO));
+            .collect(Collectors.toMap(omsOrderDTO -> omsOrderDTO.getExternalCode(), omsOrderDTO -> omsOrderDTO));
 
+        List<OmsShopProductDTO> existShopProducts = omsShopProductApi.getByShopIds(List.of(omsShopDO.getId()));
+        // 使用Map存储已存在的店铺产品信息，key=sourceId, value=OmsShopProductDO
+        Map<String, OmsShopProductDTO> existShopProductMap = Optional.ofNullable(existShopProducts)
+            .orElse(Collections.emptyList())
+            .stream()
+            .collect(Collectors.toMap(omsShopProductDO -> omsShopProductDO.getSourceId(), omsShopProductDO -> omsShopProductDO));
 
-        List<OmsOrderSaveReqDTO> omsOrderSaveReqDTOs = orders.stream()
-            .map(order -> {
-                try {
-                    OmsOrderSaveReqDTO omsOrderSaveReqDTO = new OmsOrderSaveReqDTO();
-                    MapUtils.findAndThen(existOrderMap, order.getId().toString(), omsOrderDTO -> omsOrderSaveReqDTO.setId(omsOrderDTO.getId()));
-                    omsOrderSaveReqDTO.setPlatformCode(this.platform.toString());
-                    omsOrderSaveReqDTO.setSourceNo(order.getId().toString());
-                    omsOrderSaveReqDTO.setShopId(omsShopDO.getId());
-                    omsOrderSaveReqDTO.setTotalPrice(new BigDecimal(order.getTotalPrice()));
-                    omsOrderSaveReqDTO.setBuyerName(order.getCustomer().getFirstName() + order.getCustomer().getLastName());
-                    omsOrderSaveReqDTO.setEmail(order.getCustomer().getEmail());
-                    omsOrderSaveReqDTO.setOrderCreateTime(ZonedDateTime.parse(order.getCreatedAt()).toLocalDateTime());
-                    omsOrderSaveReqDTO.setTelephone(order.getCustomer().getPhone());
-                    omsOrderSaveReqDTO.setBuyerCountryCode(order.getCustomer().getDefaultAddress().getCountryCode());
-                    omsOrderSaveReqDTO.setState(order.getCustomer().getState());
-                    omsOrderSaveReqDTO.setCity(order.getCustomer().getDefaultAddress().getCity());
-                    omsOrderSaveReqDTO.setSourceAddress(JsonUtilsX.toJsonString(order.getShippingAddress()));
-                    omsOrderSaveReqDTO.setAddress(order.getCustomer().getDefaultAddress().getAddress1());
-                    List<OmsOrderItemSaveReqDTO> omsOrderItemSaveReqDTOs = order.getLineItems().stream()
-                        .map(lineItem -> {
-                            OmsOrderItemSaveReqDTO omsOrderItemSaveReqDTO = new OmsOrderItemSaveReqDTO();
-                            omsOrderItemSaveReqDTO.setShopProductCode(lineItem.getSku());
-                            omsOrderItemSaveReqDTO.setQty(lineItem.getQuantity());
-                            omsOrderItemSaveReqDTO.setPrice(new BigDecimal(lineItem.getPrice()));
-                            return omsOrderItemSaveReqDTO;
-                        }).toList();
-                    omsOrderSaveReqDTO.setOmsOrderItemSaveReqDTOList(omsOrderItemSaveReqDTOs);
-                    return omsOrderSaveReqDTO;
-                } catch (Exception e) {
-                    log.info("转换Shopify订单异常", e);
+        List<OmsOrderSaveReqDTO> omsOrderSaveReqDTOs = new ArrayList<>();
+
+        for (ShopifyOrderRepsVO order : orders) {
+            OmsOrderSaveReqDTO omsOrderSaveReqDTO = new OmsOrderSaveReqDTO();
+            // 判断订单项对应的shopProductId是否存在
+            boolean flag = true;
+            MapUtils.findAndThen(existOrderMap, order.getId().toString(), omsOrderDTO -> omsOrderSaveReqDTO.setId(omsOrderDTO.getId()));
+            omsOrderSaveReqDTO.setPlatformCode(this.platform.toString());
+            omsOrderSaveReqDTO.setExternalCode(order.getId().toString());
+            omsOrderSaveReqDTO.setShopId(omsShopDO.getId());
+            omsOrderSaveReqDTO.setTotalPrice(new BigDecimal(order.getTotalPrice()));
+            omsOrderSaveReqDTO.setBuyerName(order.getCustomer().getFirstName() + order.getCustomer().getLastName());
+            omsOrderSaveReqDTO.setEmail(order.getCustomer().getEmail());
+            omsOrderSaveReqDTO.setOrderCreateTime(ZonedDateTime.parse(order.getCreatedAt()).toLocalDateTime());
+            omsOrderSaveReqDTO.setPhone(order.getCustomer().getPhone());
+            omsOrderSaveReqDTO.setBuyerCountryCode(order.getCustomer().getDefaultAddress().getCountryCode());
+            omsOrderSaveReqDTO.setState(order.getCustomer().getState());
+            omsOrderSaveReqDTO.setCity(order.getCustomer().getDefaultAddress().getCity());
+            omsOrderSaveReqDTO.setExternalAddress(JsonUtilsX.toJsonString(order.getShippingAddress()));
+            omsOrderSaveReqDTO.setAddress1(order.getCustomer().getDefaultAddress().getAddress1());
+
+            List<ShopifyOrderRepsVO.LineItemsDTO> lineItems = order.getLineItems();
+            List<OmsOrderItemSaveReqDTO> omsOrderItemSaveReqDTOs = new ArrayList<>();
+            for (ShopifyOrderRepsVO.LineItemsDTO lineItem : lineItems) {
+                OmsOrderItemSaveReqDTO omsOrderItemSaveReqDTO = new OmsOrderItemSaveReqDTO();
+                if (lineItem.getVariantId() == null) {
+                    flag = false;
+                    break;
                 }
-                return null;
-            }).toList();
+                omsOrderItemSaveReqDTO.setShopProductId(existShopProductMap.get(lineItem.getVariantId().toString()).getId());
+                omsOrderItemSaveReqDTO.setQty(lineItem.getQuantity());
+                omsOrderItemSaveReqDTO.setPrice(new BigDecimal(lineItem.getPrice()));
+                omsOrderItemSaveReqDTOs.add(omsOrderItemSaveReqDTO);
+            }
+            if (!flag) {
+                continue;
+            }
+            omsOrderSaveReqDTO.setOmsOrderItemSaveReqDTOList(omsOrderItemSaveReqDTOs);
+            omsOrderSaveReqDTOs.add(omsOrderSaveReqDTO);
+        }
         return omsOrderSaveReqDTOs;
     }
 }

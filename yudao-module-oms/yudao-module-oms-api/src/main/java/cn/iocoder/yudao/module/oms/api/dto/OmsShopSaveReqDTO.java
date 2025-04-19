@@ -26,9 +26,9 @@ public class OmsShopSaveReqDTO {
     private String name;
 
     /**
-     * 平台店铺名称
+     * 外部来源名称
      */
-    private String platformShopName;
+    private String externalName;
 
     /**
      * 店铺编码
