@@ -6,16 +6,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class ShopifyService {
     @Autowired
     ShopifyTokenRepository tokenRepository;
 
-    public ShopifyClient client;
+    public List<ShopifyClient> shopifyClients;
 
     @PostConstruct
     public void init() {
-        client = new ShopifyClient(tokenRepository.findAll().get(0));
+        this.shopifyClients = getAllShopifyClients();
+    }
+
+
+    public List<ShopifyClient> getAllShopifyClients() {
+        List<ShopifyClient> clients = tokenRepository.findAll().stream().map(ShopifyClient::new).toList();
+        return clients;
     }
 }

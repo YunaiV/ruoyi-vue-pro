@@ -31,12 +31,12 @@ class AmazonSpServiceTest extends SomleBaseSpringTest {
         spService.refreshAuths();
     }
 
-//    @Test
-//    void getAccount() {
-//        var shop = amazonService.shopRepository.findByCountryCode("US");
-//        var response = amazonService.spClient.getAccount(shop.getSeller());
-//        log.info(response.toString());
-//    }
+    @Test
+    void getAccount() {
+        spService.clients.forEach(client -> {
+            log.info("{}", client.getMarketplaceParticipations());
+        });
+    }
 
 
 }

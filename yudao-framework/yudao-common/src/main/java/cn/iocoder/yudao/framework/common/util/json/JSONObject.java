@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 // if use inner property to store node, then ObjectMapper.writeValueAsString(JSONObject) will be wrong
-public class JSONObject extends ObjectNode{
+public class JSONObject extends ObjectNode {
 //    public JSONObject(JsonNodeFactory nc) {
 //        super(nc);
 //    }
@@ -32,6 +32,11 @@ public class JSONObject extends ObjectNode{
         this.setAll(other);
     }
 
+    public JSONObject(JsonNode other) {
+        super(JsonUtilsX.getNodeFactory());
+        other.fields().forEachRemaining(entry -> this.set(entry.getKey(), entry.getValue()));
+    }
+
 
     public List<Map.Entry<String, JsonNode>> entrySet() {
         return _children.entrySet().stream().toList();
@@ -42,22 +47,22 @@ public class JSONObject extends ObjectNode{
     }
 
     public String getString(String fieldName) {
-        var value=this.get(fieldName);
-        if(value==null) {
+        var value = this.get(fieldName);
+        if (value == null) {
             return null;
         }
-        if(value instanceof NullNode) {
+        if (value instanceof NullNode) {
             return null;
         }
         return value.asText();
     }
 
     public BigDecimal getBigDecimal(String fieldName) {
-        var value=this.get(fieldName);
-        if(value==null) {
+        var value = this.get(fieldName);
+        if (value == null) {
             return null;
         }
-        if(value instanceof NullNode) {
+        if (value instanceof NullNode) {
             return null;
         }
         return new BigDecimal(value.asText());
@@ -65,63 +70,62 @@ public class JSONObject extends ObjectNode{
 
     public List<String> getStringList(String fieldName) {
         return StreamSupport.stream(this.get(fieldName).spliterator(), false)
-                .filter(JsonNode::isTextual) // Ensure the element is a text node
-                .map(JsonNode::asText) // Extract text value
-                .collect(Collectors.toList()); // Collect into a list
+            .filter(JsonNode::isTextual) // Ensure the element is a text node
+            .map(JsonNode::asText) // Extract text value
+            .collect(Collectors.toList()); // Collect into a list
     }
 
 
     public List<Integer> getIntegerList(String fieldName) {
         return StreamSupport.stream(this.get(fieldName).spliterator(), false)
-                .filter(JsonNode::isInt) // Ensure the element is a text node
-                .map(JsonNode::asInt) // Extract text value
-                .collect(Collectors.toList()); // Collect into a list
+            .filter(JsonNode::isInt) // Ensure the element is a text node
+            .map(JsonNode::asInt) // Extract text value
+            .collect(Collectors.toList()); // Collect into a list
     }
 
     public Integer getInteger(String fieldName) {
-        var value=this.get(fieldName);
-        if(value==null) {
+        var value = this.get(fieldName);
+        if (value == null) {
             return null;
         }
-        if(value instanceof NullNode) {
+        if (value instanceof NullNode) {
             return null;
         }
-        return value==null?null:value.asInt();
+        return value == null ? null : value.asInt();
     }
 
     public Long getLong(String fieldName) {
-        var value=this.get(fieldName);
-        if(value==null) {
+        var value = this.get(fieldName);
+        if (value == null) {
             return null;
         }
-        if(value instanceof NullNode) {
+        if (value instanceof NullNode) {
             return null;
         }
-        return value==null?null:value.asLong();
+        return value == null ? null : value.asLong();
     }
 
     public JSONArray getJSONArray(String fieldName) {
-        JsonNode value=this.get(fieldName);
-        if(value==null) {
+        JsonNode value = this.get(fieldName);
+        if (value == null) {
             return null;
         }
-        if(value instanceof NullNode) {
+        if (value instanceof NullNode) {
             return null;
         }
         return new JSONArray((ArrayNode) value);
     }
 
     public JSONObject getJSONObject(String fieldName) {
-        JsonNode value=this.get(fieldName);
-        if(value==null) {
+        JsonNode value = this.get(fieldName);
+        if (value == null) {
             return null;
         }
-        if(value instanceof NullNode) {
+        if (value instanceof NullNode) {
             return null;
         }
         return new JSONObject((ObjectNode) value);
     }
-
 
 
     private void test(String fieldName) {

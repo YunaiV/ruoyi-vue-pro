@@ -19,6 +19,7 @@ import java.util.Collection;
  */
 public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
 
+
     public LambdaQueryWrapperX<T> likeIfPresent(SFunction<T, ?> column, String val) {
         if (StringUtils.hasText(val)) {
             return (LambdaQueryWrapperX<T>) super.like(column, val);

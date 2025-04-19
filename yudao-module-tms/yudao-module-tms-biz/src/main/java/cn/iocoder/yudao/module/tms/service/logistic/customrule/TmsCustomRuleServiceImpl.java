@@ -147,7 +147,7 @@ public class TmsCustomRuleServiceImpl implements TmsCustomRuleService {
 //        ThrowUtil.ifThrow(customRuleMapper.selectById(id) == null,CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS_BY_PRODUCT_ID);
         TmsCustomRuleDO ruleDO = customRuleMapper.selectById(id);
         if (ruleDO == null) return null;
-        if ( erpProductApi.getProductDto(ruleDO.getProductId()).getCustomCategoryId() == null) {
+        if (erpProductApi.getProductDto(ruleDO.getProductId()).getCustomCategoryId() == null) {
             //不存在海关规则->原始table
             return BeanUtils.toBean(ruleDO, TmsCustomRuleBO.class);
         } else {

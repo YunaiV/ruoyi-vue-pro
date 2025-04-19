@@ -14,4 +14,5 @@ public class EccangIntegrationConfig {
     public MessageChannel eccangSaleOutputChannel() {
         return new PublishSubscribeChannel(new SimpleAsyncTaskExecutor());
     }
+
 }

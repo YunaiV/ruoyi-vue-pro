@@ -28,6 +28,7 @@
         <module>yudao-module-tms</module>
         <module>yudao-module-wms</module>
         <module>yudao-module-ai</module>
+        <module>yudao-module-oms</module>
 
 
 

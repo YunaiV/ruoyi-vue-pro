@@ -1,6 +1,8 @@
 package com.somle.amazon.service;
 
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.general.CoreUtils;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
@@ -12,6 +14,7 @@ import com.somle.amazon.controller.vo.*;
 import com.somle.amazon.model.AmazonSpAuthDO;
 import com.somle.amazon.model.enums.AmazonException;
 import com.somle.amazon.model.enums.AmazonRegion;
+import com.somle.amazon.model.reps.AmazonSpListingRepsVO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,9 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Stream;
 
 
@@ -65,7 +66,6 @@ public class AmazonSpClient {
         String fullUrl = endPoint + partialUrl;
 
 
-
         var request = RequestX.builder()
             .requestMethod(RequestX.Method.GET)
             .url(fullUrl)
@@ -76,24 +76,21 @@ public class AmazonSpClient {
     }
 
 
-
-
 //    @Transactional(readOnly = true)
 //    public Stream<AmazonShop> getShops() {
 //        return account.getSellers().stream().flatMap(seller->seller.getShops().stream());
 //    }
 
-//    @Transactional(readOnly = true)
+    //    @Transactional(readOnly = true)
 //    public AmazonShop getShop(String countryCode) {
 //        return getShops().filter(shop->shop.getCountry().getCode().equals(countryCode)).findFirst().get();
 //    }
 //
     @SneakyThrows
-    public String searchListingsItems(AmazonSpListingReqVO reqVO) {
+    public AmazonSpListingRepsVO searchListingsItems(AmazonSpListingReqVO reqVO) {
         String endPoint = getEndPoint();
-        String partialUrl = "/listings/2021-08-01/items/" + auth.getSellerId();
+        String partialUrl = "/listings/2021-08-01/items/" + reqVO.getSellerId();
         String fullUrl = endPoint + partialUrl;
-
 
 
         var request = RequestX.builder()
@@ -102,21 +99,19 @@ public class AmazonSpClient {
             .queryParams(reqVO)
             .headers(generateHeaders(auth))
             .build();
-        try(var response = WebUtils.sendRequest(request)){
+        try (var response = WebUtils.sendRequest(request)) {
             var bodyString = response.body().string();
-//            var result = JsonUtilsSomle.parseObject(bodyString, AmazonSpOrderRespVO.class);
-//            validateResponse(result);
-            return bodyString;
+            AmazonSpListingRepsVO amazonSpListingRepsVO = JSONUtil.toBean(bodyString, AmazonSpListingRepsVO.class);
+            return amazonSpListingRepsVO;
         }
     }
 
 
-
-    public void validateResponse(AmazonSpOrderRespVO response) {
-        if (!CollectionUtils.isEmpty(response.getErrors())) {
-            throw new RuntimeException("Amazon sp error response: " + response);
-        }
-    }
+//    public void validateResponse(AmazonSpOrderRespVO response) {
+//        if (!CollectionUtils.isEmpty(response.getErrors())) {
+//            throw new RuntimeException("Amazon sp error response: " + response);
+//        }
+//    }
 
     @SneakyThrows
     public void validateResponse(Response response) {
@@ -143,11 +138,8 @@ public class AmazonSpClient {
     }
 
 
-
     @SneakyThrows
     public AmazonSpOrderRespVO getOrder(AmazonSpOrderReqVO vo) {
-        log.info("get orders");
-
         String endPoint = getEndPoint();
         String partialUrl = "/orders/v0/orders";
         String fullUrl = endPoint + partialUrl;
@@ -157,10 +149,15 @@ public class AmazonSpClient {
             .queryParams(vo)
             .headers(generateHeaders(auth))
             .build();
-        try(var response = WebUtils.sendRequest(request)){
+        try (var response = WebUtils.sendRequest(request)) {
             var bodyString = response.body().string();
-            var result = JsonUtilsX.parseObject(bodyString, AmazonSpOrderRespVO.class);
-            validateResponse(result);
+            AmazonSpOrderRespVO result = JSONUtil.toBean(bodyString, AmazonSpOrderRespVO.class);
+            if (result.getPayload() != null) {
+                result.getPayload().getOrders().forEach(order -> {
+                    AmazonSpOrderItemReqVO amazonSpOrderItemReqVO = AmazonSpOrderItemReqVO.builder().orderId(order.getAmazonOrderId()).build();
+                    order.setOrderItems(getAllOrderItems(amazonSpOrderItemReqVO));
+                });
+            }
             return result;
         }
     }
@@ -169,7 +166,8 @@ public class AmazonSpClient {
     public Stream<AmazonSpOrderRespVO> streamOrder(AmazonSpOrderReqVO vo) {
         return StreamX.iterate(
             getOrder(vo),
-            page -> !StrUtils.isEmpty(page.getPayload().getNextToken()),
+            page -> page.getPayload() != null
+                && !StrUtils.isEmpty(page.getPayload().getNextToken()),
             page -> {
                 var nextToken = page.getPayload().getNextToken();
                 var reqVO = AmazonSpOrderReqVO.builder()
@@ -178,6 +176,57 @@ public class AmazonSpClient {
                 return getOrder(reqVO);
             }
         );
+    }
+
+    public List<AmazonSpOrderRespVO.Order> getAllOrders(AmazonSpOrderReqVO vo) {
+        List<AmazonSpOrderRespVO> amazonSpOrderRespVOS = streamOrder(vo).toList();
+        if (amazonSpOrderRespVOS.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return amazonSpOrderRespVOS.stream()  // 1. 转为 Stream
+            .filter(Objects::nonNull)  // 2. 过滤掉 null 的 page
+            .map(AmazonSpOrderRespVO::getPayload)  // 3. 提取 payload
+            .filter(Objects::nonNull)  // 4. 过滤掉 null 的 payload
+            .map(AmazonSpOrderRespVO.Payload::getOrders)  // 5. 提取 orders
+            .filter(Objects::nonNull)  // 6. 过滤掉 null 的 orders
+            .flatMap(List::stream)  // 7. 扁平化 orders 流
+            .filter(order -> order != null
+                && CollectionUtil.isNotEmpty(order.getOrderItems()))  // 8. 过滤 null 订单 + 空 OrderItems
+            .toList();  // 9. 收集结果
+    }
+
+    public List<AmazonSpOrderItemRespVO.OrderItem> getAllOrderItems(AmazonSpOrderItemReqVO vo) {
+        AmazonSpOrderItemRespVO amazonSpOrderItemRespVO = getOrderItem(vo);
+        List<AmazonSpOrderItemRespVO.OrderItem> orderItems = Optional.ofNullable(amazonSpOrderItemRespVO.getPayload())
+            .map(AmazonSpOrderItemRespVO.Payload::getOrderItems)
+            .orElse(Collections.emptyList());
+        AmazonSpOrderItemRespVO.Payload payload = amazonSpOrderItemRespVO.getPayload();
+        while (payload != null && StrUtil.isNotEmpty(payload.getNextToken())) {
+            vo = vo.builder().nextToken(payload.getNextToken()).build();
+            amazonSpOrderItemRespVO = getOrderItem(vo);
+            payload = amazonSpOrderItemRespVO.getPayload();
+            orderItems.addAll(payload.getOrderItems());
+        }
+        return orderItems;
+    }
+
+    @SneakyThrows
+    public AmazonSpOrderItemRespVO getOrderItem(AmazonSpOrderItemReqVO vo) {
+        String endPoint = getEndPoint();
+        String partialUrl = "/orders/v0/orders/" + vo.getOrderId() + "/orderItems";
+        String fullUrl = endPoint + partialUrl;
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.GET)
+            .url(fullUrl)
+            .queryParams(vo)
+            .headers(generateHeaders(auth))
+            .build();
+        try (var response = WebUtils.sendRequest(request)) {
+            var bodyString = response.body().string();
+            AmazonSpOrderItemRespVO result = JSONUtil.toBean(bodyString, AmazonSpOrderItemRespVO.class);
+            return result;
+        }
     }
 
 
@@ -193,7 +242,7 @@ public class AmazonSpClient {
             .queryParams(vo)
             .headers(generateHeaders(auth))
             .build();
-        try(var response = WebUtils.sendRequest(request)){
+        try (var response = WebUtils.sendRequest(request)) {
             var reportsString = WebUtils.parseResponse(response, JSONObject.class).get("reports");
             var reportList = JsonUtilsX.parseArray(reportsString, AmazonSpReportRespVO.class);
             return reportList;
@@ -228,7 +277,7 @@ public class AmazonSpClient {
             .headers(generateHeaders(auth))
             .url(reportStatusUrl)
             .build();
-        try(var response = WebUtils.sendRequest(request)){
+        try (var response = WebUtils.sendRequest(request)) {
             validateResponse(response);
             return WebUtils.parseResponse(response, AmazonSpReportRespVO.class);
         }
@@ -243,7 +292,7 @@ public class AmazonSpClient {
             .url(documentUrl)
             .headers(generateHeaders(auth))
             .build();
-        try(var response = WebUtils.sendRequest(request)){
+        try (var response = WebUtils.sendRequest(request)) {
             validateResponse(response);
             return JsonUtilsX.parseObject(response.body().string(), AmazonSpReportDocumentRespVO.class);
         }
@@ -273,7 +322,7 @@ public class AmazonSpClient {
 
         var docRespVO = getReportDocument(respVO.getReportDocumentId());
         // Use util to process the document URL
-        return WebUtils.urlToString(docRespVO.getUrl(), Objects.toString(docRespVO.getCompressionAlgorithm(),null));
+        return WebUtils.urlToString(docRespVO.getUrl(), Objects.toString(docRespVO.getCompressionAlgorithm(), null));
     }
 
     @SneakyThrows
@@ -301,7 +350,7 @@ public class AmazonSpClient {
                     log.debug("遇到错误: {}", ctx.getLastThrowable().getStackTrace().toString());
                     log.debug("正在请求url= {},第 {} 次重试。", request.getUrl(), retryCount);
                 }
-                try(var response = WebUtils.sendRequest(request)){
+                try (var response = WebUtils.sendRequest(request)) {
                     validateResponse(response);
                     var report = WebUtils.parseResponse(response, AmazonSpReportRespVO.class);
                     return report.getReportId();
@@ -324,5 +373,43 @@ public class AmazonSpClient {
         var reportString = getReportOrNull(reportId);
         return reportString;
     }
+
+
+    public List<AmazonSpListingRepsVO.ProductItem> getProducts(List<String> marketplaceIds) {
+        List<AmazonSpListingRepsVO.ProductItem> allProducts = new ArrayList<>();
+        collectListingItems(allProducts, marketplaceIds, null, 4);
+        return allProducts;
+    }
+
+    /**
+     * 分页采集 Listing 数据
+     **/
+    private void collectListingItems(List<AmazonSpListingRepsVO.ProductItem> allProducts, List<String> marketplaceIds, String pageToken, Integer retryTimes) {
+
+        // 控制重试次数
+        if (retryTimes > 5) {
+            log.error("collectListingItems - mktId=" + marketplaceIds.get(0) + "@" + getAuth().getClientId() + " - pageToken=" + pageToken + " - retryTimes=" + retryTimes + " - 超过最大重试次数，不再继续执行");
+            return;
+        }
+
+        var reqVO = AmazonSpListingReqVO.builder()
+            .sellerId(getAuth().getSellerId())
+            .pageSize(20)
+            .pageToken(pageToken)
+            .marketplaceIds(marketplaceIds)
+//            .includedData(List.of(AmazonSpListingReqVO.IncludedData.RELATIONSHIPS, AmazonSpListingReqVO.IncludedData.ATTRIBUTES))
+            .build();
+        AmazonSpListingRepsVO amazonSpListingRepsVO = searchListingsItems(reqVO);
+
+        if (CollectionUtil.isNotEmpty(amazonSpListingRepsVO.getItems())) {
+            allProducts.addAll(amazonSpListingRepsVO.getItems());
+        }
+
+        // 如果有下一页则继续采集下一页
+        if (amazonSpListingRepsVO.getPagination() != null && StrUtils.isNonEmpty(amazonSpListingRepsVO.getPagination().getNextToken())) {
+            collectListingItems(allProducts, marketplaceIds, amazonSpListingRepsVO.getPagination().getNextToken(), retryTimes);
+        }
+    }
+
 }
 

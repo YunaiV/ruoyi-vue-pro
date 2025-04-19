@@ -12,16 +12,16 @@ public class ShopifyOrderDataJob extends ShopifyDataJob {
     public String execute(String param) throws Exception {
         setDate(param);
 
-        var result = shopifyService.client.getOrders();
+        var result = shopifyService.shopifyClients.get(0).getOrders();
         var data = OssData.builder()
-                .database(DATABASE)
-                .tableName("order")
-                .syncType("inc")
-                .requestTimestamp(System.currentTimeMillis())
-                .folderDate(beforeYesterday)
-                .content(result)
-                .headers(null)
-                .build();
+            .database(DATABASE)
+            .tableName("order")
+            .syncType("inc")
+            .requestTimestamp(System.currentTimeMillis())
+            .folderDate(beforeYesterday)
+            .content(result)
+            .headers(null)
+            .build();
         service.send(data);
 
         return "data upload success";

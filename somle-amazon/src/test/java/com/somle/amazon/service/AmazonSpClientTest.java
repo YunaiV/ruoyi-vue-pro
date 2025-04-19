@@ -1,17 +1,17 @@
 package com.somle.amazon.service;
 
-import com.somle.amazon.controller.vo.AmazonSpListingReqVO;
-import com.somle.amazon.controller.vo.AmazonSpOrderReqVO;
-import com.somle.amazon.controller.vo.AmazonSpReportReqVO;
-import com.somle.amazon.controller.vo.AmazonSpReportSaveVO;
-import com.somle.amazon.controller.vo.AmazonSpReportReqVO.ProcessingStatuses;
-import com.somle.amazon.model.enums.AmazonCountry;
 import cn.iocoder.yudao.framework.common.util.json.JSONObject;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import cn.iocoder.yudao.framework.test.core.ut.SomleBaseSpringTest;
+import com.somle.amazon.controller.vo.*;
+import com.somle.amazon.controller.vo.AmazonSpReportReqVO.ProcessingStatuses;
+import com.somle.amazon.model.enums.AmazonCountry;
+import com.somle.amazon.model.reps.AmazonSpListingRepsVO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import java.time.LocalDateTime;
@@ -32,7 +32,7 @@ class AmazonSpClientTest extends SomleBaseSpringTest {
 
     @BeforeEach
     void setUp() {
-        client = spService.clients.get(2);
+        client = spService.clients.get(0);
     }
 
 //    @Test
@@ -57,29 +57,27 @@ class AmazonSpClientTest extends SomleBaseSpringTest {
 
     @Test
     void getListing() {
-        var reqVO = AmazonSpListingReqVO.builder()
-            .sellerId(client.getAuth().getSellerId())
-            .marketplaceIds(List.of(AmazonCountry.findByCode("DE").getMarketplaceId()))
-            .includedData(List.of(AmazonSpListingReqVO.IncludedData.OFFERS))
-            .build();
-        var listing = client.searchListingsItems(reqVO);
-        log.info(listing);
+        AmazonSpMarketplaceParticipationVO marketplaceParticipations = client.getMarketplaceParticipations().get(0);
+        List<AmazonSpListingRepsVO.ProductItem> products = client.getProducts(List.of(marketplaceParticipations.getMarketplace().getId()));
+        log.info(products.toString());
     }
 
 
     @Test
     void getOrder() {
+        AmazonSpMarketplaceParticipationVO marketplaceParticipations = client.getMarketplaceParticipations().get(0);
         var vo = AmazonSpOrderReqVO.builder()
-                .createdAfter(LocalDateTime.of(2024,10,23,0,0))
-                .createdBefore(LocalDateTime.of(2024,10,24,0,0))
-                .marketplaceIds(List.of(AmazonCountry.findByCode("DE").getMarketplaceId()))
-                .build();
+            .createdAfter(LocalDateTime.of(2024, 10, 23, 0, 0))
+            .createdBefore(LocalDateTime.of(2024, 10, 24, 0, 0))
+            .marketplaceIds(List.of(marketplaceParticipations.getMarketplace().getId()))
+            .build();
         // assert url equals "https://sellingpartnerapi-eu.amazon.com/orders/v0/orders?CreatedAfter=2024-10-23T00%3A00%3A00&CreatedBefore=2024-10-24T00%3A00%3A00&MarketplaceIds=A1F83G8C2ARO7P"
         var report = client.getOrder(vo);
+        List<AmazonSpOrderRespVO> list = client.streamOrder(vo).toList();
         log.info(report.toString());
     }
 
-//    @Test
+    //    @Test
 //    void getOrder2() {
 //        var results = amazonService.spClient.getShops().map(shop -> {
 //            var startTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).minusMinutes(60);
@@ -112,14 +110,14 @@ class AmazonSpClientTest extends SomleBaseSpringTest {
     @Test
     void getAsinReport() {
         var options = AmazonSpReportSaveVO.ReportOptions.builder()
-                .asinGranularity("CHILD")
-                .dateGranularity("DAY")
-                .build();
+            .asinGranularity("CHILD")
+            .dateGranularity("DAY")
+            .build();
         var vo = AmazonSpReportSaveVO.builder()
-                .reportType("GET_SALES_AND_TRAFFIC_REPORT")
-                .marketplaceIds(List.of(AmazonCountry.findByCode("DE").getMarketplaceId()))
-                .reportOptions(options)
-                .build();
+            .reportType("GET_SALES_AND_TRAFFIC_REPORT")
+            .marketplaceIds(List.of(AmazonCountry.findByCode("DE").getMarketplaceId()))
+            .reportOptions(options)
+            .build();
         var reportString = client.createAndGetReport(vo);
         var report = JsonUtilsX.parseObject(reportString, JSONObject.class);
         log.info(report.toString());
@@ -134,8 +132,8 @@ class AmazonSpClientTest extends SomleBaseSpringTest {
         var vo = AmazonSpReportSaveVO.builder()
             .reportType("GET_FBA_STORAGE_FEE_CHARGES_DATA")
             .marketplaceIds(List.of(AmazonCountry.findByCode("CA").getMarketplaceId()))
-            .dataStartTime(LocalDateTime.of(2024,12,1,0,0).toString())
-            .dataEndTime(LocalDateTime.of(2025,1,2,0,0).toString())
+            .dataStartTime(LocalDateTime.of(2024, 12, 1, 0, 0).toString())
+            .dataEndTime(LocalDateTime.of(2025, 1, 2, 0, 0).toString())
 //            .marketplaceIds(List.of(AmazonCountry.findByCode("DE").getMarketplaceId()))
 //            .reportOptions(options)
             .build();
@@ -146,10 +144,10 @@ class AmazonSpClientTest extends SomleBaseSpringTest {
     @Test
     void listReports() {
         var vo = AmazonSpReportReqVO.builder()
-                .reportTypes(List.of("GET_FBA_STORAGE_FEE_CHARGES_DATA"))
-                .processingStatuses(List.of(ProcessingStatuses.DONE))
-                .pageSize(100)
-                .build();
+            .reportTypes(List.of("GET_FBA_STORAGE_FEE_CHARGES_DATA"))
+            .processingStatuses(List.of(ProcessingStatuses.DONE))
+            .pageSize(100)
+            .build();
         var reports = client.listReports(vo);
         for (var report : reports) {
             log.info(report.toString());
