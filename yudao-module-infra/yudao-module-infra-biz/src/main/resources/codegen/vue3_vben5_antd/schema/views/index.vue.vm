@@ -28,9 +28,12 @@ import { downloadByData } from '#/utils/download';
 
 import { useGridColumns, useGridFormSchema } from './data';
 
-#if ($table.templateType == 12) ## 内嵌情况
+#if ($table.templateType == 12 || $table.templateType == 11) ## 内嵌和erp情况
 /** 子表的列表 */
 const subTabsName = ref('$subClassNameVars.get(0)')
+#if ($table.templateType == 11)
+const select${simpleClassName} = ref<${simpleClassName}Api.${simpleClassName}>();
+#end
 #end
 
 const [FormModal, formModalApi] = useVbenModal({
@@ -127,7 +130,11 @@ const [Grid, gridApi] = useVbenVxeGrid({
   },
   gridOptions: {
     columns: useGridColumns(onActionClick),
+#if (${table.templateType} == 11)
+    height: '600px',
+#else
     height: 'auto',
+#end
 #if (${table.templateType} == 2)## 树表设置
   treeConfig: {
     parentField: '${treeParentColumn.javaField}',
@@ -164,12 +171,22 @@ const [Grid, gridApi] = useVbenVxeGrid({
     rowConfig: {
       keyField: 'id',
       isHover: true,
+#if (${table.templateType} == 11)
+      isCurrent: true,
+#end
     },
     toolbarConfig: {
       refresh: { code: 'query' },
       search: true,
     },
   } as VxeTableGridOptions<${simpleClassName}Api.${simpleClassName}>,
+#if (${table.templateType} == 11)
+  gridEvents:{
+    cellClick: ({ row }: { row: ${simpleClassName}Api.${simpleClassName}}) => {
+      select${simpleClassName}.value = row;
+    },
+  }
+#end
 });
 </script>
 
@@ -177,6 +194,9 @@ const [Grid, gridApi] = useVbenVxeGrid({
   <Page auto-content-height>
     <FormModal @success="onRefresh" />
 
+#if ($table.templateType == 11) ## erp情况
+  <div>
+#end
     <Grid table-title="${table.classComment}列表">
         #if ($table.templateType == 12) ## 内嵌情况
           <template #expand_content="{ row }">
@@ -214,5 +234,21 @@ const [Grid, gridApi] = useVbenVxeGrid({
         </Button>
       </template>
     </Grid>
+
+#if ($table.templateType == 11) ## erp情况
+    <!-- 子表的表单 -->
+    <Tabs v-model:active-key="subTabsName" class="mt-2">
+        #foreach ($subTable in $subTables)
+            #set ($index = $foreach.count - 1)
+            #set ($subClassNameVar = $subClassNameVars.get($index))
+            #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+            #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+          <Tabs.TabPane key="$subClassNameVar" tab="${subTable.classComment}" force-render>
+            <${subSimpleClassName}List :${subJoinColumn_strikeCase}="select${simpleClassName}?.id" />
+          </Tabs.TabPane>
+        #end
+    </Tabs>
+    </div>
+#end
   </Page>
 </template>
