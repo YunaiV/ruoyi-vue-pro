@@ -154,15 +154,15 @@ public class CodegenEngine {
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("api/api.ts"),
                     vue3FilePath("api/${table.moduleName}/${table.businessName}/index.ts"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("views/modules/form_sub_normal.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName}Form.vue"))
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("views/modules/form_sub_inner.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName}Form.vue"))
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("views/modules/form_sub_erp.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName}Form.vue"))
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-form.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("views/modules/list_sub_inner.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName}List.vue"))
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
             .put(CodegenFrontTypeEnum.VUE3_VBEN5_ANTD_SCHEMA.getType(), vue3Vben5AntdSchemaTemplatePath("views/modules/list_sub_erp.vue"),  // 特殊：主子表专属逻辑
-                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName}List.vue"))
+                    vue3FilePath("views/${table.moduleName}/${table.businessName}/modules/${subSimpleClassName_strikeCase}-list.vue"))
             .build();
 
     @Resource
@@ -451,6 +451,8 @@ public class CodegenEngine {
             filePath = StrUtil.replace(filePath, "${subTable.className}", subTable.getClassName());
             filePath = StrUtil.replace(filePath, "${subSimpleClassName}",
                     ((List<String>) bindingMap.get("subSimpleClassNames")).get(subIndex));
+            filePath = StrUtil.replace(filePath, "${subSimpleClassName_strikeCase}",
+                    ((List<String>) bindingMap.get("subSimpleClassName_strikeCases")).get(subIndex));
         }
         return filePath;
     }

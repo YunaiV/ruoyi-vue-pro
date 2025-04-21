@@ -10,7 +10,9 @@ import Form from './modules/form.vue';
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 11 || $table.templateType == 12 )
     #foreach ($subSimpleClassName in $subSimpleClassNames)
-    import ${subSimpleClassName}List from './modules/${subSimpleClassName}List.vue'
+    #set ($index = $foreach.count - 1)
+    #set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($index))
+    import ${subSimpleClassName}List from './modules/${subSimpleClassName_strikeCase}-list.vue'
     #end
 #end
 
@@ -54,12 +56,6 @@ function onRefresh() {
 #end
 }
 
-/** 导出表格 */
-async function onExport() {
-  const data = await export${simpleClassName}(await gridApi.formApi.getValues());
-  downloadByData(data, '${table.classComment}.xls');
-}
-
 /** 创建${table.classComment} */
 function onCreate() {
   formModalApi.setData({}).open();
@@ -96,6 +92,12 @@ async function onDelete(row: ${simpleClassName}Api.${simpleClassName}) {
   }
 }
 
+/** 导出表格 */
+async function onExport() {
+  const data = await export${simpleClassName}(await gridApi.formApi.getValues());
+  downloadByData(data, '${table.classComment}.xls');
+}
+
 /** 表格操作按钮的回调函数 */
 function onActionClick({
   code,
@@ -108,12 +110,12 @@ function onActionClick({
       break;
     }
   #end
-    case 'delete': {
-      onDelete(row);
-      break;
-    }
     case 'edit': {
       onEdit(row);
+      break;
+    }
+    case 'delete': {
+      onDelete(row);
       break;
     }
   }
@@ -179,7 +181,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
         #if ($table.templateType == 12) ## 内嵌情况
           <template #expand_content="{ row }">
             <!-- 子表的表单 -->
-            <Tabs v-model:active-key="subTabsName">
+            <Tabs v-model:active-key="subTabsName" class="mx-8">
                 #foreach ($subTable in $subTables)
                     #set ($index = $foreach.count - 1)
                     #set ($subClassNameVar = $subClassNameVars.get($index))

@@ -23,6 +23,7 @@ export namespace ${simpleClassName}Api {
       #end
     #end
   }
+
 #end
   /** ${table.classComment}信息 */
   export interface ${simpleClassName} {
@@ -104,6 +105,7 @@ export function export${simpleClassName}(params: any) {
 #set ($subClassNameVar = $subClassNameVars.get($index))
 
 // ==================== 子表（$subTable.classComment） ====================
+
 ## 情况一：MASTER_ERP 时，需要分查询页子表
 #if ( $table.templateType == 11 )
 /** 获得${subTable.classComment}分页 */

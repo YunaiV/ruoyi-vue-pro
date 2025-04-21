@@ -24,7 +24,7 @@ import { get${subSimpleClassName}By${SubJoinColumnName} } from '#/api/${table.mo
 #end
 
 const props = defineProps<{
-   ${subJoinColumn.javaField}?: any // ${subJoinColumn.columnComment}（主表的关联字段）
+   ${subJoinColumn.javaField}?: number // ${subJoinColumn.columnComment}（主表的关联字段）
 }>()
 
 #if ($subTable.subJoinMany) ## 一对多
@@ -41,7 +41,7 @@ function onActionClick({
   }
 }
 
-const [${subSimpleClassName}Grid, ${subClassNameVar}GridApi] = useVbenVxeGrid({
+const [Grid, gridApi] = useVbenVxeGrid({
 gridOptions: {
   columns: use${subSimpleClassName}GridEditColumns(onActionClick),
   border: true,
@@ -60,34 +60,25 @@ gridOptions: {
 },
 });
 
-/** 删除${subTable.classComment} */
-const onDelete =  async (row: ${simpleClassName}Api.${subSimpleClassName}) => {
-  await ${subClassNameVar}GridApi.grid.remove(row);
+/** 添加${subTable.classComment} */
+const onAdd = async () => {
+  await gridApi.grid.insertAt({} as ${simpleClassName}Api.${subSimpleClassName}, -1);
 }
 
-/** 添加${subTable.classComment} */
-const handleAdd = async () => {
-  await ${subClassNameVar}GridApi.grid.insertAt({} as ${simpleClassName}Api.${subSimpleClassName}, -1);
+/** 删除${subTable.classComment} */
+const onDelete =  async (row: ${simpleClassName}Api.${subSimpleClassName}) => {
+  await gridApi.grid.remove(row);
 }
 
 /** 提供获取表格数据的方法供父组件调用 */
 defineExpose({
   getData: (): ${simpleClassName}Api.${subSimpleClassName}[] => {
-    // 获取当前数据，但排除已删除的记录
-    const allData = ${subClassNameVar}GridApi.grid.getData();
-    const removedData = ${subClassNameVar}GridApi.grid.getRemoveRecords();
-    const removedIds = new Set(removedData.map((row) => row.id));
-
-    // 过滤掉已删除的记录
-    const currentData = allData.filter((row) => !removedIds.has(row.id));
-
-    // 获取新插入的记录并移除id
-    const insertedData = ${subClassNameVar}GridApi.grid.getInsertRecords().map((row) => {
-      delete row.id;
-      return row;
-    });
-
-    return [...currentData, ...insertedData];
+    const data = gridApi.grid.getData() as ${simpleClassName}Api.${subSimpleClassName}[];
+    const removeRecords = gridApi.grid.getRemoveRecords() as ${simpleClassName}Api.${subSimpleClassName}[];
+    const insertRecords = gridApi.grid.getInsertRecords() as ${simpleClassName}Api.${subSimpleClassName}[];
+    return data
+        .filter((row) => !removeRecords.some((removed) => removed.id === row.id))
+        .concat(insertRecords.map((row: any) => ({ ...row, id: undefined })));
   },
 });
 
@@ -98,14 +89,13 @@ watch(
       if (!val) {
         return;
       }
-
       await nextTick();
-      await ${subClassNameVar}GridApi.grid.loadData(await get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField}!));
+      await gridApi.grid.loadData(await get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField}!));
     },
     { immediate: true },
 );
 #else
-const [${subSimpleClassName}Form, ${subClassNameVar}FormApi] = useVbenForm({
+const [Form, formApi] = useVbenForm({
 layout: 'horizontal',
 schema: use${subSimpleClassName}FormSchema(),
 showDefaultActions: false
@@ -114,10 +104,10 @@ showDefaultActions: false
 /** 暴露出表单校验方法和表单值获取方法 */
 defineExpose({
   validate: async () => {
-    const { valid } = await ${subClassNameVar}FormApi.validate();
+    const { valid } = await formApi.validate();
     return valid;
   },
-  getValues: ${subClassNameVar}FormApi.getValues,
+  getValues: formApi.getValues,
 });
 
 /** 监听主表的关联字段的变化，加载对应的子表数据 */
@@ -127,9 +117,8 @@ watch(
       if (!val) {
         return;
       }
-
       await nextTick();
-      await ${subClassNameVar}FormApi.setValues(await get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField}!));
+      await formApi.setValues(await get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField}!));
     },
     { immediate: true },
 );
@@ -138,7 +127,7 @@ watch(
 
 <template>
 #if ($subTable.subJoinMany) ## 一对多
-  <${subSimpleClassName}Grid class="mx-4">
+  <Grid class="mx-4">
       #foreach($column in $subColumns)
           #if ($column.createOperation || $column.updateOperation)
               #set ($javaField = $column.javaField)
@@ -191,13 +180,13 @@ watch(
               #end
           #end
       #end
-  </${subSimpleClassName}Grid>
-  <div class="flex justify-center">
-    <Button :icon="h(Plus)" type="primary" ghost @click="handleAdd" v-access:code="['${subTable.moduleName}:${simpleClassName_strikeCase}:create']">
+  </Grid>
+  <div class="flex justify-center -mt-4">
+    <Button :icon="h(Plus)" type="primary" ghost @click="onAdd" v-access:code="['${subTable.moduleName}:${simpleClassName_strikeCase}:create']">
       {{ $t('ui.actionTitle.create', ['${subTable.classComment}']) }}
     </Button>
   </div>
 #else
-  <${subSimpleClassName}Form class="mx-4" />
+  <Form class="mx-4" />
 #end
 </template>

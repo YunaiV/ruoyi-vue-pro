@@ -28,7 +28,7 @@ import { get${subSimpleClassName}By${SubJoinColumnName} } from '#/api/${table.mo
 #end
 
 const props = defineProps<{
-      ${subJoinColumn.javaField}?: any // ${subJoinColumn.columnComment}（主表的关联字段）
+      ${subJoinColumn.javaField}?: number // ${subJoinColumn.columnComment}（主表的关联字段）
 }>()
 
 #if ($table.templateType == 11) ## erp
@@ -46,6 +46,7 @@ function onCreate() {
 function onEdit(row: ${simpleClassName}Api.${subSimpleClassName}) {
   formModalApi.setData(row).open();
 }
+
 /** 删除${subTable.classComment} */
 async function onDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
   const hideLoading = message.loading({
@@ -71,16 +72,17 @@ function onActionClick({
  row,
 }: OnActionClickParams<${simpleClassName}Api.${subSimpleClassName}>) {
   switch (code) {
-    case 'delete': {
-      onDelete(row);
-      break;
-    }
     case 'edit': {
       onEdit(row);
       break;
     }
+    case 'delete': {
+      onDelete(row);
+      break;
+    }
   }
 }
+
 #end
   const [Grid, gridApi] = useVbenVxeGrid({
     gridOptions: {
@@ -119,7 +121,6 @@ const onRefresh = async ()=> {
         if (!val) {
           return;
         }
-
         await nextTick();
         await onRefresh()
       },
@@ -128,18 +129,16 @@ const onRefresh = async ()=> {
 </script>
 
 <template>
-    <div class="mx-4">
-        #if ($table.templateType == 11) ## erp
-          <FormModal @success="onRefresh" />
-          <Grid table-title="${subTable.classComment}列表">
-            <template #toolbar-tools>
-              <Button :icon="h(Plus)" type="primary" @click="onCreate" v-access:code="['${subTable.moduleName}:${subSimpleClassName_strikeCase}:create']">
-                {{ $t('ui.actionTitle.create', ['${subTable.classComment}']) }}
-              </Button>
-            </template>
-          </Grid>
-        #else
-        <Grid table-title="${subTable.classComment}列表" />
-        #end
-    </div>
+    #if ($table.templateType == 11) ## erp
+      <FormModal @success="onRefresh" />
+      <Grid table-title="${subTable.classComment}列表">
+        <template #toolbar-tools>
+          <Button :icon="h(Plus)" type="primary" @click="onCreate" v-access:code="['${subTable.moduleName}:${subSimpleClassName_strikeCase}:create']">
+            {{ $t('ui.actionTitle.create', ['${subTable.classComment}']) }}
+          </Button>
+        </template>
+      </Grid>
+    #else
+      <Grid table-title="${subTable.classComment}列表" />
+    #end
 </template>
