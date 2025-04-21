@@ -88,7 +88,7 @@ export function useFormSchema(): VbenFormSchema[] {
         maxCount: 1,
       },
   #elseif($column.htmlType == "editor")## 文本编辑器
-      component: 'Editor',
+      component: 'RichTextarea',
   #elseif($column.htmlType == "select")## 下拉框
       component: 'Select',
       componentProps: {
@@ -279,6 +279,7 @@ export function useGridColumns(
     #set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
     #set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($index))
 // ==================== 子表（$subTable.classComment） ====================
+
 #if ($table.templateType == 11) ## erp 情况
 /** 新增/修改的表单 */
 export function use${subSimpleClassName}FormSchema(): VbenFormSchema[] {
@@ -331,7 +332,7 @@ export function use${subSimpleClassName}FormSchema(): VbenFormSchema[] {
                                     maxCount: 1,
                                 },
                             #elseif($column.htmlType == "editor")## 文本编辑器
-                                component: 'Editor',
+                                component: 'RichTextarea',
                             #elseif($column.htmlType == "select")## 下拉框
                                 component: 'Select',
                                 componentProps: {
@@ -391,6 +392,56 @@ export function use${subSimpleClassName}FormSchema(): VbenFormSchema[] {
         #end
     ];
 }
+
+/** 列表的搜索表单 */
+export function use${subSimpleClassName}GridFormSchema(): VbenFormSchema[] {
+    return [
+        #foreach($column in $subColumns)
+            #if ($column.listOperation)
+                #set ($dictType = $column.dictType)
+                #set ($javaType = $column.javaType)
+                #set ($javaField = $column.javaField)
+                #set ($comment = $column.columnComment)
+                #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+                    #set ($dictMethod = "number")
+                #elseif ($javaType == "String")
+                    #set ($dictMethod = "string")
+                #elseif ($javaType == "Boolean")
+                    #set ($dictMethod = "boolean")
+                #end
+                {
+                    fieldName: '${javaField}',
+                    label: '${comment}',
+                    #if ($column.htmlType == "input" || $column.htmlType == "textarea" || $column.htmlType == "editor")
+                        component: 'Input',
+                        componentProps: {
+                            allowClear: true,
+                            placeholder: '请输入${comment}',
+                        },
+                    #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
+                        component: 'Select',
+                        componentProps: {
+                            allowClear: true,
+                            #if ("" != $dictType)## 设置了 dictType 数据字典的情况
+                                options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
+                            #else## 未设置 dictType 数据字典的情况
+                                options: [],
+                            #end
+                            placeholder: '请选择${comment}',
+                        },
+                    #elseif($column.htmlType == "datetime")
+                        component: 'RangePicker',
+                        componentProps: {
+                            ...getRangePickerDefaultProps(),
+                            allowClear: true,
+                        },
+                    #end
+                },
+            #end
+        #end
+    ];
+}
+
 /** 列表的字段 */
 export function use${subSimpleClassName}GridColumns(
     onActionClick?: OnActionClickFn<${simpleClassName}Api.${subSimpleClassName}>,
@@ -434,17 +485,18 @@ export function use${subSimpleClassName}GridColumns(
                 options: [
                     {
                         code: 'edit',
-                        show: hasAccessByCodes(['${subTable.moduleName}:${subSimpleClassName_strikeCase}:update']),
+                        show: hasAccessByCodes(['${table.moduleName}:${simpleClassName_strikeCase}:update']),
                     },
                     {
                         code: 'delete',
-                        show: hasAccessByCodes(['${subTable.moduleName}:${subSimpleClassName_strikeCase}:delete']),
+                        show: hasAccessByCodes(['${table.moduleName}:${simpleClassName_strikeCase}:delete']),
                     },
                 ],
             },
         },
     ];
 }
+
 #else
     #if ($subTable.subJoinMany) ## 一对多
     /** 新增/修改列表的字段 */
@@ -510,6 +562,7 @@ export function use${subSimpleClassName}GridColumns(
             },
         ];
     }
+
     #else
     /** 新增/修改的表单 */
     export function use${subSimpleClassName}FormSchema(): VbenFormSchema[] {
@@ -562,7 +615,7 @@ export function use${subSimpleClassName}GridColumns(
                                         maxCount: 1,
                                     },
                                 #elseif($column.htmlType == "editor")## 文本编辑器
-                                    component: 'Editor',
+                                    component: 'RichTextarea',
                                 #elseif($column.htmlType == "select")## 下拉框
                                     component: 'Select',
                                     componentProps: {
@@ -622,6 +675,7 @@ export function use${subSimpleClassName}GridColumns(
             #end
         ];
     }
+
     #end
     #if ($table.templateType == 12) ## 内嵌情况
     /** 列表的字段 */
@@ -649,6 +703,7 @@ export function use${subSimpleClassName}GridColumns(
             #end
         ];
     }
+
     #end
 #end
 #end

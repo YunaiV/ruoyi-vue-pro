@@ -6,7 +6,9 @@ import { message, Tabs, Checkbox, Input, Textarea, Select,RadioGroup,CheckboxGro
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 10 || $table.templateType == 12 )
   #foreach ($subSimpleClassName in $subSimpleClassNames)
-  import ${subSimpleClassName}Form from './${subSimpleClassName}Form.vue'
+  #set ($index = $foreach.count - 1)
+  #set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($index))
+  import ${subSimpleClassName}Form from './${subSimpleClassName_strikeCase}-form.vue'
   #end
 #end
 
@@ -125,9 +127,7 @@ const [Modal, modalApi] = useVbenModal({
     if (!data) {
       return;
     }
-
     if (data.id) {
-      // 编辑
       modalApi.lock();
       try {
         data = await get${simpleClassName}(data.id);
