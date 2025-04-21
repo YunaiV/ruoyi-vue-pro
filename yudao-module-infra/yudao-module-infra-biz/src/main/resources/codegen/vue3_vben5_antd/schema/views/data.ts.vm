@@ -75,7 +75,7 @@ export function useFormSchema(): VbenFormSchema[] {
       componentProps: {
         placeholder: '请输入${comment}',
       },
-  #elseif($column.htmlType == "imageUpload")## 图片上传
+  #elseif($column.htmlType == "imageUpload")## 图片上传 TODO @puhui999：目前分成了图片和文件上传，可以不用 fileType 之类哈，可以用下；
       component: 'FileUpload',
       componentProps: {
         fileType: 'image',
