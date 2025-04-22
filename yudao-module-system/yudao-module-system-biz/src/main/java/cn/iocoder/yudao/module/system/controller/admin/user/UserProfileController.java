@@ -79,6 +79,7 @@ public class UserProfileController {
         return success(true);
     }
 
+    @Deprecated // TODO @芋艿：逐步替换到 updateUserProfile 接口
     @RequestMapping(value = "/update-avatar",
             method = {RequestMethod.POST, RequestMethod.PUT}) // 解决 uni-app 不支持 Put 上传文件的问题
     @Operation(summary = "上传用户个人头像")
