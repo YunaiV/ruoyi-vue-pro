@@ -3,11 +3,20 @@ import type { OnActionClickParams, VxeTableGridOptions } from '#/adapter/vxe-tab
 import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 
 import { Page, useVbenModal } from '@vben/common-ui';
-import { Button, message } from 'ant-design-vue';
+import { Button, message,Tabs } from 'ant-design-vue';
 import { Download, Plus } from '@vben/icons';
 import Form from './modules/form.vue';
 
-import { ref } from 'vue';
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 11 || $table.templateType == 12 )
+    #foreach ($subSimpleClassName in $subSimpleClassNames)
+    #set ($index = $foreach.count - 1)
+    #set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($index))
+    import ${subSimpleClassName}List from './modules/${subSimpleClassName_strikeCase}-list.vue'
+    #end
+#end
+
+import { ref, h } from 'vue';
 import { $t } from '#/locales';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 #if (${table.templateType} == 2)## 树表接口
@@ -18,6 +27,14 @@ import { get${simpleClassName}Page, delete${simpleClassName}, export${simpleClas
 import { downloadByData } from '#/utils/download';
 
 import { useGridColumns, useGridFormSchema } from './data';
+
+#if ($table.templateType == 12 || $table.templateType == 11) ## 内嵌和erp情况
+/** 子表的列表 */
+const subTabsName = ref('$subClassNameVars.get(0)')
+#if ($table.templateType == 11)
+const select${simpleClassName} = ref<${simpleClassName}Api.${simpleClassName}>();
+#end
+#end
 
 const [FormModal, formModalApi] = useVbenModal({
   connectedComponent: Form,
@@ -35,18 +52,16 @@ function toggleExpand() {
 
 /** 刷新表格 */
 function onRefresh() {
+#if ($table.templateType == 12) ## 内嵌情况
+  gridApi.reload();
+#else
   gridApi.query();
-}
-
-/** 导出表格 */
-async function onExport() {
-  const data = await export${simpleClassName}(await gridApi.formApi.getValues());
-  downloadByData(data, '${table.classComment}.xls');
+#end
 }
 
 /** 创建${table.classComment} */
 function onCreate() {
-  formModalApi.setData(null).open();
+  formModalApi.setData({}).open();
 }
 
 /** 编辑${table.classComment} */
@@ -56,7 +71,7 @@ function onEdit(row: ${simpleClassName}Api.${simpleClassName}) {
 
 #if (${table.templateType} == 2)## 树表特有：新增下级
 /** 新增下级${table.classComment} */
-function onAddChild(row: ${simpleClassName}Api.${simpleClassName}) {
+function onAppend(row: ${simpleClassName}Api.${simpleClassName}) {
   formModalApi.setData({ ${treeParentColumn.javaField}: row.id }).open();
 }
 #end
@@ -80,12 +95,24 @@ async function onDelete(row: ${simpleClassName}Api.${simpleClassName}) {
   }
 }
 
+/** 导出表格 */
+async function onExport() {
+  const data = await export${simpleClassName}(await gridApi.formApi.getValues());
+  downloadByData(data, '${table.classComment}.xls');
+}
+
 /** 表格操作按钮的回调函数 */
 function onActionClick({
   code,
   row,
 }: OnActionClickParams<${simpleClassName}Api.${simpleClassName}>) {
   switch (code) {
+  #if (${table.templateType} == 2)## 树表特有：新增下级
+    case 'append': {
+      onAppend(row);
+      break;
+    }
+  #end
     case 'edit': {
       onEdit(row);
       break;
@@ -94,12 +121,6 @@ function onActionClick({
       onDelete(row);
       break;
     }
-#if (${table.templateType} == 2)## 树表特有：新增下级
-    case 'add_child': {
-      onAddChild(row);
-      break;
-    }
-#end
   }
 }
 
@@ -109,7 +130,11 @@ const [Grid, gridApi] = useVbenVxeGrid({
   },
   gridOptions: {
     columns: useGridColumns(onActionClick),
+#if (${table.templateType} == 11)
+    height: '600px',
+#else
     height: 'auto',
+#end
 #if (${table.templateType} == 2)## 树表设置
   treeConfig: {
     parentField: '${treeParentColumn.javaField}',
@@ -134,12 +159,11 @@ const [Grid, gridApi] = useVbenVxeGrid({
         },
 #else## 标准表数据加载
         query: async ({ page }, formValues) => {
-          const { items, total } = await get${simpleClassName}Page({
+          return await get${simpleClassName}Page({
             pageNo: page.currentPage,
             pageSize: page.pageSize,
             ...formValues,
           });
-          return { items, total };
         },
 #end
       },
@@ -147,12 +171,22 @@ const [Grid, gridApi] = useVbenVxeGrid({
     rowConfig: {
       keyField: 'id',
       isHover: true,
+#if (${table.templateType} == 11)
+      isCurrent: true,
+#end
     },
     toolbarConfig: {
       refresh: { code: 'query' },
       search: true,
     },
   } as VxeTableGridOptions<${simpleClassName}Api.${simpleClassName}>,
+#if (${table.templateType} == 11)
+  gridEvents:{
+    cellClick: ({ row }: { row: ${simpleClassName}Api.${simpleClassName}}) => {
+      select${simpleClassName}.value = row;
+    },
+  }
+#end
 });
 </script>
 
@@ -160,22 +194,61 @@ const [Grid, gridApi] = useVbenVxeGrid({
   <Page auto-content-height>
     <FormModal @success="onRefresh" />
 
+#if ($table.templateType == 11) ## erp情况
+  <div>
+#end
     <Grid table-title="${table.classComment}列表">
+        #if ($table.templateType == 12) ## 内嵌情况
+          <template #expand_content="{ row }">
+            <!-- 子表的表单 -->
+            <Tabs v-model:active-key="subTabsName" class="mx-8">
+                #foreach ($subTable in $subTables)
+                    #set ($index = $foreach.count - 1)
+                    #set ($subClassNameVar = $subClassNameVars.get($index))
+                    #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+                    #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+                  <Tabs.TabPane key="$subClassNameVar" tab="${subTable.classComment}" force-render>
+                    <${subSimpleClassName}List :${subJoinColumn_strikeCase}="row?.id" />
+                  </Tabs.TabPane>
+                #end
+            </Tabs>
+          </template>
+        #end
       <template #toolbar-tools>
 #if (${table.templateType} == 2)## 树表特有：展开/收缩按钮
         <Button @click="toggleExpand" class="mr-2">
           {{ isExpanded ? '收缩' : '展开' }}
         </Button>
 #end
-        <Button type="primary" @click="onCreate" v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:create']">
-          <Plus class="size-5" />
+        <Button :icon="h(Plus)" type="primary" @click="onCreate" v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:create']">
           {{ $t('ui.actionTitle.create', ['${table.classComment}']) }}
         </Button>
-        <Button type="primary" class="ml-2" @click="onExport" v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:export']">
-          <Download class="size-5" />
+        <Button
+          :icon="h(Download)"
+          type="primary"
+          class="ml-2"
+          @click="onExport"
+          v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:export']"
+        >
           {{ $t('ui.actionTitle.export') }}
         </Button>
       </template>
     </Grid>
+
+#if ($table.templateType == 11) ## erp情况
+    <!-- 子表的表单 -->
+    <Tabs v-model:active-key="subTabsName" class="mt-2">
+        #foreach ($subTable in $subTables)
+            #set ($index = $foreach.count - 1)
+            #set ($subClassNameVar = $subClassNameVars.get($index))
+            #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+            #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+          <Tabs.TabPane key="$subClassNameVar" tab="${subTable.classComment}" force-render>
+            <${subSimpleClassName}List :${subJoinColumn_strikeCase}="select${simpleClassName}?.id" />
+          </Tabs.TabPane>
+        #end
+    </Tabs>
+    </div>
+#end
   </Page>
 </template>

@@ -55,21 +55,5 @@ public class UserProfileRespVO {
      * 所属岗位数组
      */
     private List<PostSimpleRespVO> posts;
-    /**
-     * 社交用户数组
-     */
-    private List<SocialUser> socialUsers;
-
-    @Schema(description = "社交用户")
-    @Data
-    public static class SocialUser {
-
-        @Schema(description = "社交平台的类型，参见 SocialTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
-        private Integer type;
-
-        @Schema(description = "社交用户的 openid", requiredMode = Schema.RequiredMode.REQUIRED, example = "IPRmJ0wvBptiPIlGEZiPewGwiEiE")
-        private String openid;
-
-    }
 
 }

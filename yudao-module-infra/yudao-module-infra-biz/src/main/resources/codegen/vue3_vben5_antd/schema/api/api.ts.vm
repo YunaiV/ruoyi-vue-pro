@@ -4,6 +4,27 @@ import { requestClient } from '#/api/request';
 #set ($baseURL = "/${table.moduleName}/${simpleClassName_strikeCase}")
 
 export namespace ${simpleClassName}Api {
+## 特殊：主子表专属逻辑
+#foreach ($subTable in $subTables)
+  #set ($index = $foreach.count - 1)
+  #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+  #set ($subColumns = $subColumnsList.get($index))##当前字段数组
+  /** ${subTable.classComment}信息 */
+  export interface ${subSimpleClassName} {
+    #foreach ($column in $subColumns)
+      #if ($column.createOperation || $column.updateOperation)
+        #if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "short" || ${column.javaType.toLowerCase()} == "double" || ${column.javaType.toLowerCase()} == "bigdecimal")
+            ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: number; // ${column.columnComment}
+        #elseif(${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdate" || ${column.javaType.toLowerCase()} == "localdatetime")
+            ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: Date; // ${column.columnComment}
+        #else
+            ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: ${column.javaType.toLowerCase()}; // ${column.columnComment}
+        #end
+      #end
+    #end
+  }
+
+#end
   /** ${table.classComment}信息 */
   export interface ${simpleClassName} {
 #foreach ($column in $columns)
@@ -19,6 +40,18 @@ export namespace ${simpleClassName}Api {
 #end
 #if ( $table.templateType == 2 )
   children?: ${simpleClassName}[];
+#end
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 10 || $table.templateType == 12 )
+  #foreach ($subTable in $subTables)
+    #set ($index = $foreach.count - 1)
+    #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+    #if ( $subTable.subJoinMany )
+        ${subSimpleClassName.toLowerCase()}s?: ${subSimpleClassName}[]
+    #else
+        ${subSimpleClassName.toLowerCase()}?: ${subSimpleClassName}
+    #end
+  #end
 #end
   }
 }
@@ -72,35 +105,36 @@ export function export${simpleClassName}(params: any) {
 #set ($subClassNameVar = $subClassNameVars.get($index))
 
 // ==================== 子表（$subTable.classComment） ====================
+
 ## 情况一：MASTER_ERP 时，需要分查询页子表
 #if ( $table.templateType == 11 )
 /** 获得${subTable.classComment}分页 */
 export function get${subSimpleClassName}Page(params: PageParam) {
-  return requestClient.get<PageResult<${simpleClassName}Api.${simpleClassName}>>(`${baseURL}/${subSimpleClassName_strikeCase}/page`, { params });
+  return requestClient.get<PageResult<${simpleClassName}Api.${subSimpleClassName}>>(`${baseURL}/${subSimpleClassName_strikeCase}/page`, { params });
 }
 ## 情况二：非 MASTER_ERP 时，需要列表查询子表
 #else
   #if ( $subTable.subJoinMany )
 /** 获得${subTable.classComment}列表 */
 export function get${subSimpleClassName}ListBy${SubJoinColumnName}(${subJoinColumn.javaField}: number) {
-  return requestClient.get<${simpleClassName}Api.${simpleClassName}[]>(`${baseURL}/${subSimpleClassName_strikeCase}/list-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=${${subJoinColumn.javaField}}`);
+  return requestClient.get<${simpleClassName}Api.${subSimpleClassName}[]>(`${baseURL}/${subSimpleClassName_strikeCase}/list-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=${${subJoinColumn.javaField}}`);
 }
   #else
 /** 获得${subTable.classComment} */
 export function get${subSimpleClassName}By${SubJoinColumnName}(${subJoinColumn.javaField}: number) {
-  return requestClient.get<${simpleClassName}Api.${simpleClassName}>(`${baseURL}/${subSimpleClassName_strikeCase}/get-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=${${subJoinColumn.javaField}}`);
+  return requestClient.get<${simpleClassName}Api.${subSimpleClassName}>(`${baseURL}/${subSimpleClassName_strikeCase}/get-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=${${subJoinColumn.javaField}}`);
 }
   #end
 #end
 ## 特殊：MASTER_ERP 时，支持单个的新增、修改、删除操作
 #if ( $table.templateType == 11 )
 /** 新增${subTable.classComment} */
-export function create${subSimpleClassName}(data: ${simpleClassName}Api.${simpleClassName}) {
+export function create${subSimpleClassName}(data: ${simpleClassName}Api.${subSimpleClassName}) {
   return requestClient.post(`${baseURL}/${subSimpleClassName_strikeCase}/create`, data);
 }
 
 /** 修改${subTable.classComment} */
-export function update${subSimpleClassName}(data: ${simpleClassName}Api.${simpleClassName}) {
+export function update${subSimpleClassName}(data: ${simpleClassName}Api.${subSimpleClassName}) {
   return requestClient.put(`${baseURL}/${subSimpleClassName_strikeCase}/update`, data);
 }
 
@@ -111,7 +145,7 @@ export function delete${subSimpleClassName}(id: number) {
 
 /** 获得${subTable.classComment} */
 export function get${subSimpleClassName}(id: number) {
-  return requestClient.get<${simpleClassName}Api.${simpleClassName}>(`${baseURL}/${subSimpleClassName_strikeCase}/get?id=${id}`);
+  return requestClient.get<${simpleClassName}Api.${subSimpleClassName}>(`${baseURL}/${subSimpleClassName_strikeCase}/get?id=${id}`);
 }
 #end
 #end
