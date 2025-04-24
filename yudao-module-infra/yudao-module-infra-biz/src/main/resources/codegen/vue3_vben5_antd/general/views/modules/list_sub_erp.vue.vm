@@ -3,181 +3,182 @@
 #set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
 #set ($subSimpleClassName = $subSimpleClassNames.get($subIndex))
 #set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
+#set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($subIndex))
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
-<template>
-  <!-- 列表 -->
-  <ContentWrap>
-#if ($table.templateType == 11)
-    <Button
-      type="primary"
-      @click="openForm('create')"
-      v-hasPermi="['${permissionPrefix}:create']"
-    >
-      <Icon icon="ep:plus" class="mr-5px" /> 新增
-    </Button>
-#end
-    <Table :loading="loading" :dataSource="list" :rowKey="(record) => record.id" :bordered="true">
-      #foreach($column in $subColumns)
-      #if ($column.listOperationResult)
-        #set ($dictType=$column.dictType)
-        #set ($javaField = $column.javaField)
-        #set ($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-        #set ($comment=$column.columnComment)
-        #if ( $column.id == $subJoinColumn.id) ## 特殊：忽略主子表的 join 字段，不用填写
-        #elseif ($column.javaType == "LocalDateTime")## 时间类型
-      <Column
-        title="${comment}"
-        align="center"
-        dataIndex="${javaField}"
-        :customRender="({ text }) => dateFormatter(text)"
-        width="180px"
-      />
-        #elseif($column.dictType && "" != $column.dictType)## 数据字典
-      <Column title="${comment}" align="center" dataIndex="${javaField}">
-        <template #customRender="{ text }">
-          <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="text" />
-        </template>
-      </Column>
-        #else
-      <Column title="${comment}" align="center" dataIndex="${javaField}" />
-        #end
-      #end
-    #end
-    #if ($table.templateType == 11)
-      <Column title="操作" align="center">
-        <template #customRender="{ record }">
-          <Button
-            type="link"
-            @click="openForm('update', record.id)"
-            v-hasPermi="['${permissionPrefix}:update']"
-          >
-            编辑
-          </Button>
-          <Button
-            type="link"
-            danger
-            @click="handleDelete(record.id)"
-            v-hasPermi="['${permissionPrefix}:delete']"
-          >
-            删除
-          </Button>
-        </template>
-      </Column>
-    #end
-    </Table>
-    #if ($table.templateType == 11)
-    <!-- 分页 -->
-    <Pagination
-      :total="total"
-      v-model:current="queryParams.pageNo"
-      v-model:pageSize="queryParams.pageSize"
-      @change="handleQuery"
-    />
-    #end
-  </ContentWrap>
-#if ($table.templateType == 11)
-    <!-- 表单弹窗：添加/修改 -->
-    <${subSimpleClassName}Form ref="formRef" @success="getList" />
-#end
-</template>
-<script setup lang="ts">
-import { Table, Column, Button, Pagination } from 'ant-design-vue'
-import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
-import { dateFormatter } from '@/utils/formatTime'
-import { ${simpleClassName}Api } from '@/api/${table.moduleName}/${table.businessName}'
-#if ($table.templateType == 11)
-import ${subSimpleClassName}Form from './${subSimpleClassName}Form.vue'
-#end
+<script lang="ts" setup>
+  import type { OnActionClickParams, VxeTableGridOptions } from '#/adapter/vxe-table';
+  import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 
-const { t } = useI18n() // 国际化
-const message = useMessage() // 消息弹窗
+#if ($table.templateType == 11) ## erp
+  import ${subSimpleClassName}Form from './${subSimpleClassName_strikeCase}-form.vue'
+#end
+  import { useVbenModal } from '@vben/common-ui';
+  import { Button, message } from 'ant-design-vue';
+  import { Plus } from '@vben/icons';
+  import { #if($table.templateType != 11)ref,#end h, nextTick,watch } from 'vue';
+  import { $t } from '#/locales';
+  import { useVbenVxeGrid } from '#/adapter/vxe-table';
+
+
+#if ($table.templateType == 11) ## erp
+  import { delete${subSimpleClassName}, get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+  import { use${subSimpleClassName}GridFormSchema, use${subSimpleClassName}GridColumns } from '../data';
+  #else
+  #if ($subTable.subJoinMany) ## 一对多
+  import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+  #else
+  import { get${subSimpleClassName}By${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+  #end
+  import { use${subSimpleClassName}GridColumns } from '../data';
+#end
 
 const props = defineProps<{
-  ${subJoinColumn.javaField}?: number // ${subJoinColumn.columnComment}（主表的关联字段）
+      ${subJoinColumn.javaField}?: number // ${subJoinColumn.columnComment}（主表的关联字段）
 }>()
-const loading = ref(false) // 列表的加载中
-const list = ref([]) // 列表的数据
-#if ($table.templateType == 11)
-const total = ref(0) // 列表的总页数
-const queryParams = reactive({
-  pageNo: 1,
-  pageSize: 10,
-  ${subJoinColumn.javaField}: undefined as unknown
-})
 
-/** 监听主表的关联字段的变化，加载对应的子表数据 */
-watch(
-  () => props.${subJoinColumn.javaField},
-  (val: number) => {
-    if (!val) {
-      return
-    }
-    queryParams.${subJoinColumn.javaField} = val
-    handleQuery()
-  },
-    { immediate: true, deep: true }
-)
-#end
+#if ($table.templateType == 11) ## erp
+  const [FormModal, formModalApi] = useVbenModal({
+    connectedComponent: ${subSimpleClassName}Form,
+    destroyOnClose: true,
+  });
 
-/** 查询列表 */
-const getList = async () => {
-  loading.value = true
-  try {
-#if ($table.templateType == 11)
-    const data = await ${simpleClassName}Api.get${subSimpleClassName}Page(queryParams)
-    list.value = data.list
-    total.value = data.total
-#else
-  #if ( $subTable.subJoinMany )
-    list.value = await ${simpleClassName}Api.get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField})
-  #else
-    const data = await ${simpleClassName}Api.get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField})
-    if (!data) {
-      return
-    }
-    list.value.push(data)
-  #end
-#end
-  } finally {
-    loading.value = false
-  }
-}
-
-/** 搜索按钮操作 */
-const handleQuery = () => {
-  queryParams.pageNo = 1
-  getList()
-}
-#if ($table.templateType == 11)
-
-/** 添加/修改操作 */
-const formRef = ref()
-const openForm = (type: string, id?: number) => {
-  if (!props.${subJoinColumn.javaField}) {
-    message.error('请选择一个${table.classComment}')
+/** 创建${subTable.classComment} */
+function onCreate() {
+  if (!props.${subJoinColumn.javaField}){
+    message.warning("请先选择一个${table.classComment}!")
     return
   }
-  formRef.value.open(type, id, props.${subJoinColumn.javaField})
+  formModalApi.setData({${subJoinColumn.javaField}: props.${subJoinColumn.javaField}}).open();
 }
 
-/** 删除按钮操作 */
-const handleDelete = async (id: number) => {
+/** 编辑${subTable.classComment} */
+function onEdit(row: ${simpleClassName}Api.${subSimpleClassName}) {
+  formModalApi.setData(row).open();
+}
+
+/** 删除${subTable.classComment} */
+async function onDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
+  const hideLoading = message.loading({
+    content: $t('ui.actionMessage.deleting', [row.id]),
+    duration: 0,
+    key: 'action_process_msg',
+  });
   try {
-    // 删除的二次确认
-    await message.delConfirm()
-    // 发起删除
-    await ${simpleClassName}Api.delete${subSimpleClassName}(id)
-    message.success(t('common.delSuccess'))
-    // 刷新列表
-    await getList()
-  } catch {}
+    await delete${subSimpleClassName}(row.id as number);
+    message.success({
+      content: $t('ui.actionMessage.deleteSuccess', [row.id]),
+      key: 'action_process_msg',
+    });
+    onRefresh();
+  } catch {
+    hideLoading();
+  }
 }
-#end
-#if ($table.templateType != 11)
 
-/** 初始化 **/
-onMounted(() => {
-  getList()
-})
+/** 表格操作按钮的回调函数 */
+function onActionClick({
+ code,
+ row,
+}: OnActionClickParams<${simpleClassName}Api.${subSimpleClassName}>) {
+  switch (code) {
+    case 'edit': {
+      onEdit(row);
+      break;
+    }
+    case 'delete': {
+      onDelete(row);
+      break;
+    }
+  }
+}
+
 #end
+  const [Grid, gridApi] = useVbenVxeGrid({
+#if ($table.templateType == 11)
+    formOptions: {
+      schema: use${subSimpleClassName}GridFormSchema(),
+    },
+#end
+    gridOptions: {
+#if ($table.templateType == 11)
+    columns: use${subSimpleClassName}GridColumns(onActionClick),
+      proxyConfig: {
+        ajax: {
+          query: async ({ page }, formValues) => {
+              if (!props.${subJoinColumn.javaField}){
+                  return []
+              }
+            return await get${subSimpleClassName}Page({
+              pageNo: page.currentPage,
+              pageSize: page.pageSize,
+              ${subJoinColumn.javaField}: props.${subJoinColumn.javaField},
+              ...formValues,
+            });
+          },
+        },
+      },
+    pagerConfig: {
+        enabled: true,
+    },
+    toolbarConfig: {
+        refresh: { code: 'query' },
+        search: true,
+    },
+#else
+    columns: use${subSimpleClassName}GridColumns(),
+    pagerConfig: {
+        enabled: false,
+    },
+    toolbarConfig: {
+        enabled: false,
+    },
+#end
+    height: '600px',
+    rowConfig: {
+        keyField: 'id',
+        isHover: true,
+    },
+    } as VxeTableGridOptions<${simpleClassName}Api.${subSimpleClassName}>,
+  });
+
+/** 刷新表格 */
+const onRefresh = async ()=> {
+#if ($table.templateType == 11) ## erp
+    await gridApi.query();
+#else
+    #if ($subTable.subJoinMany) ## 一对多
+    await gridApi.grid.loadData(await get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField}!));
+    #else
+    await gridApi.grid.loadData([await get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField}!)]);
+    #end
+#end
+}
+
+  /** 监听主表的关联字段的变化，加载对应的子表数据 */
+  watch(
+      () => props.${subJoinColumn.javaField},
+      async (val) => {
+        if (!val) {
+          return;
+        }
+        await nextTick();
+        await onRefresh()
+      },
+      { immediate: true },
+  );
 </script>
+
+<template>
+    #if ($table.templateType == 11) ## erp
+      <FormModal @success="onRefresh" />
+      <Grid table-title="${subTable.classComment}列表">
+        <template #toolbar-tools>
+          <Button :icon="h(Plus)" type="primary" @click="onCreate" v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:create']">
+            {{ $t('ui.actionTitle.create', ['${subTable.classComment}']) }}
+          </Button>
+        </template>
+      </Grid>
+    #else
+      <Grid table-title="${subTable.classComment}列表" />
+    #end
+</template>
