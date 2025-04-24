@@ -1,0 +1,362 @@
+#set ($subTable = $subTables.get($subIndex))##当前表
+#set ($subColumns = $subColumnsList.get($subIndex))##当前字段数组
+#set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
+#set ($subSimpleClassName = $subSimpleClassNames.get($subIndex))
+#set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
+#set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+<template>
+#if ( $subTable.subJoinMany )## 情况一：一对多，table + form
+  <Form
+    ref="formRef"
+    :model="formData"
+    :rules="formRules"
+    :loading="formLoading"
+    label-col="{ span: 0 }"
+  >
+    <Table :dataSource="formData" class="-mt-10px">
+      <Column title="序号" width="100">
+        <template #customRender="{ index }">
+          {{ index + 1 }}
+        </template>
+      </Column>
+#foreach($column in $subColumns)
+    #if ($column.createOperation || $column.updateOperation)
+        #set ($dictType = $column.dictType)
+        #set ($javaField = $column.javaField)
+        #set ($javaType = $column.javaType)
+        #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+        #set ($comment = $column.columnComment)
+        #set ($dictMethod = "getDictOptions")## 计算使用哪个 dict 字典方法
+        #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+            #set ($dictMethod = "getIntDictOptions")
+        #elseif ($javaType == "String")
+            #set ($dictMethod = "getStrDictOptions")
+        #elseif ($javaType == "Boolean")
+            #set ($dictMethod = "getBoolDictOptions")
+        #end
+        #if ( $column.id == $subJoinColumn.id) ## 特殊：忽略主子表的 join 字段，不用填写
+        #elseif ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里
+      <Column title="${comment}" :minWidth="150">
+        <template #customRender="{ record, index }">
+          <FormItem :name="[index, '${javaField}']" :rules="formRules.${javaField}" class="mb-0px!">
+            <Input v-model:value="record.${javaField}" placeholder="请输入${comment}" />
+          </FormItem>
+        </template>
+      </Column>
+        #elseif($column.htmlType == "imageUpload")## 图片上传
+      <Column title="${comment}" :minWidth="200">
+        <template #customRender="{ record, index }">
+          <FormItem :name="[index, '${javaField}']" :rules="formRules.${javaField}" class="mb-0px!">
+            <UploadImg v-model:value="record.${javaField}" />
+          </FormItem>
+        </template>
+      </Column>
+        #elseif($column.htmlType == "fileUpload")## 文件上传
+      <Column title="${comment}" :minWidth="200">
+        <template #customRender="{ record, index }">
+          <FormItem :name="[index, '${javaField}']" :rules="formRules.${javaField}" class="mb-0px!">
+            <UploadFile v-model:value="record.${javaField}" />
+          </FormItem>
+        </template>
+      </Column>
+        #elseif($column.htmlType == "editor")## 文本编辑器
+      <Column title="${comment}" :minWidth="400">
+        <template #customRender="{ record, index }">
+          <FormItem :name="[index, '${javaField}']" :rules="formRules.${javaField}" class="mb-0px!">
+            <Editor v-model:value="record.${javaField}" height="150px" />
+          </FormItem>
+        </template>
+      </Column>
+        #elseif($column.htmlType == "select")## 下拉框
+      <Column title="${comment}" :minWidth="150">
+        <template #customRender="{ record, index }">
+          <FormItem :name="[index, '${javaField}']" :rules="formRules.${javaField}" class="mb-0px!">
+            <Select v-model:value="record.${javaField}" placeholder="请选择${comment}">
+              #if ("" != $dictType)## 有数据字典
+                <SelectOption
+                  v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
+                  :key="dict.value"
+                  :label="dict.label"
+                  :value="dict.value"
+                />
+              #else##没数据字典
+                <SelectOption label="请选择字典生成" value="" />
+              #end
+            </Select>
+          </FormItem>
+        </template>
+      </Column>
+        #elseif($column.htmlType == "checkbox")## 多选框
+      <Column title="${comment}" :minWidth="150">
+        <template #customRender="{ record, index }">
+          <FormItem :name="[index, '${javaField}']" :rules="formRules.${javaField}" class="mb-0px!">
+            <CheckboxGroup v-model:value="record.${javaField}">
+              #if ("" != $dictType)## 有数据字典
+                <Checkbox
+                  v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
+                  :key="dict.value"
+                  :label="dict.label"
+                  :value="dict.value"
+                />
+              #else##没数据字典
+                <Checkbox label="请选择字典生成" />
+              #end
+            </CheckboxGroup>
+          </FormItem>
+        </template>
+      </Column>
+        #elseif($column.htmlType == "radio")## 单选框
+      <Column title="${comment}" :minWidth="150">
+        <template #customRender="{ record, index }">
+          <FormItem :name="[index, '${javaField}']" :rules="formRules.${javaField}" class="mb-0px!">
+            <RadioGroup v-model:value="record.${javaField}">
+              #if ("" != $dictType)## 有数据字典
+                <Radio
+                  v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
+                  :key="dict.value"
+                  :value="dict.value"
+                >
+                  {{ dict.label }}
+                </Radio>
+              #else##没数据字典
+                <Radio value="1">请选择字典生成</Radio>
+              #end
+            </RadioGroup>
+          </FormItem>
+        </template>
+      </Column>
+        #elseif($column.htmlType == "datetime")## 时间框
+      <Column title="${comment}" :minWidth="150">
+        <template #customRender="{ record, index }">
+          <FormItem :name="[index, '${javaField}']" :rules="formRules.${javaField}" class="mb-0px!">
+            <DatePicker
+              v-model:value="record.${javaField}"
+              valueFormat="x"
+              placeholder="选择${comment}"
+            />
+          </FormItem>
+        </template>
+      </Column>
+        #elseif($column.htmlType == "textarea")## 文本框
+      <Column title="${comment}" :minWidth="200">
+        <template #customRender="{ record, index }">
+          <FormItem :name="[index, '${javaField}']" :rules="formRules.${javaField}" class="mb-0px!">
+            <Textarea v-model:value="record.${javaField}" placeholder="请输入${comment}" />
+          </FormItem>
+        </template>
+      </Column>
+        #end
+    #end
+#end
+      <Column align="center" fixed="right" title="操作" width="60">
+        <template #customRender="{ index }">
+          <Button @click="handleDelete(index)" type="link">—</Button>
+        </template>
+      </Column>
+    </Table>
+  </Form>
+  <Row justify="center" class="mt-3">
+    <Button @click="handleAdd" shape="round">+ 添加${subTable.classComment}</Button>
+  </Row>
+#else## 情况二：一对一，form
+  <Form
+    ref="formRef"
+    :model="formData"
+    :rules="formRules"
+    label-col="{ span: 6 }"
+    :loading="formLoading"
+  >
+#foreach($column in $subColumns)
+  #if ($column.createOperation || $column.updateOperation)
+  #set ($dictType = $column.dictType)
+      #set ($javaField = $column.javaField)
+      #set ($javaType = $column.javaType)
+      #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+      #set ($comment = $column.columnComment)
+      #set ($dictMethod = "getDictOptions")## 计算使用哪个 dict 字典方法
+      #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+        #set ($dictMethod = "getIntDictOptions")
+      #elseif ($javaType == "String")
+          #set ($dictMethod = "getStrDictOptions")
+      #elseif ($javaType == "Boolean")
+          #set ($dictMethod = "getBoolDictOptions")
+      #end
+      #if ( $column.id == $subJoinColumn.id) ## 特殊：忽略主子表的 join 字段，不用填写
+      #elseif ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里
+    <FormItem label="${comment}" name="${javaField}">
+      <Input v-model:value="formData.${javaField}" placeholder="请输入${comment}" />
+    </FormItem>
+      #elseif($column.htmlType == "imageUpload")## 图片上传
+    <FormItem label="${comment}" name="${javaField}">
+      <UploadImg v-model:value="formData.${javaField}" />
+    </FormItem>
+      #elseif($column.htmlType == "fileUpload")## 文件上传
+    <FormItem label="${comment}" name="${javaField}">
+      <UploadFile v-model:value="formData.${javaField}" />
+    </FormItem>
+      #elseif($column.htmlType == "editor")## 文本编辑器
+    <FormItem label="${comment}" name="${javaField}">
+      <Editor v-model:value="formData.${javaField}" height="150px" />
+    </FormItem>
+      #elseif($column.htmlType == "select")## 下拉框
+    <FormItem label="${comment}" name="${javaField}">
+      <Select v-model:value="formData.${javaField}" placeholder="请选择${comment}">
+              #if ("" != $dictType)## 有数据字典
+        <SelectOption
+          v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
+          :key="dict.value"
+          :label="dict.label"
+          :value="dict.value"
+        />
+              #else##没数据字典
+        <SelectOption label="请选择字典生成" value="" />
+              #end
+      </Select>
+    </FormItem>
+      #elseif($column.htmlType == "checkbox")## 多选框
+    <FormItem label="${comment}" name="${javaField}">
+      <CheckboxGroup v-model:value="formData.${javaField}">
+              #if ("" != $dictType)## 有数据字典
+        <Checkbox
+          v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
+          :key="dict.value"
+          :label="dict.label"
+          :value="dict.value"
+        />
+              #else##没数据字典
+        <Checkbox label="请选择字典生成" />
+              #end
+      </CheckboxGroup>
+    </FormItem>
+      #elseif($column.htmlType == "radio")## 单选框
+    <FormItem label="${comment}" name="${javaField}">
+      <RadioGroup v-model:value="formData.${javaField}">
+              #if ("" != $dictType)## 有数据字典
+        <Radio
+          v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
+          :key="dict.value"
+          :value="dict.value"
+          >
+          {{ dict.label }}
+        </Radio>
+              #else##没数据字典
+        <Radio value="1">请选择字典生成</Radio>
+              #end
+      </RadioGroup>
+    </FormItem>
+      #elseif($column.htmlType == "datetime")## 时间框
+    <FormItem label="${comment}" name="${javaField}">
+      <DatePicker
+        v-model:value="formData.${javaField}"
+        valueFormat="x"
+        placeholder="选择${comment}"
+      />
+    </FormItem>
+      #elseif($column.htmlType == "textarea")## 文本框
+    <FormItem label="${comment}" name="${javaField}">
+      <Textarea v-model:value="formData.${javaField}" placeholder="请输入${comment}" />
+    </FormItem>
+      #end
+  #end
+#end
+  </Form>
+#end
+</template>
+<script setup lang="ts">
+import { Form, FormItem, Input, Button, Table, Column, Select, SelectOption, DatePicker, Textarea, Checkbox, CheckboxGroup, Radio, RadioGroup, Row } from 'ant-design-vue'
+import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
+import { ${simpleClassName}Api } from '@/api/${table.moduleName}/${table.businessName}'
+
+const props = defineProps<{
+  ${subJoinColumn.javaField}: undefined // ${subJoinColumn.columnComment}（主表的关联字段）
+}>()
+const formLoading = ref(false) // 表单的加载中
+const formData = ref([])
+const formRules = reactive({
+#foreach ($column in $subColumns)
+    #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
+        #set($comment=$column.columnComment)
+  $column.javaField: [{ required: true, message: '${comment}不能为空', trigger: #if($column.htmlType == 'select')'change'#else'blur'#end }],
+    #end
+#end
+})
+const formRef = ref() // 表单 Ref
+
+/** 监听主表的关联字段的变化，加载对应的子表数据 */
+watch(
+  () => props.${subJoinColumn.javaField},
+  async (val) => {
+    // 1. 重置表单
+#if ( $subTable.subJoinMany )
+    formData.value = []
+#else
+    formData.value = {
+    #foreach ($column in $subColumns)
+      #if ($column.createOperation || $column.updateOperation)
+        #if ($column.htmlType == "checkbox")
+      $column.javaField: [],
+        #else
+      $column.javaField: undefined,
+        #end
+      #end
+    #end
+    }
+#end
+    // 2. val 非空，则加载数据
+    if (!val) {
+      return;
+    }
+    try {
+      formLoading.value = true
+#if ( $subTable.subJoinMany )
+      formData.value = await ${simpleClassName}Api.get${subSimpleClassName}ListBy${SubJoinColumnName}(val)
+#else
+      const data = await ${simpleClassName}Api.get${subSimpleClassName}By${SubJoinColumnName}(val)
+      if (!data) {
+        return
+      }
+      formData.value = data
+#end
+    } finally {
+      formLoading.value = false
+    }
+  },
+  { immediate: true }
+)
+#if ( $subTable.subJoinMany )
+
+/** 新增按钮操作 */
+const handleAdd = () => {
+  const row = {
+#foreach ($column in $subColumns)
+    #if ($column.createOperation || $column.updateOperation)
+      #if ($column.htmlType == "checkbox")
+    $column.javaField: [],
+      #else
+    $column.javaField: undefined,
+      #end
+  #end
+#end
+  }
+  row.${subJoinColumn.javaField} = props.${subJoinColumn.javaField}
+  formData.value.push(row)
+}
+
+/** 删除按钮操作 */
+const handleDelete = (index) => {
+  formData.value.splice(index, 1)
+}
+#end
+
+/** 表单校验 */
+const validate = () => {
+  return formRef.value.validate()
+}
+
+/** 表单值 */
+const getData = () => {
+  return formData.value
+}
+
+defineExpose({ validate, getData })
+</script>
