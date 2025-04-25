@@ -7,7 +7,10 @@ import { Tinymce as RichTextarea } from '#/components/tinymce';
 import { ImageUpload, FileUpload } from "#/components/upload";
 import { message, Tabs, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker } from 'ant-design-vue';
 import { DICT_TYPE, getDictOptions } from '#/utils/dict';
-
+#if($table.templateType == 2)## 树表需要导入这些
+import { get${simpleClassName}List } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { handleTree } from '#/utils/tree';
+#end
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 10 || $table.templateType == 12 )
   #foreach ($subSimpleClassName in $subSimpleClassNames)
@@ -44,29 +47,19 @@ const rules: Record<string, Rule[]> = {
     #end
   #end
 };
-#if (${table.templateType} == 2)## 树表特有：父ID处理
-const parentId = ref<number>(); // 新增下级时的父级 ID
-
-const getTitle = computed(() => {
-  if (formData.value?.id) {
-    return $t('ui.actionTitle.edit', ['${table.classComment}']);
-  }
-  return parentId.value
-    ? $t('ui.actionTitle.create', ['下级${table.classComment}'])
-    : $t('ui.actionTitle.create', ['${table.classComment}']);
-});
-#else## 标准表标题
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+const ${classNameVar}Tree = ref<any[]>([]) // 树形结构
+#end
 const getTitle = computed(() => {
   return formData.value?.id
     ? $t('ui.actionTitle.edit', ['${table.classComment}'])
     : $t('ui.actionTitle.create', ['${table.classComment}']);
 });
-#end
 
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 10 || $table.templateType == 12 )
   #if ( $subTables && $subTables.size() > 0 )
-
   /** 子表的表单 */
   const subTabsName = ref('$subClassNameVars.get(0)')
     #foreach ($subClassNameVar in $subClassNameVars)
@@ -75,6 +68,34 @@ const getTitle = computed(() => {
       const ${subClassNameVar}FormRef = ref<InstanceType<typeof ${subSimpleClassName}Form>>()
     #end
   #end
+#end
+
+/** 重置表单 */
+const resetForm = () => {
+  formData.value = {
+    #foreach ($column in $columns)
+      #if ($column.createOperation || $column.updateOperation)
+        #if ($column.htmlType == "checkbox")
+            $column.javaField: [],
+        #else
+            $column.javaField: undefined,
+        #end
+      #end
+    #end
+  };
+  formRef.value?.resetFields();
+}
+
+## 特殊：树表专属逻辑
+#if ( $table.templateType == 2 )
+/** 获得${table.classComment}树 */
+const get${simpleClassName}Tree = async () => {
+  ${classNameVar}Tree.value = []
+  const data = await get${simpleClassName}List()
+  const root: Tree = { id: 0, name: '顶级${table.classComment}', children: [] }
+  root.children = handleTree(data, 'id', '${treeParentColumn.javaField}')
+  ${classNameVar}Tree.value.push(root)
+}
 #end
 
 const [Modal, modalApi] = useVbenModal({
@@ -101,7 +122,7 @@ const [Modal, modalApi] = useVbenModal({
     #end
     modalApi.lock();
     // 提交表单
-    const data = formData.value;
+    const data = formData.value as ${simpleClassName}Api.${simpleClassName};
     ## 特殊：主子表专属逻辑
     #if ( $table.templateType == 10 || $table.templateType == 12 )
       #if ( $subTables && $subTables.size() > 0 )
@@ -132,18 +153,7 @@ const [Modal, modalApi] = useVbenModal({
   },
   async onOpenChange(isOpen: boolean) {
     if (!isOpen) {
-      formData.value = {
-        #foreach ($column in $columns)
-          #if ($column.createOperation || $column.updateOperation)
-            #if ($column.htmlType == "checkbox")
-                $column.javaField: [],
-            #else
-                $column.javaField: undefined,
-            #end
-          #end
-        #end
-      };
-      formRef.value?.resetFields();
+      resetForm()
       return;
     }
 
@@ -160,8 +170,11 @@ const [Modal, modalApi] = useVbenModal({
         modalApi.lock(false);
       }
     }
-    // 设置到 values
     formData.value = data;
+#if ( $table.templateType == 2 )
+    // 加载树数据
+    await get${simpleClassName}Tree()
+#end
   },
 });
 </script>
@@ -180,7 +193,6 @@ const [Modal, modalApi] = useVbenModal({
           #set ($dictType = $column.dictType)
           #set ($javaField = $column.javaField)
           #set ($javaType = $column.javaType)
-          #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
           #set ($comment = $column.columnComment)
           #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
             #set ($dictMethod = "number")
@@ -224,14 +236,14 @@ const [Modal, modalApi] = useVbenModal({
             <Form.Item label="${comment}" name="${javaField}">
               <Select v-model:value="formData.${javaField}" placeholder="请选择${comment}">
                 #if ("" != $dictType)## 有数据字典
-                  <SelectOption
+                  <Select.Option
                           v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                           :key="dict.value"
                           :label="dict.label"
                           :value="dict.value"
                   />
                 #else##没数据字典
-                  <SelectOption label="请选择字典生成" value="" />
+                  <Select.Option label="请选择字典生成" value="" />
                 #end
               </Select>
             </Form.Item>
