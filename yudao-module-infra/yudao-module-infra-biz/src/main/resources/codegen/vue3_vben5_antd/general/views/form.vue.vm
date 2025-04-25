@@ -1,8 +1,13 @@
 <script lang="ts" setup>
 import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import type { Rule } from 'ant-design-vue/es/form';
 
 import { useVbenModal } from '@vben/common-ui';
-import { message, Tabs, Checkbox, Input, Textarea, Select,RadioGroup,CheckboxGroup, DatePicker } from 'ant-design-vue';
+import { Tinymce as RichTextarea } from '#/components/tinymce';
+import { ImageUpload, FileUpload } from "#/components/upload";
+import { message, Tabs, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker } from 'ant-design-vue';
+import { DICT_TYPE, getDictOptions } from '#/utils/dict';
+
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 10 || $table.templateType == 12 )
   #foreach ($subSimpleClassName in $subSimpleClassNames)
@@ -14,12 +19,12 @@ import { message, Tabs, Checkbox, Input, Textarea, Select,RadioGroup,CheckboxGro
 
 import { computed, ref } from 'vue';
 import { $t } from '#/locales';
-import { useVbenForm } from '#/adapter/form';
 import { get${simpleClassName}, create${simpleClassName}, update${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 
-import { useFormSchema } from '../data';
-
 const emit = defineEmits(['success']);
+const formRef = ref();
+const labelCol = { span: 5 };
+const wrapperCol = { span: 13 };
 const formData = ref<Partial<${simpleClassName}Api.${simpleClassName}>>({
 #foreach ($column in $columns)
   #if ($column.createOperation || $column.updateOperation)
@@ -31,6 +36,14 @@ const formData = ref<Partial<${simpleClassName}Api.${simpleClassName}>>({
   #end
 #end
 });
+const rules: Record<string, Rule[]> = {
+  #foreach ($column in $columns)
+    #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
+      #set($comment=$column.columnComment)
+        $column.javaField: [{ required: true, message: '${comment}不能为空', trigger: #if($column.htmlType == 'select')'change'#else'blur'#end }],
+    #end
+  #end
+};
 #if (${table.templateType} == 2)## 树表特有：父ID处理
 const parentId = ref<number>(); // 新增下级时的父级 ID
 
@@ -66,10 +79,7 @@ const getTitle = computed(() => {
 
 const [Modal, modalApi] = useVbenModal({
   async onConfirm() {
-    const { valid } = await formApi.validate();
-    if (!valid) {
-      return;
-    }
+    await formRef.value?.validate();
     ## 特殊：主子表专属逻辑
     #if ( $table.templateType == 10 || $table.templateType == 12 )
       #if ( $subTables && $subTables.size() > 0 )
@@ -133,6 +143,7 @@ const [Modal, modalApi] = useVbenModal({
           #end
         #end
       };
+      formRef.value?.resetFields();
       return;
     }
 
@@ -151,7 +162,6 @@ const [Modal, modalApi] = useVbenModal({
     }
     // 设置到 values
     formData.value = data;
-    await formApi.setValues(formData.value);
   },
 });
 </script>
@@ -161,9 +171,9 @@ const [Modal, modalApi] = useVbenModal({
     <Form
       ref="formRef"
       :model="formData"
-      :rules="formRules"
-      label-col="{ span: 6 }"
-      :loading="formLoading"
+      :rules="rules"
+      :label-col="labelCol"
+      :wrapper-col="wrapperCol"
     >
       #foreach($column in $columns)
         #if ($column.createOperation || $column.updateOperation)
@@ -172,16 +182,15 @@ const [Modal, modalApi] = useVbenModal({
           #set ($javaType = $column.javaType)
           #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
           #set ($comment = $column.columnComment)
-          #set ($dictMethod = "getDictOptions")## 计算使用哪个 dict 字典方法
           #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
-            #set ($dictMethod = "getIntDictOptions")
+            #set ($dictMethod = "number")
           #elseif ($javaType == "String")
-            #set ($dictMethod = "getStrDictOptions")
+            #set ($dictMethod = "string")
           #elseif ($javaType == "Boolean")
-            #set ($dictMethod = "getBoolDictOptions")
+            #set ($dictMethod = "boolean")
           #end
           #if ( $table.templateType == 2 && $column.id == $treeParentColumn.id )
-            <FormItem label="${comment}" name="${javaField}">
+            <Form.Item label="${comment}" name="${javaField}">
               <TreeSelect
                       v-model:value="formData.${javaField}"
                       :treeData="${classNameVar}Tree"
@@ -194,29 +203,29 @@ const [Modal, modalApi] = useVbenModal({
                       treeDefaultExpandAll
                       placeholder="请选择${comment}"
               />
-            </FormItem>
+            </Form.Item>
           #elseif ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里
-            <FormItem label="${comment}" name="${javaField}">
+            <Form.Item label="${comment}" name="${javaField}">
               <Input v-model:value="formData.${javaField}" placeholder="请输入${comment}" />
-            </FormItem>
+            </Form.Item>
           #elseif($column.htmlType == "imageUpload")## 图片上传
-            <FormItem label="${comment}" name="${javaField}">
-              <UploadImg v-model:value="formData.${javaField}" />
-            </FormItem>
+            <Form.Item label="${comment}" name="${javaField}">
+              <ImageUpload v-model:value="formData.${javaField}" />
+            </Form.Item>
           #elseif($column.htmlType == "fileUpload")## 文件上传
-            <FormItem label="${comment}" name="${javaField}">
-              <UploadFile v-model:value="formData.${javaField}" />
-            </FormItem>
+            <Form.Item label="${comment}" name="${javaField}">
+              <FileUpload v-model:value="formData.${javaField}" />
+            </Form.Item>
           #elseif($column.htmlType == "editor")## 文本编辑器
-            <FormItem label="${comment}" name="${javaField}">
-              <Editor v-model:value="formData.${javaField}" height="150px" />
-            </FormItem>
+            <Form.Item label="${comment}" name="${javaField}">
+              <RichTextarea v-model="formData.${javaField}" height="500px" />
+            </Form.Item>
           #elseif($column.htmlType == "select")## 下拉框
-            <FormItem label="${comment}" name="${javaField}">
+            <Form.Item label="${comment}" name="${javaField}">
               <Select v-model:value="formData.${javaField}" placeholder="请选择${comment}">
                 #if ("" != $dictType)## 有数据字典
                   <SelectOption
-                          v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
+                          v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                           :key="dict.value"
                           :label="dict.label"
                           :value="dict.value"
@@ -225,13 +234,13 @@ const [Modal, modalApi] = useVbenModal({
                   <SelectOption label="请选择字典生成" value="" />
                 #end
               </Select>
-            </FormItem>
+            </Form.Item>
           #elseif($column.htmlType == "checkbox")## 多选框
-            <FormItem label="${comment}" name="${javaField}">
+            <Form.Item label="${comment}" name="${javaField}">
               <CheckboxGroup v-model:value="formData.${javaField}">
                 #if ("" != $dictType)## 有数据字典
                   <Checkbox
-                          v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
+                          v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                           :key="dict.value"
                           :label="dict.label"
                           :value="dict.value"
@@ -240,13 +249,13 @@ const [Modal, modalApi] = useVbenModal({
                   <Checkbox label="请选择字典生成" />
                 #end
               </CheckboxGroup>
-            </FormItem>
+            </Form.Item>
           #elseif($column.htmlType == "radio")## 单选框
-            <FormItem label="${comment}" name="${javaField}">
+            <Form.Item label="${comment}" name="${javaField}">
               <RadioGroup v-model:value="formData.${javaField}">
                 #if ("" != $dictType)## 有数据字典
                   <Radio
-                          v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
+                          v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                           :key="dict.value"
                           :value="dict.value"
                   >
@@ -256,19 +265,19 @@ const [Modal, modalApi] = useVbenModal({
                   <Radio value="1">请选择字典生成</Radio>
                 #end
               </RadioGroup>
-            </FormItem>
+            </Form.Item>
           #elseif($column.htmlType == "datetime")## 时间框
-            <FormItem label="${comment}" name="${javaField}">
+            <Form.Item label="${comment}" name="${javaField}">
               <DatePicker
                       v-model:value="formData.${javaField}"
                       valueFormat="x"
                       placeholder="选择${comment}"
               />
-            </FormItem>
+            </Form.Item>
           #elseif($column.htmlType == "textarea")## 文本框
-            <FormItem label="${comment}" name="${javaField}">
+            <Form.Item label="${comment}" name="${javaField}">
               <Textarea v-model:value="formData.${javaField}" placeholder="请输入${comment}" />
-            </FormItem>
+            </Form.Item>
           #end
         #end
       #end
