@@ -96,10 +96,8 @@
             </dependency>
             <dependency>
                 <groupId>software.amazon.awssdk</groupId>
-                <artifactId>bom</artifactId>
+                <artifactId>s3</artifactId>
                 <version>${awssdk.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
             </dependency>
 
             <!-- 业务组件 -->

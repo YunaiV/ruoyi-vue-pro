@@ -5,10 +5,12 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.AbstractFileClient;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -26,6 +28,7 @@ import java.time.Duration;
 public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
 
     private S3Client client;
+    private S3Presigner presigner;
 
     public S3FileClient(Long id, S3FileClientConfig config) {
         super(id, config);
@@ -38,11 +41,23 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
             config.setDomain(buildDomain());
         }
         // 初始化 S3 客户端
+        Region region = Region.of("us-east-1"); // 必须填，但填什么都行，常见的值有 "us-east-1"，不填会报错
+        AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(
+                AwsBasicCredentials.create(config.getAccessKey(), config.getAccessSecret()));
+        URI endpoint = URI.create(buildEndpoint());
+        S3Configuration serviceConfiguration = S3Configuration.builder() // Path-style 访问
+                .pathStyleAccessEnabled(Boolean.TRUE.equals(config.getEnablePathStyleAccess())).build();
         client = S3Client.builder()
-                .credentialsProvider(buildCredentials())
-                .region(Region.of("us-east-1")) // 必须填，但填什么都行，常见的值有 "us-east-1"，不填会报错
-                .endpointOverride(URI.create(buildEndpoint()))
-                //.serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(true).build()) //  Path-style 访问
+                .credentialsProvider(credentialsProvider)
+                .region(region)
+                .endpointOverride(endpoint)
+                .serviceConfiguration(serviceConfiguration)
+                .build();
+        presigner = S3Presigner.builder()
+                .credentialsProvider(credentialsProvider)
+                .region(region)
+                .endpointOverride(endpoint)
+                .serviceConfiguration(serviceConfiguration)
                 .build();
     }
 
@@ -55,7 +70,6 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
                 .contentType(type)
                 .contentLength((long) content.length)
                 .build();
-
         // 上传文件
         client.putObject(putRequest, RequestBody.fromBytes(content));
         // 拼接返回路径
@@ -77,42 +91,27 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
                 .bucket(config.getBucket())
                 .key(path)
                 .build();
-
         return IoUtil.readBytes(client.getObject(getRequest));
     }
 
     @Override
     public FilePresignedUrlRespDTO getPresignedObjectUrl(String path) {
-        return new FilePresignedUrlRespDTO(getPresignedUrl(path, Duration.ofMinutes(10)), config.getDomain() + "/" + path);
-    }
-
-    /**
-     * 动态创建 S3Presigner
-     *
-     * @return S3Presigner
-     */
-    private S3Presigner createPresigner() {
-        return S3Presigner.builder()
-                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(config.getAccessKey(), config.getAccessSecret())))
-                .region(Region.of("us-east-1")) // 必须填，但填什么都行，常见的值有 "us-east-1"，不填会报错
-                .endpointOverride(URI.create(buildEndpoint()))
-                .build();
+        Duration expiration = Duration.ofHours(24);
+        return new FilePresignedUrlRespDTO(getPresignedUrl(path, expiration), config.getDomain() + "/" + path);
     }
 
     /**
      * 生成动态的预签名上传 URL
      *
      * @param path     相对路径
-     * @param duration 过期时间
+     * @param expiration 过期时间
      * @return 生成的上传 URL
      */
-    public String getPresignedUrl(String path, Duration duration) {
-        try (S3Presigner presigner = createPresigner()) {
-            return presigner.presignPutObject(PutObjectPresignRequest.builder()
-                    .signatureDuration(duration)
-                    .putObjectRequest(b -> b.bucket(config.getBucket()).key(path))
-                    .build()).url().toString();
-        }
+    private String getPresignedUrl(String path, Duration expiration) {
+        return presigner.presignPutObject(PutObjectPresignRequest.builder()
+                .signatureDuration(expiration)
+                .putObjectRequest(b -> b.bucket(config.getBucket()).key(path))
+                .build()).url().toString();
     }
 
     /**
@@ -127,16 +126,6 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
         }
         // 阿里云、腾讯云、华为云都适合。七牛云比较特殊，必须有自定义域名
         return StrUtil.format("https://{}.{}", config.getBucket(), config.getEndpoint());
-    }
-
-    /**
-     * 基于 config 秘钥，构建 S3 客户端的认证信息
-     *
-     * @return S3 客户端的认证信息
-     */
-    private StaticCredentialsProvider buildCredentials() {
-        return StaticCredentialsProvider.create(
-                AwsBasicCredentials.create(config.getAccessKey(), config.getAccessSecret()));
     }
 
     /**
