@@ -181,7 +181,7 @@ public class CouponServiceImpl implements CouponService {
      * @param couponId 模版编号
      * @param userId   用户编号
      */
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW) // 每次调用开启一个新的事务
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW) // 每次调用开启一个新的事务，避免在一个大的事务里面
     public void invalidateCoupon(Long couponId, Long userId) {
         if (couponId == null || couponId <= 0) {
             return;
@@ -279,8 +279,8 @@ public class CouponServiceImpl implements CouponService {
         if (ObjUtil.notEqual(couponTemplate.getTakeType(), takeType.getType())) {
             throw exception(COUPON_TEMPLATE_CANNOT_TAKE);
         }
-        // 校验剩余数量
-        if (ObjUtil.equal(CouponTakeTypeEnum.USER.getType(), couponTemplate.getTakeType()) // 直接领取
+        // 校验发放数量不能过小（仅在 CouponTakeTypeEnum.USER 用户领取时）
+        if (CouponTakeTypeEnum.isUser(couponTemplate.getTakeType())
                 && ObjUtil.notEqual(couponTemplate.getTakeLimitCount(), CouponTemplateDO.TIME_LIMIT_COUNT_MAX) // 非不限制
                 && couponTemplate.getTakeCount() + userIds.size() > couponTemplate.getTotalCount()) {
             throw exception(COUPON_TEMPLATE_NOT_ENOUGH);
@@ -291,7 +291,6 @@ public class CouponServiceImpl implements CouponService {
                 throw exception(COUPON_TEMPLATE_EXPIRED);
             }
         }
-
     }
 
     /**
