@@ -67,6 +67,12 @@ public class S3FileClientConfig implements FileClientConfig {
     @NotNull(message = "accessSecret 不能为空")
     private String accessSecret;
 
+    /**
+     * 是否启用 PathStyle 访问
+     */
+    @NotNull(message = "enablePathStyleAccess 不能为空")
+    private Boolean enablePathStyleAccess;
+
     @SuppressWarnings("RedundantIfStatement")
     @AssertTrue(message = "domain 不能为空")
     @JsonIgnore
