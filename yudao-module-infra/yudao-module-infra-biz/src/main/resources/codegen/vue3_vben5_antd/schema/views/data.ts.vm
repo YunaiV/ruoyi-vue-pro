@@ -75,18 +75,10 @@ export function useFormSchema(): VbenFormSchema[] {
       componentProps: {
         placeholder: '请输入${comment}',
       },
-  #elseif($column.htmlType == "imageUpload")## 图片上传 TODO @puhui999：目前分成了图片和文件上传，可以不用 fileType 之类哈，可以用下；
-      component: 'FileUpload',
-      componentProps: {
-        fileType: 'image',
-        maxCount: 1,
-      },
+  #elseif($column.htmlType == "imageUpload")## 图片上传
+      component: 'ImageUpload',
   #elseif($column.htmlType == "fileUpload")## 文件上传
       component: 'FileUpload',
-      componentProps: {
-        fileType: 'file',
-        maxCount: 1,
-      },
   #elseif($column.htmlType == "editor")## 文本编辑器
       component: 'RichTextarea',
   #elseif($column.htmlType == "select")## 下拉框
@@ -320,17 +312,9 @@ export function use${subSimpleClassName}FormSchema(): VbenFormSchema[] {
                                     placeholder: '请输入${comment}',
                                 },
                             #elseif($column.htmlType == "imageUpload")## 图片上传
-                                component: 'FileUpload',
-                                componentProps: {
-                                    fileType: 'image',
-                                    maxCount: 1,
-                                },
+                                component: 'ImageUpload',
                             #elseif($column.htmlType == "fileUpload")## 文件上传
                                 component: 'FileUpload',
-                                componentProps: {
-                                    fileType: 'file',
-                                    maxCount: 1,
-                                },
                             #elseif($column.htmlType == "editor")## 文本编辑器
                                 component: 'RichTextarea',
                             #elseif($column.htmlType == "select")## 下拉框
@@ -603,17 +587,9 @@ export function use${subSimpleClassName}GridColumns(
                                         placeholder: '请输入${comment}',
                                     },
                                 #elseif($column.htmlType == "imageUpload")## 图片上传
-                                    component: 'FileUpload',
-                                    componentProps: {
-                                        fileType: 'image',
-                                        maxCount: 1,
-                                    },
+                                    component: 'ImageUpload',
                                 #elseif($column.htmlType == "fileUpload")## 文件上传
                                     component: 'FileUpload',
-                                    componentProps: {
-                                        fileType: 'file',
-                                        maxCount: 1,
-                                    },
                                 #elseif($column.htmlType == "editor")## 文本编辑器
                                     component: 'RichTextarea',
                                 #elseif($column.htmlType == "select")## 下拉框
