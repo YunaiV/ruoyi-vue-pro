@@ -73,7 +73,7 @@
         <!-- 三方云服务相关 -->
         <commons-io.version>2.17.0</commons-io.version>
         <commons-compress.version>1.27.1</commons-compress.version>
-        <aws-java-sdk-s3.version>1.12.777</aws-java-sdk-s3.version>
+        <awssdk.version>2.30.14</awssdk.version>
         <justauth.version>1.0.8</justauth.version>
         <jimureport.version>1.7.8</jimureport.version>
         <weixin-java.version>4.7.2.B</weixin-java.version>
@@ -582,9 +582,9 @@
 
             <!-- 三方云服务相关 -->
             <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-s3</artifactId>
-                <version>${aws-java-sdk-s3.version}</version>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>s3</artifactId>
+                <version>${awssdk.version}</version>
             </dependency>
 
             <dependency>
