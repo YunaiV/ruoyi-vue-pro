@@ -6,7 +6,6 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.*;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
@@ -882,6 +881,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 return;
             }
             runExecutionIds.add(task.getExecutionId());
+
             // 判断是否分配给自己任务，因为会签任务，一个节点会有多个任务
             if (isAssignUserTask(userId, task)) { // 情况一：自己的任务，进行 RETURN 标记
                 // 2.1.1 添加评论
