@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.convert.cart;
 
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
@@ -33,21 +34,18 @@ public interface TradeCartConvert {
             cartVO.setId(cart.getId()).setCount(cart.getCount()).setSelected(cart.getSelected());
             ProductSpuRespDTO spu = spuMap.get(cart.getSpuId());
             ProductSkuRespDTO sku = skuMap.get(cart.getSkuId());
-            cartVO.setSpu(convert(spu)).setSku(convert(sku));
+            cartVO.setSpu(BeanUtils.toBean(spu, AppProductSpuBaseRespVO.class))
+                    .setSku(BeanUtils.toBean(sku, AppProductSkuBaseRespVO.class));
             // 如果 SPU 不存在，或者下架，或者库存不足，说明是无效的
             if (spu == null
                 || !ProductSpuStatusEnum.isEnable(spu.getStatus())
                 || spu.getStock() <= 0) {
-                cartVO.setSelected(false); // 强制设置成不可选中
                 invalidList.add(cartVO);
             } else {
-                // 虽然 SKU 可能也会不存在，但是可以通过购物车重新选择
                 validList.add(cartVO);
             }
         });
         return new AppCartListRespVO().setValidList(validList).setInvalidList(invalidList);
     }
-    AppProductSpuBaseRespVO convert(ProductSpuRespDTO spu);
-    AppProductSkuBaseRespVO convert(ProductSkuRespDTO sku);
 
 }
