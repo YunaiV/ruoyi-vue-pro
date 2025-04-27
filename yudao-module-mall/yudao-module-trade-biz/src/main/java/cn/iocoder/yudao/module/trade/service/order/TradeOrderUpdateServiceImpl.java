@@ -545,6 +545,14 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         if (ObjectUtil.notEqual(order.getStatus(), TradeOrderStatusEnum.UNPAID.getStatus())) {
             throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
         }
+        // 1.3 校验是否支持延迟（不允许取消）
+        if (TradeOrderStatusEnum.isUnpaid(order.getStatus())) {
+            PayOrderRespDTO payOrder = payOrderApi.getOrder(order.getPayOrderId());
+            if (payOrder != null && PayOrderStatusEnum.isSuccess(payOrder.getStatus())) {
+                log.warn("[cancelOrderByMember][order({}) 支付单已支付（支付回调延迟），不支持取消]", order.getId());
+                throw exception(ORDER_CANCEL_FAIL_STATUS_NOT_UNPAID);
+            }
+        }
 
         // 2. 取消订单
         cancelOrder0(order, TradeOrderCancelTypeEnum.MEMBER_CANCEL);
@@ -581,6 +589,15 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     @Transactional(rollbackFor = Exception.class)
     @TradeOrderLog(operateType = TradeOrderOperateTypeEnum.SYSTEM_CANCEL)
     public void cancelOrderBySystem(TradeOrderDO order) {
+        // 校验是否支持延迟（不允许取消）
+        if (TradeOrderStatusEnum.isUnpaid(order.getStatus())) {
+            PayOrderRespDTO payOrder = payOrderApi.getOrder(order.getPayOrderId());
+            if (payOrder != null && PayOrderStatusEnum.isSuccess(payOrder.getStatus())) {
+                log.warn("[cancelOrderBySystem][order({}) 支付单已支付（支付回调延迟），不支持取消]", order.getId());
+                return;
+            }
+        }
+
         cancelOrder0(order, TradeOrderCancelTypeEnum.PAY_TIMEOUT);
     }
 
@@ -895,12 +912,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         if (order == null) {
             throw exception(ORDER_NOT_FOUND);
         }
-
         // 1.3 校验订单是否支付
         if (!order.getPayStatus()) {
             throw exception(ORDER_CANCEL_PAID_FAIL, "已支付");
         }
-        // 1.3 校验订单是否未退款
+        // 1.4 校验订单是否未退款
         if (ObjUtil.notEqual(TradeOrderRefundStatusEnum.NONE.getStatus(), order.getRefundStatus())) {
             throw exception(ORDER_CANCEL_PAID_FAIL, "未退款");
         }
