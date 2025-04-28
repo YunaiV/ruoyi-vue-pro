@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -44,7 +45,11 @@ public class ExcelUtils {
     }
 
     public static <T> List<T> read(MultipartFile file, Class<T> head) throws IOException {
-        return EasyExcel.read(file.getInputStream(), head, null)
+        return read(file.getInputStream(), head);
+    }
+
+    public static <T> List<T> read(InputStream inputStream, Class<T> head) throws IOException {
+        return EasyExcel.read(inputStream, head, null)
                 .autoCloseStream(false)  // 不要自动关闭，交给 Servlet 自己处理
                 .doReadAllSync();
     }
