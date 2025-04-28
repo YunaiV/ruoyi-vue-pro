@@ -39,7 +39,6 @@ export function useFormSchema(): VbenFormSchema[] {
           });
           return handleTree(data);
         },
-        class: 'w-full',
         labelField: '${treeNameColumn.javaField}',
         valueField: 'id',
         childrenField: 'children',
@@ -89,7 +88,6 @@ export function useFormSchema(): VbenFormSchema[] {
         options: [],
         #end
         placeholder: '请选择${comment}',
-        class: 'w-full',
       },
   #elseif($column.htmlType == "checkbox")## 多选框
       component: 'Checkbox',
@@ -127,7 +125,6 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'InputNumber',
       componentProps: {
         min: 0,
-        class: 'w-full',
         controlsPosition: 'right',
         placeholder: '请输入${comment}',
       },
@@ -325,7 +322,6 @@ export function use${subSimpleClassName}FormSchema(): VbenFormSchema[] {
                                         options: [],
                                     #end
                                     placeholder: '请选择${comment}',
-                                    class: 'w-full',
                                 },
                             #elseif($column.htmlType == "checkbox")## 多选框
                                 component: 'Checkbox',
@@ -363,7 +359,6 @@ export function use${subSimpleClassName}FormSchema(): VbenFormSchema[] {
                                 component: 'InputNumber',
                                 componentProps: {
                                     min: 0,
-                                    class: 'w-full',
                                     controlsPosition: 'right',
                                     placeholder: '请输入${comment}',
                                 },
@@ -600,7 +595,6 @@ export function use${subSimpleClassName}GridColumns(
                                             options: [],
                                         #end
                                         placeholder: '请选择${comment}',
-                                        class: 'w-full',
                                     },
                                 #elseif($column.htmlType == "checkbox")## 多选框
                                     component: 'Checkbox',
@@ -638,7 +632,6 @@ export function use${subSimpleClassName}GridColumns(
                                     component: 'InputNumber',
                                     componentProps: {
                                         min: 0,
-                                        class: 'w-full',
                                         controlsPosition: 'right',
                                         placeholder: '请输入${comment}',
                                     },

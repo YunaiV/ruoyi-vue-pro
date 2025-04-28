@@ -96,9 +96,16 @@ watch(
 );
 #else
 const [Form, formApi] = useVbenForm({
-layout: 'horizontal',
-schema: use${subSimpleClassName}FormSchema(),
-showDefaultActions: false
+  commonConfig: {
+    componentProps: {
+      class: 'w-full',
+    },
+    formItemClass: 'col-span-2',
+    labelWidth: 80,
+  },
+  layout: 'horizontal',
+  schema: use${subSimpleClassName}FormSchema(),
+  showDefaultActions: false
 });
 
 /** 暴露出表单校验方法和表单值获取方法 */
