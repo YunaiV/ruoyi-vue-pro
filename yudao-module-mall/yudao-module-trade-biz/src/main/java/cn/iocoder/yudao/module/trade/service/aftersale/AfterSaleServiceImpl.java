@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.trade.service.aftersale;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
@@ -16,6 +15,7 @@ import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.AfterSalePage
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.AfterSaleRefuseReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSaleCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSaleDeliveryReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSalePageReqVO;
 import cn.iocoder.yudao.module.trade.convert.aftersale.AfterSaleConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.AfterSaleDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
@@ -87,8 +87,8 @@ public class AfterSaleServiceImpl implements AfterSaleService {
     }
 
     @Override
-    public PageResult<AfterSaleDO> getAfterSalePage(Long userId, PageParam pageParam) {
-        return tradeAfterSaleMapper.selectPage(userId, pageParam);
+    public PageResult<AfterSaleDO> getAfterSalePage(Long userId, AppAfterSalePageReqVO pageReqVO) {
+        return tradeAfterSaleMapper.selectPage(userId, pageReqVO);
     }
 
     @Override
