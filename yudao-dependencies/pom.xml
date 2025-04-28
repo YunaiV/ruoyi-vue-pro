@@ -54,7 +54,7 @@
         <mapstruct.version>1.6.3</mapstruct.version>
         <hutool-5.version>5.8.35</hutool-5.version>
         <hutool-6.version>6.0.0-M19</hutool-6.version>
-        <easyexcel.version>4.0.3</easyexcel.version>
+        <fast-excel.version>fix~model-binding-SNAPSHOT</fast-excel.version>
         <velocity.version>2.4.1</velocity.version>
         <fastjson.version>1.2.83</fastjson.version>
         <guava.version>33.4.0-jre</guava.version>
@@ -475,11 +475,10 @@
                 <artifactId>hutool-extra</artifactId>
                 <version>${hutool-6.version}</version>
             </dependency>
-
             <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>easyexcel</artifactId>
-                <version>${easyexcel.version}</version>
+                <groupId>com.github.DevDengChao.fast-excel</groupId>
+                <artifactId>fastexcel</artifactId>
+                <version>${fast-excel.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>

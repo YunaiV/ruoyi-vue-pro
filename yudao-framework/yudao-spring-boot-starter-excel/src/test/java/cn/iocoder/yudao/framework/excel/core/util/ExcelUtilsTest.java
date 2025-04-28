@@ -12,16 +12,28 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ExcelUtilsTest {
+
     @Test
-    void readCsv() throws IOException, ParseException {
-        List<DemoData> list = ExcelUtils.read(new ClassPathResource("example.csv").getInputStream(), DemoData.class);
+    void readCsvAsJavaDataBean() throws IOException, ParseException {
+        List<JavaDataBean> list = ExcelUtils.read(new ClassPathResource("example.csv").getInputStream(), JavaDataBean.class);
         assertFalse(list.isEmpty());
-        DemoData data = list.getFirst();
-        assertEquals(1, data.getAnInt());
-        assertEquals(1.1, data.getADouble());
+        JavaDataBean data = list.get(0);
+        assertEquals(1.1, data.getNumber());
         assertEquals("hello", data.getString());
         Date date = new SimpleDateFormat("yyyy-MM-dd").parse("2023-10-01");
         assertEquals(date, data.getDate());
         assertTrue(data.isABoolean());
+    }
+
+    @Test
+    void readCsvAsLombokDataBean() throws IOException, ParseException {
+        List<LombokDataBean> list = ExcelUtils.read(new ClassPathResource("example.csv").getInputStream(), LombokDataBean.class);
+        assertFalse(list.isEmpty());
+        LombokDataBean data = list.get(0);
+        assertEquals(1.1, data.getNumber());
+        assertEquals("hello", data.getString());
+        Date date = new SimpleDateFormat("yyyy-MM-dd").parse("2023-10-01");
+        assertEquals(date, data.getDate());
+        assertTrue(data.getAreYouOk());
     }
 }
