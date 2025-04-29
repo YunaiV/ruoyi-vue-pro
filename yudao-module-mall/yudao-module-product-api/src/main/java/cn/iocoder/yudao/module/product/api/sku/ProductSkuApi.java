@@ -5,6 +5,9 @@ import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuUpdateStockReqDTO;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * 商品 SKU API 接口
@@ -29,6 +32,16 @@ public interface ProductSkuApi {
      * @return SKU 数组
      */
     List<ProductSkuRespDTO> getSkuList(Collection<Long> ids);
+
+    /**
+     * 批量查询 SKU MAP
+     *
+     * @param ids SKU 编号列表
+     * @return SKU MAP
+     */
+    default Map<Long, ProductSkuRespDTO> getSkuMap(Collection<Long> ids) {
+        return convertMap(getSkuList(ids), ProductSkuRespDTO::getId);
+    }
 
     /**
      * 批量查询 SKU 数组

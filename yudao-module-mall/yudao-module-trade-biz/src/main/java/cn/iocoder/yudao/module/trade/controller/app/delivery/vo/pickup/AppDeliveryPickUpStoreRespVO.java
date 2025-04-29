@@ -1,7 +1,11 @@
 package cn.iocoder.yudao.module.trade.controller.app.delivery.vo.pickup;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import java.time.LocalTime;
 
 @Schema(description = "用户 App - 自提门店 Response VO")
 @Data
@@ -27,6 +31,16 @@ public class AppDeliveryPickUpStoreRespVO {
 
     @Schema(description = "门店详细地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "复旦大学路 188 号")
     private String detailAddress;
+
+    @Schema(description = "营业开始时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "营业开始时间不能为空")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    private LocalTime openingTime;
+
+    @Schema(description = "营业结束时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "营业结束时间不能为空")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    private LocalTime closingTime;
 
     @Schema(description = "纬度", requiredMode = Schema.RequiredMode.REQUIRED, example = "5.88")
     private Double latitude;

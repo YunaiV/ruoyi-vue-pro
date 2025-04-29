@@ -30,7 +30,7 @@ public interface ProductSpuApi {
      * @param ids SPU 编号列表
      * @return SPU MAP
      */
-    default Map<Long, ProductSpuRespDTO> getSpusMap(Collection<Long> ids) {
+    default Map<Long, ProductSpuRespDTO> getSpuMap(Collection<Long> ids) {
         return convertMap(getSpuList(ids), ProductSpuRespDTO::getId);
     }
 

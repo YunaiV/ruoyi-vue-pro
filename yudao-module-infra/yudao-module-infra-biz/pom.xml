@@ -115,9 +115,10 @@
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId> <!-- 文件客户端：解决 sftp 连接 -->
         </dependency>
+        <!-- 文件客户端：解决阿里云、腾讯云、minio 等 S3 连接 -->
         <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-s3</artifactId><!-- 文件客户端：解决阿里云、腾讯云、minio 等 S3 连接 -->
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
         </dependency>
 
         <dependency>
