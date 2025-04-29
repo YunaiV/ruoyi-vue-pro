@@ -52,7 +52,7 @@ public enum SocialTypeEnum implements ArrayValuable<Integer> {
      *
      * @see <a href="https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/login.html">接入文档</a>
      */
-    WECHAT_MINI_APP(34, "WECHAT_MINI_APP"),
+    WECHAT_MINI_PROGRAM(34, "WECHAT_MINI_PROGRAM"),
     ;
 
     public static final Integer[] ARRAYS = Arrays.stream(values()).map(SocialTypeEnum::getType).toArray(Integer[]::new);
