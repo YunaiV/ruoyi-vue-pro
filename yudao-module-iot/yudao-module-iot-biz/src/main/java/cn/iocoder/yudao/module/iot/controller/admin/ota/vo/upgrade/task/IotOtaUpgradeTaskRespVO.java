@@ -9,8 +9,6 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
-
 @Data
 @Schema(description = "管理后台 - IoT OTA 升级任务 Response VO")
 public class IotOtaUpgradeTaskRespVO implements VO {
@@ -18,12 +16,12 @@ public class IotOtaUpgradeTaskRespVO implements VO {
     /**
      * 任务编号
      */
-    @Schema(description = "任务编号", requiredMode = REQUIRED, example = "1024")
+    @Schema(description = "任务编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
     /**
      * 任务名称
      */
-    @Schema(description = "任务名称", requiredMode = REQUIRED, example = "升级任务")
+    @Schema(description = "任务名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "升级任务")
     private String name;
     /**
      * 任务描述
@@ -35,31 +33,31 @@ public class IotOtaUpgradeTaskRespVO implements VO {
      * <p>
      * 关联 {@link IotOtaFirmwareDO#getId()}
      */
-    @Schema(description = "固件编号", requiredMode = REQUIRED, example = "1024")
+    @Schema(description = "固件编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long firmwareId;
     /**
      * 任务状态
      * <p>
      * 关联 {@link cn.iocoder.yudao.module.iot.enums.ota.IotOtaUpgradeTaskStatusEnum}
      */
-    @Schema(description = "任务状态", requiredMode = REQUIRED, allowableValues = {"10", "20", "21", "30"})
+    @Schema(description = "任务状态", requiredMode = Schema.RequiredMode.REQUIRED, allowableValues = {"10", "20", "21", "30"})
     private Integer status;
     /**
      * 任务状态名称
      */
-    @Schema(description = "任务状态名称", requiredMode = REQUIRED, example = "进行中")
+    @Schema(description = "任务状态名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "进行中")
     private String statusName;
     /**
      * 升级范围
      * <p>
      * 关联 {@link cn.iocoder.yudao.module.iot.enums.ota.IotOtaUpgradeTaskScopeEnum}
      */
-    @Schema(description = "升级范围", requiredMode = REQUIRED, allowableValues = {"1", "2"})
+    @Schema(description = "升级范围", requiredMode = Schema.RequiredMode.REQUIRED, allowableValues = {"1", "2"})
     private Integer scope;
     /**
      * 设备数量
      */
-    @Schema(description = "设备数量", requiredMode = REQUIRED, example = "1024")
+    @Schema(description = "设备数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long deviceCount;
     /**
      * 选中的设备编号数组
@@ -78,7 +76,7 @@ public class IotOtaUpgradeTaskRespVO implements VO {
     /**
      * 创建时间
      */
-    @Schema(description = "创建时间", requiredMode = REQUIRED, example = "2022-07-08 07:30:00")
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "2022-07-08 07:30:00")
     private LocalDateTime createTime;
 
 }

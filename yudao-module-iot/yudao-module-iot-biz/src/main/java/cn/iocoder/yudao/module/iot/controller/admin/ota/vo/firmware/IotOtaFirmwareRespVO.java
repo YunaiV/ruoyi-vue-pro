@@ -7,8 +7,6 @@ import com.fhs.core.trans.vo.VO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
-
 @Data
 @Schema(description = "管理后台 - IoT OTA 固件 Response VO")
 public class IotOtaFirmwareRespVO implements VO {
@@ -16,12 +14,12 @@ public class IotOtaFirmwareRespVO implements VO {
     /**
      * 固件编号
      */
-    @Schema(description = "固件编号", requiredMode = REQUIRED, example = "1024")
+    @Schema(description = "固件编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
     /**
      * 固件名称
      */
-    @Schema(description = "固件名称", requiredMode = REQUIRED, example = "OTA固件")
+    @Schema(description = "固件名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "OTA固件")
     private String name;
     /**
      * 固件描述
@@ -31,7 +29,7 @@ public class IotOtaFirmwareRespVO implements VO {
     /**
      * 版本号
      */
-    @Schema(description = "版本号", requiredMode = REQUIRED, example = "1.0.0")
+    @Schema(description = "版本号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1.0.0")
     private String version;
 
     /**
@@ -39,7 +37,7 @@ public class IotOtaFirmwareRespVO implements VO {
      * <p>
      * 关联 {@link cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO#getId()}
      */
-    @Schema(description = "产品编号", requiredMode = REQUIRED, example = "1024")
+    @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @Trans(type = TransType.SIMPLE, target = IotProductDO.class, fields = {"name"}, refs = {"productName"})
     private String productId;
     /**
@@ -47,12 +45,12 @@ public class IotOtaFirmwareRespVO implements VO {
      * <p>
      * 冗余 {@link cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO#getProductKey()}
      */
-    @Schema(description = "产品标识", requiredMode = REQUIRED, example = "iot-product-key")
+    @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "iot-product-key")
     private String productKey;
     /**
      * 产品名称
      */
-    @Schema(description = "产品名称", requiredMode = REQUIRED, example = "OTA产品")
+    @Schema(description = "产品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "OTA产品")
     private String productName;
     /**
      * 签名方式
@@ -69,12 +67,12 @@ public class IotOtaFirmwareRespVO implements VO {
     /**
      * 固件文件大小
      */
-    @Schema(description = "固件文件大小", requiredMode = REQUIRED, example = "1024")
+    @Schema(description = "固件文件大小", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long fileSize;
     /**
      * 固件文件 URL
      */
-    @Schema(description = "固件文件 URL", requiredMode = REQUIRED, example = "https://www.iocoder.cn")
+    @Schema(description = "固件文件 URL", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn")
     private String fileUrl;
     /**
      * 自定义信息，建议使用 JSON 格式
