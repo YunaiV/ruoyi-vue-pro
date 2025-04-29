@@ -6,7 +6,6 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.*;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
@@ -874,12 +873,14 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         List<UserTask> returnUserTaskList = BpmnModelUtils.iteratorFindChildUserTasks(targetElement, runTaskKeyList, null, null);
         List<String> returnTaskKeyList = convertList(returnUserTaskList, UserTask::getId);
 
+        List<String> runExecutionIds = new ArrayList<>();
         // 2. 给当前要被退回的 task 数组，设置退回意见
         taskList.forEach(task -> {
             // 需要排除掉，不需要设置退回意见的任务
             if (!returnTaskKeyList.contains(task.getTaskDefinitionKey())) {
                 return;
             }
+            runExecutionIds.add(task.getExecutionId());
 
             // 判断是否分配给自己任务，因为会签任务，一个节点会有多个任务
             if (isAssignUserTask(userId, task)) { // 情况一：自己的任务，进行 RETURN 标记
@@ -899,7 +900,6 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 4. 执行驳回
         // 使用 moveExecutionsToSingleActivityId 替换 moveActivityIdsToSingleActivityId 原因：
         // 当多实例任务回退的时候有问题。相关 issue: https://github.com/flowable/flowable-engine/issues/3944
-        List<String> runExecutionIds = convertList(taskList, Task::getExecutionId);
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(currentTask.getProcessInstanceId())
                 .moveExecutionsToSingleActivityId(runExecutionIds, reqVO.getTargetTaskDefinitionKey())

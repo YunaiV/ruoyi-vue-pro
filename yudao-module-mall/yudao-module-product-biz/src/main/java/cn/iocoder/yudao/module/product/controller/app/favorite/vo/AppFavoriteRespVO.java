@@ -2,16 +2,15 @@ package cn.iocoder.yudao.module.product.controller.app.favorite.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 @Schema(description = "用户 App - 商品收藏 Response VO")
 @Data
 public class AppFavoriteRespVO {
 
-    @Schema(description = "编号", requiredMode = REQUIRED, example = "1")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long id;
 
-    @Schema(description = "商品 SPU 编号", requiredMode = REQUIRED, example = "29502")
+    @Schema(description = "商品 SPU 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "29502")
     private Long spuId;
 
     // ========== 商品相关字段 ==========

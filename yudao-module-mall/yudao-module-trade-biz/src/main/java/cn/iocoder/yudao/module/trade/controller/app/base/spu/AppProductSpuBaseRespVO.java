@@ -3,8 +3,6 @@ package cn.iocoder.yudao.module.trade.controller.app.base.spu;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.util.List;
-
 /**
  * 商品 SPU 基础 Response VO
  *
@@ -24,5 +22,11 @@ public class AppProductSpuBaseRespVO {
 
     @Schema(description = "商品分类编号", example = "1")
     private Long categoryId;
+
+    @Schema(description = "商品库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "10000")
+    private Integer stock;
+
+    @Schema(description = "商品状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private Integer status;
 
 }

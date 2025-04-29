@@ -1,6 +1,5 @@
-import type { VxeTableGridOptions } from '@vben/plugins/vxe-table';
 import type { VbenFormSchema } from '#/adapter/form';
-import type { OnActionClickFn } from '#/adapter/vxe-table';
+import type { OnActionClickFn, VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 
 import { z } from '#/adapter/form';
@@ -40,7 +39,6 @@ export function useFormSchema(): VbenFormSchema[] {
           });
           return handleTree(data);
         },
-        class: 'w-full',
         labelField: '${treeNameColumn.javaField}',
         valueField: 'id',
         childrenField: 'children',
@@ -75,18 +73,10 @@ export function useFormSchema(): VbenFormSchema[] {
       componentProps: {
         placeholder: '请输入${comment}',
       },
-  #elseif($column.htmlType == "imageUpload")## 图片上传 TODO @puhui999：目前分成了图片和文件上传，可以不用 fileType 之类哈，可以用下；
-      component: 'FileUpload',
-      componentProps: {
-        fileType: 'image',
-        maxCount: 1,
-      },
+  #elseif($column.htmlType == "imageUpload")## 图片上传
+      component: 'ImageUpload',
   #elseif($column.htmlType == "fileUpload")## 文件上传
       component: 'FileUpload',
-      componentProps: {
-        fileType: 'file',
-        maxCount: 1,
-      },
   #elseif($column.htmlType == "editor")## 文本编辑器
       component: 'RichTextarea',
   #elseif($column.htmlType == "select")## 下拉框
@@ -98,7 +88,6 @@ export function useFormSchema(): VbenFormSchema[] {
         options: [],
         #end
         placeholder: '请选择${comment}',
-        class: 'w-full',
       },
   #elseif($column.htmlType == "checkbox")## 多选框
       component: 'Checkbox',
@@ -136,7 +125,6 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'InputNumber',
       componentProps: {
         min: 0,
-        class: 'w-full',
         controlsPosition: 'right',
         placeholder: '请输入${comment}',
       },
@@ -320,17 +308,9 @@ export function use${subSimpleClassName}FormSchema(): VbenFormSchema[] {
                                     placeholder: '请输入${comment}',
                                 },
                             #elseif($column.htmlType == "imageUpload")## 图片上传
-                                component: 'FileUpload',
-                                componentProps: {
-                                    fileType: 'image',
-                                    maxCount: 1,
-                                },
+                                component: 'ImageUpload',
                             #elseif($column.htmlType == "fileUpload")## 文件上传
                                 component: 'FileUpload',
-                                componentProps: {
-                                    fileType: 'file',
-                                    maxCount: 1,
-                                },
                             #elseif($column.htmlType == "editor")## 文本编辑器
                                 component: 'RichTextarea',
                             #elseif($column.htmlType == "select")## 下拉框
@@ -342,7 +322,6 @@ export function use${subSimpleClassName}FormSchema(): VbenFormSchema[] {
                                         options: [],
                                     #end
                                     placeholder: '请选择${comment}',
-                                    class: 'w-full',
                                 },
                             #elseif($column.htmlType == "checkbox")## 多选框
                                 component: 'Checkbox',
@@ -380,7 +359,6 @@ export function use${subSimpleClassName}FormSchema(): VbenFormSchema[] {
                                 component: 'InputNumber',
                                 componentProps: {
                                     min: 0,
-                                    class: 'w-full',
                                     controlsPosition: 'right',
                                     placeholder: '请输入${comment}',
                                 },
@@ -603,17 +581,9 @@ export function use${subSimpleClassName}GridColumns(
                                         placeholder: '请输入${comment}',
                                     },
                                 #elseif($column.htmlType == "imageUpload")## 图片上传
-                                    component: 'FileUpload',
-                                    componentProps: {
-                                        fileType: 'image',
-                                        maxCount: 1,
-                                    },
+                                    component: 'ImageUpload',
                                 #elseif($column.htmlType == "fileUpload")## 文件上传
                                     component: 'FileUpload',
-                                    componentProps: {
-                                        fileType: 'file',
-                                        maxCount: 1,
-                                    },
                                 #elseif($column.htmlType == "editor")## 文本编辑器
                                     component: 'RichTextarea',
                                 #elseif($column.htmlType == "select")## 下拉框
@@ -625,7 +595,6 @@ export function use${subSimpleClassName}GridColumns(
                                             options: [],
                                         #end
                                         placeholder: '请选择${comment}',
-                                        class: 'w-full',
                                     },
                                 #elseif($column.htmlType == "checkbox")## 多选框
                                     component: 'Checkbox',
@@ -663,7 +632,6 @@ export function use${subSimpleClassName}GridColumns(
                                     component: 'InputNumber',
                                     componentProps: {
                                         min: 0,
-                                        class: 'w-full',
                                         controlsPosition: 'right',
                                         placeholder: '请输入${comment}',
                                     },

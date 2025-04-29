@@ -11,8 +11,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
-
 @Data
 @Schema(description = "管理后台 - IoT OTA 升级任务创建/修改 Request VO")
 public class IotOtaUpgradeTaskSaveReqVO {
@@ -24,7 +22,7 @@ public class IotOtaUpgradeTaskSaveReqVO {
      * 任务名称
      */
     @NotEmpty(message = "任务名称不能为空")
-    @Schema(description = "任务名称", requiredMode = REQUIRED, example = "升级任务")
+    @Schema(description = "任务名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "升级任务")
     private String name;
 
     /**
@@ -39,7 +37,7 @@ public class IotOtaUpgradeTaskSaveReqVO {
      * 关联 {@link IotOtaFirmwareDO#getId()}
      */
     @NotNull(message = "固件编号不能为空")
-    @Schema(description = "固件编号", requiredMode = REQUIRED, example = "1024")
+    @Schema(description = "固件编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long firmwareId;
 
     /**
@@ -49,7 +47,7 @@ public class IotOtaUpgradeTaskSaveReqVO {
      */
     @NotNull(message = "升级范围不能为空")
     @InEnum(value = IotOtaUpgradeTaskScopeEnum.class)
-    @Schema(description = "升级范围", requiredMode = REQUIRED, example = "1")
+    @Schema(description = "升级范围", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer scope;
 
     /**
@@ -57,7 +55,7 @@ public class IotOtaUpgradeTaskSaveReqVO {
      * <p>
      * 关联 {@link IotDeviceDO#getId()}
      */
-    @Schema(description = "选中的设备编号数组", requiredMode = REQUIRED, example = "[1,2,3,4]")
+    @Schema(description = "选中的设备编号数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "[1,2,3,4]")
     private List<Long> deviceIds;
 
 }

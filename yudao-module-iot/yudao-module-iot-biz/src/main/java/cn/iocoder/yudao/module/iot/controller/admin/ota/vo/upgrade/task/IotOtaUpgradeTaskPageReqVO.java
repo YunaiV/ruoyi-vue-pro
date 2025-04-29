@@ -2,11 +2,8 @@ package cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.task;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
-
-import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 @Data
 @Schema(description = "管理后台 - IoT OTA 升级任务分页 Request VO")
@@ -22,7 +19,7 @@ public class IotOtaUpgradeTaskPageReqVO extends PageParam {
      * 固件编号字段，用于唯一标识固件，不能为空
      */
     @NotNull(message = "固件编号不能为空")
-    @Schema(description = "固件编号", requiredMode = REQUIRED, example = "1024")
+    @Schema(description = "固件编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long firmwareId;
 
 }

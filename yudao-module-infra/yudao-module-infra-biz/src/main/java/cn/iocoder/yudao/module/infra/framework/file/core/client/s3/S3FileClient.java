@@ -46,7 +46,9 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
                 AwsBasicCredentials.create(config.getAccessKey(), config.getAccessSecret()));
         URI endpoint = URI.create(buildEndpoint());
         S3Configuration serviceConfiguration = S3Configuration.builder() // Path-style 访问
-                .pathStyleAccessEnabled(Boolean.TRUE.equals(config.getEnablePathStyleAccess())).build();
+                .pathStyleAccessEnabled(Boolean.TRUE.equals(config.getEnablePathStyleAccess()))
+                .chunkedEncodingEnabled(false) // 禁用分块编码，参见 https://t.zsxq.com/kBy57
+                .build();
         client = S3Client.builder()
                 .credentialsProvider(credentialsProvider)
                 .region(region)

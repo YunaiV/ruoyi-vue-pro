@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
@@ -101,13 +102,17 @@ public class TradeBrokerageOrderHandler implements TradeOrderHandler {
     protected void addBrokerage(Long userId, List<TradeOrderItemDO> orderItems) {
         MemberUserRespDTO user = memberUserApi.getUser(userId);
         Assert.notNull(user);
-        ProductSpuRespDTO spu = productSpuApi.getSpu(orderItems.get(0).getSpuId());
-        Assert.notNull(spu);
-        ProductSkuRespDTO sku = productSkuApi.getSku(orderItems.get(0).getSkuId());
+        Map<Long, ProductSpuRespDTO> spusMap = productSpuApi.getSpuMap(convertList(orderItems, TradeOrderItemDO::getSpuId));
+        Map<Long, ProductSkuRespDTO> skusMap = productSkuApi.getSkuMap(convertList(orderItems, TradeOrderItemDO::getSkuId));
 
         // 每一个订单项，都会去生成分销记录
-        List<BrokerageAddReqBO> addList = convertList(orderItems,
-                item -> TradeOrderConvert.INSTANCE.convert(user, item, spu, sku));
+        List<BrokerageAddReqBO> addList = convertList(orderItems, item -> {
+            ProductSpuRespDTO spu = spusMap.get(item.getSpuId());
+            Assert.notNull(spu);
+            ProductSkuRespDTO sku = skusMap.get(item.getSkuId());
+            Assert.notNull(sku);
+            return TradeOrderConvert.INSTANCE.convert(user, item, spu, sku);
+        });
         brokerageRecordService.addBrokerage(userId, BrokerageRecordBizTypeEnum.ORDER, addList);
     }
 

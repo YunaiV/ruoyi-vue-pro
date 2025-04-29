@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.trade.service.aftersale;
 
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.AfterSaleDisagreeReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.AfterSalePageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.AfterSaleRefuseReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSaleCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSaleDeliveryReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSalePageReqVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.AfterSaleDO;
 
 /**
@@ -28,10 +28,10 @@ public interface AfterSaleService {
      * 【会员】获得售后订单分页
      *
      * @param userId    用户编号
-     * @param pageParam 分页参数
+     * @param pageReqVO 分页参数
      * @return 售后订单分页
      */
-    PageResult<AfterSaleDO> getAfterSalePage(Long userId, PageParam pageParam);
+    PageResult<AfterSaleDO> getAfterSalePage(Long userId, AppAfterSalePageReqVO pageReqVO);
 
     /**
      * 【会员】获得售后单

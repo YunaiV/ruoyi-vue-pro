@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.module.trade.controller.app.aftersale;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSaleCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSaleDeliveryReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSalePageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSaleRespVO;
-import cn.iocoder.yudao.module.trade.convert.aftersale.AfterSaleConvert;
+import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.AfterSaleDO;
 import cn.iocoder.yudao.module.trade.service.aftersale.AfterSaleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,16 +33,17 @@ public class AppAfterSaleController {
 
     @GetMapping(value = "/page")
     @Operation(summary = "获得售后分页")
-    public CommonResult<PageResult<AppAfterSaleRespVO>> getAfterSalePage(PageParam pageParam) {
-        return success(AfterSaleConvert.INSTANCE.convertPage02(
-                afterSaleService.getAfterSalePage(getLoginUserId(), pageParam)));
+    public CommonResult<PageResult<AppAfterSaleRespVO>> getAfterSalePage(AppAfterSalePageReqVO pageReqVO) {
+        PageResult<AfterSaleDO> pageResult = afterSaleService.getAfterSalePage(getLoginUserId(), pageReqVO);
+        return success(BeanUtils.toBean(pageResult, AppAfterSaleRespVO.class));
     }
 
     @GetMapping(value = "/get")
     @Operation(summary = "获得售后订单")
     @Parameter(name = "id", description = "售后编号", required = true, example = "1")
     public CommonResult<AppAfterSaleRespVO> getAfterSale(@RequestParam("id") Long id) {
-        return success(AfterSaleConvert.INSTANCE.convert(afterSaleService.getAfterSale(getLoginUserId(), id)));
+        AfterSaleDO afterSale = afterSaleService.getAfterSale(getLoginUserId(), id);
+        return success(BeanUtils.toBean(afterSale, AppAfterSaleRespVO.class));
     }
 
     @PostMapping(value = "/create")

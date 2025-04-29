@@ -135,7 +135,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
     private Long createPayTransfer(BrokerageWithdrawDO withdraw) {
         // 1.1 获取微信 openid
         SocialUserRespDTO socialUser = socialUserApi.getSocialUserByUserId(
-                UserTypeEnum.MEMBER.getValue(), withdraw.getUserId(), SocialTypeEnum.WECHAT_MINI_APP.getType());
+                UserTypeEnum.MEMBER.getValue(), withdraw.getUserId(), SocialTypeEnum.WECHAT_MINI_PROGRAM.getType());
         // TODO @luchi：这里，需要校验非空。如果空的话，要有业务异常哈；
         // 1.2 构建请求
         PayTransferCreateReqDTO payTransferCreateReqDTO = new PayTransferCreateReqDTO()
