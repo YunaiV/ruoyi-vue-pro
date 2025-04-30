@@ -12,14 +12,14 @@ import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialUserBindMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialUserMapper;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
-import jakarta.annotation.Resource;
-import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 

@@ -32,7 +32,6 @@ import com.binarywang.spring.starter.wxjava.mp.properties.WxMpProperties;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxJsapiSignature;
@@ -48,11 +47,13 @@ import me.zhyd.oauth.model.AuthResponse;
 import me.zhyd.oauth.model.AuthUser;
 import me.zhyd.oauth.request.AuthRequest;
 import me.zhyd.oauth.utils.AuthStateUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +92,8 @@ public class SocialClientServiceImpl implements SocialClientService {
     @Value("${yudao.wxa-subscribe-message.miniprogram-state:formal}")
     public String miniprogramState;
 
-    @Resource
+//    @Resource
+    @Autowired // TODO @芋艿：等 justauth1.4.1 发布，可以去掉
     private AuthRequestFactory authRequestFactory;
 
     @Resource

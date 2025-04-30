@@ -8,11 +8,11 @@ import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialCl
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
-import jakarta.validation.Valid;
 import me.chanjar.weixin.common.bean.WxJsapiSignature;
 import me.chanjar.weixin.common.bean.subscribemsg.TemplateInfo;
 import me.zhyd.oauth.model.AuthUser;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**

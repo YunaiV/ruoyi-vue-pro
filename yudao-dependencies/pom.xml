@@ -74,7 +74,8 @@
         <commons-io.version>2.17.0</commons-io.version>
         <commons-compress.version>1.27.1</commons-compress.version>
         <awssdk.version>2.30.14</awssdk.version>
-        <justauth.version>1.0.8</justauth.version>
+        <justauth.version>1.16.7</justauth.version>
+        <justauth-starter.version>1.4.0</justauth-starter.version>
         <jimureport.version>1.7.8</jimureport.version>
         <weixin-java.version>4.7.2.B</weixin-java.version>
         <!-- 专属于 JDK8 安全漏洞升级 -->
@@ -588,15 +589,14 @@
             </dependency>
 
             <dependency>
-                <groupId>com.xingyuv</groupId>
-                <artifactId>spring-boot-starter-justauth</artifactId> <!-- 社交登陆（例如说，个人微信、企业微信等等） -->
+                <groupId>me.zhyd.oauth</groupId>
+                <artifactId>JustAuth</artifactId> <!-- 社交登陆（例如说，个人微信、企业微信等等） -->
                 <version>${justauth.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>cn.hutool</groupId>
-                        <artifactId>hutool-core</artifactId>
-                    </exclusion>
-                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.xkcoding.justauth</groupId>
+                <artifactId>justauth-spring-boot-starter</artifactId>
+                <version>${justauth-starter.version}</version>
             </dependency>
 
             <dependency>
