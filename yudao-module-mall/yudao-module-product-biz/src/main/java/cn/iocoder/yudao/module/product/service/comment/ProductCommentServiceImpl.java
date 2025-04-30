@@ -91,7 +91,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     }
 
     private ProductSkuDO validateSku(Long skuId) {
-        ProductSkuDO sku = productSkuService.getSku(skuId);
+        ProductSkuDO sku = productSkuService.getSku(skuId, true);
         if (sku == null) {
             throw exception(SKU_NOT_EXISTS);
         }
@@ -99,7 +99,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     }
 
     private ProductSpuDO validateSpu(Long spuId) {
-        ProductSpuDO spu = productSpuService.getSpu(spuId);
+        ProductSpuDO spu = productSpuService.getSpu(spuId, true);
         if (null == spu) {
             throw exception(SPU_NOT_EXISTS);
         }
