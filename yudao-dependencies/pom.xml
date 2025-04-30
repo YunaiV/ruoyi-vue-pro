@@ -48,7 +48,7 @@
         <!-- Bpm 工作流相关 -->
         <flowable.version>7.0.1</flowable.version>
         <!-- 工具类相关 -->
-        <captcha-plus.version>2.0.3</captcha-plus.version>
+        <anji-plus-captcha.version>1.4.0</anji-plus-captcha.version>
         <jsoup.version>1.18.3</jsoup.version>
         <lombok.version>1.18.36</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
@@ -535,9 +535,9 @@
             </dependency>
 
             <dependency>
-                <groupId>com.xingyuv</groupId>
-                <artifactId>spring-boot-starter-captcha-plus</artifactId>
-                <version>${captcha-plus.version}</version>
+                <groupId>com.anji-plus</groupId>
+                <artifactId>captcha-spring-boot-starter</artifactId> <!-- 验证码，一般用于登录使用 -->
+                <version>${anji-plus-captcha.version}</version>
             </dependency>
 
             <dependency>
