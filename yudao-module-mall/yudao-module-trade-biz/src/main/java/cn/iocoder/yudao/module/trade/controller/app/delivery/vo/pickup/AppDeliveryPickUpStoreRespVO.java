@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.trade.controller.app.delivery.vo.pickup;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalTime;
 
 @Schema(description = "用户 App - 自提门店 Response VO")
