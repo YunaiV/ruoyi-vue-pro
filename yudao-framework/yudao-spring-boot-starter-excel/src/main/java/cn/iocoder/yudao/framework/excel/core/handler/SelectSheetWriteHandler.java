@@ -57,14 +57,16 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
         // 解析下拉数据
         int colIndex = 0;
         for (Field field : head.getDeclaredFields()) {
-            if (field.isAnnotationPresent(ExcelColumnSelect.class)) {
-                ExcelProperty excelProperty = field.getAnnotation(ExcelProperty.class);
-                if (excelProperty != null && excelProperty.index() != -1) {
-                    colIndex = excelProperty.index();
+            if(field.isAnnotationPresent(ExcelProperty.class)){
+                if (field.isAnnotationPresent(ExcelColumnSelect.class)) {
+                    ExcelProperty excelProperty = field.getAnnotation(ExcelProperty.class);
+                    if (excelProperty != null && excelProperty.index() != -1) {
+                        colIndex = excelProperty.index();
+                    }
+                    getSelectDataList(colIndex, field);
                 }
-                getSelectDataList(colIndex, field);
+                colIndex++;
             }
-            colIndex++;
         }
     }
 
