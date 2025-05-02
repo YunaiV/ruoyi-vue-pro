@@ -83,8 +83,6 @@ public class AdminUserServiceImpl implements AdminUserService {
     private UserPostMapper userPostMapper;
 
     @Resource
-    private FileApi fileApi;
-    @Resource
     private ConfigApi configApi;
 
     @Override
@@ -203,19 +201,6 @@ public class AdminUserServiceImpl implements AdminUserService {
         AdminUserDO updateObj = new AdminUserDO().setId(id);
         updateObj.setPassword(encodePassword(reqVO.getNewPassword())); // 加密密码
         userMapper.updateById(updateObj);
-    }
-
-    @Override
-    public String updateUserAvatar(Long id, InputStream avatarFile) {
-        validateUserExists(id);
-        // 存储文件
-        String avatar = fileApi.createFile(IoUtil.readBytes(avatarFile));
-        // 更新路径
-        AdminUserDO sysUserDO = new AdminUserDO();
-        sysUserDO.setId(id);
-        sysUserDO.setAvatar(avatar);
-        userMapper.updateById(sysUserDO);
-        return avatar;
     }
 
     @Override
