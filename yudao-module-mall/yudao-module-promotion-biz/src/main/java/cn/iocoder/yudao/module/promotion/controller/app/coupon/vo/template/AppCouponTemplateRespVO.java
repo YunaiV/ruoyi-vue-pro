@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.promotion.controller.app.coupon.vo.template;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 
-import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,6 +19,9 @@ public class AppCouponTemplateRespVO {
 
     @Schema(description = "优惠券说明", example = "优惠券使用说明")
     private String description;
+
+    @Schema(description = "发行总量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024") // -1 - 则表示不限制发放数量
+    private Integer totalCount;
 
     @Schema(description = "每人限领个数", requiredMode = Schema.RequiredMode.REQUIRED, example = "66") // -1 - 则表示不限制
     private Integer takeLimitCount;
@@ -61,6 +64,9 @@ public class AppCouponTemplateRespVO {
 
     @Schema(description = "折扣上限", example = "100") // 单位：分，仅在 discountType 为 PERCENT 使用
     private Integer discountLimitPrice;
+
+    @Schema(description = "领取优惠券的数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    private Integer takeCount;
 
     // ========== 用户相关字段 ==========
 

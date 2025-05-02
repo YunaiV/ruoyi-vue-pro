@@ -186,7 +186,7 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
     public void testSendSmsCode() {
         // 准备参数
         String mobile = randomString();
-        Integer scene = randomEle(SmsSceneEnum.values()).getScene();
+        Integer scene = SmsSceneEnum.ADMIN_MEMBER_LOGIN.getScene();
         AuthSmsSendReqVO reqVO = new AuthSmsSendReqVO(mobile, scene);
         // mock 方法（用户信息）
         AdminUserDO user = randomPojo(AdminUserDO.class);

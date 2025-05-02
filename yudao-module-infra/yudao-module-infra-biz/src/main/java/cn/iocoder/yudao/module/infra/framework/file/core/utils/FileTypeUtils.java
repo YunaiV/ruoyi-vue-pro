@@ -5,7 +5,10 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import com.alibaba.ttl.TransmittableThreadLocal;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
+import org.apache.tika.mime.MimeTypeException;
+import org.apache.tika.mime.MimeTypes;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -15,12 +18,13 @@ import java.io.IOException;
  *
  * @author 芋道源码
  */
+@Slf4j
 public class FileTypeUtils {
 
     private static final ThreadLocal<Tika> TIKA = TransmittableThreadLocal.withInitial(Tika::new);
 
     /**
-     * 获得文件的 mineType，对于doc，jar等文件会有误差
+     * 获得文件的 mineType，对于 doc，jar 等文件会有误差
      *
      * @param data 文件内容
      * @return mineType 无法识别时会返回“application/octet-stream”
@@ -31,7 +35,7 @@ public class FileTypeUtils {
     }
 
     /**
-     * 已知文件名，获取文件类型，在某些情况下比通过字节数组准确，例如使用jar文件时，通过名字更为准确
+     * 已知文件名，获取文件类型，在某些情况下比通过字节数组准确，例如使用 jar 文件时，通过名字更为准确
      *
      * @param name 文件名
      * @return mineType 无法识别时会返回“application/octet-stream”
@@ -49,6 +53,23 @@ public class FileTypeUtils {
      */
     public static String getMineType(byte[] data, String name) {
         return TIKA.get().detect(data, name);
+    }
+
+    /**
+     * 根据 mineType 获得文件后缀
+     *
+     * 注意：如果获取不到，或者发生异常，都返回 null
+     *
+     * @param mineType 类型
+     * @return 后缀，例如说 .pdf
+     */
+    public static String getExtension(String mineType) {
+        try {
+            return MimeTypes.getDefaultMimeTypes().forName(mineType).getExtension();
+        } catch (MimeTypeException e) {
+            log.warn("[getExtension][获取文件后缀({}) 失败]", mineType, e);
+            return null;
+        }
     }
 
     /**

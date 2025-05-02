@@ -18,10 +18,6 @@ public class LocalFileClient extends AbstractFileClient<LocalFileClientConfig> {
 
     @Override
     protected void doInit() {
-        // 补全风格。例如说 Linux 是 /，Windows 是 \
-        if (!config.getBasePath().endsWith(File.separator)) {
-            config.setBasePath(config.getBasePath() + File.separator);
-        }
     }
 
     @Override
@@ -46,7 +42,7 @@ public class LocalFileClient extends AbstractFileClient<LocalFileClientConfig> {
     }
 
     private String getFilePath(String path) {
-        return config.getBasePath() + path;
+        return config.getBasePath() + File.separator + path;
     }
 
 }

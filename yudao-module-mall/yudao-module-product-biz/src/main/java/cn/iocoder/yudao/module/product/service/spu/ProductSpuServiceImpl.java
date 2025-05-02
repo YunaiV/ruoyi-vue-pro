@@ -190,6 +190,14 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
+    public ProductSpuDO getSpu(Long id, boolean includeDeleted) {
+        if (includeDeleted) {
+            return productSpuMapper.selectByIdIncludeDeleted(id);
+        }
+        return getSpu(id);
+    }
+
+    @Override
     public List<ProductSpuDO> getSpuList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();

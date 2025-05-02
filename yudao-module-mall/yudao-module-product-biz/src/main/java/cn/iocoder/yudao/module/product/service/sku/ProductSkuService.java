@@ -30,6 +30,15 @@ public interface ProductSkuService {
     ProductSkuDO getSku(Long id);
 
     /**
+     * 获得商品 SKU 信息
+     *
+     * @param id 编号
+     * @param includeDeleted 是否包含已删除的
+     * @return 商品 SKU 信息
+     */
+    ProductSkuDO getSku(Long id, boolean includeDeleted);
+
+    /**
      * 获得商品 SKU 列表
      *
      * @param ids 编号

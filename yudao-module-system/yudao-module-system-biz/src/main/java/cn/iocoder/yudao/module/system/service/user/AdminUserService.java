@@ -11,9 +11,8 @@ import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserImportRe
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import jakarta.validation.Valid;
 
-import javax.validation.Valid;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -72,14 +71,6 @@ public interface AdminUserService {
      * @param reqVO 更新用户个人密码
      */
     void updateUserPassword(Long id, @Valid UserProfileUpdatePasswordReqVO reqVO);
-
-    /**
-     * 更新用户头像
-     *
-     * @param id         用户 id
-     * @param avatarFile 头像文件
-     */
-    String updateUserAvatar(Long id, InputStream avatarFile) throws Exception;
 
     /**
      * 修改密码

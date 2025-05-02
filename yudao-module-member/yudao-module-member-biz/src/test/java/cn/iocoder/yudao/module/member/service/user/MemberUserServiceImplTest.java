@@ -5,12 +5,12 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbAndRedisUnitTest;
-import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import cn.iocoder.yudao.module.member.controller.app.user.vo.AppMemberUserUpdateMobileReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
 import cn.iocoder.yudao.module.member.service.auth.MemberAuthServiceImpl;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -18,7 +18,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.annotation.Resource;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
@@ -53,8 +52,6 @@ public class MemberUserServiceImplTest extends BaseDbAndRedisUnitTest {
 
     @MockBean
     private SmsCodeApi smsCodeApi;
-    @MockBean
-    private FileApi fileApi;
 
     // TODO 芋艿：后续重构这个单测
 //    @Test
@@ -72,25 +69,6 @@ public class MemberUserServiceImplTest extends BaseDbAndRedisUnitTest {
 //        String nickname = memberUserService.getUser(userDO.getId()).getNickname();
 //        // 断言
 //        assertEquals(newNickName,nickname);
-//    }
-//
-//    @Test
-//    public void testUpdateAvatar_success() throws Exception {
-//        // mock 数据
-//        MemberUserDO dbUser = randomUserDO();
-//        userMapper.insert(dbUser);
-//
-//        // 准备参数
-//        Long userId = dbUser.getId();
-//        byte[] avatarFileBytes = randomBytes(10);
-//        ByteArrayInputStream avatarFile = new ByteArrayInputStream(avatarFileBytes);
-//        // mock 方法
-//        String avatar = randomString();
-//        when(fileApi.createFile(eq(avatarFileBytes))).thenReturn(avatar);
-//        // 调用
-//        String str = memberUserService.updateUserAvatar(userId, avatarFile);
-//        // 断言
-//        assertEquals(avatar, str);
 //    }
 
     @Test

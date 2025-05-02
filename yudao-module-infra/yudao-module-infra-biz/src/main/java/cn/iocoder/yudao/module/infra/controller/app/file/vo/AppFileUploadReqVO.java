@@ -14,7 +14,7 @@ public class AppFileUploadReqVO {
     @NotNull(message = "文件附件不能为空")
     private MultipartFile file;
 
-    @Schema(description = "文件附件", example = "yudaoyuanma.png")
-    private String path;
+    @Schema(description = "文件目录", example = "XXX/YYY")
+    private String directory;
 
 }
