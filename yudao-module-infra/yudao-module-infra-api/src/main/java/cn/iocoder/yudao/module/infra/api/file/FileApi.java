@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.infra.api.file;
 
-import jakarta.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 /**
  * 文件 API 接口
