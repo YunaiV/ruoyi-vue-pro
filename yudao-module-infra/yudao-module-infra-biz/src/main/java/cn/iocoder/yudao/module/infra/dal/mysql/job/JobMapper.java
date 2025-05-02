@@ -24,7 +24,7 @@ public interface JobMapper extends BaseMapperX<JobDO> {
                 .likeIfPresent(JobDO::getName, reqVO.getName())
                 .eqIfPresent(JobDO::getStatus, reqVO.getStatus())
                 .likeIfPresent(JobDO::getHandlerName, reqVO.getHandlerName())
-        );
+                .orderByDesc(JobDO::getId));
     }
 
 }

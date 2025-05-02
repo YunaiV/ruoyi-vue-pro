@@ -23,8 +23,7 @@ public interface CodegenTableMapper extends BaseMapperX<CodegenTableDO> {
                 .likeIfPresent(CodegenTableDO::getTableComment, pageReqVO.getTableComment())
                 .likeIfPresent(CodegenTableDO::getClassName, pageReqVO.getClassName())
                 .betweenIfPresent(CodegenTableDO::getCreateTime, pageReqVO.getCreateTime())
-                .orderByDesc(CodegenTableDO::getUpdateTime)
-        );
+                .orderByDesc(CodegenTableDO::getUpdateTime));
     }
 
     default List<CodegenTableDO> selectListByDataSourceConfigId(Long dataSourceConfigId) {
