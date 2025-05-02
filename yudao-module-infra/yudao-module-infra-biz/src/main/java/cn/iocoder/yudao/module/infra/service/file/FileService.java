@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FileCreateReq
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePresignedUrlRespVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
+import jakarta.validation.constraints.NotEmpty;
 
 /**
  * 文件 Service 接口
@@ -24,12 +25,24 @@ public interface FileService {
     /**
      * 保存文件，并返回文件的访问路径
      *
-     * @param name    文件名称
-     * @param path    文件路径
      * @param content 文件内容
+     * @param name    文件名称，允许空
+     * @param directory 目录，允许空
+     * @param type    文件的 MIME 类型，允许空
      * @return 文件路径
      */
-    String createFile(String name, String path, byte[] content);
+    String createFile(@NotEmpty(message = "文件内容不能为空") byte[] content,
+                      String name, String directory, String type);
+
+    /**
+     * 生成文件预签名地址信息
+     *
+     * @param name 文件名
+     * @param directory 目录
+     * @return 预签名地址信息
+     */
+    FilePresignedUrlRespVO getFilePresignedUrl(@NotEmpty(message = "文件名不能为空") String name,
+                                               String directory);
 
     /**
      * 创建文件
@@ -54,13 +67,5 @@ public interface FileService {
      * @return 文件内容
      */
     byte[] getFileContent(Long configId, String path) throws Exception;
-
-    /**
-     * 生成文件预签名地址信息
-     *
-     * @param path 文件路径
-     * @return 预签名地址信息
-     */
-    FilePresignedUrlRespVO getFilePresignedUrl(String path) throws Exception;
 
 }
