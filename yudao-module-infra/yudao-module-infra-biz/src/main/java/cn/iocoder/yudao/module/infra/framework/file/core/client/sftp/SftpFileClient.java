@@ -22,10 +22,6 @@ public class SftpFileClient extends AbstractFileClient<SftpFileClientConfig> {
 
     @Override
     protected void doInit() {
-        // 补全风格。例如说 Linux 是 /，Windows 是 \
-        if (!config.getBasePath().endsWith(File.separator)) {
-            config.setBasePath(config.getBasePath() + File.separator);
-        }
         // 初始化 Ftp 对象
         this.sftp = new Sftp(config.getHost(), config.getPort(), config.getUsername(), config.getPassword());
     }
@@ -35,6 +31,8 @@ public class SftpFileClient extends AbstractFileClient<SftpFileClientConfig> {
         // 执行写入
         String filePath = getFilePath(path);
         File file = FileUtils.createTempFile(content);
+        reconnectIfTimeout();
+        sftp.mkDirs(FileUtil.getParent(filePath, 1)); // 需要创建父目录，不然会报错
         sftp.upload(filePath, file);
         // 拼接返回路径
         return super.formatFileUrl(config.getDomain(), path);
@@ -43,6 +41,7 @@ public class SftpFileClient extends AbstractFileClient<SftpFileClientConfig> {
     @Override
     public void delete(String path) {
         String filePath = getFilePath(path);
+        reconnectIfTimeout();
         sftp.delFile(filePath);
     }
 
@@ -50,12 +49,17 @@ public class SftpFileClient extends AbstractFileClient<SftpFileClientConfig> {
     public byte[] getContent(String path) {
         String filePath = getFilePath(path);
         File destFile = FileUtils.createTempFile();
+        reconnectIfTimeout();
         sftp.download(filePath, destFile);
         return FileUtil.readBytes(destFile);
     }
 
     private String getFilePath(String path) {
-        return config.getBasePath() + path;
+        return config.getBasePath() + File.separator + path;
+    }
+
+    private synchronized void reconnectIfTimeout() {
+        sftp.reconnectIfTimeout();
     }
 
 }

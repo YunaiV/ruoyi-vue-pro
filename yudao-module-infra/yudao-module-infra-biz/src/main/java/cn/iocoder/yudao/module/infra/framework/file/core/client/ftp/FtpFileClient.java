@@ -26,12 +26,6 @@ public class FtpFileClient extends AbstractFileClient<FtpFileClientConfig> {
 
     @Override
     protected void doInit() {
-        // 把配置的 \ 替换成 /, 如果路径配置 \a\test, 替换成 /a/test, 替换方法已经处理 null 情况
-        config.setBasePath(StrUtil.replace(config.getBasePath(), StrUtil.BACKSLASH, StrUtil.SLASH));
-        // ftp的路径是 / 结尾
-        if (!config.getBasePath().endsWith(StrUtil.SLASH)) {
-            config.setBasePath(config.getBasePath() + StrUtil.SLASH);
-        }
         // 初始化 Ftp 对象
         this.ftp = new Ftp(config.getHost(), config.getPort(), config.getUsername(), config.getPassword(),
                 CharsetUtil.CHARSET_UTF_8, null, null, FtpMode.valueOf(config.getMode()));
@@ -43,8 +37,8 @@ public class FtpFileClient extends AbstractFileClient<FtpFileClientConfig> {
         String filePath = getFilePath(path);
         String fileName = FileUtil.getName(filePath);
         String dir = StrUtil.removeSuffix(filePath, fileName);
-        ftp.reconnectIfTimeout();
-        boolean success = ftp.upload(dir, fileName, new ByteArrayInputStream(content));
+        reconnectIfTimeout();
+        boolean success = ftp.upload(dir, fileName, new ByteArrayInputStream(content)); // 不需要主动创建目录，ftp 内部已经处理（见源码）
         if (!success) {
             throw new FtpException(StrUtil.format("上传文件到目标目录 ({}) 失败", filePath));
         }
@@ -55,7 +49,7 @@ public class FtpFileClient extends AbstractFileClient<FtpFileClientConfig> {
     @Override
     public void delete(String path) {
         String filePath = getFilePath(path);
-        ftp.reconnectIfTimeout();
+        reconnectIfTimeout();
         ftp.delFile(filePath);
     }
 
@@ -65,13 +59,17 @@ public class FtpFileClient extends AbstractFileClient<FtpFileClientConfig> {
         String fileName = FileUtil.getName(filePath);
         String dir = StrUtil.removeSuffix(filePath, fileName);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ftp.reconnectIfTimeout();
+        reconnectIfTimeout();
         ftp.download(dir, fileName, out);
         return out.toByteArray();
     }
 
     private String getFilePath(String path) {
-        return config.getBasePath() + path;
+        return config.getBasePath() + StrUtil.SLASH + path;
+    }
+
+    private synchronized void reconnectIfTimeout() {
+        ftp.reconnectIfTimeout();
     }
 
 }
