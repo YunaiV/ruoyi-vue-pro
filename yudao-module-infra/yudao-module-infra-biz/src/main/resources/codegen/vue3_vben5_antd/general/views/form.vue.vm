@@ -5,11 +5,11 @@ import type { Rule } from 'ant-design-vue/es/form';
 import { useVbenModal } from '@vben/common-ui';
 import { Tinymce as RichTextarea } from '#/components/tinymce';
 import { ImageUpload, FileUpload } from "#/components/upload";
-import { message, Tabs, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker } from 'ant-design-vue';
+import { message, Tabs, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker, TreeSelect } from 'ant-design-vue';
 import { DICT_TYPE, getDictOptions } from '#/utils/dict';
 #if($table.templateType == 2)## 树表需要导入这些
 import { get${simpleClassName}List } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
-import { handleTree } from '#/utils/tree';
+import { handleTree } from '@vben/utils'
 #end
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 10 || $table.templateType == 12 )
@@ -90,10 +90,12 @@ const resetForm = () => {
 /** 获得${table.classComment}树 */
 const get${simpleClassName}Tree = async () => {
   ${classNameVar}Tree.value = []
-  const data = await get${simpleClassName}List()
-  const root: Tree = { id: 0, name: '顶级${table.classComment}', children: [] }
-  root.children = handleTree(data, 'id', '${treeParentColumn.javaField}')
-  ${classNameVar}Tree.value.push(root)
+  const data = await get${simpleClassName}List({});
+  data.unshift({
+    id: 0,
+    name: '顶级${table.classComment}',
+  });
+    ${classNameVar}Tree.value = handleTree(data);
 }
 #end
 
@@ -205,9 +207,17 @@ const [Modal, modalApi] = useVbenModal({
                       v-model:value="formData.${javaField}"
                       :treeData="${classNameVar}Tree"
                 #if ($treeNameColumn.javaField == "name")
-                      :fieldNames="defaultProps"
+                      :fieldNames="{
+            label: 'name',
+            value: 'id',
+            children: 'children',
+          }"
                 #else
-                      :fieldNames="{...defaultProps, label: '$treeNameColumn.javaField'}"
+                      :fieldNames="{
+                        label: '$treeNameColumn.javaField',
+                        value: 'id',
+                        children: 'children',
+                        }"
                 #end
                       checkable
                       treeDefaultExpandAll

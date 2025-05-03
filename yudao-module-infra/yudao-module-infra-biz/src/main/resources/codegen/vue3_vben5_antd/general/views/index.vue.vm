@@ -26,7 +26,7 @@ import { getRangePickerDefaultProps } from '#/utils/date';
 import { ref, h, reactive,onMounted,nextTick } from 'vue';
 import { $t } from '#/locales';
 #if (${table.templateType} == 2)## 树表接口
-import { handleTree } from '@/utils/tree'
+import { handleTree,isEmpty } from '@vben/utils'
 import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 #else## 标准表接口
 import { get${simpleClassName}Page, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
@@ -42,7 +42,12 @@ const select${simpleClassName} = ref<${simpleClassName}Api.${simpleClassName}>()
 #end
 
 const loading = ref(true) // 列表的加载中
+#if ( $table.templateType == 2 )
+const list = ref<any[]>([]) // 树列表的数据
+#else
 const list = ref<${simpleClassName}Api.${simpleClassName}[]>([]) // 列表的数据
+#end
+
 ## 特殊：树表专属逻辑（树不需要分页接口）
 #if ( $table.templateType != 2 )
 const total = ref(0) // 列表的总页数
@@ -83,8 +88,7 @@ const getList = async () => {
       #end
       ## 特殊：树表专属逻辑（树不需要分页接口）
       #if ( $table.templateType == 2 )
-        const data = await get${simpleClassName}List(params)
-        list.value = handleTree(data, 'id', '${treeParentColumn.javaField}')
+        list.value = await get${simpleClassName}List(params);
       #else
         const data = await get${simpleClassName}Page(params)
         list.value = data.list
@@ -97,7 +101,9 @@ const getList = async () => {
 
 /** 搜索按钮操作 */
 const handleQuery = () => {
+#if ( $table.templateType != 2 )
   queryParams.pageNo = 1
+#end
   getList()
 }
 
@@ -163,6 +169,16 @@ try {
 const hiddenSearchBar = ref(false);
 const tableToolbarRef = ref<InstanceType<typeof TableToolbar>>();
 const tableRef = ref<VxeTableInstance>();
+
+#if (${table.templateType} == 2)
+/** 切换树形展开/收缩状态 */
+const isExpanded = ref(true);
+function toggleExpand() {
+  isExpanded.value = !isExpanded.value;
+  tableRef.value?.setAllTreeExpand(isExpanded.value);
+}
+#end
+
 /** 初始化 */
 onMounted(async () => {
   await getList();
@@ -270,6 +286,11 @@ onMounted(async () => {
             ref="tableToolbarRef"
             v-model:hidden-search="hiddenSearchBar"
         >
+        #if (${table.templateType} == 2)
+          <Button @click="toggleExpand" class="mr-2">
+            {{ isExpanded ? '收缩' : '展开' }}
+          </Button>
+        #end
           <Button
               class="ml-2"
               :icon="h(Plus)"
@@ -277,7 +298,7 @@ onMounted(async () => {
               @click="onCreate"
               v-access:code="['${permissionPrefix}:create']"
           >
-            {{ $t('ui.actionTitle.create', ['示例联系人']) }}
+            {{ $t('ui.actionTitle.create', ['${table.classComment}']) }}
           </Button>
           <Button
               :icon="h(Download)"
@@ -291,7 +312,21 @@ onMounted(async () => {
           </Button>
         </TableToolbar>
       </template>
-      <vxe-table ref="tableRef" :data="list" show-overflow :loading="loading">
+      <vxe-table
+          ref="tableRef"
+          :data="list"
+        #if ( $table.templateType == 2 )
+          :tree-config="{
+          parentField: '${treeParentColumn.javaField}',
+          rowField: 'id',
+          transform: true,
+          expandAll: true,
+          reserve: true,
+        }"
+          #end
+          show-overflow
+          :loading="loading"
+      >
           ## 特殊：主子表专属逻辑
           #if ( $table.templateType == 12 && $subTables && $subTables.size() > 0 )
             <!-- 子表的列表 -->
@@ -330,6 +365,8 @@ onMounted(async () => {
                         <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="row.${javaField}" />
                       </template>
                     </vxe-column>
+                  #elseif ($table.templateType == 2 && $javaField == $treeNameColumn.javaField)
+                    <vxe-column field="${javaField}" title="${comment}" align="center"  tree-node/>
                   #else
                     <vxe-column field="${javaField}" title="${comment}" align="center" />
                   #end
@@ -337,6 +374,16 @@ onMounted(async () => {
           #end
         <vxe-column field="operation" title="操作" align="center">
           <template #default="{row}">
+#if ( $table.templateType == 2 )
+  <Button
+      size="small"
+      type="link"
+      @click="onAppend(row as any)"
+      v-access:code="['${permissionPrefix}:create']"
+  >
+    新增下级
+  </Button>
+#end
             <Button
                 size="small"
                 type="link"
@@ -348,7 +395,11 @@ onMounted(async () => {
             <Button
                 size="small"
                 type="link"
+                danger
                 class="ml-2"
+                #if ( $table.templateType == 2 )
+                :disabled="!isEmpty(row?.children)"
+                #end
                 @click="onDelete(row as any)"
                 v-access:code="['${permissionPrefix}:delete']"
             >
@@ -357,6 +408,7 @@ onMounted(async () => {
           </template>
         </vxe-column>
       </vxe-table>
+#if ( $table.templateType != 2 )
       <!-- 分页 -->
       <div class="mt-2 flex justify-end">
         <Pagination
@@ -367,6 +419,7 @@ onMounted(async () => {
             @change="getList"
         />
       </div>
+#end
     </ContentWrap>
 
 #if ($table.templateType == 11) ## erp情况
