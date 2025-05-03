@@ -112,10 +112,11 @@ const [Modal, modalApi] = useVbenModal({
           #if ($subTable.subJoinMany) ## 一对多
             ## TODO 列表值校验？
           #else
-            const ${subClassNameVar}Valid = await ${subClassNameVar}FormRef.value?.validate();
-            if (!${subClassNameVar}Valid) {
-              subTabsName.value = '${subClassNameVar}';
-              return;
+            try {
+              await ${subClassNameVar}FormRef.value?.validate()
+            } catch (e) {
+              subTabsName.value = '${subClassNameVar}'
+              return
             }
           #end
         #end
@@ -134,7 +135,7 @@ const [Modal, modalApi] = useVbenModal({
           #if ($subTable.subJoinMany)
             data.${subClassNameVar}s = ${subClassNameVar}FormRef.value?.getData();
           #else
-            data.${subClassNameVar} = await ${subClassNameVar}FormRef.value?.getValues();
+            data.${subClassNameVar} = ${subClassNameVar}FormRef.value?.getValues();
           #end
         #end
       #end
