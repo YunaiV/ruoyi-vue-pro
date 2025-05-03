@@ -25,9 +25,8 @@ import { $t } from '#/locales';
 import { get${simpleClassName}, create${simpleClassName}, update${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 
 const emit = defineEmits(['success']);
+
 const formRef = ref();
-const labelCol = { span: 5 };
-const wrapperCol = { span: 13 };
 const formData = ref<Partial<${simpleClassName}Api.${simpleClassName}>>({
 #foreach ($column in $columns)
   #if ($column.createOperation || $column.updateOperation)
@@ -156,7 +155,6 @@ const [Modal, modalApi] = useVbenModal({
       resetForm()
       return;
     }
-
     // 加载数据
     let data = modalApi.getData<${simpleClassName}Api.${simpleClassName}>();
     if (!data) {
@@ -185,8 +183,8 @@ const [Modal, modalApi] = useVbenModal({
       ref="formRef"
       :model="formData"
       :rules="rules"
-      :label-col="labelCol"
-      :wrapper-col="wrapperCol"
+      :label-col="{ span: 5 }"
+      :wrapper-col="{ span: 18 }"
     >
       #foreach($column in $columns)
         #if ($column.createOperation || $column.updateOperation)
@@ -239,9 +237,10 @@ const [Modal, modalApi] = useVbenModal({
                   <Select.Option
                           v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                           :key="dict.value"
-                          :label="dict.label"
                           :value="dict.value"
-                  />
+                  >
+                    {{ dict.label }}
+                  </Select.Option>
                 #else##没数据字典
                   <Select.Option label="请选择字典生成" value="" />
                 #end
@@ -254,9 +253,10 @@ const [Modal, modalApi] = useVbenModal({
                   <Checkbox
                           v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                           :key="dict.value"
-                          :label="dict.label"
                           :value="dict.value"
-                  />
+                 >
+                    {{ dict.label }}
+                  </Checkbox>
                 #else##没数据字典
                   <Checkbox label="请选择字典生成" />
                 #end
