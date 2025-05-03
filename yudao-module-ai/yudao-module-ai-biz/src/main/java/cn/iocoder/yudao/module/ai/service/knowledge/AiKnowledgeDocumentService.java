@@ -68,13 +68,6 @@ public interface AiKnowledgeDocumentService {
     void updateKnowledgeDocumentStatus(AiKnowledgeDocumentUpdateStatusReqVO reqVO);
 
     /**
-     * 更新文档检索次数（增加 +1）
-     *
-     * @param ids 文档编号列表
-     */
-    void updateKnowledgeDocumentRetrievalCountIncr(Collection<Long> ids);
-
-    /**
      * 删除文档
      *
      * @param id 文档编号

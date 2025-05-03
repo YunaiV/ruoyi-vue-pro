@@ -121,11 +121,11 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         String newContent = chatResponse.getResult().getOutput().getText();
         chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId()).setContent(newContent));
         // 3.4 响应结果
+        Map<Long, AiKnowledgeDocumentDO> documentMap = knowledgeDocumentService.getKnowledgeDocumentMap(
+                convertSet(knowledgeSegments, AiKnowledgeSegmentSearchRespBO::getDocumentId));
         List<AiChatMessageRespVO.KnowledgeSegment> segments = BeanUtils.toBean(knowledgeSegments,
-                AiChatMessageRespVO.KnowledgeSegment.class,
-                segment -> {
-                    AiKnowledgeDocumentDO document = knowledgeDocumentService
-                            .getKnowledgeDocument(segment.getDocumentId());
+                AiChatMessageRespVO.KnowledgeSegment.class, segment -> {
+                    AiKnowledgeDocumentDO document = documentMap.get(segment.getDocumentId());
                     segment.setDocumentName(document != null ? document.getName() : null);
                 });
         return new AiChatMessageSendRespVO()
@@ -172,12 +172,13 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
             // 处理知识库的返回，只有首次才有
             List<AiChatMessageRespVO.KnowledgeSegment> segments = null;
             if (StrUtil.isEmpty(contentBuffer)) {
-                segments = BeanUtils.toBean(knowledgeSegments, AiChatMessageRespVO.KnowledgeSegment.class,
-                        segment -> TenantUtils.executeIgnore(() -> {
-                            AiKnowledgeDocumentDO document = knowledgeDocumentService
-                                    .getKnowledgeDocument(segment.getDocumentId());
-                            segment.setDocumentName(document != null ? document.getName() : null);
-                        }));
+                Map<Long, AiKnowledgeDocumentDO> documentMap = TenantUtils.executeIgnore(() ->
+                        knowledgeDocumentService.getKnowledgeDocumentMap(
+                                convertSet(knowledgeSegments, AiKnowledgeSegmentSearchRespBO::getDocumentId)));
+                segments = BeanUtils.toBean(knowledgeSegments, AiChatMessageRespVO.KnowledgeSegment.class, segment ->  {
+                    AiKnowledgeDocumentDO document = documentMap.get(segment.getDocumentId());
+                    segment.setDocumentName(document != null ? document.getName() : null);
+                });
             }
             // 响应结果
             String newContent = chunk.getResult() != null ? chunk.getResult().getOutput().getText() : null;

@@ -162,14 +162,6 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
     }
 
     @Override
-    public void updateKnowledgeDocumentRetrievalCountIncr(Collection<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-        knowledgeDocumentMapper.updateRetrievalCountIncr(ids);
-    }
-
-    @Override
     public AiKnowledgeDocumentDO validateKnowledgeDocumentExists(Long id) {
         AiKnowledgeDocumentDO knowledgeDocument = knowledgeDocumentMapper.selectById(id);
         if (knowledgeDocument == null) {
