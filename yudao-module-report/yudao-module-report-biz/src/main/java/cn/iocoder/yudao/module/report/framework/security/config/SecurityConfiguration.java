@@ -19,7 +19,11 @@ public class SecurityConfiguration {
 
             @Override
             public void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry) {
-                registry.requestMatchers("/jmreport/**").permitAll(); // 积木报表
+                // 积木报表
+                registry.requestMatchers("/jmreport/**").permitAll();
+                // 积木仪表盘
+                registry.requestMatchers("/drag/**").permitAll();
+                registry.requestMatchers("/jimubi/**").permitAll();
             }
 
         };
