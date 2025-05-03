@@ -133,7 +133,7 @@ public interface AiModelService {
     VectorStore getOrCreateVectorStore(Long id, Map<String, Class<?>> metadataFields);
 
     /**
-     * 获取 Tinyflow 所需 LLm Provider
+     * 获取 TinyFlow 所需 LLm Provider
      *
      * @param tinyflow tinyflow
      * @param modelId AI 模型 ID

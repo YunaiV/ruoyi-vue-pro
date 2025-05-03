@@ -40,7 +40,10 @@ public class AiWorkflowServiceImpl implements AiWorkflowService {
 
     @Override
     public Long createWorkflow(AiWorkflowSaveReqVO createReqVO) {
-        validateWorkflowForCreateOrUpdate(null, createReqVO.getCode());
+        // 1. 参数校验
+        validateCodeUnique(null, createReqVO.getCode());
+
+        // 2. 插入工作流配置
         AiWorkflowDO workflow = BeanUtils.toBean(createReqVO, AiWorkflowDO.class);
         workflowMapper.insert(workflow);
         return workflow.getId();
@@ -48,47 +51,33 @@ public class AiWorkflowServiceImpl implements AiWorkflowService {
 
     @Override
     public void updateWorkflow(AiWorkflowSaveReqVO updateReqVO) {
-        validateWorkflowForCreateOrUpdate(updateReqVO.getId(), updateReqVO.getCode());
+        // 1. 参数校验
+        validateWorkflowExists(updateReqVO.getId());
+        validateCodeUnique(updateReqVO.getId(), updateReqVO.getCode());
+
+        // 2. 更新工作流配置
         AiWorkflowDO workflow = BeanUtils.toBean(updateReqVO, AiWorkflowDO.class);
         workflowMapper.updateById(workflow);
     }
 
     @Override
     public void deleteWorkflow(Long id) {
+        // 1. 校验存在
         validateWorkflowExists(id);
+
+        // 2. 删除工作流配置
         workflowMapper.deleteById(id);
     }
 
-    @Override
-    public AiWorkflowDO getWorkflow(Long id) {
-        return workflowMapper.selectById(id);
-    }
-
-    @Override
-    public PageResult<AiWorkflowDO> getWorkflowPage(AiWorkflowPageReqVO pageReqVO) {
-        return workflowMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public Object testWorkflow(AiWorkflowTestReqVO testReqVO) {
-        Map<String, Object> variables = testReqVO.getParams();
-        Tinyflow tinyflow = parseFlowParam(testReqVO.getGraph());
-        return tinyflow.toChain().executeForResult(variables);
-    }
-
-    private void validateWorkflowForCreateOrUpdate(Long id, String code) {
-        validateWorkflowExists(id);
-        validateCodeUnique(id, code);
-    }
-
-    private void validateWorkflowExists(Long id) {
+    private AiWorkflowDO validateWorkflowExists(Long id) {
         if (ObjUtil.isNull(id)) {
-            return;
+            throw exception(WORKFLOW_NOT_EXISTS);
         }
         AiWorkflowDO workflow = workflowMapper.selectById(id);
         if (ObjUtil.isNull(workflow)) {
             throw exception(WORKFLOW_NOT_EXISTS);
         }
+        return workflow;
     }
 
     private void validateCodeUnique(Long id, String code) {
@@ -105,6 +94,30 @@ public class AiWorkflowServiceImpl implements AiWorkflowService {
         if (ObjUtil.notEqual(workflow.getId(), id)) {
             throw exception(WORKFLOW_CODE_EXISTS);
         }
+    }
+
+    @Override
+    public AiWorkflowDO getWorkflow(Long id) {
+        return workflowMapper.selectById(id);
+    }
+
+    @Override
+    public PageResult<AiWorkflowDO> getWorkflowPage(AiWorkflowPageReqVO pageReqVO) {
+        return workflowMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public Object testWorkflow(AiWorkflowTestReqVO testReqVO) {
+        // 加载 graph
+        String graph = testReqVO.getGraph() != null ? testReqVO.getGraph()
+                : validateWorkflowExists(testReqVO.getId()).getGraph();
+
+        // 构建 TinyFlow 执行链
+        Tinyflow tinyflow = parseFlowParam(graph);
+
+        // 执行
+        Map<String, Object> variables = testReqVO.getParams();
+        return tinyflow.toChain().executeForResult(variables);
     }
 
     private Tinyflow parseFlowParam(String graph) {
