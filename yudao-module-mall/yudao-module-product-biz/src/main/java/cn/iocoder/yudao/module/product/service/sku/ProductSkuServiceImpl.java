@@ -69,6 +69,14 @@ public class ProductSkuServiceImpl implements ProductSkuService {
     }
 
     @Override
+    public ProductSkuDO getSku(Long id, boolean includeDeleted) {
+        if (includeDeleted) {
+            return productSkuMapper.selectByIdIncludeDeleted(id);
+        }
+        return getSku(id);
+    }
+
+    @Override
     public List<ProductSkuDO> getSkuList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();

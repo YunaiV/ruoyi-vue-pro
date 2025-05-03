@@ -11,7 +11,6 @@ import cn.iocoder.yudao.module.trade.controller.admin.base.member.user.MemberUse
 import cn.iocoder.yudao.module.trade.controller.admin.base.product.property.ProductPropertyValueDetailRespVO;
 import cn.iocoder.yudao.module.trade.controller.admin.order.vo.TradeOrderBaseVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSaleCreateReqVO;
-import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSaleRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.AfterSaleDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.AfterSaleLogDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderDO;
@@ -62,10 +61,6 @@ public interface AfterSaleConvert {
     }
 
     ProductPropertyValueDetailRespVO convert(ProductPropertyValueDetailRespDTO bean);
-
-    AppAfterSaleRespVO convert(AfterSaleDO bean);
-
-    PageResult<AppAfterSaleRespVO> convertPage02(PageResult<AfterSaleDO> page);
 
     default AfterSaleDetailRespVO convert(AfterSaleDO afterSale, TradeOrderDO order, TradeOrderItemDO orderItem,
                                           MemberUserRespDTO user, List<AfterSaleLogDO> logs) {

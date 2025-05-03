@@ -11,12 +11,17 @@ import cn.iocoder.yudao.module.product.enums.ProductConstants;
 import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.Objects;
 import java.util.Set;
 
 @Mapper
 public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
+
+    @Select("SELECT * FROM product_spu WHERE id = #{id}")
+    ProductSpuDO selectByIdIncludeDeleted(@Param("id") Long id);
 
     /**
      * 获取商品 SPU 分页列表数据

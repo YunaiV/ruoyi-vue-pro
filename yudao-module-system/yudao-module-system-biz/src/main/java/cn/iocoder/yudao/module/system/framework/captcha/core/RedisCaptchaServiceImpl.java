@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.framework.captcha.core;
 
-import com.xingyuv.captcha.service.CaptchaCacheService;
+import com.anji.captcha.service.CaptchaCacheService;
 import lombok.Setter;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
@@ -28,7 +28,7 @@ public class RedisCaptchaServiceImpl implements CaptchaCacheService {
 
     @Override
     public boolean exists(String key) {
-        return Boolean.TRUE.equals(stringRedisTemplate.hasKey(key));
+        return stringRedisTemplate.hasKey(key);
     }
 
     @Override

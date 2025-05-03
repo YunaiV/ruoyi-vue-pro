@@ -26,18 +26,12 @@ import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
 import cn.iocoder.yudao.module.system.dal.mysql.social.SocialClientMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
+import cn.iocoder.yudao.module.system.framework.justauth.core.AuthRequestFactory;
 import com.binarywang.spring.starter.wxjava.miniapp.properties.WxMaProperties;
 import com.binarywang.spring.starter.wxjava.mp.properties.WxMpProperties;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.xingyuv.jushauth.config.AuthConfig;
-import com.xingyuv.jushauth.model.AuthCallback;
-import com.xingyuv.jushauth.model.AuthResponse;
-import com.xingyuv.jushauth.model.AuthUser;
-import com.xingyuv.jushauth.request.AuthRequest;
-import com.xingyuv.jushauth.utils.AuthStateUtils;
-import com.xingyuv.justauth.AuthRequestFactory;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +42,12 @@ import me.chanjar.weixin.common.redis.RedisTemplateWxRedisOps;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
 import me.chanjar.weixin.mp.config.impl.WxMpRedisConfigImpl;
+import me.zhyd.oauth.config.AuthConfig;
+import me.zhyd.oauth.model.AuthCallback;
+import me.zhyd.oauth.model.AuthResponse;
+import me.zhyd.oauth.model.AuthUser;
+import me.zhyd.oauth.request.AuthRequest;
+import me.zhyd.oauth.utils.AuthStateUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -337,7 +337,7 @@ public class SocialClientServiceImpl implements SocialClientService {
     WxMaService getWxMaService(Integer userType) {
         // 第一步，查询 DB 的配置项，获得对应的 WxMaService 对象
         SocialClientDO client = socialClientMapper.selectBySocialTypeAndUserType(
-                SocialTypeEnum.WECHAT_MINI_APP.getType(), userType);
+                SocialTypeEnum.WECHAT_MINI_PROGRAM.getType(), userType);
         if (client != null && Objects.equals(client.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
             return wxMaServiceCache.getUnchecked(client.getClientId() + ":" + client.getClientSecret());
         }

@@ -22,6 +22,7 @@ import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTemplateValidityType
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
@@ -180,7 +181,7 @@ public class CouponServiceImpl implements CouponService {
      * @param couponId 模版编号
      * @param userId   用户编号
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW) // 每次调用开启一个新的事务，避免在一个大的事务里面
     public void invalidateCoupon(Long couponId, Long userId) {
         if (couponId == null || couponId <= 0) {
             return;
@@ -270,13 +271,17 @@ public class CouponServiceImpl implements CouponService {
         if (CollUtil.isEmpty(userIds)) {
             throw exception(COUPON_TEMPLATE_USER_ALREADY_TAKE);
         }
-
         // 校验模板
         if (couponTemplate == null) {
             throw exception(COUPON_TEMPLATE_NOT_EXISTS);
         }
-        // 校验剩余数量
-        if (ObjUtil.notEqual(couponTemplate.getTakeLimitCount(), CouponTemplateDO.TIME_LIMIT_COUNT_MAX) // 非不限制
+        // 校验领取方式
+        if (ObjUtil.notEqual(couponTemplate.getTakeType(), takeType.getType())) {
+            throw exception(COUPON_TEMPLATE_CANNOT_TAKE);
+        }
+        // 校验发放数量不能过小（仅在 CouponTakeTypeEnum.USER 用户领取时）
+        if (CouponTakeTypeEnum.isUser(couponTemplate.getTakeType())
+                && ObjUtil.notEqual(couponTemplate.getTakeLimitCount(), CouponTemplateDO.TIME_LIMIT_COUNT_MAX) // 非不限制
                 && couponTemplate.getTakeCount() + userIds.size() > couponTemplate.getTotalCount()) {
             throw exception(COUPON_TEMPLATE_NOT_ENOUGH);
         }
@@ -285,10 +290,6 @@ public class CouponServiceImpl implements CouponService {
             if (LocalDateTimeUtils.beforeNow(couponTemplate.getValidEndTime())) {
                 throw exception(COUPON_TEMPLATE_EXPIRED);
             }
-        }
-        // 校验领取方式
-        if (ObjectUtil.notEqual(couponTemplate.getTakeType(), takeType.getType())) {
-            throw exception(COUPON_TEMPLATE_CANNOT_TAKE);
         }
     }
 

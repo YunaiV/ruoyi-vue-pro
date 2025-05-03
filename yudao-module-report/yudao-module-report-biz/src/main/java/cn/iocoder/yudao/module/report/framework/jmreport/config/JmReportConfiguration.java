@@ -1,13 +1,15 @@
 package cn.iocoder.yudao.module.report.framework.jmreport.config;
 
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
-import cn.iocoder.yudao.module.system.api.oauth2.OAuth2TokenApi;
+import cn.iocoder.yudao.module.report.framework.jmreport.core.service.JmOnlDragExternalServiceImpl;
 import cn.iocoder.yudao.module.report.framework.jmreport.core.service.JmReportTokenServiceImpl;
+import cn.iocoder.yudao.module.system.api.oauth2.OAuth2TokenApi;
 import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
 import org.jeecg.modules.jmreport.api.JmReportTokenServiceI;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 /**
  * 积木报表的配置类
@@ -19,11 +21,16 @@ import org.springframework.context.annotation.Configuration;
 public class JmReportConfiguration {
 
     @Bean
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public JmReportTokenServiceI jmReportTokenService(OAuth2TokenApi oAuth2TokenApi,
                                                       PermissionApi permissionApi,
                                                       SecurityProperties securityProperties) {
         return new JmReportTokenServiceImpl(oAuth2TokenApi, permissionApi, securityProperties);
+    }
+
+    @Bean // 暂时注释：可以按需实现后打开
+    @Primary
+    public JmOnlDragExternalServiceImpl jmOnlDragExternalService2() {
+        return new JmOnlDragExternalServiceImpl();
     }
 
 }

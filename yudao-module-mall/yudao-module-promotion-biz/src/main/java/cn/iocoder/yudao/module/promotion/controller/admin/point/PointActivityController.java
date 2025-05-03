@@ -124,7 +124,7 @@ public class PointActivityController {
         List<PointProductDO> products = pointActivityService.getPointProductListByActivityIds(
                 convertSet(activityList, PointActivityDO::getId));
         Map<Long, List<PointProductDO>> productsMap = convertMultiMap(products, PointProductDO::getActivityId);
-        Map<Long, ProductSpuRespDTO> spuMap = productSpuApi.getSpusMap(
+        Map<Long, ProductSpuRespDTO> spuMap = productSpuApi.getSpuMap(
                 convertSet(activityList, PointActivityDO::getSpuId));
         List<PointActivityRespVO> result = BeanUtils.toBean(activityList, PointActivityRespVO.class);
         result.forEach(activity -> {

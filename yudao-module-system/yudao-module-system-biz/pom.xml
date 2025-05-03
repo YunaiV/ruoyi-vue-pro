@@ -97,8 +97,12 @@
 
         <!-- 三方云服务相关 -->
         <dependency>
-            <groupId>com.xingyuv</groupId>
-            <artifactId>spring-boot-starter-justauth</artifactId> <!-- 社交登陆（例如说，个人微信、企业微信等等） -->
+            <groupId>me.zhyd.oauth</groupId>
+            <artifactId>JustAuth</artifactId> <!-- 社交登陆（例如说，个人微信、企业微信等等） -->
+        </dependency>
+        <dependency>
+            <groupId>com.xkcoding.justauth</groupId>
+            <artifactId>justauth-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>
@@ -111,8 +115,8 @@
         </dependency>
 
         <dependency>
-            <groupId>com.xingyuv</groupId>
-            <artifactId>spring-boot-starter-captcha-plus</artifactId> <!-- 验证码，一般用于登录使用 -->
+            <groupId>com.anji-plus</groupId>
+            <artifactId>captcha-spring-boot-starter</artifactId> <!-- 验证码，一般用于登录使用 -->
         </dependency>
 
         <dependency>

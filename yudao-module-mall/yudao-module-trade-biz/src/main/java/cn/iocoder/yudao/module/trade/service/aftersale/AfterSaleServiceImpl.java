@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.trade.service.aftersale;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
@@ -16,6 +15,7 @@ import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.AfterSalePage
 import cn.iocoder.yudao.module.trade.controller.admin.aftersale.vo.AfterSaleRefuseReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSaleCreateReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSaleDeliveryReqVO;
+import cn.iocoder.yudao.module.trade.controller.app.aftersale.vo.AppAfterSalePageReqVO;
 import cn.iocoder.yudao.module.trade.convert.aftersale.AfterSaleConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.aftersale.AfterSaleDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.delivery.DeliveryExpressDO;
@@ -36,6 +36,7 @@ import cn.iocoder.yudao.module.trade.framework.order.config.TradeOrderProperties
 import cn.iocoder.yudao.module.trade.service.delivery.DeliveryExpressService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,6 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -87,8 +87,8 @@ public class AfterSaleServiceImpl implements AfterSaleService {
     }
 
     @Override
-    public PageResult<AfterSaleDO> getAfterSalePage(Long userId, PageParam pageParam) {
-        return tradeAfterSaleMapper.selectPage(userId, pageParam);
+    public PageResult<AfterSaleDO> getAfterSalePage(Long userId, AppAfterSalePageReqVO pageReqVO) {
+        return tradeAfterSaleMapper.selectPage(userId, pageReqVO);
     }
 
     @Override
@@ -386,7 +386,7 @@ public class AfterSaleServiceImpl implements AfterSaleService {
             public void afterCommit() {
                 // 创建退款单
                 PayRefundCreateReqDTO createReqDTO = AfterSaleConvert.INSTANCE.convert(userIp, afterSale, tradeOrderProperties)
-                        .setReason(StrUtil.format("退款【{}】", afterSale.getSpuName()));;
+                        .setReason(StrUtil.format("退款【{}】", afterSale.getSpuName()));
                 Long payRefundId = payRefundApi.createRefund(createReqDTO);
                 // 更新售后单的退款单号
                 tradeAfterSaleMapper.updateById(new AfterSaleDO().setId(afterSale.getId()).setPayRefundId(payRefundId));

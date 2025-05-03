@@ -23,13 +23,13 @@ import java.util.Objects;
 @AllArgsConstructor
 public class RedisPendingMessageResendJob {
 
-    private static final String LOCK_KEY = "redis:pending:msg:lock";
+    private static final String LOCK_KEY = "redis:stream:pending-message-resend:lock";
 
     /**
      * 消息超时时间，默认 5 分钟
      *
      * 1. 超时的消息才会被重新投递
-     * 2. 由于定时任务 1 分钟一次，消息超时后不会被立即重投，极端情况下消息5分钟过期后，再等 1 分钟才会被扫瞄到
+     * 2. 由于定时任务 1 分钟一次，消息超时后不会被立即重投，极端情况下消息 5 分钟过期后，再等 1 分钟才会被扫瞄到
      */
     private static final int EXPIRE_TIME = 5 * 60;
 
@@ -39,7 +39,7 @@ public class RedisPendingMessageResendJob {
     private final RedissonClient redissonClient;
 
     /**
-     * 一分钟执行一次,这里选择每分钟的35秒执行，是为了避免整点任务过多的问题
+     * 一分钟执行一次,这里选择每分钟的 35 秒执行，是为了避免整点任务过多的问题
      */
     @Scheduled(cron = "35 * * * * ?")
     public void messageResend() {

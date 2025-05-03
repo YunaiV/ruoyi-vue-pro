@@ -218,7 +218,7 @@ public class MpMaterialServiceImpl implements MpMaterialService {
 
     private String uploadFile(String mediaId, File file) {
         String path = mediaId + "." + FileTypeUtil.getType(file);
-        return fileApi.createFile(path, FileUtil.readBytes(file));
+        return fileApi.createFile(FileUtil.readBytes(file), path);
     }
 
 }

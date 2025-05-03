@@ -8,7 +8,22 @@ import cn.iocoder.yudao.module.infra.framework.file.core.client.ftp.FtpFileClien
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+/**
+ * {@link FtpFileClient} 集成测试
+ *
+ * @author 芋道源码
+ */
 public class FtpFileClientTest {
+
+//    docker run -d \
+//            -p 2121:21 -p 30000-30009:30000-30009 \
+//            -e FTP_USER=foo \
+//            -e FTP_PASS=pass \
+//            -e PASV_ADDRESS=127.0.0.1 \
+//            -e PASV_MIN_PORT=30000 \
+//            -e PASV_MAX_PORT=30009 \
+//            -v $(pwd)/ftp-data:/home/vsftpd \
+//    fauria/vsftpd
 
     @Test
     @Disabled
@@ -17,10 +32,10 @@ public class FtpFileClientTest {
         FtpFileClientConfig config = new FtpFileClientConfig();
         config.setDomain("http://127.0.0.1:48080");
         config.setBasePath("/home/ftp");
-        config.setHost("kanchai.club");
-        config.setPort(221);
-        config.setUsername("");
-        config.setPassword("");
+        config.setHost("127.0.0.1");
+        config.setPort(2121);
+        config.setUsername("foo");
+        config.setPassword("pass");
         config.setMode(FtpMode.Passive.name());
         FtpFileClient client = new FtpFileClient(0L, config);
         client.init();
