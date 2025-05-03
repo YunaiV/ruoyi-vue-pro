@@ -73,7 +73,7 @@
         <awssdk.version>2.30.14</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
         <justauth-starter.version>1.4.0</justauth-starter.version>
-        <jimureport.version>1.8.1</jimureport.version>
+        <jimureport.version>1.9.4</jimureport.version>
         <weixin-java.version>4.7.2.B</weixin-java.version>
     </properties>
 
