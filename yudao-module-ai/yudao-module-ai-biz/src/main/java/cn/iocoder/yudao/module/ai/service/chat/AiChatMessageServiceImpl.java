@@ -4,12 +4,10 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
-import cn.iocoder.yudao.framework.ai.core.pojo.AiToolContext;
 import cn.iocoder.yudao.framework.ai.core.util.AiUtils;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessagePageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageRespVO;
@@ -103,8 +101,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         ChatModel chatModel = modalService.getChatModel(model.getId());
 
         // 2. 知识库找回
-        List<AiKnowledgeSegmentSearchRespBO> knowledgeSegments = recallKnowledgeSegment(sendReqVO.getContent(),
-                conversation);
+        List<AiKnowledgeSegmentSearchRespBO> knowledgeSegments = recallKnowledgeSegment(sendReqVO.getContent(), conversation);
 
         // 3. 插入 user 发送消息
         AiChatMessageDO userMessage = createChatMessage(conversation.getId(), null, model,
@@ -117,7 +114,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
                 knowledgeSegments);
 
         // 3.2 创建 chat 需要的 Prompt
-        Prompt prompt = buildPrompt(chatModel, conversation, historyMessages, knowledgeSegments, model, sendReqVO);
+        Prompt prompt = buildPrompt(conversation, historyMessages, knowledgeSegments, model, sendReqVO);
         ChatResponse chatResponse = chatModel.call(prompt);
 
         // 3.3 更新响应内容
@@ -166,7 +163,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
                 knowledgeSegments);
 
         // 4.2 构建 Prompt，并进行调用
-        Prompt prompt = buildPrompt(chatModel, conversation, historyMessages, knowledgeSegments, model, sendReqVO);
+        Prompt prompt = buildPrompt(conversation, historyMessages, knowledgeSegments, model, sendReqVO);
         Flux<ChatResponse> streamResponse = chatModel.stream(prompt);
 
         // 4.3 流式返回
@@ -222,9 +219,9 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         return knowledgeSegments;
     }
 
-    private Prompt buildPrompt(StreamingChatModel chatModel, AiChatConversationDO conversation, List<AiChatMessageDO> messages,
-            List<AiKnowledgeSegmentSearchRespBO> knowledgeSegments,
-            AiModelDO model, AiChatMessageSendReqVO sendReqVO) {
+    private Prompt buildPrompt(AiChatConversationDO conversation, List<AiChatMessageDO> messages,
+                               List<AiKnowledgeSegmentSearchRespBO> knowledgeSegments,
+                               AiModelDO model, AiChatMessageSendReqVO sendReqVO) {
         List<Message> chatMessages = new ArrayList<>();
         // 1.1 System Context 角色设定
         if (StrUtil.isNotBlank(conversation.getSystemMessage())) {
@@ -254,11 +251,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
             AiChatRoleDO chatRole = chatRoleService.getChatRole(conversation.getRoleId());
             if (chatRole != null && CollUtil.isNotEmpty(chatRole.getToolIds())) {
                 toolNames = convertSet(toolService.getToolList(chatRole.getToolIds()), AiToolDO::getName);
-                // 2.1.1 构建 Function Calling 的上下文参数
-                toolContext = Map.of(
-                    AiToolContext.CONTEXT_KEY, new AiToolContext().setChatModel(chatModel).setUserId(SecurityFrameworkUtils.getLoginUserId())
-                    .setRoleId(conversation.getRoleId())
-                    .setConversationId(conversation.getId()));
+                toolContext = AiUtils.buildCommonToolContext();
             }
         }
         // 2.2 构建 ChatOptions 对象

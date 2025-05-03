@@ -24,6 +24,18 @@
             <artifactId>yudao-common</artifactId>
         </dependency>
 
+        <!-- 业务组件 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
+        </dependency>
+
+        <!-- Web 相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-security</artifactId>
+        </dependency>
+
         <!-- Spring AI Model 模型接入 -->
         <dependency>
             <groupId>org.springframework.ai</groupId>

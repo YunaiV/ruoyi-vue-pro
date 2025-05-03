@@ -1,13 +1,11 @@
 package cn.iocoder.yudao.module.ai.service.knowledge;
 
 import cn.hutool.core.util.ObjUtil;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgePageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeSaveReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeMapper;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
@@ -65,6 +63,11 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
         if (ObjUtil.notEqual(oldKnowledge.getEmbeddingModelId(), updateReqVO.getEmbeddingModelId())) {
             knowledgeSegmentService.reindexByKnowledgeIdAsync(updateReqVO.getId());
         }
+    }
+
+    @Override
+    public void deleteKnowledge(Long id) {
+
     }
 
     @Override
