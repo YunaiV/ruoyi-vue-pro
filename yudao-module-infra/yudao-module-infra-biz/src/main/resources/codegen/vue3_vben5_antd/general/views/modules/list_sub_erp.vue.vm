@@ -14,11 +14,15 @@
   import { VxeColumn, VxeTable } from 'vxe-table';
   import { reactive,ref, h, nextTick,watch,onMounted } from 'vue';
   import { cloneDeep, formatDateTime } from '@vben/utils';
+  import { ContentWrap } from "#/components/content-wrap";
 
 #if ($table.templateType == 11) ## erp
     import { useVbenModal } from '@vben/common-ui';
     import ${subSimpleClassName}Form from './${subSimpleClassName_strikeCase}-form.vue'
-    import { Button, message } from 'ant-design-vue';
+    import { Tinymce as RichTextarea } from '#/components/tinymce';
+    import { ImageUpload, FileUpload } from "#/components/upload";
+    import { message,Button, Tabs,Pagination, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox,RangePicker, DatePicker, TreeSelect } from 'ant-design-vue';
+    import { DICT_TYPE, getDictOptions } from '#/utils/dict';
     import { Plus } from '@vben/icons';
     import { $t } from '#/locales';
     import { TableToolbar } from '#/components/table-toolbar';
@@ -99,8 +103,6 @@ async function onDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
               #end
           #end
       #end
-
-    ${subJoinColumn.javaField}: props.${subJoinColumn.javaField},
   })
 
 /** 搜索按钮操作 */
@@ -134,6 +136,7 @@ const resetQuery = () => {
                     #end
                 #end
             #end
+          params.${subJoinColumn.javaField} = props.${subJoinColumn.javaField};
           const data = await get${subSimpleClassName}Page(params)
           list.value = data.list
           total.value = data.total

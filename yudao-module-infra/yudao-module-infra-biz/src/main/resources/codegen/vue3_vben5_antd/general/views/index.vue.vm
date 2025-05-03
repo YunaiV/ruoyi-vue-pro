@@ -38,6 +38,9 @@ import { downloadByData } from '#/utils/download';
 const subTabsName = ref('$subClassNameVars.get(0)')
 #if ($table.templateType == 11)
 const select${simpleClassName} = ref<${simpleClassName}Api.${simpleClassName}>();
+async function onCellClick({ row }: { row: ${simpleClassName}Api.${simpleClassName} }) {
+  select${simpleClassName}.value = row
+}
 #end
 #end
 
@@ -323,7 +326,15 @@ onMounted(async () => {
           expandAll: true,
           reserve: true,
         }"
-          #end
+        #end
+#if ($table.templateType == 11) ## erp情况
+          @cell-click="onCellClick"
+          :row-config="{
+            keyField: 'id',
+            isHover: true,
+            isCurrent: true,
+          }"
+#end
           show-overflow
           :loading="loading"
       >
