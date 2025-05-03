@@ -36,4 +36,8 @@ public interface AiKnowledgeDocumentMapper extends BaseMapperX<AiKnowledgeDocume
         return selectList(AiKnowledgeDocumentDO::getStatus, status);
     }
 
+    default List<AiKnowledgeDocumentDO> selectListByKnowledgeId(Long knowledgeId) {
+        return selectList(AiKnowledgeDocumentDO::getKnowledgeId, knowledgeId);
+    }
+
 }

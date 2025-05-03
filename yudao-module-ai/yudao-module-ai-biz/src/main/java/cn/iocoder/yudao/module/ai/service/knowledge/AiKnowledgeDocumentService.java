@@ -82,6 +82,13 @@ public interface AiKnowledgeDocumentService {
     void deleteKnowledgeDocument(Long id);
 
     /**
+     * 根据知识库编号，批量删除文档
+     *
+     * @param knowledgeId 知识库编号
+     */
+    void deleteKnowledgeDocumentByKnowledgeId(Long knowledgeId);
+
+    /**
      * 校验文档是否存在
      *
      * @param id 文档编号
@@ -104,6 +111,14 @@ public interface AiKnowledgeDocumentService {
      * @return 文档列表
      */
     List<AiKnowledgeDocumentDO> getKnowledgeDocumentList(Collection<Long> ids);
+
+    /**
+     * 根据知识库编号获取文档列表
+     *
+     * @param knowledgeId 知识库编号
+     * @return 文档列表
+     */
+    List<AiKnowledgeDocumentDO> getKnowledgeDocumentListByKnowledgeId(Long knowledgeId);
 
     /**
      * 获取文档 Map

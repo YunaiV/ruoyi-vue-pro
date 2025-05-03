@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -34,6 +35,8 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
     private AiModelService modelService;
     @Resource
     private AiKnowledgeSegmentService knowledgeSegmentService;
+    @Resource
+    private AiKnowledgeDocumentService knowledgeDocumentService;
 
     @Override
     public Long createKnowledge(AiKnowledgeSaveReqVO createReqVO) {
@@ -66,8 +69,17 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteKnowledge(Long id) {
+        // 1. 校验存在
+        validateKnowledgeExists(id);
 
+        // 2. 删除知识库下的所有文档及段落
+        knowledgeDocumentService.deleteKnowledgeDocumentByKnowledgeId(id);
+
+        // 3. 删除知识库
+        // 特殊：知识库需要最后删除，不然相关的配置会找不到
+        knowledgeMapper.deleteById(id);
     }
 
     @Override
@@ -77,11 +89,11 @@ public class AiKnowledgeServiceImpl implements AiKnowledgeService {
 
     @Override
     public AiKnowledgeDO validateKnowledgeExists(Long id) {
-        AiKnowledgeDO knowledgeBase = knowledgeMapper.selectById(id);
-        if (knowledgeBase == null) {
+        AiKnowledgeDO knowledge = knowledgeMapper.selectById(id);
+        if (knowledge == null) {
             throw exception(KNOWLEDGE_NOT_EXISTS);
         }
-        return knowledgeBase;
+        return knowledge;
     }
 
     @Override
