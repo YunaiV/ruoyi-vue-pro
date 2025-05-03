@@ -7,10 +7,9 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.workflow.vo.AiWorkflowPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.workflow.vo.AiWorkflowSaveReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.workflow.vo.AiWorkflowTestReqVO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.workflow.AiWorkflowDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.workflow.AiWorkflowMapper;
-import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
+import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import dev.tinyflow.core.Tinyflow;
@@ -37,7 +36,7 @@ public class AiWorkflowServiceImpl implements AiWorkflowService {
     private AiWorkflowMapper workflowMapper;
 
     @Resource
-    private AiApiKeyService apiKeyService;
+    private AiModelService apiModelService;
 
     @Override
     public Long createWorkflow(AiWorkflowSaveReqVO createReqVO) {
@@ -118,25 +117,7 @@ public class AiWorkflowServiceImpl implements AiWorkflowService {
             switch (node.getString("type")) {
                 case "llmNode":
                     JSONObject data = node.getJSONObject("data");
-                    AiApiKeyDO apiKey = apiKeyService.getApiKey(data.getLong("llmId"));
-                    switch (apiKey.getPlatform()) {
-                        // TODO @lesan 需要讨论一下这里怎么弄
-                        // TODO @lesan llmId 对应 model 的编号如何？这样的话，就是 apiModelService 提供一个获取 LLM 的方法。然后，创建的方法，也在 AiModelFactory 提供。可以先接个 deepseek 先。deepseek yyds！
-                        case "OpenAI":
-                            break;
-                        case "Ollama":
-                            break;
-                        case "YiYan":
-                            break;
-                        case "XingHuo":
-                            break;
-                        case "TongYi":
-                            break;
-                        case "DeepSeek":
-                            break;
-                        case "ZhiPu":
-                            break;
-                    }
+                    apiModelService.getLLmProvider4Tinyflow(tinyflow, data.getLong("llmId"));
                     break;
                 case "internalNode":
                     break;
