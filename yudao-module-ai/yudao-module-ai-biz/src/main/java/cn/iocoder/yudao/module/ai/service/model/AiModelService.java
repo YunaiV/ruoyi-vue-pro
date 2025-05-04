@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiModelPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiModelSaveReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
+import dev.tinyflow.core.Tinyflow;
 import jakarta.validation.Valid;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.image.ImageModel;
@@ -130,5 +131,13 @@ public interface AiModelService {
      * @return VectorStore 对象
      */
     VectorStore getOrCreateVectorStore(Long id, Map<String, Class<?>> metadataFields);
+
+    /**
+     * 获取 TinyFlow 所需 LLm Provider
+     *
+     * @param tinyflow tinyflow
+     * @param modelId AI 模型 ID
+     */
+    void getLLmProvider4Tinyflow(Tinyflow tinyflow, Long modelId);
 
 }

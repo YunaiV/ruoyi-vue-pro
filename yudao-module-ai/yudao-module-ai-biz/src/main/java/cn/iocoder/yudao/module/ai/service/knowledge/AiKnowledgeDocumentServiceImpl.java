@@ -162,14 +162,6 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
     }
 
     @Override
-    public void updateKnowledgeDocumentRetrievalCountIncr(Collection<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-        knowledgeDocumentMapper.updateRetrievalCountIncr(ids);
-    }
-
-    @Override
     public AiKnowledgeDocumentDO validateKnowledgeDocumentExists(Long id) {
         AiKnowledgeDocumentDO knowledgeDocument = knowledgeDocumentMapper.selectById(id);
         if (knowledgeDocument == null) {
@@ -209,6 +201,26 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
             return Collections.emptyList();
         }
         return knowledgeDocumentMapper.selectBatchIds(ids);
+    }
+
+    @Override
+    public List<AiKnowledgeDocumentDO> getKnowledgeDocumentListByKnowledgeId(Long knowledgeId) {
+        return knowledgeDocumentMapper.selectListByKnowledgeId(knowledgeId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteKnowledgeDocumentByKnowledgeId(Long knowledgeId) {
+        // 1. 获取该知识库下的所有文档
+        List<AiKnowledgeDocumentDO> documents = knowledgeDocumentMapper.selectListByKnowledgeId(knowledgeId);
+        if (CollUtil.isEmpty(documents)) {
+            return;
+        }
+
+        // 2. 逐个删除文档及其对应的段落
+        for (AiKnowledgeDocumentDO document : documents) {
+            deleteKnowledgeDocument(document.getId());
+        }
     }
 
 }

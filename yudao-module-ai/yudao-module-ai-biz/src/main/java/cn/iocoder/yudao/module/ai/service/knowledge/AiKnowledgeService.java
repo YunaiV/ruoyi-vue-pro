@@ -30,6 +30,13 @@ public interface AiKnowledgeService {
     void updateKnowledge(AiKnowledgeSaveReqVO updateReqVO);
 
     /**
+     * 删除知识库
+     *
+     * @param id 知识库编号
+     */
+    void deleteKnowledge(Long id);
+
+    /**
      * 获得知识库
      *
      * @param id 编号

@@ -63,6 +63,15 @@ public class AiKnowledgeController {
         knowledgeService.updateKnowledge(updateReqVO);
         return success(true);
     }
+    
+    @DeleteMapping("/delete")
+    @Operation(summary = "删除知识库")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('ai:knowledge:delete')")
+    public CommonResult<Boolean> deleteKnowledge(@RequestParam("id") Long id) {
+        knowledgeService.deleteKnowledge(id);
+        return success(true);
+    }
 
     @GetMapping("/simple-list")
     @Operation(summary = "获得知识库的精简列表")

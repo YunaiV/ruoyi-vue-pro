@@ -15,13 +15,25 @@
     <description>AI 大模型拓展，接入国内外大模型</description>
     <properties>
         <spring-ai.version>1.0.0-M6</spring-ai.version>
-        <tinyflow.version>1.0.0-rc.3</tinyflow.version>
+        <tinyflow.version>1.0.2</tinyflow.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-common</artifactId>
+        </dependency>
+
+        <!-- 业务组件 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
+        </dependency>
+
+        <!-- Web 相关 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-security</artifactId>
         </dependency>
 
         <!-- Spring AI Model 模型接入 -->
@@ -98,6 +110,13 @@
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-milvus-store</artifactId>
             <version>${spring-ai.version}</version>
+            <exclusions>
+                <!-- 解决和 logback 的日志冲突 -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-reload4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -125,6 +144,10 @@
             <version>${tinyflow.version}</version>
             <exclusions>
                 <exclusion>
+                    <groupId>com.jfinal</groupId>
+                    <artifactId>enjoy</artifactId>
+                </exclusion>
+                <exclusion>
                     <!-- 解决 https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/1318/ 问题 -->
                     <groupId>com.agentsflex</groupId>
                     <artifactId>agents-flex-store-elasticsearch</artifactId>
@@ -133,6 +156,19 @@
                     <!-- TODO @芋艿：暂时移除 groovy，和 iot 冲突 -->
                     <groupId>org.codehaus.groovy</groupId>
                     <artifactId>groovy-all</artifactId>
+                </exclusion>
+                <!-- 解决和 logback 的日志冲突 -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-reload4j</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

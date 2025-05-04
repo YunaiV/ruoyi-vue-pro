@@ -101,8 +101,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         ChatModel chatModel = modalService.getChatModel(model.getId());
 
         // 2. 知识库找回
-        List<AiKnowledgeSegmentSearchRespBO> knowledgeSegments = recallKnowledgeSegment(sendReqVO.getContent(),
-                conversation);
+        List<AiKnowledgeSegmentSearchRespBO> knowledgeSegments = recallKnowledgeSegment(sendReqVO.getContent(), conversation);
 
         // 3. 插入 user 发送消息
         AiChatMessageDO userMessage = createChatMessage(conversation.getId(), null, model,
@@ -122,11 +121,11 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         String newContent = chatResponse.getResult().getOutput().getText();
         chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId()).setContent(newContent));
         // 3.4 响应结果
+        Map<Long, AiKnowledgeDocumentDO> documentMap = knowledgeDocumentService.getKnowledgeDocumentMap(
+                convertSet(knowledgeSegments, AiKnowledgeSegmentSearchRespBO::getDocumentId));
         List<AiChatMessageRespVO.KnowledgeSegment> segments = BeanUtils.toBean(knowledgeSegments,
-                AiChatMessageRespVO.KnowledgeSegment.class,
-                segment -> {
-                    AiKnowledgeDocumentDO document = knowledgeDocumentService
-                            .getKnowledgeDocument(segment.getDocumentId());
+                AiChatMessageRespVO.KnowledgeSegment.class, segment -> {
+                    AiKnowledgeDocumentDO document = documentMap.get(segment.getDocumentId());
                     segment.setDocumentName(document != null ? document.getName() : null);
                 });
         return new AiChatMessageSendRespVO()
@@ -173,12 +172,13 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
             // 处理知识库的返回，只有首次才有
             List<AiChatMessageRespVO.KnowledgeSegment> segments = null;
             if (StrUtil.isEmpty(contentBuffer)) {
-                segments = BeanUtils.toBean(knowledgeSegments, AiChatMessageRespVO.KnowledgeSegment.class,
-                        segment -> TenantUtils.executeIgnore(() -> {
-                            AiKnowledgeDocumentDO document = knowledgeDocumentService
-                                    .getKnowledgeDocument(segment.getDocumentId());
-                            segment.setDocumentName(document != null ? document.getName() : null);
-                        }));
+                Map<Long, AiKnowledgeDocumentDO> documentMap = TenantUtils.executeIgnore(() ->
+                        knowledgeDocumentService.getKnowledgeDocumentMap(
+                                convertSet(knowledgeSegments, AiKnowledgeSegmentSearchRespBO::getDocumentId)));
+                segments = BeanUtils.toBean(knowledgeSegments, AiChatMessageRespVO.KnowledgeSegment.class, segment ->  {
+                    AiKnowledgeDocumentDO document = documentMap.get(segment.getDocumentId());
+                    segment.setDocumentName(document != null ? document.getName() : null);
+                });
             }
             // 响应结果
             String newContent = chunk.getResult() != null ? chunk.getResult().getOutput().getText() : null;
@@ -221,8 +221,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     }
 
     private Prompt buildPrompt(AiChatConversationDO conversation, List<AiChatMessageDO> messages,
-            List<AiKnowledgeSegmentSearchRespBO> knowledgeSegments,
-            AiModelDO model, AiChatMessageSendReqVO sendReqVO) {
+                               List<AiKnowledgeSegmentSearchRespBO> knowledgeSegments,
+                               AiModelDO model, AiChatMessageSendReqVO sendReqVO) {
         List<Message> chatMessages = new ArrayList<>();
         // 1.1 System Context 角色设定
         if (StrUtil.isNotBlank(conversation.getSystemMessage())) {
@@ -247,16 +247,18 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
 
         // 2.1 查询 tool 工具
         Set<String> toolNames = null;
+        Map<String,Object> toolContext = Map.of();
         if (conversation.getRoleId() != null) {
             AiChatRoleDO chatRole = chatRoleService.getChatRole(conversation.getRoleId());
             if (chatRole != null && CollUtil.isNotEmpty(chatRole.getToolIds())) {
                 toolNames = convertSet(toolService.getToolList(chatRole.getToolIds()), AiToolDO::getName);
+                toolContext = AiUtils.buildCommonToolContext();
             }
         }
         // 2.2 构建 ChatOptions 对象
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
         ChatOptions chatOptions = AiUtils.buildChatOptions(platform, model.getModel(),
-                conversation.getTemperature(), conversation.getMaxTokens(), toolNames);
+                conversation.getTemperature(), conversation.getMaxTokens(), toolNames, toolContext);
         return new Prompt(chatMessages, chatOptions);
     }
 

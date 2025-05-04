@@ -7,10 +7,9 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.workflow.vo.AiWorkflowPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.workflow.vo.AiWorkflowSaveReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.workflow.vo.AiWorkflowTestReqVO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.workflow.AiWorkflowDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.workflow.AiWorkflowMapper;
-import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
+import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import dev.tinyflow.core.Tinyflow;
@@ -37,11 +36,14 @@ public class AiWorkflowServiceImpl implements AiWorkflowService {
     private AiWorkflowMapper workflowMapper;
 
     @Resource
-    private AiApiKeyService apiKeyService;
+    private AiModelService apiModelService;
 
     @Override
     public Long createWorkflow(AiWorkflowSaveReqVO createReqVO) {
-        validateWorkflowForCreateOrUpdate(null, createReqVO.getCode());
+        // 1. 参数校验
+        validateCodeUnique(null, createReqVO.getCode());
+
+        // 2. 插入工作流配置
         AiWorkflowDO workflow = BeanUtils.toBean(createReqVO, AiWorkflowDO.class);
         workflowMapper.insert(workflow);
         return workflow.getId();
@@ -49,47 +51,33 @@ public class AiWorkflowServiceImpl implements AiWorkflowService {
 
     @Override
     public void updateWorkflow(AiWorkflowSaveReqVO updateReqVO) {
-        validateWorkflowForCreateOrUpdate(updateReqVO.getId(), updateReqVO.getCode());
+        // 1. 参数校验
+        validateWorkflowExists(updateReqVO.getId());
+        validateCodeUnique(updateReqVO.getId(), updateReqVO.getCode());
+
+        // 2. 更新工作流配置
         AiWorkflowDO workflow = BeanUtils.toBean(updateReqVO, AiWorkflowDO.class);
         workflowMapper.updateById(workflow);
     }
 
     @Override
     public void deleteWorkflow(Long id) {
+        // 1. 校验存在
         validateWorkflowExists(id);
+
+        // 2. 删除工作流配置
         workflowMapper.deleteById(id);
     }
 
-    @Override
-    public AiWorkflowDO getWorkflow(Long id) {
-        return workflowMapper.selectById(id);
-    }
-
-    @Override
-    public PageResult<AiWorkflowDO> getWorkflowPage(AiWorkflowPageReqVO pageReqVO) {
-        return workflowMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public Object testWorkflow(AiWorkflowTestReqVO testReqVO) {
-        Map<String, Object> variables = testReqVO.getParams();
-        Tinyflow tinyflow = parseFlowParam(testReqVO.getGraph());
-        return tinyflow.toChain().executeForResult(variables);
-    }
-
-    private void validateWorkflowForCreateOrUpdate(Long id, String code) {
-        validateWorkflowExists(id);
-        validateCodeUnique(id, code);
-    }
-
-    private void validateWorkflowExists(Long id) {
+    private AiWorkflowDO validateWorkflowExists(Long id) {
         if (ObjUtil.isNull(id)) {
-            return;
+            throw exception(WORKFLOW_NOT_EXISTS);
         }
         AiWorkflowDO workflow = workflowMapper.selectById(id);
         if (ObjUtil.isNull(workflow)) {
             throw exception(WORKFLOW_NOT_EXISTS);
         }
+        return workflow;
     }
 
     private void validateCodeUnique(Long id, String code) {
@@ -108,6 +96,30 @@ public class AiWorkflowServiceImpl implements AiWorkflowService {
         }
     }
 
+    @Override
+    public AiWorkflowDO getWorkflow(Long id) {
+        return workflowMapper.selectById(id);
+    }
+
+    @Override
+    public PageResult<AiWorkflowDO> getWorkflowPage(AiWorkflowPageReqVO pageReqVO) {
+        return workflowMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public Object testWorkflow(AiWorkflowTestReqVO testReqVO) {
+        // 加载 graph
+        String graph = testReqVO.getGraph() != null ? testReqVO.getGraph()
+                : validateWorkflowExists(testReqVO.getId()).getGraph();
+
+        // 构建 TinyFlow 执行链
+        Tinyflow tinyflow = parseFlowParam(graph);
+
+        // 执行
+        Map<String, Object> variables = testReqVO.getParams();
+        return tinyflow.toChain().executeForResult(variables);
+    }
+
     private Tinyflow parseFlowParam(String graph) {
         // TODO @lesan：可以使用 jackson 哇？
         JSONObject json = JSONObject.parseObject(graph);
@@ -118,25 +130,7 @@ public class AiWorkflowServiceImpl implements AiWorkflowService {
             switch (node.getString("type")) {
                 case "llmNode":
                     JSONObject data = node.getJSONObject("data");
-                    AiApiKeyDO apiKey = apiKeyService.getApiKey(data.getLong("llmId"));
-                    switch (apiKey.getPlatform()) {
-                        // TODO @lesan 需要讨论一下这里怎么弄
-                        // TODO @lesan llmId 对应 model 的编号如何？这样的话，就是 apiModelService 提供一个获取 LLM 的方法。然后，创建的方法，也在 AiModelFactory 提供。可以先接个 deepseek 先。deepseek yyds！
-                        case "OpenAI":
-                            break;
-                        case "Ollama":
-                            break;
-                        case "YiYan":
-                            break;
-                        case "XingHuo":
-                            break;
-                        case "TongYi":
-                            break;
-                        case "DeepSeek":
-                            break;
-                        case "ZhiPu":
-                            break;
-                    }
+                    apiModelService.getLLmProvider4Tinyflow(tinyflow, data.getLong("llmId"));
                     break;
                 case "internalNode":
                     break;

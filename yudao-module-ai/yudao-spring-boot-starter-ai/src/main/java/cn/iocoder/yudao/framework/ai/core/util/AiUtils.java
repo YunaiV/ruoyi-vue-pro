@@ -3,6 +3,8 @@ package cn.iocoder.yudao.framework.ai.core.util;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
+import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import org.springframework.ai.azure.openai.AzureOpenAiChatOptions;
 import org.springframework.ai.chat.messages.*;
@@ -15,6 +17,8 @@ import org.springframework.ai.qianfan.QianFanChatOptions;
 import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -24,29 +28,32 @@ import java.util.Set;
  */
 public class AiUtils {
 
+    public static final String TOOL_CONTEXT_LOGIN_USER = "LOGIN_USER";
+    public static final String TOOL_CONTEXT_TENANT_ID = "TENANT_ID";
+
     public static ChatOptions buildChatOptions(AiPlatformEnum platform, String model, Double temperature, Integer maxTokens) {
-        return buildChatOptions(platform, model, temperature, maxTokens, null);
+        return buildChatOptions(platform, model, temperature, maxTokens, null, null);
     }
 
     public static ChatOptions buildChatOptions(AiPlatformEnum platform, String model, Double temperature, Integer maxTokens,
-                                               Set<String> toolNames) {
+                                               Set<String> toolNames, Map<String, Object> toolContext) {
         toolNames = ObjUtil.defaultIfNull(toolNames, Collections.emptySet());
         // noinspection EnhancedSwitchMigration
         switch (platform) {
             case TONG_YI:
                 return DashScopeChatOptions.builder().withModel(model).withTemperature(temperature).withMaxToken(maxTokens)
-                        .withFunctions(toolNames).build();
+                        .withFunctions(toolNames).withToolContext(toolContext).build();
             case YI_YAN:
                 return QianFanChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
             case ZHI_PU:
                 return ZhiPuAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
-                        .functions(toolNames).build();
+                        .functions(toolNames).toolContext(toolContext).build();
             case MINI_MAX:
                 return MiniMaxChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
-                        .functions(toolNames).build();
+                        .functions(toolNames).toolContext(toolContext).build();
             case MOONSHOT:
                 return MoonshotChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
-                        .functions(toolNames).build();
+                        .functions(toolNames).toolContext(toolContext).build();
             case OPENAI:
             case DEEP_SEEK: // 复用 OpenAI 客户端
             case DOU_BAO: // 复用 OpenAI 客户端
@@ -55,14 +62,14 @@ public class AiUtils {
             case SILICON_FLOW: // 复用 OpenAI 客户端
             case BAI_CHUAN: // 复用 OpenAI 客户端
                 return OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
-                        .toolNames(toolNames).build();
+                        .toolNames(toolNames).toolContext(toolContext).build();
             case AZURE_OPENAI:
                 // TODO 芋艿：貌似没 model 字段？？？！
                 return AzureOpenAiChatOptions.builder().deploymentName(model).temperature(temperature).maxTokens(maxTokens)
-                        .toolNames(toolNames).build();
+                        .toolNames(toolNames).toolContext(toolContext).build();
             case OLLAMA:
                 return OllamaOptions.builder().model(model).temperature(temperature).numPredict(maxTokens)
-                        .toolNames(toolNames).build();
+                        .toolNames(toolNames).toolContext(toolContext).build();
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
@@ -82,6 +89,13 @@ public class AiUtils {
             throw new UnsupportedOperationException("暂不支持 tool 消息：" + content);
         }
         throw new IllegalArgumentException(StrUtil.format("未知消息类型({})", type));
+    }
+
+    public static Map<String, Object> buildCommonToolContext() {
+        Map<String, Object> context = new HashMap<>();
+        context.put(TOOL_CONTEXT_LOGIN_USER, SecurityFrameworkUtils.getLoginUser());
+        context.put(TOOL_CONTEXT_TENANT_ID, TenantContextHolder.getTenantId());
+        return context;
     }
 
 }
