@@ -300,7 +300,7 @@ public class PointActivityServiceImpl implements PointActivityService {
             throw exception(POINT_ACTIVITY_JOIN_ACTIVITY_SINGLE_LIMIT_COUNT_EXCEED);
         }
         // 2.2 校验库存是否充足
-        if (count >= product.getStock()) {
+        if (count > product.getStock()) {
             throw exception(POINT_ACTIVITY_UPDATE_STOCK_FAIL);
         }
         return BeanUtils.toBean(product, PointValidateJoinRespDTO.class);

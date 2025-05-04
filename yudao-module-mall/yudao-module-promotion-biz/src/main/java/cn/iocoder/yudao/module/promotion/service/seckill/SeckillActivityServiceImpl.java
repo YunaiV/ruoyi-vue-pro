@@ -317,7 +317,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
             throw exception(SECKILL_JOIN_ACTIVITY_PRODUCT_NOT_EXISTS);
         }
         // 2.2 校验库存是否充足
-        if (count >= product.getStock()) {
+        if (count > product.getStock()) {
             throw exception(SECKILL_ACTIVITY_UPDATE_STOCK_FAIL);
         }
         return SeckillActivityConvert.INSTANCE.convert02(activity, product);
