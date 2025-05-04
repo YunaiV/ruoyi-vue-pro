@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import type { VxeTableInstance } from 'vxe-table';
 
 import { Page, useVbenModal } from '@vben/common-ui';
-import { formatDateTime } from '@vben/utils';
+import { cloneDeep, formatDateTime } from '@vben/utils';
 import { Button, message,Tabs,Pagination,Form,RangePicker,DatePicker,Select,Input } from 'ant-design-vue';
 import { DictTag } from '#/components/dict-tag';
 import { DICT_TYPE, getDictOptions } from '#/utils/dict';
@@ -10,6 +11,7 @@ import ${simpleClassName}Form from './modules/form.vue';
 import { Download, Plus, RefreshCw, Search } from '@vben/icons';
 import { ContentWrap } from "#/components/content-wrap";
 import { VxeColumn, VxeTable } from 'vxe-table';
+import { TableToolbar } from '#/components/table-toolbar';
 import { getRangePickerDefaultProps } from '#/utils/date';
 
 ## 特殊：主子表专属逻辑
@@ -21,10 +23,10 @@ import { getRangePickerDefaultProps } from '#/utils/date';
     #end
 #end
 
-import { ref, h, reactive,onMounted } from 'vue';
+import { ref, h, reactive,onMounted,nextTick } from 'vue';
 import { $t } from '#/locales';
 #if (${table.templateType} == 2)## 树表接口
-import { handleTree } from '@/utils/tree'
+import { handleTree,isEmpty } from '@vben/utils'
 import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 #else## 标准表接口
 import { get${simpleClassName}Page, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
@@ -36,11 +38,19 @@ import { downloadByData } from '#/utils/download';
 const subTabsName = ref('$subClassNameVars.get(0)')
 #if ($table.templateType == 11)
 const select${simpleClassName} = ref<${simpleClassName}Api.${simpleClassName}>();
+async function onCellClick({ row }: { row: ${simpleClassName}Api.${simpleClassName} }) {
+  select${simpleClassName}.value = row
+}
 #end
 #end
 
 const loading = ref(true) // 列表的加载中
+#if ( $table.templateType == 2 )
+const list = ref<any[]>([]) // 树列表的数据
+#else
 const list = ref<${simpleClassName}Api.${simpleClassName}[]>([]) // 列表的数据
+#end
+
 ## 特殊：树表专属逻辑（树不需要分页接口）
 #if ( $table.templateType != 2 )
 const total = ref(0) // 列表的总页数
@@ -69,12 +79,21 @@ const exportLoading = ref(false) // 导出的加载中
 const getList = async () => {
   loading.value = true
   try {
+    const params = cloneDeep(queryParams) as any;
+      #foreach ($column in $columns)
+          #if ($column.listOperation)
+              #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
+                if (params.${column.javaField} && Array.isArray(params.${column.javaField})) {
+                  params.${column.javaField} = (params.${column.javaField} as string[]).join(',');
+                }
+              #end
+          #end
+      #end
       ## 特殊：树表专属逻辑（树不需要分页接口）
       #if ( $table.templateType == 2 )
-        const data = await get${simpleClassName}List(queryParams)
-        list.value = handleTree(data, 'id', '${treeParentColumn.javaField}')
+        list.value = await get${simpleClassName}List(params);
       #else
-        const data = await get${simpleClassName}Page(queryParams)
+        const data = await get${simpleClassName}Page(params)
         list.value = data.list
         total.value = data.total
       #end
@@ -85,7 +104,9 @@ const getList = async () => {
 
 /** 搜索按钮操作 */
 const handleQuery = () => {
+#if ( $table.templateType != 2 )
   queryParams.pageNo = 1
+#end
   getList()
 }
 
@@ -147,20 +168,40 @@ try {
 }
 }
 
-/** 初始化 **/
-onMounted(() => {
-  getList()
-})
+/** 隐藏搜索栏 */
+const hiddenSearchBar = ref(false);
+const tableToolbarRef = ref<InstanceType<typeof TableToolbar>>();
+const tableRef = ref<VxeTableInstance>();
+
+#if (${table.templateType} == 2)
+/** 切换树形展开/收缩状态 */
+const isExpanded = ref(true);
+function toggleExpand() {
+  isExpanded.value = !isExpanded.value;
+  tableRef.value?.setAllTreeExpand(isExpanded.value);
+}
+#end
+
+/** 初始化 */
+onMounted(async () => {
+  await getList();
+  await nextTick();
+  // 挂载 toolbar 工具栏
+  const table = tableRef.value;
+  const tableToolbar = tableToolbarRef.value;
+  if (table && tableToolbar) {
+    await table.connect(tableToolbar.getToolbarRef()!);
+  }
+});
 </script>
 
 <template>
   <Page auto-content-height>
     <FormModal @success="getList" />
 
-    <ContentWrap>
+    <ContentWrap v-if="!hiddenSearchBar">
       <!-- 搜索工作栏 -->
       <Form
-          class="-mb-15px"
           :model="queryParams"
           ref="queryFormRef"
           layout="inline"
@@ -185,7 +226,7 @@ onMounted(() => {
                           placeholder="请输入${comment}"
                           allowClear
                           @pressEnter="handleQuery"
-                          class="!w-240px"
+                           class="w-full"
                       />
                     </Form.Item>
                   #elseif ($column.htmlType == "select" || $column.htmlType == "radio" || $column.htmlType == "checkbox")
@@ -194,15 +235,16 @@ onMounted(() => {
                           v-model:value="queryParams.${javaField}"
                           placeholder="请选择${comment}"
                           allowClear
-                          class="!w-240px"
+                           class="w-full"
                       >
                           #if ("" != $dictType)## 设置了 dictType 数据字典的情况
                             <Select.Option
                                 v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                                 :key="dict.value"
-                                :label="dict.label"
                                 :value="dict.value"
-                            />
+                            >
+                              {{ dict.label }}
+                            </Select.Option>
                           #else## 未设置 dictType 数据字典的情况
                             <Select.Option label="请选择字典生成" value="" />
                           #end
@@ -216,7 +258,7 @@ onMounted(() => {
                               valueFormat="YYYY-MM-DD"
                               placeholder="选择${comment}"
                               allowClear
-                              class="!w-240px"
+                               class="w-full"
                           />
                         </Form.Item>
                       #else## 范围
@@ -224,7 +266,7 @@ onMounted(() => {
                           <RangePicker
                               v-model:value="queryParams.${javaField}"
                               v-bind="getRangePickerDefaultProps()"
-                              class="!w-220px"
+                              class="w-full"
                           />
                         </Form.Item>
                       #end
@@ -232,8 +274,26 @@ onMounted(() => {
               #end
           #end
         <Form.Item>
-          <Button class="ml-2" @click="handleQuery" :icon="h(Search)">搜索</Button>
-          <Button class="ml-2" @click="resetQuery" :icon="h(RefreshCw)">重置</Button>
+          <Button class="ml-2" @click="resetQuery"> 重置 </Button>
+          <Button class="ml-2" @click="handleQuery" type="primary">
+            搜索
+          </Button>
+        </Form.Item>
+      </Form>
+    </ContentWrap>
+    
+    <!-- 列表 -->
+    <ContentWrap title="${table.classComment}">
+      <template #extra>
+        <TableToolbar
+            ref="tableToolbarRef"
+            v-model:hidden-search="hiddenSearchBar"
+        >
+        #if (${table.templateType} == 2)
+          <Button @click="toggleExpand" class="mr-2">
+            {{ isExpanded ? '收缩' : '展开' }}
+          </Button>
+        #end
           <Button
               class="ml-2"
               :icon="h(Plus)"
@@ -241,7 +301,7 @@ onMounted(() => {
               @click="onCreate"
               v-access:code="['${permissionPrefix}:create']"
           >
-            {{ $t('ui.actionTitle.create', ['示例联系人']) }}
+            {{ $t('ui.actionTitle.create', ['${table.classComment}']) }}
           </Button>
           <Button
               :icon="h(Download)"
@@ -253,13 +313,31 @@ onMounted(() => {
           >
             {{ $t('ui.actionTitle.export') }}
           </Button>
-        </Form.Item>
-      </Form>
-    </ContentWrap>
-    
-    <!-- 列表 -->
-    <ContentWrap>
-      <vxe-table :data="list"  show-overflow :loading="loading">
+        </TableToolbar>
+      </template>
+      <vxe-table
+          ref="tableRef"
+          :data="list"
+        #if ( $table.templateType == 2 )
+          :tree-config="{
+          parentField: '${treeParentColumn.javaField}',
+          rowField: 'id',
+          transform: true,
+          expandAll: true,
+          reserve: true,
+        }"
+        #end
+#if ($table.templateType == 11) ## erp情况
+          @cell-click="onCellClick"
+          :row-config="{
+            keyField: 'id',
+            isHover: true,
+            isCurrent: true,
+          }"
+#end
+          show-overflow
+          :loading="loading"
+      >
           ## 特殊：主子表专属逻辑
           #if ( $table.templateType == 12 && $subTables && $subTables.size() > 0 )
             <!-- 子表的列表 -->
@@ -298,6 +376,8 @@ onMounted(() => {
                         <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="row.${javaField}" />
                       </template>
                     </vxe-column>
+                  #elseif ($table.templateType == 2 && $javaField == $treeNameColumn.javaField)
+                    <vxe-column field="${javaField}" title="${comment}" align="center"  tree-node/>
                   #else
                     <vxe-column field="${javaField}" title="${comment}" align="center" />
                   #end
@@ -305,6 +385,16 @@ onMounted(() => {
           #end
         <vxe-column field="operation" title="操作" align="center">
           <template #default="{row}">
+#if ( $table.templateType == 2 )
+  <Button
+      size="small"
+      type="link"
+      @click="onAppend(row as any)"
+      v-access:code="['${permissionPrefix}:create']"
+  >
+    新增下级
+  </Button>
+#end
             <Button
                 size="small"
                 type="link"
@@ -316,7 +406,11 @@ onMounted(() => {
             <Button
                 size="small"
                 type="link"
+                danger
                 class="ml-2"
+                #if ( $table.templateType == 2 )
+                :disabled="!isEmpty(row?.children)"
+                #end
                 @click="onDelete(row as any)"
                 v-access:code="['${permissionPrefix}:delete']"
             >
@@ -325,6 +419,7 @@ onMounted(() => {
           </template>
         </vxe-column>
       </vxe-table>
+#if ( $table.templateType != 2 )
       <!-- 分页 -->
       <div class="mt-2 flex justify-end">
         <Pagination
@@ -335,6 +430,7 @@ onMounted(() => {
             @change="getList"
         />
       </div>
+#end
     </ContentWrap>
 
 #if ($table.templateType == 11) ## erp情况

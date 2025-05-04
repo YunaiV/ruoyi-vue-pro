@@ -5,11 +5,11 @@ import type { Rule } from 'ant-design-vue/es/form';
 import { useVbenModal } from '@vben/common-ui';
 import { Tinymce as RichTextarea } from '#/components/tinymce';
 import { ImageUpload, FileUpload } from "#/components/upload";
-import { message, Tabs, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker } from 'ant-design-vue';
+import { message, Tabs, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker, TreeSelect } from 'ant-design-vue';
 import { DICT_TYPE, getDictOptions } from '#/utils/dict';
 #if($table.templateType == 2)## 树表需要导入这些
 import { get${simpleClassName}List } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
-import { handleTree } from '#/utils/tree';
+import { handleTree } from '@vben/utils'
 #end
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 10 || $table.templateType == 12 )
@@ -25,9 +25,8 @@ import { $t } from '#/locales';
 import { get${simpleClassName}, create${simpleClassName}, update${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 
 const emit = defineEmits(['success']);
+
 const formRef = ref();
-const labelCol = { span: 5 };
-const wrapperCol = { span: 13 };
 const formData = ref<Partial<${simpleClassName}Api.${simpleClassName}>>({
 #foreach ($column in $columns)
   #if ($column.createOperation || $column.updateOperation)
@@ -91,10 +90,12 @@ const resetForm = () => {
 /** 获得${table.classComment}树 */
 const get${simpleClassName}Tree = async () => {
   ${classNameVar}Tree.value = []
-  const data = await get${simpleClassName}List()
-  const root: Tree = { id: 0, name: '顶级${table.classComment}', children: [] }
-  root.children = handleTree(data, 'id', '${treeParentColumn.javaField}')
-  ${classNameVar}Tree.value.push(root)
+  const data = await get${simpleClassName}List({});
+  data.unshift({
+    id: 0,
+    name: '顶级${table.classComment}',
+  });
+    ${classNameVar}Tree.value = handleTree(data);
 }
 #end
 
@@ -111,10 +112,11 @@ const [Modal, modalApi] = useVbenModal({
           #if ($subTable.subJoinMany) ## 一对多
             ## TODO 列表值校验？
           #else
-            const ${subClassNameVar}Valid = await ${subClassNameVar}FormRef.value?.validate();
-            if (!${subClassNameVar}Valid) {
-              subTabsName.value = '${subClassNameVar}';
-              return;
+            try {
+              await ${subClassNameVar}FormRef.value?.validate()
+            } catch (e) {
+              subTabsName.value = '${subClassNameVar}'
+              return
             }
           #end
         #end
@@ -133,7 +135,7 @@ const [Modal, modalApi] = useVbenModal({
           #if ($subTable.subJoinMany)
             data.${subClassNameVar}s = ${subClassNameVar}FormRef.value?.getData();
           #else
-            data.${subClassNameVar} = await ${subClassNameVar}FormRef.value?.getValues();
+            data.${subClassNameVar} = ${subClassNameVar}FormRef.value?.getValues();
           #end
         #end
       #end
@@ -156,7 +158,6 @@ const [Modal, modalApi] = useVbenModal({
       resetForm()
       return;
     }
-
     // 加载数据
     let data = modalApi.getData<${simpleClassName}Api.${simpleClassName}>();
     if (!data) {
@@ -185,8 +186,8 @@ const [Modal, modalApi] = useVbenModal({
       ref="formRef"
       :model="formData"
       :rules="rules"
-      :label-col="labelCol"
-      :wrapper-col="wrapperCol"
+      :label-col="{ span: 5 }"
+      :wrapper-col="{ span: 18 }"
     >
       #foreach($column in $columns)
         #if ($column.createOperation || $column.updateOperation)
@@ -207,9 +208,17 @@ const [Modal, modalApi] = useVbenModal({
                       v-model:value="formData.${javaField}"
                       :treeData="${classNameVar}Tree"
                 #if ($treeNameColumn.javaField == "name")
-                      :fieldNames="defaultProps"
+                      :fieldNames="{
+            label: 'name',
+            value: 'id',
+            children: 'children',
+          }"
                 #else
-                      :fieldNames="{...defaultProps, label: '$treeNameColumn.javaField'}"
+                      :fieldNames="{
+                        label: '$treeNameColumn.javaField',
+                        value: 'id',
+                        children: 'children',
+                        }"
                 #end
                       checkable
                       treeDefaultExpandAll
@@ -239,9 +248,10 @@ const [Modal, modalApi] = useVbenModal({
                   <Select.Option
                           v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                           :key="dict.value"
-                          :label="dict.label"
                           :value="dict.value"
-                  />
+                  >
+                    {{ dict.label }}
+                  </Select.Option>
                 #else##没数据字典
                   <Select.Option label="请选择字典生成" value="" />
                 #end
@@ -254,9 +264,10 @@ const [Modal, modalApi] = useVbenModal({
                   <Checkbox
                           v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                           :key="dict.value"
-                          :label="dict.label"
                           :value="dict.value"
-                  />
+                 >
+                    {{ dict.label }}
+                  </Checkbox>
                 #else##没数据字典
                   <Checkbox label="请选择字典生成" />
                 #end

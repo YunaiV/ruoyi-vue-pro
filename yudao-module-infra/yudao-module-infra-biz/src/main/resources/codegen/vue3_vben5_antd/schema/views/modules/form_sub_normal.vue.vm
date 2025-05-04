@@ -13,6 +13,7 @@
 #if ($subTable.subJoinMany) ## 一对多
 import { Plus } from "@vben/icons";
 import { Button, Tabs, Checkbox, Input, Textarea, Select,RadioGroup,CheckboxGroup, DatePicker } from 'ant-design-vue';
+import { ImageUpload, FileUpload } from "#/components/upload";
 import type { OnActionClickParams } from '#/adapter/vxe-table';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { use${subSimpleClassName}GridEditColumns } from '../data';
@@ -145,15 +146,11 @@ watch(
                 </template>
               #elseif($column.htmlType == "imageUpload")## 图片上传
                 <template #${javaField}="{ row }">
-                  <UploadImg v-model:value="row.${javaField}" />
+                  <ImageUpload v-model:value="row.${javaField}" />
                 </template>
               #elseif($column.htmlType == "fileUpload")## 文件上传
                 <template #${javaField}="{ row }">
-                  <UploadFile v-model:value="row.${javaField}" />
-                </template>
-              #elseif($column.htmlType == "editor")## 文本编辑器
-                <template #${javaField}="{ row }">
-                  <Textarea v-model:value="row.${javaField}" />
+                  <FileUpload v-model:value="row.${javaField}" />
                 </template>
               #elseif($column.htmlType == "select")## 下拉框
                 <template #${javaField}="{ row, column }">
@@ -180,7 +177,7 @@ watch(
                       valueFormat='x'
                   />
                 </template>
-              #elseif($column.htmlType == "textarea")## 文本框
+              #elseif($column.htmlType == "textarea" || $column.htmlType == "editor")## 文本框
                 <template #${javaField}="{ row }">
                   <Textarea v-model:value="row.${javaField}" />
                 </template>
