@@ -1,18 +1,15 @@
 package cn.iocoder.yudao.framework.web.core.util;
 
 import cn.hutool.core.util.NumberUtil;
-import cn.hutool.extra.servlet.ServletUtil;
 import cn.iocoder.yudao.framework.common.enums.TerminalEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 专属于 web 包的工具类
@@ -27,6 +24,7 @@ public class WebFrameworkUtils {
     private static final String REQUEST_ATTRIBUTE_COMMON_RESULT = "common_result";
 
     public static final String HEADER_TENANT_ID = "tenant-id";
+    public static final String HEADER_VISIT_TENANT_ID = "visit-tenant-id";
 
     /**
      * 终端的 Header
@@ -51,6 +49,18 @@ public class WebFrameworkUtils {
     public static Long getTenantId(HttpServletRequest request) {
         String tenantId = request.getHeader(HEADER_TENANT_ID);
         return NumberUtil.isNumber(tenantId) ? Long.valueOf(tenantId) : null;
+    }
+
+    /**
+     * 获得访问的租户编号，从 header 中
+     * 考虑到其它 framework 组件也会使用到租户编号，所以不得不放在 WebFrameworkUtils 统一提供
+     *
+     * @param request 请求
+     * @return 租户编号
+     */
+    public static Long getVisitTenantId(HttpServletRequest request) {
+        String tenantId = request.getHeader(HEADER_VISIT_TENANT_ID);
+        return NumberUtil.isNumber(tenantId)? Long.valueOf(tenantId) : null;
     }
 
     public static void setLoginUserId(ServletRequest request, Long userId) {

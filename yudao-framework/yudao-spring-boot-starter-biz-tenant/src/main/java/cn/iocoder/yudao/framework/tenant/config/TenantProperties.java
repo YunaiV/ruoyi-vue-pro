@@ -34,6 +34,13 @@ public class TenantProperties {
     private Set<String> ignoreUrls = new HashSet<>();
 
     /**
+     * 需要忽略跨（切换）租户访问的请求
+     *
+     * 原因是：某些接口，访问的是个人信息，在跨租户是获取不到的！
+     */
+    private Set<String> ignoreVisitUrls = Collections.emptySet();
+
+    /**
      * 需要忽略多租户的表
      *
      * 即默认所有表都开启多租户的功能，所以记得添加对应的 tenant_id 字段哟
