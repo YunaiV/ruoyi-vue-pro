@@ -4,6 +4,7 @@ server:
 --- #################### 数据库相关配置 ####################
 spring:
   autoconfigure:
+    # noinspection SpringBootApplicationYaml
     exclude:
       - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure # 排除 Druid 的自动配置，使用 dynamic-datasource-spring-boot-starter 配置多数据源
       - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration # 默认 local 环境，不开启 Quartz 的自动配置

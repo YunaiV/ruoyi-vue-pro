@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.mp.service.handler.menu;
 import cn.iocoder.yudao.module.mp.framework.mp.core.context.MpContextHolder;
 import cn.iocoder.yudao.module.mp.service.menu.MpMenuService;
 import me.chanjar.weixin.common.session.WxSessionManager;
-import me.chanjar.weixin.mp.api.WxMpMenuService;
 import me.chanjar.weixin.mp.api.WxMpMessageHandler;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
@@ -12,8 +11,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Map;
-
-import static me.chanjar.weixin.common.api.WxConsts.MenuButtonType;
 
 /**
  * 自定义菜单的事件处理器

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.mp.controller.admin.message.vo.message.MpMessageP
 import cn.iocoder.yudao.module.mp.controller.admin.message.vo.message.MpMessageSendReqVO;
 import cn.iocoder.yudao.module.mp.dal.dataobject.message.MpMessageDO;
 import cn.iocoder.yudao.module.mp.service.message.bo.MpMessageSendOutReqBO;
+import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 
@@ -31,7 +32,7 @@ public interface MpMessageService {
      * @param appId 微信公众号 appId
      * @param wxMessage 消息
      */
-    void receiveMessage(String appId, WxMpXmlMessage wxMessage);
+    void receiveMessage(WxMpService weixinService, String appId, WxMpXmlMessage wxMessage);
 
     /**
      * 使用公众号，给粉丝回复消息

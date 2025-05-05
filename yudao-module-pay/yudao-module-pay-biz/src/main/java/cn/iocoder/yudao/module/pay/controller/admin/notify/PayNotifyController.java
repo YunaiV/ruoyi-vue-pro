@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
+import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.pay.controller.admin.notify.vo.PayNotifyTaskDetailRespVO;
 import cn.iocoder.yudao.module.pay.controller.admin.notify.vo.PayNotifyTaskPageReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.notify.vo.PayNotifyTaskRespVO;
@@ -62,6 +63,7 @@ public class PayNotifyController {
     @PostMapping(value = "/order/{channelId}")
     @Operation(summary = "支付渠道的统一【支付】回调")
     @PermitAll
+    @TenantIgnore
     public String notifyOrder(@PathVariable("channelId") Long channelId,
                               @RequestParam(required = false) Map<String, String> params,
                               @RequestBody(required = false) String body) {
@@ -82,6 +84,7 @@ public class PayNotifyController {
     @PostMapping(value = "/refund/{channelId}")
     @Operation(summary = "支付渠道的统一【退款】回调")
     @PermitAll
+    @TenantIgnore
     public String notifyRefund(@PathVariable("channelId") Long channelId,
                                @RequestParam(required = false) Map<String, String> params,
                                @RequestBody(required = false) String body) {
@@ -102,6 +105,7 @@ public class PayNotifyController {
     @PostMapping(value = "/transfer/{channelId}")
     @Operation(summary = "支付渠道的统一【转账】回调")
     @PermitAll
+    @TenantIgnore
     public String notifyTransfer(@PathVariable("channelId") Long channelId,
                                  @RequestParam(required = false) Map<String, String> params,
                                  @RequestBody(required = false) String body) {

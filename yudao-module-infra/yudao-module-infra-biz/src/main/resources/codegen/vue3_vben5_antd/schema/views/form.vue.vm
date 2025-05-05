@@ -21,24 +21,11 @@ import { useFormSchema } from '../data';
 
 const emit = defineEmits(['success']);
 const formData = ref<${simpleClassName}Api.${simpleClassName}>();
-#if (${table.templateType} == 2)## 树表特有：父ID处理
-const parentId = ref<number>(); // 新增下级时的父级 ID
-
-const getTitle = computed(() => {
-  if (formData.value?.id) {
-    return $t('ui.actionTitle.edit', ['${table.classComment}']);
-  }
-  return parentId.value
-    ? $t('ui.actionTitle.create', ['下级${table.classComment}'])
-    : $t('ui.actionTitle.create', ['${table.classComment}']);
-});
-#else## 标准表标题
 const getTitle = computed(() => {
   return formData.value?.id
     ? $t('ui.actionTitle.edit', ['${table.classComment}'])
     : $t('ui.actionTitle.create', ['${table.classComment}']);
 });
-#end
 
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 10 || $table.templateType == 12 )
@@ -128,7 +115,6 @@ const [Modal, modalApi] = useVbenModal({
       formData.value = undefined;
       return;
     }
-
     // 加载数据
     let data = modalApi.getData<${simpleClassName}Api.${simpleClassName}>();
     if (!data) {

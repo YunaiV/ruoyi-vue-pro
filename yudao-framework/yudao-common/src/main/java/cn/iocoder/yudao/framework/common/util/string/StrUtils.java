@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.common.util.string;
 import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import org.aspectj.lang.JoinPoint;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -75,6 +76,32 @@ public class StrUtils {
         return Arrays.stream(content.split("\n"))
                 .filter(line -> !line.contains(sequence))
                 .collect(Collectors.joining("\n"));
+    }
+
+    /**
+     * 拼接方法的参数
+     *
+     * 特殊：排除一些无法序列化的参数，如 ServletRequest、ServletResponse、MultipartFile
+     *
+     * @param joinPoint 连接点
+     * @return 拼接后的参数
+     */
+    public static String joinMethodArgs(JoinPoint joinPoint) {
+        Object[] args = joinPoint.getArgs();
+        if (ArrayUtil.isEmpty(args)) {
+            return "";
+        }
+        return ArrayUtil.join(args, ",", item -> {
+            if (item == null) {
+                return "";
+            }
+            // 讨论可见：https://t.zsxq.com/XUJVk、https://t.zsxq.com/MnKcL
+            String clazzName = item.getClass().getName();
+            if (StrUtil.startWithAny(clazzName, "javax.servlet", "jakarta.servlet", "org.springframework.web")) {
+                return "";
+            }
+            return item;
+        });
     }
 
 }

@@ -273,16 +273,7 @@ yudao:
   tenant: # 多租户相关配置项
     enable: true
     ignore-urls:
-      - /admin-api/system/tenant/get-id-by-name # 基于名字获取租户，不许带租户编号
-      - /admin-api/system/tenant/get-by-website # 基于域名获取租户，不许带租户编号
-      - /admin-api/system/tenant/simple-list # 获取租户列表，不许带租户编号
-      - /admin-api/system/captcha/get # 获取图片验证码，和租户无关
-      - /admin-api/system/captcha/check # 校验图片验证码，和租户无关
-      - /admin-api/infra/file/*/get/** # 获取图片，和租户无关
-      - /admin-api/system/sms/callback/* # 短信回调接口，无法带上租户编号
-      - /admin-api/pay/notify/** # 支付回调通知，不携带租户编号
       - /jmreport/* # 积木报表，无法携带租户编号
-      - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，无法携带租户编号
     ignore-tables:
       - system_tenant
       - system_tenant_package
@@ -349,7 +340,7 @@ yudao:
       receive-expire-time: 14d # 收货的过期时间
       comment-expire-time: 7d # 评论的过期时间
     express:
-      client: KD_NIAO
+      client: kd_100
       kd-niao:
         api-key: cb022f1e-48f1-4c4a-a723-9001ac9676b8
         business-id: 1809751

@@ -21,7 +21,7 @@ public interface MpUserMapper extends BaseMapperX<MpUserDO> {
     }
 
     default MpUserDO selectByAppIdAndOpenid(String appId, String openid) {
-        return selectOne(MpUserDO::getAppId, appId,
+        return selectFirstOne(MpUserDO::getAppId, appId,
                 MpUserDO::getOpenid, openid);
     }
 

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.ratelimiter.core.keyresolver.impl;
 
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
+import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.framework.ratelimiter.core.annotation.RateLimiter;
 import cn.iocoder.yudao.framework.ratelimiter.core.keyresolver.RateLimiterKeyResolver;
 import org.aspectj.lang.JoinPoint;
@@ -18,7 +18,7 @@ public class DefaultRateLimiterKeyResolver implements RateLimiterKeyResolver {
     @Override
     public String resolver(JoinPoint joinPoint, RateLimiter rateLimiter) {
         String methodName = joinPoint.getSignature().toString();
-        String argsStr = StrUtil.join(",", joinPoint.getArgs());
+        String argsStr = StrUtils.joinMethodArgs(joinPoint);
         return SecureUtil.md5(methodName + argsStr);
     }
 

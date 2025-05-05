@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.mp.controller.admin.open;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.mp.controller.admin.open.vo.MpOpenCheckSignatureReqVO;
 import cn.iocoder.yudao.module.mp.controller.admin.open.vo.MpOpenHandleMessageReqVO;
@@ -36,32 +37,13 @@ public class MpOpenController {
     private MpAccountService mpAccountService;
 
     /**
-     * 接收微信公众号的校验签名
-     *
-     * 对应 <a href="https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Access_Overview.html">文档</a>
-     */
-    @Operation(summary = "校验签名") // 参见
-    @GetMapping(value = "/{appId}", produces = "text/plain;charset=utf-8")
-    public String checkSignature(@PathVariable("appId") String appId,
-                                 MpOpenCheckSignatureReqVO reqVO) {
-        log.info("[checkSignature][appId({}) 接收到来自微信服务器的认证消息({})]", appId, reqVO);
-        // 校验请求签名
-        WxMpService wxMpService = mpServiceFactory.getRequiredMpService(appId);
-        // 校验通过
-        if (wxMpService.checkSignature(reqVO.getTimestamp(), reqVO.getNonce(), reqVO.getSignature())) {
-            return reqVO.getEchostr();
-        }
-        // 校验不通过
-        return "非法请求";
-    }
-
-    /**
      * 接收微信公众号的消息推送
      *
      * <a href="https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Receiving_standard_messages.html">文档</a>
      */
     @Operation(summary = "处理消息")
     @PostMapping(value = "/{appId}", produces = "application/xml; charset=UTF-8")
+    @TenantIgnore
     public String handleMessage(@PathVariable("appId") String appId,
                                 @RequestBody String content,
                                 MpOpenHandleMessageReqVO reqVO) {
@@ -77,6 +59,27 @@ public class MpOpenController {
         } finally {
             MpContextHolder.clear();
         }
+    }
+
+    /**
+     * 接收微信公众号的校验签名
+     *
+     * 对应 <a href="https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Access_Overview.html">文档</a>
+     */
+    @Operation(summary = "校验签名") // 参见
+    @GetMapping(value = "/{appId}", produces = "text/plain;charset=utf-8")
+    @TenantIgnore
+    public String checkSignature(@PathVariable("appId") String appId,
+                                 MpOpenCheckSignatureReqVO reqVO) {
+        log.info("[checkSignature][appId({}) 接收到来自微信服务器的认证消息({})]", appId, reqVO);
+        // 校验请求签名
+        WxMpService wxMpService = mpServiceFactory.getRequiredMpService(appId);
+        // 校验通过
+        if (wxMpService.checkSignature(reqVO.getTimestamp(), reqVO.getNonce(), reqVO.getSignature())) {
+            return reqVO.getEchostr();
+        }
+        // 校验不通过
+        return "非法请求";
     }
 
     private String handleMessage0(String appId, String content, MpOpenHandleMessageReqVO reqVO) {

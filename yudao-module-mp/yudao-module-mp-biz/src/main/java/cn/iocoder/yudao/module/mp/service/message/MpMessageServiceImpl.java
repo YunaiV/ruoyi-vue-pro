@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.mp.service.message;
 
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.mp.controller.admin.message.vo.message.MpMessagePageReqVO;
@@ -18,6 +18,9 @@ import cn.iocoder.yudao.module.mp.service.account.MpAccountService;
 import cn.iocoder.yudao.module.mp.service.material.MpMaterialService;
 import cn.iocoder.yudao.module.mp.service.message.bo.MpMessageSendOutReqBO;
 import cn.iocoder.yudao.module.mp.service.user.MpUserService;
+import jakarta.annotation.Resource;
+import jakarta.validation.Validator;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.error.WxErrorException;
@@ -25,12 +28,12 @@ import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.kefu.WxMpKefuMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
+import me.chanjar.weixin.mp.bean.result.WxMpUser;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
-import javax.validation.Validator;
+import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.MESSAGE_SEND_FAIL;
@@ -69,18 +72,31 @@ public class MpMessageServiceImpl implements MpMessageService {
     }
 
     @Override
-    public void receiveMessage(String appId, WxMpXmlMessage wxMessage) {
+    @SneakyThrows
+    public void receiveMessage(WxMpService weixinService, String appId, WxMpXmlMessage wxMessage) {
         // 获得关联信息
         MpAccountDO account = mpAccountService.getAccountFromCache(appId);
         Assert.notNull(account, "公众号账号({}) 不存在", appId);
 
-        // 订阅事件不记录，因为此时公众号粉丝表中还没有此粉丝的数据
-        // TODO @芋艿：这个修复，后续看看还有啥问题
-        if (ObjUtil.equal(wxMessage.getEvent(), WxConsts.EventType.SUBSCRIBE)) {
-            return;
-        }
-
+        // 获取用户
         MpUserDO user = mpUserService.getUser(appId, wxMessage.getFromUser());
+        if (user == null) {
+            // 特殊情况：因为 receiveMessage 是异步记录，可能 SubscribeHandler 还没存储好 User，此时 sleep 轮询
+            for (int i = 0; i < 3; i++) {
+                ThreadUtil.sleep(5, TimeUnit.SECONDS);
+                user = mpUserService.getUser(appId, wxMessage.getFromUser());
+                if (user != null) {
+                    break;
+                }
+                log.warn("[receiveMessage][粉丝({}/{}) 不存在，第 {} 次重试失败]", appId, wxMessage.getFromUser(), i + 1);
+            }
+        }
+        // 特殊情况：可能 SubscribeHandler 没处理正确（例如说发生异常），则主动创建
+        if (user == null) {
+            log.warn("[receiveMessage][粉丝({}/{}) 不存在，主动创建]", appId, wxMessage.getFromUser());
+            WxMpUser wxMpUser = weixinService.getUserService().userInfo(wxMessage.getFromUser());
+            user = mpUserService.saveUser(appId, wxMpUser);
+        }
         Assert.notNull(user, "公众号粉丝({}/{}) 不存在", appId, wxMessage.getFromUser());
 
         // 记录消息

@@ -1,4 +1,5 @@
 import type { PageParam, PageResult } from '@vben/request';
+import type { Dayjs } from 'dayjs';
 
 import { requestClient } from '#/api/request';
 #set ($baseURL = "/${table.moduleName}/${simpleClassName_strikeCase}")
@@ -16,7 +17,7 @@ export namespace ${simpleClassName}Api {
         #if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "short" || ${column.javaType.toLowerCase()} == "double" || ${column.javaType.toLowerCase()} == "bigdecimal")
             ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: number; // ${column.columnComment}
         #elseif(${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdate" || ${column.javaType.toLowerCase()} == "localdatetime")
-            ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: Date; // ${column.columnComment}
+            ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: string | Dayjs; // ${column.columnComment}
         #else
             ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: ${column.javaType.toLowerCase()}; // ${column.columnComment}
         #end
@@ -32,7 +33,7 @@ export namespace ${simpleClassName}Api {
 #if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "short" || ${column.javaType.toLowerCase()} == "double" || ${column.javaType.toLowerCase()} == "bigdecimal")
     ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: number; // ${column.columnComment}
 #elseif(${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdate" || ${column.javaType.toLowerCase()} == "localdatetime")
-    ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: Date; // ${column.columnComment}
+    ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: string | Dayjs; // ${column.columnComment}
 #else
     ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: ${column.javaType.toLowerCase()}; // ${column.columnComment}
 #end
