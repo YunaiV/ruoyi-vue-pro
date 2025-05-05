@@ -60,7 +60,7 @@ public class PayClientFactoryImplIntegrationTest {
         config.setMchId("1545083881");
         config.setApiVersion(WxPayClientConfig.API_VERSION_V3);
         config.setPrivateKeyContent(IoUtil.readUtf8(new FileInputStream("/Users/yunai/Downloads/wx_pay/apiclient_key.pem")));
-        config.setPrivateCertContent(IoUtil.readUtf8(new FileInputStream("/Users/yunai/Downloads/wx_pay/apiclient_cert.pem")));
+//        config.setPrivateCertContent(IoUtil.readUtf8(new FileInputStream("/Users/yunai/Downloads/wx_pay/apiclient_cert.pem")));
         config.setApiV3Key("joerVi8y5DJ3o4ttA0o1uH47Xz1u2Ase");
         // 创建客户端
         Long channelId = RandomUtil.randomLong();
