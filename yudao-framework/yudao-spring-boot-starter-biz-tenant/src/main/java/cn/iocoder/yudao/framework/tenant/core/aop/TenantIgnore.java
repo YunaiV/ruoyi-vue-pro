@@ -13,10 +13,11 @@ import java.lang.annotation.*;
  *
  * 特殊：
  * 1、如果添加到 Controller 类上，则该 URL 自动添加到 {@link TenantProperties#getIgnoreUrls()} 中
+ * 2、如果添加到 DO 实体类上，则它对应的表名“相当于”自动添加到 {@link TenantProperties#getIgnoreTables()} 中
  *
  * @author 芋道源码
  */
-@Target({ElementType.METHOD})
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface TenantIgnore {
