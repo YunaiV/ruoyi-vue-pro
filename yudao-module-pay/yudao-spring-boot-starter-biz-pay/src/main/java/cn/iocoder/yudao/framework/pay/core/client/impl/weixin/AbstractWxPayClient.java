@@ -18,10 +18,7 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.WxPayTransferPart
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
-import com.github.binarywang.wxpay.bean.notify.WxPayNotifyV3Result;
-import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
-import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyResult;
-import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyV3Result;
+import com.github.binarywang.wxpay.bean.notify.*;
 import com.github.binarywang.wxpay.bean.request.*;
 import com.github.binarywang.wxpay.bean.result.*;
 import com.github.binarywang.wxpay.bean.transfer.QueryTransferBatchesRequest;
@@ -67,13 +64,14 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     protected void doInit(String tradeType) {
         // 创建 config 配置
         WxPayConfig payConfig = new WxPayConfig();
-        BeanUtil.copyProperties(config, payConfig, "keyContent", "privateKeyContent");
+        BeanUtil.copyProperties(config, payConfig, "keyContent", "privateKeyContent", "publicKeyContent");
         payConfig.setTradeType(tradeType);
         // weixin-pay-java 无法设置内容，只允许读取文件，所以这里要创建临时文件来解决
         if (Objects.equals(config.getApiVersion(), API_VERSION_V2)) {
             payConfig.setKeyPath(FileUtils.createTempFile(Base64.decode(config.getKeyContent())).getPath());
         } else if (Objects.equals(config.getApiVersion(), API_VERSION_V3)) {
             payConfig.setPrivateKeyPath(FileUtils.createTempFile(config.getPrivateKeyContent()).getPath());
+            payConfig.setPublicKeyPath(FileUtils.createTempFile(config.getPublicKeyContent()).getPath());
         }
 
         // 创建 client 客户端
@@ -157,12 +155,12 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     }
 
     @Override
-    public PayOrderRespDTO doParseOrderNotify(Map<String, String> params, String body) throws WxPayException {
+    public PayOrderRespDTO doParseOrderNotify(Map<String, String> params, String body, Map<String, String> headers) throws WxPayException {
         switch (config.getApiVersion()) {
             case API_VERSION_V2:
                 return doParseOrderNotifyV2(body);
             case API_VERSION_V3:
-                return doParseOrderNotifyV3(body);
+                return doParseOrderNotifyV3(body, headers);
             default:
                 throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
         }
@@ -179,9 +177,10 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
                 response.getOutTradeNo(), body);
     }
 
-    private PayOrderRespDTO doParseOrderNotifyV3(String body) throws WxPayException {
+    private PayOrderRespDTO doParseOrderNotifyV3(String body, Map<String, String> headers) throws WxPayException {
         // 1. 解析回调
-        WxPayNotifyV3Result response = client.parseOrderNotifyV3Result(body, null);
+        SignatureHeader signatureHeader = getRequestHeader(headers);
+        WxPayNotifyV3Result response = client.parseOrderNotifyV3Result(body, signatureHeader);
         WxPayNotifyV3Result.DecryptNotifyResult result = response.getResult();
         // 2. 构建结果
         Integer status = parseStatus(result.getTradeState());
@@ -321,12 +320,12 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     }
 
     @Override
-    public PayRefundRespDTO doParseRefundNotify(Map<String, String> params, String body) throws WxPayException {
+    public PayRefundRespDTO doParseRefundNotify(Map<String, String> params, String body, Map<String, String> headers) throws WxPayException {
         switch (config.getApiVersion()) {
             case API_VERSION_V2:
                 return doParseRefundNotifyV2(body);
             case API_VERSION_V3:
-                return parseRefundNotifyV3(body);
+                return parseRefundNotifyV3(body, headers);
             default:
                 throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
         }
@@ -344,9 +343,10 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         return PayRefundRespDTO.failureOf(result.getOutRefundNo(), response);
     }
 
-    private PayRefundRespDTO parseRefundNotifyV3(String body) throws WxPayException {
+    private PayRefundRespDTO parseRefundNotifyV3(String body, Map<String, String> headers) throws WxPayException {
         // 1. 解析回调
-        WxPayRefundNotifyV3Result response = client.parseRefundNotifyV3Result(body, null);
+        SignatureHeader signatureHeader = getRequestHeader(headers);
+        WxPayRefundNotifyV3Result response = client.parseRefundNotifyV3Result(body, signatureHeader);
         WxPayRefundNotifyV3Result.DecryptNotifyResult result = response.getResult();
         // 2. 构建结果
         if (Objects.equals("SUCCESS", result.getRefundStatus())) {
@@ -357,10 +357,10 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     }
 
     @Override
-    public PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body) throws WxPayException {
+    public PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body, Map<String, String> headers) throws WxPayException {
         switch (config.getApiVersion()) {
             case API_VERSION_V3:
-                return parseTransferNotifyV3(body);
+                return parseTransferNotifyV3(body, headers);
             case API_VERSION_V2:
                 throw new UnsupportedOperationException("V2 版本暂不支持，建议使用 V3 版本");
             default:
@@ -368,10 +368,11 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         }
     }
 
-    private PayTransferRespDTO parseTransferNotifyV3(String body) throws WxPayException {
+    private PayTransferRespDTO parseTransferNotifyV3(String body, Map<String, String> headers) throws WxPayException {
         // 1. 解析回调
+        SignatureHeader signatureHeader = getRequestHeader(headers);
         // TODO @luchi：这个可以复用 wxjava 里的类么？
-        WxPayTransferPartnerNotifyV3Result response = client.baseParseOrderNotifyV3Result(body, null, WxPayTransferPartnerNotifyV3Result.class, WxPayTransferPartnerNotifyV3Result.TransferNotifyResult.class);
+        WxPayTransferPartnerNotifyV3Result response = client.baseParseOrderNotifyV3Result(body, signatureHeader, WxPayTransferPartnerNotifyV3Result.class, WxPayTransferPartnerNotifyV3Result.TransferNotifyResult.class);
         WxPayTransferPartnerNotifyV3Result.TransferNotifyResult result = response.getResult();
         // 2. 构建结果
         if (Objects.equals("FINISHED", result.getBatchStatus())) {
@@ -512,6 +513,20 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     }
 
     // ========== 各种工具方法 ==========
+
+    /**
+     * 组装请求头重的签名信息
+     *
+     * @see <a href="https://github.com/binarywang/weixin-java-pay-demo/blob/master/src/main/java/com/github/binarywang/demo/wx/pay/controller/WxPayV3Controller.java#L202-L221">官方示例</a>
+     */
+    private SignatureHeader getRequestHeader(Map<String, String> headers) {
+        return SignatureHeader.builder()
+                .signature(headers.get("wechatpay-signature"))
+                .nonce(headers.get("wechatpay-nonce"))
+                .serial(headers.get("wechatpay-serial"))
+                .timeStamp(headers.get("wechatpay-timestamp"))
+                .build();
+    }
 
     static String formatDateV2(LocalDateTime time) {
         return TemporalAccessorUtil.format(time.atZone(ZoneId.systemDefault()), PURE_DATETIME_PATTERN);

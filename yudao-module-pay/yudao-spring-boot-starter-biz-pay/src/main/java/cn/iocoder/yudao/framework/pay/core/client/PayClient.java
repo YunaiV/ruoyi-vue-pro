@@ -39,9 +39,10 @@ public interface PayClient {
      *
      * @param params HTTP 回调接口 content type 为 application/x-www-form-urlencoded 的所有参数
      * @param body HTTP 回调接口的 request body
+     * @param headers HTTP 回调接口的 request headers
      * @return 支付订单信息
      */
-    PayOrderRespDTO parseOrderNotify(Map<String, String> params, String body);
+    PayOrderRespDTO parseOrderNotify(Map<String, String> params, String body, Map<String, String> headers);
 
     /**
      * 获得支付订单信息
@@ -66,9 +67,10 @@ public interface PayClient {
      *
      * @param params HTTP 回调接口 content type 为 application/x-www-form-urlencoded 的所有参数
      * @param body HTTP 回调接口的 request body
+     * @param headers HTTP 回调接口的 request headers
      * @return 支付订单信息
      */
-    PayRefundRespDTO parseRefundNotify(Map<String, String> params, String body);
+    PayRefundRespDTO parseRefundNotify(Map<String, String> params, String body, Map<String, String> headers);
 
     /**
      * 获得退款订单信息
@@ -103,8 +105,9 @@ public interface PayClient {
      *
      * @param params HTTP 回调接口 content type 为 application/x-www-form-urlencoded 的所有参数
      * @param body HTTP 回调接口的 request body
+     * @param headers HTTP 回调接口的 request headers
      * @return 转账信息
      */
-    PayTransferRespDTO parseTransferNotify(Map<String, String> params, String body);
+    PayTransferRespDTO parseTransferNotify(Map<String, String> params, String body, Map<String, String> headers);
 
 }

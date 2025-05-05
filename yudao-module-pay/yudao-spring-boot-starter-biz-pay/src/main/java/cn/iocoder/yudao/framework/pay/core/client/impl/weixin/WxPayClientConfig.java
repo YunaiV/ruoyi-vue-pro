@@ -73,13 +73,18 @@ public class WxPayClientConfig implements PayClientConfig {
     @NotBlank(message = "apiV3 密钥值不能为空", groups = V3.class)
     private String apiV3Key;
     /**
-     * 证书序列号
+     * 证书序列号（merchantSerialNumber）
      */
     @NotBlank(message = "证书序列号不能为空", groups = V3.class)
     private String certSerialNo;
 
-    @Deprecated // TODO 芋艿：V2.3.0 进行移除
-    private String privateCertContent;
+    /**
+     * pub_key.pem 证书文件的对应字符串
+     */
+    @NotBlank(message = "pub_key.pem 不能为空", groups = V3.class)
+    private String publicKeyContent;
+    @NotBlank(message = "publicKeyId 不能为空", groups = V3.class)
+    private String publicKeyId;
 
     /**
      * 分组校验 v2版本

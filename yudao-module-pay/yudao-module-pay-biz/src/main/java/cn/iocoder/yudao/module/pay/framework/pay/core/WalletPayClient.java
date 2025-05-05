@@ -89,7 +89,7 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
     }
 
     @Override
-    protected PayOrderRespDTO doParseOrderNotify(Map<String, String> params, String body) {
+    protected PayOrderRespDTO doParseOrderNotify(Map<String, String> params, String body, Map<String, String> headers) {
         throw new UnsupportedOperationException("钱包支付无支付回调");
     }
 
@@ -144,7 +144,7 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
     }
 
     @Override
-    protected PayRefundRespDTO doParseRefundNotify(Map<String, String> params, String body) {
+    protected PayRefundRespDTO doParseRefundNotify(Map<String, String> params, String body, Map<String, String> headers) {
         throw new UnsupportedOperationException("钱包支付无退款回调");
     }
 
@@ -178,7 +178,7 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
     }
 
     @Override
-    protected PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body) throws Throwable {
+    protected PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body, Map<String, String> headers) {
         throw new UnsupportedOperationException("未实现");
     }
 
