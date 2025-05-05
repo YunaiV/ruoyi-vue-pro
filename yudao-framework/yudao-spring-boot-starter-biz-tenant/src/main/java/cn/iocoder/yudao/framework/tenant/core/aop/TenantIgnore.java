@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.framework.tenant.core.aop;
 
+import cn.iocoder.yudao.framework.tenant.config.TenantProperties;
+
 import java.lang.annotation.*;
 
 /**
@@ -8,6 +10,9 @@ import java.lang.annotation.*;
  * 注意，只有 DB 的场景会过滤，其它场景暂时不过滤：
  * 1、Redis 场景：因为是基于 Key 实现多租户的能力，所以忽略没有意义，不像 DB 是一个 column 实现的
  * 2、MQ 场景：有点难以抉择，目前可以通过 Consumer 手动在消费的方法上，添加 @TenantIgnore 进行忽略
+ *
+ * 特殊：
+ * 1、如果添加到 Controller 类上，则该 URL 自动添加到 {@link TenantProperties#getIgnoreUrls()} 中
  *
  * @author 芋道源码
  */
