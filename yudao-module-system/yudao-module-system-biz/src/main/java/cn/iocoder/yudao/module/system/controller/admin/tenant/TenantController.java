@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantSaveReqVO;
@@ -39,6 +40,7 @@ public class TenantController {
 
     @GetMapping("/get-id-by-name")
     @PermitAll
+    @TenantIgnore
     @Operation(summary = "使用租户名，获得租户编号", description = "登录界面，根据用户的租户名，获得租户编号")
     @Parameter(name = "name", description = "租户名", required = true, example = "1024")
     public CommonResult<Long> getTenantIdByName(@RequestParam("name") String name) {
@@ -48,6 +50,7 @@ public class TenantController {
 
     @GetMapping({ "simple-list" })
     @PermitAll
+    @TenantIgnore
     @Operation(summary = "获取租户精简信息列表", description = "只包含被开启的租户，用于【首页】功能的选择租户选项")
     public CommonResult<List<TenantRespVO>> getTenantSimpleList() {
         List<TenantDO> list = tenantService.getTenantListByStatus(CommonStatusEnum.ENABLE.getStatus());
@@ -57,6 +60,7 @@ public class TenantController {
 
     @GetMapping("/get-by-website")
     @PermitAll
+    @TenantIgnore
     @Operation(summary = "使用域名，获得租户信息", description = "登录界面，根据用户的域名，获得租户信息")
     @Parameter(name = "website", description = "域名", required = true, example = "www.iocoder.cn")
     public CommonResult<TenantRespVO> getTenantByWebsite(@RequestParam("website") String website) {

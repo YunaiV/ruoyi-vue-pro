@@ -6,6 +6,7 @@ import cn.hutool.core.util.URLUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.*;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
 import cn.iocoder.yudao.module.infra.service.file.FileService;
@@ -76,6 +77,7 @@ public class FileController {
 
     @GetMapping("/{configId}/get/**")
     @PermitAll
+    @TenantIgnore
     @Operation(summary = "下载文件")
     @Parameter(name = "configId", description = "配置编号", required = true)
     public void getFileContent(HttpServletRequest request,
