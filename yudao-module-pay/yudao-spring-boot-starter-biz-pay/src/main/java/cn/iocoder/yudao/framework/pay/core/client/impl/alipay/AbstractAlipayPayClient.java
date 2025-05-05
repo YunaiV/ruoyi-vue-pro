@@ -23,6 +23,8 @@ import com.alipay.api.AlipayResponse;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.*;
 import com.alipay.api.internal.util.AlipaySignature;
+import com.alipay.api.internal.util.AntCertificationUtil;
+import com.alipay.api.internal.util.codec.Base64;
 import com.alipay.api.request.*;
 import com.alipay.api.response.*;
 import lombok.Getter;
@@ -30,6 +32,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
+import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
@@ -88,7 +91,10 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
             verify = AlipaySignature.rsaCheckV1(params, config.getAlipayPublicKey(),
                     StandardCharsets.UTF_8.name(), config.getSignType());
         } else if (Objects.equals(config.getMode(), MODE_CERTIFICATE)) {
-            verify = AlipaySignature.rsaCertCheckV1(params, config.getAlipayPublicCertContent(),
+            // 由于 rsaCertCheckV1 的第二个参数是 path，所以不能这么调用！！！通过阅读源码，发现可以采用如下方式！
+            X509Certificate cert = AntCertificationUtil.getCertFromContent(config.getAlipayPublicCertContent());
+            String publicKey = Base64.encodeBase64String(cert.getEncoded());
+            verify = AlipaySignature.rsaCheckV1(bodyObj, publicKey,
                     StandardCharsets.UTF_8.name(), config.getSignType());
         } else {
             throw new IllegalArgumentException("未知的公钥类型：" + config.getMode());
