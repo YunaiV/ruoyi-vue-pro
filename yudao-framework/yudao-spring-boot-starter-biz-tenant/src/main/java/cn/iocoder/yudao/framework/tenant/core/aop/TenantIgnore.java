@@ -21,4 +21,12 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface TenantIgnore {
+
+    /**
+     * 是否开启忽略租户，默认为 true 开启
+     *
+     * 支持 Spring EL 表达式，如果返回 true 则满足条件，进行租户的忽略
+     */
+    String enable() default "true";
+
 }
