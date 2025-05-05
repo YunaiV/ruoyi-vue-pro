@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -30,7 +31,7 @@ public class TenantProperties {
      *
      * 默认情况下，每个请求需要带上 tenant-id 的请求头。但是，部分请求是无需带上的，例如说短信回调、支付回调等 Open API！
      */
-    private Set<String> ignoreUrls = Collections.emptySet();
+    private Set<String> ignoreUrls = new HashSet<>();
 
     /**
      * 需要忽略多租户的表
