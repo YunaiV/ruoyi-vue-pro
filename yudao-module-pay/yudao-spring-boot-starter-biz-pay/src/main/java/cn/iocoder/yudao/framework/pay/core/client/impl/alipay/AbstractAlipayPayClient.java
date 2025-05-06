@@ -23,6 +23,8 @@ import com.alipay.api.AlipayResponse;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.*;
 import com.alipay.api.internal.util.AlipaySignature;
+import com.alipay.api.internal.util.AntCertificationUtil;
+import com.alipay.api.internal.util.codec.Base64;
 import com.alipay.api.request.*;
 import com.alipay.api.response.*;
 import lombok.Getter;
@@ -30,6 +32,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
+import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
@@ -41,6 +44,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
 import static cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig.MODE_CERTIFICATE;
+import static cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig.MODE_PUBLIC_KEY;
 
 /**
  * 支付宝抽象类，实现支付宝统一的接口、以及部分实现（退款）
@@ -79,11 +83,23 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
     }
 
     @Override
-    public PayOrderRespDTO doParseOrderNotify(Map<String, String> params, String body) throws Throwable {
+    public PayOrderRespDTO doParseOrderNotify(Map<String, String> params, String body, Map<String, String> headers) throws Throwable {
         // 1. 校验回调数据
         Map<String, String> bodyObj = HttpUtil.decodeParamMap(body, StandardCharsets.UTF_8);
-        AlipaySignature.rsaCheckV1(bodyObj, config.getAlipayPublicKey(),
-                StandardCharsets.UTF_8.name(), config.getSignType());
+        boolean verify;
+        if (Objects.equals(config.getMode(), MODE_PUBLIC_KEY)) {
+            verify = AlipaySignature.rsaCheckV1(params, config.getAlipayPublicKey(),
+                    StandardCharsets.UTF_8.name(), config.getSignType());
+        } else if (Objects.equals(config.getMode(), MODE_CERTIFICATE)) {
+            // 由于 rsaCertCheckV1 的第二个参数是 path，所以不能这么调用！！！通过阅读源码，发现可以采用如下方式！
+            X509Certificate cert = AntCertificationUtil.getCertFromContent(config.getAlipayPublicCertContent());
+            String publicKey = Base64.encodeBase64String(cert.getEncoded());
+            verify = AlipaySignature.rsaCheckV1(bodyObj, publicKey,
+                    StandardCharsets.UTF_8.name(), config.getSignType());
+        } else {
+            throw new IllegalArgumentException("未知的公钥类型：" + config.getMode());
+        }
+        Assert.isTrue(verify, "验签结果不通过");
 
         // 2. 解析订单的状态
         // 额外说明：支付宝不仅仅支付成功会回调，再各种触发支付单数据变化时，都会进行回调，所以这里 status 的解析会写的比较复杂
@@ -175,7 +191,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
     }
 
     @Override
-    public PayRefundRespDTO doParseRefundNotify(Map<String, String> params, String body) {
+    public PayRefundRespDTO doParseRefundNotify(Map<String, String> params, String body, Map<String, String> headers) {
         // 补充说明：支付宝退款时，没有回调，这点和微信支付是不同的。并且，退款分成部分退款、和全部退款。
         // ① 部分退款：是会有回调，但是它回调的是订单状态的同步回调，不是退款订单的回调
         // ② 全部退款：Wap 支付有订单状态的同步回调，但是 PC/扫码又没有
@@ -327,7 +343,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
 
     // TODO @chihuo：这里是不是也要实现，支付宝的。
     @Override
-    protected PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body) throws Throwable {
+    protected PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body, Map<String, String> headers) {
         throw new UnsupportedOperationException("未实现");
     }
 

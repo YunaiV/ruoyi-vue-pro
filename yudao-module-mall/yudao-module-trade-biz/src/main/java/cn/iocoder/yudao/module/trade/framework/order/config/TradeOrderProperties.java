@@ -47,4 +47,10 @@ public class TradeOrderProperties {
     @NotNull(message = "评论超时时间不能为空")
     private Duration commentExpireTime;
 
+    /**
+     * 是否同步订单状态到微信小程序
+     */
+    @NotNull(message = "是否同步订单状态到微信小程序不能为空")
+    private Boolean statusSyncToWxaEnable;
+
 }

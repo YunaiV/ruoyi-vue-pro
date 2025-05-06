@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.tenant.config;
 import cn.iocoder.yudao.framework.common.enums.WebFilterOrderEnum;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.framework.redis.config.YudaoCacheProperties;
+import cn.iocoder.yudao.framework.security.core.service.SecurityFrameworkService;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnoreAspect;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantDatabaseInterceptor;
@@ -15,6 +16,7 @@ import cn.iocoder.yudao.framework.tenant.core.security.TenantSecurityWebFilter;
 import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkService;
 import cn.iocoder.yudao.framework.tenant.core.service.TenantFrameworkServiceImpl;
 import cn.iocoder.yudao.framework.tenant.core.web.TenantContextWebFilter;
+import cn.iocoder.yudao.framework.tenant.core.web.TenantVisitContextInterceptor;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import cn.iocoder.yudao.module.system.api.tenant.TenantApi;
@@ -35,6 +37,8 @@ import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.util.pattern.PathPattern;
@@ -113,6 +117,25 @@ public class YudaoTenantAutoConfiguration {
                         convertList(entry.getKey().getPathPatternsCondition().getPatterns(), PathPattern::getPatternString));
             }
         }
+    }
+
+    @Bean
+    public TenantVisitContextInterceptor tenantVisitContextInterceptor(TenantProperties tenantProperties,
+                                                                       SecurityFrameworkService securityFrameworkService) {
+        return new TenantVisitContextInterceptor(tenantProperties, securityFrameworkService);
+    }
+
+    @Bean
+    public WebMvcConfigurer tenantWebMvcConfigurer(TenantProperties tenantProperties,
+                                                   TenantVisitContextInterceptor tenantVisitContextInterceptor) {
+        return new WebMvcConfigurer() {
+
+            @Override
+            public void addInterceptors(InterceptorRegistry registry) {
+                registry.addInterceptor(tenantVisitContextInterceptor)
+                        .excludePathPatterns(tenantProperties.getIgnoreVisitUrls().toArray(new String[0]));
+            }
+        };
     }
 
     // ========== Security ==========

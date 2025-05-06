@@ -66,7 +66,8 @@ public class PayNotifyController {
     @TenantIgnore
     public String notifyOrder(@PathVariable("channelId") Long channelId,
                               @RequestParam(required = false) Map<String, String> params,
-                              @RequestBody(required = false) String body) {
+                              @RequestBody(required = false) String body,
+                              @RequestHeader Map<String, String> headers) {
         log.info("[notifyOrder][channelId({}) 回调数据({}/{})]", channelId, params, body);
         // 1. 校验支付渠道是否存在
         PayClient payClient = channelService.getPayClient(channelId);
@@ -76,7 +77,7 @@ public class PayNotifyController {
         }
 
         // 2. 解析通知数据
-        PayOrderRespDTO notify = payClient.parseOrderNotify(params, body);
+        PayOrderRespDTO notify = payClient.parseOrderNotify(params, body, headers);
         orderService.notifyOrder(channelId, notify);
         return "success";
     }
@@ -87,7 +88,8 @@ public class PayNotifyController {
     @TenantIgnore
     public String notifyRefund(@PathVariable("channelId") Long channelId,
                                @RequestParam(required = false) Map<String, String> params,
-                               @RequestBody(required = false) String body) {
+                               @RequestBody(required = false) String body,
+                               @RequestHeader Map<String, String> headers) {
         log.info("[notifyRefund][channelId({}) 回调数据({}/{})]", channelId, params, body);
         // 1. 校验支付渠道是否存在
         PayClient payClient = channelService.getPayClient(channelId);
@@ -97,7 +99,7 @@ public class PayNotifyController {
         }
 
         // 2. 解析通知数据
-        PayRefundRespDTO notify = payClient.parseRefundNotify(params, body);
+        PayRefundRespDTO notify = payClient.parseRefundNotify(params, body, headers);
         refundService.notifyRefund(channelId, notify);
         return "success";
     }
@@ -108,7 +110,8 @@ public class PayNotifyController {
     @TenantIgnore
     public String notifyTransfer(@PathVariable("channelId") Long channelId,
                                  @RequestParam(required = false) Map<String, String> params,
-                                 @RequestBody(required = false) String body) {
+                                 @RequestBody(required = false) String body,
+                                 @RequestHeader Map<String, String> headers) {
         log.info("[notifyTransfer][channelId({}) 回调数据({}/{})]", channelId, params, body);
         // 1. 校验支付渠道是否存在
         PayClient payClient = channelService.getPayClient(channelId);
@@ -118,7 +121,7 @@ public class PayNotifyController {
         }
 
         // 2. 解析通知数据
-        PayTransferRespDTO notify = payClient.parseTransferNotify(params, body);
+        PayTransferRespDTO notify = payClient.parseTransferNotify(params, body, headers);
         payTransferService.notifyTransfer(channelId, notify);
         return "success";
     }

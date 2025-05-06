@@ -1,12 +1,8 @@
 package cn.iocoder.yudao.framework.pay.core.client;
 
-import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
-import java.util.Set;
+import jakarta.validation.Validator;
 
 /**
  * 支付客户端的配置，本质是支付渠道的配置
@@ -18,6 +14,7 @@ import java.util.Set;
 // @JsonTypeInfo 注解的作用，Jackson 多态
 // 1. 序列化到时数据库时，增加 @class 属性。
 // 2. 反序列化到内存对象时，通过 @class 属性，可以创建出正确的类型
+@JsonIgnoreProperties(ignoreUnknown = true) // 目的：忽略未知的属性，避免反序列化失败
 public interface PayClientConfig {
 
     /**

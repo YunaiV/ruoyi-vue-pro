@@ -101,19 +101,19 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
             throws Throwable;
 
     @Override
-    public final PayOrderRespDTO parseOrderNotify(Map<String, String> params, String body) {
+    public final PayOrderRespDTO parseOrderNotify(Map<String, String> params, String body, Map<String, String> headers) {
         try {
-            return doParseOrderNotify(params, body);
+            return doParseOrderNotify(params, body, headers);
         } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
             throw ex;
         } catch (Throwable ex) {
-            log.error("[parseOrderNotify][客户端({}) params({}) body({}) 解析失败]",
-                    getId(), params, body, ex);
+            log.error("[parseOrderNotify][客户端({}) params({}) body({}) headers({}) 解析失败]",
+                    getId(), params, body, headers, ex);
             throw buildPayException(ex);
         }
     }
 
-    protected abstract PayOrderRespDTO doParseOrderNotify(Map<String, String> params, String body)
+    protected abstract PayOrderRespDTO doParseOrderNotify(Map<String, String> params, String body, Map<String, String> headers)
             throws Throwable;
 
     @Override
@@ -155,19 +155,19 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     protected abstract PayRefundRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) throws Throwable;
 
     @Override
-    public final PayRefundRespDTO parseRefundNotify(Map<String, String> params, String body) {
+    public final PayRefundRespDTO parseRefundNotify(Map<String, String> params, String body, Map<String, String> headers) {
         try {
-            return doParseRefundNotify(params, body);
+            return doParseRefundNotify(params, body, headers);
         } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
             throw ex;
         } catch (Throwable ex) {
-            log.error("[parseRefundNotify][客户端({}) params({}) body({}) 解析失败]",
-                    getId(), params, body, ex);
+            log.error("[parseRefundNotify][客户端({}) params({}) body({}) headers({}) 解析失败]",
+                    getId(), params, body, headers, ex);
             throw buildPayException(ex);
         }
     }
 
-    protected abstract PayRefundRespDTO doParseRefundNotify(Map<String, String> params, String body)
+    protected abstract PayRefundRespDTO doParseRefundNotify(Map<String, String> params, String body, Map<String, String> headers)
             throws Throwable;
 
     @Override
@@ -220,19 +220,19 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     }
 
     @Override
-    public final PayTransferRespDTO parseTransferNotify(Map<String, String> params, String body) {
+    public final PayTransferRespDTO parseTransferNotify(Map<String, String> params, String body, Map<String, String> headers) {
         try {
-            return doParseTransferNotify(params, body);
+            return doParseTransferNotify(params, body, headers);
         } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
             throw ex;
         } catch (Throwable ex) {
-            log.error("[doParseTransferNotify][客户端({}) params({}) body({}) 解析失败]",
-                    getId(), params, body, ex);
+            log.error("[doParseTransferNotify][客户端({}) params({}) body({}) headers({}) 解析失败]",
+                    getId(), params, body, headers, ex);
             throw buildPayException(ex);
         }
     }
 
-    protected abstract PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body)
+    protected abstract PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body, Map<String, String> headers)
             throws Throwable;
 
     @Override

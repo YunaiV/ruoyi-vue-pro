@@ -66,14 +66,14 @@ public class TenantDatabaseInterceptor implements TenantLineHandler {
     }
 
     private boolean computeIgnoreTable(String tableName) {
-        // 找不到的表，说明不是 yudao 项目里的，不进行拦截
+        // 找不到的表，说明不是 yudao 项目里的，不进行拦截（忽略租户）
         TableInfo tableInfo = TableInfoHelper.getTableInfo(tableName);
         if (tableInfo == null) {
             return true;
         }
         // 如果继承了 TenantBaseDO 基类，显然不忽略租户
         if (TenantBaseDO.class.isAssignableFrom(tableInfo.getEntityType())) {
-            return true;
+            return false;
         }
         // 如果添加了 @TenantIgnore 注解，显然也不忽略租户
         TenantIgnore tenantIgnore = tableInfo.getEntityType().getAnnotation(TenantIgnore.class);

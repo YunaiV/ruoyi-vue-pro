@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.system.service.social;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxQrcodeReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxaOrderNotifyConfirmReceiveReqDTO;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxaOrderUploadShippingInfoReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxaSubscribeMessageSendReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
@@ -91,6 +93,22 @@ public interface SocialClientService {
      * @param openId     会员 openId
      */
     void sendSubscribeMessage(SocialWxaSubscribeMessageSendReqDTO reqDTO, String templateId, String openId);
+
+    /**
+     * 上传订单发货到微信小程序
+     *
+     * @param userType 用户类型
+     * @param reqDTO 请求
+     */
+    void uploadWxaOrderShippingInfo(Integer userType, SocialWxaOrderUploadShippingInfoReqDTO reqDTO);
+
+    /**
+     * 通知订单收货到微信小程序
+     *
+     * @param userType 用户类型
+     * @param reqDTO 请求
+     */
+    void notifyWxaOrderConfirmReceive(Integer userType, SocialWxaOrderNotifyConfirmReceiveReqDTO reqDTO);
 
     // =================== 客户端管理 ===================
 

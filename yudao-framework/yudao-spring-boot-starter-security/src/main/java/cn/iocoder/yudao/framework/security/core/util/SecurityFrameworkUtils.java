@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.security.core.util;
 
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
@@ -135,6 +136,23 @@ public class SecurityFrameworkUtils {
                 loginUser, null, Collections.emptyList());
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         return authenticationToken;
+    }
+
+    /**
+     * 是否条件跳过权限校验，包括数据权限、功能权限
+     *
+     * @return 是否跳过
+     */
+    public static boolean skipPermissionCheck() {
+        LoginUser loginUser = getLoginUser();
+        if (loginUser == null) {
+            return false;
+        }
+        if (loginUser.getVisitTenantId() == null) {
+            return false;
+        }
+        // 重点：跨租户访问时，无法进行权限校验
+        return ObjUtil.notEqual(loginUser.getVisitTenantId(), loginUser.getTenantId());
     }
 
 }

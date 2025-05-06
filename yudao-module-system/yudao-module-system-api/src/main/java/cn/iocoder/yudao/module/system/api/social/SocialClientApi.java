@@ -66,4 +66,20 @@ public interface SocialClientApi {
      */
     void sendWxaSubscribeMessage(SocialWxaSubscribeMessageSendReqDTO reqDTO);
 
+    /**
+     * 上传订单发货到微信小程序
+     *
+     * @param userType 用户类型
+     * @param reqDTO 请求
+     */
+    void uploadWxaOrderShippingInfo(Integer userType, SocialWxaOrderUploadShippingInfoReqDTO reqDTO);
+
+    /**
+     * 通知订单收货到微信小程序
+     *
+     * @param userType 用户类型
+     * @param reqDTO 请求
+     */
+    void notifyWxaOrderConfirmReceive(Integer userType, SocialWxaOrderNotifyConfirmReceiveReqDTO reqDTO);
+
 }
