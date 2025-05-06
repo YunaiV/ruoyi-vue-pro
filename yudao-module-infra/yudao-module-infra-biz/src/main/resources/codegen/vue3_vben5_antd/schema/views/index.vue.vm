@@ -24,7 +24,7 @@ import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClas
 #else## 标准表接口
 import { get${simpleClassName}Page, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 #end
-import { downloadByData } from '#/utils/download';
+import { downloadFileFromBlobPart } from '@vben/utils';
 
 import { useGridColumns, useGridFormSchema } from './data';
 
@@ -85,10 +85,7 @@ async function onDelete(row: ${simpleClassName}Api.${simpleClassName}) {
   });
   try {
     await delete${simpleClassName}(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.id]),
-      key: 'action_process_msg',
-    });
+    message.success( $t('ui.actionMessage.deleteSuccess', [row.id]) );
     onRefresh();
   } catch {
     hideLoading();
@@ -98,7 +95,7 @@ async function onDelete(row: ${simpleClassName}Api.${simpleClassName}) {
 /** 导出表格 */
 async function onExport() {
   const data = await export${simpleClassName}(await gridApi.formApi.getValues());
-  downloadByData(data, '${table.classComment}.xls');
+  downloadFileFromBlobPart({ fileName: '${table.classComment}.xls', source: data });
 }
 
 /** 表格操作按钮的回调函数 */

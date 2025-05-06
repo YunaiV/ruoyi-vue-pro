@@ -26,7 +26,7 @@
     import { Plus } from '@vben/icons';
     import { $t } from '#/locales';
     import { TableToolbar } from '#/components/table-toolbar';
-    import { getRangePickerDefaultProps } from '#/utils/date';
+    import { getRangePickerDefaultProps } from '@vben/utils';
 #end
 
 #if ($table.templateType == 11) ## erp
