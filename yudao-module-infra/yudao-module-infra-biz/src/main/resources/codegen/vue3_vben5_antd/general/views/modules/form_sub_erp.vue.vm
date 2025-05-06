@@ -10,7 +10,7 @@
   import { Tinymce as RichTextarea } from '#/components/tinymce';
   import { ImageUpload, FileUpload } from "#/components/upload";
   import { message, Tabs, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker, TreeSelect } from 'ant-design-vue';
-  import { DICT_TYPE, getDictOptions } from '#/utils/dict';
+  import { DICT_TYPE, getDictOptions } from '#/utils';
 
   import { computed, ref } from 'vue';
   import { $t } from '#/locales';
