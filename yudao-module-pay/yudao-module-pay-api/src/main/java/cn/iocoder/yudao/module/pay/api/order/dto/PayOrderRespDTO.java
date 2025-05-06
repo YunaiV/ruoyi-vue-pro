@@ -33,6 +33,10 @@ public class PayOrderRespDTO {
 
     // ========== 订单相关字段 ==========
     /**
+     * 商品标题
+     */
+    private String subject;
+    /**
      * 支付金额，单位：分
      */
     private Integer price;
@@ -49,5 +53,16 @@ public class PayOrderRespDTO {
     private LocalDateTime successTime;
 
     // ========== 渠道相关字段 ==========
+
+    /**
+     * 渠道用户编号
+     *
+     * 例如说，微信 openid、支付宝账号
+     */
+    private String channelUserId;
+    /**
+     * 渠道订单号
+     */
+    private String channelOrderNo;
 
 }

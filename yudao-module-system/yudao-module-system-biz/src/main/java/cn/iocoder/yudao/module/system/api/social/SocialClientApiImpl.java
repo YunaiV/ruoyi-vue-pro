@@ -94,4 +94,14 @@ public class SocialClientApiImpl implements SocialClientApi {
         socialClientService.sendSubscribeMessage(reqDTO, template.getPriTmplId(), socialUser.getOpenid());
     }
 
+    @Override
+    public void uploadWxaOrderShippingInfo(Integer userType, SocialWxaOrderUploadShippingInfoReqDTO reqDTO) {
+        socialClientService.uploadWxaOrderShippingInfo(userType, reqDTO);
+    }
+
+    @Override
+    public void notifyWxaOrderConfirmReceive(Integer userType, SocialWxaOrderNotifyConfirmReceiveReqDTO reqDTO) {
+        socialClientService.notifyWxaOrderConfirmReceive(userType, reqDTO);
+    }
+
 }

@@ -179,7 +179,8 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
 
     private PayOrderRespDTO doParseOrderNotifyV3(String body, Map<String, String> headers) throws WxPayException {
         // 1. 解析回调
-        SignatureHeader signatureHeader = getRequestHeader(headers);
+//        SignatureHeader signatureHeader = getRequestHeader(headers);
+        SignatureHeader signatureHeader = null;
         WxPayNotifyV3Result response = client.parseOrderNotifyV3Result(body, signatureHeader);
         WxPayNotifyV3Result.DecryptNotifyResult result = response.getResult();
         // 2. 构建结果

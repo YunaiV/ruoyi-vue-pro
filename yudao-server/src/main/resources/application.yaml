@@ -299,6 +299,7 @@ yudao:
       pay-expire-time: 2h # 支付的过期时间
       receive-expire-time: 14d # 收货的过期时间
       comment-expire-time: 7d # 评论的过期时间
+      status-sync-to-wxa-enable: true # 是否同步订单状态到微信小程序
     express:
       client: kd_100
       kd-niao:

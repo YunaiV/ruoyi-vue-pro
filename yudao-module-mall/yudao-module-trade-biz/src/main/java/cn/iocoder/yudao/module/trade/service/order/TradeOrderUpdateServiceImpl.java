@@ -401,6 +401,11 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                 .setOrderId(order.getId()).setUserId(order.getUserId()).setMessage(null));
         // 4.2 发送订阅消息
         getSelf().sendDeliveryOrderMessage(order, deliveryReqVO);
+
+        // 5. 处理订单发货后逻辑
+        order.setLogisticsId(updateOrderObj.getLogisticsId()).setLogisticsNo(updateOrderObj.getLogisticsNo())
+                .setStatus(updateOrderObj.getStatus()).setDeliveryTime(updateOrderObj.getDeliveryTime());
+        tradeOrderHandlers.forEach(handler -> handler.afterDeliveryOrder(order));
     }
 
     @Async
@@ -499,15 +504,20 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
      * @param order 订单
      */
     private void receiveOrder0(TradeOrderDO order) {
-        // 更新 TradeOrderDO 状态为已完成
+        // 1. 更新 TradeOrderDO 状态为已完成
+        LocalDateTime receiveTime = LocalDateTime.now();
         int updateCount = tradeOrderMapper.updateByIdAndStatus(order.getId(), order.getStatus(),
-                new TradeOrderDO().setStatus(TradeOrderStatusEnum.COMPLETED.getStatus()).setReceiveTime(LocalDateTime.now()));
+                new TradeOrderDO().setStatus(TradeOrderStatusEnum.COMPLETED.getStatus()).setReceiveTime(receiveTime));
         if (updateCount == 0) {
             throw exception(ORDER_RECEIVE_FAIL_STATUS_NOT_DELIVERED);
         }
 
-        // 插入订单日志
+        // 2. 插入订单日志
         TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.COMPLETED.getStatus());
+
+        // 3. 执行 TradeOrderHandler 后置处理
+        order.setStatus(TradeOrderStatusEnum.COMPLETED.getStatus()).setReceiveTime(receiveTime);
+        tradeOrderHandlers.forEach(handler -> handler.afterReceiveOrder(order));
     }
 
     /**
