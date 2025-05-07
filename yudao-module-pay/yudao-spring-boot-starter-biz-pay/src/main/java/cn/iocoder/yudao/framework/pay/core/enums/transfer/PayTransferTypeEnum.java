@@ -7,6 +7,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
+// TODO @芋艿：【转账】这里要不要改成支付平台？
 /**
  * 转账类型枚举
  *

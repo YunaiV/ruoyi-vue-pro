@@ -1,19 +1,17 @@
 package cn.iocoder.yudao.framework.pay.core.client.dto.transfer;
 
-import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
-import lombok.Data;
-import org.hibernate.validator.constraints.Length;
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.URL;
 
 import java.util.Map;
 
-import static cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum.*;
+import static cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum.Alipay;
+import static cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum.WxPay;
 
 /**
  * 统一转账 Request DTO
@@ -22,15 +20,6 @@ import static cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferType
  */
 @Data
 public class PayTransferUnifiedReqDTO {
-
-    /**
-     * 转账类型
-     *
-     * 关联 {@link PayTransferTypeEnum#getType()}
-     */
-    @NotNull(message = "转账类型不能为空")
-    @InEnum(PayTransferTypeEnum.class)
-    private Integer type;
 
     /**
      * 用户 IP
@@ -55,6 +44,7 @@ public class PayTransferUnifiedReqDTO {
     @Length(max = 128, message = "转账标题不能超过 128")
     private String subject;
 
+    // TODO @芋艿：userName、alipayLogonId、openid =》channelExtras；另外：validatePayTransferReqDTO 去掉；
     /**
      * 收款人姓名
      */

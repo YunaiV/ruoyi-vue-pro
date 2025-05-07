@@ -9,7 +9,6 @@ import cn.iocoder.yudao.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferStatusRespEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferCreateReqVO;
@@ -283,8 +282,7 @@ public class PayTransferServiceImpl implements PayTransferService {
                 log.error("[syncTransfer][渠道编号({}) 找不到对应的支付客户端]", transfer.getChannelId());
                 return false;
             }
-            PayTransferRespDTO resp = payClient.getTransfer(transfer.getNo(),
-                    PayTransferTypeEnum.typeOf(transfer.getType()));
+            PayTransferRespDTO resp = payClient.getTransfer(transfer.getNo());
 
             // 2. 回调转账结果
             notifyTransfer(transfer.getChannelId(), resp);

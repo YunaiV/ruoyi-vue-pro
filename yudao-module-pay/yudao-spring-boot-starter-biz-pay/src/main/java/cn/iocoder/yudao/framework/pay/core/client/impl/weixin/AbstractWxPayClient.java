@@ -17,7 +17,6 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifie
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.WxPayTransferPartnerNotifyV3Result;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
 import com.github.binarywang.wxpay.bean.notify.*;
 import com.github.binarywang.wxpay.bean.request.*;
 import com.github.binarywang.wxpay.bean.result.*;
@@ -489,7 +488,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     }
 
     @Override
-    protected PayTransferRespDTO doGetTransfer(String outTradeNo, PayTransferTypeEnum type) throws WxPayException {
+    protected PayTransferRespDTO doGetTransfer(String outTradeNo) throws WxPayException {
         QueryTransferBatchesRequest request = QueryTransferBatchesRequest.newBuilder()
                 .outBatchNo(outTradeNo).needQueryDetail(true).offset(0).limit(20).detailStatus("ALL")
                 .build();

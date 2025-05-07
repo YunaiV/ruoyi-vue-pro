@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -16,7 +17,6 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDT
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayConfig;
 import com.alipay.api.AlipayResponse;
@@ -40,8 +40,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import static cn.hutool.core.date.DatePattern.NORM_DATETIME_FORMATTER;
-import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.ERROR_CONFIGURATION;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
 import static cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig.MODE_CERTIFICATE;
 import static cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig.MODE_PUBLIC_KEY;
@@ -236,11 +235,12 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
 
     @Override
     protected PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) throws AlipayApiException {
-        // 1.1 校验公钥类型 必须使用公钥证书模式
-        if (!Objects.equals(config.getMode(), MODE_CERTIFICATE)) {
+        // 0. 校验公钥类型：必须使用公钥证书模式
+        if (ObjectUtil.notEqual(config.getMode(), MODE_CERTIFICATE)) {
             throw exception0(ERROR_CONFIGURATION.getCode(), "支付宝单笔转账必须使用公钥证书模式");
         }
-        // 1.2 构建 AlipayFundTransUniTransferModel
+
+        // 1.1 构建 AlipayFundTransUniTransferModel
         AlipayFundTransUniTransferModel model = new AlipayFundTransUniTransferModel();
         // ① 通用的参数
         model.setTransAmount(formatAmount(reqDTO.getPrice())); // 转账金额
@@ -253,32 +253,16 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         }
         // ② 个性化的参数
         Participant payeeInfo = new Participant();
-        PayTransferTypeEnum transferType = PayTransferTypeEnum.typeOf(reqDTO.getType());
-        switch (transferType) {
-            // TODO @jason：是不是不用传递 transferType 参数哈？因为应该已经明确是支付宝啦？
-            // @芋艿。 是不是还要考虑转账到银行卡。所以传 transferType 但是转账到银行卡不知道要如何测试??
-            case ALIPAY_BALANCE: {
-                payeeInfo.setIdentityType("ALIPAY_LOGON_ID");
-                payeeInfo.setIdentity(reqDTO.getAlipayLogonId()); // 支付宝登录号
-                payeeInfo.setName(reqDTO.getUserName()); // 支付宝账号姓名
-                model.setPayeeInfo(payeeInfo);
-                break;
-            }
-            case BANK_CARD: {
-                payeeInfo.setIdentityType("BANKCARD_ACCOUNT");
-                // TODO 待实现
-                throw exception(NOT_IMPLEMENTED);
-            }
-            default: {
-                throw exception0(BAD_REQUEST.getCode(), "不正确的转账类型: {}", transferType);
-            }
-        }
-        // 1.3 构建 AlipayFundTransUniTransferRequest
+        payeeInfo.setIdentityType("ALIPAY_LOGON_ID"); // 暂时只考虑转账到支付宝，银行没有权限 https://opendocs.alipay.com/open/02byvc?scene=66dd06f5a923403393b85de68d3c0055
+        payeeInfo.setIdentity(reqDTO.getAlipayLogonId()); // 支付宝登录号
+        payeeInfo.setName(reqDTO.getUserName()); // 支付宝账号姓名
+        model.setPayeeInfo(payeeInfo);
+        // 1.2 构建 AlipayFundTransUniTransferRequest
         AlipayFundTransUniTransferRequest request = new AlipayFundTransUniTransferRequest();
         request.setBizModel(model);
-        // 执行请求
+
+        // 2.1 执行请求
         AlipayFundTransUniTransferResponse response = client.certificateExecute(request);
-        // 处理结果
         if (!response.isSuccess()) {
             // 当出现 SYSTEM_ERROR, 转账可能成功也可能失败。 返回 WAIT 状态. 后续 job 会轮询，或相同 outBizNo 重新发起转账
             // 发现 outBizNo 相同 两次请求参数相同. 会返回 "PAYMENT_INFO_INCONSISTENCY", 不知道哪里的问题. 暂时返回 WAIT. 后续job 会轮询
@@ -287,25 +271,24 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
             }
             return PayTransferRespDTO.closedOf(response.getSubCode(), response.getSubMsg(),
                     reqDTO.getOutTransferNo(), response);
-        } else {
-            if (ObjectUtils.equalsAny(response.getStatus(), "REFUND", "FAIL")) { // 转账到银行卡会出现 "REFUND" "FAIL"
-                return PayTransferRespDTO.closedOf(response.getSubCode(), response.getSubMsg(),
-                        reqDTO.getOutTransferNo(), response);
-            }
-            if (Objects.equals(response.getStatus(), "DEALING")) { // 转账到银行卡会出现 "DEALING"  处理中
-                return PayTransferRespDTO.dealingOf(response.getOrderId(), reqDTO.getOutTransferNo(), response);
-            }
-            return PayTransferRespDTO.successOf(response.getOrderId(), parseTime(response.getTransDate()),
-                    response.getOutBizNo(), response);
         }
-
+        // 2.2 处理结果
+        if (ObjectUtils.equalsAny(response.getStatus(), "REFUND", "FAIL")) { // 转账到银行卡会出现 "REFUND" "FAIL"
+            return PayTransferRespDTO.closedOf(response.getSubCode(), response.getSubMsg(),
+                    reqDTO.getOutTransferNo(), response);
+        }
+        if (Objects.equals(response.getStatus(), "DEALING")) { // 转账到银行卡会出现 "DEALING" 处理中
+            return PayTransferRespDTO.dealingOf(response.getOrderId(), reqDTO.getOutTransferNo(), response);
+        }
+        return PayTransferRespDTO.successOf(response.getOrderId(), parseTime(response.getTransDate()),
+                response.getOutBizNo(), response);
     }
 
     @Override
-    protected PayTransferRespDTO doGetTransfer(String outTradeNo, PayTransferTypeEnum type) throws Throwable {
+    protected PayTransferRespDTO doGetTransfer(String outTradeNo) throws Throwable {
         // 1.1 构建 AlipayFundTransCommonQueryModel
         AlipayFundTransCommonQueryModel model = new AlipayFundTransCommonQueryModel();
-        model.setProductCode(type == PayTransferTypeEnum.BANK_CARD ? "TRANS_BANKCARD_NO_PWD" : "TRANS_ACCOUNT_NO_PWD");
+        model.setProductCode("TRANS_ACCOUNT_NO_PWD");
         model.setBizScene("DIRECT_TRANSFER"); //业务场景
         model.setOutBizNo(outTradeNo);
         // 1.2 构建 AlipayFundTransCommonQueryRequest
@@ -319,18 +302,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         } else {
             response = client.execute(request);
         }
-        // 2.2 处理返回结果
-        if (response.isSuccess()) {
-            if (ObjectUtils.equalsAny(response.getStatus(), "REFUND", "FAIL")) { // 转账到银行卡会出现 "REFUND" "FAIL"
-                return PayTransferRespDTO.closedOf(response.getSubCode(), response.getSubMsg(),
-                        outTradeNo, response);
-            }
-            if (Objects.equals(response.getStatus(), "DEALING")) { // 转账到银行卡会出现 "DEALING" 处理中
-                return PayTransferRespDTO.dealingOf(response.getOrderId(), outTradeNo, response);
-            }
-            return PayTransferRespDTO.successOf(response.getOrderId(), parseTime(response.getPayDate()),
-                    response.getOutBizNo(), response);
-        } else {
+        if (!response.isSuccess()) {
             // 当出现 SYSTEM_ERROR, 转账可能成功也可能失败。 返回 WAIT 状态. 后续 job 会轮询, 或相同 outBizNo 重新发起转账
             // 当出现 ORDER_NOT_EXIST 可能是转账还在处理中,也可能是转账处理失败. 返回 WAIT 状态. 后续 job 会轮询, 或相同 outBizNo 重新发起转账
             if (ObjectUtils.equalsAny(response.getSubCode(), "ORDER_NOT_EXIST", "SYSTEM_ERROR", "ACQ.SYSTEM_ERROR")) {
@@ -339,6 +311,16 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
             return PayTransferRespDTO.closedOf(response.getSubCode(), response.getSubMsg(),
                     outTradeNo, response);
         }
+        // 2.2 处理返回结果
+        if (ObjectUtils.equalsAny(response.getStatus(), "REFUND", "FAIL")) { // 转账到银行卡会出现 "REFUND" "FAIL"
+            return PayTransferRespDTO.closedOf(response.getSubCode(), response.getSubMsg(),
+                    outTradeNo, response);
+        }
+        if (Objects.equals(response.getStatus(), "DEALING")) { // 转账到银行卡会出现 "DEALING" 处理中
+            return PayTransferRespDTO.dealingOf(response.getOrderId(), outTradeNo, response);
+        }
+        return PayTransferRespDTO.successOf(response.getOrderId(), parseTime(response.getPayDate()),
+                response.getOutBizNo(), response);
     }
 
     // TODO @chihuo：这里是不是也要实现，支付宝的。

@@ -44,7 +44,6 @@ public class PayDemoTransferCreateReqVO {
     @NotBlank(message = "微信 openId 不能为空", groups = {WxPay.class})
     private String openid;
 
-
     // ========== 转账到银行卡和钱包相关字段 待补充 ==========
 
     public void validate(Validator validator) {

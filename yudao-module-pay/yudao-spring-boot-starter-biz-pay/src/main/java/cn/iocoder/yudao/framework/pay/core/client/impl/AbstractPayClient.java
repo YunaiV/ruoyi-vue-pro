@@ -188,7 +188,6 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
 
     @Override
     public final PayTransferRespDTO unifiedTransfer(PayTransferUnifiedReqDTO reqDTO) {
-        validatePayTransferReqDTO(reqDTO);
         PayTransferRespDTO resp;
         try {
             resp = doUnifiedTransfer(reqDTO);
@@ -201,22 +200,6 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
             throw buildPayException(ex);
         }
         return resp;
-    }
-    private void validatePayTransferReqDTO(PayTransferUnifiedReqDTO reqDTO) {
-        PayTransferTypeEnum transferType = PayTransferTypeEnum.typeOf(reqDTO.getType());
-        switch (transferType) {
-            case ALIPAY_BALANCE: {
-                ValidationUtils.validate(reqDTO,  PayTransferTypeEnum.Alipay.class);
-                break;
-            }
-            case WX_BALANCE: {
-                ValidationUtils.validate(reqDTO, PayTransferTypeEnum.WxPay.class);
-                break;
-            }
-            default: {
-                throw exception(NOT_IMPLEMENTED);
-            }
-        }
     }
 
     @Override
@@ -236,14 +219,14 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
             throws Throwable;
 
     @Override
-    public final PayTransferRespDTO getTransfer(String outTradeNo, PayTransferTypeEnum type) {
+    public final PayTransferRespDTO getTransfer(String outTradeNo) {
         try {
-            return doGetTransfer(outTradeNo, type);
+            return doGetTransfer(outTradeNo);
         } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
             throw ex;
         } catch (Throwable ex) {
-            log.error("[getTransfer][客户端({}) outTradeNo({}) type({}) 查询转账单异常]",
-                    getId(), outTradeNo, type, ex);
+            log.error("[getTransfer][客户端({}) outTradeNo({}) 查询转账单异常]",
+                    getId(), outTradeNo, ex);
             throw buildPayException(ex);
         }
     }
@@ -251,7 +234,7 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     protected abstract PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO)
             throws Throwable;
 
-    protected abstract PayTransferRespDTO doGetTransfer(String outTradeNo, PayTransferTypeEnum type)
+    protected abstract PayTransferRespDTO doGetTransfer(String outTradeNo)
             throws Throwable;
 
     // ========== 各种工具方法 ==========
