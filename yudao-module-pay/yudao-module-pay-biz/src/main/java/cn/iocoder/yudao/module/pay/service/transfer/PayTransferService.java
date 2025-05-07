@@ -3,10 +3,8 @@ package cn.iocoder.yudao.module.pay.service.transfer;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateReqDTO;
-import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.transfer.PayTransferDO;
-
 import jakarta.validation.Valid;
 
 /**
@@ -15,17 +13,6 @@ import jakarta.validation.Valid;
  * @author jason
  */
 public interface PayTransferService {
-
-    /**
-     * 创建转账单，并发起转账
-     *
-     * 此时，会发起转账渠道的调用
-     *
-     * @param reqVO 请求
-     * @param userIp 用户 ip
-     * @return 渠道的返回结果
-     */
-    PayTransferDO createTransfer(@Valid PayTransferCreateReqVO reqVO, String userIp);
 
     /**
      * 创建转账单，并发起转账

@@ -66,10 +66,10 @@ public class PayTransferRespDTO {
     /**
      * 创建【IN_PROGRESS】状态的转账返回
      */
-    public static PayTransferRespDTO dealingOf(String channelTransferNo,
-                                               String outTransferNo, Object rawData) {
+    public static PayTransferRespDTO processingOf(String channelTransferNo,
+                                                  String outTransferNo, Object rawData) {
         PayTransferRespDTO respDTO = new PayTransferRespDTO();
-        respDTO.status = PayTransferStatusRespEnum.IN_PROGRESS.getStatus();
+        respDTO.status = PayTransferStatusRespEnum.PROCESSING.getStatus();
         respDTO.channelTransferNo = channelTransferNo;
         respDTO.outTransferNo = outTransferNo;
         respDTO.rawData = rawData;

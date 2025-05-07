@@ -26,9 +26,6 @@ public class PayTransferPageReqVO extends PageParam {
     @Schema(description = "商户转账单编号", example = "17481")
     private String merchantTransferId;
 
-    @Schema(description = "类型", example = "2")
-    private Integer type;
-
     @Schema(description = "转账状态", example = "2")
     private Integer status;
 

@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.framework.pay.core.client.dto.transfer;
 
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -9,9 +8,6 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.URL;
 
 import java.util.Map;
-
-import static cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum.Alipay;
-import static cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum.WxPay;
 
 /**
  * 统一转账 Request DTO
@@ -27,6 +23,9 @@ public class PayTransferUnifiedReqDTO {
     @NotEmpty(message = "用户 IP 不能为空")
     private String userIp;
 
+    /**
+     * 外部转账单编号
+     */
     @NotEmpty(message = "外部转账单编号不能为空")
     private String outTransferNo;
 
@@ -44,24 +43,18 @@ public class PayTransferUnifiedReqDTO {
     @Length(max = 128, message = "转账标题不能超过 128")
     private String subject;
 
-    // TODO @芋艿：userName、alipayLogonId、openid =》channelExtras；另外：validatePayTransferReqDTO 去掉；
+    /**
+     * 收款人账号
+     *
+     * 微信场景下：openid
+     * 支付宝场景下：支付宝账号
+     */
+    @NotEmpty(message = "收款人账号不能为空")
+    private String userAccount;
     /**
      * 收款人姓名
      */
-    @NotBlank(message = "收款人姓名不能为空", groups = {Alipay.class})
     private String userName;
-
-    /**
-     * 支付宝登录号
-     */
-    @NotBlank(message = "支付宝登录号不能为空", groups = {Alipay.class})
-    private String alipayLogonId;
-
-    /**
-     * 微信 openId
-     */
-    @NotBlank(message = "微信 openId 不能为空", groups = {WxPay.class})
-    private String openid;
 
     /**
      * 支付渠道的额外参数

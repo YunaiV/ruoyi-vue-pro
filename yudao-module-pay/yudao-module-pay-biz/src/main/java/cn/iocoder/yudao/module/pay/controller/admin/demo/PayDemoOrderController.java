@@ -3,22 +3,21 @@ package cn.iocoder.yudao.module.pay.controller.admin.demo;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayOrderNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.api.notify.dto.PayRefundNotifyReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.order.PayDemoOrderCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.order.PayDemoOrderRespVO;
-import cn.iocoder.yudao.module.pay.convert.demo.PayDemoOrderConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.demo.PayDemoOrderDO;
 import cn.iocoder.yudao.module.pay.service.demo.PayDemoOrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
@@ -43,7 +42,7 @@ public class PayDemoOrderController {
     @Operation(summary = "获得示例订单分页")
     public CommonResult<PageResult<PayDemoOrderRespVO>> getDemoOrderPage(@Valid PageParam pageVO) {
         PageResult<PayDemoOrderDO> pageResult = payDemoOrderService.getDemoOrderPage(pageVO);
-        return success(PayDemoOrderConvert.INSTANCE.convertPage(pageResult));
+        return success(BeanUtils.toBean(pageResult, PayDemoOrderRespVO.class));
     }
 
     @PostMapping("/update-paid")

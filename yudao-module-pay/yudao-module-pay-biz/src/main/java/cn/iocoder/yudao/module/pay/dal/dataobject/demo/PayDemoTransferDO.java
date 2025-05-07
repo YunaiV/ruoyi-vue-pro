@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.pay.dal.dataobject.demo;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
-import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.transfer.PayTransferDO;
+import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -10,7 +10,6 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-// TODO 芋艿：需要详细 review
 /**
  * 示例转账订单
  *
@@ -22,24 +21,22 @@ import java.time.LocalDateTime;
 public class PayDemoTransferDO extends BaseDO {
 
     /**
-     * 订单编号
+     * 编号，自增
      */
     @TableId
     private Long id;
 
     /**
-     * 应用编号
+     * 转账渠道
      *
-     * 关联 {@link PayAppDO#getId()}
+     * 枚举 {@link cn.iocoder.yudao.module.pay.enums.PayChannelEnum}
      */
-    private Long appId;
+    private String channelCode;
 
     /**
-     * 转账类型
-     * <p>
-     * 枚举 {@link PayTransferTypeEnum}
+     * 转账标题
      */
-    private Integer type;
+    private String subject;
 
     /**
      * 转账金额，单位：分
@@ -47,37 +44,29 @@ public class PayDemoTransferDO extends BaseDO {
     private Integer price;
 
     /**
+     * 收款人账号
+     */
+    private String userAccount;
+    /**
      * 收款人姓名
      */
     private String userName;
 
     /**
-     * 支付宝登录号
-     */
-    private String alipayLogonId;
-
-    /**
-     * 微信 openId
-     */
-    private String openid;
-
-    /**
      * 转账状态
+     *
+     * 枚举 {@link PayTransferStatusEnum}
      */
     private Integer transferStatus;
 
     /**
      * 转账单编号
+     *
+     * 关联 {@link PayTransferDO#getId()}
      */
     private Long payTransferId;
-
     /**
-     * 转账支付成功渠道
-     */
-    private String payChannelCode;
-
-    /**
-     * 转账支付时间
+     * 转账成功时间
      */
     private LocalDateTime transferTime;
 

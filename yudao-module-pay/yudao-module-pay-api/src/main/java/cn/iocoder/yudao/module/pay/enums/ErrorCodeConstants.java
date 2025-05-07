@@ -65,13 +65,12 @@ public interface ErrorCodeConstants {
     ErrorCode WALLET_RECHARGE_PACKAGE_NAME_EXISTS = new ErrorCode(1_007_008_013, "钱包充值套餐名称已存在");
 
     // ========== 转账模块 1-007-009-000 ==========
-    ErrorCode PAY_TRANSFER_SUBMIT_CHANNEL_ERROR = new ErrorCode(1_007_009_000, "发起转账报错，错误码：{}，错误提示：{}");
     ErrorCode PAY_TRANSFER_NOT_FOUND = new ErrorCode(1_007_009_001, "转账单不存在");
-    ErrorCode PAY_SAME_MERCHANT_TRANSFER_TYPE_NOT_MATCH = new ErrorCode(1_007_009_002, "两次相同转账请求的类型不匹配");
-    ErrorCode PAY_SAME_MERCHANT_TRANSFER_PRICE_NOT_MATCH = new ErrorCode(1_007_009_003, "两次相同转账请求的金额不匹配");
-    ErrorCode PAY_MERCHANT_TRANSFER_EXISTS = new ErrorCode(1_007_009_004, "该笔业务的转账已经发起,请查询转账订单相关状态");
+    ErrorCode PAY_TRANSFER_CREATE_CHANNEL_NOT_MATCH = new ErrorCode(1_007_009_002, "转账发起失败，原因：两次相同转账请求的类型不匹配");
+    ErrorCode PAY_TRANSFER_CREATE_PRICE_NOT_MATCH = new ErrorCode(1_007_009_003, "转账发起失败，原因：两次相同转账请求的金额不匹配");
+    ErrorCode PAY_TRANSFER_CREATE_MERCHANT_EXISTS = new ErrorCode(1_007_009_004, "转账发起失败，原因：该笔业务的转账已经发起，请查询转账订单相关状态");
     ErrorCode PAY_TRANSFER_STATUS_IS_NOT_WAITING = new ErrorCode(1_007_009_005, "转账单不处于待转账");
-    ErrorCode PAY_TRANSFER_STATUS_IS_NOT_PENDING = new ErrorCode(1_007_009_006, "转账单不处于待转账或转账中");
+    ErrorCode PAY_TRANSFER_STATUS_IS_NOT_WAITING_OR_PROCESSING = new ErrorCode(1_007_009_006, "转账单不处于待转账或转账中");
 
     // ========== 示例订单 1-007-900-000 ==========
     ErrorCode DEMO_ORDER_NOT_FOUND = new ErrorCode(1_007_900_000, "示例订单不存在");

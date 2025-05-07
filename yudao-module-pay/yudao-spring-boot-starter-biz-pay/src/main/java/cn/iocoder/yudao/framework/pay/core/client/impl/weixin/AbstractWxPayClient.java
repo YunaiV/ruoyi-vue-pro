@@ -469,7 +469,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
                         .outDetailNo(reqDTO.getOutTransferNo())
                         .transferAmount(reqDTO.getPrice())
                         .transferRemark(reqDTO.getSubject())
-                        .openid(reqDTO.getOpenid())
+                        .openid(reqDTO.getUserAccount())
                         .build());
         // TODO @luchi：能不能我们搞个 TransferBatchesRequestX extends TransferBatchesRequest，这样更简洁一点。
         TransferBatchesRequest transferBatches = TransferBatchesRequest.newBuilder()
@@ -484,7 +484,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         // 2.1 执行请求
         TransferBatchesResult transferBatchesResult = client.getTransferService().transferBatches(transferBatches);
         // 2.2 创建返回结果
-        return PayTransferRespDTO.dealingOf(transferBatchesResult.getBatchId(), reqDTO.getOutTransferNo(), transferBatchesResult);
+        return PayTransferRespDTO.processingOf(transferBatchesResult.getBatchId(), reqDTO.getOutTransferNo(), transferBatchesResult);
     }
 
     @Override
@@ -509,7 +509,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
             return PayTransferRespDTO.closedOf(transferBatch.getBatchStatus(), transferBatch.getCloseReason(),
                     transferBatch.getOutBatchNo(), response);
         }
-        return PayTransferRespDTO.dealingOf(transferBatch.getBatchId(), transferBatch.getOutBatchNo(), response);
+        return PayTransferRespDTO.processingOf(transferBatch.getBatchId(), transferBatch.getOutBatchNo(), response);
     }
 
     // ========== 各种工具方法 ==========

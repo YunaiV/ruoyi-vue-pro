@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -40,8 +39,6 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import static cn.hutool.core.date.DatePattern.NORM_DATETIME_FORMATTER;
-import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.ERROR_CONFIGURATION;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
 import static cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig.MODE_CERTIFICATE;
 import static cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig.MODE_PUBLIC_KEY;
 
@@ -235,10 +232,9 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
 
     @Override
     protected PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) throws AlipayApiException {
-        // 0. 校验公钥类型：必须使用公钥证书模式
-        if (ObjectUtil.notEqual(config.getMode(), MODE_CERTIFICATE)) {
-            throw exception0(ERROR_CONFIGURATION.getCode(), "支付宝单笔转账必须使用公钥证书模式");
-        }
+        // 补充说明：https://opendocs.alipay.com/open/03dcrm?pathHash=4ba3b20b
+        // 沙箱环境：可通过 公钥模式 或 公钥证书模式 加签进行调试
+        // 生产环境：必须使用 公钥证书模式 加签请求强校验请求
 
         // 1.1 构建 AlipayFundTransUniTransferModel
         AlipayFundTransUniTransferModel model = new AlipayFundTransUniTransferModel();
@@ -254,7 +250,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         // ② 个性化的参数
         Participant payeeInfo = new Participant();
         payeeInfo.setIdentityType("ALIPAY_LOGON_ID"); // 暂时只考虑转账到支付宝，银行没有权限 https://opendocs.alipay.com/open/02byvc?scene=66dd06f5a923403393b85de68d3c0055
-        payeeInfo.setIdentity(reqDTO.getAlipayLogonId()); // 支付宝登录号
+        payeeInfo.setIdentity(reqDTO.getUserAccount()); // 支付宝登录号
         payeeInfo.setName(reqDTO.getUserName()); // 支付宝账号姓名
         model.setPayeeInfo(payeeInfo);
         // 1.2 构建 AlipayFundTransUniTransferRequest
@@ -262,7 +258,12 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         request.setBizModel(model);
 
         // 2.1 执行请求
-        AlipayFundTransUniTransferResponse response = client.certificateExecute(request);
+        AlipayFundTransUniTransferResponse response;
+        if (Objects.equals(config.getMode(), MODE_CERTIFICATE)) { // 证书模式
+            response = client.certificateExecute(request);
+        } else {
+            response = client.execute(request);
+        }
         if (!response.isSuccess()) {
             // 当出现 SYSTEM_ERROR, 转账可能成功也可能失败。 返回 WAIT 状态. 后续 job 会轮询，或相同 outBizNo 重新发起转账
             // 发现 outBizNo 相同 两次请求参数相同. 会返回 "PAYMENT_INFO_INCONSISTENCY", 不知道哪里的问题. 暂时返回 WAIT. 后续job 会轮询
@@ -278,7 +279,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
                     reqDTO.getOutTransferNo(), response);
         }
         if (Objects.equals(response.getStatus(), "DEALING")) { // 转账到银行卡会出现 "DEALING" 处理中
-            return PayTransferRespDTO.dealingOf(response.getOrderId(), reqDTO.getOutTransferNo(), response);
+            return PayTransferRespDTO.processingOf(response.getOrderId(), reqDTO.getOutTransferNo(), response);
         }
         return PayTransferRespDTO.successOf(response.getOrderId(), parseTime(response.getTransDate()),
                 response.getOutBizNo(), response);
@@ -317,7 +318,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
                     outTradeNo, response);
         }
         if (Objects.equals(response.getStatus(), "DEALING")) { // 转账到银行卡会出现 "DEALING" 处理中
-            return PayTransferRespDTO.dealingOf(response.getOrderId(), outTradeNo, response);
+            return PayTransferRespDTO.processingOf(response.getOrderId(), outTradeNo, response);
         }
         return PayTransferRespDTO.successOf(response.getOrderId(), parseTime(response.getPayDate()),
                 response.getOutBizNo(), response);

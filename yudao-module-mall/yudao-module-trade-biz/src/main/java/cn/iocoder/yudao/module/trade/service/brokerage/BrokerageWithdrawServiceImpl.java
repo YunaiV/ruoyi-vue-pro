@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferRespDTO;
 import cn.iocoder.yudao.module.pay.api.wallet.PayWalletApi;
 import cn.iocoder.yudao.module.pay.api.wallet.dto.PayWalletAddBalanceReqDTO;
 import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferStatusEnum;
-import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferTypeEnum;
+//import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
 import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
@@ -140,11 +140,11 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
         // 1.2 构建请求
         PayTransferCreateReqDTO payTransferCreateReqDTO = new PayTransferCreateReqDTO()
                 .setAppKey(tradeOrderProperties.getPayAppKey())
-                .setChannelCode("wx_lite").setType(PayTransferTypeEnum.WX_BALANCE.getType())
+                .setChannelCode("wx_lite") // TODO @芋艿：【转账】这里要处理下；
                 .setMerchantTransferId(withdraw.getId().toString())
                 .setPrice(withdraw.getPrice())
                 .setSubject("佣金提现")
-                .setOpenid(socialUser.getOpenid()).setUserIp(getClientIP());
+                .setUserAccount(socialUser.getOpenid()).setUserIp(getClientIP());
         // 2. 发起请求
         return payTransferApi.createTransfer(payTransferCreateReqDTO);
     }
@@ -226,7 +226,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
         if (PayTransferStatusEnum.isSuccess(transfer.getStatus())) {
             withdraw.setStatus(BrokerageWithdrawStatusEnum.WITHDRAW_SUCCESS.getStatus());
             // TODO @luchi：发送站内信
-        } else if (PayTransferStatusEnum.isPendingStatus(transfer.getStatus())) {
+        } else if (PayTransferStatusEnum.isWaitingOrProcessing(transfer.getStatus())) {
             // TODO @luchi：这里，是不是不用更新哈？
             withdraw.setStatus(BrokerageWithdrawStatusEnum.AUDIT_SUCCESS.getStatus());
         } else {

@@ -96,7 +96,6 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
         // 2.2 更新支付单到 demo 订单
         payDemoOrderMapper.updateById(new PayDemoOrderDO().setId(demoOrder.getId())
                 .setPayOrderId(payOrderId));
-        // 返回
         return demoOrder.getId();
     }
 

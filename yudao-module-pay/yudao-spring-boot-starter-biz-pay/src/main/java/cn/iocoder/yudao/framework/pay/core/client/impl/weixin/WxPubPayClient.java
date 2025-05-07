@@ -4,7 +4,6 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
@@ -27,10 +26,6 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
  */
 @Slf4j
 public class WxPubPayClient extends AbstractWxPayClient {
-
-    public WxPubPayClient(Long channelId, WxPayClientConfig config) {
-        super(channelId, PayChannelEnum.WX_PUB.getCode(), config);
-    }
 
     protected WxPubPayClient(Long channelId, String channelCode, WxPayClientConfig config) {
         super(channelId, channelCode, config);
