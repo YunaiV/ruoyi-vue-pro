@@ -23,13 +23,18 @@ import com.alipay.api.AlipayResponse;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.*;
 import com.alipay.api.internal.util.AlipaySignature;
+import com.alipay.api.internal.util.codec.Base64;
 import com.alipay.api.request.*;
 import com.alipay.api.response.*;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.PublicKey;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
@@ -82,8 +87,20 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
     public PayOrderRespDTO doParseOrderNotify(Map<String, String> params, String body) throws Throwable {
         // 1. 校验回调数据
         Map<String, String> bodyObj = HttpUtil.decodeParamMap(body, StandardCharsets.UTF_8);
-        AlipaySignature.rsaCheckV1(bodyObj, config.getAlipayPublicKey(),
-                StandardCharsets.UTF_8.name(), config.getSignType());
+        if (config.getMode().equals(MODE_CERTIFICATE)) {
+
+            // see AlipaySignature.rsaCertCheckV1()
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(config.getAlipayPublicCertContent().getBytes(StandardCharsets.UTF_8));
+            CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
+            X509Certificate cert = (X509Certificate) cf.generateCertificate(inputStream);
+            PublicKey publicKey = cert.getPublicKey();
+            String encodedPublicKey = Base64.encodeBase64String(publicKey.getEncoded());
+
+            AlipaySignature.rsaCheckV1(bodyObj, encodedPublicKey, StandardCharsets.UTF_8.name(), config.getSignType());
+        } else {
+            AlipaySignature.rsaCheckV1(bodyObj, config.getAlipayPublicKey(),
+                    StandardCharsets.UTF_8.name(), config.getSignType());
+        }
 
         // 2. 解析订单的状态
         // 额外说明：支付宝不仅仅支付成功会回调，再各种触发支付单数据变化时，都会进行回调，所以这里 status 的解析会写的比较复杂
@@ -266,7 +283,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         if (!response.isSuccess()) {
             // 当出现 SYSTEM_ERROR, 转账可能成功也可能失败。 返回 WAIT 状态. 后续 job 会轮询，或相同 outBizNo 重新发起转账
             // 发现 outBizNo 相同 两次请求参数相同. 会返回 "PAYMENT_INFO_INCONSISTENCY", 不知道哪里的问题. 暂时返回 WAIT. 后续job 会轮询
-            if (ObjectUtils.equalsAny(response.getSubCode(),"PAYMENT_INFO_INCONSISTENCY", "SYSTEM_ERROR", "ACQ.SYSTEM_ERROR")) {
+            if (ObjectUtils.equalsAny(response.getSubCode(), "PAYMENT_INFO_INCONSISTENCY", "SYSTEM_ERROR", "ACQ.SYSTEM_ERROR")) {
                 return PayTransferRespDTO.waitingOf(null, reqDTO.getOutTransferNo(), response);
             }
             return PayTransferRespDTO.closedOf(response.getSubCode(), response.getSubMsg(),
