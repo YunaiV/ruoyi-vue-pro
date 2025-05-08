@@ -57,11 +57,16 @@ public class PayDemoTransferServiceImpl implements PayDemoWithdrawService {
         demoTransferMapper.insert(withdraw);
 
         // 2.1 创建支付单
-        Long payTransferId = payTransferApi.createTransfer(new PayTransferCreateReqDTO()
+        PayTransferCreateReqDTO transferReqDTO = new PayTransferCreateReqDTO()
                 .setAppKey(PAY_APP_KEY).setChannelCode(withdraw.getTransferChannelCode()).setUserIp(getClientIP()) // 支付应用
                 .setMerchantOrderId(String.valueOf(withdraw.getId())) // 业务的订单编号
                 .setSubject(reqVO.getSubject()).setPrice(withdraw.getPrice()) // 价格信息
-                .setUserAccount(reqVO.getUserAccount()).setUserName(reqVO.getUserName())); // 收款信息
+                .setUserAccount(reqVO.getUserAccount()).setUserName(reqVO.getUserName()); // 收款信息
+        if (ObjectUtil.equal(reqVO.getType(), PayDemoWithdrawTypeEnum.WECHAT.getType())) {
+            transferReqDTO.setChannelExtras(PayTransferCreateReqDTO.buildWeiXinChannelExtra1000(
+                    "测试活动", "测试奖励"));
+        }
+        Long payTransferId = payTransferApi.createTransfer(transferReqDTO);
         // 2.2 更新转账单到 demo 示例提现单
         demoTransferMapper.updateById(new PayDemoWithdrawDO().setId(withdraw.getId())
                .setPayTransferId(payTransferId));

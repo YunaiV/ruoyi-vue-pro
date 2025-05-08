@@ -29,6 +29,14 @@ public interface PayTransferService {
     PayTransferDO getTransfer(Long id);
 
     /**
+     * 根据转账单号获取转账单
+     *
+     * @param no 转账单号
+     * @return 转账单
+     */
+    PayTransferDO getTransferByNo(String no);
+
+    /**
      * 获得转账单分页
      *
      * @param pageReqVO 分页查询

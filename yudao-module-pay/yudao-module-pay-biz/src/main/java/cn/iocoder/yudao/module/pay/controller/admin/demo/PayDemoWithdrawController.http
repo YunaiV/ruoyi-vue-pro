@@ -1,4 +1,4 @@
-### 请求 /pay/pay/demo-order 接口 => 成功
+### 请求 /pay/pay/demo-order 接口（支付宝） => 成功
 POST {{baseUrl}}/pay/demo-withdraw/create
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -10,4 +10,31 @@ tenant-id: {{adminTenantId}}
   "price": 10,
   "userAccount": "oespxk7368@sandbox.com",
   "userName": "oespxk7368"
+}
+
+### 请求 /pay/pay/demo-order 接口（微信余额） => 成功
+POST {{baseUrl}}/pay/demo-withdraw/create
+Authorization: Bearer {{token}}
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+
+{
+  "type": 2,
+  "subject": "测试转账",
+  "price": 1,
+  "userAccount": "oiSC85elO_OZogXODC5RoGyXamK4",
+  "userName": "芋艿"
+}
+
+### 请求 /pay/pay/demo-order 接口（钱包余额） => 成功
+POST {{baseUrl}}/pay/demo-withdraw/create
+Authorization: Bearer {{token}}
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+
+{
+  "type": 3,
+  "subject": "测试转账",
+  "price": 1,
+  "userAccount": "1"
 }

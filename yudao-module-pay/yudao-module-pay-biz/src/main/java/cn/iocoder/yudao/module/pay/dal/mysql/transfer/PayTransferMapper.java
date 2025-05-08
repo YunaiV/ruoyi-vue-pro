@@ -53,6 +53,10 @@ public interface PayTransferMapper extends BaseMapperX<PayTransferDO> {
                 PayTransferDO::getNo, no);
     }
 
+    default PayTransferDO selectByNo(String no) {
+        return selectOne(PayTransferDO::getNo, no);
+    }
+
 }
 
 

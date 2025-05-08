@@ -7,6 +7,7 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.date.TemporalAccessorUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.io.FileUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
@@ -20,10 +21,9 @@ import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
 import com.github.binarywang.wxpay.bean.notify.*;
 import com.github.binarywang.wxpay.bean.request.*;
 import com.github.binarywang.wxpay.bean.result.*;
-import com.github.binarywang.wxpay.bean.transfer.QueryTransferBatchesRequest;
-import com.github.binarywang.wxpay.bean.transfer.QueryTransferBatchesResult;
-import com.github.binarywang.wxpay.bean.transfer.TransferBatchesRequest;
-import com.github.binarywang.wxpay.bean.transfer.TransferBatchesResult;
+import com.github.binarywang.wxpay.bean.transfer.TransferBillsGetResult;
+import com.github.binarywang.wxpay.bean.transfer.TransferBillsRequest;
+import com.github.binarywang.wxpay.bean.transfer.TransferBillsResult;
 import com.github.binarywang.wxpay.config.WxPayConfig;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
@@ -32,8 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -463,53 +461,57 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
 
     @Override
     protected PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) throws WxPayException {
-        // 1. 构建 TransferBatchesRequest 请求
-        List<TransferBatchesRequest.TransferDetail> transferDetailList = Collections.singletonList(
-                TransferBatchesRequest.TransferDetail.newBuilder()
-                        .outDetailNo(reqDTO.getOutTransferNo())
-                        .transferAmount(reqDTO.getPrice())
-                        .transferRemark(reqDTO.getSubject())
-                        .openid(reqDTO.getUserAccount())
-                        .build());
-        // TODO @luchi：能不能我们搞个 TransferBatchesRequestX extends TransferBatchesRequest，这样更简洁一点。
-        TransferBatchesRequest transferBatches = TransferBatchesRequest.newBuilder()
+        // 1. 构建 TransferBillsRequest 请求
+        TransferBillsRequest request = TransferBillsRequest.newBuilder()
                 .appid(this.config.getAppId())
-                .outBatchNo(reqDTO.getOutTransferNo())
-                .batchName(reqDTO.getSubject())
-                .batchRemark(reqDTO.getSubject())
-                .totalAmount(reqDTO.getPrice())
-                .totalNum(transferDetailList.size())
-                .transferDetailList(transferDetailList).build()
-                .setNotifyUrl(reqDTO.getNotifyUrl());
+                .outBillNo(reqDTO.getOutTransferNo())
+                .transferAmount(reqDTO.getPrice())
+                .transferRemark(reqDTO.getSubject())
+                .transferSceneId(reqDTO.getChannelExtras().get("sceneId"))
+                .openid(reqDTO.getUserAccount())
+                .userName(reqDTO.getUserName())
+                .transferSceneReportInfos(JsonUtils.parseArray(reqDTO.getChannelExtras().get("sceneReportInfos"),
+                        TransferBillsRequest.TransferSceneReportInfo.class))
+                .notifyUrl(reqDTO.getNotifyUrl())
+                .build();
+        // 特殊：微信转账，必须 0.3 元起，才允许传入姓名
+        if (reqDTO.getPrice() < 30) {
+            request.setUserName(null);
+        }
+
         // 2.1 执行请求
-        TransferBatchesResult transferBatchesResult = client.getTransferService().transferBatches(transferBatches);
-        // 2.2 创建返回结果
-        return PayTransferRespDTO.processingOf(transferBatchesResult.getBatchId(), reqDTO.getOutTransferNo(), transferBatchesResult);
+        try {
+            TransferBillsResult response = client.getTransferService().transferBills(request);
+            System.out.println(response);
+
+            // 2.2 创建返回结果
+            // TODO @芋艿：这里要解析下；
+            return PayTransferRespDTO.processingOf(response.getTransferBillNo(), reqDTO.getOutTransferNo(), response);
+        } catch (WxPayException e) {
+            log.error("[doUnifiedTransfer][转账({}) 发起微信支付异常", reqDTO, e);
+            String errorCode = getErrorCode(e);
+            String errorMessage = getErrorMessage(e);
+            return PayTransferRespDTO.closedOf(errorCode, errorMessage,
+                    reqDTO.getOutTransferNo(), e.getXmlString());
+        }
     }
 
     @Override
     protected PayTransferRespDTO doGetTransfer(String outTradeNo) throws WxPayException {
-        QueryTransferBatchesRequest request = QueryTransferBatchesRequest.newBuilder()
-                .outBatchNo(outTradeNo).needQueryDetail(true).offset(0).limit(20).detailStatus("ALL")
-                .build();
-        QueryTransferBatchesResult response = client.getTransferService().transferBatchesOutBatchNo(request);
-        QueryTransferBatchesResult.TransferBatch transferBatch = response.getTransferBatch();
-        if (Objects.equals("FINISHED", transferBatch.getBatchStatus())) {
-            // 明细中全部成功则成功，任一失败则失败
-            if (response.getTransferDetailList().stream().allMatch(detail -> Objects.equals("SUCCESS", detail.getDetailStatus()))) {
-                return PayTransferRespDTO.successOf(transferBatch.getBatchId(), parseDateV3(transferBatch.getUpdateTime()),
-                        transferBatch.getOutBatchNo(), response);
-            }
-            if (response.getTransferDetailList().stream().anyMatch(detail -> Objects.equals("FAIL", detail.getDetailStatus()))) {
-                return PayTransferRespDTO.closedOf(transferBatch.getBatchStatus(), transferBatch.getCloseReason(),
-                        transferBatch.getOutBatchNo(), response);
-            }
+        // 1. 执行请求
+        TransferBillsGetResult response = client.getTransferService().getBillsByTransferBillNo(outTradeNo);
+
+        // 2. 创建返回结果
+        String state = response.getState();
+        if (ObjectUtils.equalsAny(state, "ACCEPTED", "PROCESSING", "WAIT_USER_CONFIRM", "TRANSFERING")) {
+            return PayTransferRespDTO.processingOf(response.getTransferBillNo(), response.getOutBillNo(), response);
         }
-        if (Objects.equals("CLOSED", transferBatch.getBatchStatus())) {
-            return PayTransferRespDTO.closedOf(transferBatch.getBatchStatus(), transferBatch.getCloseReason(),
-                    transferBatch.getOutBatchNo(), response);
+        if (Objects.equals("SUCCESS", state)) {
+            return PayTransferRespDTO.successOf(response.getTransferBillNo(), parseDateV3(response.getUpdateTime()),
+                    response.getOutBillNo(), response);
         }
-        return PayTransferRespDTO.processingOf(transferBatch.getBatchId(), transferBatch.getOutBatchNo(), response);
+        return PayTransferRespDTO.closedOf(state, response.getFailReason(),
+                response.getOutBillNo(), response);
     }
 
     // ========== 各种工具方法 ==========

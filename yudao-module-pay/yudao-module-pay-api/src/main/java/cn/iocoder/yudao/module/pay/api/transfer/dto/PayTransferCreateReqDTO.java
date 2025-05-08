@@ -1,10 +1,15 @@
 package cn.iocoder.yudao.module.pay.api.transfer.dto;
 
+import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -69,5 +74,47 @@ public class PayTransferCreateReqDTO {
      * 收款人姓名
      */
     private String userName;
+
+    /**
+     * 【微信】现金营销场景
+     *
+     * @param activityName 活动名称
+     * @param rewardDescription 奖励说明
+     * @return channelExtras
+     */
+    public static Map<String, String> buildWeiXinChannelExtra1000(String activityName, String rewardDescription) {
+        return buildWeiXinChannelExtra(1000,
+                "活动名称", activityName,
+                "奖励说明", rewardDescription);
+    }
+
+    /**
+     * 【微信】企业报销场景
+     *
+     * @param expenseType 报销类型
+     * @param expenseDescription 报销说明
+     * @return channelExtras
+     */
+    public static Map<String, String> buildWeiXinChannelExtra1006(String expenseType, String expenseDescription) {
+        return buildWeiXinChannelExtra(1006,
+                "报销类型", expenseType,
+                "报销说明", expenseDescription);
+    }
+
+    private static Map<String, String> buildWeiXinChannelExtra(Integer sceneId, String... values) {
+        Map<String, String> channelExtras = new HashMap<>();
+        // 构建场景报备信息列表
+        List<Map<String, String>> sceneReportInfos = new ArrayList<>();
+        for (int i = 0; i < values.length; i += 2) {
+            Map<String, String> info = new HashMap<>();
+            info.put("infoType", values[i]);
+            info.put("infoContent", values[i + 1]);
+            sceneReportInfos.add(info);
+        }
+        // 设置场景ID和场景报备信息
+        channelExtras.put("sceneId", StrUtil.toString(sceneId));
+        channelExtras.put("sceneReportInfos", JsonUtils.toJsonString(sceneReportInfos));
+        return channelExtras;
+    }
 
 }

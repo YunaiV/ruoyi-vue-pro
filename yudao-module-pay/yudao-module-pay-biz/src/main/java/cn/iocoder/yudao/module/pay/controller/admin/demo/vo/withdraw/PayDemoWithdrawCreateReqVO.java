@@ -27,7 +27,6 @@ public class PayDemoWithdrawCreateReqVO {
     private String userAccount;
 
     @Schema(description = "收款人姓名", example = "test1")
-    @NotBlank(message = "收款人姓名不能为空")
     private String userName;
 
     @Schema(description = "提现方式", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")

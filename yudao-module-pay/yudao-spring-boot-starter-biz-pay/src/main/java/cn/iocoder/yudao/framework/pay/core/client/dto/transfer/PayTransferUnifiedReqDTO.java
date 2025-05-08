@@ -58,6 +58,8 @@ public class PayTransferUnifiedReqDTO {
 
     /**
      * 支付渠道的额外参数
+     *
+     * 微信支付：sceneId 和 scene_report_infos 字段，必须传递；参考 <a href="https://pay.weixin.qq.com/doc/v3/merchant/4012711988#%EF%BC%883%EF%BC%89%E6%8C%89%E8%BD%AC%E8%B4%A6%E5%9C%BA%E6%99%AF%E6%8A%A5%E5%A4%87%E8%83%8C%E6%99%AF%E4%BF%A1%E6%81%AF">按转账场景报备背景信息</>
      */
     private Map<String, String> channelExtras;
 

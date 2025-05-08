@@ -239,6 +239,11 @@ public class PayTransferServiceImpl implements PayTransferService {
     }
 
     @Override
+    public PayTransferDO getTransferByNo(String no) {
+        return transferMapper.selectByNo(no);
+    }
+
+    @Override
     public PageResult<PayTransferDO> getTransferPage(PayTransferPageReqVO pageReqVO) {
         return transferMapper.selectPage(pageReqVO);
     }

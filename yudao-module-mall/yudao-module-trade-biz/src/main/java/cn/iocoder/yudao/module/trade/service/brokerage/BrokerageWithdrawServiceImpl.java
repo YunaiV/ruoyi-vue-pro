@@ -113,7 +113,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
         if (BrokerageWithdrawTypeEnum.WALLET.getType().equals(withdraw.getType())) {
             payWalletApi.addWalletBalance(new PayWalletAddBalanceReqDTO()
                     .setUserId(withdraw.getUserId()).setUserType(UserTypeEnum.MEMBER.getValue())
-                    .setBizType(PayWalletBizTypeEnum.BROKERAGE_WITHDRAW.getType()).setBizId(withdraw.getId().toString())
+                    .setBizType(PayWalletBizTypeEnum.TRANSFER.getType()).setBizId(withdraw.getId().toString())
                     .setPrice(withdraw.getPrice()));
             // 1.2 微信 API
         } else if (BrokerageWithdrawTypeEnum.WECHAT_API.getType().equals(withdraw.getType())) {
