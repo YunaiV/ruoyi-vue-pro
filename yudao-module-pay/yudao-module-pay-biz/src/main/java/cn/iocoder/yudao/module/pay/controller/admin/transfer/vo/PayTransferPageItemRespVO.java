@@ -28,7 +28,7 @@ public class PayTransferPageItemRespVO {
     private String channelCode;
 
     @Schema(description = "商户转账单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17481")
-    private String merchantTransferId;
+    private String merchantOrderId;
 
     @Schema(description = "类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     private Integer type;

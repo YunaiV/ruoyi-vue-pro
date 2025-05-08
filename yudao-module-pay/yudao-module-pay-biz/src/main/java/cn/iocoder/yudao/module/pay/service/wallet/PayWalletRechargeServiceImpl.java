@@ -122,7 +122,7 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
         }
         // 1.2 校验钱包充值是否可以支付
         if (recharge.getPayStatus()) {
-            // 特殊：如果订单已支付，且支付单号相同，直接返回，说明重复回调
+            // 特殊：支付单号相同，直接返回，说明重复回调
             if (ObjectUtil.equals(recharge.getPayOrderId(), payOrderId)) {
                 log.warn("[updateWalletRechargerPaid][recharge({}) 已支付，且支付单号相同({})，直接返回]", recharge, payOrderId);
                 return;

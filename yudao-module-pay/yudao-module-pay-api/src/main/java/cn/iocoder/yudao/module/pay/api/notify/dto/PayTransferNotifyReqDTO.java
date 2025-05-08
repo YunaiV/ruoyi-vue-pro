@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.pay.api.notify.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.NoArgsConstructor;
 
 /**
  * 转账单的通知 Request DTO
@@ -11,14 +14,16 @@ import jakarta.validation.constraints.NotNull;
  * @author jason
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PayTransferNotifyReqDTO {
 
-    // TODO 芋艿：要不要改成 orderId 待定；
     /**
      * 商户转账单号
      */
     @NotEmpty(message = "商户转账单号不能为空")
-    private String merchantTransferId;
+    private String merchantOrderId;
 
     /**
      * 转账订单编号

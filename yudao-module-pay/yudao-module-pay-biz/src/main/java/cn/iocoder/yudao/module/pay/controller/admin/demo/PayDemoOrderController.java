@@ -23,7 +23,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-@Tag(name = "管理后台 - 示例订单")
+@Tag(name = "管理后台 - 示例订单") // 目的：演示支付、退款功能
 @RestController
 @RequestMapping("/pay/demo-order")
 @Validated

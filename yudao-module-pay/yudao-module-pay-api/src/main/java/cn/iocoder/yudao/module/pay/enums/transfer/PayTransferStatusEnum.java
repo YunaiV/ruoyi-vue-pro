@@ -48,9 +48,20 @@ public enum PayTransferStatusEnum {
      * 是否处于待转账或者转账中的状态
      *
      * @param status 状态
+     * @return 是否
      */
     public static boolean isWaitingOrProcessing(Integer status) {
         return isWaiting(status) || isProgressing(status);
+    }
+
+    /**
+     * 是否处于成功或者关闭中的状态
+     *
+     * @param status 状态
+     * @return 是否
+     */
+    public static boolean isSuccessOrClosed(Integer status) {
+        return isSuccess(status) || isClosed(status);
     }
 
 }

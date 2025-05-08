@@ -108,8 +108,8 @@ public class PayNotifyServiceImpl implements PayNotifyService {
                     .setMerchantOrderId(refundDO.getMerchantOrderId()).setNotifyUrl(refundDO.getNotifyUrl());
         } else if (Objects.equals(task.getType(), PayNotifyTypeEnum.TRANSFER.getType())) {
             PayTransferDO transfer = transferService.getTransfer(task.getDataId());
-            task.setAppId(transfer.getAppId()).setMerchantTransferId(transfer.getMerchantTransferId())
-                    .setNotifyUrl(transfer.getNotifyUrl());
+            task.setAppId(transfer.getAppId())
+                    .setMerchantOrderId(transfer.getMerchantOrderId()).setNotifyUrl(transfer.getNotifyUrl());
         }
 
         // 执行插入
@@ -225,8 +225,8 @@ public class PayNotifyServiceImpl implements PayNotifyService {
             request = PayRefundNotifyReqDTO.builder().merchantOrderId(task.getMerchantOrderId())
                     .payRefundId(task.getDataId()).build();
         } else if (Objects.equals(task.getType(), PayNotifyTypeEnum.TRANSFER.getType())) {
-            request = new PayTransferNotifyReqDTO().setMerchantTransferId(task.getMerchantTransferId())
-                    .setPayTransferId(task.getDataId());
+            request = PayTransferNotifyReqDTO.builder().merchantOrderId(task.getMerchantOrderId())
+                    .payTransferId(task.getDataId()).build();
         } else {
             throw new RuntimeException("未知的通知任务类型：" + JsonUtils.toJsonString(task));
         }

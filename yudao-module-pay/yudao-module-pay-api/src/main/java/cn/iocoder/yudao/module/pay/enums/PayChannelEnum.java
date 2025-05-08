@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.pay.enums;
 
+import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 /**
  * 支付渠道的编码的枚举
@@ -10,7 +13,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum PayChannelEnum {
+public enum PayChannelEnum implements ArrayValuable<String> {
 
     WX_PUB("wx_pub", "微信 JSAPI 支付"), // 公众号网页
     WX_LITE("wx_lite", "微信小程序支付"),
@@ -28,6 +31,8 @@ public enum PayChannelEnum {
 
     WALLET("wallet", "钱包支付");
 
+    public static final String[] ARRAYS = Arrays.stream(values()).map(PayChannelEnum::getCode).toArray(String[]::new);
+
     /**
      * 编码
      *
@@ -38,5 +43,10 @@ public enum PayChannelEnum {
      * 名字
      */
     private final String name;
+
+    @Override
+    public String[] array() {
+        return ARRAYS;
+    }
 
 }

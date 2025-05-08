@@ -1,11 +1,11 @@
 ### 请求 /pay/pay/demo-order 接口 => 成功
-POST {{baseUrl}}/pay/demo-transfer/create
+POST {{baseUrl}}/pay/demo-withdraw/create
 Authorization: Bearer {{token}}
 Content-Type: application/json
 tenant-id: {{adminTenantId}}
 
 {
-  "channelCode": "alipay_pc",
+  "type": 1,
   "subject": "测试转账",
   "price": 10,
   "userAccount": "oespxk7368@sandbox.com",

@@ -2,7 +2,8 @@ package cn.iocoder.yudao.module.pay.dal.dataobject.demo;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.transfer.PayTransferDO;
-import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferStatusEnum;
+import cn.iocoder.yudao.module.pay.enums.demo.PayDemoWithdrawStatusEnum;
+import cn.iocoder.yudao.module.pay.enums.demo.PayDemoWithdrawTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -11,35 +12,27 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 示例转账订单
+ * 示例提现订单
  *
  * 演示业务系统的转账业务
  */
-@TableName(value ="pay_demo_transfer", autoResultMap = true)
-@KeySequence("pay_demo_transfer_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName(value ="pay_demo_withdraw", autoResultMap = true)
+@KeySequence("pay_demo_withdraw_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
-public class PayDemoTransferDO extends BaseDO {
+public class PayDemoWithdrawDO extends BaseDO {
 
     /**
-     * 编号，自增
+     * 提现单编号，自增
      */
     @TableId
     private Long id;
 
     /**
-     * 转账渠道
-     *
-     * 枚举 {@link cn.iocoder.yudao.module.pay.enums.PayChannelEnum}
-     */
-    private String channelCode;
-
-    /**
-     * 转账标题
+     * 提现标题
      */
     private String subject;
-
     /**
-     * 转账金额，单位：分
+     * 提现金额，单位：分
      */
     private Integer price;
 
@@ -53,11 +46,19 @@ public class PayDemoTransferDO extends BaseDO {
     private String userName;
 
     /**
-     * 转账状态
+     * 提现方式
      *
-     * 枚举 {@link PayTransferStatusEnum}
+     * 枚举 {@link PayDemoWithdrawTypeEnum}
      */
-    private Integer transferStatus;
+    private Integer type;
+    /**
+     * 提现状态
+     *
+     * 枚举 {@link PayDemoWithdrawStatusEnum}
+     */
+    private Integer status;
+
+    // ========== 转账相关字段 ==========
 
     /**
      * 转账单编号
@@ -65,6 +66,12 @@ public class PayDemoTransferDO extends BaseDO {
      * 关联 {@link PayTransferDO#getId()}
      */
     private Long payTransferId;
+    /**
+     * 转账渠道
+     *
+     * 枚举 {@link cn.iocoder.yudao.module.pay.enums.PayChannelEnum}
+     */
+    private String transferChannelCode;
     /**
      * 转账成功时间
      */

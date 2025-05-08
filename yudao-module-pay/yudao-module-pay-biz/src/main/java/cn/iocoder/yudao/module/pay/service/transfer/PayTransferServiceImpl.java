@@ -112,7 +112,7 @@ public class PayTransferServiceImpl implements PayTransferService {
     }
 
     private PayTransferDO validateTransferCanCreate(PayTransferCreateReqDTO reqDTO, Long appId) {
-        PayTransferDO transfer = transferMapper.selectByAppIdAndMerchantTransferId(appId, reqDTO.getMerchantTransferId());
+        PayTransferDO transfer = transferMapper.selectByAppIdAndMerchantOrderId(appId, reqDTO.getMerchantOrderId());
         if (transfer != null) {
             // 已经存在，并且状态不为等待状态：说明已经调用渠道转账并返回结果
             if (!PayTransferStatusEnum.isWaiting(transfer.getStatus())) {

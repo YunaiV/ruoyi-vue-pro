@@ -85,8 +85,12 @@ public interface ErrorCodeConstants {
     ErrorCode DEMO_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR = new ErrorCode(1_007_900_009, "发起退款失败，退款单编号不匹配");
     ErrorCode DEMO_ORDER_REFUND_FAIL_REFUND_PRICE_NOT_MATCH = new ErrorCode(1_007_900_010, "发起退款失败，退款单金额不匹配");
 
-    // ========== 示例转账订单 1-007-901-001 ==========
-    ErrorCode DEMO_TRANSFER_NOT_FOUND = new ErrorCode(1_007_901_001, "示例转账单不存在");
-    ErrorCode DEMO_TRANSFER_FAIL_TRANSFER_ID_ERROR = new ErrorCode(1_007_901_002, "转账失败，转账单编号不匹配");
-    ErrorCode DEMO_TRANSFER_FAIL_PRICE_NOT_MATCH = new ErrorCode(1_007_901_003, "转账失败，转账单金额不匹配");
+    // ========== 示例提现单 1-007-901-000 ==========
+    ErrorCode DEMO_WITHDRAW_NOT_FOUND = new ErrorCode(1_007_901_000, "示例提现单不存在");
+    ErrorCode DEMO_WITHDRAW_UPDATE_STATUS_FAIL_PAY_TRANSFER_ID_ERROR = new ErrorCode(1_007_901_001, "更新示例提现单状态失败，支付转账单编号不匹配");
+    ErrorCode DEMO_WITHDRAW_UPDATE_STATUS_FAIL_PAY_TRANSFER_STATUS_NOT_SUCCESS_OR_CLOSED = new ErrorCode(1_007_901_002, "更新示例提现单状态失败，支付转账单状态不是【转账成功】或【转账失败】状态");
+    ErrorCode DEMO_WITHDRAW_UPDATE_STATUS_FAIL_PAY_PRICE_NOT_MATCH = new ErrorCode(1_007_901_003, "更新示例提现单状态失败，支付转账单金额不匹配");
+    ErrorCode DEMO_WITHDRAW_UPDATE_STATUS_FAIL_PAY_MERCHANT_EXISTS = new ErrorCode(1_007_901_004, "更新示例提现单状态失败，支付转账单商户订单号不匹配");
+    ErrorCode DEMO_WITHDRAW_UPDATE_STATUS_FAIL_PAY_CHANNEL_NOT_MATCH = new ErrorCode(1_007_901_005, "更新示例提现单状态失败，支付转账单渠道不匹配");
+
 }

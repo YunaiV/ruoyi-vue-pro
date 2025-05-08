@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.pay.api.notify.dto;
 
-import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -24,7 +24,7 @@ public class PayTransferPageReqVO extends PageParam {
     private String channelCode;
 
     @Schema(description = "商户转账单编号", example = "17481")
-    private String merchantTransferId;
+    private String merchantOrderId;
 
     @Schema(description = "转账状态", example = "2")
     private Integer status;

@@ -141,7 +141,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
         PayTransferCreateReqDTO payTransferCreateReqDTO = new PayTransferCreateReqDTO()
                 .setAppKey(tradeOrderProperties.getPayAppKey())
                 .setChannelCode("wx_lite") // TODO @芋艿：【转账】这里要处理下；
-                .setMerchantTransferId(withdraw.getId().toString())
+                .setMerchantOrderId(withdraw.getId().toString())
                 .setPrice(withdraw.getPrice())
                 .setSubject("佣金提现")
                 .setUserAccount(socialUser.getOpenid()).setUserIp(getClientIP());
