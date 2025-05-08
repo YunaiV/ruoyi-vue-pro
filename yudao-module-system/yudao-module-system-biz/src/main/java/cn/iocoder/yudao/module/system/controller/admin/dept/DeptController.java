@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.system.controller.admin.dept;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptReqDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.*;
 import cn.iocoder.yudao.module.system.convert.dept.DeptConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
@@ -63,15 +65,16 @@ public class DeptController {
     @Operation(summary = "获取部门列表")
     @PreAuthorize("@ss.hasPermission('system:dept:query')")
     public CommonResult<List<DeptRespVO>> getDeptList(DeptListReqVO reqVO) {
-        List<DeptDO> list = deptService.getDeptList(reqVO);
-        return success(deptConvert.toRespVOs(deptConvert.toRespDTOs(list)));
+        List<DeptRespDTO> list = deptService.listDepts(deptConvert.toReqDTO(reqVO));
+        return success(deptConvert.toRespVOs(list));
     }
 
     @GetMapping(value = {"/list-all-simple", "/simple-list"})
     @Operation(summary = "获取部门精简信息列表", description = "只包含被开启的部门，主要用于前端的下拉选项")
     public CommonResult<List<DeptSimpleRespVO>> getSimpleDeptList() {
-        List<DeptDO> list = deptService.getDeptList(
-                new DeptListReqVO().setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        DeptReqDTO reqDTO = new DeptReqDTO();
+        reqDTO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        List<DeptRespDTO> list = deptService.listDepts(reqDTO);
         return success(deptConvert.toSimpleRespVOs(list));
     }
 

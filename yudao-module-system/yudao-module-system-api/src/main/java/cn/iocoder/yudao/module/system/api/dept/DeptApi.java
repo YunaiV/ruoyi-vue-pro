@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.api.dept;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptSaveReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 
@@ -24,6 +25,22 @@ public interface DeptApi {
      * @return 部门信息
      */
     DeptRespDTO getDept(Long id);
+
+    /**
+     * 获得部门信息
+     *
+     * @param externalId 外部ID
+     * @return 部门信息
+     */
+    DeptRespDTO getDeptByExternalId(String externalId);
+
+    /**
+     * 获得部门信息
+     *
+     * @param reqDTO reqDTO
+     * @return 部门信息
+     */
+    List<DeptRespDTO> listDepts(DeptReqDTO reqDTO);
 
     /**
      * 获得部门信息数组
@@ -68,15 +85,6 @@ public interface DeptApi {
     * @return 层级
     **/
     Integer getDeptLevel(Long id);
-
-
-    /**
-     * 根据部门id来获取该部门父亲部门的名称
-     *
-     * @Param 部门id
-     * @return 服部门名称
-     **/
-    String getParentNameById(Long id);
 
 
     /**

@@ -7,6 +7,8 @@ import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptReqDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptSaveReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptTreeRespVO;
@@ -185,18 +187,16 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
+    public List<DeptRespDTO> listDepts(DeptReqDTO reqDTO) {
+        return deptConvert.toRespDTOs(deptMapper.selectList(reqDTO));
+    }
+
+    @Override
     public List<DeptDO> getDeptList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
         return deptMapper.selectBatchIds(ids);
-    }
-
-    @Override
-    public List<DeptDO> getDeptList(DeptListReqVO reqVO) {
-        List<DeptDO> list = deptMapper.selectList(reqVO);
-        list.sort(Comparator.comparing(DeptDO::getSort));
-        return list;
     }
 
     @Override
@@ -256,20 +256,6 @@ public class DeptServiceImpl implements DeptService {
         // 校验自己存在
         validateDeptExists(id);
         return getParentList(new TreeSet<>(),id, 0).size();
-    }
-
-    @Override
-    public String getParentNameById(Long id) {
-        // 校验自己存在
-        validateDeptExists(id);
-        DeptDO deptDO = deptMapper.selectById(id);
-        Long parentId = deptDO.getParentId();
-        //校验是否已是顶级部门
-        ThrowUtil.ifThrow(DeptDO.PARENT_ID_ROOT.equals(parentId),DEPT_IS_TOP,deptDO.getName());
-        DeptDO parentDeptDO = deptMapper.selectById(parentId);
-        //校验父级部门是否存在
-        ThrowUtil.ifEmptyThrow(parentDeptDO,DEPT_PARENT_NOT_EXITS);
-        return parentDeptDO.getName();
     }
 
     @Override

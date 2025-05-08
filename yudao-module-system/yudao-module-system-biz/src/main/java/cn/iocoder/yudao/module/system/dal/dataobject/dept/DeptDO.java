@@ -62,5 +62,9 @@ public class DeptDO extends TenantBaseDO {
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
+    /**
+     * 外部ID
+     */
+    private String externalId;
 
 }

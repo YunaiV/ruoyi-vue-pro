@@ -50,4 +50,9 @@ public class DeptSaveReqDTO {
      * 状态
      **/
     private Integer status;
+
+    /**
+     * 外部ID
+     */
+    private String externalId;
 }

@@ -3,6 +3,8 @@ package com.somle.esb.converter;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptReqDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptSaveReqDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserReqDTO;
@@ -14,6 +16,8 @@ import com.somle.esb.service.EsbMappingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -79,23 +83,18 @@ public class DingTalkToErpConverter {
             erpDept.setParentId(0L);
         } else {
             try {
-                var mapping = mappingService.toMapping(dept);
-                mapping.setExternalId(dept.getParentId().toString());
-                mapping = mappingService.findMapping(mapping);
-                erpDept
-                    .setParentId(mapping.getInternalId());
+                var result = deptApi.getDeptByExternalId(dept.getParentId().toString());
+                erpDept.setParentId(result.getId());
             } catch (Exception e) {
-                throw new RuntimeException("parent mapping not found");
+                throw new RuntimeException("external id not found: " + dept.getParentId());
             }
         }
         // translate id
         try {
-            var mapping = mappingService.toMapping(dept);
-            mapping = mappingService.findMapping(mapping);
-            erpDept
-                .setId(mapping.getInternalId());
+            var result = deptApi.getDeptByExternalId(dept.getDeptId().toString());
+            erpDept.setId(result.getId());
         } catch (Exception e) {
-            log.debug("mapping not found");
+            log.debug("external id not found: " + dept.getDeptId());
         }
         //translate the rest
         erpDept

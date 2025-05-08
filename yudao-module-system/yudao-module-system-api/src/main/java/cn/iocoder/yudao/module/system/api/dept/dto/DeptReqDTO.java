@@ -9,7 +9,7 @@ import lombok.Data;
  * @author 芋道源码
  */
 @Data
-public class DeptRespDTO {
+public class DeptReqDTO {
 
     /**
      * 部门编号
@@ -19,24 +19,24 @@ public class DeptRespDTO {
      * 部门名称
      */
     private String name;
-    /**
-     * 父部门编号
-     */
-    private Long parentId;
-    /**
-     * 负责人的用户编号
-     */
-    private Long leaderUserId;
+//    /**
+//     * 父部门编号
+//     */
+//    private Long parentId;
+//    /**
+//     * 负责人的用户编号
+//     */
+//    private Long leaderUserId;
     /**
      * 部门状态
      *
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
-    /**
-     * 显示顺序
-     */
-    private Integer sort;
+//    /**
+//     * 显示顺序
+//     */
+//    private Integer sort;
     /**
      * 外部ID
      */

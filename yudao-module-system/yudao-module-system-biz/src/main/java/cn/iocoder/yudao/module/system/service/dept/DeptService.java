@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.system.service.dept;
 
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptReqDTO;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptSaveReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
@@ -51,18 +53,18 @@ public interface DeptService {
     /**
      * 获得部门信息数组
      *
+     * @param reqDTO reqDTO
+     * @return 部门信息数组
+     */
+    List<DeptRespDTO> listDepts(DeptReqDTO reqDTO);
+
+    /**
+     * 获得部门信息数组
+     *
      * @param ids 部门编号数组
      * @return 部门信息数组
      */
     List<DeptDO> getDeptList(Collection<Long> ids);
-
-    /**
-     * 筛选部门列表
-     *
-     * @param reqVO 筛选条件请求 VO
-     * @return 部门列表
-     */
-    List<DeptDO> getDeptList(DeptListReqVO reqVO);
 
     /**
      * 获得指定编号的部门 Map
@@ -125,14 +127,6 @@ public interface DeptService {
      * @return 级别
      */
     Integer getDeptLevel(Long id);
-
-    /**
-     * 获得指定部门
-     *
-     * @param id 部门编号
-     * @return 父级名称
-     */
-    String getParentNameById(Long id);
 
     /**
     * @Author Wqh
