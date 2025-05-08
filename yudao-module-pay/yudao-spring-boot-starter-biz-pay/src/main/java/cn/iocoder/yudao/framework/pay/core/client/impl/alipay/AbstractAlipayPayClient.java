@@ -81,24 +81,11 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
     @Override
     public PayOrderRespDTO doParseOrderNotify(Map<String, String> params, String body, Map<String, String> headers) throws Throwable {
         // 1. 校验回调数据
-        Map<String, String> bodyObj = HttpUtil.decodeParamMap(body, StandardCharsets.UTF_8);
-        boolean verify;
-        if (Objects.equals(config.getMode(), MODE_PUBLIC_KEY)) {
-            verify = AlipaySignature.rsaCheckV1(params, config.getAlipayPublicKey(),
-                    StandardCharsets.UTF_8.name(), config.getSignType());
-        } else if (Objects.equals(config.getMode(), MODE_CERTIFICATE)) {
-            // 由于 rsaCertCheckV1 的第二个参数是 path，所以不能这么调用！！！通过阅读源码，发现可以采用如下方式！
-            X509Certificate cert = AntCertificationUtil.getCertFromContent(config.getAlipayPublicCertContent());
-            String publicKey = Base64.encodeBase64String(cert.getEncoded());
-            verify = AlipaySignature.rsaCheckV1(bodyObj, publicKey,
-                    StandardCharsets.UTF_8.name(), config.getSignType());
-        } else {
-            throw new IllegalArgumentException("未知的公钥类型：" + config.getMode());
-        }
-        Assert.isTrue(verify, "验签结果不通过");
+        verifyNotifyData(params);
 
         // 2. 解析订单的状态
         // 额外说明：支付宝不仅仅支付成功会回调，再各种触发支付单数据变化时，都会进行回调，所以这里 status 的解析会写的比较复杂
+        Map<String, String> bodyObj = HttpUtil.decodeParamMap(body, StandardCharsets.UTF_8);
         Integer status = parseStatus(bodyObj.get("trade_status"));
         // 特殊逻辑: 支付宝没有退款成功的状态，所以，如果有退款金额，我们认为是退款成功
         if (MapUtil.getDouble(bodyObj, "refund_fee", 0D) > 0) {
@@ -324,10 +311,55 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
                 response.getOutBizNo(), response);
     }
 
-    // TODO @chihuo：这里是不是也要实现，支付宝的。
+    // TODO @芋艿：由于支付宝一直没触发回调，这个方法暂时没办法测试
     @Override
-    protected PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body, Map<String, String> headers) {
-        throw new UnsupportedOperationException("未实现");
+    protected PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body, Map<String, String> headers)
+            throws Throwable {
+        // 1. 校验回调数据
+        verifyNotifyData(params);
+
+        // 2. 解析转账状态
+        Map<String, String> bodyObj = HttpUtil.decodeParamMap(body, StandardCharsets.UTF_8);
+        String status = bodyObj.get("status");
+        String outBizNo = bodyObj.get("out_biz_no");
+        String orderId = bodyObj.get("order_id");
+        String payDate = bodyObj.get("pay_date");
+
+        // 3. 根据状态返回对应的结果
+        if (Objects.equals(status, "SUCCESS")) {
+            return PayTransferRespDTO.successOf(orderId, parseTime(payDate), outBizNo, bodyObj);
+        }
+        if (Objects.equals(status, "DEALING")) {
+            return PayTransferRespDTO.processingOf(orderId, outBizNo, bodyObj);
+        }
+        if (ObjectUtils.equalsAny(status, "REFUND", "FAIL")) {
+            return PayTransferRespDTO.closedOf(bodyObj.get("sub_code"), bodyObj.get("sub_msg"),
+                    outBizNo, bodyObj);
+        }
+        return PayTransferRespDTO.waitingOf(orderId, outBizNo, bodyObj);
+    }
+
+    /**
+     * 校验回调数据
+     *
+     * @param params 回调参数
+     * @throws Throwable 验签失败时抛出异常
+     */
+    protected void verifyNotifyData(Map<String, String> params) throws Throwable {
+        boolean verify;
+        if (Objects.equals(config.getMode(), MODE_PUBLIC_KEY)) {
+            verify = AlipaySignature.rsaCheckV1(params, config.getAlipayPublicKey(),
+                    StandardCharsets.UTF_8.name(), config.getSignType());
+        } else if (Objects.equals(config.getMode(), MODE_CERTIFICATE)) {
+            // 由于 rsaCertCheckV1 的第二个参数是 path，所以不能这么调用！！！通过阅读源码，发现可以采用如下方式！
+            X509Certificate cert = AntCertificationUtil.getCertFromContent(config.getAlipayPublicCertContent());
+            String publicKey = Base64.encodeBase64String(cert.getEncoded());
+            verify = AlipaySignature.rsaCheckV1(params, publicKey,
+                    StandardCharsets.UTF_8.name(), config.getSignType());
+        } else {
+            throw new IllegalArgumentException("未知的公钥类型：" + config.getMode());
+        }
+        Assert.isTrue(verify, "验签结果不通过");
     }
 
     // ========== 各种工具方法 ==========
