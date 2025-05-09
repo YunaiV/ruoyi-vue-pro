@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.system.api.dept.dto.DeptSaveReqDTO;
 import com.somle.dingtalk.model.DingTalkDepartment;
 import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.enums.TenantId;
-import com.somle.esb.service.EsbMappingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -29,7 +28,6 @@ public class DingtalkDepartmentHandler {
 
     private final DingTalkToErpConverter dingTalkToErpConverter;
     private final DeptApi deptApi;
-    private final EsbMappingService mappingService;
 
     @ServiceActivator(inputChannel = "dingtalkDepartmentOutputChannel")
     public void handle(@Payload DingTalkDepartment dingTalkDepartment) {

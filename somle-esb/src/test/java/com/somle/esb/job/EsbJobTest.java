@@ -22,7 +22,6 @@ import com.somle.esb.converter.EccangToErpConverter;
 import com.somle.esb.converter.ErpToEccangConverter;
 import com.somle.esb.converter.ErpToKingdeeConverter;
 import com.somle.esb.service.AliyunService;
-import com.somle.esb.service.EsbMappingService;
 import com.somle.esb.service.EsbService;
 import cn.iocoder.yudao.framework.test.core.ut.SomleBaseSpringTest;
 import com.somle.kingdee.service.KingdeeService;
@@ -41,7 +40,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Import({
     EsbService.class,
     AliyunService.class,
-//    EsbMappingService.class,
 //    ErpService.class,
 //    EccangService.class,
 //    DingTalkService.class,
@@ -118,8 +116,7 @@ class EsbJobTest extends SomleBaseSpringTest {
     ConfigApi configApi;
 
 
-    @MockBean
-    EsbMappingService esbMappingService;
+
     @MockBean
     DingTalkToErpConverter dingTalkToErpConverter;
     @MockBean

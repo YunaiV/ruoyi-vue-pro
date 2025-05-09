@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserSaveReqDTO;
 import com.dingtalk.api.response.OapiV2UserGetResponse;
 import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.enums.TenantId;
-import com.somle.esb.service.EsbMappingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -31,7 +30,6 @@ public class DingtalkUserHandler {
     public static final Long ADMIN_USER_ID = 50001L;
     private final DingTalkToErpConverter dingTalkToErpConverter;
     private final AdminUserApi adminUserApi;
-    private final EsbMappingService mappingService;
 
     @ServiceActivator(inputChannel = "dingtalkUserOutputChannel")
     public void syncUser(@Payload OapiV2UserGetResponse.UserGetResponse dingTalkUser) {

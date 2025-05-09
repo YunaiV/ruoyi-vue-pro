@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserSaveReqDTO;
 import com.dingtalk.api.response.OapiV2UserGetResponse;
 import com.somle.dingtalk.model.DingTalkDepartment;
 import com.somle.dingtalk.service.DingTalkService;
-import com.somle.esb.service.EsbMappingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,8 +26,7 @@ public class DingTalkToErpConverter {
     @Autowired
     private AdminUserApi adminUserApi;
 
-    @Autowired
-    EsbMappingService mappingService;
+
     private static final String CHINESE_CHAR_PATTERN = "[\\u4E00-\\u9FA5]+";
     private static final String ENGLISH_CHAR_PATTERN = "^[a-zA-Z\\s]+$";
 
@@ -106,14 +104,14 @@ public class DingTalkToErpConverter {
             var result = adminUserApi.getUserByExternalId(user.getUserid());
             erpUser.setId(result.getId());
         } catch (Exception e) {
-            log.debug("external id not found: " + user.getUserid());
+            log.debug("user external id not found: " + user.getUserid());
         }
         //try to translate dept id
         try {
             var erpDept = deptApi.getDeptByExternalId(user.getDeptIdList().get(0).toString());
             erpUser.setDeptId(erpDept.getId());
         } catch (Exception e) {
-            log.debug("dept mapping not found");
+            log.debug("dept external id not found: " + user.getDeptIdList().get(0));
         }
         //translate the rest
         erpUser
