@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.promotion.service.point;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
@@ -22,6 +23,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -65,7 +67,9 @@ public class PointActivityServiceImpl implements PointActivityService {
     public Long createPointActivity(PointActivitySaveReqVO createReqVO) {
         // 1.1 校验商品是否存在
         validateProductExists(createReqVO.getSpuId(), createReqVO.getProducts());
-        // 1.2 校验商品是否已经参加别的活动
+        // 1.2 填充spuId issue-801
+        ensureProductsWithSpuId(createReqVO.getSpuId(), createReqVO.getProducts());
+        // 1.3 校验商品是否已经参加别的活动
         validatePointActivityProductConflicts(null, createReqVO.getProducts());
 
         // 2.1 插入积分商城活动
@@ -89,7 +93,9 @@ public class PointActivityServiceImpl implements PointActivityService {
         }
         // 1.2 校验商品是否存在
         validateProductExists(updateReqVO.getSpuId(), updateReqVO.getProducts());
-        // 1.3 校验商品是否已经参加别的活动
+        // 1.3 填充spuId issue-801
+        ensureProductsWithSpuId(updateReqVO.getSpuId(), updateReqVO.getProducts());
+        // 1.4 校验商品是否已经参加别的活动
         validatePointActivityProductConflicts(updateReqVO.getId(), updateReqVO.getProducts());
 
         // 2.1 更新积分商城活动
@@ -306,4 +312,22 @@ public class PointActivityServiceImpl implements PointActivityService {
         return BeanUtils.toBean(product, PointValidateJoinRespDTO.class);
     }
 
+    /**
+     * 确保产品列表中所有项都有有效的spuId
+     *
+     * @param spuId 默认的spuId，当产品的spuId为空时使用
+     * @param products 需要验证的产品列表
+     */
+    private void ensureProductsWithSpuId( Long spuId, List<PointProductSaveReqVO> products) {
+        if (CollectionUtils.isAnyEmpty(products)) {
+            return;
+        }
+
+        // 直接设置缺失的spuId
+        products.forEach(product -> {
+            if (product.getSpuId() == null) {
+                product.setSpuId(spuId);
+            }
+        });
+    }
 }
