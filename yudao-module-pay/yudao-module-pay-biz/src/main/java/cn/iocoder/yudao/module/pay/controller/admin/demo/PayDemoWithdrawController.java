@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.withdraw.PayDemoWith
 import cn.iocoder.yudao.module.pay.dal.dataobject.demo.PayDemoWithdrawDO;
 import cn.iocoder.yudao.module.pay.service.demo.PayDemoWithdrawService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.PermitAll;
@@ -30,14 +31,22 @@ public class PayDemoWithdrawController {
 
     @PostMapping("/create")
     @Operation(summary = "创建示例提现单")
-    public CommonResult<Long> createDemoTransfer(@Valid @RequestBody PayDemoWithdrawCreateReqVO createReqVO) {
+    public CommonResult<Long> createDemoWithdraw(@Valid @RequestBody PayDemoWithdrawCreateReqVO createReqVO) {
         Long id = demoWithdrawService.createDemoWithdraw(createReqVO);
         return success(id);
     }
 
+    @PostMapping("/transfer")
+    @Operation(summary = "提现单转账")
+    @Parameter(name = "id", required = true, description = "提现单编号", example = "1024")
+    public CommonResult<Long> transferDemoWithdraw(@RequestParam("id") Long id) {
+        Long payTransferId = demoWithdrawService.transferDemoWithdraw(id);
+        return success(payTransferId);
+    }
+
     @GetMapping("/page")
     @Operation(summary = "获得示例提现单分页")
-    public CommonResult<PageResult<PayDemoWithdrawRespVO>> getDemoTransferPage(@Valid PageParam pageVO) {
+    public CommonResult<PageResult<PayDemoWithdrawRespVO>> getDemoWithdrawPage(@Valid PageParam pageVO) {
         PageResult<PayDemoWithdrawDO> pageResult = demoWithdrawService.getDemoWithdrawPage(pageVO);
         return success(BeanUtils.toBean(pageResult, PayDemoWithdrawRespVO.class));
     }
@@ -45,7 +54,7 @@ public class PayDemoWithdrawController {
     @PostMapping("/update-status")
     @Operation(summary = "更新示例提现单的转账状态") // 由 pay-module 转账服务，进行回调
     @PermitAll // 无需登录，安全由 PayDemoTransferService 内部校验实现
-    public CommonResult<Boolean> updateDemoTransferStatus(@RequestBody PayTransferNotifyReqDTO notifyReqDTO) {
+    public CommonResult<Boolean> updateDemoWithdrawStatus(@RequestBody PayTransferNotifyReqDTO notifyReqDTO) {
         demoWithdrawService.updateDemoWithdrawStatus(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
                 notifyReqDTO.getPayTransferId());
         return success(true);

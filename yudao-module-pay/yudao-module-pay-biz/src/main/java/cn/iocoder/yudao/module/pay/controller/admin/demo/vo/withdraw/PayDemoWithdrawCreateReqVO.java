@@ -1,12 +1,10 @@
 package cn.iocoder.yudao.module.pay.controller.admin.demo.vo.withdraw;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.pay.enums.demo.PayDemoWithdrawTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Schema(description = "管理后台 - 示例提现单创建 Request VO")
@@ -33,5 +31,12 @@ public class PayDemoWithdrawCreateReqVO {
     @NotNull(message = "提现方式不能为空")
     @InEnum(PayDemoWithdrawTypeEnum.class)
     private Integer type;
+
+    @AssertTrue(message = "收款人姓名")
+    public boolean isUserNameValid() {
+        // 特殊：支付宝必须填写用户名！！！
+        return ObjectUtil.notEqual(type, PayDemoWithdrawTypeEnum.ALIPAY.getType())
+                || ObjectUtil.isNotEmpty(userName);
+    }
 
 }

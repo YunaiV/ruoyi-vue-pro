@@ -52,5 +52,15 @@ public class PayTransferRespDTO {
      */
     private LocalDateTime successTime;
 
+    // ========== 其它字段 ==========
+
+    /**
+     * 调用渠道的错误码
+     */
+    private String channelErrorCode;
+    /**
+     * 调用渠道的错误提示
+     */
+    private String channelErrorMsg;
 
 }

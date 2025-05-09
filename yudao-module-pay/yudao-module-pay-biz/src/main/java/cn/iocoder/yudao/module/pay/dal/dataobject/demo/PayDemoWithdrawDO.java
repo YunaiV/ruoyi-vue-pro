@@ -76,5 +76,9 @@ public class PayDemoWithdrawDO extends BaseDO {
      * 转账成功时间
      */
     private LocalDateTime transferTime;
+    /**
+     * 转账错误提示
+     */
+    private String transferErrorMsg;
 
 }

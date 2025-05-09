@@ -75,7 +75,7 @@ public class PayTransferServiceImpl implements PayTransferService {
         // 1.3 校验转账单已经发起过转账
         PayTransferDO transfer = validateTransferCanCreate(reqDTO, payApp.getId());
 
-        // 2. 不存在创建转账单，否则允许使用相同的 no 再次发起转账
+        // 2.1 情况一：不存在创建转账单，则进行创建
         if (transfer == null) {
             String no = noRedisDAO.generate(TRANSFER_NO_PREFIX);
             transfer = BeanUtils.toBean(reqDTO, PayTransferDO.class)
@@ -83,6 +83,10 @@ public class PayTransferServiceImpl implements PayTransferService {
                     .setNo(no).setStatus(PayTransferStatusEnum.WAITING.getStatus())
                     .setNotifyUrl(payApp.getTransferNotifyUrl());
             transferMapper.insert(transfer);
+        } else {
+            // 2.2 情况二：存在创建转账单，但是状态为关闭，则更新为等待中
+            transferMapper.updateByIdAndStatus(transfer.getId(), transfer.getStatus(),
+                    new PayTransferDO().setStatus(PayTransferStatusEnum.WAITING.getStatus()));
         }
         try {
             // 3. 调用三方渠道发起转账
@@ -114,9 +118,9 @@ public class PayTransferServiceImpl implements PayTransferService {
     private PayTransferDO validateTransferCanCreate(PayTransferCreateReqDTO reqDTO, Long appId) {
         PayTransferDO transfer = transferMapper.selectByAppIdAndMerchantOrderId(appId, reqDTO.getMerchantOrderId());
         if (transfer != null) {
-            // 已经存在，并且状态不为等待状态：说明已经调用渠道转账并返回结果
-            if (!PayTransferStatusEnum.isWaiting(transfer.getStatus())) {
-                throw exception(PAY_TRANSFER_CREATE_MERCHANT_EXISTS);
+            // 只有转账单状态为关闭，才能再次发起转账
+            if (!PayTransferStatusEnum.isClosed(transfer.getStatus())) {
+                throw exception(PAY_TRANSFER_CREATE_FAIL_STATUS_NOT_CLOSED);
             }
             // 校验参数是否一致
             if (ObjectUtil.notEqual(reqDTO.getPrice(), transfer.getPrice())) {
@@ -160,7 +164,7 @@ public class PayTransferServiceImpl implements PayTransferService {
             return;
         }
         if (!PayTransferStatusEnum.isWaiting(transfer.getStatus())) {
-            throw exception(PAY_TRANSFER_STATUS_IS_NOT_WAITING);
+            throw exception(PAY_TRANSFER_NOTIFY_FAIL_STATUS_IS_NOT_WAITING);
         }
 
         // 2. 更新状态
@@ -168,7 +172,7 @@ public class PayTransferServiceImpl implements PayTransferService {
                 PayTransferStatusEnum.WAITING.getStatus(),
                 new PayTransferDO().setStatus(PayTransferStatusEnum.PROCESSING.getStatus()));
         if (updateCounts == 0) {
-            throw exception(PAY_TRANSFER_STATUS_IS_NOT_WAITING);
+            throw exception(PAY_TRANSFER_NOTIFY_FAIL_STATUS_IS_NOT_WAITING);
         }
         log.info("[notifyTransferProgressing][transfer({}) 更新为转账进行中状态]", transfer.getId());
     }
@@ -184,7 +188,7 @@ public class PayTransferServiceImpl implements PayTransferService {
             return;
         }
         if (!PayTransferStatusEnum.isWaitingOrProcessing(transfer.getStatus())) {
-            throw exception(PAY_TRANSFER_STATUS_IS_NOT_WAITING_OR_PROCESSING);
+            throw exception(PAY_TRANSFER_NOTIFY_FAIL_STATUS_NOT_WAITING_OR_PROCESSING);
         }
 
         // 2. 更新状态
@@ -195,7 +199,7 @@ public class PayTransferServiceImpl implements PayTransferService {
                         .setChannelTransferNo(notify.getChannelTransferNo())
                         .setChannelNotifyData(JsonUtils.toJsonString(notify)));
         if (updateCounts == 0) {
-            throw exception(PAY_TRANSFER_STATUS_IS_NOT_WAITING_OR_PROCESSING);
+            throw exception(PAY_TRANSFER_NOTIFY_FAIL_STATUS_NOT_WAITING_OR_PROCESSING);
         }
         log.info("[notifyTransferSuccess][transfer({}) 更新为已转账]", transfer.getId());
 
@@ -214,7 +218,7 @@ public class PayTransferServiceImpl implements PayTransferService {
             return;
         }
         if (!PayTransferStatusEnum.isWaitingOrProcessing(transfer.getStatus())) {
-            throw exception(PAY_TRANSFER_STATUS_IS_NOT_WAITING_OR_PROCESSING);
+            throw exception(PAY_TRANSFER_NOTIFY_FAIL_STATUS_NOT_WAITING_OR_PROCESSING);
         }
 
         // 2. 更新状态
@@ -225,7 +229,7 @@ public class PayTransferServiceImpl implements PayTransferService {
                         .setChannelNotifyData(JsonUtils.toJsonString(notify))
                         .setChannelErrorCode(notify.getChannelErrorCode()).setChannelErrorMsg(notify.getChannelErrorMsg()));
         if (updateCount == 0) {
-            throw exception(PAY_TRANSFER_STATUS_IS_NOT_WAITING_OR_PROCESSING);
+            throw exception(PAY_TRANSFER_NOTIFY_FAIL_STATUS_NOT_WAITING_OR_PROCESSING);
         }
         log.info("[notifyTransferClosed][transfer({}) 更新为关闭状态]", transfer.getId());
 

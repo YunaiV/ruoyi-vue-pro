@@ -15,10 +15,10 @@ public interface PayDemoWithdrawMapper extends BaseMapperX<PayDemoWithdrawDO> {
                 .orderByDesc(PayDemoWithdrawDO::getId));
     }
 
-    default int updateByIdAndStatus(Long id, Integer status, PayDemoWithdrawDO updateObj) {
+    default int updateByIdAndStatus(Long id, Integer whereStatus, PayDemoWithdrawDO updateObj) {
         return update(updateObj, new LambdaQueryWrapperX<PayDemoWithdrawDO>()
                 .eq(PayDemoWithdrawDO::getId, id)
-                .eq(PayDemoWithdrawDO::getStatus, status));
+                .eq(PayDemoWithdrawDO::getStatus, whereStatus));
     }
 
 }

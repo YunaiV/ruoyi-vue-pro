@@ -23,6 +23,14 @@ public interface PayDemoWithdrawService {
     Long createDemoWithdraw(@Valid PayDemoWithdrawCreateReqVO createReqVO);
 
     /**
+     * 提现单转账
+     *
+     * @param id 提现单编号
+     * @return 转账编号
+     */
+    Long transferDemoWithdraw(Long id);
+
+    /**
      * 获得示例提现单分页
      *
      * @param pageVO 分页查询参数

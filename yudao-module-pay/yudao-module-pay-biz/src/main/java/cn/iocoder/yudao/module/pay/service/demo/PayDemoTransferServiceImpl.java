@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.pay.service.demo;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -50,27 +51,58 @@ public class PayDemoTransferServiceImpl implements PayDemoWithdrawService {
 
     @Override
     public Long createDemoWithdraw(@Valid PayDemoWithdrawCreateReqVO reqVO) {
-        // 1. 保存示例提现单
         PayDemoWithdrawDO withdraw = BeanUtils.toBean(reqVO, PayDemoWithdrawDO.class)
                 .setTransferChannelCode(getTransferChannelCode(reqVO.getType()))
-                .setStatus(PayTransferStatusEnum.WAITING.getStatus());
+                .setStatus(PayDemoWithdrawStatusEnum.WAITING.getStatus());
         demoTransferMapper.insert(withdraw);
+        return withdraw.getId();
+    }
+
+    @Override
+    public Long transferDemoWithdraw(Long id) {
+        // 1.1 校验提现单
+        PayDemoWithdrawDO withdraw = validateDemoWithdrawCanTransfer(id);
+        // 1.2 特殊：如果是转账失败的情况，需要充值下
+        if (PayDemoWithdrawStatusEnum.isClosed(withdraw.getStatus())) {
+            int updateCount = demoTransferMapper.updateByIdAndStatus(withdraw.getId(), withdraw.getStatus(),
+                    new PayDemoWithdrawDO().setStatus(PayDemoWithdrawStatusEnum.WAITING.getStatus()).setTransferErrorMsg(""));
+            if (updateCount == 0) {
+                throw exception(DEMO_WITHDRAW_TRANSFER_FAIL_STATUS_NOT_WAITING_OR_CLOSED);
+            }
+            withdraw.setStatus(PayDemoWithdrawStatusEnum.WAITING.getStatus());
+        }
 
         // 2.1 创建支付单
         PayTransferCreateReqDTO transferReqDTO = new PayTransferCreateReqDTO()
                 .setAppKey(PAY_APP_KEY).setChannelCode(withdraw.getTransferChannelCode()).setUserIp(getClientIP()) // 支付应用
                 .setMerchantOrderId(String.valueOf(withdraw.getId())) // 业务的订单编号
-                .setSubject(reqVO.getSubject()).setPrice(withdraw.getPrice()) // 价格信息
-                .setUserAccount(reqVO.getUserAccount()).setUserName(reqVO.getUserName()); // 收款信息
-        if (ObjectUtil.equal(reqVO.getType(), PayDemoWithdrawTypeEnum.WECHAT.getType())) {
+                .setSubject(withdraw.getSubject()).setPrice(withdraw.getPrice()) // 价格信息
+                .setUserAccount(withdraw.getUserAccount()).setUserName(withdraw.getUserName()); // 收款信息
+        if (ObjectUtil.equal(withdraw.getType(), PayDemoWithdrawTypeEnum.WECHAT.getType())) {
+            // 注意：微信很特殊！提现需要写明用途！！！
             transferReqDTO.setChannelExtras(PayTransferCreateReqDTO.buildWeiXinChannelExtra1000(
                     "测试活动", "测试奖励"));
         }
         Long payTransferId = payTransferApi.createTransfer(transferReqDTO);
-        // 2.2 更新转账单到 demo 示例提现单
-        demoTransferMapper.updateById(new PayDemoWithdrawDO().setId(withdraw.getId())
-               .setPayTransferId(payTransferId));
-        return withdraw.getId();
+
+        // 2.2 更新转账单到 demo 示例提现单，并将状态更新为转账中
+        demoTransferMapper.updateByIdAndStatus(withdraw.getId(), withdraw.getStatus(),
+                new PayDemoWithdrawDO().setPayTransferId(payTransferId));
+        return payTransferId;
+    }
+
+    private PayDemoWithdrawDO validateDemoWithdrawCanTransfer(Long id) {
+        // 校验存在
+        PayDemoWithdrawDO withdraw = demoTransferMapper.selectById(id);
+        if (withdraw == null) {
+            throw exception(DEMO_WITHDRAW_NOT_FOUND);
+        }
+        // 校验状态，只有等待中或转账失败的订单，才能发起转账
+        if (!PayDemoWithdrawStatusEnum.isWaiting(withdraw.getStatus())
+            && !PayDemoWithdrawStatusEnum.isClosed(withdraw.getStatus())) {
+            throw exception(DEMO_WITHDRAW_TRANSFER_FAIL_STATUS_NOT_WAITING_OR_CLOSED);
+        }
+        return withdraw;
     }
 
     private String getTransferChannelCode(Integer type) {
@@ -116,10 +148,12 @@ public class PayDemoTransferServiceImpl implements PayDemoWithdrawService {
         PayTransferRespDTO payTransfer = validateDemoTransferStatusCanUpdate(withdraw, payTransferId);
 
         // 3. 更新示例订单状态
-        demoTransferMapper.updateById(new PayDemoWithdrawDO().setId(id)
-                .setPayTransferId(payTransferId)
-                .setStatus(payTransfer.getStatus())
-                .setTransferTime(payTransfer.getSuccessTime()));
+        Integer newStatus = PayTransferStatusEnum.isSuccess(payTransfer.getStatus()) ? PayDemoWithdrawStatusEnum.SUCCESS.getStatus() :
+                PayTransferStatusEnum.isClosed(payTransfer.getStatus()) ? PayDemoWithdrawStatusEnum.CLOSED.getStatus() : null;
+        Assert.notNull(newStatus, "转账单状态({}) 不合法", payTransfer.getStatus());
+        demoTransferMapper.updateByIdAndStatus(withdraw.getId(), withdraw.getStatus(),
+                new PayDemoWithdrawDO().setStatus(newStatus).setTransferTime(payTransfer.getSuccessTime())
+                        .setTransferErrorMsg(payTransfer.getChannelErrorMsg()));
     }
 
     private PayTransferRespDTO validateDemoTransferStatusCanUpdate(PayDemoWithdrawDO withdraw, Long payTransferId) {

@@ -1,4 +1,4 @@
-### 请求 /pay/pay/demo-order 接口（支付宝） => 成功
+### 请求 /pay/demo-withdraw/create 接口（支付宝） => 成功
 POST {{baseUrl}}/pay/demo-withdraw/create
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -12,7 +12,7 @@ tenant-id: {{adminTenantId}}
   "userName": "oespxk7368"
 }
 
-### 请求 /pay/pay/demo-order 接口（微信余额） => 成功
+### 请求 /pay/demo-withdraw/create 接口（微信余额） => 成功
 POST {{baseUrl}}/pay/demo-withdraw/create
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -26,7 +26,7 @@ tenant-id: {{adminTenantId}}
   "userName": "芋艿"
 }
 
-### 请求 /pay/pay/demo-order 接口（钱包余额） => 成功
+### 请求 /pay/demo-withdraw/create 接口（钱包余额） => 成功
 POST {{baseUrl}}/pay/demo-withdraw/create
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -38,3 +38,13 @@ tenant-id: {{adminTenantId}}
   "price": 1,
   "userAccount": "1"
 }
+
+### 请求 /pay/demo-withdraw/transfer 接口（发起转账） => 成功
+POST {{baseUrl}}/pay/demo-withdraw/transfer?id=1
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}
+
+### 请求 /pay/demo-withdraw/page 接口（查询分页） => 成功
+GET {{baseUrl}}/pay/demo-withdraw/page?pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}

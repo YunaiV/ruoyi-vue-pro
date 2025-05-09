@@ -35,10 +35,13 @@ public class PayDemoWithdrawRespVO {
     @Schema(description = "转账单编号", example = "23695")
     private Long payTransferId;
 
-    @Schema(description = "转账渠道")
+    @Schema(description = "转账渠道", example = "wx_lite")
     private String transferChannelCode;
 
     @Schema(description = "转账成功时间")
     private LocalDateTime transferTime;
+
+    @Schema(description = "转账失败原因", example = "IP 不正确")
+    private String transferErrorMsg;
 
 }
