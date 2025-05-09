@@ -37,17 +37,13 @@ public class DingtalkDepartmentHandler {
         // 同步到系统
         try {
             TenantContextHolder.setTenantId(TenantId.DEFAULT.getId());
-            DeptSaveReqDTO erpDepartment = dingTalkToErpConverter.toErp(dingTalkDepartment);
+            DeptSaveReqDTO erpDepartment = dingTalkToErpConverter.toSaveReq(dingTalkDepartment);
             log.info("dept to add " + erpDepartment);
             Long deptId = erpDepartment.getId();
             if (deptId != null) {
                 deptApi.updateDept(erpDepartment);
             } else {
-                deptId = deptApi.createDept(erpDepartment);
-                var mapping = mappingService.toMapping(dingTalkDepartment);
-                mapping
-                    .setInternalId(deptId);
-                mappingService.save(mapping);
+                deptApi.createDept(erpDepartment);
             }
         } finally {
             TenantContextHolder.clear();

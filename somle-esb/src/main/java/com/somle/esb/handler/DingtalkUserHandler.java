@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserReqDTO;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserSaveReqDTO;
 import com.dingtalk.api.response.OapiV2UserGetResponse;
 import com.somle.esb.converter.DingTalkToErpConverter;
 import com.somle.esb.enums.TenantId;
@@ -44,20 +44,12 @@ public class DingtalkUserHandler {
         try {
             TenantContextHolder.setTenantId(TenantId.DEFAULT.getId());
             log.info("begin syncing: " + dingTalkUser.toString());
-            AdminUserReqDTO erpUser = dingTalkToErpConverter.toErp(dingTalkUser);
+            AdminUserSaveReqDTO erpUser = dingTalkToErpConverter.toSaveReq(dingTalkUser);
             log.info("user to add " + erpUser);
-            //获取钉钉中的昵称
-            String nickname = erpUser.getNickname();
-            //根据昵称自动生成用户名
-            erpUser.setUsername(dingTalkToErpConverter.generateUserName(nickname));
             if (erpUser.getId() != null) {
                 adminUserApi.updateUser(erpUser);
             } else {
-                Long userId = adminUserApi.createUser(erpUser);
-                var mapping = mappingService.toMapping(dingTalkUser);
-                mapping
-                    .setInternalId(userId);
-                mappingService.save(mapping);
+                adminUserApi.createUser(erpUser);
             }
         } finally {
             TenantContextHolder.clear();

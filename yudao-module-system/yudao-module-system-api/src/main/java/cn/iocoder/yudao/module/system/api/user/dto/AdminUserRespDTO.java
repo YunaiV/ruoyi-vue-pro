@@ -56,5 +56,8 @@ public class AdminUserRespDTO {
      * 用户头像
      */
     private String avatar;
-
+    /**
+     * 外部id
+     */
+    private String externalId;
 }

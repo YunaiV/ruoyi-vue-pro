@@ -265,6 +265,11 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
+    public AdminUserDO getUserByExternalId(String externalId) {
+        return userMapper.selectByExternalId(externalId);
+    }
+
+    @Override
     public AdminUserDO getUserByUsername(String username) {
         return userMapper.selectByUsername(username);
     }
@@ -370,6 +375,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             validateMobileUnique(id, mobile);
             // 校验邮箱唯一
             validateEmailUnique(id, email);
+            // TODO:校验外部ID唯一
             // 校验部门处于开启状态
             deptService.validateDeptList(CollectionUtils.singleton(deptId));
             // 校验岗位处于开启状态

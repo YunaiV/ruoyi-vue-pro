@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserReqDTO;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserSaveReqDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
@@ -36,6 +36,13 @@ public class AdminUserApiImpl implements AdminUserApi {
         AdminUserDO user = userService.getUser(id);
         return BeanUtils.toBean(user, AdminUserRespDTO.class);
     }
+
+    @Override
+    public AdminUserRespDTO getUserByExternalId(String externalId) {
+        AdminUserDO user = userService.getUserByExternalId(externalId);
+        return BeanUtils.toBean(user, AdminUserRespDTO.class);
+    }
+
     @Override
     public List<AdminUserRespDTO> getUserListBySubordinate(Long id) {
         // 1.1 获取用户负责的部门
@@ -91,13 +98,13 @@ public class AdminUserApiImpl implements AdminUserApi {
     }
 
     @Override
-    public void updateUser(AdminUserReqDTO erpUser) {
+    public void updateUser(AdminUserSaveReqDTO erpUser) {
         UserSaveReqVO saveReqVO = BeanUtils.toBean(erpUser, UserSaveReqVO.class);
         userService.updateUser(saveReqVO);
     }
 
     @Override
-    public Long createUser(AdminUserReqDTO erpUser) {
+    public Long createUser(AdminUserSaveReqDTO erpUser) {
         UserSaveReqVO saveReqVO = BeanUtils.toBean(erpUser, UserSaveReqVO.class);
         return userService.createUser(saveReqVO);
     }

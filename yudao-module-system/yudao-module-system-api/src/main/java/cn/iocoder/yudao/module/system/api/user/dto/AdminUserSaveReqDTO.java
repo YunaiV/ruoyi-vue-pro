@@ -5,14 +5,14 @@ import lombok.Data;
 import java.util.Set;
 
 /**
- * @className: AdminUserReqDTO
+ * @className: AdminUserSaveReqDTO
  * @author: Wqh
  * @date: 2024/11/4 14:45
  * @Version: 1.0
  * @description:
  */
 @Data
-public class AdminUserReqDTO {
+public class AdminUserSaveReqDTO {
     //id
     private Long id;
 
@@ -45,4 +45,7 @@ public class AdminUserReqDTO {
 
     //密码
     private String password;
+
+    //外部id
+    private String externalId;
 }

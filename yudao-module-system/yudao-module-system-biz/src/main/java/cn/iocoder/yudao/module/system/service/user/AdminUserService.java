@@ -105,6 +105,14 @@ public interface AdminUserService {
     void deleteUser(Long id);
 
     /**
+     * 通过外部ID查询用户
+     *
+     * @param externalId 外部id
+     * @return 用户对象信息
+     */
+    AdminUserDO getUserByExternalId(String externalId);
+
+    /**
      * 通过用户名查询用户
      *
      * @param username 用户名

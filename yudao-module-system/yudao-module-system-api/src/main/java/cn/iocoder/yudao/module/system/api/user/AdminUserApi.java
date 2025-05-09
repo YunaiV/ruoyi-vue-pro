@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.api.user;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserReqDTO;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserSaveReqDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 
 import java.util.*;
@@ -27,6 +27,14 @@ public interface AdminUserApi {
      * @return 用户对象信息
      */
     AdminUserRespDTO getUser(Long id);
+
+    /**
+     * 通过用户 ID 查询用户
+     *
+     * @param externalId 外部ID
+     * @return 用户对象信息
+     */
+    AdminUserRespDTO getUserByExternalId(String externalId);
 
     /**
      * 通过用户 ID 查询用户下属
@@ -97,7 +105,7 @@ public interface AdminUserApi {
     * @Date 14:52 2024/11/4
     * @Param [erpUser]
      **/
-    void updateUser(AdminUserReqDTO erpUser);
+    void updateUser(AdminUserSaveReqDTO erpUser);
 
     /**
     * @Author Wqh
@@ -106,7 +114,7 @@ public interface AdminUserApi {
     * @Param [erpUser]
     * @return java.lang.Long
     **/
-    Long createUser(AdminUserReqDTO erpUser);
+    Long createUser(AdminUserSaveReqDTO erpUser);
 
     /**
     * @Author Wqh

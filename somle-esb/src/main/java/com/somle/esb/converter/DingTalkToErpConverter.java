@@ -3,21 +3,16 @@ package com.somle.esb.converter;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptReqDTO;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptSaveReqDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserReqDTO;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserSaveReqDTO;
 import com.dingtalk.api.response.OapiV2UserGetResponse;
 import com.somle.dingtalk.model.DingTalkDepartment;
 import com.somle.dingtalk.service.DingTalkService;
-import com.somle.esb.model.EsbMapping;
 import com.somle.esb.service.EsbMappingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -76,7 +71,7 @@ public class DingTalkToErpConverter {
 //        ));
 //    }
 
-    public DeptSaveReqDTO toErp(DingTalkDepartment dept) {
+    public DeptSaveReqDTO toSaveReq(DingTalkDepartment dept) {
         DeptSaveReqDTO erpDept = new DeptSaveReqDTO();
         // translate parent id
         if (dept.getDeptId() == 1L) {
@@ -104,33 +99,25 @@ public class DingTalkToErpConverter {
         return erpDept;
     }
 
-    public AdminUserReqDTO toErp(OapiV2UserGetResponse.UserGetResponse user) {
-        AdminUserReqDTO erpUser = new AdminUserReqDTO();
+    public AdminUserSaveReqDTO toSaveReq(OapiV2UserGetResponse.UserGetResponse user) {
+        AdminUserSaveReqDTO erpUser = new AdminUserSaveReqDTO();
         //try to translate id
         try {
-            var mapping = mappingService.toMapping(user);
-            mapping = mappingService.findMapping(mapping);
-            erpUser
-                .setId(mapping.getInternalId());
+            var result = adminUserApi.getUserByExternalId(user.getUserid());
+            erpUser.setId(result.getId());
         } catch (Exception e) {
-            log.debug("user mapping not found");
+            log.debug("external id not found: " + user.getUserid());
         }
         //try to translate dept id
         try {
-            var mapping = new EsbMapping();
-            mapping
-                .setType("department")
-                .setDomain("dingtalk")
-                .setExternalId(user.getDeptIdList().get(0).toString());
-            mapping = mappingService.findMapping(mapping);
-            erpUser
-                .setDeptId(mapping.getInternalId());
+            var erpDept = deptApi.getDeptByExternalId(user.getDeptIdList().get(0).toString());
+            erpUser.setDeptId(erpDept.getId());
         } catch (Exception e) {
             log.debug("dept mapping not found");
         }
         //translate the rest
         erpUser
-            .setUsername(null)
+            .setUsername(generateUserName(user.getName()))
             .setMobile(user.getMobile())
             .setEmail(user.getEmail())
             .setNickname(user.getName())
