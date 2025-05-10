@@ -75,7 +75,7 @@ public class PayDemoTransferServiceImpl implements PayDemoWithdrawService {
         // 2.1 创建支付单
         PayTransferCreateReqDTO transferReqDTO = new PayTransferCreateReqDTO()
                 .setAppKey(PAY_APP_KEY).setChannelCode(withdraw.getTransferChannelCode()).setUserIp(getClientIP()) // 支付应用
-                .setMerchantOrderId(String.valueOf(withdraw.getId())) // 业务的订单编号
+                .setMerchantTransferId(String.valueOf(withdraw.getId())) // 业务的订单编号
                 .setSubject(withdraw.getSubject()).setPrice(withdraw.getPrice()) // 价格信息
                 .setUserAccount(withdraw.getUserAccount()).setUserName(withdraw.getUserName()); // 收款信息
         if (ObjectUtil.equal(withdraw.getType(), PayDemoWithdrawTypeEnum.WECHAT.getType())) {
@@ -177,7 +177,7 @@ public class PayDemoTransferServiceImpl implements PayDemoWithdrawService {
             throw exception(DEMO_WITHDRAW_UPDATE_STATUS_FAIL_PAY_PRICE_NOT_MATCH);
         }
         // 2.3 校验转账订单匹配（二次）
-        if (ObjectUtil.notEqual(payTransfer.getMerchantOrderId(), withdraw.getId().toString())) {
+        if (ObjectUtil.notEqual(payTransfer.getMerchantTransferId(), withdraw.getId().toString())) {
             log.error("[validateDemoTransferStatusCanUpdate][withdraw({}) 转账单不匹配({})，请进行处理！payTransfer 数据是：{}]",
                     withdraw.getId(), payTransferId, JsonUtils.toJsonString(payTransfer));
             throw exception(DEMO_WITHDRAW_UPDATE_STATUS_FAIL_PAY_MERCHANT_EXISTS);

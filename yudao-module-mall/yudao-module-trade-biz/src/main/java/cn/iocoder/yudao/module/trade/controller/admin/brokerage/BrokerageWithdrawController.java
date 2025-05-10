@@ -88,7 +88,7 @@ public class BrokerageWithdrawController {
     public CommonResult<Boolean> updateBrokerageWithdrawTransferred(@RequestBody PayTransferNotifyReqDTO notifyReqDTO) {
         log.info("[updateAfterRefund][notifyReqDTO({})]", notifyReqDTO);
         brokerageWithdrawService.updateBrokerageWithdrawTransferred(
-                Long.parseLong(notifyReqDTO.getMerchantOrderId()), notifyReqDTO.getPayTransferId());
+                Long.parseLong(notifyReqDTO.getMerchantTransferId()), notifyReqDTO.getPayTransferId());
         return success(true);
     }
 

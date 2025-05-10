@@ -116,7 +116,7 @@ public class PayTransferServiceImpl implements PayTransferService {
     }
 
     private PayTransferDO validateTransferCanCreate(PayTransferCreateReqDTO reqDTO, Long appId) {
-        PayTransferDO transfer = transferMapper.selectByAppIdAndMerchantOrderId(appId, reqDTO.getMerchantOrderId());
+        PayTransferDO transfer = transferMapper.selectByAppIdAndMerchantOrderId(appId, reqDTO.getMerchantTransferId());
         if (transfer != null) {
             // 只有转账单状态为关闭，才能再次发起转账
             if (!PayTransferStatusEnum.isClosed(transfer.getStatus())) {

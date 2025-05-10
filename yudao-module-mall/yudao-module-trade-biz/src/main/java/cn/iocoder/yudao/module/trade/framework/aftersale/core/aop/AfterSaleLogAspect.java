@@ -1,18 +1,20 @@
 package cn.iocoder.yudao.module.trade.framework.aftersale.core.aop;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.trade.dal.dataobject.order.TradeOrderLogDO;
+import cn.iocoder.yudao.module.trade.enums.aftersale.AfterSaleOperateTypeEnum;
 import cn.iocoder.yudao.module.trade.framework.aftersale.core.annotations.AfterSaleLog;
 import cn.iocoder.yudao.module.trade.service.aftersale.AfterSaleLogService;
 import cn.iocoder.yudao.module.trade.service.aftersale.bo.AfterSaleLogCreateReqBO;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 
-import jakarta.annotation.Resource;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
@@ -51,6 +53,10 @@ public class AfterSaleLogAspect {
      */
     private static final ThreadLocal<Integer> AFTER_STATUS = new ThreadLocal<>();
     /**
+     * 操作类型（仅“动态场景”需要使用）
+     */
+    private static final ThreadLocal<AfterSaleOperateTypeEnum> OPERATE_TYPE = new ThreadLocal<>();
+    /**
      * 拓展参数 Map，用于格式化操作内容
      */
     private static final ThreadLocal<Map<String, Object>> EXTS = new ThreadLocal<>();
@@ -69,6 +75,7 @@ public class AfterSaleLogAspect {
             if (afterSaleId == null) { // 如果未设置，只有注解，说明不需要记录日志
                 return;
             }
+            AfterSaleOperateTypeEnum operateType = ObjUtil.defaultIfNull(OPERATE_TYPE.get(), afterSaleLog.operateType());
             Integer beforeStatus = BEFORE_STATUS.get();
             Integer afterStatus = AFTER_STATUS.get();
             Map<String, Object> exts = ObjectUtil.defaultIfNull(EXTS.get(), emptyMap());
@@ -78,7 +85,7 @@ public class AfterSaleLogAspect {
             AfterSaleLogCreateReqBO createBO = new AfterSaleLogCreateReqBO()
                     .setUserId(userId).setUserType(userType)
                     .setAfterSaleId(afterSaleId).setBeforeStatus(beforeStatus).setAfterStatus(afterStatus)
-                    .setOperateType(afterSaleLog.operateType().getType()).setContent(content);
+                    .setOperateType(operateType.getType()).setContent(content);
             afterSaleLogService.createAfterSaleLog(createBO);
         } catch (Exception exception) {
             log.error("[doAfterReturning][afterSaleLog({}) 日志记录错误]", toJsonString(afterSaleLog), exception);
@@ -116,6 +123,10 @@ public class AfterSaleLogAspect {
         EXTS.set(exts);
     }
 
+    public static void setAfterSaleOperateType(AfterSaleOperateTypeEnum operateType) {
+        OPERATE_TYPE.set(operateType);
+    }
+
     public static void setUserInfo(Long userId, Integer userType) {
         USER_ID.set(userId);
         USER_TYPE.set(userType);
@@ -127,6 +138,7 @@ public class AfterSaleLogAspect {
         AFTER_SALE_ID.remove();
         BEFORE_STATUS.remove();
         AFTER_STATUS.remove();
+        OPERATE_TYPE.remove();
         EXTS.remove();
     }
 

@@ -15,9 +15,6 @@ import cn.iocoder.yudao.module.pay.api.wallet.PayWalletApi;
 import cn.iocoder.yudao.module.pay.api.wallet.dto.PayWalletRespDTO;
 import cn.iocoder.yudao.module.pay.enums.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferStatusEnum;
-import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
-import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
-import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.withdraw.BrokerageWithdrawPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBrokerageWithdrawCreateReqVO;
 import cn.iocoder.yudao.module.trade.convert.brokerage.BrokerageWithdrawConvert;
@@ -70,8 +67,6 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
 
     @Resource
     private PayTransferApi payTransferApi;
-    @Resource
-    private SocialUserApi socialUserApi;
     @Resource
     private PayWalletApi payWalletApi;
 
@@ -140,13 +135,8 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
         if (Objects.equal(withdraw.getType(), BrokerageWithdrawTypeEnum.ALIPAY_API.getType())) {
             channelCode = PayChannelEnum.ALIPAY_PC.getCode();
         } else if (Objects.equal(withdraw.getType(), BrokerageWithdrawTypeEnum.WECHAT_API.getType())) {
-            SocialUserRespDTO socialUser = socialUserApi.getSocialUserByUserId(
-                    UserTypeEnum.MEMBER.getValue(), withdraw.getUserId(), SocialTypeEnum.WECHAT_MINI_PROGRAM.getType());
-            if (socialUser == null) {
-                throw exception(BROKERAGE_WITHDRAW_TRANSFER_FAIL_WECHAT_NOT_BIND);
-            }
             channelCode = PayChannelEnum.WX_LITE.getCode();
-            userAccount = socialUser.getOpenid();
+            userAccount = withdraw.getUserAccount();
             // 特殊：微信需要有报备信息
             channelExtras = PayTransferCreateReqDTO.buildWeiXinChannelExtra1000("佣金提现", "佣金提现");
         } else if (Objects.equal(withdraw.getType(), BrokerageWithdrawTypeEnum.WALLET.getType())) {
@@ -158,7 +148,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
         // 1.2 构建请求
         PayTransferCreateReqDTO transferReqDTO = new PayTransferCreateReqDTO()
                 .setAppKey(tradeOrderProperties.getPayAppKey()).setChannelCode(channelCode)
-                .setMerchantOrderId(withdraw.getId().toString()).setSubject("佣金提现").setPrice(withdraw.getPrice())
+                .setMerchantTransferId(withdraw.getId().toString()).setSubject("佣金提现").setPrice(withdraw.getPrice())
                 .setUserAccount(userAccount).setUserName(userName).setUserIp(getClientIP())
                 .setChannelExtras(channelExtras);
         // 1.3 发起请求
@@ -293,7 +283,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
             throw exception(BROKERAGE_WITHDRAW_UPDATE_STATUS_FAIL_PAY_PRICE_NOT_MATCH);
         }
         // 2.3 校验转账订单匹配
-        if (ObjectUtil.notEqual(payTransfer.getMerchantOrderId(), withdraw.getId().toString())) {
+        if (ObjectUtil.notEqual(payTransfer.getMerchantTransferId(), withdraw.getId().toString())) {
             log.error("[validateBrokerageTransferStatusCanUpdate][withdraw({}) 转账单不匹配({})，请进行处理！payTransfer 数据是：{}]",
                     withdraw.getId(), payTransferId, JsonUtils.toJsonString(payTransfer));
             throw exception(BROKERAGE_WITHDRAW_UPDATE_STATUS_FAIL_PAY_MERCHANT_EXISTS);

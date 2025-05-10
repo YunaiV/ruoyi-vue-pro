@@ -37,6 +37,8 @@ public interface PayNotifyTaskMapper extends BaseMapperX<PayNotifyTaskDO> {
                 .eqIfPresent(PayNotifyTaskDO::getDataId, reqVO.getDataId())
                 .eqIfPresent(PayNotifyTaskDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(PayNotifyTaskDO::getMerchantOrderId, reqVO.getMerchantOrderId())
+                .eqIfPresent(PayNotifyTaskDO::getMerchantRefundId, reqVO.getMerchantRefundId())
+                .eqIfPresent(PayNotifyTaskDO::getMerchantTransferId, reqVO.getMerchantTransferId())
                 .betweenIfPresent(PayNotifyTaskDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(PayNotifyTaskDO::getId));
     }

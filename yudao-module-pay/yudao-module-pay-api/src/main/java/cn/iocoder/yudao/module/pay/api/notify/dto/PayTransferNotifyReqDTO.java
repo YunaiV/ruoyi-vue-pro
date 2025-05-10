@@ -23,7 +23,7 @@ public class PayTransferNotifyReqDTO {
      * 商户转账单号
      */
     @NotEmpty(message = "商户转账单号不能为空")
-    private String merchantOrderId;
+    private String merchantTransferId;
 
     /**
      * 转账订单编号

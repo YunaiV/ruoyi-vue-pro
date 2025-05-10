@@ -28,7 +28,7 @@ public interface PayTransferMapper extends BaseMapperX<PayTransferDO> {
 
     default PayTransferDO selectByAppIdAndMerchantOrderId(Long appId, String merchantOrderId) {
         return selectOne(PayTransferDO::getAppId, appId,
-                    PayTransferDO::getMerchantOrderId, merchantOrderId);
+                    PayTransferDO::getMerchantTransferId, merchantOrderId);
     }
 
     default PageResult<PayTransferDO> selectPage(PayTransferPageReqVO reqVO) {
@@ -36,7 +36,7 @@ public interface PayTransferMapper extends BaseMapperX<PayTransferDO> {
                 .eqIfPresent(PayTransferDO::getNo, reqVO.getNo())
                 .eqIfPresent(PayTransferDO::getAppId, reqVO.getAppId())
                 .eqIfPresent(PayTransferDO::getChannelCode, reqVO.getChannelCode())
-                .eqIfPresent(PayTransferDO::getMerchantOrderId, reqVO.getMerchantOrderId())
+                .eqIfPresent(PayTransferDO::getMerchantTransferId, reqVO.getMerchantOrderId())
                 .eqIfPresent(PayTransferDO::getStatus, reqVO.getStatus())
                 .likeIfPresent(PayTransferDO::getUserName, reqVO.getUserName())
                 .eqIfPresent(PayTransferDO::getChannelTransferNo, reqVO.getChannelTransferNo())

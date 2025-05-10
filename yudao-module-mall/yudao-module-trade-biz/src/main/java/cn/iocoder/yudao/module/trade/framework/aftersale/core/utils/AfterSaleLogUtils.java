@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.framework.aftersale.core.utils;
 
 
+import cn.iocoder.yudao.module.trade.enums.aftersale.AfterSaleOperateTypeEnum;
 import cn.iocoder.yudao.module.trade.framework.aftersale.core.aop.AfterSaleLogAspect;
 
 import java.util.Map;
@@ -12,6 +13,10 @@ import java.util.Map;
  * @author 芋道源码
  */
 public class AfterSaleLogUtils {
+
+    public static void setAfterSaleOperateType(AfterSaleOperateTypeEnum operateType) {
+        AfterSaleLogAspect.setAfterSaleOperateType(operateType);
+    }
 
     public static void setAfterSaleInfo(Long id, Integer beforeStatus, Integer afterStatus) {
         setAfterSaleInfo(id, beforeStatus, afterStatus, null);

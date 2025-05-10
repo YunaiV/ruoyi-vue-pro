@@ -19,7 +19,9 @@ public enum AfterSaleOperateTypeEnum {
     MEMBER_DELIVERY(20, "会员填写退货物流信息，快递公司：{deliveryName}，快递单号：{logisticsNo}"),
     ADMIN_AGREE_RECEIVE(21, "商家收货"),
     ADMIN_DISAGREE_RECEIVE(22, "商家拒绝收货，原因：{reason}"),
-    ADMIN_REFUND(30, "商家退款"),
+    ADMIN_REFUND(30, "商家发起退款"),
+    SYSTEM_REFUND_SUCCESS(31, "退款成功"),
+    SYSTEM_REFUND_FAIL(32, "退款失败"),
     MEMBER_CANCEL(40, "会员取消退款"),
     ;
 

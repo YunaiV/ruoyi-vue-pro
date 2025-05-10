@@ -26,6 +26,12 @@ public class PayRefundNotifyReqDTO {
     private String merchantOrderId;
 
     /**
+     * 商户退款编号
+     */
+    @NotEmpty(message = "商户退款编号不能为空")
+    private String merchantRefundId;
+
+    /**
      * 支付退款编号
      */
     @NotNull(message = "支付退款编号不能为空")

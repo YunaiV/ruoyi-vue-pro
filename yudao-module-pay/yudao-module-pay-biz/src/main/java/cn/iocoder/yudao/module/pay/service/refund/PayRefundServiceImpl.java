@@ -91,7 +91,7 @@ public class PayRefundServiceImpl implements PayRefundService {
     }
 
     @Override
-    public Long createPayRefund(PayRefundCreateReqDTO reqDTO) {
+    public Long createRefund(PayRefundCreateReqDTO reqDTO) {
         // 1.1 校验 App
         PayAppDO app = appService.validPayApp(reqDTO.getAppKey());
         // 1.2 校验支付订单

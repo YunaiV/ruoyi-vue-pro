@@ -210,6 +210,14 @@ public interface TradeOrderUpdateService {
     void cancelPaidOrder(Long userId, Long orderId, Integer cancelType);
 
     /**
+     * 取消支付订单的退款回调
+     *
+     * @param id               订单编号
+     * @param payRefundId      支付退款编号
+     */
+    void updatePaidOrderRefunded(Long id, Long payRefundId);
+
+    /**
      * 更新下单赠送的优惠券编号到订单
      *
      * @param userId        用户编号

@@ -47,7 +47,7 @@ public class PayTransferCreateReqDTO {
      * 商户转账单编号
      */
     @NotEmpty(message = "商户转账单编号能为空")
-    private String merchantOrderId;
+    private String merchantTransferId;
 
     /**
      * 转账金额，单位：分

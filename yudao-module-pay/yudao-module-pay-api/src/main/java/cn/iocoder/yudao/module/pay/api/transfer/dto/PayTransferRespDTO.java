@@ -31,7 +31,7 @@ public class PayTransferRespDTO {
     /**
      * 商户转账单编号
      */
-    private String merchantOrderId;
+    private String merchantTransferId;
 
     // ========== 转账相关字段 ==========
 

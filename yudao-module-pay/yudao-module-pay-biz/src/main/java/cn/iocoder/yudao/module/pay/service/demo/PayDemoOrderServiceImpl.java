@@ -184,7 +184,7 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
 
         // 2.1 生成退款单号
         // 一般来说，用户发起退款的时候，都会单独插入一个售后维权表，然后使用该表的 id 作为 refundId
-        // 这里我们是个简单的 demo，所以没有售后维权表，直接使用订单 id + "-refund" 来演示
+        //          这里我们是个简单的 demo，所以没有售后维权表，直接使用订单 id + "-refund" 来演示
         String refundId = order.getId() + "-refund";
         // 2.2 创建退款单
         Long payRefundId = payRefundApi.createRefund(new PayRefundCreateReqDTO()
@@ -215,16 +215,18 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
     }
 
     @Override
-    public void updateDemoOrderRefunded(Long id, Long payRefundId) {
+    public void updateDemoOrderRefunded(Long id, String refundId, Long payRefundId) {
         // 1. 校验并获得退款订单（可退款）
-        PayRefundRespDTO payRefund = validateDemoOrderCanRefunded(id, payRefundId);
+        PayRefundRespDTO payRefund = validateDemoOrderCanRefunded(id, refundId, payRefundId);
         // 2.2 更新退款单到 demo 订单
         payDemoOrderMapper.updateById(new PayDemoOrderDO().setId(id)
                 .setRefundTime(payRefund.getSuccessTime()));
     }
 
-    private PayRefundRespDTO validateDemoOrderCanRefunded(Long id, Long payRefundId) {
+    private PayRefundRespDTO validateDemoOrderCanRefunded(Long id, String refundId, Long payRefundId) {
         // 1.1 校验示例订单
+        // 一般来说，这里应该用 refundId 来查询退款单，然后再校验订单是否匹配
+        //       这里我们是个简单的 demo，所以没有售后维权表，直接使用订单 id 来查询订单
         PayDemoOrderDO order = payDemoOrderMapper.selectById(id);
         if (order == null) {
             throw exception(DEMO_ORDER_NOT_FOUND);
@@ -241,7 +243,7 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
         if (payRefund == null) {
             throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_NOT_FOUND);
         }
-        // 2.2
+        // 2.2 必须是退款成功状态
         if (!PayRefundStatusEnum.isSuccess(payRefund.getStatus())) {
             throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_NOT_SUCCESS);
         }
@@ -252,7 +254,7 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
             throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_PRICE_NOT_MATCH);
         }
         // 2.4 校验退款订单匹配（二次）
-        if (notEqual(payRefund.getMerchantOrderId(), id.toString())) {
+        if (notEqual(payRefund.getMerchantRefundId(), id.toString() + "-refund")) {
             log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！payRefund 数据是：{}]",
                     id, payRefundId, toJsonString(payRefund));
             throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);

@@ -215,7 +215,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         when(appService.validPayApp(eq("demo"))).thenReturn(app);
 
         // 调用，并断言异常
-        assertServiceException(() -> refundService.createPayRefund(reqDTO),
+        assertServiceException(() -> refundService.createRefund(reqDTO),
                 PAY_ORDER_NOT_FOUND);
     }
 
@@ -241,7 +241,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         when(orderService.getOrder(eq(1L), eq("100"))).thenReturn(order);
 
         // 调用，并断言异常
-        assertServiceException(() -> refundService.createPayRefund(reqDTO),
+        assertServiceException(() -> refundService.createRefund(reqDTO),
                 PAY_ORDER_REFUND_FAIL_STATUS_ERROR);
     }
 
@@ -260,7 +260,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         when(orderService.getOrder(eq(1L), eq("100"))).thenReturn(order);
 
         // 调用，并断言异常
-        assertServiceException(() -> refundService.createPayRefund(reqDTO),
+        assertServiceException(() -> refundService.createRefund(reqDTO),
                 REFUND_PRICE_EXCEED);
     }
 
@@ -283,7 +283,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         refundMapper.insert(refund);
 
         // 调用，并断言异常
-        assertServiceException(() -> refundService.createPayRefund(reqDTO),
+        assertServiceException(() -> refundService.createRefund(reqDTO),
                 REFUND_PRICE_EXCEED);
     }
 
@@ -307,7 +307,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         when(channelService.validPayChannel(eq(1L))).thenReturn(channel);
 
         // 调用，并断言异常
-        assertServiceException(() -> refundService.createPayRefund(reqDTO),
+        assertServiceException(() -> refundService.createRefund(reqDTO),
                 CHANNEL_NOT_FOUND);
     }
 
@@ -339,7 +339,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         refundMapper.insert(refund);
 
         // 调用，并断言异常
-        assertServiceException(() -> refundService.createPayRefund(reqDTO),
+        assertServiceException(() -> refundService.createRefund(reqDTO),
                 REFUND_EXISTS);
     }
 
@@ -369,7 +369,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         when(client.unifiedRefund(any(PayRefundUnifiedReqDTO.class))).thenThrow(new RuntimeException());
 
         // 调用
-        Long refundId = refundService.createPayRefund(reqDTO);
+        Long refundId = refundService.createRefund(reqDTO);
         // 断言
         PayRefundDO refundDO = refundMapper.selectById(refundId);
         assertPojoEquals(reqDTO, refundDO);
@@ -422,7 +422,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
             }))).thenReturn(refundRespDTO);
 
             // 调用
-            Long refundId = refundService.createPayRefund(reqDTO);
+            Long refundId = refundService.createRefund(reqDTO);
             // 断言
             PayRefundDO refundDO = refundMapper.selectById(refundId);
             assertPojoEquals(reqDTO, refundDO);

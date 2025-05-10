@@ -32,6 +32,12 @@ public class PayNotifyTaskPageReqVO extends PageParam {
     @Schema(description = "商户订单编号", example = "26697")
     private String merchantOrderId;
 
+    @Schema(description = "商户退款编号", example = "26697")
+    private String merchantRefundId;
+
+    @Schema(description = "商户转账编号", example = "26697")
+    private String merchantTransferId;
+
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;

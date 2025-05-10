@@ -43,8 +43,23 @@ public class PayRefundRespDTO {
      */
     private String merchantOrderId;
     /**
+     * 商户退款编号
+     */
+    private String merchantRefundId;
+    /**
      * 退款成功时间
      */
     private LocalDateTime successTime;
+
+    // ========== 渠道相关字段 ==========
+
+    /**
+     * 调用渠道的错误码
+     */
+    private String channelErrorCode;
+    /**
+     * 调用渠道的错误提示
+     */
+    private String channelErrorMsg;
 
 }
