@@ -51,11 +51,11 @@ public class PayDemoWithdrawController {
         return success(BeanUtils.toBean(pageResult, PayDemoWithdrawRespVO.class));
     }
 
-    @PostMapping("/update-status")
+    @PostMapping("/update-transferred")
     @Operation(summary = "更新示例提现单的转账状态") // 由 pay-module 转账服务，进行回调
     @PermitAll // 无需登录，安全由 PayDemoTransferService 内部校验实现
-    public CommonResult<Boolean> updateDemoWithdrawStatus(@RequestBody PayTransferNotifyReqDTO notifyReqDTO) {
-        demoWithdrawService.updateDemoWithdrawStatus(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
+    public CommonResult<Boolean> updateDemoWithdrawTransferred(@RequestBody PayTransferNotifyReqDTO notifyReqDTO) {
+        demoWithdrawService.updateDemoWithdrawTransferred(Long.valueOf(notifyReqDTO.getMerchantOrderId()),
                 notifyReqDTO.getPayTransferId());
         return success(true);
     }

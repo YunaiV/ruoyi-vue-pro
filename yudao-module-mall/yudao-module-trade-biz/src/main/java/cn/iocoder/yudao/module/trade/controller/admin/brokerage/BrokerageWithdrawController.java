@@ -82,10 +82,9 @@ public class BrokerageWithdrawController {
         return success(BrokerageWithdrawConvert.INSTANCE.convertPage(pageResult, userMap));
     }
 
-    // TODO @luchi：update-transferred，url 改成这个。和 update-paid 、update-refunded 保持一致
-    @PostMapping("/update-transfer")
-    @Operation(summary = "更新转账订单为转账成功") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
-    @PermitAll // 无需登录，安全由 PayDemoOrderService 内部校验实现
+    @PostMapping("/update-transferred")
+    @Operation(summary = "更新佣金提现的转账结果") // 由 pay-module 支付服务，进行回调，可见 PayNotifyJob
+    @PermitAll // 无需登录，安全由 BrokerageWithdrawService 内部校验实现
     public CommonResult<Boolean> updateBrokerageWithdrawTransferred(@RequestBody PayTransferNotifyReqDTO notifyReqDTO) {
         log.info("[updateAfterRefund][notifyReqDTO({})]", notifyReqDTO);
         brokerageWithdrawService.updateBrokerageWithdrawTransferred(

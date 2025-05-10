@@ -37,10 +37,10 @@ public class BrokerageWithdrawBaseVO {
     private Integer type;
 
     @Schema(description = "真实姓名", example = "赵六")
-    private String name;
+    private String userName;
 
-    @Schema(description = "账号", example = "88677912132")
-    private String accountNo;
+    @Schema(description = "收款账号", example = "88677912132")
+    private String userAccount;
 
     @Schema(description = "银行名称", example = "1")
     private String bankName;
@@ -49,7 +49,7 @@ public class BrokerageWithdrawBaseVO {
     private String bankAddress;
 
     @Schema(description = "收款码", example = "https://www.iocoder.cn")
-    private String accountQrCodeUrl;
+    private String qrCodeUrl;
 
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "状态不能为空")

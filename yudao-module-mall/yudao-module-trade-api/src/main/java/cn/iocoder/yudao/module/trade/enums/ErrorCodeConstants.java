@@ -101,5 +101,11 @@ public interface ErrorCodeConstants {
     ErrorCode BROKERAGE_WITHDRAW_STATUS_NOT_AUDITING = new ErrorCode(1_011_008_001, "佣金提现记录状态不是审核中");
     ErrorCode BROKERAGE_WITHDRAW_MIN_PRICE = new ErrorCode(1_011_008_002, "提现金额不能低于 {} 元");
     ErrorCode BROKERAGE_WITHDRAW_USER_BALANCE_NOT_ENOUGH = new ErrorCode(1_011_008_003, "您当前最多可提现 {} 元");
+    ErrorCode BROKERAGE_WITHDRAW_TRANSFER_FAIL_WECHAT_NOT_BIND = new ErrorCode(1_011_008_004, "提现失败，原因：用户未绑定微信");
+    ErrorCode BROKERAGE_WITHDRAW_UPDATE_STATUS_FAIL_PAY_TRANSFER_ID_ERROR = new ErrorCode(1_011_008_005, "提现单更新转账状态失败，转账单不匹配");
+    ErrorCode BROKERAGE_WITHDRAW_UPDATE_STATUS_FAIL_PAY_TRANSFER_STATUS_NOT_SUCCESS_OR_CLOSED = new ErrorCode(1_011_008_006, "提现单更新转账状态失败，转账单状态不是成功或关闭状态");
+    ErrorCode BROKERAGE_WITHDRAW_UPDATE_STATUS_FAIL_PAY_PRICE_NOT_MATCH = new ErrorCode(1_011_008_007, "提现单更新转账状态失败，转账单金额不匹配");
+    ErrorCode BROKERAGE_WITHDRAW_UPDATE_STATUS_FAIL_PAY_MERCHANT_EXISTS = new ErrorCode(1_011_008_008, "提现单更新转账状态失败，转账单的商户订单不匹配");
+    ErrorCode BROKERAGE_WITHDRAW_UPDATE_STATUS_FAIL_PAY_CHANNEL_NOT_MATCH = new ErrorCode(1_011_008_009, "提现单更新转账状态失败，转账渠道不匹配");
 
 }

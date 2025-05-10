@@ -56,8 +56,8 @@ public class BrokerageWithdrawServiceImplTest extends BaseDbUnitTest {
         BrokerageWithdrawDO dbBrokerageWithdraw = randomPojo(BrokerageWithdrawDO.class, o -> { // 等会查询到
             o.setUserId(null);
             o.setType(null);
-            o.setName(null);
-            o.setAccountNo(null);
+            o.setUserName(null);
+            o.setUserAccount(null);
             o.setBankName(null);
             o.setStatus(null);
             o.setCreateTime(null);
@@ -68,9 +68,9 @@ public class BrokerageWithdrawServiceImplTest extends BaseDbUnitTest {
         // 测试 type 不匹配
         brokerageWithdrawMapper.insert(cloneIgnoreId(dbBrokerageWithdraw, o -> o.setType(null)));
         // 测试 name 不匹配
-        brokerageWithdrawMapper.insert(cloneIgnoreId(dbBrokerageWithdraw, o -> o.setName(null)));
+        brokerageWithdrawMapper.insert(cloneIgnoreId(dbBrokerageWithdraw, o -> o.setUserName(null)));
         // 测试 accountNo 不匹配
-        brokerageWithdrawMapper.insert(cloneIgnoreId(dbBrokerageWithdraw, o -> o.setAccountNo(null)));
+        brokerageWithdrawMapper.insert(cloneIgnoreId(dbBrokerageWithdraw, o -> o.setUserAccount(null)));
         // 测试 bankName 不匹配
         brokerageWithdrawMapper.insert(cloneIgnoreId(dbBrokerageWithdraw, o -> o.setBankName(null)));
         // 测试 status 不匹配
@@ -87,8 +87,8 @@ public class BrokerageWithdrawServiceImplTest extends BaseDbUnitTest {
         BrokerageWithdrawPageReqVO reqVO = new BrokerageWithdrawPageReqVO();
         reqVO.setUserId(null);
         reqVO.setType(null);
-        reqVO.setName(null);
-        reqVO.setAccountNo(null);
+        reqVO.setUserName(null);
+        reqVO.setUserAccount(null);
         reqVO.setBankName(null);
         reqVO.setStatus(null);
         reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));

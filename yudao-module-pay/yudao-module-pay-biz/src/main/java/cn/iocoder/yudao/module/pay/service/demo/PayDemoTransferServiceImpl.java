@@ -124,7 +124,7 @@ public class PayDemoTransferServiceImpl implements PayDemoWithdrawService {
     }
 
     @Override
-    public void updateDemoWithdrawStatus(Long id, Long payTransferId) {
+    public void updateDemoWithdrawTransferred(Long id, Long payTransferId) {
         // 1.1 校验转账单是否存在
         PayDemoWithdrawDO withdraw = demoTransferMapper.selectById(id);
         if (withdraw == null) {
