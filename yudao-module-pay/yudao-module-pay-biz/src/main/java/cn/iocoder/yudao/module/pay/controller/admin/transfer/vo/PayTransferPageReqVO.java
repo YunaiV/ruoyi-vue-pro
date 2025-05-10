@@ -32,6 +32,9 @@ public class PayTransferPageReqVO extends PageParam {
     @Schema(description = "收款人姓名", example = "王五")
     private String userName;
 
+    @Schema(description = "收款人账号", example = "26589")
+    private String userAccount;
+
     @Schema(description = "渠道转账单号")
     private String channelTransferNo;
 

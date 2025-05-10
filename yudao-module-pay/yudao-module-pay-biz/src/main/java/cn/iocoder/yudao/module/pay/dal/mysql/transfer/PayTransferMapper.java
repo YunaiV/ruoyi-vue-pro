@@ -39,6 +39,7 @@ public interface PayTransferMapper extends BaseMapperX<PayTransferDO> {
                 .eqIfPresent(PayTransferDO::getMerchantTransferId, reqVO.getMerchantOrderId())
                 .eqIfPresent(PayTransferDO::getStatus, reqVO.getStatus())
                 .likeIfPresent(PayTransferDO::getUserName, reqVO.getUserName())
+                .likeIfPresent(PayTransferDO::getUserAccount, reqVO.getUserAccount())
                 .eqIfPresent(PayTransferDO::getChannelTransferNo, reqVO.getChannelTransferNo())
                 .betweenIfPresent(PayTransferDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(PayTransferDO::getId));

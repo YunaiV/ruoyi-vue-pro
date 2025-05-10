@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -78,13 +77,8 @@ public class PayRefundController {
     @PreAuthorize("@ss.hasPermission('pay:refund:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportRefundExcel(@Valid PayRefundExportReqVO exportReqVO,
-            HttpServletResponse response) throws IOException {
+                                  HttpServletResponse response) throws IOException {
         List<PayRefundDO> list = refundService.getRefundList(exportReqVO);
-        if (CollectionUtil.isEmpty(list)) {
-            ExcelUtils.write(response, "退款订单.xls", "数据",
-                    PayRefundExcelVO.class, new ArrayList<>());
-            return;
-        }
 
         // 拼接返回
         Map<Long, PayAppDO> appMap = appService.getAppMap(convertList(list, PayRefundDO::getAppId));
