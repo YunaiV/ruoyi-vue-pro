@@ -16,6 +16,9 @@ public class BrokerageWithdrawRespVO extends BrokerageWithdrawBaseVO {
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "7161")
     private Long id;
 
+    @Schema(description = "转账错误提示", example = "余额不足")
+    private String transferErrorMsg;
+
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 

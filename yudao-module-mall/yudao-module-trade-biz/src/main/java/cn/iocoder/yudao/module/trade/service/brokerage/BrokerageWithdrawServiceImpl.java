@@ -86,15 +86,24 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
     public void auditBrokerageWithdraw(Long id, BrokerageWithdrawStatusEnum status, String auditReason, String userIp) {
         // 1.1 校验存在
         BrokerageWithdrawDO withdraw = validateBrokerageWithdrawExists(id);
+        // 1.2 特殊：【重新转账】如果是提现失败，并且状态是审核中，那么更新状态为审核中，并且清空 transferErrorMsg
+        if (BrokerageWithdrawStatusEnum.WITHDRAW_FAIL.getStatus().equals(withdraw.getStatus())) {
+            int updateCount = brokerageWithdrawMapper.updateByIdAndStatus(id, withdraw.getStatus(),
+                    new BrokerageWithdrawDO().setStatus(BrokerageWithdrawStatusEnum.AUDITING.getStatus()).setTransferErrorMsg(""));
+            if (updateCount == 0) {
+                throw exception(BROKERAGE_WITHDRAW_STATUS_NOT_AUDITING);
+            }
+            withdraw.setStatus(BrokerageWithdrawStatusEnum.AUDITING.getStatus()).setTransferErrorMsg("");
+        }
         // 1.2 校验状态为审核中
         if (ObjectUtil.notEqual(BrokerageWithdrawStatusEnum.AUDITING.getStatus(), withdraw.getStatus())) {
             throw exception(BROKERAGE_WITHDRAW_STATUS_NOT_AUDITING);
         }
 
         // 2. 更新状态
-        int rows = brokerageWithdrawMapper.updateByIdAndStatus(id, BrokerageWithdrawStatusEnum.AUDITING.getStatus(),
+        int updateCount = brokerageWithdrawMapper.updateByIdAndStatus(id, withdraw.getStatus(),
                 new BrokerageWithdrawDO().setStatus(status.getStatus()).setAuditReason(auditReason).setAuditTime(LocalDateTime.now()));
-        if (rows == 0) {
+        if (updateCount == 0) {
             throw exception(BROKERAGE_WITHDRAW_STATUS_NOT_AUDITING);
         }
 
