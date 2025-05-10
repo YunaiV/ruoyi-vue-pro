@@ -12,6 +12,7 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifie
 import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferStatusRespEnum;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateRespDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.transfer.vo.PayTransferPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
@@ -62,7 +63,7 @@ public class PayTransferServiceImpl implements PayTransferService {
     private PayNoRedisDAO noRedisDAO;
 
     @Override
-    public Long createTransfer(PayTransferCreateReqDTO reqDTO) {
+    public PayTransferCreateRespDTO createTransfer(PayTransferCreateReqDTO reqDTO) {
         // 1.1 校验 App
         PayAppDO payApp = appService.validPayApp(reqDTO.getAppKey());
         // 1.2 校验支付渠道是否有效
@@ -88,12 +89,13 @@ public class PayTransferServiceImpl implements PayTransferService {
             transferMapper.updateByIdAndStatus(transfer.getId(), transfer.getStatus(),
                     new PayTransferDO().setStatus(PayTransferStatusEnum.WAITING.getStatus()));
         }
+        PayTransferRespDTO unifiedTransferResp = null;
         try {
             // 3. 调用三方渠道发起转账
             PayTransferUnifiedReqDTO transferUnifiedReq = BeanUtils.toBean(reqDTO, PayTransferUnifiedReqDTO.class)
                     .setOutTransferNo(transfer.getNo())
                     .setNotifyUrl(genChannelTransferNotifyUrl(channel));
-            PayTransferRespDTO unifiedTransferResp = client.unifiedTransfer(transferUnifiedReq);
+            unifiedTransferResp = client.unifiedTransfer(transferUnifiedReq);
             // 4. 通知转账结果
             getSelf().notifyTransfer(channel, unifiedTransferResp);
         } catch (Throwable e) {
@@ -102,7 +104,8 @@ public class PayTransferServiceImpl implements PayTransferService {
             //       或者，使用相同 no 再次发起转账请求
             log.error("[createTransfer][转账编号({}) requestDTO({}) 发生异常]", transfer.getId(), reqDTO, e);
         }
-        return transfer.getId();
+        return new PayTransferCreateRespDTO().setId(transfer.getId())
+                .setChannelPackageInfo(unifiedTransferResp != null ? unifiedTransferResp.getChannelPackageInfo() : null);
     }
 
     /**
@@ -154,7 +157,7 @@ public class PayTransferServiceImpl implements PayTransferService {
     }
 
     private void notifyTransferProgressing(PayChannelDO channel, PayTransferRespDTO notify) {
-        // 1.校验
+        // 1. 校验
         PayTransferDO transfer = transferMapper.selectByAppIdAndNo(channel.getAppId(), notify.getOutTransferNo());
         if (transfer == null) {
             throw exception(PAY_TRANSFER_NOT_FOUND);
@@ -170,7 +173,8 @@ public class PayTransferServiceImpl implements PayTransferService {
         // 2. 更新状态
         int updateCounts = transferMapper.updateByIdAndStatus(transfer.getId(),
                 PayTransferStatusEnum.WAITING.getStatus(),
-                new PayTransferDO().setStatus(PayTransferStatusEnum.PROCESSING.getStatus()));
+                new PayTransferDO().setStatus(PayTransferStatusEnum.PROCESSING.getStatus())
+                        .setChannelPackageInfo(transfer.getChannelPackageInfo()));
         if (updateCounts == 0) {
             throw exception(PAY_TRANSFER_NOTIFY_FAIL_STATUS_IS_NOT_WAITING);
         }
@@ -261,6 +265,9 @@ public class PayTransferServiceImpl implements PayTransferService {
         }
         int count = 0;
         for (PayTransferDO transfer : list) {
+            if (!transfer.getId().equals(54L)) {
+                continue;
+            }
             count += syncTransfer(transfer) ? 1 : 0;
         }
         return count;

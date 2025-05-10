@@ -482,11 +482,19 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         // 2.1 执行请求
         try {
             TransferBillsResult response = client.getTransferService().transferBills(request);
-            System.out.println(response);
 
             // 2.2 创建返回结果
-            // TODO @芋艿：这里要解析下；
-            return PayTransferRespDTO.processingOf(response.getTransferBillNo(), reqDTO.getOutTransferNo(), response);
+            String state = response.getState();
+            if (ObjectUtils.equalsAny(state, "ACCEPTED", "PROCESSING", "WAIT_USER_CONFIRM", "TRANSFERING")) {
+                return PayTransferRespDTO.processingOf(response.getTransferBillNo(), response.getOutBillNo(), response)
+                        .setChannelPackageInfo(response.getPackageInfo()); // 一般情况下，只有 WAIT_USER_CONFIRM 会有！
+            }
+            if (Objects.equals("SUCCESS", state)) {
+                return PayTransferRespDTO.successOf(response.getTransferBillNo(), parseDateV3(response.getCreateTime()),
+                        response.getOutBillNo(), response);
+            }
+            return PayTransferRespDTO.closedOf(state, response.getFailReason(),
+                    response.getOutBillNo(), response);
         } catch (WxPayException e) {
             log.error("[doUnifiedTransfer][转账({}) 发起微信支付异常", reqDTO, e);
             String errorCode = getErrorCode(e);
@@ -499,7 +507,7 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     @Override
     protected PayTransferRespDTO doGetTransfer(String outTradeNo) throws WxPayException {
         // 1. 执行请求
-        TransferBillsGetResult response = client.getTransferService().getBillsByTransferBillNo(outTradeNo);
+        TransferBillsGetResult response = client.getTransferService().getBillsByOutBillNo(outTradeNo);
 
         // 2. 创建返回结果
         String state = response.getState();

@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.pay.api.transfer.PayTransferApi;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateRespDTO;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferRespDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.demo.vo.withdraw.PayDemoWithdrawCreateReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.demo.PayDemoWithdrawDO;
@@ -83,12 +84,13 @@ public class PayDemoTransferServiceImpl implements PayDemoWithdrawService {
             transferReqDTO.setChannelExtras(PayTransferCreateReqDTO.buildWeiXinChannelExtra1000(
                     "测试活动", "测试奖励"));
         }
-        Long payTransferId = payTransferApi.createTransfer(transferReqDTO);
+        PayTransferCreateRespDTO transferRespDTO = payTransferApi.createTransfer(transferReqDTO);
 
         // 2.2 更新转账单到 demo 示例提现单，并将状态更新为转账中
         demoTransferMapper.updateByIdAndStatus(withdraw.getId(), withdraw.getStatus(),
-                new PayDemoWithdrawDO().setPayTransferId(payTransferId));
-        return payTransferId;
+                new PayDemoWithdrawDO().setPayTransferId(transferRespDTO.getId())
+                        .setTransferChannelPackageInfo(transferRespDTO.getChannelPackageInfo()));
+        return transferRespDTO.getId();
     }
 
     private PayDemoWithdrawDO validateDemoWithdrawCanTransfer(Long id) {

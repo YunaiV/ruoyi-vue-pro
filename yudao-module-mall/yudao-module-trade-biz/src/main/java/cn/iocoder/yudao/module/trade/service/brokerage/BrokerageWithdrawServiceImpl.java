@@ -10,6 +10,7 @@ import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.pay.api.transfer.PayTransferApi;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateRespDTO;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferRespDTO;
 import cn.iocoder.yudao.module.pay.api.wallet.PayWalletApi;
 import cn.iocoder.yudao.module.pay.api.wallet.dto.PayWalletRespDTO;
@@ -152,11 +153,12 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
                 .setUserAccount(userAccount).setUserName(userName).setUserIp(getClientIP())
                 .setChannelExtras(channelExtras);
         // 1.3 发起请求
-        Long payTransferId = payTransferApi.createTransfer(transferReqDTO);
+        PayTransferCreateRespDTO transferRespDTO = payTransferApi.createTransfer(transferReqDTO);
 
         // 2. 更新提现记录
         brokerageWithdrawMapper.updateById(new BrokerageWithdrawDO().setId(withdraw.getId())
-                .setPayTransferId(payTransferId).setTransferChannelCode(channelCode));
+                .setPayTransferId(transferRespDTO.getId()).setTransferChannelCode(channelCode)
+                .setTransferChannelPackageInfo(transferRespDTO.getChannelPackageInfo()));
     }
 
     private BrokerageWithdrawDO validateBrokerageWithdrawExists(Long id) {
