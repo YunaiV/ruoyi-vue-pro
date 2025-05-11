@@ -60,14 +60,14 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static cn.hutool.core.date.DatePattern.UTC_MS_WITH_XXX_OFFSET_PATTERN;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.UTC_MS_WITH_XXX_OFFSET_FORMATTER;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static java.util.Collections.singletonList;
@@ -359,7 +359,7 @@ public class SocialClientServiceImpl implements SocialClientService {
                 .deliveryMode(1) // 统一发货
                 .shippingList(shippingList)
                 .payer(PayerBean.builder().openid(reqDTO.getOpenid()).build())
-                .uploadTime(LocalDateTimeUtil.format(LocalDateTime.now(), UTC_MS_WITH_XXX_OFFSET_PATTERN))
+                .uploadTime(ZonedDateTime.now().format(UTC_MS_WITH_XXX_OFFSET_FORMATTER))
                 .build();
         try {
             WxMaOrderShippingInfoBaseResponse response = service.getWxMaOrderShippingService().upload(request);

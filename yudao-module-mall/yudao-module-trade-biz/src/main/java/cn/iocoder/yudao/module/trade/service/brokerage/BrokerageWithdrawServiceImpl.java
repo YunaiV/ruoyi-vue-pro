@@ -136,7 +136,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
         if (Objects.equal(withdraw.getType(), BrokerageWithdrawTypeEnum.ALIPAY_API.getType())) {
             channelCode = PayChannelEnum.ALIPAY_PC.getCode();
         } else if (Objects.equal(withdraw.getType(), BrokerageWithdrawTypeEnum.WECHAT_API.getType())) {
-            channelCode = PayChannelEnum.WX_LITE.getCode();
+            channelCode = withdraw.getTransferChannelCode();
             userAccount = withdraw.getUserAccount();
             // 特殊：微信需要有报备信息
             channelExtras = PayTransferCreateReqDTO.buildWeiXinChannelExtra1000("佣金提现", "佣金提现");

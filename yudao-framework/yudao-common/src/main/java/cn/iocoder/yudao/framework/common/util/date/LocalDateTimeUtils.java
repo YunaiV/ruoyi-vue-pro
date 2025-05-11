@@ -8,11 +8,15 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.DateIntervalEnum;
 
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
+
+import static cn.hutool.core.date.DatePattern.UTC_MS_WITH_XXX_OFFSET_PATTERN;
+import static cn.hutool.core.date.DatePattern.createFormatter;
 
 /**
  * 时间工具类，用于 {@link java.time.LocalDateTime}
@@ -25,6 +29,8 @@ public class LocalDateTimeUtils {
      * 空的 LocalDateTime 对象，主要用于 DB 唯一索引的默认值
      */
     public static LocalDateTime EMPTY = buildTime(1970, 1, 1);
+
+    public static DateTimeFormatter UTC_MS_WITH_XXX_OFFSET_FORMATTER = createFormatter(UTC_MS_WITH_XXX_OFFSET_PATTERN);
 
     /**
      * 解析时间
