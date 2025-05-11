@@ -35,7 +35,7 @@ import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 @Service
 @Validated
 @Slf4j
-public class PayDemoTransferServiceImpl implements PayDemoWithdrawService {
+public class PayDemoWithdrawServiceImpl implements PayDemoWithdrawService {
 
     /**
      * 接入的支付应用标识
