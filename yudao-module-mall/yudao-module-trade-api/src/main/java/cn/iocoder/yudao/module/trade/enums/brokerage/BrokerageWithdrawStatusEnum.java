@@ -6,7 +6,6 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
-// TODO 芋艿：提现的打通，在纠结下；
 /**
  * 佣金提现状态枚举
  *

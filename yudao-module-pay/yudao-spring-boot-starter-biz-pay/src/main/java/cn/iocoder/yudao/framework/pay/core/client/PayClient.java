@@ -14,7 +14,7 @@ import java.util.Map;
  *
  * @author 芋道源码
  */
-public interface PayClient {
+public interface PayClient<Config> {
 
     /**
      * 获得渠道编号
@@ -22,6 +22,13 @@ public interface PayClient {
      * @return 渠道编号
      */
     Long getId();
+
+    /**
+     * 获得渠道配置
+     *
+     * @return 渠道配置
+     */
+    Config getConfig();
 
     // ============ 支付相关 ==========
 

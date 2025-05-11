@@ -2,8 +2,10 @@ package cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw;
 
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.pay.enums.PayChannelEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageWithdrawTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
@@ -22,6 +24,7 @@ public class AppBrokerageWithdrawCreateReqVO {
 
     @Schema(description = "提现金额，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1000")
     @PositiveOrZero(message = "提现金额不能小于 0")
+    @Min(value = 30, message = "微信提现金额不能小于 0.3", groups = {WechatApi.class})
     @NotNull(message = "提现金额不能为空")
     private Integer price;
 
@@ -42,6 +45,11 @@ public class AppBrokerageWithdrawCreateReqVO {
     private String bankName;
     @Schema(description = "开户地址", example = "海淀支行")
     private String bankAddress;
+
+    @Schema(description = "转账渠道", example = "wx_lite")
+    @NotNull(message = "转账渠道不能为空", groups = {WechatApi.class})
+    @InEnum(PayChannelEnum.class)
+    private String transferChannelCode;
 
     public interface Wallet {
     }

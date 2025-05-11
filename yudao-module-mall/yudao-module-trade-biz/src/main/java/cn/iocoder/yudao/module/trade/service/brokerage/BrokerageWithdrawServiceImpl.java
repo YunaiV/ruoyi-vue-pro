@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.pay.api.transfer.PayTransferApi;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateReqDTO;
@@ -18,7 +19,6 @@ import cn.iocoder.yudao.module.pay.enums.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferStatusEnum;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.withdraw.BrokerageWithdrawPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.withdraw.AppBrokerageWithdrawCreateReqVO;
-import cn.iocoder.yudao.module.trade.convert.brokerage.BrokerageWithdrawConvert;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageWithdrawDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.BrokerageWithdrawMapper;
@@ -157,8 +157,7 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
 
         // 2. 更新提现记录
         brokerageWithdrawMapper.updateById(new BrokerageWithdrawDO().setId(withdraw.getId())
-                .setPayTransferId(transferRespDTO.getId()).setTransferChannelCode(channelCode)
-                .setTransferChannelPackageInfo(transferRespDTO.getChannelPackageInfo()));
+                .setPayTransferId(transferRespDTO.getId()).setTransferChannelCode(channelCode));
     }
 
     private BrokerageWithdrawDO validateBrokerageWithdrawExists(Long id) {
@@ -190,7 +189,8 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
         // 2.1 计算手续费
         Integer feePrice = calculateFeePrice(createReqVO.getPrice(), tradeConfig.getBrokerageWithdrawFeePercent());
         // 2.2 创建佣金提现记录
-        BrokerageWithdrawDO withdraw = BrokerageWithdrawConvert.INSTANCE.convert(createReqVO, userId, feePrice);
+        BrokerageWithdrawDO withdraw = BeanUtils.toBean(createReqVO, BrokerageWithdrawDO.class)
+                .setUserId(userId).setFeePrice(feePrice);
         brokerageWithdrawMapper.insert(withdraw);
 
         // 3. 创建用户佣金记录

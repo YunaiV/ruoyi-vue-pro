@@ -126,12 +126,5 @@ public class BrokerageWithdrawDO extends BaseDO {
      * 转账错误提示
      */
     private String transferErrorMsg;
-    /**
-     * 渠道 package 信息
-     *
-     * 特殊：目前只有微信转账有这个东西！！！
-     * @see <a href="https://pay.weixin.qq.com/doc/v3/merchant/4012716430">JSAPI 调起用户确认收款</a>
-     */
-    private String transferChannelPackageInfo;
 
 }

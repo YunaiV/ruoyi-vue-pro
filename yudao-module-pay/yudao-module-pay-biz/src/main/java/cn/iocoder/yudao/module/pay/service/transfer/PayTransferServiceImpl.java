@@ -174,7 +174,7 @@ public class PayTransferServiceImpl implements PayTransferService {
         int updateCounts = transferMapper.updateByIdAndStatus(transfer.getId(),
                 PayTransferStatusEnum.WAITING.getStatus(),
                 new PayTransferDO().setStatus(PayTransferStatusEnum.PROCESSING.getStatus())
-                        .setChannelPackageInfo(transfer.getChannelPackageInfo()));
+                        .setChannelPackageInfo(notify.getChannelPackageInfo()));
         if (updateCounts == 0) {
             throw exception(PAY_TRANSFER_NOTIFY_FAIL_STATUS_IS_NOT_WAITING);
         }

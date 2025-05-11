@@ -88,8 +88,7 @@ public class PayDemoTransferServiceImpl implements PayDemoWithdrawService {
 
         // 2.2 更新转账单到 demo 示例提现单，并将状态更新为转账中
         demoTransferMapper.updateByIdAndStatus(withdraw.getId(), withdraw.getStatus(),
-                new PayDemoWithdrawDO().setPayTransferId(transferRespDTO.getId())
-                        .setTransferChannelPackageInfo(transferRespDTO.getChannelPackageInfo()));
+                new PayDemoWithdrawDO().setPayTransferId(transferRespDTO.getId()));
         return transferRespDTO.getId();
     }
 

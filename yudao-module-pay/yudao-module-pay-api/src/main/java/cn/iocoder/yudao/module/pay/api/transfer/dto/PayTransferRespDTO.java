@@ -70,5 +70,12 @@ public class PayTransferRespDTO {
      * @see <a href="https://pay.weixin.qq.com/doc/v3/merchant/4012716430">JSAPI 调起用户确认收款</a>
      */
     private String channelPackageInfo;
+    /**
+     * 渠道商户号
+     *
+     * 特殊：目前只有微信转账有这个东西！！！
+     * @see <a href="https://pay.weixin.qq.com/doc/v3/merchant/4012716430">JSAPI 调起用户确认收款</a>
+     */
+    private String channelMchId;
 
 }

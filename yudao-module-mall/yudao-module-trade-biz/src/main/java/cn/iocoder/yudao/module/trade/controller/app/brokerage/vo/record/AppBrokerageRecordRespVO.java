@@ -24,6 +24,9 @@ public class AppBrokerageRecordRespVO {
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status;
 
+    @Schema(description = "状态名", requiredMode = Schema.RequiredMode.REQUIRED, example = "待结算")
+    private String statusName;
+
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 

@@ -1,15 +1,11 @@
 package cn.iocoder.yudao.module.trade.convert.brokerage;
 
-import cn.hutool.core.math.Money;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
-import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.record.BrokerageRecordPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.record.BrokerageRecordRespVO;
-import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.record.AppBrokerageRecordPageReqVO;
-import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.record.AppBrokerageRecordRespVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.user.AppBrokerageUserRankByPriceRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageRecordDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
@@ -67,8 +63,6 @@ public interface BrokerageRecordConvert {
         }
         return result;
     }
-
-    BrokerageRecordPageReqVO convert(AppBrokerageRecordPageReqVO pageReqVO, Long userId);
 
     default PageResult<AppBrokerageUserRankByPriceRespVO> convertPage03(PageResult<AppBrokerageUserRankByPriceRespVO> pageResult, Map<Long, MemberUserRespDTO> userMap) {
         for (AppBrokerageUserRankByPriceRespVO vo : pageResult.getList()) {

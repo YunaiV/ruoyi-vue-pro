@@ -20,11 +20,11 @@ public class AppBrokerageRecordPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
-    @Schema(description = "业务类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "业务类型", example = "1")
     @InEnum(value = BrokerageRecordBizTypeEnum.class, message = "业务类型必须是 {value}")
     private Integer bizType;
 
-    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "状态", example = "1")
     @InEnum(value = BrokerageRecordStatusEnum.class, message = "状态必须是 {value}")
     private Integer status;
 

@@ -23,7 +23,7 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
  * @author 芋道源码
  */
 @Slf4j
-public abstract class AbstractPayClient<Config extends PayClientConfig> implements PayClient {
+public abstract class AbstractPayClient<Config extends PayClientConfig> implements PayClient<Config> {
 
     /**
      * 渠道编号
@@ -72,6 +72,11 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     @Override
     public Long getId() {
         return channelId;
+    }
+
+    @Override
+    public Config getConfig() {
+        return config;
     }
 
     // ============ 支付相关 ==========

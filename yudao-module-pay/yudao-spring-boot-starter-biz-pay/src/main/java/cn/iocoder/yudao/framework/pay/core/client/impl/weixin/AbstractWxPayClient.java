@@ -15,13 +15,13 @@ import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
 import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.WxPayTransferPartnerNotifyV3Result;
 import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
 import com.github.binarywang.wxpay.bean.notify.*;
 import com.github.binarywang.wxpay.bean.request.*;
 import com.github.binarywang.wxpay.bean.result.*;
 import com.github.binarywang.wxpay.bean.transfer.TransferBillsGetResult;
+import com.github.binarywang.wxpay.bean.transfer.TransferBillsNotifyResult;
 import com.github.binarywang.wxpay.bean.transfer.TransferBillsRequest;
 import com.github.binarywang.wxpay.bean.transfer.TransferBillsResult;
 import com.github.binarywang.wxpay.config.WxPayConfig;
@@ -355,34 +355,6 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
     }
 
     @Override
-    public PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body, Map<String, String> headers) throws WxPayException {
-        switch (config.getApiVersion()) {
-            case API_VERSION_V3:
-                return parseTransferNotifyV3(body, headers);
-            case API_VERSION_V2:
-                throw new UnsupportedOperationException("V2 版本暂不支持，建议使用 V3 版本");
-            default:
-                throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
-        }
-    }
-
-    private PayTransferRespDTO parseTransferNotifyV3(String body, Map<String, String> headers) throws WxPayException {
-        // 1. 解析回调
-        SignatureHeader signatureHeader = getRequestHeader(headers);
-        // TODO @luchi：这个可以复用 wxjava 里的类么？
-        WxPayTransferPartnerNotifyV3Result response = client.baseParseOrderNotifyV3Result(body, signatureHeader, WxPayTransferPartnerNotifyV3Result.class, WxPayTransferPartnerNotifyV3Result.TransferNotifyResult.class);
-        WxPayTransferPartnerNotifyV3Result.TransferNotifyResult result = response.getResult();
-        // 2. 构建结果
-        if (Objects.equals("FINISHED", result.getBatchStatus())) {
-            if (result.getFailNum() <= 0) {
-                return PayTransferRespDTO.successOf(result.getBatchId(), parseDateV3(result.getUpdateTime()),
-                        result.getOutBatchNo(), response);
-            }
-        }
-        return PayTransferRespDTO.closedOf(result.getBatchStatus(), result.getCloseReason(), result.getOutBatchNo(), response);
-    }
-
-    @Override
     protected PayRefundRespDTO doGetRefund(String outTradeNo, String outRefundNo) throws WxPayException {
         try {
             switch (config.getApiVersion()) {
@@ -520,6 +492,37 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         }
         return PayTransferRespDTO.closedOf(state, response.getFailReason(),
                 response.getOutBillNo(), response);
+    }
+
+    @Override
+    public PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body, Map<String, String> headers) throws WxPayException {
+        switch (config.getApiVersion()) {
+            case API_VERSION_V3:
+                return parseTransferNotifyV3(body, headers);
+            case API_VERSION_V2:
+                throw new UnsupportedOperationException("V2 版本暂不支持，建议使用 V3 版本");
+            default:
+                throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
+        }
+    }
+
+    private PayTransferRespDTO parseTransferNotifyV3(String body, Map<String, String> headers) throws WxPayException {
+        // 1. 解析回调
+        SignatureHeader signatureHeader = getRequestHeader(headers);
+        TransferBillsNotifyResult response = client.getTransferService().parseTransferBillsNotifyResult(body, signatureHeader);
+        TransferBillsNotifyResult.DecryptNotifyResult result = response.getResult();
+
+        // 2. 创建返回结果
+        String state = result.getState();
+        if (ObjectUtils.equalsAny(state, "ACCEPTED", "PROCESSING", "WAIT_USER_CONFIRM", "TRANSFERING")) {
+            return PayTransferRespDTO.processingOf(result.getTransferBillNo(), result.getOutBillNo(), response);
+        }
+        if (Objects.equals("SUCCESS", state)) {
+            return PayTransferRespDTO.successOf(result.getTransferBillNo(), parseDateV3(result.getUpdateTime()),
+                    result.getOutBillNo(), response);
+        }
+        return PayTransferRespDTO.closedOf(state, result.getFailReason(),
+                result.getOutBillNo(), response);
     }
 
     // ========== 各种工具方法 ==========
