@@ -98,7 +98,7 @@ public class PayRefundServiceImpl implements PayRefundService {
         PayOrderDO order = validatePayOrderCanRefund(reqDTO, app.getId());
         // 1.3 校验支付渠道是否有效
         PayChannelDO channel = channelService.validPayChannel(order.getChannelId());
-        PayClient client = channelService.getPayClient(channel.getId());
+        PayClient<?> client = channelService.getPayClient(channel.getId());
         if (client == null) {
             log.error("[refund][渠道编号({}) 找不到对应的支付客户端]", channel.getId());
             throw exception(CHANNEL_NOT_FOUND);

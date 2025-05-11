@@ -68,7 +68,7 @@ public class PayTransferServiceImpl implements PayTransferService {
         PayAppDO payApp = appService.validPayApp(reqDTO.getAppKey());
         // 1.2 校验支付渠道是否有效
         PayChannelDO channel = channelService.validPayChannel(payApp.getId(), reqDTO.getChannelCode());
-        PayClient client = channelService.getPayClient(channel.getId());
+        PayClient<?> client = channelService.getPayClient(channel.getId());
         if (client == null) {
             log.error("[createTransfer][渠道编号({}) 找不到对应的支付客户端]", channel.getId());
             throw exception(CHANNEL_NOT_FOUND);
@@ -273,10 +273,19 @@ public class PayTransferServiceImpl implements PayTransferService {
         return count;
     }
 
+    @Override
+    public void syncTransfer(Long id) {
+        PayTransferDO transfer = transferMapper.selectById(id);
+        if (transfer == null) {
+            throw exception(PAY_TRANSFER_NOT_FOUND);
+        }
+        syncTransfer(transfer);
+    }
+
     private boolean syncTransfer(PayTransferDO transfer) {
         try {
             // 1. 查询转账订单信息
-            PayClient payClient = channelService.getPayClient(transfer.getChannelId());
+            PayClient<?> payClient = channelService.getPayClient(transfer.getChannelId());
             if (payClient == null) {
                 log.error("[syncTransfer][渠道编号({}) 找不到对应的支付客户端]", transfer.getChannelId());
                 return false;

@@ -31,6 +31,7 @@ import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLogi
 @Validated
 @Slf4j
 public class AppBrokerageRecordController {
+
     @Resource
     private BrokerageRecordService brokerageRecordService;
 

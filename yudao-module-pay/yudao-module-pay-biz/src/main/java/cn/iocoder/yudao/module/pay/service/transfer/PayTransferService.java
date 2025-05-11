@@ -53,6 +53,13 @@ public interface PayTransferService {
     int syncTransfer();
 
     /**
+     * 【单个】同步渠道转账单状态
+     *
+     * @param id 转账单编号
+     */
+    void syncTransfer(Long id);
+
+    /**
      * 渠道的转账通知
      *
      * @param channelId  渠道编号

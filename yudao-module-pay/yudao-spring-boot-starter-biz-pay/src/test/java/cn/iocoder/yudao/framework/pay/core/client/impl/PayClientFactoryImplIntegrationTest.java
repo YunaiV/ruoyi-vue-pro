@@ -42,7 +42,7 @@ public class PayClientFactoryImplIntegrationTest {
         // 创建客户端
         Long channelId = RandomUtil.randomLong();
         payClientFactory.createOrUpdatePayClient(channelId, PayChannelEnum.WX_PUB.getCode(), config);
-        PayClient client = payClientFactory.getPayClient(channelId);
+        PayClient<?> client = payClientFactory.getPayClient(channelId);
         // 发起支付
         PayOrderUnifiedReqDTO reqDTO = buildPayOrderUnifiedReqDTO();
 //        CommonResult<?> result = client.unifiedOrder(reqDTO);
@@ -65,7 +65,7 @@ public class PayClientFactoryImplIntegrationTest {
         // 创建客户端
         Long channelId = RandomUtil.randomLong();
         payClientFactory.createOrUpdatePayClient(channelId, PayChannelEnum.WX_PUB.getCode(), config);
-        PayClient client = payClientFactory.getPayClient(channelId);
+        PayClient<?> client = payClientFactory.getPayClient(channelId);
         // 发起支付
         PayOrderUnifiedReqDTO reqDTO = buildPayOrderUnifiedReqDTO();
 //        CommonResult<?> result = client.unifiedOrder(reqDTO);
@@ -88,7 +88,7 @@ public class PayClientFactoryImplIntegrationTest {
         // 创建客户端
         Long channelId = RandomUtil.randomLong();
         payClientFactory.createOrUpdatePayClient(channelId, PayChannelEnum.ALIPAY_QR.getCode(), config);
-        PayClient client = payClientFactory.getPayClient(channelId);
+        PayClient<?> client = payClientFactory.getPayClient(channelId);
         // 发起支付
         PayOrderUnifiedReqDTO reqDTO = buildPayOrderUnifiedReqDTO();
         reqDTO.setNotifyUrl("http://yunai.natapp1.cc/admin-api/pay/notify/callback/18"); // TODO @tina: 这里改成你的 natapp 回调地址
@@ -112,7 +112,7 @@ public class PayClientFactoryImplIntegrationTest {
         // 创建客户端
         Long channelId = RandomUtil.randomLong();
         payClientFactory.createOrUpdatePayClient(channelId, PayChannelEnum.ALIPAY_WAP.getCode(), config);
-        PayClient client = payClientFactory.getPayClient(channelId);
+        PayClient<?> client = payClientFactory.getPayClient(channelId);
         // 发起支付
         PayOrderUnifiedReqDTO reqDTO = buildPayOrderUnifiedReqDTO();
 //        CommonResult<?> result = client.unifiedOrder(reqDTO);
