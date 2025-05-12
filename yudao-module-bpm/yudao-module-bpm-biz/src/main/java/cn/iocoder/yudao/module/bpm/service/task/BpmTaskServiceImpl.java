@@ -646,6 +646,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     approveUserSelectAssignees = new HashMap<>();
                 }
                 approveUserSelectAssignees.put(nextFlowNode.getId(), assignees);
+                @SuppressWarnings("unchecked")
+                Map<String,List<Long>> existing = (Map<String,List<Long>>) variables.get(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES);
+                if(CollUtil.isNotEmpty(existing)) {
+                    approveUserSelectAssignees.putAll(existing);
+                }
                 variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES, approveUserSelectAssignees);
             }
         }
