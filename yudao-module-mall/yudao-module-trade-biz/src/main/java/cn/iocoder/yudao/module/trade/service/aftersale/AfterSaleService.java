@@ -109,6 +109,15 @@ public interface AfterSaleService {
     void refundAfterSale(Long userId, String userIp, Long id);
 
     /**
+     * 更新售后订单为已退款
+     *
+     * @param id          售后编号
+     * @param orderId     订单编号
+     * @param payRefundId 支付退款编号
+     */
+    void updateAfterSaleRefunded(Long id, Long orderId, Long payRefundId);
+
+    /**
      * 【会员】取消售后
      *
      * @param userId 会员用户编号

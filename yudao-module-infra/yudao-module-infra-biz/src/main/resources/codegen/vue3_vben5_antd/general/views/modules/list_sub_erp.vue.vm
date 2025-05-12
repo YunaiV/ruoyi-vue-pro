@@ -10,7 +10,7 @@
   import type { VxeTableInstance } from 'vxe-table';
 
   import { DictTag } from '#/components/dict-tag';
-  import { DICT_TYPE, getDictOptions } from '#/utils/dict';
+  import { DICT_TYPE, getDictOptions } from '#/utils';
   import { VxeColumn, VxeTable } from 'vxe-table';
   import { reactive,ref, h, nextTick,watch,onMounted } from 'vue';
   import { cloneDeep, formatDateTime } from '@vben/utils';
@@ -22,11 +22,10 @@
     import { Tinymce as RichTextarea } from '#/components/tinymce';
     import { ImageUpload, FileUpload } from "#/components/upload";
     import { message,Button, Tabs,Pagination, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox,RangePicker, DatePicker, TreeSelect } from 'ant-design-vue';
-    import { DICT_TYPE, getDictOptions } from '#/utils/dict';
+    import { DICT_TYPE, getDictOptions, getRangePickerDefaultProps } from '#/utils';
     import { Plus } from '@vben/icons';
     import { $t } from '#/locales';
     import { TableToolbar } from '#/components/table-toolbar';
-    import { getRangePickerDefaultProps } from '#/utils/date';
 #end
 
 #if ($table.templateType == 11) ## erp

@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.pay.api.notify.dto;
 
-import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,6 +24,12 @@ public class PayRefundNotifyReqDTO {
      */
     @NotEmpty(message = "商户退款单编号不能为空")
     private String merchantOrderId;
+
+    /**
+     * 商户退款编号
+     */
+    @NotEmpty(message = "商户退款编号不能为空")
+    private String merchantRefundId;
 
     /**
      * 支付退款编号

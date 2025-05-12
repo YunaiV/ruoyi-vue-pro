@@ -6,7 +6,7 @@ import { useVbenModal } from '@vben/common-ui';
 import { Tinymce as RichTextarea } from '#/components/tinymce';
 import { ImageUpload, FileUpload } from "#/components/upload";
 import { message, Tabs, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker, TreeSelect } from 'ant-design-vue';
-import { DICT_TYPE, getDictOptions } from '#/utils/dict';
+import { DICT_TYPE, getDictOptions } from '#/utils';
 #if($table.templateType == 2)## 树表需要导入这些
 import { get${simpleClassName}List } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 import { handleTree } from '@vben/utils'

@@ -20,7 +20,9 @@ import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
+import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
+import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.product.api.comment.ProductCommentApi;
 import cn.iocoder.yudao.module.product.api.comment.dto.ProductCommentCreateReqDTO;
 import cn.iocoder.yudao.module.system.api.social.SocialClientApi;
@@ -280,7 +282,7 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
         TradeOrderDO order = validateOrderExists(id);
         // 1.2 校验订单已支付
         if (!TradeOrderStatusEnum.isUnpaid(order.getStatus()) || order.getPayStatus()) {
-            // 特殊：如果订单已支付，且支付单号相同，直接返回，说明重复回调
+            // 特殊：支付单号相同，直接返回，说明重复回调
             if (ObjectUtil.equals(order.getPayOrderId(), payOrderId)) {
                 log.warn("[updateOrderPaid][order({}) 已支付，且支付单号相同({})，直接返回]", order, payOrderId);
                 return;
@@ -938,8 +940,22 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
                 .setAppKey(tradeOrderProperties.getPayAppKey())  // 支付应用
                 .setUserIp(NetUtil.getLocalhostStr()) // 使用本机 IP，因为是服务器发起退款的
                 .setMerchantOrderId(String.valueOf(order.getId())) // 支付单号
-                .setMerchantRefundId(String.valueOf(order.getId()))
+                // 特殊：因为订单支持 AfterSale 单个售后退款，也支持整单退款，所以需要通过 order- 进行下区分
+                //      具体可见 AfterSaleController 的 updateAfterSaleRefunded 方法
+                .setMerchantRefundId("order-" + order.getId())
                 .setReason(TradeOrderCancelTypeEnum.COMBINATION_CLOSE.getName()).setPrice(order.getPayPrice())); // 价格信息
+    }
+
+    @Override
+    public void updatePaidOrderRefunded(Long id, Long payRefundId) {
+        PayRefundRespDTO payRefund = payRefundApi.getRefund(payRefundId);
+        if (payRefund == null) {
+            throw exception(ORDER_UPDATE_PAID_ORDER_REFUNDED_FAIL_REFUND_NOT_FOUND);
+        }
+        // 特殊：因为在 cancelPaidOrder 已经进行订单的取消，所以这里必须退款成功！！！
+        if (!PayRefundStatusEnum.isSuccess(payRefund.getStatus())) {
+            throw exception(ORDER_UPDATE_PAID_ORDER_REFUNDED_FAIL_REFUND_STATUS_NOT_SUCCESS);
+        }
     }
 
     @Override

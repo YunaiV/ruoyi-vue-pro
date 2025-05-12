@@ -57,13 +57,25 @@ public class BrokerageWithdrawDO extends BaseDO {
     private Integer type;
 
     /**
-     * 真实姓名
+     * 提现姓名
+     * 1. {@link BrokerageWithdrawTypeEnum#BANK}：银行开户人
+     * 2. {@link BrokerageWithdrawTypeEnum#WECHAT_API}：微信真名
+     * 3. {@link BrokerageWithdrawTypeEnum#ALIPAY_API}：支付宝真名
      */
-    private String name;
+    private String userName;
     /**
-     * 账号
+     * 提现账号
+     * 1. {@link BrokerageWithdrawTypeEnum#BANK}：银行账号
+     * 2. {@link BrokerageWithdrawTypeEnum#WECHAT_API}：微信 openid
+     * 3. {@link BrokerageWithdrawTypeEnum#ALIPAY_API}：支付宝账号
      */
-    private String accountNo;
+    private String userAccount;
+
+    /**
+     * 收款码
+     */
+    private String qrCodeUrl;
+
     /**
      * 银行名称
      */
@@ -72,10 +84,7 @@ public class BrokerageWithdrawDO extends BaseDO {
      * 开户地址
      */
     private String bankAddress;
-    /**
-     * 收款码
-     */
-    private String accountQrCodeUrl;
+
     /**
      * 状态
      * <p>
@@ -94,5 +103,28 @@ public class BrokerageWithdrawDO extends BaseDO {
      * 备注
      */
     private String remark;
+
+    // ========== 转账相关字段 ==========
+
+    /**
+     * 转账单编号
+     *
+     * 关联 {@link cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferRespDTO#getId()}
+     */
+    private Long payTransferId;
+    /**
+     * 转账渠道
+     *
+     * 枚举 {@link cn.iocoder.yudao.module.pay.enums.PayChannelEnum}
+     */
+    private String transferChannelCode;
+    /**
+     * 转账成功时间
+     */
+    private LocalDateTime transferTime;
+    /**
+     * 转账错误提示
+     */
+    private String transferErrorMsg;
 
 }

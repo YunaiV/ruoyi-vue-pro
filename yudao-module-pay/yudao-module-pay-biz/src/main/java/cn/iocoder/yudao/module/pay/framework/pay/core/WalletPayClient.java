@@ -14,14 +14,16 @@ import cn.iocoder.yudao.framework.pay.core.client.impl.AbstractPayClient;
 import cn.iocoder.yudao.framework.pay.core.client.impl.NonePayClientConfig;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.refund.PayRefundStatusRespEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
+import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferStatusRespEnum;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.transfer.PayTransferDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletTransactionDO;
-import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
+import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
+import cn.iocoder.yudao.module.pay.service.transfer.PayTransferService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletTransactionService;
 import lombok.extern.slf4j.Slf4j;
@@ -40,13 +42,14 @@ import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.REFUND_NOT_FO
 @Slf4j
 public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
 
-    public static final String USER_ID_KEY = "user_id";
-    public static final String USER_TYPE_KEY = "user_type";
+    public static final String WALLET_ID_KEY = "walletId";
 
     private PayWalletService wallService;
     private PayWalletTransactionService walletTransactionService;
+
     private PayOrderService orderService;
     private PayRefundService refundService;
+    private PayTransferService transferService;
 
     public WalletPayClient(Long channelId,  NonePayClientConfig config) {
         super(channelId, PayChannelEnum.WALLET.getCode(), config);
@@ -63,19 +66,18 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
     }
 
     @Override
+    @SuppressWarnings("PatternVariableCanBeUsed")
     protected PayOrderRespDTO doUnifiedOrder(PayOrderUnifiedReqDTO reqDTO) {
         try {
-            Long userId = MapUtil.getLong(reqDTO.getChannelExtras(), USER_ID_KEY);
-            Integer userType = MapUtil.getInt(reqDTO.getChannelExtras(), USER_TYPE_KEY);
-            Assert.notNull(userId, "用户 id 不能为空");
-            Assert.notNull(userType, "用户类型不能为空");
-            PayWalletTransactionDO transaction = wallService.orderPay(userId, userType, reqDTO.getOutTradeNo(),
-                    reqDTO.getPrice());
+            Long walletId = MapUtil.getLong(reqDTO.getChannelExtras(), WALLET_ID_KEY);
+            Assert.notNull(walletId, "钱包编号");
+            PayWalletTransactionDO transaction = wallService.orderPay(walletId,
+                    reqDTO.getOutTradeNo(), reqDTO.getPrice());
             return PayOrderRespDTO.successOf(transaction.getNo(), transaction.getCreator(),
                     transaction.getCreateTime(),
                     reqDTO.getOutTradeNo(), transaction);
         } catch (Throwable ex) {
-            log.error("[doUnifiedOrder] 失败", ex);
+            log.error("[doUnifiedOrder][reqDTO({}) 异常]", reqDTO, ex);
             Integer errorCode = INTERNAL_SERVER_ERROR.getCode();
             String errorMsg = INTERNAL_SERVER_ERROR.getMsg();
             if (ex instanceof ServiceException) {
@@ -123,6 +125,7 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
     }
 
     @Override
+    @SuppressWarnings("PatternVariableCanBeUsed")
     protected PayRefundRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) {
         try {
             PayWalletTransactionDO payWalletTransaction = wallService.orderRefund(reqDTO.getOutRefundNo(),
@@ -130,7 +133,7 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
             return PayRefundRespDTO.successOf(payWalletTransaction.getNo(), payWalletTransaction.getCreateTime(),
                     reqDTO.getOutRefundNo(), payWalletTransaction);
         } catch (Throwable ex) {
-            log.error("[doUnifiedRefund] 失败", ex);
+            log.error("[doUnifiedRefund][reqDOT({}) 异常]", reqDTO, ex);
             Integer errorCode = INTERNAL_SERVER_ERROR.getCode();
             String errorMsg = INTERNAL_SERVER_ERROR.getMsg();
             if (ex instanceof ServiceException) {
@@ -178,18 +181,71 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
     }
 
     @Override
-    protected PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body, Map<String, String> headers) {
-        throw new UnsupportedOperationException("未实现");
-    }
-
-    @Override
+    @SuppressWarnings("PatternVariableCanBeUsed")
     public PayTransferRespDTO doUnifiedTransfer(PayTransferUnifiedReqDTO reqDTO) {
-        throw new UnsupportedOperationException("待实现");
+        try {
+            Long walletId = Long.parseLong(reqDTO.getUserAccount());
+            PayWalletTransactionDO transaction = wallService.addWalletBalance(walletId, String.valueOf(reqDTO.getOutTransferNo()),
+                    PayWalletBizTypeEnum.TRANSFER, reqDTO.getPrice());
+            return PayTransferRespDTO.successOf(transaction.getNo(), transaction.getCreateTime(),
+                    reqDTO.getOutTransferNo(), transaction);
+        } catch (Throwable ex) {
+            log.error("[doUnifiedTransfer][reqDTO({}) 异常]", reqDTO, ex);
+            Integer errorCode = INTERNAL_SERVER_ERROR.getCode();
+            String errorMsg = INTERNAL_SERVER_ERROR.getMsg();
+            if (ex instanceof ServiceException) {
+                ServiceException serviceException = (ServiceException) ex;
+                errorCode = serviceException.getCode();
+                errorMsg = serviceException.getMessage();
+            }
+            return PayTransferRespDTO.closedOf(String.valueOf(errorCode), errorMsg,
+                    reqDTO.getOutTransferNo(), "");
+        }
     }
 
     @Override
-    protected PayTransferRespDTO doGetTransfer(String outTradeNo, PayTransferTypeEnum type) {
-        throw new UnsupportedOperationException("待实现");
+    protected PayTransferRespDTO doParseTransferNotify(Map<String, String> params, String body, Map<String, String> headers) {
+        throw new UnsupportedOperationException("钱包支付无转账回调");
+    }
+
+    @Override
+    protected PayTransferRespDTO doGetTransfer(String outTradeNo) {
+        if (transferService == null) {
+            transferService = SpringUtil.getBean(PayTransferService.class);
+        }
+        // 获取转账单
+        PayTransferDO transfer = transferService.getTransferByNo(outTradeNo);
+        // 转账单不存在，返回关闭状态
+        if (transfer == null) {
+            return PayTransferRespDTO.closedOf(String.valueOf(PAY_ORDER_EXTENSION_NOT_FOUND.getCode()),
+                    PAY_ORDER_EXTENSION_NOT_FOUND.getMsg(), outTradeNo, "");
+        }
+        // 关闭状态
+        if (PayTransferStatusRespEnum.isClosed(transfer.getStatus())) {
+            return PayTransferRespDTO.closedOf(transfer.getChannelErrorCode(),
+                    transfer.getChannelErrorMsg(), outTradeNo, "");
+        }
+        // 成功状态
+        if (PayTransferStatusRespEnum.isSuccess(transfer.getStatus())) {
+            PayWalletTransactionDO walletTransaction = walletTransactionService.getWalletTransaction(
+                    String.valueOf(transfer.getId()), PayWalletBizTypeEnum.TRANSFER);
+            Assert.notNull(walletTransaction, "转账单 {} 钱包流水不能为空", outTradeNo);
+            return PayTransferRespDTO.successOf(walletTransaction.getNo(), walletTransaction.getCreateTime(),
+                    outTradeNo, walletTransaction);
+        }
+        // 处理中状态
+        if (PayTransferStatusRespEnum.isProcessing(transfer.getStatus())) {
+            return PayTransferRespDTO.processingOf(transfer.getChannelTransferNo(),
+                    outTradeNo, transfer);
+        }
+        // 等待状态
+        if (transfer.getStatus().equals(PayTransferStatusRespEnum.WAITING.getStatus())) {
+            return PayTransferRespDTO.waitingOf(transfer.getChannelTransferNo(),
+                    outTradeNo, transfer);
+        }
+        // 其它状态为无效状态
+        log.error("[doGetTransfer] 转账单 {} 的状态不正确", outTradeNo);
+        throw new IllegalStateException(String.format("转账单[%s] 状态不正确", outTradeNo));
     }
 
 }

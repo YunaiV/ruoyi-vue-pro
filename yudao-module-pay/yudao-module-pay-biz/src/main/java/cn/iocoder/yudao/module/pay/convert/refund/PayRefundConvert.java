@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
-import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundDetailsRespVO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundExcelVO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundPageItemRespVO;
@@ -41,8 +40,6 @@ public interface PayRefundConvert {
     PageResult<PayRefundPageItemRespVO> convertPage(PageResult<PayRefundDO> page);
 
     PayRefundDO convert(PayRefundCreateReqDTO bean);
-
-    PayRefundRespDTO convert02(PayRefundDO bean);
 
     default List<PayRefundExcelVO> convertList(List<PayRefundDO> list, Map<Long, PayAppDO> appMap) {
         return CollectionUtils.convertList(list, order -> {

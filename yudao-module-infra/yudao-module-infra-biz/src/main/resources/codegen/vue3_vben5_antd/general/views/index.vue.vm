@@ -6,13 +6,12 @@ import { Page, useVbenModal } from '@vben/common-ui';
 import { cloneDeep, formatDateTime } from '@vben/utils';
 import { Button, message,Tabs,Pagination,Form,RangePicker,DatePicker,Select,Input } from 'ant-design-vue';
 import { DictTag } from '#/components/dict-tag';
-import { DICT_TYPE, getDictOptions } from '#/utils/dict';
+import { DICT_TYPE, getDictOptions, getRangePickerDefaultProps } from '#/utils';
 import ${simpleClassName}Form from './modules/form.vue';
 import { Download, Plus, RefreshCw, Search } from '@vben/icons';
 import { ContentWrap } from "#/components/content-wrap";
 import { VxeColumn, VxeTable } from 'vxe-table';
 import { TableToolbar } from '#/components/table-toolbar';
-import { getRangePickerDefaultProps } from '#/utils/date';
 
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 11 || $table.templateType == 12 )
@@ -31,7 +30,7 @@ import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClas
 #else## 标准表接口
 import { get${simpleClassName}Page, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 #end
-import { downloadByData } from '#/utils/download';
+import { downloadFileFromBlobPart } from '@vben/utils';
 
 #if ($table.templateType == 12 || $table.templateType == 11) ## 内嵌和erp情况
 /** 子表的列表 */
@@ -162,7 +161,7 @@ async function onExport() {
 try {
   exportLoading.value = true;
   const data = await export${simpleClassName}(queryParams);
-  downloadByData(data, '${table.classComment}.xls');
+  downloadFileFromBlobPart({ fileName: '${table.classComment}.xls', source: data });
 }finally {
   exportLoading.value = false;
 }
@@ -281,7 +280,7 @@ onMounted(async () => {
         </Form.Item>
       </Form>
     </ContentWrap>
-    
+
     <!-- 列表 -->
     <ContentWrap title="${table.classComment}">
       <template #extra>

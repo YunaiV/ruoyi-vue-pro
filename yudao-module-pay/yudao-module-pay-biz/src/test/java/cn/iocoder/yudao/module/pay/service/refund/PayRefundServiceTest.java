@@ -215,7 +215,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         when(appService.validPayApp(eq("demo"))).thenReturn(app);
 
         // 调用，并断言异常
-        assertServiceException(() -> refundService.createPayRefund(reqDTO),
+        assertServiceException(() -> refundService.createRefund(reqDTO),
                 PAY_ORDER_NOT_FOUND);
     }
 
@@ -241,7 +241,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         when(orderService.getOrder(eq(1L), eq("100"))).thenReturn(order);
 
         // 调用，并断言异常
-        assertServiceException(() -> refundService.createPayRefund(reqDTO),
+        assertServiceException(() -> refundService.createRefund(reqDTO),
                 PAY_ORDER_REFUND_FAIL_STATUS_ERROR);
     }
 
@@ -260,7 +260,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         when(orderService.getOrder(eq(1L), eq("100"))).thenReturn(order);
 
         // 调用，并断言异常
-        assertServiceException(() -> refundService.createPayRefund(reqDTO),
+        assertServiceException(() -> refundService.createRefund(reqDTO),
                 REFUND_PRICE_EXCEED);
     }
 
@@ -283,7 +283,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         refundMapper.insert(refund);
 
         // 调用，并断言异常
-        assertServiceException(() -> refundService.createPayRefund(reqDTO),
+        assertServiceException(() -> refundService.createRefund(reqDTO),
                 REFUND_PRICE_EXCEED);
     }
 
@@ -307,7 +307,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         when(channelService.validPayChannel(eq(1L))).thenReturn(channel);
 
         // 调用，并断言异常
-        assertServiceException(() -> refundService.createPayRefund(reqDTO),
+        assertServiceException(() -> refundService.createRefund(reqDTO),
                 CHANNEL_NOT_FOUND);
     }
 
@@ -331,7 +331,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
                 .setCode(PayChannelEnum.ALIPAY_APP.getCode()));
         when(channelService.validPayChannel(eq(1L))).thenReturn(channel);
         // mock 方法（client）
-        PayClient client = mock(PayClient.class);
+        PayClient<?> client = mock(PayClient.class);
         when(channelService.getPayClient(eq(10L))).thenReturn(client);
         // mock 数据（refund 已存在）
         PayRefundDO refund = randomPojo(PayRefundDO.class, o ->
@@ -339,7 +339,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         refundMapper.insert(refund);
 
         // 调用，并断言异常
-        assertServiceException(() -> refundService.createPayRefund(reqDTO),
+        assertServiceException(() -> refundService.createRefund(reqDTO),
                 REFUND_EXISTS);
     }
 
@@ -363,13 +363,13 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
                 .setCode(PayChannelEnum.ALIPAY_APP.getCode()));
         when(channelService.validPayChannel(eq(10L))).thenReturn(channel);
         // mock 方法（client）
-        PayClient client = mock(PayClient.class);
+        PayClient<?> client = mock(PayClient.class);
         when(channelService.getPayClient(eq(10L))).thenReturn(client);
         // mock 方法（client 调用发生异常）
         when(client.unifiedRefund(any(PayRefundUnifiedReqDTO.class))).thenThrow(new RuntimeException());
 
         // 调用
-        Long refundId = refundService.createPayRefund(reqDTO);
+        Long refundId = refundService.createRefund(reqDTO);
         // 断言
         PayRefundDO refundDO = refundMapper.selectById(refundId);
         assertPojoEquals(reqDTO, refundDO);
@@ -407,7 +407,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
                     .setCode(PayChannelEnum.ALIPAY_APP.getCode()));
             when(channelService.validPayChannel(eq(10L))).thenReturn(channel);
             // mock 方法（client）
-            PayClient client = mock(PayClient.class);
+            PayClient<?> client = mock(PayClient.class);
             when(channelService.getPayClient(eq(10L))).thenReturn(client);
             // mock 方法（client 成功）
             PayRefundRespDTO refundRespDTO = randomPojo(PayRefundRespDTO.class);
@@ -422,7 +422,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
             }))).thenReturn(refundRespDTO);
 
             // 调用
-            Long refundId = refundService.createPayRefund(reqDTO);
+            Long refundId = refundService.createRefund(reqDTO);
             // 断言
             PayRefundDO refundDO = refundMapper.selectById(refundId);
             assertPojoEquals(reqDTO, refundDO);
@@ -664,7 +664,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
                     .setOrderNo("P110").setNo("R220"));
             refundMapper.insert(refund);
             // mock 方法（client）
-            PayClient client = mock(PayClient.class);
+            PayClient<?> client = mock(PayClient.class);
             when(channelService.getPayClient(eq(10L))).thenReturn(client);
             // mock 方法（client 返回指定状态）
             PayRefundRespDTO respDTO = randomPojo(PayRefundRespDTO.class, o -> o.setStatus(status));
@@ -686,7 +686,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
                 .setOrderNo("P110").setNo("R220"));
         refundMapper.insert(refund);
         // mock 方法（client）
-        PayClient client = mock(PayClient.class);
+        PayClient<?> client = mock(PayClient.class);
         when(channelService.getPayClient(eq(10L))).thenReturn(client);
         // mock 方法（client 抛出异常）
         when(client.getRefund(eq("P110"), eq("R220"))).thenThrow(new RuntimeException());

@@ -140,7 +140,7 @@ public class PayOrderServiceImpl implements PayOrderService {
         PayOrderDO order = validateOrderCanSubmit(reqVO.getId());
         // 1.32 校验支付渠道是否有效
         PayChannelDO channel = validateChannelCanSubmit(order.getAppId(), reqVO.getChannelCode());
-        PayClient client = channelService.getPayClient(channel.getId());
+        PayClient<?> client = channelService.getPayClient(channel.getId());
 
         // 2. 插入 PayOrderExtensionDO
         String no = noRedisDAO.generate(payProperties.getOrderNoPrefix());
@@ -237,7 +237,7 @@ public class PayOrderServiceImpl implements PayOrderService {
         appService.validPayApp(appId);
         // 校验支付渠道是否有效
         PayChannelDO channel = channelService.validPayChannel(appId, channelCode);
-        PayClient client = channelService.getPayClient(channel.getId());
+        PayClient<?> client = channelService.getPayClient(channel.getId());
         if (client == null) {
             log.error("[validatePayChannelCanSubmit][渠道编号({}) 找不到对应的支付客户端]", channel.getId());
             throw exception(CHANNEL_NOT_FOUND);

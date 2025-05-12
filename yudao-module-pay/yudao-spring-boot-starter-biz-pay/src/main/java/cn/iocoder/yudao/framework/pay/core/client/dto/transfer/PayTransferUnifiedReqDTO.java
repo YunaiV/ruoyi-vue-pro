@@ -1,19 +1,13 @@
 package cn.iocoder.yudao.framework.pay.core.client.dto.transfer;
 
-import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.URL;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.Map;
-
-import static cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum.Alipay;
-import static cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum.WxPay;
 
 /**
  * 统一转账 Request DTO
@@ -24,20 +18,14 @@ import static cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferType
 public class PayTransferUnifiedReqDTO {
 
     /**
-     * 转账类型
-     *
-     * 关联 {@link PayTransferTypeEnum#getType()}
-     */
-    @NotNull(message = "转账类型不能为空")
-    @InEnum(PayTransferTypeEnum.class)
-    private Integer type;
-
-    /**
      * 用户 IP
      */
     @NotEmpty(message = "用户 IP 不能为空")
     private String userIp;
 
+    /**
+     * 外部转账单编号
+     */
     @NotEmpty(message = "外部转账单编号不能为空")
     private String outTransferNo;
 
@@ -56,25 +44,22 @@ public class PayTransferUnifiedReqDTO {
     private String subject;
 
     /**
+     * 收款人账号
+     *
+     * 微信场景下：openid
+     * 支付宝场景下：支付宝账号
+     */
+    @NotEmpty(message = "收款人账号不能为空")
+    private String userAccount;
+    /**
      * 收款人姓名
      */
-    @NotBlank(message = "收款人姓名不能为空", groups = {Alipay.class})
     private String userName;
 
     /**
-     * 支付宝登录号
-     */
-    @NotBlank(message = "支付宝登录号不能为空", groups = {Alipay.class})
-    private String alipayLogonId;
-
-    /**
-     * 微信 openId
-     */
-    @NotBlank(message = "微信 openId 不能为空", groups = {WxPay.class})
-    private String openid;
-
-    /**
      * 支付渠道的额外参数
+     *
+     * 微信支付：sceneId 和 scene_report_infos 字段，必须传递；参考 <a href="https://pay.weixin.qq.com/doc/v3/merchant/4012711988#%EF%BC%883%EF%BC%89%E6%8C%89%E8%BD%AC%E8%B4%A6%E5%9C%BA%E6%99%AF%E6%8A%A5%E5%A4%87%E8%83%8C%E6%99%AF%E4%BF%A1%E6%81%AF">按转账场景报备背景信息</>
      */
     private Map<String, String> channelExtras;
 

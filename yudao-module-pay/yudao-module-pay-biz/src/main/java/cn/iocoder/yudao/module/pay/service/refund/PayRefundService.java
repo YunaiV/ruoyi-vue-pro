@@ -62,7 +62,7 @@ public interface PayRefundService {
      * @param reqDTO 退款申请信息
      * @return 退款单号
      */
-    Long createPayRefund(PayRefundCreateReqDTO reqDTO);
+    Long createRefund(PayRefundCreateReqDTO reqDTO);
 
     /**
      * 渠道的退款通知

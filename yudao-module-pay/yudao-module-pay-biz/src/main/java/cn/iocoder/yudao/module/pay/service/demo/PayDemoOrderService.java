@@ -59,8 +59,9 @@ public interface PayDemoOrderService {
      * 更新示例订单为已退款
      *
      * @param id 编号
+     * @param refundId 退款编号
      * @param payRefundId 退款订单号
      */
-    void updateDemoOrderRefunded(Long id, Long payRefundId);
+    void updateDemoOrderRefunded(Long id, String refundId, Long payRefundId);
 
 }

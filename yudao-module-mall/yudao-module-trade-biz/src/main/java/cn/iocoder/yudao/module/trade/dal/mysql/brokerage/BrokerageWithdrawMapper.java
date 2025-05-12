@@ -27,18 +27,18 @@ public interface BrokerageWithdrawMapper extends BaseMapperX<BrokerageWithdrawDO
         return selectPage(reqVO, new LambdaQueryWrapperX<BrokerageWithdrawDO>()
                 .eqIfPresent(BrokerageWithdrawDO::getUserId, reqVO.getUserId())
                 .eqIfPresent(BrokerageWithdrawDO::getType, reqVO.getType())
-                .likeIfPresent(BrokerageWithdrawDO::getName, reqVO.getName())
-                .eqIfPresent(BrokerageWithdrawDO::getAccountNo, reqVO.getAccountNo())
+                .likeIfPresent(BrokerageWithdrawDO::getUserName, reqVO.getUserName())
+                .likeIfPresent(BrokerageWithdrawDO::getUserAccount, reqVO.getUserAccount())
                 .likeIfPresent(BrokerageWithdrawDO::getBankName, reqVO.getBankName())
                 .eqIfPresent(BrokerageWithdrawDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(BrokerageWithdrawDO::getCreateTime, reqVO.getCreateTime())
-                .orderByAsc(BrokerageWithdrawDO::getStatus).orderByDesc(BrokerageWithdrawDO::getId));
+                .orderByDesc(BrokerageWithdrawDO::getId));
     }
 
-    default int updateByIdAndStatus(Long id, Integer status, BrokerageWithdrawDO updateObj) {
+    default int updateByIdAndStatus(Long id, Integer whereStatus, BrokerageWithdrawDO updateObj) {
         return update(updateObj, new LambdaUpdateWrapper<BrokerageWithdrawDO>()
                 .eq(BrokerageWithdrawDO::getId, id)
-                .eq(BrokerageWithdrawDO::getStatus, status));
+                .eq(BrokerageWithdrawDO::getStatus, whereStatus));
     }
 
     default List<BrokerageWithdrawSummaryRespBO> selectCountAndSumPriceByUserIdAndStatus(Collection<Long> userIds,

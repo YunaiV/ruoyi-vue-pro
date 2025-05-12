@@ -31,6 +31,7 @@ import cn.iocoder.yudao.module.pay.service.transfer.PayTransferService;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -97,19 +98,19 @@ public class PayNotifyServiceImpl implements PayNotifyService {
         PayNotifyTaskDO task = new PayNotifyTaskDO().setType(type).setDataId(dataId);
         task.setStatus(PayNotifyStatusEnum.WAITING.getStatus()).setNextNotifyTime(LocalDateTime.now())
                 .setNotifyTimes(0).setMaxNotifyTimes(PayNotifyTaskDO.NOTIFY_FREQUENCY.length + 1);
-        // 补充 appId + notifyUrl 字段
+        // 补充 appId + notifyUrl + merchant* 字段
         if (Objects.equals(task.getType(), PayNotifyTypeEnum.ORDER.getType())) {
             PayOrderDO order = orderService.getOrder(task.getDataId()); // 不进行非空判断，有问题直接异常
-            task.setAppId(order.getAppId()).
-                    setMerchantOrderId(order.getMerchantOrderId()).setNotifyUrl(order.getNotifyUrl());
+            task.setAppId(order.getAppId()).setNotifyUrl(order.getNotifyUrl())
+                    .setMerchantOrderId(order.getMerchantOrderId());
         } else if (Objects.equals(task.getType(), PayNotifyTypeEnum.REFUND.getType())) {
-            PayRefundDO refundDO = refundService.getRefund(task.getDataId());
-            task.setAppId(refundDO.getAppId())
-                    .setMerchantOrderId(refundDO.getMerchantOrderId()).setNotifyUrl(refundDO.getNotifyUrl());
+            PayRefundDO refund = refundService.getRefund(task.getDataId());
+            task.setAppId(refund.getAppId()).setNotifyUrl(refund.getNotifyUrl())
+                    .setMerchantOrderId(refund.getMerchantOrderId()).setMerchantRefundId(refund.getMerchantRefundId());
         } else if (Objects.equals(task.getType(), PayNotifyTypeEnum.TRANSFER.getType())) {
             PayTransferDO transfer = transferService.getTransfer(task.getDataId());
-            task.setAppId(transfer.getAppId()).setMerchantTransferId(transfer.getMerchantTransferId())
-                    .setNotifyUrl(transfer.getNotifyUrl());
+            task.setAppId(transfer.getAppId()).setNotifyUrl(transfer.getNotifyUrl())
+                    .setMerchantTransferId(transfer.getMerchantTransferId());
         }
 
         // 执行插入
@@ -117,10 +118,13 @@ public class PayNotifyServiceImpl implements PayNotifyService {
 
         // 必须在事务提交后，在发起任务，否则 PayNotifyTaskDO 还没入库，就提前回调接入的业务
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
             @Override
             public void afterCommit() {
-                executeNotify(task);
+                // 异步的原因：避免阻塞当前事务，无需等待结果
+                getSelf().executeNotifyAsync(task);
             }
+
         });
     }
 
@@ -166,7 +170,17 @@ public class PayNotifyServiceImpl implements PayNotifyService {
     }
 
     /**
-     * 同步执行单个支付通知
+     * 异步执行单个支付通知
+     *
+     * @param task 通知任务
+     */
+    @Async
+    public void executeNotifyAsync(PayNotifyTaskDO task) {
+        executeNotify(task);
+    }
+
+    /**
+     * 【加锁】执行单个支付通知
      *
      * @param task 通知任务
      */
@@ -223,10 +237,11 @@ public class PayNotifyServiceImpl implements PayNotifyService {
                     .payOrderId(task.getDataId()).build();
         } else if (Objects.equals(task.getType(), PayNotifyTypeEnum.REFUND.getType())) {
             request = PayRefundNotifyReqDTO.builder().merchantOrderId(task.getMerchantOrderId())
+                    .merchantRefundId(task.getMerchantRefundId())
                     .payRefundId(task.getDataId()).build();
         } else if (Objects.equals(task.getType(), PayNotifyTypeEnum.TRANSFER.getType())) {
-            request = new PayTransferNotifyReqDTO().setMerchantTransferId(task.getMerchantTransferId())
-                    .setPayTransferId(task.getDataId());
+            request = PayTransferNotifyReqDTO.builder().merchantTransferId(task.getMerchantTransferId())
+                    .payTransferId(task.getDataId()).build();
         } else {
             throw new RuntimeException("未知的通知任务类型：" + JsonUtils.toJsonString(task));
         }

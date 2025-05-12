@@ -311,7 +311,7 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
                 .thenReturn(mockClient);
 
         // 调用
-        PayClient client = channelService.getPayClient(id);
+        PayClient<?> client = channelService.getPayClient(id);
         // 断言
         assertSame(client, mockClient);
     }

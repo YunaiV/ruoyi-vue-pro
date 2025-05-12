@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.pay.api.wallet;
 
 import cn.hutool.core.lang.Assert;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.pay.api.wallet.dto.PayWalletAddBalanceReqDTO;
+import cn.iocoder.yudao.module.pay.api.wallet.dto.PayWalletRespDTO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
@@ -29,6 +31,12 @@ public class PayWalletApiImpl implements PayWalletApi {
         // 增加余额
         PayWalletBizTypeEnum bizType = PayWalletBizTypeEnum.valueOf(reqDTO.getBizType());
         payWalletService.addWalletBalance(wallet.getId(), reqDTO.getBizId(), bizType, reqDTO.getPrice());
+    }
+
+    @Override
+    public PayWalletRespDTO getOrCreateWallet(Long userId, Integer userType) {
+        PayWalletDO wallet = payWalletService.getOrCreateWallet(userId, userType);
+        return BeanUtils.toBean(wallet, PayWalletRespDTO.class);
     }
 
 }

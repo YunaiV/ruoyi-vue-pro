@@ -37,8 +37,7 @@ public class PayWalletRechargeController {
         return success(true);
     }
 
-    // TODO @jason：发起退款，要 post 操作哈；
-    @GetMapping("/refund")
+    @PostMapping("/refund")
     @Operation(summary = "发起钱包充值退款")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     public CommonResult<Boolean> refundWalletRecharge(@RequestParam("id") Long id) {
@@ -51,7 +50,9 @@ public class PayWalletRechargeController {
     @PermitAll // 无需登录， 内部校验实现
     public CommonResult<Boolean> updateWalletRechargeRefunded(@RequestBody PayRefundNotifyReqDTO notifyReqDTO) {
         walletRechargeService.updateWalletRechargeRefunded(
-                Long.valueOf(notifyReqDTO.getMerchantOrderId()), notifyReqDTO.getPayRefundId());
+                Long.valueOf(notifyReqDTO.getMerchantOrderId()),
+                Long.valueOf(notifyReqDTO.getMerchantRefundId()),
+                notifyReqDTO.getPayRefundId());
         return success(true);
     }
 

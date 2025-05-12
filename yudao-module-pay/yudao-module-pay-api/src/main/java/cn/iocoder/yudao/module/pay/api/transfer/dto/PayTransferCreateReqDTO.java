@@ -1,13 +1,15 @@
 package cn.iocoder.yudao.module.pay.api.transfer.dto;
 
-import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferTypeEnum;
+import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,6 +26,9 @@ public class PayTransferCreateReqDTO {
     @NotNull(message = "应用标识不能为空")
     private String appKey;
 
+    /**
+     * 转账渠道
+     */
     @NotEmpty(message = "转账渠道不能为空")
     private String channelCode;
 
@@ -32,16 +37,11 @@ public class PayTransferCreateReqDTO {
      */
     private Map<String, String> channelExtras;
 
+    /**
+     * 用户 IP
+     */
     @NotEmpty(message = "用户 IP 不能为空")
     private String userIp;
-
-    /**
-     * 类型
-     */
-    @NotNull(message = "转账类型不能为空")
-    @InEnum(PayTransferTypeEnum.class)
-    private Integer type;
-
 
     /**
      * 商户转账单编号
@@ -63,15 +63,58 @@ public class PayTransferCreateReqDTO {
     private String subject;
 
     /**
+     * 收款人账号
+     *
+     * 微信场景下：openid
+     * 支付宝场景下：支付宝账号
+     */
+    @NotEmpty(message = "收款人账号不能为空")
+    private String userAccount;
+    /**
      * 收款人姓名
      */
-    @NotBlank(message = "收款人姓名不能为空", groups = {PayTransferTypeEnum.Alipay.class})
     private String userName;
 
-    @NotBlank(message = "支付宝登录号不能为空", groups = {PayTransferTypeEnum.Alipay.class})
-    private String alipayLogonId;
+    /**
+     * 【微信】现金营销场景
+     *
+     * @param activityName 活动名称
+     * @param rewardDescription 奖励说明
+     * @return channelExtras
+     */
+    public static Map<String, String> buildWeiXinChannelExtra1000(String activityName, String rewardDescription) {
+        return buildWeiXinChannelExtra(1000,
+                "活动名称", activityName,
+                "奖励说明", rewardDescription);
+    }
 
-    // ========== 微信转账相关字段 ==========
-    @NotBlank(message = "微信 openId 不能为空", groups = {PayTransferTypeEnum.WxPay.class})
-    private String openid;
+    /**
+     * 【微信】企业报销场景
+     *
+     * @param expenseType 报销类型
+     * @param expenseDescription 报销说明
+     * @return channelExtras
+     */
+    public static Map<String, String> buildWeiXinChannelExtra1006(String expenseType, String expenseDescription) {
+        return buildWeiXinChannelExtra(1006,
+                "报销类型", expenseType,
+                "报销说明", expenseDescription);
+    }
+
+    private static Map<String, String> buildWeiXinChannelExtra(Integer sceneId, String... values) {
+        Map<String, String> channelExtras = new HashMap<>();
+        // 构建场景报备信息列表
+        List<Map<String, String>> sceneReportInfos = new ArrayList<>();
+        for (int i = 0; i < values.length; i += 2) {
+            Map<String, String> info = new HashMap<>();
+            info.put("infoType", values[i]);
+            info.put("infoContent", values[i + 1]);
+            sceneReportInfos.add(info);
+        }
+        // 设置场景ID和场景报备信息
+        channelExtras.put("sceneId", StrUtil.toString(sceneId));
+        channelExtras.put("sceneReportInfos", JsonUtils.toJsonString(sceneReportInfos));
+        return channelExtras;
+    }
+
 }

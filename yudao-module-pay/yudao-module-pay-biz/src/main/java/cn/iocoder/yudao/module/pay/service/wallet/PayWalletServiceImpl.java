@@ -81,13 +81,13 @@ public class PayWalletServiceImpl implements PayWalletService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public PayWalletTransactionDO orderPay(Long userId, Integer userType, String outTradeNo, Integer price) {
+    public PayWalletTransactionDO orderPay(Long walletId, String outTradeNo, Integer price) {
         // 1. 判断支付交易拓展单是否存
         PayOrderExtensionDO orderExtension = orderService.getOrderExtensionByNo(outTradeNo);
         if (orderExtension == null) {
             throw exception(PAY_ORDER_EXTENSION_NOT_FOUND);
         }
-        PayWalletDO wallet = getOrCreateWallet(userId, userType);
+        PayWalletDO wallet = walletMapper.selectById(walletId);
         // 2. 扣减余额
         return reduceWalletBalance(wallet.getId(), orderExtension.getOrderId(), PAYMENT, price);
     }
@@ -198,7 +198,7 @@ public class PayWalletServiceImpl implements PayWalletService {
                     break;
                 }
                 case UPDATE_BALANCE: // 更新余额
-                case BROKERAGE_WITHDRAW: // 分佣提现
+                case TRANSFER: // 分佣提现
                     walletMapper.updateWhenAdd(payWallet.getId(), price);
                     break;
                 default: {

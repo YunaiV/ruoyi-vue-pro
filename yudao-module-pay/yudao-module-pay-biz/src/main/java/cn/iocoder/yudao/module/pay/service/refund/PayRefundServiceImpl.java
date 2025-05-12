@@ -91,14 +91,14 @@ public class PayRefundServiceImpl implements PayRefundService {
     }
 
     @Override
-    public Long createPayRefund(PayRefundCreateReqDTO reqDTO) {
+    public Long createRefund(PayRefundCreateReqDTO reqDTO) {
         // 1.1 校验 App
         PayAppDO app = appService.validPayApp(reqDTO.getAppKey());
         // 1.2 校验支付订单
         PayOrderDO order = validatePayOrderCanRefund(reqDTO, app.getId());
         // 1.3 校验支付渠道是否有效
         PayChannelDO channel = channelService.validPayChannel(order.getChannelId());
-        PayClient client = channelService.getPayClient(channel.getId());
+        PayClient<?> client = channelService.getPayClient(channel.getId());
         if (client == null) {
             log.error("[refund][渠道编号({}) 找不到对应的支付客户端]", channel.getId());
             throw exception(CHANNEL_NOT_FOUND);

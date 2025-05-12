@@ -28,10 +28,10 @@ public class BrokerageWithdrawPageReqVO extends PageParam {
     private Integer type;
 
     @Schema(description = "真实姓名", example = "赵六")
-    private String name;
+    private String userName;
 
     @Schema(description = "账号", example = "886779132")
-    private String accountNo;
+    private String userAccount;
 
     @Schema(description = "银行名称", example = "1")
     private String bankName;

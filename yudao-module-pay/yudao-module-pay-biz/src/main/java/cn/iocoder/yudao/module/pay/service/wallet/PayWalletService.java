@@ -41,12 +41,11 @@ public interface PayWalletService {
     /**
      * 钱包订单支付
      *
-     * @param userId     用户 id
-     * @param userType   用户类型
+     * @param walletId   钱包编号
      * @param outTradeNo 外部订单号
      * @param price      金额
      */
-    PayWalletTransactionDO orderPay(Long userId, Integer userType, String outTradeNo, Integer price);
+    PayWalletTransactionDO orderPay(Long walletId, String outTradeNo, Integer price);
 
     /**
      * 钱包订单支付退款
@@ -60,8 +59,8 @@ public interface PayWalletService {
     /**
      * 扣减钱包余额
      *
-     * @param walletId 钱包 id
-     * @param bizId    业务关联 id
+     * @param walletId 钱包编号
+     * @param bizId    业务关联编号
      * @param bizType  业务关联分类
      * @param price    扣减金额
      * @return 钱包流水
@@ -72,8 +71,8 @@ public interface PayWalletService {
     /**
      * 增加钱包余额
      *
-     * @param walletId 钱包 id
-     * @param bizId    业务关联 id
+     * @param walletId 钱包编号
+     * @param bizId    业务关联编号
      * @param bizType  业务关联分类
      * @param price    增加金额
      * @return 钱包流水

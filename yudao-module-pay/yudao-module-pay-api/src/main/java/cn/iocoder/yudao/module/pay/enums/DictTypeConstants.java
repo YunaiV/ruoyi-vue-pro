@@ -15,4 +15,6 @@ public interface DictTypeConstants {
 
     String NOTIFY_STATUS = "pay_notify_status"; // 回调状态
 
+    String TRANSFER_STATUS = "pay_transfer_status"; // 转账状态
+
 }

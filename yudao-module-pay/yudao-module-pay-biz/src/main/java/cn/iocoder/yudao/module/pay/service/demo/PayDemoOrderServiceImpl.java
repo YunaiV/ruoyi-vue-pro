@@ -96,7 +96,6 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
         // 2.2 更新支付单到 demo 订单
         payDemoOrderMapper.updateById(new PayDemoOrderDO().setId(demoOrder.getId())
                 .setPayOrderId(payOrderId));
-        // 返回
         return demoOrder.getId();
     }
 
@@ -120,14 +119,14 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
         }
         // 1.2 校验订单已支付
         if (order.getPayStatus()) {
-            // 特殊：如果订单已支付，且支付单号相同，直接返回，说明重复回调
+            // 特殊：支付单号相同，直接返回，说明重复回调
             if (ObjectUtil.equals(order.getPayOrderId(), payOrderId)) {
                 log.warn("[updateDemoOrderPaid][order({}) 已支付，且支付单号相同({})，直接返回]", order, payOrderId);
                 return;
             }
             // 异常：支付单号不同，说明支付单号错误
-            log.error("[updateDemoOrderPaid][order({}) 支付单不匹配({})，请进行处理！order 数据是：{}]",
-                    order, payOrderId, toJsonString(order));
+            log.error("[updateDemoOrderPaid][order({}) 支付单不匹配({})，请进行处理！]",
+                    order, payOrderId);
             throw exception(DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR);
         }
 
@@ -185,7 +184,7 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
 
         // 2.1 生成退款单号
         // 一般来说，用户发起退款的时候，都会单独插入一个售后维权表，然后使用该表的 id 作为 refundId
-        // 这里我们是个简单的 demo，所以没有售后维权表，直接使用订单 id + "-refund" 来演示
+        //          这里我们是个简单的 demo，所以没有售后维权表，直接使用订单 id + "-refund" 来演示
         String refundId = order.getId() + "-refund";
         // 2.2 创建退款单
         Long payRefundId = payRefundApi.createRefund(new PayRefundCreateReqDTO()
@@ -216,16 +215,18 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
     }
 
     @Override
-    public void updateDemoOrderRefunded(Long id, Long payRefundId) {
+    public void updateDemoOrderRefunded(Long id, String refundId, Long payRefundId) {
         // 1. 校验并获得退款订单（可退款）
-        PayRefundRespDTO payRefund = validateDemoOrderCanRefunded(id, payRefundId);
+        PayRefundRespDTO payRefund = validateDemoOrderCanRefunded(id, refundId, payRefundId);
         // 2.2 更新退款单到 demo 订单
         payDemoOrderMapper.updateById(new PayDemoOrderDO().setId(id)
                 .setRefundTime(payRefund.getSuccessTime()));
     }
 
-    private PayRefundRespDTO validateDemoOrderCanRefunded(Long id, Long payRefundId) {
+    private PayRefundRespDTO validateDemoOrderCanRefunded(Long id, String refundId, Long payRefundId) {
         // 1.1 校验示例订单
+        // 一般来说，这里应该用 refundId 来查询退款单，然后再校验订单是否匹配
+        //       这里我们是个简单的 demo，所以没有售后维权表，直接使用订单 id 来查询订单
         PayDemoOrderDO order = payDemoOrderMapper.selectById(id);
         if (order == null) {
             throw exception(DEMO_ORDER_NOT_FOUND);
@@ -242,7 +243,7 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
         if (payRefund == null) {
             throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_NOT_FOUND);
         }
-        // 2.2
+        // 2.2 必须是退款成功状态
         if (!PayRefundStatusEnum.isSuccess(payRefund.getStatus())) {
             throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_NOT_SUCCESS);
         }
@@ -253,7 +254,7 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
             throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_PRICE_NOT_MATCH);
         }
         // 2.4 校验退款订单匹配（二次）
-        if (notEqual(payRefund.getMerchantOrderId(), id.toString())) {
+        if (notEqual(payRefund.getMerchantRefundId(), id.toString() + "-refund")) {
             log.error("[validateDemoOrderCanRefunded][order({}) 退款单不匹配({})，请进行处理！payRefund 数据是：{}]",
                     id, payRefundId, toJsonString(payRefund));
             throw exception(DEMO_ORDER_REFUND_FAIL_REFUND_ORDER_ID_ERROR);

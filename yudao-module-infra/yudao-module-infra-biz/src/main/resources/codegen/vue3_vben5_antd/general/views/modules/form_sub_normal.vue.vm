@@ -10,7 +10,7 @@
   import { message, Tabs, Form, Input, Textarea,Button, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker } from 'ant-design-vue';
   import { computed, ref, h, onMounted,watch,nextTick } from 'vue';
   import { $t } from '#/locales';
-  import { DICT_TYPE, getDictOptions } from '#/utils/dict';
+  import { DICT_TYPE, getDictOptions } from '#/utils';
 
 #if ($subTable.subJoinMany) ## 一对多
 import type { VxeTableInstance } from 'vxe-table';

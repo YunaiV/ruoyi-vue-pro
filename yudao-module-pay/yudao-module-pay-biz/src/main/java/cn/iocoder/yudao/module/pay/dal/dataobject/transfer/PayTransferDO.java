@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.pay.dal.dataobject.transfer;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferStatusRespEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferTypeEnum;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -16,7 +15,6 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-// TODO 芋艿：需要详细 review
 /**
  * 转账单 DO
  *
@@ -35,7 +33,6 @@ public class PayTransferDO extends BaseDO {
 
     /**
      * 转账单号
-     *
      */
     private String no;
 
@@ -71,13 +68,6 @@ public class PayTransferDO extends BaseDO {
     // ========== 转账相关字段 ==========
 
     /**
-     * 类型
-     *
-     * 枚举 {@link PayTransferTypeEnum}
-     */
-    private Integer type;
-
-    /**
      * 转账标题
      */
     private String subject;
@@ -87,6 +77,10 @@ public class PayTransferDO extends BaseDO {
      */
     private Integer price;
 
+    /**
+     * 收款人账号
+     */
+    private String userAccount;
     /**
      * 收款人姓名
      */
@@ -103,19 +97,6 @@ public class PayTransferDO extends BaseDO {
      * 订单转账成功时间
      */
     private LocalDateTime successTime;
-
-    // ========== 支付宝转账相关字段 ==========
-    /**
-     * 支付宝登录号
-     */
-    private String alipayLogonId;
-
-
-    // ========== 微信转账相关字段 ==========
-    /**
-     * 微信 openId
-     */
-    private String openid;
 
     // ========== 其它字段 ==========
 
@@ -151,8 +132,15 @@ public class PayTransferDO extends BaseDO {
 
     /**
      * 渠道的同步/异步通知的内容
-     *
      */
     private String channelNotifyData;
+
+    /**
+     * 渠道 package 信息
+     *
+     * 特殊：目前只有微信转账有这个东西！！！
+     * @see <a href="https://pay.weixin.qq.com/doc/v3/merchant/4012716430">JSAPI 调起用户确认收款</a>
+     */
+    private String channelPackageInfo;
 
 }

@@ -8,19 +8,27 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.transfer.PayTransferDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper
 public interface PayTransferMapper extends BaseMapperX<PayTransferDO> {
 
-    default int updateByIdAndStatus(Long id, List<Integer> status, PayTransferDO updateObj) {
+    default int updateByIdAndStatus(Long id, List<Integer> whereStatuses, PayTransferDO updateObj) {
         return update(updateObj, new LambdaQueryWrapper<PayTransferDO>()
-                .eq(PayTransferDO::getId, id).in(PayTransferDO::getStatus, status));
+                .eq(PayTransferDO::getId, id)
+                .in(PayTransferDO::getStatus, whereStatuses));
     }
 
-    default PayTransferDO selectByAppIdAndMerchantTransferId(Long appId, String merchantTransferId){
+    default int updateByIdAndStatus(Long id, Integer whereStatus, PayTransferDO updateObj) {
+        return update(updateObj, new LambdaQueryWrapper<PayTransferDO>()
+                .eq(PayTransferDO::getId, id)
+                .eq(PayTransferDO::getStatus, whereStatus));
+    }
+
+    default PayTransferDO selectByAppIdAndMerchantOrderId(Long appId, String merchantOrderId) {
         return selectOne(PayTransferDO::getAppId, appId,
-                    PayTransferDO::getMerchantTransferId, merchantTransferId);
+                    PayTransferDO::getMerchantTransferId, merchantOrderId);
     }
 
     default PageResult<PayTransferDO> selectPage(PayTransferPageReqVO reqVO) {
@@ -28,22 +36,26 @@ public interface PayTransferMapper extends BaseMapperX<PayTransferDO> {
                 .eqIfPresent(PayTransferDO::getNo, reqVO.getNo())
                 .eqIfPresent(PayTransferDO::getAppId, reqVO.getAppId())
                 .eqIfPresent(PayTransferDO::getChannelCode, reqVO.getChannelCode())
-                .eqIfPresent(PayTransferDO::getMerchantTransferId, reqVO.getMerchantTransferId())
-                .eqIfPresent(PayTransferDO::getType, reqVO.getType())
+                .eqIfPresent(PayTransferDO::getMerchantTransferId, reqVO.getMerchantOrderId())
                 .eqIfPresent(PayTransferDO::getStatus, reqVO.getStatus())
                 .likeIfPresent(PayTransferDO::getUserName, reqVO.getUserName())
+                .likeIfPresent(PayTransferDO::getUserAccount, reqVO.getUserAccount())
                 .eqIfPresent(PayTransferDO::getChannelTransferNo, reqVO.getChannelTransferNo())
                 .betweenIfPresent(PayTransferDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(PayTransferDO::getId));
     }
 
-    default List<PayTransferDO> selectListByStatus(Integer status) {
-        return selectList(PayTransferDO::getStatus, status);
+    default List<PayTransferDO> selectListByStatus(Collection<Integer> statuses) {
+        return selectList(PayTransferDO::getStatus, statuses);
     }
 
     default PayTransferDO selectByAppIdAndNo(Long appId, String no) {
         return selectOne(PayTransferDO::getAppId, appId,
                 PayTransferDO::getNo, no);
+    }
+
+    default PayTransferDO selectByNo(String no) {
+        return selectOne(PayTransferDO::getNo, no);
     }
 
 }

@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.transfer.PayTransferDO;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
@@ -60,6 +61,7 @@ public class PayNotifyTaskDO extends TenantBaseDO {
      *
      * 1. {@link PayNotifyTypeEnum#ORDER} 时，关联 {@link PayOrderDO#getId()}
      * 2. {@link PayNotifyTypeEnum#REFUND} 时，关联 {@link PayRefundDO#getId()}
+     * 3. {@link PayNotifyTypeEnum#TRANSFER} 时，关联 {@link PayTransferDO#getId()}
      */
     private Long dataId;
     /**
@@ -67,7 +69,11 @@ public class PayNotifyTaskDO extends TenantBaseDO {
      */
     private String merchantOrderId;
     /**
-     * 商户转账单编号
+     * 商户退款编号
+     */
+    private String merchantRefundId;
+    /**
+     * 商户转账编号
      */
     private String merchantTransferId;
     /**
