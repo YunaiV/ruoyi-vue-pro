@@ -14,6 +14,7 @@ import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 import java.util.List;
 import java.util.Set;
@@ -80,6 +81,15 @@ public class BpmSequentialMultiInstanceBehavior extends SequentialMultiInstanceB
         }
 
         return super.resolveNrOfInstances(execution);
+    }
+
+    @Override
+    protected void executeOriginalBehavior(DelegateExecution execution, ExecutionEntity multiInstanceRootExecution, int loopCounter) {
+        // 参见 https://gitee.com/zhijiantianya/yudao-cloud/issues/IC239F
+        super.collectionExpression = null;
+        super.collectionVariable = FlowableUtils.formatExecutionCollectionVariable(execution.getCurrentActivityId());
+        super.collectionElementVariable = FlowableUtils.formatExecutionCollectionElementVariable(execution.getCurrentActivityId());
+        super.executeOriginalBehavior(execution, multiInstanceRootExecution, loopCounter);
     }
 
 }
