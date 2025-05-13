@@ -597,6 +597,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      * @param nextAssignees 下一个节点审批人集合（参数）
      * @param processInstance 流程实例
      */
+    @SuppressWarnings("unchecked")
     private Map<String, Object> validateAndSetNextAssignees(String taskDefinitionKey, Map<String, Object> variables, BpmnModel bpmnModel,
                                                             Map<String, List<Long>> nextAssignees, ProcessInstance processInstance) {
         // simple 设计器第一个节点默认为发起人节点，不校验是否存在审批人
@@ -646,6 +647,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                     approveUserSelectAssignees = new HashMap<>();
                 }
                 approveUserSelectAssignees.put(nextFlowNode.getId(), assignees);
+                Map<String,List<Long>> existingApproveUserSelectAssignees = (Map<String,List<Long>>) variables.get(
+                        BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES);
+                if (CollUtil.isNotEmpty(existingApproveUserSelectAssignees)) {
+                    approveUserSelectAssignees.putAll(existingApproveUserSelectAssignees);
+                }
                 variables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_APPROVE_USER_SELECT_ASSIGNEES, approveUserSelectAssignees);
             }
         }

@@ -64,7 +64,6 @@ public class AiUtils {
                 return OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolNames(toolNames).toolContext(toolContext).build();
             case AZURE_OPENAI:
-                // TODO 芋艿：貌似没 model 字段？？？！
                 return AzureOpenAiChatOptions.builder().deploymentName(model).temperature(temperature).maxTokens(maxTokens)
                         .toolNames(toolNames).toolContext(toolContext).build();
             case OLLAMA:

@@ -13,9 +13,9 @@
   import { DICT_TYPE, getDictOptions } from '#/utils';
 
 #if ($subTable.subJoinMany) ## 一对多
-import type { VxeTableInstance } from 'vxe-table';
+import type { VxeTableInstance } from '#/adapter/vxe-table';
 import { Plus } from "@vben/icons";
-import { VxeColumn, VxeTable } from 'vxe-table';
+import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
 import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 #else
 import type { Rule } from 'ant-design-vue/es/form';

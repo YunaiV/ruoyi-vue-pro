@@ -92,6 +92,7 @@ public class KeFuMessageServiceImpl implements KeFuMessageService {
         MemberUserRespDTO user = memberUserApi.getUser(kefuMessage.getSenderId());
         KeFuMessageRespVO message = BeanUtils.toBean(kefuMessage, KeFuMessageRespVO.class).setSenderAvatar(user.getAvatar());
         getSelf().sendAsyncMessageToAdmin(KEFU_MESSAGE_TYPE, message);
+        getSelf().sendAsyncMessageToMember(conversation.getUserId(), KEFU_MESSAGE_TYPE, message);
         return kefuMessage.getId();
     }
 
