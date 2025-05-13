@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.infra.job.job.JobLogCleanJob;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.quartz.SchedulerException;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
@@ -36,10 +36,10 @@ public class JobServiceImplTest extends BaseDbUnitTest {
     private JobServiceImpl jobService;
     @Resource
     private JobMapper jobMapper;
-    @MockBean
+    @MockitoBean
     private SchedulerManager schedulerManager;
 
-    @MockBean
+    @MockitoBean
     private JobLogCleanJob jobLogCleanJob;
 
     @Test

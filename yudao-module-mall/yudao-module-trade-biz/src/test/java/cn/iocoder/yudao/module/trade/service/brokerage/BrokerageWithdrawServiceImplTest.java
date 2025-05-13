@@ -11,7 +11,7 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
@@ -36,14 +36,14 @@ public class BrokerageWithdrawServiceImplTest extends BaseDbUnitTest {
     @Resource
     private BrokerageWithdrawMapper brokerageWithdrawMapper;
 
-    @MockBean
+    @MockitoBean
     private BrokerageRecordService brokerageRecordService;
-    @MockBean
+    @MockitoBean
     private BrokerageUserService brokerageUserService;
-    @MockBean
+    @MockitoBean
     private TradeConfigService tradeConfigService;
 
-    @MockBean
+    @MockitoBean
     private NotifyMessageSendApi notifyMessageSendApi;
 
     @Resource

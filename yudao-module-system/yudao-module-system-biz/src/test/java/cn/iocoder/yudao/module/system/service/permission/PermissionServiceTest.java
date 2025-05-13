@@ -18,7 +18,7 @@ import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
@@ -48,13 +48,13 @@ public class PermissionServiceTest extends BaseDbUnitTest {
     @Resource
     private UserRoleMapper userRoleMapper;
 
-    @MockBean
+    @MockitoBean
     private RoleService roleService;
-    @MockBean
+    @MockitoBean
     private MenuService menuService;
-    @MockBean
+    @MockitoBean
     private DeptService deptService;
-    @MockBean
+    @MockitoBean
     private AdminUserService userService;
 
     @Test

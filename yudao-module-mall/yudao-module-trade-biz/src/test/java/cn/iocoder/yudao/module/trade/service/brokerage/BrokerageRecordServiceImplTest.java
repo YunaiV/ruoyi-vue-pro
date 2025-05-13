@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.BrokerageRecordMapper;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
@@ -39,9 +39,9 @@ public class BrokerageRecordServiceImplTest extends BaseDbUnitTest {
     @Resource
     private BrokerageRecordMapper brokerageRecordMapper;
 
-    @MockBean
+    @MockitoBean
     private TradeConfigService tradeConfigService;
-    @MockBean
+    @MockitoBean
     private BrokerageUserService brokerageUserService;
 
     @Test

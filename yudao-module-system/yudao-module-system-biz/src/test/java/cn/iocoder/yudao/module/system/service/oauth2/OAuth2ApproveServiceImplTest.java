@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ClientDO;
 import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2ApproveMapper;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
@@ -41,7 +41,7 @@ public class OAuth2ApproveServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OAuth2ApproveMapper oauth2ApproveMapper;
 
-    @MockBean
+    @MockitoBean
     private OAuth2ClientService oauth2ClientService;
 
     @Test

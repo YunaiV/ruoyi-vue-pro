@@ -17,7 +17,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileConfigDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.file.FileConfigMapper;
 import lombok.Data;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
@@ -53,9 +53,9 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
     @Resource
     private FileConfigMapper fileConfigMapper;
 
-    @MockBean
+    @MockitoBean
     private Validator validator;
-    @MockBean
+    @MockitoBean
     private FileClientFactory fileClientFactory;
 
     @Test

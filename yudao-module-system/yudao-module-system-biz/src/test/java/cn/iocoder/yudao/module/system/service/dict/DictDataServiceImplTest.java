@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictTypeDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dict.DictDataMapper;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
@@ -35,7 +35,7 @@ public class DictDataServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private DictDataMapper dictDataMapper;
-    @MockBean
+    @MockitoBean
     private DictTypeService dictTypeService;
 
     @Test

@@ -15,7 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.stubbing.Answer;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
@@ -46,10 +46,10 @@ public class DataSourceConfigServiceImplTest extends BaseDbUnitTest {
     @Resource
     private DataSourceConfigMapper dataSourceConfigMapper;
 
-    @MockBean
+    @MockitoBean
     private AES aes;
 
-    @MockBean
+    @MockitoBean
     private DynamicDataSourceProperties dynamicDataSourceProperties;
 
     @BeforeEach

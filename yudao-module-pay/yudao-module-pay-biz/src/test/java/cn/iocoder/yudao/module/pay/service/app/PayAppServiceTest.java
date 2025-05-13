@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
@@ -46,9 +46,9 @@ public class PayAppServiceTest extends BaseDbUnitTest {
     @Resource
     private PayAppMapper appMapper;
 
-    @MockBean
+    @MockitoBean
     private PayOrderService orderService;
-    @MockBean
+    @MockitoBean
     private PayRefundService refundService;
 
     @Test

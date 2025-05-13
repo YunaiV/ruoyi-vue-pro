@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
 import org.apache.ibatis.type.JdbcType;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
@@ -24,7 +24,7 @@ public class DatabaseTableServiceImplTest extends BaseDbUnitTest {
     @Resource
     private DatabaseTableServiceImpl databaseTableService;
 
-    @MockBean
+    @MockitoBean
     private DataSourceConfigService dataSourceConfigService;
 
     @Test
