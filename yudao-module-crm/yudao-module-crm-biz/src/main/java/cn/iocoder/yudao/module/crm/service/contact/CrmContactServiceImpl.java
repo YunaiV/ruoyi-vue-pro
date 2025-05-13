@@ -214,7 +214,7 @@ public class CrmContactServiceImpl implements CrmContactService {
         }
     }
 
-    @LogRecord(type = CRM_CONTACT_TYPE, subType = CRM_CONTACT_UPDATE_OWNER_USER_SUB_TYPE, bizNo = "{{#contact.id}",
+    @LogRecord(type = CRM_CONTACT_TYPE, subType = CRM_CONTACT_UPDATE_OWNER_USER_SUB_TYPE, bizNo = "{{#contact.id}}",
             success = CRM_CONTACT_UPDATE_OWNER_USER_SUCCESS)
     public void receiveContactLog(CrmContactDO contact, Long ownerUserId) {
         // 记录操作日志上下文
