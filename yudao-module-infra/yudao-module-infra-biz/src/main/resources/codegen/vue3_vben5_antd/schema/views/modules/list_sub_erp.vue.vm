@@ -7,7 +7,7 @@
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
 <script lang="ts" setup>
   import type { OnActionClickParams, VxeTableGridOptions } from '#/adapter/vxe-table';
-  import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+  import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
 
 #if ($table.templateType == 11) ## erp
   import ${subSimpleClassName}Form from './${subSimpleClassName_strikeCase}-form.vue'
@@ -21,13 +21,13 @@
 
 
 #if ($table.templateType == 11) ## erp
-  import { delete${subSimpleClassName}, get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+  import { delete${subSimpleClassName}, get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${table.businessName}';
   import { use${subSimpleClassName}GridFormSchema, use${subSimpleClassName}GridColumns } from '../data';
   #else
   #if ($subTable.subJoinMany) ## 一对多
-  import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+  import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${table.businessName}';
   #else
-  import { get${subSimpleClassName}By${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+  import { get${subSimpleClassName}By${SubJoinColumnName} } from '#/api/${table.moduleName}/${table.businessName}';
   #end
   import { use${subSimpleClassName}GridColumns } from '../data';
 #end

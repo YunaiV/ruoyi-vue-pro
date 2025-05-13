@@ -5,7 +5,7 @@
 #set ($subClassNameVar = $subClassNameVars.get($subIndex))
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
 <script lang="ts" setup>
-  import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+  import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
 
   import { computed, ref, h, onMounted,watch,nextTick } from 'vue';
   import { $t } from '#/locales';
@@ -17,11 +17,11 @@ import { ImageUpload, FileUpload } from "#/components/upload";
 import type { OnActionClickParams } from '#/adapter/vxe-table';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { use${subSimpleClassName}GridEditColumns } from '../data';
-import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${table.businessName}';
 #else
 import { useVbenForm } from '#/adapter/form';
 import { use${subSimpleClassName}FormSchema } from '../data';
-import { get${subSimpleClassName}By${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { get${subSimpleClassName}By${SubJoinColumnName} } from '#/api/${table.moduleName}/${table.businessName}';
 #end
 
 const props = defineProps<{
