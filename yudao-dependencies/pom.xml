@@ -14,7 +14,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>2.4.2-jdk8-SNAPSHOT</revision>
+        <revision>2.5.0-jdk8-SNAPSHOT</revision>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
         <spring.framework.version>5.3.39</spring.framework.version>
