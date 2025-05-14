@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantPackageDO;
 import cn.iocoder.yudao.module.system.dal.mysql.tenant.TenantPackageMapper;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
@@ -42,7 +42,7 @@ public class TenantPackageServiceImplTest extends BaseDbUnitTest {
     @Resource
     private TenantPackageMapper tenantPackageMapper;
 
-    @MockBean
+    @MockitoBean
     private TenantService tenantService;
 
     @Test

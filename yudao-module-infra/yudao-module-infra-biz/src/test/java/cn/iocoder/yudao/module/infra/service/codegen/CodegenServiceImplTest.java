@@ -26,7 +26,7 @@ import com.baomidou.mybatisplus.generator.config.po.TableField;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import java.util.Arrays;
@@ -62,18 +62,18 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
     @Resource
     private CodegenColumnMapper codegenColumnMapper;
 
-    @MockBean
+    @MockitoBean
     private DatabaseTableService databaseTableService;
 
-    @MockBean
+    @MockitoBean
     private AdminUserApi userApi;
 
-    @MockBean
+    @MockitoBean
     private CodegenBuilder codegenBuilder;
-    @MockBean
+    @MockitoBean
     private CodegenEngine codegenEngine;
 
-    @MockBean
+    @MockitoBean
     private CodegenProperties codegenProperties;
 
     @Test

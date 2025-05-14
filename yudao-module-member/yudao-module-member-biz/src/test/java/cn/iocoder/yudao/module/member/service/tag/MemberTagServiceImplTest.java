@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.member.dal.dataobject.tag.MemberTagDO;
 import cn.iocoder.yudao.module.member.dal.mysql.tag.MemberTagMapper;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
@@ -39,7 +39,7 @@ public class MemberTagServiceImplTest extends BaseDbUnitTest {
     @Resource
     private MemberTagMapper tagMapper;
 
-    @MockBean
+    @MockitoBean
     private MemberUserService memberUserService;
 
     @Test

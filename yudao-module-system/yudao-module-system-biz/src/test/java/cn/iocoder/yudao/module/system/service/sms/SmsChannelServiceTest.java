@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannel
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsChannelMapper;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
@@ -39,9 +39,9 @@ public class SmsChannelServiceTest extends BaseDbUnitTest {
     @Resource
     private SmsChannelMapper smsChannelMapper;
 
-    @MockBean
+    @MockitoBean
     private SmsClientFactory smsClientFactory;
-    @MockBean
+    @MockitoBean
     private SmsTemplateService smsTemplateService;
 
     @Test

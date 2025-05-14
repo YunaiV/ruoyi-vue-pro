@@ -14,7 +14,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.channel.PayChannelMapper;
 import com.alibaba.fastjson.JSON;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
@@ -39,9 +39,9 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
     @Resource
     private PayChannelMapper channelMapper;
 
-    @MockBean
+    @MockitoBean
     private PayClientFactory payClientFactory;
-    @MockBean
+    @MockitoBean
     private Validator validator;
 
     @Test

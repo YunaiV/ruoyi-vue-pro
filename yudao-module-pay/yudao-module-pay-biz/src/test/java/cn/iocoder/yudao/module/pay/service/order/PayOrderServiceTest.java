@@ -30,7 +30,7 @@ import jakarta.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import java.time.Duration;
@@ -66,13 +66,13 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
     @Resource
     private PayOrderExtensionMapper orderExtensionMapper;
 
-    @MockBean
+    @MockitoBean
     private PayProperties properties;
-    @MockBean
+    @MockitoBean
     private PayAppService appService;
-    @MockBean
+    @MockitoBean
     private PayChannelService channelService;
-    @MockBean
+    @MockitoBean
     private PayNotifyService notifyService;
 
     @BeforeEach

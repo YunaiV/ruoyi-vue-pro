@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.system.api.logger.LoginLogApi;
 import cn.iocoder.yudao.module.system.api.oauth2.OAuth2TokenApi;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -36,17 +36,17 @@ public class MemberAuthServiceTest extends BaseDbAndRedisUnitTest {
     @Resource
     private MemberAuthServiceImpl authService;
 
-    @MockBean
+    @MockitoBean
     private MemberUserService userService;
-    @MockBean
+    @MockitoBean
     private SmsCodeApi smsCodeApi;
-    @MockBean
+    @MockitoBean
     private LoginLogApi loginLogApi;
-    @MockBean
+    @MockitoBean
     private OAuth2TokenApi oauth2TokenApi;
-    @MockBean
+    @MockitoBean
     private SocialUserApi socialUserApi;
-    @MockBean
+    @MockitoBean
     private PasswordEncoder passwordEncoder;
 
     @Resource

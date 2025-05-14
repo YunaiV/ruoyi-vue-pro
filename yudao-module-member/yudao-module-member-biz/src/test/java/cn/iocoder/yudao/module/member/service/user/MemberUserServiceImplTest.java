@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,13 +44,13 @@ public class MemberUserServiceImplTest extends BaseDbAndRedisUnitTest {
     @Resource
     private MemberUserMapper userMapper;
 
-    @MockBean
+    @MockitoBean
     private MemberAuthServiceImpl authService;
 
-    @MockBean
+    @MockitoBean
     private PasswordEncoder passwordEncoder;
 
-    @MockBean
+    @MockitoBean
     private SmsCodeApi smsCodeApi;
 
     // TODO 芋艿：后续重构这个单测

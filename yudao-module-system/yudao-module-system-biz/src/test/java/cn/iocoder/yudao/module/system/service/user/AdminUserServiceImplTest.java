@@ -31,7 +31,7 @@ import jakarta.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -68,19 +68,19 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
     @Resource
     private UserPostMapper userPostMapper;
 
-    @MockBean
+    @MockitoBean
     private DeptService deptService;
-    @MockBean
+    @MockitoBean
     private PostService postService;
-    @MockBean
+    @MockitoBean
     private PermissionService permissionService;
-    @MockBean
+    @MockitoBean
     private PasswordEncoder passwordEncoder;
-    @MockBean
+    @MockitoBean
     private TenantService tenantService;
-    @MockBean
+    @MockitoBean
     private FileApi fileApi;
-    @MockBean
+    @MockitoBean
     private ConfigApi configApi;
 
     @BeforeEach

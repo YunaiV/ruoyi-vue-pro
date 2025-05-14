@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.product.service.property.ProductPropertyValueServ
 import cn.iocoder.yudao.module.product.service.spu.ProductSpuService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
@@ -44,11 +44,11 @@ public class ProductSkuServiceTest extends BaseDbUnitTest {
     @Resource
     private ProductSkuMapper productSkuMapper;
 
-    @MockBean
+    @MockitoBean
     private ProductSpuService productSpuService;
-    @MockBean
+    @MockitoBean
     private ProductPropertyService productPropertyService;
-    @MockBean
+    @MockitoBean
     private ProductPropertyValueService productPropertyValueService;
 
     public Long generateId() {

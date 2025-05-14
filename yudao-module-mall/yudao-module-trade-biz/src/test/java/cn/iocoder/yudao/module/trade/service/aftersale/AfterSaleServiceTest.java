@@ -22,7 +22,7 @@ import cn.iocoder.yudao.module.trade.service.order.TradeOrderQueryService;
 import cn.iocoder.yudao.module.trade.service.order.TradeOrderUpdateService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
@@ -54,15 +54,15 @@ public class AfterSaleServiceTest extends BaseDbUnitTest {
     @Resource
     private AfterSaleLogMapper tradeAfterSaleLogMapper;
 
-    @MockBean
+    @MockitoBean
     private TradeOrderUpdateService tradeOrderUpdateService;
     @Resource
     private TradeOrderQueryService tradeOrderQueryService;
 
-    @MockBean
+    @MockitoBean
     private PayRefundApi payRefundApi;
 
-    @MockBean
+    @MockitoBean
     private TradeOrderProperties tradeOrderProperties;
 
     @Test

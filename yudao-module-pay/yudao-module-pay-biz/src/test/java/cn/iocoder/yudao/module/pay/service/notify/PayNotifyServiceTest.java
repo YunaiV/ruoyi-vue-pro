@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
@@ -54,9 +54,9 @@ public class PayNotifyServiceTest extends BaseDbUnitTest {
     @Resource
     private PayNotifyServiceImpl notifyService;
 
-    @MockBean
+    @MockitoBean
     private PayOrderService orderService;
-    @MockBean
+    @MockitoBean
     private PayRefundService refundService;
 
     @Resource
@@ -64,7 +64,7 @@ public class PayNotifyServiceTest extends BaseDbUnitTest {
     @Resource
     private PayNotifyLogMapper notifyLogMapper;
 
-    @MockBean
+    @MockitoBean
     private RedissonClient redissonClient;
 
     @Test

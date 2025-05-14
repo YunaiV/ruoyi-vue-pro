@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.member.dal.dataobject.level.MemberLevelDO;
 import cn.iocoder.yudao.module.member.dal.mysql.level.MemberLevelMapper;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
@@ -40,11 +40,11 @@ public class MemberLevelServiceImplTest extends BaseDbUnitTest {
     @Resource
     private MemberLevelMapper memberlevelMapper;
 
-    @MockBean
+    @MockitoBean
     private MemberLevelRecordService memberLevelRecordService;
-    @MockBean
+    @MockitoBean
     private MemberExperienceRecordService memberExperienceRecordService;
-    @MockBean
+    @MockitoBean
     private MemberUserService memberUserService;
 
     @Test

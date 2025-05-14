@@ -17,7 +17,7 @@ import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsTemplateMapper;
 import cn.iocoder.yudao.module.system.enums.sms.SmsTemplateTypeEnum;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
@@ -45,9 +45,9 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
     @Resource
     private SmsTemplateMapper smsTemplateMapper;
 
-    @MockBean
+    @MockitoBean
     private SmsChannelService smsChannelService;
-    @MockBean
+    @MockitoBean
     private SmsClient smsClient;
 
     @Test
