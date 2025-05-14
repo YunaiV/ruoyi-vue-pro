@@ -34,7 +34,7 @@ public class CrmCustomerIndustryParseFunction implements IParseFunction {
         if (StrUtil.isEmptyIfStr(value)) {
             return "";
         }
-        return DictFrameworkUtils.getDictDataLabel(CRM_CUSTOMER_INDUSTRY, value.toString());
+        return DictFrameworkUtils.parseDictDataLabel(CRM_CUSTOMER_INDUSTRY, value.toString());
     }
 
 }

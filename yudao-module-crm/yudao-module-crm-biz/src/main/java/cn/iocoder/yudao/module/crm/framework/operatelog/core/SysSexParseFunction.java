@@ -33,7 +33,7 @@ public class SysSexParseFunction implements IParseFunction {
         if (StrUtil.isEmptyIfStr(value)) {
             return "";
         }
-        return DictFrameworkUtils.getDictDataLabel(DictTypeConstants.USER_SEX, value.toString());
+        return DictFrameworkUtils.parseDictDataLabel(DictTypeConstants.USER_SEX, value.toString());
     }
 
 }

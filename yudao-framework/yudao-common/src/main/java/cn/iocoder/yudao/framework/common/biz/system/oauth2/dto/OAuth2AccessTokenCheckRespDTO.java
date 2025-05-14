@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.api.oauth2.dto;
+package cn.iocoder.yudao.framework.common.biz.system.oauth2.dto;
 
 import lombok.Data;
 
