@@ -1,8 +1,8 @@
-package cn.iocoder.yudao.module.system.api.oauth2;
+package cn.iocoder.yudao.framework.common.biz.system.oauth2;
 
-import cn.iocoder.yudao.module.system.api.oauth2.dto.OAuth2AccessTokenCheckRespDTO;
-import cn.iocoder.yudao.module.system.api.oauth2.dto.OAuth2AccessTokenCreateReqDTO;
-import cn.iocoder.yudao.module.system.api.oauth2.dto.OAuth2AccessTokenRespDTO;
+import cn.iocoder.yudao.framework.common.biz.system.oauth2.dto.OAuth2AccessTokenCheckRespDTO;
+import cn.iocoder.yudao.framework.common.biz.system.oauth2.dto.OAuth2AccessTokenCreateReqDTO;
+import cn.iocoder.yudao.framework.common.biz.system.oauth2.dto.OAuth2AccessTokenRespDTO;
 
 import javax.validation.Valid;
 
@@ -11,7 +11,7 @@ import javax.validation.Valid;
  *
  * @author 芋道源码
  */
-public interface OAuth2TokenApi {
+public interface OAuth2TokenCommonApi {
 
     /**
      * 创建访问令牌

@@ -1,13 +1,15 @@
 import type { VbenFormSchema } from '#/adapter/form';
 import type { OnActionClickFn, VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
 
 import { z } from '#/adapter/form';
+import { getRangePickerDefaultProps } from '#/utils/date';
+import { DICT_TYPE, getDictOptions } from '#/utils/dict';
+
 #if(${table.templateType} == 2)## 树表需要导入这些
-import { get${simpleClassName}List } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { get${simpleClassName}List } from '#/api/${table.moduleName}/${table.businessName}';
 import { handleTree } from '@vben/utils';
 #end
-import { DICT_TYPE, getDictOptions, getRangePickerDefaultProps } from '#/utils';
 import { useAccess } from '@vben/access';
 
 const { hasAccessByCodes } = useAccess();

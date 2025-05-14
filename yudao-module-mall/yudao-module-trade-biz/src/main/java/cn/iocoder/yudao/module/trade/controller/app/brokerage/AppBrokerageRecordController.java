@@ -42,7 +42,7 @@ public class AppBrokerageRecordController {
         PageResult<BrokerageRecordDO> pageResult = brokerageRecordService.getBrokerageRecordPage(
                 BeanUtils.toBean(pageReqVO, BrokerageRecordPageReqVO.class).setUserId(getLoginUserId()));
         return success(BeanUtils.toBean(pageResult, AppBrokerageRecordRespVO.class, recordVO ->
-                recordVO.setStatusName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.BROKERAGE_RECORD_STATUS, recordVO.getStatus()))));
+                recordVO.setStatusName(DictFrameworkUtils.parseDictDataLabel(DictTypeConstants.BROKERAGE_RECORD_STATUS, recordVO.getStatus()))));
     }
 
     @GetMapping("/get-product-brokerage-price")

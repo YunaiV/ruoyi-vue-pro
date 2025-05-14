@@ -33,7 +33,7 @@ public class CrmProductStatusParseFunction implements IParseFunction {
         if (StrUtil.isEmptyIfStr(value)) {
             return "";
         }
-        return DictFrameworkUtils.getDictDataLabel(DictTypeConstants.CRM_PRODUCT_STATUS, value.toString());
+        return DictFrameworkUtils.parseDictDataLabel(DictTypeConstants.CRM_PRODUCT_STATUS, value.toString());
     }
 
 }

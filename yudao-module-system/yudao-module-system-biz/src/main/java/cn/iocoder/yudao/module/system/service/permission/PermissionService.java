@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.service.permission;
 
-import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
+import cn.iocoder.yudao.framework.common.biz.system.permission.dto.DeptDataPermissionRespDTO;
 
 import java.util.Collection;
 import java.util.Set;

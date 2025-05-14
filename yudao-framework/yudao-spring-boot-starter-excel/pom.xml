@@ -27,13 +27,6 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- 业务组件 -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-system-api</artifactId> <!-- 需要使用它，进行 Dict 的查询 -->
-            <version>${revision}</version>
-        </dependency>
-
         <!-- Web 相关 -->
         <dependency>
             <groupId>org.springframework</groupId>

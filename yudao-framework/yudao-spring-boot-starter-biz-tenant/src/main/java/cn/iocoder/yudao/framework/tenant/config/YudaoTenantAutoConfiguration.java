@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.tenant.config;
 
+import cn.iocoder.yudao.framework.common.biz.system.tenant.TenantCommonApi;
 import cn.iocoder.yudao.framework.common.enums.WebFilterOrderEnum;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.framework.redis.config.YudaoCacheProperties;
@@ -19,7 +20,6 @@ import cn.iocoder.yudao.framework.tenant.core.web.TenantContextWebFilter;
 import cn.iocoder.yudao.framework.tenant.core.web.TenantVisitContextInterceptor;
 import cn.iocoder.yudao.framework.web.config.WebProperties;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
-import cn.iocoder.yudao.module.system.api.tenant.TenantApi;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -58,7 +58,7 @@ public class YudaoTenantAutoConfiguration {
     private ApplicationContext applicationContext;
 
     @Bean
-    public TenantFrameworkService tenantFrameworkService(TenantApi tenantApi) {
+    public TenantFrameworkService tenantFrameworkService(TenantCommonApi tenantApi) {
         return new TenantFrameworkServiceImpl(tenantApi);
     }
 

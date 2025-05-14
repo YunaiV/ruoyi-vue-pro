@@ -1,16 +1,15 @@
-package cn.iocoder.yudao.module.infra.api.logger;
+package cn.iocoder.yudao.framework.common.biz.infra.logger;
 
-import cn.iocoder.yudao.module.infra.api.logger.dto.ApiAccessLogCreateReqDTO;
+import cn.iocoder.yudao.framework.common.biz.infra.logger.dto.ApiAccessLogCreateReqDTO;
+import jakarta.validation.Valid;
 import org.springframework.scheduling.annotation.Async;
-
-import javax.validation.Valid;
 
 /**
  * API 访问日志的 API 接口
  *
  * @author 芋道源码
  */
-public interface ApiAccessLogApi {
+public interface ApiAccessLogCommonApi {
 
     /**
      * 创建 API 访问日志

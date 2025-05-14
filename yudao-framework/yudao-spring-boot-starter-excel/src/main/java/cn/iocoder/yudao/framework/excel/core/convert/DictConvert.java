@@ -56,7 +56,7 @@ public class DictConvert implements Converter<Object> {
         // 使用字典格式化
         String type = getType(contentProperty);
         String value = String.valueOf(object);
-        String label = DictFrameworkUtils.getDictDataLabel(type, value);
+        String label = DictFrameworkUtils.parseDictDataLabel(type, value);
         if (label == null) {
             log.error("[convertToExcelData][type({}) 转换不了 label({})]", type, value);
             return new WriteCellData<>("");

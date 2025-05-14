@@ -49,8 +49,8 @@ public class AppBrokerageWithdrawController {
         PageResult<BrokerageWithdrawDO> pageResult = brokerageWithdrawService.getBrokerageWithdrawPage(
                 BeanUtils.toBean(pageReqVO, BrokerageWithdrawPageReqVO.class).setUserId(getLoginUserId()));
         return success(BeanUtils.toBean(pageResult, AppBrokerageWithdrawRespVO.class, withdrawVO ->
-                withdrawVO.setTypeName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.BROKERAGE_WITHDRAW_TYPE, withdrawVO.getType()))
-                        .setStatusName(DictFrameworkUtils.getDictDataLabel(DictTypeConstants.BROKERAGE_WITHDRAW_STATUS, withdrawVO.getStatus()))));
+                withdrawVO.setTypeName(DictFrameworkUtils.parseDictDataLabel(DictTypeConstants.BROKERAGE_WITHDRAW_TYPE, withdrawVO.getType()))
+                        .setStatusName(DictFrameworkUtils.parseDictDataLabel(DictTypeConstants.BROKERAGE_WITHDRAW_STATUS, withdrawVO.getStatus()))));
     }
 
     @GetMapping("/get")

@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.member.dal.dataobject.user.MemberUserDO;
 import cn.iocoder.yudao.module.member.dal.mysql.user.MemberUserMapper;
 import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import cn.iocoder.yudao.module.system.api.logger.LoginLogApi;
-import cn.iocoder.yudao.module.system.api.oauth2.OAuth2TokenApi;
+import cn.iocoder.yudao.framework.common.biz.system.oauth2.OAuth2TokenCommonApi;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.social.SocialUserApi;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -43,7 +43,7 @@ public class MemberAuthServiceTest extends BaseDbAndRedisUnitTest {
     @MockBean
     private LoginLogApi loginLogApi;
     @MockBean
-    private OAuth2TokenApi oauth2TokenApi;
+    private OAuth2TokenCommonApi oauth2TokenApi;
     @MockBean
     private SocialUserApi socialUserApi;
     @MockBean

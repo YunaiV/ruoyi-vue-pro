@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.api.logger.dto;
+package cn.iocoder.yudao.framework.common.biz.system.logger.dto;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import lombok.Data;

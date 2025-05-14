@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.api.logger;
 
-import cn.iocoder.yudao.module.infra.api.logger.dto.ApiErrorLogCreateReqDTO;
+import cn.iocoder.yudao.framework.common.biz.infra.logger.ApiErrorLogCommonApi;
+import cn.iocoder.yudao.framework.common.biz.infra.logger.dto.ApiErrorLogCreateReqDTO;
 import cn.iocoder.yudao.module.infra.service.logger.ApiErrorLogService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -14,7 +15,7 @@ import javax.annotation.Resource;
  */
 @Service
 @Validated
-public class ApiErrorLogApiImpl implements ApiErrorLogApi {
+public class ApiErrorLogApiImpl implements ApiErrorLogCommonApi {
 
     @Resource
     private ApiErrorLogService apiErrorLogService;

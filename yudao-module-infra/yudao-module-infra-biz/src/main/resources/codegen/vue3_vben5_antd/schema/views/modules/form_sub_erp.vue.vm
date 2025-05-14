@@ -3,7 +3,7 @@
 #set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
 #set ($subSimpleClassName = $subSimpleClassNames.get($subIndex))
 <script lang="ts" setup>
-  import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+  import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
 
   import { useVbenModal } from '@vben/common-ui';
   import { message } from 'ant-design-vue';
@@ -11,7 +11,7 @@
   import { computed, ref } from 'vue';
   import { $t } from '#/locales';
   import { useVbenForm } from '#/adapter/form';
-  import { get${subSimpleClassName}, create${subSimpleClassName}, update${subSimpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+  import { get${subSimpleClassName}, create${subSimpleClassName}, update${subSimpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 
   import { use${subSimpleClassName}FormSchema } from '../data';
 

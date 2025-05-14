@@ -34,7 +34,7 @@ public class CrmReceivableReturnTypeParseFunction implements IParseFunction {
         if (StrUtil.isEmptyIfStr(value)) {
             return "";
         }
-        return DictFrameworkUtils.getDictDataLabel(CRM_RECEIVABLE_RETURN_TYPE, value.toString());
+        return DictFrameworkUtils.parseDictDataLabel(CRM_RECEIVABLE_RETURN_TYPE, value.toString());
     }
 
 }

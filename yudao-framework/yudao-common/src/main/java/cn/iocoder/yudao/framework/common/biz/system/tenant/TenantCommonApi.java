@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.api.tenant;
+package cn.iocoder.yudao.framework.common.biz.system.tenant;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-public interface TenantApi {
+public interface TenantCommonApi {
 
     /**
      * 获得所有租户
