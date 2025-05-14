@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.framework.common.biz.system.logger;
 
 import cn.iocoder.yudao.framework.common.biz.system.logger.dto.OperateLogCreateReqDTO;
-import jakarta.validation.Valid;
 import org.springframework.scheduling.annotation.Async;
+
+import javax.validation.Valid;
 
 /**
  * 操作日志 API 接口
