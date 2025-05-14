@@ -20,8 +20,6 @@ import cn.iocoder.yudao.module.infra.framework.codegen.config.CodegenProperties;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenBuilder;
 import cn.iocoder.yudao.module.infra.service.codegen.inner.CodegenEngine;
 import cn.iocoder.yudao.module.infra.service.db.DatabaseTableService;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.baomidou.mybatisplus.generator.config.po.TableField;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import jakarta.annotation.Resource;
@@ -66,9 +64,6 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
     private DatabaseTableService databaseTableService;
 
     @MockBean
-    private AdminUserApi userApi;
-
-    @MockBean
     private CodegenBuilder codegenBuilder;
     @MockBean
     private CodegenEngine codegenEngine;
@@ -79,7 +74,7 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateCodegenList() {
         // 准备参数
-        Long userId = randomLongId();
+        String author = randomString();
         CodegenCreateListReqVO reqVO = randomPojo(CodegenCreateListReqVO.class,
                 o -> o.setDataSourceConfigId(1L).setTableNames(Collections.singletonList("t_yunai")));
         // mock 方法（TableInfo）
@@ -97,9 +92,6 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         // mock 方法（CodegenTableDO）
         CodegenTableDO table = randomPojo(CodegenTableDO.class);
         when(codegenBuilder.buildTable(same(tableInfo))).thenReturn(table);
-        // mock 方法（AdminUserRespDTO）
-        AdminUserRespDTO user = randomPojo(AdminUserRespDTO.class, o -> o.setNickname("芋头"));
-        when(userApi.getUser(eq(userId))).thenReturn(user);
         // mock 方法（CodegenColumnDO）
         List<CodegenColumnDO> columns = randomPojoList(CodegenColumnDO.class);
         when(codegenBuilder.buildColumns(eq(table.getId()), same(fields)))
@@ -108,7 +100,7 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         when(codegenProperties.getFrontType()).thenReturn(CodegenFrontTypeEnum.VUE3_ELEMENT_PLUS.getType());
 
         // 调用
-        List<Long> result = codegenService.createCodegenList(userId, reqVO);
+        List<Long> result = codegenService.createCodegenList(author, reqVO);
         // 断言
         assertEquals(1, result.size());
         // 断言（CodegenTableDO）
@@ -117,7 +109,7 @@ public class CodegenServiceImplTest extends BaseDbUnitTest {
         assertEquals(1L, dbTable.getDataSourceConfigId());
         assertEquals(CodegenSceneEnum.ADMIN.getScene(), dbTable.getScene());
         assertEquals(CodegenFrontTypeEnum.VUE3_ELEMENT_PLUS.getType(), dbTable.getFrontType());
-        assertEquals("芋头", dbTable.getAuthor());
+        assertEquals(author, dbTable.getAuthor());
         // 断言（CodegenColumnDO）
         List<CodegenColumnDO> dbColumns = codegenColumnMapper.selectList();
         assertEquals(columns.size(), dbColumns.size());

@@ -21,11 +21,11 @@ public interface CodegenService {
     /**
      * 基于数据库的表结构，创建代码生成器的表定义
      *
-     * @param userId 用户编号
+     * @param author 作者
      * @param reqVO 表信息
      * @return 创建的表定义的编号数组
      */
-    List<Long> createCodegenList(Long userId, CodegenCreateListReqVO reqVO);
+    List<Long> createCodegenList(String author, CodegenCreateListReqVO reqVO);
 
     /**
      * 更新数据库的表和字段定义
