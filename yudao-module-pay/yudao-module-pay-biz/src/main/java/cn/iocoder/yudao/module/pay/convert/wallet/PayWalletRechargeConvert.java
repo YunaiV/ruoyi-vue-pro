@@ -32,7 +32,7 @@ public interface PayWalletRechargeConvert {
         PageResult<AppPayWalletRechargeRespVO> voPageResult = BeanUtils.toBean(pageResult, AppPayWalletRechargeRespVO.class);
         Map<Long, PayOrderDO> payOrderMap = CollectionUtils.convertMap(payOrderList, PayOrderDO::getId);
         voPageResult.getList().forEach(recharge -> {
-            recharge.setPayChannelName(DictFrameworkUtils.getDictDataLabel(
+            recharge.setPayChannelName(DictFrameworkUtils.parseDictDataLabel(
                     DictTypeConstants.CHANNEL_CODE, recharge.getPayChannelCode()));
             MapUtils.findAndThen(payOrderMap, recharge.getPayOrderId(),
                     order -> recharge.setPayOrderChannelOrderNo(order.getChannelOrderNo()));

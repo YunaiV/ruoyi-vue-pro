@@ -1,8 +1,8 @@
-package cn.iocoder.yudao.module.infra.api.logger.dto;
-
-import lombok.Data;
+package cn.iocoder.yudao.framework.common.biz.infra.logger.dto;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
 import java.time.LocalDateTime;
 
 /**

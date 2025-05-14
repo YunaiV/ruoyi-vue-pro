@@ -33,7 +33,7 @@ public class BooleanParseFunction implements IParseFunction {
         if (StrUtil.isEmptyIfStr(value)) {
             return "";
         }
-        return DictFrameworkUtils.getDictDataLabel(DictTypeConstants.BOOLEAN_STRING, value.toString());
+        return DictFrameworkUtils.parseDictDataLabel(DictTypeConstants.BOOLEAN_STRING, value.toString());
     }
 
 }

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.infra.api.logger.dto;
+package cn.iocoder.yudao.framework.common.biz.infra.logger.dto;
 
 import lombok.Data;
 
