@@ -172,6 +172,19 @@ yudao:
     transfer-notify-url: https://yunai.natapp1.cc/admin-api/pay/notify/transfer # 支付渠道的【转账】回调地址
   demo: false # 开启演示模式
   tencent-lbs-key: TVDBZ-TDILD-4ON4B-PFDZA-RNLKH-VVF6E # QQ 地图的密钥 https://lbs.qq.com/service/staticV2/staticGuide/staticDoc
+  dict:
+    cache:
+      warmup-enabled: true
+      # 默认的字典 SQL
+      default-sql: "SELECT value FROM system_dict_data WHERE dict_type = ? AND status = 0"
+      # 缓存预热的字典类型
+      warmup-dict-types:
+        # 系统功能
+        system:
+          - sys_common_status
+      # 缓存预热的SQL
+      warmup-sqls:
+        system: ${yudao.dict.cache.default-sql}
 
 justauth:
   enabled: true

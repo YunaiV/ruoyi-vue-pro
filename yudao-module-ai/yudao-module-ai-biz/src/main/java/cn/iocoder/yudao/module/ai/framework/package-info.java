@@ -3,4 +3,4 @@
  *
  * @author 芋道源码
  */
-package cn.iocoder.yudao.module.crm.framework;
+package cn.iocoder.yudao.module.ai.framework;
