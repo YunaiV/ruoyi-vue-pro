@@ -7,13 +7,13 @@ CREATE TABLE IF NOT EXISTS "system_dept" (
     "phone" varchar(11) DEFAULT NULL,
     "email" varchar(50) DEFAULT NULL,
     "status" tinyint NOT NULL,
-    "external_id" varchar(50) DEFAULT NULL,
     "creator" varchar(64) DEFAULT '',
     "create_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updater" varchar(64) DEFAULT '',
     "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted" bit NOT NULL DEFAULT FALSE,
     "tenant_id" bigint not null default  '0',
+    "external_id" varchar(50) DEFAULT NULL,
     PRIMARY KEY ("id")
 ) COMMENT '部门表';
 
@@ -243,6 +243,7 @@ CREATE TABLE IF NOT EXISTS "system_users" (
     "update_time" timestamp not null default current_timestamp,
     "deleted" bit not null default false,
     "tenant_id" bigint not null default  '0',
+    "external_id" varchar(50) DEFAULT NULL,
     primary key ("id")
 ) comment '用户信息表';
 
