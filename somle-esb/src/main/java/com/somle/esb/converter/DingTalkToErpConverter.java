@@ -71,6 +71,7 @@ public class DingTalkToErpConverter {
 
     public DeptSaveReqDTO toSaveReq(DingTalkDepartment dept) {
         DeptSaveReqDTO erpDept = new DeptSaveReqDTO();
+        erpDept.setExternalId(dept.getDeptId().toString());
         // translate parent id
         if (dept.getDeptId() == 1L) {
             erpDept.setParentId(0L);
@@ -99,6 +100,7 @@ public class DingTalkToErpConverter {
 
     public AdminUserSaveReqDTO toSaveReq(OapiV2UserGetResponse.UserGetResponse user) {
         AdminUserSaveReqDTO erpUser = new AdminUserSaveReqDTO();
+        erpUser.setExternalId(user.getUserid().toString());
         //try to translate id
         try {
             var result = adminUserApi.getUserByExternalId(user.getUserid());
