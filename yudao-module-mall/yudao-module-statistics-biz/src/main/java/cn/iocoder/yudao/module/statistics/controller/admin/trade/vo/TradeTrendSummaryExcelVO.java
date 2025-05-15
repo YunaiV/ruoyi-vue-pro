@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.statistics.controller.admin.trade.vo;
 
 import cn.iocoder.yudao.framework.excel.core.convert.MoneyConvert;
-import com.alibaba.excel.annotation.ExcelProperty;
-import com.alibaba.excel.annotation.format.DateTimeFormat;
+import cn.idev.excel.annotation.ExcelProperty;
+import cn.idev.excel.annotation.format.DateTimeFormat;
 import lombok.Data;
 
 import java.time.LocalDate;

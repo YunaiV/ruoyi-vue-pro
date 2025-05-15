@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.system.controller.admin.dept.vo.post;
 
-import com.alibaba.excel.annotation.ExcelProperty;
+import cn.idev.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 

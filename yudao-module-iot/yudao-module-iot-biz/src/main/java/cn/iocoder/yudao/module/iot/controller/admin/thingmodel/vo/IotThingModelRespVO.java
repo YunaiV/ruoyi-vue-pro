@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelEvent;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelProperty;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelService;
-import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
-import com.alibaba.excel.annotation.ExcelProperty;
+import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
+import cn.idev.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
