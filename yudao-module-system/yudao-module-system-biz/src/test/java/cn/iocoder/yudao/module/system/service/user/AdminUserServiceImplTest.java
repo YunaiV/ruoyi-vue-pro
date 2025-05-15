@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserSaveReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
@@ -91,7 +92,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreatUser_success() {
         // 准备参数
-        UserSaveReqVO reqVO = randomPojo(UserSaveReqVO.class, o -> {
+        AdminUserSaveReqDTO reqVO = randomPojo(AdminUserSaveReqDTO.class, o -> {
             o.setSex(RandomUtil.randomEle(SexEnum.values()).getSex());
             o.setMobile(randomString());
             o.setPostIds(asSet(1L, 2L));
@@ -134,7 +135,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreatUser_max() {
         // 准备参数
-        UserSaveReqVO reqVO = randomPojo(UserSaveReqVO.class);
+        AdminUserSaveReqDTO reqDTO = randomPojo(AdminUserSaveReqDTO.class);
         // mock 账户额度不足
         TenantDO tenant = randomPojo(TenantDO.class, o -> o.setAccountCount(-1));
         doNothing().when(tenantService).handleTenantInfo(argThat(handler -> {
@@ -143,7 +144,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         }));
 
         // 调用，并断言异常
-        assertServiceException(() -> userService.createUser(reqVO), USER_COUNT_MAX, -1);
+        assertServiceException(() -> userService.createUser(reqDTO), USER_COUNT_MAX, -1);
     }
 
     @Test
@@ -154,7 +155,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         userPostMapper.insert(new UserPostDO().setUserId(dbUser.getId()).setPostId(1L));
         userPostMapper.insert(new UserPostDO().setUserId(dbUser.getId()).setPostId(2L));
         // 准备参数
-        UserSaveReqVO reqVO = randomPojo(UserSaveReqVO.class, o -> {
+        AdminUserSaveReqDTO reqDTO = randomPojo(AdminUserSaveReqDTO.class, o -> {
             o.setId(dbUser.getId());
             o.setSex(RandomUtil.randomEle(SexEnum.values()).getSex());
             o.setMobile(randomString());
@@ -162,23 +163,23 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         });
         // mock deptService 的方法
         DeptDO dept = randomPojo(DeptDO.class, o -> {
-            o.setId(reqVO.getDeptId());
+            o.setId(reqDTO.getDeptId());
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
         });
         when(deptService.getDept(eq(dept.getId()))).thenReturn(dept);
         // mock postService 的方法
-        List<PostDO> posts = CollectionUtils.convertList(reqVO.getPostIds(), postId ->
+        List<PostDO> posts = CollectionUtils.convertList(reqDTO.getPostIds(), postId ->
                 randomPojo(PostDO.class, o -> {
                     o.setId(postId);
                     o.setStatus(CommonStatusEnum.ENABLE.getStatus());
                 }));
-        when(postService.getPostList(eq(reqVO.getPostIds()), isNull())).thenReturn(posts);
+        when(postService.getPostList(eq(reqDTO.getPostIds()), isNull())).thenReturn(posts);
 
         // 调用
-        userService.updateUser(reqVO);
+        userService.updateUser(reqDTO);
         // 断言
-        AdminUserDO user = userMapper.selectById(reqVO.getId());
-        assertPojoEquals(reqVO, user, "password");
+        AdminUserDO user = userMapper.selectById(reqDTO.getId());
+        assertPojoEquals(reqDTO, user, "password");
         // 断言关联岗位
         List<UserPostDO> userPosts = userPostMapper.selectListByUserId(user.getId());
         assertEquals(2L, userPosts.get(0).getPostId());

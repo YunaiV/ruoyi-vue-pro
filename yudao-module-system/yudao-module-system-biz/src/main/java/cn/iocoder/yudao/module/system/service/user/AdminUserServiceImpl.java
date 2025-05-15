@@ -13,6 +13,7 @@ import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.datapermission.core.util.DataPermissionUtils;
 import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserSaveReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthRegisterReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
@@ -86,7 +87,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = SYSTEM_USER_TYPE, subType = SYSTEM_USER_CREATE_SUB_TYPE, bizNo = "{{#user.id}}",
             success = SYSTEM_USER_CREATE_SUCCESS)
-    public Long createUser(UserSaveReqVO createReqVO) {
+    public Long createUser(AdminUserSaveReqDTO createReqDTO) {
         // 1.1 校验账户配合
         tenantService.handleTenantInfo(tenant -> {
             long count = userMapper.selectCount();
@@ -95,14 +96,14 @@ public class AdminUserServiceImpl implements AdminUserService {
             }
         });
         // 1.2 校验正确性
-        validateUserForCreateOrUpdate(null, createReqVO.getUsername(),
-                createReqVO.getMobile(), createReqVO.getEmail(), createReqVO.getDeptId(), createReqVO.getPostIds());
+        validateUserForCreateOrUpdate(null, createReqDTO.getUsername(),
+                createReqDTO.getMobile(), createReqDTO.getEmail(), createReqDTO.getDeptId(), createReqDTO.getPostIds());
         // 2.1 插入用户
-        AdminUserDO user = BeanUtils.toBean(createReqVO, AdminUserDO.class);
+        AdminUserDO user = BeanUtils.toBean(createReqDTO, AdminUserDO.class);
         // 默认禁用
         user.setStatus(CommonStatusEnum.DISABLE.getStatus());
         // 加密密码
-        user.setPassword(encodePassword(createReqVO.getPassword()));
+        user.setPassword(encodePassword(createReqDTO.getPassword()));
         //插入用户信息
         userMapper.insert(user);
         // 2.2 插入关联岗位
@@ -142,27 +143,27 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @LogRecord(type = SYSTEM_USER_TYPE, subType = SYSTEM_USER_UPDATE_SUB_TYPE, bizNo = "{{#updateReqVO.id}}",
+    @LogRecord(type = SYSTEM_USER_TYPE, subType = SYSTEM_USER_UPDATE_SUB_TYPE, bizNo = "{{#reqDTO.id}}",
             success = SYSTEM_USER_UPDATE_SUCCESS)
-    public void updateUser(UserSaveReqVO updateReqVO) {
+    public void updateUser(AdminUserSaveReqDTO reqDTO) {
         // 特殊：此处不更新密码
-        updateReqVO.setPassword(null);
+        reqDTO.setPassword(null);
         // 1. 校验正确性
-        AdminUserDO oldUser = validateUserForCreateOrUpdate(updateReqVO.getId(), updateReqVO.getUsername(),
-                updateReqVO.getMobile(), updateReqVO.getEmail(), updateReqVO.getDeptId(), updateReqVO.getPostIds());
+        AdminUserDO oldUser = validateUserForCreateOrUpdate(reqDTO.getId(), reqDTO.getUsername(),
+                reqDTO.getMobile(), reqDTO.getEmail(), reqDTO.getDeptId(), reqDTO.getPostIds());
         // 2.1 更新用户
-        AdminUserDO updateObj = BeanUtils.toBean(updateReqVO, AdminUserDO.class);
+        AdminUserDO updateObj = BeanUtils.toBean(reqDTO, AdminUserDO.class);
         userMapper.updateById(updateObj);
         // 2.2 更新岗位
-        updateUserPost(updateReqVO, updateObj);
+        updateUserPost(reqDTO, updateObj);
 
         // 3. 记录操作日志上下文
         LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldUser, UserSaveReqVO.class));
         LogRecordContext.putVariable("user", oldUser);
     }
 
-    private void updateUserPost(UserSaveReqVO reqVO, AdminUserDO updateObj) {
-        Long userId = reqVO.getId();
+    private void updateUserPost(AdminUserSaveReqDTO reqDTO, AdminUserDO updateObj) {
+        Long userId = reqDTO.getId();
         Set<Long> dbPostIds = convertSet(userPostMapper.selectListByUserId(userId), UserPostDO::getPostId);
         // 计算新增和删除的岗位编号
         Set<Long> postIds = CollUtil.emptyIfNull(updateObj.getPostIds());

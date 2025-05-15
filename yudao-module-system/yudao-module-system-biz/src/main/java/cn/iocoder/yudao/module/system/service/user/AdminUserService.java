@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.system.service.user;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserSaveReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.AuthRegisterReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
@@ -29,10 +30,10 @@ public interface AdminUserService {
     /**
      * 创建用户
      *
-     * @param createReqVO 用户信息
+     * @param reqDTO 用户信息
      * @return 用户编号
      */
-    Long createUser(@Valid UserSaveReqVO createReqVO);
+    Long createUser(@Valid AdminUserSaveReqDTO reqDTO);
 
     /**
      * 注册用户
@@ -45,9 +46,9 @@ public interface AdminUserService {
     /**
      * 修改用户
      *
-     * @param updateReqVO 用户信息
+     * @param reqDTO 用户信息
      */
-    void updateUser(@Valid UserSaveReqVO updateReqVO);
+    void updateUser(@Valid AdminUserSaveReqDTO reqDTO);
 
     /**
      * 更新用户的最后登陆信息

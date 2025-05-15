@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserSaveReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
 import cn.iocoder.yudao.module.system.convert.user.UserConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
@@ -46,11 +47,14 @@ public class UserController {
     @Resource
     private DeptService deptService;
 
+    private UserConvert userConvert = UserConvert.INSTANCE;
+
     @PostMapping("/create")
     @Operation(summary = "新增用户")
     @PreAuthorize("@ss.hasPermission('system:user:create')")
     public CommonResult<Long> createUser(@Valid @RequestBody UserSaveReqVO reqVO) {
-        Long id = userService.createUser(reqVO);
+        AdminUserSaveReqDTO reqDTO =  userConvert.toAdminUserSaveReqDTO(reqVO);
+        Long id = userService.createUser(reqDTO);
         return success(id);
     }
 
@@ -58,7 +62,8 @@ public class UserController {
     @Operation(summary = "修改用户")
     @PreAuthorize("@ss.hasPermission('system:user:update')")
     public CommonResult<Boolean> updateUser(@Valid @RequestBody UserSaveReqVO reqVO) {
-        userService.updateUser(reqVO);
+        AdminUserSaveReqDTO reqDTO =  userConvert.toAdminUserSaveReqDTO(reqVO);
+        userService.updateUser(reqDTO);
         return success(true);
     }
 

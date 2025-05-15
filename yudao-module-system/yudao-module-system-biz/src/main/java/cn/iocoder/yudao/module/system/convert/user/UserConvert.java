@@ -3,11 +3,13 @@ package cn.iocoder.yudao.module.system.convert.user;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserSaveReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSimpleRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.post.PostSimpleRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleSimpleRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.profile.UserProfileRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserSaveReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserSimpleRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
@@ -24,6 +26,8 @@ import java.util.Map;
 public interface UserConvert {
 
     UserConvert INSTANCE = Mappers.getMapper(UserConvert.class);
+
+    AdminUserSaveReqDTO toAdminUserSaveReqDTO(UserSaveReqVO reqVO);
 
     default List<UserRespVO> convertList(List<AdminUserDO> list, Map<Long, DeptDO> deptMap) {
         return CollectionUtils.convertList(list, user -> convert(user, deptMap.get(user.getDeptId())));

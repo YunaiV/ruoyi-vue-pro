@@ -99,14 +99,12 @@ public class AdminUserApiImpl implements AdminUserApi {
 
     @Override
     public void updateUser(AdminUserSaveReqDTO erpUser) {
-        UserSaveReqVO saveReqVO = BeanUtils.toBean(erpUser, UserSaveReqVO.class);
-        userService.updateUser(saveReqVO);
+        userService.updateUser(erpUser);
     }
 
     @Override
-    public Long createUser(AdminUserSaveReqDTO erpUser) {
-        UserSaveReqVO saveReqVO = BeanUtils.toBean(erpUser, UserSaveReqVO.class);
-        return userService.createUser(saveReqVO);
+    public Long createUser(AdminUserSaveReqDTO createReqDTO) {
+        return userService.createUser(createReqDTO);
     }
 
     @Override
