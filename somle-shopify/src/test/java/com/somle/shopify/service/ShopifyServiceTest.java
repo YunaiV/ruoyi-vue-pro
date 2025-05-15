@@ -41,4 +41,10 @@ class ShopifyServiceTest extends SomleBaseDbUnitTest {
         ShopifyClient client = new ShopifyClient(shopifyTokenRepository.findAll().get(0));
         log.info(client.getOrders().toString());
     }
+
+    @Test
+    void test4() {
+        ShopifyClient client = new ShopifyClient(shopifyTokenRepository.findAll().get(0));
+        log.info(client.getShop().toString());
+    }
 }

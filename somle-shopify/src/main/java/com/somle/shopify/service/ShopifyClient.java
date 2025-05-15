@@ -62,6 +62,36 @@ public class ShopifyClient {
         return JsonUtilsX.parseObject(shop, ShopifyShopRepsVO.class);
     }
 
+//    @SneakyThrows
+//    public String getShop1() {
+//        DefaultGraphqlQuery query = new DefaultGraphqlQuery("ShopMetafield");
+//        query.addResultAttributes(
+//            "accountOwner"
+//        );
+//        ResultAttributtes accountOwner = new ResultAttributtes("accountOwner");
+//        accountOwner.addResultAttributes("accountType", "active");
+//
+//
+//        query.addResultAttributes(accountOwner);
+//
+//
+//        OkHttpClient client = new OkHttpClient().newBuilder().build();
+//        MediaType mediaType = MediaType.parse("application/json");
+//        RequestBody requestBody = RequestBody.create(mediaType, query.toString());
+//
+//        Headers.Builder headerBuilder = new Headers.Builder();
+//        headerBuilder.add("Accept", "application/json");
+//        headerBuilder.add("Content-type", "application/json");
+//        headerBuilder.add(SHOPIFY_ACCESS_TOKEN, token.getAccessToken());
+//        Request request = new Request.Builder()
+//            .url(url + "/admin/api/2024-10/graphql.json")
+//            .method("POST", requestBody)
+//            .headers(headerBuilder.build())
+//            .build();
+//        Response response = client.newCall(request).execute();
+//        String result = response.body().string();
+//        return result;
+//    }
 
     /**
      * 获得订单信息

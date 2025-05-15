@@ -79,7 +79,7 @@
         <weixin-java.version>4.6.0</weixin-java.version>
         <mqtt.version>1.2.5</mqtt.version>
         <dingtalk.version>2.0.0</dingtalk.version>
-<!--        <guava.version>33.3.1-jre</guava.version>-->
+        <!--        <guava.version>33.3.1-jre</guava.version>-->
         <bucket4j.version>8.10.1</bucket4j.version>
         <commons-collection4.version>4.4</commons-collection4.version>
         <cola.component.statemachine>5.0.0</cola.component.statemachine>
@@ -89,17 +89,20 @@
         <!-- 阿里云oss -->
         <aliyun.oss>3.16.3</aliyun.oss>
         <commons.codec>1.15</commons.codec>
+        <!--   graphql语言相关依赖     -->
+        <graphql.java.tools.version>11.0.0</graphql.java.tools.version>
+        <graphql.client.version>1.2</graphql.client.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <!--索迈相关-->
 
-<!--            <dependency>-->
-<!--                <groupId>com.aliyun</groupId>-->
-<!--                <artifactId>dingtalk</artifactId>-->
-<!--                <version>${dingtalk.version}</version>-->
-<!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>com.aliyun</groupId>-->
+            <!--                <artifactId>dingtalk</artifactId>-->
+            <!--                <version>${dingtalk.version}</version>-->
+            <!--            </dependency>-->
 
             <dependency>
                 <groupId>com.bucket4j</groupId>
@@ -107,11 +110,11 @@
                 <version>${bucket4j.version}</version>
             </dependency>
 
-<!--            <dependency>-->
-<!--                <groupId>com.google.guava</groupId>-->
-<!--                <artifactId>guava</artifactId>-->
-<!--                <version>${guava.version}</version>-->
-<!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>com.google.guava</groupId>-->
+            <!--                <artifactId>guava</artifactId>-->
+            <!--                <version>${guava.version}</version>-->
+            <!--            </dependency>-->
 
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -126,17 +129,17 @@
             </dependency>
 
 
-<!--            <dependency>-->
-<!--                <groupId>com.somle</groupId>-->
-<!--                <artifactId>somle-framework</artifactId>-->
-<!--                <version>${revision}</version>-->
-<!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>com.somle</groupId>-->
+            <!--                <artifactId>somle-framework</artifactId>-->
+            <!--                <version>${revision}</version>-->
+            <!--            </dependency>-->
 
-<!--            <dependency>-->
-<!--                <groupId>com.somle</groupId>-->
-<!--                <artifactId>somle-common</artifactId>-->
-<!--                <version>${revision}</version>-->
-<!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>com.somle</groupId>-->
+            <!--                <artifactId>somle-common</artifactId>-->
+            <!--                <version>${revision}</version>-->
+            <!--            </dependency>-->
 
             <!--            <dependency>-->
             <!--                <groupId>com.somle</groupId>-->
@@ -164,7 +167,6 @@
                 <artifactId>commons-codec</artifactId>
                 <version>1.15</version>
             </dependency>
-
 
 
             <dependency>
@@ -739,7 +741,21 @@
                 <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
                 <version>${mqtt.version}</version>
             </dependency>
+            <!--            -->
+            <dependency>
+                <groupId>com.graphql-java-kickstart</groupId>
+                <artifactId>graphql-java-tools</artifactId>
+                <version>${graphql.java.tools.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mountcloud</groupId>
+                <artifactId>graphql-client</artifactId>
+                <version>${graphql.client.version}</version>
+            </dependency>
         </dependencies>
+
+
     </dependencyManagement>
 
     <build>
