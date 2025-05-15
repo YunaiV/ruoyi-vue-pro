@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.report.framework.jmreport.core.service;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.biz.system.permission.PermissionCommonApi;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.security.config.SecurityProperties;
@@ -38,7 +39,7 @@ public class JmReportTokenServiceImpl implements JmReportTokenServiceI {
     private static final String AUTHORIZATION_FORMAT = SecurityFrameworkUtils.AUTHORIZATION_BEARER + " %s";
 
     private final OAuth2TokenCommonApi oauth2TokenApi;
-    private final PermissionApi permissionApi;
+    private final PermissionCommonApi permissionApi;
 
     private final SecurityProperties securityProperties;
 
