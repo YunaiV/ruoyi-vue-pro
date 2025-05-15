@@ -90,6 +90,7 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
         // 2.1 创建支付单
         Long payOrderId = payOrderApi.createOrder(new PayOrderCreateReqDTO()
                 .setAppKey(PAY_APP_KEY).setUserIp(getClientIP()) // 支付应用
+                .setUserId(userId)
                 .setMerchantOrderId(demoOrder.getId().toString()) // 业务的订单编号
                 .setSubject(spuName).setBody("").setPrice(price) // 价格信息
                 .setExpireTime(addTime(Duration.ofHours(2L)))); // 支付的过期时间
