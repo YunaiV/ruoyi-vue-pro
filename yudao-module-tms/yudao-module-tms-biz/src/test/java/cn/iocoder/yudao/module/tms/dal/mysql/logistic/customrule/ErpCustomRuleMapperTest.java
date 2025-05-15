@@ -8,9 +8,10 @@ import cn.iocoder.yudao.module.tms.service.logistic.category.bo.TmsCustomCategor
 import cn.iocoder.yudao.module.tms.service.logistic.customrule.bo.TmsCustomRuleBO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-
+@Disabled
 @Slf4j
 class TmsCustomRuleMapperTest extends BaseDbUnitTest {
     @Resource

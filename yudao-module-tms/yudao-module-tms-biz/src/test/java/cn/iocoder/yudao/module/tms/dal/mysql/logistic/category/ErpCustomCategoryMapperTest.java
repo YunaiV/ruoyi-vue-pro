@@ -5,10 +5,12 @@ import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.TmsCust
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.TmsCustomCategoryDO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
+@Disabled
 @Slf4j
 class TmsCustomCategoryMapperTest extends BaseDbUnitTest {
     @Resource

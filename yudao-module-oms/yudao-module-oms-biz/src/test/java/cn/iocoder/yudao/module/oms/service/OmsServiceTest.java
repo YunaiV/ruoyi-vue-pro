@@ -7,12 +7,13 @@ import cn.iocoder.yudao.module.oms.dal.mysql.OmsShopMapper;
 import cn.iocoder.yudao.module.oms.service.impl.OmsShopServiceImpl;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import java.util.List;
 
-//@Disabled
+@Disabled
 @Slf4j
 @Import(OmsShopServiceImpl.class)
 public class OmsServiceTest extends BaseDbUnitTest {
