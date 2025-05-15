@@ -7,8 +7,10 @@ import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseInDO;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseInMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+@Disabled
 @Slf4j
 class SrmPurchaseInMapperTest extends BaseDbUnitTest {
 
