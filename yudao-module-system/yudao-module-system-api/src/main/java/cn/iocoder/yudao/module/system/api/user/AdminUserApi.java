@@ -116,14 +116,7 @@ public interface AdminUserApi {
     **/
     Long createUser(AdminUserSaveReqDTO erpUser);
 
-    /**
-    * @Author Wqh
-    * @Description 获取以相同用户名开头的用户数量
-    * @Date 14:52 2024/11/4
-    * @Param [username]
-    * @return java.lang.Integer
-    **/
-    Integer getUsernameIndex(String username);
+
 
 
     public static class OperatorBuilder<T> {

@@ -1,3 +1,7 @@
+system:
+  user:
+    init-password: 123456
+
 oss:
   endpoint: https://oss-cn-hangzhou.aliyuncs.com
 

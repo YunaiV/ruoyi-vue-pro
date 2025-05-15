@@ -48,4 +48,7 @@ public class AdminUserSaveReqDTO {
 
     //外部id
     private String externalId;
+
+    //用户名重复时是否添加后缀
+    private boolean appendOnDuplicateUsername;
 }

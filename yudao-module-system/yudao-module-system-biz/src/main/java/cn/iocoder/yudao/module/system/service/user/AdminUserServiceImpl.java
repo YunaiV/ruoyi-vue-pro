@@ -58,6 +58,7 @@ import static cn.iocoder.yudao.module.system.enums.LogRecordConstants.*;
 public class AdminUserServiceImpl implements AdminUserService {
 
     static final String USER_INIT_PASSWORD_KEY = "system.user.init-password";
+    static final String SUFFIX_SEPERATOR = ".";
 
     @Resource
     private AdminUserMapper userMapper;
@@ -96,6 +97,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             }
         });
         // 1.2 校验正确性
+        processUsername(createReqDTO);
         validateUserForCreateOrUpdate(null, createReqDTO.getUsername(),
                 createReqDTO.getMobile(), createReqDTO.getEmail(), createReqDTO.getDeptId(), createReqDTO.getPostIds());
         // 2.1 插入用户
@@ -132,7 +134,6 @@ public class AdminUserServiceImpl implements AdminUserService {
         });
         // 1.2 校验正确性
         validateUserForCreateOrUpdate(null, registerReqVO.getUsername(), null, null, null, null);
-
         // 2. 插入用户
         AdminUserDO user = BeanUtils.toBean(registerReqVO, AdminUserDO.class);
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
@@ -149,6 +150,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         // 特殊：此处不更新密码
         reqDTO.setPassword(null);
         // 1. 校验正确性
+        processUsername(reqDTO);
         AdminUserDO oldUser = validateUserForCreateOrUpdate(reqDTO.getId(), reqDTO.getUsername(),
                 reqDTO.getMobile(), reqDTO.getEmail(), reqDTO.getDeptId(), reqDTO.getPostIds());
         // 2.1 更新用户
@@ -415,14 +417,26 @@ public class AdminUserServiceImpl implements AdminUserService {
         }
     }
 
-    @Override
     public Integer getUsernameIndex(String username){
         try {
             LOCK.lock();
-            List<AdminUserDO> userList = userMapper.selectLikeRightByUsername(username);
-            return userList.size();
+            int matchCount = 0;
+            AdminUserDO user = userMapper.selectByUsername(username);
+            if (user != null) {
+                matchCount++;
+            }
+            List<AdminUserDO> userList = userMapper.selectLikeRightByUsername(username + SUFFIX_SEPERATOR);
+            matchCount += userList.size();
+            return matchCount;
         } finally {
             LOCK.unlock();
+        }
+    }
+
+    private void processUsername(AdminUserSaveReqDTO reqDTO) {
+        if (reqDTO.isAppendOnDuplicateUsername()) {
+            var username = reqDTO.getUsername();
+            reqDTO.setUsername(username + getUsernameIndex(username));
         }
     }
 
@@ -551,4 +565,5 @@ public class AdminUserServiceImpl implements AdminUserService {
     private String encodePassword(String password) {
         return passwordEncoder.encode(password);
     }
+
 }

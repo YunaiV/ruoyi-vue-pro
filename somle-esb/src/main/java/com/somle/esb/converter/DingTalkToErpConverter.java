@@ -118,10 +118,10 @@ public class DingTalkToErpConverter {
         //translate the rest
         erpUser
             .setUsername(generateUserName(user.getName()))
+            .setAppendOnDuplicateUsername(true)
             .setMobile(user.getMobile())
             .setEmail(user.getEmail())
             .setNickname(user.getName())
-            .setPassword("123456")
             .setAvatar(user.getAvatar());
         return erpUser;
     }
@@ -148,9 +148,6 @@ public class DingTalkToErpConverter {
             //存在特殊字符则抛出异常
             throw new RuntimeException("昵称\""+nickname+"\"不规范，请联系管理员");
         }
-        //获取以相同用户名开头的用户数量
-        Integer usernameIndex = adminUserApi.getUsernameIndex(nickname);
-        //自动生成用户账户
-        return usernameIndex == 0 ? initUsername : initUsername + "." + usernameIndex;
+        return initUsername;
     }
 }

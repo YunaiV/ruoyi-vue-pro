@@ -107,9 +107,6 @@ public class AdminUserApiImpl implements AdminUserApi {
         return userService.createUser(createReqDTO);
     }
 
-    @Override
-    public Integer getUsernameIndex(String username) {
-        return userService.getUsernameIndex(username);
-    }
+
 
 }
