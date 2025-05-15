@@ -40,9 +40,9 @@ public class OmsShopDO extends TenantBaseDO {
     private String code;
 
     /**
-     * 平台店铺编码
+     * 外部来源唯一标识[平台店铺编码]
      */
-    private String platformShopCode;
+    private String externalId;
 
 
     /**

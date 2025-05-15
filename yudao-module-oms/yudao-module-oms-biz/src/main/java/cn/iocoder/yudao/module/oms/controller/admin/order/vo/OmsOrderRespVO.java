@@ -51,9 +51,13 @@ public class OmsOrderRespVO {
     @ExcelProperty("邮箱")
     private String email;
 
-    @Schema(description = "最迟送达时间")
-    @ExcelProperty("最迟送达时间")
-    private LocalDateTime deliveryLatestTime;
+    @Schema(description = "最晚出库时间")
+    @ExcelProperty("最晚出库时间")
+    private LocalDateTime outboundLatestTime;
+
+    @Schema(description = "最晚到货时间")
+    @ExcelProperty("最晚到货时间")
+    private LocalDateTime receiveLatestTime;
 
     @Schema(description = "订单创建时间")
     @ExcelProperty("订单创建时间")

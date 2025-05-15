@@ -61,6 +61,9 @@ public class OmsShopProductRespVO extends BaseDO {
     @Schema(description = "所属部门名称")
     private String deptName;
 
+    @Schema(description = "产品编码*数量")
+    private String productCodeAndQty;
+
     @Schema(description = "店铺产品关联项", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private List<OmsShopProductItemRespVO> items;
 }

@@ -6,16 +6,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class WayfairService {
     @Autowired
     WayfairTokenRepository tokenRepository;
 
-    public WayfairClient client;
+    public List<WayfairClient> clients;
 
     @PostConstruct
     public void init() {
-        client = new WayfairClient(tokenRepository.findAll().get(0));
+        clients = tokenRepository.findAll().stream().map(n -> new WayfairClient(n)).toList();
     }
 }

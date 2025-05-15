@@ -31,7 +31,7 @@ public interface OmsOrderMapper extends BaseMapperX<OmsOrderDO> {
             .eqIfPresent(OmsOrderDO::getTotalPrice, reqVO.getTotalPrice())
             .likeIfPresent(OmsOrderDO::getBuyerName, reqVO.getBuyerName())
             .eqIfPresent(OmsOrderDO::getEmail, reqVO.getEmail())
-            .betweenIfPresent(OmsOrderDO::getDeliveryLatestTime, reqVO.getDeliveryLatestTime())
+            .betweenIfPresent(OmsOrderDO::getReceiveLatestTime, reqVO.getReceiveLatestTime())
             .betweenIfPresent(OmsOrderDO::getOrderCreateTime, reqVO.getOrderCreateTime())
             .betweenIfPresent(OmsOrderDO::getPayTime, reqVO.getPayTime())
             .eqIfPresent(OmsOrderDO::getPhone, reqVO.getPhone())

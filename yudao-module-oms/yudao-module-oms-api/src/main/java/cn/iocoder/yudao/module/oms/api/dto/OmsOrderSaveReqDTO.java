@@ -51,10 +51,15 @@ public class OmsOrderSaveReqDTO {
      * 邮箱
      */
     private String email;
+
     /**
-     * 最迟送达时间
+     * 最晚出库时间
      */
-    private LocalDateTime deliveryLatestTime;
+    private LocalDateTime outboundLatestTime;
+    /**
+     * 最晚到货时间
+     */
+    private LocalDateTime receiveLatestTime;
     /**
      * 订单创建时间
      */

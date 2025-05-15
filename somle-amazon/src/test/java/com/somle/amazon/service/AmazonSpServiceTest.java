@@ -1,11 +1,16 @@
 package com.somle.amazon.service;
 
 import cn.iocoder.yudao.framework.test.core.ut.SomleBaseSpringTest;
+import com.somle.amazon.controller.vo.AmazonSpMarketplaceParticipationVO;
+import com.somle.amazon.controller.vo.AmazonSpMarketplaceVO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Disabled
@@ -32,9 +37,29 @@ class AmazonSpServiceTest extends SomleBaseSpringTest {
     }
 
     @Test
+    void getShops() {
+        List<AmazonSpMarketplaceParticipationVO> all = new ArrayList<>();
+        spService.clients.forEach(client -> {
+            all.addAll(client.getMarketplaceParticipations());
+        });
+        log.info("{}", all);
+    }
+
+    @Test
     void getAccount() {
         spService.clients.forEach(client -> {
             log.info("{}", client.getMarketplaceParticipations());
+        });
+    }
+
+    @Test
+    void getListings() {
+        spService.clients.forEach(client -> {
+            List<String> marketplaceIds = client.getMarketplaceParticipations().stream()
+                .map(AmazonSpMarketplaceParticipationVO::getMarketplace)
+                .map(AmazonSpMarketplaceVO::getId)
+                .toList();
+            log.info("{}", client.getProducts(marketplaceIds));
         });
     }
 

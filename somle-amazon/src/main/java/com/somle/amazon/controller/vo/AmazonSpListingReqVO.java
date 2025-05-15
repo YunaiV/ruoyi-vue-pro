@@ -1,10 +1,7 @@
 package com.somle.amazon.controller.vo;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -68,6 +65,22 @@ public class AmazonSpListingReqVO {
         PROCUREMENT,
         RELATIONSHIPS,
         PRODUCT_TYPES
+    }
+
+    public String getIncludedData() {
+        StringBuilder builder = new StringBuilder();
+        for (IncludedData includedDatum : includedData) {
+            if ("FULFILLMENT_AVAILABILITY".equals(includedDatum.name())) {
+                builder.append("fulfillmentAvailability,");
+                continue;
+            }
+            if ("PRODUCT_TYPES".equals(includedDatum.name())) {
+                builder.append("productTypes,");
+                continue;
+            }
+            builder.append(includedDatum.name().toLowerCase() + ",");
+        }
+        return builder.toString();
     }
 
     public enum IdentifiersType {

@@ -15,12 +15,12 @@
         <!-- 各种 module 拓展 -->
         <module>yudao-module-system</module>
         <module>yudao-module-infra</module>
-<!--        <module>yudao-module-member</module>-->
+        <!--        <module>yudao-module-member</module>-->
         <module>yudao-module-bpm</module>
-<!--        <module>yudao-module-report</module>-->
-<!--        <module>yudao-module-mp</module>-->
-<!--        <module>yudao-module-pay</module>-->
-<!--        <module>yudao-module-mall</module>-->
+        <!--        <module>yudao-module-report</module>-->
+        <!--        <module>yudao-module-mp</module>-->
+        <!--        <module>yudao-module-pay</module>-->
+        <!--        <module>yudao-module-mall</module>-->
         <module>yudao-module-crm</module>
         <module>yudao-module-erp</module>
         <module>yudao-module-srm</module>
@@ -31,8 +31,7 @@
         <module>yudao-module-oms</module>
 
 
-
-<!--        <module>somle-framework</module>-->
+        <!--        <module>somle-framework</module>-->
         <module>somle-esb</module>
         <module>somle-amazon</module>
         <module>somle-eccang</module>
@@ -52,7 +51,7 @@
         <module>somle-bestbuy</module>
         <module>somle-cdiscount</module>
         <module>somle-home24</module>
-<!--        <module>yudao-module-iot</module>-->
+        <!--        <module>yudao-module-iot</module>-->
         <module>somle-autonomous</module>
     </modules>
 
@@ -74,6 +73,8 @@
         <spring.boot.version>3.4.1</spring.boot.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <graphql.java.tools.version>11.0.0</graphql.java.tools.version>
+        <graphql.client.version>1.2</graphql.client.version>
     </properties>
 
     <dependencyManagement>

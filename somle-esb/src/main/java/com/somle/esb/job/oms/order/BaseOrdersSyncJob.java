@@ -24,9 +24,9 @@ public abstract class BaseOrdersSyncJob implements JobHandler {
     public String execute(String param) throws Exception {
         // 设置租户为默认租户
         TenantContextHolder.setTenantId(TenantId.DEFAULT.getId());
-        omsOrderApi.createOrUpdateOrderByPlatform(listOrders());
+        omsOrderApi.createOrUpdateOrderByPlatform(listOrders(param));
         return "sync orders success!";
     }
 
-    public abstract List<OmsOrderSaveReqDTO> listOrders();
+    public abstract List<OmsOrderSaveReqDTO> listOrders(String param);
 }

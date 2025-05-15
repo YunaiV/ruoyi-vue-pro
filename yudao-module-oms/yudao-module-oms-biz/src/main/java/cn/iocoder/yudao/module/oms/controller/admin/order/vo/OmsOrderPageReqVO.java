@@ -44,9 +44,9 @@ public class OmsOrderPageReqVO extends PageParam {
     @Schema(description = "邮箱")
     private String email;
 
-    @Schema(description = "最迟送达时间")
+    @Schema(description = "最晚到货时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime[] deliveryLatestTime;
+    private LocalDateTime[] receiveLatestTime;
 
     @Schema(description = "订单创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

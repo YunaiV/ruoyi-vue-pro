@@ -34,7 +34,7 @@ public class AmazonShopProductsSyncJob extends BaseShopProductsSyncJob {
                 .map(AmazonSpMarketplaceParticipationVO::getMarketplace)
                 .map(AmazonSpMarketplaceVO::getId)
                 .toList();
-            allProducts.addAll(amazonToOmsConverter.toProducts(client.getProducts(marketplaceIds), marketplaceIds));
+            allProducts.addAll(amazonToOmsConverter.toProducts(client.getProducts(marketplaceIds), client.getAuth()));
         }
         return allProducts;
     }

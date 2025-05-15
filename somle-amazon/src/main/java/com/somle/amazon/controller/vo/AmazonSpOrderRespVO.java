@@ -3,6 +3,7 @@ package com.somle.amazon.controller.vo;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -20,7 +21,7 @@ public class AmazonSpOrderRespVO {
     public static class Order {
         private BuyerInfo BuyerInfo;
         private String AmazonOrderId;
-        private String EarliestShipDate;
+        private LocalDateTime EarliestShipDate;
         private String SalesChannel;
         private String OrderStatus;
         private Integer NumberOfItemsShipped;
@@ -32,11 +33,13 @@ public class AmazonSpOrderRespVO {
         private Boolean HasRegulatedItems;
         private String IsReplacementOrder;
         private Boolean IsSoldByAB;
-        private String LatestShipDate;
+        private LocalDateTime LatestShipDate;
         private String ShipServiceLevel;
         private Boolean IsISPU;
         private String MarketplaceId;
-        private String PurchaseDate;
+        //最迟送达时间
+        private LocalDateTime LatestDeliveryDate;
+        private LocalDateTime PurchaseDate;
         private ShippingAddress ShippingAddress;
         private Boolean IsAccessPointOrder;
         private String SellerOrderId;
@@ -45,7 +48,7 @@ public class AmazonSpOrderRespVO {
         private OrderTotal OrderTotal;
         private List<String> PaymentMethodDetails;
         private Boolean IsGlobalExpressEnabled;
-        private String LastUpdateDate;
+        private LocalDateTime LastUpdateDate;
         private String ShipmentServiceLevelCategory;
         private List<AmazonSpOrderItemRespVO.OrderItem> orderItems;
     }
@@ -53,6 +56,15 @@ public class AmazonSpOrderRespVO {
     @Data
     public static class BuyerInfo {
         private String BuyerEmail;
+        private String BuyerName;
+        private BuyerTaxInfo BuyerTaxInfo;
+        private String PurchaseOrderNumber;
+    }
+
+
+    @Data
+    public class BuyerTaxInfo {
+        private String CompanyLegalName;
     }
 
     @Data
@@ -60,7 +72,9 @@ public class AmazonSpOrderRespVO {
         private String StateOrRegion;
         private String PostalCode;
         private String CountryCode;
-        private String City; // 可选字段，部分地址包含
+        private String City;
+        private String Name;
+        private String AddressLine1;
     }
 
     @Data

@@ -118,7 +118,7 @@ public class OmsOrderController {
 
         return BeanUtils.toBean(pageResult, OmsOrderRespVO.class, order -> {
             MapUtils.findAndThen(productMap, order.getId(), productList -> {
-                order.setProductNames(CollUtil.join(productList, "，", ErpProductRespDTO::getName));
+                order.setProductNames(CollUtil.join(productList, ",", ErpProductRespDTO::getName));
 
                 List<OmsOrderRespVO.Item> items = productList.stream().flatMap(product -> {
                     OmsOrderRespVO.Item item = new OmsOrderRespVO.Item();

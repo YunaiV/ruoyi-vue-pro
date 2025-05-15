@@ -30,7 +30,7 @@ public class OmsShopRespVO {
 
     @Schema(description = "平台店铺编码", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("平台店铺编码")
-    private String platformShopCode;
+    private String externalId;
 
 
     @Schema(description = "平台名称")

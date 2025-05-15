@@ -6,8 +6,6 @@ import cn.iocoder.yudao.module.oms.controller.admin.product.vo.OmsShopProductPag
 import cn.iocoder.yudao.module.oms.controller.admin.product.vo.OmsShopProductRespVO;
 import cn.iocoder.yudao.module.oms.controller.admin.product.vo.OmsShopProductSaveReqVO;
 import cn.iocoder.yudao.module.oms.service.OmsShopProductService;
-import cn.iocoder.yudao.module.system.api.dept.DeptApi;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,15 +26,12 @@ public class OmsShopProductController {
     @Resource
     OmsShopProductService omsShopProductService;
 
-    @Resource
-    DeptApi deptApi;
 
     @GetMapping("/page")
     @Operation(summary = "获得OMS 店铺产品分页")
     @PreAuthorize("@ss.hasPermission('oms:shop-product:query')")
     public CommonResult<PageResult<OmsShopProductRespVO>> getShopProductPage(@Valid OmsShopProductPageReqVO pageReqVO) {
         return omsShopProductService.getShopProductPageVO(pageReqVO);
-
     }
 
 
@@ -46,13 +41,6 @@ public class OmsShopProductController {
     @PreAuthorize("@ss.hasPermission('oms:shop-product:query')")
     public CommonResult<OmsShopProductRespVO> getShopProduct(@RequestParam("id") Long id) {
         OmsShopProductRespVO respVO = omsShopProductService.getShopProductVoModel(id);
-        if (respVO.getDeptId() != null) {
-            DeptRespDTO deptDTO = deptApi.getDept(respVO.getDeptId());
-            if (deptDTO != null) {
-                respVO.setDeptName(deptDTO.getName());
-            }
-        }
-
         return success(respVO);
     }
 

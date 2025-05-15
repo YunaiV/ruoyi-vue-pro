@@ -60,6 +60,7 @@ public class AmazonSpClient {
 //        return WebUtils.sendRequest(request, JSONObject.class);
 //    }
 
+    @SneakyThrows
     public List<AmazonSpMarketplaceParticipationVO> getMarketplaceParticipations() {
         String endPoint = getEndPoint();
         String partialUrl = "/sellers/v1/marketplaceParticipations";
@@ -72,7 +73,7 @@ public class AmazonSpClient {
             .headers(generateHeaders(auth))
             .build();
         var response = WebUtils.sendRequest(request, AmazonSpMarketplaceParticipationRespVO.class);
-        return response.getPayload();
+        return response.getPayload().stream().filter(amazonSpMarketplaceParticipationVO -> !amazonSpMarketplaceParticipationVO.getParticipation().isHasSuspendedListings()).toList();
     }
 
 
@@ -89,7 +90,7 @@ public class AmazonSpClient {
     @SneakyThrows
     public AmazonSpListingRepsVO searchListingsItems(AmazonSpListingReqVO reqVO) {
         String endPoint = getEndPoint();
-        String partialUrl = "/listings/2021-08-01/items/" + reqVO.getSellerId();
+        String partialUrl = "/listings/2021-08-01/items/" + auth.getSellerId();
         String fullUrl = endPoint + partialUrl;
 
 
@@ -160,6 +161,21 @@ public class AmazonSpClient {
             }
             return result;
         }
+    }
+
+    @SneakyThrows
+    public String getOrderBuyerInfo(String orderId) {
+        String endPoint = getEndPoint();
+        String partialUrl = "/orders/v0/orders/" + orderId + "/buyerInfo";
+        String fullUrl = endPoint + partialUrl;
+        var request = RequestX.builder()
+            .requestMethod(RequestX.Method.GET)
+            .url(fullUrl)
+            .headers(generateHeaders(auth))
+            .build();
+        var response = WebUtils.sendRequest(request);
+        String bodyString = response.body().string();
+        return bodyString;
     }
 
     @SneakyThrows
@@ -397,7 +413,7 @@ public class AmazonSpClient {
             .pageSize(20)
             .pageToken(pageToken)
             .marketplaceIds(marketplaceIds)
-//            .includedData(List.of(AmazonSpListingReqVO.IncludedData.RELATIONSHIPS, AmazonSpListingReqVO.IncludedData.ATTRIBUTES))
+            .includedData(List.of(AmazonSpListingReqVO.IncludedData.ATTRIBUTES, AmazonSpListingReqVO.IncludedData.SUMMARIES, AmazonSpListingReqVO.IncludedData.OFFERS, AmazonSpListingReqVO.IncludedData.FULFILLMENT_AVAILABILITY, AmazonSpListingReqVO.IncludedData.PROCUREMENT, AmazonSpListingReqVO.IncludedData.RELATIONSHIPS, AmazonSpListingReqVO.IncludedData.PRODUCT_TYPES, AmazonSpListingReqVO.IncludedData.ISSUES))
             .build();
         AmazonSpListingRepsVO amazonSpListingRepsVO = searchListingsItems(reqVO);
 

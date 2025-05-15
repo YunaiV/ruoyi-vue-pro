@@ -41,6 +41,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -136,7 +137,15 @@ public class OmsShopProductServiceImpl extends ServiceImpl<OmsShopProductMapper,
                 prod.setDeptName(dept.getName());
             }
         });
-
+        //装配产品编码*数量
+        StreamX.from(pageResultVO.getList()).assemble(pageResultVO.getList(), OmsShopProductRespVO::getId, OmsShopProductRespVO::getId, (prod, original) -> {
+            List<OmsShopProductItemRespVO> items = getShopProductVoModel(original.getId()).getItems();
+            if (CollectionUtil.isEmpty(items)) {
+                return;
+            }
+            String productCodeAndQty = items.stream().map(item -> item.getProduct().getBarCode() + "*" + item.getQty()).collect(Collectors.joining(", "));
+            prod.setProductCodeAndQty(productCodeAndQty);
+        });
         return success(pageResultVO);
     }
 
@@ -162,6 +171,13 @@ public class OmsShopProductServiceImpl extends ServiceImpl<OmsShopProductMapper,
         // 店铺
         OmsShopRespVO shopDO = omsShopService.getShopById(respVO.getShopId());
         respVO.setShop(BeanUtils.toBean(shopDO, OmsShopRespVO.class));
+        //设置部门信息
+        if (respVO.getDeptId() != null) {
+            DeptRespDTO deptDTO = deptApi.getDept(respVO.getDeptId());
+            if (deptDTO != null) {
+                respVO.setDeptName(deptDTO.getName());
+            }
+        }
         return respVO;
     }
 

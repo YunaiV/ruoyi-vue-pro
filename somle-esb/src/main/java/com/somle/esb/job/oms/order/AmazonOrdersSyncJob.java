@@ -10,6 +10,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +28,15 @@ public class AmazonOrdersSyncJob extends BaseOrdersSyncJob {
     AmazonToOmsConverter amazonToOmsConverter;
 
     @Override
-    public List<OmsOrderSaveReqDTO> listOrders() {
+    public List<OmsOrderSaveReqDTO> listOrders(String param) {
+        LocalDate baseDate = LocalDate.parse(param);
+        // 2. 计算前两天的日期
+        LocalDate targetDate = baseDate.minusDays(2);
+        // 3. 生成起始时间（00:00:00）
+        LocalDateTime startTime = targetDate.atStartOfDay();
+        // 4. 生成结束时间（23:59:59）
+        LocalDateTime endTime = targetDate.atTime(23, 59, 59);
+
         return amazonSpService.clients.stream()
             .flatMap(client -> {
 
@@ -43,16 +52,15 @@ public class AmazonOrdersSyncJob extends BaseOrdersSyncJob {
                     return Stream.empty();
                 }
 
-
                 AmazonSpOrderReqVO vo = AmazonSpOrderReqVO.builder()
-                    .createdAfter(LocalDateTime.of(2024, 10, 23, 0, 0))
-                    .createdBefore(LocalDateTime.of(2024, 10, 24, 0, 0))
+                    .createdAfter(startTime)
+                    .createdBefore(endTime)
                     .marketplaceIds(marketplaceIds)
                     .build();
 
                 // 3. 获取订单并转换（添加异常处理）
                 try {
-                    return amazonToOmsConverter.toOrders(client.getAllOrders(vo)).stream();
+                    return amazonToOmsConverter.toOrders(client.getAllOrders(vo), client.getAuth()).stream();
                 } catch (Exception e) {
                     log.error("Failed to process orders for client: {}", client, e);
                     return Stream.empty();
