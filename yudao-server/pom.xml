@@ -61,7 +61,7 @@
         <!-- 微信公众号模块。默认注释，保证编译速度 -->
 <!--        <dependency>-->
 <!--            <groupId>cn.iocoder.boot</groupId>-->
-<!--            <artifactId>yudao-module-mp-biz</artifactId>-->
+<!--            <artifactId>yudao-module-mp</artifactId>-->
 <!--            <version>${revision}</version>-->
 <!--        </dependency>-->
 
