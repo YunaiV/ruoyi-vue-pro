@@ -29,7 +29,7 @@ public class ApiErrorLogRespVO {
 
     @Schema(description = "用户类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @ExcelProperty(value = "用户类型", converter = DictConvert.class)
-    @DictFormat(cn.iocoder.yudao.module.system.enums.DictTypeConstants.USER_TYPE)
+    @DictFormat(DictTypeConstants.USER_TYPE)
     private Integer userType;
 
     @Schema(description = "应用名", requiredMode = Schema.RequiredMode.REQUIRED, example = "dashboard")

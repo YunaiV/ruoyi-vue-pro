@@ -7,6 +7,8 @@ package cn.iocoder.yudao.module.infra.enums;
  */
 public interface DictTypeConstants {
 
+    String USER_TYPE = "user_type"; // 用户类型
+
     String JOB_STATUS = "infra_job_status"; // 定时任务状态的枚举
     String JOB_LOG_STATUS = "infra_job_log_status"; // 定时任务日志状态的枚举
 

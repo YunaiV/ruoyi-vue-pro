@@ -4,17 +4,18 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.pay.core.client.PayClient;
-import cn.iocoder.yudao.framework.pay.core.client.PayClientConfig;
-import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
-import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.module.pay.enums.PayChannelEnum;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.PayClient;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.PayClientConfig;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelUpdateReqVO;
 import cn.iocoder.yudao.module.pay.convert.channel.PayChannelConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.channel.PayChannelMapper;
-import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
-import jakarta.annotation.PostConstruct;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.NonePayClientConfig;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.weixin.WxPayClientConfig;
 import jakarta.annotation.Resource;
 import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
@@ -45,14 +46,6 @@ public class PayChannelServiceImpl implements PayChannelService {
 
     @Resource
     private Validator validator;
-
-    /**
-     * 初始化，为了注册钱包
-     */
-    @PostConstruct
-    public void init() {
-        payClientFactory.registerPayClientClass(PayChannelEnum.WALLET, WalletPayClient.class);
-    }
 
     @Override
     public Long createChannel(PayChannelCreateReqVO reqVO) {
@@ -89,7 +82,9 @@ public class PayChannelServiceImpl implements PayChannelService {
      */
     private PayClientConfig parseConfig(String code, String configStr) {
         // 解析配置
-        Class<? extends PayClientConfig> payClass = PayChannelEnum.getByCode(code).getConfigClass();
+        Class<? extends PayClientConfig> payClass = PayChannelEnum.isAlipay(configStr) ? AlipayPayClientConfig.class
+                : PayChannelEnum.isWeixin(configStr) ? WxPayClientConfig.class
+                : NonePayClientConfig.class;
         if (ObjectUtil.isNull(payClass)) {
             throw exception(CHANNEL_NOT_FOUND);
         }

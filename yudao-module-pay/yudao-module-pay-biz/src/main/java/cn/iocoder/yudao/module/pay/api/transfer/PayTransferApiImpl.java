@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.pay.api.transfer;
 
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WxPayClientConfig;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.weixin.WxPayClientConfig;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateRespDTO;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferRespDTO;
