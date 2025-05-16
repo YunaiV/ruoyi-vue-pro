@@ -11,7 +11,6 @@ import cn.binarywang.wx.miniapp.config.impl.WxMaRedisBetterConfigImpl;
 import cn.binarywang.wx.miniapp.constant.WxMaConstants;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.DesensitizedUtil;
 import cn.hutool.core.util.ObjUtil;
@@ -60,6 +59,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -379,7 +379,7 @@ public class SocialClientServiceImpl implements SocialClientService {
         WxMaService service = getWxMaService(userType);
         WxMaOrderShippingInfoNotifyConfirmRequest request = WxMaOrderShippingInfoNotifyConfirmRequest.builder()
                 .transactionId(reqDTO.getTransactionId())
-                .receivedTime(LocalDateTimeUtil.toEpochMilli(reqDTO.getReceivedTime()))
+                .receivedTime(reqDTO.getReceivedTime().atZone(ZoneId.systemDefault()).toEpochSecond())
                 .build();
         try {
             WxMaOrderShippingInfoBaseResponse response = service.getWxMaOrderShippingService().notifyConfirmReceive(request);
