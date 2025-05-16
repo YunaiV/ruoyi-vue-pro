@@ -13,7 +13,6 @@
     <modules>
         <module>yudao-module-pay-api</module>
         <module>yudao-module-pay-biz</module>
-        <module>yudao-spring-boot-starter-biz-pay</module>
     </modules>
 
     <name>${project.artifactId}</name>

@@ -4,10 +4,10 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.pay.core.client.PayClient;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.PayClient;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.order.PayOrderRespDTO;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.refund.PayRefundRespDTO;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.pay.controller.admin.notify.vo.PayNotifyTaskDetailRespVO;
 import cn.iocoder.yudao.module.pay.controller.admin.notify.vo.PayNotifyTaskPageReqVO;
@@ -156,7 +156,7 @@ public class PayNotifyController {
         }
         // 拼接返回
         Map<Long, PayAppDO> apps = appService.getAppMap(convertList(pageResult.getList(), PayNotifyTaskDO::getAppId));
-        
+
         // 转换对象
         return success(BeanUtils.toBean(pageResult, PayNotifyTaskRespVO.class, order -> {
             PayAppDO app = apps.get(order.getAppId());

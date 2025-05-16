@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.pay.service.order;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.order.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderExportReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderPageReqVO;

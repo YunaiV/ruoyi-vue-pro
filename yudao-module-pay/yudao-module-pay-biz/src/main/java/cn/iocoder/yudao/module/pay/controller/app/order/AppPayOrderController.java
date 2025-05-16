@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.pay.controller.app.order;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderRespVO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderSubmitRespVO;
 import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitReqVO;
@@ -10,8 +9,9 @@ import cn.iocoder.yudao.module.pay.controller.app.order.vo.AppPayOrderSubmitResp
 import cn.iocoder.yudao.module.pay.convert.order.PayOrderConvert;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
+import cn.iocoder.yudao.module.pay.enums.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
-import cn.iocoder.yudao.module.pay.framework.pay.core.WalletPayClient;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.wallet.WalletPayClient;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.wallet.PayWalletService;
 import com.google.common.collect.Maps;

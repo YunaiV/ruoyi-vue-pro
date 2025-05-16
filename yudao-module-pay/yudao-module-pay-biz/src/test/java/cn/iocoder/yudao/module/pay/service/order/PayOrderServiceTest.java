@@ -2,11 +2,10 @@ package cn.iocoder.yudao.module.pay.service.order;
 
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.pay.core.client.PayClient;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
-import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderDisplayModeEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
+import cn.iocoder.yudao.module.pay.enums.PayChannelEnum;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.PayClient;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.order.PayOrderRespDTO;
+import cn.iocoder.yudao.module.pay.framework.pay.core.enums.PayOrderDisplayModeEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbAndRedisUnitTest;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderExportReqVO;
@@ -515,7 +514,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         // 准备参数
         PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
         PayOrderRespDTO notify = randomPojo(PayOrderRespDTO.class,
-                o -> o.setStatus(PayOrderStatusRespEnum.SUCCESS.getStatus()));
+                o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus()));
 
         // 调用，并断言异常
         assertServiceException(() -> orderService.notifyOrder(channel, notify),
@@ -532,7 +531,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         // 准备参数
         PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
         PayOrderRespDTO notify = randomPojo(PayOrderRespDTO.class,
-                o -> o.setStatus(PayOrderStatusRespEnum.SUCCESS.getStatus())
+                o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus())
                         .setOutTradeNo("P110"));
 
         // 调用，并断言异常
@@ -550,7 +549,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         // 准备参数
         PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
         PayOrderRespDTO notify = randomPojo(PayOrderRespDTO.class,
-                o -> o.setStatus(PayOrderStatusRespEnum.SUCCESS.getStatus())
+                o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus())
                         .setOutTradeNo("P110"));
 
         // 调用，并断言异常
@@ -583,7 +582,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         // 准备参数
         PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
         PayOrderRespDTO notify = randomPojo(PayOrderRespDTO.class,
-                o -> o.setStatus(PayOrderStatusRespEnum.SUCCESS.getStatus())
+                o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus())
                         .setOutTradeNo("P110"));
 
         // 调用，并断言异常
@@ -611,7 +610,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         // 准备参数
         PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
         PayOrderRespDTO notify = randomPojo(PayOrderRespDTO.class,
-                o -> o.setStatus(PayOrderStatusRespEnum.SUCCESS.getStatus())
+                o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus())
                         .setOutTradeNo("P110"));
 
         // 调用，并断言异常
@@ -641,7 +640,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L)
                 .setFeeRate(10D));
         PayOrderRespDTO notify = randomPojo(PayOrderRespDTO.class,
-                o -> o.setStatus(PayOrderStatusRespEnum.SUCCESS.getStatus())
+                o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus())
                         .setOutTradeNo("P110"));
 
         // 调用，并断言异常
@@ -669,7 +668,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         // 准备参数
         PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
         PayOrderRespDTO notify = randomPojo(PayOrderRespDTO.class,
-                o -> o.setStatus(PayOrderStatusRespEnum.CLOSED.getStatus()));
+                o -> o.setStatus(PayOrderStatusEnum.CLOSED.getStatus()));
 
         // 调用，并断言异常
         assertServiceException(() -> orderService.notifyOrder(channel, notify),
@@ -686,7 +685,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         // 准备参数
         PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
         PayOrderRespDTO notify = randomPojo(PayOrderRespDTO.class,
-                o -> o.setStatus(PayOrderStatusRespEnum.CLOSED.getStatus())
+                o -> o.setStatus(PayOrderStatusEnum.CLOSED.getStatus())
                         .setOutTradeNo("P110"));
 
         // 调用，并断言
@@ -705,7 +704,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         // 准备参数
         PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
         PayOrderRespDTO notify = randomPojo(PayOrderRespDTO.class,
-                o -> o.setStatus(PayOrderStatusRespEnum.CLOSED.getStatus())
+                o -> o.setStatus(PayOrderStatusEnum.CLOSED.getStatus())
                         .setOutTradeNo("P110"));
 
         // 调用，并断言
@@ -724,7 +723,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         // 准备参数
         PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
         PayOrderRespDTO notify = randomPojo(PayOrderRespDTO.class,
-                o -> o.setStatus(PayOrderStatusRespEnum.CLOSED.getStatus())
+                o -> o.setStatus(PayOrderStatusEnum.CLOSED.getStatus())
                         .setOutTradeNo("P110"));
 
         // 调用，并断言异常
@@ -742,7 +741,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         // 准备参数
         PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
         PayOrderRespDTO notify = randomPojo(PayOrderRespDTO.class,
-                o -> o.setStatus(PayOrderStatusRespEnum.CLOSED.getStatus())
+                o -> o.setStatus(PayOrderStatusEnum.CLOSED.getStatus())
                         .setOutTradeNo("P110"));
 
         // 调用

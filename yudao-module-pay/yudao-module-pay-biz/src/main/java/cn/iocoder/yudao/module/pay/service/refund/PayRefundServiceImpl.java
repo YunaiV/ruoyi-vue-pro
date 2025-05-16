@@ -3,10 +3,9 @@ package cn.iocoder.yudao.module.pay.service.refund;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.pay.core.client.PayClient;
-import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.enums.refund.PayRefundStatusRespEnum;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.PayClient;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.refund.PayRefundRespDTO;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.refund.PayRefundUnifiedReqDTO;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundExportReqVO;
@@ -203,12 +202,12 @@ public class PayRefundServiceImpl implements PayRefundService {
     @Transactional(rollbackFor = Exception.class)
     public void notifyRefund(PayChannelDO channel, PayRefundRespDTO notify) {
         // 情况一：退款成功
-        if (PayRefundStatusRespEnum.isSuccess(notify.getStatus())) {
+        if (PayRefundStatusEnum.isSuccess(notify.getStatus())) {
             notifyRefundSuccess(channel, notify);
             return;
         }
         // 情况二：退款失败
-        if (PayRefundStatusRespEnum.isFailure(notify.getStatus())) {
+        if (PayRefundStatusEnum.isFailure(notify.getStatus())) {
             notifyRefundFailure(channel, notify);
         }
     }
@@ -302,7 +301,7 @@ public class PayRefundServiceImpl implements PayRefundService {
     private boolean syncRefund(PayRefundDO refund) {
         try {
             // 1.1 查询退款订单信息
-            PayClient payClient = channelService.getPayClient(refund.getChannelId());
+            PayClient<?> payClient = channelService.getPayClient(refund.getChannelId());
             if (payClient == null) {
                 log.error("[syncRefund][渠道编号({}) 找不到对应的支付客户端]", refund.getChannelId());
                 return false;

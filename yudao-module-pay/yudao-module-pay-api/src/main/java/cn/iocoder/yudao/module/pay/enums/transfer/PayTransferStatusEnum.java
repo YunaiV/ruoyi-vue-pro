@@ -40,7 +40,7 @@ public enum PayTransferStatusEnum {
         return Objects.equals(status, WAITING.getStatus());
     }
 
-    public static boolean isProgressing(Integer status) {
+    public static boolean isProcessing(Integer status) {
         return Objects.equals(status, PROCESSING.getStatus());
     }
 
@@ -51,7 +51,7 @@ public enum PayTransferStatusEnum {
      * @return 是否
      */
     public static boolean isWaitingOrProcessing(Integer status) {
-        return isWaiting(status) || isProgressing(status);
+        return isWaiting(status) || isProcessing(status);
     }
 
     /**

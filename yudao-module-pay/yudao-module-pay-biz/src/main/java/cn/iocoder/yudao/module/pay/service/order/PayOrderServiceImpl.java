@@ -7,10 +7,9 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
-import cn.iocoder.yudao.framework.pay.core.client.PayClient;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.enums.order.PayOrderStatusRespEnum;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.PayClient;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.order.PayOrderRespDTO;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.PayOrderExportReqVO;
@@ -218,13 +217,13 @@ public class PayOrderServiceImpl implements PayOrderService {
                 throw exception(PAY_ORDER_EXTENSION_IS_PAID);
             }
             // 情况二：调用三方接口，查询支付单状态，是不是已支付
-            PayClient payClient = channelService.getPayClient(orderExtension.getChannelId());
+            PayClient<?> payClient = channelService.getPayClient(orderExtension.getChannelId());
             if (payClient == null) {
                 log.error("[validateOrderCanSubmit][渠道编号({}) 找不到对应的支付客户端]", orderExtension.getChannelId());
                 return;
             }
             PayOrderRespDTO respDTO = payClient.getOrder(orderExtension.getNo());
-            if (respDTO != null && PayOrderStatusRespEnum.isSuccess(respDTO.getStatus())) {
+            if (respDTO != null && PayOrderStatusEnum.isSuccess(respDTO.getStatus())) {
                 log.warn("[validateOrderCanSubmit][order({}) 的 PayOrderRespDTO({}) 已支付，可能是回调延迟]",
                         id, toJsonString(respDTO));
                 throw exception(PAY_ORDER_EXTENSION_IS_PAID);
@@ -273,12 +272,12 @@ public class PayOrderServiceImpl implements PayOrderService {
     // 注意，如果是方法内调用该方法，需要通过 getSelf().notifyPayOrder(channel, notify) 调用，否则事务不生效
     public void notifyOrder(PayChannelDO channel, PayOrderRespDTO notify) {
         // 情况一：支付成功的回调
-        if (PayOrderStatusRespEnum.isSuccess(notify.getStatus())) {
+        if (PayOrderStatusEnum.isSuccess(notify.getStatus())) {
             notifyOrderSuccess(channel, notify);
             return;
         }
         // 情况二：支付失败的回调
-        if (PayOrderStatusRespEnum.isClosed(notify.getStatus())) {
+        if (PayOrderStatusEnum.isClosed(notify.getStatus())) {
             notifyOrderClosed(channel, notify);
         }
         // 情况三：WAITING：无需处理
@@ -373,6 +372,7 @@ public class PayOrderServiceImpl implements PayOrderService {
         updateOrderExtensionClosed(channel, notify);
     }
 
+    @SuppressWarnings("unused")
     private void updateOrderExtensionClosed(PayChannelDO channel, PayOrderRespDTO notify) {
         // 1. 查询 PayOrderExtensionDO
         PayOrderExtensionDO orderExtension = orderExtensionMapper.selectByNo(notify.getOutTradeNo());
@@ -488,7 +488,7 @@ public class PayOrderServiceImpl implements PayOrderService {
     private boolean syncOrder(PayOrderExtensionDO orderExtension) {
         try {
             // 1.1 查询支付订单信息
-            PayClient payClient = channelService.getPayClient(orderExtension.getChannelId());
+            PayClient<?> payClient = channelService.getPayClient(orderExtension.getChannelId());
             if (payClient == null) {
                 log.error("[syncOrder][渠道编号({}) 找不到对应的支付客户端]", orderExtension.getChannelId());
                 return false;
@@ -499,14 +499,14 @@ public class PayOrderServiceImpl implements PayOrderService {
             //  当用户支付成功之后，该订单状态在渠道的回调中无法从已关闭改为已支付，造成重大影响。
             // 考虑此定时任务是异常场景的兜底操作，因此这里不做变更，优先以回调为准。
             // 让订单自动随着支付渠道那边一起等到过期，确保渠道先过期关闭支付入口，而后通过订单过期定时任务关闭自己的订单。
-            if (PayOrderStatusRespEnum.isClosed(respDTO.getStatus())) {
+            if (PayOrderStatusEnum.isClosed(respDTO.getStatus())) {
                 return false;
             }
             // 1.2 回调支付结果
             notifyOrder(orderExtension.getChannelId(), respDTO);
 
             // 2. 如果是已支付，则返回 true
-            return PayOrderStatusRespEnum.isSuccess(respDTO.getStatus());
+            return PayOrderStatusEnum.isSuccess(respDTO.getStatus());
         } catch (Throwable e) {
             log.error("[syncOrder][orderExtension({}) 同步支付状态异常]", orderExtension.getId(), e);
             return false;
@@ -551,20 +551,20 @@ public class PayOrderServiceImpl implements PayOrderService {
                     return false;
                 }
                 // 情况二：调用三方接口，查询支付单状态，是不是已支付/已退款
-                PayClient payClient = channelService.getPayClient(orderExtension.getChannelId());
+                PayClient<?> payClient = channelService.getPayClient(orderExtension.getChannelId());
                 if (payClient == null) {
                     log.error("[expireOrder][渠道编号({}) 找不到对应的支付客户端]", orderExtension.getChannelId());
                     return false;
                 }
                 PayOrderRespDTO respDTO = payClient.getOrder(orderExtension.getNo());
-                if (PayOrderStatusRespEnum.isRefund(respDTO.getStatus())) {
+                if (PayOrderStatusEnum.isRefund(respDTO.getStatus())) {
                     // 补充说明：按道理，应该是 WAITING => SUCCESS => REFUND 状态，如果直接 WAITING => REFUND 状态，说明中间丢了过程
                     // 此时，需要人工介入，手工补齐数据，保持 WAITING => SUCCESS => REFUND 的过程
                     log.error("[expireOrder][extension({}) 的 PayOrderRespDTO({}) 已退款，可能是回调延迟]",
                             orderExtension.getId(), toJsonString(respDTO));
                     return false;
                 }
-                if (PayOrderStatusRespEnum.isSuccess(respDTO.getStatus())) {
+                if (PayOrderStatusEnum.isSuccess(respDTO.getStatus())) {
                     notifyOrder(orderExtension.getChannelId(), respDTO);
                     return false;
                 }
