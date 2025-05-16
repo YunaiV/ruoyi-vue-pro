@@ -11,6 +11,7 @@ import cn.binarywang.wx.miniapp.config.impl.WxMaRedisBetterConfigImpl;
 import cn.binarywang.wx.miniapp.constant.WxMaConstants;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.TemporalAccessorUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.DesensitizedUtil;
 import cn.hutool.core.util.ObjUtil;
@@ -379,7 +380,7 @@ public class SocialClientServiceImpl implements SocialClientService {
         WxMaService service = getWxMaService(userType);
         WxMaOrderShippingInfoNotifyConfirmRequest request = WxMaOrderShippingInfoNotifyConfirmRequest.builder()
                 .transactionId(reqDTO.getTransactionId())
-                .receivedTime(reqDTO.getReceivedTime().atZone(ZoneId.systemDefault()).toEpochSecond())
+                .receivedTime(TemporalAccessorUtil.toInstant(reqDTO.getReceivedTime()).getEpochSecond())
                 .build();
         try {
             WxMaOrderShippingInfoBaseResponse response = service.getWxMaOrderShippingService().notifyConfirmReceive(request);
