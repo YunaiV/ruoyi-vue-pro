@@ -51,6 +51,16 @@ public enum PayOrderStatusEnum implements ArrayValuable<Integer> {
     }
 
     /**
+     * 判断是否已退款
+     *
+     * @param status 状态
+     * @return 是否已退款
+     */
+    public static boolean isRefund(Integer status) {
+        return Objects.equals(status, REFUND.getStatus());
+    }
+
+    /**
      * 判断是否支付成功或者已退款
      *
      * @param status 状态

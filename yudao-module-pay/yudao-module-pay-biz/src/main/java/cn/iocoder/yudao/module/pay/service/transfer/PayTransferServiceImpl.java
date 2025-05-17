@@ -6,10 +6,9 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.pay.core.client.PayClient;
-import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.transfer.PayTransferUnifiedReqDTO;
-import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferStatusRespEnum;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.PayClient;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.transfer.PayTransferRespDTO;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.transfer.PayTransferUnifiedReqDTO;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.transfer.dto.PayTransferCreateRespDTO;
@@ -142,15 +141,15 @@ public class PayTransferServiceImpl implements PayTransferService {
     // 注意，如果是方法内调用该方法，需要通过 getSelf().notifyTransfer(channel, notify) 调用，否则事务不生效
     public void notifyTransfer(PayChannelDO channel, PayTransferRespDTO notify) {
         // 转账成功的回调
-        if (PayTransferStatusRespEnum.isSuccess(notify.getStatus())) {
+        if (PayTransferStatusEnum.isSuccess(notify.getStatus())) {
             notifyTransferSuccess(channel, notify);
         }
         // 转账关闭的回调
-        if (PayTransferStatusRespEnum.isClosed(notify.getStatus())) {
+        if (PayTransferStatusEnum.isClosed(notify.getStatus())) {
             notifyTransferClosed(channel, notify);
         }
         // 转账处理中的回调
-        if (PayTransferStatusRespEnum.isProcessing(notify.getStatus())) {
+        if (PayTransferStatusEnum.isProcessing(notify.getStatus())) {
             notifyTransferProgressing(channel, notify);
         }
         // WAITING 状态无需处理
@@ -162,7 +161,7 @@ public class PayTransferServiceImpl implements PayTransferService {
         if (transfer == null) {
             throw exception(PAY_TRANSFER_NOT_FOUND);
         }
-        if (PayTransferStatusEnum.isProgressing(transfer.getStatus())) { // 如果已经是转账中，直接返回，不用重复更新
+        if (PayTransferStatusEnum.isProcessing(transfer.getStatus())) { // 如果已经是转账中，直接返回，不用重复更新
             log.info("[notifyTransferProgressing][transfer({}) 已经是转账中状态，无需更新]", transfer.getId());
             return;
         }

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.ai.controller.admin.image;
 
 import cn.hutool.core.util.ObjUtil;
-import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;

@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.ai.controller.admin.image.vo;
 
-import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 

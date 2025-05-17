@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.pay.dal.dataobject.transfer;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
-import cn.iocoder.yudao.framework.pay.core.enums.transfer.PayTransferStatusRespEnum;
+import cn.iocoder.yudao.module.pay.enums.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
+import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -89,7 +89,7 @@ public class PayTransferDO extends BaseDO {
     /**
      * 转账状态
      *
-     * 枚举 {@link PayTransferStatusRespEnum}
+     * 枚举 {@link PayTransferStatusEnum}
      */
     private Integer status;
 

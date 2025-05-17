@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.pay.dal.dataobject.refund;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.framework.pay.core.client.dto.refund.PayRefundRespDTO;
-import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.module.pay.enums.PayChannelEnum;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.refund.PayRefundRespDTO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.app.PayAppDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;

@@ -2,11 +2,11 @@ package cn.iocoder.yudao.module.pay.service.channel;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.pay.core.client.PayClient;
-import cn.iocoder.yudao.framework.pay.core.client.PayClientFactory;
-import cn.iocoder.yudao.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
-import cn.iocoder.yudao.framework.pay.core.client.impl.weixin.WxPayClientConfig;
-import cn.iocoder.yudao.framework.pay.core.enums.channel.PayChannelEnum;
+import cn.iocoder.yudao.module.pay.enums.PayChannelEnum;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.PayClient;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.PayClientFactory;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.weixin.WxPayClientConfig;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelUpdateReqVO;

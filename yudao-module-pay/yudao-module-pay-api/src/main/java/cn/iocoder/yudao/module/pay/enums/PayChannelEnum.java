@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.pay.enums;
 
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,6 +29,7 @@ public enum PayChannelEnum implements ArrayValuable<String> {
     ALIPAY_APP("alipay_app", "支付宝App 支付"),
     ALIPAY_QR("alipay_qr", "支付宝扫码支付"),
     ALIPAY_BAR("alipay_bar", "支付宝条码支付"),
+
     MOCK("mock", "模拟支付"),
 
     WALLET("wallet", "钱包支付");
@@ -47,6 +50,18 @@ public enum PayChannelEnum implements ArrayValuable<String> {
     @Override
     public String[] array() {
         return ARRAYS;
+    }
+
+    public static PayChannelEnum getByCode(String code) {
+        return ArrayUtil.firstMatch(o -> o.getCode().equals(code), values());
+    }
+
+    public static boolean isAlipay(String channelCode) {
+        return StrUtil.startWith(channelCode, "alipay_");
+    }
+
+    public static boolean isWeixin(String channelCode) {
+        return StrUtil.startWith(channelCode, "wx_");
     }
 
 }

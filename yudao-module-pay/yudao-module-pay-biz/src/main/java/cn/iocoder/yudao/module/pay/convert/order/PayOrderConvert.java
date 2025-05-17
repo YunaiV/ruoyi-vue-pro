@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.pay.convert.order;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
-import cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderRespDTO;
 import cn.iocoder.yudao.module.pay.controller.admin.order.vo.*;
@@ -67,7 +67,7 @@ public interface PayOrderConvert {
     PayOrderUnifiedReqDTO convert2(PayOrderSubmitReqVO reqVO, String userIp);
 
     @Mapping(source = "order.status", target = "status")
-    PayOrderSubmitRespVO convert(PayOrderDO order, cn.iocoder.yudao.framework.pay.core.client.dto.order.PayOrderRespDTO respDTO);
+    PayOrderSubmitRespVO convert(PayOrderDO order, cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.order.PayOrderRespDTO respDTO);
 
     AppPayOrderSubmitRespVO convert3(PayOrderSubmitRespVO bean);
 
