@@ -26,7 +26,7 @@
         </dependency>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-product-api</artifactId>
+            <artifactId>yudao-module-product</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
@@ -36,17 +36,17 @@
         </dependency>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-system-api</artifactId>
+            <artifactId>yudao-module-system</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-infra-api</artifactId>
+            <artifactId>yudao-module-infra</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-member-api</artifactId>
+            <artifactId>yudao-module-member</artifactId>
             <version>${revision}</version>
         </dependency>
 
