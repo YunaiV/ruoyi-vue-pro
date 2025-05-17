@@ -4,11 +4,11 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserBindReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserUnbindReqVO;
-import cn.iocoder.yudao.module.system.convert.social.SocialUserConvert;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,8 +38,8 @@ public class SocialUserController {
     @PostMapping("/bind")
     @Operation(summary = "社交绑定，使用 code 授权码")
     public CommonResult<Boolean> socialBind(@RequestBody @Valid SocialUserBindReqVO reqVO) {
-        socialUserService.bindSocialUser(SocialUserConvert.INSTANCE.convert(
-                getLoginUserId(), UserTypeEnum.ADMIN.getValue(), reqVO));
+        socialUserService.bindSocialUser(BeanUtils.toBean(reqVO, SocialUserBindReqDTO.class)
+                        .setUserId(getLoginUserId()).setUserType(UserTypeEnum.ADMIN.getValue()));
         return CommonResult.success(true);
     }
 
