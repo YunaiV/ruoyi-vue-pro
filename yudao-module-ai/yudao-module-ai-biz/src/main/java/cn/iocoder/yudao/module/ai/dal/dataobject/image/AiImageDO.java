@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.image;
 
-import cn.iocoder.yudao.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.enums.image.AiImageStatusEnum;
@@ -49,7 +50,7 @@ public class AiImageDO extends BaseDO {
     /**
      * 平台
      *
-     * 枚举 {@link cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum}
+     * 枚举 {@link AiPlatformEnum}
      */
     private String platform;
     /**

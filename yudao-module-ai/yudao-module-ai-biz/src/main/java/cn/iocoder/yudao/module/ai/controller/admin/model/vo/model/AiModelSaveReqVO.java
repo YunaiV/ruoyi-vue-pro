@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.ai.controller.admin.model.vo.model;
 
-import cn.iocoder.yudao.framework.ai.core.enums.AiModelTypeEnum;
-import cn.iocoder.yudao.framework.ai.core.enums.AiPlatformEnum;
+import cn.iocoder.yudao.module.ai.enums.model.AiModelTypeEnum;
+import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
