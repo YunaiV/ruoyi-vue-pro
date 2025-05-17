@@ -21,7 +21,7 @@
     <dependencies>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-system-api</artifactId>
+            <artifactId>yudao-module-system</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
