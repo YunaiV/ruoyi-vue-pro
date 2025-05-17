@@ -20,7 +20,7 @@
     <modules>
         <module>yudao-module-product</module>
         <module>yudao-module-promotion</module>
-        <module>yudao-module-trade-biz</module>
+        <module>yudao-module-trade</module>
         <module>yudao-module-statistics</module>
         <!--
             特殊：为什么会有 yudao-module-trade-api 呢？
