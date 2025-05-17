@@ -11,7 +11,6 @@
     <modules>
         <module>yudao-module-ai-api</module>
         <module>yudao-module-ai-biz</module>
-        <module>yudao-spring-boot-starter-ai</module>
     </modules>
     <packaging>pom</packaging>
     <artifactId>yudao-module-ai</artifactId>

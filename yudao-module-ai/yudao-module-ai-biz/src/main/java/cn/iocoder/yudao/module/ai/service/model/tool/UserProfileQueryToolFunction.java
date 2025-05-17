@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.ai.service.model.tool;
 
-import cn.iocoder.yudao.framework.ai.core.util.AiUtils;
+import cn.iocoder.yudao.module.ai.util.AiUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
