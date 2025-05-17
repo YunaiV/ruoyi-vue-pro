@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link org.springframework.ai.moonshot.MoonshotChatModel} 的集成测试
+ * {@link MoonshotChatModel} 的集成测试
  *
  * @author 芋道源码
  */
