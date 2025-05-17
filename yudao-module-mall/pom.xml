@@ -19,8 +19,7 @@
     </description>
     <modules>
         <module>yudao-module-product</module>
-        <module>yudao-module-promotion-api</module>
-        <module>yudao-module-promotion-biz</module>
+        <module>yudao-module-promotion</module>
         <module>yudao-module-trade-biz</module>
         <module>yudao-module-statistics</module>
         <!--

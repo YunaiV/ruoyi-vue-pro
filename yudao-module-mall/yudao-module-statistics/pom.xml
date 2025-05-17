@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-promotion-api</artifactId>
+            <artifactId>yudao-module-promotion</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
