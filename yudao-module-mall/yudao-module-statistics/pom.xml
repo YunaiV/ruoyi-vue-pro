@@ -8,7 +8,7 @@
         <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>yudao-module-statistics-biz</artifactId>
+    <artifactId>yudao-module-statistics</artifactId>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
@@ -18,11 +18,6 @@
     </description>
 
     <dependencies>
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-statistics-api</artifactId>
-            <version>${revision}</version>
-        </dependency>
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-promotion-api</artifactId>

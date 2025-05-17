@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.statistics.service.trade;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
-import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.statistics.controller.admin.common.vo.DataComparisonRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderSummaryRespVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderTrendReqVO;
