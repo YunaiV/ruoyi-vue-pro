@@ -40,6 +40,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ClassUtils;
 
 import java.util.*;
 
@@ -64,7 +65,7 @@ public class CodegenEngine {
      * value：生成的路径
      */
     private static final Map<String, String> SERVER_TEMPLATES = MapUtil.<String, String>builder(new LinkedHashMap<>()) // 有序
-            // Java module-biz Main
+            // Java module-biz(server) Main
             .put(javaTemplatePath("controller/vo/pageReqVO"), javaModuleImplVOFilePath("PageReqVO"))
             .put(javaTemplatePath("controller/vo/listReqVO"), javaModuleImplVOFilePath("ListReqVO"))
             .put(javaTemplatePath("controller/vo/respVO"), javaModuleImplVOFilePath("RespVO"))
@@ -83,7 +84,7 @@ public class CodegenEngine {
                     javaModuleImplMainFilePath("service/${table.businessName}/${table.className}ServiceImpl"))
             .put(javaTemplatePath("service/service"),
                     javaModuleImplMainFilePath("service/${table.businessName}/${table.className}Service"))
-            // Java module-biz Test
+            // Java module-biz(server) Test
             .put(javaTemplatePath("test/serviceTest"),
                     javaModuleImplTestFilePath("service/${table.businessName}/${table.className}ServiceImplTest"))
             // Java module-api Main
@@ -195,6 +196,15 @@ public class CodegenEngine {
     private Boolean jakartaEnable;
 
     /**
+     * 是否为 yudao-cloud 项目，用于解决 Boot 和 Cloud 的 api 模块兼容性问题
+     *
+     * true  - 需要有 yudao-module-xxx-api 模块
+     * false - 不需要有，使用 api、enum 包即可
+     */
+    @Setter
+    private Boolean cloudEnable;
+
+    /**
      * 模板引擎，由 hutool 实现
      */
     private final TemplateEngine templateEngine;
@@ -209,7 +219,11 @@ public class CodegenEngine {
         config.setResourceMode(TemplateConfig.ResourceMode.CLASSPATH);
         this.templateEngine = new VelocityEngine(config);
         // 设置 javaxEnable，按照是否使用 JDK17 来判断
-        this.jakartaEnable = SystemUtil.getJavaInfo().isJavaVersionAtLeast(1700); // 17.00 * 100
+        this.jakartaEnable = SystemUtil.getJavaInfo().isJavaVersionAtLeast(1700) // 17.00 * 100
+            && ClassUtils.isPresent("jakarta.annotation.Resource", ClassUtils.getDefaultClassLoader());
+        // 设置 cloudEnable，按照是否使用 Spring Cloud 来判断
+        this.cloudEnable = ClassUtils.isPresent("cn.iocoder.yudao.module.infra.framework.rpc.config.RpcConfiguration",
+                ClassUtils.getDefaultClassLoader());
     }
 
     @PostConstruct
@@ -434,6 +448,14 @@ public class CodegenEngine {
         Map<String, String> templates = new LinkedHashMap<>();
         templates.putAll(SERVER_TEMPLATES);
         templates.putAll(FRONT_TEMPLATES.row(frontType));
+        // 如果是 Boot 项目，则不使用 api/server 模块
+        if (Boolean.FALSE.equals(cloudEnable)) {
+            SERVER_TEMPLATES.forEach((templatePath, filePath) -> {
+                filePath = StrUtil.replace(filePath, "/yudao-module-${table.moduleName}-api", "");
+                filePath = StrUtil.replace(filePath, "/yudao-module-${table.moduleName}-server", "");
+                templates.put(templatePath, filePath);
+            });
+        }
         // 如果禁用单元测试，则移除对应的模版
         if (Boolean.FALSE.equals(codegenProperties.getUnitTestEnable())) {
             templates.remove(javaTemplatePath("test/serviceTest"));
@@ -480,16 +502,16 @@ public class CodegenEngine {
 
     private static String javaModuleImplVOFilePath(String path) {
         return javaModuleFilePath("controller/${sceneEnum.basePackage}/${table.businessName}/" +
-                "vo/${sceneEnum.prefixClass}${table.className}" + path, "biz", "main");
+                "vo/${sceneEnum.prefixClass}${table.className}" + path, "server", "main");
     }
 
     private static String javaModuleImplControllerFilePath() {
         return javaModuleFilePath("controller/${sceneEnum.basePackage}/${table.businessName}/" +
-                "${sceneEnum.prefixClass}${table.className}Controller", "biz", "main");
+                "${sceneEnum.prefixClass}${table.className}Controller", "server", "main");
     }
 
     private static String javaModuleImplMainFilePath(String path) {
-        return javaModuleFilePath(path, "biz", "main");
+        return javaModuleFilePath(path, "server", "main");
     }
 
     private static String javaModuleApiMainFilePath(String path) {
@@ -497,7 +519,7 @@ public class CodegenEngine {
     }
 
     private static String javaModuleImplTestFilePath(String path) {
-        return javaModuleFilePath(path, "biz", "test");
+        return javaModuleFilePath(path, "server", "test");
     }
 
     private static String javaModuleFilePath(String path, String module, String src) {
@@ -508,7 +530,7 @@ public class CodegenEngine {
 
     private static String mapperXmlFilePath() {
         return "yudao-module-${table.moduleName}/" + // 顶级模块
-                "yudao-module-${table.moduleName}-biz/" + // 子模块
+                "yudao-module-${table.moduleName}-server/" + // 子模块
                 "src/main/resources/mapper/${table.businessName}/${table.className}Mapper.xml";
     }
 
