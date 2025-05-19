@@ -1,5 +1,6 @@
 package ${basePackage}.module.${table.moduleName}.service.${table.businessName};
 
+import cn.hutool.core.collection.CollUtil;
 import org.springframework.stereotype.Service;
 import ${jakartaPackage}.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -153,6 +154,39 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #end
 #end
     }
+
+#if ( $table.templateType != 2 && $table.deleteBatch)
+    @Override
+    ## 特殊：主子表专属逻辑
+    #if ( $subTables && $subTables.size() > 0)
+    @Transactional(rollbackFor = Exception.class)
+    #end
+    public void delete${simpleClassName}ByIds(List<${primaryColumn.javaType}> ids) {
+        // 校验存在
+        validate${simpleClassName}Exists(ids);
+        // 删除
+        ${classNameVar}Mapper.deleteByIds(ids);
+    ## 特殊：主子表专属逻辑
+    #if ( $subTables && $subTables.size() > 0)
+
+    // 删除子表
+        #foreach ($subTable in $subTables)
+            #set ($index = $foreach.count - 1)
+            #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+            #set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
+            #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+            delete${subSimpleClassName}By${SubJoinColumnName}s(ids);
+        #end
+    #end
+    }
+
+    private void validate${simpleClassName}Exists(List<${primaryColumn.javaType}> ids) {
+        List<${table.className}DO> list = ${classNameVar}Mapper.selectByIds(ids);
+        if (CollUtil.isEmpty(list) || list.size() != ids.size()) {
+            throw exception(${simpleClassName_underlineCase.toUpperCase()}_NOT_EXISTS);
+        }
+    }
+#end
 
     private void validate${simpleClassName}Exists(${primaryColumn.javaType} id) {
         if (${classNameVar}Mapper.selectById(id) == null) {
@@ -346,6 +380,12 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     private void delete${subSimpleClassName}By${SubJoinColumnName}(${primaryColumn.javaType} ${subJoinColumn.javaField}) {
         ${subClassNameVars.get($index)}Mapper.deleteBy${SubJoinColumnName}(${subJoinColumn.javaField});
     }
+
+#if ( $table.templateType != 2 && $table.deleteBatch)
+	private void delete${subSimpleClassName}By${SubJoinColumnName}s(List<${primaryColumn.javaType}> ${subJoinColumn.javaField}s) {
+        ${subClassNameVars.get($index)}Mapper.deleteBy${SubJoinColumnName}s(${subJoinColumn.javaField}s);
+	}
+#end
 
 #end
 }

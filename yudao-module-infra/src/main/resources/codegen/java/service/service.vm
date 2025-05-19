@@ -40,6 +40,15 @@ public interface ${table.className}Service {
      */
     void delete${simpleClassName}(${primaryColumn.javaType} id);
 
+#if ( $table.templateType != 2 && $table.deleteBatch)
+    /**
+    * 批量删除${table.classComment}
+    *
+    * @param ids 编号
+    */
+    void delete${simpleClassName}ByIds(List<${primaryColumn.javaType}> ids);
+#end
+
     /**
      * 获得${table.classComment}
      *

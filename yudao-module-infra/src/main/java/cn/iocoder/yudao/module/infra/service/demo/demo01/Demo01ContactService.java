@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.infra.service.demo.demo01;
 
-import jakarta.validation.*;
-
-import cn.iocoder.yudao.module.infra.controller.admin.demo.demo01.vo.Demo01ContactPageReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.demo.demo01.vo.Demo01ContactSaveReqVO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo01.Demo01ContactDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo01.vo.*;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo01.Demo01ContactDO;
+import jakarta.validation.Valid;
+
+import java.util.List;
 
 /**
  * 示例联系人 Service 接口
@@ -35,6 +35,13 @@ public interface Demo01ContactService {
      * @param id 编号
      */
     void deleteDemo01Contact(Long id);
+
+    /**
+    * 批量删除示例联系人
+    *
+    * @param ids 编号
+    */
+    void deleteDemo01ContactByIds(List<Long> ids);
 
     /**
      * 获得示例联系人

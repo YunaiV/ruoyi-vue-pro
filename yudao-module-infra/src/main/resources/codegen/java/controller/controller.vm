@@ -74,6 +74,19 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
         return success(true);
     }
 
+#if ( $table.templateType != 2 && $table.deleteBatch)
+    @DeleteMapping("/delete-batch")
+    @Parameter(name = "ids", description = "编号", required = true)
+    @Operation(summary = "批量删除${table.classComment}")
+    #if ($sceneEnum.scene == 1)
+                @PreAuthorize("@ss.hasPermission('${permissionPrefix}:delete')")
+    #end
+    public CommonResult<Boolean> delete${simpleClassName}(@RequestParam("ids") @Size(max = 100, message = "最多允许100个") List<${primaryColumn.javaType}> ids) {
+        ${classNameVar}Service.delete${simpleClassName}ByIds(ids);
+        return success(true);
+    }
+#end
+
     @GetMapping("/get")
     @Operation(summary = "获得${table.classComment}")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")

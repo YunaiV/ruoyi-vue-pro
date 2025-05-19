@@ -108,6 +108,12 @@ public class CodegenTableDO extends BaseDO {
      * 枚举 {@link CodegenFrontTypeEnum}
      */
     private Integer frontType;
+    /**
+     * 是否生成批量删除接口
+     * -true 是
+     * -false 否
+     */
+    private Boolean deleteBatch;
 
     // ========== 菜单相关字段 ==========
 
