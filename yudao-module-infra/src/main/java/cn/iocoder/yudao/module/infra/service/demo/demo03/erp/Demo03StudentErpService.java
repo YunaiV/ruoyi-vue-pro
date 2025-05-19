@@ -14,7 +14,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
  *
  * @author 芋道源码
  */
-public interface Demo03StudentService {
+public interface Demo03StudentErpService {
 
     /**
      * 创建学生
@@ -22,14 +22,14 @@ public interface Demo03StudentService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createDemo03Student(@Valid Demo03StudentSaveReqVO createReqVO);
+    Long createDemo03Student(@Valid Demo03StudentErpSaveReqVO createReqVO);
 
     /**
      * 更新学生
      *
      * @param updateReqVO 更新信息
      */
-    void updateDemo03Student(@Valid Demo03StudentSaveReqVO updateReqVO);
+    void updateDemo03Student(@Valid Demo03StudentErpSaveReqVO updateReqVO);
 
     /**
      * 删除学生
@@ -59,7 +59,7 @@ public interface Demo03StudentService {
      * @param pageReqVO 分页查询
      * @return 学生分页
      */
-    PageResult<Demo03StudentDO> getDemo03StudentPage(Demo03StudentPageReqVO pageReqVO);
+    PageResult<Demo03StudentDO> getDemo03StudentPage(Demo03StudentErpPageReqVO pageReqVO);
 
     // ==================== 子表（学生课程） ====================
 

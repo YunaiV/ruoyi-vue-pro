@@ -12,7 +12,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class Demo03StudentPageReqVO extends PageParam {
+public class Demo03StudentErpPageReqVO extends PageParam {
 
     @Schema(description = "名字", example = "芋艿")
     private String name;

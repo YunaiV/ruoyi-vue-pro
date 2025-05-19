@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.erp.vo;
+package cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.normal.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -11,7 +11,7 @@ import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 @Schema(description = "管理后台 - 学生 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class Demo03StudentRespVO {
+public class Demo03StudentNormalRespVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "8525")
     @ExcelProperty("编号")

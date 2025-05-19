@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - 学生新增/修改 Request VO")
 @Data
-public class Demo03StudentSaveReqVO {
+public class Demo03StudentErpSaveReqVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "8525")
     private Long id;

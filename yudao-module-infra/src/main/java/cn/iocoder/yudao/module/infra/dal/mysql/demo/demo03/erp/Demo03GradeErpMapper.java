@@ -15,7 +15,7 @@ import java.util.List;
  * @author 芋道源码
  */
 @Mapper
-public interface Demo03GradeMapper extends BaseMapperX<Demo03GradeDO> {
+public interface Demo03GradeErpMapper extends BaseMapperX<Demo03GradeDO> {
 
     default PageResult<Demo03GradeDO> selectPage(PageParam reqVO, Long studentId) {
         return selectPage(reqVO, new LambdaQueryWrapperX<Demo03GradeDO>()

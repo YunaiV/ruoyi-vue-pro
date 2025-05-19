@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Size;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -65,7 +64,7 @@ public class Demo01ContactController {
     @Parameter(name = "ids", description = "编号", required = true)
     @Operation(summary = "批量删除示例联系人")
     @PreAuthorize("@ss.hasPermission('infra:demo01-contact:delete')")
-    public CommonResult<Boolean> deleteDemo01Contact(@RequestParam("ids") @Size(max = 100, message = "最多允许100个") List<Long> ids) {
+    public CommonResult<Boolean> deleteDemo01Contact(@RequestParam("ids") List<Long> ids) {
         demo01ContactService.deleteDemo01ContactByIds(ids);
         return success(true);
     }

@@ -76,6 +76,13 @@ async function onDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
 #if ($table.deleteBatch)
 const deleteIds = ref<number[]>([]) // 待删除${subTable.classComment} ID
 const showDeleteBatchBtn = computed(() => isEmpty(deleteIds.value));
+function setDeleteIds({
+  records,
+}: {
+  records: ${simpleClassName}Api.${subSimpleClassName}[];
+}) {
+  deleteIds.value = records.map((item) => item.id);
+}
 /** 批量删除${subTable.classComment} */
 async function onDeleteBatch() {
   const hideLoading = message.loading({
@@ -159,12 +166,8 @@ function onActionClick({
     } as VxeTableGridOptions<${simpleClassName}Api.${subSimpleClassName}>,
     #if (${table.templateType} == 11 && $table.deleteBatch)
     gridEvents:{
-      checkboxAll: ({records,}: { records: ${simpleClassName}Api.${subSimpleClassName}[];}) => {
-        deleteIds.value = records.map((item) => item.id);
-      },
-      checkboxChange: ({records,}: { records: ${simpleClassName}Api.${subSimpleClassName}[];}) => {
-        deleteIds.value = records.map((item) => item.id);
-      },
+      checkboxAll: setDeleteIds,
+      checkboxChange: setDeleteIds,
     }
     #end
   });
