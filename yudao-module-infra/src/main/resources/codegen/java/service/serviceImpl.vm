@@ -49,19 +49,21 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #if ( $subTables && $subTables.size() > 0 && $table.templateType != 11 )
     @Transactional(rollbackFor = Exception.class)
 #end
-    public ${primaryColumn.javaType} create${simpleClassName}(${sceneEnum.prefixClass}${table.className}SaveReqVO createReqVO) {
+    public ${primaryColumn.javaType} create${simpleClassName}(${saveReqVOClass} ${saveReqVOVar}) {
 ## 特殊：树表专属逻辑
 #if ( $table.templateType == 2 )
 #set ($TreeParentJavaField = $treeParentColumn.javaField.substring(0,1).toUpperCase() + ${treeParentColumn.javaField.substring(1)})##首字母大写
 #set ($TreeNameJavaField = $treeNameColumn.javaField.substring(0,1).toUpperCase() + ${treeNameColumn.javaField.substring(1)})##首字母大写
         // 校验${treeParentColumn.columnComment}的有效性
-        validateParent${simpleClassName}(null, createReqVO.get${TreeParentJavaField}());
+        validateParent${simpleClassName}(null, ${createReqVOVar}.get${TreeParentJavaField}());
         // 校验${treeNameColumn.columnComment}的唯一性
-        validate${simpleClassName}${TreeNameJavaField}Unique(null, createReqVO.get${TreeParentJavaField}(), createReqVO.get${TreeNameJavaField}());
+        validate${simpleClassName}${TreeNameJavaField}Unique(null, ${createReqVOVar}.get${TreeParentJavaField}(), ${createReqVOVar}.get${TreeNameJavaField}());
 
 #end
         // 插入
+#if ($voType == 10)
         ${table.className}DO ${classNameVar} = BeanUtils.toBean(createReqVO, ${table.className}DO.class);
+#end
         ${classNameVar}Mapper.insert(${classNameVar});
 ## 特殊：主子表专属逻辑（非 ERP 模式）
 #if ( $subTables && $subTables.size() > 0 && $table.templateType != 11 )
@@ -73,9 +75,9 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
     #if ( $subTable.subJoinMany)
-        create${subSimpleClassName}List(${classNameVar}.getId(), createReqVO.get${subSimpleClassNames.get($index)}s());
+        create${subSimpleClassName}List(${classNameVar}.getId(), ${createReqVOVar}.get${subSimpleClassNames.get($index)}s());
     #else
-        create${subSimpleClassName}(${classNameVar}.getId(), createReqVO.get${subSimpleClassNames.get($index)}());
+        create${subSimpleClassName}(${classNameVar}.getId(), ${createReqVOVar}.get${subSimpleClassNames.get($index)}());
     #end
 #end
 #end
@@ -88,22 +90,26 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #if ( $subTables && $subTables.size() > 0 && $table.templateType != 11 )
     @Transactional(rollbackFor = Exception.class)
 #end
-    public void update${simpleClassName}(${sceneEnum.prefixClass}${table.className}SaveReqVO updateReqVO) {
+    public void update${simpleClassName}(${updateReqVOClass} ${updateReqVOVar}) {
         // 校验存在
-        validate${simpleClassName}Exists(updateReqVO.getId());
+        validate${simpleClassName}Exists(${updateReqVOVar}.getId());
 ## 特殊：树表专属逻辑
 #if ( $table.templateType == 2 )
 #set ($TreeParentJavaField = $treeParentColumn.javaField.substring(0,1).toUpperCase() + ${treeParentColumn.javaField.substring(1)})##首字母大写
 #set ($TreeNameJavaField = $treeNameColumn.javaField.substring(0,1).toUpperCase() + ${treeNameColumn.javaField.substring(1)})##首字母大写
         // 校验${treeParentColumn.columnComment}的有效性
-        validateParent${simpleClassName}(updateReqVO.getId(), updateReqVO.get${TreeParentJavaField}());
+        validateParent${simpleClassName}(${updateReqVOVar}.getId(), ${updateReqVOVar}.get${TreeParentJavaField}());
         // 校验${treeNameColumn.columnComment}的唯一性
-        validate${simpleClassName}${TreeNameJavaField}Unique(updateReqVO.getId(), updateReqVO.get${TreeParentJavaField}(), updateReqVO.get${TreeNameJavaField}());
+        validate${simpleClassName}${TreeNameJavaField}Unique(${updateReqVOVar}.getId(), ${updateReqVOVar}.get${TreeParentJavaField}(), ${updateReqVOVar}.get${TreeNameJavaField}());
 
 #end
         // 更新
+#if ($voType == 10)
         ${table.className}DO updateObj = BeanUtils.toBean(updateReqVO, ${table.className}DO.class);
         ${classNameVar}Mapper.updateById(updateObj);
+#else
+        ${classNameVar}Mapper.updateById(${updateReqVOVar});
+#end
 ## 特殊：主子表专属逻辑（非 ERP 模式）
 #if ( $subTables && $subTables.size() > 0 && $table.templateType != 11)
 
@@ -114,9 +120,9 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
     #if ( $subTable.subJoinMany)
-        update${subSimpleClassName}List(updateReqVO.getId(), updateReqVO.get${subSimpleClassNames.get($index)}s());
+        update${subSimpleClassName}List(${updateReqVOVar}.getId(), ${updateReqVOVar}.get${subSimpleClassNames.get($index)}s());
     #else
-        update${subSimpleClassName}(updateReqVO.getId(), updateReqVO.get${subSimpleClassNames.get($index)}());
+        update${subSimpleClassName}(${updateReqVOVar}.getId(), ${updateReqVOVar}.get${subSimpleClassNames.get($index)}());
     #end
 #end
 #end

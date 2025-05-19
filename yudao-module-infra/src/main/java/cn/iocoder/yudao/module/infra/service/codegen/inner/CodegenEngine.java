@@ -31,6 +31,7 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenFrontTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
+import cn.iocoder.yudao.module.infra.enums.codegen.CodegenVOTypeEnum;
 import cn.iocoder.yudao.module.infra.framework.codegen.config.CodegenProperties;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableTable;
@@ -234,6 +235,7 @@ public class CodegenEngine {
         globalBindingMap.put("baseFrameworkPackage", codegenProperties.getBasePackage()
                 + '.' + "framework"); // 用于后续获取测试类的 package 地址
         globalBindingMap.put("jakartaPackage", jakartaEnable ? "jakarta" : "javax");
+        globalBindingMap.put("voType", codegenProperties.getVoType());
         // 全局 Java Bean
         globalBindingMap.put("CommonResultClassName", CommonResult.class.getName());
         globalBindingMap.put("PageResultClassName", PageResult.class.getName());
@@ -383,11 +385,13 @@ public class CodegenEngine {
 
         // className 相关
         // 去掉指定前缀，将 TestDictType 转换成 DictType. 因为在 create 等方法后，不需要带上 Test 前缀
+        String className = table.getClassName();
         String simpleClassName = equalsAnyIgnoreCase(table.getClassName(), table.getModuleName()) ? table.getClassName()
                 : removePrefix(table.getClassName(), upperFirst(table.getModuleName()));
+        String classNameVar = lowerFirst(simpleClassName);
         bindingMap.put("simpleClassName", simpleClassName);
         bindingMap.put("simpleClassName_underlineCase", toUnderlineCase(simpleClassName)); // 将 DictType 转换成 dict_type
-        bindingMap.put("classNameVar", lowerFirst(simpleClassName)); // 将 DictType 转换成 dictType，用于变量
+        bindingMap.put("classNameVar", classNameVar); // 将 DictType 转换成 dictType，用于变量
         // 将 DictType 转换成 dict-type
         String simpleClassNameStrikeCase = toSymbolCase(simpleClassName, '-');
         bindingMap.put("simpleClassName_strikeCase", simpleClassNameStrikeCase);
@@ -441,6 +445,22 @@ public class CodegenEngine {
             bindingMap.put("subClassNameVars", subClassNameVars);
             bindingMap.put("subSimpleClassName_strikeCases", subSimpleClassNameStrikeCases);
         }
+
+        // 多个 vm 公用的 VO 变量
+        if (ObjectUtil.equal(codegenProperties.getVoType(), CodegenVOTypeEnum.VO.getType())) {
+            String prefixClass = CodegenSceneEnum.valueOf(table.getScene()).getPrefixClass();
+            bindingMap.put("saveReqVOClass", prefixClass + className + "SaveReqVO");
+            bindingMap.put("updateReqVOClass", prefixClass + className + "SaveReqVO");
+            bindingMap.put("respVOClass", prefixClass + className + "RespVO");
+            bindingMap.put("saveReqVOVar", "createReqVO");
+            bindingMap.put("updateReqVOVar", "updateReqVO");
+        } else if (ObjectUtil.equal(codegenProperties.getVoType(), CodegenVOTypeEnum.DO.getType())) {
+            bindingMap.put("saveReqVOClass", className + "DO");
+            bindingMap.put("updateReqVOClass", className + "DO");
+            bindingMap.put("respVOClass", className + "DO");
+            bindingMap.put("saveReqVOVar", classNameVar);
+            bindingMap.put("updateReqVOVar", classNameVar);
+        }
         return bindingMap;
     }
 
@@ -460,6 +480,11 @@ public class CodegenEngine {
         if (Boolean.FALSE.equals(codegenProperties.getUnitTestEnable())) {
             templates.remove(javaTemplatePath("test/serviceTest"));
             templates.remove("codegen/sql/h2.vm");
+        }
+        // 如果禁用 VO 类型，则移除对应的模版
+        if (ObjectUtil.notEqual(codegenProperties.getVoType(), CodegenVOTypeEnum.VO.getType())) {
+            templates.remove(javaTemplatePath("controller/vo/respVO"));
+            templates.remove(javaTemplatePath("controller/vo/saveReqVO"));
         }
         return templates;
     }

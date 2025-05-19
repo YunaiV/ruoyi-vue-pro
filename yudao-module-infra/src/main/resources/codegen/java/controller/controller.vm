@@ -49,8 +49,8 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
 #if ($sceneEnum.scene == 1)
     @PreAuthorize("@ss.hasPermission('${permissionPrefix}:create')")
 #end
-    public CommonResult<${primaryColumn.javaType}> create${simpleClassName}(@Valid @RequestBody ${sceneEnum.prefixClass}${table.className}SaveReqVO createReqVO) {
-        return success(${classNameVar}Service.create${simpleClassName}(createReqVO));
+    public CommonResult<${primaryColumn.javaType}> create${simpleClassName}(@Valid @RequestBody ${saveReqVOClass} ${saveReqVOVar}) {
+        return success(${classNameVar}Service.create${simpleClassName}(${saveReqVOVar}));
     }
 
     @PutMapping("/update")
@@ -58,8 +58,8 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
 #if ($sceneEnum.scene == 1)
     @PreAuthorize("@ss.hasPermission('${permissionPrefix}:update')")
 #end
-    public CommonResult<Boolean> update${simpleClassName}(@Valid @RequestBody ${sceneEnum.prefixClass}${table.className}SaveReqVO updateReqVO) {
-        ${classNameVar}Service.update${simpleClassName}(updateReqVO);
+    public CommonResult<Boolean> update${simpleClassName}(@Valid @RequestBody ${updateReqVOClass} ${updateReqVOVar}) {
+        ${classNameVar}Service.update${simpleClassName}(${updateReqVOVar});
         return success(true);
     }
 
@@ -80,9 +80,13 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
 #if ($sceneEnum.scene == 1)
     @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")
 #end
-    public CommonResult<${sceneEnum.prefixClass}${table.className}RespVO> get${simpleClassName}(@RequestParam("id") ${primaryColumn.javaType} id) {
+    public CommonResult<${respVOClass}> get${simpleClassName}(@RequestParam("id") ${primaryColumn.javaType} id) {
         ${table.className}DO ${classNameVar} = ${classNameVar}Service.get${simpleClassName}(id);
-        return success(BeanUtils.toBean(${classNameVar}, ${sceneEnum.prefixClass}${table.className}RespVO.class));
+#if ($voType == 10)
+        return success(BeanUtils.toBean(${classNameVar}, ${respVOClass}.class));
+#else
+        return success(${classNameVar});
+#end
     }
 
 #if ( $table.templateType != 2 )
@@ -91,9 +95,13 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
 #if ($sceneEnum.scene == 1)
     @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")
 #end
-    public CommonResult<PageResult<${sceneEnum.prefixClass}${table.className}RespVO>> get${simpleClassName}Page(@Valid ${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO) {
+    public CommonResult<PageResult<${respVOClass}>> get${simpleClassName}Page(@Valid ${sceneEnum.prefixClass}${table.className}PageReqVO pageReqVO) {
         PageResult<${table.className}DO> pageResult = ${classNameVar}Service.get${simpleClassName}Page(pageReqVO);
-        return success(BeanUtils.toBean(pageResult, ${sceneEnum.prefixClass}${table.className}RespVO.class));
+#if ($voType == 10)
+        return success(BeanUtils.toBean(pageResult, ${respVOClass}.class));
+#else
+        return success(pageResult);
+#end
     }
 
 ## 特殊：树表专属逻辑（树不需要分页接口）
@@ -103,9 +111,13 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
 #if ($sceneEnum.scene == 1)
     @PreAuthorize("@ss.hasPermission('${permissionPrefix}:query')")
 #end
-    public CommonResult<List<${sceneEnum.prefixClass}${table.className}RespVO>> get${simpleClassName}List(@Valid ${sceneEnum.prefixClass}${table.className}ListReqVO listReqVO) {
+    public CommonResult<List<${respVOClass}>> get${simpleClassName}List(@Valid ${sceneEnum.prefixClass}${table.className}ListReqVO listReqVO) {
         List<${table.className}DO> list = ${classNameVar}Service.get${simpleClassName}List(listReqVO);
-        return success(BeanUtils.toBean(list, ${sceneEnum.prefixClass}${table.className}RespVO.class));
+#if ($voType == 10)
+        return success(BeanUtils.toBean(list, ${respVOClass}.class));
+#else
+	    return success(list);
+#end
     }
 
 #end
@@ -121,8 +133,8 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<${table.className}DO> list = ${classNameVar}Service.get${simpleClassName}Page(pageReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "${table.classComment}.xls", "数据", ${sceneEnum.prefixClass}${table.className}RespVO.class,
-                        BeanUtils.toBean(list, ${sceneEnum.prefixClass}${table.className}RespVO.class));
+        ExcelUtils.write(response, "${table.classComment}.xls", "数据", ${respVOClass}.class,
+                        BeanUtils.toBean(list, ${respVOClass}.class));
     }
 ## 特殊：树表专属逻辑（树不需要分页接口）
 #else

@@ -21,17 +21,17 @@ public interface ${table.className}Service {
     /**
      * 创建${table.classComment}
      *
-     * @param createReqVO 创建信息
+     * @param ${saveReqVOVar} 创建信息
      * @return 编号
      */
-    ${primaryColumn.javaType} create${simpleClassName}(@Valid ${sceneEnum.prefixClass}${table.className}SaveReqVO createReqVO);
+    ${primaryColumn.javaType} create${simpleClassName}(@Valid ${saveReqVOClass} ${saveReqVOVar});
 
     /**
      * 更新${table.classComment}
      *
-     * @param updateReqVO 更新信息
+     * @param ${updateReqVOVar} 更新信息
      */
-    void update${simpleClassName}(@Valid ${sceneEnum.prefixClass}${table.className}SaveReqVO updateReqVO);
+    void update${simpleClassName}(@Valid ${updateReqVOClass} ${updateReqVOVar});
 
     /**
      * 删除${table.classComment}
