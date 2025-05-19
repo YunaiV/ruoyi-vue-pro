@@ -60,10 +60,6 @@ public class CodegenTableSaveReqVO {
     @NotNull(message = "前端类型不能为空")
     private Integer frontType;
 
-    @Schema(description = "是否生成批量删除接口", example = "true")
-    @NotNull(message = "是否生成批量删除接口不能为空")
-    private Boolean deleteBatch;
-
     @Schema(description = "父菜单编号", example = "1024")
     private Long parentMenuId;
 

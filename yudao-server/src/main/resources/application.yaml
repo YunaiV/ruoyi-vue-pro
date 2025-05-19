@@ -270,6 +270,7 @@ yudao:
     db-schemas: ${spring.datasource.dynamic.datasource.master.name}
     front-type: 20 # 前端模版的类型，参见 CodegenFrontTypeEnum 枚举类
     unit-test-enable: false # 是否生成单元测试
+    delete-batch-enable: false # 是否生成批量删除接口
   tenant: # 多租户相关配置项
     enable: true
     ignore-urls:

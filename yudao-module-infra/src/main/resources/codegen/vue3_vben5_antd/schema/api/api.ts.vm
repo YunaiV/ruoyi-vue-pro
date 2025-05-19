@@ -89,7 +89,7 @@ export function delete${simpleClassName}(id: number) {
   return requestClient.delete(`${baseURL}/delete?id=${id}`);
 }
 
-#if ( $table.templateType != 2 && $table.deleteBatch)
+#if ( $table.templateType != 2 && $deleteBatchEnable)
 // 批量删除${table.classComment}
 export function delete${simpleClassName}ByIds(ids: number[]) {
   return requestClient.delete(`${baseURL}/delete-batch?ids=${ids.join(',')}`)
@@ -151,7 +151,7 @@ export function delete${subSimpleClassName}(id: number) {
   return requestClient.delete(`${baseURL}/${subSimpleClassName_strikeCase}/delete?id=${id}`);
 }
 
-#if ($table.deleteBatch)
+#if ($deleteBatchEnable)
 // 批量删除${subTable.classComment}
 export function delete${subSimpleClassName}ByIds(ids: number[]) {
   return requestClient.delete(`${baseURL}/${subSimpleClassName_strikeCase}/delete-batch?ids=${ids.join(',')}`)

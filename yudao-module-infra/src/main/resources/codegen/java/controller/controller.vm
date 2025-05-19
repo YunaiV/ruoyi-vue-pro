@@ -74,7 +74,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
         return success(true);
     }
 
-#if ( $table.templateType != 2 && $table.deleteBatch)
+#if ( $table.templateType != 2 && $deleteBatchEnable)
     @DeleteMapping("/delete-batch")
     @Parameter(name = "ids", description = "编号", required = true)
     @Operation(summary = "批量删除${table.classComment}")
@@ -231,7 +231,7 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
         return success(true);
     }
 
-#if ($table.deleteBatch)
+#if ($deleteBatchEnable)
     @DeleteMapping("/${subSimpleClassName_strikeCase}/delete-batch")
     @Parameter(name = "ids", description = "编号", required = true)
     @Operation(summary = "批量删除${subTable.classComment}")
