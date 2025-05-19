@@ -1,15 +1,13 @@
-package cn.iocoder.yudao.module.infra.service.demo.demo03;
+package cn.iocoder.yudao.module.infra.service.demo.demo03.erp;
 
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.vo.Demo03StudentPageReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.vo.Demo03StudentSaveReqVO;
+import java.util.*;
+import jakarta.validation.*;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.erp.vo.*;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03StudentDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03CourseDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03GradeDO;
-import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03StudentDO;
-
-import jakarta.validation.Valid;
-import java.util.List;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 
 /**
  * 学生 Service 接口
@@ -41,6 +39,13 @@ public interface Demo03StudentService {
     void deleteDemo03Student(Long id);
 
     /**
+    * 批量删除学生
+    *
+    * @param ids 编号
+    */
+    void deleteDemo03StudentByIds(List<Long> ids);
+
+    /**
      * 获得学生
      *
      * @param id 编号
@@ -56,16 +61,7 @@ public interface Demo03StudentService {
      */
     PageResult<Demo03StudentDO> getDemo03StudentPage(Demo03StudentPageReqVO pageReqVO);
 
-
     // ==================== 子表（学生课程） ====================
-
-    /**
-     * 获得学生课程列表
-     *
-     * @param studentId 学生编号
-     * @return 学生课程列表
-     */
-    List<Demo03CourseDO> getDemo03CourseListByStudentId(Long studentId);
 
     /**
      * 获得学生课程分页
@@ -99,22 +95,21 @@ public interface Demo03StudentService {
     void deleteDemo03Course(Long id);
 
     /**
-     * 获得学生课程
-     *
-     * @param id 编号
+    * 批量删除学生课程
+    *
+    * @param ids 编号
+    */
+    void deleteDemo03CourseByIds(List<Long> ids);
+
+	/**
+	 * 获得学生课程
+	 *
+	 * @param id 编号
      * @return 学生课程
-     */
+	 */
     Demo03CourseDO getDemo03Course(Long id);
 
     // ==================== 子表（学生班级） ====================
-
-    /**
-     * 获得学生班级
-     *
-     * @param studentId 学生编号
-     * @return 学生班级
-     */
-    Demo03GradeDO getDemo03GradeByStudentId(Long studentId);
 
     /**
      * 获得学生班级分页
@@ -148,11 +143,18 @@ public interface Demo03StudentService {
     void deleteDemo03Grade(Long id);
 
     /**
-     * 获得学生班级
-     *
-     * @param id 编号
+    * 批量删除学生班级
+    *
+    * @param ids 编号
+    */
+    void deleteDemo03GradeByIds(List<Long> ids);
+
+	/**
+	 * 获得学生班级
+	 *
+	 * @param id 编号
      * @return 学生班级
-     */
+	 */
     Demo03GradeDO getDemo03Grade(Long id);
 
 }

@@ -431,6 +431,9 @@ export function use${subSimpleClassName}GridColumns(
     onActionClick?: OnActionClickFn<${simpleClassName}Api.${subSimpleClassName}>,
 ): VxeTableGridOptions<${simpleClassName}Api.${subSimpleClassName}>['columns'] {
     return [
+        #if ($table.templateType != 2 && $table.deleteBatch)
+            { type: 'checkbox', width: 40 },
+        #end
         #foreach($column in $subColumns)
             #if ($column.listOperationResult)
                 #set ($dictType = $column.dictType)

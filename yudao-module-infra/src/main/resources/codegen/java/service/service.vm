@@ -143,6 +143,15 @@ public interface ${table.className}Service {
      */
     void delete${subSimpleClassName}(${subPrimaryColumn.javaType} id);
 
+#if ($table.deleteBatch)
+    /**
+    * 批量删除${subTable.classComment}
+    *
+    * @param ids 编号
+    */
+    void delete${subSimpleClassName}ByIds(List<${subPrimaryColumn.javaType}> ids);
+#end
+
 	/**
 	 * 获得${subTable.classComment}
 	 *

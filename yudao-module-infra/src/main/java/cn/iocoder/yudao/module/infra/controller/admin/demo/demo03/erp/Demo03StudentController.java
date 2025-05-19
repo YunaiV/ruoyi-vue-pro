@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.infra.controller.admin.demo.demo03;
+package cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.erp;
 
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -6,13 +6,13 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.vo.Demo03StudentPageReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.vo.Demo03StudentRespVO;
-import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.vo.Demo03StudentSaveReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.erp.vo.Demo03StudentPageReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.erp.vo.Demo03StudentRespVO;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.erp.vo.Demo03StudentSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03CourseDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03GradeDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03StudentDO;
-import cn.iocoder.yudao.module.infra.service.demo.demo03.Demo03StudentService;
+import cn.iocoder.yudao.module.infra.service.demo.demo03.erp.Demo03StudentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,7 +31,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - 学生")
 @RestController
-@RequestMapping("/infra/demo03-student")
+@RequestMapping("/infra/demo03-student-erp")
 @Validated
 public class Demo03StudentController {
 
@@ -62,6 +62,15 @@ public class Demo03StudentController {
         return success(true);
     }
 
+    @DeleteMapping("/delete-batch")
+    @Parameter(name = "ids", description = "编号", required = true)
+    @Operation(summary = "批量删除学生")
+    @PreAuthorize("@ss.hasPermission('infra:demo03-student:delete')")
+    public CommonResult<Boolean> deleteDemo03Student(@RequestParam("ids") List<Long> ids) {
+        demo03StudentService.deleteDemo03StudentByIds(ids);
+        return success(true);
+    }
+
     @GetMapping("/get")
     @Operation(summary = "获得学生")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
@@ -84,12 +93,12 @@ public class Demo03StudentController {
     @PreAuthorize("@ss.hasPermission('infra:demo03-student:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportDemo03StudentExcel(@Valid Demo03StudentPageReqVO pageReqVO,
-              HttpServletResponse response) throws IOException {
+                                         HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<Demo03StudentDO> list = demo03StudentService.getDemo03StudentPage(pageReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "学生.xls", "数据", Demo03StudentRespVO.class,
-                        BeanUtils.toBean(list, Demo03StudentRespVO.class));
+                BeanUtils.toBean(list, Demo03StudentRespVO.class));
     }
 
     // ==================== 子表（学生课程） ====================
@@ -127,20 +136,21 @@ public class Demo03StudentController {
         return success(true);
     }
 
+    @DeleteMapping("/demo03-course/delete-batch")
+    @Parameter(name = "ids", description = "编号", required = true)
+    @Operation(summary = "批量删除学生课程")
+    @PreAuthorize("@ss.hasPermission('infra:demo03-student:delete')")
+    public CommonResult<Boolean> deleteDemo03Course(@RequestParam("ids") List<Long> ids) {
+        demo03StudentService.deleteDemo03CourseByIds(ids);
+        return success(true);
+    }
+
     @GetMapping("/demo03-course/get")
     @Operation(summary = "获得学生课程")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('infra:demo03-student:query')")
     public CommonResult<Demo03CourseDO> getDemo03Course(@RequestParam("id") Long id) {
         return success(demo03StudentService.getDemo03Course(id));
-    }
-
-    @GetMapping("/demo03-course/list-by-student-id")
-    @Operation(summary = "获得学生课程列表")
-    @Parameter(name = "studentId", description = "学生编号")
-    @PreAuthorize("@ss.hasPermission('infra:demo03-student:query')")
-    public CommonResult<List<Demo03CourseDO>> getDemo03CourseListByStudentId(@RequestParam("studentId") Long studentId) {
-        return success(demo03StudentService.getDemo03CourseListByStudentId(studentId));
     }
 
     // ==================== 子表（学生班级） ====================
@@ -178,20 +188,21 @@ public class Demo03StudentController {
         return success(true);
     }
 
+    @DeleteMapping("/demo03-grade/delete-batch")
+    @Parameter(name = "ids", description = "编号", required = true)
+    @Operation(summary = "批量删除学生班级")
+    @PreAuthorize("@ss.hasPermission('infra:demo03-student:delete')")
+    public CommonResult<Boolean> deleteDemo03Grade(@RequestParam("ids") List<Long> ids) {
+        demo03StudentService.deleteDemo03GradeByIds(ids);
+        return success(true);
+    }
+
     @GetMapping("/demo03-grade/get")
     @Operation(summary = "获得学生班级")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('infra:demo03-student:query')")
     public CommonResult<Demo03GradeDO> getDemo03Grade(@RequestParam("id") Long id) {
         return success(demo03StudentService.getDemo03Grade(id));
-    }
-
-    @GetMapping("/demo03-grade/get-by-student-id")
-    @Operation(summary = "获得学生班级")
-    @Parameter(name = "studentId", description = "学生编号")
-    @PreAuthorize("@ss.hasPermission('infra:demo03-student:query')")
-    public CommonResult<Demo03GradeDO> getDemo03GradeByStudentId(@RequestParam("studentId") Long studentId) {
-        return success(demo03StudentService.getDemo03GradeByStudentId(studentId));
     }
 
 }

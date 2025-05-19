@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.vo;
+package cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.erp.vo;
 
 import lombok.*;
 import io.swagger.v3.oas.annotations.media.Schema;

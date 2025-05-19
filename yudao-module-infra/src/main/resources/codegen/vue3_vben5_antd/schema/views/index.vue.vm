@@ -22,7 +22,7 @@ import { useVbenVxeGrid } from '#/adapter/vxe-table';
 #if (${table.templateType} == 2)## 树表接口
 import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 #else## 标准表接口
-import { get${simpleClassName}Page, delete${simpleClassName},delete${simpleClassName}ByIds, export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
+import { get${simpleClassName}Page, delete${simpleClassName},#if ($table.deleteBatch) delete${simpleClassName}ByIds,#end export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 #end
 import { downloadFileFromBlobPart, isEmpty } from '@vben/utils';
 

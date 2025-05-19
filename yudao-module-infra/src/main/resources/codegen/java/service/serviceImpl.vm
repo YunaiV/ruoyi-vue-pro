@@ -332,6 +332,16 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         ${subClassNameVars.get($index)}Mapper.deleteById(id);
     }
 
+#if ($table.deleteBatch)
+	@Override
+	public void delete${subSimpleClassName}ByIds(List<${subPrimaryColumn.javaType}> ids) {
+        // 校验存在
+        validate${subSimpleClassName}Exists(ids);
+        // 删除
+        ${subClassNameVars.get($index)}Mapper.deleteByIds(ids);
+	}
+#end
+
     @Override
     public ${subTable.className}DO get${subSimpleClassName}(${subPrimaryColumn.javaType} id) {
         return ${subClassNameVars.get($index)}Mapper.selectById(id);
@@ -342,6 +352,15 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
             throw exception(${simpleClassNameUnderlineCase.toUpperCase()}_NOT_EXISTS);
         }
     }
+
+#if ($table.deleteBatch)
+	private void validate${subSimpleClassName}Exists(List<${subPrimaryColumn.javaType}> ids) {
+        List<${subTable.className}DO> list = ${subClassNameVar}Mapper.selectByIds(ids);
+        if (CollUtil.isEmpty(list) || list.size() != ids.size()) {
+            throw exception(${simpleClassNameUnderlineCase.toUpperCase()}_NOT_EXISTS);
+        }
+	}
+#end
 
 ## 情况二：非 MASTER_ERP 时，支持批量的新增、修改操作
 #else
