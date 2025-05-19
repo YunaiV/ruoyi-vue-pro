@@ -51,7 +51,7 @@ public class BpmProcessIdRedisDAO {
         String noPrefix = processIdRule.getPrefix() + infix + processIdRule.getPostfix();
         String key = RedisKeyConstants.BPM_PROCESS_ID + noPrefix;
         Long no = stringRedisTemplate.opsForValue().increment(key);
-        if (StrUtil.isEmpty(infix)) {
+        if (StrUtil.isNotEmpty(infix)) {
             // 特殊：没有前缀，则不能过期，不能每次都是从 0 开始
             stringRedisTemplate.expire(key, Duration.ofDays(1L));
         }
