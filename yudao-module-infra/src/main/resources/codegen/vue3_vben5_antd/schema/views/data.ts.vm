@@ -193,6 +193,9 @@ export function useGridColumns(
   onActionClick?: OnActionClickFn<${simpleClassName}Api.${simpleClassName}>,
 ): VxeTableGridOptions<${simpleClassName}Api.${simpleClassName}>['columns'] {
   return [
+#if ($table.templateType != 2 && $table.deleteBatch)
+  { type: 'checkbox', width: 40 },
+#end
 #if ($table.templateType == 12) ## 内嵌情况
       { type: 'expand', width: 80, slots: { content: 'expand_content' } },
 #end

@@ -89,6 +89,13 @@ export function delete${simpleClassName}(id: number) {
   return requestClient.delete(`${baseURL}/delete?id=${id}`);
 }
 
+#if ( $table.templateType != 2 && $table.deleteBatch)
+// 批量删除${table.classComment}
+export function delete${simpleClassName}ByIds(ids: number[]) {
+  return requestClient.delete(`${baseURL}/delete-batch?ids=${ids.join(',')}`)
+}
+#end
+
 /** 导出${table.classComment} */
 export function export${simpleClassName}(params: any) {
   return requestClient.download('${baseURL}/export-excel', params);
