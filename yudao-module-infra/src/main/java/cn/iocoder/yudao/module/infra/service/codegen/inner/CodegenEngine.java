@@ -221,7 +221,7 @@ public class CodegenEngine {
         this.templateEngine = new VelocityEngine(config);
         // 设置 javaxEnable，按照是否使用 JDK17 来判断
         this.jakartaEnable = SystemUtil.getJavaInfo().isJavaVersionAtLeast(1700) // 17.00 * 100
-            && ClassUtils.isPresent("jakarta.annotation.Resource", ClassUtils.getDefaultClassLoader());
+                && ClassUtils.isPresent("jakarta.annotation.Resource", ClassUtils.getDefaultClassLoader());
         // 设置 cloudEnable，按照是否使用 Spring Cloud 来判断
         this.cloudEnable = ClassUtils.isPresent("cn.iocoder.yudao.module.infra.framework.rpc.config.RpcConfiguration",
                 ClassUtils.getDefaultClassLoader());
@@ -264,9 +264,9 @@ public class CodegenEngine {
     /**
      * 生成代码
      *
-     * @param table 表定义
-     * @param columns table 的字段定义数组
-     * @param subTables 子表数组，当且仅当主子表时使用
+     * @param table          表定义
+     * @param columns        table 的字段定义数组
+     * @param subTables      子表数组，当且仅当主子表时使用
      * @param subColumnsList subTables 的字段定义数组
      * @return 生成的代码，key 是路径，value 是对应代码
      */

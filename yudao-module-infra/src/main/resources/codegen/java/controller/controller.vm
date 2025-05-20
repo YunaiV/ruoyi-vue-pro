@@ -75,14 +75,14 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     }
 
 #if ( $table.templateType != 2 && $deleteBatchEnable)
-    @DeleteMapping("/delete-batch")
+    @DeleteMapping("/delete-list")
     @Parameter(name = "ids", description = "编号", required = true)
     @Operation(summary = "批量删除${table.classComment}")
     #if ($sceneEnum.scene == 1)
                 @PreAuthorize("@ss.hasPermission('${permissionPrefix}:delete')")
     #end
-    public CommonResult<Boolean> delete${simpleClassName}(@RequestParam("ids") List<${primaryColumn.javaType}> ids) {
-        ${classNameVar}Service.delete${simpleClassName}ByIds(ids);
+    public CommonResult<Boolean> delete${simpleClassName}List(@RequestParam("ids") List<${primaryColumn.javaType}> ids) {
+        ${classNameVar}Service.delete${simpleClassName}ListByIds(ids);
         return success(true);
     }
 #end
@@ -244,14 +244,14 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
     }
 
 #if ($deleteBatchEnable)
-    @DeleteMapping("/${subSimpleClassName_strikeCase}/delete-batch")
+    @DeleteMapping("/${subSimpleClassName_strikeCase}/delete-list")
     @Parameter(name = "ids", description = "编号", required = true)
     @Operation(summary = "批量删除${subTable.classComment}")
 #if ($sceneEnum.scene == 1)
     @PreAuthorize("@ss.hasPermission('${permissionPrefix}:delete')")
 #end
-    public CommonResult<Boolean> delete${subSimpleClassName}(@RequestParam("ids") List<${subPrimaryColumn.javaType}> ids) {
-        ${classNameVar}Service.delete${subSimpleClassName}ByIds(ids);
+    public CommonResult<Boolean> delete${subSimpleClassName}List(@RequestParam("ids") List<${subPrimaryColumn.javaType}> ids) {
+        ${classNameVar}Service.delete${subSimpleClassName}ListByIds(ids);
         return success(true);
     }
 #end

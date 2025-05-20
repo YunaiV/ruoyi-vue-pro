@@ -46,7 +46,7 @@ public interface ${table.className}Service {
     *
     * @param ids 编号
     */
-    void delete${simpleClassName}ByIds(List<${primaryColumn.javaType}> ids);
+    void delete${simpleClassName}ListByIds(List<${primaryColumn.javaType}> ids);
 #end
 
     /**
@@ -149,7 +149,7 @@ public interface ${table.className}Service {
     *
     * @param ids 编号
     */
-    void delete${subSimpleClassName}ByIds(List<${subPrimaryColumn.javaType}> ids);
+    void delete${subSimpleClassName}ListByIds(List<${subPrimaryColumn.javaType}> ids);
 #end
 
 	/**

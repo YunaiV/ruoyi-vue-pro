@@ -60,13 +60,12 @@ public class Demo01ContactController {
         return success(true);
     }
 
-    // TODO @puhui999：要不要 deleteDemo01ContactList？url 也叫 delete-list
-    @DeleteMapping("/delete-batch")
+    @DeleteMapping("/delete-list")
     @Parameter(name = "ids", description = "编号", required = true)
     @Operation(summary = "批量删除示例联系人")
     @PreAuthorize("@ss.hasPermission('infra:demo01-contact:delete')")
-    public CommonResult<Boolean> deleteDemo01Contact(@RequestParam("ids") List<Long> ids) {
-        demo01ContactService.deleteDemo01ContactByIds(ids);
+    public CommonResult<Boolean> deleteDemo0iContactList(@RequestParam("ids") List<Long> ids) {
+        demo01ContactService.deleteDemo0iContactListByIds(ids);
         return success(true);
     }
 

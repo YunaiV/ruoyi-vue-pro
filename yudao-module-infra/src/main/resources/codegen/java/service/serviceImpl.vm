@@ -169,7 +169,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     #if ( $subTables && $subTables.size() > 0)
     @Transactional(rollbackFor = Exception.class)
     #end
-    public void delete${simpleClassName}ByIds(List<${primaryColumn.javaType}> ids) {
+    public void delete${simpleClassName}ListByIds(List<${primaryColumn.javaType}> ids) {
         // 校验存在
         validate${simpleClassName}Exists(ids);
         // 删除
@@ -328,24 +328,19 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         // 校验存在
         validate${subSimpleClassName}Exists(${subClassNameVar}.getId());
         // 更新
-        ${subClassNameVar}.setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
+        ${subClassNameVar}.clean(); // 解决更新情况下：updateTime 不更新
         ${subClassNameVars.get($index)}Mapper.updateById(${subClassNameVar});
     }
 
     @Override
     public void delete${subSimpleClassName}(${subPrimaryColumn.javaType} id) {
-        // 校验存在
-        validate${subSimpleClassName}Exists(id);
         // 删除
         ${subClassNameVars.get($index)}Mapper.deleteById(id);
     }
 
-## TODO @puhui999：批量删除的时候，要不直接删除，就不“校验存在”；ps：主子表删除的时候，子表的处理，也要处理下哈；
 #if ($deleteBatchEnable)
 	@Override
-	public void delete${subSimpleClassName}ByIds(List<${subPrimaryColumn.javaType}> ids) {
-        // 校验存在
-        validate${subSimpleClassName}Exists(ids);
+	public void delete${subSimpleClassName}ListByIds(List<${subPrimaryColumn.javaType}> ids) {
         // 删除
         ${subClassNameVars.get($index)}Mapper.deleteByIds(ids);
 	}
@@ -362,30 +357,21 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         }
     }
 
-#if ($deleteBatchEnable)
-	private void validate${subSimpleClassName}Exists(List<${subPrimaryColumn.javaType}> ids) {
-        List<${subTable.className}DO> list = ${subClassNameVar}Mapper.selectByIds(ids);
-        if (CollUtil.isEmpty(list) || list.size() != ids.size()) {
-            throw exception(${simpleClassNameUnderlineCase.toUpperCase()}_NOT_EXISTS);
-        }
-	}
-#end
-
 ## 情况二：非 MASTER_ERP 时，支持批量的新增、修改操作
 #else
     #if ( $subTable.subJoinMany)
     private void create${subSimpleClassName}List(${primaryColumn.javaType} ${subJoinColumn.javaField}, List<${subTable.className}DO> list) {
-        list.forEach(o -> o.set${SubJoinColumnName}(${subJoinColumn.javaField}));
+        list.forEach(o -> o.set${SubJoinColumnName}(${subJoinColumn.javaField}).clean());
         ${subClassNameVars.get($index)}Mapper.insertBatch(list);
     }
 
     private void update${subSimpleClassName}List(${primaryColumn.javaType} ${subJoinColumn.javaField}, List<${subTable.className}DO> list) {
-	    list.forEach(o -> o.set${SubJoinColumnName}(${subJoinColumn.javaField}));
+	    list.forEach(o -> o.set${SubJoinColumnName}(${subJoinColumn.javaField}).clean());
 	    List<${subTable.className}DO> oldList = ${subClassNameVar}Mapper.selectListBy${SubJoinColumnName}(${subJoinColumn.javaField});
 	    List<List<${subTable.className}DO>> diffList = diffList(oldList, list, (oldVal, newVal) -> {
             boolean same = ObjectUtil.equal(oldVal.getId(), newVal.getId());
             if (same) {
-                newVal.setId(oldVal.getId()).setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
+                newVal.setId(oldVal.getId()).clean(); // 解决更新情况下：updateTime 不更新
             }
             return same;
 	    });
@@ -415,8 +401,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         if (${subClassNameVar} == null) {
 			return;
         }
-        ${subClassNameVar}.set$SubJoinColumnName(${subJoinColumn.javaField});
-        ${subClassNameVar}.setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
+        ${subClassNameVar}.set$SubJoinColumnName(${subJoinColumn.javaField}).clean();// 解决更新情况下：updateTime 不更新
         ${subClassNameVars.get($index)}Mapper.insertOrUpdate(${subClassNameVar});
     }
 

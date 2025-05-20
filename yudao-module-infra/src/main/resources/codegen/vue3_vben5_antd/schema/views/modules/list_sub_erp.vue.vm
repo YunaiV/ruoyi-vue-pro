@@ -21,7 +21,7 @@
 
 
 #if ($table.templateType == 11) ## erp
-  import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}ByIds,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${table.businessName}';
+  import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}ListByIds,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${table.businessName}';
   import { use${subSimpleClassName}GridFormSchema, use${subSimpleClassName}GridColumns } from '../data';
   import { isEmpty } from '@vben/utils';
   #else
@@ -74,15 +74,6 @@ async function onDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
 }
 
 #if ($deleteBatchEnable)
-const deleteIds = ref<number[]>([]) // 待删除${subTable.classComment} ID
-const showDeleteBatchBtn = computed(() => isEmpty(deleteIds.value));
-function setDeleteIds({
-  records,
-}: {
-  records: ${simpleClassName}Api.${subSimpleClassName}[];
-}) {
-  deleteIds.value = records.map((item) => item.id);
-}
 /** 批量删除${subTable.classComment} */
 async function onDeleteBatch() {
   const hideLoading = message.loading({
@@ -91,12 +82,21 @@ async function onDeleteBatch() {
     key: 'action_process_msg',
   });
   try {
-    await delete${subSimpleClassName}ByIds(deleteIds.value);
+    await delete${subSimpleClassName}ListByIds(deleteIds.value);
     message.success( $t('ui.actionMessage.deleteSuccess') );
     onRefresh();
   } finally {
     hideLoading();
   }
+}
+
+const deleteIds = ref<number[]>([]) // 待删除${subTable.classComment} ID
+function setDeleteIds({
+  records,
+}: {
+  records: ${simpleClassName}Api.${subSimpleClassName}[];
+}) {
+  deleteIds.value = records.map((item) => item.id);
 }
 #end
 
@@ -213,7 +213,7 @@ const onRefresh = async ()=> {
                   type="primary"
                   danger
                   class="ml-2"
-                  :disabled="showDeleteBatchBtn"
+                  :disabled="isEmpty(deleteIds)"
                   @click="onDeleteBatch"
                   v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:delete']"
               >

@@ -83,7 +83,7 @@ public class Demo03StudentInnerServiceImpl implements Demo03StudentInnerService 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteDemo03StudentByIds(List<Long> ids) {
+    public void deleteDemo03StudentListByIds(List<Long> ids) {
         // 校验存在
         validateDemo03StudentExists(ids);
         // 删除
@@ -125,17 +125,17 @@ public class Demo03StudentInnerServiceImpl implements Demo03StudentInnerService 
     }
 
     private void createDemo03CourseList(Long studentId, List<Demo03CourseDO> list) {
-        list.forEach(o -> o.setStudentId(studentId));
+        list.forEach(o -> o.setStudentId(studentId).clean());
         demo03CourseInnerMapper.insertBatch(list);
     }
 
     private void updateDemo03CourseList(Long studentId, List<Demo03CourseDO> list) {
-        list.forEach(o -> o.setStudentId(studentId));
+        list.forEach(o -> o.setStudentId(studentId).clean());
         List<Demo03CourseDO> oldList = demo03CourseInnerMapper.selectListByStudentId(studentId);
         List<List<Demo03CourseDO>> diffList = diffList(oldList, list, (oldVal, newVal) -> {
             boolean same = ObjectUtil.equal(oldVal.getId(), newVal.getId());
             if (same) {
-                newVal.setId(oldVal.getId()).setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
+                newVal.setId(oldVal.getId());
             }
             return same;
         });
@@ -179,8 +179,7 @@ public class Demo03StudentInnerServiceImpl implements Demo03StudentInnerService 
         if (demo03Grade == null) {
             return;
         }
-        demo03Grade.setStudentId(studentId);
-        demo03Grade.setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
+        demo03Grade.setStudentId(studentId).clean();
         demo03GradeInnerMapper.insertOrUpdate(demo03Grade);
     }
 

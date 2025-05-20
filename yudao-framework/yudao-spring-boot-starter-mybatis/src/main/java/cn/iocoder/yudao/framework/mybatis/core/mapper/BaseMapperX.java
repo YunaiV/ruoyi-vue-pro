@@ -215,4 +215,11 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         return delete(new LambdaQueryWrapper<T>().eq(field, value));
     }
 
+    default int deleteBatch(SFunction<T, ?> field, Collection<?> values) {
+        if (CollUtil.isEmpty(values)) {
+            return 0;
+        }
+        return delete(new LambdaQueryWrapper<T>().in(field, values));
+    }
+
 }

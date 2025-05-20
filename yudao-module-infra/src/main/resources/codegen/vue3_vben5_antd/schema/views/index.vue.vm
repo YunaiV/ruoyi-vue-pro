@@ -22,7 +22,7 @@ import { useVbenVxeGrid } from '#/adapter/vxe-table';
 #if (${table.templateType} == 2)## 树表接口
 import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 #else## 标准表接口
-import { get${simpleClassName}Page, delete${simpleClassName},#if ($deleteBatchEnable) delete${simpleClassName}ByIds,#end export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
+import { get${simpleClassName}Page, delete${simpleClassName},#if ($deleteBatchEnable) delete${simpleClassName}ListByIds,#end export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 #end
 import { downloadFileFromBlobPart, isEmpty } from '@vben/utils';
 
@@ -93,15 +93,6 @@ async function onDelete(row: ${simpleClassName}Api.${simpleClassName}) {
 }
 
 #if ($table.templateType != 2 && $deleteBatchEnable)
-const deleteIds = ref<number[]>([]) // 待删除${table.classComment} ID
-const showDeleteBatchBtn = computed(() => isEmpty(deleteIds.value));
-function setDeleteIds({
-  records,
-}: {
-  records: ${simpleClassName}Api.${simpleClassName}[];
-}) {
-  deleteIds.value = records.map((item) => item.id);
-}
 /** 批量删除${table.classComment} */
 async function onDeleteBatch() {
   const hideLoading = message.loading({
@@ -110,12 +101,21 @@ async function onDeleteBatch() {
     key: 'action_process_msg',
   });
   try {
-    await delete${simpleClassName}ByIds(deleteIds.value);
+    await delete${simpleClassName}ListByIds(deleteIds.value);
     message.success( $t('ui.actionMessage.deleteSuccess') );
     onRefresh();
   } finally {
     hideLoading();
   }
+}
+
+const deleteIds = ref<number[]>([]) // 待删除${table.classComment} ID
+function setDeleteIds({
+  records,
+}: {
+  records: ${simpleClassName}Api.${simpleClassName}[];
+}) {
+  deleteIds.value = records.map((item) => item.id);
 }
 #end
 
@@ -268,7 +268,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
             type="primary"
             danger
             class="ml-2"
-            :disabled="showDeleteBatchBtn"
+            :disabled="isEmpty(deleteIds)"
             @click="onDeleteBatch"
             v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:delete']"
         >

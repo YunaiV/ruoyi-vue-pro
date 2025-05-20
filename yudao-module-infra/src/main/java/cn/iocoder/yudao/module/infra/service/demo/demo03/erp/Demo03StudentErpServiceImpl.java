@@ -71,7 +71,7 @@ public class Demo03StudentErpServiceImpl implements Demo03StudentErpService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteDemo03StudentByIds(List<Long> ids) {
+    public void deleteDemo03StudentListByIds(List<Long> ids) {
         // 校验存在
         validateDemo03StudentExists(ids);
         // 删除
@@ -123,22 +123,18 @@ public class Demo03StudentErpServiceImpl implements Demo03StudentErpService {
         // 校验存在
         validateDemo03CourseExists(demo03Course.getId());
         // 更新
-        demo03Course.setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
+        demo03Course.clean();
         demo03CourseErpMapper.updateById(demo03Course);
     }
 
     @Override
     public void deleteDemo03Course(Long id) {
-        // 校验存在
-        validateDemo03CourseExists(id);
         // 删除
         demo03CourseErpMapper.deleteById(id);
     }
 
     @Override
-    public void deleteDemo03CourseByIds(List<Long> ids) {
-        // 校验存在
-        validateDemo03CourseExists(ids);
+    public void deleteDemo03CourseListByIds(List<Long> ids) {
         // 删除
         demo03CourseErpMapper.deleteByIds(ids);
     }
@@ -150,13 +146,6 @@ public class Demo03StudentErpServiceImpl implements Demo03StudentErpService {
 
     private void validateDemo03CourseExists(Long id) {
         if (demo03CourseErpMapper.selectById(id) == null) {
-            throw exception(DEMO03_COURSE_NOT_EXISTS);
-        }
-    }
-
-    private void validateDemo03CourseExists(List<Long> ids) {
-        List<Demo03CourseDO> list = demo03CourseErpMapper.selectByIds(ids);
-        if (CollUtil.isEmpty(list) || list.size() != ids.size()) {
             throw exception(DEMO03_COURSE_NOT_EXISTS);
         }
     }
@@ -192,22 +181,18 @@ public class Demo03StudentErpServiceImpl implements Demo03StudentErpService {
         // 校验存在
         validateDemo03GradeExists(demo03Grade.getId());
         // 更新
-        demo03Grade.setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
+        demo03Grade.clean();
         demo03GradeErpMapper.updateById(demo03Grade);
     }
 
     @Override
     public void deleteDemo03Grade(Long id) {
-        // 校验存在
-        validateDemo03GradeExists(id);
         // 删除
         demo03GradeErpMapper.deleteById(id);
     }
 
     @Override
-    public void deleteDemo03GradeByIds(List<Long> ids) {
-        // 校验存在
-        validateDemo03GradeExists(ids);
+    public void deleteDemo03GradeListByIds(List<Long> ids) {
         // 删除
         demo03GradeErpMapper.deleteByIds(ids);
     }
@@ -219,13 +204,6 @@ public class Demo03StudentErpServiceImpl implements Demo03StudentErpService {
 
     private void validateDemo03GradeExists(Long id) {
         if (demo03GradeErpMapper.selectById(id) == null) {
-            throw exception(DEMO03_GRADE_NOT_EXISTS);
-        }
-    }
-
-    private void validateDemo03GradeExists(List<Long> ids) {
-        List<Demo03GradeDO> list = demo03GradeErpMapper.selectByIds(ids);
-        if (CollUtil.isEmpty(list) || list.size() != ids.size()) {
             throw exception(DEMO03_GRADE_NOT_EXISTS);
         }
     }

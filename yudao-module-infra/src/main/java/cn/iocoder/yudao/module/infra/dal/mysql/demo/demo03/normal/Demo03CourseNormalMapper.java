@@ -23,7 +23,7 @@ public interface Demo03CourseNormalMapper extends BaseMapperX<Demo03CourseDO> {
     }
 
     default int deleteByStudentIds(List<Long> studentIds) {
-        return delete(Demo03CourseDO::getStudentId, studentIds);
+        return deleteBatch(Demo03CourseDO::getStudentId, studentIds);
     }
 
 }
