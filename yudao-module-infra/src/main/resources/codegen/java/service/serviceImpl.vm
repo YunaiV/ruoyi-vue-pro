@@ -25,6 +25,8 @@ import ${basePackage}.module.${subTable.moduleName}.dal.mysql.${subTable.busines
 #end
 
 import static ${ServiceExceptionUtilClassName}.exception;
+import static ${CollectionUtilsClassName}.convertList;
+import static ${CollectionUtilsClassName}.diffList;
 import static ${basePackage}.module.${table.moduleName}.enums.ErrorCodeConstants.*;
 
 /**
@@ -56,9 +58,9 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #set ($TreeParentJavaField = $treeParentColumn.javaField.substring(0,1).toUpperCase() + ${treeParentColumn.javaField.substring(1)})##首字母大写
 #set ($TreeNameJavaField = $treeNameColumn.javaField.substring(0,1).toUpperCase() + ${treeNameColumn.javaField.substring(1)})##首字母大写
         // 校验${treeParentColumn.columnComment}的有效性
-        validateParent${simpleClassName}(null, ${createReqVOVar}.get${TreeParentJavaField}());
+        validateParent${simpleClassName}(null, ${saveReqVOVar}.get${TreeParentJavaField}());
         // 校验${treeNameColumn.columnComment}的唯一性
-        validate${simpleClassName}${TreeNameJavaField}Unique(null, ${createReqVOVar}.get${TreeParentJavaField}(), ${createReqVOVar}.get${TreeNameJavaField}());
+        validate${simpleClassName}${TreeNameJavaField}Unique(null, ${saveReqVOVar}.get${TreeParentJavaField}(), ${saveReqVOVar}.get${TreeNameJavaField}());
 
 #end
         // 插入
@@ -76,9 +78,9 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
     #if ( $subTable.subJoinMany)
-        create${subSimpleClassName}List(${classNameVar}.getId(), ${createReqVOVar}.get${subSimpleClassNames.get($index)}s());
+        create${subSimpleClassName}List(${classNameVar}.getId(), ${saveReqVOVar}.get${subSimpleClassNames.get($index)}s());
     #else
-        create${subSimpleClassName}(${classNameVar}.getId(), ${createReqVOVar}.get${subSimpleClassNames.get($index)}());
+        create${subSimpleClassName}(${classNameVar}.getId(), ${saveReqVOVar}.get${subSimpleClassNames.get($index)}());
     #end
 #end
 #end
@@ -372,14 +374,31 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #else
     #if ( $subTable.subJoinMany)
     private void create${subSimpleClassName}List(${primaryColumn.javaType} ${subJoinColumn.javaField}, List<${subTable.className}DO> list) {
-        list.forEach(o -> o.set$SubJoinColumnName(${subJoinColumn.javaField}));
+        list.forEach(o -> o.set${SubJoinColumnName}(${subJoinColumn.javaField}));
         ${subClassNameVars.get($index)}Mapper.insertBatch(list);
     }
 
     private void update${subSimpleClassName}List(${primaryColumn.javaType} ${subJoinColumn.javaField}, List<${subTable.className}DO> list) {
-        delete${subSimpleClassName}By${SubJoinColumnName}(${subJoinColumn.javaField});
-		list.forEach(o -> o.setId(null).setUpdater(null).setUpdateTime(null)); // 解决更新情况下：1）id 冲突；2）updateTime 不更新
-        create${subSimpleClassName}List(${subJoinColumn.javaField}, list);
+	    list.forEach(o -> o.set${SubJoinColumnName}(${subJoinColumn.javaField}));
+	    List<${subTable.className}DO> oldList = ${subClassNameVar}Mapper.selectListBy${SubJoinColumnName}(${subJoinColumn.javaField});
+	    List<List<${subTable.className}DO>> diffList = diffList(oldList, list, (oldVal, newVal) -> {
+            boolean same = ObjectUtil.equal(oldVal.getId(), newVal.getId());
+            if (same) {
+                newVal.setId(oldVal.getId()).setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
+            }
+            return same;
+	    });
+
+	    // 第二步，批量添加、修改、删除
+	    if (CollUtil.isNotEmpty(diffList.get(0))) {
+	        ${subClassNameVar}Mapper.insertBatch(diffList.get(0));
+	    }
+	    if (CollUtil.isNotEmpty(diffList.get(1))) {
+	        ${subClassNameVar}Mapper.updateBatch(diffList.get(1));
+	    }
+	    if (CollUtil.isNotEmpty(diffList.get(2))) {
+	        ${subClassNameVar}Mapper.deleteByIds(convertList(diffList.get(2), ${subTable.className}DO::getId));
+	    }
     }
 
     #else

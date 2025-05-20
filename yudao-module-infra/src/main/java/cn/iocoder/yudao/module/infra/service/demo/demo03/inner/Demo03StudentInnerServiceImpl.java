@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.service.demo.demo03.inner;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.inner.vo.Demo03StudentInnerPageReqVO;
@@ -19,6 +20,8 @@ import org.springframework.validation.annotation.Validated;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.diffList;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.DEMO03_STUDENT_NOT_EXISTS;
 
 /**
@@ -127,9 +130,26 @@ public class Demo03StudentInnerServiceImpl implements Demo03StudentInnerService 
     }
 
     private void updateDemo03CourseList(Long studentId, List<Demo03CourseDO> list) {
-        deleteDemo03CourseByStudentId(studentId);
-        list.forEach(o -> o.setId(null).setUpdater(null).setUpdateTime(null)); // 解决更新情况下：1）id 冲突；2）updateTime 不更新
-        createDemo03CourseList(studentId, list);
+        list.forEach(o -> o.setStudentId(studentId));
+        List<Demo03CourseDO> oldList = demo03CourseInnerMapper.selectListByStudentId(studentId);
+        List<List<Demo03CourseDO>> diffList = diffList(oldList, list, (oldVal, newVal) -> {
+            boolean same = ObjectUtil.equal(oldVal.getId(), newVal.getId());
+            if (same) {
+                newVal.setId(oldVal.getId()).setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
+            }
+            return same;
+        });
+
+        // 第二步，批量添加、修改、删除
+        if (CollUtil.isNotEmpty(diffList.get(0))) {
+            demo03CourseInnerMapper.insertBatch(diffList.get(0));
+        }
+        if (CollUtil.isNotEmpty(diffList.get(1))) {
+            demo03CourseInnerMapper.updateBatch(diffList.get(1));
+        }
+        if (CollUtil.isNotEmpty(diffList.get(2))) {
+            demo03CourseInnerMapper.deleteByIds(convertList(diffList.get(2), Demo03CourseDO::getId));
+        }
     }
 
     private void deleteDemo03CourseByStudentId(Long studentId) {
