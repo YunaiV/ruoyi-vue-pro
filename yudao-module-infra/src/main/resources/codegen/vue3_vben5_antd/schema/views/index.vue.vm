@@ -22,7 +22,7 @@ import { useVbenVxeGrid } from '#/adapter/vxe-table';
 #if (${table.templateType} == 2)## 树表接口
 import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 #else## 标准表接口
-import { get${simpleClassName}Page, delete${simpleClassName},#if ($table.deleteBatch) delete${simpleClassName}ByIds,#end export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
+import { get${simpleClassName}Page, delete${simpleClassName},#if ($deleteBatchEnable) delete${simpleClassName}ByIds,#end export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 #end
 import { downloadFileFromBlobPart, isEmpty } from '@vben/utils';
 
@@ -92,7 +92,7 @@ async function onDelete(row: ${simpleClassName}Api.${simpleClassName}) {
   }
 }
 
-#if ($table.templateType != 2 && $table.deleteBatch)
+#if ($table.templateType != 2 && $deleteBatchEnable)
 const deleteIds = ref<number[]>([]) // 待删除${table.classComment} ID
 const showDeleteBatchBtn = computed(() => isEmpty(deleteIds.value));
 function setDeleteIds({
@@ -204,14 +204,14 @@ const [Grid, gridApi] = useVbenVxeGrid({
       search: true,
     },
   } as VxeTableGridOptions<${simpleClassName}Api.${simpleClassName}>,
-#if (${table.templateType} == 11 || $table.deleteBatch)
+#if (${table.templateType} == 11 || $deleteBatchEnable)
   gridEvents:{
     #if(${table.templateType} == 11)
     cellClick: ({ row }: { row: ${simpleClassName}Api.${simpleClassName}}) => {
       select${simpleClassName}.value = row;
     },
     #end
-    #if($table.deleteBatch)
+    #if($deleteBatchEnable)
       checkboxAll: setDeleteIds,
       checkboxChange: setDeleteIds,
     #end
@@ -262,7 +262,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
         >
           {{ $t('ui.actionTitle.export') }}
         </Button>
-#if ($table.templateType != 2 && $table.deleteBatch)
+#if ($table.templateType != 2 && $deleteBatchEnable)
         <Button
             :icon="h(Trash2)"
             type="primary"

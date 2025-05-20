@@ -21,7 +21,7 @@
 
 
 #if ($table.templateType == 11) ## erp
-  import { delete${subSimpleClassName},#if ($table.deleteBatch) delete${subSimpleClassName}ByIds,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${table.businessName}';
+  import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}ByIds,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${table.businessName}';
   import { use${subSimpleClassName}GridFormSchema, use${subSimpleClassName}GridColumns } from '../data';
   import { isEmpty } from '@vben/utils';
   #else
@@ -73,7 +73,7 @@ async function onDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
   }
 }
 
-#if ($table.deleteBatch)
+#if ($deleteBatchEnable)
 const deleteIds = ref<number[]>([]) // 待删除${subTable.classComment} ID
 const showDeleteBatchBtn = computed(() => isEmpty(deleteIds.value));
 function setDeleteIds({
@@ -164,7 +164,7 @@ function onActionClick({
         isHover: true,
     },
     } as VxeTableGridOptions<${simpleClassName}Api.${subSimpleClassName}>,
-    #if (${table.templateType} == 11 && $table.deleteBatch)
+    #if (${table.templateType} == 11 && $deleteBatchEnable)
     gridEvents:{
       checkboxAll: setDeleteIds,
       checkboxChange: setDeleteIds,
@@ -207,7 +207,7 @@ const onRefresh = async ()=> {
           <Button :icon="h(Plus)" type="primary" @click="onCreate" v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:create']">
             {{ $t('ui.actionTitle.create', ['${subTable.classComment}']) }}
           </Button>
-            #if ($table.templateType == 11 && $table.deleteBatch)
+            #if ($table.templateType == 11 && $deleteBatchEnable)
               <Button
                   :icon="h(Trash2)"
                   type="primary"

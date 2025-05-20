@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.infra.controller.admin.codegen.vo.table;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -45,9 +44,6 @@ public class CodegenTableRespVO {
 
     @Schema(description = "前端类型，参见 CodegenFrontTypeEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "20")
     private Integer frontType;
-
-    @Schema(description = "是否生成批量删除接口", example = "true")
-    private Boolean deleteBatch;
 
     @Schema(description = "父菜单编号", example = "1024")
     private Long parentMenuId;

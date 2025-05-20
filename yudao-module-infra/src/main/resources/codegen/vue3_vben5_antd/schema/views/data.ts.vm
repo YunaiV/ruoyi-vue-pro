@@ -193,7 +193,7 @@ export function useGridColumns(
   onActionClick?: OnActionClickFn<${simpleClassName}Api.${simpleClassName}>,
 ): VxeTableGridOptions<${simpleClassName}Api.${simpleClassName}>['columns'] {
   return [
-#if ($table.templateType != 2 && $table.deleteBatch)
+#if ($table.templateType != 2 && $deleteBatchEnable)
   { type: 'checkbox', width: 40 },
 #end
 #if ($table.templateType == 12) ## 内嵌情况
@@ -431,7 +431,7 @@ export function use${subSimpleClassName}GridColumns(
     onActionClick?: OnActionClickFn<${simpleClassName}Api.${subSimpleClassName}>,
 ): VxeTableGridOptions<${simpleClassName}Api.${subSimpleClassName}>['columns'] {
     return [
-        #if ($table.templateType != 2 && $table.deleteBatch)
+        #if ($table.templateType != 2 && $deleteBatchEnable)
             { type: 'checkbox', width: 40 },
         #end
         #foreach($column in $subColumns)

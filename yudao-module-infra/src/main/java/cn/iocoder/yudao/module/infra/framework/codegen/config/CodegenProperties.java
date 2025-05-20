@@ -49,4 +49,10 @@ public class CodegenProperties {
     @NotNull(message = "是否生成单元测试不能为空")
     private Boolean unitTestEnable;
 
+    /**
+     * 是否生成批量删除接口
+     */
+    @NotNull(message = "是否生成批量删除接口不能为空")
+    private Boolean deleteBatchEnable;
+
 }

@@ -40,7 +40,7 @@ public interface ${table.className}Service {
      */
     void delete${simpleClassName}(${primaryColumn.javaType} id);
 
-#if ( $table.templateType != 2 && $table.deleteBatch)
+#if ( $table.templateType != 2 && $deleteBatchEnable)
     /**
     * 批量删除${table.classComment}
     *
@@ -143,7 +143,7 @@ public interface ${table.className}Service {
      */
     void delete${subSimpleClassName}(${subPrimaryColumn.javaType} id);
 
-#if ($table.deleteBatch)
+#if ($deleteBatchEnable)
     /**
     * 批量删除${subTable.classComment}
     *

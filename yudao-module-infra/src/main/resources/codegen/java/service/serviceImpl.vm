@@ -161,7 +161,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #end
     }
 
-#if ( $table.templateType != 2 && $table.deleteBatch)
+#if ( $table.templateType != 2 && $deleteBatchEnable)
     @Override
     ## 特殊：主子表专属逻辑
     #if ( $subTables && $subTables.size() > 0)
@@ -338,7 +338,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         ${subClassNameVars.get($index)}Mapper.deleteById(id);
     }
 
-#if ($table.deleteBatch)
+#if ($deleteBatchEnable)
 	@Override
 	public void delete${subSimpleClassName}ByIds(List<${subPrimaryColumn.javaType}> ids) {
         // 校验存在
@@ -359,7 +359,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         }
     }
 
-#if ($table.deleteBatch)
+#if ($deleteBatchEnable)
 	private void validate${subSimpleClassName}Exists(List<${subPrimaryColumn.javaType}> ids) {
         List<${subTable.className}DO> list = ${subClassNameVar}Mapper.selectByIds(ids);
         if (CollUtil.isEmpty(list) || list.size() != ids.size()) {
@@ -406,7 +406,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         ${subClassNameVars.get($index)}Mapper.deleteBy${SubJoinColumnName}(${subJoinColumn.javaField});
     }
 
-#if ( $table.templateType != 2 && $table.deleteBatch)
+#if ( $table.templateType != 2 && $deleteBatchEnable)
 	private void delete${subSimpleClassName}By${SubJoinColumnName}s(List<${primaryColumn.javaType}> ${subJoinColumn.javaField}s) {
         ${subClassNameVars.get($index)}Mapper.deleteBy${SubJoinColumnName}s(${subJoinColumn.javaField}s);
 	}
