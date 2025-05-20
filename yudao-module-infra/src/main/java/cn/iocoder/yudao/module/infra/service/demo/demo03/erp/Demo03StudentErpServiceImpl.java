@@ -129,16 +129,12 @@ public class Demo03StudentErpServiceImpl implements Demo03StudentErpService {
 
     @Override
     public void deleteDemo03Course(Long id) {
-        // 校验存在
-        validateDemo03CourseExists(id);
         // 删除
         demo03CourseErpMapper.deleteById(id);
     }
 
     @Override
     public void deleteDemo03CourseListByIds(List<Long> ids) {
-        // 校验存在
-        validateDemo03CourseExists(ids);
         // 删除
         demo03CourseErpMapper.deleteByIds(ids);
     }
@@ -150,13 +146,6 @@ public class Demo03StudentErpServiceImpl implements Demo03StudentErpService {
 
     private void validateDemo03CourseExists(Long id) {
         if (demo03CourseErpMapper.selectById(id) == null) {
-            throw exception(DEMO03_COURSE_NOT_EXISTS);
-        }
-    }
-
-    private void validateDemo03CourseExists(List<Long> ids) {
-        List<Demo03CourseDO> list = demo03CourseErpMapper.selectByIds(ids);
-        if (CollUtil.isEmpty(list) || list.size() != ids.size()) {
             throw exception(DEMO03_COURSE_NOT_EXISTS);
         }
     }
@@ -198,16 +187,12 @@ public class Demo03StudentErpServiceImpl implements Demo03StudentErpService {
 
     @Override
     public void deleteDemo03Grade(Long id) {
-        // 校验存在
-        validateDemo03GradeExists(id);
         // 删除
         demo03GradeErpMapper.deleteById(id);
     }
 
     @Override
     public void deleteDemo03GradeListByIds(List<Long> ids) {
-        // 校验存在
-        validateDemo03GradeExists(ids);
         // 删除
         demo03GradeErpMapper.deleteByIds(ids);
     }
@@ -219,13 +204,6 @@ public class Demo03StudentErpServiceImpl implements Demo03StudentErpService {
 
     private void validateDemo03GradeExists(Long id) {
         if (demo03GradeErpMapper.selectById(id) == null) {
-            throw exception(DEMO03_GRADE_NOT_EXISTS);
-        }
-    }
-
-    private void validateDemo03GradeExists(List<Long> ids) {
-        List<Demo03GradeDO> list = demo03GradeErpMapper.selectByIds(ids);
-        if (CollUtil.isEmpty(list) || list.size() != ids.size()) {
             throw exception(DEMO03_GRADE_NOT_EXISTS);
         }
     }

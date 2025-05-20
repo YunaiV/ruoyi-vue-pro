@@ -334,18 +334,13 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 
     @Override
     public void delete${subSimpleClassName}(${subPrimaryColumn.javaType} id) {
-        // 校验存在
-        validate${subSimpleClassName}Exists(id);
         // 删除
         ${subClassNameVars.get($index)}Mapper.deleteById(id);
     }
 
-## TODO @puhui999：批量删除的时候，要不直接删除，就不“校验存在”；ps：主子表删除的时候，子表的处理，也要处理下哈；
 #if ($deleteBatchEnable)
 	@Override
 	public void delete${subSimpleClassName}ListByIds(List<${subPrimaryColumn.javaType}> ids) {
-        // 校验存在
-        validate${subSimpleClassName}Exists(ids);
         // 删除
         ${subClassNameVars.get($index)}Mapper.deleteByIds(ids);
 	}
@@ -361,15 +356,6 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
             throw exception(${simpleClassNameUnderlineCase.toUpperCase()}_NOT_EXISTS);
         }
     }
-
-#if ($deleteBatchEnable)
-	private void validate${subSimpleClassName}Exists(List<${subPrimaryColumn.javaType}> ids) {
-        List<${subTable.className}DO> list = ${subClassNameVar}Mapper.selectByIds(ids);
-        if (CollUtil.isEmpty(list) || list.size() != ids.size()) {
-            throw exception(${simpleClassNameUnderlineCase.toUpperCase()}_NOT_EXISTS);
-        }
-	}
-#end
 
 ## 情况二：非 MASTER_ERP 时，支持批量的新增、修改操作
 #else

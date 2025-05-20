@@ -32,7 +32,7 @@ public interface Demo03GradeErpMapper extends BaseMapperX<Demo03GradeDO> {
     }
 
     default int deleteByStudentIds(List<Long> studentIds) {
-        return delete(Demo03GradeDO::getStudentId, studentIds);
+        return deleteBatch(Demo03GradeDO::getStudentId, studentIds);
     }
 
 }
