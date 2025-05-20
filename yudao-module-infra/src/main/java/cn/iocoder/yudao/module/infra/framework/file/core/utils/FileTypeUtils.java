@@ -21,7 +21,7 @@ import java.io.IOException;
 @Slf4j
 public class FileTypeUtils {
 
-    private static final ThreadLocal<Tika> TIKA = TransmittableThreadLocal.withInitial(Tika::new);
+    private static final Tika TIKA = new Tika();
 
     /**
      * 获得文件的 mineType，对于 doc，jar 等文件会有误差
@@ -31,7 +31,7 @@ public class FileTypeUtils {
      */
     @SneakyThrows
     public static String getMineType(byte[] data) {
-        return TIKA.get().detect(data);
+        return TIKA.detect(data);
     }
 
     /**
@@ -41,7 +41,7 @@ public class FileTypeUtils {
      * @return mineType 无法识别时会返回“application/octet-stream”
      */
     public static String getMineType(String name) {
-        return TIKA.get().detect(name);
+        return TIKA.detect(name);
     }
 
     /**
@@ -52,7 +52,7 @@ public class FileTypeUtils {
      * @return mineType 无法识别时会返回“application/octet-stream”
      */
     public static String getMineType(byte[] data, String name) {
-        return TIKA.get().detect(data, name);
+        return TIKA.detect(data, name);
     }
 
     /**

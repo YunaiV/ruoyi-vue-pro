@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.infra.framework.codegen.config;
 
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenFrontTypeEnum;
+import cn.iocoder.yudao.module.infra.enums.codegen.CodegenVOTypeEnum;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
@@ -33,6 +34,14 @@ public class CodegenProperties {
      */
     @NotNull(message = "代码生成的前端类型不能为空")
     private Integer frontType;
+
+    /**
+     * 代码生成的 VO 类型
+     *
+     * 枚举 {@link CodegenVOTypeEnum#getType()}
+     */
+    @NotNull(message = "代码生成的 VO 类型不能为空")
+    private Integer voType;
 
     /**
      * 是否生成单元测试
