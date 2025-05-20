@@ -60,6 +60,7 @@ public class Demo01ContactController {
         return success(true);
     }
 
+    // TODO @puhui999：要不要 deleteDemo01ContactList？url 也叫 delete-list
     @DeleteMapping("/delete-batch")
     @Parameter(name = "ids", description = "编号", required = true)
     @Operation(summary = "批量删除示例联系人")

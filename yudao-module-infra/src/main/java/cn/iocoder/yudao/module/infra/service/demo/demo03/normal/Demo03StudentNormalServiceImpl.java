@@ -135,6 +135,8 @@ public class Demo03StudentNormalServiceImpl implements Demo03StudentNormalServic
         List<List<Demo03CourseDO>> diffList = diffList(oldList, list, (oldVal, newVal) -> {
             boolean same = ObjectUtil.equal(oldVal.getId(), newVal.getId());
             if (same) {
+                // TODO @puhui999：BaseDO 增加一个 clean 方法，里面把 creator、updator、updateTime、updater 都清空？
+                // TODO @puhui999：然后 DO 模式新增、更新，以及主子表，都 clean 下。避免前端直接传递 creator 之类的字段，直接就被更新了。
                 newVal.setId(oldVal.getId()).setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
             }
             return same;

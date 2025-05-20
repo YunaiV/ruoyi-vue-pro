@@ -13,6 +13,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 
 @Schema(description = "管理后台 - 示例联系人分页 Request VO")
 @Data
+// TODO @puhui999：要不要去掉所有 pojo 里的 @EqualsAndHashCode、@ToString，代码生成里的。因为 lombok.config 已经处理了全局了；
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class Demo01ContactPageReqVO extends PageParam {
