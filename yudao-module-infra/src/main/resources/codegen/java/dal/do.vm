@@ -78,4 +78,19 @@ public class ${table.className}DO extends BaseDO {
 #end
 #end
 
+## 特殊：主子表专属逻辑（非 ERP 模式）
+#if ( $voType == 20 && $subTables && $subTables.size() > 0 && $table.templateType != 11 )
+    #foreach ($subTable in $subTables)
+        #set ($index = $foreach.count - 1)
+        #if ( $subTable.subJoinMany)
+    @Schema(description = "${subTable.classComment}列表")
+    private List<${subTable.className}DO> ${subClassNameVars.get($index)}s;
+
+        #else
+    @Schema(description = "${subTable.classComment}")
+    private ${subTable.className}DO ${subClassNameVars.get($index)};
+        #end
+    #end
+#end
+
 }

@@ -3,9 +3,11 @@ import type { OnActionClickFn, VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
 
 import { z } from '#/adapter/form';
-import { getRangePickerDefaultProps } from '#/utils/date';
-import { DICT_TYPE, getDictOptions } from '#/utils/dict';
-
+import {
+    DICT_TYPE,
+    getDictOptions,
+    getRangePickerDefaultProps,
+} from '#/utils';
 #if(${table.templateType} == 2)## 树表需要导入这些
 import { get${simpleClassName}List } from '#/api/${table.moduleName}/${table.businessName}';
 import { handleTree } from '@vben/utils';
@@ -191,6 +193,9 @@ export function useGridColumns(
   onActionClick?: OnActionClickFn<${simpleClassName}Api.${simpleClassName}>,
 ): VxeTableGridOptions<${simpleClassName}Api.${simpleClassName}>['columns'] {
   return [
+#if ($table.templateType != 2 && $deleteBatchEnable)
+  { type: 'checkbox', width: 40 },
+#end
 #if ($table.templateType == 12) ## 内嵌情况
       { type: 'expand', width: 80, slots: { content: 'expand_content' } },
 #end
@@ -426,6 +431,9 @@ export function use${subSimpleClassName}GridColumns(
     onActionClick?: OnActionClickFn<${simpleClassName}Api.${subSimpleClassName}>,
 ): VxeTableGridOptions<${simpleClassName}Api.${subSimpleClassName}>['columns'] {
     return [
+        #if ($table.templateType != 2 && $deleteBatchEnable)
+            { type: 'checkbox', width: 40 },
+        #end
         #foreach($column in $subColumns)
             #if ($column.listOperationResult)
                 #set ($dictType = $column.dictType)

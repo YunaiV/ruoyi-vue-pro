@@ -4,7 +4,7 @@ import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.bu
 
 import { Page, useVbenModal } from '@vben/common-ui';
 import { Button, message,Tabs } from 'ant-design-vue';
-import { Download, Plus } from '@vben/icons';
+import { Download, Plus, Trash2 } from '@vben/icons';
 import Form from './modules/form.vue';
 
 ## 特殊：主子表专属逻辑
@@ -16,15 +16,15 @@ import Form from './modules/form.vue';
     #end
 #end
 
-import { ref, h } from 'vue';
+import { ref, h, computed } from 'vue';
 import { $t } from '#/locales';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 #if (${table.templateType} == 2)## 树表接口
 import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 #else## 标准表接口
-import { get${simpleClassName}Page, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
+import { get${simpleClassName}Page, delete${simpleClassName},#if ($deleteBatchEnable) delete${simpleClassName}ByIds,#end export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 #end
-import { downloadFileFromBlobPart } from '@vben/utils';
+import { downloadFileFromBlobPart, isEmpty } from '@vben/utils';
 
 import { useGridColumns, useGridFormSchema } from './data';
 
@@ -87,10 +87,37 @@ async function onDelete(row: ${simpleClassName}Api.${simpleClassName}) {
     await delete${simpleClassName}(row.id as number);
     message.success( $t('ui.actionMessage.deleteSuccess', [row.id]) );
     onRefresh();
-  } catch {
+  } finally {
     hideLoading();
   }
 }
+
+#if ($table.templateType != 2 && $deleteBatchEnable)
+const deleteIds = ref<number[]>([]) // 待删除${table.classComment} ID
+const showDeleteBatchBtn = computed(() => isEmpty(deleteIds.value));
+function setDeleteIds({
+  records,
+}: {
+  records: ${simpleClassName}Api.${simpleClassName}[];
+}) {
+  deleteIds.value = records.map((item) => item.id);
+}
+/** 批量删除${table.classComment} */
+async function onDeleteBatch() {
+  const hideLoading = message.loading({
+    content: $t('ui.actionMessage.deleting'),
+    duration: 0,
+    key: 'action_process_msg',
+  });
+  try {
+    await delete${simpleClassName}ByIds(deleteIds.value);
+    message.success( $t('ui.actionMessage.deleteSuccess') );
+    onRefresh();
+  } finally {
+    hideLoading();
+  }
+}
+#end
 
 /** 导出表格 */
 async function onExport() {
@@ -177,11 +204,17 @@ const [Grid, gridApi] = useVbenVxeGrid({
       search: true,
     },
   } as VxeTableGridOptions<${simpleClassName}Api.${simpleClassName}>,
-#if (${table.templateType} == 11)
+#if (${table.templateType} == 11 || $deleteBatchEnable)
   gridEvents:{
+    #if(${table.templateType} == 11)
     cellClick: ({ row }: { row: ${simpleClassName}Api.${simpleClassName}}) => {
       select${simpleClassName}.value = row;
     },
+    #end
+    #if($deleteBatchEnable)
+      checkboxAll: setDeleteIds,
+      checkboxChange: setDeleteIds,
+    #end
   }
 #end
 });
@@ -229,6 +262,19 @@ const [Grid, gridApi] = useVbenVxeGrid({
         >
           {{ $t('ui.actionTitle.export') }}
         </Button>
+#if ($table.templateType != 2 && $deleteBatchEnable)
+        <Button
+            :icon="h(Trash2)"
+            type="primary"
+            danger
+            class="ml-2"
+            :disabled="showDeleteBatchBtn"
+            @click="onDeleteBatch"
+            v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:delete']"
+        >
+          批量删除
+        </Button>
+#end
       </template>
     </Grid>
 

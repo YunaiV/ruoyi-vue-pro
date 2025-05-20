@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.infra.controller.admin.demo.demo01.vo;
+package cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.erp.vo;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
@@ -9,35 +9,31 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "管理后台 - 示例联系人 Response VO")
+@Schema(description = "管理后台 - 学生 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class Demo01ContactRespVO {
+public class Demo03StudentErpRespVO {
 
-    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "21555")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "8525")
     @ExcelProperty("编号")
     private Long id;
 
-    @Schema(description = "名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
+    @Schema(description = "名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
     @ExcelProperty("名字")
     private String name;
 
-    @Schema(description = "性别", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "性别", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty(value = "性别", converter = DictConvert.class)
     @DictFormat("system_user_sex") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
     private Integer sex;
 
-    @Schema(description = "出生年", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("出生年")
+    @Schema(description = "出生日期", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("出生日期")
     private LocalDateTime birthday;
 
-    @Schema(description = "简介", requiredMode = Schema.RequiredMode.REQUIRED, example = "你说的对")
+    @Schema(description = "简介", requiredMode = Schema.RequiredMode.REQUIRED, example = "随便")
     @ExcelProperty("简介")
     private String description;
-
-    @Schema(description = "头像")
-    @ExcelProperty("头像")
-    private String avatar;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")

@@ -74,6 +74,19 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
         return success(true);
     }
 
+#if ( $table.templateType != 2 && $deleteBatchEnable)
+    @DeleteMapping("/delete-batch")
+    @Parameter(name = "ids", description = "编号", required = true)
+    @Operation(summary = "批量删除${table.classComment}")
+    #if ($sceneEnum.scene == 1)
+                @PreAuthorize("@ss.hasPermission('${permissionPrefix}:delete')")
+    #end
+    public CommonResult<Boolean> delete${simpleClassName}(@RequestParam("ids") List<${primaryColumn.javaType}> ids) {
+        ${classNameVar}Service.delete${simpleClassName}ByIds(ids);
+        return success(true);
+    }
+#end
+
     @GetMapping("/get")
     @Operation(summary = "获得${table.classComment}")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
@@ -229,6 +242,19 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
         ${classNameVar}Service.delete${subSimpleClassName}(id);
         return success(true);
     }
+
+#if ($deleteBatchEnable)
+    @DeleteMapping("/${subSimpleClassName_strikeCase}/delete-batch")
+    @Parameter(name = "ids", description = "编号", required = true)
+    @Operation(summary = "批量删除${subTable.classComment}")
+#if ($sceneEnum.scene == 1)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:delete')")
+#end
+    public CommonResult<Boolean> delete${subSimpleClassName}(@RequestParam("ids") List<${subPrimaryColumn.javaType}> ids) {
+        ${classNameVar}Service.delete${subSimpleClassName}ByIds(ids);
+        return success(true);
+    }
+#end
 
 	@GetMapping("/${subSimpleClassName_strikeCase}/get")
 	@Operation(summary = "获得${subTable.classComment}")
