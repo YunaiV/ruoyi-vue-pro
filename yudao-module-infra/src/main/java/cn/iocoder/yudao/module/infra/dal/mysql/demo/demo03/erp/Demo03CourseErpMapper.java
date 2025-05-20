@@ -19,16 +19,16 @@ public interface Demo03CourseErpMapper extends BaseMapperX<Demo03CourseDO> {
 
     default PageResult<Demo03CourseDO> selectPage(PageParam reqVO, Long studentId) {
         return selectPage(reqVO, new LambdaQueryWrapperX<Demo03CourseDO>()
-            .eq(Demo03CourseDO::getStudentId, studentId)
-            .orderByDesc(Demo03CourseDO::getId));
+                .eq(Demo03CourseDO::getStudentId, studentId)
+                .orderByDesc(Demo03CourseDO::getId));
     }
 
     default int deleteByStudentId(Long studentId) {
         return delete(Demo03CourseDO::getStudentId, studentId);
     }
 
-	default int deleteByStudentIds(List<Long> studentIds) {
-	    return delete(Demo03CourseDO::getStudentId, studentIds);
-	}
+    default int deleteByStudentIds(List<Long> studentIds) {
+        return delete(Demo03CourseDO::getStudentId, studentIds);
+    }
 
 }

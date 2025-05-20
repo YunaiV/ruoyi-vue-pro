@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.normal.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import jakarta.validation.constraints.*;
-
-import java.time.LocalDateTime;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03CourseDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03GradeDO;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "管理后台 - 学生新增/修改 Request VO")
 @Data

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.infra.dal.mysql.demo.demo03.erp;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.erp.vo.*;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.erp.vo.Demo03StudentErpPageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03StudentDO;
 import org.apache.ibatis.annotations.Mapper;
 

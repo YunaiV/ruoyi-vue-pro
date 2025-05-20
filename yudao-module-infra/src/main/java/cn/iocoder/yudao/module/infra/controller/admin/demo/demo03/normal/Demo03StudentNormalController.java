@@ -1,34 +1,33 @@
 package cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.normal;
 
-import org.springframework.web.bind.annotation.*;
-import jakarta.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Operation;
-
-import jakarta.validation.*;
-import jakarta.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
-
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-
-import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
-import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.*;
-
-import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.normal.vo.*;
-import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03StudentDO;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.normal.vo.Demo03StudentNormalPageReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.normal.vo.Demo03StudentNormalRespVO;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.normal.vo.Demo03StudentNormalSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03CourseDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03GradeDO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03StudentDO;
 import cn.iocoder.yudao.module.infra.service.demo.demo03.normal.Demo03StudentNormalService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - 学生")
 @RestController
@@ -66,7 +65,7 @@ public class Demo03StudentNormalController {
     @DeleteMapping("/delete-batch")
     @Parameter(name = "ids", description = "编号", required = true)
     @Operation(summary = "批量删除学生")
-                @PreAuthorize("@ss.hasPermission('infra:demo03-student:delete')")
+    @PreAuthorize("@ss.hasPermission('infra:demo03-student:delete')")
     public CommonResult<Boolean> deleteDemo03Student(@RequestParam("ids") List<Long> ids) {
         demo03StudentNormalService.deleteDemo03StudentByIds(ids);
         return success(true);
@@ -94,12 +93,12 @@ public class Demo03StudentNormalController {
     @PreAuthorize("@ss.hasPermission('infra:demo03-student:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportDemo03StudentExcel(@Valid Demo03StudentNormalPageReqVO pageReqVO,
-              HttpServletResponse response) throws IOException {
+                                         HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<Demo03StudentDO> list = demo03StudentNormalService.getDemo03StudentPage(pageReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "学生.xls", "数据", Demo03StudentNormalRespVO.class,
-                        BeanUtils.toBean(list, Demo03StudentNormalRespVO.class));
+                BeanUtils.toBean(list, Demo03StudentNormalRespVO.class));
     }
 
     // ==================== 子表（学生课程） ====================

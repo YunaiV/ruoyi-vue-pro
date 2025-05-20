@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.erp.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 

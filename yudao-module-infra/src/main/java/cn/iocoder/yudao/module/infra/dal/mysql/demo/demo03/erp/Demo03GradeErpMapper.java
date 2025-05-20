@@ -19,19 +19,20 @@ public interface Demo03GradeErpMapper extends BaseMapperX<Demo03GradeDO> {
 
     default PageResult<Demo03GradeDO> selectPage(PageParam reqVO, Long studentId) {
         return selectPage(reqVO, new LambdaQueryWrapperX<Demo03GradeDO>()
-            .eq(Demo03GradeDO::getStudentId, studentId)
-            .orderByDesc(Demo03GradeDO::getId));
+                .eq(Demo03GradeDO::getStudentId, studentId)
+                .orderByDesc(Demo03GradeDO::getId));
     }
-        default Demo03GradeDO selectByStudentId(Long studentId) {
+
+    default Demo03GradeDO selectByStudentId(Long studentId) {
         return selectOne(Demo03GradeDO::getStudentId, studentId);
-        }
+    }
 
     default int deleteByStudentId(Long studentId) {
         return delete(Demo03GradeDO::getStudentId, studentId);
     }
 
-	default int deleteByStudentIds(List<Long> studentIds) {
-	    return delete(Demo03GradeDO::getStudentId, studentIds);
-	}
+    default int deleteByStudentIds(List<Long> studentIds) {
+        return delete(Demo03GradeDO::getStudentId, studentIds);
+    }
 
 }

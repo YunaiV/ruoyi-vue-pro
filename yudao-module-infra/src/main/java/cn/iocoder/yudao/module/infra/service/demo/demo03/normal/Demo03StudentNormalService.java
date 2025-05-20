@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.infra.service.demo.demo03.normal;
 
-import java.util.*;
-import jakarta.validation.*;
-import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.normal.vo.*;
-import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03StudentDO;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.normal.vo.Demo03StudentNormalPageReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.normal.vo.Demo03StudentNormalSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03CourseDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03GradeDO;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03StudentDO;
+import jakarta.validation.Valid;
+
+import java.util.List;
 
 /**
  * 学生 Service 接口
@@ -38,10 +40,10 @@ public interface Demo03StudentNormalService {
     void deleteDemo03Student(Long id);
 
     /**
-    * 批量删除学生
-    *
-    * @param ids 编号
-    */
+     * 批量删除学生
+     *
+     * @param ids 编号
+     */
     void deleteDemo03StudentByIds(List<Long> ids);
 
     /**
