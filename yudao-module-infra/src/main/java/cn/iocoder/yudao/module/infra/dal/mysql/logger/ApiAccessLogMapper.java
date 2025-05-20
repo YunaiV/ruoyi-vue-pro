@@ -36,7 +36,7 @@ public interface ApiAccessLogMapper extends BaseMapperX<ApiAccessLogDO> {
      * 物理删除指定时间之前的日志
      *
      * @param createTime 最大时间
-     * @param limit 删除条数，防止一次删除太多
+     * @param limit      删除条数，防止一次删除太多
      * @return 删除条数
      */
     @Delete("DELETE FROM infra_api_access_log WHERE create_time < #{createTime} LIMIT #{limit}")

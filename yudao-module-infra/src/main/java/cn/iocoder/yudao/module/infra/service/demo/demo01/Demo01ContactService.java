@@ -42,7 +42,7 @@ public interface Demo01ContactService {
      *
      * @param ids 编号
      */
-    void deleteDemo01ContactByIds(List<Long> ids);
+    void deleteDemo0iContactListByIds(List<Long> ids);
 
     /**
      * 获得示例联系人

@@ -71,7 +71,7 @@ public class Demo03StudentErpServiceImpl implements Demo03StudentErpService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteDemo03StudentByIds(List<Long> ids) {
+    public void deleteDemo03StudentListByIds(List<Long> ids) {
         // 校验存在
         validateDemo03StudentExists(ids);
         // 删除
@@ -123,7 +123,7 @@ public class Demo03StudentErpServiceImpl implements Demo03StudentErpService {
         // 校验存在
         validateDemo03CourseExists(demo03Course.getId());
         // 更新
-        demo03Course.setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
+        demo03Course.clean();
         demo03CourseErpMapper.updateById(demo03Course);
     }
 
@@ -136,7 +136,7 @@ public class Demo03StudentErpServiceImpl implements Demo03StudentErpService {
     }
 
     @Override
-    public void deleteDemo03CourseByIds(List<Long> ids) {
+    public void deleteDemo03CourseListByIds(List<Long> ids) {
         // 校验存在
         validateDemo03CourseExists(ids);
         // 删除
@@ -192,7 +192,7 @@ public class Demo03StudentErpServiceImpl implements Demo03StudentErpService {
         // 校验存在
         validateDemo03GradeExists(demo03Grade.getId());
         // 更新
-        demo03Grade.setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
+        demo03Grade.clean();
         demo03GradeErpMapper.updateById(demo03Grade);
     }
 
@@ -205,7 +205,7 @@ public class Demo03StudentErpServiceImpl implements Demo03StudentErpService {
     }
 
     @Override
-    public void deleteDemo03GradeByIds(List<Long> ids) {
+    public void deleteDemo03GradeListByIds(List<Long> ids) {
         // 校验存在
         validateDemo03GradeExists(ids);
         // 删除

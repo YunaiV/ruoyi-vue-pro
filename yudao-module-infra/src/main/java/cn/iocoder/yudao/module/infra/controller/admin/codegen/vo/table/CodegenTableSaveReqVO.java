@@ -5,10 +5,9 @@ import cn.iocoder.yudao.module.infra.enums.codegen.CodegenSceneEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 @Schema(description = "管理后台 - 代码生成表定义创建/修改 Response VO")
 @Data

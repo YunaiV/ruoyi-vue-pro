@@ -25,10 +25,10 @@ public interface FileService {
     /**
      * 保存文件，并返回文件的访问路径
      *
-     * @param content 文件内容
-     * @param name    文件名称，允许空
+     * @param content   文件内容
+     * @param name      文件名称，允许空
      * @param directory 目录，允许空
-     * @param type    文件的 MIME 类型，允许空
+     * @param type      文件的 MIME 类型，允许空
      * @return 文件路径
      */
     String createFile(@NotEmpty(message = "文件内容不能为空") byte[] content,
@@ -37,7 +37,7 @@ public interface FileService {
     /**
      * 生成文件预签名地址信息
      *
-     * @param name 文件名
+     * @param name      文件名
      * @param directory 目录
      * @return 预签名地址信息
      */

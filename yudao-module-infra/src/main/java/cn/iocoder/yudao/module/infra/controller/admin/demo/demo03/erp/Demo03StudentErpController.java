@@ -62,12 +62,12 @@ public class Demo03StudentErpController {
         return success(true);
     }
 
-    @DeleteMapping("/delete-batch")
+    @DeleteMapping("/delete-list")
     @Parameter(name = "ids", description = "编号", required = true)
     @Operation(summary = "批量删除学生")
     @PreAuthorize("@ss.hasPermission('infra:demo03-student:delete')")
-    public CommonResult<Boolean> deleteDemo03Student(@RequestParam("ids") List<Long> ids) {
-        demo03StudentErpService.deleteDemo03StudentByIds(ids);
+    public CommonResult<Boolean> deleteDemo03StudentList(@RequestParam("ids") List<Long> ids) {
+        demo03StudentErpService.deleteDemo03StudentListByIds(ids);
         return success(true);
     }
 
@@ -136,12 +136,12 @@ public class Demo03StudentErpController {
         return success(true);
     }
 
-    @DeleteMapping("/demo03-course/delete-batch")
+    @DeleteMapping("/demo03-course/delete-list")
     @Parameter(name = "ids", description = "编号", required = true)
     @Operation(summary = "批量删除学生课程")
     @PreAuthorize("@ss.hasPermission('infra:demo03-student:delete')")
-    public CommonResult<Boolean> deleteDemo03Course(@RequestParam("ids") List<Long> ids) {
-        demo03StudentErpService.deleteDemo03CourseByIds(ids);
+    public CommonResult<Boolean> deleteDemo03CourseList(@RequestParam("ids") List<Long> ids) {
+        demo03StudentErpService.deleteDemo03CourseListByIds(ids);
         return success(true);
     }
 
@@ -188,12 +188,12 @@ public class Demo03StudentErpController {
         return success(true);
     }
 
-    @DeleteMapping("/demo03-grade/delete-batch")
+    @DeleteMapping("/demo03-grade/delete-list")
     @Parameter(name = "ids", description = "编号", required = true)
     @Operation(summary = "批量删除学生班级")
     @PreAuthorize("@ss.hasPermission('infra:demo03-student:delete')")
-    public CommonResult<Boolean> deleteDemo03Grade(@RequestParam("ids") List<Long> ids) {
-        demo03StudentErpService.deleteDemo03GradeByIds(ids);
+    public CommonResult<Boolean> deleteDemo03GradeList(@RequestParam("ids") List<Long> ids) {
+        demo03StudentErpService.deleteDemo03GradeListByIds(ids);
         return success(true);
     }
 

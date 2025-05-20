@@ -28,8 +28,6 @@ import static ${DateUtilsClassName}.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 @Schema(description = "${sceneEnum.name} - ${table.classComment}分页 Request VO")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 public class ${sceneEnum.prefixClass}${table.className}PageReqVO extends PageParam {
 
 #foreach ($column in $columns)

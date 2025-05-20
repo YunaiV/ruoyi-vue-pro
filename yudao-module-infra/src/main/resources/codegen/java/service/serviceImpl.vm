@@ -169,7 +169,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     #if ( $subTables && $subTables.size() > 0)
     @Transactional(rollbackFor = Exception.class)
     #end
-    public void delete${simpleClassName}ByIds(List<${primaryColumn.javaType}> ids) {
+    public void delete${simpleClassName}ListByIds(List<${primaryColumn.javaType}> ids) {
         // 校验存在
         validate${simpleClassName}Exists(ids);
         // 删除
@@ -328,7 +328,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         // 校验存在
         validate${subSimpleClassName}Exists(${subClassNameVar}.getId());
         // 更新
-        ${subClassNameVar}.setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
+        ${subClassNameVar}.clean(); // 解决更新情况下：updateTime 不更新
         ${subClassNameVars.get($index)}Mapper.updateById(${subClassNameVar});
     }
 
@@ -342,7 +342,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 
 #if ($deleteBatchEnable)
 	@Override
-	public void delete${subSimpleClassName}ByIds(List<${subPrimaryColumn.javaType}> ids) {
+	public void delete${subSimpleClassName}ListByIds(List<${subPrimaryColumn.javaType}> ids) {
         // 校验存在
         validate${subSimpleClassName}Exists(ids);
         // 删除
@@ -374,17 +374,17 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #else
     #if ( $subTable.subJoinMany)
     private void create${subSimpleClassName}List(${primaryColumn.javaType} ${subJoinColumn.javaField}, List<${subTable.className}DO> list) {
-        list.forEach(o -> o.set${SubJoinColumnName}(${subJoinColumn.javaField}));
+        list.forEach(o -> o.set${SubJoinColumnName}(${subJoinColumn.javaField}).clean());
         ${subClassNameVars.get($index)}Mapper.insertBatch(list);
     }
 
     private void update${subSimpleClassName}List(${primaryColumn.javaType} ${subJoinColumn.javaField}, List<${subTable.className}DO> list) {
-	    list.forEach(o -> o.set${SubJoinColumnName}(${subJoinColumn.javaField}));
+	    list.forEach(o -> o.set${SubJoinColumnName}(${subJoinColumn.javaField}).clean());
 	    List<${subTable.className}DO> oldList = ${subClassNameVar}Mapper.selectListBy${SubJoinColumnName}(${subJoinColumn.javaField});
 	    List<List<${subTable.className}DO>> diffList = diffList(oldList, list, (oldVal, newVal) -> {
             boolean same = ObjectUtil.equal(oldVal.getId(), newVal.getId());
             if (same) {
-                newVal.setId(oldVal.getId()).setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
+                newVal.setId(oldVal.getId()).clean(); // 解决更新情况下：updateTime 不更新
             }
             return same;
 	    });
@@ -414,8 +414,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         if (${subClassNameVar} == null) {
 			return;
         }
-        ${subClassNameVar}.set$SubJoinColumnName(${subJoinColumn.javaField});
-        ${subClassNameVar}.setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
+        ${subClassNameVar}.set$SubJoinColumnName(${subJoinColumn.javaField}).clean();// 解决更新情况下：updateTime 不更新
         ${subClassNameVars.get($index)}Mapper.insertOrUpdate(${subClassNameVar});
     }
 
