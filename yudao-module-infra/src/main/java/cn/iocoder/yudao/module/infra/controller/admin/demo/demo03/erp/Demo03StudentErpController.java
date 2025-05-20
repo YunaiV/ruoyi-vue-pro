@@ -67,6 +67,7 @@ public class Demo03StudentErpController {
     @Operation(summary = "批量删除学生")
     @PreAuthorize("@ss.hasPermission('infra:demo03-student:delete')")
     public CommonResult<Boolean> deleteDemo03StudentList(@RequestParam("ids") List<Long> ids) {
+        // TODO @puhui999：deleteDemo03StudentList
         demo03StudentErpService.deleteDemo03StudentListByIds(ids);
         return success(true);
     }

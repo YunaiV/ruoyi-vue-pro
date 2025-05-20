@@ -65,6 +65,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #end
         // 插入
 #if ($voType == 10)
+## TODO @puhui999：insert 也要加下 clean。万一前端乱传递，哈哈哈。这个就是 do 模式的缺点；（只在 do 模式下）；看看主子表，是不是也可能存在，insert 的时候；
         ${table.className}DO ${classNameVar} = BeanUtils.toBean(createReqVO, ${table.className}DO.class);
 #end
         ${classNameVar}Mapper.insert(${classNameVar});

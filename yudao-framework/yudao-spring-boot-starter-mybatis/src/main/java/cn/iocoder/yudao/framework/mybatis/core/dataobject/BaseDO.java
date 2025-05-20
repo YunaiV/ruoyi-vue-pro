@@ -54,7 +54,7 @@ public abstract class BaseDO implements Serializable, TransPojo {
     private Boolean deleted;
 
     /**
-     * 把 creator、createTime、updateTime、updater 都清空，避免前端直接传递 creator 之类的字段，直接就被更新了。
+     * 把 creator、createTime、updateTime、updater 都清空，避免前端直接传递 creator 之类的字段，直接就被更新了
      */
     public void clean(){
         this.creator = null;
