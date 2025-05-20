@@ -78,6 +78,7 @@ public class ${table.className}DO extends BaseDO {
 #end
 #end
 ## 特殊：主子表专属逻辑（非 ERP 模式）
+## TODO @puhui999：这里空行看看，会不会多了一个哈
 #if ( $voType == 20 && $subTables && $subTables.size() > 0 && $table.templateType != 11 )
     #foreach ($subTable in $subTables)
         #set ($index = $foreach.count - 1)

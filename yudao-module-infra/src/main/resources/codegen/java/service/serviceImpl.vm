@@ -340,6 +340,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         ${subClassNameVars.get($index)}Mapper.deleteById(id);
     }
 
+## TODO @puhui999：批量删除的时候，要不直接删除，就不“校验存在”；ps：主子表删除的时候，子表的处理，也要处理下哈；
 #if ($deleteBatchEnable)
 	@Override
 	public void delete${subSimpleClassName}ListByIds(List<${subPrimaryColumn.javaType}> ids) {
