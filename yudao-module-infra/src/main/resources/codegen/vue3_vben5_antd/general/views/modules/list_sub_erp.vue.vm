@@ -10,7 +10,7 @@
   import type { VxeTableInstance } from '#/adapter/vxe-table';
 
   import { DictTag } from '#/components/dict-tag';
-  import { DICT_TYPE, getDictOptions } from '#/utils';
+  import { DICT_TYPE, getDictOptions, getRangePickerDefaultProps } from '#/utils';
   import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
   import { reactive,ref, h, nextTick,watch,onMounted } from 'vue';
   import { cloneDeep, formatDateTime } from '@vben/utils';
@@ -22,15 +22,15 @@
     import { Tinymce as RichTextarea } from '#/components/tinymce';
     import { ImageUpload, FileUpload } from "#/components/upload";
     import { message,Button, Tabs,Pagination, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox,RangePicker, DatePicker, TreeSelect } from 'ant-design-vue';
-    import { DICT_TYPE, getDictOptions, getRangePickerDefaultProps } from '#/utils';
-    import { Plus } from '@vben/icons';
+    import { Plus, Trash2 } from '@vben/icons';
     import { $t } from '#/locales';
     import { TableToolbar } from '#/components/table-toolbar';
     import { useTableToolbar } from '#/hooks';
 #end
 
 #if ($table.templateType == 11) ## erp
-  import { delete${subSimpleClassName}, get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+    import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}ListByIds,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${table.businessName}';
+    import { isEmpty } from '@vben/utils';
   #else
   #if ($subTable.subJoinMany) ## 一对多
   import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
@@ -76,11 +76,38 @@ async function onDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
       content: $t('ui.actionMessage.deleteSuccess', [row.id]),
       key: 'action_process_msg',
     });
-    getList();
-  } catch {
+    await getList();
+  } finally {
     hideLoading();
   }
 }
+
+#if ($deleteBatchEnable)
+/** 批量删除${subTable.classComment} */
+async function onDeleteBatch() {
+  const hideLoading = message.loading({
+    content: $t('ui.actionMessage.deleting'),
+    duration: 0,
+    key: 'action_process_msg',
+  });
+  try {
+    await delete${subSimpleClassName}ListByIds(deleteIds.value);
+    message.success( $t('ui.actionMessage.deleteSuccess') );
+    await getList();
+  } finally {
+    hideLoading();
+  }
+}
+
+const deleteIds = ref<number[]>([]) // 待删除${subTable.classComment} ID
+function setDeleteIds({
+  records,
+}: {
+  records: ${simpleClassName}Api.${subSimpleClassName}[];
+}) {
+  deleteIds.value = records.map((item) => item.id);
+}
+#end
 #end
 
   const loading = ref(true) // 列表的加载中
@@ -277,6 +304,19 @@ onMounted(() => {
               >
                 {{ $t('ui.actionTitle.create', ['${table.classComment}']) }}
               </Button>
+                #if ($deleteBatchEnable)
+                  <Button
+                      :icon="h(Trash2)"
+                      type="primary"
+                      danger
+                      class="ml-2"
+                      :disabled="isEmpty(deleteIds)"
+                      @click="onDeleteBatch"
+                      v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:delete']"
+                  >
+                    批量删除
+                  </Button>
+                #end
             </TableToolbar>
           </template>
           <vxe-table
@@ -284,7 +324,14 @@ onMounted(() => {
               :data="list"
               show-overflow
               :loading="loading"
+              #if ($deleteBatchEnable)
+              @checkboxAll="setDeleteIds"
+              @checkboxChange="setDeleteIds"
+              #end
           >
+              #if ($deleteBatchEnable)
+                <vxe-column type="checkbox" width="40"></vxe-column>
+              #end
               #foreach($column in $subColumns)
                   #if ($column.listOperationResult)
                       #set ($dictType=$column.dictType)
