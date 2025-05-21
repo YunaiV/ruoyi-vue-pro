@@ -218,43 +218,10 @@ export function useGridColumns(): VxeTableGridOptions<${simpleClassName}Api.${si
 #end
 #end
     {
-      field: 'operation',
       title: '操作',
-      minWidth: 200,
-      align: 'center',
+      width: 200,
       fixed: 'right',
-      headerAlign: 'center',
-      showOverflow: false,
-      cellRender: {
-        attrs: {
-          nameField: '${columns[0].javaField}',
-          nameTitle: '${table.classComment}',
-          onClick: onActionClick,
-        },
-        name: 'CellOperation',
-        options: [
-#if (${table.templateType} == 2)## 树表特有操作
-          {
-            code: 'append',
-            text: '新增下级',
-            show: hasAccessByCodes(['${table.moduleName}:${simpleClassName_strikeCase}:create']),
-          },
-#end
-          {
-            code: 'edit',
-            show: hasAccessByCodes(['${table.moduleName}:${simpleClassName_strikeCase}:update']),
-          },
-          {
-            code: 'delete',
-            show: hasAccessByCodes(['${table.moduleName}:${simpleClassName_strikeCase}:delete']),
-#if (${table.templateType} == 2)## 树表禁止删除带有子节点的数据
-            disabled: (row: ${simpleClassName}Api.${simpleClassName}) => {
-                return !!(row.children && row.children.length > 0);
-            },
-#end
-          },
-        ],
-      },
+      slots: { default: 'actions' },
     },
   ];
 }
@@ -422,9 +389,7 @@ export function use${subSimpleClassName}GridFormSchema(): VbenFormSchema[] {
 }
 
 /** 列表的字段 */
-export function use${subSimpleClassName}GridColumns(
-    onActionClick?: OnActionClickFn<${simpleClassName}Api.${subSimpleClassName}>,
-): VxeTableGridOptions<${simpleClassName}Api.${subSimpleClassName}>['columns'] {
+export function use${subSimpleClassName}GridColumns(): VxeTableGridOptions<${simpleClassName}Api.${subSimpleClassName}>['columns'] {
     return [
         #if ($table.templateType != 2 && $deleteBatchEnable)
             { type: 'checkbox', width: 40 },
@@ -450,31 +415,10 @@ export function use${subSimpleClassName}GridColumns(
             #end
         #end
         {
-            field: 'operation',
             title: '操作',
-            minWidth: 200,
-            align: 'center',
+            width: 200,
             fixed: 'right',
-            headerAlign: 'center',
-            showOverflow: false,
-            cellRender: {
-                attrs: {
-                    nameField: '${columns[0].javaField}',
-                    nameTitle: '${subTable.classComment}',
-                    onClick: onActionClick,
-                },
-                name: 'CellOperation',
-                options: [
-                    {
-                        code: 'edit',
-                        show: hasAccessByCodes(['${table.moduleName}:${simpleClassName_strikeCase}:update']),
-                    },
-                    {
-                        code: 'delete',
-                        show: hasAccessByCodes(['${table.moduleName}:${simpleClassName_strikeCase}:delete']),
-                    },
-                ],
-            },
+            slots: { default: 'actions' },
         },
     ];
 }
@@ -520,27 +464,10 @@ export function use${subSimpleClassName}GridColumns(
                 #end
             #end
             {
-                field: 'operation',
                 title: '操作',
-                minWidth: 60,
-                align: 'center',
+                width: 200,
                 fixed: 'right',
-                headerAlign: 'center',
-                showOverflow: false,
-                cellRender: {
-                    attrs: {
-                        nameField: '${columns[0].javaField}',
-                        nameTitle: '${table.classComment}',
-                        onClick: onActionClick,
-                    },
-                    name: 'CellOperation',
-                    options: [
-                        {
-                            code: 'delete',
-                            show: hasAccessByCodes(['${table.moduleName}:${simpleClassName_strikeCase}:delete']),
-                        },
-                    ],
-                },
+                slots: { default: 'actions' },
             },
         ];
     }
@@ -675,7 +602,6 @@ export function use${subSimpleClassName}GridColumns(
             #end
         ];
     }
-
     #end
 #end
 #end

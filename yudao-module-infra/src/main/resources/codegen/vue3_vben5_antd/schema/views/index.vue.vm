@@ -11,7 +11,7 @@ import Form from './modules/form.vue';
     #foreach ($subSimpleClassName in $subSimpleClassNames)
     #set ($index = $foreach.count - 1)
     #set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($index))
-    import ${subSimpleClassName}List from './modules/${subSimpleClassName_strikeCase}-list.vue'
+import ${subSimpleClassName}List from './modules/${subSimpleClassName_strikeCase}-list.vue'
     #end
 #end
 
@@ -227,38 +227,39 @@ const [Grid, gridApi] = useVbenVxeGrid({
       <template #toolbar-tools>
         <TableAction
           :actions="[
-              #if (${table.templateType} == 2)## 树表特有：展开/收缩按钮
-              {
-                label: isExpanded ? '收缩' : '展开',
-                type: 'primary',
-                onClick: toggleExpand,
-              },
-              #end
-              {
-                label: $t('ui.actionTitle.create', ['${table.classComment}']),
-                type: 'primary',
-                icon: ACTION_ICON.ADD,
-                auth: ['${table.moduleName}:${simpleClassName_strikeCase}:create'],
-                onClick: handleCreate,
-              },
-              {
-                label: $t('ui.actionTitle.export'),
-                type: 'primary',
-                icon: ACTION_ICON.DOWNLOAD,
-                auth: ['${table.moduleName}:${simpleClassName_strikeCase}:export'],
-                onClick: handleExport,
-              },
-              #if ($table.templateType != 2 && $deleteBatchEnable)
-              {
-                label: $t('ui.actionTitle.deleteBatch'),
-                type: 'primary',
-                icon: ACTION_ICON.DELETE,
-                disabled: isEmpty(deleteIds),
-                auth: ['${table.moduleName}:${simpleClassName_strikeCase}:delete'],
-                onClick: handleDeleteBatch,
-              },
-              #end
-            ]"
+            #if (${table.templateType} == 2)## 树表特有：展开/收缩按钮
+            {
+              label: isExpanded ? '收缩' : '展开',
+              type: 'primary',
+              onClick: toggleExpand,
+            },
+            #end
+            {
+              label: $t('ui.actionTitle.create', ['${table.classComment}']),
+              type: 'primary',
+              icon: ACTION_ICON.ADD,
+              auth: ['${table.moduleName}:${simpleClassName_strikeCase}:create'],
+              onClick: handleCreate,
+            },
+            {
+              label: $t('ui.actionTitle.export'),
+              type: 'primary',
+              icon: ACTION_ICON.DOWNLOAD,
+              auth: ['${table.moduleName}:${simpleClassName_strikeCase}:export'],
+              onClick: handleExport,
+            },
+            #if ($table.templateType != 2 && $deleteBatchEnable)
+            {
+              label: $t('ui.actionTitle.deleteBatch'),
+              type: 'primary',
+              danger: true,
+              icon: ACTION_ICON.DELETE,
+              disabled: isEmpty(deleteIds),
+              auth: ['${table.moduleName}:${simpleClassName_strikeCase}:delete'],
+              onClick: handleDeleteBatch,
+            },
+            #end
+          ]"
         />
       </template>
       <template #actions="{ row }">
