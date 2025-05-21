@@ -119,12 +119,6 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-test</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>4.12.0</version>
-            <scope>test</scope>
-        </dependency>
 
         <!-- spring boot 配置所需依赖 -->
         <dependency>
