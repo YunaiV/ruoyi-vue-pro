@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.framework.security.core.service;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.biz.system.permission.PermissionCommonApi;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
-import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
 import lombok.AllArgsConstructor;
 
 import java.util.Arrays;
@@ -19,7 +19,7 @@ import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUti
 @AllArgsConstructor
 public class SecurityFrameworkServiceImpl implements SecurityFrameworkService {
 
-    private final PermissionApi permissionApi;
+    private final PermissionCommonApi permissionApi;
 
     @Override
     public boolean hasPermission(String permission) {
