@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>yudao-module-iot</artifactId>
         <groupId>cn.iocoder.boot</groupId>
@@ -15,7 +14,7 @@
     <name>${project.artifactId}</name>
     <description>
         物联网 模块，主要实现 产品管理、设备管理、协议管理等功能。
-        <!-- TODO 芋艿：后续补充下 -->
+                <!-- TODO 芋艿：后续补充下 -->
     </description>
 
     <dependencies>
@@ -27,6 +26,12 @@
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-iot-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <!-- IoT 协议模块 -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-iot-protocol</artifactId>
             <version>${revision}</version>
         </dependency>
 
@@ -91,25 +96,22 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- TODO @芋艿：bom 管理 -->
+        <!-- JavaScript 引擎 - 使用 GraalJS 替代 Nashorn -->
+        <!-- TODO @haohao：得考虑下，jdk8 可能不支持 graalvm，后续哈；【优先级：低】 -->
         <dependency>
-            <groupId>org.apache.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>4.0.25</version>
-            <type>pom</type>
+            <groupId>org.graalvm.sdk</groupId>
+            <artifactId>graal-sdk</artifactId>
+            <version>22.3.0</version>
         </dependency>
-
-        <!-- TODO @芋艿：bom 管理 -->
         <dependency>
             <groupId>org.graalvm.js</groupId>
             <artifactId>js</artifactId>
-            <version>24.1.2</version>
-            <type>pom</type>
+            <version>22.3.0</version>
         </dependency>
         <dependency>
             <groupId>org.graalvm.js</groupId>
             <artifactId>js-scriptengine</artifactId>
-            <version>24.1.2</version>
+            <version>22.3.0</version>
         </dependency>
 
         <!-- TODO @芋艿：合理注释 -->
@@ -140,11 +142,11 @@
         <!--        </dependency>-->
 
         <!-- 脚本相关 -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-iot-script</artifactId>
-            <version>${revision}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>cn.iocoder.boot</groupId>-->
+<!--            <artifactId>yudao-module-iot-script</artifactId>-->
+<!--            <version>${revision}</version>-->
+<!--        </dependency>-->
 
 
     </dependencies>
