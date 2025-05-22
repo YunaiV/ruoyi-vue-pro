@@ -6,6 +6,7 @@ import cn.hutool.system.SystemUtil;
 import cn.iocoder.yudao.framework.common.enums.DocumentEnum;
 import cn.iocoder.yudao.framework.mq.redis.core.RedisMQTemplate;
 import cn.iocoder.yudao.framework.mq.redis.core.job.RedisPendingMessageResendJob;
+import cn.iocoder.yudao.framework.mq.redis.core.job.RedisStreamMessageCleanupJob;
 import cn.iocoder.yudao.framework.mq.redis.core.pubsub.AbstractRedisChannelMessageListener;
 import cn.iocoder.yudao.framework.mq.redis.core.stream.AbstractRedisStreamMessageListener;
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
@@ -71,6 +72,17 @@ public class YudaoRedisMQConsumerAutoConfiguration {
                                                                      @Value("${spring.application.name}") String groupName,
                                                                      RedissonClient redissonClient) {
         return new RedisPendingMessageResendJob(listeners, redisTemplate, groupName, redissonClient);
+    }
+
+    /**
+     * 创建 Redis Stream 消息清理任务
+     */
+    @Bean
+    @ConditionalOnBean(AbstractRedisStreamMessageListener.class)
+    public RedisStreamMessageCleanupJob redisStreamMessageCleanupJob(List<AbstractRedisStreamMessageListener<?>> listeners,
+                                                                     RedisMQTemplate redisTemplate,
+                                                                     RedissonClient redissonClient) {
+        return new RedisStreamMessageCleanupJob(listeners, redisTemplate, redissonClient);
     }
 
     /**

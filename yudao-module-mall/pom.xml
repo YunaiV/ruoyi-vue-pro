@@ -18,14 +18,18 @@
         商城大模块，由 product 商品、promotion 营销、trade 交易、statistics 统计等组成
     </description>
     <modules>
-        <module>yudao-module-promotion-api</module>
-        <module>yudao-module-promotion-biz</module>
-        <module>yudao-module-product-api</module>
-        <module>yudao-module-product-biz</module>
+        <module>yudao-module-product</module>
+        <module>yudao-module-promotion</module>
+        <module>yudao-module-trade</module>
+        <module>yudao-module-statistics</module>
+        <!--
+            特殊：为什么会有 yudao-module-trade-api 呢？
+                yudao-module-promotion 和 yudao-module-trade 之间相互循环依赖，所以抽出 yudao-module-trade-api 模块，这样：
+                1. yudao-module-promotion 依赖 yudao-module-trade-api
+                2. yudao-module-trade 依赖 yudao-module-promotion
+            从而不存在相互（循环）依赖，即 yudao-module-trade => yudao-module-promotion => yudao-module-trade-api
+         -->
         <module>yudao-module-trade-api</module>
-        <module>yudao-module-trade-biz</module>
-        <module>yudao-module-statistics-api</module>
-        <module>yudao-module-statistics-biz</module>
     </modules>
 
 </project>

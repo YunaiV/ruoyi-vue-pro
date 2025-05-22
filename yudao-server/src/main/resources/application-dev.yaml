@@ -4,6 +4,10 @@ server:
 --- #################### 数据库相关配置 ####################
 
 spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.ai.autoconfigure.vectorstore.qdrant.QdrantVectorStoreAutoConfiguration # 禁用 AI 模块的 Qdrant，手动创建
+      - org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusVectorStoreAutoConfiguration # 禁用 AI 模块的 Milvus，手动创建
   # 数据源配置项
   datasource:
     druid: # Druid 【监控】相关的全局配置
@@ -182,7 +186,7 @@ justauth:
       agent-id: 1000004
       ignore-check-redirect-uri: true
     # noinspection SpringBootApplicationYaml
-    WECHAT_MINI_APP: # 微信小程序
+    WECHAT_MINI_PROGRAM: # 微信小程序
       client-id: ${wx.miniapp.appid}
       client-secret: ${wx.miniapp.secret}
       ignore-check-redirect-uri: true

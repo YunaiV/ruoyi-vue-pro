@@ -16,7 +16,7 @@
         <module>yudao-module-system</module>
         <module>yudao-module-infra</module>
 <!--        <module>yudao-module-member</module>-->
-        <module>yudao-module-bpm</module>
+<!--        <module>yudao-module-bpm</module>-->
 <!--        <module>yudao-module-report</module>-->
 <!--        <module>yudao-module-mp</module>-->
 <!--        <module>yudao-module-pay</module>-->
@@ -24,7 +24,7 @@
 <!--        <module>yudao-module-crm</module>-->
 <!--        <module>yudao-module-erp</module>-->
 <!--        <module>yudao-module-ai</module>-->
-        <module>yudao-module-iot</module>
+<!--        <module>yudao-module-iot</module>-->
     </modules>
 
     <name>${project.artifactId}</name>
@@ -32,17 +32,17 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>2.4.0-SNAPSHOT</revision>
+        <revision>2.5.0-SNAPSHOT</revision>
         <!-- Maven 相关 -->
         <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven-surefire-plugin.version>3.2.2</maven-surefire-plugin.version>
-        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
         <!-- 看看咋放到 bom 里 -->
         <lombok.version>1.18.36</lombok.version>
-        <spring.boot.version>3.4.1</spring.boot.version>
+        <spring.boot.version>3.4.5</spring.boot.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

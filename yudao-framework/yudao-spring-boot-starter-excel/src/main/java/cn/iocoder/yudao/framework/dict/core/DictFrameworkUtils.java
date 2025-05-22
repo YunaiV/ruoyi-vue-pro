@@ -1,10 +1,9 @@
 package cn.iocoder.yudao.framework.dict.core;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.biz.system.dict.DictDataCommonApi;
 import cn.iocoder.yudao.framework.common.util.cache.CacheUtils;
-import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
-import cn.iocoder.yudao.module.system.api.dict.dto.DictDataRespDTO;
+import cn.iocoder.yudao.framework.common.biz.system.dict.dto.DictDataRespDTO;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import lombok.SneakyThrows;
@@ -12,6 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 /**
  * 字典工具类
@@ -21,76 +23,57 @@ import java.util.List;
 @Slf4j
 public class DictFrameworkUtils {
 
-    private static DictDataApi dictDataApi;
+    private static DictDataCommonApi dictDataApi;
 
-    private static final DictDataRespDTO DICT_DATA_NULL = new DictDataRespDTO();
-
-    // TODO @puhui999：GET_DICT_DATA_CACHE、GET_DICT_DATA_LIST_CACHE、PARSE_DICT_DATA_CACHE 这 3 个缓存是有点重叠，可以思考下，有没可能减少 1 个。微信讨论好私聊，再具体改哈
     /**
-     * 针对 {@link #getDictDataLabel(String, String)} 的缓存
+     * 针对 dictType 的字段数据缓存
      */
-    private static final LoadingCache<KeyValue<String, String>, DictDataRespDTO> GET_DICT_DATA_CACHE = CacheUtils.buildAsyncReloadingCache(
+    private static final LoadingCache<String, List<DictDataRespDTO>> GET_DICT_DATA_CACHE = CacheUtils.buildAsyncReloadingCache(
             Duration.ofMinutes(1L), // 过期时间 1 分钟
-            new CacheLoader<KeyValue<String, String>, DictDataRespDTO>() {
+            new CacheLoader<String, List<DictDataRespDTO>>() {
 
                 @Override
-                public DictDataRespDTO load(KeyValue<String, String> key) {
-                    return ObjectUtil.defaultIfNull(dictDataApi.getDictData(key.getKey(), key.getValue()), DICT_DATA_NULL);
+                public List<DictDataRespDTO> load(String dictType) {
+                    return dictDataApi.getDictDataList(dictType);
                 }
 
             });
 
-    /**
-     * 针对 {@link #getDictDataLabelList(String)} 的缓存
-     */
-    private static final LoadingCache<String, List<String>> GET_DICT_DATA_LIST_CACHE = CacheUtils.buildAsyncReloadingCache(
-            Duration.ofMinutes(1L), // 过期时间 1 分钟
-            new CacheLoader<String, List<String>>() {
-
-                @Override
-                public List<String> load(String dictType) {
-                    return dictDataApi.getDictDataLabelList(dictType);
-                }
-
-            });
-
-    /**
-     * 针对 {@link #parseDictDataValue(String, String)} 的缓存
-     */
-    private static final LoadingCache<KeyValue<String, String>, DictDataRespDTO> PARSE_DICT_DATA_CACHE = CacheUtils.buildAsyncReloadingCache(
-            Duration.ofMinutes(1L), // 过期时间 1 分钟
-            new CacheLoader<KeyValue<String, String>, DictDataRespDTO>() {
-
-                @Override
-                public DictDataRespDTO load(KeyValue<String, String> key) {
-                    return ObjectUtil.defaultIfNull(dictDataApi.parseDictData(key.getKey(), key.getValue()), DICT_DATA_NULL);
-                }
-
-            });
-
-    public static void init(DictDataApi dictDataApi) {
+    public static void init(DictDataCommonApi dictDataApi) {
         DictFrameworkUtils.dictDataApi = dictDataApi;
         log.info("[init][初始化 DictFrameworkUtils 成功]");
     }
 
-    @SneakyThrows
-    public static String getDictDataLabel(String dictType, Integer value) {
-        return GET_DICT_DATA_CACHE.get(new KeyValue<>(dictType, String.valueOf(value))).getLabel();
+    public static void clearCache() {
+        GET_DICT_DATA_CACHE.invalidateAll();
     }
 
     @SneakyThrows
-    public static String getDictDataLabel(String dictType, String value) {
-        return GET_DICT_DATA_CACHE.get(new KeyValue<>(dictType, value)).getLabel();
+    public static String parseDictDataLabel(String dictType, Integer value) {
+        if (value == null) {
+            return null;
+        }
+        return parseDictDataLabel(dictType, String.valueOf(value));
+    }
+
+    @SneakyThrows
+    public static String parseDictDataLabel(String dictType, String value) {
+        List<DictDataRespDTO> dictDatas = GET_DICT_DATA_CACHE.get(dictType);
+        DictDataRespDTO dictData = CollUtil.findOne(dictDatas, data -> Objects.equals(data.getValue(), value));
+        return dictData != null ? dictData.getLabel(): null;
     }
 
     @SneakyThrows
     public static List<String> getDictDataLabelList(String dictType) {
-        return GET_DICT_DATA_LIST_CACHE.get(dictType);
+        List<DictDataRespDTO> dictDatas = GET_DICT_DATA_CACHE.get(dictType);
+        return convertList(dictDatas, DictDataRespDTO::getLabel);
     }
 
     @SneakyThrows
     public static String parseDictDataValue(String dictType, String label) {
-        return PARSE_DICT_DATA_CACHE.get(new KeyValue<>(dictType, label)).getValue();
+        List<DictDataRespDTO> dictDatas = GET_DICT_DATA_CACHE.get(dictType);
+        DictDataRespDTO dictData = CollUtil.findOne(dictDatas, data -> Objects.equals(data.getLabel(), label));
+        return dictData!= null ? dictData.getValue(): null;
     }
 
 }

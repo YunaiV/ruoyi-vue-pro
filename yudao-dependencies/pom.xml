@@ -14,17 +14,17 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>2.4.0-SNAPSHOT</revision>
+        <revision>2.5.0-SNAPSHOT</revision>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>3.4.1</spring.boot.version>
+        <spring.boot.version>3.4.5</spring.boot.version>
         <!-- Web 相关 -->
-        <springdoc.version>2.7.0</springdoc.version>
+        <springdoc.version>2.8.3</springdoc.version>
         <knife4j.version>4.6.0</knife4j.version>
         <!-- DB 相关 -->
         <druid.version>1.2.24</druid.version>
-        <mybatis.version>3.5.17</mybatis.version>
-        <mybatis-plus.version>3.5.9</mybatis-plus.version>
+        <mybatis.version>3.5.19</mybatis.version>
+        <mybatis-plus.version>3.5.10.1</mybatis-plus.version>
         <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
         <mybatis-plus-join.version>1.4.13</mybatis-plus-join.version>
         <easy-trans.version>3.0.6</easy-trans.version>
@@ -39,7 +39,7 @@
         <lock4j.version>2.2.7</lock4j.version>
         <!-- 监控相关 -->
         <skywalking.version>9.0.0</skywalking.version>
-        <spring-boot-admin.version>3.4.1</spring-boot-admin.version>
+        <spring-boot-admin.version>3.4.5</spring-boot-admin.version>
         <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
         <podam.version>8.0.2.RELEASE</podam.version>
@@ -48,20 +48,20 @@
         <!-- Bpm 工作流相关 -->
         <flowable.version>7.0.1</flowable.version>
         <!-- 工具类相关 -->
-        <captcha-plus.version>2.0.3</captcha-plus.version>
+        <anji-plus-captcha.version>1.4.0</anji-plus-captcha.version>
         <jsoup.version>1.18.3</jsoup.version>
         <lombok.version>1.18.36</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <hutool-5.version>5.8.35</hutool-5.version>
         <hutool-6.version>6.0.0-M19</hutool-6.version>
-        <easyexcel.verion>4.0.3</easyexcel.verion>
+        <easyexcel.version>4.0.3</easyexcel.version>
         <velocity.version>2.4.1</velocity.version>
         <fastjson.version>1.2.83</fastjson.version>
-        <guava.version>33.4.0-jre</guava.version>
+        <guava.version>33.4.8-jre</guava.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <commons-net.version>3.11.1</commons-net.version>
         <jsch.version>0.1.55</jsch.version>
-        <tika-core.version>2.9.2</tika-core.version>
+        <tika-core.version>3.1.0</tika-core.version>
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
         <netty.version>4.1.116.Final</netty.version>
@@ -71,10 +71,11 @@
         <!-- 三方云服务相关 -->
         <commons-io.version>2.17.0</commons-io.version>
         <commons-compress.version>1.27.1</commons-compress.version>
-        <aws-java-sdk-s3.version>1.12.777</aws-java-sdk-s3.version>
-        <justauth.version>2.0.5</justauth.version>
-        <jimureport.version>1.8.1</jimureport.version>
-        <weixin-java.version>4.6.0</weixin-java.version>
+        <awssdk.version>2.30.14</awssdk.version>
+        <justauth.version>1.16.7</justauth.version>
+        <justauth-starter.version>1.4.0</justauth-starter.version>
+        <jimureport.version>1.9.4</jimureport.version>
+        <weixin-java.version>4.7.5.B</weixin-java.version>
     </properties>
 
     <dependencyManagement>
@@ -174,6 +175,7 @@
                 <version>${druid.version}</version>
             </dependency>
             <dependency>
+                <!-- 注意：必须声明，避免 flowable 和 mybatis-plus 引入的 mybatis 版本不一致！！！ -->
                 <groupId>org.mybatis</groupId>
                 <artifactId>mybatis</artifactId>
                 <version>${mybatis.version}</version>
@@ -479,7 +481,7 @@
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>easyexcel</artifactId>
-                <version>${easyexcel.verion}</version>
+                <version>${easyexcel.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
@@ -534,9 +536,9 @@
             </dependency>
 
             <dependency>
-                <groupId>com.xingyuv</groupId>
-                <artifactId>spring-boot-starter-captcha-plus</artifactId>
-                <version>${captcha-plus.version}</version>
+                <groupId>com.anji-plus</groupId>
+                <artifactId>captcha-spring-boot-starter</artifactId> <!-- 验证码，一般用于登录使用 -->
+                <version>${anji-plus-captcha.version}</version>
             </dependency>
 
             <dependency>
@@ -553,16 +555,22 @@
 
             <!-- 三方云服务相关 -->
             <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-s3</artifactId>
-                <version>${aws-java-sdk-s3.version}</version>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>s3</artifactId>
+                <version>${awssdk.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.xingyuv</groupId>
-                <artifactId>spring-boot-starter-justauth</artifactId> <!-- 社交登陆（例如说，个人微信、企业微信等等） -->
+                <groupId>me.zhyd.oauth</groupId>
+                <artifactId>JustAuth</artifactId> <!-- 社交登陆（例如说，个人微信、企业微信等等） -->
                 <version>${justauth.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.xkcoding.justauth</groupId>
+                <artifactId>justauth-spring-boot-starter</artifactId>
+                <version>${justauth-starter.version}</version>
                 <exclusions>
+                    <!-- 移除，避免和项目里的 hutool-all 冲突 -->
                     <exclusion>
                         <groupId>cn.hutool</groupId>
                         <artifactId>hutool-core</artifactId>
@@ -591,10 +599,15 @@
                 <groupId>org.jeecgframework.jimureport</groupId>
                 <artifactId>jimureport-spring-boot3-starter-fastjson2</artifactId>
                 <version>${jimureport.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jeecgframework.jimureport</groupId>
+                <artifactId>jimubi-spring-boot3-starter</artifactId>
+                <version>${jimureport.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>com.alibaba</groupId>
-                        <artifactId>druid</artifactId>
+                        <groupId>com.github.jsqlparser</groupId>
+                        <artifactId>jsqlparser</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

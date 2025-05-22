@@ -1,0 +1,2 @@
+## 主表的 normal 和 inner 使用相同的 form 表单
+#parse("codegen/vue3_vben5_antd/general/views/modules/form_sub_normal.vue.vm")

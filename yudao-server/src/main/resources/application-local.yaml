@@ -3,13 +3,16 @@ server:
 
 --- #################### 数据库相关配置 ####################
 spring:
-  # 数据源配置项
   autoconfigure:
+    # noinspection SpringBootApplicationYaml
     exclude:
       - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration # 默认 local 环境，不开启 Quartz 的自动配置
       - de.codecentric.boot.admin.server.config.AdminServerAutoConfiguration # 禁用 Spring Boot Admin 的 Server 的自动配置
       - de.codecentric.boot.admin.server.ui.config.AdminServerUiAutoConfiguration # 禁用 Spring Boot Admin 的 Server UI 的自动配置
       - de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration # 禁用 Spring Boot Admin 的 Client 的自动配置
+      - org.springframework.ai.autoconfigure.vectorstore.qdrant.QdrantVectorStoreAutoConfiguration # 禁用 AI 模块的 Qdrant，手动创建
+      - org.springframework.ai.autoconfigure.vectorstore.milvus.MilvusVectorStoreAutoConfiguration # 禁用 AI 模块的 Milvus，手动创建
+  # 数据源配置项
   datasource:
     druid: # Druid 【监控】相关的全局配置
       web-stat-filter:
@@ -66,14 +69,13 @@ spring:
           url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true&nullCatalogMeansCurrent=true
           username: root
           password: 123456
-        tdengine: # IoT 数据库
-          lazy: true # 开启懒加载，保证启动速度
-          url: jdbc:TAOS-RS://chaojiniu.top:6041/ruoyi_vue_pro
-          driver-class-name: com.taosdata.jdbc.rs.RestfulDriver
-          username: root
-          password: taosdata
-          druid:
-            validation-query: SELECT SERVER_STATUS() # TDengine 数据源的有效性检查 SQL
+#        tdengine: # IoT 数据库（需要 IoT 物联网再开启噢！）
+#          url: jdbc:TAOS-RS://127.0.0.1:6041/ruoyi_vue_pro
+#          driver-class-name: com.taosdata.jdbc.rs.RestfulDriver
+#          username: root
+#          password: taosdata
+#          druid:
+#            validation-query: SELECT SERVER_STATUS() # TDengine 数据源的有效性检查 SQL
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   data:
@@ -194,10 +196,10 @@ wx:
   mp: # 公众号配置（必填），参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-starters/wx-java-mp-spring-boot-starter/README.md 文档
 #    app-id: wx041349c6f39b268b # 测试号（牛希尧提供的）
 #    secret: 5abee519483bc9f8cb37ce280e814bd0
-    app-id: wx5b23ba7a5589ecbb # 测试号（自己的）
-    secret: 2a7b3b20c537e52e74afd395eb85f61f
-#    app-id: wxa69ab825b163be19 # 测试号（Kongdy 提供的）
-#    secret: bd4f9fab889591b62aeac0d7b8d8b4a0
+#    app-id: wx5b23ba7a5589ecbb # 测试号（自己的）
+#    secret: 2a7b3b20c537e52e74afd395eb85f61f
+    app-id: wxf56b1542b9e85f8a # 测试号（Kongdy 提供的）
+    secret: 496379dcef1ba869e9234de8d598cfd3
     # 存储配置，解决 AccessToken 的跨节点的共享
     config-storage:
       type: RedisTemplate # 采用 RedisTemplate 操作 Redis，会自动从 Spring 中获取
@@ -208,10 +210,10 @@ wx:
     #    secret: 333ae72f41552af1e998fe1f54e1584a
 #    appid: wx63c280fe3248a3e7 # wenhualian的接口测试号
 #    secret: 6f270509224a7ae1296bbf1c8cb97aed
-#    appid: wxc4598c446f8a9cb3 # 测试号（Kongdy 提供的）
-#    secret: 4a1a04e07f6a4a0751b39c3064a92c8b
-    appid: wx66186af0759f47c9 # 测试号（puhui 提供的）
-    secret: 3218bcbd112cbc614c7264ceb20144ac
+    appid: wxc4598c446f8a9cb3 # 测试号（Kongdy 提供的）
+    secret: 4a1a04e07f6a4a0751b39c3064a92c8b
+#    appid: wx66186af0759f47c9 # 测试号（puhui 提供的）
+#    secret: 3218bcbd112cbc614c7264ceb20144ac
     config-storage:
       type: RedisTemplate # 采用 RedisTemplate 操作 Redis，会自动从 Spring 中获取
       key-prefix: wa # Redis Key 的前缀
@@ -226,9 +228,9 @@ yudao:
   security:
     mock-enable: true
   pay:
-    order-notify-url: http://yunai.natapp1.cc/admin-api/pay/notify/order # 支付渠道的【支付】回调地址
-    refund-notify-url: http://yunai.natapp1.cc/admin-api/pay/notify/refund # 支付渠道的【退款】回调地址
-    transfer-notify-url: http://yunai.natapp1.cc/admin-api/pay/notify/transfer # 支付渠道的【转账】回调地址
+    order-notify-url: https://yutou.mynatapp.cc/admin-api/pay/notify/order # 支付渠道的【支付】回调地址
+    refund-notify-url: https://yutou.mynatapp.cc/admin-api/pay/notify/refund # 支付渠道的【退款】回调地址
+    transfer-notify-url: https://yutou.mynatapp.cc/admin-api/pay/notify/transfer # 支付渠道的【转账】回调地址
   access-log: # 访问日志的配置项
     enable: false
   demo: false # 关闭演示模式
@@ -251,7 +253,7 @@ justauth:
       agent-id: 1000004
       ignore-check-redirect-uri: true
     # noinspection SpringBootApplicationYaml
-    WECHAT_MINI_APP: # 微信小程序
+    WECHAT_MINI_PROGRAM: # 微信小程序
       client-id: ${wx.miniapp.appid}
       client-secret: ${wx.miniapp.secret}
       ignore-check-redirect-uri: true

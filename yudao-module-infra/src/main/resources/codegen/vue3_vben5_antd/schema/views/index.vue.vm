@@ -1,0 +1,316 @@
+<script lang="ts" setup>
+import type { VxeTableGridOptions } from '#/adapter/vxe-table';
+import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
+
+import { Page, useVbenModal } from '@vben/common-ui';
+import { message,Tabs } from 'ant-design-vue';
+import Form from './modules/form.vue';
+
+## 特殊：主子表专属逻辑
+#if ( $table.templateType == 11 || $table.templateType == 12 )
+    #foreach ($subSimpleClassName in $subSimpleClassNames)
+    #set ($index = $foreach.count - 1)
+    #set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($index))
+import ${subSimpleClassName}List from './modules/${subSimpleClassName_strikeCase}-list.vue'
+    #end
+#end
+
+import { ref, computed } from 'vue';
+import { $t } from '#/locales';
+import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
+#if (${table.templateType} == 2)## 树表接口
+import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
+#else## 标准表接口
+import { get${simpleClassName}Page, delete${simpleClassName},#if ($deleteBatchEnable) delete${simpleClassName}ListByIds,#end export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
+#end
+import { downloadFileFromBlobPart, isEmpty } from '@vben/utils';
+
+import { useGridColumns, useGridFormSchema } from './data';
+
+#if ($table.templateType == 12 || $table.templateType == 11) ## 内嵌和erp情况
+/** 子表的列表 */
+const subTabsName = ref('$subClassNameVars.get(0)')
+#if ($table.templateType == 11)
+const select${simpleClassName} = ref<${simpleClassName}Api.${simpleClassName}>();
+#end
+#end
+
+const [FormModal, formModalApi] = useVbenModal({
+  connectedComponent: Form,
+  destroyOnClose: true,
+});
+
+#if (${table.templateType} == 2)## 树表特有：控制表格展开收缩
+/** 切换树形展开/收缩状态 */
+const isExpanded = ref(true);
+function toggleExpand() {
+  isExpanded.value = !isExpanded.value;
+  gridApi.grid.setAllTreeExpand(isExpanded.value);
+}
+#end
+
+/** 刷新表格 */
+function onRefresh() {
+#if ($table.templateType == 12) ## 内嵌情况
+  gridApi.reload();
+#else
+  gridApi.query();
+#end
+}
+
+/** 创建${table.classComment} */
+function handleCreate() {
+  formModalApi.setData({}).open();
+}
+
+/** 编辑${table.classComment} */
+function handleEdit(row: ${simpleClassName}Api.${simpleClassName}) {
+  formModalApi.setData(row).open();
+}
+
+#if (${table.templateType} == 2)## 树表特有：新增下级
+/** 新增下级${table.classComment} */
+function handleAppend(row: ${simpleClassName}Api.${simpleClassName}) {
+  formModalApi.setData({ ${treeParentColumn.javaField}: row.id }).open();
+}
+#end
+
+/** 删除${table.classComment} */
+async function handleDelete(row: ${simpleClassName}Api.${simpleClassName}) {
+  const hideLoading = message.loading({
+    content: $t('ui.actionMessage.deleting', [row.id]),
+    key: 'action_key_msg',
+  });
+  try {
+    await delete${simpleClassName}(row.id as number);
+    message.success({
+      content: $t('ui.actionMessage.deleteSuccess', [row.id]),
+      key: 'action_key_msg',
+    });
+    onRefresh();
+  } finally {
+    hideLoading();
+  }
+}
+
+#if ($table.templateType != 2 && $deleteBatchEnable)
+/** 批量删除${table.classComment} */
+async function handleDeleteBatch() {
+  const hideLoading = message.loading({
+    content: $t('ui.actionMessage.deleting'),
+    key: 'action_key_msg',
+  });
+  try {
+    await delete${simpleClassName}ListByIds(deleteIds.value);
+    message.success({
+      content: $t('ui.actionMessage.deleteSuccess'),
+      key: 'action_key_msg',
+    });
+    onRefresh();
+  } finally {
+    hideLoading();
+  }
+}
+
+const deleteIds = ref<number[]>([]) // 待删除${table.classComment} ID
+function setDeleteIds({
+  records,
+}: {
+  records: ${simpleClassName}Api.${simpleClassName}[];
+}) {
+  deleteIds.value = records.map((item) => item.id);
+}
+#end
+
+/** 导出表格 */
+async function handleExport() {
+  const data = await export${simpleClassName}(await gridApi.formApi.getValues());
+  downloadFileFromBlobPart({ fileName: '${table.classComment}.xls', source: data });
+}
+
+const [Grid, gridApi] = useVbenVxeGrid({
+  formOptions: {
+    schema: useGridFormSchema(),
+  },
+  gridOptions: {
+    columns: useGridColumns(),
+#if (${table.templateType} == 11)
+    height: '600px',
+#else
+    height: 'auto',
+#end
+#if (${table.templateType} == 2)## 树表设置
+  treeConfig: {
+    parentField: '${treeParentColumn.javaField}',
+    rowField: 'id',
+    transform: true,
+    expandAll: true,
+    reserve: true,
+  },
+  pagerConfig: {
+    enabled: false,
+  },
+#else## 标准表设置
+    pagerConfig: {
+      enabled: true,
+    },
+#end
+    proxyConfig: {
+      ajax: {
+#if (${table.templateType} == 2)## 树表数据加载
+        query: async (_, formValues) => {
+          return await get${simpleClassName}List(formValues);
+        },
+#else## 标准表数据加载
+        query: async ({ page }, formValues) => {
+          return await get${simpleClassName}Page({
+            pageNo: page.currentPage,
+            pageSize: page.pageSize,
+            ...formValues,
+          });
+        },
+#end
+      },
+    },
+    rowConfig: {
+      keyField: 'id',
+      isHover: true,
+#if (${table.templateType} == 11)
+      isCurrent: true,
+#end
+    },
+    toolbarConfig: {
+      refresh: { code: 'query' },
+      search: true,
+    },
+  } as VxeTableGridOptions<${simpleClassName}Api.${simpleClassName}>,
+#if (${table.templateType} == 11 || $deleteBatchEnable)
+  gridEvents:{
+    #if(${table.templateType} == 11)
+    cellClick: ({ row }: { row: ${simpleClassName}Api.${simpleClassName}}) => {
+      select${simpleClassName}.value = row;
+    },
+    #end
+    #if($deleteBatchEnable)
+      checkboxAll: setDeleteIds,
+      checkboxChange: setDeleteIds,
+    #end
+  }
+#end
+});
+</script>
+
+<template>
+  <Page auto-content-height>
+    <FormModal @success="onRefresh" />
+
+#if ($table.templateType == 11) ## erp情况
+  <div>
+#end
+    <Grid table-title="${table.classComment}列表">
+        #if ($table.templateType == 12) ## 内嵌情况
+          <template #expand_content="{ row }">
+            <!-- 子表的表单 -->
+            <Tabs v-model:active-key="subTabsName" class="mx-8">
+                #foreach ($subTable in $subTables)
+                    #set ($index = $foreach.count - 1)
+                    #set ($subClassNameVar = $subClassNameVars.get($index))
+                    #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+                    #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+                  <Tabs.TabPane key="$subClassNameVar" tab="${subTable.classComment}" force-render>
+                    <${subSimpleClassName}List :${subJoinColumn_strikeCase}="row?.id" />
+                  </Tabs.TabPane>
+                #end
+            </Tabs>
+          </template>
+        #end
+      <template #toolbar-tools>
+        <TableAction
+          :actions="[
+            #if (${table.templateType} == 2)## 树表特有：展开/收缩按钮
+            {
+              label: isExpanded ? '收缩' : '展开',
+              type: 'primary',
+              onClick: toggleExpand,
+            },
+            #end
+            {
+              label: $t('ui.actionTitle.create', ['${table.classComment}']),
+              type: 'primary',
+              icon: ACTION_ICON.ADD,
+              auth: ['${table.moduleName}:${simpleClassName_strikeCase}:create'],
+              onClick: handleCreate,
+            },
+            {
+              label: $t('ui.actionTitle.export'),
+              type: 'primary',
+              icon: ACTION_ICON.DOWNLOAD,
+              auth: ['${table.moduleName}:${simpleClassName_strikeCase}:export'],
+              onClick: handleExport,
+            },
+            #if ($table.templateType != 2 && $deleteBatchEnable)
+            {
+              label: $t('ui.actionTitle.deleteBatch'),
+              type: 'primary',
+              danger: true,
+              icon: ACTION_ICON.DELETE,
+              disabled: isEmpty(deleteIds),
+              auth: ['${table.moduleName}:${simpleClassName_strikeCase}:delete'],
+              onClick: handleDeleteBatch,
+            },
+            #end
+          ]"
+        />
+      </template>
+      <template #actions="{ row }">
+        <TableAction
+          :actions="[
+            #if (${table.templateType} == 2)## 树表特有：新增下级
+            {
+              label: '新增下级',
+              type: 'link',
+              icon: ACTION_ICON.ADD,
+              auth: ['${table.moduleName}:${simpleClassName_strikeCase}:create'],
+              onClick: handleAppend.bind(null, row),
+            },
+            #end
+            {
+              label: $t('common.edit'),
+              type: 'link',
+              icon: ACTION_ICON.EDIT,
+              auth: ['${table.moduleName}:${simpleClassName_strikeCase}:update'],
+              onClick: handleEdit.bind(null, row),
+            },
+            {
+              label: $t('common.delete'),
+              type: 'link',
+              danger: true,
+              icon: ACTION_ICON.DELETE,
+              auth: ['${table.moduleName}:${simpleClassName_strikeCase}:delete'],
+              popConfirm: {
+                title: $t('ui.actionMessage.deleteConfirm', [row.id]),
+                confirm: handleDelete.bind(null, row),
+              },
+            },
+          ]"
+        />
+      </template>
+    </Grid>
+
+#if ($table.templateType == 11) ## erp情况
+    <!-- 子表的表单 -->
+    <Tabs v-model:active-key="subTabsName" class="mt-2">
+        #foreach ($subTable in $subTables)
+            #set ($index = $foreach.count - 1)
+            #set ($subClassNameVar = $subClassNameVars.get($index))
+            #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+            #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+          <Tabs.TabPane key="$subClassNameVar" tab="${subTable.classComment}" force-render>
+            <${subSimpleClassName}List :${subJoinColumn_strikeCase}="select${simpleClassName}?.id" />
+          </Tabs.TabPane>
+        #end
+    </Tabs>
+    </div>
+#end
+  </Page>
+</template>

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.framework.web.core.handler;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjUtil;
@@ -13,8 +14,8 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
-import cn.iocoder.yudao.module.infra.api.logger.ApiErrorLogApi;
-import cn.iocoder.yudao.module.infra.api.logger.dto.ApiErrorLogCreateReqDTO;
+import cn.iocoder.yudao.framework.common.biz.infra.logger.ApiErrorLogCommonApi;
+import cn.iocoder.yudao.framework.common.biz.infra.logger.dto.ApiErrorLogCreateReqDTO;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -27,6 +28,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.util.Assert;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -37,6 +39,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -60,7 +63,7 @@ public class GlobalExceptionHandler {
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     private final String applicationName;
 
-    private final ApiErrorLogApi apiErrorLogApi;
+    private final ApiErrorLogCommonApi apiErrorLogApi;
 
     /**
      * 处理所有异常，主要是提供给 Filter 使用
@@ -135,9 +138,23 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public CommonResult<?> methodArgumentNotValidExceptionExceptionHandler(MethodArgumentNotValidException ex) {
         log.warn("[methodArgumentNotValidExceptionExceptionHandler]", ex);
+        // 获取 errorMessage
+        String errorMessage = null;
         FieldError fieldError = ex.getBindingResult().getFieldError();
-        assert fieldError != null; // 断言，避免告警
-        return CommonResult.error(BAD_REQUEST.getCode(), String.format("请求参数不正确:%s", fieldError.getDefaultMessage()));
+        if (fieldError == null) {
+            // 组合校验，参考自 https://t.zsxq.com/3HVTx
+            List<ObjectError> allErrors = ex.getBindingResult().getAllErrors();
+            if (CollUtil.isNotEmpty(allErrors)) {
+                errorMessage = allErrors.get(0).getDefaultMessage();
+            }
+        } else {
+            errorMessage = fieldError.getDefaultMessage();
+        }
+        // 转换 CommonResult
+        if (StrUtil.isEmpty(errorMessage)) {
+            return CommonResult.error(BAD_REQUEST);
+        }
+        return CommonResult.error(BAD_REQUEST.getCode(), String.format("请求参数不正确:%s", errorMessage));
     }
 
     /**

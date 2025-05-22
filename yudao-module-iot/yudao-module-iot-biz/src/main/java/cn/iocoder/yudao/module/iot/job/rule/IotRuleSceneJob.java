@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.job.rule;
 
+import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerTypeEnum;
 import cn.iocoder.yudao.module.iot.service.rule.IotRuleSceneService;
 import jakarta.annotation.Resource;
@@ -41,7 +42,7 @@ public class IotRuleSceneJob extends QuartzJobBean {
      * @return JobData Map
      */
     public static Map<String, Object> buildJobDataMap(Long ruleSceneId) {
-        return Map.of(JOB_DATA_KEY_RULE_SCENE_ID, ruleSceneId);
+        return MapUtil.of(JOB_DATA_KEY_RULE_SCENE_ID, ruleSceneId);
     }
 
     /**

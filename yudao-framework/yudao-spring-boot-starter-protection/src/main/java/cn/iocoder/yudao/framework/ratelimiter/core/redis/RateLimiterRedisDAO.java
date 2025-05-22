@@ -44,6 +44,7 @@ public class RateLimiterRedisDAO {
         RateLimiterConfig config = rateLimiter.getConfig();
         if (config == null) {
             rateLimiter.trySetRate(RateType.OVERALL, count, rateInterval, RateIntervalUnit.SECONDS);
+            rateLimiter.expire(rateInterval, TimeUnit.SECONDS); // 原因参见 https://t.zsxq.com/lcR0W
             return rateLimiter;
         }
         // 2. 如果存在，并且配置相同，则直接返回
@@ -54,6 +55,7 @@ public class RateLimiterRedisDAO {
         }
         // 3. 如果存在，并且配置不同，则进行新建
         rateLimiter.setRate(RateType.OVERALL, count, rateInterval, RateIntervalUnit.SECONDS);
+        rateLimiter.expire(rateInterval, TimeUnit.SECONDS); // 原因参见 https://t.zsxq.com/lcR0W
         return rateLimiter;
     }
 
