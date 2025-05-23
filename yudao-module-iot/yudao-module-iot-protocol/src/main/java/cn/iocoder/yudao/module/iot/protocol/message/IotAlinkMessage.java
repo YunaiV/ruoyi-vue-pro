@@ -11,9 +11,9 @@ import java.util.Map;
  * IoT Alink 消息模型
  * <p>
  * 基于阿里云 Alink 协议规范实现的标准消息格式
- * @see <a href="https://help.aliyun.com/zh/iot/user-guide/alink-protocol-1">阿里云物联网 —— Alink 协议</a>
  *
  * @author haohao
+ * @see <a href="https://help.aliyun.com/zh/iot/user-guide/alink-protocol-1">阿里云物联网 —— Alink 协议</a>
  */
 @Data
 @Builder

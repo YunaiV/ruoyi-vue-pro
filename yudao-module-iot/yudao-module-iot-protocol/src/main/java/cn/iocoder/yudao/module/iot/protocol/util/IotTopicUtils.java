@@ -126,12 +126,12 @@ public class IotTopicUtils {
         if (StrUtil.isBlank(topic) || !topic.startsWith(IotTopicConstants.SYS_TOPIC_PREFIX)) {
             return null;
         }
-        
+
         String[] parts = topic.split("/");
         if (parts.length < 4) {
             return null;
         }
-        
+
         return parts[2];
     }
 
@@ -146,12 +146,12 @@ public class IotTopicUtils {
         if (StrUtil.isBlank(topic) || !topic.startsWith(IotTopicConstants.SYS_TOPIC_PREFIX)) {
             return null;
         }
-        
+
         String[] parts = topic.split("/");
         if (parts.length < 4) {
             return null;
         }
-        
+
         return parts[3];
     }
 
@@ -166,19 +166,19 @@ public class IotTopicUtils {
         if (StrUtil.isBlank(topic) || !topic.startsWith(IotTopicConstants.SYS_TOPIC_PREFIX)) {
             return null;
         }
-        
+
         // 服务调用主题
         if (topic.contains("/thing/service/")) {
             String servicePart = topic.substring(topic.indexOf("/thing/service/") + "/thing/service/".length());
             return servicePart.replace("/", ".");
         }
-        
+
         // 事件上报主题
         if (topic.contains("/thing/event/")) {
             String eventPart = topic.substring(topic.indexOf("/thing/event/") + "/thing/event/".length());
             return "event." + eventPart.replace("/", ".");
         }
-        
+
         return null;
     }
 } 

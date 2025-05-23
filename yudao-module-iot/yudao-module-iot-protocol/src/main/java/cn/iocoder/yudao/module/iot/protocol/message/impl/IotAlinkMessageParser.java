@@ -40,7 +40,7 @@ public class IotAlinkMessageParser implements IotMessageParser {
             JSONObject json = JSONUtil.parseObj(message);
             String id = json.getStr("id");
             String method = json.getStr("method");
-            
+
             if (StrUtil.isBlank(method)) {
                 // 尝试从 topic 中解析方法
                 method = IotTopicUtils.parseMethodFromTopic(topic);
