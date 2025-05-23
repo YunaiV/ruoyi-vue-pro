@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.job.vo.log.JobLogPageReqVO
 import cn.iocoder.yudao.module.infra.dal.dataobject.job.JobLogDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.job.JobLogMapper;
 import cn.iocoder.yudao.module.infra.enums.job.JobLogStatusEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
