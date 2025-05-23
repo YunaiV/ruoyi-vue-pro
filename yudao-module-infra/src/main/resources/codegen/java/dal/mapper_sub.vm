@@ -54,4 +54,10 @@ public interface ${subTable.className}Mapper extends BaseMapperX<${subTable.clas
         return delete(${subTable.className}DO::get${SubJoinColumnName}, ${subJoinColumn.javaField});
     }
 
+#if ( $table.templateType != 2 && $deleteBatchEnable)
+	default int deleteBy${SubJoinColumnName}s(List<${subJoinColumn.javaType}> ${subJoinColumn.javaField}s) {
+	    return deleteBatch(${subTable.className}DO::get${SubJoinColumnName}, ${subJoinColumn.javaField}s);
+	}
+#end
+
 }

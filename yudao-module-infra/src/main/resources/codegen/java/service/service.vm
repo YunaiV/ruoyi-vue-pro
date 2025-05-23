@@ -21,17 +21,17 @@ public interface ${table.className}Service {
     /**
      * 创建${table.classComment}
      *
-     * @param createReqVO 创建信息
+     * @param ${saveReqVOVar} 创建信息
      * @return 编号
      */
-    ${primaryColumn.javaType} create${simpleClassName}(@Valid ${sceneEnum.prefixClass}${table.className}SaveReqVO createReqVO);
+    ${primaryColumn.javaType} create${simpleClassName}(@Valid ${saveReqVOClass} ${saveReqVOVar});
 
     /**
      * 更新${table.classComment}
      *
-     * @param updateReqVO 更新信息
+     * @param ${updateReqVOVar} 更新信息
      */
-    void update${simpleClassName}(@Valid ${sceneEnum.prefixClass}${table.className}SaveReqVO updateReqVO);
+    void update${simpleClassName}(@Valid ${updateReqVOClass} ${updateReqVOVar});
 
     /**
      * 删除${table.classComment}
@@ -39,6 +39,15 @@ public interface ${table.className}Service {
      * @param id 编号
      */
     void delete${simpleClassName}(${primaryColumn.javaType} id);
+
+#if ( $table.templateType != 2 && $deleteBatchEnable)
+    /**
+    * 批量删除${table.classComment}
+    *
+    * @param ids 编号
+    */
+    void delete${simpleClassName}ListByIds(List<${primaryColumn.javaType}> ids);
+#end
 
     /**
      * 获得${table.classComment}
@@ -133,6 +142,15 @@ public interface ${table.className}Service {
      * @param id 编号
      */
     void delete${subSimpleClassName}(${subPrimaryColumn.javaType} id);
+
+#if ($deleteBatchEnable)
+    /**
+    * 批量删除${subTable.classComment}
+    *
+    * @param ids 编号
+    */
+    void delete${subSimpleClassName}ListByIds(List<${subPrimaryColumn.javaType}> ids);
+#end
 
 	/**
 	 * 获得${subTable.classComment}

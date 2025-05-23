@@ -14,6 +14,17 @@ import java.time.LocalDateTime;
 #end
 import com.baomidou.mybatisplus.annotation.*;
 import ${BaseDOClassName};
+## 处理 Schema 注解（仅 DO 模式）
+#if ($voType == 20)
+import io.swagger.v3.oas.annotations.media.Schema;
+#foreach ($column in $columns)
+    #if ("$!column.dictType" != "")## 有设置数据字典
+        import ${DictFormatClassName};
+        import ${DictConvertClassName};
+        #break
+    #end
+#end
+#end
 
 /**
  * ${subTable.classComment} DO
@@ -28,6 +39,10 @@ import ${BaseDOClassName};
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+## 处理 Schema 注解（仅 DO 模式）
+#if ($voType == 20)
+@Schema(description = "${sceneEnum.name} - ${table.classComment} Response VO")
+#end
 public class ${subTable.className}DO extends BaseDO {
 
 #foreach ($column in $subColumns)
@@ -42,6 +57,11 @@ public class ${subTable.className}DO extends BaseDO {
     #if (${column.primaryKey})##处理主键
     @TableId#if (${column.javaType} == 'String')(type = IdType.INPUT)#end
     #end
+#if ($voType == 20)
+## 1. 处理 Swagger 注解
+    @Schema(description = "${column.columnComment}"#if (!${column.nullable}), requiredMode = Schema.RequiredMode.REQUIRED#end#if ("$!column.example" != ""), example = "${column.example}"#end)
+#end
+## 2. 处理字段定义
     private ${column.javaType} ${column.javaField};
 #end
 #end

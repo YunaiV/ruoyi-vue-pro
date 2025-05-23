@@ -1,5 +1,6 @@
 package ${basePackage}.module.${table.moduleName}.service.${table.businessName};
 
+import cn.hutool.core.collection.CollUtil;
 import org.springframework.stereotype.Service;
 import ${jakartaPackage}.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -24,6 +25,8 @@ import ${basePackage}.module.${subTable.moduleName}.dal.mysql.${subTable.busines
 #end
 
 import static ${ServiceExceptionUtilClassName}.exception;
+import static ${CollectionUtilsClassName}.convertList;
+import static ${CollectionUtilsClassName}.diffList;
 import static ${basePackage}.module.${table.moduleName}.enums.ErrorCodeConstants.*;
 
 /**
@@ -49,19 +52,22 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #if ( $subTables && $subTables.size() > 0 && $table.templateType != 11 )
     @Transactional(rollbackFor = Exception.class)
 #end
-    public ${primaryColumn.javaType} create${simpleClassName}(${sceneEnum.prefixClass}${table.className}SaveReqVO createReqVO) {
+    public ${primaryColumn.javaType} create${simpleClassName}(${saveReqVOClass} ${saveReqVOVar}) {
 ## 特殊：树表专属逻辑
 #if ( $table.templateType == 2 )
 #set ($TreeParentJavaField = $treeParentColumn.javaField.substring(0,1).toUpperCase() + ${treeParentColumn.javaField.substring(1)})##首字母大写
 #set ($TreeNameJavaField = $treeNameColumn.javaField.substring(0,1).toUpperCase() + ${treeNameColumn.javaField.substring(1)})##首字母大写
         // 校验${treeParentColumn.columnComment}的有效性
-        validateParent${simpleClassName}(null, createReqVO.get${TreeParentJavaField}());
+        validateParent${simpleClassName}(null, ${saveReqVOVar}.get${TreeParentJavaField}());
         // 校验${treeNameColumn.columnComment}的唯一性
-        validate${simpleClassName}${TreeNameJavaField}Unique(null, createReqVO.get${TreeParentJavaField}(), createReqVO.get${TreeNameJavaField}());
+        validate${simpleClassName}${TreeNameJavaField}Unique(null, ${saveReqVOVar}.get${TreeParentJavaField}(), ${saveReqVOVar}.get${TreeNameJavaField}());
 
 #end
         // 插入
+#if ($voType == 10)
+## TODO @puhui999：insert 也要加下 clean。万一前端乱传递，哈哈哈。这个就是 do 模式的缺点；（只在 do 模式下）；看看主子表，是不是也可能存在，insert 的时候；
         ${table.className}DO ${classNameVar} = BeanUtils.toBean(createReqVO, ${table.className}DO.class);
+#end
         ${classNameVar}Mapper.insert(${classNameVar});
 ## 特殊：主子表专属逻辑（非 ERP 模式）
 #if ( $subTables && $subTables.size() > 0 && $table.templateType != 11 )
@@ -73,9 +79,9 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
     #if ( $subTable.subJoinMany)
-        create${subSimpleClassName}List(${classNameVar}.getId(), createReqVO.get${subSimpleClassNames.get($index)}s());
+        create${subSimpleClassName}List(${classNameVar}.getId(), ${saveReqVOVar}.get${subSimpleClassNames.get($index)}s());
     #else
-        create${subSimpleClassName}(${classNameVar}.getId(), createReqVO.get${subSimpleClassNames.get($index)}());
+        create${subSimpleClassName}(${classNameVar}.getId(), ${saveReqVOVar}.get${subSimpleClassNames.get($index)}());
     #end
 #end
 #end
@@ -88,22 +94,26 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #if ( $subTables && $subTables.size() > 0 && $table.templateType != 11 )
     @Transactional(rollbackFor = Exception.class)
 #end
-    public void update${simpleClassName}(${sceneEnum.prefixClass}${table.className}SaveReqVO updateReqVO) {
+    public void update${simpleClassName}(${updateReqVOClass} ${updateReqVOVar}) {
         // 校验存在
-        validate${simpleClassName}Exists(updateReqVO.getId());
+        validate${simpleClassName}Exists(${updateReqVOVar}.getId());
 ## 特殊：树表专属逻辑
 #if ( $table.templateType == 2 )
 #set ($TreeParentJavaField = $treeParentColumn.javaField.substring(0,1).toUpperCase() + ${treeParentColumn.javaField.substring(1)})##首字母大写
 #set ($TreeNameJavaField = $treeNameColumn.javaField.substring(0,1).toUpperCase() + ${treeNameColumn.javaField.substring(1)})##首字母大写
         // 校验${treeParentColumn.columnComment}的有效性
-        validateParent${simpleClassName}(updateReqVO.getId(), updateReqVO.get${TreeParentJavaField}());
+        validateParent${simpleClassName}(${updateReqVOVar}.getId(), ${updateReqVOVar}.get${TreeParentJavaField}());
         // 校验${treeNameColumn.columnComment}的唯一性
-        validate${simpleClassName}${TreeNameJavaField}Unique(updateReqVO.getId(), updateReqVO.get${TreeParentJavaField}(), updateReqVO.get${TreeNameJavaField}());
+        validate${simpleClassName}${TreeNameJavaField}Unique(${updateReqVOVar}.getId(), ${updateReqVOVar}.get${TreeParentJavaField}(), ${updateReqVOVar}.get${TreeNameJavaField}());
 
 #end
         // 更新
+#if ($voType == 10)
         ${table.className}DO updateObj = BeanUtils.toBean(updateReqVO, ${table.className}DO.class);
         ${classNameVar}Mapper.updateById(updateObj);
+#else
+        ${classNameVar}Mapper.updateById(${updateReqVOVar});
+#end
 ## 特殊：主子表专属逻辑（非 ERP 模式）
 #if ( $subTables && $subTables.size() > 0 && $table.templateType != 11)
 
@@ -114,9 +124,9 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
     #if ( $subTable.subJoinMany)
-        update${subSimpleClassName}List(updateReqVO.getId(), updateReqVO.get${subSimpleClassNames.get($index)}s());
+        update${subSimpleClassName}List(${updateReqVOVar}.getId(), ${updateReqVOVar}.get${subSimpleClassNames.get($index)}s());
     #else
-        update${subSimpleClassName}(updateReqVO.getId(), updateReqVO.get${subSimpleClassNames.get($index)}());
+        update${subSimpleClassName}(${updateReqVOVar}.getId(), ${updateReqVOVar}.get${subSimpleClassNames.get($index)}());
     #end
 #end
 #end
@@ -153,6 +163,39 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #end
 #end
     }
+
+#if ( $table.templateType != 2 && $deleteBatchEnable)
+    @Override
+    ## 特殊：主子表专属逻辑
+    #if ( $subTables && $subTables.size() > 0)
+    @Transactional(rollbackFor = Exception.class)
+    #end
+    public void delete${simpleClassName}ListByIds(List<${primaryColumn.javaType}> ids) {
+        // 校验存在
+        validate${simpleClassName}Exists(ids);
+        // 删除
+        ${classNameVar}Mapper.deleteByIds(ids);
+    ## 特殊：主子表专属逻辑
+    #if ( $subTables && $subTables.size() > 0)
+
+    // 删除子表
+        #foreach ($subTable in $subTables)
+            #set ($index = $foreach.count - 1)
+            #set ($subSimpleClassName = $subSimpleClassNames.get($index))
+            #set ($subJoinColumn = $subJoinColumns.get($index))##当前 join 字段
+            #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+            delete${subSimpleClassName}By${SubJoinColumnName}s(ids);
+        #end
+    #end
+    }
+
+    private void validate${simpleClassName}Exists(List<${primaryColumn.javaType}> ids) {
+        List<${table.className}DO> list = ${classNameVar}Mapper.selectByIds(ids);
+        if (CollUtil.isEmpty(list) || list.size() != ids.size()) {
+            throw exception(${simpleClassName_underlineCase.toUpperCase()}_NOT_EXISTS);
+        }
+    }
+#end
 
     private void validate${simpleClassName}Exists(${primaryColumn.javaType} id) {
         if (${classNameVar}Mapper.selectById(id) == null) {
@@ -286,17 +329,23 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         // 校验存在
         validate${subSimpleClassName}Exists(${subClassNameVar}.getId());
         // 更新
-        ${subClassNameVar}.setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
+        ${subClassNameVar}.clean(); // 解决更新情况下：updateTime 不更新
         ${subClassNameVars.get($index)}Mapper.updateById(${subClassNameVar});
     }
 
     @Override
     public void delete${subSimpleClassName}(${subPrimaryColumn.javaType} id) {
-        // 校验存在
-        validate${subSimpleClassName}Exists(id);
         // 删除
         ${subClassNameVars.get($index)}Mapper.deleteById(id);
     }
+
+#if ($deleteBatchEnable)
+	@Override
+	public void delete${subSimpleClassName}ListByIds(List<${subPrimaryColumn.javaType}> ids) {
+        // 删除
+        ${subClassNameVars.get($index)}Mapper.deleteByIds(ids);
+	}
+#end
 
     @Override
     public ${subTable.className}DO get${subSimpleClassName}(${subPrimaryColumn.javaType} id) {
@@ -313,14 +362,31 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #else
     #if ( $subTable.subJoinMany)
     private void create${subSimpleClassName}List(${primaryColumn.javaType} ${subJoinColumn.javaField}, List<${subTable.className}DO> list) {
-        list.forEach(o -> o.set$SubJoinColumnName(${subJoinColumn.javaField}));
+        list.forEach(o -> o.set${SubJoinColumnName}(${subJoinColumn.javaField}).clean());
         ${subClassNameVars.get($index)}Mapper.insertBatch(list);
     }
 
     private void update${subSimpleClassName}List(${primaryColumn.javaType} ${subJoinColumn.javaField}, List<${subTable.className}DO> list) {
-        delete${subSimpleClassName}By${SubJoinColumnName}(${subJoinColumn.javaField});
-		list.forEach(o -> o.setId(null).setUpdater(null).setUpdateTime(null)); // 解决更新情况下：1）id 冲突；2）updateTime 不更新
-        create${subSimpleClassName}List(${subJoinColumn.javaField}, list);
+	    list.forEach(o -> o.set${SubJoinColumnName}(${subJoinColumn.javaField}).clean());
+	    List<${subTable.className}DO> oldList = ${subClassNameVar}Mapper.selectListBy${SubJoinColumnName}(${subJoinColumn.javaField});
+	    List<List<${subTable.className}DO>> diffList = diffList(oldList, list, (oldVal, newVal) -> {
+            boolean same = ObjectUtil.equal(oldVal.getId(), newVal.getId());
+            if (same) {
+                newVal.setId(oldVal.getId()).clean(); // 解决更新情况下：updateTime 不更新
+            }
+            return same;
+	    });
+
+	    // 第二步，批量添加、修改、删除
+	    if (CollUtil.isNotEmpty(diffList.get(0))) {
+	        ${subClassNameVar}Mapper.insertBatch(diffList.get(0));
+	    }
+	    if (CollUtil.isNotEmpty(diffList.get(1))) {
+	        ${subClassNameVar}Mapper.updateBatch(diffList.get(1));
+	    }
+	    if (CollUtil.isNotEmpty(diffList.get(2))) {
+	        ${subClassNameVar}Mapper.deleteByIds(convertList(diffList.get(2), ${subTable.className}DO::getId));
+	    }
     }
 
     #else
@@ -336,8 +402,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         if (${subClassNameVar} == null) {
 			return;
         }
-        ${subClassNameVar}.set$SubJoinColumnName(${subJoinColumn.javaField});
-        ${subClassNameVar}.setUpdater(null).setUpdateTime(null); // 解决更新情况下：updateTime 不更新
+        ${subClassNameVar}.set$SubJoinColumnName(${subJoinColumn.javaField}).clean();// 解决更新情况下：updateTime 不更新
         ${subClassNameVars.get($index)}Mapper.insertOrUpdate(${subClassNameVar});
     }
 
@@ -346,6 +411,12 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     private void delete${subSimpleClassName}By${SubJoinColumnName}(${primaryColumn.javaType} ${subJoinColumn.javaField}) {
         ${subClassNameVars.get($index)}Mapper.deleteBy${SubJoinColumnName}(${subJoinColumn.javaField});
     }
+
+#if ( $table.templateType != 2 && $deleteBatchEnable)
+	private void delete${subSimpleClassName}By${SubJoinColumnName}s(List<${primaryColumn.javaType}> ${subJoinColumn.javaField}s) {
+        ${subClassNameVars.get($index)}Mapper.deleteBy${SubJoinColumnName}s(${subJoinColumn.javaField}s);
+	}
+#end
 
 #end
 }

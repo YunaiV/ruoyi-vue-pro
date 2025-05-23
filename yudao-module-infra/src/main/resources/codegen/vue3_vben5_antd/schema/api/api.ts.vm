@@ -89,6 +89,13 @@ export function delete${simpleClassName}(id: number) {
   return requestClient.delete(`${baseURL}/delete?id=${id}`);
 }
 
+#if ( $table.templateType != 2 && $deleteBatchEnable)
+/** 批量删除${table.classComment} */
+export function delete${simpleClassName}ListByIds(ids: number[]) {
+  return requestClient.delete(`${baseURL}/delete-list?ids=${ids.join(',')}`)
+}
+#end
+
 /** 导出${table.classComment} */
 export function export${simpleClassName}(params: any) {
   return requestClient.download('${baseURL}/export-excel', params);
@@ -143,6 +150,13 @@ export function update${subSimpleClassName}(data: ${simpleClassName}Api.${subSim
 export function delete${subSimpleClassName}(id: number) {
   return requestClient.delete(`${baseURL}/${subSimpleClassName_strikeCase}/delete?id=${id}`);
 }
+
+#if ($deleteBatchEnable)
+/** 批量删除${subTable.classComment} */
+export function delete${subSimpleClassName}ListByIds(ids: number[]) {
+  return requestClient.delete(`${baseURL}/${subSimpleClassName_strikeCase}/delete-list?ids=${ids.join(',')}`)
+}
+#end
 
 /** 获得${subTable.classComment} */
 export function get${subSimpleClassName}(id: number) {

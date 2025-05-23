@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.infra.dal.mysql.demo.demo03;
+package cn.iocoder.yudao.module.infra.dal.mysql.demo.demo03.erp;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -15,7 +15,7 @@ import java.util.List;
  * @author 芋道源码
  */
 @Mapper
-public interface Demo03CourseMapper extends BaseMapperX<Demo03CourseDO> {
+public interface Demo03CourseErpMapper extends BaseMapperX<Demo03CourseDO> {
 
     default PageResult<Demo03CourseDO> selectPage(PageParam reqVO, Long studentId) {
         return selectPage(reqVO, new LambdaQueryWrapperX<Demo03CourseDO>()
@@ -23,12 +23,12 @@ public interface Demo03CourseMapper extends BaseMapperX<Demo03CourseDO> {
                 .orderByDesc(Demo03CourseDO::getId));
     }
 
-    default List<Demo03CourseDO> selectListByStudentId(Long studentId) {
-        return selectList(Demo03CourseDO::getStudentId, studentId);
-    }
-
     default int deleteByStudentId(Long studentId) {
         return delete(Demo03CourseDO::getStudentId, studentId);
+    }
+
+    default int deleteByStudentIds(List<Long> studentIds) {
+        return deleteBatch(Demo03CourseDO::getStudentId, studentIds);
     }
 
 }

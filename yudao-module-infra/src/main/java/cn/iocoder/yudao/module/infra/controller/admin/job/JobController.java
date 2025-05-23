@@ -71,10 +71,10 @@ public class JobController {
         return success(true);
     }
 
-	@DeleteMapping("/delete")
+    @DeleteMapping("/delete")
     @Operation(summary = "删除定时任务")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-	@PreAuthorize("@ss.hasPermission('infra:job:delete')")
+    @PreAuthorize("@ss.hasPermission('infra:job:delete')")
     public CommonResult<Boolean> deleteJob(@RequestParam("id") Long id)
             throws SchedulerException {
         jobService.deleteJob(id);

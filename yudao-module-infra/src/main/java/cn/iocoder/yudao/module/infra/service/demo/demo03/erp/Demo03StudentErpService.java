@@ -1,14 +1,14 @@
-package cn.iocoder.yudao.module.infra.service.demo.demo03;
+package cn.iocoder.yudao.module.infra.service.demo.demo03.erp;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.vo.Demo03StudentPageReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.vo.Demo03StudentSaveReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.erp.vo.Demo03StudentErpPageReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.erp.vo.Demo03StudentErpSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03CourseDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03GradeDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03StudentDO;
+import jakarta.validation.Valid;
 
-import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-public interface Demo03StudentService {
+public interface Demo03StudentErpService {
 
     /**
      * 创建学生
@@ -24,14 +24,14 @@ public interface Demo03StudentService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createDemo03Student(@Valid Demo03StudentSaveReqVO createReqVO);
+    Long createDemo03Student(@Valid Demo03StudentErpSaveReqVO createReqVO);
 
     /**
      * 更新学生
      *
      * @param updateReqVO 更新信息
      */
-    void updateDemo03Student(@Valid Demo03StudentSaveReqVO updateReqVO);
+    void updateDemo03Student(@Valid Demo03StudentErpSaveReqVO updateReqVO);
 
     /**
      * 删除学生
@@ -39,6 +39,13 @@ public interface Demo03StudentService {
      * @param id 编号
      */
     void deleteDemo03Student(Long id);
+
+    /**
+     * 批量删除学生
+     *
+     * @param ids 编号
+     */
+    void deleteDemo03StudentListByIds(List<Long> ids);
 
     /**
      * 获得学生
@@ -54,18 +61,9 @@ public interface Demo03StudentService {
      * @param pageReqVO 分页查询
      * @return 学生分页
      */
-    PageResult<Demo03StudentDO> getDemo03StudentPage(Demo03StudentPageReqVO pageReqVO);
-
+    PageResult<Demo03StudentDO> getDemo03StudentPage(Demo03StudentErpPageReqVO pageReqVO);
 
     // ==================== 子表（学生课程） ====================
-
-    /**
-     * 获得学生课程列表
-     *
-     * @param studentId 学生编号
-     * @return 学生课程列表
-     */
-    List<Demo03CourseDO> getDemo03CourseListByStudentId(Long studentId);
 
     /**
      * 获得学生课程分页
@@ -99,6 +97,13 @@ public interface Demo03StudentService {
     void deleteDemo03Course(Long id);
 
     /**
+     * 批量删除学生课程
+     *
+     * @param ids 编号
+     */
+    void deleteDemo03CourseListByIds(List<Long> ids);
+
+    /**
      * 获得学生课程
      *
      * @param id 编号
@@ -107,14 +112,6 @@ public interface Demo03StudentService {
     Demo03CourseDO getDemo03Course(Long id);
 
     // ==================== 子表（学生班级） ====================
-
-    /**
-     * 获得学生班级
-     *
-     * @param studentId 学生编号
-     * @return 学生班级
-     */
-    Demo03GradeDO getDemo03GradeByStudentId(Long studentId);
 
     /**
      * 获得学生班级分页
@@ -146,6 +143,13 @@ public interface Demo03StudentService {
      * @param id 编号
      */
     void deleteDemo03Grade(Long id);
+
+    /**
+     * 批量删除学生班级
+     *
+     * @param ids 编号
+     */
+    void deleteDemo03GradeListByIds(List<Long> ids);
 
     /**
      * 获得学生班级
