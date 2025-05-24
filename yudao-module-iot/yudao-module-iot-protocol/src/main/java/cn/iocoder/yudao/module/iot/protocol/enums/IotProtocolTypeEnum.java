@@ -13,9 +13,9 @@ import lombok.Getter;
 public enum IotProtocolTypeEnum {
 
     /**
-     * Alink 协议（阿里云物联网协议）
+     * MQTT 协议（默认实现）
      */
-    ALINK("alink", "Alink 协议"),
+    MQTT("mqtt", "MQTT 协议"),
 
     /**
      * MQTT 原始协议

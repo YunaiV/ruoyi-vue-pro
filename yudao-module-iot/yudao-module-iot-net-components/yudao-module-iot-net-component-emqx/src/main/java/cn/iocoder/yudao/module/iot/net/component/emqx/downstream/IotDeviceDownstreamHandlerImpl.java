@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.*;
 import cn.iocoder.yudao.module.iot.net.component.core.constants.IotDeviceTopicEnum;
 import cn.iocoder.yudao.module.iot.net.component.core.downstream.IotDeviceDownstreamHandler;
-import cn.iocoder.yudao.module.iot.net.component.core.message.IotAlinkMessage;
+import cn.iocoder.yudao.module.iot.net.component.core.message.IotMqttMessage;
 import cn.iocoder.yudao.module.iot.net.component.core.util.IotNetComponentCommonUtils;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import io.vertx.core.buffer.Buffer;
@@ -56,7 +56,7 @@ public class IotDeviceDownstreamHandlerImpl implements IotDeviceDownstreamHandle
             // 构建请求消息
             String requestId = StrUtil.isNotEmpty(reqDTO.getRequestId()) ? reqDTO.getRequestId()
                     : IotNetComponentCommonUtils.generateRequestId();
-            IotAlinkMessage message = IotAlinkMessage.createServiceInvokeMessage(
+            IotMqttMessage message = IotMqttMessage.createServiceInvokeMessage(
                     requestId, reqDTO.getIdentifier(), reqDTO.getParams());
 
             // 发送消息
@@ -93,7 +93,7 @@ public class IotDeviceDownstreamHandlerImpl implements IotDeviceDownstreamHandle
             // 构建请求消息
             String requestId = StrUtil.isNotEmpty(reqDTO.getRequestId()) ? reqDTO.getRequestId()
                     : IotNetComponentCommonUtils.generateRequestId();
-            IotAlinkMessage message = IotAlinkMessage.createPropertySetMessage(requestId, reqDTO.getProperties());
+            IotMqttMessage message = IotMqttMessage.createPropertySetMessage(requestId, reqDTO.getProperties());
 
             // 发送消息
             publishMessage(topic, message.toJsonObject());

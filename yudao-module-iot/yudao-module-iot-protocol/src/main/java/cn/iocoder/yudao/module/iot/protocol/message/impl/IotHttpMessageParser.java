@@ -6,8 +6,8 @@ import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.module.iot.protocol.constants.IotHttpConstants;
 import cn.iocoder.yudao.module.iot.protocol.constants.IotLogConstants;
 import cn.iocoder.yudao.module.iot.protocol.constants.IotTopicConstants;
-import cn.iocoder.yudao.module.iot.protocol.message.IotAlinkMessage;
 import cn.iocoder.yudao.module.iot.protocol.message.IotMessageParser;
+import cn.iocoder.yudao.module.iot.protocol.message.IotMqttMessage;
 import cn.iocoder.yudao.module.iot.protocol.message.IotStandardResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,7 +61,7 @@ public class IotHttpMessageParser implements IotMessageParser {
     public static final String TOPIC_PATH_PREFIX = IotHttpConstants.Path.TOPIC_PREFIX;
 
     @Override
-    public IotAlinkMessage parse(String topic, byte[] payload) {
+    public IotMqttMessage parse(String topic, byte[] payload) {
         if (payload == null || payload.length == 0) {
             log.warn(IotLogConstants.Http.RECEIVED_EMPTY_MESSAGE, topic);
             return null;
@@ -92,7 +92,7 @@ public class IotHttpMessageParser implements IotMessageParser {
      * @param message 认证消息JSON
      * @return 标准消息格式
      */
-    private IotAlinkMessage parseAuthMessage(String message) {
+    private IotMqttMessage parseAuthMessage(String message) {
         if (!JSONUtil.isTypeJSON(message)) {
             log.warn(IotLogConstants.Http.AUTH_MESSAGE_NOT_JSON, message);
             return null;
@@ -121,7 +121,7 @@ public class IotHttpMessageParser implements IotMessageParser {
         params.put(IotHttpConstants.AuthField.SIGN_METHOD,
                 json.getStr(IotHttpConstants.AuthField.SIGN_METHOD, IotHttpConstants.DefaultValue.SIGN_METHOD));
 
-        return IotAlinkMessage.builder()
+        return IotMqttMessage.builder()
                 .id(generateMessageId())
                 .method(IotHttpConstants.Method.DEVICE_AUTH)
                 .version(json.getStr(IotHttpConstants.AuthField.VERSION, IotHttpConstants.DefaultValue.VERSION))
@@ -136,7 +136,7 @@ public class IotHttpMessageParser implements IotMessageParser {
      * @param message 消息内容
      * @return 标准消息格式
      */
-    private IotAlinkMessage parseDataMessage(String topic, String message) {
+    private IotMqttMessage parseDataMessage(String topic, String message) {
         // 提取实际的主题，去掉 /topic 前缀
         String actualTopic = topic.substring(TOPIC_PATH_PREFIX.length()); // 直接移除/topic前缀
 
@@ -156,7 +156,7 @@ public class IotHttpMessageParser implements IotMessageParser {
      * @param message JSON消息
      * @return 标准消息格式
      */
-    private IotAlinkMessage parseJsonDataMessage(String topic, String message) {
+    private IotMqttMessage parseJsonDataMessage(String topic, String message) {
         JSONObject json = JSONUtil.parseObj(message);
 
         // 生成消息ID
@@ -181,7 +181,7 @@ public class IotHttpMessageParser implements IotMessageParser {
             paramsMap.put(IotHttpConstants.MessageField.DATA, params);
         }
 
-        return IotAlinkMessage.builder()
+        return IotMqttMessage.builder()
                 .id(messageId)
                 .method(method)
                 .version(json.getStr(IotHttpConstants.MessageField.VERSION,
@@ -197,11 +197,11 @@ public class IotHttpMessageParser implements IotMessageParser {
      * @param message 原始消息
      * @return 标准消息格式
      */
-    private IotAlinkMessage parseRawDataMessage(String topic, String message) {
+    private IotMqttMessage parseRawDataMessage(String topic, String message) {
         Map<String, Object> params = new HashMap<>();
         params.put(IotHttpConstants.MessageField.DATA, message);
 
-        return IotAlinkMessage.builder()
+        return IotMqttMessage.builder()
                 .id(generateMessageId())
                 .method(inferMethodFromTopic(topic))
                 .version(IotHttpConstants.DefaultValue.MESSAGE_VERSION)
@@ -263,7 +263,7 @@ public class IotHttpMessageParser implements IotMessageParser {
      * @return 消息ID
      */
     private String generateMessageId() {
-        return IotAlinkMessage.generateRequestId();
+        return IotMqttMessage.generateRequestId();
     }
 
     @Override

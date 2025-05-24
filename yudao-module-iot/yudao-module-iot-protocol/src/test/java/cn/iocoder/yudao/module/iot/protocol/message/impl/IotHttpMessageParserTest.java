@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.protocol.message.impl;
 
 import cn.hutool.json.JSONObject;
-import cn.iocoder.yudao.module.iot.protocol.message.IotAlinkMessage;
+import cn.iocoder.yudao.module.iot.protocol.message.IotMqttMessage;
 import cn.iocoder.yudao.module.iot.protocol.message.IotStandardResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,7 +58,7 @@ class IotHttpMessageParserTest {
         byte[] payload = authMessage.toString().getBytes(StandardCharsets.UTF_8);
 
         // 解析消息
-        IotAlinkMessage result = parser.parse(topic, payload);
+        IotMqttMessage result = parser.parse(topic, payload);
 
         // 验证结果
         assertNotNull(result);
@@ -88,7 +88,7 @@ class IotHttpMessageParserTest {
         byte[] payload = authMessage.toString().getBytes(StandardCharsets.UTF_8);
 
         // 解析消息
-        IotAlinkMessage result = parser.parse(topic, payload);
+        IotMqttMessage result = parser.parse(topic, payload);
 
         // 验证结果
         assertNull(result);
@@ -113,7 +113,7 @@ class IotHttpMessageParserTest {
         byte[] payload = dataMessage.toString().getBytes(StandardCharsets.UTF_8);
 
         // 解析消息
-        IotAlinkMessage result = parser.parse(topic, payload);
+        IotMqttMessage result = parser.parse(topic, payload);
 
         // 验证结果
         assertNotNull(result);
@@ -132,7 +132,7 @@ class IotHttpMessageParserTest {
         byte[] payload = rawData.getBytes(StandardCharsets.UTF_8);
 
         // 解析消息
-        IotAlinkMessage result = parser.parse(topic, payload);
+        IotMqttMessage result = parser.parse(topic, payload);
 
         // 验证结果
         assertNotNull(result);
@@ -161,7 +161,7 @@ class IotHttpMessageParserTest {
         String rawData = "test data";
         byte[] payload = rawData.getBytes(StandardCharsets.UTF_8);
 
-        IotAlinkMessage result = parser.parse(topic, payload);
+        IotMqttMessage result = parser.parse(topic, payload);
         assertNotNull(result);
         assertEquals(expectedMethod, result.getMethod());
     }

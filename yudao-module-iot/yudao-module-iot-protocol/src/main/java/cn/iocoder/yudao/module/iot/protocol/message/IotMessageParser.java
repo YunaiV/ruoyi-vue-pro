@@ -16,7 +16,7 @@ public interface IotMessageParser {
      * @param payload 消息负载
      * @return 解析后的标准消息，如果解析失败返回 null
      */
-    IotAlinkMessage parse(String topic, byte[] payload);
+    IotMqttMessage parse(String topic, byte[] payload);
 
     /**
      * 格式化响应消息

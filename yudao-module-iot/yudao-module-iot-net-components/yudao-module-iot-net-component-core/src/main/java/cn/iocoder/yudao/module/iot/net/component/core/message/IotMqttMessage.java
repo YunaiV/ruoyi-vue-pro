@@ -8,16 +8,15 @@ import lombok.Data;
 import java.util.Map;
 
 /**
- * IoT Alink 消息模型
+ * IoT MQTT 消息模型
  * <p>
- * 基于阿里云 Alink 协议规范实现的标准消息格式
- * @see <a href="https://help.aliyun.com/zh/iot/user-guide/alink-protocol-1">阿里云物联网 —— Alink 协议</a>
+ * 基于 MQTT 协议规范实现的标准消息格式，兼容 Alink 协议
  *
  * @author haohao
  */
 @Data
 @Builder
-public class IotAlinkMessage {
+public class IotMqttMessage {
 
     /**
      * 消息 ID
@@ -69,11 +68,11 @@ public class IotAlinkMessage {
      * @param requestId         请求 ID，为空时自动生成
      * @param serviceIdentifier 服务标识符
      * @param params            服务参数
-     * @return Alink 消息对象
+     * @return MQTT 消息对象
      */
-    public static IotAlinkMessage createServiceInvokeMessage(String requestId, String serviceIdentifier,
+    public static IotMqttMessage createServiceInvokeMessage(String requestId, String serviceIdentifier,
                                                              Map<String, Object> params) {
-        return IotAlinkMessage.builder()
+        return IotMqttMessage.builder()
                 .id(requestId != null ? requestId : generateRequestId())
                 .method("thing.service." + serviceIdentifier)
                 .params(params)
@@ -85,10 +84,10 @@ public class IotAlinkMessage {
      *
      * @param requestId  请求 ID，为空时自动生成
      * @param properties 设备属性
-     * @return Alink 消息对象
+     * @return MQTT 消息对象
      */
-    public static IotAlinkMessage createPropertySetMessage(String requestId, Map<String, Object> properties) {
-        return IotAlinkMessage.builder()
+    public static IotMqttMessage createPropertySetMessage(String requestId, Map<String, Object> properties) {
+        return IotMqttMessage.builder()
                 .id(requestId != null ? requestId : generateRequestId())
                 .method("thing.service.property.set")
                 .params(properties)
@@ -100,13 +99,13 @@ public class IotAlinkMessage {
      *
      * @param requestId   请求 ID，为空时自动生成
      * @param identifiers 要获取的属性标识符列表
-     * @return Alink 消息对象
+     * @return MQTT 消息对象
      */
-    public static IotAlinkMessage createPropertyGetMessage(String requestId, String[] identifiers) {
+    public static IotMqttMessage createPropertyGetMessage(String requestId, String[] identifiers) {
         JSONObject params = new JSONObject();
         params.set("identifiers", identifiers);
 
-        return IotAlinkMessage.builder()
+        return IotMqttMessage.builder()
                 .id(requestId != null ? requestId : generateRequestId())
                 .method("thing.service.property.get")
                 .params(params)
@@ -118,10 +117,10 @@ public class IotAlinkMessage {
      *
      * @param requestId 请求 ID，为空时自动生成
      * @param configs   设备配置
-     * @return Alink 消息对象
+     * @return MQTT 消息对象
      */
-    public static IotAlinkMessage createConfigSetMessage(String requestId, Map<String, Object> configs) {
-        return IotAlinkMessage.builder()
+    public static IotMqttMessage createConfigSetMessage(String requestId, Map<String, Object> configs) {
+        return IotMqttMessage.builder()
                 .id(requestId != null ? requestId : generateRequestId())
                 .method("thing.service.config.set")
                 .params(configs)
@@ -133,10 +132,10 @@ public class IotAlinkMessage {
      *
      * @param requestId 请求 ID，为空时自动生成
      * @param otaInfo   OTA 升级信息
-     * @return Alink 消息对象
+     * @return MQTT 消息对象
      */
-    public static IotAlinkMessage createOtaUpgradeMessage(String requestId, Map<String, Object> otaInfo) {
-        return IotAlinkMessage.builder()
+    public static IotMqttMessage createOtaUpgradeMessage(String requestId, Map<String, Object> otaInfo) {
+        return IotMqttMessage.builder()
                 .id(requestId != null ? requestId : generateRequestId())
                 .method("thing.service.ota.upgrade")
                 .params(otaInfo)

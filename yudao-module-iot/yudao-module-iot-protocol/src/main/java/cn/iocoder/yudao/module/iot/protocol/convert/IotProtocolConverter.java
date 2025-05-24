@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.protocol.convert;
 
-import cn.iocoder.yudao.module.iot.protocol.message.IotAlinkMessage;
+import cn.iocoder.yudao.module.iot.protocol.message.IotMqttMessage;
 import cn.iocoder.yudao.module.iot.protocol.message.IotStandardResponse;
 
 /**
@@ -20,7 +20,7 @@ public interface IotProtocolConverter {
      * @param protocol 协议类型
      * @return 标准消息对象，转换失败返回 null
      */
-    IotAlinkMessage convertToStandardMessage(String topic, byte[] payload, String protocol);
+    IotMqttMessage convertToStandardMessage(String topic, byte[] payload, String protocol);
 
     /**
      * 将标准响应转换为字节数组

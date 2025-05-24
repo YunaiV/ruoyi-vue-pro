@@ -3,10 +3,10 @@ package cn.iocoder.yudao.module.iot.protocol.convert.impl;
 import cn.iocoder.yudao.module.iot.protocol.constants.IotLogConstants;
 import cn.iocoder.yudao.module.iot.protocol.convert.IotProtocolConverter;
 import cn.iocoder.yudao.module.iot.protocol.enums.IotProtocolTypeEnum;
-import cn.iocoder.yudao.module.iot.protocol.message.IotAlinkMessage;
 import cn.iocoder.yudao.module.iot.protocol.message.IotMessageParser;
+import cn.iocoder.yudao.module.iot.protocol.message.IotMqttMessage;
 import cn.iocoder.yudao.module.iot.protocol.message.IotStandardResponse;
-import cn.iocoder.yudao.module.iot.protocol.message.impl.IotAlinkMessageParser;
+import cn.iocoder.yudao.module.iot.protocol.message.impl.IotMqttMessageParser;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -33,8 +33,9 @@ public class DefaultIotProtocolConverter implements IotProtocolConverter {
      * 构造函数，初始化默认支持的协议
      */
     public DefaultIotProtocolConverter() {
-        // 注册 Alink 协议解析器
-        registerParser(IotProtocolTypeEnum.ALINK.getCode(), new IotAlinkMessageParser());
+        // 注册 MQTT 协议解析器作为默认实现
+        IotMqttMessageParser mqttParser = new IotMqttMessageParser();
+        registerParser(IotProtocolTypeEnum.MQTT.getCode(), mqttParser);
     }
 
     /**
@@ -59,7 +60,7 @@ public class DefaultIotProtocolConverter implements IotProtocolConverter {
     }
 
     @Override
-    public IotAlinkMessage convertToStandardMessage(String topic, byte[] payload, String protocol) {
+    public IotMqttMessage convertToStandardMessage(String topic, byte[] payload, String protocol) {
         IotMessageParser parser = parsers.get(protocol);
         if (parser == null) {
             log.warn(IotLogConstants.Converter.UNSUPPORTED_PROTOCOL, protocol);
@@ -108,13 +109,13 @@ public class DefaultIotProtocolConverter implements IotProtocolConverter {
      * @param payload 消息负载
      * @return 解析后的标准消息，如果无法解析返回 null
      */
-    public IotAlinkMessage autoConvert(String topic, byte[] payload) {
+    public IotMqttMessage autoConvert(String topic, byte[] payload) {
         // 遍历所有解析器，找到能处理该主题的解析器
         for (Map.Entry<String, IotMessageParser> entry : parsers.entrySet()) {
             IotMessageParser parser = entry.getValue();
             if (parser.canHandle(topic)) {
                 try {
-                    IotAlinkMessage message = parser.parse(topic, payload);
+                    IotMqttMessage message = parser.parse(topic, payload);
                     if (message != null) {
                         log.debug(IotLogConstants.Converter.AUTO_SELECT_PROTOCOL, entry.getKey(), topic);
                         return message;
