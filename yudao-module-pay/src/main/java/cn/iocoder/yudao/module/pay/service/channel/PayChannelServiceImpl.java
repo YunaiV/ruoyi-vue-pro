@@ -82,8 +82,8 @@ public class PayChannelServiceImpl implements PayChannelService {
      */
     private PayClientConfig parseConfig(String code, String configStr) {
         // 解析配置
-        Class<? extends PayClientConfig> payClass = PayChannelEnum.isAlipay(configStr) ? AlipayPayClientConfig.class
-                : PayChannelEnum.isWeixin(configStr) ? WxPayClientConfig.class
+        Class<? extends PayClientConfig> payClass = PayChannelEnum.isAlipay(code) ? AlipayPayClientConfig.class
+                : PayChannelEnum.isWeixin(code) ? WxPayClientConfig.class
                 : NonePayClientConfig.class;
         if (ObjectUtil.isNull(payClass)) {
             throw exception(CHANNEL_NOT_FOUND);
