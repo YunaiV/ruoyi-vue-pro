@@ -248,7 +248,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
             updateSkus.forEach(sku -> productSkuMapper.updateById(sku));
         }
         if (CollUtil.isNotEmpty(existsSkuMap)) {
-            productSkuMapper.deleteBatchIds(existsSkuMap.values());
+            productSkuMapper.deleteByIds(existsSkuMap.values());
         }
     }
 

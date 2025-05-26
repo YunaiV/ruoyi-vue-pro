@@ -240,7 +240,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
             saleReturnItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            saleReturnItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpSaleReturnItemDO::getId));
+            saleReturnItemMapper.deleteByIds(convertList(diffList.get(2), ErpSaleReturnItemDO::getId));
         }
     }
 

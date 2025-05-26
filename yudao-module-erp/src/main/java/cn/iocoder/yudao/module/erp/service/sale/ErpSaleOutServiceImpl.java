@@ -240,7 +240,7 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
             saleOutItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            saleOutItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpSaleOutItemDO::getId));
+            saleOutItemMapper.deleteByIds(convertList(diffList.get(2), ErpSaleOutItemDO::getId));
         }
     }
 

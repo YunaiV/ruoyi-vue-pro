@@ -98,7 +98,7 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
             expressTemplateFreeMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            expressTemplateFreeMapper.deleteBatchIds(convertList(diffList.get(2), DeliveryExpressTemplateFreeDO::getId));
+            expressTemplateFreeMapper.deleteByIds(convertList(diffList.get(2), DeliveryExpressTemplateFreeDO::getId));
         }
     }
 
@@ -122,7 +122,7 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
             expressTemplateChargeMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            expressTemplateChargeMapper.deleteBatchIds(convertList(diffList.get(2), DeliveryExpressTemplateChargeDO::getId));
+            expressTemplateChargeMapper.deleteByIds(convertList(diffList.get(2), DeliveryExpressTemplateChargeDO::getId));
         }
     }
 

@@ -169,7 +169,7 @@ public class ErpStockCheckServiceImpl implements ErpStockCheckService {
             stockCheckItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            stockCheckItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpStockCheckItemDO::getId));
+            stockCheckItemMapper.deleteByIds(convertList(diffList.get(2), ErpStockCheckItemDO::getId));
         }
     }
 

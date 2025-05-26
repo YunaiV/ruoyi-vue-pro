@@ -183,7 +183,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
             purchaseOrderItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            purchaseOrderItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpPurchaseOrderItemDO::getId));
+            purchaseOrderItemMapper.deleteByIds(convertList(diffList.get(2), ErpPurchaseOrderItemDO::getId));
         }
     }
 

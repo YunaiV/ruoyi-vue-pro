@@ -175,7 +175,7 @@ public class CrmContractServiceImpl implements CrmContractService {
             contractProductMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            contractProductMapper.deleteBatchIds(convertSet(diffList.get(2), CrmContractProductDO::getId));
+            contractProductMapper.deleteByIds(convertSet(diffList.get(2), CrmContractProductDO::getId));
         }
     }
 

@@ -180,7 +180,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
             businessProductMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            businessProductMapper.deleteBatchIds(convertSet(diffList.get(2), CrmBusinessProductDO::getId));
+            businessProductMapper.deleteByIds(convertSet(diffList.get(2), CrmBusinessProductDO::getId));
         }
     }
 

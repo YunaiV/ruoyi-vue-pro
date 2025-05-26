@@ -165,7 +165,7 @@ public class ErpStockInServiceImpl implements ErpStockInService {
             stockInItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            stockInItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpStockInItemDO::getId));
+            stockInItemMapper.deleteByIds(convertList(diffList.get(2), ErpStockInItemDO::getId));
         }
     }
 

@@ -166,7 +166,7 @@ public class ErpStockMoveServiceImpl implements ErpStockMoveService {
             stockMoveItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            stockMoveItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpStockMoveItemDO::getId));
+            stockMoveItemMapper.deleteByIds(convertList(diffList.get(2), ErpStockMoveItemDO::getId));
         }
     }
 

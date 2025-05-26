@@ -162,7 +162,7 @@ public class AiChatConversationServiceImpl implements AiChatConversationService 
         if (CollUtil.isEmpty(list)) {
             return;
         }
-        chatConversationMapper.deleteBatchIds(convertList(list, AiChatConversationDO::getId));
+        chatConversationMapper.deleteByIds(convertList(list, AiChatConversationDO::getId));
     }
 
     @Override

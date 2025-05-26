@@ -195,7 +195,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
             saleOrderItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            saleOrderItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpSaleOrderItemDO::getId));
+            saleOrderItemMapper.deleteByIds(convertList(diffList.get(2), ErpSaleOrderItemDO::getId));
         }
     }
 

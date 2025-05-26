@@ -204,7 +204,7 @@ public class CodegenServiceImpl implements CodegenService {
         codegenColumnMapper.insertBatch(columns);
         // 4.2 删除不存在的字段
         if (CollUtil.isNotEmpty(deleteColumnIds)) {
-            codegenColumnMapper.deleteBatchIds(deleteColumnIds);
+            codegenColumnMapper.deleteByIds(deleteColumnIds);
         }
     }
 

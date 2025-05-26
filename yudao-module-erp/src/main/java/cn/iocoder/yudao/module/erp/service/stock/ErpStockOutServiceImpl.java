@@ -165,7 +165,7 @@ public class ErpStockOutServiceImpl implements ErpStockOutService {
             stockOutItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            stockOutItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpStockOutItemDO::getId));
+            stockOutItemMapper.deleteByIds(convertList(diffList.get(2), ErpStockOutItemDO::getId));
         }
     }
 

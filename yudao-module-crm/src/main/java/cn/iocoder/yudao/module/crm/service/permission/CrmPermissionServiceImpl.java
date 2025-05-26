@@ -255,7 +255,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         }
 
         // 删除数据权限
-        permissionMapper.deleteBatchIds(convertSet(permissions, CrmPermissionDO::getId));
+        permissionMapper.deleteByIds(convertSet(permissions, CrmPermissionDO::getId));
     }
 
     @Override
@@ -286,7 +286,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         }
 
         // 删除数据权限
-        permissionMapper.deleteBatchIds(ids);
+        permissionMapper.deleteByIds(ids);
     }
 
     @Override

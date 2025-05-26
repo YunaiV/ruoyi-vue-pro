@@ -100,7 +100,7 @@ public class CrmBusinessStatusServiceImpl implements CrmBusinessStatusService {
             businessStatusMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            businessStatusMapper.deleteBatchIds(convertSet(diffList.get(2), CrmBusinessStatusDO::getId));
+            businessStatusMapper.deleteByIds(convertSet(diffList.get(2), CrmBusinessStatusDO::getId));
         }
     }
 

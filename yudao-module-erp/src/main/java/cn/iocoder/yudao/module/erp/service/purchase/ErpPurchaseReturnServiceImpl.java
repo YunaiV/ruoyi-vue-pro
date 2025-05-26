@@ -228,7 +228,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
             purchaseReturnItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            purchaseReturnItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpPurchaseReturnItemDO::getId));
+            purchaseReturnItemMapper.deleteByIds(convertList(diffList.get(2), ErpPurchaseReturnItemDO::getId));
         }
     }
 
