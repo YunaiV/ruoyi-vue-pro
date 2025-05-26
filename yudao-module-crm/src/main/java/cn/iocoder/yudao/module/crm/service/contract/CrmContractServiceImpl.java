@@ -341,7 +341,7 @@ public class CrmContractServiceImpl implements CrmContractService {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }
-        return contractMapper.selectBatchIds(ids);
+        return contractMapper.selectByIds(ids);
     }
 
     @Override

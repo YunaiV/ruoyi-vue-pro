@@ -81,7 +81,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }
-        return productSkuMapper.selectBatchIds(ids);
+        return productSkuMapper.selectByIds(ids);
     }
 
     @Override
@@ -268,7 +268,7 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         });
 
         // 更新 SPU 库存
-        List<ProductSkuDO> skus = productSkuMapper.selectBatchIds(
+        List<ProductSkuDO> skus = productSkuMapper.selectByIds(
                 convertSet(updateStockReqDTO.getItems(), ProductSkuUpdateStockReqDTO.Item::getId));
         Map<Long, Integer> spuStockIncrCounts = ProductSkuConvert.INSTANCE.convertSpuStockMap(
                 updateStockReqDTO.getItems(), skus);

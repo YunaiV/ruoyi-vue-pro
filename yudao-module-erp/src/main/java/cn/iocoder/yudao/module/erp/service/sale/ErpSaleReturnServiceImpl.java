@@ -248,7 +248,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteSaleReturn(List<Long> ids) {
         // 1. 校验不处于已审批
-        List<ErpSaleReturnDO> saleReturns = saleReturnMapper.selectBatchIds(ids);
+        List<ErpSaleReturnDO> saleReturns = saleReturnMapper.selectByIds(ids);
         if (CollUtil.isEmpty(saleReturns)) {
             return;
         }

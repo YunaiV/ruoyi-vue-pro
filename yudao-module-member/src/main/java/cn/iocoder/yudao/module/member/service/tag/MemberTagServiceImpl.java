@@ -109,7 +109,7 @@ public class MemberTagServiceImpl implements MemberTagService {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }
-        return memberTagMapper.selectBatchIds(ids);
+        return memberTagMapper.selectByIds(ids);
     }
 
     @Override

@@ -78,7 +78,7 @@ public class IotProductCategoryServiceImpl implements IotProductCategoryService 
         if (CollUtil.isEmpty(ids)) {
             return CollUtil.newArrayList();
         }
-        return iotProductCategoryMapper.selectBatchIds(ids);
+        return iotProductCategoryMapper.selectByIds(ids);
     }
 
     @Override

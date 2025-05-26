@@ -214,7 +214,7 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteFinancePayment(List<Long> ids) {
         // 1. 校验不处于已审批
-        List<ErpFinancePaymentDO> payments = financePaymentMapper.selectBatchIds(ids);
+        List<ErpFinancePaymentDO> payments = financePaymentMapper.selectByIds(ids);
         if (CollUtil.isEmpty(payments)) {
             return;
         }

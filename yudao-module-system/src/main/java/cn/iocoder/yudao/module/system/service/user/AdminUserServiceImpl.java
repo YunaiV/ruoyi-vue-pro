@@ -291,7 +291,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         if (CollUtil.isEmpty(userIds)) {
             return Collections.emptyList();
         }
-        return userMapper.selectBatchIds(userIds);
+        return userMapper.selectByIds(userIds);
     }
 
     @Override
@@ -299,7 +299,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return userMapper.selectBatchIds(ids);
+        return userMapper.selectByIds(ids);
     }
 
     @Override
@@ -308,7 +308,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             return;
         }
         // 获得岗位信息
-        List<AdminUserDO> users = userMapper.selectBatchIds(ids);
+        List<AdminUserDO> users = userMapper.selectByIds(ids);
         Map<Long, AdminUserDO> userMap = CollectionUtils.convertMap(users, AdminUserDO::getId);
         // 校验
         ids.forEach(id -> {

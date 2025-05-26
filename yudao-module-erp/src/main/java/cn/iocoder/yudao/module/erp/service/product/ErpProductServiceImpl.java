@@ -72,7 +72,7 @@ public class ErpProductServiceImpl implements ErpProductService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        List<ErpProductDO> list = productMapper.selectBatchIds(ids);
+        List<ErpProductDO> list = productMapper.selectByIds(ids);
         Map<Long, ErpProductDO> productMap = convertMap(list, ErpProductDO::getId);
         for (Long id : ids) {
             ErpProductDO product = productMap.get(id);
@@ -108,7 +108,7 @@ public class ErpProductServiceImpl implements ErpProductService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        List<ErpProductDO> list = productMapper.selectBatchIds(ids);
+        List<ErpProductDO> list = productMapper.selectByIds(ids);
         return buildProductVOList(list);
     }
 

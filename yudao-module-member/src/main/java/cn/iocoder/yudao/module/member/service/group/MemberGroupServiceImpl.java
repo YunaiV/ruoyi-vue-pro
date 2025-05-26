@@ -87,7 +87,7 @@ public class MemberGroupServiceImpl implements MemberGroupService {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }
-        return memberGroupMapper.selectBatchIds(ids);
+        return memberGroupMapper.selectByIds(ids);
     }
 
     @Override

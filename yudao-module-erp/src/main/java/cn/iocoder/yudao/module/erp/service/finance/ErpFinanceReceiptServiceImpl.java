@@ -214,7 +214,7 @@ public class ErpFinanceReceiptServiceImpl implements ErpFinanceReceiptService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteFinanceReceipt(List<Long> ids) {
         // 1. 校验不处于已审批
-        List<ErpFinanceReceiptDO> receipts = financeReceiptMapper.selectBatchIds(ids);
+        List<ErpFinanceReceiptDO> receipts = financeReceiptMapper.selectByIds(ids);
         if (CollUtil.isEmpty(receipts)) {
             return;
         }

@@ -200,7 +200,7 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return knowledgeDocumentMapper.selectBatchIds(ids);
+        return knowledgeDocumentMapper.selectByIds(ids);
     }
 
     @Override

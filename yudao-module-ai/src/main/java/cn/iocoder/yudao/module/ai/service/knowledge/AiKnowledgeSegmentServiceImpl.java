@@ -351,7 +351,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return segmentMapper.selectBatchIds(ids);
+        return segmentMapper.selectByIds(ids);
     }
 
 }

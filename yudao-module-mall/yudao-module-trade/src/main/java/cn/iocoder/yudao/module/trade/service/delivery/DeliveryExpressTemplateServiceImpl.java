@@ -176,7 +176,7 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
 
     @Override
     public List<DeliveryExpressTemplateDO> getDeliveryExpressTemplateList(Collection<Long> ids) {
-        return expressTemplateMapper.selectBatchIds(ids);
+        return expressTemplateMapper.selectByIds(ids);
     }
 
     @Override
@@ -205,7 +205,7 @@ public class DeliveryExpressTemplateServiceImpl implements DeliveryExpressTempla
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyMap();
         }
-        List<DeliveryExpressTemplateDO> templateList = expressTemplateMapper.selectBatchIds(ids);
+        List<DeliveryExpressTemplateDO> templateList = expressTemplateMapper.selectByIds(ids);
         // 查询 templateCharge 数组
         List<DeliveryExpressTemplateChargeDO> chargeList = expressTemplateChargeMapper.selectByTemplateIds(ids);
         // 查询 templateFree 数组

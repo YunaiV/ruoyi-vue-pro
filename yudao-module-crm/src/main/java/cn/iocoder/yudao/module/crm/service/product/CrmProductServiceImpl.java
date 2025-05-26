@@ -158,7 +158,7 @@ public class CrmProductServiceImpl implements CrmProductService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        List<CrmProductDO> list = productMapper.selectBatchIds(ids);
+        List<CrmProductDO> list = productMapper.selectByIds(ids);
         Map<Long, CrmProductDO> productMap = convertMap(list, CrmProductDO::getId);
         for (Long id : ids) {
             CrmProductDO product = productMap.get(id);
@@ -177,7 +177,7 @@ public class CrmProductServiceImpl implements CrmProductService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return productMapper.selectBatchIds(ids);
+        return productMapper.selectByIds(ids);
     }
 
 }

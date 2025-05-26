@@ -137,7 +137,7 @@ public class MemberUserServiceImpl implements MemberUserService {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }
-        return memberUserMapper.selectBatchIds(ids);
+        return memberUserMapper.selectByIds(ids);
     }
 
     @Override

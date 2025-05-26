@@ -200,7 +200,7 @@ public class RoleServiceImpl implements RoleService {
         if (CollectionUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return roleMapper.selectBatchIds(ids);
+        return roleMapper.selectByIds(ids);
     }
 
     @Override
@@ -236,7 +236,7 @@ public class RoleServiceImpl implements RoleService {
             return;
         }
         // 获得角色信息
-        List<RoleDO> roles = roleMapper.selectBatchIds(ids);
+        List<RoleDO> roles = roleMapper.selectByIds(ids);
         Map<Long, RoleDO> roleMap = convertMap(roles, RoleDO::getId);
         // 校验
         ids.forEach(id -> {

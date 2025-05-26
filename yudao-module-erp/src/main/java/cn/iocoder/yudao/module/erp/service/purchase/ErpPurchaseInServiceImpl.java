@@ -240,7 +240,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     @Transactional(rollbackFor = Exception.class)
     public void deletePurchaseIn(List<Long> ids) {
         // 1. 校验不处于已审批
-        List<ErpPurchaseInDO> purchaseIns = purchaseInMapper.selectBatchIds(ids);
+        List<ErpPurchaseInDO> purchaseIns = purchaseInMapper.selectByIds(ids);
         if (CollUtil.isEmpty(purchaseIns)) {
             return;
         }

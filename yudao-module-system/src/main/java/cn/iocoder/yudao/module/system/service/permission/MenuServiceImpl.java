@@ -187,7 +187,7 @@ public class MenuServiceImpl implements MenuService {
         if (CollUtil.isEmpty(ids)) {
             return Lists.newArrayList();
         }
-        return menuMapper.selectBatchIds(ids);
+        return menuMapper.selectByIds(ids);
     }
 
     /**

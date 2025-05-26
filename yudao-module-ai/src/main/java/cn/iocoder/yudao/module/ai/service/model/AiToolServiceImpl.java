@@ -84,7 +84,7 @@ public class AiToolServiceImpl implements AiToolService {
 
     @Override
     public List<AiToolDO> getToolList(Collection<Long> ids) {
-        return toolMapper.selectBatchIds(ids);
+        return toolMapper.selectByIds(ids);
     }
 
     @Override

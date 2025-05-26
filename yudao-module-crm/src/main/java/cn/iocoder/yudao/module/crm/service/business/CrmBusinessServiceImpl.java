@@ -328,7 +328,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }
-        return businessMapper.selectBatchIds(ids);
+        return businessMapper.selectByIds(ids);
     }
 
     @Override

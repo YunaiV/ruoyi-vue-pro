@@ -101,7 +101,7 @@ public class ErpAccountServiceImpl implements ErpAccountService {
 
     @Override
     public List<ErpAccountDO> getAccountList(Collection<Long> ids) {
-        return accountMapper.selectBatchIds(ids);
+        return accountMapper.selectByIds(ids);
     }
 
     @Override

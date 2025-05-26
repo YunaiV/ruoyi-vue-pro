@@ -262,7 +262,7 @@ public class CrmContactServiceImpl implements CrmContactService {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }
-        return contactMapper.selectBatchIds(ids);
+        return contactMapper.selectByIds(ids);
     }
 
     @Override

@@ -174,7 +174,7 @@ public class ErpStockMoveServiceImpl implements ErpStockMoveService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteStockMove(List<Long> ids) {
         // 1. 校验不处于已审批
-        List<ErpStockMoveDO> stockMoves = stockMoveMapper.selectBatchIds(ids);
+        List<ErpStockMoveDO> stockMoves = stockMoveMapper.selectByIds(ids);
         if (CollUtil.isEmpty(stockMoves)) {
             return;
         }

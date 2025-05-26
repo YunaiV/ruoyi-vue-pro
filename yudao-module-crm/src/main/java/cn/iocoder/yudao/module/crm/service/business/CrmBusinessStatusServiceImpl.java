@@ -160,7 +160,7 @@ public class CrmBusinessStatusServiceImpl implements CrmBusinessStatusService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return businessStatusTypeMapper.selectBatchIds(ids);
+        return businessStatusTypeMapper.selectByIds(ids);
     }
 
     @Override
@@ -175,7 +175,7 @@ public class CrmBusinessStatusServiceImpl implements CrmBusinessStatusService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return businessStatusMapper.selectBatchIds(ids);
+        return businessStatusMapper.selectByIds(ids);
     }
 
     @Override

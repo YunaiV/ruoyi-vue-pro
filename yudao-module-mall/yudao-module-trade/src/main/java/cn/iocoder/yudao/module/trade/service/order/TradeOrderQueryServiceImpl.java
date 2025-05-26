@@ -84,7 +84,7 @@ public class TradeOrderQueryServiceImpl implements TradeOrderQueryService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return tradeOrderMapper.selectBatchIds(ids);
+        return tradeOrderMapper.selectByIds(ids);
     }
 
     @Override

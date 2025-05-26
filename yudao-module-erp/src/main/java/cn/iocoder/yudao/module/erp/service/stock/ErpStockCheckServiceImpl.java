@@ -177,7 +177,7 @@ public class ErpStockCheckServiceImpl implements ErpStockCheckService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteStockCheck(List<Long> ids) {
         // 1. 校验不处于已审批
-        List<ErpStockCheckDO> stockChecks = stockCheckMapper.selectBatchIds(ids);
+        List<ErpStockCheckDO> stockChecks = stockCheckMapper.selectByIds(ids);
         if (CollUtil.isEmpty(stockChecks)) {
             return;
         }

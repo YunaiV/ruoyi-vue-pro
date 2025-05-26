@@ -80,7 +80,7 @@ public class BpmFormServiceImpl implements BpmFormService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return formMapper.selectBatchIds(ids);
+        return formMapper.selectByIds(ids);
     }
 
     @Override

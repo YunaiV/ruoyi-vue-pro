@@ -392,7 +392,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     @Transactional(rollbackFor = Exception.class)
     public void receiveCustomer(List<Long> ids, Long ownerUserId, Boolean isReceive) {
         // 1.1 校验存在
-        List<CrmCustomerDO> customers = customerMapper.selectBatchIds(ids);
+        List<CrmCustomerDO> customers = customerMapper.selectByIds(ids);
         if (customers.size() != ids.size()) {
             throw exception(CUSTOMER_NOT_EXISTS);
         }
@@ -496,7 +496,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return customerMapper.selectBatchIds(ids);
+        return customerMapper.selectByIds(ids);
     }
 
     @Override
