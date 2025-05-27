@@ -1,11 +1,10 @@
 package cn.iocoder.yudao.module.infra.service.file;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.infra.framework.file.core.client.FileClient;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigPageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileConfigDO;
-
+import cn.iocoder.yudao.module.infra.framework.file.core.client.FileClient;
 import javax.validation.Valid;
 
 /**

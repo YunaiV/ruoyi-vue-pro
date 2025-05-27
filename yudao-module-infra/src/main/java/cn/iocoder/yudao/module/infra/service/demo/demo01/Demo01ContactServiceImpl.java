@@ -1,19 +1,20 @@
 package cn.iocoder.yudao.module.infra.service.demo.demo01;
 
-import cn.iocoder.yudao.module.infra.controller.admin.demo.demo01.vo.Demo01ContactPageReqVO;
-import cn.iocoder.yudao.module.infra.controller.admin.demo.demo01.vo.Demo01ContactSaveReqVO;
-import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-
-import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo01.Demo01ContactDO;
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo01.vo.Demo01ContactPageReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo01.vo.Demo01ContactSaveReqVO;
+import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo01.Demo01ContactDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.demo.demo01.Demo01ContactMapper;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.DEMO01_CONTACT_NOT_EXISTS;
 
 /**
  * 示例联系人 Service 实现类
@@ -51,6 +52,21 @@ public class Demo01ContactServiceImpl implements Demo01ContactService {
         validateDemo01ContactExists(id);
         // 删除
         demo01ContactMapper.deleteById(id);
+    }
+
+    @Override
+    public void deleteDemo0iContactListByIds(List<Long> ids) {
+        // 校验存在
+        validateDemo01ContactExists(ids);
+        // 删除
+        demo01ContactMapper.deleteByIds(ids);
+    }
+
+    private void validateDemo01ContactExists(List<Long> ids) {
+        List<Demo01ContactDO> list = demo01ContactMapper.selectByIds(ids);
+        if (CollUtil.isEmpty(list) || list.size() != ids.size()) {
+            throw exception(DEMO01_CONTACT_NOT_EXISTS);
+        }
     }
 
     private void validateDemo01ContactExists(Long id) {

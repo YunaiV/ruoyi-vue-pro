@@ -38,6 +38,7 @@ public class AiUtils {
     public static ChatOptions buildChatOptions(AiPlatformEnum platform, String model, Double temperature, Integer maxTokens,
                                                Set<String> toolNames, Map<String, Object> toolContext) {
         toolNames = ObjUtil.defaultIfNull(toolNames, Collections.emptySet());
+        toolContext = ObjUtil.defaultIfNull(toolContext, Collections.emptyMap());
         // noinspection EnhancedSwitchMigration
         switch (platform) {
             case TONG_YI:

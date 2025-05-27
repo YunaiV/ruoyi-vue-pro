@@ -4,27 +4,26 @@ import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
-import cn.iocoder.yudao.module.infra.framework.file.core.client.FileClient;
-import cn.iocoder.yudao.module.infra.framework.file.core.client.FileClientConfig;
-import cn.iocoder.yudao.module.infra.framework.file.core.client.FileClientFactory;
-import cn.iocoder.yudao.module.infra.framework.file.core.enums.FileStorageEnum;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigPageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigSaveReqVO;
 import cn.iocoder.yudao.module.infra.convert.file.FileConfigConvert;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileConfigDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.file.FileConfigMapper;
+import cn.iocoder.yudao.module.infra.framework.file.core.client.FileClient;
+import cn.iocoder.yudao.module.infra.framework.file.core.client.FileClientConfig;
+import cn.iocoder.yudao.module.infra.framework.file.core.client.FileClientFactory;
+import cn.iocoder.yudao.module.infra.framework.file.core.enums.FileStorageEnum;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import javax.annotation.Resource;
+import javax.validation.Validator;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
-import javax.validation.Validator;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
@@ -138,7 +137,7 @@ public class FileConfigServiceImpl implements FileConfigService {
     /**
      * 清空指定文件配置
      *
-     * @param id 配置编号
+     * @param id     配置编号
      * @param master 是否主配置
      */
     private void clearCache(Long id, Boolean master) {

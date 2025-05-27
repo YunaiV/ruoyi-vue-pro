@@ -1,16 +1,18 @@
-package cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.vo;
+package cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.normal.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import javax.validation.constraints.*;
-import java.time.LocalDateTime;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03CourseDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03GradeDO;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "管理后台 - 学生新增/修改 Request VO")
 @Data
-public class Demo03StudentSaveReqVO {
+public class Demo03StudentNormalSaveReqVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "8525")
     private Long id;
@@ -31,9 +33,10 @@ public class Demo03StudentSaveReqVO {
     @NotEmpty(message = "简介不能为空")
     private String description;
 
-
+    @Schema(description = "学生课程列表")
     private List<Demo03CourseDO> demo03Courses;
 
+    @Schema(description = "学生班级")
     private Demo03GradeDO demo03Grade;
 
 }

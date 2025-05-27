@@ -60,6 +60,15 @@ public class Demo01ContactController {
         return success(true);
     }
 
+    @DeleteMapping("/delete-list")
+    @Parameter(name = "ids", description = "编号", required = true)
+    @Operation(summary = "批量删除示例联系人")
+    @PreAuthorize("@ss.hasPermission('infra:demo01-contact:delete')")
+    public CommonResult<Boolean> deleteDemo0iContactList(@RequestParam("ids") List<Long> ids) {
+        demo01ContactService.deleteDemo0iContactListByIds(ids);
+        return success(true);
+    }
+
     @GetMapping("/get")
     @Operation(summary = "获得示例联系人")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
@@ -82,12 +91,12 @@ public class Demo01ContactController {
     @PreAuthorize("@ss.hasPermission('infra:demo01-contact:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportDemo01ContactExcel(@Valid Demo01ContactPageReqVO pageReqVO,
-              HttpServletResponse response) throws IOException {
+                                         HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<Demo01ContactDO> list = demo01ContactService.getDemo01ContactPage(pageReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "示例联系人.xls", "数据", Demo01ContactRespVO.class,
-                        BeanUtils.toBean(list, Demo01ContactRespVO.class));
+                BeanUtils.toBean(list, Demo01ContactRespVO.class));
     }
 
 }

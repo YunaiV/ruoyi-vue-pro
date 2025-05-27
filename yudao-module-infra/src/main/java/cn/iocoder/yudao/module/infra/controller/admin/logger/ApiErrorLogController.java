@@ -63,7 +63,7 @@ public class ApiErrorLogController {
     @PreAuthorize("@ss.hasPermission('infra:api-error-log:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportApiErrorLogExcel(@Valid ApiErrorLogPageReqVO exportReqVO,
-              HttpServletResponse response) throws IOException {
+                                       HttpServletResponse response) throws IOException {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<ApiErrorLogDO> list = apiErrorLogService.getApiErrorLogPage(exportReqVO).getList();
         // 导出 Excel

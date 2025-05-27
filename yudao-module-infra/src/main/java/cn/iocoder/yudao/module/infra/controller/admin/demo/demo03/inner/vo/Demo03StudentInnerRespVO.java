@@ -1,17 +1,18 @@
-package cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.vo;
+package cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.inner.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-
-import java.time.LocalDateTime;
-import com.alibaba.excel.annotation.*;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - 学生 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class Demo03StudentRespVO {
+public class Demo03StudentInnerRespVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "8525")
     @ExcelProperty("编号")

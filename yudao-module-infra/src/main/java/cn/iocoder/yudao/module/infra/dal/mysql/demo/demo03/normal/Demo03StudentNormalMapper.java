@@ -1,11 +1,11 @@
-package cn.iocoder.yudao.module.infra.dal.mysql.demo.demo03;
+package cn.iocoder.yudao.module.infra.dal.mysql.demo.demo03.normal;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.normal.vo.Demo03StudentNormalPageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.demo.demo03.Demo03StudentDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.vo.*;
 
 /**
  * 学生 Mapper
@@ -13,9 +13,9 @@ import cn.iocoder.yudao.module.infra.controller.admin.demo.demo03.vo.*;
  * @author 芋道源码
  */
 @Mapper
-public interface Demo03StudentMapper extends BaseMapperX<Demo03StudentDO> {
+public interface Demo03StudentNormalMapper extends BaseMapperX<Demo03StudentDO> {
 
-    default PageResult<Demo03StudentDO> selectPage(Demo03StudentPageReqVO reqVO) {
+    default PageResult<Demo03StudentDO> selectPage(Demo03StudentNormalPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<Demo03StudentDO>()
                 .likeIfPresent(Demo03StudentDO::getName, reqVO.getName())
                 .eqIfPresent(Demo03StudentDO::getSex, reqVO.getSex())

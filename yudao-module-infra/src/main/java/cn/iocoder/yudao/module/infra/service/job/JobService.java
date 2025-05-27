@@ -4,9 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobPageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.job.vo.job.JobSaveReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.job.JobDO;
-import org.quartz.SchedulerException;
-
 import javax.validation.Valid;
+import org.quartz.SchedulerException;
 
 /**
  * 定时任务 Service 接口
@@ -33,7 +32,7 @@ public interface JobService {
     /**
      * 更新定时任务的状态
      *
-     * @param id 任务编号
+     * @param id     任务编号
      * @param status 状态
      */
     void updateJobStatus(Long id, Integer status) throws SchedulerException;

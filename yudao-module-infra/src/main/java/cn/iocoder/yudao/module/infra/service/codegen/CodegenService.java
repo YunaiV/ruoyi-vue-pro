@@ -22,7 +22,7 @@ public interface CodegenService {
      * 基于数据库的表结构，创建代码生成器的表定义
      *
      * @param author 作者
-     * @param reqVO 表信息
+     * @param reqVO  表信息
      * @return 创建的表定义的编号数组
      */
     List<Long> createCodegenList(String author, CodegenCreateListReqVO reqVO);
@@ -92,8 +92,8 @@ public interface CodegenService {
      * 获得数据库自带的表定义列表
      *
      * @param dataSourceConfigId 数据源的配置编号
-     * @param name 表名称
-     * @param comment 表描述
+     * @param name               表名称
+     * @param comment            表描述
      * @return 表定义列表
      */
     List<DatabaseTableRespVO> getDatabaseTableList(Long dataSourceConfigId, String name, String comment);

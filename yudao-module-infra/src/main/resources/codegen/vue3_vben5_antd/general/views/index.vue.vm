@@ -8,7 +8,7 @@ import { Button, message,Tabs,Pagination,Form,RangePicker,DatePicker,Select,Inpu
 import { DictTag } from '#/components/dict-tag';
 import { DICT_TYPE, getDictOptions, getRangePickerDefaultProps } from '#/utils';
 import ${simpleClassName}Form from './modules/form.vue';
-import { Download, Plus, RefreshCw, Search } from '@vben/icons';
+import { Download, Plus, RefreshCw, Search, Trash2 } from '@vben/icons';
 import { ContentWrap } from '#/components/content-wrap';
 import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
 import { TableToolbar } from '#/components/table-toolbar';
@@ -29,7 +29,8 @@ import { $t } from '#/locales';
 import { handleTree,isEmpty } from '@vben/utils'
 import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 #else## 标准表接口
-import { get${simpleClassName}Page, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { isEmpty } from '@vben/utils';
+import { get${simpleClassName}Page, delete${simpleClassName},#if ($deleteBatchEnable) delete${simpleClassName}ListByIds,#end export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 #end
 import { downloadFileFromBlobPart } from '@vben/utils';
 
@@ -152,10 +153,37 @@ async function onDelete(row: ${simpleClassName}Api.${simpleClassName}) {
       key: 'action_process_msg',
     });
     await getList();
-  } catch {
+  } finally {
     hideLoading();
   }
 }
+
+#if ($table.templateType != 2 && $deleteBatchEnable)
+/** 批量删除${table.classComment} */
+async function onDeleteBatch() {
+  const hideLoading = message.loading({
+    content: $t('ui.actionMessage.deleting'),
+    duration: 0,
+    key: 'action_process_msg',
+  });
+  try {
+    await delete${simpleClassName}ListByIds(deleteIds.value);
+    message.success( $t('ui.actionMessage.deleteSuccess') );
+    await getList();
+  } finally {
+    hideLoading();
+  }
+}
+
+const deleteIds = ref<number[]>([]) // 待删除${table.classComment} ID
+function setDeleteIds({
+  records,
+}: {
+  records: ${simpleClassName}Api.${simpleClassName}[];
+}) {
+  deleteIds.value = records.map((item) => item.id);
+}
+#end
 
 /** 导出表格 */
 async function onExport() {
@@ -302,6 +330,19 @@ onMounted(() => {
           >
             {{ $t('ui.actionTitle.export') }}
           </Button>
+        #if ($table.templateType != 2 && $deleteBatchEnable)
+          <Button
+              :icon="h(Trash2)"
+              type="primary"
+              danger
+              class="ml-2"
+              :disabled="isEmpty(deleteIds)"
+              @click="onDeleteBatch"
+              v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:delete']"
+          >
+            批量删除
+          </Button>
+        #end
         </TableToolbar>
       </template>
       <vxe-table
@@ -326,7 +367,14 @@ onMounted(() => {
 #end
           show-overflow
           :loading="loading"
+#if ($table.templateType != 2 && $deleteBatchEnable)
+          @checkboxAll="setDeleteIds"
+          @checkboxChange="setDeleteIds"
+#end
       >
+#if ($table.templateType != 2 && $deleteBatchEnable)
+        <vxe-column type="checkbox" width="40"></vxe-column>
+#end
           ## 特殊：主子表专属逻辑
           #if ( $table.templateType == 12 && $subTables && $subTables.size() > 0 )
             <!-- 子表的列表 -->
@@ -421,7 +469,6 @@ onMounted(() => {
       </div>
 #end
     </ContentWrap>
-
 #if ($table.templateType == 11) ## erp情况
   <ContentWrap>
     <!-- 子表的表单 -->
