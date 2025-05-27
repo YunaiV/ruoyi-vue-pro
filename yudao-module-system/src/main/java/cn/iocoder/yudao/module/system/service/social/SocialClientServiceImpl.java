@@ -262,9 +262,9 @@ public class SocialClientServiceImpl implements SocialClientService {
     public WxMaPhoneNumberInfo getWxMaPhoneNumberInfo(Integer userType, String phoneCode) {
         WxMaService service = getWxMaService(userType);
         try {
-            return service.getUserService().getPhoneNoInfo(phoneCode);
+            return service.getUserService().getPhoneNumber(phoneCode);
         } catch (WxErrorException e) {
-            log.error("[getPhoneNoInfo][userType({}) phoneCode({}) 获得手机号失败]", userType, phoneCode, e);
+            log.error("[getPhoneNumber][userType({}) phoneCode({}) 获得手机号失败]", userType, phoneCode, e);
             throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_PHONE_CODE_ERROR);
         }
     }
@@ -474,7 +474,6 @@ public class SocialClientServiceImpl implements SocialClientService {
 
     /**
      * 校验社交应用是否重复，需要保证 userType + socialType 唯一
-     *
      * 原因是，不同端（userType）选择某个社交登录（socialType）时，需要通过 {@link #buildAuthRequest(Integer, Integer)} 构建对应的请求
      *
      * @param id         编号
