@@ -7,19 +7,61 @@
         <groupId>cn.iocoder.boot</groupId>
         <version>${revision}</version>
     </parent>
-    <modules>
-        <module>yudao-module-iot-common</module>
-        <module>yudao-module-iot-message-bus</module>
-    </modules>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>yudao-module-iot-core</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
     <description>
-        iot 模块下，提供 iot-biz 和 iot-gateway 模块的核心功能。
-        例如说：消息总线、消息协议（编解码）等。
+        iot 模块下，提供 iot-biz 和 iot-gateway 模块的核心功能。例如说：
+        1. 消息总线：跨 iot-biz 和 iot-gateway 的设备消息。可选择使用 spring event、redis stream、rocketmq、kafka、rabbitmq 等。
+        2. 查询设备信息的通用 API
     </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-common</artifactId>
+        </dependency>
+
+        <!-- Spring 核心 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- 消息中间件相关（可选依赖） -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-redis</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- 测试依赖 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 </project>
