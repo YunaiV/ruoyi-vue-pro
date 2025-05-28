@@ -15,7 +15,7 @@
     <name>${project.artifactId}</name>
     <description>
         物联网协议模块，提供 topic 解析、协议转换等功能
-        作为 yudao-module-iot-biz 和 yudao-module-iot-gateway-server 的共享包
+        作为 iot-biz 和 iot-gateway 的共享包
     </description>
 
     <dependencies>
@@ -68,4 +68,4 @@
         </dependency>
     </dependencies>
 
-</project> 
+</project>

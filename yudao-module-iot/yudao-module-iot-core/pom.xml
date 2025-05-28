@@ -8,6 +8,7 @@
         <version>${revision}</version>
     </parent>
     <modules>
+        <module>yudao-module-iot-common</module>
         <module>yudao-module-iot-message-bus</module>
     </modules>
     <modelVersion>4.0.0</modelVersion>
@@ -17,7 +18,7 @@
 
     <name>${project.artifactId}</name>
     <description>
-        iot 模块下，提供 biz 和 gateway-server 模块的核心功能。
+        iot 模块下，提供 iot-biz 和 iot-gateway 模块的核心功能。
         例如说：消息总线、消息协议（编解码）等。
     </description>
 
