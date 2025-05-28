@@ -99,6 +99,18 @@ public class JsonUtils {
         }
     }
 
+    public static <T> T parseObject(byte[] text, Type type) {
+        if (ArrayUtil.isEmpty(text)) {
+            return null;
+        }
+        try {
+            return objectMapper.readValue(text, objectMapper.getTypeFactory().constructType(type));
+        } catch (IOException e) {
+            log.error("json parse err,json:{}", text, e);
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * 将字符串解析成指定类型的对象
      * 使用 {@link #parseObject(String, Class)} 时，在@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS) 的场景下，

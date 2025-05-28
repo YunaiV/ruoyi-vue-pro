@@ -20,9 +20,8 @@ public interface IotMessageBus {
     /**
      * 注册消息订阅者
      *
-     * @param topic 主题
      * @param subscriber 订阅者
      */
-    void register(String topic, IotMessageBusSubscriber<?> subscriber);
+    void register(IotMessageBusSubscriber<?> subscriber);
 
 }

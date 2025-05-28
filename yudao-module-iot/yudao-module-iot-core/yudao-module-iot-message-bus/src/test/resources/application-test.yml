@@ -1,4 +1,0 @@
-yudao:
-  iot:
-    message-bus:
-      type: local

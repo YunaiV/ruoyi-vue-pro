@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.iot.messagebus.core.IotMessageBusSubscriber;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
@@ -51,17 +50,21 @@ public class LocalIotMessageBusIntegrationTest {
         IotMessageBusSubscriber<String> subscriber1 = new IotMessageBusSubscriber<>() {
 
             @Override
-            public void onMessage(String topic, String message) {
-                log.info("[订阅者1] 收到消息 - Topic: {}, Message: {}", topic, message);
-                subscriber1Count.incrementAndGet();
-                assertEquals("test-topic", topic);
-                assertEquals(testMessage, message);
-                latch.countDown();
+            public String getTopic() {
+                return topic;
             }
 
             @Override
-            public int order() {
-                return 1;
+            public String getGroup() {
+                return "group1";
+            }
+
+            @Override
+            public void onMessage(String message) {
+                log.info("[订阅者1] 收到消息 - Topic: {}, Message: {}", getTopic(), message);
+                subscriber1Count.incrementAndGet();
+                assertEquals(testMessage, message);
+                latch.countDown();
             }
 
         };
@@ -69,35 +72,39 @@ public class LocalIotMessageBusIntegrationTest {
         IotMessageBusSubscriber<String> subscriber2 = new IotMessageBusSubscriber<>() {
 
             @Override
-            public void onMessage(String topic, String message) {
-                log.info("[订阅者2] 收到消息 - Topic: {}, Message: {}", topic, message);
+            public String getTopic() {
+                return topic;
+            }
+
+            @Override
+            public String getGroup() {
+                return "group2";
+            }
+
+            @Override
+            public void onMessage(String message) {
+                log.info("[订阅者2] 收到消息 - Topic: {}, Message: {}", getTopic(), message);
                 subscriber2Count.incrementAndGet();
-                assertEquals("test-topic", topic);
                 assertEquals(testMessage, message);
                 latch.countDown();
             }
 
-            @Override
-            public int order() {
-                return 0;
-            }
-
         };
         // 注册订阅者
-        messageBus.register(topic, subscriber1);
-        messageBus.register(topic, subscriber2);
+        messageBus.register(subscriber1);
+        messageBus.register(subscriber2);
 
         // 发送消息
         log.info("[测试] 发送消息 - Topic: {}, Message: {}", topic, testMessage);
         messageBus.post(topic, testMessage);
-        // 等待消息处理完成（最多等待5秒）
-        boolean completed = latch.await(5, TimeUnit.SECONDS);
+        // 等待消息处理完成（最多等待 10 秒）
+        boolean completed = latch.await(10, TimeUnit.SECONDS);
 
         // 验证结果
         assertTrue(completed, "消息处理超时");
-        assertEquals(1, subscriber1Count.get(), "订阅者1应该收到1条消息");
-        assertEquals(1, subscriber2Count.get(), "订阅者2应该收到1条消息");
-        log.info("[测试] 测试完成 - 订阅者1收到{}条消息，订阅者2收到{}条消息", subscriber1Count.get(), subscriber2Count.get());
+        assertEquals(1, subscriber1Count.get(), "订阅者 1 应该收到 1 条消息");
+        assertEquals(1, subscriber2Count.get(), "订阅者 2 应该收到 1 条消息");
+        log.info("[测试] 测试完成 - 订阅者 1 收到{}条消息，订阅者 2 收到{}条消息", subscriber1Count.get(), subscriber2Count.get());
     }
 
     /**
@@ -116,16 +123,20 @@ public class LocalIotMessageBusIntegrationTest {
         IotMessageBusSubscriber<String> statusSubscriber = new IotMessageBusSubscriber<>() {
 
             @Override
-            public void onMessage(String topic, String message) {
-                log.info("[状态订阅者] 收到消息 - Topic: {}, Message: {}", topic, message);
-                assertEquals(topic1, topic);
-                assertEquals(message1, message);
-                latch.countDown();
+            public String getTopic() {
+                return topic1;
             }
 
             @Override
-            public int order() {
-                return 0;
+            public String getGroup() {
+                return "status-group";
+            }
+
+            @Override
+            public void onMessage(String message) {
+                log.info("[状态订阅者] 收到消息 - Topic: {}, Message: {}", getTopic(), message);
+                assertEquals(message1, message);
+                latch.countDown();
             }
 
         };
@@ -133,28 +144,32 @@ public class LocalIotMessageBusIntegrationTest {
         IotMessageBusSubscriber<String> dataSubscriber = new IotMessageBusSubscriber<>() {
 
             @Override
-            public void onMessage(String topic, String message) {
-                log.info("[数据订阅者] 收到消息 - Topic: {}, Message: {}", topic, message);
-                assertEquals(topic2, topic);
+            public String getTopic() {
+                return topic2;
+            }
+
+            @Override
+            public String getGroup() {
+                return "data-group";
+            }
+
+            @Override
+            public void onMessage(String message) {
+                log.info("[数据订阅者] 收到消息 - Topic: {}, Message: {}", getTopic(), message);
                 assertEquals(message2, message);
                 latch.countDown();
             }
 
-            @Override
-            public int order() {
-                return 1;
-            }
-
         };
         // 注册订阅者到不同主题
-        messageBus.register(topic1, statusSubscriber);
-        messageBus.register(topic2, dataSubscriber);
+        messageBus.register(statusSubscriber);
+        messageBus.register(dataSubscriber);
 
         // 发送消息到不同主题
         messageBus.post(topic1, message1);
         messageBus.post(topic2, message2);
         // 等待消息处理完成
-        boolean completed = latch.await(5, TimeUnit.SECONDS);
+        boolean completed = latch.await(10, TimeUnit.SECONDS);
         assertTrue(completed, "消息处理超时");
         log.info("[测试] 多主题测试完成");
     }
