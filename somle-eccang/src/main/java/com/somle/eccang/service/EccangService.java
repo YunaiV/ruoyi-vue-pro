@@ -475,6 +475,11 @@ public class EccangService {
         return getAllPage(JsonUtilsX.toJSONObject(eccangRmaReturnReqVO), "getRmaReturnList");
     }
 
+    //退件重发列表
+    public Stream<EccangPage> getRmaRefaList(EccangRmaRefaReqVO eccangRmaRefaReqVO) {
+        return getAllPage(JsonUtilsX.toJSONObject(eccangRmaRefaReqVO), "getRmaRefaList");
+    }
+
     /**
      * @return java.util.stream.Stream<com.somle.eccang.model.EccangResponse.EccangPage>
      * @Author gumaomao
