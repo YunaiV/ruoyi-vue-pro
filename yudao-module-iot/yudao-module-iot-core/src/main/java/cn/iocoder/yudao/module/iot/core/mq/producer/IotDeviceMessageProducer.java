@@ -30,7 +30,7 @@ public class IotDeviceMessageProducer {
      * @param message 设备消息
      */
     public void sendGatewayDeviceMessage(String serverId, Object message) {
-        messageBus.post(IotDeviceMessage.getMessageBusGatewayDeviceMessageTopic(serverId), message);
+        messageBus.post(IotDeviceMessage.buildMessageBusGatewayDeviceMessageTopic(serverId), message);
     }
 
 }

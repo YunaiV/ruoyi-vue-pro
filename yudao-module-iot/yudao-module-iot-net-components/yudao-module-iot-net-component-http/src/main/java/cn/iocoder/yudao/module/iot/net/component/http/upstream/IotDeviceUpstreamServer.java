@@ -32,7 +32,7 @@ public class IotDeviceUpstreamServer extends AbstractVerticle {
     private final IotDeviceMessageProducer deviceMessageProducer;
 
     @Override
-    public void start() throws Exception {
+    public void start() {
         start(Promise.promise());
     }
 

@@ -1,12 +1,11 @@
 package cn.iocoder.yudao.module.iot.net.component.http.config;
 
-import cn.hutool.system.SystemUtil;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
+import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
+import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBusSubscriber;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
-import cn.iocoder.yudao.module.iot.net.component.core.config.IotNetComponentCommonProperties;
 import cn.iocoder.yudao.module.iot.net.component.core.downstream.IotDeviceDownstreamHandler;
-import cn.iocoder.yudao.module.iot.net.component.core.heartbeat.IotNetComponentRegistry;
-import cn.iocoder.yudao.module.iot.net.component.core.util.IotNetComponentCommonUtils;
 import cn.iocoder.yudao.module.iot.net.component.http.downstream.IotDeviceDownstreamHandlerImpl;
 import cn.iocoder.yudao.module.iot.net.component.http.upstream.IotDeviceUpstreamServer;
 import io.vertx.core.Vertx;
@@ -36,15 +35,6 @@ import org.springframework.context.event.EventListener;
 public class IotNetComponentHttpAutoConfiguration {
 
     /**
-     * 组件 key
-     */
-    private static final String PLUGIN_KEY = "http";
-
-    public IotNetComponentHttpAutoConfiguration() {
-        // 构造函数中不输出日志，移到 initialize 方法中
-    }
-
-    /**
      * 初始化 HTTP 组件
      *
      * @param event 应用启动事件
@@ -53,27 +43,30 @@ public class IotNetComponentHttpAutoConfiguration {
     public void initialize(ApplicationStartedEvent event) {
         log.info("[IotNetComponentHttpAutoConfiguration][开始初始化]");
 
-        // 从应用上下文中获取需要的 Bean
-        IotNetComponentRegistry componentRegistry = event.getApplicationContext()
-                .getBean(IotNetComponentRegistry.class);
-        IotNetComponentCommonProperties commonProperties = event.getApplicationContext()
-                .getBean(IotNetComponentCommonProperties.class);
+        // TODO @芋艿：临时处理
+        IotMessageBus messageBus = event.getApplicationContext()
+                .getBean(IotMessageBus.class);
+        messageBus.register(new IotMessageBusSubscriber<IotDeviceMessage>() {
 
-        // 设置当前组件的核心标识
-        // 注意：这里只为当前 HTTP 组件设置 pluginKey，不影响其他组件
-        // TODO @haohao：多个会存在冲突的问题哇？
-        commonProperties.setPluginKey(PLUGIN_KEY);
+            @Override
+            public String getTopic() {
+                return IotDeviceMessage.buildMessageBusGatewayDeviceMessageTopic("yy");
+            }
 
-        // 将 HTTP 组件注册到组件注册表
-        componentRegistry.registerComponent(
-                PLUGIN_KEY,
-                SystemUtil.getHostInfo().getAddress(),
-                0, // 内嵌模式固定为 0：自动生成对应的 port 端口号
-                IotNetComponentCommonUtils.getProcessId());
+            @Override
+            public String getGroup() {
+                return "test";
+            }
 
-        log.info("[initialize][IoT HTTP 组件初始化完成]");
+            @Override
+            public void onMessage(IotDeviceMessage message) {
+                System.out.println(message);
+            }
+
+        });
     }
 
+    // TODO @芋艿：貌似这里不用注册 bean？
     /**
      * 创建 Vert.x 实例
      *

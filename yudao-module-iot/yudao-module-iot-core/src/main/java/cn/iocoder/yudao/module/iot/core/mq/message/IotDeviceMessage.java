@@ -32,7 +32,7 @@ public class IotDeviceMessage {
      *
      * 其中，%s 就是该“server”(protocol) 的标识
      */
-    public static final String MESSAGE_BUS_GATEWAY_DEVICE_MESSAGE_TOPIC = MESSAGE_BUS_DEVICE_MESSAGE_TOPIC + "/%s";
+    public static final String MESSAGE_BUS_GATEWAY_DEVICE_MESSAGE_TOPIC = MESSAGE_BUS_DEVICE_MESSAGE_TOPIC + "_%s";
 
     /**
      * 请求编号
@@ -71,6 +71,7 @@ public class IotDeviceMessage {
      * 例如说：属性上报的 properties、事件上报的 params
      */
     private Object data;
+    // TODO @芋艿：可能会去掉
     /**
      * 响应码
      *
@@ -100,6 +101,20 @@ public class IotDeviceMessage {
         return this;
     }
 
+    public IotDeviceMessage ofPropertySet(Map<String, Object> properties) {
+        this.setType(IotDeviceMessageTypeEnum.PROPERTY.getType());
+        this.setIdentifier(IotDeviceMessageIdentifierEnum.PROPERTY_SET.getIdentifier());
+        this.setData(properties);
+        return this;
+    }
+
+    public static IotDeviceMessage of(String productKey, String deviceName, String deviceKey,
+                                      String serverId, Long tenantId) {
+        return of(productKey, deviceName, deviceKey,
+                null, null,
+                serverId, tenantId);
+    }
+
     public static IotDeviceMessage of(String productKey, String deviceName, String deviceKey,
                                       String requestId, LocalDateTime reportTime,
                                       String serverId, Long tenantId) {
@@ -117,7 +132,7 @@ public class IotDeviceMessage {
 
     // ========== Topic 相关 ==========
 
-    public static String getMessageBusGatewayDeviceMessageTopic(String serverId) {
+    public static String buildMessageBusGatewayDeviceMessageTopic(String serverId) {
         return String.format(MESSAGE_BUS_GATEWAY_DEVICE_MESSAGE_TOPIC, serverId);
     }
 

@@ -16,7 +16,7 @@ Authorization: Bearer {{token}}
 ### 请求 /iot/device/downstream 接口（属性设置） => 成功
 POST {{baseUrl}}/iot/device/downstream
 Content-Type: application/json
-tenant-id: {{adminTenentId}}
+tenant-id: {{adminTenantId}}
 Authorization: Bearer {{token}}
 
 {

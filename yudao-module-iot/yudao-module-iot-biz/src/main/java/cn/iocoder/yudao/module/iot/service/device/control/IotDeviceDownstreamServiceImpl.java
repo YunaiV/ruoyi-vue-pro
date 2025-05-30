@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.*;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceDownstreamReqVO;
+import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInstanceDO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageIdentifierEnum;
@@ -52,6 +53,8 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
 
     @Resource
     private IotDeviceProducer deviceProducer;
+    @Resource
+    private IotDeviceMessageProducer deviceMessageProducer;
 
     @Override
     public IotDeviceMessage downstreamDevice(IotDeviceDownstreamReqVO downstreamReqVO) {
@@ -150,26 +153,16 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
         // TODO @super：【可优化】过滤掉不合法的属性
 
         // 2. 发送请求
-        String url = String.format("sys/%s/%s/thing/service/property/set",
-                getProductKey(device, parentDevice), getDeviceName(device, parentDevice));
-        IotDevicePropertySetReqDTO reqDTO = new IotDevicePropertySetReqDTO()
-                .setProperties((Map<String, Object>) downstreamReqVO.getData());
-        CommonResult<Boolean> result = requestPlugin(url, reqDTO, device);
-
-        // 3. 发送设备消息
-        IotDeviceMessage message = new IotDeviceMessage().setRequestId(reqDTO.getRequestId())
-                .setType(IotDeviceMessageTypeEnum.PROPERTY.getType())
-                .setIdentifier(IotDeviceMessageIdentifierEnum.PROPERTY_SET.getIdentifier())
-                .setData(reqDTO.getProperties());
-        sendDeviceMessage(message, device, result.getCode());
-
-        // 4. 如果不成功，抛出异常，提示用户
-        if (result.isError()) {
-            log.error("[setDeviceProperty][设备({})属性设置失败，请求参数：({})，响应结果：({})]",
-                    device.getDeviceKey(), reqDTO, result);
-            throw exception(DEVICE_DOWNSTREAM_FAILED, result.getMsg());
-        }
-        return message;
+        // TODO @芋艿：deviceName 的设置
+        String deviceName = "xx";
+        Long tenantId = 1L;
+        cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage message = cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage
+                .of(getProductKey(device, parentDevice), getDeviceName(device, parentDevice), deviceName,
+                        null, tenantId);
+        String serverId = "yy";
+        deviceMessageProducer.sendGatewayDeviceMessage(serverId, message);
+        // TODO @芋艿：后续可以清理掉
+        return null;
     }
 
     /**
