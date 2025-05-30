@@ -26,13 +26,13 @@ yudao:
         upstream-url: http://127.0.0.1:48080 # 主程序 API 地址
         upstream-connect-timeout: 30s # 连接超时
         upstream-read-timeout: 30s # 读取超时
-        
+
         # 下行通信配置，用于接收主程序的控制指令
         downstream-port: 18888 # 下行服务器端口
-        
+
         # 组件服务唯一标识
         server-key: yudao-module-iot-net-component-server
-        
+
         # 心跳频率，单位：毫秒
         heartbeat-interval: 30000
 
@@ -50,15 +50,26 @@ yudao:
         enabled: true        # 启用EMQX组件
         mqtt-host: 127.0.0.1 # MQTT服务器主机地址
         mqtt-port: 1883      # MQTT服务器端口
-        mqtt-username: yudao # MQTT服务器用户名
-        mqtt-password: 123456 # MQTT服务器密码
+        mqtt-username: admin # MQTT服务器用户名
+        mqtt-password: admin123 # MQTT服务器密码
         mqtt-ssl: false      # 是否启用SSL
         mqtt-topics: # 订阅的主题列表
           - "/sys/#"
         auth-port: 8101      # 认证端口
+    message-bus:
+      type: rocketmq # 消息总线的类型
 
 # 日志配置
 logging:
   level:
     cn.iocoder.yudao: INFO
-    root: INFO 
+    root: INFO
+
+--- #################### 消息队列相关 ####################
+
+# rocketmq 配置项，对应 RocketMQProperties 配置类
+rocketmq:
+  name-server: 127.0.0.1:9876 # RocketMQ Namesrv
+  # Producer 配置项
+  producer:
+    group: ${spring.application.name}_PRODUCER # 生产者分组

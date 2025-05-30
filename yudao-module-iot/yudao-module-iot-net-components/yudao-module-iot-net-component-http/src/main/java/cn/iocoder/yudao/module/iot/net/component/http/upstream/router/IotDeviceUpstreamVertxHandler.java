@@ -8,17 +8,16 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceEventReportReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDevicePropertyReportReqDTO;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotDeviceStateUpdateReqDTO;
-import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.net.component.core.constants.IotDeviceTopicEnum;
 import cn.iocoder.yudao.module.iot.net.component.core.pojo.IotStandardResponse;
 import cn.iocoder.yudao.module.iot.net.component.core.util.IotNetComponentCommonUtils;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationContext;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -33,6 +32,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
  *
  * @author 芋道源码
  */
+@RequiredArgsConstructor
 @Slf4j
 public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
 
@@ -70,17 +70,10 @@ public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
      * 设备上行 API
      */
     private final IotDeviceUpstreamApi deviceUpstreamApi;
-
     /**
-     * 构造函数
-     *
-     * @param deviceUpstreamApi  设备上行 API
-     * @param applicationContext 应用上下文
+     * 设备消息生产者
      */
-    public IotDeviceUpstreamVertxHandler(IotDeviceUpstreamApi deviceUpstreamApi,
-                                         ApplicationContext applicationContext) {
-        this.deviceUpstreamApi = deviceUpstreamApi;
-    }
+    private final IotDeviceMessageProducer deviceMessageProducer;
 
     @Override
     public void handle(RoutingContext routingContext) {
@@ -170,18 +163,17 @@ public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
      */
     private void handlePropertyPost(RoutingContext routingContext, String productKey, String deviceName,
                                     String requestId, JsonObject body) {
-        // 处理属性上报
-        IotDevicePropertyReportReqDTO reportReqDTO = parsePropertyReportRequest(productKey, deviceName,
-                requestId, body);
+        // 1.1 构建设备消息
+        String deviceKey = "xxx"; // TODO @芋艿：待支持
+        Long tenantId = 1L; // TODO @芋艿：待支持
+        IotDeviceMessage message = IotDeviceMessage.of(productKey, deviceName, deviceKey,
+                        requestId, LocalDateTime.now(), IotNetComponentCommonUtils.getProcessId(), tenantId)
+                .ofPropertyReport(parsePropertiesFromBody(body));
+        // 1.2 发送消息
+        deviceMessageProducer.sendDeviceMessage(message);
 
-        // 设备上线
-        updateDeviceState(reportReqDTO.getProductKey(), reportReqDTO.getDeviceName());
-
-        // 属性上报
-        CommonResult<Boolean> result = deviceUpstreamApi.reportDeviceProperty(reportReqDTO);
-
-        // 返回响应
-        sendResponse(routingContext, requestId, PROPERTY_METHOD, result);
+        // 2. 返回响应
+        sendResponse(routingContext, requestId, PROPERTY_METHOD, null);
     }
 
     /**
@@ -199,9 +191,6 @@ public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
         // 处理事件上报
         IotDeviceEventReportReqDTO reportReqDTO = parseEventReportRequest(productKey, deviceName, identifier,
                 requestId, body);
-
-        // 设备上线
-        updateDeviceState(reportReqDTO.getProductKey(), reportReqDTO.getDeviceName());
 
         // 事件上报
         CommonResult<Boolean> result = deviceUpstreamApi.reportDeviceEvent(reportReqDTO);
@@ -221,8 +210,11 @@ public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
      */
     private void sendResponse(RoutingContext routingContext, String requestId, String method,
                               CommonResult<Boolean> result) {
+        // TODO @芋艿：后续再优化
         IotStandardResponse response;
-        if (result.isSuccess()) {
+        if (result == null ) {
+            response = IotStandardResponse.success(requestId, method, null);
+        } else if (result.isSuccess()) {
             response = IotStandardResponse.success(requestId, method, result.getData());
         } else {
             response = IotStandardResponse.error(requestId, method, result.getCode(), result.getMsg());
@@ -265,45 +257,7 @@ public class IotDeviceUpstreamVertxHandler implements Handler<RoutingContext> {
                 EVENT_METHOD_SUFFIX;
     }
 
-    /**
-     * 更新设备状态
-     *
-     * @param productKey 产品 Key
-     * @param deviceName 设备名称
-     */
-    private void updateDeviceState(String productKey, String deviceName) {
-        IotDeviceStateUpdateReqDTO reqDTO = ((IotDeviceStateUpdateReqDTO) new IotDeviceStateUpdateReqDTO()
-                .setRequestId(IdUtil.fastSimpleUUID())
-                .setProcessId(IotNetComponentCommonUtils.getProcessId())
-                .setReportTime(LocalDateTime.now())
-                .setProductKey(productKey)
-                .setDeviceName(deviceName)).setState(IotDeviceStateEnum.ONLINE.getState());
-        deviceUpstreamApi.updateDeviceState(reqDTO);
-    }
-
-    /**
-     * 解析属性上报请求
-     *
-     * @param productKey 产品 Key
-     * @param deviceName 设备名称
-     * @param requestId  请求 ID
-     * @param body       请求体
-     * @return 属性上报请求 DTO
-     */
-    private IotDevicePropertyReportReqDTO parsePropertyReportRequest(String productKey, String deviceName,
-                                                                     String requestId, JsonObject body) {
-        // 解析属性
-        Map<String, Object> properties = parsePropertiesFromBody(body);
-
-        // 构建属性上报请求 DTO
-        return ((IotDevicePropertyReportReqDTO) new IotDevicePropertyReportReqDTO()
-                .setRequestId(requestId)
-                .setProcessId(IotNetComponentCommonUtils.getProcessId())
-                .setReportTime(LocalDateTime.now())
-                .setProductKey(productKey)
-                .setDeviceName(deviceName)).setProperties(properties);
-    }
-
+    // TODO @芋艿：这块在看看
     /**
      * 从请求体解析属性
      *

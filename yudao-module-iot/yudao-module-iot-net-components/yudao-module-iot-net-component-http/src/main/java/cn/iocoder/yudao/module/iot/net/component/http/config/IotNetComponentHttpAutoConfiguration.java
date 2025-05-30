@@ -2,12 +2,13 @@ package cn.iocoder.yudao.module.iot.net.component.http.config;
 
 import cn.hutool.system.SystemUtil;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
-import cn.iocoder.yudao.module.iot.net.component.http.downstream.IotDeviceDownstreamHandlerImpl;
-import cn.iocoder.yudao.module.iot.net.component.http.upstream.IotDeviceUpstreamServer;
+import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.net.component.core.config.IotNetComponentCommonProperties;
 import cn.iocoder.yudao.module.iot.net.component.core.downstream.IotDeviceDownstreamHandler;
 import cn.iocoder.yudao.module.iot.net.component.core.heartbeat.IotNetComponentRegistry;
 import cn.iocoder.yudao.module.iot.net.component.core.util.IotNetComponentCommonUtils;
+import cn.iocoder.yudao.module.iot.net.component.http.downstream.IotDeviceDownstreamHandlerImpl;
+import cn.iocoder.yudao.module.iot.net.component.http.upstream.IotDeviceUpstreamServer;
 import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,7 +16,6 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Lazy;
@@ -86,25 +86,14 @@ public class IotNetComponentHttpAutoConfiguration {
 
     /**
      * 创建设备上行服务器
-     *
-     * @param vertx              Vert.x 实例
-     * @param deviceUpstreamApi  设备上行 API
-     * @param properties         HTTP 组件配置属性
-     * @param applicationContext 应用上下文
-     * @return 设备上行服务器
      */
     @Bean(name = "httpDeviceUpstreamServer", initMethod = "start", destroyMethod = "stop")
     public IotDeviceUpstreamServer deviceUpstreamServer(
             @Lazy @Qualifier("httpVertx") Vertx vertx,
             IotDeviceUpstreamApi deviceUpstreamApi,
             IotNetComponentHttpProperties properties,
-            ApplicationContext applicationContext) {
-        if (log.isDebugEnabled()) {
-            log.debug("HTTP 服务器配置: port={}", properties.getServerPort());
-        } else {
-            log.info("HTTP 服务器将监听端口: {}", properties.getServerPort());
-        }
-        return new IotDeviceUpstreamServer(vertx, properties, deviceUpstreamApi, applicationContext);
+            IotDeviceMessageProducer deviceMessageProducer) {
+        return new IotDeviceUpstreamServer(vertx, properties, deviceUpstreamApi, deviceMessageProducer);
     }
 
     /**

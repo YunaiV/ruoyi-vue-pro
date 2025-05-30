@@ -311,6 +311,9 @@ yudao:
       kd100:
         key: pLXUGAwK5305
         customer: E77DF18BE109F454A5CD319E44BF5177
+  iot:
+    message-bus:
+      type: rocketmq # 消息总线的类型
 
 debug: false
 # 插件配置 TODO 芋艿：【IOT】需要处理下

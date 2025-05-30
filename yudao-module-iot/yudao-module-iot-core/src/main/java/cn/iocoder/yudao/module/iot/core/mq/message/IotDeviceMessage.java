@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.core.mq.message;
 
+import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageIdentifierEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageTypeEnum;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 // TODO @芋艿：参考阿里云的物模型，优化 IoT 上下行消息的设计，尽量保持一致（渐进式，不要一口气）！
 
@@ -19,6 +21,18 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class IotDeviceMessage {
+
+    /**
+     * 【消息总线】应用的设备消息 Topic，由 iot-gateway 发给 iot-biz 进行消费
+     */
+    public static final String MESSAGE_BUS_DEVICE_MESSAGE_TOPIC = "iot_device_message";
+
+    /**
+     * 【消息总线】设备消息 Topic，由 iot-biz 发送给 iot-gateway 的某个 “server”(protocol) 进行消费
+     *
+     * 其中，%s 就是该“server”(protocol) 的标识
+     */
+    public static final String MESSAGE_BUS_GATEWAY_DEVICE_MESSAGE_TOPIC = MESSAGE_BUS_DEVICE_MESSAGE_TOPIC + "/%s";
 
     /**
      * 请求编号
@@ -70,8 +84,41 @@ public class IotDeviceMessage {
     private LocalDateTime reportTime;
 
     /**
+     * 服务编号，该消息由哪个消息发送
+     */
+    private String serverId;
+
+    /**
      * 租户编号
      */
     private Long tenantId;
+
+    public IotDeviceMessage ofPropertyReport(Map<String, Object> properties) {
+        this.setType(IotDeviceMessageTypeEnum.PROPERTY.getType());
+        this.setIdentifier(IotDeviceMessageIdentifierEnum.PROPERTY_REPORT.getIdentifier());
+        this.setData(properties);
+        return this;
+    }
+
+    public static IotDeviceMessage of(String productKey, String deviceName, String deviceKey,
+                                      String requestId, LocalDateTime reportTime,
+                                      String serverId, Long tenantId) {
+        if (requestId == null) {
+            requestId = IdUtil.fastSimpleUUID();
+        }
+        if (reportTime == null) {
+            reportTime = LocalDateTime.now();
+        }
+        return IotDeviceMessage.builder()
+                .requestId(requestId).reportTime(reportTime)
+               .productKey(productKey).deviceName(deviceName).deviceKey(deviceKey)
+                .serverId(serverId).tenantId(tenantId).build();
+    }
+
+    // ========== Topic 相关 ==========
+
+    public static String getMessageBusGatewayDeviceMessageTopic(String serverId) {
+        return String.format(MESSAGE_BUS_GATEWAY_DEVICE_MESSAGE_TOPIC, serverId);
+    }
 
 }
