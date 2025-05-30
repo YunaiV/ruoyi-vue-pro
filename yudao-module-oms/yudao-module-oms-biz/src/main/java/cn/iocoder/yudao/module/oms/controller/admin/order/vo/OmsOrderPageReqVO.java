@@ -27,7 +27,7 @@ public class OmsOrderPageReqVO extends PageParam {
     private String code;
 
     @Schema(description = "外部来源号，即平台订单号")
-    private String externalCode;
+    private String externalId;
 
     @Schema(description = "店铺id", example = "8058")
     private Long shopId;

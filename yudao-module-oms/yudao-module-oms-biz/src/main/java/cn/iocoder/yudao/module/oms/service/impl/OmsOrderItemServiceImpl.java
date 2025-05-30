@@ -84,5 +84,15 @@ public class OmsOrderItemServiceImpl implements OmsOrderItemService {
         return orderItemMapper.deleteByOrderIds(orderIds);
     }
 
+    @Override
+    public OmsOrderItemDO getOrderItemByExternalId(String externalId) {
+        return orderItemMapper.selectOne(OmsOrderItemDO::getExternalId, externalId);
+    }
+
+    @Override
+    public void updateOrderItems(List<OmsOrderItemDO> updateOrderItems) {
+        orderItemMapper.updateById(updateOrderItems);
+    }
+
 
 }

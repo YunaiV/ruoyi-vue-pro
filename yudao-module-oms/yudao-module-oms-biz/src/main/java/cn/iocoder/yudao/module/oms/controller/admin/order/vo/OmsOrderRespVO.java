@@ -29,7 +29,7 @@ public class OmsOrderRespVO {
 
     @Schema(description = "外部来源号，即平台订单号", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("外部来源号，即平台订单号")
-    private String externalCode;
+    private String externalId;
 
     @Schema(description = "店铺id", example = "8058")
     @ExcelProperty("店铺id")
@@ -74,6 +74,9 @@ public class OmsOrderRespVO {
     @Schema(description = "公司名", example = "张三")
     @ExcelProperty("公司名")
     private String companyName;
+
+    @Schema(description = "收件人姓名")
+    private String recipientName;
 
     @Schema(description = "收件人国家")
     @ExcelProperty("收件人国家")
@@ -125,6 +128,10 @@ public class OmsOrderRespVO {
     @Schema(description = "产品信息", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("产品信息")
     private String productNames;
+
+    @Schema(description = "订单明细", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("订单明细")
+    private String orderItemNames;
 
 
     @Schema(description = "所属店铺", requiredMode = Schema.RequiredMode.REQUIRED)

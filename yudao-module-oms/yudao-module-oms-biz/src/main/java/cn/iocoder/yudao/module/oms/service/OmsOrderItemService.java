@@ -67,4 +67,14 @@ public interface OmsOrderItemService {
      */
     int deleteByOrderIds(List<Long> orderIds);
 
+    /**
+     * @Description: 按externalId查询订单项
+     */
+    OmsOrderItemDO getOrderItemByExternalId(String externalId);
+
+    /**
+     * @Description: 批量更新订单项集合
+     */
+    void updateOrderItems(List<OmsOrderItemDO> updateOrderItems);
+
 }

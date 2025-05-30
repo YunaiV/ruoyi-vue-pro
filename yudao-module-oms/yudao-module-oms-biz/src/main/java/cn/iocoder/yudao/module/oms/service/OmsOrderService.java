@@ -54,4 +54,9 @@ public interface OmsOrderService {
      */
     List<OmsOrderItemDO> getOrderItemListByOrderIds(Collection<Long> orderIds);
 
+    /**
+     * 批量更新订单集合
+     */
+    void updateOrders(List<OmsOrderDO> updateOrders);
+
 }

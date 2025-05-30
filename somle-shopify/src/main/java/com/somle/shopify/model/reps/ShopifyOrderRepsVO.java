@@ -12,6 +12,8 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ShopifyOrderRepsVO {
 
+    private String pageInfo;
+
     private Long id;
 
     private String adminGraphqlApiId;
@@ -741,7 +743,7 @@ public class ShopifyOrderRepsVO {
 
         private String lastName;
 
-        private Object address2;
+        private String address2;
 
         private Object company;
 

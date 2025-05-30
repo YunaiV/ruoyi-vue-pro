@@ -23,9 +23,9 @@ public class OmsOrderDTO {
      */
     private String code;
     /**
-     * 外部单据编码，即平台订单号 唯一标识
+     * 外部单据id【平台订单号 唯一标识】
      */
-    private String externalCode;
+    private String externalId;
     /**
      * 店铺id
      */
@@ -46,10 +46,16 @@ public class OmsOrderDTO {
      * 邮箱
      */
     private String email;
+
     /**
-     * 最迟送达时间
+     * 最晚出库时间
      */
-    private LocalDateTime deliveryLatestTime;
+    private LocalDateTime outboundLatestTime;
+
+    /**
+     * 最晚到货时间
+     */
+    private LocalDateTime receiveLatestTime;
     /**
      * 订单创建时间
      */
@@ -114,4 +120,9 @@ public class OmsOrderDTO {
      * 邮编
      */
     private String postalCode;
+
+    /***
+     *订单状态【0草稿 1待审核】
+     */
+    private Integer status;
 }

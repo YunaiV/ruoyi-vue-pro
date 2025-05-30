@@ -69,4 +69,15 @@ public class OmsShopProductDTO {
      * 店铺所属店铺
      */
     private OmsShopDTO shop;
+
+    /***
+     *
+     * 激活状态【0是未激活，1是已激活】
+     */
+    private Boolean status;
+
+    /**
+     * 外部来源激活状态【0是未激活，1是已激活】
+     */
+    private Boolean externalStatus;
 }

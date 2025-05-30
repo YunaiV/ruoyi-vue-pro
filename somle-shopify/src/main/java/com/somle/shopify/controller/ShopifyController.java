@@ -1,10 +1,7 @@
 package com.somle.shopify.controller;
 
-import cn.iocoder.yudao.framework.common.util.json.JSONObject;
-import com.somle.shopify.service.ShopifyClient;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import java.util.HashMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/shopify")

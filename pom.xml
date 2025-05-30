@@ -53,6 +53,9 @@
         <module>somle-home24</module>
         <!--        <module>yudao-module-iot</module>-->
         <module>somle-autonomous</module>
+        <module>somle-shopee</module>
+        <module>somle-lazada</module>
+        <module>somle-tiktok</module>
     </modules>
 
     <name>${project.artifactId}</name>

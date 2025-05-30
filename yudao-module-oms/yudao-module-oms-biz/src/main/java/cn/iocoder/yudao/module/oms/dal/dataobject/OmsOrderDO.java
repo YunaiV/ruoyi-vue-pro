@@ -38,9 +38,9 @@ public class OmsOrderDO extends TenantBaseDO {
      */
     private String code;
     /**
-     * 外部单据编码，即平台订单号 唯一标识
+     * 外部单据id【平台订单号 唯一标识】
      */
-    private String externalCode;
+    private String externalId;
     /**
      * 店铺id
      */
@@ -131,9 +131,15 @@ public class OmsOrderDO extends TenantBaseDO {
      * 门牌号
      */
     private String houseNo;
+
     /**
      * 邮编
      */
     private String postalCode;
+
+    /***
+     *订单状态【0草稿 1待审核】
+     */
+    private Integer status;
 
 }

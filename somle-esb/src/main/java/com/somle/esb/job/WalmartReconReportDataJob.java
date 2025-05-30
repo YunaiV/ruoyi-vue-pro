@@ -11,16 +11,16 @@ public class WalmartReconReportDataJob extends WalmartDataJob {
     public String execute(String param) throws Exception {
         setDate(param);
 
-        var result = walmartService.getClient().getReconFile(yesterday);
+        var result = walmartService.walmartClients.get(0).getReconFile(yesterday);
         var data = OssData.builder()
-                .database(DATABASE)
-                .tableName("recon_report")
-                .syncType("inc")
-                .requestTimestamp(System.currentTimeMillis())
-                .folderDate(yesterday)
-                .content(result)
-                .headers(null)
-                .build();
+            .database(DATABASE)
+            .tableName("recon_report")
+            .syncType("inc")
+            .requestTimestamp(System.currentTimeMillis())
+            .folderDate(yesterday)
+            .content(result)
+            .headers(null)
+            .build();
         service.send(data);
 
         return "data upload success";

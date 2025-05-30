@@ -1,5 +1,6 @@
 package com.somle.home24.service;
 
+import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.util.web.RequestX;
 import cn.iocoder.yudao.framework.common.util.web.WebUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -8,12 +9,16 @@ import com.somle.home24.model.req.Home24InvoicesReq;
 import com.somle.home24.model.req.Home24OrderReq;
 import com.somle.home24.model.resp.Home24CommonInvoicesResp;
 import com.somle.home24.model.resp.Home24CommonOrdersResp;
+import com.somle.home24.model.resp.Home24OrderResp;
+import com.somle.home24.model.resp.Home24ShopResp;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -40,23 +45,19 @@ public class Home24Client {
         Home24CommonOrdersResp<Object> home24Resp = null;
         int offset = 0;
         int totalCount = 0;
-
         do {
             // 设置偏移量
             orderReq.setOffset(offset);
             AtomicReference<Home24CommonOrdersResp<Object>> respOrders = new AtomicReference<>();
             // 发送请求并处理响应
             WebUtils.sendRequest(createRequest(orderReq, "/api/orders", RequestX.Method.GET), (response, e) -> {
-                if (e != null) {
-                    log.error("请求失败 {}", e.getMessage());
-                    try {
-                        throw e;
-                    } catch (Exception ex) {
-                        throw new RuntimeException(ex);
-                    }
-                } else {
-                    respOrders.set(handleResponse(response, Home24CommonOrdersResp.class));
+                try {
+                    String bodyString = response.body().string();
+                    Home24OrderResp home24OrderResp = JSONUtil.toBean(bodyString, Home24OrderResp.class);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
                 }
+                respOrders.set(handleResponse(response, Home24CommonOrdersResp.class));
             });
 
 
@@ -82,6 +83,31 @@ public class Home24Client {
         } while (offset < totalCount); // 如果当前的 offset 小于总数量，则继续请求
 
         return home24Resp;
+    }
+
+    @SneakyThrows
+    public List<Home24OrderResp.Order> getAllOrders(Home24OrderReq orderReq) {
+        List<Home24OrderResp.Order> orders = new ArrayList<>();
+        int offset = 0;
+        int totalCount = 0;
+
+        do {
+            // 设置偏移量
+            orderReq.setOffset(offset);
+            Response response = WebUtils.sendRequest(createRequest(orderReq, "/api/orders", RequestX.Method.GET));
+            String bodyString = response.body().string();
+            Home24OrderResp home24OrderResp = JSONUtil.toBean(bodyString, Home24OrderResp.class);
+            if (home24OrderResp.getOrders() == null) {
+                return null;
+            } else {
+                offset += orderReq.getMax();
+                totalCount = home24OrderResp.getTotalCount();
+                orders.addAll(home24OrderResp.getOrders());
+            }
+        } while (
+            orders.size() < totalCount
+        );
+        return orders;
     }
 
 
@@ -135,6 +161,25 @@ public class Home24Client {
         return resp;
     }
 
+    //获取店铺信息
+    @SneakyThrows
+    public Home24ShopResp getShopInformation() {
+        var endpoint = "/api/account";
+        RequestX request = createRequest(null, endpoint, RequestX.Method.GET);
+        Response response = WebUtils.sendRequest(request);
+        String bodyString = response.body().string();
+        Home24ShopResp home24ShopResp = JSONUtil.toBean(bodyString, Home24ShopResp.class);
+        return home24ShopResp;
+    }
+
+//    @SneakyThrows
+//    public void getProduct() {
+//        var endpoint = "/api/products";
+//        RequestX request = createRequest(null, endpoint, RequestX.Method.GET);
+//        Response response = WebUtils.sendRequest(request);
+//        String bodyString = response.body().string();
+//        System.out.println(bodyString);
+//    }
 
     /**
      * 创建请求

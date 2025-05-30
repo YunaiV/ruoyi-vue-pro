@@ -86,15 +86,8 @@ public class AmazonToOmsConverter {
         List<OmsShopProductSaveReqDTO> omsShopProductDOs = new ArrayList<>();
         for (AmazonSpListingRepsVO.ProductItem amazonProductRepsDTO : product) {
             List<AmazonSpListingRepsVO.ProductSummary> summaryList = amazonProductRepsDTO.getSummaries();
-            if (CollectionUtil.isEmpty(summaryList)) {
-                continue;
-            }
-            OmsShopDTO omsShopDTO = omsShopDTOMap.get(amazonProductRepsDTO.getSummaries().get(0).getMarketplaceId() + '#' + auth.getSellerId());
-            if (omsShopDTO == null) {
-                continue;
-            }
-
-            // 使用Map存储已存在的店铺产品信息，key=sourceId, value=OmsShopProductDO
+            OmsShopDTO omsShopDTO = omsShopDTOMap.get(auth.getSellerId() + '#' + amazonProductRepsDTO.getSummaries().get(0).getMarketplaceId());
+            // 使用Map存储已存在的店铺产品信息，key=externalId, value=OmsShopProductDO
             Map<String, OmsShopProductDTO> existShopProductMap = Optional.ofNullable(existShopProducts)
                 .orElse(Collections.emptyList())
                 .stream()
@@ -143,7 +136,7 @@ public class AmazonToOmsConverter {
         Map<String, OmsOrderDTO> existOrderMap = Optional.ofNullable(existOrders)
             .orElse(Collections.emptyList())
             .stream()
-            .collect(Collectors.toMap(omsOrderDTO -> omsOrderDTO.getExternalCode(), omsOrderDTO -> omsOrderDTO));
+            .collect(Collectors.toMap(omsOrderDTO -> omsOrderDTO.getExternalId(), omsOrderDTO -> omsOrderDTO));
 
 
         List<Long> shopIds = omsShopMap.values().stream().map(OmsShopDTO::getId).toList();
@@ -167,7 +160,7 @@ public class AmazonToOmsConverter {
                 omsOrderSaveReqDTO.setCode(omsOrderDTO.getCode());
             });
             omsOrderSaveReqDTO.setPlatformCode(this.platform.toString());
-            omsOrderSaveReqDTO.setExternalCode(order.getAmazonOrderId());
+            omsOrderSaveReqDTO.setExternalId(order.getAmazonOrderId());
             MapUtils.findAndThen(omsShopMap, order.getMarketplaceId() + '#' + auth.getSellerId(), omsShopDTO -> omsOrderSaveReqDTO.setShopId(omsShopDTO.getId()));
             omsOrderSaveReqDTO.setPayTime(order.getPurchaseDate());
             omsOrderSaveReqDTO.setOrderCreateTime(order.getPurchaseDate());
@@ -201,6 +194,7 @@ public class AmazonToOmsConverter {
             List<OmsOrderItemSaveReqDTO> omsOrderItemSaveReqDTOs = new ArrayList<>();
             for (AmazonSpOrderItemRespVO.OrderItem orderItem : orderItems) {
                 OmsOrderItemSaveReqDTO omsOrderItemSaveReqDTO = new OmsOrderItemSaveReqDTO();
+                omsOrderItemSaveReqDTO.setExternalId(orderItem.getOrderItemId());
                 if (ObjectUtil.isNotEmpty(existShopProductMap.get(omsOrderSaveReqDTO.getShopId()))) {
                     omsOrderItemSaveReqDTO.setShopProductId(existShopProductMap.get(omsOrderSaveReqDTO.getShopId()).get(orderItem.getSellerSKU()).getId());
                 }

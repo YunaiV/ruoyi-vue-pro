@@ -36,6 +36,21 @@ public class OmsOrderItemDO extends TenantBaseDO {
      * 店铺产品编号
      */
     private Long shopProductId;
+
+    /**
+     * 店铺产品外部来源id
+     */
+    private String shopProductExternalId;
+
+    /**
+     * 店铺产品外部编码
+     */
+    private String shopProductExternalCode;
+
+    /***
+     * 外部来源唯一标识
+     */
+    private String externalId;
     /**
      * 店铺产品数量
      */

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor
@@ -26,9 +25,9 @@ public class WayfairOrderRepsVO {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class DropshipPurchaseOrder {
         private String poNumber;
-        private LocalDateTime poDate;
+        private String poDate;
         private Long orderId;
-        private LocalDateTime estimatedShipDate;
+        private String estimatedShipDate;
         private String customerName;
         private String customerAddress1;
         private String customerAddress2;

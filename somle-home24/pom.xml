@@ -7,10 +7,8 @@
         <version>${revision}</version>
     </parent>
 
-    <groupId>com.somle.home24</groupId>
+    <groupId>com.somle</groupId>
     <artifactId>somle-home24</artifactId>
-
-    <name>somle-home24</name>
 
 
     <dependencies>

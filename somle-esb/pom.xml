@@ -165,6 +165,31 @@
             <version>${revision}</version>
         </dependency>
         <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-shopee</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-lazada</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-home24</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-manomano</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-tiktok</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-tms-api</artifactId>
             <version>${revision}</version>

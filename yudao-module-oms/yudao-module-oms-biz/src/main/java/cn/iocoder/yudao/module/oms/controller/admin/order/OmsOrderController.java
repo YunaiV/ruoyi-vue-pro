@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.oms.dal.dataobject.OmsOrderItemDO;
 import cn.iocoder.yudao.module.oms.dal.dataobject.OmsShopProductItemDO;
 import cn.iocoder.yudao.module.oms.service.OmsOrderService;
 import cn.iocoder.yudao.module.oms.service.OmsShopProductItemService;
+import cn.iocoder.yudao.module.oms.service.OmsShopProductService;
 import cn.iocoder.yudao.module.oms.service.OmsShopService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -49,6 +50,8 @@ public class OmsOrderController {
     private OmsOrderService omsOrderService;
     @Resource
     private OmsShopProductItemService omsShopProductItemService;
+    @Resource
+    private OmsShopProductService omsShopProductService;
 
     @Resource
     private OmsShopService omsShopService;
@@ -77,7 +80,7 @@ public class OmsOrderController {
         OmsOrderPageReqVO vo = OmsOrderPageReqVO.builder()
             .code(order.getCode())
             .shopId(order.getShopId())
-            .externalCode(order.getExternalCode())
+            .externalId(order.getExternalId())
             .build();
         PageResult<OmsOrderDO> pageResult = new PageResult<>();
         pageResult.setTotal(1L);
@@ -116,7 +119,7 @@ public class OmsOrderController {
         Map<Long, OmsShopRespVO> shopMap = omsShopService.getShopMapByIds(shopIds);
 
 
-        return BeanUtils.toBean(pageResult, OmsOrderRespVO.class, order -> {
+        PageResult<OmsOrderRespVO> bean = BeanUtils.toBean(pageResult, OmsOrderRespVO.class, order -> {
             MapUtils.findAndThen(productMap, order.getId(), productList -> {
                 order.setProductNames(CollUtil.join(productList, ",", ErpProductRespDTO::getName));
 
@@ -131,10 +134,19 @@ public class OmsOrderController {
                 order.setItems(items);
             });
 
+            MapUtils.findAndThen(orderItemMap, order.getId(), orderItems -> {
+                StringBuffer sb = new StringBuffer();
+                orderItems.forEach(orderItem -> {
+                    sb.append(orderItem.getShopProductExternalCode()).append(" * ").append(orderItem.getQty()).append(" ; ");
+                });
+                order.setOrderItemNames(sb.toString());
+            });
+
             MapUtils.findAndThen(shopMap, order.getShopId(), shop -> {
                 order.setShopName(shop.getName());
             });
         });
+        return bean;
     }
     // todo 待优化订单项详情
 

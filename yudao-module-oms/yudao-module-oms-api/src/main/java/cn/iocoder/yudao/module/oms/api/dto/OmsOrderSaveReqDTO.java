@@ -28,9 +28,9 @@ public class OmsOrderSaveReqDTO {
      */
     private String code;
     /**
-     * 外部单据编码，即平台订单号 唯一标识
+     * 外部单据id【平台订单号 唯一标识】
      */
-    private String externalCode;
+    private String externalId;
     /**
      * 店铺id
      */

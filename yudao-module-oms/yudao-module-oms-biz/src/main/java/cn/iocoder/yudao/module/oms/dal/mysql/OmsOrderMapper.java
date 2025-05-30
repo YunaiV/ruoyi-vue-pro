@@ -25,7 +25,7 @@ public interface OmsOrderMapper extends BaseMapperX<OmsOrderDO> {
         return new MPJLambdaWrapperX<OmsOrderDO>()
             .eqIfPresent(OmsOrderDO::getPlatformCode, reqVO.getPlatformCode())
             .eqIfPresent(OmsOrderDO::getCode, reqVO.getCode())
-            .eqIfPresent(OmsOrderDO::getExternalCode, reqVO.getExternalCode())
+            .likeIfPresent(OmsOrderDO::getExternalId, reqVO.getExternalId())
             .eqIfPresent(OmsOrderDO::getShopId, reqVO.getShopId())
             .eqIfPresent(OmsOrderDO::getShippingFee, reqVO.getShippingFee())
             .eqIfPresent(OmsOrderDO::getTotalPrice, reqVO.getTotalPrice())
