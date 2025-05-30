@@ -47,10 +47,4 @@ public class IotNetComponentServerProperties {
      */
     private String serverKey = "yudao-module-iot-net-component-server";
 
-    /**
-     * 心跳发送频率，单位：毫秒
-     * <p>
-     * 默认：30 秒
-     */
-    private Long heartbeatInterval = 30000L;
-} 
+}

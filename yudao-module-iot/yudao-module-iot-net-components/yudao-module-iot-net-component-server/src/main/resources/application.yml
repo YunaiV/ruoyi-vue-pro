@@ -17,8 +17,6 @@ yudao:
     base-package: cn.iocoder.yudao # 主项目包路径，确保正确
   iot:
     component:
-      # 这里可以覆盖或添加 component-core 中的通用配置
-      instance-heartbeat-timeout: 30000 # 心跳超时时间
 
       # 网络组件服务器专用配置
       server:
@@ -32,9 +30,6 @@ yudao:
 
         # 组件服务唯一标识
         server-key: yudao-module-iot-net-component-server
-
-        # 心跳频率，单位：毫秒
-        heartbeat-interval: 30000
 
       # ====================================
       # 针对引入的 HTTP 组件的配置

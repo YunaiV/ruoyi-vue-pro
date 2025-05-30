@@ -80,14 +80,4 @@ public interface IotDeviceUpstreamApi {
     @PostMapping(PREFIX + "/authenticate-emqx-connection")
     CommonResult<Boolean> authenticateEmqxConnection(@Valid @RequestBody IotDeviceEmqxAuthReqDTO authReqDTO);
 
-    // ========== 插件相关 ==========
-
-    /**
-     * 心跳插件实例
-     *
-     * @param heartbeatReqDTO 心跳插件实例 DTO
-     */
-    @PostMapping(PREFIX + "/heartbeat-plugin-instance")
-    CommonResult<Boolean> heartbeatPluginInstance(@Valid @RequestBody IotPluginInstanceHeartbeatReqDTO heartbeatReqDTO);
-
 }

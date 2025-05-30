@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.iot.service.plugin;
 
-import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.IotPluginInstanceHeartbeatReqDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginConfigDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInstanceDO;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,13 +12,6 @@ import java.time.LocalDateTime;
  * @author 芋道源码
  */
 public interface IotPluginInstanceService {
-
-    /**
-     * 心跳插件实例
-     *
-     * @param heartbeatReqDTO 心跳插件实例 DTO
-     */
-    void heartbeatPluginInstance(IotPluginInstanceHeartbeatReqDTO heartbeatReqDTO);
 
     /**
      * 离线超时插件实例

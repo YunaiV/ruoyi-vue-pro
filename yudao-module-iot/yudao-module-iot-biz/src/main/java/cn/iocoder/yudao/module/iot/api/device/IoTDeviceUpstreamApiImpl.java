@@ -21,8 +21,6 @@ public class IoTDeviceUpstreamApiImpl implements IotDeviceUpstreamApi {
 
     @Resource
     private IotDeviceUpstreamService deviceUpstreamService;
-    @Resource
-    private IotPluginInstanceService pluginInstanceService;
 
     // ========== 设备相关 ==========
 
@@ -66,14 +64,6 @@ public class IoTDeviceUpstreamApiImpl implements IotDeviceUpstreamApi {
     public CommonResult<Boolean> authenticateEmqxConnection(IotDeviceEmqxAuthReqDTO authReqDTO) {
         boolean result = deviceUpstreamService.authenticateEmqxConnection(authReqDTO);
         return success(result);
-    }
-
-    // ========== 插件相关 ==========
-
-    @Override
-    public CommonResult<Boolean> heartbeatPluginInstance(IotPluginInstanceHeartbeatReqDTO heartbeatReqDTO) {
-        pluginInstanceService.heartbeatPluginInstance(heartbeatReqDTO);
-        return success(true);
     }
 
 }

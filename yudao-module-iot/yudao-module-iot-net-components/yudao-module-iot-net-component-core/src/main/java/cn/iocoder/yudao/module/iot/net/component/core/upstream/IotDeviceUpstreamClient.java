@@ -53,8 +53,4 @@ public class IotDeviceUpstreamClient implements IotDeviceUpstreamApi {
         return deviceUpstreamApi.reportDeviceProperty(reportReqDTO);
     }
 
-    @Override
-    public CommonResult<Boolean> heartbeatPluginInstance(IotPluginInstanceHeartbeatReqDTO heartbeatReqDTO) {
-        return deviceUpstreamApi.heartbeatPluginInstance(heartbeatReqDTO);
-    }
 }

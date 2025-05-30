@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.iot.net.component.emqx.upstream;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
-import cn.iocoder.yudao.module.iot.net.component.core.heartbeat.IotNetComponentRegistry;
 import cn.iocoder.yudao.module.iot.net.component.emqx.config.IotNetComponentEmqxProperties;
 import cn.iocoder.yudao.module.iot.net.component.emqx.upstream.router.IotDeviceAuthVertxHandler;
 import cn.iocoder.yudao.module.iot.net.component.emqx.upstream.router.IotDeviceMqttMessageHandler;
@@ -40,7 +39,6 @@ public class IotDeviceUpstreamServer {
     private final MqttClient client;
     private final IotNetComponentEmqxProperties emqxProperties;
     private final IotDeviceMqttMessageHandler mqttMessageHandler;
-    private final IotNetComponentRegistry componentRegistry;
 
     /**
      * 服务运行状态标志
@@ -50,12 +48,10 @@ public class IotDeviceUpstreamServer {
     public IotDeviceUpstreamServer(IotNetComponentEmqxProperties emqxProperties,
                                    IotDeviceUpstreamApi deviceUpstreamApi,
                                    Vertx vertx,
-                                   MqttClient client,
-                                   IotNetComponentRegistry componentRegistry) {
+                                   MqttClient client) {
         this.vertx = vertx;
         this.emqxProperties = emqxProperties;
         this.client = client;
-        this.componentRegistry = componentRegistry;
 
         // 创建 Router 实例
         Router router = Router.router(vertx);

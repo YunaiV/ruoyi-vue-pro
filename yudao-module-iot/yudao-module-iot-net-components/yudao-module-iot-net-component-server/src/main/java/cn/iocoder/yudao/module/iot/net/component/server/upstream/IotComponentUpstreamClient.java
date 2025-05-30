@@ -69,12 +69,6 @@ public class IotComponentUpstreamClient implements IotDeviceUpstreamApi {
         return doPost(url, reportReqDTO);
     }
 
-    @Override
-    public CommonResult<Boolean> heartbeatPluginInstance(IotPluginInstanceHeartbeatReqDTO heartbeatReqDTO) {
-        String url = properties.getUpstreamUrl() + URL_PREFIX + "/heartbeat-plugin-instance";
-        return doPost(url, heartbeatReqDTO);
-    }
-
     @SuppressWarnings("unchecked")
     private <T> CommonResult<Boolean> doPost(String url, T requestBody) {
         try {
@@ -87,4 +81,4 @@ public class IotComponentUpstreamClient implements IotDeviceUpstreamApi {
             return CommonResult.error(INTERNAL_SERVER_ERROR);
         }
     }
-} 
+}
