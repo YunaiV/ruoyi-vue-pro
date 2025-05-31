@@ -103,39 +103,6 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- JavaScript 引擎 - 使用 GraalJS 替代 Nashorn -->
-        <!-- TODO @haohao：得考虑下，jdk8 可能不支持 graalvm，后续哈；【优先级：低】 -->
-        <dependency>
-            <groupId>org.graalvm.sdk</groupId>
-            <artifactId>graal-sdk</artifactId>
-            <version>22.3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.graalvm.js</groupId>
-            <artifactId>js</artifactId>
-            <version>22.3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.graalvm.js</groupId>
-            <artifactId>js-scriptengine</artifactId>
-            <version>22.3.0</version>
-        </dependency>
-
-        <!-- TODO @芋艿：合理注释 -->
-        <!-- IoT 数据桥梁的执行器所需消息队列。如果您只需要使用 rocketmq 那么则注释掉其它消息队列即可 -->
-        <!--        <dependency>-->
-        <!--            <groupId>org.apache.rocketmq</groupId>-->
-        <!--            <artifactId>rocketmq-spring-boot-starter</artifactId>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.kafka</groupId>-->
-        <!--            <artifactId>spring-kafka</artifactId>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.boot</groupId>-->
-        <!--            <artifactId>spring-boot-starter-amqp</artifactId>-->
-        <!--        </dependency>-->
-
         <!-- IoT 网络组件：接收来自设备的上行数据 -->
         <!--        <dependency>-->
         <!--            <groupId>cn.iocoder.boot</groupId>-->
@@ -147,13 +114,6 @@
         <!--            <artifactId>yudao-module-iot-net-component-emqx</artifactId>-->
         <!--            <version>${revision}</version>-->
         <!--        </dependency>-->
-
-        <!-- 脚本相关 -->
-<!--        <dependency>-->
-<!--            <groupId>cn.iocoder.boot</groupId>-->
-<!--            <artifactId>yudao-module-iot-script</artifactId>-->
-<!--            <version>${revision}</version>-->
-<!--        </dependency>-->
     </dependencies>
 
 </project>

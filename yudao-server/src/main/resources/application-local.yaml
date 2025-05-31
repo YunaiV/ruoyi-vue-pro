@@ -69,13 +69,13 @@ spring:
           url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true&nullCatalogMeansCurrent=true
           username: root
           password: 123456
-#        tdengine: # IoT 数据库（需要 IoT 物联网再开启噢！）
-#          url: jdbc:TAOS-RS://127.0.0.1:6041/ruoyi_vue_pro
-#          driver-class-name: com.taosdata.jdbc.rs.RestfulDriver
-#          username: root
-#          password: taosdata
-#          druid:
-#            validation-query: SELECT SERVER_STATUS() # TDengine 数据源的有效性检查 SQL
+        tdengine: # IoT 数据库（需要 IoT 物联网再开启噢！）
+          url: jdbc:TAOS-RS://127.0.0.1:6041/ruoyi_vue_pro
+          driver-class-name: com.taosdata.jdbc.rs.RestfulDriver
+          username: root
+          password: taosdata
+          druid:
+            validation-query: SELECT SERVER_STATUS() # TDengine 数据源的有效性检查 SQL
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   data:
