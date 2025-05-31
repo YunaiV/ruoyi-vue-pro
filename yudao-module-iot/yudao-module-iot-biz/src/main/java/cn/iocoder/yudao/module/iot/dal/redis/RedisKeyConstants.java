@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.dal.redis;
 
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInstanceDO;
 
 /**
  * IoT Redis Key 枚举类
@@ -42,14 +41,5 @@ public interface RedisKeyConstants {
      * VALUE 数据类型：String 数组(JSON)，即 {@link cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO} 列表
      */
     String THING_MODEL_LIST = "iot:thing_model_list";
-
-    /**
-     * 设备插件的插件进程编号的映射，采用 HASH 结构
-     *
-     * KEY 格式：device_plugin_instance_process_ids
-     * HASH KEY：${deviceKey}
-     * VALUE：插件进程编号，对应 {@link IotPluginInstanceDO#getProcessId()} 字段
-     */
-    String DEVICE_PLUGIN_INSTANCE_PROCESS_IDS = "iot:device_plugin_instance_process_ids";
 
 }

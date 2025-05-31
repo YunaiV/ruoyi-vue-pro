@@ -1,25 +1,23 @@
 package cn.iocoder.yudao.module.iot.service.device.control;
 
-import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.*;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDeviceConfigSetReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDeviceOtaUpgradeReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDevicePropertyGetReqDTO;
+import cn.iocoder.yudao.module.iot.api.device.dto.control.downstream.IotDeviceServiceInvokeReqDTO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceDownstreamReqVO;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.plugin.IotPluginInstanceDO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageIdentifierEnum;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageTypeEnum;
 import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.mq.producer.device.IotDeviceProducer;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
-import cn.iocoder.yudao.module.iot.service.plugin.IotPluginInstanceService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestTemplate;
@@ -45,8 +43,6 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
 
     @Resource
     private IotDeviceService deviceService;
-    @Resource
-    private IotPluginInstanceService pluginInstanceService;
 
     @Resource
     private RestTemplate restTemplate;
@@ -118,7 +114,8 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
                 downstreamReqVO.getIdentifier());
         IotDeviceServiceInvokeReqDTO reqDTO = new IotDeviceServiceInvokeReqDTO()
                 .setParams((Map<String, Object>) downstreamReqVO.getData());
-        CommonResult<Boolean> result = requestPlugin(url, reqDTO, device);
+//        CommonResult<Boolean> result = requestPlugin(url, reqDTO, device);
+        CommonResult<Boolean> result = null;
 
         // 3. 发送设备消息
         IotDeviceMessage message = new IotDeviceMessage().setRequestId(reqDTO.getRequestId())
@@ -187,7 +184,8 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
                 getProductKey(device, parentDevice), getDeviceName(device, parentDevice));
         IotDevicePropertyGetReqDTO reqDTO = new IotDevicePropertyGetReqDTO()
                 .setIdentifiers((List<String>) downstreamReqVO.getData());
-        CommonResult<Boolean> result = requestPlugin(url, reqDTO, device);
+//        CommonResult<Boolean> result = requestPlugin(url, reqDTO, device);
+        CommonResult<Boolean> result = null;
 
         // 3. 发送设备消息
         IotDeviceMessage message = new IotDeviceMessage().setRequestId(reqDTO.getRequestId())
@@ -224,7 +222,8 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
                 getProductKey(device, parentDevice), getDeviceName(device, parentDevice));
         IotDeviceConfigSetReqDTO reqDTO = new IotDeviceConfigSetReqDTO()
                 .setConfig(config);
-        CommonResult<Boolean> result = requestPlugin(url, reqDTO, device);
+//        CommonResult<Boolean> result = requestPlugin(url, reqDTO, device);
+        CommonResult<Boolean> result = null;
 
         // 3. 发送设备消息
         IotDeviceMessage message = new IotDeviceMessage().setRequestId(reqDTO.getRequestId())
@@ -261,7 +260,8 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
         String url = String.format("ota/%s/%s/upgrade",
                 getProductKey(device, parentDevice), getDeviceName(device, parentDevice));
         IotDeviceOtaUpgradeReqDTO reqDTO = IotDeviceOtaUpgradeReqDTO.build(data);
-        CommonResult<Boolean> result = requestPlugin(url, reqDTO, device);
+//        CommonResult<Boolean> result = requestPlugin(url, reqDTO, device);
+        CommonResult<Boolean> result = null;
 
         // 3. 发送设备消息
         IotDeviceMessage message = new IotDeviceMessage().setRequestId(reqDTO.getRequestId())
@@ -277,43 +277,6 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
             throw exception(DEVICE_DOWNSTREAM_FAILED, result.getMsg());
         }
         return message;
-    }
-
-    /**
-     * 请求插件
-     *
-     * @param url    URL
-     * @param reqDTO 请求参数，只需要设置子类的参数！
-     * @param device 设备
-     * @return 响应结果
-     */
-    @SuppressWarnings({ "unchecked", "HttpUrlsUsage" })
-    private CommonResult<Boolean> requestPlugin(String url, IotDeviceDownstreamAbstractReqDTO reqDTO,
-            IotDeviceDO device) {
-        // 获得设备对应的插件实例
-        IotPluginInstanceDO pluginInstance = pluginInstanceService.getPluginInstanceByDeviceKey(device.getDeviceKey());
-        if (pluginInstance == null) {
-            throw exception(DEVICE_DOWNSTREAM_FAILED, "设备找不到对应的插件实例");
-        }
-
-        // 补充通用参数
-        reqDTO.setRequestId(IdUtil.fastSimpleUUID());
-
-        // 执行请求
-        ResponseEntity<CommonResult<Boolean>> responseEntity;
-        try {
-            responseEntity = restTemplate.postForEntity(
-                    String.format("http://%s:%d/%s", pluginInstance.getHostIp(), pluginInstance.getDownstreamPort(),
-                            url),
-                    reqDTO, (Class<CommonResult<Boolean>>) (Class<?>) CommonResult.class);
-            Assert.isTrue(responseEntity.getStatusCode().is2xxSuccessful(),
-                    "HTTP 状态码不是 2xx，而是" + responseEntity.getStatusCode());
-            Assert.notNull(responseEntity.getBody(), "响应结果不能为空");
-        } catch (Exception ex) {
-            log.error("[requestPlugin][设备({}) url({}) 下行消息失败，请求参数({})]", device.getDeviceKey(), url, reqDTO, ex);
-            throw exception(DEVICE_DOWNSTREAM_FAILED, ExceptionUtil.getMessage(ex));
-        }
-        return responseEntity.getBody();
     }
 
     private void sendDeviceMessage(IotDeviceMessage message, IotDeviceDO device, Integer code) {

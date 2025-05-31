@@ -316,6 +316,3 @@ yudao:
       type: rocketmq # 消息总线的类型
 
 debug: false
-# 插件配置 TODO 芋艿：【IOT】需要处理下
-pf4j:
-  pluginsDir: /Users/anhaohao/code/gitee/ruoyi-vue-pro/plugins # 插件目录

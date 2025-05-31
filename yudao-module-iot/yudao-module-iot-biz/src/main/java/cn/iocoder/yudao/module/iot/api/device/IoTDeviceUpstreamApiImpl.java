@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.iot.api.device;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.*;
 import cn.iocoder.yudao.module.iot.service.device.control.IotDeviceUpstreamService;
-import cn.iocoder.yudao.module.iot.service.plugin.IotPluginInstanceService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Primary;
 import org.springframework.validation.annotation.Validated;

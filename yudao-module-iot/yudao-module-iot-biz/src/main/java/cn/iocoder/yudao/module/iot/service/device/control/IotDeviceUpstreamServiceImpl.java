@@ -19,7 +19,6 @@ import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.mq.producer.device.IotDeviceProducer;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
-import cn.iocoder.yudao.module.iot.service.plugin.IotPluginInstanceService;
 import cn.iocoder.yudao.module.iot.util.MqttSignUtils;
 import cn.iocoder.yudao.module.iot.util.MqttSignUtils.MqttSignResult;
 import jakarta.annotation.Resource;
@@ -45,8 +44,6 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
     private IotDeviceService deviceService;
     @Resource
     private IotDevicePropertyService devicePropertyService;
-    @Resource
-    private IotPluginInstanceService pluginInstanceService;
 
     @Resource
     private IotDeviceProducer deviceProducer;
@@ -315,7 +312,8 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
 
     private void updateDeviceLastTime(IotDeviceDO device, IotDeviceUpstreamAbstractReqDTO reqDTO) {
         // 1. 【异步】记录设备与插件实例的映射
-        pluginInstanceService.updateDevicePluginInstanceProcessIdAsync(device.getDeviceKey(), reqDTO.getProcessId());
+//        pluginInstanceService.updateDevicePluginInstanceProcessIdAsync(device.getDeviceKey(), reqDTO.getProcessId());
+        // TODO @芋艿：需要单独补充下；
 
         // 2. 【异步】更新设备的最后时间
         devicePropertyService.updateDeviceReportTimeAsync(device.getDeviceKey(), LocalDateTime.now());

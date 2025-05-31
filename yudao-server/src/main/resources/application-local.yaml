@@ -266,8 +266,3 @@ justauth:
     type: REDIS
     prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::
     timeout: 24h # 超时时长，目前只对 Redis 缓存生效，默认 3 分钟
-
---- #################### iot相关配置 TODO 芋艿【IOT】：再瞅瞅 ####################
-pf4j:
-#  pluginsDir: /tmp/
-  pluginsDir: ../plugins
