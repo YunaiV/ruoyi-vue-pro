@@ -1,0 +1,109 @@
+package cn.iocoder.yudao.module.iot.gateway.config;
+
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
+
+@ConfigurationProperties(prefix = "yudao.iot.gateway")
+@Validated
+@Data
+public class IotGatewayProperties {
+
+    /**
+     * 设备 RPC 服务配置
+     */
+    private RpcProperties rpc;
+
+    /**
+     * 协议配置
+     */
+    private ProtocolProperties protocol;
+
+    @Data
+    public static class RpcProperties {
+
+        /**
+         * 主程序 API 地址
+         */
+        private String url;
+        /**
+         * 连接超时时间
+         */
+        private String connectTimeout;
+        /**
+         * 读取超时时间
+         */
+        private String readTimeout;
+
+    }
+
+    @Data
+    public static class ProtocolProperties {
+
+        /**
+         * HTTP 组件配置
+         */
+        private HttpProperties http;
+
+        /**
+         * EMQX 组件配置
+         */
+        private EmqxProperties emqx;
+
+    }
+
+    @Data
+    public static class HttpProperties {
+
+        /**
+         * 是否开启
+         */
+        private Boolean enabled;
+        /**
+         * 服务端口
+         */
+        private Integer serverPort;
+
+    }
+
+    @Data
+    public static class EmqxProperties {
+
+        /**
+         * 是否开启
+         */
+        private Boolean enabled;
+        /**
+         * MQTT 服务器地址
+         */
+        private String mqttHost;
+        /**
+         * MQTT 服务器端口
+         */
+        private Integer mqttPort;
+        /**
+         * MQTT 用户名
+         */
+        private String mqttUsername;
+        /**
+         * MQTT 密码
+         */
+        private String mqttPassword;
+        /**
+         * MQTT 是否开启 SSL
+         */
+        private Boolean mqttSsl;
+        /**
+         * MQTT 主题
+         */
+        private List<String> mqttTopics;
+        /**
+         * 认证端口
+         */
+        private Integer authPort;
+
+    }
+
+}

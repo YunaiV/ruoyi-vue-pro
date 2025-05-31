@@ -17,30 +17,10 @@
     </description>
 
     <dependencies>
-        <!-- Spring Boot 核心 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-
         <!-- Web 相关 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <!-- Net Component 核心 -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-iot-net-component-core</artifactId>
-            <version>${revision}</version>
-        </dependency>
-
-        <!-- Net Component HTTP -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-iot-net-component-http</artifactId>
-            <version>${revision}</version>
         </dependency>
 
         <!-- Net Component EMQX -->
@@ -50,32 +30,8 @@
             <version>${revision}</version>
         </dependency>
 
-        <!-- TODO @芋艿：消息队列，后续可能去掉，默认不使用 rocketmq -->
-        <dependency>
-            <groupId>org.apache.rocketmq</groupId>
-            <artifactId>rocketmq-spring-boot-starter</artifactId>
-        </dependency>
+
 
     </dependencies>
-
-    <build>
-        <!-- 设置构建的 jar 包名 -->
-        <finalName>${project.artifactId}</finalName>
-        <plugins>
-            <!-- 打包 -->
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring.boot.version}</version>                <!-- 需要确认父 POM 中有定义 -->
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>                            <!-- 将引入的 jar 打入其中 -->
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

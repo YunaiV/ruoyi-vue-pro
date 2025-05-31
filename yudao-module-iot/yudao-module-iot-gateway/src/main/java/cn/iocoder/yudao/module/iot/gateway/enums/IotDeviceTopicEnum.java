@@ -1,8 +1,8 @@
-package cn.iocoder.yudao.module.iot.net.component.core.constants;
+package cn.iocoder.yudao.module.iot.gateway.enums;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-// TODO @haohao：要不放到 enums 包下；
 /**
  * IoT 设备主题枚举
  * <p>
@@ -10,6 +10,7 @@ import lombok.Getter;
  *
  * @author haohao
  */
+@RequiredArgsConstructor
 @Getter
 public enum IotDeviceTopicEnum {
 
@@ -27,36 +28,36 @@ public enum IotDeviceTopicEnum {
     // TODO @haohao：注释时，中英文之间，有个空格；
     /**
      * 设备属性设置主题
-     * 请求Topic：/sys/${productKey}/${deviceName}/thing/service/property/set
-     * 响应Topic：/sys/${productKey}/${deviceName}/thing/service/property/set_reply
+     * 请求 Topic：/sys/${productKey}/${deviceName}/thing/service/property/set
+     * 响应 Topic：/sys/${productKey}/${deviceName}/thing/service/property/set_reply
      */
     PROPERTY_SET_TOPIC("/thing/service/property/set", "设备属性设置主题"),
 
     /**
      * 设备属性获取主题
-     * 请求Topic：/sys/${productKey}/${deviceName}/thing/service/property/get
-     * 响应Topic：/sys/${productKey}/${deviceName}/thing/service/property/get_reply
+     * 请求 Topic：/sys/${productKey}/${deviceName}/thing/service/property/get
+     * 响应 Topic：/sys/${productKey}/${deviceName}/thing/service/property/get_reply
      */
     PROPERTY_GET_TOPIC("/thing/service/property/get", "设备属性获取主题"),
 
     /**
      * 设备配置设置主题
-     * 请求Topic：/sys/${productKey}/${deviceName}/thing/service/config/set
-     * 响应Topic：/sys/${productKey}/${deviceName}/thing/service/config/set_reply
+     * 请求 Topic：/sys/${productKey}/${deviceName}/thing/service/config/set
+     * 响应 Topic：/sys/${productKey}/${deviceName}/thing/service/config/set_reply
      */
     CONFIG_SET_TOPIC("/thing/service/config/set", "设备配置设置主题"),
 
     /**
      * 设备OTA升级主题
-     * 请求Topic：/sys/${productKey}/${deviceName}/thing/service/ota/upgrade
-     * 响应Topic：/sys/${productKey}/${deviceName}/thing/service/ota/upgrade_reply
+     * 请求 Topic：/sys/${productKey}/${deviceName}/thing/service/ota/upgrade
+     * 响应 Topic：/sys/${productKey}/${deviceName}/thing/service/ota/upgrade_reply
      */
     OTA_UPGRADE_TOPIC("/thing/service/ota/upgrade", "设备OTA升级主题"),
 
     /**
      * 设备属性上报主题
-     * 请求Topic：/sys/${productKey}/${deviceName}/thing/event/property/post
-     * 响应Topic：/sys/${productKey}/${deviceName}/thing/event/property/post_reply
+     * 请求 Topic：/sys/${productKey}/${deviceName}/thing/event/property/post
+     * 响应 Topic：/sys/${productKey}/${deviceName}/thing/event/property/post_reply
      */
     PROPERTY_POST_TOPIC("/thing/event/property/post", "设备属性上报主题"),
 
@@ -77,12 +78,6 @@ public enum IotDeviceTopicEnum {
 
     private final String topic;
     private final String description;
-
-    // TODO @haohao：使用 lombok 去除
-    IotDeviceTopicEnum(String topic, String description) {
-        this.topic = topic;
-        this.description = description;
-    }
 
     /**
      * 构建设备服务调用主题

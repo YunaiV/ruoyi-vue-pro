@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.iot.net.component.core.pojo;
 
 import cn.hutool.core.util.StrUtil;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 /**
  * IoT 标准协议响应实体类
@@ -12,7 +11,6 @@ import lombok.experimental.Accessors;
  * @author haohao
  */
 @Data
-@Accessors(chain = true) // TODO @haohao：貌似不用写 @Accessors(chain = true)，我全局加啦，可见 lombok.config
 public class IotStandardResponse {
 
     /**

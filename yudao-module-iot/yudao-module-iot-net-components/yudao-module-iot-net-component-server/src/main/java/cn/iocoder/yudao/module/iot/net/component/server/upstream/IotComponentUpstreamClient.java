@@ -1,8 +1,6 @@
 package cn.iocoder.yudao.module.iot.net.component.server.upstream;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
-import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.*;
 import cn.iocoder.yudao.module.iot.net.component.server.config.IotNetComponentServerProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +17,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
  */
 @RequiredArgsConstructor
 @Slf4j
-public class IotComponentUpstreamClient implements IotDeviceUpstreamApi {
+public class IotComponentUpstreamClient {
 
     public static final String URL_PREFIX = "/rpc-api/iot/device/upstream";
 
@@ -27,47 +25,11 @@ public class IotComponentUpstreamClient implements IotDeviceUpstreamApi {
 
     private final RestTemplate restTemplate;
 
-    @Override
-    public CommonResult<Boolean> updateDeviceState(IotDeviceStateUpdateReqDTO updateReqDTO) {
-        String url = properties.getUpstreamUrl() + URL_PREFIX + "/update-state";
-        return doPost(url, updateReqDTO);
-    }
-
-    @Override
-    public CommonResult<Boolean> reportDeviceEvent(IotDeviceEventReportReqDTO reportReqDTO) {
-        String url = properties.getUpstreamUrl() + URL_PREFIX + "/report-event";
-        return doPost(url, reportReqDTO);
-    }
-
-    @Override
-    public CommonResult<Boolean> registerDevice(IotDeviceRegisterReqDTO registerReqDTO) {
-        String url = properties.getUpstreamUrl() + URL_PREFIX + "/register-device";
-        return doPost(url, registerReqDTO);
-    }
-
-    @Override
-    public CommonResult<Boolean> registerSubDevice(IotDeviceRegisterSubReqDTO registerReqDTO) {
-        String url = properties.getUpstreamUrl() + URL_PREFIX + "/register-sub-device";
-        return doPost(url, registerReqDTO);
-    }
-
-    @Override
-    public CommonResult<Boolean> addDeviceTopology(IotDeviceTopologyAddReqDTO addReqDTO) {
-        String url = properties.getUpstreamUrl() + URL_PREFIX + "/add-device-topology";
-        return doPost(url, addReqDTO);
-    }
-
-    @Override
-    public CommonResult<Boolean> authenticateEmqxConnection(IotDeviceEmqxAuthReqDTO authReqDTO) {
-        String url = properties.getUpstreamUrl() + URL_PREFIX + "/authenticate-emqx-connection";
-        return doPost(url, authReqDTO);
-    }
-
-    @Override
-    public CommonResult<Boolean> reportDeviceProperty(IotDevicePropertyReportReqDTO reportReqDTO) {
-        String url = properties.getUpstreamUrl() + URL_PREFIX + "/report-property";
-        return doPost(url, reportReqDTO);
-    }
+//    @Override
+//    public CommonResult<Boolean> updateDeviceState(IotDeviceStateUpdateReqDTO updateReqDTO) {
+//        String url = properties.getUpstreamUrl() + URL_PREFIX + "/update-state";
+//        return doPost(url, updateReqDTO);
+//    }
 
     @SuppressWarnings("unchecked")
     private <T> CommonResult<Boolean> doPost(String url, T requestBody) {

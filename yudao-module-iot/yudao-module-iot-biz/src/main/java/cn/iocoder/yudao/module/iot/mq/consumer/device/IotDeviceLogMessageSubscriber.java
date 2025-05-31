@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.mq.consumer.device;
 
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
-import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBusSubscriber;
+import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.service.device.data.IotDeviceLogService;
 import jakarta.annotation.PostConstruct;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class IotDeviceLogMessageBusSubscriber implements IotMessageBusSubscriber<IotDeviceMessage> {
+public class IotDeviceLogMessageSubscriber implements IotMessageSubscriber<IotDeviceMessage> {
 
     @Resource
     private IotMessageBus messageBus;

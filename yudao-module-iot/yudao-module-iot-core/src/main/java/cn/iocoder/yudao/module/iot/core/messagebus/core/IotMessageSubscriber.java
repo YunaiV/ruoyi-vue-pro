@@ -7,7 +7,7 @@ package cn.iocoder.yudao.module.iot.core.messagebus.core;
  *
  * @author 芋道源码
  */
-public interface IotMessageBusSubscriber<T> {
+public interface IotMessageSubscriber<T> {
 
     /**
      * @return 主题

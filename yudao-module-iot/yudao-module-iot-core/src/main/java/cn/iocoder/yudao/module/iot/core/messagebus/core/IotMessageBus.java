@@ -22,6 +22,6 @@ public interface IotMessageBus {
      *
      * @param subscriber 订阅者
      */
-    void register(IotMessageBusSubscriber<?> subscriber);
+    void register(IotMessageSubscriber<?> subscriber);
 
 }

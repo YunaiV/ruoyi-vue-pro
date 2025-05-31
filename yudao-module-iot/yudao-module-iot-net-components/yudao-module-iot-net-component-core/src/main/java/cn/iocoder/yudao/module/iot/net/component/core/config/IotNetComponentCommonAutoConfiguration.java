@@ -11,9 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  *
  * @author haohao
  */
-@AutoConfiguration
 @EnableConfigurationProperties(IotNetComponentCommonProperties.class)
-@EnableScheduling // 开启定时任务，因为 IotNetComponentInstanceHeartbeatJob 是一个定时任务
 public class IotNetComponentCommonAutoConfiguration {
 
     /**

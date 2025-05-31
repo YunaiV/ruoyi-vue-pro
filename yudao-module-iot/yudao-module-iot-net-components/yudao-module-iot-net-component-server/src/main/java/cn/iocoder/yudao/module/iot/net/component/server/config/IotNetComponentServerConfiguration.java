@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.iot.net.component.server.config;
 
 import cn.iocoder.yudao.module.iot.api.device.IotDeviceUpstreamApi;
 import cn.iocoder.yudao.module.iot.net.component.server.upstream.IotComponentUpstreamClient;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -50,28 +49,4 @@ public class IotNetComponentServerConfiguration {
         return new IotComponentUpstreamClient(properties, restTemplate);
     }
 
-    /**
-     * 配置默认的设备上行客户端，避免在独立运行模式下的循环依赖问题
-     *
-     * @return 设备上行客户端
-     */
-    @Bean
-    @ConditionalOnMissingBean(name = "serverDeviceUpstreamClient")
-    public Object serverDeviceUpstreamClient() {
-        // 返回一个空对象，避免找不到类的问题
-        return new Object();
-    }
-
-    // TODO @haohao：这个是不是木有用呀？
-    /**
-     * 配置默认的组件实例注册客户端
-     *
-     * @return 插件实例注册客户端
-     */
-    @Bean
-    @ConditionalOnMissingBean(name = "serverPluginInstanceRegistryClient")
-    public Object serverPluginInstanceRegistryClient() {
-        // 返回一个空对象，避免找不到类的问题
-        return new Object();
-    }
 }

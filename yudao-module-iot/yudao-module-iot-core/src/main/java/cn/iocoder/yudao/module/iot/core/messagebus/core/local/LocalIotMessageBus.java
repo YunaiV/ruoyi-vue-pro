@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.core.messagebus.core.local;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
-import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBusSubscriber;
+import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
@@ -30,7 +30,7 @@ public class LocalIotMessageBus implements IotMessageBus {
      * 订阅者映射表
      * Key: topic
      */
-    private final Map<String, List<IotMessageBusSubscriber<?>>> subscribers = new HashMap<>();
+    private final Map<String, List<IotMessageSubscriber<?>>> subscribers = new HashMap<>();
 
     @Override
     public void post(String topic, Object message) {
@@ -38,9 +38,9 @@ public class LocalIotMessageBus implements IotMessageBus {
     }
 
     @Override
-    public void register(IotMessageBusSubscriber<?> subscriber) {
+    public void register(IotMessageSubscriber<?> subscriber) {
         String topic = subscriber.getTopic();
-        List<IotMessageBusSubscriber<?>> topicSubscribers = subscribers.computeIfAbsent(topic, k -> new ArrayList<>());
+        List<IotMessageSubscriber<?>> topicSubscribers = subscribers.computeIfAbsent(topic, k -> new ArrayList<>());
         topicSubscribers.add(subscriber);
         log.info("[register][topic({}/{}) 注册消费者({})成功]",
                 topic, subscriber.getGroup(), subscriber.getClass().getName());
@@ -50,11 +50,11 @@ public class LocalIotMessageBus implements IotMessageBus {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void onMessage(LocalIotMessage message) {
         String topic = message.getTopic();
-        List<IotMessageBusSubscriber<?>> topicSubscribers = subscribers.get(topic);
+        List<IotMessageSubscriber<?>> topicSubscribers = subscribers.get(topic);
         if (CollUtil.isEmpty(topicSubscribers)) {
             return;
         }
-        for (IotMessageBusSubscriber subscriber : topicSubscribers) {
+        for (IotMessageSubscriber subscriber : topicSubscribers) {
             try {
                 subscriber.onMessage(message.getMessage());
             } catch (Exception ex) {

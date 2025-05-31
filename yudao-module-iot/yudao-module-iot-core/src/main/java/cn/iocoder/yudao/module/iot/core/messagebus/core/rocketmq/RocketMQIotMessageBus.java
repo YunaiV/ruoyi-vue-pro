@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.core.messagebus.core.rocketmq;
 import cn.hutool.core.util.TypeUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
-import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBusSubscriber;
+import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +47,7 @@ public class RocketMQIotMessageBus implements IotMessageBus {
 
     @Override
     @SneakyThrows
-    public void register(IotMessageBusSubscriber<?> subscriber) {
+    public void register(IotMessageSubscriber<?> subscriber) {
         Type type = TypeUtil.getTypeArgument(subscriber.getClass(), 0);
         if (type == null) {
             throw new IllegalStateException(String.format("类型(%s) 需要设置消息类型", getClass().getName()));

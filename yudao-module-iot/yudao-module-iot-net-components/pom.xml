@@ -18,9 +18,8 @@
 
     <modules>
         <module>yudao-module-iot-net-component-core</module>
-        <module>yudao-module-iot-net-component-http</module>
         <module>yudao-module-iot-net-component-emqx</module>
         <module>yudao-module-iot-net-component-server</module>
     </modules>
 
-</project> 
+</project>

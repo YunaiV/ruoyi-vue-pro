@@ -20,7 +20,6 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,9 +42,6 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
 
     @Resource
     private IotDeviceService deviceService;
-
-    @Resource
-    private RestTemplate restTemplate;
 
     @Resource
     private IotDeviceProducer deviceProducer;
@@ -156,7 +152,7 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
         cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage message = cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage
                 .of(getProductKey(device, parentDevice), getDeviceName(device, parentDevice), deviceName,
                         null, tenantId);
-        String serverId = "yy";
+        String serverId = "192_168_64_1_8092";
         deviceMessageProducer.sendGatewayDeviceMessage(serverId, message);
         // TODO @芋艿：后续可以清理掉
         return null;

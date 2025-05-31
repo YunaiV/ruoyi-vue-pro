@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.iot.core.mq.message;
 
-import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageIdentifierEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageTypeEnum;
+import cn.iocoder.yudao.module.iot.core.util.IotCoreUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -119,7 +119,7 @@ public class IotDeviceMessage {
                                       String requestId, LocalDateTime reportTime,
                                       String serverId, Long tenantId) {
         if (requestId == null) {
-            requestId = IdUtil.fastSimpleUUID();
+            requestId = IotCoreUtils.generateRequestId();
         }
         if (reportTime == null) {
             reportTime = LocalDateTime.now();

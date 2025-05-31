@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.core.messagebus.core.local;
 
 import cn.iocoder.yudao.module.iot.core.messagebus.config.IotMessageBusAutoConfiguration;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
-import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBusSubscriber;
+import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ public class LocalIotMessageBusIntegrationTest {
         AtomicInteger subscriber2Count = new AtomicInteger(0);
 
         // 创建第一个订阅者
-        IotMessageBusSubscriber<String> subscriber1 = new IotMessageBusSubscriber<>() {
+        IotMessageSubscriber<String> subscriber1 = new IotMessageSubscriber<>() {
 
             @Override
             public String getTopic() {
@@ -69,7 +69,7 @@ public class LocalIotMessageBusIntegrationTest {
 
         };
         // 创建第二个订阅者
-        IotMessageBusSubscriber<String> subscriber2 = new IotMessageBusSubscriber<>() {
+        IotMessageSubscriber<String> subscriber2 = new IotMessageSubscriber<>() {
 
             @Override
             public String getTopic() {
@@ -120,7 +120,7 @@ public class LocalIotMessageBusIntegrationTest {
         CountDownLatch latch = new CountDownLatch(2);
 
         // 创建订阅者 1 - 只订阅设备状态
-        IotMessageBusSubscriber<String> statusSubscriber = new IotMessageBusSubscriber<>() {
+        IotMessageSubscriber<String> statusSubscriber = new IotMessageSubscriber<>() {
 
             @Override
             public String getTopic() {
@@ -141,7 +141,7 @@ public class LocalIotMessageBusIntegrationTest {
 
         };
         // 创建订阅者 2 - 只订阅设备数据
-        IotMessageBusSubscriber<String> dataSubscriber = new IotMessageBusSubscriber<>() {
+        IotMessageSubscriber<String> dataSubscriber = new IotMessageSubscriber<>() {
 
             @Override
             public String getTopic() {

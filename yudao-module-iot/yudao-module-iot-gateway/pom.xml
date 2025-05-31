@@ -16,4 +16,46 @@
         ② 功能二：接收来自消息网关的消息（由 iot-biz 发送），并进行编码（encode）后，发送给设备
     </description>
 
+    <dependencies>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-module-iot-core</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <!-- 消息队列相关 -->
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+            <!-- TODO @芋艿：消息队列，后续可能去掉，默认不使用 rocketmq -->
+<!--            <optional>true</optional> -->
+        </dependency>
+
+        <!-- 工具类相关 -->
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-web</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <!-- 设置构建的 jar 包名 -->
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <!-- 打包 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal> <!-- 将引入的 jar 打入其中 -->
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

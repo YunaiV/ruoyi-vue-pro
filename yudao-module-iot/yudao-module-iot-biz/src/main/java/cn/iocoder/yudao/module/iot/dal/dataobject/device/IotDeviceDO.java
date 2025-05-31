@@ -33,6 +33,7 @@ public class IotDeviceDO extends TenantBaseDO {
      */
     @TableId
     private Long id;
+    // TODO @芋艿：看看怎么弱化 deviceKey
     /**
      * 设备唯一标识符，全局唯一，用于识别设备
      *

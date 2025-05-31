@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: iot-gateway-server
+
+--- #################### 消息队列相关 ####################
+
+# rocketmq 配置项，对应 RocketMQProperties 配置类
+rocketmq:
+  name-server: 127.0.0.1:9876 # RocketMQ Namesrv
+  # Producer 配置项
+  producer:
+    group: ${spring.application.name}_PRODUCER # 生产者分组
+
+--- #################### 芋道相关配置 ####################
+
+yudao:
+  iot:
+    # 网关配置
+    gateway:
+      # 设备 RPC 配置
+      rpc:
+        url: http://127.0.0.1:48080 # 主程序 API 地址
+        connect-timeout: 30s
+        read-timeout: 30s
+
+      # 协议配置
+      protocol:
+        # ====================================
+        # 针对引入的 HTTP 组件的配置
+        # ====================================
+        http:
+          enabled: true
+          server-port: 8092
+        # ====================================
+        # 针对引入的 EMQX 组件的配置
+        # ====================================
+        emqx:
+          enabled: true
+          mqtt-host: 127.0.0.1
+          mqtt-port: 1883
+          mqtt-username: admin
+          mqtt-password: admin123
+          mqtt-ssl: false
+          mqtt-topics:
+            - "/sys/#"
+          auth-port: 8101
+
+    # 消息总线配置
+    message-bus:
+      type: rocketmq # 消息总线的类型
+
+# 日志配置
+# TODO 芋艿：是不是可以删除
+logging:
+  level:
+    cn.iocoder.yudao: INFO
+    root: INFO
