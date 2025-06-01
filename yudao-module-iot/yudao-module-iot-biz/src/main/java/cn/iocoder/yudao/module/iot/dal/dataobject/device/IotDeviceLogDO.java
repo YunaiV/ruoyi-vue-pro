@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.device;
 
 import cn.hutool.core.util.IdUtil;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageIdentifierEnum;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageTypeEnum;
-import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,11 +31,11 @@ public class IotDeviceLogDO {
     private String id;
 
     /**
-     * 请求编号
+     * 消息编号
      *
-     * 对应 {@link IotDeviceMessage#getRequestId()} 字段
+     * 对应 {@link IotDeviceMessage#getMessageId()} 字段
      */
-    private String requestId;
+    private String messageId;
 
     /**
      * 产品标识
@@ -50,11 +50,11 @@ public class IotDeviceLogDO {
      */
     private String deviceName;
     /**
-     * 设备标识
-     * <p>
-     * 关联 {@link IotDeviceDO#getDeviceKey()}}
+     * 设备编号
+     *
+     * 关联 {@link IotDeviceDO#getId()}
      */
-    private String deviceKey; // 非存储字段，用于 TDengine 的 TAG
+    private Long deviceId;
 
     /**
      * 日志类型
@@ -86,6 +86,11 @@ public class IotDeviceLogDO {
      * 上报时间戳
      */
     private Long reportTime;
+
+    /**
+     * 租户编号
+     */
+    private Long tenantId;
 
     /**
      * 时序时间

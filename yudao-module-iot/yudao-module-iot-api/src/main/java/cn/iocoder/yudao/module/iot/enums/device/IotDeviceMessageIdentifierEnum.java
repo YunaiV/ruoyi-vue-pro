@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum IotDeviceMessageIdentifierEnum {
 
-    PROPERTY_GET("get"), // 下行 TODO 芋艿：【讨论】貌似这个“上行”更合理？device 主动拉取配置。和 IotDevicePropertyGetReqDTO 一样的配置
+    PROPERTY_GET("get"), // 下行
     PROPERTY_SET("set"), // 下行
     PROPERTY_REPORT("report"), // 上行
 

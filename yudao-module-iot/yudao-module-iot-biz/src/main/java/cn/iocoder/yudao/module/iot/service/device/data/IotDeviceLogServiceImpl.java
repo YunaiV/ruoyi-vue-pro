@@ -8,9 +8,11 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceLogPageReqVO;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.IotDeviceLogMapper;
-import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
@@ -35,6 +37,9 @@ import java.util.stream.Collectors;
 public class IotDeviceLogServiceImpl implements IotDeviceLogService {
 
     @Resource
+    private IotDeviceService deviceService;
+
+    @Resource
     private IotDeviceLogMapper deviceLogMapper;
 
     @Override
@@ -51,9 +56,16 @@ public class IotDeviceLogServiceImpl implements IotDeviceLogService {
 
     @Override
     public void createDeviceLog(IotDeviceMessage message) {
+        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(
+                message.getProductKey(), message.getDeviceName());
+        if (device == null) {
+            log.error("[createDeviceLog][设备({}/{}) 不存在]", message.getProductKey(), message.getDeviceName());
+            return;
+        }
         IotDeviceLogDO log = BeanUtils.toBean(message, IotDeviceLogDO.class)
                 .setId(IdUtil.fastSimpleUUID())
-                .setContent(JsonUtils.toJsonString(message.getData()));
+                .setContent(JsonUtils.toJsonString(message.getData()))
+                .setTenantId(device.getTenantId());
         deviceLogMapper.insert(log);
     }
 

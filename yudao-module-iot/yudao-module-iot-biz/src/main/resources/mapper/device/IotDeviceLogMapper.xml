@@ -6,18 +6,19 @@
 
     <update id="createDeviceLogSTable">
         CREATE STABLE IF NOT EXISTS device_log (
-                ts TIMESTAMP,
-                id NCHAR(50),
-                product_key NCHAR(50),
-                device_name NCHAR(50),
-                type NCHAR(50),
-                identifier NCHAR(255),
-                content NCHAR(1024),
-                code INT,
-                report_time TIMESTAMP
-            ) TAGS (
-                device_key NCHAR(50)
-            )
+            ts TIMESTAMP,
+            id NCHAR(50),
+            message_id NCHAR(50),
+            type NCHAR(50),
+            identifier NCHAR(255),
+            content NCHAR(1024),
+            code INT,
+            report_time TIMESTAMP,
+            tenant_id BIGINT
+        ) TAGS (
+            product_key NCHAR(50),
+            device_name NCHAR(50)
+        )
     </update>
 
     <select id="showDeviceLogSTable" resultType="String">
@@ -25,25 +26,21 @@
     </select>
 
     <insert id="insert">
-        INSERT INTO device_log_${deviceKey} (ts, id, product_key, device_name, type, identifier, content, code, report_time)
+        INSERT INTO device_log_${productKey}_${deviceName} (
+            ts, id, message_id, type, identifier,
+            content, code, report_time, tenant_id
+        )
         USING device_log
-        TAGS ('${deviceKey}')
+        TAGS ('${productKey}', '${deviceName}')
         VALUES (
-            NOW,
-            #{id},
-            #{productKey},
-            #{deviceName},
-            #{type},
-            #{identifier},
-            #{content},
-            #{code},
-            #{reportTime}
+            NOW, #{id}, #{messageId}, #{type}, #{identifier},
+            #{content}, #{code}, #{reportTime}, #{tenantId}
         )
     </insert>
 
     <select id="selectPage" resultType="cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO">
         SELECT ts, id, device_key, product_key, type, identifier, content, report_time
-        FROM device_log_${reqVO.deviceKey}
+        FROM device_log_${productKey}_${deviceName}
         <where>
             <if test="reqVO.type != null and reqVO.type != ''">
                 AND type = #{reqVO.type}
@@ -66,10 +63,10 @@
     </select>
 
     <select id="selectDeviceLogUpCountByHour" resultType="java.util.Map">
-        SELECT 
+        SELECT
             TIMETRUNCATE(ts, 1h) as time,
-            COUNT(*) as data 
-        FROM 
+            COUNT(*) as data
+        FROM
         <choose>
             <when test="deviceKey != null and deviceKey != ''">
                 device_log_${deviceKey}
@@ -94,10 +91,10 @@
     </select>
 
     <select id="selectDeviceLogDownCountByHour" resultType="java.util.Map">
-        SELECT 
+        SELECT
             TIMETRUNCATE(ts, 1h) as time,
-            COUNT(*) as data 
-        FROM 
+            COUNT(*) as data
+        FROM
         <choose>
             <when test="deviceKey != null and deviceKey != ''">
                 device_log_${deviceKey}

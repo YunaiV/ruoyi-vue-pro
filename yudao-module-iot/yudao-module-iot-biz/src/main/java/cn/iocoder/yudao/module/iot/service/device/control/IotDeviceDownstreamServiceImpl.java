@@ -146,14 +146,11 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
         // TODO @super：【可优化】过滤掉不合法的属性
 
         // 2. 发送请求
-        // TODO @芋艿：deviceName 的设置
-        String deviceName = "xx";
-        Long tenantId = 1L;
         cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage message = cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage
-                .of(getProductKey(device, parentDevice), getDeviceName(device, parentDevice), deviceName,
-                        null, tenantId);
+                .of(getProductKey(device, parentDevice), getDeviceName(device, parentDevice));
         String serverId = "192_168_64_1_8092";
         deviceMessageProducer.sendGatewayDeviceMessage(serverId, message);
+        deviceMessageProducer.sendDeviceMessage(message);
         // TODO @芋艿：后续可以清理掉
         return null;
     }

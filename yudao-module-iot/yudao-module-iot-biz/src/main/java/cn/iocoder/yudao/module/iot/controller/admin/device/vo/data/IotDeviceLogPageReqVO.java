@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 public class IotDeviceLogPageReqVO extends PageParam {
 
+    // TODO @芋艿：【优先级：中】改成通过 deviceId 查询；然后转换下；
     @Schema(description = "设备标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "device123")
     @NotEmpty(message = "设备标识不能为空")
     private String deviceKey;

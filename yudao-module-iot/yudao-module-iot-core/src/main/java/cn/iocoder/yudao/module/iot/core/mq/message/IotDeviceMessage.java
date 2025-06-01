@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-// TODO @芋艿：参考阿里云的物模型，优化 IoT 上下行消息的设计，尽量保持一致（渐进式，不要一口气）！
-
 /**
  * IoT 设备消息
  */
@@ -35,9 +33,9 @@ public class IotDeviceMessage {
     public static final String MESSAGE_BUS_GATEWAY_DEVICE_MESSAGE_TOPIC = MESSAGE_BUS_DEVICE_MESSAGE_TOPIC + "_%s";
 
     /**
-     * 请求编号
+     * 消息编号
      */
-    private String requestId;
+    private String messageId;
 
     /**
      * 设备信息
@@ -47,10 +45,6 @@ public class IotDeviceMessage {
      * 设备名称
      */
     private String deviceName;
-    /**
-     * 设备标识
-     */
-    private String deviceKey;
 
     /**
      * 消息类型
@@ -89,11 +83,6 @@ public class IotDeviceMessage {
      */
     private String serverId;
 
-    /**
-     * 租户编号
-     */
-    private Long tenantId;
-
     public IotDeviceMessage ofPropertyReport(Map<String, Object> properties) {
         this.setType(IotDeviceMessageTypeEnum.PROPERTY.getType());
         this.setIdentifier(IotDeviceMessageIdentifierEnum.PROPERTY_REPORT.getIdentifier());
@@ -108,26 +97,27 @@ public class IotDeviceMessage {
         return this;
     }
 
-    public static IotDeviceMessage of(String productKey, String deviceName, String deviceKey,
-                                      String serverId, Long tenantId) {
-        return of(productKey, deviceName, deviceKey,
-                null, null,
-                serverId, tenantId);
+    public static IotDeviceMessage of(String productKey, String deviceName) {
+        return of(productKey, deviceName,
+                null, null);
     }
 
-    public static IotDeviceMessage of(String productKey, String deviceName, String deviceKey,
-                                      String requestId, LocalDateTime reportTime,
-                                      String serverId, Long tenantId) {
-        if (requestId == null) {
-            requestId = IotCoreUtils.generateRequestId();
-        }
+    public static IotDeviceMessage of(String productKey, String deviceName,
+                                      String serverId) {
+        return of(productKey, deviceName,
+                null, serverId);
+    }
+
+    public static IotDeviceMessage of(String productKey, String deviceName,
+                                      LocalDateTime reportTime, String serverId) {
         if (reportTime == null) {
             reportTime = LocalDateTime.now();
         }
+        String messageId = IotCoreUtils.generateMessageId();
         return IotDeviceMessage.builder()
-                .requestId(requestId).reportTime(reportTime)
-               .productKey(productKey).deviceName(deviceName).deviceKey(deviceKey)
-                .serverId(serverId).tenantId(tenantId).build();
+                .messageId(messageId).reportTime(reportTime)
+                .productKey(productKey).deviceName(deviceName)
+                .serverId(serverId).build();
     }
 
     // ========== Topic 相关 ==========

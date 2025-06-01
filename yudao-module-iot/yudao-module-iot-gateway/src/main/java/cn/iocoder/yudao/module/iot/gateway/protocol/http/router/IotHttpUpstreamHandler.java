@@ -2,8 +2,6 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.http.router;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
@@ -16,7 +14,6 @@ import io.vertx.ext.web.RoutingContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
@@ -69,36 +66,34 @@ public class IotHttpUpstreamHandler implements Handler<RoutingContext> {
     @Override
     public void handle(RoutingContext routingContext) {
         String path = routingContext.request().path();
-        String requestId = IdUtil.fastSimpleUUID();
 
         try {
             // 1. 解析通用参数
-            Map<String, String> params = parseCommonParams(routingContext, requestId);
+            Map<String, String> params = parseCommonParams(routingContext);
             String productKey = params.get("productKey");
             String deviceName = params.get("deviceName");
             JsonObject body = routingContext.body().asJsonObject();
-            requestId = params.get("requestId");
 
             // 2. 根据路径模式处理不同类型的请求
             if (isPropertyPostPath(path)) {
                 // 处理属性上报
-                handlePropertyPost(routingContext, productKey, deviceName, requestId, body);
+                handlePropertyPost(routingContext, productKey, deviceName, body);
                 return;
             }
 
             if (isEventPostPath(path)) {
                 // 处理事件上报
                 String identifier = routingContext.pathParam("identifier");
-                handleEventPost(routingContext, productKey, deviceName, identifier, requestId, body);
+                handleEventPost(routingContext, productKey, deviceName, identifier, body);
                 return;
             }
 
             // 不支持的请求路径
-            sendErrorResponse(routingContext, requestId, "unknown", BAD_REQUEST.getCode(), "不支持的请求路径");
+            sendErrorResponse(routingContext,  "unknown", BAD_REQUEST.getCode(), "不支持的请求路径");
         } catch (Exception e) {
             log.error("[handle][处理上行请求异常] path={}", path, e);
             String method = determineMethodFromPath(path, routingContext);
-            sendErrorResponse(routingContext, requestId, method, INTERNAL_SERVER_ERROR.getCode(),
+            sendErrorResponse(routingContext, method, INTERNAL_SERVER_ERROR.getCode(),
                     INTERNAL_SERVER_ERROR.getMsg());
         }
     }
@@ -107,18 +102,12 @@ public class IotHttpUpstreamHandler implements Handler<RoutingContext> {
      * 解析通用参数
      *
      * @param routingContext   路由上下文
-     * @param defaultRequestId 默认请求 ID
      * @return 参数映射
      */
-    private Map<String, String> parseCommonParams(RoutingContext routingContext, String defaultRequestId) {
+    private Map<String, String> parseCommonParams(RoutingContext routingContext) {
         Map<String, String> params = MapUtil.newHashMap();
         params.put("productKey", routingContext.pathParam("productKey"));
         params.put("deviceName", routingContext.pathParam("deviceName"));
-
-        JsonObject body = routingContext.body().asJsonObject();
-        String requestId = ObjUtil.defaultIfNull(body.getString("id"), defaultRequestId);
-        params.put("requestId", requestId);
-
         return params;
     }
 
@@ -149,23 +138,18 @@ public class IotHttpUpstreamHandler implements Handler<RoutingContext> {
      * @param routingContext 路由上下文
      * @param productKey     产品 Key
      * @param deviceName     设备名称
-     * @param requestId      请求 ID
      * @param body           请求体
      */
     private void handlePropertyPost(RoutingContext routingContext, String productKey, String deviceName,
-                                    String requestId, JsonObject body) {
+                                    JsonObject body) {
         // 1.1 构建设备消息
-        String deviceKey = "xxx"; // TODO @芋艿：待支持
-        Long tenantId = 1L; // TODO @芋艿：待支持
-        IotDeviceMessage message = IotDeviceMessage.of(productKey, deviceName, deviceKey,
-                        requestId, LocalDateTime.now(),
-                        protocol.getServerId(), tenantId)
+        IotDeviceMessage message = IotDeviceMessage.of(productKey, deviceName, protocol.getServerId())
                 .ofPropertyReport(parsePropertiesFromBody(body));
         // 1.2 发送消息
         deviceMessageProducer.sendDeviceMessage(message);
 
         // 2. 返回响应
-        sendResponse(routingContext, requestId, null, null);
+        sendResponse(routingContext, null);
     }
 
     /**
@@ -175,11 +159,10 @@ public class IotHttpUpstreamHandler implements Handler<RoutingContext> {
      * @param productKey     产品 Key
      * @param deviceName     设备名称
      * @param identifier     事件标识符
-     * @param requestId      请求 ID
      * @param body           请求体
      */
     private void handleEventPost(RoutingContext routingContext, String productKey, String deviceName,
-                                 String identifier, String requestId, JsonObject body) {
+                                 String identifier, JsonObject body) {
 //        // 处理事件上报
 //        IotDeviceEventReportReqDTO reportReqDTO = parseEventReportRequest(productKey, deviceName, identifier,
 //                requestId, body);
@@ -196,11 +179,9 @@ public class IotHttpUpstreamHandler implements Handler<RoutingContext> {
      * 发送响应
      *
      * @param routingContext 路由上下文
-     * @param requestId      请求 ID
-     * @param method         方法名
      * @param result         结果
      */
-    private void sendResponse(RoutingContext routingContext, String requestId, String method,
+    private void sendResponse(RoutingContext routingContext,
                               CommonResult<Boolean> result) {
 //        // TODO @芋艿：后续再优化
 //        IotStandardResponse response;
@@ -218,12 +199,11 @@ public class IotHttpUpstreamHandler implements Handler<RoutingContext> {
      * 发送错误响应
      *
      * @param routingContext 路由上下文
-     * @param requestId      请求 ID
      * @param method         方法名
      * @param code           错误代码
      * @param message        错误消息
      */
-    private void sendErrorResponse(RoutingContext routingContext, String requestId, String method, Integer code,
+    private void sendErrorResponse(RoutingContext routingContext, String method, Integer code,
                                    String message) {
 //        IotStandardResponse errorResponse = IotStandardResponse.error(requestId, method, code, message);
 //        IotNetComponentCommonUtils.writeJsonResponse(routingContext, errorResponse);

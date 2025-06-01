@@ -22,7 +22,7 @@ public class IotCoreUtils {
         return serverId.replaceAll("\\.", "_");
     }
 
-    public static String generateRequestId() {
+    public static String generateMessageId() {
         return IdUtil.fastSimpleUUID();
     }
 

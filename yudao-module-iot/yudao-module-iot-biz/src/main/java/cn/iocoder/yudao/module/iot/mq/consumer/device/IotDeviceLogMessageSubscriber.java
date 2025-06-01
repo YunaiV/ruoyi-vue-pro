@@ -39,11 +39,10 @@ public class IotDeviceLogMessageSubscriber implements IotMessageSubscriber<IotDe
         return "iot_device_log_consumer";
     }
 
-    // TODO @芋艿：后续再对接这个细节逻辑；
     @Override
     public void onMessage(IotDeviceMessage message) {
         log.info("[onMessage][消息内容({})]", message);
-//        deviceLogService.createDeviceLog(message);
+        deviceLogService.createDeviceLog(message);
     }
 
 }
