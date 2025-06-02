@@ -128,7 +128,8 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
             return;
         }
         // 1. 获得设备信息
-        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(message.getProductKey(), message.getDeviceName());
+        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(
+                message.getProductKey(), message.getDeviceName());
         if (device == null) {
             log.error("[saveDeviceProperty][消息({}) 对应的设备不存在]", message);
             return;
@@ -155,9 +156,9 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
                 LocalDateTimeUtil.toEpochMilli(message.getReportTime()));
 
         // 3.2 保存设备属性【日志】
-        // TODO @芋艿：这里要调整下；
-        deviceDataRedisDAO.putAll(device.getDeviceKey(), convertMap(properties.entrySet(), Map.Entry::getKey,
-                entry -> IotDevicePropertyDO.builder().value(entry.getValue()).updateTime(message.getReportTime()).build()));
+        Map<String, IotDevicePropertyDO> properties2 = convertMap(properties.entrySet(), Map.Entry::getKey, entry ->
+                IotDevicePropertyDO.builder().value(entry.getValue()).updateTime(message.getReportTime()).build());
+        deviceDataRedisDAO.putAll(device.getProductKey(), device.getDeviceName(), properties2);
     }
 
     @Override
@@ -166,15 +167,16 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
         IotDeviceDO device = deviceService.validateDeviceExists(deviceId);
 
         // 获得设备属性
-        return deviceDataRedisDAO.get(device.getDeviceKey());
+        return deviceDataRedisDAO.get(device.getProductKey(), device.getDeviceName());
     }
 
     @Override
     public PageResult<IotDevicePropertyRespVO> getHistoryDevicePropertyPage(IotDevicePropertyHistoryPageReqVO pageReqVO) {
         // 获取设备信息
         IotDeviceDO device = deviceService.validateDeviceExists(pageReqVO.getDeviceId());
-        pageReqVO.setDeviceKey(device.getDeviceKey());
+        pageReqVO.setProductKey(device.getProductKey()).setDeviceName(device.getDeviceName());
 
+        // 分页查询
         try {
             IPage<IotDevicePropertyRespVO> page = devicePropertyMapper.selectPageByHistory(
                     new Page<>(pageReqVO.getPageNo(), pageReqVO.getPageSize()), pageReqVO);

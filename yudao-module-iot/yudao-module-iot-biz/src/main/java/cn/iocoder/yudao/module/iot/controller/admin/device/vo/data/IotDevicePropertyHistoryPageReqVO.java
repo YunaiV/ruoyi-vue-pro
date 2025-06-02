@@ -20,8 +20,11 @@ public class IotDevicePropertyHistoryPageReqVO extends PageParam {
     @NotNull(message = "设备编号不能为空")
     private Long deviceId;
 
-    @Schema(description = "设备 Key", hidden = true)
-    private String deviceKey; // 非前端传递，后端自己查询设置
+    @Schema(description = "产品 Key", hidden = true)
+    private String productKey; // 非前端传递，后端自己查询设置
+
+    @Schema(description = "设备名称", hidden = true)
+    private String deviceName; // 非前端传递，后端自己查询设置
 
     @Schema(description = "属性标识符", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "属性标识符不能为空")

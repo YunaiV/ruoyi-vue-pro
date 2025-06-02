@@ -8,6 +8,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+// TODO @puhui999：后面重构哈
 /**
  * 针对 {@link IotDeviceMessage} 的消费者，处理规则场景
  *
