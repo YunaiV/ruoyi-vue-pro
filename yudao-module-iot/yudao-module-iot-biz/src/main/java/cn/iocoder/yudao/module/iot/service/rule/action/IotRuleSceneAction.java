@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.iot.service.rule.action;
 
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
-import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 
 import javax.annotation.Nullable;
 

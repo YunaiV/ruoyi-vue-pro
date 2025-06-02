@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.iot.mq.consumer.device;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageIdentifierEnum;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageTypeEnum;
-import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;

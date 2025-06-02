@@ -4,8 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeHttpConfig;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
-import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -15,8 +15,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_TENANT_ID;
 
 /**
  * Http 的 {@link IotDataBridgeExecute} 实现类
@@ -48,7 +46,8 @@ public class IotHttpDataBridgeExecute implements IotDataBridgeExecute<IotDataBri
             if (CollUtil.isNotEmpty(config.getHeaders())) {
                 config.getHeaders().putAll(config.getHeaders());
             }
-            headers.add(HEADER_TENANT_ID, message.getTenantId().toString());
+            // TODO @puhui999：@yunai：可能需要通过设备查询到租户，然后 set
+//            headers.add(HEADER_TENANT_ID, message.getTenantId().toString());
             // 1.2 构建 URL
             UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(config.getUrl());
             if (CollUtil.isNotEmpty(config.getQuery())) {

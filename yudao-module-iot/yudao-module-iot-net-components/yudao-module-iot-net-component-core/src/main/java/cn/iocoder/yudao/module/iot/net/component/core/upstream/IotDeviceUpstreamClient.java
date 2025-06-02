@@ -19,38 +19,8 @@ public class IotDeviceUpstreamClient implements IotDeviceUpstreamApi {
     private IotDeviceUpstreamApi deviceUpstreamApi;
 
     @Override
-    public CommonResult<Boolean> updateDeviceState(IotDeviceStateUpdateReqDTO updateReqDTO) {
-        return deviceUpstreamApi.updateDeviceState(updateReqDTO);
-    }
-
-    @Override
-    public CommonResult<Boolean> reportDeviceEvent(IotDeviceEventReportReqDTO reportReqDTO) {
-        return deviceUpstreamApi.reportDeviceEvent(reportReqDTO);
-    }
-
-    @Override
-    public CommonResult<Boolean> registerDevice(IotDeviceRegisterReqDTO registerReqDTO) {
-        return deviceUpstreamApi.registerDevice(registerReqDTO);
-    }
-
-    @Override
-    public CommonResult<Boolean> registerSubDevice(IotDeviceRegisterSubReqDTO registerReqDTO) {
-        return deviceUpstreamApi.registerSubDevice(registerReqDTO);
-    }
-
-    @Override
-    public CommonResult<Boolean> addDeviceTopology(IotDeviceTopologyAddReqDTO addReqDTO) {
-        return deviceUpstreamApi.addDeviceTopology(addReqDTO);
-    }
-
-    @Override
     public CommonResult<Boolean> authenticateEmqxConnection(IotDeviceEmqxAuthReqDTO authReqDTO) {
         return deviceUpstreamApi.authenticateEmqxConnection(authReqDTO);
-    }
-
-    @Override
-    public CommonResult<Boolean> reportDeviceProperty(IotDevicePropertyReportReqDTO reportReqDTO) {
-        return deviceUpstreamApi.reportDeviceProperty(reportReqDTO);
     }
 
 }

@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.core.mq.message;
 
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageIdentifierEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageTypeEnum;
-import cn.iocoder.yudao.module.iot.core.util.IotCoreUtils;
+import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -79,7 +79,7 @@ public class IotDeviceMessage {
     private LocalDateTime reportTime;
 
     /**
-     * 服务编号，该消息由哪个消息发送
+     * 服务编号，该消息由哪个 server 服务进行消费
      */
     private String serverId;
 
@@ -94,6 +94,18 @@ public class IotDeviceMessage {
         this.setType(IotDeviceMessageTypeEnum.PROPERTY.getType());
         this.setIdentifier(IotDeviceMessageIdentifierEnum.PROPERTY_SET.getIdentifier());
         this.setData(properties);
+        return this;
+    }
+
+    public IotDeviceMessage ofStateOnline() {
+        this.setType(IotDeviceMessageTypeEnum.STATE.getType());
+        this.setIdentifier(IotDeviceMessageIdentifierEnum.STATE_ONLINE.getIdentifier());
+        return this;
+    }
+
+    public IotDeviceMessage ofStateOffline() {
+        this.setType(IotDeviceMessageTypeEnum.STATE.getType());
+        this.setIdentifier(IotDeviceMessageIdentifierEnum.STATE_OFFLINE.getIdentifier());
         return this;
     }
 
@@ -113,17 +125,11 @@ public class IotDeviceMessage {
         if (reportTime == null) {
             reportTime = LocalDateTime.now();
         }
-        String messageId = IotCoreUtils.generateMessageId();
+        String messageId = IotDeviceMessageUtils.generateMessageId();
         return IotDeviceMessage.builder()
                 .messageId(messageId).reportTime(reportTime)
                 .productKey(productKey).deviceName(deviceName)
                 .serverId(serverId).build();
-    }
-
-    // ========== Topic 相关 ==========
-
-    public static String buildMessageBusGatewayDeviceMessageTopic(String serverId) {
-        return String.format(MESSAGE_BUS_GATEWAY_DEVICE_MESSAGE_TOPIC, serverId);
     }
 
 }

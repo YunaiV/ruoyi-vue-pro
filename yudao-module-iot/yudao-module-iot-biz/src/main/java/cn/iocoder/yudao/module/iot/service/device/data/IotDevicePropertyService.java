@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.iot.service.device.data;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyHistoryPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
-import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
@@ -56,16 +56,43 @@ public interface IotDevicePropertyService {
      * 获得最后上报时间小于指定时间的设备标识
      *
      * @param maxReportTime 最大上报时间
-     * @return 设备标识列表
+     * @return [productKey, deviceName] 列表
      */
-    Set<String> getDeviceKeysByReportTime(LocalDateTime maxReportTime);
+    Set<String[]> getProductKeyDeviceNameListByReportTime(LocalDateTime maxReportTime);
 
     /**
-     * 异步更新设备上报时间
+     * 更新设备上报时间
      *
-     * @param deviceKey  设备标识
+     * @param productKey  产品标识
+     * @param deviceName  设备名称
      * @param reportTime 上报时间
      */
-    void updateDeviceReportTimeAsync(String deviceKey, LocalDateTime reportTime);
+    void updateDeviceReportTime(String productKey, String deviceName, LocalDateTime reportTime);
+
+    /**
+     * 更新设备关联的网关 serverId
+     *
+     * @param productKey 产品标识
+     * @param deviceName 设备名称
+     * @param serverId 网关 serverId
+     */
+    void updateDeviceServerId(String productKey, String deviceName, String serverId);
+
+    /**
+     * 删除设备关联的网关 serverId
+     *
+     * @param productKey 产品标识
+     * @param deviceName 设备名称
+     */
+    void deleteDeviceServerId(String productKey, String deviceName);
+
+    /**
+     * 获得设备关联的网关 serverId
+     *
+     * @param productKey 产品标识
+     * @param deviceName 设备名称
+     * @return 网关 serverId
+     */
+    String getDeviceServerId(String productKey, String deviceName);
 
 }

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.enums.device;
+package cn.iocoder.yudao.module.iot.core.enums;
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
 import lombok.Getter;

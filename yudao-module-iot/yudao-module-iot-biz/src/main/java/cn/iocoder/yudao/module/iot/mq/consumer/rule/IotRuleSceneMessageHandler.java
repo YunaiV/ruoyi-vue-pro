@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.mq.consumer.rule;
 
-import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.service.rule.IotRuleSceneService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

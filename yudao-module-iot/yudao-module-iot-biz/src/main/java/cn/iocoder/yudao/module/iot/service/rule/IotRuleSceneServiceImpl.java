@@ -17,6 +17,7 @@ import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleScenePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleSceneSaveReqVO;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.rule.IotRuleSceneMapper;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageIdentifierEnum;
@@ -26,7 +27,6 @@ import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerConditionParame
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerTypeEnum;
 import cn.iocoder.yudao.module.iot.framework.job.core.IotSchedulerManager;
 import cn.iocoder.yudao.module.iot.job.rule.IotRuleSceneJob;
-import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.service.rule.action.IotRuleSceneAction;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
@@ -240,16 +240,17 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
 
     @Override
     public void executeRuleSceneByDevice(IotDeviceMessage message) {
-        TenantUtils.execute(message.getTenantId(), () -> {
-            // 1. 获得设备匹配的规则场景
-            List<IotRuleSceneDO> ruleScenes = getMatchedRuleSceneListByMessage(message);
-            if (CollUtil.isEmpty(ruleScenes)) {
-                return;
-            }
-
-            // 2. 执行规则场景
-            executeRuleSceneAction(message, ruleScenes);
-        });
+        // TODO @芋艿：这里的 tenantId，通过设备获取；
+//        TenantUtils.execute(message.getTenantId(), () -> {
+//            // 1. 获得设备匹配的规则场景
+//            List<IotRuleSceneDO> ruleScenes = getMatchedRuleSceneListByMessage(message);
+//            if (CollUtil.isEmpty(ruleScenes)) {
+//                return;
+//            }
+//
+//            // 2. 执行规则场景
+//            executeRuleSceneAction(message, ruleScenes);
+//        });
     }
 
     @Override

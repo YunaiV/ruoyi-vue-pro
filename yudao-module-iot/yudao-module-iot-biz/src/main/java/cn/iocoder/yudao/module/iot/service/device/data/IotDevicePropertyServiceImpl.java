@@ -9,17 +9,18 @@ import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyHistoryPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType.ThingModelDateOrTextDataSpecs;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.redis.device.DevicePropertyRedisDAO;
 import cn.iocoder.yudao.module.iot.dal.redis.device.DeviceReportTimeRedisDAO;
+import cn.iocoder.yudao.module.iot.dal.redis.device.DeviceServerIdRedisDAO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.IotDevicePropertyMapper;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotDataSpecsDataTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField;
-import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
@@ -27,7 +28,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -70,6 +70,8 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     private DevicePropertyRedisDAO deviceDataRedisDAO;
     @Resource
     private DeviceReportTimeRedisDAO deviceReportTimeRedisDAO;
+    @Resource
+    private DeviceServerIdRedisDAO deviceServerIdRedisDAO;
 
     @Resource
     private IotDevicePropertyMapper devicePropertyMapper;
@@ -153,7 +155,8 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
                 LocalDateTimeUtil.toEpochMilli(message.getReportTime()));
 
         // 3.2 保存设备属性【日志】
-        deviceDataRedisDAO.putAll(message.getDeviceKey(), convertMap(properties.entrySet(), Map.Entry::getKey,
+        // TODO @芋艿：这里要调整下；
+        deviceDataRedisDAO.putAll(device.getDeviceKey(), convertMap(properties.entrySet(), Map.Entry::getKey,
                 entry -> IotDevicePropertyDO.builder().value(entry.getValue()).updateTime(message.getReportTime()).build()));
     }
 
@@ -187,14 +190,31 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     // ========== 设备时间相关操作 ==========
 
     @Override
-    public Set<String> getDeviceKeysByReportTime(LocalDateTime maxReportTime) {
+    public Set<String[]> getProductKeyDeviceNameListByReportTime(LocalDateTime maxReportTime) {
         return deviceReportTimeRedisDAO.range(maxReportTime);
     }
 
     @Override
-    @Async
-    public void updateDeviceReportTimeAsync(String deviceKey, LocalDateTime reportTime) {
-        deviceReportTimeRedisDAO.update(deviceKey, reportTime);
+    public void updateDeviceReportTime(String productKey, String deviceName, LocalDateTime reportTime) {
+        deviceReportTimeRedisDAO.update(productKey, deviceName, reportTime);
+    }
+
+    @Override
+    public void updateDeviceServerId(String productKey, String deviceName, String serverId) {
+        if (StrUtil.isEmpty(serverId)) {
+            return;
+        }
+        deviceServerIdRedisDAO.update(productKey, deviceName, serverId);
+    }
+
+    @Override
+    public void deleteDeviceServerId(String productKey, String deviceName) {
+        deviceServerIdRedisDAO.delete(productKey, deviceName);
+    }
+
+    @Override
+    public String getDeviceServerId(String productKey, String deviceName) {
+        return deviceServerIdRedisDAO.get(productKey, deviceName);
     }
 
 }

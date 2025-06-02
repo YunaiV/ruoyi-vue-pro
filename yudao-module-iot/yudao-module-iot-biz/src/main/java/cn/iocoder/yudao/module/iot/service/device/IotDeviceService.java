@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.service.device;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
-import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 

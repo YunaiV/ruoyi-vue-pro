@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.http;
 
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
-import cn.iocoder.yudao.module.iot.core.util.IotCoreUtils;
+import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.router.IotHttpUpstreamHandler;
 import io.vertx.core.AbstractVerticle;
@@ -70,7 +70,7 @@ public class IotHttpUpstreamProtocol extends AbstractVerticle {
     }
 
     public String getServerId() {
-        return IotCoreUtils.generateServerId(httpProperties.getServerPort());
+        return IotDeviceMessageUtils.generateServerId(httpProperties.getServerPort());
     }
 
 }

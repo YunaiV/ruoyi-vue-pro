@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.*;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
-import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -41,8 +41,8 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
     @BeforeEach
     public void setUp() {
         // 创建共享的测试消息
-        message = IotDeviceMessage.builder().requestId("TEST-001").reportTime(LocalDateTime.now()).tenantId(1L)
-                .productKey("testProduct").deviceName("testDevice").deviceKey("testDeviceKey")
+        message = IotDeviceMessage.builder().messageId("TEST-001").reportTime(LocalDateTime.now())
+                .productKey("testProduct").deviceName("testDevice")
                 .type("property").identifier("temperature").data("{\"value\": 60}")
                 .build();
     }

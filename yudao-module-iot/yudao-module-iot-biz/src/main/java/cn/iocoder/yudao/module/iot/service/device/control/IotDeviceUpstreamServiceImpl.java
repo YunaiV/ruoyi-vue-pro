@@ -1,22 +1,15 @@
 package cn.iocoder.yudao.module.iot.service.device.control;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.*;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceUpstreamReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
-import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageIdentifierEnum;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageTypeEnum;
-import cn.iocoder.yudao.module.iot.enums.device.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
-import cn.iocoder.yudao.module.iot.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.mq.producer.device.IotDeviceProducer;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
 import cn.iocoder.yudao.module.iot.util.MqttSignUtils;
@@ -45,9 +38,7 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
     @Resource
     private IotDevicePropertyService devicePropertyService;
 
-    @Resource
-    private IotDeviceProducer deviceProducer;
-
+    // TODO @芋艿：需要重新实现下；
     @Override
     @SuppressWarnings("unchecked")
     public void upstreamDevice(IotDeviceUpstreamReqVO simulatorReqVO) {
@@ -74,53 +65,13 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
         }
         // 2.3 情况三：状态变更
         if (Objects.equals(simulatorReqVO.getType(), IotDeviceMessageTypeEnum.STATE.getType())) {
-            updateDeviceState(((IotDeviceStateUpdateReqDTO) new IotDeviceStateUpdateReqDTO()
-                    .setRequestId(IdUtil.fastSimpleUUID()).setReportTime(LocalDateTime.now())
-                    .setProductKey(device.getProductKey()).setDeviceName(device.getDeviceName()))
-                    .setState((Integer) simulatorReqVO.getData()));
+            // TODO @芋艿：这里未搞完
             return;
         }
         throw new IllegalArgumentException("未知的类型：" + simulatorReqVO.getType());
     }
 
-    @Override
-    public void updateDeviceState(IotDeviceStateUpdateReqDTO updateReqDTO) {
-        Assert.isTrue(ObjectUtils.equalsAny(updateReqDTO.getState(),
-                IotDeviceStateEnum.ONLINE.getState(), IotDeviceStateEnum.OFFLINE.getState()),
-                "状态不合法");
-        // 1.1 获得设备
-        log.info("[updateDeviceState][更新设备状态: {}]", updateReqDTO);
-        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(
-                updateReqDTO.getProductKey(), updateReqDTO.getDeviceName());
-        if (device == null) {
-            log.error("[updateDeviceState][设备({}/{}) 不存在]",
-                    updateReqDTO.getProductKey(), updateReqDTO.getDeviceName());
-            return;
-        }
-        TenantUtils.execute(device.getTenantId(), () -> {
-            // 1.2 记录设备的最后时间
-            updateDeviceLastTime(device, updateReqDTO);
-            // 1.3 当前状态一致，不处理
-            if (Objects.equals(device.getState(), updateReqDTO.getState())) {
-                return;
-            }
-
-            // 2. 更新设备状态
-            deviceService.updateDeviceState(device.getId(), updateReqDTO.getState());
-
-            // 3. TODO 芋艿：子设备的关联
-
-            // 4. 发送设备消息
-            IotDeviceMessage message = BeanUtils.toBean(updateReqDTO, IotDeviceMessage.class)
-                    .setType(IotDeviceMessageTypeEnum.STATE.getType())
-                    .setIdentifier(ObjUtil.equals(updateReqDTO.getState(), IotDeviceStateEnum.ONLINE.getState())
-                            ? IotDeviceMessageIdentifierEnum.STATE_ONLINE.getIdentifier()
-                            : IotDeviceMessageIdentifierEnum.STATE_OFFLINE.getIdentifier());
-            sendDeviceMessage(message, device);
-        });
-    }
-
-    @Override
+//    @Override TODO 芋艿：待重新实现
     public void reportDeviceProperty(IotDevicePropertyReportReqDTO reportReqDTO) {
         // 1.1 获得设备
         log.info("[reportDeviceProperty][上报设备属性: {}]", reportReqDTO);
@@ -131,18 +82,16 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
                     reportReqDTO.getProductKey(), reportReqDTO.getDeviceName());
             return;
         }
-        // 1.2 记录设备的最后时间
-        updateDeviceLastTime(device, reportReqDTO);
 
         // 2. 发送设备消息
-        IotDeviceMessage message = BeanUtils.toBean(reportReqDTO, IotDeviceMessage.class)
-                .setType(IotDeviceMessageTypeEnum.PROPERTY.getType())
-                .setIdentifier(IotDeviceMessageIdentifierEnum.PROPERTY_REPORT.getIdentifier())
-                .setData(reportReqDTO.getProperties());
-        sendDeviceMessage(message, device);
+//        IotDeviceMessage message = BeanUtils.toBean(reportReqDTO, IotDeviceMessage.class)
+//                .setType(IotDeviceMessageTypeEnum.PROPERTY.getType())
+//                .setIdentifier(IotDeviceMessageIdentifierEnum.PROPERTY_REPORT.getIdentifier())
+//                .setData(reportReqDTO.getProperties());
+//        sendDeviceMessage(message, device);
     }
 
-    @Override
+    //    @Override TODO 芋艿：待重新实现
     public void reportDeviceEvent(IotDeviceEventReportReqDTO reportReqDTO) {
         // 1.1 获得设备
         log.info("[reportDeviceEvent][上报设备事件: {}]", reportReqDTO);
@@ -153,18 +102,16 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
                     reportReqDTO.getProductKey(), reportReqDTO.getDeviceName());
             return;
         }
-        // 1.2 记录设备的最后时间
-        updateDeviceLastTime(device, reportReqDTO);
 
         // 2. 发送设备消息
-        IotDeviceMessage message = BeanUtils.toBean(reportReqDTO, IotDeviceMessage.class)
-                .setType(IotDeviceMessageTypeEnum.EVENT.getType())
-                .setIdentifier(reportReqDTO.getIdentifier())
-                .setData(reportReqDTO.getParams());
-        sendDeviceMessage(message, device);
+//        IotDeviceMessage message = BeanUtils.toBean(reportReqDTO, IotDeviceMessage.class)
+//                .setType(IotDeviceMessageTypeEnum.EVENT.getType())
+//                .setIdentifier(reportReqDTO.getIdentifier())
+//                .setData(reportReqDTO.getParams());
+//        sendDeviceMessage(message, device);
     }
 
-    @Override
+    //    @Override TODO 芋艿：待重新实现
     public void registerDevice(IotDeviceRegisterReqDTO registerReqDTO) {
         log.info("[registerDevice][注册设备: {}]", registerReqDTO);
         registerDevice0(registerReqDTO.getProductKey(), registerReqDTO.getDeviceName(), null, registerReqDTO);
@@ -186,18 +133,18 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
                     registerReqDTO, productKey, device, gatewayId);
         }
         // 1.2 记录设备的最后时间
-        updateDeviceLastTime(device, registerReqDTO);
+//        updateDeviceLastTime(device, registerReqDTO);
 
         // 2. 发送设备消息
         if (registerNew) {
-            IotDeviceMessage message = BeanUtils.toBean(registerReqDTO, IotDeviceMessage.class)
-                    .setType(IotDeviceMessageTypeEnum.REGISTER.getType())
-                    .setIdentifier(IotDeviceMessageIdentifierEnum.REGISTER_REGISTER.getIdentifier());
-            sendDeviceMessage(message, device);
+//            IotDeviceMessage message = BeanUtils.toBean(registerReqDTO, IotDeviceMessage.class)
+//                    .setType(IotDeviceMessageTypeEnum.REGISTER.getType())
+//                    .setIdentifier(IotDeviceMessageIdentifierEnum.REGISTER_REGISTER.getIdentifier());
+//            sendDeviceMessage(message, device);
         }
     }
 
-    @Override
+    //    @Override TODO 芋艿：待重新实现
     public void registerSubDevice(IotDeviceRegisterSubReqDTO registerReqDTO) {
         // 1.1 注册子设备
         log.info("[registerSubDevice][注册子设备: {}]", registerReqDTO);
@@ -214,7 +161,7 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
             return;
         }
         // 1.2 记录设备的最后时间
-        updateDeviceLastTime(device, registerReqDTO);
+//        updateDeviceLastTime(device, registerReqDTO);
 
         // 2. 处理子设备
         if (CollUtil.isNotEmpty(registerReqDTO.getParams())) {
@@ -224,14 +171,14 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
         }
 
         // 3. 发送设备消息
-        IotDeviceMessage message = BeanUtils.toBean(registerReqDTO, IotDeviceMessage.class)
-                .setType(IotDeviceMessageTypeEnum.REGISTER.getType())
-                .setIdentifier(IotDeviceMessageIdentifierEnum.REGISTER_REGISTER_SUB.getIdentifier())
-                .setData(registerReqDTO.getParams());
-        sendDeviceMessage(message, device);
+//        IotDeviceMessage message = BeanUtils.toBean(registerReqDTO, IotDeviceMessage.class)
+//                .setType(IotDeviceMessageTypeEnum.REGISTER.getType())
+//                .setIdentifier(IotDeviceMessageIdentifierEnum.REGISTER_REGISTER_SUB.getIdentifier())
+//                .setData(registerReqDTO.getParams());
+//        sendDeviceMessage(message, device);
     }
 
-    @Override
+    //    @Override TODO 芋艿：待重新实现
     public void addDeviceTopology(IotDeviceTopologyAddReqDTO addReqDTO) {
         // 1.1 获得设备
         log.info("[addDeviceTopology][添加设备拓扑: {}]", addReqDTO);
@@ -247,8 +194,6 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
                     addReqDTO.getProductKey(), addReqDTO.getDeviceName(), device);
             return;
         }
-        // 1.2 记录设备的最后时间
-        updateDeviceLastTime(device, addReqDTO);
 
         // 2. 处理拓扑
         if (CollUtil.isNotEmpty(addReqDTO.getParams())) {
@@ -270,11 +215,11 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
         }
 
         // 3. 发送设备消息
-        IotDeviceMessage message = BeanUtils.toBean(addReqDTO, IotDeviceMessage.class)
-                .setType(IotDeviceMessageTypeEnum.TOPOLOGY.getType())
-                .setIdentifier(IotDeviceMessageIdentifierEnum.TOPOLOGY_ADD.getIdentifier())
-                .setData(addReqDTO.getParams());
-        sendDeviceMessage(message, device);
+//        IotDeviceMessage message = BeanUtils.toBean(addReqDTO, IotDeviceMessage.class)
+//                .setType(IotDeviceMessageTypeEnum.TOPOLOGY.getType())
+//                .setIdentifier(IotDeviceMessageIdentifierEnum.TOPOLOGY_ADD.getIdentifier())
+//                .setData(addReqDTO.getParams());
+//        sendDeviceMessage(message, device);
     }
 
     // TODO @芋艿：后续需要考虑，http 的认证
@@ -308,35 +253,6 @@ public class IotDeviceUpstreamServiceImpl implements IotDeviceUpstreamService {
         }
         log.error("[authenticateEmqxConnection][认证失败，密码不正确]");
         return false;
-    }
-
-    private void updateDeviceLastTime(IotDeviceDO device, IotDeviceUpstreamAbstractReqDTO reqDTO) {
-        // 1. 【异步】记录设备与插件实例的映射
-//        pluginInstanceService.updateDevicePluginInstanceProcessIdAsync(device.getDeviceKey(), reqDTO.getProcessId());
-        // TODO @芋艿：需要单独补充下；
-
-        // 2. 【异步】更新设备的最后时间
-        devicePropertyService.updateDeviceReportTimeAsync(device.getDeviceKey(), LocalDateTime.now());
-    }
-
-    private void sendDeviceMessage(IotDeviceMessage message, IotDeviceDO device) {
-        // 1. 完善消息
-        message.setDeviceKey(device.getDeviceKey())
-                .setTenantId(device.getTenantId());
-        if (StrUtil.isEmpty(message.getRequestId())) {
-            message.setRequestId(IdUtil.fastSimpleUUID());
-        }
-        if (message.getReportTime() == null) {
-            message.setReportTime(LocalDateTime.now());
-        }
-
-        // 2. 发送消息
-        try {
-            deviceProducer.sendDeviceMessage(message);
-            log.info("[sendDeviceMessage][message({}) 发送消息成功]", message);
-        } catch (Exception e) {
-            log.error("[sendDeviceMessage][message({}) 发送消息失败]", message, e);
-        }
     }
 
 }

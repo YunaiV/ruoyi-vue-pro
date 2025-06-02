@@ -19,11 +19,10 @@ public interface RedisKeyConstants {
      */
     String DEVICE_PROPERTY = "iot:device_property:%s";
 
-    // TODO @芋艿：弱化 deviceKey；使用 product_key + device_name 替代
     /**
      * 设备的最后上报时间，采用 ZSET 结构
      *
-     * KEY 格式：{deviceKey}
+     * KEY 格式：{productKey},${deviceName}
      * SCORE：上报时间
      */
     String DEVICE_REPORT_TIMES = "iot:device_report_times";
@@ -43,5 +42,14 @@ public interface RedisKeyConstants {
      * VALUE 数据类型：String 数组(JSON)，即 {@link cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO} 列表
      */
     String THING_MODEL_LIST = "iot:thing_model_list";
+
+    /**
+     * 设备关联的网关 serverId 缓存，采用 HASH 结构
+     *
+     * KEY 格式：device_server_id
+     * HASH KEY：{productKey},{deviceName}
+     * VALUE 数据类型：String serverId
+     */
+    String DEVICE_SERVER_ID = "iot:device_server_id";
 
 }
