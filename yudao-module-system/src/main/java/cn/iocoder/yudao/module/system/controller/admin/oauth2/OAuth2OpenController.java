@@ -119,23 +119,14 @@ public class OAuth2OpenController {
                 grantType, scopes, redirectUri);
 
         // 2. 根据授权模式，获取访问令牌
-        OAuth2AccessTokenDO accessTokenDO;
-        switch (grantTypeEnum) {
-            case AUTHORIZATION_CODE:
-                accessTokenDO = oauth2GrantService.grantAuthorizationCodeForAccessToken(client.getClientId(), code, redirectUri, state);
-                break;
-            case PASSWORD:
-                accessTokenDO = oauth2GrantService.grantPassword(username, password, client.getClientId(), scopes);
-                break;
-            case CLIENT_CREDENTIALS:
-                accessTokenDO = oauth2GrantService.grantClientCredentials(client.getClientId(), scopes);
-                break;
-            case REFRESH_TOKEN:
-                accessTokenDO = oauth2GrantService.grantRefreshToken(refreshToken, client.getClientId());
-                break;
-            default:
-                throw new IllegalArgumentException("未知授权类型：" + grantType);
-        }
+        OAuth2AccessTokenDO accessTokenDO = switch (grantTypeEnum) {
+            case AUTHORIZATION_CODE ->
+                    oauth2GrantService.grantAuthorizationCodeForAccessToken(client.getClientId(), code, redirectUri, state);
+            case PASSWORD -> oauth2GrantService.grantPassword(username, password, client.getClientId(), scopes);
+            case CLIENT_CREDENTIALS -> oauth2GrantService.grantClientCredentials(client.getClientId(), scopes);
+            case REFRESH_TOKEN -> oauth2GrantService.grantRefreshToken(refreshToken, client.getClientId());
+            default -> throw new IllegalArgumentException("未知授权类型：" + grantType);
+        };
         Assert.notNull(accessTokenDO, "访问令牌不能为空"); // 防御性检查
         return success(OAuth2OpenConvert.INSTANCE.convert(accessTokenDO));
     }
