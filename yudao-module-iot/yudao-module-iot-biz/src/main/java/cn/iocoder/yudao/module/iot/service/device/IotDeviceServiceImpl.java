@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.service.device;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -12,16 +13,16 @@ import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceGroupDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.device.IotDeviceMapper;
 import cn.iocoder.yudao.module.iot.dal.redis.RedisKeyConstants;
-import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
-import cn.iocoder.yudao.module.iot.util.MqttSignUtils;
-import cn.iocoder.yudao.module.iot.util.MqttSignUtils.MqttSignResult;
+import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -397,15 +398,17 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         return respVO;
     }
 
+    // TODO @芋艿：改成通用的；
     @Override
     public IotDeviceMqttConnectionParamsRespVO getMqttConnectionParams(Long deviceId) {
         IotDeviceDO device = validateDeviceExists(deviceId);
-        MqttSignResult mqttSignResult = MqttSignUtils.calculate(device.getProductKey(), device.getDeviceName(),
-                device.getDeviceSecret());
-        return new IotDeviceMqttConnectionParamsRespVO()
-                .setMqttClientId(mqttSignResult.getClientId())
-                .setMqttUsername(mqttSignResult.getUsername())
-                .setMqttPassword(mqttSignResult.getPassword());
+//        MqttSignResult mqttSignResult = MqttSignUtils.calculate(device.getProductKey(), device.getDeviceName(),
+//                device.getDeviceSecret());
+//        return new IotDeviceMqttConnectionParamsRespVO()
+//                .setMqttClientId(mqttSignResult.getClientId())
+//                .setMqttUsername(mqttSignResult.getUsername())
+//                .setMqttPassword(mqttSignResult.getPassword());
+        return null;
     }
 
     private void deleteDeviceCache(IotDeviceDO device) {
@@ -457,6 +460,31 @@ public class IotDeviceServiceImpl implements IotDeviceService {
             return Collections.emptyList();
         }
         return deviceMapper.selectByProductKeyAndDeviceNames(productKey, deviceNames);
+    }
+
+    @Override
+    public boolean authDevice(IotDeviceAuthReqDTO authReqDTO) {
+        // 1. 校验设备是否存在
+        IotDeviceAuthUtils.DeviceInfo deviceInfo = IotDeviceAuthUtils.parseUsername(authReqDTO.getUsername());
+        if (deviceInfo == null) {
+            log.error("[authDevice][认证失败，username({}) 格式不正确]", authReqDTO.getUsername());
+            return false;
+        }
+        String deviceName = deviceInfo.getDeviceName();
+        String productKey = deviceInfo.getProductKey();
+        IotDeviceDO device = getSelf().getDeviceByProductKeyAndDeviceNameFromCache(productKey, deviceName);
+        if (device == null) {
+            log.warn("[authDevice][设备({}/{}) 不存在]", productKey, deviceName);
+            return false;
+        }
+
+        // 2. 校验密码
+        IotDeviceAuthUtils.AuthInfo authInfo = IotDeviceAuthUtils.getAuthInfo(productKey, deviceName, device.getDeviceSecret());
+        if (ObjUtil.notEqual(authInfo.getPassword(), authReqDTO.getPassword())) {
+            log.error("[authDevice][设备({}/{}) 密码不正确]", productKey, deviceName);
+            return false;
+        }
+        return true;
     }
 
 }

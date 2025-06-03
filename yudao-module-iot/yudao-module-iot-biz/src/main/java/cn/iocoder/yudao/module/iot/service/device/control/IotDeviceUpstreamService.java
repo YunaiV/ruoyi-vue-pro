@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.iot.service.device.control;
 
-import cn.iocoder.yudao.module.iot.api.device.dto.control.upstream.*;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceUpstreamReqVO;
 import jakarta.validation.Valid;
 
@@ -47,12 +46,5 @@ public interface IotDeviceUpstreamService {
 //     * @param addReqDTO 添加设备拓扑 DTO
 //     */
 //    void addDeviceTopology(IotDeviceTopologyAddReqDTO addReqDTO);
-
-    /**
-     * Emqx 连接认证
-     *
-     * @param authReqDTO Emqx 连接认证 DTO
-     */
-    boolean authenticateEmqxConnection(IotDeviceEmqxAuthReqDTO authReqDTO);
 
 }

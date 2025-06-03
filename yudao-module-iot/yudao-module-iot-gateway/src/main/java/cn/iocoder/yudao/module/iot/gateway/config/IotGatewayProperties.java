@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.iot.gateway.config;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.Duration;
 import java.util.List;
 
 @ConfigurationProperties(prefix = "yudao.iot.gateway")
@@ -15,6 +18,10 @@ public class IotGatewayProperties {
      * 设备 RPC 服务配置
      */
     private RpcProperties rpc;
+    /**
+     * Token 配置
+     */
+    private TokenProperties token;
 
     /**
      * 协议配置
@@ -27,15 +34,34 @@ public class IotGatewayProperties {
         /**
          * 主程序 API 地址
          */
+        @NotEmpty(message = "主程序 API 地址不能为空")
         private String url;
         /**
          * 连接超时时间
          */
-        private String connectTimeout;
+        @NotNull(message = "连接超时时间不能为空")
+        private Duration connectTimeout;
         /**
          * 读取超时时间
          */
-        private String readTimeout;
+        @NotNull(message = "读取超时时间不能为空")
+        private Duration readTimeout;
+
+    }
+
+    @Data
+    public static class TokenProperties {
+
+        /**
+         * 密钥
+         */
+        @NotEmpty(message = "密钥不能为空")
+        private String secret;
+        /**
+         * 令牌有效期
+         */
+        @NotNull(message = "令牌有效期不能为空")
+        private Duration expiration;
 
     }
 
@@ -60,6 +86,7 @@ public class IotGatewayProperties {
         /**
          * 是否开启
          */
+        @NotNull(message = "是否开启不能为空")
         private Boolean enabled;
         /**
          * 服务端口
@@ -74,6 +101,7 @@ public class IotGatewayProperties {
         /**
          * 是否开启
          */
+        @NotNull(message = "是否开启不能为空")
         private Boolean enabled;
         /**
          * MQTT 服务器地址

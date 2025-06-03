@@ -23,6 +23,11 @@
             <version>${revision}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+
         <!-- 消息队列相关 -->
         <dependency>
             <groupId>org.apache.rocketmq</groupId>

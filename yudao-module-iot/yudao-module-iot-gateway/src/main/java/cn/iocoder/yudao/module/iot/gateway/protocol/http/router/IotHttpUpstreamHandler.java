@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.http.router;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
@@ -16,11 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
-import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
-import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
-
 /**
- * IoT 网关 HTTP 协议的处理器
+ * IoT 网关 HTTP 协议的【上行】处理器
  *
  * @author 芋道源码
  */
@@ -54,47 +52,35 @@ public class IotHttpUpstreamHandler implements Handler<RoutingContext> {
     private static final String EVENT_METHOD_SUFFIX = ".post";
 
     private final IotHttpUpstreamProtocol protocol;
-//    /**
-//     * 设备上行 API
-//     */
-//    private final IotDeviceUpstreamApi deviceUpstreamApi;
-    /**
-     * 设备消息生产者
-     */
+
     private final IotDeviceMessageProducer deviceMessageProducer;
 
+    public IotHttpUpstreamHandler(IotHttpUpstreamProtocol protocol) {
+        this.protocol = protocol;
+        this.deviceMessageProducer = SpringUtil.getBean(IotDeviceMessageProducer.class);
+    }
+
     @Override
-    public void handle(RoutingContext routingContext) {
-        String path = routingContext.request().path();
+    public void handle(RoutingContext context) {
+        String path = context.request().path();
+        // 1. 解析通用参数
+        Map<String, String> params = parseCommonParams(context);
+        String productKey = params.get("productKey");
+        String deviceName = params.get("deviceName");
+        JsonObject body = context.body().asJsonObject();
 
-        try {
-            // 1. 解析通用参数
-            Map<String, String> params = parseCommonParams(routingContext);
-            String productKey = params.get("productKey");
-            String deviceName = params.get("deviceName");
-            JsonObject body = routingContext.body().asJsonObject();
+        // 2. 根据路径模式处理不同类型的请求
+        if (isPropertyPostPath(path)) {
+            // 处理属性上报
+            handlePropertyPost(context, productKey, deviceName, body);
+            return;
+        }
 
-            // 2. 根据路径模式处理不同类型的请求
-            if (isPropertyPostPath(path)) {
-                // 处理属性上报
-                handlePropertyPost(routingContext, productKey, deviceName, body);
-                return;
-            }
-
-            if (isEventPostPath(path)) {
-                // 处理事件上报
-                String identifier = routingContext.pathParam("identifier");
-                handleEventPost(routingContext, productKey, deviceName, identifier, body);
-                return;
-            }
-
-            // 不支持的请求路径
-            sendErrorResponse(routingContext,  "unknown", BAD_REQUEST.getCode(), "不支持的请求路径");
-        } catch (Exception e) {
-            log.error("[handle][处理上行请求异常] path={}", path, e);
-            String method = determineMethodFromPath(path, routingContext);
-            sendErrorResponse(routingContext, method, INTERNAL_SERVER_ERROR.getCode(),
-                    INTERNAL_SERVER_ERROR.getMsg());
+        if (isEventPostPath(path)) {
+            // 处理事件上报
+            String identifier = context.pathParam("identifier");
+            handleEventPost(context, productKey, deviceName, identifier, body);
+            return;
         }
     }
 
@@ -169,7 +155,6 @@ public class IotHttpUpstreamHandler implements Handler<RoutingContext> {
 //
 //        // 事件上报
 //        CommonResult<Boolean> result = deviceUpstreamApi.reportDeviceEvent(reportReqDTO);
-//        String method = EVENT_METHOD_PREFIX + identifier + EVENT_METHOD_SUFFIX;
 //
 //        // 返回响应
 //        sendResponse(routingContext, requestId, method, result);
@@ -193,20 +178,6 @@ public class IotHttpUpstreamHandler implements Handler<RoutingContext> {
 //            response = IotStandardResponse.error(requestId, method, result.getCode(), result.getMsg());
 //        }
 //        IotNetComponentCommonUtils.writeJsonResponse(routingContext, response);
-    }
-
-    /**
-     * 发送错误响应
-     *
-     * @param routingContext 路由上下文
-     * @param method         方法名
-     * @param code           错误代码
-     * @param message        错误消息
-     */
-    private void sendErrorResponse(RoutingContext routingContext, String method, Integer code,
-                                   String message) {
-//        IotStandardResponse errorResponse = IotStandardResponse.error(requestId, method, code, message);
-//        IotNetComponentCommonUtils.writeJsonResponse(routingContext, errorResponse);
     }
 
     /**

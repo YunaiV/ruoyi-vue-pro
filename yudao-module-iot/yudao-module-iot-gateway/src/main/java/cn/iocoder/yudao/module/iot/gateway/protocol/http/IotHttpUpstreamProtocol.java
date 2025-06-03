@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.http;
 
-import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
+import cn.iocoder.yudao.module.iot.gateway.protocol.http.router.IotHttpAuthHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.router.IotHttpUpstreamHandler;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
@@ -25,8 +25,6 @@ public class IotHttpUpstreamProtocol extends AbstractVerticle {
 
     private final IotGatewayProperties.HttpProperties httpProperties;
 
-    private final IotDeviceMessageProducer deviceMessageProducer;
-
     private HttpServer httpServer;
 
     @Override
@@ -38,10 +36,11 @@ public class IotHttpUpstreamProtocol extends AbstractVerticle {
         router.route().handler(BodyHandler.create());
 
         // 创建处理器，添加路由处理器
-        IotHttpUpstreamHandler upstreamHandler = new IotHttpUpstreamHandler(
-                this, deviceMessageProducer);
+        IotHttpUpstreamHandler upstreamHandler = new IotHttpUpstreamHandler(this);
         router.post(IotHttpUpstreamHandler.PROPERTY_PATH).handler(upstreamHandler);
         router.post(IotHttpUpstreamHandler.EVENT_PATH).handler(upstreamHandler);
+        IotHttpAuthHandler authHandler = new IotHttpAuthHandler(this);
+        router.post(IotHttpAuthHandler.PATH).handler(authHandler);
 
         // 启动 HTTP 服务器
         try {

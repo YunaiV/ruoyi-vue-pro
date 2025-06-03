@@ -24,9 +24,8 @@ public class IotGatewayConfiguration {
     public static class HttpProtocolConfiguration {
 
         @Bean
-        public IotHttpUpstreamProtocol iotHttpUpstreamProtocol(IotGatewayProperties gatewayProperties,
-                                                               IotDeviceMessageProducer deviceMessageProducer) {
-            return new IotHttpUpstreamProtocol(gatewayProperties.getProtocol().getHttp(), deviceMessageProducer);
+        public IotHttpUpstreamProtocol iotHttpUpstreamProtocol(IotGatewayProperties gatewayProperties) {
+            return new IotHttpUpstreamProtocol(gatewayProperties.getProtocol().getHttp());
         }
 
         @Bean

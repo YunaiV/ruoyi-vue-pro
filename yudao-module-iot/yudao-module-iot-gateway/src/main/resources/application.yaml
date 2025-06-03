@@ -22,6 +22,10 @@ yudao:
         url: http://127.0.0.1:48080 # 主程序 API 地址
         connect-timeout: 30s
         read-timeout: 30s
+      # 设备 Token 配置
+      token:
+        secret: 1234567890123456789012345678901
+        expiration: 7d
 
       # 协议配置
       protocol:

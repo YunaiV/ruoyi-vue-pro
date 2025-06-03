@@ -1,17 +1,15 @@
-package cn.iocoder.yudao.module.iot.api.device.dto.control.upstream;
+package cn.iocoder.yudao.module.iot.core.biz.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
-// TODO @芋艿：要不要继承 IotDeviceUpstreamAbstractReqDTO
-// TODO @芋艿：@haohao：后续其它认证的设计
 /**
- * IoT 认证 Emqx 连接 Request DTO
+ * IoT 设备认证 Request DTO
  *
  * @author 芋道源码
  */
 @Data
-public class IotDeviceEmqxAuthReqDTO {
+public class IotDeviceAuthReqDTO {
 
     /**
      * 客户端 ID

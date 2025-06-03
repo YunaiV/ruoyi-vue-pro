@@ -121,23 +121,10 @@ public class IotDeviceDO extends TenantBaseDO {
      */
     private String firmwareId;
 
-    // TODO @芋艿：【待定 003】：要不要增加 username？目前 tl 有，阿里云之类的没有
     /**
-     * 设备密钥，用于设备认证，需安全存储
+     * 设备密钥，用于设备认证
      */
     private String deviceSecret;
-    /**
-     * MQTT 客户端 ID
-     */
-    private String mqttClientId;
-    /**
-     * MQTT 用户名
-     */
-    private String mqttUsername;
-    /**
-     * MQTT 密码
-     */
-    private String mqttPassword;
     /**
      * 认证类型（如一机一密、动态注册）
      */

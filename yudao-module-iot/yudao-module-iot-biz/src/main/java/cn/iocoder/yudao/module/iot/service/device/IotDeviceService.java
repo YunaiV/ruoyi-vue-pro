@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.service.device;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import jakarta.validation.Valid;
@@ -227,5 +228,13 @@ public interface IotDeviceService {
      * @return 设备列表
      */
     List<IotDeviceDO> getDeviceListByProductKeyAndNames(String productKey, List<String> deviceNames);
+
+    /**
+     * 认证设备
+     *
+     * @param authReqDTO 认证信息
+     * @return 是否认证成功
+     */
+    boolean authDevice(IotDeviceAuthReqDTO authReqDTO);
 
 }

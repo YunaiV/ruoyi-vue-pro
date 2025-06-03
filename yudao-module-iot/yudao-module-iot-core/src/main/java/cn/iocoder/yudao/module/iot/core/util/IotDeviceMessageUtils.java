@@ -6,7 +6,7 @@ import cn.hutool.system.SystemUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 
 /**
- * IoT 设备消息的工具类
+ * IoT 设备【消息】的工具类
  *
  * @author 芋道源码
  */

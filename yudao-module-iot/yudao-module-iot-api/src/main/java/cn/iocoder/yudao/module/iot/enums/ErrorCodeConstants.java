@@ -39,18 +39,6 @@ public interface ErrorCodeConstants {
     ErrorCode DEVICE_GROUP_NOT_EXISTS = new ErrorCode(1_050_005_000, "设备分组不存在");
     ErrorCode DEVICE_GROUP_DELETE_FAIL_DEVICE_EXISTS = new ErrorCode(1_050_005_001, "设备分组下存在设备，不允许删除");
 
-    // ========== 插件配置 1-050-006-000 ==========
-    ErrorCode PLUGIN_CONFIG_NOT_EXISTS = new ErrorCode(1_050_006_000, "插件配置不存在");
-    ErrorCode PLUGIN_INSTALL_FAILED = new ErrorCode(1_050_006_001, "插件安装失败");
-    ErrorCode PLUGIN_INSTALL_FAILED_FILE_NAME_NOT_MATCH = new ErrorCode(1_050_006_002, "插件安装失败，文件名与原插件id不匹配");
-    ErrorCode PLUGIN_CONFIG_DELETE_FAILED_RUNNING = new ErrorCode(1_050_006_003, "请先停止插件");
-    ErrorCode PLUGIN_STATUS_INVALID = new ErrorCode(1_050_006_004, "插件状态无效");
-    ErrorCode PLUGIN_CONFIG_KEY_DUPLICATE = new ErrorCode(1_050_006_005, "插件标识已存在");
-    ErrorCode PLUGIN_START_FAILED = new ErrorCode(1_050_006_006, "插件启动失败");
-    ErrorCode PLUGIN_STOP_FAILED = new ErrorCode(1_050_006_007, "插件停止失败");
-
-    // ========== 插件实例 1-050-007-000 ==========
-
     // ========== 固件相关 1-050-008-000 ==========
 
     ErrorCode OTA_FIRMWARE_NOT_EXISTS = new ErrorCode(1_050_008_000, "固件信息不存在");
@@ -66,16 +54,10 @@ public interface ErrorCodeConstants {
     ErrorCode OTA_UPGRADE_RECORD_DUPLICATE = new ErrorCode(1_050_008_201, "升级记录重复");
     ErrorCode OTA_UPGRADE_RECORD_CANNOT_RETRY = new ErrorCode(1_050_008_202, "升级记录不能重试");
 
-    // ========== MQTT 通信相关 1-050-009-000 ==========
-    ErrorCode MQTT_TOPIC_ILLEGAL = new ErrorCode(1_050_009_000, "topic illegal");
-
     // ========== IoT 数据桥梁 1-050-010-000 ==========
     ErrorCode DATA_BRIDGE_NOT_EXISTS = new ErrorCode(1_050_010_000, "IoT 数据桥梁不存在");
 
     // ========== IoT 场景联动 1-050-011-000 ==========
     ErrorCode RULE_SCENE_NOT_EXISTS = new ErrorCode(1_050_011_000, "IoT 场景联动不存在");
-
-    // ========== IoT 产品脚本信息 1-050-012-000 ==========
-    ErrorCode PRODUCT_SCRIPT_NOT_EXISTS = new ErrorCode(1_050_012_000, "IoT 产品脚本信息不存在");
 
 }
