@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.service.device;
 
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
@@ -31,7 +32,7 @@ public class IotDeviceClientServiceImpl implements IotDeviceCommonApi {
     public void init() {
         IotGatewayProperties.RpcProperties rpc = gatewayProperties.getRpc();
         restTemplate = new RestTemplateBuilder()
-                .rootUri(rpc.getUrl() + "/rpc-api/iot/device/")
+                .rootUri(rpc.getUrl() + "/rpc-api/iot/device")
                 .readTimeout(rpc.getReadTimeout())
                 .connectTimeout(rpc.getConnectTimeout())
                 .build();
@@ -39,7 +40,7 @@ public class IotDeviceClientServiceImpl implements IotDeviceCommonApi {
 
     @Override
     public CommonResult<Boolean> authDevice(IotDeviceAuthReqDTO authReqDTO) {
-        return doPost("auth", authReqDTO);
+        return doPost("/auth", authReqDTO);
     }
 
     @SuppressWarnings("unchecked")
@@ -48,6 +49,7 @@ public class IotDeviceClientServiceImpl implements IotDeviceCommonApi {
             CommonResult<Boolean> result = restTemplate.postForObject(url, requestBody,
                     (Class<CommonResult<Boolean>>) (Class<?>) CommonResult.class);
             log.info("[doPost][url({}) requestBody({}) result({})]", url, requestBody, result);
+            Assert.notNull(result, "请求结果不能为空");
             return result;
         } catch (Exception e) {
             log.error("[doPost][url({}) requestBody({}) 发生异常]", url, requestBody, e);

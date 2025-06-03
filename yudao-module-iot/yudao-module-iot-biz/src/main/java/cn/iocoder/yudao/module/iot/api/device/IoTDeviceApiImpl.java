@@ -10,6 +10,7 @@ import jakarta.annotation.security.PermitAll;
 import org.springframework.context.annotation.Primary;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -30,7 +31,7 @@ public class IoTDeviceApiImpl implements IotDeviceCommonApi {
     @Override
     @PostMapping(RpcConstants.RPC_API_PREFIX + "/iot/device/auth")
     @PermitAll
-    public CommonResult<Boolean> authDevice(IotDeviceAuthReqDTO authReqDTO) {
+    public CommonResult<Boolean> authDevice(@RequestBody IotDeviceAuthReqDTO authReqDTO) {
         return success(deviceService.authDevice(authReqDTO));
     }
 

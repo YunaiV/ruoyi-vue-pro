@@ -2,11 +2,13 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.http.router;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpUpstreamProtocol;
@@ -47,7 +49,7 @@ public class IotHttpAuthHandler extends IotHttpAbstractHandler {
 
     @Override
     public CommonResult<Object> handle0(RoutingContext context) {
-        // 解析参数
+        // 1. 解析参数
         JsonObject body = context.body().asJsonObject();
         String clientId = body.getString("clientId");
         if (StrUtil.isEmpty(clientId)) {
@@ -62,20 +64,23 @@ public class IotHttpAuthHandler extends IotHttpAbstractHandler {
             throw invalidParamException("password 不能为空");
         }
 
-        // 执行认证
+        // 2.1 执行认证
         CommonResult<Boolean> result = deviceClientService.authDevice(new IotDeviceAuthReqDTO()
                 .setClientId(clientId).setUsername(username).setPassword(password));
-        if (result == null || !result.isSuccess()) {
+        result.checkError();;
+        if (!BooleanUtil.isTrue(result.getData())) {
             throw exception(DEVICE_AUTH_FAIL);
         }
-
-        // 生成 Token
+        // 2.2 生成 Token
         IotDeviceAuthUtils.DeviceInfo deviceInfo = deviceTokenService.parseUsername(username);
         Assert.notNull(deviceInfo, "设备信息不能为空");
         String token = deviceTokenService.createToken(deviceInfo.getProductKey(), deviceInfo.getDeviceName());
         Assert.notBlank(token, "生成 token 不能为空位");
 
-        // TODO @芋艿：发送上线消息；
+        // 3. 执行上线
+        deviceMessageProducer.sendDeviceMessage(IotDeviceMessage.of(deviceInfo.getProductKey(), deviceInfo.getDeviceName(),
+                        protocol.getServerId())
+                .ofStateOnline());
 
         // 构建响应数据
         return success(MapUtil.of("token", token));

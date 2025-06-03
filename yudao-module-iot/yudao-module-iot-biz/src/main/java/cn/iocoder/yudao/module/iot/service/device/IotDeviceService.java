@@ -235,6 +235,6 @@ public interface IotDeviceService {
      * @param authReqDTO 认证信息
      * @return 是否认证成功
      */
-    boolean authDevice(IotDeviceAuthReqDTO authReqDTO);
+    boolean authDevice(@Valid IotDeviceAuthReqDTO authReqDTO);
 
 }
