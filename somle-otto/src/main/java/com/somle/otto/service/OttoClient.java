@@ -1,33 +1,90 @@
 package com.somle.otto.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import cn.hutool.json.JSONUtil;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
 import cn.iocoder.yudao.framework.common.util.web.RequestX;
 import cn.iocoder.yudao.framework.common.util.web.WebUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.somle.otto.model.pojo.OttoAccount;
+import com.somle.otto.model.pojo.OttoAuthToken;
 import com.somle.otto.model.req.OttoReceiptReq;
-import com.somle.otto.model.resp.OttoCommonResp;
+import com.somle.otto.model.resp.*;
+import com.somle.otto.repository.OttoAccountDao;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Response;
+import okhttp3.*;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 public class OttoClient {
     private static final String BASEURL = "https://api.otto.market";
-    OttoAccount ottoAccount;
+    public OttoAccount ottoAccount;
+
+    OttoAccountDao accountDao;
 
     // 构造函数初始化 OkHttpClient
-    public OttoClient(OttoAccount ottoAccount) {
+    public OttoClient(OttoAccount ottoAccount, OttoAccountDao accountDao) {
         this.ottoAccount = ottoAccount;
+        this.accountDao = accountDao;
     }
 
     // 获取 OAuth 令牌
     public String getAccessToken() {
         return ottoAccount.getOauthToken().getAccessToken();
+    }
+
+    @SneakyThrows
+    public OttoProductResp getProduct(String page) {
+        RequestX requestX = RequestX.builder()
+            .requestMethod(RequestX.Method.GET)
+            .url(BASEURL + "/v4/products?page=" + page + "&limit=100")
+            .headers(Map.of("Authorization", "Bearer " + getAccessToken()))
+            .build();
+        Response response = WebUtils.sendRequest(requestX);
+        String bodyString = response.body().string();
+        OttoProductResp ottoProductResp = JSONUtil.toBean(bodyString, OttoProductResp.class);
+        return ottoProductResp;
+    }
+
+
+    public List<OttoProductResp.ProductVariation> getAllProducts() {
+        refreshToken(this);
+        List<OttoProductResp.ProductVariation> productVariations = new ArrayList<>();
+        int page = 0;
+        while (true) {
+            OttoProductResp ottoProductResp = getProduct(String.valueOf(page));
+            if (ottoProductResp.getProductVariations() == null || ottoProductResp.getProductVariations().isEmpty()) {
+                break;
+            }
+            productVariations.addAll(ottoProductResp.getProductVariations());
+            page++;
+        }
+        productVariations = productVariations.stream().map(
+            productVariation -> {
+                productVariation.setQuantity(getSkuQuantity(productVariation.getSku()).getQuantity());
+                return productVariation;
+            }
+        ).toList();
+        return productVariations;
+    }
+
+    @SneakyThrows
+    public OttoSkuQuantityResp getSkuQuantity(String sku) {
+        RequestX requestX = RequestX.builder()
+            .requestMethod(RequestX.Method.GET)
+            .url(BASEURL + "/v1/availability/quantities/" + sku)
+            .headers(Map.of("Authorization", "Bearer " + getAccessToken()))
+            .build();
+        Response response = WebUtils.sendRequest(requestX);
+        String bodyString = response.body().string();
+        OttoSkuQuantityResp ottoSkuQuantityResp = JSONUtil.toBean(bodyString, OttoSkuQuantityResp.class);
+        return ottoSkuQuantityResp;
     }
 
     /**
@@ -39,23 +96,64 @@ public class OttoClient {
      * @return OttoCommonResp<Object> resources为订单页集合
      */
     @SneakyThrows
-    public OttoCommonResp<Object> getOrders(String startTime, String endTime) {
+    public OttoOrderResp getOrders(String startTime, String endTime, String nextcursor) {
 
         Map<String, ? extends Serializable> map = Map.of(
-                "fromOrderDate", startTime,
-                "toOrderDate", endTime,
-                "limit", 128,
-                "mode", "BUCKET"
+            "fromOrderDate", startTime,
+            "toOrderDate", endTime,
+            "limit", 128,
+//            "mode", "BUCKET",
+            "nextcursor", nextcursor
         );
         RequestX requestX = RequestX.builder()
-                .requestMethod(RequestX.Method.GET)
-                .url(BASEURL + "/v4/orders")
-                .queryParams(map)
-                .headers(Map.of("Authorization", "Bearer " + getAccessToken()))
-                .build();
-        try(Response response = WebUtils.sendRequest(requestX)){
-            return handleResponse(response);
+            .requestMethod(RequestX.Method.GET)
+            .url(BASEURL + "/v4/orders")
+            .queryParams(map)
+            .headers(Map.of("Authorization", "Bearer " + getAccessToken()))
+            .build();
+        Response response = WebUtils.sendRequest(requestX);
+        String bodyString = response.body().string();
+        OttoOrderResp ottoOrderResp = JSONUtil.toBean(bodyString, OttoOrderResp.class);
+        return ottoOrderResp;
+    }
+
+    @SneakyThrows
+    public List<OttoOrder> getAllOrders(String startTime, String endTime) {
+        refreshToken(this);
+        List<OttoOrder> orders = new ArrayList<>();
+        OttoOrderResp ottoOrderResp = getOrders(startTime, endTime, "");
+        orders.addAll(ottoOrderResp.getResources());
+        if (ottoOrderResp.getLinks() == null) {
+            return orders;
         }
+        OttoOrderResp.Link link = ottoOrderResp.getLinks().get(0);
+        while ("next".equals(link.rel)) {
+            ottoOrderResp = getOrders(startTime, endTime, getNextCursor(link.href).get());
+            orders.addAll(ottoOrderResp.getResources());
+            if (ottoOrderResp.getLinks() == null) {
+                return orders;
+            }
+            link = ottoOrderResp.getLinks().get(0);
+        }
+        return orders;
+    }
+
+    public Optional<String> getNextCursor(String url) {
+        if (url == null || !url.contains("?")) {
+            return Optional.empty();
+        }
+
+        String query = url.split("\\?", 2)[1]; // 取查询参数部分
+        for (String param : query.split("&")) {
+            if (param.startsWith("nextcursor=")) {
+                String[] pair = param.split("=", 2); // 分割键值对
+                if (pair.length > 1) {
+                    return Optional.of(pair[1]); // 返回值
+                }
+                return Optional.empty(); // 无值情况
+            }
+        }
+        return Optional.empty(); // 未找到参数
     }
 
     /**
@@ -69,20 +167,20 @@ public class OttoClient {
     @SneakyThrows
     public OttoCommonResp<Object> getSettlement(String startTime, String endTime) {
         OttoReceiptReq req = OttoReceiptReq.builder()
-                .limit(128)  // 最大128
-                .from(startTime)
-                .to(endTime)
-                .receiptTypes(List.of("PURCHASE"))  // 订单完成并已支付
-                .build();
+            .limit(128)  // 最大128
+            .from(startTime)
+            .to(endTime)
+            .receiptTypes(List.of("PURCHASE"))  // 订单完成并已支付
+            .build();
 
         RequestX requestX = RequestX.builder()
-                .requestMethod(RequestX.Method.GET)
-                .url(BASEURL + "/v3/receipts")
-                .queryParams(req)
-                .headers(Map.of("Authorization", "Bearer " + getAccessToken()))
-                .build();
+            .requestMethod(RequestX.Method.GET)
+            .url(BASEURL + "/v3/receipts")
+            .queryParams(req)
+            .headers(Map.of("Authorization", "Bearer " + getAccessToken()))
+            .build();
 
-        try(Response response = WebUtils.sendRequest(requestX)){
+        try (Response response = WebUtils.sendRequest(requestX)) {
             return handleResponse(response);
         }
     }
@@ -91,13 +189,13 @@ public class OttoClient {
     private OttoCommonResp<Object> getSettlementFromLinks(OttoCommonResp.OttoLinks links) {
 
         RequestX requestX = RequestX.builder()
-                .requestMethod(RequestX.Method.GET)
-                .url(BASEURL + links.getHref())  // 使用 links 中的 href 字段
-                .headers(Map.of("Authorization", "Bearer " + getAccessToken()))
-                .build();
+            .requestMethod(RequestX.Method.GET)
+            .url(BASEURL + links.getHref())  // 使用 links 中的 href 字段
+            .headers(Map.of("Authorization", "Bearer " + getAccessToken()))
+            .build();
 
         try {
-            try(Response response = WebUtils.sendRequest(requestX)){
+            try (Response response = WebUtils.sendRequest(requestX)) {
                 if (response.isSuccessful()) {
                     return parseResponse(response);
                 }
@@ -160,4 +258,58 @@ public class OttoClient {
         throw new RuntimeException("HTTP error: " + response.code());
     }
 
+
+    // 刷新令牌
+    public void refreshToken(OttoClient client) {
+        OttoAccessTokenResp token = getToken(client);
+
+        OttoAuthToken authToken = OttoAuthToken.builder()
+            .scope(token.getScope())
+            .accessToken(token.getAccessToken())
+            .tokenType(token.getTokenType())
+            .expiresIn(token.getExpiresIn())
+            .build();
+
+        log.debug("Generated authToken: {}", authToken);
+        client.ottoAccount.setOauthToken(authToken);
+        accountDao.save(client.ottoAccount);
+    }
+
+    @SneakyThrows
+    private OttoAccessTokenResp getToken(OttoClient client) {
+        OkHttpClient httpClient = new OkHttpClient();
+        RequestBody formBody = new FormBody.Builder()
+            .add("grant_type", "client_credentials")
+            .add("scope", "orders products receipts returns price-reduction shipments quantities shipping-profiles availability")
+            .add("client_id", client.ottoAccount.getClientId())
+            .add("client_secret", client.ottoAccount.getClientSecret())
+            .build();
+
+        Request request = new Request.Builder()
+            .url("https://api.otto.market/v1/token")
+            .post(formBody)
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .build();
+
+        try (Response response = httpClient.newCall(request).execute()) {
+            return Optional.ofNullable(response.body())
+                .map(responseBody -> {
+                    try {
+                        String bodyString = responseBody.string();
+                        log.debug("Response body: {}", bodyString);
+                        return JsonUtilsX.parseObject(bodyString, OttoAccessTokenResp.class);
+                    } catch (IOException e) {
+                        log.error("Error reading response body", e);
+                        throw new RuntimeException("Error reading response body", e);
+                    }
+                })
+                .orElseThrow(() -> {
+                    log.error("Response body is null");
+                    return new RuntimeException("Response body is null");
+                });
+        } catch (IOException e) {
+            log.error("Error during token request", e);
+            throw new RuntimeException("Error during token request", e);
+        }
+    }
 }

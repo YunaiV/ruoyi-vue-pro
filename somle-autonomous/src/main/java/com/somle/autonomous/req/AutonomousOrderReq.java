@@ -26,6 +26,9 @@ public class AutonomousOrderReq {
     @JsonProperty("limit")
     private Integer limit;
 
+    @JsonProperty("last_id")
+    private String lastId;
+
     //订单状态集合
     @JsonProperty("statuses[]")
     private Integer statuses;

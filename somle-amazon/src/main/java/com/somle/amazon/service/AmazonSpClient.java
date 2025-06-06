@@ -100,8 +100,8 @@ public class AmazonSpClient {
             .queryParams(reqVO)
             .headers(generateHeaders(auth))
             .build();
-        try (var response = WebUtils.sendRequest(request)) {
-            var bodyString = response.body().string();
+        try (Response response = WebUtils.sendRequest(request)) {
+            String bodyString = response.body().string();
             AmazonSpListingRepsVO amazonSpListingRepsVO = JSONUtil.toBean(bodyString, AmazonSpListingRepsVO.class);
             return amazonSpListingRepsVO;
         }

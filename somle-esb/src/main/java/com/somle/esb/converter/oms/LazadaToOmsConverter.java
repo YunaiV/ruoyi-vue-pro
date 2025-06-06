@@ -15,7 +15,7 @@ import com.somle.lazada.model.reps.LazadaOrderItemResp;
 import com.somle.lazada.model.reps.LazadaOrderResp;
 import com.somle.lazada.model.reps.LazadaProductResp;
 import com.somle.lazada.model.reps.LazadaSellerResp;
-import com.somle.lazada.service.LazadaClient;
+import com.somle.staples.service.LazadaClient;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -184,6 +184,7 @@ public class LazadaToOmsConverter {
                 }
                 OmsOrderItemSaveReqDTO omsOrderItemSaveReqDTO = new OmsOrderItemSaveReqDTO();
                 omsOrderItemSaveReqDTO.setExternalId(orderItem.getOrderItemId());
+                omsOrderItemSaveReqDTO.setShopProductExternalCode(orderItem.getSku());
                 if (ObjectUtil.isNotEmpty(existShopProductMap.get(omsOrderSaveReqDTO.getShopId()))) {
                     omsOrderItemSaveReqDTO.setShopProductId(existShopProductMap.get(omsOrderSaveReqDTO.getShopId()).get(orderItem.getSku()).getId());
                 }

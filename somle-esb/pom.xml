@@ -194,6 +194,21 @@
             <artifactId>yudao-module-tms-api</artifactId>
             <version>${revision}</version>
         </dependency>
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-otto</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-rakuten</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.somle</groupId>
+            <artifactId>somle-autonomous</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
 
     </dependencies>

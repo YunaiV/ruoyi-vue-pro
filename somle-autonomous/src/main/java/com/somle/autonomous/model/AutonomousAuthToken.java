@@ -30,8 +30,8 @@ public class AutonomousAuthToken {
     @JsonProperty("expire_at") // Maps JSON property expire_at to expireAt
     private long expireAt;
 
-    @OneToOne(mappedBy = "autonomousAuthToken")
-    private AutonomousAccount autonomousAccount;
+//    @OneToOne(mappedBy = "autonomousAuthToken")
+//    private AutonomousAccount autonomousAccount;
 
     @Override
     public String toString() {

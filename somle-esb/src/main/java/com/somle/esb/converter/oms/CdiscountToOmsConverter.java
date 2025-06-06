@@ -140,7 +140,7 @@ public class CdiscountToOmsConverter {
                 OmsOrderItemSaveReqDTO omsOrderItemSaveReqDTO = new OmsOrderItemSaveReqDTO();
                 String productId = orderLine.getOffer().getProductId();
                 omsOrderItemSaveReqDTO.setShopProductExternalId(productId);
-                omsOrderItemSaveReqDTO.setShopProductExternalCode(orderLine.getOffer().getSellerProductId());
+                omsOrderItemSaveReqDTO.setShopProductExternalCode(orderLine.getOffer().getProductId());
                 shippingFee = shippingFee.add(Optional.ofNullable(orderLine.getSellingPrice()).get().getShippingCost());
                 omsOrderItemSaveReqDTO.setPrice(orderLine.getTotalPrice().getSellingPrice());
                 omsOrderItemSaveReqDTO.setQty(orderLine.getQuantity());

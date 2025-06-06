@@ -1,8 +1,5 @@
 package com.somle.bestbuy.service;
 
-import cn.iocoder.yudao.framework.common.util.json.JSONObject;
-
-import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +20,9 @@ public class BestbuyServiceTest extends SomleBaseDbUnitTest {
 
     @Test
     void test() {
-        JSONObject orders = service.getOrders();
-        log.info("{}",orders);
+        service.bestbuyClients.forEach(bestbuyClient -> {
+            bestbuyClient.getAllOrders();
+            log.info("{}", 11);
+        });
     }
 }

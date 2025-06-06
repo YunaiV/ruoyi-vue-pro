@@ -7,10 +7,9 @@
         <version>${revision}</version>
     </parent>
 
+    <groupId>com.somle</groupId>
     <artifactId>somle-rakuten</artifactId>
-    <packaging>jar</packaging>
 
-    <name>somle-rakuten</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

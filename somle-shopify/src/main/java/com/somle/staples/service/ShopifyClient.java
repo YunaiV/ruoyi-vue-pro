@@ -1,4 +1,4 @@
-package com.somle.lazada.service;
+package com.somle.staples.service;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.json.JSONArray;

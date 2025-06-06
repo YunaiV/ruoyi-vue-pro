@@ -7,9 +7,8 @@
         <version>${revision}</version>
     </parent>
 
+    <groupId>com.somle</groupId>
     <artifactId>somle-otto</artifactId>
-    <packaging>jar</packaging>
-    <name>somle-otto</name>
 
 
     <properties>

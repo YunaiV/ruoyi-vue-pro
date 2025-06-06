@@ -16,7 +16,7 @@ logging:
 spring:
   # 数据源配置项
   datasource:
-    url: jdbc:mysql://192.168.10.151:3306/ruoyi-vue-test?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
+    url: jdbc:mysql://192.168.10.151:3306/ruoyi-vue-pro?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf-8
     driverClassName: com.mysql.cj.jdbc.Driver
     username: it003
     password: asivJssflioKK

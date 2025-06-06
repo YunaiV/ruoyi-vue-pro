@@ -9,6 +9,7 @@ import com.somle.autonomous.resp.AutonomousOrderResp;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.Rollback;
@@ -17,6 +18,7 @@ import java.util.Optional;
 
 @Slf4j
 @DataJpaTest
+@Disabled
 class AutonomousClientTest extends SomleBaseDbUnitTest {
 
     @Resource

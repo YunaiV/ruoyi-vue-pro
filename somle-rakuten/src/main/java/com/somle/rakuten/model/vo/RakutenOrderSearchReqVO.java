@@ -3,7 +3,8 @@ package com.somle.rakuten.model.vo;
 
 import cn.hutool.core.date.DatePattern;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.somle.rakuten.model.pojo.RakutenPaginationReqModel;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.somle.rakuten.model.pojo.PaginationRequestModel;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
@@ -64,5 +65,6 @@ public class RakutenOrderSearchReqVO {
 
     private Integer oneDayOperationFlag;                // 是否为当天出货订单，1表示当天出货的订单
 
-    private RakutenPaginationReqModel rakutenPaginationReqModel; // 分页请求模型，用于处理分页查询,不写最大1000条
+    @JsonProperty("PaginationRequestModel")
+    private PaginationRequestModel paginationRequestModel; // 分页请求模型，用于处理分页查询,不写最大1000条
 }

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 // 主类，表示销售订单
@@ -15,7 +16,7 @@ import java.util.List;
 public class OttoOrder {
     private String salesOrderId; // 销售订单ID
     private String orderNumber;   // 订单编号
-    private String orderDate;     // 订单日期
+    private LocalDateTime orderDate;     // 订单日期
     private String lastModifiedDate; // 最后修改日期
     private List<PositionItem> positionItems; // 订单项列表
     private OrderLifecycleInformation orderLifecycleInformation; // 订单生命周期信息

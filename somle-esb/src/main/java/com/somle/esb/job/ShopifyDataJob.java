@@ -3,7 +3,7 @@ package com.somle.esb.job;
 
 import com.somle.esb.model.Domain;
 import com.somle.esb.service.EsbService;
-import com.somle.lazada.service.ShopifyService;
+import com.somle.staples.service.ShopifyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

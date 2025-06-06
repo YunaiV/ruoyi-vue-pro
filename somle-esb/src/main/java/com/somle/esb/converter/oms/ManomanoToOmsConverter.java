@@ -78,11 +78,11 @@ public class ManomanoToOmsConverter {
         List<OmsShopProductSaveReqDTO> omsShopProductDOs = products.stream()
             .map(manomanoProductRepsDTO -> {
                     OmsShopProductSaveReqDTO shopProductDTO = new OmsShopProductSaveReqDTO();
-                    MapUtils.findAndThen(existShopProductMap, manomanoProductRepsDTO.getSku() + "#" + omsShopDTO.getId(), omsShopProductDO -> shopProductDTO.setId(omsShopProductDO.getId()));
+                MapUtils.findAndThen(existShopProductMap, manomanoProductRepsDTO.getIdMe().toString(), omsShopProductDO -> shopProductDTO.setId(omsShopProductDO.getId()));
                     shopProductDTO.setShopId(omsShopDTO.getId());
                     shopProductDTO.setCode(manomanoProductRepsDTO.getSku());
-                    shopProductDTO.setExternalId(manomanoProductRepsDTO.getSku() + "#" + omsShopDTO.getId());
-                    shopProductDTO.setName(manomanoProductRepsDTO.getIdMe().toString());
+                shopProductDTO.setExternalId(manomanoProductRepsDTO.getIdMe().toString());
+                shopProductDTO.setName(manomanoProductRepsDTO.getIdMeLink());
                     if (manomanoProductRepsDTO.getPrice() != null) {
                         shopProductDTO.setPrice(new BigDecimal(manomanoProductRepsDTO.getPrice()));
                     }

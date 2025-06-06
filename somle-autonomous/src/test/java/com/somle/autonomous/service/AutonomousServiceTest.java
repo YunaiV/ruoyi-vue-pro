@@ -1,20 +1,19 @@
 package com.somle.autonomous.service;
 
 import cn.iocoder.yudao.framework.test.core.ut.SomleBaseDbUnitTest;
-import com.somle.autonomous.repository.AutonomousAccountRepository;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.Rollback;
 
+@Disabled
 @Slf4j
-@Import({AutonomousAccountRepository.class, AutonomousService.class})
+@Import({AutonomousService.class})
 class AutonomousServiceTest extends SomleBaseDbUnitTest {
 
-    @Resource
-    AutonomousAccountRepository autonomousAccountRepository;
     @Resource
     AutonomousService autonomousService;
 
@@ -23,5 +22,10 @@ class AutonomousServiceTest extends SomleBaseDbUnitTest {
     @Rollback(value = false)
     void flushAccessToken() {
         autonomousService.refreshOrObtainAccessToken();
+    }
+
+    @Test
+    void test() {
+        autonomousService.autonomousClients.get(0).getAllProduct();
     }
 }

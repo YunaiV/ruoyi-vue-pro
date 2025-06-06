@@ -177,6 +177,7 @@ public class ShopeeToOmsConverter {
                     omsOrderItemSaveReqDTO.setShopProductId(omsShopProductDTO.getId());
                 }
                 totalPrice = totalPrice.add(item.getModelDiscountedPrice());
+                omsOrderItemSaveReqDTO.setShopProductExternalCode(modelSku);
                 omsOrderItemSaveReqDTO.setExternalId(item.getModelId().toString());
                 omsOrderItemSaveReqDTO.setQty(item.getModelQuantityPurchased());
                 if (ObjectUtil.isNotEmpty(item.getModelOriginalPrice())) {

@@ -52,8 +52,8 @@ public class OttoAuthToken {
      */
     private String scope;
 
-    @OneToOne(mappedBy = "oauthToken")
-    private OttoAccount ottoAccount;
+//    @OneToOne(mappedBy = "oauthToken")
+//    private OttoAccount ottoAccount;
 
 }
 
