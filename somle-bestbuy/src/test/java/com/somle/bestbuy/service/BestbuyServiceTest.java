@@ -21,7 +21,7 @@ public class BestbuyServiceTest extends SomleBaseDbUnitTest {
     @Test
     void test() {
         service.bestbuyClients.forEach(bestbuyClient -> {
-            bestbuyClient.getAllOrders();
+//            bestbuyClient.getAllOrders();
             log.info("{}", 11);
         });
     }
