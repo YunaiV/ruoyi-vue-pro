@@ -91,7 +91,7 @@ export function delete${simpleClassName}(id: number) {
 
 #if ( $table.templateType != 2 && $deleteBatchEnable)
 /** 批量删除${table.classComment} */
-export function delete${simpleClassName}ListByIds(ids: number[]) {
+export function delete${simpleClassName}List(ids: number[]) {
   return requestClient.delete(`${baseURL}/delete-list?ids=${ids.join(',')}`)
 }
 #end
@@ -154,7 +154,7 @@ export function export${simpleClassName}(params: any) {
 
     #if ($deleteBatchEnable)
     /** 批量删除${subTable.classComment} */
-    export function delete${subSimpleClassName}ListByIds(ids: number[]) {
+    export function delete${subSimpleClassName}List(ids: number[]) {
       return requestClient.delete(`${baseURL}/${subSimpleClassName_strikeCase}/delete-list?ids=${ids.join(',')}`)
     }
     #end
