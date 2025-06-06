@@ -65,10 +65,13 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #end
         // 插入
 #if ($voType == 10)
-## TODO @puhui999：insert 也要加下 clean。万一前端乱传递，哈哈哈。这个就是 do 模式的缺点；（只在 do 模式下）；看看主子表，是不是也可能存在，insert 的时候；
         ${table.className}DO ${classNameVar} = BeanUtils.toBean(createReqVO, ${table.className}DO.class);
-#end
         ${classNameVar}Mapper.insert(${classNameVar});
+#else
+        ${saveReqVOVar}.clean() // 清理掉创建、更新时间等相关属性值
+        ${classNameVar}Mapper.insert(${saveReqVOVar});
+#end
+
 ## 特殊：主子表专属逻辑（非 ERP 模式）
 #if ( $subTables && $subTables.size() > 0 && $table.templateType != 11 )
 
@@ -112,6 +115,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         ${table.className}DO updateObj = BeanUtils.toBean(updateReqVO, ${table.className}DO.class);
         ${classNameVar}Mapper.updateById(updateObj);
 #else
+        ${updateReqVOVar}.clean() // 清理掉创建、更新时间等相关属性值
         ${classNameVar}Mapper.updateById(${updateReqVOVar});
 #end
 ## 特殊：主子表专属逻辑（非 ERP 模式）
@@ -320,6 +324,7 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         }
         // 插入
 #end
+        ${subClassNameVar}.clean() // 清理掉创建、更新时间等相关属性值
         ${subClassNameVars.get($index)}Mapper.insert(${subClassNameVar});
         return ${subClassNameVar}.getId();
     }
