@@ -101,7 +101,7 @@ async function handleDeleteBatch() {
     key: 'action_key_msg',
   });
   try {
-    await delete${simpleClassName}ListByIds(deleteIds.value);
+    await delete${simpleClassName}ListByIds(checkedIds.value);
     message.success({
       content: $t('ui.actionMessage.deleteSuccess'),
       key: 'action_key_msg',
@@ -112,13 +112,13 @@ async function handleDeleteBatch() {
   }
 }
 
-const deleteIds = ref<number[]>([]) // 待删除${table.classComment} ID
-function setDeleteIds({
+const checkedIds = ref<number[]>([])
+function handleRowCheckboxChange({
   records,
 }: {
   records: ${simpleClassName}Api.${simpleClassName}[];
 }) {
-  deleteIds.value = records.map((item) => item.id);
+  checkedIds.value = records.map((item) => item.id);
 }
 #end
 
@@ -192,8 +192,8 @@ const [Grid, gridApi] = useVbenVxeGrid({
     },
     #end
     #if($deleteBatchEnable)
-      checkboxAll: setDeleteIds,
-      checkboxChange: setDeleteIds,
+      checkboxAll: handleRowCheckboxChange,
+      checkboxChange: handleRowCheckboxChange,
     #end
   }
 #end
@@ -254,7 +254,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
               type: 'primary',
               danger: true,
               icon: ACTION_ICON.DELETE,
-              disabled: isEmpty(deleteIds),
+              disabled: isEmpty(checkedIds),
               auth: ['${table.moduleName}:${simpleClassName_strikeCase}:delete'],
               onClick: handleDeleteBatch,
             },

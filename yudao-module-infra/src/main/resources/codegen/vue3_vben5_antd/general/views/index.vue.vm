@@ -167,7 +167,7 @@ async function onDeleteBatch() {
     key: 'action_process_msg',
   });
   try {
-    await delete${simpleClassName}ListByIds(deleteIds.value);
+    await delete${simpleClassName}ListByIds(checkedIds.value);
     message.success( $t('ui.actionMessage.deleteSuccess') );
     await getList();
   } finally {
@@ -175,13 +175,13 @@ async function onDeleteBatch() {
   }
 }
 
-const deleteIds = ref<number[]>([]) // 待删除${table.classComment} ID
-function setDeleteIds({
+const checkedIds = ref<number[]>([])
+function handleRowCheckboxChange({
   records,
 }: {
   records: ${simpleClassName}Api.${simpleClassName}[];
 }) {
-  deleteIds.value = records.map((item) => item.id);
+  checkedIds.value = records.map((item) => item.id);
 }
 #end
 
@@ -336,7 +336,7 @@ onMounted(() => {
               type="primary"
               danger
               class="ml-2"
-              :disabled="isEmpty(deleteIds)"
+              :disabled="isEmpty(checkedIds)"
               @click="onDeleteBatch"
               v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:delete']"
           >
@@ -368,8 +368,8 @@ onMounted(() => {
           show-overflow
           :loading="loading"
 #if ($table.templateType != 2 && $deleteBatchEnable)
-          @checkboxAll="setDeleteIds"
-          @checkboxChange="setDeleteIds"
+          @checkboxAll="handleRowCheckboxChange"
+          @checkboxChange="handleRowCheckboxChange"
 #end
       >
 #if ($table.templateType != 2 && $deleteBatchEnable)
