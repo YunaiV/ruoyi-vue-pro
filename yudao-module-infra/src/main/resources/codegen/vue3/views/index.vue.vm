@@ -107,6 +107,17 @@
           <Icon icon="ep:sort" class="mr-5px" /> 展开/折叠
         </el-button>
 #end
+      #if ($table.templateType != 2 && $deleteBatchEnable)
+        <el-button
+            type="danger"
+            plain
+            :disabled="isEmpty(checkedIds)"
+            @click="handleDeleteBatch"
+            v-hasPermi="['${table.moduleName}:${simpleClassName_strikeCase}:delete']"
+        >
+          <Icon icon="ep:delete" class="mr-5px" /> 批量删除
+        </el-button>
+      #end
       </el-form-item>
     </el-form>
   </ContentWrap>
@@ -116,12 +127,16 @@
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 11 && $subTables && $subTables.size() > 0 )
     <el-table
+      row-key="id"
       v-loading="loading"
       :data="list"
       :stripe="true"
       :show-overflow-tooltip="true"
       highlight-current-row
       @current-change="handleCurrentChange"
+      #if ($deleteBatchEnable)
+      @selection-change="handleRowCheckboxChange"
+      #end
     >
 ## 特殊：树表专属逻辑
 #elseif ( $table.templateType == 2 )
@@ -135,7 +150,19 @@
       v-if="refreshTable"
     >
 #else
-    <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
+    <el-table
+        row-key="id"
+        v-loading="loading"
+        :data="list"
+        :stripe="true"
+        :show-overflow-tooltip="true"
+        #if ($deleteBatchEnable)
+        @selection-change="handleRowCheckboxChange"
+        #end
+    >
+#end
+#if ($table.templateType != 2 && $deleteBatchEnable)
+    <el-table-column type="selection" width="55" />
 #end
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 12 && $subTables && $subTables.size() > 0 )
@@ -234,13 +261,14 @@
 
 <script setup lang="ts">
 import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
+import { isEmpty } from '@/utils/is'
 import { dateFormatter } from '@/utils/formatTime'
 ## 特殊：树表专属逻辑
 #if ( $table.templateType == 2 )
 import { handleTree } from '@/utils/tree'
 #end
 import download from '@/utils/download'
-import { ${simpleClassName}Api, ${simpleClassName}VO } from '@/api/${table.moduleName}/${table.businessName}'
+import { ${simpleClassName}Api, ${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
 import ${simpleClassName}Form from './${simpleClassName}Form.vue'
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType != 10 )
@@ -256,7 +284,7 @@ const message = useMessage() // 消息弹窗
 const { t } = useI18n() // 国际化
 
 const loading = ref(true) // 列表的加载中
-const list = ref<${simpleClassName}VO[]>([]) // 列表的数据
+const list = ref<${simpleClassName}[]>([]) // 列表的数据
 ## 特殊：树表专属逻辑（树不需要分页接口）
 #if ( $table.templateType != 2 )
 const total = ref(0) // 列表的总页数
@@ -329,6 +357,24 @@ const handleDelete = async (id: number) => {
     await getList()
   } catch {}
 }
+
+#if ($table.templateType != 2 && $deleteBatchEnable)
+/** 批量删除${table.classComment} */
+const handleDeleteBatch = async () => {
+  try {
+    // 删除的二次确认
+    await message.delConfirm()
+    await ${simpleClassName}Api.delete${simpleClassName}List(checkedIds.value);
+    message.success(t('common.delSuccess'))
+    await getList();
+  } catch {}
+}
+
+const checkedIds = ref<number[]>([])
+const handleRowCheckboxChange = (records: ${simpleClassName}[]) => {
+  checkedIds.value = records.map((item) => item.id);
+}
+#end
 
 /** 导出按钮操作 */
 const handleExport = async () => {

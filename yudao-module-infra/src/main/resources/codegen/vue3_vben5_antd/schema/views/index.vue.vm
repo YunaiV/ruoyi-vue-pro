@@ -21,7 +21,7 @@ import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 #if (${table.templateType} == 2)## 树表接口
 import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 #else## 标准表接口
-import { get${simpleClassName}Page, delete${simpleClassName},#if ($deleteBatchEnable) delete${simpleClassName}ListByIds,#end export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
+import { get${simpleClassName}Page, delete${simpleClassName},#if ($deleteBatchEnable) delete${simpleClassName}List,#end export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 #end
 import { downloadFileFromBlobPart, isEmpty } from '@vben/utils';
 
@@ -101,7 +101,8 @@ async function handleDeleteBatch() {
     key: 'action_key_msg',
   });
   try {
-    await delete${simpleClassName}ListByIds(checkedIds.value);
+    // TODO @puhui999: 移除所有模板中的 List
+    await delete${simpleClassName}List(checkedIds.value);
     message.success({
       content: $t('ui.actionMessage.deleteSuccess'),
       key: 'action_key_msg',

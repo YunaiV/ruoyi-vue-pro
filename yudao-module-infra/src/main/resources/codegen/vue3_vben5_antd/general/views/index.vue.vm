@@ -30,7 +30,7 @@ import { handleTree,isEmpty } from '@vben/utils'
 import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 #else## 标准表接口
 import { isEmpty } from '@vben/utils';
-import { get${simpleClassName}Page, delete${simpleClassName},#if ($deleteBatchEnable) delete${simpleClassName}ListByIds,#end export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
+import { get${simpleClassName}Page, delete${simpleClassName},#if ($deleteBatchEnable) delete${simpleClassName}List,#end export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 #end
 import { downloadFileFromBlobPart } from '@vben/utils';
 
@@ -157,7 +157,7 @@ async function onDelete(row: ${simpleClassName}Api.${simpleClassName}) {
     hideLoading();
   }
 }
-
+// TODO @puhui999: 改成和 schema 模式一样
 #if ($table.templateType != 2 && $deleteBatchEnable)
 /** 批量删除${table.classComment} */
 async function onDeleteBatch() {
@@ -167,7 +167,7 @@ async function onDeleteBatch() {
     key: 'action_process_msg',
   });
   try {
-    await delete${simpleClassName}ListByIds(checkedIds.value);
+    await delete${simpleClassName}List(checkedIds.value);
     message.success( $t('ui.actionMessage.deleteSuccess') );
     await getList();
   } finally {

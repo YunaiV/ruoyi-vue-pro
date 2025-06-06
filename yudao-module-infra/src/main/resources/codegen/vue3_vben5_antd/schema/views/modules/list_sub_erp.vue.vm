@@ -19,7 +19,7 @@ import { $t } from '#/locales';
 import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 
 #if ($table.templateType == 11) ## erp
-import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}ListByIds,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${table.businessName}';
+import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}List,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${table.businessName}';
 import { use${subSimpleClassName}GridFormSchema, use${subSimpleClassName}GridColumns } from '../data';
 import { isEmpty } from '@vben/utils';
 #else
@@ -81,7 +81,7 @@ async function handleDeleteBatch() {
     key: 'action_key_msg',
   });
   try {
-    await delete${subSimpleClassName}ListByIds(checkedIds.value);
+    await delete${subSimpleClassName}List(checkedIds.value);
     message.success({
       content: $t('ui.actionMessage.deleteSuccess', [row.id]),
       key: 'action_key_msg',
