@@ -7,8 +7,8 @@
 <script lang="ts" setup>
   import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 
-  import { message, Tabs, Form, Input, Textarea,Button, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker } from 'ant-design-vue';
-  import { computed, ref, h, onMounted,watch,nextTick } from 'vue';
+  import { ElMessage, ElTabs, ElTabPane, ElForm, ElFormItem, ElInput, ElButton, ElSelect, ElOption, ElRadioGroup, ElRadio, ElCheckboxGroup, ElCheckbox, ElDatePicker } from 'element-plus';
+  import { computed, ref, reactive, h, onMounted,watch,nextTick } from 'vue';
   import { $t } from '#/locales';
   import { DICT_TYPE, getDictOptions } from '#/utils';
 
@@ -18,7 +18,7 @@ import { Plus } from "@vben/icons";
 import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
 import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 #else
-import type { Rule } from 'ant-design-vue/es/form';
+import type { FormRules } from 'element-plus';
 import { Tinymce as RichTextarea } from '#/components/tinymce';
 import { get${subSimpleClassName}By${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 #end
@@ -76,14 +76,14 @@ const formData = ref<Partial<${simpleClassName}Api.${subSimpleClassName}>>({
         #end
     #end
 });
-const rules: Record<string, Rule[]> = {
+const rules = reactive<FormRules>({
     #foreach ($column in $subColumns)
         #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
             #set($comment=$column.columnComment)
                 $column.javaField: [{ required: true, message: '${comment}不能为空', trigger: #if($column.htmlType == 'select')'change'#else'blur'#end }],
         #end
     #end
-};
+});
 /** 暴露出表单校验方法和表单值获取方法 */
 defineExpose({
   validate: async () => await formRef.value?.validate(),
@@ -124,90 +124,89 @@ watch(
               #elseif ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里
                 <vxe-column field="${javaField}" title="${comment}" align="center">
                   <template #default="{row}">
-                    <Input v-model:value="row.${javaField}" />
+                    <el-input v-model="row.${javaField}" />
                   </template>
                 </vxe-column>
               #elseif($column.htmlType == "imageUpload")## 图片上传
                 <vxe-column field="${javaField}" title="${comment}" align="center">
                   <template #default="{row}">
-                    <ImageUpload v-model:value="row.${javaField}" />
+                    <ImageUpload v-model="row.${javaField}" />
                   </template>
                 </vxe-column>
               #elseif($column.htmlType == "fileUpload")## 文件上传
                 <vxe-column field="${javaField}" title="${comment}" align="center">
                   <template #default="{row}">
-                    <FileUpload v-model:value="row.${javaField}" />
+                    <FileUpload v-model="row.${javaField}" />
                   </template>
                 </vxe-column>
               #elseif($column.htmlType == "select")## 下拉框
                 <vxe-column field="${javaField}" title="${comment}" align="center">
                   <template #default="{row}">
-                    <Select v-model:value="row.${javaField}" placeholder="请选择${comment}">
+                    <el-select v-model="row.${javaField}" placeholder="请选择${comment}">
                         #if ("" != $dictType)## 有数据字典
-                          <Select.Option
+                          <el-option
                               v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                               :key="dict.value"
                               :value="dict.value"
-                          >
-                            {{ dict.label }}
-                          </Select.Option>
+                              :label="dict.label"
+                          />
                         #else##没数据字典
-                          <Select.Option label="请选择字典生成" value="" />
+                          <el-option label="请选择字典生成" value="" />
                         #end
-                    </Select>
+                    </el-select>
                   </template>
                 </vxe-column>
               #elseif($column.htmlType == "checkbox")## 多选框
                 <vxe-column field="${javaField}" title="${comment}" align="center">
                   <template #default="{row}">
-                    <CheckboxGroup v-model:value="row.${javaField}">
+                    <el-checkbox-group v-model="row.${javaField}">
                         #if ("" != $dictType)## 有数据字典
-                          <Checkbox
+                          <el-checkbox
                               v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                               :key="dict.value"
-                              :value="dict.value"
+                              :label="dict.value"
                           >
                             {{ dict.label }}
-                          </Checkbox>
+                          </el-checkbox>
                         #else##没数据字典
-                          <Checkbox label="请选择字典生成" />
+                          <el-checkbox label="请选择字典生成" />
                         #end
-                    </CheckboxGroup>
+                    </el-checkbox-group>
                   </template>
                 </vxe-column>
               #elseif($column.htmlType == "radio")## 单选框
                 <vxe-column field="${javaField}" title="${comment}" align="center">
                   <template #default="{row}">
-                    <RadioGroup v-model:value="row.${javaField}">
+                    <el-radio-group v-model="row.${javaField}">
                         #if ("" != $dictType)## 有数据字典
-                          <Radio
+                          <el-radio
                               v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                               :key="dict.value"
-                              :value="dict.value"
+                              :label="dict.value"
                           >
                             {{ dict.label }}
-                          </Radio>
+                          </el-radio>
                         #else##没数据字典
-                          <Radio value="1">请选择字典生成</Radio>
+                          <el-radio :label="1">请选择字典生成</el-radio>
                         #end
-                    </RadioGroup>
+                    </el-radio-group>
                   </template>
                 </vxe-column>
               #elseif($column.htmlType == "datetime")## 时间框
                 <vxe-column field="${javaField}" title="${comment}" align="center">
                   <template #default="{row}">
-                    <DatePicker
-                        v-model:value="row.${javaField}"
-                        :showTime="true"
+                    <el-date-picker
+                        v-model="row.${javaField}"
+                        type="datetime"
+                        value-format="x"
                         format="YYYY-MM-DD HH:mm:ss"
-                        valueFormat='x'
                     />
                   </template>
                 </vxe-column>
               #elseif($column.htmlType == "textarea" || $column.htmlType == "editor")## 文本框
                 <vxe-column field="${javaField}" title="${comment}" align="center">
                   <template #default="{row}">
-                    <Textarea v-model:value="row.${javaField}" />
+                    <el-input v-model="row.${javaField}" type="textarea" />
                   </template>
                 </vxe-column>
               #end
@@ -215,31 +214,31 @@ watch(
       #end
     <vxe-column field="operation" title="操作" align="center">
       <template #default="{row}">
-        <Button
+        <el-button
             size="small"
-            type="link"
-            danger
+            type="danger"
+            link
             @click="onDelete(row as any)"
             v-access:code="['${permissionPrefix}:delete']"
         >
           {{ $t('ui.actionTitle.delete') }}
-        </Button>
+        </el-button>
       </template>
     </vxe-column>
   </vxe-table>
   <div class="flex justify-center mt-4">
-    <Button :icon="h(Plus)" type="primary" ghost @click="onAdd" v-access:code="['${permissionPrefix}:create']">
+    <el-button :icon="h(Plus)" type="primary" plain @click="onAdd" v-access:code="['${permissionPrefix}:create']">
       {{ $t('ui.actionTitle.create', ['${subTable.classComment}']) }}
-    </Button>
+    </el-button>
   </div>
 #else
-  <Form
+  <el-form
       ref="formRef"
       class="mx-4"
       :model="formData"
       :rules="rules"
-      :label-col="{ span: 5 }"
-      :wrapper-col="{ span: 18 }"
+      label-width="120px"
+      label-position="right"
   >
       #foreach($column in $subColumns)
           #if ($column.createOperation || $column.updateOperation)
@@ -255,84 +254,83 @@ watch(
                   #set ($dictMethod = "boolean")
               #end
               #if ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里
-                <Form.Item label="${comment}" name="${javaField}">
-                  <Input v-model:value="formData.${javaField}" placeholder="请输入${comment}" />
-                </Form.Item>
+                <el-form-item label="${comment}" prop="${javaField}">
+                  <el-input v-model="formData.${javaField}" placeholder="请输入${comment}" />
+                </el-form-item>
               #elseif($column.htmlType == "imageUpload")## 图片上传
-                <Form.Item label="${comment}" name="${javaField}">
-                  <ImageUpload v-model:value="formData.${javaField}" />
-                </Form.Item>
+                <el-form-item label="${comment}" prop="${javaField}">
+                  <ImageUpload v-model="formData.${javaField}" />
+                </el-form-item>
               #elseif($column.htmlType == "fileUpload")## 文件上传
-                <Form.Item label="${comment}" name="${javaField}">
-                  <FileUpload v-model:value="formData.${javaField}" />
-                </Form.Item>
+                <el-form-item label="${comment}" prop="${javaField}">
+                  <FileUpload v-model="formData.${javaField}" />
+                </el-form-item>
               #elseif($column.htmlType == "editor")## 文本编辑器
-                <Form.Item label="${comment}" name="${javaField}">
+                <el-form-item label="${comment}" prop="${javaField}">
                   <RichTextarea v-model="formData.${javaField}" height="500px" />
-                </Form.Item>
+                </el-form-item>
               #elseif($column.htmlType == "select")## 下拉框
-                <Form.Item label="${comment}" name="${javaField}">
-                  <Select v-model:value="formData.${javaField}" placeholder="请选择${comment}">
+                <el-form-item label="${comment}" prop="${javaField}">
+                  <el-select v-model="formData.${javaField}" placeholder="请选择${comment}">
                       #if ("" != $dictType)## 有数据字典
-                        <Select.Option
+                        <el-option
                             v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                             :key="dict.value"
                             :value="dict.value"
-                        >
-                          {{ dict.label }}
-                        </Select.Option>
+                            :label="dict.label"
+                        />
                       #else##没数据字典
-                        <Select.Option label="请选择字典生成" value="" />
+                        <el-option label="请选择字典生成" value="" />
                       #end
-                  </Select>
-                </Form.Item>
+                  </el-select>
+                </el-form-item>
               #elseif($column.htmlType == "checkbox")## 多选框
-                <Form.Item label="${comment}" name="${javaField}">
-                  <CheckboxGroup v-model:value="formData.${javaField}">
+                <el-form-item label="${comment}" prop="${javaField}">
+                  <el-checkbox-group v-model="formData.${javaField}">
                       #if ("" != $dictType)## 有数据字典
-                        <Checkbox
+                        <el-checkbox
                             v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                             :key="dict.value"
-                            :value="dict.value"
+                            :label="dict.value"
                         >
                           {{ dict.label }}
-                        </Checkbox>
+                        </el-checkbox>
                       #else##没数据字典
-                        <Checkbox label="请选择字典生成" />
+                        <el-checkbox label="请选择字典生成" />
                       #end
-                  </CheckboxGroup>
-                </Form.Item>
+                  </el-checkbox-group>
+                </el-form-item>
               #elseif($column.htmlType == "radio")## 单选框
-                <Form.Item label="${comment}" name="${javaField}">
-                  <RadioGroup v-model:value="formData.${javaField}">
+                <el-form-item label="${comment}" prop="${javaField}">
+                  <el-radio-group v-model="formData.${javaField}">
                       #if ("" != $dictType)## 有数据字典
-                        <Radio
+                        <el-radio
                             v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                             :key="dict.value"
-                            :value="dict.value"
+                            :label="dict.value"
                         >
                           {{ dict.label }}
-                        </Radio>
+                        </el-radio>
                       #else##没数据字典
-                        <Radio value="1">请选择字典生成</Radio>
+                        <el-radio :label="1">请选择字典生成</el-radio>
                       #end
-                  </RadioGroup>
-                </Form.Item>
+                  </el-radio-group>
+                </el-form-item>
               #elseif($column.htmlType == "datetime")## 时间框
-                <Form.Item label="${comment}" name="${javaField}">
-                  <DatePicker
-                      v-model:value="formData.${javaField}"
-                      valueFormat="x"
+                <el-form-item label="${comment}" prop="${javaField}">
+                  <el-date-picker
+                      v-model="formData.${javaField}"
+                      value-format="x"
                       placeholder="选择${comment}"
                   />
-                </Form.Item>
+                </el-form-item>
               #elseif($column.htmlType == "textarea")## 文本框
-                <Form.Item label="${comment}" name="${javaField}">
-                  <Textarea v-model:value="formData.${javaField}" placeholder="请输入${comment}" />
-                </Form.Item>
+                <el-form-item label="${comment}" prop="${javaField}">
+                  <el-input v-model="formData.${javaField}" type="textarea" placeholder="请输入${comment}" />
+                </el-form-item>
               #end
           #end
       #end
-  </Form>
+  </el-form>
 #end
 </template>
