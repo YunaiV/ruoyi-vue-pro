@@ -123,24 +123,24 @@ const [FormModal, formModalApi] = useVbenModal({
 });
 
 /** 创建${table.classComment} */
-function onCreate() {
+function handleCreate() {
   formModalApi.setData({}).open();
 }
 
 /** 编辑${table.classComment} */
-function onEdit(row: ${simpleClassName}Api.${simpleClassName}) {
+function handleEdit(row: ${simpleClassName}Api.${simpleClassName}) {
   formModalApi.setData(row).open();
 }
 
 #if (${table.templateType} == 2)## 树表特有：新增下级
 /** 新增下级${table.classComment} */
-function onAppend(row: ${simpleClassName}Api.${simpleClassName}) {
+function handleAppend(row: ${simpleClassName}Api.${simpleClassName}) {
   formModalApi.setData({ ${treeParentColumn.javaField}: row.id }).open();
 }
 #end
 
 /** 删除${table.classComment} */
-async function onDelete(row: ${simpleClassName}Api.${simpleClassName}) {
+async function handleDelete(row: ${simpleClassName}Api.${simpleClassName}) {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting', [row.id]),
     duration: 0,
@@ -157,10 +157,10 @@ async function onDelete(row: ${simpleClassName}Api.${simpleClassName}) {
     hideLoading();
   }
 }
-// TODO @puhui999: 改成和 schema 模式一样
+
 #if ($table.templateType != 2 && $deleteBatchEnable)
 /** 批量删除${table.classComment} */
-async function onDeleteBatch() {
+async function handleDeleteBatch() {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting'),
     duration: 0,
@@ -315,7 +315,7 @@ onMounted(() => {
               class="ml-2"
               :icon="h(Plus)"
               type="primary"
-              @click="onCreate"
+              @click="handleCreate"
               v-access:code="['${permissionPrefix}:create']"
           >
             {{ $t('ui.actionTitle.create', ['${table.classComment}']) }}
@@ -337,7 +337,7 @@ onMounted(() => {
               danger
               class="ml-2"
               :disabled="isEmpty(checkedIds)"
-              @click="onDeleteBatch"
+              @click="handleDeleteBatch"
               v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:delete']"
           >
             批量删除
@@ -426,7 +426,7 @@ onMounted(() => {
   <Button
       size="small"
       type="link"
-      @click="onAppend(row as any)"
+      @click="handleAppend(row as any)"
       v-access:code="['${permissionPrefix}:create']"
   >
     新增下级
@@ -435,7 +435,7 @@ onMounted(() => {
             <Button
                 size="small"
                 type="link"
-                @click="onEdit(row as any)"
+                @click="handleEdit(row as any)"
                 v-access:code="['${permissionPrefix}:update']"
             >
               {{ $t('ui.actionTitle.edit') }}
@@ -448,7 +448,7 @@ onMounted(() => {
                 #if ( $table.templateType == 2 )
                 :disabled="!isEmpty(row?.children)"
                 #end
-                @click="onDelete(row as any)"
+                @click="handleDelete(row as any)"
                 v-access:code="['${permissionPrefix}:delete']"
             >
               {{ $t('ui.actionTitle.delete') }}
