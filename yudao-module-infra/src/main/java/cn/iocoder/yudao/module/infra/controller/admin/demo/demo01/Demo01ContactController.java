@@ -65,7 +65,7 @@ public class Demo01ContactController {
     @Operation(summary = "批量删除示例联系人")
     @PreAuthorize("@ss.hasPermission('infra:demo01-contact:delete')")
     public CommonResult<Boolean> deleteDemo0iContactList(@RequestParam("ids") List<Long> ids) {
-        demo01ContactService.deleteDemo0iContactListByIds(ids);
+        demo01ContactService.deleteDemo0iContactList(ids);
         return success(true);
     }
 

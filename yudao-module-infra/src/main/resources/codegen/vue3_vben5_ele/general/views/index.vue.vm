@@ -4,7 +4,7 @@ import type { VxeTableInstance } from '#/adapter/vxe-table';
 
 import { Page, useVbenModal } from '@vben/common-ui';
 import { cloneDeep, formatDateTime } from '@vben/utils';
-import { Button, message,Tabs,Pagination,Form,RangePicker,DatePicker,Select,Input } from 'ant-design-vue';
+import { ElButton, ElMessage, ElLoading, ElTabs, ElTabPane, ElPagination, ElForm, ElFormItem, ElDatePicker, ElSelect, ElOption, ElInput } from 'element-plus';
 import { DictTag } from '#/components/dict-tag';
 import { DICT_TYPE, getDictOptions, getRangePickerDefaultProps } from '#/utils';
 import ${simpleClassName}Form from './modules/form.vue';
@@ -141,37 +141,32 @@ function handleAppend(row: ${simpleClassName}Api.${simpleClassName}) {
 
 /** 删除${table.classComment} */
 async function handleDelete(row: ${simpleClassName}Api.${simpleClassName}) {
-  const hideLoading = message.loading({
-    content: $t('ui.actionMessage.deleting', [row.id]),
-    duration: 0,
-    key: 'action_process_msg',
+  const loadingInstance = ElLoading.service({
+    text: $t('ui.actionMessage.deleting', [row.id]),
+    background: 'rgba(0, 0, 0, 0.7)',
   });
   try {
     await delete${simpleClassName}(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.id]),
-      key: 'action_process_msg',
-    });
+    ElMessage.success($t('ui.actionMessage.deleteSuccess', [row.id]));
     await getList();
   } finally {
-    hideLoading();
+    loadingInstance.close();
   }
 }
 
 #if ($table.templateType != 2 && $deleteBatchEnable)
 /** 批量删除${table.classComment} */
 async function handleDeleteBatch() {
-  const hideLoading = message.loading({
-    content: $t('ui.actionMessage.deleting'),
-    duration: 0,
-    key: 'action_process_msg',
+  const loadingInstance = ElLoading.service({
+    text: $t('ui.actionMessage.deleting'),
+    background: 'rgba(0, 0, 0, 0.7)',
   });
   try {
     await delete${simpleClassName}List(checkedIds.value);
-    message.success( $t('ui.actionMessage.deleteSuccess') );
+    ElMessage.success($t('ui.actionMessage.deleteSuccess'));
     await getList();
   } finally {
-    hideLoading();
+    loadingInstance.close();
   }
 }
 
@@ -218,10 +213,10 @@ onMounted(() => {
 
     <ContentWrap v-if="!hiddenSearchBar">
       <!-- 搜索工作栏 -->
-      <Form
+      <el-form
           :model="queryParams"
           ref="queryFormRef"
-          layout="inline"
+          inline
       >
           #foreach($column in $columns)
               #if ($column.listOperation)
@@ -237,66 +232,69 @@ onMounted(() => {
                       #set ($dictMethod = "boolean")
                   #end
                   #if ($column.htmlType == "input")
-                    <Form.Item label="${comment}" name="${javaField}">
-                      <Input
-                          v-model:value="queryParams.${javaField}"
+                    <el-form-item label="${comment}">
+                      <el-input
+                          v-model="queryParams.${javaField}"
                           placeholder="请输入${comment}"
-                          allowClear
-                          @pressEnter="handleQuery"
-                           class="w-full"
+                          clearable
+                          @keyup.enter="handleQuery"
+                           class="!w-[240px]"
                       />
-                    </Form.Item>
+                    </el-form-item>
                   #elseif ($column.htmlType == "select" || $column.htmlType == "radio" || $column.htmlType == "checkbox")
-                    <Form.Item label="${comment}" name="${javaField}">
-                      <Select
-                          v-model:value="queryParams.${javaField}"
+                    <el-form-item label="${comment}">
+                      <el-select
+                          v-model="queryParams.${javaField}"
                           placeholder="请选择${comment}"
-                          allowClear
-                           class="w-full"
+                          clearable
+                           class="!w-[240px]"
                       >
                           #if ("" != $dictType)## 设置了 dictType 数据字典的情况
-                            <Select.Option
+                            <el-option
                                 v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                                 :key="dict.value"
                                 :value="dict.value"
-                            >
-                              {{ dict.label }}
-                            </Select.Option>
+                                :label="dict.label"
+                            />
                           #else## 未设置 dictType 数据字典的情况
-                            <Select.Option label="请选择字典生成" value="" />
+                            <el-option label="请选择字典生成" value="" />
                           #end
-                      </Select>
-                    </Form.Item>
+                      </el-select>
+                    </el-form-item>
                   #elseif($column.htmlType == "datetime")
                       #if ($column.listOperationCondition != "BETWEEN")## 非范围
-                        <Form.Item label="${comment}" name="${javaField}">
-                          <DatePicker
-                              v-model:value="queryParams.${javaField}"
-                              valueFormat="YYYY-MM-DD"
+                        <el-form-item label="${comment}">
+                          <el-date-picker
+                              v-model="queryParams.${javaField}"
+                              value-format="YYYY-MM-DD"
                               placeholder="选择${comment}"
-                              allowClear
-                               class="w-full"
+                              clearable
+                               class="!w-[240px]"
                           />
-                        </Form.Item>
+                        </el-form-item>
                       #else## 范围
-                        <Form.Item label="${comment}" name="${javaField}">
-                          <RangePicker
-                              v-model:value="queryParams.${javaField}"
-                              v-bind="getRangePickerDefaultProps()"
-                              class="w-full"
+                        <el-form-item label="${comment}">
+                          <el-date-picker
+                              v-model="queryParams.${javaField}"
+                              type="daterange"
+                              value-format="YYYY-MM-DD"
+                              range-separator="至"
+                              start-placeholder="开始日期"
+                              end-placeholder="结束日期"
+                              class="!w-[240px]"
                           />
-                        </Form.Item>
+                        </el-form-item>
                       #end
                   #end
               #end
           #end
-        <Form.Item>
-          <Button class="ml-2" @click="resetQuery"> 重置 </Button>
-          <Button class="ml-2" @click="handleQuery" type="primary">
+        <el-form-item>
+          <el-button class="ml-2" @click="resetQuery"> 重置 </el-button>
+          <el-button class="ml-2" @click="handleQuery" type="primary">
             搜索
-          </Button>
-        </Form.Item>
-      </Form>
+          </el-button>
+        </el-form-item>
+      </el-form>
     </ContentWrap>
 
     <!-- 列表 -->
@@ -307,11 +305,11 @@ onMounted(() => {
             v-model:hidden-search="hiddenSearchBar"
         >
         #if (${table.templateType} == 2)
-          <Button @click="toggleExpand" class="mr-2">
+          <el-button @click="toggleExpand" class="mr-2">
             {{ isExpanded ? '收缩' : '展开' }}
-          </Button>
+          </el-button>
         #end
-          <Button
+          <el-button
               class="ml-2"
               :icon="h(Plus)"
               type="primary"
@@ -319,8 +317,8 @@ onMounted(() => {
               v-access:code="['${permissionPrefix}:create']"
           >
             {{ $t('ui.actionTitle.create', ['${table.classComment}']) }}
-          </Button>
-          <Button
+          </el-button>
+          <el-button
               :icon="h(Download)"
               type="primary"
               class="ml-2"
@@ -329,19 +327,18 @@ onMounted(() => {
               v-access:code="['${permissionPrefix}:export']"
           >
             {{ $t('ui.actionTitle.export') }}
-          </Button>
+          </el-button>
         #if ($table.templateType != 2 && $deleteBatchEnable)
-          <Button
+          <el-button
               :icon="h(Trash2)"
-              type="primary"
-              danger
+              type="danger"
               class="ml-2"
               :disabled="isEmpty(checkedIds)"
               @click="handleDeleteBatch"
               v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:delete']"
           >
             批量删除
-          </Button>
+          </el-button>
         #end
         </TableToolbar>
       </template>
@@ -381,17 +378,17 @@ onMounted(() => {
             <vxe-column type="expand" width="60">
               <template #content="{ row }">
                 <!-- 子表的表单 -->
-                <Tabs v-model:active-key="subTabsName" class="mx-8">
+                <el-tabs v-model="subTabsName" class="mx-8">
                     #foreach ($subTable in $subTables)
                         #set ($index = $foreach.count - 1)
                         #set ($subClassNameVar = $subClassNameVars.get($index))
                         #set ($subSimpleClassName = $subSimpleClassNames.get($index))
                         #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
-                      <Tabs.TabPane key="$subClassNameVar" tab="${subTable.classComment}" force-render>
+                      <el-tab-pane name="$subClassNameVar" label="${subTable.classComment}">
                         <${subSimpleClassName}List :${subJoinColumn_strikeCase}="row?.id" />
-                      </Tabs.TabPane>
+                      </el-tab-pane>
                     #end
-                </Tabs>
+                </el-tabs>
               </template>
             </vxe-column>
           #end
@@ -423,27 +420,29 @@ onMounted(() => {
         <vxe-column field="operation" title="操作" align="center">
           <template #default="{row}">
 #if ( $table.templateType == 2 )
-  <Button
+  <el-button
       size="small"
-      type="link"
+      type="primary"
+      link
       @click="handleAppend(row as any)"
       v-access:code="['${permissionPrefix}:create']"
   >
     新增下级
-  </Button>
+  </el-button>
 #end
-            <Button
+            <el-button
                 size="small"
-                type="link"
+                type="primary"
+                link
                 @click="handleEdit(row as any)"
                 v-access:code="['${permissionPrefix}:update']"
             >
               {{ $t('ui.actionTitle.edit') }}
-            </Button>
-            <Button
+            </el-button>
+            <el-button
                 size="small"
-                type="link"
-                danger
+                type="danger"
+                link
                 class="ml-2"
                 #if ( $table.templateType == 2 )
                 :disabled="!isEmpty(row?.children)"
@@ -452,19 +451,21 @@ onMounted(() => {
                 v-access:code="['${permissionPrefix}:delete']"
             >
               {{ $t('ui.actionTitle.delete') }}
-            </Button>
+            </el-button>
           </template>
         </vxe-column>
       </vxe-table>
 #if ( $table.templateType != 2 )
       <!-- 分页 -->
       <div class="mt-2 flex justify-end">
-        <Pagination
+        <el-pagination
             :total="total"
-            v-model:current="queryParams.pageNo"
+            v-model:current-page="queryParams.pageNo"
             v-model:page-size="queryParams.pageSize"
-            show-size-changer
-            @change="getList"
+            :page-sizes="[10, 20, 50, 100]"
+            layout="total, sizes, prev, pager, next, jumper"
+            @size-change="getList"
+            @current-change="getList"
         />
       </div>
 #end
@@ -472,17 +473,17 @@ onMounted(() => {
 #if ($table.templateType == 11) ## erp情况
   <ContentWrap>
     <!-- 子表的表单 -->
-    <Tabs v-model:active-key="subTabsName">
+    <el-tabs v-model="subTabsName">
         #foreach ($subTable in $subTables)
             #set ($index = $foreach.count - 1)
             #set ($subClassNameVar = $subClassNameVars.get($index))
             #set ($subSimpleClassName = $subSimpleClassNames.get($index))
             #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
-          <Tabs.TabPane key="$subClassNameVar" tab="${subTable.classComment}" force-render>
+          <el-tab-pane name="$subClassNameVar" label="${subTable.classComment}">
             <${subSimpleClassName}List :${subJoinColumn_strikeCase}="select${simpleClassName}?.id" />
-          </Tabs.TabPane>
+          </el-tab-pane>
         #end
-    </Tabs>
+    </el-tabs>
   </ContentWrap>
 #end
   </Page>

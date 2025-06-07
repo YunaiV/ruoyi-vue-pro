@@ -3,7 +3,7 @@ import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
 
 import { Page, useVbenModal } from '@vben/common-ui';
-import { message,Tabs } from 'ant-design-vue';
+import { ElMessage, ElTabs, ElTabPane, ElLoading } from 'element-plus';
 import Form from './modules/form.vue';
 
 ## 特殊：主子表专属逻辑
@@ -77,38 +77,32 @@ function handleAppend(row: ${simpleClassName}Api.${simpleClassName}) {
 
 /** 删除${table.classComment} */
 async function handleDelete(row: ${simpleClassName}Api.${simpleClassName}) {
-  const hideLoading = message.loading({
-    content: $t('ui.actionMessage.deleting', [row.id]),
-    key: 'action_key_msg',
+  const loadingInstance = ElLoading.service({
+    text: $t('ui.actionMessage.deleting', [row.id]),
+    background: 'rgba(0, 0, 0, 0.7)',
   });
   try {
     await delete${simpleClassName}(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.id]),
-      key: 'action_key_msg',
-    });
+    ElMessage.success($t('ui.actionMessage.deleteSuccess', [row.id]));
     onRefresh();
   } finally {
-    hideLoading();
+    loadingInstance.close();
   }
 }
 
 #if ($table.templateType != 2 && $deleteBatchEnable)
 /** 批量删除${table.classComment} */
 async function handleDeleteBatch() {
-  const hideLoading = message.loading({
-    content: $t('ui.actionMessage.deleting'),
-    key: 'action_key_msg',
+  const loadingInstance = ElLoading.service({
+    text: $t('ui.actionMessage.deleting'),
+    background: 'rgba(0, 0, 0, 0.7)',
   });
   try {
     await delete${simpleClassName}List(checkedIds.value);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess'),
-      key: 'action_key_msg',
-    });
+    ElMessage.success($t('ui.actionMessage.deleteSuccess'));
     onRefresh();
   } finally {
-    hideLoading();
+    loadingInstance.close();
   }
 }
 
@@ -211,17 +205,17 @@ const [Grid, gridApi] = useVbenVxeGrid({
         #if ($table.templateType == 12) ## 内嵌情况
           <template #expand_content="{ row }">
             <!-- 子表的表单 -->
-            <Tabs v-model:active-key="subTabsName" class="mx-8">
+            <el-tabs v-model="subTabsName" class="mx-8">
                 #foreach ($subTable in $subTables)
                     #set ($index = $foreach.count - 1)
                     #set ($subClassNameVar = $subClassNameVars.get($index))
                     #set ($subSimpleClassName = $subSimpleClassNames.get($index))
                     #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
-                  <Tabs.TabPane key="$subClassNameVar" tab="${subTable.classComment}" force-render>
+                  <el-tab-pane name="$subClassNameVar" label="${subTable.classComment}">
                     <${subSimpleClassName}List :${subJoinColumn_strikeCase}="row?.id" />
-                  </Tabs.TabPane>
+                  </el-tab-pane>
                 #end
-            </Tabs>
+            </el-tabs>
           </template>
         #end
       <template #toolbar-tools>
@@ -251,8 +245,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
             #if ($table.templateType != 2 && $deleteBatchEnable)
             {
               label: $t('ui.actionTitle.deleteBatch'),
-              type: 'primary',
-              danger: true,
+              type: 'danger',
               icon: ACTION_ICON.DELETE,
               disabled: isEmpty(checkedIds),
               auth: ['${table.moduleName}:${simpleClassName_strikeCase}:delete'],
@@ -268,7 +261,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
             #if (${table.templateType} == 2)## 树表特有：新增下级
             {
               label: '新增下级',
-              type: 'link',
+              type: 'text',
               icon: ACTION_ICON.ADD,
               auth: ['${table.moduleName}:${simpleClassName_strikeCase}:create'],
               onClick: handleAppend.bind(null, row),
@@ -276,15 +269,15 @@ const [Grid, gridApi] = useVbenVxeGrid({
             #end
             {
               label: $t('common.edit'),
-              type: 'link',
+              type: 'text',
               icon: ACTION_ICON.EDIT,
               auth: ['${table.moduleName}:${simpleClassName_strikeCase}:update'],
               onClick: handleEdit.bind(null, row),
             },
             {
               label: $t('common.delete'),
-              type: 'link',
-              danger: true,
+              type: 'danger',
+              text: true,
               icon: ACTION_ICON.DELETE,
               auth: ['${table.moduleName}:${simpleClassName_strikeCase}:delete'],
               popConfirm: {
@@ -299,17 +292,17 @@ const [Grid, gridApi] = useVbenVxeGrid({
 
 #if ($table.templateType == 11) ## erp情况
     <!-- 子表的表单 -->
-    <Tabs v-model:active-key="subTabsName" class="mt-2">
+    <el-tabs v-model="subTabsName" class="mt-2">
         #foreach ($subTable in $subTables)
             #set ($index = $foreach.count - 1)
             #set ($subClassNameVar = $subClassNameVars.get($index))
             #set ($subSimpleClassName = $subSimpleClassNames.get($index))
             #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
-          <Tabs.TabPane key="$subClassNameVar" tab="${subTable.classComment}" force-render>
+          <el-tab-pane name="$subClassNameVar" label="${subTable.classComment}">
             <${subSimpleClassName}List :${subJoinColumn_strikeCase}="select${simpleClassName}?.id" />
-          </Tabs.TabPane>
+          </el-tab-pane>
         #end
-    </Tabs>
+    </el-tabs>
     </div>
 #end
   </Page>

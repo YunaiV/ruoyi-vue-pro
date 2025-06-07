@@ -13,7 +13,7 @@ import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.bu
 import ${subSimpleClassName}Form from './${subSimpleClassName_strikeCase}-form.vue'
 #end
 import { useVbenModal } from '@vben/common-ui';
-import { message } from 'ant-design-vue';
+import { ElMessage, ElLoading } from 'element-plus';
 import { ref, computed, nextTick,watch } from 'vue';
 import { $t } from '#/locales';
 import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
@@ -44,7 +44,7 @@ const [FormModal, formModalApi] = useVbenModal({
 /** 创建${subTable.classComment} */
 function handleCreate() {
   if (!props.${subJoinColumn.javaField}){
-    message.warning("请先选择一个${table.classComment}!")
+    ElMessage.warning("请先选择一个${table.classComment}!")
     return
   }
   formModalApi.setData({${subJoinColumn.javaField}: props.${subJoinColumn.javaField}}).open();
@@ -57,38 +57,32 @@ function handleEdit(row: ${simpleClassName}Api.${subSimpleClassName}) {
 
 /** 删除${subTable.classComment} */
 async function handleDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
-  const hideLoading = message.loading({
-    content: $t('ui.actionMessage.deleting', [row.id]),
-    key: 'action_process_msg',
+  const loadingInstance = ElLoading.service({
+    text: $t('ui.actionMessage.deleting', [row.id]),
+    background: 'rgba(0, 0, 0, 0.7)',
   });
   try {
     await delete${subSimpleClassName}(row.id as number);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.id]),
-      key: 'action_key_msg',
-    });
+    ElMessage.success($t('ui.actionMessage.deleteSuccess', [row.id]));
     onRefresh();
   } finally {
-    hideLoading();
+    loadingInstance.close();
   }
 }
 
 #if ($deleteBatchEnable)
 /** 批量删除${subTable.classComment} */
 async function handleDeleteBatch() {
-  const hideLoading = message.loading({
-    content: $t('ui.actionMessage.deleting'),
-    key: 'action_key_msg',
+  const loadingInstance = ElLoading.service({
+    text: $t('ui.actionMessage.deleting'),
+    background: 'rgba(0, 0, 0, 0.7)',
   });
   try {
     await delete${subSimpleClassName}List(checkedIds.value);
-    message.success({
-      content: $t('ui.actionMessage.deleteSuccess', [row.id]),
-      key: 'action_key_msg',
-    });
+    ElMessage.success($t('ui.actionMessage.deleteSuccess'));
     onRefresh();
   } finally {
-    hideLoading();
+    loadingInstance.close();
   }
 }
 
@@ -201,8 +195,7 @@ watch(
               #if ($table.templateType == 11 && $deleteBatchEnable)
               {
                 label: $t('ui.actionTitle.deleteBatch'),
-                type: 'primary',
-                danger: true,
+                type: 'danger',
                 icon: ACTION_ICON.DELETE,
                 disabled: isEmpty(checkedIds),
                 auth: ['${table.moduleName}:${simpleClassName_strikeCase}:delete'],
@@ -217,15 +210,15 @@ watch(
             :actions="[
               {
                 label: $t('common.edit'),
-                type: 'link',
+                type: 'text',
                 icon: ACTION_ICON.EDIT,
                 auth: ['${table.moduleName}:${simpleClassName_strikeCase}:update'],
                 onClick: handleEdit.bind(null, row),
               },
               {
                 label: $t('common.delete'),
-                type: 'link',
-                danger: true,
+                type: 'danger',
+                text: true,
                 icon: ACTION_ICON.DELETE,
                 auth: ['${table.moduleName}:${simpleClassName_strikeCase}:delete'],
                 popConfirm: {

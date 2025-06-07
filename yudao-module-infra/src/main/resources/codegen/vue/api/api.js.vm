@@ -27,6 +27,16 @@ export function delete${simpleClassName}(id) {
   })
 }
 
+#if ( $table.templateType != 2 && $deleteBatchEnable)
+/** 批量删除${table.classComment} */
+export function delete${simpleClassName}List(ids) {
+  return request({
+    url: `${baseURL}/delete-list?ids=${ids.join(',')}`,
+    method: 'delete'
+  })
+}
+#end
+
 // 获得${table.classComment}
 export function get${simpleClassName}(id) {
   return request({
@@ -130,6 +140,15 @@ export function export${simpleClassName}Excel(params) {
       method: 'delete'
     })
   }
+  #if ($deleteBatchEnable)
+  /** 批量删除${subTable.classComment} */
+  export function delete${subSimpleClassName}List(ids) {
+    return request({
+      url: `${baseURL}/${subSimpleClassName_strikeCase}/delete-list?ids=${ids.join(',')}`,
+      method: 'delete'
+    })
+  }
+  #end
   // 获得${subTable.classComment}
   export function get${subSimpleClassName}(id) {
     return request({

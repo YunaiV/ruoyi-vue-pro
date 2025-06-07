@@ -16,8 +16,31 @@
     >
       <Icon icon="ep:plus" class="mr-5px" /> 新增
     </el-button>
+    #if ($deleteBatchEnable)
+      <el-button
+          type="danger"
+          plain
+          :disabled="isEmpty(checkedIds)"
+          @click="handleDeleteBatch"
+          v-hasPermi="['${permissionPrefix}:delete']"
+      >
+        <Icon icon="ep:delete" class="mr-5px" /> 批量删除
+      </el-button>
+    #end
 #end
-    <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
+    <el-table
+        row-key="id"
+        v-loading="loading"
+        :data="list"
+        :stripe="true"
+        :show-overflow-tooltip="true"
+        #if ($table.templateType == 11 && $deleteBatchEnable)
+        @selection-change="handleRowCheckboxChange"
+        #end
+    >
+        #if ($table.templateType == 11 && $deleteBatchEnable)
+          <el-table-column type="selection" width="55" />
+        #end
       #foreach($column in $subColumns)
       #if ($column.listOperationResult)
         #set ($dictType=$column.dictType)
@@ -85,14 +108,18 @@
 <script setup lang="ts">
 import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
 import { dateFormatter } from '@/utils/formatTime'
-import { ${simpleClassName}Api } from '@/api/${table.moduleName}/${table.businessName}'
+#if ($deleteBatchEnable)
+import { isEmpty } from '@/utils/is'
+#end
+import { ${simpleClassName}Api, ${subSimpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
 #if ($table.templateType == 11)
 import ${subSimpleClassName}Form from './${subSimpleClassName}Form.vue'
 #end
 
+#if ($table.templateType == 11)
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
-
+#end
 const props = defineProps<{
   ${subJoinColumn.javaField}?: number // ${subJoinColumn.columnComment}（主表的关联字段）
 }>()
@@ -144,12 +171,12 @@ const getList = async () => {
   }
 }
 
+#if ($table.templateType == 11)
 /** 搜索按钮操作 */
 const handleQuery = () => {
   queryParams.pageNo = 1
   getList()
 }
-#if ($table.templateType == 11)
 
 /** 添加/修改操作 */
 const formRef = ref()
@@ -173,6 +200,24 @@ const handleDelete = async (id: number) => {
     await getList()
   } catch {}
 }
+
+#if ($table.templateType == 11 && $deleteBatchEnable)
+/** 批量删除${subTable.classComment} */
+const handleDeleteBatch = async () => {
+  try {
+    // 删除的二次确认
+    await message.delConfirm()
+    await ${simpleClassName}Api.delete${subSimpleClassName}List(checkedIds.value);
+    message.success(t('common.delSuccess'))
+    await getList();
+  } catch {}
+}
+
+const checkedIds = ref<number[]>([])
+const handleRowCheckboxChange = (records: ${subSimpleClassName}[]) => {
+  checkedIds.value = records.map((item) => item.id);
+}
+#end
 #end
 #if ($table.templateType != 11)
 

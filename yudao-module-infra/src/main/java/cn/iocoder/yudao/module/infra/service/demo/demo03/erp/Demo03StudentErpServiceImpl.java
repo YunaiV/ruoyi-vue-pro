@@ -71,7 +71,7 @@ public class Demo03StudentErpServiceImpl implements Demo03StudentErpService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteDemo03StudentListByIds(List<Long> ids) {
+    public void deleteDemo03StudentList(List<Long> ids) {
         // 校验存在
         validateDemo03StudentExists(ids);
         // 删除
@@ -134,7 +134,7 @@ public class Demo03StudentErpServiceImpl implements Demo03StudentErpService {
     }
 
     @Override
-    public void deleteDemo03CourseListByIds(List<Long> ids) {
+    public void deleteDemo03CourseList(List<Long> ids) {
         // 删除
         demo03CourseErpMapper.deleteByIds(ids);
     }
@@ -192,7 +192,7 @@ public class Demo03StudentErpServiceImpl implements Demo03StudentErpService {
     }
 
     @Override
-    public void deleteDemo03GradeListByIds(List<Long> ids) {
+    public void deleteDemo03GradeList(List<Long> ids) {
         // 删除
         demo03GradeErpMapper.deleteByIds(ids);
     }
