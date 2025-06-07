@@ -29,7 +29,7 @@
 #end
 
 #if ($table.templateType == 11) ## erp
-    import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}List,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${table.businessName}';
+    import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}List,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
     import { isEmpty } from '@vben/utils';
   #else
   #if ($subTable.subJoinMany) ## 一对多
