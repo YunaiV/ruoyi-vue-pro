@@ -41,6 +41,7 @@ public class RocketMQIotMessageBus implements IotMessageBus {
 
     @Override
     public void post(String topic, Object message) {
+        // TODO @芋艿：需要 orderly！
         SendResult result = rocketMQTemplate.syncSend(topic, JsonUtils.toJsonString(message));
         log.info("[post][topic({}) 发送消息({}) result({})]", topic, message, result);
     }

@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.gateway.enums.IotDeviceTopicEnum;
@@ -41,16 +40,6 @@ public class IotHttpUpstreamHandler implements Handler<RoutingContext> {
             + IotDeviceTopicEnum.EVENT_POST_TOPIC_PREFIX.getTopic() + ":identifier"
             + IotDeviceTopicEnum.EVENT_POST_TOPIC_SUFFIX.getTopic();
 
-    /**
-     * 事件上报方法前缀
-     */
-    private static final String EVENT_METHOD_PREFIX = "thing.event.";
-
-    /**
-     * 事件上报方法后缀
-     */
-    private static final String EVENT_METHOD_SUFFIX = ".post";
-
     private final IotHttpUpstreamProtocol protocol;
 
     private final IotDeviceMessageProducer deviceMessageProducer;
@@ -64,37 +53,19 @@ public class IotHttpUpstreamHandler implements Handler<RoutingContext> {
     public void handle(RoutingContext context) {
         String path = context.request().path();
         // 1. 解析通用参数
-        Map<String, String> params = parseCommonParams(context);
-        String productKey = params.get("productKey");
-        String deviceName = params.get("deviceName");
+        String productKey = context.pathParam("productKey");
+        String deviceName = context.pathParam("deviceName");
         JsonObject body = context.body().asJsonObject();
 
         // 2. 根据路径模式处理不同类型的请求
         if (isPropertyPostPath(path)) {
             // 处理属性上报
             handlePropertyPost(context, productKey, deviceName, body);
-            return;
-        }
-
-        if (isEventPostPath(path)) {
+        } else if (isEventPostPath(path)) {
             // 处理事件上报
             String identifier = context.pathParam("identifier");
             handleEventPost(context, productKey, deviceName, identifier, body);
-            return;
         }
-    }
-
-    /**
-     * 解析通用参数
-     *
-     * @param routingContext   路由上下文
-     * @return 参数映射
-     */
-    private Map<String, String> parseCommonParams(RoutingContext routingContext) {
-        Map<String, String> params = MapUtil.newHashMap();
-        params.put("productKey", routingContext.pathParam("productKey"));
-        params.put("deviceName", routingContext.pathParam("deviceName"));
-        return params;
     }
 
     /**
@@ -134,8 +105,8 @@ public class IotHttpUpstreamHandler implements Handler<RoutingContext> {
         // 1.2 发送消息
         deviceMessageProducer.sendDeviceMessage(message);
 
-        // 2. 返回响应
-        sendResponse(routingContext, null);
+//        // 2. 返回响应
+//        sendResponse(routingContext, null);
     }
 
     /**
@@ -155,49 +126,6 @@ public class IotHttpUpstreamHandler implements Handler<RoutingContext> {
 //
 //        // 事件上报
 //        CommonResult<Boolean> result = deviceUpstreamApi.reportDeviceEvent(reportReqDTO);
-//
-//        // 返回响应
-//        sendResponse(routingContext, requestId, method, result);
-    }
-
-    /**
-     * 发送响应
-     *
-     * @param routingContext 路由上下文
-     * @param result         结果
-     */
-    private void sendResponse(RoutingContext routingContext,
-                              CommonResult<Boolean> result) {
-//        // TODO @芋艿：后续再优化
-//        IotStandardResponse response;
-//        if (result == null ) {
-//            response = IotStandardResponse.success(requestId, method, null);
-//        } else if (result.isSuccess()) {
-//            response = IotStandardResponse.success(requestId, method, result.getData());
-//        } else {
-//            response = IotStandardResponse.error(requestId, method, result.getCode(), result.getMsg());
-//        }
-//        IotNetComponentCommonUtils.writeJsonResponse(routingContext, response);
-    }
-
-    /**
-     * 从路径确定方法名
-     *
-     * @param path           路径
-     * @param routingContext 路由上下文
-     * @return 方法名
-     */
-    private String determineMethodFromPath(String path, RoutingContext routingContext) {
-        if (StrUtil.contains(path, "/property/")) {
-            return null;
-        }
-
-        return EVENT_METHOD_PREFIX
-                + (routingContext.pathParams().containsKey("identifier")
-                        ? routingContext.pathParam("identifier")
-                        : "unknown")
-                +
-                EVENT_METHOD_SUFFIX;
     }
 
     // TODO @芋艿：这块在看看

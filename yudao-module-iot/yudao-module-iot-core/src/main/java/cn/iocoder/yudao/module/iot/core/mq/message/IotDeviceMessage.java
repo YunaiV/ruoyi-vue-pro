@@ -32,11 +32,13 @@ public class IotDeviceMessage {
      */
     public static final String MESSAGE_BUS_GATEWAY_DEVICE_MESSAGE_TOPIC = MESSAGE_BUS_DEVICE_MESSAGE_TOPIC + "_%s";
 
+    // TODO @芋艿：thingsboard 对应 id，全部由后端生成，由于追溯；是不是调整下？
     /**
      * 消息编号
      */
     private String messageId;
 
+    // TODO @芋艿：thingsboard 是使用 deviceId
     /**
      * 设备信息
      */
@@ -46,6 +48,7 @@ public class IotDeviceMessage {
      */
     private String deviceName;
 
+    // TODO @芋艿：thingsboard 只定义了 type；相当于 type + identifier 结合！TbMsgType
     /**
      * 消息类型
      *
@@ -59,6 +62,8 @@ public class IotDeviceMessage {
      */
     private String identifier;
 
+    // TODO @芋艿：thingsboard 只有 data 字段，没有 code 字段；
+    // TODO @芋艿：要不提前序列化成字符串？？？类似 thingsboard 的 data 字段
     /**
      * 请求参数
      *
