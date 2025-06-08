@@ -37,7 +37,7 @@ yudao:
         # 针对引入的 EMQX 组件的配置
         # ====================================
         emqx:
-          enabled: false
+          enabled: true
           mqtt-ssl: false
           mqtt-topics:
             - "/sys/#"                         # 系统主题（设备上报）
