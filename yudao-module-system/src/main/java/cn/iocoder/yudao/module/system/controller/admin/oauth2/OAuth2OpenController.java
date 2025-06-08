@@ -120,6 +120,7 @@ public class OAuth2OpenController {
 
         // 2. 根据授权模式，获取访问令牌
         OAuth2AccessTokenDO accessTokenDO = switch (grantTypeEnum) {
+            // TODO @xingyu：这里改了，可能会影响 jdk8 版本哈；
             case AUTHORIZATION_CODE ->
                     oauth2GrantService.grantAuthorizationCodeForAccessToken(client.getClientId(), code, redirectUri, state);
             case PASSWORD -> oauth2GrantService.grantPassword(username, password, client.getClientId(), scopes);

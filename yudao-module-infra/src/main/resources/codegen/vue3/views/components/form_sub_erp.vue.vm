@@ -170,7 +170,7 @@ const submitForm = async () => {
   // 提交请求
   formLoading.value = true
   try {
-    const data = formData.value as unknown as  ${subSimpleClassName}
+    const data = formData.value as unknown as ${subSimpleClassName}
     if (formType.value === 'create') {
       await ${simpleClassName}Api.create${subSimpleClassName}(data)
       message.success(t('common.createSuccess'))
