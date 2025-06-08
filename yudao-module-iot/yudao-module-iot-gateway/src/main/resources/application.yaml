@@ -1,17 +1,18 @@
 spring:
   application:
     name: iot-gateway-server
+  profiles:
+    active: local # 默认激活本地开发环境
 
 --- #################### 消息队列相关 ####################
 
 # rocketmq 配置项，对应 RocketMQProperties 配置类
 rocketmq:
-  name-server: 127.0.0.1:9876 # RocketMQ Namesrv
   # Producer 配置项
   producer:
     group: ${spring.application.name}_PRODUCER # 生产者分组
 
---- #################### 芋道相关配置 ####################
+--- #################### IoT 网关相关配置 ####################
 
 yudao:
   iot:
@@ -19,12 +20,10 @@ yudao:
     gateway:
       # 设备 RPC 配置
       rpc:
-        url: http://127.0.0.1:48080 # 主程序 API 地址
         connect-timeout: 30s
         read-timeout: 30s
       # 设备 Token 配置
       token:
-        secret: 1234567890123456789012345678901
         expiration: 7d
 
       # 协议配置
@@ -34,28 +33,34 @@ yudao:
         # ====================================
         http:
           enabled: true
-          server-port: 8092
         # ====================================
         # 针对引入的 EMQX 组件的配置
         # ====================================
         emqx:
-          enabled: true
-          mqtt-host: 127.0.0.1
-          mqtt-port: 1883
-          mqtt-username: admin
-          mqtt-password: admin123
+          enabled: false
           mqtt-ssl: false
           mqtt-topics:
-            - "/sys/#"
-          auth-port: 8101
+            - "/sys/#"                         # 系统主题（设备上报）
+            - "/ota/#"                         # OTA 升级主题
+            - "/config/#"                      # 配置主题
 
     # 消息总线配置
     message-bus:
       type: rocketmq # 消息总线的类型
 
-# 日志配置
-# TODO 芋艿：是不是可以删除
+--- #################### 日志相关配置 ####################
+
+# 基础日志配置
 logging:
+  file:
+    name: ${user.home}/logs/${spring.application.name}.log # 日志文件名，全路径
   level:
-    cn.iocoder.yudao: INFO
+    # 应用基础日志级别
+    cn.iocoder.yudao.module.iot.gateway: INFO
+    org.springframework.boot: INFO
+    # RocketMQ 日志
+    org.apache.rocketmq: WARN
+    # 根日志级别
     root: INFO
+
+debug: false
