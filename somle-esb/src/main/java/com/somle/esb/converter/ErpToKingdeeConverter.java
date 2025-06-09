@@ -132,7 +132,7 @@ public class ErpToKingdeeConverter {
         reqVO.setSaleDepartmentId(productDTO.getDeptId());
         reqVO.setDeclaredTypeZh(customRuleDTO.getDeclaredType());
         //将报关规则的id存到这里面去
-        reqVO.setMaxStockCheckQty(String.valueOf(customRuleDTO.getId()));
+        reqVO.setMaxInventoryQty(String.valueOf(customRuleDTO.getId()));
         return reqVO;
     }
 

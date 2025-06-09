@@ -9,13 +9,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * @className: StockCheckBatchLogVO
+ * @className: InventoryBatchLogVO
  * @author: Wqh
  * @date: 2024/12/20 9:29
  */
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class EccangStockCheckBatchLogVO {
+public class EccangInventoryBatchLogVO {
     // 仓库代码如:["BALLLYHA1-01","HAOBA"]
     private List<String> warehouseCode;
 

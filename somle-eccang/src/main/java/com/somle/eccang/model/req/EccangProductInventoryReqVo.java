@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class EccangProductStockCheckReqVo {
+public class EccangProductInventoryReqVo {
     @JsonProperty("pageSize")
     private Integer pageSize;          // 每页数据长度(最大2000)
     private Integer page;             // 当前页

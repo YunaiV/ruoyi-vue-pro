@@ -39,5 +39,5 @@ public class EccangAsnListReqVo {
 
     private Integer businessType; // 保税用户填1,其它可不填
 
-    private Integer isGetStockCheckCode; // 是否返回库存批次号字段：0否，1是；默认0
+    private Integer isGetInventoryCode; // 是否返回库存批次号字段：0否，1是；默认0
 }

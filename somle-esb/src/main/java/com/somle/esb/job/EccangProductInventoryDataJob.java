@@ -1,30 +1,30 @@
 package com.somle.esb.job;
 
-import com.somle.eccang.model.req.EccangProductStockCheckReqVo;
+import com.somle.eccang.model.req.EccangProductInventoryReqVo;
 import com.somle.esb.model.OssData;
 import org.springframework.stereotype.Component;
 
 /**
- * @className: EccangProductStockCheckDataJob
+ * @className: EccangProductInventoryDataJob
  * @author: gumaomao
  * @date: 2025/04/08
  * @Version: 1.0
  * @description: 易仓WMS获取产品库存
  */
 @Component
-public class EccangProductStockCheckDataJob extends EccangDataJob {
+public class EccangProductInventoryDataJob extends EccangDataJob {
 
     @Override
     public String execute(String param) throws Exception {
         setDate(param);
-        var vo = EccangProductStockCheckReqVo.builder()
+        var vo = EccangProductInventoryReqVo.builder()
             .page(1)
             .pageSize(100)
             .build();
-        eccangWMSService.streamProductStockCheck(vo).forEach(page -> {
+        eccangWMSService.streamProductInventory(vo).forEach(page -> {
                 OssData data = OssData.builder()
                     .database(DATABASE)
-                    .tableName("product_stockCheck")
+                    .tableName("product_inventory")
                     .syncType("full")
                     .requestTimestamp(System.currentTimeMillis())
                     .folderDate(today)

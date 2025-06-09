@@ -12,8 +12,8 @@ import java.time.LocalDate;
 @Data
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-//eccang-StockCheckBatch请求体
-public class EccangStockCheckBatchReqVO {
+//eccang-InventoryBatch请求体
+public class EccangInventoryBatchReqVO {
     // 产品SKU，多个时使用空格隔开
     private String productSku;
 

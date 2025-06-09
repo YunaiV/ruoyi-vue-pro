@@ -42,7 +42,7 @@ public class KingdeeServiceTest extends SomleBaseSpringTest {
         {"辅助资料", "bd_auxinfo"},
         {"品标签分类", "bd_labelgroup"},
         {"辅助资料分类", "bd_auxinfotype"},
-        {"库存", "inv_stockCheck_entity"},
+        {"库存", "inv_inventory_entity"},
         {"物流公司", "bd_logisticscompany"},
         {"部门", "bd_department"},
         {"外部基础资料", "iac_virtualbase"},

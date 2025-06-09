@@ -72,8 +72,8 @@ public class KingdeeProductSaveReqVO {
     private Boolean isWeight; // 是否启用称重功能
     private String kfPeriod; // 商品的保质期
     private String kfPeriodType; // 保质期的单位，1为天，2为月，3为年
-    private String maxStockCheckQty; // 商品的最大库存量
-    private String minStockCheckQty; // 商品的最小库存量
+    private String maxInventoryQty; // 商品的最大库存量
+    private String minInventoryQty; // 商品的最小库存量
     private String model; // 商品的规格型号
     private String mulLabelNumber; // 商品标签编号，用于商品的分类或标记
     private String netWeight; // 商品的净重
@@ -87,7 +87,7 @@ public class KingdeeProductSaveReqVO {
     private String registrationNumber; // 商品的注册证号
     private String remark; // 商品的备注信息
     private String saleUnitId; // 销售单位ID
-    private String secStockCheckQty; // 安全库存量
+    private String secInventoryQty; // 安全库存量
     private String spaceId; // 仓位ID，标识商品存放的仓库位置
     private String stockId; // 仓库ID，标识商品所在的仓库
     private List<Store> storeEntity; // 商品的库存管理实体

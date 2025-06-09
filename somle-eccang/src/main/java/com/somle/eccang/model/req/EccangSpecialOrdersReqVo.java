@@ -30,7 +30,7 @@ public class EccangSpecialOrdersReqVo {
     private Integer spoProcessType; // 处理类型：1:重新上架销售 2:退回国内 3:不良品 4:销毁 5:待检查 6:换标 8:产品升级
     private String searchType;    // 搜索类型：searchCode退件单号 searchSku搜索SKU
     private String code;          // 搜索值，配合上面的searchType条件使用，代表对应类型的单号或者sku代码
-    private Integer stockCheckType; // 库存类型：0标准 1:不良 2:暂存
+    private Integer inventoryType; // 库存类型：0标准 1:不良 2:暂存
     private Integer spoAttr;      // 退件标识：1:标准退件 2:回邮退件
     private Integer spoLabelServices; // Label服务 1:是 0:否
     private String spoDescLike;   // 退件原因,模糊搜索

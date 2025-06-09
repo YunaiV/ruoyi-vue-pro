@@ -1,10 +1,10 @@
 package com.somle.eccang.controller;
 
+import com.somle.eccang.model.EccangInventoryBatchLogVO;
 import com.somle.eccang.model.EccangOrder;
 import com.somle.eccang.model.EccangOrderVO;
 import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.model.EccangResponse.EccangPage;
-import com.somle.eccang.model.EccangStockCheckBatchLogVO;
 import com.somle.eccang.service.EccangService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,21 +20,21 @@ public class EccangController {
     @Autowired
     EccangService eccangService;
 
-    @GetMapping("/getStockCheck")
-    public List<EccangPage> getStockCheck(
+    @GetMapping("/getInventory")
+    public List<EccangPage> getInventory(
     ) {
-        return eccangService.getStockCheck().toList();
+        return eccangService.getInventory().toList();
     }
 
-    @GetMapping("/getStockCheckBatchLog")
-    public List<EccangPage> getStockCheckBatchLog(
+    @GetMapping("/getInventoryBatchLog")
+    public List<EccangPage> getInventoryBatchLog(
         @RequestParam String startTime,
         @RequestParam String endTime
     ) {
-        EccangStockCheckBatchLogVO vo = new EccangStockCheckBatchLogVO();
+        EccangInventoryBatchLogVO vo = new EccangInventoryBatchLogVO();
         vo.setDateFrom(LocalDateTime.parse(startTime));
         vo.setDateTo(LocalDateTime.parse(endTime));
-        return eccangService.getStockCheckBatchLog(vo).toList();
+        return eccangService.getInventoryBatchLog(vo).toList();
     }
 
     @GetMapping("/getOrderShip")
