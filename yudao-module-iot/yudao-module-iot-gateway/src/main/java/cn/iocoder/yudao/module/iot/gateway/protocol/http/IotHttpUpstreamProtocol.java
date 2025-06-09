@@ -36,11 +36,10 @@ public class IotHttpUpstreamProtocol extends AbstractVerticle {
         router.route().handler(BodyHandler.create());
 
         // 创建处理器，添加路由处理器
-        IotHttpUpstreamHandler upstreamHandler = new IotHttpUpstreamHandler(this);
-        router.post(IotHttpUpstreamHandler.PROPERTY_PATH).handler(upstreamHandler);
-        router.post(IotHttpUpstreamHandler.EVENT_PATH).handler(upstreamHandler);
         IotHttpAuthHandler authHandler = new IotHttpAuthHandler(this);
         router.post(IotHttpAuthHandler.PATH).handler(authHandler);
+        IotHttpUpstreamHandler upstreamHandler = new IotHttpUpstreamHandler(this);
+        router.post(IotHttpUpstreamHandler.PATH).handler(upstreamHandler);
 
         // 启动 HTTP 服务器
         try {
