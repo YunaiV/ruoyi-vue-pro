@@ -55,7 +55,7 @@ public class IotDeviceDownstreamServiceImpl implements IotDeviceDownstreamServic
         if (StrUtil.isEmpty(serverId)) {
             throw exception(DEVICE_DOWNSTREAM_FAILED_SERVER_ID_NULL);
         }
-        deviceMessageProducer.sendGatewayDeviceMessage(serverId, message);
+        deviceMessageProducer.sendDeviceMessageToGateway(serverId, message);
 
         // 3.2 发送给服务器（用于设备日志等的记录）
         deviceMessageProducer.sendDeviceMessage(message);

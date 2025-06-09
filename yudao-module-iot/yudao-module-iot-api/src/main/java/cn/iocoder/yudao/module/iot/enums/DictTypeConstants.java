@@ -15,8 +15,5 @@ public class DictTypeConstants {
     public static final String VALIDATE_TYPE = "iot_validate_type";
 
     public static final String DEVICE_STATE = "iot_device_state";
-    
-    public static final String IOT_DATA_BRIDGE_DIRECTION_ENUM = "iot_data_bridge_direction_enum";
-    public static final String IOT_DATA_BRIDGE_TYPE_ENUM = "iot_data_bridge_type_enum";
 
 }
