@@ -186,7 +186,8 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
 
         // 3. 创建退款单
         String walletRechargeId = String.valueOf(id);
-        String refundId = walletRechargeId + "-refund";
+        // 钱包充值的退款ID直接使用充值记录ID，保持与校验逻辑一致
+        String refundId = walletRechargeId;
         Long payRefundId = payRefundApi.createRefund(new PayRefundCreateReqDTO()
                 .setAppKey(payProperties.getWalletPayAppKey()).setUserIp(userIp)
                 .setMerchantOrderId(walletRechargeId)
