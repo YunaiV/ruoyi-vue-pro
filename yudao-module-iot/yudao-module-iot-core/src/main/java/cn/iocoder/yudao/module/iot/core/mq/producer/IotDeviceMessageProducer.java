@@ -30,7 +30,7 @@ public class IotDeviceMessageProducer {
      * @param serverId 网关的 serverId 标识
      * @param message 设备消息
      */
-    public void sendGatewayDeviceMessage(String serverId, Object message) {
+    public void sendDeviceMessageToGateway(String serverId, IotDeviceMessage message) {
         messageBus.post(IotDeviceMessageUtils.buildMessageBusGatewayDeviceMessageTopic(serverId), message);
     }
 

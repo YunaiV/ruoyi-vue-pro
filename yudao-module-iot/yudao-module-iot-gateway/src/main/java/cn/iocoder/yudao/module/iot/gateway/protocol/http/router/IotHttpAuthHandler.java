@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.service.auth.IotDeviceTokenService;
+import cn.iocoder.yudao.module.iot.gateway.service.message.IotDeviceMessageService;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
@@ -40,11 +41,14 @@ public class IotHttpAuthHandler extends IotHttpAbstractHandler {
 
     private final IotDeviceCommonApi deviceClientService;
 
+    private final IotDeviceMessageService deviceMessageService;
+
     public IotHttpAuthHandler(IotHttpUpstreamProtocol protocol) {
         this.protocol = protocol;
         this.deviceMessageProducer = SpringUtil.getBean(IotDeviceMessageProducer.class);
         this.deviceTokenService = SpringUtil.getBean(IotDeviceTokenService.class);
         this.deviceClientService = SpringUtil.getBean(IotDeviceCommonApi.class);
+        this.deviceMessageService = SpringUtil.getBean(IotDeviceMessageService.class);
     }
 
     @Override
@@ -78,9 +82,9 @@ public class IotHttpAuthHandler extends IotHttpAbstractHandler {
         Assert.notBlank(token, "生成 token 不能为空位");
 
         // 3. 执行上线
-        deviceMessageProducer.sendDeviceMessage(IotDeviceMessage.of(deviceInfo.getProductKey(), deviceInfo.getDeviceName(),
-                        protocol.getServerId())
-                .ofStateOnline());
+        IotDeviceMessage message = deviceMessageService.buildDeviceMessageOfStateOnline(
+                deviceInfo.getProductKey(), deviceInfo.getDeviceName(), protocol.getServerId());
+        deviceMessageProducer.sendDeviceMessage(message);
 
         // 构建响应数据
         return success(MapUtil.of("token", token));

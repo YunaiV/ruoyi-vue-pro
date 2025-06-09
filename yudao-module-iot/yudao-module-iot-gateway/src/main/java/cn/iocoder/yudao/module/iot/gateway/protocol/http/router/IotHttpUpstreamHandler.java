@@ -1,14 +1,17 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.http.router;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.gateway.enums.IotDeviceTopicEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpUpstreamProtocol;
-import io.vertx.core.Handler;
+import cn.iocoder.yudao.module.iot.gateway.service.message.IotDeviceMessageService;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import lombok.RequiredArgsConstructor;
@@ -23,49 +26,39 @@ import java.util.Map;
  */
 @RequiredArgsConstructor
 @Slf4j
-public class IotHttpUpstreamHandler implements Handler<RoutingContext> {
+public class IotHttpUpstreamHandler extends IotHttpAbstractHandler {
 
-    // TODO @haohao：你说，咱要不要把 "/sys/:productKey/:deviceName"
-    //            + IotDeviceTopicEnum.PROPERTY_POST_TOPIC.getTopic()，也抽到 IotDeviceTopicEnum 的 build 这种？尽量都收敛掉？
-    /**
-     * 属性上报路径
-     */
-    public static final String PROPERTY_PATH = "/sys/:productKey/:deviceName"
-            + IotDeviceTopicEnum.PROPERTY_POST_TOPIC.getTopic();
-
-    /**
-     * 事件上报路径
-     */
-    public static final String EVENT_PATH = "/sys/:productKey/:deviceName"
-            + IotDeviceTopicEnum.EVENT_POST_TOPIC_PREFIX.getTopic() + ":identifier"
-            + IotDeviceTopicEnum.EVENT_POST_TOPIC_SUFFIX.getTopic();
+    public static final String PATH = "/topic/sys/:productKey/:deviceName/*";
 
     private final IotHttpUpstreamProtocol protocol;
 
     private final IotDeviceMessageProducer deviceMessageProducer;
 
+    private final IotDeviceMessageService deviceMessageService;
+
     public IotHttpUpstreamHandler(IotHttpUpstreamProtocol protocol) {
         this.protocol = protocol;
         this.deviceMessageProducer = SpringUtil.getBean(IotDeviceMessageProducer.class);
+        this.deviceMessageService = SpringUtil.getBean(IotDeviceMessageService.class);
     }
 
     @Override
-    public void handle(RoutingContext context) {
-        String path = context.request().path();
+    protected CommonResult<Object> handle0(RoutingContext context) {
         // 1. 解析通用参数
         String productKey = context.pathParam("productKey");
         String deviceName = context.pathParam("deviceName");
-        JsonObject body = context.body().asJsonObject();
+        String method = context.pathParam("*").replaceAll(StrPool.SLASH, StrPool.DOT);
 
-        // 2. 根据路径模式处理不同类型的请求
-        if (isPropertyPostPath(path)) {
-            // 处理属性上报
-            handlePropertyPost(context, productKey, deviceName, body);
-        } else if (isEventPostPath(path)) {
-            // 处理事件上报
-            String identifier = context.pathParam("identifier");
-            handleEventPost(context, productKey, deviceName, identifier, body);
-        }
+        // 2.1 解析消息
+        byte[] bytes = context.body().buffer().getBytes();
+        IotDeviceMessage message = deviceMessageService.decodeDeviceMessage(bytes,
+                productKey, deviceName, protocol.getServerId());
+        Assert.equals(method, message.getMethod(), "method 不匹配");
+        // 2.2 发送消息
+        deviceMessageProducer.sendDeviceMessage(message);
+
+        // 3. 返回结果
+        return CommonResult.success(MapUtil.of("messageId", message.getId()));
     }
 
     /**
@@ -101,7 +94,8 @@ public class IotHttpUpstreamHandler implements Handler<RoutingContext> {
                                     JsonObject body) {
         // 1.1 构建设备消息
         IotDeviceMessage message = IotDeviceMessage.of(productKey, deviceName, protocol.getServerId())
-                .ofPropertyReport(parsePropertiesFromBody(body));
+//                .ofPropertyReport(parsePropertiesFromBody(body))
+                ;
         // 1.2 发送消息
         deviceMessageProducer.sendDeviceMessage(message);
 

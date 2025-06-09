@@ -33,7 +33,7 @@ public abstract class IotHttpAbstractHandler implements Handler<RoutingContext> 
     private final IotDeviceTokenService deviceTokenService = SpringUtil.getBean(IotDeviceTokenService.class);
 
     @Override
-    public void handle(RoutingContext context) {
+    public final void handle(RoutingContext context) {
         try {
             // 1. 前置处理
             CommonResult<Object> result = beforeHandle(context);

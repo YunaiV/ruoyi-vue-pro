@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.gateway.service.auth;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 
 /**
- * IoT 设备 Token 服务 Service 接口
+ * IoT 设备 Token Service 接口
  *
  * @author 芋道源码
  */

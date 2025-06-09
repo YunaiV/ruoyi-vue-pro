@@ -18,6 +18,7 @@ public class IotDeviceMessageUtils {
         return IdUtil.fastSimpleUUID();
     }
 
+    // TODO @芋艿：需要优化下；
     /**
      * 是否是上行消息：由设备发送
      *
