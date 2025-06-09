@@ -33,5 +33,19 @@ public class SortingField implements Serializable {
      * 顺序
      */
     private String order;
+    /**
+     * 是否转换字段名格式（驼峰转下划线）
+     * 默认为 true，保持向后兼容性
+     */
+    private Boolean convertFieldFormat = true;
+
+    /**
+     * 构造函数，保持向后兼容性
+     */
+    public SortingField(String field, String order) {
+        this.field = field;
+        this.order = order;
+        this.convertFieldFormat = true;
+    }
 
 }

@@ -36,10 +36,17 @@ public class MyBatisUtils {
         Page<T> page = new Page<>(pageParam.getPageNo(), pageParam.getPageSize());
         // 排序字段
         if (!CollectionUtil.isEmpty(sortingFields)) {
-            page.addOrder(sortingFields.stream().map(sortingField -> SortingField.ORDER_ASC.equals(sortingField.getOrder())
-                            ? OrderItem.asc(StrUtil.toUnderlineCase(sortingField.getField()))
-                            : OrderItem.desc(StrUtil.toUnderlineCase(sortingField.getField())))
-                    .collect(Collectors.toList()));
+            page.addOrder(sortingFields.stream().map(sortingField -> {
+                // 根据 convertFieldFormat 字段决定是否进行驼峰转下划线转换
+                String fieldName = sortingField.getField();
+                if (Boolean.TRUE.equals(sortingField.getConvertFieldFormat())) {
+                    fieldName = StrUtil.toUnderlineCase(fieldName);
+                }
+
+                return SortingField.ORDER_ASC.equals(sortingField.getOrder())
+                        ? OrderItem.asc(fieldName)
+                        : OrderItem.desc(fieldName);
+            }).collect(Collectors.toList()));
         }
         return page;
     }
