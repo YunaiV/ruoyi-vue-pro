@@ -53,7 +53,7 @@ public class InboundStateMachineConfigure {
         builder.externalTransitions()
             .fromAmong(WmsInboundAuditStatus.DRAFT.getValue(),WmsInboundAuditStatus.REJECT.getValue(),WmsInboundAuditStatus.AUDITING.getValue())
             .to( WmsInboundAuditStatus.ABANDONED.getValue())
-            .on(WmsInboundAuditStatus.Event.REJECT)
+            .on(WmsInboundAuditStatus.Event.ABANDON)
             .handle(InboundAbandonTransitionHandler.class);
 
         // 同意
@@ -81,7 +81,7 @@ public class InboundStateMachineConfigure {
         builder.setFailCallback(InboundTransitionFailCallback.class);
 
         // 返回
-        return builder.build(InboundStateMachineConfigure.STATE_MACHINE_NAME,c->c.data().getAuditStatus());
+        return builder.build(InboundStateMachineConfigure.STATE_MACHINE_NAME,ctx -> ctx.data().getAuditStatus());
 
     }
 

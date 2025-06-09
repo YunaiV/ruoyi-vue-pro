@@ -2,7 +2,8 @@ package cn.iocoder.yudao.module.srm.config.purchase.order.impl.action.item;
 
 import cn.iocoder.yudao.framework.cola.statemachine.Action;
 import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
-import cn.iocoder.yudao.module.srm.api.purchase.SrmPayCountDTO;
+import cn.iocoder.yudao.module.srm.config.machine.SrmPayCountContext;
+import cn.iocoder.yudao.module.srm.config.machine.order.SrmOrderItemOffContext;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseOrderItemMapper;
@@ -24,7 +25,7 @@ import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_ORDER_
 
 @Component
 @Slf4j
-public class OrderItemPayActionImpl implements Action<SrmPaymentStatus, SrmEventEnum, SrmPayCountDTO> {
+public class OrderItemPayActionImpl implements Action<SrmPaymentStatus, SrmEventEnum, SrmPayCountContext> {
     @Resource
     private SrmPurchaseOrderItemMapper itemMapper;
     @Resource
@@ -32,11 +33,11 @@ public class OrderItemPayActionImpl implements Action<SrmPaymentStatus, SrmEvent
     @Resource(name = PURCHASE_ORDER_PAYMENT_STATE_MACHINE_NAME)
     private StateMachine<SrmPaymentStatus, SrmEventEnum, SrmPurchaseOrderDO> paymentStateMachine;
     @Resource(name = PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME)
-    private StateMachine<SrmOffStatus, SrmEventEnum, SrmPurchaseOrderItemDO> purchaseOrderItemOffStateMachine;
+    private StateMachine<SrmOffStatus, SrmEventEnum, SrmOrderItemOffContext> purchaseOrderItemOffStateMachine;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void execute(SrmPaymentStatus f, SrmPaymentStatus t, SrmEventEnum event, SrmPayCountDTO context) {
+    public void execute(SrmPaymentStatus f, SrmPaymentStatus t, SrmEventEnum event, SrmPayCountContext context) {
         // 支付状态机执行
         SrmPurchaseOrderItemDO orderItemDO = itemMapper.selectById(context.getOrderItemId());
         // 1. 校验参数
@@ -50,16 +51,18 @@ public class OrderItemPayActionImpl implements Action<SrmPaymentStatus, SrmEvent
             if (context.getPayCountDiff() != null) {
                 BigDecimal oldMoney = orderItemDO.getPayPrice() == null ? BigDecimal.ZERO : orderItemDO.getPayPrice();
                 BigDecimal newMoney = context.getPayCountDiff();
+                BigDecimal finalMoney = oldMoney.add(newMoney);
                 //最终金额 = 原金额 + 调整金额
-                orderItemDO.setPayPrice(oldMoney.add(newMoney));
-            }
-            //根据支付金额 动态判断当前支付状态, 如果支付金额大于等于订单金额，则支付状态为已支付。如果支付金额为0，则支付状态为未支付。其余是部分支付。
-            if (orderItemDO.getPayPrice().compareTo(orderItemDO.getTotalPrice()) >= 0) {
-                t = SrmPaymentStatus.ALL_PAYMENT;
-            } else if (orderItemDO.getPayPrice().compareTo(BigDecimal.ZERO) == 0) {
-                t = SrmPaymentStatus.NONE_PAYMENT;
-            } else {
-                t = SrmPaymentStatus.PARTIALLY_PAYMENT;
+                orderItemDO.setPayPrice(finalMoney);
+
+                //根据支付金额 动态判断当前支付状态, 如果支付金额大于等于订单金额，则支付状态为已支付。如果支付金额为0，则支付状态为未支付。其余是部分支付。
+                if (finalMoney.compareTo(orderItemDO.getTotalPrice()) >= 0) {
+                    t = SrmPaymentStatus.ALL_PAYMENT;
+                } else if (finalMoney.compareTo(BigDecimal.ZERO) == 0) {
+                    t = SrmPaymentStatus.NONE_PAYMENT;
+                } else {
+                    t = SrmPaymentStatus.PARTIALLY_PAYMENT;
+                }
             }
         }
         orderItemDO.setPayStatus(t.getCode());
@@ -83,10 +86,9 @@ public class OrderItemPayActionImpl implements Action<SrmPaymentStatus, SrmEvent
 
     private void checkStatusAndClose(Long orderItemId) {
         SrmPurchaseOrderItemDO orderItemDO = itemMapper.selectById(orderItemId);
-        if (Objects.equals(orderItemDO.getInStatus(), SrmStorageStatus.ALL_IN_STORAGE.getCode()) && Objects.equals(orderItemDO.getPayStatus(),
-            SrmPaymentStatus.ALL_PAYMENT.getCode())) {
+        if (Objects.equals(orderItemDO.getInboundStatus(), SrmStorageStatus.ALL_IN_STORAGE.getCode()) && Objects.equals(orderItemDO.getPayStatus(), SrmPaymentStatus.ALL_PAYMENT.getCode())) {
             // 当前订单项，完全入库 + 完全付款 -> 关闭订单项
-            purchaseOrderItemOffStateMachine.fireEvent(SrmOffStatus.fromCode(orderItemDO.getOffStatus()), SrmEventEnum.AUTO_CLOSE, orderItemDO);
+            purchaseOrderItemOffStateMachine.fireEvent(SrmOffStatus.fromCode(orderItemDO.getOffStatus()), SrmEventEnum.AUTO_CLOSE, new SrmOrderItemOffContext().setItemId(orderItemDO.getId()));
         }
     }
 }

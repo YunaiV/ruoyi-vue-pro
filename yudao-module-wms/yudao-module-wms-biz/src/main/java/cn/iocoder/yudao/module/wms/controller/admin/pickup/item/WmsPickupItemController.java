@@ -1,31 +1,11 @@
 package cn.iocoder.yudao.module.wms.controller.admin.pickup.item;
 
-import org.springframework.web.bind.annotation.*;
+import cn.iocoder.yudao.module.wms.service.pickup.item.WmsPickupItemService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.constraints.*;
-import jakarta.validation.*;
-import jakarta.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
-import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.*;
-import cn.iocoder.yudao.module.wms.controller.admin.pickup.item.vo.*;
-import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
-import cn.iocoder.yudao.module.wms.service.pickup.item.WmsPickupItemService;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_ITEM_NOT_EXISTS;
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "拣货单详情")
 @RestController
@@ -119,4 +99,4 @@ public class WmsPickupItemController {
     // // 导出 Excel
     // ExcelUtils.write(response, "拣货单详情.xls", "数据", WmsPickupItemRespVO.class, BeanUtils.toBean(list, WmsPickupItemRespVO.class));
     // }
-}
+}

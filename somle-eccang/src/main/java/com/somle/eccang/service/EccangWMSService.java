@@ -9,7 +9,7 @@ import com.somle.eccang.model.EccangResponse;
 import com.somle.eccang.model.EccangWMSResponse;
 import com.somle.eccang.model.EccangWMSToken;
 import com.somle.eccang.model.req.EccangAsnListReqVo;
-import com.somle.eccang.model.req.EccangProductInventoryReqVo;
+import com.somle.eccang.model.req.EccangProductStockCheckReqVo;
 import com.somle.eccang.model.req.EccangSpecialOrdersReqVo;
 import com.somle.eccang.repository.EccangWMSTokenRepository;
 import jakarta.annotation.PostConstruct;
@@ -77,14 +77,14 @@ public class EccangWMSService {
         );
     }
 
-    public Stream<EccangResponse.EccangPage> streamProductInventory(EccangProductInventoryReqVo eccangProductInventoryReqVo) {
-        String endpoint = "getProductInventory";
+    public Stream<EccangResponse.EccangPage> streamProductStockCheck(EccangProductStockCheckReqVo eccangProductStockCheckReqVo) {
+        String endpoint = "getProductStockCheck";
         return StreamX.iterate(
-            getPage(JsonUtilsX.toJSONObject(eccangProductInventoryReqVo), endpoint),
+            getPage(JsonUtilsX.toJSONObject(eccangProductStockCheckReqVo), endpoint),
             page -> page.hasNext(),
             page -> {
-                eccangProductInventoryReqVo.setPage(page.getPage() + 1);
-                return getPage(JsonUtilsX.toJSONObject(eccangProductInventoryReqVo), endpoint);
+                eccangProductStockCheckReqVo.setPage(page.getPage() + 1);
+                return getPage(JsonUtilsX.toJSONObject(eccangProductStockCheckReqVo), endpoint);
             }
         );
     }

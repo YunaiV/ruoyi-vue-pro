@@ -1,13 +1,16 @@
 package cn.iocoder.yudao.module.wms.controller.admin.exchange.vo;
 
+import cn.iocoder.yudao.module.wms.controller.admin.exchange.item.vo.WmsExchangeItemRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
-import com.alibaba.excel.annotation.*;
 import java.util.List;
-import cn.iocoder.yudao.module.wms.controller.admin.exchange.defective.vo.WmsExchangeDefectiveRespVO;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
@@ -56,7 +59,7 @@ public class WmsExchangeRespVO {
 
     @Schema(description = "详情清单", example = "")
     @ExcelProperty("详情清单")
-    private List<WmsExchangeDefectiveRespVO> defectiveList;
+    private List<WmsExchangeItemRespVO> itemList;
 
     @Schema(description = "创建者", example = "")
     @ExcelProperty("创建者")
@@ -74,4 +77,7 @@ public class WmsExchangeRespVO {
     @Schema(description = "租户编号", example = "")
     @ExcelProperty("租户编号")
     private Long tenantId;
+
+    @Schema(description = "仓库", example = "")
+    private WmsWarehouseSimpleRespVO warehouse;
 }

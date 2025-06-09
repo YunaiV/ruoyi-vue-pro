@@ -39,7 +39,7 @@ public class AuditActionImpl implements Action<SrmAuditStatus, SrmEventEnum, Srm
     private SrmPurchaseOrderItemMapper srmPurchaseOrderItemMapper;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void execute(SrmAuditStatus from, SrmAuditStatus to, SrmEventEnum event, SrmPurchaseRequestAuditReqVO req) {
         SrmPurchaseRequestDO data = mapper.selectById(req.getRequestId());
         List<SrmPurchaseRequestItemsDO> itemsDOS = itemsMapper.selectListByRequestId(req.getRequestId());
@@ -54,13 +54,13 @@ public class AuditActionImpl implements Action<SrmAuditStatus, SrmEventEnum, Srm
                 itemDO.setApprovedQty(item.getApprovedQty() == null ? itemDO.getQty() : item.getApprovedQty());//默认(批准数量 = 申请数量)
             });
             //设置审核意见
-            data.setReviewComment(req.getReviewComment());
+            data.setAuditAdvice(req.getAuditAdvice());
             data.setAuditTime(LocalDateTime.now());
             data.setAuditorId(getLoginUserId());
         }
         //审核不通过(设置未通过意见)
         if (event == SrmEventEnum.REJECT) {
-            data.setReviewComment(req.getReviewComment());
+            data.setAuditAdvice(req.getAuditAdvice());
             data.setAuditTime(LocalDateTime.now());
             data.setAuditorId(getLoginUserId());
         }

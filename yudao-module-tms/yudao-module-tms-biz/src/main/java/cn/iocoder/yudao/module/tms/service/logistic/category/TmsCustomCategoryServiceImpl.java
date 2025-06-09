@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.TmsCustomCategoryPageReqVO;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.vo.TmsCustomCategorySaveReqVO;
@@ -15,6 +14,8 @@ import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.item.TmsCust
 import cn.iocoder.yudao.module.tms.dal.mysql.logistic.category.TmsCustomCategoryMapper;
 import cn.iocoder.yudao.module.tms.dal.mysql.logistic.category.item.TmsCustomCategoryItemMapper;
 import cn.iocoder.yudao.module.tms.dal.mysql.logistic.customrule.TmsCustomRuleMapper;
+import cn.iocoder.yudao.module.tms.enums.TmsDictTypeConstants;
+import cn.iocoder.yudao.module.tms.enums.TmsErrorCodeConstants;
 import cn.iocoder.yudao.module.tms.service.logistic.category.bo.TmsCustomCategoryBO;
 import cn.iocoder.yudao.module.tms.service.logistic.category.item.TmsCustomCategoryItemService;
 import jakarta.annotation.Resource;
@@ -31,7 +32,6 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.module.tms.enums.DictValue.PRODUCT_MATERIAL;
 
 /**
  * 海关分类 Service 实现类
@@ -56,7 +56,7 @@ public class TmsCustomCategoryServiceImpl implements TmsCustomCategoryService {
     @Transactional(rollbackFor = Exception.class)
     public Long createCustomRuleCategory(TmsCustomCategorySaveReqVO createReqVO) {
         //材质-字典校验
-        dictDataApi.validateDictDataList(PRODUCT_MATERIAL.getName(), List.of(String.valueOf(createReqVO.getMaterial())));
+        dictDataApi.validateDictDataList(TmsDictTypeConstants.PRODUCT_MATERIAL, List.of(String.valueOf(createReqVO.getMaterial())));
         validateCustomRuleCategoryNotExists(createReqVO);
         // 插入
         TmsCustomCategoryDO customRuleCategory = TmsCustomCategoryConvert.INSTANCE.convert(createReqVO);
@@ -77,7 +77,7 @@ public class TmsCustomCategoryServiceImpl implements TmsCustomCategoryService {
                 createReqVO.getMaterial(), createReqVO.getDeclaredType());
 
         if (CollectionUtils.isNotEmpty(categoryList)) {
-            throw exception(ErrorCodeConstants.CUSTOM_RULE_CATEGORY_EXISTS, createReqVO.getDeclaredType());
+            throw exception(TmsErrorCodeConstants.CUSTOM_RULE_CATEGORY_EXISTS, createReqVO.getDeclaredType());
         }
     }
 
@@ -89,12 +89,12 @@ public class TmsCustomCategoryServiceImpl implements TmsCustomCategoryService {
         Long categoryId = updateReqVO.getId();
         validateCustomRuleCategoryExists(categoryId);
         //材质-字典校验
-        dictDataApi.validateDictDataList(PRODUCT_MATERIAL.getName(), List.of(String.valueOf(updateReqVO.getMaterial())));
+        dictDataApi.validateDictDataList(TmsDictTypeConstants.PRODUCT_MATERIAL, List.of(String.valueOf(updateReqVO.getMaterial())));
         // 更新
         TmsCustomCategoryDO updateObj = BeanUtils.toBean(updateReqVO, TmsCustomCategoryDO.class);
         customRuleCategoryMapper.updateById(updateObj);
         // 更新子表
-        List<TmsCustomCategoryItemDO> itemDOS = TmsCustomCategoryItemConvert.INSTANCE.convert(updateReqVO.getCustomRuleCategoryItems());
+        List<TmsCustomCategoryItemDO> itemDOS = BeanUtils.toBean(updateReqVO.getCustomRuleCategoryItems(), TmsCustomCategoryItemDO.class);
         List<Long> itemIds = updateCustomRuleCategoryItemList(categoryId, itemDOS);
         //同步
 //        this.syncCustomRuleCategoryItem(itemIds);
@@ -114,7 +114,7 @@ public class TmsCustomCategoryServiceImpl implements TmsCustomCategoryService {
 
     private void validateCustomRuleCategoryExists(Long id) {
         if (customRuleCategoryMapper.selectById(id) == null) {
-            throw exception(ErrorCodeConstants.CUSTOM_RULE_CATEGORY_NOT_EXISTS);
+            throw exception(TmsErrorCodeConstants.CUSTOM_RULE_CATEGORY_NOT_EXISTS);
         }
     }
 
@@ -133,11 +133,11 @@ public class TmsCustomCategoryServiceImpl implements TmsCustomCategoryService {
         if (CollUtil.isEmpty(ids)) {
             return;
         }
-        List<TmsCustomCategoryDO> list = customRuleCategoryMapper.selectBatchIds(ids);
+        List<TmsCustomCategoryDO> list = customRuleCategoryMapper.selectByIds(ids);
         Map<Long, TmsCustomCategoryDO> map = convertMap(list, TmsCustomCategoryDO::getId);
         for (Long id : ids) {
             TmsCustomCategoryDO aDo = map.get(id);
-            ThrowUtil.ifEmptyThrow(aDo, ErrorCodeConstants.CUSTOM_RULE_CATEGORY_NOT_EXISTS);
+            ThrowUtil.ifEmptyThrow(aDo, TmsErrorCodeConstants.CUSTOM_RULE_CATEGORY_NOT_EXISTS);
         }
     }
 
@@ -198,13 +198,18 @@ public class TmsCustomCategoryServiceImpl implements TmsCustomCategoryService {
      * @param itemsDOList 海关分类子表
      */
     private List<Long> updateCustomRuleCategoryItemList(Long categoryId, List<TmsCustomCategoryItemDO> itemsDOList) {
+        itemsDOList.forEach(o -> o.setCustomCategoryId(categoryId));
         List<TmsCustomCategoryItemDO> oldList = customRuleCategoryItemMapper.selectListByCategoryId(categoryId);
-        List<List<TmsCustomCategoryItemDO>> diffedList = diffList(oldList, itemsDOList,
-            (oldVal, newVal) -> oldVal.getId().equals(newVal.getId()));
+        List<List<TmsCustomCategoryItemDO>> diffedList = diffList(
+            oldList,
+            itemsDOList,
+            (o1, o2) -> o1.getId().equals(o2.getId()),
+            (o1, o2) -> o1.businessHashCode() == o2.businessHashCode() || o1.businessEquals(o2)
+        );
+
         List<Long> itemIds = new ArrayList<>();
         //批量添加、修改、删除
         if (CollUtil.isNotEmpty(diffedList.get(0))) {
-            diffedList.get(0).forEach(o -> o.setCustomCategoryId(categoryId));
             customRuleCategoryItemMapper.insertBatch(diffedList.get(0));
             itemIds.addAll(diffedList.get(0).stream().map(TmsCustomCategoryItemDO::getId).toList());
         }

@@ -5,7 +5,6 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
-import cn.iocoder.yudao.framework.common.enums.enums.DictTypeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
@@ -17,6 +16,7 @@ import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.TmsCustomRuleDTO;
+import cn.iocoder.yudao.module.tms.enums.TmsDictTypeConstants;
 import com.somle.eccang.model.EccangCategory;
 import com.somle.eccang.model.EccangProduct;
 import com.somle.eccang.service.EccangService;
@@ -87,17 +87,17 @@ public class ErpToEccangConverter {
 
         Integer countryCode = customRuleDTO.getCountryCode();
         String countrySuffix = ObjectUtil.isNotEmpty(countryCode)
-            ? getCountrySuffix(dictDataApi.getDictData(DictTypeConstants.COUNTRY_CODE, String.valueOf(countryCode)).getLabel())
+            ? getCountrySuffix(dictDataApi.getDictData(TmsDictTypeConstants.COUNTRY_CODE, String.valueOf(countryCode)).getLabel())
             : "";
-        String barCode = productDTO.getBarCode();
+        String productCode = productDTO.getCode();
         String suffix = countrySuffix.isEmpty() ? "" : "-" + countrySuffix;
         eccangProduct.setProductTitle(productDTO.getName() + suffix);
-        eccangProduct.setProductTitleEn(CharSequenceUtil.isNotBlank(barCode) ? barCode + suffix : barCode);
-        eccangProduct.setProductSku(CharSequenceUtil.isNotBlank(barCode) ? barCode + suffix : barCode);
+        eccangProduct.setProductTitleEn(CharSequenceUtil.isNotBlank(productCode) ? productCode + suffix : productCode);
+        eccangProduct.setProductSku(CharSequenceUtil.isNotBlank(productCode) ? productCode + suffix : productCode);
         //申报币种
         Optional.ofNullable(customRuleDTO.getDeclaredValueCurrencyCode())
             .map(String::valueOf)
-            .map(code -> dictDataApi.getDictData(DictTypeConstants.CURRENCY_CODE, code))
+            .map(code -> dictDataApi.getDictData(TmsDictTypeConstants.CURRENCY_CODE, code))
             .filter(dictData -> ObjectUtil.isNotEmpty(dictData.getLabel()))
             .ifPresent(dictData -> eccangProduct.setPdDeclareCurrencyCode(dictData.getLabel()));
 
@@ -134,8 +134,8 @@ public class ErpToEccangConverter {
         EccangProduct eccangProduct = setDefaultValue(new EccangProduct());
         //SKU和标题
         eccangProduct.setProductTitle(productDTO.getName());
-        eccangProduct.setProductTitleEn(productDTO.getBarCode());
-        eccangProduct.setProductSku(productDTO.getBarCode());
+        eccangProduct.setProductTitleEn(productDTO.getCode());
+        eccangProduct.setProductSku(productDTO.getCode());
         this.setProductSizeAndWeight(eccangProduct, productDTO, (product, dto) -> {
         });
         this.setProductCategoriesAndOrganizationId(eccangProduct, productDTO, userMap);

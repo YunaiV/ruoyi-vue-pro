@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.tms.service.logistic.category.item;
 
-import cn.iocoder.yudao.framework.common.enums.enums.DictTypeConstants;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.item.vo.TmsCustomCategoryItemPageReqVO;
 import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.item.vo.TmsCustomCategoryItemSaveReqVO;
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.item.TmsCustomCategoryItemDO;
 import cn.iocoder.yudao.module.tms.dal.mysql.logistic.category.item.TmsCustomCategoryItemMapper;
-import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
+import cn.iocoder.yudao.module.tms.enums.TmsDictTypeConstants;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.tms.enums.ErrorCodeConstants.CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS;
+import static cn.iocoder.yudao.module.tms.enums.TmsErrorCodeConstants.CUSTOM_RULE_CATEGORY_ITEM_NOT_EXISTS;
 
 /**
  * 海关分类子表 Service 实现类
@@ -35,7 +35,7 @@ public class TmsCustomCategoryItemServiceImpl implements TmsCustomCategoryItemSe
 
     @Override
     public Long createCustomRuleCategoryItem(TmsCustomCategoryItemSaveReqVO createReqVO) {
-        dictDataApi.validateDictDataList(DictTypeConstants.COUNTRY_CODE, List.of(String.valueOf(createReqVO.getCountryCode())));
+        dictDataApi.validateDictDataList(TmsDictTypeConstants.COUNTRY_CODE, List.of(String.valueOf(createReqVO.getCountryCode())));
         // 插入
         TmsCustomCategoryItemDO customRuleCategoryItem = BeanUtils.toBean(createReqVO, TmsCustomCategoryItemDO.class);
         customRuleCategoryItemMapper.insert(customRuleCategoryItem);
@@ -51,7 +51,7 @@ public class TmsCustomCategoryItemServiceImpl implements TmsCustomCategoryItemSe
 
     @Override
     public void updateCustomRuleCategoryItem(TmsCustomCategoryItemSaveReqVO updateReqVO) {
-        dictDataApi.validateDictDataList(DictTypeConstants.COUNTRY_CODE, List.of(String.valueOf(updateReqVO.getCountryCode())));
+        dictDataApi.validateDictDataList(TmsDictTypeConstants.COUNTRY_CODE, List.of(String.valueOf(updateReqVO.getCountryCode())));
         // 校验存在
         validateCustomRuleCategoryItemExists(updateReqVO.getId());
         // 更新

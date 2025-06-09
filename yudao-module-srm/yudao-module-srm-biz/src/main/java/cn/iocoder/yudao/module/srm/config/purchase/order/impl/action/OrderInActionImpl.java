@@ -47,7 +47,7 @@ public class OrderInActionImpl implements Action<SrmStorageStatus, SrmEventEnum,
             boolean allInStorage = true;
 
             for (SrmPurchaseOrderItemDO item : items) {
-                Integer inStatus = item.getInStatus();
+                Integer inStatus = item.getInboundStatus();
                 if (inStatus == null || inStatus.equals(SrmStorageStatus.NONE_IN_STORAGE.getCode())) {
                     hasNotInStorage = true;
                     allInStorage = false;
@@ -68,7 +68,7 @@ public class OrderInActionImpl implements Action<SrmStorageStatus, SrmEventEnum,
         }
 
         SrmPurchaseOrderDO orderDO = mapper.selectById(context.getId());
-        orderDO.setInStatus(to.getCode());
+        orderDO.setInboundStatus(to.getCode());
         mapper.updateById(orderDO);
         //log
         log.debug("入库状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());

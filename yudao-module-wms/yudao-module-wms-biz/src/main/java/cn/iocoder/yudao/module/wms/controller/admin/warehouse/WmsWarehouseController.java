@@ -21,14 +21,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -36,8 +29,11 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.WAREHOUSE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.WAREHOUSE_NOT_EXISTS;
 
+/**
+ * @author jisencai
+ */
 @Tag(name = "仓库")
 @RestController
 @RequestMapping("/wms/warehouse")
@@ -115,10 +111,10 @@ public class WmsWarehouseController {
     /**
      * @sign : 225F7C4E91ACF511
      */
-    @GetMapping("/page")
+    @PostMapping("/page")
     @Operation(summary = "获得仓库分页")
     @PreAuthorize("@ss.hasPermission('wms:warehouse:query')")
-    public CommonResult<PageResult<WmsWarehouseRespVO>> getWarehousePage(@Valid WmsWarehousePageReqVO pageReqVO) {
+    public CommonResult<PageResult<WmsWarehouseRespVO>> getWarehousePage(@Valid @RequestBody WmsWarehousePageReqVO pageReqVO) {
         // 查询数据
         PageResult<WmsWarehouseDO> doPageResult = warehouseService.getWarehousePage(pageReqVO);
         // 转换
@@ -141,5 +137,17 @@ public class WmsWarehouseController {
         List<WmsWarehouseDO> list = warehouseService.getWarehousePage(pageReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "仓库.xls", "数据", WmsWarehouseRespVO.class, BeanUtils.toBean(list, WmsWarehouseRespVO.class));
+    }
+
+    @GetMapping("/simple-list/exchange")
+    @Operation(summary = "获得转换单仓库列表")
+    @PreAuthorize("@ss.hasPermission('wms:warehouse:query')")
+    public CommonResult<List<WmsWarehouseSimpleRespVO>> getWarehouseSimpleListForExchange(Integer exchange) {
+        // 查询数据
+        List<WmsWarehouseDO> doList = warehouseService.getSimpleListForExchange(exchange);
+        // 转换
+        List<WmsWarehouseSimpleRespVO> voList = BeanUtils.toBean(doList, WmsWarehouseSimpleRespVO.class);
+        // 返回
+        return success(voList);
     }
 }

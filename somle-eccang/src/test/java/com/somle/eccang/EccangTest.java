@@ -1,14 +1,16 @@
 package com.somle.eccang;
 
+import cn.iocoder.yudao.framework.test.core.ut.SomleBaseSpringTest;
 import com.somle.eccang.config.EccangIntegrationConfig;
 import com.somle.eccang.model.*;
 import com.somle.eccang.repository.EccangTokenRepository;
 import com.somle.eccang.service.EccangService;
-import cn.iocoder.yudao.framework.test.core.ut.SomleBaseSpringTest;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.*;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import java.time.LocalDate;
@@ -60,22 +62,22 @@ public class EccangTest extends SomleBaseSpringTest {
     }
 
     @Test
-    void getInventory() {
-        var result = service.getInventory();
+    void getStockCheck() {
+        var result = service.getStockCheck();
         log.info(result.toString());
     }
 
     @Test
-    void getInventoryBatchLog() {
+    void getStockCheckBatchLog() {
         var date = LocalDate.of(2024, 12, 19);
         var time1 = LocalTime.of(0, 0, 0);
         var time2 = LocalTime.of(23, 59, 59);
         var datetime1 = LocalDateTime.of(date, time1);
         var datetime2 = LocalDateTime.of(date, time2);
-        EccangInventoryBatchLogVO vo = new EccangInventoryBatchLogVO();
+        EccangStockCheckBatchLogVO vo = new EccangStockCheckBatchLogVO();
         vo.setDateFrom(datetime1);
         vo.setDateTo(datetime2);
-        var result = service.getInventoryBatchLog(vo);
+        var result = service.getStockCheckBatchLog(vo);
         log.error(String.valueOf(result.toList().size()));
     }
 

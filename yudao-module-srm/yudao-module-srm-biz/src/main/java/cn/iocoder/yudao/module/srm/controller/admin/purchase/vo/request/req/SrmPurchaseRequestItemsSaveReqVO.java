@@ -27,7 +27,7 @@ public class SrmPurchaseRequestItemsSaveReqVO {
 
     @Schema(description = "产品sku")
     @NotBlank(message = "产品sku不能为空")
-    private String barCode;
+    private String productCode;
 
     @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "产品编号不能为空")
@@ -56,11 +56,11 @@ public class SrmPurchaseRequestItemsSaveReqVO {
 
     @Schema(description = "含税单价")
     @Positive(message = "含税单价必须为正数")
-    private BigDecimal actTaxPrice;
+    private BigDecimal grossPrice;
 
     @Schema(description = "价税合计")
     @DecimalMin(value = "0.0", message = "价税合计必须大于0")
-    private BigDecimal allAmount;
+    private BigDecimal grossTotalPrice;
 
     @Schema(description = "参考单价")
     @DecimalMin(value = "0.0", message = "参考单价必须大于0")
@@ -69,16 +69,16 @@ public class SrmPurchaseRequestItemsSaveReqVO {
     //是否计算得到？待确认
     @Schema(description = "税额，单位：元")
     @DecimalMin(value = "0.0", message = "税额必须大于0")
-    private BigDecimal taxPrice;
+    private BigDecimal tax;
 
     @Schema(description = "增值税税率，百分比")
     //    @DecimalMin(value = "0.0", message = "税率不能为负")
     //    @DecimalMax(value = "1.0", message = "税率不能超过100%")
-    private BigDecimal taxPercent;
+    private BigDecimal taxRate;
     //期望到货日期
     @Schema(description = "期望到货日期")
     private LocalDateTime expectArrivalDate;
 
     @Schema(description = "版本号")
-    private Long version;
+    private Integer version;
 }

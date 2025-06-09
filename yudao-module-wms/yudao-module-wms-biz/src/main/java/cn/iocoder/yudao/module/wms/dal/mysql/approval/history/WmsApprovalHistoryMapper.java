@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalHistoryPageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.approval.history.WmsApprovalHistoryDO;
-import cn.iocoder.yudao.module.wms.enums.common.WmsBillType;
+import cn.iocoder.yudao.module.system.enums.somle.BillType;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -51,7 +51,7 @@ public interface WmsApprovalHistoryMapper extends BaseMapperX<WmsApprovalHistory
         return selectList(new LambdaQueryWrapperX<WmsApprovalHistoryDO>().eq(WmsApprovalHistoryDO::getBillType, billType).eq(WmsApprovalHistoryDO::getStatusType, statusType).eq(WmsApprovalHistoryDO::getBillId, billId));
     }
 
-    default List<WmsApprovalHistoryDO> selectGroupedApprovalHistory(WmsBillType billType, List<Long> billIds) {
+    default List<WmsApprovalHistoryDO> selectGroupedApprovalHistory(BillType billType, List<Long> billIds) {
         LambdaQueryWrapperX<WmsApprovalHistoryDO> wrapper = new LambdaQueryWrapperX<>();
         wrapper.eq(WmsApprovalHistoryDO::getBillType, billType.getValue())
             .in(WmsApprovalHistoryDO::getBillId, billIds);

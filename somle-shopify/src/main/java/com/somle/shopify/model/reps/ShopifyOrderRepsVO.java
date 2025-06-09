@@ -855,7 +855,7 @@ public class ShopifyOrderRepsVO {
 
         private Long variantId;
 
-        private String variantInventoryManagement;
+        private String variantStockCheckManagement;
 
         private String variantTitle;
 

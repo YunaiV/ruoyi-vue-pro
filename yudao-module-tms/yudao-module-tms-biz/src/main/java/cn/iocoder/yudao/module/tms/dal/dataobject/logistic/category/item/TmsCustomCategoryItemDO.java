@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 /**
  * 海关分类子表 DO
@@ -30,7 +31,7 @@ public class TmsCustomCategoryItemDO extends TenantBaseDO {
     @TableId(type = IdType.AUTO)
     private Long id;
     /**
-     * 分类表id
+     * 分类表id(主表ID)
      */
     private Long customCategoryId;
     /**
@@ -46,4 +47,17 @@ public class TmsCustomCategoryItemDO extends TenantBaseDO {
      */
     private BigDecimal taxRate;
 
+    //业务equals 比较方法
+
+    public int businessHashCode() {
+        return Objects.hash(id, customCategoryId, countryCode, hscode, taxRate);
+    }
+
+    public Boolean businessEquals(TmsCustomCategoryItemDO item) {
+        return this.getCountryCode().equals(item.getCountryCode())
+            && this.getHscode().equals(item.getHscode())
+            && this.getCustomCategoryId().equals(item.getCustomCategoryId())
+            && this.getId().equals(item.getId())
+            && this.getTaxRate().equals(item.getTaxRate());
+    }
 }

@@ -42,7 +42,7 @@ public class InPayActionImpl implements Action<SrmPaymentStatus, SrmEventEnum, S
 
             // 遍历所有子项，检查支付状态
             for (SrmPurchaseInItemDO itemDO : itemDOS) {
-                int payStatus = itemDO.getPayStatus();
+                int payStatus = itemDO.getPayStatus() == null ? SrmPaymentStatus.NONE_PAYMENT.getCode() : itemDO.getPayStatus();
 
                 if (payStatus == SrmPaymentStatus.NONE_PAYMENT.getCode()) {
                     allPaid = false;  // 存在未付款子项

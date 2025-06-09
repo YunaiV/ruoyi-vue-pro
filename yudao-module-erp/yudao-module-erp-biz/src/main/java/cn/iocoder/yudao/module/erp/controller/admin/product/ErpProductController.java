@@ -111,13 +111,11 @@ public class ErpProductController {
     @Operation(summary = "导出产品 Excel")
     @PreAuthorize("@ss.hasPermission('erp:product:export')")
     @ApiAccessLog(operateType = EXPORT)
-    public void exportProductExcel(@Valid ErpProductPageReqVO pageReqVO,
-                                   HttpServletResponse response) throws IOException {
+    public void exportProductExcel(@Valid ErpProductPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         PageResult<ErpProductRespVO> pageResult = productService.getProductVOPage(pageReqVO);
         // 导出 Excel
-        ExcelUtils.write(response, "产品.xls", "数据", ErpProductRespVO.class,
-            pageResult.getList());
+        ExcelUtils.write(response, "产品.xls", "数据", ErpProductRespVO.class, pageResult.getList());
     }
 
 }

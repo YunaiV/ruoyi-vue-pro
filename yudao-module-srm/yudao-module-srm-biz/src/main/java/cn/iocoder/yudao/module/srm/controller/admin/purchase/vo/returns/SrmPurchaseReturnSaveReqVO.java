@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.returns;
 
 import cn.iocoder.yudao.module.system.api.utils.Validation;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -17,12 +17,16 @@ public class SrmPurchaseReturnSaveReqVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @Null(groups = Validation.OnCreate.class, message = "创建时，退货单id必须为空")
+    @NotNull(groups = Validation.OnUpdate.class, message = "更新时，退货单id不能为空")
     private Long id;
+
+    @Schema(description = "退货单编号")
+    private String code;
 
     @Schema(description = "结算账户编号")
     private Long accountId;
 
-    @Schema(description = "退货时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "退货时间")
     @NotNull(message = "退货时间不能为空")
     private LocalDateTime returnTime;
 
@@ -32,6 +36,9 @@ public class SrmPurchaseReturnSaveReqVO {
     @Schema(description = "其它金额，单位：元")
     private BigDecimal otherPrice;
 
+    @Schema(description = "供应商id")
+    private Long supplierId;
+
     @Schema(description = "附件地址")
     private String fileUrl;
 
@@ -39,6 +46,7 @@ public class SrmPurchaseReturnSaveReqVO {
     private String remark;
 
     @Schema(description = "退货清单列表")
+    @Size(min = 1, message = "至少选择一个到货明细行")
     private List<Item> items;
 
 
@@ -46,66 +54,32 @@ public class SrmPurchaseReturnSaveReqVO {
     public static class Item {
 
         @Schema(description = "退货项编号")
+        @Null(groups = Validation.OnCreate.class, message = "创建时，退货单明细行id必须为空")
         private Long id;
 
 
-        @Schema(description = "入库项id", requiredMode = Schema.RequiredMode.REQUIRED)
-        @NotNull(message = "入库项id不能为空")
-        private Long inItemId;
+        @Schema(description = "到货项id", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "到货项id不能为空")
+        private Long arriveItemId;
 
-        @Schema(description = "仓库编号", requiredMode = Schema.RequiredMode.REQUIRED)
-        @NotNull(message = "仓库编号不能为空")
-        private Long warehouseId;
-
-        @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
-        @NotNull(message = "产品编号不能为空")
-        private Long productId;
-        @Schema(description = "报关品名(入库带出)")
-        private String declaredType;
-
-        @Schema(description = "产品sku(入库项带出)")
-        private String barCode;
-
-        @Schema(description = "产品名称(入库项带出)")
-        private String productName;
-
-        @Schema(description = "产品单位名称(入库项带出)")
-        private String productUnitName;
-
-        @Schema(description = "产品单位单位", requiredMode = Schema.RequiredMode.REQUIRED)
-        @NotNull(message = "产品单位单位不能为空")
-        private Long productUnitId;
-
-        @Schema(description = "产品单价")
-        private BigDecimal productPrice;
-
-        @Schema(description = "退货", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "退货数量", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "退货数量不能为空")
         private BigDecimal qty;
-
-        @Schema(description = "含税单价")
-        @DecimalMin(value = "0.00", message = "含税单价不能小于0")
-        private BigDecimal actTaxPrice;
-
-        @Schema(description = "增值税税率，百分比")
-        private BigDecimal taxPercent;
-
-        @Schema(description = "币别ID,财务管理-币别维护")
-        private Long currencyId;
-
-        @Schema(description = "币别名称")
-        private String currencyName;
 
         @Schema(description = "备注")
         private String remark;
 
-        @Schema(description = "箱率")
-        private String containerRate;
-
-        @Schema(description = "申请人id")
-        private Long applicantId;
-
-        @Schema(description = "申请人部门id")
-        private Long applicationDeptId;
+//从到货项复制
+//        @Schema(description = "退货申请人id")
+//        private Long applicantId;
+//
+//        @Schema(description = "退货申请人部门id")
+//        private Long applicationDeptId;
+//
+//        /**
+//         * 实际入库数量,取到货单item的实际入库数量
+//         */
+//        @Schema(description = "实际入库数量,到货项实际入库数量")
+//        private BigDecimal actualQty;
     }
 }

@@ -1,16 +1,16 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import jakarta.validation.constraints.*;
-import java.util.List;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.item.vo.WmsStockBinMoveItemSaveReqVO;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.item.vo.WmsStockBinMoveItemSaveReqVO;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsMoveExecuteStatus;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
+import java.util.List;
 
 /**
- * @table-fields : no,execute_status,id,warehouse_id
+ * @table-fields : no,execute_status,remark,id,warehouse_id
  */
 @Schema(description = "管理后台 - 库位移动新增/修改 Request VO")
 @Data
@@ -22,6 +22,9 @@ public class WmsStockBinMoveSaveReqVO {
     @Schema(description = "单据号")
     private String no;
 
+    @Schema(description = "入库单ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "15798")
+    private Long inboundId;
+
     @Schema(description = "仓库ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "15798")
     @NotNull(message = "仓库ID不能为空")
     private Long warehouseId;
@@ -29,7 +32,10 @@ public class WmsStockBinMoveSaveReqVO {
     @Schema(description = "详情清单", example = "")
     private List<WmsStockBinMoveItemSaveReqVO> itemList;
 
-    @Schema(description = "库存移动的执行状态 ; WmsMoveExecuteStatus : 0-草稿 , 1-已执行", example = "")
+    @Schema(description = "WMS库存移动的执行状态 ; WmsMoveExecuteStatus : 0-草稿 , 1-已执行", example = "")
     @InEnum(WmsMoveExecuteStatus.class)
     private Integer executeStatus;
+
+    @Schema(description = "备注", example = "")
+    private String remark;
 }

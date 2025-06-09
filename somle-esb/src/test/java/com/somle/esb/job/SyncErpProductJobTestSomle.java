@@ -6,8 +6,8 @@ import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.tms.api.logistic.customrule.TmsCustomRuleApi;
 import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.TmsCustomRuleDTO;
-import com.somle.esb.handler.ErpCustomRuleHandler;
-import com.somle.esb.handler.ErpProductHandler;
+import com.somle.esb.handler.erp.ErpCustomRuleHandler;
+import com.somle.esb.handler.erp.ErpProductHandler;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
@@ -39,13 +39,13 @@ public class SyncErpProductJobTestSomle extends SomleBaseSpringIntegrationTest {
             TenantContextHolder.setTenantId(50001L);// 自动
             // 发送消息
             Optional.ofNullable(tmsCustomRuleApi.listCustomRules(null)).ifPresent(detailDTOS -> {
-                barCodes.set(detailDTOS.stream().map(dto -> dto.getProductDTO().getBarCode()).toList());
+                barCodes.set(detailDTOS.stream().map(dto -> dto.getProductDTO().getCode()).toList());
                 log.info("预计同步产品skus大小={{}},barCodes = {{}}", barCodes.get().size(), barCodes.get());
                 int total = detailDTOS.size();
                 int processed = 0;
                 //输出预计同步的barcode集合
                 for (TmsCustomRuleDTO detailDTO : detailDTOS) {
-                    String barCode = detailDTO.getProductDTO().getBarCode();
+                    String barCode = detailDTO.getProductDTO().getCode();
                     log.debug("发送消息, BarCode = {}", barCode);
                     // 单独处理每个条目
                     erpCustomRuleHandler.syncCustomRulesToEccang(List.of(detailDTO));

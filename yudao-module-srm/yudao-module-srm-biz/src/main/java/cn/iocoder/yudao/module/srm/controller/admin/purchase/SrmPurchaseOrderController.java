@@ -8,8 +8,6 @@ import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
-import cn.iocoder.yudao.module.erp.api.stock.WmsWarehouseApi;
-import cn.iocoder.yudao.module.erp.api.stock.dto.ErpWarehouseDTO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.SrmPurchaseOrderBaseRespVO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.req.*;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
@@ -17,11 +15,14 @@ import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemD
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmSupplierDO;
 import cn.iocoder.yudao.module.srm.service.purchase.SrmPurchaseOrderService;
 import cn.iocoder.yudao.module.srm.service.purchase.SrmSupplierService;
+import cn.iocoder.yudao.module.srm.service.purchase.bo.order.SrmPurchaseOrderBO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.system.api.utils.Validation;
+import cn.iocoder.yudao.module.wms.api.warehouse.WmsWarehouseApi;
+import cn.iocoder.yudao.module.wms.api.warehouse.dto.WmsWarehouseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -59,7 +60,6 @@ public class SrmPurchaseOrderController {
     @Autowired
     @Lazy
     SrmPurchaseOrderService purchaseOrderService;
-    //    warehouse
 
     @PostMapping("/create")
     @Operation(summary = "创建采购订单")
@@ -100,19 +100,22 @@ public class SrmPurchaseOrderController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('srm:purchase-order:query')")
     public CommonResult<SrmPurchaseOrderBaseRespVO> getPurchaseOrder(@RequestParam("id") Long id) {
-        SrmPurchaseOrderDO purchaseOrder = purchaseOrderService.getPurchaseOrder(id);
-        if (purchaseOrder == null) {
+        SrmPurchaseOrderBO purchaseOrderBO = purchaseOrderService.getPurchaseOrderBO(id);
+        if (purchaseOrderBO == null) {
             return success(null);
         }
-        List<SrmPurchaseOrderBaseRespVO> vos = bindList(Collections.singletonList(purchaseOrder));
-        return success(vos.get(0));
+        List<SrmPurchaseOrderBaseRespVO> respVOS = bindList(Collections.singletonList(purchaseOrderBO));
+        return success(respVOS.get(0));
     }
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     @Operation(summary = "获得采购订单分页")
     @PreAuthorize("@ss.hasPermission('srm:purchase-order:query')")
-    public CommonResult<PageResult<SrmPurchaseOrderBaseRespVO>> getPurchaseOrderPage(@Valid SrmPurchaseOrderPageReqVO pageReqVO) {
-        PageResult<SrmPurchaseOrderDO> pageResult = purchaseOrderService.getPurchaseOrderPage(pageReqVO);
+    public CommonResult<PageResult<SrmPurchaseOrderBaseRespVO>> getPurchaseOrderPage(@Valid @RequestBody(required = false) SrmPurchaseOrderPageReqVO pageReqVO) {
+        if (pageReqVO == null) {
+            pageReqVO = new SrmPurchaseOrderPageReqVO();
+        }
+        PageResult<SrmPurchaseOrderBO> pageResult = purchaseOrderService.getPurchaseOrderPageBO(pageReqVO);
         return success(new PageResult<>(bindList(pageResult.getList()), pageResult.getTotal()));
     }
 
@@ -130,9 +133,9 @@ public class SrmPurchaseOrderController {
     @ApiAccessLog(operateType = EXPORT)
     public void exportPurchaseOrderExcel(@Valid SrmPurchaseOrderPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<SrmPurchaseOrderBaseRespVO> voList = bindList(purchaseOrderService.getPurchaseOrderPage(pageReqVO).getList());
+        List<SrmPurchaseOrderBaseRespVO> bindList = bindList(purchaseOrderService.getPurchaseOrderBOList(pageReqVO));
         // 导出 Excel
-        ExcelUtils.write(response, "采购订单.xls", "数据", SrmPurchaseOrderBaseRespVO.class, voList);
+        ExcelUtils.write(response, "采购订单.xls", "数据", SrmPurchaseOrderBaseRespVO.class, bindList);
     }
 
     @PostMapping("/submitAudit")
@@ -165,14 +168,14 @@ public class SrmPurchaseOrderController {
     }
 
     @PostMapping("/merge")
-    @Operation(summary = "合并入库")
+    @Operation(summary = "合并成采购到货单")
     @PreAuthorize("@ss.hasPermission('srm:purchase-order:merge')")
     public CommonResult<Boolean> mergePurchaseOrder(@Validated @RequestBody SrmPurchaseOrderMergeReqVO reqVO) {
         purchaseOrderService.merge(reqVO);
         return success(true);
     }
 
-    //查查询采购合同的模板List<String>
+    //查询采购合同的模板List<String>
     @GetMapping("/getTemplateList")
     @Operation(summary = "查询采购合同模板")
     @PreAuthorize("@ss.hasPermission('srm:purchase-order:generate-contract')")
@@ -189,13 +192,10 @@ public class SrmPurchaseOrderController {
         purchaseOrderService.generateContract(reqVO, response);
     }
 
-    private List<SrmPurchaseOrderBaseRespVO> bindList(List<? extends SrmPurchaseOrderDO> list) {
+    private List<SrmPurchaseOrderBaseRespVO> bindList(List<SrmPurchaseOrderBO> list) {
         // 1.1 订单项
-        List<SrmPurchaseOrderItemDO> purchaseOrderItemList =
-            purchaseOrderService.getPurchaseOrderItemListByOrderIds(convertSet(list, SrmPurchaseOrderDO::getId));
+        List<SrmPurchaseOrderItemDO> purchaseOrderItemList = list.stream().flatMap(order -> order.getSrmPurchaseOrderItemDOS().stream()).collect(Collectors.toList());
         Map<Long, List<SrmPurchaseOrderItemDO>> purchaseOrderItemMap = convertMultiMap(purchaseOrderItemList, SrmPurchaseOrderItemDO::getOrderId);
-        // 1.2 产品
-        //        Map<Long, ErpProductDTO> productMap = erpProductApi.getProductMap(convertSet(purchaseOrderItemList, SrmPurchaseOrderItemDO::getProductId));
         // 1.3 供应商
         Map<Long, SrmSupplierDO> supplierMap = supplierService.getSupplierMap(convertSet(list, SrmPurchaseOrderDO::getSupplierId));
         // 1.4 人员
@@ -207,32 +207,29 @@ public class SrmPurchaseOrderController {
         // 1.5 部门
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(purchaseOrderItemList, SrmPurchaseOrderItemDO::getApplicationDeptId));
         // 1.6 仓库
-        Map<Long, ErpWarehouseDTO> warehouseMap = wmsWarehouseApi.getWarehouseMap(convertSet(purchaseOrderItemList, SrmPurchaseOrderItemDO::getWarehouseId));
-        //1.7 币别map
-        //        Map<Long, ErpCurrencyDTO> currencyMap = erpCurrencyApi.getCurrencyMap(convertSet(list, SrmPurchaseOrderDO::getCurrencyId));
+        Map<Long, WmsWarehouseDTO> warehouseMap = wmsWarehouseApi.getWarehouseMap(convertSet(purchaseOrderItemList, SrmPurchaseOrderItemDO::getWarehouseId));
 
         // 2. 开始拼接
         return BeanUtils.toBean(list, SrmPurchaseOrderBaseRespVO.class, respVO -> {
             respVO.setItems(BeanUtils.toBean(purchaseOrderItemMap.get(respVO.getId()), SrmPurchaseOrderBaseRespVO.Item.class, item -> {
-                //设置产品
-                // 设置仓库
+                //仓库
                 MapUtils.findAndThen(warehouseMap, item.getWarehouseId(), erpWarehouseDO -> item.setWarehouseName(erpWarehouseDO.getName()));
                 //人员
                 MapUtils.findAndThen(userMap, Long.parseLong(item.getCreator()), user -> item.setCreator(user.getNickname()));
                 MapUtils.findAndThen(userMap, Long.parseLong(item.getUpdater()), user -> item.setUpdater(user.getNickname()));
-                //申请人name
+                //申请人
                 MapUtils.findAndThen(userMap, item.getApplicantId(), user -> item.setApplicantName(user.getNickname()));
-                //部门name
+                //部门
                 MapUtils.findAndThen(deptMap, item.getApplicationDeptId(), dept -> item.setDepartmentName(dept.getName()));
                 //待入库数量
                 item.setWaitInCount(item.getQty().subtract(item.getInboundClosedQty() == null ? BigDecimal.ZERO : item.getInboundClosedQty()));
             }));
+            //供应商
             MapUtils.findAndThen(supplierMap, respVO.getSupplierId(), supplier -> respVO.setSupplierName(supplier.getName()));
             //人员
             MapUtils.findAndThen(userMap, respVO.getAuditorId(), user -> respVO.setAuditor(user.getNickname()));
             MapUtils.findAndThen(userMap, Long.parseLong(respVO.getCreator()), user -> respVO.setCreator(user.getNickname()));
             MapUtils.findAndThen(userMap, Long.parseLong(respVO.getUpdater()), user -> respVO.setUpdater(user.getNickname()));
-            //待入库数量
         });
     }
 

@@ -3,25 +3,29 @@ package cn.iocoder.yudao.module.wms.service.quantity;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemOwnershipDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemLogicDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.stock.logic.WmsStockLogicDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
+import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.WmsInboundItemLogicQueryMapper;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockFlowDirection;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
+import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.outbound.WmsOutboundService;
 import cn.iocoder.yudao.module.wms.service.quantity.context.OutboundContext;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_NOT_EXISTS;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSHIP_NOT_EXISTS;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_WAREHOUSE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.*;
 
 /**
  * @author: LeeFJ
@@ -33,6 +37,13 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
 
     @Resource
     protected WmsOutboundService outboundService;
+
+    @Resource
+    protected WmsInboundItemLogicQueryMapper inboundItemLogicQueryMapper;
+
+    @Resource
+    @Lazy
+    private WmsInboundService inboundService;
 
     @Resource
     protected WmsInboundItemService inboundItemService;
@@ -52,11 +63,11 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
     /**
      * 更新库存货位库存量
      **/
-    protected abstract void processInboundItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId);
+    protected abstract List<WmsInboundItemFlowDO> processInboundItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId);
     /**
      * 更新库存货位库存量
      **/
-    protected abstract WmsStockFlowDirection updateStockOwnershipQty(WmsStockOwnershipDO stockOwnershipDO, WmsOutboundItemRespVO item, Integer quantity);
+    protected abstract WmsStockFlowDirection updateStockLogicQty(WmsStockLogicDO stockLogicDO, WmsOutboundItemRespVO item, Integer quantity);
     /**
      * 更新库存货位库存量
      **/
@@ -69,6 +80,7 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
     protected abstract void updateOutbound(WmsOutboundRespVO outboundRespVO);
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void execute(OutboundContext context) {
 
         WmsOutboundRespVO outboundRespVO=outboundService.getOutboundWithItemList(context.getOutboundId());
@@ -86,29 +98,43 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
                 deptId=outboundRespVO.getDeptId();
             }
 
+            List<Long> deptIds = new ArrayList<>();
+            List<Long> companyIds = new ArrayList<>();
+
             // 如果未指定归属，则按入库批次的先进先出进行处理
             if (deptId == null || companyId == null) {
-                WmsInboundItemOwnershipDO inboundItemOwnership = inboundService.getInboundItemOwnership(warehouseId, productId, true);
-                if(inboundItemOwnership==null) {
-                    throw exception(STOCK_OWNERSHIP_NOT_EXISTS);
+                //todo 获取批次列表，然后根据可售数量判断取多个批次的库存
+                List<WmsInboundItemLogicDO> inboundItemLogicList = inboundService.getInboundItemLogicList(warehouseId, productId, true);
+                if (inboundItemLogicList == null) {
+                    throw exception(STOCK_LOGIC_NOT_EXISTS);
                 }
-                deptId = inboundItemOwnership.getDeptId();
-                companyId = inboundItemOwnership.getCompanyId();
+                int totalQty = item.getActualQty();
+
+                for (WmsInboundItemLogicDO inboundItemLogic : inboundItemLogicList) {
+                    deptIds.add(inboundItemLogic.getDeptId());
+                    companyIds.add(inboundItemLogic.getCompanyId());
+                    if (inboundItemLogic.getSellableQty() >= totalQty) {
+                        break;
+                    } else {
+                        totalQty = totalQty - inboundItemLogic.getSellableQty();
+                    }
+                }
+            } else {
+                deptIds.add(deptId);
+                companyIds.add(companyId);
             }
-            // 抛出异常
-            if (deptId == null || companyId == null) {
-                throw exception(STOCK_OWNERSHIP_NOT_EXISTS);
-            }
 
-
-
-
-            // 执行入库的原子操作
+            // 执行出库的原子操作
             Integer quantity= getExecuteQty(item);
-            outboundSingleItem(outboundRespVO,item,companyId, deptId, warehouseId, item.getBinId(),productId, quantity, outboundRespVO.getId(), item.getId());
+            for (int i = 0; i < deptIds.size(); i++) {
+                companyId = companyIds.get(i);
+                deptId = deptIds.get(i);
+                // 执行单个出库详情
+                this.outboundSingleItem(outboundRespVO, item, companyId, deptId, warehouseId, item.getBinId(), productId, quantity, outboundRespVO.getId(), item.getId());
+            }
         }
         updateOutbound(outboundRespVO);
-        // 完成最终的入库
+        // 完成最终的出库
         outboundService.finishOutbound(outboundRespVO);
 
     }
@@ -136,9 +162,9 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
     private WmsOutboundStatus processItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
 
         this.processStockWarehouseItem(item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
-        this.processInboundItem(outboundRespVO,item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
-        this.processStockOwnerShipItem(item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
-        this.processStockBinItem(item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
+        List<WmsInboundItemFlowDO> inboundItemFlowList=this.processInboundItem(outboundRespVO,item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
+        this.processStockLogicItem(item, companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
+        this.processStockBinItem(item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId,inboundItemFlowList);
         // 当前逻辑,默认全部入库
         return WmsOutboundStatus.ALL;
     }
@@ -170,54 +196,50 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
 
 
     /**
-     * 处理所有者库存
+     * 处理逻辑库存
      **/
-    private void processStockOwnerShipItem(WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
+    private void processStockLogicItem(WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
 
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
         // 查询库存记录
-        WmsStockOwnershipDO stockOwnershipDO = stockOwnershipService.getByUkProductOwner(warehouseId, companyId, deptId, productId, false);
+        WmsStockLogicDO stockLogicDO = stockLogicService.getByUkProductOwner(warehouseId, companyId, deptId, productId, false);
         WmsStockFlowDirection wmsStockFlowDirection = null;
         // 如果不存在抛出异常
-        if (stockOwnershipDO == null) {
-            throw exception(STOCK_OWNERSHIP_NOT_EXISTS);
+        if (stockLogicDO == null) {
+            throw exception(STOCK_LOGIC_NOT_EXISTS);
         } else { // 如果存在就修改
-            wmsStockFlowDirection = this.updateStockOwnershipQty(stockOwnershipDO, item, quantity);
+            wmsStockFlowDirection = this.updateStockLogicQty(stockLogicDO, item, quantity);
         }
         // 保存
-        stockOwnershipService.insertOrUpdate(stockOwnershipDO);
+        stockLogicService.insertOrUpdate(stockLogicDO);
         // 记录流水
-        stockFlowService.createForStockOwnership(this.getReason(),wmsStockFlowDirection, productId, stockOwnershipDO,quantity, outboundId, outboundItemId);
+        stockFlowService.createForStockLogic(this.getReason(), wmsStockFlowDirection, productId, stockLogicDO, quantity, outboundId, outboundItemId);
     }
 
 
     /**
      * 处理仓位库存
      **/
-    private void processStockBinItem(WmsOutboundItemRespVO item,Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
+    private void processStockBinItem(WmsOutboundItemRespVO item,Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId,List<WmsInboundItemFlowDO> inboundItemFlowList) {
         // 调整仓位库存
         JdbcUtils.requireTransaction();
 
-//        // 指定了库存批次
-//        if(item.getInboundItemId()!=null) {
-//            // 获得库存批次对应的有货的仓位
-//            updateMultiStockBinQty(warehouseId, productId, item, quantity);
-//
-//        } else { // 未指定库存批次，但指定了库存仓位
-            WmsStockBinDO stockBinDO = stockBinService.getStockBin(binId, productId, false);
-            WmsStockFlowDirection wmsStockFlowDirection = null;
-            // 如果不存在抛出异常
-            if (stockBinDO == null) {
-                throw exception(STOCK_BIN_NOT_EXISTS);
-            } else {
-                wmsStockFlowDirection = this.updateSingleStockBinQty(stockBinDO, item, quantity);
-            }
-            // 保存
-            stockBinService.insertOrUpdate(stockBinDO);
-            // 记录流水
-            stockFlowService.createForStockBin(this.getReason(), wmsStockFlowDirection, productId, stockBinDO, quantity, outboundId, outboundItemId);
-//        }
+        WmsStockBinDO stockBinDO = stockBinService.getStockBin(binId, productId, false);
+        WmsStockFlowDirection wmsStockFlowDirection = null;
+        // 如果不存在抛出异常
+        if (stockBinDO == null) {
+            throw exception(STOCK_BIN_NOT_EXISTS);
+        } else {
+            wmsStockFlowDirection = this.updateSingleStockBinQty(stockBinDO, item, quantity);
+        }
+        // 保存
+        stockBinService.insertOrUpdate(stockBinDO);
+        // 记录流水
+        for (WmsInboundItemFlowDO flowDO : inboundItemFlowList) {
+            stockFlowService.createForStockBin(this.getReason(), wmsStockFlowDirection, productId, stockBinDO, flowDO.getOutboundAvailableDeltaQty(), outboundId, outboundItemId,flowDO.getId());
+        }
+
     }
 
 

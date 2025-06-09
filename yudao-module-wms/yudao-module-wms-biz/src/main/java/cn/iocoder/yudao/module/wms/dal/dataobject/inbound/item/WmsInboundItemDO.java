@@ -1,13 +1,15 @@
 package cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item;
 
-import lombok.*;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
 
 /**
  * 入库单详情 DO
  * @author 李方捷
- * @table-fields : outbound_available_qty,inbound_status,company_id,plan_qty,shelved_qty,upstream_item_id,remark,latest_flow_id,inbound_id,actual_qty,product_id,id,dept_id
+ * @table-fields : outbound_available_qty,inbound_status,company_id,plan_qty,shelve_closed_qty,upstream_id,remark,inbound_dept_id,latest_flow_id,inbound_id,inbound_company_id,actual_qty,product_id,id,dept_id
  */
 @TableName("wms_inbound_item")
 // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -32,12 +34,12 @@ public class WmsInboundItemDO extends BaseDO {
     private Long inboundId;
 
     /**
-     * 标准产品ID
+     * 产品ID
      */
     private Long productId;
 
     /**
-     * 入库状态 ; InboundStatus : 0-未入库 , 1-部分入库 , 2-已入库
+     * 入库状态 : 0-未入库 , 1-部分入库 , 2-已入库
      */
     private Integer inboundStatus;
 
@@ -57,9 +59,9 @@ public class WmsInboundItemDO extends BaseDO {
     private Integer planQty;
 
     /**
-     * 已上架量，已经拣货到仓位的库存量
+     * 已上架量
      */
-    private Integer shelvedQty;
+    private Integer shelveClosedQty;
 
     /**
      * 最新的流水ID
@@ -82,7 +84,8 @@ public class WmsInboundItemDO extends BaseDO {
     private String remark;
 
     /**
-     * 来源详情ID
+     * 来源明细行ID
      */
-    private Long upstreamItemId;
+    private Long upstreamId;
+
 }

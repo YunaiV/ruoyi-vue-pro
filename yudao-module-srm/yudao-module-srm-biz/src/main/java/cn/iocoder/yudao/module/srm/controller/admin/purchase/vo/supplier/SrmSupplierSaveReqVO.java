@@ -16,60 +16,60 @@ import java.math.BigDecimal;
 @Data
 public class SrmSupplierSaveReqVO {
 
-    @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "17791")
+    @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long id;
 
-    @Schema(description = "供应商名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋道源码")
+    @Schema(description = "供应商名称", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "供应商名称不能为空")
     private String name;
 
-    @Schema(description = "联系人", example = "芋艿")
+    @Schema(description = "联系人")
     private String contact;
 
-    @Schema(description = "手机号码", example = "15601691300")
+    @Schema(description = "手机号码")
     @Length(max = 30, message = "手机号码长度不能超过 30 个字符")
     private String mobile;
 
-    @Schema(description = "联系电话", example = "18818288888")
+    @Schema(description = "联系电话")
     @Length(max = 30, message = "联系电话长度不能超过 30 个字符")
     private String telephone;
 
-    @Schema(description = "电子邮箱", example = "76853@qq.com")
+    @Schema(description = "电子邮箱")
     @Email
     private String email;
 
-    @Schema(description = "传真", example = "20 7123 4567")
+    @Schema(description = "传真")
     private String fax;
 
-    @Schema(description = "备注", example = "你猜")
+    @Schema(description = "备注")
     private String remark;
 
-    @Schema(description = "开启状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "开启状态", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "开启状态不能为空")
     @InEnum(value = CommonStatusEnum.class)
-    private Integer status;
+    private Integer openStatus;
 
-    @Schema(description = "排序", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
+    @Schema(description = "排序", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer sort;
 
-    @Schema(description = "纳税人识别号", example = "91130803MA098BY05W")
+    @Schema(description = "纳税人识别号")
     private String taxNo;
 
-    @Schema(description = "税率", example = "10")
-    private BigDecimal taxPercent;
+    @Schema(description = "税率")
+    private BigDecimal taxRate;
 
-    @Schema(description = "开户行", example = "张三")
+    @Schema(description = "开户行")
     private String bankName;
 
-    @Schema(description = "开户账号", example = "622908212277228617")
+    @Schema(description = "开户账号")
     private String bankAccount;
 
-    @Schema(description = "开户地址", example = "兴业银行浦东支行")
+    @Schema(description = "开户地址")
     private String bankAddress;
 
-    @Schema(description = "付款条款")
-    @NotBlank(message = "付款条款不能为空")
-    private String paymentTerms;
+    @Schema(description = "付款条款ID")
+    @NotNull(message = "付款条款ID不能为空")
+    private Long paymentTermsId;
 
     @Schema(description = "送达地址")
     @NotBlank(message = "送达地址不能为空")

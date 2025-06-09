@@ -128,7 +128,7 @@ public class OmsOrderController {
 
                     return Stream.of(item.setProductId(product.getId())
                         .setProductName(product.getName())
-                        .setProductBarCode(product.getBarCode())
+                        .setProductBarCode(product.getCode())
                         .setProductUnitName(product.getUnitName()));
                 }).toList();
                 order.setItems(items);

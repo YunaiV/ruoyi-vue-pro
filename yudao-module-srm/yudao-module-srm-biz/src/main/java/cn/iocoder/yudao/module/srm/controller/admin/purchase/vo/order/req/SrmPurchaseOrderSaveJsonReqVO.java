@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.order.req;
 
+import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -14,37 +15,44 @@ public class SrmPurchaseOrderSaveJsonReqVO {
 
     @Schema(description = "id")
     @NotNull(message = "修改json属性时，订单id不能为null")
+    @DiffLogField(name = "订单编号")
     private Long id;
 
     @Schema(description = "订单清单列表")
     @NotNull(message = "订单项不能为空")
     @Size(min = 1, message = "商品信息至少一个")
+    @DiffLogField(name = "订单清单列表")
     private List<@Valid Item> items;
 
     @Schema(description = "版本号")
-    private Long version;
+    private Integer version;
 
     @Data
     public static class Item {
 
         @Schema(description = "订单项编号")
         @NotNull(message = "修改json属性时订单项id不能为空")
+        @DiffLogField(name = "订单项编号")
         private Long id;
 
         @Schema(description = "验货单json")
+        @DiffLogField(name = "验货单")
         private String inspectionJson;
 
         @Schema(description = "总验货通过数量")
+        @DiffLogField(name = "总验货通过数量")
         private Integer totalInspectionPassCount;
 
         @Schema(description = "完工单json")
+        @DiffLogField(name = "完工单")
         private String completionJson;
 
         @Schema(description = "总完工单通过数量")
+        @DiffLogField(name = "总完工单通过数量")
         private Integer totalCompletionPassCount;
 
         @Schema(description = "版本号")
-        private Long version;
+        private Integer version;
     }
 
 }

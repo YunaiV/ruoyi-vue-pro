@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
 import org.apache.ibatis.annotations.Mapper;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,16 +44,19 @@ public interface WmsInboundItemMapper extends BaseMapperX<WmsInboundItemDO> {
 
     default List<WmsInboundItemDO> selectItemListHasAvailableQty(Long warehouseId, Long productId) {
         MPJLambdaWrapperX<WmsInboundItemDO> query = new MPJLambdaWrapperX<>();
-        query.select(WmsInboundItemDO::getId, WmsInboundItemDO::getInboundId, WmsInboundItemDO::getProductId, WmsInboundItemDO::getOutboundAvailableQty);
+//        query.select(WmsInboundItemDO::getId, WmsInboundItemDO::getInboundId, WmsInboundItemDO::getProductId);
+        query.selectAll(WmsInboundItemDO.class);
         query.innerJoin(WmsInboundDO.class, WmsInboundDO::getId, WmsInboundItemDO::getInboundId);
         query.in(WmsInboundDO::getInboundStatus, Arrays.asList(WmsInboundStatus.ALL.getValue(), WmsInboundStatus.PART.getValue()));
-        query.eq(WmsInboundDO::getWarehouseId, warehouseId).eq(WmsInboundItemDO::getProductId, productId).gt(WmsInboundItemDO::getOutboundAvailableQty, 0).last("ORDER BY DATEDIFF(t1.inbound_time, now())+t1.init_age desc");
+        query.eq(WmsInboundDO::getWarehouseId, warehouseId).eq(WmsInboundItemDO::getProductId, productId).last("ORDER BY DATEDIFF(t1.inbound_time, now())+t1.init_age desc");
+        query.selectAll(WmsInboundItemDO.class);
         return selectList(query);
     }
-    // default PageResult<WmsInboundItemOwnershipDO> selectInboundItemOwnershipList(Long productId) {
+
+    // default PageResult<WmsInboundItemLogicDO> selectInboundItemLogicList(Long productId) {
     // 
     // 
-    // MPJLambdaWrapperX<WmsInboundItemOwnershipDO> wrapper = new MPJLambdaWrapperX();
+    // MPJLambdaWrapperX<WmsInboundItemLogicDO> wrapper = new MPJLambdaWrapperX();
     // //
     // wrapper.selectAll(WmsInboundItemDO.class);
     // wrapper.select(WmsInboundDO::getWarehouseId);
@@ -64,13 +68,19 @@ public interface WmsInboundItemMapper extends BaseMapperX<WmsInboundItemDO> {
     // 
     // 
     // 
-    // PageResult<WmsInboundItemOwnershipDO> pageResult =selectPage(new PageParam(),wrapper);
+    // PageResult<WmsInboundItemLogicDO> pageResult =selectPage(new PageParam(),wrapper);
     // 
-    // List<WmsInboundItemOwnershipDO> list= selectList(wrapper);
+    // List<WmsInboundItemLogicDO> list= selectList(wrapper);
     // 
     // return selectPage(new PageParam(), wrapper);
     // 
     // 
     // 
     // }
-}
+    /**
+     * 按 inbound_id,product_id 查询 WmsInboundItemDO 清单
+     */
+    default List<WmsInboundItemDO> selectByInboundIdAndProductId(Long inboundId, Long productId) {
+        return selectList(new LambdaQueryWrapperX<WmsInboundItemDO>().eq(WmsInboundItemDO::getInboundId, inboundId).eq(WmsInboundItemDO::getProductId, productId));
+    }
+}

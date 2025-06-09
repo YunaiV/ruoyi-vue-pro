@@ -11,4 +11,9 @@ public interface TmsRedisKeyConstants {
      * TmsCustomProductService 服务的缓存集合+分页+list
      */
     String TMS_CUSTOM_PRODUCT_LIST = "tms:custom_product_service:list:";
+
+    /**
+     * 序号
+     */
+    String NO = "tms:seq_no:";
 }

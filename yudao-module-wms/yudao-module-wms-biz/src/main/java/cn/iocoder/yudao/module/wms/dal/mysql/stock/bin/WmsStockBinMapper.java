@@ -36,7 +36,7 @@ public interface WmsStockBinMapper extends BaseMapperX<WmsStockBinDO> {
         MPJLambdaWrapperX<WmsStockBinDO> wrapper = new MPJLambdaWrapperX();
         // 连接产品视图
         wrapper.innerJoin(WmsProductDO.class, WmsProductDO::getId, WmsStockBinDO::getProductId)
-            .likeIfExists(WmsProductDO::getBarCode, reqVO.getProductCode())
+            .likeIfExists(WmsProductDO::getCode, reqVO.getProductCode())
             .eqIfExists(WmsProductDO::getDeptId, reqVO.getProductDeptId());
 
         if(reqVO.getZoneId()!=null) {
@@ -54,6 +54,8 @@ public interface WmsStockBinMapper extends BaseMapperX<WmsStockBinDO> {
         wrapper.betweenIfPresent(WmsStockBinDO::getAvailableQty,reqVO.getAvailableQty());
         wrapper.betweenIfPresent(WmsStockBinDO::getOutboundPendingQty,reqVO.getOutboundPendingQty());
         wrapper.betweenIfPresent(WmsStockBinDO::getSellableQty,reqVO.getSellableQty());
+        //筛除可用数量为0的数据
+        wrapper.ne(WmsStockBinDO::getAvailableQty,0);
 
         return selectPage(reqVO, wrapper);
 
@@ -64,6 +66,25 @@ public interface WmsStockBinMapper extends BaseMapperX<WmsStockBinDO> {
      */
     default List<WmsStockBinDO> selectByWarehouseId(Long warehouseId) {
         return selectList(new LambdaQueryWrapperX<WmsStockBinDO>().eq(WmsStockBinDO::getWarehouseId, warehouseId));
+    }
+
+    /**
+     * 按 product_id 查询 WmsStockBinDO 清单
+     */
+    default WmsStockBinDO selectByProductId(Long productId, int planQty, Long warehouseId) {
+        MPJLambdaWrapperX<WmsStockBinDO> wrapper = new MPJLambdaWrapperX();
+        wrapper.eq(WmsStockBinDO::getProductId, productId)
+               .eqIfPresent(WmsStockBinDO::getWarehouseId, warehouseId)
+               .ge(WmsStockBinDO::getSellableQty, planQty)
+               .leftJoin(WmsWarehouseBinDO.class, on -> on
+                       .eq(WmsWarehouseBinDO::getId, WmsStockBinDO::getBinId)
+                       .eq(WmsWarehouseBinDO::getWarehouseId, WmsStockBinDO::getWarehouseId))
+                .selectAll(WmsStockBinDO.class)
+                .select(WmsWarehouseBinDO::getPickingOrder)
+                .orderByAsc(WmsWarehouseBinDO::getPickingOrder)
+                .orderByDesc(WmsStockBinDO::getUpdateTime)
+                .last("limit 1");
+        return selectOne(wrapper);
     }
 
     /**

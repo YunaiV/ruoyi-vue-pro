@@ -1,10 +1,16 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.flow.vo;
 
+import cn.iocoder.yudao.module.wms.controller.admin.company.FmsCompanySimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.flow.vo.WmsInboundItemFlowSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.pickup.vo.WmsPickupSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMoveRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.logic.move.vo.WmsStockLogicMoveRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehouseSimpleVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stockcheck.vo.WmsStockCheckRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
@@ -19,7 +25,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,reason,outbound_pending_qty,delta_qty,updater,update_time,product_id,shelving_pending_qty,id,reason_bill_id,defective_qty,purchase_plan_qty,direction,creator,create_time,flow_time,next_flow_id,available_qty,purchase_transit_qty,stock_id,stock_type,return_transit_qty,sellable_qty,warehouse_id,reason_item_id,prev_flow_id
+ * @table-fields : tenant_id,reason,outbound_pending_qty,delta_qty,make_pending_qty,updater,update_time,product_id,shelving_pending_qty,id,reason_bill_id,defective_qty,direction,creator,create_time,flow_time,transit_qty,available_qty,next_flow_id,stock_id,stock_type,inbound_item_flow_id,return_transit_qty,sellable_qty,prev_flow_id,reason_item_id,warehouse_id
  */
 @Schema(description = "管理后台 - 库存流水 Response VO")
 @Data
@@ -30,8 +36,8 @@ public class WmsStockFlowRespVO {
     @ExcelProperty("主键")
     private Long id;
 
-    @Schema(description = "库存类型 ; WmsStockType : 1-仓库库存 , 2-仓位库存 , 3-所有者库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @ExcelProperty("库存类型")
+    @Schema(description = "WMS库存类型 ; WmsStockType : 1-仓库库存 , 2-仓位库存 , 3-逻辑库存", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @ExcelProperty("WMS库存类型")
     private Integer stockType;
 
     @Schema(description = "库存ID，分别指向三张库存表的ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "17743")
@@ -44,8 +50,8 @@ public class WmsStockFlowRespVO {
     @Schema(description = "库位", example = "")
     private WmsWarehouseBinRespVO bin;
 
-    @Schema(description = "流水发生的原因 ; WmsStockReason : 1-入库 , 2-拣货 , 3-出库 , 4-提交出库单 , 5-拒绝出库单", requiredMode = Schema.RequiredMode.REQUIRED, example = "不香")
-    @ExcelProperty("流水发生的原因")
+    @Schema(description = "WMS流水发生的原因 ; WmsStockReason : 1-入库 , 2-拣货 , 3-出库 , 4-提交出库单 , 5-拒绝出库单 , 6-库位库存移动 , 7-逻辑库存移动 , 8-盘赢 , 9-盘亏", requiredMode = Schema.RequiredMode.REQUIRED, example = "不香")
+    @ExcelProperty("WMS流水发生的原因")
     private Integer reason;
 
     @Schema(description = "流水触发的单据ID", example = "21958")
@@ -116,14 +122,6 @@ public class WmsStockFlowRespVO {
     @ExcelProperty("待出库量")
     private Integer outboundPendingQty;
 
-    @Schema(description = "采购计划量", example = "")
-    @ExcelProperty("采购计划量")
-    private Integer purchasePlanQty;
-
-    @Schema(description = "采购在途量", example = "")
-    @ExcelProperty("采购在途量")
-    private Integer purchaseTransitQty;
-
     @Schema(description = "退件在途数量", example = "")
     @ExcelProperty("退件在途数量")
     private Integer returnTransitQty;
@@ -136,8 +134,8 @@ public class WmsStockFlowRespVO {
     @ExcelProperty("待上架数量")
     private Integer shelvingPendingQty;
 
-    @Schema(description = "库存流水方向 ; WmsStockFlowDirection : -1-流出 , 1-流入", example = "")
-    @ExcelProperty("库存流水方向")
+    @Schema(description = "WMS库存流水方向 ; WmsStockFlowDirection : -1-流出 , 1-流入", example = "")
+    @ExcelProperty("WMS库存流水方向")
     private Integer direction;
 
     @Schema(description = "入库单", example = "")
@@ -149,6 +147,15 @@ public class WmsStockFlowRespVO {
     @Schema(description = "拣货单", example = "")
     private WmsPickupSimpleRespVO pickup;
 
+    @Schema(description = "盘点单", example = "")
+    private WmsStockCheckRespVO stockCheck;
+
+    @Schema(description = "仓位库存移动单", example = "")
+    private WmsStockBinMoveRespVO stockBinMove;
+
+    @Schema(description = "仓位库存移动单", example = "")
+    private WmsStockLogicMoveRespVO stockLogicMove;
+
     @Schema(description = "部门", example = "")
     private DeptSimpleRespVO dept;
 
@@ -159,4 +166,32 @@ public class WmsStockFlowRespVO {
     @Schema(description = "更新人姓名", example = "李四")
     @ExcelProperty("更新人姓名")
     private String updaterName;
+
+    @Schema(description = "当前仓库库存", example = "{}")
+    @ExcelProperty("当前仓库库存")
+    private WmsStockWarehouseSimpleVO stockWarehouse;
+
+    @Schema(description = "批次库存流水ID", example = "")
+    @ExcelProperty("批次库存流水ID")
+    private Long inboundItemFlowId;
+
+    @Schema(description = "批次库存流水", example = "")
+    @ExcelProperty("批次库存流水")
+    private WmsInboundItemFlowSimpleVO inboundItemFlow;
+
+    @Schema(description = "在制数量", example = "")
+    @ExcelProperty("在制数量")
+    private Integer makePendingQty;
+
+    @Schema(description = "在途量", example = "")
+    @ExcelProperty("在途量")
+    private Integer transitQty;
+
+    @Schema(description = "公司", example = "")
+    @ExcelProperty("公司")
+    private FmsCompanySimpleRespVO company;
+
+
+
+
 }

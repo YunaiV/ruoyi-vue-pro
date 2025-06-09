@@ -7,9 +7,7 @@ import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
 import org.springframework.stereotype.Component;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_AUDIT_ERROR;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_AUDIT_FAIL;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_STATUS_PARSE_ERROR;
+import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.*;
 
 /**
  * @author: LeeFJ
@@ -30,7 +28,7 @@ public class InboundTransitionFailCallback implements FailCallback<Integer, WmsI
             throw exception(INBOUND_STATUS_PARSE_ERROR);
         }
         if(to==null) {
-            throw exception(INBOUND_AUDIT_ERROR);
+            throw exception(INBOUND_AUDIT_ERROR,currStatus.getLabel());
         }
         WmsInboundAuditStatus toStatus = WmsInboundAuditStatus.parse(to);
         if (toStatus == null) {

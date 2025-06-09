@@ -18,7 +18,7 @@ public class ErpProductSimpleRespDTO {
     /**
      * SKU (编码)
      * */
-    private String barCode;
+    private String code;
 
     /**
      * 产品分类编号

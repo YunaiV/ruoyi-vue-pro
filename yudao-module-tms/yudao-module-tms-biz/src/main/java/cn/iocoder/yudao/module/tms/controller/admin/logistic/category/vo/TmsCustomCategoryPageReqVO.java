@@ -29,4 +29,10 @@ public class TmsCustomCategoryPageReqVO extends PageParam {
 
     @Schema(description = "英文品名")
     private String declaredTypeEn;
+
+    @Schema(description = "用途描述")
+    private String customsPurpose;
+
+    @Schema(description = "报关材质描述")
+    private String customsMaterial;
 }

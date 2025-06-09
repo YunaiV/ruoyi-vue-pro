@@ -3,21 +3,8 @@ package cn.iocoder.yudao.framework.common.util.collection;
 
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
+import java.util.*;
+import java.util.function.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -62,8 +49,6 @@ public class StreamX<T> {
     private Iterable<T> iterable = null;
 
     private Stream<T> stream = null;
-
-
 
 
     private Stream<T> stream() {
@@ -758,57 +743,86 @@ public class StreamX<T> {
 
 
     /**
-     * 将当前Map中的元素，按照指定的key，设置到对应元素的属性中
-     * @param propertyValueMap 以 keyGetter 方法对应的属性值为 key 的属性值对象 Map
-     * @param keyPropertyGetter 获取当前元素属性值的方法，以此属性值为 key，从 propertyValueMap 中获取对应的属性值
-     * @param propertySetter 设置当前元素属性值的方法，将 beanMap 中获取到的属性值设置到当前元素属性中
-     * @return 当前对象
-     **/
-    public <K, M> StreamX<T> assemble(Map<K,M> propertyValueMap, Function<T,K> keyPropertyGetter, BiConsumer<T,M> propertySetter) {
-        this.forEach(t->{
-            if(t==null) {
-                return;
-            }
-            K key = keyPropertyGetter.apply(t);
-            M value = propertyValueMap.get(key);
-            propertySetter.accept(t,value);
-        });
-        return this;
-    }
-
-    /**
-     * 将当前 valueList 中的元素，按照指定的 key，设置到对应元素的属性中
-     * @param valueList 以 keyPropertyGetter4List 方法对应的属性值为 key 的属性值对象 Map
-     * @param keyPropertyGetter4List 用此方法获取当前元素属性值，以此属性值为 key，产生中间 Map
-     * @param keyPropertyGetter 获取当前元素属性值的方法，以此属性值为 key，从中间 Map 中获取对应的属性值
-     * @param propertySetter 设置当前元素属性值的方法，将中间 Map 中获取到的属性值设置到当前元素属性中
-     * @return 当前对象
-     **/
-    public <K, M> StreamX<T> assemble(Collection<M> valueList, Function<M,K> keyPropertyGetter4List,Function<T,K> keyPropertyGetter, BiConsumer<T,M> propertySetter) {
-        Map<K,M> propertyValueMap=StreamX.from(valueList).toMap(keyPropertyGetter4List,t->t);
-        return this.assemble(propertyValueMap,keyPropertyGetter,propertySetter);
-    }
-
-    /**
      * Same as Stream::iterate but will include the first element where hasNext evaluate to false
      *
-     * @param <T>          The type of the element.
+     * @param <T>     The type of the element.
      * @param seed    the initial element
-     * @param hasNext   a predicate to apply to elements to determine when the last element is reached
-     * @param next  a function to be applied to the previous element to produce a new element
+     * @param hasNext a predicate to apply to elements to determine when the last element is reached
+     * @param next    a function to be applied to the previous element to produce a new element
      * @return a new sequential Stream
      */
     public static <T> Stream<T> iterate(T seed, Predicate<? super T> hasNext, UnaryOperator<T> next) {
         return StreamSupport.stream(new PaginationSpliterator<>(seed, hasNext, next), false);
     }
 
+    public static <B, I> CompareResult<B> compare(Collection<B> baseCollection, Collection<B> targetCollection, Function<B, I> key) {
+
+        Map<I, B> baseMap = StreamX.from(baseCollection).toMap(key, t -> t);
+        Map<I, B> targetMap = StreamX.from(targetCollection).toMap(key, t -> t);
+
+        CompareResult result = new CompareResult();
+
+        StreamX.from(targetCollection).filter(Objects::nonNull).forEach(item -> {
+            if (!baseMap.keySet().contains(key.apply(item))) {
+                result.addTargetMoreThanBase(item);
+            }
+            if (baseMap.keySet().contains(key.apply(item))) {
+                result.addIntersection(item);
+            }
+        });
+        baseCollection.forEach(item -> {
+            if (!targetMap.keySet().contains(key.apply(item))) {
+                result.addBaseMoreThanTarget(item);
+            }
+        });
+        return result;
+    }
+
+    public static <B, V> boolean isRepeated(Collection<B> collection, Function<B, V> value) {
+        Set<V> set = StreamX.from(collection).toSet(value);
+        return set.size() != collection.size();
+    }
+
+    /**
+     * 将当前Map中的元素，按照指定的key，设置到对应元素的属性中
+     *
+     * @param propertyValueMap  以 keyGetter 方法对应的属性值为 key 的属性值对象 Map
+     * @param keyPropertyGetter 获取当前元素属性值的方法，以此属性值为 key，从 propertyValueMap 中获取对应的属性值
+     * @param propertySetter    设置当前元素属性值的方法，将 beanMap 中获取到的属性值设置到当前元素属性中
+     * @return 当前对象
+     **/
+    public <K, M> StreamX<T> assemble(Map<K, M> propertyValueMap, Function<T, K> keyPropertyGetter, BiConsumer<T, M> propertySetter) {
+        this.forEach(t -> {
+            if (t == null) {
+                return;
+            }
+            K key = keyPropertyGetter.apply(t);
+            M value = propertyValueMap.get(key);
+            propertySetter.accept(t, value);
+        });
+        return this;
+    }
+
+    /**
+     * 将当前 valueList 中的元素，按照指定的 key，设置到对应元素的属性中
+     *
+     * @param valueList              以 keyPropertyGetter4List 方法对应的属性值为 key 的属性值对象 Map
+     * @param keyPropertyGetter4List 用此方法获取当前元素属性值，以此属性值为 key，产生中间 Map
+     * @param keyPropertyGetter      获取当前元素属性值的方法，以此属性值为 key，从中间 Map 中获取对应的属性值
+     * @param propertySetter         设置当前元素属性值的方法，将中间 Map 中获取到的属性值设置到当前元素属性中
+     * @return 当前对象
+     **/
+    public <K, M> StreamX<T> assemble(Collection<M> valueList, Function<M, K> keyPropertyGetter4List, Function<T, K> keyPropertyGetter, BiConsumer<T, M> propertySetter) {
+        Map<K, M> propertyValueMap = StreamX.from(valueList).toMap(keyPropertyGetter4List, t -> t);
+        return this.assemble(propertyValueMap, keyPropertyGetter, propertySetter);
+    }
 
     @Getter
     public static class CompareResult<B> {
 
-        private List<B> intersectionList= new ArrayList<>();
-        private List<B> baseMoreThanTargetList= new ArrayList<>();
-        private List<B> targetMoreThanBaseList= new ArrayList<>();
+        private List<B> intersectionList = new ArrayList<>();
+        private List<B> baseMoreThanTargetList = new ArrayList<>();
+        private List<B> targetMoreThanBaseList = new ArrayList<>();
 
         void addIntersection(B bean) {
             this.intersectionList.add(bean);
@@ -823,40 +837,9 @@ public class StreamX<T> {
         }
 
 
-
-    }
-
-    public static <B,I> CompareResult<B> compare(Collection<B> baseCollection, Collection<B> targetCollection, Function<B,I> key) {
-
-        Map<I,B> baseMap=StreamX.from(baseCollection).toMap(key,t->t);
-        Map<I,B> targetMap=StreamX.from(targetCollection).toMap(key,t->t);
-
-        CompareResult result = new CompareResult();
-
-        StreamX.from(targetCollection).filter(Objects::nonNull).forEach(item -> {
-            if(!baseMap.keySet().contains(key.apply(item))) {
-                result.addTargetMoreThanBase(item);
-            }
-            if(baseMap.keySet().contains(key.apply(item))) {
-                result.addIntersection(item);
-            }
-        });
-        baseCollection.forEach(item -> {
-            if(!targetMap.keySet().contains(key.apply(item))) {
-                result.addBaseMoreThanTarget(item);
-            }
-        });
-        return result;
-    }
-
-    public static <B,V> boolean isRepeated(Collection<B> collection, Function<B,V> value) {
-        Set<V> set=StreamX.from(collection).toSet(value);
-        return set.size()!=collection.size();
     }
 
 }
-
-
 
 
 class PaginationSpliterator<T> implements Spliterator<T> {

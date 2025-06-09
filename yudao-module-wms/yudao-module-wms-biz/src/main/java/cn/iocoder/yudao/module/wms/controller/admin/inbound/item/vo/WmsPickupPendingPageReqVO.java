@@ -5,11 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.time.LocalDateTime;
-
-import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
  * @table-fields : inbound_id,source_item_id,left_quantity,inbound_status,actual_quantity,create_time,product_id,plan_quantity,shelved_quantity
@@ -20,8 +15,31 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class WmsPickupPendingPageReqVO extends PageParam {
 
+    /**
+     * 入库单编号
+     **/
     @Schema(description = "入库单编号", example = "29327")
-    private String inboundNo;
+    private String inboundCode;
+
+    /**
+     * 入库状态
+     **/
+    @Schema(description = "入库状态", example = "0/1")
+    private String inboundStatus;
+
+
+    /**
+     * 仓库ID
+     **/
+    @Schema(description = "仓库ID", example = "32")
+    private Long warehouseId;
+
+
+    /**
+     * 产品ID
+     **/
+    @Schema(description = "产品ID", example = "29327")
+    private Long productId;
 
 
 }

@@ -24,4 +24,13 @@ public interface TmsCustomProductMapper extends BaseMapperX<TmsCustomProductDO> 
             .orderByDesc(TmsCustomProductDO::getId));
     }
 
+    /**
+     * 获取指定产品ID的 CustomProductDO
+     *
+     * @param productId 产品ID
+     * @return CustomProductDO
+     */
+    default TmsCustomProductDO getCustomProductByProductId(Long productId) {
+        return selectOne(TmsCustomProductDO::getProductId, productId);
+    }
 }

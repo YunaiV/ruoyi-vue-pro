@@ -1,14 +1,12 @@
 package cn.iocoder.yudao.module.srm.service.purchase;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.SrmPurchaseRequestAuditReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.SrmPurchaseRequestItemsSaveReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.SrmPurchaseRequestMergeReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.SrmPurchaseRequestPageReqVO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.SrmPurchaseRequestSaveReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.*;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestItemsDO;
+import cn.iocoder.yudao.module.srm.service.purchase.bo.request.SrmPurchaseRequestBO;
 import jakarta.validation.Valid;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -50,13 +48,18 @@ public interface SrmPurchaseRequestService {
     SrmPurchaseRequestDO getPurchaseRequest(Long id);
 
     /**
-     * 获得ERP采购申请单分页
-     *
-     * @param pageReqVO 分页查询
-     * @return ERP采购申请单分页
+     * 获得ERP采购申请单
+     * @param id 主表ID
+     * @return SrmPurchaseRequestBO
      */
-    PageResult<SrmPurchaseRequestDO> getPurchaseRequestPage(SrmPurchaseRequestPageReqVO pageReqVO);
-
+    SrmPurchaseRequestBO getPurchaseRequestBO(Long id);
+    /**
+     * 获得采购申请单项分页
+     *
+     * @param pageReqVO 分页查询对象
+     * @return 一主 + 多从DO
+     */
+    PageResult<SrmPurchaseRequestBO> getPurchaseRequestItemBOPage(SrmPurchaseRequestPageReqVO pageReqVO);
     /**
      * 获得采购申请单单项列表
      *
@@ -64,25 +67,6 @@ public interface SrmPurchaseRequestService {
      * @return 采购申请单项列表
      */
     List<SrmPurchaseRequestItemsDO> getPurchaseRequestItemListByOrderId(Long requestId);
-
-    //    /**
-    //     * 更新采购申请单状态
-    //     * 该方法用于更新指定采购申请单的状态信息，包括审核状态、订单状态和下架状态。
-    //     * @param id 采购申请单的唯一标识符
-    //     * @param auditStatus 审核状态，用于表示采购申请单的审核情况
-    //     * @param orderStatus 订单状态，用于表示采购申请单的订单处理情况
-    //     * @param offStatus 下架状态，用于表示采购申请单是否被下架
-    //     */
-    //    void updatePurchaseRequestStatus(Long id, Integer auditStatus, Integer orderStatus, Integer offStatus);
-
-    //    /**
-    //     * 更新采购申请单子项状态(审核状态+关闭状态)
-    //     *
-    //     * @param itemIds     子表id
-    //     * @param orderStatus 采购状态
-    //     * @param offStatus   关闭状态
-    //     */
-    //    void updateItemStatus(List<Long> itemIds, Integer orderStatus, Integer offStatus);
 
     /**
      * 获得采购订单项 List
@@ -129,20 +113,12 @@ public interface SrmPurchaseRequestService {
     SrmPurchaseRequestItemsDO validItemIdExist(Long id);
 
     /**
-     * 校验采购订单的子项目是否合法
+     * 校验采购订单的子项目是否存在
      *
      * @param itemIds 采购订单子项目id集合
      * @return SrmPurchaseRequestItemsDO集合
      */
     List<SrmPurchaseRequestItemsDO> validItemIdsExist(Collection<Long> itemIds);
-
-    /**
-     * 校验采购订单的子项目是否合法
-     *
-     * @param ids 采购订单子项目id集合
-     * @return SrmPurchaseRequestItemsDO
-     */
-    List<SrmPurchaseRequestItemsDO> validatePurchaseRequestItems(Collection<Long> ids);
 
     /**
      * 校验采购订单的子项目是否合法

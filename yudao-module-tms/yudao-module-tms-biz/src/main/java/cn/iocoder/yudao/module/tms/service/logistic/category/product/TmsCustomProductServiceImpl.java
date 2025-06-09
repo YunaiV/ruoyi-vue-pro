@@ -10,7 +10,6 @@ import cn.iocoder.yudao.module.tms.controller.admin.logistic.category.product.vo
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.product.TmsCustomProductDO;
 import cn.iocoder.yudao.module.tms.dal.mysql.logistic.category.product.TmsCustomProductMapper;
 import cn.iocoder.yudao.module.tms.service.logistic.category.TmsCustomCategoryService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -28,7 +27,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.CUSTOM_PRODUCT_NOT_EXISTS;
+import static cn.iocoder.yudao.module.tms.enums.TmsErrorCodeConstants.CUSTOM_PRODUCT_EXISTS;
+import static cn.iocoder.yudao.module.tms.enums.TmsErrorCodeConstants.CUSTOM_PRODUCT_NOT_EXISTS;
 import static cn.iocoder.yudao.module.tms.dal.redis.TmsRedisKeyConstants.TMS_CUSTOM_PRODUCT;
 import static cn.iocoder.yudao.module.tms.dal.redis.TmsRedisKeyConstants.TMS_CUSTOM_PRODUCT_LIST;
 
@@ -55,7 +55,8 @@ public class TmsCustomProductServiceImpl implements TmsCustomProductService {
     @Override
     @CacheEvict(value = TMS_CUSTOM_PRODUCT_LIST, allEntries = true)
     public Long createCustomProduct(TmsCustomProductSaveReqVO vo) {
-        //校验存在
+        //校验当前SKU在数据库中是否已经存在
+        validHasProductId(vo.getProductId());
         //产品存在+分类存在
         validData(vo);
         // 插入
@@ -66,6 +67,22 @@ public class TmsCustomProductServiceImpl implements TmsCustomProductService {
         return customProduct.getId();
     }
 
+    /**
+     * 校验产品id是否已经存在
+     *
+     * @param productId productId
+     */
+    private void validHasProductId(Long productId) {
+        if (customProductMapper.getCustomProductByProductId(productId) != null) {
+            throw exception(CUSTOM_PRODUCT_EXISTS);
+        }
+    }
+
+    /**
+     * 校验产品+规则id 是否存在
+     *
+     * @param vo 创建或修改的VO
+     */
     private void validData(TmsCustomProductSaveReqVO vo) {
         erpProductApi.validProductList(Collections.singletonList(vo.getProductId()));
         tmsCustomCategoryService.validCustomRuleCategory(Collections.singletonList(vo.getCustomCategoryId()));
@@ -76,7 +93,11 @@ public class TmsCustomProductServiceImpl implements TmsCustomProductService {
     public TmsCustomProductDO updateCustomProduct(TmsCustomProductSaveReqVO vo) {
         validData(vo);
         // 校验存在
-        validateCustomProductExists(vo.getId());
+        TmsCustomProductDO customProductDO = validateCustomProductExists(vo.getId());
+        // 校验变更的产品id是否存在
+        if (!customProductDO.getProductId().equals(vo.getProductId())) {
+            validHasProductId(vo.getProductId());
+        }
         // 更新
         TmsCustomProductDO updateObj = BeanUtils.toBean(vo, TmsCustomProductDO.class);
         customProductMapper.updateById(updateObj);
@@ -108,10 +129,12 @@ public class TmsCustomProductServiceImpl implements TmsCustomProductService {
         customProductMapper.deleteById(id);
     }
 
-    private void validateCustomProductExists(Long id) {
-        if (customProductMapper.selectById(id) == null) {
+    private TmsCustomProductDO validateCustomProductExists(Long id) {
+        TmsCustomProductDO tmsCustomProductDO = customProductMapper.selectById(id);
+        if (tmsCustomProductDO == null) {
             throw exception(CUSTOM_PRODUCT_NOT_EXISTS);
         }
+        return tmsCustomProductDO;
     }
 
     @Override
@@ -130,8 +153,7 @@ public class TmsCustomProductServiceImpl implements TmsCustomProductService {
     @Override
     public TmsCustomProductDO getCustomProductByProductId(Long productId) {
         //根据产品id查询海关产品分类表
-        TmsCustomProductDO customProduct = customProductMapper.selectOne(new LambdaQueryWrapper<TmsCustomProductDO>().eq(TmsCustomProductDO::getProductId, productId));
-        return customProduct;
+        return customProductMapper.getCustomProductByProductId(productId);
     }
 
     @Override

@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.system.api.user;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserSaveReqDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserSaveReqDTO;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -17,9 +17,10 @@ import java.util.function.Function;
  */
 public interface AdminUserApi {
 
-    public static AdminUserApi inst() {
+    static AdminUserApi inst() {
         return SpringUtils.getBean(AdminUserApi.class);
     }
+
     /**
      * 通过用户 ID 查询用户
      *
@@ -100,39 +101,59 @@ public interface AdminUserApi {
     void validateUserList(Collection<Long> ids);
 
     /**
-    * @Author Wqh
-    * @Description 修改用户
-    * @Date 14:52 2024/11/4
-    * @Param [erpUser]
+     * @Author Wqh
+     * @Description 修改用户
+     * @Date 14:52 2024/11/4
+     * @Param [erpUser]
      **/
     void updateUser(AdminUserSaveReqDTO erpUser);
 
     /**
-    * @Author Wqh
-    * @Description 新增用户
-    * @Date 14:52 2024/11/4
-    * @Param [erpUser]
-    * @return java.lang.Long
-    **/
+     * @return java.lang.Long
+     * @Author Wqh
+     * @Description 新增用户
+     * @Date 14:52 2024/11/4
+     * @Param [erpUser]
+     **/
     Long createUser(AdminUserSaveReqDTO erpUser);
 
+    /**
+     * @return java.lang.Integer
+     * @Author Wqh
+     * @Description 获取以相同用户名开头的用户数量
+     * @Date 14:52 2024/11/4
+     * @Param [username]
+     **/
+    Integer getUsernameIndex(String username);
 
+    /**
+     * 准备数据填充
+     **/
+    default <T> OperatorBuilder<T> prepareFill(Collection<T> list) {
+        return new OperatorBuilder<>(this, list, null);
+    }
 
+    /**
+     * 准备数据填充
+     **/
+    default <T> OperatorBuilder<T> prepareFill(Collection<T> list, Function<AdminUserRespDTO, String> propertyGetter) {
+        return new OperatorBuilder<>(this, list, propertyGetter);
+    }
 
-    public static class OperatorBuilder<T> {
+    class OperatorBuilder<T> {
 
-        private Collection<T> collection;
-        private List<Function<T,?>> getters = new ArrayList<>();
-        private List<BiConsumer<T,String>> setters = new ArrayList<>();
-        private List<Function<AdminUserRespDTO,String>> propertyGetters = new ArrayList<>();
-        private AdminUserApi userApi;
-        private Function<AdminUserRespDTO,String> defaultPropertyGetter;
+        private final Collection<T> collection;
+        private final List<Function<T, ?>> getters = new ArrayList<>();
+        private final List<BiConsumer<T, String>> setters = new ArrayList<>();
+        private final List<Function<AdminUserRespDTO, String>> propertyGetters = new ArrayList<>();
+        private final AdminUserApi userApi;
+        private Function<AdminUserRespDTO, String> defaultPropertyGetter;
 
-        public OperatorBuilder(AdminUserApi userApi,Collection<T> collection,Function<AdminUserRespDTO,String> defaultPropertyGetter) {
+        public OperatorBuilder(AdminUserApi userApi, Collection<T> collection, Function<AdminUserRespDTO, String> defaultPropertyGetter) {
             this.collection = collection;
             this.userApi = userApi;
             this.defaultPropertyGetter = defaultPropertyGetter;
-            if(this.defaultPropertyGetter==null) {
+            if (this.defaultPropertyGetter == null) {
                 this.defaultPropertyGetter = AdminUserRespDTO::getNickname;
             }
         }
@@ -140,14 +161,14 @@ public interface AdminUserApi {
         /**
          * 设置填充关系
          **/
-        public OperatorBuilder<T> mapping(Function<T,?> getter, BiConsumer<T,String> setter) {
-            return this.mapping(getter,setter,null);
+        public OperatorBuilder<T> mapping(Function<T, ?> getter, BiConsumer<T, String> setter) {
+            return this.mapping(getter, setter, null);
         }
 
         /**
          * 设置填充关系
          **/
-        public OperatorBuilder<T> mapping(Function<T,?> getter, BiConsumer<T,String> setter,Function<AdminUserRespDTO,String> propertyGetter) {
+        public OperatorBuilder<T> mapping(Function<T, ?> getter, BiConsumer<T, String> setter, Function<AdminUserRespDTO, String> propertyGetter) {
             this.getters.add(getter);
             this.setters.add(setter);
             propertyGetters.add(propertyGetter);
@@ -159,47 +180,31 @@ public interface AdminUserApi {
          **/
         public void fill() {
 
-            Set<Long> userIds=new HashSet<>();
+            Set<Long> userIds = new HashSet<>();
             for (T t : collection) {
-                for (int i = 0; i < getters.size(); i++) {
-                    Function<T, ?> getter = getters.get(i);
+                for (Function<T, ?> getter : getters) {
                     Object userId = getter.apply(t);
                     userIds.add(NumberUtils.parseLong(userId));
                 }
             }
 
-            Map<Long, AdminUserRespDTO> userMap=userApi.getUserMap(userIds);
+            Map<Long, AdminUserRespDTO> userMap = userApi.getUserMap(userIds);
             for (T t : collection) {
                 for (int i = 0; i < getters.size(); i++) {
-                    Function<T,?> getter = getters.get(i);
-                    BiConsumer<T,String> setter = setters.get(i);
+                    Function<T, ?> getter = getters.get(i);
+                    BiConsumer<T, String> setter = setters.get(i);
                     Long userId = NumberUtils.parseLong(getter.apply(t));
                     AdminUserRespDTO user = userMap.get(userId);
-                    if(user!=null) {
-                        Function<AdminUserRespDTO,String> propertyGetter = propertyGetters.get(i);
-                        if(propertyGetter==null) {
-                            propertyGetter= this.defaultPropertyGetter;
+                    if (user != null) {
+                        Function<AdminUserRespDTO, String> propertyGetter = propertyGetters.get(i);
+                        if (propertyGetter == null) {
+                            propertyGetter = this.defaultPropertyGetter;
                         }
-                        String propValue=propertyGetter.apply(user);
-                        setter.accept(t,propValue);
+                        String propValue = propertyGetter.apply(user);
+                        setter.accept(t, propValue);
                     }
                 }
             }
         }
     }
-
-    /**
-     * 准备数据填充
-     **/
-    default <T> OperatorBuilder<T> prepareFill(Collection<T> list) {
-        return new OperatorBuilder<>(this,list,null);
-    }
-
-    /**
-     * 准备数据填充
-     **/
-    default <T> OperatorBuilder<T> prepareFill(Collection<T> list, Function<AdminUserRespDTO,String> propertyGetter) {
-        return new OperatorBuilder<>(this,list,propertyGetter);
-    }
-
 }

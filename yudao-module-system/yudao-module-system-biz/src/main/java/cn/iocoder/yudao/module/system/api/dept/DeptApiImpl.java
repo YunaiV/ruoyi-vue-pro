@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.api.dept;
 
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptSaveReqDTO;
@@ -51,6 +52,15 @@ public class DeptApiImpl implements DeptApi {
     @Override
     public List<DeptRespDTO> getDeptList(Collection<Long> ids) {
         List<DeptDO> depts = deptService.getDeptList(ids);
+        return deptConvert.toRespDTOs(depts);
+    }
+
+    @Override
+    public List<DeptRespDTO> getDeptListByNames(Collection<String> names) {
+        if(CollectionUtils.isEmpty(names)) {
+            return List.of();
+        }
+        List<DeptDO> depts = deptService.getDeptListByNames(names);
         return deptConvert.toRespDTOs(depts);
     }
 

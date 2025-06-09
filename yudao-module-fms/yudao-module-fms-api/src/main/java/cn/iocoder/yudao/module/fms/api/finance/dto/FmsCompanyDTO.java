@@ -18,6 +18,14 @@ public class FmsCompanyDTO {
      */
     private String name;
     /**
+     * 公司名称（英文）
+     */
+    private String nameEn;
+    /**
+     * 公司简称
+     */
+    private String abbr;
+    /**
      * 联系人
      */
     private String contact;
@@ -45,6 +53,10 @@ public class FmsCompanyDTO {
      * 公司地址
      */
     private String companyAddress;
+    /**
+     * 公司地址（英文）
+     */
+    private String companyAddressEn;
     /**
      * 备注
      */

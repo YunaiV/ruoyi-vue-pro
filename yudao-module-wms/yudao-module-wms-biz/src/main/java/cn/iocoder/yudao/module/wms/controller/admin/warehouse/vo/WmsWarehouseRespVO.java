@@ -1,15 +1,17 @@
 package cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo;
 
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
-import com.alibaba.excel.annotation.*;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,country,creator,code,contact_phone,create_time,city,contact_person,postcode,is_sync,updater,mode,external_storage_id,update_time,address_line2,province,address_line1,company_name,name,id,status
+ * @table-fields : tenant_id,country,creator,code,contact_phone,create_time,city,contact_person,postcode,is_sync,updater,mode,external_storage_id,update_time,address_line2,province,address_line1,address_line3,name,id,status
  */
 @Schema(description = "管理后台 - 仓库 Response VO")
 @Data
@@ -36,9 +38,9 @@ public class WmsWarehouseRespVO {
     @ExcelProperty("外部存储ID")
     private Long externalStorageId;
 
-    @Schema(description = "公司名称", example = "张三")
-    @ExcelProperty("公司名称")
-    private String companyName;
+    @Schema(description = "详细地址3", example = "张三")
+    @ExcelProperty("详细地址3")
+    private String addressLine3;
 
     @Schema(description = "国家")
     @ExcelProperty("国家")

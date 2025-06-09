@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.tms.dal.mysql.logistic.customrule.TmsCustomRuleMa
 import cn.iocoder.yudao.module.tms.service.logistic.customrule.TmsCustomRuleService;
 import cn.iocoder.yudao.module.tms.service.logistic.customrule.bo.TmsCustomRuleBO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,19 +17,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.tms.enums.ErrorCodeConstants.CUSTOM_RULE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.tms.enums.TmsErrorCodeConstants.CUSTOM_RULE_NOT_EXISTS;
 
 @Service
 public class TmsCustomRuleApiImpl implements TmsCustomRuleApi {
-    //    @Autowired
-//    ErpProductMapper tmsProductMapper;
     @Autowired
     TmsCustomRuleMapper customRuleMapper;
-    //    @Autowired
-//    ErpProductService tmsProductService;
     @Autowired
     ErpProductApi erpProductApi;
     @Autowired
+    @Lazy
     TmsCustomRuleService tmsCustomRuleService;
 
     @Override

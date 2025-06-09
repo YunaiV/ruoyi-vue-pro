@@ -4,37 +4,40 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.wms.api.warehouse.dto.WmsWarehouseQueryDTO;
+import cn.iocoder.yudao.module.wms.api.warehouse.dto.WmsWarehouseSimpleDTO;
 import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinRespVO;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehousePageReqVO;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehouseRespVO;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehouseSaveReqVO;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsWarehouseProductVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.*;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.product.WmsProductDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.warehouse.WmsStockWarehouseMapper;
+import cn.iocoder.yudao.module.wms.dal.mysql.stock.warehouse.WmsStockWarehouseProductMapper;
 import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
 import cn.iocoder.yudao.module.wms.service.outbound.WmsOutboundService;
 import cn.iocoder.yudao.module.wms.service.stock.bin.WmsStockBinService;
-import cn.iocoder.yudao.module.wms.service.stock.ownership.WmsStockOwnershipService;
+import cn.iocoder.yudao.module.wms.service.stock.logic.WmsStockLogicService;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
+import com.google.common.collect.Maps;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_WAREHOUSE_NOT_EXISTS;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_WAREHOUSE_WAREHOUSE_ID_PRODUCT_ID_DUPLICATE;
+import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.STOCK_WAREHOUSE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.STOCK_WAREHOUSE_WAREHOUSE_ID_PRODUCT_ID_DUPLICATE;
 
 /**
  * 仓库库存 Service 实现类
@@ -49,8 +52,11 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
     private WmsStockWarehouseMapper stockWarehouseMapper;
 
     @Resource
+    private WmsStockWarehouseProductMapper stockWarehouseProductMapper;
+
+    @Resource
     @Lazy
-    private WmsStockOwnershipService stockOwnershipService;
+    private WmsStockLogicService stockLogicService;
 
     @Resource
     @Lazy
@@ -88,17 +94,17 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
      * @sign : DC724E64364D70F5
      */
     @Override
-    public WmsStockWarehouseDO updateStockWarehouse(WmsStockWarehouseSaveReqVO updateReqVO) {
+    @Transactional(rollbackFor = Exception.class)
+    public void updateStockWarehouse(WmsStockWarehouseSaveReqVO updateReqVO) {
         // 校验存在
-        WmsStockWarehouseDO exists = validateStockWarehouseExists(updateReqVO.getId());
-        if (!Objects.equals(updateReqVO.getId(), exists.getId()) && Objects.equals(updateReqVO.getWarehouseId(), exists.getWarehouseId()) && Objects.equals(updateReqVO.getProductId(), exists.getProductId())) {
-            throw exception(STOCK_WAREHOUSE_WAREHOUSE_ID_PRODUCT_ID_DUPLICATE);
-        }
+        WmsStockWarehouseDO exists = validateStockWarehouseExists(updateReqVO.getProductId(), updateReqVO.getWarehouseId());
+//        if (!Objects.equals(updateReqVO.getId(), exists.getId()) && Objects.equals(updateReqVO.getWarehouseId(), exists.getWarehouseId()) && Objects.equals(updateReqVO.getProductId(), exists.getProductId())) {
+//            throw exception(STOCK_WAREHOUSE_WAREHOUSE_ID_PRODUCT_ID_DUPLICATE);
+//        }
         // 更新
-        WmsStockWarehouseDO stockWarehouse = BeanUtils.toBean(updateReqVO, WmsStockWarehouseDO.class);
-        stockWarehouseMapper.updateById(stockWarehouse);
-        // 返回
-        return stockWarehouse;
+        int makePendingQty = Math.max(exists.getMakePendingQty() + updateReqVO.getMakePendingQty(), 0);
+        exists.setMakePendingQty(makePendingQty);
+        stockWarehouseMapper.updateById(exists);
     }
 
     /**
@@ -107,21 +113,21 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteStockWarehouse(Long id) {
-        // 校验存在
-        WmsStockWarehouseDO stockWarehouse = validateStockWarehouseExists(id);
-        // 唯一索引去重
-        stockWarehouse.setWarehouseId(stockWarehouseMapper.flagUKeyAsLogicDelete(stockWarehouse.getWarehouseId()));
-        stockWarehouse.setProductId(stockWarehouseMapper.flagUKeyAsLogicDelete(stockWarehouse.getProductId()));
-        stockWarehouseMapper.updateById(stockWarehouse);
-        // 删除
-        stockWarehouseMapper.deleteById(id);
+//        // 校验存在
+//        WmsStockWarehouseDO stockWarehouse = validateStockWarehouseExists(id);
+//        // 唯一索引去重
+//        stockWarehouse.setWarehouseId(stockWarehouseMapper.flagUKeyAsLogicDelete(stockWarehouse.getWarehouseId()));
+//        stockWarehouse.setProductId(stockWarehouseMapper.flagUKeyAsLogicDelete(stockWarehouse.getProductId()));
+//        stockWarehouseMapper.updateById(stockWarehouse);
+//        // 删除
+//        stockWarehouseMapper.deleteById(id);
     }
 
     /**
      * @sign : 0AC227DD0DAC3D98
      */
-    private WmsStockWarehouseDO validateStockWarehouseExists(Long id) {
-        WmsStockWarehouseDO stockWarehouse = stockWarehouseMapper.selectById(id);
+    private WmsStockWarehouseDO validateStockWarehouseExists(Long productId, Long warehouseId) {
+        WmsStockWarehouseDO stockWarehouse = stockWarehouseMapper.getByWarehouseIdAndProductId(warehouseId, productId);
         if (stockWarehouse == null) {
             throw exception(STOCK_WAREHOUSE_NOT_EXISTS);
         }
@@ -141,16 +147,16 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
     @Override
     public WmsStockWarehouseDO getStockWarehouse(Long warehouseId, Long productId, boolean createNew) {
         WmsStockWarehouseDO stockWarehouseDO = stockWarehouseMapper.getByWarehouseIdAndProductId(warehouseId, productId);
-        if(stockWarehouseDO==null && createNew) {
+        if (stockWarehouseDO == null && createNew) {
             stockWarehouseDO = new WmsStockWarehouseDO();
             stockWarehouseDO.setWarehouseId(warehouseId);
             stockWarehouseDO.setProductId(productId);
             // 待上架量
             stockWarehouseDO.setShelvingPendingQty(0);
             // 采购计划量
-            stockWarehouseDO.setPurchasePlanQty(0);
+            stockWarehouseDO.setMakePendingQty(0);
             // 采购在途量
-            stockWarehouseDO.setPurchaseTransitQty(0);
+            stockWarehouseDO.setTransitQty(0);
             // 退货在途量
             stockWarehouseDO.setReturnTransitQty(0);
             // 可售量，未被单据占用的良品数量
@@ -163,7 +169,7 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
             stockWarehouseDO.setDefectiveQty(0);
             // 待出库量
             stockWarehouseDO.setOutboundPendingQty(0);
-            //
+            // 
             stockWarehouseMapper.insert(stockWarehouseDO);
         }
         return stockWarehouseDO;
@@ -174,13 +180,13 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
         if (stockWarehouseDO == null) {
             throw exception(STOCK_WAREHOUSE_NOT_EXISTS);
         }
-        // 采购计划量
-        if (stockWarehouseDO.getPurchasePlanQty() == null) {
-            stockWarehouseDO.setPurchasePlanQty(0);
+        // 在制量
+        if (stockWarehouseDO.getMakePendingQty() == null) {
+            stockWarehouseDO.setMakePendingQty(0);
         }
         // 采购在途量
-        if (stockWarehouseDO.getPurchaseTransitQty() == null) {
-            stockWarehouseDO.setPurchaseTransitQty(0);
+        if (stockWarehouseDO.getTransitQty() == null) {
+            stockWarehouseDO.setTransitQty(0);
         }
         // 退货在途量
         if (stockWarehouseDO.getReturnTransitQty() == null) {
@@ -227,27 +233,22 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
     @Override
     public void assembleWarehouse(List<WmsStockWarehouseRespVO> list) {
         Map<Long, WmsWarehouseDO> warehouseDOMap = warehouseService.getWarehouseMap(StreamX.from(list).toSet(WmsStockWarehouseRespVO::getWarehouseId));
-        Map<Long, WmsWarehouseSimpleRespVO> warehouseVOMap = StreamX.from(warehouseDOMap.values())
-            .toMap(WmsWarehouseDO::getId, v-> BeanUtils.toBean(v, WmsWarehouseSimpleRespVO.class));
-
+        Map<Long, WmsWarehouseSimpleRespVO> warehouseVOMap = StreamX.from(warehouseDOMap.values()).toMap(WmsWarehouseDO::getId, v -> BeanUtils.toBean(v, WmsWarehouseSimpleRespVO.class));
         StreamX.from(list).assemble(warehouseVOMap, WmsStockWarehouseRespVO::getWarehouseId, WmsStockWarehouseRespVO::setWarehouse);
     }
 
+    @Override
     public String getWarehouseProductKey(Long warehouseId, Long productId) {
         return warehouseId + "_" + productId;
     }
 
     @Override
     public void assembleStockBin(List<WmsStockWarehouseRespVO> list) {
-
-        List<WmsWarehouseProductVO> warehouseProductList = StreamX.from(list).toList(v->BeanUtils.toBean(v, WmsWarehouseProductVO.class));
-
-        Map<String, List<WmsStockBinRespVO>> StockBinVOMap = stockBinService.selectStockBinGroup(warehouseProductList,true);
-
-        StreamX.from(list).assemble(StockBinVOMap, e->{
+        List<WmsWarehouseProductVO> warehouseProductList = StreamX.from(list).toList(v -> BeanUtils.toBean(v, WmsWarehouseProductVO.class));
+        Map<String, List<WmsStockBinRespVO>> StockBinVOMap = stockBinService.selectStockBinGroup(warehouseProductList, true);
+        StreamX.from(list).assemble(StockBinVOMap, e -> {
             return getWarehouseProductKey(e.getWarehouseId(), e.getProductId());
         }, WmsStockWarehouseRespVO::setStockBinList);
-
     }
 
     @Override
@@ -257,9 +258,90 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
 
     @Override
     public List<WmsStockWarehouseDO> getByProductIds(Long warehouseId, List<Long> productIds) {
-        if(CollectionUtils.isEmpty(productIds)) {
+        if (CollectionUtils.isEmpty(productIds)) {
             return List.of();
         }
-        return stockWarehouseMapper.getByProductIds(warehouseId,productIds);
+        return stockWarehouseMapper.getByProductIds(warehouseId, productIds);
+    }
+
+    @Override
+    public List<WmsStockWarehouseDO> selectStockWarehouse(List<WmsWarehouseProductVO> wmsWarehouseProductVOList) {
+        if (CollectionUtils.isEmpty(wmsWarehouseProductVOList)) {
+            return List.of();
+        }
+        return stockWarehouseMapper.selectStockWarehouse(wmsWarehouseProductVOList);
+    }
+
+    @Override
+    public PageResult<WmsStockWarehouseProductRespVO> getStockGroupedWarehousePage(WmsStockWarehousePageReqVO pageReqVO) {
+        PageResult<WmsProductDO> pageResult = stockWarehouseProductMapper.getStockGroupedWarehousePage(pageReqVO);
+        if(pageResult.getList().isEmpty()) {
+            return new PageResult<>();
+        }
+        PageResult<WmsStockWarehouseProductRespVO> voPageResult = BeanUtils.toBean(pageResult, WmsStockWarehouseProductRespVO.class);
+        List<WmsStockWarehouseDO> list = stockWarehouseMapper.selectByProductIds(StreamX.from(pageResult.getList()).toSet(WmsProductDO::getId));
+        //筛选仓库
+        if(pageReqVO.getWarehouseId() != null) {
+            list = list.stream().filter(v -> v.getWarehouseId().equals(pageReqVO.getWarehouseId())).toList();
+        }
+        List<WmsStockWarehouseRespVO> voList = BeanUtils.toBean(list, WmsStockWarehouseRespVO.class);
+        this.assembleProducts(voList);
+        this.assembleWarehouse(voList);
+        this.assembleStockBin(voList);
+        Map<Long, List<WmsStockWarehouseRespVO>> map = StreamX.from(voList).groupBy(WmsStockWarehouseRespVO::getProductId);
+        StreamX.from(voPageResult.getList()).assemble(map, WmsStockWarehouseProductRespVO::getId, WmsStockWarehouseProductRespVO::setStockWarehouseList);
+        StreamX.from(voPageResult.getList()).assemble(pageResult.getList(), WmsProductDO::getId, WmsStockWarehouseProductRespVO::getId, (e, p) -> {
+            e.setProduct(BeanUtils.toBean(p, WmsProductRespSimpleVO.class));
+        });
+        return voPageResult;
+    }
+
+    /**
+     * 按 ID 集合查询 WmsStockWarehouseDO
+     */
+    @Override
+    public List<WmsStockWarehouseDO> selectByIds(List<Long> idList) {
+        if (CollectionUtils.isEmpty(idList)) {
+            return List.of();
+        }
+        return stockWarehouseMapper.selectByIds(idList);
+    }
+
+    @Override
+    public Map<Long, List<WmsStockWarehouseDO>>  selectSellableQty(WmsWarehouseQueryDTO wmsWarehouseQueryDTO) {
+        Map<Long, List<WmsStockWarehouseDO>> map = Maps.newHashMap();
+        List<WmsWarehouseSimpleDTO> warehouses = wmsWarehouseQueryDTO.getWarehouses();
+        if (CollectionUtils.isEmpty(warehouses)) {
+            return Map.of();
+        }
+        warehouses.forEach(wmsWarehouse -> {
+            LambdaQueryWrapperX<WmsStockWarehouseDO> wrapper = new LambdaQueryWrapperX<>();
+            wrapper.eqIfPresent(WmsStockWarehouseDO::getWarehouseId, wmsWarehouse.getWarehouseId())
+                    .inIfPresent(WmsStockWarehouseDO::getProductId, wmsWarehouse.getProductIds())
+                    .ge(WmsStockWarehouseDO::getSellableQty, 0);
+            List<WmsStockWarehouseDO> rtnList = stockWarehouseMapper.selectList(wrapper);
+            map.put(wmsWarehouse.getWarehouseId(), rtnList);
+        });
+
+        return map;
+    }
+
+    @Override
+    public List<WmsStockWarehouseDO> selectSellableQtyList(WmsWarehouseQueryDTO wmsWarehouseQueryDTO) {
+        if (CollectionUtils.isEmpty(wmsWarehouseQueryDTO.getWarehouses())) {
+            return List.of();
+        }
+        List<WmsStockWarehouseDO> rtnList = new ArrayList<>();
+        for (WmsWarehouseSimpleDTO warehouse : wmsWarehouseQueryDTO.getWarehouses()) {
+            LambdaQueryWrapperX<WmsStockWarehouseDO> wrapper = new LambdaQueryWrapperX<>();
+            wrapper.eqIfPresent(WmsStockWarehouseDO::getWarehouseId, warehouse.getWarehouseId())
+                .inIfPresent(WmsStockWarehouseDO::getProductId, warehouse.getProductIds())
+                .ge(WmsStockWarehouseDO::getSellableQty, 0);
+            List<WmsStockWarehouseDO> results = stockWarehouseMapper.selectList(wrapper);
+            if (!results.isEmpty()) {
+                rtnList.add(results.get(0));
+            }
+        }
+        return rtnList;
     }
 }

@@ -1,12 +1,17 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.flow;
 
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.flow.vo.WmsStockFlowPageReqVO;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.flow.vo.WmsStockFlowRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.flow.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.flow.WmsStockFlowDO;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsStockFlowDirection;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockType;
 import cn.iocoder.yudao.module.wms.service.stock.flow.WmsStockFlowService;
@@ -14,18 +19,17 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
+import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "库存流水")
@@ -88,19 +92,17 @@ public class WmsStockFlowController {
     @Operation(summary = "获得仓库库存流水分页")
     @PreAuthorize("@ss.hasPermission('wms:stock-flow:query')")
     public CommonResult<PageResult<WmsStockFlowRespVO>> getStockFlowPageWarehouse(@Valid @RequestBody WmsStockFlowPageReqVO pageReqVO) {
-
         pageReqVO.setStockType(WmsStockType.WAREHOUSE.getValue());
-        pageReqVO.setReason(new Integer[]{ WmsStockReason.INBOUND.getValue(), WmsStockReason.OUTBOUND_AGREE.getValue() });
-
+        pageReqVO.setReason(new Integer[]{WmsStockReason.INBOUND.getValue(), WmsStockReason.OUTBOUND_FINISH.getValue()});
         return getStockFlowPage(pageReqVO);
     }
 
-    @PostMapping("/page-ownership")
-    @Operation(summary = "获得所有者库存流水分页")
+    @PostMapping("/page-logic")
+    @Operation(summary = "获得逻辑库存流水分页")
     @PreAuthorize("@ss.hasPermission('wms:stock-flow:query')")
-    public CommonResult<PageResult<WmsStockFlowRespVO>> getStockFlowPageOwnership(@Valid @RequestBody WmsStockFlowPageReqVO pageReqVO) {
-        pageReqVO.setStockType(WmsStockType.OWNERSHIP.getValue());
-        pageReqVO.setReason(new Integer[]{ WmsStockReason.INBOUND.getValue(), WmsStockReason.OUTBOUND_AGREE.getValue() });
+    public CommonResult<PageResult<WmsStockFlowRespVO>> getStockFlowPageLogic(@Valid @RequestBody WmsStockFlowPageReqVO pageReqVO) {
+        pageReqVO.setStockType(WmsStockType.LOGIC.getValue());
+        pageReqVO.setReason(new Integer[]{WmsStockReason.INBOUND.getValue(), WmsStockReason.OUTBOUND_FINISH.getValue()});
         return getStockFlowPage(pageReqVO);
     }
 
@@ -109,44 +111,166 @@ public class WmsStockFlowController {
     @PreAuthorize("@ss.hasPermission('wms:stock-flow:query')")
     public CommonResult<PageResult<WmsStockFlowRespVO>> getStockFlowPageBin(@Valid @RequestBody WmsStockFlowPageReqVO pageReqVO) {
         pageReqVO.setStockType(WmsStockType.BIN.getValue());
-        pageReqVO.setReason(new Integer[]{ WmsStockReason.INBOUND.getValue(), WmsStockReason.PICKUP.getValue(),WmsStockReason.OUTBOUND_AGREE.getValue() });
+        pageReqVO.setReason(new Integer[]{WmsStockReason.INBOUND.getValue(), WmsStockReason.PICKUP.getValue(), WmsStockReason.OUTBOUND_FINISH.getValue()});
         return getStockFlowPage(pageReqVO);
     }
 
+    /**
+     * @sign : E223AB2DDEC0F1A8
+     */
     public CommonResult<PageResult<WmsStockFlowRespVO>> getStockFlowPage(@Valid WmsStockFlowPageReqVO pageReqVO) {
         // 查询数据
         PageResult<WmsStockFlowDO> doPageResult = stockFlowService.getStockFlowPage(pageReqVO);
         // 转换
         PageResult<WmsStockFlowRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsStockFlowRespVO.class);
-
-        // 装配模型
         stockFlowService.assembleProducts(voPageResult.getList());
-        stockFlowService.assembleWarehouse(voPageResult.getList());
         stockFlowService.assembleBin(voPageResult.getList());
-        stockFlowService.assembleCompanyAndDept(voPageResult.getList());
+        stockFlowService.assembleWarehouse(voPageResult.getList());
         stockFlowService.assembleInbound(voPageResult.getList());
         stockFlowService.assembleOutbound(voPageResult.getList());
         stockFlowService.assemblePickup(voPageResult.getList());
-
+        stockFlowService.assembleStockWarehouse(voPageResult.getList());
+        stockFlowService.assembleInboundItemFlow(voPageResult.getList());
+        stockFlowService.assembleCompanyAndDept(voPageResult.getList());
+        stockFlowService.assembleStockCheck(voPageResult.getList());
+        stockFlowService.assembleBinMove(voPageResult.getList());
+        stockFlowService.assembleLogicMove(voPageResult.getList());
+        //批次可用库存数量显示为库存变更前数量
+        stockFlowService.assembleBatchAvailableQty(voPageResult.getList());
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
-            .mapping(WmsStockFlowRespVO::getCreator, WmsStockFlowRespVO::setCreatorName)
-            .mapping(WmsStockFlowRespVO::getUpdater, WmsStockFlowRespVO::setUpdaterName)
-            .fill();
-
-
+			.mapping(WmsStockFlowRespVO::getCreator, WmsStockFlowRespVO::setCreatorName)
+			.mapping(WmsStockFlowRespVO::getUpdater, WmsStockFlowRespVO::setUpdaterName)
+			.fill();
         // 返回
         return success(voPageResult);
     }
 
-    // @GetMapping("/export-excel")
-    // @Operation(summary = "导出库存流水 Excel")
-    // @PreAuthorize("@ss.hasPermission('wms:stock-flow:export')")
-    // @ApiAccessLog(operateType = EXPORT)
-    // public void exportStockFlowExcel(@Valid WmsStockFlowPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
-    // pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-    // List<WmsStockFlowDO> list = stockFlowService.getStockFlowPage(pageReqVO).getList();
-    // // 导出 Excel
-    // ExcelUtils.write(response, "库存流水.xls", "数据", WmsStockFlowRespVO.class, BeanUtils.toBean(list, WmsStockFlowRespVO.class));
-    // }
+    @PostMapping("/export-warehouse")
+    @Operation(summary = "导出仓库库存流水 Excel")
+    @PreAuthorize("@ss.hasPermission('wms:stock-flow:export-warehouse')")
+    @ApiAccessLog(operateType = EXPORT)
+    public void exportStockWarehouseFlowExcel(@Valid @RequestBody WmsStockFlowPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
+        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        List<WmsStockFlowRespVO> list = this.getStockFlowPageWarehouse(pageReqVO).getData().getList();
+        Map<Long,WmsStockFlowRespVO> map = StreamX.from(list).toMap(WmsStockFlowRespVO::getId);
+        List<WmsStockFlowWarehouseExcelVO> excelVOS = BeanUtils.toBean(list, WmsStockFlowWarehouseExcelVO.class);
+        for (WmsStockFlowWarehouseExcelVO excelVO : excelVOS) {
+            WmsStockFlowRespVO flowRespVO = map.get(excelVO.getId());
+            if(flowRespVO==null) {
+                continue;
+            }
+            applyExcelVO(excelVO, flowRespVO);
+        }
+        // 导出 Excel
+        ExcelUtils.write(response, "仓库库存流水.xls", "数据", WmsStockFlowWarehouseExcelVO.class, excelVOS);
+    }
+
+    private void applyExcelVO(WmsStockFlowWarehouseExcelVO excelVO, WmsStockFlowRespVO flowRespVO) {
+        excelVO.setWarehouseName(flowRespVO.getWarehouse().getName());
+        excelVO.setProductCode(flowRespVO.getProduct().getCode());
+        excelVO.setFlowTime(DateUtils.formatLocalDateTime(flowRespVO.getCreateTime()));
+        if(flowRespVO.getInbound()!=null) {
+            excelVO.setReasonBillCode(flowRespVO.getInbound().getCode());
+        } else if(flowRespVO.getOutbound()!=null) {
+            excelVO.setReasonBillCode(flowRespVO.getOutbound().getCode());
+        } else if(flowRespVO.getPickup()!=null) {
+            excelVO.setReasonBillCode(flowRespVO.getPickup().getCode());
+        } else if (flowRespVO.getStockCheck() != null) {
+            excelVO.setReasonBillCode(flowRespVO.getStockCheck().getCode());
+        } else if(flowRespVO.getStockBinMove()!=null) {
+            excelVO.setReasonBillCode(flowRespVO.getStockBinMove().getNo());
+        } else if (flowRespVO.getStockLogicMove() != null) {
+            excelVO.setReasonBillCode(flowRespVO.getStockLogicMove().getNo());
+        }
+        excelVO.setDirectionLabel(WmsStockFlowDirection.parse(flowRespVO.getDirection()).getLabel());
+
+    }
+
+
+    @PostMapping("/export-bin")
+    @Operation(summary = "导出库位库存流水 Excel")
+    @PreAuthorize("@ss.hasPermission('wms:stock-flow:export-bin')")
+    @ApiAccessLog(operateType = EXPORT)
+    public void exportStockBinFlowExcel(@Valid @RequestBody WmsStockFlowPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
+        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        List<WmsStockFlowRespVO> list = this.getStockFlowPageWarehouse(pageReqVO).getData().getList();
+        Map<Long,WmsStockFlowRespVO> map = StreamX.from(list).toMap(WmsStockFlowRespVO::getId);
+        List<WmsStockFlowBinExcelVO> excelVOS = BeanUtils.toBean(list, WmsStockFlowBinExcelVO.class);
+        for (WmsStockFlowBinExcelVO excelVO : excelVOS) {
+            WmsStockFlowRespVO flowRespVO = map.get(excelVO.getId());
+            if(flowRespVO==null) {
+                continue;
+            }
+            applyExcelVO(excelVO, flowRespVO);
+        }
+        // 导出 Excel
+        ExcelUtils.write(response, "库位库存流水.xls", "数据", WmsStockFlowBinExcelVO.class, excelVOS);
+    }
+
+    private void applyExcelVO(WmsStockFlowBinExcelVO excelVO, WmsStockFlowRespVO flowRespVO) {
+        excelVO.setWarehouseName(flowRespVO.getWarehouse().getName());
+        excelVO.setProductCode(flowRespVO.getProduct().getCode());
+        excelVO.setFlowTime(DateUtils.formatLocalDateTime(flowRespVO.getCreateTime()));
+        if(flowRespVO.getInbound()!=null) {
+            excelVO.setReasonBillCode(flowRespVO.getInbound().getCode());
+        } else if(flowRespVO.getOutbound()!=null) {
+            excelVO.setReasonBillCode(flowRespVO.getOutbound().getCode());
+        } else if(flowRespVO.getPickup()!=null) {
+            excelVO.setReasonBillCode(flowRespVO.getPickup().getCode());
+        } else if (flowRespVO.getStockCheck() != null) {
+            excelVO.setReasonBillCode(flowRespVO.getStockCheck().getCode());
+        } else if(flowRespVO.getStockBinMove()!=null) {
+            excelVO.setReasonBillCode(flowRespVO.getStockBinMove().getNo());
+        } else if (flowRespVO.getStockLogicMove() != null) {
+            excelVO.setReasonBillCode(flowRespVO.getStockLogicMove().getNo());
+        }
+        excelVO.setDirectionLabel(WmsStockFlowDirection.parse(flowRespVO.getDirection()).getLabel());
+        excelVO.setBinName(flowRespVO.getBin().getName());
+    }
+
+
+    @PostMapping("/export-logic")
+    @Operation(summary = "导出库位库存流水 Excel")
+    @PreAuthorize("@ss.hasPermission('wms:stock-flow:export-logic')")
+    @ApiAccessLog(operateType = EXPORT)
+    public void exportStockLogicFlowExcel(@Valid @RequestBody WmsStockFlowPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
+        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        List<WmsStockFlowRespVO> list = this.getStockFlowPageWarehouse(pageReqVO).getData().getList();
+        Map<Long,WmsStockFlowRespVO> map = StreamX.from(list).toMap(WmsStockFlowRespVO::getId);
+        List<WmsStockFlowLogicExcelVO> excelVOS = BeanUtils.toBean(list, WmsStockFlowLogicExcelVO.class);
+        for (WmsStockFlowLogicExcelVO excelVO : excelVOS) {
+            WmsStockFlowRespVO flowRespVO = map.get(excelVO.getId());
+            if(flowRespVO==null) {
+                continue;
+            }
+            applyExcelVO(excelVO, flowRespVO);
+        }
+        // 导出 Excel
+        ExcelUtils.write(response, "逻辑库存流水.xls", "数据", WmsStockFlowLogicExcelVO.class, excelVOS);
+    }
+
+    private void applyExcelVO(WmsStockFlowLogicExcelVO excelVO, WmsStockFlowRespVO flowRespVO) {
+        excelVO.setWarehouseName(flowRespVO.getWarehouse().getName());
+        excelVO.setProductCode(flowRespVO.getProduct().getCode());
+        excelVO.setFlowTime(DateUtils.formatLocalDateTime(flowRespVO.getCreateTime()));
+        if(flowRespVO.getInbound()!=null) {
+            excelVO.setReasonBillCode(flowRespVO.getInbound().getCode());
+        } else if(flowRespVO.getOutbound()!=null) {
+            excelVO.setReasonBillCode(flowRespVO.getOutbound().getCode());
+        } else if(flowRespVO.getPickup()!=null) {
+            excelVO.setReasonBillCode(flowRespVO.getPickup().getCode());
+        } else if (flowRespVO.getStockCheck() != null) {
+            excelVO.setReasonBillCode(flowRespVO.getStockCheck().getCode());
+        } else if(flowRespVO.getStockBinMove()!=null) {
+            excelVO.setReasonBillCode(flowRespVO.getStockBinMove().getNo());
+        } else if (flowRespVO.getStockLogicMove() != null) {
+            excelVO.setReasonBillCode(flowRespVO.getStockLogicMove().getNo());
+        }
+        excelVO.setDirectionLabel(WmsStockFlowDirection.parse(flowRespVO.getDirection()).getLabel());
+        excelVO.setCompanyName(flowRespVO.getCompany().getName());
+        excelVO.setDeptName(flowRespVO.getDept().getName());
+    }
+
+
 }

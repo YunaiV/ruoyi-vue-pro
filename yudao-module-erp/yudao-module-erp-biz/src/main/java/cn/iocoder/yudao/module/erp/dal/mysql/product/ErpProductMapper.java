@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -21,26 +22,23 @@ public interface ErpProductMapper extends BaseMapperX<ErpProductDO> {
 
     default PageResult<ErpProductDO> selectPage(ErpProductPageReqVO reqVO) {
         MPJLambdaWrapper<ErpProductDO> orderByDesc = new MPJLambdaWrapperX<ErpProductDO>()
-            .betweenIfPresent(ErpProductDO::getCreateTime, reqVO.getCreateTime()) // 添加创建时间查询
-            .betweenIfPresent(ErpProductDO::getUpdateTime, reqVO.getUpdateTime())  // 添加修改时间查询
-            .likeIfExists(ErpProductDO::getName, reqVO.getName())
+            .betweenIfPresent(ErpProductDO::getCreateTime, reqVO.getCreateTime())
+            .betweenIfPresent(ErpProductDO::getUpdateTime, reqVO.getUpdateTime())
             .eqIfExists(ErpProductDO::getCategoryId, reqVO.getCategoryId())
-            .likeIfExists(ErpProductDO::getBarCode, reqVO.getBarCode())
+            .likeIfExists(ErpProductDO::getCode, reqVO.getCode())
             .likeIfExists(ErpProductDO::getBrand, reqVO.getBrand())
             .eqIfExists(ErpProductDO::getDeptId, reqVO.getDeptId())
             .likeIfExists(ErpProductDO::getSeries, reqVO.getSeries())
             .eqIfExists(ErpProductDO::getStatus, reqVO.getStatus())
-            .likeIfExists(ErpProductDO::getPackageWidth, reqVO.getPackageWidth())  // 包装宽度查询
-            .likeIfExists(ErpProductDO::getPackageLength, reqVO.getPackageLength())  // 包装长度查询
-            .likeIfExists(ErpProductDO::getPackageHeight, reqVO.getPackageHeight())  // 包装高度查询
-            .likeIfExists(ErpProductDO::getPackageWeight, reqVO.getPackageWeight())  // 包装重量查询
-            .likeIfExists(ErpProductDO::getWidth, reqVO.getWidth())  // 宽度查询
-            .likeIfExists(ErpProductDO::getLength, reqVO.getLength()) // 长度查询
-            .likeIfExists(ErpProductDO::getHeight, reqVO.getHeight())  // 高度查询
-            .likeIfExists(ErpProductDO::getWeight, reqVO.getWeight())  // 重量查询
-            // 创建人 模糊
+            .likeIfExists(ErpProductDO::getPackageWidth, reqVO.getPackageWidth())
+            .likeIfExists(ErpProductDO::getPackageLength, reqVO.getPackageLength())
+            .likeIfExists(ErpProductDO::getPackageHeight, reqVO.getPackageHeight())
+            .likeIfExists(ErpProductDO::getPackageWeight, reqVO.getPackageWeight())
+            .likeIfExists(ErpProductDO::getWidth, reqVO.getWidth())
+            .likeIfExists(ErpProductDO::getLength, reqVO.getLength())
+            .likeIfExists(ErpProductDO::getHeight, reqVO.getHeight())
+            .likeIfExists(ErpProductDO::getWeight, reqVO.getWeight())
             .eqIfExists(ErpProductDO::getCreator, reqVO.getCreator())
-            // 更新人 模糊
             .eqIfExists(ErpProductDO::getUpdater, reqVO.getUpdater())
             .orderByDesc(ErpProductDO::getId);
         return selectPage(reqVO, orderByDesc);
@@ -55,7 +53,7 @@ public interface ErpProductMapper extends BaseMapperX<ErpProductDO> {
     }
 
     default ErpProductDO selectByCode(String code) {
-        return selectOne(ErpProductDO::getBarCode, code);
+        return selectOne(ErpProductDO::getCode, code);
     }
 
     default List<ErpProductDO> selectListByStatus(Boolean status) {
@@ -67,7 +65,7 @@ public interface ErpProductMapper extends BaseMapperX<ErpProductDO> {
      * @Author Wqh
      * @Description 根据颜色，系列，型号查询出最大的流水号
      * @Date 13:36 2024/10/21
-     * @Param [barCode]
+     * @Param [code]
      **/
     default ErpProductDO selectMaxSerialByColorAndModelAndSeries(String color, String model, String series) {
         return selectOne(new LambdaQueryWrapperX<ErpProductDO>()
@@ -91,15 +89,26 @@ public interface ErpProductMapper extends BaseMapperX<ErpProductDO> {
     }
 
     /**
-     * 根据条码(barCode)查询出id列表
+     * 根据条码(code)查询出id列表
      *
-     * @param barCode SKU（编码
+     * @param code SKU（编码
      * @return id集合
      */
-    default List<Long> selectIdListByBarCode(String barCode) {
+    default List<Long> selectIdListByCode(String code) {
         return selectList(new LambdaQueryWrapperX<ErpProductDO>()
-            .like(ErpProductDO::getBarCode, barCode)
+            .eq(ErpProductDO::getCode, code)
             .select(ErpProductDO::getId))
             .stream().map(ErpProductDO::getId).toList();
+    }
+
+    /**
+     * 根据条码(code)查询出id列表
+     *
+     * @param codes SKU（编码
+     * @return ErpProductDO 集合
+     */
+    default List<ErpProductDO> selectByCodes(Collection<String> codes){
+        return selectList(new LambdaQueryWrapperX<ErpProductDO>()
+            .in(ErpProductDO::getCode, codes));
     }
 }

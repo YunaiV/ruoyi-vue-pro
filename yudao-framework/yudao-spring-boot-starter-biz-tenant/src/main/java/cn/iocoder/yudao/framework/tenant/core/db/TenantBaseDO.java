@@ -20,5 +20,6 @@ public abstract class TenantBaseDO extends BaseDO {
 //    /**
 //     * 乐观锁
 //     */
+    //    @Version
 //    private Integer revision;
 }

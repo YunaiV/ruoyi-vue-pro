@@ -1,17 +1,20 @@
 package cn.iocoder.yudao.module.fms.api.finance;
 
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.fms.api.finance.dto.FmsCompanyDTO;
+import cn.iocoder.yudao.module.fms.dal.dataobject.finance.subject.FmsCompanyDO;
 import cn.iocoder.yudao.module.fms.service.finance.subject.FmsCompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.FINANCE_SUBJECT_NOT_EXISTS;
+import static cn.iocoder.yudao.module.fms.api.enums.FmsErrorCodeConstants.FINANCE_SUBJECT_NOT_EXISTS;
 
 @Service
 public class FmsCompanyApiImpl implements FmsCompanyApi {
@@ -21,9 +24,7 @@ public class FmsCompanyApiImpl implements FmsCompanyApi {
 
 
     @Override
-    public List<FmsCompanyDTO> validateCompany(List<Long> ids) {
-        //ids去重
-        ids = ids.stream().distinct().toList();
+    public List<FmsCompanyDTO> validateCompany(Set<Long> ids) {
         List<FmsCompanyDTO> dtoList = BeanUtils.toBean(subjectService.listCompany(ids), FmsCompanyDTO.class);
         //如果ids长度不等于dtoList长度，则说明有id不存在
         if (ids.size() != dtoList.size()) {
@@ -36,15 +37,23 @@ public class FmsCompanyApiImpl implements FmsCompanyApi {
 
 
     @Override
-    public List<FmsCompanyDTO> getCompanyList(List<Long> ids) {
-        //ids去重
-        ids = ids.stream().distinct().toList();
-        List<FmsCompanyDTO> dtoList = BeanUtils.toBean(subjectService.listCompany(ids), FmsCompanyDTO.class);
-        return dtoList;
+    public List<FmsCompanyDTO> getCompanyList(Set<Long> ids) {
+        return BeanUtils.toBean(subjectService.listCompany(ids), FmsCompanyDTO.class);
     }
 
     @Override
-    public Map<Long,FmsCompanyDTO> getCompanyMap(List<Long> ids) {
+    public Map<Long,FmsCompanyDTO> getCompanyMap(Set<Long> ids) {
          return StreamX.from(getCompanyList(ids)).toMap(FmsCompanyDTO::getId);
+    }
+
+    @Override
+    public Map<String, FmsCompanyDTO> getCompanyMapByNames(Set<String> companyNames) {
+
+        if(CollectionUtils.isEmpty(companyNames)) {
+            return Map.of();
+        }
+        List<FmsCompanyDO> listCompanyByNames =  subjectService.listCompanyByNames(companyNames);
+        return StreamX.from(listCompanyByNames).toMap(FmsCompanyDO::getName,e->BeanUtils.toBean(e,FmsCompanyDTO.class));
+
     }
 }

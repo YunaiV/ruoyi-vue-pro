@@ -29,7 +29,7 @@ public class OrderActionImpl implements Action<SrmOrderStatus, SrmEventEnum, Srm
     private SrmPurchaseRequestItemsMapper purchaseRequestItemsMapper;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void execute(SrmOrderStatus from, SrmOrderStatus to, SrmEventEnum event, SrmPurchaseRequestDO context) {
         //        if (event == SrmEventEnum.ORDER_GOODS_ADD || event == SrmEventEnum.ORDER_GOODS_REDUCE) {
         //            updatePurchaseOrderStatus(context);

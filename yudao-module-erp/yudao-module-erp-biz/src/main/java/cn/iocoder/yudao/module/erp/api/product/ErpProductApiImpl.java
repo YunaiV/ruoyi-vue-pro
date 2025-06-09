@@ -14,15 +14,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PRODUCT_NOT_ENABLE;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PRODUCT_NOT_EXISTS;
+import static cn.iocoder.yudao.module.erp.enums.ErpErrorCodeConstants.PRODUCT_NOT_ENABLE;
+import static cn.iocoder.yudao.module.erp.enums.ErpErrorCodeConstants.PRODUCT_NOT_EXISTS;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -42,6 +39,7 @@ public class ErpProductApiImpl implements ErpProductApi {
     }
 
     //获得所有产品DTO，根据ids，如果ids为null返回所有
+    @Override
     public List<ErpProductDTO> listProductDTOs(List<Long> ids) {
         List<ErpProductDO> dos;
         if (ids != null) {
@@ -60,6 +58,15 @@ public class ErpProductApiImpl implements ErpProductApi {
         Map<Long, ErpProductDO> productMap = convertMap(erpProductMapper.selectByIds(ids), ErpProductDO::getId);
         return ErpProductConvert.INSTANCE.convert(productMap);
 
+    }
+
+    @Override
+    public List<ErpProductDTO> listProductsByCodes(Collection<String> codes) {
+        if (CollUtil.isEmpty(codes)) {
+            return Collections.emptyList();
+        }
+        List<ErpProductDO> erpProductDOs = erpProductMapper.selectByCodes(codes);
+        return ErpProductConvert.INSTANCE.convert(erpProductDOs);
     }
 
     @Override
@@ -93,11 +100,6 @@ public class ErpProductApiImpl implements ErpProductApi {
     }
 
     @Override
-    public List<Long> listProductIdByBarCode(String barCode) {
-        return erpProductService.listProductIdByBarCode(barCode);
-    }
-
-    @Override
     public List<ErpProductRespDTO> getProductVOList(Collection<Long> ids) {
         List<ErpProductRespVO> productVOList = erpProductService.getProductVOList(ids);
         return BeanUtils.toBean(productVOList, ErpProductRespDTO.class);
@@ -105,12 +107,11 @@ public class ErpProductApiImpl implements ErpProductApi {
 
     @Override
     public Map<Long, ErpProductRespDTO> getProductDTOMap(Collection<Long> ids) {
-        Map<Long, ErpProductRespVO> productVOMap = erpProductService.getProductVOMap(ids);
-        Map<Long, ErpProductRespDTO> productDTOMap = productVOMap.entrySet().stream()
+        Map<Long, ErpProductRespVO> productVOMap = erpProductService.getProductVOMap(new HashSet<>(ids));
+        return productVOMap.entrySet().stream()
             .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
                 ErpProductRespVO productVO = entry.getValue();
                 return BeanUtils.toBean(productVO, ErpProductRespDTO.class);
             }));
-        return productDTOMap;
     }
 }

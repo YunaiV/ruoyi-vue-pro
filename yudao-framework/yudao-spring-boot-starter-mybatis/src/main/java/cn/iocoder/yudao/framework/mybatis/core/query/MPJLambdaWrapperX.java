@@ -4,7 +4,6 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.toolkit.MPJWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.springframework.util.StringUtils;
 
@@ -20,102 +19,110 @@ import java.util.function.Consumer;
  */
 public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
 
-    public MPJLambdaWrapperX<T> likeIfPresent(SFunction<T, ?> column, String val) {
-        MPJWrappers.lambdaJoin().like(column, val);
+    //    SFunction<T, ?> column	只能用于主表字段	 联表字段报错
+//    SFunction<S, ?> column + <S> 泛型	支持任意类字段（主表、子表、三表）	 推荐写法, 让编译器自动推断 S 类型
+    public <S> MPJLambdaWrapperX<T> likeIfPresent(SFunction<S, ?> column, String val) {
         if (StringUtils.hasText(val)) {
             return (MPJLambdaWrapperX<T>) super.like(column, val);
         }
         return this;
     }
 
-    public MPJLambdaWrapperX<T> inIfPresent(SFunction<T, ?> column, Collection<?> values) {
+    public <S> MPJLambdaWrapperX<T> inIfPresent(SFunction<S, ?> column, Collection<?> values) {
         if (ObjectUtil.isAllNotEmpty(values) && !ArrayUtil.isEmpty(values)) {
             return (MPJLambdaWrapperX<T>) super.in(column, values);
         }
         return this;
     }
 
-    public MPJLambdaWrapperX<T> inIfPresent(SFunction<T, ?> column, Object... values) {
+    public <S> MPJLambdaWrapperX<T> inIfPresent(SFunction<S, ?> column, Object... values) {
         if (ObjectUtil.isAllNotEmpty(values) && !ArrayUtil.isEmpty(values)) {
             return (MPJLambdaWrapperX<T>) super.in(column, values);
         }
         return this;
     }
 
-    public MPJLambdaWrapperX<T> eqIfPresent(SFunction<T, ?> column, Object val) {
-        if (ObjectUtil.isNotEmpty(val)) {
+    public <S> MPJLambdaWrapperX<T> eqIfPresent(SFunction<S, ?> column, Object val) {
+        if (val != null) {
             return (MPJLambdaWrapperX<T>) super.eq(column, val);
         }
         return this;
     }
 
-    public MPJLambdaWrapperX<T> neIfPresent(SFunction<T, ?> column, Object val) {
+    public <S> MPJLambdaWrapperX<T> neIfPresent(SFunction<S, ?> column, Object val) {
         if (ObjectUtil.isNotEmpty(val)) {
             return (MPJLambdaWrapperX<T>) super.ne(column, val);
         }
         return this;
     }
 
-    public MPJLambdaWrapperX<T> gtIfPresent(SFunction<T, ?> column, Object val) {
+    public <S> MPJLambdaWrapperX<T> gtIfPresent(SFunction<S, ?> column, Object val) {
         if (val != null) {
             return (MPJLambdaWrapperX<T>) super.gt(column, val);
         }
         return this;
     }
 
-    public MPJLambdaWrapperX<T> geIfPresent(SFunction<T, ?> column, Object val) {
+    public <S> MPJLambdaWrapperX<T> geIfPresent(SFunction<S, ?> column, Object val) {
         if (val != null) {
             return (MPJLambdaWrapperX<T>) super.ge(column, val);
         }
         return this;
     }
 
-    public MPJLambdaWrapperX<T> ltIfPresent(SFunction<T, ?> column, Object val) {
+    public <S> MPJLambdaWrapperX<T> ltIfPresent(SFunction<S, ?> column, Object val) {
         if (val != null) {
             return (MPJLambdaWrapperX<T>) super.lt(column, val);
         }
         return this;
     }
 
-    public MPJLambdaWrapperX<T> leIfPresent(SFunction<T, ?> column, Object val) {
+    public <S> MPJLambdaWrapperX<T> leIfPresent(SFunction<S, ?> column, Object val) {
         if (val != null) {
             return (MPJLambdaWrapperX<T>) super.le(column, val);
         }
         return this;
     }
 
-    public MPJLambdaWrapperX<T> betweenIfPresent(SFunction<T, ?> column, Object val1, Object val2) {
-        if (val1 != null && val2 != null) {
-            return (MPJLambdaWrapperX<T>) super.between(column, val1, val2);
-        }
-        if (val1 != null) {
-            return (MPJLambdaWrapperX<T>) ge(column, val1);
-        }
-        if (val2 != null) {
-            return (MPJLambdaWrapperX<T>) le(column, val2);
-        }
-        return this;
-    }
-
+    /**
+     * @param sqlExpr sql
+     * @param values  值
+     * @return this
+     * @author 李方捷
+     */
     public MPJLambdaWrapperX<T> betweenIfPresent(String sqlExpr, Object[] values) {
         Object val1 = ArrayUtils.get(values, 0);
         Object val2 = ArrayUtils.get(values, 1);
-        if(val1!=null && val2!=null) {
+        if (val1 != null && val2 != null) {
             return (MPJLambdaWrapperX<T>) super.between(sqlExpr, val1, val2);
-        } else if(val1!=null) {
+        } else if (val1 != null) {
             return (MPJLambdaWrapperX<T>) ge(sqlExpr, val1);
-        } else if(val2!=null) {
+        } else if (val2 != null) {
             return (MPJLambdaWrapperX<T>) le(sqlExpr, val2);
         } else {
             return this;
         }
     }
 
-    public MPJLambdaWrapperX<T> betweenIfPresent(SFunction<T, ?> column, Object[] values) {
+    public <S> MPJLambdaWrapperX<T> betweenIfPresent(SFunction<S, ?> column, Object[] values) {
         Object val1 = ArrayUtils.get(values, 0);
         Object val2 = ArrayUtils.get(values, 1);
         return betweenIfPresent(column, val1, val2);
     }
+
+    public <S> MPJLambdaWrapperX<T> betweenIfPresent(SFunction<S, ?> column, Object val1, Object val2) {
+        if (val1 != null && val2 != null) {
+            return (MPJLambdaWrapperX<T>) super.between(column, val1, val2);
+        }
+        if (val1 != null) {
+            return (MPJLambdaWrapperX<T>) super.ge(column, val1);
+        }
+        if (val2 != null) {
+            return (MPJLambdaWrapperX<T>) super.le(column, val2);
+        }
+        return this;
+    }
+
 
     // ========== 重写父类方法，方便链式调用 ==========
 
@@ -323,5 +330,44 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
         super.selectLen(column, alias);
         return this;
     }
+
+    // ========== 关键重写：使 leftJoin 返回当前类型 this ==========
+    @Override
+    public <A, B> MPJLambdaWrapperX<T> leftJoin(Class<A> clazz, SFunction<A, ?> left, SFunction<B, ?> right) {
+        super.leftJoin(clazz, left, right);
+        return this;
+    }
+
+    @Override
+    public <A, B> MPJLambdaWrapperX<T> rightJoin(Class<A> clazz, SFunction<A, ?> left, SFunction<B, ?> right) {
+        super.rightJoin(clazz, left, right);
+        return this;
+    }
+
+    @Override
+    public <A, B> MPJLambdaWrapperX<T> innerJoin(Class<A> clazz, SFunction<A, ?> left, SFunction<B, ?> right) {
+        super.innerJoin(clazz, left, right);
+        return this;
+    }
+
+    // ========== 添加扩展 Join 支持 ext 函数式参数 ==========
+    public <A, B> MPJLambdaWrapperX<T> leftJoin(Class<A> clazz, SFunction<A, ?> left, SFunction<B, ?> right, Consumer<MPJLambdaWrapperX<T>> ext) {
+        super.leftJoin(clazz, left, right);
+        if (ext != null) ext.accept(this);
+        return this;
+    }
+
+    public <A, B> MPJLambdaWrapperX<T> rightJoin(Class<A> clazz, SFunction<A, ?> left, SFunction<B, ?> right, Consumer<MPJLambdaWrapperX<T>> ext) {
+        super.rightJoin(clazz, left, right);
+        if (ext != null) ext.accept(this);
+        return this;
+    }
+
+    public <A, B> MPJLambdaWrapperX<T> innerJoin(Class<A> clazz, SFunction<A, ?> left, SFunction<B, ?> right, Consumer<MPJLambdaWrapperX<T>> ext) {
+        super.innerJoin(clazz, left, right);
+        if (ext != null) ext.accept(this);
+        return this;
+    }
+
 
 }

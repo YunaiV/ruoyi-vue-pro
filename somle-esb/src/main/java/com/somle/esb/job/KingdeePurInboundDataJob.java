@@ -11,7 +11,7 @@ public class KingdeePurInboundDataJob extends KingdeeDataJob {
     public String execute(String param) throws Exception {
         // 设置日期参数
         setDate(param);
-        var vo = KingdeePurInboundReqVO.builder().build();
+        var vo = new KingdeePurInboundReqVO();
         for (KingdeeClient client : kingdeeService.getClients()) {
             client.streamPurInbound(vo).forEach(
                 page -> {

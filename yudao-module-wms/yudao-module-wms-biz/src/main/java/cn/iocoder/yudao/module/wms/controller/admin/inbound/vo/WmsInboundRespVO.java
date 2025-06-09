@@ -9,12 +9,14 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
 import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,creator,code,inbound_status,company_id,inbound_time,create_time,arrival_actual_time,audit_status,creator_comment,type,trace_no,upstream_bill_type,updater,update_time,upstream_bill_id,init_age,shipping_method,id,upstream_bill_code,dept_id,warehouse_id,arrival_plan_time
+ * @table-fields : tenant_id,creator,code,inbound_status,company_id,create_time,inbound_time,arrival_actual_time,remark,audit_status,trace_no,type,updater,upstream_type,update_time,init_age,upstream_id,shipping_method,id,upstream_code,dept_id,arrival_plan_time,shelving_status,warehouse_id
  */
 @Schema(description = "管理后台 - 入库单 Response VO")
 @Data
@@ -40,10 +42,6 @@ public class WmsInboundRespVO {
     @Schema(description = "WMS运输方式 ; WmsShippingMethod : 0-海运 , 1-铁路 , 2-空运 , 3-集卡")
     @ExcelProperty("WMS运输方式")
     private Integer shippingMethod;
-
-    @Schema(description = "特别说明，创建方专用")
-    @ExcelProperty("特别说明")
-    private String creatorComment;
 
     @Schema(description = "初始库龄")
     @ExcelProperty("初始库龄")
@@ -99,9 +97,9 @@ public class WmsInboundRespVO {
     @ExcelProperty("实际到货时间")
     private LocalDateTime arrivalActualTime;
 
-    @Schema(description = "预计到货时间", example = "")
+    @Schema(description = "计划到货时间", example = "")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    @ExcelProperty("预计到货时间")
+    @ExcelProperty("计划到货时间")
     private LocalDateTime arrivalPlanTime;
 
     @Schema(description = "入库时间", example = "")
@@ -129,13 +127,21 @@ public class WmsInboundRespVO {
 
     @Schema(description = "来源单据ID", example = "")
     @ExcelProperty("来源单据ID")
-    private Long upstreamBillId;
+    private Long upstreamId;
 
-    @Schema(description = "来源单据号", example = "")
-    @ExcelProperty("来源单据号")
-    private String upstreamBillCode;
+    @Schema(description = "来源单据编码", example = "")
+    @ExcelProperty("来源单据编码")
+    private String upstreamCode;
 
-    @Schema(description = "WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单 , 2-盘点单", example = "")
-    @ExcelProperty("WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单 , 2-盘点单")
-    private Integer upstreamBillType;
+    @Schema(description = "SYSTEM单据类型 ; BillType : 0-手工入库 , 1-采购入库 , 2-盘点入库", example = "")
+    @ExcelProperty("WMS来源单据类型")
+    private Integer upstreamType;
+
+    @Schema(description = "WMS入库单上架状态 ; WmsInboundShelvingStatus : 1-未上架 , 2-部分上架 , 3-已上架", example = "")
+    @ExcelProperty("WMS入库单上架状态")
+    private Integer shelveStatus;
+
+    @Schema(description = "特别说明，创建方专用", example = "")
+    @ExcelProperty("特别说明，创建方专用")
+    private String remark;
 }

@@ -272,6 +272,46 @@ public class CollectionUtils {
         return asList(createList, updateList, deleteList);
     }
 
+    /**
+     * 对比老、新两个列表，找出新增、修改、删除的数据
+     *
+     * @param oldList     老列表
+     * @param newList     新列表
+     * @param sameFunc    标识判断函数：判断两个对象是否是“同一个”
+     * @param changedFunc 变更判断函数：判断两个对象是否“字段内容变更”
+     * @return [新增列表、修改列表、删除列表]
+     */
+    public static <T> List<List<T>> diffList(Collection<T> oldList, Collection<T> newList,
+                                             BiFunction<T, T, Boolean> sameFunc,
+                                             BiPredicate<T, T> changedFunc) {
+        List<T> createList = new LinkedList<>(newList); // 默认都认为是新增的，后续会进行移除
+        List<T> updateList = new ArrayList<>();
+        List<T> deleteList = new ArrayList<>();
+
+        // 遍历旧数据，找出更新和删除项
+        for (T oldObj : oldList) {
+            T foundObj = null;
+            for (Iterator<T> iterator = createList.iterator(); iterator.hasNext(); ) {
+                T newObj = iterator.next();
+                if (!sameFunc.apply(oldObj, newObj)) {
+                    continue;
+                }
+                iterator.remove();
+                foundObj = newObj;
+                break;
+            }
+            if (foundObj != null) {
+                if (!changedFunc.test(oldObj, foundObj)) {
+                    updateList.add(foundObj);
+                }
+            } else {
+                deleteList.add(oldObj);
+            }
+        }
+        return Arrays.asList(createList, updateList, deleteList);
+    }
+
+
     public static boolean containsAny(Collection<?> source, Collection<?> candidates) {
         return org.springframework.util.CollectionUtils.containsAny(source, candidates);
     }

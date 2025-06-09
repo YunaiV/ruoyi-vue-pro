@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.srm.config.purchase.request.impl.action.item;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.cola.statemachine.Action;
 import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
-import cn.iocoder.yudao.module.srm.api.purchase.SrmOrderCountDTO;
+import cn.iocoder.yudao.module.srm.config.machine.SrmQuantityOrderedCountContext;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseRequestItemsMapper;
@@ -28,12 +28,12 @@ import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_REQUES
 //订购子表状态机
 @Component
 @Slf4j
-public class ItemOrderActionImpl implements Action<SrmOrderStatus, SrmEventEnum, SrmOrderCountDTO> {
+public class ItemOrderActionImpl implements Action<SrmOrderStatus, SrmEventEnum, SrmQuantityOrderedCountContext> {
 
     @Autowired
     @Lazy
     SrmPurchaseRequestMapper requestMapper;
-    @Resource(name = SrmStateMachines.PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME)
+    @Resource(name = SrmStateMachines.PURCHASE_REQUEST_ORDER_STATE_MACHINE)
     @Lazy
     StateMachine<SrmOrderStatus, SrmEventEnum, SrmPurchaseRequestDO> requestStateMachine;
     @Autowired
@@ -46,8 +46,8 @@ public class ItemOrderActionImpl implements Action<SrmOrderStatus, SrmEventEnum,
     private SrmPurchaseRequestItemsMapper itemsMapper;
 
     @Override
-    @Transactional
-    public void execute(SrmOrderStatus from, SrmOrderStatus to, SrmEventEnum event, SrmOrderCountDTO context) {
+    @Transactional(rollbackFor = Exception.class)
+    public void execute(SrmOrderStatus from, SrmOrderStatus to, SrmEventEnum event, SrmQuantityOrderedCountContext context) {
         //更新采购申请项的下单数量
         //更新采购申请项的采购状态(暂无)
         SrmPurchaseRequestItemsDO rItemDO = null;

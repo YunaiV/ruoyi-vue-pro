@@ -42,7 +42,7 @@ public class KingdeeServiceTest extends SomleBaseSpringTest {
         {"辅助资料", "bd_auxinfo"},
         {"品标签分类", "bd_labelgroup"},
         {"辅助资料分类", "bd_auxinfotype"},
-        {"库存", "inv_inventory_entity"},
+        {"库存", "inv_stockCheck_entity"},
         {"物流公司", "bd_logisticscompany"},
         {"部门", "bd_department"},
         {"外部基础资料", "iac_virtualbase"},
@@ -150,7 +150,7 @@ public class KingdeeServiceTest extends SomleBaseSpringTest {
             .createStartTime(LocalDateTimeUtils.toTimestamp(LocalDateTime.now().minusDays(1)))
             .createEndTime(LocalDateTimeUtils.toTimestamp(LocalDateTime.now()))
             .build();
- log.info(JsonUtilsX.toJsonString(client.streamPurRequest(vo)));
+        log.info(JsonUtilsX.toJsonString(client.getAllPurRequest(vo)));
     }
 
     @Test
@@ -163,7 +163,7 @@ public class KingdeeServiceTest extends SomleBaseSpringTest {
             .createEndTime(Timestamp.from(end))
             .build();
         log.info(JsonUtilsX.toJSONObject(vo).toString());
-log.info(client.streamPurOrder(vo).toString());
+        log.info(client.getAllPurOrder(vo).toString());
     }
 
     @Test

@@ -33,18 +33,14 @@ public class SrmPurchaseOrderDO extends TenantBaseDO {
     private Long id;
 
     @Version
-    private Long version;
+    private Integer version;
 
     /**
      * 采购单编号
      */
-    private String no;
+    private String code;
     /**
-     * 采购状态
-     */
-    private Integer status;
-    /**
-     * 供应商编号
+     * 供应商编号(乙方)
      */
     private Long supplierId;
     /**
@@ -55,6 +51,10 @@ public class SrmPurchaseOrderDO extends TenantBaseDO {
      * 合计数量
      */
     private BigDecimal totalCount;
+    /**
+     * 币别id(财务管理-币别维护)
+     */
+    private Long currencyId;
     /**
      * 币别名称
      */
@@ -70,7 +70,7 @@ public class SrmPurchaseOrderDO extends TenantBaseDO {
     /**
      * 合计税额，单位：元
      */
-    private BigDecimal totalTaxPrice;
+    private BigDecimal totalGrossPrice;
     /**
      * 优惠率，百分比
      */
@@ -94,9 +94,9 @@ public class SrmPurchaseOrderDO extends TenantBaseDO {
     /**
      * 采购入库数量
      */
-    private BigDecimal totalInCount;
+    private BigDecimal totalInboundCount;
     /**
-     * 采购退货数量
+     * 采购退货总数
      */
     private BigDecimal totalReturnCount;
     /**
@@ -116,17 +116,9 @@ public class SrmPurchaseOrderDO extends TenantBaseDO {
      */
     private LocalDateTime auditTime;
     /**
-     * 财务主体id
+     * 财务主体id(采购公司，甲方)
      */
     private Long purchaseCompanyId;
-    //    /**
-    //     * x码
-    //     */
-    //    private String xCode;
-    /**
-     * 箱率
-     */
-    private String containerRate;
     /**
      * 仓库id
      */
@@ -142,7 +134,7 @@ public class SrmPurchaseOrderDO extends TenantBaseDO {
     /**
      * 入库状态
      */
-    private Integer inStatus;
+    private Integer inboundStatus;
     /**
      * 付款状态
      */
@@ -156,17 +148,17 @@ public class SrmPurchaseOrderDO extends TenantBaseDO {
      */
     private String address;
     /**
-     * 付款条款
+     * 付款条款(快照)
      */
     private String paymentTerms;
     /**
      * 装运港
      */
-    private String portOfLoading;
+    private String fromPortName;
     /**
      * 目的港
      */
-    private String portOfDischarge;
+    private String toPortName;
     /**
      * 采购状态
      */
@@ -174,5 +166,5 @@ public class SrmPurchaseOrderDO extends TenantBaseDO {
     /**
      * 审核意见
      */
-    private String reviewComment;
+    private String auditAdvice;
 }

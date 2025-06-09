@@ -18,7 +18,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 public class SrmPurchaseRequestPageReqVO extends PageParam {
 
     @Schema(description = "单据编号")
-    private String no;
+    private String code;
 
     @Schema(description = "申请人id")
     private Long applicantId;
@@ -70,17 +70,17 @@ public class SrmPurchaseRequestPageReqVO extends PageParam {
     private String delivery;
 
     @Schema(description = "审核意见")
-    private String reviewComment;
+    private String auditAdvice;
 
     @Schema(description = "入库状态")
-    private Integer inStatus;
+    private Integer inboundStatus;
     //子表分割线
 
     @Schema(description = "产品id")
     private Long productId;
 
     @Schema(description = "产品sku")
-    private String barCode;
+    private String productCode;
 
     @Schema(description = "产品名称")
     private String productName;

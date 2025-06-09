@@ -2,10 +2,12 @@ package cn.iocoder.yudao.module.tms.api.logistic.customrule;
 
 import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.TmsCustomRuleDTO;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
 //@FeignClient(name = "tms-custom", path = "/tms/custom")
+@Validated
 public interface TmsCustomRuleApi {
 
     /**

@@ -39,6 +39,13 @@ public enum WmsStockFlowDirection implements ArrayValuable<Integer>, DictEnum {
     /**
      * 按 name 或 label 匹配枚举，name 优先
      **/
+    public static WmsStockFlowDirection parseByQty(Integer qty) {
+        return qty > 0 ? IN : OUT;
+    }
+
+    /**
+     * 按 name 或 label 匹配枚举，name 优先
+     **/
     public static WmsStockFlowDirection parse(String nameOrLabel) {
         for (WmsStockFlowDirection e : WmsStockFlowDirection.values()) {
             if(e.name().equalsIgnoreCase(nameOrLabel)) {

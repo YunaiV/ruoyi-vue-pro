@@ -1,32 +1,34 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse;
 
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehousePageReqVO;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehouseRespVO;
+import cn.iocoder.yudao.module.wms.api.warehouse.dto.WmsWarehouseQueryDTO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.service.stock.warehouse.WmsStockWarehouseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_WAREHOUSE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.STOCK_WAREHOUSE_NOT_EXISTS;
 
 @Tag(name = "仓库库存")
 @RestController
@@ -46,16 +48,16 @@ public class WmsStockWarehouseController {
     // public CommonResult<Long> createStockWarehouse(@Valid @RequestBody WmsStockWarehouseSaveReqVO createReqVO) {
     // return success(stockWarehouseService.createStockWarehouse(createReqVO).getId());
     // }
-    // /**
-    // * @sign : A68FAA9D68AA9447
-    // */
-    // @PutMapping("/update")
-    // @Operation(summary = "更新仓库库存")
-    // @PreAuthorize("@ss.hasPermission('wms:stock-warehouse:update')")
-    // public CommonResult<Boolean> updateStockWarehouse(@Valid @RequestBody WmsStockWarehouseSaveReqVO updateReqVO) {
-    // stockWarehouseService.updateStockWarehouse(updateReqVO);
-    // return success(true);
-    // }
+     /**
+     * @sign : A68FAA9D68AA9447
+     */
+     @PutMapping("/update")
+     @Operation(summary = "更新仓库库存")
+     @PreAuthorize("@ss.hasPermission('wms:stock-warehouse:update')")
+     public CommonResult<Boolean> updateStockWarehouse(@Valid @RequestBody WmsStockWarehouseSaveReqVO updateReqVO) {
+     stockWarehouseService.updateStockWarehouse(updateReqVO);
+     return success(true);
+     }
     // @DeleteMapping("/delete")
     // @Operation(summary = "删除仓库库存")
     // @Parameter(name = "id", description = "编号", required = true)
@@ -111,14 +113,54 @@ public class WmsStockWarehouseController {
         // 返回
         return success(voPageResult);
     }
-    // @GetMapping("/export-excel")
-    // @Operation(summary = "导出仓库库存 Excel")
-    // @PreAuthorize("@ss.hasPermission('wms:stock-warehouse:export')")
-    // @ApiAccessLog(operateType = EXPORT)
-    // public void exportStockWarehouseExcel(@Valid WmsStockWarehousePageReqVO pageReqVO, HttpServletResponse response) throws IOException {
-    // pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-    // List<WmsStockWarehouseDO> list = stockWarehouseService.getStockWarehousePage(pageReqVO).getList();
-    // // 导出 Excel
-    // ExcelUtils.write(response, "仓库库存.xls", "数据", WmsStockWarehouseRespVO.class, BeanUtils.toBean(list, WmsStockWarehouseRespVO.class));
-    // }
+
+    /**
+     * @sign : 5473D7BBFDAEBB83
+     */
+    @PostMapping("/page-grouped")
+    @Operation(summary = "获得分组的仓库库存分页")
+    @PreAuthorize("@ss.hasPermission('wms:stock-warehouse:query')")
+    public CommonResult<PageResult<WmsStockWarehouseProductRespVO>> getStockGroupedWarehousePage(@Valid @RequestBody WmsStockWarehousePageReqVO pageReqVO) {
+        // 查询数据
+        PageResult<WmsStockWarehouseProductRespVO> doPageResult = stockWarehouseService.getStockGroupedWarehousePage(pageReqVO);
+        // // 转换
+        // PageResult<WmsStockWarehouseRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsStockWarehouseRespVO.class);
+        // 
+        // 
+        // 
+        // // 人员姓名填充
+        // AdminUserApi.inst().prepareFill(voPageResult.getList())
+        // .mapping(WmsStockWarehouseRespVO::getCreator, WmsStockWarehouseRespVO::setCreatorName)
+        // .mapping(WmsStockWarehouseRespVO::getUpdater, WmsStockWarehouseRespVO::setUpdaterName)
+        // .fill();
+        // stockWarehouseService.assembleProducts(voPageResult.getList());
+        // stockWarehouseService.assembleWarehouse(voPageResult.getList());
+        // stockWarehouseService.assembleStockBin(voPageResult.getList());
+        // 返回
+        return success(doPageResult);
+    }
+
+    @PostMapping("/export-excel")
+    @Operation(summary = "导出仓库库存 Excel")
+    @PreAuthorize("@ss.hasPermission('wms:stock-warehouse:export')")
+    @ApiAccessLog(operateType = EXPORT)
+    public void exportStockWarehouseExcel(@Valid @RequestBody WmsStockWarehousePageReqVO pageReqVO, HttpServletResponse response) throws IOException {
+        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        List<WmsStockWarehouseRespVO> list = this.getStockWarehousePage(pageReqVO).getData().getList();
+        List<WmsStockWarehouseExcelVO> excelVOList = BeanUtils.toBean(list, WmsStockWarehouseExcelVO.class);
+        StreamX.from(excelVOList).assemble(list,WmsStockWarehouseRespVO::getId,WmsStockWarehouseExcelVO::getId,(ex,rs)->{
+            ex.setWarehouseName(rs.getWarehouse().getName());
+            ex.setProductCode(rs.getProduct().getCode());
+        });
+        // 导出 Excel
+        ExcelUtils.write(response, "仓库库存.xls", "数据", WmsStockWarehouseExcelVO.class, excelVOList);
+    }
+
+    @PostMapping("/select-sellable-qty")
+    @Operation(summary = "查询可售库存")
+//    @PreAuthorize("@ss.hasPermission('wms:inbound:query')")
+    public CommonResult<List<WmsStockWarehouseDO>> selectSellableQty(@RequestBody WmsWarehouseQueryDTO wmsWarehouseQueryDTO) {
+        return success(stockWarehouseService.selectSellableQtyList(wmsWarehouseQueryDTO));
+
+    }
 }

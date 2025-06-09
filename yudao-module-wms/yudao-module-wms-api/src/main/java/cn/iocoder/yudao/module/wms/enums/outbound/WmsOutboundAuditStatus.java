@@ -22,6 +22,10 @@ public enum WmsOutboundAuditStatus implements ArrayValuable<Integer>, DictEnum {
     REJECT(2, "已驳回"),
     PASS(3, "已通过"),
     FINISHED(4, "已出库"),
+    /**
+     * 5:已作废
+     **/
+    ABANDONED(5, "作废"),
    ;
 
     public static final Integer[] VALUES = Arrays.stream(values()).map(WmsOutboundAuditStatus::getValue).toArray(Integer[]::new);
@@ -94,7 +98,7 @@ public enum WmsOutboundAuditStatus implements ArrayValuable<Integer>, DictEnum {
 
     public static enum Event {
 
-        SUBMIT("提交审核"),AGREE("通过审核"), REJECT("拒绝审核"),FINISH("完成出库");
+        SUBMIT("提交审核"),ABANDON("废弃出库单"),AGREE("通过审核"), REJECT("拒绝审核"),FINISH("完成出库");
 
         @Getter
         private String label;

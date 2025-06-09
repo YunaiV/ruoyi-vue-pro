@@ -24,6 +24,8 @@ public interface FmsCompanyMapper extends BaseMapperX<FmsCompanyDO> {
             .eqIfPresent(FmsCompanyDO::getUpdater, reqVO.getUpdater())
             .betweenIfPresent(FmsCompanyDO::getUpdateTime, reqVO.getUpdateTime())
             .likeIfPresent(FmsCompanyDO::getName, reqVO.getName())
+            .likeIfPresent(FmsCompanyDO::getNameEn, reqVO.getNameEn())
+            .likeIfPresent(FmsCompanyDO::getAbbr, reqVO.getAbbr())
             .likeIfPresent(FmsCompanyDO::getContact, reqVO.getContact())
             .likeIfPresent(FmsCompanyDO::getMobile, reqVO.getMobile())
             .likeIfPresent(FmsCompanyDO::getTelephone, reqVO.getTelephone())
@@ -31,6 +33,7 @@ public interface FmsCompanyMapper extends BaseMapperX<FmsCompanyDO> {
             .likeIfPresent(FmsCompanyDO::getFax, reqVO.getFax())
             .likeIfPresent(FmsCompanyDO::getDeliveryAddress, reqVO.getDeliveryAddress())
             .likeIfPresent(FmsCompanyDO::getCompanyAddress, reqVO.getCompanyAddress())
+            .likeIfPresent(FmsCompanyDO::getCompanyAddressEn, reqVO.getCompanyAddressEn())
             .likeIfPresent(FmsCompanyDO::getRemark, reqVO.getRemark())
             .eqIfPresent(FmsCompanyDO::getStatus, reqVO.getStatus())
             .likeIfPresent(FmsCompanyDO::getTaxNo, reqVO.getTaxNo())
@@ -40,10 +43,10 @@ public interface FmsCompanyMapper extends BaseMapperX<FmsCompanyDO> {
             .orderByDesc(FmsCompanyDO::getId));
     }
 
-    //精简列表
+    //精简列表，查找开启状态的DO
     default List<FmsCompanyDO> selectListSimple() {
         return selectList(new LambdaQueryWrapperX<FmsCompanyDO>()
-            .select(FmsCompanyDO::getId, FmsCompanyDO::getName)
+            .select(FmsCompanyDO::getId, FmsCompanyDO::getName).eq(FmsCompanyDO::getStatus, true)
             .orderByDesc(FmsCompanyDO::getId));
     }
 }

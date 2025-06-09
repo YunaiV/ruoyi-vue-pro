@@ -18,8 +18,8 @@ import java.util.Map;
 public enum SrmExecutionStatus implements ArrayValuable<Integer> {
 
     PENDING(1, "待执行"),
-    IN_PROGRESS(2, "执行中"),
-    COMPLETED(3, "已完成"),
+    IN_PROGRESS(2, "部分执行"),
+    COMPLETED(3, "全部执行"),
     PAUSED(4, "已暂停"),
     CANCELLED(5, "已取消"),
     FAILED(6, "执行失败"),

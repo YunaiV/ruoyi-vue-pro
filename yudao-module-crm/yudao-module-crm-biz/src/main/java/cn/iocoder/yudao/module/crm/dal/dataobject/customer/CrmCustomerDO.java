@@ -152,7 +152,7 @@ public class CrmCustomerDO extends BaseDO {
     /**
      * 国家列表
      * <p>
-     * 对应字典 {@link cn.iocoder.yudao.framework.common.enums.enums.DictTypeConstants#COUNTRY_CODE}
+     * 对应字典
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<Long> countryCodes;

@@ -50,6 +50,16 @@ public interface DeptApi {
      */
     List<DeptRespDTO> getDeptList(Collection<Long> ids);
 
+
+    /**
+     * 按名称获得部门信息数组
+     *
+     * @param names 部门编号数组
+     * @return 部门信息数组
+     */
+    List<DeptRespDTO> getDeptListByNames(Collection<String> names);
+
+
     /**
      * 校验部门们是否有效。如下情况，视为无效：
      * 1. 部门编号不存在
@@ -68,6 +78,17 @@ public interface DeptApi {
     default Map<Long, DeptRespDTO> getDeptMap(Collection<Long> ids) {
         List<DeptRespDTO> list = getDeptList(ids);
         return CollectionUtils.convertMap(list, DeptRespDTO::getId);
+    }
+
+    /**
+     * 获得指定编号的部门 Map
+     *
+     * @param names 部门编号数组
+     * @return 部门 Map
+     */
+    default Map<String, DeptRespDTO> getDeptMapByNames(Collection<String> names) {
+        List<DeptRespDTO> list = getDeptListByNames(names);
+        return CollectionUtils.convertMap(list, DeptRespDTO::getName);
     }
 
     /**

@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 拣货单详情 Service 接口
@@ -57,4 +58,8 @@ public interface WmsPickupItemService {
     List<WmsPickupItemDO> selectByPickupId(Long id);
 
     void assembleProduct(List<WmsPickupItemRespVO> itemList);
+
+    void assembleInbound(List<WmsPickupItemRespVO> itemList);
+
+    List<WmsPickupItemDO> getPickupItemListByInboundItemIds(Set<Long> inboundItemIds);
 }

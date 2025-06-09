@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
  */
 @Repository
 @Slf4j
+@SuppressWarnings("ALL")
 public class SrmNoRedisDAO {
 
     //    /**
@@ -71,7 +72,7 @@ public class SrmNoRedisDAO {
     /**
      * 采购入库 {@link SrmPurchaseInDO}
      */
-    public static final String PURCHASE_IN_NO_PREFIX = "CGRK";
+    public static final String PURCHASE_IN_NO_PREFIX = "CGDH";
     /**
      * 采购退货 {@link SrmPurchaseReturnDO}
      */
@@ -111,18 +112,18 @@ public class SrmNoRedisDAO {
      * 手动设置序号时，同时更新 Redis 的值为最大值
      *
      * @param prefix       前缀
-     * @param fullSerialNo 全部流水号，例如说 "PO-20211009-000001"
+     * @param fullSerialNo 全部流水号，例如说 "CGDD-20250109-000001"
      */
     public void setManualSerial(String prefix, String fullSerialNo) {
         try {
             // 解析出日期和流水号数字部分
-            String[] parts = fullSerialNo.split("-");
+            String[] parts = fullSerialNo.split(StrPool.DASHED);
             String datePart = parts[1];           // 20250329
             String numberPart = parts[2];         // 000123
             long manualNo = Long.parseLong(numberPart);
 
             // 构造 Redis key
-            String keyPrefix = prefix + "-" + datePart;
+            String keyPrefix = prefix + StrPool.DASHED + datePart;
             String key = SrmRedisKeyConstants.NO + keyPrefix;
 
             // 获取 Redis 当前值

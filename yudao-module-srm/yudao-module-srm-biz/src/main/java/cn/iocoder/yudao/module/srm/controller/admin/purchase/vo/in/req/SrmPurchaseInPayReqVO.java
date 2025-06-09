@@ -24,8 +24,8 @@ public class SrmPurchaseInPayReqVO {
 
     @Data
     public static class Item {
-        @Schema(description = "采购入库项ID", requiredMode = Schema.RequiredMode.REQUIRED)
-        @NotNull(message = "采购入库项ID不能为空")
+        @Schema(description = "采购到货项ID", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "采购到货项ID不能为空")
         private Long id;
 
         @Schema(description = "付款金额", requiredMode = Schema.RequiredMode.REQUIRED)

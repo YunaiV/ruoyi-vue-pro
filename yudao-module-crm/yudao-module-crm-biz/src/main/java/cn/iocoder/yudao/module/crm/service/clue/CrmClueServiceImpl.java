@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.crm.service.clue;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
-import cn.iocoder.yudao.framework.common.enums.enums.DictTypeConstants;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.clue.vo.CrmCluePageReqVO;
@@ -132,7 +131,7 @@ public class CrmClueServiceImpl implements CrmClueService {
             Collection<String> countryCodes = reqVO.getCountryCodes().stream()
                 .map(String::valueOf)
                 .toList();
-            dictDataApi.validateDictDataList(DictTypeConstants.COUNTRY_CODE, countryCodes);
+            dictDataApi.validateDictDataList(CrmDictTypeConstants.CRM_COUNTRY_CODE, countryCodes);
         }
     }
 

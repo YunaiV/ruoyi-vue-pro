@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -63,6 +65,14 @@ public class SrmPaymentTermServiceImpl implements SrmPaymentTermService {
     @Override
     public SrmPaymentTermDO getPaymentTerm(Long id) {
         return paymentTermMapper.selectById(id);
+    }
+
+    @Override
+    public List<SrmPaymentTermDO> getPaymentTermList(List<Long> ids) {
+        if (ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return paymentTermMapper.selectByIds(new HashSet<>(ids));
     }
 
     @Override

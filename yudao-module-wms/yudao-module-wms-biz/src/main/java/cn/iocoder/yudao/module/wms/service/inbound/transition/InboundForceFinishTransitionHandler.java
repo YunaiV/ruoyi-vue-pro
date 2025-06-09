@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
 import org.springframework.stereotype.Component;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_FORCE_FINISH_NOT_ALLOWED;
+import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.INBOUND_FORCE_FINISH_NOT_ALLOWED;
 
 
 /**

@@ -30,7 +30,9 @@ public class OrderExecuteActionImpl implements Action<SrmExecutionStatus, SrmEve
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void execute(SrmExecutionStatus from, SrmExecutionStatus to, SrmEventEnum event, SrmPurchaseOrderDO context) {
-        if (event != SrmEventEnum.EXECUTION_INIT) {
+
+        //动态调整执行状态
+        if (event == SrmEventEnum.EXECUTION_ADJUSTMENT) {
             //判断子 是否全部执行？部分执行？全部未执行，以此变化
             boolean hasNotInEx = false;
             boolean hasPartialEx = false;
@@ -60,11 +62,12 @@ public class OrderExecuteActionImpl implements Action<SrmExecutionStatus, SrmEve
             SrmPurchaseOrderDO orderDO = mapper.selectById(context.getId());
             orderDO.setExecuteStatus(newStatus.getCode());
             mapper.updateById(orderDO);
+            log.debug("执行状态机触发({})事件", event.getDesc());
+        } else {
+            SrmPurchaseOrderDO orderDO = mapper.selectById(context.getId());
+            orderDO.setExecuteStatus(to.getCode());
+            mapper.updateById(orderDO);
+            log.debug("执行状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
         }
-        SrmPurchaseOrderDO orderDO = mapper.selectById(context.getId());
-        orderDO.setExecuteStatus(to.getCode());
-        mapper.updateById(orderDO);
-        //log
-        log.debug("执行状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), from.getDesc(), to.getDesc());
     }
 }

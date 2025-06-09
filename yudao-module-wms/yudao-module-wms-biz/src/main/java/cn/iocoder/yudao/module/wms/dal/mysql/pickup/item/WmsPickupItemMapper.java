@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.pickup.item;
 
-import java.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.wms.controller.admin.pickup.item.vo.WmsPickupItemPageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
 import org.apache.ibatis.annotations.Mapper;
-import cn.iocoder.yudao.module.wms.controller.admin.pickup.item.vo.*;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * 拣货单详情 Mapper
@@ -33,5 +35,14 @@ public interface WmsPickupItemMapper extends BaseMapperX<WmsPickupItemDO> {
      */
     default List<WmsPickupItemDO> selectByPickupId(Long pickupId) {
         return selectList(new LambdaQueryWrapperX<WmsPickupItemDO>().eq(WmsPickupItemDO::getPickupId, pickupId));
+    }
+
+    default List<WmsPickupItemDO> getPickupItemListByInboundItemIds(Set<Long> inboundItemIds) {
+        return selectList(new LambdaQueryWrapperX<WmsPickupItemDO>().in(WmsPickupItemDO::getInboundItemId, inboundItemIds));
+    }
+
+    default WmsPickupItemDO getByInboundIdAndProductId(Long inboundId, Long productId) {
+        return selectOne(new LambdaQueryWrapperX<WmsPickupItemDO>().eq(WmsPickupItemDO::getInboundId, inboundId)
+                .eq(WmsPickupItemDO::getProductId, productId));
     }
 }

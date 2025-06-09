@@ -4,12 +4,11 @@ oss:
   endpoint: https://oss-cn-hangzhou.aliyuncs.com
 spring:
   main:
-    #    lazy-initialization: true # 如果开启懒加载，会导致ServiceActivator不能自动订阅inputChannel
+    lazy-initialization: true # 开启懒加载，加快速度
     banner-mode: off # 单元测试，禁用 Banner
   test:
     database:
       replace: none
-
 logging:
   level:
     com.somle: DEBUG

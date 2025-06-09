@@ -8,8 +8,6 @@ import com.somle.kingdee.model.KingdeePurOrderReqVO;
 import com.somle.kingdee.service.KingdeeClient;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 public class KingdeePurOrderDataJob extends KingdeeDataJob {
 
@@ -27,7 +25,7 @@ public class KingdeePurOrderDataJob extends KingdeeDataJob {
 
         // 获取所有 Kingdee 客户端列表
         for (KingdeeClient client : kingdeeService.getClients()) {
-            client.streamPurOrder(vo).forEach(
+            client.getAllPurOrder(vo).forEach(
 
                 page -> {
                     service.send(

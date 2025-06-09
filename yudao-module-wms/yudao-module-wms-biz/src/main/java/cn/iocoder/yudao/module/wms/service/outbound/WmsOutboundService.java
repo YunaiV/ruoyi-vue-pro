@@ -2,12 +2,14 @@ package cn.iocoder.yudao.module.wms.service.outbound;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundImportReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
 import jakarta.validation.Valid;
+
 import java.util.List;
 
 /**
@@ -30,7 +32,7 @@ public interface WmsOutboundService {
      *
      * @param updateReqVO 更新信息
      */
-    WmsOutboundDO updateOutbound(@Valid WmsOutboundSaveReqVO updateReqVO);
+    void updateOutbound(@Valid WmsOutboundSaveReqVO updateReqVO);
 
     /**
      * 删除出库单
@@ -77,5 +79,11 @@ public interface WmsOutboundService {
 
     void assembleApprovalHistory(List<WmsOutboundRespVO> list);
 
-    WmsOutboundDO createForInventory(WmsOutboundSaveReqVO outboundSaveReqVO);
+    WmsOutboundDO createForStockCheck(WmsOutboundSaveReqVO outboundSaveReqVO);
+
+    List<WmsOutboundDO> getOutboundList(Integer upstreamType, Long upstreamId);
+
+    WmsOutboundRespVO generateOutbound(WmsOutboundImportReqVO importReqVO);
+
+    void forceAbandon(WmsApprovalReqVO approvalReqVO);
 }

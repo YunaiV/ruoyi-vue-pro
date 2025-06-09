@@ -18,7 +18,7 @@ public class PaymentActionImpl implements Action<SrmPaymentStatus, SrmEventEnum,
     private SrmPurchaseRequestMapper mapper;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void execute(SrmPaymentStatus from, SrmPaymentStatus to, SrmEventEnum event, SrmPurchaseRequestDO context) {
         SrmPurchaseRequestDO aDo = mapper.selectById(context.getId());
         aDo.setOrderStatus(to.getCode());

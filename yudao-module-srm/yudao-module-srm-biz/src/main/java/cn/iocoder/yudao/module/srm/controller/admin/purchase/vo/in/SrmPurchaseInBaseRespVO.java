@@ -1,178 +1,280 @@
 package cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in;
 
-import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
-import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.base.SrmPurchaseBaseRespVO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(description = "管理后台 - ERP 采购入库 Response VO")
+@Schema(description = "管理后台 - 采购到货单基础 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class SrmPurchaseInBaseRespVO extends SrmPurchaseBaseRespVO {
-    @Schema(description = "编号")
+public class SrmPurchaseInBaseRespVO {
+
+    // ========== 基本信息 ==========
+    @Schema(description = "到货单编号", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("到货单编号")
     private Long id;
 
-    @Schema(description = "入库单编号")
-    @ExcelProperty("入库单编号")
-    private String no;
+    @Schema(description = "到货单号", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("到货单号")
+    private String code;
 
-    @Schema(description = "单据日期")
+    @Schema(description = "单据日期", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("单据日期")
     private LocalDateTime billTime;
 
-    @Schema(description = "收获地址")
+    @Schema(description = "到货时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("到货时间")
+    private LocalDateTime arriveTime;
+
+    @Schema(description = "备注")
+    private String remark;
+
+    // ========== 供应商信息 ==========
+    @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Long supplierId;
+
+    @Schema(description = "供应商名称")
+    @ExcelProperty("供应商名称")
+    private String supplierName;
+
+    @Schema(description = "收货地址")
     private String address;
+
+    // ========== 结算信息 ==========
+    @Schema(description = "结算日期")
+    private LocalDateTime settlementDate;
+
+    @Schema(description = "结算账户编号")
+    private Long accountId;
+
+    @Schema(description = "结算账户名称")
+    private String accountName;
+
+    @Schema(description = "币种编号")
+    private Long currencyId;
+
+    @Schema(description = "币种名称")
+    private String currencyName;
+
+    @Schema(description = "汇率")
+    private BigDecimal exchangeRate;
+
+    // ========== 状态信息 ==========
+    @Schema(description = "入库状态")
+    private Integer inboundStatus;
 
     @Schema(description = "付款状态")
     private Integer payStatus;
 
-    @Schema(description = "对账状态(false:未对账 ，true:已对账)")
+    @Schema(description = "对账状态")
     private Boolean reconciliationStatus;
 
-    @Schema(description = "入库时间")
-    @ExcelProperty("入库时间")
-    private LocalDateTime inTime;
+    @Schema(description = "审核状态")
+    private Integer auditStatus;
+
+    @Schema(description = "审核人编号")
+    private Long auditorId;
+
+    @Schema(description = "审核人名称")
+    @ExcelProperty("审核人名称")
+    private String auditorName;
+
+    @Schema(description = "审核时间")
+    private LocalDateTime auditTime;
 
     @Schema(description = "审核意见")
-    private String reviewComment;
+    private String auditAdvice;
+
+    // ========== 数量金额信息 ==========
+    @Schema(description = "商品总体积，单位：m³")
+    private BigDecimal totalVolume;
+
+    @Schema(description = "商品总重量，单位：kg")
+    private BigDecimal totalWeight;
+
+    @Schema(description = "合计数量")
+    private BigDecimal totalCount;
+
+    @Schema(description = "最终合计价格")
+    private BigDecimal totalPrice;
+
+    @Schema(description = "合计产品价格")
+    private BigDecimal totalProductPrice;
+
+    @Schema(description = "合计税额")
+    private BigDecimal totalGrossPrice;
+
+    @Schema(description = "优惠率，百分比")
+    private BigDecimal discountPercent;
+
+    @Schema(description = "优惠金额")
+    private BigDecimal discountPrice;
+
+    @Schema(description = "其他金额")
+    private BigDecimal otherPrice;
+
+    @Schema(description = "已支付金额")
+    private BigDecimal paymentPrice;
+
+    // ========== 审计信息 ==========
+    @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
+    private LocalDateTime createTime;
+
+    @Schema(description = "创建人编号")
+    private String creator;
+
+    @Schema(description = "创建人名称")
+    private String creatorName;
+
+    @Schema(description = "更新时间")
+    private LocalDateTime updateTime;
+
+    @Schema(description = "更新人编号")
+    private String updater;
+
+    @Schema(description = "更新人名称")
+    private String updaterName;
 
     @Schema(description = "版本号")
-    private Long version;
+    private Integer version;
 
+    // ========== 入库项列表 ==========
     @Schema(description = "入库项列表")
     private List<Item> items;
 
     @Data
     public static class Item {
 
-        @Schema(description = "入库项id")
+        // ========== 基本信息 ==========
+        @Schema(description = "入库项编号", requiredMode = Schema.RequiredMode.REQUIRED)
         private Long id;
 
-        @Schema(description = "采购订单项id")
-        private Long orderItemId;
-
-        @Schema(description = "仓库id")
-        private Long warehouseId;
-
-        @Schema(description = "产品存放仓库名称")
-        private String warehouseName;
-
-        @Schema(description = "产品id")
-        private Long productId;
-
-        @Schema(description = "型号规格(产品带出)")
-        private String model;
-
-        @Schema(description = "产品信息")
-        private ErpProductDTO product;
-
-        @Schema(description = "产品单位")
-        private Long productUnitId;
-
-        @Schema(description = "产品单价")
-        private BigDecimal productPrice;
-
-        @Schema(description = "产品数量")
-        @NotNull(message = "产品数量不能为空")
-        private BigDecimal qty;
-
-        @Schema(description = "税率，百分比")
-        private BigDecimal taxPercent;
-
-        @Schema(description = "税额，单位：元")
-        private BigDecimal taxPrice;
-
-        @Schema(description = "含税单价")
-        private BigDecimal actTaxPrice;
-
-        @Schema(description = "价税合计")
-        private BigDecimal allAmount;
+        @Schema(description = "到货单编号", requiredMode = Schema.RequiredMode.REQUIRED)
+        private Long arriveId;
 
         @Schema(description = "备注")
         private String remark;
 
-        //        @Schema(description = "汇率,财务管理-币别维护")
-        //        private BigDecimal exchangeRate;
+        @Schema(description = "版本号")
+        private Integer version;
 
-        @Schema(description = "结算日期")
-        private LocalDateTime settlementDate;
+        // ========== 仓库信息 ==========
+        @Schema(description = "仓库编号", requiredMode = Schema.RequiredMode.REQUIRED)
+        private Long warehouseId;
 
-        // ========== 关联字段 ==========
+        @Schema(description = "仓库名称")
+        @ExcelProperty("仓库名称")
+        private String warehouseName;
 
-        @Schema(description = "库存数量")
-        private BigDecimal stockCount; // 该字段仅仅在“详情”和“编辑”时使用
+        // ========== 产品信息 ==========
+        @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED)
+        private Long productId;
 
-        @Schema(description = "箱率")
-        private String containerRate;
-        // ========== 产品中带出 ==========
-        /**
-         * 商品体积，单位：m^3 平米
-         */
-        @Schema(description = "商品总体积,单位：m^3 平米")
-        private Double totalVolume;
-        /**
-         * 商品重量，单位：kg 千克
-         */
-        @Schema(description = "商品总重量,单位：kg 千克")
-        private Double totalWeight;
+        @Schema(description = "产品名称")
+        @ExcelProperty("产品名称")
+        private String productName;
 
-        //        @Schema(description = "源单行号")
-        //        private int srcSeq;
-        // 源单类型ID
-        //        private String srcBillTypeId;
+        @Schema(description = "产品单位编号", requiredMode = Schema.RequiredMode.REQUIRED)
+        private Long productUnitId;
 
-        //        @Schema(description = "源单类型")
-        //        private String srcBillTypeName;
+        @Schema(description = "产品单位名称")
+        @ExcelProperty("产品单位")
+        private String productUnitName;
 
-        //        @Schema(description = "源单单号")
-        //        private int srcNo;
-
-        @Schema(description = "总价，单位：元,totalPrice = productPrice * count")
-        private BigDecimal totalPrice;
-
-        @Schema(description = "币别id(财务管理-币别维护)")
-        private Long currencyId;
-
-        @Schema(description = "付款状态")
-        private Integer payStatus;
-
-        @Schema(description = "申请人id")
-        private Long applicantId;
-        //申请人名称
-        @Schema(description = "申请人名称")
-        private String applicantName;
-
-        @Schema(description = "申请部门id")
-        private Long applicationDeptId;
-        //申请部门名称
-        @Schema(description = "申请部门名称")
-        private String applicationDeptName;
-
-        @Schema(description = "来源单据类型")
-        private String source;
-
-        @Schema(description = "采购订单编号-展示用(源单单号,采购单)")
-        private String orderNo;
+        @Schema(description = "型号规格")
+        private String model;
 
         @Schema(description = "报关品名")
         private String declaredType;
 
+        @Schema(description = "报关品名英文")
+        private String declaredTypeEn;
+
         @Schema(description = "条码")
-        private String barCode;
+        private String productCode;
 
-        @Schema(description = "产品名称")
-        private String productName;
+        @Schema(description = "x码")
+        private String fbaCode;
 
-        @Schema(description = "产品单位名称")
-        private String productUnitName;
+        @Schema(description = "箱率")
+        private String containerRate;
 
-        @Schema(description = "版本号")
-        private Long version;
+        // ========== 数量金额信息 ==========
+        @Schema(description = "产品单价")
+        private BigDecimal productPrice;
+
+        @Schema(description = "库存数量")
+        private BigDecimal stockCount;
+
+        @Schema(description = "到货数量")
+        private BigDecimal qty;
+
+        @Schema(description = "实际入库数量")
+        private BigDecimal actualQty;
+
+        @Schema(description = "关联订单行的采购数")
+        private BigDecimal orderQty;
+
+        @Schema(description = "总价")
+        private BigDecimal totalPrice;
+
+        @Schema(description = "税率，百分比")
+        private BigDecimal taxRate;
+
+        @Schema(description = "税额")
+        private BigDecimal tax;
+
+        @Schema(description = "含税单价")
+        private BigDecimal grossPrice;
+
+        @Schema(description = "价税合计")
+        private BigDecimal grossTotalPrice;
+
+        @Schema(description = "合计产品价格")
+        private BigDecimal totalProductPrice;
+
+        @Schema(description = "合计税价")
+        private BigDecimal totalGrossPrice;
+
+        @Schema(description = "已付款金额")
+        private BigDecimal payPrice;
+
+        // ========== 状态信息 ==========
+        @Schema(description = "入库状态")
+        private Integer inboundStatus;
+
+        @Schema(description = "付款状态")
+        private Integer payStatus;
+
+        @Schema(description = "付款状态名称")
+        private String payStatusName;
+
+        // ========== 来源信息 ==========
+        @Schema(description = "采购订单项编号")
+        private Long orderItemId;
+
+        @Schema(description = "采购订单编号")
+        private String orderCode;
+
+        @Schema(description = "单据来源")
+        private String source;
+
+        // ========== 申请人信息 ==========
+        @Schema(description = "申请人编号")
+        private Long applicantId;
+
+        @Schema(description = "申请人名称")
+        private String applicantName;
+
+        @Schema(description = "申请部门编号")
+        private Long applicationDeptId;
+
+        @Schema(description = "申请部门名称")
+        private String applicationDeptName;
     }
 }

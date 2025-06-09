@@ -24,7 +24,7 @@ public class KingdeePurRequestDataJob extends KingdeeDataJob {
         // 获取所有 Kingdee 客户端列表
         for (KingdeeClient client : kingdeeService.getClients()) {
 
-            client.streamPurRequest(vo).forEach(
+            client.getAllPurRequest(vo).forEach(
 
                 page -> {
                     service.send(

@@ -92,12 +92,10 @@ public class ErpProductCategoryController {
     @Operation(summary = "导出产品分类 Excel")
     @PreAuthorize("@ss.hasPermission('erp:product-category:export')")
     @ApiAccessLog(operateType = EXPORT)
-    public void exportProductCategoryExcel(@Valid ErpProductCategoryListReqVO listReqVO,
-                                           HttpServletResponse response) throws IOException {
+    public void exportProductCategoryExcel(@Valid ErpProductCategoryListReqVO listReqVO, HttpServletResponse response) throws IOException {
         List<ErpProductCategoryDO> list = productCategoryService.getProductCategoryList(listReqVO);
         // 导出 Excel
-        ExcelUtils.write(response, "产品分类.xls", "数据", ErpProductCategoryRespVO.class,
-                BeanUtils.toBean(list, ErpProductCategoryRespVO.class));
+        ExcelUtils.write(response, "产品分类.xls", "数据", ErpProductCategoryRespVO.class, BeanUtils.toBean(list, ErpProductCategoryRespVO.class));
     }
 
 }

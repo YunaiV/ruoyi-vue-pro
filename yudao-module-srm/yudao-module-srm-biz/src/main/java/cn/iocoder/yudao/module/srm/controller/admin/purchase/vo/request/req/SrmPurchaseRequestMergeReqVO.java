@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req;
 
+import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -16,7 +17,7 @@ import java.util.List;
 public class SrmPurchaseRequestMergeReqVO {
 
     @Schema(description = "订单No")
-    private String no;
+    private String code;
 
     @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "供应商编号不能为空")
@@ -32,6 +33,11 @@ public class SrmPurchaseRequestMergeReqVO {
     @Schema(description = "项目列表", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<requestItems> items;
 
+    @Schema(description = "币别id(财务管理-币别维护)")
+    @DiffLogField(name = "币别编号")
+    @NotNull(message = "币别编号不能为空")
+    private Long currencyId;
+
     @Schema(description = "订单币别名称")
     @NotBlank(message = "订单币别名称不能为空")
     private String currencyName;
@@ -40,10 +46,10 @@ public class SrmPurchaseRequestMergeReqVO {
     private String paymentTerms;
 
     @Schema(description = "装运港")
-    private String portOfLoading;
+    private String fromPortName;
 
     @Schema(description = "目的港")
-    private String portOfDischarge;
+    private String toPortName;
 
     @Schema(description = "结算账户编号")
     private Long accountId;
@@ -93,11 +99,11 @@ public class SrmPurchaseRequestMergeReqVO {
         //含税单价
         @Schema(description = "含税单价")
         @Positive(message = "含税单价必须为正数")
-        private BigDecimal actTaxPrice;
+        private BigDecimal grossPrice;
 
         @Schema(description = "价税合计")
         @DecimalMin(value = "0.0", message = "价税合计必须大于0")
-        private BigDecimal allAmount;
+        private BigDecimal grossTotalPrice;
 
         @Schema(description = "参考单价")
         @DecimalMin(value = "0.0", message = "参考单价必须大于0")
@@ -106,10 +112,10 @@ public class SrmPurchaseRequestMergeReqVO {
         //是否计算得到？待确认
         @Schema(description = "税额，单位：元")
         @DecimalMin(value = "0.0", message = "税额必须大于0")
-        private BigDecimal taxPrice;
+        private BigDecimal tax;
 
         @Schema(description = "增值税税率，百分比")
-        private BigDecimal taxPercent;
+        private BigDecimal taxRate;
 
         @Schema(description = "交货日期(交期)")
         @NotNull(message = "交货日期不能为空")

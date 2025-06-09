@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.returns.SrmPurch
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.returns.SrmPurchaseReturnSaveReqVO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseReturnDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseReturnItemDO;
+import cn.iocoder.yudao.module.srm.service.purchase.refund.SrmPurchaseReturnBO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
@@ -39,7 +40,7 @@ public interface SrmPurchaseReturnService {
     /**
      * 更新采购退货的退款金额
      *
-     * @param id 编号
+     * @param id          编号
      * @param refundPrice 退款金额
      */
     void updatePurchaseReturnRefundPrice(Long id, BigDecimal refundPrice);
@@ -59,6 +60,15 @@ public interface SrmPurchaseReturnService {
      */
     SrmPurchaseReturnDO getPurchaseReturn(Long id);
 
+    SrmPurchaseReturnBO getPurchaseBOReturn(Long id);
+    /**
+     * 获取采购退货列表
+     *
+     * @param ids 采购退货id数组
+     * @return 采购退货列表
+     */
+    List<SrmPurchaseReturnDO> getPurchaseReturnList(List<Long> ids);
+
     /**
      * 校验采购退货，已经审核通过
      *
@@ -73,9 +83,16 @@ public interface SrmPurchaseReturnService {
      * @param pageReqVO 分页查询
      * @return 采购退货分页
      */
-    PageResult<SrmPurchaseReturnDO> getPurchaseReturnPage(SrmPurchaseReturnPageReqVO pageReqVO);
-
+    PageResult<SrmPurchaseReturnBO> getPurchaseReturnBOPage(SrmPurchaseReturnPageReqVO pageReqVO);
     // ==================== 采购退货项 ====================
+
+    /**
+     * 校验采购退货项是否存在
+     *
+     * @param ids 采购退货项编号列表
+     * @return 采购退货项列表
+     */
+    List<SrmPurchaseReturnItemDO> validatePurchaseReturnItemExists(List<Long> ids);
 
     /**
      * 获得采购退货项列表
@@ -112,4 +129,5 @@ public interface SrmPurchaseReturnService {
      * 切换退款状态
      */
     void refund(SrmPurchaseReturnAuditReqVO vo);
+
 }

@@ -37,12 +37,12 @@ public class OffActionImpl implements Action<SrmOffStatus, SrmEventEnum, SrmPurc
         //手动关闭+自动关闭事件
         if (event == SrmEventEnum.MANUAL_CLOSE || event == SrmEventEnum.AUTO_CLOSE) {
             //未审核->异常
-            ThrowUtil.ifThrow(Objects.equals(context.getAuditStatus(), SrmAuditStatus.PENDING_REVIEW.getCode()), SrmErrorCodeConstants.PURCHASE_REQUEST_CLOSE_FAIL, context.getNo());
+            ThrowUtil.ifThrow(Objects.equals(context.getAuditStatus(), SrmAuditStatus.PENDING_REVIEW.getCode()), SrmErrorCodeConstants.PURCHASE_REQUEST_CLOSE_FAIL, context.getCode());
         }
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void execute(SrmOffStatus from, SrmOffStatus to, SrmEventEnum event, SrmPurchaseRequestDO context) {
         validate(from, to, event, context);
         SrmPurchaseRequestDO aDo = mapper.selectById(context.getId());

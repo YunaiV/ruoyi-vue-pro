@@ -12,7 +12,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,no,creator,update_time,create_time,execute_status,id,warehouse_id,updater
+ * @table-fields : tenant_id,no,creator,update_time,create_time,execute_status,remark,id,warehouse_id,updater
  */
 @Schema(description = "管理后台 - 库位移动 Response VO")
 @Data
@@ -56,10 +56,14 @@ public class WmsStockBinMoveRespVO {
     @ExcelProperty("详情清单")
     private List<WmsStockBinMoveItemRespVO> itemList;
 
-    @Schema(description = "库存移动的执行状态 ; WmsMoveExecuteStatus : 0-草稿 , 1-已执行", example = "")
-    @ExcelProperty("库存移动的执行状态")
+    @Schema(description = "WMS库存移动的执行状态 ; WmsMoveExecuteStatus : 0-草稿 , 1-已执行", example = "")
+    @ExcelProperty("WMS库存移动的执行状态")
     private Integer executeStatus;
 
     @Schema(description = "仓库", example = "")
     private WmsWarehouseSimpleRespVO warehouse;
+
+    @Schema(description = "备注", example = "")
+    @ExcelProperty("备注")
+    private String remark;
 }

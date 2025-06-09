@@ -30,37 +30,37 @@ public class WmsNoRedisDAO {
     /**
      * 库位库存移动单的流水号前缀
      **/
-    public static final String STOCK_BIN_MOVE_NO_PREFIX = "BIMV";
+    public static final String STOCK_BIN_MOVE_NO_PREFIX = "KWKC";
 
     /**
-     * 所有者库存移动单的流水号前缀
+     * 逻辑库存移动单的流水号前缀
      **/
-    public static final String STOCK_OWNERSHIP_MOVE_NO_PREFIX = "OWMV";
+    public static final String STOCK_LOGIC_MOVE_NO_PREFIX = "SYZKC";
 
 
     /**
      * 入库单单据号前缀
      */
-    public static final String INBOUND_NO_PREFIX = "INBD";
+    public static final String INBOUND_NO_PREFIX = "RKD";
     /**
      * 出库单单据号前缀
      */
-    public static final String OUTBOUND_NO_PREFIX = "OUBD";
+    public static final String OUTBOUND_NO_PREFIX = "CKD";
 
     /**
      * 拣货单单据号前缀
      **/
-    public static final String PICKUP_NO_PREFIX = "PIUP";
+    public static final String PICKUP_NO_PREFIX = "JHD";
 
     /**
      * 盘点单据号前缀
      **/
-    public static final String INVENTORY_NO_PREFIX = "INVE";
+    public static final String STOCKCHECK_NO_PREFIX = "PDD";
 
     /**
      * 盘点单据号前缀
      **/
-    public static final String EXCHANGE_NO_PREFIX = "EXCH";
+    public static final String EXCHANGE_NO_PREFIX = "HHD";
 
 
 
@@ -69,7 +69,7 @@ public class WmsNoRedisDAO {
     private StringRedisTemplate stringRedisTemplate;
 
     /**
-     * 生成序号，使用当前日期，格式为 {PREFIX} + "_" + yyyyMMdd + "_" + 6 位自增
+     * 生成序号，使用当前日期，格式为 {PREFIX} + "-" + yyyyMMdd + "-" + 6 位自增
      * 例如说：QTRK-20211009-000001 （没有中间空格）
      *
      * @param prefix 前缀
@@ -78,12 +78,12 @@ public class WmsNoRedisDAO {
      */
     public String generate(String prefix,int seqLength) {
         // 递增序号
-        String noPrefix = prefix  + DateUtil.format(LocalDateTime.now(), DatePattern.PURE_DATE_PATTERN);
+        String noPrefix = prefix + "-" + DateUtil.format(LocalDateTime.now(), DatePattern.PURE_DATE_PATTERN);
         String key = NO + noPrefix;
         Long no = stringRedisTemplate.opsForValue().increment(key);
         // 设置过期时间
         stringRedisTemplate.expire(key, Duration.ofDays(1L));
-        return noPrefix + String.format("%0"+seqLength+"d", no);
+        return noPrefix + "-" + String.format("%0"+seqLength+"d", no);
     }
 
 }

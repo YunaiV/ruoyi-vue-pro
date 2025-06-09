@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.fms.dal.dataobject.finance.subject.FmsCompanyDO;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Fms财务公司 Service 接口
@@ -58,10 +59,20 @@ public interface FmsCompanyService {
     List<FmsCompanySimpleRespVO> ListCompanySimple();
 
     /**
-     * 校验财务主体集合
+     * 查询财务主体集合
      *
      * @param ids ids
      * @return FmsCompanyDO
      */
-    List<FmsCompanyDO> listCompany(List<Long> ids);
+    List<FmsCompanyDO> listCompany(Set<Long> ids);
+
+    /**
+     * 按名称查询财务主体集合
+     *
+     * @param names names
+     * @return FmsCompanyDO
+     */
+    List<FmsCompanyDO> listCompanyByNames(Set<String> names);
+
+
 }

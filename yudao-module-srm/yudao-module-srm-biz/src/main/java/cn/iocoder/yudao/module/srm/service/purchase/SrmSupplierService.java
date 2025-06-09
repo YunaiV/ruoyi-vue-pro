@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.srm.service.purchase;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.supplier.SrmSupplierPageReqVO;
+import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.supplier.SrmSupplierRespVO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.supplier.SrmSupplierSaveReqVO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmSupplierDO;
 import jakarta.validation.Valid;
@@ -91,4 +92,6 @@ public interface SrmSupplierService {
      */
     List<SrmSupplierDO> getSupplierListByStatus(Integer status);
 
+    //装配供应商付款条款
+    void assemblePaymentTerms(List<SrmSupplierRespVO> supplierList);
 }

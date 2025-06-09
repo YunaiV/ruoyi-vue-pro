@@ -24,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
@@ -69,7 +70,9 @@ public class SrmSupplierController {
     @PreAuthorize("@ss.hasPermission('srm:supplier:query')")
     public CommonResult<SrmSupplierRespVO> getSupplier(@RequestParam("id") Long id) {
         SrmSupplierDO supplier = supplierService.getSupplier(id);
-        return success(BeanUtils.toBean(supplier, SrmSupplierRespVO.class));
+        SrmSupplierRespVO bean = BeanUtils.toBean(supplier, SrmSupplierRespVO.class);
+        supplierService.assemblePaymentTerms(Collections.singletonList(bean));
+        return success(bean);
     }
 
     @GetMapping("/page")
@@ -77,7 +80,9 @@ public class SrmSupplierController {
     @PreAuthorize("@ss.hasPermission('srm:supplier:query')")
     public CommonResult<PageResult<SrmSupplierRespVO>> getSupplierPage(@Valid SrmSupplierPageReqVO pageReqVO) {
         PageResult<SrmSupplierDO> pageResult = supplierService.getSupplierPage(pageReqVO);
-        return success(BeanUtils.toBean(pageResult, SrmSupplierRespVO.class));
+        PageResult<SrmSupplierRespVO> respVOPageResult = BeanUtils.toBean(pageResult, SrmSupplierRespVO.class);
+        supplierService.assemblePaymentTerms(respVOPageResult.getList());
+        return success(respVOPageResult);
     }
 
     @GetMapping("/simple-list")

@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
 import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
 import cn.iocoder.yudao.module.wms.service.stock.bin.WmsStockBinService;
 import cn.iocoder.yudao.module.wms.service.stock.flow.WmsStockFlowService;
-import cn.iocoder.yudao.module.wms.service.stock.ownership.WmsStockOwnershipService;
+import cn.iocoder.yudao.module.wms.service.stock.logic.WmsStockLogicService;
 import cn.iocoder.yudao.module.wms.service.stock.warehouse.WmsStockWarehouseService;
 import jakarta.annotation.Resource;
 import lombok.Getter;
@@ -36,7 +36,7 @@ public abstract class QuantityExecutor<T> {
 
     @Resource
     @Lazy
-    protected WmsStockOwnershipService stockOwnershipService;
+    protected WmsStockLogicService stockLogicService;
 
     @Resource
     @Lazy

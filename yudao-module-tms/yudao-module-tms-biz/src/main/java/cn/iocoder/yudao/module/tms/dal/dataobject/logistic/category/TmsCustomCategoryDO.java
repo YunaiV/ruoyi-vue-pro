@@ -39,5 +39,12 @@ public class TmsCustomCategoryDO extends TenantBaseDO {
      * 英文品名
      */
     private String declaredTypeEn;
-
+    /**
+     * 用途描述
+     */
+    private String customsPurpose;
+    /**
+     * 报关材质描述
+     */
+    private String customsMaterial;
 }

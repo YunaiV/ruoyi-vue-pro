@@ -1,15 +1,19 @@
 package cn.iocoder.yudao.module.wms.controller.admin.stock.bin;
 
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespBinVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinExcelVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.vo.WmsStockBinRespVO;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.ownership.vo.WmsStockOwnershipPureRespVO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemOwnershipDO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.logic.vo.WmsStockLogicPureRespVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemLogicDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
 import cn.iocoder.yudao.module.wms.service.stock.bin.WmsStockBinService;
@@ -17,20 +21,18 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "仓位库存")
@@ -108,18 +110,18 @@ public class WmsStockBinController {
         stockBinService.assembleBin(voPageResult.getList(),true);
 
         // 获取建议库存
-        if(Objects.equals(1,pageReqVO.getWithSuggestedOwnership())) {
-            //List<WmsStockOwnershipPureRespVO> suggestedOwnershipList = new ArrayList<>();
+        if (Objects.equals(1, pageReqVO.getWithSuggestedLogic())) {
+            //List<WmsStockLogicPureRespVO> suggestedLogicList = new ArrayList<>();
             Map<Long, List<Long>> productIdsMap = StreamX.from(voPageResult.getList()).groupBy(WmsStockBinRespVO::getWarehouseId,WmsStockBinRespVO::getProductId);
 
             for (Map.Entry<Long, List<Long>> entry : productIdsMap.entrySet()) {
-                Map<Long, WmsInboundItemOwnershipDO> ownershipMap = inboundService.getInboundItemOwnershipMap(entry.getKey(), entry.getValue(), true);
+                Map<Long, WmsInboundItemLogicDO> logicMap = inboundService.getInboundItemLogicMap(entry.getKey(), entry.getValue(), true);
 
                 StreamX.from(voPageResult.getList())
                     .filter(e-> Objects.equals(entry.getKey(),e.getWarehouseId()))
                     .forEach(e->{
-                        WmsInboundItemOwnershipDO ownership = ownershipMap.get(e.getProductId());
-                        e.setSuggestedOwnership(BeanUtils.toBean(ownership, WmsStockOwnershipPureRespVO.class));
+                        WmsInboundItemLogicDO logic = logicMap.get(e.getProductId());
+                        e.setSuggestedLogic(BeanUtils.toBean(logic, WmsStockLogicPureRespVO.class));
                     });
             }
 
@@ -130,6 +132,9 @@ public class WmsStockBinController {
             .mapping(WmsStockBinRespVO::getCreator, WmsStockBinRespVO::setCreatorName)
             .mapping(WmsStockBinRespVO::getUpdater, WmsStockBinRespVO::setUpdaterName)
             .fill();
+        //过滤 3个都是0的,可用量,待出库量,可售量，
+        // TODO待优化，mapper限定
+        voPageResult.getList().removeIf(e -> Objects.equals(e.getAvailableQty(), 0) && Objects.equals(e.getOutboundPendingQty(), 0) && Objects.equals(e.getSellableQty(), 0));
         // 返回
         return success(voPageResult);
     }
@@ -149,15 +154,27 @@ public class WmsStockBinController {
     }
 
 
-    // @GetMapping("/export-excel")
-    // @Operation(summary = "导出仓位库存 Excel")
-    // @PreAuthorize("@ss.hasPermission('wms:stock-bin:export')")
-    // @ApiAccessLog(operateType = EXPORT)
-    // public void exportStockBinExcel(@Valid WmsStockBinPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
-    // pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-    // List<WmsStockBinDO> list = stockBinService.getStockBinPage(pageReqVO).getList();
-    // // 导出 Excel
-    // ExcelUtils.write(response, "仓位库存.xls", "数据", WmsStockBinRespVO.class, BeanUtils.toBean(list, WmsStockBinRespVO.class));
-    // }
+    @PostMapping("/export-excel")
+    @Operation(summary = "导出仓位库存 Excel")
+    @PreAuthorize("@ss.hasPermission('wms:stock-bin:export')")
+    @ApiAccessLog(operateType = EXPORT)
+    public void exportStockBinExcel(@Valid @RequestBody WmsStockBinPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
+        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
+        List<WmsStockBinRespVO> list = this.getStockBinPage(pageReqVO).getData().getList();
+        List<WmsStockBinExcelVO> xlsList = BeanUtils.toBean(list, WmsStockBinExcelVO.class);
+        Map<Long, WmsStockBinRespVO> voMap= StreamX.from(list).toMap(WmsStockBinRespVO::getId);
+        for (WmsStockBinExcelVO xlsVO : xlsList) {
+            WmsStockBinRespVO vo=voMap.get(xlsVO.getId());
+            if(vo==null) {
+                continue;
+            }
+            xlsVO.setWarehouseName(vo.getWarehouse().getName());
+            xlsVO.setBinName(vo.getBin().getName());
+            xlsVO.setProductCode(vo.getProduct().getCode());
+        }
+
+        // 导出 Excel
+        ExcelUtils.write(response, "仓位库存.xls", "数据", WmsStockBinExcelVO.class,xlsList);
+    }
 }
 

@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.srm.config.purchase.request;
 
 import cn.iocoder.yudao.framework.cola.statemachine.Action;
 import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
-import cn.iocoder.yudao.framework.cola.statemachine.builder.FailCallback;
 import cn.iocoder.yudao.framework.cola.statemachine.builder.StateMachineBuilder;
 import cn.iocoder.yudao.framework.cola.statemachine.builder.StateMachineBuilderFactory;
+import cn.iocoder.yudao.module.srm.config.BaseFailCallbackImpl;
 import cn.iocoder.yudao.module.srm.config.purchase.request.impl.action.StorageActionImpl;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.SrmPurchaseRequestAuditReqVO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestDO;
@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.srm.enums.status.SrmOrderStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmStorageStatus;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,10 +30,10 @@ public class SrmPurchaseRequestStatusMachine {
     private Action<SrmAuditStatus, SrmEventEnum, SrmPurchaseRequestAuditReqVO> auditActionImpl;
 
 
-    @Resource
-    private FailCallback baseFailCallbackImpl;
+    @Autowired
+    private BaseFailCallbackImpl baseFailCallbackImpl;
 
-    @Bean(PURCHASE_REQUEST_AUDIT_STATE_MACHINE_NAME)
+    @Bean(PURCHASE_REQUEST_AUDIT_STATE_MACHINE)
     public StateMachine<SrmAuditStatus, SrmEventEnum, SrmPurchaseRequestAuditReqVO> getPurchaseRequestStateMachine() {
         StateMachineBuilder<SrmAuditStatus, SrmEventEnum, SrmPurchaseRequestAuditReqVO> builder = StateMachineBuilderFactory.create();
 
@@ -51,12 +52,13 @@ public class SrmPurchaseRequestStatusMachine {
         // 反审核
         builder.externalTransition().from(SrmAuditStatus.APPROVED).to(SrmAuditStatus.REVOKED).on(SrmEventEnum.WITHDRAW_REVIEW).perform(auditActionImpl);
         builder.setFailCallback(baseFailCallbackImpl);
-        return builder.build(PURCHASE_REQUEST_AUDIT_STATE_MACHINE_NAME);
+        return builder.build(PURCHASE_REQUEST_AUDIT_STATE_MACHINE);
     }
 
     @Resource
     private Action<SrmOffStatus, SrmEventEnum, SrmPurchaseRequestDO> offActionImpl;
-    @Bean(PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME)
+
+    @Bean(PURCHASE_REQUEST_OFF_STATE_MACHINE)
     public StateMachine<SrmOffStatus, SrmEventEnum, SrmPurchaseRequestDO> getPurchaseRequestOffStateMachine() {
         StateMachineBuilder<SrmOffStatus, SrmEventEnum, SrmPurchaseRequestDO> builder = StateMachineBuilderFactory.create();
         // 初始化状态
@@ -70,12 +72,13 @@ public class SrmPurchaseRequestStatusMachine {
         //撤销关闭
         builder.externalTransitions().fromAmong(SrmOffStatus.MANUAL_CLOSED, SrmOffStatus.CLOSED, SrmOffStatus.OPEN).to(SrmOffStatus.OPEN).on(SrmEventEnum.CANCEL_DELETE).perform(offActionImpl);
         builder.setFailCallback(baseFailCallbackImpl);
-        return builder.build(PURCHASE_REQUEST_OFF_STATE_MACHINE_NAME);
+        return builder.build(PURCHASE_REQUEST_OFF_STATE_MACHINE);
     }
 
     @Resource
     private Action<SrmOrderStatus, SrmEventEnum, SrmPurchaseRequestDO> orderActionImpl;
-    @Bean(PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME)
+
+    @Bean(PURCHASE_REQUEST_ORDER_STATE_MACHINE)
     public StateMachine<SrmOrderStatus, SrmEventEnum, SrmPurchaseRequestDO> getPurchaseOrderStateMachine() {
         StateMachineBuilder<SrmOrderStatus, SrmEventEnum, SrmPurchaseRequestDO> builder = StateMachineBuilderFactory.create();
         //初始化事件
@@ -92,14 +95,14 @@ public class SrmPurchaseRequestStatusMachine {
         //放弃订购
         builder.externalTransitions().fromAmong(SrmOrderStatus.PARTIALLY_ORDERED, SrmOrderStatus.OT_ORDERED).to(SrmOrderStatus.ORDER_FAILED).on(SrmEventEnum.ORDER_CANCEL).perform(orderActionImpl);
         builder.setFailCallback(baseFailCallbackImpl);
-        return builder.build(PURCHASE_REQUEST_ORDER_STATE_MACHINE_NAME);
+        return builder.build(PURCHASE_REQUEST_ORDER_STATE_MACHINE);
     }
 
 
     @Resource
     StorageActionImpl storageActionImpl;
 
-    @Bean(PURCHASE_REQUEST_STORAGE_STATE_MACHINE_NAME)
+    @Bean(PURCHASE_REQUEST_STORAGE_STATE_MACHINE)
     public StateMachine<SrmStorageStatus, SrmEventEnum, SrmPurchaseRequestDO> buildPurchaseOrderItemStorageStateMachine() {
         StateMachineBuilder<SrmStorageStatus, SrmEventEnum, SrmPurchaseRequestDO> builder = StateMachineBuilderFactory.create();
         // 初始化入库
@@ -110,6 +113,6 @@ public class SrmPurchaseRequestStatusMachine {
         builder.externalTransitions().fromAmong(SrmStorageStatus.NONE_IN_STORAGE, SrmStorageStatus.PARTIALLY_IN_STORAGE, SrmStorageStatus.ALL_IN_STORAGE).to(SrmStorageStatus.NONE_IN_STORAGE).on(SrmEventEnum.STOCK_ADJUSTMENT).perform(storageActionImpl);
         // 设置错误回调
         builder.setFailCallback(baseFailCallbackImpl);
-        return builder.build(PURCHASE_REQUEST_STORAGE_STATE_MACHINE_NAME);
+        return builder.build(PURCHASE_REQUEST_STORAGE_STATE_MACHINE);
     }
 }

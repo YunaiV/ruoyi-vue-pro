@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.item.vo.WmsStockBinMoveItemPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.item.vo.WmsStockBinMoveItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.item.vo.WmsStockBinMoveItemSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMoveImportExcelVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.move.item.WmsStockBinMoveItemDO;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -65,4 +66,10 @@ public interface WmsStockBinMoveItemService {
     void assembleProduct(List<WmsStockBinMoveItemRespVO> stockBinMoveItemList);
 
     void assembleBinMove(List<WmsStockBinMoveItemRespVO> list);
+
+    void assembleWarehouseForImp(List<WmsStockBinMoveImportExcelVO> impVOList);
+
+    void assembleBinForImp(List<WmsStockBinMoveImportExcelVO> impVOList);
+
+    void assembleProductForImp(List<WmsStockBinMoveImportExcelVO> impVOList);
 }

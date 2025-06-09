@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.srm.dal.dataobject.purchase;
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.Version;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -21,25 +22,31 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SrmPurchaseReturnItemDO extends BaseDO {
-
+public class SrmPurchaseReturnItemDO extends TenantBaseDO {
     /**
      * 编号
      */
     @TableId
     private Long id;
     /**
+     * 乐观锁
+     */
+    @Version
+    private Integer version;
+    /**
      * 采购退货编号
      * <p>
      * 关联 {@link SrmPurchaseReturnDO#getId()}
      */
     private Long returnId;
-
     /**
-     * 入库项id
+     * 到货项id
      */
-    private Long inItemId;
-
+    private Long arriveItemId;
+    /**
+     * 入库单code
+     */
+    private String arriveCode;
     /**
      * 仓库编号
      * <p>
@@ -55,19 +62,14 @@ public class SrmPurchaseReturnItemDO extends BaseDO {
      * <p>
      */
     private Long productUnitId;
-
-    /**
-     * 币种编号
-     */
-//    private Long currencyId;
-    /**
-     * 币别名称
-     */
-    private String currencyName;
     /**
      * 产品单位单价，单位：元
      */
     private BigDecimal productPrice;
+    /**
+     * 产品单位名称
+     */
+    private String productUnitName;
     /**
      * 数量
      */
@@ -81,13 +83,13 @@ public class SrmPurchaseReturnItemDO extends BaseDO {
     /**
      * 税率，百分比
      */
-    private BigDecimal taxPercent;
+    private BigDecimal taxRate;
     /**
      * 税额，单位：元
      * <p>
-     * taxPrice = totalPrice * taxPercent
+     * tax = totalPrice * taxRate
      */
-    private BigDecimal taxPrice;
+    private BigDecimal tax;
 
     /**
      * 备注
@@ -97,7 +99,7 @@ public class SrmPurchaseReturnItemDO extends BaseDO {
     /**
      * 含税单价
      */
-    private BigDecimal actTaxPrice;
+    private BigDecimal grossPrice;
 
     /**
      * 箱率
@@ -118,11 +120,27 @@ public class SrmPurchaseReturnItemDO extends BaseDO {
      */
     private String declaredType;
     /**
+     * 报关品名英文
+     */
+    private String declaredTypeEn;
+    /**
      * 产品sku
      */
-    private String barCode;
+    private String productCode;
     /**
      * 产品名称
      */
     private String productName;
+    /**
+     * 出库状态
+     */
+    private Integer outboundStatus;
+    /**
+     * 出库数量
+     */
+    private BigDecimal outboundQty;
+    /**
+     * 实际入库数量,取到货单item的实际入库数量
+     */
+    private BigDecimal actualQty;
 }

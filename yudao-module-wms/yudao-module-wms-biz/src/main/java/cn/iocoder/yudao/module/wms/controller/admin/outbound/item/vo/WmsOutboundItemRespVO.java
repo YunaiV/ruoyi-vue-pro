@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo;
 
+import cn.iocoder.yudao.module.wms.controller.admin.company.FmsCompanySimpleRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinRespVO;
@@ -8,11 +10,13 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,creator,company_id,create_time,bin_id,plan_qty,upstream_item_id,remark,outbound_id,updater,update_time,outbound_status,actual_qty,product_id,id,dept_id
+ * @table-fields : tenant_id,creator,company_id,create_time,bin_id,plan_qty,upstream_id,remark,outbound_id,updater,update_time,outbound_status,actual_qty,product_id,id,dept_id
  */
 @Schema(description = "管理后台 - 出库单详情 Response VO")
 @Data
@@ -24,7 +28,7 @@ public class WmsOutboundItemRespVO {
     private Long id;
 
     @Schema(description = "入库单ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "6602")
-    @ExcelProperty("入库单ID")
+    @ExcelProperty("出库单ID")
     private Long outboundId;
 
     @Schema(description = "标准产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "20572")
@@ -100,7 +104,14 @@ public class WmsOutboundItemRespVO {
     @ExcelProperty("备注")
     private String remark;
 
-    @Schema(description = "来源详情ID", example = "")
-    @ExcelProperty("来源详情ID")
-    private Long upstreamItemId;
+    @Schema(description = "来源明细行ID", example = "")
+    @ExcelProperty("来源明细行ID")
+    private Long upstreamId;
+
+    @Schema(description = "部门", example = "")
+    private DeptSimpleRespVO dept;
+
+    @Schema(description = "财务公司", example = "")
+    @ExcelProperty("财务公司")
+    private FmsCompanySimpleRespVO company;
 }

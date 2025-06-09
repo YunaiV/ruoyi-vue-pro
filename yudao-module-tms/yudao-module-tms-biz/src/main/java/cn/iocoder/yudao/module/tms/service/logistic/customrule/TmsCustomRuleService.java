@@ -81,4 +81,13 @@ public interface TmsCustomRuleService {
      * @return 海关规则BO分页
      */
     PageResult<TmsCustomRuleBO> getCustomRuleBOPage(TmsCustomRulePageReqVO pageReqVO);
+
+    /**
+     * 根据国别和产品ID集合获得海关规则列表
+     *
+     * @param country    国别
+     * @param productIds 产品ID集合
+     * @return 海关规则列表
+     */
+    List<TmsCustomRuleDO> getCustomRuleListByCountryAndProducts(Long countryCode, List<Long> productIds);
 }

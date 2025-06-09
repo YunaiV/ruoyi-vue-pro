@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.wms.service.quantity;
 
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.flow.vo.WmsInboundItemFlowSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehouseSaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.stock.logic.WmsStockLogicDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockFlowDirection;
@@ -13,8 +16,12 @@ import cn.iocoder.yudao.module.wms.service.quantity.context.InboundContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 
 /**
  * @author: LeeFJ
@@ -65,11 +72,21 @@ public class InboundExecutor extends QuantityExecutor<InboundContext> {
             // 执行入库的原子操作
             WmsInboundStatus inboundStatus = inboundSingleItem(companyId, deptId, warehouseId, productId, item.getPlanQty(), item.getActualQty(), inboundRespVO.getId(), item.getId());
             item.setInboundStatus(inboundStatus.getValue());
-
+            item.setInboundCompanyId(companyId);
+            item.setInboundDeptId(deptId);
+            //仓库信息更新
+            this.updateStockWarehouse(inboundRespVO, item);
         }
         // 完成最终的入库
         inboundService.finishInbound(inboundRespVO);
 
+    }
+
+    private void updateStockWarehouse(WmsInboundRespVO inboundRespVO, WmsInboundItemRespVO item) {
+        WmsStockWarehouseDO stockWarehouse = stockWarehouseService.getStockWarehouse(inboundRespVO.getWarehouseId(), item.getProductId(), FALSE);
+        WmsStockWarehouseSaveReqVO createReqVO = BeanUtils.toBean(stockWarehouse, WmsStockWarehouseSaveReqVO.class);
+        createReqVO.setTransitQty(item.getPlanQty());
+        stockWarehouseService.updateStockWarehouse(createReqVO);
     }
 
     /**
@@ -99,7 +116,7 @@ public class InboundExecutor extends QuantityExecutor<InboundContext> {
         // 调整仓库库存
         this.processStockWarehouseItem(companyId, deptId, warehouseId, productId, actualQuantity, inboundId, inboundItemId);
         // 调整归属库存
-        this.processStockOwnershipItem(companyId, deptId, warehouseId, productId, actualQuantity, inboundId, inboundItemId);
+        this.processStockLogicItem(companyId, deptId, warehouseId, productId, actualQuantity, inboundId, inboundItemId);
         // 当前逻辑,默认全部入库
         if(actualQuantity==0) {
             return WmsInboundStatus.NONE;
@@ -131,20 +148,40 @@ public class InboundExecutor extends QuantityExecutor<InboundContext> {
     /**
      * 调整归属库存
      */
-    private void processStockOwnershipItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer actualQuantity, Long inboundId, Long inboundItemId) {
+    private void processStockLogicItem(Long companyId, Long deptId, Long warehouseId, Long productId, Integer actualQuantity, Long inboundId, Long inboundItemId) {
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
         // 查询库存记录
-        WmsStockOwnershipDO stockOwnershipDO = stockOwnershipService.getByUkProductOwner(warehouseId, companyId, deptId, productId, true);
+        WmsStockLogicDO stockLogicDO = stockLogicService.getByUkProductOwner(warehouseId, companyId, deptId, productId, true);
 
         // 待上架量
-        stockOwnershipDO.setShelvingPendingQty(stockOwnershipDO.getShelvingPendingQty() + actualQuantity);
+        stockLogicDO.setShelvePendingQty(stockLogicDO.getShelvePendingQty() + actualQuantity);
 
         // 保存
-        stockOwnershipService.insertOrUpdate(stockOwnershipDO);
+        stockLogicService.insertOrUpdate(stockLogicDO);
         // 记录流水
-        stockFlowService.createForStockOwnership(this.getReason(), WmsStockFlowDirection.IN, productId, stockOwnershipDO, actualQuantity, inboundId, inboundItemId);
+        stockFlowService.createForStockLogic(this.getReason(), WmsStockFlowDirection.IN, productId, stockLogicDO, actualQuantity, inboundId, inboundItemId);
     }
 
 
+    public static void setShelveAvailableQty(List<? extends WmsInboundItemRespVO> items) {
+        items.forEach(item -> {
+            item.setShelveAvailableQty(item.getActualQty() - item.getShelveClosedQty());
+        });
+    }
+
+    public static void setShelveAvailableQty(Collection<? extends WmsInboundItemFlowSimpleVO> items) {
+        items.forEach(item -> {
+            item.setShelveAvailableQty(item.getActualQty() - item.getShelveClosedQty());
+        });
+    }
+
+    public void updateTransitQty(WmsInboundRespVO inbound) {
+        List<WmsInboundItemRespVO> itemList = inbound.getItemList();
+        for (WmsInboundItemRespVO item : itemList) {
+            WmsStockWarehouseDO stockWarehouseDO = stockWarehouseService.getStockWarehouse(inbound.getWarehouseId(), item.getProductId(), TRUE);
+            stockWarehouseDO.setTransitQty(stockWarehouseDO.getTransitQty() + item.getPlanQty());
+            stockWarehouseService.updateStockWarehouse(BeanUtils.toBean(stockWarehouseDO, WmsStockWarehouseSaveReqVO.class));
+        }
+    }
 }

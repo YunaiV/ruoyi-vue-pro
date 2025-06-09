@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.zone.WmsWarehouseZon
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 库区 Service 接口
@@ -60,5 +61,5 @@ public interface WmsWarehouseZoneService {
 
     List<WmsWarehouseZoneDO> getSimpleList(@Valid WmsWarehouseZonePageReqVO pageReqVO);
 
-    List<WmsWarehouseZoneDO> selectByIds(List<Long> list);
+    List<WmsWarehouseZoneDO> selectByIds(Set<Long> list);
 }

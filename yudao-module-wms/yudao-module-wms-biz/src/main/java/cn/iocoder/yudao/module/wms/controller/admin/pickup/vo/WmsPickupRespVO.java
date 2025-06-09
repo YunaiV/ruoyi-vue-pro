@@ -7,12 +7,14 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
 import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,creator,update_time,code,create_time,upstream_bill_id,id,upstream_bill_code,warehouse_id,upstream_bill_type,updater
+ * @table-fields : tenant_id,creator,update_time,code,create_time,upstream_id,id,upstream_code,warehouse_id,upstream_type,updater
  */
 @Schema(description = "管理后台 - 拣货单 Response VO")
 @Data
@@ -69,13 +71,13 @@ public class WmsPickupRespVO {
 
     @Schema(description = "来源单据ID", example = "")
     @ExcelProperty("来源单据ID")
-    private Long upstreamBillId;
+    private Long upstreamId;
 
-    @Schema(description = "来源单据号", example = "")
-    @ExcelProperty("来源单据号")
-    private String upstreamBillCode;
+    @Schema(description = "来源单据编码", example = "")
+    @ExcelProperty("来源单据编码")
+    private String upstreamCode;
 
     @Schema(description = "来源单据类型", example = "")
     @ExcelProperty("来源单据类型")
-    private Integer upstreamBillType;
+    private Integer upstreamType;
 }

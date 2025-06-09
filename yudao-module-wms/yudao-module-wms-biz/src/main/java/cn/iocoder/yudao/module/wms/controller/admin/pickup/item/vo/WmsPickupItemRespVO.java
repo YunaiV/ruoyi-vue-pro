@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms.controller.admin.pickup.item.vo;
 
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.product.WmsProductRespSimpleVO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -30,6 +31,10 @@ public class WmsPickupItemRespVO {
     @Schema(description = "入库单ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "20253")
     @ExcelProperty("入库单ID")
     private Long inboundId;
+
+    @Schema(description = "入库单", example = "")
+    @ExcelProperty("入库单")
+    private WmsInboundSimpleRespVO inbound;
 
     @Schema(description = "入库单明细ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "21563")
     @ExcelProperty("入库单明细ID")

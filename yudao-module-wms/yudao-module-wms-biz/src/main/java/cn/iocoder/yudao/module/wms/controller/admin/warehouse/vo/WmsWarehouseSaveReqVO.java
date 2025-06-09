@@ -4,11 +4,12 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.wms.enums.common.WmsValidStatus;
 import cn.iocoder.yudao.module.wms.enums.warehouse.WmsWarehouseMode;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
- * @table-fields : country,code,contact_phone,city,contact_person,postcode,is_sync,mode,external_storage_id,address_line2,province,address_line1,company_name,name,id,status
+ * @table-fields : country,code,contact_phone,city,contact_person,postcode,is_sync,mode,external_storage_id,address_line2,province,address_line1,address_line3,name,id,status
  */
 @Schema(description = "管理后台 - 仓库新增/修改 Request VO")
 @Data
@@ -33,8 +34,8 @@ public class WmsWarehouseSaveReqVO {
     @Schema(description = "外部存储ID", example = "22814")
     private Long externalStorageId;
 
-    @Schema(description = "公司名称", example = "张三")
-    private String companyName;
+    @Schema(description = "详细地址3", example = "张三")
+    private String addressLine3;
 
     @Schema(description = "国家")
     private String country;

@@ -29,7 +29,7 @@ import cn.iocoder.yudao.module.wms.dal.mysql.stock.bin.WmsStockBinMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.bin.WmsStockBinProductMapper;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.stock.flow.WmsStockFlowService;
-import cn.iocoder.yudao.module.wms.service.stock.ownership.WmsStockOwnershipService;
+import cn.iocoder.yudao.module.wms.service.stock.logic.WmsStockLogicService;
 import cn.iocoder.yudao.module.wms.service.stock.warehouse.WmsStockWarehouseService;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import cn.iocoder.yudao.module.wms.service.warehouse.bin.WmsWarehouseBinService;
@@ -41,16 +41,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_BIN_ID_PRODUCT_ID_DUPLICATE;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_NOT_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.STOCK_BIN_BIN_ID_PRODUCT_ID_DUPLICATE;
+import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.STOCK_BIN_NOT_EXISTS;
 
 /**
  * 仓位库存 Service 实现类
@@ -83,7 +78,7 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
     WmsStockWarehouseService stockWarehouseService;
 
     @Autowired
-    private WmsStockOwnershipService wmsStockOwnershipService;
+    private WmsStockLogicService wmsStockLogicService;
 
     @Autowired
     @Lazy
@@ -233,6 +228,7 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
         }
     }
 
+    @Override
     public List<WmsStockBinRespVO> selectStockBinList(List<WmsWarehouseProductVO> warehouseProductList, Boolean withBin) {
         if(CollectionUtils.isEmpty(warehouseProductList)) {
             return List.of();
@@ -282,13 +278,13 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
 
     @Override
     public void assembleBin(List<WmsStockBinRespVO> list, boolean withZone) {
-        List<WmsWarehouseBinDO> binDOList = warehouseBinService.selectByIds(StreamX.from(list).toList(WmsStockBinRespVO::getBinId).stream().distinct().toList());
+        List<WmsWarehouseBinDO> binDOList = warehouseBinService.selectByIds(StreamX.from(list).toSet(WmsStockBinRespVO::getBinId));
         List<WmsWarehouseBinRespVO> binVOList = BeanUtils.toBean(binDOList, WmsWarehouseBinRespVO.class);
         StreamX.from(list).assemble(binVOList, WmsWarehouseBinRespVO::getId, WmsStockBinRespVO::getBinId,WmsStockBinRespVO::setBin);
 
         if(withZone) {
             // 装配库区
-            List<Long> binIds= StreamX.from(list).toList(WmsStockBinRespVO::getBinId);
+            Set<Long> binIds= StreamX.from(binVOList).toSet(WmsWarehouseBinRespVO::getZoneId);
             List<WmsWarehouseZoneDO> warehouseZoneDOList = warehouseZoneService.selectByIds(binIds);
             Map<Long, WmsWarehouseZoneSimpleRespVO> warehouseZoneVOMap = StreamX.from(warehouseZoneDOList)
                 .toMap(WmsWarehouseZoneDO::getId, v-> BeanUtils.toBean(v, WmsWarehouseZoneSimpleRespVO.class));
@@ -307,13 +303,14 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
         if(CollectionUtils.isEmpty(stockBinIds)) {
             return List.of();
         }
-        return stockBinMapper.selectBatchIds(stockBinIds);
+        return stockBinMapper.selectByIds(stockBinIds);
 
     }
 
     /**
      * 按库存批次详情ID 查询仓位库存清单
      **/
+    @Override
     public List<WmsStockBinDO> selectBinsByInboundItemId(Long warehouseId, Long productId, Long inboundItemId) {
         return stockBinMapper.selectBinsByInboundItemId(warehouseId, productId, inboundItemId);
     }
@@ -360,14 +357,8 @@ public class WmsStockBinServiceImpl implements WmsStockBinService {
             .toMap(WmsWarehouseDO::getId, v-> BeanUtils.toBean(v, WmsWarehouseSimpleRespVO.class));
         StreamX.from(stockWarehouseVOList).assemble(warehouseVOMap, WmsStockWarehouseRespVO::getWarehouseId, WmsStockWarehouseRespVO::setWarehouse);
 
-
-
-
-
         // 仓库按产品分组
         Map<Long, List<WmsStockWarehouseRespVO>> stockWarehouseMap = StreamX.from(stockWarehouseVOList).groupBy(v->v.getProductId());
-
-
 
         // 装配仓库库存清单
         StreamX.from(list).assemble(stockWarehouseMap, WmsProductRespBinVO::getId, WmsProductRespBinVO::setStockWarehouseList);

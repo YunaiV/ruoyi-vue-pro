@@ -1,15 +1,18 @@
 package cn.iocoder.yudao.module.wms.controller.admin.pickup.vo;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : code,create_time,upstream_bill_id,upstream_bill_code,warehouse_id,upstream_bill_type
+ * @table-fields : code,create_time,upstream_id,upstream_code,warehouse_id,upstream_type
  */
 @Schema(description = "管理后台 - 拣货单分页 Request VO")
 @Data
@@ -28,11 +31,11 @@ public class WmsPickupPageReqVO extends PageParam {
     private String code;
 
     @Schema(description = "来源单据ID", example = "")
-    private Long upstreamBillId;
+    private Long upstreamId;
 
-    @Schema(description = "来源单据号", example = "")
-    private String upstreamBillCode;
+    @Schema(description = "来源单据编码", example = "")
+    private String upstreamCode;
 
     @Schema(description = "来源单据类型", example = "")
-    private Integer upstreamBillType;
+    private Integer upstreamType;
 }

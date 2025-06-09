@@ -1,16 +1,15 @@
 package cn.iocoder.yudao.module.wms.dal.dataobject.warehouse;
 
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
 
 /**
  * 仓库 DO
  * @author 李方捷
- * @table-fields : country,code,contact_phone,city,contact_person,postcode,is_sync,mode,external_storage_id,address_line2,province,address_line1,company_name,name,id,status
+ * @table-fields : country,code,contact_phone,city,contact_person,postcode,is_sync,mode,external_storage_id,address_line2,province,address_line1,address_line3,name,id,status
  */
 @TableName("wms_warehouse")
 // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -50,9 +49,9 @@ public class WmsWarehouseDO extends BaseDO {
     private Long externalStorageId;
 
     /**
-     * 公司名称
+     * 详细地址3
      */
-    private String companyName;
+    private String addressLine3;
 
     /**
      * 国家

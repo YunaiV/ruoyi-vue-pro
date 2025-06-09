@@ -21,7 +21,7 @@ public class WmsPickupSimpleRespVO {
 
     @Schema(description = "单据号")
     @ExcelProperty("单据号")
-    private String no;
+    private String code;
 
     @Schema(description = "仓库ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "22380")
     @ExcelProperty("仓库ID")

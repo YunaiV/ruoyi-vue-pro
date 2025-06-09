@@ -6,12 +6,15 @@ import cn.iocoder.yudao.module.system.api.dept.dto.DeptReqDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptSaveReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptTreeRespVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptTreeRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * 部门 Service 接口
@@ -145,4 +148,13 @@ public interface DeptService {
      * @return java.util.List<cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptTreeRespVO>
      **/
     List<DeptTreeRespVO> getTreeDeptList();
+
+    /**
+     * 校验部门们是否有效。如下情况，视为无效：
+     * 1. 部门编号不存在
+     * 2. 部门被禁用
+     *
+     * @param names 角色编号数组
+     */
+    List<DeptDO> getDeptListByNames(Collection<String> names);
 }

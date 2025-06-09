@@ -16,13 +16,14 @@ public enum WmsStockReason implements ArrayValuable<Integer>, DictEnum {
 
     INBOUND(1, "入库"),
     PICKUP(2, "拣货"),
-    OUTBOUND_AGREE(3, "出库"),
+    OUTBOUND_FINISH(3, "完成出库"),
+    OUTBOUND_AGREE(10, "同意出库单"),
     OUTBOUND_SUBMIT(4, "提交出库单"),
     OUTBOUND_REJECT(5, "拒绝出库单"),
     STOCK_BIN_MOVE(6,"库位库存移动"),
-    STOCK_OWNERSHIP_MOVE(7,"所有者库存移动"),
-    INVENTORY_POSITIVE(8,"盘赢"),
-    INVENTORY_NEGATIVE(9,"盘亏")
+    STOCK_LOGIC_MOVE(7, "逻辑库存移动"),
+    STOCKCHECK_POSITIVE(8, "盘赢"),
+    STOCKCHECK_NEGATIVE(9, "盘亏"),
 
    ;
 

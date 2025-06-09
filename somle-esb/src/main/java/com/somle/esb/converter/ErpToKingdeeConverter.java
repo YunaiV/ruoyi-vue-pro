@@ -1,18 +1,23 @@
 package com.somle.esb.converter;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.framework.common.enums.enums.DictTypeConstants;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.srm.api.purchase.dto.SrmPurchaseInDTO;
+import cn.iocoder.yudao.module.srm.api.purchase.dto.SrmPurchaseOrderDTO;
+import cn.iocoder.yudao.module.srm.api.purchase.dto.SrmPurchaseOrderItemDTO;
+import cn.iocoder.yudao.module.srm.api.purchase.dto.SrmPurchaseReturnDTO;
 import cn.iocoder.yudao.module.srm.api.supplier.dto.SrmSupplierDTO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import cn.iocoder.yudao.module.system.api.dict.dto.DictDataRespDTO;
 import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.TmsCustomRuleDTO;
-import com.somle.kingdee.model.KingdeeAuxInfoDetail;
-import com.somle.kingdee.model.KingdeeProductSaveReqVO;
-import com.somle.kingdee.model.supplier.KingdeeSupplier;
+import cn.iocoder.yudao.module.tms.enums.TmsDictTypeConstants;
+import com.somle.kingdee.model.*;
+import com.somle.kingdee.model.supplier.KingdeeSupplierSaveVO;
 import com.somle.kingdee.model.supplier.SupplierBomentity;
 import com.somle.kingdee.service.KingdeeService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +26,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.util.number.LengthUtils.mmToCmAsFloat;
@@ -84,22 +91,22 @@ public class ErpToKingdeeConverter {
         // 获取产品名称
         String productName = productDTO.getName();
         // 获取产品条码
-        String barCode = productDTO.getBarCode();
+        String productCode = productDTO.getCode();
         // 如果国家编码不为空，且产品条码不为空，设置SKU
         if (ObjectUtil.isNotEmpty(countryCode)) {
-            DictDataRespDTO dictData = dictDataApi.getDictData(DictTypeConstants.COUNTRY_CODE, String.valueOf(countryCode));
-            if (CharSequenceUtil.isNotBlank(barCode)) {
+            DictDataRespDTO dictData = dictDataApi.getDictData(TmsDictTypeConstants.COUNTRY_CODE, String.valueOf(countryCode));
+            if (CharSequenceUtil.isNotBlank(productCode)) {
                 String countrySuffix = getCountrySuffix(dictData.getLabel());
-                reqVO.setNumber(barCode + "-" + countrySuffix);
+                reqVO.setNumber(productCode + "-" + countrySuffix);
                 reqVO.setName(productName + "-" + countrySuffix);
             }
         }
         // 如果国家编码为空，且产品名称不为空，设置SKU
-        else if (ObjectUtil.isNotEmpty(productName) && ObjectUtil.isNotEmpty(barCode)) {
-            reqVO.setNumber(barCode);
+        else if (ObjectUtil.isNotEmpty(productName) && ObjectUtil.isNotEmpty(productCode)) {
+            reqVO.setNumber(productCode);
             reqVO.setName(productName);
         }
-        reqVO.setBarcode(productDTO.getBarCode());
+        reqVO.setBarcode(productDTO.getCode());
         // 报关品名
         reqVO.setProducingPace(customRuleDTO.getDeclaredType());
         reqVO.setDeclaredTypeEn(customRuleDTO.getDeclaredTypeEn());
@@ -125,7 +132,7 @@ public class ErpToKingdeeConverter {
         reqVO.setSaleDepartmentId(productDTO.getDeptId());
         reqVO.setDeclaredTypeZh(customRuleDTO.getDeclaredType());
         //将报关规则的id存到这里面去
-        reqVO.setMaxInventoryQty(String.valueOf(customRuleDTO.getId()));
+        reqVO.setMaxStockCheckQty(String.valueOf(customRuleDTO.getId()));
         return reqVO;
     }
 
@@ -140,9 +147,9 @@ public class ErpToKingdeeConverter {
         KingdeeProductSaveReqVO reqVO = new KingdeeProductSaveReqVO();
         //普通
         reqVO.setCheckType("1");
-        reqVO.setNumber(productDTO.getBarCode());
+        reqVO.setNumber(productDTO.getCode());
         reqVO.setName(productDTO.getName());
-        reqVO.setBarcode(productDTO.getBarCode());
+        reqVO.setBarcode(productDTO.getCode());
         reqVO.setCostMethod("2");
 
         reqVO.setGrossWeight(String.valueOf(productDTO.getPackageWeight()));
@@ -161,22 +168,22 @@ public class ErpToKingdeeConverter {
     }
 
 
-    public KingdeeSupplier toKingdee(SrmSupplierDTO erpSupplierDTO) {
-        KingdeeSupplier kingdeeSupplier = new KingdeeSupplier();
-        kingdeeSupplier.setName(erpSupplierDTO.getName());
-        kingdeeSupplier.setAccountOpenAddr(erpSupplierDTO.getBankAddress());
-        kingdeeSupplier.setBank(erpSupplierDTO.getBankName());
-        kingdeeSupplier.setBankAccount(erpSupplierDTO.getBankAccount());
-        kingdeeSupplier.setRemark(erpSupplierDTO.getRemark());
-        kingdeeSupplier.setRate(String.valueOf(erpSupplierDTO.getTaxPercent()));
-        kingdeeSupplier.setTaxpayerNo(erpSupplierDTO.getTaxNo());
+    public KingdeeSupplierSaveVO toKingdee(SrmSupplierDTO erpSupplierDTO) {
+        KingdeeSupplierSaveVO kingdeeSupplierSaveVO = new KingdeeSupplierSaveVO();
+        kingdeeSupplierSaveVO.setName(erpSupplierDTO.getName());
+        kingdeeSupplierSaveVO.setAccountOpenAddr(erpSupplierDTO.getBankAddress());
+        kingdeeSupplierSaveVO.setBank(erpSupplierDTO.getBankName());
+        kingdeeSupplierSaveVO.setBankAccount(erpSupplierDTO.getBankAccount());
+        kingdeeSupplierSaveVO.setRemark(erpSupplierDTO.getRemark());
+        kingdeeSupplierSaveVO.setRate(String.valueOf(erpSupplierDTO.getTaxRate()));
+        kingdeeSupplierSaveVO.setTaxpayerNo(erpSupplierDTO.getTaxNo());
         List<SupplierBomentity> bomEntityList = new ArrayList<>();
         SupplierBomentity bomEntity = new SupplierBomentity();
         bomEntity.setContactPerson(erpSupplierDTO.getContact());
         bomEntity.setMobile(erpSupplierDTO.getMobile());
         bomEntity.setEmail(erpSupplierDTO.getEmail());
-        kingdeeSupplier.setBomEntity(bomEntityList);
-        return kingdeeSupplier;
+        kingdeeSupplierSaveVO.setBomEntity(bomEntityList);
+        return kingdeeSupplierSaveVO;
     }
 
     public KingdeeAuxInfoDetail toKingdee(String deptId) {
@@ -254,5 +261,311 @@ public class ErpToKingdeeConverter {
         department.setRemark(LocalDateTime.now().toString());
 
         return department;
+    }
+
+    /**
+     * 将 SRM 采购入库单转换为金蝶采购入库单
+     *
+     * @param inOrder SRM采购入库单
+     * @return 金蝶采购入库单
+     */
+    KingdeePurInboundSaveReqVO convert(SrmPurchaseInDTO inOrder) {
+        return null;
+    }
+
+    /**
+     * 将 SRM 采购入库单列表转换为金蝶采购入库单列表
+     *
+     * @param inOrders SRM采购入库单列表
+     * @return 金蝶采购入库单列表
+     */
+    public List<KingdeePurInboundSaveReqVO> convertInDTOList(List<SrmPurchaseInDTO> inOrders) {
+        return null;
+    }
+
+    /**
+     * 将 SRM 采购订单转换为金蝶采购订单
+     * 转换包括：
+     * 1. 基本信息：订单日期、订单编号、供应商信息等
+     * 2. 商品分录：物料信息、数量、价格、金额等
+     *
+     * @param order SRM采购订单，包含订单基本信息和商品明细
+     * @return 金蝶采购订单，如果输入为null则返回null
+     */
+    public KingdeePurOrderSaveReqVO convertOrderDTO(SrmPurchaseOrderDTO order) {
+        if (order == null) {
+            return null;
+        }
+        KingdeePurOrderSaveReqVO vo = new KingdeePurOrderSaveReqVO();
+
+        // 1. 转换基本信息
+        convertBasicInfo(vo, order);
+
+        // 2. 转换商品分录
+        if (order.getItems() != null) {
+            vo.setMaterialEntity(convertToMaterialEntity(order.getItems()));
+        }
+
+        return vo;
+    }
+
+    /**
+     * 转换订单基本信息
+     * 包括：单据日期、单据编号、供应商信息、备注、总金额、外部单号等
+     *
+     * @param target 目标对象（金蝶采购订单）
+     * @param source 源对象（SRM采购订单）
+     */
+    public void convertBasicInfo(KingdeePurOrderSaveReqVO target, SrmPurchaseOrderDTO source) {
+        // 单据日期：格式化为 yyyy-MM-dd
+        if (source.getOrderDate() != null) {
+            target.setBillDate(DateUtil.format(source.getOrderDate(), "yyyy-MM-dd"));
+        }
+
+        // 单据编号
+        target.setBillNo(StrUtil.trimToNull(source.getOrderNo()));
+
+        // 供应商信息：ID转为字符串，编码去除空格
+        if (source.getSupplierId() != null) {
+            target.setSupplierId(String.valueOf(source.getSupplierId()));
+        }
+        target.setSupplierNumber(StrUtil.trimToNull(source.getSupplierCode()));
+
+        // 备注
+        target.setRemark(StrUtil.trimToNull(source.getRemark()));
+
+        // 总金额：BigDecimal转Double
+        if (source.getTotalAmount() != null) {
+            target.setTotalAmount(source.getTotalAmount().doubleValue());
+        }
+
+        // 外部单号：ID转为字符串
+        if (source.getId() != null) {
+            target.setOutsidePkId(String.valueOf(source.getId()));
+        }
+    }
+
+    /**
+     * 将 SRM 采购订单列表转换为金蝶采购订单列表
+     * 过滤掉null值，确保返回的列表不包含null元素
+     *
+     * @param orders SRM采购订单列表
+     * @return 金蝶采购订单列表，如果输入为null则返回空列表
+     */
+    public List<KingdeePurOrderSaveReqVO> convertOrderDTOList(List<SrmPurchaseOrderDTO> orders) {
+        if (orders == null) {
+            return Collections.emptyList();
+        }
+        return orders.stream()
+            .filter(Objects::nonNull)
+            .map(this::convertOrderDTO)
+            .filter(Objects::nonNull)
+            .toList();
+    }
+
+    /**
+     * 将 SRM 采购订单项列表转换为金蝶商品分录列表
+     * 过滤掉null值，确保返回的列表不包含null元素
+     *
+     * @param items SRM采购订单项列表
+     * @return 金蝶商品分录列表，如果输入为null则返回空列表
+     */
+    List<KingdeePurOrderSaveReqVO.MaterialEntity> convertToMaterialEntity(List<SrmPurchaseOrderItemDTO> items) {
+        if (items == null) {
+            return Collections.emptyList();
+        }
+        return items.stream()
+            .filter(Objects::nonNull)
+            .map(this::convertToMaterialEntity)
+            .filter(Objects::nonNull)
+            .toList();
+    }
+
+    /**
+     * 将 SRM 采购订单项转换为金蝶商品分录
+     * 转换包括：
+     * 1. 物料信息：物料ID、物料编码
+     * 2. 数量信息：数量、单价、金额
+     * 3. 单位信息：单位ID、单位编码
+     * 4. 其他信息：备注、交货日期、仓库、税率等
+     *
+     * @param item SRM采购订单项
+     * @return 金蝶商品分录，如果输入为null则返回null
+     */
+    KingdeePurOrderSaveReqVO.MaterialEntity convertToMaterialEntity(SrmPurchaseOrderItemDTO item) {
+        if (item == null) {
+            return null;
+        }
+        KingdeePurOrderSaveReqVO.MaterialEntity entity = new KingdeePurOrderSaveReqVO.MaterialEntity();
+
+        // 1. 物料信息
+        entity.setMaterialId(String.valueOf(item.getMaterialId()));
+        entity.setMaterialNumber(StrUtil.trimToNull(item.getMaterialCode()));
+
+        // 2. 数量信息
+        if (item.getQuantity() != null) {
+            entity.setQty(item.getQuantity().doubleValue());
+        }
+        if (item.getPrice() != null) {
+            entity.setPrice(item.getPrice().toString());
+        }
+        if (item.getAmount() != null) {
+            entity.setAmount(item.getAmount().toString());
+        }
+
+        // 3. 单位信息
+        entity.setUnitId(StrUtil.trimToNull(item.getUnit())); // 单位ID
+        entity.setUnitNumber(StrUtil.trimToNull(item.getUnit())); // 单位编码
+
+        // 4. 其他信息
+        entity.setComment(StrUtil.trimToNull(item.getRemark()));
+        entity.setDeliveryDate(item.getDeliveryDate());
+        if (item.getWarehouseId() != null) {
+            entity.setStockId(String.valueOf(item.getWarehouseId()));
+        }
+        entity.setStockNumber(StrUtil.trimToNull(item.getWarehouseName()));
+
+        // 5. 税率相关信息
+        if (item.getTaxRate() != null) {
+            entity.setCess(String.valueOf(item.getTaxRate()));
+        }
+        if (item.getTaxAmount() != null) {
+            entity.setTaxAmount(String.valueOf(item.getTaxAmount()));
+        }
+        if (item.getGrossPrice() != null) {
+            entity.setActTaxPrice(String.valueOf(item.getGrossPrice()));
+        }
+        if (item.getGrossTotalPrice() != null) {
+            entity.setAllAmount(String.valueOf(item.getGrossTotalPrice()));
+        }
+
+        // 6. 条码信息
+        entity.setBarcode(StrUtil.trimToNull(item.getProductCode()));
+
+        return entity;
+    }
+
+
+    /**
+     * 将 SRM 采购退货单转换为金蝶采购退货单
+     *
+     * @param returnOrder SRM采购退货单
+     * @return 金蝶采购退货单
+     */
+    public KingdeePurReturnSaveReqVO convertReturnDTO(SrmPurchaseReturnDTO returnOrder) {
+        return null;
+    }
+
+    /**
+     * 将 SRM 采购退货单列表转换为金蝶采购退货单列表
+     *
+     * @param returnOrders SRM采购退货单列表
+     * @return 金蝶采购退货单列表
+     */
+    public List<KingdeePurReturnSaveReqVO> convertReturnDTOList(List<SrmPurchaseReturnDTO> returnOrders) {
+        return null;
+    }
+
+    /**
+     * 将 SRM 供应商转换为金蝶供应商
+     *
+     * @param supplier SRM供应商
+     * @return 金蝶供应商
+     */
+    public KingdeeSupplierSaveVO convertSupplierDTO(SrmSupplierDTO supplier) {
+        if (supplier == null) {
+            return null;
+        }
+        KingdeeSupplierSaveVO kingdeeSupplierSaveVO = new KingdeeSupplierSaveVO();
+        // 基本信息
+        convertBasicInfo(kingdeeSupplierSaveVO, supplier);
+        // 银行信息
+        convertBankInfo(kingdeeSupplierSaveVO, supplier);
+        // 税务信息
+        convertTaxInfo(kingdeeSupplierSaveVO, supplier);
+        // 地址信息
+        convertAddressInfo(kingdeeSupplierSaveVO, supplier);
+        // 联系人信息
+        kingdeeSupplierSaveVO.setBomEntity(convertToBomEntity(supplier));
+        return kingdeeSupplierSaveVO;
+    }
+
+    /**
+     * 将 SRM 供应商列表转换为金蝶供应商列表
+     *
+     * @param suppliers SRM供应商列表
+     * @return 金蝶供应商列表
+     */
+    public List<KingdeeSupplierSaveVO> convertSupplierDTOList(List<SrmSupplierDTO> suppliers) {
+        if (suppliers == null) {
+            return Collections.emptyList();
+        }
+        return suppliers.stream()
+            .filter(Objects::nonNull)
+            .map(this::convertSupplierDTO)
+            .filter(Objects::nonNull)
+            .toList();
+    }
+
+    /**
+     * 转换基本信息
+     */
+    void convertBasicInfo(KingdeeSupplierSaveVO target, SrmSupplierDTO source) {
+        if (source.getId() != null) {
+            //把供应商ID作为金蝶的供应商编码
+            target.setNumber(String.valueOf(source.getId()));
+        }
+        target.setName(StrUtil.trimToNull(source.getName()));
+        target.setRemark(StrUtil.trimToNull(source.getRemark()));
+        // 设置开票名称，默认与供应商名称一致
+        target.setInvoiceName(StrUtil.trimToNull(source.getName()));
+    }
+
+    /**
+     * 转换银行信息
+     */
+    void convertBankInfo(KingdeeSupplierSaveVO target, SrmSupplierDTO source) {
+        target.setAccountOpenAddr(StrUtil.trimToNull(source.getBankAddress()));
+        target.setBank(StrUtil.trimToNull(source.getBankName()));
+        target.setBankAccount(StrUtil.trimToNull(source.getBankAccount()));
+    }
+
+    /**
+     * 转换税务信息
+     */
+    void convertTaxInfo(KingdeeSupplierSaveVO target, SrmSupplierDTO source) {
+        if (source.getTaxRate() != null) {
+            target.setRate(String.valueOf(source.getTaxRate()));
+        }
+        target.setTaxpayerNo(StrUtil.trimToNull(source.getTaxNo()));
+    }
+
+    /**
+     * 转换地址信息
+     */
+    void convertAddressInfo(KingdeeSupplierSaveVO target, SrmSupplierDTO source) {
+        // 设置详细地址
+        target.setAddr(StrUtil.trimToNull(source.getCompanyAddress()));
+        // 设置送达地址
+        if (StrUtil.isNotBlank(source.getDeliveryAddress())) {
+            target.setAddr(StrUtil.trimToNull(source.getDeliveryAddress()));
+        }
+    }
+
+    /**
+     * 转换为联系人信息(金蝶可以是复数联系人)
+     */
+    List<SupplierBomentity> convertToBomEntity(SrmSupplierDTO supplier) {
+        if (supplier == null) {
+            return Collections.emptyList();
+        }
+        SupplierBomentity bomEntity = new SupplierBomentity();
+        bomEntity.setContactPerson(StrUtil.trimToNull(supplier.getContact()));
+        bomEntity.setMobile(StrUtil.trimToNull(supplier.getMobile()));
+        bomEntity.setPhone(StrUtil.trimToNull(supplier.getTelephone()));
+        bomEntity.setEmail(StrUtil.trimToNull(supplier.getEmail()));
+        // 设置为首要联系人
+        bomEntity.setIsDefaultLinkman(true);
+        return Collections.singletonList(bomEntity);
     }
 }

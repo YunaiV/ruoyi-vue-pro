@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundPageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import org.apache.ibatis.annotations.Mapper;
+
 import java.util.List;
 
 /**
@@ -16,19 +17,26 @@ import java.util.List;
 @Mapper
 public interface WmsOutboundMapper extends BaseMapperX<WmsOutboundDO> {
 
+    static final String PRODUCT_ID_EXISTS_SQL = "select 1 from wms_outbound_item oi where oi.outbound_id=wms_outbound.id and oi.product_id = {0}";
+
     default PageResult<WmsOutboundDO> selectPage(WmsOutboundPageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<WmsOutboundDO>()
-				.eqIfPresent(WmsOutboundDO::getCode, reqVO.getCode())
+        LambdaQueryWrapperX<WmsOutboundDO> wrapperX = new LambdaQueryWrapperX<>();
+        if (reqVO.getProductId() != null) {
+            wrapperX.exists(PRODUCT_ID_EXISTS_SQL, reqVO.getProductId());
+        }
+        wrapperX.likeIfPresent(WmsOutboundDO::getCode, reqVO.getCode())
 				.eqIfPresent(WmsOutboundDO::getWarehouseId, reqVO.getWarehouseId())
 				.eqIfPresent(WmsOutboundDO::getType, reqVO.getType())
 				.eqIfPresent(WmsOutboundDO::getOutboundStatus, reqVO.getOutboundStatus())
 				.eqIfPresent(WmsOutboundDO::getAuditStatus, reqVO.getAuditStatus())
-				.eqIfPresent(WmsOutboundDO::getUpstreamBillId, reqVO.getUpstreamBillId())
-				.eqIfPresent(WmsOutboundDO::getUpstreamBillCode, reqVO.getUpstreamBillCode())
-				.eqIfPresent(WmsOutboundDO::getUpstreamBillType, reqVO.getUpstreamBillType())
-				.eqIfPresent(WmsOutboundDO::getCreatorComment, reqVO.getCreatorComment())
+            .eqIfPresent(WmsOutboundDO::getUpstreamId, reqVO.getUpstreamId())
+            .eqIfPresent(WmsOutboundDO::getUpstreamCode, reqVO.getUpstreamCode())
+            .eqIfPresent(WmsOutboundDO::getUpstreamType, reqVO.getUpstreamType())
+				.eqIfPresent(WmsOutboundDO::getRemark, reqVO.getRemark())
+                .eqIfPresent(WmsOutboundDO::getCompanyId, reqVO.getCompanyId())
 				.betweenIfPresent(WmsOutboundDO::getCreateTime, reqVO.getCreateTime())
-				.orderByDesc(WmsOutboundDO::getId));
+				.orderByDesc(WmsOutboundDO::getCreateTime);
+        return selectPage(reqVO, wrapperX);
     }
 
     /**
@@ -69,5 +77,12 @@ public interface WmsOutboundMapper extends BaseMapperX<WmsOutboundDO> {
         LambdaQueryWrapperX<WmsOutboundDO> wrapper = new LambdaQueryWrapperX<>();
         wrapper.eq(WmsOutboundDO::getCode, code);
         return selectOne(wrapper);
+    }
+
+    default List<WmsOutboundDO> getOutboundList(Integer billType, Long upstreamId) {
+        LambdaQueryWrapperX<WmsOutboundDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(WmsOutboundDO::getUpstreamId, upstreamId);
+        wrapper.eq(WmsOutboundDO::getUpstreamType, billType);
+        return selectList(wrapper);
     }
 }

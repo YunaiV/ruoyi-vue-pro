@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.wms.dal.dataobject.product;
 
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
-import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -38,7 +37,7 @@ public class WmsProductDO extends TenantBaseDO {
     /**
      * SKU（编码）
      */
-    private String barCode;
+    private String code;
     /**
      * 产品分类编号
      */

@@ -8,25 +8,25 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
-import cn.iocoder.yudao.module.erp.api.stock.WmsWarehouseApi;
-import cn.iocoder.yudao.module.erp.api.stock.dto.ErpWarehouseDTO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.SrmPurchaseInBaseRespVO;
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.req.*;
-import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseInDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseInItemDO;
-import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmSupplierDO;
+import cn.iocoder.yudao.module.srm.enums.SrmPurchaseOrderSourceEnum;
 import cn.iocoder.yudao.module.srm.service.purchase.SrmPurchaseInService;
 import cn.iocoder.yudao.module.srm.service.purchase.SrmPurchaseOrderService;
 import cn.iocoder.yudao.module.srm.service.purchase.SrmSupplierService;
+import cn.iocoder.yudao.module.srm.service.purchase.bo.in.SrmPurchaseInBO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.system.api.utils.Validation;
+import cn.iocoder.yudao.module.wms.api.warehouse.WmsWarehouseApi;
+import cn.iocoder.yudao.module.wms.api.warehouse.dto.WmsWarehouseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,9 +40,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.math.RoundingMode;
-import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -51,7 +50,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
-@Tag(name = "管理后台 - ERP 采购入库")
+@Tag(name = "管理后台 - ERP 采购到货")
 @RestController
 @RequestMapping("/srm/purchase-in")
 @Validated
@@ -69,26 +68,23 @@ public class SrmPurchaseInController {
     SrmPurchaseOrderService srmPurchaseOrderService;
 
     @PostMapping("/create")
-    @Operation(summary = "创建采购入库")
-    @Idempotent
+    @Operation(summary = "创建采购到货")
     @PreAuthorize("@ss.hasPermission('srm:purchase-in:create')")
-    public CommonResult<Long> createPurchaseIn(@Valid @RequestBody SrmPurchaseInSaveReqVO createReqVO) {
-        //给vo里面的项的source设置字符串a
-        createReqVO.getItems().forEach(item -> item.setSource("WEB录入"));
-        createReqVO.setInTime(LocalDateTime.now());
+    public CommonResult<Long> createPurchaseIn(@Validated(Validation.OnCreate.class) @RequestBody SrmPurchaseInSaveReqVO createReqVO) {
+        createReqVO.getItems().forEach(item -> item.setSource(SrmPurchaseOrderSourceEnum.WEB_ENTRY.getDesc()));
         return success(purchaseInService.createPurchaseIn(createReqVO));
     }
 
     @PutMapping("/update")
-    @Operation(summary = "更新采购入库")
+    @Operation(summary = "更新采购到货")
     @PreAuthorize("@ss.hasPermission('srm:purchase-in:update')")
-    public CommonResult<Boolean> updatePurchaseIn(@Valid @RequestBody SrmPurchaseInSaveReqVO updateReqVO) {
+    public CommonResult<Boolean> updatePurchaseIn(@Validated(Validation.OnUpdate.class) @RequestBody SrmPurchaseInSaveReqVO updateReqVO) {
         purchaseInService.updatePurchaseIn(updateReqVO);
         return success(true);
     }
 
     @DeleteMapping("/delete")
-    @Operation(summary = "删除采购入库")
+    @Operation(summary = "删除采购到货")
     @Parameter(name = "ids", description = "编号数组", required = true)
     @PreAuthorize("@ss.hasPermission('srm:purchase-in:delete')")
     public CommonResult<Boolean> deletePurchaseIn(@RequestParam("ids") List<Long> ids) {
@@ -97,43 +93,38 @@ public class SrmPurchaseInController {
     }
 
     @GetMapping("/get")
-    @Operation(summary = "获得采购入库")
+    @Operation(summary = "获得采购到货")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('srm:purchase-in:query')")
     public CommonResult<SrmPurchaseInBaseRespVO> getPurchaseIn(@RequestParam("id") Long id) {
-        SrmPurchaseInDO purchaseIn = purchaseInService.getPurchaseIn(id);
-        if (purchaseIn == null) {
-            return success(null);
-        }
-        SrmPurchaseInBaseRespVO respVO = bindList(Collections.singletonList(purchaseIn)).get(0);
-        return success(respVO);
+        SrmPurchaseInBO purchaseInBO = purchaseInService.getPurchaseInBOById(id);
+        return success(bindList(Collections.singletonList(purchaseInBO)).get(0));
     }
 
-    @GetMapping("/page")
-    @Operation(summary = "获得采购入库分页")
+    @PostMapping("/page")
+    @Operation(summary = "获得采购到货分页")
     @PreAuthorize("@ss.hasPermission('srm:purchase-in:query')")
-    public CommonResult<PageResult<SrmPurchaseInBaseRespVO>> getPurchaseInPage(@Valid SrmPurchaseInPageReqVO pageReqVO) {
-        PageResult<SrmPurchaseInDO> pageResult = purchaseInService.getPurchaseInPage(pageReqVO);
-        List<SrmPurchaseInBaseRespVO> respVOS = bindList(pageResult.getList());
-        return success(new PageResult<>(respVOS, pageResult.getTotal()));
+    public CommonResult<PageResult<SrmPurchaseInBaseRespVO>> getPurchaseInPage(@Valid @RequestBody(required = false) SrmPurchaseInPageReqVO pageReqVO) {
+        PageResult<SrmPurchaseInBO> pageResult = purchaseInService.getPurchaseInBOPage(pageReqVO);
+        return success(new PageResult<>(bindList(pageResult.getList()), pageResult.getTotal()));
     }
 
     @GetMapping("/export-excel")
-    @Operation(summary = "导出采购入库 Excel")
+    @Operation(summary = "导出采购到货 Excel")
     @PreAuthorize("@ss.hasPermission('srm:purchase-in:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportPurchaseInExcel(@Valid SrmPurchaseInPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        PageResult<SrmPurchaseInDO> page = purchaseInService.getPurchaseInPage(pageReqVO);
+        PageResult<SrmPurchaseInBO> page = purchaseInService.getPurchaseInBOPage(pageReqVO);
         // 导出 Excel
-        ExcelUtils.write(response, "采购入库.xls", "数据", SrmPurchaseInBaseRespVO.class, bindList(page.getList()));
+        ExcelUtils.write(response, "采购到货.xls", "数据", SrmPurchaseInBaseRespVO.class, bindList(page.getList()));
     }
 
     @PutMapping("/submitAudit")
     @Operation(summary = "提交审核")
-    @PreAuthorize("@ss.hasPermission('srm:purchase-in:submitAudit')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-in:submit-audit')")
     public CommonResult<Boolean> submitAudit(@Valid @RequestBody SrmPurchaseInSubmitReqVO vo) {
-        purchaseInService.submitAudit(vo.getInIds().stream().distinct().toList());
+        purchaseInService.submitAudit(vo.getArriveIds().stream().distinct().toList());
         return success(true);
     }
 
@@ -148,65 +139,81 @@ public class SrmPurchaseInController {
     //切换付款状态方法(暂时)
     @PostMapping("/changePayStatus")
     @Operation(summary = "切换付款状态")
-    @PreAuthorize("@ss.hasPermission('srm:purchase-in:changePayStatus')")
+    @PreAuthorize("@ss.hasPermission('srm:purchase-in:change-pay-status')")
     public CommonResult<Boolean> changePayStatus(@Valid @RequestBody SrmPurchaseInPayReqVO vo) {
-        //        purchaseInService.changePayStatus(reqVO.getInId(), reqVO.getPayStatus());
         purchaseInService.switchPayStatus(vo);
         return success(true);
     }
     //TODO 合并出库
 
-    private List<SrmPurchaseInBaseRespVO> bindList(List<SrmPurchaseInDO> list) {
+    private List<SrmPurchaseInBaseRespVO> bindList(List<SrmPurchaseInBO> list) {
         if (CollUtil.isEmpty(list)) {
             return Collections.emptyList();
         }
-        // 1.1 入库项
-        List<SrmPurchaseInItemDO> purchaseInItemList = purchaseInService.getPurchaseInItemListByInIds(convertSet(list, SrmPurchaseInDO::getId));
-        Map<Long, List<SrmPurchaseInItemDO>> purchaseInItemMap = convertMultiMap(purchaseInItemList, SrmPurchaseInItemDO::getInId);
+
+        // 1. 获取关联数据
+        // 1.1 到货项
+        List<SrmPurchaseInItemDO> purchaseInItemList = list.stream()
+            .flatMap(bo -> bo.getSrmPurchaseInItemDOS().stream())
+            .collect(Collectors.toList());
+        Map<Long, List<SrmPurchaseInItemDO>> purchaseInItemMap = convertMultiMap(purchaseInItemList, SrmPurchaseInItemDO::getArriveId);
+
         // 1.2 产品信息
         Map<Long, ErpProductDTO> productMap = erpProductApi.getProductMap(convertSet(purchaseInItemList, SrmPurchaseInItemDO::getProductId));
         // 1.3 供应商信息
-        Map<Long, SrmSupplierDO> supplierMap = supplierService.getSupplierMap(convertSet(list, SrmPurchaseInDO::getSupplierId));
+        Map<Long, SrmSupplierDO> supplierMap = supplierService.getSupplierMap(convertSet(list, SrmPurchaseInBO::getSupplierId));
         // 1.4 人员信息
-        Set<Long> userIds = Stream.concat(list.stream().flatMap(orderDO -> Stream.of(orderDO.getAuditorId(),//审核者
-                safeParseLong(orderDO.getCreator()), safeParseLong(orderDO.getUpdater()))), purchaseInItemList.stream()
-                .flatMap(orderItemDO -> Stream.of(safeParseLong(orderItemDO.getCreator()), safeParseLong(orderItemDO.getUpdater()), orderItemDO.getApplicantId())))
+        Set<Long> userIds = Stream.concat(list.stream().flatMap(inBO -> Stream.of(inBO.getAuditorId(),//审核者
+                safeParseLong(inBO.getCreator()), safeParseLong(inBO.getUpdater()))), purchaseInItemList.stream()
+                .flatMap(itemDO -> Stream.of(safeParseLong(itemDO.getCreator()), safeParseLong(itemDO.getUpdater()), itemDO.getApplicantId())))
             .distinct().filter(Objects::nonNull).collect(Collectors.toSet());
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         // 1.5 部门
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(purchaseInItemList, SrmPurchaseInItemDO::getApplicationDeptId));
         // 1.6 获取仓库信息
-        Map<Long, ErpWarehouseDTO> warehouseMap = wmsWarehouseApi.getWarehouseMap(convertSet(purchaseInItemList, SrmPurchaseInItemDO::getWarehouseId));
-        //1.7 订单项map orderItemId
-        Map<Long, SrmPurchaseOrderDO> orderItemMap =
-            srmPurchaseOrderService.getPurchaseOrderItemMap(purchaseInItemList.stream().map(SrmPurchaseInItemDO::getOrderItemId).collect(Collectors.toSet()));
-        // 2. 开始拼接
-        return BeanUtils.toBean(list, SrmPurchaseInBaseRespVO.class, purchaseIn -> {
-            purchaseIn.setItems(BeanUtils.toBean(purchaseInItemMap.get(purchaseIn.getId()), SrmPurchaseInBaseRespVO.Item.class, item -> {
-                //设置产品信息-带出相关字段
-                MapUtils.findAndThen(productMap, item.getProductId(), product -> item.setProduct(product).setTotalVolume(
-                            product.getLength() * product.getHeight() * product.getWidth() * Double.parseDouble(String.valueOf(item.getQty())))//总体积=数量*产品体积
-                        .setTotalWeight(product.getWeight().setScale(2, RoundingMode.HALF_UP).longValue() * Double.parseDouble(String.valueOf(item.getQty())))
-                    //总重量=数量*产品重量
-                );
-                // 设置仓库信息
-                MapUtils.findAndThen(warehouseMap, item.getWarehouseId(), erpWarehouseDO -> item.setWarehouseName(erpWarehouseDO.getName()));
-                //部门
-                MapUtils.findAndThen(deptMap, item.getApplicationDeptId(), dept -> item.setApplicationDeptName(dept.getName()));
-                //人员
-                MapUtils.findAndThen(userMap, item.getApplicantId(), user -> item.setApplicantName(user.getNickname()));
-                //订单的no
-                MapUtils.findAndThen(orderItemMap, item.getOrderItemId(), order -> item.setOrderNo(order.getNo()));
-            }));
-            //            purchaseIn.setProductNames(CollUtil.join(purchaseIn.getItems(), "，", SrmPurchaseInBaseRespVO.Item::getProductName));
-            //产品-带出相关字段
-            MapUtils.findAndThen(supplierMap, purchaseIn.getSupplierId(), supplier -> purchaseIn.setSupplierName(supplier.getName()));
+        Map<Long, WmsWarehouseDTO> warehouseMap = wmsWarehouseApi.getWarehouseMap(convertSet(purchaseInItemList, SrmPurchaseInItemDO::getWarehouseId));
 
-            //人员
-            MapUtils.findAndThen(userMap, safeParseLong(purchaseIn.getCreator()), user -> purchaseIn.setCreator(user.getNickname()));
-            MapUtils.findAndThen(userMap, safeParseLong(purchaseIn.getAuditor()), user -> purchaseIn.setAuditor(user.getNickname()));
+        //orderItemId 集合
+        Set<Long> orderItemIds = purchaseInItemList.stream().map(SrmPurchaseInItemDO::getOrderItemId).collect(Collectors.toSet());
+        List<SrmPurchaseOrderItemDO> orderItemList = srmPurchaseOrderService.getPurchaseOrderItemList(orderItemIds);
+        //map
+        Map<Long, SrmPurchaseOrderItemDO> orderItemMap = orderItemList.stream().collect(Collectors.toMap(SrmPurchaseOrderItemDO::getId, Function.identity()));
 
-        });
+        // 2. 转换为 VO 列表
+        return list.stream().map(inBO -> {
+            // 2.1 转换为基础 VO
+            SrmPurchaseInBaseRespVO respVO = BeanUtils.toBean(inBO, SrmPurchaseInBaseRespVO.class);
+            // 2.2 设置供应商信息
+            MapUtils.findAndThen(supplierMap, inBO.getSupplierId(), supplier -> respVO.setSupplierName(supplier.getName()));
+            // 2.3 设置审核人信息
+            MapUtils.findAndThen(userMap, inBO.getAuditorId(), user -> respVO.setAuditorName(user.getNickname()));
+            // 2.4 设置创建人信息
+            MapUtils.findAndThen(userMap, safeParseLong(inBO.getCreator()), user -> respVO.setCreatorName(user.getNickname()));
+            // 2.5 设置更新人信息
+            MapUtils.findAndThen(userMap, safeParseLong(inBO.getUpdater()), user -> respVO.setUpdaterName(user.getNickname()));
+            // 2.6 设置入库项列表
+            List<SrmPurchaseInItemDO> items = purchaseInItemMap.get(inBO.getId());
+            if (CollUtil.isNotEmpty(items)) {
+                respVO.setItems(items.stream().map(item -> {
+                    SrmPurchaseInBaseRespVO.Item itemVO = BeanUtils.toBean(item, SrmPurchaseInBaseRespVO.Item.class);
+                    // 设置产品信息
+                    MapUtils.findAndThen(productMap, item.getProductId(), product -> {
+                        itemVO.setProductName(product.getName());
+                        itemVO.setModel(product.getModel());
+                    });
+                    // 设置仓库信息
+                    MapUtils.findAndThen(warehouseMap, item.getWarehouseId(), warehouse -> itemVO.setWarehouseName(warehouse.getName()));
+                    // 设置申请人信息
+                    MapUtils.findAndThen(userMap, item.getApplicantId(), user -> itemVO.setApplicantName(user.getNickname()));
+                    // 设置部门信息
+                    MapUtils.findAndThen(deptMap, item.getApplicationDeptId(), dept -> itemVO.setApplicationDeptName(dept.getName()));
+                    //关联订单行的采购数
+                    MapUtils.findAndThen(orderItemMap, item.getOrderItemId(), orderItem -> itemVO.setOrderQty(orderItem.getQty()));
+                    return itemVO;
+                }).collect(Collectors.toList()));
+            }
+            return respVO;
+        }).collect(Collectors.toList());
     }
 
     /**

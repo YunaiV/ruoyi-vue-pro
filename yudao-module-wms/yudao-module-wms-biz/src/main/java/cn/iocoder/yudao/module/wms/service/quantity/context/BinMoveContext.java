@@ -14,6 +14,7 @@ import java.util.List;
 @Data
 public class BinMoveContext {
 
+    private Long inboundId;
     private WmsStockBinMoveDO binMoveDO;
     private List<WmsStockBinMoveItemDO> binMoveItemDOList;
 

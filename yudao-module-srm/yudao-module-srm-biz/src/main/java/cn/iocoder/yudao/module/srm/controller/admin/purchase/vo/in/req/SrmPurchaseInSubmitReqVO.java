@@ -7,6 +7,6 @@ import java.util.Collection;
 
 @Data
 public class SrmPurchaseInSubmitReqVO {
-    @NotNull
-    private Collection<Long> inIds;
+    @NotNull(message = "采购到货单ID不能为空")
+    private Collection<Long> arriveIds;
 }

@@ -31,7 +31,7 @@ public class OrderOffActionImpl implements Action<SrmOffStatus, SrmEventEnum, Sr
         //手动关闭+自动关闭事件
         if (event == SrmEventEnum.MANUAL_CLOSE || event == SrmEventEnum.AUTO_CLOSE) {
             //未审核->异常
-            ThrowUtil.ifThrow(Objects.equals(context.getAuditStatus(), SrmAuditStatus.PENDING_REVIEW.getCode()), SrmErrorCodeConstants.PURCHASE_ORDER_CLOSE_FAIL, context.getNo());
+            ThrowUtil.ifThrow(Objects.equals(context.getAuditStatus(), SrmAuditStatus.PENDING_REVIEW.getCode()), SrmErrorCodeConstants.PURCHASE_ORDER_CLOSE_FAIL, context.getCode());
         }
     }
 

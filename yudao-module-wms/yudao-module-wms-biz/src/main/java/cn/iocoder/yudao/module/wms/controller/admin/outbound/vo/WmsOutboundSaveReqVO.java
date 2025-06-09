@@ -1,22 +1,24 @@
 package cn.iocoder.yudao.module.wms.controller.admin.outbound.vo;
 
-import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import jakarta.validation.constraints.*;
-import java.util.List;
-import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemSaveReqVO;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundType;
+import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
+import cn.iocoder.yudao.module.system.enums.somle.BillType;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemSaveReqVO;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
-import cn.iocoder.yudao.module.wms.enums.common.WmsBillType;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundType;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : code,company_id,remark,outbound_time,audit_status,creator_comment,type,upstream_bill_type,latest_outbound_action_id,outbound_status,upstream_bill_id,id,upstream_bill_code,dept_id,warehouse_id
+ * @table-fields : code,company_id,remark,audit_status,outbound_time,type,upstream_type,latest_outbound_action_id,outbound_status,upstream_id,id,upstream_code,dept_id,warehouse_id
  */
 @Schema(description = "管理后台 - 出库单新增/修改 Request VO")
 @Data
@@ -39,9 +41,6 @@ public class WmsOutboundSaveReqVO {
     @InEnum(WmsOutboundAuditStatus.class)
     private Integer auditStatus;
 
-    @Schema(description = "特别说明，创建方专用")
-    private String creatorComment;
-
     @Schema(description = "详情清单", example = "")
     private List<WmsOutboundItemSaveReqVO> itemList;
 
@@ -59,6 +58,10 @@ public class WmsOutboundSaveReqVO {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime outboundTime;
 
+    @Schema(description = "计划出库时间", example = "")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime outboundPlanTime;
+
     @Schema(description = "出库动作ID，与flow关联", example = "")
     private Long latestOutboundActionId;
 
@@ -69,11 +72,12 @@ public class WmsOutboundSaveReqVO {
     private String code;
 
     @Schema(description = "来源单据ID", example = "")
-    private Long upstreamBillId;
+    private Long upstreamId;
 
-    @Schema(description = "来源单据号", example = "")
-    private String upstreamBillCode;
+    @Schema(description = "来源单据编码", example = "")
+    private String upstreamCode;
 
-    @Schema(description = "WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单 , 2-盘点单", example = "")
-    private Integer upstreamBillType;
+    @Schema(description = "WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单 , 2-盘点单 , 3-换货单", example = "")
+    @InEnum(BillType.class)
+    private Integer upstreamType;
 }

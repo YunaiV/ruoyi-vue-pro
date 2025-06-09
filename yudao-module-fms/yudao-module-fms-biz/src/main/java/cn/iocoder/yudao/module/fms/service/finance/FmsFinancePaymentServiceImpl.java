@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.enums.common.ErpBizTypeEnum;
-import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
+import cn.iocoder.yudao.module.fms.api.status.FmsAuditStatus;
 import cn.iocoder.yudao.module.fms.controller.admin.finance.vo.payment.FmsFinancePaymentPageReqVO;
 import cn.iocoder.yudao.module.fms.controller.admin.finance.vo.payment.FmsFinancePaymentSaveReqVO;
 import cn.iocoder.yudao.module.fms.dal.dataobject.finance.FmsFinancePaymentDO;
@@ -27,7 +27,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.fms.api.enums.FmsErrorCodeConstants.*;
 
 // TODO 芋艿：记录操作日志
 
@@ -83,7 +83,7 @@ public class FmsFinancePaymentServiceImpl implements FmsFinancePaymentService {
         // 2.1 插入付款单
         FmsFinancePaymentDO payment = BeanUtils.toBean(createReqVO, FmsFinancePaymentDO.class, in -> in
             .setNo(no)
-            .setStatus(ErpAuditStatus.PENDING_REVIEW.getCode())
+            .setStatus(FmsAuditStatus.PENDING_REVIEW.getCode())
         );
         calculateTotalPrice(payment, paymentItems);
         financePaymentMapper.insert(payment);
@@ -101,7 +101,7 @@ public class FmsFinancePaymentServiceImpl implements FmsFinancePaymentService {
     public void updateFinancePayment(FmsFinancePaymentSaveReqVO updateReqVO) {
         // 1.1 校验存在
         FmsFinancePaymentDO payment = validateFinancePaymentExists(updateReqVO.getId());
-        if (ErpAuditStatus.APPROVED.getCode().equals(payment.getStatus())) {
+        if (FmsAuditStatus.APPROVED.getCode().equals(payment.getStatus())) {
             throw exception(FINANCE_PAYMENT_UPDATE_FAIL_APPROVE, payment.getNo());
         }
         // 1.2 校验供应商
@@ -134,7 +134,7 @@ public class FmsFinancePaymentServiceImpl implements FmsFinancePaymentService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateFinancePaymentStatus(Long id, Integer status) {
-        boolean approve = ErpAuditStatus.APPROVED.getCode().equals(status);
+        boolean approve = FmsAuditStatus.APPROVED.getCode().equals(status);
         // 1.1 校验存在
         FmsFinancePaymentDO payment = validateFinancePaymentExists(id);
         // 1.2 校验状态
@@ -213,7 +213,7 @@ public class FmsFinancePaymentServiceImpl implements FmsFinancePaymentService {
             return;
         }
         payments.forEach(payment -> {
-            if (ErpAuditStatus.APPROVED.getCode().equals(payment.getStatus())) {
+            if (FmsAuditStatus.APPROVED.getCode().equals(payment.getStatus())) {
                 throw exception(FINANCE_PAYMENT_DELETE_FAIL_APPROVE, payment.getNo());
             }
         });

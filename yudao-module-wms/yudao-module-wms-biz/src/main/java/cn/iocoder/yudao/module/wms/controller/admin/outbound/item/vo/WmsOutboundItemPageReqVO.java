@@ -1,15 +1,18 @@
 package cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : company_id,outbound_status,actual_qty,create_time,bin_id,plan_qty,product_id,upstream_item_id,remark,dept_id,outbound_id
+ * @table-fields : company_id,outbound_status,actual_qty,create_time,bin_id,plan_qty,product_id,upstream_id,remark,dept_id,outbound_id
  */
 @Schema(description = "管理后台 - 出库单详情分页 Request VO")
 @Data
@@ -48,6 +51,6 @@ public class WmsOutboundItemPageReqVO extends PageParam {
     @Schema(description = "备注", example = "")
     private String remark;
 
-    @Schema(description = "来源详情ID", example = "")
-    private Long upstreamItemId;
+    @Schema(description = "来源明细行ID", example = "")
+    private Long upstreamId;
 }

@@ -16,8 +16,10 @@ public enum WmsOutboundType implements ArrayValuable<Integer>, DictEnum {
 
     MANUAL(1, "手工出库"),
     ORDER(2, "订单出库"),
-    INVENTORY(3, "盘点出库"),
-   ;
+    STOCKCHECK(3, "盘点出库"),
+
+    OUTBOUND_BILL(4, "头程单出库"),
+    TRANSFER(5, "调拨出库");
 
     public static final Integer[] VALUES = Arrays.stream(values()).map(WmsOutboundType::getValue).toArray(Integer[]::new);
 
@@ -30,7 +32,7 @@ public enum WmsOutboundType implements ArrayValuable<Integer>, DictEnum {
      **/
     public static WmsOutboundType parse(Integer value) {
         for (WmsOutboundType e : WmsOutboundType.values()) {
-            if(e.getValue().equals(value)) {
+            if (e.getValue().equals(value)) {
                 return e;
             }
         }
@@ -42,12 +44,12 @@ public enum WmsOutboundType implements ArrayValuable<Integer>, DictEnum {
      **/
     public static WmsOutboundType parse(String nameOrLabel) {
         for (WmsOutboundType e : WmsOutboundType.values()) {
-            if(e.name().equalsIgnoreCase(nameOrLabel)) {
+            if (e.name().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
         }
         for (WmsOutboundType e : WmsOutboundType.values()) {
-            if(e.getLabel().equalsIgnoreCase(nameOrLabel)) {
+            if (e.getLabel().equalsIgnoreCase(nameOrLabel)) {
                 return e;
             }
         }

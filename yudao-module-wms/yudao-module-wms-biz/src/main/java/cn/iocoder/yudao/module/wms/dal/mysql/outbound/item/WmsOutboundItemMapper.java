@@ -23,7 +23,7 @@ public interface WmsOutboundItemMapper extends BaseMapperX<WmsOutboundItemDO> {
 				.eqIfPresent(WmsOutboundItemDO::getProductId, reqVO.getProductId())
 				.eqIfPresent(WmsOutboundItemDO::getPlanQty, reqVO.getPlanQty())
 				.eqIfPresent(WmsOutboundItemDO::getActualQty, reqVO.getActualQty())
-				.eqIfPresent(WmsOutboundItemDO::getUpstreamItemId, reqVO.getUpstreamItemId())
+            .eqIfPresent(WmsOutboundItemDO::getUpstreamId, reqVO.getUpstreamId())
 				.betweenIfPresent(WmsOutboundItemDO::getCreateTime, reqVO.getCreateTime())
 				.orderByDesc(WmsOutboundItemDO::getId));
     }

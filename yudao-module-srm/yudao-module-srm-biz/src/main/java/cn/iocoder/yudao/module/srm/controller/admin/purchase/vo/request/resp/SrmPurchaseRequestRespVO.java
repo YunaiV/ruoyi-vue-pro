@@ -25,7 +25,7 @@ public class SrmPurchaseRequestRespVO extends BaseVO {
 
     @Schema(description = "单据编号")
     @ExcelProperty("单据编号")
-    private String no;
+    private String code;
 
     @Schema(description = "申请人")
     @ExcelProperty("申请人")
@@ -104,7 +104,7 @@ public class SrmPurchaseRequestRespVO extends BaseVO {
      */
     @Schema(description = "审核意见")
     @ExcelProperty("审核意见")
-    private String reviewComment;
+    private String auditAdvice;
 
 
     @Schema(description = "结算账户编号")
@@ -124,7 +124,7 @@ public class SrmPurchaseRequestRespVO extends BaseVO {
     private String remark;
 
     @Schema(description = "版本号")
-    private Long version;
+    private Integer version;
 //    /**
 //     * 采购单ID
 //     *

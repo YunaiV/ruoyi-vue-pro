@@ -20,13 +20,64 @@
     </description>
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.somle</groupId>
-            <artifactId>somle-esb</artifactId>
-            <version>${revision}</version>
-        </dependency>
+    <profiles>
+        <!-- 本地开发环境 -->
+        <profile>
+            <id>local</id>
+            <dependencies>
 
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>local-esb</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.somle</groupId>
+                    <artifactId>somle-esb</artifactId>
+                    <version>${revision}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <!-- 正式环境(全部加载)-默认 -->
+        <profile>
+            <id>prod</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+
+                <!-- AI 大模型相关模块。默认注释，保证编译速度 -->
+                <dependency>
+                    <groupId>cn.iocoder.boot</groupId>
+                    <artifactId>yudao-module-ai-biz</artifactId>
+                    <version>${revision}</version>
+                </dependency>
+                <!-- 工作流。默认注释，保证编译速度 -->
+                <dependency>
+                    <groupId>cn.iocoder.boot</groupId>
+                    <artifactId>yudao-module-bpm-biz</artifactId>
+                    <version>${revision}</version>
+                </dependency>
+                <!-- 更多模块 -->
+                <dependency>
+                    <groupId>com.somle</groupId>
+                    <artifactId>somle-esb</artifactId>
+                    <version>${revision}</version>
+                </dependency>
+                <!-- CRM 相关模块。默认注释，保证编译速度 -->
+                <dependency>
+                    <groupId>cn.iocoder.boot</groupId>
+                    <artifactId>yudao-module-crm-biz</artifactId>
+                    <version>${revision}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
+
+    <dependencies>
 
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
@@ -52,13 +103,7 @@
         <!--            <artifactId>yudao-module-report-biz</artifactId>-->
         <!--            <version>${revision}</version>-->
         <!--        </dependency>-->
-        <!-- 工作流。默认注释，保证编译速度 -->
-        <dependency>
 
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-bpm-biz</artifactId>
-            <version>${revision}</version>
-        </dependency>
         <!-- 支付服务。默认注释，保证编译速度 -->
         <!--        <dependency>-->
         <!--            <groupId>cn.iocoder.boot</groupId>-->
@@ -95,12 +140,6 @@
         <!--            <version>${revision}</version>-->
         <!--        </dependency>-->
 
-        <!-- CRM 相关模块。默认注释，保证编译速度 -->
-        <dependency>
-            <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-crm-biz</artifactId>
-            <version>${revision}</version>
-        </dependency>
 
         <!-- ERP 相关模块。默认注释，保证编译速度 -->
         <dependency>
@@ -130,11 +169,9 @@
             <artifactId>yudao-module-tms-biz</artifactId>
             <version>${revision}</version>
         </dependency>
-
-        <!-- AI 大模型相关模块。默认注释，保证编译速度 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
-            <artifactId>yudao-module-ai-biz</artifactId>
+            <artifactId>yudao-module-wms-biz</artifactId>
             <version>${revision}</version>
         </dependency>
 
@@ -157,6 +194,7 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-protection</artifactId>
         </dependency>
+
 
     </dependencies>
 

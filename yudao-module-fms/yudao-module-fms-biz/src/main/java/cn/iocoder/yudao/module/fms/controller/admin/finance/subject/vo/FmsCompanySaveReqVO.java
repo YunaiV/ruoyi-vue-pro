@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.fms.controller.admin.finance.subject.vo;
 
 import cn.iocoder.yudao.module.system.api.utils.Validation;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
@@ -18,6 +19,14 @@ public class FmsCompanySaveReqVO {
     @Schema(description = "主体名称", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "主体名称不能为空")
     private String name;
+
+    @Schema(description = "公司名称（英文）", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "公司名称（英文）不能为空")
+    private String nameEn;
+
+    @Schema(description = "公司简称", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "公司简称不能为空")
+    private String abbr;
 
     @Schema(description = "联系人")
     private String contact;
@@ -39,6 +48,9 @@ public class FmsCompanySaveReqVO {
 
     @Schema(description = "公司地址")
     private String companyAddress;
+
+    @Schema(description = "公司地址（英文）")
+    private String companyAddressEn;
 
     @Schema(description = "备注")
     private String remark;

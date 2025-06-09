@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.srm.dal.dataobject.purchase;
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import cn.iocoder.yudao.module.srm.enums.status.SrmAuditStatus;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.Version;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 /**
  * ERP 采购退货 DO
  *
- * @author 芋道源码
+ * @author wdy
  */
 @TableName(value = "srm_purchase_return")
 @KeySequence("srm_purchase_return_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -24,7 +25,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuppressWarnings("all")
-public class SrmPurchaseReturnDO extends BaseDO {
+public class SrmPurchaseReturnDO extends TenantBaseDO {
 
     /**
      * 编号
@@ -32,9 +33,14 @@ public class SrmPurchaseReturnDO extends BaseDO {
     @TableId
     private Long id;
     /**
+     * 乐观锁
+     */
+    @Version
+    private Integer version;
+    /**
      * 采购退货单号
      */
-    private String no;
+    private String code;
     /**
      * 审批状态
      * <p>
@@ -52,7 +58,7 @@ public class SrmPurchaseReturnDO extends BaseDO {
     /**
      * 审核意见
      */
-    private String reviewComment;
+    private String auditAdvice;
     /**
      * 供应商编号
      * <p>
@@ -70,18 +76,14 @@ public class SrmPurchaseReturnDO extends BaseDO {
      */
     private LocalDateTime returnTime;
 
-//    /**
-//     * 采购订单编号
-//     *
-//     * 关联 {@link SrmPurchaseOrderDO#getId()}
-//     */
-//    private Long orderId;
-//    /**
-//     * 采购订单号
-//     *
-//     * 冗余 {@link SrmPurchaseOrderDO#getNo()}
-//     */
-//    private String orderNo;
+    /**
+     * 币种编号
+     */
+    private Long currencyId;
+    /**
+     * 价税合计
+     */
+    private BigDecimal grossTotalPrice;
 
     /**
      * 合计数量
@@ -90,9 +92,17 @@ public class SrmPurchaseReturnDO extends BaseDO {
     /**
      * 最终合计价格，单位：元
      * <p>
-     * totalPrice = totalProductPrice + totalTaxPrice - discountPrice + otherPrice
+     * totalPrice = totalProductPrice + totalGrossPrice - discountPrice + otherPrice
      */
     private BigDecimal totalPrice;
+    /**
+     * 总毛重，单位：kg
+     */
+    private BigDecimal totalWeight;
+    /**
+     * 总体积,毫米，单位：mm³
+     */
+    private BigDecimal totalVolume;
     /**
      * 已退款金额，单位：元
      * <p>
@@ -107,7 +117,7 @@ public class SrmPurchaseReturnDO extends BaseDO {
     /**
      * 合计税额，单位：元
      */
-    private BigDecimal totalTaxPrice;
+    private BigDecimal totalGrossPrice;
     /**
      * 优惠率，百分比
      */
@@ -115,7 +125,7 @@ public class SrmPurchaseReturnDO extends BaseDO {
     /**
      * 优惠金额，单位：元
      * <p>
-     * discountPrice = (totalProductPrice + totalTaxPrice) * discountPercent
+     * discountPrice = (totalProductPrice + totalGrossPrice) * discountPercent
      */
     private BigDecimal discountPrice;
     /**
@@ -136,4 +146,8 @@ public class SrmPurchaseReturnDO extends BaseDO {
      * 退款状态
      */
     private Integer refundStatus;
+    /**
+     * 出库状态
+     */
+    private Integer outboundStatus;
 }

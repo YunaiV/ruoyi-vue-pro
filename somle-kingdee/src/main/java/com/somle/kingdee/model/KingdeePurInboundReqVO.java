@@ -3,15 +3,17 @@ package com.somle.kingdee.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.Builder;
 import lombok.Data;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * 采购入库单列表查询请求对象
+ */
+//@Builder
 @Data
-@Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class KingdeePurInboundReqVO {
     /**
@@ -106,13 +108,13 @@ public class KingdeePurInboundReqVO {
      * 当前页，默认1 (Current page, default is 1)
      * 非必填 (Optional)
      */
-    private String page;
+    private String page = "1";
 
     /**
      * 每页显示条数默认10 (Page size, default is 10)
      * 非必填 (Optional)
      */
-    private String pageSize;
+    private String pageSize = "10";
 
     /**
      * 开始日期 (Start bill date, format: "yyyy-MM-dd", leave empty for no filtering)

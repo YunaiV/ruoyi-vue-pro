@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.cola.statemachine.Action;
 import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
-import cn.iocoder.yudao.module.srm.api.purchase.SrmInCountDTO;
+import cn.iocoder.yudao.module.srm.config.machine.request.SrmRequestInMachineContext;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestItemsDO;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseRequestItemsMapper;
@@ -20,28 +20,30 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
-import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_REQUEST_STORAGE_STATE_MACHINE_NAME;
+import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.PURCHASE_REQUEST_STORAGE_STATE_MACHINE;
 
 @Slf4j
 @Component
-public class ItemStorageActionImpl implements Action<SrmStorageStatus, SrmEventEnum, SrmInCountDTO> {
+public class ItemStorageActionImpl implements Action<SrmStorageStatus, SrmEventEnum, SrmRequestInMachineContext> {
     @Autowired
     private SrmPurchaseRequestItemsMapper mapper;
-    @Resource(name = PURCHASE_REQUEST_STORAGE_STATE_MACHINE_NAME)
+    @Resource(name = PURCHASE_REQUEST_STORAGE_STATE_MACHINE)
     private StateMachine<SrmStorageStatus, SrmEventEnum, SrmPurchaseRequestDO> stateMachine;
     @Autowired
     private SrmPurchaseRequestMapper srmPurchaseRequestMapper;
 
     @Override
-    @Transactional
-    public void execute(SrmStorageStatus f, SrmStorageStatus t, SrmEventEnum event, SrmInCountDTO context) {
+    @Transactional(rollbackFor = Exception.class)
+    public void execute(SrmStorageStatus f, SrmStorageStatus t, SrmEventEnum event, SrmRequestInMachineContext context) {
         SrmPurchaseRequestItemsDO itemsDO = mapper.selectById(context.getApplyItemId());
         if (event == SrmEventEnum.STOCK_ADJUSTMENT) {
+            //1.0 更新入库数量
             BigDecimal oldCount = itemsDO.getInboundClosedQty() == null ? BigDecimal.ZERO : itemsDO.getInboundClosedQty();
             BigDecimal changeCount = context.getInCount();
             itemsDO.setInboundClosedQty(oldCount.add(changeCount));//入库数量
             //根据入库数量来动态计算当前状态
 
+            //2.0 更新入库状态
             if (itemsDO.getInboundClosedQty().compareTo(BigDecimal.valueOf(itemsDO.getQty())) >= 0) {
                 //入库量 >= 申请量
                 t = SrmStorageStatus.ALL_IN_STORAGE;
@@ -52,12 +54,12 @@ public class ItemStorageActionImpl implements Action<SrmStorageStatus, SrmEventE
                 t = SrmStorageStatus.NONE_IN_STORAGE;
             }
         } else {
-            itemsDO.setInStatus(t.getCode());//状态
+            itemsDO.setInboundStatus(t.getCode());//状态
         }
         ThrowUtil.ifSqlThrow(mapper.updateById(itemsDO), GlobalErrorCodeConstants.DB_BATCH_UPDATE_ERROR);
         //传递事件给主申请单
         SrmPurchaseRequestDO requestDO = srmPurchaseRequestMapper.selectById(itemsDO.getRequestId());
-        stateMachine.fireEvent(SrmStorageStatus.fromCode(requestDO.getInStatus()), event, requestDO);
+        stateMachine.fireEvent(SrmStorageStatus.fromCode(requestDO.getInboundStatus()), event, requestDO);
         log.debug("item入库状态机触发({})事件：将对象{},由状态 {}->{}", event.getDesc(), JSONUtil.toJsonStr(context), f.getDesc(), t.getDesc());
     }
 }

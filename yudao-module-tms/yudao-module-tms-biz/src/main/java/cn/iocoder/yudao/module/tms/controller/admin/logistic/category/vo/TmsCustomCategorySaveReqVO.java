@@ -32,6 +32,14 @@ public class TmsCustomCategorySaveReqVO {
     @NotBlank(message = "英文品名不能为空")
     private String declaredTypeEn;
 
+    @Schema(description = "用途描述", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "用途描述不能为空")
+    private String customsPurpose;
+
+    @Schema(description = "报关材质描述", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "报关材质描述不能为空")
+    private String customsMaterial;
+
     @Schema(description = "海关分类子表列表")
     @NotNull( message = "至少维护一个国别详情")
     @Valid

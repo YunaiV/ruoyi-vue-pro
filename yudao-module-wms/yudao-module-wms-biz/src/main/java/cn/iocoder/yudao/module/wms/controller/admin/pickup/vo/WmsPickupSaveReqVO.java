@@ -1,14 +1,13 @@
 package cn.iocoder.yudao.module.wms.controller.admin.pickup.vo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
-import jakarta.validation.constraints.*;
-import java.util.List;
 import cn.iocoder.yudao.module.wms.controller.admin.pickup.item.vo.WmsPickupItemSaveReqVO;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import java.util.List;
 
 /**
- * @table-fields : code,upstream_bill_id,id,upstream_bill_code,warehouse_id,upstream_bill_type
+ * @table-fields : code,upstream_id,id,upstream_code,warehouse_id,upstream_type
  */
 @Schema(description = "管理后台 - 拣货单新增/修改 Request VO")
 @Data
@@ -27,11 +26,15 @@ public class WmsPickupSaveReqVO {
     private String code;
 
     @Schema(description = "来源单据ID", example = "")
-    private Long upstreamBillId;
+    private Long upstreamId;
 
-    @Schema(description = "来源单据号", example = "")
-    private String upstreamBillCode;
+    @Schema(description = "来源单据编码", example = "")
+    private String upstreamCode;
 
     @Schema(description = "来源单据类型", example = "")
-    private Integer upstreamBillType;
+    private Integer upstreamType;
+
+    @Schema(description = "创建拣货单的原因,默认留空", example = "")
+    private Integer cause;
+
 }

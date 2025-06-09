@@ -1,12 +1,10 @@
 package cn.iocoder.yudao.module.tms.service.logistic.customrule;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.framework.common.enums.enums.DictTypeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
-import cn.iocoder.yudao.module.erp.enums.ErpDictTypeConstants;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import cn.iocoder.yudao.module.tms.api.logistic.customrule.TmsCustomRuleApi;
 import cn.iocoder.yudao.module.tms.api.logistic.customrule.dto.TmsCustomRuleDTO;
@@ -15,6 +13,7 @@ import cn.iocoder.yudao.module.tms.controller.admin.logistic.customrule.vo.TmsCu
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.category.product.TmsCustomProductDO;
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.customrule.TmsCustomRuleDO;
 import cn.iocoder.yudao.module.tms.dal.mysql.logistic.customrule.TmsCustomRuleMapper;
+import cn.iocoder.yudao.module.tms.enums.TmsDictTypeConstants;
 import cn.iocoder.yudao.module.tms.service.logistic.category.product.TmsCustomProductService;
 import cn.iocoder.yudao.module.tms.service.logistic.customrule.bo.TmsCustomRuleBO;
 import jakarta.annotation.Resource;
@@ -36,7 +35,7 @@ import java.util.stream.Collectors;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_BATCH_INSERT_ERROR;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.DB_UPDATE_ERROR;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.tms.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.tms.enums.TmsErrorCodeConstants.*;
 
 /**
  * ERP 海关规则 Service 实现类
@@ -181,23 +180,23 @@ public class TmsCustomRuleServiceImpl implements TmsCustomRuleService {
             return;
         }
         // 如果 id 为空，说明不用比较是否为相同 id 的字典类型
-        String barCode = erpProductApi.getProductDto(productId).getBarCode();
-        String countryDesc = dictDataApi.getDictDataLabel(DictTypeConstants.COUNTRY_CODE, countryCode);
-        ThrowUtil.ifThrow(id == null, NO_REPEAT_OF_COUNTRY_CODE_AND_PRODUCT_CODE, barCode + countryDesc);
-        ThrowUtil.ifThrow(!tmsCustomRuleDO.getId().equals(id), NO_REPEAT_OF_COUNTRY_CODE_AND_PRODUCT_CODE, barCode + countryDesc);
+        String productCode = erpProductApi.getProductDto(productId).getCode();
+        String countryDesc = dictDataApi.getDictDataLabel(TmsDictTypeConstants.COUNTRY_CODE, countryCode);
+        ThrowUtil.ifThrow(id == null, NO_REPEAT_OF_COUNTRY_CODE_AND_PRODUCT_CODE, productCode + countryDesc);
+        ThrowUtil.ifThrow(!tmsCustomRuleDO.getId().equals(id), NO_REPEAT_OF_COUNTRY_CODE_AND_PRODUCT_CODE, productCode + countryDesc);
     }
 
     private void baseValidator(TmsCustomRuleSaveReqVO vo) {
         //国家
         Optional.ofNullable(vo.getCountryCode())
-            .ifPresent(countryCodes -> dictDataApi.validateDictDataList(DictTypeConstants.COUNTRY_CODE,
+            .ifPresent(countryCodes -> dictDataApi.validateDictDataList(TmsDictTypeConstants.COUNTRY_CODE,
                 countryCodes.stream()
                     .map(String::valueOf)
                     .collect(Collectors.toSet())));
         //货币
-        Optional.ofNullable(vo.getDeclaredValueCurrencyCode()).ifPresent(i -> dictDataApi.validateDictDataList(DictTypeConstants.CURRENCY_CODE, Collections.singleton(String.valueOf(i))));
+        Optional.ofNullable(vo.getDeclaredValueCurrencyCode()).ifPresent(i -> dictDataApi.validateDictDataList(TmsDictTypeConstants.CURRENCY_CODE, Collections.singleton(String.valueOf(i))));
         //物流属性
-        Optional.ofNullable(vo.getLogisticAttribute()).ifPresent(i -> dictDataApi.validateDictDataList(ErpDictTypeConstants.ERP_LOGISTIC_ATTRIBUTE, Collections.singleton(String.valueOf(i))));
+        Optional.ofNullable(vo.getLogisticAttribute()).ifPresent(i -> dictDataApi.validateDictDataList(TmsDictTypeConstants.ERP_LOGISTIC_ATTRIBUTE, Collections.singleton(String.valueOf(i))));
 
     }
 
@@ -208,5 +207,13 @@ public class TmsCustomRuleServiceImpl implements TmsCustomRuleService {
         //手动映射
         source.setCountryCode(null);
         return BeanUtils.toBean(source, TmsCustomRuleDO.class).setCountryCode(countryCode);
+    }
+
+    /**
+     * 根据国别和产品ID集合获得海关规则列表
+     */
+    @Override
+    public List<TmsCustomRuleDO> getCustomRuleListByCountryAndProducts(Long countryCode, List<Long> productIds) {
+        return customRuleMapper.selectListByCountryAndProductIds(countryCode, productIds);
     }
 }

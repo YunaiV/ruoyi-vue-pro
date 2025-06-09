@@ -12,9 +12,7 @@ import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.system.api.utils.Validation;
-import cn.iocoder.yudao.module.tms.controller.admin.logistic.customrule.vo.TmsCustomRulePageReqVO;
-import cn.iocoder.yudao.module.tms.controller.admin.logistic.customrule.vo.TmsCustomRuleRespVO;
-import cn.iocoder.yudao.module.tms.controller.admin.logistic.customrule.vo.TmsCustomRuleSaveReqVO;
+import cn.iocoder.yudao.module.tms.controller.admin.logistic.customrule.vo.*;
 import cn.iocoder.yudao.module.tms.dal.dataobject.logistic.customrule.TmsCustomRuleDO;
 import cn.iocoder.yudao.module.tms.service.logistic.customrule.TmsCustomRuleService;
 import cn.iocoder.yudao.module.tms.service.logistic.customrule.bo.TmsCustomRuleBO;
@@ -113,6 +111,12 @@ public class TmsCustomRuleController {
         ExcelUtils.write(response, "ERP 海关规则.xls", "数据", TmsCustomRuleRespVO.class, voList);
     }
 
+    @PostMapping("/list-by-country-product")
+    @Operation(summary = "根据国别和产品ID集合获得海关规则")
+    public CommonResult<List<TmsCustomRuleListRespVO>> getCustomRuleListByCountryAndProducts(@Valid @RequestBody TmsCustomRuleListReqVO reqVO) {
+        List<TmsCustomRuleDO> list = customRuleService.getCustomRuleListByCountryAndProducts(reqVO.getCountryCode(), reqVO.getProductIds());
+        return success(BeanUtils.toBean(list, TmsCustomRuleListRespVO.class));
+    }
 
     private List<TmsCustomRuleRespVO> bindBOList(List<TmsCustomRuleBO> list) {
         if (CollUtil.isEmpty(list)) {

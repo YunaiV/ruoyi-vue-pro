@@ -63,10 +63,10 @@ public class WmsStockBinPageReqVO extends PageParam {
     private Integer[] warehouseOutboundPendingQty;
 
     @Schema(description = "仓库库存-采购计划量", example = "")
-    private Integer[] warehousePurchasePlanQty;
+    private Integer[] warehouseMakePendingQty;
 
     @Schema(description = "仓库库存-采购在途量", example = "")
-    private Integer[] warehousePurchaseTransitQty;
+    private Integer[] warehouseTransitQty;
 
     @Schema(description = "仓库库存-退件在途数量", example = "")
     private Integer[] warehouseReturnTransitQty;
@@ -78,8 +78,8 @@ public class WmsStockBinPageReqVO extends PageParam {
     private Integer[] warehouseShelvingPendingQty;
 
 
-    @Schema(description = "是否返回 suggestedOwnership ", example = "")
-    private Integer withSuggestedOwnership;
+    @Schema(description = "是否返回 suggestedLogic ", example = "")
+    private Integer withSuggestedLogic;
 
 
 }

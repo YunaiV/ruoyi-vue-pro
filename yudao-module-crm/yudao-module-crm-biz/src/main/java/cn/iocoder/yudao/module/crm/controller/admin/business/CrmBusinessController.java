@@ -140,7 +140,7 @@ public class CrmBusinessController {
         businessVO.setProducts(BeanUtils.toBean(businessProducts, CrmBusinessRespVO.Product.class, businessProductVO ->
             MapUtils.findAndThen(erpProductMap, businessProductVO.getProductId(),
                 product -> businessProductVO.setProductName(product.getName())
-                    .setBarCode(product.getBarCode()).setProductUnitName(unitMap.get(product.getUnitId()).getName()))));
+                    .setBarCode(product.getCode()).setProductUnitName(unitMap.get(product.getUnitId()).getName()))));
         return businessVO;
     }
 

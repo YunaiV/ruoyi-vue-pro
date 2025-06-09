@@ -103,4 +103,4 @@ public class WmsStockBinMoveItemController {
     // // 导出 Excel
     // ExcelUtils.write(response, "库位移动详情.xls", "数据", WmsStockBinMoveItemRespVO.class, BeanUtils.toBean(list, WmsStockBinMoveItemRespVO.class));
     // }
-}
+}

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : bin_move_id,create_time,product_id,qty,from_bin_id,to_bin_id
+ * @table-fields : bin_move_id,create_time,product_id,qty,remark,from_bin_id,to_bin_id
  */
 @Schema(description = "管理后台 - 库位移动详情分页 Request VO")
 @Data
@@ -35,4 +35,7 @@ public class WmsStockBinMoveItemPageReqVO extends PageParam {
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
+
+    @Schema(description = "备注", example = "")
+    private String remark;
 }

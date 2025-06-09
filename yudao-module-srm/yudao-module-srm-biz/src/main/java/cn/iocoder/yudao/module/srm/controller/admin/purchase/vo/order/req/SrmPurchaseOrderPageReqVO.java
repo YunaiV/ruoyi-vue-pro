@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -18,18 +19,14 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class SrmPurchaseOrderPageReqVO extends PageParam {
 
-    @Schema(description = "采购状态")
-    private Integer status;
+    @Schema(description = "采购单编号")
+    private String code;
 
     @Schema(description = "供应商编号")
     private Long supplierId;
 
     @Schema(description = "结算账户编号")
     private Long accountId;
-
-    @Schema(description = "采购时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime[] orderTime;
 
     @Schema(description = "合计数量")
     private BigDecimal totalCount;
@@ -41,7 +38,7 @@ public class SrmPurchaseOrderPageReqVO extends PageParam {
     private BigDecimal totalProductPrice;
 
     @Schema(description = "合计税额，单位：元")
-    private BigDecimal totalTaxPrice;
+    private BigDecimal totalGrossPrice;
 
     @Schema(description = "优惠率，百分比")
     private BigDecimal discountPercent;
@@ -52,14 +49,11 @@ public class SrmPurchaseOrderPageReqVO extends PageParam {
     @Schema(description = "定金金额，单位：元")
     private BigDecimal depositPrice;
 
-    @Schema(description = "附件地址")
-    private String fileUrl;
-
     @Schema(description = "备注")
     private String remark;
 
     @Schema(description = "采购入库数量")
-    private BigDecimal totalInCount;
+    private BigDecimal totalInboundCount;
 
     @Schema(description = "采购退货数量")
     private BigDecimal totalReturnCount;
@@ -67,6 +61,9 @@ public class SrmPurchaseOrderPageReqVO extends PageParam {
     @Schema(description = "单据日期")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] billTime;
+
+    @Schema(description = "制单人ID,创建人ID")
+    private Long creator;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
@@ -87,7 +84,7 @@ public class SrmPurchaseOrderPageReqVO extends PageParam {
     private Long purchaseCompanyId;
 
     @Schema(description = "x码")
-    private String xCode;
+    private String fbaCode;
 
     @Schema(description = "箱率")
     private String containerRate;
@@ -101,8 +98,8 @@ public class SrmPurchaseOrderPageReqVO extends PageParam {
     @Schema(description = "执行状态")
     private Integer executeStatus;
 
-    @Schema(description = "入库状态")
-    private Integer inStatus;
+    @Schema(description = "入库状态(多选)")
+    private List<Integer> inboundStatusList;
 
     @Schema(description = "付款状态")
     private Integer payStatus;
@@ -119,23 +116,15 @@ public class SrmPurchaseOrderPageReqVO extends PageParam {
     @Schema(description = "采购状态")
     private Integer orderStatus;
 
-    //    @Schema(description = "验货单json")
-    //    private String inspectionJson;
-    //
-    //    @Schema(description = "完工单json")
-    //    private String completionJson;
-    //    @Schema(description = "总验货通过数量")
-    //    private Integer totalInspectionPassCount;
-
+    @Schema(description = "原单单号（采购申请单code）")
+    private String purchaseApplyCode;
     //子表分割线
-    @Schema(description = "采购申请单No")
-    private String erpPurchaseRequestItemNo;
 
     @Schema(description = "产品id")
     private Long productId;
 
     @Schema(description = "产品sku")
-    private String barCode;
+    private String productCode;
 
     @Schema(description = "产品名称")
     private String productName;

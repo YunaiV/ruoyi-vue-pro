@@ -1,11 +1,12 @@
 package com.somle.kingdee.model;
 
-import java.util.List;
-import com.fasterxml.jackson.databind.JsonNode;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtilsX;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,6 +17,7 @@ import lombok.*;
 public class KingdeeResponse {
     private JsonNode data;
     private String description;
+    //errcode	integer	返回码，成功时为0
     private String errcode;
 
 

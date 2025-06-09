@@ -6,11 +6,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : outbound_available_qty,inbound_status,company_id,create_time,plan_qty,shelved_qty,upstream_item_id,remark,latest_flow_id,inbound_id,actual_qty,product_id,dept_id
+ * @table-fields : outbound_available_qty,inbound_status,company_id,create_time,plan_qty,shelve_closed_qty,upstream_id,remark,inbound_dept_id,latest_flow_id,inbound_id,inbound_company_id,actual_qty,product_id,dept_id
  */
 @Schema(description = "管理后台 - 入库单详情分页 Request VO")
 @Data
@@ -53,7 +55,7 @@ public class WmsInboundItemPageReqVO extends PageParam {
     private Integer[] planQty;
 
     @Schema(description = "已上架量，已经拣货到仓位的库存量", example = "")
-    private Integer[] shelvedQty;
+    private Integer[] shelveClosedQty;
 
     @Schema(description = "最新的流水ID", example = "", hidden = true)
     private Long latestFlowId;
@@ -61,15 +63,21 @@ public class WmsInboundItemPageReqVO extends PageParam {
     @Schema(description = "库龄", example = "")
     private Integer[] age;
 
-    @Schema(description = "库存归属部门ID", example = "")
+    @Schema(description = "库存归属部门ID,由用户指定", example = "")
     private Long deptId;
 
-    @Schema(description = "库存财务公司ID", example = "")
+    @Schema(description = "库存财务公司ID,由用户指定", example = "")
     private Long companyId;
 
     @Schema(description = "备注", example = "")
     private String remark;
 
-    @Schema(description = "来源详情ID", example = "")
-    private Long upstreamItemId;
+    @Schema(description = "来源明细行ID", example = "")
+    private Long upstreamId;
+
+    @Schema(description = "入库的财务公司ID", example = "")
+    private Long inboundCompanyId;
+
+    @Schema(description = "入库的归属部门ID,由用户指定", example = "")
+    private Long inboundDeptId;
 }

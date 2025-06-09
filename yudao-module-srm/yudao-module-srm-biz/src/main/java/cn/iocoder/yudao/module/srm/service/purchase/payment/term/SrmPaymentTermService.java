@@ -45,6 +45,7 @@ public interface SrmPaymentTermService {
      */
     SrmPaymentTermDO getPaymentTerm(Long id);
 
+    List<SrmPaymentTermDO> getPaymentTermList(List<Long> ids);
     /**
      * 获得付款条款分页
      *

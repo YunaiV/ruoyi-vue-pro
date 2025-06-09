@@ -1,18 +1,17 @@
 package cn.iocoder.yudao.module.wms.dal.dataobject.inbound;
 
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 /**
  * 入库单 DO
  * @author 李方捷
- * @table-fields : code,inbound_status,company_id,inbound_time,arrival_actual_time,audit_status,creator_comment,type,trace_no,upstream_bill_type,upstream_bill_id,init_age,shipping_method,id,upstream_bill_code,dept_id,warehouse_id,arrival_plan_time
+ * @table-fields : code,inbound_status,company_id,inbound_time,arrival_actual_time,remark,audit_status,trace_no,type,upstream_type,init_age,upstream_id,shipping_method,id,upstream_code,dept_id,arrival_plan_time,shelving_status,warehouse_id
  */
 @TableName("wms_inbound")
 // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -32,7 +31,7 @@ public class WmsInboundDO extends BaseDO {
     private Long id;
 
     /**
-     * 入库单类型
+     * 类型
      */
     private Integer type;
 
@@ -47,14 +46,9 @@ public class WmsInboundDO extends BaseDO {
     private String traceNo;
 
     /**
-     * 运输方式，1-海运；2-火车；3-空运；4、集卡
+     * 运输方式: 1-海运；2-火车；3-空运；4、集卡
      */
     private Integer shippingMethod;
-
-    /**
-     * 特别说明，创建方专用
-     */
-    private String creatorComment;
 
     /**
      * 初始库龄
@@ -62,7 +56,7 @@ public class WmsInboundDO extends BaseDO {
     private Integer initAge;
 
     /**
-     * 入库单类型 ; InboundStatus : 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过
+     * 审批状态: 0-起草中 , 1-待审批 , 2-已驳回 , 3-已通过
      */
     private Integer auditStatus;
 
@@ -72,7 +66,7 @@ public class WmsInboundDO extends BaseDO {
     private Integer inboundStatus;
 
     /**
-     * 库存财务公司ID
+     * 财务公司ID
      */
     private Long companyId;
 
@@ -82,7 +76,7 @@ public class WmsInboundDO extends BaseDO {
     private LocalDateTime arrivalActualTime;
 
     /**
-     * 预计到货时间
+     * 计划到货时间
      */
     private LocalDateTime arrivalPlanTime;
 
@@ -104,15 +98,25 @@ public class WmsInboundDO extends BaseDO {
     /**
      * 来源单据ID
      */
-    private Long upstreamBillId;
+    private Long upstreamId;
 
     /**
-     * 来源单据号
+     * 来源单据编码
      */
-    private String upstreamBillCode;
+    private String upstreamCode;
 
     /**
-     * WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单 , 2-盘点单
+     * 来源单据类型: 0-入库单 , 1-出库单 , 2-盘点单
      */
-    private Integer upstreamBillType;
+    private Integer upstreamType;
+
+    /**
+     * 上架状态
+     */
+    private Integer shelveStatus;
+
+    /**
+     * 特别说明，创建方专用
+     */
+    private String remark;
 }

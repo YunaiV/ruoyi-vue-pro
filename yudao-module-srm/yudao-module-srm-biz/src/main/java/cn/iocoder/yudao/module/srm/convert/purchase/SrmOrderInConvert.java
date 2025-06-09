@@ -33,7 +33,10 @@ public interface SrmOrderInConvert {
         SrmPurchaseInSaveReqVO.Item inVOItem = new SrmPurchaseInSaveReqVO.Item();
         BeanUtils.copyProperties(orderItemDO, inVOItem);
         inVOItem.setId(null); // 创建时 ID 需要为 null
-        inVOItem.setSource("采购项合并入库"); // 单据来源，默认写死
+        inVOItem.setVersion(null); // 版本号需要为 null
+        inVOItem.setSource("采购项合并到货"); // 单据来源，默认写死
+        inVOItem.setOrderItemId(orderItemDO.getId()); // 订单项编号作为源单号
+        inVOItem.setWarehouseId(orderItemDO.getWarehouseId()); //合并的时候仓库为准
         //        inVOItem.setOrderId(orderItemDO.getOrderId()); // 订单编号转 int 作为源单号
         return inVOItem;
     }

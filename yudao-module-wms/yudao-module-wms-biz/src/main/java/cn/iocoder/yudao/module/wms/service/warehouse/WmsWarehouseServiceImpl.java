@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.wms.api.warehouse.dto.vo.WmsWarehouseListReqDTO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehousePageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.external.storage.WmsExternalStorageDO;
@@ -22,18 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.EXTERNAL_STORAGE_NOT_EXISTS;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.WAREHOUSE_BE_REFERRED;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.WAREHOUSE_CODE_DUPLICATE;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.WAREHOUSE_NAME_DUPLICATE;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.WAREHOUSE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.*;
 
 /**
  * 仓库 Service 实现类
@@ -149,7 +142,8 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
     /**
      * @sign : 8F00B204E9800998
      */
-    private WmsWarehouseDO validateWarehouseExists(Long id) {
+    @Override
+    public WmsWarehouseDO validateWarehouseExists(Long id) {
         WmsWarehouseDO warehouse = warehouseMapper.selectById(id);
         if (warehouse == null) {
             throw exception(WAREHOUSE_NOT_EXISTS);
@@ -170,6 +164,7 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
     /**
      * 按 externalStorageId 查询 WmsWarehouseDO
      */
+    @Override
     public List<WmsWarehouseDO> selectByExternalStorageId(Long externalStorageId, int limit) {
         return warehouseMapper.selectByExternalStorageId(externalStorageId, limit);
     }
@@ -194,5 +189,27 @@ public class WmsWarehouseServiceImpl implements WmsWarehouseService {
             return List.of();
         }
         return warehouseMapper.selectByIds(ids);
+    }
+
+    @Override
+    public Map<String, WmsWarehouseDO> getWarehouseMapByCode(Set<String> codes) {
+        if(CollectionUtils.isEmpty(codes)) {
+            return Map.of();
+        }
+        List<WmsWarehouseDO> wmsWarehouseDOList = warehouseMapper.selectByCodes(codes);
+        return StreamX.from(wmsWarehouseDOList).toMap(WmsWarehouseDO::getCode);
+    }
+
+    @Override
+    public List<WmsWarehouseDO> selectList(WmsWarehouseListReqDTO reqDTO) {
+        return warehouseMapper.selectList(reqDTO);
+    }
+
+    /**
+     * 获得转换单仓库列表
+     */
+    @Override
+    public List<WmsWarehouseDO> getSimpleListForExchange(Integer exchange) {
+        return warehouseMapper.getSimpleListForExchange(exchange);
     }
 }

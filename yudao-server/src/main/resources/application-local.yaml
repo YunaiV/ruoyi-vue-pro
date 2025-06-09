@@ -2,12 +2,12 @@ oss:
   bucketName: somle-bigdata-dev
 kingdee:
   outerInstanceIds:
-    - 369949131390717952 #金蝶沙盒
+    - 409386088805830656 #金蝶沙盒
 
 debug: false
 
 srm:
-  enable-preload: true
+  enable-preload: false
 
 --- #################### 数据库相关配置 ####################
 
@@ -69,10 +69,6 @@ spring:
       port: 6379 # 端口
       database: 1 # 数据库索引
       password: uniplore # 密码，建议生产环境开启
-  task:
-    scheduling:
-      simple:
-        concurrency-limit: 0  # local中0并发，关闭定时
 
 --- #################### 定时任务相关配置 ####################
 # Quartz 配置项，对应 QuartzProperties 配置)
@@ -166,12 +162,18 @@ logging:
   file:
     name: log/${spring.application.name}.log # 日志文件名，全路径
   level:
+    com.mzt.logapi.service.impl: debug
+    org:
+      springframework.beans.factory: info
     cn:
       iocoder:
         yudao:
           module:
+            system.logger: debug
             srm: debug
             oms: debug
+            tms: debug
+            wms: debug
           framework:
             template: debug
     root: info

@@ -27,8 +27,9 @@ public class OperateLogServiceImpl implements OperateLogService {
 
     @Override
     public void createOperateLog(OperateLogCreateReqDTO createReqDTO) {
-        OperateLogDO log = BeanUtils.toBean(createReqDTO, OperateLogDO.class);
-        operateLogMapper.insert(log);
+        operateLogMapper.insert(BeanUtils.toBean(createReqDTO, OperateLogDO.class));
+        //log debug
+        log.debug("[createOperateLog][createReqDTO({})]", createReqDTO);
     }
 
     @Override

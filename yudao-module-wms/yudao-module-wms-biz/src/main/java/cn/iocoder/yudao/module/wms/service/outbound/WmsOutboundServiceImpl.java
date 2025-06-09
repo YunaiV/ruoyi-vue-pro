@@ -8,11 +8,16 @@ import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
+import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
+import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductRespDTO;
 import cn.iocoder.yudao.module.fms.api.finance.FmsCompanyApi;
 import cn.iocoder.yudao.module.fms.api.finance.dto.FmsCompanyDTO;
+import cn.iocoder.yudao.module.srm.api.purchase.SrmPurchaseReturnApi;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.enums.somle.BillType;
 import cn.iocoder.yudao.module.wms.config.OutboundStateMachineConfigure;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalHistoryRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
@@ -20,6 +25,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.company.FmsCompanySimpleResp
 import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundImportReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundSaveReqVO;
@@ -31,14 +37,16 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.outbound.WmsOutboundMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.outbound.item.WmsOutboundItemMapper;
+import cn.iocoder.yudao.module.wms.dal.mysql.pickup.item.WmsPickupItemMapper;
+import cn.iocoder.yudao.module.wms.dal.mysql.stock.bin.WmsStockBinMapper;
 import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
 import cn.iocoder.yudao.module.wms.enums.WmsConstants;
-import cn.iocoder.yudao.module.wms.enums.common.WmsBillType;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundType;
 import cn.iocoder.yudao.module.wms.service.approval.history.WmsApprovalHistoryService;
+import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
 import cn.iocoder.yudao.module.wms.service.outbound.item.WmsOutboundItemService;
 import cn.iocoder.yudao.module.wms.service.stock.bin.WmsStockBinService;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
@@ -47,23 +55,14 @@ import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+
+import java.time.LocalDateTime;
+import java.util.*;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.INBOUND_CAN_NOT_EDIT;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_CAN_NOT_EDIT;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_ITEM_NOT_EXISTS;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_ITEM_PLAN_QTY_ERROR;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_ITEM_PRODUCT_ID_REPEATED;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_NOT_EXISTS;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_NO_DUPLICATE;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.OUTBOUND_WAREHOUSE_ERROR;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_NOT_ENOUGH;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_NOT_EXISTS;
+import static cn.iocoder.yudao.module.system.enums.somle.BillType.SRM_PURCHASE_RETURN;
+import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus.*;
 
 /**
  * 出库单 Service 实现类
@@ -91,6 +90,9 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     private WmsOutboundMapper outboundMapper;
 
     @Resource
+    private WmsStockBinMapper stockBinMapper;
+
+    @Resource
     @Lazy
     private WmsWarehouseBinService wmsWarehouseBinService;
 
@@ -109,10 +111,24 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     private FmsCompanyApi companyApi;
 
     @Resource
+    private SrmPurchaseReturnApi srmPurchaseReturnApi;
+
+    @Resource
+    @Lazy
+    private WmsInboundService inboundService;
+
+    @Resource
+    private ErpProductApi productApi;
+
+    @Resource
+    private WmsPickupItemMapper pickupItemMapper;
+
+    @Resource
     private WmsApprovalHistoryService approvalHistoryService;
 
     @Resource(name = OutboundStateMachineConfigure.STATE_MACHINE_NAME)
     private StateMachine<Integer, WmsOutboundAuditStatus.Event, TransitionContext<WmsOutboundDO>> outboundStateMachine;
+
 
     /**
      * @sign : A523E13094CD30CE
@@ -121,7 +137,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     @Transactional(rollbackFor = Exception.class)
     public WmsOutboundDO createOutbound(WmsOutboundSaveReqVO createReqVO) {
         // 设置单据号
-        String no = noRedisDAO.generate(WmsNoRedisDAO.OUTBOUND_NO_PREFIX, 3);
+        String no = noRedisDAO.generate(WmsNoRedisDAO.OUTBOUND_NO_PREFIX, 6);
         createReqVO.setAuditStatus(WmsOutboundAuditStatus.DRAFT.getValue());
         createReqVO.setOutboundStatus(WmsOutboundStatus.NONE.getValue());
         createReqVO.setCode(no);
@@ -153,16 +169,19 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     }
 
     private void processAndValidateForOutbound(WmsOutboundDO outboundDO, List<WmsOutboundItemDO> itemList) {
-        List<Long> binIdList = StreamX.from(itemList).toList(WmsOutboundItemDO::getBinId);
+        Set<Long> binIdList = StreamX.from(itemList).toSet(WmsOutboundItemDO::getBinId);
         List<WmsWarehouseBinDO> wmsWarehouseBinDOList = wmsWarehouseBinService.selectByIds(binIdList);
         Set<Long> warehouseIdSetOfBin = StreamX.from(wmsWarehouseBinDOList).toSet(WmsWarehouseBinDO::getWarehouseId);
         // 校验仓库
         if (warehouseIdSetOfBin.size() != 1) {
             throw exception(OUTBOUND_WAREHOUSE_ERROR);
         }
-        Long warehouseId = StreamX.from(warehouseIdSetOfBin).first();
-        if (!Objects.equals(warehouseId, outboundDO.getWarehouseId())) {
-            throw exception(OUTBOUND_WAREHOUSE_ERROR);
+//        outboundDO.setUpstreamType(outboundDO.getType());
+        if (outboundDO.getUpstreamType() != null && outboundDO.getUpstreamType().equals(SRM_PURCHASE_RETURN.getValue())) {
+            Long warehouseId = StreamX.from(warehouseIdSetOfBin).first();
+            if (!Objects.equals(warehouseId, outboundDO.getWarehouseId())) {
+                throw exception(OUTBOUND_WAREHOUSE_ERROR);
+            }
         }
         Map<Long, Map<Long, WmsStockBinDO>> binMap = stockBinService.getStockBinMap(binIdList, StreamX.from(itemList).toList(WmsOutboundItemDO::getProductId));
         // 校验仓位库存
@@ -173,20 +192,67 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
                 stockBinDO = map.get(itemDO.getProductId());
             }
             if (stockBinDO == null) {
-                throw exception(STOCK_BIN_NOT_EXISTS);
+                ErpProductDTO productDto = productApi.getProductDto(itemDO.getProductId());
+                throw exception(STOCK_BIN_PRODUCT_NOT_EXISTS, productDto.getCode());
             }
-            if (stockBinDO.getSellableQty() < itemDO.getPlanQty()) {
-                throw exception(STOCK_BIN_NOT_ENOUGH);
-            }
+            //建单时不做此项校验
+//            if (stockBinDO.getSellableQty() < itemDO.getPlanQty()) {
+//                ErpProductDTO productDto = productApi.getProductDto(itemDO.getProductId());
+//                throw exception(STOCK_BIN_PRODUCT_NOT_ENOUGH, productDto.getBarCode());
+//            }
         }
     }
+
+    /**
+     * 处理从外部模块发起的出库申请单
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public WmsOutboundRespVO generateOutbound(WmsOutboundImportReqVO importReqVO) {
+
+        Map<Long, ErpProductRespDTO> productDTOMap = productApi.getProductDTOMap(StreamX.from(importReqVO.getItemList()).toList(WmsOutboundItemSaveReqVO::getProductId));
+        List<WmsOutboundItemSaveReqVO> itemList = BeanUtils.toBean(importReqVO.getItemList(), WmsOutboundItemSaveReqVO.class);
+        //查库位
+        for(WmsOutboundItemSaveReqVO item : itemList) {
+            //查询仓位库存表 规则1.根据后进先出筛选出最近入库批次 2.同一批次下，多个库位，根据自带优先级进行选择 3.该库位必须有足够货量
+            WmsStockBinDO stockBin = stockBinMapper.selectByProductId(item.getProductId(), item.getPlanQty(), importReqVO.getWarehouseId());
+            if(stockBin == null) {
+                throw exception(STOCK_BIN_PRODUCT_NOT_ENOUGH, productDTOMap.get(item.getProductId()).getName());
+            }
+            item.setBinId(stockBin.getBinId());
+        }
+        WmsOutboundSaveReqVO createReqVO = BeanUtils.toBean(importReqVO, WmsOutboundSaveReqVO.class);
+        createReqVO.setItemList(itemList);
+//        createReqVO.setUpstreamCode(importReqVO.getUpstreamCode());
+//        createReqVO.setWarehouseId(importReqVO.getWarehouseId());
+        WmsOutboundDO outboundDO = createOutbound(createReqVO);
+        return BeanUtils.toBean(outboundDO, WmsOutboundRespVO.class);
+    }
+
+    /**
+     * 强制作废出库单
+     */
+    @Override
+    public void forceAbandon(WmsApprovalReqVO approvalReqVO) {
+        // 获得业务对象
+        WmsOutboundDO outbound = validateOutboundExists(approvalReqVO.getBillId());
+        if(outbound.getAuditStatus().equals(AUDITING.getValue())){
+            approve(WmsOutboundAuditStatus.Event.REJECT, approvalReqVO);
+        }
+        if(outbound.getAuditStatus().equals(DRAFT.getValue())||outbound.getAuditStatus().equals(REJECT.getValue())){
+            approve(WmsOutboundAuditStatus.Event.ABANDON, approvalReqVO);
+        }else{
+            throw exception(OUTBOUND_ABANDON_NOT_ALLOWED);
+        }
+    }
+
 
     /**
      * @sign : E1DA4E6302BF0EFA
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public WmsOutboundDO updateOutbound(WmsOutboundSaveReqVO updateReqVO) {
+    public void updateOutbound(WmsOutboundSaveReqVO updateReqVO) {
         // 校验存在
         WmsOutboundDO exists = validateOutboundExists(updateReqVO.getId());
         // 判断是否允许编辑
@@ -224,12 +290,18 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
                 item.setOutboundId(updateReqVO.getId());
             });
             // 保存详情
-            outboundItemMapper.insertBatch(toInsetList);
-            outboundItemMapper.updateBatch(toUpdateList);
-            outboundItemMapper.deleteBatchIds(toDeleteList);
+            if (!toInsetList.isEmpty()) {
+                outboundItemMapper.insertBatch(toInsetList);
+            }
+            if (!toUpdateList.isEmpty()) {
+                outboundItemMapper.updateBatch(toUpdateList);
+            }
+            if (!toDeleteList.isEmpty()) {
+                List<Long> deleteIds = StreamX.from(toDeleteList).toList(WmsOutboundItemDO::getId);
+                outboundItemMapper.deleteByIds(deleteIds);
+            }
         }
         // 返回
-        return outbound;
     }
 
     @Override
@@ -251,7 +323,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         // 判断是否允许删除
         WmsOutboundAuditStatus auditStatus = WmsOutboundAuditStatus.parse(outbound.getAuditStatus());
         if (!auditStatus.matchAny(WmsOutboundAuditStatus.DRAFT, WmsOutboundAuditStatus.REJECT)) {
-            throw exception(INBOUND_CAN_NOT_EDIT);
+            throw exception(OUTBOUND_CAN_NOT_EDIT);
         }
         // 唯一索引去重
         outbound.setCode(outboundMapper.flagUKeyAsLogicDelete(outbound.getCode()));
@@ -263,6 +335,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     /**
      * @sign : 87FB607B65309CC4
      */
+    @Override
     public WmsOutboundDO validateOutboundExists(Long id) {
         WmsOutboundDO outbound = outboundMapper.selectById(id);
         if (outbound == null) {
@@ -304,20 +377,20 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
 
     @Override
     public void assembleCompany(List<WmsOutboundRespVO> list) {
-        Map<Long, FmsCompanyDTO> companyMap = companyApi.getCompanyMap(StreamX.from(list).toList(WmsOutboundRespVO::getCompanyId));
+        Map<Long, FmsCompanyDTO> companyMap = companyApi.getCompanyMap(StreamX.from(list).toSet(WmsOutboundRespVO::getCompanyId));
         Map<Long, FmsCompanySimpleRespVO> companyVOMap = StreamX.from(companyMap.values()).toMap(FmsCompanyDTO::getId, v -> BeanUtils.toBean(v, FmsCompanySimpleRespVO.class));
         StreamX.from(list).assemble(companyVOMap, WmsOutboundRespVO::getCompanyId, WmsOutboundRespVO::setCompany);
     }
 
     @Override
     public void assembleApprovalHistory(List<WmsOutboundRespVO> list) {
-        Map<Long, List<WmsApprovalHistoryRespVO>> groupedApprovalHistory = approvalHistoryService.selectGroupedApprovalHistory(WmsBillType.OUTBOUND, StreamX.from(list).toList(WmsOutboundRespVO::getId));
+        Map<Long, List<WmsApprovalHistoryRespVO>> groupedApprovalHistory = approvalHistoryService.selectGroupedApprovalHistory(BillType.WMS_OUTBOUND, StreamX.from(list).toList(WmsOutboundRespVO::getId));
         StreamX.from(list).assemble(groupedApprovalHistory, WmsOutboundRespVO::getId, WmsOutboundRespVO::setApprovalHistoryList);
     }
 
     @Override
-    public WmsOutboundDO createForInventory(WmsOutboundSaveReqVO outboundSaveReqVO) {
-        outboundSaveReqVO.setType(WmsOutboundType.INVENTORY.getValue());
+    public WmsOutboundDO createForStockCheck(WmsOutboundSaveReqVO outboundSaveReqVO) {
+        outboundSaveReqVO.setType(WmsOutboundType.STOCKCHECK.getValue());
         // 
         WmsOutboundDO outbound = this.createOutbound(outboundSaveReqVO);
         WmsApprovalReqVO approvalReqVO = new WmsApprovalReqVO();
@@ -329,9 +402,7 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         // 拉取明细
         List<WmsOutboundItemDO> outboundItemDOS = outboundItemService.selectByOutboundId(outbound.getId());
         // 设置实际出库量
-        StreamX.from(outboundItemDOS).assemble(outboundSaveReqVO.getItemList(),
-            itm->itm.getProductId()+"-"+itm.getBinId(),
-            itm->itm.getProductId()+"-"+itm.getBinId(), (a, b) -> {
+        StreamX.from(outboundItemDOS).assemble(outboundSaveReqVO.getItemList(), itm -> itm.getProductId() + "-" + itm.getBinId(), itm -> itm.getProductId() + "-" + itm.getBinId(), (a, b) -> {
             a.setActualQty(b.getActualQty());
         });
         // 保存实际入库量
@@ -340,6 +411,11 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         this.approve(WmsOutboundAuditStatus.Event.FINISH, approvalReqVO);
         // 
         return this.getOutbound(outbound.getId());
+    }
+
+    @Override
+    public List<WmsOutboundDO> getOutboundList(Integer upstreamType, Long upstreamId) {
+        return outboundMapper.getOutboundList(upstreamType, upstreamId);
     }
 
     @Override
@@ -372,8 +448,9 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         // 处理明细的出库状态
         List<WmsOutboundItemDO> itemList = BeanUtils.toBean(outboundRespVO.getItemList(), WmsOutboundItemDO.class);
         outboundItemMapper.updateBatch(itemList);
-        // 处理入库单状态
+        // 处理出库单状态
         WmsOutboundDO outboundDO = BeanUtils.toBean(outboundRespVO, WmsOutboundDO.class);
+        outboundDO.setOutboundTime(LocalDateTime.now());
         outboundMapper.updateById(outboundDO);
     }
 
@@ -385,14 +462,14 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     @Override
     public void approve(WmsOutboundAuditStatus.Event event, WmsApprovalReqVO approvalReqVO) {
         // 设置业务默认值
-        approvalReqVO.setBillType(WmsBillType.OUTBOUND.getValue());
+        approvalReqVO.setBillType(BillType.WMS_OUTBOUND.getValue());
         approvalReqVO.setStatusType(WmsOutboundAuditStatus.getType());
         // 获得业务对象
-        WmsOutboundDO inbound = validateOutboundExists(approvalReqVO.getBillId());
+        WmsOutboundDO outbound = validateOutboundExists(approvalReqVO.getBillId());
         // 锁在外，事务在锁内
         WmsOutboundServiceImpl proxy = SpringUtils.getBeanByExactType(WmsOutboundServiceImpl.class);
-        lockRedisDAO.lockByWarehouse(inbound.getWarehouseId(), () -> {
-            proxy.fireEvent(event, approvalReqVO, inbound);
+        lockRedisDAO.lockByWarehouse(outbound.getWarehouseId(), () -> {
+            proxy.fireEvent(event, approvalReqVO, outbound);
         });
     }
 

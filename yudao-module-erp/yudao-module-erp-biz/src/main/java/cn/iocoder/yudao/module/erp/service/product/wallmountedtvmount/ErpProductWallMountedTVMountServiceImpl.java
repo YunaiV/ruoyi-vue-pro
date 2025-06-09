@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.erp.service.product.bo.ErpProductBO;
 import cn.iocoder.yudao.module.erp.service.product.wallmountedtvmount.bo.WallMountedTVMountBO;
 import org.springframework.stereotype.Service;
 
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PRODUCT_FIELD_NOT_MATCH;
+import static cn.iocoder.yudao.module.erp.enums.ErpErrorCodeConstants.PRODUCT_FIELD_NOT_MATCH;
 
 /**
  * 挂墙电视支架

@@ -28,17 +28,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -146,10 +141,10 @@ public class WmsInboundController {
     /**
      * @sign : 1F430B4B7632C52B
      */
-    @GetMapping("/page")
+    @PostMapping("/page")
     @Operation(summary = "获得入库单分页")
     @PreAuthorize("@ss.hasPermission('wms:inbound:query')")
-    public CommonResult<PageResult<WmsInboundRespVO>> getInboundPage(@Valid WmsInboundPageReqVO pageReqVO) {
+    public CommonResult<PageResult<WmsInboundRespVO>> getInboundPage(@Valid @RequestBody WmsInboundPageReqVO pageReqVO) {
         // 查询数据
         PageResult<WmsInboundDO> doPageResult = inboundService.getInboundPage(pageReqVO);
         // 转换
@@ -191,4 +186,4 @@ public class WmsInboundController {
         // 导出 Excel
         ExcelUtils.write(response, "入库单.xls", "数据", WmsInboundRespVO.class, BeanUtils.toBean(list, WmsInboundRespVO.class));
     }
-}
+}

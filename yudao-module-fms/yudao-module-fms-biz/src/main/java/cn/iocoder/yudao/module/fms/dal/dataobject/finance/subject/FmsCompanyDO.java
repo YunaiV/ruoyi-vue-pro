@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.fms.dal.dataobject.finance.subject;
 
-import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -19,9 +19,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FmsCompanyDO extends BaseDO {
-    //公司名称
-    private String companyName;
+public class FmsCompanyDO extends TenantBaseDO {
     /**
      * 编号
      */
@@ -32,9 +30,19 @@ public class FmsCompanyDO extends BaseDO {
      */
     private Integer revision;
     /**
-     * 主体名称
+     * 公司名称
      */
     private String name;
+
+    /**
+     * 公司名称（英文）
+     */
+    private String nameEn;
+
+    /**
+     * 公司简称
+     */
+    private String abbr;
     /**
      * 联系人
      */
@@ -63,6 +71,11 @@ public class FmsCompanyDO extends BaseDO {
      * 公司地址
      */
     private String companyAddress;
+
+    /**
+     * 公司地址（英文）
+     */
+    private String companyAddressEn;
     /**
      * 备注
      */

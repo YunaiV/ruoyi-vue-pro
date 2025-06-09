@@ -45,7 +45,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.erp.dal.redis.ErpRedisKeyConstants.PRODUCT;
 import static cn.iocoder.yudao.module.erp.dal.redis.ErpRedisKeyConstants.PRODUCT_LIST;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.erp.enums.ErpErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.USER_NOT_EXISTS;
 
 /**
@@ -94,7 +94,7 @@ public class ErpProductServiceImpl implements ErpProductService {
     public Long createProduct(ErpProductSaveReqVO createReqVO) {
         //TODO 暂时编号不是系统自动生成，后续添加生成规则，流水号的递增由编号来判断，编号相同流水号便自增
         //校验是否存在相同的产品编码
-        validateProductCodeUnique(null, createReqVO.getBarCode());
+        validateProductCodeUnique(null, createReqVO.getCode());
         //检验是否存在相同的产品名称
         validateProductNameUnique(null, createReqVO.getName());
         //校验颜色，型号，系列是否已经有存在相同的产品
@@ -145,7 +145,7 @@ public class ErpProductServiceImpl implements ErpProductService {
         // 校验存在
         validateProductExists(productId);
         //校验不同的id下是否存在相同的产品编码
-        validateProductCodeUnique(updateReqVO.getId(), updateReqVO.getBarCode());
+        validateProductCodeUnique(updateReqVO.getId(), updateReqVO.getCode());
         //检验是否存在相同的产品名称
         validateProductNameUnique(productId, updateReqVO.getName());
         //校验颜色，型号，系列是否已经有存在相同的产品
@@ -306,7 +306,7 @@ public class ErpProductServiceImpl implements ErpProductService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        List<ErpProductDO> list = productMapper.selectBatchIds(ids);
+        List<ErpProductDO> list = productMapper.selectByIds(ids);
         return buildProductVOList(list);
     }
 
@@ -418,7 +418,6 @@ public class ErpProductServiceImpl implements ErpProductService {
      * @Author Wqh
      * @Description 根据编码查询出最大的流水号
      * @Date 10:06 2024/10/22
-     * @Param [barCode]
      **/
     private Integer increaseSerial(String color, String model, String series) {
         try {
@@ -481,14 +480,5 @@ public class ErpProductServiceImpl implements ErpProductService {
         Integer level = deptApi.getDeptLevel(deptId);
         //判断登记是否符合要求
         ThrowUtil.ifThrow(!levels.contains(level), DEPT_LEVEL_NOT_MATCH);
-    }
-
-    @Override
-    public List<Long> listProductIdByBarCode(String barCode) {
-        if (StrUtil.isBlank(barCode)) {
-            return Collections.emptyList();
-        }
-        productMapper.selectIdListByBarCode(barCode);
-        return List.of();
     }
 }

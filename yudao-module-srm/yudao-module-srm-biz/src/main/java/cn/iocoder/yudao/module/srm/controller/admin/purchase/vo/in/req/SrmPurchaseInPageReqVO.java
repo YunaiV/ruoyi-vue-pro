@@ -7,78 +7,126 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(description = "管理后台 - ERP 采购入库分页 Request VO")
+@Schema(description = "管理后台 - 采购到货单分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class SrmPurchaseInPageReqVO extends PageParam {
 
-    public static final Integer PAYMENT_STATUS_NONE = 0;
-    public static final Integer PAYMENT_STATUS_PART = 1;
-    public static final Integer PAYMENT_STATUS_ALL = 2;
+    // ========== 主表查询参数 ==========
+    @Schema(description = "主表查询参数")
+    private MainQuery mainQuery;
 
-    @Schema(description = "采购单编号-单据编号")
-    private String no;
+    // ========== 明细表查询参数 ==========
+    @Schema(description = "明细表查询参数")
+    private ItemQuery itemQuery;
 
-    @Schema(description = "单据日期")
-    private LocalDateTime[] billTime;
+    @Schema(description = "主表查询参数")
+    @Data
+    public static class MainQuery {
+        // ========== 基础信息 ==========
+        @Schema(description = "到货单编号")
+        private Long id;
 
-    //    @Schema(description = "汇率,财务管理-币别维护",example = "5.8")
-    //    private BigDecimal exchangeRate;
+        @Schema(description = "到货单号")
+        private String code;
 
-    @Schema(description = "应付款余额")
-    private BigDecimal payableBalance;
+        // ========== 供应商信息 ==========
+        @Schema(description = "供应商编号")
+        private Long supplierId;
 
-    @Schema(description = "审核人ID")
-    private String auditorId;
+        @Schema(description = "收货地址")
+        private String address;
 
-    @Schema(description = "审核时间")
-    private LocalDateTime[] auditTime;
+        // ========== 结算信息 ==========
+        @Schema(description = "结算账户编号")
+        private Long accountId;
 
-    @Schema(description = "入库审核状态")
-    private Integer auditStatus;
+        @Schema(description = "币种编号")
+        private Long currencyId;
 
-    @Schema(description = "入库时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime[] inTime;
+        // ========== 时间信息 ==========
+        @Schema(description = "单据日期")
+        @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+        private LocalDateTime[] billTime;
 
-    @Schema(description = "备注")
-    private String remark;
+        @Schema(description = "到货时间")
+        @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+        private LocalDateTime[] arriveTime;
 
-    @Schema(description = "入库状态")
-    private Integer status;
+        // ========== 审核信息 ==========
+        @Schema(description = "审核人编号")
+        private String auditorId;
 
-    @Schema(description = "创建者")
-    private String creator;
+        @Schema(description = "审核时间")
+        @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+        private LocalDateTime[] auditTime;
 
-    @Schema(description = "产品编号")
-    private Long productId;
+        // ========== 状态信息 ==========
+        @Schema(description = "入库状态")
+        private Integer inboundStatus;
 
-    @Schema(description = "仓库编号")
-    private Long warehouseId;
+        @Schema(description = "审核状态")
+        private Integer auditStatus;
 
-    @Schema(description = "结算账号编号")
-    private Long accountId;
+        // ========== 时间范围 ==========
+        @Schema(description = "创建时间")
+        @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+        private LocalDateTime[] createTime;
+    }
 
-    @Schema(description = "结算日期")
-    private LocalDateTime settlementDate;
+    @Schema(description = "明细表查询参数")
+    @Data
+    public static class ItemQuery {
+        // ========== 产品信息 ==========
+        @Schema(description = "产品编号")
+        private Long productId;
 
-    @Schema(description = "付款状态")
-    private Integer payStatus;
+        @Schema(description = "产品名称")
+        private String productName;
 
-    @Schema(description = "是否可付款")
-    private Boolean paymentEnable; // 对应 paymentStatus = [0, 1]
+        @Schema(description = "产品单位编号")
+        private Long productUnitId;
 
-    @Schema(description = "采购单号")
-    private String orderNo;
+        @Schema(description = "报关品名")
+        private String declaredType;
 
-    //reconciliationStatus
-    @Schema(description = "是否对账")
-    private Boolean reconciliationEnable;
+        @Schema(description = "报关品名英文")
+        private String declaredTypeEn;
 
+        @Schema(description = "条码")
+        private String productCode;
+
+        // ========== 仓库信息 ==========
+        @Schema(description = "仓库编号")
+        private Long warehouseId;
+
+        // ========== 订单信息 ==========
+        @Schema(description = "采购订单编号")
+        private String orderCode;
+
+        @Schema(description = "采购订单项编号")
+        private Long orderItemId;
+
+        @Schema(description = "单据来源")
+        private String source;
+
+        // ========== 申请人信息 ==========
+        @Schema(description = "申请人编号")
+        private Long applicantId;
+
+        @Schema(description = "申请部门编号")
+        private Long applicationDeptId;
+
+        // ========== 状态信息 ==========
+        @Schema(description = "入库状态")
+        private Integer inboundStatus;
+
+        @Schema(description = "付款状态")
+        private Integer payStatus;
+    }
 }

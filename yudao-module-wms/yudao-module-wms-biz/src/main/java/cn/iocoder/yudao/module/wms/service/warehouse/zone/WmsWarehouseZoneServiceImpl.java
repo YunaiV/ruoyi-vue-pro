@@ -19,12 +19,10 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.WAREHOUSE_NOT_EXISTS;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.WAREHOUSE_ZONE_BE_REFERRED;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.WAREHOUSE_ZONE_CODE_DUPLICATE;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.WAREHOUSE_ZONE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.*;
 
 /**
  * 库区 Service 实现类
@@ -146,7 +144,7 @@ public class WmsWarehouseZoneServiceImpl implements WmsWarehouseZoneService {
     }
 
     @Override
-    public List<WmsWarehouseZoneDO> selectByIds(List<Long> ids) {
+    public List<WmsWarehouseZoneDO> selectByIds(Set<Long> ids) {
         if(CollectionUtils.isEmpty(ids)) {
             return List.of();
         }

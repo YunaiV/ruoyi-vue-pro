@@ -14,10 +14,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.FINANCE_SUBJECT_NOT_EXISTS;
+import static cn.iocoder.yudao.module.fms.api.enums.FmsErrorCodeConstants.FINANCE_SUBJECT_NOT_EXISTS;
 import static cn.iocoder.yudao.module.fms.dal.redis.FmsRedisKeyConstants.FINANCE_SUBJECT_LIST;
 
 /**
@@ -71,6 +73,9 @@ public class FmsCompanyServiceImpl implements FmsCompanyService {
 
     @Override
     public FmsCompanyDO getCompany(Long id) {
+        if (id == null) {
+            return null;
+        }
         return CompanyMapper.selectById(id);
     }
 
@@ -90,7 +95,20 @@ public class FmsCompanyServiceImpl implements FmsCompanyService {
 
     @Override
     @Cacheable(value = FINANCE_SUBJECT_LIST, key = "'DO:'+#ids", unless = "#result == null")
-    public List<FmsCompanyDO> listCompany(List<Long> ids) {
+    public List<FmsCompanyDO> listCompany(Set<Long> ids) {
+        if (ids.isEmpty()) {
+            return new ArrayList<>();
+        }
         return CompanyMapper.selectList(FmsCompanyDO::getId, ids);
+    }
+
+
+
+    @Override
+    public List<FmsCompanyDO> listCompanyByNames(Set<String> names) {
+        if (names.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return CompanyMapper.selectList(FmsCompanyDO::getName, names);
     }
 }

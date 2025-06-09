@@ -135,9 +135,4 @@ public interface ErpProductService {
      */
     Long getProductCountByUnitId(Long unitId);
 
-
-    /**
-     * 根据barCode模糊查询productId集合
-     */
-    List<Long> listProductIdByBarCode(String barCode);
 }

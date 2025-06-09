@@ -21,4 +21,6 @@ public class SrmSupplierPageReqVO extends PageParam {
     @Schema(description = "联系电话", example = "18818288888")
     private String telephone;
 
+    @Schema(description = "开启状态")
+    private Integer openStatus;
 }

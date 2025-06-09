@@ -37,4 +37,8 @@ public interface DeptMapper extends BaseMapperX<DeptDO> {
         return selectList(DeptDO::getLeaderUserId, id);
     }
 
+    default List<DeptDO> selectListByNames(Collection<String> names){
+        return selectList(new LambdaQueryWrapperX<DeptDO>()
+            .in(DeptDO::getName,names));
+    }
 }

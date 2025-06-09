@@ -10,7 +10,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 /**
  * 仓库库存 DO
  * @author 李方捷
- * @table-fields : outbound_pending_qty,product_id,shelving_pending_qty,available_qty,purchase_transit_qty,id,defective_qty,return_transit_qty,sellable_qty,purchase_plan_qty,warehouse_id
+ * @table-fields : outbound_pending_qty,product_id,transit_qty,shelving_pending_qty,available_qty,id,defective_qty,make_pending_qty,return_transit_qty,sellable_qty,warehouse_id
  */
 @TableName("wms_stock_warehouse")
 // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -55,16 +55,6 @@ public class WmsStockWarehouseDO extends BaseDO {
     private Integer outboundPendingQty;
 
     /**
-     * 采购计划量
-     */
-    private Integer purchasePlanQty;
-
-    /**
-     * 采购在途量
-     */
-    private Integer purchaseTransitQty;
-
-    /**
      * 退件在途数量
      */
     private Integer returnTransitQty;
@@ -78,4 +68,14 @@ public class WmsStockWarehouseDO extends BaseDO {
      * 待上架数量，上架是指从拣货区上架到货架
      */
     private Integer shelvingPendingQty;
+
+    /**
+     * 在途量
+     */
+    private Integer transitQty;
+
+    /**
+     * 在制数量
+     */
+    private Integer makePendingQty;
 }

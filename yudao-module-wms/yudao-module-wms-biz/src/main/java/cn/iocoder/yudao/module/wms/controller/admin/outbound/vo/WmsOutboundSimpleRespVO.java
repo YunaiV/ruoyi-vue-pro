@@ -24,7 +24,7 @@ public class WmsOutboundSimpleRespVO {
 
     @Schema(description = "单据号")
     @ExcelProperty("单据号")
-    private String no;
+    private String code;
 
     @Schema(description = "仓库ID", example = "16056")
     @ExcelProperty("仓库ID")
@@ -38,8 +38,8 @@ public class WmsOutboundSimpleRespVO {
     @ExcelProperty("来源单据ID")
     private Long sourceBillId;
 
-    @Schema(description = "来源单据号")
-    @ExcelProperty("来源单据号")
+    @Schema(description = "来源单据编码")
+    @ExcelProperty("来源单据编码")
     private String sourceBillNo;
 
     @Schema(description = "来源单据类型 ; BillType : 0-入库单 , 1-出库单", example = "2")
@@ -67,5 +67,9 @@ public class WmsOutboundSimpleRespVO {
     @ExcelProperty("出库时间")
     private LocalDateTime outboundTime;
 
+    @Schema(description = "计划出库时间", example = "")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    @ExcelProperty("计划出库时间")
+    private LocalDateTime outboundPlanTime;
 
 }

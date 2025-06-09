@@ -76,4 +76,13 @@ public class YudaoMybatisAutoConfiguration {
         throw new IllegalArgumentException(StrUtil.format("DbType{} 找不到合适的 IKeyGenerator 实现类", dbType));
     }
 
+
+//    /**
+//     * 实现数据物理删除
+//     **/
+//    @Bean
+//    public ISqlInjector absoluteDeleteMpSqlInjector() {
+//        return new AbsoluteDeleteMpSqlInjector();
+//    }
+
 }

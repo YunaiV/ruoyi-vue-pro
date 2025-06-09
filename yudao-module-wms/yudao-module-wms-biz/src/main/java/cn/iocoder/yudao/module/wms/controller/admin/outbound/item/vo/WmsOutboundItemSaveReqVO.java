@@ -1,17 +1,19 @@
 package cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo;
 
-import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import jakarta.validation.constraints.*;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
- * @table-fields : company_id,outbound_status,actual_qty,bin_id,plan_qty,product_id,upstream_item_id,remark,id,dept_id,outbound_id
+ * @table-fields : company_id,outbound_status,actual_qty,bin_id,plan_qty,product_id,upstream_id,remark,id,dept_id,outbound_id
  */
-@Schema(description = "管理后台 - 出库单详情新增/修改 Request VO")
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Schema(description = "管理后台 - 出库单详情新增/修改 Request VO")
 public class WmsOutboundItemSaveReqVO {
 
     @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "27153")
@@ -47,6 +49,12 @@ public class WmsOutboundItemSaveReqVO {
     @Schema(description = "备注", example = "")
     private String remark;
 
-    @Schema(description = "来源详情ID", example = "")
-    private Long upstreamItemId;
+    @Schema(description = "来源明细行ID", example = "")
+    private Long upstreamId;
+//
+//    @Schema(description = "产品信息")
+//    private WmsProductDO product;
+//
+//    @Schema(description = "库位信息")
+//    private WmsStockCheckBinDO bin;
 }

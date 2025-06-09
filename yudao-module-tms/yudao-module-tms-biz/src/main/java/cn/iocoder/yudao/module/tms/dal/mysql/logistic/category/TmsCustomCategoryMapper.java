@@ -29,6 +29,8 @@ public interface TmsCustomCategoryMapper extends BaseMapperX<TmsCustomCategoryDO
             .eqIfPresent(TmsCustomCategoryDO::getMaterial, reqVO.getMaterial())
             .likeIfPresent(TmsCustomCategoryDO::getDeclaredType, reqVO.getDeclaredType())
             .likeIfPresent(TmsCustomCategoryDO::getDeclaredTypeEn, reqVO.getDeclaredTypeEn())
+            .likeIfPresent(TmsCustomCategoryDO::getCustomsPurpose, reqVO.getCustomsPurpose())
+            .likeIfPresent(TmsCustomCategoryDO::getCustomsMaterial, reqVO.getCustomsMaterial())
             .orderByDesc(TmsCustomCategoryDO::getId);
     }
 

@@ -31,7 +31,7 @@ public class SrmPurchaseRequestItemsDO extends TenantBaseDO {
     @TableId
     private Long id;
     @Version
-    private Long version;
+    private Integer version;
     /**
      * 商品id
      */
@@ -47,7 +47,7 @@ public class SrmPurchaseRequestItemsDO extends TenantBaseDO {
     /**
      * 产品sku
      */
-    private String barCode;
+    private String productCode;
     /**
      * 产品名称
      */
@@ -81,7 +81,7 @@ public class SrmPurchaseRequestItemsDO extends TenantBaseDO {
     /**
      * 含税单价
      */
-    private BigDecimal actTaxPrice;
+    private BigDecimal grossPrice;
     /**
      * 关闭状态
      */
@@ -93,7 +93,7 @@ public class SrmPurchaseRequestItemsDO extends TenantBaseDO {
     /**
      * 价税合计
      */
-    private BigDecimal allAmount;
+    private BigDecimal grossTotalPrice;
     /**
      * 参考单价
      */
@@ -101,27 +101,18 @@ public class SrmPurchaseRequestItemsDO extends TenantBaseDO {
     /**
      * 税额，单位：元
      * <p>
-     * taxPrice = totalPrice * taxPercent
+     * tax = totalPrice * taxRate
      */
-    private BigDecimal taxPrice;
+    private BigDecimal tax;
     /**
      * 税率，百分比
      */
-    private BigDecimal taxPercent;
-    //    /**
-    //     * ERP 采购订单ID
-    //     * {@link SrmPurchaseOrderDO#getId()} ()}
-    //     */
-    //    private Long purchaseOrderId;
+    private BigDecimal taxRate;
+
     /**
      * 产品已订购数量
      */
     private Integer orderClosedQty;
-    //    /**
-    //     * ERP 采购订单项ID
-    //     * {@link SrmPurchaseOrderItemDO#getId()} ()}
-    //     */
-    //    private Long purchaseOrderItemId;
     /**
      * 期望到货日期
      */
@@ -129,5 +120,5 @@ public class SrmPurchaseRequestItemsDO extends TenantBaseDO {
     /**
      * 入库状态
      */
-    private Integer inStatus;
+    private Integer inboundStatus;
 }

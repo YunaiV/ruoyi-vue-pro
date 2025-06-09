@@ -34,7 +34,7 @@ public class SrmPurchaseOrderItemDO extends TenantBaseDO {
     private Long id;
 
     @Version
-    private Long version;
+    private Integer version;
     /**
      * 仓库编号
      * <p>
@@ -80,28 +80,28 @@ public class SrmPurchaseOrderItemDO extends TenantBaseDO {
     /**
      * 税率，百分比
      */
-    private BigDecimal taxPercent;
+    private BigDecimal taxRate;
     /**
-     * 税额，单位：元 taxPrice = totalPrice * taxPercent
+     * 税额，单位：元 tax = totalPrice * taxRate
      */
-    private BigDecimal taxPrice;
+    private BigDecimal tax;
     /**
      * 含税单价
      */
-    private BigDecimal actTaxPrice;
+    private BigDecimal grossPrice;
     /**
      * 价税合计
      */
-    private BigDecimal allAmount;
+    private BigDecimal grossTotalPrice;
     // ========== 采购金额和数量 ==========
     /**
      * 合计产品价格，单位：元
      */
     private BigDecimal totalProductPrice;
     /**
-     * 合计产品税价，单位：元
+     * 合计税额
      */
-    private BigDecimal totalTaxPrice;
+    private BigDecimal totalGrossPrice;
     /**
      * 优惠率，百分比
      */
@@ -124,12 +124,12 @@ public class SrmPurchaseOrderItemDO extends TenantBaseDO {
     private BigDecimal payPrice;
     // ========== 采购入库 ==========
     /**
-     * 采购入库数量
+     * 入库数量
      */
     private BigDecimal inboundClosedQty;
     // ========== 采购退货（出库）） ==========
     /**
-     * 采购退货数量
+     * 退货数量
      */
     private BigDecimal returnCount;
     // ========== 其他 ==========
@@ -148,7 +148,7 @@ public class SrmPurchaseOrderItemDO extends TenantBaseDO {
     /**
      * 入库状态
      */
-    private Integer inStatus;
+    private Integer inboundStatus;
     /**
      * 付款状态
      */
@@ -158,11 +158,12 @@ public class SrmPurchaseOrderItemDO extends TenantBaseDO {
      */
     private Long purchaseApplyItemId;
     /**
-     * 采购申请单No
+     * 采购申请单code,冗余  {@link SrmPurchaseRequestDO#getCode()}
      */
-    private String erpPurchaseRequestItemNo;
+    private String purchaseApplyCode;
 
-    private String xcode;//x码
+
+    private String fbaCode;//x码
     private String containerRate;//箱率
     /**
      * 汇率
@@ -197,7 +198,7 @@ public class SrmPurchaseOrderItemDO extends TenantBaseDO {
      */
     private String declaredTypeEn;
 
-    private String barCode;
+    private String productCode;
     /**
      * 产品名称
      */
@@ -208,7 +209,7 @@ public class SrmPurchaseOrderItemDO extends TenantBaseDO {
     private String productUnitName;
 
     /**
-     * 单据来源
+     * 单据来源描述,例如：web引入
      */
     private String source;
 

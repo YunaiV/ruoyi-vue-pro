@@ -3,7 +3,9 @@ package cn.iocoder.yudao.module.srm.config.purchase.order.impl.action.item;
 import cn.iocoder.yudao.framework.cola.statemachine.Action;
 import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
-import cn.iocoder.yudao.module.srm.api.purchase.SrmInCountDTO;
+import cn.iocoder.yudao.module.srm.config.machine.SrmOrderInCountContext;
+import cn.iocoder.yudao.module.srm.config.machine.order.SrmOrderItemOffContext;
+import cn.iocoder.yudao.module.srm.config.machine.request.SrmRequestInMachineContext;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestItemsDO;
@@ -13,11 +15,11 @@ import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseRequestItemsMap
 import cn.iocoder.yudao.module.srm.enums.SrmEventEnum;
 import cn.iocoder.yudao.module.srm.enums.status.SrmExecutionStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmOffStatus;
-import cn.iocoder.yudao.module.srm.enums.status.SrmPaymentStatus;
 import cn.iocoder.yudao.module.srm.enums.status.SrmStorageStatus;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,32 +33,33 @@ import static cn.iocoder.yudao.module.srm.enums.SrmStateMachines.*;
 //订单项入库状态机
 @Component
 @Slf4j
-public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventEnum, SrmInCountDTO> {
+public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventEnum, SrmOrderInCountContext> {
 
     @Autowired
-    SrmPurchaseRequestItemsMapper erpPurchaseRequestItemsMapper;
-    @Resource
-    private SrmPurchaseOrderItemMapper itemMapper;
-    @Resource
+    private SrmPurchaseRequestItemsMapper erpPurchaseRequestItemsMapper;
+    @Autowired
+    private SrmPurchaseOrderItemMapper orderItemMapper;
+    @Autowired
     private SrmPurchaseOrderMapper mapper;
     @Resource(name = PURCHASE_ORDER_STORAGE_STATE_MACHINE_NAME)
-    private StateMachine storageStateMachine;
+    private StateMachine<SrmStorageStatus, SrmEventEnum, SrmPurchaseOrderDO> orderStorageStateMachine;
 
     @Resource(name = PURCHASE_REQUEST_ITEM_STORAGE_STATE_MACHINE_NAME)
-    private StateMachine purchaseRequestItemStateMachine;
+    private StateMachine<SrmStorageStatus, SrmEventEnum, SrmRequestInMachineContext> requestItemInStateMachine;
 
     @Resource(name = PURCHASE_ORDER_ITEM_EXECUTION_STATE_MACHINE_NAME)
-    private StateMachine<SrmExecutionStatus, SrmEventEnum, SrmPurchaseOrderItemDO> purchaseOrderItemExecutionStateMachine;
+    @Lazy
+    private StateMachine<SrmExecutionStatus, SrmEventEnum, SrmPurchaseOrderItemDO> orderItemExecutionStateMachine;
 
     @Resource(name = PURCHASE_ORDER_ITEM_OFF_STATE_MACHINE_NAME)
-    private StateMachine<SrmOffStatus, SrmEventEnum, SrmPurchaseOrderItemDO> purchaseOrderItemOffStateMachine;
+    private StateMachine<SrmOffStatus, SrmEventEnum, SrmOrderItemOffContext> orderItemOffStateMachine;
 
     //入库项(->入库主单)->订单项(->订单主单)->申请项(->订单主单)
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void execute(SrmStorageStatus from, SrmStorageStatus to, SrmEventEnum event, SrmInCountDTO dto) {
+    public void execute(SrmStorageStatus from, SrmStorageStatus to, SrmEventEnum event, SrmOrderInCountContext dto) {
         // 1. 先查询数据库中的采购项信息
-        SrmPurchaseOrderItemDO oldData = itemMapper.selectById(dto.getOrderItemId());
+        SrmPurchaseOrderItemDO oldData = orderItemMapper.selectById(dto.getOrderItemId());
         if (oldData == null) {
             return; // 防止空指针异常
         }
@@ -76,7 +79,7 @@ public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventE
         }
 
         if (event == SrmEventEnum.STORAGE_INIT) {
-
+            //
         }
 
         if (event == SrmEventEnum.STOCK_ADJUSTMENT) {
@@ -95,29 +98,29 @@ public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventE
 
         }
         // 更新数据库中的采购项状态
-        itemMapper.updateById(oldData.setInStatus(to.getCode())//状态
-            .setInboundClosedQty(newInCount)//入库数量
-        );
+        oldData.setInboundStatus(to.getCode());//状态
+        oldData.setInboundClosedQty(newInCount);//入库数量
+        orderItemMapper.updateById(oldData);
 
         // 3. 记录日志
         log.debug("订单项入库状态机触发({})事件：订单项ID={}，状态 {} -> {}, 入库数量={}, 退货数量={}", event.getDesc(), oldData.getId(), from.getDesc(),
             to.getDesc(), dto.getInCount(), dto.getReturnCount());
-        //4.0
+        //4.0 传递事件给别的状态机
         toOrder(event, oldData);
         toRequestItem(oldData, dtoCount);
         // 当前订单项，完全入库 + 完全付款 -> 关闭订单项
         checkStatusAndClose(dto.getOrderItemId());
-        //
-        toOrderExecute(dto.getOrderItemId());
+        // 执行状态机(目前跟到货数量相关、跟入库数量无关)
+//        toOrderExecute(dto.getOrderItemId());
     }
 
     private void toOrderExecute(Long orderItemId) {
-        SrmPurchaseOrderItemDO orderItemDO = itemMapper.selectById(orderItemId);
+        SrmPurchaseOrderItemDO orderItemDO = orderItemMapper.selectById(orderItemId);
         //部分入库->部分执行 , 完全入库 -> 完全执行
-        if (Objects.equals(orderItemDO.getInStatus(), SrmStorageStatus.ALL_IN_STORAGE.getCode())) {
-            purchaseOrderItemExecutionStateMachine.fireEvent(SrmExecutionStatus.fromCode(orderItemDO.getExecuteStatus()), SrmEventEnum.START_EXECUTION, orderItemDO);
-        } else if (Objects.equals(orderItemDO.getInStatus(), SrmStorageStatus.PARTIALLY_IN_STORAGE.getCode())) {
-            purchaseOrderItemExecutionStateMachine.fireEvent(SrmExecutionStatus.fromCode(orderItemDO.getExecuteStatus()), SrmEventEnum.COMPLETE_EXECUTION, orderItemDO);
+        if (Objects.equals(orderItemDO.getInboundStatus(), SrmStorageStatus.ALL_IN_STORAGE.getCode())) {
+            orderItemExecutionStateMachine.fireEvent(SrmExecutionStatus.fromCode(orderItemDO.getExecuteStatus()), SrmEventEnum.START_EXECUTION, orderItemDO);
+        } else if (Objects.equals(orderItemDO.getInboundStatus(), SrmStorageStatus.PARTIALLY_IN_STORAGE.getCode())) {
+            orderItemExecutionStateMachine.fireEvent(SrmExecutionStatus.fromCode(orderItemDO.getExecuteStatus()), SrmEventEnum.COMPLETE_EXECUTION, orderItemDO);
         }
     }
 
@@ -127,12 +130,9 @@ public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventE
             //传递给申请项入库状态机
             SrmPurchaseRequestItemsDO applyItemDO = erpPurchaseRequestItemsMapper.selectById(applyItemId);
             ThrowUtil.ifThrow(applyItemDO == null, PURCHASE_REQUEST_ITEM_NOT_FOUND, oldData.getId(), applyItemId);
-            BigDecimal oldCount = applyItemDO.getInboundClosedQty();
-            //                BigDecimal result = (oldCount != null && oldCount.compareTo(BigDecimal.ZERO) == 0) ? BigDecimal.ZERO : oldCount;
-            BigDecimal result = oldCount == null ? BigDecimal.ZERO : oldCount;
-            BigDecimal changeCount = result.subtract(dtoCount);
-            purchaseRequestItemStateMachine.fireEvent(SrmStorageStatus.fromCode(applyItemDO.getInStatus()), SrmEventEnum.STOCK_ADJUSTMENT,
-                SrmInCountDTO.builder().applyItemId(applyItemId).inCount(changeCount).build());
+            //
+            requestItemInStateMachine.fireEvent(SrmStorageStatus.fromCode(applyItemDO.getInboundStatus()), SrmEventEnum.STOCK_ADJUSTMENT,
+                SrmRequestInMachineContext.builder().applyItemId(applyItemId).inCount(dtoCount).build());
         });
     }
 
@@ -142,16 +142,26 @@ public class OrderItemInActionImpl implements Action<SrmStorageStatus, SrmEventE
         SrmPurchaseOrderDO orderDO = mapper.selectById(oldData.getOrderId());
         if (orderDO == null) {
             log.error("未找到对应的采购订单,订单ID={}", oldData.getOrderId());
+            return;
         }
-        storageStateMachine.fireEvent(SrmStorageStatus.fromCode(orderDO.getInStatus()), event, orderDO);
+        if (orderDO.getInboundStatus() == null) {
+            log.warn("未找到对应的采购订单,订单ID={}", oldData.getOrderId());
+            return;
+        }
+        if (event == SrmEventEnum.STORAGE_INIT) {
+            log.debug("采购项订单入库状态初始化");
+            return;
+        }
+        orderStorageStateMachine.fireEvent(SrmStorageStatus.fromCode(orderDO.getInboundStatus()), SrmEventEnum.STOCK_ADJUSTMENT, orderDO);
     }
 
     private void checkStatusAndClose(Long orderItemId) {
-        SrmPurchaseOrderItemDO orderItemDO = itemMapper.selectById(orderItemId);
-        if (Objects.equals(orderItemDO.getInStatus(), SrmStorageStatus.ALL_IN_STORAGE.getCode()) && Objects.equals(orderItemDO.getPayStatus(),
-            SrmPaymentStatus.ALL_PAYMENT.getCode())) {
-            // 当前订单项，完全入库 + 完全付款 -> 关闭订单项
-            purchaseOrderItemOffStateMachine.fireEvent(SrmOffStatus.fromCode(orderItemDO.getOffStatus()), SrmEventEnum.AUTO_CLOSE, orderItemDO);
+        SrmPurchaseOrderItemDO orderItemDO = orderItemMapper.selectById(orderItemId);
+        // 当前订单项，完全入库 + 完全付款 -> 关闭订单项
+        //&& Objects.equals(orderItemDO.getPayStatus(),SrmPaymentStatus.ALL_PAYMENT.getCode())
+        if (Objects.equals(orderItemDO.getInboundStatus(), SrmStorageStatus.ALL_IN_STORAGE.getCode())) {
+            // 当前订单项，完全入库  -> 关闭订单项
+            orderItemOffStateMachine.fireEvent(SrmOffStatus.fromCode(orderItemDO.getOffStatus()), SrmEventEnum.AUTO_CLOSE, new SrmOrderItemOffContext().setItemId(orderItemDO.getId()));
         }
     }
 }

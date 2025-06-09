@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.srm.config.purchase.order.impl.action.item;
 import cn.iocoder.yudao.framework.cola.statemachine.Action;
 import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
+import cn.iocoder.yudao.module.srm.config.machine.order.SrmOrderItemOffContext;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseOrderItemMapper;
@@ -23,7 +24,7 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class OrderItemOffActionImpl implements Action<SrmOffStatus, SrmEventEnum, SrmPurchaseOrderItemDO> {
+public class OrderItemOffActionImpl implements Action<SrmOffStatus, SrmEventEnum, SrmOrderItemOffContext> {
 
     @Resource(name = SrmStateMachines.PURCHASE_ORDER_OFF_STATE_MACHINE_NAME)
     @Lazy
@@ -38,25 +39,23 @@ public class OrderItemOffActionImpl implements Action<SrmOffStatus, SrmEventEnum
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void execute(SrmOffStatus from, SrmOffStatus to, SrmEventEnum event, SrmPurchaseOrderItemDO context) {
+    public void execute(SrmOffStatus from, SrmOffStatus to, SrmEventEnum event, SrmOrderItemOffContext context) {
         // 查询采购订单子项
-        SrmPurchaseOrderItemDO itemDO = purchaseOrderService.validatePurchaseOrderItemExists(context.getId());
+        SrmPurchaseOrderItemDO itemDO = purchaseOrderService.validatePurchaseOrderItemExists(context.getItemId());
         if(itemDO == null) {
-            log.warn("采购订单子项不存在，ID: {}", context.getId());
+            log.warn("采购订单子项不存在，ID: {}", context.getItemId());
             return;
         }
-
         // 更新子项的状态
         itemDO.setOffStatus(to.getCode());
         itemMapper.updateById(itemDO);
-        log.info("子项开关状态机触发({})事件：对象ID={}，状态 {} -> {}", event.getDesc(), itemDO.getId(), from.getDesc(), to.getDesc());
+        log.debug("子项开关状态机触发({})事件：对象ID={}，状态 {} -> {}", event.getDesc(), itemDO.getId(), from.getDesc(), to.getDesc());
 
-        SrmPurchaseOrderDO orderDO = orderMapper.selectById(context.getOrderId());
+        SrmPurchaseOrderDO orderDO = orderMapper.selectById(itemDO.getOrderId());
         if(orderDO == null) {
-            log.warn("订单子项ID={} 关联的订单ID={} 不存在，无法更新主表状态", context.getId(), context.getOrderId());
+            log.warn("订单子项ID={} 不存在，无法更新主表状态", context.getItemId());
             return;
         }
-
         updateOrderStatusIfNeeded(orderDO, event, to);
     }
 

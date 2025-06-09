@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.req.SrmPurcha
 import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.in.req.SrmPurchaseInSaveReqVO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseInDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseInItemDO;
+import cn.iocoder.yudao.module.srm.service.purchase.bo.in.SrmPurchaseInBO;
 import jakarta.validation.Valid;
 
 import java.math.BigDecimal;
@@ -14,14 +15,14 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * ERP 采购入库 Service 接口
+ * ERP 采购到货 Service 接口
  *
  * @author 芋道源码
  */
 public interface SrmPurchaseInService {
 
     /**
-     * 创建采购入库
+     * 创建采购到货
      *
      * @param createReqVO 创建信息
      * @return 编号
@@ -29,22 +30,14 @@ public interface SrmPurchaseInService {
     Long createPurchaseIn(@Valid SrmPurchaseInSaveReqVO createReqVO);
 
     /**
-     * 更新采购入库
+     * 更新采购到货
      *
      * @param updateReqVO 更新信息
      */
     void updatePurchaseIn(@Valid SrmPurchaseInSaveReqVO updateReqVO);
 
-    //    /**
-    //     * 更新采购入库的状态
-    //     *
-    //     * @param id 编号
-    //     * @param status 状态
-    //     */
-    //    void updatePurchaseInStatus(Long id, Integer status);
-
     /**
-     * 更新采购入库的付款金额
+     * 更新采购到货的付款金额
      *
      * @param id           编号
      * @param paymentPrice 付款金额
@@ -52,51 +45,62 @@ public interface SrmPurchaseInService {
     void updatePurchaseInPaymentPrice(Long id, BigDecimal paymentPrice);
 
     /**
-     * 删除采购入库
+     * 删除采购到货
      *
      * @param ids 编号数组
      */
     void deletePurchaseIn(List<Long> ids);
 
     /**
-     * 获得采购入库
+     * 获得采购到货
      *
      * @param id 编号
-     * @return 采购入库
+     * @return 采购到货
      */
     SrmPurchaseInDO getPurchaseIn(Long id);
 
     /**
-     * 校验采购入库，已经审核通过
+     * 获取采购到货列表
      *
-     * @param id 编号
-     * @return 采购入库
+     * @param ids 入库单ids
+     * @return 采购到货列表
      */
-    SrmPurchaseInDO validatePurchaseIn(Long id);
+    List<SrmPurchaseInDO> getPurchaseInList(List<Long> ids);
 
     /**
-     * 获得采购入库分页
+     * 校验入库订单
+     * @param id 入库单id
+     * @return SrmPurchaseInDO
+     */
+    SrmPurchaseInDO validatePurchaseInExists(Long id);
+    /**
+     * 获得采购到货分页
      *
      * @param pageReqVO 分页查询
-     * @return 采购入库分页
+     * @return 采购到货分页
      */
-    PageResult<SrmPurchaseInDO> getPurchaseInPage(SrmPurchaseInPageReqVO pageReqVO);
+    PageResult<SrmPurchaseInBO> getPurchaseInBOPage(SrmPurchaseInPageReqVO pageReqVO);
 
-    // ==================== 采购入库项 ====================
+    //list
+    List<SrmPurchaseInBO> getPurchaseInBOList(List<Long> ids);
+
+    //id
+    SrmPurchaseInBO getPurchaseInBOById(Long id);
+    // ==================== 采购到货项 ====================
 
     /**
-     * 获得采购入库项列表
+     * 获得采购到货项列表
      *
-     * @param inId 采购入库编号
-     * @return 采购入库项列表
+     * @param inId 采购到货编号
+     * @return 采购到货项列表
      */
     List<SrmPurchaseInItemDO> getPurchaseInItemListByInId(Long inId);
 
     /**
-     * 获得采购入库项 List
+     * 获得采购到货项 List
      *
-     * @param inIds 采购入库编号数组
-     * @return 采购入库项 List
+     * @param inIds 采购到货编号数组
+     * @return 采购到货项 List
      */
     List<SrmPurchaseInItemDO> getPurchaseInItemListByInIds(Collection<Long> inIds);
 
@@ -127,4 +131,6 @@ public interface SrmPurchaseInService {
      * @param vo 入库项ids
      */
     void switchPayStatus(SrmPurchaseInPayReqVO vo);
+
+
 }

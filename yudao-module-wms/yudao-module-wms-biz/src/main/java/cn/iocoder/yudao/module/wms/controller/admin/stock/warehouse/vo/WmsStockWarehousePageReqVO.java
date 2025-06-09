@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : create_time,outbound_pending_qty,product_id,shelving_pending_qty,available_qty,purchase_transit_qty,defective_qty,return_transit_qty,sellable_qty,purchase_plan_qty,warehouse_id
+ * @table-fields : create_time,outbound_pending_qty,product_id,transit_qty,shelving_pending_qty,available_qty,defective_qty,make_pending_qty,return_transit_qty,sellable_qty,warehouse_id
  */
 @Schema(description = "管理后台 - 仓库库存分页 Request VO")
 @Data
@@ -28,7 +28,6 @@ public class WmsStockWarehousePageReqVO extends PageParam {
     @Schema(description = "产品部门", example = "3153")
     private Long productDeptId;
 
-
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
@@ -42,12 +41,6 @@ public class WmsStockWarehousePageReqVO extends PageParam {
     @Schema(description = "待出库量", example = "")
     private Integer[] outboundPendingQty;
 
-    @Schema(description = "采购计划量", example = "")
-    private Integer[] purchasePlanQty;
-
-    @Schema(description = "采购在途量", example = "")
-    private Integer[] purchaseTransitQty;
-
     @Schema(description = "退件在途数量", example = "")
     private Integer[] returnTransitQty;
 
@@ -57,5 +50,9 @@ public class WmsStockWarehousePageReqVO extends PageParam {
     @Schema(description = "待上架数量，上架是指从拣货区上架到货架", example = "")
     private Integer[] shelvingPendingQty;
 
+    @Schema(description = "在途量", example = "")
+    private Integer[] transitQty;
 
+    @Schema(description = "在制数量", example = "")
+    private Integer[] makePendingQty;
 }

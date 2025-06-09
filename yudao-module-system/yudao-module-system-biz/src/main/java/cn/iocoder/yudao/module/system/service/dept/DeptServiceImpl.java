@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.util.ThrowUtil;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptLevelRespDTO;
@@ -279,6 +280,14 @@ public class DeptServiceImpl implements DeptService {
             deptTreeRespVO.setChildren(childDeptListTree);
         }
         return deptTreeRespVos;
+    }
+
+    @Override
+    public List<DeptDO> getDeptListByNames(Collection<String> names) {
+        if(CollectionUtils.isEmpty(names)) {
+            return List.of();
+        }
+        return deptMapper.selectListByNames(names);
     }
 
     private TreeSet<DeptLevelRespDTO> getParentList(TreeSet<DeptLevelRespDTO> deptList, Long id, Integer level){

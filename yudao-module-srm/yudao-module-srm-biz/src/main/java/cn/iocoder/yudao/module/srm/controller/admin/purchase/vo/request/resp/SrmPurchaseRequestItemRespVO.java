@@ -20,7 +20,7 @@ public class SrmPurchaseRequestItemRespVO extends BaseVO {
 
     @Schema(description = "产品编码", example = "FTC1607AWB")
     @ExcelProperty("产品编码")
-    private String no;
+    private String code;
 
     // ========== 产品信息 ==========
     //
@@ -38,15 +38,11 @@ public class SrmPurchaseRequestItemRespVO extends BaseVO {
     private String declaredTypeEn;
 
     @Schema(description = "产品sku")
-    private String barCode;
+    private String productCode;
 
     @Schema(description = "产品名称", example = "巧克力")
     @ExcelProperty("产品名称")
     private String productName;
-
-    @Schema(description = "产品sku", example = "A9985")
-    @ExcelProperty("产品条码")
-    private String productBarCode;
 
     @Schema(description = "产品单位名称", example = "盒")
     @ExcelProperty("产品单位名称")
@@ -76,19 +72,19 @@ public class SrmPurchaseRequestItemRespVO extends BaseVO {
 
     @Schema(description = "含税单价", example = "100.00")
     @ExcelProperty("含税单价")
-    private BigDecimal actTaxPrice;
+    private BigDecimal grossPrice;
 
     @Schema(description = "价税合计")
     @ExcelProperty("价税合计")
-    private BigDecimal allAmount;
+    private BigDecimal grossTotalPrice;
 
     @Schema(description = "税额，单位：元")
     @ExcelProperty("税额")
-    private BigDecimal taxPrice;
+    private BigDecimal tax;
 
     @Schema(description = "税率，百分比")
     @ExcelProperty("税率")
-    private BigDecimal taxPercent;
+    private BigDecimal taxRate;
 
     @Schema(description = "批准数量")
     @ExcelProperty("批准数量")
@@ -130,5 +126,5 @@ public class SrmPurchaseRequestItemRespVO extends BaseVO {
     private LocalDateTime expectArrivalDate;
 
     @Schema(description = "版本号")
-    private Long version;
+    private Integer version;
 }

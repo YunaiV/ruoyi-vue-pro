@@ -3,16 +3,14 @@ package cn.iocoder.yudao.framework.common.exception.util;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
-import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link ServiceException} 工具类
- *
+ * <p>
  * 目的在于，格式化异常信息提示。
  * 考虑到 String.format 在参数不正确时会报错，因此使用 {} 作为占位符，并使用 {@link #doFormat(int, String, Object...)} 方法来格式化
- *
  */
 @Slf4j
 public class ServiceExceptionUtil {
@@ -29,11 +27,7 @@ public class ServiceExceptionUtil {
 
     public static ServiceException exception0(Integer code, String messagePattern, Object... params) {
         String message = doFormat(code, messagePattern, params);
-        ServiceException e=new ServiceException(code, message);
-        if(!SpringUtils.isProd()) {
-            log.error("Service Error",e);
-        }
-        return e;
+        return new ServiceException(code, message);
     }
 
     public static ServiceException invalidParamException(String messagePattern, Object... params) {

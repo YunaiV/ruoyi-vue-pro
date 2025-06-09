@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req;
 
+import com.mzt.logapi.starter.annotation.DiffLogAllFields;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -11,6 +12,7 @@ import java.util.List;
 @Schema(description = "管理后台 - ERP采购申请单审核状态 Request VO")
 @Data
 @Builder
+@DiffLogAllFields
 public class SrmPurchaseRequestAuditReqVO {
     // 请求ID
     @NotNull(message = "申请单ID不能为空")
@@ -33,7 +35,7 @@ public class SrmPurchaseRequestAuditReqVO {
 
     //审核意见
     @Schema(description = "审核意见")
-    private String reviewComment;
+    private String auditAdvice;
 
     @Data
     public static class requestItems {

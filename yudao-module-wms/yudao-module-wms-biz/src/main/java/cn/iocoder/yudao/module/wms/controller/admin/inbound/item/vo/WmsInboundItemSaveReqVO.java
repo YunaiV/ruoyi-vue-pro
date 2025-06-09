@@ -1,14 +1,15 @@
 package cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo;
 
-import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import jakarta.validation.constraints.*;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
- * @table-fields : outbound_available_qty,inbound_status,company_id,plan_qty,shelved_qty,upstream_item_id,remark,latest_flow_id,inbound_id,actual_qty,product_id,id,dept_id
+ * @author jisencai
+ * @table-fields : outbound_available_qty,inbound_status,company_id,plan_qty,shelve_closed_qty,upstream_id,remark,inbound_dept_id,latest_flow_id,inbound_id,inbound_company_id,actual_qty,product_id,id,dept_id
  */
 @Schema(description = "管理后台 - 入库单详情新增/修改 Request VO")
 @Data
@@ -39,20 +40,21 @@ public class WmsInboundItemSaveReqVO {
     private Integer planQty;
 
     @Schema(description = "已上架量，已经拣货到仓位的库存量", example = "")
-    private Integer shelvedQty;
+    private Integer shelveClosedQty;
 
     @Schema(description = "最新的流水ID", example = "")
     private Long latestFlowId;
 
-    @Schema(description = "库存归属部门ID", example = "")
+    @Schema(description = "库存归属部门ID,由用户指定", example = "")
     private Long deptId;
 
-    @Schema(description = "库存财务公司ID", example = "")
+    @Schema(description = "库存财务公司ID,由用户指定", example = "")
     private Long companyId;
 
     @Schema(description = "备注", example = "")
     private String remark;
 
-    @Schema(description = "来源详情ID", example = "")
-    private Long upstreamItemId;
+    @Schema(description = "来源明细行ID", example = "")
+    private Long upstreamId;
+
 }

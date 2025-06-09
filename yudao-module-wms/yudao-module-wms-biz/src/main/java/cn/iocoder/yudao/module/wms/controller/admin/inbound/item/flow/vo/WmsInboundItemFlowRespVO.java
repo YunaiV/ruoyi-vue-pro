@@ -1,15 +1,17 @@
 package cn.iocoder.yudao.module.wms.controller.admin.inbound.item.flow.vo;
 
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import java.util.*;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
-import com.alibaba.excel.annotation.*;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,creator,outbound_qty,create_time,outbound_id,outbound_item_id,updater,inbound_id,outbound_action_id,update_time,product_id,id,inbound_item_id
+ * @table-fields : bill_id,tenant_id,outbound_available_qty,creator,create_time,shelve_closed_qty,updater,inbound_id,outbound_available_delta_qty,outbound_action_id,update_time,actual_qty,bill_item_id,product_id,bill_type,id,inbound_item_id,direction
  */
 @Schema(description = "管理后台 - 入库单库存详情扣减 Response VO")
 @Data
@@ -31,14 +33,6 @@ public class WmsInboundItemFlowRespVO {
     @Schema(description = "标准产品ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "30952")
     @ExcelProperty("标准产品ID")
     private Long productId;
-
-    @Schema(description = "出库单ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "11015")
-    @ExcelProperty("出库单ID")
-    private Long outboundId;
-
-    @Schema(description = "出库单明细ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "28163")
-    @ExcelProperty("出库单明细ID")
-    private Long outboundItemId;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
@@ -69,11 +63,42 @@ public class WmsInboundItemFlowRespVO {
     @ExcelProperty("更新者")
     private String updater;
 
-    @Schema(description = "变化的数量，出库量", example = "")
-    @ExcelProperty("变化的数量")
-    private Integer outboundQty;
-
     @Schema(description = "出库动作ID", example = "")
     @ExcelProperty("出库动作ID")
     private Long outboundActionId;
+
+    @Schema(description = "WMS来源单据类型 ; WmsBillType : 0-入库单 , 1-出库单 , 2-盘点单 , 3-换货单", example = "")
+    @ExcelProperty("WMS来源单据类型")
+    private Integer billType;
+
+    @Schema(description = "出库单ID", example = "")
+    @ExcelProperty("出库单ID")
+    private Long billId;
+
+    @Schema(description = "出库单明细ID", example = "")
+    @ExcelProperty("出库单明细ID")
+    private Long billItemId;
+
+    @Schema(description = "WMS库存流水方向 ; WmsStockFlowDirection : -1-流出 , 1-流入", example = "")
+    @ExcelProperty("WMS库存流水方向")
+    private Integer direction;
+
+    @Schema(description = "可上架量", example = "")
+    private Integer shelveAvailableQty;
+
+    @Schema(description = "变化的数量，可出库量的变化量", example = "")
+    @ExcelProperty("变化的数量")
+    private Integer outboundAvailableDeltaQty;
+
+    @Schema(description = "可出库量", example = "")
+    @ExcelProperty("可出库量")
+    private Integer outboundAvailableQty;
+
+    @Schema(description = "实际入库量", example = "")
+    @ExcelProperty("实际入库量")
+    private Integer actualQty;
+
+    @Schema(description = "已上架量，已经拣货到仓位的库存量", example = "")
+    @ExcelProperty("已上架量，已经拣货到仓位的库存量")
+    private Integer shelveClosedQty;
 }

@@ -12,7 +12,8 @@ import java.util.Objects;
 
 /**
  * 换货单审批状态
- **/
+ *
+ * @author jisencai*/
 @RequiredArgsConstructor
 @Getter
 public enum WmsExchangeAuditStatus implements ArrayValuable<Integer>, DictEnum {

@@ -80,7 +80,7 @@ public class SrmPurchaseBaseRespVO {
 
     @Schema(description = "合计税额，单位：元", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("合计税额，单位：元")
-    protected BigDecimal totalTaxPrice;
+    protected BigDecimal totalGrossPrice;
 
     @Schema(description = "优惠率，百分比", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("优惠率，百分比")

@@ -6,8 +6,9 @@ import cn.iocoder.yudao.framework.cola.statemachine.builder.StateMachineBuilderF
 import cn.iocoder.yudao.framework.cola.statemachine.builder.TransitionContext;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
+import cn.iocoder.yudao.module.wms.service.outbound.transition.OutboundAbandonTransitionHandler;
 import cn.iocoder.yudao.module.wms.service.outbound.transition.OutboundAgreeTransitionHandler;
-import cn.iocoder.yudao.module.wms.service.outbound.transition.OutboundExecuteTransitionHandler;
+import cn.iocoder.yudao.module.wms.service.outbound.transition.OutboundFinishTransitionHandler;
 import cn.iocoder.yudao.module.wms.service.outbound.transition.OutboundRejectTransitionHandler;
 import cn.iocoder.yudao.module.wms.service.outbound.transition.OutboundSubmitTransitionHandler;
 import cn.iocoder.yudao.module.wms.service.outbound.transition.OutboundTransitionFailCallback;
@@ -46,6 +47,14 @@ public class OutboundStateMachineConfigure {
             .on(WmsOutboundAuditStatus.Event.SUBMIT)
             .handle(OutboundSubmitTransitionHandler.class);
 
+
+        // 废弃
+        builder.externalTransitions()
+            .fromAmong(WmsOutboundAuditStatus.DRAFT.getValue(),WmsOutboundAuditStatus.REJECT.getValue(),WmsOutboundAuditStatus.AUDITING.getValue())
+            .to( WmsOutboundAuditStatus.ABANDONED.getValue())
+            .on(WmsOutboundAuditStatus.Event.ABANDON)
+            .handle(OutboundAbandonTransitionHandler.class);
+
         // 同意
         builder.externalTransition()
             .from(WmsOutboundAuditStatus.AUDITING.getValue())
@@ -65,12 +74,12 @@ public class OutboundStateMachineConfigure {
             .from(WmsOutboundAuditStatus.PASS.getValue())
             .to(WmsOutboundAuditStatus.FINISHED.getValue())
             .on(WmsOutboundAuditStatus.Event.FINISH)
-            .handle(OutboundExecuteTransitionHandler.class);
+            .handle(OutboundFinishTransitionHandler.class);
 
         // 失败处理
         builder.setFailCallback(OutboundTransitionFailCallback.class);
 
-        return builder.build(OutboundStateMachineConfigure.STATE_MACHINE_NAME,c->c.data().getAuditStatus());
+        return builder.build(OutboundStateMachineConfigure.STATE_MACHINE_NAME,ctx -> ctx.data().getAuditStatus());
 
     }
 

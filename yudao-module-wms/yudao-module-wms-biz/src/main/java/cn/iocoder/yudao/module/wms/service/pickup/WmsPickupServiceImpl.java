@@ -20,8 +20,10 @@ import cn.iocoder.yudao.module.wms.dal.mysql.pickup.WmsPickupMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.pickup.item.WmsPickupItemMapper;
 import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
+import cn.iocoder.yudao.module.wms.enums.pickup.WmsPickupCause;
 import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
+import cn.iocoder.yudao.module.wms.service.pickup.item.WmsPickupItemService;
 import cn.iocoder.yudao.module.wms.service.quantity.PickupExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.context.PickupContext;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
@@ -31,19 +33,12 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_ITEM_INBOUND_ITEM_ID_REPEATED;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_ITEM_INBOUND_ITEM_ID_WAREHOUSE_ID_NOT_SAME;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_ITEM_NOT_EXISTS;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_ITEM_QTY_ERROR;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_NOT_EXISTS;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.PICKUP_NO_DUPLICATE;
+import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.*;
 
 /**
  * 拣货单 Service 实现类
@@ -87,13 +82,21 @@ public class WmsPickupServiceImpl implements WmsPickupService {
     @Lazy
     private WmsWarehouseService warehouseService;
 
+    @Resource
+    @Lazy
+    private WmsPickupItemService pickupItemService;
+
     /**
      * @sign : E7A4B1135281D8DB
      */
     @Override
     public WmsPickupDO createPickup(WmsPickupSaveReqVO createReqVO) {
-        // 设置单据号
-        String no = noRedisDAO.generate(WmsNoRedisDAO.PICKUP_NO_PREFIX, 3);
+        if(createReqVO.getCause()==null) {
+            createReqVO.setCause(WmsPickupCause.PICKUP.getValue());
+        }
+        WmsPickupCause cause = WmsPickupCause.parse(createReqVO.getCause());
+         // 设置单据号
+        String no = noRedisDAO.generate(WmsNoRedisDAO.PICKUP_NO_PREFIX, 6);
         createReqVO.setCode(no);
         if (pickupMapper.getByNo(createReqVO.getCode()) != null) {
             throw exception(PICKUP_NO_DUPLICATE);
@@ -116,7 +119,7 @@ public class WmsPickupServiceImpl implements WmsPickupService {
         }
         WmsPickupDO pickup = BeanUtils.toBean(createReqVO, WmsPickupDO.class);
         // 校验入库单与仓位的仓库必须是同一个仓库
-        List<WmsInboundItemDO> inboundItemDOList = processAndValidateForPickIn(pickup, toInsetList);
+        List<WmsInboundItemDO> inboundItemDOList = processAndValidateForPickIn(pickup, toInsetList,cause);
         WmsPickupServiceImpl proxy = SpringUtils.getBeanByExactType(WmsPickupServiceImpl.class);
         AtomicReference<WmsPickupDO> pickupDO = new AtomicReference<>();
         lockRedisDAO.lockByWarehouse(pickup.getWarehouseId(), () -> {
@@ -153,19 +156,19 @@ public class WmsPickupServiceImpl implements WmsPickupService {
         pickupExecutor.execute(context);
     }
 
-    private List<WmsInboundItemDO> processAndValidateForPickIn(WmsPickupDO pickup, List<WmsPickupItemDO> toInsetList) {
+    private List<WmsInboundItemDO> processAndValidateForPickIn(WmsPickupDO pickup, List<WmsPickupItemDO> toInsetList,WmsPickupCause cause) {
         // 准备数据
         List<Long> inboundItemIdList = StreamX.from(toInsetList).toList(WmsPickupItemDO::getInboundItemId);
         List<WmsInboundItemDO> inboundItemDOList = inboundItemService.selectByIds(inboundItemIdList);
         List<Long> inboundIdList = StreamX.from(inboundItemDOList).toList(WmsInboundItemDO::getInboundId);
         List<WmsInboundDO> inboundDOList = inboundService.selectByIds(inboundIdList);
         Set<Long> warehouseIdSetOfInboundItem = StreamX.from(inboundDOList).toSet(WmsInboundDO::getWarehouseId);
-        List<Long> binIdList = StreamX.from(toInsetList).toList(WmsPickupItemDO::getBinId);
+        Set<Long> binIdList = StreamX.from(toInsetList).toSet(WmsPickupItemDO::getBinId);
         List<WmsWarehouseBinDO> wmsWarehouseBinDOList = wmsWarehouseBinService.selectByIds(binIdList);
         Set<Long> warehouseIdSetOfBin = StreamX.from(wmsWarehouseBinDOList).toSet(WmsWarehouseBinDO::getWarehouseId);
         // 校验仓库
         if (warehouseIdSetOfInboundItem.size() != 1) {
-            throw exception(PICKUP_ITEM_INBOUND_ITEM_ID_WAREHOUSE_ID_NOT_SAME);
+            throw exception(PICKUP_ITEM_SINGLE_WAREHOUSE_ALLOW);
         }
         if (warehouseIdSetOfBin.size() != 1) {
             throw exception(PICKUP_ITEM_INBOUND_ITEM_ID_WAREHOUSE_ID_NOT_SAME);
@@ -177,8 +180,10 @@ public class WmsPickupServiceImpl implements WmsPickupService {
         }
         // 校验数量
         for (WmsPickupItemDO itemDO : toInsetList) {
-            if (itemDO.getQty() == null || itemDO.getQty() <= 0) {
-                throw exception(PICKUP_ITEM_QTY_ERROR);
+            if (cause == WmsPickupCause.PICKUP || cause == WmsPickupCause.STOCKCHECK) {
+                if (itemDO.getQty() == null || itemDO.getQty() <= 0) {
+                    throw exception(PICKUP_ITEM_QTY_ERROR);
+                }
             }
         }
         // 设置仓库ID
@@ -213,7 +218,7 @@ public class WmsPickupServiceImpl implements WmsPickupService {
             // 保存详情
             pickupItemMapper.insertBatch(toInsetList);
             pickupItemMapper.updateBatch(toUpdateList);
-            pickupItemMapper.deleteBatchIds(toDeleteList);
+            pickupItemMapper.deleteByIds(toDeleteList);
         }
         // 更新
         WmsPickupDO pickup = BeanUtils.toBean(updateReqVO, WmsPickupDO.class);
@@ -274,7 +279,14 @@ public class WmsPickupServiceImpl implements WmsPickupService {
     }
 
     @Override
-    public void createForInventory(WmsPickupSaveReqVO pickupSaveReqVO) {
+    public void createForStockCheck(WmsPickupSaveReqVO pickupSaveReqVO) {
+        pickupSaveReqVO.setCause(WmsPickupCause.STOCKCHECK.getValue());
         this.createPickup(pickupSaveReqVO);
     }
-}
+
+    @Override
+    public void createForBinMove(WmsPickupSaveReqVO pickupSaveReqVO) {
+        pickupSaveReqVO.setCause(WmsPickupCause.BIN_MOVE.getValue());
+        this.createPickup(pickupSaveReqVO);
+    }
+}

@@ -9,10 +9,7 @@ import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
-import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundPageReqVO;
-import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
-import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundSaveReqVO;
-import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundSimpleRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.outbound.WmsOutboundService;
@@ -26,16 +23,11 @@ import jakarta.validation.Valid;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.io.IOException;
 import java.util.List;
+
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -60,6 +52,16 @@ public class WmsOutboundController {
     @PreAuthorize("@ss.hasPermission('wms:outbound:create')")
     public CommonResult<Long> createOutbound(@Validated(ValidationGroup.create.class) @RequestBody WmsOutboundSaveReqVO createReqVO) {
         return success(outboundService.createOutbound(createReqVO).getId());
+    }
+
+    /**
+     * @sign : 3E40A4073A9BDC00
+     */
+    @PostMapping("/generate")
+    @Operation(summary = "根据入库单号生成出库单")
+    @PreAuthorize("@ss.hasPermission('wms:outbound:generate')")
+    public CommonResult<Long> generateOutbound(@Validated(ValidationGroup.create.class) @RequestBody WmsOutboundImportReqVO importReqVO) {
+        return success(outboundService.generateOutbound(importReqVO).getId());
     }
 
     /**
@@ -94,6 +96,11 @@ public class WmsOutboundController {
         WmsOutboundRespVO outboundVO = outboundService.getOutboundWithItemList(id);
         // 装配出库仓位
         outboundItemService.assembleBin(outboundVO.getItemList());
+        // 人员姓名填充
+        AdminUserApi.inst().prepareFill(List.of(outboundVO))
+                .mapping(WmsOutboundRespVO::getCreator, WmsOutboundRespVO::setCreatorName)
+                .mapping(WmsOutboundRespVO::getUpdater, WmsOutboundRespVO::setUpdaterName)
+                .fill();
         // 返回
         return success(outboundVO);
     }
@@ -156,11 +163,15 @@ public class WmsOutboundController {
         return success(true);
     }
 
+    /**
+     * 同意出库单审批 并完成出库
+     */
     @PutMapping("/agree")
-    @Operation(summary = "同意审批")
+    @Operation(summary = "同意出库")
     @PreAuthorize("@ss.hasPermission('wms:outbound:agree')")
     public CommonResult<Boolean> agree(@RequestBody WmsApprovalReqVO approvalReqVO) {
         outboundService.approve(WmsOutboundAuditStatus.Event.AGREE, approvalReqVO);
+        outboundService.approve(WmsOutboundAuditStatus.Event.FINISH, approvalReqVO);
         return success(true);
     }
 
@@ -172,6 +183,14 @@ public class WmsOutboundController {
         return success(true);
     }
 
+    @PutMapping("/abandon")
+    @Operation(summary = "废弃审批")
+    @PreAuthorize("@ss.hasPermission('wms:outbound:abandon')")
+    public CommonResult<Boolean> abandon(@RequestBody WmsApprovalReqVO approvalReqVO) {
+        outboundService.approve(WmsOutboundAuditStatus.Event.ABANDON, approvalReqVO);
+        return success(true);
+    }
+
     @PutMapping("/finish")
     @Operation(summary = "完成出库")
     @PreAuthorize("@ss.hasPermission('wms:outbound:finish')")
@@ -179,4 +198,4 @@ public class WmsOutboundController {
         outboundService.approve(WmsOutboundAuditStatus.Event.FINISH, approvalReqVO);
         return success(true);
     }
-}
+}

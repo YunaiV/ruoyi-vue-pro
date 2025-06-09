@@ -8,13 +8,11 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
-
 import java.time.LocalDateTime;
-
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : tenant_id,creator,update_time,bin_move_id,create_time,product_id,qty,id,from_bin_id,to_bin_id,updater
+ * @table-fields : tenant_id,creator,update_time,bin_move_id,create_time,product_id,qty,remark,id,from_bin_id,to_bin_id,updater
  */
 @Schema(description = "管理后台 - 库位移动详情 Response VO")
 @Data
@@ -66,7 +64,6 @@ public class WmsStockBinMoveItemRespVO {
     @ExcelProperty("更新者")
     private String updater;
 
-
     @Schema(description = "来源库位", example = "")
     private WmsWarehouseBinRespVO fromBin;
 
@@ -78,4 +75,8 @@ public class WmsStockBinMoveItemRespVO {
 
     @Schema(description = "主单", example = "")
     private WmsStockBinMoveSimpleRespVO binMove;
+
+    @Schema(description = "备注", example = "")
+    @ExcelProperty("备注")
+    private String remark;
 }

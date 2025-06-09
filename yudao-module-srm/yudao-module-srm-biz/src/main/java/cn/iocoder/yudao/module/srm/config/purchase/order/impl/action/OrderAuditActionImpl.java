@@ -38,7 +38,7 @@ public class OrderAuditActionImpl implements Action<SrmAuditStatus, SrmEventEnum
             if (event == SrmEventEnum.AGREE || event == SrmEventEnum.REJECT) {
                 orderDO.setAuditTime(LocalDateTime.now());
                 orderDO.setAuditorId(getLoginUserId());
-                orderDO.setReviewComment(reqVO.getReviewComment());//审核意见
+                orderDO.setAuditAdvice(reqVO.getAuditAdvice());//审核意见
             }
             //            orderDO.setReviewComment(reqVO.getReviewComment()); DB添加字段
             ThrowUtil.ifSqlThrow(mapper.updateById(orderDO), DB_UPDATE_ERROR);

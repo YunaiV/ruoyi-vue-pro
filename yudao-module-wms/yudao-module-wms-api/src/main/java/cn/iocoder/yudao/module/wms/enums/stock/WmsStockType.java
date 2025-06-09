@@ -16,7 +16,7 @@ public enum WmsStockType implements ArrayValuable<Integer>, DictEnum {
 
     WAREHOUSE(1, "仓库库存"),
     BIN(2, "仓位库存"),
-    OWNERSHIP(3, "所有者库存"),
+    LOGIC(3, "逻辑库存"),
    ;
 
     public static final Integer[] VALUES = Arrays.stream(values()).map(WmsStockType::getValue).toArray(Integer[]::new);

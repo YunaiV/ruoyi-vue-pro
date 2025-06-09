@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.tms.dal.mysql.logistic.customrule;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -15,6 +16,7 @@ import jakarta.validation.constraints.NotNull;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -43,7 +45,7 @@ public interface TmsCustomRuleMapper extends BaseMapperX<TmsCustomRuleDO> {
     }
 
     //海关分类
-    private MPJLambdaWrapper<TmsCustomRuleDO> getBOWrapper(@NotNull TmsCustomRulePageReqVO reqVO) {
+    private MPJLambdaWrapper<TmsCustomRuleDO> buildBOWrapper(@NotNull TmsCustomRulePageReqVO reqVO) {
         return bindQueryWrapper(reqVO)
             .leftJoin(TmsCustomCategoryDO.class, TmsCustomCategoryDO::getId, TmsCustomProductDO::getCustomCategoryId)
             .likeIfExists(TmsCustomCategoryDO::getDeclaredType, reqVO.getDeclaredType())  // 申报品名
@@ -88,7 +90,7 @@ public interface TmsCustomRuleMapper extends BaseMapperX<TmsCustomRuleDO> {
      * @return List<TmsCustomRuleDO>
      */
     default List<TmsCustomRuleBO> selectByProductId(@NotNull List<Long> productIds) {
-        MPJLambdaWrapper<TmsCustomRuleDO> boWrapper = getBOWrapper(new TmsCustomRulePageReqVO());
+        MPJLambdaWrapper<TmsCustomRuleDO> boWrapper = buildBOWrapper(new TmsCustomRulePageReqVO());
         boWrapper.in(TmsCustomRuleDO::getProductId, productIds);
         return selectJoinList(TmsCustomRuleBO.class, boWrapper);
     }
@@ -96,17 +98,17 @@ public interface TmsCustomRuleMapper extends BaseMapperX<TmsCustomRuleDO> {
 
     // 分页查询 TmsCustomRuleBO 海关规则数据(3表联查)海关规则->产品->分类 ，不关联国家查询
     default PageResult<TmsCustomRuleBO> selectBOPage(@NotNull TmsCustomRulePageReqVO reqVO) {
-        return selectJoinPage(reqVO, TmsCustomRuleBO.class, getBOWrapper(reqVO));
+        return selectJoinPage(reqVO, TmsCustomRuleBO.class, buildBOWrapper(reqVO));
     }
 
     // list查询 TmsCustomRuleBO 海关规则数据(3表联查)海关规则->产品->分类，不关联国家查询
     default List<TmsCustomRuleBO> selectBOList(@NotNull TmsCustomRulePageReqVO reqVO) {
-        return selectJoinList(TmsCustomRuleBO.class, getBOWrapper(reqVO));
+        return selectJoinList(TmsCustomRuleBO.class, buildBOWrapper(reqVO));
     }
 
     //关联国家查询 customCategoryId
     default List<TmsCustomRuleBO> selectBOListEqCountryCodeByCategoryId(@NotNull TmsCustomRulePageReqVO reqVO, @NotNull Long customCategoryId) {
-        return selectJoinList(TmsCustomRuleBO.class, getBOWrapper(reqVO)
+        return selectJoinList(TmsCustomRuleBO.class, buildBOWrapper(reqVO)
             .eq(TmsCustomRuleDO::getCountryCode, TmsCustomCategoryItemDO::getCountryCode)
             .eq(TmsCustomCategoryItemDO::getCustomCategoryId, customCategoryId)
         );
@@ -114,7 +116,7 @@ public interface TmsCustomRuleMapper extends BaseMapperX<TmsCustomRuleDO> {
 
     //关联国家查询 customCategoryItemId
     default List<TmsCustomRuleBO> selectBOListEqCountryCodeByItemId(@NotNull TmsCustomRulePageReqVO reqVO, @NotNull List<Long> customCategoryItemId) {
-        return selectJoinList(TmsCustomRuleBO.class, getBOWrapper(reqVO)
+        return selectJoinList(TmsCustomRuleBO.class, buildBOWrapper(reqVO)
             .eq(TmsCustomRuleDO::getCountryCode, TmsCustomCategoryItemDO::getCountryCode)
             .in(TmsCustomCategoryItemDO::getId, customCategoryItemId)
         );
@@ -122,7 +124,7 @@ public interface TmsCustomRuleMapper extends BaseMapperX<TmsCustomRuleDO> {
 
     //查到TmsCustomRuleBO通过id 关联国家查询
     default TmsCustomRuleBO getCustomRuleBOById(@NotNull Long id) {
-        MPJLambdaWrapper<TmsCustomRuleDO> wrapper = getBOWrapper(new TmsCustomRulePageReqVO());
+        MPJLambdaWrapper<TmsCustomRuleDO> wrapper = buildBOWrapper(new TmsCustomRulePageReqVO());
         wrapper.eq(TmsCustomRuleDO::getId, id);
         //根据海关规则的国别1-1映射 分类子表
         wrapper.eq(TmsCustomRuleDO::getCountryCode, TmsCustomCategoryItemDO::getCountryCode);
@@ -131,11 +133,21 @@ public interface TmsCustomRuleMapper extends BaseMapperX<TmsCustomRuleDO> {
 
     //通过ids查TmsCustomRuleBO集合 关联国家查询1:1
     default List<TmsCustomRuleBO> selectCustomRuleBOByIds(Collection<Long> ids) {
-        MPJLambdaWrapper<TmsCustomRuleDO> wrapper = getBOWrapper(new TmsCustomRulePageReqVO());
+        MPJLambdaWrapper<TmsCustomRuleDO> wrapper = buildBOWrapper(new TmsCustomRulePageReqVO());
         if (ids != null) {
             wrapper.in(TmsCustomRuleDO::getId, ids);
         }
         wrapper.eq(TmsCustomRuleDO::getCountryCode, TmsCustomCategoryItemDO::getCountryCode);
         return this.selectJoinList(TmsCustomRuleBO.class, wrapper);
+    }
+
+    default List<TmsCustomRuleDO> selectListByCountryAndProductIds(Long countryCode, List<Long> productIds) {
+        if (CollUtil.isEmpty(productIds) || countryCode == null) {
+            return Collections.emptyList();
+        }
+        MPJLambdaWrapper<TmsCustomRuleDO> wrapper = bindQueryWrapper(new TmsCustomRulePageReqVO());
+        wrapper.eq(TmsCustomRuleDO::getCountryCode, countryCode);
+        wrapper.in(TmsCustomRuleDO::getProductId, productIds);
+        return selectList(wrapper);
     }
 }

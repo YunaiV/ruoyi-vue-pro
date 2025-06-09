@@ -2,12 +2,13 @@ package cn.iocoder.yudao.module.wms.service.quantity;
 
 import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
+import cn.iocoder.yudao.module.system.enums.somle.BillType;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.stock.ownership.WmsStockOwnershipDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.stock.logic.WmsStockLogicDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockFlowDirection;
@@ -23,9 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_BIN_NOT_ENOUGH;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_OWNERSHIP_NOT_ENOUGH;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.STOCK_WAREHOUSE_NOT_ENOUGH;
+import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.*;
 
 /**
  * @author: LeeFJ
@@ -72,10 +71,12 @@ public class OutboundRejectExecutor extends OutboundExecutor {
     /**
      * 更新入库单明细
      **/
-    protected void processInboundItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
+    @Override
+    protected List<WmsInboundItemFlowDO> processInboundItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
 
 
-        List<WmsInboundItemFlowDO> flowDOList = inboundItemFlowService.selectByActionId(outboundRespVO.getLatestOutboundActionId());
+//        List<WmsInboundItemFlowDO> flowDOList = inboundItemFlowService.selectByActionId(outboundRespVO.getLatestOutboundActionId());
+        List<WmsInboundItemFlowDO> flowDOList = inboundItemFlowService.selectByOutboundId(outboundId, productId);
 
         Long actionId= IdUtil.getSnowflakeNextId();
         outboundRespVO.setLatestOutboundActionId(actionId);
@@ -86,7 +87,7 @@ public class OutboundRejectExecutor extends OutboundExecutor {
         Map<Long,WmsInboundItemDO> map=StreamX.from(inboundItemsList).toMap(WmsInboundItemDO::getId);
         for (WmsInboundItemFlowDO flowDO : flowDOList) {
             WmsInboundItemDO inboundItemDO = map.get(flowDO.getInboundItemId());
-            Integer qty=flowDO.getOutboundQty();
+            Integer qty=flowDO.getOutboundAvailableDeltaQty();
             inboundItemDO.setOutboundAvailableQty(inboundItemDO.getOutboundAvailableQty()+qty);
 
             //
@@ -95,28 +96,39 @@ public class OutboundRejectExecutor extends OutboundExecutor {
             newFlowDO.setInboundId(inboundItemDO.getInboundId());
             newFlowDO.setInboundItemId(inboundItemDO.getId());
             newFlowDO.setProductId(inboundItemDO.getProductId());
-            newFlowDO.setOutboundQty(qty);
-            newFlowDO.setOutboundId(outboundId);
-            newFlowDO.setOutboundItemId(outboundItemId);
+
+            newFlowDO.setBillType(BillType.WMS_OUTBOUND.getValue());
+            newFlowDO.setBillId(outboundRespVO.getId());
+            newFlowDO.setBillItemId(item.getId());
+
+            newFlowDO.setDirection(WmsStockFlowDirection.IN.getValue());
+            newFlowDO.setOutboundAvailableDeltaQty(qty);
+            newFlowDO.setOutboundAvailableQty(inboundItemDO.getOutboundAvailableQty());
+
+//            newFlowDO.setOutboundQty(qty);
+//            newFlowDO.setOutboundId(outboundId);
+//            newFlowDO.setOutboundItemId(outboundItemId);
             inboundItemFlowList.add(newFlowDO);
 
         }
         // 保存详情与流水
         inboundItemService.saveItems(inboundItemsList,inboundItemFlowList);
 
+        return inboundItemFlowList;
+
     }
 
     /**
-     * 更新所有者库存
+     * 更新逻辑库存
      **/
     @Override
-    protected  WmsStockFlowDirection updateStockOwnershipQty(WmsStockOwnershipDO stockOwnershipDO,WmsOutboundItemRespVO item,  Integer quantity) {
+    protected WmsStockFlowDirection updateStockLogicQty(WmsStockLogicDO stockLogicDO, WmsOutboundItemRespVO item, Integer quantity) {
         // 可用量
-        // stockOwnershipDO.setAvailableQty(stockOwnershipDO.getAvailableQty() + quantity);
+        // stockLogicDO.setAvailableQty(stockLogicDO.getAvailableQty() + quantity);
         // 待出库量
-        stockOwnershipDO.setOutboundPendingQty(stockOwnershipDO.getOutboundPendingQty() - quantity);
-        if(stockOwnershipDO.getOutboundPendingQty()<0) {
-            throw exception(STOCK_OWNERSHIP_NOT_ENOUGH);
+        stockLogicDO.setOutboundPendingQty(stockLogicDO.getOutboundPendingQty() - quantity);
+        if (stockLogicDO.getOutboundPendingQty() < 0) {
+            throw exception(STOCK_LOGIC_NOT_ENOUGH);
         }
         return WmsStockFlowDirection.IN;
     }

@@ -1,15 +1,19 @@
 package cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
- * @table-fields : country,code,contact_phone,create_time,city,contact_person,postcode,is_sync,mode,external_storage_id,address_line2,province,address_line1,company_name,name,status
+ * @author jisencai
+ * @table-fields : country,code,contact_phone,create_time,city,contact_person,postcode,is_sync,mode,external_storage_id,address_line2,province,address_line1,address_line3,name,status
  */
 @Schema(description = "管理后台 - 仓库分页 Request VO")
 @Data
@@ -29,8 +33,8 @@ public class WmsWarehousePageReqVO extends PageParam {
     @Schema(description = "外部存储ID", example = "22814")
     private Long externalStorageId;
 
-    @Schema(description = "公司名称", example = "张三")
-    private String companyName;
+    @Schema(description = "详细地址3", example = "张三")
+    private String addressLine3;
 
     @Schema(description = "国家")
     private String country;

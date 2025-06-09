@@ -61,7 +61,7 @@ public class SrmSupplierDO extends BaseDO {
      * <p>
      * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum}
      */
-    private Integer status;
+    private Integer openStatus;
     /**
      * 排序
      */
@@ -73,7 +73,7 @@ public class SrmSupplierDO extends BaseDO {
     /**
      * 税率
      */
-    private BigDecimal taxPercent;
+    private BigDecimal taxRate;
     /**
      * 开户行
      */
@@ -88,9 +88,9 @@ public class SrmSupplierDO extends BaseDO {
     private String bankAddress;
 
     /**
-     * 付款条款
+     * 付款条款ID
      */
-    private String paymentTerms;
+    private Long paymentTermsId;
 
     /**
      * 送达地址

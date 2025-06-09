@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.fms.dal.dataobject.finance;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.erp.enums.status.ErpAuditStatus;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -37,7 +36,7 @@ public class FmsFinancePaymentDO extends BaseDO {
     /**
      * 付款状态
      * <p>
-     * 枚举 {@link ErpAuditStatus}
+     * 枚举 {@link cn.iocoder.yudao.module.fms.api.status.FmsAuditStatus}
      */
     private Integer status;
     /**

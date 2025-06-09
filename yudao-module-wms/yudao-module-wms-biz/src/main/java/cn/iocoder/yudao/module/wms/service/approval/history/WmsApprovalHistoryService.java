@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsAppro
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalHistoryRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalHistorySaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.approval.history.WmsApprovalHistoryDO;
-import cn.iocoder.yudao.module.wms.enums.common.WmsBillType;
+import cn.iocoder.yudao.module.system.enums.somle.BillType;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -56,5 +56,12 @@ public interface WmsApprovalHistoryService {
      */
     PageResult<WmsApprovalHistoryDO> getApprovalHistoryPage(WmsApprovalHistoryPageReqVO pageReqVO);
 
-    Map<Long, List<WmsApprovalHistoryRespVO>> selectGroupedApprovalHistory(WmsBillType wmsBillType, List<Long> billIds);
+    /**
+     * 指定单据类型，返回按单据ID分组的审批历史
+     *
+     * @param billType 单据类型
+     * @param billIds 单据ID清单
+     * @return 审批历史分页
+     */
+    Map<Long, List<WmsApprovalHistoryRespVO>> selectGroupedApprovalHistory(BillType billType, List<Long> billIds);
 }

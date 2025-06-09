@@ -1,16 +1,15 @@
 package cn.iocoder.yudao.module.wms.dal.dataobject.outbound.item;
 
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
 
 /**
  * 出库单详情 DO
  * @author 李方捷
- * @table-fields : company_id,outbound_status,actual_qty,bin_id,plan_qty,product_id,upstream_item_id,remark,id,dept_id,outbound_id
+ * @table-fields : company_id,outbound_status,actual_qty,bin_id,plan_qty,product_id,upstream_id,remark,id,dept_id,outbound_id
  */
 @TableName("wms_outbound_item")
 // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
@@ -75,7 +74,7 @@ public class WmsOutboundItemDO extends BaseDO {
     private String remark;
 
     /**
-     * 来源详情ID
+     * 来源明细行ID
      */
-    private Long upstreamItemId;
+    private Long upstreamId;
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo;
 
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.zone.vo.WmsWarehouseZoneSimpleRespVO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -36,5 +37,9 @@ public class WmsWarehouseBinSimpleRespVO {
     @Schema(description = "拣货顺序")
     @ExcelProperty("拣货顺序")
     private Integer pickingOrder;
+
+    @Schema(description = "库区")
+    @ExcelProperty("库区")
+    private WmsWarehouseZoneSimpleRespVO zone;
 
 }

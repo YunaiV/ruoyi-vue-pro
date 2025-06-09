@@ -1,14 +1,14 @@
 package cn.iocoder.yudao.module.wms.service.stock.warehouse;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehousePageReqVO;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehouseRespVO;
-import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.WmsStockWarehouseSaveReqVO;
+import cn.iocoder.yudao.module.wms.api.warehouse.dto.WmsWarehouseQueryDTO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.warehouse.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 仓库库存 Service 接口
@@ -26,11 +26,11 @@ public interface WmsStockWarehouseService {
     WmsStockWarehouseDO createStockWarehouse(@Valid WmsStockWarehouseSaveReqVO createReqVO);
 
     /**
-     * 更新仓库库存
+     * 更新仓库库信息(在制数量)
      *
      * @param updateReqVO 更新信息
      */
-    WmsStockWarehouseDO updateStockWarehouse(@Valid WmsStockWarehouseSaveReqVO updateReqVO);
+    void updateStockWarehouse(@Valid WmsStockWarehouseSaveReqVO updateReqVO);
 
     /**
      * 删除仓库库存
@@ -70,4 +70,23 @@ public interface WmsStockWarehouseService {
     List<WmsStockWarehouseDO> selectByWarehouse(@NotNull(message = "仓库ID不能为空") Long warehouseId);
 
     List<WmsStockWarehouseDO> getByProductIds(Long warehouseId, List<Long> list);
+
+    List<WmsStockWarehouseDO> selectStockWarehouse(List<WmsWarehouseProductVO> wmsWarehouseProductVOList);
+
+    PageResult<WmsStockWarehouseProductRespVO> getStockGroupedWarehousePage(@Valid WmsStockWarehousePageReqVO pageReqVO);
+
+    /**
+     * 按 ID 集合查询 WmsStockWarehouseDO
+     */
+    List<WmsStockWarehouseDO> selectByIds(List<Long> idList);
+
+    /**
+     * 查询可售库存
+     *
+     * @param wmsWarehouseQueryDTO 入参
+     * @return 可售库存列表
+     */
+    Map<Long, List<WmsStockWarehouseDO>> selectSellableQty(WmsWarehouseQueryDTO wmsWarehouseQueryDTO);
+
+    List<WmsStockWarehouseDO> selectSellableQtyList(WmsWarehouseQueryDTO wmsWarehouseQueryDTO);
 }

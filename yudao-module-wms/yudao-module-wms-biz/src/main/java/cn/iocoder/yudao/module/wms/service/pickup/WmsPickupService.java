@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.pickup.vo.WmsPickupRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.pickup.vo.WmsPickupSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.WmsPickupDO;
 import jakarta.validation.Valid;
+
 import java.util.List;
 
 /**
@@ -57,5 +58,7 @@ public interface WmsPickupService {
 
     void assembleWarehouse(List<WmsPickupRespVO> list);
 
-    void createForInventory(WmsPickupSaveReqVO pickupSaveReqVO);
+    void createForStockCheck(WmsPickupSaveReqVO pickupSaveReqVO);
+
+    void createForBinMove(WmsPickupSaveReqVO pickupSaveReqVO);
 }

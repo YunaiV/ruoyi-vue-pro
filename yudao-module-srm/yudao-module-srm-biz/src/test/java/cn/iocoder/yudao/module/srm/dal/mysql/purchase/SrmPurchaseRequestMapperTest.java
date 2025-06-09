@@ -19,7 +19,7 @@ class SrmPurchaseRequestMapperTest extends BaseDbUnitTest {
     @Test
     void selectPage() {
         SrmPurchaseRequestPageReqVO vo = new SrmPurchaseRequestPageReqVO();
-        vo.setBarCode("W11F7142L");
+        vo.setProductCode("W11F7142L");
         PageResult<SrmPurchaseRequestDO> page = srmPurchaseRequestMapper.selectPage(vo);
         //log
         log.info("page:{}", page);

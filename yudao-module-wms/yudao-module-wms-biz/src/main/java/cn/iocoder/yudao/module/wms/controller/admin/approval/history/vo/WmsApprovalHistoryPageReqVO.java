@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
+
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
@@ -17,7 +20,7 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class WmsApprovalHistoryPageReqVO extends PageParam {
 
-    @Schema(description = "来源单据类型 ; BillType : 0-入库单 , 1-出库单", example = "2")
+    @Schema(implementation = Long.class, description = "来源单据类型 ; BillType : 0-入库单 , 1-出库单", example = "2")
     private Integer billType;
 
     @Schema(description = "业务单据ID", example = "29844")

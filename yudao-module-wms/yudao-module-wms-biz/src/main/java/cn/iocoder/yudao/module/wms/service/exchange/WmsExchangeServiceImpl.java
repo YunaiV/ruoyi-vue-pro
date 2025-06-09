@@ -1,17 +1,27 @@
 package cn.iocoder.yudao.module.wms.service.exchange;
 
+import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
+import cn.iocoder.yudao.framework.cola.statemachine.builder.TransitionContext;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.system.enums.somle.BillType;
+import cn.iocoder.yudao.module.wms.config.ExchangeStateMachineConfigure;
+import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.exchange.vo.WmsExchangePageReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.exchange.vo.WmsExchangeRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.exchange.vo.WmsExchangeSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.exchange.WmsExchangeDO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.exchange.defective.WmsExchangeDefectiveDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.exchange.item.WmsExchangeItemDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.exchange.WmsExchangeMapper;
-import cn.iocoder.yudao.module.wms.dal.mysql.exchange.defective.WmsExchangeDefectiveMapper;
+import cn.iocoder.yudao.module.wms.dal.mysql.exchange.item.WmsExchangeItemMapper;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
+import cn.iocoder.yudao.module.wms.enums.WmsConstants;
 import cn.iocoder.yudao.module.wms.enums.exchange.WmsExchangeAuditStatus;
+import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -20,14 +30,11 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.EXCHANGE_CAN_NOT_DELETE;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.EXCHANGE_CAN_NOT_EDIT;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.EXCHANGE_CODE_DUPLICATE;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.EXCHANGE_DEFECTIVE_EXISTS;
-import static cn.iocoder.yudao.module.wms.enums.ErrorCodeConstants.EXCHANGE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.*;
 
 /**
  * 换货单 Service 实现类
@@ -40,13 +47,21 @@ public class WmsExchangeServiceImpl implements WmsExchangeService {
 
     @Resource
     @Lazy
-    private WmsExchangeDefectiveMapper exchangeDefectiveMapper;
+    private WmsExchangeItemMapper exchangeItemMapper;
 
     @Resource
     private WmsNoRedisDAO noRedisDAO;
 
     @Resource
     private WmsExchangeMapper exchangeMapper;
+
+    @Resource
+    @Lazy
+    private WmsWarehouseService warehouseService;
+
+    @Resource(name = ExchangeStateMachineConfigure.STATE_MACHINE_NAME)
+    private StateMachine<Integer, WmsExchangeAuditStatus.Event, TransitionContext<WmsExchangeDO>> exchangeStateMachine;
+
 
     /**
      * @sign : 48FA5E8619B15D35
@@ -55,7 +70,7 @@ public class WmsExchangeServiceImpl implements WmsExchangeService {
     @Transactional(rollbackFor = Exception.class)
     public WmsExchangeDO createExchange(WmsExchangeSaveReqVO createReqVO) {
         // 设置单据号
-        String code = noRedisDAO.generate(WmsNoRedisDAO.EXCHANGE_NO_PREFIX, 3);
+        String code = noRedisDAO.generate(WmsNoRedisDAO.EXCHANGE_NO_PREFIX, 6);
         createReqVO.setCode(code);
         createReqVO.setAuditStatus(WmsExchangeAuditStatus.DRAFT.getValue());
         if (exchangeMapper.getByCode(createReqVO.getCode()) != null) {
@@ -65,20 +80,20 @@ public class WmsExchangeServiceImpl implements WmsExchangeService {
         WmsExchangeDO exchange = BeanUtils.toBean(createReqVO, WmsExchangeDO.class);
         exchangeMapper.insert(exchange);
         // 保存良次换货详情详情
-        if (createReqVO.getDefectiveList() != null) {
-            List<WmsExchangeDefectiveDO> toInsetList = new ArrayList<>();
-            StreamX.from(createReqVO.getDefectiveList()).filter(Objects::nonNull).forEach(item -> {
+        if (createReqVO.getItemList() != null) {
+            List<WmsExchangeItemDO> toInsetList = new ArrayList<>();
+            StreamX.from(createReqVO.getItemList()).filter(Objects::nonNull).forEach(item -> {
                 item.setId(null);
                 // 设置归属
                 item.setExchangeId(exchange.getId());
-                toInsetList.add(BeanUtils.toBean(item, WmsExchangeDefectiveDO.class));
+                toInsetList.add(BeanUtils.toBean(item, WmsExchangeItemDO.class));
             });
             // 校验 toInsetList 中是否有重复的 productId
-            boolean isProductIdRepeated = StreamX.isRepeated(toInsetList, WmsExchangeDefectiveDO::getProductId);
+            boolean isProductIdRepeated = StreamX.isRepeated(toInsetList, WmsExchangeItemDO::getProductId);
             if (isProductIdRepeated) {
-                throw exception(EXCHANGE_DEFECTIVE_EXISTS);
+                throw exception(EXCHANGE_ITEM_EXISTS);
             }
-            exchangeDefectiveMapper.insertBatch(toInsetList);
+            exchangeItemMapper.insertBatch(toInsetList);
         }
         // 返回
         return exchange;
@@ -100,28 +115,28 @@ public class WmsExchangeServiceImpl implements WmsExchangeService {
         // 单据号不允许被修改
         updateReqVO.setCode(exists.getCode());
         // 保存良次换货详情详情
-        if (updateReqVO.getDefectiveList() != null) {
-            List<WmsExchangeDefectiveDO> existsInDB = exchangeDefectiveMapper.selectByExchangeId(updateReqVO.getId());
-            StreamX.CompareResult<WmsExchangeDefectiveDO> compareResult = StreamX.compare(existsInDB, BeanUtils.toBean(updateReqVO.getDefectiveList(), WmsExchangeDefectiveDO.class), WmsExchangeDefectiveDO::getId);
-            List<WmsExchangeDefectiveDO> toInsetList = compareResult.getTargetMoreThanBaseList();
-            List<WmsExchangeDefectiveDO> toUpdateList = compareResult.getIntersectionList();
-            List<WmsExchangeDefectiveDO> toDeleteList = compareResult.getBaseMoreThanTargetList();
-            List<WmsExchangeDefectiveDO> finalList = new ArrayList<>();
+        if (updateReqVO.getItemList() != null) {
+            List<WmsExchangeItemDO> existsInDB = exchangeItemMapper.selectByExchangeId(updateReqVO.getId());
+            StreamX.CompareResult<WmsExchangeItemDO> compareResult = StreamX.compare(existsInDB, BeanUtils.toBean(updateReqVO.getItemList(), WmsExchangeItemDO.class), WmsExchangeItemDO::getId);
+            List<WmsExchangeItemDO> toInsetList = compareResult.getTargetMoreThanBaseList();
+            List<WmsExchangeItemDO> toUpdateList = compareResult.getIntersectionList();
+            List<WmsExchangeItemDO> toDeleteList = compareResult.getBaseMoreThanTargetList();
+            List<WmsExchangeItemDO> finalList = new ArrayList<>();
             finalList.addAll(toInsetList);
             finalList.addAll(toUpdateList);
             // 校验 toInsetList 中是否有重复的 productId
-            boolean isProductIdRepeated = StreamX.isRepeated(toInsetList, WmsExchangeDefectiveDO::getProductId);
+            boolean isProductIdRepeated = StreamX.isRepeated(toInsetList, WmsExchangeItemDO::getProductId);
             if (isProductIdRepeated) {
-                throw exception(EXCHANGE_DEFECTIVE_EXISTS);
+                throw exception(EXCHANGE_ITEM_EXISTS);
             }
             // 设置归属
             finalList.forEach(item -> {
                 item.setExchangeId(updateReqVO.getId());
             });
             // 保存详情
-            exchangeDefectiveMapper.insertBatch(toInsetList);
-            exchangeDefectiveMapper.updateBatch(toUpdateList);
-            exchangeDefectiveMapper.deleteBatchIds(toDeleteList);
+            exchangeItemMapper.insertBatch(toInsetList);
+            exchangeItemMapper.updateBatch(toUpdateList);
+            exchangeItemMapper.deleteByIds(toDeleteList);
         }
         // 更新
         WmsExchangeDO exchange = BeanUtils.toBean(updateReqVO, WmsExchangeDO.class);
@@ -174,10 +189,57 @@ public class WmsExchangeServiceImpl implements WmsExchangeService {
     /**
      * 按 ID 集合查询 WmsExchangeDO
      */
+    @Override
     public List<WmsExchangeDO> selectByIds(List<Long> idList) {
         if (CollectionUtils.isEmpty(idList)) {
             return List.of();
         }
         return exchangeMapper.selectByIds(idList);
+    }
+
+    /**
+     * 更新换货审批状态
+     **/
+    @Override
+    public WmsExchangeDO updateExchangeAuditStatus(Long id, Integer status) {
+        WmsExchangeDO exchangeDO = validateExchangeExists(id);
+        exchangeDO.setAuditStatus(status);
+        exchangeMapper.updateById(exchangeDO);
+        return exchangeDO;
+    }
+
+    /**
+     * 审批
+     **/
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void approve(WmsExchangeAuditStatus.Event event, WmsApprovalReqVO approvalReqVO) {
+        // 设置业务默认值
+        approvalReqVO.setBillType(BillType.WMS_EXCHANGE.getValue());
+        approvalReqVO.setStatusType(WmsExchangeAuditStatus.getType());
+        // 获得业务对象
+        WmsExchangeDO exchangeDO = validateExchangeExists(approvalReqVO.getBillId());
+        TransitionContext<WmsExchangeDO> ctx = TransitionContext.from(exchangeDO);
+        ctx.setExtra(WmsConstants.APPROVAL_REQ_VO_KEY, approvalReqVO);
+        // 触发事件
+        exchangeStateMachine.fireEvent(event, ctx);
+    }
+
+    /**
+     * 完成换货
+     **/
+    @Override
+    public void finishExchange(WmsExchangeDO exchangeDO, List<WmsExchangeItemDO> exchangeItemDOList) {
+         // 暂无实现逻辑
+    }
+
+    /**
+     * 组装仓库
+     **/
+    @Override
+    public void assembleWarehouse(List<WmsExchangeRespVO> list) {
+        Map<Long, WmsWarehouseDO> warehouseDOMap = warehouseService.getWarehouseMap(StreamX.from(list).toSet(WmsExchangeRespVO::getWarehouseId));
+        Map<Long, WmsWarehouseSimpleRespVO> warehouseVOMap = StreamX.from(warehouseDOMap.values()).toMap(WmsWarehouseDO::getId, v -> BeanUtils.toBean(v, WmsWarehouseSimpleRespVO.class));
+        StreamX.from(list).assemble(warehouseVOMap, WmsExchangeRespVO::getWarehouseId, WmsExchangeRespVO::setWarehouse);
     }
 }

@@ -43,7 +43,7 @@ public class ShopifyShopProductRepsVO {
         private String title;
         private String price;
         private Integer position;
-        private String inventoryPolicy;
+        private String stockCheckPolicy;
         private String compareAtPrice;
         private String option1;
         private String option2;
@@ -54,14 +54,14 @@ public class ShopifyShopProductRepsVO {
         private String barcode;
         private String fulfillmentService;
         private Integer grams;
-        private String inventoryManagement;
+        private String stockCheckManagement;
         private Boolean requiresShipping;
         private String sku;
         private Double weight;
         private String weightUnit;
-        private Long inventoryItemId;
-        private Integer inventoryQuantity;
-        private Integer oldInventoryQuantity;
+        private Long stockCheckItemId;
+        private Integer stockCheckQuantity;
+        private Integer oldStockCheckQuantity;
         private String adminGraphqlApiId;
         private Long imageId;
     }

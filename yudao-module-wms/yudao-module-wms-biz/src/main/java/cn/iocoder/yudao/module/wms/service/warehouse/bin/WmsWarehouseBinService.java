@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinD
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 库位 Service 接口
@@ -63,8 +64,18 @@ public interface WmsWarehouseBinService {
      */
     List<WmsWarehouseBinDO> selectByZoneId(Long zoneId, int limit);
 
-    List<WmsWarehouseBinDO> selectByIds(List<Long> ids);
+    /**
+     * 按ID获得仓位集合
+     **/
+    List<WmsWarehouseBinDO> selectByIds(Set<Long> ids);
 
-
+    /**
+     * 查询建单列表
+     **/
     List<WmsWarehouseBinDO> getSimpleList(@Valid WmsWarehouseBinPageReqVO pageReqVO);
+
+    /**
+     * 按 code 获得仓位集合
+     **/
+    List<WmsWarehouseBinDO> selectByCodes(Set<String> set);
 }
