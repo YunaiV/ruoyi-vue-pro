@@ -5,6 +5,8 @@ import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticePageReqVO
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notice.NoticeDO;
 
+import java.util.List;
+
 /**
  * 通知公告 Service 接口
  */
@@ -31,6 +33,13 @@ public interface NoticeService {
      * @param id 编号
      */
     void deleteNotice(Long id);
+
+    /**
+     * 批量删除通知公告
+     *
+     * @param ids 编号列表
+     */
+    void deleteNoticeList(List<Long> ids);
 
     /**
      * 获得通知公告分页列表
