@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.service.auth.IotDeviceTokenService;
+import cn.iocoder.yudao.module.iot.gateway.service.message.IotDeviceMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,12 +29,14 @@ public class IotMqttAuthRouter {
     private final IotDeviceMessageProducer deviceMessageProducer;
     private final IotDeviceTokenService deviceTokenService;
     private final IotDeviceCommonApi deviceCommonApi;
+    private final IotDeviceMessageService deviceMessageService;
 
     public IotMqttAuthRouter(IotMqttUpstreamProtocol protocol) {
         this.protocol = protocol;
         this.deviceMessageProducer = SpringUtil.getBean(IotDeviceMessageProducer.class);
         this.deviceTokenService = SpringUtil.getBean(IotDeviceTokenService.class);
         this.deviceCommonApi = SpringUtil.getBean(IotDeviceCommonApi.class);
+        this.deviceMessageService = SpringUtil.getBean(IotDeviceMessageService.class);
     }
 
     /**
@@ -125,15 +128,15 @@ public class IotMqttAuthRouter {
         }
 
         try {
-            // 发送设备状态消息
-            IotDeviceMessage message = IotDeviceMessage.of(
-                    deviceInfo.getProductKey(), deviceInfo.getDeviceName(), protocol.getServerId());
-
+            // 使用 IotDeviceMessageService 构建设备状态消息
+            IotDeviceMessage message;
             if (online) {
-                message = message.ofStateOnline();
+                message = deviceMessageService.buildDeviceMessageOfStateOnline(
+                        deviceInfo.getProductKey(), deviceInfo.getDeviceName(), protocol.getServerId());
                 log.info("[handleDeviceStateChange][发送设备上线消息成功][username: {}]", username);
             } else {
-                message = message.ofStateOffline();
+                message = deviceMessageService.buildDeviceMessageOfStateOffline(
+                        deviceInfo.getProductKey(), deviceInfo.getDeviceName(), protocol.getServerId());
                 log.info("[handleDeviceStateChange][发送设备下线消息成功][username: {}]", username);
             }
 

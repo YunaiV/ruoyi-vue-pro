@@ -5,6 +5,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.gateway.enums.IotDeviceTopicEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol;
+import cn.iocoder.yudao.module.iot.gateway.service.message.IotDeviceMessageService;
 import io.vertx.mqtt.messages.MqttPublishMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ public class IotMqttUpstreamRouter {
 
     private final IotMqttUpstreamProtocol protocol;
     private final IotDeviceMessageProducer deviceMessageProducer;
+    private final IotDeviceMessageService deviceMessageService;
 
     // 处理器实例
     private IotMqttPropertyHandler propertyHandler;
@@ -31,10 +33,11 @@ public class IotMqttUpstreamRouter {
     public IotMqttUpstreamRouter(IotMqttUpstreamProtocol protocol) {
         this.protocol = protocol;
         this.deviceMessageProducer = SpringUtil.getBean(IotDeviceMessageProducer.class);
+        this.deviceMessageService = SpringUtil.getBean(IotDeviceMessageService.class);
         // 初始化处理器
-        this.propertyHandler = new IotMqttPropertyHandler(protocol, deviceMessageProducer);
-        this.eventHandler = new IotMqttEventHandler(protocol, deviceMessageProducer);
-        this.serviceHandler = new IotMqttServiceHandler(protocol, deviceMessageProducer);
+        this.propertyHandler = new IotMqttPropertyHandler(protocol, deviceMessageProducer, deviceMessageService);
+        this.eventHandler = new IotMqttEventHandler(protocol, deviceMessageProducer, deviceMessageService);
+        this.serviceHandler = new IotMqttServiceHandler(protocol, deviceMessageProducer, deviceMessageService);
     }
 
     /**

@@ -6,10 +6,11 @@ import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.gateway.enums.IotDeviceTopicEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol;
+import cn.iocoder.yudao.module.iot.gateway.service.message.IotDeviceMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
 
 /**
  * IoT 网关 MQTT 事件处理器
@@ -24,6 +25,7 @@ public class IotMqttEventHandler extends IotMqttAbstractHandler {
 
     private final IotMqttUpstreamProtocol protocol;
     private final IotDeviceMessageProducer deviceMessageProducer;
+    private final IotDeviceMessageService deviceMessageService;
 
     @Override
     public void handle(String topic, String payload) {
@@ -31,7 +33,6 @@ public class IotMqttEventHandler extends IotMqttAbstractHandler {
             log.info("[handle][接收到设备事件上报][topic: {}]", topic);
 
             // 解析消息内容
-            JSONObject jsonObject = JSONUtil.parseObj(payload);
             String[] topicParts = parseTopic(topic);
             if (topicParts == null) {
                 return;
@@ -45,12 +46,10 @@ public class IotMqttEventHandler extends IotMqttAbstractHandler {
                 return;
             }
 
-            Map<String, Object> eventData = parseEventDataFromPayload(jsonObject);
-            IotDeviceMessage message = IotDeviceMessage.of(productKey, deviceName, protocol.getServerId());
-            // 设置事件消息类型和标识符
-            message.setType("event");
-            message.setIdentifier(eventIdentifier);
-            message.setData(eventData);
+            // 使用 IotDeviceMessageService 解码消息
+            byte[] messageBytes = payload.getBytes(StandardCharsets.UTF_8);
+            IotDeviceMessage message = deviceMessageService.decodeDeviceMessage(
+                    messageBytes, productKey, deviceName, protocol.getServerId());
 
             // 发送消息
             deviceMessageProducer.sendDeviceMessage(message);
@@ -58,7 +57,7 @@ public class IotMqttEventHandler extends IotMqttAbstractHandler {
 
             // 发送响应消息
             String method = "thing.event." + eventIdentifier + ".post";
-            sendResponse(topic, jsonObject, method);
+            sendResponse(topic, JSONUtil.parseObj(payload), method);
         } catch (Exception e) {
             log.error("[handle][处理设备事件上报失败][topic: {}][payload: {}]", topic, payload, e);
         }
@@ -81,21 +80,6 @@ public class IotMqttEventHandler extends IotMqttAbstractHandler {
     }
 
     /**
-     * 从消息载荷解析事件数据
-     *
-     * @param jsonObject 消息 JSON 对象
-     * @return 事件数据映射
-     */
-    private Map<String, Object> parseEventDataFromPayload(JSONObject jsonObject) {
-        JSONObject params = jsonObject.getJSONObject("params");
-        if (params == null) {
-            log.warn("[parseEventDataFromPayload][消息格式不正确，缺少 params 字段][jsonObject: {}]", jsonObject);
-            return Map.of();
-        }
-        return params;
-    }
-
-    /**
      * 发送响应消息
      *
      * @param topic      原始主题
@@ -103,18 +87,22 @@ public class IotMqttEventHandler extends IotMqttAbstractHandler {
      * @param method     响应方法
      */
     private void sendResponse(String topic, JSONObject jsonObject, String method) {
-        String replyTopic = IotDeviceTopicEnum.getReplyTopic(topic);
+        try {
+            String replyTopic = IotDeviceTopicEnum.getReplyTopic(topic);
 
-        // 构建响应消息
-        JSONObject response = new JSONObject();
-        response.set("id", jsonObject.getStr("id"));
-        response.set("code", 200);
-        response.set("method", method);
-        response.set("data", new JSONObject());
+            // 构建响应消息
+            JSONObject response = new JSONObject();
+            response.set("id", jsonObject.getStr("id"));
+            response.set("code", 200);
+            response.set("method", method);
+            response.set("data", new JSONObject());
 
-        // 发送响应
-        protocol.publishMessage(replyTopic, response.toString());
-        log.debug("[sendResponse][发送响应消息][topic: {}]", replyTopic);
+            // 发送响应
+            protocol.publishMessage(replyTopic, response.toString());
+            log.debug("[sendResponse][发送响应消息成功][topic: {}]", replyTopic);
+        } catch (Exception e) {
+            log.error("[sendResponse][发送响应消息失败][topic: {}]", topic, e);
+        }
     }
 
 }
