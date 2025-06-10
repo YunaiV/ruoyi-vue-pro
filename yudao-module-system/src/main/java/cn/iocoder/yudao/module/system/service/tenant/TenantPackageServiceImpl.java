@@ -12,11 +12,11 @@ import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantPackageDO;
 import cn.iocoder.yudao.module.system.dal.mysql.tenant.TenantPackageMapper;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -76,6 +76,19 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         tenantPackageMapper.deleteById(id);
     }
 
+    @Override
+    public void deleteTenantPackageList(List<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 校验存在
+        ids.forEach(this::validateTenantPackageExists);
+        // 校验正在使用
+        validateTenantUsedBatch(ids);
+        // 批量删除
+        tenantPackageMapper.deleteByIds(ids);
+    }
+
     private TenantPackageDO validateTenantPackageExists(Long id) {
         TenantPackageDO tenantPackage = tenantPackageMapper.selectById(id);
         if (tenantPackage == null) {
@@ -87,6 +100,20 @@ public class TenantPackageServiceImpl implements TenantPackageService {
     private void validateTenantUsed(Long id) {
         if (tenantService.getTenantCountByPackageId(id) > 0) {
             throw exception(TENANT_PACKAGE_USED);
+        }
+    }
+
+    /**
+     * 校验租户套餐是否被使用 - 批量
+     *
+     * @param ids 租户套餐编号数组
+     */
+    private void validateTenantUsedBatch(List<Long> ids) {
+        // 查询是否有租户正在使用该套餐
+        for (Long id : ids) {
+            if (tenantService.getTenantCountByPackageId(id) > 0) {
+                throw exception(TENANT_PACKAGE_USED);
+            }
         }
     }
 

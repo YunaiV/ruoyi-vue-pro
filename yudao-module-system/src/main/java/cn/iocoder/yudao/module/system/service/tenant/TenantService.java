@@ -7,8 +7,8 @@ import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.tenant.TenantSa
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantDO;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantInfoHandler;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
-
 import jakarta.validation.Valid;
+
 import java.util.List;
 import java.util.Set;
 
@@ -48,6 +48,13 @@ public interface TenantService {
      * @param id 编号
      */
     void deleteTenant(Long id);
+
+    /**
+     * 批量删除租户
+     *
+     * @param ids 编号数组
+     */
+    void deleteTenantList(List<Long> ids);
 
     /**
      * 获得租户

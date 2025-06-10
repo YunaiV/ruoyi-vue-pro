@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackagePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackageSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantPackageDO;
-
 import jakarta.validation.Valid;
+
 import java.util.List;
 
 /**
@@ -36,6 +36,13 @@ public interface TenantPackageService {
      * @param id 编号
      */
     void deleteTenantPackage(Long id);
+
+    /**
+     * 批量删除租户套餐
+     *
+     * @param ids 编号数组
+     */
+    void deleteTenantPackageList(List<Long> ids);
 
     /**
      * 获得租户套餐

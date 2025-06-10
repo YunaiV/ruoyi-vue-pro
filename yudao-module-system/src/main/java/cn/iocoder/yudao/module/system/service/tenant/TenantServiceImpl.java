@@ -31,13 +31,13 @@ import cn.iocoder.yudao.module.system.service.tenant.handler.TenantInfoHandler;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -225,6 +225,17 @@ public class TenantServiceImpl implements TenantService {
         tenantMapper.deleteById(id);
     }
 
+    @Override
+    public void deleteTenantList(List<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 校验存在
+        validateUpdateTenantBatch(ids);
+        // 批量删除
+        tenantMapper.deleteByIds(ids);
+    }
+
     private TenantDO validateUpdateTenant(Long id) {
         TenantDO tenant = tenantMapper.selectById(id);
         if (tenant == null) {
@@ -235,6 +246,26 @@ public class TenantServiceImpl implements TenantService {
             throw exception(TENANT_CAN_NOT_UPDATE_SYSTEM);
         }
         return tenant;
+    }
+
+    /**
+     * 校验租户是否可以更新 - 批量
+     *
+     * @param ids 租户编号数组
+     */
+    private void validateUpdateTenantBatch(List<Long> ids) {
+        // 查询租户
+        List<TenantDO> tenants = tenantMapper.selectByIds(ids);
+        if (tenants.size() != ids.size()) {
+            throw exception(TENANT_NOT_EXISTS);
+        }
+
+        // 校验是否有系统内置租户
+        tenants.forEach(tenant -> {
+            if (isSystemTenant(tenant)) {
+                throw exception(TENANT_CAN_NOT_UPDATE_SYSTEM);
+            }
+        });
     }
 
     @Override
