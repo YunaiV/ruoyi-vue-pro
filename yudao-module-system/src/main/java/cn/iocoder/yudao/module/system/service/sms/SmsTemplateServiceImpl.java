@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReUtil;
@@ -7,22 +8,22 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.system.framework.sms.core.client.SmsClient;
-import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsTemplateRespDTO;
-import cn.iocoder.yudao.module.system.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplatePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.sms.SmsTemplateMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
+import cn.iocoder.yudao.module.system.framework.sms.core.client.SmsClient;
+import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsTemplateRespDTO;
+import cn.iocoder.yudao.module.system.framework.sms.core.enums.SmsTemplateAuditStatusEnum;
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -100,8 +101,28 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
         smsTemplateMapper.deleteById(id);
     }
 
+    @Override
+    @CacheEvict(cacheNames = RedisKeyConstants.SMS_TEMPLATE,
+            allEntries = true) // allEntries 清空所有缓存，因为 id 不是直接的缓存 code，不好清理
+    public void deleteSmsTemplateList(List<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 校验存在
+        validateSmsTemplateListExists(ids);
+        // 批量删除
+        smsTemplateMapper.deleteByIds(ids);
+    }
+
     private void validateSmsTemplateExists(Long id) {
         if (smsTemplateMapper.selectById(id) == null) {
+            throw exception(SMS_TEMPLATE_NOT_EXISTS);
+        }
+    }
+
+    private void validateSmsTemplateListExists(List<Long> ids) {
+        List<SmsTemplateDO> templates = smsTemplateMapper.selectByIds(ids);
+        if (templates.size() != ids.size()) {
             throw exception(SMS_TEMPLATE_NOT_EXISTS);
         }
     }
