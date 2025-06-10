@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplatePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplateSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
-
 import jakarta.validation.Valid;
+
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +38,13 @@ public interface MailTemplateService {
      * @param id 编号
      */
     void deleteMailTemplate(Long id);
+
+    /**
+     * 批量删除邮件模版
+     *
+     * @param ids 编号列表
+     */
+    void deleteMailTemplateList(List<Long> ids);
 
     /**
      * 获取邮件模版

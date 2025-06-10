@@ -10,11 +10,11 @@ import cn.iocoder.yudao.module.system.service.mail.MailTemplateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -51,6 +51,15 @@ public class MailTemplateController {
     @PreAuthorize("@ss.hasPermission('system:mail-template:delete')")
     public CommonResult<Boolean> deleteMailTemplate(@RequestParam("id") Long id) {
         mailTempleService.deleteMailTemplate(id);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete-list")
+    @Operation(summary = "批量删除邮件模版")
+    @Parameter(name = "ids", description = "编号列表", required = true)
+    @PreAuthorize("@ss.hasPermission('system:mail-template:delete')")
+    public CommonResult<Boolean> deleteMailTemplateList(@RequestParam("ids") List<Long> ids) {
+        mailTempleService.deleteMailTemplateList(ids);
         return success(true);
     }
 
