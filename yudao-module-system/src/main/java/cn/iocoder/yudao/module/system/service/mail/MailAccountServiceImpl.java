@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.service.mail;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountPageReqVO;
@@ -7,13 +8,13 @@ import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccou
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailAccountMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -69,8 +70,37 @@ public class MailAccountServiceImpl implements MailAccountService {
         mailAccountMapper.deleteById(id);
     }
 
+    @Override
+    @CacheEvict(value = RedisKeyConstants.MAIL_ACCOUNT, allEntries = true)
+    public void deleteMailAccountList(List<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 校验是否存在
+        validateMailAccountsExists(ids);
+        // 校验是否存在关联模版
+        for (Long id : ids) {
+            if (mailTemplateService.getMailTemplateCountByAccountId(id) > 0) {
+                throw exception(MAIL_ACCOUNT_RELATE_TEMPLATE_EXISTS);
+            }
+        }
+        // 批量删除
+        mailAccountMapper.deleteByIds(ids);
+    }
+
     private void validateMailAccountExists(Long id) {
         if (mailAccountMapper.selectById(id) == null) {
+            throw exception(MAIL_ACCOUNT_NOT_EXISTS);
+        }
+    }
+
+    private void validateMailAccountsExists(List<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 校验存在
+        List<MailAccountDO> accounts = mailAccountMapper.selectByIds(ids);
+        if (CollUtil.isEmpty(accounts) || accounts.size() != ids.size()) {
             throw exception(MAIL_ACCOUNT_NOT_EXISTS);
         }
     }
