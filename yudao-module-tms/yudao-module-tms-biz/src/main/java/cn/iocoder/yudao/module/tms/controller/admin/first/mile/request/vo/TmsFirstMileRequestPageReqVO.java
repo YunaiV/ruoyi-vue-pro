@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - 头程申请单分页 Request VO")
@@ -42,12 +41,6 @@ public class TmsFirstMileRequestPageReqVO extends PageParam {
 
     @Schema(description = "关闭状态")
     private Integer offStatus;
-
-    @Schema(description = "总重量（kg）")
-    private BigDecimal[] totalWeight;
-
-    @Schema(description = "总体积（m³）")
-    private BigDecimal[] totalVolume;
 
     private TmsFirstMileRequestItemPageReqVO item;
 }

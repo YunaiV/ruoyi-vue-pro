@@ -8,7 +8,7 @@ import lombok.Data;
 public class TmsPortInfoSimpleRespVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Integer id;
+    private Long id;
 
     @Schema(description = "港口名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "上海港")
     private String name;

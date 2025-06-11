@@ -3,8 +3,10 @@ package cn.iocoder.yudao.module.wms.dal.mysql.warehouse.bin;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.bin.vo.WmsWarehouseBinPageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.zone.WmsWarehouseZoneDO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -85,5 +87,15 @@ public interface WmsWarehouseBinMapper extends BaseMapperX<WmsWarehouseBinDO> {
         wrapper.in(WmsWarehouseBinDO::getCode, codes);
         return selectList(wrapper);
 
+    }
+
+    default List<WmsWarehouseBinDO> getSimpleListForExchange(WmsWarehouseBinPageReqVO pageReqVO) {
+        MPJLambdaWrapperX<WmsWarehouseBinDO> wrapper = new MPJLambdaWrapperX<>();
+        wrapper.eqIfPresent(WmsWarehouseBinDO::getWarehouseId, pageReqVO.getWarehouseId());
+        wrapper.eq(WmsWarehouseBinDO::getStatus, 1);
+        wrapper.selectAll(WmsWarehouseBinDO.class);
+        wrapper.innerJoin(WmsWarehouseZoneDO.class, WmsWarehouseZoneDO::getId, WmsWarehouseBinDO::getZoneId)
+            .eq(WmsWarehouseZoneDO::getPartitionType, pageReqVO.getPartitionType());
+        return selectList(wrapper);
     }
 }

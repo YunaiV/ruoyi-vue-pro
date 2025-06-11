@@ -6,35 +6,58 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.system.enums.somle.BillType;
 import cn.iocoder.yudao.module.wms.config.ExchangeStateMachineConfigure;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.exchange.vo.WmsExchangePageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.exchange.vo.WmsExchangeRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.exchange.vo.WmsExchangeSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.item.vo.WmsStockBinMoveItemSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.stock.bin.move.vo.WmsStockBinMoveSaveReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSimpleRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.exchange.WmsExchangeDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.exchange.item.WmsExchangeItemDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemLogicDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.exchange.WmsExchangeMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.exchange.item.WmsExchangeItemMapper;
+import cn.iocoder.yudao.module.wms.dal.mysql.stock.warehouse.WmsStockWarehouseMapper;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
 import cn.iocoder.yudao.module.wms.enums.WmsConstants;
 import cn.iocoder.yudao.module.wms.enums.exchange.WmsExchangeAuditStatus;
+import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
+import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
+import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundType;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundType;
+import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
+import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
+import cn.iocoder.yudao.module.wms.service.outbound.WmsOutboundService;
+import cn.iocoder.yudao.module.wms.service.stock.bin.move.WmsStockBinMoveService;
+import cn.iocoder.yudao.module.wms.service.stock.flow.WmsStockFlowService;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import jakarta.annotation.Resource;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.*;
+import static java.lang.Boolean.TRUE;
 
 /**
  * 换货单 Service 实现类
@@ -43,7 +66,11 @@ import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.*;
  */
 @Service
 @Validated
+@Slf4j
 public class WmsExchangeServiceImpl implements WmsExchangeService {
+
+    @Getter
+    private WmsStockReason reason;
 
     @Resource
     @Lazy
@@ -59,8 +86,24 @@ public class WmsExchangeServiceImpl implements WmsExchangeService {
     @Lazy
     private WmsWarehouseService warehouseService;
 
+    @Resource
+    @Lazy
+    protected WmsStockFlowService stockFlowService;
+
+    @Resource
+    private WmsOutboundService outboundService;
+
+    @Resource
+    private WmsStockBinMoveService stockBinMoveService;
+
     @Resource(name = ExchangeStateMachineConfigure.STATE_MACHINE_NAME)
     private StateMachine<Integer, WmsExchangeAuditStatus.Event, TransitionContext<WmsExchangeDO>> exchangeStateMachine;
+
+    @Resource
+    private WmsStockWarehouseMapper wmsStockWarehouseMapper;
+
+    @Resource
+    private WmsInboundService wmsInboundService;
 
 
     /**
@@ -230,7 +273,94 @@ public class WmsExchangeServiceImpl implements WmsExchangeService {
      **/
     @Override
     public void finishExchange(WmsExchangeDO exchangeDO, List<WmsExchangeItemDO> exchangeItemDOList) {
-         // 暂无实现逻辑
+        //校验本方法在事务中
+        JdbcUtils.requireTransaction();
+        log.info("[finishExchange][完成换货单开始，exchangeDO({}) exchangeItemDOList({})]", exchangeDO, exchangeItemDOList);
+        int type = exchangeDO.getType();
+        if (type == 1) {
+            //换货单类型为良品转不良品
+            this.performBinMove(exchangeDO, exchangeItemDOList);
+        } else {
+            //换货单类型为不良品转良品
+            this.performOutboundInbound(exchangeDO, exchangeItemDOList);
+        }
+
+        log.info("[finishExchange][完成换货单结束，exchangeDO({}) exchangeItemDOList({})]", exchangeDO, exchangeItemDOList);
+    }
+
+    private void performOutboundInbound(WmsExchangeDO exchangeDO, List<WmsExchangeItemDO> exchangeItemDOList) {
+        this.performInbound(exchangeDO, exchangeItemDOList);
+        this.performOutbound(exchangeDO, exchangeItemDOList);
+    }
+
+    //执行出库动作
+    private void performOutbound(WmsExchangeDO exchangeDO, List<WmsExchangeItemDO> exchangeItemDOList) {
+        //1.新建入库单
+        WmsInboundSaveReqVO createInboundVO = new WmsInboundSaveReqVO();
+        createInboundVO.setType(WmsInboundType.EXCHANGE.getValue());
+        createInboundVO.setWarehouseId(exchangeDO.getWarehouseId());
+        createInboundVO.setAuditStatus(WmsInboundAuditStatus.DRAFT.getValue());
+        createInboundVO.setInboundStatus(WmsInboundStatus.NONE.getValue());
+        createInboundVO.setInboundTime(LocalDateTime.now());
+        List<WmsInboundItemSaveReqVO> inboundItemDOList = new ArrayList<>();
+        for (WmsExchangeItemDO itemDO : exchangeItemDOList) {
+            WmsInboundItemSaveReqVO inboundItemDO = BeanUtils.toBean(itemDO, WmsInboundItemSaveReqVO.class);
+            inboundItemDO.setPlanQty(itemDO.getQty());
+            inboundItemDO.setActualQty(itemDO.getQty());
+            inboundItemDOList.add(inboundItemDO);
+        }
+        createInboundVO.setItemList(inboundItemDOList);
+        WmsInboundDO inboundDO = wmsInboundService.createInbound(createInboundVO);
+        WmsApprovalReqVO approvalInboundReqVO = new WmsApprovalReqVO();
+        approvalInboundReqVO.setBillType(BillType.WMS_INBOUND.getValue());
+        approvalInboundReqVO.setBillId(inboundDO.getId());
+        approvalInboundReqVO.setStatusType(WmsOutboundAuditStatus.getType());
+        //2.提交审核并通过
+        wmsInboundService.approve(WmsInboundAuditStatus.Event.SUBMIT, approvalInboundReqVO);
+        wmsInboundService.approve(WmsInboundAuditStatus.Event.AGREE, approvalInboundReqVO);
+
+        //记录流水
+        Integer reason = exchangeDO.getType() == 1 ? WmsStockReason.EXCHANGE_GOOD_TO_BAD.getValue() : WmsStockReason.EXCHANGE_BAD_TO_GOOD.getValue();
+//        stockFlowService.createForStockWarehouse(reason,wmsStockFlowDirection, productId, stockWarehouseDO, quantity, outboundId, outboundItemId);
+    }
+
+    //执行入库动作
+    private void performInbound(WmsExchangeDO exchangeDO, List<WmsExchangeItemDO> exchangeItemDOList) {
+        //1.新建出库单
+        WmsOutboundSaveReqVO createReqVO = new WmsOutboundSaveReqVO();
+        createReqVO.setWarehouseId(exchangeDO.getWarehouseId());
+        createReqVO.setType(WmsOutboundType.EXCHANGE.getValue());
+        createReqVO.setOutboundStatus(WmsOutboundStatus.NONE.getValue());
+        List<WmsOutboundItemSaveReqVO> outboundItemDOList = new ArrayList<>();
+        for (WmsExchangeItemDO itemDO : exchangeItemDOList) {
+            WmsOutboundItemSaveReqVO outboundItemDO = BeanUtils.toBean(itemDO, WmsOutboundItemSaveReqVO.class);
+            outboundItemDO.setPlanQty(itemDO.getQty());
+            outboundItemDO.setActualQty(itemDO.getQty());
+            outboundItemDO.setBinId(itemDO.getFromBinId());
+            outboundItemDOList.add(outboundItemDO);
+        }
+        createReqVO.setItemList(outboundItemDOList);
+        WmsOutboundDO outboundDO = outboundService.createOutbound(createReqVO);
+        WmsApprovalReqVO approvalReqVO = new WmsApprovalReqVO();
+        approvalReqVO.setBillType(BillType.WMS_OUTBOUND.getValue());
+        approvalReqVO.setBillId(outboundDO.getId());
+        approvalReqVO.setStatusType(WmsOutboundAuditStatus.getType());
+        //2.提交审核并通过
+        outboundService.approve(WmsOutboundAuditStatus.Event.SUBMIT, approvalReqVO);
+        outboundService.approve(WmsOutboundAuditStatus.Event.AGREE, approvalReqVO);
+        outboundService.approve(WmsOutboundAuditStatus.Event.FINISH, approvalReqVO);
+    }
+
+    //执行移库位操作
+    private void performBinMove(WmsExchangeDO exchangeDO, List<WmsExchangeItemDO> exchangeItemDOList) {
+        for (WmsExchangeItemDO itemDO : exchangeItemDOList) {
+            WmsStockBinMoveSaveReqVO createReqVO = new WmsStockBinMoveSaveReqVO();
+            createReqVO.setItemList(Collections.singletonList(BeanUtils.toBean(itemDO, WmsStockBinMoveItemSaveReqVO.class)));
+            WmsInboundItemLogicDO inboundItemDetail = wmsInboundService.selectInboundItemLogicList(exchangeDO.getWarehouseId(), itemDO.getProductId(), TRUE).get(0);
+            createReqVO.setInboundId(inboundItemDetail.getId());
+            createReqVO.setWarehouseId(exchangeDO.getWarehouseId());
+            stockBinMoveService.createStockBinMove(createReqVO);
+        }
     }
 
     /**

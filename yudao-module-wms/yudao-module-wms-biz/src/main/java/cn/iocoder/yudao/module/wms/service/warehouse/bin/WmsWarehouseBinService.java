@@ -78,4 +78,9 @@ public interface WmsWarehouseBinService {
      * 按 code 获得仓位集合
      **/
     List<WmsWarehouseBinDO> selectByCodes(Set<String> set);
+
+    /**
+     * 获得转换单库位精简列表
+     **/
+    List<WmsWarehouseBinDO> getSimpleListForExchange(WmsWarehouseBinPageReqVO pageReqVO);
 }

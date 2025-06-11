@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.tms.controller.admin.first.mile.request.item.vo;
 
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.ToString;
@@ -30,20 +31,21 @@ public class TmsFirstMileRequestItemPageReqVO {
     @Schema(description = "申请数量")
     private Integer qty;
 
-    @Schema(description = "包装长（cm）")
+    @Schema(description = "包装长（mm）(单个产品)")
     private BigDecimal[] packageLength;
 
-    @Schema(description = "包装宽（cm）")
+    @Schema(description = "包装宽（mm）(单个产品)")
     private BigDecimal[] packageWidth;
 
-    @Schema(description = "包装高（cm）")
+    @Schema(description = "包装高（mm）(单个产品)")
     private BigDecimal[] packageHeight;
 
-    @Schema(description = "毛重（kg）")
+    @Schema(description = "毛重（kg）(单个产品)")
     private BigDecimal[] packageWeight;
 
-    @Schema(description = "体积（m³）")
-    private BigDecimal[] volume;
+    @Schema(description = "重量（kg）(单个产品)")
+    @ExcelProperty("重量（kg）(单个产品)")
+    private BigDecimal weight;
 
     @Schema(description = "订购状态")
     private Integer orderStatus;

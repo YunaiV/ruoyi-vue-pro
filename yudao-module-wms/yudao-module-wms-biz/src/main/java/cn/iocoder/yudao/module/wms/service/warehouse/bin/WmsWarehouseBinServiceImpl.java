@@ -147,6 +147,7 @@ public class WmsWarehouseBinServiceImpl implements WmsWarehouseBinService {
     /**
      * 按 warehouseId 查询 WmsWarehouseBinDO
      */
+    @Override
     public List<WmsWarehouseBinDO> selectByWarehouseId(Long warehouseId, int limit) {
         return warehouseBinMapper.selectByWarehouseId(warehouseId, limit);
     }
@@ -154,6 +155,7 @@ public class WmsWarehouseBinServiceImpl implements WmsWarehouseBinService {
     /**
      * 按 zoneId 查询 WmsWarehouseBinDO
      */
+    @Override
     public List<WmsWarehouseBinDO> selectByZoneId(Long zoneId, int limit) {
         return warehouseBinMapper.selectByZoneId(zoneId, limit);
     }
@@ -177,6 +179,11 @@ public class WmsWarehouseBinServiceImpl implements WmsWarehouseBinService {
             return List.of();
         }
         return warehouseBinMapper.selectByCodes(codes);
+    }
+
+    @Override
+    public List<WmsWarehouseBinDO> getSimpleListForExchange(WmsWarehouseBinPageReqVO pageReqVO) {
+        return warehouseBinMapper.getSimpleListForExchange(pageReqVO);
     }
 
 

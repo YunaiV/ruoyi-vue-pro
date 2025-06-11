@@ -25,6 +25,9 @@ public class FmsCompanyApiImpl implements FmsCompanyApi {
 
     @Override
     public List<FmsCompanyDTO> validateCompany(Set<Long> ids) {
+        if (ids.isEmpty()) {
+            return List.of();
+        }
         List<FmsCompanyDTO> dtoList = BeanUtils.toBean(subjectService.listCompany(ids), FmsCompanyDTO.class);
         //如果ids长度不等于dtoList长度，则说明有id不存在
         if (ids.size() != dtoList.size()) {

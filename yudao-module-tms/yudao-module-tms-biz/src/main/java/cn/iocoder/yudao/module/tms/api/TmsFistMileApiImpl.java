@@ -53,6 +53,7 @@ public class TmsFistMileApiImpl implements TmsFistMileApi {
         // 3.1 填充子项的出库明细数值
         for (TmsOutboundItemReqDTO outboundItem : dto.getItems()) {
             tmsFirstMileService.updateFirstMileItemOutbound(new TmsFistMileItemUpdateDTO()
+                .setId(outboundItem.getUpstreamId())
                 .setInOutType(false)
                 .setOutboundId(outboundItem.getUpstreamId())
                 .setOutboundQty(outboundItem.getActualQty().intValue())

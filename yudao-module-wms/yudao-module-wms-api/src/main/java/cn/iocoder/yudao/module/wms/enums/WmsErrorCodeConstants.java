@@ -278,8 +278,8 @@ public interface WmsErrorCodeConstants {
     ErrorCode EXCHANGE_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_023_008, "换货单不符合审批条件");
     ErrorCode EXCHANGE_AUDIT_FAIL = new ErrorCode(2_001_023_009, "审核错误，当前换货单状态为{}，在{}状态时才允许{}");
     ErrorCode EXCHANGE_AUDIT_ERROR = new ErrorCode(2_001_023_010, "换货单审核错误");
-    ErrorCode EXCHANGE_ITEM_ITEM_NOT_EXISTS = new ErrorCode(2_001_023_011, "换货单审核错误");
-    ErrorCode EXCHANGE_QUANTITY_ERROR = new ErrorCode(2_001_023_010, "换货单审核错误");
+    ErrorCode EXCHANGE_ITEM_ITEM_NOT_EXISTS = new ErrorCode(2_001_023_011, "换货单产品不存在");
+    ErrorCode EXCHANGE_QUANTITY_ERROR = new ErrorCode(2_001_023_010, "换货单数量错误");
 
     // ========== WMS_EXCHANGE_ITEM 良次换货详情表 2_001_024_000 ==========
     ErrorCode EXCHANGE_ITEM_NOT_EXISTS = new ErrorCode(2_001_024_001, "良次换货详情不存在");

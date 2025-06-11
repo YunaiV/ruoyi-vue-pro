@@ -36,7 +36,6 @@ public interface TmsFirstMileRequestItemMapper extends BaseMapperX<TmsFirstMileR
             .betweenIfPresent(TmsFirstMileRequestItemDO::getPackageWidth, vo.getPackageWidth())
             .betweenIfPresent(TmsFirstMileRequestItemDO::getPackageHeight, vo.getPackageHeight())
             .betweenIfPresent(TmsFirstMileRequestItemDO::getPackageWeight, vo.getPackageWeight())
-            .betweenIfPresent(TmsFirstMileRequestItemDO::getVolume, vo.getVolume())
             .eqIfPresent(TmsFirstMileRequestItemDO::getOrderStatus, vo.getOrderStatus())
             .eqIfPresent(TmsFirstMileRequestItemDO::getOffStatus, vo.getOffStatus())
             .eqIfPresent(TmsFirstMileRequestItemDO::getOrderClosedQty, vo.getOrderClosedQty())
@@ -50,8 +49,6 @@ public interface TmsFirstMileRequestItemMapper extends BaseMapperX<TmsFirstMileR
         return buildWrapper(vo.getItem()).leftJoin(TmsFirstMileRequestDO.class, TmsFirstMileRequestDO::getId,
                 TmsFirstMileRequestItemDO::getRequestId)
             .betweenIfPresent(TmsFirstMileRequestDO::getCreateTime, vo.getCreateTime())
-            .betweenIfPresent(TmsFirstMileRequestDO::getTotalWeight, vo.getTotalWeight())
-            .betweenIfPresent(TmsFirstMileRequestDO::getTotalVolume, vo.getTotalVolume())
             .eqIfPresent(TmsFirstMileRequestDO::getId, vo.getId())
             .likeIfPresent(TmsFirstMileRequestDO::getCode, vo.getCode())
             .eqIfPresent(TmsFirstMileRequestDO::getRequesterId, vo.getRequesterId())

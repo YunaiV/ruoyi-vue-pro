@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.tms.api.first.mile.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -17,6 +18,7 @@ public class TmsFistMileItemUpdateDTO {
     /**
      * 明细行ID
      */
+    @NotNull(message = "头程单明细行ID不能为空")
     private Long id;
 
     /**

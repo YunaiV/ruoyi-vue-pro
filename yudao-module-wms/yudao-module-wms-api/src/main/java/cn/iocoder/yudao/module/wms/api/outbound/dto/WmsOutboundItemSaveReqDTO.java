@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.wms.api.outbound.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.NonNull;
 
 
 @Data
@@ -25,13 +25,12 @@ public class WmsOutboundItemSaveReqDTO {
     /**
      * 库存财务公司ID
      **/
-    @NonNull
     private Long companyId;
 
     /**
      * 库存归属部门ID
      **/
-    @NonNull
+    @NotNull(message = "出库单明细行归属部门ID不能为空")
     private Long deptId;
 
     /**

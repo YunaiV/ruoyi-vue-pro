@@ -88,26 +88,6 @@ public class TmsFirstMileDO extends TenantBaseDO {
      */
     private LocalDateTime arrivePlanTime;
     /**
-     * 货柜体积（m³）
-     */
-    private BigDecimal totalVolume;
-    /**
-     * 货柜毛重（kg）
-     */
-    private BigDecimal totalWeight;
-    /**
-     * 货柜净重（kg）
-     */
-    private BigDecimal netWeight;
-    /**
-     * 货柜货值（按最近采购价）
-     */
-    private BigDecimal totalValue;
-    /**
-     * 货柜件数
-     */
-    private Integer totalQty;
-    /**
      * 备注
      */
     private String remark;

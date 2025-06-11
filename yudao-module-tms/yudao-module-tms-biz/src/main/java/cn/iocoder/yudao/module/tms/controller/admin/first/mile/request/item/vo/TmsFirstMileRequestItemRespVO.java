@@ -48,25 +48,45 @@ public class TmsFirstMileRequestItemRespVO extends BaseVO {
     @ExcelProperty("申请数量")
     private Integer qty;
 
-    @Schema(description = "包装长（cm）")
-    @ExcelProperty("包装长（cm）")
+    //    快照产品信息
+    /**
+     * 包装长（mm）(单个产品)
+     */
     private BigDecimal packageLength;
-
-    @Schema(description = "包装宽（cm）")
-    @ExcelProperty("包装宽（cm）")
+    /**
+     * 包装宽（mm）(单个产品)
+     */
     private BigDecimal packageWidth;
-
-    @Schema(description = "包装高（cm）")
-    @ExcelProperty("包装高（cm）")
+    /**
+     * 包装高（mm）(单个产品)
+     */
     private BigDecimal packageHeight;
+    /**
+     * 毛重（kg）(单个产品)
+     */
+    private BigDecimal packageWeight;
+    /**
+     * 基础重量(kg)(单个产品)
+     */
+    private BigDecimal weight;
+
+    @Schema(description = "包装长（mm）")
+    private BigDecimal totalPackageLength;
+
+    @Schema(description = "包装宽（mm）")
+    private BigDecimal totalPackageWidth;
+
+    @Schema(description = "包装高（mm）")
+    private BigDecimal totalPackageHeight;
 
     @Schema(description = "毛重（kg）")
-    @ExcelProperty("毛重（kg）")
-    private BigDecimal packageWeight;
+    private BigDecimal totalPackageWeight;
 
-    @Schema(description = "体积（m³）")
-    @ExcelProperty("体积（m³）")
-    private BigDecimal volume;
+    @Schema(description = "总净重（kg）")
+    private BigDecimal totalWeight;
+
+    @Schema(description = "总体积（mm³）")
+    private BigDecimal totalVolume;
 
     @Schema(description = "订购状态")
     @ExcelProperty(value = "订购状态", converter = DictConvert.class)
@@ -96,7 +116,6 @@ public class TmsFirstMileRequestItemRespVO extends BaseVO {
 
     @Schema(description = "版本号")
     private Integer revision;
-
 
     @Schema(description = "备注")
     @ExcelProperty("备注")

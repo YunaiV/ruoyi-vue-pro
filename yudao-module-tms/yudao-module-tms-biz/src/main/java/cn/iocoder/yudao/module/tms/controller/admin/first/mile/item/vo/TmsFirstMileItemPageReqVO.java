@@ -65,20 +65,18 @@ public class TmsFirstMileItemPageReqVO {
     @Schema(description = "发出仓ID")
     private Long fromWarehouseId;
 
-    @Schema(description = "包装长（cm）")
+    @Schema(description = "包装长（mm）(单个产品)")
     private BigDecimal[] packageLength;
 
-    @Schema(description = "包装宽（cm）")
+    @Schema(description = "包装宽（mm）(单个产品)")
     private BigDecimal[] packageWidth;
 
-    @Schema(description = "包装高（cm）")
+    @Schema(description = "包装高（mm）(单个产品)")
     private BigDecimal[] packageHeight;
 
-    @Schema(description = "毛重（kg）")
+    @Schema(description = "毛重（kg）(单个产品)")
     private BigDecimal[] packageWeight;
 
-    @Schema(description = "体积（m³）")
-    private BigDecimal[] volume;
 
     @Schema(description = "销售公司ID")
     private Long salesCompanyId;

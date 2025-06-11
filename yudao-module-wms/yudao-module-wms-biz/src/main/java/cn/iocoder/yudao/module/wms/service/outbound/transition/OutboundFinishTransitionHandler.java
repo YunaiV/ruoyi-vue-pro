@@ -4,6 +4,7 @@ package cn.iocoder.yudao.module.wms.service.outbound.transition;
 import cn.iocoder.yudao.framework.cola.statemachine.builder.TransitionContext;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.enums.somle.BillType;
+import cn.iocoder.yudao.module.tms.api.first.mile.TmsFistMileApi;
 import cn.iocoder.yudao.module.tms.api.transfer.TmsTransferApi;
 import cn.iocoder.yudao.module.tms.api.transfer.dto.TmsOutboundItemReqDTO;
 import cn.iocoder.yudao.module.tms.api.transfer.dto.TmsOutboundReqDTO;
@@ -17,6 +18,7 @@ import cn.iocoder.yudao.module.wms.service.quantity.OutboundFinishExecutor;
 import cn.iocoder.yudao.module.wms.service.quantity.context.OutboundContext;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -41,8 +43,12 @@ public class OutboundFinishTransitionHandler extends BaseOutboundTransitionHandl
     @Resource
     private TmsTransferApi tmsTransferApi;
 
+    @Resource
+    private TmsFistMileApi tmsFistMileApi;
+
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void perform(Integer from, Integer to, WmsOutboundAuditStatus.Event event, TransitionContext<WmsOutboundDO> context) {
         super.perform(from, to, event, context);
         // 调整库存
@@ -55,13 +61,21 @@ public class OutboundFinishTransitionHandler extends BaseOutboundTransitionHandl
         List<WmsOutboundItemDO> outboundItemDOS = outboundItemService.selectByOutboundId(outboundDO.getId());
 
         BillType billType = BillType.parse(outboundDO.getUpstreamType());
-        //更新TMS调拨单/头程单状态机
-        if (billType == BillType.TMS_TRANSFER || billType == BillType.TMS_FIRST_MILE) {
+        //更新TMS调拨单
+        if (billType == BillType.TMS_TRANSFER) {
             TmsOutboundReqDTO reqDTO = BeanUtils.toBean(context.data(), TmsOutboundReqDTO.class);
             reqDTO.setItems(BeanUtils.toBean(outboundItemDOS, TmsOutboundItemReqDTO.class));
             //默认全部出库
             reqDTO.setOutboundStatus(WmsOutboundStatus.ALL.getValue());
             tmsTransferApi.afterOutboundAudit(reqDTO);
+        }
+        //更新TMS头程单
+        if (billType == BillType.TMS_FIRST_MILE) {
+            TmsOutboundReqDTO reqDTO = BeanUtils.toBean(context.data(), TmsOutboundReqDTO.class);
+            reqDTO.setItems(BeanUtils.toBean(outboundItemDOS, TmsOutboundItemReqDTO.class));
+            //默认全部出库
+            reqDTO.setOutboundStatus(WmsOutboundStatus.ALL.getValue());
+            tmsFistMileApi.outboundAudit(reqDTO);
         }
      }
 }

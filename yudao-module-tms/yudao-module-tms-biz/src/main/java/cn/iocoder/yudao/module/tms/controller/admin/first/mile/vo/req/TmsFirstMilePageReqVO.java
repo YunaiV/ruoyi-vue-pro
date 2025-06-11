@@ -75,21 +75,6 @@ public class TmsFirstMilePageReqVO extends PageParam {
         @Schema(description = "预计到货日期")
         private LocalDateTime[] arrivePlanTime;
 
-        @Schema(description = "货柜体积（m³）")
-        private BigDecimal[] totalVolume;
-
-        @Schema(description = "货柜毛重（kg）")
-        private BigDecimal[] totalWeight;
-
-        @Schema(description = "货柜净重（kg）")
-        private BigDecimal[] netWeight;
-
-        @Schema(description = "货柜货值（按最近采购价）")
-        private BigDecimal[] totalValue;
-
-        @Schema(description = "货柜件数")
-        private Integer[] totalQty;
-
         @Schema(description = "备注")
         private String remark;
 
