@@ -39,10 +39,19 @@ public interface RedisKeyConstants {
     /**
      * 设备信息的数据缓存，使用 Spring Cache 操作（忽略租户）
      *
-     * KEY 格式：device_${productKey}_${deviceName}
+     * KEY 格式 1：device_${id}
+     * KEY 格式 2：device_${productKey}_${deviceName}
      * VALUE 数据类型：String(JSON)
      */
     String DEVICE = "iot:device";
+
+    /**
+     * 产品信息的数据缓存，使用 Spring Cache 操作（忽略租户）
+     *
+     * KEY 格式：product_${id}
+     * VALUE 数据类型：String(JSON)
+     */
+    String PRODUCT = "iot:product";
 
     /**
      * 物模型的数据缓存，使用 Spring Cache 操作（忽略租户）

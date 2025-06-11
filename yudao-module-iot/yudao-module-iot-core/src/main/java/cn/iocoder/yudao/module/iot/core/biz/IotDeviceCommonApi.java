@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.iot.core.biz;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
-import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceInfoReqDTO;
-import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceInfoRespDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceGetReqDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 
 /**
  * IoT 设备通用 API
@@ -26,6 +26,6 @@ public interface IotDeviceCommonApi {
      * @param infoReqDTO 设备信息请求
      * @return 设备信息
      */
-    CommonResult<IotDeviceInfoRespDTO> getDeviceInfo(IotDeviceInfoReqDTO infoReqDTO);
+    CommonResult<IotDeviceRespDTO> getDevice(IotDeviceGetReqDTO infoReqDTO);
 
 }

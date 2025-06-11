@@ -31,7 +31,7 @@ public class IotRuleSceneDeviceControlAction implements IotRuleSceneAction {
         Assert.notNull(control, "设备控制配置不能为空");
         // 遍历每个设备，下发消息
         control.getDeviceNames().forEach(deviceName -> {
-            IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(control.getProductKey(), deviceName);
+            IotDeviceDO device = deviceService.getDeviceFromCache(control.getProductKey(), deviceName);
             if (device == null) {
                 log.error("[execute][message({}) config({}) 对应的设备不存在]", message, config);
                 return;

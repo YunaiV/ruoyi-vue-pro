@@ -2,15 +2,19 @@ package cn.iocoder.yudao.module.iot.service.product;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.product.IotProductMapper;
+import cn.iocoder.yudao.module.iot.dal.redis.RedisKeyConstants;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
 import cn.iocoder.yudao.module.iot.service.device.property.IotDevicePropertyService;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import jakarta.annotation.Resource;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -56,6 +60,7 @@ public class IotProductServiceImpl implements IotProductService {
     }
 
     @Override
+    @CacheEvict(value = RedisKeyConstants.PRODUCT, key = "#updateReqVO.id")
     public void updateProduct(IotProductSaveReqVO updateReqVO) {
         updateReqVO.setProductKey(null); // 不更新产品标识
         // 1.1 校验存在
@@ -68,6 +73,7 @@ public class IotProductServiceImpl implements IotProductService {
     }
 
     @Override
+    @CacheEvict(value = RedisKeyConstants.PRODUCT, key = "#id")
     public void deleteProduct(Long id) {
         // 1.1 校验存在
         IotProductDO iotProductDO = validateProductExists(id);
@@ -107,6 +113,13 @@ public class IotProductServiceImpl implements IotProductService {
     }
 
     @Override
+    @Cacheable(value = RedisKeyConstants.PRODUCT, key = "#id", unless = "#result == null")
+    @TenantIgnore // 忽略租户信息
+    public IotProductDO getProductFromCache(Long id) {
+        return productMapper.selectById(id);
+    }
+
+    @Override
     public IotProductDO getProductByProductKey(String productKey) {
         return productMapper.selectByProductKey(productKey);
     }
@@ -118,6 +131,7 @@ public class IotProductServiceImpl implements IotProductService {
 
     @Override
     @DSTransactional(rollbackFor = Exception.class)
+    @CacheEvict(value = RedisKeyConstants.PRODUCT, key = "#id")
     public void updateProductStatus(Long id, Integer status) {
         // 1. 校验存在
         validateProductExists(id);
@@ -142,6 +156,5 @@ public class IotProductServiceImpl implements IotProductService {
     public Long getProductCount(LocalDateTime createTime) {
         return productMapper.selectCountByCreateTime(createTime);
     }
-
 
 }

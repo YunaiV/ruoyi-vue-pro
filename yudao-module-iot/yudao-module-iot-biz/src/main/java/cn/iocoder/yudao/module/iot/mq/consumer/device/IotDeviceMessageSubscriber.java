@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.mq.consumer.device;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
@@ -61,18 +62,19 @@ public class IotDeviceMessageSubscriber implements IotMessageSubscriber<IotDevic
             return;
         }
 
-        // 1.1 更新设备的最后时间
-        // TODO 芋艿：后续加缓存；
-        IotDeviceDO device = deviceService.validateDeviceExists(message.getDeviceId());
-        devicePropertyService.updateDeviceReportTime(device.getProductKey(), device.getDeviceName(), LocalDateTime.now());
-        // 1.2 更新设备的连接 server
-        devicePropertyService.updateDeviceServerId(device.getProductKey(), device.getDeviceName(), message.getServerId());
+        TenantUtils.execute(message.getTenantId(), () -> {
+            // 1.1 更新设备的最后时间
+            IotDeviceDO device = deviceService.validateDeviceExistsFromCache(message.getDeviceId());
+            devicePropertyService.updateDeviceReportTime(device.getProductKey(), device.getDeviceName(), LocalDateTime.now());
+            // 1.2 更新设备的连接 server
+            devicePropertyService.updateDeviceServerId(device.getProductKey(), device.getDeviceName(), message.getServerId());
 
-        // 2. 未上线的设备，强制上线
-        forceDeviceOnline(message, device);
+            // 2. 未上线的设备，强制上线
+            forceDeviceOnline(message, device);
 
-        // 3. 核心：处理消息
-        deviceMessageService.handleUpstreamDeviceMessage(message, device);
+            // 3. 核心：处理消息
+            deviceMessageService.handleUpstreamDeviceMessage(message, device);
+        });
     }
 
     private void forceDeviceOnline(IotDeviceMessage message, IotDeviceDO device) {

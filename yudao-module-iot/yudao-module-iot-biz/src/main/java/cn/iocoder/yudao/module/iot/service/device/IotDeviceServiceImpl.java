@@ -28,6 +28,7 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -221,6 +222,15 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         return device;
     }
 
+    @Override
+    public IotDeviceDO validateDeviceExistsFromCache(Long id) {
+        IotDeviceDO device = getSelf().getDeviceFromCache(id);
+        if (device == null) {
+            throw exception(DEVICE_NOT_EXISTS);
+        }
+        return device;
+    }
+
     /**
      * 校验网关设备是否存在
      *
@@ -239,6 +249,20 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     @Override
     public IotDeviceDO getDevice(Long id) {
         return deviceMapper.selectById(id);
+    }
+
+    @Override
+    @Cacheable(value = RedisKeyConstants.DEVICE, key = "#id", unless = "#result == null")
+    @TenantIgnore // 忽略租户信息
+    public IotDeviceDO getDeviceFromCache(Long id) {
+        return deviceMapper.selectById(id);
+    }
+
+    @Override
+    @Cacheable(value = RedisKeyConstants.DEVICE, key = "#productKey + '_' + #deviceName", unless = "#result == null")
+    @TenantIgnore // 忽略租户信息，跨租户 productKey + deviceName 是唯一的
+    public IotDeviceDO getDeviceFromCache(String productKey, String deviceName) {
+        return deviceMapper.selectByProductKeyAndDeviceName(productKey, deviceName);
     }
 
     @Override
@@ -306,13 +330,6 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     @Override
     public Long getDeviceCountByGroupId(Long groupId) {
         return deviceMapper.selectCountByGroupId(groupId);
-    }
-
-    @Override
-    @Cacheable(value = RedisKeyConstants.DEVICE, key = "#productKey + '_' + #deviceName", unless = "#result == null")
-    @TenantIgnore // 忽略租户信息，跨租户 productKey + deviceName 是唯一的
-    public IotDeviceDO getDeviceByProductKeyAndDeviceNameFromCache(String productKey, String deviceName) {
-        return deviceMapper.selectByProductKeyAndDeviceName(productKey, deviceName);
     }
 
     /**
@@ -425,12 +442,11 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         devices.forEach(this::deleteDeviceCache);
     }
 
-    @CacheEvict(value = RedisKeyConstants.DEVICE, key = "#device.productKey + '_' + #device.deviceName")
+    @Caching(evict = {
+        @CacheEvict(value = RedisKeyConstants.DEVICE, key = "#device.id"),
+        @CacheEvict(value = RedisKeyConstants.DEVICE, key = "#device.productKey + '_' + #device.deviceName")
+    })
     public void deleteDeviceCache0(IotDeviceDO device) {
-    }
-
-    private IotDeviceServiceImpl getSelf() {
-        return SpringUtil.getBean(getClass());
     }
 
     @Override
@@ -477,7 +493,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         }
         String deviceName = deviceInfo.getDeviceName();
         String productKey = deviceInfo.getProductKey();
-        IotDeviceDO device = getSelf().getDeviceByProductKeyAndDeviceNameFromCache(productKey, deviceName);
+        IotDeviceDO device = getSelf().getDeviceFromCache(productKey, deviceName);
         if (device == null) {
             log.warn("[authDevice][设备({}/{}) 不存在]", productKey, deviceName);
             return false;
@@ -490,6 +506,10 @@ public class IotDeviceServiceImpl implements IotDeviceService {
             return false;
         }
         return true;
+    }
+
+    private IotDeviceServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
     }
 
 }

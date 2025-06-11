@@ -71,6 +71,12 @@ public class IotProductDO extends TenantBaseDO {
     private Integer netType;
 
     /**
+     * 编解码器类型
+     *
+     * 字典 {@link cn.iocoder.yudao.module.iot.enums.DictTypeConstants#CODEC_TYPE}
+     */
+    private String codecType;
+    /**
      * 接入网关协议
      * <p>
      * 枚举 {@link cn.iocoder.yudao.module.iot.enums.product.IotProtocolTypeEnum}

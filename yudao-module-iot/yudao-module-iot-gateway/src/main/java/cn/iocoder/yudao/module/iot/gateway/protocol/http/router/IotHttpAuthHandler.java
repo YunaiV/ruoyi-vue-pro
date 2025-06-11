@@ -9,11 +9,10 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.service.auth.IotDeviceTokenService;
-import cn.iocoder.yudao.module.iot.gateway.service.message.IotDeviceMessageService;
+import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
@@ -35,19 +34,16 @@ public class IotHttpAuthHandler extends IotHttpAbstractHandler {
 
     private final IotHttpUpstreamProtocol protocol;
 
-    private final IotDeviceMessageProducer deviceMessageProducer;
-
     private final IotDeviceTokenService deviceTokenService;
 
-    private final IotDeviceCommonApi deviceClientService;
+    private final IotDeviceCommonApi deviceApi;
 
     private final IotDeviceMessageService deviceMessageService;
 
     public IotHttpAuthHandler(IotHttpUpstreamProtocol protocol) {
         this.protocol = protocol;
-        this.deviceMessageProducer = SpringUtil.getBean(IotDeviceMessageProducer.class);
         this.deviceTokenService = SpringUtil.getBean(IotDeviceTokenService.class);
-        this.deviceClientService = SpringUtil.getBean(IotDeviceCommonApi.class);
+        this.deviceApi = SpringUtil.getBean(IotDeviceCommonApi.class);
         this.deviceMessageService = SpringUtil.getBean(IotDeviceMessageService.class);
     }
 
@@ -69,9 +65,9 @@ public class IotHttpAuthHandler extends IotHttpAbstractHandler {
         }
 
         // 2.1 执行认证
-        CommonResult<Boolean> result = deviceClientService.authDevice(new IotDeviceAuthReqDTO()
+        CommonResult<Boolean> result = deviceApi.authDevice(new IotDeviceAuthReqDTO()
                 .setClientId(clientId).setUsername(username).setPassword(password));
-        result.checkError();;
+        result.checkError();
         if (!BooleanUtil.isTrue(result.getData())) {
             throw exception(DEVICE_AUTH_FAIL);
         }
@@ -82,9 +78,9 @@ public class IotHttpAuthHandler extends IotHttpAbstractHandler {
         Assert.notBlank(token, "生成 token 不能为空位");
 
         // 3. 执行上线
-        IotDeviceMessage message = deviceMessageService.buildDeviceMessageOfStateOnline(
+        IotDeviceMessage message = IotDeviceMessage.buildStateOnline();
+        deviceMessageService.sendDeviceMessage(message,
                 deviceInfo.getProductKey(), deviceInfo.getDeviceName(), protocol.getServerId());
-        deviceMessageProducer.sendDeviceMessage(message);
 
         // 构建响应数据
         return success(MapUtil.of("token", token));

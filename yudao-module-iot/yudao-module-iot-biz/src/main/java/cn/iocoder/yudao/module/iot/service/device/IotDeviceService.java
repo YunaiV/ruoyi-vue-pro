@@ -106,12 +106,41 @@ public interface IotDeviceService {
     IotDeviceDO validateDeviceExists(Long id);
 
     /**
+     * 【缓存】校验设备是否存在
+     *
+     * @param id 设备 ID
+     * @return 设备对象
+     */
+    IotDeviceDO validateDeviceExistsFromCache(Long id);
+
+    /**
      * 获得设备
      *
      * @param id 编号
      * @return IoT 设备
      */
     IotDeviceDO getDevice(Long id);
+
+    /**
+     * 【缓存】获得设备信息
+     * <p>
+     * 注意：该方法会忽略租户信息，所以调用时，需要确认会不会有跨租户访问的风险！！！
+     *
+     * @param id 编号
+     * @return IoT 设备
+     */
+    IotDeviceDO getDeviceFromCache(Long id);
+
+    /**
+     * 【缓存】根据产品 key 和设备名称，获得设备信息
+     * <p>
+     * 注意：该方法会忽略租户信息，所以调用时，需要确认会不会有跨租户访问的风险！！！
+     *
+     * @param productKey 产品 key
+     * @param deviceName 设备名称
+     * @return 设备信息
+     */
+    IotDeviceDO getDeviceFromCache(String productKey, String deviceName);
 
     /**
      * 根据设备 key 获得设备
@@ -176,17 +205,6 @@ public interface IotDeviceService {
      * @return 设备数量
      */
     Long getDeviceCountByGroupId(Long groupId);
-
-    /**
-     * 【缓存】根据产品 key 和设备名称，获得设备信息
-     * <p>
-     * 注意：该方法会忽略租户信息，所以调用时，需要确认会不会有跨租户访问的风险！！！
-     *
-     * @param productKey 产品 key
-     * @param deviceName 设备名称
-     * @return 设备信息
-     */
-    IotDeviceDO getDeviceByProductKeyAndDeviceNameFromCache(String productKey, String deviceName);
 
     /**
      * 导入设备

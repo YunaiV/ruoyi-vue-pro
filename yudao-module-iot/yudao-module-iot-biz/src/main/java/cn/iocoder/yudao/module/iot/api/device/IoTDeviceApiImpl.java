@@ -2,12 +2,15 @@ package cn.iocoder.yudao.module.iot.api.device;
 
 import cn.iocoder.yudao.framework.common.enums.RpcConstants;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
-import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceInfoReqDTO;
-import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceInfoRespDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceGetReqDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
+import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.context.annotation.Primary;
@@ -30,6 +33,8 @@ public class IoTDeviceApiImpl implements IotDeviceCommonApi {
 
     @Resource
     private IotDeviceService deviceService;
+    @Resource
+    private IotProductService productService;
 
     @Override
     @PostMapping(RpcConstants.RPC_API_PREFIX + "/iot/device/auth")
@@ -39,24 +44,17 @@ public class IoTDeviceApiImpl implements IotDeviceCommonApi {
     }
 
     @Override
-    @PostMapping(RpcConstants.RPC_API_PREFIX + "/iot/device/info")
+    @PostMapping(RpcConstants.RPC_API_PREFIX + "/iot/device/get") // 特殊：方便调用，暂时使用 POST，实际更推荐 GET
     @PermitAll
-    public CommonResult<IotDeviceInfoRespDTO> getDeviceInfo(@RequestBody IotDeviceInfoReqDTO infoReqDTO) {
-        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(
-                infoReqDTO.getProductKey(), infoReqDTO.getDeviceName());
-
-        if (device == null) {
-            return success(null);
-        }
-
-        IotDeviceInfoRespDTO respDTO = new IotDeviceInfoRespDTO();
-        respDTO.setDeviceId(device.getId());
-        respDTO.setProductKey(device.getProductKey());
-        respDTO.setDeviceName(device.getDeviceName());
-        respDTO.setDeviceKey(device.getDeviceKey());
-        respDTO.setTenantId(device.getTenantId());
-
-        return success(respDTO);
+    public CommonResult<IotDeviceRespDTO> getDevice(@RequestBody IotDeviceGetReqDTO getReqDTO) {
+        IotDeviceDO device = getReqDTO.getId() != null ? deviceService.getDeviceFromCache(getReqDTO.getId())
+                : deviceService.getDeviceFromCache(getReqDTO.getProductKey(), getReqDTO.getDeviceName());
+        return success(BeanUtils.toBean(device, IotDeviceRespDTO.class, deviceDTO -> {
+            IotProductDO product = productService.getProductFromCache(deviceDTO.getProductId());
+            if (product != null) {
+                deviceDTO.setCodecType(product.getCodecType());
+            }
+        }));
     }
 
 }

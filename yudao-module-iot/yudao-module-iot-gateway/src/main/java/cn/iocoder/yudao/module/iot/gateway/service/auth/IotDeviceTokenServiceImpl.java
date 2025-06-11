@@ -61,7 +61,7 @@ public class IotDeviceTokenServiceImpl implements IotDeviceTokenService {
         JSONObject payload = jwt.getPayloads();
         // 检查过期时间
         Long exp = payload.getLong("exp");
-        if (exp == null || exp > System.currentTimeMillis() / 1000) {
+        if (exp == null || exp < System.currentTimeMillis() / 1000) {
             throw exception(DEVICE_TOKEN_EXPIRED);
         }
         String productKey = payload.getStr("productKey");

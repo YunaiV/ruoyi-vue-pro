@@ -36,14 +36,10 @@ public abstract class IotHttpAbstractHandler implements Handler<RoutingContext> 
     public final void handle(RoutingContext context) {
         try {
             // 1. 前置处理
-            CommonResult<Object> result = beforeHandle(context);
-            if (result != null) {
-                writeResponse(context, result);
-                return;
-            }
+            beforeHandle(context);
 
             // 2. 执行逻辑
-            result = handle0(context);
+            CommonResult<Object> result = handle0(context);
             writeResponse(context, result);
         } catch (ServiceException e) {
             writeResponse(context, CommonResult.error(e.getCode(), e.getMessage()));
@@ -55,11 +51,11 @@ public abstract class IotHttpAbstractHandler implements Handler<RoutingContext> 
 
     protected abstract CommonResult<Object> handle0(RoutingContext context);
 
-    private CommonResult<Object> beforeHandle(RoutingContext context) {
+    private void beforeHandle(RoutingContext context) {
         // 如果不需要认证，则不走前置处理
         String path = context.request().path();
         if (ObjUtil.equal(path, IotHttpAuthHandler.PATH)) {
-            return null;
+            return;
         }
 
         // 解析参数
@@ -84,7 +80,6 @@ public abstract class IotHttpAbstractHandler implements Handler<RoutingContext> 
                 || ObjUtil.notEqual(deviceName, deviceInfo.getDeviceName())) {
             throw exception(FORBIDDEN);
         }
-        return null;
     }
 
     @SuppressWarnings("deprecation")

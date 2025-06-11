@@ -9,7 +9,6 @@
             ts TIMESTAMP,
             id NCHAR(50),
             report_time TIMESTAMP,
-            device_id BIGINT,
             tenant_id BIGINT,
             server_id NCHAR(50),
             upstream BOOL,
@@ -29,21 +28,21 @@
 
     <insert id="insert">
         INSERT INTO device_message_${deviceId} (
-            ts, id, report_time, device_id, tenant_id,
-            server_id, upstream, request_id, method, params,
-            data, code
+            ts, id, report_time, tenant_id, server_id,
+            upstream, request_id, method, params, data,
+            code
         )
         USING device_message
         TAGS (#{deviceId})
         VALUES (
-            #{ts}, #{id}, #{reportTime}, #{deviceId}, #{tenantId},
-            #{serverId}, #{upstream}, #{requestId}, #{method}, #{params},
-            #{data}, #{code}
+            #{ts}, #{id}, #{reportTime}, #{tenantId},  #{serverId},
+            #{upstream}, #{requestId}, #{method}, #{params}, #{data},
+            #{code}
         )
     </insert>
 
     <select id="selectPage" resultType="cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO">
-        SELECT ts, id, report_time, device_id, tenant_id, server_id, upstream, 
+        SELECT ts, id, report_time, device_id, tenant_id, server_id, upstream,
                request_id, method, params, data, code
         FROM device_message_${reqVO.deviceId}
         <where>
@@ -125,4 +124,4 @@
         ORDER BY time ASC
     </select>
 
-</mapper> 
+</mapper>
