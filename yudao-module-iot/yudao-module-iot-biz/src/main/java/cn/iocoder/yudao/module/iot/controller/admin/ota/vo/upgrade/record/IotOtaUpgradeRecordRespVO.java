@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.record;
 
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaUpgradeTaskDO;
 import com.fhs.core.trans.anno.Trans;
@@ -89,7 +90,7 @@ public class IotOtaUpgradeRecordRespVO {
      * 升级进度描述
      * <p>
      * 注意，只记录设备最后一次的升级进度描述
-     * 如果想看历史记录，可以查看 {@link cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO} 设备日志
+     * 如果想看历史记录，可以查看 {@link IotDeviceMessageDO} 设备日志
      */
     @Schema(description = "升级进度描述", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private String description;

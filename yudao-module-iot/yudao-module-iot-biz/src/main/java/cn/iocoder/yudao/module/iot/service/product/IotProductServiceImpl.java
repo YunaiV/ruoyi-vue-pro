@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProduc
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.product.IotProductMapper;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
-import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
+import cn.iocoder.yudao.module.iot.service.device.property.IotDevicePropertyService;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;

@@ -96,7 +96,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
             return null;
         }
 
-        IotDeviceMessage message = IotDeviceMessage.of(null,
+        IotDeviceMessage message = IotDeviceMessage.requestOf(null,
                 IotDeviceMessageMethodEnum.STATE_ONLINE.getMethod(), null);
 
         return appendDeviceMessage(message, deviceInfo, serverId);
@@ -112,9 +112,8 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
             return null;
         }
 
-        IotDeviceMessage message = IotDeviceMessage.of(null,
-                IotDeviceMessageMethodEnum.STATE_OFFLINE.getMethod(), null);
-
+        IotDeviceMessage message = IotDeviceMessage.requestOf(IotDeviceMessageMethodEnum.STATE_OFFLINE.getMethod(),
+                null);
         return appendDeviceMessage(message, deviceInfo, serverId);
     }
 
@@ -122,23 +121,18 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
      * 补充消息的后端字段
      *
      * @param message    消息
-     * @param deviceInfo 设备信息
+     * @param device 设备信息
      * @param serverId   设备连接的 serverId
      * @return 消息
      */
     private IotDeviceMessage appendDeviceMessage(IotDeviceMessage message,
-                                                 IotDeviceCacheService.DeviceInfo deviceInfo, String serverId) {
+                                                 IotDeviceCacheService.DeviceInfo device, String serverId) {
         message.setId(IotDeviceMessageUtils.generateMessageId()).setReportTime(LocalDateTime.now())
-                .setDeviceId(deviceInfo.getDeviceId()).setTenantId(deviceInfo.getTenantId()).setServerId(serverId);
-
+                .setDeviceId(device.getDeviceId()).setTenantId(device.getTenantId()).setServerId(serverId);
         // 特殊：如果设备没有指定 requestId，则使用 messageId
         if (StrUtil.isEmpty(message.getRequestId())) {
             message.setRequestId(message.getId());
         }
-
-        log.debug("[appendDeviceMessage][消息字段补充完成][deviceId: {}][tenantId: {}]",
-                deviceInfo.getDeviceId(), deviceInfo.getTenantId());
-
         return message;
     }
 

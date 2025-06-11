@@ -6,13 +6,12 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceDownstreamReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceUpstreamReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.message.IotDeviceMessageSendReqVO;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
-import cn.iocoder.yudao.module.iot.service.device.control.IotDeviceDownstreamService;
-import cn.iocoder.yudao.module.iot.service.device.control.IotDeviceUpstreamService;
+import cn.iocoder.yudao.module.iot.service.device.message.IotDeviceMessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,9 +41,7 @@ public class IotDeviceController {
     @Resource
     private IotDeviceService deviceService;
     @Resource
-    private IotDeviceUpstreamService deviceUpstreamService;
-    @Resource
-    private IotDeviceDownstreamService deviceDownstreamService;
+    private IotDeviceMessageService deviceMessageService;
 
     @PostMapping("/create")
     @Operation(summary = "创建设备")
@@ -161,19 +158,12 @@ public class IotDeviceController {
         ExcelUtils.write(response, "设备导入模板.xls", "数据", IotDeviceImportExcelVO.class, list);
     }
 
-    @PostMapping("/upstream")
-    @Operation(summary = "设备上行", description = "可用于设备模拟")
+    // TODO @芋艿：需要重构
+    @PostMapping("/send-message")
+    @Operation(summary = "发送消息", description = "可用于设备模拟")
     @PreAuthorize("@ss.hasPermission('iot:device:upstream')")
-    public CommonResult<Boolean> upstreamDevice(@Valid @RequestBody IotDeviceUpstreamReqVO upstreamReqVO) {
-        deviceUpstreamService.upstreamDevice(upstreamReqVO);
-        return success(true);
-    }
-
-    @PostMapping("/downstream")
-    @Operation(summary = "设备下行", description = "可用于设备模拟")
-    @PreAuthorize("@ss.hasPermission('iot:device:downstream')")
-    public CommonResult<Boolean> downstreamDevice(@Valid @RequestBody IotDeviceDownstreamReqVO downstreamReqVO) {
-        deviceDownstreamService.downstreamDevice(downstreamReqVO);
+    public CommonResult<Boolean> upstreamDevice(@Valid @RequestBody IotDeviceMessageSendReqVO sendReqVO) {
+        deviceMessageService.sendDeviceMessage(BeanUtils.toBean(sendReqVO, IotDeviceMessage.class));
         return success(true);
     }
 

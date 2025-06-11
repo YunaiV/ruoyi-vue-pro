@@ -7,10 +7,10 @@ import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.yudao.framework.tenant.core.job.TenantJob;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
-import cn.iocoder.yudao.module.iot.service.device.data.IotDevicePropertyService;
+import cn.iocoder.yudao.module.iot.service.device.message.IotDeviceMessageService;
+import cn.iocoder.yudao.module.iot.service.device.property.IotDevicePropertyService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
@@ -43,10 +43,10 @@ public class IotDeviceOfflineCheckJob implements JobHandler {
     private IotDeviceService deviceService;
     @Resource
     private IotDevicePropertyService devicePropertyService;
-
     @Resource
-    private IotDeviceMessageProducer deviceMessageProducer;
+    private IotDeviceMessageService deviceMessageService;
 
+    // TODO @芋艿：需要重构下；
     @Override
     @TenantJob
     public String execute(String param) {
@@ -69,8 +69,7 @@ public class IotDeviceOfflineCheckJob implements JobHandler {
             }
             offlineDeviceKeys.add(new String[]{device.getProductKey(), device.getDeviceName()});
             // 为什么不直接更新状态呢？因为通过 IotDeviceMessage 可以经过一系列的处理，例如说记录日志等等
-            deviceMessageProducer.sendDeviceMessage(IotDeviceMessage.of(device.getProductKey(), device.getDeviceName())
-                    .ofStateOffline());
+            deviceMessageService.sendDeviceMessage(IotDeviceMessage.buildStateOffline().setDeviceId(device.getId()));
         }
         return JsonUtils.toJsonString(offlineDeviceKeys);
     }

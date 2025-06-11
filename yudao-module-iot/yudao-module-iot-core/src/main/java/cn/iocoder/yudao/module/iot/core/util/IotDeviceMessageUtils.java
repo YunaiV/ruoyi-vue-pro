@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.iot.core.util;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.system.SystemUtil;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 
 /**
@@ -18,15 +19,28 @@ public class IotDeviceMessageUtils {
         return IdUtil.fastSimpleUUID();
     }
 
-    // TODO @芋艿：需要优化下；
     /**
      * 是否是上行消息：由设备发送
      *
      * @param message 消息
      * @return 是否
      */
+    @SuppressWarnings("SimplifiableConditionalExpression")
     public static boolean isUpstreamMessage(IotDeviceMessage message) {
-        return StrUtil.isNotEmpty(message.getServerId());
+        IotDeviceMessageMethodEnum methodEnum = IotDeviceMessageMethodEnum.of(message.getMethod());
+        Assert.notNull(methodEnum, "无法识别的消息方法：" + message.getMethod());
+        // 注意：回复消息时，需要取反
+        return !isReplyMessage(message) ? methodEnum.getUpstream() : !methodEnum.getUpstream();
+    }
+
+    /**
+     * 是否是回复消息，通过 {@link IotDeviceMessage#getCode()} 非空进行识别
+     *
+     * @param message 消息
+     * @return 是否
+     */
+    public static boolean isReplyMessage(IotDeviceMessage message) {
+        return message.getCode() != null;
     }
 
     // ========== Topic 相关 ==========

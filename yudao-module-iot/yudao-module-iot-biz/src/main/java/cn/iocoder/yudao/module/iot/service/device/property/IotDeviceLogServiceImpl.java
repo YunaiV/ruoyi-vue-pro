@@ -1,17 +1,11 @@
-package cn.iocoder.yudao.module.iot.service.device.data;
+package cn.iocoder.yudao.module.iot.service.device.property;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceLogPageReqVO;
-import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
-import cn.iocoder.yudao.module.iot.dal.tdengine.IotDeviceLogMapper;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
+import cn.iocoder.yudao.module.iot.dal.tdengine.IotDeviceMessageMapper;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -40,39 +34,12 @@ public class IotDeviceLogServiceImpl implements IotDeviceLogService {
     private IotDeviceService deviceService;
 
     @Resource
-    private IotDeviceLogMapper deviceLogMapper;
+    private IotDeviceMessageMapper deviceLogMapper;
 
     @Override
-    public void defineDeviceLog() {
-        if (StrUtil.isNotEmpty(deviceLogMapper.showDeviceLogSTable())) {
-            log.info("[defineDeviceLog][设备日志超级表已存在，创建跳过]");
-            return;
-        }
-
-        log.info("[defineDeviceLog][设备日志超级表不存在，创建开始...]");
-        deviceLogMapper.createDeviceLogSTable();
-        log.info("[defineDeviceLog][设备日志超级表不存在，创建成功]");
-    }
-
-    @Override
-    public void createDeviceLog(IotDeviceMessage message) {
-        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(
-                message.getProductKey(), message.getDeviceName());
-        if (device == null) {
-            log.error("[createDeviceLog][设备({}/{}) 不存在]", message.getProductKey(), message.getDeviceName());
-            return;
-        }
-        IotDeviceLogDO log = BeanUtils.toBean(message, IotDeviceLogDO.class)
-                .setId(IdUtil.fastSimpleUUID())
-                .setContent(JsonUtils.toJsonString(message.getData()))
-                .setTenantId(device.getTenantId());
-        deviceLogMapper.insert(log);
-    }
-
-    @Override
-    public PageResult<IotDeviceLogDO> getDeviceLogPage(IotDeviceLogPageReqVO pageReqVO) {
+    public PageResult<IotDeviceMessageDO> getDeviceLogPage(IotDeviceLogPageReqVO pageReqVO) {
         try {
-            IPage<IotDeviceLogDO> page = deviceLogMapper.selectPage(
+            IPage<IotDeviceMessageDO> page = deviceLogMapper.selectPage(
                     new Page<>(pageReqVO.getPageNo(), pageReqVO.getPageSize()), pageReqVO);
             return new PageResult<>(page.getRecords(), page.getTotal());
         } catch (Exception exception) {
@@ -92,7 +59,8 @@ public class IotDeviceLogServiceImpl implements IotDeviceLogService {
     @Override
     public List<Map<Long, Integer>> getDeviceLogUpCountByHour(String deviceKey, Long startTime, Long endTime) {
         // TODO @super：不能只基于数据库统计。因为有一些小时，可能出现没数据的情况，导致前端展示的图是不全的。可以参考 CrmStatisticsCustomerService 来实现
-        List<Map<String, Object>> list = deviceLogMapper.selectDeviceLogUpCountByHour(deviceKey, startTime, endTime);
+        // TODO @芋艿：这里实现，需要调整
+        List<Map<String, Object>> list = deviceLogMapper.selectDeviceLogUpCountByHour(0L, startTime, endTime);
         return list.stream()
                 .map(map -> {
                     // 从Timestamp获取时间戳
@@ -108,7 +76,8 @@ public class IotDeviceLogServiceImpl implements IotDeviceLogService {
     // TODO @super：getDeviceLogDownCountByHour 融合到 getDeviceLogUpCountByHour
     @Override
     public List<Map<Long, Integer>> getDeviceLogDownCountByHour(String deviceKey, Long startTime, Long endTime) {
-        List<Map<String, Object>> list = deviceLogMapper.selectDeviceLogDownCountByHour(deviceKey, startTime, endTime);
+        // TODO @芋艿：这里实现，需要调整
+        List<Map<String, Object>> list = deviceLogMapper.selectDeviceLogDownCountByHour(0L, startTime, endTime);
         return list.stream()
                 .map(map -> {
                     // 从Timestamp获取时间戳

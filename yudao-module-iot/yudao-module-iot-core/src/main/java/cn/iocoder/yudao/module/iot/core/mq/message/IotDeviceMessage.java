@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.core.mq.message;
 
+import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import lombok.AllArgsConstructor;
@@ -43,6 +44,20 @@ public class IotDeviceMessage {
      */
     private LocalDateTime reportTime;
 
+    /**
+     * 设备编号
+     */
+    private Long deviceId;
+    /**
+     * 租户编号
+     */
+    private Long tenantId;
+
+    /**
+     * 服务编号，该消息由哪个 server 发送
+     */
+    private String serverId;
+
     // ========== codec（编解码）字段 ==========
 
     /**
@@ -72,84 +87,53 @@ public class IotDeviceMessage {
      * 响应错误码
      */
     private Integer code;
-
-    // ========== 后端字段 ==========
-
     /**
-     * 设备编号
+     * 返回结果信息
      */
-    private Long deviceId;
-    /**
-     * 租户编号
-     */
-    private Long tenantId;
+    private String msg;
 
-    /**
-     * 服务编号，该消息由哪个 server 服务进行消费
-     */
-    private String serverId;
+    // ========== 基础方法：只传递“codec（编解码）字段” ==========
 
-//    public IotDeviceMessage ofPropertyReport(Map<String, Object> properties) {
-//        this.setType(IotDeviceMessageTypeEnum.PROPERTY.getType());
-//        this.setIdentifier(IotDeviceMessageIdentifierEnum.PROPERTY_REPORT.getIdentifier());
-//        this.setData(properties);
-//        return this;
-//    }
-//
-//    public IotDeviceMessage ofPropertySet(Map<String, Object> properties) {
-//        this.setType(IotDeviceMessageTypeEnum.PROPERTY.getType());
-//        this.setIdentifier(IotDeviceMessageIdentifierEnum.PROPERTY_SET.getIdentifier());
-//        this.setData(properties);
-//        return this;
-//    }
-//
-//    public IotDeviceMessage ofStateOnline() {
-//        this.setType(IotDeviceMessageTypeEnum.STATE.getType());
-//        this.setIdentifier(IotDeviceMessageIdentifierEnum.STATE_ONLINE.getIdentifier());
-//        return this;
-//    }
-//
-//    public IotDeviceMessage ofStateOffline() {
-//        this.setType(IotDeviceMessageTypeEnum.STATE.getType());
-//        this.setIdentifier(IotDeviceMessageIdentifierEnum.STATE_OFFLINE.getIdentifier());
-//        return this;
-//    }
-//
-//    public static IotDeviceMessage of(String productKey, String deviceName) {
-//        return of(productKey, deviceName,
-//                null, null);
-//    }
-//
-//    public static IotDeviceMessage of(String productKey, String deviceName,
-//                                      String serverId) {
-//        return of(productKey, deviceName,
-//                null, serverId);
-//    }
-//
-//    public static IotDeviceMessage of(String productKey, String deviceName,
-//                                      LocalDateTime reportTime, String serverId) {
-//        if (reportTime == null) {
-//            reportTime = LocalDateTime.now();
-//        }
-//        String messageId = IotDeviceMessageUtils.generateMessageId();
-//        return IotDeviceMessage.builder()
-//                .messageId(messageId).reportTime(reportTime)
-//                .productKey(productKey).deviceName(deviceName)
-//                .serverId(serverId).build();
-//    }
+    public static IotDeviceMessage requestOf(String method) {
+        return requestOf(null, method, null);
+    }
 
-    public static IotDeviceMessage of(String requestId, String method, Object params) {
-        return of(requestId, method, params, null, null);
+    public static IotDeviceMessage requestOf(String method, Object params) {
+        return requestOf(null, method, params);
+    }
+
+    public static IotDeviceMessage requestOf(String requestId, String method, Object params) {
+        return of(requestId, method, params, null, null, null);
+    }
+
+    public static IotDeviceMessage replyOf(String requestId, String method,
+                                           Object data, Integer code, String msg) {
+        if (code == null) {
+            code = GlobalErrorCodeConstants.SUCCESS.getCode();
+            msg = GlobalErrorCodeConstants.SUCCESS.getMsg();
+        }
+        return of(requestId, method, null, data, code, msg);
     }
 
     public static IotDeviceMessage of(String requestId, String method,
-                                      Object params, Object data, Integer code) {
+                                      Object params, Object data, Integer code, String msg) {
         // 通用参数
         IotDeviceMessage message = new IotDeviceMessage()
                 .setId(IotDeviceMessageUtils.generateMessageId()).setReportTime(LocalDateTime.now());
         // 当前参数
-        message.setRequestId(requestId).setMethod(method).setParams(params).setData(data).setCode(code);
+        message.setRequestId(requestId).setMethod(method).setParams(params)
+                .setData(data).setCode(code).setMsg(msg);
         return message;
+    }
+
+    // ========== 核心方法：在 of 基础方法之上，添加对应 method ==========
+
+    public static IotDeviceMessage buildStateOnline() {
+        return requestOf(IotDeviceMessageMethodEnum.STATE_ONLINE.getMethod());
+    }
+
+    public static IotDeviceMessage buildStateOffline() {
+        return requestOf(IotDeviceMessageMethodEnum.STATE_OFFLINE.getMethod());
     }
 
 }

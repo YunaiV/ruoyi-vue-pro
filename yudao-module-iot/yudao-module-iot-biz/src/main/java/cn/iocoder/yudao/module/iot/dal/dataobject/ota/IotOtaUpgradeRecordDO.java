@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.dal.dataobject.ota;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -77,7 +78,7 @@ public class IotOtaUpgradeRecordDO extends BaseDO {
      * 升级进度描述
      *
      * 注意，只记录设备最后一次的升级进度描述
-     * 如果想看历史记录，可以查看 {@link cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO} 设备日志
+     * 如果想看历史记录，可以查看 {@link IotDeviceMessageDO} 设备日志
      */
     private String description;
     /**

@@ -272,12 +272,9 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     @Override
-    public void updateDeviceState(Long id, Integer state) {
-        // 1. 校验存在
-        IotDeviceDO device = validateDeviceExists(id);
-
-        // 2. 更新状态和时间
-        IotDeviceDO updateObj = new IotDeviceDO().setId(id).setState(state);
+    public void updateDeviceState(IotDeviceDO device, Integer state) {
+        // 1. 更新状态和时间
+        IotDeviceDO updateObj = new IotDeviceDO().setId(device.getId()).setState(state);
         if (device.getOnlineTime() == null
                 && Objects.equals(state, IotDeviceStateEnum.ONLINE.getState())) {
             updateObj.setActiveTime(LocalDateTime.now());
@@ -289,8 +286,16 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         }
         deviceMapper.updateById(updateObj);
 
-        // 3. 清空对应缓存
+        // 2. 清空对应缓存
         deleteDeviceCache(device);
+    }
+
+    @Override
+    public void updateDeviceState(Long id, Integer state) {
+        // 校验存在
+        IotDeviceDO device = validateDeviceExists(id);
+        // 执行更新
+        updateDeviceState(device, state);
     }
 
     @Override

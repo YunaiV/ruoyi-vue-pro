@@ -1,11 +1,10 @@
-package cn.iocoder.yudao.module.iot.service.device.data;
+package cn.iocoder.yudao.module.iot.service.device.property;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyHistoryPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType.ThingModelDateOrTextDataSpecs;
@@ -121,21 +120,13 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     }
 
     @Override
-    @TenantIgnore
-    public void saveDeviceProperty(IotDeviceMessage message) {
+    public void saveDeviceProperty(IotDeviceDO device, IotDeviceMessage message) {
         if (!(message.getData() instanceof Map)) {
             log.error("[saveDeviceProperty][消息内容({}) 的 data 类型不正确]", message);
             return;
         }
-        // 1. 获得设备信息
-        IotDeviceDO device = deviceService.getDeviceByProductKeyAndDeviceNameFromCache(
-                message.getProductKey(), message.getDeviceName());
-        if (device == null) {
-            log.error("[saveDeviceProperty][消息({}) 对应的设备不存在]", message);
-            return;
-        }
 
-        // 2. 根据物模型，拼接合法的属性
+        // 1. 根据物模型，拼接合法的属性
         // TODO @芋艿：【待定 004】赋能后，属性到底以 thingModel 为准（ik），还是 db 的表结构为准（tl）？
         List<IotThingModelDO> thingModels = thingModelService.getThingModelListByProductKeyFromCache(device.getProductKey());
         Map<String, Object> properties = new HashMap<>();
@@ -151,11 +142,11 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
             return;
         }
 
-        // 3.1 保存设备属性【数据】
+        // 2.1 保存设备属性【数据】
         devicePropertyMapper.insert(device, properties,
                 LocalDateTimeUtil.toEpochMilli(message.getReportTime()));
 
-        // 3.2 保存设备属性【日志】
+        // 2.2 保存设备属性【日志】
         Map<String, IotDevicePropertyDO> properties2 = convertMap(properties.entrySet(), Map.Entry::getKey, entry ->
                 IotDevicePropertyDO.builder().value(entry.getValue()).updateTime(message.getReportTime()).build());
         deviceDataRedisDAO.putAll(device.getProductKey(), device.getDeviceName(), properties2);
@@ -207,11 +198,6 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
             return;
         }
         deviceServerIdRedisDAO.update(productKey, deviceName, serverId);
-    }
-
-    @Override
-    public void deleteDeviceServerId(String productKey, String deviceName) {
-        deviceServerIdRedisDAO.delete(productKey, deviceName);
     }
 
     @Override

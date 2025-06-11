@@ -14,7 +14,7 @@ import java.util.Arrays;
 public enum IotDeviceMessageTypeEnum implements ArrayValuable<String> {
 
     STATE("state"), // 设备状态
-    PROPERTY("property"), // 设备属性：可参考 https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services 设备属性、事件、服务
+//    PROPERTY("property"), // 设备属性：可参考 https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services 设备属性、事件、服务
     EVENT("event"), // 设备事件：可参考 https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services 设备属性、事件、服务
     SERVICE("service"), // 设备服务：可参考 https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services 设备属性、事件、服务
     CONFIG("config"), // 设备配置：可参考 https://help.aliyun.com/zh/iot/user-guide/remote-configuration-1 远程配置

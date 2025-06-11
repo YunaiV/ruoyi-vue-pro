@@ -1,9 +1,10 @@
-package cn.iocoder.yudao.module.iot.service.device.data;
+package cn.iocoder.yudao.module.iot.service.device.property;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyHistoryPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
 import jakarta.validation.Valid;
 
@@ -30,9 +31,10 @@ public interface IotDevicePropertyService {
     /**
      * 保存设备数据
      *
+     * @param device 设备
      * @param message 设备消息
      */
-    void saveDeviceProperty(IotDeviceMessage message);
+    void saveDeviceProperty(IotDeviceDO device, IotDeviceMessage message);
 
     /**
      * 获得设备属性最新数据
@@ -77,14 +79,6 @@ public interface IotDevicePropertyService {
      * @param serverId 网关 serverId
      */
     void updateDeviceServerId(String productKey, String deviceName, String serverId);
-
-    /**
-     * 删除设备关联的网关 serverId
-     *
-     * @param productKey 产品标识
-     * @param deviceName 设备名称
-     */
-    void deleteDeviceServerId(String productKey, String deviceName);
 
     /**
      * 获得设备关联的网关 serverId

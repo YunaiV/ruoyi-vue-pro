@@ -63,6 +63,14 @@ public interface IotDeviceService {
     /**
      * 更新设备状态
      *
+     * @param device 设备信息
+     * @param state 状态
+     */
+    void updateDeviceState(IotDeviceDO device, Integer state);
+
+    /**
+     * 更新设备状态
+     *
      * @param id    编号
      * @param state 状态
      */

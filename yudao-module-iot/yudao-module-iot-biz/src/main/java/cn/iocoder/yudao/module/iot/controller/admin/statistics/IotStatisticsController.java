@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsR
 import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsSummaryRespVO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
-import cn.iocoder.yudao.module.iot.service.device.data.IotDeviceLogService;
+import cn.iocoder.yudao.module.iot.service.device.property.IotDeviceLogService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductCategoryService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import io.swagger.v3.oas.annotations.Operation;

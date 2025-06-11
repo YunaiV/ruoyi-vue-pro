@@ -3,8 +3,6 @@ package cn.iocoder.yudao.module.iot.gateway.config;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpUpstreamProtocol;
-import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttDownstreamSubscriber;
-import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -44,16 +42,17 @@ public class IotGatewayConfiguration {
     @Slf4j
     public static class MqttProtocolConfiguration {
 
-        @Bean
-        public IotMqttUpstreamProtocol iotMqttUpstreamProtocol(IotGatewayProperties gatewayProperties) {
-            return new IotMqttUpstreamProtocol(gatewayProperties.getProtocol().getEmqx());
-        }
-
-        @Bean
-        public IotMqttDownstreamSubscriber iotMqttDownstreamSubscriber(IotMqttUpstreamProtocol mqttUpstreamProtocol,
-                                                                       IotMessageBus messageBus) {
-            return new IotMqttDownstreamSubscriber(mqttUpstreamProtocol, messageBus);
-        }
+        // TODO @haohao：临时注释，避免报错
+//        @Bean
+//        public IotMqttUpstreamProtocol iotMqttUpstreamProtocol(IotGatewayProperties gatewayProperties) {
+//            return new IotMqttUpstreamProtocol(gatewayProperties.getProtocol().getEmqx());
+//        }
+//
+//        @Bean
+//        public IotMqttDownstreamSubscriber iotMqttDownstreamSubscriber(IotMqttUpstreamProtocol mqttUpstreamProtocol,
+//                                                                       IotMessageBus messageBus) {
+//            return new IotMqttDownstreamSubscriber(mqttUpstreamProtocol, messageBus);
+//        }
     }
 
 }

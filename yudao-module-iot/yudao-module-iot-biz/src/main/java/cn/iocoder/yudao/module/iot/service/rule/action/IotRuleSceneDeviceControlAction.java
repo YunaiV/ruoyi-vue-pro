@@ -1,13 +1,12 @@
 package cn.iocoder.yudao.module.iot.service.rule.action;
 
 import cn.hutool.core.lang.Assert;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.control.IotDeviceDownstreamReqVO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
-import cn.iocoder.yudao.module.iot.service.device.control.IotDeviceDownstreamService;
+import cn.iocoder.yudao.module.iot.service.device.message.IotDeviceMessageService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,9 +21,9 @@ import org.springframework.stereotype.Component;
 public class IotRuleSceneDeviceControlAction implements IotRuleSceneAction {
 
     @Resource
-    private IotDeviceDownstreamService deviceDownstreamService;
-    @Resource
     private IotDeviceService deviceService;
+    @Resource
+    private IotDeviceMessageService deviceMessageService;
 
     @Override
     public void execute(IotDeviceMessage message, IotRuleSceneDO.ActionConfig config) {
@@ -38,9 +37,9 @@ public class IotRuleSceneDeviceControlAction implements IotRuleSceneAction {
                 return;
             }
             try {
-                IotDeviceMessage downstreamMessage = deviceDownstreamService.downstreamDevice(new IotDeviceDownstreamReqVO()
-                        .setId(device.getId()).setType(control.getType()).setIdentifier(control.getIdentifier())
-                        .setData(control.getData()));
+                // TODO @芋艿：@puhui999：这块可能要改，从 type => method
+                IotDeviceMessage downstreamMessage = deviceMessageService.sendDeviceMessage(IotDeviceMessage.requestOf(
+                        control.getType() + control.getIdentifier(), control.getData()).setDeviceId(device.getId()));
                 log.info("[execute][message({}) config({}) 下发消息({})成功]", message, config, downstreamMessage);
             } catch (Exception e) {
                 log.error("[execute][message({}) config({}) 下发消息失败]", message, config, e);

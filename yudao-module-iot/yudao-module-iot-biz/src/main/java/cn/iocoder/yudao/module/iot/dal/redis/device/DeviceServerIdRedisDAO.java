@@ -43,17 +43,6 @@ public class DeviceServerIdRedisDAO {
     }
 
     /**
-     * 删除设备关联的网关 serverId
-     *
-     * @param productKey 产品标识
-     * @param deviceName 设备名称
-     */
-    public void delete(String productKey, String deviceName) {
-        String hashKey = buildHashKey(productKey, deviceName);
-        stringRedisTemplate.opsForHash().delete(RedisKeyConstants.DEVICE_SERVER_ID, hashKey);
-    }
-
-    /**
      * 构建 HASH KEY
      *
      * @param productKey 产品标识
@@ -64,4 +53,4 @@ public class DeviceServerIdRedisDAO {
         return productKey + StrUtil.COMMA + deviceName;
     }
 
-} 
+}

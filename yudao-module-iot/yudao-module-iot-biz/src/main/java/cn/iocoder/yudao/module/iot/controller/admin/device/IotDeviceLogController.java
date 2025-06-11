@@ -5,8 +5,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceLogPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceLogRespVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceLogDO;
-import cn.iocoder.yudao.module.iot.service.device.data.IotDeviceLogService;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
+import cn.iocoder.yudao.module.iot.service.device.property.IotDeviceLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -32,7 +32,7 @@ public class IotDeviceLogController {
     @Operation(summary = "获得设备日志分页")
     @PreAuthorize("@ss.hasPermission('iot:device:log-query')")
     public CommonResult<PageResult<IotDeviceLogRespVO>> getDeviceLogPage(@Valid IotDeviceLogPageReqVO pageReqVO) {
-        PageResult<IotDeviceLogDO> pageResult = deviceLogService.getDeviceLogPage(pageReqVO);
+        PageResult<IotDeviceMessageDO> pageResult = deviceLogService.getDeviceLogPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, IotDeviceLogRespVO.class));
     }
 

@@ -309,8 +309,10 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
     private List<IotRuleSceneDO> getMatchedRuleSceneListByMessage(IotDeviceMessage message) {
         // 1. 匹配设备
         // TODO @芋艿：可能需要 getSelf(); 缓存
-        List<IotRuleSceneDO> ruleScenes = getRuleSceneListByProductKeyAndDeviceNameFromCache(
-                message.getProductKey(), message.getDeviceName());
+        List<IotRuleSceneDO> ruleScenes = null;
+        // TODO @芋艿：这里需要适配
+//        List<IotRuleSceneDO> ruleScenes = getRuleSceneListByProductKeyAndDeviceNameFromCache(
+//                message.getProductKey(), message.getDeviceName());
         if (CollUtil.isEmpty(ruleScenes)) {
             return ruleScenes;
         }
@@ -329,10 +331,11 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
                 }
                 // 2.3 多个条件，只需要满足一个即可
                 IotRuleSceneDO.TriggerCondition matchedCondition = CollUtil.findOne(trigger.getConditions(), condition -> {
-                    if (ObjUtil.notEqual(message.getType(), condition.getType())
-                            || ObjUtil.notEqual(message.getIdentifier(), condition.getIdentifier())) {
-                        return false;
-                    }
+                    // TODO @芋艿：这里的逻辑，需要适配
+//                    if (ObjUtil.notEqual(message.getType(), condition.getType())
+//                            || ObjUtil.notEqual(message.getIdentifier(), condition.getIdentifier())) {
+//                        return false;
+//                    }
                     // 多个条件参数，必须全部满足。所以，下面的逻辑就是找到一个不满足的条件参数
                     IotRuleSceneDO.TriggerConditionParameter notMatchedParameter = CollUtil.findOne(condition.getParameters(),
                             parameter -> !isTriggerConditionParameterMatched(message, parameter, ruleScene, trigger));
