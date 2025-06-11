@@ -96,20 +96,18 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     /**
      * 补充消息的后端字段
      *
-     * @param message    消息
-     * @param device 设备信息
-     * @param serverId   设备连接的 serverId
-     * @return 消息
+     * @param message  消息
+     * @param device   设备信息
+     * @param serverId 设备连接的 serverId
      */
-    private IotDeviceMessage appendDeviceMessage(IotDeviceMessage message,
-                                                 IotDeviceRespDTO device, String serverId) {
+    private void appendDeviceMessage(IotDeviceMessage message,
+                                     IotDeviceRespDTO device, String serverId) {
         message.setId(IotDeviceMessageUtils.generateMessageId()).setReportTime(LocalDateTime.now())
                 .setDeviceId(device.getId()).setTenantId(device.getTenantId()).setServerId(serverId);
         // 特殊：如果设备没有指定 requestId，则使用 messageId
         if (StrUtil.isEmpty(message.getRequestId())) {
             message.setRequestId(message.getId());
         }
-        return message;
     }
 
 }

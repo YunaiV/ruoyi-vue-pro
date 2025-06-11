@@ -12,11 +12,13 @@
             tenant_id BIGINT,
             server_id NCHAR(50),
             upstream BOOL,
+            reply BOOL,
             request_id NCHAR(50),
             method NCHAR(100),
             params NCHAR(2048),
             data NCHAR(2048),
-            code INT
+            code INT,
+            msg NCHAR(256)
         ) TAGS (
             device_id BIGINT
         )
@@ -29,21 +31,22 @@
     <insert id="insert">
         INSERT INTO device_message_${deviceId} (
             ts, id, report_time, tenant_id, server_id,
-            upstream, request_id, method, params, data,
-            code
+            upstream, reply, request_id, method, params,
+            data, code, msg
         )
         USING device_message
         TAGS (#{deviceId})
         VALUES (
-            #{ts}, #{id}, #{reportTime}, #{tenantId},  #{serverId},
-            #{upstream}, #{requestId}, #{method}, #{params}, #{data},
-            #{code}
+            NOW, #{id}, #{reportTime}, #{tenantId},  #{serverId},
+            #{upstream}, #{reply}, #{requestId}, #{method}, #{params},
+            #{data}, #{code}, #{msg}
         )
     </insert>
 
     <select id="selectPage" resultType="cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO">
-        SELECT ts, id, report_time, device_id, tenant_id, server_id, upstream,
-               request_id, method, params, data, code
+        SELECT ts, id, report_time, tenant_id, server_id,
+               upstream, reply, request_id, method, params,
+               data, code, msg
         FROM device_message_${reqVO.deviceId}
         <where>
             <if test="reqVO.method != null and reqVO.method != ''">

@@ -22,7 +22,7 @@ public interface RedisKeyConstants {
     /**
      * 设备的最后上报时间，采用 ZSET 结构
      *
-     * KEY 格式：{productKey},${deviceName}
+     * KEY 格式：{deviceId}
      * SCORE：上报时间
      */
     String DEVICE_REPORT_TIMES = "iot:device_report_times";
@@ -39,7 +39,7 @@ public interface RedisKeyConstants {
     /**
      * 设备信息的数据缓存，使用 Spring Cache 操作（忽略租户）
      *
-     * KEY 格式 1：device_${id}
+     * KEY 格式 1：device_${deviceId}
      * KEY 格式 2：device_${productKey}_${deviceName}
      * VALUE 数据类型：String(JSON)
      */
@@ -48,7 +48,7 @@ public interface RedisKeyConstants {
     /**
      * 产品信息的数据缓存，使用 Spring Cache 操作（忽略租户）
      *
-     * KEY 格式：product_${id}
+     * KEY 格式：product_${productId}
      * VALUE 数据类型：String(JSON)
      */
     String PRODUCT = "iot:product";

@@ -65,9 +65,9 @@ public class IotDeviceMessageSubscriber implements IotMessageSubscriber<IotDevic
         TenantUtils.execute(message.getTenantId(), () -> {
             // 1.1 更新设备的最后时间
             IotDeviceDO device = deviceService.validateDeviceExistsFromCache(message.getDeviceId());
-            devicePropertyService.updateDeviceReportTime(device.getProductKey(), device.getDeviceName(), LocalDateTime.now());
+            devicePropertyService.updateDeviceReportTimeAsync(device.getId(), LocalDateTime.now());
             // 1.2 更新设备的连接 server
-            devicePropertyService.updateDeviceServerId(device.getProductKey(), device.getDeviceName(), message.getServerId());
+            devicePropertyService.updateDeviceServerIdAsync(device.getId(), message.getServerId());
 
             // 2. 未上线的设备，强制上线
             forceDeviceOnline(message, device);

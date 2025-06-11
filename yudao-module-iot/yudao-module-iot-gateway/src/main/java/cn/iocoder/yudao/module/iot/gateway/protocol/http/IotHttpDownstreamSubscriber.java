@@ -39,7 +39,7 @@ public class IotHttpDownstreamSubscriber implements IotMessageSubscriber<IotDevi
 
     @Override
     public void onMessage(IotDeviceMessage message) {
-        log.error("[onMessage][IoT 网关 HTTP 协议不支持下行消息，忽略消息：{}]", message);
+        log.info("[onMessage][IoT 网关 HTTP 协议不支持下行消息，忽略消息：{}]", message);
     }
 
 }

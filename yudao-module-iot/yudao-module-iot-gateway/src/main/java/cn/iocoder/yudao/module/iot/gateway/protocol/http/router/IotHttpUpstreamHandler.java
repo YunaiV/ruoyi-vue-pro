@@ -6,7 +6,6 @@ import cn.hutool.core.text.StrPool;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.ext.web.RoutingContext;
@@ -26,13 +25,10 @@ public class IotHttpUpstreamHandler extends IotHttpAbstractHandler {
 
     private final IotHttpUpstreamProtocol protocol;
 
-    private final IotDeviceMessageProducer deviceMessageProducer;
-
     private final IotDeviceMessageService deviceMessageService;
 
     public IotHttpUpstreamHandler(IotHttpUpstreamProtocol protocol) {
         this.protocol = protocol;
-        this.deviceMessageProducer = SpringUtil.getBean(IotDeviceMessageProducer.class);
         this.deviceMessageService = SpringUtil.getBean(IotDeviceMessageService.class);
     }
 
@@ -46,10 +42,11 @@ public class IotHttpUpstreamHandler extends IotHttpAbstractHandler {
         // 2.1 解析消息
         byte[] bytes = context.body().buffer().getBytes();
         IotDeviceMessage message = deviceMessageService.decodeDeviceMessage(bytes,
-                productKey, deviceName, protocol.getServerId());
+                productKey, deviceName);
         Assert.equals(method, message.getMethod(), "method 不匹配");
         // 2.2 发送消息
-        deviceMessageProducer.sendDeviceMessage(message);
+        deviceMessageService.sendDeviceMessage(message,
+                productKey, deviceName, protocol.getServerId());
 
         // 3. 返回结果
         return CommonResult.success(MapUtil.of("messageId", message.getId()));

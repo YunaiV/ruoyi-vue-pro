@@ -27,6 +27,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -183,26 +184,27 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     // ========== 设备时间相关操作 ==========
 
     @Override
-    public Set<String[]> getProductKeyDeviceNameListByReportTime(LocalDateTime maxReportTime) {
+    public Set<Long> getDeviceIdListByReportTime(LocalDateTime maxReportTime) {
         return deviceReportTimeRedisDAO.range(maxReportTime);
     }
 
     @Override
-    public void updateDeviceReportTime(String productKey, String deviceName, LocalDateTime reportTime) {
-        deviceReportTimeRedisDAO.update(productKey, deviceName, reportTime);
+    @Async
+    public void updateDeviceReportTimeAsync(Long id, LocalDateTime reportTime) {
+        deviceReportTimeRedisDAO.update(id, reportTime);
     }
 
     @Override
-    public void updateDeviceServerId(String productKey, String deviceName, String serverId) {
+    public void updateDeviceServerIdAsync(Long id, String serverId) {
         if (StrUtil.isEmpty(serverId)) {
             return;
         }
-        deviceServerIdRedisDAO.update(productKey, deviceName, serverId);
+        deviceServerIdRedisDAO.update(id, serverId);
     }
 
     @Override
-    public String getDeviceServerId(String productKey, String deviceName) {
-        return deviceServerIdRedisDAO.get(productKey, deviceName);
+    public String getDeviceServerId(Long id) {
+        return deviceServerIdRedisDAO.get(id);
     }
 
 }

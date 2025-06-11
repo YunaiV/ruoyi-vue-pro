@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.iot.service.device.message;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
@@ -16,6 +18,7 @@ import cn.iocoder.yudao.module.iot.service.device.property.IotDevicePropertyServ
 import com.google.common.base.Objects;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -56,10 +59,16 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         log.info("[defineDeviceMessageStable][设备消息超级表不存在，创建成功]");
     }
 
-    // TODO @芋艿：要不要异步记录；
-    private void createDeviceLog(IotDeviceMessage message) {
+    @Async
+    void createDeviceLogAsync(IotDeviceMessage message) {
         IotDeviceMessageDO messageDO = BeanUtils.toBean(message, IotDeviceMessageDO.class)
                 .setUpstream(IotDeviceMessageUtils.isUpstreamMessage(message));
+        if (message.getParams() != null) {
+            messageDO.setParams(JsonUtils.toJsonString(messageDO.getData()));
+        }
+        if (messageDO.getData() != null) {
+            messageDO.setData(JsonUtils.toJsonString(messageDO.getData()));
+        }
         deviceLogMapper.insert(messageDO);
     }
 
@@ -72,6 +81,10 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     // TODO @芋艿：针对连接网关的设备，是不是 productKey、deviceName 需要调整下；
     @Override
     public IotDeviceMessage sendDeviceMessage(IotDeviceMessage message, IotDeviceDO device) {
+        return sendDeviceMessage(message, device, null);
+    }
+
+    private IotDeviceMessage sendDeviceMessage(IotDeviceMessage message, IotDeviceDO device, String serverId) {
         // 1. 补充信息
         appendDeviceMessage(message, device);
 
@@ -84,31 +97,31 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
         // 2.2 情况二：发送下行消息
         // 如果是下行消息，需要校验 serverId 存在
-        String serverId = devicePropertyService.getDeviceServerId(device.getProductKey(), device.getDeviceName());
         if (StrUtil.isEmpty(serverId)) {
-            throw exception(DEVICE_DOWNSTREAM_FAILED_SERVER_ID_NULL);
+            serverId = devicePropertyService.getDeviceServerId(device.getId());
+            if (StrUtil.isEmpty(serverId)) {
+                throw exception(DEVICE_DOWNSTREAM_FAILED_SERVER_ID_NULL);
+            }
         }
         deviceMessageProducer.sendDeviceMessageToGateway(serverId, message);
         // 特殊：记录消息日志。原因：上行消息，消费时，已经会记录；下行消息，因为消费在 Gateway 端，所以需要在这里记录
-        createDeviceLog(message);
+        getSelf().createDeviceLogAsync(message);
         return message;
     }
 
     /**
      * 补充消息的后端字段
      *
-     * @param message    消息
-     * @param device 设备信息
-     * @return 消息
+     * @param message 消息
+     * @param device  设备信息
      */
-    private IotDeviceMessage appendDeviceMessage(IotDeviceMessage message, IotDeviceDO device) {
+    private void appendDeviceMessage(IotDeviceMessage message, IotDeviceDO device) {
         message.setId(IotDeviceMessageUtils.generateMessageId()).setReportTime(LocalDateTime.now())
                 .setDeviceId(device.getId()).setTenantId(device.getTenantId());
         // 特殊：如果设备没有指定 requestId，则使用 messageId
         if (StrUtil.isEmpty(message.getRequestId())) {
             message.setRequestId(message.getId());
         }
-        return message;
     }
 
     @Override
@@ -120,26 +133,33 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
             replyData = handleUpstreamDeviceMessage0(message, device);
         } catch (ServiceException ex) {
             serviceException = ex;
-            log.warn("[onMessage][message({}) 业务异常]", message, serviceException);
+            log.warn("[handleUpstreamDeviceMessage][message({}) 业务异常]", message, serviceException);
         } catch (Exception ex) {
-            log.error("[onMessage][message({}) 发生异常]", message, ex);
+            log.error("[handleUpstreamDeviceMessage][message({}) 发生异常]", message, ex);
             throw ex;
         }
 
         // 2. 记录消息
-        createDeviceLog(message);
+        getSelf().createDeviceLogAsync(message);
 
         // 3. 回复消息。前提：非 _reply 消息，并且非禁用回复的消息
         if (IotDeviceMessageUtils.isReplyMessage(message)
-            || IotDeviceMessageMethodEnum.isReplyDisabled(message.getMethod())) {
+            || IotDeviceMessageMethodEnum.isReplyDisabled(message.getMethod())
+            || StrUtil.isEmpty(message.getServerId())) {
             return;
         }
-        sendDeviceMessage(IotDeviceMessage.replyOf(message.getRequestId(), message.getMethod(), replyData,
-                serviceException != null ? serviceException.getCode() : null,
-                serviceException != null ? serviceException.getMessage() : null));
+        try {
+            IotDeviceMessage replyMessage = IotDeviceMessage.replyOf(message.getRequestId(), message.getMethod(), replyData,
+                    serviceException != null ? serviceException.getCode() : null,
+                    serviceException != null ? serviceException.getMessage() : null);
+            sendDeviceMessage(replyMessage, device, message.getServerId());
+        } catch (Exception ex) {
+            log.error("[handleUpstreamDeviceMessage][message({}) 回复消息失败]", message, ex);
+        }
     }
 
     // TODO @芋艿：可优化：未来逻辑复杂后，可以独立拆除 Processor 处理器
+    @SuppressWarnings("SameReturnValue")
     private Object handleUpstreamDeviceMessage0(IotDeviceMessage message, IotDeviceDO device) {
         // 设备上线
         if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.STATE_ONLINE.getMethod())) {
@@ -162,6 +182,10 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
         // TODO @芋艿：这里可以按需，添加别的逻辑；
         return null;
+    }
+
+    private IotDeviceMessageServiceImpl getSelf() {
+        return SpringUtil.getBean(getClass());
     }
 
 }

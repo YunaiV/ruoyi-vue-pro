@@ -55,38 +55,35 @@ public interface IotDevicePropertyService {
     // ========== 设备时间相关操作 ==========
 
     /**
-     * 获得最后上报时间小于指定时间的设备标识
+     * 获得最后上报时间小于指定时间的设备编号集合
      *
      * @param maxReportTime 最大上报时间
-     * @return [productKey, deviceName] 列表
+     * @return 设备编号集合
      */
-    Set<String[]> getProductKeyDeviceNameListByReportTime(LocalDateTime maxReportTime);
+    Set<Long> getDeviceIdListByReportTime(LocalDateTime maxReportTime);
 
     /**
      * 更新设备上报时间
      *
-     * @param productKey  产品标识
-     * @param deviceName  设备名称
+     * @param id 设备编号
      * @param reportTime 上报时间
      */
-    void updateDeviceReportTime(String productKey, String deviceName, LocalDateTime reportTime);
+    void updateDeviceReportTimeAsync(Long id, LocalDateTime reportTime);
 
     /**
-     * 更新设备关联的网关 serverId
+     * 更新设备关联的网关服务 serverId
      *
-     * @param productKey 产品标识
-     * @param deviceName 设备名称
+     * @param id 设备编号
      * @param serverId 网关 serverId
      */
-    void updateDeviceServerId(String productKey, String deviceName, String serverId);
+    void updateDeviceServerIdAsync(Long id, String serverId);
 
     /**
-     * 获得设备关联的网关 serverId
+     * 获得设备关联的网关服务 serverId
      *
-     * @param productKey 产品标识
-     * @param deviceName 设备名称
+     * @param id 设备编号
      * @return 网关 serverId
      */
-    String getDeviceServerId(String productKey, String deviceName);
+    String getDeviceServerId(Long id);
 
 }
