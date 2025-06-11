@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.gateway.enums.IotDeviceTopicEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol;
-import cn.iocoder.yudao.module.iot.gateway.service.message.IotDeviceMessageService;
+import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,7 +49,7 @@ public class IotMqttEventHandler extends IotMqttAbstractHandler {
             // 使用 IotDeviceMessageService 解码消息
             byte[] messageBytes = payload.getBytes(StandardCharsets.UTF_8);
             IotDeviceMessage message = deviceMessageService.decodeDeviceMessage(
-                    messageBytes, productKey, deviceName, protocol.getServerId());
+                    messageBytes, productKey, deviceName);
 
             // 发送消息
             deviceMessageProducer.sendDeviceMessage(message);

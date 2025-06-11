@@ -5,7 +5,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.gateway.enums.IotDeviceTopicEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol;
-import cn.iocoder.yudao.module.iot.gateway.service.message.IotDeviceMessageService;
+import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.mqtt.messages.MqttPublishMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

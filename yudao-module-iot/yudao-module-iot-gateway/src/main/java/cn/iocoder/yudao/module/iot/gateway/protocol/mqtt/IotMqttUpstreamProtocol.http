@@ -1,0 +1,139 @@
+### IoT MQTT HTTP 认证服务测试文件
+### 用于测试独立的 MQTT HTTP 认证服务接口
+### 服务由 IotMqttHttpAuthProtocol 启动，运行在配置的端口上（默认 8090）
+### 注意：这些接口通常由 EMQX 调用，也可以用于手动测试
+
+### 配置说明：
+### 在 application-local.yaml 中可以配置端口：
+### yudao:
+###   iot:
+###     gateway:
+###       protocol:
+###         emqx:
+###           http-auth-port: 8090  # 可以修改为其他端口
+
+### 1. MQTT 设备认证接口 => 成功认证
+POST http://localhost:8090/mqtt/auth/authenticate
+Content-Type: application/json
+
+{
+  "clientid": "test_product.test_device",
+  "username": "test_device&test_product",
+  "password": "test_device_secret_hmac_password"
+}
+
+### 2. MQTT 设备认证接口 => 参数不完整（clientid 为空）
+POST http://localhost:8090/mqtt/auth/authenticate
+Content-Type: application/json
+
+{
+  "clientid": "",
+  "username": "test_device&test_product",
+  "password": "test_device_secret"
+}
+
+### 3. MQTT 设备认证接口 => 参数不完整（username 为空）
+POST http://localhost:8090/mqtt/auth/authenticate
+Content-Type: application/json
+
+{
+  "clientid": "test_product.test_device",
+  "username": "",
+  "password": "test_device_secret"
+}
+
+### 4. MQTT 设备认证接口 => 参数不完整（password 为空）
+POST http://localhost:8090/mqtt/auth/authenticate
+Content-Type: application/json
+
+{
+  "clientid": "test_product.test_device",
+  "username": "test_device&test_product",
+  "password": ""
+}
+
+### 5. MQTT 设备认证接口 => 认证失败（错误的设备密钥）
+POST http://localhost:8090/mqtt/auth/authenticate
+Content-Type: application/json
+
+{
+  "clientid": "test_product.test_device",
+  "username": "test_device&test_product",
+  "password": "wrong_password"
+}
+
+### 6. EMQX 客户端连接事件钩子 => 设备上线
+POST http://localhost:8090/mqtt/auth/connected
+Content-Type: application/json
+
+{
+  "clientid": "test_product.test_device",
+  "username": "test_device&test_product",
+  "timestamp": 1703808000000,
+  "peername": "192.168.1.100:52036",
+  "sockname": "127.0.0.1:1883"
+}
+
+### 7. EMQX 客户端连接事件钩子 => 用户名为空
+POST http://localhost:8090/mqtt/auth/connected
+Content-Type: application/json
+
+{
+  "clientid": "test_product.test_device",
+  "username": "",
+  "timestamp": 1703808000000,
+  "peername": "192.168.1.100:52036",
+  "sockname": "127.0.0.1:1883"
+}
+
+### 8. EMQX 客户端断开连接事件钩子 => 设备下线（正常断开）
+POST http://localhost:8090/mqtt/auth/disconnected
+Content-Type: application/json
+
+{
+  "clientid": "test_product.test_device",
+  "username": "test_device&test_product",
+  "reason": "normal",
+  "timestamp": 1703808060000
+}
+
+### 9. 使用自定义端口测试（如果配置了不同端口）
+### 假设配置了端口 8091：
+### POST http://localhost:8091/mqtt/auth/authenticate
+### Content-Type: application/json
+### 
+### {
+###   "clientid": "test_product.test_device",
+###   "username": "test_device&test_product",
+###   "password": "test_device_secret_hmac_password"
+### }
+
+### EMQX 配置参考：
+### authentication = [
+###   {
+###     mechanism = http
+###     method = post
+###     url = "http://localhost:8090/mqtt/auth/authenticate"  # 使用配置的端口
+###     body = {
+###       clientid = "${clientid}"
+###       username = "${username}"
+###       password = "${password}"
+###     }
+###     headers = {
+###       "content-type" = "application/json"
+###     }
+###   }
+### ]
+###
+### webhooks = [
+###   {
+###     name = "client_connected"
+###     url = "http://localhost:8090/mqtt/auth/connected"    # 使用配置的端口
+###     events = ["client.connected"]
+###   },
+###   {
+###     name = "client_disconnected"
+###     url = "http://localhost:8090/mqtt/auth/disconnected" # 使用配置的端口
+###     events = ["client.disconnected"]
+###   }
+### ] 

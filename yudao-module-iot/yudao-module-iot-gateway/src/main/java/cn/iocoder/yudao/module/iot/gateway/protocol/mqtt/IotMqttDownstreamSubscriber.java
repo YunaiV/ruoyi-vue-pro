@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt;
 
 import cn.hutool.json.JSONObject;
+import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceGetReqDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.enums.IotDeviceTopicEnum;
-import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceCacheService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +27,7 @@ public class IotMqttDownstreamSubscriber implements IotMessageSubscriber<IotDevi
     private final IotMessageBus messageBus;
 
     @Resource
-    private IotDeviceCacheService deviceCacheService;
+    private IotDeviceCommonApi deviceApi;
 
     @PostConstruct
     public void init() {
@@ -81,7 +83,9 @@ public class IotMqttDownstreamSubscriber implements IotMessageSubscriber<IotDevi
         String method = message.getMethod();
 
         // 通过 deviceId 获取设备信息
-        IotDeviceCacheService.DeviceInfo deviceInfo = deviceCacheService.getDeviceInfoById(message.getDeviceId());
+        IotDeviceGetReqDTO reqDTO = new IotDeviceGetReqDTO();
+        reqDTO.setId(message.getDeviceId());
+        IotDeviceRespDTO deviceInfo = deviceApi.getDevice(reqDTO).getData();
         if (deviceInfo == null) {
             log.warn("[handlePropertyMessage][设备信息不存在][deviceId: {}]", message.getDeviceId());
             return;
@@ -116,7 +120,9 @@ public class IotMqttDownstreamSubscriber implements IotMessageSubscriber<IotDevi
         String method = message.getMethod();
 
         // 通过 deviceId 获取设备信息
-        IotDeviceCacheService.DeviceInfo deviceInfo = deviceCacheService.getDeviceInfoById(message.getDeviceId());
+        IotDeviceGetReqDTO reqDTO = new IotDeviceGetReqDTO();
+        reqDTO.setId(message.getDeviceId());
+        IotDeviceRespDTO deviceInfo = deviceApi.getDevice(reqDTO).getData();
         if (deviceInfo == null) {
             log.warn("[handleServiceMessage][设备信息不存在][deviceId: {}]", message.getDeviceId());
             return;
@@ -141,7 +147,9 @@ public class IotMqttDownstreamSubscriber implements IotMessageSubscriber<IotDevi
      */
     private void handleConfigMessage(IotDeviceMessage message) {
         // 通过 deviceId 获取设备信息
-        IotDeviceCacheService.DeviceInfo deviceInfo = deviceCacheService.getDeviceInfoById(message.getDeviceId());
+        IotDeviceGetReqDTO reqDTO = new IotDeviceGetReqDTO();
+        reqDTO.setId(message.getDeviceId());
+        IotDeviceRespDTO deviceInfo = deviceApi.getDevice(reqDTO).getData();
         if (deviceInfo == null) {
             log.warn("[handleConfigMessage][设备信息不存在][deviceId: {}]", message.getDeviceId());
             return;
@@ -163,7 +171,9 @@ public class IotMqttDownstreamSubscriber implements IotMessageSubscriber<IotDevi
      */
     private void handleOtaMessage(IotDeviceMessage message) {
         // 通过 deviceId 获取设备信息
-        IotDeviceCacheService.DeviceInfo deviceInfo = deviceCacheService.getDeviceInfoById(message.getDeviceId());
+        IotDeviceGetReqDTO reqDTO = new IotDeviceGetReqDTO();
+        reqDTO.setId(message.getDeviceId());
+        IotDeviceRespDTO deviceInfo = deviceApi.getDevice(reqDTO).getData();
         if (deviceInfo == null) {
             log.warn("[handleOtaMessage][设备信息不存在][deviceId: {}]", message.getDeviceId());
             return;
