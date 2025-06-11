@@ -86,26 +86,27 @@ public class TmsFirstMileItemDO extends TenantBaseDO {
      * 发出仓ID
      */
     private Long fromWarehouseId;
+//    快照
     /**
-     * 包装长（cm）
+     * 包装长（mm）(单个产品)
      */
     private BigDecimal packageLength;
     /**
-     * 包装宽（cm）
+     * 包装宽（mm）(单个产品)
      */
     private BigDecimal packageWidth;
     /**
-     * 包装高（cm）
+     * 包装高（mm）(单个产品)
      */
     private BigDecimal packageHeight;
     /**
-     * 毛重（kg）
+     * 毛重（kg）(单个产品)
      */
     private BigDecimal packageWeight;
     /**
-     * 体积（m³）
+     * 基础重量 (kg) (单个产品)
      */
-    private BigDecimal volume;
+    private BigDecimal weight;
     /**
      * 销售公司ID
      */

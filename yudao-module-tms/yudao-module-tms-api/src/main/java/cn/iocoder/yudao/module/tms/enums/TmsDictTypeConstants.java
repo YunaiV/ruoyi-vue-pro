@@ -7,7 +7,7 @@ public interface TmsDictTypeConstants {
     //产品材料
     String PRODUCT_MATERIAL = "erp_product_material";
 
-    //费用类型
+    //TMS费用类型
     String TMS_FEE_TYPE = "fee_type";
 
     //开关状态
@@ -27,5 +27,9 @@ public interface TmsDictTypeConstants {
     // 货币代码
     String CURRENCY_CODE = "currency_code";
 
+    //物流属性
     String ERP_LOGISTIC_ATTRIBUTE = "erp_logistic_attribute";
+
+    //货柜类型
+    String TMS_LOGISTIC_TYPE = "tms_cabinet_type";
 }

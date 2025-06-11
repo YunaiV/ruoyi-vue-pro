@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.wms.dal.dataobject.exchange;
 
-import lombok.*;
-import java.util.*;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 /**
  * 换货单 DO
@@ -35,13 +35,15 @@ public class WmsExchangeDO extends BaseDO {
     private String code;
 
     /**
-     * 类型
+     * '类型 : 1-良品转次品 , 2-次品转良品'
      */
+    @NotNull(message = "类型不能为空")
     private Integer type;
 
     /**
      * 调出仓库ID
      */
+    @NotNull(message = "调出仓库ID不能为空")
     private Long warehouseId;
 
     /**

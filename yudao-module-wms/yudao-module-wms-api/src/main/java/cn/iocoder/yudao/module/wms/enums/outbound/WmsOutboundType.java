@@ -18,8 +18,9 @@ public enum WmsOutboundType implements ArrayValuable<Integer>, DictEnum {
     ORDER(2, "订单出库"),
     STOCKCHECK(3, "盘点出库"),
 
-    OUTBOUND_BILL(4, "头程单出库"),
-    TRANSFER(5, "调拨出库");
+    FIRST_MILE(4, "头程单出库"),
+    TRANSFER(5, "调拨出库"),
+    EXCHANGE(6, "换货出库");
 
     public static final Integer[] VALUES = Arrays.stream(values()).map(WmsOutboundType::getValue).toArray(Integer[]::new);
 

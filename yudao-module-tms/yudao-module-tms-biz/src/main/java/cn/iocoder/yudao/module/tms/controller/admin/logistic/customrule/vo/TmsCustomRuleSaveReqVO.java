@@ -37,7 +37,9 @@ public class TmsCustomRuleSaveReqVO {
     private Integer logisticAttribute;
 
     @Schema(description = "条形码")
-    @Pattern(regexp = "^[^\\r\\n]*$", message = "条形码不能包含换行符")
-    @Pattern(regexp = "^\\S.*\\S$", message = "条形码开头和结尾不能是空格")
+    @Pattern.List({
+        @Pattern(regexp = "^[^\\r\\n]*$", message = "条形码不能包含换行符"),
+        @Pattern(regexp = "^\\S.*\\S$", message = "条形码开头和结尾不能是空格")
+    })
     private String fbaBarCode;
 }

@@ -17,7 +17,7 @@ public class TmsPortInfoRespVO {
 
     @Schema(description = "编号")
     @ExcelProperty("编号")
-    private Integer id;
+    private Long id;
 
     @Schema(description = "创建人")
     @ExcelProperty("创建人")

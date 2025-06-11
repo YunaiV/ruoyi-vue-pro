@@ -133,24 +133,24 @@ public interface WmsInboundService {
 
     /**
      * 按入库顺序获得第一个入库批次
-     * @param warehouseId
-     * @param productId
+     * @param warehouseId 仓库编号
+     * @param productId 产品编号
      * @param olderFirst 是否按入库时间升序
      */
     WmsInboundItemLogicDO getInboundItemLogic(Long warehouseId, Long productId, boolean olderFirst);
 
     /**
      * 按入库顺序获得第一个入库批次
-     * @param warehouseId
-     * @param productId
+     * @param warehouseId 仓库编号
+     * @param productId 产品编号
      * @param olderFirst 是否按入库时间升序
      */
     List<WmsInboundItemLogicDO> selectInboundItemLogicList(Long warehouseId, Long productId, boolean olderFirst);
 
     /**
      * 按入库顺序获得第一个入库批次
-     * @param warehouseId
-     * @param productIds
+     * @param warehouseId 仓库编号
+     * @param productIds 产品编号
      * @param olderFirst 是否按入库时间升序
      */
     Map<Long, WmsInboundItemLogicDO> getInboundItemLogicMap(Long warehouseId, List<Long> productIds, boolean olderFirst);

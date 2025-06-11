@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.tms.controller.admin.first.mile.item.vo;
 
 import cn.iocoder.yudao.module.system.api.utils.Validation;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import lombok.Data;
@@ -44,6 +45,7 @@ public class TmsFirstMileItemSaveReqVO {
 
     @Schema(description = "发出仓ID", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "发出仓ID不能为空")
+    @Min(value = 1, message = "发出仓ID小于1不存在")
     private Long fromWarehouseId;
 
     @Schema(description = "销售公司ID")

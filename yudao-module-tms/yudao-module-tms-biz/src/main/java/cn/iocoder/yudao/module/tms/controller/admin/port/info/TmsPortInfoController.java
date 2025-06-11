@@ -47,7 +47,7 @@ public class TmsPortInfoController {
     @Operation(summary = "创建TMS港口信息")
     @Idempotent
     @PreAuthorize("@ss.hasPermission('tms:port-info:create')")
-    public CommonResult<Integer> createPortInfo(
+    public CommonResult<Long> createPortInfo(
         @Validated(Validation.OnCreate.class) @RequestBody TmsPortInfoSaveReqVO createReqVO) {
         return success(portInfoService.createPortInfo(createReqVO));
     }
@@ -65,7 +65,7 @@ public class TmsPortInfoController {
     @Operation(summary = "删除TMS港口信息")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('tms:port-info:delete')")
-    public CommonResult<Boolean> deletePortInfo(@RequestParam("id") Integer id) {
+    public CommonResult<Boolean> deletePortInfo(@RequestParam("id") Long id) {
         portInfoService.deletePortInfo(id);
         return success(true);
     }
@@ -74,7 +74,7 @@ public class TmsPortInfoController {
     @Operation(summary = "获得TMS港口信息")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('tms:port-info:query')")
-    public CommonResult<TmsPortInfoRespVO> getPortInfo(@RequestParam("id") Integer id) {
+    public CommonResult<TmsPortInfoRespVO> getPortInfo(@RequestParam("id") Long id) {
         TmsPortInfoDO portInfo = portInfoService.getPortInfo(id);
         TmsPortInfoRespVO tmsPortInfoRespVO = BeanUtils.toBean(portInfo, TmsPortInfoRespVO.class);
         // 人员姓名填充

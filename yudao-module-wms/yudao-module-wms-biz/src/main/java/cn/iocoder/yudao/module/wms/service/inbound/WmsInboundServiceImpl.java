@@ -498,8 +498,8 @@ public class WmsInboundServiceImpl implements WmsInboundService {
 
     /**
      * 按入库顺序获得第一个入库批次
-     * @param warehouseId
-     * @param productId
+     * @param warehouseId 仓库ID
+     * @param productId 产品ID
      * @param olderFirst 是否按入库时间升序
      */
     @Override
@@ -509,8 +509,8 @@ public class WmsInboundServiceImpl implements WmsInboundService {
 
     /**
      * 按入库顺序获得第一个入库批次
-     * @param warehouseId
-     * @param productIds
+     * @param warehouseId 仓库ID
+     * @param productIds 产品ID
      * @param olderFirst 是否按入库时间升序
      */
     @Override
@@ -564,9 +564,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         // 拉取明细
         List<WmsInboundItemDO> inboundItemDOS = inboundItemService.selectByInboundId(inbound.getId());
         // 设置实际入库量
-        StreamX.from(inboundItemDOS).assemble(actualQtyMap, WmsInboundItemDO::getProductId, (itemO, qty) -> {
-            itemO.setActualQty(qty);
-        });
+        StreamX.from(inboundItemDOS).assemble(actualQtyMap, WmsInboundItemDO::getProductId, WmsInboundItemDO::setActualQty);
         // 保存实际入库量
         inboundItemService.updateActualQuantity(BeanUtils.toBean(inboundItemDOS, WmsInboundItemSaveReqVO.class));
         // 同意确认收货
@@ -582,9 +580,9 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     public void updateShelvingStatus(Set<Long> ids) {
         for (Long id : ids) {
             List<WmsInboundItemDO> inboundItemDOList = inboundItemMapper.selectByInboundId(id, Integer.MAX_VALUE);
-            Integer none = 0;
-            Integer part = 0;
-            Integer full = 0;
+            int none = 0;
+            int part = 0;
+            int full = 0;
             for (WmsInboundItemDO itemDO : inboundItemDOList) {
                 Integer actualQty = itemDO.getActualQty();
                 Integer ShelveClosedQty = itemDO.getShelveClosedQty();
@@ -635,9 +633,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         // 拉取明细
         List<WmsInboundItemDO> inboundItemDOS = inboundItemService.selectByInboundId(inbound.getId());
         // 设置实际入库量
-        StreamX.from(inboundItemDOS).assemble(actualQtyMap, WmsInboundItemDO::getProductId, (itemO, qty) -> {
-            itemO.setActualQty(qty);
-        });
+        StreamX.from(inboundItemDOS).assemble(actualQtyMap, WmsInboundItemDO::getProductId, WmsInboundItemDO::setActualQty);
         // 保存实际入库量
         inboundItemService.updateActualQuantity(BeanUtils.toBean(inboundItemDOS, WmsInboundItemSaveReqVO.class));
         //

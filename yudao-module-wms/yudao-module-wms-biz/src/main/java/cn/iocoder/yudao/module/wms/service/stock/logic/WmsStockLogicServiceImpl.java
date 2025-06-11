@@ -249,4 +249,9 @@ public class WmsStockLogicServiceImpl implements WmsStockLogicService {
 
         return stockLogicMapper.selectByDeptIdAndProductIdAndCountryId(deptId, productIds, country);
     }
+
+    @Override
+    public List<WmsStockLogicDO> selectByWarehouseIdAndProductId(Long warehouseId, Long productId) {
+        return stockLogicMapper.selectByDeptIdAndProductId(warehouseId, productId);
+    }
 }

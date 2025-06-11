@@ -84,24 +84,24 @@ public class TmsFirstMileRespVO extends BaseVO {
     @ExcelProperty("预计到货日期")
     private LocalDateTime arrivePlanTime;
 
-    @Schema(description = "货柜体积（m³）")
-    @ExcelProperty("货柜体积（m³）")
+    @Schema(description = "总货柜体积（m³）")
+    @ExcelProperty("总货柜体积（m³）")
     private BigDecimal totalVolume;
 
-    @Schema(description = "货柜毛重（kg）")
-    @ExcelProperty("货柜毛重（kg）")
-    private BigDecimal totalWeight;
+    @Schema(description = "总货柜毛重（kg）")
+    @ExcelProperty("总货柜毛重（kg）")
+    private BigDecimal totalPackageWeight;
 
-    @Schema(description = "货柜净重（kg）")
-    @ExcelProperty("货柜净重（kg）")
+    @Schema(description = "总货柜净重（kg）")
+    @ExcelProperty("总货柜净重（kg）")
     private BigDecimal netWeight;
 
-    @Schema(description = "货柜货值（按最近采购价）")
-    @ExcelProperty("货柜货值（按最近采购价）")
+    @Schema(description = "总货柜货值（按最近采购价）")
+    @ExcelProperty("总货柜货值（按最近采购价）")
     private BigDecimal totalValue;
 
-    @Schema(description = "货柜件数")
-    @ExcelProperty("货柜件数")
+    @Schema(description = "总货柜件数")
+    @ExcelProperty("总货柜件数")
     private Integer totalQty;
 
     @Schema(description = "总箱数")

@@ -86,4 +86,6 @@ public interface WmsOutboundService {
     WmsOutboundRespVO generateOutbound(WmsOutboundImportReqVO importReqVO);
 
     void forceAbandon(WmsApprovalReqVO approvalReqVO);
+
+    void auditAgree(WmsApprovalReqVO approvalReqVO);
 }

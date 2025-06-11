@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.tms.enums.TmsErrorCodeConstants.PORT_INFO_NAME_DUPLICATE;
@@ -29,7 +31,7 @@ public class TmsPortInfoServiceImpl implements TmsPortInfoService {
     private TmsPortInfoMapper portInfoMapper;
 
     @Override
-    public Integer createPortInfo(TmsPortInfoSaveReqVO createReqVO) {
+    public Long createPortInfo(TmsPortInfoSaveReqVO createReqVO) {
         // 校验港口名称重复
         validatePortInfoNameDuplicate(null, createReqVO.getName());
         // 插入
@@ -51,20 +53,23 @@ public class TmsPortInfoServiceImpl implements TmsPortInfoService {
     }
 
     @Override
-    public void deletePortInfo(Integer id) {
+    public void deletePortInfo(Long id) {
         // 校验存在
         validatePortInfoExists(id);
         // 删除
         portInfoMapper.deleteById(id);
     }
 
-    private void validatePortInfoExists(Integer id) {
-        if (portInfoMapper.selectById(id) == null) {
-            throw exception(PORT_INFO_NOT_EXISTS);
+    @Override
+    public TmsPortInfoDO validatePortInfoExists(Long id) {
+        TmsPortInfoDO portInfo = portInfoMapper.selectById(id);
+        if (portInfo == null) {
+            throw exception(PORT_INFO_NOT_EXISTS, id);
         }
+        return portInfo;
     }
 
-    private void validatePortInfoNameDuplicate(Integer id, String name) {
+    private void validatePortInfoNameDuplicate(Long id, String name) {
         TmsPortInfoDO portInfo = portInfoMapper.selectOne(TmsPortInfoDO::getName, name);
         if (portInfo != null && !portInfo.getId().equals(id)) {
             throw exception(PORT_INFO_NAME_DUPLICATE, name);
@@ -72,7 +77,7 @@ public class TmsPortInfoServiceImpl implements TmsPortInfoService {
     }
 
     @Override
-    public TmsPortInfoDO getPortInfo(Integer id) {
+    public TmsPortInfoDO getPortInfo(Long id) {
         return portInfoMapper.selectById(id);
     }
 
@@ -84,5 +89,24 @@ public class TmsPortInfoServiceImpl implements TmsPortInfoService {
     @Override
     public List<TmsPortInfoDO> getPortInfoList() {
         return portInfoMapper.selectList();
+    }
+
+    @Override
+    public List<TmsPortInfoDO> validatePortInfoExistsList(Set<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        List<TmsPortInfoDO> portInfoList = portInfoMapper.selectByIds(ids);
+        if (portInfoList.size() != ids.size()) {
+            // 找出不存在的ID
+            Set<Long> existIds = portInfoList.stream()
+                .map(TmsPortInfoDO::getId)
+                .collect(Collectors.toSet());
+            Set<Long> notExistIds = ids.stream()
+                .filter(id -> !existIds.contains(id))
+                .collect(Collectors.toSet());
+            throw exception(PORT_INFO_NOT_EXISTS, notExistIds);
+        }
+        return portInfoList;
     }
 }

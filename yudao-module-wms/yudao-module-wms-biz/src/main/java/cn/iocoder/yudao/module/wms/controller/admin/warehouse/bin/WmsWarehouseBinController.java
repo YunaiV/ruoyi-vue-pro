@@ -156,4 +156,16 @@ public class WmsWarehouseBinController {
         // 导出 Excel
         ExcelUtils.write(response, "库位.xls", "数据", WmsWarehouseBinRespVO.class, BeanUtils.toBean(list, WmsWarehouseBinRespVO.class));
     }
+
+    @GetMapping("/exchange/simple-list")
+    @Operation(summary = "获得转换单库位精简列表")
+    @PreAuthorize("@ss.hasPermission('wms:warehouse-bin:query')")
+    public CommonResult<List<WmsWarehouseBinSimpleRespVO>> getWarehouseSimpleListForExchange(@Valid WmsWarehouseBinPageReqVO pageReqVO) {
+        // 查询数据
+        List<WmsWarehouseBinDO> doList = warehouseBinService.getSimpleListForExchange(pageReqVO);
+        // 转换
+        List<WmsWarehouseBinSimpleRespVO> voList = BeanUtils.toBean(doList, WmsWarehouseBinSimpleRespVO.class);
+
+        return success(voList);
+    }
 }

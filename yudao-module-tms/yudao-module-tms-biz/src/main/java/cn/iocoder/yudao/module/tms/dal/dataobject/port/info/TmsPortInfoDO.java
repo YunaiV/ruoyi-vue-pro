@@ -25,7 +25,7 @@ public class TmsPortInfoDO extends BaseDO {
      * 主键
      */
     @TableId
-    private Integer id;
+    private Long id;
     /**
      * 乐观锁
      */

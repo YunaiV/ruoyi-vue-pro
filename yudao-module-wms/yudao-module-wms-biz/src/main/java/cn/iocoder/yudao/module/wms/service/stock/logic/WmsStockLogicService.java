@@ -159,4 +159,14 @@ public interface WmsStockLogicService {
         }
         return list.stream().collect(Collectors.toMap(WmsStockLogicDO::getProductId, Function.identity()));
     }
+
+    /**
+     * 根据部门ID和产品ID查询库存归属
+     *
+     * @param warehouseId 仓库ID
+     * @param productId   产品ID
+     * @return 库存归属列表
+     */
+    List<WmsStockLogicDO> selectByWarehouseIdAndProductId(Long warehouseId, Long productId);
+
 }

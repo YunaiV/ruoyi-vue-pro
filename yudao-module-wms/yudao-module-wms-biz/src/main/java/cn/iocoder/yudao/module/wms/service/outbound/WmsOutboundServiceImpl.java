@@ -52,6 +52,7 @@ import cn.iocoder.yudao.module.wms.service.stock.bin.WmsStockBinService;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import cn.iocoder.yudao.module.wms.service.warehouse.bin.WmsWarehouseBinService;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -129,6 +130,8 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     @Resource(name = OutboundStateMachineConfigure.STATE_MACHINE_NAME)
     private StateMachine<Integer, WmsOutboundAuditStatus.Event, TransitionContext<WmsOutboundDO>> outboundStateMachine;
 
+    @Autowired
+    WmsOutboundService wmsOutboundService;
 
     /**
      * @sign : A523E13094CD30CE
@@ -213,10 +216,10 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         Map<Long, ErpProductRespDTO> productDTOMap = productApi.getProductDTOMap(StreamX.from(importReqVO.getItemList()).toList(WmsOutboundItemSaveReqVO::getProductId));
         List<WmsOutboundItemSaveReqVO> itemList = BeanUtils.toBean(importReqVO.getItemList(), WmsOutboundItemSaveReqVO.class);
         //查库位
-        for(WmsOutboundItemSaveReqVO item : itemList) {
+        for (WmsOutboundItemSaveReqVO item : itemList) {
             //查询仓位库存表 规则1.根据后进先出筛选出最近入库批次 2.同一批次下，多个库位，根据自带优先级进行选择 3.该库位必须有足够货量
             WmsStockBinDO stockBin = stockBinMapper.selectByProductId(item.getProductId(), item.getPlanQty(), importReqVO.getWarehouseId());
-            if(stockBin == null) {
+            if (stockBin == null) {
                 throw exception(STOCK_BIN_PRODUCT_NOT_ENOUGH, productDTOMap.get(item.getProductId()).getName());
             }
             item.setBinId(stockBin.getBinId());
@@ -236,14 +239,21 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     public void forceAbandon(WmsApprovalReqVO approvalReqVO) {
         // 获得业务对象
         WmsOutboundDO outbound = validateOutboundExists(approvalReqVO.getBillId());
-        if(outbound.getAuditStatus().equals(AUDITING.getValue())){
+        if (outbound.getAuditStatus().equals(AUDITING.getValue())) {
             approve(WmsOutboundAuditStatus.Event.REJECT, approvalReqVO);
         }
-        if(outbound.getAuditStatus().equals(DRAFT.getValue())||outbound.getAuditStatus().equals(REJECT.getValue())){
+        if (outbound.getAuditStatus().equals(DRAFT.getValue()) || outbound.getAuditStatus().equals(REJECT.getValue())) {
             approve(WmsOutboundAuditStatus.Event.ABANDON, approvalReqVO);
-        }else{
+        } else {
             throw exception(OUTBOUND_ABANDON_NOT_ALLOWED);
         }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void auditAgree(WmsApprovalReqVO approvalReqVO) {
+        wmsOutboundService.approve(WmsOutboundAuditStatus.Event.AGREE, approvalReqVO);
+        wmsOutboundService.approve(WmsOutboundAuditStatus.Event.FINISH, approvalReqVO);
     }
 
 
