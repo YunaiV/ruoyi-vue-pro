@@ -162,7 +162,7 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
     private WmsOutboundStatus processItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
 
         this.processStockWarehouseItem(item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
-        List<WmsInboundItemFlowDO> inboundItemFlowList=this.processInboundItem(outboundRespVO,item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
+        List<WmsItemFlowDO> itemFlowList = this.processInboundItem(outboundRespVO, item, companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
         this.processStockLogicItem(item, companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
         this.processStockBinItem(item, companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId, itemFlowList);
         // 当前逻辑,默认全部入库
