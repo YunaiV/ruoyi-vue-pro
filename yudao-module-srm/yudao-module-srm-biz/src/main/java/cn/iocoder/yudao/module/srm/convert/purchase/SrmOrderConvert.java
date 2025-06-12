@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.SrmP
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestItemsDO;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmSupplierDO;
 import cn.iocoder.yudao.module.srm.service.purchase.bo.order.SrmPurchaseOrderBO;
 import cn.iocoder.yudao.module.srm.service.purchase.bo.order.SrmPurchaseOrderItemBO;
 import cn.iocoder.yudao.module.srm.service.purchase.bo.order.word.SrmPurchaseOrderItemWordBO;
@@ -68,7 +69,7 @@ public interface SrmOrderConvert {
      * 合同word 渲染BO用
      */
     default SrmPurchaseOrderWordBO bindDataFormOrderItemDO(List<SrmPurchaseOrderItemDO> itemDOS, SrmPurchaseOrderDO orderDO,
-                                                           SrmPurchaseOrderGenerateContractReqVO vo, Map<Long, FmsCompanyDTO> dtoMap) {
+                                                           SrmPurchaseOrderGenerateContractReqVO vo, Map<Long, FmsCompanyDTO> dtoMap, SrmSupplierDO srmSupplierDO) {
         //        Set<Long> productIds = itemDOS.stream().map(SrmPurchaseOrderItemDO::getProductId).collect(Collectors.toSet());
         //        Map<Long, ErpProductDTO> productMap = erpProductApi.getProductMap(productIds);
         //收集产品的单位map getProductUnitMap
@@ -94,7 +95,7 @@ public interface SrmOrderConvert {
             })).setTotalCount(peek.getTotalCount().setScale(0, RoundingMode.HALF_UP));
             //渲染甲方乙方
             peek.setA(dtoMap.get(vo.getPartyAId()));
-            peek.setB(dtoMap.get(vo.getPartyBId()));
+            peek.setB(srmSupplierDO);
             //渲染起始目的港口名称
             peek.setPortOfLoading(orderDO.getFromPortName());
             peek.setPortOfDischarge(orderDO.getToPortName());

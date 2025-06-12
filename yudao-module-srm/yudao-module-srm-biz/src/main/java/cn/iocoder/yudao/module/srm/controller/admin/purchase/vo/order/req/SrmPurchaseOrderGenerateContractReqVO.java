@@ -38,13 +38,12 @@ public class SrmPurchaseOrderGenerateContractReqVO {
     //甲方主体id
     @Schema(description = "甲方主体id", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "甲方主体id不能为空")
-    @DiffLogField(name = "甲方主体编号")
+    @DiffLogField(name = "甲方财务主体编号")
     private Long partyAId;
 
-    //乙方主体id
-    @Schema(description = "乙方主体id", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "乙方主体id不能为空")
-    @DiffLogField(name = "乙方主体编号")
+    @Schema(description = "乙方供应商ID", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "乙方供应商ID不能为空")
+    @DiffLogField(name = "乙方供应商编号")
     private Long partyBId;
 
     @Schema(description = "付款条款", requiredMode = Schema.RequiredMode.REQUIRED)
