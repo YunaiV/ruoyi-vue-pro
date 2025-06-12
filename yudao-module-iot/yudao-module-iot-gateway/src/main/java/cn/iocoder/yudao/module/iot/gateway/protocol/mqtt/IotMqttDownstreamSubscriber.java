@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
@@ -47,19 +48,28 @@ public class IotMqttDownstreamSubscriber implements IotMessageSubscriber<IotDevi
 
     @Override
     public void onMessage(IotDeviceMessage message) {
-        log.info("[onMessage][接收到下行消息：{}]", message);
+        log.info("[onMessage][接收到下行消息][messageId: {}][method: {}][deviceId: {}]",
+                message.getId(), message.getMethod(), message.getDeviceId());
         try {
             // 根据消息方法处理不同的下行消息
             String method = message.getMethod();
             if (method == null) {
-                log.warn("[onMessage][消息({})方法为空]", message);
+                log.warn("[onMessage][消息方法为空][messageId: {}][deviceId: {}]",
+                        message.getId(), message.getDeviceId());
+                return;
+            }
+
+            // 过滤上行消息：下行订阅者只处理下行消息
+            if (isUpstreamMessage(method)) {
+                log.debug("[onMessage][忽略上行消息][method: {}][messageId: {}]", method, message.getId());
                 return;
             }
 
             // 处理下行消息
             handleDownstreamMessage(message);
         } catch (Exception e) {
-            log.error("[onMessage][处理下行消息失败：{}]", message, e);
+            log.error("[onMessage][处理下行消息失败][messageId: {}][method: {}][deviceId: {}]",
+                    message.getId(), message.getMethod(), message.getDeviceId(), e);
         }
     }
 
@@ -153,6 +163,17 @@ public class IotMqttDownstreamSubscriber implements IotMessageSubscriber<IotDevi
         payload.set("method", method);
         payload.set("params", message.getData());
         return payload;
+    }
+
+    /**
+     * 判断是否为上行消息
+     *
+     * @param method 消息方法
+     * @return 是否为上行消息
+     */
+    private boolean isUpstreamMessage(String method) {
+        IotDeviceMessageMethodEnum methodEnum = IotDeviceMessageMethodEnum.of(method);
+        return methodEnum != null && methodEnum.getUpstream();
     }
 
 }

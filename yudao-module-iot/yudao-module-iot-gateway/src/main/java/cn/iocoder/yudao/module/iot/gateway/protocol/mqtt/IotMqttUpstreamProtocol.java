@@ -37,9 +37,19 @@ import java.util.concurrent.TimeUnit;
 public class IotMqttUpstreamProtocol {
 
     /**
-     * 默认 QoS 级别
+     * 默认 QoS 级别 - 至少一次
      */
     private static final MqttQoS DEFAULT_QOS = MqttQoS.AT_LEAST_ONCE;
+
+    /**
+     * 连接超时时间（秒）
+     */
+    private static final int CONNECT_TIMEOUT_SECONDS = 10;
+
+    /**
+     * 重连延迟时间（毫秒）
+     */
+    private static final long RECONNECT_DELAY_MS = 5000;
 
     private final IotGatewayProperties.EmqxProperties emqxProperties;
 
@@ -227,25 +237,26 @@ public class IotMqttUpstreamProtocol {
      * 连接 MQTT Broker 并订阅主题
      */
     private void connectMqtt() {
+        // 参数校验
         String host = emqxProperties.getMqttHost();
         Integer port = emqxProperties.getMqttPort();
 
         if (StrUtil.isBlank(host)) {
-            String msg = "[connectMqtt][MQTT Host 为空，无法连接]";
-            log.error(msg);
-            return;
+            log.error("[connectMqtt][MQTT Host 为空，无法连接]");
+            throw new IllegalArgumentException("MQTT Host 不能为空");
         }
-        if (port == null) {
-            log.warn("[connectMqtt][MQTT Port 为 null，使用默认端口 1883]");
-            port = 1883;
+        if (port == null || port <= 0) {
+            log.error("[connectMqtt][MQTT Port 无效：{}]", port);
+            throw new IllegalArgumentException("MQTT Port 必须为正整数");
         }
 
-        final Integer finalPort = port;
-        CompletableFuture<Void> connectFuture = mqttClient.connect(finalPort, host)
+        log.info("[connectMqtt][开始连接 MQTT Broker][host: {}][port: {}]", host, port);
+
+        CompletableFuture<Void> connectFuture = mqttClient.connect(port, host)
                 .toCompletionStage()
                 .toCompletableFuture()
                 .thenAccept(connAck -> {
-                    log.info("[connectMqtt][MQTT 客户端连接成功]");
+                    log.info("[connectMqtt][MQTT 客户端连接成功][host: {}][port: {}]", host, port);
                     // 设置断开重连监听器
                     mqttClient.closeHandler(closeEvent -> {
                         log.warn("[closeHandler][MQTT 连接已断开，准备重连]");
@@ -257,17 +268,19 @@ public class IotMqttUpstreamProtocol {
                     subscribeToTopics();
                 })
                 .exceptionally(error -> {
-                    log.error("[connectMqtt][连接 MQTT Broker 失败]", error);
+                    log.error("[connectMqtt][连接 MQTT Broker 失败][host: {}][port: {}]", host, port, error);
+                    // 连接失败时也要尝试重连
                     reconnectWithDelay();
                     return null;
                 });
 
         // 等待连接完成
         try {
-            connectFuture.get(10, TimeUnit.SECONDS);
+            connectFuture.get(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             log.info("[connectMqtt][MQTT 客户端启动完成]");
         } catch (Exception e) {
             log.error("[connectMqtt][MQTT 客户端启动失败]", e);
+            throw new RuntimeException("MQTT 客户端启动失败", e);
         }
     }
 
@@ -284,15 +297,19 @@ public class IotMqttUpstreamProtocol {
      */
     private void subscribeToTopics() {
         List<String> topicList = emqxProperties.getMqttTopics();
-        if (CollUtil.isEmpty(topicList)) {
-            log.warn("[subscribeToTopics][没有配置要订阅的主题]");
-            return;
-        }
+        // @NotEmpty 注解已保证 topicList 不为空，无需重复校验
+
+        log.info("[subscribeToTopics][开始订阅主题，共 {} 个]", topicList.size());
 
         for (String topic : topicList) {
+            if (StrUtil.isBlank(topic)) {
+                log.warn("[subscribeToTopics][跳过空主题]");
+                continue;
+            }
+
             mqttClient.subscribe(topic, DEFAULT_QOS.value(), subscribeResult -> {
                 if (subscribeResult.succeeded()) {
-                    log.info("[subscribeToTopics][订阅主题成功: {}]", topic);
+                    log.info("[subscribeToTopics][订阅主题成功: {}][QoS: {}]", topic, DEFAULT_QOS.value());
                 } else {
                     log.error("[subscribeToTopics][订阅主题失败: {}]", topic, subscribeResult.cause());
                 }
@@ -304,10 +321,16 @@ public class IotMqttUpstreamProtocol {
      * 延迟重连
      */
     private void reconnectWithDelay() {
-        vertx.setTimer(5000, timerId -> {
+        vertx.setTimer(RECONNECT_DELAY_MS, timerId -> {
             if (isRunning && (mqttClient == null || !mqttClient.isConnected())) {
-                log.info("[reconnectWithDelay][开始重连 MQTT Broker]");
-                connectMqtt();
+                log.info("[reconnectWithDelay][开始重连 MQTT Broker，延迟 {} 毫秒]", RECONNECT_DELAY_MS);
+                try {
+                    connectMqtt();
+                } catch (Exception e) {
+                    log.error("[reconnectWithDelay][重连失败，将继续尝试重连]", e);
+                    // 重连失败时继续尝试重连
+                    reconnectWithDelay();
+                }
             }
         });
     }

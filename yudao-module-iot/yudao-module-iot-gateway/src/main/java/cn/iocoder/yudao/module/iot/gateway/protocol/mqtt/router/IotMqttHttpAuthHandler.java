@@ -13,15 +13,37 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import lombok.extern.slf4j.Slf4j;
 
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVICE_AUTH_FAIL;
+
 /**
  * IoT 网关 MQTT HTTP 认证处理器
  * <p>
- * 处理 EMQX 的认证请求和事件钩子
+ * 处理 EMQX 的认证请求和事件钩子，提供统一的错误处理和参数校验
  *
  * @author 芋道源码
  */
 @Slf4j
 public class IotMqttHttpAuthHandler {
+
+    /**
+     * 认证成功状态码
+     */
+    private static final int SUCCESS_STATUS_CODE = 200;
+
+    /**
+     * 参数错误状态码
+     */
+    private static final int BAD_REQUEST_STATUS_CODE = 400;
+
+    /**
+     * 认证失败状态码
+     */
+    private static final int UNAUTHORIZED_STATUS_CODE = 401;
+
+    /**
+     * 服务器错误状态码
+     */
+    private static final int INTERNAL_ERROR_STATUS_CODE = 500;
 
     /**
      * EMQX 认证接口
@@ -44,7 +66,7 @@ public class IotMqttHttpAuthHandler {
             // 参数校验
             if (StrUtil.isEmpty(clientid) || StrUtil.isEmpty(username) || StrUtil.isEmpty(password)) {
                 log.warn("[authenticate][认证参数不完整][clientId: {}][username: {}]", clientid, username);
-                sendErrorResponse(context, 400, "认证参数不完整");
+                sendErrorResponse(context, BAD_REQUEST_STATUS_CODE, "认证参数不完整");
                 return;
             }
 
@@ -58,7 +80,7 @@ public class IotMqttHttpAuthHandler {
             result.checkError();
             if (!BooleanUtil.isTrue(result.getData())) {
                 log.warn("[authenticate][设备认证失败][clientId: {}][username: {}]", clientid, username);
-                sendErrorResponse(context, 401, "设备认证失败");
+                sendErrorResponse(context, UNAUTHORIZED_STATUS_CODE, DEVICE_AUTH_FAIL.getMsg());
                 return;
             }
 
@@ -67,7 +89,7 @@ public class IotMqttHttpAuthHandler {
 
         } catch (Exception e) {
             log.error("[authenticate][设备认证异常]", e);
-            sendErrorResponse(context, 500, "认证服务异常");
+            sendErrorResponse(context, INTERNAL_ERROR_STATUS_CODE, "认证服务异常");
         }
     }
 
@@ -79,7 +101,7 @@ public class IotMqttHttpAuthHandler {
             // 解析请求体
             JsonObject body = context.body().asJsonObject();
             if (body == null) {
-                sendErrorResponse(context, 400, "请求体不能为空");
+                sendErrorResponse(context, BAD_REQUEST_STATUS_CODE, "请求体不能为空");
                 return;
             }
 
@@ -94,7 +116,7 @@ public class IotMqttHttpAuthHandler {
 
         } catch (Exception e) {
             log.error("[connected][处理设备连接事件失败]", e);
-            sendErrorResponse(context, 500, "处理失败");
+            sendErrorResponse(context, INTERNAL_ERROR_STATUS_CODE, "处理失败");
         }
     }
 
@@ -106,7 +128,7 @@ public class IotMqttHttpAuthHandler {
             // 解析请求体
             JsonObject body = context.body().asJsonObject();
             if (body == null) {
-                sendErrorResponse(context, 400, "请求体不能为空");
+                sendErrorResponse(context, BAD_REQUEST_STATUS_CODE, "请求体不能为空");
                 return;
             }
 
@@ -123,7 +145,7 @@ public class IotMqttHttpAuthHandler {
 
         } catch (Exception e) {
             log.error("[disconnected][处理设备断开连接事件失败]", e);
-            sendErrorResponse(context, 500, "处理失败");
+            sendErrorResponse(context, INTERNAL_ERROR_STATUS_CODE, "处理失败");
         }
     }
 
@@ -175,7 +197,7 @@ public class IotMqttHttpAuthHandler {
      */
     private void sendSuccessResponse(RoutingContext context, String message) {
         context.response()
-                .setStatusCode(200)
+                .setStatusCode(SUCCESS_STATUS_CODE)
                 .putHeader("Content-Type", "text/plain; charset=utf-8")
                 .end(message);
     }

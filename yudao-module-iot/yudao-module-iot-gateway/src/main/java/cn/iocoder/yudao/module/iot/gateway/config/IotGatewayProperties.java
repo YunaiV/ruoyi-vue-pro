@@ -103,38 +103,64 @@ public class IotGatewayProperties {
          */
         @NotNull(message = "是否开启不能为空")
         private Boolean enabled;
+
         /**
-         * HTTP 认证端口
+         * HTTP 认证端口（默认：8090）
          */
         private Integer httpAuthPort = 8090;
+
         /**
          * MQTT 服务器地址
          */
+        @NotEmpty(message = "MQTT 服务器地址不能为空")
         private String mqttHost;
+
         /**
-         * MQTT 服务器端口
+         * MQTT 服务器端口（默认：1883）
          */
-        private Integer mqttPort;
+        @NotNull(message = "MQTT 服务器端口不能为空")
+        private Integer mqttPort = 1883;
+
         /**
          * MQTT 用户名
          */
+        @NotEmpty(message = "MQTT 用户名不能为空")
         private String mqttUsername;
+
         /**
          * MQTT 密码
          */
+        @NotEmpty(message = "MQTT 密码不能为空")
         private String mqttPassword;
+
         /**
-         * MQTT 是否开启 SSL
+         * MQTT 是否开启 SSL（默认：false）
          */
-        private Boolean mqttSsl;
+        @NotNull(message = "MQTT 是否开启 SSL 不能为空")
+        private Boolean mqttSsl = false;
+
         /**
-         * MQTT客户端 ID
+         * MQTT 客户端 ID（如果为空，系统将自动生成）
          */
         private String mqttClientId;
+
         /**
-         * MQTT 主题
+         * MQTT 主题列表
          */
+        @NotEmpty(message = "MQTT 主题不能为空")
         private List<String> mqttTopics;
+
+        /**
+         * 获取 MQTT 客户端 ID，如果未配置则自动生成
+         *
+         * @return MQTT 客户端 ID
+         */
+        public String getMqttClientId() {
+            if (cn.hutool.core.util.StrUtil.isBlank(mqttClientId)) {
+                mqttClientId = "iot-gateway-mqtt-" + System.currentTimeMillis();
+            }
+            return mqttClientId;
+        }
 
     }
 
