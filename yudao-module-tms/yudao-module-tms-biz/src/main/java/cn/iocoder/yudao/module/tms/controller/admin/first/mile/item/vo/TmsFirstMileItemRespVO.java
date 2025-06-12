@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.tms.controller.admin.first.mile.item.vo;
 
 import cn.iocoder.yudao.framework.mybatis.core.vo.BaseVO;
+import cn.iocoder.yudao.module.tms.controller.admin.common.vo.TmsProductRespVO;
 import cn.iocoder.yudao.module.tms.controller.admin.first.mile.vo.resp.TmsFirstMileStockRespVO;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -29,20 +30,14 @@ public class TmsFirstMileItemRespVO extends BaseVO {
 
     @Schema(description = "产品ID")
     private Long productId;
+
+    @Schema(description = "产品信息")
+    TmsProductRespVO product;
     /**
      * FBA条码
      */
     @Schema(description = "FBA条码")
     private String fbaBarCode;
-
-    //产品名称
-    @Schema(description = "产品名称")
-    @ExcelProperty("产品名称")
-    private String productName;
-    //产品SKU
-    @Schema(description = "产品SKU")
-    @ExcelProperty("产品SKU")
-    private String productSku;
 
     @Schema(description = "件数")
     @ExcelProperty("件数")
