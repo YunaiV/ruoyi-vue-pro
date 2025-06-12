@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.system.api.utils.Validation;
 import cn.iocoder.yudao.module.system.enums.common.CountryEnum;
+import cn.iocoder.yudao.module.tms.controller.admin.common.vo.TmsProductRespVO;
 import cn.iocoder.yudao.module.tms.controller.admin.first.mile.request.item.vo.TmsFirstMileRequestItemRespVO;
 import cn.iocoder.yudao.module.tms.controller.admin.first.mile.request.vo.*;
 import cn.iocoder.yudao.module.tms.controller.admin.first.mile.vo.req.TmsFirstMileSaveReqVO;
@@ -246,10 +247,7 @@ public class TmsFirstMileRequestController {
             if (bo.getItems() != null) {
                 List<TmsFirstMileRequestItemRespVO> items = bo.getItems().stream().map(item ->
                     BeanUtils.toBean(item, TmsFirstMileRequestItemRespVO.class, itemRespVO -> {
-                        MapUtils.findAndThen(productMap, item.getProductId(), product -> {
-                            itemRespVO.setProductName(product.getName());
-                            itemRespVO.setProductWeight(product.getWeight());
-                        });
+                        MapUtils.findAndThen(productMap, item.getProductId(), product -> itemRespVO.setProduct(BeanUtils.toBean(product, TmsProductRespVO.class)));
                         MapUtils.findAndThen(dtoMap, item.getSalesCompanyId(), company -> itemRespVO.setSalesCompanyName(company.getName()));
                         MapUtils.findAndThen(userMap, safeParseLong(item.getCreator()), user -> itemRespVO.setCreator(user.getNickname()));
                         MapUtils.findAndThen(userMap, safeParseLong(item.getUpdater()), user -> itemRespVO.setUpdater(user.getNickname()));
