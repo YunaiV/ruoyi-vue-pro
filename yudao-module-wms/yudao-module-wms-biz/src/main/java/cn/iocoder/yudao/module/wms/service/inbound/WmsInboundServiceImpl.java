@@ -661,4 +661,18 @@ public class WmsInboundServiceImpl implements WmsInboundService {
     public WmsInboundDO getByWarehouseIdAndProductId(Long warehouseId, Long productId) {
         return inboundMapper.getByWarehouseIdAndProductId(warehouseId, productId);
     }
+
+//    /**
+//     * 按 productId、locationId、warehouseId 查询 WmsItemFlowDO
+//     *
+//     * @param productId   产品 ID
+//     * @param binId       库位 ID
+//     * @param warehouseId 仓库 ID
+//     * @return 入库单库存详情扣减列表
+//     */
+//    @Override
+//    public List<WmsInboundItemFlowDetailVO> selectByProductIdAndBinIdAndWarehouseId(Long warehouseId, Long binId, Long productId, int limit) {
+//        return inboundMapper.selectByProductIdAndBinIdAndWarehouseId(productId, binId, warehouseId, limit);
+//    }
+
 }
