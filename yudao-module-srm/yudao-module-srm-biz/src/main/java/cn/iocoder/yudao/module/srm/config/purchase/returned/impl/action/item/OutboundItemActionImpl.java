@@ -46,6 +46,9 @@ public class OutboundItemActionImpl implements Action<SrmOutboundStatus, SrmEven
     @Transactional(rollbackFor = Exception.class)
     public void execute(SrmOutboundStatus from, SrmOutboundStatus to, SrmEventEnum event, SrmPurchaseOutItemCountContext context) {
         SrmPurchaseReturnItemDO returnItemDO = srmPurchaseReturnItemMapper.selectById(context.getOutItemId());
+        if (returnItemDO == null) {
+            throw new IllegalArgumentException("退货子项不存在,id:" + context.getOutItemId());
+        }
 
         if (event == SrmEventEnum.OUT_STORAGE_ADJUSTMENT) {
             if (context.getOutCount() == null) {

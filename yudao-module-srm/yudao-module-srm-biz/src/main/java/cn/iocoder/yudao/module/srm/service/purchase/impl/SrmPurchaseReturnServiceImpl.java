@@ -227,8 +227,7 @@ public class SrmPurchaseReturnServiceImpl implements SrmPurchaseReturnService {
 
     private void initSlaveStatus(List<SrmPurchaseReturnItemDO> item) {
         for (SrmPurchaseReturnItemDO returnItemDO : item) {
-            SrmPurchaseOutItemCountContext outed = SrmPurchaseOutItemCountContext.builder().outItemId(returnItemDO.getArriveItemId()).build();
-            itemOutStorageStateMachine.fireEvent(SrmOutboundStatus.NONE_OUTBOUND, SrmEventEnum.OUT_STORAGE_INIT, outed);
+            itemOutStorageStateMachine.fireEvent(SrmOutboundStatus.NONE_OUTBOUND, SrmEventEnum.OUT_STORAGE_INIT, SrmPurchaseOutItemCountContext.builder().outItemId(returnItemDO.getId()).build());
         }
 
     }
@@ -565,9 +564,7 @@ public class SrmPurchaseReturnServiceImpl implements SrmPurchaseReturnService {
             throw exception(PURCHASE_RETURN_NOT_EXISTS);
         }
         // 2. 触发事件
-        dos.forEach(returnDO -> {
-            auditStatusMachine.fireEvent(SrmAuditStatus.fromCode(returnDO.getAuditStatus()), SrmEventEnum.SUBMIT_FOR_REVIEW, SrmPurchaseReturnAuditReqVO.builder().ids(Collections.singletonList(returnDO.getId())).build());
-        });
+        dos.forEach(returnDO -> auditStatusMachine.fireEvent(SrmAuditStatus.fromCode(returnDO.getAuditStatus()), SrmEventEnum.SUBMIT_FOR_REVIEW, SrmPurchaseReturnAuditReqVO.builder().ids(Collections.singletonList(returnDO.getId())).build()));
     }
 
     /**
