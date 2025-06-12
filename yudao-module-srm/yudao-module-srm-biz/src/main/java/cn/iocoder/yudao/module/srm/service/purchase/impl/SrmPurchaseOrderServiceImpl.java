@@ -25,6 +25,7 @@ import cn.iocoder.yudao.module.srm.convert.purchase.SrmOrderInConvert;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestItemsDO;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmSupplierDO;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseInItemMapper;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseOrderItemMapper;
 import cn.iocoder.yudao.module.srm.dal.mysql.purchase.SrmPurchaseOrderMapper;
@@ -137,6 +138,8 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
     MessageChannel purchaseOrderChannel;
     @Autowired
     private WmsWarehouseApi wmsWarehouseApi;
+    @Autowired
+    private SrmSupplierService srmSupplierService;
 
     /**
      * 校验是否存在入库项
@@ -877,8 +880,9 @@ public class SrmPurchaseOrderServiceImpl implements SrmPurchaseOrderService {
         try (XWPFTemplate xwpfTemplate = templateService.buildXWPDFTemplate(resource)) {
             //2 模板word渲染数据
             List<SrmPurchaseOrderItemDO> itemDOS = purchaseOrderItemMapper.selectListByOrderId(orderDO.getId());
-            Map<Long, FmsCompanyDTO> dtoMap = convertMap(erpCompanyApi.validateCompany(Set.of(reqVO.getPartyAId(), reqVO.getPartyBId())), FmsCompanyDTO::getId);
-            SrmPurchaseOrderWordBO wordBO = SrmOrderConvert.INSTANCE.bindDataFormOrderItemDO(itemDOS, orderDO, reqVO, dtoMap);
+            Map<Long, FmsCompanyDTO> dtoMap = convertMap(erpCompanyApi.validateCompany(Set.of(reqVO.getPartyAId())), FmsCompanyDTO::getId);
+            SrmSupplierDO supplierDO = srmSupplierService.getSupplier(reqVO.getPartyBId());
+            SrmPurchaseOrderWordBO wordBO = SrmOrderConvert.INSTANCE.bindDataFormOrderItemDO(itemDOS, orderDO, reqVO, dtoMap, supplierDO);
             xwpfTemplate.render(wordBO);
             //3 转换pdf，返回响应
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(); // 用于捕获输出流
