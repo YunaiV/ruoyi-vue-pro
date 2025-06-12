@@ -24,6 +24,7 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
 
     // ========== 设备属性 ==========
     // 可参考 https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services
+    // TODO @haohao：使用 report 哈；
     PROPERTY_POST("thing.property.post", true),
     PROPERTY_REPORT("thing.property.report", true),
 

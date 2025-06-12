@@ -149,8 +149,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
             return;
         }
         try {
-            IotDeviceMessage replyMessage = IotDeviceMessage.replyOf(message.getRequestId(), message.getMethod(),
-                    replyData,
+            IotDeviceMessage replyMessage = IotDeviceMessage.replyOf(message.getRequestId(), message.getMethod(), replyData,
                     serviceException != null ? serviceException.getCode() : null,
                     serviceException != null ? serviceException.getMessage() : null);
             sendDeviceMessage(replyMessage, device, message.getServerId());

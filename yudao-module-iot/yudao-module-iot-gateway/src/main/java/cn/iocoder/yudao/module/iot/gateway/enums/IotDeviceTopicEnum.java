@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.gateway.enums;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+// TODO @haohao：这个类，我们是不是可以删除了哈？
 /**
  * IoT 设备主题枚举
  * <p>
