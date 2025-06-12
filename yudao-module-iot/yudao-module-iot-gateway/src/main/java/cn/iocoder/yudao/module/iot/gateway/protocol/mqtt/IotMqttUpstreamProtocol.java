@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
@@ -18,34 +17,39 @@ import io.vertx.mqtt.MqttClient;
 import io.vertx.mqtt.MqttClientOptions;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+// TODO @haohao：看看有没多余的 log，可以不打噢。
+// TODO @haohao：有没多余的注释可以去掉，减少 ai 味，保持简洁；
 /**
  * IoT 网关 MQTT 统一协议
  * <p>
- * 集成了 MQTT 上行协议和 HTTP 认证协议的功能：
- * 1. MQTT 客户端：连接 EMQX，处理设备上行和下行消息
- * 2. HTTP 认证服务：为 EMQX 提供设备认证接口
+ * 1. MQTT 客户端：连接 EMQX，消费处理设备上行和下行消息
+ * 2. HTTP 认证服务：为 EMQX 提供设备认证、连接、断开接口
  *
  * @author 芋道源码
  */
 @Slf4j
 public class IotMqttUpstreamProtocol {
 
+    // TODO @haohao：是不是也丢到配置里？
     /**
      * 默认 QoS 级别 - 至少一次
      */
     private static final MqttQoS DEFAULT_QOS = MqttQoS.AT_LEAST_ONCE;
 
+    // TODO @haohao：这个也是；
     /**
      * 连接超时时间（秒）
      */
     private static final int CONNECT_TIMEOUT_SECONDS = 10;
 
+    // TODO @haohao：重连也是；
     /**
      * 重连延迟时间（毫秒）
      */
@@ -53,8 +57,10 @@ public class IotMqttUpstreamProtocol {
 
     private final IotGatewayProperties.EmqxProperties emqxProperties;
 
-    // 共享资源
     private Vertx vertx;
+
+    @Getter
+    private final String serverId;
 
     // MQTT 客户端相关
     private MqttClient mqttClient;
@@ -62,6 +68,7 @@ public class IotMqttUpstreamProtocol {
 
     // HTTP 认证服务相关
     private HttpServer httpAuthServer;
+    // TODO @haohao：authHandler 可以 local 哈；
     private IotMqttHttpAuthHandler authHandler;
 
     /**
@@ -69,11 +76,9 @@ public class IotMqttUpstreamProtocol {
      */
     private volatile boolean isRunning = false;
 
-    /**
-     * 构造函数
-     */
     public IotMqttUpstreamProtocol(IotGatewayProperties.EmqxProperties emqxProperties) {
         this.emqxProperties = emqxProperties;
+        this.serverId = IotDeviceMessageUtils.generateServerId(emqxProperties.getMqttPort());
     }
 
     @PostConstruct
@@ -98,6 +103,7 @@ public class IotMqttUpstreamProtocol {
             isRunning = true;
             log.info("[start][MQTT 统一协议服务启动完成]");
         } catch (Exception e) {
+            // TODO @haohao：失败，是不是直接 System.exit 哈！
             log.error("[start][MQTT 统一协议服务启动失败]", e);
             // 启动失败时清理资源
             stop();
@@ -169,6 +175,7 @@ public class IotMqttUpstreamProtocol {
      * 停止 HTTP 认证服务
      */
     private void stopHttpAuthServer() {
+        // TODO @haohao：一些 if return 最好搞下；
         if (httpAuthServer != null) {
             try {
                 httpAuthServer.close().result();
@@ -195,8 +202,7 @@ public class IotMqttUpstreamProtocol {
                 .setClientId(emqxProperties.getMqttClientId())
                 .setUsername(emqxProperties.getMqttUsername())
                 .setPassword(emqxProperties.getMqttPassword())
-                .setSsl(ObjUtil.defaultIfNull(emqxProperties.getMqttSsl(), false));
-
+                .setSsl(emqxProperties.getMqttSsl());
         this.mqttClient = MqttClient.create(vertx, options);
 
         // 连接 MQTT Broker
@@ -256,6 +262,7 @@ public class IotMqttUpstreamProtocol {
                 .toCompletionStage()
                 .toCompletableFuture()
                 .thenAccept(connAck -> {
+                    // TODO @haohao：是不是可以连接完，然后在执行里面；不用 通过 thenAccept 哈；
                     log.info("[connectMqtt][MQTT 客户端连接成功][host: {}][port: {}]", host, port);
                     // 设置断开重连监听器
                     mqttClient.closeHandler(closeEvent -> {
@@ -268,6 +275,7 @@ public class IotMqttUpstreamProtocol {
                     subscribeToTopics();
                 })
                 .exceptionally(error -> {
+                    // TODO @haohao：这里的异常，是不是不用重连哈？因为直接就退出了。然后有 closeHandler 监听重连了；
                     log.error("[connectMqtt][连接 MQTT Broker 失败][host: {}][port: {}]", host, port, error);
                     // 连接失败时也要尝试重连
                     reconnectWithDelay();
@@ -297,16 +305,10 @@ public class IotMqttUpstreamProtocol {
      */
     private void subscribeToTopics() {
         List<String> topicList = emqxProperties.getMqttTopics();
-        // @NotEmpty 注解已保证 topicList 不为空，无需重复校验
 
         log.info("[subscribeToTopics][开始订阅主题，共 {} 个]", topicList.size());
 
         for (String topic : topicList) {
-            if (StrUtil.isBlank(topic)) {
-                log.warn("[subscribeToTopics][跳过空主题]");
-                continue;
-            }
-
             mqttClient.subscribe(topic, DEFAULT_QOS.value(), subscribeResult -> {
                 if (subscribeResult.succeeded()) {
                     log.info("[subscribeToTopics][订阅主题成功: {}][QoS: {}]", topic, DEFAULT_QOS.value());
@@ -322,6 +324,7 @@ public class IotMqttUpstreamProtocol {
      */
     private void reconnectWithDelay() {
         vertx.setTimer(RECONNECT_DELAY_MS, timerId -> {
+            // TODO @haohao：if return，括号少一些；
             if (isRunning && (mqttClient == null || !mqttClient.isConnected())) {
                 log.info("[reconnectWithDelay][开始重连 MQTT Broker，延迟 {} 毫秒]", RECONNECT_DELAY_MS);
                 try {
@@ -348,13 +351,6 @@ public class IotMqttUpstreamProtocol {
         } else {
             log.warn("[publishMessage][MQTT 客户端未连接，无法发布消息][topic: {}]", topic);
         }
-    }
-
-    /**
-     * 获取服务器 ID
-     */
-    public String getServerId() {
-        return IotDeviceMessageUtils.generateServerId(emqxProperties.getMqttPort());
     }
 
 }

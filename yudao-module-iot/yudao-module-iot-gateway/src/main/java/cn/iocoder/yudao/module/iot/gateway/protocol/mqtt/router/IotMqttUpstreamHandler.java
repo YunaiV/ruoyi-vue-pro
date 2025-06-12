@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.enums.IotDeviceTopicEnum;
+import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.mqtt.messages.MqttPublishMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -20,9 +21,10 @@ import java.nio.charset.StandardCharsets;
 public class IotMqttUpstreamHandler extends IotMqttAbstractHandler {
 
     private final IotDeviceMessageService deviceMessageService;
+
     private final String serverId;
 
-    public IotMqttUpstreamHandler(cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol protocol) {
+    public IotMqttUpstreamHandler(IotMqttUpstreamProtocol protocol) {
         this.deviceMessageService = SpringUtil.getBean(IotDeviceMessageService.class);
         this.serverId = protocol.getServerId();
     }
@@ -32,6 +34,7 @@ public class IotMqttUpstreamHandler extends IotMqttAbstractHandler {
      */
     public void handle(MqttPublishMessage message) {
         String topic = message.topicName();
+        // TODO @haohao： message.payload().getBytes();
         String payload = message.payload().toString(StandardCharsets.UTF_8);
 
         log.debug("[handle][收到 MQTT 消息][topic: {}]", topic);
@@ -44,6 +47,7 @@ public class IotMqttUpstreamHandler extends IotMqttAbstractHandler {
         // 1. 识别并验证消息类型
         String messageType = getMessageType(topic);
         if (messageType == null) {
+            // TODO @haohao：log 是不是把 payload 也打印下哈
             log.warn("[doHandle][未知的消息类型][topic: {}]", topic);
             return;
         }
@@ -56,9 +60,11 @@ public class IotMqttUpstreamHandler extends IotMqttAbstractHandler {
      * 处理消息的统一逻辑
      */
     private void processMessage(String topic, String payload, String messageType) {
+        // TODO @haohao：messageType 解析，是不是作用不大哈？
         log.info("[processMessage][接收到{}][topic: {}]", messageType, topic);
 
         // 解析主题获取设备信息
+        // TODO @haohao：不一定是 7 个哈；阿里云 topic 有点差异的；可以考虑解析到 topicParts[2]、topicParts[3] 的 topic
         String[] topicParts = parseTopic(topic);
         if (topicParts == null) {
             return;
@@ -66,19 +72,21 @@ public class IotMqttUpstreamHandler extends IotMqttAbstractHandler {
 
         String productKey = topicParts[2];
         String deviceName = topicParts[3];
+        // TODO @haohao：解析不到，可以打个 error log；
 
         // 解码消息
         byte[] messageBytes = payload.getBytes(StandardCharsets.UTF_8);
         IotDeviceMessage message = deviceMessageService.decodeDeviceMessage(
                 messageBytes, productKey, deviceName);
 
-        // 发送消息到队列（需要补充设备信息）
+        // 发送消息到队列
         deviceMessageService.sendDeviceMessage(message, productKey, deviceName, serverId);
 
         // 记录成功日志
         log.info("[processMessage][处理{}成功][topic: {}]", messageType, topic);
     }
 
+    // TODO @haohao：合并下处理；不搞成每个 topic 一个处理；
     /**
      * 识别消息类型
      *

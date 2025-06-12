@@ -11,7 +11,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -19,13 +19,20 @@ import lombok.extern.slf4j.Slf4j;
  *
  * @author 芋道源码
  */
-@RequiredArgsConstructor
 @Slf4j
 public class IotHttpUpstreamProtocol extends AbstractVerticle {
 
     private final IotGatewayProperties.HttpProperties httpProperties;
 
     private HttpServer httpServer;
+
+    @Getter
+    private final String serverId;
+
+    public IotHttpUpstreamProtocol(IotGatewayProperties.HttpProperties httpProperties) {
+        this.httpProperties = httpProperties;
+        this.serverId = IotDeviceMessageUtils.generateServerId(httpProperties.getServerPort());
+    }
 
     @Override
     @PostConstruct
@@ -65,10 +72,6 @@ public class IotHttpUpstreamProtocol extends AbstractVerticle {
                 log.error("[stop][IoT 网关 HTTP 协议停止失败]", e);
             }
         }
-    }
-
-    public String getServerId() {
-        return IotDeviceMessageUtils.generateServerId(httpProperties.getServerPort());
     }
 
 }

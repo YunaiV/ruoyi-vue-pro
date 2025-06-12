@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 
+// TODO @haohao：是不是不用基类哈；
 /**
  * IoT 网关 MQTT 协议的处理器抽象基类
  * <p>

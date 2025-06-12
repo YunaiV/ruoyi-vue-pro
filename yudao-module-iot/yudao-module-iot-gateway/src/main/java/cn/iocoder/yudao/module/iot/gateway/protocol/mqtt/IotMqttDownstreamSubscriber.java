@@ -61,6 +61,7 @@ public class IotMqttDownstreamSubscriber implements IotMessageSubscriber<IotDevi
 
             // 过滤上行消息：下行订阅者只处理下行消息
             if (isUpstreamMessage(method)) {
+                // TODO @haohao：打个 erroor log，按道理不会发生；
                 log.debug("[onMessage][忽略上行消息][method: {}][messageId: {}]", method, message.getId());
                 return;
             }
@@ -149,6 +150,7 @@ public class IotMqttDownstreamSubscriber implements IotMessageSubscriber<IotDevi
         return null;
     }
 
+    // TODO @haohao：按道理说，这里的应该是通过 encodeMessage；
     /**
      * 构建下行消息载荷
      *

@@ -44,9 +44,6 @@ public class IotGatewayConfiguration {
     @Slf4j
     public static class MqttProtocolConfiguration {
 
-        /**
-         * MQTT 统一协议：集成上行协议和HTTP认证协议
-         */
         @Bean
         public IotMqttUpstreamProtocol iotMqttUnifiedProtocol(IotGatewayProperties gatewayProperties) {
             return new IotMqttUpstreamProtocol(gatewayProperties.getProtocol().getEmqx());
