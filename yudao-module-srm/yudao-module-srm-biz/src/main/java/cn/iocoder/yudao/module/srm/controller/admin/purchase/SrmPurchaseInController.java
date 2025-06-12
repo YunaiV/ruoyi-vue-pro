@@ -2,11 +2,13 @@ package cn.iocoder.yudao.module.srm.controller.admin.purchase;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
+import cn.iocoder.yudao.framework.common.enums.TimeZoneEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.excel.core.convert.DynamicTimeZoneLocalDateTimeConvert;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
@@ -27,6 +29,7 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.system.api.utils.Validation;
 import cn.iocoder.yudao.module.wms.api.warehouse.WmsWarehouseApi;
 import cn.iocoder.yudao.module.wms.api.warehouse.dto.WmsWarehouseDTO;
+import com.google.common.collect.Lists;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -118,6 +121,8 @@ public class SrmPurchaseInController {
         PageResult<SrmPurchaseInBO> page = purchaseInService.getPurchaseInBOPage(pageReqVO);
         // 导出 Excel
         ExcelUtils.write(response, "采购到货.xls", "数据", SrmPurchaseInBaseRespVO.class, bindList(page.getList()));
+//        ExcelUtils.write(response, "采购到货.xls", "数据", SrmPurchaseInBaseRespVO.class, bindList(page.getList())
+//                , Lists.newArrayList(DynamicTimeZoneLocalDateTimeConvert.build(TimeZoneEnum.UTC_ZONE_ID, TimeZoneEnum.UTC8_ZONE_ID)));
     }
 
     @PutMapping("/submitAudit")
@@ -154,8 +159,8 @@ public class SrmPurchaseInController {
         // 1. 获取关联数据
         // 1.1 到货项
         List<SrmPurchaseInItemDO> purchaseInItemList = list.stream()
-            .flatMap(bo -> bo.getSrmPurchaseInItemDOS().stream())
-            .collect(Collectors.toList());
+                .flatMap(bo -> bo.getSrmPurchaseInItemDOS().stream())
+                .collect(Collectors.toList());
         Map<Long, List<SrmPurchaseInItemDO>> purchaseInItemMap = convertMultiMap(purchaseInItemList, SrmPurchaseInItemDO::getArriveId);
 
         // 1.2 产品信息
@@ -164,9 +169,9 @@ public class SrmPurchaseInController {
         Map<Long, SrmSupplierDO> supplierMap = supplierService.getSupplierMap(convertSet(list, SrmPurchaseInBO::getSupplierId));
         // 1.4 人员信息
         Set<Long> userIds = Stream.concat(list.stream().flatMap(inBO -> Stream.of(inBO.getAuditorId(),//审核者
-                safeParseLong(inBO.getCreator()), safeParseLong(inBO.getUpdater()))), purchaseInItemList.stream()
-                .flatMap(itemDO -> Stream.of(safeParseLong(itemDO.getCreator()), safeParseLong(itemDO.getUpdater()), itemDO.getApplicantId())))
-            .distinct().filter(Objects::nonNull).collect(Collectors.toSet());
+                        safeParseLong(inBO.getCreator()), safeParseLong(inBO.getUpdater()))), purchaseInItemList.stream()
+                        .flatMap(itemDO -> Stream.of(safeParseLong(itemDO.getCreator()), safeParseLong(itemDO.getUpdater()), itemDO.getApplicantId())))
+                .distinct().filter(Objects::nonNull).collect(Collectors.toSet());
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(userIds);
         // 1.5 部门
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(purchaseInItemList, SrmPurchaseInItemDO::getApplicationDeptId));
