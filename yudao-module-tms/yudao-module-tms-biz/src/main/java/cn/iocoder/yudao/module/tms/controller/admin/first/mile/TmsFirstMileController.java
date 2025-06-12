@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.module.system.api.utils.Validation;
+import cn.iocoder.yudao.module.tms.controller.admin.common.vo.TmsProductRespVO;
 import cn.iocoder.yudao.module.tms.controller.admin.fee.vo.TmsFeeRespVO;
 import cn.iocoder.yudao.module.tms.controller.admin.first.mile.item.vo.TmsFirstMileItemRespVO;
 import cn.iocoder.yudao.module.tms.controller.admin.first.mile.vo.req.TmsFirstMileAuditReqVO;
@@ -296,10 +297,7 @@ public class TmsFirstMileController {
                     MapUtils.findAndThen(companyMap, item.getCompanyId(), company -> itemRespVO.setCompanyName(company.getAbbr()));
                     MapUtils.findAndThen(companyMap, item.getSalesCompanyId(), company -> itemRespVO.setSalesCompanyName(company.getAbbr()));
                     //产品
-                    MapUtils.findAndThen(productMap, item.getProductId(), product -> {
-                        itemRespVO.setProductName(product.getName())
-                            .setProductSku(product.getCode());
-                    });
+                    MapUtils.findAndThen(productMap, item.getProductId(), product -> itemRespVO.setProduct(BeanUtils.toBean(product, TmsProductRespVO.class)));
                     //部门
                     MapUtils.findAndThen(deptMap, item.getDeptId(), dept -> itemRespVO.setDeptName(dept.getName()));
                     //仓库
