@@ -38,9 +38,7 @@ public interface SrmOrderConvert {
      * @param itemDOMap       采购项Map
      * @return 采购订单的入参reqVO的item
      */
-    default SrmPurchaseOrderSaveReqVO.Item convertToErpPurchaseOrderSaveReqVOItem(SrmPurchaseRequestItemsDO itemDO,
-        Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> requestItemsMap, Map<Long, SrmPurchaseRequestItemsDO> itemDOMap) {
-
+    default SrmPurchaseOrderSaveReqVO.Item convertToErpPurchaseOrderSaveReqVOItem(SrmPurchaseRequestItemsDO itemDO, Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> requestItemsMap, Map<Long, SrmPurchaseRequestItemsDO> itemDOMap) {
         SrmPurchaseOrderSaveReqVO.Item item = new SrmPurchaseOrderSaveReqVO.Item();
         //SrmPurchaseRequestItemsDO ->  SrmPurchaseOrderSaveReqVO.Item
         SrmPurchaseRequestItemsDO requestItemsDO = itemDOMap.get(itemDO.getId());
@@ -55,15 +53,14 @@ public interface SrmOrderConvert {
         // 设置下单数量(采购) == 申请项批准数量
         item.setQty(reqVO.getOrderQuantity()); //合并时vo -> 数量
         //vo 必填项 ，特殊
-        item.setProductPrice(itemDO.getGrossPrice());//产品含税单价->产品价格
+        item.setProductPrice(reqVO.getProductPrice());//产品含税单价->产品价格
         //价税合计
-        item.setDeliveryTime(itemDO.getExpectArrivalDate());//交货日期 -> 期望到货日期
+        item.setDeliveryTime(reqVO.getDeliveryTime());//交货日期 -> 期望到货日期
         return item;
     }
 
     //list
-    default List<SrmPurchaseOrderSaveReqVO.Item> convertToErpPurchaseOrderSaveReqVOItemList(List<SrmPurchaseRequestItemsDO> itemDOList,
-        Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> requestItemsMap, Map<Long, SrmPurchaseRequestItemsDO> itemDOMap) {
+    default List<SrmPurchaseOrderSaveReqVO.Item> convertToErpPurchaseOrderSaveReqVOItemList(List<SrmPurchaseRequestItemsDO> itemDOList, Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> requestItemsMap, Map<Long, SrmPurchaseRequestItemsDO> itemDOMap) {
         return itemDOList.stream().map(itemDO -> convertToErpPurchaseOrderSaveReqVOItem(itemDO, requestItemsMap, itemDOMap)).collect(Collectors.toList());
     }
 
