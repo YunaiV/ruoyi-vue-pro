@@ -6,14 +6,14 @@ import cn.iocoder.yudao.module.system.enums.somle.BillType;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsItemFlowDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.logic.WmsStockLogicDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockFlowDirection;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
-import cn.iocoder.yudao.module.wms.service.inbound.item.flow.WmsInboundItemFlowService;
+import cn.iocoder.yudao.module.wms.service.inbound.item.flow.WmsItemFlowService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -41,7 +41,7 @@ public class OutboundRejectExecutor extends OutboundExecutor {
 
     @Resource
     @Lazy
-    private WmsInboundItemFlowService inboundItemFlowService;
+    private WmsItemFlowService itemFlowService;
 
 
     /**
@@ -72,26 +72,26 @@ public class OutboundRejectExecutor extends OutboundExecutor {
      * 更新入库单明细
      **/
     @Override
-    protected List<WmsInboundItemFlowDO> processInboundItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
+    protected List<WmsItemFlowDO> processInboundItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
 
 
-//        List<WmsInboundItemFlowDO> flowDOList = inboundItemFlowService.selectByActionId(outboundRespVO.getLatestOutboundActionId());
-        List<WmsInboundItemFlowDO> flowDOList = inboundItemFlowService.selectByOutboundId(outboundId, productId);
+//        List<WmsItemFlowDO> flowDOList = itemFlowService.selectByActionId(outboundRespVO.getLatestOutboundActionId());
+        List<WmsItemFlowDO> flowDOList = itemFlowService.selectByOutboundId(outboundId, productId);
 
         Long actionId= IdUtil.getSnowflakeNextId();
         outboundRespVO.setLatestOutboundActionId(actionId);
 
-        List<Long> inboundItemIds= StreamX.from(flowDOList).toList(WmsInboundItemFlowDO::getInboundItemId);
+        List<Long> inboundItemIds = StreamX.from(flowDOList).toList(WmsItemFlowDO::getInboundItemId);
         List<WmsInboundItemDO> inboundItemsList=inboundItemService.selectByIds(inboundItemIds);
-        List<WmsInboundItemFlowDO> inboundItemFlowList = new ArrayList<>();
+        List<WmsItemFlowDO> itemFlowList = new ArrayList<>();
         Map<Long,WmsInboundItemDO> map=StreamX.from(inboundItemsList).toMap(WmsInboundItemDO::getId);
-        for (WmsInboundItemFlowDO flowDO : flowDOList) {
+        for (WmsItemFlowDO flowDO : flowDOList) {
             WmsInboundItemDO inboundItemDO = map.get(flowDO.getInboundItemId());
             Integer qty=flowDO.getOutboundAvailableDeltaQty();
             inboundItemDO.setOutboundAvailableQty(inboundItemDO.getOutboundAvailableQty()+qty);
 
             //
-            WmsInboundItemFlowDO newFlowDO=new WmsInboundItemFlowDO();
+            WmsItemFlowDO newFlowDO = new WmsItemFlowDO();
             newFlowDO.setOutboundActionId(actionId);
             newFlowDO.setInboundId(inboundItemDO.getInboundId());
             newFlowDO.setInboundItemId(inboundItemDO.getId());
@@ -108,13 +108,13 @@ public class OutboundRejectExecutor extends OutboundExecutor {
 //            newFlowDO.setOutboundQty(qty);
 //            newFlowDO.setOutboundId(outboundId);
 //            newFlowDO.setOutboundItemId(outboundItemId);
-            inboundItemFlowList.add(newFlowDO);
+            itemFlowList.add(newFlowDO);
 
         }
         // 保存详情与流水
-        inboundItemService.saveItems(inboundItemsList,inboundItemFlowList);
+        inboundItemService.saveItems(inboundItemsList, itemFlowList);
 
-        return inboundItemFlowList;
+        return itemFlowList;
 
     }
 

@@ -97,11 +97,11 @@ public interface WmsStockFlowMapper extends BaseMapperX<WmsStockFlowDO> {
 
     default WmsStockFlowDO getLastFlow(Long warehouseId, Integer stockType, Long stockId) {
         // 解决高并发插入冲突
-        // List<WmsStockFlowDO> list=selectList(new LambdaQueryWrapperX<WmsStockFlowDO>().eq(WmsStockFlowDO::getWarehouseId, warehouseId).eq(WmsStockFlowDO::getStockType, stockType).eq(WmsStockFlowDO::getStockId, stockId).eq(WmsStockFlowDO::getNextFlowId, 0));
-        // return list.isEmpty()?null:list.get(0);
-        LambdaQueryWrapperX<WmsStockFlowDO> wrapper = new LambdaQueryWrapperX<WmsStockFlowDO>().eq(WmsStockFlowDO::getWarehouseId, warehouseId).eq(WmsStockFlowDO::getStockType, stockType).eq(WmsStockFlowDO::getStockId, stockId).eq(WmsStockFlowDO::getNextFlowId, 0);
+        List<WmsStockFlowDO> list = selectList(new LambdaQueryWrapperX<WmsStockFlowDO>().eq(WmsStockFlowDO::getWarehouseId, warehouseId).eq(WmsStockFlowDO::getStockType, stockType).eq(WmsStockFlowDO::getStockId, stockId).eq(WmsStockFlowDO::getNextFlowId, 0));
+        return list.isEmpty() ? null : list.get(0);
+//        LambdaQueryWrapperX<WmsStockFlowDO> wrapper = new LambdaQueryWrapperX<WmsStockFlowDO>().eq(WmsStockFlowDO::getWarehouseId, warehouseId).eq(WmsStockFlowDO::getStockType, stockType).eq(WmsStockFlowDO::getStockId, stockId).eq(WmsStockFlowDO::getNextFlowId, 0);
         // 无并发
-        return selectOne(wrapper);
+//        return selectOne(wrapper);
     }
 
     default List<WmsStockFlowDO> selectStockFlow(Long stockType, Long stockId) {

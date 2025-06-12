@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.wms.controller.admin.stock.flow.vo;
 
 import cn.iocoder.yudao.module.wms.controller.admin.company.FmsCompanySimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.dept.DeptSimpleRespVO;
+import cn.iocoder.yudao.module.wms.controller.admin.exchange.vo.WmsExchangeRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.flow.vo.WmsInboundItemFlowSimpleVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundSimpleRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundSimpleRespVO;
@@ -149,6 +150,9 @@ public class WmsStockFlowRespVO {
 
     @Schema(description = "盘点单", example = "")
     private WmsStockCheckRespVO stockCheck;
+
+    @Schema(description = "换货单", example = "")
+    private WmsExchangeRespVO exchange;
 
     @Schema(description = "仓位库存移动单", example = "")
     private WmsStockBinMoveRespVO stockBinMove;

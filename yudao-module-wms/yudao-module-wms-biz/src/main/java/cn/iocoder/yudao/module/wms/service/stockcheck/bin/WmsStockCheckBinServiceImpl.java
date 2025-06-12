@@ -225,6 +225,7 @@ public class WmsStockCheckBinServiceImpl implements WmsStockCheckBinService {
         WmsStockCheckDO stockCheckDO = stockCheckService.validateStockCheckExists(stockCheckId);
         WmsStockCheckAuditStatus auditStatus = WmsStockCheckAuditStatus.parse(stockCheckDO.getAuditStatus());
         // 除了审批中的情况，其它情况不允许修改实际盘点量
+        assert auditStatus != null;
         if (!auditStatus.matchAny(WmsStockCheckAuditStatus.AUDITING)) {
             throw exception(STOCKCHECK_CAN_NOT_EDIT);
         }

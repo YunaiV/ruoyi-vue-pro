@@ -20,7 +20,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WmsInboundItemFlowDO extends BaseDO {
+public class WmsItemFlowDO extends BaseDO {
 
     /**
      * 主键
