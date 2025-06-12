@@ -215,10 +215,8 @@ public class SrmPurchaseRequestServiceImpl implements SrmPurchaseRequestService 
         //申请单已审核+未关闭才可以合并
         validMerge(itemsDOS);
         // 创建 itemsMap 和 requestItemDOMap
-        Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> itemsMap =
-            reqVO.getItems().stream().collect(Collectors.toMap(SrmPurchaseRequestMergeReqVO.requestItems::getId, Function.identity()));
-        Map<Long, SrmPurchaseRequestItemsDO> requestItemDOMap =
-            itemsDOS.stream().collect(Collectors.toMap(SrmPurchaseRequestItemsDO::getId, Function.identity()));
+        Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> itemsMap = reqVO.getItems().stream().collect(Collectors.toMap(SrmPurchaseRequestMergeReqVO.requestItems::getId, Function.identity()));
+        Map<Long, SrmPurchaseRequestItemsDO> requestItemDOMap = itemsDOS.stream().collect(Collectors.toMap(SrmPurchaseRequestItemsDO::getId, Function.identity()));
 
         // SrmPurchaseRequestItemsDO item -> 订单vo item
         List<SrmPurchaseOrderSaveReqVO.Item> voItemList = SrmOrderConvert.INSTANCE.convertToErpPurchaseOrderSaveReqVOItemList(itemsDOS, itemsMap, requestItemDOMap);
