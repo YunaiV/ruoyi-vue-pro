@@ -24,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -146,6 +147,6 @@ public class SrmSupplierServiceImpl implements SrmSupplierService {
             p -> BeanUtils.toBean(p, SrmPaymentTermRespVO.class)
         );
         //额外
-        supplierList.forEach(e -> e.setPaymentTerms(e.getSrmPaymentTermsResp().getPaymentTermZh()));
+        supplierList.forEach(e -> Optional.ofNullable(e.getSrmPaymentTermsResp()).ifPresent(p -> e.setPaymentTerms(e.getSrmPaymentTermsResp().getPaymentTermZh())));
     }
 }
