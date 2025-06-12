@@ -81,7 +81,7 @@ public class IotAlinkDeviceMessageCodec implements IotDeviceMessageCodec {
 
     @Override
     public String type() {
-        return "alink";
+        return "Alink";
     }
 
 }

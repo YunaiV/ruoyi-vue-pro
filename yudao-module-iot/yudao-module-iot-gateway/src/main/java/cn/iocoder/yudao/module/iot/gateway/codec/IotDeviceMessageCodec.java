@@ -26,7 +26,7 @@ public interface IotDeviceMessageCodec {
     IotDeviceMessage decode(byte[] bytes);
 
     /**
-     * @return 类型
+     * @return 数据格式（编码器类型）
      */
     String type();
 

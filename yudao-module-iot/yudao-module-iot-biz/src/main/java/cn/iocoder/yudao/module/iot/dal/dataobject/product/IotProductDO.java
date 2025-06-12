@@ -71,34 +71,12 @@ public class IotProductDO extends TenantBaseDO {
     private Integer netType;
 
     /**
-     * 编解码器类型
-     *
+     * 数据格式（编解码器类型）
+     * <p>
      * 字典 {@link cn.iocoder.yudao.module.iot.enums.DictTypeConstants#CODEC_TYPE}
+     *
+     * 目的：用于 gateway-server 解析消息格式
      */
     private String codecType;
-    /**
-     * 接入网关协议
-     * <p>
-     * 枚举 {@link cn.iocoder.yudao.module.iot.enums.product.IotProtocolTypeEnum}
-     */
-    private Integer protocolType;
-    /**
-     * 协议编号
-     * <p>
-     * TODO 外键：后续加
-     */
-    private Long protocolId;
-    /**
-     * 数据格式
-     * <p>
-     * 枚举 {@link cn.iocoder.yudao.module.iot.enums.product.IotDataFormatEnum}
-     */
-    private Integer dataFormat;
-    /**
-     * 数据校验级别
-     * <p>
-     * 枚举 {@link cn.iocoder.yudao.module.iot.enums.product.IotValidateTypeEnum}
-     */
-    private Integer validateType;
 
 }
