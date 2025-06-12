@@ -24,6 +24,7 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
 
     // ========== 设备属性 ==========
     // 可参考 https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services
+    PROPERTY_POST("thing.property.post", true),
     PROPERTY_REPORT("thing.property.report", true),
 
     PROPERTY_SET("thing.property.set", false),
@@ -33,7 +34,8 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
 
     ;
 
-    public static final String[] ARRAYS = Arrays.stream(values()).map(IotDeviceMessageMethodEnum::getMethod).toArray(String[]::new);
+    public static final String[] ARRAYS = Arrays.stream(values()).map(IotDeviceMessageMethodEnum::getMethod)
+            .toArray(String[]::new);
 
     /**
      * 不进行 reply 回复的方法集合

@@ -105,33 +105,33 @@ public class IotMqttDownstreamSubscriber implements IotMessageSubscriber<IotDevi
         }
 
         // 属性相关操作
-        if (method.startsWith("thing.service.property.")) {
-            if ("thing.service.property.set".equals(method)) {
+        if (method.startsWith(IotDeviceTopicEnum.PROPERTY_SERVICE_METHOD_PREFIX)) {
+            if (IotDeviceTopicEnum.PROPERTY_SET_METHOD.equals(method)) {
                 return IotDeviceTopicEnum.buildPropertySetTopic(productKey, deviceName);
-            } else if ("thing.service.property.get".equals(method)) {
+            } else if (IotDeviceTopicEnum.PROPERTY_GET_METHOD.equals(method)) {
                 return IotDeviceTopicEnum.buildPropertyGetTopic(productKey, deviceName);
             }
             return null;
         }
 
         // 配置设置操作
-        if (method.startsWith("thing.service.config.")) {
+        if (method.startsWith(IotDeviceTopicEnum.CONFIG_SERVICE_METHOD_PREFIX)) {
             return IotDeviceTopicEnum.buildConfigSetTopic(productKey, deviceName);
         }
 
         // OTA 升级操作
-        if (method.startsWith("thing.service.ota.")) {
+        if (method.startsWith(IotDeviceTopicEnum.OTA_SERVICE_METHOD_PREFIX)) {
             return IotDeviceTopicEnum.buildOtaUpgradeTopic(productKey, deviceName);
         }
 
         // 一般服务调用操作
-        if (method.startsWith("thing.service.")) {
-            // 排除属性、配置、OTA相关的服务调用
+        if (method.startsWith(IotDeviceTopicEnum.SERVICE_METHOD_PREFIX)) {
+            // 排除属性、配置、OTA 相关的服务调用
             if (method.contains("property") || method.contains("config") || method.contains("ota")) {
                 return null; // 已在上面处理
             }
             // 从方法中提取服务标识符
-            String serviceIdentifier = method.substring("thing.service.".length());
+            String serviceIdentifier = method.substring(IotDeviceTopicEnum.SERVICE_METHOD_PREFIX.length());
             return IotDeviceTopicEnum.buildServiceTopic(productKey, deviceName, serviceIdentifier);
         }
 

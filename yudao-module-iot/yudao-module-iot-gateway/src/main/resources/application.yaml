@@ -40,9 +40,7 @@ yudao:
           enabled: true
           mqtt-ssl: false
           mqtt-topics:
-            - "/sys/#"                         # 系统主题（设备上报）
-            - "/ota/#"                         # OTA 升级主题
-            - "/config/#"                      # 配置主题
+            - "/sys/#"                         # 系统主题
 
     # 消息总线配置
     message-bus:

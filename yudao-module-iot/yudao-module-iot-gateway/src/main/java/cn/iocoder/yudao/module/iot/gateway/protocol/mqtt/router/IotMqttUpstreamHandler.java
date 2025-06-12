@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
+import cn.iocoder.yudao.module.iot.gateway.enums.IotDeviceTopicEnum;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.mqtt.messages.MqttPublishMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +23,12 @@ public class IotMqttUpstreamHandler {
 
     private final IotDeviceMessageProducer deviceMessageProducer;
     private final IotDeviceMessageService deviceMessageService;
+    private final String serverId;
 
-    public IotMqttUpstreamHandler() {
+    public IotMqttUpstreamHandler(cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol protocol) {
         this.deviceMessageProducer = SpringUtil.getBean(IotDeviceMessageProducer.class);
         this.deviceMessageService = SpringUtil.getBean(IotDeviceMessageService.class);
+        this.serverId = protocol.getServerId();
     }
 
     /**
@@ -92,8 +95,8 @@ public class IotMqttUpstreamHandler {
         IotDeviceMessage message = deviceMessageService.decodeDeviceMessage(
                 messageBytes, productKey, deviceName);
 
-        // 发送消息到队列
-        deviceMessageProducer.sendDeviceMessage(message);
+        // 发送消息到队列（需要补充设备信息）
+        deviceMessageService.sendDeviceMessage(message, productKey, deviceName, serverId);
 
         // 记录成功日志
         log.info("[processMessage][处理{}成功][topic: {}]", messageType, topic);
@@ -106,26 +109,109 @@ public class IotMqttUpstreamHandler {
      * @return 消息类型描述，如果不支持返回 null
      */
     private String getMessageType(String topic) {
-        // 设备事件上报: /sys/{productKey}/{deviceName}/thing/event/{eventIdentifier}/post
-        if (topic.contains("/thing/event/") && topic.endsWith("/post")) {
+        if (StrUtil.isBlank(topic)) {
+            return null;
+        }
+
+        // 按优先级匹配主题类型，避免误匹配
+
+        // 1. 设备属性上报: /sys/{productKey}/{deviceName}/thing/event/property/post
+        if (isPropertyPostTopic(topic)) {
+            return IotDeviceTopicEnum.PROPERTY_POST_TOPIC.getDescription();
+        }
+
+        // 2. 设备事件上报: /sys/{productKey}/{deviceName}/thing/event/{eventIdentifier}/post
+        if (isEventPostTopic(topic)) {
             return "设备事件上报";
         }
 
-        // 设备属性操作: /sys/{productKey}/{deviceName}/thing/property/post
-        // 或属性响应: /sys/{productKey}/{deviceName}/thing/service/property/set_reply
-        if (topic.endsWith("/thing/property/post") ||
-                topic.contains("/thing/service/property/set") ||
-                topic.contains("/thing/service/property/get")) {
-            return "设备属性操作";
+        // 3. 设备属性设置响应: /sys/{productKey}/{deviceName}/thing/service/property/set_reply
+        if (isPropertySetReplyTopic(topic)) {
+            return "设备属性设置响应";
         }
 
-        // 设备服务调用: /sys/{productKey}/{deviceName}/thing/service/{serviceIdentifier}
-        if (topic.contains("/thing/service/") && !topic.contains("/property/")) {
-            return "设备服务调用";
+        // 4. 设备属性获取响应: /sys/{productKey}/{deviceName}/thing/service/property/get_reply
+        if (isPropertyGetReplyTopic(topic)) {
+            return "设备属性获取响应";
+        }
+
+        // 5. 设备配置设置响应: /sys/{productKey}/{deviceName}/thing/service/config/set_reply
+        if (isConfigSetReplyTopic(topic)) {
+            return IotDeviceTopicEnum.CONFIG_SET_TOPIC.getDescription() + "响应";
+        }
+
+        // 6. 设备 OTA 升级响应:
+        // /sys/{productKey}/{deviceName}/thing/service/ota/upgrade_reply
+        if (isOtaUpgradeReplyTopic(topic)) {
+            return IotDeviceTopicEnum.OTA_UPGRADE_TOPIC.getDescription() + "响应";
+        }
+
+        // 7. 其他服务调用响应: 通用服务调用响应
+        if (isServiceReplyTopic(topic)) {
+            return "设备服务调用响应";
         }
 
         // 不支持的消息类型
         return null;
+    }
+
+    /**
+     * 判断是否为属性上报主题
+     */
+    private boolean isPropertyPostTopic(String topic) {
+        return topic.contains(IotDeviceTopicEnum.PROPERTY_POST_TOPIC.getTopic());
+    }
+
+    /**
+     * 判断是否为事件上报主题
+     */
+    private boolean isEventPostTopic(String topic) {
+        return topic.contains(IotDeviceTopicEnum.EVENT_POST_TOPIC_PREFIX.getTopic())
+                && topic.endsWith(IotDeviceTopicEnum.EVENT_POST_TOPIC_SUFFIX.getTopic())
+                && !topic.contains("property"); // 排除属性上报主题
+    }
+
+    /**
+     * 判断是否为属性设置响应主题
+     */
+    private boolean isPropertySetReplyTopic(String topic) {
+        return topic.contains(IotDeviceTopicEnum.PROPERTY_SET_TOPIC.getTopic())
+                && topic.endsWith(IotDeviceTopicEnum.REPLY_SUFFIX);
+    }
+
+    /**
+     * 判断是否为属性获取响应主题
+     */
+    private boolean isPropertyGetReplyTopic(String topic) {
+        return topic.contains(IotDeviceTopicEnum.PROPERTY_GET_TOPIC.getTopic())
+                && topic.endsWith(IotDeviceTopicEnum.REPLY_SUFFIX);
+    }
+
+    /**
+     * 判断是否为配置设置响应主题
+     */
+    private boolean isConfigSetReplyTopic(String topic) {
+        return topic.contains(IotDeviceTopicEnum.CONFIG_SET_TOPIC.getTopic())
+                && topic.endsWith(IotDeviceTopicEnum.REPLY_SUFFIX);
+    }
+
+    /**
+     * 判断是否为 OTA 升级响应主题
+     */
+    private boolean isOtaUpgradeReplyTopic(String topic) {
+        return topic.contains(IotDeviceTopicEnum.OTA_UPGRADE_TOPIC.getTopic())
+                && topic.endsWith(IotDeviceTopicEnum.REPLY_SUFFIX);
+    }
+
+    /**
+     * 判断是否为服务调用响应主题（排除已处理的特殊服务）
+     */
+    private boolean isServiceReplyTopic(String topic) {
+        return topic.contains(IotDeviceTopicEnum.SERVICE_TOPIC_PREFIX)
+                && topic.endsWith(IotDeviceTopicEnum.REPLY_SUFFIX)
+                && !topic.contains("property")
+                && !topic.contains("config")
+                && !topic.contains("ota");
     }
 
     /**

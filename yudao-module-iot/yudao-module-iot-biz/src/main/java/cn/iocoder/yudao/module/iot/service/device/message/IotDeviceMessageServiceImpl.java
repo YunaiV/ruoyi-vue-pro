@@ -144,12 +144,13 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
         // 3. 回复消息。前提：非 _reply 消息，并且非禁用回复的消息
         if (IotDeviceMessageUtils.isReplyMessage(message)
-            || IotDeviceMessageMethodEnum.isReplyDisabled(message.getMethod())
-            || StrUtil.isEmpty(message.getServerId())) {
+                || IotDeviceMessageMethodEnum.isReplyDisabled(message.getMethod())
+                || StrUtil.isEmpty(message.getServerId())) {
             return;
         }
         try {
-            IotDeviceMessage replyMessage = IotDeviceMessage.replyOf(message.getRequestId(), message.getMethod(), replyData,
+            IotDeviceMessage replyMessage = IotDeviceMessage.replyOf(message.getRequestId(), message.getMethod(),
+                    replyData,
                     serviceException != null ? serviceException.getCode() : null,
                     serviceException != null ? serviceException.getMessage() : null);
             sendDeviceMessage(replyMessage, device, message.getServerId());
@@ -175,7 +176,8 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         }
 
         // 属性上报
-        if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.PROPERTY_REPORT.getMethod())) {
+        if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.PROPERTY_REPORT.getMethod()) ||
+                Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod())) {
             devicePropertyService.saveDeviceProperty(device, message);
             return null;
         }

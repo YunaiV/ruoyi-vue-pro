@@ -128,6 +128,10 @@ public class IotGatewayProperties {
          */
         private Boolean mqttSsl;
         /**
+         * MQTT客户端 ID
+         */
+        private String mqttClientId;
+        /**
          * MQTT 主题
          */
         private List<String> mqttTopics;

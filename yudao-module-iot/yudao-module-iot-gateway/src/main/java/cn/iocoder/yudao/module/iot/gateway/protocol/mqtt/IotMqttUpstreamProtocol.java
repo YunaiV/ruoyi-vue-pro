@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
+import cn.iocoder.yudao.module.iot.gateway.enums.IotDeviceTopicEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router.IotMqttHttpAuthHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router.IotMqttUpstreamHandler;
 import io.netty.handler.codec.mqtt.MqttQoS;
@@ -137,9 +137,9 @@ public class IotMqttUpstreamProtocol {
         this.authHandler = new IotMqttHttpAuthHandler();
 
         // 添加认证路由
-        router.post("/mqtt/auth/authenticate").handler(authHandler::authenticate);
-        router.post("/mqtt/auth/connected").handler(authHandler::connected);
-        router.post("/mqtt/auth/disconnected").handler(authHandler::disconnected);
+        router.post(IotDeviceTopicEnum.MQTT_AUTH_AUTHENTICATE_PATH).handler(authHandler::authenticate);
+        router.post(IotDeviceTopicEnum.MQTT_AUTH_CONNECTED_PATH).handler(authHandler::connected);
+        router.post(IotDeviceTopicEnum.MQTT_AUTH_DISCONNECTED_PATH).handler(authHandler::disconnected);
 
         // 启动 HTTP 服务器
         int authPort = emqxProperties.getHttpAuthPort();
@@ -176,11 +176,13 @@ public class IotMqttUpstreamProtocol {
         log.info("[startMqttClient][开始启动 MQTT 客户端]");
 
         // 初始化消息处理器
-        this.upstreamHandler = new IotMqttUpstreamHandler();
+        this.upstreamHandler = new IotMqttUpstreamHandler(this);
 
         // 创建 MQTT 客户端
+        log.info("[startMqttClient][使用 MQTT 客户端 ID: {}]", emqxProperties.getMqttClientId());
+
         MqttClientOptions options = new MqttClientOptions()
-                .setClientId("yudao-iot-gateway-" + IdUtil.fastSimpleUUID())
+                .setClientId(emqxProperties.getMqttClientId())
                 .setUsername(emqxProperties.getMqttUsername())
                 .setPassword(emqxProperties.getMqttPassword())
                 .setSsl(ObjUtil.defaultIfNull(emqxProperties.getMqttSsl(), false));

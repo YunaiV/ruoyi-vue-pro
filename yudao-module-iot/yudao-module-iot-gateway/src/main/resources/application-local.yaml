@@ -39,9 +39,7 @@ yudao:
           mqtt-password: public                # MQTT 密码
           mqtt-ssl: false                      # 是否开启 SSL
           mqtt-topics:
-            - "/sys/#"                         # 系统主题（设备上报）
-            - "/ota/#"                         # OTA 升级主题
-            - "/config/#"                      # 配置主题
+            - "/sys/#"                         # 系统主题
 
     # 消息总线配置
     message-bus:
