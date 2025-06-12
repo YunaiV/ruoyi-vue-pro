@@ -6,15 +6,18 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
-import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router.IotMqttUpstreamRouter;
+import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router.IotMqttHttpAuthHandler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router.IotMqttUpstreamHandler;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpServer;
+import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.mqtt.MqttClient;
 import io.vertx.mqtt.MqttClientOptions;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -22,11 +25,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * IoT 网关 MQTT 协议：接收设备上行消息
+ * IoT 网关 MQTT 统一协议
+ * <p>
+ * 集成了 MQTT 上行协议和 HTTP 认证协议的功能：
+ * 1. MQTT 客户端：连接 EMQX，处理设备上行和下行消息
+ * 2. HTTP 认证服务：为 EMQX 提供设备认证接口
  *
  * @author 芋道源码
  */
-@RequiredArgsConstructor
 @Slf4j
 public class IotMqttUpstreamProtocol {
 
@@ -37,30 +43,143 @@ public class IotMqttUpstreamProtocol {
 
     private final IotGatewayProperties.EmqxProperties emqxProperties;
 
+    // 共享资源
     private Vertx vertx;
+
+    // MQTT 客户端相关
     private MqttClient mqttClient;
-    private IotMqttUpstreamRouter messageRouter;
+    private IotMqttUpstreamHandler upstreamHandler;
+
+    // HTTP 认证服务相关
+    private HttpServer httpAuthServer;
+    private IotMqttHttpAuthHandler authHandler;
 
     /**
      * 服务运行状态标志
      */
     private volatile boolean isRunning = false;
 
+    /**
+     * 构造函数
+     */
+    public IotMqttUpstreamProtocol(IotGatewayProperties.EmqxProperties emqxProperties) {
+        this.emqxProperties = emqxProperties;
+    }
+
     @PostConstruct
     public void start() {
         if (isRunning) {
-            log.warn("[start][MQTT 协议服务已经在运行中，请勿重复启动]");
+            log.warn("[start][MQTT 统一协议服务已经在运行中，请勿重复启动]");
             return;
         }
-        log.info("[start][开始启动 MQTT 协议服务]");
+        log.info("[start][开始启动 MQTT 统一协议服务]");
 
-        // 初始化组件
-        this.vertx = Vertx.vertx();
-        this.messageRouter = new IotMqttUpstreamRouter(this);
+        try {
+            // 1. 创建共享的 Vertx 实例
+            this.vertx = Vertx.vertx();
+            log.info("[start][共享 Vertx 实例创建成功]");
+
+            // 2. 启动 HTTP 认证服务
+            startHttpAuthServer();
+
+            // 3. 启动 MQTT 客户端
+            startMqttClient();
+
+            isRunning = true;
+            log.info("[start][MQTT 统一协议服务启动完成]");
+        } catch (Exception e) {
+            log.error("[start][MQTT 统一协议服务启动失败]", e);
+            // 启动失败时清理资源
+            stop();
+            throw e;
+        }
+    }
+
+    @PreDestroy
+    public void stop() {
+        if (!isRunning) {
+            log.warn("[stop][MQTT 统一协议服务已经停止，无需再次停止]");
+            return;
+        }
+        log.info("[stop][开始停止 MQTT 统一协议服务]");
+
+        // 1. 停止 MQTT 客户端
+        stopMqttClient();
+
+        // 2. 停止 HTTP 认证服务
+        stopHttpAuthServer();
+
+        // 3. 关闭 Vertx 实例
+        if (vertx != null) {
+            try {
+                vertx.close();
+                log.info("[stop][Vertx 实例已关闭]");
+            } catch (Exception e) {
+                log.warn("[stop][关闭 Vertx 实例失败]", e);
+            }
+        }
+
+        isRunning = false;
+        log.info("[stop][MQTT 统一协议服务已停止]");
+    }
+
+    /**
+     * 启动 HTTP 认证服务
+     */
+    private void startHttpAuthServer() {
+        log.info("[startHttpAuthServer][开始启动 HTTP 认证服务]");
+
+        // 创建路由
+        Router router = Router.router(vertx);
+        router.route().handler(BodyHandler.create());
+
+        // 创建认证处理器
+        this.authHandler = new IotMqttHttpAuthHandler();
+
+        // 添加认证路由
+        router.post("/mqtt/auth/authenticate").handler(authHandler::authenticate);
+        router.post("/mqtt/auth/connected").handler(authHandler::connected);
+        router.post("/mqtt/auth/disconnected").handler(authHandler::disconnected);
+
+        // 启动 HTTP 服务器
+        int authPort = emqxProperties.getHttpAuthPort();
+        try {
+            httpAuthServer = vertx.createHttpServer()
+                    .requestHandler(router)
+                    .listen(authPort)
+                    .result();
+            log.info("[startHttpAuthServer][HTTP 认证服务启动成功，端口：{}]", authPort);
+        } catch (Exception e) {
+            log.error("[startHttpAuthServer][HTTP 认证服务启动失败]", e);
+            throw e;
+        }
+    }
+
+    /**
+     * 停止 HTTP 认证服务
+     */
+    private void stopHttpAuthServer() {
+        if (httpAuthServer != null) {
+            try {
+                httpAuthServer.close().result();
+                log.info("[stopHttpAuthServer][HTTP 认证服务已停止]");
+            } catch (Exception e) {
+                log.error("[stopHttpAuthServer][HTTP 认证服务停止失败]", e);
+            }
+        }
+    }
+
+    /**
+     * 启动 MQTT 客户端
+     */
+    private void startMqttClient() {
+        log.info("[startMqttClient][开始启动 MQTT 客户端]");
+
+        // 初始化消息处理器
+        this.upstreamHandler = new IotMqttUpstreamHandler();
 
         // 创建 MQTT 客户端
         MqttClientOptions options = new MqttClientOptions()
-                // TODO @haohao：clientid 建议也配置文件；想通名字，会冲突哇？
                 .setClientId("yudao-iot-gateway-" + IdUtil.fastSimpleUUID())
                 .setUsername(emqxProperties.getMqttUsername())
                 .setPassword(emqxProperties.getMqttPassword())
@@ -72,14 +191,10 @@ public class IotMqttUpstreamProtocol {
         connectMqtt();
     }
 
-    @PreDestroy
-    public void stop() {
-        if (!isRunning) {
-            log.warn("[stop][MQTT 协议服务已经停止，无需再次停止]");
-            return;
-        }
-        log.info("[stop][开始停止 MQTT 协议服务]");
-
+    /**
+     * 停止 MQTT 客户端
+     */
+    private void stopMqttClient() {
         // 1. 取消 MQTT 主题订阅
         if (mqttClient != null && mqttClient.isConnected()) {
             List<String> topicList = emqxProperties.getMqttTopics();
@@ -87,9 +202,9 @@ public class IotMqttUpstreamProtocol {
                 for (String topic : topicList) {
                     try {
                         mqttClient.unsubscribe(topic);
-                        log.debug("[stop][取消订阅主题: {}]", topic);
+                        log.debug("[stopMqttClient][取消订阅主题: {}]", topic);
                     } catch (Exception e) {
-                        log.warn("[stop][取消订阅主题异常: {}]", topic, e);
+                        log.warn("[stopMqttClient][取消订阅主题异常: {}]", topic, e);
                     }
                 }
             }
@@ -99,33 +214,20 @@ public class IotMqttUpstreamProtocol {
         try {
             if (mqttClient != null && mqttClient.isConnected()) {
                 mqttClient.disconnect();
+                log.info("[stopMqttClient][MQTT 客户端已断开]");
             }
         } catch (Exception e) {
-            log.warn("[stop][关闭 MQTT 客户端异常]", e);
+            log.warn("[stopMqttClient][关闭 MQTT 客户端异常]", e);
         }
-
-        // 3. 关闭 Vertx
-        try {
-            if (vertx != null) {
-                vertx.close();
-            }
-        } catch (Exception e) {
-            log.warn("[stop][关闭 Vertx 异常]", e);
-        }
-
-        // 4. 更新状态
-        isRunning = false;
-        log.info("[stop][MQTT 协议服务已停止]");
     }
 
     /**
      * 连接 MQTT Broker 并订阅主题
      */
     private void connectMqtt() {
-        // 检查必要的 MQTT 配置
-        // TODO @haohao：这些通过配置文件的 validate 去做哈，简化下；
         String host = emqxProperties.getMqttHost();
         Integer port = emqxProperties.getMqttPort();
+
         if (StrUtil.isBlank(host)) {
             String msg = "[connectMqtt][MQTT Host 为空，无法连接]";
             log.error(msg);
@@ -133,7 +235,7 @@ public class IotMqttUpstreamProtocol {
         }
         if (port == null) {
             log.warn("[connectMqtt][MQTT Port 为 null，使用默认端口 1883]");
-            port = 1883; // 默认 MQTT 端口
+            port = 1883;
         }
 
         final Integer finalPort = port;
@@ -152,7 +254,6 @@ public class IotMqttUpstreamProtocol {
                     // 订阅主题
                     subscribeToTopics();
                 })
-                // TODO @haohao：这个要不要改成，必须连接成功？不做重试；不然启动也蛮危险的？
                 .exceptionally(error -> {
                     log.error("[connectMqtt][连接 MQTT Broker 失败]", error);
                     reconnectWithDelay();
@@ -162,10 +263,9 @@ public class IotMqttUpstreamProtocol {
         // 等待连接完成
         try {
             connectFuture.get(10, TimeUnit.SECONDS);
-            isRunning = true;
-            log.info("[connectMqtt][MQTT 协议服务启动完成]");
+            log.info("[connectMqtt][MQTT 客户端启动完成]");
         } catch (Exception e) {
-            log.error("[connectMqtt][MQTT 协议服务启动失败]", e);
+            log.error("[connectMqtt][MQTT 客户端启动失败]", e);
         }
     }
 
@@ -173,7 +273,7 @@ public class IotMqttUpstreamProtocol {
      * 设置 MQTT 消息处理器
      */
     private void setupMessageHandler() {
-        mqttClient.publishHandler(messageRouter::route);
+        mqttClient.publishHandler(upstreamHandler::handle);
         log.debug("[setupMessageHandler][MQTT 消息处理器设置完成]");
     }
 
@@ -182,76 +282,54 @@ public class IotMqttUpstreamProtocol {
      */
     private void subscribeToTopics() {
         List<String> topicList = emqxProperties.getMqttTopics();
-        // TODO @haohao：建议 topicList 直接 validate 校验
         if (CollUtil.isEmpty(topicList)) {
-            log.warn("[subscribeToTopics][未配置 MQTT 主题，使用默认主题]");
-            topicList = List.of("/sys/#"); // 默认订阅所有系统主题
+            log.warn("[subscribeToTopics][没有配置要订阅的主题]");
+            return;
         }
 
         for (String topic : topicList) {
-            // TODO @haohao：直接 validate 校验；嘿嘿，主要保证核心逻辑，简单点
-            if (StrUtil.isBlank(topic)) {
-                log.warn("[subscribeToTopics][跳过空主题]");
-                continue;
-            }
-
-            mqttClient.subscribe(topic, DEFAULT_QOS.value())
-                    .onSuccess(ack -> log.info("[subscribeToTopics][订阅主题成功: {}]", topic))
-                    .onFailure(err -> log.error("[subscribeToTopics][订阅主题失败: {}]", topic, err));
+            mqttClient.subscribe(topic, DEFAULT_QOS.value(), subscribeResult -> {
+                if (subscribeResult.succeeded()) {
+                    log.info("[subscribeToTopics][订阅主题成功: {}]", topic);
+                } else {
+                    log.error("[subscribeToTopics][订阅主题失败: {}]", topic, subscribeResult.cause());
+                }
+            });
         }
     }
 
     /**
-     * 重连 MQTT 客户端
+     * 延迟重连
      */
     private void reconnectWithDelay() {
-        if (!isRunning) {
-            log.info("[reconnectWithDelay][服务已停止，不再尝试重连]");
-            return;
-        }
-
-        // 默认重连延迟 5 秒
-        int reconnectDelayMs = 5000;
-        vertx.setTimer(reconnectDelayMs, id -> {
-            log.info("[reconnectWithDelay][开始重新连接 MQTT]");
-            connectMqtt();
+        vertx.setTimer(5000, timerId -> {
+            if (isRunning && (mqttClient == null || !mqttClient.isConnected())) {
+                log.info("[reconnectWithDelay][开始重连 MQTT Broker]");
+                connectMqtt();
+            }
         });
     }
 
     /**
-     * 发布消息到 MQTT
+     * 发布消息到 MQTT Broker
      *
      * @param topic   主题
      * @param payload 消息内容
      */
     public void publishMessage(String topic, String payload) {
-        if (mqttClient == null || !mqttClient.isConnected()) {
-            log.warn("[publishMessage][MQTT 客户端未连接，无法发送消息][topic: {}]", topic);
-            return;
+        if (mqttClient != null && mqttClient.isConnected()) {
+            mqttClient.publish(topic, Buffer.buffer(payload), DEFAULT_QOS, false, false);
+            log.debug("[publishMessage][发布消息成功][topic: {}]", topic);
+        } else {
+            log.warn("[publishMessage][MQTT 客户端未连接，无法发布消息][topic: {}]", topic);
         }
-
-        mqttClient.publish(topic, Buffer.buffer(payload), DEFAULT_QOS, false, false)
-                .onSuccess(v -> log.debug("[publishMessage][发送消息成功][topic: {}]", topic))
-                .onFailure(err -> log.error("[publishMessage][发送消息失败][topic: {}]", topic, err));
     }
 
     /**
      * 获取服务器 ID
-     *
-     * @return 服务器 ID
      */
     public String getServerId() {
         return IotDeviceMessageUtils.generateServerId(emqxProperties.getMqttPort());
-    }
-
-    // TODO @haohao：这个要删除哇？
-    /**
-     * 获取 MQTT 客户端
-     *
-     * @return MQTT 客户端
-     */
-    public MqttClient getMqttClient() {
-        return mqttClient;
     }
 
 }

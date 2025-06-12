@@ -1,14 +1,14 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
-import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
-import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceGetReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.enums.IotDeviceTopicEnum;
+import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class IotMqttDownstreamSubscriber implements IotMessageSubscriber<IotDevi
     private final IotMessageBus messageBus;
 
     @Resource
-    private IotDeviceCommonApi deviceApi;
+    private IotDeviceService deviceService;
 
     @PostConstruct
     public void init() {
@@ -56,137 +56,87 @@ public class IotMqttDownstreamSubscriber implements IotMessageSubscriber<IotDevi
                 return;
             }
 
-            // TODO @haohao：看看怎么融合下
-            if (method.startsWith("thing.service.property.")) {
-                handlePropertyMessage(message);
-            } else if (method.startsWith("thing.service.") && !method.contains("property") && !method.contains("config")
-                    && !method.contains("ota")) {
-                handleServiceMessage(message);
-            } else if (method.startsWith("thing.service.config.")) {
-                handleConfigMessage(message);
-            } else if (method.startsWith("thing.service.ota.")) {
-                handleOtaMessage(message);
-            } else {
-                log.warn("[onMessage][未知的消息方法：{}]", method);
-            }
+            // 处理下行消息
+            handleDownstreamMessage(message);
         } catch (Exception e) {
             log.error("[onMessage][处理下行消息失败：{}]", message, e);
         }
     }
 
     /**
-     * 处理属性相关消息
+     * 处理下行消息
      *
      * @param message 设备消息
      */
-    private void handlePropertyMessage(IotDeviceMessage message) {
-        String method = message.getMethod();
-
-        // 通过 deviceId 获取设备信息
-        // TODO @haohao：通过缓存拿；
-        IotDeviceGetReqDTO reqDTO = new IotDeviceGetReqDTO();
-        reqDTO.setId(message.getDeviceId());
-        IotDeviceRespDTO deviceInfo = deviceApi.getDevice(reqDTO).getData();
+    private void handleDownstreamMessage(IotDeviceMessage message) {
+        // 1. 获取设备信息（使用缓存）
+        IotDeviceRespDTO deviceInfo = deviceService.getDeviceFromCache(message.getDeviceId());
         if (deviceInfo == null) {
-            log.warn("[handlePropertyMessage][设备信息不存在][deviceId: {}]", message.getDeviceId());
+            log.warn("[handleDownstreamMessage][设备信息不存在][deviceId: {}]", message.getDeviceId());
             return;
         }
 
-        String productKey = deviceInfo.getProductKey();
-        String deviceName = deviceInfo.getDeviceName();
-
-        if ("thing.service.property.set".equals(method)) {
-            // 属性设置
-            String topic = IotDeviceTopicEnum.buildPropertySetTopic(productKey, deviceName);
-            JSONObject payload = buildDownstreamPayload(message, method);
-            protocol.publishMessage(topic, payload.toString());
-            log.info("[handlePropertyMessage][发送属性设置消息][topic: {}]", topic);
-        } else if ("thing.service.property.get".equals(method)) {
-            // 属性获取
-            String topic = IotDeviceTopicEnum.buildPropertyGetTopic(productKey, deviceName);
-            JSONObject payload = buildDownstreamPayload(message, method);
-            protocol.publishMessage(topic, payload.toString());
-            log.info("[handlePropertyMessage][发送属性获取消息][topic: {}]", topic);
-        } else {
-            log.warn("[handlePropertyMessage][未知的属性操作：{}]", method);
-        }
-    }
-
-    /**
-     * 处理服务调用消息
-     *
-     * @param message 设备消息
-     */
-    private void handleServiceMessage(IotDeviceMessage message) {
-        String method = message.getMethod();
-
-        // 通过 deviceId 获取设备信息
-        IotDeviceGetReqDTO reqDTO = new IotDeviceGetReqDTO();
-        reqDTO.setId(message.getDeviceId());
-        IotDeviceRespDTO deviceInfo = deviceApi.getDevice(reqDTO).getData();
-        if (deviceInfo == null) {
-            log.warn("[handleServiceMessage][设备信息不存在][deviceId: {}]", message.getDeviceId());
+        // 2. 根据方法构建主题
+        String topic = buildTopicByMethod(message.getMethod(), deviceInfo.getProductKey(), deviceInfo.getDeviceName());
+        if (StrUtil.isBlank(topic)) {
+            log.warn("[handleDownstreamMessage][未知的消息方法：{}]", message.getMethod());
             return;
         }
 
-        String productKey = deviceInfo.getProductKey();
-        String deviceName = deviceInfo.getDeviceName();
-
-        // 从方法中提取服务标识符
-        String serviceIdentifier = method.substring("thing.service.".length());
-
-        String topic = IotDeviceTopicEnum.buildServiceTopic(productKey, deviceName, serviceIdentifier);
-        JSONObject payload = buildDownstreamPayload(message, method);
-        protocol.publishMessage(topic, payload.toString());
-        log.info("[handleServiceMessage][发送服务调用消息][topic: {}]", topic);
-    }
-
-    /**
-     * 处理配置设置消息
-     *
-     * @param message 设备消息
-     */
-    private void handleConfigMessage(IotDeviceMessage message) {
-        // 通过 deviceId 获取设备信息
-        IotDeviceGetReqDTO reqDTO = new IotDeviceGetReqDTO();
-        reqDTO.setId(message.getDeviceId());
-        IotDeviceRespDTO deviceInfo = deviceApi.getDevice(reqDTO).getData();
-        if (deviceInfo == null) {
-            log.warn("[handleConfigMessage][设备信息不存在][deviceId: {}]", message.getDeviceId());
-            return;
-        }
-
-        String productKey = deviceInfo.getProductKey();
-        String deviceName = deviceInfo.getDeviceName();
-
-        String topic = IotDeviceTopicEnum.buildConfigSetTopic(productKey, deviceName);
+        // 3. 构建载荷
         JSONObject payload = buildDownstreamPayload(message, message.getMethod());
+
+        // 4. 发送消息
         protocol.publishMessage(topic, payload.toString());
-        log.info("[handleConfigMessage][发送配置设置消息][topic: {}]", topic);
+        log.info("[handleDownstreamMessage][发送下行消息成功][method: {}][topic: {}]", message.getMethod(), topic);
     }
 
     /**
-     * 处理 OTA 升级消息
+     * 根据方法构建主题
      *
-     * @param message 设备消息
+     * @param method     消息方法
+     * @param productKey 产品标识
+     * @param deviceName 设备名称
+     * @return 构建的主题，如果方法不支持返回 null
      */
-    private void handleOtaMessage(IotDeviceMessage message) {
-        // 通过 deviceId 获取设备信息
-        IotDeviceGetReqDTO reqDTO = new IotDeviceGetReqDTO();
-        reqDTO.setId(message.getDeviceId());
-        IotDeviceRespDTO deviceInfo = deviceApi.getDevice(reqDTO).getData();
-        if (deviceInfo == null) {
-            log.warn("[handleOtaMessage][设备信息不存在][deviceId: {}]", message.getDeviceId());
-            return;
+    private String buildTopicByMethod(String method, String productKey, String deviceName) {
+        if (StrUtil.isBlank(method)) {
+            return null;
         }
 
-        String productKey = deviceInfo.getProductKey();
-        String deviceName = deviceInfo.getDeviceName();
+        // 属性相关操作
+        if (method.startsWith("thing.service.property.")) {
+            if ("thing.service.property.set".equals(method)) {
+                return IotDeviceTopicEnum.buildPropertySetTopic(productKey, deviceName);
+            } else if ("thing.service.property.get".equals(method)) {
+                return IotDeviceTopicEnum.buildPropertyGetTopic(productKey, deviceName);
+            }
+            return null;
+        }
 
-        String topic = IotDeviceTopicEnum.buildOtaUpgradeTopic(productKey, deviceName);
-        JSONObject payload = buildDownstreamPayload(message, message.getMethod());
-        protocol.publishMessage(topic, payload.toString());
-        log.info("[handleOtaMessage][发送 OTA 升级消息][topic: {}]", topic);
+        // 配置设置操作
+        if (method.startsWith("thing.service.config.")) {
+            return IotDeviceTopicEnum.buildConfigSetTopic(productKey, deviceName);
+        }
+
+        // OTA 升级操作
+        if (method.startsWith("thing.service.ota.")) {
+            return IotDeviceTopicEnum.buildOtaUpgradeTopic(productKey, deviceName);
+        }
+
+        // 一般服务调用操作
+        if (method.startsWith("thing.service.")) {
+            // 排除属性、配置、OTA相关的服务调用
+            if (method.contains("property") || method.contains("config") || method.contains("ota")) {
+                return null; // 已在上面处理
+            }
+            // 从方法中提取服务标识符
+            String serviceIdentifier = method.substring("thing.service.".length());
+            return IotDeviceTopicEnum.buildServiceTopic(productKey, deviceName, serviceIdentifier);
+        }
+
+        // 不支持的方法
+        return null;
     }
 
     /**
