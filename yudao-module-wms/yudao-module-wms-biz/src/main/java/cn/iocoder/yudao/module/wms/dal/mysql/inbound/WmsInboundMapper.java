@@ -116,4 +116,6 @@ public interface WmsInboundMapper extends BaseMapperX<WmsInboundDO> {
             .last("limit 1");
         return selectOne(wrapper);
     }
+
+
 }

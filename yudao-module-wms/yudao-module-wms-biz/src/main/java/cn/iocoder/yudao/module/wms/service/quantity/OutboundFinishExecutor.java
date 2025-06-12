@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWareho
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockFlowDirection;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
-import cn.iocoder.yudao.module.wms.service.inbound.item.flow.WmsInboundItemFlowService;
+import cn.iocoder.yudao.module.wms.service.inbound.item.flow.WmsItemFlowService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -37,7 +37,7 @@ public class OutboundFinishExecutor extends OutboundExecutor {
 
     @Resource
     @Lazy
-    private WmsInboundItemFlowService inboundItemFlowService;
+    private WmsItemFlowService itemFlowService;
 
     public OutboundFinishExecutor() {
         super(WmsStockReason.OUTBOUND_FINISH);
@@ -82,7 +82,7 @@ public class OutboundFinishExecutor extends OutboundExecutor {
     @Override
     protected List<WmsItemFlowDO> processInboundItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
 
-        List<WmsItemFlowDO> flowDOList = inboundItemFlowService.selectByActionId(outboundRespVO.getLatestOutboundActionId());
+        List<WmsItemFlowDO> flowDOList = itemFlowService.selectByActionId(outboundRespVO.getLatestOutboundActionId());
 
         Long actionId= IdUtil.getSnowflakeNextId();
         outboundRespVO.setLatestOutboundActionId(actionId);

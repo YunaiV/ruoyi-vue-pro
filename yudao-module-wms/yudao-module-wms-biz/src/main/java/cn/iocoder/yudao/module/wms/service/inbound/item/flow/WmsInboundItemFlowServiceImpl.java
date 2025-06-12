@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.flow.vo.WmsInboundItemFlowPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.flow.vo.WmsInboundItemFlowSaveReqVO;
+import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundItemFlowDetailVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsItemFlowDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.flow.WmsInboundItemFlowMapper;
@@ -117,6 +118,15 @@ public class WmsInboundItemFlowServiceImpl implements WmsItemFlowService {
         return inboundItemFlowMapper.selectByInboundId(inboundId, limit);
     }
 
+
+    /**
+     * 按 inboundIds 查询 List<WmsItemFlowDO>
+     */
+    @Override
+    public List<WmsItemFlowDO> selectByInboundIds(List<Long> inboundIds, int limit) {
+        return inboundItemFlowMapper.selectByInboundIds(inboundIds, limit);
+    }
+
     @Override
     public void insert(WmsItemFlowDO flowDO) {
         inboundItemFlowMapper.insert(flowDO);
@@ -153,4 +163,10 @@ public class WmsInboundItemFlowServiceImpl implements WmsItemFlowService {
         }
         return inboundItemFlowMapper.selectByIds(idList);
     }
+
+    @Override
+    public List<WmsInboundItemFlowDetailVO> selectByProductIdAndBinIdAndWarehouseId(Long productId, Long binId, Long warehouseId, int limit) {
+        return inboundItemFlowMapper.selectByProductIdAndBinIdAndWarehouseId(productId, binId, warehouseId, 1000);
+    }
+
 }
