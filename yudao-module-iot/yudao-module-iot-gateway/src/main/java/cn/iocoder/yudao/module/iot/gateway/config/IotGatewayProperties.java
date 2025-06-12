@@ -104,6 +104,10 @@ public class IotGatewayProperties {
         @NotNull(message = "是否开启不能为空")
         private Boolean enabled;
         /**
+         * HTTP 认证端口
+         */
+        private Integer httpAuthPort = 8090;
+        /**
          * MQTT 服务器地址
          */
         private String mqttHost;
@@ -127,10 +131,6 @@ public class IotGatewayProperties {
          * MQTT 主题
          */
         private List<String> mqttTopics;
-        /**
-         * 认证端口
-         */
-        private Integer authPort;
 
     }
 

@@ -1,15 +1,11 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.spring.SpringUtil;
-import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
-import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router.IotMqttAuthRouter;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router.IotMqttUpstreamRouter;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import io.vertx.core.Vertx;
@@ -43,8 +39,6 @@ public class IotMqttUpstreamProtocol {
     private Vertx vertx;
     private MqttClient mqttClient;
     private IotMqttUpstreamRouter messageRouter;
-    private IotMqttAuthRouter authRouter;
-        private IotDeviceMessageProducer deviceMessageProducer;
 
     /**
      * 服务运行状态标志
@@ -61,9 +55,7 @@ public class IotMqttUpstreamProtocol {
 
         // 初始化组件
         this.vertx = Vertx.vertx();
-        this.deviceMessageProducer = SpringUtil.getBean(IotDeviceMessageProducer.class);
         this.messageRouter = new IotMqttUpstreamRouter(this);
-        this.authRouter = new IotMqttAuthRouter(this);
 
         // 创建 MQTT 客户端
         MqttClientOptions options = new MqttClientOptions()
@@ -253,15 +245,6 @@ public class IotMqttUpstreamProtocol {
      */
     public MqttClient getMqttClient() {
         return mqttClient;
-    }
-
-    /**
-     * 获取认证路由器
-     *
-     * @return 认证路由器
-     */
-    public IotMqttAuthRouter getAuthRouter() {
-        return authRouter;
     }
 
 }

@@ -1,5 +1,4 @@
-server:
-  port: 8090  # IoT 网关服务端口
+# ==================== IoT 网关本地开发环境配置 ====================
 
 --- #################### 消息队列相关 ####################
 
@@ -26,16 +25,23 @@ yudao:
         # 针对引入的 HTTP 组件的配置
         # ====================================
         http:
+          enabled: true
           server-port: 8092
         # ====================================
         # 针对引入的 EMQX 组件的配置
         # ====================================
         emqx:
+          enabled: true
+          http-auth-port: 8090  # MQTT HTTP 认证服务端口
           mqtt-host: 127.0.0.1                # MQTT Broker 地址
           mqtt-port: 1883                     # MQTT Broker 端口
           mqtt-username: admin                 # MQTT 用户名
           mqtt-password: public                # MQTT 密码
-          auth-port: 8101                      # 认证端口
+          mqtt-ssl: false                      # 是否开启 SSL
+          mqtt-topics:
+            - "/sys/#"                         # 系统主题（设备上报）
+            - "/ota/#"                         # OTA 升级主题
+            - "/config/#"                      # 配置主题
 
     # 消息总线配置
     message-bus:
@@ -50,4 +56,4 @@ logging:
     cn.iocoder.yudao.module.iot.gateway.protocol.mqtt: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.http: DEBUG
     # MQTT 客户端日志
-    io.vertx.mqtt: DEBUG
+    io.vertx.mqtt: DEBUG 
