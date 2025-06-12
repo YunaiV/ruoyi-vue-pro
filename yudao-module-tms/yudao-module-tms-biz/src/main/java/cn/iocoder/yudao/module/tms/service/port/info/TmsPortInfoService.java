@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.tms.dal.dataobject.port.info.TmsPortInfoDO;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * TMS港口信息 Service 接口
@@ -21,7 +22,7 @@ public interface TmsPortInfoService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Integer createPortInfo(@Valid TmsPortInfoSaveReqVO createReqVO);
+    Long createPortInfo(@Valid TmsPortInfoSaveReqVO createReqVO);
 
     /**
      * 更新TMS港口信息
@@ -35,7 +36,7 @@ public interface TmsPortInfoService {
      *
      * @param id 编号
      */
-    void deletePortInfo(Integer id);
+    void deletePortInfo(Long id);
 
     /**
      * 获得TMS港口信息
@@ -43,7 +44,7 @@ public interface TmsPortInfoService {
      * @param id 编号
      * @return TMS港口信息
      */
-    TmsPortInfoDO getPortInfo(Integer id);
+    TmsPortInfoDO getPortInfo(Long id);
 
     /**
      * 获得TMS港口信息分页
@@ -59,5 +60,21 @@ public interface TmsPortInfoService {
      * @return TMS港口信息列表
      */
     List<TmsPortInfoDO> getPortInfoList();
+
+    /**
+     * 校验港口是否存在
+     *
+     * @param id 编号
+     * @return 港口信息
+     */
+    TmsPortInfoDO validatePortInfoExists(Long id);
+
+    /**
+     * 批量校验港口是否存在
+     *
+     * @param ids 编号集合
+     * @return 港口信息列表
+     */
+    List<TmsPortInfoDO> validatePortInfoExistsList(Set<Long> ids);
 
 }

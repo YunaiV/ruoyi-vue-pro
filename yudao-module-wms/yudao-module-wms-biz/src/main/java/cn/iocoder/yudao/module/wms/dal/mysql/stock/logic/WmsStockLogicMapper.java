@@ -72,7 +72,7 @@ public interface WmsStockLogicMapper extends BaseMapperX<WmsStockLogicDO> {
         // 连接仓库表
         wrapper.innerJoin(WmsWarehouseDO.class, WmsWarehouseDO::getId, WmsStockLogicDO::getWarehouseId)
             //限定国家
-            .eq(WmsWarehouseDO::getCountry, country)
+            .eqIfPresent(WmsWarehouseDO::getCountry, country)
             // 按部门ID和产品ID查询
             //指定部门
             .eqIfPresent(WmsStockLogicDO::getDeptId, deptId)
@@ -81,4 +81,16 @@ public interface WmsStockLogicMapper extends BaseMapperX<WmsStockLogicDO> {
         return selectList(wrapper);
     }
 
+    default List<WmsStockLogicDO> selectByDeptIdAndProductId(Long warehouseId, Long productId) {
+        MPJLambdaWrapperX<WmsStockLogicDO> wrapper = new MPJLambdaWrapperX<>();
+        // 连接仓库表
+        wrapper.innerJoin(WmsWarehouseDO.class, WmsWarehouseDO::getId, WmsStockLogicDO::getWarehouseId)
+            //指定产品集合
+            .eq(WmsStockLogicDO::getProductId, productId)
+            //指定仓库
+            .eq(WmsStockLogicDO::getWarehouseId, warehouseId)
+            //默认先进先出
+            .orderByAsc(WmsStockLogicDO::getCreateTime);
+        return selectList(wrapper);
+    }
 }

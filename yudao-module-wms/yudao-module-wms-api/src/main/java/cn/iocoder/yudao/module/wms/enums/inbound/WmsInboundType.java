@@ -18,6 +18,7 @@ public enum WmsInboundType implements ArrayValuable<Integer>, DictEnum {
     PURCHASE(2, "采购入库"),
     STOCKCHECK(3, "盘点入库"),
     TRANSFER(4, "调拨入库"),
+    EXCHANGE(6, " 换货入库"),
    ;
 
     public static final Integer[] VALUES = Arrays.stream(values()).map(WmsInboundType::getValue).toArray(Integer[]::new);

@@ -13,6 +13,8 @@ import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundStatus;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockFlowDirection;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
 import cn.iocoder.yudao.module.wms.service.quantity.context.InboundContext;
+import cn.iocoder.yudao.module.wms.service.stock.logic.WmsStockLogicService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +35,8 @@ import static java.lang.Boolean.TRUE;
 @Component
 public class InboundExecutor extends QuantityExecutor<InboundContext> {
 
+    @Resource
+    private WmsStockLogicService wmsStockLogicService;
 
     public InboundExecutor() {
         super(WmsStockReason.INBOUND);
@@ -55,10 +59,27 @@ public class InboundExecutor extends QuantityExecutor<InboundContext> {
             if(companyId==null) {
                 companyId=inboundRespVO.getCompanyId();
             }
+            if (companyId == null) {
+                // 入库单及明细行均未指定公司ID
+                List<WmsStockLogicDO> wmsStockLogicDOS = wmsStockLogicService.selectByWarehouseIdAndProductId(warehouseId, productId);
+                if (wmsStockLogicDOS.isEmpty()) {
+                    log.error("inboundSingleItem Error, no stock logic found for warehouseId: {}, productId: {}", warehouseId, productId);
+                } else {
+                    companyId = wmsStockLogicDOS.get(0).getCompanyId();
+                }
+            }
             // 部门ID首先考虑明细行，明细行未指定时使用单据中的部门ID
             Long deptId = item.getDeptId();
             if(deptId==null) {
                 deptId=inboundRespVO.getDeptId();
+            }
+            if (deptId == null) {
+                List<WmsStockLogicDO> wmsStockLogicDOS = wmsStockLogicService.selectByWarehouseIdAndProductId(warehouseId, productId);
+                if (wmsStockLogicDOS.isEmpty()) {
+                    log.error("inboundSingleItem Error, no stock logic found for warehouseId: {}, productId: {}", warehouseId, productId);
+                } else {
+                    deptId = wmsStockLogicDOS.get(0).getDeptId();
+                }
             }
             // 如果入库单及明细上未指定部门,默认按产品的部门ID
             if (deptId == null) {
@@ -69,6 +90,7 @@ public class InboundExecutor extends QuantityExecutor<InboundContext> {
             if(item.getActualQty()==null) {
                 item.setActualQty(item.getPlanQty());
             }
+
             // 执行入库的原子操作
             WmsInboundStatus inboundStatus = inboundSingleItem(companyId, deptId, warehouseId, productId, item.getPlanQty(), item.getActualQty(), inboundRespVO.getId(), item.getId());
             item.setInboundStatus(inboundStatus.getValue());

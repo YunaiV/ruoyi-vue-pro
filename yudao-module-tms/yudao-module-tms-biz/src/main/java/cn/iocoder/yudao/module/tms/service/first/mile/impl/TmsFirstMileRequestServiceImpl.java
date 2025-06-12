@@ -99,6 +99,29 @@ public class TmsFirstMileRequestServiceImpl implements TmsFirstMileRequestServic
         }
     }
 
+    /**
+     * 设置产品信息到明细中
+     *
+     * @param requestItemDOS 明细列表
+     */
+    private void setProductInfoToItems(List<TmsFirstMileRequestItemDO> requestItemDOS) {
+        //校验产品是否存在并获取产品信息
+        List<ErpProductDTO> productDTOs = erpProductApi.validProductList(requestItemDOS.stream().map(TmsFirstMileRequestItemDO::getProductId).distinct().toList());
+        // 将产品信息转换为Map以便快速查找
+        Map<Long, ErpProductDTO> productMap = productDTOs.stream().collect(Collectors.toMap(ErpProductDTO::getId, Function.identity()));
+        // 设置产品信息到明细中
+        requestItemDOS.forEach(item -> {
+            ErpProductDTO product = productMap.get(item.getProductId());
+            if (product != null) {
+                item.setPackageLength(BigDecimal.valueOf(product.getLength()));
+                item.setPackageWidth(BigDecimal.valueOf(product.getWidth()));
+                item.setPackageHeight(BigDecimal.valueOf(product.getHeight()));
+                item.setPackageWeight(product.getWeight());
+                item.setWeight(product.getWeight());
+            }
+        });
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = TmsLogRecordConstants.TMS_FIRST_MILE_REQUEST_TYPE,
@@ -112,9 +135,8 @@ public class TmsFirstMileRequestServiceImpl implements TmsFirstMileRequestServic
 
         // 计算主表的总重量和总体积
         List<TmsFirstMileRequestItemDO> requestItemDOS = TmsFirstMileRequestConvert.convertItemList(vo.getItems());
-        //校验产品是否存在
-        erpProductApi.validProductList(requestItemDOS.stream().map(TmsFirstMileRequestItemDO::getProductId).distinct().toList());
-        calculateTotalWeightAndVolume(firstMileRequest, requestItemDOS);
+        // 设置产品信息到明细中
+        setProductInfoToItems(requestItemDOS);
 
         //code 校验
         if (vo.getCode() != null) {
@@ -126,8 +148,6 @@ public class TmsFirstMileRequestServiceImpl implements TmsFirstMileRequestServic
         } else {
             vo.setCode(tmsNoRedisDAO.generate(FIRST_MILE_REQUEST_NO_PREFIX, FIRST_MILE_REQUEST_CREATE_FAIL));
         }
-        //校验产品是否存在
-        erpProductApi.validProductList(requestItemDOS.stream().map(TmsFirstMileRequestItemDO::getProductId).distinct().toList());
         // 校验人+部门+仓库是否合法
         adminUserApi.validateUser(firstMileRequest.getRequesterId());
         deptApi.validateDeptList(Collections.singleton(firstMileRequest.getRequestDeptId()));
@@ -401,61 +421,6 @@ public class TmsFirstMileRequestServiceImpl implements TmsFirstMileRequestServic
         });
     }
 
-    /**
-     * 计算主表的总重量和总体积
-     *
-     * @param firstMileRequest 主表对象
-     * @param requestItemDOS   子表对象列表
-     */
-    private void calculateTotalWeightAndVolume(TmsFirstMileRequestDO firstMileRequest, List<TmsFirstMileRequestItemDO> requestItemDOS) {
-        if (requestItemDOS == null || requestItemDOS.isEmpty()) {
-            firstMileRequest.setTotalWeight(BigDecimal.ZERO);
-            firstMileRequest.setTotalVolume(BigDecimal.ZERO);
-//            firstMileRequest.setNetWeight(BigDecimal.ZERO);
-            return;
-        }
-
-        // 计算总重量和总体积
-        BigDecimal totalWeight = BigDecimal.ZERO;
-        BigDecimal totalVolume = BigDecimal.ZERO;
-        BigDecimal netWeight = BigDecimal.ZERO;
-
-        for (TmsFirstMileRequestItemDO item : requestItemDOS) {
-            // 获取产品信息
-            ErpProductDTO product = erpProductApi.getProductDto(item.getProductId());
-            if (product == null) {
-                continue;
-            }
-
-            // 设置明细项的包装长宽高
-            item.setPackageLength(BigDecimal.valueOf(product.getPackageLength()));
-            item.setPackageWidth(BigDecimal.valueOf(product.getPackageWidth()));
-            item.setPackageHeight(BigDecimal.valueOf(product.getPackageHeight()));
-            item.setPackageWeight(product.getWeight());
-
-            // 累加毛重和净重
-            if (product.getWeight() != null && item.getQty() != null) {
-                totalWeight = totalWeight.add(product.getWeight().multiply(BigDecimal.valueOf(item.getQty())));
-                // 累加净重 = 包装重量 * 数量
-                netWeight = netWeight.add(product.getPackageWeight().multiply(BigDecimal.valueOf(item.getQty())));
-            }
-
-            // 计算单个物品的体积（长*宽*高）并乘以数量
-            if (product.getPackageLength() != null && product.getPackageWidth() != null && product.getPackageHeight() != null && item.getQty() != null) {
-                BigDecimal itemVolume = BigDecimal.valueOf(product.getPackageLength())
-                    .multiply(BigDecimal.valueOf(product.getPackageWidth()))
-                    .multiply(BigDecimal.valueOf(product.getPackageHeight()))
-                    .multiply(BigDecimal.valueOf(item.getQty()));
-                // 设置明细项的体积
-                item.setVolume(itemVolume);
-                totalVolume = totalVolume.add(itemVolume);
-            }
-        }
-
-        firstMileRequest.setTotalWeight(totalWeight);
-        firstMileRequest.setTotalVolume(totalVolume);
-//        firstMileRequest.setNetWeight(netWeight);
-    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -526,9 +491,8 @@ public class TmsFirstMileRequestServiceImpl implements TmsFirstMileRequestServic
 
         // 计算主表的总重量和总体积
         List<TmsFirstMileRequestItemDO> requestItemDOS = TmsFirstMileRequestConvert.convertItemList(vo.getItems());
-        //校验产品是否存在
-        erpProductApi.validProductList(requestItemDOS.stream().map(TmsFirstMileRequestItemDO::getProductId).distinct().toList());
-        calculateTotalWeightAndVolume(updateObj, requestItemDOS);
+        // 设置产品信息到明细中
+        setProductInfoToItems(requestItemDOS);
 
         firstMileRequestMapper.updateById(updateObj);
 

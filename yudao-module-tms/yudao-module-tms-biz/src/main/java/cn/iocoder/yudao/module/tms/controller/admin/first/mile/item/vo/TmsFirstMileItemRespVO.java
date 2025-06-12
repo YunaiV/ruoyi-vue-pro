@@ -93,25 +93,47 @@ public class TmsFirstMileItemRespVO extends BaseVO {
     @ExcelProperty("发出仓名称")
     private String fromWarehouseName;
 
-    @Schema(description = "包装长（cm）")
-    @ExcelProperty("包装长（cm）")
+//    快照产品信息
+    /**
+     * 包装长（mm）(单个产品)
+     */
     private BigDecimal packageLength;
-
-    @Schema(description = "包装宽（cm）")
-    @ExcelProperty("包装宽（cm）")
+    /**
+     * 包装宽（mm）(单个产品)
+     */
     private BigDecimal packageWidth;
-
-    @Schema(description = "包装高（cm）")
-    @ExcelProperty("包装高（cm）")
+    /**
+     * 包装高（mm）(单个产品)
+     */
     private BigDecimal packageHeight;
-
-    @Schema(description = "毛重（kg）")
-    @ExcelProperty("毛重（kg）")
+    /**
+     * 毛重（kg）(单个产品)
+     */
     private BigDecimal packageWeight;
+    /**
+     * 基础重量(kg)(单个产品)
+     */
+    private BigDecimal weight;
 
-    @Schema(description = "体积（m³）")
-    @ExcelProperty("体积（m³）")
-    private BigDecimal volume;
+    @Schema(description = "总包装长（mm）")
+    @ExcelProperty("总包装长（mm）")
+    private BigDecimal totalPackageLength;
+
+    @Schema(description = "总包装宽（mm）")
+    @ExcelProperty("总包装宽（mm）")
+    private BigDecimal totalPackageWidth;
+
+    @Schema(description = "总包装高（mm）")
+    @ExcelProperty("总包装高（mm）")
+    private BigDecimal totalPackageHeight;
+
+    @Schema(description = "总毛重（kg）")
+    @ExcelProperty("总毛重（kg）")
+    private BigDecimal totalPackageWeight;
+
+    @Schema(description = "总体积（m³）")
+    @ExcelProperty("总体积（m³）")
+    private BigDecimal totalVolume;
 
     @Schema(description = "销售公司ID")
     private Long salesCompanyId;

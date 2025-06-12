@@ -64,12 +64,15 @@ public class TmsFirstMileRequestRespVO extends BaseVO {
     @DictFormat(TmsDictTypeConstants.OFF_STATUS)
     private Integer offStatus;
 
-    @Schema(description = "总重量（kg）")
-    @ExcelProperty("总重量（kg）")
+    @Schema(description = "总净重（kg）")
+    @ExcelProperty("总净重（kg）")
     private BigDecimal totalWeight;
 
-    @Schema(description = "总体积（m³）")
-    @ExcelProperty("总体积（m³）")
+    @Schema(description = "总毛重（kg）")
+    private BigDecimal totalPackageWeight;
+
+    @Schema(description = "总体积（mm³）")
+    @ExcelProperty("总体积（mm³）")
     private BigDecimal totalVolume;
 
     @Schema(description = "明细数量")

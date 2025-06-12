@@ -51,6 +51,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -295,7 +296,10 @@ public class TmsFirstMileController {
                     MapUtils.findAndThen(companyMap, item.getCompanyId(), company -> itemRespVO.setCompanyName(company.getAbbr()));
                     MapUtils.findAndThen(companyMap, item.getSalesCompanyId(), company -> itemRespVO.setSalesCompanyName(company.getAbbr()));
                     //产品
-                    MapUtils.findAndThen(productMap, item.getProductId(), product -> itemRespVO.setProductName(product.getName()).setProductSku(product.getCode()));
+                    MapUtils.findAndThen(productMap, item.getProductId(), product -> {
+                        itemRespVO.setProductName(product.getName())
+                            .setProductSku(product.getCode());
+                    });
                     //部门
                     MapUtils.findAndThen(deptMap, item.getDeptId(), dept -> itemRespVO.setDeptName(dept.getName()));
                     //仓库
@@ -303,11 +307,39 @@ public class TmsFirstMileController {
                     //上游单据CODE
                     MapUtils.findAndThen(requestMap, item.getRequestItemId(), request -> itemRespVO.setRequestCode(request.getCode()));
 
+                    // 计算明细行的总包装长度等，使用明细行的快照信息
+                    if (item.getPackageLength() != null) {
+                        itemRespVO.setTotalPackageLength(item.getPackageLength().multiply(new BigDecimal(item.getQty())));
+                    }
+                    if (item.getPackageWidth() != null) {
+                        itemRespVO.setTotalPackageWidth(item.getPackageWidth().multiply(new BigDecimal(item.getQty())));
+                    }
+                    if (item.getPackageHeight() != null) {
+                        itemRespVO.setTotalPackageHeight(item.getPackageHeight().multiply(new BigDecimal(item.getQty())));
+                    }
+
                     return itemRespVO;
                 }).collect(Collectors.toList());
                 respVO.setFirstMileItems(items);
-                // 设置明细汇总box
+
+                // 设置汇总数据
                 respVO.setTotalBoxQty(items.stream().mapToInt(TmsFirstMileItemRespVO::getBoxQty).sum());
+                respVO.setTotalQty(items.stream().mapToInt(TmsFirstMileItemRespVO::getQty).sum());
+
+                // 计算体积、包装重量和净重的汇总
+                double totalVolume = items.stream()
+                    .mapToDouble(item -> item.getTotalVolume() != null ? item.getTotalVolume().multiply(new BigDecimal(item.getQty())).doubleValue() : 0)
+                    .sum();
+                double totalPackageWeight = items.stream()
+                    .mapToDouble(item -> item.getPackageWeight() != null ? item.getPackageWeight().multiply(new BigDecimal(item.getQty())).doubleValue() : 0)
+                    .sum();
+                double netWeight = items.stream()
+                    .mapToDouble(item -> item.getWeight() != null ? item.getWeight().multiply(new BigDecimal(item.getQty())).doubleValue() : 0)
+                    .sum();
+
+                respVO.setTotalVolume(BigDecimal.valueOf(totalVolume));
+                respVO.setTotalPackageWeight(BigDecimal.valueOf(totalPackageWeight));
+                respVO.setNetWeight(BigDecimal.valueOf(netWeight));
             }
             // 设置费用信息 1:N
             if (CollUtil.isNotEmpty(bo.getFees())) {

@@ -50,7 +50,6 @@ public interface TmsFirstMileItemMapper extends BaseMapperX<TmsFirstMileItemDO> 
             .betweenIfPresent(TmsFirstMileItemDO::getPackageWidth, vo.getPackageWidth())
             .betweenIfPresent(TmsFirstMileItemDO::getPackageHeight, vo.getPackageHeight())
             .betweenIfPresent(TmsFirstMileItemDO::getPackageWeight, vo.getPackageWeight())
-            .betweenIfPresent(TmsFirstMileItemDO::getVolume, vo.getVolume())
             .eqIfPresent(TmsFirstMileItemDO::getSalesCompanyId, vo.getSalesCompanyId())
             .orderByDesc(TmsFirstMileItemDO::getCreateTime);
     }
@@ -83,11 +82,6 @@ public interface TmsFirstMileItemMapper extends BaseMapperX<TmsFirstMileItemDO> 
             .eqIfPresent(TmsFirstMileDO::getCabinetType, vo.getMainQueryVO().getCabinetType()) // 柜型
             .betweenIfPresent(TmsFirstMileDO::getPackTime, vo.getMainQueryVO().getPackTime()) // 装箱时间范围
             .betweenIfPresent(TmsFirstMileDO::getArrivePlanTime, vo.getMainQueryVO().getArrivePlanTime()) // 预计到港时间范围
-            .betweenIfPresent(TmsFirstMileDO::getTotalVolume, vo.getMainQueryVO().getTotalVolume()) // 总体积范围
-            .betweenIfPresent(TmsFirstMileDO::getTotalWeight, vo.getMainQueryVO().getTotalWeight()) // 总重量范围
-            .betweenIfPresent(TmsFirstMileDO::getNetWeight, vo.getMainQueryVO().getNetWeight()) // 净重范围
-            .betweenIfPresent(TmsFirstMileDO::getTotalValue, vo.getMainQueryVO().getTotalValue()) // 总价值范围
-            .betweenIfPresent(TmsFirstMileDO::getTotalQty, vo.getMainQueryVO().getTotalQty()) // 总数量范围
             .likeIfPresent(TmsFirstMileDO::getRemark, vo.getMainQueryVO().getRemark()) // 备注
             .eqIfPresent(TmsFirstMileDO::getOutboundStatus, vo.getMainQueryVO().getOutboundStatus()) // 出库状态
             .betweenIfPresent(TmsFirstMileDO::getOutboundTime, vo.getMainQueryVO().getOutboundTime()) // 出库时间范围
@@ -125,7 +119,7 @@ public interface TmsFirstMileItemMapper extends BaseMapperX<TmsFirstMileItemDO> 
             // 排序
             .orderByDesc(TmsVesselTrackingDO::getCreateTime);
 
-        if (vo.getTrackingQueryVO().getArriveEstimateTime() != null) {
+        if (vo.getTrackingQueryVO().getArriveEstimateTime() != null && vo.getTrackingQueryVO().getArriveEstimateTime().length == 2) {
             //    if (val1 != null && val2 != null) {
             //            return (MPJLambdaWrapperX<T>) super.between(column, val1, val2);
             //        }

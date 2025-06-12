@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -69,7 +70,6 @@ public class TmsFirstMileRequestController {
     @Idempotent
     @PreAuthorize("@ss.hasPermission('tms:first-mile-request:create')")
     public CommonResult<Long> createFirstMileRequest(@Validated(Validation.OnCreate.class) @RequestBody TmsFirstMileRequestSaveReqVO vo) {
-
         return success(firstMileRequestService.createFirstMileRequest(vo));
     }
 
@@ -108,7 +108,7 @@ public class TmsFirstMileRequestController {
     @PostMapping("/page")
     @Operation(summary = "获得头程申请单分页")
     @PreAuthorize("@ss.hasPermission('tms:first-mile-request:query')")
-    public CommonResult<PageResult<TmsFirstMileRequestRespVO>> getFirstMileRequestPage(@Validated @RequestBody TmsFirstMileRequestPageReqVO pageReqVO) {
+    public CommonResult<PageResult<TmsFirstMileRequestRespVO>> getFirstMileRequestPage(@Validated @RequestBody(required = false) TmsFirstMileRequestPageReqVO pageReqVO) {
         PageResult<TmsFirstMileRequestBO> pageBO = firstMileRequestService.getFirstMileRequestBOPage(pageReqVO);
         List<TmsFirstMileRequestRespVO> respVOList = bindListResult(pageBO.getList());
         // 创建结果对象
@@ -254,16 +254,64 @@ public class TmsFirstMileRequestController {
                         MapUtils.findAndThen(userMap, safeParseLong(item.getCreator()), user -> itemRespVO.setCreator(user.getNickname()));
                         MapUtils.findAndThen(userMap, safeParseLong(item.getUpdater()), user -> itemRespVO.setUpdater(user.getNickname()));
                         //带出该申请部门的 该产品sku的 中国的 仓库库存汇总
-                            MapUtils.findAndThen(wmsStockLogicDTOMap, item.getProductId(), wmsStockLogicDTO -> itemRespVO.setDomesticWarehouseStock(wmsStockLogicDTO.getAvailableQty()));
+                        MapUtils.findAndThen(wmsStockLogicDTOMap, item.getProductId(), wmsStockLogicDTO -> itemRespVO.setDomesticWarehouseStock(wmsStockLogicDTO.getAvailableQty()));
+
+                        // 计算总长宽高和重量
+                        if (item.getQty() != null && item.getQty() > 0) {
+                            // 计算总长宽高
+                            if (item.getPackageLength() != null) {
+                                itemRespVO.setTotalPackageLength(item.getPackageLength().multiply(new BigDecimal(item.getQty())));
+                            }
+                            if (item.getPackageWidth() != null) {
+                                itemRespVO.setTotalPackageWidth(item.getPackageWidth().multiply(new BigDecimal(item.getQty())));
+                            }
+                            if (item.getPackageHeight() != null) {
+                                itemRespVO.setTotalPackageHeight(item.getPackageHeight().multiply(new BigDecimal(item.getQty())));
+                            }
+
+                            // 计算总重量
+                            if (item.getPackageWeight() != null) {
+                                itemRespVO.setTotalWeight(item.getPackageWeight().multiply(new BigDecimal(item.getQty())));
+                            }
+
+                            // 计算总体积（立方毫米）
+                            if (item.getPackageLength() != null && item.getPackageWidth() != null && item.getPackageHeight() != null) {
+                                BigDecimal volume = item.getPackageLength()
+                                    .multiply(item.getPackageWidth())
+                                    .multiply(item.getPackageHeight())
+                                    .multiply(new BigDecimal(item.getQty()));
+                                itemRespVO.setTotalVolume(volume);
+                            }
                         }
-                            //自动计算该sku的采购在途数量
-                    )).collect(Collectors.toList());
+                    })).collect(Collectors.toList());
 
                 respVO.setItems(items);
                 // 设置明细数量
                 respVO.setItemCount(items.size());
+
+                // 计算总重量和总体积
+                BigDecimal totalWeight = BigDecimal.ZERO;
+                BigDecimal totalPackageWeight = BigDecimal.ZERO;
+                BigDecimal totalVolume = BigDecimal.ZERO;
+                for (TmsFirstMileRequestItemRespVO item : items) {
+                    if (item.getTotalWeight() != null) {
+                        totalWeight = totalWeight.add(item.getTotalWeight());
+                    }
+                    if (item.getTotalPackageWeight() != null) {
+                        totalPackageWeight = totalPackageWeight.add(item.getTotalPackageWeight());
+                    }
+                    if (item.getTotalVolume() != null) {
+                        totalVolume = totalVolume.add(item.getTotalVolume());
+                    }
+                }
+                respVO.setTotalWeight(totalWeight);
+                respVO.setTotalPackageWeight(totalPackageWeight);
+                respVO.setTotalVolume(totalVolume);
             } else {
                 respVO.setItemCount(0);
+                respVO.setTotalWeight(BigDecimal.ZERO);
+                respVO.setTotalPackageWeight(BigDecimal.ZERO);
+                respVO.setTotalVolume(BigDecimal.ZERO);
             }
             return respVO;
         }).collect(Collectors.toList());

@@ -26,10 +26,6 @@ public interface TmsFirstMileRequestMapper extends BaseMapperX<TmsFirstMileReque
             .eqIfPresent(TmsFirstMileRequestDO::getAuditStatus, reqVO.getAuditStatus())
             .eqIfPresent(TmsFirstMileRequestDO::getOrderStatus, reqVO.getOrderStatus())
             .eqIfPresent(TmsFirstMileRequestDO::getOffStatus, reqVO.getOffStatus())
-            //    @Schema(description = "FBA条码")
-            //    private String fbaBarCode;
-            .betweenIfPresent(TmsFirstMileRequestDO::getTotalWeight, reqVO.getTotalWeight())
-            .betweenIfPresent(TmsFirstMileRequestDO::getTotalVolume, reqVO.getTotalVolume())
             .orderByDesc(TmsFirstMileRequestDO::getId));
     }
 

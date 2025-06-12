@@ -42,7 +42,6 @@ public class TmsCustomCategorySaveReqVO {
 
     @Schema(description = "海关分类子表列表")
     @NotNull( message = "至少维护一个国别详情")
-    @Valid
-    private List<TmsCustomCategoryItemSaveReqVO> customRuleCategoryItems;
+    private List<@Valid TmsCustomCategoryItemSaveReqVO> customRuleCategoryItems;
 
 }

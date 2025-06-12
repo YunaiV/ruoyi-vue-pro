@@ -170,8 +170,7 @@ public class WmsOutboundController {
     @Operation(summary = "同意出库")
     @PreAuthorize("@ss.hasPermission('wms:outbound:agree')")
     public CommonResult<Boolean> agree(@RequestBody WmsApprovalReqVO approvalReqVO) {
-        outboundService.approve(WmsOutboundAuditStatus.Event.AGREE, approvalReqVO);
-        outboundService.approve(WmsOutboundAuditStatus.Event.FINISH, approvalReqVO);
+        outboundService.auditAgree(approvalReqVO);
         return success(true);
     }
 

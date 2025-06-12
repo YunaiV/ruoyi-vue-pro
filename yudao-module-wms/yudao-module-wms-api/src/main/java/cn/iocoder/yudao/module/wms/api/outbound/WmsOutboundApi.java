@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.wms.api.outbound;
 
 import cn.iocoder.yudao.module.wms.api.outbound.dto.WmsOutboundDTO;
 import cn.iocoder.yudao.module.wms.api.outbound.dto.WmsOutboundImportReqDTO;
-import cn.iocoder.yudao.module.wms.api.outbound.dto.WmsOutboundSaveReqDTO;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
@@ -11,23 +11,8 @@ import java.util.List;
  * @date: 2025/4/28 17:03
  * @description: 出库单 API
  */
+@Validated
 public interface WmsOutboundApi {
-
-    /**
-     * 创建出库单
-     *
-     * @param createReqDTO 出库单创建请求
-     * @return 出库单ID
-     */
-    Long createOutbound(WmsOutboundSaveReqDTO createReqDTO);
-
-    /**
-     * 按 ID 查询出库单
-     *
-     * @param id 出库单更新请求
-     * @return WmsInboundDTO
-     */
-    WmsOutboundDTO getOutbound(Long id);
 
     /**
      * 按 上游单据类型 和 上游单据ID 查询出库单
@@ -46,9 +31,9 @@ public interface WmsOutboundApi {
     void abandonOutbound(Long id,String comment);
 
     /**
-     * 根据入库单生成出库单
+     * 生成出库单
+     *
      * @param importReqVO 入参
-     * @return 出参
      */
-    WmsOutboundDTO generateOutbound(WmsOutboundImportReqDTO importReqVO);
+    void generateOutbound(WmsOutboundImportReqDTO importReqVO);
 }

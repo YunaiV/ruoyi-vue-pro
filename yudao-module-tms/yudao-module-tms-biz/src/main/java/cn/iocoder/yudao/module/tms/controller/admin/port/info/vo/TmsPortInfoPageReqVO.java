@@ -17,6 +17,9 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class TmsPortInfoPageReqVO extends PageParam {
 
+    @Schema(description = "编号")
+    private Long id;
+
     @Schema(description = "创建人")
     private String creator;
 

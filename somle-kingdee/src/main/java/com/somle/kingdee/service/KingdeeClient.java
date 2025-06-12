@@ -250,6 +250,7 @@ public class KingdeeClient {
             Optional.ofNullable(map.get(supplierCopy.getName())).ifPresent(requestVO -> supplierCopy.setId(requestVO.getId()));
         } catch (Exception e) {
             log.debug("id not found for {}adding new", supplierCopy.getNumber());
+            throw exception(KingDeeErrorCodeConstants.SUPPLIER_LIST_SYNC_FAIL, this.token.getAccountName(), kingdeeSupplierSaveVO.getId() + kingdeeSupplierSaveVO.getName());
         }
 //        supplierCopy.setIgnoreWarn(true);//忽略告警信息(如：单价为0)保存
         return postResponse(endUrl, new TreeMap<>(), supplierCopy);
@@ -620,7 +621,7 @@ public class KingdeeClient {
         if (queryReqVO == null) {
             queryReqVO = new KingdeeSupplierQueryReqVO();
         }
-        String cacheKey = KingdeeRedisKeyConstants.KINGDEE_SUPPLIER_LIST + ":" + this.token.getAppKey() + ":" + Objects.hash(JsonUtilsX.toJsonString(queryReqVO));
+        String cacheKey = KingdeeRedisKeyConstants.KINGDEE_SUPPLIER_LIST + ":" + this.token.getAccountName() + ":" + Objects.hash(token.getAppKey(), JsonUtilsX.toJsonString(queryReqVO));
         String lockKey = cacheKey + ":lock";
 
         // 1. 尝试从缓存获取
@@ -634,7 +635,7 @@ public class KingdeeClient {
         RLock lock = redissonClient.getLock(lockKey);
         boolean locked = false;
         try {
-            locked = lock.tryLock(0, 5, TimeUnit.MINUTES);
+            locked = lock.tryLock(0, 10, TimeUnit.SECONDS);
             if (!locked) {
                 throw exception(SUPPLIER_LIST_LOADING);
             }
@@ -666,7 +667,7 @@ public class KingdeeClient {
                             KingdeeSupplierQueryReqVO pageVO = new KingdeeSupplierQueryReqVO();
                             BeanUtils.copyProperties(finalQueryReqVO, pageVO);
                             pageVO.setPage(currentPage);
-                            log.info("线程[{}]开始获取第{}页数据,页数{}", Thread.currentThread().getName(), currentPage, pageVO.getPageSize());
+                            log.debug("线程[{}]开始获取第{}页数据,页数{}", Thread.currentThread().getName(), currentPage, pageVO.getPageSize());
                             return getPage(JsonUtilsX.toJSONObject(pageVO), endpoint);
                         } finally {
                             semaphore.release();

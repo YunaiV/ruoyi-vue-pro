@@ -124,12 +124,12 @@ public class KingdeeService {
     }
 
     /**
-     * 获取第一个公司的供应商集合
+     * 获取所有公司的供应商集合
      * key:公司name
      */
     public Map<String, KingdeeSupplierSaveVO> getAllSupplierList(KingdeeSupplierQueryReqVO queryReqVO) {
         AtomicReference<Map<String, KingdeeSupplierSaveVO>> map = new AtomicReference<>();
-        clients.stream().findFirst().ifPresent(peek -> map.set(peek.getAllSupplierList(queryReqVO)));
+        clients.stream().parallel().forEach(peek -> map.set(peek.getAllSupplierList(queryReqVO)));
         return map.get();
     }
 

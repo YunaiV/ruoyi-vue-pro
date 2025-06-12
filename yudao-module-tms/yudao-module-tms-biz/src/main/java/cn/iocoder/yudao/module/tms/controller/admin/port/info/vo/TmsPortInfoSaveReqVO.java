@@ -13,7 +13,7 @@ public class TmsPortInfoSaveReqVO {
     @Schema(description = "编号")
     @NotNull(groups = {Validation.OnUpdate.class}, message = "更新时，港口信息id不能为空")
     @Null(groups = {Validation.OnCreate.class}, message = "创建时，港口信息id需为空")
-    private Integer id;
+    private Long id;
 
     @Schema(description = "港口编码")
     private String code;

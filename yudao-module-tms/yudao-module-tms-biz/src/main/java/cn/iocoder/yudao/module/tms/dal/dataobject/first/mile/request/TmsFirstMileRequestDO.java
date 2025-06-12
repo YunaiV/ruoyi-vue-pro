@@ -7,8 +7,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.Version;
 import lombok.*;
 
-import java.math.BigDecimal;
-
 /**
  * 头程申请单 DO
  *
@@ -66,14 +64,6 @@ public class TmsFirstMileRequestDO extends TenantBaseDO {
      * 关闭状态
      */
     private Integer offStatus;
-    /**
-     * 总重量（kg）
-     */
-    private BigDecimal totalWeight;
-    /**
-     * 总体积（m³）
-     */
-    private BigDecimal totalVolume;
     /**
      * 备注
      */

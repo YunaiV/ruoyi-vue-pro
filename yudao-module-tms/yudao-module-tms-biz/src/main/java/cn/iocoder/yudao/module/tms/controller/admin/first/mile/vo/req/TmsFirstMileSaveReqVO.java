@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -36,6 +37,7 @@ public class TmsFirstMileSaveReqVO {
 
     @Schema(description = "单据日期")
     @DiffLogField(name = "单据日期")
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime billTime;
 
     @Schema(description = "物流商ID")
@@ -73,15 +75,6 @@ public class TmsFirstMileSaveReqVO {
     @DiffLogField(name = "预计到货日期")
     private LocalDateTime arrivePlanTime;
 
-
-    @Schema(description = "货柜货值（按最近采购价）")
-    @DiffLogField(name = "货柜货值")
-    private BigDecimal totalValue;
-
-    @Schema(description = "货柜件数")
-    @DiffLogField(name = "货柜件数")
-    private Integer totalQty;
-
     @Schema(description = "备注")
     @DiffLogField(name = "备注")
     private String remark;
@@ -98,6 +91,7 @@ public class TmsFirstMileSaveReqVO {
 
     @Schema(description = "头程单明细列表")
     @DiffLogField(name = "头程单明细列表")
+    @Size(min = 1, message = "头程单明细列表不能为空,至少存在一个")
     private List<TmsFirstMileItemSaveReqVO> firstMileItems;
 
     @Schema(description = "出运订单费用明细列表")
@@ -106,6 +100,7 @@ public class TmsFirstMileSaveReqVO {
 
     @Schema(description = "船期信息")
     @DiffLogField(name = "船期信息")
+    @NotNull(message = "船期信息不能为空")
     private TmsVesselTrackingSaveReqVO2 vesselTracking;
 
 
