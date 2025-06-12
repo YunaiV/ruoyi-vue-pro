@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.system.enums.somle.BillType;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsItemFlowDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.WmsPickupDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
@@ -16,7 +16,7 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWareho
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockFlowDirection;
 import cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
-import cn.iocoder.yudao.module.wms.service.inbound.item.flow.WmsInboundItemFlowService;
+import cn.iocoder.yudao.module.wms.service.inbound.item.flow.WmsItemFlowService;
 import cn.iocoder.yudao.module.wms.service.quantity.context.PickupContext;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +46,7 @@ public class PickupExecutor extends QuantityExecutor<PickupContext> {
 
     @Resource
     @Lazy
-    private WmsInboundItemFlowService inboundItemFlowService;
+    private WmsItemFlowService itemFlowService;
 
     public PickupExecutor() {
         super(WmsStockReason.PICKUP);
@@ -150,7 +150,7 @@ public class PickupExecutor extends QuantityExecutor<PickupContext> {
         inboundItemService.updateById(inboundItemDO);
 
         // 记录流水
-        WmsInboundItemFlowDO flowDO = new WmsInboundItemFlowDO();
+        WmsItemFlowDO flowDO = new WmsItemFlowDO();
         flowDO.setInboundId(inboundItemDO.getInboundId());
         flowDO.setInboundItemId(inboundItemDO.getId());
         flowDO.setProductId(inboundItemDO.getProductId());
@@ -165,7 +165,7 @@ public class PickupExecutor extends QuantityExecutor<PickupContext> {
         flowDO.setActualQty(inboundItemDO.getActualQty());
         flowDO.setShelveClosedQty(inboundItemDO.getShelveClosedQty());
 
-        inboundItemFlowService.insert(flowDO);
+        itemFlowService.insert(flowDO);
 
         return flowDO.getId();
 

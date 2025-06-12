@@ -182,4 +182,6 @@ public interface WmsInboundService {
     WmsInboundDO createForTransfer(WmsInboundSaveReqVO inboundSaveReqVO);
 
     void forceAbandon(WmsApprovalReqVO approvalReqVO);
+
+    WmsInboundDO getByWarehouseIdAndProductId(Long warehouseId, Long productId);
 }

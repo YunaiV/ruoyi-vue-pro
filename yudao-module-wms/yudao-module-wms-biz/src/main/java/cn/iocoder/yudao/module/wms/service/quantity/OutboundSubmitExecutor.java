@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.system.enums.somle.BillType;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsItemFlowDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.logic.WmsStockLogicDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
@@ -64,7 +64,7 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
      * 更新入库单详情
      **/
     @Override
-    protected List<WmsInboundItemFlowDO> processInboundItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
+    protected List<WmsItemFlowDO> processInboundItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
 
         Long actionId = IdUtil.getSnowflakeNextId();
         outboundRespVO.setLatestOutboundActionId(actionId);
@@ -94,7 +94,7 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
 //
 //        // 从多个有可用库存的入库批次，以先进先出的原则扣除
 //        List<WmsInboundItemDO> itemsToUpdate = new ArrayList<>();
-//        List<WmsInboundItemFlowDO> inboundItemFlowList = new ArrayList<>();
+//        List<WmsItemFlowDO> itemFlowList = new ArrayList<>();
 //
 //        Integer available = inboundItem.getOutboundAvailableQty();
 //        Integer flowQty = quantity;
@@ -103,7 +103,7 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
 //        itemsToUpdate.add(inboundItem);
 //
 //        //
-//        WmsInboundItemFlowDO flowDO = new WmsInboundItemFlowDO();
+//        WmsItemFlowDO flowDO = new WmsItemFlowDO();
 //        flowDO.setOutboundActionId(actionId);
 //        flowDO.setInboundId(inboundItem.getInboundId());
 //        flowDO.setInboundItemId(inboundItem.getId());
@@ -111,17 +111,17 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
 //        flowDO.setOutboundQty(flowQty);
 //        flowDO.setOutboundId(outboundId);
 //        flowDO.setOutboundItemId(outboundItemId);
-//        inboundItemFlowList.add(flowDO);
+//        itemFlowList.add(flowDO);
 //
 //        // 保存详情与流水
-//        inboundItemService.saveItems(itemsToUpdate,inboundItemFlowList);
+//        inboundItemService.saveItems(itemsToUpdate,itemFlowList);
 //
 //    }
 
     /**
      * 从指定仓位出库,此时需要动态计算库存批次
      **/
-    protected List<WmsInboundItemFlowDO> processInboundItemForBin(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long actionId ,Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
+    protected List<WmsItemFlowDO> processInboundItemForBin(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long actionId, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
 
         WmsStockBinDO stockBinDO = stockBinService.getStockBin(binId, productId, false);
         // 如果不存在抛出异常
@@ -150,7 +150,7 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
 
         // 从多个有可用库存的入库批次，以先进先出的原则扣除
         List<WmsInboundItemDO> itemsToUpdate = new ArrayList<>();
-        List<WmsInboundItemFlowDO> inboundItemFlowList = new ArrayList<>();
+        List<WmsItemFlowDO> itemFlowList = new ArrayList<>();
         for (WmsInboundItemDO itemDO : itemsList) {
             Integer available = itemDO.getOutboundAvailableQty();
             Integer flowQty = 0;
@@ -161,7 +161,7 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
                 itemDO.setOutboundAvailableQty(available);
                 itemsToUpdate.add(itemDO);
                 //
-                WmsInboundItemFlowDO flowDO = new WmsInboundItemFlowDO();
+                WmsItemFlowDO flowDO = new WmsItemFlowDO();
                 flowDO.setOutboundActionId(actionId);
                 flowDO.setInboundId(itemDO.getInboundId());
                 flowDO.setInboundItemId(itemDO.getId());
@@ -177,7 +177,7 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
                 flowDO.setActualQty(itemDO.getActualQty());
                 flowDO.setShelveClosedQty(itemDO.getShelveClosedQty());
 
-                inboundItemFlowList.add(flowDO);
+                itemFlowList.add(flowDO);
 
             } else if (available.equals(quantity)) {
                 // 刚好单次扣除
@@ -187,7 +187,7 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
                 itemDO.setOutboundAvailableQty(available);
                 itemsToUpdate.add(itemDO);
                 //
-                WmsInboundItemFlowDO flowDO = new WmsInboundItemFlowDO();
+                WmsItemFlowDO flowDO = new WmsItemFlowDO();
                 flowDO.setOutboundActionId(actionId);
                 flowDO.setInboundId(itemDO.getInboundId());
                 flowDO.setInboundItemId(itemDO.getId());
@@ -203,7 +203,7 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
                 flowDO.setActualQty(itemDO.getActualQty());
                 flowDO.setShelveClosedQty(itemDO.getShelveClosedQty());
 
-                inboundItemFlowList.add(flowDO);
+                itemFlowList.add(flowDO);
 
                 break;
             } else { // 单次扣除
@@ -213,7 +213,7 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
                 itemsToUpdate.add(itemDO);
 
                 //
-                WmsInboundItemFlowDO flowDO = new WmsInboundItemFlowDO();
+                WmsItemFlowDO flowDO = new WmsItemFlowDO();
                 flowDO.setOutboundActionId(actionId);
                 flowDO.setInboundId(itemDO.getInboundId());
                 flowDO.setInboundItemId(itemDO.getId());
@@ -229,15 +229,15 @@ public class OutboundSubmitExecutor extends OutboundExecutor {
                 flowDO.setActualQty(itemDO.getActualQty());
                 flowDO.setShelveClosedQty(itemDO.getShelveClosedQty());
 
-                inboundItemFlowList.add(flowDO);
+                itemFlowList.add(flowDO);
 
                 break;
             }
         }
         // 保存详情与流水
-        inboundItemService.saveItems(itemsToUpdate,inboundItemFlowList);
+        inboundItemService.saveItems(itemsToUpdate, itemFlowList);
 
-        return inboundItemFlowList;
+        return itemFlowList;
     }
 
 

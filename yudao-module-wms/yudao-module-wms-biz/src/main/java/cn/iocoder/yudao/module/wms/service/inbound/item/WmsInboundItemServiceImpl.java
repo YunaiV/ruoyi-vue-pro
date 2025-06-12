@@ -25,7 +25,7 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemBinQueryDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemQueryDO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsItemFlowDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.item.WmsPickupItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
@@ -288,12 +288,12 @@ public class WmsInboundItemServiceImpl implements WmsInboundItemService {
      * 保存入库单详情
      */
     @Override
-    public void saveItems(List<WmsInboundItemDO> itemsToUpdate, List<WmsInboundItemFlowDO> inboundItemFlowList) {
+    public void saveItems(List<WmsInboundItemDO> itemsToUpdate, List<WmsItemFlowDO> itemFlowList) {
         // 保存流水
-        inboundItemFlowMapper.insertBatch(inboundItemFlowList);
-        Map<Long, WmsInboundItemFlowDO> flowDOMap = StreamX.from(inboundItemFlowList).toMap(WmsInboundItemFlowDO::getInboundItemId);
+        inboundItemFlowMapper.insertBatch(itemFlowList);
+        Map<Long, WmsItemFlowDO> flowDOMap = StreamX.from(itemFlowList).toMap(WmsItemFlowDO::getInboundItemId);
         for (WmsInboundItemDO itemDO : itemsToUpdate) {
-            WmsInboundItemFlowDO flowDO = flowDOMap.get(itemDO.getId());
+            WmsItemFlowDO flowDO = flowDOMap.get(itemDO.getId());
             itemDO.setLatestFlowId(flowDO.getId());
         }
         // 保存余量

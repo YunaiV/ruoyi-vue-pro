@@ -108,6 +108,24 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
     }
 
     /**
+     * 用于采购订单 - 在途数量更新
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void quickUpdateStockWarehouse(WmsStockWarehouseSaveReqVO updateReqVO) {
+        // 校验存在
+        WmsStockWarehouseDO stockWarehouse = stockWarehouseMapper.getByWarehouseIdAndProductId(updateReqVO.getProductId(), updateReqVO.getWarehouseId());
+        if (stockWarehouse == null) {
+            log.info(String.valueOf(STOCK_WAREHOUSE_NOT_EXISTS), updateReqVO.getWarehouseId(), updateReqVO.getProductId());
+            return;
+        }
+        // 更新
+        int makePendingQty = Math.max(stockWarehouse.getMakePendingQty() + updateReqVO.getMakePendingQty(), 0);
+        stockWarehouse.setMakePendingQty(makePendingQty);
+        stockWarehouseMapper.updateById(stockWarehouse);
+    }
+
+    /**
      * @sign : BC4B0A75A01DA133
      */
     @Override
@@ -129,7 +147,7 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
     private WmsStockWarehouseDO validateStockWarehouseExists(Long productId, Long warehouseId) {
         WmsStockWarehouseDO stockWarehouse = stockWarehouseMapper.getByWarehouseIdAndProductId(warehouseId, productId);
         if (stockWarehouse == null) {
-            throw exception(STOCK_WAREHOUSE_NOT_EXISTS);
+            throw exception(STOCK_WAREHOUSE_NOT_EXISTS, warehouseId, productId);
         }
         return stockWarehouse;
     }

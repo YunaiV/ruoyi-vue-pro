@@ -26,7 +26,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSim
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemLogicDO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsItemFlowDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.flow.WmsStockFlowDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
@@ -412,7 +412,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
             return;
         }
         for (WmsInboundItemRespVO respVO : itemList) {
-            WmsInboundItemFlowDO inboundItemFlow = WmsInboundItemFlowDO.builder()
+            WmsItemFlowDO inboundItemFlow = WmsItemFlowDO.builder()
                     .inboundId(respVO.getInboundId())
                     .inboundItemId(respVO.getId())
                     .productId(respVO.getProductId())
@@ -655,5 +655,10 @@ public class WmsInboundServiceImpl implements WmsInboundService {
         }else{
             throw exception(INBOUND_ABANDON_NOT_ALLOWED);
         }
+    }
+
+    @Override
+    public WmsInboundDO getByWarehouseIdAndProductId(Long warehouseId, Long productId) {
+        return inboundMapper.getByWarehouseIdAndProductId(warehouseId, productId);
     }
 }

@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.*;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemBinQueryDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemQueryDO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsItemFlowDO;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -117,7 +117,7 @@ public interface WmsInboundItemService {
     /**
      * 保存入库单详情
      */
-    void saveItems(List<WmsInboundItemDO> itemsToUpdate, List<WmsInboundItemFlowDO> inboundItemFlowList);
+    void saveItems(List<WmsInboundItemDO> itemsToUpdate, List<WmsItemFlowDO> itemFlowList);
 
     /**
      * 装配仓库

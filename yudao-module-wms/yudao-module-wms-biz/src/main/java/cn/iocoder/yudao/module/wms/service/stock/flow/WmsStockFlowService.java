@@ -111,4 +111,6 @@ public interface WmsStockFlowService {
     void assembleLogicMove(List<WmsStockFlowRespVO> list);
 
     void assembleBatchAvailableQty(List<WmsStockFlowRespVO> list);
+
+    void assembleExchange(List<WmsStockFlowRespVO> list);
 }

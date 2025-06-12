@@ -89,4 +89,6 @@ public interface WmsStockWarehouseService {
     Map<Long, List<WmsStockWarehouseDO>> selectSellableQty(WmsWarehouseQueryDTO wmsWarehouseQueryDTO);
 
     List<WmsStockWarehouseDO> selectSellableQtyList(WmsWarehouseQueryDTO wmsWarehouseQueryDTO);
+
+    void quickUpdateStockWarehouse(WmsStockWarehouseSaveReqVO bean);
 }

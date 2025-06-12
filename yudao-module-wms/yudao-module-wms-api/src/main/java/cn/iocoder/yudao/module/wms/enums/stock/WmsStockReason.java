@@ -25,8 +25,7 @@ public enum WmsStockReason implements ArrayValuable<Integer>, DictEnum {
     STOCK_LOGIC_MOVE(7, "逻辑库存移动"),
     STOCKCHECK_POSITIVE(8, "盘赢"),
     STOCKCHECK_NEGATIVE(9, "盘亏"),
-    EXCHANGE_GOOD_TO_BAD(10, "换货良换次"),
-    EXCHANGE_BAD_TO_GOOD(11, "换货次换良"),
+    EXCHANGE(10, "良次转换"),
    ;
 
     public static final Integer[] VALUES = Arrays.stream(values()).map(WmsStockReason::getValue).toArray(Integer[]::new);
