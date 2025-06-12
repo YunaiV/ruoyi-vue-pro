@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router.IotMqttUpstreamRouter;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.mqtt.MqttClient;
 import io.vertx.mqtt.MqttClientOptions;
 import jakarta.annotation.PostConstruct;
@@ -59,6 +60,7 @@ public class IotMqttUpstreamProtocol {
 
         // 创建 MQTT 客户端
         MqttClientOptions options = new MqttClientOptions()
+                // TODO @haohao：clientid 建议也配置文件；想通名字，会冲突哇？
                 .setClientId("yudao-iot-gateway-" + IdUtil.fastSimpleUUID())
                 .setUsername(emqxProperties.getMqttUsername())
                 .setPassword(emqxProperties.getMqttPassword())
@@ -121,6 +123,7 @@ public class IotMqttUpstreamProtocol {
      */
     private void connectMqtt() {
         // 检查必要的 MQTT 配置
+        // TODO @haohao：这些通过配置文件的 validate 去做哈，简化下；
         String host = emqxProperties.getMqttHost();
         Integer port = emqxProperties.getMqttPort();
         if (StrUtil.isBlank(host)) {
@@ -149,6 +152,7 @@ public class IotMqttUpstreamProtocol {
                     // 订阅主题
                     subscribeToTopics();
                 })
+                // TODO @haohao：这个要不要改成，必须连接成功？不做重试；不然启动也蛮危险的？
                 .exceptionally(error -> {
                     log.error("[connectMqtt][连接 MQTT Broker 失败]", error);
                     reconnectWithDelay();
@@ -178,12 +182,14 @@ public class IotMqttUpstreamProtocol {
      */
     private void subscribeToTopics() {
         List<String> topicList = emqxProperties.getMqttTopics();
+        // TODO @haohao：建议 topicList 直接 validate 校验
         if (CollUtil.isEmpty(topicList)) {
             log.warn("[subscribeToTopics][未配置 MQTT 主题，使用默认主题]");
             topicList = List.of("/sys/#"); // 默认订阅所有系统主题
         }
 
         for (String topic : topicList) {
+            // TODO @haohao：直接 validate 校验；嘿嘿，主要保证核心逻辑，简单点
             if (StrUtil.isBlank(topic)) {
                 log.warn("[subscribeToTopics][跳过空主题]");
                 continue;
@@ -224,7 +230,7 @@ public class IotMqttUpstreamProtocol {
             return;
         }
 
-        mqttClient.publish(topic, io.vertx.core.buffer.Buffer.buffer(payload), DEFAULT_QOS, false, false)
+        mqttClient.publish(topic, Buffer.buffer(payload), DEFAULT_QOS, false, false)
                 .onSuccess(v -> log.debug("[publishMessage][发送消息成功][topic: {}]", topic))
                 .onFailure(err -> log.error("[publishMessage][发送消息失败][topic: {}]", topic, err));
     }
@@ -238,6 +244,7 @@ public class IotMqttUpstreamProtocol {
         return IotDeviceMessageUtils.generateServerId(emqxProperties.getMqttPort());
     }
 
+    // TODO @haohao：这个要删除哇？
     /**
      * 获取 MQTT 客户端
      *

@@ -56,6 +56,7 @@ public class IotMqttEventHandler extends IotMqttAbstractHandler {
             log.info("[handle][处理设备事件上报成功][topic: {}]", topic);
 
             // 发送响应消息
+            // TODO @haohao：这里应该只 ack 哈；reply 在 biz 业务处理了。handleUpstreamDeviceMessage
             String method = "thing.event." + eventIdentifier + ".post";
             sendResponse(topic, JSONUtil.parseObj(payload), method);
         } catch (Exception e) {

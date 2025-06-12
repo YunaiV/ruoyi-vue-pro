@@ -48,15 +48,15 @@ public class IotMqttDownstreamSubscriber implements IotMessageSubscriber<IotDevi
     @Override
     public void onMessage(IotDeviceMessage message) {
         log.info("[onMessage][接收到下行消息：{}]", message);
-
         try {
             // 根据消息方法处理不同的下行消息
             String method = message.getMethod();
             if (method == null) {
-                log.warn("[onMessage][消息方法为空]");
+                log.warn("[onMessage][消息({})方法为空]", message);
                 return;
             }
 
+            // TODO @haohao：看看怎么融合下
             if (method.startsWith("thing.service.property.")) {
                 handlePropertyMessage(message);
             } else if (method.startsWith("thing.service.") && !method.contains("property") && !method.contains("config")
@@ -83,6 +83,7 @@ public class IotMqttDownstreamSubscriber implements IotMessageSubscriber<IotDevi
         String method = message.getMethod();
 
         // 通过 deviceId 获取设备信息
+        // TODO @haohao：通过缓存拿；
         IotDeviceGetReqDTO reqDTO = new IotDeviceGetReqDTO();
         reqDTO.setId(message.getDeviceId());
         IotDeviceRespDTO deviceInfo = deviceApi.getDevice(reqDTO).getData();

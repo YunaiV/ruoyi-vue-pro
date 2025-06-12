@@ -12,6 +12,7 @@ import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+// TODO @haohao：可以融合到 IotMqttUpstreamProtocol 么？主要考虑，一个协议，一个 protocol；
 /**
  * IoT 网关 MQTT HTTP 认证协议：提供 HTTP 认证接口供 EMQX 调用
  *
@@ -82,6 +83,7 @@ public class IotMqttHttpAuthProtocol extends AbstractVerticle {
         }
     }
 
+    // TODO @haohao：这里不搞默认，必须填写哈；
     /**
      * 获取认证服务端口
      * 从配置中获取，默认使用 8090 端口

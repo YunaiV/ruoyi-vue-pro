@@ -1,3 +1,4 @@
+### TODO 芋艿：这个文件是不是要留着；
 ### IoT MQTT HTTP 认证服务测试文件
 ### 用于测试独立的 MQTT HTTP 认证服务接口
 ### 服务由 IotMqttHttpAuthProtocol 启动，运行在配置的端口上（默认 8090）
@@ -101,7 +102,7 @@ Content-Type: application/json
 ### 假设配置了端口 8091：
 ### POST http://localhost:8091/mqtt/auth/authenticate
 ### Content-Type: application/json
-### 
+###
 ### {
 ###   "clientid": "test_product.test_device",
 ###   "username": "test_device&test_product",
@@ -136,4 +137,4 @@ Content-Type: application/json
 ###     url = "http://localhost:8090/mqtt/auth/disconnected" # 使用配置的端口
 ###     events = ["client.disconnected"]
 ###   }
-### ] 
+### ]
