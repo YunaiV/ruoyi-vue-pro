@@ -50,10 +50,6 @@ public interface IotThingModelMapper extends BaseMapperX<IotThingModelDO> {
         return selectList(IotThingModelDO::getProductId, productId);
     }
 
-    default List<IotThingModelDO> selectListByProductKey(String productKey) {
-        return selectList(IotThingModelDO::getProductKey, productKey);
-    }
-
     default List<IotThingModelDO> selectListByProductIdAndType(Long productId, Integer type) {
         return selectList(IotThingModelDO::getProductId, productId,
                 IotThingModelDO::getType, type);

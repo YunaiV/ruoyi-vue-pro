@@ -23,17 +23,17 @@ import java.util.stream.Collectors;
 @InterceptorIgnore(tenantLine = "true") // 避免 SQL 解析，因为 JSqlParser 对 TDengine 的 SQL 解析会报错
 public interface IotDevicePropertyMapper {
 
-    List<TDengineTableField> getProductPropertySTableFieldList(@Param("productKey") String productKey);
+    List<TDengineTableField> getProductPropertySTableFieldList(@Param("productId") Long productId);
 
-    void createProductPropertySTable(@Param("productKey") String productKey,
+    void createProductPropertySTable(@Param("productId") Long productId,
                                      @Param("fields") List<TDengineTableField> fields);
 
     @SuppressWarnings("SimplifyStreamApiCallChains") // 保持 JDK8 兼容性
-    default void alterProductPropertySTable(String productKey,
+    default void alterProductPropertySTable(Long productId,
                                             List<TDengineTableField> oldFields,
                                             List<TDengineTableField> newFields) {
         oldFields.removeIf(field -> StrUtil.equalsAny(field.getField(),
-                TDengineTableField.FIELD_TS, "report_time", "device_name"));
+                TDengineTableField.FIELD_TS, "report_time"));
         List<TDengineTableField> addFields = newFields.stream().filter( // 新增的字段
                         newField -> oldFields.stream().noneMatch(oldField -> oldField.getField().equals(newField.getField())))
                 .collect(Collectors.toList());
@@ -62,22 +62,22 @@ public interface IotDevicePropertyMapper {
         });
 
         // 执行
-        addFields.forEach(field -> alterProductPropertySTableAddField(productKey, field));
-        dropFields.forEach(field -> alterProductPropertySTableDropField(productKey, field));
-        modifyLengthFields.forEach(field -> alterProductPropertySTableModifyField(productKey, field));
+        addFields.forEach(field -> alterProductPropertySTableAddField(productId, field));
+        dropFields.forEach(field -> alterProductPropertySTableDropField(productId, field));
+        modifyLengthFields.forEach(field -> alterProductPropertySTableModifyField(productId, field));
         modifyTypeFields.forEach(field -> {
-            alterProductPropertySTableDropField(productKey, field);
-            alterProductPropertySTableAddField(productKey, field);
+            alterProductPropertySTableDropField(productId, field);
+            alterProductPropertySTableAddField(productId, field);
         });
     }
 
-    void alterProductPropertySTableAddField(@Param("productKey") String productKey,
+    void alterProductPropertySTableAddField(@Param("productId") Long productId,
                                             @Param("field") TDengineTableField field);
 
-    void alterProductPropertySTableModifyField(@Param("productKey") String productKey,
+    void alterProductPropertySTableModifyField(@Param("productId") Long productId,
                                                @Param("field") TDengineTableField field);
 
-    void alterProductPropertySTableDropField(@Param("productKey") String productKey,
+    void alterProductPropertySTableDropField(@Param("productId") Long productId,
                                              @Param("field") TDengineTableField field);
 
     void insert(@Param("device") IotDeviceDO device,

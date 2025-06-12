@@ -5,11 +5,11 @@
 <mapper namespace="cn.iocoder.yudao.module.iot.dal.tdengine.IotDevicePropertyMapper">
 
     <select id="getProductPropertySTableFieldList" resultType="cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField">
-        DESCRIBE product_property_${productKey}
+        DESCRIBE product_property_${productId}
     </select>
 
     <update id="createProductPropertySTable">
-        CREATE STABLE product_property_${productKey} (
+        CREATE STABLE product_property_${productId} (
             ts TIMESTAMP,
             report_time TIMESTAMP,
         <foreach item="field" collection="fields" separator=",">
@@ -20,12 +20,12 @@
         </foreach>
         )
         TAGS (
-            device_name NCHAR(50)
+            device_id BIGINT
         )
     </update>
 
     <update id="alterProductPropertySTableAddField">
-        ALTER STABLE product_property_${productKey}
+        ALTER STABLE product_property_${productId}
         ADD COLUMN ${field.field} ${field.type}
         <if test="field.length != null and field.length > 0">
             (${field.length})
@@ -33,7 +33,7 @@
     </update>
 
     <update id="alterProductPropertySTableModifyField">
-        ALTER STABLE product_property_${productKey}
+        ALTER STABLE product_property_${productId}
         MODIFY COLUMN ${field.field} ${field.type}
         <if test="field.length != null and field.length > 0">
             (${field.length})
@@ -41,14 +41,14 @@
     </update>
 
     <update id="alterProductPropertySTableDropField">
-        ALTER STABLE product_property_${productKey}
+        ALTER STABLE product_property_${productId}
         DROP COLUMN ${field.field}
     </update>
 
     <insert id="insert">
-        INSERT INTO device_property_${device.productKey}_${device.deviceName}
-        USING product_property_${device.productKey}
-        TAGS ('${device.deviceName}')
+        INSERT INTO device_property_${device.id}
+        USING product_property_${device.productId}
+        TAGS ('${device.id}')
         (ts, report_time,
         <foreach item="key" collection="properties.keys" separator=",">
             ${@cn.hutool.core.util.StrUtil@toUnderlineCase(key)}
@@ -63,13 +63,14 @@
     </insert>
 
     <select id="describeSuperTable" resultType="java.util.Map">
-        DESCRIBE product_property_${productKey}
+        DESCRIBE product_property_${productId}
     </select>
 
+    <!-- TODO @芋艿：这里查询有点问题 -->
     <select id="selectPageByHistory"
             resultType="cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO">
         SELECT ${@cn.hutool.core.util.StrUtil@toUnderlineCase(reqVO.identifier)} AS `value`, ts AS update_time
-        FROM device_property_${reqVO.productKey}_${reqVO.deviceName}
+        FROM device_property_${reqVO.deviceId}
         WHERE ${@cn.hutool.core.util.StrUtil@toUnderlineCase(reqVO.identifier)} IS NOT NULL
           AND ts BETWEEN ${@cn.hutool.core.date.LocalDateTimeUtil@toEpochMilli(reqVO.times[0])}
               AND ${@cn.hutool.core.date.LocalDateTimeUtil@toEpochMilli(reqVO.times[1])}

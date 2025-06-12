@@ -29,7 +29,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -133,10 +132,10 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     }
 
     @Override
-    @Cacheable(value = RedisKeyConstants.THING_MODEL_LIST, key = "#productKey")
+    @Cacheable(value = RedisKeyConstants.THING_MODEL_LIST, key = "#productId")
     @TenantIgnore // 忽略租户信息，跨租户 productKey 是唯一的
-    public List<IotThingModelDO> getThingModelListByProductKeyFromCache(String productKey) {
-        return thingModelMapper.selectListByProductKey(productKey);
+    public List<IotThingModelDO> getThingModelListByProductIdFromCache(Long productId) {
+        return thingModelMapper.selectListByProductId(productId);
     }
 
     @Override
@@ -362,12 +361,6 @@ public class IotThingModelServiceImpl implements IotThingModelService {
 
     private IotThingModelServiceImpl getSelf() {
         return SpringUtil.getBean(getClass());
-    }
-
-    // TODO @super：用不到，删除下；
-    @Override
-    public Long getThingModelCount(LocalDateTime createTime) {
-        return thingModelMapper.selectCountByCreateTime(createTime);
     }
 
 }

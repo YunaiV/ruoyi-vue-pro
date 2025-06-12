@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelS
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import jakarta.validation.Valid;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -60,10 +59,10 @@ public interface IotThingModelService {
      *
      * 注意：该方法会忽略租户信息，所以调用时，需要确认会不会有跨租户访问的风险！！！
      *
-     * @param productKey 产品标识
+     * @param productId 产品编号
      * @return 产品物模型列表
      */
-    List<IotThingModelDO> getThingModelListByProductKeyFromCache(String productKey);
+    List<IotThingModelDO> getThingModelListByProductIdFromCache(Long productId);
 
     /**
      * 获得产品物模型分页
@@ -80,14 +79,5 @@ public interface IotThingModelService {
      * @return 产品物模型列表
      */
     List<IotThingModelDO> getThingModelList(IotThingModelListReqVO reqVO);
-
-    // TODO @super：用不到，删除下哈。
-    /**
-     * 获得物模型数量
-     *
-     * @param createTime 创建时间，如果为空，则统计所有物模型数量
-     * @return 物模型数量
-     */
-    Long getThingModelCount(LocalDateTime createTime);
 
 }

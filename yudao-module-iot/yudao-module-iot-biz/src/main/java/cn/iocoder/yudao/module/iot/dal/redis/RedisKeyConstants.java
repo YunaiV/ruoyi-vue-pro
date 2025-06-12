@@ -9,15 +9,14 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
  */
 public interface RedisKeyConstants {
 
-    // TODO @芋艿：弱化 deviceKey；使用 product_key + device_name 替代
     /**
      * 设备属性的数据缓存，采用 HASH 结构
      * <p>
-     * KEY 格式：device_property:{deviceKey}
+     * KEY 格式：device_property:{deviceId}
      * HASH KEY：identifier 属性标识
      * VALUE 数据类型：String(JSON) {@link IotDevicePropertyDO}
      */
-    String DEVICE_PROPERTY = "iot:device_property:%s";
+    String DEVICE_PROPERTY = "iot:device_property:%d";
 
     /**
      * 设备的最后上报时间，采用 ZSET 结构
@@ -31,7 +30,7 @@ public interface RedisKeyConstants {
      * 设备关联的网关 serverId 缓存，采用 HASH 结构
      *
      * KEY 格式：device_server_id
-     * HASH KEY：{productKey},{deviceName}
+     * HASH KEY：{deviceId}
      * VALUE 数据类型：String serverId
      */
     String DEVICE_SERVER_ID = "iot:device_server_id";
@@ -56,7 +55,7 @@ public interface RedisKeyConstants {
     /**
      * 物模型的数据缓存，使用 Spring Cache 操作（忽略租户）
      *
-     * KEY 格式：thing_model_${productKey}
+     * KEY 格式：thing_model_${productId}
      * VALUE 数据类型：String 数组(JSON)，即 {@link cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO} 列表
      */
     String THING_MODEL_LIST = "iot:thing_model_list";

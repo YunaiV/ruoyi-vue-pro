@@ -20,7 +20,6 @@ import cn.iocoder.yudao.module.iot.dal.tdengine.IotDevicePropertyMapper;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotDataSpecsDataTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField;
-import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -60,8 +59,6 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
             .build();
 
     @Resource
-    private IotDeviceService deviceService;
-    @Resource
     private IotThingModelService thingModelService;
     @Resource
     private IotProductService productService;
@@ -87,7 +84,7 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
         // 1.2 解析 DB 里的字段
         List<TDengineTableField> oldFields = new ArrayList<>();
         try {
-            oldFields.addAll(devicePropertyMapper.getProductPropertySTableFieldList(product.getProductKey()));
+            oldFields.addAll(devicePropertyMapper.getProductPropertySTableFieldList(product.getId()));
         } catch (Exception e) {
             if (!e.getMessage().contains("Table does not exist")) {
                 throw e;
@@ -101,11 +98,11 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
                 log.info("[defineDevicePropertyData][productId({}) 没有需要定义的属性]", productId);
                 return;
             }
-            devicePropertyMapper.createProductPropertySTable(product.getProductKey(), newFields);
+            devicePropertyMapper.createProductPropertySTable(product.getId(), newFields);
             return;
         }
         // 2.2 情况二：如果是修改的时候，需要更新表
-        devicePropertyMapper.alterProductPropertySTable(product.getProductKey(), oldFields, newFields);
+        devicePropertyMapper.alterProductPropertySTable(product.getId(), oldFields, newFields);
     }
 
     private List<TDengineTableField> buildTableFieldList(List<IotThingModelDO> thingModels) {
@@ -122,16 +119,17 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
 
     @Override
     public void saveDeviceProperty(IotDeviceDO device, IotDeviceMessage message) {
-        if (!(message.getData() instanceof Map)) {
+        // TODO @芋艿：这里要改下协议！
+        if (!(message.getParams() instanceof Map)) {
             log.error("[saveDeviceProperty][消息内容({}) 的 data 类型不正确]", message);
             return;
         }
 
         // 1. 根据物模型，拼接合法的属性
         // TODO @芋艿：【待定 004】赋能后，属性到底以 thingModel 为准（ik），还是 db 的表结构为准（tl）？
-        List<IotThingModelDO> thingModels = thingModelService.getThingModelListByProductKeyFromCache(device.getProductKey());
+        List<IotThingModelDO> thingModels = thingModelService.getThingModelListByProductIdFromCache(device.getProductId());
         Map<String, Object> properties = new HashMap<>();
-        ((Map<?, ?>) message.getData()).forEach((key, value) -> {
+        ((Map<?, ?>) message.getParams()).forEach((key, value) -> {
             if (CollUtil.findOne(thingModels, thingModel -> thingModel.getIdentifier().equals(key)) == null) {
                 log.error("[saveDeviceProperty][消息({}) 的属性({}) 不存在]", message, key);
                 return;
@@ -150,25 +148,16 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
         // 2.2 保存设备属性【日志】
         Map<String, IotDevicePropertyDO> properties2 = convertMap(properties.entrySet(), Map.Entry::getKey, entry ->
                 IotDevicePropertyDO.builder().value(entry.getValue()).updateTime(message.getReportTime()).build());
-        deviceDataRedisDAO.putAll(device.getProductKey(), device.getDeviceName(), properties2);
+        deviceDataRedisDAO.putAll(device.getId(), properties2);
     }
 
     @Override
     public Map<String, IotDevicePropertyDO> getLatestDeviceProperties(Long deviceId) {
-        // 获取设备信息
-        IotDeviceDO device = deviceService.validateDeviceExists(deviceId);
-
-        // 获得设备属性
-        return deviceDataRedisDAO.get(device.getProductKey(), device.getDeviceName());
+        return deviceDataRedisDAO.get(deviceId);
     }
 
     @Override
     public PageResult<IotDevicePropertyRespVO> getHistoryDevicePropertyPage(IotDevicePropertyHistoryPageReqVO pageReqVO) {
-        // 获取设备信息
-        IotDeviceDO device = deviceService.validateDeviceExists(pageReqVO.getDeviceId());
-        pageReqVO.setProductKey(device.getProductKey()).setDeviceName(device.getDeviceName());
-
-        // 分页查询
         try {
             IPage<IotDevicePropertyRespVO> page = devicePropertyMapper.selectPageByHistory(
                     new Page<>(pageReqVO.getPageNo(), pageReqVO.getPageSize()), pageReqVO);
