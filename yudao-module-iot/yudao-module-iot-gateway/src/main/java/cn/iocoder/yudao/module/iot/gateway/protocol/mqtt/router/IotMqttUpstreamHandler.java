@@ -20,6 +20,7 @@ import java.util.Arrays;
 public class IotMqttUpstreamHandler {
 
     private final IotDeviceMessageService deviceMessageService;
+
     private final String serverId;
 
     public IotMqttUpstreamHandler(IotMqttUpstreamProtocol protocol) {
@@ -30,56 +31,50 @@ public class IotMqttUpstreamHandler {
     /**
      * 处理 MQTT 发布消息
      */
-    public void handle(MqttPublishMessage message) {
-        String topic = message.topicName();
-        byte[] payload = message.payload().getBytes();
-
-        log.debug("[handle][收到 MQTT 消息, topic: {}]", topic);
-
+    public void handle(MqttPublishMessage mqttMessage) {
+        String topic = mqttMessage.topicName();
+        byte[] payload = mqttMessage.payload().getBytes();
         try {
             // 1. 前置校验
             if (StrUtil.isBlank(topic)) {
                 log.warn("[handle][主题为空, 忽略消息]");
                 return;
             }
-            // 注意：payload 可以为空
 
-            // 2. 识别并验证消息类型
+            // 2.1 识别并验证消息类型
             String messageType = getMessageType(topic);
+            // TODO @haohao：可以使用 hutool 的，它的字符串拼接更简单；
             Assert.notNull(messageType, String.format("未知的消息类型, topic(%s)", topic));
-            log.debug("[handle][接收到上行消息({}), topic: {}]", messageType, topic);
-
-            // 3. 解析主题，获取 productKey 和 deviceName
+            // 2.2 解析主题，获取 productKey 和 deviceName
+            // TODO @haohao：体感 getMessageType 和下面，都 split；是不是一次就 ok 拉；1）split 掉；2）2、3 位置是 productKey、deviceName；3）4 开始还是 method
             String[] topicParts = topic.split("/");
             if (topicParts.length < 4) {
-                log.warn("[handle][主题格式不正确，无法解析 productKey 和 deviceName][topic: {}]", topic);
+                log.warn("[handle][topic({}) 格式不正确，无法解析 productKey 和 deviceName]", topic);
                 return;
             }
             String productKey = topicParts[2];
             String deviceName = topicParts[3];
+            // TODO @haohao：是不是要判断，部分为空，就不行呀；
             if (StrUtil.isAllBlank(productKey, deviceName)) {
-                log.warn("[handle][主题中 productKey 或 deviceName 为空][topic: {}]", topic);
+                log.warn("[handle][topic({}) 格式不正确，productKey 和 deviceName 部分为空]", topic);
                 return;
             }
 
-            // 4. 解码消息
-            IotDeviceMessage deviceMessage = deviceMessageService.decodeDeviceMessage(
-                    payload, productKey, deviceName);
-            if (deviceMessage == null) {
-                log.warn("[handle][消息解码失败][topic: {}]", topic);
+            // 3. 解码消息
+            IotDeviceMessage message = deviceMessageService.decodeDeviceMessage(payload, productKey, deviceName);
+            if (message == null) {
+                log.warn("[handle][topic({}) payload({}) 消息解码失败", topic, new String(payload));
                 return;
             }
 
-            // 5. 发送消息到队列
-            deviceMessageService.sendDeviceMessage(deviceMessage, productKey, deviceName, serverId);
-
-            // 6. 记录成功日志
-            log.debug("[handle][处理上行消息({})成功, topic: {}]", messageType, topic);
+            // 4. 发送消息到队列
+            deviceMessageService.sendDeviceMessage(message, productKey, deviceName, serverId);
         } catch (Exception e) {
-            log.error("[handle][处理 MQTT 消息失败][topic: {}][payload: {}]", topic, new String(payload), e);
+            log.error("[handle][topic({}) payload({}) 处理异常]", topic, new String(payload), e);
         }
     }
 
+    // TODO @haohao：是不是 getMethodFromTopic？
     /**
      * 从主题中，获得消息类型
      *
@@ -89,9 +84,9 @@ public class IotMqttUpstreamHandler {
     private String getMessageType(String topic) {
         String[] topicParts = topic.split("/");
         // 约定：topic 第 4 个部分开始为消息类型
-        // 例如：/sys/{productKey}/{deviceName}/thing/property/post ->
-        // thing/property/post
+        // 例如：/sys/{productKey}/{deviceName}/thing/property/post -> thing/property/post
         if (topicParts.length > 4) {
+            // TODO @haohao：是不是 subString 前 3 个，性能更好；
             return String.join("/", Arrays.copyOfRange(topicParts, 4, topicParts.length));
         }
         return topicParts[topicParts.length - 1];

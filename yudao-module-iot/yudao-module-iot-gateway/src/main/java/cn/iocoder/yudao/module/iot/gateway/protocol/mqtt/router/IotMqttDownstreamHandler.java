@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * IoT 网关 MQTT 下行消息处理器
  * <p>
- * 从消息总线接收到下行消息，然后发布到 MQTT Broker
+ * 从消息总线接收到下行消息，然后发布到 MQTT Broker，从而被设备所接收
  *
  * @author 芋道源码
  */
@@ -23,7 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 public class IotMqttDownstreamHandler {
 
     private final IotMqttUpstreamProtocol protocol;
+
     private final IotDeviceService deviceService;
+
     private final IotDeviceMessageService deviceMessageService;
 
     public IotMqttDownstreamHandler(IotMqttUpstreamProtocol protocol) {
@@ -41,25 +43,24 @@ public class IotMqttDownstreamHandler {
         // 1. 获取设备信息（使用缓存）
         IotDeviceRespDTO deviceInfo = deviceService.getDeviceFromCache(message.getDeviceId());
         if (deviceInfo == null) {
-            log.warn("[handle][设备信息不存在, deviceId: {}]", message.getDeviceId());
+            log.error("[handle][设备信息({})不存在]", message.getDeviceId());
             return;
         }
 
-        // 2. 根据方法构建主题
+        // 2.1 根据方法构建主题
         String topic = buildTopicByMethod(message.getMethod(), deviceInfo.getProductKey(), deviceInfo.getDeviceName());
         if (StrUtil.isBlank(topic)) {
             log.warn("[handle][未知的消息方法: {}]", message.getMethod());
             return;
         }
-
-        // 3. 构建载荷
+        // 2.2 构建载荷
+        // TODO @haohao：这里是不是 encode 就可以发拉？因为本身就 json 化了。
         JSONObject payload = buildDownstreamPayload(message);
-
-        // 4. 发布消息
+        // 2.3 发布消息
         protocol.publishMessage(topic, payload.toString());
-        log.debug("[handle][发布下行消息成功, method: {}, topic: {}]", message.getMethod(), topic);
     }
 
+    // TODO @haohao：这个是不是也可以计算；IotDeviceMessageUtils 的 isReplyMessage；这样就直接生成了；
     /**
      * 根据方法构建主题
      *

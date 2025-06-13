@@ -35,6 +35,11 @@ public class IotMqttUpstreamProtocol {
 
     private final IotGatewayProperties.EmqxProperties emqxProperties;
 
+    /**
+     * 服务运行状态标志
+     */
+    private volatile boolean isRunning = false;
+
     private Vertx vertx;
 
     @Getter
@@ -46,11 +51,6 @@ public class IotMqttUpstreamProtocol {
 
     // HTTP 认证服务相关
     private HttpServer httpAuthServer;
-
-    /**
-     * 服务运行状态标志
-     */
-    private volatile boolean isRunning = false;
 
     public IotMqttUpstreamProtocol(IotGatewayProperties.EmqxProperties emqxProperties) {
         this.emqxProperties = emqxProperties;
@@ -66,13 +66,12 @@ public class IotMqttUpstreamProtocol {
         log.info("[start][启动 MQTT 协议服务]");
 
         try {
-            // 1. 创建共享的 Vertx 实例
             this.vertx = Vertx.vertx();
 
-            // 2. 启动 HTTP 认证服务
+            // 1. 启动 HTTP 认证服务
             startHttpAuthServer();
 
-            // 3. 启动 MQTT 客户端
+            // 2. 启动 MQTT 客户端
             startMqttClient();
 
             isRunning = true;
@@ -119,16 +118,15 @@ public class IotMqttUpstreamProtocol {
     private void startHttpAuthServer() {
         log.info("[startHttpAuthServer][启动 HTTP 认证服务]");
 
-        // 创建路由
+        // 1.1 创建路由
         Router router = Router.router(vertx);
         router.route().handler(BodyHandler.create());
-
-        // 创建认证处理器
+        // 1.2 创建认证处理器
         IotMqttHttpAuthHandler authHandler = new IotMqttHttpAuthHandler(this);
         router.post(IotMqttTopicUtils.MQTT_AUTH_PATH).handler(authHandler::handleAuth);
         router.post(IotMqttTopicUtils.MQTT_EVENT_PATH).handler(authHandler::handleEvent);
 
-        // 启动 HTTP 服务器
+        // 2. 启动 HTTP 服务器
         int authPort = emqxProperties.getHttpAuthPort();
         try {
             httpAuthServer = vertx.createHttpServer()
@@ -172,7 +170,7 @@ public class IotMqttUpstreamProtocol {
             createMqttClient();
 
             // 3. 连接 MQTT Broker（异步连接，不会抛出异常）
-            connectMqtt();
+            connectMqtt(false);
 
             log.info("[startMqttClient][MQTT 客户端启动完成，正在异步连接中...]");
         } catch (Exception e) {
@@ -213,13 +211,6 @@ public class IotMqttUpstreamProtocol {
 
     /**
      * 连接 MQTT Broker 并订阅主题
-     */
-    private void connectMqtt() {
-        connectMqtt(false);
-    }
-
-    /**
-     * 连接 MQTT Broker 并订阅主题
      *
      * @param isReconnect 是否为重连
      */
@@ -227,6 +218,7 @@ public class IotMqttUpstreamProtocol {
         // 1. 参数校验
         String host = emqxProperties.getMqttHost();
         Integer port = emqxProperties.getMqttPort();
+        // TODO @haohao：这些参数校验，交给 validator；
         if (StrUtil.isBlank(host)) {
             log.error("[connectMqtt][MQTT Host 为空, 无法连接]");
             throw new IllegalArgumentException("MQTT Host 不能为空");
@@ -246,6 +238,7 @@ public class IotMqttUpstreamProtocol {
 
         // 2. 异步连接
         mqttClient.connect(port, host, connectResult -> {
+            // TODO @haohao：if return，减少括号哈；
             if (connectResult.succeeded()) {
                 if (isReconnect) {
                     log.info("[connectMqtt][MQTT 客户端重连成功, host: {}, port: {}]", host, port);
@@ -253,16 +246,15 @@ public class IotMqttUpstreamProtocol {
                     log.info("[connectMqtt][MQTT 客户端连接成功, host: {}, port: {}]", host, port);
                 }
 
-                // 3. 设置处理器
+                // 设置处理器
                 setupMqttHandlers();
-
-                // 4. 订阅主题
+                // 订阅主题
                 subscribeToTopics();
-
             } else {
                 log.error("[connectMqtt][连接 MQTT Broker 失败, host: {}, port: {}, isReconnect: {}]",
                         host, port, isReconnect, connectResult.cause());
 
+                // TODO @haohao：体感上，是不是首次必须连接成功？类似 mysql；首次要连接上，然后后续可以重连；
                 if (!isReconnect) {
                     // 首次连接失败时，也要尝试重连
                     log.warn("[connectMqtt][首次连接失败，将开始重连机制]");
@@ -279,14 +271,11 @@ public class IotMqttUpstreamProtocol {
      * 创建 MQTT 客户端
      */
     private void createMqttClient() {
-        log.debug("[createMqttClient][创建 MQTT 客户端, clientId: {}]", emqxProperties.getMqttClientId());
-
         MqttClientOptions options = new MqttClientOptions()
                 .setClientId(emqxProperties.getMqttClientId())
                 .setUsername(emqxProperties.getMqttUsername())
                 .setPassword(emqxProperties.getMqttPassword())
                 .setSsl(emqxProperties.getMqttSsl());
-
         this.mqttClient = MqttClient.create(vertx, options);
     }
 
@@ -294,6 +283,7 @@ public class IotMqttUpstreamProtocol {
      * 设置 MQTT 处理器
      */
     private void setupMqttHandlers() {
+        // TODO @haohao：mqttClient 一定非空；
         if (mqttClient == null) {
             log.warn("[setupMqttHandlers][MQTT 客户端为空，跳过处理器设置]");
             return;
@@ -311,6 +301,7 @@ public class IotMqttUpstreamProtocol {
         });
 
         // 设置消息处理器
+        // TODO @haohao：upstreamHandler 一定非空；
         if (upstreamHandler != null) {
             mqttClient.publishHandler(upstreamHandler::handle);
             log.debug("[setupMqttHandlers][MQTT 消息处理器设置完成]");
@@ -328,7 +319,6 @@ public class IotMqttUpstreamProtocol {
             log.warn("[subscribeToTopics][订阅主题列表为空, 跳过订阅]");
             return;
         }
-
         if (mqttClient == null || !mqttClient.isConnected()) {
             log.warn("[subscribeToTopics][MQTT 客户端未连接, 跳过订阅]");
             return;
@@ -337,10 +327,12 @@ public class IotMqttUpstreamProtocol {
         int qos = emqxProperties.getMqttQos();
         log.info("[subscribeToTopics][开始订阅主题, 共 {} 个, QoS: {}]", topicList.size(), qos);
 
+        // TODO @haohao：使用 atomicinteger 会更合适；
         int[] successCount = { 0 }; // 使用数组以便在 lambda 中修改
         int[] failCount = { 0 };
 
         for (String topic : topicList) {
+            // TODO @haohao：MqttClient subscribe(Map<String, Integer> topics, 是不是更简洁哈；
             mqttClient.subscribe(topic, qos, subscribeResult -> {
                 if (subscribeResult.succeeded()) {
                     successCount[0]++;

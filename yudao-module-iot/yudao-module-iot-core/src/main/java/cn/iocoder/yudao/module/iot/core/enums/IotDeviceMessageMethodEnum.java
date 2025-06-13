@@ -23,12 +23,13 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
     STATE_OFFLINE("thing.state.offline", true),
 
     // ========== 设备属性 ==========
-    // 可参考
-    // https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services
+    // 可参考：https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services
+
     PROPERTY_POST("thing.property.post", true),
     PROPERTY_SET("thing.property.set", false),
 
     // ========== 设备事件 ==========
+
     EVENT_POST("thing.event.post", true),
 
     ;
