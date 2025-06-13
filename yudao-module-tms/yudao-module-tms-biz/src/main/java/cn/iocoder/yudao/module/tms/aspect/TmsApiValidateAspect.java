@@ -22,10 +22,20 @@ public class TmsApiValidateAspect {
 
     @Around("@annotation(tmsApiValidate)")
     public Object around(ProceedingJoinPoint joinPoint, TmsApiValidate tmsApiValidate) throws Throwable {
+        String prefix = tmsApiValidate.prefix();
         for (Object arg : joinPoint.getArgs()) {
             Set<ConstraintViolation<Object>> violations = validator.validate(arg, tmsApiValidate.groups());
             if (!violations.isEmpty()) {
-                throw new ConstraintViolationException(violations);
+                // 拼接前缀到所有message
+                StringBuilder sb = new StringBuilder();
+                for (ConstraintViolation<Object> violation : violations) {
+                    if (!prefix.isEmpty()) {
+                        sb.append(prefix).append(": ");
+                    }
+//                    sb.append(violation.getPropertyPath()).append(" ");
+                    sb.append(violation.getMessage()).append("; ");
+                }
+                throw new ConstraintViolationException(sb.toString(), violations);
             }
         }
         return joinPoint.proceed();

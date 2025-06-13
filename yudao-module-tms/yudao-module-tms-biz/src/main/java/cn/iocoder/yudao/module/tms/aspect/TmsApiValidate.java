@@ -11,5 +11,19 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TmsApiValidate {
+    /**
+     * 分组校验
+     *
+     * @return void
+     * <p>
+     * {@link cn.iocoder.yudao.module.system.api.utils.Validation}
+     */
     Class<?>[] groups() default {};
+
+    /**
+     * 前缀
+     *
+     * @return str
+     */
+    String prefix() default "";
 }
