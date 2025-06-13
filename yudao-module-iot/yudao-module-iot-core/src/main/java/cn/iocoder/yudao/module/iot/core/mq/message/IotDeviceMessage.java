@@ -25,9 +25,9 @@ public class IotDeviceMessage {
     public static final String MESSAGE_BUS_DEVICE_MESSAGE_TOPIC = "iot_device_message";
 
     /**
-     * 【消息总线】设备消息 Topic，由 iot-biz 发送给 iot-gateway 的某个 “server”(protocol) 进行消费
+     * 【消息总线】设备消息 Topic，由 iot-biz 发送给 iot-gateway 的某个 "server"(protocol) 进行消费
      *
-     * 其中，%s 就是该“server”(protocol) 的标识
+     * 其中，%s 就是该"server"(protocol) 的标识
      */
     public static final String MESSAGE_BUS_GATEWAY_DEVICE_MESSAGE_TOPIC = MESSAGE_BUS_DEVICE_MESSAGE_TOPIC + "_%s";
 
@@ -92,7 +92,7 @@ public class IotDeviceMessage {
      */
     private String msg;
 
-    // ========== 基础方法：只传递“codec（编解码）字段” ==========
+    // ========== 基础方法：只传递"codec（编解码）字段" ==========
 
     public static IotDeviceMessage requestOf(String method) {
         return requestOf(null, method, null);

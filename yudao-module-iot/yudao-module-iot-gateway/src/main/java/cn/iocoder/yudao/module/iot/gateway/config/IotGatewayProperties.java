@@ -134,7 +134,7 @@ public class IotGatewayProperties {
         private String mqttPassword;
 
         /**
-         * MQTT 是否开启 SSL（默认：false）
+         * MQTT 客户端的 SSL 开关
          */
         @NotNull(message = "MQTT 是否开启 SSL 不能为空")
         private Boolean mqttSsl = false;
@@ -145,10 +145,29 @@ public class IotGatewayProperties {
         private String mqttClientId;
 
         /**
-         * MQTT 主题列表
+         * MQTT 订阅的主题
          */
         @NotEmpty(message = "MQTT 主题不能为空")
         private List<String> mqttTopics;
+
+        /**
+         * 默认 QoS 级别
+         * <p>
+         * 0 - 最多一次
+         * 1 - 至少一次
+         * 2 - 刚好一次
+         */
+        private Integer mqttQos = 1;
+
+        /**
+         * 连接超时时间（秒）
+         */
+        private Integer connectTimeoutSeconds = 10;
+
+        /**
+         * 重连延迟时间（毫秒）
+         */
+        private Long reconnectDelayMs = 5000L;
 
         /**
          * 获取 MQTT 客户端 ID，如果未配置则自动生成

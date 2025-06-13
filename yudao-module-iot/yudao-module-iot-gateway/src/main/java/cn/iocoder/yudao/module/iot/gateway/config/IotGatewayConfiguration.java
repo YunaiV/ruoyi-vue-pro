@@ -45,7 +45,7 @@ public class IotGatewayConfiguration {
     public static class MqttProtocolConfiguration {
 
         @Bean
-        public IotMqttUpstreamProtocol iotMqttUnifiedProtocol(IotGatewayProperties gatewayProperties) {
+        public IotMqttUpstreamProtocol iotMqttUpstreamProtocol(IotGatewayProperties gatewayProperties) {
             return new IotMqttUpstreamProtocol(gatewayProperties.getProtocol().getEmqx());
         }
 

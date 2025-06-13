@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 
 /**
  * 针对 {@link IotDeviceMessage} 的业务处理器：调用 method 对应的逻辑。例如说：
- * 1. {@link IotDeviceMessageMethodEnum#PROPERTY_REPORT} 属性上报时，记录设备属性
+ * 1. {@link IotDeviceMessageMethodEnum#PROPERTY_POST} 属性上报时，记录设备属性
  *
  * @author alwayssuper
  */

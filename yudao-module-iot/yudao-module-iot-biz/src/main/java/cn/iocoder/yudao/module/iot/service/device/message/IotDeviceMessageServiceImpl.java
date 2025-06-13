@@ -126,7 +126,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
     @Override
     public void handleUpstreamDeviceMessage(IotDeviceMessage message, IotDeviceDO device) {
-        // 1. 理消息
+        // 1. 处理消息
         Object replyData = null;
         ServiceException serviceException = null;
         try {
@@ -175,8 +175,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         }
 
         // 属性上报
-        if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.PROPERTY_REPORT.getMethod()) ||
-                Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod())) {
+        if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod())) {
             devicePropertyService.saveDeviceProperty(device, message);
             return null;
         }
