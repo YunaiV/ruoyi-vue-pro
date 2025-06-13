@@ -124,4 +124,5 @@ public interface TmsTransferService {
      * @return 可售库存数量信息
      */
     TmsTransferSellableQtyRespVO getSellableQty(TmsTransferSellableQtyReqVO reqVO);
+
 }

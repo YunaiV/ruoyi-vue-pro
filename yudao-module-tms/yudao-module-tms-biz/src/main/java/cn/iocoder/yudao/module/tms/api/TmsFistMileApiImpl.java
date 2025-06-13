@@ -32,7 +32,7 @@ public class TmsFistMileApiImpl implements TmsFistMileApi {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @TmsApiValidate
+    @TmsApiValidate(prefix = "出库单审批通过回调")
     public void outboundAudit(TmsOutboundReqDTO dto) {
         // 1.0 校验上游类型是否是头程出库
         if (!Objects.equals(dto.getUpstreamType(), BillType.TMS_FIRST_MILE.getValue())) {

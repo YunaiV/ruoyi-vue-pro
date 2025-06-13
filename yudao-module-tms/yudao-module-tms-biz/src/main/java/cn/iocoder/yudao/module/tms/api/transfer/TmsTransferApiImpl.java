@@ -48,7 +48,7 @@ public class TmsTransferApiImpl implements TmsTransferApi {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @TmsApiValidate
+    @TmsApiValidate(prefix = "调拨单出库回调")
     public void afterOutboundAudit(TmsOutboundReqDTO reqDTO) {
         log.debug("调拨单[{}]出库审核通过，开始创建入库单", JSONUtil.parse(reqDTO));
         // 1.0 校验上游类型是否是调拨出库
@@ -130,7 +130,7 @@ public class TmsTransferApiImpl implements TmsTransferApi {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @TmsApiValidate
+    @TmsApiValidate(prefix = "调拨单入库回调")
     public void afterInboundAudit(TmsInboundReqDTO reqDTO) {
         log.debug("调拨单[{}]入库审核通过，开始回填入库单信息", JSONUtil.parse(reqDTO));
         // 1.0 校验上游类型是否是调拨入库
