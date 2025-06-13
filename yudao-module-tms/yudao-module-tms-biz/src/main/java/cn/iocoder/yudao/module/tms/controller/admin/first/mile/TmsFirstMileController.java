@@ -315,6 +315,12 @@ public class TmsFirstMileController {
                     if (item.getPackageHeight() != null) {
                         itemRespVO.setTotalPackageHeight(item.getPackageHeight().multiply(new BigDecimal(item.getQty())));
                     }
+                    if (item.getPackageWeight() != null) {
+                        itemRespVO.setTotalPackageWeight(item.getPackageWeight().multiply(new BigDecimal(item.getQty())));
+                    }
+                    if (item.getPackageLength() != null && item.getPackageWidth() != null && item.getPackageHeight() != null) {
+                        itemRespVO.setTotalVolume(item.getPackageLength().multiply(item.getPackageWidth()).multiply(item.getPackageHeight()).multiply(new BigDecimal(item.getQty())));
+                    }
 
                     return itemRespVO;
                 }).collect(Collectors.toList());
@@ -326,7 +332,7 @@ public class TmsFirstMileController {
 
                 // 计算体积、包装重量和净重的汇总
                 double totalVolume = items.stream()
-                    .mapToDouble(item -> item.getTotalVolume() != null ? item.getTotalVolume().multiply(new BigDecimal(item.getQty())).doubleValue() : 0)
+                    .mapToDouble(item -> item.getTotalVolume() != null ? item.getTotalVolume().doubleValue() : 0)
                     .sum();
                 double totalPackageWeight = items.stream()
                     .mapToDouble(item -> item.getPackageWeight() != null ? item.getPackageWeight().multiply(new BigDecimal(item.getQty())).doubleValue() : 0)
