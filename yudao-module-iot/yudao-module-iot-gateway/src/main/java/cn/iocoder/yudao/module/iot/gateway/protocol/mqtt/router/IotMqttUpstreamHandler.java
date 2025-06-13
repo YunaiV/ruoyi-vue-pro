@@ -9,6 +9,8 @@ import io.vertx.mqtt.messages.MqttPublishMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
+import java.util.Arrays;
+
 /**
  * IoT 网关 MQTT 上行消息处理器
  *
@@ -32,12 +34,12 @@ public class IotMqttUpstreamHandler {
         String topic = message.topicName();
         byte[] payload = message.payload().getBytes();
 
-        log.debug("[handle][收到 MQTT 消息][topic: {}]", topic);
+        log.debug("[handle][收到 MQTT 消息, topic: {}]", topic);
 
         try {
             // 1. 前置校验
             if (StrUtil.isBlank(topic)) {
-                log.warn("[validateInput][主题为空，忽略消息]");
+                log.warn("[handle][主题为空, 忽略消息]");
                 return;
             }
             // 注意：payload 可以为空
@@ -45,7 +47,7 @@ public class IotMqttUpstreamHandler {
             // 2. 识别并验证消息类型
             String messageType = getMessageType(topic);
             Assert.notNull(messageType, String.format("未知的消息类型, topic(%s)", topic));
-            log.info("[handle][接收到{}][topic: {}]", messageType, topic);
+            log.debug("[handle][接收到上行消息({}), topic: {}]", messageType, topic);
 
             // 3. 解析主题，获取 productKey 和 deviceName
             String[] topicParts = topic.split("/");
@@ -72,7 +74,7 @@ public class IotMqttUpstreamHandler {
             deviceMessageService.sendDeviceMessage(deviceMessage, productKey, deviceName, serverId);
 
             // 6. 记录成功日志
-            log.info("[handle][处理{}成功，已转发到 MQ][topic: {}]", messageType, topic);
+            log.debug("[handle][处理上行消息({})成功, topic: {}]", messageType, topic);
         } catch (Exception e) {
             log.error("[handle][处理 MQTT 消息失败][topic: {}][payload: {}]", topic, new String(payload), e);
         }
@@ -86,10 +88,13 @@ public class IotMqttUpstreamHandler {
      */
     private String getMessageType(String topic) {
         String[] topicParts = topic.split("/");
-        if (topicParts.length < 7) {
-            return null;
+        // 约定：topic 第 4 个部分开始为消息类型
+        // 例如：/sys/{productKey}/{deviceName}/thing/property/post ->
+        // thing/property/post
+        if (topicParts.length > 4) {
+            return String.join("/", Arrays.copyOfRange(topicParts, 4, topicParts.length));
         }
-        return topicParts[3];
+        return topicParts[topicParts.length - 1];
     }
 
 }

@@ -41,14 +41,14 @@ public class IotMqttDownstreamHandler {
         // 1. 获取设备信息（使用缓存）
         IotDeviceRespDTO deviceInfo = deviceService.getDeviceFromCache(message.getDeviceId());
         if (deviceInfo == null) {
-            log.warn("[handle][设备信息不存在][deviceId: {}]", message.getDeviceId());
+            log.warn("[handle][设备信息不存在, deviceId: {}]", message.getDeviceId());
             return;
         }
 
         // 2. 根据方法构建主题
         String topic = buildTopicByMethod(message.getMethod(), deviceInfo.getProductKey(), deviceInfo.getDeviceName());
         if (StrUtil.isBlank(topic)) {
-            log.warn("[handle][未知的消息方法：{}]", message.getMethod());
+            log.warn("[handle][未知的消息方法: {}]", message.getMethod());
             return;
         }
 
@@ -57,7 +57,7 @@ public class IotMqttDownstreamHandler {
 
         // 4. 发布消息
         protocol.publishMessage(topic, payload.toString());
-        log.info("[handle][发布下行消息成功][method: {}][topic: {}]", message.getMethod(), topic);
+        log.debug("[handle][发布下行消息成功, method: {}, topic: {}]", message.getMethod(), topic);
     }
 
     /**

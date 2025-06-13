@@ -37,6 +37,7 @@ yudao:
           mqtt-port: 1883                     # MQTT Broker 端口
           mqtt-username: admin                 # MQTT 用户名
           mqtt-password: public                # MQTT 密码
+          mqtt-client-id: iot-gateway-mqtt     # MQTT 客户端 ID
           mqtt-ssl: false                      # 是否开启 SSL
           mqtt-topics:
             - "/sys/#"                         # 系统主题

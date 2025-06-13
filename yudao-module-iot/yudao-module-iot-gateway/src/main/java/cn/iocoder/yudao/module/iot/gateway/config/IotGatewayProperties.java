@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.config;
 
+import cn.hutool.core.util.StrUtil;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -175,7 +176,7 @@ public class IotGatewayProperties {
          * @return MQTT 客户端 ID
          */
         public String getMqttClientId() {
-            if (cn.hutool.core.util.StrUtil.isBlank(mqttClientId)) {
+            if (StrUtil.isBlank(mqttClientId)) {
                 mqttClientId = "iot-gateway-mqtt-" + System.currentTimeMillis();
             }
             return mqttClientId;

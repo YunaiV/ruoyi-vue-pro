@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt;
 
-import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
@@ -45,13 +44,13 @@ public class IotMqttDownstreamSubscriber implements IotMessageSubscriber<IotDevi
 
     @Override
     public void onMessage(IotDeviceMessage message) {
-        log.info("[onMessage][接收到下行消息][messageId: {}][method: {}][deviceId: {}]",
+        log.debug("[onMessage][接收到下行消息, messageId: {}, method: {}, deviceId: {}]",
                 message.getId(), message.getMethod(), message.getDeviceId());
         try {
             // 1. 校验
             String method = message.getMethod();
             if (method == null) {
-                log.warn("[onMessage][消息方法为空][messageId: {}][deviceId: {}]",
+                log.warn("[onMessage][消息方法为空, messageId: {}, deviceId: {}]",
                         message.getId(), message.getDeviceId());
                 return;
             }
@@ -59,20 +58,9 @@ public class IotMqttDownstreamSubscriber implements IotMessageSubscriber<IotDevi
             // 2. 处理下行消息
             downstreamHandler.handle(message);
         } catch (Exception e) {
-            log.error("[onMessage][处理下行消息失败][messageId: {}][method: {}][deviceId: {}]",
+            log.error("[onMessage][处理下行消息失败, messageId: {}, method: {}, deviceId: {}]",
                     message.getId(), message.getMethod(), message.getDeviceId(), e);
         }
-    }
-
-    /**
-     * 判断是否为上行消息
-     *
-     * @param method 消息方法
-     * @return 是否为上行消息
-     */
-    private boolean isUpstreamMessage(String method) {
-        IotDeviceMessageMethodEnum methodEnum = IotDeviceMessageMethodEnum.of(method);
-        return methodEnum != null && methodEnum.getUpstream();
     }
 
 }

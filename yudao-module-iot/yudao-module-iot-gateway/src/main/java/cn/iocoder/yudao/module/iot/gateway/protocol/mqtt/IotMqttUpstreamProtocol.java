@@ -21,7 +21,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * IoT 网关 MQTT 协议：接收设备上行消息
@@ -61,10 +60,10 @@ public class IotMqttUpstreamProtocol {
     @PostConstruct
     public void start() {
         if (isRunning) {
-            log.warn("[start][MQTT 统一协议服务已经在运行中，请勿重复启动]");
+            log.warn("[start][MQTT 协议服务已经在运行中，请勿重复启动]");
             return;
         }
-        log.info("[start][开始启动 MQTT 统一协议服务]");
+        log.info("[start][启动 MQTT 协议服务]");
 
         try {
             // 1. 创建共享的 Vertx 实例
@@ -77,9 +76,9 @@ public class IotMqttUpstreamProtocol {
             startMqttClient();
 
             isRunning = true;
-            log.info("[start][MQTT 统一协议服务启动完成]");
+            log.info("[start][MQTT 协议服务启动完成]");
         } catch (Exception e) {
-            log.error("[start][MQTT 统一协议服务启动失败]", e);
+            log.error("[start][MQTT 协议服务启动失败]", e);
             // 启动失败时清理资源
             stop();
             throw e;
@@ -89,10 +88,10 @@ public class IotMqttUpstreamProtocol {
     @PreDestroy
     public void stop() {
         if (!isRunning) {
-            log.warn("[stop][MQTT 统一协议服务已经停止，无需再次停止]");
+            log.warn("[stop][MQTT 协议服务已经停止，无需再次停止]");
             return;
         }
-        log.info("[stop][开始停止 MQTT 统一协议服务]");
+        log.info("[stop][停止 MQTT 协议服务]");
 
         // 1. 停止 MQTT 客户端
         stopMqttClient();
@@ -104,28 +103,28 @@ public class IotMqttUpstreamProtocol {
         if (vertx != null) {
             try {
                 vertx.close();
-                log.info("[stop][Vertx 实例已关闭]");
+                log.debug("[stop][Vertx 实例已关闭]");
             } catch (Exception e) {
                 log.warn("[stop][关闭 Vertx 实例失败]", e);
             }
         }
 
         isRunning = false;
-        log.info("[stop][MQTT 统一协议服务已停止]");
+        log.info("[stop][MQTT 协议服务已停止]");
     }
 
     /**
      * 启动 HTTP 认证服务
      */
     private void startHttpAuthServer() {
-        log.info("[startHttpAuthServer][开始启动 HTTP 认证服务]");
+        log.info("[startHttpAuthServer][启动 HTTP 认证服务]");
 
         // 创建路由
         Router router = Router.router(vertx);
         router.route().handler(BodyHandler.create());
 
         // 创建认证处理器
-        IotMqttHttpAuthHandler authHandler = new IotMqttHttpAuthHandler();
+        IotMqttHttpAuthHandler authHandler = new IotMqttHttpAuthHandler(this);
         router.post(IotMqttTopicUtils.MQTT_AUTH_AUTHENTICATE_PATH).handler(authHandler::authenticate);
         router.post(IotMqttTopicUtils.MQTT_AUTH_CONNECTED_PATH).handler(authHandler::connected);
         router.post(IotMqttTopicUtils.MQTT_AUTH_DISCONNECTED_PATH).handler(authHandler::disconnected);
@@ -137,7 +136,7 @@ public class IotMqttUpstreamProtocol {
                     .requestHandler(router)
                     .listen(authPort)
                     .result();
-            log.info("[startHttpAuthServer][HTTP 认证服务启动成功，端口：{}]", authPort);
+            log.info("[startHttpAuthServer][HTTP 认证服务启动成功, 端口: {}]", authPort);
         } catch (Exception e) {
             log.error("[startHttpAuthServer][HTTP 认证服务启动失败]", e);
             throw e;
@@ -163,23 +162,24 @@ public class IotMqttUpstreamProtocol {
      * 启动 MQTT 客户端
      */
     private void startMqttClient() {
-        log.info("[startMqttClient][开始启动 MQTT 客户端]");
+        log.info("[startMqttClient][启动 MQTT 客户端]");
 
-        // 1. 初始化消息处理器
-        this.upstreamHandler = new IotMqttUpstreamHandler(this);
+        try {
+            // 1. 初始化消息处理器
+            this.upstreamHandler = new IotMqttUpstreamHandler(this);
 
-        // 2. 创建 MQTT 客户端
-        log.info("[startMqttClient][使用 MQTT 客户端 ID: {}]", emqxProperties.getMqttClientId());
+            // 2. 创建 MQTT 客户端
+            log.info("[startMqttClient][使用 MQTT 客户端 ID: {}]", emqxProperties.getMqttClientId());
+            createMqttClient();
 
-        MqttClientOptions options = new MqttClientOptions()
-                .setClientId(emqxProperties.getMqttClientId())
-                .setUsername(emqxProperties.getMqttUsername())
-                .setPassword(emqxProperties.getMqttPassword())
-                .setSsl(emqxProperties.getMqttSsl());
-        this.mqttClient = MqttClient.create(vertx, options);
+            // 3. 连接 MQTT Broker（异步连接，不会抛出异常）
+            connectMqtt();
 
-        // 3. 连接 MQTT Broker
-        connectMqtt();
+            log.info("[startMqttClient][MQTT 客户端启动完成，正在异步连接中...]");
+        } catch (Exception e) {
+            log.error("[startMqttClient][MQTT 客户端启动失败]", e);
+            throw new RuntimeException("MQTT 客户端启动失败", e);
+        }
     }
 
     /**
@@ -195,7 +195,7 @@ public class IotMqttUpstreamProtocol {
                         mqttClient.unsubscribe(topic);
                         log.debug("[stopMqttClient][取消订阅主题: {}]", topic);
                     } catch (Exception e) {
-                        log.warn("[stopMqttClient][取消订阅主题异常: {}]", topic, e);
+                        log.warn("[stopMqttClient][取消订阅主题({})异常]", topic, e);
                     }
                 }
             }
@@ -216,43 +216,107 @@ public class IotMqttUpstreamProtocol {
      * 连接 MQTT Broker 并订阅主题
      */
     private void connectMqtt() {
+        connectMqtt(false);
+    }
+
+    /**
+     * 连接 MQTT Broker 并订阅主题
+     *
+     * @param isReconnect 是否为重连
+     */
+    private void connectMqtt(boolean isReconnect) {
         // 1. 参数校验
         String host = emqxProperties.getMqttHost();
         Integer port = emqxProperties.getMqttPort();
         if (StrUtil.isBlank(host)) {
-            log.error("[connectMqtt][MQTT Host 为空，无法连接]");
+            log.error("[connectMqtt][MQTT Host 为空, 无法连接]");
             throw new IllegalArgumentException("MQTT Host 不能为空");
         }
         if (port == null || port <= 0) {
-            log.error("[connectMqtt][MQTT Port 无效：{}]", port);
+            log.error("[connectMqtt][MQTT Port({}) 无效]", port);
             throw new IllegalArgumentException("MQTT Port 必须为正整数");
         }
-        log.info("[connectMqtt][开始连接 MQTT Broker][host: {}][port: {}]", host, port);
 
-        // 2. 连接
-        try {
-            mqttClient.connect(port, host)
-                    .toCompletionStage()
-                    .toCompletableFuture()
-                    .get(emqxProperties.getConnectTimeoutSeconds(), TimeUnit.SECONDS);
-            log.info("[connectMqtt][MQTT 客户端连接成功][host: {}][port: {}]", host, port);
+        if (isReconnect) {
+            log.info("[connectMqtt][开始重连 MQTT Broker, host: {}, port: {}]", host, port);
+            // 重连时重新创建客户端实例
+            createMqttClient();
+        } else {
+            log.info("[connectMqtt][开始连接 MQTT Broker, host: {}, port: {}]", host, port);
+        }
 
-            // 3. 设置处理器
-            // 3.1 设置断开重连监听器
-            mqttClient.closeHandler(closeEvent -> {
-                log.warn("[closeHandler][MQTT 连接已断开，准备重连]");
-                reconnectWithDelay();
-            });
-            // 3.2 设置消息处理器
+        // 2. 异步连接
+        mqttClient.connect(port, host, connectResult -> {
+            if (connectResult.succeeded()) {
+                if (isReconnect) {
+                    log.info("[connectMqtt][MQTT 客户端重连成功, host: {}, port: {}]", host, port);
+                } else {
+                    log.info("[connectMqtt][MQTT 客户端连接成功, host: {}, port: {}]", host, port);
+                }
+
+                // 3. 设置处理器
+                setupMqttHandlers();
+
+                // 4. 订阅主题
+                subscribeToTopics();
+
+            } else {
+                log.error("[connectMqtt][连接 MQTT Broker 失败, host: {}, port: {}, isReconnect: {}]",
+                        host, port, isReconnect, connectResult.cause());
+
+                if (!isReconnect) {
+                    // 首次连接失败时，也要尝试重连
+                    log.warn("[connectMqtt][首次连接失败，将开始重连机制]");
+                    reconnectWithDelay();
+                } else {
+                    // 重连失败时，继续尝试重连
+                    reconnectWithDelay();
+                }
+            }
+        });
+    }
+
+    /**
+     * 创建 MQTT 客户端
+     */
+    private void createMqttClient() {
+        log.debug("[createMqttClient][创建 MQTT 客户端, clientId: {}]", emqxProperties.getMqttClientId());
+
+        MqttClientOptions options = new MqttClientOptions()
+                .setClientId(emqxProperties.getMqttClientId())
+                .setUsername(emqxProperties.getMqttUsername())
+                .setPassword(emqxProperties.getMqttPassword())
+                .setSsl(emqxProperties.getMqttSsl());
+
+        this.mqttClient = MqttClient.create(vertx, options);
+    }
+
+    /**
+     * 设置 MQTT 处理器
+     */
+    private void setupMqttHandlers() {
+        if (mqttClient == null) {
+            log.warn("[setupMqttHandlers][MQTT 客户端为空，跳过处理器设置]");
+            return;
+        }
+
+        // 设置断开重连监听器
+        mqttClient.closeHandler(closeEvent -> {
+            log.warn("[closeHandler][MQTT 连接已断开, 准备重连]");
+            reconnectWithDelay();
+        });
+
+        // 设置异常处理器
+        mqttClient.exceptionHandler(exception -> {
+            log.error("[exceptionHandler][MQTT 客户端异常]", exception);
+        });
+
+        // 设置消息处理器
+        if (upstreamHandler != null) {
             mqttClient.publishHandler(upstreamHandler::handle);
-            log.debug("[setupMessageHandler][MQTT 消息处理器设置完成]");
-
-            // 4. 订阅主题
-            subscribeToTopics();
-        } catch (Exception e) {
-            log.error("[connectMqtt][连接 MQTT Broker 失败][host: {}][port: {}]", host, port, e);
-            reconnectWithDelay(); // 连接失败时，也要尝试重连
-            throw new RuntimeException("MQTT 客户端启动失败", e);
+            log.debug("[setupMqttHandlers][MQTT 消息处理器设置完成]");
+        } else {
+            log.warn("[setupMqttHandlers][上行消息处理器为空，跳过设置]");
         }
     }
 
@@ -261,15 +325,43 @@ public class IotMqttUpstreamProtocol {
      */
     private void subscribeToTopics() {
         List<String> topicList = emqxProperties.getMqttTopics();
-        int qos = emqxProperties.getMqttQos();
+        if (CollUtil.isEmpty(topicList)) {
+            log.warn("[subscribeToTopics][订阅主题列表为空, 跳过订阅]");
+            return;
+        }
 
-        log.info("[subscribeToTopics][开始订阅主题，共 {} 个]", topicList.size());
+        if (mqttClient == null || !mqttClient.isConnected()) {
+            log.warn("[subscribeToTopics][MQTT 客户端未连接, 跳过订阅]");
+            return;
+        }
+
+        int qos = emqxProperties.getMqttQos();
+        log.info("[subscribeToTopics][开始订阅主题, 共 {} 个, QoS: {}]", topicList.size(), qos);
+
+        int[] successCount = {0}; // 使用数组以便在 lambda 中修改
+        int[] failCount = {0};
+
         for (String topic : topicList) {
             mqttClient.subscribe(topic, qos, subscribeResult -> {
                 if (subscribeResult.succeeded()) {
-                    log.info("[subscribeToTopics][订阅主题成功: {}][QoS: {}]", topic, qos);
+                    successCount[0]++;
+                    log.debug("[subscribeToTopics][订阅主题成功, topic: {}, qos: {}]", topic, qos);
+
+                    // 当所有主题都处理完成时，记录汇总日志
+                    if (successCount[0] + failCount[0] == topicList.size()) {
+                        log.info("[subscribeToTopics][主题订阅完成, 成功: {}, 失败: {}, 总计: {}]",
+                                successCount[0], failCount[0], topicList.size());
+                    }
                 } else {
-                    log.error("[subscribeToTopics][订阅主题失败: {}]", topic, subscribeResult.cause());
+                    failCount[0]++;
+                    log.error("[subscribeToTopics][订阅主题失败, topic: {}, qos: {}, 原因: {}]",
+                            topic, qos, subscribeResult.cause().getMessage(), subscribeResult.cause());
+
+                    // 当所有主题都处理完成时，记录汇总日志
+                    if (successCount[0] + failCount[0] == topicList.size()) {
+                        log.info("[subscribeToTopics][主题订阅完成, 成功: {}, 失败: {}, 总计: {}]",
+                                successCount[0], failCount[0], topicList.size());
+                    }
                 }
             });
         }
@@ -281,15 +373,21 @@ public class IotMqttUpstreamProtocol {
     private void reconnectWithDelay() {
         long delay = emqxProperties.getReconnectDelayMs();
         vertx.setTimer(delay, timerId -> {
-            if (!isRunning || (mqttClient != null && mqttClient.isConnected())) {
+            if (!isRunning) {
+                log.debug("[reconnectWithDelay][服务已停止, 取消重连]");
                 return;
             }
-            log.info("[reconnectWithDelay][开始重连 MQTT Broker，延迟 {} 毫秒]", delay);
+            // 检查连接状态，如果已连接则无需重连
+            if (mqttClient != null && mqttClient.isConnected()) {
+                log.debug("[reconnectWithDelay][MQTT 客户端已连接, 无需重连]");
+                return;
+            }
+            log.info("[reconnectWithDelay][开始重连 MQTT Broker, 延迟: {} ms]", delay);
             try {
-                connectMqtt();
+                connectMqtt(true); // 标记为重连
             } catch (Exception e) {
-                log.error("[reconnectWithDelay][重连失败，将继续尝试重连]", e);
-                reconnectWithDelay(); // 失败后，继续尝试
+                log.error("[reconnectWithDelay][重连失败, 将继续尝试]", e);
+                // 重连失败时，不需要重复调用，因为 connectMqtt(true) 内部已经处理了重连逻辑
             }
         });
     }
@@ -302,7 +400,7 @@ public class IotMqttUpstreamProtocol {
      */
     public void publishMessage(String topic, String payload) {
         if (mqttClient == null || !mqttClient.isConnected()) {
-            log.warn("[publishMessage][MQTT 客户端未连接，无法发布消息][topic: {}]", topic);
+            log.warn("[publishMessage][MQTT 客户端未连接, 无法发布消息到 topic({})]", topic);
             return;
         }
         MqttQoS qos = MqttQoS.valueOf(emqxProperties.getMqttQos());
