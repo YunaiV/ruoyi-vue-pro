@@ -21,22 +21,26 @@ public final class IotMqttTopicUtils {
      */
     private static final String SERVICE_TOPIC_PREFIX = "/thing/";
 
-    // ========== MQTT 认证路径常量 ==========
+    // ========== MQTT HTTP 接口路径常量 ==========
 
     /**
-     * MQTT 认证路径
+     * MQTT 认证接口路径
+     * 对应 EMQX HTTP 认证插件的认证请求接口
      */
-    public static final String MQTT_AUTH_AUTHENTICATE_PATH = "/mqtt/auth/authenticate";
+    public static final String MQTT_AUTH_PATH = "/mqtt/auth";
 
     /**
-     * MQTT 连接事件路径
+     * MQTT 统一事件处理接口路径
+     * 对应 EMQX Webhook 的统一事件处理接口，支持所有客户端事件
+     * 包括：client.connected、client.disconnected、message.publish 等
      */
-    public static final String MQTT_AUTH_CONNECTED_PATH = "/mqtt/auth/connected";
+    public static final String MQTT_EVENT_PATH = "/mqtt/event";
 
     /**
-     * MQTT 断开事件路径
+     * MQTT 授权接口路径（预留）
+     * 对应 EMQX HTTP 授权插件的授权检查接口
      */
-    public static final String MQTT_AUTH_DISCONNECTED_PATH = "/mqtt/auth/disconnected";
+    public static final String MQTT_AUTHZ_PATH = "/mqtt/authz";
 
     // ========== 工具方法 ==========
 

@@ -125,9 +125,8 @@ public class IotMqttUpstreamProtocol {
 
         // 创建认证处理器
         IotMqttHttpAuthHandler authHandler = new IotMqttHttpAuthHandler(this);
-        router.post(IotMqttTopicUtils.MQTT_AUTH_AUTHENTICATE_PATH).handler(authHandler::authenticate);
-        router.post(IotMqttTopicUtils.MQTT_AUTH_CONNECTED_PATH).handler(authHandler::connected);
-        router.post(IotMqttTopicUtils.MQTT_AUTH_DISCONNECTED_PATH).handler(authHandler::disconnected);
+        router.post(IotMqttTopicUtils.MQTT_AUTH_PATH).handler(authHandler::handleAuth);
+        router.post(IotMqttTopicUtils.MQTT_EVENT_PATH).handler(authHandler::handleEvent);
 
         // 启动 HTTP 服务器
         int authPort = emqxProperties.getHttpAuthPort();
@@ -338,8 +337,8 @@ public class IotMqttUpstreamProtocol {
         int qos = emqxProperties.getMqttQos();
         log.info("[subscribeToTopics][开始订阅主题, 共 {} 个, QoS: {}]", topicList.size(), qos);
 
-        int[] successCount = {0}; // 使用数组以便在 lambda 中修改
-        int[] failCount = {0};
+        int[] successCount = { 0 }; // 使用数组以便在 lambda 中修改
+        int[] failCount = { 0 };
 
         for (String topic : topicList) {
             mqttClient.subscribe(topic, qos, subscribeResult -> {
