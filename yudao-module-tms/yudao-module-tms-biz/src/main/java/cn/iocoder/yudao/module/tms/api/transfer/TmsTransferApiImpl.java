@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.system.enums.somle.BillType;
 import cn.iocoder.yudao.module.tms.api.transfer.dto.*;
 import cn.iocoder.yudao.module.tms.aspect.TmsApiValidate;
 import cn.iocoder.yudao.module.tms.dal.dataobject.transfer.item.TmsTransferItemDO;
-import cn.iocoder.yudao.module.tms.dal.mysql.transfer.TmsTransferMapper;
 import cn.iocoder.yudao.module.tms.service.bo.transfer.TmsTransferBO;
 import cn.iocoder.yudao.module.tms.service.transfer.TmsTransferService;
 import cn.iocoder.yudao.module.tms.service.transfer.item.TmsTransferItemService;
@@ -14,9 +13,8 @@ import cn.iocoder.yudao.module.wms.api.inbound.WmsInboundApi;
 import cn.iocoder.yudao.module.wms.api.inbound.dto.WmsInboundItemSaveReqDTO;
 import cn.iocoder.yudao.module.wms.api.inbound.dto.WmsInboundSaveReqDTO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundType;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,18 +31,12 @@ import static jodd.util.StringUtil.truncate;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class TmsTransferApiImpl implements TmsTransferApi {
 
-    @Resource
-    private TmsTransferService transferService;
-
-    @Autowired
-    private TmsTransferMapper transferMapper;
-
-    @Resource
-    private TmsTransferItemService transferItemService;
-    @Resource
-    private WmsInboundApi wmsInboundApi;
+    private final TmsTransferService transferService;
+    private final TmsTransferItemService transferItemService;
+    private final WmsInboundApi wmsInboundApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
