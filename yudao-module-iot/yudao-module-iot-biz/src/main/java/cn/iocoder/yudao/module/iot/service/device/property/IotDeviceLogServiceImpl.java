@@ -2,13 +2,7 @@ package cn.iocoder.yudao.module.iot.service.device.property;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceLogPageReqVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.IotDeviceMessageMapper;
-import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,24 +25,7 @@ import java.util.stream.Collectors;
 public class IotDeviceLogServiceImpl implements IotDeviceLogService {
 
     @Resource
-    private IotDeviceService deviceService;
-
-    @Resource
     private IotDeviceMessageMapper deviceLogMapper;
-
-    @Override
-    public PageResult<IotDeviceMessageDO> getDeviceLogPage(IotDeviceLogPageReqVO pageReqVO) {
-        try {
-            IPage<IotDeviceMessageDO> page = deviceLogMapper.selectPage(
-                    new Page<>(pageReqVO.getPageNo(), pageReqVO.getPageSize()), pageReqVO);
-            return new PageResult<>(page.getRecords(), page.getTotal());
-        } catch (Exception exception) {
-            if (exception.getMessage().contains("Table does not exist")) {
-                return PageResult.empty();
-            }
-            throw exception;
-        }
-    }
 
     @Override
     public Long getDeviceLogCount(LocalDateTime createTime) {

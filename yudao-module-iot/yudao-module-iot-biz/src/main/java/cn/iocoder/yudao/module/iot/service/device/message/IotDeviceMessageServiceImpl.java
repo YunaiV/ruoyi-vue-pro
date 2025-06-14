@@ -3,8 +3,10 @@ package cn.iocoder.yudao.module.iot.service.device.message;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.message.IotDeviceMessagePageReqVO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
@@ -15,6 +17,8 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
 import cn.iocoder.yudao.module.iot.dal.tdengine.IotDeviceMessageMapper;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.property.IotDevicePropertyService;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.base.Objects;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -62,9 +66,10 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     @Async
     void createDeviceLogAsync(IotDeviceMessage message) {
         IotDeviceMessageDO messageDO = BeanUtils.toBean(message, IotDeviceMessageDO.class)
-                .setUpstream(IotDeviceMessageUtils.isUpstreamMessage(message));
+                .setUpstream(IotDeviceMessageUtils.isUpstreamMessage(message))
+                .setReply(IotDeviceMessageUtils.isReplyMessage(message));
         if (message.getParams() != null) {
-            messageDO.setParams(JsonUtils.toJsonString(messageDO.getData()));
+            messageDO.setParams(JsonUtils.toJsonString(messageDO.getParams()));
         }
         if (messageDO.getData() != null) {
             messageDO.setData(JsonUtils.toJsonString(messageDO.getData()));
@@ -182,6 +187,20 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
         // TODO @芋艿：这里可以按需，添加别的逻辑；
         return null;
+    }
+
+    @Override
+    public PageResult<IotDeviceMessageDO> getDeviceMessagePage(IotDeviceMessagePageReqVO pageReqVO) {
+        try {
+            IPage<IotDeviceMessageDO> page = deviceLogMapper.selectPage(
+                    new Page<>(pageReqVO.getPageNo(), pageReqVO.getPageSize()), pageReqVO);
+            return new PageResult<>(page.getRecords(), page.getTotal());
+        } catch (Exception exception) {
+            if (exception.getMessage().contains("Table does not exist")) {
+                return PageResult.empty();
+            }
+            throw exception;
+        }
     }
 
     private IotDeviceMessageServiceImpl getSelf() {

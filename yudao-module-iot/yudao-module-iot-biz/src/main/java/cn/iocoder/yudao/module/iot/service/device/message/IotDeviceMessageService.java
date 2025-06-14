@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.iot.service.device.message;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.message.IotDeviceMessagePageReqVO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
 
 /**
  * IoT 设备消息 Service 接口
@@ -45,5 +48,13 @@ public interface IotDeviceMessageService {
      * @param device 设备
      */
     void handleUpstreamDeviceMessage(IotDeviceMessage message, IotDeviceDO device);
+
+    /**
+     * 获得设备消息分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 设备消息分页
+     */
+    PageResult<IotDeviceMessageDO> getDeviceMessagePage(IotDeviceMessagePageReqVO pageReqVO);
 
 }

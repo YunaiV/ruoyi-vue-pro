@@ -55,12 +55,6 @@
             <if test="reqVO.upstream != null">
                 AND upstream = #{reqVO.upstream}
             </if>
-            <if test="reqVO.startTime != null">
-                AND ts >= #{reqVO.startTime}
-            </if>
-            <if test="reqVO.endTime != null">
-                AND ts &lt;= #{reqVO.endTime}
-            </if>
         </where>
         ORDER BY ts DESC
     </select>

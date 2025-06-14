@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.dal.tdengine;
 
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceLogPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.message.IotDeviceMessagePageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.annotation.TDengineDS;
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
@@ -47,7 +47,7 @@ public interface IotDeviceMessageMapper {
      * @return 设备消息列表
      */
     IPage<IotDeviceMessageDO> selectPage(IPage<IotDeviceMessageDO> page,
-                                         @Param("reqVO") IotDeviceLogPageReqVO reqVO);
+                                         @Param("reqVO") IotDeviceMessagePageReqVO reqVO);
 
     /**
      * 统计设备消息数量

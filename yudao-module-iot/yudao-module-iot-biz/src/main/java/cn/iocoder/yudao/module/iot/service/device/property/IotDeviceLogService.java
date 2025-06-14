@@ -1,34 +1,22 @@
 package cn.iocoder.yudao.module.iot.service.device.property;
 
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDeviceLogPageReqVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
-
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 /**
- * IoT 设备日志数据 Service 接口
+ * IoT 设备消息数据 Service 接口
  *
  * @author alwayssuper
  */
 public interface IotDeviceLogService {
 
     /**
-     * 获得设备日志分页
+     * 获得设备消息数量
      *
-     * @param pageReqVO 分页查询
-     * @return 设备日志分页
-     */
-    PageResult<IotDeviceMessageDO> getDeviceLogPage(IotDeviceLogPageReqVO pageReqVO);
-
-    /**
-     * 获得设备日志数量
-     *
-     * @param createTime 创建时间，如果为空，则统计所有日志数量
-     * @return 日志数量
+     * @param createTime 创建时间，如果为空，则统计所有消息数量
+     * @return 消息数量
      */
     Long getDeviceLogCount(@Nullable LocalDateTime createTime);
 

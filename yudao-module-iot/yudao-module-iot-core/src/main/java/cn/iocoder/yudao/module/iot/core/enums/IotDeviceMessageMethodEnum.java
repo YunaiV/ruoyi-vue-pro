@@ -19,18 +19,18 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
 
     // ========== 设备状态 ==========
 
-    STATE_ONLINE("thing.state.online", true),
-    STATE_OFFLINE("thing.state.offline", true),
+    STATE_ONLINE("thing.state.online", "设备上线", true),
+    STATE_OFFLINE("thing.state.offline", "设备下线", true),
 
     // ========== 设备属性 ==========
     // 可参考：https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services
 
-    PROPERTY_POST("thing.property.post", true),
-    PROPERTY_SET("thing.property.set", false),
+    PROPERTY_POST("thing.property.post", "属性上报", true),
+    PROPERTY_SET("thing.property.set", "属性设置", false),
 
     // ========== 设备事件 ==========
 
-    EVENT_POST("thing.event.post", true),
+    EVENT_POST("thing.event.post", "事件上报", true),
 
     ;
 
@@ -43,6 +43,8 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
     public static final Set<String> REPLY_DISABLED = Set.of(STATE_ONLINE.getMethod(), STATE_OFFLINE.getMethod());
 
     private final String method;
+
+    private final String name;
 
     private final Boolean upstream;
 

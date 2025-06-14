@@ -29,7 +29,7 @@ public class IotDeviceMessageDO {
      */
     private Long reportTime;
     /**
-     * 存储时序时间
+     * 存储时间戳
      */
     private Long ts;
 
