@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device.vo.device;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.Set;
@@ -12,10 +11,6 @@ public class IotDeviceSaveReqVO {
 
     @Schema(description = "设备编号", example = "177")
     private Long id;
-
-    @Schema(description = "设备编号", requiredMode = Schema.RequiredMode.AUTO, example = "177")
-    @Size(max = 50, message = "设备编号长度不能超过 50 个字符")
-    private String deviceKey;
 
     @Schema(description = "设备名称", requiredMode = Schema.RequiredMode.AUTO, example = "王五")
     private String deviceName;

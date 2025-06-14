@@ -143,14 +143,6 @@ public interface IotDeviceService {
     IotDeviceDO getDeviceFromCache(String productKey, String deviceName);
 
     /**
-     * 根据设备 key 获得设备
-     *
-     * @param deviceKey 编号
-     * @return IoT 设备
-     */
-    IotDeviceDO getDeviceByDeviceKey(String deviceKey);
-
-    /**
      * 获得设备分页
      *
      * @param pageReqVO 分页查询

@@ -70,7 +70,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
             throw exception(PRODUCT_NOT_EXISTS);
         }
         // 1.2 统一校验
-        validateCreateDeviceParam(product.getProductKey(), createReqVO.getDeviceName(), createReqVO.getDeviceKey(),
+        validateCreateDeviceParam(product.getProductKey(), createReqVO.getDeviceName(),
                 createReqVO.getGatewayId(), product);
         // 1.3 校验分组存在
         deviceGroupService.validateDeviceGroupExists(createReqVO.getGroupIds());
@@ -84,7 +84,6 @@ public class IotDeviceServiceImpl implements IotDeviceService {
 
     @Override
     public IotDeviceDO createDevice(String productKey, String deviceName, Long gatewayId) {
-        String deviceKey = generateDeviceKey();
         // 1.1 校验产品是否存在
         IotProductDO product = TenantUtils.executeIgnore(() -> productService.getProductByProductKey(productKey));
         if (product == null) {
@@ -92,27 +91,22 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         }
         return TenantUtils.execute(product.getTenantId(), () -> {
             // 1.2 校验设备名称在同一产品下是否唯一
-            validateCreateDeviceParam(productKey, deviceName, deviceKey, gatewayId, product);
+            validateCreateDeviceParam(productKey, deviceName, gatewayId, product);
 
             // 2. 插入到数据库
-            IotDeviceDO device = new IotDeviceDO().setDeviceName(deviceName).setDeviceKey(deviceKey)
-                    .setGatewayId(gatewayId);
+            IotDeviceDO device = new IotDeviceDO().setDeviceName(deviceName).setGatewayId(gatewayId);
             initDevice(device, product);
             deviceMapper.insert(device);
             return device;
         });
     }
 
-    private void validateCreateDeviceParam(String productKey, String deviceName, String deviceKey,
+    private void validateCreateDeviceParam(String productKey, String deviceName,
                                            Long gatewayId, IotProductDO product) {
         TenantUtils.executeIgnore(() -> {
             // 校验设备名称在同一产品下是否唯一
             if (deviceMapper.selectByProductKeyAndDeviceName(productKey, deviceName) != null) {
                 throw exception(DEVICE_NAME_EXISTS);
-            }
-            // 校验设备标识是否唯一
-            if (deviceMapper.selectByDeviceKey(deviceKey) != null) {
-                throw exception(DEVICE_KEY_EXISTS);
             }
         });
 
@@ -134,7 +128,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
 
     @Override
     public void updateDevice(IotDeviceSaveReqVO updateReqVO) {
-        updateReqVO.setDeviceKey(null).setDeviceName(null).setProductId(null); // 不允许更新
+        updateReqVO.setDeviceName(null).setProductId(null); // 不允许更新
         // 1.1 校验存在
         IotDeviceDO device = validateDeviceExists(updateReqVO.getId());
         // 1.2 校验父设备是否为合法网关
@@ -263,11 +257,6 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     @TenantIgnore // 忽略租户信息，跨租户 productKey + deviceName 是唯一的
     public IotDeviceDO getDeviceFromCache(String productKey, String deviceName) {
         return deviceMapper.selectByProductKeyAndDeviceName(productKey, deviceName);
-    }
-
-    @Override
-    public IotDeviceDO getDeviceByDeviceKey(String deviceKey) {
-        return deviceMapper.selectByDeviceKey(deviceKey);
     }
 
     @Override
@@ -401,7 +390,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
                 IotDeviceDO existDevice = deviceMapper.selectByDeviceName(importDevice.getDeviceName());
                 if (existDevice == null) {
                     createDevice(new IotDeviceSaveReqVO()
-                            .setDeviceName(importDevice.getDeviceName()).setDeviceKey(generateDeviceKey())
+                            .setDeviceName(importDevice.getDeviceName())
                             .setProductId(product.getId()).setGatewayId(gatewayId).setGroupIds(groupIds));
                     respVO.getCreateDeviceNames().add(importDevice.getDeviceName());
                     return;

@@ -20,10 +20,6 @@ public class IotDeviceRespVO {
     @Schema(description = "设备编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "177")
     private Long id;
 
-    @Schema(description = "设备唯一标识符", requiredMode = Schema.RequiredMode.REQUIRED)
-    @ExcelProperty("设备唯一标识符")
-    private String deviceKey;
-
     @Schema(description = "设备名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "王五")
     @ExcelProperty("设备名称")
     private String deviceName;

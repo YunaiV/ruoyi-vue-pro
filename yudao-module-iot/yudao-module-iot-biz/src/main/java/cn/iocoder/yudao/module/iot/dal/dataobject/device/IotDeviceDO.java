@@ -33,13 +33,6 @@ public class IotDeviceDO extends TenantBaseDO {
      */
     @TableId
     private Long id;
-    // TODO @芋艿：看看怎么弱化 deviceKey
-    /**
-     * 设备唯一标识符，全局唯一，用于识别设备
-     *
-     * 类似阿里云 <a href="https://help.aliyun.com/zh/iot/developer-reference/api-querydeviceinfo">QueryDeviceInfo</a> 的 IotInstanceId
-     */
-    private String deviceKey;
     /**
      * 设备名称，在产品内唯一，用于标识设备
      */
