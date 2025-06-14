@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router;
+package cn.iocoder.yudao.module.iot.gateway.protocol.emqx.router;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -6,29 +6,29 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
-import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol;
+import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import cn.iocoder.yudao.module.iot.gateway.util.IotMqttTopicUtils;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * IoT 网关 MQTT 下行消息处理器
+ * IoT 网关 EMQX 下行消息处理器
  * <p>
  * 从消息总线接收到下行消息，然后发布到 MQTT Broker，从而被设备所接收
  *
  * @author 芋道源码
  */
 @Slf4j
-public class IotMqttDownstreamHandler {
+public class IotEmqxDownstreamHandler {
 
-    private final IotMqttUpstreamProtocol protocol;
+    private final IotEmqxUpstreamProtocol protocol;
 
     private final IotDeviceService deviceService;
 
     private final IotDeviceMessageService deviceMessageService;
 
-    public IotMqttDownstreamHandler(IotMqttUpstreamProtocol protocol) {
+    public IotEmqxDownstreamHandler(IotEmqxUpstreamProtocol protocol) {
         this.protocol = protocol;
         this.deviceService = SpringUtil.getBean(IotDeviceService.class);
         this.deviceMessageService = SpringUtil.getBean(IotDeviceMessageService.class);

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router;
+package cn.iocoder.yudao.module.iot.gateway.protocol.emqx.router;
 
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
@@ -8,21 +8,23 @@ import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
-import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * IoT 网关 MQTT HTTP 认证处理器
+ * IoT 网关 EMQX 认证事件处理器
  * <p>
- * 处理 EMQX 的认证请求和事件钩子，提供统一的错误处理和参数校验
+ * 为 EMQX 提供 HTTP 接口服务，包括：
+ * 1. 设备认证接口 - 对应 EMQX HTTP 认证插件
+ * 2. 设备事件处理接口 - 对应 EMQX Webhook 事件通知
+ * 提供统一的错误处理和参数校验
  *
  * @author 芋道源码
  */
 @Slf4j
-public class IotMqttHttpAuthHandler {
+public class IotEmqxAuthEventHandler {
 
     /**
      * HTTP 成功状态码（EMQX 要求固定使用 200）
@@ -48,14 +50,14 @@ public class IotMqttHttpAuthHandler {
     private static final String EVENT_CLIENT_CONNECTED = "client.connected";
     private static final String EVENT_CLIENT_DISCONNECTED = "client.disconnected";
 
-    private final IotMqttUpstreamProtocol protocol;
+    private final String serverId;
 
     private final IotDeviceMessageService deviceMessageService;
 
     private final IotDeviceCommonApi deviceApi;
 
-    public IotMqttHttpAuthHandler(IotMqttUpstreamProtocol protocol) {
-        this.protocol = protocol;
+    public IotEmqxAuthEventHandler(String serverId) {
+        this.serverId = serverId;
         this.deviceMessageService = SpringUtil.getBean(IotDeviceMessageService.class);
         this.deviceApi = SpringUtil.getBean(IotDeviceCommonApi.class);
     }
@@ -216,7 +218,7 @@ public class IotMqttHttpAuthHandler {
 
             // 3. 发送设备状态消息
             deviceMessageService.sendDeviceMessage(message,
-                    deviceInfo.getProductKey(), deviceInfo.getDeviceName(), protocol.getServerId());
+                    deviceInfo.getProductKey(), deviceInfo.getDeviceName(), serverId);
         } catch (Exception e) {
             log.error("[handleDeviceStateChange][发送设备状态消息失败: {}]", username, e);
         }

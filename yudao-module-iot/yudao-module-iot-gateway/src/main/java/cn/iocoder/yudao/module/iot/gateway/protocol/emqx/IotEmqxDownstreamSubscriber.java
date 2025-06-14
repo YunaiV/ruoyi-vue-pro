@@ -1,29 +1,31 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt;
+package cn.iocoder.yudao.module.iot.gateway.protocol.emqx;
 
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
-import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router.IotMqttDownstreamHandler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.router.IotEmqxDownstreamHandler;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * IoT 网关 MQTT 订阅者：接收下行给设备的消息
+ * IoT 网关 EMQX 订阅者：接收下行给设备的消息
  *
  * @author 芋道源码
  */
 @Slf4j
-public class IotMqttDownstreamSubscriber implements IotMessageSubscriber<IotDeviceMessage> {
+public class IotEmqxDownstreamSubscriber implements IotMessageSubscriber<IotDeviceMessage> {
 
-    private final IotMqttDownstreamHandler downstreamHandler;
+    private final IotEmqxDownstreamHandler downstreamHandler;
+
     private final IotMessageBus messageBus;
-    private final IotMqttUpstreamProtocol protocol;
 
-    public IotMqttDownstreamSubscriber(IotMqttUpstreamProtocol protocol, IotMessageBus messageBus) {
+    private final IotEmqxUpstreamProtocol protocol;
+
+    public IotEmqxDownstreamSubscriber(IotEmqxUpstreamProtocol protocol, IotMessageBus messageBus) {
         this.protocol = protocol;
         this.messageBus = messageBus;
-        this.downstreamHandler = new IotMqttDownstreamHandler(protocol);
+        this.downstreamHandler = new IotEmqxDownstreamHandler(protocol);
     }
 
     @PostConstruct

@@ -1,26 +1,26 @@
-package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router;
+package cn.iocoder.yudao.module.iot.gateway.protocol.emqx.router;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol;
+import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.mqtt.messages.MqttPublishMessage;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * IoT 网关 MQTT 上行消息处理器
+ * IoT 网关 EMQX 上行消息处理器
  *
  * @author 芋道源码
  */
 @Slf4j
-public class IotMqttUpstreamHandler {
+public class IotEmqxUpstreamHandler {
 
     private final IotDeviceMessageService deviceMessageService;
 
     private final String serverId;
 
-    public IotMqttUpstreamHandler(IotMqttUpstreamProtocol protocol) {
+    public IotEmqxUpstreamHandler(IotEmqxUpstreamProtocol protocol) {
         this.deviceMessageService = SpringUtil.getBean(IotDeviceMessageService.class);
         this.serverId = protocol.getServerId();
     }
