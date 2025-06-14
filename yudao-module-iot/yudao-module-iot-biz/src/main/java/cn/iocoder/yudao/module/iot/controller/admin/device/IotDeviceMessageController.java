@@ -5,6 +5,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.message.IotDeviceMessageRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.message.IotDeviceMessagePageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.message.IotDeviceMessageSendReqVO;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
 import cn.iocoder.yudao.module.iot.service.device.message.IotDeviceMessageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,9 +15,7 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -34,6 +34,14 @@ public class IotDeviceMessageController {
     public CommonResult<PageResult<IotDeviceMessageRespVO>> getDeviceLogPage(@Valid IotDeviceMessagePageReqVO pageReqVO) {
         PageResult<IotDeviceMessageDO> pageResult = deviceMessageService.getDeviceMessagePage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, IotDeviceMessageRespVO.class));
+    }
+
+    @PostMapping("/send")
+    @Operation(summary = "发送消息", description = "可用于设备模拟")
+    @PreAuthorize("@ss.hasPermission('iot:device:message-end')")
+    public CommonResult<Boolean> upstreamDevice(@Valid @RequestBody IotDeviceMessageSendReqVO sendReqVO) {
+        deviceMessageService.sendDeviceMessage(BeanUtils.toBean(sendReqVO, IotDeviceMessage.class));
+        return success(true);
     }
 
 }

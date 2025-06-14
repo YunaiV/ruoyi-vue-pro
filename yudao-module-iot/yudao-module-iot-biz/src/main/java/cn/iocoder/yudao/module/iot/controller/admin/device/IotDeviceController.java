@@ -7,8 +7,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.message.IotDeviceMessageSendReqVO;
-import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.message.IotDeviceMessageService;
@@ -156,15 +154,6 @@ public class IotDeviceController {
                         .productKey("YzvHxd4r67sT4s2B").groupNames("").build());
         // 输出
         ExcelUtils.write(response, "设备导入模板.xls", "数据", IotDeviceImportExcelVO.class, list);
-    }
-
-    // TODO @芋艿：需要重构
-    @PostMapping("/send-message")
-    @Operation(summary = "发送消息", description = "可用于设备模拟")
-    @PreAuthorize("@ss.hasPermission('iot:device:upstream')")
-    public CommonResult<Boolean> upstreamDevice(@Valid @RequestBody IotDeviceMessageSendReqVO sendReqVO) {
-        deviceMessageService.sendDeviceMessage(BeanUtils.toBean(sendReqVO, IotDeviceMessage.class));
-        return success(true);
     }
 
     @GetMapping("/get-auth-info")

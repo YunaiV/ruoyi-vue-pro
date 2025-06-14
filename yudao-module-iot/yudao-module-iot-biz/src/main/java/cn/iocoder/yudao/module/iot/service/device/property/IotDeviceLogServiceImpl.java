@@ -57,10 +57,8 @@ public class IotDeviceLogServiceImpl implements IotDeviceLogService {
         List<Map<String, Object>> list = deviceLogMapper.selectDeviceLogDownCountByHour(0L, startTime, endTime);
         return list.stream()
                 .map(map -> {
-                    // 从Timestamp获取时间戳
                     Timestamp timestamp = (Timestamp) map.get("time");
                     Long timeMillis = timestamp.getTime();
-                    // 消息数量转换
                     Integer count = ((Number) map.get("data")).intValue();
                     return MapUtil.of(timeMillis, count);
                 })
