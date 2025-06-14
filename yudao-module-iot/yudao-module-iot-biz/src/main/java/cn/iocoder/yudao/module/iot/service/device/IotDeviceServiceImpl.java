@@ -409,17 +409,13 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         return respVO;
     }
 
-    // TODO @芋艿：改成通用的；
     @Override
-    public IotDeviceMqttConnectionParamsRespVO getMqttConnectionParams(Long deviceId) {
-        IotDeviceDO device = validateDeviceExists(deviceId);
-//        MqttSignResult mqttSignResult = MqttSignUtils.calculate(device.getProductKey(), device.getDeviceName(),
-//                device.getDeviceSecret());
-//        return new IotDeviceMqttConnectionParamsRespVO()
-//                .setMqttClientId(mqttSignResult.getClientId())
-//                .setMqttUsername(mqttSignResult.getUsername())
-//                .setMqttPassword(mqttSignResult.getPassword());
-        return null;
+    public IotDeviceAuthInfoRespVO getDeviceAuthInfo(Long id) {
+        IotDeviceDO device = validateDeviceExists(id);
+        // 使用 IotDeviceAuthUtils 生成认证信息
+        IotDeviceAuthUtils.AuthInfo authInfo = IotDeviceAuthUtils.getAuthInfo(
+                device.getProductKey(), device.getDeviceName(), device.getDeviceSecret());
+        return BeanUtils.toBean(authInfo, IotDeviceAuthInfoRespVO.class);
     }
 
     private void deleteDeviceCache(IotDeviceDO device) {

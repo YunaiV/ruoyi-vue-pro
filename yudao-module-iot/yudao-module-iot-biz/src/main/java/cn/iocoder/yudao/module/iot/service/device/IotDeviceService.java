@@ -216,12 +216,12 @@ public interface IotDeviceService {
     Long getDeviceCount(@Nullable LocalDateTime createTime);
 
     /**
-     * 获取 MQTT 连接参数
+     * 获得设备认证信息
      *
-     * @param deviceId 设备 ID
+     * @param id 设备编号
      * @return MQTT 连接参数
      */
-    IotDeviceMqttConnectionParamsRespVO getMqttConnectionParams(Long deviceId);
+    IotDeviceAuthInfoRespVO getDeviceAuthInfo(Long id);
 
     /**
      * 获得各个产品下的设备数量 Map

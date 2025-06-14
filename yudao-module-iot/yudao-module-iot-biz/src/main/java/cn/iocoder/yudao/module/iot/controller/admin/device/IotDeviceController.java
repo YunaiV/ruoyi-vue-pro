@@ -167,12 +167,11 @@ public class IotDeviceController {
         return success(true);
     }
 
-    // TODO @haohao：是不是默认详情接口，不返回 secret，然后这个接口，用于统一返回。然后接口名可以更通用一点。
-    @GetMapping("/mqtt-connection-params")
-    @Operation(summary = "获取 MQTT 连接参数")
-    @PreAuthorize("@ss.hasPermission('iot:device:mqtt-connection-params')")
-    public CommonResult<IotDeviceMqttConnectionParamsRespVO> getMqttConnectionParams(@RequestParam("deviceId") Long deviceId) {
-        return success(deviceService.getMqttConnectionParams(deviceId));
+    @GetMapping("/get-auth-info")
+    @Operation(summary = "获得设备连接信息")
+    @PreAuthorize("@ss.hasPermission('iot:device:auth-info')")
+    public CommonResult<IotDeviceAuthInfoRespVO> getDeviceAuthInfo(@RequestParam("id") Long id) {
+        return success(deviceService.getDeviceAuthInfo(id));
     }
 
     // TODO @haohao：可以使用 @RequestParam("productKey") String productKey, @RequestParam("deviceNames") List<String> deviceNames 来接收哇？
