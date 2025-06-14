@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class LocalIotMessage {
+public class IotLocalMessage {
 
     private String topic;
 

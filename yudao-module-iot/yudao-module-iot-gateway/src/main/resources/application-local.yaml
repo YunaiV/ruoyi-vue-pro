@@ -31,7 +31,7 @@ yudao:
         # 针对引入的 EMQX 组件的配置
         # ====================================
         emqx:
-          enabled: true
+          enabled: false
           http-port: 8090                       # MQTT HTTP 服务端口
           mqtt-host: 127.0.0.1                  # MQTT Broker 地址
           mqtt-port: 1883                       # MQTT Broker 端口
@@ -44,7 +44,7 @@ yudao:
 
     # 消息总线配置
     message-bus:
-      type: rocketmq # 本地开发使用 RocketMQ
+      type: redis # 本地开发使用 RocketMQ
 
 --- #################### 日志相关配置 ####################
 

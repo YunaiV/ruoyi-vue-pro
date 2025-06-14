@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * {@link RocketMQIotMessageBus} 集成测试
+ * {@link IotRocketMQMessageBus} 集成测试
  *
  * @author 芋道源码
  */

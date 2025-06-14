@@ -4,6 +4,7 @@ import cn.hutool.core.util.TypeUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -14,8 +15,6 @@ import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.spring.autoconfigure.RocketMQProperties;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
-
-import jakarta.annotation.PreDestroy;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -28,7 +27,7 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @Slf4j
-public class RocketMQIotMessageBus implements IotMessageBus {
+public class IotRocketMQMessageBus implements IotMessageBus {
 
     private final RocketMQProperties rocketMQProperties;
 
@@ -38,6 +37,21 @@ public class RocketMQIotMessageBus implements IotMessageBus {
      * 主题对应的消费者映射
      */
     private final List<DefaultMQPushConsumer> topicConsumers = new ArrayList<>();
+
+    /**
+     * 销毁时关闭所有消费者
+     */
+    @PreDestroy
+    public void destroy() {
+        for (DefaultMQPushConsumer consumer : topicConsumers) {
+            try {
+                consumer.shutdown();
+                log.info("[destroy][关闭 group({}) 的消费者成功]", consumer.getConsumerGroup());
+            } catch (Exception e) {
+                log.error("[destroy]关闭 group({}) 的消费者异常]", consumer.getConsumerGroup(), e);
+            }
+        }
+    }
 
     @Override
     public void post(String topic, Object message) {
@@ -79,21 +93,6 @@ public class RocketMQIotMessageBus implements IotMessageBus {
 
         // 2. 保存消费者引用
         topicConsumers.add(consumer);
-    }
-
-    /**
-     * 销毁时关闭所有消费者
-     */
-    @PreDestroy
-    public void destroy() {
-        for (DefaultMQPushConsumer consumer : topicConsumers) {
-            try {
-                consumer.shutdown();
-                log.info("[destroy][关闭 group({}) 的消费者成功]", consumer.getConsumerGroup());
-            } catch (Exception e) {
-                log.error("[destroy]关闭 group({}) 的消费者异常]", consumer.getConsumerGroup(), e);
-            }
-        }
     }
 
 }

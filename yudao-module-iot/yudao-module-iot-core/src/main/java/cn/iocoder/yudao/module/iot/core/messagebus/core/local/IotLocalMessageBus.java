@@ -22,7 +22,7 @@ import java.util.Map;
  */
 @RequiredArgsConstructor
 @Slf4j
-public class LocalIotMessageBus implements IotMessageBus {
+public class IotLocalMessageBus implements IotMessageBus {
 
     private final ApplicationContext applicationContext;
 
@@ -34,7 +34,7 @@ public class LocalIotMessageBus implements IotMessageBus {
 
     @Override
     public void post(String topic, Object message) {
-        applicationContext.publishEvent(new LocalIotMessage(topic, message));
+        applicationContext.publishEvent(new IotLocalMessage(topic, message));
     }
 
     @Override
@@ -48,7 +48,7 @@ public class LocalIotMessageBus implements IotMessageBus {
 
     @EventListener
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public void onMessage(LocalIotMessage message) {
+    public void onMessage(IotLocalMessage message) {
         String topic = message.getTopic();
         List<IotMessageSubscriber<?>> topicSubscribers = subscribers.get(topic);
         if (CollUtil.isEmpty(topicSubscribers)) {

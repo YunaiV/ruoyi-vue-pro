@@ -37,14 +37,14 @@ yudao:
         # 针对引入的 EMQX 组件的配置
         # ====================================
         emqx:
-          enabled: true
+          enabled: false
           mqtt-ssl: false
           mqtt-topics:
             - "/sys/#"                         # 系统主题
 
     # 消息总线配置
     message-bus:
-      type: rocketmq # 消息总线的类型
+      type: redis # 消息总线的类型
 
 --- #################### 日志相关配置 ####################
 

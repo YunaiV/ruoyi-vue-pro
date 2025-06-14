@@ -69,9 +69,8 @@ public class YudaoRedisMQConsumerAutoConfiguration {
     @ConditionalOnBean(AbstractRedisStreamMessageListener.class) // 只有 AbstractStreamMessageListener 存在的时候，才需要注册 Redis pubsub 监听
     public RedisPendingMessageResendJob redisPendingMessageResendJob(List<AbstractRedisStreamMessageListener<?>> listeners,
                                                                      RedisMQTemplate redisTemplate,
-                                                                     @Value("${spring.application.name}") String groupName,
                                                                      RedissonClient redissonClient) {
-        return new RedisPendingMessageResendJob(listeners, redisTemplate, groupName, redissonClient);
+        return new RedisPendingMessageResendJob(listeners, redisTemplate, redissonClient);
     }
 
     /**
@@ -141,14 +140,14 @@ public class YudaoRedisMQConsumerAutoConfiguration {
      *
      * @return 消费者名字
      */
-    private static String buildConsumerName() {
+    public static String buildConsumerName() {
         return String.format("%s@%d", SystemUtil.getHostInfo().getAddress(), SystemUtil.getCurrentPID());
     }
 
     /**
      * 校验 Redis 版本号，是否满足最低的版本号要求！
      */
-    private static void checkRedisVersion(RedisTemplate<String, ?> redisTemplate) {
+    public static void checkRedisVersion(RedisTemplate<String, ?> redisTemplate) {
         // 获得 Redis 版本
         Properties info = redisTemplate.execute((RedisCallback<Properties>) RedisServerCommands::info);
         String version = MapUtil.getStr(info, "redis_version");

@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * {@link LocalIotMessageBus} 集成测试
+ * {@link IotLocalMessageBus} 集成测试
  *
  * @author 芋道源码
  */
