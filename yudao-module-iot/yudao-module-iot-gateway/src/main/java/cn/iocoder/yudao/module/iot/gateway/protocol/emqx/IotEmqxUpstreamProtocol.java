@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.emqx;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.router.IotEmqxUpstreamHandler;
@@ -67,9 +66,11 @@ public class IotEmqxUpstreamProtocol {
             stop();
 
             // 异步关闭应用，避免阻塞当前线程
+            // TODO @haohao：是不是阻塞，也没关系哈？
             new Thread(() -> {
                 try {
-                    Thread.sleep(1000); // 等待1秒让日志输出完成
+                    // TODO @haohao：可以考虑用 ThreadUtil.sleep 更简洁
+                    Thread.sleep(1000); // 等待 1 秒让日志输出完成
                     log.error("[start][由于 MQTT 连接失败，正在关闭应用]");
                 } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
@@ -110,13 +111,10 @@ public class IotEmqxUpstreamProtocol {
      */
     private void startMqttClient() {
         try {
-            // 2.1. 初始化消息处理器
+            // 1. 初始化消息处理器
             this.upstreamHandler = new IotEmqxUpstreamHandler(this);
 
-            // 2.2. 创建 MQTT 客户端
-            createMqttClient();
-
-            // 2.3. 连接 MQTT Broker（同步等待首次连接结果）
+            // 2. 创建 MQTT 客户端，连接 MQTT Broker
             boolean connected = connectMqttSync();
             if (!connected) {
                 throw new RuntimeException("首次连接 MQTT Broker 失败");
@@ -134,11 +132,14 @@ public class IotEmqxUpstreamProtocol {
      * @param isSync      是否同步等待连接结果
      * @return 当 isSync 为 true 时返回连接是否成功，否则返回 null
      */
+    // TODO @haohao：是不是不用结果；结束后，直接判断 this.mqttClient.isConnected()；
     private Boolean connectMqtt(boolean isReconnect, boolean isSync) {
+        // TODO @haohao：这块代码，是不是放到
         String host = emqxProperties.getMqttHost();
         Integer port = emqxProperties.getMqttPort();
 
         // 2.3.1. 如果是重连，则需要重新创建 MQTT 客户端
+        // TODO @hoahao：疑惑，为啥这里要重新创建对象呀？另外，创建是不是拿到 reconnectWithDelay 会更合适？这样和 startMqttClient 一样呢；
         if (isReconnect) {
             createMqttClient();
         }
@@ -148,7 +149,6 @@ public class IotEmqxUpstreamProtocol {
         AtomicBoolean success = isSync
                 ? new AtomicBoolean(false)
                 : null;
-
         mqttClient.connect(port, host, connectResult -> {
             if (connectResult.succeeded()) {
                 if (isReconnect) {
@@ -204,21 +204,18 @@ public class IotEmqxUpstreamProtocol {
      * 停止 MQTT 客户端
      */
     private void stopMqttClient() {
-        // 1.1. 取消订阅所有主题
+        // 1. 取消订阅所有主题
         if (mqttClient != null && mqttClient.isConnected()) {
             List<String> topicList = emqxProperties.getMqttTopics();
-            if (CollUtil.isNotEmpty(topicList)) {
-                for (String topic : topicList) {
-                    try {
-                        mqttClient.unsubscribe(topic);
-                    } catch (Exception e) {
-                        log.warn("[stopMqttClient][取消订阅主题({})异常]", topic, e);
-                    }
+            for (String topic : topicList) {
+                try {
+                    mqttClient.unsubscribe(topic);
+                } catch (Exception e) {
+                    log.warn("[stopMqttClient][取消订阅主题({})异常]", topic, e);
                 }
             }
         }
-
-        // 1.2. 断开 MQTT 客户端连接
+        // 2. 断开 MQTT 客户端连接
         if (mqttClient != null && mqttClient.isConnected()) {
             try {
                 mqttClient.disconnect();
@@ -244,18 +241,18 @@ public class IotEmqxUpstreamProtocol {
      * 设置 MQTT 处理器
      */
     private void setupMqttHandlers() {
-        // 1. 设置断开重连监听器
+        // 1.1 设置断开重连监听器
         mqttClient.closeHandler(closeEvent -> {
-            if (isRunning) {
-                log.warn("[closeHandler][MQTT 连接已断开, 准备重连]");
-                reconnectWithDelay();
+            if (!isRunning) {
+                return;
             }
+            log.warn("[closeHandler][MQTT 连接已断开, 准备重连]");
+            reconnectWithDelay();
         });
-
-        // 2. 设置异常处理器
+        // 1.2 设置异常处理器
         mqttClient.exceptionHandler(exception -> log.error("[exceptionHandler][MQTT 客户端异常]", exception));
 
-        // 3. 设置消息处理器
+        // 2. 设置消息处理器
         mqttClient.publishHandler(upstreamHandler::handle);
     }
 
@@ -270,16 +267,13 @@ public class IotEmqxUpstreamProtocol {
             return;
         }
 
+        // 2. 批量订阅所有主题
+        Map<String, Integer> topics = new HashMap<>();
         int qos = emqxProperties.getMqttQos();
-
-        // 2. 构建主题-QoS 映射，批量订阅
-        Map<String, Integer> topicQosMap = new HashMap<>();
         for (String topic : topicList) {
-            topicQosMap.put(topic, qos);
+            topics.put(topic, qos);
         }
-
-        // 3. 批量订阅所有主题
-        mqttClient.subscribe(topicQosMap, subscribeResult -> {
+        mqttClient.subscribe(topics, subscribeResult -> {
             if (subscribeResult.succeeded()) {
                 log.info("[subscribeToTopics][订阅主题成功, 共 {} 个主题]", topicList.size());
             } else {
@@ -307,6 +301,7 @@ public class IotEmqxUpstreamProtocol {
             } catch (Exception e) {
                 log.error("[reconnectWithDelay][重连失败, 将继续尝试]", e);
             }
+            // TODO @haohao：是不是把如果连接失败，放到这里处理？继续发起。。。这样，connect 逻辑更简单纯粹；1）首次连接，失败就退出；2）重新连接，如果失败，继续重试！
         });
     }
 

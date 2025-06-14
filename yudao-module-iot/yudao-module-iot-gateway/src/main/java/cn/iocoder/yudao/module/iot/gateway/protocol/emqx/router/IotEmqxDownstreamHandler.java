@@ -40,7 +40,7 @@ public class IotEmqxDownstreamHandler {
      * @param message 设备消息
      */
     public void handle(IotDeviceMessage message) {
-        // 1. 获取设备信息（使用缓存）
+        // 1. 获取设备信息
         IotDeviceRespDTO deviceInfo = deviceService.getDeviceFromCache(message.getDeviceId());
         if (deviceInfo == null) {
             log.error("[handle][设备信息({})不存在]", message.getDeviceId());
@@ -53,11 +53,10 @@ public class IotEmqxDownstreamHandler {
             log.warn("[handle][未知的消息方法: {}]", message.getMethod());
             return;
         }
-
         // 2.2 构建载荷
         byte[] payload = deviceMessageService.encodeDeviceMessage(message, deviceInfo.getProductKey(), deviceInfo.getDeviceName());
-
         // 2.3 发布消息
+        // TODO @haohao：可以直接使用 bytes 作为 payload 么？
         protocol.publishMessage(topic, new String(payload));
     }
 
@@ -77,17 +76,15 @@ public class IotEmqxDownstreamHandler {
             return null;
         }
 
-        // 2. 判断是否回复消息
+        // 2. 根据消息方法和回复状态，构建 topic
         boolean isReply = IotDeviceMessageUtils.isReplyMessage(message);
-
-        // 3. 根据消息方法和回复状态，构建主题
+        // TODO @haohao：这里判断，要不去掉 methodEnum == IotDeviceMessageMethodEnum.PROPERTY_POST？直接构建？？如果未来有不回复的，在特殊搞开关；
         if (methodEnum == IotDeviceMessageMethodEnum.PROPERTY_POST && isReply) {
             return IotMqttTopicUtils.buildPropertyPostReplyTopic(productKey, deviceName);
         }
         if (methodEnum == IotDeviceMessageMethodEnum.PROPERTY_SET && !isReply) {
             return IotMqttTopicUtils.buildPropertySetTopic(productKey, deviceName);
         }
-
         log.warn("[buildTopicByMethod][暂时不支持的下行消息: method={}, isReply={}]",
                 message.getMethod(), isReply);
         return null;

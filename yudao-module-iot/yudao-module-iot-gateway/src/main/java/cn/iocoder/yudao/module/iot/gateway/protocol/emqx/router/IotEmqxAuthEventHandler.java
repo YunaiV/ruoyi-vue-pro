@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
  * 为 EMQX 提供 HTTP 接口服务，包括：
  * 1. 设备认证接口 - 对应 EMQX HTTP 认证插件
  * 2. 设备事件处理接口 - 对应 EMQX Webhook 事件通知
- * 提供统一的错误处理和参数校验
  *
  * @author 芋道源码
  */
@@ -83,7 +82,7 @@ public class IotEmqxAuthEventHandler {
             }
 
             // 2. 执行认证
-            boolean authResult = performDeviceAuth(clientId, username, password);
+            boolean authResult = handleDeviceAuth(clientId, username, password);
             log.info("[handleAuth][设备认证结果: {} -> {}]", username, authResult);
             if (authResult) {
                 sendAuthResponse(context, RESULT_ALLOW);
@@ -97,8 +96,7 @@ public class IotEmqxAuthEventHandler {
     }
 
     /**
-     * EMQX 统一事件处理接口
-     * 根据 EMQX 官方 Webhook 设计，统一处理所有客户端事件
+     * EMQX 统一事件处理接口：根据 EMQX 官方 Webhook 设计，统一处理所有客户端事件
      * 支持的事件类型：client.connected、client.disconnected 等
      */
     public void handleEvent(RoutingContext context) {
@@ -160,18 +158,16 @@ public class IotEmqxAuthEventHandler {
      * @return 请求体JSON对象，解析失败时返回null
      */
     private JsonObject parseRequestBody(RoutingContext context) {
-        String rawBody = null;
         try {
-            rawBody = context.body().asString();
             JsonObject body = context.body().asJsonObject();
             if (body == null) {
-                log.info("[parseRequestBody][请求体为空][rawBody={}]", rawBody);
+                log.info("[parseRequestBody][请求体为空]");
                 sendAuthResponse(context, RESULT_IGNORE);
                 return null;
             }
             return body;
         } catch (Exception e) {
-            log.error("[parseRequestBody][解析请求体失败][rawBody={}]", rawBody, e);
+            log.error("[parseRequestBody][body({}) 解析请求体失败]", context.body().asString(), e);
             sendAuthResponse(context, RESULT_IGNORE);
             return null;
         }
@@ -185,14 +181,14 @@ public class IotEmqxAuthEventHandler {
      * @param password 密码
      * @return 认证是否成功
      */
-    private boolean performDeviceAuth(String clientId, String username, String password) {
+    private boolean handleDeviceAuth(String clientId, String username, String password) {
         try {
             CommonResult<Boolean> result = deviceApi.authDevice(new IotDeviceAuthReqDTO()
                     .setClientId(clientId).setUsername(username).setPassword(password));
             result.checkError();
             return BooleanUtil.isTrue(result.getData());
         } catch (Exception e) {
-            log.error("[performDeviceAuth][认证接口调用失败: {}]", username, e);
+            log.error("[handleDeviceAuth][设备({}) 认证接口调用失败]", username, e);
             throw e;
         }
     }
@@ -207,7 +203,7 @@ public class IotEmqxAuthEventHandler {
         // 1. 解析设备信息
         IotDeviceAuthUtils.DeviceInfo deviceInfo = IotDeviceAuthUtils.parseUsername(username);
         if (deviceInfo == null) {
-            log.debug("[handleDeviceStateChange][跳过非设备连接: {}]", username);
+            log.debug("[handleDeviceStateChange][跳过非设备({})连接]", username);
             return;
         }
 
