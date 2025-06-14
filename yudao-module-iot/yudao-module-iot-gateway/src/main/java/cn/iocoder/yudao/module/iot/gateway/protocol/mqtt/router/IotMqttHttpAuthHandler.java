@@ -14,8 +14,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import lombok.extern.slf4j.Slf4j;
 
-import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVICE_AUTH_FAIL;
-
 /**
  * IoT 网关 MQTT HTTP 认证处理器
  * <p>
@@ -67,7 +65,7 @@ public class IotMqttHttpAuthHandler {
      */
     public void handleAuth(RoutingContext context) {
         try {
-            // 参数校验
+            // 1. 参数校验
             JsonObject body = parseRequestBody(context);
             if (body == null) {
                 return;
@@ -78,23 +76,21 @@ public class IotMqttHttpAuthHandler {
             log.debug("[handleAuth][设备认证请求: clientId={}, username={}]", clientId, username);
             if (StrUtil.hasEmpty(clientId, username, password)) {
                 log.info("[handleAuth][认证参数不完整: clientId={}, username={}]", clientId, username);
-                sendAuthResponse(context, RESULT_DENY, false, "认证参数不完整");
+                sendAuthResponse(context, RESULT_DENY);
                 return;
             }
 
-            // 执行设备认证
+            // 2. 执行认证
             boolean authResult = performDeviceAuth(clientId, username, password);
+            log.info("[handleAuth][设备认证结果: {} -> {}]", username, authResult);
             if (authResult) {
-                // TODO @haohao：是不是两条 info，直接打认证结果：authResult
-                log.info("[handleAuth][设备认证成功: {}]", username);
-                sendAuthResponse(context, RESULT_ALLOW, false, null);
+                sendAuthResponse(context, RESULT_ALLOW);
             } else {
-                log.info("[handleAuth][设备认证失败: {}]", username);
-                sendAuthResponse(context, RESULT_DENY, false, DEVICE_AUTH_FAIL.getMsg());
+                sendAuthResponse(context, RESULT_DENY);
             }
         } catch (Exception e) {
             log.error("[handleAuth][设备认证异常]", e);
-            sendAuthResponse(context, RESULT_IGNORE, false, "认证服务异常");
+            sendAuthResponse(context, RESULT_IGNORE);
         }
     }
 
@@ -104,9 +100,10 @@ public class IotMqttHttpAuthHandler {
      * 支持的事件类型：client.connected、client.disconnected 等
      */
     public void handleEvent(RoutingContext context) {
+        JsonObject body = null;
         try {
-            // 解析请求体
-            JsonObject body = parseRequestBody(context);
+            // 1. 解析请求体
+            body = parseRequestBody(context);
             if (body == null) {
                 return;
             }
@@ -114,7 +111,7 @@ public class IotMqttHttpAuthHandler {
             String username = body.getString("username");
             log.debug("[handleEvent][收到事件: {} - {}]", event, username);
 
-            // 根据事件类型进行分发处理
+            // 2. 根据事件类型进行分发处理
             switch (event) {
                 case EVENT_CLIENT_CONNECTED:
                     handleClientConnected(body);
@@ -123,15 +120,13 @@ public class IotMqttHttpAuthHandler {
                     handleClientDisconnected(body);
                     break;
                 default:
-                    log.debug("[handleEvent][忽略事件: {}]", event);
                     break;
             }
 
             // EMQX Webhook 只需要 200 状态码，无需响应体
             context.response().setStatusCode(SUCCESS_STATUS_CODE).end();
         } catch (Exception e) {
-            // TODO @haohao：body 可以打印出来
-            log.error("[handleEvent][事件处理失败]", e);
+            log.error("[handleEvent][事件处理失败][body={}]", body != null ? body.encode() : "null", e);
             // 即使处理失败，也返回 200 避免EMQX重试
             context.response().setStatusCode(SUCCESS_STATUS_CODE).end();
         }
@@ -163,18 +158,19 @@ public class IotMqttHttpAuthHandler {
      * @return 请求体JSON对象，解析失败时返回null
      */
     private JsonObject parseRequestBody(RoutingContext context) {
+        String rawBody = null;
         try {
+            rawBody = context.body().asString();
             JsonObject body = context.body().asJsonObject();
             if (body == null) {
-                log.info("[parseRequestBody][请求体为空]");
-                sendAuthResponse(context, RESULT_IGNORE, false, "请求体不能为空");
+                log.info("[parseRequestBody][请求体为空][rawBody={}]", rawBody);
+                sendAuthResponse(context, RESULT_IGNORE);
                 return null;
             }
             return body;
         } catch (Exception e) {
-            // TODO @haohao：最好把 body 打印出来；
-            log.error("[parseRequestBody][解析请求体失败]", e);
-            sendAuthResponse(context, RESULT_IGNORE, false, "请求体格式错误");
+            log.error("[parseRequestBody][解析请求体失败][rawBody={}]", rawBody, e);
+            sendAuthResponse(context, RESULT_IGNORE);
             return null;
         }
     }
@@ -203,13 +199,10 @@ public class IotMqttHttpAuthHandler {
      * 处理设备状态变化
      *
      * @param username 用户名
-     * @param online   是否在线
+     * @param online   是否在线 true 在线 false 离线
      */
     private void handleDeviceStateChange(String username, boolean online) {
-        // 解析设备信息
-        if (StrUtil.isEmpty(username) || "undefined".equals(username)) {
-            return;
-        }
+        // 1. 解析设备信息
         IotDeviceAuthUtils.DeviceInfo deviceInfo = IotDeviceAuthUtils.parseUsername(username);
         if (deviceInfo == null) {
             log.debug("[handleDeviceStateChange][跳过非设备连接: {}]", username);
@@ -217,24 +210,13 @@ public class IotMqttHttpAuthHandler {
         }
 
         try {
-            // TODO @haohao：serverId 获取非空，可以忽略掉；
-            String serverId = protocol.getServerId();
-            if (StrUtil.isEmpty(serverId)) {
-                log.error("[handleDeviceStateChange][获取服务器ID失败]");
-                return;
-            }
-
-            // 构建设备状态消息
+            // 2. 构建设备状态消息
             IotDeviceMessage message = online ? IotDeviceMessage.buildStateOnline()
                     : IotDeviceMessage.buildStateOffline();
-            // 发送消息到消息总线
-            deviceMessageService.sendDeviceMessage(message,
-                    deviceInfo.getProductKey(), deviceInfo.getDeviceName(), serverId);
 
-            // TODO @haohao：online 不用翻译
-            log.info("[handleDeviceStateChange][设备状态更新: {}/{} -> {}]",
-                    deviceInfo.getProductKey(), deviceInfo.getDeviceName(),
-                    online ? "在线" : "离线");
+            // 3. 发送设备状态消息
+            deviceMessageService.sendDeviceMessage(message,
+                    deviceInfo.getProductKey(), deviceInfo.getDeviceName(), protocol.getServerId());
         } catch (Exception e) {
             log.error("[handleDeviceStateChange][发送设备状态消息失败: {}]", username, e);
         }
@@ -244,16 +226,14 @@ public class IotMqttHttpAuthHandler {
      * 发送 EMQX 认证响应
      * 根据 EMQX 官方文档要求，必须返回 JSON 格式响应
      *
-     * @param context     路由上下文
-     * @param result      认证结果：allow、deny、ignore
-     * @param isSuperuser 是否超级用户
-     * @param message     日志消息（仅用于日志记录，不返回给EMQX）
+     * @param context 路由上下文
+     * @param result  认证结果：allow、deny、ignore
      */
-    private void sendAuthResponse(RoutingContext context, String result, boolean isSuperuser, String message) {
+    private void sendAuthResponse(RoutingContext context, String result) {
         // 构建符合 EMQX 官方规范的响应
         JsonObject response = new JsonObject()
                 .put("result", result)
-                .put("is_superuser", isSuperuser);
+                .put("is_superuser", false);
 
         // 可以根据业务需求添加客户端属性
         // response.put("client_attrs", new JsonObject().put("role", "device"));
@@ -261,7 +241,6 @@ public class IotMqttHttpAuthHandler {
         // 可以添加认证过期时间（可选）
         // response.put("expire_at", System.currentTimeMillis() / 1000 + 3600);
 
-        // 记录详细的响应日志（message仅用于日志，不返回给EMQX）
         context.response()
                 .setStatusCode(SUCCESS_STATUS_CODE)
                 .putHeader("Content-Type", "application/json; charset=utf-8")

@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.iot.gateway.config;
 
-import cn.hutool.core.util.StrUtil;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -105,46 +104,53 @@ public class IotGatewayProperties {
         @NotNull(message = "是否开启不能为空")
         private Boolean enabled;
 
-        // TODO @haohao：是不是改成 httpPort？不只认证，目前看。
         /**
-         * HTTP 认证端口（默认：8090）
+         * HTTP 服务端口（默认：8090）
          */
-        private Integer httpAuthPort = 8090;
+        private Integer httpPort = 8090;
 
         /**
          * MQTT 服务器地址
          */
         @NotEmpty(message = "MQTT 服务器地址不能为空")
         private String mqttHost;
+
         /**
          * MQTT 服务器端口（默认：1883）
          */
         @NotNull(message = "MQTT 服务器端口不能为空")
         private Integer mqttPort = 1883;
+
         /**
          * MQTT 用户名
          */
         @NotEmpty(message = "MQTT 用户名不能为空")
         private String mqttUsername;
+
         /**
          * MQTT 密码
          */
         @NotEmpty(message = "MQTT 密码不能为空")
         private String mqttPassword;
+
         /**
          * MQTT 客户端的 SSL 开关
          */
         @NotNull(message = "MQTT 是否开启 SSL 不能为空")
         private Boolean mqttSsl = false;
+
         /**
          * MQTT 客户端 ID（如果为空，系统将自动生成）
          */
+        @NotEmpty(message = "MQTT 客户端 ID 不能为空")
         private String mqttClientId;
+
         /**
          * MQTT 订阅的主题
          */
         @NotEmpty(message = "MQTT 主题不能为空")
         private List<@NotEmpty(message = "MQTT 主题不能为空") String> mqttTopics;
+
         /**
          * 默认 QoS 级别
          * <p>
@@ -158,23 +164,11 @@ public class IotGatewayProperties {
          * 连接超时时间（秒）
          */
         private Integer connectTimeoutSeconds = 10;
+
         /**
          * 重连延迟时间（毫秒）
          */
         private Long reconnectDelayMs = 5000L;
-
-        // TODO @haohao：貌似可以通过配置文件 + el 表达式；尽量还是配置文件；
-        /**
-         * 获取 MQTT 客户端 ID，如果未配置则自动生成
-         *
-         * @return MQTT 客户端 ID
-         */
-        public String getMqttClientId() {
-            if (StrUtil.isBlank(mqttClientId)) {
-                mqttClientId = "iot-gateway-mqtt-" + System.currentTimeMillis();
-            }
-            return mqttClientId;
-        }
 
     }
 

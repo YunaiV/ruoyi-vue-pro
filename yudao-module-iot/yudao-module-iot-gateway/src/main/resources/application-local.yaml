@@ -32,13 +32,13 @@ yudao:
         # ====================================
         emqx:
           enabled: true
-          http-auth-port: 8090  # MQTT HTTP 认证服务端口
-          mqtt-host: 127.0.0.1                # MQTT Broker 地址
-          mqtt-port: 1883                     # MQTT Broker 端口
-          mqtt-username: admin                 # MQTT 用户名
-          mqtt-password: public                # MQTT 密码
-          mqtt-client-id: iot-gateway-mqtt     # MQTT 客户端 ID
-          mqtt-ssl: false                      # 是否开启 SSL
+          http-port: 8090                       # MQTT HTTP 服务端口
+          mqtt-host: 127.0.0.1                  # MQTT Broker 地址
+          mqtt-port: 1883                       # MQTT Broker 端口
+          mqtt-username: admin                  # MQTT 用户名
+          mqtt-password: public                 # MQTT 密码
+          mqtt-client-id: iot-gateway-mqtt      # MQTT 客户端 ID
+          mqtt-ssl: false                       # 是否开启 SSL
           mqtt-topics:
             - "/sys/#"                         # 系统主题
 
@@ -55,4 +55,4 @@ logging:
     cn.iocoder.yudao.module.iot.gateway.protocol.mqtt: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.http: DEBUG
     # MQTT 客户端日志
-    io.vertx.mqtt: DEBUG 
+#    io.vertx.mqtt: DEBUG

@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.router;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
-import cn.hutool.json.JSONObject;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
@@ -48,52 +48,49 @@ public class IotMqttDownstreamHandler {
         }
 
         // 2.1 根据方法构建主题
-        String topic = buildTopicByMethod(message.getMethod(), deviceInfo.getProductKey(), deviceInfo.getDeviceName());
+        String topic = buildTopicByMethod(message, deviceInfo.getProductKey(), deviceInfo.getDeviceName());
         if (StrUtil.isBlank(topic)) {
             log.warn("[handle][未知的消息方法: {}]", message.getMethod());
             return;
         }
+
         // 2.2 构建载荷
-        // TODO @haohao：这里是不是 encode 就可以发拉？因为本身就 json 化了。
-        JSONObject payload = buildDownstreamPayload(message);
+        byte[] payload = deviceMessageService.encodeDeviceMessage(message, deviceInfo.getProductKey(), deviceInfo.getDeviceName());
+
         // 2.3 发布消息
-        protocol.publishMessage(topic, payload.toString());
+        protocol.publishMessage(topic, new String(payload));
     }
 
-    // TODO @haohao：这个是不是也可以计算；IotDeviceMessageUtils 的 isReplyMessage；这样就直接生成了；
     /**
-     * 根据方法构建主题
+     * 根据消息方法和回复状态构建主题
      *
-     * @param method     消息方法
+     * @param message    设备消息
      * @param productKey 产品标识
      * @param deviceName 设备名称
      * @return 构建的主题，如果方法不支持返回 null
      */
-    private String buildTopicByMethod(String method, String productKey, String deviceName) {
-        IotDeviceMessageMethodEnum methodEnum = IotDeviceMessageMethodEnum.of(method);
+    private String buildTopicByMethod(IotDeviceMessage message, String productKey, String deviceName) {
+        // 1. 解析消息方法
+        IotDeviceMessageMethodEnum methodEnum = IotDeviceMessageMethodEnum.of(message.getMethod());
         if (methodEnum == null) {
+            log.warn("[buildTopicByMethod][未知的消息方法: {}]", message.getMethod());
             return null;
         }
-        return switch (methodEnum) {
-            case PROPERTY_POST -> IotMqttTopicUtils.buildPropertyPostReplyTopic(productKey, deviceName);
-            case PROPERTY_SET -> IotMqttTopicUtils.buildPropertySetTopic(productKey, deviceName);
-            default -> null;
-        };
 
-    }
+        // 2. 判断是否回复消息
+        boolean isReply = IotDeviceMessageUtils.isReplyMessage(message);
 
-    /**
-     * 构建下行消息载荷
-     *
-     * @param message 设备消息
-     * @return JSON 载荷
-     */
-    private JSONObject buildDownstreamPayload(IotDeviceMessage message) {
-        // 使用 IotDeviceMessageService 进行消息编码
-        IotDeviceRespDTO device = deviceService.getDeviceFromCache(message.getDeviceId());
-        byte[] encodedBytes = deviceMessageService.encodeDeviceMessage(message, device.getProductKey(),
-                device.getDeviceName());
-        return new JSONObject(new String(encodedBytes));
+        // 3. 根据消息方法和回复状态，构建主题
+        if (methodEnum == IotDeviceMessageMethodEnum.PROPERTY_POST && isReply) {
+            return IotMqttTopicUtils.buildPropertyPostReplyTopic(productKey, deviceName);
+        }
+        if (methodEnum == IotDeviceMessageMethodEnum.PROPERTY_SET && !isReply) {
+            return IotMqttTopicUtils.buildPropertySetTopic(productKey, deviceName);
+        }
+
+        log.warn("[buildTopicByMethod][暂时不支持的下行消息: method={}, isReply={}]",
+                message.getMethod(), isReply);
+        return null;
     }
 
 }
