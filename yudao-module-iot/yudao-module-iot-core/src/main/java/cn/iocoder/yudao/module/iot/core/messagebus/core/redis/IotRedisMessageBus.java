@@ -6,12 +6,15 @@ import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.mq.redis.config.YudaoRedisMQConsumerAutoConfiguration.buildConsumerName;
 import static cn.iocoder.yudao.framework.mq.redis.config.YudaoRedisMQConsumerAutoConfiguration.checkRedisVersion;
@@ -27,6 +30,9 @@ public class IotRedisMessageBus implements IotMessageBus {
     private final RedisTemplate<String, ?> redisTemplate;
 
     private final StreamMessageListenerContainer<String, ObjectRecord<String, String>> redisStreamMessageListenerContainer;
+
+    @Getter
+    private final List<IotMessageSubscriber<?>> subscribers = new ArrayList<>();
 
     public IotRedisMessageBus(RedisTemplate<String, ?> redisTemplate) {
         this.redisTemplate = redisTemplate;
@@ -87,6 +93,7 @@ public class IotRedisMessageBus implements IotMessageBus {
             // ack 消息消费完成
             redisTemplate.opsForStream().acknowledge(subscriber.getGroup(), message);
         });
+        this.subscribers.add(subscriber);
     }
 
 }

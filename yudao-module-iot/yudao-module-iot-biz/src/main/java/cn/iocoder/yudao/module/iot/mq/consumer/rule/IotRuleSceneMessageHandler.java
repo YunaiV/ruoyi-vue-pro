@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.iot.mq.consumer.rule;
 
+import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
+import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.service.rule.IotRuleSceneService;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 // TODO @puhui999：后面重构哈
@@ -16,14 +17,34 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class IotRuleSceneMessageHandler {
+public class IotRuleSceneMessageHandler implements IotMessageSubscriber<IotDeviceMessage> {
 
     @Resource
     private IotRuleSceneService ruleSceneService;
 
-    @EventListener
-    @Async
+    @Resource
+    private IotMessageBus messageBus;
+
+    @PostConstruct
+    public void init() {
+        messageBus.register(this);
+    }
+
+    @Override
+    public String getTopic() {
+        return IotDeviceMessage.MESSAGE_BUS_DEVICE_MESSAGE_TOPIC;
+    }
+
+    @Override
+    public String getGroup() {
+        return "iot_rule_consumer";
+    }
+
+    @Override
     public void onMessage(IotDeviceMessage message) {
+        if (true) {
+            return;
+        }
         log.info("[onMessage][消息内容({})]", message);
         ruleSceneService.executeRuleSceneByDevice(message);
     }
