@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.iot.service.device;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjUtil;
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
@@ -15,6 +14,7 @@ import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
+import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceGroupDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
@@ -22,7 +22,6 @@ import cn.iocoder.yudao.module.iot.dal.mysql.device.IotDeviceMapper;
 import cn.iocoder.yudao.module.iot.dal.redis.RedisKeyConstants;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
-import cn.iocoder.yudao.module.iot.core.util.IotDeviceAuthUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -319,15 +318,6 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     @Override
     public Long getDeviceCountByGroupId(Long groupId) {
         return deviceMapper.selectCountByGroupId(groupId);
-    }
-
-    /**
-     * 生成 deviceKey
-     *
-     * @return 生成的 deviceKey
-     */
-    private String generateDeviceKey() {
-        return RandomUtil.randomString(16);
     }
 
     /**

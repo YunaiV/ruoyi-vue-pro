@@ -2,9 +2,15 @@ package cn.iocoder.yudao.module.iot.service.device.message;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.message.IotDeviceMessagePageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsDeviceMessageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsDeviceMessageSummaryByDateRespVO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
+
+import javax.annotation.Nullable;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * IoT 设备消息 Service 接口
@@ -56,5 +62,22 @@ public interface IotDeviceMessageService {
      * @return 设备消息分页
      */
     PageResult<IotDeviceMessageDO> getDeviceMessagePage(IotDeviceMessagePageReqVO pageReqVO);
+
+    /**
+     * 获得设备消息数量
+     *
+     * @param createTime 创建时间，如果为空，则统计所有消息数量
+     * @return 消息数量
+     */
+    Long getDeviceMessageCount(@Nullable LocalDateTime createTime);
+
+    /**
+     * 获取设备消息的数据统计
+     *
+     * @param reqVO 统计请求
+     * @return 设备消息的数据统计
+     */
+    List<IotStatisticsDeviceMessageSummaryByDateRespVO> getDeviceMessageSummaryByDate(
+            IotStatisticsDeviceMessageReqVO reqVO);
 
 }

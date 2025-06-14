@@ -57,20 +57,10 @@ public interface IotDeviceMessageMapper {
      */
     Long selectCountByCreateTime(@Param("createTime") Long createTime);
 
-    // TODO @super：1）上行、下行，不写在 mapper 里，而是通过参数传递，这样，selectDeviceLogUpCountByHour、selectDeviceLogDownCountByHour 可以合并；
-    //  TODO @super：2）不能只基于 identifier 来计算，而是要 type + identifier 成对
     /**
-     * 查询每个小时设备上行消息数量
+     * 按照时间范围（小时），统计设备的消息数量
      */
-    List<Map<String, Object>> selectDeviceLogUpCountByHour(@Param("deviceId") Long deviceId,
-                                                           @Param("startTime") Long startTime,
-                                                           @Param("endTime") Long endTime);
-
-    /**
-     * 查询每个小时设备下行消息数量
-     */
-    List<Map<String, Object>> selectDeviceLogDownCountByHour(@Param("deviceId") Long deviceId,
-                                                             @Param("startTime") Long startTime,
-                                                             @Param("endTime") Long endTime);
+    List<Map<String, Object>> selectDeviceMessageCountGroupByDate(@Param("startTime") Long startTime,
+                                                                  @Param("endTime") Long endTime);
 
 }

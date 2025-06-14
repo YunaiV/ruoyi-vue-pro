@@ -69,19 +69,12 @@
         </where>
     </select>
 
-    <select id="selectDeviceLogUpCountByHour" resultType="java.util.Map">
+    <select id="selectDeviceMessageCountGroupByDate" resultType="java.util.Map">
         SELECT
-            TIMETRUNCATE(ts, 1h) as time,
-            COUNT(*) as data
-        FROM
-        <choose>
-            <when test="deviceId != null">
-                device_message_${deviceId}
-            </when>
-            <otherwise>
-                device_message
-            </otherwise>
-        </choose>
+            TIMETRUNCATE(ts, 1h) AS time,
+            SUM(CASE WHEN upstream = true THEN 1 ELSE 0 END) AS upstream_count,
+            SUM(CASE WHEN upstream = false THEN 1 ELSE 0 END) AS downstream_count
+        FROM device_message
         <where>
             <if test="startTime != null">
                 AND ts >= #{startTime}
@@ -89,36 +82,8 @@
             <if test="endTime != null">
                 AND ts &lt;= #{endTime}
             </if>
-            AND upstream = true
         </where>
-        GROUP BY TIMETRUNCATE(ts, 1h)
-        ORDER BY time ASC
-    </select>
-
-    <select id="selectDeviceLogDownCountByHour" resultType="java.util.Map">
-        SELECT
-            TIMETRUNCATE(ts, 1h) as time,
-            COUNT(*) as data
-        FROM
-        <choose>
-            <when test="deviceId != null">
-                device_message_${deviceId}
-            </when>
-            <otherwise>
-                device_message
-            </otherwise>
-        </choose>
-        <where>
-            <if test="startTime != null">
-                AND ts >= #{startTime}
-            </if>
-            <if test="endTime != null">
-                AND ts &lt;= #{endTime}
-            </if>
-            AND upstream = false
-        </where>
-        GROUP BY TIMETRUNCATE(ts, 1h)
-        ORDER BY time ASC
+        GROUP BY time
     </select>
 
 </mapper>

@@ -1,12 +1,17 @@
 package cn.iocoder.yudao.module.iot.service.device.message;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.message.IotDeviceMessagePageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsDeviceMessageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsDeviceMessageSummaryByDateRespVO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
@@ -26,9 +31,13 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_DOWNSTREAM_FAILED_SERVER_ID_NULL;
 
 /**
@@ -47,19 +56,19 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     private IotDevicePropertyService devicePropertyService;
 
     @Resource
-    private IotDeviceMessageMapper deviceLogMapper;
+    private IotDeviceMessageMapper deviceMessageMapper;
 
     @Resource
     private IotDeviceMessageProducer deviceMessageProducer;
 
     @Override
     public void defineDeviceMessageStable() {
-        if (StrUtil.isNotEmpty(deviceLogMapper.showSTable())) {
+        if (StrUtil.isNotEmpty(deviceMessageMapper.showSTable())) {
             log.info("[defineDeviceMessageStable][设备消息超级表已存在，创建跳过]");
             return;
         }
         log.info("[defineDeviceMessageStable][设备消息超级表不存在，创建开始...]");
-        deviceLogMapper.createSTable();
+        deviceMessageMapper.createSTable();
         log.info("[defineDeviceMessageStable][设备消息超级表不存在，创建成功]");
     }
 
@@ -74,7 +83,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         if (messageDO.getData() != null) {
             messageDO.setData(JsonUtils.toJsonString(messageDO.getData()));
         }
-        deviceLogMapper.insert(messageDO);
+        deviceMessageMapper.insert(messageDO);
     }
 
     @Override
@@ -192,7 +201,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     @Override
     public PageResult<IotDeviceMessageDO> getDeviceMessagePage(IotDeviceMessagePageReqVO pageReqVO) {
         try {
-            IPage<IotDeviceMessageDO> page = deviceLogMapper.selectPage(
+            IPage<IotDeviceMessageDO> page = deviceMessageMapper.selectPage(
                     new Page<>(pageReqVO.getPageNo(), pageReqVO.getPageSize()), pageReqVO);
             return new PageResult<>(page.getRecords(), page.getTotal());
         } catch (Exception exception) {
@@ -201,6 +210,33 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
             }
             throw exception;
         }
+    }
+
+    @Override
+    public Long getDeviceMessageCount(LocalDateTime createTime) {
+        return deviceMessageMapper.selectCountByCreateTime(createTime != null ? LocalDateTimeUtil.toEpochMilli(createTime) : null);
+    }
+
+    @Override
+    public List<IotStatisticsDeviceMessageSummaryByDateRespVO> getDeviceMessageSummaryByDate(
+            IotStatisticsDeviceMessageReqVO reqVO) {
+        // 1. 按小时统计，获取分项统计数据
+        List<Map<String, Object>> countList = deviceMessageMapper.selectDeviceMessageCountGroupByDate(
+                LocalDateTimeUtil.toEpochMilli(reqVO.getTimes()[0]), LocalDateTimeUtil.toEpochMilli(reqVO.getTimes()[1]));
+
+        // 2. 按照日期间隔，合并数据
+        List<LocalDateTime[]> timeRanges = LocalDateTimeUtils.getDateRangeList(reqVO.getTimes()[0], reqVO.getTimes()[1], reqVO.getInterval());
+        return convertList(timeRanges, times -> {
+            Integer upstreamCount = countList.stream()
+                    .filter(vo -> LocalDateTimeUtils.isBetween(times[0], times[1], (Timestamp) vo.get("time")))
+                    .mapToInt(value -> MapUtil.getInt(value, "upstream_count")).sum();
+            Integer downstreamCount = countList.stream()
+                    .filter(vo -> LocalDateTimeUtils.isBetween(times[0], times[1], (Timestamp) vo.get("time")))
+                    .mapToInt(value -> MapUtil.getInt(value, "downstream_count")).sum();
+            return new IotStatisticsDeviceMessageSummaryByDateRespVO()
+                    .setTime(LocalDateTimeUtils.formatDateRange(times[0], times[1], reqVO.getInterval()))
+                    .setUpstreamCount(upstreamCount).setDownstreamCount(downstreamCount);
+        });
     }
 
     private IotDeviceMessageServiceImpl getSelf() {
