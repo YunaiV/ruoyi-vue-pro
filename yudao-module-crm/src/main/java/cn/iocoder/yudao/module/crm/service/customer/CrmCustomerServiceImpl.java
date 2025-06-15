@@ -163,7 +163,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     }
 
     @Override
-    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_FOLLOW_UP_SUB_TYPE, bizNo = "{{#id}",
+    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_FOLLOW_UP_SUB_TYPE, bizNo = "{{#id}}",
             success = CRM_CUSTOMER_FOLLOW_UP_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
     public void updateCustomerFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent) {
