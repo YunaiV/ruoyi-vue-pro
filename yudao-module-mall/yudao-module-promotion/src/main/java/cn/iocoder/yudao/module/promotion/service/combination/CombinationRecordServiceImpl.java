@@ -165,7 +165,6 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
         ProductSpuRespDTO spu = productSpuApi.getSpu(reqDTO.getSpuId());
         ProductSkuRespDTO sku = productSkuApi.getSku(reqDTO.getSkuId());
         CombinationRecordDO record = CombinationActivityConvert.INSTANCE.convert(reqDTO, keyValue.getKey(), user, spu, sku);
-        record.setPicUrl(spu.getPicUrl()); // fix：拼团记录创建时，需要设置拼团商品的图片
         // 2.1. 如果是团长需要设置 headId 为 CombinationRecordDO#HEAD_ID_GROUP
         if (record.getHeadId() == null) {
             record.setStartTime(LocalDateTime.now())
