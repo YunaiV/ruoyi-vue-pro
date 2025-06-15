@@ -195,7 +195,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
             saleOrderItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            saleOrderItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpSaleOrderItemDO::getId));
+            saleOrderItemMapper.deleteByIds(convertList(diffList.get(2), ErpSaleOrderItemDO::getId));
         }
     }
 
@@ -243,7 +243,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteSaleOrder(List<Long> ids) {
         // 1. 校验不处于已审批
-        List<ErpSaleOrderDO> saleOrders = saleOrderMapper.selectBatchIds(ids);
+        List<ErpSaleOrderDO> saleOrders = saleOrderMapper.selectByIds(ids);
         if (CollUtil.isEmpty(saleOrders)) {
             return;
         }

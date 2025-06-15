@@ -189,7 +189,7 @@ public class ErpFinanceReceiptServiceImpl implements ErpFinanceReceiptService {
             financeReceiptItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            financeReceiptItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpFinanceReceiptItemDO::getId));
+            financeReceiptItemMapper.deleteByIds(convertList(diffList.get(2), ErpFinanceReceiptItemDO::getId));
         }
 
         // 第三步，更新销售出库、退货的收款金额情况
@@ -214,7 +214,7 @@ public class ErpFinanceReceiptServiceImpl implements ErpFinanceReceiptService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteFinanceReceipt(List<Long> ids) {
         // 1. 校验不处于已审批
-        List<ErpFinanceReceiptDO> receipts = financeReceiptMapper.selectBatchIds(ids);
+        List<ErpFinanceReceiptDO> receipts = financeReceiptMapper.selectByIds(ids);
         if (CollUtil.isEmpty(receipts)) {
             return;
         }
@@ -230,7 +230,7 @@ public class ErpFinanceReceiptServiceImpl implements ErpFinanceReceiptService {
             financeReceiptMapper.deleteById(receipt.getId());
             // 2.2 删除收款单项
             List<ErpFinanceReceiptItemDO> receiptItems = financeReceiptItemMapper.selectListByReceiptId(receipt.getId());
-            financeReceiptItemMapper.deleteBatchIds(convertSet(receiptItems, ErpFinanceReceiptItemDO::getId));
+            financeReceiptItemMapper.deleteByIds(convertSet(receiptItems, ErpFinanceReceiptItemDO::getId));
 
             // 2.3 更新销售出库、退货的收款金额情况
             updateSalePrice(receiptItems);

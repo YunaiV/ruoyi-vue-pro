@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.ratelimiter.core.redis;
 import lombok.AllArgsConstructor;
 import org.redisson.api.*;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -40,11 +41,13 @@ public class RateLimiterRedisDAO {
         String redisKey = formatKey(key);
         RRateLimiter rateLimiter = redissonClient.getRateLimiter(redisKey);
         long rateInterval = timeUnit.toSeconds(time);
+        Duration duration = Duration.ofSeconds(rateInterval);
         // 1. 如果不存在，设置 rate 速率
         RateLimiterConfig config = rateLimiter.getConfig();
         if (config == null) {
-            rateLimiter.trySetRate(RateType.OVERALL, count, rateInterval, RateIntervalUnit.SECONDS);
-            rateLimiter.expire(rateInterval, TimeUnit.SECONDS); // 原因参见 https://t.zsxq.com/lcR0W
+            rateLimiter.trySetRate(RateType.OVERALL, count, duration);
+            // 原因参见 https://t.zsxq.com/lcR0W
+            rateLimiter.expire(duration);
             return rateLimiter;
         }
         // 2. 如果存在，并且配置相同，则直接返回
@@ -54,8 +57,9 @@ public class RateLimiterRedisDAO {
             return rateLimiter;
         }
         // 3. 如果存在，并且配置不同，则进行新建
-        rateLimiter.setRate(RateType.OVERALL, count, rateInterval, RateIntervalUnit.SECONDS);
-        rateLimiter.expire(rateInterval, TimeUnit.SECONDS); // 原因参见 https://t.zsxq.com/lcR0W
+        rateLimiter.setRate(RateType.OVERALL, count, duration);
+        // 原因参见 https://t.zsxq.com/lcR0W
+        rateLimiter.expire(duration);
         return rateLimiter;
     }
 

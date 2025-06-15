@@ -81,7 +81,7 @@ public class ErpCustomerServiceImpl implements ErpCustomerService {
 
     @Override
     public List<ErpCustomerDO> getCustomerList(Collection<Long> ids) {
-        return customerMapper.selectBatchIds(ids);
+        return customerMapper.selectByIds(ids);
     }
 
     @Override

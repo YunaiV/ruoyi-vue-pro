@@ -274,7 +274,7 @@ public class SocialClientServiceImplTest extends BaseDbUnitTest {
         WxMaUserService userService = mock(WxMaUserService.class);
         when(wxMaService.getUserService()).thenReturn(userService);
         WxMaPhoneNumberInfo phoneNumber = randomPojo(WxMaPhoneNumberInfo.class);
-        when(userService.getPhoneNoInfo(eq(phoneCode))).thenReturn(phoneNumber);
+        when(userService.getPhoneNumber(eq(phoneCode))).thenReturn(phoneNumber);
 
         // 调用
         WxMaPhoneNumberInfo result = socialClientService.getWxMaPhoneNumberInfo(userType, phoneCode);
@@ -291,7 +291,7 @@ public class SocialClientServiceImplTest extends BaseDbUnitTest {
         WxMaUserService userService = mock(WxMaUserService.class);
         when(wxMaService.getUserService()).thenReturn(userService);
         WxErrorException wxErrorException = new WxErrorException(new NullPointerException());
-        when(userService.getPhoneNoInfo(eq(phoneCode))).thenThrow(wxErrorException);
+        when(userService.getPhoneNumber(eq(phoneCode))).thenThrow(wxErrorException);
 
         // 调用并断言异常
         assertServiceException(() -> socialClientService.getWxMaPhoneNumberInfo(userType, phoneCode),

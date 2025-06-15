@@ -45,7 +45,7 @@ public interface Demo03StudentErpService {
      *
      * @param ids 编号
      */
-    void deleteDemo03StudentListByIds(List<Long> ids);
+    void deleteDemo03StudentList(List<Long> ids);
 
     /**
      * 获得学生
@@ -101,7 +101,7 @@ public interface Demo03StudentErpService {
      *
      * @param ids 编号
      */
-    void deleteDemo03CourseListByIds(List<Long> ids);
+    void deleteDemo03CourseList(List<Long> ids);
 
     /**
      * 获得学生课程
@@ -149,7 +149,7 @@ public interface Demo03StudentErpService {
      *
      * @param ids 编号
      */
-    void deleteDemo03GradeListByIds(List<Long> ids);
+    void deleteDemo03GradeList(List<Long> ids);
 
     /**
      * 获得学生班级

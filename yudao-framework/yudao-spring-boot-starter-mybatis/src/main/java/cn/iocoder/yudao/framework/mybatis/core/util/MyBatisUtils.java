@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.framework.mybatis.core.util;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.lang.func.Func1;
+import cn.hutool.core.lang.func.LambdaUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
@@ -101,6 +103,20 @@ public class MyBatisUtils {
         return DbTypeEnum.getFindInSetTemplate(dbType)
                 .replace("#{column}", column)
                 .replace("#{value}", StrUtil.toString(value));
+    }
+
+    /**
+     * 将驼峰命名转换为下划线命名
+     *
+     * 使用场景：
+     * 1. <a href="https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/1357/files">fix:修复"商品统计聚合函数的别名与排序字段不符"导致的 SQL 异常</a>
+     *
+     * @param func 字段名函数(驼峰命名)
+     * @return 字段名(下划线命名)
+     */
+    public static <T> String toUnderlineCase(Func1<T, ?> func) {
+        String fieldName = LambdaUtil.getFieldName(func);
+        return StrUtil.toUnderlineCase(fieldName);
     }
 
 }

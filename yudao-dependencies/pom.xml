@@ -14,7 +14,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>2.5.0-SNAPSHOT</revision>
+        <revision>2.6.0-SNAPSHOT</revision>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
         <spring.boot.version>3.4.5</spring.boot.version>
@@ -64,7 +64,7 @@
         <tika-core.version>3.1.0</tika-core.version>
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
-        <netty.version>4.1.116.Final</netty.version>
+        <netty.version>4.1.118.Final</netty.version>
         <mqtt.version>1.2.5</mqtt.version>
         <pf4j-spring.version>0.9.0</pf4j-spring.version>
         <vertx.version>4.5.13</vertx.version>

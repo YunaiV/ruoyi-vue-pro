@@ -189,7 +189,7 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
             financePaymentItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            financePaymentItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpFinancePaymentItemDO::getId));
+            financePaymentItemMapper.deleteByIds(convertList(diffList.get(2), ErpFinancePaymentItemDO::getId));
         }
 
         // 第三步，更新采购入库、退货的付款金额情况
@@ -214,7 +214,7 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteFinancePayment(List<Long> ids) {
         // 1. 校验不处于已审批
-        List<ErpFinancePaymentDO> payments = financePaymentMapper.selectBatchIds(ids);
+        List<ErpFinancePaymentDO> payments = financePaymentMapper.selectByIds(ids);
         if (CollUtil.isEmpty(payments)) {
             return;
         }
@@ -230,7 +230,7 @@ public class ErpFinancePaymentServiceImpl implements ErpFinancePaymentService {
             financePaymentMapper.deleteById(payment.getId());
             // 2.2 删除付款单项
             List<ErpFinancePaymentItemDO> paymentItems = financePaymentItemMapper.selectListByPaymentId(payment.getId());
-            financePaymentItemMapper.deleteBatchIds(convertSet(paymentItems, ErpFinancePaymentItemDO::getId));
+            financePaymentItemMapper.deleteByIds(convertSet(paymentItems, ErpFinancePaymentItemDO::getId));
 
             // 2.3 更新采购入库、退货的付款金额情况
             updatePurchasePrice(paymentItems);

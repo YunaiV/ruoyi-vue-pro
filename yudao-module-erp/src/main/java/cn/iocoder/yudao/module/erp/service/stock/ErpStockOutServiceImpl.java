@@ -165,7 +165,7 @@ public class ErpStockOutServiceImpl implements ErpStockOutService {
             stockOutItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            stockOutItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpStockOutItemDO::getId));
+            stockOutItemMapper.deleteByIds(convertList(diffList.get(2), ErpStockOutItemDO::getId));
         }
     }
 
@@ -173,7 +173,7 @@ public class ErpStockOutServiceImpl implements ErpStockOutService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteStockOut(List<Long> ids) {
         // 1. 校验不处于已审批
-        List<ErpStockOutDO> stockOuts = stockOutMapper.selectBatchIds(ids);
+        List<ErpStockOutDO> stockOuts = stockOutMapper.selectByIds(ids);
         if (CollUtil.isEmpty(stockOuts)) {
             return;
         }

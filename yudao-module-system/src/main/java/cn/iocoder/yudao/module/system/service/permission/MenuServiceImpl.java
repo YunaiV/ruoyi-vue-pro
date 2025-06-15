@@ -105,6 +105,24 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = RedisKeyConstants.PERMISSION_MENU_ID_LIST,
+            allEntries = true) // allEntries 清空所有缓存，因为 Spring Cache 不支持按照 ids 批量删除
+    public void deleteMenuList(List<Long> ids) {
+        // 校验是否还有子菜单
+        ids.forEach(id -> {
+            if (menuMapper.selectCountByParentId(id) > 0) {
+                throw exception(MENU_EXISTS_CHILDREN);
+            }
+        });
+
+        // 标记删除
+        menuMapper.deleteByIds(ids);
+        // 删除授予给角色的权限
+        ids.forEach(id -> permissionService.processMenuDeleted(id));
+    }
+
+    @Override
     public List<MenuDO> getMenuList() {
         return menuMapper.selectList();
     }
@@ -187,7 +205,7 @@ public class MenuServiceImpl implements MenuService {
         if (CollUtil.isEmpty(ids)) {
             return Lists.newArrayList();
         }
-        return menuMapper.selectBatchIds(ids);
+        return menuMapper.selectByIds(ids);
     }
 
     /**

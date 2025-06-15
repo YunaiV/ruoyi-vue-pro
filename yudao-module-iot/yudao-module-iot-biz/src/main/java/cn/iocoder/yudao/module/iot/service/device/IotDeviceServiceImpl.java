@@ -150,7 +150,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     @Transactional(rollbackFor = Exception.class)
     public void updateDeviceGroup(IotDeviceUpdateGroupReqVO updateReqVO) {
         // 1.1 校验设备存在
-        List<IotDeviceDO> devices = deviceMapper.selectBatchIds(updateReqVO.getIds());
+        List<IotDeviceDO> devices = deviceMapper.selectByIds(updateReqVO.getIds());
         if (CollUtil.isEmpty(devices)) {
             return;
         }
@@ -188,7 +188,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         if (CollUtil.isEmpty(ids)) {
             return;
         }
-        List<IotDeviceDO> devices = deviceMapper.selectBatchIds(ids);
+        List<IotDeviceDO> devices = deviceMapper.selectByIds(ids);
         if (CollUtil.isEmpty(devices)) {
             return;
         }

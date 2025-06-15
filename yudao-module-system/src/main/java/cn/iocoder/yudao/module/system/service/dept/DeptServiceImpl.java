@@ -159,7 +159,7 @@ public class DeptServiceImpl implements DeptService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return deptMapper.selectBatchIds(ids);
+        return deptMapper.selectByIds(ids);
     }
 
     @Override

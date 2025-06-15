@@ -187,7 +187,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     }
 
     private void validatePermissionExists(Collection<Long> ids) {
-        List<CrmPermissionDO> permissionList = permissionMapper.selectBatchIds(ids);
+        List<CrmPermissionDO> permissionList = permissionMapper.selectByIds(ids);
         if (ObjUtil.notEqual(permissionList.size(), ids.size())) {
             throw exception(CRM_PERMISSION_NOT_EXISTS);
         }
@@ -255,7 +255,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         }
 
         // 删除数据权限
-        permissionMapper.deleteBatchIds(convertSet(permissions, CrmPermissionDO::getId));
+        permissionMapper.deleteByIds(convertSet(permissions, CrmPermissionDO::getId));
     }
 
     @Override
@@ -268,7 +268,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
 
     @Override
     public void deletePermissionBatch(Collection<Long> ids, Long userId) {
-        List<CrmPermissionDO> permissions = permissionMapper.selectBatchIds(ids);
+        List<CrmPermissionDO> permissions = permissionMapper.selectByIds(ids);
         if (CollUtil.isEmpty(permissions)) {
             throw exception(CRM_PERMISSION_NOT_EXISTS);
         }
@@ -286,7 +286,7 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         }
 
         // 删除数据权限
-        permissionMapper.deleteBatchIds(ids);
+        permissionMapper.deleteByIds(ids);
     }
 
     @Override

@@ -163,7 +163,7 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return chatRoleMapper.selectBatchIds(ids);
+        return chatRoleMapper.selectByIds(ids);
     }
 
     @Override

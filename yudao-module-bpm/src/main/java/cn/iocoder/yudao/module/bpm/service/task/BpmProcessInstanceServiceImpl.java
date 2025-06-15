@@ -270,7 +270,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(node))
                 .setCandidateUserIds(getTaskCandidateUserList(bpmnModel, node.getId(),
                         loginUserId, historicProcessInstance.getProcessDefinitionId(), processVariables)));
-        if (CollUtil.isNotEmpty(nextActivityNodes)) {
+        if (CollUtil.isEmpty(nextActivityNodes)) {
             return nextActivityNodes;
         }
 

@@ -169,7 +169,7 @@ public class ErpStockCheckServiceImpl implements ErpStockCheckService {
             stockCheckItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            stockCheckItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpStockCheckItemDO::getId));
+            stockCheckItemMapper.deleteByIds(convertList(diffList.get(2), ErpStockCheckItemDO::getId));
         }
     }
 
@@ -177,7 +177,7 @@ public class ErpStockCheckServiceImpl implements ErpStockCheckService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteStockCheck(List<Long> ids) {
         // 1. 校验不处于已审批
-        List<ErpStockCheckDO> stockChecks = stockCheckMapper.selectBatchIds(ids);
+        List<ErpStockCheckDO> stockChecks = stockCheckMapper.selectByIds(ids);
         if (CollUtil.isEmpty(stockChecks)) {
             return;
         }

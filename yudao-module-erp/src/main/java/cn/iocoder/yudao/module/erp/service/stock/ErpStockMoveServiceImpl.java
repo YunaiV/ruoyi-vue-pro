@@ -166,7 +166,7 @@ public class ErpStockMoveServiceImpl implements ErpStockMoveService {
             stockMoveItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            stockMoveItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpStockMoveItemDO::getId));
+            stockMoveItemMapper.deleteByIds(convertList(diffList.get(2), ErpStockMoveItemDO::getId));
         }
     }
 
@@ -174,7 +174,7 @@ public class ErpStockMoveServiceImpl implements ErpStockMoveService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteStockMove(List<Long> ids) {
         // 1. 校验不处于已审批
-        List<ErpStockMoveDO> stockMoves = stockMoveMapper.selectBatchIds(ids);
+        List<ErpStockMoveDO> stockMoves = stockMoveMapper.selectByIds(ids);
         if (CollUtil.isEmpty(stockMoves)) {
             return;
         }

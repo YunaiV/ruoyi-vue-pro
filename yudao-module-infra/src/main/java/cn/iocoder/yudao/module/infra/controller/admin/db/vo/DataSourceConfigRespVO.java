@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class DataSourceConfigRespVO {
 
     @Schema(description = "主键编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Integer id;
+    private Long id;
 
     @Schema(description = "数据源名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "test")
     private String name;

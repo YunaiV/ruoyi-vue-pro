@@ -50,8 +50,6 @@ import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.bef
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.promotion.enums.MessageTemplateConstants.COMBINATION_SUCCESS;
 
-// TODO 芋艿：等拼团记录做完，完整 review 下
-
 /**
  * 拼团记录 Service 实现类
  *
@@ -219,9 +217,7 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
 
         // 3. 拼团成功发送订阅消息
         if (updateSuccess && isFull) {
-            records.forEach(item -> {
-                getSelf().sendCombinationResultMessage(item);
-            });
+            records.forEach(item -> getSelf().sendCombinationResultMessage(item));
         }
     }
 

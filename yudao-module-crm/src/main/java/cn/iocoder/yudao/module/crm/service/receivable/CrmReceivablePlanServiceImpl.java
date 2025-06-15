@@ -165,7 +165,7 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }
-        return receivablePlanMapper.selectBatchIds(ids);
+        return receivablePlanMapper.selectByIds(ids);
     }
 
     @Override

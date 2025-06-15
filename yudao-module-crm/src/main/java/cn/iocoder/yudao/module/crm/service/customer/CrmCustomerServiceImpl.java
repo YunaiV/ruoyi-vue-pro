@@ -47,7 +47,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.LogRecordConstants.*;
@@ -163,7 +162,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     }
 
     @Override
-    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_FOLLOW_UP_SUB_TYPE, bizNo = "{{#id}",
+    @LogRecord(type = CRM_CUSTOMER_TYPE, subType = CRM_CUSTOMER_FOLLOW_UP_SUB_TYPE, bizNo = "{{#id}}",
             success = CRM_CUSTOMER_FOLLOW_UP_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
     public void updateCustomerFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent) {
@@ -233,24 +232,18 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     private void transfer(CrmCustomerTransferReqVO reqVO, Long userId) {
         if (reqVO.getToBizTypes().contains(CrmBizTypeEnum.CRM_CONTACT.getType())) {
             List<CrmContactDO> contactList = contactService.getContactListByCustomerIdOwnerUserId(reqVO.getId(), userId);
-            contactList.forEach(item -> {
-                contactService.transferContact(new CrmContactTransferReqVO(item.getId(), reqVO.getNewOwnerUserId(),
-                        reqVO.getOldOwnerPermissionLevel()), userId);
-            });
+            contactList.forEach(item -> contactService.transferContact(new CrmContactTransferReqVO(item.getId(), reqVO.getNewOwnerUserId(),
+                    reqVO.getOldOwnerPermissionLevel()), userId));
         }
         if (reqVO.getToBizTypes().contains(CrmBizTypeEnum.CRM_BUSINESS.getType())) {
             List<CrmBusinessDO> businessList = businessService.getBusinessListByCustomerIdOwnerUserId(reqVO.getId(), userId);
-            businessList.forEach(item -> {
-                businessService.transferBusiness(new CrmBusinessTransferReqVO(item.getId(), reqVO.getNewOwnerUserId(),
-                        reqVO.getOldOwnerPermissionLevel()), userId);
-            });
+            businessList.forEach(item -> businessService.transferBusiness(new CrmBusinessTransferReqVO(item.getId(), reqVO.getNewOwnerUserId(),
+                    reqVO.getOldOwnerPermissionLevel()), userId));
         }
         if (reqVO.getToBizTypes().contains(CrmBizTypeEnum.CRM_CONTRACT.getType())) {
             List<CrmContractDO> contractList = contractService.getContractListByCustomerIdOwnerUserId(reqVO.getId(), userId);
-            contractList.forEach(item -> {
-                contractService.transferContract(new CrmContractTransferReqVO(item.getId(), reqVO.getNewOwnerUserId(),
-                        reqVO.getOldOwnerPermissionLevel()), userId);
-            });
+            contractList.forEach(item -> contractService.transferContract(new CrmContractTransferReqVO(item.getId(), reqVO.getNewOwnerUserId(),
+                    reqVO.getOldOwnerPermissionLevel()), userId));
         }
     }
 
@@ -392,7 +385,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
     @Transactional(rollbackFor = Exception.class)
     public void receiveCustomer(List<Long> ids, Long ownerUserId, Boolean isReceive) {
         // 1.1 校验存在
-        List<CrmCustomerDO> customers = customerMapper.selectBatchIds(ids);
+        List<CrmCustomerDO> customers = customerMapper.selectByIds(ids);
         if (customers.size() != ids.size()) {
             throw exception(CUSTOMER_NOT_EXISTS);
         }
@@ -496,7 +489,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return customerMapper.selectBatchIds(ids);
+        return customerMapper.selectByIds(ids);
     }
 
     @Override

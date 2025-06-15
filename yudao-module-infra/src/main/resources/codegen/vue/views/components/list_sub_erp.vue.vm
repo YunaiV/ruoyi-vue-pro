@@ -13,10 +13,36 @@
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="openForm(undefined)"
                    v-hasPermi="['${permissionPrefix}:create']">新增</el-button>
       </el-col>
+    #if ($deleteBatchEnable)
+      <el-col :span="1.5">
+        <el-button
+            type="danger"
+            plain
+            icon="el-icon-delete"
+            size="mini"
+            :disabled="isEmpty(checkedIds)"
+            @click="handleDeleteBatch"
+            v-hasPermi="['${permissionPrefix}:delete']"
+        >
+          批量删除
+        </el-button>
+      </el-col>
+    #end
     </el-row>
 #end
       ## 列表
-      <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
+      <el-table
+          v-loading="loading"
+          :data="list"
+          :stripe="true"
+          :show-overflow-tooltip="true"
+          #if ($table.templateType == 11 && $deleteBatchEnable)
+          @selection-change="handleRowCheckboxChange"
+          #end
+      >
+          #if ($table.templateType == 11 && $deleteBatchEnable)
+            <el-table-column type="selection" width="55" />
+          #end
           #foreach($column in $subColumns)
               #if ($column.listOperationResult)
                   #set ($dictType=$column.dictType)
@@ -82,6 +108,9 @@
         // 列表的数据
         list: [],
 #if ($table.templateType == 11)
+        #if ($deleteBatchEnable)
+        checkedIds: [],
+        #end
         // 列表的总页数
         total: 0,
         // 查询参数
@@ -135,12 +164,27 @@
           this.loading = false;
         }
       },
-      /** 搜索按钮操作 */
-      handleQuery() {
-        this.queryParams.pageNo = 1;
-        this.getList();
-      },
+      #if ($table.templateType == 11 && $deleteBatchEnable)
+        /** 批量删除${table.classComment} */
+        async handleDeleteBatch() {
+          await this.#[[$modal]]#.confirm('是否确认删除?')
+          try {
+            await ${simpleClassName}Api.delete${subSimpleClassName}List(this.checkedIds);
+            await this.getList();
+            this.#[[$modal]]#.msgSuccess("删除成功");
+          } catch {}
+        },
+        handleRowCheckboxChange(records) {
+          this.checkedIds = records.map((item) => item.id);
+        },
+        #end
+
 #if ($table.templateType == 11)
+        /** 搜索按钮操作 */
+        handleQuery() {
+          this.queryParams.pageNo = 1;
+          this.getList();
+        },
       /** 添加/修改操作 */
       openForm(id) {
         if (!this.${subJoinColumn.javaField}) {

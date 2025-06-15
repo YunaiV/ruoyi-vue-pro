@@ -54,7 +54,7 @@ public class SocialUserServiceImpl implements SocialUserService {
             return Collections.emptyList();
         }
         // 获得社交用户
-        return socialUserMapper.selectBatchIds(convertSet(socialUserBinds, SocialUserBindDO::getSocialUserId));
+        return socialUserMapper.selectByIds(convertSet(socialUserBinds, SocialUserBindDO::getSocialUserId));
     }
 
     @Override

@@ -55,7 +55,7 @@ public class Demo01ContactServiceImpl implements Demo01ContactService {
     }
 
     @Override
-    public void deleteDemo0iContactListByIds(List<Long> ids) {
+    public void deleteDemo0iContactList(List<Long> ids) {
         // 校验存在
         validateDemo01ContactExists(ids);
         // 删除

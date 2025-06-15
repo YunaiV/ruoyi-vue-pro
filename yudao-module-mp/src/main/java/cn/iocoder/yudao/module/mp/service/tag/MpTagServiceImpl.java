@@ -157,7 +157,7 @@ public class MpTagServiceImpl implements MpTagService {
         });
         // 情况三，部分标签已经不存在了，删除
         if (CollUtil.isNotEmpty(tagMap)) {
-            mpTagMapper.deleteBatchIds(convertList(tagMap.values(), MpTagDO::getId));
+            mpTagMapper.deleteByIds(convertList(tagMap.values(), MpTagDO::getId));
         }
     }
 

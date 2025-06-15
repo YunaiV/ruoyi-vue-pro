@@ -204,7 +204,7 @@ public class CodegenServiceImpl implements CodegenService {
         codegenColumnMapper.insertBatch(columns);
         // 4.2 删除不存在的字段
         if (CollUtil.isNotEmpty(deleteColumnIds)) {
-            codegenColumnMapper.deleteBatchIds(deleteColumnIds);
+            codegenColumnMapper.deleteByIds(deleteColumnIds);
         }
     }
 
@@ -220,6 +220,15 @@ public class CodegenServiceImpl implements CodegenService {
         codegenTableMapper.deleteById(tableId);
         // 删除 column 字段定义
         codegenColumnMapper.deleteListByTableId(tableId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteCodegenList(List<Long> tableIds) {
+        // 批量删除 table 表定义
+        codegenTableMapper.deleteByIds(tableIds);
+        // 批量删除 column 字段定义
+        codegenColumnMapper.deleteListByTableId(tableIds);
     }
 
     @Override

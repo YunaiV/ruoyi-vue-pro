@@ -19,7 +19,7 @@ import { $t } from '#/locales';
 import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 
 #if ($table.templateType == 11) ## erp
-import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}ListByIds,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${table.businessName}';
+import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}List,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${table.businessName}';
 import { use${subSimpleClassName}GridFormSchema, use${subSimpleClassName}GridColumns } from '../data';
 import { isEmpty } from '@vben/utils';
 #else
@@ -81,7 +81,7 @@ async function handleDeleteBatch() {
     key: 'action_key_msg',
   });
   try {
-    await delete${subSimpleClassName}ListByIds(deleteIds.value);
+    await delete${subSimpleClassName}List(checkedIds.value);
     message.success({
       content: $t('ui.actionMessage.deleteSuccess', [row.id]),
       key: 'action_key_msg',
@@ -92,13 +92,13 @@ async function handleDeleteBatch() {
   }
 }
 
-const deleteIds = ref<number[]>([]) // 待删除${subTable.classComment} ID
-function setDeleteIds({
+const checkedIds = ref<number[]>([])
+function handleRowCheckboxChange({
   records,
 }: {
   records: ${simpleClassName}Api.${subSimpleClassName}[];
 }) {
-  deleteIds.value = records.map((item) => item.id);
+  checkedIds.value = records.map((item) => item.id);
 }
 #end
 
@@ -151,8 +151,8 @@ const [Grid, gridApi] = useVbenVxeGrid({
   } as VxeTableGridOptions<${simpleClassName}Api.${subSimpleClassName}>,
   #if (${table.templateType} == 11 && $deleteBatchEnable)
   gridEvents:{
-    checkboxAll: setDeleteIds,
-    checkboxChange: setDeleteIds,
+    checkboxAll: handleRowCheckboxChange,
+    checkboxChange: handleRowCheckboxChange,
   }
   #end
 });
@@ -204,7 +204,7 @@ watch(
                 type: 'primary',
                 danger: true,
                 icon: ACTION_ICON.DELETE,
-                disabled: isEmpty(deleteIds),
+                disabled: isEmpty(checkedIds),
                 auth: ['${table.moduleName}:${simpleClassName_strikeCase}:delete'],
                 onClick: handleDeleteBatch,
               },

@@ -232,7 +232,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
             purchaseInItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            purchaseInItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpPurchaseInItemDO::getId));
+            purchaseInItemMapper.deleteByIds(convertList(diffList.get(2), ErpPurchaseInItemDO::getId));
         }
     }
 
@@ -240,7 +240,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     @Transactional(rollbackFor = Exception.class)
     public void deletePurchaseIn(List<Long> ids) {
         // 1. 校验不处于已审批
-        List<ErpPurchaseInDO> purchaseIns = purchaseInMapper.selectBatchIds(ids);
+        List<ErpPurchaseInDO> purchaseIns = purchaseInMapper.selectByIds(ids);
         if (CollUtil.isEmpty(purchaseIns)) {
             return;
         }

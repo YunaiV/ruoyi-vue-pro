@@ -68,6 +68,7 @@ import java.util.Objects;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.UTC_MS_WITH_XXX_OFFSET_FORMATTER;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.toEpochSecond;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static java.util.Collections.singletonList;
@@ -262,9 +263,9 @@ public class SocialClientServiceImpl implements SocialClientService {
     public WxMaPhoneNumberInfo getWxMaPhoneNumberInfo(Integer userType, String phoneCode) {
         WxMaService service = getWxMaService(userType);
         try {
-            return service.getUserService().getPhoneNoInfo(phoneCode);
+            return service.getUserService().getPhoneNumber(phoneCode);
         } catch (WxErrorException e) {
-            log.error("[getPhoneNoInfo][userType({}) phoneCode({}) 获得手机号失败]", userType, phoneCode, e);
+            log.error("[getPhoneNumber][userType({}) phoneCode({}) 获得手机号失败]", userType, phoneCode, e);
             throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_PHONE_CODE_ERROR);
         }
     }
@@ -379,7 +380,7 @@ public class SocialClientServiceImpl implements SocialClientService {
         WxMaService service = getWxMaService(userType);
         WxMaOrderShippingInfoNotifyConfirmRequest request = WxMaOrderShippingInfoNotifyConfirmRequest.builder()
                 .transactionId(reqDTO.getTransactionId())
-                .receivedTime(LocalDateTimeUtil.toEpochMilli(reqDTO.getReceivedTime()))
+                .receivedTime(toEpochSecond(reqDTO.getReceivedTime()))
                 .build();
         try {
             WxMaOrderShippingInfoBaseResponse response = service.getWxMaOrderShippingService().notifyConfirmReceive(request);
@@ -466,6 +467,11 @@ public class SocialClientServiceImpl implements SocialClientService {
         socialClientMapper.deleteById(id);
     }
 
+    @Override
+    public void deleteSocialClientList(List<Long> ids) {
+        socialClientMapper.deleteByIds(ids);
+    }
+
     private void validateSocialClientExists(Long id) {
         if (socialClientMapper.selectById(id) == null) {
             throw exception(SOCIAL_CLIENT_NOT_EXISTS);
@@ -474,7 +480,6 @@ public class SocialClientServiceImpl implements SocialClientService {
 
     /**
      * 校验社交应用是否重复，需要保证 userType + socialType 唯一
-     *
      * 原因是，不同端（userType）选择某个社交登录（socialType）时，需要通过 {@link #buildAuthRequest(Integer, Integer)} 构建对应的请求
      *
      * @param id         编号

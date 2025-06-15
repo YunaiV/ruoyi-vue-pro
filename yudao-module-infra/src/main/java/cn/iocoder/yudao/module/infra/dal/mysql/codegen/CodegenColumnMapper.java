@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper
@@ -17,8 +18,12 @@ public interface CodegenColumnMapper extends BaseMapperX<CodegenColumnDO> {
     }
 
     default void deleteListByTableId(Long tableId) {
+        delete(CodegenColumnDO::getTableId, tableId);
+    }
+
+    default void deleteListByTableId(Collection<Long> tableIds) {
         delete(new LambdaQueryWrapperX<CodegenColumnDO>()
-                .eq(CodegenColumnDO::getTableId, tableId));
+               .in(CodegenColumnDO::getTableId, tableIds));
     }
 
 }

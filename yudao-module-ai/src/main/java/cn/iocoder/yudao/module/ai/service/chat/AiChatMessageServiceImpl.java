@@ -339,7 +339,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
             throw exception(CHAT_MESSAGE_NOT_EXIST);
         }
         // 2. 执行删除
-        chatMessageMapper.deleteBatchIds(convertList(messages, AiChatMessageDO::getId));
+        chatMessageMapper.deleteByIds(convertList(messages, AiChatMessageDO::getId));
     }
 
     @Override

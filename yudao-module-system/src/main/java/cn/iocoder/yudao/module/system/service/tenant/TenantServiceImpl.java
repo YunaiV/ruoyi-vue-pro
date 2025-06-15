@@ -31,13 +31,13 @@ import cn.iocoder.yudao.module.system.service.tenant.handler.TenantInfoHandler;
 import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -223,6 +223,15 @@ public class TenantServiceImpl implements TenantService {
         validateUpdateTenant(id);
         // 删除
         tenantMapper.deleteById(id);
+    }
+
+    @Override
+    public void deleteTenantList(List<Long> ids) {
+        // 1. 校验存在
+        ids.forEach(this::validateUpdateTenant);
+
+        // 2. 批量删除
+        tenantMapper.deleteByIds(ids);
     }
 
     private TenantDO validateUpdateTenant(Long id) {

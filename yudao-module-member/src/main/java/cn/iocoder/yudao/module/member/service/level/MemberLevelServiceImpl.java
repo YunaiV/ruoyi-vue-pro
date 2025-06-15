@@ -169,7 +169,7 @@ public class MemberLevelServiceImpl implements MemberLevelService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return memberLevelMapper.selectBatchIds(ids);
+        return memberLevelMapper.selectByIds(ids);
     }
 
     @Override
