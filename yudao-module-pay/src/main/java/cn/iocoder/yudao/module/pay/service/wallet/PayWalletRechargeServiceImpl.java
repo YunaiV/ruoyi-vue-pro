@@ -4,6 +4,7 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.pay.api.order.dto.PayOrderCreateReqDTO;
@@ -22,6 +23,7 @@ import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.system.api.social.SocialClientApi;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxaOrderUploadShippingInfoReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxaSubscribeMessageSendReqDTO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -167,6 +169,18 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
                 .addMessage("amount2", fenToYuanStr(walletRecharge.getTotalPrice())) // 充值金额
                 .addMessage("time3", LocalDateTimeUtil.formatNormal(walletRecharge.getCreateTime())) // 充值时间
                 .addMessage("phrase4", "充值成功")); // 充值状态
+        // 3. 调用接口上传虚拟物品发货信息
+        PayOrderDO payOrder = payOrderService.getOrder(payOrderId);
+        SocialWxaOrderUploadShippingInfoReqDTO reqDTO = new SocialWxaOrderUploadShippingInfoReqDTO()
+                .setTransactionId(payOrder.getChannelOrderNo())
+                .setOpenid(payOrder.getChannelUserId())
+                .setItemDesc(payOrder.getSubject())
+                .setLogisticsType(SocialWxaOrderUploadShippingInfoReqDTO.LOGISTICS_TYPE_VIRTUAL); // 虚拟物品发货类型
+        try {
+            socialClientApi.uploadWxaOrderShippingInfo(UserTypeEnum.MEMBER.getValue(), reqDTO);
+        } catch (Exception ex) {
+            log.error("[sendWalletRechargerPaidMessage][订单({}) 上传订单物流信息到微信小程序失败]", payOrder, ex);
+        }
     }
 
     @Override
