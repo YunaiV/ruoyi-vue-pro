@@ -1,24 +1,27 @@
 package cn.iocoder.yudao.module.system.controller.admin.sms;
 
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.*;
-import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
-import cn.iocoder.yudao.module.system.service.sms.SmsTemplateService;
-import cn.iocoder.yudao.module.system.service.sms.SmsSendService;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplatePageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateSaveReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.sms.vo.template.SmsTemplateSendReqVO;
+import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsTemplateDO;
+import cn.iocoder.yudao.module.system.service.sms.SmsSendService;
+import cn.iocoder.yudao.module.system.service.sms.SmsTemplateService;
 import io.swagger.v3.oas.annotations.Operation;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -56,6 +59,15 @@ public class SmsTemplateController {
     @PreAuthorize("@ss.hasPermission('system:sms-template:delete')")
     public CommonResult<Boolean> deleteSmsTemplate(@RequestParam("id") Long id) {
         smsTemplateService.deleteSmsTemplate(id);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete-list")
+    @Parameter(name = "ids", description = "编号列表", required = true)
+    @Operation(summary = "批量删除短信模板")
+    @PreAuthorize("@ss.hasPermission('system:sms-template:delete')")
+    public CommonResult<Boolean> deleteSmsTemplateList(@RequestParam("ids") List<Long> ids) {
+        smsTemplateService.deleteSmsTemplateList(ids);
         return success(true);
     }
 

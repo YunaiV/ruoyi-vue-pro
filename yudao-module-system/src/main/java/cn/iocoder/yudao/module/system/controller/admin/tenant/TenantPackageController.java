@@ -4,18 +4,21 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.*;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackagePageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackageRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackageSaveReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.tenant.vo.packages.TenantPackageSimpleRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantPackageDO;
 import cn.iocoder.yudao.module.system.service.tenant.TenantPackageService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -50,6 +53,15 @@ public class TenantPackageController {
     @PreAuthorize("@ss.hasPermission('system:tenant-package:delete')")
     public CommonResult<Boolean> deleteTenantPackage(@RequestParam("id") Long id) {
         tenantPackageService.deleteTenantPackage(id);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete-list")
+    @Parameter(name = "ids", description = "编号列表", required = true)
+    @Operation(summary = "批量删除租户套餐")
+    @PreAuthorize("@ss.hasPermission('system:tenant-package:delete')")
+    public CommonResult<Boolean> deleteTenantPackageList(@RequestParam("ids") List<Long> ids) {
+        tenantPackageService.deleteTenantPackageList(ids);
         return success(true);
     }
 

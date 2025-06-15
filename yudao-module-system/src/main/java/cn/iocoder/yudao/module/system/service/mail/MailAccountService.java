@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
-
 import jakarta.validation.Valid;
+
 import java.util.List;
 
 /**
@@ -37,6 +37,13 @@ public interface MailAccountService {
      * @param id 编号
      */
     void deleteMailAccount(Long id);
+
+    /**
+     * 批量删除邮箱账号
+     *
+     * @param ids 编号列表
+     */
+    void deleteMailAccountList(List<Long> ids);
 
     /**
      * 获取邮箱账号信息
