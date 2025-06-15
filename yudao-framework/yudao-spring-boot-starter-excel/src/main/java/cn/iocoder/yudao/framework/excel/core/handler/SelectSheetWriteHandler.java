@@ -10,6 +10,8 @@ import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.dict.core.DictFrameworkUtils;
 import cn.iocoder.yudao.framework.excel.core.annotations.ExcelColumnSelect;
 import cn.iocoder.yudao.framework.excel.core.function.ExcelColumnSelectFunction;
+import com.alibaba.excel.annotation.ExcelIgnore;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.write.handler.SheetWriteHandler;
 import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
@@ -20,6 +22,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +59,17 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
     public SelectSheetWriteHandler(Class<?> head) {
         // 解析下拉数据
         int colIndex = 0;
+        boolean ignoreUnannotated = head.isAnnotationPresent(ExcelIgnoreUnannotated.class);
         for (Field field : head.getDeclaredFields()) {
+            // 忽略 static final 或 transient 的字段
+            if(isStaticFinalOrTransient(field) ) {
+                continue;
+            }
+            // 忽略的字段跳过
+            if((ignoreUnannotated && !field.isAnnotationPresent(ExcelProperty.class))
+                    || field.isAnnotationPresent(ExcelIgnore.class)){
+                continue;
+            }
             if (field.isAnnotationPresent(ExcelColumnSelect.class)) {
                 ExcelProperty excelProperty = field.getAnnotation(ExcelProperty.class);
                 if (excelProperty != null && excelProperty.index() != -1) {
@@ -67,6 +80,18 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
             colIndex++;
         }
     }
+
+    /**
+     * 判断字段是否是静态的、最终的、 transient 的
+     * EasyExcel 默认是忽略 static final 或 transient 的字段，所以需要判断
+     * @param field 字段
+     * @return 是否是静态的、最终的、 transient 的
+     */
+    private boolean isStaticFinalOrTransient(Field field) {
+       return (Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers()))
+                        || Modifier.isTransient(field.getModifiers());
+    }
+
 
     /**
      * 获得下拉数据，并添加到 {@link #selectMap} 中
