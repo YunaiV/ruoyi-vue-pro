@@ -1,16 +1,20 @@
 package cn.iocoder.yudao.module.statistics.dal.mysql.product;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.SortablePageParam;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.module.statistics.controller.admin.product.vo.ProductStatisticsReqVO;
 import cn.iocoder.yudao.module.statistics.controller.admin.product.vo.ProductStatisticsRespVO;
 import cn.iocoder.yudao.module.statistics.dal.dataobject.product.ProductStatisticsDO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.dromara.hutool.core.func.LambdaUtil;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -49,16 +53,31 @@ public interface ProductStatisticsMapper extends BaseMapperX<ProductStatisticsDO
     private static MPJLambdaWrapperX<ProductStatisticsDO> buildWrapper(ProductStatisticsReqVO reqVO) {
         return new MPJLambdaWrapperX<ProductStatisticsDO>()
                 .betweenIfPresent(ProductStatisticsDO::getTime, reqVO.getTimes())
-                .selectSum(ProductStatisticsDO::getBrowseCount)
-                .selectSum(ProductStatisticsDO::getBrowseUserCount)
-                .selectSum(ProductStatisticsDO::getFavoriteCount)
-                .selectSum(ProductStatisticsDO::getCartCount)
-                .selectSum(ProductStatisticsDO::getOrderCount)
-                .selectSum(ProductStatisticsDO::getOrderPayCount)
-                .selectSum(ProductStatisticsDO::getOrderPayPrice)
-                .selectSum(ProductStatisticsDO::getAfterSaleCount)
-                .selectSum(ProductStatisticsDO::getAfterSaleRefundPrice)
-                .selectAvg(ProductStatisticsDO::getBrowseConvertPercent);
+                .selectSum(ProductStatisticsDO::getBrowseCount,toUnderlineCase(ProductStatisticsDO::getBrowseCount))
+                .selectSum(ProductStatisticsDO::getBrowseUserCount,toUnderlineCase(ProductStatisticsDO::getBrowseUserCount))
+                .selectSum(ProductStatisticsDO::getFavoriteCount,toUnderlineCase(ProductStatisticsDO::getFavoriteCount))
+                .selectSum(ProductStatisticsDO::getCartCount,toUnderlineCase(ProductStatisticsDO::getCartCount))
+                .selectSum(ProductStatisticsDO::getOrderCount,toUnderlineCase(ProductStatisticsDO::getOrderCount))
+                .selectSum(ProductStatisticsDO::getOrderPayCount,toUnderlineCase(ProductStatisticsDO::getOrderPayCount))
+                .selectSum(ProductStatisticsDO::getOrderPayPrice,toUnderlineCase(ProductStatisticsDO::getOrderPayPrice))
+                .selectSum(ProductStatisticsDO::getAfterSaleCount,toUnderlineCase(ProductStatisticsDO::getAfterSaleCount))
+                .selectSum(ProductStatisticsDO::getAfterSaleRefundPrice,toUnderlineCase(ProductStatisticsDO::getAfterSaleRefundPrice))
+                .selectAvg(ProductStatisticsDO::getBrowseConvertPercent,toUnderlineCase(ProductStatisticsDO::getBrowseConvertPercent));
+    }
+
+    /**
+     * 将驼峰命名转换为下划线命名
+     *
+     * @param func 字段名函数(驼峰命名)
+     * @return 字段名(下划线命名)
+     * @param <T> 泛型
+     * <p>
+     * fix:排序时排序字段被 {@link MyBatisUtils#buildPage} 由驼峰命名被转为下划线命名，
+     *     因此聚合函数的别名也做统一，统一为下划线命名，解决排序时找不到字段的问题。
+     */
+    private static <T> String toUnderlineCase(SFunction<T, ?> func) {
+        String fieldName = LambdaUtil.getFieldName(func);
+        return StrUtil.toUnderlineCase(fieldName);
     }
 
     /**
