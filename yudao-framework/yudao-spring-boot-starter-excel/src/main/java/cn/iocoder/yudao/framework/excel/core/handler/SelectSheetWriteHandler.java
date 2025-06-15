@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.excel.core.handler;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.poi.excel.ExcelUtil;
@@ -61,15 +62,18 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
         int colIndex = 0;
         boolean ignoreUnannotated = head.isAnnotationPresent(ExcelIgnoreUnannotated.class);
         for (Field field : head.getDeclaredFields()) {
-            // 忽略 static final 或 transient 的字段
-            if(isStaticFinalOrTransient(field) ) {
+            // 关联 https://github.com/YunaiV/ruoyi-vue-pro/pull/853
+            // 1.1 忽略 static final 或 transient 的字段
+            if (isStaticFinalOrTransient(field) ) {
                 continue;
             }
-            // 忽略的字段跳过
-            if((ignoreUnannotated && !field.isAnnotationPresent(ExcelProperty.class))
-                    || field.isAnnotationPresent(ExcelIgnore.class)){
+            // 1.2 忽略的字段跳过
+            if ((ignoreUnannotated && !field.isAnnotationPresent(ExcelProperty.class))
+                    || field.isAnnotationPresent(ExcelIgnore.class)) {
                 continue;
             }
+
+            // 2. 核心：处理有 ExcelColumnSelect 注解的字段
             if (field.isAnnotationPresent(ExcelColumnSelect.class)) {
                 ExcelProperty excelProperty = field.getAnnotation(ExcelProperty.class);
                 if (excelProperty != null && excelProperty.index() != -1) {
@@ -83,13 +87,14 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
 
     /**
      * 判断字段是否是静态的、最终的、 transient 的
-     * EasyExcel 默认是忽略 static final 或 transient 的字段，所以需要判断
+     * 原因：EasyExcel 默认是忽略 static final 或 transient 的字段，所以需要判断
+     *
      * @param field 字段
-     * @return 是否是静态的、最终的、 transient 的
+     * @return 是否是静态的、最终的、transient 的
      */
     private boolean isStaticFinalOrTransient(Field field) {
-       return (Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers()))
-                        || Modifier.isTransient(field.getModifiers());
+        return (Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers()))
+                || Modifier.isTransient(field.getModifiers());
     }
 
 
