@@ -17,6 +17,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - 文件配置")
@@ -57,6 +59,15 @@ public class FileConfigController {
     @PreAuthorize("@ss.hasPermission('infra:file-config:delete')")
     public CommonResult<Boolean> deleteFileConfig(@RequestParam("id") Long id) {
         fileConfigService.deleteFileConfig(id);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete-list")
+    @Operation(summary = "批量删除文件配置")
+    @Parameter(name = "ids", description = "编号列表", required = true)
+    @PreAuthorize("@ss.hasPermission('infra:file-config:delete')")
+    public CommonResult<Boolean> deleteFileConfigList(@RequestParam("ids") List<Long> ids) {
+        fileConfigService.deleteFileConfigList(ids);
         return success(true);
     }
 

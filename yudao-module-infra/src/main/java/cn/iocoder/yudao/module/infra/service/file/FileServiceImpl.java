@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.infra.service.file;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
@@ -19,6 +20,10 @@ import com.google.common.annotations.VisibleForTesting;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static cn.hutool.core.date.DatePattern.PURE_DATE_PATTERN;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -154,6 +159,36 @@ public class FileServiceImpl implements FileService {
 
         // 删除记录
         fileMapper.deleteById(id);
+    }
+
+    @Override
+    public void deleteFileList(List<Long> ids) throws Exception {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+
+        // 校验存在
+        List<FileDO> files = fileMapper.selectByIds(ids);
+        if (files.size() != ids.size()) {
+            throw exception(FILE_NOT_EXISTS);
+        }
+
+        // 按照配置分组，批量删除
+        Map<Long, List<FileDO>> configFiles = files.stream()
+                .collect(Collectors.groupingBy(FileDO::getConfigId));
+        for (Map.Entry<Long, List<FileDO>> entry : configFiles.entrySet()) {
+            // 获取客户端
+            FileClient client = fileConfigService.getFileClient(entry.getKey());
+            Assert.notNull(client, "客户端({}) 不能为空", entry.getKey());
+
+            // 批量删除文件
+            for (FileDO file : entry.getValue()) {
+                client.delete(file.getPath());
+            }
+        }
+
+        // 删除记录
+        fileMapper.deleteByIds(ids);
     }
 
     private FileDO validateFileExists(Long id) {

@@ -223,6 +223,25 @@ public class CodegenServiceImpl implements CodegenService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteCodegenList(List<Long> tableIds) {
+        if (CollUtil.isEmpty(tableIds)) {
+            return;
+        }
+
+        // 校验是否都存在
+        List<CodegenTableDO> tables = codegenTableMapper.selectByIds(tableIds);
+        if (tables.size() != tableIds.size()) {
+            throw exception(CODEGEN_TABLE_NOT_EXISTS);
+        }
+
+        // 批量删除 table 表定义
+        codegenTableMapper.deleteByIds(tableIds);
+        // 批量删除 column 字段定义
+        tableIds.forEach(tableId -> codegenColumnMapper.deleteListByTableId(tableId));
+    }
+
+    @Override
     public List<CodegenTableDO> getCodegenTableList(Long dataSourceConfigId) {
         return codegenTableMapper.selectListByDataSourceConfigId(dataSourceConfigId);
     }

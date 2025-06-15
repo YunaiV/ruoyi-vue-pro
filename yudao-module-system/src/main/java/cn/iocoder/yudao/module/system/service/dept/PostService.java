@@ -39,6 +39,13 @@ public interface PostService {
     void deletePost(Long id);
 
     /**
+     * 批量删除岗位信息
+     *
+     * @param ids 岗位编号数组
+     */
+    void deletePostList(List<Long> ids);
+
+    /**
      * 获得岗位列表
      *
      * @param ids 岗位编号数组
