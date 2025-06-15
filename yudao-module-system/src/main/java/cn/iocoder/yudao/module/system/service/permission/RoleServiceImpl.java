@@ -125,10 +125,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteRoleList(List<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-        // 1. 校验是否可以更新
+        // 1. 校验是否可以删除
         ids.forEach(this::validateRoleForUpdate);
 
         // 2.1 标记删除

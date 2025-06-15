@@ -172,17 +172,8 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteJobList(List<Long> ids) throws SchedulerException {
-        if (ids == null || ids.isEmpty()) {
-            return;
-        }
-
-        // 校验存在
-        List<JobDO> jobs = jobMapper.selectByIds(ids);
-        if (jobs.size() != ids.size()) {
-            throw exception(JOB_NOT_EXISTS);
-        }
-
         // 批量删除
+        List<JobDO> jobs = jobMapper.selectByIds(ids);
         jobMapper.deleteByIds(ids);
 
         // 删除 Job 到 Quartz 中

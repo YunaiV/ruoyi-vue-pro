@@ -64,7 +64,6 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void deletePostList(List<Long> ids) {
-        // 删除岗位
         postMapper.deleteByIds(ids);
     }
 

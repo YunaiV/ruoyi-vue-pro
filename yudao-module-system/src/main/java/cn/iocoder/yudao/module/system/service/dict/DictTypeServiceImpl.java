@@ -89,21 +89,15 @@ public class DictTypeServiceImpl implements DictTypeService {
 
     @Override
     public void deleteDictTypeList(List<Long> ids) {
-        if (ids == null || ids.isEmpty()) {
-            return;
-        }
-        // 校验是否存在
-        ids.forEach(this::validateDictTypeExists);
-
-        // 校验是否有字典数据
+        // 1. 校验是否有字典数据
         List<DictTypeDO> dictTypes = dictTypeMapper.selectByIds(ids);
-        for (DictTypeDO dictType : dictTypes) {
+        dictTypes.forEach(dictType -> {
             if (dictDataService.getDictDataCountByDictType(dictType.getType()) > 0) {
                 throw exception(DICT_TYPE_HAS_CHILDREN);
             }
-        }
+        });
 
-        // 批量删除字典类型
+        // 2. 批量删除字典类型
         LocalDateTime now = LocalDateTime.now();
         ids.forEach(id -> dictTypeMapper.updateToDelete(id, now));
     }

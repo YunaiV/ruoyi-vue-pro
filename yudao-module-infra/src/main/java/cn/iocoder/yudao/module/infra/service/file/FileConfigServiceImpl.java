@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.infra.service.file;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -138,17 +137,8 @@ public class FileConfigServiceImpl implements FileConfigService {
 
     @Override
     public void deleteFileConfigList(List<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-
-        // 校验存在
-        List<FileConfigDO> configs = fileConfigMapper.selectByIds(ids);
-        if (configs.size() != ids.size()) {
-            throw exception(FILE_CONFIG_NOT_EXISTS);
-        }
-
         // 校验是否有主配置
+        List<FileConfigDO> configs = fileConfigMapper.selectByIds(ids);
         for (FileConfigDO config : configs) {
             if (Boolean.TRUE.equals(config.getMaster())) {
                 throw exception(FILE_CONFIG_DELETE_FAIL_MASTER);
@@ -159,9 +149,7 @@ public class FileConfigServiceImpl implements FileConfigService {
         fileConfigMapper.deleteByIds(ids);
 
         // 清空缓存
-        for (Long id : ids) {
-            clearCache(id, null);
-        }
+        ids.forEach(id -> clearCache(id, null));
     }
 
     /**
