@@ -20,6 +20,8 @@ import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static cn.hutool.core.date.DatePattern.PURE_DATE_PATTERN;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_NOT_EXISTS;
@@ -154,6 +156,23 @@ public class FileServiceImpl implements FileService {
 
         // 删除记录
         fileMapper.deleteById(id);
+    }
+
+    @Override
+    @SneakyThrows
+    public void deleteFileList(List<Long> ids) {
+        // 删除文件
+        List<FileDO> files = fileMapper.selectByIds(ids);
+        for (FileDO file : files) {
+            // 获取客户端
+            FileClient client = fileConfigService.getFileClient(file.getConfigId());
+            Assert.notNull(client, "客户端({}) 不能为空", file.getPath());
+            // 删除文件
+            client.delete(file.getPath());
+        }
+
+        // 删除记录
+        fileMapper.deleteByIds(ids);
     }
 
     private FileDO validateFileExists(Long id) {

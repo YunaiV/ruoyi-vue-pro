@@ -12,11 +12,11 @@ import cn.iocoder.yudao.module.system.service.sms.SmsChannelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 import java.util.Comparator;
 import java.util.List;
 
@@ -51,6 +51,15 @@ public class SmsChannelController {
     @PreAuthorize("@ss.hasPermission('system:sms-channel:delete')")
     public CommonResult<Boolean> deleteSmsChannel(@RequestParam("id") Long id) {
         smsChannelService.deleteSmsChannel(id);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete-list")
+    @Parameter(name = "ids", description = "编号列表", required = true)
+    @Operation(summary = "批量删除短信渠道")
+    @PreAuthorize("@ss.hasPermission('system:sms-channel:delete')")
+    public CommonResult<Boolean> deleteSmsChannelList(@RequestParam("ids") List<Long> ids) {
+        smsChannelService.deleteSmsChannelList(ids);
         return success(true);
     }
 

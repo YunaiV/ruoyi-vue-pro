@@ -12,11 +12,11 @@ import cn.iocoder.yudao.module.system.dal.dataobject.tenant.TenantPackageDO;
 import cn.iocoder.yudao.module.system.dal.mysql.tenant.TenantPackageMapper;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -74,6 +74,19 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         validateTenantUsed(id);
         // 删除
         tenantPackageMapper.deleteById(id);
+    }
+
+    @Override
+    public void deleteTenantPackageList(List<Long> ids) {
+        // 1. 校验是否有租户正在使用该套餐
+        for (Long id : ids) {
+            if (tenantService.getTenantCountByPackageId(id) > 0) {
+                throw exception(TENANT_PACKAGE_USED);
+            }
+        }
+
+        // 2. 批量删除
+        tenantPackageMapper.deleteByIds(ids);
     }
 
     private TenantPackageDO validateTenantPackageExists(Long id) {

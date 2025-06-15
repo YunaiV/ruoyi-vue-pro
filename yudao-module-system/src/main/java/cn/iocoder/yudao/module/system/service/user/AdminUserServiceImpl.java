@@ -249,6 +249,19 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteUserList(List<Long> ids) {
+        // 1. 批量删除用户
+        userMapper.deleteByIds(ids);
+
+        // 2. 批量删除用户关联数据
+        ids.forEach(id -> {
+            permissionService.processUserDeleted(id);
+            userPostMapper.deleteByUserId(id);
+        });
+    }
+
+    @Override
     public AdminUserDO getUserByUsername(String username) {
         return userMapper.selectByUsername(username);
     }

@@ -63,6 +63,11 @@ public class DataSourceConfigServiceImpl implements DataSourceConfigService {
         dataSourceConfigMapper.deleteById(id);
     }
 
+    @Override
+    public void deleteDataSourceConfigList(List<Long> ids) {
+        dataSourceConfigMapper.deleteByIds(ids);
+    }
+
     private void validateDataSourceConfigExists(Long id) {
         if (dataSourceConfigMapper.selectById(id) == null) {
             throw exception(DATA_SOURCE_CONFIG_NOT_EXISTS);

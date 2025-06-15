@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.system.service.permission;
 
-import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuSaveVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.permission.vo.menu.MenuSaveVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO;
 
 import java.util.Collection;
@@ -35,6 +35,13 @@ public interface MenuService {
      * @param id 菜单编号
      */
     void deleteMenu(Long id);
+
+    /**
+     * 批量删除菜单
+     *
+     * @param ids 菜单编号数组
+     */
+    void deleteMenuList(List<Long> ids);
 
     /**
      * 获得所有菜单列表

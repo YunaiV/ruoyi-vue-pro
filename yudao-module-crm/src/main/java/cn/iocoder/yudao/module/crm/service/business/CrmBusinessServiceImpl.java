@@ -147,7 +147,7 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
-    @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_FOLLOW_UP_SUB_TYPE, bizNo = "{{#id}",
+    @LogRecord(type = CRM_BUSINESS_TYPE, subType = CRM_BUSINESS_FOLLOW_UP_SUB_TYPE, bizNo = "{{#id}}",
             success = CRM_BUSINESS_FOLLOW_UP_SUCCESS)
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_BUSINESS, bizId = "#id", level = CrmPermissionLevelEnum.WRITE)
     public void updateBusinessFollowUp(Long id, LocalDateTime contactNextTime, String contactLastContent) {

@@ -7,13 +7,13 @@ import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccou
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailAccountMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -67,6 +67,21 @@ public class MailAccountServiceImpl implements MailAccountService {
 
         // 删除
         mailAccountMapper.deleteById(id);
+    }
+
+    @Override
+    @CacheEvict(value = RedisKeyConstants.MAIL_ACCOUNT,
+            allEntries = true) // allEntries 清空所有缓存，因为 Spring Cache 不支持按照 ids 批量删除
+    public void deleteMailAccountList(List<Long> ids) {
+        // 1. 校验是否存在关联模版
+        for (Long id : ids) {
+            if (mailTemplateService.getMailTemplateCountByAccountId(id) > 0) {
+                throw exception(MAIL_ACCOUNT_RELATE_TEMPLATE_EXISTS);
+            }
+        }
+
+        // 2. 批量删除
+        mailAccountMapper.deleteByIds(ids);
     }
 
     private void validateMailAccountExists(Long id) {

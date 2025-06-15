@@ -81,6 +81,16 @@ public class JobController {
         return success(true);
     }
 
+    @DeleteMapping("/delete-list")
+    @Operation(summary = "批量删除定时任务")
+    @Parameter(name = "ids", description = "编号列表", required = true)
+    @PreAuthorize("@ss.hasPermission('infra:job:delete')")
+    public CommonResult<Boolean> deleteJobList(@RequestParam("ids") List<Long> ids)
+            throws SchedulerException {
+        jobService.deleteJobList(ids);
+        return success(true);
+    }
+
     @PutMapping("/trigger")
     @Operation(summary = "触发定时任务")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
