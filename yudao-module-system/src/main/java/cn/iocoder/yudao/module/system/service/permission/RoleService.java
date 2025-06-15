@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RolePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
-
 import jakarta.validation.Valid;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -39,6 +39,13 @@ public interface RoleService {
      * @param id 角色编号
      */
     void deleteRole(Long id);
+
+    /**
+     * 批量删除角色
+     *
+     * @param ids 角色编号数组
+     */
+    void deleteRoleList(List<Long> ids);
 
     /**
      * 设置角色的数据权限

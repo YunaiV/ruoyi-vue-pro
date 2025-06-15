@@ -37,6 +37,13 @@ public interface DictTypeService {
     void deleteDictType(Long id);
 
     /**
+     * 批量删除字典类型
+     *
+     * @param ids 字典类型编号列表
+     */
+    void deleteDictTypeList(List<Long> ids);
+
+    /**
      * 获得字典类型分页列表
      *
      * @param pageReqVO 分页请求

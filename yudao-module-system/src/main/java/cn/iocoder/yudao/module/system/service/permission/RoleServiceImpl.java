@@ -122,6 +122,21 @@ public class RoleServiceImpl implements RoleService {
         LogRecordContext.putVariable("role", role);
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteRoleList(List<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 1. 校验是否可以更新
+        ids.forEach(this::validateRoleForUpdate);
+
+        // 2.1 标记删除
+        roleMapper.deleteByIds(ids);
+        // 2.2 删除相关数据
+        ids.forEach(id -> permissionService.processRoleDeleted(id));
+    }
+
     /**
      * 校验角色的唯一字段是否重复
      *

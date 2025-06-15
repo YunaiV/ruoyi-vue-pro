@@ -105,6 +105,31 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = RedisKeyConstants.PERMISSION_MENU_ID_LIST, allEntries = true)
+    public void deleteMenuList(List<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 校验是否还有子菜单
+        for (Long id : ids) {
+            if (menuMapper.selectCountByParentId(id) > 0) {
+                throw exception(MENU_EXISTS_CHILDREN);
+            }
+        }
+        // 校验删除的菜单是否存在
+        List<MenuDO> menus = menuMapper.selectByIds(ids);
+        if (menus.size() != ids.size()) {
+            throw exception(MENU_NOT_EXISTS);
+        }
+
+        // 标记删除
+        menuMapper.deleteByIds(ids);
+        // 删除授予给角色的权限
+        ids.forEach(id -> permissionService.processMenuDeleted(id));
+    }
+
+    @Override
     public List<MenuDO> getMenuList() {
         return menuMapper.selectList();
     }

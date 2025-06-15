@@ -99,6 +99,18 @@ public class DictDataServiceImpl implements DictDataService {
     }
 
     @Override
+    public void deleteDictDataList(List<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 校验是否存在
+        ids.forEach(this::validateDictDataExists);
+
+        // 批量删除字典数据
+        dictDataMapper.deleteByIds(ids);
+    }
+
+    @Override
     public long getDictDataCountByDictType(String dictType) {
         return dictDataMapper.selectCountByDictType(dictType);
     }
