@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.pay.service.wallet;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
@@ -17,6 +18,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletRechargeDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletRechargePackageDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletRechargeMapper;
+import cn.iocoder.yudao.module.pay.enums.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
@@ -158,9 +160,8 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
 
     @Async
     public void sendWalletRechargerPaidMessage(Long payOrderId, PayWalletRechargeDO walletRecharge) {
-        // 1. 获得会员钱包信息
+        // 1. 构建并发送模版消息
         PayWalletDO wallet = payWalletService.getWallet(walletRecharge.getWalletId());
-        // 2. 构建并发送模版消息
         socialClientApi.sendWxaSubscribeMessage(new SocialWxaSubscribeMessageSendReqDTO()
                 .setUserId(wallet.getUserId()).setUserType(wallet.getUserType())
                 .setTemplateTitle(WXA_WALLET_RECHARGER_PAID)
@@ -169,8 +170,13 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
                 .addMessage("amount2", fenToYuanStr(walletRecharge.getTotalPrice())) // 充值金额
                 .addMessage("time3", LocalDateTimeUtil.formatNormal(walletRecharge.getCreateTime())) // 充值时间
                 .addMessage("phrase4", "充值成功")); // 充值状态
-        // 3. 调用接口上传虚拟物品发货信息
+
+        // 2. 调用接口上传虚拟物品发货信息
+        // 注意：只有微信小程序支付的订单，才需要同步
         PayOrderDO payOrder = payOrderService.getOrder(payOrderId);
+        if (ObjUtil.notEqual(payOrder.getChannelCode(), PayChannelEnum.WX_LITE.getCode())) {
+            return;
+        }
         SocialWxaOrderUploadShippingInfoReqDTO reqDTO = new SocialWxaOrderUploadShippingInfoReqDTO()
                 .setTransactionId(payOrder.getChannelOrderNo())
                 .setOpenid(payOrder.getChannelUserId())
