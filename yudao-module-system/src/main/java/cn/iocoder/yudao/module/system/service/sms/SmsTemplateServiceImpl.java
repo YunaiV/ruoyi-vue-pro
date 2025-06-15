@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReUtil;
@@ -105,24 +104,11 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
     @CacheEvict(cacheNames = RedisKeyConstants.SMS_TEMPLATE,
             allEntries = true) // allEntries 清空所有缓存，因为 id 不是直接的缓存 code，不好清理
     public void deleteSmsTemplateList(List<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-        // 校验存在
-        validateSmsTemplateListExists(ids);
-        // 批量删除
         smsTemplateMapper.deleteByIds(ids);
     }
 
     private void validateSmsTemplateExists(Long id) {
         if (smsTemplateMapper.selectById(id) == null) {
-            throw exception(SMS_TEMPLATE_NOT_EXISTS);
-        }
-    }
-
-    private void validateSmsTemplateListExists(List<Long> ids) {
-        List<SmsTemplateDO> templates = smsTemplateMapper.selectByIds(ids);
-        if (templates.size() != ids.size()) {
             throw exception(SMS_TEMPLATE_NOT_EXISTS);
         }
     }

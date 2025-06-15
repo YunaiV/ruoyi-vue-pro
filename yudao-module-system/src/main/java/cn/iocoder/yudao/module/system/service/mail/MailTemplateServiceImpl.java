@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.service.mail;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
@@ -102,28 +101,11 @@ public class MailTemplateServiceImpl implements MailTemplateService {
     @CacheEvict(cacheNames = RedisKeyConstants.MAIL_TEMPLATE,
             allEntries = true) // allEntries 清空所有缓存，因为 id 不是直接的缓存 code，不好清理
     public void deleteMailTemplateList(List<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-        // 校验存在
-        validateMailTemplatesExists(ids);
-        // 批量删除
         mailTemplateMapper.deleteByIds(ids);
     }
 
     private void validateMailTemplateExists(Long id) {
         if (mailTemplateMapper.selectById(id) == null) {
-            throw exception(MAIL_TEMPLATE_NOT_EXISTS);
-        }
-    }
-
-    private void validateMailTemplatesExists(List<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-        // 校验存在
-        List<MailTemplateDO> templates = mailTemplateMapper.selectByIds(ids);
-        if (CollUtil.isEmpty(templates) || templates.size() != ids.size()) {
             throw exception(MAIL_TEMPLATE_NOT_EXISTS);
         }
     }

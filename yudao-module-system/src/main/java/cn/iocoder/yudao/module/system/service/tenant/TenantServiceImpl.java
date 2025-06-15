@@ -227,12 +227,10 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public void deleteTenantList(List<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-        // 校验存在
-        validateUpdateTenantBatch(ids);
-        // 批量删除
+        // 1. 校验存在
+        ids.forEach(this::validateUpdateTenant);
+
+        // 2. 批量删除
         tenantMapper.deleteByIds(ids);
     }
 
@@ -246,26 +244,6 @@ public class TenantServiceImpl implements TenantService {
             throw exception(TENANT_CAN_NOT_UPDATE_SYSTEM);
         }
         return tenant;
-    }
-
-    /**
-     * 校验租户是否可以更新 - 批量
-     *
-     * @param ids 租户编号数组
-     */
-    private void validateUpdateTenantBatch(List<Long> ids) {
-        // 查询租户
-        List<TenantDO> tenants = tenantMapper.selectByIds(ids);
-        if (tenants.size() != ids.size()) {
-            throw exception(TENANT_NOT_EXISTS);
-        }
-
-        // 校验是否有系统内置租户
-        tenants.forEach(tenant -> {
-            if (isSystemTenant(tenant)) {
-                throw exception(TENANT_CAN_NOT_UPDATE_SYSTEM);
-            }
-        });
     }
 
     @Override

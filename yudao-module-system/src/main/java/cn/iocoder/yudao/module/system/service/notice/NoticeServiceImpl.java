@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.service.notice;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticePageReqVO;
@@ -53,9 +52,6 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     public void deleteNoticeList(List<Long> ids) {
-        // 校验是否存在
-        validateNoticesExists(ids);
-        // 批量删除通知公告
         noticeMapper.deleteByIds(ids);
     }
 
@@ -76,17 +72,6 @@ public class NoticeServiceImpl implements NoticeService {
         }
         NoticeDO notice = noticeMapper.selectById(id);
         if (notice == null) {
-            throw exception(NOTICE_NOT_FOUND);
-        }
-    }
-
-    private void validateNoticesExists(List<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-        // 校验存在
-        List<NoticeDO> notices = noticeMapper.selectByIds(ids);
-        if (CollUtil.isEmpty(notices) || notices.size() != ids.size()) {
             throw exception(NOTICE_NOT_FOUND);
         }
     }

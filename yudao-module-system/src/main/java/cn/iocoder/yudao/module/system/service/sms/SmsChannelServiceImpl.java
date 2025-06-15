@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
@@ -68,18 +67,14 @@ public class SmsChannelServiceImpl implements SmsChannelService {
 
     @Override
     public void deleteSmsChannelList(List<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-        // 校验存在
-        validateSmsChannelBatchExists(ids);
-        // 校验是否有在使用该账号的模版
-        for (Long id : ids) {
+        // 1. 校验是否有在使用该账号的模版
+        ids.forEach(id -> {
             if (smsTemplateService.getSmsTemplateCountByChannelId(id) > 0) {
                 throw exception(SMS_CHANNEL_HAS_CHILDREN);
             }
-        }
-        // 批量删除
+        });
+
+        // 2. 批量删除
         smsChannelMapper.deleteByIds(ids);
     }
 
@@ -89,13 +84,6 @@ public class SmsChannelServiceImpl implements SmsChannelService {
             throw exception(SMS_CHANNEL_NOT_EXISTS);
         }
         return channel;
-    }
-
-    private void validateSmsChannelBatchExists(List<Long> ids) {
-        List<SmsChannelDO> channels = smsChannelMapper.selectByIds(ids);
-        if (channels.size() != ids.size()) {
-            throw exception(SMS_CHANNEL_NOT_EXISTS);
-        }
     }
 
     @Override

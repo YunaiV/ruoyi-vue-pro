@@ -175,8 +175,6 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     @Transactional(rollbackFor = Exception.class)
     #end
     public void delete${simpleClassName}ListByIds(List<${primaryColumn.javaType}> ids) {
-        // 校验存在
-        validate${simpleClassName}Exists(ids);
         // 删除
         ${classNameVar}Mapper.deleteByIds(ids);
     ## 特殊：主子表专属逻辑
@@ -193,12 +191,6 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
     #end
     }
 
-    private void validate${simpleClassName}Exists(List<${primaryColumn.javaType}> ids) {
-        List<${table.className}DO> list = ${classNameVar}Mapper.selectByIds(ids);
-        if (CollUtil.isEmpty(list) || list.size() != ids.size()) {
-            throw exception(${simpleClassName_underlineCase.toUpperCase()}_NOT_EXISTS);
-        }
-    }
 #end
 
     private void validate${simpleClassName}Exists(${primaryColumn.javaType} id) {

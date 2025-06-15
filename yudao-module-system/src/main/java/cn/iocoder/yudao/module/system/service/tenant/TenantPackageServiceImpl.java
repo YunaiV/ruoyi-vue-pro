@@ -78,14 +78,14 @@ public class TenantPackageServiceImpl implements TenantPackageService {
 
     @Override
     public void deleteTenantPackageList(List<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
+        // 1. 校验是否有租户正在使用该套餐
+        for (Long id : ids) {
+            if (tenantService.getTenantCountByPackageId(id) > 0) {
+                throw exception(TENANT_PACKAGE_USED);
+            }
         }
-        // 校验存在
-        ids.forEach(this::validateTenantPackageExists);
-        // 校验正在使用
-        validateTenantUsedBatch(ids);
-        // 批量删除
+
+        // 2. 批量删除
         tenantPackageMapper.deleteByIds(ids);
     }
 
@@ -100,20 +100,6 @@ public class TenantPackageServiceImpl implements TenantPackageService {
     private void validateTenantUsed(Long id) {
         if (tenantService.getTenantCountByPackageId(id) > 0) {
             throw exception(TENANT_PACKAGE_USED);
-        }
-    }
-
-    /**
-     * 校验租户套餐是否被使用 - 批量
-     *
-     * @param ids 租户套餐编号数组
-     */
-    private void validateTenantUsedBatch(List<Long> ids) {
-        // 查询是否有租户正在使用该套餐
-        for (Long id : ids) {
-            if (tenantService.getTenantCountByPackageId(id) > 0) {
-                throw exception(TENANT_PACKAGE_USED);
-            }
         }
     }
 

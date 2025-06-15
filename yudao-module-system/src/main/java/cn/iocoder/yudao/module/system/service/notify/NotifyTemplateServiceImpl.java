@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.service.notify;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -90,21 +89,7 @@ public class NotifyTemplateServiceImpl implements NotifyTemplateService {
     @CacheEvict(cacheNames = RedisKeyConstants.NOTIFY_TEMPLATE,
             allEntries = true) // allEntries 清空所有缓存，因为 id 不是直接的缓存 code，不好清理
     public void deleteNotifyTemplateList(List<Long> ids) {
-        // 校验存在
-        validateNotifyTemplatesExists(ids);
-        // 批量删除
         notifyTemplateMapper.deleteByIds(ids);
-    }
-
-    private void validateNotifyTemplatesExists(List<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-        // 校验存在
-        List<NotifyTemplateDO> templates = notifyTemplateMapper.selectByIds(ids);
-        if (CollUtil.isEmpty(templates) || templates.size() != ids.size()) {
-            throw exception(NOTIFY_TEMPLATE_NOT_EXISTS);
-        }
     }
 
     private void validateNotifyTemplateExists(Long id) {

@@ -468,24 +468,11 @@ public class SocialClientServiceImpl implements SocialClientService {
 
     @Override
     public void deleteSocialClientList(List<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-        // 校验存在
-        validateSocialClientBatchExists(ids);
-        // 批量删除
         socialClientMapper.deleteByIds(ids);
     }
 
     private void validateSocialClientExists(Long id) {
         if (socialClientMapper.selectById(id) == null) {
-            throw exception(SOCIAL_CLIENT_NOT_EXISTS);
-        }
-    }
-
-    private void validateSocialClientBatchExists(List<Long> ids) {
-        List<SocialClientDO> clients = socialClientMapper.selectByIds(ids);
-        if (clients.size() != ids.size()) {
             throw exception(SOCIAL_CLIENT_NOT_EXISTS);
         }
     }

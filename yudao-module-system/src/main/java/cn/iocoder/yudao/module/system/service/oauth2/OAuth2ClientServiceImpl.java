@@ -77,24 +77,11 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
     @CacheEvict(cacheNames = RedisKeyConstants.OAUTH_CLIENT,
             allEntries = true) // allEntries 清空所有缓存，因为 id 不是直接的缓存 key，不好清理
     public void deleteOAuth2ClientList(List<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-        // 校验存在
-        validateOAuth2ClientBatchExists(ids);
-        // 批量删除
         oauth2ClientMapper.deleteByIds(ids);
     }
 
     private void validateOAuth2ClientExists(Long id) {
         if (oauth2ClientMapper.selectById(id) == null) {
-            throw exception(OAUTH2_CLIENT_NOT_EXISTS);
-        }
-    }
-
-    private void validateOAuth2ClientBatchExists(List<Long> ids) {
-        List<OAuth2ClientDO> clients = oauth2ClientMapper.selectByIds(ids);
-        if (clients.size() != ids.size()) {
             throw exception(OAUTH2_CLIENT_NOT_EXISTS);
         }
     }

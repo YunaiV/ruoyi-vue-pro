@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.system.service.mail;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccountPageReqVO;
@@ -71,36 +70,22 @@ public class MailAccountServiceImpl implements MailAccountService {
     }
 
     @Override
-    @CacheEvict(value = RedisKeyConstants.MAIL_ACCOUNT, allEntries = true)
+    @CacheEvict(value = RedisKeyConstants.MAIL_ACCOUNT,
+            allEntries = true) // allEntries 清空所有缓存，因为 Spring Cache 不支持按照 ids 批量删除
     public void deleteMailAccountList(List<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-        // 校验是否存在
-        validateMailAccountsExists(ids);
-        // 校验是否存在关联模版
+        // 1. 校验是否存在关联模版
         for (Long id : ids) {
             if (mailTemplateService.getMailTemplateCountByAccountId(id) > 0) {
                 throw exception(MAIL_ACCOUNT_RELATE_TEMPLATE_EXISTS);
             }
         }
-        // 批量删除
+
+        // 2. 批量删除
         mailAccountMapper.deleteByIds(ids);
     }
 
     private void validateMailAccountExists(Long id) {
         if (mailAccountMapper.selectById(id) == null) {
-            throw exception(MAIL_ACCOUNT_NOT_EXISTS);
-        }
-    }
-
-    private void validateMailAccountsExists(List<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return;
-        }
-        // 校验存在
-        List<MailAccountDO> accounts = mailAccountMapper.selectByIds(ids);
-        if (CollUtil.isEmpty(accounts) || accounts.size() != ids.size()) {
             throw exception(MAIL_ACCOUNT_NOT_EXISTS);
         }
     }
