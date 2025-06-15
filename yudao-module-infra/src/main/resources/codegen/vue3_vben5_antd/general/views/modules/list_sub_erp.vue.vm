@@ -29,7 +29,7 @@
 #end
 
 #if ($table.templateType == 11) ## erp
-    import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}ListByIds,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${table.businessName}';
+    import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}List,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
     import { isEmpty } from '@vben/utils';
   #else
   #if ($subTable.subJoinMany) ## 一对多
@@ -50,7 +50,7 @@ const props = defineProps<{
   });
 
 /** 创建${subTable.classComment} */
-function onCreate() {
+function handleCreate() {
   if (!props.${subJoinColumn.javaField}){
     message.warning("请先选择一个${table.classComment}!")
     return
@@ -59,12 +59,12 @@ function onCreate() {
 }
 
 /** 编辑${subTable.classComment} */
-function onEdit(row: ${simpleClassName}Api.${subSimpleClassName}) {
+function handleEdit(row: ${simpleClassName}Api.${subSimpleClassName}) {
   formModalApi.setData(row).open();
 }
 
 /** 删除${subTable.classComment} */
-async function onDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
+async function handleDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting', [row.id]),
     duration: 0,
@@ -84,14 +84,14 @@ async function onDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
 
 #if ($deleteBatchEnable)
 /** 批量删除${subTable.classComment} */
-async function onDeleteBatch() {
+async function handleDeleteBatch() {
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting'),
     duration: 0,
     key: 'action_process_msg',
   });
   try {
-    await delete${subSimpleClassName}ListByIds(deleteIds.value);
+    await delete${subSimpleClassName}List(checkedIds.value);
     message.success( $t('ui.actionMessage.deleteSuccess') );
     await getList();
   } finally {
@@ -99,13 +99,13 @@ async function onDeleteBatch() {
   }
 }
 
-const deleteIds = ref<number[]>([]) // 待删除${subTable.classComment} ID
-function setDeleteIds({
+const checkedIds = ref<number[]>([])
+function handleRowCheckboxChange({
   records,
 }: {
   records: ${simpleClassName}Api.${subSimpleClassName}[];
 }) {
-  deleteIds.value = records.map((item) => item.id);
+  checkedIds.value = records.map((item) => item.id);
 }
 #end
 #end
@@ -299,7 +299,7 @@ onMounted(() => {
                   class="ml-2"
                   :icon="h(Plus)"
                   type="primary"
-                  @click="onCreate"
+                  @click="handleCreate"
                   v-access:code="['${permissionPrefix}:create']"
               >
                 {{ $t('ui.actionTitle.create', ['${table.classComment}']) }}
@@ -310,8 +310,8 @@ onMounted(() => {
                       type="primary"
                       danger
                       class="ml-2"
-                      :disabled="isEmpty(deleteIds)"
-                      @click="onDeleteBatch"
+                      :disabled="isEmpty(checkedIds)"
+                      @click="handleDeleteBatch"
                       v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:delete']"
                   >
                     批量删除
@@ -325,8 +325,8 @@ onMounted(() => {
               show-overflow
               :loading="loading"
               #if ($deleteBatchEnable)
-              @checkboxAll="setDeleteIds"
-              @checkboxChange="setDeleteIds"
+              @checkboxAll="handleRowCheckboxChange"
+              @checkboxChange="handleRowCheckboxChange"
               #end
           >
               #if ($deleteBatchEnable)
@@ -361,7 +361,7 @@ onMounted(() => {
                 <Button
                     size="small"
                     type="link"
-                    @click="onEdit(row as any)"
+                    @click="handleEdit(row as any)"
                     v-access:code="['${permissionPrefix}:update']"
                 >
                   {{ $t('ui.actionTitle.edit') }}
@@ -371,7 +371,7 @@ onMounted(() => {
                     type="link"
                     danger
                     class="ml-2"
-                    @click="onDelete(row as any)"
+                    @click="handleDelete(row as any)"
                     v-access:code="['${permissionPrefix}:delete']"
                 >
                   {{ $t('ui.actionTitle.delete') }}

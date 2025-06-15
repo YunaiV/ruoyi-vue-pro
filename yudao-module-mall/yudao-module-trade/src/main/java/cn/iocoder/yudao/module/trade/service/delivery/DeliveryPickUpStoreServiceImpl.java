@@ -75,7 +75,7 @@ public class DeliveryPickUpStoreServiceImpl implements DeliveryPickUpStoreServic
 
     @Override
     public List<DeliveryPickUpStoreDO> getDeliveryPickUpStoreList(Collection<Long> ids) {
-        return deliveryPickUpStoreMapper.selectBatchIds(ids);
+        return deliveryPickUpStoreMapper.selectByIds(ids);
     }
 
     @Override

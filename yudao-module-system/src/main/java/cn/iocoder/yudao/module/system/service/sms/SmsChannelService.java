@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.system.service.sms;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.framework.sms.core.client.SmsClient;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.sms.vo.channel.SmsChannelSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.sms.SmsChannelDO;
+import cn.iocoder.yudao.module.system.framework.sms.core.client.SmsClient;
+import jakarta.validation.Valid;
 
-import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -38,6 +38,13 @@ public interface SmsChannelService {
      * @param id 编号
      */
     void deleteSmsChannel(Long id);
+
+    /**
+     * 批量删除短信渠道
+     *
+     * @param ids 编号数组
+     */
+    void deleteSmsChannelList(List<Long> ids);
 
     /**
      * 获得短信渠道

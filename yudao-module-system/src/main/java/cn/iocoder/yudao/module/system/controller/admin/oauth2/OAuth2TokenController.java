@@ -12,11 +12,12 @@ import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -44,6 +45,16 @@ public class OAuth2TokenController {
     @PreAuthorize("@ss.hasPermission('system:oauth2-token:delete')")
     public CommonResult<Boolean> deleteAccessToken(@RequestParam("accessToken") String accessToken) {
         authService.logout(accessToken, LoginLogTypeEnum.LOGOUT_DELETE.getType());
+        return success(true);
+    }
+
+    @DeleteMapping("/delete-list")
+    @Operation(summary = "批量删除访问令牌")
+    @Parameter(name = "accessTokens", description = "访问令牌数组", required = true)
+    @PreAuthorize("@ss.hasPermission('system:oauth2-token:delete')")
+    public CommonResult<Boolean> deleteAccessTokenList(@RequestParam("accessTokens") List<String> accessTokens) {
+        accessTokens.forEach(accessToken ->
+                authService.logout(accessToken, LoginLogTypeEnum.LOGOUT_DELETE.getType()));
         return success(true);
     }
 

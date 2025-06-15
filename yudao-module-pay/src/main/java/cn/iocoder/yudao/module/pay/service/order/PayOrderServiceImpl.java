@@ -89,7 +89,7 @@ public class PayOrderServiceImpl implements PayOrderService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return orderMapper.selectBatchIds(ids);
+        return orderMapper.selectByIds(ids);
     }
 
     @Override

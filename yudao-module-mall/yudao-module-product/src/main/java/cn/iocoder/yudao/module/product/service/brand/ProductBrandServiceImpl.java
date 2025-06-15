@@ -90,7 +90,7 @@ public class ProductBrandServiceImpl implements ProductBrandService {
 
     @Override
     public List<ProductBrandDO> getBrandList(Collection<Long> ids) {
-        return brandMapper.selectBatchIds(ids);
+        return brandMapper.selectByIds(ids);
     }
 
     @Override

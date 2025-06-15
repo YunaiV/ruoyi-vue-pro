@@ -70,7 +70,7 @@ public class BpmUserGroupServiceImpl implements BpmUserGroupService {
 
     @Override
     public List<BpmUserGroupDO> getUserGroupList(Collection<Long> ids) {
-        return userGroupMapper.selectBatchIds(ids);
+        return userGroupMapper.selectByIds(ids);
     }
 
 
@@ -90,7 +90,7 @@ public class BpmUserGroupServiceImpl implements BpmUserGroupService {
             return;
         }
         // 获得用户组信息
-        List<BpmUserGroupDO> userGroups = userGroupMapper.selectBatchIds(ids);
+        List<BpmUserGroupDO> userGroups = userGroupMapper.selectByIds(ids);
         Map<Long, BpmUserGroupDO> userGroupMap = convertMap(userGroups, BpmUserGroupDO::getId);
         // 校验
         ids.forEach(id -> {

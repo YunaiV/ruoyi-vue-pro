@@ -113,7 +113,7 @@
 </template>
 <script setup lang="ts">
 import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
-import { ${simpleClassName}Api } from '@/api/${table.moduleName}/${table.businessName}'
+import { ${simpleClassName}Api, ${subSimpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
@@ -144,12 +144,12 @@ const formRules = reactive({
 const formRef = ref() // 表单 Ref
 
 /** 打开弹窗 */
-const open = async (type: string, id?: number, ${subJoinColumn.javaField}: number) => {
+const open = async (type: string, id?: number, ${subJoinColumn.javaField}?: number) => {
   dialogVisible.value = true
   dialogTitle.value = t('action.' + type)
   formType.value = type
   resetForm()
-  formData.value.${subJoinColumn.javaField} = ${subJoinColumn.javaField}
+  formData.value.${subJoinColumn.javaField} = ${subJoinColumn.javaField}  as any
   // 修改时，设置数据
   if (id) {
     formLoading.value = true
@@ -170,7 +170,7 @@ const submitForm = async () => {
   // 提交请求
   formLoading.value = true
   try {
-    const data = formData.value
+    const data = formData.value as unknown as ${subSimpleClassName}
     if (formType.value === 'create') {
       await ${simpleClassName}Api.create${subSimpleClassName}(data)
       message.success(t('common.createSuccess'))

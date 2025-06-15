@@ -249,6 +249,19 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteUserList(List<Long> ids) {
+        // 1. 批量删除用户
+        userMapper.deleteByIds(ids);
+
+        // 2. 批量删除用户关联数据
+        ids.forEach(id -> {
+            permissionService.processUserDeleted(id);
+            userPostMapper.deleteByUserId(id);
+        });
+    }
+
+    @Override
     public AdminUserDO getUserByUsername(String username) {
         return userMapper.selectByUsername(username);
     }
@@ -290,7 +303,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         if (CollUtil.isEmpty(userIds)) {
             return Collections.emptyList();
         }
-        return userMapper.selectBatchIds(userIds);
+        return userMapper.selectByIds(userIds);
     }
 
     @Override
@@ -298,7 +311,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return userMapper.selectBatchIds(ids);
+        return userMapper.selectByIds(ids);
     }
 
     @Override
@@ -307,7 +320,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             return;
         }
         // 获得岗位信息
-        List<AdminUserDO> users = userMapper.selectBatchIds(ids);
+        List<AdminUserDO> users = userMapper.selectByIds(ids);
         Map<Long, AdminUserDO> userMap = CollectionUtils.convertMap(users, AdminUserDO::getId);
         // 校验
         ids.forEach(id -> {

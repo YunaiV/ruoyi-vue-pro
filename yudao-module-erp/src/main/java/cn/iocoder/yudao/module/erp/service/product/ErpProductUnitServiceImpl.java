@@ -105,7 +105,7 @@ public class ErpProductUnitServiceImpl implements ErpProductUnitService {
 
     @Override
     public List<ErpProductUnitDO> getProductUnitList(Collection<Long> ids) {
-         return productUnitMapper.selectBatchIds(ids);
+         return productUnitMapper.selectByIds(ids);
     }
 
 }

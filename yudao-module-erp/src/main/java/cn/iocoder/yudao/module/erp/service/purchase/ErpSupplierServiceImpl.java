@@ -79,7 +79,7 @@ public class ErpSupplierServiceImpl implements ErpSupplierService {
 
     @Override
     public List<ErpSupplierDO> getSupplierList(Collection<Long> ids) {
-        return supplierMapper.selectBatchIds(ids);
+        return supplierMapper.selectByIds(ids);
     }
 
     @Override

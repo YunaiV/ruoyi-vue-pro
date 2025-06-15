@@ -240,7 +240,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
             saleReturnItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            saleReturnItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpSaleReturnItemDO::getId));
+            saleReturnItemMapper.deleteByIds(convertList(diffList.get(2), ErpSaleReturnItemDO::getId));
         }
     }
 
@@ -248,7 +248,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteSaleReturn(List<Long> ids) {
         // 1. 校验不处于已审批
-        List<ErpSaleReturnDO> saleReturns = saleReturnMapper.selectBatchIds(ids);
+        List<ErpSaleReturnDO> saleReturns = saleReturnMapper.selectByIds(ids);
         if (CollUtil.isEmpty(saleReturns)) {
             return;
         }

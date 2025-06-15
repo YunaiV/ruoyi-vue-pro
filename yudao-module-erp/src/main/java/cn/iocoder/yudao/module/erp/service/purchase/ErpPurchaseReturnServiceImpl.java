@@ -228,7 +228,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
             purchaseReturnItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            purchaseReturnItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpPurchaseReturnItemDO::getId));
+            purchaseReturnItemMapper.deleteByIds(convertList(diffList.get(2), ErpPurchaseReturnItemDO::getId));
         }
     }
 
@@ -236,7 +236,7 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
     @Transactional(rollbackFor = Exception.class)
     public void deletePurchaseReturn(List<Long> ids) {
         // 1. 校验不处于已审批
-        List<ErpPurchaseReturnDO> purchaseReturns = purchaseReturnMapper.selectBatchIds(ids);
+        List<ErpPurchaseReturnDO> purchaseReturns = purchaseReturnMapper.selectByIds(ids);
         if (CollUtil.isEmpty(purchaseReturns)) {
             return;
         }

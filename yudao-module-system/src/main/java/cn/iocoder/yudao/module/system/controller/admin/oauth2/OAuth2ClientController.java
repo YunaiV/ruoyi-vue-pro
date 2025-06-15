@@ -11,12 +11,13 @@ import cn.iocoder.yudao.module.system.service.oauth2.OAuth2ClientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
@@ -50,6 +51,15 @@ public class OAuth2ClientController {
     @PreAuthorize("@ss.hasPermission('system:oauth2-client:delete')")
     public CommonResult<Boolean> deleteOAuth2Client(@RequestParam("id") Long id) {
         oAuth2ClientService.deleteOAuth2Client(id);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete-list")
+    @Parameter(name = "ids", description = "编号列表", required = true)
+    @Operation(summary = "批量删除 OAuth2 客户端")
+    @PreAuthorize("@ss.hasPermission('system:oauth2-client:delete')")
+    public CommonResult<Boolean> deleteOAuth2ClientList(@RequestParam("ids") List<Long> ids) {
+        oAuth2ClientService.deleteOAuth2ClientList(ids);
         return success(true);
     }
 

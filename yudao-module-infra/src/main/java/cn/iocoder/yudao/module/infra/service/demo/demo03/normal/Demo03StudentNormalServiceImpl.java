@@ -83,7 +83,7 @@ public class Demo03StudentNormalServiceImpl implements Demo03StudentNormalServic
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteDemo03StudentListByIds(List<Long> ids) {
+    public void deleteDemo03StudentList(List<Long> ids) {
         // 校验存在
         validateDemo03StudentExists(ids);
         // 删除

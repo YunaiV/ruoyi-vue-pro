@@ -240,7 +240,7 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
             saleOutItemMapper.updateBatch(diffList.get(1));
         }
         if (CollUtil.isNotEmpty(diffList.get(2))) {
-            saleOutItemMapper.deleteBatchIds(convertList(diffList.get(2), ErpSaleOutItemDO::getId));
+            saleOutItemMapper.deleteByIds(convertList(diffList.get(2), ErpSaleOutItemDO::getId));
         }
     }
 
@@ -248,7 +248,7 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteSaleOut(List<Long> ids) {
         // 1. 校验不处于已审批
-        List<ErpSaleOutDO> saleOuts = saleOutMapper.selectBatchIds(ids);
+        List<ErpSaleOutDO> saleOuts = saleOutMapper.selectByIds(ids);
         if (CollUtil.isEmpty(saleOuts)) {
             return;
         }

@@ -154,7 +154,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 
     @Override
     public List<BargainActivityDO> getBargainActivityList(Set<Long> ids) {
-        return bargainActivityMapper.selectBatchIds(ids);
+        return bargainActivityMapper.selectByIds(ids);
     }
 
     @Override

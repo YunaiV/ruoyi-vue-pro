@@ -89,7 +89,7 @@ public class AiImageServiceImpl implements AiImageService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return imageMapper.selectBatchIds(ids);
+        return imageMapper.selectByIds(ids);
     }
 
     @Override

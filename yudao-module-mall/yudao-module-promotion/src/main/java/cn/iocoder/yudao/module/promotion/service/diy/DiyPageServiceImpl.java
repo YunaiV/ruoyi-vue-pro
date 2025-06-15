@@ -104,7 +104,7 @@ public class DiyPageServiceImpl implements DiyPageService {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }
-        return diyPageMapper.selectBatchIds(ids);
+        return diyPageMapper.selectByIds(ids);
     }
 
     @Override

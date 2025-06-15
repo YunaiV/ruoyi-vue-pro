@@ -135,6 +135,13 @@ public interface SocialClientService {
     void deleteSocialClient(Long id);
 
     /**
+     * 批量删除社交客户端
+     *
+     * @param ids 编号数组
+     */
+    void deleteSocialClientList(List<Long> ids);
+
+    /**
      * 获得社交客户端
      *
      * @param id 编号

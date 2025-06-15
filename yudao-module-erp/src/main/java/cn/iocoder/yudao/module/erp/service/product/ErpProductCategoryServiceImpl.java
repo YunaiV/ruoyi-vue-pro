@@ -143,7 +143,7 @@ public class ErpProductCategoryServiceImpl implements ErpProductCategoryService 
 
     @Override
     public List<ErpProductCategoryDO> getProductCategoryList(Collection<Long> ids) {
-        return erpProductCategoryMapper.selectBatchIds(ids);
+        return erpProductCategoryMapper.selectByIds(ids);
     }
 
 }

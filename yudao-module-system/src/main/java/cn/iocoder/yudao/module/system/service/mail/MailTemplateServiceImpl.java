@@ -11,14 +11,14 @@ import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailTemplateMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -97,6 +97,13 @@ public class MailTemplateServiceImpl implements MailTemplateService {
         mailTemplateMapper.deleteById(id);
     }
 
+    @Override
+    @CacheEvict(cacheNames = RedisKeyConstants.MAIL_TEMPLATE,
+            allEntries = true) // allEntries 清空所有缓存，因为 id 不是直接的缓存 code，不好清理
+    public void deleteMailTemplateList(List<Long> ids) {
+        mailTemplateMapper.deleteByIds(ids);
+    }
+
     private void validateMailTemplateExists(Long id) {
         if (mailTemplateMapper.selectById(id) == null) {
             throw exception(MAIL_TEMPLATE_NOT_EXISTS);
@@ -125,14 +132,19 @@ public class MailTemplateServiceImpl implements MailTemplateService {
         return StrUtil.format(content, params);
     }
 
-    @VisibleForTesting
-    public List<String> parseTemplateContentParams(String content) {
-        return ReUtil.findAllGroup1(PATTERN_PARAMS, content);
-    }
-
     @Override
     public long getMailTemplateCountByAccountId(Long accountId) {
         return mailTemplateMapper.selectCountByAccountId(accountId);
+    }
+
+    /**
+     * 获得邮件模板中的参数，形如 {key}
+     *
+     * @param content 内容
+     * @return 参数列表
+     */
+    private List<String> parseTemplateContentParams(String content) {
+        return ReUtil.findAllGroup1(PATTERN_PARAMS, content);
     }
 
 }

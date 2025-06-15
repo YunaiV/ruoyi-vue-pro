@@ -277,7 +277,7 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
         if (CollUtil.isEmpty(ids)) {
             return ListUtil.empty();
         }
-        return receivableMapper.selectBatchIds(ids);
+        return receivableMapper.selectByIds(ids);
     }
 
     @Override

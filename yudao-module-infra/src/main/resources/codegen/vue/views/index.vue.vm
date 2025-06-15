@@ -53,26 +53,45 @@
         <el-button type="warning" plain icon="el-icon-download" size="mini" @click="handleExport" :loading="exportLoading"
                    v-hasPermi="['${permissionPrefix}:export']">导出</el-button>
       </el-col>
-        ## 特殊：树表专属逻辑
-        #if ( $table.templateType == 2 )
-          <el-col :span="1.5">
-            <el-button type="danger" plain icon="el-icon-sort" size="mini" @click="toggleExpandAll">
-              展开/折叠
-            </el-button>
-          </el-col>
-        #end
+    ## 特殊：树表专属逻辑
+    #if ( $table.templateType == 2 )
+      <el-col :span="1.5">
+        <el-button type="danger" plain icon="el-icon-sort" size="mini" @click="toggleExpandAll">
+          展开/折叠
+        </el-button>
+      </el-col>
+    #end
+    #if ($table.templateType != 2 && $deleteBatchEnable)
+      <el-col :span="1.5">
+        <el-button
+            type="danger"
+            plain
+            icon="el-icon-delete"
+            size="mini"
+            :disabled="isEmpty(checkedIds)"
+            @click="handleDeleteBatch"
+            v-hasPermi="['${permissionPrefix}:delete']"
+        >
+          批量删除
+        </el-button>
+      </el-col>
+    #end
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
       ## 特殊：主子表专属逻辑
       #if ( $table.templateType == 11 && $subTables && $subTables.size() > 0 )
       <el-table
+        row-key="id"
         v-loading="loading"
         :data="list"
         :stripe="true"
         :highlight-current-row="true"
         :show-overflow-tooltip="true"
         @current-change="handleCurrentChange"
+        #if ($deleteBatchEnable)
+        @selection-change="handleRowCheckboxChange"
+        #end
       >
           ## 特殊：树表专属逻辑
       #elseif ( $table.templateType == 2 )
@@ -87,7 +106,18 @@
         :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
       >
       #else
-      <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true">
+      <el-table
+          v-loading="loading"
+          :data="list"
+          :stripe="true"
+          :show-overflow-tooltip="true"
+          #if ($deleteBatchEnable)
+          @selection-change="handleRowCheckboxChange"
+          #end
+      >
+      #end
+      #if ($table.templateType != 2 && $deleteBatchEnable)
+        <el-table-column type="selection" width="55" />
       #end
       ## 特殊：主子表专属逻辑
       #if ( $table.templateType == 12 && $subTables && $subTables.size() > 0 )
@@ -229,6 +259,7 @@ export default {
       refreshTable: true,
       // 选中行
       currentRow: {},
+      checkedIds: [],
       // 查询参数
       queryParams: {
         ## 特殊：树表专属逻辑（树不需要分页接口）
@@ -301,6 +332,20 @@ export default {
        this.#[[$modal]]#.msgSuccess("删除成功");
       } catch {}
     },
+    #if ($table.templateType != 2 && $deleteBatchEnable)
+    /** 批量删除${table.classComment} */
+    async handleDeleteBatch() {
+      await this.#[[$modal]]#.confirm('是否确认删除?')
+      try {
+        await ${simpleClassName}Api.delete${simpleClassName}List(this.checkedIds);
+        await this.getList();
+        this.#[[$modal]]#.msgSuccess("删除成功");
+      } catch {}
+    },
+    handleRowCheckboxChange(records) {
+      this.checkedIds = records.map((item) => item.id);
+    },
+    #end
     /** 导出按钮操作 */
     async handleExport() {
       await this.#[[$modal]]#.confirm('是否确认导出所有${table.classComment}数据项?');

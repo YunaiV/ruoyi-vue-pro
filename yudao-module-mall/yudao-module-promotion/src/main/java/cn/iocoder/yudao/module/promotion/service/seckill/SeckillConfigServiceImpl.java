@@ -132,7 +132,7 @@ public class SeckillConfigServiceImpl implements SeckillConfigService {
             return;
         }
         // 1. 如果有数量不匹配，说明有不存在的，则抛出 SECKILL_CONFIG_NOT_EXISTS 业务异常
-        List<SeckillConfigDO> configs = seckillConfigMapper.selectBatchIds(ids);
+        List<SeckillConfigDO> configs = seckillConfigMapper.selectByIds(ids);
         if (configs.size() != ids.size()) {
             throw exception(SECKILL_CONFIG_NOT_EXISTS);
         }

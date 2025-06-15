@@ -44,7 +44,7 @@ public interface Demo03StudentInnerService {
      *
      * @param ids 编号
      */
-    void deleteDemo03StudentListByIds(List<Long> ids);
+    void deleteDemo03StudentList(List<Long> ids);
 
     /**
      * 获得学生

@@ -67,7 +67,7 @@ public class MpUserServiceImpl implements MpUserService {
 
     @Override
     public List<MpUserDO> getUserList(Collection<Long> ids) {
-        return mpUserMapper.selectBatchIds(ids);
+        return mpUserMapper.selectByIds(ids);
     }
 
     @Override

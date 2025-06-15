@@ -266,10 +266,10 @@ import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } f
 import { ${simpleClassName}Api } from '@/api/${table.moduleName}/${table.businessName}'
 
 const props = defineProps<{
-  ${subJoinColumn.javaField}: undefined // ${subJoinColumn.columnComment}（主表的关联字段）
+  ${subJoinColumn.javaField}: number // ${subJoinColumn.columnComment}（主表的关联字段）
 }>()
 const formLoading = ref(false) // 表单的加载中
-const formData = ref([])
+const formData = ref<any#if ( $subTable.subJoinMany )[]#end>(#if ( $subTable.subJoinMany )[]#else{}#end)
 const formRules = reactive({
 #foreach ($column in $subColumns)
     #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
@@ -336,7 +336,7 @@ const handleAdd = () => {
   #end
 #end
   }
-  row.${subJoinColumn.javaField} = props.${subJoinColumn.javaField}
+  row.${subJoinColumn.javaField} = props.${subJoinColumn.javaField} as any
   formData.value.push(row)
 }
 

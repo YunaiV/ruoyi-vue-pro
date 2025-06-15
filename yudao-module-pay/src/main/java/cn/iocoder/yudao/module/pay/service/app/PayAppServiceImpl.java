@@ -121,7 +121,7 @@ public class PayAppServiceImpl implements PayAppService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return appMapper.selectBatchIds(ids);
+        return appMapper.selectByIds(ids);
     }
 
     @Override

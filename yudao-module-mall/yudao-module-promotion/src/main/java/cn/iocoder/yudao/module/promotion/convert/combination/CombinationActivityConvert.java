@@ -122,10 +122,8 @@ public interface CombinationActivityConvert {
         return convert(reqDTO).setVirtualGroup(false)
                 .setStatus(CombinationRecordStatusEnum.IN_PROGRESS.getStatus()) // 创建后默认状态为进行中
                 .setUserSize(activity.getUserSize()).setUserCount(1) // 默认就是 1 插入后会接着更新一次所有的拼团记录
-                // 用户信息
-                .setNickname(user.getNickname()).setAvatar(user.getAvatar())
-                // 商品信息
-                .setSpuName(spu.getName()).setPicUrl(sku.getPicUrl());
+                .setNickname(user.getNickname()).setAvatar(user.getAvatar()) // 用户信息
+                .setSpuName(spu.getName()).setPicUrl(ObjectUtil.defaultIfBlank(sku.getPicUrl(), spu.getPicUrl())); // 商品信息
     }
 
     default List<CombinationActivityRespVO> convertList(List<CombinationActivityDO> list,

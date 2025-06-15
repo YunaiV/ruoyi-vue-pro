@@ -67,8 +67,7 @@ public class Demo03StudentErpController {
     @Operation(summary = "批量删除学生")
     @PreAuthorize("@ss.hasPermission('infra:demo03-student:delete')")
     public CommonResult<Boolean> deleteDemo03StudentList(@RequestParam("ids") List<Long> ids) {
-        // TODO @puhui999：deleteDemo03StudentList
-        demo03StudentErpService.deleteDemo03StudentListByIds(ids);
+        demo03StudentErpService.deleteDemo03StudentList(ids);
         return success(true);
     }
 
@@ -142,7 +141,7 @@ public class Demo03StudentErpController {
     @Operation(summary = "批量删除学生课程")
     @PreAuthorize("@ss.hasPermission('infra:demo03-student:delete')")
     public CommonResult<Boolean> deleteDemo03CourseList(@RequestParam("ids") List<Long> ids) {
-        demo03StudentErpService.deleteDemo03CourseListByIds(ids);
+        demo03StudentErpService.deleteDemo03CourseList(ids);
         return success(true);
     }
 
@@ -194,7 +193,7 @@ public class Demo03StudentErpController {
     @Operation(summary = "批量删除学生班级")
     @PreAuthorize("@ss.hasPermission('infra:demo03-student:delete')")
     public CommonResult<Boolean> deleteDemo03GradeList(@RequestParam("ids") List<Long> ids) {
-        demo03StudentErpService.deleteDemo03GradeListByIds(ids);
+        demo03StudentErpService.deleteDemo03GradeList(ids);
         return success(true);
     }
 

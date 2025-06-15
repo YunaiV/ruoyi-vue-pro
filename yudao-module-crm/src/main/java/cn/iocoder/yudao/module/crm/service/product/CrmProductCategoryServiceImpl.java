@@ -132,7 +132,7 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
 
     @Override
     public List<CrmProductCategoryDO> getProductCategoryList(Collection<Long> ids) {
-        return productCategoryMapper.selectBatchIds(ids);
+        return productCategoryMapper.selectByIds(ids);
     }
 
 }
