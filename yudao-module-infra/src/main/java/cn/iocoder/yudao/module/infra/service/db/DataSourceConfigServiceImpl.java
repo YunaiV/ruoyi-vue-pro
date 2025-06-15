@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.infra.service.db;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.infra.controller.admin.db.vo.DataSourceConfigSaveReqVO;
@@ -61,6 +62,17 @@ public class DataSourceConfigServiceImpl implements DataSourceConfigService {
         validateDataSourceConfigExists(id);
         // 删除
         dataSourceConfigMapper.deleteById(id);
+    }
+
+    @Override
+    public void deleteDataSourceConfigList(List<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 校验存在
+        ids.forEach(this::validateDataSourceConfigExists);
+        // 批量删除
+        dataSourceConfigMapper.deleteByIds(ids);
     }
 
     private void validateDataSourceConfigExists(Long id) {

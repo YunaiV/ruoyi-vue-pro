@@ -49,6 +49,13 @@ public interface CodegenService {
     void deleteCodegen(Long tableId);
 
     /**
+     * 批量删除数据库的表和字段定义
+     *
+     * @param tableIds 数据编号列表
+     */
+    void deleteCodegenList(List<Long> tableIds);
+
+    /**
      * 获得表定义列表
      *
      * @param dataSourceConfigId 数据源配置的编号

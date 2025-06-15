@@ -36,6 +36,13 @@ public interface DataSourceConfigService {
     void deleteDataSourceConfig(Long id);
 
     /**
+     * 批量删除数据源配置
+     *
+     * @param ids 编号列表
+     */
+    void deleteDataSourceConfigList(List<Long> ids);
+
+    /**
      * 获得数据源配置
      *
      * @param id 编号

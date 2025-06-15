@@ -62,6 +62,15 @@ public class ConfigController {
         return success(true);
     }
 
+    @DeleteMapping("/delete-list")
+    @Operation(summary = "批量删除参数配置")
+    @Parameter(name = "ids", description = "编号列表", required = true)
+    @PreAuthorize("@ss.hasPermission('infra:config:delete')")
+    public CommonResult<Boolean> deleteConfigList(@RequestParam("ids") List<Long> ids) {
+        configService.deleteConfigList(ids);
+        return success(true);
+    }
+
     @GetMapping(value = "/get")
     @Operation(summary = "获得参数配置")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
