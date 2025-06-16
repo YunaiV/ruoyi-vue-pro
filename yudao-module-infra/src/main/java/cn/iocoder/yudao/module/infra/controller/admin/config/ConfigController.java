@@ -101,7 +101,7 @@ public class ConfigController {
         return success(ConfigConvert.INSTANCE.convertPage(page));
     }
 
-    @GetMapping("/export")
+    @GetMapping("/export-excel")
     @Operation(summary = "导出参数配置")
     @PreAuthorize("@ss.hasPermission('infra:config:export')")
     @ApiAccessLog(operateType = EXPORT)

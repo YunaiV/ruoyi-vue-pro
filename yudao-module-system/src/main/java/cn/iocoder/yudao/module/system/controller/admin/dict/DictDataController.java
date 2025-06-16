@@ -98,7 +98,7 @@ public class DictDataController {
         return success(BeanUtils.toBean(dictData, DictDataRespVO.class));
     }
 
-    @GetMapping("/export")
+    @GetMapping("/export-excel")
     @Operation(summary = "导出字典数据")
     @PreAuthorize("@ss.hasPermission('system:dict:export')")
     @ApiAccessLog(operateType = EXPORT)
