@@ -15,6 +15,8 @@ import org.apache.ibatis.annotations.Param;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils.toUnderlineCase;
+
 /**
  * 商品统计 Mapper
  *
@@ -49,16 +51,16 @@ public interface ProductStatisticsMapper extends BaseMapperX<ProductStatisticsDO
     static MPJLambdaWrapperX<ProductStatisticsDO> buildWrapper(ProductStatisticsReqVO reqVO) {
         return new MPJLambdaWrapperX<ProductStatisticsDO>()
                 .betweenIfPresent(ProductStatisticsDO::getTime, reqVO.getTimes())
-                .selectSum(ProductStatisticsDO::getBrowseCount)
-                .selectSum(ProductStatisticsDO::getBrowseUserCount)
-                .selectSum(ProductStatisticsDO::getFavoriteCount)
-                .selectSum(ProductStatisticsDO::getCartCount)
-                .selectSum(ProductStatisticsDO::getOrderCount)
-                .selectSum(ProductStatisticsDO::getOrderPayCount)
-                .selectSum(ProductStatisticsDO::getOrderPayPrice)
-                .selectSum(ProductStatisticsDO::getAfterSaleCount)
-                .selectSum(ProductStatisticsDO::getAfterSaleRefundPrice)
-                .selectAvg(ProductStatisticsDO::getBrowseConvertPercent);
+                .selectSum(ProductStatisticsDO::getBrowseCount, toUnderlineCase(ProductStatisticsDO::getBrowseCount))
+                .selectSum(ProductStatisticsDO::getBrowseUserCount, toUnderlineCase(ProductStatisticsDO::getBrowseUserCount))
+                .selectSum(ProductStatisticsDO::getFavoriteCount, toUnderlineCase(ProductStatisticsDO::getFavoriteCount))
+                .selectSum(ProductStatisticsDO::getCartCount, toUnderlineCase(ProductStatisticsDO::getCartCount))
+                .selectSum(ProductStatisticsDO::getOrderCount, toUnderlineCase(ProductStatisticsDO::getOrderCount))
+                .selectSum(ProductStatisticsDO::getOrderPayCount, toUnderlineCase(ProductStatisticsDO::getOrderPayCount))
+                .selectSum(ProductStatisticsDO::getOrderPayPrice, toUnderlineCase(ProductStatisticsDO::getOrderPayPrice))
+                .selectSum(ProductStatisticsDO::getAfterSaleCount, toUnderlineCase(ProductStatisticsDO::getAfterSaleCount))
+                .selectSum(ProductStatisticsDO::getAfterSaleRefundPrice, toUnderlineCase(ProductStatisticsDO::getAfterSaleRefundPrice))
+                .selectAvg(ProductStatisticsDO::getBrowseConvertPercent, toUnderlineCase(ProductStatisticsDO::getBrowseConvertPercent));
     }
 
     /**

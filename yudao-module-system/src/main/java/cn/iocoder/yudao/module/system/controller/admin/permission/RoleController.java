@@ -7,7 +7,9 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.*;
+import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RolePageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.permission.vo.role.RoleSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.service.permission.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,6 +60,15 @@ public class RoleController {
     @PreAuthorize("@ss.hasPermission('system:role:delete')")
     public CommonResult<Boolean> deleteRole(@RequestParam("id") Long id) {
         roleService.deleteRole(id);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete-list")
+    @Operation(summary = "批量删除角色")
+    @Parameter(name = "ids", description = "编号列表", required = true)
+    @PreAuthorize("@ss.hasPermission('system:role:delete')")
+    public CommonResult<Boolean> deleteRoleList(@RequestParam("ids") List<Long> ids) {
+        roleService.deleteRoleList(ids);
         return success(true);
     }
 

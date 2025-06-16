@@ -52,6 +52,15 @@ public class DataSourceConfigController {
         return success(true);
     }
 
+    @DeleteMapping("/delete-list")
+    @Operation(summary = "批量删除数据源配置")
+    @Parameter(name = "ids", description = "编号列表", required = true)
+    @PreAuthorize("@ss.hasPermission('infra:data-source-config:delete')")
+    public CommonResult<Boolean> deleteDataSourceConfigList(@RequestParam("ids") List<Long> ids) {
+        dataSourceConfigService.deleteDataSourceConfigList(ids);
+        return success(true);
+    }
+
     @GetMapping("/get")
     @Operation(summary = "获得数据源配置")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")

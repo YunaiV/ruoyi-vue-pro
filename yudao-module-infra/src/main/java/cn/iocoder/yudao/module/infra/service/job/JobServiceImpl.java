@@ -169,6 +169,19 @@ public class JobServiceImpl implements JobService {
         schedulerManager.deleteJob(job.getHandlerName());
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteJobList(List<Long> ids) throws SchedulerException {
+        // 批量删除
+        List<JobDO> jobs = jobMapper.selectByIds(ids);
+        jobMapper.deleteByIds(ids);
+
+        // 删除 Job 到 Quartz 中
+        for (JobDO job : jobs) {
+            schedulerManager.deleteJob(job.getHandlerName());
+        }
+    }
+
     private JobDO validateJobExists(Long id) {
         JobDO job = jobMapper.selectById(id);
         if (job == null) {

@@ -58,8 +58,17 @@ public class DictDataController {
     @Operation(summary = "删除字典数据")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('system:dict:delete')")
-    public CommonResult<Boolean> deleteDictData(Long id) {
+    public CommonResult<Boolean> deleteDictData(@RequestParam("id") Long id) {
         dictDataService.deleteDictData(id);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete-list")
+    @Operation(summary = "批量删除字典数据")
+    @Parameter(name = "ids", description = "编号列表", required = true)
+    @PreAuthorize("@ss.hasPermission('system:dict:delete')")
+    public CommonResult<Boolean> deleteDictDataList(@RequestParam("ids") List<Long> ids) {
+        dictDataService.deleteDictDataList(ids);
         return success(true);
     }
 
@@ -73,7 +82,7 @@ public class DictDataController {
     }
 
     @GetMapping("/page")
-    @Operation(summary = "/获得字典类型的分页列表")
+    @Operation(summary = "获得字典类型的分页")
     @PreAuthorize("@ss.hasPermission('system:dict:query')")
     public CommonResult<PageResult<DictDataRespVO>> getDictTypePage(@Valid DictDataPageReqVO pageReqVO) {
         PageResult<DictDataDO> pageResult = dictDataService.getDictDataPage(pageReqVO);
@@ -89,7 +98,7 @@ public class DictDataController {
         return success(BeanUtils.toBean(dictData, DictDataRespVO.class));
     }
 
-    @GetMapping("/export")
+    @GetMapping("/export-excel")
     @Operation(summary = "导出字典数据")
     @PreAuthorize("@ss.hasPermission('system:dict:export')")
     @ApiAccessLog(operateType = EXPORT)

@@ -12,12 +12,12 @@ import cn.iocoder.yudao.module.system.service.permission.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
 import java.util.Comparator;
 import java.util.List;
 
@@ -54,6 +54,15 @@ public class MenuController {
     @PreAuthorize("@ss.hasPermission('system:menu:delete')")
     public CommonResult<Boolean> deleteMenu(@RequestParam("id") Long id) {
         menuService.deleteMenu(id);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete-list")
+    @Operation(summary = "批量删除菜单")
+    @Parameter(name = "ids", description = "编号列表", required = true)
+    @PreAuthorize("@ss.hasPermission('system:menu:delete')")
+    public CommonResult<Boolean> deleteMenuList(@RequestParam("ids") List<Long> ids) {
+        menuService.deleteMenuList(ids);
         return success(true);
     }
 

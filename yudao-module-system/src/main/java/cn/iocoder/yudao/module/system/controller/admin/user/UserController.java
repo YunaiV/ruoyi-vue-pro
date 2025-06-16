@@ -136,7 +136,7 @@ public class UserController {
         return success(UserConvert.INSTANCE.convert(user, dept));
     }
 
-    @GetMapping("/export")
+    @GetMapping("/export-excel")
     @Operation(summary = "导出用户")
     @PreAuthorize("@ss.hasPermission('system:user:export')")
     @ApiAccessLog(operateType = EXPORT)

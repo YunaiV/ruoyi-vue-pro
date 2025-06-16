@@ -99,6 +99,11 @@ public class DictDataServiceImpl implements DictDataService {
     }
 
     @Override
+    public void deleteDictDataList(List<Long> ids) {
+        dictDataMapper.deleteByIds(ids);
+    }
+
+    @Override
     public long getDictDataCountByDictType(String dictType) {
         return dictDataMapper.selectCountByDictType(dictType);
     }

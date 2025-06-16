@@ -9,9 +9,9 @@ import cn.iocoder.yudao.module.system.controller.admin.dict.vo.type.DictTypeSave
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictTypeDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dict.DictTypeMapper;
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -85,6 +85,21 @@ public class DictTypeServiceImpl implements DictTypeService {
         }
         // 删除字典类型
         dictTypeMapper.updateToDelete(id, LocalDateTime.now());
+    }
+
+    @Override
+    public void deleteDictTypeList(List<Long> ids) {
+        // 1. 校验是否有字典数据
+        List<DictTypeDO> dictTypes = dictTypeMapper.selectByIds(ids);
+        dictTypes.forEach(dictType -> {
+            if (dictDataService.getDictDataCountByDictType(dictType.getType()) > 0) {
+                throw exception(DICT_TYPE_HAS_CHILDREN);
+            }
+        });
+
+        // 2. 批量删除字典类型
+        LocalDateTime now = LocalDateTime.now();
+        ids.forEach(id -> dictTypeMapper.updateToDelete(id, now));
     }
 
     @Override

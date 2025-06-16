@@ -69,6 +69,7 @@ import java.util.Objects;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.UTC_MS_WITH_XXX_OFFSET_FORMATTER;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.toEpochSecond;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static java.util.Collections.singletonList;
@@ -381,7 +382,7 @@ public class SocialClientServiceImpl implements SocialClientService {
         WxMaService service = getWxMaService(userType);
         WxMaOrderShippingInfoNotifyConfirmRequest request = WxMaOrderShippingInfoNotifyConfirmRequest.builder()
                 .transactionId(reqDTO.getTransactionId())
-                .receivedTime(LocalDateTimeUtil.toEpochMilli(reqDTO.getReceivedTime()))
+                .receivedTime(toEpochSecond(reqDTO.getReceivedTime()))
                 .build();
         try {
             WxMaOrderShippingInfoBaseResponse response = service.getWxMaOrderShippingService().notifyConfirmReceive(request);

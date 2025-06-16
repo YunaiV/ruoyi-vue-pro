@@ -62,6 +62,15 @@ public class DictTypeController {
         return success(true);
     }
 
+    @DeleteMapping("/delete-list")
+    @Operation(summary = "批量删除字典类型")
+    @Parameter(name = "ids", description = "编号列表", required = true)
+    @PreAuthorize("@ss.hasPermission('system:dict:delete')")
+    public CommonResult<Boolean> deleteDictTypeList(@RequestParam("ids") List<Long> ids) {
+        dictTypeService.deleteDictTypeList(ids);
+        return success(true);
+    }
+
     @GetMapping("/page")
     @Operation(summary = "获得字典类型的分页列表")
     @PreAuthorize("@ss.hasPermission('system:dict:query')")
@@ -88,7 +97,7 @@ public class DictTypeController {
     }
 
     @Operation(summary = "导出数据类型")
-    @GetMapping("/export")
+    @GetMapping("/export-excel")
     @PreAuthorize("@ss.hasPermission('system:dict:query')")
     @ApiAccessLog(operateType = EXPORT)
     public void export(HttpServletResponse response, @Valid DictTypePageReqVO exportReqVO) throws IOException {

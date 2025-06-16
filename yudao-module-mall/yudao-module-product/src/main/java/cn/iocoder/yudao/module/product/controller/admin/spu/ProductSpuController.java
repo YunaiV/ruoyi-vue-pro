@@ -124,7 +124,7 @@ public class ProductSpuController {
         return success(productSpuService.getTabsCount());
     }
 
-    @GetMapping("/export")
+    @GetMapping("/export-excel")
     @Operation(summary = "导出商品")
     @PreAuthorize("@ss.hasPermission('product:spu:export')")
     @ApiAccessLog(operateType = EXPORT)

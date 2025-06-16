@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.job.JobDO;
 import javax.validation.Valid;
 import org.quartz.SchedulerException;
 
+import java.util.List;
+
 /**
  * 定时任务 Service 接口
  *
@@ -57,6 +59,13 @@ public interface JobService {
      * @param id 编号
      */
     void deleteJob(Long id) throws SchedulerException;
+
+    /**
+     * 批量删除定时任务
+     *
+     * @param ids 编号列表
+     */
+    void deleteJobList(List<Long> ids) throws SchedulerException;
 
     /**
      * 获得定时任务

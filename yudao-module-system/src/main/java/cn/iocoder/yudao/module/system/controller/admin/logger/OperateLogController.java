@@ -46,7 +46,7 @@ public class OperateLogController {
     }
 
     @Operation(summary = "导出操作日志")
-    @GetMapping("/export")
+    @GetMapping("/export-excel")
     @PreAuthorize("@ss.hasPermission('system:operate-log:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportOperateLog(HttpServletResponse response, @Valid OperateLogPageReqVO exportReqVO) throws IOException {

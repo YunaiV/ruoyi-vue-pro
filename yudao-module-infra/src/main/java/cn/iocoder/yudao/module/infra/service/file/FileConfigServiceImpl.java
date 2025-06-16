@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -132,6 +133,23 @@ public class FileConfigServiceImpl implements FileConfigService {
 
         // 清空缓存
         clearCache(id, null);
+    }
+
+    @Override
+    public void deleteFileConfigList(List<Long> ids) {
+        // 校验是否有主配置
+        List<FileConfigDO> configs = fileConfigMapper.selectByIds(ids);
+        for (FileConfigDO config : configs) {
+            if (Boolean.TRUE.equals(config.getMaster())) {
+                throw exception(FILE_CONFIG_DELETE_FAIL_MASTER);
+            }
+        }
+
+        // 批量删除
+        fileConfigMapper.deleteByIds(ids);
+
+        // 清空缓存
+        ids.forEach(id -> clearCache(id, null));
     }
 
     /**
