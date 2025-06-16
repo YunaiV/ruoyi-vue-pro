@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.srm.service.purchase.bo.order.word;
 
 import cn.iocoder.yudao.module.fms.api.finance.dto.FmsCompanyDTO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmSupplierDO;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -24,7 +25,7 @@ public class SrmPurchaseOrderWordBO extends SrmPurchaseOrderDO {
     //付款方
     FmsCompanyDTO a;
     //供货方
-    FmsCompanyDTO b;
+    SrmSupplierDO b;
 
     //付款条款
     private String paymentTerms;

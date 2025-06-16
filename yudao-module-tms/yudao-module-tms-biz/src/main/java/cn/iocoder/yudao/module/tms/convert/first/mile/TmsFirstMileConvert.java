@@ -41,7 +41,8 @@ public class TmsFirstMileConvert {
             .filter(Objects::nonNull) // 保证后续不会NPE
             .collect(Collectors.toMap(
                 TmsVesselTrackingDO::getUpstreamId,
-                Function.identity()
+                Function.identity(),
+                (a, b) -> a
             ));
 
         log.debug("转换主表BO列表，itemMap: {}", itemMap);

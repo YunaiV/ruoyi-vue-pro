@@ -10,6 +10,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
+ * @author jisencai
  * @table-fields : no,execute_status,remark,id,warehouse_id
  */
 @Schema(description = "管理后台 - 库位移动新增/修改 Request VO")

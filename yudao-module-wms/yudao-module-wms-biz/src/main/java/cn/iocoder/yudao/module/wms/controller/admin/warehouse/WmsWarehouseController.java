@@ -43,8 +43,6 @@ public class WmsWarehouseController {
     @Resource
     private WmsWarehouseService warehouseService;
 
-
-
     /**
      * @sign : 85CB8518B4499F29
      */

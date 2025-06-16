@@ -3,8 +3,10 @@ package cn.iocoder.yudao.module.wms.dal.mysql.inbound;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundPageReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.module.wms.enums.inbound.WmsInboundAuditStatus;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -100,4 +102,20 @@ public interface WmsInboundMapper extends BaseMapperX<WmsInboundDO> {
         wrapper.ne(WmsInboundDO::getAuditStatus, WmsInboundAuditStatus.ABANDONED.getValue());
         return selectList(wrapper);
     }
+
+    /**
+     * 按 warehouseId, productId 查询唯一的 WmsInboundDO
+     */
+    default WmsInboundDO getByWarehouseIdAndProductId(Long warehouseId, Long productId) {
+        MPJLambdaWrapperX<WmsInboundDO> wrapper = new MPJLambdaWrapperX<>();
+        wrapper.selectAll(WmsInboundDO.class)
+            .eqIfPresent(WmsInboundDO::getWarehouseId, warehouseId)
+            .innerJoin(WmsInboundItemDO.class, WmsInboundItemDO::getInboundId, WmsInboundDO::getId)
+            .eqIfPresent(WmsInboundItemDO::getProductId, productId)
+            .orderByAsc(WmsInboundDO::getCreateTime)
+            .last("limit 1");
+        return selectOne(wrapper);
+    }
+
+
 }

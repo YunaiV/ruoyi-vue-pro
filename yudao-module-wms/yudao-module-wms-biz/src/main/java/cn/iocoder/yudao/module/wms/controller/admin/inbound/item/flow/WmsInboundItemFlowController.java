@@ -1,12 +1,15 @@
 package cn.iocoder.yudao.module.wms.controller.admin.inbound.item.flow;
 
-import cn.iocoder.yudao.module.wms.service.inbound.item.flow.WmsInboundItemFlowService;
+import cn.iocoder.yudao.module.wms.service.inbound.item.flow.WmsItemFlowService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * @author jisencai
+ */
 @Tag(name = "入库单库存详情扣减")
 @RestController
 @RequestMapping("/wms/inbound-item-flow")
@@ -14,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WmsInboundItemFlowController {
 
     @Resource
-    private WmsInboundItemFlowService inboundItemFlowService;
+    private WmsItemFlowService itemFlowService;
 
 //    /**
 //     * @sign : DF23AF4DA093DBC0
@@ -23,7 +26,7 @@ public class WmsInboundItemFlowController {
 //    @Operation(summary = "创建入库单库存详情扣减")
 //    @PreAuthorize("@ss.hasPermission('wms:inbound-item-flow:create')")
 //    public CommonResult<Long> createInboundItemFlow(@Valid @RequestBody WmsInboundItemFlowSaveReqVO createReqVO) {
-//        return success(inboundItemFlowService.createInboundItemFlow(createReqVO).getId());
+//        return success(itemFlowService.createInboundItemFlow(createReqVO).getId());
 //    }
 //
 //    /**
@@ -33,7 +36,7 @@ public class WmsInboundItemFlowController {
 //    @Operation(summary = "更新入库单库存详情扣减")
 //    @PreAuthorize("@ss.hasPermission('wms:inbound-item-flow:update')")
 //    public CommonResult<Boolean> updateInboundItemFlow(@Valid @RequestBody WmsInboundItemFlowSaveReqVO updateReqVO) {
-//        inboundItemFlowService.updateInboundItemFlow(updateReqVO);
+//        itemFlowService.updateInboundItemFlow(updateReqVO);
 //        return success(true);
 //    }
 //
@@ -42,7 +45,7 @@ public class WmsInboundItemFlowController {
 //    @Parameter(name = "id", description = "编号", required = true)
 //    @PreAuthorize("@ss.hasPermission('wms:inbound-item-flow:delete')")
 //    public CommonResult<Boolean> deleteInboundItemFlow(@RequestParam("id") Long id) {
-//        inboundItemFlowService.deleteInboundItemFlow(id);
+//        itemFlowService.deleteInboundItemFlow(id);
 //        return success(true);
 //    }
 //
@@ -55,7 +58,7 @@ public class WmsInboundItemFlowController {
 //    @PreAuthorize("@ss.hasPermission('wms:inbound-item-flow:query')")
 //    public CommonResult<WmsInboundItemFlowRespVO> getInboundItemFlow(@RequestParam("id") Long id) {
 //        // 查询数据
-//        WmsInboundItemFlowDO inboundItemFlow = inboundItemFlowService.getInboundItemFlow(id);
+//        WmsItemFlowDO inboundItemFlow = itemFlowService.getInboundItemFlow(id);
 //        if (inboundItemFlow == null) {
 //            throw exception(INBOUND_ITEM_FLOW_NOT_EXISTS);
 //        }
@@ -78,7 +81,7 @@ public class WmsInboundItemFlowController {
 //    @PreAuthorize("@ss.hasPermission('wms:inbound-item-flow:query')")
 //    public CommonResult<PageResult<WmsInboundItemFlowRespVO>> getInboundItemFlowPage(@Valid WmsInboundItemFlowPageReqVO pageReqVO) {
 //        // 查询数据
-//        PageResult<WmsInboundItemFlowDO> doPageResult = inboundItemFlowService.getInboundItemFlowPage(pageReqVO);
+//        PageResult<WmsItemFlowDO> doPageResult = itemFlowService.getInboundItemFlowPage(pageReqVO);
 //        // 转换
 //        PageResult<WmsInboundItemFlowRespVO> voPageResult = BeanUtils.toBean(doPageResult, WmsInboundItemFlowRespVO.class);
 //        // 人员姓名填充
@@ -96,7 +99,7 @@ public class WmsInboundItemFlowController {
 //    @ApiAccessLog(operateType = EXPORT)
 //    public void exportInboundItemFlowExcel(@Valid WmsInboundItemFlowPageReqVO pageReqVO, HttpServletResponse response) throws IOException {
 //        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-//        List<WmsInboundItemFlowDO> list = inboundItemFlowService.getInboundItemFlowPage(pageReqVO).getList();
+//        List<WmsItemFlowDO> list = itemFlowService.getInboundItemFlowPage(pageReqVO).getList();
 //        // 导出 Excel
 //        ExcelUtils.write(response, "入库单库存详情扣减.xls", "数据", WmsInboundItemFlowRespVO.class, BeanUtils.toBean(list, WmsInboundItemFlowRespVO.class));
 //    }

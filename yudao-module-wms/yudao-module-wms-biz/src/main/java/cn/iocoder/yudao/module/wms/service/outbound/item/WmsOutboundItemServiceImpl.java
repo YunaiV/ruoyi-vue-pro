@@ -170,9 +170,9 @@ public class WmsOutboundItemServiceImpl implements WmsOutboundItemService {
         WmsOutboundAuditStatus auditStatus = WmsOutboundAuditStatus.parse(outboundDO.getAuditStatus());
         WmsOutboundStatus wmsOutboundStatus = WmsOutboundStatus.parse(outboundDO.getOutboundStatus());
 //         审批通过后，设置实际出库量
-        if (!auditStatus.matchAny(WmsOutboundAuditStatus.FINISHED)) {
-            throw exception(OUTBOUND_CAN_NOT_EDIT);
-        }
+//        if (!auditStatus.matchAny(WmsOutboundAuditStatus.FINISHED)) {
+//            throw exception(OUTBOUND_CAN_NOT_EDIT);
+//        }
 //        // 除了未入库的情况，其它情况不允许修改实际入库量
 //        if (!wmsOutboundStatus.matchAny(WmsOutboundStatus.NONE)) {
 //            throw exception(INBOUND_CAN_NOT_EDIT);

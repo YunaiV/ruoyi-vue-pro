@@ -26,7 +26,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSim
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemLogicDO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsItemFlowDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.flow.WmsStockFlowDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
@@ -412,7 +412,7 @@ public class WmsInboundServiceImpl implements WmsInboundService {
             return;
         }
         for (WmsInboundItemRespVO respVO : itemList) {
-            WmsInboundItemFlowDO inboundItemFlow = WmsInboundItemFlowDO.builder()
+            WmsItemFlowDO inboundItemFlow = WmsItemFlowDO.builder()
                     .inboundId(respVO.getInboundId())
                     .inboundItemId(respVO.getId())
                     .productId(respVO.getProductId())
@@ -656,4 +656,23 @@ public class WmsInboundServiceImpl implements WmsInboundService {
             throw exception(INBOUND_ABANDON_NOT_ALLOWED);
         }
     }
+
+    @Override
+    public WmsInboundDO getByWarehouseIdAndProductId(Long warehouseId, Long productId) {
+        return inboundMapper.getByWarehouseIdAndProductId(warehouseId, productId);
+    }
+
+//    /**
+//     * 按 productId、locationId、warehouseId 查询 WmsItemFlowDO
+//     *
+//     * @param productId   产品 ID
+//     * @param binId       库位 ID
+//     * @param warehouseId 仓库 ID
+//     * @return 入库单库存详情扣减列表
+//     */
+//    @Override
+//    public List<WmsInboundItemFlowDetailVO> selectByProductIdAndBinIdAndWarehouseId(Long warehouseId, Long binId, Long productId, int limit) {
+//        return inboundMapper.selectByProductIdAndBinIdAndWarehouseId(productId, binId, warehouseId, limit);
+//    }
+
 }

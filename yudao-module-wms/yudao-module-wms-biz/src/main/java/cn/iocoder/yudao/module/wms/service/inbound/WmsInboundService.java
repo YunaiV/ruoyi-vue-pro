@@ -182,4 +182,11 @@ public interface WmsInboundService {
     WmsInboundDO createForTransfer(WmsInboundSaveReqVO inboundSaveReqVO);
 
     void forceAbandon(WmsApprovalReqVO approvalReqVO);
+
+    WmsInboundDO getByWarehouseIdAndProductId(Long warehouseId, Long productId);
+
+//    /**
+//     * 根据产品ID，库位ID和仓库ID查询
+//     */
+//    List<WmsInboundItemFlowDetailVO> selectByProductIdAndBinIdAndWarehouseId(Long warehouseId, Long fromBinId, Long productId, int limit);
 }

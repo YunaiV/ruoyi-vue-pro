@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemLogicDO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsInboundItemFlowDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsItemFlowDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.logic.WmsStockLogicDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
@@ -63,7 +63,7 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
     /**
      * 更新库存货位库存量
      **/
-    protected abstract List<WmsInboundItemFlowDO> processInboundItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId);
+    protected abstract List<WmsItemFlowDO> processInboundItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId);
     /**
      * 更新库存货位库存量
      **/
@@ -162,9 +162,9 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
     private WmsOutboundStatus processItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
 
         this.processStockWarehouseItem(item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
-        List<WmsInboundItemFlowDO> inboundItemFlowList=this.processInboundItem(outboundRespVO,item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
+        List<WmsItemFlowDO> itemFlowList=this.processInboundItem(outboundRespVO,item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
         this.processStockLogicItem(item, companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
-        this.processStockBinItem(item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId,inboundItemFlowList);
+        this.processStockBinItem(item, companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId, itemFlowList);
         // 当前逻辑,默认全部入库
         return WmsOutboundStatus.ALL;
     }
@@ -221,7 +221,7 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
     /**
      * 处理仓位库存
      **/
-    private void processStockBinItem(WmsOutboundItemRespVO item,Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId,List<WmsInboundItemFlowDO> inboundItemFlowList) {
+    private void processStockBinItem(WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId, List<WmsItemFlowDO> itemFlowList) {
         // 调整仓位库存
         JdbcUtils.requireTransaction();
 
@@ -236,7 +236,7 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
         // 保存
         stockBinService.insertOrUpdate(stockBinDO);
         // 记录流水
-        for (WmsInboundItemFlowDO flowDO : inboundItemFlowList) {
+        for (WmsItemFlowDO flowDO : itemFlowList) {
             stockFlowService.createForStockBin(this.getReason(), wmsStockFlowDirection, productId, stockBinDO, flowDO.getOutboundAvailableDeltaQty(), outboundId, outboundItemId,flowDO.getId());
         }
 

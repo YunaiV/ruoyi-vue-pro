@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.wms.controller.admin.exchange.vo.WmsExchangePageR
 import cn.iocoder.yudao.module.wms.controller.admin.exchange.vo.WmsExchangeRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.exchange.vo.WmsExchangeSaveReqVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.exchange.WmsExchangeDO;
-import cn.iocoder.yudao.module.wms.dal.dataobject.exchange.item.WmsExchangeItemDO;
 import cn.iocoder.yudao.module.wms.enums.exchange.WmsExchangeAuditStatus;
 import jakarta.validation.Valid;
 
@@ -72,10 +71,10 @@ public interface WmsExchangeService {
      **/
     void approve(WmsExchangeAuditStatus.Event event, WmsApprovalReqVO approvalReqVO);
 
-    /**
-     * 完成换货
-     **/
-    void finishExchange(WmsExchangeDO exchangeDO, List<WmsExchangeItemDO> exchangeItemDOList);
+//    /**
+//     * 完成换货
+//     **/
+//    void finishExchange(WmsExchangeDO exchangeDO, List<WmsExchangeItemDO> exchangeItemDOList);
 
     /**
      * 组装仓库

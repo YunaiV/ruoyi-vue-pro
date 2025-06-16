@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.srm.controller.admin.purchase.vo.request.req.SrmP
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmPurchaseRequestItemsDO;
+import cn.iocoder.yudao.module.srm.dal.dataobject.purchase.SrmSupplierDO;
 import cn.iocoder.yudao.module.srm.service.purchase.bo.order.SrmPurchaseOrderBO;
 import cn.iocoder.yudao.module.srm.service.purchase.bo.order.SrmPurchaseOrderItemBO;
 import cn.iocoder.yudao.module.srm.service.purchase.bo.order.word.SrmPurchaseOrderItemWordBO;
@@ -38,9 +39,7 @@ public interface SrmOrderConvert {
      * @param itemDOMap       采购项Map
      * @return 采购订单的入参reqVO的item
      */
-    default SrmPurchaseOrderSaveReqVO.Item convertToErpPurchaseOrderSaveReqVOItem(SrmPurchaseRequestItemsDO itemDO,
-        Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> requestItemsMap, Map<Long, SrmPurchaseRequestItemsDO> itemDOMap) {
-
+    default SrmPurchaseOrderSaveReqVO.Item convertToErpPurchaseOrderSaveReqVOItem(SrmPurchaseRequestItemsDO itemDO, Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> requestItemsMap, Map<Long, SrmPurchaseRequestItemsDO> itemDOMap) {
         SrmPurchaseOrderSaveReqVO.Item item = new SrmPurchaseOrderSaveReqVO.Item();
         //SrmPurchaseRequestItemsDO ->  SrmPurchaseOrderSaveReqVO.Item
         SrmPurchaseRequestItemsDO requestItemsDO = itemDOMap.get(itemDO.getId());
@@ -55,15 +54,14 @@ public interface SrmOrderConvert {
         // 设置下单数量(采购) == 申请项批准数量
         item.setQty(reqVO.getOrderQuantity()); //合并时vo -> 数量
         //vo 必填项 ，特殊
-        item.setProductPrice(itemDO.getGrossPrice());//产品含税单价->产品价格
+        item.setProductPrice(reqVO.getProductPrice());//产品含税单价->产品价格
         //价税合计
-        item.setDeliveryTime(itemDO.getExpectArrivalDate());//交货日期 -> 期望到货日期
+        item.setDeliveryTime(reqVO.getDeliveryTime());//交货日期 -> 期望到货日期
         return item;
     }
 
     //list
-    default List<SrmPurchaseOrderSaveReqVO.Item> convertToErpPurchaseOrderSaveReqVOItemList(List<SrmPurchaseRequestItemsDO> itemDOList,
-        Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> requestItemsMap, Map<Long, SrmPurchaseRequestItemsDO> itemDOMap) {
+    default List<SrmPurchaseOrderSaveReqVO.Item> convertToErpPurchaseOrderSaveReqVOItemList(List<SrmPurchaseRequestItemsDO> itemDOList, Map<Long, SrmPurchaseRequestMergeReqVO.requestItems> requestItemsMap, Map<Long, SrmPurchaseRequestItemsDO> itemDOMap) {
         return itemDOList.stream().map(itemDO -> convertToErpPurchaseOrderSaveReqVOItem(itemDO, requestItemsMap, itemDOMap)).collect(Collectors.toList());
     }
 
@@ -71,7 +69,7 @@ public interface SrmOrderConvert {
      * 合同word 渲染BO用
      */
     default SrmPurchaseOrderWordBO bindDataFormOrderItemDO(List<SrmPurchaseOrderItemDO> itemDOS, SrmPurchaseOrderDO orderDO,
-                                                           SrmPurchaseOrderGenerateContractReqVO vo, Map<Long, FmsCompanyDTO> dtoMap) {
+                                                           SrmPurchaseOrderGenerateContractReqVO vo, Map<Long, FmsCompanyDTO> dtoMap, SrmSupplierDO srmSupplierDO) {
         //        Set<Long> productIds = itemDOS.stream().map(SrmPurchaseOrderItemDO::getProductId).collect(Collectors.toSet());
         //        Map<Long, ErpProductDTO> productMap = erpProductApi.getProductMap(productIds);
         //收集产品的单位map getProductUnitMap
@@ -97,7 +95,7 @@ public interface SrmOrderConvert {
             })).setTotalCount(peek.getTotalCount().setScale(0, RoundingMode.HALF_UP));
             //渲染甲方乙方
             peek.setA(dtoMap.get(vo.getPartyAId()));
-            peek.setB(dtoMap.get(vo.getPartyBId()));
+            peek.setB(srmSupplierDO);
             //渲染起始目的港口名称
             peek.setPortOfLoading(orderDO.getFromPortName());
             peek.setPortOfDischarge(orderDO.getToPortName());

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.tms.controller.admin.first.mile.request.item.vo;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.framework.mybatis.core.vo.BaseVO;
+import cn.iocoder.yudao.module.tms.controller.admin.common.vo.TmsProductRespVO;
 import cn.iocoder.yudao.module.tms.enums.TmsDictTypeConstants;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -26,9 +27,8 @@ public class TmsFirstMileRequestItemRespVO extends BaseVO {
     @Schema(description = "产品id")
     private Long productId;
 
-    @Schema(description = "产品名称")
-    @ExcelProperty("产品名称")
-    private String productName;
+    @Schema(description = "产品信息")
+    private TmsProductRespVO product;
 
     //带出该申请部门的 该产品sku的 中国的 仓库库存汇总
     @Schema(description = "国内仓库库存")
@@ -101,11 +101,6 @@ public class TmsFirstMileRequestItemRespVO extends BaseVO {
     @Schema(description = "已订购数")
     @ExcelProperty("已订购数")
     private Integer orderClosedQty;
-
-    //产品重量
-    @Schema(description = "产品基础重量（kg）")
-    @ExcelProperty("产品基础重量（kg）")
-    private BigDecimal productWeight;
 
     @Schema(description = "销售公司ID")
     private Long salesCompanyId;
