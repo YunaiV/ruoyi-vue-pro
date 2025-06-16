@@ -28,7 +28,7 @@ public class YudaoServerApplication {
         // 如果你碰到启动的问题，请认真阅读 https://doc.iocoder.cn/quick-start/ 文章
         // 如果你碰到启动的问题，请认真阅读 https://doc.iocoder.cn/quick-start/ 文章
         // 如果你碰到启动的问题，请认真阅读 https://doc.iocoder.cn/quick-start/ 文章
-//        TimeZone.setDefault(TimeZone.getTimeZone(TimeZoneEnum.TIME_ZONE_UTC));
+        TimeZone.setDefault(TimeZone.getTimeZone(TimeZoneEnum._UTC_TIME_ZONE));
         SpringApplication.run(YudaoServerApplication.class, args);
 //        new SpringApplicationBuilder(YudaoServerApplication.class)
 //                .applicationStartup(new BufferingApplicationStartup(20480))

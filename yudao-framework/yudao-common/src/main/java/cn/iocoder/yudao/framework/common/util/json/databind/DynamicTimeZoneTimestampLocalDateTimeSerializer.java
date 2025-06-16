@@ -14,11 +14,16 @@ import java.time.ZoneId;
 import java.util.Objects;
 import java.util.TimeZone;
 
-import static cn.hutool.core.date.DatePattern.NORM_DATETIME_FORMATTER;
+public class DynamicTimeZoneTimestampLocalDateTimeSerializer extends JsonSerializer<LocalDateTime> {
 
-public class DynamicTimeZoneString2LocalDateTimeSerializer extends JsonSerializer<LocalDateTime> {
+    public static final DynamicTimeZoneTimestampLocalDateTimeSerializer INSTANCE;
 
+    static {
+        INSTANCE = new DynamicTimeZoneTimestampLocalDateTimeSerializer();
+    }
 
+    private DynamicTimeZoneTimestampLocalDateTimeSerializer() {
+    }
     @Override
     public void serialize(LocalDateTime localDateTime, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
@@ -30,12 +35,10 @@ public class DynamicTimeZoneString2LocalDateTimeSerializer extends JsonSerialize
             }
         }
 
-        //        LocalDateTime转换为字符串
-        String utcTime = localDateTime
+        long epochMilli = localDateTime
                 .atZone(TimeZoneEnum.UTC_ZONE_ID)
-                .withZoneSameInstant(toZoneId)
-                .toLocalDateTime()
-                .format(NORM_DATETIME_FORMATTER);
-        jsonGenerator.writeString(utcTime);
+                .toInstant()
+                .toEpochMilli();
+        jsonGenerator.writeNumber(epochMilli);
     }
 }

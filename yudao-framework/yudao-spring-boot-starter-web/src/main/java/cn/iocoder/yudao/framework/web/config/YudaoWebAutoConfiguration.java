@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.framework.web.config;
 
 import cn.iocoder.yudao.framework.common.enums.WebFilterOrderEnum;
-import cn.iocoder.yudao.framework.common.util.json.databind.DynamicTimeZoneLocalDateTime2TimestampDeserializer;
-import cn.iocoder.yudao.framework.common.util.json.databind.DynamicTimeZoneTimestamp2LocalDateTimeSerializer;
+import cn.iocoder.yudao.framework.common.util.json.databind.DynamicTimeZoneTimestampLocalDateTimeDeserializer;
+import cn.iocoder.yudao.framework.common.util.json.databind.DynamicTimeZoneTimestampLocalDateTimeSerializer;
 import cn.iocoder.yudao.framework.common.util.json.databind.NumberSerializer;
 import cn.iocoder.yudao.framework.common.util.spring.DynamicTimeZoneLocalDateTimeConverter;
 import cn.iocoder.yudao.framework.web.core.filter.CacheRequestBodyFilter;
@@ -72,8 +72,8 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
                 .addSerializer(LocalDate.class, LocalDateSerializer.INSTANCE)
                 .addDeserializer(LocalDate.class, LocalDateDeserializer.INSTANCE)
                 // 新增 LocalDateTime 序列化、反序列化规则，使用 Long 时间戳
-                .addDeserializer(LocalDateTime.class, new DynamicTimeZoneLocalDateTime2TimestampDeserializer())
-                .addSerializer(LocalDateTime.class, new DynamicTimeZoneTimestamp2LocalDateTimeSerializer());
+                .addDeserializer(LocalDateTime.class, DynamicTimeZoneTimestampLocalDateTimeDeserializer.INSTANCE)
+                .addSerializer(LocalDateTime.class, DynamicTimeZoneTimestampLocalDateTimeSerializer.INSTANCE);
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
