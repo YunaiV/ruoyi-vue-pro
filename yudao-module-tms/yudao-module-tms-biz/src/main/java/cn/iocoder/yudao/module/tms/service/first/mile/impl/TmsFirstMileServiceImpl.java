@@ -637,14 +637,18 @@ public class TmsFirstMileServiceImpl implements TmsFirstMileService {
                 .orElse(new TmsFirstMileStockRespVO());
 
             stockVO.setCompanyName(
-                Optional.ofNullable(companyMap.get(stockVO.getCompanyId()))
-                    .map(FmsCompanyDTO::getName)
-                    .orElse("未知公司"));
+                Optional.ofNullable(stockVO.getCompanyId())
+                    .map(companyId -> Optional.ofNullable(companyMap.get(companyId))
+                        .map(FmsCompanyDTO::getName)
+                        .orElse("未知公司"))
+                    .orElse(null));
 
             stockVO.setInboundCompanyName(
-                Optional.ofNullable(companyMap.get(stockVO.getInboundCompanyId()))
-                    .map(FmsCompanyDTO::getName)
-                    .orElse("未知公司"));
+                Optional.ofNullable(stockVO.getInboundCompanyId())
+                    .map(companyId -> Optional.ofNullable(companyMap.get(companyId))
+                        .map(FmsCompanyDTO::getName)
+                        .orElse("未知公司"))
+                    .orElse(null));
 
             item.setStock(Collections.singletonList(stockVO));
         });
