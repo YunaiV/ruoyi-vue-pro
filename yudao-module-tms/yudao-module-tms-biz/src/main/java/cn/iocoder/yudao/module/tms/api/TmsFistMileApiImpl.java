@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.tms.api.first.mile.dto.TmsFistMileItemUpdateDTO;
 import cn.iocoder.yudao.module.tms.api.first.mile.dto.TmsFistMileUpdateDTO;
 import cn.iocoder.yudao.module.tms.api.transfer.dto.TmsOutboundItemReqDTO;
 import cn.iocoder.yudao.module.tms.api.transfer.dto.TmsOutboundReqDTO;
-import cn.iocoder.yudao.module.tms.aspect.TmsApiValidate;
 import cn.iocoder.yudao.module.tms.dal.dataobject.first.mile.item.TmsFirstMileItemDO;
 import cn.iocoder.yudao.module.tms.service.first.mile.TmsFirstMileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +31,6 @@ public class TmsFistMileApiImpl implements TmsFistMileApi {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @TmsApiValidate(prefix = "出库单审批通过回调")
     public void outboundAudit(TmsOutboundReqDTO dto) {
         // 1.0 校验上游类型是否是头程出库
         if (!Objects.equals(dto.getUpstreamType(), BillType.TMS_FIRST_MILE.getValue())) {
