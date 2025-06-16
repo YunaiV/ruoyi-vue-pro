@@ -79,6 +79,7 @@ public class IotEmqxDownstreamHandler {
         boolean isReply = IotDeviceMessageUtils.isReplyMessage(message);
 
         // TODO @芋艿：需要添加对应的 Topic，所以需要先判断消息方法类型
+        // TODO @haohao：基于 method，然后逆推对应的 topic，可以哇？约定好~
         // 根据消息方法和回复状态构建对应的主题
         switch (methodEnum) {
             case PROPERTY_POST:
