@@ -68,17 +68,17 @@ public class LocalDateTimeUtils {
      * 创建指定时间
      *
      * @param year  年
-     * @param mouth 月
+     * @param month 月
      * @param day   日
      * @return 指定时间
      */
-    public static LocalDateTime buildTime(int year, int mouth, int day) {
-        return LocalDateTime.of(year, mouth, day, 0, 0, 0);
+    public static LocalDateTime buildTime(int year, int month, int day) {
+        return LocalDateTime.of(year, month, day, 0, 0, 0);
     }
 
-    public static LocalDateTime[] buildBetweenTime(int year1, int mouth1, int day1,
-                                                   int year2, int mouth2, int day2) {
-        return new LocalDateTime[]{buildTime(year1, mouth1, day1), buildTime(year2, mouth2, day2)};
+    public static LocalDateTime[] buildBetweenTime(int year1, int month1, int day1,
+                                                   int year2, int month2, int day2) {
+        return new LocalDateTime[]{buildTime(year1, month1, day1), buildTime(year2, month2, day2)};
     }
 
     /**
@@ -225,7 +225,7 @@ public class LocalDateTimeUtils {
                                                          Integer interval) {
         // 1.1 找到枚举
         DateIntervalEnum intervalEnum = DateIntervalEnum.valueOf(interval);
-        Assert.notNull(intervalEnum, "interval({}} 找不到对应的枚举", interval);
+        Assert.notNull(intervalEnum, "interval({}) 找不到对应的枚举", interval);
         // 1.2 将时间对齐
         startTime = LocalDateTimeUtil.beginOfDay(startTime);
         endTime = LocalDateTimeUtil.endOfDay(endTime);
@@ -292,7 +292,7 @@ public class LocalDateTimeUtils {
     public static String formatDateRange(LocalDateTime startTime, LocalDateTime endTime, Integer interval) {
         // 1. 找到枚举
         DateIntervalEnum intervalEnum = DateIntervalEnum.valueOf(interval);
-        Assert.notNull(intervalEnum, "interval({}} 找不到对应的枚举", interval);
+        Assert.notNull(intervalEnum, "interval({}) 找不到对应的枚举", interval);
 
         // 2. 循环，生成时间范围
         switch (intervalEnum) {
