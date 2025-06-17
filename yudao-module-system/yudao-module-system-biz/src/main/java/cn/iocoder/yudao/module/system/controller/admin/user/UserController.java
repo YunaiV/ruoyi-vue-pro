@@ -1,12 +1,14 @@
 package cn.iocoder.yudao.module.system.controller.admin.user;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
+import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserSaveReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.*;
 import cn.iocoder.yudao.module.system.convert.user.UserConvert;
@@ -14,6 +16,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
+import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,6 +34,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -46,6 +50,8 @@ public class UserController {
     private AdminUserService userService;
     @Resource
     private DeptService deptService;
+    @Resource
+    private PermissionService permissionService;
 
     private UserConvert userConvert = UserConvert.INSTANCE;
 
@@ -53,7 +59,7 @@ public class UserController {
     @Operation(summary = "新增用户")
     @PreAuthorize("@ss.hasPermission('system:user:create')")
     public CommonResult<Long> createUser(@Valid @RequestBody UserSaveReqVO reqVO) {
-        AdminUserSaveReqDTO reqDTO =  userConvert.toAdminUserSaveReqDTO(reqVO);
+        AdminUserSaveReqDTO reqDTO = userConvert.toAdminUserSaveReqDTO(reqVO);
         Long id = userService.createUser(reqDTO);
         return success(id);
     }
@@ -62,7 +68,7 @@ public class UserController {
     @Operation(summary = "修改用户")
     @PreAuthorize("@ss.hasPermission('system:user:update')")
     public CommonResult<Boolean> updateUser(@Valid @RequestBody UserSaveReqVO reqVO) {
-        AdminUserSaveReqDTO reqDTO =  userConvert.toAdminUserSaveReqDTO(reqVO);
+        AdminUserSaveReqDTO reqDTO = userConvert.toAdminUserSaveReqDTO(reqVO);
         userService.updateUser(reqDTO);
         return success(true);
     }
@@ -101,11 +107,32 @@ public class UserController {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(new PageResult<>(pageResult.getTotal()));
         }
-        // 拼接数据
-        Map<Long, DeptDO> deptMap = deptService.getDeptMap(
-                convertList(pageResult.getList(), AdminUserDO::getDeptId));
-        return success(new PageResult<>(UserConvert.INSTANCE.convertList(pageResult.getList(), deptMap),
+        // 拼接部门数据
+        List<Long> deptIdList = convertList(pageResult.getList(), AdminUserDO::getDeptId);
+        Map<Long, DeptDO> deptMap = deptService.getDeptMap(deptIdList);
+        // 拼接角色数据
+        List<Long> userIdList = convertList(pageResult.getList(), AdminUserDO::getId);
+        Map<Long, List<String>> userRoleNameMap = permissionService.getUserRoleNameMap(userIdList);
+        return success(new PageResult<>(UserConvert.INSTANCE.convertList(pageResult.getList(), deptMap, userRoleNameMap),
                 pageResult.getTotal()));
+    }
+
+
+    @GetMapping("/get-user-data-permission")
+    @Operation(summary = "获得用户数据权限")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    public CommonResult<UserDataPermissionRespVO> getUserDataPermission(@RequestParam("id") Long id) {
+        DeptDataPermissionRespDTO deptDataPermission = permissionService.getDeptDataPermission(id);
+        Map<Long, DeptDO> deptMap = deptService.getDeptMap(deptDataPermission.getDeptIds());
+        UserDataPermissionRespVO vo = new UserDataPermissionRespVO();
+        vo.setAll(deptDataPermission.getAll());
+        vo.setSelf(deptDataPermission.getSelf());
+        List<UserDataPermissionRespVO.DeptVO> voList = deptDataPermission.getDeptIds().stream()
+                .map(deptMap::get)
+                .map(dept -> Convert.convert(UserDataPermissionRespVO.DeptVO.class, dept))
+                .toList();
+        vo.setDeptList(voList);
+        return success(vo);
     }
 
     @GetMapping({"/list-all-simple", "/simple-list"})
@@ -173,5 +200,6 @@ public class UserController {
         List<UserImportExcelVO> list = ExcelUtils.read(file, UserImportExcelVO.class);
         return success(userService.importUserList(list, updateSupport));
     }
+
 
 }

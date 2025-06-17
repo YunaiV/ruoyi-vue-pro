@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.system.service.permission;
 import cn.iocoder.yudao.module.system.api.permission.dto.DeptDataPermissionRespDTO;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static java.util.Collections.singleton;
@@ -115,6 +117,14 @@ public interface PermissionService {
      * @return 角色编号集合
      */
     Set<Long> getUserRoleIdListByUserId(Long userId);
+
+    /**
+     * 获得用户拥有的角色名称集合
+     *
+     * @param userIdList 用户编号列表
+     * @return 角色编号集合
+     */
+    Map<Long, List<String>> getUserRoleNameMap(List<Long> userIdList);
 
     /**
      * 获得用户拥有的角色编号集合，从缓存中获取

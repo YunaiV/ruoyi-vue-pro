@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.convert.user;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -16,6 +17,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.dept.PostDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import com.google.common.collect.Lists;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -28,6 +30,23 @@ public interface UserConvert {
     UserConvert INSTANCE = Mappers.getMapper(UserConvert.class);
 
     AdminUserSaveReqDTO toAdminUserSaveReqDTO(UserSaveReqVO reqVO);
+
+    default UserRespVO convert(AdminUserDO user, DeptDO dept, List<String> userRoleNameList) {
+        UserRespVO userVO = BeanUtils.toBean(user, UserRespVO.class);
+        if (dept != null) {
+            userVO.setDeptName(dept.getName());
+        }
+        if (CollUtil.isNotEmpty(userRoleNameList)) {
+            userVO.setRoleNameList(userRoleNameList);
+        } else {
+            userVO.setRoleNameList(Lists.newArrayList());
+        }
+        return userVO;
+    }
+
+    default List<UserRespVO> convertList(List<AdminUserDO> list, Map<Long, DeptDO> deptMap, Map<Long, List<String>> userRoleNameMap) {
+        return CollectionUtils.convertList(list, user -> convert(user, deptMap.get(user.getDeptId()), userRoleNameMap.get(user.getId())));
+    }
 
     default List<UserRespVO> convertList(List<AdminUserDO> list, Map<Long, DeptDO> deptMap) {
         return CollectionUtils.convertList(list, user -> convert(user, deptMap.get(user.getDeptId())));

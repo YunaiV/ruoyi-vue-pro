@@ -30,8 +30,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.annotation.Resource;
+
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
@@ -86,7 +88,7 @@ public class PermissionServiceImpl implements PermissionService {
     /**
      * 判断指定角色，是否拥有该 permission 权限
      *
-     * @param roles 指定角色数组
+     * @param roles      指定角色数组
      * @param permission 权限标识
      * @return 是否拥有
      */
@@ -134,9 +136,9 @@ public class PermissionServiceImpl implements PermissionService {
     @DSTransactional // 多数据源，使用 @DSTransactional 保证本地事务，以及数据源的切换
     @Caching(evict = {
             @CacheEvict(value = RedisKeyConstants.MENU_ROLE_ID_LIST,
-            allEntries = true),
+                    allEntries = true),
             @CacheEvict(value = RedisKeyConstants.PERMISSION_MENU_ID_LIST,
-            allEntries = true) // allEntries 清空所有缓存，主要一次更新涉及到的 menuIds 较多，反倒批量会更快
+                    allEntries = true) // allEntries 清空所有缓存，主要一次更新涉及到的 menuIds 较多，反倒批量会更快
     })
     public void assignRoleMenu(Long roleId, Set<Long> menuIds) {
         // 获得角色拥有菜单编号
@@ -237,6 +239,34 @@ public class PermissionServiceImpl implements PermissionService {
     public Set<Long> getUserRoleIdListByUserId(Long userId) {
         return convertSet(userRoleMapper.selectListByUserId(userId), UserRoleDO::getRoleId);
     }
+
+    @Override
+    public Map<Long, List<String>> getUserRoleNameMap(List<Long> userIdList) {
+        if (userIdList.isEmpty()){
+            return Collections.emptyMap();
+        }
+        //用户关联的角色
+        List<UserRoleDO> userRoleList = userRoleMapper.selectListByUserId(userIdList);
+        if (userRoleList.isEmpty()){
+            return Collections.emptyMap();
+        }
+        Set<Long> roleIdList = convertSet(userRoleList, UserRoleDO::getRoleId);
+        if (roleIdList.isEmpty()){
+            return Collections.emptyMap();
+        }
+        //角色列表
+        List<RoleDO> roleList = roleService.getRoleList(roleIdList);
+        if (roleList.isEmpty()){
+            return Collections.emptyMap();
+        }
+        Map<Long, String> roleMap = roleList.stream().collect(Collectors.toMap(RoleDO::getId, RoleDO::getName));
+        Map<Long, List<UserRoleDO>> userRoleMap = userRoleList.stream().collect(Collectors.groupingBy(UserRoleDO::getUserId));
+        return userRoleMap.entrySet().stream().map(entry -> {
+            List<String> roleNames = entry.getValue().stream().map(userRole -> roleMap.get(userRole.getRoleId())).toList();
+            return Map.entry(entry.getKey(), roleNames);
+        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
 
     @Override
     @Cacheable(value = RedisKeyConstants.USER_ROLE_ID_LIST, key = "#userId")
