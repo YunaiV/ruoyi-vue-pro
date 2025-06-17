@@ -44,7 +44,7 @@ public class LoginLogController {
         return success(BeanUtils.toBean(pageResult, LoginLogRespVO.class));
     }
 
-    @GetMapping("/export")
+    @GetMapping("/export-excel")
     @Operation(summary = "导出登录日志 Excel")
     @PreAuthorize("@ss.hasPermission('system:login-log:export')")
     @ApiAccessLog(operateType = EXPORT)

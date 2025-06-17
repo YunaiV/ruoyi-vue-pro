@@ -91,7 +91,7 @@ public class PostController {
         return success(BeanUtils.toBean(pageResult, PostRespVO.class));
     }
 
-    @GetMapping("/export")
+    @GetMapping("/export-excel")
     @Operation(summary = "岗位管理")
     @PreAuthorize("@ss.hasPermission('system:post:export')")
     @ApiAccessLog(operateType = EXPORT)

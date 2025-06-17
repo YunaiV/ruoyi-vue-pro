@@ -97,7 +97,7 @@ public class DictTypeController {
     }
 
     @Operation(summary = "导出数据类型")
-    @GetMapping("/export")
+    @GetMapping("/export-excel")
     @PreAuthorize("@ss.hasPermission('system:dict:query')")
     @ApiAccessLog(operateType = EXPORT)
     public void export(HttpServletResponse response, @Valid DictTypePageReqVO exportReqVO) throws IOException {
