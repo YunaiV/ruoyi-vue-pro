@@ -56,7 +56,7 @@ public interface TmsErrorCodeConstants {
     ErrorCode FIRST_MILE_CODE_GENERATE_FAIL_MAX_TRY = new ErrorCode(1_030_901_006, "头程单编号，生成失败，重复{}次");
     ErrorCode FIRST_MILE_CODE_FORMAT_ERROR = new ErrorCode(1_030_901_007, "头程单({})编号格式错误");
     ErrorCode FIRST_MILE_ITEM_LIST_NOT_EMPTY = new ErrorCode(1_030_901_008, "头程单明细列表不能为空");
-    ErrorCode FIRST_MILE_UPDATE_FAIL_APPROVE = new ErrorCode(1_030_901_009, "头程单({})状态为({})，不允许修改");
+    ErrorCode FIRST_MILE_UPDATE_FAIL_APPROVE = new ErrorCode(1_030_901_009, "头程单({})状态为({})，头程单部分不允许修改");
     ErrorCode FIRST_MILE_DELETE_FAIL_APPROVE = new ErrorCode(1_030_901_010, "头程单({})状态为({})，不允许删除");
     ErrorCode FIRST_MILE_CREATE_FAIL = new ErrorCode(1_030_901_011, "头程单创建子项失败，原因({})");
     ErrorCode FIRST_MILE_PROCESS_FAIL_WAREHOUSE_ID_DONT_EXISTS = new ErrorCode(1_030_901_012, "创建出库单需要头程明细中仓库ID不为空");

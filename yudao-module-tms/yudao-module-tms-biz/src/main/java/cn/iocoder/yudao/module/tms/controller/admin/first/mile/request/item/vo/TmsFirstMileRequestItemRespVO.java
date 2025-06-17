@@ -69,6 +69,10 @@ public class TmsFirstMileRequestItemRespVO extends BaseVO {
      * 基础重量(kg)(单个产品)
      */
     private BigDecimal weight;
+    /**
+     * 体积（mm³）(单个产品)
+     */
+    private BigDecimal volume;
 
     @Schema(description = "包装长（mm）")
     private BigDecimal totalPackageLength;
