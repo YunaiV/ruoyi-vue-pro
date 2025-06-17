@@ -13,6 +13,7 @@ import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.infra.api.logger.ApiErrorLogApi;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -62,8 +63,6 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
 
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.removeIf(converter -> converter instanceof MappingJackson2HttpMessageConverter);
-        List<HttpMessageConverter<?>> convertersCopy = new ArrayList<>();
         SimpleModule simpleModule = new SimpleModule();
         simpleModule
                 // 新增 Long 类型序列化规则，数值超过 2^53-1，在 JS 会出现精度丢失问题，因此 Long 自动序列化为字符串类型
@@ -74,17 +73,12 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
                 // 新增 LocalDateTime 序列化、反序列化规则，使用 Long 时间戳
                 .addDeserializer(LocalDateTime.class, DynamicTimeZoneTimestampLocalDateTimeDeserializer.INSTANCE)
                 .addSerializer(LocalDateTime.class, DynamicTimeZoneTimestampLocalDateTimeSerializer.INSTANCE);
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL); // 忽略 null 值
-        objectMapper.registerModules(simpleModule);
-
-        convertersCopy.add(new MappingJackson2HttpMessageConverter(objectMapper));
-        convertersCopy.addAll(converters);
-        converters.clear();
-        converters.addAll(convertersCopy);
-//        log.info("当前HttpMessageConverter：{}", converters);
+        converters.forEach(converter -> {
+            if (converter instanceof MappingJackson2HttpMessageConverter) {
+                ((MappingJackson2HttpMessageConverter) converter).getObjectMapper().registerModule(simpleModule);
+            }
+        });
+        log.info("当前HttpMessageConverter：{}", converters);
     }
 
 
