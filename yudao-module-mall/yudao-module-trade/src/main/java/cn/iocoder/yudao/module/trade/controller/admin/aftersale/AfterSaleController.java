@@ -141,8 +141,10 @@ public class AfterSaleController {
     public CommonResult<Boolean> updateAfterSaleRefunded(@RequestBody PayRefundNotifyReqDTO notifyReqDTO) {
         log.info("[updateAfterRefund][notifyReqDTO({})]", notifyReqDTO);
         if (StrUtil.startWithAny(notifyReqDTO.getMerchantRefundId(), "order-")) {
+            // 去掉 "order-" 前缀后转换为 Long
+            String orderIdStr = notifyReqDTO.getMerchantRefundId().substring(6); // "order-".length() = 6
             tradeOrderUpdateService.updatePaidOrderRefunded(
-                    Long.parseLong(notifyReqDTO.getMerchantRefundId()),
+                    Long.parseLong(orderIdStr),
                     notifyReqDTO.getPayRefundId());
         } else {
             afterSaleService.updateAfterSaleRefunded(
