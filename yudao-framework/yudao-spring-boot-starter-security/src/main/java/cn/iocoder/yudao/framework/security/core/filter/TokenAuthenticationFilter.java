@@ -2,6 +2,8 @@ package cn.iocoder.yudao.framework.security.core.filter;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.enums.TimeZoneEnum;
+import cn.iocoder.yudao.framework.common.enums.WebCommonEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
@@ -14,12 +16,15 @@ import cn.iocoder.yudao.module.system.api.oauth2.OAuth2TokenApi;
 import cn.iocoder.yudao.module.system.api.oauth2.dto.OAuth2AccessTokenCheckRespDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 /**
@@ -57,6 +62,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 if (loginUser != null) {
                     SecurityFrameworkUtils.setLoginUser(loginUser, request);
                 }
+                // 3. 设置用户时区 ，后期扩展根据用户设置时区进行处理
+                RequestContextHolder.getRequestAttributes().setAttribute(WebCommonEnum.HTTP_HEADER_TIME_ZONE, TimeZoneEnum._UTC8_TIME_ZONE, RequestAttributes.SCOPE_REQUEST);
             } catch (Throwable ex) {
                 CommonResult<?> result = globalExceptionHandler.allExceptionHandler(request, ex);
                 ServletUtils.writeJSON(response, result);
@@ -94,11 +101,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     /**
      * 模拟登录用户，方便日常开发调试
-     *
+     * <p>
      * 注意，在线上环境下，一定要关闭该功能！！！
      *
-     * @param request 请求
-     * @param token 模拟的 token，格式为 {@link SecurityProperties#getMockSecret()} + 用户编号
+     * @param request  请求
+     * @param token    模拟的 token，格式为 {@link SecurityProperties#getMockSecret()} + 用户编号
      * @param userType 用户类型
      * @return 模拟的 LoginUser
      */

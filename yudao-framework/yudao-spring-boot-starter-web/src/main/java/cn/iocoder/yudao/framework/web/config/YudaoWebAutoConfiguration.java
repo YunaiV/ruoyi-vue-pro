@@ -1,14 +1,26 @@
 package cn.iocoder.yudao.framework.web.config;
 
 import cn.iocoder.yudao.framework.common.enums.WebFilterOrderEnum;
+import cn.iocoder.yudao.framework.common.util.json.databind.DynamicTimeZoneTimestampLocalDateTimeDeserializer;
+import cn.iocoder.yudao.framework.common.util.json.databind.DynamicTimeZoneTimestampLocalDateTimeSerializer;
+import cn.iocoder.yudao.framework.common.util.json.databind.NumberSerializer;
+import cn.iocoder.yudao.framework.common.util.spring.DynamicTimeZoneLocalDateTimeConverter;
 import cn.iocoder.yudao.framework.web.core.filter.CacheRequestBodyFilter;
 import cn.iocoder.yudao.framework.web.core.filter.DemoFilter;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalResponseBodyHandler;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.infra.api.logger.ApiErrorLogApi;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import jakarta.annotation.Resource;
 import jakarta.servlet.Filter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -18,6 +30,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.format.FormatterRegistry;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -27,6 +42,12 @@ import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Slf4j
 @AutoConfiguration
 @EnableConfigurationProperties(WebProperties.class)
 public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
@@ -38,6 +59,40 @@ public class YudaoWebAutoConfiguration implements WebMvcConfigurer {
      */
     @Value("${spring.application.name}")
     private String applicationName;
+
+    @Override
+    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+        converters.removeIf(converter -> converter instanceof MappingJackson2HttpMessageConverter);
+        List<HttpMessageConverter<?>> convertersCopy = new ArrayList<>();
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule
+                // 新增 Long 类型序列化规则，数值超过 2^53-1，在 JS 会出现精度丢失问题，因此 Long 自动序列化为字符串类型
+                .addSerializer(Long.class, NumberSerializer.INSTANCE)
+                .addSerializer(Long.TYPE, NumberSerializer.INSTANCE)
+                .addSerializer(LocalDate.class, LocalDateSerializer.INSTANCE)
+                .addDeserializer(LocalDate.class, LocalDateDeserializer.INSTANCE)
+                // 新增 LocalDateTime 序列化、反序列化规则，使用 Long 时间戳
+                .addDeserializer(LocalDateTime.class, DynamicTimeZoneTimestampLocalDateTimeDeserializer.INSTANCE)
+                .addSerializer(LocalDateTime.class, DynamicTimeZoneTimestampLocalDateTimeSerializer.INSTANCE);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL); // 忽略 null 值
+        objectMapper.registerModules(simpleModule);
+
+        convertersCopy.add(new MappingJackson2HttpMessageConverter(objectMapper));
+        convertersCopy.addAll(converters);
+        converters.clear();
+        converters.addAll(convertersCopy);
+//        log.info("当前HttpMessageConverter：{}", converters);
+    }
+
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        //处理GET请求路径参数的转换
+        registry.addConverter(new DynamicTimeZoneLocalDateTimeConverter());
+    }
 
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
