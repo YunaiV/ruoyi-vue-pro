@@ -53,7 +53,7 @@
         <!-- 工具类相关 -->
         <anji-plus-captcha.version>1.4.0</anji-plus-captcha.version>
         <jsoup.version>1.18.3</jsoup.version>
-        <lombok.version>1.18.36</lombok.version>
+        <lombok.version>1.18.38</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <hutool.version>5.8.35</hutool.version>
         <easyexcel.version>4.0.3</easyexcel.version>
