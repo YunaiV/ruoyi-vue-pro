@@ -42,7 +42,18 @@ public class ProductStatisticsServiceImpl implements ProductStatisticsService {
 
     @Override
     public PageResult<ProductStatisticsDO> getProductStatisticsRankPage(ProductStatisticsReqVO reqVO, SortablePageParam pageParam) {
-        PageUtils.buildDefaultSortingField(pageParam, ProductStatisticsDO::getBrowseCount); // 默认浏览量倒序
+        // 默认浏览量倒序，禁用字段格式转换以避免驼峰字段被错误转换为下划线
+        PageUtils.buildDefaultSortingField(pageParam, ProductStatisticsDO::getBrowseCount);
+
+        // 对于商品统计排序，需要特殊处理字段格式转换
+        // 因为 MyBatis Plus 的 LambdaQueryWrapper 已经处理了字段映射，不需要再次转换
+        if (pageParam != null && pageParam.getSortingFields() != null) {
+            pageParam.getSortingFields().forEach(sortingField -> {
+                // 禁用字段格式转换，避免驼峰字段被转换为下划线导致 SQL 异常
+                sortingField.setConvertFieldFormat(false);
+            });
+        }
+
         return productStatisticsMapper.selectPageGroupBySpuId(reqVO, pageParam);
     }
 

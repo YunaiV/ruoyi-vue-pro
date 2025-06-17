@@ -51,6 +51,24 @@ public class PageUtils {
     }
 
     /**
+     * 构建排序字段，支持控制字段格式转换
+     *
+     * @param func                排序字段的 Lambda 表达式
+     * @param order               排序类型 {@link SortingField#ORDER_ASC} {@link SortingField#ORDER_DESC}
+     * @param convertFieldFormat  是否转换字段名格式（驼峰转下划线）
+     * @param <T>                 排序字段所属的类型
+     * @return 排序字段
+     */
+    public static <T> SortingField buildSortingField(Func1<T, ?> func, String order, Boolean convertFieldFormat) {
+        Assert.isTrue(ArrayUtil.contains(ORDER_TYPES, order), String.format("字段的排序类型只能是 %s/%s", ORDER_TYPES));
+
+        String fieldName = LambdaUtil.getFieldName(func);
+        SortingField sortingField = new SortingField(fieldName, order);
+        sortingField.setConvertFieldFormat(convertFieldFormat);
+        return sortingField;
+    }
+
+    /**
      * 构建默认的排序字段
      * 如果排序字段为空，则设置排序字段；否则忽略
      *
