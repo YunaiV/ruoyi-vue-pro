@@ -81,6 +81,7 @@
                             <path>
                                 <groupId>org.springframework.boot</groupId>
                                 <artifactId>spring-boot-configuration-processor</artifactId>
+                                <version>${spring.boot.version}</version>
                             </path>
                             <path>
                                 <groupId>org.projectlombok</groupId>
