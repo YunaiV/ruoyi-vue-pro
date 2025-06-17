@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.cola.statemachine.StateMachine;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
 import cn.iocoder.yudao.module.fms.api.finance.FmsCompanyApi;
@@ -359,7 +360,8 @@ public class TmsTransferServiceImpl implements TmsTransferService {
 
     @Override
     public PageResult<TmsTransferRespVO> getTmsTransferRespVOPage(TmsTransferPageReqVO pageReqVO) {
-        PageResult<TmsTransferBO> boPageResult = this.getTransferBOPage(pageReqVO);
+        TmsTransferService service = SpringUtils.getBean(TmsTransferService.class);
+        PageResult<TmsTransferBO> boPageResult = service.getTransferBOPage(pageReqVO);
         if (boPageResult.getList().isEmpty()) {
             return new PageResult<>(Collections.emptyList(), boPageResult.getTotal());
         }

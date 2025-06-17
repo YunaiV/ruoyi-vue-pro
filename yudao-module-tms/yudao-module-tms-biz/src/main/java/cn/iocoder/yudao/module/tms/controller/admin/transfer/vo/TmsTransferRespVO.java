@@ -85,7 +85,7 @@ public class TmsTransferRespVO {
     @ExcelProperty("审核意见")
     private String auditAdvice;
 
-    @Schema(description = "出库状态")
+    @Schema(description = "出库状态(wms出库状态)")
     @ExcelProperty("出库状态")
     private Integer outboundStatus;
 
@@ -93,7 +93,7 @@ public class TmsTransferRespVO {
     @ExcelProperty("出库时间")
     private LocalDateTime outboundTime;
 
-    @Schema(description = "入库状态")
+    @Schema(description = "入库状态(wms入库状态)")
     @ExcelProperty("入库状态")
     private Integer inboundStatus;
 

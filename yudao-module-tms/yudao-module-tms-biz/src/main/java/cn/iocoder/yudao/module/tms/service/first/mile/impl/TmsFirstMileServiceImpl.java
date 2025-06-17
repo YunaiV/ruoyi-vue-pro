@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
 import cn.iocoder.yudao.module.erp.api.product.ErpProductApi;
 import cn.iocoder.yudao.module.erp.api.product.dto.ErpProductDTO;
@@ -74,6 +75,7 @@ import org.springframework.validation.annotation.Validated;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -119,7 +121,6 @@ public class TmsFirstMileServiceImpl implements TmsFirstMileService {
     StateMachine<TmsOrderStatus, TmsEventEnum, TmsFistMileRequestItemDTO> requestItemOrderStateMachine;
     @Autowired
     private FmsCompanyApi fmsCompanyApi;
-
 
     //校验code中间日期是否是当天
     private static void validCodeDateIsToday(TmsFirstMileSaveReqVO vo) {
@@ -292,8 +293,7 @@ public class TmsFirstMileServiceImpl implements TmsFirstMileService {
         // 只有草稿状态或审核不通过状态才能修改
         if (tmsFirstMileDO.getAuditStatus() != null) {
             // 如果不是草稿状态或审核不通过状态，则抛出异常
-            if (!TmsAuditStatus.DRAFT.getCode().equals(tmsFirstMileDO.getAuditStatus())
-                && !TmsAuditStatus.REJECTED.getCode().equals(tmsFirstMileDO.getAuditStatus())) {
+            if (!TmsAuditStatus.DRAFT.getCode().equals(tmsFirstMileDO.getAuditStatus()) && !TmsAuditStatus.REJECTED.getCode().equals(tmsFirstMileDO.getAuditStatus())) {
                 throw exception(errorCode, tmsFirstMileDO.getCode(), TmsAuditStatus.fromCode(tmsFirstMileDO.getAuditStatus()).getDesc());
             }
         }
@@ -313,10 +313,10 @@ public class TmsFirstMileServiceImpl implements TmsFirstMileService {
         if (!Objects.equals(vo.getCode(), tmsFirstMileDO.getCode())) {
             validateFirstMileCode(vo.getCode(), vo.getId());
         }
-
-        //校验状态
-        statusCheckForEdit(tmsFirstMileDO, FIRST_MILE_UPDATE_FAIL_APPROVE);
-
+        //判断头程单主子表是否改变
+        if (this.checkTmsFirstMileChanged(vo, tmsFirstMileDO)) {
+            statusCheckForEdit(tmsFirstMileDO, FIRST_MILE_UPDATE_FAIL_APPROVE);
+        }
         //校验更新参数
         validateFirstMile(vo, tmsFirstMileDO);
 
@@ -347,6 +347,75 @@ public class TmsFirstMileServiceImpl implements TmsFirstMileService {
             tmsVesselTrackingService.deleteVesselTracking(vo.getId(), First_MILE_SOURCE_TYPE);
         }
     }
+
+
+    private boolean checkTmsFirstMileChanged(TmsFirstMileSaveReqVO vo, TmsFirstMileDO tmsFirstMileDO) {
+        TmsFirstMileService tmsFirstMileService = SpringUtils.getBean(TmsFirstMileService.class);
+        TmsFirstMileBO firstMileBO = tmsFirstMileService.getFirstMileBO(tmsFirstMileDO.getId());
+
+        // 主表比对
+        TmsFirstMileSaveReqVO oldVO = BeanUtils.toBean(firstMileBO, TmsFirstMileSaveReqVO.class);
+        TmsFirstMileSaveReqVO newVO = BeanUtils.toBean(vo, TmsFirstMileSaveReqVO.class);
+        if (!isSameMainData(oldVO, newVO)) {
+            return true;
+        }
+
+        // 子表比对
+        List<TmsFirstMileItemDO> oldItems = firstMileBO.getItems();
+        List<TmsFirstMileItemSaveReqVO> newItems = vo.getFirstMileItems();
+
+        // 数量不一致
+        if (oldItems.size() != newItems.size()) {
+            return true;
+        }
+
+        Map<Long, TmsFirstMileItemSaveReqVO> newItemMap = newItems.stream()
+            .filter(item -> item.getId() != null)
+            .collect(Collectors.toMap(TmsFirstMileItemSaveReqVO::getId, Function.identity()));
+
+        for (TmsFirstMileItemDO oldItem : oldItems) {
+            TmsFirstMileItemSaveReqVO newItem = newItemMap.get(oldItem.getId());
+            if (newItem == null || !isSameItemData(oldItem, newItem)) {
+                return true;
+            }
+        }
+
+        // 新增的子项（ID 为 null）→ 新增
+        return newItems.stream().anyMatch(item -> item.getId() == null);
+    }
+
+    private boolean isSameMainData(TmsFirstMileSaveReqVO oldVO, TmsFirstMileSaveReqVO newVO) {
+        return Objects.equals(oldVO.getCode(), newVO.getCode()) &&
+            Objects.equals(oldVO.getBillTime(), newVO.getBillTime()) &&
+            Objects.equals(oldVO.getCarrierId(), newVO.getCarrierId()) &&
+            Objects.equals(oldVO.getSettlementDate(), newVO.getSettlementDate()) &&
+            Objects.equals(oldVO.getBalance(), newVO.getBalance()) &&
+            Objects.equals(oldVO.getToWarehouseId(), newVO.getToWarehouseId()) &&
+            Objects.equals(oldVO.getCabinetType(), newVO.getCabinetType()) &&
+            Objects.equals(oldVO.getPackTime(), newVO.getPackTime()) &&
+            Objects.equals(oldVO.getSalesCompanyId(), newVO.getSalesCompanyId()) &&
+            Objects.equals(oldVO.getArrivePlanTime(), newVO.getArrivePlanTime()) &&
+            Objects.equals(oldVO.getRemark(), newVO.getRemark()) &&
+            Objects.equals(oldVO.getExportCompanyId(), newVO.getExportCompanyId()) &&
+            Objects.equals(oldVO.getTransitCompanyId(), newVO.getTransitCompanyId()) &&
+            Objects.equals(oldVO.getRevision(), newVO.getRevision());
+    }
+
+    private boolean isSameItemData(TmsFirstMileItemDO oldItem, TmsFirstMileItemSaveReqVO newItem) {
+        return Objects.equals(oldItem.getRequestItemId(), newItem.getRequestItemId()) &&
+            Objects.equals(oldItem.getProductId(), newItem.getProductId()) &&
+            Objects.equals(oldItem.getFbaBarCode(), newItem.getFbaBarCode()) &&
+            Objects.equals(oldItem.getQty(), newItem.getQty()) &&
+            Objects.equals(oldItem.getBoxQty(), newItem.getBoxQty()) &&
+            Objects.equals(oldItem.getCompanyId(), newItem.getCompanyId()) &&
+            Objects.equals(oldItem.getDeptId(), newItem.getDeptId()) &&
+            Objects.equals(oldItem.getRemark(), newItem.getRemark()) &&
+            Objects.equals(oldItem.getOutboundPlanQty(), newItem.getOutboundPlanQty()) &&
+            Objects.equals(oldItem.getFromWarehouseId(), newItem.getFromWarehouseId()) &&
+            Objects.equals(oldItem.getSalesCompanyId(), newItem.getSalesCompanyId()) &&
+            Objects.equals(oldItem.getRevision(), newItem.getRevision());
+    }
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -637,14 +706,18 @@ public class TmsFirstMileServiceImpl implements TmsFirstMileService {
                 .orElse(new TmsFirstMileStockRespVO());
 
             stockVO.setCompanyName(
-                Optional.ofNullable(companyMap.get(stockVO.getCompanyId()))
-                    .map(FmsCompanyDTO::getName)
-                    .orElse("未知公司"));
+                Optional.ofNullable(stockVO.getCompanyId())
+                    .map(companyId -> Optional.ofNullable(companyMap.get(companyId))
+                        .map(FmsCompanyDTO::getName)
+                        .orElse("未知公司"))
+                    .orElse(null));
 
             stockVO.setInboundCompanyName(
-                Optional.ofNullable(companyMap.get(stockVO.getInboundCompanyId()))
-                    .map(FmsCompanyDTO::getName)
-                    .orElse("未知公司"));
+                Optional.ofNullable(stockVO.getInboundCompanyId())
+                    .map(companyId -> Optional.ofNullable(companyMap.get(companyId))
+                        .map(FmsCompanyDTO::getName)
+                        .orElse("未知公司"))
+                    .orElse(null));
 
             item.setStock(Collections.singletonList(stockVO));
         });

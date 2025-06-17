@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.tms.api.transfer;
 
 import cn.iocoder.yudao.module.tms.api.transfer.dto.TmsInboundReqDTO;
 import cn.iocoder.yudao.module.tms.api.transfer.dto.TmsOutboundReqDTO;
+import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -17,7 +18,7 @@ public interface TmsTransferApi {
      *
      * @param reqDTO 出库单信息
      */
-    void afterOutboundAudit(TmsOutboundReqDTO reqDTO);
+    void afterOutboundAudit(@Valid TmsOutboundReqDTO reqDTO);
 
     /**
      * 2.0 入库单审核后回调
@@ -26,5 +27,5 @@ public interface TmsTransferApi {
      *
      * @param reqDTO 入库单信息
      */
-    void afterInboundAudit(TmsInboundReqDTO reqDTO);
+    void afterInboundAudit(@Valid TmsInboundReqDTO reqDTO);
 }

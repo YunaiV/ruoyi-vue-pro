@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.tms.api.first.mile;
 
 import cn.iocoder.yudao.module.tms.api.transfer.dto.TmsOutboundReqDTO;
+import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -14,5 +15,5 @@ public interface TmsFistMileApi {
      * <p>
      * 回填头程单数据
      */
-    void outboundAudit(TmsOutboundReqDTO dto);
+    void outboundAudit(@Valid TmsOutboundReqDTO dto);
 }

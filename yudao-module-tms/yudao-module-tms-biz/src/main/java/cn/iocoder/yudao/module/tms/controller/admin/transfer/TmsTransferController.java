@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.framework.idempotent.core.annotation.Idempotent;
+import cn.iocoder.yudao.module.system.api.utils.Validation;
 import cn.iocoder.yudao.module.tms.controller.admin.transfer.vo.*;
 import cn.iocoder.yudao.module.tms.service.transfer.TmsTransferService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +16,7 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.Size;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +30,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @Tag(name = "管理后台 - 调拨单")
 @RestController
 @RequestMapping("/tms/transfer")
+@Validated
 public class TmsTransferController {
 
     @Resource
@@ -37,14 +40,14 @@ public class TmsTransferController {
     @Operation(summary = "创建调拨单")
     @Idempotent
     @PreAuthorize("@ss.hasPermission('tms:transfer:create')")
-    public CommonResult<Long> createTransfer(@RequestBody TmsTransferSaveReqVO createReqVO) {
+    public CommonResult<Long> createTransfer(@Validated(Validation.OnCreate.class) @RequestBody TmsTransferSaveReqVO createReqVO) {
         return success(transferService.createTransfer(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新调拨单")
     @PreAuthorize("@ss.hasPermission('tms:transfer:update')")
-    public CommonResult<Boolean> updateTransfer(@RequestBody TmsTransferSaveReqVO updateReqVO) {
+    public CommonResult<Boolean> updateTransfer(@Validated(Validation.OnUpdate.class) @RequestBody TmsTransferSaveReqVO updateReqVO) {
         transferService.updateTransfer(updateReqVO);
         return success(true);
     }

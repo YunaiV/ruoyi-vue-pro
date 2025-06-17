@@ -14,7 +14,7 @@ public class TmsTransferItemSaveReqVO {
     @Null(groups = {Validation.OnCreate.class}, message = "创建时，调拨单明细id需为空")
     private Long id;
 
-    @Schema(description = "调拨单id")
+    @Schema(description = "调拨单id,前端无关,后端传值用")
     private Long transferId;
 
     @Schema(description = "产品id")

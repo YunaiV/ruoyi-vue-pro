@@ -80,7 +80,7 @@ public class TmsFirstMileController {
     @PostMapping("/create")
     @Operation(summary = "创建头程单")
     @PreAuthorize("@ss.hasPermission('tms:first-mile:create')")
-    public CommonResult<Long> createFirstMile(@RequestBody TmsFirstMileSaveReqVO vo) {
+    public CommonResult<Long> createFirstMile(@Validated(Validation.OnCreate.class) @RequestBody TmsFirstMileSaveReqVO vo) {
         return success(firstMileService.createFirstMile(vo));
     }
 
@@ -166,7 +166,7 @@ public class TmsFirstMileController {
     @PutMapping("/audit-status")
     @Operation(summary = "审核/反审核")
     @PreAuthorize("@ss.hasPermission('tms:first-mile:review')")
-    public CommonResult<Boolean> audit(@Validated @RequestBody TmsFirstMileAuditReqVO reqVO) {
+    public CommonResult<Boolean> audit(@RequestBody TmsFirstMileAuditReqVO reqVO) {
         firstMileService.review(reqVO);
         return success(true);
     }
@@ -181,7 +181,7 @@ public class TmsFirstMileController {
     @PostMapping("/stock/list")
     @Operation(summary = "批量查询产品库存信息")
     @PreAuthorize("@ss.hasPermission('tms:first-mile:query')")
-    public CommonResult<TmsFirstMileStockListRespVO> getStockList(@Validated @RequestBody TmsFirstMileStockQueryReqVO reqVO) {
+    public CommonResult<TmsFirstMileStockListRespVO> getStockList(@RequestBody TmsFirstMileStockQueryReqVO reqVO) {
         // 1. 获取所有产品ID
         Set<Long> productIds = reqVO.getRelations().stream()
                 .map(TmsFirstMileStockQueryReqVO.ProductDeptRelation::getProductId)
@@ -315,6 +315,12 @@ public class TmsFirstMileController {
                     if (item.getPackageHeight() != null) {
                         itemRespVO.setTotalPackageHeight(item.getPackageHeight().multiply(new BigDecimal(item.getQty())));
                     }
+                    if (item.getPackageWeight() != null) {
+                        itemRespVO.setTotalPackageWeight(item.getPackageWeight().multiply(new BigDecimal(item.getQty())));
+                    }
+                    if (item.getPackageLength() != null && item.getPackageWidth() != null && item.getPackageHeight() != null) {
+                        itemRespVO.setTotalVolume(item.getPackageLength().multiply(item.getPackageWidth()).multiply(item.getPackageHeight()).multiply(new BigDecimal(item.getQty())));
+                    }
 
                     return itemRespVO;
                 }).collect(Collectors.toList());
@@ -326,7 +332,7 @@ public class TmsFirstMileController {
 
                 // 计算体积、包装重量和净重的汇总
                 double totalVolume = items.stream()
-                    .mapToDouble(item -> item.getTotalVolume() != null ? item.getTotalVolume().multiply(new BigDecimal(item.getQty())).doubleValue() : 0)
+                    .mapToDouble(item -> item.getTotalVolume() != null ? item.getTotalVolume().doubleValue() : 0)
                     .sum();
                 double totalPackageWeight = items.stream()
                     .mapToDouble(item -> item.getPackageWeight() != null ? item.getPackageWeight().multiply(new BigDecimal(item.getQty())).doubleValue() : 0)
