@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.device.vo.data;
+package cn.iocoder.yudao.module.iot.controller.admin.device.vo.property;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
@@ -28,4 +28,4 @@ public class IotDevicePropertyHistoryListReqVO {
     @Size(min = 2, max = 2, message = "请选择时间范围")
     private LocalDateTime[] times;
 
-} 
+}

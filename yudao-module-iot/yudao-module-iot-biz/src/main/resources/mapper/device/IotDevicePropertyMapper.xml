@@ -67,7 +67,7 @@
     </select>
 
     <select id="selectListByHistory"
-            resultType="cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO">
+            resultType="cn.iocoder.yudao.module.iot.controller.admin.device.vo.property.IotDevicePropertyRespVO">
         SELECT ${@cn.hutool.core.util.StrUtil@toUnderlineCase(reqVO.identifier)} AS `value`, ts AS update_time
         FROM device_property_${reqVO.deviceId}
         WHERE ${@cn.hutool.core.util.StrUtil@toUnderlineCase(reqVO.identifier)} IS NOT NULL

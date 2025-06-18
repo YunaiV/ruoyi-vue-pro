@@ -132,6 +132,11 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     }
 
     @Override
+    public List<IotThingModelDO> getThingModelListByProductIdAndType(Long productId, Integer type) {
+        return thingModelMapper.selectListByProductIdAndType(productId, type);
+    }
+
+    @Override
     @Cacheable(value = RedisKeyConstants.THING_MODEL_LIST, key = "#productId")
     @TenantIgnore // 忽略租户信息，跨租户 productKey 是唯一的
     public List<IotThingModelDO> getThingModelListByProductIdFromCache(Long productId) {

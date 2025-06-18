@@ -3,13 +3,12 @@ package cn.iocoder.yudao.module.iot.dal.tdengine;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyHistoryListReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.property.IotDevicePropertyHistoryListReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.property.IotDevicePropertyRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField;
 import cn.iocoder.yudao.module.iot.framework.tdengine.core.annotation.TDengineDS;
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

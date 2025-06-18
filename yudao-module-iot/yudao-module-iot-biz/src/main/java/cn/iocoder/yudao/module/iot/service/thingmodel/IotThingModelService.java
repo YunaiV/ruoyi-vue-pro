@@ -55,6 +55,15 @@ public interface IotThingModelService {
     List<IotThingModelDO> getThingModelListByProductId(Long productId);
 
     /**
+     * 获得产品物模型列表
+     *
+     * @param productId 产品编号
+     * @param type 物模型类型
+     * @return 产品物模型列表
+     */
+    List<IotThingModelDO> getThingModelListByProductIdAndType(Long productId, Integer type);
+
+    /**
      * 【缓存】获得产品物模型列表
      *
      * 注意：该方法会忽略租户信息，所以调用时，需要确认会不会有跨租户访问的风险！！！
