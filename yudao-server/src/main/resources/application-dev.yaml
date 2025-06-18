@@ -47,21 +47,21 @@ spring:
       primary: master
       datasource:
         master:
-          url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true # MySQL Connector/J 8.X 连接的示例
+          url: jdbc:mysql://127.0.0.1:3306/tunnel_management?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true # MySQL Connector/J 8.X 连接的示例
           username: root
-          password: 123456
+          password: Coolhomer
         slave: # 模拟从库，可根据自己需要修改 # 模拟从库，可根据自己需要修改
           lazy: true # 开启懒加载，保证启动速度
-          url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true # MySQL Connector/J 8.X 连接的示例
+          url: jdbc:mysql://127.0.0.1:3306/tunnel_management?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true # MySQL Connector/J 8.X 连接的示例
           username: root
-          password: 123456
+          password: Coolhomer
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   redis:
-    host: 400-infra.server.iocoder.cn # 地址
-    port: 6379 # 端口
+    host: 127.0.0.1 # 地址
+    port: 6379 # 端口 
     database: 1 # 数据库索引
-#    password: 123456 # 密码，建议生产环境开启
+    password: 123456 # 密码，建议生产环境开启
 
 --- #################### 定时任务相关配置 ####################
 

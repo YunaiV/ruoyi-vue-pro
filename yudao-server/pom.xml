@@ -31,6 +31,13 @@
             <artifactId>yudao-module-infra</artifactId>
             <version>${revision}</version>
         </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-resolver-dns-native-macos</artifactId>
+            <version>4.1.100.Final</version> <!-- 根据你项目实际使用的 Netty 版本 -->
+            <classifier>osx-aarch_64</classifier> <!-- Apple Silicon；Intel 用 osx-x86_64 -->
+            <scope>runtime</scope>
+        </dependency>
 
         <!-- 会员中心。默认注释，保证编译速度 -->
 <!--        <dependency>-->

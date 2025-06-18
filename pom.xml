@@ -57,6 +57,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-resolver-dns-native-macos</artifactId>
+                <version>4.1.100.Final</version> <!-- 与你项目中 netty 的版本一致或兼容 -->
+                <classifier>osx-aarch_64</classifier> <!-- 如果你是 M1/M2/M3 芯片；否则用 osx-x86_64 -->
+                <scope>runtime</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
