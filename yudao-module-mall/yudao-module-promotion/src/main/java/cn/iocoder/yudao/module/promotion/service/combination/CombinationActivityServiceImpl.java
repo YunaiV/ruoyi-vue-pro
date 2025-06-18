@@ -86,7 +86,7 @@ public class CombinationActivityServiceImpl implements CombinationActivityServic
             activityList.removeIf(item -> ObjectUtil.equal(item.getId(), activityId));
         }
         // 查找是否有其它活动，选择了该产品
-        List<CombinationActivityDO> matchActivityList = filterList(activityList, activity -> ObjectUtil.equal(activity.getId(), spuId));
+        List<CombinationActivityDO> matchActivityList = filterList(activityList, activity -> ObjectUtil.equal(activity.getSpuId(), spuId));
         if (CollUtil.isNotEmpty(matchActivityList)) {
             throw exception(COMBINATION_ACTIVITY_SPU_CONFLICTS);
         }
