@@ -3,10 +3,8 @@ package cn.iocoder.yudao.module.iot.controller.admin.device;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyHistoryPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyHistoryListReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
@@ -16,7 +14,6 @@ import cn.iocoder.yudao.module.iot.service.device.property.IotDevicePropertyServ
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -46,18 +43,12 @@ public class IotDevicePropertyController {
     @Resource
     private IotDeviceService deviceService;
 
-    @GetMapping("/latest")
+    @GetMapping("/get-latest")
     @Operation(summary = "获取设备属性最新属性")
-    @Parameters({
-            @Parameter(name = "deviceId", description = "设备编号", required = true),
-            @Parameter(name = "identifier", description = "标识符"),
-            @Parameter(name = "name", description = "名称")
-    })
+    @Parameter(name = "deviceId", description = "设备编号", required = true)
     @PreAuthorize("@ss.hasPermission('iot:device:property-query')")
     public CommonResult<List<IotDevicePropertyRespVO>> getLatestDeviceProperties(
-            @RequestParam("deviceId") Long deviceId,
-            @RequestParam(value = "identifier", required = false) String identifier,
-            @RequestParam(value = "name", required = false) String name) {
+            @RequestParam("deviceId") Long deviceId) {
         Map<String, IotDevicePropertyDO> properties = devicePropertyService.getLatestDeviceProperties(deviceId);
 
         // 拼接数据
@@ -70,12 +61,6 @@ public class IotDevicePropertyController {
             if (thingModel == null || thingModel.getProperty() == null) {
                 return null;
             }
-            if (StrUtil.isNotEmpty(identifier) && !StrUtil.contains(thingModel.getIdentifier(), identifier)) {
-                return null;
-            }
-            if (StrUtil.isNotEmpty(name) && !StrUtil.contains(thingModel.getName(), name)) {
-                return null;
-            }
             // 构建对象
             IotDevicePropertyDO property = entry.getValue();
             return new IotDevicePropertyRespVO().setProperty(thingModel.getProperty())
@@ -83,13 +68,12 @@ public class IotDevicePropertyController {
         }));
     }
 
-    @GetMapping("/history-page")
-    @Operation(summary = "获取设备属性历史数据")
+    @GetMapping("/history-list")
+    @Operation(summary = "获取设备属性历史数据列表")
     @PreAuthorize("@ss.hasPermission('iot:device:property-query')")
-    public CommonResult<PageResult<IotDevicePropertyRespVO>> getHistoryDevicePropertyPage(
-            @Valid IotDevicePropertyHistoryPageReqVO pageReqVO) {
-        Assert.notEmpty(pageReqVO.getIdentifier(), "标识符不能为空");
-        return success(devicePropertyService.getHistoryDevicePropertyPage(pageReqVO));
+    public CommonResult<List<IotDevicePropertyRespVO>> getHistoryDevicePropertyList(
+            @Valid IotDevicePropertyHistoryListReqVO listReqVO) {
+        return success(devicePropertyService.getHistoryDevicePropertyList(listReqVO));
     }
 
 }

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.device.property;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyHistoryPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyHistoryListReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDevicePropertyDO;
 import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,10 +48,10 @@ public interface IotDevicePropertyService {
     /**
      * 获得设备属性历史数据
      *
-     * @param pageReqVO 分页请求
+     * @param listReqVO 列表请求
      * @return 设备属性历史数据
      */
-    PageResult<IotDevicePropertyRespVO> getHistoryDevicePropertyPage(@Valid IotDevicePropertyHistoryPageReqVO pageReqVO);
+    List<IotDevicePropertyRespVO> getHistoryDevicePropertyList(@Valid IotDevicePropertyHistoryListReqVO listReqVO);
 
     // ========== 设备时间相关操作 ==========
 

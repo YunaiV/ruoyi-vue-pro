@@ -66,15 +66,14 @@
         DESCRIBE product_property_${productId}
     </select>
 
-    <!-- TODO @芋艿：这里查询有点问题 -->
-    <select id="selectPageByHistory"
+    <select id="selectListByHistory"
             resultType="cn.iocoder.yudao.module.iot.controller.admin.device.vo.data.IotDevicePropertyRespVO">
         SELECT ${@cn.hutool.core.util.StrUtil@toUnderlineCase(reqVO.identifier)} AS `value`, ts AS update_time
         FROM device_property_${reqVO.deviceId}
         WHERE ${@cn.hutool.core.util.StrUtil@toUnderlineCase(reqVO.identifier)} IS NOT NULL
           AND ts BETWEEN ${@cn.hutool.core.date.LocalDateTimeUtil@toEpochMilli(reqVO.times[0])}
               AND ${@cn.hutool.core.date.LocalDateTimeUtil@toEpochMilli(reqVO.times[1])}
-        ORDER BY ts DESC
+        ORDER BY ts ASC
     </select>
 
 </mapper>

@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device.vo.data;
 
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -12,9 +11,9 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-@Schema(description = "管理后台 - IoT 设备属性历史分页 Request VO")
+@Schema(description = "管理后台 - IoT 设备属性历史列表 Request VO")
 @Data
-public class IotDevicePropertyHistoryPageReqVO extends PageParam {
+public class IotDevicePropertyHistoryListReqVO {
 
     @Schema(description = "设备编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "177")
     @NotNull(message = "设备编号不能为空")
@@ -29,4 +28,4 @@ public class IotDevicePropertyHistoryPageReqVO extends PageParam {
     @Size(min = 2, max = 2, message = "请选择时间范围")
     private LocalDateTime[] times;
 
-}
+} 
