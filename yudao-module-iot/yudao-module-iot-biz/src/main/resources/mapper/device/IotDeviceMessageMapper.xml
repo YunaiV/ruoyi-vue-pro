@@ -13,6 +13,7 @@
             server_id NCHAR(50),
             upstream BOOL,
             reply BOOL,
+            identifier NCHAR(100),
             request_id NCHAR(50),
             method NCHAR(100),
             params NCHAR(2048),
@@ -31,22 +32,22 @@
     <insert id="insert">
         INSERT INTO device_message_${deviceId} (
             ts, id, report_time, tenant_id, server_id,
-            upstream, reply, request_id, method, params,
-            data, code, msg
+            upstream, reply, identifier, request_id, method,
+            params, data, code, msg
         )
         USING device_message
         TAGS (#{deviceId})
         VALUES (
             NOW, #{id}, #{reportTime}, #{tenantId},  #{serverId},
-            #{upstream}, #{reply}, #{requestId}, #{method}, #{params},
-            #{data}, #{code}, #{msg}
+            #{upstream}, #{reply}, #{identifier}, #{requestId}, #{method}, 
+            #{params}, #{data}, #{code}, #{msg}
         )
     </insert>
 
     <select id="selectPage" resultType="cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO">
         SELECT ts, id, report_time, tenant_id, server_id,
-               upstream, reply, request_id, method, params,
-               data, code, msg
+               upstream, reply, identifier, request_id, method, 
+               params, data, code, msg
         FROM device_message_${reqVO.deviceId}
         <where>
             <if test="reqVO.method != null and reqVO.method != ''">
@@ -55,7 +56,26 @@
             <if test="reqVO.upstream != null">
                 AND upstream = #{reqVO.upstream}
             </if>
+            <if test="reqVO.reply != null">
+                AND reply = #{reqVO.reply}
+            </if>
+            <if test="reqVO.identifier != null and reqVO.identifier != ''">
+                AND identifier = #{reqVO.identifier}
+            </if>
         </where>
+        ORDER BY ts DESC
+    </select>
+
+    <select id="selectListByRequestIdsAndReply" resultType="cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO">
+        SELECT ts, id, report_time, tenant_id, server_id,
+               upstream, reply, identifier, request_id, method, 
+               params, data, code, msg
+        FROM device_message_${deviceId}
+        WHERE reply = #{reply}
+        AND request_id IN
+        <foreach collection="requestIds" item="requestId" open="(" close=")" separator=",">
+            #{requestId}
+        </foreach>
         ORDER BY ts DESC
     </select>
 

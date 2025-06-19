@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +57,18 @@ public interface IotDeviceMessageMapper {
      * @return 消息数量
      */
     Long selectCountByCreateTime(@Param("createTime") Long createTime);
+
+    /**
+     * 按照 requestIds 批量查询消息
+     *
+     * @param deviceId 设备编号
+     * @param requestIds 请求编号集合
+     * @param reply 是否回复消息
+     * @return 消息列表
+     */
+    List<IotDeviceMessageDO> selectListByRequestIdsAndReply(@Param("deviceId") Long deviceId,
+                                                            @Param("requestIds") Collection<String> requestIds,
+                                                            @Param("reply") Boolean reply);
 
     /**
      * 按照时间范围（小时），统计设备的消息数量

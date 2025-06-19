@@ -89,3 +89,13 @@ Authorization: Bearer {{token}}
     "information": "{\"desc\":\"升级到最新版本\"}"
   }
 }
+
+### 查询设备消息对分页 - 基础查询（设备编号25）
+GET {{baseUrl}}/iot/device/message/pair-page?deviceId=25&pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}
+
+### 查询设备消息对分页 - 按标识符过滤（identifier=eat）
+GET {{baseUrl}}/iot/device/message/pair-page?deviceId=25&identifier=eat&pageNo=1&pageSize=10
+Authorization: Bearer {{token}}
+tenant-id: {{adminTenantId}}

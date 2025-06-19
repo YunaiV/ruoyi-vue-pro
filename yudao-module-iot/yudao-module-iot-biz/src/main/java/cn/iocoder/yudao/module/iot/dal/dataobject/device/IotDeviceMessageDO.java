@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.dal.dataobject.device;
 
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -63,6 +64,13 @@ public class IotDeviceMessageDO {
      * 计算并存储的目的：方便计算多少条请求、多少条回复
      */
     private Boolean reply;
+    /**
+     * 标识符
+     *
+     * 例如说：{@link IotThingModelDO#getIdentifier()}
+     * 目前，只有事件上报、服务调用才有！！！
+     */
+    private String identifier;
 
     // ========== codec（编解码）字段 ==========
 

@@ -132,6 +132,11 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     }
 
     @Override
+    public List<IotThingModelDO> getThingModelListByProductIdAndIdentifiers(Long productId, Collection<String> identifiers) {
+        return thingModelMapper.selectListByProductIdAndIdentifiers(productId, identifiers);
+    }
+
+    @Override
     public List<IotThingModelDO> getThingModelListByProductIdAndType(Long productId, Integer type) {
         return thingModelMapper.selectListByProductIdAndType(productId, type);
     }

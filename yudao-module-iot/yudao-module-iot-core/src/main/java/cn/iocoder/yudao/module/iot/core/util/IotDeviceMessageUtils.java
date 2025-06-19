@@ -1,10 +1,14 @@
 package cn.iocoder.yudao.module.iot.core.util;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.system.SystemUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+
+import java.util.Map;
 
 /**
  * IoT 设备【消息】的工具类
@@ -41,6 +45,23 @@ public class IotDeviceMessageUtils {
      */
     public static boolean isReplyMessage(IotDeviceMessage message) {
         return message.getCode() != null;
+    }
+
+    /**
+     * 提取消息中的标识符
+     *
+     * @param message 消息
+     * @return 标识符
+     */
+    @SuppressWarnings("unchecked")
+    public static String getIdentifier(IotDeviceMessage message) {
+        if (StrUtil.equalsAny(message.getMethod(), IotDeviceMessageMethodEnum.EVENT_POST.getMethod(),
+                message.getMethod(), IotDeviceMessageMethodEnum.SERVICE_INVOKE.getMethod())
+            && message.getParams() != null) {
+            Map<String, Object> params = (Map<String, Object>) message.getParams();
+            return MapUtil.getStr(params, "identifier");
+        }
+        return null;
     }
 
     // ========== Topic 相关 ==========

@@ -76,7 +76,8 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     void createDeviceLogAsync(IotDeviceMessage message) {
         IotDeviceMessageDO messageDO = BeanUtils.toBean(message, IotDeviceMessageDO.class)
                 .setUpstream(IotDeviceMessageUtils.isUpstreamMessage(message))
-                .setReply(IotDeviceMessageUtils.isReplyMessage(message));
+                .setReply(IotDeviceMessageUtils.isReplyMessage(message))
+                .setIdentifier(IotDeviceMessageUtils.getIdentifier(message));
         if (message.getParams() != null) {
             messageDO.setParams(JsonUtils.toJsonString(messageDO.getParams()));
         }
@@ -210,6 +211,13 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
             }
             throw exception;
         }
+    }
+
+    @Override
+    public List<IotDeviceMessageDO> getDeviceMessageListByRequestIdsAndReply(Long deviceId,
+                                                                             List<String> requestIds,
+                                                                             Boolean reply) {
+        return deviceMessageMapper.selectListByRequestIdsAndReply(deviceId, requestIds, reply);
     }
 
     @Override

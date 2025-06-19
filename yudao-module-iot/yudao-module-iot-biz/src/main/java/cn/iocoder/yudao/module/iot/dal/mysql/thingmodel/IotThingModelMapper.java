@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelP
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -50,6 +50,12 @@ public interface IotThingModelMapper extends BaseMapperX<IotThingModelDO> {
         return selectList(IotThingModelDO::getProductId, productId);
     }
 
+    default List<IotThingModelDO> selectListByProductIdAndIdentifiers(Long productId, Collection<String> identifiers) {
+        return selectList(new LambdaQueryWrapperX<IotThingModelDO>()
+                .eq(IotThingModelDO::getProductId, productId)
+                .in(IotThingModelDO::getIdentifier, identifiers));
+    }
+
     default List<IotThingModelDO> selectListByProductIdAndType(Long productId, Integer type) {
         return selectList(IotThingModelDO::getProductId, productId,
                 IotThingModelDO::getType, type);
@@ -67,18 +73,6 @@ public interface IotThingModelMapper extends BaseMapperX<IotThingModelDO> {
     default IotThingModelDO selectByProductIdAndName(Long productId, String name) {
         return selectOne(IotThingModelDO::getProductId, productId,
                 IotThingModelDO::getName, name);
-    }
-
-    // TODO @super：用不到，删除下；
-    /**
-     * 统计物模型数量
-     *
-     * @param createTime 创建时间，如果为空，则统计所有物模型数量
-     * @return 物模型数量
-     */
-    default Long selectCountByCreateTime(LocalDateTime createTime) {
-        return selectCount(new LambdaQueryWrapperX<IotThingModelDO>()
-                .geIfPresent(IotThingModelDO::getCreateTime, createTime));
     }
 
 }

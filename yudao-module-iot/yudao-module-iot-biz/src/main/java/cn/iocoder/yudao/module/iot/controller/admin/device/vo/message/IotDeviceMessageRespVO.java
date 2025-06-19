@@ -30,6 +30,9 @@ public class IotDeviceMessageRespVO {
     @Schema(description = "是否回复消息", example = "false", examples = "true")
     private Boolean reply;
 
+    @Schema(description = "标识符", example = "temperature")
+    private String identifier;
+
     // ========== codec（编解码）字段 ==========
 
     @Schema(description = "请求编号", example = "req_123")

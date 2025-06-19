@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsD
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
@@ -62,6 +64,19 @@ public interface IotDeviceMessageService {
      * @return 设备消息分页
      */
     PageResult<IotDeviceMessageDO> getDeviceMessagePage(IotDeviceMessagePageReqVO pageReqVO);
+
+    /**
+     * 获得指定 requestId 的设备消息列表
+     *
+     * @param deviceId 设备编号
+     * @param requestIds requestId 列表
+     * @param reply 是否回复
+     * @return 设备消息列表
+     */
+    List<IotDeviceMessageDO> getDeviceMessageListByRequestIdsAndReply(
+            @NotNull(message = "设备编号不能为空") Long deviceId,
+            @NotEmpty(message = "请求编号不能为空") List<String> requestIds,
+            Boolean reply);
 
     /**
      * 获得设备消息数量

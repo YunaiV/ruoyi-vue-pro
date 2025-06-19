@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.IotThingModelS
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import jakarta.validation.Valid;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -53,6 +54,15 @@ public interface IotThingModelService {
      * @return 产品物模型列表
      */
     List<IotThingModelDO> getThingModelListByProductId(Long productId);
+
+    /**
+     * 获得产品物模型列表
+     *
+     * @param productId 产品编号
+     * @param identifiers 功能标识列表
+     * @return 产品物模型列表
+     */
+    List<IotThingModelDO> getThingModelListByProductIdAndIdentifiers(Long productId, Collection<String> identifiers);
 
     /**
      * 获得产品物模型列表

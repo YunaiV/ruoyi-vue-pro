@@ -32,6 +32,10 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
 
     EVENT_POST("thing.event.post", "事件上报", true),
 
+    // ========== 设备服务调用 ==========
+
+    SERVICE_INVOKE("thing.service.invoke", "服务调用", false),
+
     ;
 
     public static final String[] ARRAYS = Arrays.stream(values()).map(IotDeviceMessageMethodEnum::getMethod)
