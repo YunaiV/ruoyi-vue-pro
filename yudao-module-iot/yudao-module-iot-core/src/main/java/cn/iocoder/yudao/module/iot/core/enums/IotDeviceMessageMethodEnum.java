@@ -36,6 +36,11 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
 
     SERVICE_INVOKE("thing.service.invoke", "服务调用", false),
 
+    // ========== 设备配置 ==========
+    // 可参考：https://help.aliyun.com/zh/iot/user-guide/remote-configuration-1
+
+    CONFIG_PUSH("thing.config.push", "配置推送", true),
+
     ;
 
     public static final String[] ARRAYS = Arrays.stream(values()).map(IotDeviceMessageMethodEnum::getMethod)
