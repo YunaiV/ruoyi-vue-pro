@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Lazy;
 
 /**
  * 数量处理执行器
+ * @author jisencai
  */
 public abstract class QuantityExecutor<T> {
 

@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.wms.controller.admin.pickup.vo.WmsPickupPageReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.pickup.vo.WmsPickupRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.pickup.vo.WmsPickupSaveReqVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.pickup.WmsPickupDO;
 import jakarta.validation.Valid;
 
@@ -22,7 +23,7 @@ public interface WmsPickupService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    WmsPickupDO createPickup(@Valid WmsPickupSaveReqVO createReqVO);
+    WmsPickupDO createPickup(@Valid WmsPickupSaveReqVO createReqVO, WmsInboundDO inboundDO);
 
     /**
      * 更新拣货单
@@ -58,7 +59,7 @@ public interface WmsPickupService {
 
     void assembleWarehouse(List<WmsPickupRespVO> list);
 
-    void createForStockCheck(WmsPickupSaveReqVO pickupSaveReqVO);
+    void createForStockCheck(WmsPickupSaveReqVO pickupSaveReqVO, WmsInboundDO inboundDO);
 
     void createForBinMove(WmsPickupSaveReqVO pickupSaveReqVO);
 }

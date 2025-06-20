@@ -23,9 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.*;
-
 /**
  * @author: LeeFJ
  * @date: 2025/3/25 13:15
@@ -55,9 +52,9 @@ public class OutboundRejectExecutor extends OutboundExecutor {
         stockWarehouseDO.setSellableQty(stockWarehouseDO.getSellableQty() + quantity);
         // 待出库量
         stockWarehouseDO.setOutboundPendingQty(stockWarehouseDO.getOutboundPendingQty() - quantity);
-        if(stockWarehouseDO.getOutboundPendingQty()<0) {
-            throw exception(STOCK_WAREHOUSE_NOT_ENOUGH);
-        }
+//        if(stockWarehouseDO.getOutboundPendingQty()<0) {
+//            throw exception(STOCK_WAREHOUSE_NOT_ENOUGH);
+//        }
 
         return WmsStockFlowDirection.IN;
     }
@@ -127,9 +124,9 @@ public class OutboundRejectExecutor extends OutboundExecutor {
         // stockLogicDO.setAvailableQty(stockLogicDO.getAvailableQty() + quantity);
         // 待出库量
         stockLogicDO.setOutboundPendingQty(stockLogicDO.getOutboundPendingQty() - quantity);
-        if (stockLogicDO.getOutboundPendingQty() < 0) {
-            throw exception(STOCK_LOGIC_NOT_ENOUGH);
-        }
+//        if (stockLogicDO.getOutboundPendingQty() < 0) {
+//            throw exception(STOCK_LOGIC_NOT_ENOUGH);
+//        }
         return WmsStockFlowDirection.IN;
     }
 
@@ -144,9 +141,9 @@ public class OutboundRejectExecutor extends OutboundExecutor {
         stockBinDO.setSellableQty(stockBinDO.getSellableQty() + quantity);
         // 待出库量
         stockBinDO.setOutboundPendingQty(stockBinDO.getOutboundPendingQty() - quantity);
-        if(stockBinDO.getOutboundPendingQty()<0) {
-            throw exception(STOCK_BIN_NOT_ENOUGH);
-        }
+//        if(stockBinDO.getOutboundPendingQty()<0) {
+//            throw exception(STOCK_BIN_NOT_ENOUGH);
+//        }
 
         return WmsStockFlowDirection.IN;
     }

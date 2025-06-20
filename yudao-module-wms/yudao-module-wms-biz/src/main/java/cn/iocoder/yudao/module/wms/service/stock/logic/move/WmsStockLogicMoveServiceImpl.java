@@ -66,10 +66,9 @@ public class WmsStockLogicMoveServiceImpl implements cn.iocoder.yudao.module.wms
     @Override
     @Transactional(rollbackFor = Exception.class)
     public WmsStockLogicMoveDO createStockLogicMove(WmsStockLogicMoveSaveReqVO createReqVO) {
-        WmsStockLogicMoveDO stockLogicMoveDO = lockRedisDAO.lockByWarehouse(createReqVO.getWarehouseId(), () -> {
+        return lockRedisDAO.lockByWarehouse(createReqVO.getWarehouseId(), () -> {
             return createStockLogicMoveInLock(createReqVO);
         });
-        return stockLogicMoveDO;
     }
 
     @Transactional(rollbackFor = Exception.class)

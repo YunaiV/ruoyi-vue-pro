@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.enums.somle.BillType;
+import cn.iocoder.yudao.module.wms.api.outbound.dto.WmsOutboundValidateReqDTO;
 import cn.iocoder.yudao.module.wms.config.OutboundStateMachineConfigure;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalHistoryRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
@@ -33,12 +34,14 @@ import cn.iocoder.yudao.module.wms.controller.admin.warehouse.vo.WmsWarehouseSim
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.item.WmsOutboundItemDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.stock.warehouse.WmsStockWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.WmsWarehouseDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.warehouse.bin.WmsWarehouseBinDO;
 import cn.iocoder.yudao.module.wms.dal.mysql.outbound.WmsOutboundMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.outbound.item.WmsOutboundItemMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.pickup.item.WmsPickupItemMapper;
 import cn.iocoder.yudao.module.wms.dal.mysql.stock.bin.WmsStockBinMapper;
+import cn.iocoder.yudao.module.wms.dal.mysql.stock.warehouse.WmsStockWarehouseMapper;
 import cn.iocoder.yudao.module.wms.dal.redis.lock.WmsLockRedisDAO;
 import cn.iocoder.yudao.module.wms.dal.redis.no.WmsNoRedisDAO;
 import cn.iocoder.yudao.module.wms.enums.WmsConstants;
@@ -49,6 +52,7 @@ import cn.iocoder.yudao.module.wms.service.approval.history.WmsApprovalHistorySe
 import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
 import cn.iocoder.yudao.module.wms.service.outbound.item.WmsOutboundItemService;
 import cn.iocoder.yudao.module.wms.service.stock.bin.WmsStockBinService;
+import cn.iocoder.yudao.module.wms.service.stock.warehouse.WmsStockWarehouseService;
 import cn.iocoder.yudao.module.wms.service.warehouse.WmsWarehouseService;
 import cn.iocoder.yudao.module.wms.service.warehouse.bin.WmsWarehouseBinService;
 import jakarta.annotation.Resource;
@@ -119,6 +123,9 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     private WmsInboundService inboundService;
 
     @Resource
+    private WmsStockWarehouseMapper wmsStockWarehouseMapper;
+
+    @Resource
     private ErpProductApi productApi;
 
     @Resource
@@ -132,6 +139,8 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
 
     @Autowired
     WmsOutboundService wmsOutboundService;
+    @Autowired
+    private WmsStockWarehouseService wmsStockWarehouseService;
 
     /**
      * @sign : A523E13094CD30CE
@@ -254,6 +263,11 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
     public void auditAgree(WmsApprovalReqVO approvalReqVO) {
         wmsOutboundService.approve(WmsOutboundAuditStatus.Event.AGREE, approvalReqVO);
         wmsOutboundService.approve(WmsOutboundAuditStatus.Event.FINISH, approvalReqVO);
+    }
+
+    @Override
+    public void assembleUpstreamType(List<WmsOutboundRespVO> list) {
+        list.forEach(o -> o.setUpstreamType(o.getUpstreamType() == null ? o.getType() : o.getUpstreamType()));
     }
 
 
@@ -489,5 +503,31 @@ public class WmsOutboundServiceImpl implements WmsOutboundService {
         ctx.setExtra(WmsConstants.APPROVAL_REQ_VO_KEY, approvalReqVO);
         // 触发事件
         outboundStateMachine.fireEvent(event, ctx);
+    }
+
+    /**
+     * 验证出库单数据，外部模块校验用
+     *
+     * @param validateReqDTOList 入参
+     * @return 结果
+     */
+    @Override
+    public boolean validateOutboundData(List<WmsOutboundValidateReqDTO> validateReqDTOList) {
+        if (validateReqDTOList.isEmpty()) {
+            throw exception(OUTBOUND_ITEM_NOT_EXISTS);
+        }
+        //根据产品id检验数量谁否充分
+        for (WmsOutboundValidateReqDTO validateReqDTO : validateReqDTOList) {
+            List<WmsStockWarehouseDO> stockWarehouseDOList = wmsStockWarehouseMapper.getByProductIds(null, Collections.singletonList(validateReqDTO.getProductId()));
+            if (stockWarehouseDOList == null || stockWarehouseDOList.isEmpty()) {
+                throw exception(PRODUCT_NOT_EXISTS, validateReqDTO.getProductName());
+            }
+            for (WmsStockWarehouseDO stockWarehouseDO : stockWarehouseDOList) {
+                if (stockWarehouseDO.getSellableQty() < validateReqDTO.getQuantity()) {
+                    throw exception(STOCK_WAREHOUSE_ITEM_NOT_ENOUGH, validateReqDTO.getProductName());
+                }
+            }
+        }
+        return true;
     }
 }

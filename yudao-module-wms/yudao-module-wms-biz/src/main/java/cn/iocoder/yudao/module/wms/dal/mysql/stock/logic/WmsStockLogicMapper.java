@@ -27,8 +27,8 @@ public interface WmsStockLogicMapper extends BaseMapperX<WmsStockLogicDO> {
         wrapper.innerJoin(WmsProductDO.class, WmsProductDO::getId, WmsStockLogicDO::getProductId).likeIfExists(WmsProductDO::getCode, reqVO.getProductCode());
         // 按仓库
         // 按产品ID
-        wrapper.eqIfPresent(WmsStockLogicDO::getWarehouseId, reqVO.getWarehouseId()).
-            eqIfPresent(WmsStockLogicDO::getProductId, reqVO.getProductId());
+        wrapper.eqIfPresent(WmsStockLogicDO::getWarehouseId, reqVO.getWarehouseId());
+        wrapper.eqIfPresent(WmsStockLogicDO::getProductId, reqVO.getProductId());
         wrapper.eqIfPresent(WmsStockLogicDO::getCompanyId, reqVO.getCompanyId());
         wrapper.eqIfPresent(WmsStockLogicDO::getDeptId, reqVO.getDeptId());
         wrapper.betweenIfPresent(WmsStockLogicDO::getCreateTime, reqVO.getCreateTime());
@@ -48,6 +48,8 @@ public interface WmsStockLogicMapper extends BaseMapperX<WmsStockLogicDO> {
         wrapper.eq(WmsStockLogicDO::getCompanyId, companyId);
         wrapper.eqIfPresent(WmsStockLogicDO::getDeptId, deptId);
         wrapper.eq(WmsStockLogicDO::getProductId, productId);
+        wrapper.orderByAsc(WmsStockLogicDO::getCreateTime);
+        wrapper.last("limit 1");
         return selectOne(wrapper);
     }
 
@@ -71,17 +73,17 @@ public interface WmsStockLogicMapper extends BaseMapperX<WmsStockLogicDO> {
         MPJLambdaWrapperX<WmsStockLogicDO> wrapper = new MPJLambdaWrapperX<>();
         // 连接仓库表
         wrapper.innerJoin(WmsWarehouseDO.class, WmsWarehouseDO::getId, WmsStockLogicDO::getWarehouseId)
-            //限定国家
+            // 限定国家
             .eqIfPresent(WmsWarehouseDO::getCountry, country)
             // 按部门ID和产品ID查询
-            //指定部门
+            // 指定部门
             .eqIfPresent(WmsStockLogicDO::getDeptId, deptId)
-            //指定产品集合
+            // 指定产品集合
             .in(WmsStockLogicDO::getProductId, productIds);
         return selectList(wrapper);
     }
 
-    default List<WmsStockLogicDO> selectByDeptIdAndProductId(Long warehouseId, Long productId) {
+    default List<WmsStockLogicDO> selectByWarehouseIdAndProductId(Long warehouseId, Long productId) {
         MPJLambdaWrapperX<WmsStockLogicDO> wrapper = new MPJLambdaWrapperX<>();
         // 连接仓库表
         wrapper.innerJoin(WmsWarehouseDO.class, WmsWarehouseDO::getId, WmsStockLogicDO::getWarehouseId)

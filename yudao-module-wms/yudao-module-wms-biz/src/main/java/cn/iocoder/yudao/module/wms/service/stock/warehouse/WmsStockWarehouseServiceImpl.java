@@ -114,7 +114,7 @@ public class WmsStockWarehouseServiceImpl implements WmsStockWarehouseService {
     @Transactional(rollbackFor = Exception.class)
     public void quickUpdateStockWarehouse(WmsStockWarehouseSaveReqVO updateReqVO) {
         // 校验存在
-        WmsStockWarehouseDO stockWarehouse = stockWarehouseMapper.getByWarehouseIdAndProductId(updateReqVO.getProductId(), updateReqVO.getWarehouseId());
+        WmsStockWarehouseDO stockWarehouse = stockWarehouseMapper.getByWarehouseIdAndProductId(updateReqVO.getWarehouseId(), updateReqVO.getProductId());
         if (stockWarehouse == null) {
             log.info(String.valueOf(STOCK_WAREHOUSE_NOT_EXISTS), updateReqVO.getWarehouseId(), updateReqVO.getProductId());
             return;

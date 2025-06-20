@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.wms.service.quantity;
 
 import cn.hutool.core.util.IdUtil;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
+import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.system.enums.somle.BillType;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
@@ -55,6 +56,9 @@ public class OutboundFinishExecutor extends OutboundExecutor {
     @Override
     protected WmsStockFlowDirection updateStockWarehouseQty(WmsStockWarehouseDO stockWarehouseDO, WmsOutboundItemRespVO item, Integer quantity) {
 
+        // 校验本方法在事务中
+        JdbcUtils.requireTransaction();
+
         Integer actualQty=item.getActualQty();
 
         // 可用量
@@ -99,7 +103,6 @@ public class OutboundFinishExecutor extends OutboundExecutor {
             newFlowDO.setInboundId(inboundItemDO.getInboundId());
             newFlowDO.setInboundItemId(inboundItemDO.getId());
             newFlowDO.setProductId(inboundItemDO.getProductId());
-
 
             newFlowDO.setBillType(BillType.WMS_OUTBOUND.getValue());
             newFlowDO.setBillId(outboundRespVO.getId());
@@ -163,11 +166,6 @@ public class OutboundFinishExecutor extends OutboundExecutor {
         }
         return WmsStockFlowDirection.OUT;
     }
-
-//    @Override
-//    protected void updateMultiStockBinQty(Long warehouseId, Long productId, WmsOutboundItemRespVO item,Integer quantity) {
-//        //TODO 按库存批次出库暂不实现
-//    }
 
     /**
      * 更新出库单

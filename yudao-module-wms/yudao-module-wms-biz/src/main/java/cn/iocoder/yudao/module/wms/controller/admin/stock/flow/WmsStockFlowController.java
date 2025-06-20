@@ -31,7 +31,11 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.module.wms.enums.stock.WmsStockReason.*;
 
+/**
+ * @author jisencai
+ */
 @Tag(name = "库存流水")
 @RestController
 @RequestMapping("/wms/stock-flow")
@@ -93,7 +97,7 @@ public class WmsStockFlowController {
     @PreAuthorize("@ss.hasPermission('wms:stock-flow:query')")
     public CommonResult<PageResult<WmsStockFlowRespVO>> getStockFlowPageWarehouse(@Valid @RequestBody WmsStockFlowPageReqVO pageReqVO) {
         pageReqVO.setStockType(WmsStockType.WAREHOUSE.getValue());
-        pageReqVO.setReason(new Integer[]{WmsStockReason.INBOUND.getValue(), WmsStockReason.OUTBOUND_FINISH.getValue()});
+        pageReqVO.setReason(new Integer[]{WmsStockReason.INBOUND.getValue(), OUTBOUND_FINISH.getValue()});
         return getStockFlowPage(pageReqVO);
     }
 
@@ -102,7 +106,7 @@ public class WmsStockFlowController {
     @PreAuthorize("@ss.hasPermission('wms:stock-flow:query')")
     public CommonResult<PageResult<WmsStockFlowRespVO>> getStockFlowPageLogic(@Valid @RequestBody WmsStockFlowPageReqVO pageReqVO) {
         pageReqVO.setStockType(WmsStockType.LOGIC.getValue());
-        pageReqVO.setReason(new Integer[]{WmsStockReason.INBOUND.getValue(), WmsStockReason.OUTBOUND_FINISH.getValue()});
+        pageReqVO.setReason(new Integer[]{WmsStockReason.INBOUND.getValue(), OUTBOUND_FINISH.getValue(), OUTBOUND_SUBMIT.getValue(), OUTBOUND_REJECT.getValue(), OUTBOUND_AGREE.getValue(), STOCK_LOGIC_MOVE.getValue()});
         return getStockFlowPage(pageReqVO);
     }
 
@@ -111,7 +115,8 @@ public class WmsStockFlowController {
     @PreAuthorize("@ss.hasPermission('wms:stock-flow:query')")
     public CommonResult<PageResult<WmsStockFlowRespVO>> getStockFlowPageBin(@Valid @RequestBody WmsStockFlowPageReqVO pageReqVO) {
         pageReqVO.setStockType(WmsStockType.BIN.getValue());
-        pageReqVO.setReason(new Integer[]{WmsStockReason.INBOUND.getValue(), WmsStockReason.PICKUP.getValue(), WmsStockReason.OUTBOUND_FINISH.getValue(), WmsStockReason.EXCHANGE.getValue()});
+        pageReqVO.setReason(new Integer[]{INBOUND.getValue(), PICKUP.getValue(), OUTBOUND_FINISH.getValue(), EXCHANGE.getValue(), STOCK_BIN_MOVE.getValue(), PICKUP.getValue(), OUTBOUND_SUBMIT.getValue(), OUTBOUND_REJECT.getValue()});
+//        pageReqVO.setReason(new Integer[]{WmsStockReason.STOCK_BIN_MOVE.getValue()});
         return getStockFlowPage(pageReqVO);
     }
 
@@ -137,7 +142,7 @@ public class WmsStockFlowController {
         stockFlowService.assembleLogicMove(voPageResult.getList());
         stockFlowService.assembleExchange(voPageResult.getList());
         //批次可用库存数量显示为库存变更前数量
-        stockFlowService.assembleBatchAvailableQty(voPageResult.getList());
+        stockFlowService.assembleBinStock(voPageResult.getList());
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
 			.mapping(WmsStockFlowRespVO::getCreator, WmsStockFlowRespVO::setCreatorName)

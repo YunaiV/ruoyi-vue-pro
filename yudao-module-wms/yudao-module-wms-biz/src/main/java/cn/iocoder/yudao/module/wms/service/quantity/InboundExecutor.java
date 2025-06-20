@@ -17,11 +17,13 @@ import cn.iocoder.yudao.module.wms.service.stock.logic.WmsStockLogicService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.fhs.common.constant.Constant.ZERO;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
@@ -44,6 +46,7 @@ public class InboundExecutor extends QuantityExecutor<InboundContext> {
 
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void execute(InboundContext context) {
 
         final WmsInboundRespVO inboundRespVO = inboundService.getInboundWithItemList(context.getInboundId());
@@ -162,7 +165,9 @@ public class InboundExecutor extends QuantityExecutor<InboundContext> {
         // 保存
         stockWarehouseService.insertOrUpdate(stockWarehouseDO);
         // 记录流水
-        stockFlowService.createForStockWarehouse(this.getReason(), WmsStockFlowDirection.IN,productId, stockWarehouseDO, actualQuantity, inboundId, inboundItemId);
+        Integer beforeQty = stockWarehouseDO.getAvailableQty() == null ? ZERO : stockWarehouseDO.getAvailableQty();
+        Integer afterQty = beforeQty + actualQuantity;
+        stockFlowService.createForStockWarehouse(this.getReason(), WmsStockFlowDirection.IN, productId, stockWarehouseDO, actualQuantity, inboundId, inboundItemId, beforeQty, afterQty, inboundId);
 
     }
 
@@ -182,7 +187,9 @@ public class InboundExecutor extends QuantityExecutor<InboundContext> {
         // 保存
         stockLogicService.insertOrUpdate(stockLogicDO);
         // 记录流水
-        stockFlowService.createForStockLogic(this.getReason(), WmsStockFlowDirection.IN, productId, stockLogicDO, actualQuantity, inboundId, inboundItemId);
+        Integer beforeQty = stockLogicDO.getAvailableQty() == null ? ZERO : stockLogicDO.getAvailableQty();
+        Integer afterQty = beforeQty + actualQuantity;
+        stockFlowService.createForStockLogic(this.getReason(), WmsStockFlowDirection.IN, productId, stockLogicDO, actualQuantity, inboundId, inboundItemId, beforeQty, afterQty, inboundId);
     }
 
 

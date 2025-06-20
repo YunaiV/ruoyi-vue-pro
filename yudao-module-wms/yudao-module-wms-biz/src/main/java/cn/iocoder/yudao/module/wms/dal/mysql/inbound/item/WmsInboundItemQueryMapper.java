@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.dal.mysql.inbound.item;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemListForTmsReqVO;
@@ -124,5 +125,16 @@ public interface WmsInboundItemQueryMapper extends BaseMapperX<WmsInboundItemQue
         wrapper1.leftJoin(WmsInboundDO.class, WmsInboundDO::getId, WmsInboundItemQueryDO::getInboundId)
             .eq(WmsInboundDO::getWarehouseId, listForTmsReqVO.getWarehouseId());
         return selectList(wrapper1);
+    }
+
+    default List<WmsInboundItemDO> selectByWarehouseIdAndProductId(Long warehouseId, Long productId) {
+        MPJLambdaWrapperX<WmsInboundItemQueryDO> wrapper = new MPJLambdaWrapperX<>();
+        wrapper.eq(WmsInboundItemDO::getProductId, productId)
+            .selectAll(WmsInboundItemDO.class);
+        wrapper.innerJoin(WmsInboundDO.class, WmsInboundDO::getId, WmsInboundItemQueryDO::getInboundId)
+            .eq(WmsInboundDO::getWarehouseId, warehouseId);
+        wrapper.orderByAsc(WmsInboundItemDO::getCreateTime);
+        List<WmsInboundItemQueryDO> rtnList = selectList(wrapper);
+        return BeanUtils.toBean(rtnList, WmsInboundItemDO.class);
     }
 }

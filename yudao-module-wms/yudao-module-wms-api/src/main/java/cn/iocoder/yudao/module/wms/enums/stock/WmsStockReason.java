@@ -18,7 +18,6 @@ public enum WmsStockReason implements ArrayValuable<Integer>, DictEnum {
     INBOUND(1, "入库"),
     PICKUP(2, "拣货"),
     OUTBOUND_FINISH(3, "完成出库"),
-    OUTBOUND_AGREE(10, "同意出库单"),
     OUTBOUND_SUBMIT(4, "提交出库单"),
     OUTBOUND_REJECT(5, "拒绝出库单"),
     STOCK_BIN_MOVE(6,"库位库存移动"),
@@ -26,6 +25,7 @@ public enum WmsStockReason implements ArrayValuable<Integer>, DictEnum {
     STOCKCHECK_POSITIVE(8, "盘赢"),
     STOCKCHECK_NEGATIVE(9, "盘亏"),
     EXCHANGE(10, "良次转换"),
+    OUTBOUND_AGREE(11, "同意出库单"),
    ;
 
     public static final Integer[] VALUES = Arrays.stream(values()).map(WmsStockReason::getValue).toArray(Integer[]::new);

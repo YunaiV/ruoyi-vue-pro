@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.wms.api.stock.logic;
 
 import cn.iocoder.yudao.module.wms.api.stock.logic.dto.WmsStockLogicDTO;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.Map;
  *
  * @author wdy
  */
+@Validated
 public interface WmsStockLogicApi {
 
     /**

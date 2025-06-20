@@ -157,7 +157,9 @@ public class WmsInboundItemController {
         inboundItemService.assembleStockType(voPageResult.getList());
         inboundItemService.assembleCompany(voPageResult.getList());
         inboundItemService.assembleStockWarehouse(voPageResult.getList());
-        //
+        inboundItemService.assembleStockLogic(voPageResult.getList());
+        inboundItemService.assembleInboundItems(voPageResult.getList());
+
         InboundExecutor.setShelveAvailableQty(voPageResult.getList());
         // 返回
         return success(voPageResult);

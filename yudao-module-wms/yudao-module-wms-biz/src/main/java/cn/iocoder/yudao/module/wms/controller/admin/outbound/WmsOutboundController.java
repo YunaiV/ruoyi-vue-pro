@@ -120,6 +120,7 @@ public class WmsOutboundController {
         outboundService.assembleDept(voPageResult.getList());
         outboundService.assembleCompany(voPageResult.getList());
         outboundService.assembleApprovalHistory(voPageResult.getList());
+        outboundService.assembleUpstreamType(voPageResult.getList());
         // 人员姓名填充
         AdminUserApi.inst().prepareFill(voPageResult.getList())
 			.mapping(WmsOutboundRespVO::getCreator, WmsOutboundRespVO::setCreatorName)
@@ -197,4 +198,13 @@ public class WmsOutboundController {
         outboundService.approve(WmsOutboundAuditStatus.Event.FINISH, approvalReqVO);
         return success(true);
     }
+
+//    @PostMapping("/validate")
+//    @Operation(summary = "头程单提交校验")
+//    public CommonResult<Boolean> validateOutboundData(@RequestBody List<WmsOutboundValidateReqDTO> validateReqDTOList) {
+//        // 调用服务层进行校验
+//        boolean result = outboundService.validateOutboundData(validateReqDTOList);
+//        // 返回校验结果
+//        return success(result);
+//    }
 }

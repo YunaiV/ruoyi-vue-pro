@@ -94,4 +94,7 @@ public class WmsStockBinRespVO {
     @Schema(description = "备注", example = "")
     @ExcelProperty("备注")
     private String remark;
+
+    public WmsStockBinRespVO(WmsStockBinRespVO fromStockBin) {
+    }
 }

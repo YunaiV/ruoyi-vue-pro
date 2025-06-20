@@ -22,7 +22,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -49,7 +48,7 @@ public class WmsPickupController {
     @Operation(summary = "创建拣货单")
     @PreAuthorize("@ss.hasPermission('wms:pickup:create')")
     public CommonResult<Long> createPickup(@RequestBody WmsPickupSaveReqVO createReqVO) {
-        return success(pickupService.createPickup(createReqVO).getId());
+        return success(pickupService.createPickup(createReqVO, null).getId());
     }
 
     // /**

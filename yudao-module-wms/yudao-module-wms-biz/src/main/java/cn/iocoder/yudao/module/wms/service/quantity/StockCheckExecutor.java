@@ -37,6 +37,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,6 +97,7 @@ public class StockCheckExecutor extends QuantityExecutor<StockCheckContext> {
 
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void execute(StockCheckContext context) {
 
         // 确认在事务内
@@ -155,7 +157,6 @@ public class StockCheckExecutor extends QuantityExecutor<StockCheckContext> {
                 outboundItemSaveReqVO.setActualQty(Math.abs(deltaQty));
                 outboundItemSaveReqVO.setBinId(stockCheckBinDO.getBinId());
                 outboundItemSaveReqVOList.add(outboundItemSaveReqVO);
-
             }
 
         }
@@ -239,7 +240,7 @@ public class StockCheckExecutor extends QuantityExecutor<StockCheckContext> {
         pickupSaveReqVO.setUpstreamCode(stockCheckDO.getCode());
         pickupSaveReqVO.setUpstreamType(BillType.WMS_STOCKCHECK.getValue());
         // 执行拣货
-        pickupService.createForStockCheck(pickupSaveReqVO);
+        pickupService.createForStockCheck(pickupSaveReqVO, inboundDO);
 
     }
 

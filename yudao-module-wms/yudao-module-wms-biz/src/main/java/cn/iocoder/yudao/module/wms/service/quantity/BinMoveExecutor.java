@@ -24,6 +24,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.*;
+import static com.fhs.common.constant.Constant.ZERO;
 
 /**
  * @author: LeeFJ
@@ -66,6 +68,7 @@ public class BinMoveExecutor extends QuantityExecutor<BinMoveContext> {
 
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void execute(BinMoveContext context) {
 
         WmsPickupSaveReqVO fromPickup=new WmsPickupSaveReqVO();
@@ -123,6 +126,16 @@ public class BinMoveExecutor extends QuantityExecutor<BinMoveContext> {
         for (WmsStockBinMoveItemDO binMoveItemDO : binMoveItemDOList) {
             WmsStockBinRespVO fromStockBin = stockBinMap.get(makeStockKey(binMoveItemDO.getFromBinId(),binMoveItemDO.getProductId()));
             WmsStockBinRespVO toStockBin = stockBinMap.get(makeStockKey(binMoveItemDO.getToBinId(),binMoveItemDO.getProductId()));
+            if (fromStockBin == null) {
+                throw exception(STOCK_BIN_NOT_EXISTS);
+            } else if (toStockBin == null) {
+                //目标库位无数据时，新建库位库存记录
+                toStockBin = new WmsStockBinRespVO(fromStockBin);
+                toStockBin.setBinId(binMoveItemDO.getToBinId());
+                toStockBin.setId(null);
+                toStockBin.setSellableQty(ZERO);
+                toStockBin.setAvailableQty(ZERO);
+            }
             // 未指定 inboundId 时，不通过拣货完成移库操作
             if(inboundId==null) {
                 this.processStockBin(binMoveDO.getWarehouseId(), binMoveItemDO, fromStockBin, toStockBin);
@@ -142,20 +155,18 @@ public class BinMoveExecutor extends QuantityExecutor<BinMoveContext> {
 
         // 完成库位移动
         stockBinMoveService.finishMove(binMoveDO,binMoveItemDOList);
-
+        //todo 添加库存流水
     }
 
     /**
      * 通过拣货完成上下架移库操作
      **/
-    private void processStockBin(Long inboundId,Long warehouseId,WmsStockBinMoveItemDO binMoveItemDO,WmsStockBinRespVO fromStockBinVO,WmsStockBinRespVO toStockBinVO,List<WmsPickupItemSaveReqVO> fromPickupItemList,List<WmsPickupItemSaveReqVO> toPickupItemList) {
+    private void processStockBin(Long inboundId, Long warehouseId, WmsStockBinMoveItemDO binMoveItemDO, WmsStockBinRespVO fromStockBinVO, WmsStockBinRespVO toStockBinVO, List<WmsPickupItemSaveReqVO> fromPickupItemList, List<WmsPickupItemSaveReqVO> toPickupItemList) {
 
         JdbcUtils.requireTransaction();
 
         // 处理出方
         WmsStockBinDO fromStockBinDO = BeanUtils.toBean(fromStockBinVO,WmsStockBinDO.class);
-        //
-
 
         fromStockBinDO.setAvailableQty(fromStockBinDO.getAvailableQty()-binMoveItemDO.getQty());
         if(fromStockBinDO.getAvailableQty()<0) {
@@ -185,8 +196,8 @@ public class BinMoveExecutor extends QuantityExecutor<BinMoveContext> {
         toPickupItem.setInboundId(inboundId);
         toPickupItem.setInboundItemId(inboundItemDO.getId());
         toPickupItem.setProductId(binMoveItemDO.getProductId());
-        toPickupItem.setBinId(fromStockBinVO.getBinId());
-        toPickupItem.setQty(-binMoveItemDO.getQty());
+        toPickupItem.setBinId(toStockBinVO.getBinId());
+        toPickupItem.setQty(binMoveItemDO.getQty());
         toPickupItemList.add(toPickupItem);
 
     }
@@ -217,8 +228,7 @@ public class BinMoveExecutor extends QuantityExecutor<BinMoveContext> {
         // 保存
         stockBinService.insertOrUpdate(fromStockBinDO);
         // 记录流水
-        stockFlowService.createForStockBin(this.getReason(), WmsStockFlowDirection.OUT, binMoveItemDO.getProductId(), fromStockBinDO , binMoveItemDO.getQty(), binMoveItemDO.getBinMoveId(), binMoveItemDO.getId(),null);
-
+        stockFlowService.createForStockBin(this.getReason(), WmsStockFlowDirection.OUT, binMoveItemDO.getProductId(), fromStockBinDO, binMoveItemDO.getQty(), binMoveItemDO.getBinMoveId(), binMoveItemDO.getId(), fromStockBinDO.getBinId(), fromStockBinDO.getSellableQty(), fromStockBinDO.getSellableQty() - binMoveItemDO.getQty(), null);
 
         // 入方
         WmsStockBinDO toStockBinDO = stockBinService.getStockBin(binMoveItemDO.getToBinId(),binMoveItemDO.getProductId(), true);
@@ -229,7 +239,7 @@ public class BinMoveExecutor extends QuantityExecutor<BinMoveContext> {
         // 保存
         stockBinService.insertOrUpdate(toStockBinDO);
         // 记录流水
-        stockFlowService.createForStockBin(this.getReason(),WmsStockFlowDirection.IN, binMoveItemDO.getProductId(),toStockBinDO , binMoveItemDO.getQty(), binMoveItemDO.getBinMoveId(), binMoveItemDO.getId(),null);
+        stockFlowService.createForStockBin(this.getReason(), WmsStockFlowDirection.IN, binMoveItemDO.getProductId(), toStockBinDO, binMoveItemDO.getQty(), binMoveItemDO.getBinMoveId(), binMoveItemDO.getId(), toStockBinDO.getBinId(), toStockBinDO.getSellableQty(), toStockBinDO.getSellableQty() - binMoveItemDO.getQty(), null);
     }
 
 

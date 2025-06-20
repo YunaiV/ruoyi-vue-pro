@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
+ * @author jisencai
  * @table-fields : reason,create_time,outbound_pending_qty,delta_qty,flow_time,transit_qty,available_qty,next_flow_id,make_pending_qty,stock_id,stock_type,inbound_item_flow_id,product_id,shelving_pending_qty,reason_bill_id,defective_qty,return_transit_qty,sellable_qty,direction,prev_flow_id,reason_item_id,warehouse_id
  */
 @Schema(description = "管理后台 - 库存流水分页 Request VO")

@@ -20,7 +20,7 @@ import java.util.List;
  * @author 李方捷
  */
 @Mapper
-public interface WmsInboundItemFlowMapper extends BaseMapperX<WmsItemFlowDO> {
+public interface WmsItemFlowMapper extends BaseMapperX<WmsItemFlowDO> {
 
     default PageResult<WmsItemFlowDO> selectPage(WmsInboundItemFlowPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<WmsItemFlowDO>()
@@ -75,18 +75,22 @@ public interface WmsInboundItemFlowMapper extends BaseMapperX<WmsItemFlowDO> {
         reqVO.setPageNo(1);
         LambdaQueryWrapperX<WmsItemFlowDO> wrapper = new LambdaQueryWrapperX<>();
         wrapper.in(WmsItemFlowDO::getInboundId, inboundIds);
+        wrapper.orderByDesc(WmsItemFlowDO::getCreateTime);
         return selectPage(reqVO, wrapper).getList();
     }
 
     /**
      * 根据产品ID，库位ID和仓库ID查询
      */
-    default List<WmsInboundItemFlowDetailVO> selectByProductIdAndBinIdAndWarehouseId(Long productId, Long binId, Long warehouseId, Integer limit) {
+    default List<WmsInboundItemFlowDetailVO> selectByProductIdAndBinIdAndWarehouseId(Long warehouseId, Long binId, Long productId, int limit) {
         MPJLambdaWrapperX<WmsItemFlowDO> wrapper = new MPJLambdaWrapperX<>();
         wrapper.selectAs(WmsItemFlowDO::getId, "id")
             .selectAs(WmsItemFlowDO::getInboundItemId, "inboundItemId")
+            .selectAs(WmsItemFlowDO::getInboundId, "inboundId")
             .selectAs(WmsItemFlowDO::getProductId, "productId")
             .selectAs(WmsItemFlowDO::getOutboundAvailableQty, "outboundAvailableQty")
+            .selectAs(WmsInboundDO::getWarehouseId, "warehouseId")
+            .selectAs(WmsStockBinDO::getBinId, "binId")
             .selectAs(WmsItemFlowDO::getCreateTime, "createTime")
             .innerJoin(WmsInboundItemDO.class, WmsInboundItemDO::getId, WmsItemFlowDO::getInboundItemId)
             .innerJoin(WmsInboundDO.class, WmsInboundDO::getId, WmsInboundItemDO::getInboundId)
@@ -96,9 +100,7 @@ public interface WmsInboundItemFlowMapper extends BaseMapperX<WmsItemFlowDO> {
             .eqIfPresent(WmsInboundDO::getWarehouseId, warehouseId)
             .orderByAsc(WmsInboundDO::getCreateTime)
             .last("LIMIT " + limit);
-        List<WmsItemFlowDO> rtnList1 = selectList(wrapper);
-        List<WmsInboundItemFlowDetailVO> rtnList = selectJoinList(WmsInboundItemFlowDetailVO.class, wrapper);
 
-        return rtnList;
+        return selectJoinList(WmsInboundItemFlowDetailVO.class, wrapper);
     }
 }

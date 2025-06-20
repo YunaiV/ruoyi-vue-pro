@@ -5,7 +5,9 @@ import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundStatus;
 import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundType;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -18,6 +20,9 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
  * @table-fields : code,company_id,remark,audit_status,outbound_time,type,upstream_type,latest_outbound_action_id,outbound_status,upstream_id,id,upstream_code,dept_id,warehouse_id
  */
 @Data
+@SuppressWarnings("ALL")
+@NoArgsConstructor
+@AllArgsConstructor
 public class WmsOutboundImportReqDTO {
 
 
@@ -25,7 +30,7 @@ public class WmsOutboundImportReqDTO {
     /**
      * WMS出库单类型
      */
-    @NotNull(message = "WMS出库单类型不能为空", groups = { ValidationGroup.create.class })
+    @NotNull(message = "WMS出库单类型不能为空")
     @InEnum(WmsOutboundType.class)
     private Integer type;
 

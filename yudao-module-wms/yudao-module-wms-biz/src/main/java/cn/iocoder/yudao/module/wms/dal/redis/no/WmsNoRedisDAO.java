@@ -30,37 +30,37 @@ public class WmsNoRedisDAO {
     /**
      * 库位库存移动单的流水号前缀
      **/
-    public static final String STOCK_BIN_MOVE_NO_PREFIX = "KWKC";
+    public static final String STOCK_BIN_MOVE_NO_PREFIX = "SBM";
 
     /**
      * 逻辑库存移动单的流水号前缀
      **/
-    public static final String STOCK_LOGIC_MOVE_NO_PREFIX = "SYZKC";
+    public static final String STOCK_LOGIC_MOVE_NO_PREFIX = "LIM";
 
 
     /**
      * 入库单单据号前缀
      */
-    public static final String INBOUND_NO_PREFIX = "RKD";
+    public static final String INBOUND_NO_PREFIX = "IBO";
     /**
      * 出库单单据号前缀
      */
-    public static final String OUTBOUND_NO_PREFIX = "CKD";
+    public static final String OUTBOUND_NO_PREFIX = "OBO";
 
     /**
      * 拣货单单据号前缀
      **/
-    public static final String PICKUP_NO_PREFIX = "JHD";
+    public static final String PICKUP_NO_PREFIX = "PIO";
 
     /**
      * 盘点单据号前缀
      **/
-    public static final String STOCKCHECK_NO_PREFIX = "PDD";
+    public static final String STOCKCHECK_NO_PREFIX = "SCD";
 
     /**
      * 盘点单据号前缀
      **/
-    public static final String EXCHANGE_NO_PREFIX = "HHD";
+    public static final String EXCHANGE_NO_PREFIX = "EXD";
 
 
 

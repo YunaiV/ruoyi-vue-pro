@@ -685,6 +685,7 @@ public class SrmPurchaseReturnServiceImpl implements SrmPurchaseReturnService {
             //根据主单的公司ID复制给明细行
             saveReqDTOS.forEach(item -> item.setCompanyId(importReqDTO.getCompanyId()));
             importReqDTO.setItemList(saveReqDTOS);
+            importReqDTO.setCompanyId(null);
             // 生成出库单
             wmsOutboundApi.generateOutbound(importReqDTO);
         });

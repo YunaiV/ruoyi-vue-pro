@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 /**
+ * @author jisencai
  * @table-fields : create_time,outbound_pending_qty,bin_id,product_id,available_qty,sellable_qty,warehouse_id
  */
 @Schema(description = "管理后台 - 仓位库存分页 Request VO")
@@ -51,8 +52,6 @@ public class WmsStockBinPageReqVO extends PageParam {
     @Schema(description = "可售量，未被单据占用的良品数量", example = "")
     private Integer[] sellableQty;
 
-
-
     @Schema(description = "仓库库存-可用量，在库的良品数量", example = "")
     private Integer[] warehouseAvailableQty;
 
@@ -76,7 +75,6 @@ public class WmsStockBinPageReqVO extends PageParam {
 
     @Schema(description = "仓库库存-待上架数量，上架是指从拣货区上架到货架", example = "")
     private Integer[] warehouseShelvingPendingQty;
-
 
     @Schema(description = "是否返回 suggestedLogic ", example = "")
     private Integer withSuggestedLogic;

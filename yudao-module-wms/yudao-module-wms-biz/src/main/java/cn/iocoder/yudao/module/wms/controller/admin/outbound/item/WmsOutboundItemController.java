@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.common.validation.ValidationGroup;
 import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.*;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
@@ -26,7 +25,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
@@ -217,11 +219,12 @@ public class WmsOutboundItemController {
     }
 
 
-    @PutMapping("/update-actual-quantity")
-    @Operation(summary = "设置实际出库量")
-    @PreAuthorize("@ss.hasPermission('wms:outbound-item:update')")
-    public CommonResult<Boolean> updateActualQuantity(@Validated(ValidationGroup.update.class) @RequestBody WmsOutboundSaveReqVO updateReqVOList) {
-        outboundItemService.updateActualQuantity(updateReqVOList.getItemList());
-        return success(true);
-    }
+//    @PutMapping("/update-actual-quantity")
+//    @Operation(summary = "设置实际出库量")
+//    @PreAuthorize("@ss.hasPermission('wms:outbound-item:update')")
+//    public CommonResult<Boolean> updateActualQuantity(@Validated(ValidationGroup.update.class) @RequestBody WmsOutboundSaveReqVO updateReqVOList) {
+//        return null;
+////        outboundItemService.updateActualQuantity(updateReqVOList.getItemList());
+////        return success(true);
+//    }
 }

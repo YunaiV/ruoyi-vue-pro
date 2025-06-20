@@ -90,7 +90,7 @@ public class WmsPickupServiceImpl implements WmsPickupService {
      * @sign : E7A4B1135281D8DB
      */
     @Override
-    public WmsPickupDO createPickup(WmsPickupSaveReqVO createReqVO) {
+    public WmsPickupDO createPickup(WmsPickupSaveReqVO createReqVO, WmsInboundDO inboundDO) {
         if(createReqVO.getCause()==null) {
             createReqVO.setCause(WmsPickupCause.PICKUP.getValue());
         }
@@ -123,13 +123,13 @@ public class WmsPickupServiceImpl implements WmsPickupService {
         WmsPickupServiceImpl proxy = SpringUtils.getBeanByExactType(WmsPickupServiceImpl.class);
         AtomicReference<WmsPickupDO> pickupDO = new AtomicReference<>();
         lockRedisDAO.lockByWarehouse(pickup.getWarehouseId(), () -> {
-            pickupDO.set(proxy.createPickupInLock(pickup, toInsetList));
+            pickupDO.set(proxy.createPickupInLock(pickup, toInsetList, cause, inboundDO));
         });
         return pickupDO.get();
     }
 
     @Transactional(rollbackFor = Exception.class)
-    protected WmsPickupDO createPickupInLock(WmsPickupDO pickup, List<WmsPickupItemDO> toInsetList) {
+    protected WmsPickupDO createPickupInLock(WmsPickupDO pickup, List<WmsPickupItemDO> toInsetList, WmsPickupCause cause, WmsInboundDO inboundDO) {
         // 取得锁之后需要重新取数
         List<Long> inboundItemIdList = StreamX.from(toInsetList).toList(WmsPickupItemDO::getInboundItemId);
         List<WmsInboundItemDO> inboundItemDOList = inboundItemService.selectByIds(inboundItemIdList);
@@ -279,14 +279,14 @@ public class WmsPickupServiceImpl implements WmsPickupService {
     }
 
     @Override
-    public void createForStockCheck(WmsPickupSaveReqVO pickupSaveReqVO) {
+    public void createForStockCheck(WmsPickupSaveReqVO pickupSaveReqVO, WmsInboundDO inboundDO) {
         pickupSaveReqVO.setCause(WmsPickupCause.STOCKCHECK.getValue());
-        this.createPickup(pickupSaveReqVO);
+        this.createPickup(pickupSaveReqVO, inboundDO);
     }
 
     @Override
     public void createForBinMove(WmsPickupSaveReqVO pickupSaveReqVO) {
         pickupSaveReqVO.setCause(WmsPickupCause.BIN_MOVE.getValue());
-        this.createPickup(pickupSaveReqVO);
+        this.createPickup(pickupSaveReqVO, null);
     }
 }

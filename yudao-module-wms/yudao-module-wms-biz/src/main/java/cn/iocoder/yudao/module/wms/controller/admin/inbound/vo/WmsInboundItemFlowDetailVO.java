@@ -4,7 +4,7 @@ import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * @author jisencai
@@ -15,19 +15,20 @@ import java.time.LocalDateTime;
 @ExcelIgnoreUnannotated
 public class WmsInboundItemFlowDetailVO {
 
-    private Long wmsInboundId;
-
-    private Long wmsItemFlowId;
-
-    private Integer outboundAvailableQty;
+    private Long id;
 
     private Long inboundItemId;
 
+    private Long inboundId;
+
     private Long productId;
 
-    private LocalDateTime createTime;
+    private Integer outboundAvailableQty;
 
-    private Long id;
+    private Long warehouseId;
 
+    private Long binId;
+
+    private Date createTime;
 
 }

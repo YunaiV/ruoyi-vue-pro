@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.wms.service.quantity;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.item.vo.WmsOutboundItemRespVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
+import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemLogicDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsItemFlowDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.stock.bin.WmsStockBinDO;
@@ -26,6 +27,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.*;
+import static com.fhs.common.constant.Constant.ZERO;
 
 /**
  * @author: LeeFJ
@@ -102,9 +104,9 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
             List<Long> companyIds = new ArrayList<>();
 
             // 如果未指定归属，则按入库批次的先进先出进行处理
-            if (deptId == null || companyId == null) {
-                //todo 获取批次列表，然后根据可售数量判断取多个批次的库存
-                List<WmsInboundItemLogicDO> inboundItemLogicList = inboundService.getInboundItemLogicList(warehouseId, productId, true);
+            if (/*deptId == null || */companyId == null) {
+                //获取批次列表，然后根据可售数量判断取多个批次的库存
+                List<WmsInboundItemLogicDO> inboundItemLogicList = inboundService.getInboundItemLogicList(warehouseId, productId, deptId, true);
                 if (inboundItemLogicList == null) {
                     throw exception(STOCK_LOGIC_NOT_EXISTS);
                 }
@@ -124,13 +126,18 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
                 companyIds.add(companyId);
             }
 
+            List<Long> uniqueDeptIds = deptIds.stream().distinct().toList();
+            List<Long> uniqueCompanyIds = companyIds.stream().distinct().toList();
+
             // 执行出库的原子操作
             Integer quantity= getExecuteQty(item);
-            for (int i = 0; i < deptIds.size(); i++) {
-                companyId = companyIds.get(i);
-                deptId = deptIds.get(i);
-                // 执行单个出库详情
-                this.outboundSingleItem(outboundRespVO, item, companyId, deptId, warehouseId, item.getBinId(), productId, quantity, outboundRespVO.getId(), item.getId());
+            for (int i = 0; i < uniqueCompanyIds.size(); i++) {
+                for (int j = 0; j < uniqueDeptIds.size(); j++) {
+                    companyId = companyIds.get(i);
+                    deptId = deptIds.get(j);
+                    // 执行单个出库详情
+                    this.outboundSingleItem(outboundRespVO, item, companyId, deptId, warehouseId, item.getBinId(), productId, quantity, outboundRespVO.getId(), item.getId());
+                }
             }
         }
         updateOutbound(outboundRespVO);
@@ -162,7 +169,7 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
     private WmsOutboundStatus processItem(WmsOutboundRespVO outboundRespVO, WmsOutboundItemRespVO item, Long companyId, Long deptId, Long warehouseId, Long binId, Long productId, Integer quantity, Long outboundId, Long outboundItemId) {
 
         this.processStockWarehouseItem(item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
-        List<WmsItemFlowDO> itemFlowList=this.processInboundItem(outboundRespVO,item,companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
+        List<WmsItemFlowDO> itemFlowList = this.processInboundItem(outboundRespVO, item, companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
         this.processStockLogicItem(item, companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId);
         this.processStockBinItem(item, companyId, deptId, warehouseId, binId, productId, quantity, outboundId, outboundItemId, itemFlowList);
         // 当前逻辑,默认全部入库
@@ -190,8 +197,11 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
         // 更新库存
         stockWarehouseService.insertOrUpdate(stockWarehouseDO);
         // 记录流水
-        stockFlowService.createForStockWarehouse(this.getReason(),wmsStockFlowDirection, productId, stockWarehouseDO, quantity, outboundId, outboundItemId);
-
+        WmsInboundDO inboundDO = inboundService.getByDetails(warehouseId, productId, companyId, deptId);
+        int beforeQty = stockWarehouseDO.getAvailableQty() == null ? ZERO : stockWarehouseDO.getAvailableQty();
+        Integer afterQty = beforeQty + quantity * wmsStockFlowDirection.getValue();
+        stockFlowService.createForStockWarehouse(this.getReason(), wmsStockFlowDirection, productId, stockWarehouseDO, quantity, outboundId, outboundItemId,
+            beforeQty, afterQty, inboundDO.getId());
     }
 
 
@@ -214,7 +224,10 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
         // 保存
         stockLogicService.insertOrUpdate(stockLogicDO);
         // 记录流水
-        stockFlowService.createForStockLogic(this.getReason(), wmsStockFlowDirection, productId, stockLogicDO, quantity, outboundId, outboundItemId);
+        WmsInboundDO inboundDO = inboundService.getByDetails(warehouseId, productId, companyId, deptId);
+        Integer beforeQty = stockLogicDO.getAvailableQty();
+        Integer afterQty = beforeQty + quantity * wmsStockFlowDirection.getValue();
+        stockFlowService.createForStockLogic(this.getReason(), wmsStockFlowDirection, productId, stockLogicDO, quantity, outboundId, outboundItemId, beforeQty, afterQty, inboundDO.getId());
     }
 
 
@@ -236,9 +249,10 @@ public abstract class OutboundExecutor extends QuantityExecutor<OutboundContext>
         // 保存
         stockBinService.insertOrUpdate(stockBinDO);
         // 记录流水
-        for (WmsItemFlowDO flowDO : itemFlowList) {
-            stockFlowService.createForStockBin(this.getReason(), wmsStockFlowDirection, productId, stockBinDO, flowDO.getOutboundAvailableDeltaQty(), outboundId, outboundItemId,flowDO.getId());
-        }
+        // 记录库位变化快照值
+        Integer beforeQty = stockBinDO.getSellableQty() - quantity * itemFlowList.get(0).getDirection();
+        Integer afterQty = stockBinDO.getSellableQty();
+        stockFlowService.createForStockBin(this.getReason(), wmsStockFlowDirection, productId, stockBinDO, itemFlowList.get(0).getOutboundAvailableDeltaQty(), outboundId, outboundItemId, binId, beforeQty, afterQty, itemFlowList.get(0).getInboundId());
 
     }
 

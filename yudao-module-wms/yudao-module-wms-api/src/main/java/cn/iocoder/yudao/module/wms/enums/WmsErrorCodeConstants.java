@@ -90,6 +90,7 @@ public interface WmsErrorCodeConstants {
     ErrorCode STOCK_WAREHOUSE_APPROVAL_CONDITION_IS_NOT_MATCH = new ErrorCode(2_001_008_006, "仓库库存不符合审批条件");
     ErrorCode STOCK_WAREHOUSE_NOT_ENOUGH = new ErrorCode(2_001_008_007, "仓库库存不足");
     ErrorCode STOCK_WAREHOUSE_EXISTS = new ErrorCode(2_001_008_008, "仓库库存已存在");
+    ErrorCode STOCK_WAREHOUSE_ITEM_NOT_ENOUGH = new ErrorCode(2_001_014_015, "产品{}库存不足无法提交");
 
     // ========== WMS_STOCK_BIN 仓位库存表 2_001_009_000 ==========
     ErrorCode STOCK_BIN_NOT_EXISTS = new ErrorCode(2_001_009_001, "仓位库存不存在");

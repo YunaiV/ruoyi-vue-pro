@@ -162,7 +162,7 @@ public interface WmsInboundService {
      * @param productId   产品编号
      * @param olderFirst  是否按入库时间升序
      */
-    List<WmsInboundItemLogicDO> getInboundItemLogicList(Long warehouseId, Long productId, boolean olderFirst);
+    List<WmsInboundItemLogicDO> getInboundItemLogicList(Long warehouseId, Long productId, Long deptId, boolean olderFirst);
 
     /**
      * 创建盘点入库单
@@ -183,7 +183,10 @@ public interface WmsInboundService {
 
     void forceAbandon(WmsApprovalReqVO approvalReqVO);
 
-    WmsInboundDO getByWarehouseIdAndProductId(Long warehouseId, Long productId);
+    /**
+     * 根据仓库ID，商品ID和库位号查询入库单
+     */
+    WmsInboundDO getByDetails(Long warehouseId, Long productId, Long companyId, Long deptId);
 
 //    /**
 //     * 根据产品ID，库位ID和仓库ID查询

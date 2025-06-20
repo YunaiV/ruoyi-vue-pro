@@ -4,6 +4,8 @@ import cn.iocoder.yudao.module.wms.api.inbound.dto.WmsInboundDTO;
 import cn.iocoder.yudao.module.wms.api.inbound.dto.WmsInboundItemListForTmsReqDTO;
 import cn.iocoder.yudao.module.wms.api.inbound.dto.WmsInboundItemRespDTO;
 import cn.iocoder.yudao.module.wms.api.inbound.dto.WmsInboundSaveReqDTO;
+import jakarta.validation.Valid;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
@@ -12,6 +14,7 @@ import java.util.List;
  * @date: 2025/4/28 17:03
  * @description: 入库单 API
  */
+@Validated
 public interface WmsInboundApi {
 
     /**
@@ -20,7 +23,7 @@ public interface WmsInboundApi {
      * @param createReqDTO 入库单创建请求
      * @return 入库单ID
      */
-    Long createInbound(WmsInboundSaveReqDTO createReqDTO);
+    Long createInbound(@Valid WmsInboundSaveReqDTO createReqDTO);
 
     /**
      * 按 ID 查询入库单
@@ -54,5 +57,5 @@ public interface WmsInboundApi {
      * @param reqDTO 入参
      * @return 出库单列表
      */
-    List<WmsInboundItemRespDTO> getInboundItemList(WmsInboundItemListForTmsReqDTO reqDTO);
+    List<WmsInboundItemRespDTO> getInboundItemList(@Valid WmsInboundItemListForTmsReqDTO reqDTO);
 }

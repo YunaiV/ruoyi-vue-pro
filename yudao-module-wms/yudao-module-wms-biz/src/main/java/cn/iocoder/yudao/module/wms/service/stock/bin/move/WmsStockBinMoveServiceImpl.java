@@ -106,12 +106,12 @@ public class WmsStockBinMoveServiceImpl implements WmsStockBinMoveService {
         }
         // 重新读取DO
         WmsStockBinMoveDO newStockBinMove = stockBinMoveMapper.selectById(stockBinMove.getId());
-        List<WmsStockBinMoveItemDO> binMoveItemDOS = stockBinMoveItemMapper.selectByBinMoveId(newStockBinMove.getId());
+        List<WmsStockBinMoveItemDO> binMoveItemDoS = stockBinMoveItemMapper.selectByBinMoveId(newStockBinMove.getId());
         // 执行库位移动
         BinMoveContext context = new BinMoveContext();
         context.setInboundId(createReqVO.getInboundId());
         context.setBinMoveDO(newStockBinMove);
-        context.setBinMoveItemDOList(binMoveItemDOS);
+        context.setBinMoveItemDOList(binMoveItemDoS);
         binMoveExecutor.execute(context);
         // 返回
         return stockBinMove;

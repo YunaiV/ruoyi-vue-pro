@@ -85,6 +85,6 @@ public interface WmsItemFlowService {
      */
     List<WmsItemFlowDO> selectByIds(List<Long> idList);
 
-    List<WmsInboundItemFlowDetailVO> selectByProductIdAndBinIdAndWarehouseId(Long productId, Long binId, Long warehouseId, int limit);
+    List<WmsInboundItemFlowDetailVO> selectByProductIdAndBinIdAndWarehouseId(Long warehouseId, Long binId, Long productId, int limit);
 
 }

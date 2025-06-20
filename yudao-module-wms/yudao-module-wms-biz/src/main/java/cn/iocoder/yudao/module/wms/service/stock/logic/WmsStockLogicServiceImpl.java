@@ -252,6 +252,6 @@ public class WmsStockLogicServiceImpl implements WmsStockLogicService {
 
     @Override
     public List<WmsStockLogicDO> selectByWarehouseIdAndProductId(Long warehouseId, Long productId) {
-        return stockLogicMapper.selectByDeptIdAndProductId(warehouseId, productId);
+        return stockLogicMapper.selectByWarehouseIdAndProductId(warehouseId, productId);
     }
 }

@@ -3,15 +3,18 @@ package cn.iocoder.yudao.module.wms.api.outbound;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.wms.api.outbound.dto.WmsOutboundDTO;
 import cn.iocoder.yudao.module.wms.api.outbound.dto.WmsOutboundImportReqDTO;
+import cn.iocoder.yudao.module.wms.api.outbound.dto.WmsOutboundValidateReqDTO;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundImportReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.outbound.WmsOutboundDO;
+import cn.iocoder.yudao.module.wms.enums.outbound.WmsOutboundAuditStatus;
 import cn.iocoder.yudao.module.wms.service.inbound.item.WmsInboundItemService;
 import cn.iocoder.yudao.module.wms.service.outbound.WmsOutboundService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
@@ -21,6 +24,7 @@ import java.util.List;
  * @description: 入库单 API 实现
  */
 @Service
+@Validated
 public class WmsOutboundApiImpl implements WmsOutboundApi {
 
     @Resource
@@ -136,7 +140,15 @@ public class WmsOutboundApiImpl implements WmsOutboundApi {
     @Override
     public void generateOutbound(WmsOutboundImportReqDTO importReqVO) {
         WmsOutboundRespVO wmsOutboundRespVO = outboundService.generateOutbound(BeanUtils.toBean(importReqVO, WmsOutboundImportReqVO.class));
+        WmsApprovalReqVO approvalReqVO = new WmsApprovalReqVO();
+        approvalReqVO.setBillId(wmsOutboundRespVO.getId());
+        outboundService.approve(WmsOutboundAuditStatus.Event.SUBMIT, approvalReqVO);
         BeanUtils.toBean(wmsOutboundRespVO, WmsOutboundDTO.class);
+    }
+
+    @Override
+    public Boolean validateOutboundData(List<WmsOutboundValidateReqDTO> validateReqDTOList) {
+        return outboundService.validateOutboundData(validateReqDTOList);
     }
 
 }

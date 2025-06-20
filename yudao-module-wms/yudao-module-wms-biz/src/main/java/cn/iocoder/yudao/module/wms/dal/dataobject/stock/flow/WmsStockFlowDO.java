@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.module.wms.dal.dataobject.stock.flow;
 
-import lombok.*;
-import com.baomidou.mybatisplus.annotation.*;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
+
 import java.sql.Timestamp;
 
 /**
@@ -131,4 +134,24 @@ public class WmsStockFlowDO extends BaseDO {
      * 在途量
      */
     private Integer transitQty;
+
+    /**
+     * 库位ID
+     */
+    private Long binId;
+
+    /**
+     * 入库单ID
+     */
+    private Long inboundId;
+
+    /**
+     * 库位改变前数量
+     */
+    private Integer beforeQty;
+
+    /**
+     * 库位改变后数量
+     */
+    private Integer afterQty;
 }

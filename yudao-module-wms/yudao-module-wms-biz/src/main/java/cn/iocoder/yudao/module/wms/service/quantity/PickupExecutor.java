@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.util.collection.StreamX;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.system.enums.somle.BillType;
+import cn.iocoder.yudao.module.system.enums.somle.CompanyCode;
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.vo.WmsInboundItemRespVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.WmsInboundItemDO;
@@ -22,12 +23,14 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.wms.enums.WmsErrorCodeConstants.*;
+import static com.fhs.common.constant.Constant.ZERO;
 
 /**
  * @author: LeeFJ
@@ -53,6 +56,7 @@ public class PickupExecutor extends QuantityExecutor<PickupContext> {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void execute(PickupContext context) {
 
         // 确认在事务内
@@ -87,8 +91,9 @@ public class PickupExecutor extends QuantityExecutor<PickupContext> {
             pickupItemDO.setInboundItemId(inboundItemVO.getId());
             pickupItemDO.setProductId(inboundItemVO.getProductId());
             pickupItemDO.setPickupId(pickup.getId());
+            Integer direction = pickupItemDO.getQty() > 0 ? WmsStockFlowDirection.IN.getValue() : WmsStockFlowDirection.OUT.getValue();
             // 调整仓位库存
-            this.processItem(pickup, pickupItemDO, inboundMap.get(inboundItemVO.getInboundId()), inboundItemVO);
+            this.processItem(pickup, pickupItemDO, inboundMap.get(inboundItemVO.getInboundId()), inboundItemVO, direction);
             inboundItemService.updateById(BeanUtils.toBean(inboundItemVO, WmsInboundItemDO.class));
         }
 
@@ -102,9 +107,9 @@ public class PickupExecutor extends QuantityExecutor<PickupContext> {
     /**
      * 处理明细行
      **/
-    private void processItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO, WmsInboundItemRespVO inboundItemVO) {
+    private void processItem(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO, WmsInboundItemRespVO inboundItemVO, Integer direction) {
         Long flowId = this.processInboundItem(pickup, pickupItemDO, inboundDO, inboundItemVO);
-        this.processStockBin(pickup, pickupItemDO, inboundDO, inboundItemVO,flowId);
+        this.processStockBin(pickup, pickupItemDO, inboundDO, inboundItemVO, flowId, direction);
         this.processStockWarehouseItem(pickup, pickupItemDO, inboundDO, inboundItemVO);
         this.processStockLogicItem(pickup, pickupItemDO, inboundDO, inboundItemVO);
     }
@@ -113,7 +118,7 @@ public class PickupExecutor extends QuantityExecutor<PickupContext> {
     /**
      * 处理库存仓位
      **/
-    private void processStockBin(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO, WmsInboundItemRespVO inboundItemVO,Long flowId) {
+    private void processStockBin(WmsPickupDO pickup, WmsPickupItemDO pickupItemDO, WmsInboundDO inboundDO, WmsInboundItemRespVO inboundItemVO, Long flowId, Integer direction) {
 
         JdbcUtils.requireTransaction();
         WmsStockBinDO stockBinDO = stockBinService.getStockBin(pickupItemDO.getBinId(), inboundItemVO.getProductId(), true);
@@ -125,7 +130,9 @@ public class PickupExecutor extends QuantityExecutor<PickupContext> {
         // 保存
         stockBinService.insertOrUpdate(stockBinDO);
         // 记录流水
-        stockFlowService.createForStockBin(this.getReason(), WmsStockFlowDirection.IN, inboundItemVO.getProductId(), stockBinDO, pickupItemDO.getQty(), pickupItemDO.getPickupId(), pickupItemDO.getId(),flowId);
+//        stockFlowService.createForStockBin(this.getReason(), WmsStockFlowDirection.IN, inboundItemVO.getProductId(), stockBinDO, pickupItemDO.getQty(), pickupItemDO.getPickupId(), pickupItemDO.getId(),flowId);
+        stockFlowService.createForStockBin(this.getReason(), WmsStockFlowDirection.parse(direction), inboundItemVO.getProductId(), stockBinDO, Math.abs(pickupItemDO.getQty()),
+            pickupItemDO.getPickupId(), pickupItemDO.getId(), stockBinDO.getBinId(), stockBinDO.getSellableQty() - pickupItemDO.getQty(), stockBinDO.getSellableQty(), inboundDO.getId());
     }
 
     /**
@@ -182,7 +189,7 @@ public class PickupExecutor extends QuantityExecutor<PickupContext> {
         Long productId = inboundItemVO.getProductId();
         Integer quantity = pickupItemDO.getQty();
 
-        //List<WmsStockBinDO> stockBinList = stockBinService.selectStockBin(warehouseId, productId);
+//        List<WmsStockBinDO> stockBinList = stockBinService.selectStockBin(warehouseId, productId);
 
 //        Integer availableQuantity = 0;
 //        Integer sellableQuantity = 0;
@@ -208,7 +215,9 @@ public class PickupExecutor extends QuantityExecutor<PickupContext> {
         // 更新库存
         stockWarehouseService.insertOrUpdate(stockWarehouseDO);
         // 记录流水
-        stockFlowService.createForStockWarehouse(this.getReason(),WmsStockFlowDirection.OUT, productId, stockWarehouseDO, quantity, pickup.getId(), pickupItemDO.getId());
+        Integer beforeQty = stockWarehouseDO.getAvailableQty() == null ? ZERO : stockWarehouseDO.getAvailableQty();
+        Integer afterQty = beforeQty + quantity;
+        stockFlowService.createForStockWarehouse(this.getReason(), WmsStockFlowDirection.OUT, productId, stockWarehouseDO, quantity, pickup.getId(), pickupItemDO.getId(), beforeQty, afterQty, inboundDO.getId());
     }
 
 
@@ -227,28 +236,35 @@ public class PickupExecutor extends QuantityExecutor<PickupContext> {
             companyId = inboundDO.getCompanyId();
         }
 
-
         // 部门ID首先考虑明细行，明细行未指定时使用单据中的部门ID
         Long deptId = inboundItemVO.getDeptId();
         if(deptId==null) {
             deptId=inboundDO.getDeptId();
         }
-        // 如果入库单及明细上未指定部门,默认按产品的部门ID
-        if (deptId == null) {
-            deptId = inboundItemVO.getProduct().getDeptId();
-        }
-
+//        // 如果入库单及明细上未指定部门,默认按产品的部门ID
+//        if (deptId == null) {
+//            deptId = inboundItemVO.getProduct().getDeptId();
+//        }
 
         // 刷新逻辑库存
         // wmsStockLogicService.refreshForPickup(pickup.getWarehouseId(), inboundDO.getCompanyId(), deptId,inboundItemVO.getProductId(), pickup.getId(), pickupItemDO.getId(),);
 
         // 校验本方法在事务中
         JdbcUtils.requireTransaction();
+        companyId = companyId == null ? CompanyCode.SOMILE.getValue() : companyId;
         // 查询库存记录
         WmsStockLogicDO stockLogicDO = stockLogicService.getByUkProductOwner(warehouseId, companyId, deptId, productId, false);
         // 如果不存在就创建
         if (stockLogicDO == null) {
-            throw exception(STOCK_LOGIC_NOT_EXISTS);
+            stockLogicDO = WmsStockLogicDO.builder()
+                .deptId(deptId)
+                .warehouseId(warehouseId)
+                .companyId(companyId)
+                .productId(productId)
+                .availableQty(quantity)
+                .outboundPendingQty(ZERO)
+                .shelvePendingQty(ZERO)
+                .build();
         } else {
             // 如果存在就修改
             // 可用量
@@ -262,7 +278,8 @@ public class PickupExecutor extends QuantityExecutor<PickupContext> {
         // 保存
         stockLogicService.insertOrUpdate(stockLogicDO);
         // 记录流水
-        stockFlowService.createForStockLogic(this.getReason(), WmsStockFlowDirection.IN, productId, stockLogicDO, quantity, pickup.getId(), pickupItemDO.getId());
+        stockFlowService.createForStockLogic(this.getReason(), WmsStockFlowDirection.IN, productId, stockLogicDO, quantity, pickup.getId(), pickupItemDO.getId(),
+            stockLogicDO.getAvailableQty() - quantity, stockLogicDO.getAvailableQty(), inboundDO.getId());
 
     }
 

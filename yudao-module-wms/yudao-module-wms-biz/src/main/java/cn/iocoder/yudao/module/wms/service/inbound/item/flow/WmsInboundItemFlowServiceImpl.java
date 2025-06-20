@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.wms.controller.admin.inbound.item.flow.vo.WmsInbo
 import cn.iocoder.yudao.module.wms.controller.admin.inbound.vo.WmsInboundItemFlowDetailVO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.WmsInboundDO;
 import cn.iocoder.yudao.module.wms.dal.dataobject.inbound.item.flow.WmsItemFlowDO;
-import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.flow.WmsInboundItemFlowMapper;
+import cn.iocoder.yudao.module.wms.dal.mysql.inbound.item.flow.WmsItemFlowMapper;
 import cn.iocoder.yudao.module.wms.service.inbound.WmsInboundService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
@@ -35,7 +35,7 @@ public class WmsInboundItemFlowServiceImpl implements WmsItemFlowService {
     private WmsInboundService inboundService;
 
     @Resource
-    private WmsInboundItemFlowMapper inboundItemFlowMapper;
+    private WmsItemFlowMapper inboundItemFlowMapper;
 
     /**
      * @sign : 1F1F95A6107AA047
@@ -165,8 +165,8 @@ public class WmsInboundItemFlowServiceImpl implements WmsItemFlowService {
     }
 
     @Override
-    public List<WmsInboundItemFlowDetailVO> selectByProductIdAndBinIdAndWarehouseId(Long productId, Long binId, Long warehouseId, int limit) {
-        return inboundItemFlowMapper.selectByProductIdAndBinIdAndWarehouseId(productId, binId, warehouseId, 1000);
+    public List<WmsInboundItemFlowDetailVO> selectByProductIdAndBinIdAndWarehouseId(Long warehouseId, Long binId, Long productId, int limit) {
+        return inboundItemFlowMapper.selectByProductIdAndBinIdAndWarehouseId(warehouseId, binId, productId, 1000);
     }
 
 }

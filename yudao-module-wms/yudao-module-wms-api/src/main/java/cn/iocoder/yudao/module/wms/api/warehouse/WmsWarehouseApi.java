@@ -5,6 +5,8 @@ import cn.iocoder.yudao.module.wms.api.warehouse.dto.WmsWareHouseUpdateReqDTO;
 import cn.iocoder.yudao.module.wms.api.warehouse.dto.WmsWarehouseDTO;
 import cn.iocoder.yudao.module.wms.api.warehouse.dto.WmsWarehouseQueryDTO;
 import cn.iocoder.yudao.module.wms.api.warehouse.dto.vo.WmsWarehouseListReqDTO;
+import jakarta.validation.Valid;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.Set;
 /**
  * 仓库API 接口
  */
+@Validated
 public interface WmsWarehouseApi {
 
 
@@ -27,7 +30,7 @@ public interface WmsWarehouseApi {
      * @param reqDTO 查询条件
      * @return 仓库列表
      */
-    List<WmsWarehouseDTO> selectList(WmsWarehouseListReqDTO reqDTO);
+    List<WmsWarehouseDTO> selectList(@Valid WmsWarehouseListReqDTO reqDTO);
 
     /**
      * 更新仓库库信息(在制数量)
@@ -35,7 +38,7 @@ public interface WmsWarehouseApi {
      * @param updateReqVO 产品ID, 仓库ID，在制数量
      * @return 仓库库存
      */
-    Boolean updateStockWarehouse(WmsWareHouseUpdateReqDTO updateReqVO);
+    Boolean updateStockWarehouse(@Valid WmsWareHouseUpdateReqDTO updateReqVO);
 
     /**
      * 查询可售库存
@@ -43,6 +46,6 @@ public interface WmsWarehouseApi {
      * @param wmsWarehouseQueryDTO 仓库编号
      * @return 可售库存列表
      */
-    Map<Long, List<WmsStockWarehouseSimpleDTO>>  selectSellableQty(WmsWarehouseQueryDTO wmsWarehouseQueryDTO);
+    Map<Long, List<WmsStockWarehouseSimpleDTO>> selectSellableQty(@Valid WmsWarehouseQueryDTO wmsWarehouseQueryDTO);
 
 }

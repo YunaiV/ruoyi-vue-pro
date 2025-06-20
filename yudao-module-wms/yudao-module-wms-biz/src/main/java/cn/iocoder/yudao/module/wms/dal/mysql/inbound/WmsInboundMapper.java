@@ -104,14 +104,16 @@ public interface WmsInboundMapper extends BaseMapperX<WmsInboundDO> {
     }
 
     /**
-     * 按 warehouseId, productId 查询唯一的 WmsInboundDO
+     * 按 warehouseId, productId,companyId, deptId 查询 WmsInboundDO
      */
-    default WmsInboundDO getByWarehouseIdAndProductId(Long warehouseId, Long productId) {
+    default WmsInboundDO getByDetails(Long warehouseId, Long productId, Long companyId, Long deptId) {
         MPJLambdaWrapperX<WmsInboundDO> wrapper = new MPJLambdaWrapperX<>();
         wrapper.selectAll(WmsInboundDO.class)
             .eqIfPresent(WmsInboundDO::getWarehouseId, warehouseId)
             .innerJoin(WmsInboundItemDO.class, WmsInboundItemDO::getInboundId, WmsInboundDO::getId)
             .eqIfPresent(WmsInboundItemDO::getProductId, productId)
+            .eqIfPresent(WmsInboundItemDO::getCompanyId, companyId)
+            .eqIfPresent(WmsInboundItemDO::getDeptId, deptId)
             .orderByAsc(WmsInboundDO::getCreateTime)
             .last("limit 1");
         return selectOne(wrapper);

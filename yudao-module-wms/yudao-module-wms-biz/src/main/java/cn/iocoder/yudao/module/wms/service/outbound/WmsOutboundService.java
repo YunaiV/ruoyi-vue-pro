@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.wms.service.outbound;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.wms.api.outbound.dto.WmsOutboundValidateReqDTO;
 import cn.iocoder.yudao.module.wms.controller.admin.approval.history.vo.WmsApprovalReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundImportReqVO;
 import cn.iocoder.yudao.module.wms.controller.admin.outbound.vo.WmsOutboundPageReqVO;
@@ -88,4 +89,8 @@ public interface WmsOutboundService {
     void forceAbandon(WmsApprovalReqVO approvalReqVO);
 
     void auditAgree(WmsApprovalReqVO approvalReqVO);
+
+    void assembleUpstreamType(List<WmsOutboundRespVO> list);
+
+    boolean validateOutboundData(List<WmsOutboundValidateReqDTO> validateReqDTOList);
 }
