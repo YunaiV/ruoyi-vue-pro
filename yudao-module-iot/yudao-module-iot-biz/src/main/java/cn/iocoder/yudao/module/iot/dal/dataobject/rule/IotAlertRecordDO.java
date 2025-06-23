@@ -34,13 +34,13 @@ public class IotAlertRecordDO extends BaseDO {
     /**
      * 告警名称
      *
-     * 冗余 {@link IotAlertConfig#getName()}
+     * 冗余 {@link IotAlertConfigDO#getName()}
      */
     private Long configId;
     /**
      * 告警名称
      *
-     * 冗余 {@link IotAlertConfig#getName()}
+     * 冗余 {@link IotAlertConfigDO#getName()}
      */
     private String name;
 

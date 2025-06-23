@@ -49,7 +49,7 @@ public class IotRuleSceneDeviceControlAction implements IotRuleSceneAction {
 
     @Override
     public IotRuleSceneActionTypeEnum getType() {
-        return IotRuleSceneActionTypeEnum.DEVICE_CONTROL;
+        return IotRuleSceneActionTypeEnum.DEVICE_PROPERTY_SET;
     }
 
 }

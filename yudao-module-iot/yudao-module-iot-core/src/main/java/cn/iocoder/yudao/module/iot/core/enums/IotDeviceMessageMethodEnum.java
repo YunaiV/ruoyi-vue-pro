@@ -19,8 +19,11 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
 
     // ========== 设备状态 ==========
 
+    // TODO @芋艿：要合并下；thing.state.update
     STATE_ONLINE("thing.state.online", "设备上线", true),
     STATE_OFFLINE("thing.state.offline", "设备下线", true),
+
+    STATE_UPDATE("thing.state.update", "设备状态更新", true),
 
     // ========== 设备属性 ==========
     // 可参考：https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services

@@ -9,6 +9,7 @@ import java.util.Arrays;
 /**
  * IoT 设备消息类型枚举
  */
+@Deprecated
 @Getter
 @RequiredArgsConstructor
 public enum IotDeviceMessageTypeEnum implements ArrayValuable<String> {

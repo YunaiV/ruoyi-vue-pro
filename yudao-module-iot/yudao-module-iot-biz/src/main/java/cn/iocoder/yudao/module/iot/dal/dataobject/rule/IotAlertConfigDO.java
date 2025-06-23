@@ -23,7 +23,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IotAlertConfig extends BaseDO {
+public class IotAlertConfigDO extends BaseDO {
 
     /**
      * 配置编号
