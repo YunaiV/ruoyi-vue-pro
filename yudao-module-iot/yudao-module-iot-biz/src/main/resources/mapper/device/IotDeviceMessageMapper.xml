@@ -103,7 +103,7 @@
                 AND ts &lt;= #{endTime}
             </if>
         </where>
-        GROUP BY time
+        GROUP BY TIMETRUNCATE(ts, 1h)
     </select>
 
 </mapper>
