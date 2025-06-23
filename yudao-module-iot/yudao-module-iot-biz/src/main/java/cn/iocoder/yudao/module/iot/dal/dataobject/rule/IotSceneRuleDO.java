@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.rule;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
@@ -25,38 +26,35 @@ import java.util.List;
 /**
  * IoT 场景联动 DO
  *
+ * 基于 {@link Trigger} 触发 {@link Action}
+ *
  * @author 芋道源码
  */
-@TableName(value = "iot_rule_scene2", autoResultMap = true)
-@KeySequence("iot_rule_scene_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName(value = "iot_scene_rule", autoResultMap = true)
+@KeySequence("iot_scene_rule_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IotRuleScene2DO extends TenantBaseDO {
+public class IotSceneRuleDO extends TenantBaseDO {
 
     /**
-     * 设备编号 - 全部设备
-     */
-    public static final Long DEVICE_ID_ALL = 0L;
-
-    /**
-     * 场景编号
+     * 场景联动编号
      */
     @TableId
     private Long id;
     /**
-     * 场景名称
+     * 场景联动名称
      */
     private String name;
     /**
-     * 场景描述
+     * 场景联动描述
      */
     private String description;
     /**
-     * 场景状态
+     * 场景联动状态
      *
-     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum}
+     * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
 
@@ -103,7 +101,7 @@ public class IotRuleScene2DO extends TenantBaseDO {
          * 设备编号
          *
          * 关联 {@link IotDeviceDO#getId()}
-         * 特殊：如果为 0，则是全部
+         * 特殊：如果为 {@link IotDeviceDO#DEVICE_ID_ALL} 时，则是全部设备
          */
         private Long deviceId;
         /**

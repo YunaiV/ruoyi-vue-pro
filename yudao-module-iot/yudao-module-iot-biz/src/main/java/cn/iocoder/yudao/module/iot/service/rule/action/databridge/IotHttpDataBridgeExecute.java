@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeHttpConfig;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotDataRuleSinkTypeEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -30,7 +30,7 @@ public class IotHttpDataBridgeExecute implements IotDataBridgeExecute<IotDataBri
 
     @Override
     public Integer getType() {
-        return IotDataBridgeTypeEnum.HTTP.getType();
+        return IotDataRuleSinkTypeEnum.HTTP.getType();
     }
 
     @Override

@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeAbstractConfig;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeDirectionEnum;
-import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotDataRuleSinkTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -36,7 +36,7 @@ public class IotDataBridgeSaveReqVO {
 
     @Schema(description = "桥梁类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "桥梁类型不能为空")
-    @InEnum(IotDataBridgeTypeEnum.class)
+    @InEnum(IotDataRuleSinkTypeEnum.class)
     private Integer type;
 
     @Schema(description = "桥梁配置")

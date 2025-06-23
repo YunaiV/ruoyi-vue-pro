@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeRocketMQConfig;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotDataRuleSinkTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendResult;
@@ -25,7 +25,7 @@ public class IotRocketMQDataBridgeExecute extends
 
     @Override
     public Integer getType() {
-        return IotDataBridgeTypeEnum.ROCKETMQ.getType();
+        return IotDataRuleSinkTypeEnum.ROCKETMQ.getType();
     }
 
     @Override

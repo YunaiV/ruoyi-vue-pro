@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.IotDataBridgePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.IotDataBridgeRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.IotDataBridgeSaveReqVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataRuleSinkDO;
 import cn.iocoder.yudao.module.iot.service.rule.IotDataBridgeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -61,7 +61,7 @@ public class IotDataBridgeController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('iot:data-bridge:query')")
     public CommonResult<IotDataBridgeRespVO> getDataBridge(@RequestParam("id") Long id) {
-        IotDataBridgeDO dataBridge = dataBridgeService.getDataBridge(id);
+        IotDataRuleSinkDO dataBridge = dataBridgeService.getDataBridge(id);
         return success(BeanUtils.toBean(dataBridge, IotDataBridgeRespVO.class));
     }
 
@@ -69,14 +69,14 @@ public class IotDataBridgeController {
     @Operation(summary = "获得数据桥梁分页")
     @PreAuthorize("@ss.hasPermission('iot:data-bridge:query')")
     public CommonResult<PageResult<IotDataBridgeRespVO>> getDataBridgePage(@Valid IotDataBridgePageReqVO pageReqVO) {
-        PageResult<IotDataBridgeDO> pageResult = dataBridgeService.getDataBridgePage(pageReqVO);
+        PageResult<IotDataRuleSinkDO> pageResult = dataBridgeService.getDataBridgePage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, IotDataBridgeRespVO.class));
     }
 
     @GetMapping("/simple-list")
     @Operation(summary = "获取数据桥梁的精简信息列表", description = "主要用于前端的下拉选项")
     public CommonResult<List<IotDataBridgeRespVO>> getSimpleDataBridgeList() {
-        List<IotDataBridgeDO> list = dataBridgeService.getDataBridgeList(CommonStatusEnum.ENABLE.getStatus());
+        List<IotDataRuleSinkDO> list = dataBridgeService.getDataBridgeList(CommonStatusEnum.ENABLE.getStatus());
         return success(convertList(list, dataBridge -> // 只返回 id、name 字段
                 new IotDataBridgeRespVO().setId(dataBridge.getId()).setName(dataBridge.getName())));
     }

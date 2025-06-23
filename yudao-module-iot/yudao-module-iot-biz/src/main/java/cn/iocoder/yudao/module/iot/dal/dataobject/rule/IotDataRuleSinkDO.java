@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeAbstractConfig;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeDirectionEnum;
-import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotDataRuleSinkTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -13,7 +13,7 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 /**
- * IoT 数据桥梁 DO
+ * IoT 数据流转的数据目的 DO
  *
  * @author 芋道源码
  */
@@ -23,19 +23,19 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IotDataBridgeDO extends BaseDO {
+public class IotDataRuleSinkDO extends BaseDO {
 
     /**
-     * 桥梁编号
+     * 数据目的编号
      */
     @TableId
     private Long id;
     /**
-     * 桥梁名称
+     * 数据目的名称
      */
     private String name;
     /**
-     * 桥梁描述
+     * 数据目的描述
      */
     private String description;
     /**
@@ -43,23 +43,25 @@ public class IotDataBridgeDO extends BaseDO {
      *
      * 枚举 {@link CommonStatusEnum}
      */
+    @Deprecated // TODO @puhui999：这个删除
     private Integer status;
     /**
      * 桥梁方向
      *
      * 枚举 {@link IotDataBridgeDirectionEnum}
      */
+    @Deprecated // TODO @puhui999：这个删除
     private Integer direction;
 
     /**
-     * 桥梁类型
+     * 数据目的类型
      *
-     * 枚举 {@link IotDataBridgeTypeEnum}
+     * 枚举 {@link IotDataRuleSinkTypeEnum}
      */
     private Integer type;
 
     /**
-     * 桥梁配置
+     * 数据目的配置
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private IotDataBridgeAbstractConfig config;

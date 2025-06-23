@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.IotDataBridgePageReqVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataRuleSinkDO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -15,20 +15,20 @@ import java.util.List;
  * @author HUIHUI
  */
 @Mapper
-public interface IotDataBridgeMapper extends BaseMapperX<IotDataBridgeDO> {
+public interface IotDataBridgeMapper extends BaseMapperX<IotDataRuleSinkDO> {
 
-    default PageResult<IotDataBridgeDO> selectPage(IotDataBridgePageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<IotDataBridgeDO>()
-                .likeIfPresent(IotDataBridgeDO::getName, reqVO.getName())
-                .eqIfPresent(IotDataBridgeDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(IotDataBridgeDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(IotDataBridgeDO::getId));
+    default PageResult<IotDataRuleSinkDO> selectPage(IotDataBridgePageReqVO reqVO) {
+        return selectPage(reqVO, new LambdaQueryWrapperX<IotDataRuleSinkDO>()
+                .likeIfPresent(IotDataRuleSinkDO::getName, reqVO.getName())
+                .eqIfPresent(IotDataRuleSinkDO::getStatus, reqVO.getStatus())
+                .betweenIfPresent(IotDataRuleSinkDO::getCreateTime, reqVO.getCreateTime())
+                .orderByDesc(IotDataRuleSinkDO::getId));
     }
 
-    default List<IotDataBridgeDO> selectList(Integer status) {
-        return selectList(new LambdaQueryWrapperX<IotDataBridgeDO>()
-                .eqIfPresent(IotDataBridgeDO::getStatus, status)
-                .orderByDesc(IotDataBridgeDO::getId));
+    default List<IotDataRuleSinkDO> selectList(Integer status) {
+        return selectList(new LambdaQueryWrapperX<IotDataRuleSinkDO>()
+                .eqIfPresent(IotDataRuleSinkDO::getStatus, status)
+                .orderByDesc(IotDataRuleSinkDO::getId));
     }
 
 }

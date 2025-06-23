@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataRuleSinkDO;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -100,7 +100,7 @@ public abstract class AbstractCacheableDataBridgeExecute<Config, Producer> imple
 
     @Override
     @SuppressWarnings({"unchecked"})
-    public void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) {
+    public void execute(IotDeviceMessage message, IotDataRuleSinkDO dataBridge) {
         if (ObjUtil.notEqual(dataBridge.getType(), getType())) {
             return;
         }

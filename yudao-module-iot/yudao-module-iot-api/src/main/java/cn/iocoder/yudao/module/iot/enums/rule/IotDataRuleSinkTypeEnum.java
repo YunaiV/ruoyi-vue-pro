@@ -7,13 +7,13 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 
 /**
- * IoT 数据桥接的类型枚举
+ * IoT 数据流转的数据目的的类型枚举
  *
  * @author 芋道源码
  */
 @RequiredArgsConstructor
 @Getter
-public enum IotDataBridgeTypeEnum implements ArrayValuable<Integer> {
+public enum IotDataRuleSinkTypeEnum implements ArrayValuable<Integer> {
 
     HTTP(1, "HTTP"),
     TCP(2, "TCP"),
@@ -32,7 +32,7 @@ public enum IotDataBridgeTypeEnum implements ArrayValuable<Integer> {
 
     private final String name;
 
-    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotDataBridgeTypeEnum::getType).toArray(Integer[]::new);
+    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotDataRuleSinkTypeEnum::getType).toArray(Integer[]::new);
 
     @Override
     public Integer[] array() {

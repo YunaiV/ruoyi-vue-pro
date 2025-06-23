@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataRuleSinkDO;
 
 /**
  * IoT 数据桥梁的执行器 execute 接口
@@ -24,7 +24,7 @@ public interface IotDataBridgeExecute<Config> {
      * @param dataBridge 数据桥梁
      */
     @SuppressWarnings({"unchecked"})
-    default void execute(IotDeviceMessage message, IotDataBridgeDO dataBridge) throws Exception {
+    default void execute(IotDeviceMessage message, IotDataRuleSinkDO dataBridge) throws Exception {
         // 1.1 校验数据桥梁类型
         if (!getType().equals(dataBridge.getType())) {
             return;

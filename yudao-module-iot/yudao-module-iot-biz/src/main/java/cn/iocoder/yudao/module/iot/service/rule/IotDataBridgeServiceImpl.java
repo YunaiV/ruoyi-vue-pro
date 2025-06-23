@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.IotDataBridgePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.IotDataBridgeSaveReqVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataRuleSinkDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.rule.IotDataBridgeMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class IotDataBridgeServiceImpl implements IotDataBridgeService {
     @Override
     public Long createDataBridge(IotDataBridgeSaveReqVO createReqVO) {
         // 插入
-        IotDataBridgeDO dataBridge = BeanUtils.toBean(createReqVO, IotDataBridgeDO.class);
+        IotDataRuleSinkDO dataBridge = BeanUtils.toBean(createReqVO, IotDataRuleSinkDO.class);
         dataBridgeMapper.insert(dataBridge);
         // 返回
         return dataBridge.getId();
@@ -41,7 +41,7 @@ public class IotDataBridgeServiceImpl implements IotDataBridgeService {
         // 校验存在
         validateDataBridgeExists(updateReqVO.getId());
         // 更新
-        IotDataBridgeDO updateObj = BeanUtils.toBean(updateReqVO, IotDataBridgeDO.class);
+        IotDataRuleSinkDO updateObj = BeanUtils.toBean(updateReqVO, IotDataRuleSinkDO.class);
         dataBridgeMapper.updateById(updateObj);
     }
 
@@ -60,17 +60,17 @@ public class IotDataBridgeServiceImpl implements IotDataBridgeService {
     }
 
     @Override
-    public IotDataBridgeDO getDataBridge(Long id) {
+    public IotDataRuleSinkDO getDataBridge(Long id) {
         return dataBridgeMapper.selectById(id);
     }
 
     @Override
-    public PageResult<IotDataBridgeDO> getDataBridgePage(IotDataBridgePageReqVO pageReqVO) {
+    public PageResult<IotDataRuleSinkDO> getDataBridgePage(IotDataBridgePageReqVO pageReqVO) {
         return dataBridgeMapper.selectPage(pageReqVO);
     }
 
     @Override
-    public List<IotDataBridgeDO> getDataBridgeList(Integer status) {
+    public List<IotDataRuleSinkDO> getDataBridgeList(Integer status) {
         return dataBridgeMapper.selectList(status);
     }
 

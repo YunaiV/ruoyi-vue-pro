@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeKafkaMQConfig;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotDataRuleSinkTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -31,7 +31,7 @@ public class IotKafkaMQDataBridgeExecute extends
 
     @Override
     public Integer getType() {
-        return IotDataBridgeTypeEnum.KAFKA.getType();
+        return IotDataRuleSinkTypeEnum.KAFKA.getType();
     }
 
     @Override

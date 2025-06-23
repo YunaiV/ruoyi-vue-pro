@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.service.rule.action;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataRuleSinkDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
 import cn.iocoder.yudao.module.iot.service.rule.IotDataBridgeService;
@@ -36,7 +36,7 @@ public class IotRuleSceneDataBridgeAction implements IotRuleSceneAction {
         }
         // 1.2 获得数据桥梁
         Assert.notNull(config.getDataBridgeId(), "数据桥梁编号不能为空");
-        IotDataBridgeDO dataBridge = dataBridgeService.getDataBridge(config.getDataBridgeId());
+        IotDataRuleSinkDO dataBridge = dataBridgeService.getDataBridge(config.getDataBridgeId());
         if (dataBridge == null || dataBridge.getConfig() == null) {
             log.error("[execute][message({}) config({}) 对应的数据桥梁不存在]", message, config);
             return;

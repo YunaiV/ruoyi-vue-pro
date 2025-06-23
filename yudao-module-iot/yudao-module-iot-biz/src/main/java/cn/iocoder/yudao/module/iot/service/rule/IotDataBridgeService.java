@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.service.rule;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.IotDataBridgePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.IotDataBridgeSaveReqVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataBridgeDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataRuleSinkDO;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -43,7 +43,7 @@ public interface IotDataBridgeService {
      * @param id 编号
      * @return 数据桥梁
      */
-    IotDataBridgeDO getDataBridge(Long id);
+    IotDataRuleSinkDO getDataBridge(Long id);
 
     /**
      * 获得数据桥梁分页
@@ -51,7 +51,7 @@ public interface IotDataBridgeService {
      * @param pageReqVO 分页查询
      * @return 数据桥梁分页
      */
-    PageResult<IotDataBridgeDO> getDataBridgePage(IotDataBridgePageReqVO pageReqVO);
+    PageResult<IotDataRuleSinkDO> getDataBridgePage(IotDataBridgePageReqVO pageReqVO);
 
     /**
      * 获取数据桥梁列表
@@ -59,6 +59,6 @@ public interface IotDataBridgeService {
      * @param status 状态，如果为空，则不进行筛选
      * @return 数据桥梁列表
      */
-    List<IotDataBridgeDO> getDataBridgeList(Integer status);
+    List<IotDataRuleSinkDO> getDataBridgeList(Integer status);
 
 }

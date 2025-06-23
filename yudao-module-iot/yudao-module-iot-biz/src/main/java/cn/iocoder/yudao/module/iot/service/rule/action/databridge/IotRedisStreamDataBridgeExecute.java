@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeRedisStreamConfig;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotDataRuleSinkTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -29,7 +29,7 @@ public class IotRedisStreamDataBridgeExecute extends
 
     @Override
     public Integer getType() {
-        return IotDataBridgeTypeEnum.REDIS_STREAM.getType();
+        return IotDataRuleSinkTypeEnum.REDIS_STREAM.getType();
     }
 
     @Override

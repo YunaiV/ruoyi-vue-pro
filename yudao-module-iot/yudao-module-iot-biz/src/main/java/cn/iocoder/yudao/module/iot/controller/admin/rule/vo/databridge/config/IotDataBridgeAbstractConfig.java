@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config;
 
-import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotDataRuleSinkTypeEnum;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
@@ -28,7 +28,7 @@ public abstract class IotDataBridgeAbstractConfig {
     /**
      * 配置类型
      *
-     * 枚举 {@link IotDataBridgeTypeEnum#getType()}
+     * 枚举 {@link IotDataRuleSinkTypeEnum#getType()}
      */
     private String type;
 

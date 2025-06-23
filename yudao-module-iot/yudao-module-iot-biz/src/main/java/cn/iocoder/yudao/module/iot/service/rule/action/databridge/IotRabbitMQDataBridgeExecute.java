@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.IotDataBridgeRabbitMQConfig;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.enums.rule.IotDataBridgeTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotDataRuleSinkTypeEnum;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -26,7 +26,7 @@ public class IotRabbitMQDataBridgeExecute extends
 
     @Override
     public Integer getType() {
-        return IotDataBridgeTypeEnum.RABBITMQ.getType();
+        return IotDataRuleSinkTypeEnum.RABBITMQ.getType();
     }
 
     @Override
