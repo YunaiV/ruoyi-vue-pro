@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>yudao</artifactId>
+        <groupId>cn.iocoder.boot</groupId>
+        <version>${revision}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>yudao-module-huawei-smarthome</artifactId>
+    <packaging>pom</packaging> <!-- 父模块的packaging通常是pom -->
+
+    <name>${project.artifactId}</name>
+    <description>
+        华为智能家居模块，用于对接华为全屋智能开放平台。
+    </description>
+
+    <modules>
+        <module>yudao-module-huawei-smarthome-api</module>
+        <module>yudao-module-huawei-smarthome-biz</module>
+    </modules>
+
+</project>
