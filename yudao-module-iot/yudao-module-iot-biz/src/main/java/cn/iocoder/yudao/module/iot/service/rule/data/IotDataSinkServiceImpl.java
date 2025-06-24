@@ -1,0 +1,75 @@
+package cn.iocoder.yudao.module.iot.service.rule.data;
+
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.data.sink.IotDataSinkPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.data.sink.IotDataSinkSaveReqVO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataSinkDO;
+import cn.iocoder.yudao.module.iot.dal.mysql.rule.IotDataSinkMapper;
+import jakarta.annotation.Resource;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DATA_BRIDGE_NOT_EXISTS;
+
+/**
+ * IoT 数据流转目的 Service 实现类
+ *
+ * @author HUIHUI
+ */
+@Service
+@Validated
+public class IotDataSinkServiceImpl implements IotDataSinkService {
+
+    @Resource
+    private IotDataSinkMapper dataSinkMapper;
+
+    @Override
+    public Long createDataSink(IotDataSinkSaveReqVO createReqVO) {
+        IotDataSinkDO dataBridge = BeanUtils.toBean(createReqVO, IotDataSinkDO.class);
+        dataSinkMapper.insert(dataBridge);
+        return dataBridge.getId();
+    }
+
+    @Override
+    public void updateDataSink(IotDataSinkSaveReqVO updateReqVO) {
+        // 校验存在
+        validateDataBridgeExists(updateReqVO.getId());
+        // 更新
+        IotDataSinkDO updateObj = BeanUtils.toBean(updateReqVO, IotDataSinkDO.class);
+        dataSinkMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void deleteDataSink(Long id) {
+        // 校验存在
+        validateDataBridgeExists(id);
+        // 删除
+        dataSinkMapper.deleteById(id);
+    }
+
+    private void validateDataBridgeExists(Long id) {
+        if (dataSinkMapper.selectById(id) == null) {
+            throw exception(DATA_BRIDGE_NOT_EXISTS);
+        }
+    }
+
+    @Override
+    public IotDataSinkDO getDataSink(Long id) {
+        return dataSinkMapper.selectById(id);
+    }
+
+    @Override
+    public PageResult<IotDataSinkDO> getDataSinkPage(IotDataSinkPageReqVO pageReqVO) {
+        return dataSinkMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<IotDataSinkDO> getDataSinkListByStatus(Integer status) {
+        return dataSinkMapper.selectListByStatus(status);
+    }
+
+}

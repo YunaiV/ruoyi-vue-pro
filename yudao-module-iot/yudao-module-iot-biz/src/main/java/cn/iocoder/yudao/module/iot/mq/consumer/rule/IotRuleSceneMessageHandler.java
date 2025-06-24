@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.mq.consumer.rule;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.service.rule.IotRuleSceneService;
+import cn.iocoder.yudao.module.iot.service.rule.scene.IotRuleSceneService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

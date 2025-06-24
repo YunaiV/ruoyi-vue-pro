@@ -1,8 +1,15 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.rule;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,9 +18,9 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * IoT 数据流转 DO
+ * IoT 数据流转规则 DO
  *
- * 组合 {@link IotDataRuleSourceDO} => {@link IotDataRuleSinkDO}
+ * 监听 {@link SourceConfig} 数据源，转发到 {@link IotDataSinkDO} 数据目的
  *
  * @author 芋道源码
  */
@@ -45,18 +52,54 @@ public class IotDataRuleDO {
     private Integer status;
 
     /**
-     * 数据源编号
-     *
-     * 关联 {@link IotDataRuleSourceDO#getId()}
+     * 数据源配置数组
      */
-    private List<Long> sourceIds;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<SourceConfig> sourceConfigs;
     /**
      * 数据目的编号
      *
-     * 关联 {@link IotDataRuleSinkDO#getId()}
+     * 关联 {@link IotDataSinkDO#getId()}
      */
+    @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> sinkIds;
 
     // TODO @芋艿：未来考虑使用 groovy；支持数据处理；
+
+    /**
+     * 数据源配置
+     */
+    @Data
+    public static class SourceConfig {
+
+        /**
+         * 消息方法
+         *
+         * 枚举 {@link IotDeviceMessageMethodEnum} 中的 upstream 上行部分
+         */
+        private String method;
+
+        /**
+         * 产品编号
+         *
+         * 关联 {@link IotProductDO#getId()}
+         */
+        private Long productId;
+        /**
+         * 设备编号
+         *
+         * 关联 {@link IotDeviceDO#getId()}
+         * 特殊：如果为 {@link IotDeviceDO#DEVICE_ID_ALL} 时，则是全部设备
+         */
+        private Long deviceId;
+
+        /**
+         * 标识符
+         *
+         * 1. 物模型时，对应：{@link IotThingModelDO#getIdentifier()}
+         */
+        private String identifier;
+
+    }
 
 }

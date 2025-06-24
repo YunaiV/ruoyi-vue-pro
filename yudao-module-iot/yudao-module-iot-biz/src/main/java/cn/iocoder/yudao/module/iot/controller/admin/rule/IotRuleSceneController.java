@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleScenePa
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleSceneRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleSceneSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
-import cn.iocoder.yudao.module.iot.service.rule.IotRuleSceneService;
+import cn.iocoder.yudao.module.iot.service.rule.scene.IotRuleSceneService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
-import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.databridge.config.*;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataRuleSinkDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataSinkDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.*;
+import cn.iocoder.yudao.module.iot.service.rule.data.action.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -129,7 +130,7 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
 
         // 3. 执行测试
         log.info("[testHttpDataBridge][执行HTTP数据桥接测试]");
-        httpDataBridgeExecute.execute(message, new IotDataRuleSinkDO()
+        httpDataBridgeExecute.execute(message, new IotDataSinkDO()
                 .setType(httpDataBridgeExecute.getType()).setConfig(config));
     }
 
@@ -144,10 +145,10 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
     private void executeAndVerifyCache(IotDataBridgeExecute<?> action, IotDataBridgeAbstractConfig config, String type)
             throws Exception {
         log.info("[test{}DataBridge][第一次执行，应该会创建新的 producer]", type);
-        action.execute(message, new IotDataRuleSinkDO().setType(action.getType()).setConfig(config));
+        action.execute(message, new IotDataSinkDO().setType(action.getType()).setConfig(config));
 
         log.info("[test{}DataBridge][第二次执行，应该会复用缓存的 producer]", type);
-        action.execute(message, new IotDataRuleSinkDO().setType(action.getType()).setConfig(config));
+        action.execute(message, new IotDataSinkDO().setType(action.getType()).setConfig(config));
     }
 
 }

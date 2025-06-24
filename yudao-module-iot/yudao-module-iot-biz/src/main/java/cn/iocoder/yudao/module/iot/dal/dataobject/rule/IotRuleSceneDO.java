@@ -201,7 +201,7 @@ public class IotRuleSceneDO extends TenantBaseDO {
          * 数据桥接编号
          *
          * 必填：当 {@link #type} 为 {@link IotRuleSceneActionTypeEnum#DATA_BRIDGE} 时
-         * 关联：{@link IotDataRuleSinkDO#getId()}
+         * 关联：{@link IotDataSinkDO#getId()}
          */
         private Long dataBridgeId;
 
