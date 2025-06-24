@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.controller.admin.rule.vo.data.sink;
 
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataBridgeAbstractConfig;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotAbstractDataSinkConfig;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -26,7 +26,7 @@ public class IotDataSinkRespVO {
     private Integer type;
 
     @Schema(description = "数据目的配置")
-    private IotDataBridgeAbstractConfig config;
+    private IotAbstractDataSinkConfig config;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;

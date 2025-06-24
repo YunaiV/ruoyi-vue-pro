@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.iot.service.rule.action.databridge;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataSinkDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.*;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataSinkDO;
 import cn.iocoder.yudao.module.iot.service.rule.data.action.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,7 +54,7 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
         IotKafkaMQDataBridgeExecute action = new IotKafkaMQDataBridgeExecute();
 
         // 2. 创建配置
-        IotDataBridgeKafkaMQConfig config = new IotDataBridgeKafkaMQConfig()
+        IotDataSinkKafkaConfig config = new IotDataSinkKafkaConfig()
                 .setBootstrapServers("127.0.0.1:9092")
                 .setTopic("test-topic")
                 .setSsl(false)
@@ -71,7 +71,7 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
         IotRabbitMQDataBridgeExecute action = new IotRabbitMQDataBridgeExecute();
 
         // 2. 创建配置
-        IotDataBridgeRabbitMQConfig config = new IotDataBridgeRabbitMQConfig()
+        IotDataSinkRabbitMQConfig config = new IotDataSinkRabbitMQConfig()
                 .setHost("localhost")
                 .setPort(5672)
                 .setVirtualHost("/")
@@ -91,7 +91,7 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
         IotRedisStreamDataBridgeExecute action = new IotRedisStreamDataBridgeExecute();
 
         // 2. 创建配置
-        IotDataBridgeRedisStreamConfig config = new IotDataBridgeRedisStreamConfig()
+        IotDataSinkRedisStreamConfig config = new IotDataSinkRedisStreamConfig()
                 .setHost("127.0.0.1")
                 .setPort(6379)
                 .setDatabase(0)
@@ -108,7 +108,7 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
         IotRocketMQDataBridgeExecute action = new IotRocketMQDataBridgeExecute();
 
         // 2. 创建配置
-        IotDataBridgeRocketMQConfig config = new IotDataBridgeRocketMQConfig()
+        IotDataSinkRocketMQConfig config = new IotDataSinkRocketMQConfig()
                 .setNameServer("127.0.0.1:9876")
                 .setGroup("test-group")
                 .setTopic("test-topic")
@@ -125,7 +125,7 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
                 .thenReturn(new ResponseEntity<>("Success", HttpStatus.OK));
 
         // 2. 创建配置
-        IotDataBridgeHttpConfig config = new IotDataBridgeHttpConfig()
+        IotDataSinkHttpConfig config = new IotDataSinkHttpConfig()
                 .setUrl("https://doc.iocoder.cn/").setMethod(HttpMethod.GET.name());
 
         // 3. 执行测试
@@ -142,7 +142,7 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
      * @param type MQ 类型
      * @throws Exception 如果执行过程中发生异常
      */
-    private void executeAndVerifyCache(IotDataBridgeExecute<?> action, IotDataBridgeAbstractConfig config, String type)
+    private void executeAndVerifyCache(IotDataBridgeExecute<?> action, IotAbstractDataSinkConfig config, String type)
             throws Exception {
         log.info("[test{}DataBridge][第一次执行，应该会创建新的 producer]", type);
         action.execute(message, new IotDataSinkDO().setType(action.getType()).setConfig(config));

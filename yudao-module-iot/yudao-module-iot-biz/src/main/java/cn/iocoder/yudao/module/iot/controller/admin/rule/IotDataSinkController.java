@@ -75,7 +75,7 @@ public class IotDataSinkController {
 
     @GetMapping("/simple-list")
     @Operation(summary = "获取数据目的的精简信息列表", description = "主要用于前端的下拉选项")
-    public CommonResult<List<IotDataSinkRespVO>> getSimpleDataSinkList() {
+    public CommonResult<List<IotDataSinkRespVO>> getDataSinkSimpleList() {
         List<IotDataSinkDO> list = dataSinkService.getDataSinkListByStatus(CommonStatusEnum.ENABLE.getStatus());
         return success(convertList(list, sink -> // 只返回 id、name 字段
                 new IotDataSinkRespVO().setId(sink.getId()).setName(sink.getName())));

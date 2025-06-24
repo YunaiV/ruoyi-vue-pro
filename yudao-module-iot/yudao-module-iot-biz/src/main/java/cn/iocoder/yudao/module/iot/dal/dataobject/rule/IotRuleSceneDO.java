@@ -22,8 +22,9 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.Map;
 
+// TODO @芋艿：优化注释；
 /**
- * IoT 场景联动 DO
+ * IoT 场景联动规则 DO
  *
  * @author 芋道源码
  */

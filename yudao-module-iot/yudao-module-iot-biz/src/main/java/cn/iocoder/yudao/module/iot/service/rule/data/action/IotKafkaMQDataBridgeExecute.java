@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.rule.data.action;
 
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataBridgeKafkaMQConfig;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataSinkKafkaConfig;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataSinkTypeEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Slf4j
 public class IotKafkaMQDataBridgeExecute extends
-        AbstractCacheableDataBridgeExecute<IotDataBridgeKafkaMQConfig, KafkaTemplate<String, String>> {
+        AbstractCacheableDataBridgeExecute<IotDataSinkKafkaConfig, KafkaTemplate<String, String>> {
 
     private static final Duration SEND_TIMEOUT = Duration.ofMillis(10000); // 10 秒超时时间
 
@@ -35,7 +35,7 @@ public class IotKafkaMQDataBridgeExecute extends
     }
 
     @Override
-    public void execute0(IotDeviceMessage message, IotDataBridgeKafkaMQConfig config) throws Exception {
+    public void execute0(IotDeviceMessage message, IotDataSinkKafkaConfig config) throws Exception {
         // 1. 获取或创建 KafkaTemplate
         KafkaTemplate<String, String> kafkaTemplate = getProducer(config);
 
@@ -46,7 +46,7 @@ public class IotKafkaMQDataBridgeExecute extends
     }
 
     @Override
-    protected KafkaTemplate<String, String> initProducer(IotDataBridgeKafkaMQConfig config) {
+    protected KafkaTemplate<String, String> initProducer(IotDataSinkKafkaConfig config) {
         // 1.1 构建生产者配置
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());

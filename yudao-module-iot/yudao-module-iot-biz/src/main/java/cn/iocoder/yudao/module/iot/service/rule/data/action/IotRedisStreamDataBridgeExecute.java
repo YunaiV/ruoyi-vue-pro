@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.rule.data.action;
 
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataBridgeRedisStreamConfig;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataSinkRedisStreamConfig;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataSinkTypeEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class IotRedisStreamDataBridgeExecute extends
-        AbstractCacheableDataBridgeExecute<IotDataBridgeRedisStreamConfig, RedisTemplate<String, Object>> {
+        AbstractCacheableDataBridgeExecute<IotDataSinkRedisStreamConfig, RedisTemplate<String, Object>> {
 
     @Override
     public Integer getType() {
@@ -33,7 +33,7 @@ public class IotRedisStreamDataBridgeExecute extends
     }
 
     @Override
-    public void execute0(IotDeviceMessage message, IotDataBridgeRedisStreamConfig config) throws Exception {
+    public void execute0(IotDeviceMessage message, IotDataSinkRedisStreamConfig config) throws Exception {
         // 1. 获取 RedisTemplate
         RedisTemplate<String, Object> redisTemplate = getProducer(config);
 
@@ -45,7 +45,7 @@ public class IotRedisStreamDataBridgeExecute extends
     }
 
     @Override
-    protected RedisTemplate<String, Object> initProducer(IotDataBridgeRedisStreamConfig config) {
+    protected RedisTemplate<String, Object> initProducer(IotDataSinkRedisStreamConfig config) {
         // 1.1 创建 Redisson 配置
         Config redissonConfig = new Config();
         SingleServerConfig serverConfig = redissonConfig.useSingleServer()

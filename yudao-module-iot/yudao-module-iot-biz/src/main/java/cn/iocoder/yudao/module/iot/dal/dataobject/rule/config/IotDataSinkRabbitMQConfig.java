@@ -3,12 +3,12 @@ package cn.iocoder.yudao.module.iot.dal.dataobject.rule.config;
 import lombok.Data;
 
 /**
- * IoT RabbitMQ 配置 {@link IotDataBridgeAbstractConfig} 实现类
+ * IoT RabbitMQ 配置 {@link IotAbstractDataSinkConfig} 实现类
  *
  * @author HUIHUI
  */
 @Data
-public class IotDataBridgeRabbitMQConfig extends IotDataBridgeAbstractConfig {
+public class IotDataSinkRabbitMQConfig extends IotAbstractDataSinkConfig {
 
     /**
      * RabbitMQ 服务器地址

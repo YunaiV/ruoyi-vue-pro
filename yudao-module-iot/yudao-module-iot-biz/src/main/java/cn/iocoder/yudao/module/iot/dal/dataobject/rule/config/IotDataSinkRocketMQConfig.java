@@ -3,12 +3,12 @@ package cn.iocoder.yudao.module.iot.dal.dataobject.rule.config;
 import lombok.Data;
 
 /**
- * IoT RocketMQ 配置 {@link IotDataBridgeAbstractConfig} 实现类
+ * IoT RocketMQ 配置 {@link IotAbstractDataSinkConfig} 实现类
  *
  * @author HUIHUI
  */
 @Data
-public class IotDataBridgeRocketMQConfig extends IotDataBridgeAbstractConfig {
+public class IotDataSinkRocketMQConfig extends IotAbstractDataSinkConfig {
 
     /**
      * RocketMQ 名称服务器地址

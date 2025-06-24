@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.service.rule.data.action;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataBridgeHttpConfig;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataSinkHttpConfig;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataSinkTypeEnum;
 import jakarta.annotation.Resource;
@@ -23,7 +23,7 @@ import java.util.Map;
  */
 @Component
 @Slf4j
-public class IotHttpDataBridgeExecute implements IotDataBridgeExecute<IotDataBridgeHttpConfig> {
+public class IotHttpDataBridgeExecute implements IotDataBridgeExecute<IotDataSinkHttpConfig> {
 
     @Resource
     private RestTemplate restTemplate;
@@ -35,7 +35,7 @@ public class IotHttpDataBridgeExecute implements IotDataBridgeExecute<IotDataBri
 
     @Override
     @SuppressWarnings({"unchecked", "deprecation"})
-    public void execute0(IotDeviceMessage message, IotDataBridgeHttpConfig config) {
+    public void execute0(IotDeviceMessage message, IotDataSinkHttpConfig config) {
         String url = null;
         HttpMethod method = HttpMethod.valueOf(config.getMethod().toUpperCase());
         HttpEntity<String> requestEntity = null;

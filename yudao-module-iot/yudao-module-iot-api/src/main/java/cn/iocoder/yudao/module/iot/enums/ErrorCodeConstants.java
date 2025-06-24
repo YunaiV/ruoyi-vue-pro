@@ -54,10 +54,13 @@ public interface ErrorCodeConstants {
     ErrorCode OTA_UPGRADE_RECORD_DUPLICATE = new ErrorCode(1_050_008_201, "升级记录重复");
     ErrorCode OTA_UPGRADE_RECORD_CANNOT_RETRY = new ErrorCode(1_050_008_202, "升级记录不能重试");
 
-    // ========== IoT 数据桥梁 1-050-010-000 ==========
-    ErrorCode DATA_BRIDGE_NOT_EXISTS = new ErrorCode(1_050_010_000, "IoT 数据桥梁不存在");
+    // ========== IoT 数据流转规则 1-050-010-000 ==========
+    ErrorCode DATA_RULE_NOT_EXISTS = new ErrorCode(1_050_010_000, "数据流转规则不存在");
 
-    // ========== IoT 场景联动 1-050-011-000 ==========
-    ErrorCode RULE_SCENE_NOT_EXISTS = new ErrorCode(1_050_011_000, "IoT 场景联动不存在");
+    // ========== IoT 数据流转目的 1-050-011-000 ==========
+    ErrorCode DATA_BRIDGE_NOT_EXISTS = new ErrorCode(1_050_011_000, "数据桥梁不存在");
+
+    // ========== IoT 场景联动 1-050-012-000 ==========
+    ErrorCode RULE_SCENE_NOT_EXISTS = new ErrorCode(1_050_012_000, "场景联动不存在");
 
 }

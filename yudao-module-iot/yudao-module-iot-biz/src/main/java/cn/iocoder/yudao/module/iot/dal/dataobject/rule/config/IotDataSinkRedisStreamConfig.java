@@ -3,12 +3,12 @@ package cn.iocoder.yudao.module.iot.dal.dataobject.rule.config;
 import lombok.Data;
 
 /**
- * IoT Redis Stream 配置 {@link IotDataBridgeAbstractConfig} 实现类
+ * IoT Redis Stream 配置 {@link IotAbstractDataSinkConfig} 实现类
  *
  * @author HUIHUI
  */
 @Data
-public class IotDataBridgeRedisStreamConfig extends IotDataBridgeAbstractConfig {
+public class IotDataSinkRedisStreamConfig extends IotAbstractDataSinkConfig {
 
     /**
      * Redis 服务器地址

@@ -16,7 +16,7 @@ import java.util.List;
 public interface IotDataSinkService {
 
     /**
-     * 创建数据目的
+     * 创建数据流转目的
      *
      * @param createReqVO 创建信息
      * @return 编号
@@ -24,40 +24,40 @@ public interface IotDataSinkService {
     Long createDataSink(@Valid IotDataSinkSaveReqVO createReqVO);
 
     /**
-     * 更新数据目的
+     * 更新数据流转目的
      *
      * @param updateReqVO 更新信息
      */
     void updateDataSink(@Valid IotDataSinkSaveReqVO updateReqVO);
 
     /**
-     * 删除数据目的
+     * 删除数据流转目的
      *
      * @param id 编号
      */
     void deleteDataSink(Long id);
 
     /**
-     * 获得数据目的
+     * 获得数据流转目的
      *
      * @param id 编号
-     * @return 数据目的
+     * @return 数据流转目的
      */
     IotDataSinkDO getDataSink(Long id);
 
     /**
-     * 获得数据目的分页
+     * 获得数据流转目的分页
      *
      * @param pageReqVO 分页查询
-     * @return 数据目的分页
+     * @return 数据流转目的分页
      */
     PageResult<IotDataSinkDO> getDataSinkPage(IotDataSinkPageReqVO pageReqVO);
 
     /**
-     * 获取数据目的列表
+     * 获取数据流转目的列表
      *
      * @param status 状态，如果为空，则不进行筛选
-     * @return 数据目的列表
+     * @return 数据流转目的列表
      */
     List<IotDataSinkDO> getDataSinkListByStatus(Integer status);
 

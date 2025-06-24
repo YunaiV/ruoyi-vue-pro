@@ -5,12 +5,12 @@ import lombok.Data;
 import java.util.Map;
 
 /**
- * IoT HTTP 配置 {@link IotDataBridgeAbstractConfig} 实现类
+ * IoT HTTP 配置 {@link IotAbstractDataSinkConfig} 实现类
  *
  * @author HUIHUI
  */
 @Data
-public class IotDataBridgeHttpConfig extends IotDataBridgeAbstractConfig {
+public class IotDataSinkHttpConfig extends IotAbstractDataSinkConfig {
 
     /**
      * 请求 URL

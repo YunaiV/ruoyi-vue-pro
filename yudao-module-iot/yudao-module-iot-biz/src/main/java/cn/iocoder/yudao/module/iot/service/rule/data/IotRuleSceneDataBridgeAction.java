@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * IoT 数据桥梁的 {@link IotRuleSceneAction} 实现类
+ * IoT 数据流转目的的 {@link IotRuleSceneAction} 实现类
  *
  * @author 芋道源码
  */
@@ -35,15 +35,15 @@ public class IotRuleSceneDataBridgeAction implements IotRuleSceneAction {
         if (message == null) {
             return;
         }
-        // 1.2 获得数据桥梁
-        Assert.notNull(config.getDataBridgeId(), "数据桥梁编号不能为空");
+        // 1.2 获得数据流转目的
+        Assert.notNull(config.getDataBridgeId(), "数据流转目的编号不能为空");
         IotDataSinkDO dataBridge = dataBridgeService.getDataSink(config.getDataBridgeId());
         if (dataBridge == null || dataBridge.getConfig() == null) {
-            log.error("[execute][message({}) config({}) 对应的数据桥梁不存在]", message, config);
+            log.error("[execute][message({}) config({}) 对应的数据流转目的不存在]", message, config);
             return;
         }
         if (CommonStatusEnum.isDisable(dataBridge.getStatus())) {
-            log.info("[execute][message({}) config({}) 对应的数据桥梁({}) 状态为禁用]", message, config, dataBridge);
+            log.info("[execute][message({}) config({}) 对应的数据流转目的({}) 状态为禁用]", message, config, dataBridge);
             return;
         }
 

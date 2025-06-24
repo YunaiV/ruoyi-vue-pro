@@ -3,17 +3,17 @@ package cn.iocoder.yudao.module.iot.dal.dataobject.rule.config;
 import lombok.Data;
 
 /**
- * IoT MQTT 配置 {@link IotDataBridgeAbstractConfig} 实现类
+ * IoT Kafka 配置 {@link IotAbstractDataSinkConfig} 实现类
  *
  * @author HUIHUI
  */
 @Data
-public class IotDataBridgeMqttConfig extends IotDataBridgeAbstractConfig {
+public class IotDataSinkKafkaConfig extends IotAbstractDataSinkConfig {
 
     /**
-     * MQTT 服务器地址
+     * Kafka 服务器地址
      */
-    private String url;
+    private String bootstrapServers;
     /**
      * 用户名
      */
@@ -23,9 +23,10 @@ public class IotDataBridgeMqttConfig extends IotDataBridgeAbstractConfig {
      */
     private String password;
     /**
-     * 客户端编号
+     * 是否启用 SSL
      */
-    private String clientId;
+    private Boolean ssl;
+
     /**
      * 主题
      */

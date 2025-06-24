@@ -16,14 +16,14 @@ import lombok.Data;
 @Data
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", visible = true)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = IotDataBridgeHttpConfig.class, name = "1"),
-        @JsonSubTypes.Type(value = IotDataBridgeMqttConfig.class, name = "10"),
-        @JsonSubTypes.Type(value = IotDataBridgeRedisStreamConfig.class, name = "21"),
-        @JsonSubTypes.Type(value = IotDataBridgeRocketMQConfig.class, name = "30"),
-        @JsonSubTypes.Type(value = IotDataBridgeRabbitMQConfig.class, name = "31"),
-        @JsonSubTypes.Type(value = IotDataBridgeKafkaMQConfig.class, name = "32"),
+        @JsonSubTypes.Type(value = IotDataSinkHttpConfig.class, name = "1"),
+        @JsonSubTypes.Type(value = IotDataSinkMqttConfig.class, name = "10"),
+        @JsonSubTypes.Type(value = IotDataSinkRedisStreamConfig.class, name = "21"),
+        @JsonSubTypes.Type(value = IotDataSinkRocketMQConfig.class, name = "30"),
+        @JsonSubTypes.Type(value = IotDataSinkRabbitMQConfig.class, name = "31"),
+        @JsonSubTypes.Type(value = IotDataSinkKafkaConfig.class, name = "32"),
 })
-public abstract class IotDataBridgeAbstractConfig {
+public abstract class IotAbstractDataSinkConfig {
 
     /**
      * 配置类型

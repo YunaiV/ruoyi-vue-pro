@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.rule.data.action;
 
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataBridgeRabbitMQConfig;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataSinkRabbitMQConfig;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataSinkTypeEnum;
 import com.rabbitmq.client.Channel;
@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets;
 @Component
 @Slf4j
 public class IotRabbitMQDataBridgeExecute extends
-        AbstractCacheableDataBridgeExecute<IotDataBridgeRabbitMQConfig, Channel> {
+        AbstractCacheableDataBridgeExecute<IotDataSinkRabbitMQConfig, Channel> {
 
 
     @Override
@@ -30,7 +30,7 @@ public class IotRabbitMQDataBridgeExecute extends
     }
 
     @Override
-    public void execute0(IotDeviceMessage message, IotDataBridgeRabbitMQConfig config) throws Exception {
+    public void execute0(IotDeviceMessage message, IotDataSinkRabbitMQConfig config) throws Exception {
         // 1. 获取或创建 Channel
         Channel channel = getProducer(config);
 
@@ -47,7 +47,7 @@ public class IotRabbitMQDataBridgeExecute extends
 
     @Override
     @SuppressWarnings("resource")
-    protected Channel initProducer(IotDataBridgeRabbitMQConfig config) throws Exception {
+    protected Channel initProducer(IotDataSinkRabbitMQConfig config) throws Exception {
         // 1. 创建连接工厂
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(config.getHost());

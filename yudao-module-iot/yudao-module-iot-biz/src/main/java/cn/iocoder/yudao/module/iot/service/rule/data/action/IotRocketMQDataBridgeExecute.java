@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.rule.data.action;
 
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataBridgeRocketMQConfig;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataSinkRocketMQConfig;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataSinkTypeEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class IotRocketMQDataBridgeExecute extends
-        AbstractCacheableDataBridgeExecute<IotDataBridgeRocketMQConfig, DefaultMQProducer> {
+        AbstractCacheableDataBridgeExecute<IotDataSinkRocketMQConfig, DefaultMQProducer> {
 
     @Override
     public Integer getType() {
@@ -29,7 +29,7 @@ public class IotRocketMQDataBridgeExecute extends
     }
 
     @Override
-    public void execute0(IotDeviceMessage message, IotDataBridgeRocketMQConfig config) throws Exception {
+    public void execute0(IotDeviceMessage message, IotDataSinkRocketMQConfig config) throws Exception {
         // 1. 获取或创建 Producer
         DefaultMQProducer producer = getProducer(config);
 
@@ -50,7 +50,7 @@ public class IotRocketMQDataBridgeExecute extends
     }
 
     @Override
-    protected DefaultMQProducer initProducer(IotDataBridgeRocketMQConfig config) throws Exception {
+    protected DefaultMQProducer initProducer(IotDataSinkRocketMQConfig config) throws Exception {
         DefaultMQProducer producer = new DefaultMQProducer(config.getGroup());
         producer.setNamesrvAddr(config.getNameServer());
         producer.start();
