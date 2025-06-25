@@ -6,9 +6,9 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDevicePageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import jakarta.annotation.Nullable;
 import org.apache.ibatis.annotations.Mapper;
 
-import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -50,8 +50,9 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
         return selectCount(IotDeviceDO::getProductId, productId);
     }
 
-    default List<IotDeviceDO> selectListByDeviceType(Integer deviceType) {
-        return selectList(IotDeviceDO::getDeviceType, deviceType);
+    default List<IotDeviceDO> selectListByDeviceType(@Nullable Integer deviceType) {
+        return selectList(new LambdaQueryWrapperX<IotDeviceDO>()
+                .geIfPresent(IotDeviceDO::getDeviceType, deviceType));
     }
 
     default List<IotDeviceDO> selectListByState(Integer state) {

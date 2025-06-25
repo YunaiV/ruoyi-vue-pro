@@ -158,6 +158,21 @@ public class IotThingModelServiceImpl implements IotThingModelService {
         return thingModelMapper.selectList(reqVO);
     }
 
+    @Override
+    public void validateThingModelsExist(Long productId, Set<String> identifiers) {
+        if (CollUtil.isEmpty(identifiers)) {
+            return;
+        }
+        List<IotThingModelDO> thingModels = thingModelMapper.selectListByProductIdAndIdentifiers(
+            productId, identifiers);
+        Set<String> foundIdentifiers = convertSet(thingModels, IotThingModelDO::getIdentifier);
+        for (String identifier : identifiers) {
+            if (!foundIdentifiers.contains(identifier)) {
+                throw exception(THING_MODEL_NOT_EXISTS);
+            }
+        }
+    }
+
     /**
      * 校验功能是否存在
      *

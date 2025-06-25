@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -112,5 +113,11 @@ public interface IotProductService {
      */
     Long getProductCount(@Nullable LocalDateTime createTime);
 
+    /**
+     * 批量校验产品存在
+     *
+     * @param ids 产品编号集合
+     */
+    void validateProductsExist(Collection<Long> ids);
 
 }

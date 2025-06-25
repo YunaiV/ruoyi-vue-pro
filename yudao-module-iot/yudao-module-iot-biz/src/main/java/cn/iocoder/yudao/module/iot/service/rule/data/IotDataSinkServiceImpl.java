@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.rule.data;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.data.sink.IotDataSinkPageReqVO;
@@ -7,13 +8,16 @@ import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.data.sink.IotDataSin
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataSinkDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.rule.IotDataSinkMapper;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DATA_BRIDGE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DATA_SINK_NOT_EXISTS;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DATA_SINK_DELETE_FAIL_USED_BY_RULE;
 
 /**
  * IoT 数据流转目的 Service 实现类
@@ -26,6 +30,10 @@ public class IotDataSinkServiceImpl implements IotDataSinkService {
 
     @Resource
     private IotDataSinkMapper dataSinkMapper;
+
+    @Resource
+    @Lazy // 延迟，避免循环依赖报错
+    private IotDataRuleService dataRuleService;
 
     @Override
     public Long createDataSink(IotDataSinkSaveReqVO createReqVO) {
@@ -47,13 +55,17 @@ public class IotDataSinkServiceImpl implements IotDataSinkService {
     public void deleteDataSink(Long id) {
         // 校验存在
         validateDataBridgeExists(id);
+        // 校验是否被数据流转规则使用
+        if (CollUtil.isNotEmpty(dataRuleService.getDataRuleBySinkId(id))) {
+            throw exception(DATA_SINK_DELETE_FAIL_USED_BY_RULE);
+        }
         // 删除
         dataSinkMapper.deleteById(id);
     }
 
     private void validateDataBridgeExists(Long id) {
         if (dataSinkMapper.selectById(id) == null) {
-            throw exception(DATA_BRIDGE_NOT_EXISTS);
+            throw exception(DATA_SINK_NOT_EXISTS);
         }
     }
 
@@ -70,6 +82,17 @@ public class IotDataSinkServiceImpl implements IotDataSinkService {
     @Override
     public List<IotDataSinkDO> getDataSinkListByStatus(Integer status) {
         return dataSinkMapper.selectListByStatus(status);
+    }
+
+    @Override
+    public void validateDataSinksExist(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        List<IotDataSinkDO> sinks = dataSinkMapper.selectByIds(ids);
+        if (sinks.size() != ids.size()) {
+            throw exception(DATA_SINK_NOT_EXISTS);
+        }
     }
 
 }

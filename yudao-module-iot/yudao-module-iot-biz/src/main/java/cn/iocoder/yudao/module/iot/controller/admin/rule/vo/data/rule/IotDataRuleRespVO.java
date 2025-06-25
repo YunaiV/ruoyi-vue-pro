@@ -11,16 +11,16 @@ import java.util.List;
 @Data
 public class IotDataRuleRespVO {
 
-    @Schema(description = "场景编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "8540")
+    @Schema(description = "数据流转规则编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "8540")
     private Long id;
 
-    @Schema(description = "场景名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @Schema(description = "数据流转规则名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
     private String name;
 
-    @Schema(description = "场景描述", example = "你猜")
+    @Schema(description = "数据流转规则描述", example = "你猜")
     private String description;
 
-    @Schema(description = "场景状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "数据流转规则状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status;
 
     @Schema(description = "数据源配置数组", requiredMode = Schema.RequiredMode.REQUIRED)

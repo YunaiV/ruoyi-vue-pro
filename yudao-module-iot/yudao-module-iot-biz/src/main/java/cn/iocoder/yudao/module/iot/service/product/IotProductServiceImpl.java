@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.product;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -155,6 +157,17 @@ public class IotProductServiceImpl implements IotProductService {
     @Override
     public Long getProductCount(LocalDateTime createTime) {
         return productMapper.selectCountByCreateTime(createTime);
+    }
+
+    @Override
+    public void validateProductsExist(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        List<IotProductDO> products = productMapper.selectByIds(ids);
+        if (products.size() != ids.size()) {
+            throw exception(PRODUCT_NOT_EXISTS);
+        }
     }
 
 }

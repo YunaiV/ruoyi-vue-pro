@@ -483,6 +483,17 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         return true;
     }
 
+    @Override
+    public void validateDevicesExist(Set<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        List<IotDeviceDO> deviceIds = deviceMapper.selectByIds(ids);
+        if (deviceIds.size() != ids.size()) {
+            throw exception(DEVICE_NOT_EXISTS);
+        }
+    }
+
     private IotDeviceServiceImpl getSelf() {
         return SpringUtil.getBean(getClass());
     }

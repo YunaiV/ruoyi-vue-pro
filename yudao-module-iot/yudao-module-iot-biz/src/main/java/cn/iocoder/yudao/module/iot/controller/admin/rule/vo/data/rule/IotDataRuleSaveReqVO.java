@@ -14,18 +14,18 @@ import java.util.List;
 @Data
 public class IotDataRuleSaveReqVO {
 
-    @Schema(description = "场景编号", example = "8540")
+    @Schema(description = "数据流转规则编号", example = "8540")
     private Long id;
 
-    @Schema(description = "场景名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
-    @NotEmpty(message = "场景名称不能为空")
+    @Schema(description = "数据流转规则名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @NotEmpty(message = "数据流转规则名称不能为空")
     private String name;
 
-    @Schema(description = "场景描述", example = "你猜")
+    @Schema(description = "数据流转规则描述", example = "你猜")
     private String description;
 
-    @Schema(description = "场景状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotNull(message = "场景状态不能为空")
+    @Schema(description = "数据流转规则状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "数据流转规则状态不能为空")
     @InEnum(CommonStatusEnum.class)
     private Integer status;
 

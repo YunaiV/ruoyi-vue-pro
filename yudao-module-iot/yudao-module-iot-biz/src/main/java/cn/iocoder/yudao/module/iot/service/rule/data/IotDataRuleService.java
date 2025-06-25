@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.rule.data;
 
+import java.util.List;
+
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.data.rule.IotDataRulePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.data.rule.IotDataRuleSaveReqVO;
@@ -50,5 +52,13 @@ public interface IotDataRuleService {
      * @return 数据流转规则分页
      */
     PageResult<IotDataRuleDO> getDataRulePage(IotDataRulePageReqVO pageReqVO);
+
+    /**
+     * 根据数据目的编号，获得数据流转规则列表
+     *
+     * @param sinkId 数据目的编号
+     * @return 是否被使用
+     */
+    List<IotDataRuleDO> getDataRuleBySinkId(Long sinkId);
 
 }

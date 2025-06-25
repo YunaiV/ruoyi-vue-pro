@@ -58,7 +58,8 @@ public interface ErrorCodeConstants {
     ErrorCode DATA_RULE_NOT_EXISTS = new ErrorCode(1_050_010_000, "数据流转规则不存在");
 
     // ========== IoT 数据流转目的 1-050-011-000 ==========
-    ErrorCode DATA_BRIDGE_NOT_EXISTS = new ErrorCode(1_050_011_000, "数据桥梁不存在");
+    ErrorCode DATA_SINK_NOT_EXISTS = new ErrorCode(1_050_011_000, "数据桥梁不存在");
+    ErrorCode DATA_SINK_DELETE_FAIL_USED_BY_RULE = new ErrorCode(1_050_011_001, "数据流转目的正在被数据流转规则使用，无法删除");
 
     // ========== IoT 场景联动 1-050-012-000 ==========
     ErrorCode RULE_SCENE_NOT_EXISTS = new ErrorCode(1_050_012_000, "场景联动不存在");

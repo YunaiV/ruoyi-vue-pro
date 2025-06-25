@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * IoT 设备 Service 接口
@@ -254,5 +255,12 @@ public interface IotDeviceService {
      * @return 是否认证成功
      */
     boolean authDevice(@Valid IotDeviceAuthReqDTO authReqDTO);
+
+    /**
+     * 校验设备是否存在
+     *
+     * @param ids 设备编号数组
+     */
+    void validateDevicesExist(Set<Long> ids);
 
 }

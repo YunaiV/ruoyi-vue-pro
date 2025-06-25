@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * IoT 产品物模型 Service 接口
@@ -98,5 +99,13 @@ public interface IotThingModelService {
      * @return 产品物模型列表
      */
     List<IotThingModelDO> getThingModelList(IotThingModelListReqVO reqVO);
+
+    /**
+     * 批量校验物模型存在
+     *
+     * @param productId 产品编号
+     * @param identifiers 标识符集合
+     */
+    void validateThingModelsExist(Long productId, Set<String> identifiers);
 
 }

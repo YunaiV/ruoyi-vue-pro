@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.data.sink.IotDataSin
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataSinkDO;
 import jakarta.validation.Valid;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -60,5 +61,12 @@ public interface IotDataSinkService {
      * @return 数据流转目的列表
      */
     List<IotDataSinkDO> getDataSinkListByStatus(Integer status);
+
+    /**
+     * 批量校验数据目的存在
+     *
+     * @param ids 数据目的编号集合
+     */
+    void validateDataSinksExist(Collection<Long> ids);
 
 }
