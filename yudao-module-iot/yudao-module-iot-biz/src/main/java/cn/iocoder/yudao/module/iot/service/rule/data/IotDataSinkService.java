@@ -47,6 +47,14 @@ public interface IotDataSinkService {
     IotDataSinkDO getDataSink(Long id);
 
     /**
+     * 从缓存中获得数据流转目的
+     *
+     * @param id 编号
+     * @return 数据流转目的
+     */
+    IotDataSinkDO getDataSinkFromCache(Long id);
+
+    /**
      * 获得数据流转目的分页
      *
      * @param pageReqVO 分页查询

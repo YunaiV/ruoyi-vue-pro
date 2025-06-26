@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 /**
- * {@link IotDataBridgeExecute} 实现类的单元测试
+ * {@link IotDataRuleAction} 实现类的单元测试
  *
  * @author HUIHUI
  */
@@ -37,7 +37,7 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
     private RestTemplate restTemplate;
 
     @InjectMocks
-    private IotHttpDataBridgeExecute httpDataBridgeExecute;
+    private IotHttpDataSinkAction httpDataBridgeExecute;
 
     @BeforeEach
     public void setUp() {
@@ -51,7 +51,7 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
     @Test
     public void testKafkaMQDataBridge() throws Exception {
         // 1. 创建执行器实例
-        IotKafkaMQDataBridgeExecute action = new IotKafkaMQDataBridgeExecute();
+        IotKafkaDataRuleAction action = new IotKafkaDataRuleAction();
 
         // 2. 创建配置
         IotDataSinkKafkaConfig config = new IotDataSinkKafkaConfig()
@@ -68,7 +68,7 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
     @Test
     public void testRabbitMQDataBridge() throws Exception {
         // 1. 创建执行器实例
-        IotRabbitMQDataBridgeExecute action = new IotRabbitMQDataBridgeExecute();
+        IotRabbitMQDataRuleAction action = new IotRabbitMQDataRuleAction();
 
         // 2. 创建配置
         IotDataSinkRabbitMQConfig config = new IotDataSinkRabbitMQConfig()
@@ -88,7 +88,7 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
     @Test
     public void testRedisStreamDataBridge() throws Exception {
         // 1. 创建执行器实例
-        IotRedisStreamDataBridgeExecute action = new IotRedisStreamDataBridgeExecute();
+        IotRedisStreamRuleAction action = new IotRedisStreamRuleAction();
 
         // 2. 创建配置
         IotDataSinkRedisStreamConfig config = new IotDataSinkRedisStreamConfig()
@@ -105,7 +105,7 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
     @Test
     public void testRocketMQDataBridge() throws Exception {
         // 1. 创建执行器实例
-        IotRocketMQDataBridgeExecute action = new IotRocketMQDataBridgeExecute();
+        IotRocketMQDataRuleAction action = new IotRocketMQDataRuleAction();
 
         // 2. 创建配置
         IotDataSinkRocketMQConfig config = new IotDataSinkRocketMQConfig()
@@ -142,7 +142,7 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
      * @param type MQ 类型
      * @throws Exception 如果执行过程中发生异常
      */
-    private void executeAndVerifyCache(IotDataBridgeExecute<?> action, IotAbstractDataSinkConfig config, String type)
+    private void executeAndVerifyCache(IotDataRuleAction<?> action, IotAbstractDataSinkConfig config, String type)
             throws Exception {
         log.info("[test{}DataBridge][第一次执行，应该会创建新的 producer]", type);
         action.execute(message, new IotDataSinkDO().setType(action.getType()).setConfig(config));

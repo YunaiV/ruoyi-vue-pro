@@ -17,17 +17,17 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Kafka 的 {@link IotDataBridgeExecute} 实现类
+ * Kafka 的 {@link IotDataRuleAction} 实现类
  *
  * @author HUIHUI
  */
 @ConditionalOnClass(name = "org.springframework.kafka.core.KafkaTemplate")
 @Component
 @Slf4j
-public class IotKafkaMQDataBridgeExecute extends
-        AbstractCacheableDataBridgeExecute<IotDataSinkKafkaConfig, KafkaTemplate<String, String>> {
+public class IotKafkaDataRuleAction extends
+        IotDataRuleCacheableAction<IotDataSinkKafkaConfig, KafkaTemplate<String, String>> {
 
-    private static final Duration SEND_TIMEOUT = Duration.ofMillis(10000); // 10 秒超时时间
+    private static final Duration SEND_TIMEOUT = Duration.ofSeconds(10);
 
     @Override
     public Integer getType() {
@@ -35,7 +35,7 @@ public class IotKafkaMQDataBridgeExecute extends
     }
 
     @Override
-    public void execute0(IotDeviceMessage message, IotDataSinkKafkaConfig config) throws Exception {
+    public void execute(IotDeviceMessage message, IotDataSinkKafkaConfig config) throws Exception {
         // 1. 获取或创建 KafkaTemplate
         KafkaTemplate<String, String> kafkaTemplate = getProducer(config);
 

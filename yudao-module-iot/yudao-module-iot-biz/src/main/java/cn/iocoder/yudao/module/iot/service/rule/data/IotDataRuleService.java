@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.module.iot.service.rule.data;
 
-import java.util.List;
-
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.data.rule.IotDataRulePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.data.rule.IotDataRuleSaveReqVO;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataRuleDO;
 import jakarta.validation.Valid;
+
+import java.util.List;
 
 /**
  * IoT 数据流转规则 Service 接口
@@ -59,6 +60,13 @@ public interface IotDataRuleService {
      * @param sinkId 数据目的编号
      * @return 是否被使用
      */
-    List<IotDataRuleDO> getDataRuleBySinkId(Long sinkId);
+    List<IotDataRuleDO> getDataRuleListBySinkId(Long sinkId);
+
+    /**
+     * 执行数据流转规则
+     *
+     * @param message 消息
+     */
+    void executeDataRule(IotDeviceMessage message);
 
 }

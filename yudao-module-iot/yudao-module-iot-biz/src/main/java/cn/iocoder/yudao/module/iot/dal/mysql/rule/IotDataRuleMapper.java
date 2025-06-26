@@ -31,4 +31,8 @@ public interface IotDataRuleMapper extends BaseMapperX<IotDataRuleDO> {
                 .apply(MyBatisUtils.findInSet("sink_ids", sinkId)));
     }
 
+    default List<IotDataRuleDO> selectListByStatus(Integer status) {
+        return selectList(IotDataRuleDO::getStatus, status);
+    }
+
 }

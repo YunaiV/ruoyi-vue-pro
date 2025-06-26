@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 /**
  * IoT 设备消息标识符枚举
  */
+@Deprecated
 @Getter
 @RequiredArgsConstructor
 public enum IotDeviceMessageIdentifierEnum {

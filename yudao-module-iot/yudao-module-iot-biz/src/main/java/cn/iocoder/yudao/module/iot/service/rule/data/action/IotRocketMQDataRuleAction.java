@@ -13,15 +13,15 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;
 
 /**
- * RocketMQ 的 {@link IotDataBridgeExecute} 实现类
+ * RocketMQ 的 {@link IotDataRuleAction} 实现类
  *
  * @author HUIHUI
  */
 @ConditionalOnClass(name = "org.apache.rocketmq.client.producer.DefaultMQProducer")
 @Component
 @Slf4j
-public class IotRocketMQDataBridgeExecute extends
-        AbstractCacheableDataBridgeExecute<IotDataSinkRocketMQConfig, DefaultMQProducer> {
+public class IotRocketMQDataRuleAction extends
+        IotDataRuleCacheableAction<IotDataSinkRocketMQConfig, DefaultMQProducer> {
 
     @Override
     public Integer getType() {
@@ -29,7 +29,7 @@ public class IotRocketMQDataBridgeExecute extends
     }
 
     @Override
-    public void execute0(IotDeviceMessage message, IotDataSinkRocketMQConfig config) throws Exception {
+    public void execute(IotDeviceMessage message, IotDataSinkRocketMQConfig config) throws Exception {
         // 1. 获取或创建 Producer
         DefaultMQProducer producer = getProducer(config);
 

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.rule.data.action;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataSinkDO;
@@ -17,14 +18,14 @@ import java.time.Duration;
 // TODO @芋艿：websocket
 
 /**
- * 带缓存功能的数据流转目的执行器抽象类
+ * 可缓存的 {@link IotDataRuleAction} 抽象实现
  *
  * 该类提供了一个通用的缓存机制，用于管理各类数据桥接的生产者(Producer)实例。
  *
  * 主要特点:
  * - 基于Guava Cache实现高效的生产者实例缓存管理
  * - 自动处理生产者的生命周期（创建、获取、关闭）
- * - 支持30分钟未访问自动过期清理机制
+ * - 支持 30 分钟未访问自动过期清理机制
  * - 异常处理与日志记录，便于问题排查
  *
  * 子类需要实现:
@@ -36,7 +37,7 @@ import java.time.Duration;
  * @author HUIHUI
  */
 @Slf4j
-public abstract class AbstractCacheableDataBridgeExecute<Config, Producer> implements IotDataBridgeExecute<Config> {
+public abstract class IotDataRuleCacheableAction<Config, Producer> implements IotDataRuleAction {
 
     /**
      * Producer 缓存
@@ -45,10 +46,6 @@ public abstract class AbstractCacheableDataBridgeExecute<Config, Producer> imple
             .expireAfterAccess(Duration.ofMinutes(30)) // 30 分钟未访问就提前过期
             .removalListener((RemovalListener<Config, Producer>) notification -> {
                 Producer producer = notification.getValue();
-                if (producer == null) {
-                    return;
-                }
-
                 try {
                     closeProducer(producer);
                     log.info("[PRODUCER_CACHE][配置({}) 对应的 producer 已关闭]", notification.getKey());
@@ -100,15 +97,21 @@ public abstract class AbstractCacheableDataBridgeExecute<Config, Producer> imple
 
     @Override
     @SuppressWarnings({"unchecked"})
-    public void execute(IotDeviceMessage message, IotDataSinkDO dataBridge) {
-        if (ObjUtil.notEqual(dataBridge.getType(), getType())) {
-            return;
-        }
+    public void execute(IotDeviceMessage message, IotDataSinkDO dataSink) {
+        Assert.isTrue(ObjUtil.equal(dataSink.getType(), getType()), "类型({})不匹配", dataSink.getType());
         try {
-            execute0(message, (Config) dataBridge.getConfig());
+            execute(message, (Config) dataSink.getConfig());
         } catch (Exception e) {
-            log.error("[execute][桥梁配置 config({}) 对应的 message({}) 发送异常]", dataBridge.getConfig(), message, e);
+            log.error("[execute][桥梁配置 config({}) 对应的 message({}) 发送异常]", dataSink.getConfig(), message, e);
         }
     }
+
+    /**
+     * 执行数据流转
+     *
+     * @param message 设备消息
+     * @param config  配置信息
+     */
+    protected abstract void execute(IotDeviceMessage message, Config config) throws Exception;
 
 }

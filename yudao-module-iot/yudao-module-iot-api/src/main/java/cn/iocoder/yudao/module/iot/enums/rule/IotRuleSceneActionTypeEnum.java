@@ -40,9 +40,7 @@ public enum IotRuleSceneActionTypeEnum implements ArrayValuable<Integer> {
 
     @Deprecated
     ALERT(2), // 告警执行
-
-    @Deprecated
-    DATA_BRIDGE(3); // 桥接执行
+    ;
 
     private final Integer type;
 

@@ -18,14 +18,14 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Component;
 
 /**
- * Redis Stream 的 {@link IotDataBridgeExecute} 实现类
+ * Redis Stream 的 {@link IotDataRuleAction} 实现类
  *
  * @author HUIHUI
  */
 @Component
 @Slf4j
-public class IotRedisStreamDataBridgeExecute extends
-        AbstractCacheableDataBridgeExecute<IotDataSinkRedisStreamConfig, RedisTemplate<String, Object>> {
+public class IotRedisStreamRuleAction extends
+        IotDataRuleCacheableAction<IotDataSinkRedisStreamConfig, RedisTemplate<String, Object>> {
 
     @Override
     public Integer getType() {
@@ -33,7 +33,7 @@ public class IotRedisStreamDataBridgeExecute extends
     }
 
     @Override
-    public void execute0(IotDeviceMessage message, IotDataSinkRedisStreamConfig config) throws Exception {
+    public void execute(IotDeviceMessage message, IotDataSinkRedisStreamConfig config) throws Exception {
         // 1. 获取 RedisTemplate
         RedisTemplate<String, Object> redisTemplate = getProducer(config);
 

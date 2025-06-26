@@ -60,4 +60,20 @@ public interface RedisKeyConstants {
      */
     String THING_MODEL_LIST = "iot:thing_model_list";
 
+    /**
+     * 数据流转规则的数据缓存，使用 Spring Cache 操作
+     *
+     * KEY 格式：data_rule_list_${deviceId}_${method}_${identifier}
+     * VALUE 数据类型：String 数组(JSON)，即 {@link cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataRuleDO} 列表
+     */
+    String DATA_RULE_LIST = "iot:data_rule_list";
+
+    /**
+     * 数据目的的数据缓存，使用 Spring Cache 操作
+     *
+     * KEY 格式：data_sink_${id}
+     * VALUE 数据类型：String(JSON)，即 {@link cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataSinkDO}
+     */
+    String DATA_SINK = "iot:data_sink";
+
 }

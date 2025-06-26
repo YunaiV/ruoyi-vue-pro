@@ -214,11 +214,6 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
                     .build());
             action01.setDeviceControl(actionDeviceControl01);
 //            ruleScene01.getActions().add(action01); // TODO 芋艿：先不测试了
-            // 数据桥接（http）
-            IotRuleSceneDO.ActionConfig action02 = new IotRuleSceneDO.ActionConfig();
-            action02.setType(IotRuleSceneActionTypeEnum.DATA_BRIDGE.getType());
-            action02.setDataBridgeId(1L);
-            ruleScene01.getActions().add(action02);
             return ListUtil.toList(ruleScene01);
         }
 

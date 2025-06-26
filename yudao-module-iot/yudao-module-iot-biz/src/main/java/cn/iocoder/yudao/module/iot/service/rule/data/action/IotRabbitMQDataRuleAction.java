@@ -13,16 +13,15 @@ import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 
 /**
- * RabbitMQ 的 {@link IotDataBridgeExecute} 实现类
+ * RabbitMQ 的 {@link IotDataRuleAction} 实现类
  *
  * @author HUIHUI
  */
 @ConditionalOnClass(name = "com.rabbitmq.client.Channel")
 @Component
 @Slf4j
-public class IotRabbitMQDataBridgeExecute extends
-        AbstractCacheableDataBridgeExecute<IotDataSinkRabbitMQConfig, Channel> {
-
+public class IotRabbitMQDataRuleAction extends
+        IotDataRuleCacheableAction<IotDataSinkRabbitMQConfig, Channel> {
 
     @Override
     public Integer getType() {
@@ -30,16 +29,15 @@ public class IotRabbitMQDataBridgeExecute extends
     }
 
     @Override
-    public void execute0(IotDeviceMessage message, IotDataSinkRabbitMQConfig config) throws Exception {
-        // 1. 获取或创建 Channel
+    public void execute(IotDeviceMessage message, IotDataSinkRabbitMQConfig config) throws Exception {
+        // 1.1 获取或创建 Channel
         Channel channel = getProducer(config);
-
-        // 2.1 声明交换机、队列和绑定关系
+        // 1.2 声明交换机、队列和绑定关系
         channel.exchangeDeclare(config.getExchange(), "direct", true);
         channel.queueDeclare(config.getQueue(), true, false, false, null);
         channel.queueBind(config.getQueue(), config.getExchange(), config.getRoutingKey());
 
-        // 2.2 发送消息
+        // 2. 发送消息
         channel.basicPublish(config.getExchange(), config.getRoutingKey(), null,
                 message.toString().getBytes(StandardCharsets.UTF_8));
         log.info("[executeRabbitMQ][message({}) config({}) 发送成功]", message, config);
@@ -55,10 +53,8 @@ public class IotRabbitMQDataBridgeExecute extends
         factory.setVirtualHost(config.getVirtualHost());
         factory.setUsername(config.getUsername());
         factory.setPassword(config.getPassword());
-
         // 2. 创建连接
         Connection connection = factory.newConnection();
-
         // 3. 创建信道
         return connection.createChannel();
     }

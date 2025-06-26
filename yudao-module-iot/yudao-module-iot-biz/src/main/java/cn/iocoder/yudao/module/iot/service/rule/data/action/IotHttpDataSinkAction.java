@@ -1,10 +1,12 @@
 package cn.iocoder.yudao.module.iot.service.rule.data.action;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataSinkHttpConfig;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataSinkDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataSinkHttpConfig;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataSinkTypeEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -17,13 +19,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Http 的 {@link IotDataBridgeExecute} 实现类
+ * HTTP 的 {@link IotDataRuleAction} 实现类
  *
  * @author HUIHUI
  */
 @Component
 @Slf4j
-public class IotHttpDataBridgeExecute implements IotDataBridgeExecute<IotDataSinkHttpConfig> {
+public class IotHttpDataSinkAction implements IotDataRuleAction {
 
     @Resource
     private RestTemplate restTemplate;
@@ -34,8 +36,9 @@ public class IotHttpDataBridgeExecute implements IotDataBridgeExecute<IotDataSin
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "deprecation"})
-    public void execute0(IotDeviceMessage message, IotDataSinkHttpConfig config) {
+    public void execute(IotDeviceMessage message, IotDataSinkDO dataSink) {
+        IotDataSinkHttpConfig config = (IotDataSinkHttpConfig) dataSink.getConfig();
+        Assert.notNull(config, "配置({})不能为空", dataSink.getId());
         String url = null;
         HttpMethod method = HttpMethod.valueOf(config.getMethod().toUpperCase());
         HttpEntity<String> requestEntity = null;

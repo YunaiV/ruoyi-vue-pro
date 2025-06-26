@@ -7,7 +7,9 @@ import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.data.sink.IotDataSin
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.data.sink.IotDataSinkSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataSinkDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.rule.IotDataSinkMapper;
+import cn.iocoder.yudao.module.iot.dal.redis.RedisKeyConstants;
 import jakarta.annotation.Resource;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -16,8 +18,8 @@ import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DATA_SINK_NOT_EXISTS;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DATA_SINK_DELETE_FAIL_USED_BY_RULE;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DATA_SINK_NOT_EXISTS;
 
 /**
  * IoT 数据流转目的 Service 实现类
@@ -56,7 +58,7 @@ public class IotDataSinkServiceImpl implements IotDataSinkService {
         // 校验存在
         validateDataBridgeExists(id);
         // 校验是否被数据流转规则使用
-        if (CollUtil.isNotEmpty(dataRuleService.getDataRuleBySinkId(id))) {
+        if (CollUtil.isNotEmpty(dataRuleService.getDataRuleListBySinkId(id))) {
             throw exception(DATA_SINK_DELETE_FAIL_USED_BY_RULE);
         }
         // 删除
@@ -71,6 +73,12 @@ public class IotDataSinkServiceImpl implements IotDataSinkService {
 
     @Override
     public IotDataSinkDO getDataSink(Long id) {
+        return dataSinkMapper.selectById(id);
+    }
+
+    @Override
+    @Cacheable(value = RedisKeyConstants.DATA_SINK, key = "#id")
+    public IotDataSinkDO getDataSinkFromCache(Long id) {
         return dataSinkMapper.selectById(id);
     }
 
