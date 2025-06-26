@@ -2,9 +2,12 @@ package cn.iocoder.yudao.module.iot.dal.dataobject.ota;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * IoT OTA 固件 DO
@@ -24,7 +27,7 @@ public class IotOtaFirmwareDO extends BaseDO {
     /**
      * 固件编号
      */
-    @TableField
+    @TableId
     private Long id;
     /**
      * 固件名称
