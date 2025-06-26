@@ -19,10 +19,6 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
 
     // ========== 设备状态 ==========
 
-    // TODO @芋艿：要合并下；thing.state.update
-    STATE_ONLINE("thing.state.online", "设备上线", true),
-    STATE_OFFLINE("thing.state.offline", "设备下线", true),
-
     STATE_UPDATE("thing.state.update", "设备状态更新", true),
 
     // ========== 设备属性 ==========
@@ -52,7 +48,7 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
     /**
      * 不进行 reply 回复的方法集合
      */
-    public static final Set<String> REPLY_DISABLED = Set.of(STATE_ONLINE.getMethod(), STATE_OFFLINE.getMethod());
+    public static final Set<String> REPLY_DISABLED = Set.of(STATE_UPDATE.getMethod());
 
     private final String method;
 

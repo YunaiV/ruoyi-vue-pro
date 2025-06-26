@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.dal.dataobject.rule;
+package cn.iocoder.yudao.module.iot.dal.dataobject.alert;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
@@ -45,17 +45,17 @@ public class IotAlertRecordDO extends BaseDO {
     private String name;
 
     /**
-     * 产品标识
+     * 产品编号
      *
-     * 关联 {@link IotProductDO#getProductKey()} ()}
+     * 关联 {@link IotProductDO#getId()}
      */
-    private String productKey;
+    private Long productId;
     /**
-     * 设备名称
+     * 设备编号
      *
-     * 冗余 {@link IotDeviceDO#getDeviceName()}
+     * 关联 {@link IotDeviceDO#getId()}
      */
-    private String deviceName;
+    private String deviceId;
 
     // TODO @芋艿：有没更好的方式
     /**
@@ -64,7 +64,6 @@ public class IotAlertRecordDO extends BaseDO {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private IotDeviceMessage deviceMessage;
 
-    // TODO @芋艿：换成枚举，枚举对应 ApiErrorLogProcessStatusEnum
     /**
      * 处理状态
      *

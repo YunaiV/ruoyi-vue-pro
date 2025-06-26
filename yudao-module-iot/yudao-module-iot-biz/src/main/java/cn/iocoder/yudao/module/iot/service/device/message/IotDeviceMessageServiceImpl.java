@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.device.message;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -13,7 +14,6 @@ import cn.iocoder.yudao.module.iot.controller.admin.device.vo.message.IotDeviceM
 import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsDeviceMessageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsDeviceMessageSummaryByDateRespVO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
-import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
@@ -176,15 +176,12 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     // TODO @芋艿：可优化：未来逻辑复杂后，可以独立拆除 Processor 处理器
     @SuppressWarnings("SameReturnValue")
     private Object handleUpstreamDeviceMessage0(IotDeviceMessage message, IotDeviceDO device) {
-        // 设备上线
-        if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.STATE_ONLINE.getMethod())) {
-            deviceService.updateDeviceState(device, IotDeviceStateEnum.ONLINE.getState());
-            // TODO 芋艿：子设备的关联
-            return null;
-        }
-        // 设备下线
-        if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.STATE_OFFLINE.getMethod())) {
-            deviceService.updateDeviceState(device, IotDeviceStateEnum.OFFLINE.getState());
+        // 设备上下线
+        if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod())) {
+            String stateStr = IotDeviceMessageUtils.getIdentifier(message);
+            assert stateStr != null;
+            Assert.notEmpty(stateStr, "设备状态不能为空");
+            deviceService.updateDeviceState(device, Integer.valueOf(stateStr));
             // TODO 芋艿：子设备的关联
             return null;
         }

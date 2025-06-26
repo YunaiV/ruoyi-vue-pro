@@ -1,14 +1,21 @@
-package cn.iocoder.yudao.module.iot.dal.dataobject.rule;
+package cn.iocoder.yudao.module.iot.dal.dataobject.alert;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.iot.enums.rule.IotAlertConfigReceiveTypeEnum;
+import cn.iocoder.yudao.framework.mybatis.core.type.IntegerListTypeHandler;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
+import cn.iocoder.yudao.module.iot.enums.DictTypeConstants;
+import cn.iocoder.yudao.module.iot.enums.alert.IotAlertConfigReceiveTypeEnum;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -41,37 +48,37 @@ public class IotAlertConfigDO extends BaseDO {
     /**
      * 配置状态
      *
-     * TODO 数据字典
+     * 字典 {@link DictTypeConstants#ALERT_LEVEL}
      */
     private Integer level;
     /**
      * 配置状态
      *
-     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum}
+     * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
 
     /**
-     * 关联的规则场景编号数组
+     * 关联的场景联动规则编号数组
      *
      * 关联 {@link IotRuleSceneDO#getId()}
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<Long> ruleSceneIds;
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> sceneRuleIds;
 
     /**
      * 接收的用户编号数组
      *
      * 关联 {@link AdminUserRespDTO#getId()}
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> receiveUserIds;
     /**
      * 接收的类型数组
      *
      * 枚举 {@link IotAlertConfigReceiveTypeEnum}
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = IntegerListTypeHandler.class)
     private List<Integer> receiveTypes;
 
 }

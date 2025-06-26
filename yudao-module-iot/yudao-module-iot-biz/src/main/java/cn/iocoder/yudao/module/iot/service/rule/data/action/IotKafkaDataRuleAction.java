@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.rule.data.action;
 
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataSinkKafkaConfig;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataSinkTypeEnum;
@@ -9,6 +10,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -36,13 +38,27 @@ public class IotKafkaDataRuleAction extends
 
     @Override
     public void execute(IotDeviceMessage message, IotDataSinkKafkaConfig config) throws Exception {
-        // 1. 获取或创建 KafkaTemplate
-        KafkaTemplate<String, String> kafkaTemplate = getProducer(config);
+        try {
+            // 1. 获取或创建 KafkaTemplate
+            KafkaTemplate<String, String> kafkaTemplate = getProducer(config);
 
-        // 2. 发送消息并等待结果
-        kafkaTemplate.send(config.getTopic(), message.toString())
-                .get(SEND_TIMEOUT.getSeconds(), TimeUnit.SECONDS); // 添加超时等待
-        log.info("[execute0][message({}) 发送成功]", message);
+            // 2. 发送消息并等待结果
+            SendResult<String, String> sendResult = kafkaTemplate.send(config.getTopic(), JsonUtils.toJsonString(message))
+                    .get(SEND_TIMEOUT.getSeconds(), TimeUnit.SECONDS);
+            // 3. 处理发送结果
+            if (sendResult != null && sendResult.getRecordMetadata() != null) {
+                log.info("[execute][message({}) config({}) 发送成功，结果: partition={}, offset={}, timestamp={}]",
+                        message, config,
+                        sendResult.getRecordMetadata().partition(),
+                        sendResult.getRecordMetadata().offset(),
+                        sendResult.getRecordMetadata().timestamp());
+            } else {
+                log.warn("[execute][message({}) config({}) 发送结果为空]", message, config);
+            }
+        } catch (Exception e) {
+            log.error("[execute][message({}) config({}) 发送失败]", message, config, e);
+            throw e;
+        }
     }
 
     @Override

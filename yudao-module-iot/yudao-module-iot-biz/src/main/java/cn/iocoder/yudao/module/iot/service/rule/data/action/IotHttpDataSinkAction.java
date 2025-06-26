@@ -18,6 +18,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.HashMap;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_TENANT_ID;
+
 /**
  * HTTP 的 {@link IotDataRuleAction} 实现类
  *
@@ -36,6 +38,7 @@ public class IotHttpDataSinkAction implements IotDataRuleAction {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void execute(IotDeviceMessage message, IotDataSinkDO dataSink) {
         IotDataSinkHttpConfig config = (IotDataSinkHttpConfig) dataSink.getConfig();
         Assert.notNull(config, "配置({})不能为空", dataSink.getId());
@@ -49,8 +52,7 @@ public class IotHttpDataSinkAction implements IotDataRuleAction {
             if (CollUtil.isNotEmpty(config.getHeaders())) {
                 config.getHeaders().putAll(config.getHeaders());
             }
-            // TODO @puhui999：@yunai：可能需要通过设备查询到租户，然后 set
-//            headers.add(HEADER_TENANT_ID, message.getTenantId().toString());
+            headers.add(HEADER_TENANT_ID, message.getTenantId().toString());
             // 1.2 构建 URL
             UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(config.getUrl());
             if (CollUtil.isNotEmpty(config.getQuery())) {
@@ -72,18 +74,17 @@ public class IotHttpDataSinkAction implements IotDataRuleAction {
                 requestEntity = new HttpEntity<>(JsonUtils.toJsonString(requestBody), headers);
             }
 
-            // 2.1 发送请求
+            // 2. 发送请求
             responseEntity = restTemplate.exchange(url, method, requestEntity, String.class);
-            // 2.2 记录日志
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                log.info("[executeHttp][message({}) config({}) url({}) method({}) requestEntity({}) 请求成功({})]",
+                log.info("[execute][message({}) config({}) url({}) method({}) requestEntity({}) 请求成功({})]",
                         message, config, url, method, requestEntity, responseEntity);
             } else {
-                log.error("[executeHttp][message({}) config({}) url({}) method({}) requestEntity({}) 请求失败({})]",
+                log.error("[execute][message({}) config({}) url({}) method({}) requestEntity({}) 请求失败({})]",
                         message, config, url, method, requestEntity, responseEntity);
             }
         } catch (Exception e) {
-            log.error("[executeHttp][message({}) config({}) url({}) method({}) requestEntity({}) 请求异常({})]",
+            log.error("[execute][message({}) config({}) url({}) method({}) requestEntity({}) 请求异常({})]",
                     message, config, url, method, requestEntity, responseEntity, e);
         }
     }

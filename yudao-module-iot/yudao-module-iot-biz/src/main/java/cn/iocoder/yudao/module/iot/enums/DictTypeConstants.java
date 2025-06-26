@@ -14,5 +14,6 @@ public class DictTypeConstants {
 
     public static final String DEVICE_STATE = "iot_device_state";
 
+    public static final String ALERT_LEVEL = "iot_alert_level";
 
 }

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.rule.data.action;
 
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataSinkRedisStreamConfig;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataSinkTypeEnum;
@@ -38,10 +39,10 @@ public class IotRedisStreamRuleAction extends
         RedisTemplate<String, Object> redisTemplate = getProducer(config);
 
         // 2. 创建并发送 Stream 记录
-        ObjectRecord<String, IotDeviceMessage> record = StreamRecords.newRecord()
-                .ofObject(message).withStreamKey(config.getTopic());
+        ObjectRecord<String, ?> record = StreamRecords.newRecord()
+                .ofObject(JsonUtils.toJsonString(message)).withStreamKey(config.getTopic());
         String recordId = String.valueOf(redisTemplate.opsForStream().add(record));
-        log.info("[executeRedisStream][消息发送成功] messageId: {}, config: {}", recordId, config);
+        log.info("[execute][消息发送成功] messageId: {}, config: {}", recordId, config);
     }
 
     @Override
@@ -56,11 +57,11 @@ public class IotRedisStreamRuleAction extends
             serverConfig.setPassword(config.getPassword());
         }
 
-        // 创建 RedisTemplate 并配置
+        // 2.1 创建 RedisTemplate 并配置
         RedissonClient redisson = Redisson.create(redissonConfig);
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(new RedissonConnectionFactory(redisson));
-        // 设置序列化器
+        // 2.2 设置序列化器
         template.setKeySerializer(RedisSerializer.string());
         template.setHashKeySerializer(RedisSerializer.string());
         template.setValueSerializer(RedisSerializer.json());

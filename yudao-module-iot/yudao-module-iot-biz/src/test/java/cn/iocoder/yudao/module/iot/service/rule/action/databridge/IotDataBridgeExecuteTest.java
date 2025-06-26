@@ -39,6 +39,7 @@ public class IotDataBridgeExecuteTest extends BaseMockitoUnitTest {
 
     @BeforeEach
     public void setUp() {
+        // TODO @芋艿：@puhui999：需要调整下；
         // 创建共享的测试消息
         //message = IotDeviceMessage.builder().messageId("TEST-001").reportTime(LocalDateTime.now())
         //        .productKey("testProduct").deviceName("testDevice")

@@ -172,7 +172,7 @@ public class IotDataRuleServiceImpl implements IotDataRuleService {
         for (IotDataRuleDO rule : rules) {
             IotDataRuleDO.SourceConfig found = CollUtil.findOne(rule.getSourceConfigs(),
                     config -> ObjectUtils.equalsAny(config.getDeviceId(), deviceId, IotDeviceDO.DEVICE_ID_ALL)
-                            && (StrUtil.isNotEmpty(config.getMethod()) || ObjUtil.equal(config.getMethod(), method))
+                            && Objects.equals(config.getMethod(), method)
                             && (StrUtil.isEmpty(config.getIdentifier()) || ObjUtil.equal(config.getIdentifier(), identifier)));
             if (found != null) {
                 matchedRules.add(new IotDataRuleDO().setId(rule.getId()).setSinkIds(rule.getSinkIds()));
