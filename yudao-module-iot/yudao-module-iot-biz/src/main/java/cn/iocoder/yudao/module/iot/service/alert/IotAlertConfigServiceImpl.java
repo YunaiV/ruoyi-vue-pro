@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.alert.vo.IotAlertConfigPageR
 import cn.iocoder.yudao.module.iot.controller.admin.alert.vo.IotAlertConfigSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.alert.IotAlertConfigDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.alert.IotAlertConfigMapper;
+import cn.iocoder.yudao.module.iot.service.rule.scene.IotRuleSceneService;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -25,8 +27,18 @@ public class IotAlertConfigServiceImpl implements IotAlertConfigService {
     @Resource
     private IotAlertConfigMapper alertConfigMapper;
 
+    @Resource
+    private IotRuleSceneService ruleSceneService;
+
+    @Resource
+    private AdminUserApi adminUserApi;
+
     @Override
     public Long createAlertConfig(IotAlertConfigSaveReqVO createReqVO) {
+        // 校验关联数据是否存在
+        ruleSceneService.validateRuleSceneList(createReqVO.getSceneRuleIds());
+        adminUserApi.validateUserList(createReqVO.getReceiveUserIds());
+
         IotAlertConfigDO alertConfig = BeanUtils.toBean(createReqVO, IotAlertConfigDO.class);
         alertConfigMapper.insert(alertConfig);
         return alertConfig.getId();
@@ -36,6 +48,10 @@ public class IotAlertConfigServiceImpl implements IotAlertConfigService {
     public void updateAlertConfig(IotAlertConfigSaveReqVO updateReqVO) {
         // 校验存在
         validateAlertConfigExists(updateReqVO.getId());
+        // 校验关联数据是否存在
+        ruleSceneService.validateRuleSceneList(updateReqVO.getSceneRuleIds());
+        adminUserApi.validateUserList(updateReqVO.getReceiveUserIds());
+
         // 更新
         IotAlertConfigDO updateObj = BeanUtils.toBean(updateReqVO, IotAlertConfigDO.class);
         alertConfigMapper.updateById(updateObj);

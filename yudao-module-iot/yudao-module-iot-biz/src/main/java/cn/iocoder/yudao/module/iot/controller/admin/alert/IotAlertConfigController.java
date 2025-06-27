@@ -1,33 +1,30 @@
 package cn.iocoder.yudao.module.iot.controller.admin.alert;
 
-import org.springframework.web.bind.annotation.*;
-import jakarta.annotation.Resource;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Operation;
-
-import jakarta.validation.constraints.*;
-import jakarta.validation.*;
-import jakarta.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
-
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
-import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-
-import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
-
-import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
-import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.*;
-
-import cn.iocoder.yudao.module.iot.controller.admin.alert.vo.*;
+import cn.iocoder.yudao.module.iot.controller.admin.alert.vo.IotAlertConfigPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.alert.vo.IotAlertConfigRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.alert.vo.IotAlertConfigSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.alert.IotAlertConfigDO;
 import cn.iocoder.yudao.module.iot.service.alert.IotAlertConfigService;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
 
 @Tag(name = "管理后台 - IoT 告警配置")
 @RestController
@@ -37,6 +34,9 @@ public class IotAlertConfigController {
 
     @Resource
     private IotAlertConfigService alertConfigService;
+
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建告警配置")
@@ -76,7 +76,12 @@ public class IotAlertConfigController {
     @PreAuthorize("@ss.hasPermission('iot:alert-config:query')")
     public CommonResult<PageResult<IotAlertConfigRespVO>> getAlertConfigPage(@Valid IotAlertConfigPageReqVO pageReqVO) {
         PageResult<IotAlertConfigDO> pageResult = alertConfigService.getAlertConfigPage(pageReqVO);
-        return success(BeanUtils.toBean(pageResult, IotAlertConfigRespVO.class));
+        // 转换返回
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertSetByFlatMap(pageResult.getList(), config -> config.getReceiveUserIds().stream()));
+        return success(BeanUtils.toBean(pageResult, IotAlertConfigRespVO.class, vo ->
+                vo.setReceiveUserNames(vo.getReceiveUserIds().stream().map(userMap::get)
+                        .filter(Objects::nonNull).map(AdminUserRespDTO::getNickname).collect(Collectors.toList()))));
     }
 
 }

@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.type.IntegerListTypeHandler;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
 import cn.iocoder.yudao.module.iot.enums.DictTypeConstants;
-import cn.iocoder.yudao.module.iot.enums.alert.IotAlertConfigReceiveTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.alert.IotAlertReceiveTypeEnum;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -24,7 +24,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-@TableName("iot_alert_config")
+@TableName(value = "iot_alert_config", autoResultMap = true)
 @KeySequence("iot_alert_config_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @Builder
@@ -76,7 +76,7 @@ public class IotAlertConfigDO extends BaseDO {
     /**
      * 接收的类型数组
      *
-     * 枚举 {@link IotAlertConfigReceiveTypeEnum}
+     * 枚举 {@link IotAlertReceiveTypeEnum}
      */
     @TableField(typeHandler = IntegerListTypeHandler.class)
     private List<Integer> receiveTypes;

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.controller.admin.rule;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -18,7 +19,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 @Tag(name = "管理后台 - IoT 场景联动")
 @RestController
@@ -68,6 +72,14 @@ public class IotRuleSceneController {
     public CommonResult<PageResult<IotRuleSceneRespVO>> getRuleScenePage(@Valid IotRuleScenePageReqVO pageReqVO) {
         PageResult<IotRuleSceneDO> pageResult = ruleSceneService.getRuleScenePage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, IotRuleSceneRespVO.class));
+    }
+
+    @GetMapping("/simple-list")
+    @Operation(summary = "获取场景联动的精简信息列表", description = "主要用于前端的下拉选项")
+    public CommonResult<List<IotRuleSceneRespVO>> getRuleSceneSimpleList() {
+        List<IotRuleSceneDO> list = ruleSceneService.getRuleSceneListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        return success(convertList(list, scene -> // 只返回 id、name 字段
+                new IotRuleSceneRespVO().setId(scene.getId()).setName(scene.getName())));
     }
 
     @GetMapping("/test")

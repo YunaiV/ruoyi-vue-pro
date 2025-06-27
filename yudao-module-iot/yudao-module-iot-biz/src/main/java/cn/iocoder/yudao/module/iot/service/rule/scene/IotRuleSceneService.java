@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerTypeEnum;
 import jakarta.validation.Valid;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -54,6 +55,22 @@ public interface IotRuleSceneService {
      * @return 场景联动分页
      */
     PageResult<IotRuleSceneDO> getRuleScenePage(IotRuleScenePageReqVO pageReqVO);
+
+    /**
+     * 校验规则场景编号们是否存在。如下情况，视为无效：
+     * 1. 规则场景编号不存在
+     *
+     * @param ids 规则场景编号数组
+     */
+    void validateRuleSceneList(Collection<Long> ids);
+
+    /**
+     * 获得指定状态的场景联动列表
+     *
+     * @param status 状态
+     * @return 场景联动列表
+     */
+    List<IotRuleSceneDO> getRuleSceneListByStatus(Integer status);
 
     /**
      * 【缓存】获得指定设备的场景列表

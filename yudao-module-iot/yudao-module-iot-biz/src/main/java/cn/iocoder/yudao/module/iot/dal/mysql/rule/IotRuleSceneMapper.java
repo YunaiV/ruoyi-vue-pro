@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotRuleScenePa
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * IoT 场景联动 Mapper
  *
@@ -22,6 +24,10 @@ public interface IotRuleSceneMapper extends BaseMapperX<IotRuleSceneDO> {
                 .eqIfPresent(IotRuleSceneDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(IotRuleSceneDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(IotRuleSceneDO::getId));
+    }
+
+    default List<IotRuleSceneDO> selectListByStatus(Integer status) {
+        return selectList(IotRuleSceneDO::getStatus, status);
     }
 
 }

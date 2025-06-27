@@ -31,6 +31,9 @@ public class IotAlertConfigRespVO {
     @Schema(description = "接收的用户编号数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "100,200")
     private List<Long> receiveUserIds;
 
+    @Schema(description = "接收的用户名称数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三,李四")
+    private List<String> receiveUserNames;
+
     @Schema(description = "接收的类型数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "1,2,3")
     private List<Integer> receiveTypes;
 

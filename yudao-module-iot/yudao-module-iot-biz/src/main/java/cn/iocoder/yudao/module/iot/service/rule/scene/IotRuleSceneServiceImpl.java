@@ -42,9 +42,12 @@ import org.springframework.validation.annotation.Validated;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Collection;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.RULE_SCENE_NOT_EXISTS;
 
@@ -109,6 +112,22 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
         return ruleSceneMapper.selectPage(pageReqVO);
     }
 
+    @Override
+    public void validateRuleSceneList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 批量查询存在的规则场景
+        List<IotRuleSceneDO> existingScenes = ruleSceneMapper.selectByIds(ids);
+        if (existingScenes.size() != ids.size()) {
+            throw exception(RULE_SCENE_NOT_EXISTS);
+        }
+    }
+
+    @Override
+    public List<IotRuleSceneDO> getRuleSceneListByStatus(Integer status) {
+        return ruleSceneMapper.selectListByStatus(status);
+    }
 
     // TODO 芋艿，缓存待实现
     @Override
