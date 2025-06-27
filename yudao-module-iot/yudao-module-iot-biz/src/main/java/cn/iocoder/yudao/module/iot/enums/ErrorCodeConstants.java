@@ -64,4 +64,7 @@ public interface ErrorCodeConstants {
     // ========== IoT 场景联动 1-050-012-000 ==========
     ErrorCode RULE_SCENE_NOT_EXISTS = new ErrorCode(1_050_012_000, "场景联动不存在");
 
+    // ========== IoT 告警配置 1-050-013-000 ==========
+    ErrorCode ALERT_CONFIG_NOT_EXISTS = new ErrorCode(1_050_013_000, "IoT 告警配置不存在");
+
 }
