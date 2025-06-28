@@ -1,69 +1,49 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.action;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
-import cn.iocoder.yudao.module.iot.dal.dataobject.alert.IotAlertConfigDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.alert.IotAlertRecordDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
-import cn.iocoder.yudao.module.iot.service.alert.IotAlertConfigService;
 import cn.iocoder.yudao.module.iot.service.alert.IotAlertRecordService;
-import cn.iocoder.yudao.module.system.api.mail.MailSendApi;
-import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
-import cn.iocoder.yudao.module.system.api.sms.SmsSendApi;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nullable;
 import java.util.List;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 // TODO @puhui999、@芋艿：未测试；需要场景联动开发完
 /**
- * IoT 告警触发的 {@link IotSceneRuleAction} 实现类
+ * IoT 告警恢复的 {@link IotSceneRuleAction} 实现类
  *
  * @author 芋道源码
  */
 @Component
-public class IotAlertTriggerSceneRuleAction implements IotSceneRuleAction {
+public class IotAlertRecoverSceneRuleAction implements IotSceneRuleAction {
 
-    @Resource
-    private IotAlertConfigService alertConfigService;
+    private static final String PROCESS_REMARK = "告警自动回复，基于【{}】场景联动规则";
+
     @Resource
     private IotAlertRecordService alertRecordService;
 
-    @Resource
-    private SmsSendApi smsSendApi;
-    @Resource
-    private MailSendApi mailSendApi;
-    @Resource
-    private NotifyMessageSendApi notifyMessageSendApi;
-
     @Override
-    public void execute(@Nullable IotDeviceMessage message,
+    public void execute(IotDeviceMessage message,
                         IotRuleSceneDO rule, IotRuleSceneDO.ActionConfig actionConfig) throws Exception {
-        List<IotAlertConfigDO> alertConfigs = alertConfigService.getAlertConfigListBySceneRuleIdAndStatus(
-                rule.getId(), CommonStatusEnum.ENABLE.getStatus());
-        if (CollUtil.isEmpty(alertConfigs)) {
+        Long deviceId = message != null ? message.getDeviceId() : null;
+        List<IotAlertRecordDO> alertRecords = alertRecordService.getAlertRecordListBySceneRuleId(
+                rule.getId(), deviceId, false);
+        if (CollUtil.isEmpty(alertRecords)) {
             return;
         }
-        alertConfigs.forEach(alertConfig -> {
-            // 记录告警记录
-            alertRecordService.createAlertRecord(alertConfig, message);
-            // 发送告警消息
-            sendAlertMessage(alertConfig, message);
-        });
-    }
-
-    private void sendAlertMessage(IotAlertConfigDO config, IotDeviceMessage deviceMessage) {
-        // TODO @芋艿：等场景联动开发完，再实现
-        // TODO @芋艿：短信
-        // TODO @芋艿：邮箱
-        // TODO @芋艿：站内信
+        alertRecordService.processAlertRecordList(convertList(alertRecords, IotAlertRecordDO::getId),
+                StrUtil.format(PROCESS_REMARK, rule.getName()));
     }
 
     @Override
     public IotRuleSceneActionTypeEnum getType() {
-        return IotRuleSceneActionTypeEnum.ALERT_TRIGGER;
+        return IotRuleSceneActionTypeEnum.ALERT_RECOVER;
     }
 
 }
