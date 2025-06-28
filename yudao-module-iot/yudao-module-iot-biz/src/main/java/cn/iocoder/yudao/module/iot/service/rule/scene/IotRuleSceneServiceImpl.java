@@ -443,7 +443,7 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
                 // 3.2 执行动作
                 actions.forEach(action -> {
                     try {
-                        action.execute(message, actionConfig);
+                        action.execute(message, ruleScene, actionConfig);
                         log.info("[executeRuleSceneAction][消息({}) 规则场景编号({}) 的执行动作({}) 成功]",
                                 message, ruleScene.getId(), actionConfig);
                     } catch (Exception e) {

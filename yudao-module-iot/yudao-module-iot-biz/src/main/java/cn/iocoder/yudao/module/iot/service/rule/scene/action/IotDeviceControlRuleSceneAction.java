@@ -26,23 +26,24 @@ public class IotDeviceControlRuleSceneAction implements IotSceneRuleAction {
     private IotDeviceMessageService deviceMessageService;
 
     @Override
-    public void execute(IotDeviceMessage message, IotRuleSceneDO.ActionConfig config) {
-        IotRuleSceneDO.ActionDeviceControl control = config.getDeviceControl();
+    public void execute(IotDeviceMessage message,
+                        IotRuleSceneDO rule, IotRuleSceneDO.ActionConfig actionConfig) {
+        IotRuleSceneDO.ActionDeviceControl control = actionConfig.getDeviceControl();
         Assert.notNull(control, "设备控制配置不能为空");
         // 遍历每个设备，下发消息
         control.getDeviceNames().forEach(deviceName -> {
             IotDeviceDO device = deviceService.getDeviceFromCache(control.getProductKey(), deviceName);
             if (device == null) {
-                log.error("[execute][message({}) config({}) 对应的设备不存在]", message, config);
+                log.error("[execute][message({}) actionConfig({}) 对应的设备不存在]", message, actionConfig);
                 return;
             }
             try {
                 // TODO @芋艿：@puhui999：这块可能要改，从 type => method
                 IotDeviceMessage downstreamMessage = deviceMessageService.sendDeviceMessage(IotDeviceMessage.requestOf(
                         control.getType() + control.getIdentifier(), control.getData()).setDeviceId(device.getId()));
-                log.info("[execute][message({}) config({}) 下发消息({})成功]", message, config, downstreamMessage);
+                log.info("[execute][message({}) actionConfig({}) 下发消息({})成功]", message, actionConfig, downstreamMessage);
             } catch (Exception e) {
-                log.error("[execute][message({}) config({}) 下发消息失败]", message, config, e);
+                log.error("[execute][message({}) actionConfig({}) 下发消息失败]", message, actionConfig, e);
             }
         });
     }

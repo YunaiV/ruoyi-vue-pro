@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * IoT 规则场景 Service 接口
+ * IoT 规则场景规则 Service 接口
  *
  * @author 芋道源码
  */
@@ -57,10 +57,10 @@ public interface IotRuleSceneService {
     PageResult<IotRuleSceneDO> getRuleScenePage(IotRuleScenePageReqVO pageReqVO);
 
     /**
-     * 校验规则场景编号们是否存在。如下情况，视为无效：
-     * 1. 规则场景编号不存在
+     * 校验规则场景联动规则编号们是否存在。如下情况，视为无效：
+     * 1. 规则场景联动规则编号不存在
      *
-     * @param ids 规则场景编号数组
+     * @param ids 场景联动规则编号数组
      */
     void validateRuleSceneList(Collection<Long> ids);
 
@@ -91,7 +91,7 @@ public interface IotRuleSceneService {
     /**
      * 基于 {@link IotRuleSceneTriggerTypeEnum#TIMER} 场景，执行规则场景
      *
-     * @param id 场景编号
+     * @param id 场景联动规则编号
      */
     void executeRuleSceneByTimer(Long id);
 

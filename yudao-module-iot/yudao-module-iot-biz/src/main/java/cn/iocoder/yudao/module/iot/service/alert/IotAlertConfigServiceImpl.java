@@ -9,8 +9,11 @@ import cn.iocoder.yudao.module.iot.dal.mysql.alert.IotAlertConfigMapper;
 import cn.iocoder.yudao.module.iot.service.rule.scene.IotRuleSceneService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.ALERT_CONFIG_NOT_EXISTS;
@@ -28,6 +31,7 @@ public class IotAlertConfigServiceImpl implements IotAlertConfigService {
     private IotAlertConfigMapper alertConfigMapper;
 
     @Resource
+    @Lazy // 延迟，避免循环依赖报错
     private IotRuleSceneService ruleSceneService;
 
     @Resource
@@ -39,6 +43,7 @@ public class IotAlertConfigServiceImpl implements IotAlertConfigService {
         ruleSceneService.validateRuleSceneList(createReqVO.getSceneRuleIds());
         adminUserApi.validateUserList(createReqVO.getReceiveUserIds());
 
+        // 插入
         IotAlertConfigDO alertConfig = BeanUtils.toBean(createReqVO, IotAlertConfigDO.class);
         alertConfigMapper.insert(alertConfig);
         return alertConfig.getId();
@@ -79,6 +84,16 @@ public class IotAlertConfigServiceImpl implements IotAlertConfigService {
     @Override
     public PageResult<IotAlertConfigDO> getAlertConfigPage(IotAlertConfigPageReqVO pageReqVO) {
         return alertConfigMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<IotAlertConfigDO> getAlertConfigListByStatus(Integer status) {
+        return alertConfigMapper.selectListByStatus(status);
+    }
+
+    @Override
+    public List<IotAlertConfigDO> getAlertConfigListBySceneRuleIdAndStatus(Long sceneRuleId, Integer status) {
+        return alertConfigMapper.selectListBySceneRuleIdAndStatus(sceneRuleId, status);
     }
 
 }

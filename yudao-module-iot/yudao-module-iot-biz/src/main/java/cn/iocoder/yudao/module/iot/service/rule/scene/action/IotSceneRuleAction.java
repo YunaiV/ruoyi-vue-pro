@@ -19,9 +19,12 @@ public interface IotSceneRuleAction {
      * @param message 消息，允许空
      *                1. 空的情况：定时触发
      *                2. 非空的情况：设备触发
-     * @param config  配置
+     * @param rule    规则
+     * @param actionConfig  执行配置（实际对应规则里的哪条执行配置）
      */
-    void execute(@Nullable IotDeviceMessage message, IotRuleSceneDO.ActionConfig config) throws Exception;
+    void execute(@Nullable IotDeviceMessage message,
+                 IotRuleSceneDO rule,
+                 IotRuleSceneDO.ActionConfig actionConfig) throws Exception;
 
     /**
      * 获得类型

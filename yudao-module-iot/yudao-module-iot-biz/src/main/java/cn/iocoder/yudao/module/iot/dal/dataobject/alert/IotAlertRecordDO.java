@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
  *
  * @author 芋道源码
  */
-@TableName("iot_alert_record")
+@TableName(value = "iot_alert_record", autoResultMap = true)
 @KeySequence("iot_alert_record_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @Builder
@@ -44,6 +44,13 @@ public class IotAlertRecordDO extends BaseDO {
      * 冗余 {@link IotAlertConfigDO#getName()}
      */
     private String configName;
+    /**
+     * 告警级别
+     *
+     * 冗余 {@link IotAlertConfigDO#getLevel()}
+     * 字典 {@link cn.iocoder.yudao.module.iot.enums.DictTypeConstants#ALERT_LEVEL}
+     */
+    private Integer configLevel;
 
     /**
      * 产品编号
@@ -56,7 +63,7 @@ public class IotAlertRecordDO extends BaseDO {
      *
      * 关联 {@link IotDeviceDO#getId()}
      */
-    private String deviceId;
+    private Long deviceId;
     /**
      * 触发的设备消息
      */

@@ -67,4 +67,7 @@ public interface ErrorCodeConstants {
     // ========== IoT 告警配置 1-050-013-000 ==========
     ErrorCode ALERT_CONFIG_NOT_EXISTS = new ErrorCode(1_050_013_000, "IoT 告警配置不存在");
 
+    // ========== IoT 告警记录 1-050-014-000 ==========
+    ErrorCode ALERT_RECORD_NOT_EXISTS = new ErrorCode(1_050_014_000, "IoT 告警记录不存在");
+
 }

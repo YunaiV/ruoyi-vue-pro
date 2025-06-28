@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.alert.vo.config.IotAlertConf
 import cn.iocoder.yudao.module.iot.dal.dataobject.alert.IotAlertConfigDO;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 /**
  * IoT 告警配置 Service 接口
  *
@@ -50,5 +52,21 @@ public interface IotAlertConfigService {
      * @return 告警配置分页
      */
     PageResult<IotAlertConfigDO> getAlertConfigPage(IotAlertConfigPageReqVO pageReqVO);
+
+    /**
+     * 获得告警配置列表
+     *
+     * @param status 状态
+     * @return 告警配置列表
+     */
+    List<IotAlertConfigDO> getAlertConfigListByStatus(Integer status);
+
+    /**
+     * 获得告警配置列表
+     *
+     * @param sceneRuleId 场景流动规则编号
+     * @return 告警配置列表
+     */
+    List<IotAlertConfigDO> getAlertConfigListBySceneRuleIdAndStatus(Long sceneRuleId, Integer status);
 
 }
