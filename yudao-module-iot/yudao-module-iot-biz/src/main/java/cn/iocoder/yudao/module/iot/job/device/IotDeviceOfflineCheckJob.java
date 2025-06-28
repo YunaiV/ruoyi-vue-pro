@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.tenant.core.job.TenantJob;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import cn.iocoder.yudao.module.iot.framework.iot.config.YudaoIotProperties;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.message.IotDeviceMessageService;
 import cn.iocoder.yudao.module.iot.service.device.property.IotDevicePropertyService;
@@ -24,17 +25,14 @@ import java.util.Set;
  *
  * 检测逻辑：设备最后一条 {@link IotDeviceMessage} 消息超过一定时间，则认为设备离线
  *
+ * @see <a href="https://help.aliyun.com/zh/iot/support/faq-about-device-status#98f7056b2957y">阿里云 IoT —— 设备离线分析</a>
  * @author 芋道源码
  */
 @Component
 public class IotDeviceOfflineCheckJob implements JobHandler {
 
-    /**
-     * 设备离线超时时间
-     *
-     * TODO 芋艿：暂定 10 分钟，后续看看要不要基于设备或者全局有配置文件
-     */
-    public static final Duration OFFLINE_TIMEOUT = Duration.ofMinutes(10);
+    @Resource
+    private YudaoIotProperties iotProperties;
 
     @Resource
     private IotDeviceService deviceService;
@@ -52,8 +50,7 @@ public class IotDeviceOfflineCheckJob implements JobHandler {
             return JsonUtils.toJsonString(Collections.emptyList());
         }
         // 1.2 获取超时的设备集合
-        Set<Long> timeoutDeviceIds = devicePropertyService.getDeviceIdListByReportTime(
-                LocalDateTime.now().minus(OFFLINE_TIMEOUT));
+        Set<Long> timeoutDeviceIds = devicePropertyService.getDeviceIdListByReportTime(getTimeoutTime());
 
         // 2. 下线设备
         List<String[]> offlineDevices = CollUtil.newArrayList();
@@ -66,6 +63,11 @@ public class IotDeviceOfflineCheckJob implements JobHandler {
             deviceMessageService.sendDeviceMessage(IotDeviceMessage.buildStateOffline().setDeviceId(device.getId()));
         }
         return JsonUtils.toJsonString(offlineDevices);
+    }
+
+    private LocalDateTime getTimeoutTime() {
+        return LocalDateTime.now().minus(Duration.ofNanos(
+                (long) (iotProperties.getKeepAliveTime().toNanos() * iotProperties.getKeepAliveFactor())));
     }
 
 }

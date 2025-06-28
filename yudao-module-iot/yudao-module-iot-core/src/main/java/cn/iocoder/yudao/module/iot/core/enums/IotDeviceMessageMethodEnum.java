@@ -21,6 +21,8 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
 
     STATE_UPDATE("thing.state.update", "设备状态更新", true),
 
+    // TODO 芋艿：要不要加个 ping 消息；
+
     // ========== 设备属性 ==========
     // 可参考：https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services
 
