@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.enums.rule;
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -15,17 +16,16 @@ import java.util.Arrays;
 @Getter
 public enum IotRuleSceneActionTypeEnum implements ArrayValuable<Integer> {
 
-    // TODO @芋艿：后续“对应”部分，要 @下，等包结构梳理完；
     /**
      * 设备属性设置
      *
-     * 对应 IotDeviceMessageMethodEnum.DEVICE_PROPERTY_SET
+     * 对应 {@link IotDeviceMessageMethodEnum#PROPERTY_SET}
      */
     DEVICE_PROPERTY_SET(1),
     /**
      * 设备服务调用
      *
-     * 对应 IotDeviceMessageMethodEnum.DEVICE_SERVICE_INVOKE
+     * 对应 {@link IotDeviceMessageMethodEnum#SERVICE_INVOKE}
      */
     DEVICE_SERVICE_INVOKE(2),
 
@@ -38,8 +38,6 @@ public enum IotRuleSceneActionTypeEnum implements ArrayValuable<Integer> {
      */
     ALERT_RECOVER(101),
 
-    @Deprecated
-    ALERT(2), // 告警执行
     ;
 
     private final Integer type;

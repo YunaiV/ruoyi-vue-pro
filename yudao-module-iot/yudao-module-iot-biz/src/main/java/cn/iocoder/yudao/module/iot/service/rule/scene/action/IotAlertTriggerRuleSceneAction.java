@@ -8,21 +8,21 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nullable;
 
 /**
- * IoT 告警的 {@link IotRuleSceneAction} 实现类
+ * IoT 告警触发的 {@link IotSceneRuleAction} 实现类
  *
  * @author 芋道源码
  */
 @Component
-public class IotRuleSceneAlertAction implements IotRuleSceneAction {
+public class IotAlertTriggerRuleSceneAction implements IotSceneRuleAction {
 
     @Override
     public void execute(@Nullable IotDeviceMessage message, IotRuleSceneDO.ActionConfig config) {
-        // TODO @芋艿：待实现
+        // TODO @AI：
     }
 
     @Override
     public IotRuleSceneActionTypeEnum getType() {
-        return IotRuleSceneActionTypeEnum.ALERT;
+        return IotRuleSceneActionTypeEnum.ALERT_TRIGGER;
     }
 
 }

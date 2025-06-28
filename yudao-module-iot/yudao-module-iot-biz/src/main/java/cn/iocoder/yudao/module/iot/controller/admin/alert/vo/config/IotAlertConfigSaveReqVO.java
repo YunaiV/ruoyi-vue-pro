@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.alert.vo;
+package cn.iocoder.yudao.module.iot.controller.admin.alert.vo.config;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;

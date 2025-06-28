@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.AllArgsConstructor;
@@ -29,12 +30,12 @@ public class IotAlertRecordDO extends BaseDO {
     /**
      * 记录编号
      */
-    @TableField
+    @TableId
     private Long id;
     /**
      * 告警名称
      *
-     * 冗余 {@link IotAlertConfigDO#getName()}
+     * 冗余 {@link IotAlertConfigDO#getId()}
      */
     private Long configId;
     /**
@@ -42,7 +43,7 @@ public class IotAlertRecordDO extends BaseDO {
      *
      * 冗余 {@link IotAlertConfigDO#getName()}
      */
-    private String name;
+    private String configName;
 
     /**
      * 产品编号
@@ -56,8 +57,6 @@ public class IotAlertRecordDO extends BaseDO {
      * 关联 {@link IotDeviceDO#getId()}
      */
     private String deviceId;
-
-    // TODO @芋艿：有没更好的方式
     /**
      * 触发的设备消息
      */
@@ -65,10 +64,7 @@ public class IotAlertRecordDO extends BaseDO {
     private IotDeviceMessage deviceMessage;
 
     /**
-     * 处理状态
-     *
-     * true - 已处理
-     * false - 未处理
+     * 是否处理
      */
     private Boolean processStatus;
     /**

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.alert.vo;
+package cn.iocoder.yudao.module.iot.controller.admin.alert.vo.config;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

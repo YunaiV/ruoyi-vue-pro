@@ -12,13 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * IoT 设备控制的 {@link IotRuleSceneAction} 实现类
+ * IoT 设备控制的 {@link IotSceneRuleAction} 实现类
  *
  * @author 芋道源码
  */
 @Component
 @Slf4j
-public class IotRuleSceneDeviceControlAction implements IotRuleSceneAction {
+public class IotDeviceControlRuleSceneAction implements IotSceneRuleAction {
 
     @Resource
     private IotDeviceService deviceService;

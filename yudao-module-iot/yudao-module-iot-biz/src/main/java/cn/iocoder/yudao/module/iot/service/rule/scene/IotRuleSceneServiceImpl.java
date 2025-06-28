@@ -27,7 +27,7 @@ import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneConditionOperatorEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerTypeEnum;
 import cn.iocoder.yudao.module.iot.framework.job.core.IotSchedulerManager;
 import cn.iocoder.yudao.module.iot.job.rule.IotRuleSceneJob;
-import cn.iocoder.yudao.module.iot.service.rule.scene.action.IotRuleSceneAction;
+import cn.iocoder.yudao.module.iot.service.rule.scene.action.IotSceneRuleAction;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -39,15 +39,13 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Collection;
-import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.RULE_SCENE_NOT_EXISTS;
 
@@ -65,7 +63,7 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
     private IotRuleSceneMapper ruleSceneMapper;
 
     @Resource
-    private List<IotRuleSceneAction> ruleSceneActions;
+    private List<IotSceneRuleAction> ruleSceneActions;
 
     @Resource(name = "iotSchedulerManager")
     private IotSchedulerManager schedulerManager;
@@ -437,7 +435,7 @@ public class IotRuleSceneServiceImpl implements IotRuleSceneService {
             // 2. 遍历规则场景的动作
             ruleScene.getActions().forEach(actionConfig -> {
                 // 3.1 获取对应的动作 Action 数组
-                List<IotRuleSceneAction> actions = filterList(ruleSceneActions,
+                List<IotSceneRuleAction> actions = filterList(ruleSceneActions,
                         action -> action.getType().getType().equals(actionConfig.getType()));
                 if (CollUtil.isEmpty(actions)) {
                     return;

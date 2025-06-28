@@ -7,16 +7,14 @@ import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
 import javax.annotation.Nullable;
 
 /**
- * IoT 规则场景的场景执行器接口
+ * IoT 场景联动的执行器接口
  *
  * @author 芋道源码
  */
-public interface IotRuleSceneAction {
-
-    // TODO @芋艿：groovy 或者 javascript 实现数据的转换；可以考虑基于 hutool 的 ScriptUtil 做
+public interface IotSceneRuleAction {
 
     /**
-     * 执行场景
+     * 执行场景联动
      *
      * @param message 消息，允许空
      *                1. 空的情况：定时触发
