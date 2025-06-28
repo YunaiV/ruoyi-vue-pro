@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static java.util.Collections.singleton;
 
 @Tag(name = "管理后台 - IoT 告警记录")
 @RestController
@@ -49,7 +50,7 @@ public class IotAlertRecordController {
     @Operation(summary = "处理告警记录")
     @PreAuthorize("@ss.hasPermission('iot:alert-record:process')")
     public CommonResult<Boolean> processAlertRecord(@Valid @RequestBody IotAlertRecordProcessReqVO processReqVO) {
-        alertRecordService.processAlertRecord(processReqVO);
+        alertRecordService.processAlertRecordList(singleton(processReqVO.getId()), processReqVO.getProcessRemark());
         return success(true);
     }
 

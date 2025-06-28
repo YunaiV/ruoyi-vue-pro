@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotRuleSceneDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -51,6 +52,12 @@ public class IotAlertRecordDO extends BaseDO {
      * 字典 {@link cn.iocoder.yudao.module.iot.enums.DictTypeConstants#ALERT_LEVEL}
      */
     private Integer configLevel;
+    /**
+     * 场景规则编号
+     *
+     * 关联 {@link IotRuleSceneDO#getId()}
+     */
+    private Long sceneRuleId;
 
     /**
      * 产品编号

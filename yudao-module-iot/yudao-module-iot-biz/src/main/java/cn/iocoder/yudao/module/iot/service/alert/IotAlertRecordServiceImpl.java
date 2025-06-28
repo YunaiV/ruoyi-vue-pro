@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.iot.service.alert;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.alert.vo.recrod.IotAlertRecordPageReqVO;
-import cn.iocoder.yudao.module.iot.controller.admin.alert.vo.recrod.IotAlertRecordProcessReqVO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.alert.IotAlertConfigDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.alert.IotAlertRecordDO;
@@ -13,8 +13,8 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.ALERT_RECORD_NOT_EXISTS;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * IoT 告警记录 Service 实现类
@@ -42,35 +42,35 @@ public class IotAlertRecordServiceImpl implements IotAlertRecordService {
     }
 
     @Override
-    public void processAlertRecord(IotAlertRecordProcessReqVO processReqVO) {
-        // 校验告警记录是否存在
-        IotAlertRecordDO alertRecord = alertRecordMapper.selectById(processReqVO.getId());
-        if (alertRecord == null) {
-            throw exception(ALERT_RECORD_NOT_EXISTS);
-        }
-
-        // 更新处理状态和备注
-        alertRecordMapper.updateById(IotAlertRecordDO.builder()
-                .id(processReqVO.getId())
-                .processStatus(true)
-                .processRemark(processReqVO.getProcessRemark())
-                .build());
+    public List<IotAlertRecordDO> getAlertRecordListBySceneRuleId(Long sceneRuleId, Long deviceId, Boolean processStatus) {
+        return alertRecordMapper.selectListBySceneRuleId(sceneRuleId, deviceId, processStatus);
     }
 
     @Override
-    public Long createAlertRecord(IotAlertConfigDO config, IotDeviceMessage message) {
+    public void processAlertRecordList(Collection<Long> ids, String processRemark) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 批量更新告警记录的处理状态
+        alertRecordMapper.updateList(ids, IotAlertRecordDO.builder()
+                .processStatus(true).processRemark(processRemark).build());
+    }
+
+    @Override
+    public Long createAlertRecord(IotAlertConfigDO config, Long sceneRuleId, IotDeviceMessage message) {
         // 构建告警记录
         IotAlertRecordDO.IotAlertRecordDOBuilder builder = IotAlertRecordDO.builder()
                 .configId(config.getId()).configName(config.getName()).configLevel(config.getLevel())
-                .processStatus(false);
+                .sceneRuleId(sceneRuleId).processStatus(false);
         if (message != null) {
             builder.deviceMessage(message);
             // 填充设备信息
             IotDeviceDO device = deviceService.getDeviceFromCache(message.getDeviceId());
-            if (device!= null) {
+            if (device != null) {
                 builder.productId(device.getProductId()).deviceId(device.getId());
             }
         }
+
         // 插入记录
         IotAlertRecordDO record = builder.build();
         alertRecordMapper.insert(record);
