@@ -85,6 +85,7 @@ public class IotGatewayConfiguration {
     @Slf4j
     public static class TcpProtocolConfiguration {
 
+        // TODO @haohao：close
         @Bean
         public Vertx tcpVertx() {
             return Vertx.vertx();
@@ -92,16 +93,17 @@ public class IotGatewayConfiguration {
 
         @Bean
         public IotTcpUpstreamProtocol iotTcpUpstreamProtocol(Vertx tcpVertx, IotGatewayProperties gatewayProperties,
-                IotTcpConnectionManager connectionManager, IotDeviceMessageService messageService,
-                IotDeviceService deviceService, IotDeviceCommonApi deviceApi) {
+                                                             IotTcpConnectionManager connectionManager,
+                                                             IotDeviceMessageService messageService,
+                                                             IotDeviceService deviceService, IotDeviceCommonApi deviceApi) {
             return new IotTcpUpstreamProtocol(tcpVertx, gatewayProperties, connectionManager,
                     messageService, deviceService, deviceApi);
         }
 
         @Bean
         public IotTcpDownstreamSubscriber iotTcpDownstreamSubscriber(IotTcpUpstreamProtocol tcpUpstreamProtocol,
-                IotMessageBus messageBus,
-                IotTcpDownstreamHandler downstreamHandler) {
+                                                                     IotMessageBus messageBus,
+                                                                     IotTcpDownstreamHandler downstreamHandler) {
             return new IotTcpDownstreamSubscriber(tcpUpstreamProtocol, messageBus, downstreamHandler);
         }
 

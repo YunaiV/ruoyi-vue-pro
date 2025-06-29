@@ -79,7 +79,7 @@ public class IotEmqxDownstreamHandler {
         // 2. 根据消息方法和回复状态，构建 topic
         boolean isReply = IotDeviceMessageUtils.isReplyMessage(message);
 
-        // TODO @芋艿：看看基于 message 的 method 去反向推导；
+        // TODO @haohao：看看基于 message 的 method 去反向推导；
         // 3. 根据消息方法类型构建对应的主题
         switch (methodEnum) {
             case PROPERTY_POST:
@@ -88,21 +88,18 @@ public class IotEmqxDownstreamHandler {
                     return IotMqttTopicUtils.buildPropertyPostReplyTopic(productKey, deviceName);
                 }
                 break;
-
             case PROPERTY_SET:
                 // 属性设置：只支持非回复消息（下行）
                 if (!isReply) {
                     return IotMqttTopicUtils.buildPropertySetTopic(productKey, deviceName);
                 }
                 break;
-
             case EVENT_POST:
                 // 事件上报：只支持回复消息（下行）
                 if (isReply) {
                     return IotMqttTopicUtils.buildEventPostReplyTopicGeneric(productKey, deviceName);
                 }
                 break;
-
             case SERVICE_INVOKE:
                 // 服务调用：支持请求和回复
                 if (isReply) {
@@ -110,14 +107,12 @@ public class IotEmqxDownstreamHandler {
                 } else {
                     return IotMqttTopicUtils.buildServiceTopicGeneric(productKey, deviceName);
                 }
-
             case CONFIG_PUSH:
                 // 配置推送：平台向设备推送配置（下行请求），设备回复确认（上行回复）
                 if (!isReply) {
                     return IotMqttTopicUtils.buildConfigPushTopic(productKey, deviceName);
                 }
                 break;
-
             default:
                 log.warn("[buildTopicByMethod][未处理的消息方法: {}]", methodEnum);
                 break;

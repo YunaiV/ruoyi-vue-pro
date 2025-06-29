@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentMap;
 @Slf4j
 public class IotTcpConnectionManager {
 
+    // TODO @haohao：要考虑，相同设备，多次连接的情况哇？
     /**
      * 连接集合
      *
@@ -50,6 +51,7 @@ public class IotTcpConnectionManager {
      * @param socket Netty Channel
      */
     public void removeConnection(NetSocket socket) {
+        // TODO @haohao：vertx 的 socket，有没办法设置一些属性，类似 netty 的；目的是，避免遍历 connectionMap 去操作哈；
         connectionMap.entrySet().stream()
                 .filter(entry -> entry.getValue().equals(socket))
                 .findFirst()

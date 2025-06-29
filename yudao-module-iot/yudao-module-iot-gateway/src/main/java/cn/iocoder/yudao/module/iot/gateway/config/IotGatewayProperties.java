@@ -108,10 +108,12 @@ public class IotGatewayProperties {
          */
         @NotNull(message = "是否开启不能为空")
         private Boolean enabled;
+        // TODO @haohao：加个默认值？
         /**
          * 服务端口
          */
         private Integer serverPort;
+        // TODO @haohao：应该不用？一般都监听 0.0.0.0 哈；
         /**
          * 服务主机
          */

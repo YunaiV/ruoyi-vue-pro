@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 public class IotTcpDownstreamHandler {
 
     private final IotTcpConnectionManager connectionManager;
+
     private final IotDeviceMessageService messageService;
 
     /**
@@ -43,6 +44,7 @@ public class IotTcpDownstreamHandler {
         // 3. 发送消息
         socket.write(Buffer.buffer(bytes));
         // TODO @芋艿：这里的换行符，需要和设备端约定
+        // TODO @haohao：tcp 要不定长？很少 \n 哈。然后有个 magic number；可以参考 dubbo rpc；
         socket.write("\n");
     }
 

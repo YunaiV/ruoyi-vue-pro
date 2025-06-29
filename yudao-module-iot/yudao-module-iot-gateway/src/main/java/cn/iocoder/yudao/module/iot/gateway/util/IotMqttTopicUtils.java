@@ -16,6 +16,7 @@ public final class IotMqttTopicUtils {
      */
     private static final String SYS_TOPIC_PREFIX = "/sys/";
 
+    // TODO @haohao：这个要删除哇？
     /**
      * 服务调用主题前缀
      */
@@ -36,6 +37,7 @@ public final class IotMqttTopicUtils {
      */
     public static final String MQTT_EVENT_PATH = "/mqtt/event";
 
+    // TODO @haohao：这个要删除哇？
     /**
      * MQTT 授权接口路径（预留）
      * 对应 EMQX HTTP 授权插件的授权检查接口

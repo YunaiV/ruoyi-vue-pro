@@ -64,6 +64,7 @@ public class IotTcpConnectionHandler implements Handler<Buffer> {
     public void handle(Buffer buffer) {
         log.info("[handle][接收到数据: {}]", buffer);
         try {
+            // TODO @haohao：可以调研下，做个对比表格哈；
             // 1. 处理认证
             if (!authenticated) {
                 handleAuthentication(buffer);
@@ -80,6 +81,11 @@ public class IotTcpConnectionHandler implements Handler<Buffer> {
     private void handleAuthentication(Buffer buffer) {
         // 1. 解析认证信息
         // TODO @芋艿：这里的认证协议，需要和设备端约定。默认为 productKey,deviceName,password
+        // TODO @haohao：这里，要不也 json 解析？类似 http 是 {
+        //    "clientId": "4aymZgOTOOCrDKRT.small",
+        //    "username": "small&4aymZgOTOOCrDKRT",
+        //    "password": "509e2b08f7598eb139d276388c600435913ba4c94cd0d50aebc5c0d1855bcb75"
+        //}
         String[] parts = buffer.toString().split(",");
         if (parts.length != 3) {
             log.error("[handleAuthentication][认证信息({})格式不正确]", buffer);
