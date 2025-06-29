@@ -79,6 +79,7 @@ public class IotEmqxDownstreamHandler {
         // 2. 根据消息方法和回复状态，构建 topic
         boolean isReply = IotDeviceMessageUtils.isReplyMessage(message);
 
+        // TODO @芋艿：看看基于 message 的 method 去反向推导；
         // 3. 根据消息方法类型构建对应的主题
         switch (methodEnum) {
             case PROPERTY_POST:
@@ -96,6 +97,7 @@ public class IotEmqxDownstreamHandler {
                 break;
 
             case EVENT_POST:
+                // TODO @haohao：不用 eventIdentifier 拼接哈，直接 data 里面，有 identifier 字段
                 // 事件上报：只支持回复消息（下行）
                 if (isReply) {
                     String identifier = IotDeviceMessageUtils.getIdentifier(message);
@@ -107,6 +109,7 @@ public class IotEmqxDownstreamHandler {
 
             case SERVICE_INVOKE:
                 // 服务调用：支持请求和回复
+                // TODO @haohao：不用 serviceIdentifier 拼接哈，直接 data 里面，有 identifier 字段
                 String serviceIdentifier = IotDeviceMessageUtils.getIdentifier(message);
                 if (StrUtil.isNotBlank(serviceIdentifier)) {
                     if (isReply) {

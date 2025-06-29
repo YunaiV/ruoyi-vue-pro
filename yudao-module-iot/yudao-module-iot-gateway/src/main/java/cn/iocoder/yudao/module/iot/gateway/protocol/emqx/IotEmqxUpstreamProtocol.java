@@ -31,7 +31,7 @@ public class IotEmqxUpstreamProtocol {
 
     private volatile boolean isRunning = false;
 
-    private Vertx vertx;
+    private final Vertx vertx;
 
     @Getter
     private final String serverId;
