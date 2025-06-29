@@ -102,7 +102,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
      * 校验设备序列号全局唯一性
      *
      * @param serialNumber 设备序列号
-     * @param excludeId 排除的设备ID（用于更新时排除自身）
+     * @param excludeId 排除的设备编号（用于更新时排除自身）
      */
     private void validateSerialNumberUnique(String serialNumber, Long excludeId) {
         if (StrUtil.isBlank(serialNumber)) {
