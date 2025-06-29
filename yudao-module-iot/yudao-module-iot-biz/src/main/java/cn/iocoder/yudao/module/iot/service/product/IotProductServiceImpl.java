@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
-import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
@@ -47,12 +46,9 @@ public class IotProductServiceImpl implements IotProductService {
     @Override
     public Long createProduct(IotProductSaveReqVO createReqVO) {
         // 1. 校验 ProductKey
-        TenantUtils.executeIgnore(() -> {
-            // 为什么忽略租户？避免多个租户之间，productKey 重复，导致 TDengine 设备属性表重复
-            if (productMapper.selectByProductKey(createReqVO.getProductKey()) != null) {
-                throw exception(PRODUCT_KEY_EXISTS);
-            }
-        });
+        if (productMapper.selectByProductKey(createReqVO.getProductKey()) != null) {
+            throw exception(PRODUCT_KEY_EXISTS);
+        }
 
         // 2. 插入
         IotProductDO product = BeanUtils.toBean(createReqVO, IotProductDO.class)
