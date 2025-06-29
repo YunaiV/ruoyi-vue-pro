@@ -73,6 +73,8 @@ public class IotDeviceServiceImpl implements IotDeviceService {
                 createReqVO.getGatewayId(), product);
         // 1.3 校验分组存在
         deviceGroupService.validateDeviceGroupExists(createReqVO.getGroupIds());
+        // 1.4 校验设备序列号全局唯一
+        validateSerialNumberUnique(createReqVO.getSerialNumber(), null);
 
         // 2. 插入到数据库
         IotDeviceDO device = BeanUtils.toBean(createReqVO, IotDeviceDO.class);
@@ -81,38 +83,34 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         return device.getId();
     }
 
-    @Override
-    public IotDeviceDO createDevice(String productKey, String deviceName, Long gatewayId) {
-        // 1.1 校验产品是否存在
-        IotProductDO product = TenantUtils.executeIgnore(() -> productService.getProductByProductKey(productKey));
-        if (product == null) {
-            throw exception(PRODUCT_NOT_EXISTS);
-        }
-        return TenantUtils.execute(product.getTenantId(), () -> {
-            // 1.2 校验设备名称在同一产品下是否唯一
-            validateCreateDeviceParam(productKey, deviceName, gatewayId, product);
-
-            // 2. 插入到数据库
-            IotDeviceDO device = new IotDeviceDO().setDeviceName(deviceName).setGatewayId(gatewayId);
-            initDevice(device, product);
-            deviceMapper.insert(device);
-            return device;
-        });
-    }
-
     private void validateCreateDeviceParam(String productKey, String deviceName,
                                            Long gatewayId, IotProductDO product) {
+        // 校验设备名称在同一产品下是否唯一
         TenantUtils.executeIgnore(() -> {
-            // 校验设备名称在同一产品下是否唯一
             if (deviceMapper.selectByProductKeyAndDeviceName(productKey, deviceName) != null) {
                 throw exception(DEVICE_NAME_EXISTS);
             }
         });
-
         // 校验父设备是否为合法网关
         if (IotProductDeviceTypeEnum.isGatewaySub(product.getDeviceType())
                 && gatewayId != null) {
             validateGatewayDeviceExists(gatewayId);
+        }
+    }
+
+    /**
+     * 校验设备序列号全局唯一性
+     *
+     * @param serialNumber 设备序列号
+     * @param excludeId 排除的设备ID（用于更新时排除自身）
+     */
+    private void validateSerialNumberUnique(String serialNumber, Long excludeId) {
+        if (StrUtil.isBlank(serialNumber)) {
+            return;
+        }
+        IotDeviceDO existDevice = deviceMapper.selectBySerialNumber(serialNumber);
+        if (existDevice != null && ObjUtil.notEqual(existDevice.getId(), excludeId)) {
+            throw exception(DEVICE_SERIAL_NUMBER_EXISTS);
         }
     }
 
@@ -137,6 +135,8 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         }
         // 1.3 校验分组存在
         deviceGroupService.validateDeviceGroupExists(updateReqVO.getGroupIds());
+        // 1.4 校验设备序列号全局唯一
+        validateSerialNumberUnique(updateReqVO.getSerialNumber(), updateReqVO.getId());
 
         // 2. 更新到数据库
         IotDeviceDO updateObj = BeanUtils.toBean(updateReqVO, IotDeviceDO.class);
@@ -417,6 +417,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         devices.forEach(this::deleteDeviceCache);
     }
 
+    @SuppressWarnings("unused")
     @Caching(evict = {
         @CacheEvict(value = RedisKeyConstants.DEVICE, key = "#device.id"),
         @CacheEvict(value = RedisKeyConstants.DEVICE, key = "#device.productKey + '_' + #device.deviceName")

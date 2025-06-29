@@ -81,6 +81,10 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
                 .in(IotDeviceDO::getDeviceName, deviceNames));
     }
 
+    default IotDeviceDO selectBySerialNumber(String serialNumber) {
+        return selectOne(IotDeviceDO::getSerialNumber, serialNumber);
+    }
+
     /**
      * 查询指定产品下的设备数量
      *
