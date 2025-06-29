@@ -36,7 +36,6 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -430,25 +429,14 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         return deviceMapper.selectCountByCreateTime(createTime);
     }
 
-    // TODO @super：简化
     @Override
     public Map<Long, Integer> getDeviceCountMapByProductId() {
-        // 查询结果转换成Map
-        List<Map<String, Object>> list = deviceMapper.selectDeviceCountMapByProductId();
-        return list.stream().collect(Collectors.toMap(
-            map -> Long.valueOf(map.get("key").toString()),
-            map -> Integer.valueOf(map.get("value").toString())
-        ));
+        return deviceMapper.selectDeviceCountMapByProductId();
     }
 
     @Override
     public Map<Integer, Long> getDeviceCountMapByState() {
-        // 查询结果转换成Map
-        List<Map<String, Object>> list = deviceMapper.selectDeviceCountGroupByState();
-        return list.stream().collect(Collectors.toMap(
-            map -> Integer.valueOf(map.get("key").toString()),
-            map -> Long.valueOf(map.get("value").toString())
-        ));
+        return deviceMapper.selectDeviceCountGroupByState();
     }
 
     @Override

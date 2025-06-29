@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.IotDevicePageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Nullable;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * IoT 设备 Mapper
@@ -80,19 +82,33 @@ public interface IotDeviceMapper extends BaseMapperX<IotDeviceDO> {
     }
 
     /**
-     * 查询指定产品下各状态的设备数量
+     * 查询指定产品下的设备数量
      *
-     * @return 设备数量统计列表
+     * @return 产品编号 -> 设备数量的映射
      */
-    // TODO @super：通过 mybatis-plus 来写哈，然后返回 Map  貌似就行了？！
-    List<Map<String, Object>> selectDeviceCountMapByProductId();
+    default Map<Long, Integer> selectDeviceCountMapByProductId() {
+        List<Map<String, Object>> result = selectMaps(new QueryWrapper<IotDeviceDO>()
+                .select("product_id AS productId", "COUNT(1) AS deviceCount")
+                .groupBy("product_id"));
+        return result.stream().collect(Collectors.toMap(
+            map -> Long.valueOf(map.get("productId").toString()),
+            map -> Integer.valueOf(map.get("deviceCount").toString())
+        ));
+    }
 
-    // TODO @super：通过 mybatis-plus 来写哈，然后返回 Map  貌似就行了？！
     /**
      * 查询各个状态下的设备数量
      *
-     * @return 设备数量统计列表
+     * @return 设备状态 -> 设备数量的映射
      */
-    List<Map<String, Object>> selectDeviceCountGroupByState();
+    default Map<Integer, Long> selectDeviceCountGroupByState() {
+        List<Map<String, Object>> result = selectMaps(new QueryWrapper<IotDeviceDO>()
+                .select("state", "COUNT(1) AS deviceCount")
+                .groupBy("state"));
+        return result.stream().collect(Collectors.toMap(
+            map -> Integer.valueOf(map.get("state").toString()),
+            map -> Long.valueOf(map.get("deviceCount").toString())
+        ));
+    }
 
 }
