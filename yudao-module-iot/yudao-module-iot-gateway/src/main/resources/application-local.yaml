@@ -1,5 +1,4 @@
 # ==================== IoT 网关本地开发环境配置 ====================
-
 --- #################### 消息队列相关 ####################
 
 # rocketmq 配置项，对应 RocketMQProperties 配置类
@@ -41,6 +40,13 @@ yudao:
           mqtt-ssl: false                       # 是否开启 SSL
           mqtt-topics:
             - "/sys/#"                         # 系统主题
+        # ====================================
+        # 针对引入的 TCP 组件的配置
+        # ====================================
+        tcp:
+          enabled: true
+          server-port: 8093
+          server-host: 0.0.0.0
 
     # 消息总线配置
     message-bus:
@@ -52,7 +58,7 @@ yudao:
 logging:
   level:
     # 开发环境详细日志
-    cn.iocoder.yudao.module.iot.gateway.protocol.mqtt: DEBUG
+    cn.iocoder.yudao.module.iot.gateway.protocol.emqx: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.http: DEBUG
     # MQTT 客户端日志
 #    io.vertx.mqtt: DEBUG

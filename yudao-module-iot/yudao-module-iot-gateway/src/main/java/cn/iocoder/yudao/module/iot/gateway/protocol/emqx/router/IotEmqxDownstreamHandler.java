@@ -97,28 +97,19 @@ public class IotEmqxDownstreamHandler {
                 break;
 
             case EVENT_POST:
-                // TODO @haohao：不用 eventIdentifier 拼接哈，直接 data 里面，有 identifier 字段
                 // 事件上报：只支持回复消息（下行）
                 if (isReply) {
-                    String identifier = IotDeviceMessageUtils.getIdentifier(message);
-                    if (StrUtil.isNotBlank(identifier)) {
-                        return IotMqttTopicUtils.buildEventPostReplyTopic(productKey, deviceName, identifier);
-                    }
+                    return IotMqttTopicUtils.buildEventPostReplyTopicGeneric(productKey, deviceName);
                 }
                 break;
 
             case SERVICE_INVOKE:
                 // 服务调用：支持请求和回复
-                // TODO @haohao：不用 serviceIdentifier 拼接哈，直接 data 里面，有 identifier 字段
-                String serviceIdentifier = IotDeviceMessageUtils.getIdentifier(message);
-                if (StrUtil.isNotBlank(serviceIdentifier)) {
-                    if (isReply) {
-                        return IotMqttTopicUtils.buildServiceReplyTopic(productKey, deviceName, serviceIdentifier);
-                    } else {
-                        return IotMqttTopicUtils.buildServiceTopic(productKey, deviceName, serviceIdentifier);
-                    }
+                if (isReply) {
+                    return IotMqttTopicUtils.buildServiceReplyTopicGeneric(productKey, deviceName);
+                } else {
+                    return IotMqttTopicUtils.buildServiceTopicGeneric(productKey, deviceName);
                 }
-                break;
 
             case CONFIG_PUSH:
                 // 配置推送：平台向设备推送配置（下行请求），设备回复确认（上行回复）

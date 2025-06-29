@@ -78,6 +78,11 @@ public class IotGatewayProperties {
          */
         private EmqxProperties emqx;
 
+        /**
+         * TCP 组件配置
+         */
+        private TcpProperties tcp;
+
     }
 
     @Data
@@ -92,6 +97,25 @@ public class IotGatewayProperties {
          * 服务端口
          */
         private Integer serverPort;
+
+    }
+
+    @Data
+    public static class TcpProperties {
+
+        /**
+         * 是否开启
+         */
+        @NotNull(message = "是否开启不能为空")
+        private Boolean enabled;
+        /**
+         * 服务端口
+         */
+        private Integer serverPort;
+        /**
+         * 服务主机
+         */
+        private String serverHost;
 
     }
 

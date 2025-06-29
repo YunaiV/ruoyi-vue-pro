@@ -80,42 +80,6 @@ public final class IotMqttTopicUtils {
     }
 
     /**
-     * 构建设备服务调用主题
-     *
-     * @param productKey        产品 Key
-     * @param deviceName        设备名称
-     * @param serviceIdentifier 服务标识符
-     * @return 完整的主题路径
-     */
-    public static String buildServiceTopic(String productKey, String deviceName, String serviceIdentifier) {
-        return buildDeviceTopicPrefix(productKey, deviceName) + SERVICE_TOPIC_PREFIX + serviceIdentifier;
-    }
-
-    /**
-     * 构建设备服务调用回复主题
-     *
-     * @param productKey        产品 Key
-     * @param deviceName        设备名称
-     * @param serviceIdentifier 服务标识符
-     * @return 完整的主题路径
-     */
-    public static String buildServiceReplyTopic(String productKey, String deviceName, String serviceIdentifier) {
-        return buildDeviceTopicPrefix(productKey, deviceName) + SERVICE_TOPIC_PREFIX + serviceIdentifier + "_reply";
-    }
-
-    /**
-     * 构建设备事件上报回复主题
-     *
-     * @param productKey      产品 Key
-     * @param deviceName      设备名称
-     * @param eventIdentifier 事件标识符
-     * @return 完整的主题路径
-     */
-    public static String buildEventPostReplyTopic(String productKey, String deviceName, String eventIdentifier) {
-        return buildDeviceTopicPrefix(productKey, deviceName) + "/thing/event/" + eventIdentifier + "_reply";
-    }
-
-    /**
      * 构建设备配置推送主题
      *
      * @param productKey 产品 Key
@@ -124,6 +88,45 @@ public final class IotMqttTopicUtils {
      */
     public static String buildConfigPushTopic(String productKey, String deviceName) {
         return buildDeviceTopicPrefix(productKey, deviceName) + "/thing/config/push";
+    }
+
+    /**
+     * 构建设备事件上报通用回复主题
+     * <p>
+     * 不包含具体的事件标识符，事件标识符通过消息 data 中的 identifier 字段传递
+     *
+     * @param productKey 产品 Key
+     * @param deviceName 设备名称
+     * @return 完整的主题路径
+     */
+    public static String buildEventPostReplyTopicGeneric(String productKey, String deviceName) {
+        return buildDeviceTopicPrefix(productKey, deviceName) + "/thing/event/post_reply";
+    }
+
+    /**
+     * 构建设备服务调用通用主题
+     * <p>
+     * 不包含具体的服务标识符，服务标识符通过消息 data 中的 identifier 字段传递
+     *
+     * @param productKey 产品 Key
+     * @param deviceName 设备名称
+     * @return 完整的主题路径
+     */
+    public static String buildServiceTopicGeneric(String productKey, String deviceName) {
+        return buildDeviceTopicPrefix(productKey, deviceName) + "/thing/service/invoke";
+    }
+
+    /**
+     * 构建设备服务调用通用回复主题
+     * <p>
+     * 不包含具体的服务标识符，服务标识符通过消息 data 中的 identifier 字段传递
+     *
+     * @param productKey 产品 Key
+     * @param deviceName 设备名称
+     * @return 完整的主题路径
+     */
+    public static String buildServiceReplyTopicGeneric(String productKey, String deviceName) {
+        return buildDeviceTopicPrefix(productKey, deviceName) + "/thing/service/invoke_reply";
     }
 
 }
