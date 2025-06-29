@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType;
+package cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.model.dataType;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotEmpty;
@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 /**
  * IoT 物模型数据类型为布尔型或枚举型的 DataSpec 定义
  *
- * 数据类型，取值为 bool 或 enum。
+ * 数据类型，取值为 bool 或 enum
  *
  * @author HUIHUI
  */

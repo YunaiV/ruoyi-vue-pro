@@ -106,6 +106,6 @@ public interface IotThingModelService {
      * @param productId 产品编号
      * @param identifiers 标识符集合
      */
-    void validateThingModelsExist(Long productId, Set<String> identifiers);
+    void validateThingModelListExists(Long productId, Set<String> identifiers);
 
 }

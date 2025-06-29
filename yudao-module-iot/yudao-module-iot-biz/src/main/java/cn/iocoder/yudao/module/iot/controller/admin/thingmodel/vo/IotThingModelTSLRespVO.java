@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo;
 
-import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelEvent;
-import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelProperty;
-import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.ThingModelService;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.model.ThingModelEvent;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.model.ThingModelProperty;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.model.ThingModelService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 public class IotThingModelTSLRespVO {
 
-    @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @Schema(description = "产品编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long productId;
 
     @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "temperature_sensor")

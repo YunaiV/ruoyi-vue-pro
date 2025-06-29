@@ -1,14 +1,15 @@
 package cn.iocoder.yudao.module.iot.controller.admin.thingmodel;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.vo.*;
+import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
+import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
+import com.google.common.base.Objects;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,6 +33,8 @@ public class IotThingModelController {
 
     @Resource
     private IotThingModelService thingModelService;
+    @Resource
+    private IotProductService productService;
 
     @PostMapping("/create")
     @Operation(summary = "创建产品物模型")
@@ -71,23 +74,21 @@ public class IotThingModelController {
     @Parameter(name = "productId", description = "产品 ID", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('iot:thing-model:query')")
     public CommonResult<IotThingModelTSLRespVO> getThingModelTsl(@RequestParam("productId") Long productId) {
-        IotThingModelTSLRespVO tslRespVO = new IotThingModelTSLRespVO();
-        // TODO @puhui999：是不是要先查询产品哈？原因是，万一没配置物模型，但是产品已经有了！
-        // 1. 获得产品所有物模型定义
-        List<IotThingModelDO> thingModels = thingModelService.getThingModelListByProductId(productId);
-        if (CollUtil.isEmpty(thingModels)) {
-            return success(tslRespVO);
+        // 1. 获得产品
+        IotProductDO product = productService.getProduct(productId);
+        if (product == null) {
+            return success(null);
         }
-
-        // 2. 设置公共部分参数
-        IotThingModelDO thingModel = thingModels.get(0);
-        tslRespVO.setProductId(thingModel.getProductId()).setProductKey(thingModel.getProductKey());
+        IotThingModelTSLRespVO tslRespVO = new IotThingModelTSLRespVO()
+                .setProductId(product.getId()).setProductKey(product.getProductKey());
+        // 2. 获得物模型定义
+        List<IotThingModelDO> thingModels = thingModelService.getThingModelListByProductId(productId);
         tslRespVO.setProperties(convertList(filterList(thingModels, item ->
-                ObjUtil.equal(IotThingModelTypeEnum.PROPERTY.getType(), item.getType())), IotThingModelDO::getProperty));
-        tslRespVO.setServices(convertList(filterList(thingModels, item ->
-                ObjUtil.equal(IotThingModelTypeEnum.SERVICE.getType(), item.getType())), IotThingModelDO::getService));
-        tslRespVO.setEvents(convertList(filterList(thingModels, item ->
-                ObjUtil.equal(IotThingModelTypeEnum.EVENT.getType(), item.getType())), IotThingModelDO::getEvent));
+                        Objects.equal(IotThingModelTypeEnum.PROPERTY.getType(), item.getType())), IotThingModelDO::getProperty))
+                .setServices(convertList(filterList(thingModels, item ->
+                        Objects.equal(IotThingModelTypeEnum.SERVICE.getType(), item.getType())), IotThingModelDO::getService))
+                .setEvents(convertList(filterList(thingModels, item ->
+                        Objects.equal(IotThingModelTypeEnum.EVENT.getType(), item.getType())), IotThingModelDO::getEvent));
         return success(tslRespVO);
     }
 

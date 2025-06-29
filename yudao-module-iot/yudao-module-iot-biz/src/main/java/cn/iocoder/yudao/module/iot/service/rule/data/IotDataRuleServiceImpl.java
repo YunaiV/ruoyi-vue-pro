@@ -143,7 +143,7 @@ public class IotDataRuleServiceImpl implements IotDataRuleService {
                             productId -> new HashSet<>()).add(config.getIdentifier());
         }
         for (Map.Entry<Long, Set<String>> entry : productIdIdentifiers.entrySet()) {
-            thingModelService.validateThingModelsExist(entry.getKey(), entry.getValue());
+            thingModelService.validateThingModelListExists(entry.getKey(), entry.getValue());
         }
     }
 

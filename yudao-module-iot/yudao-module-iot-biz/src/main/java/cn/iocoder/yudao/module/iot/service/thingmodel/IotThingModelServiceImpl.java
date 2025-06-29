@@ -66,7 +66,7 @@ public class IotThingModelServiceImpl implements IotThingModelService {
         thingModelMapper.insert(thingModel);
 
         // 3. 删除缓存
-        deleteThingModelListCache(createReqVO.getProductKey());
+        deleteThingModelListCache(createReqVO.getProductId());
         return thingModel.getId();
     }
 
@@ -85,7 +85,7 @@ public class IotThingModelServiceImpl implements IotThingModelService {
         thingModelMapper.updateById(thingModel);
 
         // 3. 删除缓存
-        deleteThingModelListCache(updateReqVO.getProductKey());
+        deleteThingModelListCache(updateReqVO.getProductId());
     }
 
     @Override
@@ -103,7 +103,7 @@ public class IotThingModelServiceImpl implements IotThingModelService {
         thingModelMapper.deleteById(id);
 
         // 3. 删除缓存
-        deleteThingModelListCache(thingModel.getProductKey());
+        deleteThingModelListCache(thingModel.getProductId());
     }
 
     @Override
@@ -128,7 +128,7 @@ public class IotThingModelServiceImpl implements IotThingModelService {
 
     @Override
     @Cacheable(value = RedisKeyConstants.THING_MODEL_LIST, key = "#productId")
-    @TenantIgnore // 忽略租户信息，跨租户 productKey 是唯一的
+    @TenantIgnore // 忽略租户信息
     public List<IotThingModelDO> getThingModelListByProductIdFromCache(Long productId) {
         return thingModelMapper.selectListByProductId(productId);
     }
@@ -144,7 +144,7 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     }
 
     @Override
-    public void validateThingModelsExist(Long productId, Set<String> identifiers) {
+    public void validateThingModelListExists(Long productId, Set<String> identifiers) {
         if (CollUtil.isEmpty(identifiers)) {
             return;
         }
@@ -158,11 +158,6 @@ public class IotThingModelServiceImpl implements IotThingModelService {
         }
     }
 
-    /**
-     * 校验功能是否存在
-     *
-     * @param id 功能编号
-     */
     private void validateProductThingModelMapperExists(Long id) {
         if (thingModelMapper.selectById(id) == null) {
             throw exception(THING_MODEL_NOT_EXISTS);
@@ -170,13 +165,12 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     }
 
     private void validateIdentifierUnique(Long id, Long productId, String identifier) {
-        // 1.0 情况一：创建时校验
+        // 1. 情况一：创建时校验
         if (id == null) {
             // 1.1 系统保留字段，不能用于标识符定义
             if (StrUtil.equalsAny(identifier, "set", "get", "post", "property", "event", "time", "value")) {
                 throw exception(THING_MODEL_IDENTIFIER_INVALID);
             }
-
             // 1.2 校验唯一
             IotThingModelDO thingModel = thingModelMapper.selectByProductIdAndIdentifier(productId, identifier);
             if (thingModel != null) {
@@ -185,7 +179,7 @@ public class IotThingModelServiceImpl implements IotThingModelService {
             return;
         }
 
-        // 2.0 情况二：更新时校验
+        // 2. 情况二：更新时校验
         IotThingModelDO thingModel = thingModelMapper.selectByProductIdAndIdentifier(productId, identifier);
         if (thingModel != null && ObjectUtil.notEqual(thingModel.getId(), id)) {
             throw exception(THING_MODEL_IDENTIFIER_EXISTS);
@@ -206,13 +200,14 @@ public class IotThingModelServiceImpl implements IotThingModelService {
         }
     }
 
-    private void deleteThingModelListCache(String productKey) {
+    private void deleteThingModelListCache(Long productId) {
         // 保证 Spring AOP 触发
-        getSelf().deleteThingModelListCache0(productKey);
+        getSelf().deleteThingModelListCache0(productId);
     }
 
-    @CacheEvict(value = RedisKeyConstants.THING_MODEL_LIST, key = "#productKey")
-    public void deleteThingModelListCache0(String productKey) {
+    @CacheEvict(value = RedisKeyConstants.THING_MODEL_LIST, key = "#productId")
+    @TenantIgnore // 忽略租户信息
+    public void deleteThingModelListCache0(Long productId) {
     }
 
     private IotThingModelServiceImpl getSelf() {

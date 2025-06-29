@@ -1,7 +1,7 @@
-package cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model;
+package cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.model;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType.ThingModelDataSpecs;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.model.dataType.ThingModelDataSpecs;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotDataSpecsDataTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelParamDirectionEnum;
 import jakarta.validation.constraints.NotEmpty;

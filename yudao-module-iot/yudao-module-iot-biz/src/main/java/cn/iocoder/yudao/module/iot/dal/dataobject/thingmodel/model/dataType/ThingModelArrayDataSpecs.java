@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.thingmodel.model.dataType;
+package cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.model.dataType;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.Valid;
