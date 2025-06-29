@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxDownstreamSubscr
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxUpstreamProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpUpstreamProtocol;
+import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -45,14 +46,21 @@ public class IotGatewayConfiguration {
     @Slf4j
     public static class MqttProtocolConfiguration {
 
-        @Bean
-        public IotEmqxAuthEventProtocol iotEmqxAuthEventProtocol(IotGatewayProperties gatewayProperties) {
-            return new IotEmqxAuthEventProtocol(gatewayProperties.getProtocol().getEmqx());
+        @Bean(destroyMethod = "close")
+        public Vertx emqxVertx() {
+            return Vertx.vertx();
         }
 
         @Bean
-        public IotEmqxUpstreamProtocol iotEmqxUpstreamProtocol(IotGatewayProperties gatewayProperties) {
-            return new IotEmqxUpstreamProtocol(gatewayProperties.getProtocol().getEmqx());
+        public IotEmqxAuthEventProtocol iotEmqxAuthEventProtocol(IotGatewayProperties gatewayProperties,
+                                                                 Vertx emqxVertx) {
+            return new IotEmqxAuthEventProtocol(gatewayProperties.getProtocol().getEmqx(), emqxVertx);
+        }
+
+        @Bean
+        public IotEmqxUpstreamProtocol iotEmqxUpstreamProtocol(IotGatewayProperties gatewayProperties,
+                                                               Vertx emqxVertx) {
+            return new IotEmqxUpstreamProtocol(gatewayProperties.getProtocol().getEmqx(), emqxVertx);
         }
 
         @Bean

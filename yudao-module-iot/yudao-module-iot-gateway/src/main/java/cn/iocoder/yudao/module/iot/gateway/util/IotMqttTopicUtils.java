@@ -91,4 +91,39 @@ public final class IotMqttTopicUtils {
         return buildDeviceTopicPrefix(productKey, deviceName) + SERVICE_TOPIC_PREFIX + serviceIdentifier;
     }
 
+    /**
+     * 构建设备服务调用回复主题
+     *
+     * @param productKey        产品 Key
+     * @param deviceName        设备名称
+     * @param serviceIdentifier 服务标识符
+     * @return 完整的主题路径
+     */
+    public static String buildServiceReplyTopic(String productKey, String deviceName, String serviceIdentifier) {
+        return buildDeviceTopicPrefix(productKey, deviceName) + SERVICE_TOPIC_PREFIX + serviceIdentifier + "_reply";
+    }
+
+    /**
+     * 构建设备事件上报回复主题
+     *
+     * @param productKey      产品 Key
+     * @param deviceName      设备名称
+     * @param eventIdentifier 事件标识符
+     * @return 完整的主题路径
+     */
+    public static String buildEventPostReplyTopic(String productKey, String deviceName, String eventIdentifier) {
+        return buildDeviceTopicPrefix(productKey, deviceName) + "/thing/event/" + eventIdentifier + "_reply";
+    }
+
+    /**
+     * 构建设备配置推送主题
+     *
+     * @param productKey 产品 Key
+     * @param deviceName 设备名称
+     * @return 完整的主题路径
+     */
+    public static String buildConfigPushTopic(String productKey, String deviceName) {
+        return buildDeviceTopicPrefix(productKey, deviceName) + "/thing/config/push";
+    }
+
 }

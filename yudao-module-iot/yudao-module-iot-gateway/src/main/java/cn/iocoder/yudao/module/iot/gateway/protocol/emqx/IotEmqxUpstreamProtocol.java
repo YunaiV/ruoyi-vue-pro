@@ -10,7 +10,6 @@ import io.vertx.mqtt.MqttClient;
 import io.vertx.mqtt.MqttClientOptions;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import jodd.util.ThreadUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,9 +40,11 @@ public class IotEmqxUpstreamProtocol {
 
     private IotEmqxUpstreamHandler upstreamHandler;
 
-    public IotEmqxUpstreamProtocol(IotGatewayProperties.EmqxProperties emqxProperties) {
+    public IotEmqxUpstreamProtocol(IotGatewayProperties.EmqxProperties emqxProperties,
+                                   Vertx vertx) {
         this.emqxProperties = emqxProperties;
         this.serverId = IotDeviceMessageUtils.generateServerId(emqxProperties.getMqttPort());
+        this.vertx = vertx;
     }
 
     @PostConstruct
@@ -53,13 +54,10 @@ public class IotEmqxUpstreamProtocol {
         }
 
         try {
-            // 1. 初始化 Vertx 实例
-            this.vertx = Vertx.vertx();
-
-            // 2. 启动 MQTT 客户端
+            // 1. 启动 MQTT 客户端
             startMqttClient();
 
-            // 3. 标记服务为运行状态
+            // 2. 标记服务为运行状态
             isRunning = true;
             log.info("[start][IoT 网关 EMQX 协议启动成功]");
         } catch (Exception e) {
@@ -67,10 +65,16 @@ public class IotEmqxUpstreamProtocol {
             stop();
 
             // 异步关闭应用
-            // TODO haohao：是不是不用 sleep 也行哈？
             Thread shutdownThread = new Thread(() -> {
-                ThreadUtil.sleep(1000);
-                log.error("[start][由于 MQTT 连接失败，正在关闭应用]");
+                try {
+                    // 确保日志输出完成，使用更优雅的方式
+                    log.error("[start][由于 MQTT 连接失败，正在关闭应用]");
+                    // 等待日志输出完成
+                    Thread.sleep(1000);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    log.warn("[start][应用关闭被中断]");
+                }
                 System.exit(1);
             });
             shutdownThread.setDaemon(true);
@@ -90,16 +94,7 @@ public class IotEmqxUpstreamProtocol {
         // 1. 停止 MQTT 客户端
         stopMqttClient();
 
-        // 2. 关闭 Vertx 实例
-        if (vertx != null) {
-            try {
-                vertx.close();
-            } catch (Exception e) {
-                log.warn("[stop][关闭 Vertx 实例失败]", e);
-            }
-        }
-
-        // 3. 标记服务为停止状态
+        // 2. 标记服务为停止状态
         isRunning = false;
         log.info("[stop][IoT 网关 MQTT 协议服务已停止]");
     }
@@ -147,7 +142,7 @@ public class IotEmqxUpstreamProtocol {
 
         // 2. 等待连接结果
         try {
-            // TODO @haohao：想了下，timeout 可以不设置，全靠 mqttclient 的超时时间？
+            // 应用层超时控制：防止启动过程无限阻塞，与MQTT客户端的网络超时是不同层次的控制
             boolean awaitResult = latch.await(10, java.util.concurrent.TimeUnit.SECONDS);
             if (!awaitResult) {
                 log.error("[connectMqttSync][等待连接结果超时]");

@@ -54,7 +54,8 @@ public class IotEmqxDownstreamHandler {
             return;
         }
         // 2.2 构建载荷
-        byte[] payload = deviceMessageService.encodeDeviceMessage(message, deviceInfo.getProductKey(), deviceInfo.getDeviceName());
+        byte[] payload = deviceMessageService.encodeDeviceMessage(message, deviceInfo.getProductKey(),
+                deviceInfo.getDeviceName());
         // 2.3 发布消息
         protocol.publishMessage(topic, payload);
     }
@@ -78,19 +79,53 @@ public class IotEmqxDownstreamHandler {
         // 2. 根据消息方法和回复状态，构建 topic
         boolean isReply = IotDeviceMessageUtils.isReplyMessage(message);
 
-        // TODO @芋艿：需要添加对应的 Topic，所以需要先判断消息方法类型
-        // TODO @haohao：基于 method，然后逆推对应的 topic，可以哇？约定好~
-        // 根据消息方法和回复状态构建对应的主题
+        // 3. 根据消息方法类型构建对应的主题
         switch (methodEnum) {
             case PROPERTY_POST:
+                // 属性上报：只支持回复消息（下行）
                 if (isReply) {
                     return IotMqttTopicUtils.buildPropertyPostReplyTopic(productKey, deviceName);
                 }
                 break;
+
             case PROPERTY_SET:
+                // 属性设置：只支持非回复消息（下行）
                 if (!isReply) {
                     return IotMqttTopicUtils.buildPropertySetTopic(productKey, deviceName);
                 }
+                break;
+
+            case EVENT_POST:
+                // 事件上报：只支持回复消息（下行）
+                if (isReply) {
+                    String identifier = IotDeviceMessageUtils.getIdentifier(message);
+                    if (StrUtil.isNotBlank(identifier)) {
+                        return IotMqttTopicUtils.buildEventPostReplyTopic(productKey, deviceName, identifier);
+                    }
+                }
+                break;
+
+            case SERVICE_INVOKE:
+                // 服务调用：支持请求和回复
+                String serviceIdentifier = IotDeviceMessageUtils.getIdentifier(message);
+                if (StrUtil.isNotBlank(serviceIdentifier)) {
+                    if (isReply) {
+                        return IotMqttTopicUtils.buildServiceReplyTopic(productKey, deviceName, serviceIdentifier);
+                    } else {
+                        return IotMqttTopicUtils.buildServiceTopic(productKey, deviceName, serviceIdentifier);
+                    }
+                }
+                break;
+
+            case CONFIG_PUSH:
+                // 配置推送：平台向设备推送配置（下行请求），设备回复确认（上行回复）
+                if (!isReply) {
+                    return IotMqttTopicUtils.buildConfigPushTopic(productKey, deviceName);
+                }
+                break;
+
+            default:
+                log.warn("[buildTopicByMethod][未处理的消息方法: {}]", methodEnum);
                 break;
         }
 
