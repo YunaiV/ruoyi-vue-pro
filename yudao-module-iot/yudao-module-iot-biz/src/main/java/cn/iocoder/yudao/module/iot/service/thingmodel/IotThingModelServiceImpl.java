@@ -20,6 +20,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -47,6 +48,7 @@ public class IotThingModelServiceImpl implements IotThingModelService {
     private IotThingModelMapper thingModelMapper;
 
     @Resource
+    @Lazy // 延迟加载，解决循环依赖
     private IotProductService productService;
 
     @Override

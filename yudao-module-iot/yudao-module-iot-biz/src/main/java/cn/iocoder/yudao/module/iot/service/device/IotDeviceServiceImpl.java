@@ -56,6 +56,7 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     private IotDeviceMapper deviceMapper;
 
     @Resource
+    @Lazy  // 延迟加载，解决循环依赖
     private IotProductService productService;
     @Resource
     @Lazy // 延迟加载，解决循环依赖

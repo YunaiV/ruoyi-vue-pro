@@ -10,12 +10,12 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.product.IotProductMapper;
 import cn.iocoder.yudao.module.iot.dal.redis.RedisKeyConstants;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductStatusEnum;
+import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.property.IotDevicePropertyService;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import jakarta.annotation.Resource;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -40,8 +40,9 @@ public class IotProductServiceImpl implements IotProductService {
     private IotProductMapper productMapper;
 
     @Resource
-    @Lazy  // 延迟加载，解决循环依赖
     private IotDevicePropertyService devicePropertyDataService;
+    @Resource
+    private IotDeviceService deviceService;
 
     @Override
     public Long createProduct(IotProductSaveReqVO createReqVO) {
@@ -65,6 +66,7 @@ public class IotProductServiceImpl implements IotProductService {
         IotProductDO iotProductDO = validateProductExists(updateReqVO.getId());
         // 1.2 发布状态不可更新
         validateProductStatus(iotProductDO);
+
         // 2. 更新
         IotProductDO updateObj = BeanUtils.toBean(updateReqVO, IotProductDO.class);
         productMapper.updateById(updateObj);
@@ -74,9 +76,14 @@ public class IotProductServiceImpl implements IotProductService {
     @CacheEvict(value = RedisKeyConstants.PRODUCT, key = "#id")
     public void deleteProduct(Long id) {
         // 1.1 校验存在
-        IotProductDO iotProductDO = validateProductExists(id);
+        IotProductDO product = validateProductExists(id);
         // 1.2 发布状态不可删除
-        validateProductStatus(iotProductDO);
+        validateProductStatus(product);
+        // 1.3 校验是否有设备
+        if (deviceService.getDeviceCountByProductId(id) > 0) {
+            throw exception(PRODUCT_DELETE_FAIL_HAS_DEVICE);
+        }
+
         // 2. 删除
         productMapper.deleteById(id);
     }

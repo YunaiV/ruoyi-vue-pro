@@ -23,6 +23,7 @@ import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -58,6 +59,7 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     @Resource
     private IotThingModelService thingModelService;
     @Resource
+    @Lazy  // 延迟加载，解决循环依赖
     private IotProductService productService;
 
     @Resource
