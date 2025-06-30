@@ -6,7 +6,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.task.IotOtaUpgradeTaskPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.task.IotOtaUpgradeTaskRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.task.IotOtaUpgradeTaskSaveReqVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaUpgradeTaskDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaTaskDO;
 import cn.iocoder.yudao.module.iot.service.ota.IotOtaUpgradeTaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -48,7 +48,7 @@ public class IotOtaUpgradeTaskController {
     @Operation(summary = "获得升级任务分页")
     @PreAuthorize(value = "@ss.hasPermission('iot:ota-upgrade-task:query')")
     public CommonResult<PageResult<IotOtaUpgradeTaskRespVO>> getUpgradeTaskPage(@Valid IotOtaUpgradeTaskPageReqVO pageReqVO) {
-        PageResult<IotOtaUpgradeTaskDO> pageResult = upgradeTaskService.getUpgradeTaskPage(pageReqVO);
+        PageResult<IotOtaTaskDO> pageResult = upgradeTaskService.getUpgradeTaskPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, IotOtaUpgradeTaskRespVO.class));
     }
 
@@ -57,7 +57,7 @@ public class IotOtaUpgradeTaskController {
     @Parameter(name = "id", description = "升级任务编号", required = true, example = "1024")
     @PreAuthorize(value = "@ss.hasPermission('iot:ota-upgrade-task:query')")
     public CommonResult<IotOtaUpgradeTaskRespVO> getUpgradeTask(@RequestParam("id") Long id) {
-        IotOtaUpgradeTaskDO upgradeTask = upgradeTaskService.getUpgradeTask(id);
+        IotOtaTaskDO upgradeTask = upgradeTaskService.getUpgradeTask(id);
         return success(BeanUtils.toBean(upgradeTask, IotOtaUpgradeTaskRespVO.class));
     }
 

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.dal.dataobject.ota;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
+import cn.iocoder.yudao.module.iot.enums.ota.IotOtaTaskRecordStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -11,17 +12,17 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 /**
- * IoT OTA 升级记录 DO
+ * IoT OTA 升级任务记录 DO
  *
  * @author 芋道源码
  */
-@TableName(value = "iot_ota_upgrade_record", autoResultMap = true)
-@KeySequence("iot_ota_upgrade_record_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName(value = "iot_ota_task_record", autoResultMap = true)
+@KeySequence("iot_ota_task_record_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IotOtaUpgradeRecordDO extends BaseDO {
+public class IotOtaTaskRecordDO extends BaseDO {
 
     @TableId
     private Long id;
@@ -35,28 +36,16 @@ public class IotOtaUpgradeRecordDO extends BaseDO {
     /**
      * 任务编号
      *
-     * 关联 {@link IotOtaUpgradeTaskDO#getId()}
+     * 关联 {@link IotOtaTaskDO#getId()}
      */
     private Long taskId;
 
     /**
-     * 产品标识
-     *
-     * 关联 {@link cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO#getId()}
-     */
-    private String productKey;
-    /**
-     * 设备名称
-     *
-     * 关联 {@link cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO#getId()}
-     */
-    private String deviceName;
-    /**
      * 设备编号
      *
-     * 关联 {@link cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO#getId()}
+     * 关联 {@link IotDeviceDO#getId()}
      */
-    private String deviceId;
+    private Long deviceId;
     /**
      * 来源的固件编号
      *
@@ -67,7 +56,7 @@ public class IotOtaUpgradeRecordDO extends BaseDO {
     /**
      * 升级状态
      *
-     * 关联 {@link cn.iocoder.yudao.module.iot.enums.ota.IotOtaUpgradeRecordStatusEnum}
+     * 关联 {@link IotOtaTaskRecordStatusEnum}
      */
     private Integer status;
     /**

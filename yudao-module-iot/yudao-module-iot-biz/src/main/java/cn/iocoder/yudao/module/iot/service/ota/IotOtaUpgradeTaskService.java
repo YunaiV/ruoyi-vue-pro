@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.service.ota;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.task.IotOtaUpgradeTaskPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.task.IotOtaUpgradeTaskSaveReqVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaUpgradeTaskDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaTaskDO;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public interface IotOtaUpgradeTaskService {
      * @param id OTA升级任务的ID
      * @return OTA升级任务的详细信息对象
      */
-    IotOtaUpgradeTaskDO getUpgradeTask(Long id);
+    IotOtaTaskDO getUpgradeTask(Long id);
 
     /**
      * 分页查询OTA升级任务
@@ -44,7 +44,7 @@ public interface IotOtaUpgradeTaskService {
      * @param pageReqVO OTA升级任务的分页查询请求对象，包含查询条件和分页信息
      * @return 分页查询结果，包含OTA升级任务列表和总记录数
      */
-    PageResult<IotOtaUpgradeTaskDO> getUpgradeTaskPage(@Valid IotOtaUpgradeTaskPageReqVO pageReqVO);
+    PageResult<IotOtaTaskDO> getUpgradeTaskPage(@Valid IotOtaUpgradeTaskPageReqVO pageReqVO);
 
     /**
      * 根据任务状态获取升级任务列表
@@ -52,7 +52,7 @@ public interface IotOtaUpgradeTaskService {
      * @param state 任务状态，用于筛选符合条件的升级任务
      * @return 返回符合指定状态的升级任务列表，列表中的元素为 IotOtaUpgradeTaskDO 对象
      */
-    List<IotOtaUpgradeTaskDO> getUpgradeTaskByState(Integer state);
+    List<IotOtaTaskDO> getUpgradeTaskByState(Integer state);
 
     /**
      * 更新升级任务的状态。

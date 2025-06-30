@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.iot.service.ota;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.record.IotOtaUpgradeRecordPageReqVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaUpgradeRecordDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaTaskRecordDO;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -40,19 +40,12 @@ public interface IotOtaUpgradeRecordService {
     Map<Integer, Long> getOtaUpgradeRecordStatistics(Long firmwareId);
 
     /**
-     * 重试指定的 OTA 升级记录
-     *
-     * @param id 需要重试的升级记录的ID。
-     */
-    void retryUpgradeRecord(Long id);
-
-    /**
      * 获取指定 ID 的 OTA 升级记录的详细信息。
      *
      * @param id 需要查询的升级记录的ID。
      * @return 返回包含升级记录详细信息的响应对象。
      */
-    IotOtaUpgradeRecordDO getUpgradeRecord(Long id);
+    IotOtaTaskRecordDO getUpgradeRecord(Long id);
 
     /**
      * 分页查询 OTA 升级记录。
@@ -60,7 +53,7 @@ public interface IotOtaUpgradeRecordService {
      * @param pageReqVO 包含分页查询条件的请求对象，必须经过验证。
      * @return 返回包含分页查询结果的响应对象。
      */
-    PageResult<IotOtaUpgradeRecordDO> getUpgradeRecordPage(@Valid IotOtaUpgradeRecordPageReqVO pageReqVO);
+    PageResult<IotOtaTaskRecordDO> getUpgradeRecordPage(@Valid IotOtaUpgradeRecordPageReqVO pageReqVO);
 
     /**
      * 根据任务 ID 取消升级记录
@@ -71,34 +64,5 @@ public interface IotOtaUpgradeRecordService {
      * @param taskId 要取消升级记录的任务ID。该ID唯一标识一个任务，通常由任务管理系统生成。
      */
     void cancelUpgradeRecordByTaskId(Long taskId);
-
-    // TODO @li：不要的方法，可以删除下哈。
-    /**
-     * 根据升级状态获取升级记录列表
-     *
-     * @param state 升级状态，用于筛选符合条件的升级记录
-     * @return 返回符合指定状态的升级记录列表，列表中的元素为 {@link IotOtaUpgradeRecordDO} 对象
-     */
-    List<IotOtaUpgradeRecordDO> getUpgradeRecordListByState(Integer state);
-
-    /**
-     * 更新升级记录的状态。
-     * <p>
-     * 该函数用于批量更新指定升级记录的状态。通过传入的ID列表和状态值，将对应的升级记录的状态更新为指定的值。
-     *
-     * @param ids    需要更新状态的升级记录的ID列表。列表中的每个元素代表一个升级记录的ID。
-     * @param status 要更新的状态值。该值应为有效的状态标识符，通常为整数类型。
-     */
-    void updateUpgradeRecordStatus(List<Long> ids, Integer status);
-
-    /**
-     * 根据任务ID获取升级记录列表
-     * <p>
-     * 该函数通过给定的任务ID，查询并返回与该任务相关的所有升级记录。
-     *
-     * @param taskId 任务ID，用于指定需要查询的任务
-     * @return 返回一个包含升级记录的列表，列表中的每个元素为IotOtaUpgradeRecordDO对象
-     */
-    List<IotOtaUpgradeRecordDO> getUpgradeRecordListByTaskId(Long taskId);
 
 }

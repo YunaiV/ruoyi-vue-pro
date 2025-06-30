@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.record.IotOtaUpgradeRecordPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.record.IotOtaUpgradeRecordRespVO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaUpgradeRecordDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaTaskRecordDO;
 import cn.iocoder.yudao.module.iot.service.ota.IotOtaUpgradeRecordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -50,7 +50,7 @@ public class IotOtaUpgradeRecordController {
     @PreAuthorize("@ss.hasPermission('iot:ota-upgrade-record:query')")
     public CommonResult<PageResult<IotOtaUpgradeRecordRespVO>> getUpgradeRecordPage(
             @Valid IotOtaUpgradeRecordPageReqVO pageReqVO) {
-        PageResult<IotOtaUpgradeRecordDO> pageResult = upgradeRecordService.getUpgradeRecordPage(pageReqVO);
+        PageResult<IotOtaTaskRecordDO> pageResult = upgradeRecordService.getUpgradeRecordPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, IotOtaUpgradeRecordRespVO.class));
     }
 
@@ -59,17 +59,8 @@ public class IotOtaUpgradeRecordController {
     @PreAuthorize("@ss.hasPermission('iot:ota-upgrade-record:query')")
     @Parameter(name = "id", description = "升级记录编号", required = true, example = "1024")
     public CommonResult<IotOtaUpgradeRecordRespVO> getUpgradeRecord(@RequestParam("id") Long id) {
-        IotOtaUpgradeRecordDO upgradeRecord = upgradeRecordService.getUpgradeRecord(id);
+        IotOtaTaskRecordDO upgradeRecord = upgradeRecordService.getUpgradeRecord(id);
         return success(BeanUtils.toBean(upgradeRecord, IotOtaUpgradeRecordRespVO.class));
-    }
-
-    @PutMapping("/retry")
-    @Operation(summary = "重试升级记录")
-    @PreAuthorize("@ss.hasPermission('iot:ota-upgrade-record:retry')")
-    @Parameter(name = "id", description = "升级记录编号", required = true, example = "1024")
-    public CommonResult<Boolean> retryUpgradeRecord(@RequestParam("id") Long id) {
-        upgradeRecordService.retryUpgradeRecord(id);
-        return success(true);
     }
 
 }

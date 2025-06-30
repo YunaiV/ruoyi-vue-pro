@@ -7,18 +7,19 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 
 /**
- * IoT OTA 升级任务的范围枚举
+ * IoT OTA 升级任务的设备范围枚举
  *
  * @author haohao
  */
 @RequiredArgsConstructor
 @Getter
-public enum IotOtaUpgradeTaskScopeEnum implements ArrayValuable<Integer> {
+public enum IotOtaTaskDeviceScopeEnum implements ArrayValuable<Integer> {
 
     ALL(1), // 全部设备：只包括当前产品下的设备，不包括未来创建的设备
     SELECT(2); // 指定设备
 
-    public static final Integer[] ARRAYS = Arrays.stream(values()).map(IotOtaUpgradeTaskScopeEnum::getScope).toArray(Integer[]::new);
+    public static final Integer[] ARRAYS = Arrays.stream(values())
+            .map(IotOtaTaskDeviceScopeEnum::getScope).toArray(Integer[]::new);
 
     /**
      * 范围

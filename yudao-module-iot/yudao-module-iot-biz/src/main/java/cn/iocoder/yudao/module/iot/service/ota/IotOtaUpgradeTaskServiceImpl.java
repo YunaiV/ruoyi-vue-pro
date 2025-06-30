@@ -8,10 +8,10 @@ import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.task.IotOtaUp
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.task.IotOtaUpgradeTaskSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaUpgradeTaskDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaTaskDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.ota.IotOtaUpgradeTaskMapper;
-import cn.iocoder.yudao.module.iot.enums.ota.IotOtaUpgradeTaskScopeEnum;
-import cn.iocoder.yudao.module.iot.enums.ota.IotOtaUpgradeTaskStatusEnum;
+import cn.iocoder.yudao.module.iot.enums.ota.IotOtaTaskDeviceScopeEnum;
+import cn.iocoder.yudao.module.iot.enums.ota.IotOtaTaskStatusEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +61,7 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
         validateScopeAndDevice(createReqVO.getScope(), createReqVO.getDeviceIds(), firmware.getProductId());
 
         // 2. 保存 OTA 升级任务信息到数据库
-        IotOtaUpgradeTaskDO upgradeTask = initOtaUpgradeTask(createReqVO, firmware.getProductId());
+        IotOtaTaskDO upgradeTask = initOtaUpgradeTask(createReqVO, firmware.getProductId());
         upgradeTaskMapper.insert(upgradeTask);
 
         // 3. 生成设备升级记录信息并存储，等待定时任务轮询
@@ -73,16 +73,16 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
     @Transactional(rollbackFor = Exception.class)
     public void cancelUpgradeTask(Long id) {
         // 1.1 校验升级任务是否存在
-        IotOtaUpgradeTaskDO upgradeTask = validateUpgradeTaskExists(id);
+        IotOtaTaskDO upgradeTask = validateUpgradeTaskExists(id);
         // 1.2 校验升级任务是否可以取消
         // TODO @li：ObjUtil notequals
-        if (!Objects.equals(upgradeTask.getStatus(), IotOtaUpgradeTaskStatusEnum.IN_PROGRESS.getStatus())) {
+        if (!Objects.equals(upgradeTask.getStatus(), IotOtaTaskStatusEnum.IN_PROGRESS.getStatus())) {
             throw exception(OTA_UPGRADE_TASK_CANNOT_CANCEL);
         }
 
         // 2. 更新 OTA 升级任务状态为已取消
-        upgradeTaskMapper.updateById(IotOtaUpgradeTaskDO.builder()
-                .id(id).status(IotOtaUpgradeTaskStatusEnum.CANCELED.getStatus())
+        upgradeTaskMapper.updateById(IotOtaTaskDO.builder()
+                .id(id).status(IotOtaTaskStatusEnum.CANCELED.getStatus())
                 .build());
 
         // 3. 更新 OTA 升级记录状态为已取消
@@ -90,30 +90,30 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
     }
 
     @Override
-    public IotOtaUpgradeTaskDO getUpgradeTask(Long id) {
+    public IotOtaTaskDO getUpgradeTask(Long id) {
         return upgradeTaskMapper.selectById(id);
     }
 
     @Override
-    public PageResult<IotOtaUpgradeTaskDO> getUpgradeTaskPage(IotOtaUpgradeTaskPageReqVO pageReqVO) {
+    public PageResult<IotOtaTaskDO> getUpgradeTaskPage(IotOtaUpgradeTaskPageReqVO pageReqVO) {
         return upgradeTaskMapper.selectUpgradeTaskPage(pageReqVO);
     }
 
     @Override
-    public List<IotOtaUpgradeTaskDO> getUpgradeTaskByState(Integer state) {
+    public List<IotOtaTaskDO> getUpgradeTaskByState(Integer state) {
         return upgradeTaskMapper.selectUpgradeTaskByState(state);
     }
 
     @Override
     public void updateUpgradeTaskStatus(Long id, Integer status) {
-        upgradeTaskMapper.updateById(IotOtaUpgradeTaskDO.builder().id(id).status(status).build());
+        upgradeTaskMapper.updateById(IotOtaTaskDO.builder().id(id).status(status).build());
     }
 
     /**
      * 校验固件升级任务是否重复
      */
     private void validateFirmwareTaskDuplicate(Long firmwareId, String taskName) {
-        List<IotOtaUpgradeTaskDO> upgradeTaskList = upgradeTaskMapper.selectByFirmwareIdAndName(firmwareId, taskName);
+        List<IotOtaTaskDO> upgradeTaskList = upgradeTaskMapper.selectByFirmwareIdAndName(firmwareId, taskName);
         if (CollUtil.isNotEmpty(upgradeTaskList)) {
             throw exception(OTA_UPGRADE_TASK_NAME_DUPLICATE);
         }
@@ -128,14 +128,14 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
      * @throws cn.iocoder.yudao.framework.common.exception.ServiceException，抛出相应的异常
      */
     private void validateScopeAndDevice(Integer scope, List<Long> deviceIds, Long productId) {
-        if (Objects.equals(scope, IotOtaUpgradeTaskScopeEnum.SELECT.getScope())) {
+        if (Objects.equals(scope, IotOtaTaskDeviceScopeEnum.SELECT.getScope())) {
             if (CollUtil.isEmpty(deviceIds)) {
                 throw exception(OTA_UPGRADE_TASK_DEVICE_IDS_EMPTY);
             }
             return;
         }
-        
-        if (Objects.equals(scope, IotOtaUpgradeTaskScopeEnum.ALL.getScope())) {
+
+        if (Objects.equals(scope, IotOtaTaskDeviceScopeEnum.ALL.getScope())) {
             List<IotDeviceDO> deviceList = deviceService.getDeviceListByProductId(productId);
             if (CollUtil.isEmpty(deviceList)) {
                 throw exception(OTA_UPGRADE_TASK_DEVICE_LIST_EMPTY);
@@ -146,8 +146,8 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
     /**
      * 验证升级任务是否存在
      */
-    private IotOtaUpgradeTaskDO validateUpgradeTaskExists(Long id) {
-        IotOtaUpgradeTaskDO upgradeTask = upgradeTaskMapper.selectById(id);
+    private IotOtaTaskDO validateUpgradeTaskExists(Long id) {
+        IotOtaTaskDO upgradeTask = upgradeTaskMapper.selectById(id);
         if (Objects.isNull(upgradeTask)) {
             throw exception(OTA_UPGRADE_TASK_NOT_EXISTS);
         }
@@ -157,14 +157,14 @@ public class IotOtaUpgradeTaskServiceImpl implements IotOtaUpgradeTaskService {
     /**
      * 初始化升级任务
      */
-    private IotOtaUpgradeTaskDO initOtaUpgradeTask(IotOtaUpgradeTaskSaveReqVO createReqVO, Long productId) {
-        IotOtaUpgradeTaskDO upgradeTask = BeanUtils.toBean(createReqVO, IotOtaUpgradeTaskDO.class);
-        upgradeTask.setDeviceCount(Convert.toLong(CollUtil.size(createReqVO.getDeviceIds())))
-                .setStatus(IotOtaUpgradeTaskStatusEnum.IN_PROGRESS.getStatus());
-        
-        if (Objects.equals(createReqVO.getScope(), IotOtaUpgradeTaskScopeEnum.ALL.getScope())) {
+    private IotOtaTaskDO initOtaUpgradeTask(IotOtaUpgradeTaskSaveReqVO createReqVO, Long productId) {
+        IotOtaTaskDO upgradeTask = BeanUtils.toBean(createReqVO, IotOtaTaskDO.class);
+        upgradeTask.setDeviceTotalCount(Convert.toLong(CollUtil.size(createReqVO.getDeviceIds())))
+                .setStatus(IotOtaTaskStatusEnum.IN_PROGRESS.getStatus());
+
+        if (Objects.equals(createReqVO.getScope(), IotOtaTaskDeviceScopeEnum.ALL.getScope())) {
             List<IotDeviceDO> deviceList = deviceService.getDeviceListByProductId(productId);
-            upgradeTask.setDeviceCount((long) deviceList.size());
+            upgradeTask.setDeviceTotalCount((long) deviceList.size());
             upgradeTask.setDeviceIds(
                     deviceList.stream().map(IotDeviceDO::getId).collect(Collectors.toList()));
         }

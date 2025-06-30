@@ -3,7 +3,8 @@ package cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.record;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaUpgradeTaskDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaTaskDO;
+import cn.iocoder.yudao.module.iot.enums.ota.IotOtaTaskRecordStatusEnum;
 import com.fhs.core.trans.anno.Trans;
 import com.fhs.core.trans.constant.TransType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -36,7 +37,7 @@ public class IotOtaUpgradeRecordRespVO {
     /**
      * 任务编号
      * <p>
-     * 关联 {@link IotOtaUpgradeTaskDO#getId()}
+     * 关联 {@link IotOtaTaskDO#getId()}
      */
     @Schema(description = "任务编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long taskId;
@@ -77,7 +78,7 @@ public class IotOtaUpgradeRecordRespVO {
     /**
      * 升级状态
      * <p>
-     * 关联 {@link cn.iocoder.yudao.module.iot.enums.ota.IotOtaUpgradeRecordStatusEnum}
+     * 关联 {@link IotOtaTaskRecordStatusEnum}
      */
     @Schema(description = "升级状态", requiredMode = Schema.RequiredMode.REQUIRED, allowableValues = {"0", "10", "20", "30", "40", "50"})
     private Integer status;

@@ -9,17 +9,11 @@ import lombok.Data;
 @Schema(description = "管理后台 - IoT OTA 升级任务分页 Request VO")
 public class IotOtaUpgradeTaskPageReqVO extends PageParam {
 
-    /**
-     * 任务名称字段，用于描述任务的名称
-     */
+    @Schema(description = "固件编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @NotNull(message = "固件编号不能为空")
+    private Long firmwareId;
+
     @Schema(description = "任务名称", example = "升级任务")
     private String name;
-
-    /**
-     * 固件编号字段，用于唯一标识固件，不能为空
-     */
-    @NotNull(message = "固件编号不能为空")
-    @Schema(description = "固件编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
-    private Long firmwareId;
 
 }
