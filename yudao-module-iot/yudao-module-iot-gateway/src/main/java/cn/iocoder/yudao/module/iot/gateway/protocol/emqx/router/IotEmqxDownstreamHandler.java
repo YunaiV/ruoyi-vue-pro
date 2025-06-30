@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.emqx.router;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
-import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxUpstreamProtocol;
@@ -69,58 +68,11 @@ public class IotEmqxDownstreamHandler {
      * @return 构建的主题，如果方法不支持返回 null
      */
     private String buildTopicByMethod(IotDeviceMessage message, String productKey, String deviceName) {
-        // 1. 解析消息方法
-        IotDeviceMessageMethodEnum methodEnum = IotDeviceMessageMethodEnum.of(message.getMethod());
-        if (methodEnum == null) {
-            log.warn("[buildTopicByMethod][未知的消息方法: {}]", message.getMethod());
-            return null;
-        }
-
-        // 2. 根据消息方法和回复状态，构建 topic
+        // 1. 判断是否为回复消息
         boolean isReply = IotDeviceMessageUtils.isReplyMessage(message);
 
-        // TODO @haohao：看看基于 message 的 method 去反向推导；
-        // 3. 根据消息方法类型构建对应的主题
-        switch (methodEnum) {
-            case PROPERTY_POST:
-                // 属性上报：只支持回复消息（下行）
-                if (isReply) {
-                    return IotMqttTopicUtils.buildPropertyPostReplyTopic(productKey, deviceName);
-                }
-                break;
-            case PROPERTY_SET:
-                // 属性设置：只支持非回复消息（下行）
-                if (!isReply) {
-                    return IotMqttTopicUtils.buildPropertySetTopic(productKey, deviceName);
-                }
-                break;
-            case EVENT_POST:
-                // 事件上报：只支持回复消息（下行）
-                if (isReply) {
-                    return IotMqttTopicUtils.buildEventPostReplyTopicGeneric(productKey, deviceName);
-                }
-                break;
-            case SERVICE_INVOKE:
-                // 服务调用：支持请求和回复
-                if (isReply) {
-                    return IotMqttTopicUtils.buildServiceReplyTopicGeneric(productKey, deviceName);
-                } else {
-                    return IotMqttTopicUtils.buildServiceTopicGeneric(productKey, deviceName);
-                }
-            case CONFIG_PUSH:
-                // 配置推送：平台向设备推送配置（下行请求），设备回复确认（上行回复）
-                if (!isReply) {
-                    return IotMqttTopicUtils.buildConfigPushTopic(productKey, deviceName);
-                }
-                break;
-            default:
-                log.warn("[buildTopicByMethod][未处理的消息方法: {}]", methodEnum);
-                break;
-        }
-
-        log.warn("[buildTopicByMethod][暂时不支持的下行消息: method={}, isReply={}]",
-                message.getMethod(), isReply);
-        return null;
+        // 2. 根据消息方法类型构建对应的主题
+        return IotMqttTopicUtils.buildTopicByMethod(message.getMethod(), productKey, deviceName, isReply);
     }
 
 }
