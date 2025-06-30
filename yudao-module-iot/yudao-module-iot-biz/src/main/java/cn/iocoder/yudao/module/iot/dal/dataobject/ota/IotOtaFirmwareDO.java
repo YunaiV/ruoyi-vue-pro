@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.ota;
 
+import cn.hutool.crypto.digest.DigestAlgorithm;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -34,7 +35,7 @@ public class IotOtaFirmwareDO extends BaseDO {
      */
     private String name;
     /**
-     * 固件版本
+     * 固件描述
      */
     private String description;
     /**
@@ -47,37 +48,25 @@ public class IotOtaFirmwareDO extends BaseDO {
      *
      * 关联 {@link cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO#getId()}
      */
-    // TODO @li：帮我改成 Long 哈，写错了
-    private String productId;
-    /**
-     * 产品标识
-     *
-     * 冗余 {@link cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO#getProductKey()}
-     */
-    private String productKey;
+    private Long productId;
 
     /**
-     * 签名方式
-     *
-     * 例如说：MD5、SHA256
+     * 固件文件 URL
      */
-    private String signMethod;
-    /**
-     * 固件文件签名
-     */
-    private String fileSign;
+    private String fileUrl;
     /**
      * 固件文件大小
      */
     private Long fileSize;
     /**
-     * 固件文件 URL
+     * 固件文件签名算法
+     *
+     * 枚举 {@link DigestAlgorithm}，目前只使用 MD5
      */
-    private String fileUrl;
-
+    private String fileDigestAlgorithm;
     /**
-     * 自定义信息，建议使用 JSON 格式
+     * 固件文件签名结果
      */
-    private String information;
+    private String fileDigestValue;
 
 }

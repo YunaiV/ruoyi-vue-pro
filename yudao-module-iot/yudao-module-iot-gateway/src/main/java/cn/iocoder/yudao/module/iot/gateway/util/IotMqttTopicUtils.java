@@ -18,6 +18,11 @@ public final class IotMqttTopicUtils {
      */
     private static final String SYS_TOPIC_PREFIX = "/sys/";
 
+    /**
+     * 回复主题后缀
+     */
+    private static final String REPLY_TOPIC_SUFFIX = "_reply";
+
     // ========== MQTT HTTP 接口路径常量 ==========
 
     /**
@@ -48,15 +53,12 @@ public final class IotMqttTopicUtils {
         if (StrUtil.isBlank(method)) {
             return null;
         }
-
         // 1. 将点分隔符转换为斜杠
         String topicSuffix = method.replace('.', '/');
-
         // 2. 对于回复消息，添加 _reply 后缀
         if (isReply) {
-            topicSuffix += "_reply";
+            topicSuffix += REPLY_TOPIC_SUFFIX;
         }
-
         // 3. 构建完整主题
         return SYS_TOPIC_PREFIX + productKey + "/" + deviceName + "/" + topicSuffix;
     }

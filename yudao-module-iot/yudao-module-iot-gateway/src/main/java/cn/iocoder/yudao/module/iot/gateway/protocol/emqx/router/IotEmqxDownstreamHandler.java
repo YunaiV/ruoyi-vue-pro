@@ -70,7 +70,6 @@ public class IotEmqxDownstreamHandler {
     private String buildTopicByMethod(IotDeviceMessage message, String productKey, String deviceName) {
         // 1. 判断是否为回复消息
         boolean isReply = IotDeviceMessageUtils.isReplyMessage(message);
-
         // 2. 根据消息方法类型构建对应的主题
         return IotMqttTopicUtils.buildTopicByMethod(message.getMethod(), productKey, deviceName, isReply);
     }

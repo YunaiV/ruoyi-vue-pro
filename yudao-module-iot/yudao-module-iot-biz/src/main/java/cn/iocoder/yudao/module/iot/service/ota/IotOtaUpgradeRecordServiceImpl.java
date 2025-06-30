@@ -34,24 +34,19 @@ public class IotOtaUpgradeRecordServiceImpl implements IotOtaUpgradeRecordServic
 
     @Resource
     private IotOtaUpgradeRecordMapper upgradeRecordMapper;
-    // TODO @li：1）@Resource 写在 @Lazy 之前，先用关键注解；2）有必要的情况下，在写 @Lazy 注解。
-    @Lazy
     @Resource
     private IotDeviceService deviceService;
-    @Lazy
     @Resource
     private IotOtaFirmwareService firmwareService;
-    @Lazy
     @Resource
     private IotOtaUpgradeTaskService upgradeTaskService;
 
     @Override
     public void createOtaUpgradeRecordBatch(List<Long> deviceIds, Long firmwareId, Long upgradeTaskId) {
         // 1. 校验升级记录信息是否存在，并且已经取消的任务可以重新开始
-        // TODO @li：批量查询。。
         deviceIds.forEach(deviceId -> validateUpgradeRecordDuplicate(firmwareId, upgradeTaskId, String.valueOf(deviceId)));
 
-        // 2.初始化OTA升级记录列表信息
+        // 2. 初始化OTA升级记录列表信息
         IotOtaUpgradeTaskDO upgradeTask = upgradeTaskService.getUpgradeTask(upgradeTaskId);
         IotOtaFirmwareDO firmware = firmwareService.getOtaFirmware(firmwareId);
         List<IotDeviceDO> deviceList = deviceService.getDeviceListByIdList(deviceIds);
@@ -67,10 +62,9 @@ public class IotOtaUpgradeRecordServiceImpl implements IotOtaUpgradeRecordServic
             upgradeRecord.setProgress(0);
             return upgradeRecord;
         }).toList();
-        // 3.保存数据
+        // 3. 保存数据
         upgradeRecordMapper.insertBatch(upgradeRecordList);
         // TODO @芋艿：在这里需要处理推送升级任务的逻辑
-
     }
 
     // TODO @li：1）方法注释，简单写；2）父类写了注释，子类就不用写了。。。
@@ -116,9 +110,9 @@ public class IotOtaUpgradeRecordServiceImpl implements IotOtaUpgradeRecordServic
 
     @Override
     public void retryUpgradeRecord(Long id) {
-        // 1.1.校验升级记录信息是否存在
+        // 1.1 校验升级记录信息是否存在
         IotOtaUpgradeRecordDO upgradeRecord = validateUpgradeRecordExists(id);
-        // 1.2.校验升级记录是否可以重新升级
+        // 1.2 校验升级记录是否可以重新升级
         validateUpgradeRecordCanRetry(upgradeRecord);
 
         // 2. 将一些数据重置，这样定时任务轮询就可以重启任务
@@ -191,16 +185,12 @@ public class IotOtaUpgradeRecordServiceImpl implements IotOtaUpgradeRecordServic
      * @param deviceId   设备ID，用于标识特定的设备
      */
     private void validateUpgradeRecordDuplicate(Long firmwareId, Long taskId, String deviceId) {
-        // 根据条件查询升级记录
         IotOtaUpgradeRecordDO upgradeRecord = upgradeRecordMapper.selectByConditions(firmwareId, taskId, deviceId);
-        // 如果查询到升级记录且状态不是已取消，则抛出异常
-        // TODO @li：if return，减少括号层级；
-        // TODO @li：ObjUtil.notEquals，尽量不用 ！取否逻辑；
-        if (upgradeRecord != null) {
-            if (!IotOtaUpgradeRecordStatusEnum.CANCELED.getStatus().equals(upgradeRecord.getStatus())) {
-                // TODO @li：提示的时候，需要把 deviceName 给提示出来，不然用户不知道哪个重复啦。
-                throw exception(OTA_UPGRADE_RECORD_DUPLICATE);
-            }
+        if (upgradeRecord == null) {
+            return;
+        }
+        if (!Objects.equals(upgradeRecord.getStatus(), IotOtaUpgradeRecordStatusEnum.CANCELED.getStatus())) {
+            throw exception(OTA_UPGRADE_RECORD_DUPLICATE);
         }
     }
 
@@ -216,12 +206,10 @@ public class IotOtaUpgradeRecordServiceImpl implements IotOtaUpgradeRecordServic
      */
     // TODO @li：这种一次性的方法（不复用的），其实一步一定要抽成小方法；
     private void validateUpgradeRecordCanRetry(IotOtaUpgradeRecordDO upgradeRecord) {
-        // 检查升级记录的状态是否为 PENDING、PUSHED 或 UPGRADING
         if (ObjectUtils.equalsAny(upgradeRecord.getStatus(),
                 IotOtaUpgradeRecordStatusEnum.PENDING.getStatus(),
                 IotOtaUpgradeRecordStatusEnum.PUSHED.getStatus(),
                 IotOtaUpgradeRecordStatusEnum.UPGRADING.getStatus())) {
-            // 如果升级记录处于上述状态之一，则抛出异常，表示不允许重试
             throw exception(OTA_UPGRADE_RECORD_CANNOT_RETRY);
         }
     }
