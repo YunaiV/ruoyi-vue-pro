@@ -2,10 +2,13 @@ package cn.iocoder.yudao.module.iot.enums.ota;
 
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 /**
  * IoT OTA 升级任务记录的状态枚举
@@ -25,6 +28,17 @@ public enum IotOtaTaskRecordStatusEnum implements ArrayValuable<Integer> {
 
     public static final Integer[] ARRAYS = Arrays.stream(values())
             .map(IotOtaTaskRecordStatusEnum::getStatus).toArray(Integer[]::new);
+
+    public static final Set<Integer> IN_PROCESS_STATUSES = SetUtils.asSet(
+            PENDING.getStatus(),
+            PUSHED.getStatus(),
+            UPGRADING.getStatus(),
+            SUCCESS.getStatus());
+
+    public static final List<Integer> PRIORITY_STATUSES = Arrays.asList(
+            SUCCESS.getStatus(),
+            PENDING.getStatus(), PUSHED.getStatus(), UPGRADING.getStatus(),
+            FAILURE.getStatus(), CANCELED.getStatus());
 
     /**
      * 状态

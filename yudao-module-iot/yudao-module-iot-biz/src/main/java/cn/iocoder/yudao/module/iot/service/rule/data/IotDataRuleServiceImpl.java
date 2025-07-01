@@ -121,7 +121,7 @@ public class IotDataRuleServiceImpl implements IotDataRuleService {
                 convertSet(sourceConfigs, IotDataRuleDO.SourceConfig::getProductId));
 
         // 2. 校验设备
-        deviceService.validateDevicesExist(convertSet(sourceConfigs, IotDataRuleDO.SourceConfig::getDeviceId,
+        deviceService.validateDeviceListExists(convertSet(sourceConfigs, IotDataRuleDO.SourceConfig::getDeviceId,
                 config -> ObjUtil.notEqual(config.getDeviceId(), IotDeviceDO.DEVICE_ID_ALL)));
 
         // 3. 校验物模型存在

@@ -2,67 +2,67 @@ package cn.iocoder.yudao.module.iot.service.ota;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.task.record.IotOtaTaskRecordPageReqVO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaTaskRecordDO;
 import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-// TODO @li：注释写的有点冗余，可以看看别的模块哈。= = AI 生成的注释，有的时候太啰嗦了，需要处理下的哈
 /**
- * IotOtaUpgradeRecordService 接口定义了与物联网设备OTA升级记录相关的操作。
- * 该接口提供了创建、更新、查询、统计和重试升级记录的功能。
+ * IoT OTA 升级记录 Service 接口
  */
 public interface IotOtaTaskRecordService {
 
     /**
      * 批量创建 OTA 升级记录
-     * 该函数用于为指定的设备列表、固件ID和升级任务ID创建OTA升级记录。
      *
-     * @param deviceIds     设备ID列表，表示需要升级的设备集合。
-     * @param firmwareId    固件ID，表示要升级到的固件版本。
-     * @param upgradeTaskId 升级任务ID，表示此次升级任务的唯一标识。
+     * @param devices      设备列表
+     * @param firmwareId   固件编号
+     * @param taskId       任务编号
      */
-    void createOtaTaskRecordBatch(List<Long> deviceIds, Long firmwareId, Long upgradeTaskId);
+    void createOtaTaskRecordList(List<IotDeviceDO> devices, Long firmwareId, Long taskId);
 
     /**
-     * 获取 OTA 升级记录的数量统计
+     * 获取 OTA 升级记录的状态统计
      *
-     * @return 返回一个 Map，其中键为状态码，值为对应状态的升级记录数量
+     * @param firmwareId 固件编号
+     * @param taskId     任务编号
+     * @return 状态统计 Map，key 为状态码，value 为对应状态的升级记录数量
      */
-    Map<Integer, Long> getOtaTaskRecordCount(@Valid IotOtaTaskRecordPageReqVO pageReqVO);
+    Map<Integer, Long> getOtaTaskRecordStatusCountMap(Long firmwareId, Long taskId);
 
     /**
-     * 获取 OTA 升级记录的统计信息
+     * 获取 OTA 升级记录
      *
-     * @return 返回一个 Map，其中键为状态码，值为对应状态的升级记录统计信息
-     */
-    Map<Integer, Long> getOtaTaskRecordStatistics(Long firmwareId);
-
-    /**
-     * 获取指定 ID 的 OTA 升级记录的详细信息
-     *
-     * @param id 需要查询的升级记录的 ID
-     * @return 返回包含升级记录详细信息的响应对象
+     * @param id 编号
+     * @return OTA 升级记录
      */
     IotOtaTaskRecordDO getOtaTaskRecord(Long id);
 
     /**
-     * 分页查询 OTA 升级记录
+     * 获取 OTA 升级记录分页
      *
-     * @param pageReqVO 包含分页查询条件的请求对象，必须经过验证。
-     * @return 返回包含分页查询结果的响应对象。
+     * @param pageReqVO 分页查询
+     * @return OTA 升级记录分页
      */
     PageResult<IotOtaTaskRecordDO> getOtaTaskRecordPage(@Valid IotOtaTaskRecordPageReqVO pageReqVO);
 
     /**
-     * 根据任务 ID 取消升级记录
-     * <p>
-     * 该函数用于根据给定的任务ID，取消与该任务相关的升级记录。通常用于在任务执行失败或用户手动取消时，
-     * 清理或标记相关的升级记录为取消状态。
+     * 根据 OTA 任务编号，取消未结束的升级记录
      *
-     * @param taskId 要取消升级记录的任务ID。该ID唯一标识一个任务，通常由任务管理系统生成。
+     * @param taskId 升级任务编号
      */
-    void cancelUpgradeRecordByTaskId(Long taskId);
+    void cancelTaskRecordListByTaskId(Long taskId);
+
+    /**
+     * 根据设备编号和记录状态，获取 OTA 升级记录列表
+     *
+     * @param deviceIds 设备编号集合
+     * @param statuses  记录状态集合
+     * @return OTA 升级记录列表
+     */
+    List<IotOtaTaskRecordDO> getOtaTaskRecordListByDeviceIdAndStatus(Set<Long> deviceIds, Set<Integer> statuses);
 
 }

@@ -23,9 +23,14 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.OTA_FIRMWARE_NOT_EXISTS;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.OTA_FIRMWARE_PRODUCT_VERSION_DUPLICATE;
 
-@Slf4j
+/**
+ * OTA 固件管理 Service 实现类
+ *
+ * @author Shelly Chan
+ */
 @Service
 @Validated
+@Slf4j
 public class IotOtaFirmwareServiceImpl implements IotOtaFirmwareService {
 
     @Resource
@@ -37,7 +42,9 @@ public class IotOtaFirmwareServiceImpl implements IotOtaFirmwareService {
     @Override
     public Long createOtaFirmware(IotOtaFirmwareCreateReqVO saveReqVO) {
         // 1.1 校验固件产品 + 版本号不能重复
-        validateProductAndVersionDuplicate(saveReqVO.getProductId(), saveReqVO.getVersion());
+        if (otaFirmwareMapper.selectByProductIdAndVersion(saveReqVO.getProductId(), saveReqVO.getVersion()) != null) {
+            throw exception(OTA_FIRMWARE_PRODUCT_VERSION_DUPLICATE);
+        }
         // 1.2 校验产品存在
         productService.validateProductExists(saveReqVO.getProductId());
 
@@ -84,24 +91,11 @@ public class IotOtaFirmwareServiceImpl implements IotOtaFirmwareService {
     }
 
     /**
-     * 验证产品和版本号是否重复
-     */
-    private void validateProductAndVersionDuplicate(Long productId, String version) {
-        // 只查询1条记录检查是否存在
-        IotOtaFirmwareDO firmware = otaFirmwareMapper.selectOne(IotOtaFirmwareDO::getProductId, productId, 
-                IotOtaFirmwareDO::getVersion, version);
-        if (firmware != null) {
-            throw exception(OTA_FIRMWARE_PRODUCT_VERSION_DUPLICATE);
-        }
-    }
-
-    /**
      * 计算文件签名
-     * 
+     *
      * @param firmware 固件对象
-     * @throws Exception 下载或计算签名失败时抛出异常
      */
-    private void calculateFileDigest(IotOtaFirmwareDO firmware) throws Exception {
+    private void calculateFileDigest(IotOtaFirmwareDO firmware) {
         String fileUrl = firmware.getFileUrl();
         // 下载文件并计算签名
         byte[] fileBytes = HttpUtil.downloadBytes(fileUrl);

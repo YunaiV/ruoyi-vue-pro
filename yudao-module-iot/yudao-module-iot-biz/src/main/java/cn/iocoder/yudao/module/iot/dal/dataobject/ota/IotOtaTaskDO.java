@@ -61,7 +61,7 @@ public class IotOtaTaskDO extends BaseDO {
     /**
      * 设备总数数量
      */
-    private Long deviceTotalCount;
+    private Integer deviceTotalCount;
     /**
      * 设备成功数量
      */

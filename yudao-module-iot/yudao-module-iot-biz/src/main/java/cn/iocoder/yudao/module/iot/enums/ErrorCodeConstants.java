@@ -41,20 +41,25 @@ public interface ErrorCodeConstants {
     ErrorCode DEVICE_GROUP_NOT_EXISTS = new ErrorCode(1_050_005_000, "设备分组不存在");
     ErrorCode DEVICE_GROUP_DELETE_FAIL_DEVICE_EXISTS = new ErrorCode(1_050_005_001, "设备分组下存在设备，不允许删除");
 
-    // ========== 固件相关 1-050-008-000 ==========
+    // ========== OTA 固件相关 1-050-008-000 ==========
 
     ErrorCode OTA_FIRMWARE_NOT_EXISTS = new ErrorCode(1_050_008_000, "固件信息不存在");
     ErrorCode OTA_FIRMWARE_PRODUCT_VERSION_DUPLICATE = new ErrorCode(1_050_008_001, "产品版本号重复");
 
-    ErrorCode OTA_UPGRADE_TASK_NOT_EXISTS = new ErrorCode(1_050_008_100, "升级任务不存在");
-    ErrorCode OTA_UPGRADE_TASK_NAME_DUPLICATE = new ErrorCode(1_050_008_101, "升级任务名称重复");
-    ErrorCode OTA_UPGRADE_TASK_DEVICE_IDS_EMPTY = new ErrorCode(1_050_008_102, "设备编号列表不能为空");
-    ErrorCode OTA_UPGRADE_TASK_DEVICE_LIST_EMPTY = new ErrorCode(1_050_008_103, "设备列表不能为空");
-    ErrorCode OTA_UPGRADE_TASK_CANNOT_CANCEL = new ErrorCode(1_050_008_104, "升级任务不能取消");
+    // ========== OTA 升级任务相关 1-050-008-100 ==========
 
-    ErrorCode OTA_UPGRADE_RECORD_NOT_EXISTS = new ErrorCode(1_050_008_200, "升级记录不存在");
-    ErrorCode OTA_UPGRADE_RECORD_DUPLICATE = new ErrorCode(1_050_008_201, "升级记录重复");
-    ErrorCode OTA_UPGRADE_RECORD_CANNOT_RETRY = new ErrorCode(1_050_008_202, "升级记录不能重试");
+    ErrorCode OTA_TASK_NOT_EXISTS = new ErrorCode(1_050_008_100, "升级任务不存在");
+    ErrorCode OTA_TASK_CREATE_FAIL_NAME_DUPLICATE = new ErrorCode(1_050_008_101, "创建 OTA 任务失败，原因：任务名称重复");
+    ErrorCode OTA_TASK_CREATE_FAIL_DEVICE_FIRMWARE_EXISTS = new ErrorCode(1_050_008_102,
+            "创建 OTA 任务失败，原因：设备({})已经是该固件版本");
+    ErrorCode OTA_TASK_CREATE_FAIL_DEVICE_OTA_IN_PROCESS = new ErrorCode(1_050_008_102,
+            "创建 OTA 任务失败，原因：设备({})已经在升级中...");
+    ErrorCode OTA_TASK_CREATE_FAIL_DEVICE_EMPTY = new ErrorCode(1_050_008_103, "创建 OTA 任务失败，原因：没有可升级的设备");
+    ErrorCode OTA_TASK_CANCEL_FAIL_STATUS_END = new ErrorCode(1_050_008_104, "取消 OTA 任务失败，原因：任务状态不是进行中");
+
+    // ========== OTA 升级任务相关 1-050-008-100 ==========
+
+    ErrorCode OTA_TASK_RECORD_NOT_EXISTS = new ErrorCode(1_050_008_200, "升级记录不存在");
 
     // ========== IoT 数据流转规则 1-050-010-000 ==========
     ErrorCode DATA_RULE_NOT_EXISTS = new ErrorCode(1_050_010_000, "数据流转规则不存在");

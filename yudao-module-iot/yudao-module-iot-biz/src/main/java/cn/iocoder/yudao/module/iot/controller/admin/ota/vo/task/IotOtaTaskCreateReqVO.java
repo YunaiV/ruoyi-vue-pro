@@ -32,4 +32,6 @@ public class IotOtaTaskCreateReqVO {
     @Schema(description = "选中的设备编号数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "1,2,3")
     private List<Long> deviceIds;
 
+    // TODO @li：如果 deviceScope 等于 2 时，deviceIds 校验非空；
+
 }

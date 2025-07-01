@@ -3,8 +3,6 @@ package cn.iocoder.yudao.module.iot.controller.admin.ota.vo.task.record;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 @Schema(description = "管理后台 - IoT OTA 升级记录 Response VO")
 @Data
 public class IotOtaTaskRecordRespVO {
@@ -23,12 +21,6 @@ public class IotOtaTaskRecordRespVO {
     @Schema(description = "任务编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long taskId;
 
-    @Schema(description = "产品标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "iot")
-    private String productKey;
-
-    @Schema(description = "设备名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "iot")
-    private String deviceName;
-
     @Schema(description = "设备编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private String deviceId;
 
@@ -46,11 +38,5 @@ public class IotOtaTaskRecordRespVO {
 
     @Schema(description = "升级进度描述", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private String description;
-
-    @Schema(description = "升级开始时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    private LocalDateTime startTime;
-
-    @Schema(description = "升级结束时间", requiredMode = Schema.RequiredMode.REQUIRED)
-    private LocalDateTime endTime;
 
 }

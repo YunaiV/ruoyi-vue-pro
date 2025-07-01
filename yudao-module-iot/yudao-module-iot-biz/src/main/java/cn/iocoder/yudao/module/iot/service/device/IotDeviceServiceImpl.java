@@ -279,11 +279,6 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     @Override
-    public List<IotDeviceDO> getDeviceListByIdList(List<Long> deviceIdList) {
-        return deviceMapper.selectByIds(deviceIdList);
-    }
-
-    @Override
     public void updateDeviceState(IotDeviceDO device, Integer state) {
         // 1. 更新状态和时间
         IotDeviceDO updateObj = new IotDeviceDO().setId(device.getId()).setState(state);
@@ -474,14 +469,15 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     @Override
-    public void validateDevicesExist(Set<Long> ids) {
+    public List<IotDeviceDO> validateDeviceListExists(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
-            return;
+            return Collections.emptyList();
         }
-        List<IotDeviceDO> deviceIds = deviceMapper.selectByIds(ids);
-        if (deviceIds.size() != ids.size()) {
+        List<IotDeviceDO> devices = deviceMapper.selectByIds(ids);
+        if (devices.size() != ids.size()) {
             throw exception(DEVICE_NOT_EXISTS);
         }
+        return devices;
     }
 
     private IotDeviceServiceImpl getSelf() {

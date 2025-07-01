@@ -14,7 +14,7 @@ import jakarta.validation.Valid;
 public interface IotOtaTaskService {
 
     /**
-     * 创建 OTA升 级任务
+     * 创建 OTA 升级任务
      *
      * @param createReqVO 创建请求对象
      * @return 升级任务编号

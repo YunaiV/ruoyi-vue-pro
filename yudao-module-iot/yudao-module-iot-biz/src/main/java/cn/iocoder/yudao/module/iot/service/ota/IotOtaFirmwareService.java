@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;
 import jakarta.validation.Valid;
 
 /**
- * OTA 固件管理 Service
+ * OTA 固件管理 Service 接口
  *
  * @author Shelly Chan
  */

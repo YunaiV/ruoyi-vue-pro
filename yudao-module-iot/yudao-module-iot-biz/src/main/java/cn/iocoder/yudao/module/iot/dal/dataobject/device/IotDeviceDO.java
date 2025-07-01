@@ -117,7 +117,7 @@ public class IotDeviceDO extends TenantBaseDO {
      *
      * 关联 {@link IotOtaFirmwareDO#getId()}
      */
-    private String firmwareId;
+    private Long firmwareId;
 
     /**
      * 设备密钥，用于设备认证

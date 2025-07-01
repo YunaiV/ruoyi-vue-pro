@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * IoT 设备 Service 接口
@@ -155,20 +154,12 @@ public interface IotDeviceService {
     List<IotDeviceDO> getDeviceListByState(Integer state);
 
     /**
-     * 根据产品ID获取设备列表
+     * 根据产品编号，获取设备列表
      *
-     * @param productId 产品ID，用于查询特定产品的设备列表
-     * @return 返回与指定产品ID关联的设备列表，列表中的每个元素为IotDeviceDO对象
+     * @param productId 产品编号
+     * @return 设备列表
      */
     List<IotDeviceDO> getDeviceListByProductId(Long productId);
-
-    /**
-     * 根据设备ID列表获取设备信息列表
-     *
-     * @param deviceIdList 设备ID列表，包含需要查询的设备ID
-     * @return 返回与设备ID列表对应的设备信息列表，列表中的每个元素为IotDeviceDO对象
-     */
-    List<IotDeviceDO> getDeviceListByIdList(List<Long> deviceIdList);
 
     /**
      * 基于产品编号，获得设备数量
@@ -248,6 +239,6 @@ public interface IotDeviceService {
      *
      * @param ids 设备编号数组
      */
-    void validateDevicesExist(Set<Long> ids);
+    List<IotDeviceDO> validateDeviceListExists(Collection<Long> ids);
 
 }

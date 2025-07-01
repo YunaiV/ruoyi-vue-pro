@@ -7,9 +7,10 @@ import cn.iocoder.yudao.module.iot.enums.ota.IotOtaTaskRecordStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.*;
-
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * IoT OTA 升级任务记录 DO
@@ -70,13 +71,5 @@ public class IotOtaTaskRecordDO extends BaseDO {
      * 如果想看历史记录，可以查看 {@link IotDeviceMessageDO} 设备日志
      */
     private String description;
-    /**
-     * 升级开始时间
-     */
-    private LocalDateTime startTime;
-    /**
-     * 升级结束时间
-     */
-    private LocalDateTime endTime;
 
 }
