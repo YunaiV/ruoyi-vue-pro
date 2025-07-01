@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.task;
+package cn.iocoder.yudao.module.iot.controller.admin.ota.vo.task;
 
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.iot.enums.ota.IotOtaTaskDeviceScopeEnum;
@@ -9,9 +9,9 @@ import lombok.Data;
 
 import java.util.List;
 
-@Schema(description = "管理后台 - IoT OTA 升级任务创建/修改 Request VO")
+@Schema(description = "管理后台 - IoT OTA 升级任务创建 Request VO")
 @Data
-public class IotOtaUpgradeTaskSaveReqVO {
+public class IotOtaTaskCreateReqVO {
 
     @NotEmpty(message = "任务名称不能为空")
     @Schema(description = "任务名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "升级任务")
@@ -27,7 +27,7 @@ public class IotOtaUpgradeTaskSaveReqVO {
     @Schema(description = "升级范围", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "升级范围不能为空")
     @InEnum(value = IotOtaTaskDeviceScopeEnum.class)
-    private Integer scope;
+    private Integer deviceScope;
 
     @Schema(description = "选中的设备编号数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "1,2,3")
     private List<Long> deviceIds;

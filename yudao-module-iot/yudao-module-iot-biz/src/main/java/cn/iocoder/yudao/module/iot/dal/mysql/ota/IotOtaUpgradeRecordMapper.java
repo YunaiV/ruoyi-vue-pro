@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.dal.mysql.ota;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.record.IotOtaUpgradeRecordPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.task.record.IotOtaTaskRecordPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaTaskRecordDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -80,11 +80,11 @@ public interface IotOtaUpgradeRecordMapper extends BaseMapperX<IotOtaTaskRecordD
      * @return 返回分页查询结果，包含符合条件的 OTA升级记录列表
      */
     // TODO @li：selectPage 就 ok 拉。
-    default PageResult<IotOtaTaskRecordDO> selectUpgradeRecordPage(IotOtaUpgradeRecordPageReqVO pageReqVO) {
+    default PageResult<IotOtaTaskRecordDO> selectUpgradeRecordPage(IotOtaTaskRecordPageReqVO pageReqVO) {
         // TODO @li：这里的注释，可以去掉哈；然后下面的“如果”。。。也没必要注释
         // 使用LambdaQueryWrapperX构建查询条件，并根据请求参数动态添加查询条件
         return selectPage(pageReqVO, new LambdaQueryWrapperX<IotOtaTaskRecordDO>()
-                .likeIfPresent(IotOtaTaskRecordDO::getDeviceName, pageReqVO.getDeviceName()) // 如果设备名称存在，则添加模糊查询条件
+//                .likeIfPresent(IotOtaTaskRecordDO::getDeviceName, pageReqVO.getDeviceName()) // 如果设备名称存在，则添加模糊查询条件
                 .eqIfPresent(IotOtaTaskRecordDO::getTaskId, pageReqVO.getTaskId())); // 如果任务ID存在，则添加等值查询条件
     }
 

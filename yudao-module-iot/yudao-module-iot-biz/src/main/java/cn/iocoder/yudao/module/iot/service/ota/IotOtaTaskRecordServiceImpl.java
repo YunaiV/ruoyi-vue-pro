@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.iot.service.ota;
 import cn.hutool.core.convert.Convert;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
-import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.record.IotOtaUpgradeRecordPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.task.record.IotOtaTaskRecordPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaTaskRecordDO;
@@ -29,40 +29,39 @@ import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
 @Slf4j
 @Service
 @Validated
-public class IotOtaUpgradeRecordServiceImpl implements IotOtaUpgradeRecordService {
+public class IotOtaTaskRecordServiceImpl implements IotOtaTaskRecordService {
 
     @Resource
-    private IotOtaUpgradeRecordMapper upgradeRecordMapper;
+    private IotOtaUpgradeRecordMapper iotOtaUpgradeRecordMapper;
+
     @Resource
     private IotDeviceService deviceService;
     @Resource
     private IotOtaFirmwareService firmwareService;
     @Resource
-    private IotOtaUpgradeTaskService upgradeTaskService;
+    private IotOtaTaskService upgradeTaskService;
 
     @Override
-    public void createOtaUpgradeRecordBatch(List<Long> deviceIds, Long firmwareId, Long upgradeTaskId) {
+    public void createOtaTaskRecordBatch(List<Long> deviceIds, Long firmwareId, Long upgradeTaskId) {
         // 1. 校验升级记录信息是否存在，并且已经取消的任务可以重新开始
         deviceIds.forEach(deviceId -> validateUpgradeRecordDuplicate(firmwareId, upgradeTaskId, String.valueOf(deviceId)));
 
         // 2. 初始化OTA升级记录列表信息
-        IotOtaTaskDO upgradeTask = upgradeTaskService.getUpgradeTask(upgradeTaskId);
+        IotOtaTaskDO upgradeTask = upgradeTaskService.getOtaTask(upgradeTaskId);
         IotOtaFirmwareDO firmware = firmwareService.getOtaFirmware(firmwareId);
         List<IotDeviceDO> deviceList = deviceService.getDeviceListByIdList(deviceIds);
         List<IotOtaTaskRecordDO> upgradeRecordList = deviceList.stream().map(device -> {
             IotOtaTaskRecordDO upgradeRecord = new IotOtaTaskRecordDO();
             upgradeRecord.setFirmwareId(firmware.getId());
             upgradeRecord.setTaskId(upgradeTask.getId());
-            upgradeRecord.setProductKey(device.getProductKey());
-            upgradeRecord.setDeviceName(device.getDeviceName());
-            upgradeRecord.setDeviceId(Convert.toStr(device.getId()));
+            upgradeRecord.setDeviceId(device.getId());
             upgradeRecord.setFromFirmwareId(Convert.toLong(device.getFirmwareId()));
             upgradeRecord.setStatus(IotOtaTaskRecordStatusEnum.PENDING.getStatus());
             upgradeRecord.setProgress(0);
             return upgradeRecord;
         }).toList();
         // 3. 保存数据
-        upgradeRecordMapper.insertBatch(upgradeRecordList);
+        iotOtaUpgradeRecordMapper.insertBatch(upgradeRecordList);
         // TODO @芋艿：在这里需要处理推送升级任务的逻辑
     }
 
@@ -76,9 +75,9 @@ public class IotOtaUpgradeRecordServiceImpl implements IotOtaUpgradeRecordServic
      */
     @Override
     @Transactional
-    public Map<Integer, Long> getOtaUpgradeRecordCount(IotOtaUpgradeRecordPageReqVO pageReqVO) {
+    public Map<Integer, Long> getOtaTaskRecordCount(IotOtaTaskRecordPageReqVO pageReqVO) {
         // 分别查询不同状态的OTA升级记录数量
-        List<Map<String, Object>> upgradeRecordCountList = upgradeRecordMapper.selectOtaUpgradeRecordCount(
+        List<Map<String, Object>> upgradeRecordCountList = iotOtaUpgradeRecordMapper.selectOtaUpgradeRecordCount(
                 pageReqVO.getTaskId(), pageReqVO.getDeviceName());
         Map<String, Object> upgradeRecordCountMap = ObjectUtils.defaultIfNull(upgradeRecordCountList.get(0));
         Objects.requireNonNull(upgradeRecordCountMap);
@@ -89,9 +88,9 @@ public class IotOtaUpgradeRecordServiceImpl implements IotOtaUpgradeRecordServic
 
     @Override
     @Transactional
-    public Map<Integer, Long> getOtaUpgradeRecordStatistics(Long firmwareId) {
+    public Map<Integer, Long> getOtaTaskRecordStatistics(Long firmwareId) {
         // 查询并统计不同状态的OTA升级记录数量
-        List<Map<String, Object>> upgradeRecordStatisticsList = upgradeRecordMapper.selectOtaUpgradeRecordStatistics(firmwareId);
+        List<Map<String, Object>> upgradeRecordStatisticsList = iotOtaUpgradeRecordMapper.selectOtaUpgradeRecordStatistics(firmwareId);
         Map<String, Object> upgradeRecordStatisticsMap = ObjectUtils.defaultIfNull(upgradeRecordStatisticsList.get(0));
         Objects.requireNonNull(upgradeRecordStatisticsMap);
         return upgradeRecordStatisticsMap.entrySet().stream().collect(Collectors.toMap(
@@ -100,19 +99,19 @@ public class IotOtaUpgradeRecordServiceImpl implements IotOtaUpgradeRecordServic
     }
 
     @Override
-    public IotOtaTaskRecordDO getUpgradeRecord(Long id) {
-        return upgradeRecordMapper.selectById(id);
+    public IotOtaTaskRecordDO getOtaTaskRecord(Long id) {
+        return iotOtaUpgradeRecordMapper.selectById(id);
     }
 
     @Override
-    public PageResult<IotOtaTaskRecordDO> getUpgradeRecordPage(IotOtaUpgradeRecordPageReqVO pageReqVO) {
-        return upgradeRecordMapper.selectUpgradeRecordPage(pageReqVO);
+    public PageResult<IotOtaTaskRecordDO> getOtaTaskRecordPage(IotOtaTaskRecordPageReqVO pageReqVO) {
+        return iotOtaUpgradeRecordMapper.selectUpgradeRecordPage(pageReqVO);
     }
 
     @Override
     public void cancelUpgradeRecordByTaskId(Long taskId) {
         // 暂定只有待推送的升级记录可以取消 TODO @芋艿：可以看看阿里云，哪些可以取消
-        upgradeRecordMapper.updateUpgradeRecordStatusByTaskIdAndStatus(
+        iotOtaUpgradeRecordMapper.updateUpgradeRecordStatusByTaskIdAndStatus(
                 IotOtaTaskRecordStatusEnum.CANCELED.getStatus(), taskId,
                 IotOtaTaskRecordStatusEnum.PENDING.getStatus());
     }
@@ -127,7 +126,7 @@ public class IotOtaUpgradeRecordServiceImpl implements IotOtaUpgradeRecordServic
      */
     private IotOtaTaskRecordDO validateUpgradeRecordExists(Long id) {
         // 根据ID查询升级记录
-        IotOtaTaskRecordDO upgradeRecord = upgradeRecordMapper.selectById(id);
+        IotOtaTaskRecordDO upgradeRecord = iotOtaUpgradeRecordMapper.selectById(id);
         // 如果查询结果为空，抛出异常
         if (upgradeRecord == null) {
             throw exception(OTA_UPGRADE_RECORD_NOT_EXISTS);
@@ -147,7 +146,7 @@ public class IotOtaUpgradeRecordServiceImpl implements IotOtaUpgradeRecordServic
      * @param deviceId   设备ID，用于标识特定的设备
      */
     private void validateUpgradeRecordDuplicate(Long firmwareId, Long taskId, String deviceId) {
-        IotOtaTaskRecordDO upgradeRecord = upgradeRecordMapper.selectByConditions(firmwareId, taskId, deviceId);
+        IotOtaTaskRecordDO upgradeRecord = iotOtaUpgradeRecordMapper.selectByConditions(firmwareId, taskId, deviceId);
         if (upgradeRecord == null) {
             return;
         }

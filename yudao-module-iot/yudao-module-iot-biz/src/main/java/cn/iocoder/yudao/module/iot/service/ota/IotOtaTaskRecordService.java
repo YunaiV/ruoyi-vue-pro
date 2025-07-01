@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.ota;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.upgrade.record.IotOtaUpgradeRecordPageReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.task.record.IotOtaTaskRecordPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaTaskRecordDO;
 import jakarta.validation.Valid;
 
@@ -13,7 +13,7 @@ import java.util.Map;
  * IotOtaUpgradeRecordService 接口定义了与物联网设备OTA升级记录相关的操作。
  * 该接口提供了创建、更新、查询、统计和重试升级记录的功能。
  */
-public interface IotOtaUpgradeRecordService {
+public interface IotOtaTaskRecordService {
 
     /**
      * 批量创建 OTA 升级记录
@@ -23,37 +23,37 @@ public interface IotOtaUpgradeRecordService {
      * @param firmwareId    固件ID，表示要升级到的固件版本。
      * @param upgradeTaskId 升级任务ID，表示此次升级任务的唯一标识。
      */
-    void createOtaUpgradeRecordBatch(List<Long> deviceIds, Long firmwareId, Long upgradeTaskId);
+    void createOtaTaskRecordBatch(List<Long> deviceIds, Long firmwareId, Long upgradeTaskId);
 
     /**
      * 获取 OTA 升级记录的数量统计
      *
      * @return 返回一个 Map，其中键为状态码，值为对应状态的升级记录数量
      */
-    Map<Integer, Long> getOtaUpgradeRecordCount(@Valid IotOtaUpgradeRecordPageReqVO pageReqVO);
+    Map<Integer, Long> getOtaTaskRecordCount(@Valid IotOtaTaskRecordPageReqVO pageReqVO);
 
     /**
-     * 获取 OTA 升级记录的统计信息。
+     * 获取 OTA 升级记录的统计信息
      *
      * @return 返回一个 Map，其中键为状态码，值为对应状态的升级记录统计信息
      */
-    Map<Integer, Long> getOtaUpgradeRecordStatistics(Long firmwareId);
+    Map<Integer, Long> getOtaTaskRecordStatistics(Long firmwareId);
 
     /**
-     * 获取指定 ID 的 OTA 升级记录的详细信息。
+     * 获取指定 ID 的 OTA 升级记录的详细信息
      *
-     * @param id 需要查询的升级记录的ID。
-     * @return 返回包含升级记录详细信息的响应对象。
+     * @param id 需要查询的升级记录的 ID
+     * @return 返回包含升级记录详细信息的响应对象
      */
-    IotOtaTaskRecordDO getUpgradeRecord(Long id);
+    IotOtaTaskRecordDO getOtaTaskRecord(Long id);
 
     /**
-     * 分页查询 OTA 升级记录。
+     * 分页查询 OTA 升级记录
      *
      * @param pageReqVO 包含分页查询条件的请求对象，必须经过验证。
      * @return 返回包含分页查询结果的响应对象。
      */
-    PageResult<IotOtaTaskRecordDO> getUpgradeRecordPage(@Valid IotOtaUpgradeRecordPageReqVO pageReqVO);
+    PageResult<IotOtaTaskRecordDO> getOtaTaskRecordPage(@Valid IotOtaTaskRecordPageReqVO pageReqVO);
 
     /**
      * 根据任务 ID 取消升级记录
