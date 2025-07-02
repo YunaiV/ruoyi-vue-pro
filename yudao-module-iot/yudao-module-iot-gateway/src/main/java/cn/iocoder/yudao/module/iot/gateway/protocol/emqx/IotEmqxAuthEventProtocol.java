@@ -28,20 +28,20 @@ public class IotEmqxAuthEventProtocol {
 
     private final String serverId;
 
-    private Vertx vertx;
+    private final Vertx vertx;
 
     private HttpServer httpServer;
 
-    public IotEmqxAuthEventProtocol(IotGatewayProperties.EmqxProperties emqxProperties) {
+    public IotEmqxAuthEventProtocol(IotGatewayProperties.EmqxProperties emqxProperties,
+                                    Vertx vertx) {
         this.emqxProperties = emqxProperties;
+        this.vertx = vertx;
         this.serverId = IotDeviceMessageUtils.generateServerId(emqxProperties.getMqttPort());
     }
 
     @PostConstruct
     public void start() {
         try {
-            // 创建 Vertx 实例
-            this.vertx = Vertx.vertx();
             startHttpServer();
             log.info("[start][IoT 网关 EMQX 认证事件协议服务启动成功, 端口: {}]", emqxProperties.getHttpPort());
         } catch (Exception e) {
@@ -53,17 +53,6 @@ public class IotEmqxAuthEventProtocol {
     @PreDestroy
     public void stop() {
         stopHttpServer();
-
-        // 关闭 Vertx 实例
-        if (vertx != null) {
-            try {
-                vertx.close();
-                log.debug("[stop][Vertx 实例已关闭]");
-            } catch (Exception e) {
-                log.warn("[stop][关闭 Vertx 实例失败]", e);
-            }
-        }
-
         log.info("[stop][IoT 网关 EMQX 认证事件协议服务已停止]");
     }
 

@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageIdentifierEnum;
 import cn.iocoder.yudao.module.iot.enums.device.IotDeviceMessageTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneActionTypeEnum;
-import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerConditionParameterOperatorEnum;
+import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneConditionOperatorEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotRuleSceneTriggerTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -22,8 +22,9 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.Map;
 
+// TODO @芋艿：优化注释；
 /**
- * IoT 场景联动 DO
+ * IoT 场景联动规则 DO
  *
  * @author 芋道源码
  */
@@ -163,7 +164,7 @@ public class IotRuleSceneDO extends TenantBaseDO {
         /**
          * 操作符
          *
-         * 枚举 {@link IotRuleSceneTriggerConditionParameterOperatorEnum}
+         * 枚举 {@link IotRuleSceneConditionOperatorEnum}
          */
         private String operator;
 
@@ -171,7 +172,7 @@ public class IotRuleSceneDO extends TenantBaseDO {
          * 比较值
          *
          * 如果有多个值，则使用 "," 分隔，类似 "1,2,3"。
-         * 例如说，{@link IotRuleSceneTriggerConditionParameterOperatorEnum#IN}、{@link IotRuleSceneTriggerConditionParameterOperatorEnum#BETWEEN}
+         * 例如说，{@link IotRuleSceneConditionOperatorEnum#IN}、{@link IotRuleSceneConditionOperatorEnum#BETWEEN}
          */
         private String value;
 
@@ -193,17 +194,9 @@ public class IotRuleSceneDO extends TenantBaseDO {
         /**
          * 设备控制
          *
-         * 必填：当 {@link #type} 为 {@link IotRuleSceneActionTypeEnum#DEVICE_CONTROL} 时
+         * 必填：当 {@link #type} 为 {@link IotRuleSceneActionTypeEnum#DEVICE_PROPERTY_SET} 时
          */
         private ActionDeviceControl deviceControl;
-
-        /**
-         * 数据桥接编号
-         *
-         * 必填：当 {@link #type} 为 {@link IotRuleSceneActionTypeEnum#DATA_BRIDGE} 时
-         * 关联：{@link IotDataBridgeDO#getId()}
-         */
-        private Long dataBridgeId;
 
     }
 

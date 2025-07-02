@@ -19,8 +19,9 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
 
     // ========== 设备状态 ==========
 
-    STATE_ONLINE("thing.state.online", "设备上线", true),
-    STATE_OFFLINE("thing.state.offline", "设备下线", true),
+    STATE_UPDATE("thing.state.update", "设备状态更新", true),
+
+    // TODO 芋艿：要不要加个 ping 消息；
 
     // ========== 设备属性 ==========
     // 可参考：https://help.aliyun.com/zh/iot/user-guide/device-properties-events-and-services
@@ -49,7 +50,7 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
     /**
      * 不进行 reply 回复的方法集合
      */
-    public static final Set<String> REPLY_DISABLED = Set.of(STATE_ONLINE.getMethod(), STATE_OFFLINE.getMethod());
+    public static final Set<String> REPLY_DISABLED = Set.of(STATE_UPDATE.getMethod());
 
     private final String method;
 

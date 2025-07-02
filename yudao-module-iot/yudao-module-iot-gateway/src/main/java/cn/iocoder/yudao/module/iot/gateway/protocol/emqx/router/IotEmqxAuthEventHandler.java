@@ -209,7 +209,7 @@ public class IotEmqxAuthEventHandler {
 
         try {
             // 2. 构建设备状态消息
-            IotDeviceMessage message = online ? IotDeviceMessage.buildStateOnline()
+            IotDeviceMessage message = online ? IotDeviceMessage.buildStateUpdateOnline()
                     : IotDeviceMessage.buildStateOffline();
 
             // 3. 发送设备状态消息

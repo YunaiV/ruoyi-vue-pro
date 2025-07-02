@@ -41,6 +41,11 @@ yudao:
           mqtt-ssl: false
           mqtt-topics:
             - "/sys/#"                         # 系统主题
+        # ====================================
+        # 针对引入的 TCP 组件的配置
+        # ====================================
+        tcp:
+          enabled: false
 
     # 消息总线配置
     message-bus:

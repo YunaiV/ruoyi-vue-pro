@@ -3,16 +3,17 @@ package cn.iocoder.yudao.module.iot.service.device;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
-import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * IoT 设备 Service 接口
@@ -28,18 +29,6 @@ public interface IotDeviceService {
      * @return 编号
      */
     Long createDevice(@Valid IotDeviceSaveReqVO createReqVO);
-
-    /**
-     * 【设备注册】创建设备
-     *
-     * @param productKey 产品标识
-     * @param deviceName 设备名称
-     * @param gatewayId  网关设备 ID
-     * @return 设备
-     */
-    IotDeviceDO createDevice(@NotEmpty(message = "产品标识不能为空") String productKey,
-                             @NotEmpty(message = "设备名称不能为空") String deviceName,
-                             Long gatewayId);
 
     /**
      * 更新设备
@@ -151,12 +140,14 @@ public interface IotDeviceService {
     PageResult<IotDeviceDO> getDevicePage(IotDevicePageReqVO pageReqVO);
 
     /**
-     * 基于设备类型，获得设备列表
+     * 根据条件，获得设备列表
      *
      * @param deviceType 设备类型
+     * @param productId 产品编号
      * @return 设备列表
      */
-    List<IotDeviceDO> getDeviceListByDeviceType(@Nullable Integer deviceType);
+    List<IotDeviceDO> getDeviceListByCondition(@Nullable Integer deviceType,
+                                               @Nullable Long productId);
 
     /**
      * 获得状态，获得设备列表
@@ -167,20 +158,12 @@ public interface IotDeviceService {
     List<IotDeviceDO> getDeviceListByState(Integer state);
 
     /**
-     * 根据产品ID获取设备列表
+     * 根据产品编号，获取设备列表
      *
-     * @param productId 产品ID，用于查询特定产品的设备列表
-     * @return 返回与指定产品ID关联的设备列表，列表中的每个元素为IotDeviceDO对象
+     * @param productId 产品编号
+     * @return 设备列表
      */
     List<IotDeviceDO> getDeviceListByProductId(Long productId);
-
-    /**
-     * 根据设备ID列表获取设备信息列表
-     *
-     * @param deviceIdList 设备ID列表，包含需要查询的设备ID
-     * @return 返回与设备ID列表对应的设备信息列表，列表中的每个元素为IotDeviceDO对象
-     */
-    List<IotDeviceDO> getDeviceListByIdList(List<Long> deviceIdList);
 
     /**
      * 基于产品编号，获得设备数量
@@ -254,5 +237,30 @@ public interface IotDeviceService {
      * @return 是否认证成功
      */
     boolean authDevice(@Valid IotDeviceAuthReqDTO authReqDTO);
+
+    /**
+     * 校验设备是否存在
+     *
+     * @param ids 设备编号数组
+     */
+    List<IotDeviceDO> validateDeviceListExists(Collection<Long> ids);
+
+    /**
+     * 获得设备列表
+     *
+     * @param ids 设备编号数组
+     * @return 设备列表
+     */
+    List<IotDeviceDO> getDeviceList(Collection<Long> ids);
+
+    /**
+     * 获得设备 Map
+     *
+     * @param ids 设备编号数组
+     * @return 设备 Map
+     */
+    default Map<Long, IotDeviceDO> getDeviceMap(Collection<Long> ids) {
+        return convertMap(getDeviceList(ids), IotDeviceDO::getId);
+    }
 
 }

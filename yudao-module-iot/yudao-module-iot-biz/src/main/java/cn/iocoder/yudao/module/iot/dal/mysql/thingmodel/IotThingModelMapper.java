@@ -25,8 +25,6 @@ public interface IotThingModelMapper extends BaseMapperX<IotThingModelDO> {
                 .likeIfPresent(IotThingModelDO::getName, reqVO.getName())
                 .eqIfPresent(IotThingModelDO::getType, reqVO.getType())
                 .eqIfPresent(IotThingModelDO::getProductId, reqVO.getProductId())
-                // TODO @芋艿：看看要不要加枚举
-                .notIn(IotThingModelDO::getIdentifier, "get", "set", "post")
                 .orderByDesc(IotThingModelDO::getId));
     }
 
@@ -36,8 +34,6 @@ public interface IotThingModelMapper extends BaseMapperX<IotThingModelDO> {
                 .likeIfPresent(IotThingModelDO::getName, reqVO.getName())
                 .eqIfPresent(IotThingModelDO::getType, reqVO.getType())
                 .eqIfPresent(IotThingModelDO::getProductId, reqVO.getProductId())
-                // TODO @芋艿：看看要不要加枚举
-                .notIn(IotThingModelDO::getIdentifier, "get", "set", "post")
                 .orderByDesc(IotThingModelDO::getId));
     }
 
@@ -59,15 +55,6 @@ public interface IotThingModelMapper extends BaseMapperX<IotThingModelDO> {
     default List<IotThingModelDO> selectListByProductIdAndType(Long productId, Integer type) {
         return selectList(IotThingModelDO::getProductId, productId,
                 IotThingModelDO::getType, type);
-    }
-
-    default List<IotThingModelDO> selectListByProductIdAndIdentifiersAndTypes(Long productId,
-                                                                              List<String> identifiers,
-                                                                              List<Integer> types) {
-        return selectList(new LambdaQueryWrapperX<IotThingModelDO>()
-                .eq(IotThingModelDO::getProductId, productId)
-                .in(IotThingModelDO::getIdentifier, identifiers)
-                .in(IotThingModelDO::getType, types));
     }
 
     default IotThingModelDO selectByProductIdAndName(Long productId, String name) {

@@ -78,7 +78,7 @@ public class IotHttpAuthHandler extends IotHttpAbstractHandler {
         Assert.notBlank(token, "生成 token 不能为空位");
 
         // 3. 执行上线
-        IotDeviceMessage message = IotDeviceMessage.buildStateOnline();
+        IotDeviceMessage message = IotDeviceMessage.buildStateUpdateOnline();
         deviceMessageService.sendDeviceMessage(message,
                 deviceInfo.getProductKey(), deviceInfo.getDeviceName(), protocol.getServerId());
 

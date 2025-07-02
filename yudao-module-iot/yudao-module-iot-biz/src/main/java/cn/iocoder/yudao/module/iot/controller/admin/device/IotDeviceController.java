@@ -9,9 +9,9 @@ import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.device.*;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
-import cn.iocoder.yudao.module.iot.service.device.message.IotDeviceMessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,8 +38,6 @@ public class IotDeviceController {
 
     @Resource
     private IotDeviceService deviceService;
-    @Resource
-    private IotDeviceMessageService deviceMessageService;
 
     @PostMapping("/create")
     @Operation(summary = "创建设备")
@@ -124,12 +122,17 @@ public class IotDeviceController {
 
     @GetMapping("/simple-list")
     @Operation(summary = "获取设备的精简信息列表", description = "主要用于前端的下拉选项")
-    @Parameter(name = "deviceType", description = "设备类型", example = "1")
-    public CommonResult<List<IotDeviceRespVO>> getSimpleDeviceList(
-            @RequestParam(value = "deviceType", required = false) Integer deviceType) {
-        List<IotDeviceDO> list = deviceService.getDeviceListByDeviceType(deviceType);
-        return success(convertList(list, device ->  // 只返回 id、name 字段
-                new IotDeviceRespVO().setId(device.getId()).setDeviceName(device.getDeviceName())));
+    @Parameters({
+            @Parameter(name = "deviceType", description = "设备类型", example = "1"),
+            @Parameter(name = "productId", description = "产品编号", example = "1024")
+    })
+    public CommonResult<List<IotDeviceRespVO>> getDeviceSimpleList(
+            @RequestParam(value = "deviceType", required = false) Integer deviceType,
+            @RequestParam(value = "productId", required = false) Long productId) {
+        List<IotDeviceDO> list = deviceService.getDeviceListByCondition(deviceType, productId);
+        return success(convertList(list, device ->  // 只返回 id、name、productId 字段
+                new IotDeviceRespVO().setId(device.getId()).setDeviceName(device.getDeviceName())
+                        .setProductId(device.getProductId())));
     }
 
     @PostMapping("/import")

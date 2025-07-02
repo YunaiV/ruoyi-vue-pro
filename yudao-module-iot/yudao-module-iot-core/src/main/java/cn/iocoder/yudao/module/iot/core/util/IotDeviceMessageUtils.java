@@ -55,11 +55,16 @@ public class IotDeviceMessageUtils {
      */
     @SuppressWarnings("unchecked")
     public static String getIdentifier(IotDeviceMessage message) {
+        if (message.getParams() == null) {
+            return null;
+        }
         if (StrUtil.equalsAny(message.getMethod(), IotDeviceMessageMethodEnum.EVENT_POST.getMethod(),
-                message.getMethod(), IotDeviceMessageMethodEnum.SERVICE_INVOKE.getMethod())
-            && message.getParams() != null) {
+                IotDeviceMessageMethodEnum.SERVICE_INVOKE.getMethod())) {
             Map<String, Object> params = (Map<String, Object>) message.getParams();
             return MapUtil.getStr(params, "identifier");
+        }  else if (StrUtil.equalsAny(message.getMethod(), IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod())) {
+            Map<String, Object> params = (Map<String, Object>) message.getParams();
+            return MapUtil.getStr(params, "state");
         }
         return null;
     }

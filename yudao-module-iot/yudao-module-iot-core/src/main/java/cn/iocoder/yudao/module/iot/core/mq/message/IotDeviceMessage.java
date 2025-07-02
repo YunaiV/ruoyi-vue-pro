@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.iot.core.mq.message;
 
+import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -128,12 +130,14 @@ public class IotDeviceMessage {
 
     // ========== 核心方法：在 of 基础方法之上，添加对应 method ==========
 
-    public static IotDeviceMessage buildStateOnline() {
-        return requestOf(IotDeviceMessageMethodEnum.STATE_ONLINE.getMethod());
+    public static IotDeviceMessage buildStateUpdateOnline() {
+        return requestOf(IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod(),
+                MapUtil.of("state", IotDeviceStateEnum.ONLINE.getState()));
     }
 
     public static IotDeviceMessage buildStateOffline() {
-        return requestOf(IotDeviceMessageMethodEnum.STATE_OFFLINE.getMethod());
+        return requestOf(IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod(),
+                MapUtil.of("state", IotDeviceStateEnum.OFFLINE.getState()));
     }
 
 }

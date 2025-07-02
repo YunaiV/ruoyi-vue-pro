@@ -29,6 +29,11 @@ import java.util.Set;
 public class IotDeviceDO extends TenantBaseDO {
 
     /**
+     * 设备编号 - 全部设备
+     */
+    public static final Long DEVICE_ID_ALL = 0L;
+
+    /**
      * 设备 ID，主键，自增
      */
     @TableId
@@ -112,7 +117,7 @@ public class IotDeviceDO extends TenantBaseDO {
      *
      * 关联 {@link IotOtaFirmwareDO#getId()}
      */
-    private String firmwareId;
+    private Long firmwareId;
 
     /**
      * 设备密钥，用于设备认证

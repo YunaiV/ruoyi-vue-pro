@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.mq.consumer.device;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceStateEnum;
@@ -19,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * 针对 {@link IotDeviceMessage} 的业务处理器：调用 method 对应的逻辑。例如说：
@@ -83,15 +83,14 @@ public class IotDeviceMessageSubscriber implements IotMessageSubscriber<IotDevic
             return;
         }
         // 如果是 STATE 相关的消息，无需处理，不然就重复处理状态了
-        if (ObjectUtils.equalsAny(message.getMethod(), IotDeviceMessageMethodEnum.STATE_ONLINE.getMethod(),
-                IotDeviceMessageMethodEnum.STATE_OFFLINE.getMethod())) {
+        if (Objects.equals(message.getMethod(), IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod())) {
             return;
         }
 
         // 特殊：设备非在线时，主动标记设备为在线
         // 为什么不直接更新状态呢？因为通过 IotDeviceMessage 可以经过一系列的处理，例如说记录日志、规则引擎等等
         try {
-            deviceMessageService.sendDeviceMessage(IotDeviceMessage.buildStateOnline().setDeviceId(device.getId()));
+            deviceMessageService.sendDeviceMessage(IotDeviceMessage.buildStateUpdateOnline().setDeviceId(device.getId()));
         } catch (Exception e) {
             // 注意：即使执行失败，也不影响主流程
             log.error("[forceDeviceOnline][message({}) device({}) 强制设备上线失败]", message, device, e);
